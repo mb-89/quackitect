@@ -207,3 +207,8 @@
 {"ts":"2026-08-20T11:24:47.984Z","op":"update","visit":"iterations/i38/derive-criteria@0","node":"d98","brief":"criterion minted; re-reading the drawn cards"}
 {"ts":"2026-08-20T11:25:10.940Z","op":"update","visit":"iterations/i38/derive-criteria@0","node":"d99","brief":"criteria: standing set reused, one axis added"}
 {"ts":"2026-08-20T11:26:00.967Z","op":"update","visit":"iterations/i38/derive-criteria@0","node":"d100","brief":"compare cards rendered from the nodes"}
+{"ts":"2026-08-20T11:26:52.513Z","op":"update","visit":"iterations/i38/derive-functions@0","node":"d101","brief":"functions re-earned; the new axis has no function by design"}
+{"ts":"2026-08-20T11:27:11.887Z","op":"update","visit":"iterations/i38/derive-functions@0","node":"d102","brief":"re-aiming at ship; the target had cleared"}
+{"ts":"2026-08-20T11:28:00.683Z","op":"update","visit":"iterations/i38/derive-functions@0","node":"d103","brief":"the repeatability axis gets the two functions that carry it"}
+{"ts":"2026-08-20T11:28:01.263Z","op":"update","visit":"iterations/i38/derive-functions@0","node":"d104","brief":"functions re-earned; the checker refuted the prose"}
+{"ts":"2026-08-20T11:28:30.710Z","op":"done","visit":"iterations/i38/derive-criteria@0","node":"d92","brief":"derive-functions re-signed with the axis covered"}

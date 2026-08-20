@@ -6,6 +6,7 @@ cluster: the-walk
 statement: put the named driver where whoever is driving can read it, and take no further action on it
 satisfies:
   - req-the-machine-names-a-driver-and-starts-nothing
+  - req-a-machine-decision-repeats
 inputs:
   - flow-driver-recommendation
 outputs:
@@ -13,6 +14,11 @@ outputs:
 ---
 
 ## Rationale
+
+IT ALSO CARRIES THE SECOND HALF OF REPEATABILITY: what was read. An answer that
+repeats but cannot say what it was derived from is reproducible only by luck —
+nobody can tell whether it repeated because the inputs held or because nothing
+looked. Publishing the driver publishes the reading behind it.
 
 THE FUNCTION IS THE FULL STOP. Publishing is where the machine's part ends, and the requirement beside it forbids the obvious next step.
 

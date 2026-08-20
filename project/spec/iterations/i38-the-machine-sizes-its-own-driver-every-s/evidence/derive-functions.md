@@ -1,7 +1,7 @@
 ---
 form: derive-functions
 by: agent
-signed_off: 2026-08-20T11:09:17.345Z
+signed_off: 2026-08-20T11:28:01.600Z
 reopened: "2026-08-20T11:09:16.268Z — write-requirements was re-signed after it: the complexity value is now per column, and flow-step-difficulty and the obtain function describe a per-row value"
 authors: agent
 files:
@@ -61,6 +61,14 @@ THE TEST I APPLIED: could a completely different implementation satisfy these fi
 - RE-EARNED AFTER THE PER-COLUMN PROBE. Two nodes changed and the function set did not: flow-step-difficulty and fn-...obtain-a-step-s-difficulty are now keyed to the change size being walked rather than to the row. The other four functions are unaffected, because a reduction, a lookup, a publication and a stamp do not care where the number came from.
 
 - THAT IS THE NEUTRALITY CHECK PAYING OFF RATHER THAN AN ACCIDENT. The impurity this form admitted was that flow-step-difficulty encoded "declared" into the flow layer. The correction landed on exactly that flow and on the one function that reads it, and nothing else in the layer moved.
+
+- RE-EARNED AT M4 AFTER derive-criteria ADDED A REQUIREMENT, and the first attempt at this paragraph was wrong in a way worth keeping. It argued that req-a-machine-decision-repeats needs NO function, because repeatability is a property of the chain rather than a thing any link does. THE ENGINE REFUSED THE FORM: every requirement is covered by a function, and nothing in the corpus refined it.
+
+- THE CHECKER WAS RIGHT AND THE PROSE WAS A RATIONALISATION. Every standing quality axis is satisfied by a function — one-second answers by serve-a-step, every-call-logged by keep-the-record, audit-from-log by the same. There was no reason mine should be the exception except that I had not decided where it belonged.
+
+- IT BELONGS ON TWO. fn-...resolve-a-difficulty-to-a-driver is where repeatability is true or false: the others read, reduce and publish, and this one turns an input into the decision. fn-...publish-the-driver-outward carries the second half — recording what was read, without which an answer that repeats is reproducible only by luck.
+
+- THIS IS THE MECHANICAL-CHECK ARGUMENT LANDING ON ITS AUTHOR, which is worth more than another example of it landing on somebody else. A coverage rule the engine enforces caught a coverage gap I had just written a paragraph excusing.
 
 ## anything_else
 
