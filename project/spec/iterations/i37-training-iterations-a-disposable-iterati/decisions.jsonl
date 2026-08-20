@@ -1786,3 +1786,6 @@
 {"ts":"2026-08-20T13:36:00.971Z","op":"done","visit":"iterations/i37/gate-validation@0","node":"d1015","brief":"package built and driven"}
 {"ts":"2026-08-20T13:36:01.375Z","op":"done","visit":"iterations/i37/gate-validation@0","node":"d1016","brief":"package built and driven"}
 {"ts":"2026-08-20T13:36:10.137Z","op":"plan","visit":"iterations/i37/package@0","parent":null,"nodes":[{"id":"d1024","brief":"the package is built"},{"id":"d1025","brief":"unpacked"},{"id":"d1026","brief":"installed and driven"}]}
+{"ts":"2026-08-20T13:36:41.033Z","op":"update","visit":"iterations/i37/gate-release@0","node":"d1027","brief":"discovering what gate-release asks"}
+{"ts":"2026-08-20T13:40:34.739Z","op":"update","visit":"iterations/i37/gate-release@0","node":"d1028","brief":"gate-release: pass with one override, and what ships known"}
+{"ts":"2026-08-20T13:40:47.582Z","op":"update","visit":"iterations/i37/shipped@0","node":"d1029","brief":"at the ship state"}
