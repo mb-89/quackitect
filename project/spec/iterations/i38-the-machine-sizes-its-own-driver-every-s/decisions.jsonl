@@ -490,3 +490,8 @@
 {"ts":"2026-08-20T14:57:49.748Z","op":"done","visit":"iterations/i38/cut-criteria@2","node":"d49","brief":"landed"}
 {"ts":"2026-08-20T14:57:50.192Z","op":"done","visit":"iterations/i38/record-adrs@0","node":"d60","brief":"landed"}
 {"ts":"2026-08-20T14:57:50.682Z","op":"done","visit":"iterations/i38/record-adrs@0","node":"d61","brief":"landed"}
+{"ts":"2026-08-20T14:58:20.106Z","op":"plan","visit":"iterations/i38/evaluate-architecture@0","parent":null,"nodes":[{"id":"d76","brief":"evaluate the architecture against the musts"},{"id":"d77","brief":"gate the architecture"}]}
+{"ts":"2026-08-20T15:01:12.227Z","op":"update","visit":"iterations/i38/evaluate-architecture@0","node":"d78","brief":"minting architecture risk the-actor-is-recorded-where-the-call-is-served"}
+{"ts":"2026-08-20T15:01:12.386Z","op":"update","visit":"iterations/i38/evaluate-architecture@0","node":"d79","brief":"minting architecture risk audit-answers-from-log"}
+{"ts":"2026-08-20T15:02:31.589Z","op":"update","visit":"iterations/i38/evaluate-architecture@0","node":"d80","brief":"evaluate-architecture: 43 cards walked, two newly unaddressed"}
+{"ts":"2026-08-20T15:02:55.584Z","op":"update","visit":"iterations/i38/evaluate-architecture@0","node":"d81","brief":"evaluate-architecture signed"}
