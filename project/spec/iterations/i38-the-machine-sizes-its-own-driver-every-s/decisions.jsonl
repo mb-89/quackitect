@@ -478,3 +478,4 @@
 {"ts":"2026-08-20T14:42:50.859Z","op":"update","visit":"iterations/i38/record-adrs@0","node":"d67","brief":"recording decision a-record-without-a-driver-or-a-reason"}
 {"ts":"2026-08-20T14:42:51.022Z","op":"update","visit":"iterations/i38/record-adrs@0","node":"d68","brief":"recording decision difficulty-is-two-figures-and-is-name"}
 {"ts":"2026-08-20T14:43:20.883Z","op":"update","visit":"iterations/i38/record-adrs@0","node":"d69","brief":"recording the four deciding ADRs"}
+{"ts":"2026-08-20T14:43:45.465Z","op":"update","visit":"iterations/i38/decompose-structure@0","node":"d70","brief":"on to decompose-structure"}

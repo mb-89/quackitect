@@ -1047,6 +1047,90 @@ WHAT IT LEAVES BEHIND MEANWHILE. i38's evaluate-set is grey on disk — signed
 chain. The corpus is correct and the record says so; what cannot be done from
 inside the walk is make it stand again.
 
+## F30 — the requirements specify the seed's mechanism, so every candidate that improves on it fails a must
+
+THE MUSTS WERE NEVER CHECKED AGAINST THE CANDIDATES. Not at build_chart, not at
+run-candidates, not at evaluate-set, not at gate-candidates. The check exists in
+the method — a must GATES a candidate, a should SCORES one, and cut-criteria says
+so in as many words — and nobody ran it.
+
+Run at M5, after the winner was declared, it returns this:
+
+| must | seed | derived | reader | receiver |
+| --- | --- | --- | --- | --- |
+| every-matrix-row-declares-its-complexity | satisfies | VIOLATES | VIOLATES | VIOLATES |
+| a-milestone-takes-the-maximum-complexity-over-its-rows | satisfies | VIOLATES | VIOLATES | VIOLATES |
+| one-model-list-is-read-live-from-the-repository | VIOLATES | VIOLATES | unsettled | VIOLATES |
+| every-call-records-the-model-that-answered-it | satisfies | satisfies | unsettled | VIOLATES |
+| a-weaker-driver-than-named-owes-a-recorded-reason | satisfies | satisfies | unsettled | VIOLATES |
+
+EVERY CANDIDATE VIOLATES AT LEAST ONE. The declared winner violates five of five.
+The candidate that violates fewest is cand-the-seed-made-total — the one the
+comparison eliminated.
+
+### Why, and it is not that the candidates are bad
+
+READ THE REQUIREMENTS AS SENTENCES AND THE CAUSE IS PLAIN. They do not state
+needs; they state the seed's mechanism.
+
+- "The driver a milestone names shall be derived from the MAXIMUM COMPLEXITY OVER
+  THE ROWS that milestone holds." That is not a need. It is one design's
+  reduction step, written as a demand.
+- "The mapping from a complexity rung to a model shall be ONE FILE in the
+  repository." That is a file layout.
+- "The loader shall REFUSE ANY ROW THAT DOES NOT DECLARE a complexity value from
+  the five-rung ladder." That is a declaration mechanism, and it forbids deriving
+  the value by construction.
+
+A candidate that improves on the seed's mechanism necessarily violates the
+requirement that encodes it. The design space M4 spent seven finders exploring
+was excluded a priori by M3's own requirements, and the exclusion was invisible
+because nothing compared the two.
+
+### The shape of the failure, so it is recognisable
+
+M3 DERIVED REQUIREMENTS FROM A SEED THAT ALREADY CONTAINED A DESIGN. The seed
+proposed a ladder, a model list, a milestone maximum and a per-row rating.
+write-requirements turned each into a `shall`. Every one passed the EARS shape
+check, carries a `breaks_if_removed`, and is graded. They are well-formed
+requirements about a mechanism nobody had chosen yet.
+
+AND THE GATE THAT SHOULD HAVE CAUGHT IT SAID SO OUT LOUD, IN THE WRONG DIRECTION.
+gate-candidates' own follow-up reads: "the musts are not absent from the
+comparison, they are prior to it. req-the-machine-names-a-driver-and-starts-nothing,
+req-a-machine-decision-repeats and the fatal live-read rule are checked as
+constraints at gate-design." There is no state called gate-design. The check was
+deferred to a state that does not exist, by the gate whose job it was, and the
+sentence reads like diligence.
+
+### What it does to the record
+
+THE DECLARED WINNER IS INELIGIBLE ON ITS OWN REGISTER. So is every rival. The
+comparison ranked four candidates on five should-axes while all four failed the
+constraints, which is a ranking of things that were never in the running.
+
+TWO REPAIRS ARE POSSIBLE AND THEY ARE NOT EQUIVALENT.
+
+- AMEND THE REQUIREMENTS TO STATE NEEDS. "A milestone's driver is strong enough
+  for the hardest work it holds" is the need behind the maximum. "A rung resolves
+  to a worker by one rule that every host reads the same way" is the need behind
+  the one file. This reopens M3 and its gate, and it is the honest repair.
+- DECLARE THE SEED AND RECORD THAT THE COMPARISON WAS DECORATIVE. Cheaper, and it
+  makes M4 a four-day exercise whose output was already fixed at M3.
+
+### The general lesson, which is not about sizing
+
+A REQUIREMENT THAT NAMES A MECHANISM IS A DESIGN DECISION WEARING A DEMAND'S
+CLOTHES, and it is invisible at the moment it is written because it passes every
+check a requirement has. The EARS shape does not catch it. `breaks_if_removed`
+does not catch it — the harm is real, it is just the harm of removing that
+design. The damage grade does not catch it.
+
+WHAT WOULD CATCH IT is exactly the check nobody ran: hold every must against
+every candidate before scoring. A must that no candidate but the incumbent can
+satisfy is a must that encodes the incumbent. That is a mechanical test, it costs
+one pass, and this record has now demonstrated what it costs to skip.
+
 ## Leads for whoever opens an engine iteration
 
 Collected here because none of them is i38's work and none would survive the
