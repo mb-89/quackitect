@@ -20,8 +20,10 @@ export interface CallRecord {
   response?: unknown;
   /** see dsp-call-log.md#the-acting-role-is-stamped-where-the-call-is-served */
   actor?: "human" | "agent" | "ui";
-  /** WHERE THE WALK STOOD when this call was served, stamped by the code that
-   *  knows — the same rule the actor above follows.
+  /** WHERE THE CALL LANDED, stamped by the code that knows — the same rule the
+   *  actor above follows. The stamp is taken AFTER the handler runs, so a pull
+   *  that moved the walk carries its DESTINATION, and a refusal carries where
+   *  it stood when it was refused.
    *
    *  IT USED TO BE INFERRED AND THE INFERENCE DOES NOT HOLD. Cost per state was
    *  to be recovered by carrying each pull's `where` forward from its RESPONSE;

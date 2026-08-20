@@ -18,6 +18,9 @@ import { git } from "../engine/gitlane.ts";
 import { freshRoot, gitInit } from "./helpers.ts";
 
 const SUBJECT = "i90-the-iteration-under-benchmark";
+/** Numbered BELOW the subject, so it existed at the rewind point — which is
+ *  the only thing that makes it a control rather than a newer file. */
+const OLDER = "i89-a-neighbour-that-predates-the-rewind";
 const CONTROL = "i91-a-neighbour-that-must-survive-the-rewind";
 
 function write(root: string, rel: string, text: string): void {
@@ -30,10 +33,34 @@ function write(root: string, rel: string, text: string): void {
  *  The commit that names the subject started is what the rewind point is the
  *  parent of, so everything committed BEFORE it is the past the benchmark is
  *  allowed to see, and everything after is what must be absent. */
+/** The three conditions no log holds. Nothing in the repo sets them, so a
+ *  test that wants a run to BIND has to supply them — which is the point. */
+const CONDITIONS_SET = { SE_HARNESS: "test-harness", SE_MODEL: "test-model", SE_EFFORT: "test-effort" };
+
+function withConditions<T>(env: Record<string, string>, fn: () => T): T {
+  const keys = ["SE_HARNESS", "SE_MODEL", "SE_EFFORT"];
+  const saved = Object.fromEntries(keys.map((k) => [k, process.env[k]]));
+  for (const k of keys) delete process.env[k];
+  for (const [k, v] of Object.entries(env)) process.env[k] = v;
+  try {
+    return fn();
+  } finally {
+    for (const k of keys) {
+      if (saved[k] === undefined) delete process.env[k];
+      else process.env[k] = saved[k];
+    }
+  }
+}
+
 function benchRepo(): { root: string; rewind: string; futureCommit: string } {
   const root = freshRoot();
   gitInit(root);
   write(root, `project/spec/iterations/${SUBJECT}/record.md`, `---\nid: ${SUBJECT}\nstatus: shipped\n---\n`);
+  // THE PIN IS THE SCALE FACTOR and a report is refused without it, so a
+  // fixture standing in for a real archived iteration carries one.
+  write(root, `project/spec/iterations/${SUBJECT}/machines/seeded.json`, JSON.stringify({ change_size: "major" }));
+  write(root, `project/spec/iterations/${OLDER}/record.md`, `---\nid: ${OLDER}\nstatus: shipped\n---\n`);
+  write(root, `project/spec/trace/requirement/req-the-older-neighbour-left-a-trace.md`, `about ${OLDER}\n`);
   write(root, `project/spec/trace/requirement/req-known-before-the-rewind.md`, `about ${CONTROL} and the past\n`);
   write(root, "project/deliverable/engine/today.ts", "export const now = 1;\n");
   git(root, "add", "-A");
@@ -107,22 +134,71 @@ describe("a bound run cannot reach past its rewind point", { concurrency: true }
     assert.match(String((r as { refused: string }).refused), /rewind/i, "and the refusal names what could not be established");
   });
 
+  test("a run that cannot say what it was taken under refuses AT BIND", () => {
+    // Not at report time, after the whole walk. The conditions are knowable
+    // now, and this module's own law is that the refusal happens once, at the
+    // earliest point the cause is knowable. Catching it late binds, walks the
+    // iteration, and throws the result away.
+    const { root } = benchRepo();
+    const r = withConditions({}, () => benchmarkBind(root, { iteration: SUBJECT }));
+    assert.ok("refused" in r, "it refuses");
+    assert.match(String((r as { refused: string }).refused), /model/, "and names what is unset");
+    assert.match(String((r as { refused: string }).refused), /SE_MODEL/, "with the remedy");
+  });
+
   test("a bound run names the iteration it re-walks and the commit it was cut at", () => {
     const { root, rewind } = benchRepo();
-    const r = benchmarkBind(root, { iteration: SUBJECT });
-    assert.ok(!("refused" in r), "a sound request binds");
+    const r = withConditions(CONDITIONS_SET, () => benchmarkBind(root, { iteration: SUBJECT }));
+    assert.ok(!("refused" in r), `a sound request binds: ${JSON.stringify(r)}`);
     assert.equal((r as { iteration: string }).iteration, SUBJECT);
     assert.equal((r as { rewind: string }).rewind, rewind);
+  });
+
+  test("the control is run against a neighbour that PREDATES the rewind point", () => {
+    // It used to pick the lowest-SORTING shipped iteration instead. That draws
+    // a NEWER neighbour for the oldest subject, whose absence from the rewound
+    // tree is correct — so the control failed for the right reason about the
+    // wrong file, and refused the default run. i89 exists at i90's rewind
+    // point; anything numbered above it does not.
+    const { root } = benchRepo();
+    const r = withConditions(CONDITIONS_SET, () => benchmarkBind(root, { iteration: SUBJECT }));
+    assert.ok(!("refused" in r), `an older neighbour passes the control: ${JSON.stringify(r)}`);
+    assert.equal((r as { controlled: boolean }).controlled, true, "and the run records that it had one");
   });
 });
 
 const CONDITIONS = ["iteration", "rewind", "change_size", "rigor_matrix_hash", "se_version", "harness", "model", "effort"];
 
 function fullReport(): Record<string, unknown> {
-  const r: Record<string, unknown> = { stop_at: "shipped", ended_at: "shipped" };
+  const r: Record<string, unknown> = {
+    stop_at: "shipped",
+    ended_at: "shipped",
+    // A REPORT SAYS WHICH DIRECTORIES ITS CONDITIONS COVER. The matrix hash
+    // alone is necessary and not sufficient, so the set is a field of its own
+    // and the guard checks every pair has a hash beside it.
+    stamp_covers: conditionsStampDirs()
+      .map((d) => `${d}=abc123`)
+      .join(" "),
+  };
   for (const c of CONDITIONS) r[c] = "x";
   return r;
 }
+
+test("a stamp_covers line that names a directory with no hash is refused", () => {
+  // The line used to be emitted and never looked at, so six directories with
+  // an empty hash beside each read as a stamped set and asserted nothing.
+  const r = fullReport();
+  r.stamp_covers = "project/guidance= project/deliverable/engine=abc123";
+  const problems = reportProblems(r);
+  assert.equal(problems.length, 1);
+  assert.match(problems[0], /project\/guidance/, "and it names the directory that carries no hash");
+});
+
+test("a report with no stamp_covers at all is refused", () => {
+  const r = fullReport();
+  delete r.stamp_covers;
+  assert.match(reportProblems(r).join(" "), /stamp_covers/);
+});
 
 // THE CONCEALMENT HAS A SPEC AND NO CASES YET, AND THAT IS DELIBERATE.
 //

@@ -2,9 +2,9 @@
 //
 import { createHash } from "node:crypto";
 import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { isAbsolute, join, relative, resolve } from "node:path";
 import { controlFilesPresent } from "./benchmark-guard.ts";
-import { CONDITIONS, conditionsStampDirs } from "./benchmark-report.ts";
+import { CONDITIONS, conditionsStampDirs, reportProblems } from "./benchmark-report.ts";
 import { git } from "./gitlane.ts";
 import { noteOf } from "./notes.ts";
 import { SE_VERSION } from "./version.ts";
@@ -13,6 +13,10 @@ export interface BenchmarkRun {
   iteration: string;
   rewind: string;
   tree: string;
+  /** Whether a POSITIVE CONTROL could be run — false when the subject is the
+   *  oldest shipped iteration and has no older neighbour. A run without one has
+   *  a weaker result, not an equal one, and the report says so. */
+  controlled: boolean;
   stop_at: string;
   ended_at: string;
   conditions: Record<string, string>;
@@ -138,6 +142,36 @@ export function leastRecentlyBenchmarked(root: string): string | undefined {
   return [...shipped].sort((a, b) => (last.get(a) ?? "").localeCompare(last.get(b) ?? "") || a.localeCompare(b))[0];
 }
 
+/** The number in `i<n>-slug`, or undefined. Iterations are numbered in order,
+ *  so this is the only ordering that means "existed before". A LEXICOGRAPHIC
+ *  sort puts i11 before i2, which is why the control picked wrong. */
+function itNumber(id: string): number | undefined {
+  const m = /^i(\d+)(?:-|$)/.exec(id);
+  return m === null ? undefined : Number(m[1]);
+}
+
+/** The newest shipped iteration that is OLDER than the subject.
+ *
+ *  It is the only honest control: an iteration numbered above the subject did
+ *  not exist at the subject's rewind point, so its absence from the rewound
+ *  tree proves the rewind worked rather than that the fetch failed. */
+function olderNeighbour(root: string, iteration: string): string | undefined {
+  const mine = itNumber(iteration);
+  if (mine === undefined) return undefined;
+  return shippedIterations(root)
+    .map((id) => ({ id, n: itNumber(id) }))
+    .filter((x): x is { id: string; n: number } => x.n !== undefined && x.n < mine)
+    .sort((a, b) => b.n - a.n)[0]?.id;
+}
+
+/** A path this run made, under `<root>/.se/bench`. Anything else is not ours
+ *  to delete, however the binding on disk describes it. */
+function ownTree(root: string, tree: string): boolean {
+  const home = resolve(join(root, ".se", "bench"));
+  const rel = relative(home, resolve(tree));
+  return rel !== "" && !rel.startsWith("..") && !isAbsolute(rel);
+}
+
 /** Every iteration the archive marks shipped — the pool a run draws from. */
 function shippedIterations(root: string): string[] {
   const dir = join(root, "project", "spec", "iterations");
@@ -222,12 +256,25 @@ export function benchmarkBind(root: string, opts: { iteration?: string; stop_at?
   // THE POSITIVE CONTROL RUNS IN THE PRODUCT, not only in a test. An empty
   // fetch and a correct rewind both answer "not there" to everything, so a run
   // proves the tree HAS what the rewind was never meant to remove.
-  const neighbour = shippedIterations(root).find((i) => i !== iteration);
+  //
+  // THE NEIGHBOUR MUST PREDATE THE REWIND POINT. It used to be the first
+  // shipped iteration that is not this one, off a LEXICOGRAPHIC sort — so the
+  // oldest subject drew a NEWER neighbour, correctly absent from its rewound
+  // tree, and the control failed for the right reason about the wrong file.
+  // That false refusal landed on exactly the DEFAULT pick: with no reports
+  // folder every iteration is equally un-benchmarked, so the tiebreak returns
+  // the lowest-sorting one.
+  const neighbour = olderNeighbour(root, iteration);
   if (neighbour !== undefined && controlFilesPresent(tree, neighbour) === 0) {
     return {
       refused: `the rewound tree for ${iteration} holds no trace of ${neighbour} either — the control failed, so an empty fetch cannot be told from a correct rewind`,
     };
   }
+  // A SUBJECT WITH NO OLDER NEIGHBOUR HAS NO CONTROL, and the run records that
+  // rather than staying quiet. The control exists because absence is
+  // unfalsifiable from inside, so a run that could not run one has a weaker
+  // result — not an equal one — and a reader has to be able to see which.
+  const controlled = neighbour !== undefined;
   const conditions: Record<string, string> = {
     iteration,
     rewind,
@@ -242,10 +289,29 @@ export function benchmarkBind(root: string, opts: { iteration?: string; stop_at?
   // reader who wants the old field still finds it; the five directories beside
   // it are what stop the report claiming more than it knows.
   conditions.rigor_matrix_hash = conditions["project/deliverable/machines/rigor_matrix/rows"] ?? "";
+  // THE CONDITIONS ARE KNOWABLE NOW, SO THEY ARE CHECKED NOW. This module's own
+  // law, forty lines up: the refusal happens ONCE, at the earliest point where
+  // the cause is knowable. Leaving an unset model or effort to be caught at
+  // report time would bind, walk the whole iteration, and then throw the result
+  // away — which is the exact shape that law exists to prevent.
+  // CHECKED IN THE SHAPE A REPORT WILL CARRY, never in the shape the binding
+  // happens to hold. The two drifted once already: bind passed its raw
+  // conditions, which have no stamp_covers, so the field the report requires
+  // was invisible to the check that exists to catch a missing field.
+  const owed = reportProblems({ ...stampedConditions(conditions), stop_at: "x", ended_at: "x" });
+  if (owed.length > 0) {
+    // THE REMEDY NAMES WHAT IS ACTUALLY MISSING. An unset env var and an
+    // unpinned iteration are different problems with different fixes, and a
+    // refusal that always says "set SE_MODEL" sends a reader to the wrong one.
+    const fromEnv = owed.filter((p) => /^(harness|model|effort):/.test(p)).map((p) => `SE_${p.split(":")[0].toUpperCase()}`);
+    const how = fromEnv.length > 0 ? ` — set ${fromEnv.join(", ")} and bind again` : "";
+    return { refused: `the run cannot record what it was taken under: ${owed.join("; ")}${how}` };
+  }
   const run: BenchmarkRun = {
     iteration,
     rewind,
     tree,
+    controlled,
     // THE WHOLE WALK IS THE DEFAULT, by owner ruling. A stop point is a
     // narrowing somebody asked for, never the normal case.
     stop_at: opts.stop_at ?? "shipped",
@@ -284,7 +350,10 @@ export function benchmarkStop(root: string, run: BenchmarkRun, endedAt: string):
   // invisible to `git status`, so the inspection that exists to catch "a write
   // somewhere unexpected" passed straight over it.
   git(root, "update-ref", "-d", `refs/bench/${run.iteration}`);
-  rmSync(run.tree, { recursive: true, force: true });
+  // NEVER FORCE-DELETE A PATH THAT IS NOT OURS. `run.tree` arrives off a JSON
+  // file on disk, so a corrupted or hand-edited binding could name anything. A
+  // wrong ref deletion is recoverable; an arbitrary recursive delete is not.
+  if (ownTree(root, run.tree)) rmSync(run.tree, { recursive: true, force: true });
   return done;
 }
 
@@ -329,15 +398,18 @@ export function isBound(root: string): boolean {
 
 /** The conditions a report must carry, drawn off a bound run. Named here so
  *  the binding and the report cannot drift about what the eight are. */
-export function conditionsFor(run: BenchmarkRun): Record<string, string> {
+/** The eight conditions plus the stamp set, in the shape a report carries.
+ *  ONE PLACE, so the bind-time check and the report cannot disagree about what
+ *  a report needs. */
+function stampedConditions(conditions: Record<string, string>): Record<string, string> {
   const out: Record<string, string> = {};
-  for (const c of CONDITIONS) out[c] = run.conditions[c] ?? "";
-  // THE STAMP SET TRAVELS WITH THEM. This used to iterate CONDITIONS alone and
-  // drop every per-directory hash the binding had just computed, so a real
-  // report stamped the matrix by itself — the exact claim this design calls a
-  // lie in writing.
+  for (const c of CONDITIONS) out[c] = conditions[c] ?? "";
   out.stamp_covers = conditionsStampDirs()
-    .map((rel) => `${rel}=${run.conditions[rel] ?? ""}`)
+    .map((rel) => `${rel}=${conditions[rel] ?? ""}`)
     .join(" ");
   return out;
+}
+
+export function conditionsFor(run: BenchmarkRun): Record<string, string> {
+  return stampedConditions(run.conditions);
 }

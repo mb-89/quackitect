@@ -27,7 +27,11 @@ export interface CallRecordish {
 
 /** Calls the log cannot place. They are COUNTED rather than dropped: a total
  *  that silently omits work reads as a cheaper walk than happened. */
-export const UNATTRIBUTED = "(before the first pull)";
+export const UNATTRIBUTED = "(unstamped)";
+
+/** Thrown rather than returned, because a caller that ignores this would write
+ *  the emptiness into a report as though it were a measurement. */
+export class Unpartitionable extends Error {}
 
 function empty(): StateCost {
   return { calls: 0, ms: 0, forms_filled: 0, forms_refilled: 0, refusals_by_clause: {}, entered: 0 };
@@ -75,9 +79,24 @@ function whereOf(rec: CallRecordish): string | undefined {
  *  stamp, so a log written before the stamp existed still partitions. What
  *  precedes the first stamp is counted under UNATTRIBUTED rather than dropped. */
 export function costPerState(log: CallRecordish[]): Record<string, StateCost> {
+  // A LOG WITH NO STAMP AT ALL CANNOT ANSWER THIS QUESTION, and answering it
+  // anyway is worse than answering nothing. Before this guard, a pre-stamp log
+  // produced ONE bucket holding every call — 801 calls, three TYPED refusals
+  // that only a state gate can emit, and `entered: 0` — under a label that read
+  // like a cause. Rendered into a report's per-state table, a reader believes
+  // it. An empty answer is unmistakably broken; a plausible one is not.
+  if (log.length > 0 && !log.some((r) => Array.isArray(r.where) && r.where.length > 0)) {
+    throw new Unpartitionable(
+      `${String(log.length)} records and not one carries a walk position — this log predates the stamp, so cost per state cannot be derived from it. Records written from now on carry it; this one is not a baseline.`,
+    );
+  }
   const out: Record<string, StateCost> = {};
   let here: string | undefined;
-  let formRefused = false;
+  // PER STATE, NOT PER LOOP. Held on the loop, a form refused in one state
+  // billed a refill to the NEXT state's first form. Reset on every state change
+  // instead and a genuine refill was lost when the state moved between the
+  // refusal and the retry. Both are wrong; the flag belongs to the bucket.
+  const formRefused = new Map<string, boolean>();
   for (const rec of log) {
     const stamp = whereOf(rec);
     if (stamp !== undefined && stamp !== here) {
@@ -94,12 +113,13 @@ export function costPerState(log: CallRecordish[]): Record<string, StateCost> {
     }
     const isForm = rec.tool === "se_pull" && rec.args?.form !== undefined;
     if (isForm) {
+      const key = here ?? UNATTRIBUTED;
       b.forms_filled += 1;
       // A REFILL IS A FORM SENT AGAIN AFTER A FORM WAS REFUSED — never after
       // any other call failed. The first version armed on every failure, so an
       // unrelated refusal before the session's first form counted as a refill.
-      if (formRefused) b.forms_refilled += 1;
-      formRefused = refused;
+      if (formRefused.get(key) === true) b.forms_refilled += 1;
+      formRefused.set(key, refused);
     }
   }
   return out;
@@ -124,6 +144,21 @@ function missing(report: Record<string, unknown>, key: string): boolean {
  *  writes a report, so this is what stops a report that says nothing. */
 export function reportProblems(report: Record<string, unknown>): string[] {
   const out: string[] = [];
+  // THE STAMP SET IS CHECKED, NOT MERELY CARRIED. `stamp_covers` used to be
+  // emitted and never looked at, so a report could name all six directories
+  // with an empty hash beside each — a line that LOOKS like the set is stamped
+  // and asserts nothing. That is "claims more than it knows" in a new costume.
+  const covers = String(report.stamp_covers ?? "");
+  if (covers.trim() === "") out.push("stamp_covers: a report says which directories its conditions cover, or it claims the matrix alone");
+  else {
+    const blank = covers
+      .split(" ")
+      .filter((p) => p.includes("="))
+      .filter((p) => p.split("=")[1] === "")
+      .map((p) => p.split("=")[0]);
+    if (blank.length > 0)
+      out.push(`stamp_covers: ${blank.join(", ")} named with no hash — a directory in the set is stamped or it is not in the set`);
+  }
   for (const c of CONDITIONS) {
     if (missing(report, c)) out.push(`${c}: a report without it cannot say what it was taken under`);
   }

@@ -2,11 +2,11 @@
 minted_in: i37-training-iterations-a-disposable-iterati
 id: raid-asm-carry-forward-attribution-covers-every-call-between-two-pulls
 type: "[[raid]]"
-kind: assumption
+kind: issue
 statement: "Every lane call between two se_pull answers belongs to the state the earlier pull named, so carrying that state forward attributes the whole log."
 owner: the maintainer of the machine
 trigger: the first benchmark run that derives cost per state
-status: superseded
+status: mitigated
 impact: "Cost lands on the wrong state wherever a call happened somewhere else. The ranked per-state view stops being trustworthy in exactly the places that are most expensive, which is where subagents and long tool runs live."
 breaks_how_badly: corrosive
 how_likely: plausible
@@ -52,7 +52,19 @@ NOT THE TOTAL, WHICH STAYS RIGHT. The per-state ranking is the thing that
 degrades, and the per-state ranking is what makes a benchmark actionable rather
 than a single number.
 
-## Probed 2026-08-20 — the premise was wrong, and the rule is superseded
+## It is an ISSUE now, and it keeps its id
+
+THE CARD SAYS SO: a falsified assumption becomes an ISSUE, not a risk — it has
+already happened. Change the kind, keep the id, and say so in the body
+([[raid]]). The id still reads `raid-asm-`, which is the card working as
+written: the id is what other nodes point at, and renaming it to match the kind
+would break every reference to buy nothing.
+
+`superseded` was tried first and it belongs to DECISIONS alone. What happened
+here is not a decision being replaced; it is a claim that was measured and found
+false, and then fixed.
+
+## Probed 2026-08-20 — the premise was wrong, and the rule is replaced
 
 THIS NODE SAID `Every se_pull carries its where`. It does not, and the mistake
 is worth keeping because it is precise.

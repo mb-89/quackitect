@@ -1627,3 +1627,31 @@
 {"ts":"2026-08-20T11:27:33.745Z","op":"update","visit":"iterations/i37/fix-findings@0","node":"d864","brief":"typechecking the benchmark verb"}
 {"ts":"2026-08-20T11:27:53.351Z","op":"update","visit":"iterations/i37/fix-findings@0","node":"d865","brief":"a truncating read makes read-modify-write unsafe"}
 {"ts":"2026-08-20T11:28:25.800Z","op":"update","visit":"iterations/i37/fix-findings@0","node":"d866","brief":"committing the benchmark verb"}
+{"ts":"2026-08-20T11:28:47.125Z","op":"update","visit":"iterations/i37/fix-findings@0","node":"d867","brief":"refreshing the lane view of a file repaired outside it"}
+{"ts":"2026-08-20T11:37:08.821Z","op":"update","visit":"iterations/i37/fix-findings@0","node":"d868","brief":"checking the lane is answering"}
+{"ts":"2026-08-20T11:37:23.335Z","op":"update","visit":"iterations/i37/fix-findings@0","node":"d869","brief":"the control picks a neighbour that predates the rewind"}
+{"ts":"2026-08-20T11:37:40.199Z","op":"update","visit":"iterations/i37/fix-findings@0","node":"d870","brief":"the control picks a neighbour that predates the rewind"}
+{"ts":"2026-08-20T11:37:58.310Z","op":"update","visit":"iterations/i37/fix-findings@0","node":"d871","brief":"the helpers the control and the delete guard need"}
+{"ts":"2026-08-20T11:37:58.617Z","op":"update","visit":"iterations/i37/fix-findings@0","node":"d872","brief":"path helpers for the delete guard"}
+{"ts":"2026-08-20T11:37:58.914Z","op":"update","visit":"iterations/i37/fix-findings@0","node":"d873","brief":"the delete stays inside the tree this run made"}
+{"ts":"2026-08-20T11:38:16.515Z","op":"update","visit":"iterations/i37/fix-findings@0","node":"d874","brief":"a run refuses at bind when it cannot say what it was taken under"}
+{"ts":"2026-08-20T11:38:16.798Z","op":"update","visit":"iterations/i37/fix-findings@0","node":"d875","brief":"bind needs the report guard"}
+{"ts":"2026-08-20T11:38:17.083Z","op":"update","visit":"iterations/i37/fix-findings@0","node":"d876","brief":"a run records whether its control could run at all"}
+{"ts":"2026-08-20T11:38:39.003Z","op":"update","visit":"iterations/i37/fix-findings@0","node":"d877","brief":"the bucket names what it knows, not a cause it cannot know"}
+{"ts":"2026-08-20T11:38:39.276Z","op":"update","visit":"iterations/i37/fix-findings@0","node":"d878","brief":"an unpartitionable log refuses rather than inventing a table"}
+{"ts":"2026-08-20T11:38:39.545Z","op":"update","visit":"iterations/i37/fix-findings@0","node":"d879","brief":"a refill belongs to the state whose form was refused"}
+{"ts":"2026-08-20T11:38:39.805Z","op":"update","visit":"iterations/i37/fix-findings@0","node":"d880","brief":"the refill flag is keyed by state"}
+{"ts":"2026-08-20T11:38:40.097Z","op":"update","visit":"iterations/i37/fix-findings@0","node":"d881","brief":"the refill reads and writes its own state flag"}
+{"ts":"2026-08-20T11:38:56.882Z","op":"update","visit":"iterations/i37/fix-findings@0","node":"d882","brief":"a run without a control says so"}
+{"ts":"2026-08-20T11:40:14.950Z","op":"update","visit":"iterations/i37/fix-findings@0","node":"d883","brief":"the bind cases carry the conditions a run must record"}
+{"ts":"2026-08-20T11:40:15.231Z","op":"update","visit":"iterations/i37/fix-findings@0","node":"d884","brief":"a helper that supplies the conditions a bind requires"}
+{"ts":"2026-08-20T11:41:15.057Z","op":"update","visit":"iterations/i37/fix-findings@0","node":"d885","brief":"a refusal names the fix for the thing that is missing"}
+{"ts":"2026-08-20T11:41:15.359Z","op":"update","visit":"iterations/i37/fix-findings@0","node":"d886","brief":"the fixture carries a pin and an older neighbour, as a real archive does"}
+{"ts":"2026-08-20T11:41:33.595Z","op":"update","visit":"iterations/i37/fix-findings@0","node":"d887","brief":"the control case pins the ordering that was wrong"}
+{"ts":"2026-08-20T11:42:11.577Z","op":"update","visit":"iterations/i37/fix-findings@0","node":"d888","brief":"the stamp set is checked, not merely carried"}
+{"ts":"2026-08-20T11:42:11.827Z","op":"update","visit":"iterations/i37/fix-findings@0","node":"d889","brief":"the comment says where the stamp is actually taken"}
+{"ts":"2026-08-20T11:42:12.122Z","op":"update","visit":"iterations/i37/fix-findings@0","node":"d890","brief":"the record says what the field means"}
+{"ts":"2026-08-20T11:42:24.687Z","op":"update","visit":"iterations/i37/fix-findings@0","node":"d891","brief":"a falsified assumption becomes an issue and keeps its id"}
+{"ts":"2026-08-20T11:43:24.941Z","op":"update","visit":"iterations/i37/fix-findings@0","node":"d892","brief":"the report fixture carries the stamp set the guard now checks"}
+{"ts":"2026-08-20T11:44:18.154Z","op":"update","visit":"iterations/i37/fix-findings@0","node":"d893","brief":"bind checks the shape a report will carry"}
+{"ts":"2026-08-20T11:45:20.582Z","op":"update","visit":"iterations/i37/fix-findings@0","node":"d894","brief":"committing the second fix pass"}
