@@ -484,3 +484,9 @@
 {"ts":"2026-08-20T14:48:52.892Z","op":"update","visit":"iterations/i38/decompose-structure@0","node":"d73","brief":"re-reading the element matrix after allocation"}
 {"ts":"2026-08-20T14:49:42.841Z","op":"update","visit":"iterations/i38/decompose-structure@0","node":"d74","brief":"decompose-structure: 23 elements, nothing unimplemented"}
 {"ts":"2026-08-20T14:50:15.435Z","op":"update","visit":"iterations/i38/decompose-structure@0","node":"d75","brief":"allocation drawn"}
+{"ts":"2026-08-20T14:57:47.845Z","op":"done","visit":"iterations/i38/cut-criteria@2","node":"d46","brief":"landed"}
+{"ts":"2026-08-20T14:57:48.903Z","op":"done","visit":"iterations/i38/cut-criteria@2","node":"d47","brief":"landed"}
+{"ts":"2026-08-20T14:57:49.339Z","op":"done","visit":"iterations/i38/cut-criteria@2","node":"d48","brief":"landed"}
+{"ts":"2026-08-20T14:57:49.748Z","op":"done","visit":"iterations/i38/cut-criteria@2","node":"d49","brief":"landed"}
+{"ts":"2026-08-20T14:57:50.192Z","op":"done","visit":"iterations/i38/record-adrs@0","node":"d60","brief":"landed"}
+{"ts":"2026-08-20T14:57:50.682Z","op":"done","visit":"iterations/i38/record-adrs@0","node":"d61","brief":"landed"}
