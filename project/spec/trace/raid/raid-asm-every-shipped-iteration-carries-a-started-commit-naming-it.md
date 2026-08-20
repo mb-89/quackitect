@@ -6,12 +6,12 @@ kind: assumption
 statement: "Every shipped iteration has exactly one commit whose message names it as started, so a rewind point can be found for any of them mechanically."
 owner: the maintainer of the machine
 trigger: the first benchmark run that names an iteration other than i33
-status: deferred
+status: probed
 defer_until: "M7 reaches a state where se_git is legal — the check is one log query, `git log --format=%s | grep '^iteration .*: started$'`, compared against the fifteen shipped records"
 impact: "A benchmark cannot be pointed at part of the archive, and which part fails is discovered one run at a time rather than known."
 breaks_how_badly: crippling
 how_likely: plausible
-probe: "unprobed \u2014 checked on i33 only, where 5f85977f is its started commit. The other ten pinned records are unchecked."
+probe: "FALSE, measured 2026-08-20 at run-demos. 16 shipped iterations, 6 with exactly one started commit, 10 with none, 0 with two. rewindPointFor resolves 6 of 16, so the benchmark pool is six."
 probed: 2026-08-19
 source_refs:
   - req-a-bound-run-resolves-no-commit-newer-than-its-rewind-point
@@ -34,6 +34,54 @@ that the archive is not uniform.
 
 WHAT FALSIFIES IT. Any pinned record with no started commit, or with two.
 
+
+## PROBED 2026-08-20 — FALSE, and worse than this node feared
+
+RUN AT run-demos, where `se_git` finally came within reach. One script over the
+whole archive.
+
+    shipped iterations       16
+    with exactly one         6
+    with none                10
+    with more than one       0
+    rewindPointFor resolves  6 of 16
+
+THE TEN WITHOUT: i1, i2, i3, i8, i12, i15, i17, i27, i28, i34.
+
+THIS NODE SUSPECTED i27 because it is the one folder without the modern id
+shape. i27 is among them — and so are i15, i28 and i34, which are recent. The
+cause is not age.
+
+## The mechanism was on this node all along
+
+`markStarted` returns early when a record already carries `started:`, so a
+field written any other way suppresses the commit forever. Every one of the
+sixteen HAS the field. Its presence is exactly what hides its absence.
+
+## What it costs, and it is a design claim rather than a number
+
+THE BENCHMARK POOL IS SIX, NOT SIXTEEN: i5, i6, i11, i16, i33, i35.
+
+`raid-dec-an-archived-iteration-is-the-benchmark-and-nothing-is-authored` rests
+on the archive being reachable material. Two thirds of it is not reachable.
+Nothing about the MECHANISM changes; how much it has to work with does.
+
+THE DEFAULT RUN IS UNUSABLE UNTIL THIS IS FIXED, and that is the sharp end.
+`leastRecentlyBenchmarked` sorts never-benchmarked first, and the
+lowest-sorting shipped iteration is i1, which has no start commit. So
+`se_benchmark` with no argument REFUSES every time. Demonstrated at run-demos
+before the named run was made.
+
+## Two fixes, and they are not the same fix
+
+- FILTER THE POOL to iterations that can bind. Cheap, honest, and it makes the
+  default work today. It also makes the pool silently smaller, so the filter
+  has to SAY how many it dropped.
+- BACKFILL THE TEN with a start commit each. Recovers the material, and it is
+  archaeology: the right commit for each has to be found rather than guessed,
+  and a guessed rewind point is worse than none.
+
+THE FIRST IS THIS ITERATION'S TO DO IF IT SHIPS. The second is not.
 
 ## Half-probed 2026-08-20, and the half that was reachable HOLDS
 

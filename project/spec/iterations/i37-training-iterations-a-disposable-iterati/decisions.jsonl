@@ -1746,3 +1746,23 @@
 {"ts":"2026-08-20T13:01:40.152Z","op":"update","visit":"iterations/i37/fill-story-evidence@1","node":"d984","brief":"the reading verb asks the concealment now"}
 {"ts":"2026-08-20T13:02:01.480Z","op":"update","visit":"iterations/i37/fill-story-evidence@1","node":"d985","brief":"the reading verb asks the concealment now"}
 {"ts":"2026-08-20T13:02:01.896Z","op":"update","visit":"iterations/i37/fill-story-evidence@1","node":"d986","brief":"the reading verb asks the concealment now"}
+{"ts":"2026-08-20T13:02:20.378Z","op":"update","visit":"iterations/i37/fill-story-evidence@1","node":"d987","brief":"the concealment is built; back to the walk"}
+{"ts":"2026-08-20T13:02:33.332Z","op":"update","visit":"iterations/i37/fill-story-evidence@1","node":"d988","brief":"the story evidence law is computed; signing is a bare submit"}
+{"ts":"2026-08-20T13:03:06.726Z","op":"update","visit":"iterations/i37/fill-story-evidence@1","node":"d989","brief":"the demo drawing, one step per must story"}
+{"ts":"2026-08-20T13:03:35.083Z","op":"update","visit":"iterations/i37/fill-story-evidence@1","node":"d990","brief":"the demo drawing is authored; M8 opens"}
+{"ts":"2026-08-20T13:03:57.203Z","op":"update","visit":"iterations/i37/cut-criteria@9","node":"d991","brief":"to the demos, where the first real run happens"}
+{"ts":"2026-08-20T13:04:20.548Z","op":"update","visit":"iterations/i37/run-spikes/end@1","node":"d992","brief":"walking the chain forward"}
+{"ts":"2026-08-20T13:06:37.622Z","op":"update","visit":"iterations/i37/gate-implementation@2","node":"d993","brief":"walking the chain forward"}
+{"ts":"2026-08-20T13:06:38.809Z","op":"update","visit":"iterations/i37/run-demos/start@0","node":"d994","brief":"walking the chain forward"}
+{"ts":"2026-08-20T13:06:43.718Z","op":"update","visit":"iterations/i37/run-demos/sty-know-whether-a-machine-change-helped@0","node":"d995","brief":"walking the chain forward"}
+{"ts":"2026-08-20T13:07:11.831Z","op":"update","visit":"iterations/i37/run-demos/sty-know-whether-a-machine-change-helped@0","node":"d996","brief":"the server predates the verb it must run"}
+{"ts":"2026-08-20T13:08:53.550Z","op":"update","visit":"iterations/i37/run-demos/sty-know-whether-a-machine-change-helped@0","node":"d997","brief":"reading the demo form"}
+{"ts":"2026-08-20T13:09:30.595Z","op":"update","visit":"iterations/i37/run-demos/sty-know-whether-a-machine-change-helped@0","node":"d998","brief":"the first benchmark run is performed and recorded"}
+{"ts":"2026-08-20T13:09:43.117Z","op":"update","visit":"iterations/i37/run-demos/sty-know-whether-a-machine-change-helped@0","node":"d999","brief":"the first benchmark run is performed and recorded"}
+{"ts":"2026-08-20T13:10:11.204Z","op":"update","visit":"iterations/i37/run-demos/sty-know-whether-a-machine-change-helped@0","node":"d1000","brief":"the deferred probe came due and the assumption is false"}
+{"ts":"2026-08-20T13:10:47.191Z","op":"update","visit":"iterations/i37/run-demos/sty-know-whether-a-machine-change-helped@0","node":"d1001","brief":"the deferred probe came due and the assumption is false"}
+{"ts":"2026-08-20T13:11:24.067Z","op":"update","visit":"iterations/i37/run-demos/sty-know-whether-a-machine-change-helped@0","node":"d1002","brief":"walking the chain forward"}
+{"ts":"2026-08-20T13:11:26.674Z","op":"update","visit":"iterations/i37/run-demos/sty-know-whether-a-machine-change-helped@0","node":"d1003","brief":"walking the chain forward"}
+{"ts":"2026-08-20T13:11:38.881Z","op":"update","visit":"iterations/i37/run-demos/sty-know-whether-a-machine-change-helped@0","node":"d1004","brief":"to the second demo"}
+{"ts":"2026-08-20T13:11:40.148Z","op":"update","visit":"iterations/i37/run-demos/sty-walk-a-past-tree-without-reaching-its-future@0","node":"d1005","brief":"at the doors demo"}
+{"ts":"2026-08-20T13:12:13.739Z","op":"plan","visit":"iterations/i37/run-demos/sty-walk-a-past-tree-without-reaching-its-future@0","parent":null,"nodes":[{"id":"d1006","brief":"every door tried"},{"id":"d1007","brief":"every one closed"},{"id":"d1008","brief":"all four reopened"}]}
