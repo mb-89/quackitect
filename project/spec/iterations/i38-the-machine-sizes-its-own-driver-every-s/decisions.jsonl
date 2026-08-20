@@ -370,3 +370,32 @@
 {"ts":"2026-08-20T13:14:56.358Z","op":"update","visit":"iterations/i38/gate-candidates@0","node":"d261","brief":"hostile review of M4: recounting figures"}
 {"ts":"2026-08-20T13:14:56.491Z","op":"update","visit":"iterations/i38/gate-candidates@0","node":"d262","brief":"hostile review of M4: recounting figures"}
 {"ts":"2026-08-20T13:14:56.616Z","op":"update","visit":"iterations/i38/gate-candidates@0","node":"d263","brief":"hostile review of M4: recounting figures"}
+{"ts":"2026-08-20T13:16:08.619Z","op":"done","visit":"iterations/i38/enumerate-space/find_prior_art@0","node":"d183","brief":"landed"}
+{"ts":"2026-08-20T13:16:09.173Z","op":"done","visit":"iterations/i38/enumerate-space/build_chart@0","node":"d198","brief":"landed"}
+{"ts":"2026-08-20T13:16:09.716Z","op":"done","visit":"iterations/i38/cut-criteria@0","node":"d223","brief":"landed"}
+{"ts":"2026-08-20T13:16:10.248Z","op":"done","visit":"iterations/i38/cut-criteria@0","node":"d224","brief":"landed"}
+{"ts":"2026-08-20T13:16:10.751Z","op":"done","visit":"iterations/i38/cut-criteria@0","node":"d225","brief":"landed"}
+{"ts":"2026-08-20T13:16:11.278Z","op":"done","visit":"iterations/i38/cut-criteria@0","node":"d226","brief":"landed"}
+{"ts":"2026-08-20T13:16:11.815Z","op":"done","visit":"iterations/i38/cut-criteria@0","node":"d227","brief":"landed"}
+{"ts":"2026-08-20T13:16:12.340Z","op":"done","visit":"iterations/i38/evaluate-set@0","node":"d244","brief":"landed"}
+{"ts":"2026-08-20T13:16:12.901Z","op":"done","visit":"iterations/i38/evaluate-set@0","node":"d245","brief":"landed"}
+{"ts":"2026-08-20T13:16:13.426Z","op":"done","visit":"iterations/i38/evaluate-set@0","node":"d246","brief":"landed"}
+{"ts":"2026-08-20T13:16:13.975Z","op":"done","visit":"iterations/i38/evaluate-set@0","node":"d247","brief":"landed"}
+{"ts":"2026-08-20T13:16:14.488Z","op":"done","visit":"iterations/i38/gate-candidates@0","node":"d248","brief":"landed"}
+{"ts":"2026-08-20T13:16:15.033Z","op":"done","visit":"iterations/i38/gate-candidates@0","node":"d249","brief":"landed"}
+{"ts":"2026-08-20T13:16:15.535Z","op":"done","visit":"iterations/i38/gate-candidates@0","node":"d250","brief":"landed"}
+{"ts":"2026-08-20T13:16:16.025Z","op":"update","visit":"iterations/i38/gate-candidates@0","node":"d264","brief":"reopening evaluate-set for a miscount found before the gate blessed"}
+{"ts":"2026-08-20T13:16:32.047Z","op":"update","visit":"iterations/i38/evaluate-set@1","node":"d265","brief":"five fours, not four"}
+{"ts":"2026-08-20T13:16:33.052Z","op":"update","visit":"iterations/i38/evaluate-set@1","node":"d266","brief":"evaluate-set re-signed"}
+{"ts":"2026-08-20T13:17:32.775Z","op":"update","visit":"iterations/i38/gate-candidates@0","node":"d267","brief":"verifying the XACML 2003 date claim"}
+{"ts":"2026-08-20T13:17:58.011Z","op":"update","visit":"iterations/i38/gate-candidates@0","node":"d268","brief":"reopening find_prior_art for an unverified date"}
+{"ts":"2026-08-20T13:18:40.253Z","op":"update","visit":"iterations/i38/gate-candidates@0","node":"d269","brief":"hostile review of M4"}
+{"ts":"2026-08-20T13:18:53.024Z","op":"update","visit":"iterations/i38/gate-candidates@0","node":"d270","brief":"hostile review of M4"}
+{"ts":"2026-08-20T13:18:53.151Z","op":"update","visit":"iterations/i38/gate-candidates@0","node":"d271","brief":"hostile review of M4"}
+{"ts":"2026-08-20T13:18:53.276Z","op":"update","visit":"iterations/i38/gate-candidates@0","node":"d272","brief":"hostile review of M4"}
+{"ts":"2026-08-20T13:18:53.400Z","op":"update","visit":"iterations/i38/gate-candidates@0","node":"d273","brief":"hostile review of M4"}
+{"ts":"2026-08-20T13:18:53.526Z","op":"update","visit":"iterations/i38/gate-candidates@0","node":"d274","brief":"hostile review of M4"}
+{"ts":"2026-08-20T13:19:01.550Z","op":"update","visit":"iterations/i38/gate-candidates@0","node":"d275","brief":"hostile review of M4"}
+{"ts":"2026-08-20T13:23:26.034Z","op":"done","visit":"iterations/i38/cut-criteria@0","node":"d228","brief":"gate rounds complete, verdict written"}
+{"ts":"2026-08-20T13:23:59.671Z","op":"update","visit":"iterations/i38/gate-candidates@0","node":"d276","brief":"gate: saying plainly that the pass had not returned"}
+{"ts":"2026-08-20T13:24:08.299Z","op":"update","visit":"iterations/i38/gate-candidates@0","node":"d277","brief":"blessing gate-candidates: pass with overrides"}

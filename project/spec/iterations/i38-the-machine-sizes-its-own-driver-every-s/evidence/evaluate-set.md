@@ -1,7 +1,8 @@
 ---
 form: evaluate-set
 by: agent
-signed_off: 2026-08-20T13:07:02.561Z
+signed_off: 2026-08-20T13:16:33.471Z
+reopened: "2026-08-20T13:16:16.027Z — its current_situation says FOUR SCORES OF 4 WERE AWARDED and there are five: the seed takes 4 on actor-recorded and on comparison, the derived ladder 4 on wrong-act, the receiver 4 on wrong-act and on host-swap. The same paragraph then lists five named comparisons, so the form contradicts itself in two consecutive sentences."
 authors: agent
 files:
 ---
@@ -12,7 +13,7 @@ files:
 
 Four candidates, five surviving axes, twenty judgements. The table below was filled by a spawned research agent with a clean context, as this state's own note requires: it received the four candidate records, the five axes, the anchors and the prior-art list, and none of the composer's reasoning. Its scores land verbatim.
 
-THE ANCHORS DID THE WORK THEY WERE WRITTEN FOR. Four scores of 4 were awarded and every one names its comparison — Kubernetes effective request, Kubernetes VPA in updateMode Off, Nix requiredSystemFeatures, Nextflow label and withLabel, OASIS XACML 3.0. No 5 was awarded. Nothing scored above par without a name, because the rule makes that impossible to record.
+THE ANCHORS DID THE WORK THEY WERE WRITTEN FOR. Five scores of 4 were awarded and every one names its own comparison — Kubernetes effective request, Kubernetes VPA in updateMode Off, Nix requiredSystemFeatures, Nextflow label and withLabel, OASIS XACML 3.0. No 5 was awarded. Nothing scored above par without a name, because the rule makes that impossible to record.
 
 AND THE SCORER OVERTURNED THE COMPOSER, WHICH IS WHY THE STATE FORBIDS THE COMPOSER FROM SCORING. cand-the-derived-ladder was called the strongest line on the chart in this record's own build_chart follow-up. It is the one candidate eliminated here.
 

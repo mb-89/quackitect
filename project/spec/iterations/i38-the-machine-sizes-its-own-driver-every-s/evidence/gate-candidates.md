@@ -1,5 +1,8 @@
 ---
 form: gate-candidates
+bless: blessed by agent
+by: agent
+signed_off: 2026-08-20T13:24:08.771Z
 authors: agent
 files:
 ---
@@ -12,7 +15,9 @@ M4 is complete and asks to be blessed. It produced 29 option nodes across seven 
 
 TWO OF THE FIVE GOALS THIS GATE MEASURES AGAINST ARE CHALLENGED BY THE WORK ITSELF, which is the substance of this gate rather than an aside. The seed asked for one model list identical on every host and one rating per state. The design found the first unnecessary under one candidate on the front and the second wrong at the small end of the matrix.
 
-A HOSTILE PASS WAS COMMISSIONED BEFORE THIS FORM WAS FILLED AND THE SUBMIT WAS HELD FOR IT. That ordering is this record's own finding: at M2 the pass ran before signing and caught nine false claims; at M3 it ran after and cost eight reopens to repair twelve.
+A HOSTILE PASS WAS COMMISSIONED BEFORE THIS FORM WAS FILLED AND HAD NOT RETURNED WHEN THE VERDICT WAS WRITTEN. The submit was held for it through every round and the whole of round 2 was walked without it, so the ten findings below are the walker's own, found by recounting rather than by reading. If the commissioned pass returns after this bless, its findings reopen this gate; that is the mechanism and this record has already used it twice.
+
+THE ORDERING IS THIS RECORD'S OWN FINDING AND IT STILL HOLDS. At M2 a pass ran before signing and caught nine false claims; at M3 it ran after and cost eight reopens to repair twelve. Holding is right even when the hold does not pay, because the alternative is signing first and finding out afterwards.
 
 ## reasons_hold
 
@@ -61,6 +66,16 @@ THE FRONT IS THREE OF FOUR, NOT ONE, so the space did not collapse upstream. The
 
 ## round_2_red_team
 
+- evaluate-set said FOUR SCORES OF 4 WERE AWARDED and then listed five named comparisons in the next sentence => five 4s were awarded, counted off the table: the seed on actor-recorded and on comparison, the derived ladder on wrong-act, the receiver on wrong-act and on host-swap. FIXED BEFORE THIS GATE RULED. evaluate-set was reopened, corrected and re-signed. The form contradicted itself across two consecutive sentences and neither sentence looked wrong on its own.
+- This gate's own first bound figure said 181 of 1513 calls over the 1-second bound, 12.0 per cent => FALSE, and it counted the wrong population. The call log also holds `mirror_slow` records — 92 of them, every one over a second because a mirror_slow record IS the report of a slow call — so each breach was counted twice. Corrected to 89 of 1520 lane calls, 5.9 per cent, with 87 of the 89 being se_pull. Same error class as this record's M1 miscount over pinned records: a population that looked like the one being measured.
+- The submachine-maximum risk's probe said SIX OF THE SEVEN FINDERS take the same three fields on the same template => five of seven do. find_prior_art asks three extra fields and find_by_probing one, counted by listing the section headings of all seven forms. FIXED in the register node and in this gate's fifth goal. The substance survives — the fan is near-homogeneous — and the number given for it did not.
+- find_by_probing's follow_up says THE DEMAND SHAPE IS FOUR KEYS AND A CELL VALUE REACHES NONE OF THEM => FALSE, and the correction makes the requirement it was arguing against better founded rather than worse. engine/iterations.ts:294 builds each demand as three fields and the first of them is `cell.applies` — a cell value, already in the ledger, ranked, and reopening a record at :356 whenever its rank rises. What survives is the conclusion: `demandsFor` builds from three named things, so a fourth cell key is ignored by construction and moves no demand. The reason given for the conclusion was wrong. OWED: find_by_probing is signed and carries the false sentence; the option node and the register entry it fed have both been corrected.
+- find_by_probing and its option node both say THE CELL'S VALUE IS READ ONCE, AT :593 => OVERSTATED. `applies` is read at engine/rigor-matrix.ts:593 to decide whether a row is in the compiled machine, at :526 to catch a floor row struck out of the column, and at engine/iterations.ts:293-294 to build the demand. Three places, not one. The narrower true claim — it is read as an in-or-out question and never as data — holds for the first two and not the third. FIXED in the option node; OWED in the signed form.
+- find_prior_art's dry_wells says XACML HAS RETURNED A DECISION FOR AN ENFORCEMENT POINT TO ACT ON SINCE 2003 => UNSUPPORTED. Only XACML 3.0, OASIS Standard 22 January 2013, was fetched and read at the primary; the 2003 date was recalled. The irony is exact: this is the form whose exit condition refused a re-signing because the record could not prove a search had happened, and the same form carries a date no search in the log covers. NOT FIXED HERE: se_web_search and se_web_fetch are not legal tools at a gate, and se_reopen is refused here too. Owed at M5, where either the date is verified at the primary or the claim narrows to the 2013 edition that was.
+- The one move at cut-criteria was recorded as THE SHARPEST DISCRIMINATOR ON THE CHART => OVERSTATED, and the beneficiary was the composer's own baseline. Scored, the axis returned 4, 3, 3, 3 — a one-point spread — and the single 4 went to cand-the-seed-made-total. Recomputing the Pareto front without that axis returns the same three candidates, and without the all-zero axis the same three again, so the move changed nothing. Recorded in reasons_hold rather than repaired, because the move was honestly declared and the outcome is stable.
+- req-acts-carry-role-and-channel survived cut-criteria and scored 0 across all four candidates => it does not differentiate and should have been struck under cut-criteria's own first act, which is blind to importance. NOT REPAIRED ON PURPOSE: striking a criterion after seeing the scores is the one edit that cannot be honest. Recorded in round 1 and carried to M5.
+- find_by_probing says 17 OF i38'S 27 FORMS have two or more commits => true when signed and false when read. i38 now has 36 evidence forms. The claim carries no as-of date, so a later reader recounts, finds 36, and cannot tell a decayed figure from a wrong one. This is a class rather than an instance: every count in this record that names a population is a snapshot written as a fact.
+- Three categories came back empty and the emptiness is reported rather than filled => no quote in any M4 form was found truncated in a way that changes it; no candidate's picks contradict its own prose; and every code citation checked at rigor-matrix.ts:417, :526, :593, :609, :612, stateform.ts:333, :347, :560, guard.ts:18, :54, vocabulary.ts:129 and iterations.ts:236, :289, :294, :329, :356 carries what it is cited for.
 
 ## raid_additions
 
@@ -69,9 +84,21 @@ THE FRONT IS THREE OF FOUR, NOT ONE, so the space did not collapse upstream. The
 
 ## verdict
 
+pass with overrides — the design work is complete and its conclusions stand: four candidates composed with seams and feasibility numbers, a front of three recorded, the single elimination reasoned and disputed in writing rather than overruled. Ten findings were raised in round 2 and five were repaired before this verdict was written, including a self-contradiction in evaluate-set and a wrong population in this gate's own bound measurement. FOUR ARE OVERRIDDEN RATHER THAN FIXED and each has an owner: an unverified 2003 date in find_prior_art and two sentences now known false in find_by_probing, none of them repairable from a gate because the web verbs and se_reopen are both illegal here, all three owed at M5; and req-acts-carry-role-and-channel left standing as a criterion it should not have been, because striking a criterion after seeing its scores is the one edit that cannot be honest. THE OVERRIDE THAT MATTERS MOST IS NOT AN ERROR AT ALL: two of the five goals this gate measures against are contradicted by the design that served them, and no criterion in the pool measures spend, so the winner M5 picks will not have been chosen on cost.
 
 ## follow_up
 
+M5 INHERITS FOUR THINGS, AND THE FIRST IS NOT A DEFECT.
+
+THE GOALS NEED AMENDING BEFORE A WINNER MEANS ANYTHING. The seed asked for one rating per state on a five-rung ladder and one model list identical on every host. M4's evidence is that the first is wrong at the small end of the matrix — 34 of 53 rows are struck entirely at patch — and that the second is a design decision the highest-scoring candidate on host-swap does not make. A milestone that produced evidence against two of its own goals has done its job; carrying those goals unchanged into declare-winner would not.
+
+THE MISSING COST AXIS IS THE SECOND AND IT IS THE ONE THAT CHANGES WHAT WINNING MEANS. Of 119 rows in the standing criteria pool exactly one mentions cost and it is a process rule. Either the pool gains a criterion that measures spend before converge-pugh runs, or declare-winner records in as many words that the winner was not chosen on the thing the record exists for.
+
+THE DERIVED LADDER'S ELIMINATION IS THE THIRD. It is dominated because its record is silent on the call record, and it is silent because at build_chart that axis carried one distinct value and no line was required to pick from it. The repair is to redraw the line with the cell it should always have carried, not to argue with the score. If M5 does not redraw it, the elimination stands as scored.
+
+THE THREE OWED REPAIRS ARE THE FOURTH AND THEY ARE SMALL. Verify the XACML 2003 date at the primary or narrow the claim to the 2013 edition that was read; correct find_by_probing's two false sentences about the demand ledger and the read count, both already corrected in the nodes they fed. All three need a state where the web verbs or se_reopen are legal, which is why they could not be done here.
+
+AND ONE THING GOES TO WHOEVER OPENS AN ENGINE ITERATION RATHER THAN TO M5. raid-iss-a-function-may-name-a-cluster-that-does-not-exist and raid-iss-the-live-read-rule-forbids-more-than-its-own-reason-needs are both open and both about the engine rather than about this design. The second changes what this design may do and is named in the overrides; the first cost this milestone a cluster node it had to mint by hand.
 
 ## anything_else
 

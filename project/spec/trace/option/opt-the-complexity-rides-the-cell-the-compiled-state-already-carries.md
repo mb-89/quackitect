@@ -18,8 +18,13 @@ from `fm[col + "_note"]`. `compileColumn` at :609 pulls that cell and folds its
 body into the compiled state's guidance at :612.
 
 SO THE PROSE OF A CELL ALREADY REACHES THE WALKER AND ITS VALUE DOES NOT.
-`cell.applies` is read once, at :593, to decide whether the row is in the machine
-at all. Nothing else about the cell survives as data.
+`cell.applies` is read as an in-or-out question and never as data — at :593 to
+decide whether the row is in the compiled machine, and at :526 to catch a floor
+row struck out of the column. CORRECTED AT gate-candidates: it reaches one more
+place and that place matters. engine/iterations.ts:294 puts it in the demand
+ledger as the first of three fields, and :356 reopens a record whenever its rank
+rises. So one cell value already travels further than this option would send a
+second one. Nothing else about the cell survives as data.
 
 WHAT THIS OPTION IS. A third cell key beside those two — the complexity for this
 row at this column — read by cellsOf, carried by compileColumn onto the StateDecl.
