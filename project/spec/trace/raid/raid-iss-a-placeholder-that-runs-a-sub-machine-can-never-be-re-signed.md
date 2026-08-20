@@ -3,12 +3,12 @@ minted_in: i37-training-iterations-a-disposable-iterati
 id: raid-iss-a-placeholder-that-runs-a-sub-machine-can-never-be-re-signed
 type: "[[raid]]"
 kind: issue
-statement: "A state whose job is to run a sub-machine cannot be re-signed after a feeder re-signs above it, because se_reopen resolves its name to the sub-machine and the claim guard will not let the walk past until it is signed."
+statement: "A refusal names the wrong remedy: reopening a placeholder from inside the sub-machine that shares its name refuses, and the refusal points at se_pull instead of at the machine argument that actually resolves it."
 owner: the owner
 trigger: any reopen upstream of run-spikes, build-steps, run-candidates, enumerate-space or run-demos
 status: open
-impact: "The walk pins permanently. Every remedy the engine offers was tried and none applies, so an iteration that reopens anything upstream of a sub-machine placeholder cannot reach its next gate."
-breaks_how_badly: fatal
+impact: "The walk appears permanently pinned to an agent following the refusals. This one cost a full unattended run: the agent tried six remedies, reported a fatal blocker, and stopped one state short of a gate."
+breaks_how_badly: corrosive
 how_likely: expected
 weighs_with: none
 weighs_against: none
@@ -81,3 +81,57 @@ so even a fix that unpinned this one walk would meet it twice more.
 Either `se_reopen` resolves a placeholder ahead of the sub-machine that shares
 its name, or a placeholder's claim follows its sub-machine's completion rather
 than standing on a signature of its own.
+
+## CORRECTED 2026-08-19 — there was a remedy and this record was wrong
+
+THE OWNER SAID SO PLAINLY: an engine defect is a thing to fix, not a wall to
+stop at. Going to look was the right move and it took one grep.
+
+`se_reopen` TAKES A `machine` ARGUMENT. Its own tool description says so:
+"which machine the state belongs to — needed from outside it, e.g. i1".
+
+    se_reopen {state: "run-spikes", machine: "i37", reason: "..."}
+
+REOPENED IMMEDIATELY. The walk was never pinned.
+
+## What the real defect is, and it is much smaller
+
+THE REFUSAL NAMES THE WRONG REMEDY. `stateFormState` in
+`engine/sessionclaims.ts` throws:
+
+    expected: a state of run-spikes with an evidence form
+    remedy:   se_pull — "the walk's own states carry the forms"
+
+BOTH LINES POINT AWAY FROM THE FIX. The `expected` says the name is not a state
+of this machine, which is true and useless — the caller meant the state one
+frame OUT. The `remedy` says to pull, and pulling never serves that form.
+
+THE ARGUMENT THAT WOULD HAVE FIXED IT IS NOT MENTIONED. It exists, it is
+documented on the tool, and the refusal does not name it.
+
+## Against the standing law
+
+`refusals.md` opens with it: ANYTHING THAT BLOCKS OWES A REMEDY, NOT ONLY A
+TYPED REFUSAL. And: "THE TEST OF A REMEDY: could somebody act on it without
+asking a second question? If not, it is a diagnosis rather than a remedy."
+
+THIS REMEDY FAILED THAT TEST and the cost is measured: six attempted remedies,
+a wrongly-graded fatal register entry, a field report built around a blocker
+that was not one, and a stopped run.
+
+## The fix
+
+When the named state is not in the current machine, look outward through the
+frame stack. If a machine there declares it, name that machine in the remedy:
+
+    se_reopen {state: "<name>", machine: "<that machine's id>"}
+
+The engine already knows the answer — `subs` and `machine` are both on the
+claims host. It just does not say it.
+
+## Why the grade dropped from fatal to corrosive
+
+NOTHING IS UNREACHABLE. The walk was never actually stuck, so no iteration is
+blocked and no data is at risk. What it destroys is an agent's afternoon, and
+it does it silently, which is exactly the shape this iteration exists to
+measure.

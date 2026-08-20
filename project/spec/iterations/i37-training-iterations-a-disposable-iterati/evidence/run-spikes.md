@@ -1,5 +1,6 @@
 ---
 form: run-spikes
+reopened: "2026-08-20T06:59:28.606Z — rank-unknowns re-signed above it after the M6 spikes overturned the declared winner"
 by: agent
 signed_off: 2026-08-19T19:34:22.818Z
 authors: agent
