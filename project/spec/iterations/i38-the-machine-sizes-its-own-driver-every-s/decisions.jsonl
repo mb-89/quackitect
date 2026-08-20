@@ -405,3 +405,8 @@
 {"ts":"2026-08-20T13:28:44.108Z","op":"update","visit":"iterations/i38/reverse-sensitivity@0","node":"d283","brief":"minting tripwire the-leaders-whole-margin-is-one-cell-t"}
 {"ts":"2026-08-20T13:28:44.254Z","op":"update","visit":"iterations/i38/reverse-sensitivity@0","node":"d284","brief":"minting tripwire the-winner-flips-the-moment-the-damage"}
 {"ts":"2026-08-20T13:29:36.364Z","op":"update","visit":"iterations/i38/reverse-sensitivity@0","node":"d285","brief":"reverse-sensitivity signed"}
+{"ts":"2026-08-20T13:30:19.169Z","op":"plan","visit":"iterations/i38/declare-winner@0","parent":null,"nodes":[{"id":"d286","brief":"redraw the two silent lines"},{"id":"d287","brief":"recompose them"},{"id":"d288","brief":"re-score with a fresh reader"},{"id":"d289","brief":"re-derive the matrix"}]}
+{"ts":"2026-08-20T13:30:54.578Z","op":"update","visit":"iterations/i38/declare-winner@0","node":"d290","brief":"trying to route back to the chart to redraw two lines"}
+{"ts":"2026-08-20T13:31:29.440Z","op":"update","visit":"iterations/i38/declare-winner@0","node":"d291","brief":"reading declare-winner"}
+{"ts":"2026-08-20T13:32:38.675Z","op":"plan","visit":"iterations/i38/declare-winner@0","parent":null,"nodes":[{"id":"d292","brief":"recount M4 figures against the option and candidate nodes"},{"id":"d293","brief":"check engine citations at their cited lines"}]}
+{"ts":"2026-08-20T13:32:48.914Z","op":"update","visit":"iterations/i38/declare-winner@0","node":"d294","brief":"declare-winner signed"}
