@@ -237,3 +237,7 @@
 {"ts":"2026-08-20T11:45:26.363Z","op":"update","visit":"iterations/i38/partition-functions@0","node":"d126","brief":"partition-functions: reading the form"}
 {"ts":"2026-08-20T11:46:49.549Z","op":"update","visit":"iterations/i38/partition-functions@0","node":"d127","brief":"the four decision functions become the-sizing cluster"}
 {"ts":"2026-08-20T11:47:12.466Z","op":"update","visit":"iterations/i38/partition-functions@0","node":"d128","brief":"partition: a new cluster, measured from the flows"}
+{"ts":"2026-08-20T11:52:02.591Z","op":"update","visit":"iterations/i38/enumerate-space/find_contradiction@0","node":"d129","brief":"find_contradiction: reading the form"}
+{"ts":"2026-08-20T11:53:22.031Z","op":"update","visit":"iterations/i38/enumerate-space/find_contradiction@0","node":"d130","brief":"minting contradiction option the-decision-is-fixed-within-a-run-a"}
+{"ts":"2026-08-20T11:53:22.148Z","op":"update","visit":"iterations/i38/enumerate-space/find_contradiction@0","node":"d131","brief":"minting contradiction option split-a-submachine-where-the-spread-"}
+{"ts":"2026-08-20T11:53:50.723Z","op":"plan","visit":"iterations/i38/enumerate-space/find_contradiction@0","parent":null,"nodes":[{"id":"d132","brief":"contradiction finder: four stated"},{"id":"d133","brief":"three broken"},{"id":"d134","brief":"one traded"}]}
