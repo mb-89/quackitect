@@ -937,3 +937,22 @@
 {"ts":"2026-08-20T09:50:12.871Z","op":"update","visit":"iterations/i37/build-steps/derive-what-the-walk-cost@0","node":"d175","brief":"pinning what is actually mine: both halves of one state agree"}
 {"ts":"2026-08-20T09:50:21.857Z","op":"update","visit":"iterations/i37/build-steps/derive-what-the-walk-cost@0","node":"d176","brief":"typechecking the merged tree"}
 {"ts":"2026-08-20T09:50:32.385Z","op":"update","visit":"iterations/i37/build-steps/derive-what-the-walk-cost@0","node":"d177","brief":"completing the trunk merge"}
+{"ts":"2026-08-20T09:50:44.081Z","op":"update","visit":"iterations/i37/build-steps/derive-what-the-walk-cost@0","node":"d178","brief":"pushing the merged branch"}
+{"ts":"2026-08-20T09:51:16.639Z","op":"update","visit":"iterations/i37/build-steps/derive-what-the-walk-cost@0","node":"d179","brief":"reading the first build chunk"}
+{"ts":"2026-08-20T09:51:54.851Z","op":"update","visit":"iterations/i37/build-steps/derive-what-the-walk-cost@0","node":"d180","brief":"building derive-what-the-walk-cost: the carry-forward rule"}
+{"ts":"2026-08-20T09:52:03.029Z","op":"update","visit":"iterations/i37/build-steps/derive-what-the-walk-cost@0","node":"d181","brief":"typechecking the cost derivation"}
+{"ts":"2026-08-20T09:52:05.423Z","op":"update","visit":"iterations/i37/build-steps/derive-what-the-walk-cost@0","node":"d182","brief":"checking the cost chunk against its case"}
+{"ts":"2026-08-20T09:54:23.190Z","op":"update","visit":"iterations/i37/build-steps/derive-what-the-walk-cost@0","node":"d183","brief":"re-projecting the prompt layer after the merge"}
+{"ts":"2026-08-20T09:54:34.698Z","op":"update","visit":"iterations/i37/build-steps/derive-what-the-walk-cost@0","node":"d184","brief":"re-running the battery after re-projecting the prompt layer"}
+{"ts":"2026-08-20T09:57:37.707Z","op":"update","visit":"iterations/i37/build-steps/derive-what-the-walk-cost@0","node":"d185","brief":"derive-what-the-walk-cost is built and green"}
+{"ts":"2026-08-20T09:57:50.083Z","op":"update","visit":"iterations/i37/build-steps/derive-what-the-walk-cost@0","node":"d186","brief":"reading what the walk now owes"}
+{"ts":"2026-08-20T09:58:02.855Z","op":"update","visit":"iterations/i37/build-steps/derive-what-the-walk-cost@0","node":"d187","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T09:58:06.180Z","op":"update","visit":"iterations/i37/build-steps/derive-what-the-walk-cost@0","node":"d188","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T09:58:08.934Z","op":"update","visit":"iterations/i37/build-steps/write-the-benchmark-report@0","node":"d189","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T09:58:09.336Z","op":"update","visit":"iterations/i37/build-steps/write-the-benchmark-report@0","node":"d190","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T09:58:37.530Z","op":"update","visit":"iterations/i37/build-steps/write-the-benchmark-report@0","node":"d191","brief":"building write-the-benchmark-report: the conditions guard and the stamp set"}
+{"ts":"2026-08-20T09:59:02.678Z","op":"update","visit":"iterations/i37/build-steps/write-the-benchmark-report@0","node":"d192","brief":"the benchmark-run item template, discovered by being written"}
+{"ts":"2026-08-20T09:59:11.224Z","op":"update","visit":"iterations/i37/build-steps/write-the-benchmark-report@0","node":"d193","brief":"typechecking the report chunk"}
+{"ts":"2026-08-20T09:59:13.758Z","op":"update","visit":"iterations/i37/build-steps/write-the-benchmark-report@0","node":"d194","brief":"checking the report chunk"}
+{"ts":"2026-08-20T10:02:39.060Z","op":"update","visit":"iterations/i37/build-steps/write-the-benchmark-report@0","node":"d195","brief":"write-the-benchmark-report is built and its cases pass"}
+{"ts":"2026-08-20T10:02:48.947Z","op":"update","visit":"iterations/i37/build-steps/write-the-benchmark-report@0","node":"d196","brief":"checkpointing two built chunks"}
