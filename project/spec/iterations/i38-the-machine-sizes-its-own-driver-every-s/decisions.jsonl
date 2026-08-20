@@ -849,3 +849,11 @@
 {"ts":"2026-08-20T19:08:53.669Z","op":"update","visit":"iterations/i38/gate-inputs@2","node":"d22","brief":"walking the record"}
 {"ts":"2026-08-20T19:10:57.315Z","op":"update","visit":"iterations/i38/gate-requirements@0","node":"d23","brief":"walking the record"}
 {"ts":"2026-08-20T19:14:41.296Z","op":"update","visit":"iterations/i38/author-tests@0","node":"d24","brief":"walking the record"}
+{"ts":"2026-08-20T19:16:15.587Z","op":"update","visit":"iterations/i38/author-tests@0","node":"d25","brief":"cold scoring pass"}
+{"ts":"2026-08-20T19:16:22.619Z","op":"update","visit":"iterations/i38/author-tests@0","node":"d26","brief":"cold must-check pass"}
+{"ts":"2026-08-20T19:16:42.244Z","op":"update","visit":"iterations/i38/author-tests@0","node":"d27","brief":"cold must-check pass"}
+{"ts":"2026-08-20T19:16:42.410Z","op":"update","visit":"iterations/i38/author-tests@0","node":"d28","brief":"cold must-check pass"}
+{"ts":"2026-08-20T19:16:53.056Z","op":"update","visit":"iterations/i38/author-tests@0","node":"d29","brief":"cold must-check pass"}
+{"ts":"2026-08-20T19:16:53.220Z","op":"update","visit":"iterations/i38/author-tests@0","node":"d30","brief":"cold must-check pass"}
+{"ts":"2026-08-20T19:17:32.692Z","op":"update","visit":"iterations/i38/author-tests@0","node":"d31","brief":"cold must-check pass"}
+{"ts":"2026-08-20T19:17:39.118Z","op":"update","visit":"iterations/i38/author-tests@0","node":"d32","brief":"cold must-check pass"}

@@ -31,7 +31,7 @@ ONE LIST, EDITED BY HAND, READ LIVE — the same shape both existing dials alrea
 
 Whoever is driving reads the name and starts the next stretch on it.
 |||
-THIS IS THE SLIDE THAT DOES NOT FILL YET, AND THE REASON IS NARROWER THAN THIS DECK FIRST CLAIMED. It said nothing is listening on an unattended box. Something is: se-start.ts:141 spawns the lane and :155-170 polls until it answers before any agent launches, and the agent it then launches at :245 is alive and pulling. THE ACTUAL HOLE is that a live agent has no way to become a different model, and nothing beside it can relaunch one mid-walk. The receiver can read and cannot act.
+THIS IS THE SLIDE THAT DOES NOT FILL YET, AND THE REASON IS NARROWER THAN THIS DECK FIRST CLAIMED. It said nothing is listening on an unattended box. Something is: se-start.ts:141 spawns the lane and :155-170 polls until it answers before any agent launches, and the agent it then launches at :245 is alive and pulling. CORRECTED AGAIN 2026-08-20 AND THIS SLIDE NOW FILLS. It ended "the receiver can read and cannot act", which was false. A live agent has no way to BECOME a different model and does not need one: it hands the step to a subagent on a stronger hand. THE HOLE THAT REMAINS is that nothing makes it do so, and nothing in the log can tell the two hands apart afterwards.
 
 ---
 

@@ -62,13 +62,22 @@ implementation. Nothing the lane can reach answers "what served this call".
 
 WHAT WOULD LIFT IT is named in the requirement itself and is confirmed here: the
 value arriving from whatever performed the spawn, which knows what it started and
-is not the party being measured. THAT PARTY DOES NOT EXIST — see
-`exp-can-anything-act-on-a-published-driver`, where the same absence is what
-makes the payoff unreachable.
+is not the party being measured.
 
-SO THE TWO SPIKES MEET AT ONE MISSING THING. A receiver that could act on a
-published driver would also be the party that could report what it started. One
-absence costs the payoff and the attribution both.
+THAT PARTY EXISTS, corrected 2026-08-20. This section said it did not, citing
+`exp-can-anything-act-on-a-published-driver`, and that spike has since been
+settled the other way: the party is the walking agent, which delegates a step to
+a subagent on a stronger hand and therefore knows what it started.
+
+SO THE TWO SPIKES MEET AT ONE PARTY RATHER THAN AT ONE ABSENCE. The hand that
+acts on a published driver is the same hand that could report what it started —
+and it is inside our walk, not outside it.
+
+WHAT THE MARK STILL RESTS ON, and it is narrower than "nobody knows". The value
+still arrives from the party being measured, because the walker both spawns and
+reports. Taking the mark off needs the value to come from something the walker
+does not control, and that is outside this iteration's box. But the reason is
+now a trust boundary rather than a missing party.
 
 ## What this does not settle
 

@@ -35,7 +35,7 @@ IT TRADES OUR ASSUMPTIONS FOR SOMEBODY ELSE'S CAPABILITY.
 - The judgement and reading figures are separable in practice. Argued from two
   worked examples in the corpus and never measured.
 
-AND ITS ACCOUNTABILITY IS HALF A MECHANISM, WHICH IT SHOULD BE READ AS ADMITTING. It names an acceptable over-driving rate in advance because that is the only half of measuring that lives on our side of the boundary. We can state the tolerance; we cannot observe what actually answered, because under this line nothing of ours ever knew which model the rung resolved to. Every other candidate can reconcile a named driver against a real one, and this one is asking a receiver it does not control to report against a number it did not choose.
+AND ITS ACCOUNTABILITY IS HALF A MECHANISM, WHICH IT SHOULD BE READ AS ADMITTING. It names an acceptable over-driving rate in advance because that is the only half of measuring that lives on our side of the boundary. We can state the tolerance; we cannot CHECK what actually answered, because this line holds no roster to check a self-report against. CORRECTED 2026-08-20: this clause read "nothing of ours ever knew which model the rung resolved to", and that is false. The party that resolves the rung is the walking agent, which chooses the hand it spawns and therefore knows. What is lost is the cross-check, not the knowledge. Every other candidate can reconcile a named driver against a real one. This one asks the resolving party to report against a number it did not choose — and where that party is our own walker the ask is reasonable, while for a consumer outside our tree it is a request we cannot back.
 
 THE ONE THING IT LEANS ON THAT IS SETTLED is the shape of the no-match value,
 verified at the primary — OASIS XACML 3.0, 22 January 2013 — where NotApplicable
@@ -127,8 +127,11 @@ distribution, which is computable from the ratings alone the day they are
 written."
 
 SO THE OPTION IS FINE AND THIS LINE IS THE ONE WITH THE GAP. The target is
-computable here as it is anywhere; what cannot be computed here is the OTHER
-side, because nothing of ours learns which model the rung resolved to. This
+computable here as it is anywhere; what cannot be VERIFIED here is the OTHER
+side, because this line holds no roster against which to check what the resolving
+party reports. CORRECTED 2026-08-20: this sentence said nothing of ours learns
+which model the rung resolved to. The walking agent learns it, because it is the
+one that picks the hand. This
 line's most-quoted admission of its own weakness had been attributed to a source
 that denies it.
 
@@ -303,9 +306,13 @@ SIDES. NotApplicable makes the absence legible on the wire; a record carrying
 neither a driver nor a reason being invalid makes it legible in the log. Taking
 one without the other leaves the hole open in whichever place was not covered.
 
-THE MEASUREMENT SEAM IS BROKEN AND THE CANDIDATE ADMITS IT. Naming an acceptable
-over-driving rate needs somebody to report against it, and under this line
-nothing of ours ever learns which model the rung resolved to.
+THE MEASUREMENT SEAM IS NARROWER THAN THIS FILE CLAIMED THREE TIMES. Naming an
+acceptable over-driving rate needs somebody to report against it, and under this
+line that somebody is the walking agent, which knows what it spawned and reports
+it. WHAT IS MISSING IS THE CHECK ON THAT REPORT: this line holds no roster, so
+nothing of ours can compare a self-report against what the rung should have
+resolved to. CORRECTED 2026-08-20, on a cold reader's finding that this file
+carried the correction twice and the falsehood three times.
 
 ## What it costs
 
