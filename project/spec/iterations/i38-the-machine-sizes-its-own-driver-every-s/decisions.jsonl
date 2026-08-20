@@ -217,3 +217,10 @@
 {"ts":"2026-08-20T11:30:46.659Z","op":"update","visit":"iterations/i38/derive-functions@0","node":"d107","brief":"the requirements gate falls; its evidence was falsified"}
 {"ts":"2026-08-20T11:31:28.197Z","op":"update","visit":"iterations/i38/gate-requirements@1","node":"d108","brief":"the non-monotonic half is withdrawn; the spread survives"}
 {"ts":"2026-08-20T11:32:17.759Z","op":"update","visit":"iterations/i38/gate-requirements@1","node":"d109","brief":"F17: the measurements never entered the lane"}
+{"ts":"2026-08-20T11:34:16.956Z","op":"update","visit":"iterations/i38/gate-requirements@1","node":"d110","brief":"re-measuring refusals through the lane so the count has a ref"}
+{"ts":"2026-08-20T11:34:27.898Z","op":"update","visit":"iterations/i38/gate-requirements@1","node":"d111","brief":"refusal tally over the whole log, through the lane"}
+{"ts":"2026-08-20T11:36:09.001Z","op":"update","visit":"iterations/i38/gate-requirements@1","node":"d112","brief":"refusal figures corrected; the recovery claim withdrawn"}
+{"ts":"2026-08-20T11:36:09.131Z","op":"update","visit":"iterations/i38/gate-requirements@1","node":"d113","brief":"reopening probe-assumptions on the refusal figures"}
+{"ts":"2026-08-20T11:36:35.511Z","op":"update","visit":"iterations/i38/probe-assumptions@2","node":"d114","brief":"probe-assumptions re-signed with true figures and withdrawn claims"}
+{"ts":"2026-08-20T11:36:59.962Z","op":"update","visit":"iterations/i38/gate-requirements@1","node":"d115","brief":"minting the missing milestone-difficulty flow"}
+{"ts":"2026-08-20T11:37:00.084Z","op":"update","visit":"iterations/i38/gate-requirements@1","node":"d116","brief":"the reduction now emits a milestone-level flow"}

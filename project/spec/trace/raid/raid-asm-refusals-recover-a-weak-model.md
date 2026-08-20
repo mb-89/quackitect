@@ -18,16 +18,41 @@ source_refs:
   - "the owner's ruling 2026-08-12: hand validation, never automation"
 ---
 
-## A SECOND ONE-SIDED DATA POINT, i38 on 2026-08-20
+## A SECOND ONE-SIDED DATA POINT, i38 on 2026-08-20 — CORRECTED THE SAME DAY
 
-STILL NOT A WEAK MODEL, so this narrows nothing that matters. Recorded because
-the sample is now two sessions rather than one, and because one clause behaved
-differently from the rest.
+STILL NOT A WEAK MODEL, so this narrows nothing that matters.
 
-FORTY-FIVE REFUSALS OVER FIVE HUNDRED CALLS. Every typed clause hit —
-SE-C-046, SE-C-101, SE-C-110, SE-C-112, SE-C-120, SE-C-125, SE-C-133, SE-C-138
-and the EARS check — recovered in one turn from the payload, with one exception
-below.
+THE FIGURES BELOW REPLACE A WRONG SET, and the wrong set is kept because how it
+was wrong is the useful part.
+
+FIRST REPORTED: "forty-five refusals over five hundred calls", with a clause
+list naming SE-C-046, 101, 110, 112, 120, 125, 133, 138. BOTH HALVES WERE
+WRONG.
+
+- THE POPULATION WAS A TAIL WINDOW. The measuring call passed `limit: 500` while
+  the log held more than seven hundred records, so it measured the last five
+  hundred and the form reported it as the session.
+- THE CLAUSE LIST WAS RECALLED, NOT READ. SE-C-125 and SE-C-138 never fired at
+  all this session; they were carried over from this node's own earlier probe
+  describing the i35 run. SE-C-102 and SE-C-122 did fire and were missing.
+
+MEASURED PROPERLY, over the whole file: 891 records, 72 refusals.
+SE-C-121 ×28, SE-C-133 ×20, SE-C-110 ×4, SE-C-120 ×4, SE-C-101 ×3, SE-C-102 ×3,
+SE-C-122 ×3, SE-C-046 ×1, SE-C-112 ×1, and five whose response this parse could
+not read.
+
+AND THE COUNT HAD TO BE TAKEN TWICE. A first parse required the `response` field
+to be an object and reported a different distribution; fifteen records store it
+as a JSON STRING instead. TWO HONEST PARSES OF ONE FILE DISAGREED because the
+log is not uniformly shaped, which is worth knowing before anyone ranks clauses
+from it.
+
+THE RECOVERY CLAIM IS WITHDRAWN. The form said every typed clause recovered in
+one turn except the narration ones. NOTHING MEASURED THAT — recovery is a
+property of the NEXT call, and no pass over the log was made to check it. It
+was an assertion in the shape of a measurement, and at least one counter-example
+is in the walker's own trail: a state-gate refusal whose remedy named a
+different door was answered by re-sending the identical call.
 
 THE EXCEPTION IS WORTH THE ENTRY. SE-C-121 fired sixteen times and SE-C-133
 twenty, and both are NARRATION clauses. The 121s were node ids guessed rather

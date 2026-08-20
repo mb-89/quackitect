@@ -1,8 +1,8 @@
 ---
 form: probe-assumptions
 by: agent
-signed_off: 2026-08-20T11:13:33.816Z
-reopened: "2026-08-20T11:13:32.664Z — identify-assumptions was re-signed after it with a corrected row count, and this states own follow-up quotes the old figure"
+signed_off: 2026-08-20T11:36:36.012Z
+reopened: "2026-08-20T11:36:09.134Z — its refusal figures were taken over a tail window imposed by the query limit, its clause list was recalled rather than read, and its claim that every typed clause recovered in one turn was never measured"
 authors: agent
 files:
 ---
@@ -104,14 +104,16 @@ IT CHANGED THREE ARTIFACTS BEFORE ANY RATING WAS WRITTEN. req-every-matrix-row-d
 
 TWO STANDING ASSUMPTIONS WERE RE-PROBED ON THIS SESSION'S OWN EVIDENCE.
 
-- raid-asm-only-one-agent-works-a-clone-at-a-time: ITS TRIGGER FIRED, four times, when reviewing agents and a researcher read the clone while the walker wrote to it. IT HELD, and only for the weaker claim: every one was read-only by instruction, so two writers never met. THE TRIGGER NOW NEEDS SHARPENING — a reviewer at a gate is the roster's own design, so "two agents on one checkout" will keep firing on the safe case until it distinguishes a second READER from a second WRITER.
-- raid-asm-refusals-recover-a-weak-model: a second one-sided data point, still not a weak model. Forty-five refusals in five hundred calls, every typed clause recovered in one turn EXCEPT the narration ones — SE-C-121 sixteen times and SE-C-133 twenty. The 121s were node ids guessed while the open node map rode every result. That is this assumption's own failure mode arriving in a capable model: a remedy present, correct, and unused because the answer looked obvious. The claim to test is narrower than whether the remedy works — it is whether the remedy is placed where a reader who thinks they know will still see it.
+- raid-asm-only-one-agent-works-a-clone-at-a-time: ITS TRIGGER FIRED, four times, when reviewing agents and a researcher read the clone while the walker wrote to it. THE COUNT IS SUPPORTED BY THE RECORD; THE REST IS NOT, AND THE ENTRY NOW SAYS SO. 'Every one was read-only by instruction' rests on the walker's memory of instructions it gave: nothing in the repository records what a subagent was told, the call log carries no subagent actor, and no mtime check, dirty-tree observation or git evidence was taken. SO 'IT HELD' IS AN ASSERTION, NOT A PROBE OUTCOME. The hazard the assumption names is two WRITERS, and that is precisely the half nothing here can reach. THE TRIGGER NOW NEEDS SHARPENING — a reviewer at a gate is the roster's own design, so "two agents on one checkout" will keep firing on the safe case until it distinguishes a second READER from a second WRITER.
+- raid-asm-refusals-recover-a-weak-model: a second one-sided data point, still not a weak model, AND THE FIGURES FIRST WRITTEN HERE WERE WRONG TWICE OVER. They said forty-five refusals in five hundred calls; the query carried `limit: 500` while the log held over seven hundred records, so the form reported a tail window as the session. MEASURED OVER THE WHOLE FILE: 891 records, 72 refusals — SE-C-121 x28, SE-C-133 x20, SE-C-110 x4, SE-C-120 x4, SE-C-101 x3, SE-C-102 x3, SE-C-122 x3, SE-C-046 x1, SE-C-112 x1, and five unreadable by this parse. THE CLAUSE LIST WAS ALSO RECALLED RATHER THAN READ: SE-C-125 and SE-C-138 never fired this session and were carried in from the node's own earlier probe about a different run, while SE-C-102 and SE-C-122 fired and were omitted. AND THE COUNT NEEDED TAKING TWICE — fifteen records store `response` as a JSON string rather than an object, so a first parse silently dropped them and two honest parses of one file disagreed. THE RECOVERY CLAIM IS WITHDRAWN ENTIRELY: 'every typed clause recovered in one turn except the narration ones' measured nothing. Recovery is a property of the NEXT call and no pass over the log was made to check it. WHAT SURVIVES is the observation the figures were dressing: the two narration clauses dominate at 48 of 72, and the SE-C-121s were node ids guessed while the open node map rode every result — a remedy present, correct and unused because the answer looked obvious.
 
 ONE STANDING UNPROBED, HONESTLY. raid-asm-the-model-ladder-is-a-total-order cannot be tested until a list exists. Its probe is written and costs one state walked at two rungs.
 
 - RE-EARNED AFTER A RECOUNT UPSTREAM. The matrix figure moved from forty-six of fifty-two to forty-seven of fifty-three; a counting script had truncated each row file at three thousand characters and one long row lost a cell. The falsification this state performed does not rest on that figure at all — it rests on draft-vision's four column notes, read directly — so nothing here moved.
 
 - WORTH SAYING BECAUSE IT IS THE THIRD SHAPE OF THE SAME ERROR IN THREE MILESTONES. M1 recalled a number. M2 read a listing by eye. M3 ran a program that silently dropped a row. Each correction adopted the previous lesson and met a new mechanism. THE PATTERN IS NOT CARELESSNESS ABOUT METHOD — it is that no method carries its own check, and the cross-check for this one was already on the record: this iteration established fifty-three rows at its kickoff and wrote fifty-two four milestones later without either figure noticing the other.
+
+- RE-SIGNED AFTER AN ADVERSARIAL PASS. Two of this state's three probe results were reported over populations the state chose without saying so, and one was not a measurement at all. The falsification of the per-column assumption — this state's actual result — was itself half wrong and is corrected in the entry: the SPREAD stands, the NON-MONOTONICITY was manufactured by quoting one of a note's two sentences and is withdrawn.
 
 ## anything_else
 

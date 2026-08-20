@@ -9,11 +9,16 @@ satisfies:
 inputs:
   - flow-step-difficulty
 outputs:
-  - flow-step-difficulty
+  - flow-milestone-difficulty
 ---
 
 ## Rationale
 
 THE REDUCTION IS THE MAXIMUM and this function does not say so, because the requirement does. What the function fixes is that a milestone gets ONE answer and that the inputs to it survive.
+
+IT EMITS A DIFFERENT FLOW FROM THE ONE IT CONSUMES, corrected 2026-08-20. It
+first declared `flow-step-difficulty` on both sides, so the milestone maximum
+travelled typed as a step difficulty and the reduction was invisible to the
+type system. `flow-milestone-difficulty` is the output now.
 
 KEEPING THE SPREAD IS HALF THE FUNCTION. Without it nothing in the record says how much of a milestone was walked by more than it needed, and the only signal that would ever justify splitting one is gone.

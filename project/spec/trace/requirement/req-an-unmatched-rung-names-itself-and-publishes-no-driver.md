@@ -2,7 +2,7 @@
 minted_in: i38-the-machine-sizes-its-own-driver-every-s
 id: req-an-unmatched-rung-names-itself-and-publishes-no-driver
 type: "[[requirement]]"
-statement: "Where the model list carries no entry for a rung, the milestone shall publish no driver and shall name the rung that went unmatched, and shall never fall back to whatever model is currently running."
+statement: "Where the model list carries no entry for a rung, the milestone shall publish no driver, naming the unmatched rung and never falling back to whatever model is currently running."
 kind: functional
 verify_method: test
 breaks_if_removed: "A silent fallback is indistinguishable from a working lookup, so a list that has quietly stopped covering the ladder keeps producing confident answers that mean nothing."

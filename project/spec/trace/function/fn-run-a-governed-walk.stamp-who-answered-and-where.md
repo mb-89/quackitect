@@ -7,6 +7,7 @@ statement: record, with every call, which model answered it and which state the 
 satisfies:
   - req-every-call-records-the-model-that-answered-it
   - req-every-call-records-the-state-it-was-made-in
+  - req-a-weaker-driver-than-named-owes-a-recorded-reason
 inputs:
   - flow-dispatched-call
 outputs:
@@ -14,6 +15,11 @@ outputs:
 ---
 
 ## Rationale
+
+IT ALSO CARRIES THE REASON, OR ITS ABSENCE. Where the driver that walked is
+weaker than the one named, the record takes the stated reason — and where none
+was given it takes the mark that says so. That is the same act as stamping who
+and where: the record grows a field the server knows about the call.
 
 STAMPED WHERE THE CALL IS SERVED, which is where the acting role is already stamped and for the stated reason: the code that knows writes it, and nothing downstream infers it.
 
