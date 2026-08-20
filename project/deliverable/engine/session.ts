@@ -79,6 +79,7 @@ import { Liveness } from "./sessionlive.ts";
 import { ReadGate } from "./sessionreads.ts";
 import { Scripts } from "./sessionscript.ts";
 import { Views } from "./sessionviews.ts";
+import { difficultyOf, publish } from "./sizing.ts";
 import { NARRATION_DEFAULT_CALLS, NARRATION_DEFAULT_MINUTES } from "./toll.ts";
 import type { loadTrace } from "./trace.ts";
 
@@ -541,6 +542,38 @@ export class Session {
   /** Boot is done — the toll arms on this; the reading room pays none. */
   isBooted(): boolean {
     return this.bannerShown;
+  }
+
+  /** HOW STRONG A HAND THE STEP IN HAND NEEDS — el-sizing's whole outbound
+   *  half, riding the pull beside the state and the tier.
+   *
+   *  THE LANE SAYS AND DOES NOT DO. Publishing is where the machine's part
+   *  ends: nothing here starts a process, and nothing downstream of this
+   *  value inside the box starts one either
+   *  (req-the-machine-names-a-driver-and-starts-nothing).
+   *
+   *  A RUNG AND THE PAIR IT CAME FROM, NEVER A MODEL. Resolving a rung to a
+   *  concrete hand is whoever holds the fleet's business — in our own
+   *  deployment, the walking agent, which acts by delegating the step to a
+   *  subagent on a stronger hand.
+   *
+   *  A STEP WITH NO RATING PUBLISHES NOTHING RATHER THAN A GUESS. The field is
+   *  absent, and the walk carries on exactly as it did before this existed. A
+   *  fallback to whatever is running would be indistinguishable from a working
+   *  lookup, which is what
+   *  req-an-unmatched-rung-names-itself-and-publishes-no-driver forbids. */
+  private strengthNeeded(): Record<string, unknown> {
+    try {
+      const m = this.machine;
+      const id = this.active()[0];
+      const step = m?.states.find((s) => s.id === id);
+      if (step === undefined || step.submachine !== undefined) return {};
+      return { needs: publish(difficultyOf(step)) };
+    } catch {
+      // AN UNRATED STEP IS THE COMMON CASE TODAY and it is not an error. The
+      // block refuses rather than guessing, and the pull publishes nothing.
+      return {};
+    }
   }
 
   /** THE STATE A CALL WAS MADE IN, as a field for the record rather than a
@@ -2285,6 +2318,7 @@ export class Session {
       // (owner ruling 2026-08-14).
       ...this.tierFor(this._autonomy),
       narration: { minutes: this._narrationMinutes, calls: this._narrationCalls },
+      ...this.strengthNeeded(),
     });
 
     // STEPPING OUT stays the agent's decision — the machine cannot know
