@@ -356,3 +356,4 @@
 {"ts":"2026-08-20T13:01:24.652Z","op":"update","visit":"iterations/i38/evaluate-set@0","node":"d241","brief":"second gate-design reference in the issue node"}
 {"ts":"2026-08-20T13:01:24.944Z","op":"update","visit":"iterations/i38/evaluate-set@0","node":"d242","brief":"reading the over-driving-rate option node, last read of the scoring pass"}
 {"ts":"2026-08-20T13:02:10.366Z","op":"update","visit":"iterations/i38/evaluate-set@0","node":"d243","brief":"carrying probe measurements into three open register entries"}
+{"ts":"2026-08-20T13:06:52.010Z","op":"plan","visit":"iterations/i38/evaluate-set@0","parent":null,"nodes":[{"id":"d244","brief":"land the spawned scorer's table"},{"id":"d245","brief":"compute the front"},{"id":"d246","brief":"write the reading"},{"id":"d247","brief":"sign evaluate-set"}]}
