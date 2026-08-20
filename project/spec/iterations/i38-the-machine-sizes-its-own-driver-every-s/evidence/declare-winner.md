@@ -1,7 +1,8 @@
 ---
 form: declare-winner
 by: agent
-signed_off: 2026-08-20T13:32:49.313Z
+signed_off: 2026-08-20T14:36:18.341Z
+reopened: "2026-08-20T14:35:33.597Z — it declared cand-the-seed-made-total on a scoring that has since been re-earned against a redrawn candidate set. That candidate is dominated by cand-the-reader-beside-the-walk and off the front; the computed winner is now cand-the-receiver-decides, with the reader level at zero."
 authors: agent
 files:
 ---
@@ -10,40 +11,38 @@ files:
 
 ## current_situation
 
-The seat held at converge-pugh and the winner is drawn, not chosen here: cand-the-seed-made-total. This state's own guidance says nothing here recomputes or overrides it, so the declaration stands and the comments carry what the arithmetic cannot.
+The seat holds and the winner is drawn: cand-the-receiver-decides. This state's guidance says nothing here recomputes or overrides it.
 
-THE ARITHMETIC IS SOUND AND THE COMPARISON UNDER IT IS NOT, and reverse-sensitivity measured how far. The declaration is made anyway, because the repair needs build_chart and there is no drawn path back to it from here — se_reopen is not a legal tool at this state and se_aim answers that no path exists.
+THIS IS THE SECOND DECLARATION AND IT NAMES A DIFFERENT CANDIDATE. The first declared cand-the-seed-made-total with a finding recorded against it — that it led on two axes both fed by one cell, and that six of seven grafted worlds unseated it. The finding was acted on: the candidate set was redrawn, evaluate-set was reopened, a second clean-context scorer re-scored the corrected set, and the candidate that was declared is now dominated and off the front.
+
+SO THE FIRST DECLARATION WAS NOT OVERTURNED BY ARGUMENT. It was overturned by the evidence it was made on being re-earned.
 
 ## winner
 
 
 ## comments
 
-THE WINNER IS DECLARED WITH A FINDING AGAINST IT RATHER THAN BESIDE IT, and a reader who takes the name without the rest has the wrong impression of how it was won.
+THE WINNER IS DECLARED WITH ITS MARGIN STATED, because the margin is one point on one axis.
 
-IT LEADS ON TWO AXES AND NOTHING ELSE. On req-a-wrong-act-never-passes-silently it scores 3 and is joint-lowest of four. On req-walk-survives-host-swap it scores 2 and is lowest of four. On req-acts-carry-role-and-channel every candidate scores 0. Its whole margin is req-the-actor-is-recorded-where-the-call-is-served and req-comparison-carries-both-sides.
+IT LEADS ON TWO AXES AND TRAILS ON A THIRD. On req-a-wrong-act-never-passes-silently it scores 4, tied with cand-the-reader-beside-the-walk which reaches the same score by a different mechanism. On req-walk-survives-host-swap it scores 4 against the reader's 3, and that single point is the whole of its lead. On req-the-actor-is-recorded-where-the-call-is-served it scores 0 and is WORST of four. On the remaining two axes all four candidates tie.
 
-BOTH OF THOSE COME FROM ONE CELL. opt-the-record-carries-both-the-named-driver-and-the-one-that-answered sits alone on its axis, so the chart's completeness check demanded a pick from nobody, and two rivals went to the scorer silent on a question neither is prevented from answering.
+THE RIVAL LEVEL WITH IT CAN TAKE THE POINT. cand-the-reader-beside-the-walk is not prevented from publishing a rung rather than a model — it stands outside the walk either way, and what makes this winner the winner is publishing forward from inside it. Grafted, the reader reaches 13 against 11 and leads outright. Recorded as raid-risk-the-reader-can-take-the-leaders-only-structural-advantage, and graft-onto-the-winner runs next and is where it gets tested.
 
-SIX OF SEVEN GRAFTED WORLDS UNSEAT IT. cand-the-derived-ladder taking that cell reaches 14 and leads outright; taking half of it moves the datum to cand-the-receiver-decides and the receiver leads; cand-the-reader-beside-the-walk taking any part of it makes the receiver leader. Only one graft of the seven leaves this winner leading. cand-the-receiver-decides cannot take either strength, and its own record says why, so its tie at zero is robust in the way this lead is not.
+AND A WEIGHTING REACHES THE SAME RIVAL WITH NO GRAFT AT ALL. Fatal 4, crippling 3, corrosive 2 — the grades the axes already carry — gives reader 35 against this winner's 34. The lead is one crippling point against two corrosive ones, and the grades nearly cancel them.
 
-AND THE TIE IS GRADE-BLIND. cand-the-receiver-decides is level on an unweighted sign count, and its two pluses are on axes graded fatal and crippling while this winner's two are graded corrosive. Weighting fatal 4, crippling 3, corrosive 2 gives 38 against 34. No weight is invented anywhere in this record, because meth-pugh-convergence names weights-chosen-afterwards as decision theatre, and the mitigation is the recorded run rather than a better number.
+WHAT THIS WINNER CANNOT DO, AND ITS OWN RECORD SAYS SO. It cannot answer the actor axis in kind, because nothing of ours ever learns which model the rung resolved to. That is not a gap to be filled later; it is the consequence of the choice that earns it the host-swap point. The trade is the whole comparison: host portability by construction, bought with an attribution we can never make.
 
-TWO TRIPWIRES STAND AGAINST THIS DECLARATION and both name their fallback:
-raid-risk-the-leaders-whole-margin-is-one-cell-two-rivals-can-take and
-raid-risk-the-winner-flips-the-moment-the-damage-grades-are-weighed.
+WHAT IT IS NOT CHOSEN ON. No criterion in the pool measures spend. Both candidates on the front spend nothing on the walk — this one because it publishes and stops, the reader because it sits outside — and neither was chosen for that. A design meant to stop overspending has been selected on prevention, portability and auditability, and on nothing about cost.
 
-WHAT WOULD SETTLE IT IS ONE EDIT PER SILENT RIVAL AND A RE-SCORE, and it cannot be made from here. The chart is signed, reopening needs a tool this state does not carry, and the drawing offers no path backwards. That is a fact about the machine rather than an excuse: a defect found downstream of the state that caused it can only be recorded, and this record now carries it in the register, in reverse-sensitivity, in gate-candidates and here.
-
-THE DECLARATION IS THEREFORE HONEST IN BOTH DIRECTIONS. cand-the-seed-made-total is the computed winner of a comparison whose candidate set was drawn incompletely, and the incompleteness favoured it.
+AND THE DEPENDENCY THIS WINNER CARRIES IS THE HEAVIEST ON THE CHART. raid-dep-the-payoff-waits-on-a-weak-model-being-able-to-boot-at-all blocks its value on a receiver that can read a rung and act, and nbr-the-driver-that-performs-the-spawn was rewritten in this record because the first version claimed one existed. The receiver reads and cannot act. This is the candidate furthest from anything shippable alone, and the arithmetic that chose it does not see that.
 
 ## follow_up
 
-graft-onto-the-winner IS NEXT AND ITS TRAFFIC RUNS THE WRONG WAY FOR THIS FINDING. Its job is to take what a rival does better and put it on the winner. Here the open question is the reverse — two rivals could take what the winner does better — and the machine has no state for that, which is why it is a RAID entry.
+graft-onto-the-winner IS NEXT AND IT HAS A REAL QUESTION THIS TIME. Every axis a loser beat this winner on gets asked, and there is exactly one: req-the-actor-is-recorded-where-the-call-is-served, where the reader scores 2 and the two eliminated candidates 1 against this winner's 0. Whether it can be taken is the whole of that state's work, and its own record says it cannot.
 
-WHAT THE GRAFT STATE CAN STILL DO IS REAL. cand-the-receiver-decides beats the winner on a fatal axis and a crippling one, and both of its mechanisms are graftable: the no-match as a returned value rather than a silence, and a record carrying neither a driver nor a reason being invalid. Neither requires giving up the roster. Taking both would remove the winner's two lowest scores, which is the strongest available answer to the tripwires short of redrawing the chart.
+THE TRIPWIRE POINTS THE OTHER WAY AND BOTH GET TESTED THERE. The graft state asks what the winner can take from a loser. The tripwire asks what a rival can take from the winner. The second is the one that changes the declaration, and the machine has no state for it — which is why it is a RAID entry with a fallback rather than a step.
 
-AND THE MISSING COST AXIS STILL HAS NO HOME. gate-candidates recorded that nothing in the criteria pool measures spend and that the winner would therefore not be chosen on cost. It was not, and this declaration is where that becomes a fact about the architecture rather than a warning about the process.
+THE MISSING COST AXIS IS NOW THE ONLY THING THAT WOULD SEPARATE THE FRONT ON PURPOSE. The two survivors differ by one point of host portability and two of attribution. They differ enormously in what they cost to build and what they save, and no axis asked.
 
 ## anything_else
 

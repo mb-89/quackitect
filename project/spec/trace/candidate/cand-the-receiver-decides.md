@@ -13,6 +13,7 @@ picks:
   - "[[opt-publish-the-difficulty-and-let-consumers-choose-their-own-hand]]"
   - "[[opt-a-driver-claim-cannot-be-made-without-a-driver-or-a-reason]]"
   - "[[opt-name-the-acceptable-over-driving-rate-in-advance]]"
+  - "[[opt-the-record-carries-both-the-named-driver-and-the-one-that-answered]]"
 ---
 
 ## What it leans on
@@ -35,6 +36,30 @@ AND ITS ACCOUNTABILITY IS HALF A MECHANISM, WHICH IT SHOULD BE READ AS ADMITTING
 THE ONE THING IT LEANS ON THAT IS SETTLED is the shape of the no-match value,
 verified at the primary — OASIS XACML 3.0, 22 January 2013 — where NotApplicable
 and Indeterminate are distinct returned results.
+
+
+## Grafted at graft-onto-the-winner, 2026-08-20
+
+ONE AXIS WAS WON BY LOSERS AND IT IS THE ONE THIS CANDIDATE IS WORST ON.
+req-the-actor-is-recorded-where-the-call-is-served: 0 here, 2 for
+cand-the-reader-beside-the-walk, 1 for the two eliminated lines.
+
+HALF THE MECHANISM IS TAKEABLE AND THE HALF IS THE ONE ON OUR SIDE OF THE
+BOUNDARY. This candidate can never record what answered — nothing of ours learns
+which model the rung resolved to, which is the consequence of the choice that
+earns it its host-swap point. It can record what it NAMED: the rung it published
+and the state it published it for. Grafted:
+opt-the-record-carries-both-the-named-driver-and-the-one-that-answered now sits on
+this line for its named half.
+
+IT CLOSES A HOLE IN THIS CANDIDATE OWN SAFETY RULE. A record carrying neither a
+named driver nor a stated reason is not a valid record — that was already here,
+and it was unenforceable, because nothing recorded the named driver. Now something
+does.
+
+THE SCORE IS NOT MOVED. A second hand put this axis at 0 with this file own
+sentence as its anchor, and the hand that performs a graft does not re-score it.
+The addition is recorded beside the score rather than over it.
 
 ## Why this one
 
