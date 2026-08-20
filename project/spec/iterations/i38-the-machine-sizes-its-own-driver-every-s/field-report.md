@@ -1,0 +1,189 @@
+---
+id: i38-field-report
+statement: "What the i38 cloud run found, written to the branch because .se/ does not survive the container."
+---
+
+# i38 — field report
+
+WHY THIS FILE EXISTS. Owner ruling, 2026-08-20, given at the start of this
+run: "Everything you find, write it into a field report because notes will
+not survive the container."
+
+That is a field observation and not a preference. `.se/` is machine-local and
+never committed, so `se_note` on a cloud box writes into a file the box eats
+when it is reclaimed. The contract routes strays to `se_note` in four separate
+rules and `cloud-runner.md` repeats it twice; on this host every one of those
+instructions writes into a hole. This file is the durable home instead.
+
+WHAT IS IN HERE. Findings, corrections and leads from the run, written as they
+were found. Anything that belongs in guidance, a machine or the register is
+named as such, so a later retro can move it rather than rediscover it.
+
+## The run
+
+- Box: fresh cloud clone, arrived 2026-08-20T09:09:32Z, engine 6.0.0.
+- Branch: `claude/iteration-38-1zvb7s`.
+- Dials, raised on the owner's word at the desk: autonomy `strategic`,
+  stop-at `blockers only`.
+- Route: boot to front desk, then `iterations` to i38. The word had already
+  arrived with the session, so the desk did not wait for it.
+
+## Findings
+
+### F1 — the prompt layer arrives stale on a fresh clone
+
+MEASURED. `boot/prepare_idle`'s exit script went red on the first attempt:
+`project/AGENTS.md`, `project/CLAUDE.md` and
+`project/.github/instructions/protocol.instructions.md` were each reported
+STALE against `project/guidance/`. One run of `place-prompt-layer.ts` fixed
+all three and the exit passed.
+
+WHY IT MATTERS. The projection is deterministic from `project/guidance/`, so a
+clone can only ever be stale or identical. A fresh box therefore hits this red
+every time, and it is the first thing an unattended walk meets.
+
+THE FIX IS ONE LINE IN THE ARRIVAL. `se-arrive.ts` already fetches, installs,
+places the cage and starts the lane. Placing the prompt layer belongs in the
+same list, and then the red never happens.
+
+SECOND-ORDER: preflight's own remedy text names the SCRIPT
+(`Run engine/bin/place-prompt-layer.ts`) where the lane carries `se_prompt_place`
+for exactly that job. Following the remedy as written produced the only
+`se_run` call of the whole window. A remedy that names a shell script where a
+lane verb exists teaches the shell habit the retro then counts.
+
+### F2 — se_note is a write-only hole on a cloud box
+
+The owner named this before the machine did. Recorded here as the finding it
+is: on a host whose disk is reclaimed, every instruction to capture a stray
+with `se_note` writes into `.se/notes.jsonl`, which is machine-local and never
+committed.
+
+THE GUIDANCE ALREADY KNOWS THE SHAPE OF THIS PROBLEM. `cloud-runner.md` says in
+as many words that a commit nobody pushed did not happen, and that work you do
+not push you have thrown away. A note is the same object with the same disk
+under it, and the card does not say so.
+
+DURABLE HOME: `project/guidance/method/cloud-runner.md`, under "What to leave
+behind", which currently says "CAPTURE EVERY STRAY with se_note" without
+qualification.
+
+### F3 — the retro's log-mining window cannot span sessions on a cloud clone
+
+`se_log_query {since: "last_retro"}` opened at this session's first record,
+because a fresh clone starts `.se/calls.jsonl` empty and there is no earlier
+drain to mark a boundary. The onboard-retro therefore mined boot and itself,
+and nothing else. The method's step 1 has a long passage about the boundary
+being poisoned by the wrong drain; it has nothing about the boundary being the
+whole file because the file is new.
+
+The step cannot say this from inside — an empty window and a genuinely quiet
+window produce the same clean-looking result, which is the same failure mode
+the memory-drain step was already patched for on 2026-08-19.
+
+DURABLE HOME: `project/guidance/method/retro.md`, step 1.
+
+### F4 — se_log_query silently ignores an unknown key inside `filter`
+
+MEASURED. `se_log_query {filter: {outcome: "rejected"}}` returned all 42
+records rather than refusing. `outcome` is not one of the filter's keys
+(`tool`, `ok`, `since`, `text`), and SE-C-101 refuses an unknown argument at
+the top level of a call — `se_help {tool: "..."}` was refused correctly on the
+same session. Inside `filter` the same mistake answers instead.
+
+WHY IT MATTERS. A wrong filter reads exactly like a real answer. The lane's own
+law is that anything which blocks owes a remedy; this does not block at all.
+
+### F5 — group_by "clause" buckets every record under "(none)"
+
+MEASURED. `se_log_query {group_by: "clause"}` returned `{"(none)": 38}` over a
+window containing five rejections carrying SE-C-120, SE-C-121 and SE-C-101.
+The clause sits inside each rejected record's `response`, and the grouping does
+not reach it.
+
+WHY IT MATTERS. Retro step 8 asks for "refusal clauses by frequency" as the
+first of five rankings, and `se_log_query` is named as the tool for it — "never
+an ad-hoc script". The prescribed call cannot produce the prescribed ranking;
+the clauses have to be dug out of the records by hand.
+
+### F6 — a stale count in prose has no way to go loudly wrong
+
+Every measured figure the i38 seed carries was taken against the matrix as it
+stood before i9 added `M5_27 graft-onto-the-winner` on 2026-08-19. The seed was
+written the next day.
+
+- 52 states claimed; 53 on disk.
+- 86 evidence fields claimed; 89 declared, across 43 of the 53 rows.
+- 23 drawn fields claimed; 25 of 89, and the two extra are that same row's.
+- "M0 through M3 have ONE drawn field between them"; there are three.
+- A warning that the row-count test hard-codes 52 and will turn red; the test
+  already asserts 53 and carries a dated comment for every change.
+
+AND ONE OUTSIDE THE RECORD ENTIRELY. `project/guidance/method/tour.md:70`
+tells a newcomer the matrix has "50 rows of steps". It has 53. That is the
+page a person meets first.
+
+THE DURABLE POINT IS NOT THE ARITHMETIC. A count written into prose reads
+exactly the same whether it is current or a fortnight old, and nothing
+recomputes it. Every measured figure a record carries is an undated snapshot.
+Registered as `raid-iss-the-i38-seed-counts-a-matrix-that-has-since-moved`;
+the tour.md line belongs to guidance rather than to i38.
+
+### F7 — the demand ledger reopens on `depends_on`, and that is a live cascade door
+
+FOUND BY A REVIEWER WITH NO SHARED CONTEXT, then verified against the engine.
+
+`engine/iterations.ts:294` stores a `shape` on every demand. `:329` defines
+`shapeOf` as JSON over `[depends_on sorted, busbar, seeds, runs]`. `:350-364`
+returns a step as MOVED when the two shapes differ, and the absent-shape escape
+at `:357-359` shields only pins taken before the field existed — live pins
+carry shape on every demand.
+
+SO INSERTING A STATE CHANGES THE FOLLOWING ROW'S `depends_on`, moves its shape,
+and reopens that step and its downstream cone in every standing iteration. Four
+iterations stand open; i9 alone pins 53 demands.
+
+WHY IT MATTERS BEYOND i38. The record hunted exactly this cascade and found the
+HASH path, which it then closed correctly. The shape path was never looked at.
+Anyone editing a matrix row's dependencies is one call away from reopening
+signed work in records they have never opened, and nothing warns them.
+
+Registered as
+`raid-risk-naming-a-driver-per-milestone-moves-the-step-shapes-and-reopens-standing-claims`.
+
+### F8 — a resolution held only in prose has no mechanism under it
+
+The record rules that complexity is read live and never pinned into
+`seeded.json`'s demands. Verified true today: `demandOf` serialises
+evidence-field structure and `shapeOf` reads four named keys, and a new
+frontmatter key enters neither.
+
+NOTHING ASSERTS THAT IT STAYS TRUE. One test assertion would hold the line and
+it does not exist. A later hand can pin the value without meaning to, and the
+first thing to notice would be a cascade.
+
+### F9 — two guidance pages disagree about fixed model mappings
+
+`project/guidance/method/subagents.md:31` carries an owner grant of 2026-07-11:
+"JUDGE IT PER SUBAGENT. There is no fixed mapping and none should be invented."
+i38's ruling of 2026-08-20 builds exactly one fixed mapping.
+
+RESOLVED AT THE GATE RATHER THAN OUTRANKED, because letting the newer ruling
+simply win drops a half that is still true. The two govern different subjects:
+`subagents.md` governs an AD-HOC TASK the walker invented, where no rating
+exists and there is nothing to look up; i38's list governs a RATED STATE, where
+the machine holds a value and a lookup is not an invention.
+
+THE SEAM IS RATED-STATE VERSUS AD-HOC-TASK, and it is written down nowhere.
+`subagents.md` is the durable home for it, and writing it there is outside
+i38's scope.
+
+## What this run did to the record
+
+- The onboard-retro signed with an empty inbox and said so rather than being
+  skipped silently.
+- The kickoff gate proposes `major`, on a cone the seed did not name: the flat
+  walk has no milestone seam, so naming a driver per milestone edits a
+  dependency, and a dependency edit is a reopen.
+- Five register entries were minted, three of them from the reviewer's findings.
+

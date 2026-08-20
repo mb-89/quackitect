@@ -1,0 +1,33 @@
+{"ts":"2026-08-20T09:14:18.095Z","op":"update","visit":"iterations/i38/onboard-retro@0","node":"d7","brief":"onboard-retro: surveying to see whether the inbox pends"}
+{"ts":"2026-08-20T09:14:31.081Z","op":"update","visit":"iterations/i38/onboard-retro@0","node":"d8","brief":"inbox empty (0 pending notes) — skipping the onboard retro per the empty-inbox rule"}
+{"ts":"2026-08-20T09:14:56.678Z","op":"done","visit":"front_desk@0","node":"d3","brief":"dials set to strategic and blockers-only per the owner word"}
+{"ts":"2026-08-20T09:15:44.332Z","op":"done","visit":"front_desk@0","node":"d2","brief":"desk sweep done"}
+{"ts":"2026-08-20T09:17:12.286Z","op":"update","visit":"iterations/i38/onboard-retro@0","node":"d9","brief":"submitting the onboard-retro evidence"}
+{"ts":"2026-08-20T09:17:24.651Z","op":"plan","visit":"iterations/i38/gate-kickoff@0","parent":"d4","nodes":[{"id":"d10","brief":"read the rigor matrix columns"},{"id":"d11","brief":"propose a change size with reasoning"},{"id":"d12","brief":"spawn a reviewer for the gate brief"},{"id":"d13","brief":"bless the kickoff"}]}
+{"ts":"2026-08-20T09:21:20.577Z","op":"update","visit":"iterations/i38/gate-kickoff@0","node":"d14","brief":"reviewer spawned; minting the raid entries the gate owes"}
+{"ts":"2026-08-20T09:22:12.654Z","op":"update","visit":"iterations/i38/gate-kickoff@0","node":"d15","brief":"opening the field report on the branch, per the owner ruling"}
+{"ts":"2026-08-20T09:22:19.812Z","op":"done","visit":"iterations/i38/gate-kickoff@0","node":"d10","brief":"read the matrix README and the gate-kickoff row cells"}
+{"ts":"2026-08-20T09:22:20.210Z","op":"done","visit":"iterations/i38/gate-kickoff@0","node":"d12","brief":"reviewer running with the record and the draft brief"}
+{"ts":"2026-08-20T09:23:28.125Z","op":"update","visit":"iterations/i38/gate-kickoff@0","node":"d16","brief":"filling the kickoff brief while the reviewer and researcher run"}
+{"ts":"2026-08-20T09:24:32.111Z","op":"done","visit":"iterations/i38/gate-kickoff@0","node":"d11","brief":"change size proposed as major with the cone named"}
+{"ts":"2026-08-20T09:24:56.995Z","op":"update","visit":"iterations/i38/gate-kickoff@0","node":"d17","brief":"correcting the two template-shaped fields"}
+{"ts":"2026-08-20T09:25:28.310Z","op":"update","visit":"iterations/i38/gate-kickoff@0","node":"d18","brief":"round 0 verify: five checks against the tree, three corrections"}
+{"ts":"2026-08-20T09:25:51.039Z","op":"update","visit":"iterations/i38/gate-kickoff@0","node":"d19","brief":"round 0 recast as the four items the form names"}
+{"ts":"2026-08-20T09:27:22.392Z","op":"update","visit":"iterations/i38/gate-kickoff@0","node":"d20","brief":"minting the falsified-premise issue the gate found"}
+{"ts":"2026-08-20T09:27:22.515Z","op":"update","visit":"iterations/i38/gate-kickoff@0","node":"d21","brief":"minting the stale-counts issue the gate found"}
+{"ts":"2026-08-20T09:29:17.171Z","op":"update","visit":"iterations/i38/gate-kickoff@0","node":"d22","brief":"minting the shape-cascade risk the reviewer found"}
+{"ts":"2026-08-20T09:29:17.291Z","op":"update","visit":"iterations/i38/gate-kickoff@0","node":"d23","brief":"minting the model-list portability assumption"}
+{"ts":"2026-08-20T09:29:17.406Z","op":"update","visit":"iterations/i38/gate-kickoff@0","node":"d24","brief":"minting the self-report attribution assumption"}
+{"ts":"2026-08-20T09:29:36.107Z","op":"update","visit":"iterations/i38/gate-kickoff@0","node":"d25","brief":"folding the reviewer's numerator finding into the stale-counts entry"}
+{"ts":"2026-08-20T09:29:58.907Z","op":"plan","visit":"iterations/i38/gate-kickoff@0","parent":"d13","nodes":[{"id":"d26","brief":"correct round 0 and the change-size cone"},{"id":"d27","brief":"write the red team from the reviewer"},{"id":"d28","brief":"list the raid references"},{"id":"d29","brief":"rule the verdict"}]}
+{"ts":"2026-08-20T09:31:11.523Z","op":"done","visit":"iterations/i38/gate-kickoff@0","node":"d27","brief":"red team recast as finding-and-answer lines"}
+{"ts":"2026-08-20T09:31:20.575Z","op":"done","visit":"iterations/i38/gate-kickoff@0","node":"d28","brief":"five register entries minted and referenced"}
+{"ts":"2026-08-20T09:31:30.632Z","op":"update","visit":"iterations/i38/gate-kickoff@0","node":"d30","brief":"raid references sent as ids rather than paths"}
+{"ts":"2026-08-20T09:32:11.317Z","op":"update","visit":"iterations/i38/gate-kickoff@0","node":"d31","brief":"the two assumptions get the probe section their kind demands"}
+{"ts":"2026-08-20T09:33:18.395Z","op":"update","visit":"iterations/i38/gate-kickoff@0","node":"d32","brief":"folding the gate findings into the field report"}
+{"ts":"2026-08-20T09:34:19.928Z","op":"done","visit":"iterations/i38/gate-kickoff@0","node":"d29","brief":"validate round written from a live prior-art scan"}
+{"ts":"2026-08-20T09:34:54.537Z","op":"update","visit":"iterations/i38/gate-kickoff@0","node":"d33","brief":"the scan's primary sources sharpen both assumptions"}
+{"ts":"2026-08-20T09:35:23.052Z","op":"update","visit":"iterations/i38/gate-kickoff@0","node":"d34","brief":"minting the silent-drift risk the prior-art scan established"}
+{"ts":"2026-08-20T09:35:34.543Z","op":"update","visit":"iterations/i38/gate-kickoff@0","node":"d35","brief":"six entries referenced and the verdict ruled"}
+{"ts":"2026-08-20T09:36:01.565Z","op":"update","visit":"iterations/i38/gate-kickoff@0","node":"d36","brief":"the scan's recommendations ride as input to the design states"}
+{"ts":"2026-08-20T09:36:19.354Z","op":"update","visit":"iterations/i38/gate-kickoff@0","node":"d37","brief":"anything_else broken into paragraphs the wall guard accepts"}
