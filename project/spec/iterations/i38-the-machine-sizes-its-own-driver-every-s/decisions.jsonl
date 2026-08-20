@@ -399,3 +399,9 @@
 {"ts":"2026-08-20T13:23:26.034Z","op":"done","visit":"iterations/i38/cut-criteria@0","node":"d228","brief":"gate rounds complete, verdict written"}
 {"ts":"2026-08-20T13:23:59.671Z","op":"update","visit":"iterations/i38/gate-candidates@0","node":"d276","brief":"gate: saying plainly that the pass had not returned"}
 {"ts":"2026-08-20T13:24:08.299Z","op":"update","visit":"iterations/i38/gate-candidates@0","node":"d277","brief":"blessing gate-candidates: pass with overrides"}
+{"ts":"2026-08-20T13:24:46.738Z","op":"plan","visit":"iterations/i38/converge-pugh@0","parent":null,"nodes":[{"id":"d278","brief":"read converge-pugh"},{"id":"d279","brief":"run the pugh matrix"},{"id":"d280","brief":"sign converge-pugh"}]}
+{"ts":"2026-08-20T13:26:19.305Z","op":"update","visit":"iterations/i38/converge-pugh@0","node":"d281","brief":"converge-pugh signed"}
+{"ts":"2026-08-20T13:26:29.429Z","op":"update","visit":"iterations/i38/reverse-sensitivity@0","node":"d282","brief":"reading reverse-sensitivity"}
+{"ts":"2026-08-20T13:28:44.108Z","op":"update","visit":"iterations/i38/reverse-sensitivity@0","node":"d283","brief":"minting tripwire the-leaders-whole-margin-is-one-cell-t"}
+{"ts":"2026-08-20T13:28:44.254Z","op":"update","visit":"iterations/i38/reverse-sensitivity@0","node":"d284","brief":"minting tripwire the-winner-flips-the-moment-the-damage"}
+{"ts":"2026-08-20T13:29:36.364Z","op":"update","visit":"iterations/i38/reverse-sensitivity@0","node":"d285","brief":"reverse-sensitivity signed"}

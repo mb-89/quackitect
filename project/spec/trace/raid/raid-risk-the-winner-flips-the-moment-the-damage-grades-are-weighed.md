@@ -1,0 +1,37 @@
+---
+minted_in: i38-the-machine-sizes-its-own-driver-every-s
+id: raid-risk-the-winner-flips-the-moment-the-damage-grades-are-weighed
+type: "[[raid]]"
+kind: risk
+statement: "The leader wins on an unweighted count of signs while every axis already carries a damage grade, and under any ordering that respects those grades the leader loses."
+owner: the owner
+trigger: "the first time anyone asks why the grades are drawn on the matrix if nothing reads them, and any future record that types a band value"
+status: open
+looked: 2026-08-20
+impact: "The decision turns on a modelling choice nobody made deliberately. The template refuses to weight because no band value is typed, which is the right default against decision theatre and is not a neutral one: it discards information the axes carry and the matrix displays."
+breaks_how_badly: corrosive
+how_likely: expected
+probe: "COMPUTED OVER THE SIGNED SCORE TABLE, 2026-08-20. Unweighted, the totals against the datum are derived minus one, reader minus one, receiver ZERO, and the datum keeps the seat on a tie. The receiver's tie is one PLUS on req-a-wrong-act-never-passes-silently, graded fatal, and one PLUS on req-walk-survives-host-swap, graded crippling, against two MINUSES on axes graded corrosive. Weighting fatal 4, crippling 3, corrosive 2 gives receiver 38, seed 34, reader 33, derived 28. Any weighting that puts fatal above corrosive flips it, because the leader's two wins are the two lowest-graded axes on the sheet. A SECOND ROUTE REACHES THE SAME PLACE: removing req-comparison-carries-both-sides, the row this record moved up 42 places and then recorded as overstated, moves the datum to the reader and makes the receiver leader at plus one."
+probed: 2026-08-20
+source_refs:
+  - i38-the-machine-sizes-its-own-driver-every-s
+  - "reverse-sensitivity, 2026-08-20"
+weighs_with: raid-risk-the-leaders-whole-margin-is-one-cell-two-rivals-can-take
+weighs_against: none
+---
+
+## The fallback
+
+DO NOT INVENT THE WEIGHTS HERE. meth-pugh-convergence names decision theatre by
+name — weights chosen after the fact to justify a preferred option — and the
+mitigation is the recorded run, not a better number.
+
+THE FALLBACK IS TO SAY IT OUT LOUD AT declare-winner: the winner is the winner of
+an unweighted count, the runner-up is level with it, and the runner-up's two
+advantages are graded fatal and crippling while the winner's two are graded
+corrosive. A reader who wants the other answer does not need new evidence, only a
+weighting, and that is a fact about this decision rather than an argument against
+it.
+
+IF A BAND VALUE IS EVER TYPED, this record's choice reopens. That is the tripwire:
+the first weighting anyone writes into the matrix is the trigger to re-run M5.
