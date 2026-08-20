@@ -247,3 +247,6 @@
 {"ts":"2026-08-20T11:56:39.245Z","op":"update","visit":"iterations/i38/enumerate-space/find_analogy@0","node":"d138","brief":"analogy finder: two transfers, one confirmation"}
 {"ts":"2026-08-20T11:57:05.304Z","op":"update","visit":"iterations/i38/enumerate-space/find_analogy@0","node":"d139","brief":"abstractions recast to the three cells the template wants"}
 {"ts":"2026-08-20T11:57:05.838Z","op":"update","visit":"iterations/i38/enumerate-space/find_analogy@0","node":"d140","brief":"analogy finder signed"}
+{"ts":"2026-08-20T11:57:29.256Z","op":"update","visit":"iterations/i38/enumerate-space/find_without@0","node":"d141","brief":"find_without: reading the form"}
+{"ts":"2026-08-20T11:58:10.903Z","op":"update","visit":"iterations/i38/enumerate-space/find_without@0","node":"d142","brief":"minting trim option name-the-driver-per-state-not-per-mi"}
+{"ts":"2026-08-20T11:58:11.024Z","op":"update","visit":"iterations/i38/enumerate-space/find_without@0","node":"d143","brief":"minting trim option the-row-names-the-driver-and-there-i"}
