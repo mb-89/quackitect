@@ -1005,6 +1005,27 @@ does not do is offer a way to reach the root.
   walk "reboots at start and walks back to your target". It cleared the blockers
   `se_why` reports and moved the position not at all.
 
+### The mechanism, found last and obvious afterwards
+
+THE TARGET WILL NOT HOLD ANYWHERE BUT SHIP, AND THAT IS A RULING, NOT A BUG.
+"AN ITERATION HAS ONE TARGET AND IT IS ITS SHIP STATE (owner ruling 2026-08-19).
+Never aim at a state in the middle of one." The engine enforces it: an aim at a
+mid-iteration state arrives, clears, and the walk re-routes to ship, which lands
+it at the furthest state it can reach. Measured here — aiming at evaluate-set
+moved the walk to derive-functions for exactly one call, and the next bare pull
+put it back at graft-onto-the-winner with the target reading `iterations/i38/shipped`.
+
+SO THE TWO RULES MEET AND LEAVE NO DOOR. The target may only be ship, the drawing
+only goes forward, and a reopened state behind the walk is therefore unreachable
+by the walking agent — not by accident, but as the exact intersection of two
+deliberate choices. The contract even warns against the aim I kept trying, and I
+tried it four times before reading why it could not work.
+
+WHOSE HAND CAN MOVE IT. The reload's own refusal names the answer: "ask the
+person to aim the mirror". The person's controls are the target and the dials,
+and the mirror is where they are. An unattended agent that reopens behind itself
+has to wait for a person, which on a cloud box means it has to say so.
+
 ### Why this is worth an engine iteration
 
 THE ONE-WAY DRAWING IS DELIBERATE AND THE ASYMMETRY IS NOT. Forward-only routing
