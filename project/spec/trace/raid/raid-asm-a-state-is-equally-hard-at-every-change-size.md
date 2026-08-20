@@ -55,6 +55,39 @@ walked `draft-vision` at major. The work was an inherit: point at the resident
 vision, argue the delta in a paragraph, rewrite nothing. That is not the same
 act as authoring a vision packet and it is not the same rung.
 
+## MECHANICAL CORROBORATION, found at the requirements gate
+
+THE NON-MONOTONICITY ABOVE IS A READING OF PROSE and the walker who wanted the
+result made it. Here is the same finding without a judgment in it.
+
+TWO ROWS ARE NON-MONOTONIC IN THEIR APPLICATION CELLS, which is frontmatter
+rather than interpretation:
+
+| row | patch | minor | major | product |
+| --- | --- | --- | --- | --- |
+| M4_25 run-candidates | none | none | full | tailored |
+| M6_15 run-spikes | none | none | full | tailored |
+
+BOTH DECLARE THAT PRODUCT DOES LESS THAN MAJOR. `run-spikes` applies in full at
+major — every seeded spike runs, parallel, each within its timebox — and at
+product becomes a STANDING ARTIFACT: the spike records retained with their
+iteration.
+
+SO THE COLUMNS ARE NOT AN ORDERED SCALE OF INCREASING WORK, and the matrix said
+so before this iteration looked. Anyone can re-run the comparison: read four
+frontmatter keys per row and check whether they rise.
+
+WHAT THIS KILLS INDEPENDENTLY OF THE draft-vision READING. The cheap repair for
+a per-row rating was one value plus a per-column adjustment. That repair needs
+the columns to be ordered. Two rows say they are not, on evidence that involves
+no rung, no ladder and no judgment.
+
+WHAT IT DOES NOT ESTABLISH, said rather than blurred: application and difficulty
+are different things, and a row doing LESS at product does not automatically do
+EASIER work there. This corroborates the premise the cheap repair rests on
+failing; the three-rung spread itself still rests on reading draft-vision's
+notes.
+
 ## WHAT THIS COSTS THE DESIGN
 
 ONE VALUE PER ROW CANNOT EXPRESS IT. The rating has to live where the rest of

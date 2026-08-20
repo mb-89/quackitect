@@ -193,3 +193,12 @@
 {"ts":"2026-08-20T11:18:01.484Z","op":"update","visit":"iterations/i38/gate-requirements@0","node":"d83","brief":"recording the owner sharpening on process claims"}
 {"ts":"2026-08-20T11:18:29.192Z","op":"update","visit":"iterations/i38/gate-requirements@0","node":"d84","brief":"field report takes the process-claim distinction"}
 {"ts":"2026-08-20T11:19:25.543Z","op":"plan","visit":"iterations/i38/gate-requirements@0","parent":"d48","nodes":[{"id":"d85","brief":"red team"},{"id":"d86","brief":"refs"},{"id":"d87","brief":"verdict and follow-up"}]}
+{"ts":"2026-08-20T11:20:40.785Z","op":"update","visit":"iterations/i38/gate-requirements@0","node":"d88","brief":"mechanical corroboration for the non-monotonicity"}
+{"ts":"2026-08-20T11:20:41.529Z","op":"update","visit":"iterations/i38/gate-requirements@0","node":"d89","brief":"round 0 and red team take the mechanical corroboration"}
+{"ts":"2026-08-20T11:21:05.889Z","op":"done","visit":"iterations/i38/gate-requirements@0","node":"d79","brief":"acceptance items filled"}
+{"ts":"2026-08-20T11:21:06.396Z","op":"done","visit":"iterations/i38/gate-requirements@0","node":"d80","brief":"rounds 0 and 1 written"}
+{"ts":"2026-08-20T11:21:06.962Z","op":"done","visit":"iterations/i38/gate-requirements@0","node":"d81","brief":"goals and bound measured"}
+{"ts":"2026-08-20T11:21:07.489Z","op":"done","visit":"iterations/i38/gate-requirements@0","node":"d85","brief":"red team written and sharpened by a mechanical check"}
+{"ts":"2026-08-20T11:21:08.014Z","op":"done","visit":"iterations/i38/gate-requirements@0","node":"d86","brief":"three assumptions referenced"}
+{"ts":"2026-08-20T11:21:08.586Z","op":"done","visit":"iterations/i38/gate-requirements@0","node":"d87","brief":"verdict and follow-up written"}
+{"ts":"2026-08-20T11:21:10.346Z","op":"update","visit":"iterations/i38/gate-requirements@0","node":"d90","brief":"holding the submit for the M3 adversarial pass"}
