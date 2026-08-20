@@ -1,7 +1,8 @@
 ---
 form: derive-criteria
 by: agent
-signed_off: 2026-08-20T11:26:17.768Z
+signed_off: 2026-08-20T11:45:11.826Z
+reopened: "2026-08-20T11:45:09.399Z — the requirements it draws its axes from were re-signed after it during the M3 repairs, including a tenth requirement minted for the extension the completeness criterion had skipped"
 authors: agent
 files:
 ---
@@ -198,6 +199,10 @@ THE STATE'S OWN NOTE SAYS WHAT TO DO WITH THAT: standing criteria are reused whe
 - IT DELIBERATELY DOES NOT MEASURE CORRECTNESS. A design that reliably returns the same wrong driver scores full marks here. That is the separation working: a criterion that smuggles correctness into repeatability measures two things and is worth neither.
 
 - NOTHING WAS RE-JUDGED AMONG THE STANDING FOURTEEN. They were read rather than re-derived, which is what the note asks, and none of them measures something this change makes stale.
+
+- RE-EARNED AFTER THE M3 REPAIRS. The register gained a tenth requirement — req-a-weaker-driver-than-named-owes-a-recorded-reason — and it is NOT a criterion axis: it is a functional demand about what the record carries, not a dimension candidates are scored on. The axis set is unchanged at fifteen.
+
+- THE ADDED AXIS ITSELF SURVIVED THE PASS UNTOUCHED. req-a-machine-decision-repeats was not among the twelve findings, and the argument for it is unaffected: against the standing fourteen a runtime router still wins on every axis, so the set could not express why the chosen design is chosen.
 
 ## anything_else
 

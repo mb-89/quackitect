@@ -234,3 +234,6 @@
 {"ts":"2026-08-20T11:44:06.208Z","op":"update","visit":"iterations/i38/gate-requirements@1","node":"d123","brief":"gate re-ruled on repaired evidence"}
 {"ts":"2026-08-20T11:44:24.197Z","op":"update","visit":"iterations/i38/gate-requirements@1","node":"d124","brief":"verdict recast as a legal choice"}
 {"ts":"2026-08-20T11:44:24.943Z","op":"update","visit":"iterations/i38/gate-requirements@1","node":"d125","brief":"requirements gate re-blessed on repaired evidence"}
+{"ts":"2026-08-20T11:45:26.363Z","op":"update","visit":"iterations/i38/partition-functions@0","node":"d126","brief":"partition-functions: reading the form"}
+{"ts":"2026-08-20T11:46:49.549Z","op":"update","visit":"iterations/i38/partition-functions@0","node":"d127","brief":"the four decision functions become the-sizing cluster"}
+{"ts":"2026-08-20T11:47:12.466Z","op":"update","visit":"iterations/i38/partition-functions@0","node":"d128","brief":"partition: a new cluster, measured from the flows"}

@@ -2,7 +2,7 @@
 minted_in: i38-the-machine-sizes-its-own-driver-every-s
 id: fn-run-a-governed-walk.resolve-a-difficulty-to-a-driver
 type: "[[function]]"
-cluster: the-walk
+cluster: the-sizing
 statement: resolve a difficulty to the driver it calls for, from one standing mapping, or answer that none matches
 satisfies:
   - req-one-model-list-is-read-live-from-the-repository

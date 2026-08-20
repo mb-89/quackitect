@@ -2,7 +2,7 @@
 minted_in: i38-the-machine-sizes-its-own-driver-every-s
 id: fn-run-a-governed-walk.publish-the-driver-outward
 type: "[[function]]"
-cluster: the-walk
+cluster: the-sizing
 statement: put the named driver where whoever is driving can read it, and take no further action on it
 satisfies:
   - req-the-machine-names-a-driver-and-starts-nothing
