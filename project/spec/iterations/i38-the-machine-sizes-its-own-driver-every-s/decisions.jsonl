@@ -338,3 +338,7 @@
 {"ts":"2026-08-20T12:50:50.441Z","op":"update","visit":"iterations/i38/run-candidates/the-derived-ladder@0","node":"d220","brief":"composing the-derived-ladder"}
 {"ts":"2026-08-20T12:50:52.743Z","op":"update","visit":"iterations/i38/run-candidates/the-reader-beside-the-walk@0","node":"d221","brief":"composing the-reader-beside-the-walk"}
 {"ts":"2026-08-20T12:50:54.912Z","op":"update","visit":"iterations/i38/run-candidates/the-receiver-decides@0","node":"d222","brief":"composing the-receiver-decides"}
+{"ts":"2026-08-20T12:54:43.967Z","op":"plan","visit":"iterations/i38/cut-criteria@0","parent":null,"nodes":[{"id":"d223","brief":"read the criteria pool"},{"id":"d224","brief":"cut to the rows that discriminate"},{"id":"d225","brief":"sign cut-criteria"}]}
+{"ts":"2026-08-20T12:55:13.486Z","op":"plan","visit":"iterations/i38/cut-criteria@0","parent":null,"nodes":[{"id":"d226","brief":"aim the walk at ship"},{"id":"d227","brief":"evaluate the candidate set"},{"id":"d228","brief":"gate the design"}]}
+{"ts":"2026-08-20T12:55:20.277Z","op":"update","visit":"iterations/i38/cut-criteria@0","node":"d229","brief":"aiming the walk at the ship state"}
+{"ts":"2026-08-20T12:55:26.759Z","op":"update","visit":"iterations/i38/cut-criteria@0","node":"d230","brief":"aiming the walk at the ship state"}
