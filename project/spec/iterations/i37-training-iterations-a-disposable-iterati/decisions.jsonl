@@ -209,3 +209,14 @@
 {"ts":"2026-08-20T07:07:35.933Z","op":"update","visit":"iterations/i37/cut-criteria@0","node":"d6","brief":"walking toward the reopened placeholder"}
 {"ts":"2026-08-20T07:07:36.548Z","op":"update","visit":"iterations/i37/cut-criteria@0","node":"d7","brief":"walking toward the reopened placeholder"}
 {"ts":"2026-08-20T07:19:53.201Z","op":"plan","visit":"iterations/i37/write-requirements@0","parent":null,"nodes":[{"id":"d1","brief":"answer the new set-level question the merge brought"},{"id":"d2","brief":"walk forward to run-spikes"}]}
+{"ts":"2026-08-20T07:20:30.183Z","op":"update","visit":"iterations/i37/derive-functions@0","node":"d3","brief":"aiming at run-spikes on the merged engine"}
+{"ts":"2026-08-20T07:21:07.705Z","op":"update","visit":"iterations/i37/derive-functions@0","node":"d4","brief":"the target resolver also stops at an owed placeholder"}
+{"ts":"2026-08-20T07:22:34.331Z","op":"update","visit":"iterations/i37/derive-functions@0","node":"d1","brief":"taking the offered door forward"}
+{"ts":"2026-08-20T07:22:44.520Z","op":"update","visit":"iterations/i37/derive-functions@0","node":"d2","brief":"taking the gate-requirements door"}
+{"ts":"2026-08-20T07:23:10.713Z","op":"update","visit":"iterations/i37/derive-functions@0","node":"d3","brief":"asking the machine why the walk will not move"}
+{"ts":"2026-08-20T07:23:35.538Z","op":"update","visit":"iterations/i37/derive-functions@0","node":"d4","brief":"re-signing derive-functions against the moved ground"}
+{"ts":"2026-08-20T07:23:42.090Z","op":"update","visit":"iterations/i37/identify-assumptions@0","node":"d5","brief":"re-signing identify-assumptions against the moved ground"}
+{"ts":"2026-08-20T07:23:49.867Z","op":"update","visit":"iterations/i37/probe-assumptions@0","node":"d6","brief":"re-signing probe-assumptions against the moved ground"}
+{"ts":"2026-08-20T07:23:57.439Z","op":"update","visit":"iterations/i37/gate-requirements@0","node":"d7","brief":"re-signing gate-requirements against the moved ground"}
+{"ts":"2026-08-20T07:24:09.541Z","op":"update","visit":"iterations/i37/derive-criteria@0","node":"d8","brief":"re-signing derive-criteria against the moved ground"}
+{"ts":"2026-08-20T07:24:19.625Z","op":"update","visit":"iterations/i37/partition-functions@0","node":"d9","brief":"re-signing partition-functions against the moved ground"}

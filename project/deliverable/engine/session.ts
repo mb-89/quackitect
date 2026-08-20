@@ -1564,6 +1564,18 @@ export class Session {
     const decl = this.declForPrefix(cut < 0 ? "" : target.slice(0, cut))?.states.find(
       (s) => s.id === (cut < 0 ? target : target.slice(cut + 1)),
     );
+    // A PLACEHOLDER WHOSE CLAIM IS OWED IS THE TARGET ITSELF, not its
+    // sub-machine's start. Naming it is how a walk gets back to a reopened
+    // placeholder to re-sign it; resolving past it aims at a state the
+    // drawing cannot reach and the aim refuses. Same rule as expandNode's
+    // landing, for the same reason.
+    if (decl?.submachine !== undefined) {
+      const owner = this.declForPrefix(cut < 0 ? "" : target.slice(0, cut));
+      const it = owner === undefined ? undefined : this.declIteration(owner);
+      const owed =
+        owner !== undefined && it !== undefined && this.owesASignature(decl, it) && !new Set(this.claims.recordDone(owner)).has(decl.id);
+      if (owed) return target;
+    }
     return decl?.submachine !== undefined ? Session.qual(target, this.declForPrefix(target)?.initial ?? "start") : target;
   }
 
