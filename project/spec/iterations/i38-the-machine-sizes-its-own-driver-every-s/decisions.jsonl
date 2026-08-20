@@ -363,3 +363,10 @@
 {"ts":"2026-08-20T13:12:34.262Z","op":"update","visit":"iterations/i38/gate-candidates@0","node":"d254","brief":"gate reasons_hold: the move favoured the baseline and changed nothing"}
 {"ts":"2026-08-20T13:13:17.225Z","op":"update","visit":"iterations/i38/gate-candidates@0","node":"d255","brief":"correcting six of seven to five of seven in the fan measurement"}
 {"ts":"2026-08-20T13:13:17.379Z","op":"update","visit":"iterations/i38/gate-candidates@0","node":"d256","brief":"same correction in the gate's fifth goal"}
+{"ts":"2026-08-20T13:14:47.789Z","op":"update","visit":"iterations/i38/gate-candidates@0","node":"d257","brief":"correcting the bound figure: mirror_slow double-counted every breach"}
+{"ts":"2026-08-20T13:14:55.963Z","op":"update","visit":"iterations/i38/gate-candidates@0","node":"d258","brief":"hostile review of M4: recounting figures"}
+{"ts":"2026-08-20T13:14:56.099Z","op":"update","visit":"iterations/i38/gate-candidates@0","node":"d259","brief":"hostile review of M4: recounting figures"}
+{"ts":"2026-08-20T13:14:56.229Z","op":"update","visit":"iterations/i38/gate-candidates@0","node":"d260","brief":"hostile review of M4: recounting figures"}
+{"ts":"2026-08-20T13:14:56.358Z","op":"update","visit":"iterations/i38/gate-candidates@0","node":"d261","brief":"hostile review of M4: recounting figures"}
+{"ts":"2026-08-20T13:14:56.491Z","op":"update","visit":"iterations/i38/gate-candidates@0","node":"d262","brief":"hostile review of M4: recounting figures"}
+{"ts":"2026-08-20T13:14:56.616Z","op":"update","visit":"iterations/i38/gate-candidates@0","node":"d263","brief":"hostile review of M4: recounting figures"}
