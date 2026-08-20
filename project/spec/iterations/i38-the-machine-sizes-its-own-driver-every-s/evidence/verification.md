@@ -1,7 +1,8 @@
 ---
 form: verification
 by: agent
-signed_off: 2026-08-20T21:12:39.619Z
+signed_off: 2026-08-20T21:31:27.661Z
+reopened: "2026-08-20T21:31:25.664Z — the tester's nine findings are fixed. One was a live defect this build introduced — a lane call with a bad part vanished from the log — and one was a lookup that had never worked, which is why deleting it changed no test. The battery re-runs against the fixed tree."
 authors: agent
 files:
 ---
@@ -68,6 +69,33 @@ Deleting `...this.strengthNeeded()` from the pull's head produced ZERO additiona
 
 BOTH INSPECTIONS PASS INDEPENDENTLY. The tester re-ran both checklists and reached the same verdict I did, item by item, and added one caveat worth keeping: `rowsStamp` keys its cache on `size:mtimeMs`, whose resolution is filesystem-dependent. That is a cache-freshness hazard rather than an answer-variance one, and it is older than this build.
 
+### Re-earned after the fix pass, 2026-08-20
+
+ALL NINE FINDINGS ARE ANSWERED and the battery is 1642 pass, 0 fail — ten more cases than the tester ran against.
+
+### The live defect, and it was worse one layer down
+
+A LANE CALL CARRYING A BAD `part` IS NOW REFUSED TYPED, before anything reaches the log. And the refusal RECORD was being lost the same way: a refused call is observed too, so `whichHand` passed the same bad value to `append`, which threw inside the hook that must never break dispatch.
+
+SO THE DIVISION IS NOW EXPLICIT. The lane refuses a bad declaration. The log never refuses a record it is asked to write, and falls back — with the caller's raw claim still on the record, in the arguments.
+
+### The head lookup had never worked
+
+`active()` reports a nested id like `iterations/i1/onboard-retro`, and a compiled iteration's states are named bare. The lookup found nothing and the catch treated it as an unrated step, which is the ordinary case — so it failed silently from the day it was written.
+
+THAT IS WHY DELETING THE WHOLE CALL CHANGED NO TEST. Nothing had ever stood a walk on a rated step. The new case does, and it goes red on deletion — checked by deleting the line and running it.
+
+AND IT NEEDED A PINNED COLUMN TO BE REACHABLE AT ALL. A difficulty is declared per change-size column, so an iteration before its kickoff gate has none: its two M0 steps compile through `compileM0`, which has no column to read a cell from. Nothing is published there and nothing should be.
+
+### The mark counted the wrong thing
+
+`unreasoned` fired on any named driver with no reason, and the lane's own schema tells callers to send `named_driver` on every call while walking a rated step. Nearly every record would have been marked, and a mark that fires on nearly everything counts nothing.
+
+IT NOW FIRES ON A CALLER-DECLARED `went_weaker`. Nothing here can work out "weaker": `named_driver` is a rung and `answered_by` is a model name, and no mapping between them exists in this tree. The declaration is voluntary, like the part, and that residue is unchanged and recorded.
+
+### One finding was mine rather than the tester's
+
+THE FIELD ON THE PULL IS `hand` AND NOT `needs`. The pull already serves a `needs` on each OPTION meaning "this door needs the person". One answer carrying one word for two things is a vocabulary an agent has to disambiguate by level, and no check would ever have caught it — the inspection found it by reading the whole envelope.
 
 ## claims
 
@@ -111,7 +139,6 @@ TWO ARE DEFECTS IN WHAT THE CODE MEANS, not in what it does.
 ONE IS A MISSING CASE the spec already owes: a standing claim surviving a rating edit, end to end.
 
 ONE IS BOOKKEEPING: `tests/sizing-on-the-pull.test.ts` is named by no spec, and `tsp-the-lane-publishes-a-strength-and-starts-nothing` names an element node in its `files:` where a test file belongs.
-
 
 ## anything_else
 

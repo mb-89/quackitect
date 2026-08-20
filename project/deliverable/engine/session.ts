@@ -563,6 +563,11 @@ export class Session {
    *  lookup, which is what
    *  req-an-unmatched-rung-names-itself-and-publishes-no-driver forbids. */
   private strengthNeeded(): Record<string, unknown> {
+    // THE FIELD IS `hand`, NOT `needs`. The pull already serves a `needs` on
+    // each OPTION, meaning "this door needs the person, because the work is
+    // above the dial". One answer carrying one word for two things is a
+    // vocabulary an agent has to disambiguate by level, and no check would
+    // ever have caught it.
     try {
       // THE LEAF, NOT THE OUTER MACHINE. `active()` reports a nested id like
       // `iterations/i1/onboard-retro`, and the compiled iteration's own states
@@ -579,7 +584,7 @@ export class Session {
       const step = this.state(machine, id);
       if (process.env.SE_DBG_SIZING === "1") console.error("DBG", machine.id, id, Object.keys(step).join(","));
       if (step.submachine !== undefined) return {};
-      return { needs: publish(difficultyOf(step)) };
+      return { hand: publish(difficultyOf(step)) };
     } catch (e) {
       if (process.env.SE_DBG_SIZING === "1") console.error("DBG-THREW", String((e as Error).message).slice(0, 120));
       // AN UNRATED STEP IS THE COMMON CASE TODAY and it is not an error. The

@@ -52,10 +52,10 @@ test("every rated step produces a rung and the pair it came from", () => {
   rateEverything(root);
   const sent = envelopeFor(root);
   assert.ok(sent.length > 0, "the column must compile some steps for this to mean anything");
-  for (const needs of sent) {
-    assert.deepEqual(needs.pair, { judgement: "C3", reading: "R1" }, "the input goes out with the decision");
-    assert.ok(RUNGS.includes(needs.rung as (typeof RUNGS)[number]), `${needs.rung} is not in the published vocabulary`);
-    assert.ok(!String(needs.rung).includes("-"), "the block names a rung and never a model");
+  for (const hand of sent) {
+    assert.deepEqual(hand.pair, { judgement: "C3", reading: "R1" }, "the input goes out with the decision");
+    assert.ok(RUNGS.includes(hand.rung as (typeof RUNGS)[number]), `${hand.rung} is not in the published vocabulary`);
+    assert.ok(!String(hand.rung).includes("-"), "the block names a rung and never a model");
   }
 });
 
@@ -68,7 +68,7 @@ test("a pull standing where nothing is rated is unchanged from before this exist
   s.setAutonomy(1);
   await pullTo(s, "idle");
   const body = (await s.pull()) as Record<string, unknown>;
-  assert.equal(body.needs, undefined, "no rating, no statement — and no refusal either");
+  assert.equal(body.hand, undefined, "no rating, no statement — and no refusal either");
   assert.ok("where" in body, "the walk carries on exactly as it did");
 });
 
@@ -91,7 +91,7 @@ test("nothing on the sizing path starts a process", () => {
 //
 // FOUND BY A FRESH-EYES TESTER, by mutation: deleting `...this.strengthNeeded()`
 // from the pull's head produced ZERO additional failures across the whole
-// battery. The only case touching `body.needs` asserted it ABSENT, and the
+// battery. The only case touching `body.hand` asserted it ABSENT, and the
 // positive case built the envelope itself with compileColumn and publish — so
 // it could not see the field go away.
 //
@@ -119,8 +119,8 @@ test("a live pull inside a rated, pinned iteration carries the published strengt
   await session.advance(sid);
   await pullTo(session, `iterations/${sid}/onboard-retro`);
   const body = (await session.pull({}, "agent")) as Record<string, unknown>;
-  const needs = body.needs as { rung?: string; pair?: Difficulty } | undefined;
-  assert.ok(needs !== undefined, "the head consults the sizing block — delete that line and this is the case that goes red");
-  assert.deepEqual(needs.pair, { judgement: "C3", reading: "R1" }, "the input goes out beside the decision");
-  assert.ok(RUNGS.includes(needs.rung as (typeof RUNGS)[number]), `${needs.rung} is not in the published vocabulary`);
+  const hand = body.hand as { rung?: string; pair?: Difficulty } | undefined;
+  assert.ok(hand !== undefined, "the head consults the sizing block — delete that line and this is the case that goes red");
+  assert.deepEqual(hand.pair, { judgement: "C3", reading: "R1" }, "the input goes out beside the decision");
+  assert.ok(RUNGS.includes(hand.rung as (typeof RUNGS)[number]), `${hand.rung} is not in the published vocabulary`);
 });

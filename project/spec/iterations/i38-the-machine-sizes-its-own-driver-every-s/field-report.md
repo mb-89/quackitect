@@ -2444,6 +2444,212 @@ was that sentence. Repairing it took a walk from `frame-delta` to
 WHAT A CHECK WOULD HAVE TO DO. Not verify citations — every citation here was
 correct. It would have to ask whether the CITED CLAIM is true, which is a
 different question and is the one nothing on any gate form asks.
+## F64 — four of eight cases were green from birth, and the file's own comment explained why they were red
+
+`tests/call-attribution.test.ts` was written at `observe-red` following the
+pattern `tests/actor-stamp.test.ts` uses: append a record carrying the new
+fields as a plain literal, assert they come back. Its header said what made
+them red, in the words that file learned it in:
+
+> NOTHING HERE IS CAST. The append objects are written as plain literals on
+> purpose: excess-property checking is what makes the first case red before the
+> record type declares `actor`, and an `as` assertion would suppress exactly
+> that.
+
+FOUR OF EIGHT CASES PASSED ON THE FIRST RUN. `append` keeps keys it does not
+declare, and `node --test` strips types rather than checking them. Asserting a
+field comes back out passed against no design at all.
+
+THE ORIGINAL FILE'S CLAIM WAS TRUE WHEN IT WAS WRITTEN and is not true of a
+copy. Excess-property checking runs under `tsc`, which the pre-commit hook
+fires — so the check exists, at a different moment, on a different call. A test
+that is red under the type-checker and green under the runner is green at
+`observe-red`, because `observe-red` runs the runner.
+
+WHAT MAKES A CASE RED HERE IS REQUIRED-NESS, NOT PRESENCE. A call with no part,
+no state and no answering model must not become a record, and the requirement's
+own measure says so: calls whose part is absent = 0. That case is red because a
+behaviour is missing, which is what a red is for.
+
+THE PATTERN WAS COPIED WITH ITS REASONING and the reasoning did not travel. That
+is the general shape: a comment explaining why something works is evidence about
+the file it was written in, and evidence about nothing else.
+
+## F65 — the promotion was implemented against the wrong field, and the check named the rows
+
+`exp-two-hands-rating-the-same-six-cells` promotes one rule: a placeholder row
+that stands in for work happening elsewhere carries no difficulty of its own.
+Two independent readers rated six cells, agreed on five, and both named the same
+disagreement as their least-sure for the same reason.
+
+THE SPIKE NAMES ITS THREE ROWS: `M4_25 run-candidates`, `M6_15 run-spikes`,
+`M7_40 build-steps`. I implemented the rule against `row.seeds`.
+
+ALL THREE CARRY `runs`. Four rows carry `seeds`, and two of them —
+`rank-unknowns` and `fill-story-evidence` — carry no `runs` at all. Under the
+wrong field those two were exempted from rating, and they are real work:
+`specify-build` authors two design specs and then draws a ten-step machine.
+
+SEEDING IS NOT DESCENDING, and the two words sit next to each other in the same
+frontmatter. A row that SEEDS authors a drawing and is walked like any other
+step. A row that RUNS is where the walk descends, and the work is in the states
+below it.
+
+THE CHECK CAUGHT IT BECAUSE IT ASSERTS A LIST AND NOT A COUNT. It came back
+`['enumerate-space', 'rank-unknowns', 'specify-build', 'fill-story-evidence']`,
+and two of those four names are obviously not placeholders. A count would have
+said four and left me to work out which.
+
+## F66 — two designs named modules that were never built, and nothing noticed for twenty-nine iterations
+
+`trace-design` refuses a design spec naming a file that does not exist. Two
+specs authored at i9 failed it:
+
+- `dsp-the-state-declaration` named `engine/statedecl.ts`.
+- `dsp-the-install-preflight` named `engine/bin/install-preflight.ts`.
+
+NEITHER MODULE HAS EVER EXISTED. `git log` on both paths returns nothing.
+
+THE CHECK RUNS EVERY ITERATION AND ONLY LOOKS AT THAT ITERATION'S SPECS. These
+two came into scope because i38 added interface crossings to them at
+`specify-build`, to clear ten crossings realized by no spec. Clearing one debt
+surfaced another that had been standing for twenty-nine iterations.
+
+WHAT STANDS INSTEAD IS, IN ONE CASE, THE THING THE DESIGN EXISTS TO REMOVE.
+`engine/paths.ts` carries `EXCLUDED_DIRS` as its own copy of the machine-state
+folder's name — one of the five consumers `dsp-the-state-declaration` says
+should be GENERATED from a single declaration. The design is right, unbuilt, and
+its absence is exactly the drift it was written against.
+
+THE OTHER IS THE SAME SHAPE AT A DIFFERENT MOMENT. `engine/bin/preflight.ts`
+runs precondition checks at BOOT. The design asks for one at INSTALL, because a
+boot check keeps a broken machine from walking and an install check keeps a
+half-installed machine from existing. `req-setup-stops-before-partial` is met by
+nothing.
+
+BOTH NOW CARRY `NOT BUILT YET` and what to do instead, which is the voice rule
+this record already had and neither spec followed. A design and the thing
+existing read identically otherwise.
+
+## F67 — the design spec proposed a shape the surface cannot edit, and the code's own comment said why
+
+`dsp-the-sizing-block` specified where a difficulty is declared: a `complexity:`
+block on the matrix row, keyed by column, each holding two figures.
+
+THE LOADER'S OWN COMMENT, TWENTY LINES FROM WHERE THE VALUE WOULD BE READ:
+
+> The column value is the cell; `<column>_note` is its prose. Both are scalars,
+> because a Bases table edits a cell inline and cannot edit a nested map.
+
+A NESTED MAP PUTS THE RATING OUT OF REACH OF THE PERSON WHO DOES THE RATING.
+The whole design rests on somebody declaring 154 difficulties by hand, and the
+surface they would do it on cannot edit the shape the spec chose.
+
+THE SHAPE IS ONE SCALAR, `<column>_complexity: C3/R1`. It costs a parse the
+nested form would not have needed, and an unreadable value refuses naming both
+vocabularies.
+
+WHAT WOULD HAVE CAUGHT IT EARLIER is reading the file the design lands in before
+specifying the shape it lands in. The spec named `rigor-matrix.ts` in its own
+`files:` list, and the answer was in that file.
+
+## F68 — a file became an input to the answer and not to the cache key
+
+The load-time refusal for an unrated cell is gated on one line in the matrix
+folder's README, so that saying "every active cell is rated" and MAKING it
+binding are one act rather than two that can disagree.
+
+THE MATRIX IS CACHED AGAINST A CONTENT HASH OF `rows/`. The README is not in it.
+So a fixture that wrote the line got the pre-line answer back, and the check it
+was arming never fired.
+
+IT LOOKED LIKE A TEST BUG FOR TWO PASSES. The case failed, the fixture looked
+right, and the refusal it expected was real — just computed before the line
+existed. What made it visible was reducing it to four lines outside the test
+file and watching the same write produce the right answer.
+
+THE FIX IS ONE LINE IN THE STAMP AND ONE IN THE HASH, and the general rule is
+older than this iteration: a cache key must cover every input the answer depends
+on. Adding an input to a cached computation and not to its key is a defect the
+computation cannot report, because from inside it nothing is wrong.
+## F69 — the battery was green, and the tester's verdict was FAIL
+
+A fresh-eyes tester ran `npx tsc -p .` clean and `node --test "tests/*.test.ts"`
+at 1632 pass, 0 fail, ninety-four seconds. Then it built an isolated copy of the
+repository, deleted mechanisms one at a time, and re-ran.
+
+FIVE MECHANISMS COULD BE DELETED WITHOUT A SINGLE RED.
+
+- The whole lane-side wiring that takes a call's coordinates from its caller.
+  Replaced with constants: identical to control.
+- The line that puts the published strength on the pull. Deleted: identical to
+  control.
+- The per-step values in a unit's spread. Rewritten to report the maximum for
+  every step: the file stayed at twelve pass.
+- The unmatched branch, which no input the loader accepts can reach.
+- Determinism, which is the absence of state and so has nothing to delete.
+
+ONE MECHANISM WAS REAL AND THE MUTATION PROVED IT. Folding the difficulty into
+the demand ledger turned two cases red. The fatal row's guard does what it says.
+
+WHAT THE SHAPE OF THE FAILURE WAS, in one sentence: every check tested a LAYER
+in isolation — `CallLog.append` directly, the tool schema separately, the
+envelope assembled by the test itself — and nothing tested the JOIN between
+them, which is the only part a user's call actually travels.
+
+AND THE JOIN IS WHERE THE DEFECTS WERE. Two of the three unchecked joins were
+BROKEN, not merely untested: a bad part lost the record, and the head's lookup
+had never once found a rated step.
+
+MUTATION IS WHAT FOUND THIS AND NOTHING ELSE WOULD HAVE. Reading the tests
+finds a missing case; reading the code finds a missing branch. Only deleting the
+mechanism finds a check that cannot see it go.
+
+## F70 — a lookup that never worked, hidden by a catch that treats failure as ordinary
+
+The pull's head sized the step the walk stands on. It read `active()[0]`, which
+reports a nested id like `iterations/i1/onboard-retro`, and looked it up in the
+OUTER machine, whose states carry bare names.
+
+IT FOUND NOTHING, EVERY TIME, FROM THE DAY IT WAS WRITTEN.
+
+THE CATCH IS WHY NOBODY NOTICED. An unrated step is the ordinary case today —
+nothing in the product's matrix carries a rating — so the code around it reads:
+if the block refuses, publish nothing. A lookup that misses and a step that has
+no rating produce the same silence, and the silence was designed in.
+
+THE TEST COULD NOT HAVE CAUGHT IT EITHER, because writing one needed three
+facts nobody had assembled: a rating is per change-size column, an iteration
+before its kickoff has no column, and the id the walk reports is not the id the
+machine uses. The fixture that finally worked pins the column first.
+
+WHAT MAKES THIS GENERAL. A fallback that swallows a failure into a legitimate
+outcome makes the failure unobservable from inside. The two are distinguishable
+only from outside — by deleting the code and seeing whether anything changes.
+
+## F71 — a mark that fires on nearly everything counts nothing
+
+`unreasoned` was supposed to say: a step was walked by a weaker hand than the
+one named, and no reason was given. It fired whenever a driver was NAMED and no
+reason came with it.
+
+THE LANE'S OWN SCHEMA ASKS CALLERS TO SEND `named_driver` ON EVERY CALL while
+walking a rated step, so every such call with no reason — which is nearly all of
+them, since going weaker is the exception — would have been marked.
+
+THE FIELD WOULD HAVE READ AS AN EPIDEMIC OF UNREASONED WALKS and meant nothing
+at all.
+
+THE CAUSE IS THAT "WEAKER" IS NOT COMPUTABLE HERE. `named_driver` is a rung and
+`answered_by` is a model name, and the declared architecture holds no roster
+mapping one to the other — that is the design's own measurement seam, and this
+is where it bit. The mark now fires on a caller-declared `went_weaker`.
+
+SO THE ASYMMETRY IS TWICE VOLUNTARY: the walker declares that it went weaker,
+and then owes a sentence. `raid-risk-the-weaker-model-asymmetry-has-nothing-enforcing-it`
+stands at crippling and this build does not retire it.
+
+
 
 
 
