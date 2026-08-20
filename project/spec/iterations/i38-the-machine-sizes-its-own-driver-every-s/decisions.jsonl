@@ -164,3 +164,4 @@
 {"ts":"2026-08-20T11:02:53.941Z","op":"update","visit":"iterations/i38/derive-functions@0","node":"d57","brief":"minting stamp-who-answered-and-where"}
 {"ts":"2026-08-20T11:03:22.421Z","op":"update","visit":"iterations/i38/derive-functions@0","node":"d58","brief":"derive-functions: five functions, three flows"}
 {"ts":"2026-08-20T11:03:36.371Z","op":"update","visit":"iterations/i38/derive-functions@0","node":"d59","brief":"derive-functions signed"}
+{"ts":"2026-08-20T11:05:15.815Z","op":"update","visit":"iterations/i38/identify-assumptions@0","node":"d60","brief":"minting the per-column difficulty assumption"}
