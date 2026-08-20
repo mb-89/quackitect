@@ -1616,3 +1616,14 @@
 {"ts":"2026-08-20T11:23:39.861Z","op":"update","visit":"iterations/i37/fix-findings@0","node":"d853","brief":"recording why the position is stamped rather than inferred"}
 {"ts":"2026-08-20T11:23:55.379Z","op":"update","visit":"iterations/i37/fix-findings@0","node":"d854","brief":"the cage the parent is in does not reach the child"}
 {"ts":"2026-08-20T11:24:03.432Z","op":"update","visit":"iterations/i37/fix-findings@0","node":"d855","brief":"committing the register and design updates"}
+{"ts":"2026-08-20T11:24:50.326Z","op":"update","visit":"iterations/i37/fix-findings@0","node":"d856","brief":"the run gets its door"}
+{"ts":"2026-08-20T11:25:08.525Z","op":"update","visit":"iterations/i37/fix-findings@0","node":"d857","brief":"the verb needs an end that reads the bound run off disk"}
+{"ts":"2026-08-20T11:25:42.824Z","op":"update","visit":"iterations/i37/fix-findings@0","node":"d858","brief":"the benchmark verb belongs with the core tools, which hold the root"}
+{"ts":"2026-08-20T11:26:04.858Z","op":"update","visit":"iterations/i37/fix-findings@0","node":"d859","brief":"restoring the file I truncated"}
+{"ts":"2026-08-20T11:26:19.694Z","op":"update","visit":"iterations/i37/fix-findings@0","node":"d860","brief":"reading the real parse error"}
+{"ts":"2026-08-20T11:26:34.666Z","op":"update","visit":"iterations/i37/fix-findings@0","node":"d861","brief":"restoring the line a truncating read destroyed"}
+{"ts":"2026-08-20T11:26:42.536Z","op":"update","visit":"iterations/i37/fix-findings@0","node":"d862","brief":"restoring tools.ts from HEAD"}
+{"ts":"2026-08-20T11:26:53.176Z","op":"update","visit":"iterations/i37/fix-findings@0","node":"d863","brief":"recovering the truncated line from git"}
+{"ts":"2026-08-20T11:27:33.745Z","op":"update","visit":"iterations/i37/fix-findings@0","node":"d864","brief":"typechecking the benchmark verb"}
+{"ts":"2026-08-20T11:27:53.351Z","op":"update","visit":"iterations/i37/fix-findings@0","node":"d865","brief":"a truncating read makes read-modify-write unsafe"}
+{"ts":"2026-08-20T11:28:25.800Z","op":"update","visit":"iterations/i37/fix-findings@0","node":"d866","brief":"committing the benchmark verb"}

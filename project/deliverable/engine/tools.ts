@@ -11,6 +11,7 @@
 
 import { spawn } from "node:child_process";
 import { join } from "node:path";
+import { benchmarkBind, benchmarkEnd } from "./benchmark.ts";
 import { setAnswerSpill } from "./bound.ts";
 import { CallLog } from "./calllog.ts";
 import { parseUpdate } from "./decisions.ts";
@@ -483,6 +484,42 @@ export function coreTools(
 ): ToolDef[] {
   const model = new ModelFileSystem(rootOf, boundRecord);
   return [
+    {
+      name: "se_benchmark",
+      title: "se.benchmark",
+      description:
+        "OPEN OR CLOSE A BENCHMARK RUN. A run re-walks an ARCHIVED iteration from the commit before that iteration started, so what the machine costs can be measured against the walk that really happened. Name an iteration, or name none and the one benchmarked longest ago is taken \u2014 runs CYCLE rather than repeating, and the reports folder is the only scheduler state there is. A run BINDS OR IT REFUSES, once, at the earliest point the cause is knowable: no iteration, no rewind point, an empty tree, or a failed positive control. It never binds and then refuses per request, because a report full of refusals reads as a machine failure rather than as a guard. {stop: true} ends the open run and records WHERE IT ACTUALLY ENDED, which is the number this whole mechanism exists to collect \u2014 a run that died still leaves a result. WHAT IT MEASURES IS PROCESS OVERHEAD UNDER OBSERVATION, never production behaviour and never the quality of any decision: the agent is TOLD it is walking a benchmark. Never compare two single runs \u2014 report a median over at least three with the spread beside it.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          iteration: {
+            type: "string",
+            description: "the archived iteration to re-walk \u2014 omit it and the one benchmarked longest ago is taken",
+          },
+          stop_at: {
+            type: "string",
+            description:
+              "where the run should stop \u2014 the WHOLE WALK is the default, and a stop point is a narrowing somebody asked for",
+          },
+          stop: {
+            type: "boolean",
+            description: "end the open run and record where it actually ended",
+          },
+          ended_at: {
+            type: "string",
+            description: "with stop: the state the run actually ended in, recorded even when it equals stop_at",
+          },
+        },
+      },
+      handler: (args) => {
+        if (args.stop === true) return benchmarkEnd(projectRoot, args.ended_at === undefined ? "" : String(args.ended_at));
+        return benchmarkBind(projectRoot, {
+          ...(args.iteration === undefined ? {} : { iteration: String(args.iteration) }),
+          ...(args.stop_at === undefined ? {} : { stop_at: String(args.stop_at) }),
+        }) as unknown as Record<string, unknown>;
+      },
+    },
+
     ...fileTools(rootOf, model, reading),
     ...runTools(rootOf, projectRoot, reading, mirror),
     ...deskTools(rootOf, projectRoot, model, judgmentDrainAllowed, reading, doors, mirror),

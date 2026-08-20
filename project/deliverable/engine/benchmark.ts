@@ -288,6 +288,36 @@ export function benchmarkStop(root: string, run: BenchmarkRun, endedAt: string):
   return done;
 }
 
+/** END THE OPEN RUN, from the lane, without the caller holding the run object.
+ *
+ *  A RUN THAT DIED STILL LEAVES A RESULT, so this reads the bound run off disk
+ *  rather than asking for it: the caller that ends a run is often not the one
+ *  that opened it. */
+export function benchmarkEnd(root: string, endedAt: string): Record<string, unknown> {
+  const bound = join(root, ".se", "benchmark.json");
+  if (!existsSync(bound)) return { refused: "no benchmark run is bound — nothing to end" };
+  let run: BenchmarkRun;
+  try {
+    run = JSON.parse(readFileSync(bound, "utf8")) as BenchmarkRun;
+  } catch {
+    // THE BINDING IS UNREADABLE AND THE RUN IS STILL OVER. Refusing here would
+    // leave a bound run nobody can close.
+    rmSync(bound, { force: true });
+    return { refused: "the bound run could not be read — the binding is cleared and the run is lost" };
+  }
+  const done = benchmarkStop(root, run, endedAt);
+  return {
+    ended: done.iteration,
+    stop_at: done.stop_at,
+    ended_at: done.ended_at,
+    // WHERE IT WAS TOLD TO STOP AND WHERE IT ENDED ARE BOTH REPORTED, even when
+    // equal — a reader cannot tell "reached the end" from "nobody recorded it"
+    // when one of them is simply absent.
+    reached_the_end: done.ended_at === done.stop_at,
+    conditions: conditionsFor(done),
+  };
+}
+
 /** Where the reports live. One place, so the guard and the report agree. */
 export function reportsDirRel(): string {
   return join("project", "spec", "benchmarks");
