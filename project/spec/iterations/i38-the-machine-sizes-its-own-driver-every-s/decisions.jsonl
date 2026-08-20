@@ -241,3 +241,9 @@
 {"ts":"2026-08-20T11:53:22.031Z","op":"update","visit":"iterations/i38/enumerate-space/find_contradiction@0","node":"d130","brief":"minting contradiction option the-decision-is-fixed-within-a-run-a"}
 {"ts":"2026-08-20T11:53:22.148Z","op":"update","visit":"iterations/i38/enumerate-space/find_contradiction@0","node":"d131","brief":"minting contradiction option split-a-submachine-where-the-spread-"}
 {"ts":"2026-08-20T11:53:50.723Z","op":"plan","visit":"iterations/i38/enumerate-space/find_contradiction@0","parent":null,"nodes":[{"id":"d132","brief":"contradiction finder: four stated"},{"id":"d133","brief":"three broken"},{"id":"d134","brief":"one traded"}]}
+{"ts":"2026-08-20T11:55:20.601Z","op":"update","visit":"iterations/i38/enumerate-space/find_analogy@0","node":"d135","brief":"find_analogy: reading the form"}
+{"ts":"2026-08-20T11:56:08.542Z","op":"update","visit":"iterations/i38/enumerate-space/find_analogy@0","node":"d136","brief":"minting analogy option name-the-acceptable-over-driving-rat"}
+{"ts":"2026-08-20T11:56:08.710Z","op":"update","visit":"iterations/i38/enumerate-space/find_analogy@0","node":"d137","brief":"minting analogy option audit-a-sample-rather-than-reconcile"}
+{"ts":"2026-08-20T11:56:39.245Z","op":"update","visit":"iterations/i38/enumerate-space/find_analogy@0","node":"d138","brief":"analogy finder: two transfers, one confirmation"}
+{"ts":"2026-08-20T11:57:05.304Z","op":"update","visit":"iterations/i38/enumerate-space/find_analogy@0","node":"d139","brief":"abstractions recast to the three cells the template wants"}
+{"ts":"2026-08-20T11:57:05.838Z","op":"update","visit":"iterations/i38/enumerate-space/find_analogy@0","node":"d140","brief":"analogy finder signed"}
