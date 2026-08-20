@@ -65,6 +65,29 @@ own ceiling never opens. The alternative — binding and refusing per request �
 produces a report full of refusals that reads as a machine failure rather than
 as a guard.
 
+## The pool is what can bind
+
+SHIPPED IS NOT THE SAME AS BENCHMARKABLE. Measured 2026-08-20: of sixteen
+shipped iterations, TEN have no commit naming them started, so their history
+cannot be cut.
+
+`markStarted` RETURNS EARLY when a record already carries `started:`, so a
+field written any other way suppresses the commit forever — and all sixteen
+have the field, which is exactly what hid it.
+
+THE DEFAULT PICK USED TO LAND ON ONE OF THE TEN AND REFUSE EVERY TIME, because
+never-benchmarked sorts first and the lowest-sorting shipped iteration is one
+of them. So `se_benchmark` with no argument was unusable.
+
+THE DROPPED COUNT IS RETURNED, NOT SWALLOWED. `benchmarkPool` gives the pick,
+the pool, the shipped count and the names of what it could not reach. A pool
+that quietly shrinks is the failure this iteration kept finding in other laws,
+and it is not one this design gets to repeat.
+
+THE POOL IS SIX: i5, i6, i11, i16, i33, i35. Backfilling the other ten is
+archaeology — the right commit for each has to be found rather than guessed,
+and a guessed rewind point is worse than none.
+
 ## Rationale
 
 THE TREE IS FETCHED, NOT EXPORTED, and this was wrong on the element's first

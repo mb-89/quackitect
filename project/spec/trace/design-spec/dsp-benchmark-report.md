@@ -51,6 +51,24 @@ TWO FIELDS THAT ARE NOT NUMBERS. Where the run was told to stop, and where it
 actually stopped. Both are recorded even when equal, because a reader cannot
 distinguish `reached the end` from `nobody recorded it` when one is omitted.
 
+## The stamp is a set, not one hash
+
+`rigorMatrixContentHash` HASHES `rigor_matrix/rows` AND NOTHING ELSE — read
+2026-08-20, and recorded on
+`raid-asm-the-rigor-matrix-hash-identifies-what-changes-walk-cost`.
+
+GUIDANCE, FORM TEMPLATES, ITEM TEMPLATES, METHOD CARDS AND THE ENGINE all
+change what a walk costs and none of them moves that hash. The placeholder fix
+shipped during this iteration turned an unwalkable chain into a walkable one
+and moved zero rows.
+
+SO A REPORT STAMPING THE MATRIX ALONE CLAIMS MORE THAN IT KNOWS: it would call
+two runs comparable across exactly the changes this project makes most often.
+
+`stamp_covers` CARRIES A HASH PER DIRECTORY, and `reportProblems` refuses a
+report that names a directory with no hash beside it — a line that looks like a
+stamped set and asserts nothing is the same lie in a new costume.
+
 ## Rationale
 
 THE CONDITIONS STAMP CLAIMS MORE THAN IT KNOWS TODAY, and the design says so

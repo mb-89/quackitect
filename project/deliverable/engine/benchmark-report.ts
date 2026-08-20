@@ -170,11 +170,10 @@ export function reportProblems(report: Record<string, unknown>): string[] {
 
 /** WHAT THE CONDITIONS STAMP COVERS, and it is a SET rather than one hash.
  *
- *  The rigor matrix hash covers `rigor_matrix/rows` and nothing else — read
- *  2026-08-20, and recorded on
- *  raid-asm-the-rigor-matrix-hash-identifies-what-changes-walk-cost. Guidance,
- *  form templates, item templates, method cards and the engine itself all
- *  change what a walk costs and none of them moves that hash.
+ *  The rigor matrix hash covers `rigor_matrix/rows` and nothing else, so
+ *  guidance, forms, items, methods and the engine all change what a walk costs
+ *  without moving it.
+ *  see dsp-benchmark-report.md#the-stamp-is-a-set-not-one-hash
  *
  *  A REPORT STAMPING THE MATRIX ALONE CLAIMS MORE THAN IT KNOWS: it would call
  *  two runs comparable across exactly the changes this project makes most

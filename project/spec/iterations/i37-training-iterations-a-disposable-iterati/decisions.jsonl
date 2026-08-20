@@ -1775,3 +1775,10 @@
 {"ts":"2026-08-20T13:20:23.386Z","op":"update","visit":"iterations/i37/gate-validation@0","node":"d1012","brief":"the demonstration specs that carry the two runs"}
 {"ts":"2026-08-20T13:20:23.547Z","op":"update","visit":"iterations/i37/gate-validation@0","node":"d1013","brief":"the demonstration specs that carry the two runs"}
 {"ts":"2026-08-20T13:22:01.391Z","op":"plan","visit":"iterations/i37/gate-validation@0","parent":null,"nodes":[{"id":"d1014","brief":"gate-validation: one override discharged"},{"id":"d1015","brief":"one stands"},{"id":"d1016","brief":"one correction owed"}]}
+{"ts":"2026-08-20T13:23:12.726Z","op":"update","visit":"iterations/i37/package@0","node":"d1017","brief":"the pool is what can bind, and the dropped count is returned"}
+{"ts":"2026-08-20T13:23:46.025Z","op":"update","visit":"iterations/i37/package@0","node":"d1018","brief":"the bind draws from the pool and its refusal counts the archive"}
+{"ts":"2026-08-20T13:23:46.302Z","op":"update","visit":"iterations/i37/package@0","node":"d1019","brief":"a case pins that the pool names what it dropped"}
+{"ts":"2026-08-20T13:24:12.126Z","op":"update","visit":"iterations/i37/package@0","node":"d1020","brief":"a case pins that the pool names what it dropped"}
+{"ts":"2026-08-20T13:28:41.839Z","op":"update","visit":"iterations/i37/package@0","node":"d1021","brief":"the dated reasoning moves to the design spec, and a pointer stays"}
+{"ts":"2026-08-20T13:28:42.133Z","op":"update","visit":"iterations/i37/package@0","node":"d1022","brief":"the pool reasoning lands where the pointer aims"}
+{"ts":"2026-08-20T13:28:42.293Z","op":"update","visit":"iterations/i37/package@0","node":"d1023","brief":"the stamp reasoning lands where the pointer aims"}

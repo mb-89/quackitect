@@ -125,7 +125,22 @@ export function standRewoundTree(
  *  AN ITERATION NEVER BENCHMARKED SORTS FIRST. Absence is older than any date,
  *  so a fresh archive cycles through everything once before repeating. */
 export function leastRecentlyBenchmarked(root: string): string | undefined {
+  return benchmarkPool(root).pick;
+}
+
+/** THE POOL A RUN CAN ACTUALLY DRAW FROM, and how much of the archive it is.
+ *
+ *  SHIPPED IS NOT THE SAME AS BENCHMARKABLE, and the dropped count is returned
+ *  rather than swallowed.
+ *  see dsp-benchmark-binding.md#the-pool-is-what-can-bind */
+export function benchmarkPool(root: string): { pick?: string; pool: string[]; shipped: number; unreachable: string[] } {
   const shipped = shippedIterations(root);
+  const unreachable = shipped.filter((id) => rewindPointFor(root, id) === undefined);
+  const pool = shipped.filter((id) => !unreachable.includes(id));
+  return { pick: leastRecentOf(root, pool), pool, shipped: shipped.length, unreachable };
+}
+
+function leastRecentOf(root: string, shipped: string[]): string | undefined {
   if (shipped.length === 0) return undefined;
   const last = new Map<string, string>();
   const dir = join(root, reportsDirRel());
@@ -244,8 +259,19 @@ function hostConditions(env: NodeJS.ProcessEnv): Record<string, string> {
  *  refusal happens once, at the earliest point where the cause is knowable,
  *  and it names the cause. */
 export function benchmarkBind(root: string, opts: { iteration?: string; stop_at?: string }): BenchmarkRun | BindRefusal {
-  const iteration = opts.iteration ?? leastRecentlyBenchmarked(root);
-  if (iteration === undefined) return { refused: "no iteration to walk — the archive holds nothing shipped" };
+  const chosen = benchmarkPool(root);
+  const iteration = opts.iteration ?? chosen.pick;
+  if (iteration === undefined) {
+    // THE REFUSAL SAYS HOW MUCH OF THE ARCHIVE IS OUT OF REACH, because
+    // "nothing to walk" over a sixteen-record archive is a puzzle rather than
+    // an answer.
+    return {
+      refused:
+        chosen.shipped === 0
+          ? "no iteration to walk — the archive holds nothing shipped"
+          : `no iteration to walk — all ${String(chosen.shipped)} shipped iterations lack a commit naming them started, so no history can be cut`,
+    };
+  }
   const rewind = rewindPointFor(root, iteration);
   if (rewind === undefined) {
     return { refused: `no rewind point for ${iteration} — no single commit names it as started, so the history cannot be cut` };

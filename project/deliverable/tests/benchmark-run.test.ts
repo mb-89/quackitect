@@ -11,7 +11,7 @@ import { strict as assert } from "node:assert";
 import { existsSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { describe, test } from "node:test";
-import { benchmarkBind, leastRecentlyBenchmarked, rewindPointFor, standRewoundTree } from "../engine/benchmark.ts";
+import { benchmarkBind, benchmarkPool, leastRecentlyBenchmarked, rewindPointFor, standRewoundTree } from "../engine/benchmark.ts";
 import { concealedFromLane, concealmentCallSites, controlFilesPresent, resolvesInBoundTree } from "../engine/benchmark-guard.ts";
 import { conditionsStampDirs, costPerState, reportProblems, UNATTRIBUTED } from "../engine/benchmark-report.ts";
 import { fileGlob, fileList, fileRead } from "../engine/files.ts";
@@ -120,6 +120,19 @@ describe("a bound run cannot reach past its rewind point", { concurrency: true }
     const into = join(root, ".bench-tree");
     standRewoundTree(root, SUBJECT, rewind, into);
     assert.ok(controlFilesPresent(into, CONTROL) > 0, "the tree holds a different iteration's trace");
+  });
+
+  test("the pool is what can BIND, and what it dropped is counted rather than swallowed", () => {
+    // Shipped is not the same as benchmarkable. Measured on the real archive:
+    // ten of sixteen shipped iterations have no start commit, and the default
+    // pick used to land on one of them and refuse every time.
+    const { root } = benchRepo();
+    write(root, "project/spec/iterations/i88-shipped-but-never-started/record.md", "---\nid: i88\nstatus: shipped\n---\n");
+    const p = benchmarkPool(root);
+    assert.ok(!p.pool.includes("i88-shipped-but-never-started"), "an iteration with no start commit is not in the pool");
+    assert.ok(p.unreachable.includes("i88-shipped-but-never-started"), "and it is NAMED as dropped, not silently gone");
+    assert.ok(p.shipped > p.pool.length, "the shipped count is kept, so a reader sees the shortfall");
+    assert.notEqual(p.pick, "i88-shipped-but-never-started", "the default pick can bind");
   });
 
   test("with no iteration named, a run takes the one benchmarked longest ago", () => {
