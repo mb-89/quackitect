@@ -5,10 +5,10 @@ applyTo: '**'
 ---
 
 <!-- GENERATED at agent start. Do not edit — the next start overwrites it.
-     from project/guidance/contract.md fcaa70fa98be
-     from project/guidance/walking.md b8040822706b
+     from project/guidance/contract.md 808e6defe6a3
+     from project/guidance/walking.md 5eea148fd1c1
      from project/guidance/method/lane.md 73eb9c0258aa
-     from project/guidance/voice.md c2ba01e3e89a
+     from project/guidance/voice.md f59715f4ccc4
 -->
 
 # contract — the binding rules of the session
@@ -225,7 +225,7 @@ and the conflict surfaced only because a walk hit the state.
 THE CONTRACT OVERRIDES DEFAULTS — the first line of this file says so. This
 rule is where that override is written down for subagents and for research.
 
-HOW TO SPAWN ONE WELL is `guidance/method/subagents.md`. It carries three
+HOW TO SPAWN ONE WELL is `project/guidance/method/subagents.md`. It carries three
 things this rule does not: which model each subagent gets, what an interrupt
 does to one running in the background, and what its narration costs you.
 
@@ -305,29 +305,22 @@ names which of four you got.
   THREE KEYS ARE ACTS, NOT SECTIONS. Everything else in the form is a field
   and gets saved.
 
-  EACH FIELD SAYS WHICH OF TWO ACTS IT WANTS, on its hint, as `act`. They are
-  not the same work and the wrong one wastes the state.
+  EACH FIELD SAYS WHICH OF TWO ACTS IT WANTS, on its hint, as `act`.
 
-  - `author` — the page is yours. Nothing computed it and nothing will. Write
-    it.
-  - `rule` — THE ENGINE ALREADY DREW IT, from what stands elsewhere in the
-    record. Read the drawing, then accept it, reject it or pick among what it
-    offers. Your judgment is the answer; prose is not.
+  - `author` — the page is yours. Nothing computed it. Write it.
+  - `rule` — THE ENGINE ALREADY DREW IT from what stands elsewhere. Read the
+    drawing, then accept it, reject it, or pick among what it offers. Your
+    judgment is the answer; prose is not.
 
-  A DRAWN FIELD IS NOT AN EMPTY PAGE, and it used to arrive looking like one.
-  23 of the 86 evidence fields in the rigor matrix are drawn — the Pugh matrix,
-  the flip conditions, the clustered DSM, the Pareto front, every checklist over
-  a live source. Nothing on the form said so.
+  A DRAWN FIELD IS NOT AN EMPTY PAGE and used to arrive looking like one — 23
+  of the matrix's 86 fields are drawn. So the same form invited two opposite
+  mistakes: type prose over a computation, or stamp one unread. Both were
+  walked on i15.
 
-  SO THE SAME FORM INVITED TWO OPPOSITE MISTAKES. Take a drawing for an empty
-  page and you type prose over a computation. Take an empty page for a drawing
-  and you stamp it without reading. Both were walked on i15.
-
-  WHAT A RULE FIELD ASKS FOR, concretely: the engine says the flips are these
-  three; you say which are credible. It says the clusters are these; you move
-  the rows it got wrong. It says the winner is this; you say whether the seat
-  holds. Re-deriving the computation by hand is the waste, and typing an essay
-  where a pick was wanted is the other one.
+  CONCRETELY: the engine says the flips are these three, you say which are
+  credible. It says the clusters are these, you move the rows it got wrong.
+  Re-deriving the drawing by hand is the waste; an essay where a pick was
+  wanted is the other one.
 
   - `submit: true` — stamp it. Runs every check, then signs.
   - `bless: true` or `bless: false` — the gate's thumb, up or down.
@@ -490,9 +483,7 @@ refusing, and the agent's pull is what moves.
 - `.se/reading.md` is the same thing as a file, for a person to open.
 
 READ SERIALLY FOR NOW. A RETREAT, not a preference: a Copilot harness appears
-to cancel itself on parallel batches (observed 2026-07-31). The lane serves
-parallel reads fine. Lifts when that bug is understood or hosts can be
-detected.
+to cancel itself on parallel batches. The lane serves parallel reads fine.
 
 ## Narration — the update rides every call
 
@@ -519,23 +510,14 @@ whole object.
   a PROGRESS view, not a completion record — fourteen items ticked in the last
   minute tell a reader nothing the commit would not.
 
-  SIZE AN ITEM SO IT CAN CLOSE WHERE YOU STAND. An item is a thing that will
-  be DONE while you are still in this state, and the stall guard is what
-  measures that: it counts updates since anything closed, so an item that
-  cannot close makes every later update look like a stall.
-
-  MEASURED ON THE i15 WALK: 57 refusals, all SE-C-133, all with the same two
-  items open — "walk boot reading loop", still open hours after boot ended,
-  and "work milestones as served", which cannot close until the iteration
-  does. The work was real and the narration was honest. The checklist was the
-  wrong shape, and nothing said how to shape one.
+  SIZE AN ITEM SO IT CAN CLOSE WHERE YOU STAND. The stall guard counts
+  updates since anything closed, so an item that cannot close makes every
+  later update look like a stall. On i15 that cost 57 refusals, all with the
+  same two unclosable items open.
 
   SO AN ITEM NAMING A WHOLE MILESTONE IS NOT AN ITEM. It is the state you are
-  in. Plan the steps inside it, and plan again when you reach the next one —
-  a second `plan` is free and is what scope growth wants anyway.
-
-  AND CLOSE IT THE MOMENT IT LANDS. An item finished twenty calls ago and
-  still open is what turns the guard from a nudge into a toll.
+  in. Plan the steps inside it, and plan again at the next one — a second
+  `plan` is free. And close each item the moment it lands.
 - `{op: "fork", brief, items?}` opens a BLOCKING detour: the current item
   cannot continue until it is fixed. Scope growth is another `plan`, not a
   fork.
@@ -555,20 +537,17 @@ whole object.
   chained brief still refuses (SE-C-120): which part resolved the node is
   not the engine's to guess.
 - THE STALL WARNS AT FIVE AND REFUSES AT TWELVE (SE-C-133), and the gap is
-  the grace. Both were five, so the warning bit one call later — which is a
-  two-stage refusal, not a warning. The counter measures updates since
-  anything CLOSED, and real work runs past six while reading its way to a
-  root cause.
+  the grace. The counter measures updates since anything CLOSED, and real work
+  runs past six while reading its way to a root cause.
 
 HOW OFTEN IS THE PERSON'S CONTROL, on the mirror's bar. Five notches, both
 clocks running — minutes and calls, whichever falls due first. A low notch is
 them asking to see the work, not a tax to pay with filler.
 
-THE READING LOOP PAYS NOTHING (owner ruling 2026-08-18). A pull carrying only
-a read proof does not spend a call. The machine forced that hop and no
-judgment happened on it, so there is nothing to narrate — and a toll falling
-due mid-loop could only ever be paid with filler. The minutes clock still
-runs, and a pull carrying evidence beside the proof pays like any other work.
+THE READING LOOP PAYS NOTHING. A pull carrying only a read proof does not
+spend a call: the machine forced the hop and no judgment happened on it. The
+minutes clock still runs, and a pull carrying evidence beside the proof pays
+like any other work.
 
 ## Notes
 
@@ -611,21 +590,16 @@ A red is understood and fixed properly, then you move.
 A SCOPED RUN IS THE ONLY ONE YOU MAKE. Ask it as a QUESTION — `se_test
 {question: "did X break Y"}` — and the engine decides what to run.
 
-IT DOES NOT BLOCK. The answer comes back `handed_off: true` with a job handle
-and says so: the run is in the background, and `se_test {job: "..."}` reads
-its status. This page used to claim the opposite — that a run blocks and there
-is nothing to poll — while the engine has always handed a handle back.
+IT DOES NOT BLOCK. The answer comes back `handed_off: true` with a job handle;
+`se_test {job: "..."}` reads its status.
 
-POLLING PAYS NO CALL. The narration toll skips a poll, for the reason it skips
-the reading loop: the machine forced the hop, no judgment happened on it, and
-a toll falling due there could only be paid with filler. Measured before the
-skip existed: 25 of a session's 40 `se_test` calls were refused by the toll,
-and every one of them was a poll.
+POLLING PAYS NO CALL. The toll skips a poll for the reason it skips the reading
+loop: the machine forced the hop and no judgment happened on it. Before that
+skip, 25 of a session's 40 `se_test` calls were refused, every one a poll.
 
-SO DO OTHER WORK WHILE IT RUNS, and read the verdict when it lands. The answer
-names how long the last battery took, so you know what scale of wait to
-expect. What you never do is sit polling in a tight loop — that is the
-minutes clock's business, not the call clock's.
+SO DO OTHER WORK WHILE IT RUNS and read the verdict when it lands. The answer
+names how long the last battery took. What you never do is sit polling in a
+tight loop — that is the minutes clock's business.
 
 THE FULL BATTERY IS THE ENGINE'S. It runs once, at verification, fired by
 that state's own exit script — you never call it and there is no state where
@@ -1009,12 +983,11 @@ So the list is the rule's memory: the specific words that got through. A rule wi
 
 ### A ruling that is not built yet says so, in its first line
 
-- MARK IT WITH THE WORDS `NOT BUILT YET`, in the heading or the opening sentence. A test reads that marker: a guidance page may name a lane verb the engine does not register only inside a section carrying it. A decision to build a thing and the thing existing read identically otherwise, and the reader cannot tell them apart.
+- MARK IT WITH THE WORDS `NOT BUILT YET`, in the heading or the opening sentence. A test reads that marker: a guidance page may name a lane verb the engine does not register only inside a section carrying it. A decision to build a thing and the thing existing read identically otherwise.
 - SAY WHAT TO DO INSTEAD, in the same breath. A reader who came for the capability needs the way that works today, not only the news that the good way is coming.
 - Write the ruling in the FUTURE where it is unbuilt. "The verb wraps X" says it exists. "When it is built, the verb will wrap X" does not.
-- THIS BINDS HARDEST ON NAMES. A heading reading "se_package builds the artifact" teaches a lane verb into existence, and the reader spends their calls discovering it does not answer. That heading stood for four days.
-- The same holds for a state, a field, a flag or a file. Naming it in the present tense is a claim that it is there.
-- WHY IT IS A WRITING RULE AND NOT A LINT. The two readings are grammatically identical, so nothing mechanical separates them. Only the author knows which one they meant.
+- THIS BINDS HARDEST ON NAMES. A heading reading "se_package builds the artifact" teaches a lane verb into existence, and the reader spends calls discovering it does not answer. The same holds for a state, a field, a flag or a file.
+- WHY IT IS A WRITING RULE AND NOT A LINT. The two readings are grammatically identical. Only the author knows which was meant.
 
 ### The sycophancy guard (applies to every assessment)
 - Praise is a signal, not a nicety. Endorse only what survives the disconfirming question.
@@ -1053,6 +1026,5 @@ So the list is the rule's memory: the specific words that got through. A rule wi
 - ENTRY documents carry no method jargon (owner law, 2026-07-12).
   - The README and anything a stranger reads FIRST use plain language only.
   - A method term (suspect, bless, cone, gate) may appear where its definition is one click away, in the book's termrefs. Never bare in the front door.
-  - The i17 red-team and the i19 cold-read both caught exactly this.
-  - THE TERMS LINT DOES SEE THE README. `engine/bin/prose-inspect.ts` line 40 sets its entry-document list to README.md, and its first item flags a bare method term on any line carrying no link.
+  - THE TERMS LINT DOES SEE THE README. `project/deliverable/engine/bin/prose-inspect.ts` line 40 sets its entry-document list to README.md, and its first item flags a bare method term on any line carrying no link.
   - This line said the opposite until 2026-08-19. It was corrected after the predecessor version was found to have had the same check all along, tested and green.
