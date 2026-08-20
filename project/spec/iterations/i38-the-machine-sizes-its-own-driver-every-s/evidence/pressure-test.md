@@ -1,7 +1,8 @@
 ---
 form: pressure-test
 by: agent
-signed_off: 2026-08-20T09:52:53.530Z
+signed_off: 2026-08-20T10:06:38.502Z
+reopened: "2026-08-20T10:06:02.578Z — it quotes a blast radius of thirteen of fourteen pinned records that is wrong by the wrong population, and it answered ground that moved when the register sweep found the standing weak-model entries"
 authors: agent
 files:
 ---
@@ -203,8 +204,8 @@ split the two axes instead of crossing them.
 
 Before those, this change had nowhere to live.
 
-Q: IF YOU ADD A STATE TO NAME THE DRIVER, YOU EDIT A DEPENDENCY, AND THIRTEEN
-OF FOURTEEN PINNED RECORDS REOPEN. Is the whole third goal not simply
+Q: IF YOU ADD A STATE TO NAME THE DRIVER, YOU EDIT A DEPENDENCY, AND TWO OTHER
+LIVE ITERATIONS REOPEN ALONG WITH THIS ONE. Is the whole third goal not simply
 unaffordable?
 
 A: IT MAY BE, AND THAT IS THE OPEN QUESTION THIS MILESTONE HANDS DOWNWARD
@@ -223,6 +224,41 @@ should be dropped rather than shipped and maintained. The scan's first
 recommendation is exactly that, and it is carried into the requirements as a
 candidate rather than dismissed — which means this design has to beat it
 there, not here.
+
+Q: YOU FIRST WROTE THAT QUESTION AS "THIRTEEN OF FOURTEEN PINNED RECORDS
+REOPEN". Which was it?
+
+A: TWO OTHERS, AND THE FIRST FIGURE WAS MINE AND WRONG. Fourteen records carry
+a seeded column and thirteen carry a comparable shape, but eleven of the
+fourteen are SHIPPED. Cross-checking status against pins gives three both open
+and pinned — i9, i36 and this one — so the live exposure is two other
+iterations.
+
+THE UNCOMFORTABLE PART IS HOW IT HAPPENED. The kickoff had estimated four. I
+counted, believed I was sharpening the estimate, and inflated it roughly
+sixfold by counting the wrong population. A number arrived at by measurement
+is not automatically better than one arrived at by reading, and this one was
+worse.
+
+Q: YOUR OWN PRESSURE TEST DID NOT FIND ANY OF THIS. What is the test for?
+
+A: IT DID NOT, AND THE GATE DID. Three states were reopened on findings this
+form's FAQ never raised: a register sweep that had not happened, a measurement
+that proved nothing, and the figure above. THE PATTERN IS THE ANSWER — every
+question that landed came from outside the packet, and the ones written from
+inside it were the comfortable ones. This form said so before the gate proved
+it, which is worth something and is not worth much.
+
+Q: A STANDING ENTRY SAYS WEAKER MODELS CANNOT PRODUCE THE BOOT READING PROOF AT
+ALL. Why are you routing cheap models toward states they cannot reach?
+
+A: BECAUSE THE TWO ENTRIES WANT EACH OTHER, and that is the honest sequencing
+argument rather than a dodge. Until something names which states are cheap,
+there is no case for spending effort on the boot door, because nobody can say
+what opening it would buy. Until the door opens, naming them buys nothing.
+
+WHAT CHANGES BECAUSE OF IT is the pitch, not the plan: the payoff waits on
+somebody else's open issue and the case now says so where a reader meets it.
 
 ## findings_folded
 
@@ -257,6 +293,24 @@ THE ONE THING WORTH SAYING ABOUT THE TEST ITSELF: the questions that hurt most
 came from outside. The reviewer found the shape cascade and the scan found the
 scheduler literature; neither was reachable from inside the draft. The
 questions written from within the packet were the comfortable ones.
+
+AND THREE MORE, FOLDED ON RE-SIGN AFTER THE MOTIVATION GATE FAILED.
+
+CHANGED — THE CASCADE FIGURE. Thirteen of fourteen became two other live
+iterations, because eleven of the fourteen pinned records are shipped. The
+question that quotes it is rewritten and a new question asks which it was, so
+the correction is visible rather than tidied away.
+
+CHANGED — THE PAYOFF'S DEPENDENCY ENTERS THE FAQ. The register sweep that this
+milestone owed and skipped turns up an open, crippling entry saying weaker
+models cannot boot at all. A new question asks it directly and the answer is
+sequencing, not denial.
+
+NOT CHANGED, AND WORTH SAYING PLAINLY — THIS TEST DID NOT CATCH ITS OWN
+PACKET'S WORST ERRORS. The gate did, on an adversarial pass with no shared
+context. The form had already observed that the questions written from inside
+the packet were the comfortable ones; being right about that in advance did not
+make the test work.
 
 ## follow_up
 

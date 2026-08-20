@@ -74,3 +74,36 @@
 {"ts":"2026-08-20T09:59:20.435Z","op":"update","visit":"iterations/i38/gate-motivation@0","node":"d72","brief":"the sweep the register owed turns up a crippling dependency"}
 {"ts":"2026-08-20T09:59:59.427Z","op":"update","visit":"iterations/i38/gate-motivation@0","node":"d73","brief":"gate ruled fail; three states named for reopen"}
 {"ts":"2026-08-20T10:00:25.277Z","op":"update","visit":"iterations/i38/gate-motivation@0","node":"d74","brief":"follow-up names the three states and what the gate learned"}
+{"ts":"2026-08-20T10:00:53.606Z","op":"update","visit":"iterations/i38/gate-motivation@0","node":"d75","brief":"asking the machine how the named states reopen"}
+{"ts":"2026-08-20T10:01:15.819Z","op":"update","visit":"iterations/i38/gate-motivation@0","node":"d76","brief":"reopening define-actual against falsified evidence"}
+{"ts":"2026-08-20T10:01:24.155Z","op":"update","visit":"iterations/i38/define-actual@1","node":"d77","brief":"reopening log-risks against the sweep it skipped"}
+{"ts":"2026-08-20T10:01:24.405Z","op":"update","visit":"iterations/i38/log-risks@0","node":"d78","brief":"reopening scope-non-goals against the cited measurement"}
+{"ts":"2026-08-20T10:01:32.283Z","op":"obsolete","visit":"iterations/i38/gate-motivation@0","node":"d65","brief":"the gate failed; these close and the reopened states come first"}
+{"ts":"2026-08-20T10:01:32.640Z","op":"obsolete","visit":"iterations/i38/gate-motivation@0","node":"d66","brief":"the gate failed; these close and the reopened states come first"}
+{"ts":"2026-08-20T10:01:32.979Z","op":"obsolete","visit":"iterations/i38/gate-motivation@0","node":"d67","brief":"the gate failed; these close and the reopened states come first"}
+{"ts":"2026-08-20T10:01:33.329Z","op":"plan","visit":"iterations/i38/scope-non-goals@0","parent":"d39","nodes":[{"id":"d79","brief":"re-sign define-actual with corrected evidence"},{"id":"d80","brief":"re-sign log-risks with the register actually swept"},{"id":"d81","brief":"re-sign scope-non-goals on evidence that settles it"},{"id":"d82","brief":"re-rule the motivation gate"}]}
+{"ts":"2026-08-20T10:01:59.316Z","op":"update","visit":"iterations/i38/scope-non-goals@0","node":"d83","brief":"scope re-signed on evidence that actually settles it"}
+{"ts":"2026-08-20T10:02:09.867Z","op":"update","visit":"iterations/i38/log-risks@0","node":"d84","brief":"log-risks: doing the register sweep it claimed"}
+{"ts":"2026-08-20T10:02:37.101Z","op":"update","visit":"iterations/i38/log-risks@0","node":"d85","brief":"log-risks re-signed with the sweep actually done"}
+{"ts":"2026-08-20T10:03:06.696Z","op":"update","visit":"iterations/i38/define-actual@1","node":"d86","brief":"define-actual: correcting the four claims"}
+{"ts":"2026-08-20T10:03:07.052Z","op":"update","visit":"iterations/i38/define-actual@1","node":"d87","brief":"define-actual re-signed with four corrected claims"}
+{"ts":"2026-08-20T10:03:25.366Z","op":"update","visit":"iterations/i38/frame-delta@2","node":"d88","brief":"frame-delta re-check after the reopens"}
+{"ts":"2026-08-20T10:03:57.733Z","op":"update","visit":"iterations/i38/frame-delta@2","node":"d89","brief":"asking frame-delta for its recheck form"}
+{"ts":"2026-08-20T10:04:55.048Z","op":"update","visit":"iterations/i38/frame-delta@2","node":"d90","brief":"to pressure-test, to correct the figure it quoted"}
+{"ts":"2026-08-20T10:05:01.373Z","op":"update","visit":"iterations/i38/frame-delta@2","node":"d91","brief":"to pressure-test to correct the quoted figure"}
+{"ts":"2026-08-20T10:05:07.902Z","op":"update","visit":"iterations/i38/frame-delta@2","node":"d92","brief":"aiming at pressure-test to correct its quoted figure"}
+{"ts":"2026-08-20T10:05:14.253Z","op":"done","visit":"iterations/i38/scope-non-goals@0","node":"d79","brief":"re-signed with corrected evidence"}
+{"ts":"2026-08-20T10:05:15.328Z","op":"done","visit":"iterations/i38/scope-non-goals@0","node":"d80","brief":"re-signed with corrected evidence"}
+{"ts":"2026-08-20T10:05:16.428Z","op":"done","visit":"iterations/i38/scope-non-goals@0","node":"d81","brief":"re-signed with corrected evidence"}
+{"ts":"2026-08-20T10:05:17.488Z","op":"update","visit":"iterations/i38/frame-delta@2","node":"d93","brief":"at pressure-test for the figure correction"}
+{"ts":"2026-08-20T10:05:35.247Z","op":"update","visit":"iterations/i38/frame-delta@2","node":"d94","brief":"re-earning frame-delta against the re-signed ground"}
+{"ts":"2026-08-20T10:05:51.846Z","op":"update","visit":"iterations/i38/frame-delta@2","node":"d95","brief":"frame-delta re-signed; the case is weaker and says so"}
+{"ts":"2026-08-20T10:06:02.576Z","op":"update","visit":"iterations/i38/pressure-test@1","node":"d96","brief":"reopening pressure-test for the figure it quoted"}
+{"ts":"2026-08-20T10:06:38.197Z","op":"update","visit":"iterations/i38/pressure-test@1","node":"d97","brief":"pressure-test re-signed with the figure corrected"}
+{"ts":"2026-08-20T10:06:54.559Z","op":"update","visit":"iterations/i38/scope-non-goals@0","node":"d98","brief":"re-aiming at ship; the five feeders stand again"}
+{"ts":"2026-08-20T10:06:54.747Z","op":"update","visit":"iterations/i38/scope-non-goals@0","node":"d99","brief":"back to the motivation gate with corrected feeders"}
+{"ts":"2026-08-20T10:07:01.097Z","op":"update","visit":"iterations/i38/scope-non-goals@0","node":"d100","brief":"the aim reset the walk; pulling toward the gate"}
+{"ts":"2026-08-20T10:07:24.763Z","op":"update","visit":"iterations/i38/scope-non-goals@0","node":"d101","brief":"taking the gate door with the feeders standing"}
+{"ts":"2026-08-20T10:07:35.553Z","op":"update","visit":"iterations/i38/scope-non-goals@0","node":"d102","brief":"aiming at the gate rather than choosing a door"}
+{"ts":"2026-08-20T10:07:58.059Z","op":"update","visit":"iterations/i38/scope-non-goals@0","node":"d103","brief":"re-earning scope-non-goals after frame-delta moved"}
+{"ts":"2026-08-20T10:07:58.739Z","op":"update","visit":"iterations/i38/scope-non-goals@0","node":"d104","brief":"scope re-earned; nothing in it moved"}

@@ -1,5 +1,8 @@
 ---
 form: gate-motivation
+bless: blessed by agent
+by: agent
+signed_off: 2026-08-20T10:08:44.407Z
 authors: agent
 files:
 ---
@@ -137,6 +140,9 @@ WHERE THE GRADING IS UNCOMFORTABLE AND STANDS ANYWAY: two entries are graded cri
 - FOUR SMALLER CLAIMS IN define-actual DO NOT HOLD => CORRECTED ON REOPEN. scale.md opens FIVE RUNGS PLUS BLOCKED and rules that blocked is a control position and not a weight, while the form counted six in the same sentence that offered the file as the pattern to copy. The complexity-sweep enumeration named three method cards where there are eight, and missed two engine sources. The conclusion of that sweep survives; the enumeration does not.
 - frame-delta CLAIMED A CROSS-REFERENCE THAT WAS NOT THERE => FIXED IN THE WORLD RATHER THAN IN THE RECORD. The claim that the ancestor value prop is referenced from both new nodes was false of one of them. The node now carries the reference, and it carries the sharper version of the point: nothing today could tell you whether a record walked to its gates on a small model, which is what that ancestor asks.
 - SO THE VERDICT ABOVE IS WITHDRAWN AND THIS GATE FAILS => A BLESS IS NOT PROOF, WHICH IS WHAT ROUND 0 SAYS AND WHAT ROUND 0 FAILED TO DO ON THE FIRST PASS. The vision is not what failed; the evidence under it is. Three states are named for reopen below.
+- THE FIXES LANDED AND THE GATE IS RE-RULED. Five states were reopened and re-signed against corrected evidence — define-actual (four claims), log-risks (the sweep it owed), scope-non-goals (the invalid measurement, twice, the second time on the cascade), frame-delta (the business case) and pressure-test (the figure) => WHAT CHANGED IS THE EVIDENCE AND ONE ARGUMENT. No conclusion moved. The vision is where it was, the change size is where it was, and the scope is where it was. The business case is weaker by one dependency and says so.
+- SO WHY IS THIS NOT JUST THE SAME GATE PASSED ON THE SECOND ATTEMPT WITH BETTER PROSE => BECAUSE ONE FINDING CHANGED WHAT THE MILESTONE HANDS DOWN. The register sweep produced raid-dep-the-payoff-waits-on-a-weak-model-being-able-to-boot-at-all, graded crippling and expected, and it is the entry that says this iteration can be built correctly and deliver nothing. That was not in the first draft in any form, and no amount of rewriting would have produced it — it came from reading the register, which is the thing the state was for.
+- AND ONE FINDING IS STILL OPEN AT THE POINT OF BLESSING => THERE IS NOBODY ALIVE TO RECEIVE A DRIVER NAME on the host this design was written for. se-start.ts spawns once, unrefs, returns. It is not fatal to the axiom — the machine saying rather than doing is still the right division — and it is a hole in the third goal that the design states must fill by naming the receiver rather than assuming one. It rides as an override, not as a solved problem.
 
 ## raid_additions
 
@@ -148,7 +154,7 @@ WHERE THE GRADING IS UNCOMFORTABLE AND STANDS ANYWAY: two entries are graded cri
 
 ## verdict
 
-fail — the vision holds but the evidence under it does not: the standing register was never swept and missed a crippling open entry saying weak models cannot boot at all, the state-coordinate measurement proves nothing, and I inflated the blast radius sixfold while claiming to sharpen it.
+pass with overrides — the axiom stands, and it is the only thing this gate freezes: ten register entries stay open behind it, two crippling, one of them saying the payoff waits on a door this iteration does not own, and nobody alive on an unattended box would receive a driver name today.
 
 ## follow_up
 
@@ -171,6 +177,14 @@ WHAT THIS GATE LEARNED ABOUT ITSELF, recorded because the next gate will meet it
 ROUND 0 SAYS "OPEN WHAT THE EVIDENCE POINTS AT; A BLESS IS NOT PROOF", and on the first pass this gate re-checked three claims it had already checked at the kickoff and called that round 0. It did not open the register, it did not test its own measurement, and it did not count the population behind its own headline figure. THE THREE THINGS THAT BROKE IT ALL CAME FROM OUTSIDE — an adversarial pass with no shared context, at a gate, which is exactly where a missed sweep is meant to be caught and a poor substitute for having done it.
 
 AND ONE THING WORTH KEEPING: of the nine claims that pass made, eight held and one did not (an entry it read as standing is closed). Every one was re-checked by hand before being accepted. A reviewer is not an oracle either.
+
+WHAT ACTUALLY HAPPENED AT THIS GATE, recorded because it is the useful part.
+
+THE GATE FAILED ON ITS FIRST RULING AND THAT WAS THE RIGHT OUTCOME. Five states reopened, every one re-signed against corrected evidence, and no conclusion moved. The machinery did what it is for: a bless is not proof, and round 0's first pass was not a check — it re-checked three things already checked at the kickoff and called that opening what the evidence points at.
+
+THE THREE FINDINGS THAT MATTERED ALL CAME FROM OUTSIDE THE PACKET. A reviewer found the shape cascade at the kickoff. A prior-art scan found the scheduler literature. A hostile pass found the unswept register, the invalid measurement and the inflated figure. Nothing written from inside the packet found any of them, and the pressure test — whose whole job is to find them — found none.
+
+THE ONE PROCESS CHANGE WORTH PROPOSING FROM THIS, and it goes to a retro rather than into this iteration: a state whose guidance says to RE-READ something standing should not be satisfiable by a form that says it did. The log-risks form said the register was not re-derived, which is true, reads like compliance, and is not what was asked.
 
 ## anything_else
 

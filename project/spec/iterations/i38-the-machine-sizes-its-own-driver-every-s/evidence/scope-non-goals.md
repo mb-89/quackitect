@@ -1,7 +1,8 @@
 ---
 form: scope-non-goals
 by: agent
-signed_off: 2026-08-20T09:46:37.932Z
+signed_off: 2026-08-20T10:07:59.118Z
+reopened: "2026-08-20T10:07:58.061Z — frame-delta was re-signed after it, so it answered older ground: the business case now says the payoff waits on the boot door, which does not move the scope but is what the scope is scoping"
 authors: agent
 files:
 ---
@@ -28,7 +29,7 @@ It is decided below, with the reasoning, and it is flagged as the one place in t
 
 5. AND STAMP THE STATE THE CALL WAS MADE IN, which is the decision this state takes.
 
-WHY FIVE IS IN SCOPE, stated as an argument rather than asserted. The record's fourth goal does not say "record the model"; it says record it "so a walk can be attributed after the fact". Attribution is the goal and the stamp is one of its two coordinates. Measured on this box today, the other coordinate is absent: grouping the call log by visit or by state puts every record in a single bucket, while grouping by actor separates cleanly — so the mechanism works and only the field is missing. Shipping four without five delivers a field that answers no question anybody asked, and it would read as done.
+WHY FIVE IS IN SCOPE, stated as an argument rather than asserted. The record's fourth goal does not say "record the model"; it says record it "so a walk can be attributed after the fact". Attribution is the goal and the stamp is one of its two coordinates. READ FROM THE RECORD SHAPE, which is the only thing that settles it: engine/calllog.ts:11-24 declares CallRecord and its fields end at actor and se_version. There is no state, no visit, no step. THIS FIELD FIRST CITED A MEASUREMENT THAT PROVES NOTHING and the correction is kept rather than hidden — it said grouping the log by visit or by state put every record in one bucket while grouping by actor separated cleanly. calllog.ts:289-292 digs a dotted path and falls back to (none) for ANY key it cannot reach, so group_by "banana" returns the same shape, measured at 285 records in one bucket. The conclusion was right and the evidence could not have established it. Shipping four without five delivers a field that answers no question anybody asked, and it would read as done.
 
 IT IS ALSO ONE CHANGE RATHER THAN TWO. Both values are known where the call is served, which is exactly where the actor is already stamped and for the reason the call-log design gives: the code that knows stamps it, and nothing downstream infers it. The record grows two fields in one edit or it grows neither.
 
@@ -54,6 +55,12 @@ AND IT IS WHAT THE LADDER WILL NEED LATER. Every route out of the standing drift
 - The requirements state inherits two candidates the scan produced and the scope deliberately excluded: derive the rung from a declared checker, and make a rung a (model, effort) pair. Both are requirements-shaped questions about what a row and a list must declare.
 
 - The gap claim's weakness — declared resource classes drift upward and nothing notices — belongs in the requirements as something the design must answer, not as prose in an earlier form.
+
+- RE-SIGNED AFTER THE MOTIVATION GATE FAILED. Only the evidence under the fifth scope item changed; the scope itself is unmoved, because the claim it rests on — the call record carries no state field — is true and is now established from the record's own declaration rather than from a grouping call that cannot tell an absent field from an unreachable one.
+
+- THE LESSON IS NOT ABOUT THIS FIELD. The same run had already written up that grouping behaviour as an engine defect when the key was `clause`, and then used it as proof three states later. A measurement you have just called broken cannot be your evidence.
+
+- RE-EARNED A SECOND TIME after frame-delta was re-signed. Nothing in the scope moved. What changed upstream is the business case, which now says the payoff waits on a door this iteration does not own — that weakens the CASE for the scope and not the scope itself, and the difference is worth being explicit about: the sixth scope item is still the right work whether or not the saving is reachable this quarter.
 
 ## anything_else
 

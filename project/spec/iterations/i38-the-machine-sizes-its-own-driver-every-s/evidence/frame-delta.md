@@ -1,7 +1,8 @@
 ---
 form: frame-delta
 by: agent
-signed_off: 2026-08-20T09:45:28.492Z
+signed_off: 2026-08-20T10:05:52.233Z
+reopened: "2026-08-20T10:05:35.249Z — define-actual was re-signed after it, so it answered older ground: the sweep it rests on now names a standing crippling entry saying weak models cannot boot at all, which weakens its business case without moving its gap claim"
 authors: agent
 files:
 ---
@@ -57,6 +58,12 @@ WHAT CAN BE SAID WITHOUT INVENTING A NUMBER. The published cost reductions from 
 
 AND THE ONE NUMBER THIS DESIGN COULD HONESTLY QUOTE DOES NOT EXIST YET, because nothing today can attribute a call to a state. The saving is unmeasurable in this system until the coordinate is there. Saying so is the case; a projection would be a fiction.
 
+AND THE CASE IS WEAKER THAN THIS FORM FIRST WROTE IT, which the register sweep found after this state was first signed.
+
+THE PAYOFF WAITS ON A DOOR THIS ITERATION DOES NOT OWN. A standing entry from i28, still open and graded crippling and expected, says weaker models cannot produce the boot reading proof at all — the first step of the first thing every machine does closes to them. Routing a cheaper driver to a cheaper state buys nothing while that holds.
+
+SO THE SEQUENCING IS THE CASE RATHER THAN THE SAVING. This iteration makes the saving nameable; something else has to make it reachable. Stated here because a case that reads as though the payoff arrives on ship day is a promise the tree cannot keep, and raid-dep-the-payoff-waits-on-a-weak-model-being-able-to-boot-at-all now carries it where a reader will meet it.
+
 ## follow_up
 
 - The scope state is next and it has one real question to settle: whether the backward half of the delta ships with the forward half or waits. `raid-iss-a-call-cannot-be-attributed-to-the-state-it-was-made-in` is the input to it.
@@ -64,6 +71,10 @@ AND THE ONE NUMBER THIS DESIGN COULD HONESTLY QUOTE DOES NOT EXIST YET, because 
 - The gap claim's honest weakness — the scheduler literature runs against a declared class — should be carried into the requirements rather than left in this form. The two named ways out (derive the rung from a declared checker, or reconcile it afterwards) are requirements-shaped, not prose-shaped.
 
 - vp-a-cheaper-model-does-the-mechanical-work already stood before this iteration and is its direct ancestor. It is referenced from both new nodes rather than restated.
+
+- RE-EARNED AFTER define-actual WAS RE-SIGNED. The gap claim is unmoved: the machine still knows what work it is asking for and still does not use it. The why-now is unmoved. What moved is the business case, and only in the direction of being weaker — the payoff waits on the boot door.
+
+- ONE SENTENCE HERE WAS FALSE WHEN FIRST WRITTEN and is now true: the ancestor value prop is referenced from both new nodes. It was fixed in the world rather than edited here, and the node it was missing from carries the sharper version — nothing today could tell you whether a record walked to its gates on a small model, which is exactly what that ancestor asks.
 
 ## anything_else
 
