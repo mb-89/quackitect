@@ -8,7 +8,7 @@ owner: the driving agent
 trigger: the next iteration that opens the lane's reporting surfaces
 status: open
 breaks_how_badly: corrosive
-how_likely: certain
+how_likely: expected
 impact: Two must requirements read as met in the corpus and are not met in the running system, so a later reader trusts a diagnosis that is never produced.
 source_refs:
   - project/spec/trace/requirement/req-interrupted-call-names-the-stopping-layer.md

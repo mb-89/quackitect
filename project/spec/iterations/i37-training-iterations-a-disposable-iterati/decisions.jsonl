@@ -553,3 +553,7 @@
 {"ts":"2026-08-20T07:46:06.883Z","op":"update","visit":"iterations/i37/rank-unknowns@0","node":"d339","brief":"answering with the engine s own tokenisation"}
 {"ts":"2026-08-20T07:46:09.343Z","op":"update","visit":"iterations/i37/rank-unknowns@0","node":"d340","brief":"walking the re-signed chain forward"}
 {"ts":"2026-08-20T07:46:10.237Z","op":"update","visit":"iterations/i37/rank-unknowns@0","node":"d341","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T07:46:51.084Z","op":"update","visit":"iterations/i37/rank-unknowns@0","node":"d342","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T07:46:52.011Z","op":"update","visit":"iterations/i37/rank-unknowns@0","node":"d343","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T07:47:00.550Z","op":"update","visit":"iterations/i37/rank-unknowns@0","node":"d344","brief":"checking what holds at rank-unknowns"}
+{"ts":"2026-08-20T07:47:19.719Z","op":"update","visit":"iterations/i37/rank-unknowns@0","node":"d345","brief":"mapping three off-scale grades the merge brought onto the standing scale"}
