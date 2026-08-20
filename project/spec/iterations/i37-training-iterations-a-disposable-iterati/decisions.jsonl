@@ -1766,3 +1766,12 @@
 {"ts":"2026-08-20T13:11:38.881Z","op":"update","visit":"iterations/i37/run-demos/sty-know-whether-a-machine-change-helped@0","node":"d1004","brief":"to the second demo"}
 {"ts":"2026-08-20T13:11:40.148Z","op":"update","visit":"iterations/i37/run-demos/sty-walk-a-past-tree-without-reaching-its-future@0","node":"d1005","brief":"at the doors demo"}
 {"ts":"2026-08-20T13:12:13.739Z","op":"plan","visit":"iterations/i37/run-demos/sty-walk-a-past-tree-without-reaching-its-future@0","parent":null,"nodes":[{"id":"d1006","brief":"every door tried"},{"id":"d1007","brief":"every one closed"},{"id":"d1008","brief":"all four reopened"}]}
+{"ts":"2026-08-20T13:18:07.339Z","op":"done","visit":"iterations/i37/run-demos/sty-walk-a-past-tree-without-reaching-its-future@0","node":"d1006","brief":"demonstrated and recorded"}
+{"ts":"2026-08-20T13:18:08.045Z","op":"done","visit":"iterations/i37/run-demos/sty-walk-a-past-tree-without-reaching-its-future@0","node":"d1007","brief":"demonstrated and recorded"}
+{"ts":"2026-08-20T13:18:08.721Z","op":"done","visit":"iterations/i37/run-demos/sty-walk-a-past-tree-without-reaching-its-future@0","node":"d1008","brief":"demonstrated and recorded"}
+{"ts":"2026-08-20T13:18:09.320Z","op":"update","visit":"iterations/i37/gate-validation@0","node":"d1009","brief":"reading the gate-validation form"}
+{"ts":"2026-08-20T13:18:22.786Z","op":"update","visit":"iterations/i37/gate-validation@0","node":"d1010","brief":"reading the gate-validation form"}
+{"ts":"2026-08-20T13:18:38.858Z","op":"update","visit":"iterations/i37/gate-validation@0","node":"d1011","brief":"discovering the exact items"}
+{"ts":"2026-08-20T13:20:23.386Z","op":"update","visit":"iterations/i37/gate-validation@0","node":"d1012","brief":"the demonstration specs that carry the two runs"}
+{"ts":"2026-08-20T13:20:23.547Z","op":"update","visit":"iterations/i37/gate-validation@0","node":"d1013","brief":"the demonstration specs that carry the two runs"}
+{"ts":"2026-08-20T13:22:01.391Z","op":"plan","visit":"iterations/i37/gate-validation@0","parent":null,"nodes":[{"id":"d1014","brief":"gate-validation: one override discharged"},{"id":"d1015","brief":"one stands"},{"id":"d1016","brief":"one correction owed"}]}
