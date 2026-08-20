@@ -539,6 +539,207 @@ reaches it, so no refusal, no toll and no guard can fire. THE ONLY PLACE THIS
 SHOWS UP is a ratio: eight hundred and eighty lane calls and one `se_run`, in an
 iteration that counted things constantly.
 
+## F18 — the machine already enforces F16, and enforcing it caught a false claim inside the hour
+
+F16 argued that a claim should bind to the query that produced it, and that the
+binding matters most where the claim is about our own work. That argument was
+written as a proposal. It is already built, for one narrow case, and it fired.
+
+WHAT HAPPENED. find_prior_art was reopened for a commissioned search that landed
+after the form was signed. The re-sign was refused:
+
+> outward search RED — 1 problem
+> - 89 options claim outward sources and no log segment records se_web_search,
+>   se_web_fetch or the native WebSearch — either the search did not happen, or
+>   it happened outside the lane
+
+The condition is `project/deliverable/engine/bin/outward-search.ts`. It counts
+web calls in `.se/calls*.jsonl` and refuses when any option carries
+`found_by: prior-art` or `analogy` and no query is recorded. The search HAD
+happened — in a subagent, using its own native tools — so nothing in the record
+could prove it.
+
+THE FIX WAS TO RUN THE SEARCH AGAIN, INSIDE THE LANE, AND THAT CAUGHT A
+FABRICATION. The form claimed Kubernetes computes a pod's effective request as
+the maximum over its containers. Fetched at the primary through `se_web_fetch`:
+
+> The Pod's effective request/limit for a resource is the higher of: the sum of
+> all app containers request/limit for a resource; the effective init
+> request/limit for a resource.
+
+A maximum over the init containers and a SUM over the app ones. The claim as
+written was false. It had survived being written, being read back, and being
+signed. It did not survive being fetched.
+
+WHY THAT IS THE WHOLE ARGUMENT IN ONE INCIDENT. The condition does not check
+whether the claim is true — it cannot. It checks whether the ACT that would make
+the claim checkable is on the record. Forcing the act produced the check for
+free, because a person who has the page open reads it.
+
+AND IT NAMES THE GAP IN F16 PRECISELY. The condition binds OUTWARD claims to a
+query. Nothing binds INWARD claims — a claim about our own corpus, our own log,
+our own process — to anything at all, and F16 argued those are the ones that
+cannot be re-derived later. The mechanism exists. It is pointed at the half that
+was already the easier half.
+
+## F19 — a function can name a cluster nobody declared, and three representations are why
+
+partition-functions declared a new cluster, `the-sizing`, and signed. No cluster
+node was ever written. Every later form drawing its offer list from the declared
+clusters offered eight and could not name the one the whole record is about.
+
+THREE REPRESENTATIONS OF ONE FACT, each verified by reading.
+
+- STORED BARE. Every function node carries `cluster: the-walk` — nine distinct
+  values across `project/spec/trace/function`, none prefixed.
+- OFFERED AS AN ID. `stateform.ts:560` resolves `$clusters` to `clusterItems`,
+  which returns `cluster-the-walk`.
+- NEVER CHECKED. `engine/guard.ts:18` lists nine REFERENCE_KEYS and `cluster` is
+  not among them. Adding it would not help: `fileForId` at `vocabulary.ts:129`
+  resolves by declared id prefix, `the-sizing` starts with none, so the guard
+  returns undefined and skips the value in silence.
+
+THE MORPH CHART'S OWN LOOKUP IS ALREADY DEAD FROM THE SAME CAUSE.
+`stateform.ts:347` places an option by `byCluster.get(bare(cluster))` against a
+map keyed by node id, so a bare-named cluster never matches. It is invisible
+today only because an option carrying a design question evicts the cluster rows
+entirely.
+
+Logged as `raid-iss-a-function-may-name-a-cluster-that-does-not-exist`. The item
+doc says a function cannot belong to a cluster nobody has named. That has not
+been true for twenty-three iterations; it worked because nobody added a cluster.
+
+## F20 — the completeness check is a better critic than reading is
+
+The morphological chart came back as a chart of singletons: twenty-eight options
+under eighteen question strings, so most rows held one cell. A row with one cell
+is a design parameter with no choice in it.
+
+FIRST PASS, BY READING: merged the near-duplicates onto eight axes. It read well.
+`where a step's declared difficulty comes from` and `where the difficulty number
+comes from` were plainly one parameter written twice.
+
+SECOND PASS, BY THE ENGINE: the candidate completeness check refused two of those
+eight, because a single line picked twice in them.
+
+> cand-the-seed-made-total picks twice in what is published, and where it lands,
+> how the decision is held to account
+
+That is the mechanical proof that those two were not parameters at all. Four
+independent questions had been bundled under "what is published": what the block
+publishes, where the publication lands, how often it publishes, and what the call
+record holds. Every candidate answers all four, so no candidate can choose
+between them.
+
+THE TEST NO AMOUNT OF RE-READING WOULD HAVE PRODUCED: can one line take two cells
+from this row? If yes, the row is a bundle of features, not a parameter. The axis
+NAMES were fine. Reading them again would have found nothing.
+
+`chartProblems` at `stateform-problems.ts:706` is twenty lines long and it is the
+sharpest reviewer this record has met.
+
+## F21 — the incumbent had no node, so the chart was scoring the alternatives against nothing
+
+Twenty-eight options stood for this change. Every one of them is a way of NOT
+doing what the seed asks for — deriving the difficulty, computing it, observing
+it, publishing something else instead, moving the decider outside.
+
+The seed's own proposal — a person writes the difficulty into the matrix cell by
+hand — was on the chart nowhere.
+
+IT SURFACED AS A REFUSAL, NOT AS A THOUGHT. The completeness check said
+`cand-the-seed-made-total misses how a step's difficulty is arrived at`, because
+the baseline candidate had nothing to pick on the axis its whole architecture is
+about.
+
+WHY IT HAPPENS, so it can be recognised. A finder's job is to find ALTERNATIVES.
+Seven finders ran and all seven searched away from the incumbent, because that is
+what they are for. Nobody's job was to write down what we already do. The null
+option is documented as having the highest value and the lowest proposal rate of
+any option there is; the incumbent has the same property and no card says so.
+
+Minted as `opt-the-difficulty-is-declared-by-hand-on-the-cell`, found_by
+`without`, sourced to the seed. Two of four candidate lines pick it.
+
+## F22 — four probes, and what they measured
+
+M4's probing finder is the only one that runs rather than reasons. All four ran
+through `se_run`, so unlike every other measurement in this record they are in
+the call log.
+
+PROBE 1 — the matrix already declares a per-column word, and it collapses exactly
+where this record operates. At major, 49 of 53 rows read `full`; at product, 51
+of 53. At patch it discriminates: 13 tailored, 34 none, 6 full. The FIELD COUNT
+is the opposite — at major it spreads across seven classes, from 10 rows asking
+no evidence field to one asking six. A declared word is redundant where it
+discriminates and uninformative where it does not.
+
+PROBE 2 — the reopen history is durable, in the tree, and sharply discriminating.
+640 evidence forms, 140 carrying a reopen mark, 197 distinct state names walked,
+146 never reopened. Among states walked five or more times: pressure-test 4 of 6,
+derive-criteria 4 of 6, reverse-sensitivity 3 of 5 at the top; all six finder
+states at 0 of 6 at the bottom. Judgement states above enumeration states, which
+is the ordering a difficulty signal would want.
+
+AND THE PROBE CONFIRMED ITS OWN STATED FEAR IN THE SAME RUN. The option node was
+written before the probe and said a row never reopened because nobody checked
+would read as easy. The six finders at zero include the two signed in this
+session, and nothing has ever run a hostile pass over a finder.
+
+PROBE 3 — two signings of one state can be compared mechanically. 17 of i38's 27
+forms have two or more commits; similarity between first and last signed body
+runs 0.39 to 0.99, median 0.81.
+
+A SECOND RESULT FELL OUT UNASKED: every one of the seventeen GREW. 21 lines to
+29, 29 to 54, 180 to 182. Not one shrank. The ratchet that
+`raid-risk-a-hand-declared-rung-drifts-upward` predicts for declared rungs is
+already observable in this record's own evidence, measured on its own commits.
+
+PROBE 4 — the per-column channel already exists and half of it is already in use.
+`cellsOf` at `rigor-matrix.ts:417` builds a cell per row per column from
+`fm[col]` and `fm[col + "_note"]`; `compileColumn` at :609 pulls the cell and
+folds its PROSE into the compiled state at :612. The cell's VALUE is read once,
+at :593, only to decide whether the row is in the machine at all.
+
+So a complexity value is a third cell key on a path that already runs — and the
+probe also found that `req-the-complexity-value-is-read-live-and-never-pinned`
+forbids more than its own reason needs. Its stated harm is demand movement;
+`shapeOf` serialises four keys and a cell value reaches none of them. Logged as
+`raid-iss-the-live-read-rule-forbids-more-than-its-own-reason-needs` for
+gate-design.
+
+WHAT THE FOUR DID TO THE OPTION SET. One new option, three standing options moved
+from reasoned to measured, and one standing requirement found over-stated. The
+probes were worth more as critics than as generators.
+
+## F23 — the error rate did not fall in M4
+
+Counts written and then found wrong, in this milestone alone, all caught by a
+pass over my own prose before signing:
+
+- "Twelve options stand from four finders" — eleven stood, from four finders.
+- "Four of the five requirements land in the-sizing; two land in the-account" —
+  four plus two out of five, which is not a number.
+- "Eight of twelve produced something" — nine did, and three operators were
+  silent, not four.
+- "640 signed evidence forms" — 640 forms on disk, and signedness was not
+  measured.
+- "Five axes carry two or more alternatives" — six do.
+- "Three axes were reached from three or more finders" — three were; two of the
+  three I named were reached from two.
+- "Forty-three rows stood before this state's rewrite" — fifty-six did.
+
+SEVEN IN ONE MILESTONE, EVERY ONE A COUNT, EVERY ONE CAUGHT BY RE-DERIVING
+RATHER THAN BY RE-READING. Not one was caught by reading the sentence again. The
+consistent shape across M1 to M4 is now unambiguous: prose about quantities is
+where this fails, and the only thing that catches it is running the count again
+against the source.
+
+WHICH IS THE ARGUMENT FOR F16 AND F18 STATED AS A PERSONAL FAILURE RATE. A count
+in prose is unverifiable by anyone who was not there. A count bound to the
+command that produced it is verifiable forever. Seven times in one milestone, the
+difference mattered.
+
 ## Leads for whoever opens an engine iteration
 
 Collected here because none of them is i38's work and none would survive the
