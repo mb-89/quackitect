@@ -81,6 +81,20 @@ export function difficultyOf(step: unknown): Difficulty {
       `step ${s.id ?? "(unnamed)"} carries no complexity — rate its cell, or write the line in the matrix README once every active cell is rated`,
     );
   }
+  // AND THE FIGURES MUST BE FIGURES. This checked only that they were text, so
+  // an unrecognised value reached `sizeUnit`, where `indexOf` returned -1 and
+  // `Math.max(0, -1)` named the WEAKEST rung — under-driving, which is the
+  // direction this design says is the dangerous one. `rungFor` returns an
+  // unmatched value for the same input; the two disagreed.
+  //
+  // FOUND BY A RED TEAM AT i38's implementation gate: sizeUnit([{C9,R9}])
+  // answered C0/R0, and publish named `derive` for it.
+  if (!(JUDGEMENT_RUNGS as readonly string[]).includes(d.judgement) || !(READING_RUNGS as readonly string[]).includes(d.reading)) {
+    throw new Error(
+      `step ${s.id ?? "(unnamed)"} carries an unreadable complexity ${d.judgement}/${d.reading} — judgement is one of ` +
+        `${JUDGEMENT_RUNGS.join(" ")} and reading is one of ${READING_RUNGS.join(" ")}`,
+    );
+  }
   return { judgement: d.judgement, reading: d.reading };
 }
 
@@ -94,9 +108,13 @@ export function difficultyOf(step: unknown): Difficulty {
 export function sizeUnit(steps: unknown[]): UnitSizing {
   const spread = steps.map((s) => ({ step: ((s ?? {}) as { id?: string }).id ?? "(unnamed)", difficulty: difficultyOf(s) }));
   if (spread.length === 0) throw new Error("a unit with no steps has no difficulty — there is nothing to size");
+  // EVERY FIGURE IS IN VOCABULARY BY THE TIME IT GETS HERE — `difficultyOf`
+  // refuses anything else — so an index of -1 is a programmer error rather
+  // than a datum, and it is named instead of quietly becoming rung zero.
   const pick = (of: (d: Difficulty) => string, rungs: readonly string[]): string => {
-    let best = 0;
+    let best = -1;
     for (const s of spread) best = Math.max(best, rungs.indexOf(of(s.difficulty)));
+    if (best < 0) throw new Error(`a unit of ${spread.length} step(s) placed none of its figures on ${rungs.join(" ")}`);
     return rungs[best];
   };
   return {

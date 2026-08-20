@@ -704,7 +704,17 @@ export function buildServer(
         tool: "se_update",
         args: { via: tool, visit, ...op },
         actor: "agent",
-        ...whichHand(session, raw),
+        // THE CALL'S OWN COORDINATES, NOT THE UPDATE PAYLOAD'S. This read
+        // `raw` — the {op, node, brief} object — so an `se_update` record took
+        // its part and its answering model out of a place they never appear.
+        // Every one of them said `walker` and `unreported` however the caller
+        // declared itself, and a coordinate placed INSIDE the update object
+        // reached the record while bypassing the vocabulary guard entirely.
+        // `se_update` is the second most common tool in the log.
+        //
+        // FOUND BY A RED TEAM AT i38's implementation gate, by probing rather
+        // than reading: `as: "guide"` on the call, `walker` on the record.
+        ...whichHand(session, args),
         ok: true,
         outcome: "result",
         duration_ms: 0,
@@ -719,7 +729,7 @@ export function buildServer(
         tool: "se_update",
         args: { via: tool, refused: true },
         actor: "agent",
-        ...whichHand(session, raw),
+        ...whichHand(session, args),
         ok: false,
         outcome: "rejected",
         duration_ms: 0,
@@ -832,12 +842,26 @@ export function buildServer(
         });
       }
     }
-    if (args.relayed_by !== undefined && args.relayed_by === args.as) {
+    // THE COMPARISON IS ON THE RESOLVED PARTS, NOT THE RAW ARGUMENTS. It read
+    // `args.relayed_by === args.as`, and `as` is undefined when the caller
+    // omits it — so `relayed_by: "walker"` with no `as` passed the guard, the
+    // part defaulted to `walker`, and the log's own rule then threw inside the
+    // observer. The dispatch swallows an observer's throw, so the record
+    // vanished. On a REFUSED call it took the refusal record with it, which is
+    // exactly the defect this guard was added to close.
+    //
+    // FOUND BY A RED TEAM AT i38's implementation gate.
+    const partNow = typeof args.as === "string" ? args.as : "walker";
+    if (args.relayed_by !== undefined && args.relayed_by === partNow) {
       throw new Rejection({
         clause: CLAUSES.UNKNOWN_ARGS,
-        expected: "relayed_by to name a DIFFERENT part from `as` — it says who FILED work somebody else authored",
-        got: `both are ${JSON.stringify(args.as)}`,
-        remedy: { tool, args: {}, note: "a guide filing its own work needs neither key" },
+        expected: "relayed_by to name a DIFFERENT part from the one filing — it says who FILED work somebody else authored",
+        got: `both are ${JSON.stringify(partNow)}${args.as === undefined ? " (`as` omitted, so the part is `walker`)" : ""}`,
+        remedy: {
+          tool,
+          args: {},
+          note: 'a guide filing its own work needs neither key; a walker relaying a guide\'s work sends as: "guide", relayed_by: "walker"',
+        },
         source: "engine/tools.ts which-hand",
       });
     }
@@ -935,12 +959,21 @@ export function buildServer(
     // and what the record settled on.
     const word = (v: unknown): CallPart | undefined => (typeof v === "string" && PART_WORDS.has(v) ? (v as CallPart) : undefined);
     const declared = word(a.as);
-    const relayed = word(a.relayed_by) === declared ? undefined : word(a.relayed_by);
+    const part: CallPart = declared ?? "walker";
+    // COMPARED AGAINST THE RESOLVED PART, not the declared one. With `as`
+    // omitted, `declared` is undefined and every relay looked distinct from
+    // it — so a `relayed_by: "walker"` produced a record whose relayer WAS its
+    // author, which the log refuses, inside the hook that must never throw.
+    const relayed = word(a.relayed_by) === part ? undefined : word(a.relayed_by);
     const named = typeof a.named_driver === "string" && a.named_driver !== "" ? a.named_driver : undefined;
     // THE REASON ONLY MEANS ANYTHING BESIDE A NAMED STRENGTH. Carried alone it
     // is a sentence about nothing, and it would suppress the `unreasoned` mark
     // on a record that never named a driver to be weaker than.
-    const why = named !== undefined && typeof a.weaker_reason === "string" && a.weaker_reason !== "" ? a.weaker_reason : undefined;
+    // A BLANK REASON IS NOT A REASON. `" "` passed a `!== ""` test and
+    // suppressed the mark, which is the smallest possible way to owe a
+    // sentence and give none.
+    const said = typeof a.weaker_reason === "string" ? a.weaker_reason.trim() : "";
+    const why = said !== "" ? said : undefined;
     // THE MARK IS ABOUT GOING WEAKER, AND ONLY THE CALLER KNOWS. `named_driver`
     // is a rung and `answered_by` is a model name; nothing in this tree maps
     // one to the other, so "weaker" is not computable here.
@@ -950,10 +983,15 @@ export function buildServer(
     // it — and the schema tells callers to send `named_driver` on every call.
     // A mark that fires on nearly everything counts nothing. Found by a
     // fresh-eyes tester at i38's verification.
-    const weaker = named !== undefined && a.went_weaker === true;
+    // `went_weaker: true` IS A COMPLETE STATEMENT ON ITS OWN. This required a
+    // `named_driver` beside it, and a caller who said in as many words that a
+    // weaker hand walked the step, while omitting the echo of the rung, left a
+    // record carrying no trace of it at all — which is the outcome the
+    // requirement's own breaks_if_removed describes.
+    const weaker = a.went_weaker === true;
     return {
       state: session.currentState(),
-      part: declared ?? "walker",
+      part,
       answered_by: typeof a.answered_by === "string" ? a.answered_by : UNREPORTED,
       ...(relayed !== undefined ? { relayed_by: relayed } : {}),
       ...(named !== undefined ? { named_driver: named } : {}),

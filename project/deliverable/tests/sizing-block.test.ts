@@ -278,3 +278,45 @@ test("the unmatched branch guards a coupling between three ladders", async () =>
   assert.equal(j.length, ladder.length, "a judgement figure with no rung above it would publish an unmatched value for a legal cell");
   assert.equal(r.length, ladder.length, "and so would a reading figure");
 });
+
+test("an unrecognised figure refuses, and never falls to the weakest rung", async () => {
+  // FOUND BY A RED TEAM: `indexOf` returned -1 for an unknown figure and
+  // `Math.max(0, -1)` named rung zero — so a unit holding a C9/R9 step was
+  // sized `C0/R0` and published as `derive`. Under-driving, which this design
+  // names as the dangerous direction, silently.
+  //
+  // `rungFor` HONOURED THE DOCTRINE ON THE SAME INPUT and returned an
+  // unmatched value. The two disagreed, and the weaker answer was the one the
+  // unit path gave.
+  const { sizeUnit: unit, difficultyOf: of } = await sizing();
+  for (const bad of [
+    { judgement: "C9", reading: "R9" },
+    { judgement: "", reading: "" },
+    { judgement: "C3", reading: "banana" },
+  ]) {
+    assert.throws(
+      () => of({ id: "x", complexity: bad }),
+      (e: Error) => e.message.includes("C0") && e.message.includes("R0"),
+      `${JSON.stringify(bad)} must refuse, naming both vocabularies`,
+    );
+    assert.throws(() => unit([{ id: "x", complexity: bad }]), `a unit holding ${JSON.stringify(bad)} must refuse too`);
+  }
+});
+
+test("an over-segmented rating refuses rather than dropping what it cannot read", () => {
+  const root = freshRoot();
+  const victim = appliedRows(root).find((r) => r.runs === undefined);
+  assert.ok(victim !== undefined);
+  const abs = join(matrixDir(root), "rows", victim.file);
+  const text = readFileSync(abs, "utf8");
+  const end = text.indexOf("\n---", 3);
+  // FOUND BY A RED TEAM: `C3/R1/anything/at/all` was accepted and everything
+  // past the second segment dropped without a word, against a requirement
+  // whose verb is "refusing loudly".
+  writeFileSync(abs, `${text.slice(0, end)}\n${SIZE}_complexity: C3/R1/R4${text.slice(end)}`, "utf8");
+  assert.throws(
+    () => readRigorMatrix(root),
+    (e: Error) => e.message.includes("C3/R1/R4"),
+    "the refusal quotes what it was given",
+  );
+});

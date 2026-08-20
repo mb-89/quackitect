@@ -566,31 +566,22 @@ export class Session {
     // THE FIELD IS `hand`, NOT `needs`. The pull already serves a `needs` on
     // each OPTION, meaning "this door needs the person, because the work is
     // above the dial". One answer carrying one word for two things is a
-    // vocabulary an agent has to disambiguate by level, and no check would
-    // ever have caught it.
-    try {
-      // THE LEAF, NOT THE OUTER MACHINE. `active()` reports a nested id like
-      // `iterations/i1/onboard-retro`, and the compiled iteration's own states
-      // are named bare. Looking the nested id up in the outer machine found
-      // nothing and published nothing — silently, because the catch below
-      // treats an unrated step as the ordinary case.
-      //
-      // FOUND BY A FRESH-EYES TESTER AT i38's verification: deleting this
-      // whole call changed no test, because no test ever stood the walk on a
-      // rated step. The lookup had never worked.
-      const { machine, ids } = this.leaves();
-      const id = ids[0];
-      if (id === undefined) return {};
-      const step = this.state(machine, id);
-      if (process.env.SE_DBG_SIZING === "1") console.error("DBG", machine.id, id, Object.keys(step).join(","));
-      if (step.submachine !== undefined) return {};
-      return { hand: publish(difficultyOf(step)) };
-    } catch (e) {
-      if (process.env.SE_DBG_SIZING === "1") console.error("DBG-THREW", String((e as Error).message).slice(0, 120));
-      // AN UNRATED STEP IS THE COMMON CASE TODAY and it is not an error. The
-      // block refuses rather than guessing, and the pull publishes nothing.
-      return {};
-    }
+    // vocabulary an agent has to disambiguate by level.
+    //
+    // THERE IS NO BLANKET CATCH HERE ANY MORE, and that is the point. A catch
+    // that turned every failure into "unrated" hid a lookup that had never
+    // worked for a whole iteration, because unrated IS the ordinary case and
+    // the two are indistinguishable from inside. An unrated step is now tested
+    // for by NAME, and anything else is a bug that will surface.
+    const { machine, ids } = this.leaves();
+    const id = ids[0];
+    if (id === undefined) return {};
+    // A STATE THE MACHINE DOES NOT DECLARE is not a sizing question. `state()`
+    // refuses one, and a pull must not.
+    const step = machine.states.find((s) => s.id === id);
+    if (step === undefined || step.submachine !== undefined) return {};
+    if (step.complexity === undefined) return {};
+    return { hand: publish(difficultyOf(step)) };
   }
 
   /** THE STATE A CALL WAS MADE IN, as a field for the record rather than a

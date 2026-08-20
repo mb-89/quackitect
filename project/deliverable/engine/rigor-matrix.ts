@@ -103,8 +103,17 @@ export const READING_RUNGS = ["R0", "R1", "R2", "R3", "R4"] as const;
  *  Bases table edits a cell inline and cannot edit a nested map. */
 function parseDifficulty(raw: unknown, row: string, col: string): CellDifficulty {
   if (typeof raw !== "string") throw new Error(`matrix row ${row} carries a non-text ${col}_complexity`);
-  const [judgement = "", reading = ""] = raw.trim().split("/");
-  if (!(JUDGEMENT_RUNGS as readonly string[]).includes(judgement) || !(READING_RUNGS as readonly string[]).includes(reading)) {
+  // EXACTLY TWO SEGMENTS. `C3/R1/anything/at/all` used to be accepted and
+  // everything past the second dropped without a word, against a requirement
+  // whose verb is "refusing loudly". Found by a red team at i38's
+  // implementation gate.
+  const parts = raw.trim().split("/");
+  const [judgement = "", reading = ""] = parts;
+  if (
+    parts.length !== 2 ||
+    !(JUDGEMENT_RUNGS as readonly string[]).includes(judgement) ||
+    !(READING_RUNGS as readonly string[]).includes(reading)
+  ) {
     throw new Error(
       `matrix row ${row} carries an unreadable ${col}_complexity "${raw}" — the shape is <judgement>/<reading>, ` +
         `judgement one of ${JUDGEMENT_RUNGS.join(" ")} and reading one of ${READING_RUNGS.join(" ")}`,

@@ -348,3 +348,108 @@ test("a weaker walk through the lane with no reason is marked, and one at streng
   const plain = await pullThenLastRecord(freshRoot(), { named_driver: "frame" });
   assert.equal(plain?.unreasoned, undefined, "the lane asks for named_driver on every call — that alone owes nothing");
 });
+
+// ── what a red team broke, and what now holds it ──────────────────────────
+
+test("a relayer with no declared part refuses the call, and the record survives", async () => {
+  const { buildServer } = await import("../engine/tools.ts");
+  const root = freshRoot();
+  const server = buildServer(root);
+  // `as` OMITTED AND `relayed_by: "walker"`. The guard compared raw arguments,
+  // so this passed it; the part then defaulted to `walker`, and the log's own
+  // rule threw inside the observer — which the dispatch swallows. The record
+  // vanished, and on a refused call the REFUSAL record vanished with it.
+  const res = await server.handle({
+    jsonrpc: "2.0",
+    id: 1,
+    method: "tools/call",
+    params: { name: "se_pull", arguments: { relayed_by: "walker" } },
+  });
+  assert.equal((res?.result as { isError?: boolean } | undefined)?.isError, true, "the call is refused");
+  const lines = readFileSync(join(seDir(root), "calls.jsonl"), "utf8")
+    .trim()
+    .split("\n")
+    .filter(Boolean);
+  assert.equal(lines.length, 1, "and the refusal is on the record — losing it is the defect this holds");
+});
+
+test("a refused call carrying a relay still reaches the log", async () => {
+  const { buildServer } = await import("../engine/tools.ts");
+  const root = freshRoot();
+  const server = buildServer(root);
+  await server.handle({
+    jsonrpc: "2.0",
+    id: 1,
+    method: "tools/call",
+    params: { name: "se_pull", arguments: { as: "sorcerer", relayed_by: "walker" } },
+  });
+  const lines = readFileSync(join(seDir(root), "calls.jsonl"), "utf8")
+    .trim()
+    .split("\n")
+    .filter(Boolean);
+  assert.equal(lines.length, 1, "two bad keys at once must not be worse than one");
+  assert.equal((JSON.parse(lines[0]) as { ok: boolean }).ok, false);
+});
+
+test("an se_update record carries the CALL's coordinates, not the update payload's", async () => {
+  const { buildServer } = await import("../engine/tools.ts");
+  const root = freshRoot();
+  const server = buildServer(root);
+  await server.handle({
+    jsonrpc: "2.0",
+    id: 1,
+    method: "tools/call",
+    params: {
+      name: "se_pull",
+      arguments: { as: "guide", answered_by: "a-strong-model", update: { op: "plan", items: ["one", "two"] } },
+    },
+  });
+  const recs = readFileSync(join(seDir(root), "calls.jsonl"), "utf8")
+    .trim()
+    .split("\n")
+    .filter(Boolean)
+    .map((l) => JSON.parse(l) as Record<string, unknown>);
+  const upd = recs.find((r) => r.tool === "se_update");
+  assert.ok(upd !== undefined, "the update is its own record");
+  assert.equal(upd.part, "guide", "it read the {op, items} object, where a part never appears, and said walker");
+  assert.equal(upd.answered_by, "a-strong-model");
+});
+
+test("a coordinate hidden inside the update object does not reach the record", async () => {
+  const { buildServer } = await import("../engine/tools.ts");
+  const root = freshRoot();
+  const server = buildServer(root);
+  await server.handle({
+    jsonrpc: "2.0",
+    id: 1,
+    method: "tools/call",
+    params: {
+      name: "se_pull",
+      arguments: { update: { op: "plan", items: ["one"], as: "owner", answered_by: "smuggled-model" } },
+    },
+  });
+  const recs = readFileSync(join(seDir(root), "calls.jsonl"), "utf8")
+    .trim()
+    .split("\n")
+    .filter(Boolean)
+    .map((l) => JSON.parse(l) as Record<string, unknown>);
+  for (const r of recs) {
+    assert.notEqual(r.part, "owner", "the vocabulary guard reads the arguments, so the update object was a way past it");
+    assert.notEqual(r.answered_by, "smuggled-model");
+  }
+});
+
+test("went_weaker alone arms the mark, with no named driver beside it", () => {
+  const log = logIn();
+  // A CALLER SAYING IN AS MANY WORDS THAT A WEAKER HAND WALKED THE STEP left a
+  // record carrying no trace of it, because the mark required a `named_driver`
+  // echo the same caller could simply omit.
+  const rec = log.append({ ...base, actor: "agent", answered_by: "weak", state: "s", part: "walker", went_weaker: true });
+  assert.equal((rec as unknown as Record<string, unknown>).unreasoned, true, "the statement is complete on its own");
+});
+
+test("a blank reason is not a reason", async () => {
+  const rec = await pullThenLastRecord(freshRoot(), { went_weaker: true, weaker_reason: "   " });
+  assert.equal(rec?.unreasoned, true, "whitespace is the smallest way to owe a sentence and give none");
+  assert.equal(rec?.weaker_reason, null);
+});
