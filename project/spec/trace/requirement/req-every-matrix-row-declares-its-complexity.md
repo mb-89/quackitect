@@ -2,7 +2,7 @@
 minted_in: i38-the-machine-sizes-its-own-driver-every-s
 id: req-every-matrix-row-declares-its-complexity
 type: "[[requirement]]"
-statement: "When the rigor matrix is loaded, the loader shall refuse any row that does not declare a complexity value from the five-rung ladder for every change-size column in which that row applies."
+statement: "When the rigor matrix is loaded, the engine shall obtain a complexity for every row in every change-size column in which that row applies, and shall refuse loudly where it cannot rather than proceeding without one."
 kind: functional
 verify_method: test
 breaks_if_removed: "A rating that is optional is a rating most rows will not carry, and a maximum taken over a partly-rated milestone is not a maximum. The mechanism degrades to nothing without saying so."
@@ -15,6 +15,23 @@ source_refs:
   - "raid-risk-a-hand-declared-rung-drifts-upward-and-nothing-ever-says-so"
 priority: must
 ---
+
+
+## Restated at gate-architecture, 2026-08-20
+
+THIS ROW NAMED A DECLARATION MECHANISM and forbade derivation by construction: a
+loader that refuses a row which does not DECLARE cannot accept a row whose value
+is computed, because there is nothing to declare.
+
+WHAT IT MEANS, taken from its own breaks_if_removed: a rating that is optional is
+a rating most rows will not carry, and the mechanism degrades to nothing without
+saying so. The demand is that every applying row HAS a complexity and that its
+absence fails loudly.
+
+OBTAIN RATHER THAN DECLARE IS THE WHOLE CHANGE. Declaring satisfies it. Deriving
+from the row's own field count satisfies it. Two figures rather than one satisfies
+it, because the row still has a complexity the engine can obtain. What does not
+satisfy it is a row the engine reaches with nothing and walks anyway.
 
 ## Detail
 

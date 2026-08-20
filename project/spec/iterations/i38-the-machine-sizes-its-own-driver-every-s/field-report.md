@@ -1047,7 +1047,22 @@ WHAT IT LEAVES BEHIND MEANWHILE. i38's evaluate-set is grey on disk — signed
 chain. The corpus is correct and the record says so; what cannot be done from
 inside the walk is make it stand again.
 
-## F30 — the requirements specify the seed's mechanism, so every candidate that improves on it fails a must
+## F30 — three requirements specify the seed's mechanism, and the check that would have shown it was never run
+
+CORRECTED AT gate-architecture, AFTER THE FIRST VERSION OF THIS ENTRY OVERSTATED
+ITS OWN FINDING. The first version said the declared winner violates five of five
+musts. It violates three, and the three are exactly the three that name a
+mechanism. On the other two the entry was wrong: `req-every-call-records-the-model-that-answered-it`
+permits a self-report in its own text — "marked as self-reported wherever the lane
+cannot obtain the value independently" — and nothing about publishing a rung stops
+an agent reporting what it is; and `req-a-weaker-driver-than-named-owes-a-recorded-reason`
+is not violated but rendered VACUOUS, because its trigger cannot be evaluated
+without a rung-to-model map the architecture does not hold. A vacuous obligation
+and a violated one are different findings and the weaker one is the true one.
+
+THE SHAPE OF THAT ERROR IS THIS RECORD'S OWN SIGNATURE, for the third time: a real
+finding resting on a claim broader than the evidence. The real finding is below and
+it did not need the exaggeration.
 
 THE MUSTS WERE NEVER CHECKED AGAINST THE CANDIDATES. Not at build_chart, not at
 run-candidates, not at evaluate-set, not at gate-candidates. The check exists in
@@ -1061,12 +1076,20 @@ Run at M5, after the winner was declared, it returns this:
 | every-matrix-row-declares-its-complexity | satisfies | VIOLATES | VIOLATES | VIOLATES |
 | a-milestone-takes-the-maximum-complexity-over-its-rows | satisfies | VIOLATES | VIOLATES | VIOLATES |
 | one-model-list-is-read-live-from-the-repository | VIOLATES | VIOLATES | unsettled | VIOLATES |
-| every-call-records-the-model-that-answered-it | satisfies | satisfies | unsettled | VIOLATES |
-| a-weaker-driver-than-named-owes-a-recorded-reason | satisfies | satisfies | unsettled | VIOLATES |
+| every-call-records-the-model-that-answered-it | satisfies | satisfies | satisfies | satisfies |
+| a-weaker-driver-than-named-owes-a-recorded-reason | satisfies | satisfies | satisfies | vacuous |
 
-EVERY CANDIDATE VIOLATES AT LEAST ONE. The declared winner violates five of five.
-The candidate that violates fewest is cand-the-seed-made-total — the one the
-comparison eliminated.
+EVERY CANDIDATE VIOLATES AT LEAST ONE, AND EVERY VIOLATION IS OF ONE OF THE SAME
+THREE ROWS. The declared winner violates three. So does the derived ladder. The
+reader violates two. cand-the-seed-made-total violates one — and the one it
+violates it violates because it split the roster from the mapping, which the row
+demanded be a single file.
+
+THE THREE ROWS THAT DO ALL THE EXCLUDING ARE THE THREE THAT NAME A MECHANISM. That
+is the finding, and it is sharper than the first version's: it is not that the
+candidates are bad, and not that every must is wrong. Three rows out of ten are
+design decisions in a demand's clothes, and those three excluded most of the
+design space between them.
 
 ### Why, and it is not that the candidates are bad
 
@@ -1109,14 +1132,29 @@ THE DECLARED WINNER IS INELIGIBLE ON ITS OWN REGISTER. So is every rival. The
 comparison ranked four candidates on five should-axes while all four failed the
 constraints, which is a ranking of things that were never in the running.
 
-TWO REPAIRS ARE POSSIBLE AND THEY ARE NOT EQUIVALENT.
+THE REPAIR IS NOT A CHOICE, AND THE FIRST VERSION OF THIS ENTRY WAS WRONG TO
+PRESENT IT AS ONE. The method settles it in its own words. meth-requirement-authoring:148:
+"A named mechanism ('shall use a queue') is design frozen as obligation. Name the
+outcome; the mechanism is M4's to choose." items/requirement.md:143: "WHAT, NEVER
+HOW. A requirement that names a mechanism has frozen a design." The three rows are
+defective by the project's own standard and restating them is a repair rather than
+an option.
 
-- AMEND THE REQUIREMENTS TO STATE NEEDS. "A milestone's driver is strong enough
-  for the hardest work it holds" is the need behind the maximum. "A rung resolves
-  to a worker by one rule that every host reads the same way" is the need behind
-  the one file. This reopens M3 and its gate, and it is the honest repair.
-- DECLARE THE SEED AND RECORD THAT THE COMPARISON WAS DECORATIVE. Cheaper, and it
-  makes M4 a four-day exercise whose output was already fixed at M3.
+DONE AT gate-architecture, 2026-08-20, with write-requirements reopened for it.
+
+- "derived from the maximum complexity over the rows" became "no step shall be
+  walked by a driver weaker than that step's own difficulty requires, and the
+  record shall make visible where a step was driven above its own difficulty".
+- "one file in the repository, read live, no per-host roster" became "whatever the
+  engine publishes about how strong a hand a step needs shall be the same on every
+  supported host for the same inputs, with nothing about it discovered at run time".
+- "the loader shall refuse any row that does not DECLARE a complexity value from
+  the five-rung ladder" became "the engine shall OBTAIN a complexity for every row
+  in every applying column, and shall refuse loudly where it cannot".
+
+EACH OUTCOME CAME OUT OF THE ROW'S OWN `breaks_if_removed`, which is where the need
+was hiding the whole time. After the restatement all four candidates satisfy all
+three, and the declared architecture is eligible.
 
 ### The general lesson, which is not about sizing
 

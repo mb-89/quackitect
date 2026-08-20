@@ -2,7 +2,7 @@
 minted_in: i38-the-machine-sizes-its-own-driver-every-s
 id: req-a-milestone-takes-the-maximum-complexity-over-its-rows
 type: "[[requirement]]"
-statement: "The driver a milestone names shall be derived from the maximum complexity over the rows that milestone holds, and the per-row values shall be reported alongside it."
+statement: "No step shall be walked by a driver weaker than that step's own difficulty requires, and the record shall make visible where a step was driven above its own difficulty."
 kind: functional
 verify_method: test
 breaks_if_removed: "A milestone driven below its hardest row produces a plausible wrong answer at exactly the step where a checker cannot see it. Reporting only the maximum hides how much of the milestone was overpaid for."
@@ -15,6 +15,23 @@ source_refs:
   - "raid-risk-a-submachine-maximum-drags-easy-items-onto-an-expensive-walker"
 priority: must
 ---
+
+
+## Restated at gate-architecture, 2026-08-20
+
+THIS ROW NAMED A MECHANISM AND meth-requirement-authoring:148 FORBIDS IT: "a named
+mechanism is design frozen as obligation. Name the outcome; the mechanism is M4's
+to choose."
+
+WHAT IT SAID: the driver a milestone names shall be derived from the maximum
+complexity over the rows that milestone holds. That is one design's reduction
+step. It excluded every candidate that names per state, which was three of the
+four M4 composed, before any of them was scored.
+
+WHAT IT MEANS, taken from its own breaks_if_removed: no step under-driven, and the
+overpayment visible. Both halves survive the restatement and neither names how.
+A milestone maximum satisfies it. So does naming per state. So does splitting a
+submachine where the spread is wide.
 
 ## Detail
 

@@ -2,7 +2,7 @@
 form: write-requirements
 by: agent
 signed_off: 2026-08-20T11:38:30.331Z
-reopened: "2026-08-20T11:38:29.280Z — its completeness criterion claims every step and extension was checked step by step; three extensions were never walked, including 6c which the safety asymmetry rests on, and two statements carried more than one shall"
+reopened: "2026-08-20T15:09:19.092Z — three of its musts name a mechanism rather than an outcome, which meth-requirement-authoring:148 forbids in as many words - a named mechanism is design frozen as obligation, name the outcome, the mechanism is M4 to choose - and items/requirement:143 repeats as WHAT, NEVER HOW. req-a-milestone-takes-the-maximum-complexity-over-its-rows names a reduction step, req-one-model-list-is-read-live-from-the-repository names a file layout, req-every-matrix-row-declares-its-complexity names a declaration mechanism and forbids derivation by construction. Held against the four candidates at gate-architecture, every candidate violates at least one must and the declared winner violates five, because a design that improves on the seed mechanism necessarily fails the demand encoding it."
 authors: agent
 files:
 ---

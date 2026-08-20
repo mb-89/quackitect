@@ -495,3 +495,9 @@
 {"ts":"2026-08-20T15:01:12.386Z","op":"update","visit":"iterations/i38/evaluate-architecture@0","node":"d79","brief":"minting architecture risk audit-answers-from-log"}
 {"ts":"2026-08-20T15:02:31.589Z","op":"update","visit":"iterations/i38/evaluate-architecture@0","node":"d80","brief":"evaluate-architecture: 43 cards walked, two newly unaddressed"}
 {"ts":"2026-08-20T15:02:55.584Z","op":"update","visit":"iterations/i38/evaluate-architecture@0","node":"d81","brief":"evaluate-architecture signed"}
+{"ts":"2026-08-20T15:03:36.663Z","op":"update","visit":"iterations/i38/gate-architecture@0","node":"d82","brief":"at gate-architecture"}
+{"ts":"2026-08-20T15:05:02.725Z","op":"update","visit":"iterations/i38/gate-architecture@0","node":"d83","brief":"gate-architecture rounds 0 and 1 and the goals"}
+{"ts":"2026-08-20T15:05:51.123Z","op":"update","visit":"iterations/i38/gate-architecture@0","node":"d84","brief":"gate-architecture: fail, with the repair named"}
+{"ts":"2026-08-20T15:06:19.218Z","op":"update","visit":"iterations/i38/gate-architecture@0","node":"d85","brief":"ruling gate-architecture fail"}
+{"ts":"2026-08-20T15:09:19.088Z","op":"update","visit":"iterations/i38/gate-architecture@0","node":"d86","brief":"reopening write-requirements: three musts name mechanisms"}
+{"ts":"2026-08-20T15:09:58.122Z","op":"update","visit":"iterations/i38/write-requirements@1","node":"d87","brief":"restating three musts as outcomes"}
