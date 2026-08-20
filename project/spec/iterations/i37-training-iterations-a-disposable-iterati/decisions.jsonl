@@ -956,3 +956,42 @@
 {"ts":"2026-08-20T09:59:13.758Z","op":"update","visit":"iterations/i37/build-steps/write-the-benchmark-report@0","node":"d194","brief":"checking the report chunk"}
 {"ts":"2026-08-20T10:02:39.060Z","op":"update","visit":"iterations/i37/build-steps/write-the-benchmark-report@0","node":"d195","brief":"write-the-benchmark-report is built and its cases pass"}
 {"ts":"2026-08-20T10:02:48.947Z","op":"update","visit":"iterations/i37/build-steps/write-the-benchmark-report@0","node":"d196","brief":"checkpointing two built chunks"}
+{"ts":"2026-08-20T10:03:00.766Z","op":"update","visit":"iterations/i37/build-steps/write-the-benchmark-report@0","node":"d197","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T10:03:01.360Z","op":"update","visit":"iterations/i37/build-steps/write-the-benchmark-report@0","node":"d198","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T10:03:01.915Z","op":"update","visit":"iterations/i37/build-steps/write-the-benchmark-report@0","node":"d199","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T10:03:02.504Z","op":"update","visit":"iterations/i37/build-steps/write-the-benchmark-report@0","node":"d200","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T10:03:03.088Z","op":"update","visit":"iterations/i37/build-steps/write-the-benchmark-report@0","node":"d201","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T10:03:03.665Z","op":"update","visit":"iterations/i37/build-steps/write-the-benchmark-report@0","node":"d202","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T10:03:04.244Z","op":"update","visit":"iterations/i37/build-steps/write-the-benchmark-report@0","node":"d203","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T10:03:04.773Z","op":"update","visit":"iterations/i37/build-steps/write-the-benchmark-report@0","node":"d204","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T10:03:05.305Z","op":"update","visit":"iterations/i37/build-steps/write-the-benchmark-report@0","node":"d205","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T10:03:05.873Z","op":"update","visit":"iterations/i37/build-steps/write-the-benchmark-report@0","node":"d206","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T10:03:06.437Z","op":"update","visit":"iterations/i37/build-steps/write-the-benchmark-report@0","node":"d207","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T10:03:06.994Z","op":"update","visit":"iterations/i37/build-steps/write-the-benchmark-report@0","node":"d208","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T10:03:14.302Z","op":"update","visit":"iterations/i37/build-steps/write-the-benchmark-report@0","node":"d209","brief":"reading the stopped step"}
+{"ts":"2026-08-20T10:03:36.266Z","op":"update","visit":"iterations/i37/build-steps/write-the-benchmark-report@0","node":"d210","brief":"going to the root of the chain, as the refusal says"}
+{"ts":"2026-08-20T10:03:39.050Z","op":"update","visit":"iterations/i37/build-steps/write-the-benchmark-report@0","node":"d211","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T10:03:39.857Z","op":"update","visit":"iterations/i37/build-steps/write-the-benchmark-report@0","node":"d212","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T10:03:47.937Z","op":"update","visit":"iterations/i37/build-steps/write-the-benchmark-report@0","node":"d213","brief":"aiming at the root chunk with its qualified name"}
+{"ts":"2026-08-20T10:03:55.994Z","op":"update","visit":"iterations/i37/build-steps/stand-the-rewound-tree@0","node":"d214","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T10:03:56.338Z","op":"update","visit":"iterations/i37/build-steps/stand-the-rewound-tree@0","node":"d215","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T10:05:01.835Z","op":"update","visit":"iterations/i37/build-steps/stand-the-rewound-tree@0","node":"d216","brief":"building stand-the-rewound-tree: the fetch, the split and the control"}
+{"ts":"2026-08-20T10:05:02.261Z","op":"update","visit":"iterations/i37/build-steps/stand-the-rewound-tree@0","node":"d217","brief":"building stand-the-rewound-tree: the fetch, the split and the control"}
+{"ts":"2026-08-20T10:05:33.170Z","op":"update","visit":"iterations/i37/build-steps/stand-the-rewound-tree@0","node":"d218","brief":"the rewind cases needed a repository with a past and a future"}
+{"ts":"2026-08-20T10:05:40.217Z","op":"update","visit":"iterations/i37/build-steps/stand-the-rewound-tree@0","node":"d219","brief":"typechecking the rewound-tree chunk"}
+{"ts":"2026-08-20T10:05:52.696Z","op":"update","visit":"iterations/i37/build-steps/stand-the-rewound-tree@0","node":"d220","brief":"checking the rewound-tree chunk"}
+{"ts":"2026-08-20T10:08:30.647Z","op":"update","visit":"iterations/i37/build-steps/stand-the-rewound-tree@0","node":"d221","brief":"stand-the-rewound-tree is built and its four cases pass"}
+{"ts":"2026-08-20T10:09:19.941Z","op":"update","visit":"iterations/i37/build-steps/bind-a-run-and-write-its-conditions@0","node":"d222","brief":"building bind-a-run-and-write-its-conditions"}
+{"ts":"2026-08-20T10:09:27.253Z","op":"update","visit":"iterations/i37/build-steps/bind-a-run-and-write-its-conditions@0","node":"d223","brief":"typechecking the binding"}
+{"ts":"2026-08-20T10:09:41.077Z","op":"update","visit":"iterations/i37/build-steps/bind-a-run-and-write-its-conditions@0","node":"d224","brief":"the pool a run draws from is the shipped set"}
+{"ts":"2026-08-20T10:09:50.291Z","op":"update","visit":"iterations/i37/build-steps/bind-a-run-and-write-its-conditions@0","node":"d225","brief":"checking the binding chunk"}
+{"ts":"2026-08-20T10:13:12.434Z","op":"update","visit":"iterations/i37/build-steps/bind-a-run-and-write-its-conditions@0","node":"d226","brief":"a record and a report are notes, so they go through the door"}
+{"ts":"2026-08-20T10:13:20.672Z","op":"update","visit":"iterations/i37/build-steps/bind-a-run-and-write-its-conditions@0","node":"d227","brief":"typechecking after routing reads through the door"}
+{"ts":"2026-08-20T10:13:40.701Z","op":"update","visit":"iterations/i37/build-steps/bind-a-run-and-write-its-conditions@0","node":"d228","brief":"raising the read ceiling with its reason, after giving two back"}
+{"ts":"2026-08-20T10:13:50.746Z","op":"update","visit":"iterations/i37/build-steps/bind-a-run-and-write-its-conditions@0","node":"d229","brief":"checking the binding and the ratchet"}
+{"ts":"2026-08-20T10:16:15.306Z","op":"update","visit":"iterations/i37/build-steps/bind-a-run-and-write-its-conditions@0","node":"d230","brief":"raising the write ceiling with its reason"}
+{"ts":"2026-08-20T10:16:24.182Z","op":"update","visit":"iterations/i37/build-steps/bind-a-run-and-write-its-conditions@0","node":"d231","brief":"re-checking with both ratchets re-earned"}
+{"ts":"2026-08-20T10:20:05.273Z","op":"update","visit":"iterations/i37/build-steps/bind-a-run-and-write-its-conditions@0","node":"d232","brief":"se_version is a recorded field name rather than a lane verb"}
+{"ts":"2026-08-20T10:20:14.601Z","op":"update","visit":"iterations/i37/build-steps/bind-a-run-and-write-its-conditions@0","node":"d233","brief":"final check on the binding chunk"}
+{"ts":"2026-08-20T10:22:53.525Z","op":"update","visit":"iterations/i37/build-steps/bind-a-run-and-write-its-conditions@0","node":"d234","brief":"the binding is built; 1616 of 1618 pass"}
+{"ts":"2026-08-20T10:23:07.033Z","op":"update","visit":"iterations/i37/build-steps/write-the-benchmark-report@0","node":"d235","brief":"checkpointing four built chunks"}

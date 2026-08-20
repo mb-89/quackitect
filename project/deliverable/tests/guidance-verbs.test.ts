@@ -32,6 +32,8 @@ function registered(): Set<string> {
 const NOT_A_VERB: Record<string, string> = {
   se_test_verdict: "a call-log record kind, written by the battery when it ends",
   se_update: "the narration op's internal tool name on the log line, never called directly",
+  se_version:
+    "a field name, not a verb — calllog.ts stamps it on every record and a benchmark report carries it forward as one of its conditions",
 };
 
 /** Every page an agent is served as guidance. The method layer, the state

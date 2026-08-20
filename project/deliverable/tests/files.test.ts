@@ -117,7 +117,20 @@ test("no new file read bypasses the door — the count may fall, never rise", ()
   // and the door would have to parse a log as a node to do it.
   // THAT ONE ARRIVED ON TOP OF 111 AT THE i36 MERGE, 2026-08-20. Its own branch
   // counted it as 107 because it never saw the five increments above it.
-  const CEILING = 112;
+  // 115 since 2026-08-20: the benchmark run reads three things no door holds.
+  // FIVE WERE WRITTEN AND TWO WERE GIVEN BACK, which is what this ratchet is
+  // for: a record and a benchmark report are both NOTES, so they went through
+  // noteOf, and the engine version already has its one reader in version.ts.
+  //   - benchmark.ts dirHash: raw BYTES of arbitrary files, to stamp what a
+  //     run's conditions actually cover. It hashes guidance, forms, items,
+  //     methods and the engine, most of which are not notes at all, and it
+  //     wants bytes rather than a parse.
+  //   - benchmark.ts changeSizeOf: the pin, machines/seeded.json — one tiny
+  //     JSON object, the same shape as increments 100 through 104.
+  //   - benchmark-guard.ts controlFilesPresent: markdown in the REWOUND TREE,
+  //     which is a fetched checkout and not this vault. No door could serve it
+  //     even in principle, exactly as at 107 and 111.
+  const CEILING = 115;
   let found = 0;
   const offenders: string[] = [];
   const walk = (dir: URL, rel: string): void => {
@@ -169,7 +182,13 @@ test("no new file write bypasses the door — the count may fall, never rise", (
   // skill file into three host directories from a single loop. It is a
   // projection of guidance, placed exactly like the protocol files beside it,
   // and no note door could hold a file whose shape the host owns.
-  const CEILING = 41;
+  // 42 since 2026-08-20: benchmark.ts writes `.se/benchmark.json` when a run
+  // binds — which run is open, where its history was cut, and the three
+  // conditions no log holds. SESSION state, exactly the shape of 39 and 40:
+  // machine-local, gitignored, and deleted when the run ends. The one thing a
+  // benchmark COMMITS is its report, and that is a note written through the
+  // item template rather than by this call.
+  const CEILING = 42;
   let found = 0;
   const offenders: string[] = [];
   const walk = (dir: URL, rel: string): void => {
