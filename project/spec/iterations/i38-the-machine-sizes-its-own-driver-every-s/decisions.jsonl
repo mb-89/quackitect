@@ -202,3 +202,4 @@
 {"ts":"2026-08-20T11:21:08.014Z","op":"done","visit":"iterations/i38/gate-requirements@0","node":"d86","brief":"three assumptions referenced"}
 {"ts":"2026-08-20T11:21:08.586Z","op":"done","visit":"iterations/i38/gate-requirements@0","node":"d87","brief":"verdict and follow-up written"}
 {"ts":"2026-08-20T11:21:10.346Z","op":"update","visit":"iterations/i38/gate-requirements@0","node":"d90","brief":"holding the submit for the M3 adversarial pass"}
+{"ts":"2026-08-20T11:21:50.337Z","op":"done","visit":"iterations/i38/write-requirements@0","node":"d48","brief":"requirements gate blessed; a bless does not outlive its evidence"}

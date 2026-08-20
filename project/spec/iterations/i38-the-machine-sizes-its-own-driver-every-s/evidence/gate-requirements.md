@@ -1,5 +1,8 @@
 ---
 form: gate-requirements
+bless: blessed by agent
+by: agent
+signed_off: 2026-08-20T11:21:50.750Z
 authors: agent
 files:
 ---
