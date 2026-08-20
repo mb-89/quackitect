@@ -1,0 +1,14 @@
+{
+  "extensions": [
+    ".md"
+  ],
+  "excludeDirectories": [
+    "node_modules",
+    ".git",
+    ".obsidian",
+    ".se",
+    ".worktrees",
+    "dist",
+    "tests"
+  ]
+}

@@ -11,7 +11,7 @@ action it may take is decided by the state machine.
 
 v3 inverts v2's build order: **channel and visibility first, guidance early,
 the record-keeping layer last.** v2's post-mortem in one line: enforcement
-without guidance regresses below convention. See `project/spec/v3-plan.md`.
+without guidance regresses below convention. See `spec/v3-plan.md`.
 
 ## Layout
 
@@ -46,7 +46,7 @@ A cloud box gets there in one command, and usually without being asked — the
 repository's own `.claude/settings.json` fires it when a session starts.
 
 ```bash
-node project/deliverable/engine/bin/se-arrive.ts --autonomy 0.6
+node deliverable/engine/bin/se-arrive.ts --autonomy 0.6
 ```
 
 It fetches the branches the records cite, checks the runtime against the pin,
@@ -55,7 +55,7 @@ agent with no tools of its own can still call it. Running it twice changes
 nothing. `SE_NO_ARRIVE=1` turns it off on a machine where the editor is in
 charge.
 
-The card for the agent that lands there is `project/guidance/method/cloud-runner.md`.
+The card for the agent that lands there is `guidance/method/cloud-runner.md`.
 
 ## What a change needs before you see it
 
@@ -64,10 +64,10 @@ which edit. Here is the whole rule.
 
 | you changed | you need |
 | --- | --- |
-| `project/deliverable/brand/palette.css` | nothing. It is read on every render. |
+| `deliverable/brand/palette.css` | nothing. It is read on every render. |
 | a machine drawing, guidance, a rigor-matrix row | nothing. They are read live. |
-| `project/deliverable/engine/**.ts` | restart the se server. Node caches modules at import, so a correct file on disk means nothing to a process already running. |
-| `project/deliverable/vscode/src/extension.ts` | re-run `RUNME.ps1`. |
+| `deliverable/engine/**.ts` | restart the se server. Node caches modules at import, so a correct file on disk means nothing to a process already running. |
+| `deliverable/vscode/src/extension.ts` | re-run `RUNME.ps1`. |
 
 The last row is the trap. VS Code loads the extension **copy** under
 `~/.vscode/extensions`, so reloading the window re-reads that copy and not your
@@ -104,7 +104,7 @@ either tree changes nothing.
 Four things stay home:
 
 - the git history
-- this project's own records in `project/spec`
+- this project's own records in `spec`
 - the session state in `.se/`
 - everything the ignore file already excludes
 
@@ -122,7 +122,7 @@ The Mirror's buttons drive the same core by the person's hand.
 
 ## The cage (how it blocks)
 
-`project/.claude/settings.json` **denies the current native tools by
+`.claude/settings.json` **denies the current native tools by
 name** — Bash, BashOutput, KillShell, Read, Write, Edit, NotebookEdit,
 Glob, Grep, WebSearch, WebFetch, Skill (an explicit blacklist by owner
 ruling: a tool added in the future is NOT blocked automatically; blocking it
@@ -131,7 +131,7 @@ model's context entirely. `mcp__se__*` is allowlisted. Subagents (Task)
 stay available and inherit the same denies — they are caged too.
 
 The settings file and `.mcp.json` are GENERATED: edit the templates in
-`project/deliverable/cage/`; the extension places them when the window opens (the
+`deliverable/cage/`; the extension places them when the window opens (the
 generated copies are gitignored).
 
 **Hard dependencies (owner ruling 2026-07-26): ripgrep and git.** The RUNME
@@ -166,8 +166,8 @@ call — result, rejection, error — is appended raw to `.se/calls.jsonl`.
 
 Machines are DRAWN — Advanced Canvas files, compiled at load, refused with
 the offending element named on any misparse. Engine-owned machines live in
-`project/deliverable/machines/`; owner-authored process machines will live
-in `project/spec/` later. **Authoring rules: `project/guidance/authoring/machines.md`** —
+`deliverable/machines/`; owner-authored process machines will live
+in `spec/` later. **Authoring rules: `guidance/authoring/machines.md`** —
 notably: file refs are VAULT-relative (the Obsidian vault root is
 `project/`), the fields an agent reads live in the state note's
 FRONTMATTER while the body is prose for humans, and start/terminal states
@@ -191,7 +191,7 @@ before those are met is refused, and the refusal says what would make it
 possible. The pull itself is never blocked.
 
 Every refusal carries a code, and each code is explained in
-[the refusals guide](project/guidance/refusals.md).
+[the refusals guide](guidance/refusals.md).
 
 ## Status
 

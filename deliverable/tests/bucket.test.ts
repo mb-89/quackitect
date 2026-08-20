@@ -1,0 +1,165 @@
+// i11's bucket: a finding that blocks nothing is carried as an owed item
+// naming an open register entry, and the close HANDS IT to the next record.
+//
+// IT REFUSED UNTIL 2026-08-16 and the owner changed it, because a close that
+// will not pass leaves the walk standing in the last state with no legal move.
+//
+// THESE WERE FIRST WRITTEN AGAINST A BOOTED SERVER AND FAILED ON THE FIXTURE.
+// Every case hit SE-C-110 — "nothing asked for a form", "no bound expedition" —
+// so none of them ever reached the code under test. A red for the wrong reason
+// is not a red for the requirement.
+//
+// SO THEY DRIVE THE MECHANISMS DIRECTLY. Reaching a checklist field through a
+// real walk means seeding a record, entering a container and walking to a state
+// that owns one; that path is the DEMONSTRATION's job (tsp-carry-a-finding),
+// and it is where reachability gets judged. What belongs here is whether the
+// mechanism is correct, and these call it.
+import { strict as assert } from "node:assert";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
+import { test } from "node:test";
+import { owedStanding } from "../engine/records.ts";
+import { checklistOwed } from "../engine/stateform-problems.ts";
+import { loadTrace } from "../engine/trace.ts";
+import { freshRoot } from "./helpers.ts";
+
+function entry(root: string, id: string, status: string): void {
+  const dir = join(root, "spec", "trace", "raid");
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(
+    join(dir, `${id}.md`),
+    `---\nid: ${id}\ntype: "[[raid]]"\nkind: risk\nstatement: a throwaway entry for the bucket's cases\nowner: the driving agent\ntrigger: never\nstatus: ${status}\n---\n`,
+    "utf8",
+  );
+}
+
+function evidence(root: string, recordDir: string, file: string, body: string): void {
+  const dir = join(root, recordDir, "evidence");
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(join(dir, file), body, "utf8");
+}
+
+// req-a-harmless-finding-is-carried-not-stopped-on
+//
+// THE PERMISSION. Today a finding has two fates and both are bad: it blocks the
+// state until somebody fixes it, or it becomes a note nobody reads again. i34
+// ran a whole iteration in the first mode and wrote `[owed]` zero times.
+test("an owed item naming an open register entry is carried, not treated as unchecked", () => {
+  const root = freshRoot();
+  entry(root, "raid-risk-a-throwaway-that-is-open", "open");
+  const corpus = loadTrace(root);
+
+  const owed = checklistOwed(
+    ["Dependencies stay layered"],
+    "- [owed] Dependencies stay layered — raid-risk-a-throwaway-that-is-open",
+    corpus,
+  );
+
+  assert.equal(owed.length, 1, `a well-formed owed item was not carried: ${JSON.stringify(owed)}`);
+  assert.equal(owed[0].ref, "raid-risk-a-throwaway-that-is-open");
+});
+
+// req-a-harmless-finding-names-an-open-entry
+//
+// THE GUARD. A disposition somebody asserted is not one somebody agreed —
+// NASA NPR 7123.1 turns on that word. Without this, `- [owed]` is strictly
+// WEAKER than the unchecked box it replaces: `- [ ]` reads as unfinished,
+// `- [owed]` reads as dispositioned.
+test("an owed item naming nothing is not counted as a carried finding", () => {
+  const root = freshRoot();
+  const corpus = loadTrace(root);
+
+  const owed = checklistOwed(["Dependencies stay layered"], "- [owed] Dependencies stay layered — raid-does-not-exist-at-all", corpus);
+
+  assert.deepEqual(owed, [], "an owed item pointing at nothing was counted as a genuine carried finding");
+});
+
+// THE CASE THAT WOULD HAVE CAUGHT i11's OWN DEFECT, and did not exist.
+//
+// The close guard was built on `stampRecordClosed`, reached only from the
+// EXPEDITION close, reading a hardcoded `spec/expeditions/` path. An
+// iteration closes through `itCloseShipped`, which never looked at all.
+//
+// SO i11 SHIPPED PAST NINE OWED ITEMS with the mechanism it had just built
+// watching the wrong door, and its own evidence said three times that the
+// close would refuse. Every case below passed while that was true, because
+// each drove the READER directly and none drove the caller.
+//
+// THIS ONE READS THE SOURCE, the same way discipline.test.ts guards the
+// autonomy dial. A behavioural case would need a git tree; the defect is one
+// hardcoded path, and a reader with a pattern catches it.
+test("the iteration close reads the ITERATION's owed items, not the expeditions folder", () => {
+  const src = readFileSync(new URL("../engine/records.ts", import.meta.url), "utf8");
+  const at = src.indexOf("export function itCloseShipped");
+  assert.ok(at > 0, "the iteration close is gone");
+  const body = src.slice(at, src.indexOf("\n}\n", at));
+  assert.match(
+    body,
+    /owedStanding\(root, `spec\/iterations\//,
+    "the iteration close does not read its own record's owed items — this is exactly how i11 shipped past nine",
+  );
+});
+
+// req-close-refuses-loose-ends
+//
+// THE ROW WAS MINTED IN i1 AND HAD NO IMPLEMENTATION until i11. It is a `must`
+// graded fatal. A probe went looking for the mechanism to compare against the
+// form-side guard and found nothing there; the owner ruled the same day that
+// the close site gets built here.
+test("an owed item whose entry is still open is carried by the close", () => {
+  const root = freshRoot();
+  entry(root, "raid-risk-a-throwaway-that-is-open", "open");
+  evidence(
+    root,
+    "spec/expeditions/e99",
+    "some-state.md",
+    "## quality_ok\n\n- [owed] Dependencies stay layered — raid-risk-a-throwaway-that-is-open\n",
+  );
+
+  const standing = owedStanding(root, "spec/expeditions/e99");
+
+  assert.equal(standing.length, 1, `the close saw no owed item standing: ${JSON.stringify(standing)}`);
+  assert.equal(standing[0].where, "some-state.md", "the close does not say which form carries it");
+});
+
+// The disposition ruling, made when this reader was built.
+//
+// `accepted` AND `deferred` LOOK WRONG IN THE DISPOSED SET AND ARE NOT. They
+// are exactly where a carried finding drifts, and both are real rulings.
+// Treating either as unresolved would make the close refuse work somebody had
+// already decided — which is what teaches people to stop using the bucket.
+test("an owed item whose entry was accepted is not carried — it was ruled on", () => {
+  const root = freshRoot();
+  entry(root, "raid-risk-a-throwaway-somebody-accepted", "accepted");
+  evidence(
+    root,
+    "spec/expeditions/e99",
+    "some-state.md",
+    "## quality_ok\n\n- [owed] Dependencies stay layered — raid-risk-a-throwaway-somebody-accepted\n",
+  );
+
+  assert.deepEqual(
+    owedStanding(root, "spec/expeditions/e99"),
+    [],
+    "a ruled entry still held the close, so a disposition counts for nothing",
+  );
+});
+
+// The deletion-orphans defect, caught at the last place that can catch it.
+//
+// The form side refuses an unresolved ref at submit, so a ref that resolves to
+// nothing HERE means the entry was deleted after the form signed. That is the
+// defect i11 saw five times in one day, arriving at the close.
+test("an owed item whose entry was deleted after signing holds the close", () => {
+  const root = freshRoot();
+  evidence(
+    root,
+    "spec/expeditions/e99",
+    "some-state.md",
+    "## quality_ok\n\n- [owed] Dependencies stay layered — raid-risk-somebody-deleted-this\n",
+  );
+
+  const standing = owedStanding(root, "spec/expeditions/e99");
+
+  assert.equal(standing.length, 1, "a deleted entry let the close pass, so an orphaned owed item ships silently");
+});

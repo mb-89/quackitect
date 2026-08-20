@@ -27,7 +27,7 @@ $root = $PSScriptRoot
 
 # THE PRODUCT NAME IS ONE FACT (brand.json at the root). Nothing below spells
 # it out, so an export renames the whole system by writing that one file.
-$brandFile = Join-Path $root "project\deliverable\brand\brand.json"
+$brandFile = Join-Path $root "deliverable\brand\brand.json"
 $brand = if (Test-Path $brandFile) { Get-Content $brandFile -Raw | ConvertFrom-Json } else { [pscustomobject]@{ name = "se"; id = "se"; abbr = $null } }
 $P = $brand.name
 $brandId = $brand.id
@@ -46,8 +46,8 @@ $forwarded = @($args | ForEach-Object { "$_" })
 # flag nobody documented.
 if ($forwarded | Where-Object { $_ -in @("--help", "-h", "-?", "-Help") }) {
   $node = Get-Command node -ErrorAction SilentlyContinue
-  if ($node) { node (Join-Path $root "project\deliverable\engine\bin\se-mcp.ts") --help }
-  else { Write-Output "  (node not installed yet - the whole help lives in project\deliverable\engine\bin\se-mcp.ts)" }
+  if ($node) { node (Join-Path $root "deliverable\engine\bin\se-mcp.ts") --help }
+  else { Write-Output "  (node not installed yet - the whole help lives in deliverable\engine\bin\se-mcp.ts)" }
   exit 0
 }
 
@@ -226,7 +226,7 @@ $classic = [bool]($forwarded | Where-Object { $_ -eq "--classic" })
 $forwarded = @($forwarded | Where-Object { $_ -notin @("--classic") })
 if (-not $classic) {
   if (-not (Ensure-Tool "code" "Microsoft.VisualStudioCode" "VS Code")) { exit 1 }
-  $extSrc = Join-Path $root "project\deliverable\vscode"
+  $extSrc = Join-Path $root "deliverable\vscode"
   $extDest = Join-Path $env:USERPROFILE ".vscode\extensions\$brandId.$brandId-0.1.0"
   New-Item -ItemType Directory -Force -Path $extDest | Out-Null
   robocopy $extSrc $extDest /MIR /NFL /NDL /NJH /NJS /NP | Out-Null
@@ -236,7 +236,7 @@ if (-not $classic) {
   }
   # THE COPY IS WHAT CARRIES A NAME. The source keeps its placeholders, so
   # there is one tree and a rename stays one file.
-  $rendered = node (Join-Path $root "project\deliverable\engine\bin\brand.ts") --root $root --dest $extDest
+  $rendered = node (Join-Path $root "deliverable\engine\bin\brand.ts") --root $root --dest $extDest
   if ($LASTEXITCODE -ne 0) {
     Write-Host "naming the extension FAILED - see above" -ForegroundColor Red
     exit 1
@@ -283,8 +283,8 @@ if (-not $classic) {
   }
   Write-Host "  extension in place - $rendered" -ForegroundColor Green
   Write-Host "  $extDest" -ForegroundColor DarkGray
-  Write-Host "$P - opening VS Code on project\ - the extension takes it from here. You should not need to run this again" -ForegroundColor Cyan
-  code (Join-Path $root "project")
+  Write-Host "$P - opening VS Code - the extension takes it from here. You should not need to run this again" -ForegroundColor Cyan
+  code $root
   exit 0
 }
 
@@ -308,7 +308,7 @@ if ($busy.Count -gt 0) {
 
 # Engine dependencies. @vscode/ripgrep ships the rg binary via npm.
 Write-Host "$P - installing engine dependencies" -ForegroundColor Cyan
-Push-Location (Join-Path $root "project\deliverable")
+Push-Location (Join-Path $root "deliverable")
 try {
   npm install --no-audit --no-fund --loglevel=error
   if ($LASTEXITCODE -ne 0) {
@@ -335,7 +335,7 @@ try {
 # system. A FAILURE HERE IS NOT FATAL - the launcher falls back to leaving the
 # kickoff in the box for the reader to send by hand.
 Write-Host "$P - installing extension dependencies" -ForegroundColor Cyan
-Push-Location (Join-Path $root "project\deliverable\vscode")
+Push-Location (Join-Path $root "deliverable\vscode")
 try {
   npm install --no-audit --no-fund --loglevel=error
   if ($LASTEXITCODE -ne 0) {
@@ -351,25 +351,25 @@ try {
 # remote tools (desktop security rule), so they ship as templates in
 # workspace\deliverable\cage and are placed locally here - declaratively, every run.
 Write-Host "$P - installing cage config" -ForegroundColor Cyan
-$ws = Join-Path $root "project"
+$ws = $root
 New-Item -ItemType Directory -Force -Path (Join-Path $ws ".claude") | Out-Null
 Copy-Item (Join-Path $ws "deliverable\cage\mcp.json") (Join-Path $ws ".mcp.json") -Force
 Copy-Item (Join-Path $ws "deliverable\cage\claude-settings.json") (Join-Path $ws ".claude\settings.json") -Force
-Write-Host "  project\.mcp.json + project\.claude\settings.json in place"
+Write-Host "  .mcp.json + .claude\settings.json in place"
 # COPILOT'S CAGE IS SHAPED DIFFERENTLY. Its MCP config is a file like
 # Claude's, so it is placed here the same way. Its tool DENIAL is not a
 # file at all - Copilot takes that on the command line, so that half rides
 # the launch and lives in deliverable\cage\copilot-cage.json as data you can correct.
 New-Item -ItemType Directory -Force -Path (Join-Path $ws ".copilot") | Out-Null
 Copy-Item (Join-Path $ws "deliverable\cage\copilot-mcp-config.json") (Join-Path $ws ".copilot\mcp-config.json") -Force
-Write-Host "  project\.copilot\mcp-config.json in place"
+Write-Host "  .copilot\mcp-config.json in place"
 
 # The FAST gate only (sub-second): canvases compile, hard deps answer, the
 # log location is writable. The FULL test suite is not run here - it runs
 # INSIDE boot (prepare_idle's selftest exit script), engine-observed, so
 # launching stays instant and the walk still proves the engine green.
 Write-Host "$P - preflight (full selftests run in boot)" -ForegroundColor Cyan
-Push-Location (Join-Path $root "project\deliverable")
+Push-Location (Join-Path $root "deliverable")
 try {
   node engine\bin\preflight.ts --root $root
   if ($LASTEXITCODE -ne 0) {
@@ -405,12 +405,12 @@ if (($null -eq $agentHost) -and (-not $manual)) {
 }
 if ($manual) {
   Write-Host "$P - manual mode: no agent, the Mirror is yours" -ForegroundColor Cyan
-  node (Join-Path $root "project\deliverable\engine\bin\se-manual.ts") --root $root @forwarded
+  node (Join-Path $root "deliverable\engine\bin\se-manual.ts") --root $root @forwarded
   exit $LASTEXITCODE
 }
 $env:SE_ARGS = ($forwarded -join "`n")
 $argNote = if ($forwarded.Count -gt 0) { " (args: $($forwarded -join ' '))" } else { "" }
-Write-Host "$P - launching caged agent in project/$argNote" -ForegroundColor Cyan
+Write-Host "$P - launching caged agent$argNote" -ForegroundColor Cyan
 Write-Host "$P - the Mirror (your hand on the walk): the server opens http://localhost:7333 as soon as it is up" -ForegroundColor Cyan
 
 # The server opens the Mirror itself as soon as it listens (se_panel
@@ -430,7 +430,7 @@ $kickoff = (Get-Content (Join-Path $ws "deliverable\cage\kickoff.txt") -Raw).Tri
 # kills the agent - which happened for real on 2026-07-28. When no terminal
 # binding is installed the host runs the agent on this terminal instead, so a
 # terminal that will not start still never costs you your agent.
-Push-Location (Join-Path $root "project")
+Push-Location $root
 try {
   if ($agentHost -eq "copilot") {
     # COPILOT DOES TAKE AN OPENING PROMPT - `copilot -i "<text>"` starts an
@@ -455,14 +455,14 @@ try {
       copilot @cageArgs -i $kickoff
     } else {
       Write-Host "$P - the agent runs in the Mirror's terminal pane, in the background" -ForegroundColor Cyan
-      node (Join-Path $root "project\deliverable\engine\bin\se-pty.ts") --pty-port 7334 --detach -- copilot @cageArgs -i $kickoff
+      node (Join-Path $root "deliverable\engine\bin\se-pty.ts") --pty-port 7334 --detach -- copilot @cageArgs -i $kickoff
     }
   } elseif ($ownTerminal) {
     Write-Host "$P - own terminal: the agent runs in THIS window; the Mirror's terminal pane stays empty" -ForegroundColor Cyan
     claude $kickoff
   } else {
     Write-Host "$P - the agent runs in the Mirror's terminal pane, in the background" -ForegroundColor Cyan
-    node (Join-Path $root "project\deliverable\engine\bin\se-pty.ts") --pty-port 7334 --detach -- claude $kickoff
+    node (Join-Path $root "deliverable\engine\bin\se-pty.ts") --pty-port 7334 --detach -- claude $kickoff
   }
 } finally {
   Pop-Location

@@ -1,5 +1,7 @@
-# machine-local — never committed
-.se/
+# machine-local — never committed. The folder itself is NOT ignored, because
+# git honours a negation only inside a directory it can still see.
+.se/*
+!.se/quack-watch.json
 *.log
 
 # node
@@ -17,16 +19,16 @@ Thumbs.db
 # the scratchpad is the agent's workbench — whatever it wants, never committed
 # (owner ruling 2026-08-12). The no-binaries rule stops reaching into it, which
 # is what req-every-artifact-is-readable-text was always about: the PRODUCT.
-project/scratchpad/
+scratchpad/
 
 # built packages — assembled by engine/bin/package.ts, never committed
 dist/
 
-# placed into the OPENED folder from project/deliverable/cage/ — never committed.
+# placed into the OPENED folder from deliverable/cage/ — never committed.
 # The extension does it locally. On a cloud host the arriving agent does it
 # itself, then spawns a caged subagent to walk (guidance/method/cloud-runner.md).
-project/.mcp.json
-project/.claude/settings.json
-project/.claude/output-styles/
-project/.copilot/
-project/.github/copilot-instructions.md
+.mcp.json
+.claude/settings.json
+.claude/output-styles/
+.copilot/
+.github/copilot-instructions.md
