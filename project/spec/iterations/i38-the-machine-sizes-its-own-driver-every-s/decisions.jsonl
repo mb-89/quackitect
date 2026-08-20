@@ -38,3 +38,8 @@
 {"ts":"2026-08-20T09:39:36.148Z","op":"plan","visit":"iterations/i38/log-risks@0","parent":"d39","nodes":[{"id":"d44","brief":"reference the six standing entries at log-risks"},{"id":"d45","brief":"submit log-risks"}]}
 {"ts":"2026-08-20T09:40:35.823Z","op":"update","visit":"iterations/i38/log-risks@0","node":"d46","brief":"minting the submachine-maximum cost risk from conflict two"}
 {"ts":"2026-08-20T09:40:35.948Z","op":"update","visit":"iterations/i38/log-risks@0","node":"d47","brief":"minting the unenforced-asymmetry risk from conflict three"}
+{"ts":"2026-08-20T09:41:38.803Z","op":"plan","visit":"iterations/i38/define-actual@0","parent":"d39","nodes":[{"id":"d48","brief":"define the actual for the driver question"},{"id":"d49","brief":"submit define-actual"}]}
+{"ts":"2026-08-20T09:42:28.096Z","op":"update","visit":"iterations/i38/define-actual@0","node":"d50","brief":"the attribution goal needs a second coordinate the record lacks"}
+{"ts":"2026-08-20T09:43:27.479Z","op":"plan","visit":"iterations/i38/frame-delta@0","parent":"d39","nodes":[{"id":"d51","brief":"frame the delta with a gap claim and value props"},{"id":"d52","brief":"submit frame-delta"}]}
+{"ts":"2026-08-20T09:44:29.770Z","op":"update","visit":"iterations/i38/frame-delta@0","node":"d53","brief":"minting the forward-half value prop this delta authors"}
+{"ts":"2026-08-20T09:44:29.896Z","op":"update","visit":"iterations/i38/frame-delta@0","node":"d54","brief":"minting the attribution value prop this delta authors"}
