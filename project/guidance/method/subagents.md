@@ -26,6 +26,36 @@ A SUBAGENT THAT DOES NOT KNOW ABOUT THE CAGE WILL REACH FOR ITS NATIVE TOOLS.
 It will then report that it could not read anything, and you will have paid
 for a turn that found nothing.
 
+### THE CHILD IS NOT IN THE CAGE, measured 2026-08-20
+
+The `se` MCP server is NOT in a subagent's tool set. The child cannot call a
+lane verb at all, whatever you tell it.
+
+What happened on i37's verification. The tester was handed the lane rule in
+full: the verbs, the argument names, the root-relative path rule, the
+read-only limit. It answered `No matching deferred tools found` for every
+`se_` verb. Its native Bash and Read were not blocked, and it used them.
+
+So the warning above prepares for the wrong failure. The real case is a child
+that knows about a cage it is not in.
+
+WHAT TO TELL A SUBAGENT INSTEAD, until the lane reaches children:
+
+- Say the paths are root-relative to the project root, and that it reads with
+  its NATIVE tools.
+- Say it may not write, unless you meant it to.
+- Say the lane exists and that it cannot drive it. A child that has been told
+  to use `se_` verbs wastes its first calls discovering they are absent.
+
+WHY IT MATTERS BEYOND CONVENIENCE. Fresh eyes see a DIFFERENT PROJECT than
+the walk does: no state gate, no narration toll, no typed refusals, no call
+log. Every finding a subagent makes about LANE BEHAVIOUR is second-hand by
+construction.
+
+So weigh a subagent's lane findings accordingly, and re-check the ones that
+matter by driving the verb yourself. On i37 the tester's findings were good
+and two of them rested on reading `project/deliverable/engine/tools-file.ts` rather than on calling it.
+
 ## Which model
 
 JUDGE IT PER SUBAGENT (owner grant 2026-07-11). There is no fixed mapping and

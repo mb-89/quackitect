@@ -7,6 +7,8 @@
 // take anything out, while its own method opens by weighing that inbox.
 import { strict as assert } from "node:assert";
 import { spawnSync } from "node:child_process";
+import { mkdirSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
 import { test } from "node:test";
 import { CallLog } from "../engine/calllog.ts";
 import { backlogNotes } from "../engine/inbox.ts";
@@ -198,6 +200,40 @@ test("the survey lists a note by title — cut at a word, never mid-word, and ne
   assert.equal(note.text, undefined, "the body stays out of the listing");
   const whole = await call(server, "se_log_query", { ref });
   assert.ok(String((whole.body as unknown as { text: string }).text).includes(substance), "and the whole note comes back by ref");
+});
+
+// THE BOUNDARY CROSSES A ROTATION (found live 2026-08-20, during a retro).
+// The log rotates at 12 MB, which this project fills in under a day, so a
+// rotation lands INSIDE an iteration rather than between retros. The mark
+// used to be sought in the live file alone: with the previous retro's drain
+// sitting in an archive, the window silently opened at the live file's own
+// start. Measured that morning: 1,613 records mined where 16,073 stood.
+test("the retro boundary is found in an archive when a rotation split the period", () => {
+  const root = freshRoot();
+  const dir = seDir(root);
+  mkdirSync(dir, { recursive: true });
+  const rec = (ts: string, tool: string, args: Record<string, unknown> = {}): string =>
+    `${JSON.stringify({ ref: `call-${ts}`, ts, se_version: "0", tool, args, ok: true, outcome: "result", duration_ms: 0 })}\n`;
+
+  // The archive: work, then the previous retro's judged drain, then more work.
+  writeFileSync(
+    join(dir, "calls-2026-08-20T10-00-00-000Z.jsonl"),
+    rec("2026-08-19T09:00:00.000Z", "se_pull") +
+      rec("2026-08-19T10:00:00.000Z", "se_note_drain", { disposition: "backlog" }) +
+      rec("2026-08-19T11:00:00.000Z", "se_pull"),
+    "utf8",
+  );
+  // The live file: everything after the rotation, and no drain at all.
+  writeFileSync(join(dir, "calls.jsonl"), rec("2026-08-20T12:00:00.000Z", "se_pull") + rec("2026-08-20T13:00:00.000Z", "se_pull"), "utf8");
+
+  const log = new CallLog(dir);
+  const scoped = log.query({ filter: { since: "last_retro" } });
+  // The floor is inclusive, so the drain itself and the three records after it
+  // stand: one more in the archive, two live. Without the archive scan this
+  // answered 2 — the live file alone.
+  assert.equal(scoped.total, 4, "the window opens at the archived drain, not at the live file's start");
+  const oldest = (scoped.records ?? []).map((r) => r.ts).sort()[0];
+  assert.equal(oldest, "2026-08-19T10:00:00.000Z", "and it reaches back across the rotation to the drain itself");
 });
 
 // The needs-retro gate moved (owner design 2026-07-27): it holds the FIRST

@@ -121,6 +121,27 @@ including ones that allow no tools at all. The lane handed you the call, so
 the lane does not then refuse it. Before i36 both guards bit, and a state that
 served a bounded answer could make its own answer unreadable.
 
+## A LONG LINE IS CUT WITHOUT A CURSOR, so never read-modify-write source
+
+USE `se_file_patch` FOR EVERY EDIT TO SOURCE. Never read a file whole, edit it
+in memory, and write it back. A patch names `old_string` and `new_string`, so
+it cannot destroy what it did not name.
+
+WHY THE HABIT IS A RULE. `se_file_read` truncates a single long LINE and says
+so in one phrase inside a wall of source. Unlike a `bounded` answer, that cut
+carries NO cursor and the file looks whole. A write-back then makes the cut
+real.
+
+MEASURED 2026-08-20 on i37. `project/deliverable/engine/tools.ts` holds the `se_pull` description
+as one 3,246-character string literal. The read returned it cut at 2,035
+characters. The write-back left an unterminated string and three parse errors,
+and the tool surface would not compile.
+
+WHAT CAUGHT IT WAS BIOME, not the lane. Nothing in the write path asks whether
+the content came from a truncating read.
+
+SO THE CHECK IS ON YOU, and the patch verb removes the need for it.
+
 WRITE A SCRIPT WHEN THE QUESTION IS ABOUT MANY THINGS. Counting what a rule
 touches, routing four hundred blocks, measuring which methods need what,
 applying one shape across a tree — these are programs, not readings. Reading

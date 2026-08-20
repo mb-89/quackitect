@@ -29,3 +29,12 @@ source_refs:
 - Fix `se_web_fetch` to report the final URL after a redirect and apply
   `offset` paging against that resolved page, not the pre-redirect one.
 - Refresh unreachable Codex, Cursor and Claude primary sources or keep their claims unverified.
+
+## Swept 2026-08-20, at the standalone retro after i37 shipped
+
+RE-AFFIRMED AS STANDING, trigger unchanged. i37 did not touch what this entry
+is about, so nothing here moved.
+
+THE LOOK IS THE POINT. A debt nobody re-reads is a lie in the ledger, and this
+line is the evidence that somebody read it on this date.
+

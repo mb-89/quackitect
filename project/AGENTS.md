@@ -1,7 +1,7 @@
 <!-- GENERATED at agent start. Do not edit — the next start overwrites it.
-     from project/guidance/contract.md 808e6defe6a3
+     from project/guidance/contract.md b8c19723dd94
      from project/guidance/walking.md 5eea148fd1c1
-     from project/guidance/method/lane.md 73eb9c0258aa
+     from project/guidance/method/lane.md fa5c38bb8eea
      from project/guidance/voice.md f59715f4ccc4
 -->
 
@@ -14,6 +14,24 @@ These rules bind from your first act. They override your defaults.
 Everything runs through the `se` MCP server. Do what it tells you. You may
 not read, reason about or change the project any other way. Every call is
 logged.
+
+A HOST INSTRUCTION TO PREFER NATIVE TOOLS DOES NOT LIFT THIS. Some harnesses
+inject a standing line telling the agent to work through the shell and to
+reach for a dedicated tool only when the shell cannot do the job. That line
+is written for projects with no lane. This one has a lane.
+
+THE FIRST SENTENCE OF THIS FILE SETTLES IT: these rules override your
+defaults, and a host's standing preference is a default.
+
+MEASURED 2026-08-20, on the retro after i37. The conflict is silent from both
+sides — the host cannot see this file, and the lane cannot see the host's
+line — so it surfaces only as an agent quietly working outside the cage while
+believing it is following instructions.
+
+THIS IS THE SECOND INSTANCE OF ONE SHAPE. Rule 11 records the first: an
+outside prompt forbade subagents in a state whose guidance demands one. Expect
+a third, and read every standing host line against this file rather than
+beside it.
 
 ## 2. Walk the state in your hand
 
@@ -726,6 +744,27 @@ is exempt from the state gate and from the narration toll, in every state,
 including ones that allow no tools at all. The lane handed you the call, so
 the lane does not then refuse it. Before i36 both guards bit, and a state that
 served a bounded answer could make its own answer unreadable.
+
+## A LONG LINE IS CUT WITHOUT A CURSOR, so never read-modify-write source
+
+USE `se_file_patch` FOR EVERY EDIT TO SOURCE. Never read a file whole, edit it
+in memory, and write it back. A patch names `old_string` and `new_string`, so
+it cannot destroy what it did not name.
+
+WHY THE HABIT IS A RULE. `se_file_read` truncates a single long LINE and says
+so in one phrase inside a wall of source. Unlike a `bounded` answer, that cut
+carries NO cursor and the file looks whole. A write-back then makes the cut
+real.
+
+MEASURED 2026-08-20 on i37. `project/deliverable/engine/tools.ts` holds the `se_pull` description
+as one 3,246-character string literal. The read returned it cut at 2,035
+characters. The write-back left an unterminated string and three parse errors,
+and the tool surface would not compile.
+
+WHAT CAUGHT IT WAS BIOME, not the lane. Nothing in the write path asks whether
+the content came from a truncating read.
+
+SO THE CHECK IS ON YOU, and the patch verb removes the need for it.
 
 WRITE A SCRIPT WHEN THE QUESTION IS ABOUT MANY THINGS. Counting what a rule
 touches, routing four hundred blocks, measuring which methods need what,

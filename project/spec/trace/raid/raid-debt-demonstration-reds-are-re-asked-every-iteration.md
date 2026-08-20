@@ -7,7 +7,7 @@ statement: observe-red asks every non-test spec in the corpus for a red observat
 owner: the owner
 trigger: the next iteration that reaches observe-red, which is every iteration
 status: open
-looked: 2026-08-19
+looked: 2026-08-20
 breaks_how_badly: abrasive
 how_likely: expected
 impact: observe-red refuses while any box stands open. i35 minted 2 demonstration specs and met a checklist of 15, so 13 belonged to other records and none of them had a red for THIS delta to observe. The alternative is ticking boxes on reds nobody watched, which is worse — so the walk stops until each one is either fabricated or owed.
@@ -82,3 +82,18 @@ one call site, and it is not this one.
 
 TRIGGER RE-AFFIRMED, and it fires on the next iteration that reaches the step,
 which is every iteration.
+
+## Swept 2026-08-20, at the standalone retro after i37 shipped
+
+THE TRIGGER FIRED AGAIN, as this row says it always does. i37 reached
+observe-red and re-answered demonstrations belonging to closed iterations.
+
+WHAT i37 ADDED IS ONE MEASUREMENT AND ONE HALF-FIX. `tests/checklists-stay-home.test.ts`
+now pins that both halves of the observe-red evidence scope to the same record,
+so the two halves can no longer disagree about which iteration they are about.
+
+THE COST THIS ROW NAMES IS UNCHANGED. Scoping the two halves together does not
+shrink the corpus either half is asked about.
+
+RESCHEDULED, TRIGGER RE-AFFIRMED: the next iteration reaching observe-red.
+
