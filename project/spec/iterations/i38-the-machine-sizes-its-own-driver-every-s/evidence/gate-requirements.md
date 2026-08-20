@@ -1,5 +1,6 @@
 ---
 form: gate-requirements
+reopened: "2026-08-20T11:30:46.661Z — blessed on evidence an adversarial pass has since falsified: the non-monotonicity was manufactured by quoting half a two-sentence note and ignoring the omit lists, and the claim that this iteration inherited draft-vision at major is contradicted by its own signed form"
 bless: blessed by agent
 by: agent
 signed_off: 2026-08-20T11:21:50.750Z

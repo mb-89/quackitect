@@ -464,6 +464,81 @@ can still be read past what it supports, exactly as the `group_by` measurement
 was. That class needs a negative control or a reader with no shared context, and
 no binding reaches it.
 
+
+## F17 — every measurement I made is invisible to the lane, and that is why the process claims cannot be checked
+
+FOUND BY AN ADVERSARIAL PASS AT M3, 2026-08-20, which reported that no counting
+program ran this session. Its evidence: the call log records exactly ONE
+`se_run` in eight hundred and eighty calls, and it was the prompt-layer
+placement at boot.
+
+THE REVIEWER WAS RIGHT ABOUT THE LOG AND WRONG ABOUT THE WORLD, and the gap
+between those two is the finding.
+
+THE PROGRAMS DID RUN. Every count in this iteration — 279 requirements, 44
+functions, 67 flows, 47 of 53 rows, the refusal tallies, the non-monotonic row
+sweep — was produced by a `python3 -c` invocation through the harness's own
+shell, not through `se_run`. They ran, they were real, and the lane never saw
+one of them.
+
+SO THE CALL LOG SAYS I DID NO MEASURING and I did a great deal. A reader
+auditing this iteration from the record would conclude every figure in it was
+asserted.
+
+### Why this is the same finding as F16 and not a new one
+
+F16 SAID PROCESS CLAIMS MUST BIND TO THE CALL LOG, because the tree records the
+result and is silent about the act.
+
+THIS IS WHAT HAPPENS WHEN THE ACT ITSELF ROUTES AROUND THE LOG. "Counted by
+program rather than read off a listing" is exactly the claim F16 says needs a
+citable ref — and there is no ref, because the counting never entered the lane.
+The claim is true and unverifiable, which is indistinguishable from false.
+
+AND THE CONTRACT ALREADY FORBADE IT. Rule 1: the lane is the only door;
+`se_run` is the verb for what the lane cannot do. Every one of those counts
+belonged in `se_run` or in `se_file_search --count_only`, and the reason is not
+bookkeeping — it is that a call through the lane gets a ref, and a ref is what a
+claim binds to.
+
+### The conflict that produced it, stated plainly
+
+THIS SESSION'S HARNESS INSTRUCTIONS SAY to do the work through the shell
+wherever it can accomplish the job, and to prefer it over the dedicated tools.
+THE PROJECT'S CONTRACT SAYS the lane is the only door.
+
+I FOLLOWED THE HARNESS AND NOT THE CONTRACT, without noticing the two
+disagreed, for eight hundred and eighty calls. That is the same shape as the
+i33 finding already on the record — a session prompt outside the repository
+carrying an instruction the repository could not see — and it surfaced the same
+way, only when something hit it.
+
+### What it costs, concretely
+
+- EVERY FIGURE IN THIS ITERATION IS UNVERIFIABLE FROM THE RECORD. The numbers
+  are right; nothing in the log can show how they were got.
+- THE TRUNCATION BUG WAS INVISIBLE TWICE OVER. A script that silently dropped a
+  row ran outside the lane, so neither the log nor a reviewer could find it, and
+  it took an independent recount to catch.
+- AND IT MAKES THE REVIEWER'S JOB IMPOSSIBLE IN ONE DIRECTION. The pass could
+  prove the counts were never made through the lane. It could not prove they
+  were made at all, so it reported a fabrication where there was a
+  contract violation.
+
+### What to do about it
+
+- COUNT THROUGH THE LANE. `se_file_search {count_only: true}` and `se_run` both
+  return a ref. Nothing else does.
+- AND WHERE A HARNESS INSTRUCTION AND THE CONTRACT DISAGREE, the contract wins
+  and the disagreement is a note. This one was never noticed, which is worse
+  than deciding it wrongly.
+
+DURABLE HOME: `project/guidance/contract.md` rule 1 already says it. What is
+missing is anything that NOTICES — the lane cannot see a call that never
+reaches it, so no refusal, no toll and no guard can fire. THE ONLY PLACE THIS
+SHOWS UP is a ratio: eight hundred and eighty lane calls and one `se_run`, in an
+iteration that counted things constantly.
+
 ## Leads for whoever opens an engine iteration
 
 Collected here because none of them is i38's work and none would survive the

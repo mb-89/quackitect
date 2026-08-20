@@ -3,185 +3,98 @@ minted_in: i38-the-machine-sizes-its-own-driver-every-s
 id: raid-asm-a-state-is-equally-hard-at-every-change-size
 type: "[[raid]]"
 kind: issue
-statement: "FALSIFIED 2026-08-20. The design gives each matrix row ONE complexity value; the probe found a single row spanning three rungs across its columns, and not monotonically, so one value per row cannot express what the matrix already says."
+statement: "A row's difficulty varies with change size while the design gives each row ONE complexity value. The SPREAD is established; the NON-MONOTONICITY this entry first claimed was manufactured by quoting half a note and is withdrawn."
 owner: the owner
 trigger: "the first rating pass over the matrix, and the first walk at a change size other than the one the ratings were judged against"
 status: open
-impact: "A rating judged against the column it was written for is wrong at every other column, in the expensive direction at the small end: a patch walk pays a major walk's driver for a state the matrix itself has already tailored down to almost nothing."
-breaks_how_badly: crippling
+impact: "A rating judged against the column it was written for is wrong at every other column, in the expensive direction at the small end: a patch walk pays a major walk's driver for a state the matrix itself has already tailored down."
+breaks_how_badly: corrosive
 how_likely: expected
-falsified: 2026-08-20
-probe: "COUNTED OVER THE MATRIX AT i38's identify-assumptions, 2026-08-20, AND RECOUNTED AT THE REQUIREMENTS GATE BECAUSE THE FIRST COUNT WAS WRONG. All FIFTY-THREE rows declare all four change-size cells; FORTY-SEVEN differ across the columns and six are identical in all four. The first count said forty-six of fifty-two: the counting script read only the first three thousand characters of each file, so one long row lost its fourth cell and dropped out of the population entirely. The conclusion is untouched and the method was not. The spread is not cosmetic: draft-vision is `none` at patch, `inherit` at minor, `tailored` at major and `full` at product — four different amounts of work under one row name. write-requirements is `tailored` at patch and `full` everywhere else. The design's own words are that every STATE says how hard it is, and the hazard it worried about — a key added to all rows moving the matrix hash — is stated per row, so one value per row is what is proposed."
+probe: "SPREAD ESTABLISHED, NON-MONOTONICITY WITHDRAWN, both 2026-08-20. THE SPREAD HOLDS on M3_10_write-requirements: `tailored` at patch, where the note says CLARIFICATION ONLY and no new requirement rows, against `full` everywhere else, where every requirement is authored with its kind, verify method and breaks-if-removed. Repairing wording against a checkable shape and authoring a requirement a reader must judge are different rungs. THE NON-MONOTONICITY WAS FALSE. It rested on rating draft-vision C1 at major from the first sentence of a two-sentence note; the second sentence says a major that shifts a goal or a conflict REWRITES THE AFFECTED PART OF THE PACKET. The row's evidence fields settle it mechanically: big_idea, to_be_world and moore_pitch each carry `omit: [minor]` and goal_system does not, so minor asks ONE field and major asks four. Minor is a strict subset of major."
 probed: 2026-08-20
 source_refs:
   - i38-the-machine-sizes-its-own-driver-every-s
   - req-every-matrix-row-declares-its-complexity
-  - req-a-milestone-takes-the-maximum-complexity-over-its-rows
 weighs_with: raid-risk-a-hand-declared-rung-drifts-upward-and-nothing-ever-says-so
 weighs_against: none
 ---
 
-## FALSIFIED AT probe-assumptions, 2026-08-20
+## WHAT THIS ENTRY FIRST CLAIMED, AND WHY HALF OF IT IS WITHDRAWN
 
-IT WAS AN ASSUMPTION FOR ONE STATE. The probe named in it was run at the next
-state and came back negative, so the kind is now `issue`: it has happened, it
-is present tense, and the id is kept.
+IT CLAIMED THREE RUNGS AND NON-MONOTONICITY, and built both on a reading of
+`draft-vision`'s four column notes. An adversarial pass with no shared context
+took the row apart and the non-monotonic half did not survive.
 
-THE PROBE AS WRITTEN: take a row whose cells span a wide range, rate it at two
-columns, and see whether the ratings differ by a rung or more.
+THE QUOTE WAS CUT IN HALF. The major note is two sentences. The first —
+"INHERIT-WITH-JUDGMENT: point to the resident vision and argue in one paragraph
+whether the change bends it" — reads as accept-only, and that is the half this
+entry quoted. THE SECOND SENTENCE: "A major that leaves the vision untouched
+inherits; one that shifts a goal or a conflict rewrites the affected part of the
+packet, and only that part." Rewriting the part a shifted goal touches is the
+same act the entry rated C3 at minor.
 
-`draft-vision` WAS THE ROW, and its own column notes are the evidence.
+THE EVIDENCE FIELDS SETTLE IT WITHOUT ANY READING AT ALL. `big_idea`,
+`to_be_world` and `moore_pitch` each carry `omit: [minor]`; `goal_system` does
+not. So minor asks ONE field and major asks FOUR, `goal_system` among them.
+MINOR IS A STRICT SUBSET OF MAJOR in both fields asked and judgment asked, and
+no non-monotonicity can survive that. The omit lists were never looked at.
 
-| column | what the row's note asks for | rung |
-| --- | --- | --- |
-| patch | "Does not apply. The vision is axiomatic and a patch never touches it." | none |
-| minor | one question survives — name a goal conflict the delta creates and rule which wins | C3, narrowly |
-| major | "INHERIT-WITH-JUDGMENT: point to the resident vision and argue in one paragraph whether the change bends it" | C1 |
-| product | "STANDING ARTIFACT: the vision packet — big idea, to-be world, goal system, pitch … the axiom every smaller column inherits" | C4 |
+AND THE ROW'S OWN CELLS ARE MONOTONIC: `none`, `inherit`, `tailored`, `full`,
+non-decreasing. The entry inverted an ordering the row declares about itself.
 
-THREE RUNGS UNDER ONE ROW NAME, and worse than that: NOT MONOTONIC. Minor asks
-for a small piece of authored judgment while major asks the agent to accept a
-standing artifact and say whether it moved. The bigger column is the EASIER one.
+## THE WORST PART WAS NOT THE READING
 
-CORROBORATED BY A SECOND ROW. `write-requirements` is `tailored` at patch —
-"CLARIFICATION ONLY … an unclear requirement whose wording produced the wrong
-output is repaired in place … No new requirement rows" — and `full` everywhere
-else, where every new requirement is authored with its kind, its verify method
-and its breaks-if-removed. Repairing wording against a checkable shape is C2;
-authoring a requirement a reader must judge is C3.
+THIS ENTRY CLAIMED FIRST-HAND EVIDENCE AND THE FIRST-HAND EVIDENCE IS FALSE. It
+said: "This iteration walked `draft-vision` at major. The work was an inherit:
+point at the resident vision, argue the delta in a paragraph, rewrite nothing."
 
-AND MEASURED FROM THIS WALK RATHER THAN ONLY FROM THE PAGE. This iteration
-walked `draft-vision` at major. The work was an inherit: point at the resident
-vision, argue the delta in a paragraph, rewrite nothing. That is not the same
-act as authoring a vision packet and it is not the same rung.
+THE SIGNED FORM SAYS OTHERWISE, and it is in this record's own evidence folder.
+`draft-vision.md` carries a filled `big_idea` of three paragraphs, a
+`to_be_world` of five, a `goal_system` of five goals with three conflicts each
+ruled and a priority order, and a four-paragraph `moore_pitch` — roughly four
+thousand eight hundred characters. THE WHOLE PACKET WAS AUTHORED. Nothing was
+inherited and a great deal was written.
 
-## MECHANICAL CORROBORATION, found at the requirements gate
+SO THE ENTRY CITED THE WALKER'S MEMORY OF ITS OWN WORK against a file the
+walker had signed ninety minutes earlier, and the memory was wrong in the exact
+direction the argument needed. That is the most dangerous shape available: a
+process claim, stated as measurement, contradicted by an artifact in the tree.
 
-THE NON-MONOTONICITY ABOVE IS A READING OF PROSE and the walker who wanted the
-result made it. Here is the same finding without a judgment in it.
+## WHAT SURVIVES, AND IT IS ENOUGH TO KEEP THE ISSUE OPEN
 
-TWO ROWS ARE NON-MONOTONIC IN THEIR APPLICATION CELLS, which is frontmatter
-rather than interpretation:
+DIFFICULTY DOES VARY WITH COLUMN. `write-requirements` is the clean case and it
+is a monotonic row, so it carries spread without carrying the withdrawn half:
+at patch the note says CLARIFICATION ONLY, an unclear requirement repaired in
+place, EARS shape and verify method surviving the edit, no new rows. At every
+other size every new requirement is authored with its kind, its verify method
+and its breaks-if-removed filled.
 
-| row | patch | minor | major | product |
-| --- | --- | --- | --- | --- |
-| M4_25 run-candidates | none | none | full | tailored |
-| M6_15 run-spikes | none | none | full | tailored |
+REPAIRING WORDING AGAINST A CHECKABLE SHAPE IS NOT AUTHORING A REQUIREMENT A
+READER MUST JUDGE. One value for that row is wrong at one end or the other.
 
-BOTH DECLARE THAT PRODUCT DOES LESS THAN MAJOR. `run-spikes` applies in full at
-major — every seeded spike runs, parallel, each within its timebox — and at
-product becomes a STANDING ARTIFACT: the spike records retained with their
-iteration.
+## What this costs the design, restated honestly
 
-SO THE COLUMNS ARE NOT AN ORDERED SCALE OF INCREASING WORK, and the matrix said
-so before this iteration looked. Anyone can re-run the comparison: read four
-frontmatter keys per row and check whether they rise.
+ONE VALUE PER ROW IS STILL WRONG, on spread alone. A rating keyed to one
+unnamed column reads as if it applied at all four.
 
-WHAT THIS KILLS INDEPENDENTLY OF THE draft-vision READING. The cheap repair for
-a per-row rating was one value plus a per-column adjustment. That repair needs
-the columns to be ordered. Two rows say they are not, on evidence that involves
-no rung, no ladder and no judgment.
+THE CHEAP REPAIR IS BACK ON THE TABLE and this entry no longer rules it out. If
+the columns are ordered — and for `draft-vision` they demonstrably are — then one
+row value plus a per-column adjustment could express the spread. WHETHER THE
+ADJUSTMENT IS DERIVABLE is unknown, and deriving it would need per-column data
+anyway, which is the simpler thing to store.
 
-WHAT IT DOES NOT ESTABLISH, said rather than blurred: application and difficulty
-are different things, and a row doing LESS at product does not automatically do
-EASIER work there. This corroborates the premise the cheap repair rests on
-failing; the three-rung spread itself still rests on reading draft-vision's
-notes.
-
-## WHAT THIS COSTS THE DESIGN
-
-ONE VALUE PER ROW CANNOT EXPRESS IT. The rating has to live where the rest of
-the row's per-size truth already lives — in the cells — or the matrix will carry
-a number keyed to one unnamed column while every walk at another column reads it
-as if it applied.
-
-THE NON-MONOTONICITY KILLS THE CHEAP REPAIR. If bigger columns were always
-harder, one row value plus a per-column adjustment would work. They are not, so
-nothing can be derived from a single number.
-
-AND IT WOULD HAVE FAILED SILENTLY. Nothing compares a declared rung against
-what the work turned out to need, so a rating keyed to the major column would
-have over-driven every patch walk forever with no signal — which is the standing
-drift risk arriving through a door this iteration would have built itself.
-
-## The counter-case, and why it did not survive
-
-THE HONEST ARGUMENT WAS THAT DIFFICULTY AND VOLUME DIFFER: the cells say how
-MUCH of a step applies, not how HARD the judgment is, so the KIND of thinking
-might be stable even where the amount is not.
-
-`draft-vision` REFUTES IT DIRECTLY. Its columns do not differ in amount alone.
-At major the agent ACCEPTS a standing artifact; at product it FRAMES one from
-nothing. Those are different kinds of act by the ladder's own definitions, not
-different sizes of the same act.
-
-## What closes this issue
-
-THE RATING MOVES INTO THE CELLS, or the schema says explicitly which column a
-row's single value is keyed to and every other column is refused a driver rather
-than given the wrong one. The first is more work and is probably right; the
-second is honest and cheap. Either is a change to `req-every-matrix-row-declares-its-complexity`,
-which is why that requirement was amended the same day.
-
-## The original probe, kept
-
-THE CHEAP HALF, run at identify-assumptions: count how many rows already vary by
-column. FORTY-SEVEN OF FIFTY-THREE, six identical.
-
-IT WAS FIRST REPORTED AS FORTY-SIX OF FIFTY-TWO and the error is worth keeping.
-The count was made by a program rather than by eye — which is the correction
-this iteration had already adopted twice — and the program truncated each file
-at three thousand characters, so one long row lost its fourth cell and left the
-population. A MEASUREMENT WITH A SILENT TRUNCATION IN IT IS NOT BETTER THAN A
-GUESS BECAUSE IT WAS AUTOMATED.
-
-AND THE SANITY CHECK WAS ALREADY IN HAND. This iteration established at its
-kickoff gate that the matrix has fifty-three rows, and then wrote fifty-two four
-milestones later without noticing the two figures disagreed.
-
-THE HALF THAT NEEDS THE RATINGS: take any row whose cells span a wide range —
-`draft-vision` is the clearest, running from `none` to `full` — and rate it
-twice, once as the patch column asks and once as the product column asks. If
-the two ratings differ by a rung or more, one value per row cannot be right.
-
-WHAT WOULD FALSIFY THE ASSUMPTION, in order of how likely each is:
-
-- A rating pass that finds itself asking "at which size?" and having nowhere to
-  put the answer. This is the expected outcome and it arrives at M3 or M7.
-- A patch walk paying a top-rung driver for a state its own column marked
-  `none` or `inherit`.
-- Two people rating the same row differently because they were each thinking of
-  a different column, with nothing in the artifact to show why they disagreed.
-
-WHAT WOULD CONFIRM IT: the ratings cluster by row regardless of column, because
-the KIND of judgment a state asks for is stable even when the AMOUNT of work is
-not. That is a real possibility and it is the assumption's honest case — see
-below.
-
-## The honest case for the assumption
-
-DIFFICULTY AND VOLUME ARE NOT THE SAME THING. The cells say how MUCH of a step
-applies, not how HARD the judgment is. `draft-vision` at `tailored` is a
-smaller job than at `full` and it may be the same KIND of job — still framing,
-still a thing only a reader can judge, still C4 by the ladder's own definitions.
-
-IF THAT HOLDS, one value per row is exactly right and the column is irrelevant
-to it. The ladder rates the kind of thinking, and the column rates the amount.
-
-## Why it is registered rather than assumed
-
-BECAUSE NOBODY HAS CHECKED, and the cost of being wrong is asymmetric. If the
-kind is stable, one value per row costs nothing and the entry closes at the
-first rating pass. If it is not, every rating in the matrix is silently keyed to
-one unnamed column, and the small-change walks pay for it forever without
-anything saying so.
-
-AND IT COMPOUNDS WITH THE DRIFT RISK. A rating that is wrong for three of four
-columns will never be contradicted, because nothing compares a declared rung
-against what the work turned out to need.
+TWO ROWS ARE STILL NON-MONOTONIC IN THEIR APPLICATION CELLS —
+`M4_25 run-candidates` and `M6_15 run-spikes`, both `full` at major and
+`tailored` at product, and independently confirmed to be the only two. THAT IS
+ABOUT APPLICATION, NOT DIFFICULTY, and this entry no longer leans on it for
+more than it says.
 
 ## What closes it
 
-THE FIRST RATING PASS, which is this iteration's own work. It should rate one
-wide-spread row at two columns before rating anything else, and say which way it
-came out. That is one row's work and it settles the shape of all fifty-three.
+THE FIRST RATING PASS, rating `write-requirements` at patch and at major. If
+the two differ, per-column stands. If they do not, one value per row is right
+and this entry closes.
+
+AND IT SHOULD RATE `draft-vision` AT MINOR AND MAJOR TOO, now that the omit
+lists are known: one field against four is the sharpest available test of
+whether volume and difficulty come apart.
