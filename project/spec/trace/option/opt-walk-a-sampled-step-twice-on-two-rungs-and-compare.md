@@ -3,7 +3,7 @@ minted_in: i38-the-machine-sizes-its-own-driver-every-s
 id: opt-walk-a-sampled-step-twice-on-two-rungs-and-compare
 type: "[[option]]"
 cluster: the-sizing
-question: how the decision is checked
+question: how over-driving is measured
 statement: "a sampled step is walked twice on two different rungs and the two results compared, so the claim that the rung matters is measured rather than assumed"
 found_by: transform
 source: "SIT Multiplication applied to cluster-the-sizing — copy the walk and change the copy's hand"

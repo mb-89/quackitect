@@ -3,7 +3,7 @@ minted_in: i38-the-machine-sizes-its-own-driver-every-s
 id: opt-the-complexity-rides-the-cell-the-compiled-state-already-carries
 type: "[[option]]"
 cluster: the-sizing
-question: where the difficulty number comes from
+question: how the difficulty reaches the walker
 statement: "the complexity is a value on the matrix cell beside its applies word, compiled onto the state exactly as the cell's prose already is, so obtaining a step's difficulty is a field read on the state the walker is already holding"
 found_by: probe
 source: "probe 4 at find_by_probing — reading engine/rigor-matrix.ts to find where a per-column value could land"

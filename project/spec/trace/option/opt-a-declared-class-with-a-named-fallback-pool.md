@@ -3,7 +3,7 @@ minted_in: i38-the-machine-sizes-its-own-driver-every-s
 id: opt-a-declared-class-with-a-named-fallback-pool
 type: "[[option]]"
 cluster: the-sizing
-question: what happens when the standing mapping has no entry
+question: who resolves a rung to a worker
 statement: the mapping ships with a default entry and an explicit switch saying whether an unmatched class falls through to it or refuses, so the no-match case is a configured decision rather than a surprise
 found_by: prior-art
 source: LiteLLM's tag routing, docs.litellm.ai/docs/proxy/tag_routing — a caller attaches a declared tag, config maps tags to deployments, and a `default` pool plus `allow_fail_open` make no-match a named, configurable condition rather than an error nobody planned

@@ -3,7 +3,7 @@ minted_in: i38-the-machine-sizes-its-own-driver-every-s
 id: opt-name-the-driver-per-state-not-per-milestone
 type: "[[option]]"
 cluster: the-sizing
-question: what the driver is named for
+question: what unit gets a driver named
 statement: "the driver is named for each state as the walk reaches it rather than once per milestone, which removes the reduction entirely and with it the whole problem of one hard item dragging the easy ones onto an expensive walker"
 found_by: without
 source: "trimming — the reduction function exists only because the naming happens at milestone granularity; remove the granularity mismatch and the function has nothing left to do"

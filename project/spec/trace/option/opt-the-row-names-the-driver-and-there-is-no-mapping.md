@@ -3,7 +3,7 @@ minted_in: i38-the-machine-sizes-its-own-driver-every-s
 id: opt-the-row-names-the-driver-and-there-is-no-mapping
 type: "[[option]]"
 cluster: the-sizing
-question: whether a rung is needed between the state and the worker
+question: what the mapping from difficulty to driver holds
 statement: "each row names the worker it needs directly, which removes the rung, the standing mapping and the resolve step, at the price of editing every row when the roster changes"
 found_by: without
 source: "trimming — the mapping exists only to hold an indirection; if the indirection buys nothing the artifact does not need it"

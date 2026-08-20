@@ -3,7 +3,7 @@ minted_in: i38-the-machine-sizes-its-own-driver-every-s
 id: opt-publish-the-driver-only-when-it-changes
 type: "[[option]]"
 cluster: the-sizing
-question: how often the named driver is published
+question: how often the block publishes
 statement: "the block publishes a driver only when the answer differs from the one already standing, so the common case costs nothing and a receiver sees a signal rather than a heartbeat"
 found_by: heuristic
 source: "the heuristic make the common case cheap and the rare case possible, held against the sizing cluster"

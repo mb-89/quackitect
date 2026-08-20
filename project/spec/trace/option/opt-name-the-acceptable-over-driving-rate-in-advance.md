@@ -3,7 +3,7 @@ minted_in: i38-the-machine-sizes-its-own-driver-every-s
 id: opt-name-the-acceptable-over-driving-rate-in-advance
 type: "[[option]]"
 cluster: the-sizing
-question: how a declared class avoids drifting upward with nothing to stop it
+question: how over-driving is measured
 statement: "the design states in advance what proportion of work it is willing to over-drive, and measures against that number, so over-provisioning becomes a budget somebody set rather than a drift nobody sees"
 found_by: analogy
 source: "emergency-department triage, where the two errors are named and priced separately: under-triage is measured and held near zero because it kills, and a substantial over-triage rate is ACCEPTED and stated as the price of that, rather than being discovered later as waste"

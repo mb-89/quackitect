@@ -3,7 +3,7 @@ minted_in: i38-the-machine-sizes-its-own-driver-every-s
 id: opt-a-rung-names-an-intensity-as-well-as-a-worker
 type: "[[option]]"
 cluster: the-sizing
-question: what the standing mapping holds
+question: what the mapping from difficulty to driver holds
 statement: the mapping's entry is not a worker's name but a pair — which worker and how hard it should try — so two steps of different difficulty can share a worker and still cost differently
 found_by: prior-art
 source: the request-level effort parameter documented at platform.claude.com/docs/en/build-with-claude/effort, a per-request intensity ladder orthogonal to model choice which affects tool calls as well as tokens

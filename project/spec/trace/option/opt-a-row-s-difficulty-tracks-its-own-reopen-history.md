@@ -3,7 +3,7 @@ minted_in: i38-the-machine-sizes-its-own-driver-every-s
 id: opt-a-row-s-difficulty-tracks-its-own-reopen-history
 type: "[[option]]"
 cluster: the-sizing
-question: where the difficulty number comes from
+question: how a step's difficulty is arrived at
 statement: "a state's difficulty rises when its own past walks were reopened and falls when they were not, so the number is corrected by the record instead of being fixed by a declaration"
 found_by: transform
 source: "SIT Attribute Dependency applied to cluster-the-sizing — make difficulty vary with a quantity it currently ignores"

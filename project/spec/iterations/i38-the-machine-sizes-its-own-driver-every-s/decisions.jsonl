@@ -313,3 +313,16 @@
 {"ts":"2026-08-20T12:27:27.442Z","op":"update","visit":"iterations/i38/enumerate-space/build_chart@0","node":"d195","brief":"diagnosing the outward-search refusal"}
 {"ts":"2026-08-20T12:28:23.336Z","op":"update","visit":"iterations/i38/enumerate-space/build_chart@0","node":"d196","brief":"looking for the stored script_result timestamp"}
 {"ts":"2026-08-20T12:29:03.166Z","op":"update","visit":"iterations/i38/enumerate-space/build_chart@0","node":"d197","brief":"re-submitting to force a fresh condition run"}
+{"ts":"2026-08-20T12:30:35.917Z","op":"plan","visit":"iterations/i38/enumerate-space/build_chart@0","parent":null,"nodes":[{"id":"d198","brief":"read the morphological method"},{"id":"d199","brief":"consolidate the question axes"},{"id":"d200","brief":"fill and sign build_chart"}]}
+{"ts":"2026-08-20T12:31:32.750Z","op":"update","visit":"iterations/i38/enumerate-space/build_chart@0","node":"d201","brief":"re-reading the chart after the axes moved"}
+{"ts":"2026-08-20T12:33:29.487Z","op":"update","visit":"iterations/i38/enumerate-space/build_chart@0","node":"d202","brief":"minting candidate the-seed-made-total"}
+{"ts":"2026-08-20T12:33:29.627Z","op":"update","visit":"iterations/i38/enumerate-space/build_chart@0","node":"d203","brief":"minting candidate the-derived-ladder"}
+{"ts":"2026-08-20T12:34:08.947Z","op":"update","visit":"iterations/i38/enumerate-space/build_chart@0","node":"d204","brief":"minting candidate the-reader-beside-the-walk"}
+{"ts":"2026-08-20T12:34:09.094Z","op":"update","visit":"iterations/i38/enumerate-space/build_chart@0","node":"d205","brief":"minting candidate the-receiver-decides"}
+{"ts":"2026-08-20T12:35:02.444Z","op":"update","visit":"iterations/i38/enumerate-space/build_chart@0","node":"d206","brief":"build_chart: eight axes, four candidates"}
+{"ts":"2026-08-20T12:37:00.168Z","op":"update","visit":"iterations/i38/enumerate-space/build_chart@0","node":"d207","brief":"minting the incumbent as a chart cell"}
+{"ts":"2026-08-20T12:37:13.318Z","op":"update","visit":"iterations/i38/enumerate-space/build_chart@0","node":"d208","brief":"splitting composable features off the two over-broad axes"}
+{"ts":"2026-08-20T12:38:01.951Z","op":"update","visit":"iterations/i38/enumerate-space/build_chart@0","node":"d209","brief":"writing what each candidate leans on"}
+{"ts":"2026-08-20T12:38:16.278Z","op":"update","visit":"iterations/i38/enumerate-space/build_chart@0","node":"d210","brief":"redrawing the chart with one cell per contested axis"}
+{"ts":"2026-08-20T12:38:33.607Z","op":"update","visit":"iterations/i38/enumerate-space/build_chart@0","node":"d211","brief":"receiver-decides: naming its half-measurement"}
+{"ts":"2026-08-20T12:38:33.770Z","op":"update","visit":"iterations/i38/enumerate-space/build_chart@0","node":"d212","brief":"redrawing the chart with one cell per contested axis"}

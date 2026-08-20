@@ -1,0 +1,80 @@
+---
+minted_in: i38-the-machine-sizes-its-own-driver-every-s
+id: cand-the-derived-ladder
+name: "The derived ladder"
+statement: "Nothing is declared: difficulty is computed from what a state's own matrix cell already makes it do, named per state rather than per milestone, and the claim that the rung matters is tested by walking sampled steps twice."
+type: "[[candidate]]"
+picks:
+  - "[[opt-the-difficulty-is-computed-from-the-row-s-own-field-count]]"
+  - "[[opt-the-complexity-rides-the-cell-the-compiled-state-already-carries]]"
+  - "[[opt-the-roster-and-the-mapping-are-two-records-on-two-clocks]]"
+  - "[[opt-name-the-driver-per-state-not-per-milestone]]"
+  - "[[opt-a-declared-class-with-a-named-fallback-pool]]"
+  - "[[opt-the-mapping-is-checked-for-totality-when-the-machine-compiles]]"
+  - "[[opt-publish-the-driver-only-when-it-changes]]"
+  - "[[opt-walk-a-sampled-step-twice-on-two-rungs-and-compare]]"
+---
+
+## What it leans on
+
+WHAT IT LEANS ON IS A FORMULA NOBODY HAS WRITTEN, and that is the whole risk.
+
+- Field count tracks difficulty. Probe 1 shows it DISCRIMINATES at major where
+  the declared word does not, which is not the same as showing it discriminates
+  CORRECTLY. Seven classes ranked wrongly are worse than one class ranked not at
+  all, because the wrong ranking is actionable.
+- A derived number cannot drift. This one is structural rather than empirical:
+  there is no typed value to raise, and raising the derived value means adding
+  evidence fields, which is a visible change to what the state does.
+- Two walks of one step can be compared. Probe 3 established the method and gave
+  the scale — median similarity 0.81 between a form and its own repair — but the
+  agreement threshold is a design decision nobody has made.
+
+IT ALSO LEANS ON THE SAME UNMEASURED CLAIM AS EVERY OTHER LINE, with one
+difference: it is the only line that carries the experiment that would settle it,
+so it is the only line that can find out it was wrong.
+
+## Why this one
+
+IT IS THE ONLY CANDIDATE THAT CANNOT DRIFT, and drift is the failure the
+literature is loudest about. A declared number is cheap to raise and nothing
+contradicts it. A number nobody types has nothing to raise: making a state
+harder means adding evidence fields to it, which is a visible change to what
+the state does.
+
+PROBE 1 MEASURED THAT THE DERIVATION WORKS WHERE IT MATTERS. At major, the
+declared rigor word reads `full` on forty-nine of fifty-three rows and ranks
+nothing, while the field count spreads across seven classes. The derived signal
+is informative exactly where the declared one is a constant.
+
+DROPPING THE MILESTONE MAXIMUM FOLLOWS FROM THE SAME MEASUREMENT. Once the
+number is free to compute, there is no reason to pay for computing it once per
+milestone, and the spread the maximum hides is the waste it was hiding.
+
+## How it works
+
+obtain-a-step-s-difficulty computes from the compiled cell: how many evidence
+fields the row still asks for at this column, and whether the method it names is
+a judgement method or a stamp. reduce-a-milestone-to-one-difficulty does not
+run — every state carries its own. resolve-a-difficulty-to-a-driver maps to a
+rung naming both a worker and an intensity, with a named pool.
+publish-the-driver-outward emits on change, which matters more here because
+per-state naming multiplies the raw rate.
+
+THE ACCOUNTABILITY IS AN EXPERIMENT RATHER THAN AN AUDIT. A sampled step is
+walked twice, once at the named rung and once a rung below, and the two signed
+forms are compared. Where they agree the rung was not needed there; where they
+diverge it earned its keep. Probe 3 established that the comparison is
+computable and gave the range a repair pass produces — median similarity 0.81
+between a form and its own repair — so an agreement threshold has a measured
+scale to sit against.
+
+## What it costs
+
+THE FORMULA IS A DESIGN DECISION NOBODY HAS MADE, and a bad formula is worse
+than a bad declaration because it is wrong everywhere at once. Field count is a
+reading measure wearing a judgement label, and it cannot express a state that
+asks one field and needs deep judgement.
+
+DOUBLE-WALKING COSTS MONEY ON THE SAMPLE and needs an agreement rule nobody has
+written. Two signed forms are never byte-identical.

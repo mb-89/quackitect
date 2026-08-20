@@ -3,7 +3,7 @@ minted_in: i38-the-machine-sizes-its-own-driver-every-s
 id: opt-the-record-is-the-channel-and-there-is-no-separate-publication
 type: "[[option]]"
 cluster: the-account
-question: what the block publishes
+question: where the publication lands
 statement: "the call record carries the named driver and that is the whole publication, so a receiver learns the recommendation by reading the log rather than by being told"
 found_by: transform
 source: "SIT Task Unification applied to cluster-the-account — give the record a second job"

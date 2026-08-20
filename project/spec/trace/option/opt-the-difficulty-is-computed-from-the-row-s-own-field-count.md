@@ -3,7 +3,7 @@ minted_in: i38-the-machine-sizes-its-own-driver-every-s
 id: opt-the-difficulty-is-computed-from-the-row-s-own-field-count
 type: "[[option]]"
 cluster: the-sizing
-question: where the difficulty number comes from
+question: how a step's difficulty is arrived at
 statement: "a state's difficulty at a change size is computed from what the rigor matrix already makes it do at that size — the fields it asks for and the method it names — instead of being declared alongside them"
 found_by: transform
 source: "SCAMPER Combine applied to cluster-the-sizing — merge the new declaration into the row that already exists"

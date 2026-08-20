@@ -3,7 +3,7 @@ minted_in: i38-the-machine-sizes-its-own-driver-every-s
 id: opt-score-the-work-at-dispatch-instead-of-declaring-it
 type: "[[option]]"
 cluster: the-sizing
-question: how the driver for a piece of work is decided
+question: how a step's difficulty is arrived at
 statement: the strength a piece of work needs is estimated when the work arrives rather than written into the artifact beforehand, and the estimator is corrected by what happened afterwards
 found_by: prior-art
 source: Cursor's router, described at cursor.com/blog/how-cursor-router-works — a trained complexity predictor emitting a continuous score per request, retrained on live traffic labelled by whether the user proceeded or corrected; and AWS Bedrock Intelligent Prompt Routing, docs.aws.amazon.com/bedrock/latest/userguide/prompt-routing.html, which predicts per-request response quality against a tunable threshold
