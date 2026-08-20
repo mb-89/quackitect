@@ -6,8 +6,9 @@ kind: issue
 statement: "The fatal live-read requirement forbids pinning the complexity anywhere, but the harm it was written against is confined to the demand ledger, and the ledger is a narrow structure that a cell value cannot reach."
 owner: the walking agent
 trigger: "any candidate that carries the complexity on the compiled machine, which is every candidate riding the cell"
+looked: 2026-08-20
 status: open
-impact: "As written the requirement rules out the cheapest implementation on the chart — three edits to code that already runs — and rules it out for a reason that does not apply to it. A must-priority constraint that over-reaches costs the design its best candidate at gate-design, silently, because a constraint is checked and not argued."
+impact: "As written the requirement rules out the cheapest implementation on the chart — three edits to code that already runs — and rules it out for a reason that does not apply to it. A must-priority constraint that over-reaches costs the design its best candidate at gate-candidates, silently, because a constraint is checked and not argued."
 breaks_how_badly: degraded
 how_likely: expected
 probe: "MEASURED AT probe 4, find_by_probing, by reading the code the requirement is about. The harm named in breaks_if_removed is demand movement: engine/iterations.ts:329 shapeOf serialises exactly four keys — depends_on sorted, busbar, seeds, runs — and :350 reopens a record where two shapes differ. A value on RigorMatrixCell reaches none of those four. It reaches the compiled StateDecl, by the same path engine/rigor-matrix.ts:612 already uses for the cell's prose, and the compiled machine is written to the pin at iterations.ts:236. So the value would be PINNED, which the statement forbids, and would NOT move a demand, which is the only harm the requirement records."
@@ -46,5 +47,5 @@ breaks_if_removed — a stated harm from staleness — or it is struck and the
 requirement says what it means: the complexity shall never enter a record's demand
 ledger. The second is what the risk node behind it actually describes.
 
-THIS IS FOR gate-design TO RULE ON, not for the finder to fix. A finder that
+THIS IS FOR gate-candidates TO RULE ON, not for the finder to fix. A finder that
 amends the requirement it is searching under has stopped searching.

@@ -706,7 +706,7 @@ probe also found that `req-the-complexity-value-is-read-live-and-never-pinned`
 forbids more than its own reason needs. Its stated harm is demand movement;
 `shapeOf` serialises four keys and a cell value reaches none of them. Logged as
 `raid-iss-the-live-read-rule-forbids-more-than-its-own-reason-needs` for
-gate-design.
+gate-candidates.
 
 WHAT THE FOUR DID TO THE OPTION SET. One new option, three standing options moved
 from reasoned to measured, and one standing requirement found over-stated. The
