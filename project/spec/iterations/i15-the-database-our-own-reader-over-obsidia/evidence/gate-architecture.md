@@ -2,7 +2,7 @@
 form: gate-architecture
 bless: blessed by agent
 by: agent
-signed_off: 2026-08-16T18:26:25.734Z
+signed_off: 2026-08-19T17:42:22.001Z
 authors: agent
 files: null
 ---
@@ -40,7 +40,7 @@ evaluate-architecture closed: 25 scenarios ruled (24 addressed, 1 at risk), 8 fi
 
 ## verdict
 
-pass — the structure numbers are clean, the one at-risk finding is on the register rather than silently passed, and the decomposition traces cleanly to the DSM coupling computed three states earlier; M7 builds inside this baseline
+pass — zero interface debt, zero idle elements, zero unimplemented functions at decompose-structure; all quality scenarios ruled at evaluate-architecture, one at-risk finding (real-scale query timing) correctly minted rather than hidden. The corpus-drift scenarios found this session were verified against actual code before being ruled, not assumed.
 
 ## follow_up
 
@@ -48,3 +48,16 @@ M6/M7 inherit: the req-call-answers-in-one-second risk against el-query-evaluato
 
 ## anything_else
 
+## goals_served
+
+- Ship a read-only lane verb that reads nodes, edges, states and notes from .base files, returns filtered rows with chosen fields, and refuses an unknown field by naming the field list.: nothing yet — m7 owns the build; m5 decomposed the winning candidate's structure (zero interface debt, zero idle elements) and evaluated it against the quality scenarios, an at-risk finding on real-scale timing minted this milestone.
+- Harvest v1's 25 working .base query files from `spec/queries/` at ref `main`, plus the reader ADR at `spec/decisions/adr-query-in-engine.md`.: nothing yet — still owed at the harvesting sub-step.
+- Extend the pinned Bases subset only where a harvested query needs it, test-first, reopening the decision rather than smuggling in a silent extension.: nothing yet — m5/m6 own it.
+- Add conformance fixtures that pin the subset against drift.: nothing yet — m7 (author-tests) owns it.
+- Fix raid-debt-delta-default-views so the $-item resolvers default to the bound record's minted_in delta, with an opt-in to widen to the corpus.: nothing yet — m7 owns the resolver-default rewrite.
+- Build the BM25 retrieval sibling as its own lane verb over the same corpus, forcing per-candidate disposition rather than raw retrieval, and skipping what the graph already encodes structurally.: nothing yet — m5 recorded the deciding ADR (raid-dec-i15-query-answers-via-declarative-view-spec) that both verbs build against; m7 owns the build.
+- Mint the interface entries both new lane verbs owe.: nothing yet — owed once the verbs exist.
+
+## bound_breaches
+
+- if-agent-harness-to-entrypoint: not breached — no calls against this interface have run since gate-kickoff last signed; M5 states used file/read/write/search tools only.

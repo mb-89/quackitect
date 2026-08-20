@@ -67,6 +67,36 @@ The trigger stands unchanged.
 
 RE-ACCEPTED, and the trigger fired twice in one record. i5's validation gate served 24 must stories and 9 value props for a delta of five requirements, and observe-red served the whole non-test corpus. Both are this debt's exact cost. i5 minted [[raid-iss-a-gate-form-asks-the-standing-set-where-its-guidance-says-the-delta]] from the gate half before finding this entry; the two describe one repair and it should be built once.
 
+## Repayment landed 2026-08-19, at i15's fix-delta-default-resolvers chunk
+
+FOUR RESOLVERS NOW DEFAULT TO THE BOUND RECORD'S OWN minted_in, WITH AN
+EXPLICIT `:all` OPT-IN: $experiments, $requirements, $test-specs,
+$design-specs, $value-props (all through typedItems), $claim-specs, and
+$must-stories. $promotions is fixed too, but differently — its own owner
+derivation (`basename(traceRoot)`) never actually matched under the current
+one-tree-one-path ADR, so it silently stayed corpus-wide since the day it
+was written; the owner now comes from the bound evidence folder instead,
+the same source every other fix here uses.
+
+Proven by node-scoping.test.ts's "the delta-default view": two records'
+worth of requirement nodes, a bound evidence folder, and three cases — the
+bare source shows only the bound record's own node, `:all` shows both, and
+with nothing bound the legacy corpus-wide behaviour is untouched.
+
+SEVEN RESOLVERS ARE DELIBERATELY LEFT CORPUS-WIDE: $functions, $clusters,
+$flows, $options, $candidates, $criterion_pool, $compounding_suspects, and
+$assumptions. These model something that spans records — an architecture,
+a candidate pool, a comparison in progress — not a per-record history list.
+Scoping them to minted_in risks hiding the very options a walk needs to
+place a new node against (a function belongs in an existing cluster another
+record minted; a candidate is compared against options nobody in this
+record proposed). Narrowing them needs a design pass this chunk did not do,
+not a mechanical repeat of the typedItems fix.
+
+STATUS STAYS OPEN. The debt's own closure bar ("every $-item resolver")
+is not fully met — eight of fifteen source names are fixed, covering the
+debt's own worked example (test-specs) exactly. The remaining seven are a
+named, reasoned follow-up, not a silent gap.
 ## Swept 2026-08-19, at i9's onboard-retro: RESCHEDULED
 
 UNMOVED. `engine/stateform.ts` line 928 and line 943 still list the whole

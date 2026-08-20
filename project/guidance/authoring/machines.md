@@ -34,7 +34,7 @@ the first pull, and the machine is done when everything before end has
 transitioned into it.
 
 ALL machines share the SAME two notes
-(`deliverable/machines/states/start.md` / `end.md`, `state_kind: start` /
+(`project/deliverable/machines/states/start.md` / `end.md`, `state_kind: start` /
 `end`). Never write machine-specific content into them, and never create
 per-machine start/end notes.
 
@@ -80,7 +80,7 @@ priority: operational        # HUMAN INVOLVEMENT: the weight of ENTERING this
                              # below). Never a number.
 tags: review                 # optional; joins the state to guidance (the pull's tag rule)
 exit_read:                   # conditions are FLAT keys: <entry|exit>_<type>.
-  - workspace/AGENTS.md      # YAML lists render as chips in Obsidian —
+  - project/AGENTS.md      # YAML lists render as chips in Obsidian —
   - project/guidance/voice.md    # comma strings are accepted too
 exit_script:
   - project/deliverable/engine/bin/preflight.ts
@@ -127,7 +127,7 @@ at or below the dial. The human always may. Work INSIDE a state is never
 gated — only entering is.
 
 THE RUNGS ARE WORDS, and the words are the truth (owner cut-over ruling
-2026-08-12). The ladder LIVES in machines/scale.md; the engine reads it,
+2026-08-12). The ladder LIVES in project/deliverable/machines/scale.md; the engine reads it,
 and the numbers beside the rungs are transitional anchors for the
 weighing. Author `priority:` as a rung word:
 

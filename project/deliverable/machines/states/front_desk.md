@@ -8,7 +8,7 @@ legal_tools: all, se_note_drain
 guidance: |
   THE FRONT DESK - the router with a brain.
 
-  The method rides in and you follow it. It is guidance/method/front-desk.md,
+  The method rides in and you follow it. It is project/guidance/method/front-desk.md,
   pulled by tag.
 
   INFORM YOURSELF over the machinery, so the advice is current. se_survey

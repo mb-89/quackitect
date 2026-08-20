@@ -30,6 +30,8 @@ The agent asks the query verb for every node of kind decision whose statement or
 BUILT, AND UNREACHABLE. `answerStructuredQuery` takes a kind and a named field list, which is this slide's shape almost word for word. i15's own `build-query-evaluator` evidence, signed 2026-08-16, records it implemented with four of four cases green. What is missing is one hop — a verb — rather than any of the work this slide describes.
 
 NOT YET AVAILABLE. i15 is still `status: open`, so the verb this slide describes does not exist in the lane. `engine/bases.ts` and `engine/basesclient.ts` stand as the reader beneath it, which is why the slide is a claim about work in flight rather than about a gap nobody has started.
+
+DEMONSTRATED 2026-08-19, i15 run-demos. `se_query` is wired and reachable. The demonstration asked for architecture decisions by kind and got filtered rows back, naming exactly the fields it wanted. Report: rpt-answer-what-does-this-touch.md in i15 own reports folder.
 ---
 
 The verb returns filtered rows — only the matching nodes, only the named fields — instead of a directory to search by hand.
@@ -37,6 +39,8 @@ The verb returns filtered rows — only the matching nodes, only the named field
 BUILT AND TEST-VERIFIED. `tests/query.test.ts` drives filtered rows and named fields directly. NOT DEMONSTRATED, because the actor this story names cannot call it: the demonstration is tsp-a-structured-query-answers-what-a-decision-touches, and its step 2 has nothing to call.
 
 THE SHAPE IS ALREADY PROVEN ELSEWHERE, which is what makes this credible rather than hopeful. The evidence forms already serve exactly this: `probe-assumptions` renders a node-table over 42 raid nodes with `probe` and `probed` as named columns, and writing a cell writes that key on that node. Filtered rows with named fields exist — they are just not reachable as a verb.
+
+DEMONSTRATED 2026-08-19, i15 run-demos, AND A REAL BUG FOUND ON THE WAY. The first real run against a harvested .base file returned the whole vault, not filtered rows: parseBase silently dropped the file own top-level filters. Fixed the same session (engine/tables.ts), with two new regression tests. Re-run after the fix returned correctly filtered rows. Report: rpt-answer-what-does-this-touch.md.
 ---
 
 The agent asks for a field that does not exist on that node type. The verb refuses by name and lists the fields that do exist, instead of returning an empty or wrong result.
@@ -44,6 +48,8 @@ The agent asks for a field that does not exist on that node type. The verb refus
 BUILT, at `engine/query.ts:51`. It names the unknown field and lists the legal ones for that kind. AND THE CONTRAST IS ON FILE: the log query an agent CAN reach does the opposite, dropping records that match its own filter and reporting `older: 0` while doing it — raid-iss-the-call-log-query-omits-matching-records-and-says-it-did-not. The correct behaviour sits behind the closed door and the silent miss is the one that ships.
 
 THE REFUSAL HALF IS THE PROVEN HALF. The lane refuses an unknown ARGUMENT name today under SE-C-101, and the same discipline runs over evidence fields: i35 was refused SE-C-112 naming `sty-answer-what-does-this-touch` and two siblings, by id, rather than being handed a quiet pass.
+
+DEMONSTRATED 2026-08-19, i15 run-demos. Asked for `decided_in`, a field the Architecture decisions view does not carry. Refused by name, listing the legal fields: addresses, name, statement. SE-C-144 held for real. Report: rpt-answer-what-does-this-touch.md.
 ---
 
 The agent follows one returned id to its file and reads the decision's own rationale. What used to cost four search calls across 300 files now costs one structured query and one read.
@@ -51,3 +57,5 @@ The agent follows one returned id to its file and reads the decision's own ratio
 NOT DELIVERED, and one hop away. i15 stands `status: open` with the evaluator built and nothing exposing it. NOT DEMONSTRATED either, and the demonstration cannot run until that verb exists — which is said in the spec rather than left as a blank. THE COST IS STILL BEING PAID: i33's own walk ran text searches all evening to answer questions this evaluator was built for.
 
 UNMEASURED, and it must stay that way until the verb ships. The four-calls-to-one claim is a target, not an observation. What IS measured is the numerator: i35 spent four lane calls locating one node this run.
+
+PARTIALLY DEMONSTRATED 2026-08-19, i15 run-demos. The one matched row could not be followed to its file this run: it carries `name: undefined`, because the matching note uses `id` as its identifier key and the harvested view asks for `name` — a harvest-content gap, not a code defect, captured as note-b20975667464. The four-calls-to-one claim stays unmeasured. Report: rpt-answer-what-does-this-touch.md.

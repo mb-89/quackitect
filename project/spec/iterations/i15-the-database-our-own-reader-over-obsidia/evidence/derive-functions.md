@@ -1,8 +1,8 @@
 ---
 form: derive-functions
-reopened: "2026-08-16T17:26:21.953Z — same ripple as gate-requirements: derive-criteria's weighs_with/weighs_against writes to requirement files postdate this state's signed_off; needs a fresh bless to clear the downstream claim-guard"
+reopened: "2026-08-19T17:27:07.758Z — same claims-registration gap, cascading fix through M3"
 by: agent
-signed_off: 2026-08-16T17:26:27.526Z
+signed_off: 2026-08-19T17:29:15.048Z
 authors: agent
 files: null
 ---

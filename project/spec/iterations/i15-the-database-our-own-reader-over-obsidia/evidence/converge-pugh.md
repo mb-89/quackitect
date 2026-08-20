@@ -1,7 +1,8 @@
 ---
 form: converge-pugh
+reopened: "2026-08-19T17:38:28.557Z — same claims-registration gap, cascading fix through M5"
 by: agent
-signed_off: 2026-08-16T18:19:09.787Z
+signed_off: 2026-08-19T17:38:28.956Z
 authors: agent
 files: null
 ---

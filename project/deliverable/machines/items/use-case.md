@@ -46,7 +46,7 @@ Owner ruling 2026-08-19. The `quality-area` use cases are the nine
 characteristics of ISO/IEC 25010:2023, and nothing else.
 [[sty-what-a-quality-is]] is the ONLY story that refines `vp-qualities`
 directly — a second one is a value-prop-level promise wearing a story's
-clothes, and it belongs downstream instead (see machines/items/value-prop.md).
+clothes, and it belongs downstream instead (see project/deliverable/machines/items/value-prop.md).
 
 DO NOT INVENT A TENTH quality-area use case. If a genuinely missing
 ISO/IEC 25010:2023 characteristic turns up, add that real characteristic —

@@ -96,4 +96,10 @@ export const CLAUSES = {
   // SE-C-143 was minted as SE-C-140 on the i16 branch and renumbered at the merge:
   // i17 shipped SE-C-140 first, and a number in a shipped log is never reused.
   WRITE_TARGET_IS_SOURCE: "SE-C-143", // a writable declared root is the tree this system was produced from — or the guard cannot prove it is not; it fails CLOSED, because the isolation law is the one thing a vehicle may never breach
+  QUERY_UNKNOWN_FIELD: "SE-C-144",
+  // A SEARCH PATTERN THAT IS NOT A REGEX. rg is a regex engine, and an
+  // ordinary source fragment — "function route(", "aimAt()" — is a regex with
+  // an unclosed group in it. It came back as raw rg stderr with no clause and
+  // no remedy, which is the one thing every other refusal in this lane is not.
+  SEARCH_PATTERN: "SE-C-145", // the search pattern does not parse as a regex — the escaped literal rides the refusal // a structured query names a field the matched kind does not carry — refused by name, listing the fields that ARE legal, rather than silently returning an empty column
 } as const;

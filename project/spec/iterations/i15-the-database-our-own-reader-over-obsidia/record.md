@@ -1,6 +1,24 @@
 ---
 id: i15-the-database-our-own-reader-over-obsidia
-status: open
+status: shipped
+closed: 2026-08-19T21:04:23.636Z
+carried_count: 15
+carried:
+  - tsp-autonomy-tiers — raid-iss-the-autonomy-number-still-rides-every-answer (verification.md)
+  - tsp-bound-surface — raid-iss-whole-product-claims-reverified-by-every-record (verification.md)
+  - tsp-derivation-analysis — raid-issue-the-corpus-wide-inspections-have-no-runner (verification.md)
+  - tsp-desk-and-gates — raid-issue-must-demos-owed (verification.md)
+  - tsp-first-run — raid-issue-must-demos-owed (verification.md)
+  - tsp-panel-walkthrough — raid-issue-must-demos-owed (verification.md)
+  - tsp-prose-inspection — raid-issue-the-corpus-wide-inspections-have-no-runner (verification.md)
+  - tsp-record-inspection — raid-issue-the-corpus-wide-inspections-have-no-runner (verification.md)
+  - tsp-tour-run — raid-issue-must-demos-owed (verification.md)
+  - tsp-two-machines — raid-iss-whole-product-claims-reverified-by-every-record (verification.md)
+  - tsp-unattended-start — raid-debt-human-observed-demonstrations (verification.md)
+  - tsp-a-slow-signal-keeps-the-wait — raid-issue-must-demos-owed (verification.md)
+  - tsp-a-vehicle-is-made-and-then-drives-something-else — raid-issue-must-demos-owed (verification.md)
+  - tsp-one-door-into-the-pool — raid-issue-the-corpus-wide-inspections-have-no-runner (verification.md)
+  - tsp-the-engine-keeps-no-record-of-what-it-produced — raid-issue-the-corpus-wide-inspections-have-no-runner (verification.md)
 started: 2026-08-16T15:43:47.798Z
 opened: 2026-08-12T19:42:58.849Z
 goal: "The database: our own reader over Obsidian Bases compatible files, extending the format where we need to, harvesting the 26 working query files v1 already wrote."

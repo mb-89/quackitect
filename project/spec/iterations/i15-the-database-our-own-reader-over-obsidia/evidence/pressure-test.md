@@ -1,8 +1,9 @@
 ---
 form: pressure-test
+reopened: "2026-08-19T17:18:36.708Z — same claims-registration gap, cascading fix"
 amended: 2026-08-16T16:31:08.736Z by agent — ref "main" resolves — verified 2026-08-16; the hostile question's premise no longer holds
 by: agent
-signed_off: 2026-08-16T16:26:37.526Z
+signed_off: 2026-08-19T17:18:37.115Z
 authors: agent
 files: null
 ---

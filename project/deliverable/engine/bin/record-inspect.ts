@@ -73,8 +73,8 @@ function testRunsCarryTheirQuestion(): void {
     const q = /"question"\s*:\s*"[^"]+"/.test(body);
     const s = /"scope"\s*:\s*"[^"]+"/.test(body);
     if (!q && !s) {
-      // Neither key at all is the pre-2026-08-17 shape, which cannot carry
-      // them. Judging it would block boot over a record nobody can fix.
+      // Neither key at all is the older shape, which cannot carry them.
+      // Judging it would block boot over a record nobody can fix.
       stale += 1;
       continue;
     }

@@ -5,10 +5,10 @@ applyTo: '**'
 ---
 
 <!-- GENERATED at agent start. Do not edit — the next start overwrites it.
-     from project/guidance/contract.md 7987f2f45156
-     from project/guidance/walking.md 60936239a991
-     from project/guidance/method/lane.md 9090ed0f4b6b
-     from project/guidance/voice.md 5d2f97858f4b
+     from project/guidance/contract.md fcaa70fa98be
+     from project/guidance/walking.md b8040822706b
+     from project/guidance/method/lane.md 73eb9c0258aa
+     from project/guidance/voice.md c2ba01e3e89a
 -->
 
 # contract — the binding rules of the session
@@ -160,7 +160,18 @@ leaves the memory. Durable knowledge goes where the machine reads it:
 - condition notes
 - the spec
 
-What the NEXT session must know goes to `.se/HANDOVER.md`.
+THERE IS NO HANDOVER FILE, and nobody writes one (owner ruling 2026-08-07).
+This rule used to end by sending the next session's context to
+`.se/HANDOVER.md`. That file is gone: the duty only ever discharged on a tidy
+exit, and sessions get killed instead.
+
+WHAT REPLACED IT IS DERIVED. Boot describes the last session from the call
+log and puts it on the banner, so nothing is written on the way out and
+nothing is read on the way in.
+
+SO WHAT THE NEXT SESSION MUST KNOW GOES IN THE FOUR HOMES ABOVE, written when
+the thought occurs. A note, a parked to-do, or guidance — never saved for an
+exit that may never come.
 
 ## 9. Never open a record unasked
 
@@ -240,9 +251,16 @@ rules loaded. Do exactly three things there, in order, and nothing else.
   a copy, and not a list of headings — a recital, short, showing you hold
   them.
 - PRINT THE DESK'S GREETING VERBATIM. Its wording lives in
-  `guidance/method/front-desk.md`. Nothing else prints: no list of doors, no
+  `project/guidance/method/front-desk.md`. Nothing else prints: no list of doors, no
   line about the dial, no account of the boot.
 - END YOUR TURN. The desk waits for the person's word.
+
+THE WORD MAY HAVE ARRIVED ALREADY, and then there is nothing to wait for. An
+unattended run is handed its goal before the session starts — in the kickoff,
+in the entrypoint's arguments, or in the message that opened the session.
+Recite, print the greeting, and go straight through the routed door in the
+same turn. Waiting there for a word you are already holding is a stall, and
+nobody is beside the box to end it.
 
 NO VISIBLE RECITAL MEANS THE RULES NEVER LOADED, and the person should stop
 you. That is the whole point of asking for one: this file reaches you through
@@ -276,8 +294,9 @@ proof, the position.
 One call, one optional payload. It answers with an INSTRUCTION, and `pull`
 names which of four you got.
 
-- `read` — a document rides in `document`; `prove` names its last words. Read
-  it, pull again with `form: {"read": "<those words>"}`. Keep going until no
+- `read` — a document rides in `document`, and `prove` asks THREE
+  FILL-IN-THE-BLANK QUESTIONS about it. Answer all three, in one string, and
+  pull again with `form: {"read": "<the answers>"}`. Keep going until no
   `read` comes back — then you hold everything, by construction.
 - `fill` — the machine BUILT the form and handed it over. Fill it, return it
   as `form` on the next pull. There is no submit VERB; the pull is the only
@@ -285,6 +304,30 @@ names which of four you got.
 
   THREE KEYS ARE ACTS, NOT SECTIONS. Everything else in the form is a field
   and gets saved.
+
+  EACH FIELD SAYS WHICH OF TWO ACTS IT WANTS, on its hint, as `act`. They are
+  not the same work and the wrong one wastes the state.
+
+  - `author` — the page is yours. Nothing computed it and nothing will. Write
+    it.
+  - `rule` — THE ENGINE ALREADY DREW IT, from what stands elsewhere in the
+    record. Read the drawing, then accept it, reject it or pick among what it
+    offers. Your judgment is the answer; prose is not.
+
+  A DRAWN FIELD IS NOT AN EMPTY PAGE, and it used to arrive looking like one.
+  23 of the 86 evidence fields in the rigor matrix are drawn — the Pugh matrix,
+  the flip conditions, the clustered DSM, the Pareto front, every checklist over
+  a live source. Nothing on the form said so.
+
+  SO THE SAME FORM INVITED TWO OPPOSITE MISTAKES. Take a drawing for an empty
+  page and you type prose over a computation. Take an empty page for a drawing
+  and you stamp it without reading. Both were walked on i15.
+
+  WHAT A RULE FIELD ASKS FOR, concretely: the engine says the flips are these
+  three; you say which are credible. It says the clusters are these; you move
+  the rows it got wrong. It says the winner is this; you say whether the seat
+  holds. Re-deriving the computation by hand is the waste, and typing an essay
+  where a pick was wanted is the other one.
 
   - `submit: true` — stamp it. Runs every check, then signs.
   - `bless: true` or `bless: false` — the gate's thumb, up or down.
@@ -300,6 +343,13 @@ names which of four you got.
   form, and at high autonomy the agent uses both (owner ruling 2026-08-09).
   Blessing your own gate is normal here when the person has said so. Below the
   dial it is theirs, exactly like every other step.
+
+  WHICH ONE APPLIES IS THE ENGINE'S ANSWER, NEVER YOURS TO DERIVE. Every gate
+  carries a weight, and a bless from the agent is refused when the dial sits
+  at or below it — the refusal names both rungs. SO SEND THE BLESS AND READ
+  THE ANSWER. Reading the contract, the autonomy scale and the stop-at scale
+  to work out whether you are allowed costs three documents and settles
+  nothing the one call would not.
 
   BOTH IN ONE PULL IS LEGAL: `form: {"verdict": "pass — why", "submit": true,
   "bless": true}` fills, stamps and blesses in a single call.
@@ -365,7 +415,7 @@ BLOCKING IS AN INSTRUCTION, NOT AN ERROR. A threshold, an unmet condition, an
 undrawn route: the pull says so instead of throwing. What stays a refusal is
 what is genuinely ILLEGAL — a choice outside the offer, a form nothing asked
 for. A refusal is typed and carries an executable remedy. Every clause's
-rule stands ahead of time in guidance/refusals.md. Follow the remedy;
+rule stands ahead of time in project/guidance/refusals.md. Follow the remedy;
 recover in one turn. A result carrying a `banner` is shown VERBATIM.
 
 A PULL MAY MOVE THE WALK. There is no passive position query: "where am I" is
@@ -397,7 +447,7 @@ state forward or back — the walk advances on the agent's pull and nothing else
 
 THE TWO DIALS ASK NEIGHBOURING QUESTIONS. Autonomy says what the agent may
 DECIDE alone. Stop-at says how far it may GO before handing back, and its four
-notches are machines/stopat.md: `state end`, `agent judgement` (the default),
+notches are project/deliverable/machines/stopat.md: `state end`, `agent judgement` (the default),
 `bless`, `blockers only`.
 
 AT `state end` THE ENGINE HOLDS EVERY TRANSITION and the person releases them
@@ -407,14 +457,35 @@ refusing, and the agent's pull is what moves.
 ## The reading
 
 - Whenever anything is owed, the pull answers `read` and the document rides
-  along. `prove` names its LAST WORDS.
+  along. `prove` carries the questions.
+- THREE PROBES, SPREAD THROUGH THE DOCUMENT. Each quotes a short run of words
+  and asks for the FOUR WORDS THAT FOLLOW it. They sit near the 30%, 60% and
+  92% marks, so all of it has to be in hand.
+- THE ANCHOR SITS BETWEEN `«` AND `»`. Those marks are the delimiters and are
+  never part of the anchor. Plain quotes are used only where the anchor itself
+  carries a guillemet, so the delimiter is always a character the anchor does
+  not hold — an anchor ending in a quote mark used to hide its own end.
+- ANSWER ALL THREE IN ONE STRING, as `form: {"read": "..."}`. Join them any
+  way you like. Order does not matter and separators do not matter.
+- QUOTE GENEROUSLY. The check asks whether your answer CONTAINS the words it
+  wants, never whether it matches them exactly. A longer quote around the
+  anchor passes; a clipped one misses. Unsure? Paste the whole sentence.
+- PUNCTUATION IS NOT A WORD. Only tokens carrying a letter or a digit count,
+  so a dash, a bullet or a bare quote mark sitting between two words is
+  skipped. Counting four words by eye and including one costs you the probe.
+  Quoting generously makes this stop mattering.
+- CASE AND SPACING ARE IGNORED, so there is nothing to normalise by hand.
+- A WRONG ANSWER NAMES EXACTLY WHICH PROBES MISSED, and the ones you got right
+  are BANKED. Send only the named ones on the retry — there is no need to
+  resend what already landed, and no penalty if you do.
+- The same document comes again with each wrong answer. Read the probes it
+  names rather than the whole file: the answer is in the text you already
+  hold.
+- WHY PROBES AND NOT A HASH: you cannot compute one, and one the engine handed
+  you would prove only that a message arrived. Spread probes are the cheapest
+  thing that a host which truncated the text cannot answer.
 - ONE DOCUMENT AT A TIME, on purpose: a host that moves a large result to disk
   hands you a preview, and a single document cannot be eaten.
-- WHY THE TAIL: truncation drops the END, so the end is exactly what a host
-  that ate the text cannot give back. It is also the only proof you can
-  produce — you cannot compute a hash, and one the engine handed you would
-  prove only that a message arrived.
-- A wrong answer credits nothing and the same document comes again.
 - You never name a path and never work out what you owe.
 - `.se/reading.md` is the same thing as a file, for a person to open.
 
@@ -429,18 +500,51 @@ detected.
 every call that changes something. The toll is the enforcement floor, never
 the rhythm; the log should tell the story without gaps.
 
-- `plan {items}` starts the checklist, BEFORE the first edit of any
+YOUR FIRST ONE IS A PLAN, and it rides the pull that starts the work:
+
+    se_pull  update: {op: "plan", items: ["read the record", "fill the gate", "submit"]}
+
+NOBODY WILL ASK YOU FOR IT. The toll only bites after minutes or calls have
+run out, so a short state can be walked start to finish with the log holding
+nothing but pulls. That is a silent walk, and on an unattended machine the log
+is the only witness there is.
+
+EVERY OP CARRIES `op`, AND THE SHORTHAND BELOW IS NOT THE PAYLOAD. `{node,
+brief}` alone is refused with SE-C-120 saying `op: undefined`; the call is
+`{op: "done", node, brief}`. The op names the line you are reading, never the
+whole object.
+
+- `{op: "plan", items}` starts the checklist, BEFORE the first edit of any
   multi-step work. Check items off with `done` AS each lands. The checklist is
   a PROGRESS view, not a completion record — fourteen items ticked in the last
   minute tell a reader nothing the commit would not.
-- `fork {brief, items?}` opens a BLOCKING detour: the current item cannot
-  continue until it is fixed. Scope growth is another `plan`, not a fork.
-- `done | obsolete | revert {node, brief}` resolves a node. Everything started
-  gets resolved; abandoning silently is illegal.
-- `defer {node, to}` parks a point for the state that can do it.
-- `update {node, brief}` says what you are doing ON an item. The node is
-  required while a checklist stands — an update floating free of every item is
-  narration wearing progress's clothes. With nothing open, a bare update is
+
+  SIZE AN ITEM SO IT CAN CLOSE WHERE YOU STAND. An item is a thing that will
+  be DONE while you are still in this state, and the stall guard is what
+  measures that: it counts updates since anything closed, so an item that
+  cannot close makes every later update look like a stall.
+
+  MEASURED ON THE i15 WALK: 57 refusals, all SE-C-133, all with the same two
+  items open — "walk boot reading loop", still open hours after boot ended,
+  and "work milestones as served", which cannot close until the iteration
+  does. The work was real and the narration was honest. The checklist was the
+  wrong shape, and nothing said how to shape one.
+
+  SO AN ITEM NAMING A WHOLE MILESTONE IS NOT AN ITEM. It is the state you are
+  in. Plan the steps inside it, and plan again when you reach the next one —
+  a second `plan` is free and is what scope growth wants anyway.
+
+  AND CLOSE IT THE MOMENT IT LANDS. An item finished twenty calls ago and
+  still open is what turns the guard from a nudge into a toll.
+- `{op: "fork", brief, items?}` opens a BLOCKING detour: the current item
+  cannot continue until it is fixed. Scope growth is another `plan`, not a
+  fork.
+- `{op: "done" | "obsolete" | "revert", node, brief}` resolves a node.
+  Everything started gets resolved; abandoning silently is illegal.
+- `{op: "defer", node, to}` parks a point for the state that can do it.
+- `{op: "update", node, brief}` says what you are doing ON an item. The node
+  is required while a checklist stands — an update floating free of every item
+  is narration wearing progress's clothes. With nothing open, a bare update is
   right.
 - THE BRIEF IS ONE LINE, 90 characters. A brief that chains three or more
   separator-joined parts is corrected rather than refused, and the result
@@ -469,6 +573,9 @@ runs, and a pull carrying evidence beside the proof pays like any other work.
 ## Notes
 
 - `se_note {text}` captures a stray anywhere; keep walking.
+- A NOTE IS PROSE AND THE WALL GUARD BINDS IT. One paragraph of six hundred
+  characters is refused with SE-C-125, the same as any other text the lane
+  takes. Break it into paragraphs as you write it.
 - `se_note_drain {ref, disposition}` takes one back out. `done` and `obsolete`
   are CHECKS ANYONE CAN RUN — look, and if the code carries it, drain it,
   saying `where:`. `carried` and `backlog` are the RETRO's judgment and the
@@ -501,8 +608,24 @@ the machine holding that job, not an obstacle to route around.
 Test to answer a question — did THIS change break THAT — never to reassure.
 A red is understood and fixed properly, then you move.
 
-A SCOPED RUN IS THE ONLY ONE YOU MAKE. It blocks and answers, so there is
-nothing to poll: no handle, no second call asking whether it finished.
+A SCOPED RUN IS THE ONLY ONE YOU MAKE. Ask it as a QUESTION — `se_test
+{question: "did X break Y"}` — and the engine decides what to run.
+
+IT DOES NOT BLOCK. The answer comes back `handed_off: true` with a job handle
+and says so: the run is in the background, and `se_test {job: "..."}` reads
+its status. This page used to claim the opposite — that a run blocks and there
+is nothing to poll — while the engine has always handed a handle back.
+
+POLLING PAYS NO CALL. The narration toll skips a poll, for the reason it skips
+the reading loop: the machine forced the hop, no judgment happened on it, and
+a toll falling due there could only be paid with filler. Measured before the
+skip existed: 25 of a session's 40 `se_test` calls were refused by the toll,
+and every one of them was a poll.
+
+SO DO OTHER WORK WHILE IT RUNS, and read the verdict when it lands. The answer
+names how long the last battery took, so you know what scale of wait to
+expect. What you never do is sit polling in a tight loop — that is the
+minutes clock's business, not the call clock's.
 
 THE FULL BATTERY IS THE ENGINE'S. It runs once, at verification, fired by
 that state's own exit script — you never call it and there is no state where
@@ -530,7 +653,7 @@ Your native tools are blocked here, tool by tool, by an explicit list:
 
 Which file holds that list depends on the host. Claude Code reads
 `.claude/settings.json`, and GitHub Copilot CLI takes the same list on its
-command line from `deliverable/cage/copilot-cage.json`.
+command line from `project/deliverable/cage/copilot-cage.json`.
 
 The effect is the one rule: the `se` lane replaces every native tool, as good
 or better.
@@ -552,6 +675,19 @@ or better.
 
 PATHS ARE ROOT-RELATIVE TO THE PROJECT ROOT, which is the parent of the folder
 you have open. You open `project/`; a path you pass starts `project/`.
+
+DROPPING THAT ONE WORD IS LEGAL AND SILENT. A path beginning `spec/` where it
+should begin `project/spec/` resolves, the write succeeds, and the file lands
+beside `project/` where nothing reads it. Nothing refuses it, because the root
+is a real place and its own files live there.
+
+MEASURED ON THE i15 WALK: a harvest wrote 25 query files and an ADR to a
+top-level `spec/`, noticed only afterwards, and cleaned up with an `rm -rf` at
+the repository root through the `no_tool_reason` hatch — because delete and
+move were both illegal where the walk stood.
+
+SO CHECK THE PREFIX ON THE FIRST WRITE OF A BATCH, not the twenty-sixth. A
+path that names a folder the product does not have is the tell.
 
 Every call is logged raw to `.se/calls.jsonl`.
 
@@ -594,10 +730,22 @@ dropped exists nowhere — not on the result, not in the log. Ends carry
 verdicts: exit codes, totals, units. Prefer structured results (`se_test`) and
 fetch full output by ref (`se_log_query`) over shaping it in the shell.
 
-A RESULT THE HOST MOVED TO DISK IS RE-FETCHED BY REF, never by reading the
-host's file. The lane logged the full response; `se_log_query` with the
-call's ref serves it back. Retro finding 2026-08-10: several shell reads of
-host-persisted files stood where one log query belonged.
+A RESULT THE HOST MOVED TO DISK IS NOT READ BACK FROM THE HOST'S FILE. Retro
+finding 2026-08-10: several shell reads of host-persisted files stood where a
+lane call belonged.
+
+WHAT THE LOG ACTUALLY KEEPS, because this used to promise more than it holds.
+The call log is a TRAIL, not an archive.
+
+- `se_run` OUTPUT IS KEPT WHOLE, and `se_log_query {ref}` serves it back. That
+  is the one a caller comes back for, and it is the one that is there.
+- EVERY OTHER RESPONSE IS CAPPED IN THE LOG, middle cut, about five hundred
+  characters. A big form or a big pull is NOT recoverable from it.
+
+SO A HOST-TRUNCATED ANSWER IS ASKED FOR AGAIN, SMALLER. Page a read with
+`offset`/`limit`, narrow a search, or pull again — the machine recomputes from
+where the walk stands, so nothing is lost by asking twice. Hunting the log for
+a payload it never held costs a call and answers nothing.
 
 A RESULT WITH `bounded: true` WAS CUT BY THE LANE BEFORE THE HOST COULD CUT IT.
 The first page and a `next` call ride in the result. Make that exact call.
@@ -859,6 +1007,15 @@ So the list is the rule's memory: the specific words that got through. A rule wi
 - ASK WHERE A QUESTION IS OWED. A judgment asserted about somebody's own domain cannot be caught by them, which is exactly when it does the most damage.
 - Owner ruling 2026-08-06, after a gate carried a fabricated comparison about a tool nobody here had run.
 
+### A ruling that is not built yet says so, in its first line
+
+- MARK IT WITH THE WORDS `NOT BUILT YET`, in the heading or the opening sentence. A test reads that marker: a guidance page may name a lane verb the engine does not register only inside a section carrying it. A decision to build a thing and the thing existing read identically otherwise, and the reader cannot tell them apart.
+- SAY WHAT TO DO INSTEAD, in the same breath. A reader who came for the capability needs the way that works today, not only the news that the good way is coming.
+- Write the ruling in the FUTURE where it is unbuilt. "The verb wraps X" says it exists. "When it is built, the verb will wrap X" does not.
+- THIS BINDS HARDEST ON NAMES. A heading reading "se_package builds the artifact" teaches a lane verb into existence, and the reader spends their calls discovering it does not answer. That heading stood for four days.
+- The same holds for a state, a field, a flag or a file. Naming it in the present tense is a claim that it is there.
+- WHY IT IS A WRITING RULE AND NOT A LINT. The two readings are grammatically identical, so nothing mechanical separates them. Only the author knows which one they meant.
+
 ### The sycophancy guard (applies to every assessment)
 - Praise is a signal, not a nicety. Endorse only what survives the disconfirming question.
 - If ours is genuinely better, say so plainly.
@@ -886,7 +1043,7 @@ So the list is the rule's memory: the specific words that got through. A rule wi
   - Then deepening detail.
   - The fully detailed discussion sits at the bottom.
   - A single paragraph needs none of this.
-  - The method card holds the depth: `machines/methods/progressive-disclosure.md`.
+  - The method card holds the depth: `project/deliverable/machines/methods/progressive-disclosure.md`.
 - Diátaxis (diataxis.fr) for docs. Keep the four modes apart: tutorial, how-to, reference, explanation.
   - Do not blend them in one place.
 - Keep internals out of prose. The general reader does not care how the system works inside.

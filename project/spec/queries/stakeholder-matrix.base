@@ -1,0 +1,10 @@
+filters:
+  and:
+    - 'type == "stakeholder"'
+views:
+  - type: table
+    name: Stakeholders
+    order: [name, role, statement]
+    sort:
+      - property: role
+        direction: ASC

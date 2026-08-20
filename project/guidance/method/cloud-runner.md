@@ -194,6 +194,32 @@ exist and it still answers. On an unattended machine this is the first fact
 worth having, because every later report is about SOME build and a report that
 does not say which one is hearsay.
 
+### The host refused it before the lane ever saw it
+
+A REFUSAL WITH NO CLAUSE AND NO REMEDY IS NOT THE LANE'S. Every lane refusal
+is typed: a clause, what was expected, what it got, and the exact call to make
+instead. A denial carrying none of those came from the HOST's own permission
+layer, above the lane, and the engine never heard the call at all.
+
+HOW TO TELL, and it takes one call. Pull again. The lane's own refusals leave
+the walk exactly where it was and say why; a host denial leaves the walk
+untouched and the pull answers as though nothing was tried, because nothing
+was.
+
+THERE IS NO REMEDY TO FOLLOW, so do not hunt for one. Nothing in
+`project/guidance/refusals.md` covers it, and re-sending the same call reaches
+the same layer.
+
+WHAT TO DO: say plainly which call was denied and by what, capture it with
+`se_note`, and treat it as a stop of the third kind — something broke and no
+remedy gets you past it. On an attended machine the person can widen the
+permission. On an unattended one the note is the whole record.
+
+MEASURED 2026-08-19: a walk at `tactical` reached a kickoff gate whose bless
+was its to give, sent `form: {"bless": true}`, and the host denied it. The
+agent read the denial as the engine's and reported the gate as the owner's.
+It was not; nobody had refused it.
+
 ### Another machine may be walking the same record
 
 NOTHING STOPS IT, AND NOTHING IS MEANT TO. There is no claim, no lock and no
@@ -235,6 +261,10 @@ not delivered — you have thrown away.
 
 SO PUSHING IS PART OF THE RUN, not something that follows it.
 
+UNLESS THIS SESSION WAS TOLD NOT TO, and then it wins. This is the DEFAULT for
+an unattended box, never a duty outranking the person who started the run. The
+detail is in the last bullet below.
+
 - PUSH WHAT YOU COMMITTED, to the branch you were given. If you were given
   none, push the branch you are on.
 - PUSH BEFORE YOU REPORT, and push again after any later commit. A report
@@ -245,6 +275,11 @@ SO PUSHING IS PART OF THE RUN, not something that follows it.
   report.
 - WHAT DOES NOT CHANGE: no force, no history rewrite, and no push to a branch
   you were not given. SE-C-002 stands untouched.
+- A SESSION TOLD NOT TO PUSH DOES NOT PUSH. This ruling is about the DEFAULT
+  on an unattended box, not a duty that outranks the person who started the
+  run. Where the session's own instructions forbid a push, they win: say in
+  the report that the work is committed and unpushed, and that the box takes
+  it when it is reclaimed. Never push to prove a card right.
 
 THE GUIDANCE AND THE ENGINE NOW DISAGREE, deliberately and temporarily. The
 engine is the half that is wrong, and closing the gap is an iteration's work:
@@ -260,6 +295,12 @@ the whole account.
 - RECORD EVERY ANSWER with `se_answer`, even when the question came from
   yourself.
 
-WRITE THE HANDOVER BEFORE YOU RUN OUT. `.se/HANDOVER.md` is what the next
-session reads, and on an unattended machine it is the only thing that carries
-context across.
+WRITE IT DOWN AS YOU GO, BECAUSE THERE IS NO HANDOVER TO WRITE AT THE END
+(owner ruling 2026-08-07). This card used to send the next session's context
+to `.se/HANDOVER.md`. That file is gone, and boot now describes the last
+session from the call log instead.
+
+THAT MAKES THE THREE LINES ABOVE THE WHOLE ACCOUNT. An update nobody rode, a
+stray nobody captured and an answer nobody recorded are lost when the box is
+reclaimed. Anything that must outlive the run goes into guidance, a note or
+the record, at the moment you think of it.

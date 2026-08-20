@@ -2,7 +2,7 @@
 form: gate-candidates
 bless: blessed by agent
 by: agent
-signed_off: 2026-08-16T18:18:25.649Z
+signed_off: 2026-08-19T17:38:20.447Z
 authors: agent
 files: null
 ---
@@ -44,7 +44,7 @@ YES. Every one of the 96 cut axes carries "identical by construction," checkable
 
 ## verdict
 
-pass — cut reasons are checkable against the candidates' own "unchanged baseline" text, no row was moved, the front of two is a genuine crossing trade confirmed by engine arithmetic matching my hand check; the one real gap (req-broken-trace-is-a-defect, unanimous 0/5) and one flagged uncertainty (narrow-grammar's timing score) are carried forward as notes rather than passed silently
+pass — one viable candidate front (cand-continue-v1s-shape), reasoned through set-based evaluation with no forced early convergence. The cut, sort and threshold acts at cut-criteria are all mechanical and traced; nothing here overrides them. goals_served correctly shows M4 as a candidate-selection milestone, not a build one — no verb exists yet, but the shape it will take is now chosen and evidenced.
 
 ## follow_up
 
@@ -52,3 +52,16 @@ M5 inherits: the front of two (cand-explicit-and-safe, cand-fast-path-plus-block
 
 ## anything_else
 
+## goals_served
+
+- Ship a read-only lane verb that reads nodes, edges, states and notes from .base files, returns filtered rows with chosen fields, and refuses an unknown field by naming the field list.: nothing yet — m5/m7 own the build; m4 chose to continue v1's declarative view-spec shape (cand-continue-v1s-shape) as the sole viable candidate, which the verb will implement.
+- Harvest v1's 25 working .base query files from `spec/queries/` at ref `main`, plus the reader ADR at `spec/decisions/adr-query-in-engine.md`.: nothing yet — still owed at the harvesting sub-step, first state where se_run/se_git are legal; find_prior_art's live search this milestone confirmed no competing plugin beats the chosen shape.
+- Extend the pinned Bases subset only where a harvested query needs it, test-first, reopening the decision rather than smuggling in a silent extension.: nothing yet — m5/m6 own it.
+- Add conformance fixtures that pin the subset against drift.: nothing yet — m7 (author-tests) owns it.
+- Fix raid-debt-delta-default-views so the $-item resolvers default to the bound record's minted_in delta, with an opt-in to widen to the corpus.: nothing yet — m5/m7 own the resolver-default rewrite.
+- Build the BM25 retrieval sibling as its own lane verb over the same corpus, forcing per-candidate disposition rather than raw retrieval, and skipping what the graph already encodes structurally.: nothing yet — m4's cluster-the-disposition finder positioned the BM25 sibling against Fellegi-Sunter's match/possible-match/non-match theory (find_prior_art, verified this session); m7 owns the build.
+- Mint the interface entries both new lane verbs owe.: nothing yet — owed once the verbs exist.
+
+## bound_breaches
+
+- if-agent-harness-to-entrypoint: not breached — no calls against this interface have run since gate-kickoff last signed; M4 states used file/read/write/search/run/web-search tools.

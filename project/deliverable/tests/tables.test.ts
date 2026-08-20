@@ -275,6 +275,29 @@ describe("the vault", { concurrency: true }, () => {
       for (const v of spec.views) assert.doesNotMatch(renderView(spec, v, rows).html, /tbl-refused/);
     }
   });
+
+  // file.hasTag reads r.tags off the FILE object a method receives — the
+  // isolated expr.test.ts fixture sets that by hand. A real vault row's file
+  // object used to carry only name/path/folder/ext, so file.hasTag silently
+  // matched nothing against real notes, ever — two of the harvested queries
+  // (decisions-strategy.base, force-rationales.base) rely on it.
+  test("readVault forwards frontmatter tags onto file.tags, so file.hasTag matches real notes", () => {
+    const root = mkdtempSync(join(tmpdir(), "se-tags-"));
+    const dir = join(root, "project", "rows");
+    mkdirSync(dir, { recursive: true });
+    writeFileSync(
+      join(dir, "tagged.md"),
+      ["---", "kind: matrix-row", "tags:", "  - strategy", "---", "", "# Tagged", ""].join("\n"),
+      "utf8",
+    );
+    writeFileSync(join(dir, "untagged.md"), ["---", "kind: matrix-row", "---", "", "# Untagged", ""].join("\n"), "utf8");
+    const rows = readVault(root);
+    const tagged = rows.find((r) => (r.file as Row).name === "tagged");
+    const untagged = rows.find((r) => (r.file as Row).name === "untagged");
+    assert.ok(tagged !== undefined && untagged !== undefined, "both fixture notes came back as rows");
+    assert.equal(matches('file.hasTag("strategy")', tagged as Row), true, "the tagged note matches its own tag");
+    assert.equal(matches('file.hasTag("strategy")', untagged as Row), false, "the untagged note does not");
+  });
 });
 
 const NOTE = [

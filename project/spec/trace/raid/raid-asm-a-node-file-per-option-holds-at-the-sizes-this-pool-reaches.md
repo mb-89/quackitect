@@ -7,7 +7,7 @@ statement: One file per option is a workable store at the scale a single product
 owner: the driving agent
 trigger: the migration, or the first time a pool answer has to be windowed
 status: deferred
-defer_until: ready when migration probe data is captured and reviewed
+defer_until: the migration runs and its before-and-after timing of the sweep, the conformance pass and one reference view is taken
 impact: It is the storage half of the minor column. If it fails the pool needs an index or a database, M4 has to open, and the change size this iteration was blessed at was wrong.
 breaks_how_badly: crippling
 how_likely: conceivable

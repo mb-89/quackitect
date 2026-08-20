@@ -9,7 +9,7 @@ anywhere without missing the point.
 
 **When.** Every answer, report, summary, and email. Especially when the
 reader is busy, the message is long, or the harness might eat the tail.
-Progressive disclosure (methods/progressive-disclosure.md) is the same
+Progressive disclosure (project/deliverable/machines/methods/progressive-disclosure.md) is the same
 idea for whole documents and interfaces.
 
 **Steps.**

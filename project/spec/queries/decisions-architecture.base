@@ -1,0 +1,8 @@
+filters:
+  and:
+    - 'type == "adr"'
+    - 'kind == "architecture"'
+views:
+  - type: table
+    name: Architecture decisions
+    order: [name, statement, addresses]

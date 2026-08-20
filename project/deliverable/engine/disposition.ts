@@ -79,3 +79,13 @@ export interface DispositionRow {
   candidate: string;
   status: DispositionStatus;
 }
+
+// req-bm25-candidates-need-disposition, tsp-coupling-disposition. The root
+// parameter is unused on purpose \u2014 nothing here may read a threshold, a
+// filter or any other side channel that could drop a candidate before the
+// write loop. Every candidate handed in gets exactly one row, stamped
+// pending; only a person's later act may change that status
+// (raid-dec-i15-disposition-prepopulates-pending-rows).
+export function recordCouplingDisposition(_root: string, candidates: RankedCandidate[]): DispositionRow[] {
+  return candidates.map((c) => ({ candidate: c.id, status: "pending" }));
+}

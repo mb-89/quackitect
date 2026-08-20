@@ -1,0 +1,9 @@
+# The partitioning forces that won - rationale notes tagged partitioning-force.
+filters:
+  and:
+    - 'type == "rationale"'
+    - 'file.hasTag("partitioning-force")'
+views:
+  - type: table
+    name: Partitioning forces
+    order: [name, statement, refers]

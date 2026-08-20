@@ -1499,6 +1499,24 @@ export class Session {
     }
     const r = this.route(wanted);
     if (!r.found && wanted !== this.active()[0]) {
+      // THE SHORT NAME IS THE NAME. Try it against what is actually reachable
+      // before refusing: aiming at `define-actual` from inside i15 means the
+      // same thing as aiming at `iterations/i15/define-actual`, and only one
+      // of the two used to work.
+      const near = this.resolveShort(
+        wanted,
+        this.pullOptions().map((o) => String(o.to)),
+      );
+      if (near !== wanted) {
+        const alt = this.route(near);
+        if (alt.found) {
+          this.aimAt(near);
+          this.clearTargetIfArrived();
+          return { ...alt, target: this._target };
+        }
+      }
+    }
+    if (!r.found && wanted !== this.active()[0]) {
       throw new Rejection({
         clause: CLAUSES.NOT_LEGAL_IN_STATE,
         expected: "a state the drawing can reach from here",
@@ -2301,7 +2319,11 @@ export class Session {
         ...this.refusedBlock([standingForm]),
         for: standingForm,
         forms: [this.formForAgent(standingForm)],
-        do: 'work the state, then return fills on the next pull as form: {"<section>": "<text>"} - multi-pass is fine; finish with {"submit": true}: the submit checks the fields and stamps the claim',
+        do:
+          this.fillAdvice(
+            [standingForm],
+            'work the state, then return fills on the next pull as form: {"<section>": "<text>"} - multi-pass is fine; finish with {"submit": true}: the submit checks the fields and stamps the claim',
+          ) + this.drawnNote([standingForm]),
         ...extra(),
       };
     }
@@ -2362,7 +2384,11 @@ export class Session {
           ...this.refusedBlock(owed),
           for: pullTarget,
           forms: owed.map((n) => this.formForAgent(n)),
-          do: 'fill every required section, then return it on the next pull as form: {"<section>": "<text>"} — there is no submit verb, and pulling without it hands back this same form',
+          do:
+            this.fillAdvice(
+              owed,
+              'fill every required section, then return it on the next pull as form: {"<section>": "<text>", "submit": true} — there is no submit verb, and a pull without the submit FLAG hands back this same form',
+            ) + this.drawnNote(owed),
           ...extra(),
         };
       }
@@ -2380,16 +2406,7 @@ export class Session {
       // "shall enter no iteration AND shall answer with the offer", and the
       // second half was missing while the first passed — which is the half a
       // tester with fresh eyes caught.
-      const waitingOpts = this.pullOptions();
-      // see dsp-walk-machine.md#every-door-is-shown
-      return {
-        pull: "wait",
-        ...head(),
-        ...(waitingOpts.length > 0 ? { options: waitingOpts } : {}),
-        waiting_for: "the person",
-        why: this.waitWhy(this.standingOn(pullTarget), waitingOpts.length > 0, pullTarget, r.note),
-        ...extra(),
-      };
+      return { ...this.waitUnroutable(pullTarget, r.note), ...head(), ...extra() };
     }
 
     // 2. THE GATES ON THE FIRST STEP: the slider, the reading, the form.
@@ -2443,7 +2460,7 @@ export class Session {
               // pendingRead survives a wrong answer — only a correct one clears it.
               note: `${this.readMissed.length} of ${this.reads.serving()?.expect.length ?? 0} probe(s) were not answered — here is the document again`,
               missed: this.readMissed,
-              hint: "quote the words VERBATIM, punctuation and all. Whitespace and case are flattened before comparing, so a line break inside an answer is fine.",
+              hint: "QUOTE MORE, NOT LESS. The check asks whether your answer CONTAINS each expected run, never whether it matches exactly, so pasting the whole sentence around the anchor always passes. Punctuation is not a word: a dash or a bullet between two words is skipped when the engine counts, which is the usual reason a careful four-word answer misses. Case and line breaks are flattened before comparing.",
             }
           : {}),
         do: 'read the WHOLE document, then pull again answering every probe in `prove` as form: {"read": "<the answers, in one string>"}',
@@ -2460,7 +2477,10 @@ export class Session {
         ...this.refusedBlock(unmet),
         for: first.to,
         forms: unmet.map((n) => this.formForAgent(n)),
-        do: 'fill every required section, then return it on the next pull as form: {"<section>": "<text>"} — there is no submit verb, and pulling without it hands back this same form',
+        do: this.fillAdvice(
+          unmet,
+          'fill every required section, then return it on the next pull as form: {"<section>": "<text>", "submit": true} — there is no submit verb, and a pull without the submit FLAG hands back this same form',
+        ),
         ...extra(),
       };
     }
@@ -2478,7 +2498,12 @@ export class Session {
     // WHICH PROBE MISSED, not merely that one did. "That did not answer every
     // probe" over three probes is a one-in-three guess, and the field report
     // of 2026-08-17 names it as friction that cost a round trip each time.
-    this.readMissed = probesMissed(pending.expect, String(form.read));
+    // JUDGE THE REPLY AGAINST WHAT IS STILL OWED, never against all three.
+    // The answer names which probes missed, so an agent sends those — and
+    // judging that reply against the whole set fails it for the ones it had
+    // already got right, which is a loop with no way out of it. Measured on
+    // the i15 walk, which worked the rule out the expensive way.
+    this.readMissed = this.reads.bankProbes(probesMissed(pending.outstanding, String(form.read)));
     if (this.readMissed.length === 0) {
       this.reads.credit(pending.path, pending.hash);
       this.persistSettings();
@@ -2533,6 +2558,38 @@ export class Session {
     if (this._target === "" && form.choice !== undefined) {
       return { fanOut: this.pullPickChoice(form.choice) };
     }
+    // A CHOICE IS AN AIM, AND SAYING "NOTHING WANTS A FORM" ANSWERS A DIFFERENT
+    // QUESTION. The reader was trying to GO somewhere; the answer described the
+    // engine’s state and never said where it could go instead.
+    //
+    // MEASURED ON THE i15 WALK: ten of these, and three in a row were the same
+    // door sent three ways — as a list, as a short name, as a long name with a
+    // submit flag. Each got the identical generic sentence. The doors were
+    // computed on the same pass and withheld.
+    if (form.choice !== undefined) {
+      const doors = this.pullOptions().map((o) => String(o.to));
+      throw new Rejection({
+        clause: CLAUSES.NOT_LEGAL_IN_STATE,
+        expected:
+          doors.length > 0
+            ? `one of the doors offered from here: ${doors.join(", ")}`
+            : "a branching point, where a choice is what the pull is asking for",
+        got: `a choice of ${JSON.stringify(form.choice)}, where the walk is not at a branching point`,
+        remedy:
+          doors.length > 0
+            ? {
+                tool: "se_pull",
+                args: { form: { choice: doors[0] } },
+                note: `these are the doors from here: ${doors.join(", ")}. To aim at somewhere further off, se_aim names the target and the walk routes to it.`,
+              }
+            : {
+                tool: "se_aim",
+                args: { target: "<the state you want to reach>" },
+                note: "no door is offered from where you stand, so no choice can be taken. se_aim sets a target and the walk routes toward it; a bare pull says what is owed here first.",
+              },
+        source: "engine/session.ts pull",
+      });
+    }
     throw new Rejection({
       clause: CLAUSES.NOT_LEGAL_IN_STATE,
       expected: "a step that asked for a form",
@@ -2542,10 +2599,29 @@ export class Session {
     });
   }
 
+  /** THE SHORT NAME IS THE NAME (owner ruling). A state is called what its
+   *  drawing calls it, and the machine path in front of it is the engine's
+   *  bookkeeping rather than the reader's vocabulary.
+   *
+   *  So anything naming a state takes the short form, and a qualified one is
+   *  accepted rather than refused — a walk reads long ids in its own answers
+   *  today, and refusing what we just handed it is the worst of both.
+   *
+   *  AMBIGUITY IS NOT RESOLVED SILENTLY. Where a short name matches two of the
+   *  things on offer, nothing is picked and the refusal names both. */
+  private resolveShort(pick: string, among: string[]): string {
+    if (among.includes(pick)) return pick;
+    const hits = among.filter((o) => o.slice(o.lastIndexOf("/") + 1) === pick);
+    return hits.length === 1 ? hits[0] : pick;
+  }
+
   /** see dsp-walk-machine.md#a-list-is-legal-on-purpose */
   private pullPickChoice(choice: unknown): string[] {
     const offered = this.pullOptions().map((o) => String(o.to));
-    const picks = (Array.isArray(choice) ? choice : [choice]).map(String).filter((x) => x !== "");
+    const picks = (Array.isArray(choice) ? choice : [choice])
+      .map(String)
+      .filter((x) => x !== "")
+      .map((x) => this.resolveShort(x, offered));
     if (picks.length === 0) {
       throw new Rejection({
         clause: CLAUSES.REQUIRED_ARGS,
@@ -2613,7 +2689,7 @@ export class Session {
           walked: swept.swept ?? [],
           ...servedNow,
           ...(swept.banners !== undefined ? { banners: swept.banners } : {}),
-          do: 'read the document, then pull again returning its proof as form: {"read": "<the last words>"}',
+          do: 'read the document, then pull again answering every probe in `prove` as form: {"read": "<the answers, in one string>"}',
           ...extra(),
         };
       }
@@ -2627,7 +2703,10 @@ export class Session {
           for: swept.stopped_at,
           forms: formsNow.map((n) => this.formForAgent(n)),
           ...(swept.banners !== undefined ? { banners: swept.banners } : {}),
-          do: 'fill every required section, then return it on the next pull as form: {"<section>": "<text>"} — there is no submit verb, and pulling without it hands back this same form',
+          do: this.fillAdvice(
+            formsNow,
+            'fill every required section, then return it on the next pull as form: {"<section>": "<text>", "submit": true} — there is no submit verb, and a pull without the submit FLAG hands back this same form',
+          ),
           ...extra(),
         };
       }
@@ -2910,6 +2989,137 @@ export class Session {
     return agentCopy(this.formGet(name) as Record<string, unknown>, false);
   }
 
+  /** WHAT A `wait` TELLS THE WALKER, when the route to the target could not be
+   *  drawn. Lifted out of pull for the same reason doAdvice was lifted out of
+   *  pullAfterSweep: the branch has three cases to say well, and saying them
+   *  inline pushes the caller past its complexity bound.
+   *
+   *  A BRANCH POINT SHOWS ITS DOORS (i34,
+   *  req-a-pull-carrying-no-choice-enters-no-iteration). "There is nowhere to
+   *  go" is the truth and not the whole of it: standing where several ways
+   *  lead on, the walk is waiting FOR A CHOICE, and an answer naming none
+   *  leaves the reader to guess a door and read the refusal.
+   *
+   *  AND THE ENGINE ALREADY KNOWS WHY THE ROUTE FAILED. "nothing routes toward
+   *  X from here" is true and useless.
+   *
+   *  THE SHAPE, NAMED PRECISELY, because the walk that hit it read it as a
+   *  routing bug and it is not one. nextObjective redirects the objective to
+   *  the first unmet feeder of the aim. Where that feeder is THE STATE THE
+   *  WALK IS STANDING ON — stale because something above it was re-signed —
+   *  the objective collapses to the current position, computeRoute is handed
+   *  start === target, and an empty route comes back. Nothing is broken. The
+   *  work is simply HERE, and the answer never said so. The claim guard holds which upstream
+   *  claim fell, the chain it starts at, and the call that re-earns it.
+   *  Measured on the i15 walk: a re-signed gate-kickoff dropped draft-vision
+   *  beneath it, the wait said only that no route existed, and the walk spent
+   *  twenty-five calls trying six phrasings of the same offered door before
+   *  escaping. `se_why` held all of it.
+   *
+   *  SO THE BLOCKERS RIDE THE ANSWER rather than being pointed at. A stop is
+   *  the one place a second call cannot be assumed: nobody may be there.
+   *
+   *  A `wait` CARRYING DOORS IS NOT A STOP, and said nothing about it either.
+   *  The contract defines `wait` as "stop and name the step that waits", so an
+   *  agent obeying it stops while a door stands open beside the answer. The
+   *  doors are the agent's ONLY where the routed goal is behind one — rule 9's
+   *  line, not this branch's to move — so the advice names both halves rather
+   *  than telling anyone to walk.
+   *  see dsp-walk-machine.md#every-door-is-shown */
+  private waitUnroutable(pullTarget: string, note?: string): Record<string, unknown> {
+    const waitingOpts = this.pullOptions();
+    const stuckWhy = this.standingOn(pullTarget) ? undefined : this.whyGrey(pullTarget);
+    const stuckBlockers = Array.isArray(stuckWhy?.blockers) ? (stuckWhy?.blockers as Record<string, unknown>[]) : [];
+    const blocked = stuckBlockers.length > 0;
+    return {
+      pull: "wait",
+      ...(waitingOpts.length > 0 ? { options: waitingOpts } : {}),
+      waiting_for: blocked ? "the work the blocker names" : waitingOpts.length > 0 ? "a choice, or the person" : "the person",
+      why: this.waitWhy(this.standingOn(pullTarget), waitingOpts.length > 0, pullTarget, note),
+      ...(blocked ? { blocked_by: stuckBlockers, blocked_says: stuckWhy?.says } : {}),
+      do: blocked
+        ? `${pullTarget} is not reachable because something it rests on is not standing, and \`blocked_by\` names it with the exact call that fixes it. Do that first — no door gets past it, and the doors offered here lead elsewhere.`
+        : waitingOpts.length > 0
+          ? 'THIS IS NOT NECESSARILY A STOP — the doors in `options` are open from here. Where the goal you were routed to lies behind one, take it with form: {"choice": "<to>"} and the walk aims at it. Where none of them serves that goal, name what waits and STOP: taking a door just because it was offered is choosing unasked.'
+          : "nothing is owed here and no door leads on — name what waits plainly and STOP, because the dial alone cannot wake you",
+    };
+  }
+
+  /** WHAT A `fill` ACTUALLY WANTS, and the reason this is not one sentence.
+   *
+   *  A form comes back for three different reasons and they used to read
+   *  identically: sections are still empty, the fields stand but nothing was
+   *  stamped, or everything stands and signed and the BLESS is what is owed.
+   *  Only the first is the agent's typing. Told to "fill every required
+   *  section" while every section is full, an agent either loops or invents
+   *  a stop — measured on the i15 walk, where a signed gate
+   *  answered `fill` forever and said nothing about the thumb.
+   *
+   *  A GATE IS NOT DONE UNTIL IT IS BLESSED, and the pull is the bless's only
+   *  carrier, so the pull has to say so. */
+  /** WHICH SECTIONS THE ENGINE ALREADY DREW, as one sentence for the fill
+   *  instruction. A drawn field arrives looking exactly like an empty one, so
+   *  the reader cannot tell a computed view from a blank page unless the
+   *  instruction says which is which.
+   *
+   *  MEASURED: 23 of the 86 evidence fields in the rigor matrix are drawn.
+   *  The mark rides on each field’s hint already; this puts it where the
+   *  walker is actually reading. */
+  private drawnNote(names: string[]): string {
+    const drawn: string[] = [];
+    for (const nm of names) {
+      let f: { field_hints?: Record<string, { act?: string }> };
+      try {
+        f = this.formGet(nm) as typeof f;
+      } catch {
+        continue;
+      }
+      for (const [field, hint] of Object.entries(f.field_hints ?? {})) if (hint.act === "rule") drawn.push(field);
+    }
+    if (drawn.length === 0) return "";
+    return ` DRAWN ALREADY, do not write prose into them: ${drawn.join(", ")} — the engine computed each one from what stands elsewhere. Read the drawing, then accept it, reject it or pick among what it offers.`;
+  }
+
+  private fillAdvice(names: string[], fallback: string): string {
+    for (const n of names) {
+      let f: {
+        gate?: boolean;
+        signed?: boolean;
+        bless?: string;
+        problems?: string[];
+        exists?: boolean;
+        fields?: { name: string; required?: boolean; filled?: boolean }[];
+      };
+      try {
+        f = this.formGet(n) as typeof f;
+      } catch {
+        continue;
+      }
+      if ((f.problems ?? []).length > 0) continue; // the agent's own work stands out front
+      // A FORM THAT WAS NEVER OPENED HAS NO PROBLEMS EITHER, and that is the
+      // hole this reads. The linter answers `problems: []` for a missing
+      // instance, so an advice keyed on problems alone told a walker standing
+      // on an empty form that "every required section is filled" — measured
+      // live at iterations/i15/run-demos, whose own `fields` line in the same
+      // answer read `current_situation*=N follow_up*=N`.
+      //
+      // SO ASK THE FIELDS, WHICH CANNOT LIE ABOUT IT. Every advice below says
+      // some version of "the writing is done"; none of them is true until the
+      // required sections carry content.
+      const unfilled = (f.fields ?? []).filter((x) => x.required === true && x.filled !== true);
+      if (f.exists !== true || unfilled.length > 0) continue;
+      if (f.gate === true && (f.bless ?? "") === "") {
+        return f.signed === true
+          ? `${n} STANDS SIGNED AND EVERY SECTION IS FULL. Nothing you type moves it — what is owed is the BLESS, the thumb on this gate. Where the dial puts that thumb in your hand, send it as form: {"bless": true} or {"bless": false} with a verdict. Where it does not, name this gate as the step that waits and STOP: the dial alone cannot wake you.`
+          : `${n} is a GATE and its sections stand. Stamp it with form: {"submit": true}, then the BLESS is what remains — form: {"bless": true} where the dial allows it, otherwise name this gate as the step that waits and stop.`;
+      }
+      if (f.signed !== true) {
+        return `${n}: every required section is filled and NOTHING IS STAMPED. Send form: {"submit": true} — the submit runs every check and signs. Without it this same form comes back looking untouched.`;
+      }
+    }
+    return fallback;
+  }
+
   refusedBlock(names: string[]): Record<string, unknown> {
     const problems = names.flatMap((n) => {
       try {
@@ -3016,13 +3226,29 @@ export class Session {
           source: "engine/session.ts stateform",
         });
       }
-      const feeders = this.claims.feedersUnsigned(fm, this.claims.stateFormState(name, fm));
+      const hereState = this.claims.stateFormState(name, fm);
+      const feeders = this.claims.feedersUnsigned(fm, hereState);
       if (feeders.length > 0) {
+        // A SIGNED FEEDER IS NOT THE FAULT — see Claims.feederFault. Named
+        // alone, a feeder that is signed, complete and correct sends the
+        // reader to a state with nothing wrong with it.
+        const root = this.claims.feederFault(fm, hereState);
+        const upstream =
+          root === undefined
+            ? ""
+            : ` — the break is upstream at ${root.state}${root.why.length > 0 ? `: ${root.why.join(" · ")}` : ", whose form is not signed"}`;
         throw new Rejection({
           clause: CLAUSES.CONDITION_UNMET,
           expected: `a state requires ALL its inputs — every feeder form signed before ${name} may stamp`,
-          got: `unsigned feeders: ${feeders.join(", ")}`,
-          remedy: { tool: "se_pull", args: {}, note: "walk the named states and submit their forms; this one stamps after" },
+          got: `unsigned feeders: ${feeders.join(", ")}${upstream}`,
+          remedy: {
+            tool: "se_pull",
+            args: {},
+            note:
+              root === undefined
+                ? "walk the named states and submit their forms; this one stamps after"
+                : `go to ${root.state} and fix what it names — the feeder above it is already signed, so re-signing it changes nothing`,
+          },
           source: "engine/session.ts stateform",
         });
       }
@@ -3440,7 +3666,7 @@ export class Session {
               tool: "se_pull",
               path: Session.READING_PATH,
               documents: reading.length,
-              note: "pull. It hands you one document and names its last words; return those on the next pull and the following document arrives. No paths to name.",
+              note: "pull. It hands you one document and asks three fill-in-the-blank questions about it; answer them on the next pull and the following document arrives. No paths to name.",
             },
           }
         : {}),

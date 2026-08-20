@@ -1,7 +1,8 @@
 ---
 form: reverse-sensitivity
+reopened: "2026-08-19T17:38:43.020Z — same claims-registration gap, cascading fix through M5"
 by: agent
-signed_off: 2026-08-16T18:20:46.129Z
+signed_off: 2026-08-19T17:38:43.419Z
 authors: agent
 files: null
 ---

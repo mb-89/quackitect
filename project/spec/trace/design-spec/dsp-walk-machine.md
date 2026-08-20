@@ -497,7 +497,6 @@ se_reopen and se_amend join them because A CLAIM IS FIXED FROM OUTSIDE IT
  se_why joins them because A DIAGNOSTIC IS NEEDED EXACTLY WHERE THE WALK IS
  STUCK. A verb that explains why a state is grey, but is only callable from
  states where nothing is grey, is useless at the one moment it exists for.
-
  It was written gated and its own first test caught it: refused at
  boot/read_contract, which is precisely the kind of place somebody asks.
 
@@ -997,8 +996,7 @@ CHOICE POINT: standing on the iterations container with two records
 open, a bare pull left through the container's exit and arrived at the
 desk, because the desk looked like somewhere it had been told to go.
 
-THE REQUIREMENT HAS TWO CONJUNCTS and this is the second: the engine
-"shall enter no iteration AND shall answer with the offer". Leaving
+THE REQUIREMENT HAS TWO CONJUNCTS and this is the second: the engine"shall enter no iteration AND shall answer with the offer". Leaving
 satisfies the first and fails the second, which is exactly the half a
 tester with fresh eyes caught after the builder tested only the first.
 
@@ -1497,7 +1495,6 @@ and at a low dial only a person can. Losing one silently is not the
 same kind of loss, so this one is confirmed rather than assumed.
 
 ## An amend may not break what the signature covers
-
 AN AMEND MAY NOT BREAK WHAT THE SIGNATURE COVERS. Written first and
 judged after, because the check reads the file; a failure puts the
 original back, so a refused amend leaves nothing behind.
@@ -1997,7 +1994,6 @@ EXCEPT ALONG A FALLBACK, AND THAT EXCEPTION IS THE WHOLE REPAIR LOOP
 (owner instruction 2026-08-18: "you do the verification, you fail, you go
 to fix-findings, you go back to verification, you try again... I don't
 know why every agent keeps messing that up").
-
 THEY WERE NOT MESSING IT UP. A fallback edge IS the drawn path for this
 state failing, and this line demanded a GREEN CLAIM before it could be
 walked — which is demanding that the failure not have happened. So a
@@ -2095,3 +2091,15 @@ drawn path back into it.
 SO THE STALE CASE KEEPS THE ACT `se_why` ALREADY NAMES. The reopen is what
 puts the claim in a shape the pop can honour, and it is one call the agent is
 already told to make.
+
+## Only what might need action earns a dot
+
+The exposure chart plots what a reader might still have to do something
+about. Three states are excluded and each for its own reason.
+
+- CLOSED is done.
+- SUPERSEDED is done, by something else.
+- DEFERRED is parked behind its own until, so it is not owed yet.
+
+An entry in any of the three is real and recorded; it just is not a call on
+anybody today, and plotting it buries the ones that are.

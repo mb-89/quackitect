@@ -8,7 +8,7 @@ owner: the maintainer
 trigger: any new lane verb, and any agent's first hour
 status: open
 impact: "Twenty-one refusals in one session — sixteen per cent of every refusal in the window — were an argument named right for a neighbouring tool. Each costs a round trip that produces nothing, and none of them is a mistake about intent."
-breaks_how_badly: crippling
+breaks_how_badly: corrosive
 how_likely: expected
 source_refs:
   - i5-engine-hygiene-one-version-source-every-

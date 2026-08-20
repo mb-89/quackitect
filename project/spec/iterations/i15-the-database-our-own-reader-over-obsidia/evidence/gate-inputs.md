@@ -2,7 +2,7 @@
 form: gate-inputs
 bless: blessed by agent
 by: agent
-signed_off: 2026-08-16T16:52:49.725Z
+signed_off: 2026-08-19T17:23:15.653Z
 authors: agent
 files: null
 ---
@@ -69,7 +69,7 @@ None narrates the pinned subset or the ranking math, per map-stakeholders' own i
 
 ## verdict
 
-pass with overrides — the user picture is sound: four roles re-checked, an excluded-use list still current, three new stories generalized into three new use cases with full bidirectional coverage across the standing 31-story, 38-use-case set. One item stays open, not blocking: raid-risk-i15-ships-without-a-live-prior-art-scan, because no search tool is permitted in this session, same as at gate-kickoff and gate-motivation. change_size stays major, unchanged from gate-kickoff.
+pass with overrides — same two open, non-blocking items carried from gate-motivation: the live prior-art scan (raid-risk-i15-ships-without-a-live-prior-art-scan, no search tool legal yet) and the raid file's own frontmatter (raid-asm-v1-ref-for-spec-queries-is-reachable, no write tool legal at this gate). Coverage checks (story-to-value-prop, use-case-to-story) are computed and green, per this gate's own struck-counts rule; nothing here re-derives them. goals_served and bound_breaches are honestly answered — M2 produced the user picture (context, stakeholders, stories, use cases), not the verb itself, and no interface breach occurred.
 
 ## follow_up
 
@@ -79,3 +79,16 @@ raid-risk-i15-ships-without-a-live-prior-art-scan stays open, resolved at the ne
 
 ## anything_else
 
+## goals_served
+
+- Ship a read-only lane verb that reads nodes, edges, states and notes from .base files, returns filtered rows with chosen fields, and refuses an unknown field by naming the field list.: nothing yet — m2's own outputs (context, stakeholders, stories, use cases) describe who needs this and why; the verb itself is m5/m7 (specify-build/build-chunks) scope.
+- Harvest v1's 25 working .base query files from `spec/queries/` at ref `main`, plus the reader ADR at `spec/decisions/adr-query-in-engine.md`.: nothing yet — still m2 scope to locate and confirm; the actual copy happens once harvesting-legal tools (se_run/se_git) are available, per gate-motivation's own follow_up.
+- Extend the pinned Bases subset only where a harvested query needs it, test-first, reopening the decision rather than smuggling in a silent extension.: nothing yet — contingent on m3's derived requirements naming which harvested queries need it.
+- Add conformance fixtures that pin the subset against drift.: nothing yet — m7 (author-tests) owns it.
+- Fix raid-debt-delta-default-views so the $-item resolvers default to the bound record's minted_in delta, with an opt-in to widen to the corpus.: nothing yet — m2 produced no artifact touching the resolver default; m5/m7 own the rewrite.
+- Build the BM25 retrieval sibling as its own lane verb over the same corpus, forcing per-candidate disposition rather than raw retrieval, and skipping what the graph already encodes structurally.: nothing yet — draw-context named the BM25 sibling as a system neighbour/capability at this milestone; the build is m7.
+- Mint the interface entries both new lane verbs owe.: nothing yet — owed once the verbs exist.
+
+## bound_breaches
+
+- if-agent-harness-to-entrypoint: not breached — no calls against this interface have run since gate-kickoff last signed; M2 states used only file/read/write/search tools.

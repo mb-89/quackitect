@@ -41,6 +41,16 @@ OUR OWN PREDECESSOR (the-query): v1 harvested 25 .base files plus adr-query-in-e
 
 OUR OWN PREDECESSOR (the-disposition): this engine's own judge-a-claim function (cluster-the-walk) already builds a form, checks what comes back, and carries a person's verdict on it — the same explicit-disposition-on-every-item shape, one cluster over, already running in production here.
 
+## live_search_verification
+
+LIVE OUTWARD SEARCH RUN 2026-08-19, closing raid-risk-i15-ships-without-a-live-prior-art-scan for this finder. Three native WebSearch queries, this session, at the state whose tools finally allow it:
+
+- "Obsidian Bases plugin filter sort formula columns 2026" - confirms the shipped-competitor claim above: Bases ships column sort, base-level and view-level filters (AND-combined), and a formula editor via the properties pop-up. Matches practicalpkm.com's plugin overview and got.md's 2026 guide.
+- "Obsidian Dataview plugin DQL query language frontmatter github" - confirms the second shipped-competitor claim: DQL is a pipeline-based, SQL-looking query language, plus inline expressions and DataviewJS; the canonical repo is github.com/blacksmithgu/obsidian-dataview.
+- "Fellegi Sunter 1969 theory record linkage match non-match possible match" - confirms the cluster-the-disposition literature claim: the paper's own three-way decision (link, possible-link, non-link) is exactly the match/non-match/possible-match shape cited above, 2607 citations per scispace.com.
+
+No new competitor or literature surfaced beyond what the resident evidence already named. The claims stand VERIFIED rather than merely asserted.
+
 ## dry_wells
 
 - none — both cluster-the-query and cluster-the-disposition returned real literature and real shipped precedent this pass

@@ -1,16 +1,19 @@
-// A CHECKLIST BELONGS TO THE ITERATION THAT IS WALKING IT.
+// BOTH HALVES OF A STATE ASK ABOUT THE SAME RECORD.
 //
-// `$claim-specs` resolved every non-test spec in the project, with no owner.
-// observe-red asks whether every NEW check failed before the build; handed
-// twenty-one specs, twenty of them other iterations', the only way to satisfy
-// it is to tick boxes for reds nobody observed.
+// observe-red asks whether every NEW check failed before the build. It has two
+// halves and they disagreed about whose checks they meant.
 //
-// The same shape already bit `$promotions` and was already fixed —
-// tests/promotions-stay-home.test.ts pins that one. This resolver sits one
-// function above it in the same file and was left unscoped.
+// THE ENGINE HALF was scoped all along: red-observed.ts reads each test spec's
+// minted_in and skips every one that is not the record standing there.
 //
-// WHAT SETTLES IT is that the state disagreed with itself: red-observed.ts
-// filters test specs by minted_in, and the form half filtered nothing.
+// THE FORM HALF was not. `$claim-specs` resolved every non-test spec in the
+// project, so i37 was handed twenty-one boxes, twenty of them other
+// iterations. The only way to tick those is to assert a red nobody observed.
+//
+// The same shape bit `$promotions` first — tests/promotions-stay-home.test.ts
+// pins that one — and trunk generalised the fix into scopedToOwner with an
+// `:all` opt-out. What this file pins is the AGREEMENT: one state, one answer
+// about whose specs it is asking about.
 // see dsp-evidence-forms.md#a-checklist-over-the-whole-corpus-asks-for-a-lie
 import { strict as assert } from "node:assert";
 import { readFileSync } from "node:fs";
@@ -20,38 +23,33 @@ import { fileURLToPath } from "node:url";
 const STATEFORM = fileURLToPath(new URL("../engine/stateform.ts", import.meta.url));
 const RED_OBSERVED = fileURLToPath(new URL("../engine/bin/red-observed.ts", import.meta.url));
 
-describe("a checklist stays in its own iteration", { concurrency: true }, () => {
-  test("the claim-specs filter matches on the owning record, not just on method", () => {
-    const src = readFileSync(STATEFORM, "utf8");
-    const at = src.indexOf("function claimSpecItems(");
-    assert.ok(at > 0, "the filter exists");
-    const body = src.slice(at, at + 700);
+/** The body of a named function, far enough to cover its filters. */
+function bodyOf(src: string, decl: string): string {
+  const at = src.indexOf(decl);
+  assert.ok(at > 0, `${decl} exists`);
+  return src.slice(at, at + 900);
+}
 
-    assert.match(body, /minted_in/, "it reads the spec's owner");
-    assert.match(body, /basename\(/, "and compares it to the record being walked");
-    assert.ok(
-      body.indexOf("minted_in") > body.indexOf('"test"'),
-      "the owner check comes after the method check, so a test-method spec is still dropped first",
-    );
+describe("a checklist stays in its own iteration", { concurrency: true }, () => {
+  test("the claim-specs source scopes to the record that owns the walk", () => {
+    const body = bodyOf(readFileSync(STATEFORM, "utf8"), "function claimSpecItems(");
+    assert.match(body, /scopedToOwner\(/, "it goes through the shared owner filter");
+    assert.match(body, /minted_in/, "and the thing it matches on is the spec's owner");
   });
 
-  test("the source is given the evidence directory, or it cannot know the owner", () => {
-    const src = readFileSync(STATEFORM, "utf8");
+  test("the call site hands the source the owner, or it cannot scope", () => {
+    // A resolver that scopes but is never told who is walking scopes to nothing.
     assert.match(
-      src,
-      /\$claim-specs"\) return claimSpecItems\(traceRoot, evidenceDir\)/,
-      "the call site passes the record's own folder through",
+      readFileSync(STATEFORM, "utf8"),
+      /claim-specs"\) return claimSpecItems\(traceRoot, owner/,
+      "the owner reaches the resolver",
     );
   });
 
   test("both halves of observe-red scope to the same record", () => {
-    // The form half asks a person about the non-test specs; the engine half
-    // runs the test-method ones. Disagreeing about WHOSE is the defect.
+    // THIS is the case that was actually wrong: one state, two halves, opposite
+    // answers. Either half drifting back to the whole corpus fails here.
     assert.match(readFileSync(RED_OBSERVED, "utf8"), /minted_in/, "the engine half filters by owner");
-    assert.match(
-      readFileSync(STATEFORM, "utf8").slice(readFileSync(STATEFORM, "utf8").indexOf("function claimSpecItems(")),
-      /minted_in/,
-      "and so does the form half",
-    );
+    assert.match(bodyOf(readFileSync(STATEFORM, "utf8"), "function claimSpecItems("), /minted_in/, "and so does the form half");
   });
 });

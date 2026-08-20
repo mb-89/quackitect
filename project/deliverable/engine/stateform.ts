@@ -220,8 +220,33 @@ export interface FieldHint {
   /** Root-relative path to the item template `of:` names, so the reader is
    *  one click from the rules for what they must type. Empty without `of:`. */
   of_template: string;
-  /** The type itself, for the link's label. */
+  /** The type itself, for the link’s label. */
   of: string;
+  /** WHAT THE AGENT'S ACT ON THIS FIELD IS, and the two are not the same
+   *  work. `rule` means the ENGINE DREW IT from what already stands - the
+   *  agent reads the drawing and accepts, rejects or picks. `author` means
+   *  the page is the agent's own to write.
+   *
+   *  MEASURED ON THE RIGOR MATRIX: 23 of its 86 evidence fields are drawn,
+   *  and nothing on the served form said which. A reader cannot tell a
+   *  computed view from an empty page, so the same form invites two opposite
+   *  mistakes - typing prose over a drawing, or stamping one unread. */
+  act: "rule" | "author";
+}
+
+/** Which act a field asks for - see FieldHint.act.
+ *
+ *  FOUR DECLARATIONS MAKE A FIELD DRAWN, and every one of them names a place
+ *  the answer comes FROM: `reads` another field’s output, `writes` a key back
+ *  onto the nodes, `picks` from a live pool, or lists items from a live
+ *  $-source. A field declaring none of them has no source but the agent,
+ *  which is exactly what authoring means. */
+export function fieldAct(f: { reads?: string; writes?: string; picks?: Record<string, string[]>; items?: string[] }): "rule" | "author" {
+  if ((f.reads ?? "") !== "") return "rule";
+  if ((f.writes ?? "") !== "") return "rule";
+  if (Object.keys(f.picks ?? {}).length > 0) return "rule";
+  if ((f.items ?? []).some((i) => i.trimStart().startsWith("$"))) return "rule";
+  return "author";
 }
 
 /** see dsp-evidence-forms.md#type-prefix-and-folder-filled-from-the-fields-declared */
@@ -234,12 +259,13 @@ export function expandHint(root: string, text: string, of: string): string {
     .replace(/\{folder\}/g, tpl?.folder === undefined || tpl.folder === "" ? "project/spec/trace" : tpl.folder);
 }
 
-export function fieldHint(root: string, meta: TemplateMeta | undefined, of: string): FieldHint {
+export function fieldHint(root: string, meta: TemplateMeta | undefined, of: string, act: "rule" | "author" = "author"): FieldHint {
   return {
     placeholder: expandHint(root, meta?.placeholder ?? "", of),
     description: expandHint(root, meta?.description ?? "", of),
     of_template: of === "" || itemTemplate(root, of) === undefined ? "" : itemTemplateRel(of),
     of,
+    act,
   };
 }
 
@@ -510,32 +536,44 @@ export function goalItems(evidenceDir?: string): string[] {
 /** ONE SOURCE RESOLVER, so a `$name` means the same thing wherever it is
  *  written. Items and picks both come through here; a literal passes
  *  straight out, which is what makes a fixed list legal beside a live one. */
+// raid-debt-delta-default-views: A `:all` suffix on a `$name` source is the
+// explicit opt-in that widens a delta-defaulted resolver back to the whole
+// corpus. Only typedItems/claimSpecItems/mustStoryItems/promotionItems read
+// it — the pool/comparison-machine sources below (functions, clusters,
+// flows, options, candidates, criterion_pool, compounding_suspects,
+// assumptions) stay corpus-wide by design: they model something that spans
+// records (an architecture, a candidate pool), not a per-record history
+// list, so scoping them down risks hiding the very options a walk needs to
+// place a new node against. Left as a named follow-up rather than guessed.
 function resolveSource(i: string, root: string, traceRoot: string, instanceRaw?: string, evidenceDir?: string): string[] {
-  if (i === "$inbox") return inboxItems(root, instanceRaw);
-  if (i === "$goals") return goalItems(evidenceDir);
-  if (i === "$breaches") return breachItems();
-  if (i === "$assumptions") return assumptionItems(traceRoot);
-  if (i === "$criterion_pool") return criterionPoolItems(traceRoot);
-  if (i === "$compounding_suspects") return compoundingSuspectItems(traceRoot);
-  if (i === "$criterion_axes") return criterionAxisItems(traceRoot);
-  if (i === "$functions") return functionItems(traceRoot);
-  if (i === "$clusters") return clusterItems(traceRoot);
-  if (i === "$flows") return flowItems(traceRoot);
-  if (i === "$options") return optionItems(traceRoot);
-  const typed = TYPED_SOURCES[i];
-  if (typed !== undefined) return typedItems(traceRoot, typed);
-  const catalog = CATALOG_SOURCES[i];
+  const all = i.endsWith(":all");
+  const name = all ? i.slice(0, -4) : i;
+  const owner = boundOwner(evidenceDir);
+  if (name === "$inbox") return inboxItems(root, instanceRaw);
+  if (name === "$goals") return goalItems(evidenceDir);
+  if (name === "$breaches") return breachItems();
+  if (name === "$assumptions") return assumptionItems(traceRoot);
+  if (name === "$criterion_pool") return criterionPoolItems(traceRoot);
+  if (name === "$compounding_suspects") return compoundingSuspectItems(traceRoot);
+  if (name === "$criterion_axes") return criterionAxisItems(traceRoot);
+  if (name === "$functions") return functionItems(traceRoot);
+  if (name === "$clusters") return clusterItems(traceRoot);
+  if (name === "$flows") return flowItems(traceRoot);
+  if (name === "$options") return optionItems(traceRoot);
+  const typed = TYPED_SOURCES[name];
+  if (typed !== undefined) return typedItems(traceRoot, typed, owner, all);
+  const catalog = CATALOG_SOURCES[name];
   if (catalog !== undefined) return catalogItems(root, catalog);
-  if (i === "$promotions") return promotionItems(traceRoot, evidenceDir);
-  if (i === "$claim-specs") return claimSpecItems(traceRoot, evidenceDir);
-  if (i === "$must-stories") return mustStoryItems(traceRoot);
-  if (i === "$candidates") return candidateItems(traceRoot);
-  if (i === "$triz_parameters") return trizParameterItems(root);
+  if (name === "$promotions") return promotionItems(traceRoot, owner);
+  if (name === "$claim-specs") return claimSpecItems(traceRoot, owner, all);
+  if (name === "$must-stories") return mustStoryItems(traceRoot, owner, all);
+  if (name === "$candidates") return candidateItems(traceRoot);
+  if (name === "$triz_parameters") return trizParameterItems(root);
   // A `$name` NOBODY RESOLVES IS A TYPO, and the silent version of this bug is
   // the worst kind: the field renders, the datalist is empty, and the form
   // looks like it simply has no offer. `$` is reserved for live sources, so a
   // literal can never legitimately start with one.
-  if (i.startsWith("$")) throw new Error(`no item source named ${i} — see resolveSource in stateform.ts for the ones there are`);
+  if (name.startsWith("$")) throw new Error(`no item source named ${name} — see resolveSource in stateform.ts for the ones there are`);
   return [i];
 }
 
@@ -865,7 +903,7 @@ export function stateFormModel(
     fieldArgs[f.name] = fieldArgsFor(f, root, traceRoot, instanceRaw, instanceAbs === undefined ? undefined : dirname(instanceAbs));
   const fieldHints: Record<string, FieldHint> = {};
   for (const f of s.evidence_form) {
-    fieldHints[f.name] = fieldHint(root, templateMetas[f.template ?? "free-form"], f.of ?? "");
+    fieldHints[f.name] = fieldHint(root, templateMetas[f.template ?? "free-form"], f.of ?? "", fieldAct(f));
   }
   for (const d of s.inputs ?? []) inputs.push({ label: d.label, description: d.description, entry: false });
   return {
@@ -975,54 +1013,86 @@ export function candidateItems(traceRoot: string): string[] {
 
 /** $claim-specs, resolved live: the specs no run can prove — every
  *  method but test. Verification observes these green by fresh eyes.
- *
- *  SCOPED TO THE RECORD, exactly like $promotions one function below.
- *  see dsp-evidence-forms.md#a-checklist-over-the-whole-corpus-asks-for-a-lie */
-function claimSpecItems(traceRoot: string, evidenceDir?: string): string[] {
-  const owner = evidenceDir === undefined ? basename(traceRoot) : basename(dirname(evidenceDir));
-  return (
+ *  Delta-defaults to the bound record's own; `:all` opts back into the
+ *  whole corpus (raid-debt-delta-default-views). */
+function claimSpecItems(traceRoot: string, owner?: string, all = false): string[] {
+  return scopedToOwner(
     traceFolder(traceRoot, "test-spec")
       .filter((n) => String(n.fm.method ?? "") !== "test")
-      .filter((n) => String(n.fm.minted_in ?? "").trim() === owner)
       // A demonstrates-only spec belongs to VALIDATION: its run is M8's demo
       // machine and the gate's musts_demonstrated. Verification's checklist
       // holds only specs that verify requirements.
-      .filter((n) => fmList(n.fm.verifies).some((l) => !l.trim().startsWith("<!--") && !/^none\b/i.test(l.trim())))
-      .map((n) => n.id)
-      .sort()
-  );
-}
-
-/** $must-stories, resolved live: the stories graded must. Each one is
- *  demonstrated end to end at M8 and answers the gate with its report. */
-function mustStoryItems(traceRoot: string): string[] {
-  return traceFolder(traceRoot, "story")
-    .filter((n) => String(n.fm.priority ?? "") === "must")
+      .filter((n) => fmList(n.fm.verifies).some((l) => !l.trim().startsWith("<!--") && !/^none\b/i.test(l.trim()))),
+    owner,
+    all,
+    (n) => String(n.fm.minted_in ?? ""),
+  )
     .map((n) => n.id)
     .sort();
 }
 
-/** see dsp-evidence-forms.md#promotions-resolved-live */
-function promotionItems(traceRoot: string, evidenceDir?: string): string[] {
-  // THE OWNER IS THE RECORD'S OWN FOLDER, and it has to be told. traceRoot
-  // defaults to the project root, whose basename is the checkout's name — so
-  // deriving the owner from it matched no record ever, and every promotion
-  // resolved to an empty set.
-  const owner = evidenceDir === undefined ? basename(traceRoot) : basename(dirname(evidenceDir));
+/** $must-stories, resolved live: the stories graded must. Each one is
+ *  demonstrated end to end at M8 and answers the gate with its report.
+ *  Delta-defaults to the bound record's own; `:all` opts back into the
+ *  whole corpus (raid-debt-delta-default-views). */
+function mustStoryItems(traceRoot: string, owner?: string, all = false): string[] {
+  return scopedToOwner(
+    traceFolder(traceRoot, "story").filter((n) => String(n.fm.priority ?? "") === "must"),
+    owner,
+    all,
+    (n) => String(n.fm.minted_in ?? ""),
+  )
+    .map((n) => n.id)
+    .sort();
+}
+
+/** see dsp-evidence-forms.md#promotions-resolved-live
+ *
+ *  THE OWNER COMES FROM evidenceDir, NEVER FROM basename(traceRoot). The
+ *  latter matched only under the abandoned per-record-worktree layout —
+ *  under the current one-tree-one-path ADR traceRoot defaults to the
+ *  project root, whose basename is never an iteration id, so this never
+ *  actually scoped anything. Same bug this whole debt is about. */
+function promotionItems(traceRoot: string, owner?: string): string[] {
   return traceFolder(traceRoot, "experiment")
     .filter((n) => {
       const p = String(n.fm.promote ?? "").trim();
       if (p === "" || /^none\b/i.test(p)) return false;
-      return String(n.fm.minted_in ?? "").trim() === owner;
+      return owner === undefined || String(n.fm.minted_in ?? "").trim() === owner;
     })
     .map((n) => n.id)
     .sort();
 }
 
-function typedItems(traceRoot: string, type: string): string[] {
+// raid-debt-delta-default-views / req-nodes-scoped-to-iteration: A $-item
+// source defaults to the BOUND RECORD'S OWN minted_in delta. `owner` is that
+// record's id (from evidenceDir, never from traceRoot — see boundOwner
+// below); `all` is the explicit `:all` opt-in that widens back to the whole
+// corpus. Nothing bound (owner undefined) leaves legacy corpus-wide
+// behaviour untouched — a corpus-level state has no delta to default to.
+//
+// THE COVERAGE LAWS ARE UNTOUCHED. EvidenceField.covers reads loadTrace
+// directly and never passes through here — this narrows what a resolver
+// SHOWS, never what a coverage check COUNTS.
+function boundOwner(evidenceDir?: string): string | undefined {
+  if (evidenceDir === undefined) return undefined;
+  const id = basename(dirname(evidenceDir));
+  return id === "" || id === "." ? undefined : id;
+}
+
+function scopedToOwner<T>(nodes: T[], owner: string | undefined, all: boolean, mintedInOf: (n: T) => string): T[] {
+  if (all || owner === undefined) return nodes;
+  return nodes.filter((n) => mintedInOf(n).trim() === owner);
+}
+
+function typedItems(traceRoot: string, type: string, owner?: string, all = false): string[] {
   try {
-    return loadTrace(traceRoot)
-      .filter((n) => n.type === type)
+    return scopedToOwner(
+      loadTrace(traceRoot).filter((n) => n.type === type),
+      owner,
+      all,
+      (n) => n.minted_in ?? "",
+    )
       .map((n) => n.id)
       .sort();
   } catch {

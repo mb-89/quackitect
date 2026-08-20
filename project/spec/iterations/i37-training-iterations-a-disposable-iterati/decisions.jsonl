@@ -930,3 +930,10 @@
 {"ts":"2026-08-20T09:47:08.731Z","op":"update","visit":"iterations/i37/build-steps/derive-what-the-walk-cost@0","node":"d168","brief":"reading what biome refuses"}
 {"ts":"2026-08-20T09:47:22.547Z","op":"update","visit":"iterations/i37/build-steps/derive-what-the-walk-cost@0","node":"d169","brief":"the cycling goal had no case, so it gets one"}
 {"ts":"2026-08-20T09:47:30.323Z","op":"update","visit":"iterations/i37/build-steps/derive-what-the-walk-cost@0","node":"d170","brief":"re-checking lint before the commit"}
+{"ts":"2026-08-20T09:47:41.612Z","op":"update","visit":"iterations/i37/build-steps/derive-what-the-walk-cost@0","node":"d171","brief":"merging trunk into the i37 branch"}
+{"ts":"2026-08-20T09:48:20.346Z","op":"update","visit":"iterations/i37/build-steps/derive-what-the-walk-cost@0","node":"d172","brief":"trunk generalized my claim-specs fix, so its version wins"}
+{"ts":"2026-08-20T09:49:10.411Z","op":"update","visit":"iterations/i37/build-steps/derive-what-the-walk-cost@0","node":"d173","brief":"both sides appended independent sections, so both stay"}
+{"ts":"2026-08-20T09:49:27.548Z","op":"update","visit":"iterations/i37/build-steps/derive-what-the-walk-cost@0","node":"d174","brief":"both sides appended independent sections, so both stay"}
+{"ts":"2026-08-20T09:50:12.871Z","op":"update","visit":"iterations/i37/build-steps/derive-what-the-walk-cost@0","node":"d175","brief":"pinning what is actually mine: both halves of one state agree"}
+{"ts":"2026-08-20T09:50:21.857Z","op":"update","visit":"iterations/i37/build-steps/derive-what-the-walk-cost@0","node":"d176","brief":"typechecking the merged tree"}
+{"ts":"2026-08-20T09:50:32.385Z","op":"update","visit":"iterations/i37/build-steps/derive-what-the-walk-cost@0","node":"d177","brief":"completing the trunk merge"}

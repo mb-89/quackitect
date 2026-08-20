@@ -15,6 +15,7 @@ import { createInterface } from "node:readline";
 import { boundAnswer } from "./bound.ts";
 import { Rejection } from "./errors.ts";
 import { type Harness, harnessFor } from "./harness.ts";
+import { RepeatWatch } from "./repeat.ts";
 
 export interface ToolDef {
   /** Wire name, [a-zA-Z0-9_-] only. */
@@ -90,6 +91,8 @@ export function requestContextAdapter(defaults: { workspaceId?: string } = {}): 
 }
 
 export class McpServer {
+  /** see engine/repeat.ts — the same refusal, over and over, is its own fault. */
+  private readonly repeats = new RepeatWatch();
   private tools = new Map<string, ToolDef>();
   private guards: DispatchGuard[] = [];
   private decorators: ResultDecorator[] = [];
@@ -139,6 +142,28 @@ export class McpServer {
 
   addObserver(observer: CallObserver): void {
     this.observers.push(observer);
+  }
+
+  /** A REFUSAL, SERVED AND COUNTED.
+   *
+   *  Rejections are results, not protocol errors: the model must read the
+   *  clause and its executable remedy and recover in one turn.
+   *
+   *  AND WHEN IT DOES NOT, the identical answer comes back and nothing counts
+   *  it. The watch rides ON the refusal, because a refused call cannot be
+   *  refused harder (engine/repeat.ts).
+   *
+   *  THE BOUND HOLDS HERE TOO. An unreadable refusal is worse than an
+   *  unreadable result: the reason a submit was rejected sits inside it, and
+   *  no cheap question answers it. */
+  private refused(id: number | string, name: string, args: Record<string, unknown>, e: Rejection, started: number): JsonRpcResponse {
+    const again = this.repeats.refused(name, String(e.toJSON().clause ?? "(unnamed)"));
+    const body = again === undefined ? e.toJSON() : { ...e.toJSON(), repeated: again };
+    this.observe({ tool: name, args, ok: false, duration_ms: Date.now() - started, outcome: "rejected", response: body });
+    return this.ok(id, {
+      content: [{ type: "text", text: boundAnswer(`${name}-refused`, body, this.seDir).text }],
+      isError: true,
+    });
   }
 
   private observe(record: Parameters<CallObserver>[0]): void {
@@ -221,6 +246,7 @@ export class McpServer {
             // calls.jsonl would bloat it for no reader's benefit.
             const { payload, blocks } = this.splitAttachments(result);
             this.observe({ tool: name, args, ok: true, duration_ms: Date.now() - started, outcome: "result", response: payload });
+            this.repeats.passed(); // the walk moved, so nothing is repeating
             // THE BOUND FIRES HERE because this is the one place every
             // answer is serialised. A host that truncates gives back nothing
             // the engine can act on; the bound gives back a remedy.
@@ -229,18 +255,7 @@ export class McpServer {
               isError: false,
             });
           } catch (e) {
-            if (e instanceof Rejection) {
-              // Rejections are results, not protocol errors: the model must
-              // read clause + executable remedy and recover in one turn.
-              this.observe({ tool: name, args, ok: false, duration_ms: Date.now() - started, outcome: "rejected", response: e.toJSON() });
-              // THE BOUND HOLDS ON REFUSALS TOO. An unreadable refusal is
-              // worse than an unreadable result: the reason a submit was
-              // rejected sits inside it, and no cheap question answers it.
-              return this.ok(id, {
-                content: [{ type: "text", text: boundAnswer(`${name}-refused`, e.toJSON(), this.seDir).text }],
-                isError: true,
-              });
-            }
+            if (e instanceof Rejection) return this.refused(id, name, args, e, started);
             this.observe({
               tool: name,
               args,

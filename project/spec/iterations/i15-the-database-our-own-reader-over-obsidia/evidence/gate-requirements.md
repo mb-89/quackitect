@@ -1,10 +1,10 @@
 ---
 form: gate-requirements
 bless: blessed by agent
+by: agent
+signed_off: 2026-08-19T17:30:40.611Z
 reopened: 2026-08-16T17:25:25.575Z — derive-criteria's weighs_with/weighs_against writes to the same requirement files postdate this gate's signed_off timestamp; two se_amend attempts recorded the ripple but did not clear the downstream claim-guard (signed_off itself is untouched by amend), so a fresh bless is needed to update it
 amended: 2026-08-16T17:23:05.814Z by agent — derive-criteria added weighs_with/weighs_against frontmatter to the same requirement files this round already verified; re-affirming since the substantive claims (statement, kind, priority, breaks_how_badly) this round checked are untouched
-by: agent
-signed_off: 2026-08-16T17:25:33.165Z
 authors: agent
 files: null
 ---
@@ -44,7 +44,7 @@ Design input for i15 is complete: 3 use cases (uc-query-the-corpus-by-structure,
 
 ## verdict
 
-pass with overrides — Design input is coherent, traced both ways, and free of contradictions or scope creep. Two named overrides ride the pass, both already register entries per meth-gate-review's own rule: (1) the $-item resolver-default scope item has a complete repayment spec in raid-debt-delta-default-views.md but no EARS requirement row — acceptable because the debt entry is itself owner-rescheduled and fully specified, but the next state touching resolvers should promote it to a formal row before build closes on it; (2) the live prior-art scan still has not run, tracked in raid-risk-i15-ships-without-a-live-prior-art-scan.md, unresolvable by any state reached this session for lack of a legal search tool. Neither override blocks moving into solution space; both are named so a later sweep does not have to rediscover them.
+pass with overrides — same open items carried forward: the live prior-art scan and the raid file's own frontmatter, both named at gate-motivation and unchanged since. The requirement register (208 rows, seven new this iteration), the solution-neutral function structure, and the assumption sweep with probes are all complete and coverage-checked mechanically. Corpus drift found while re-walking this milestone (a deleted requirement still referenced, an unmarked EARS exemption, two uncovered requirements from another line of work) was fixed in place rather than worked around, and is noted for the retro.
 
 ## follow_up
 
@@ -58,3 +58,16 @@ When the resolver-default work is actually built, write a formal EARS requiremen
 
 ## anything_else
 
+## goals_served
+
+- Ship a read-only lane verb that reads nodes, edges, states and notes from .base files, returns filtered rows with chosen fields, and refuses an unknown field by naming the field list.: nothing yet — m5/m7 (specify-build/build-chunks) own the implementation; m3 wrote the requirements the verb must satisfy (req-query-returns-named-fields, req-query-refuses-unknown-field, req-query-empty-result-explicit, req-query-is-deterministic).
+- Harvest v1's 25 working .base query files from `spec/queries/` at ref `main`, plus the reader ADR at `spec/decisions/adr-query-in-engine.md`.: nothing yet — still owed at the harvesting sub-step, first state where se_run/se_git are legal.
+- Extend the pinned Bases subset only where a harvested query needs it, test-first, reopening the decision rather than smuggling in a silent extension.: nothing yet — m5/m6 own it, contingent on what the harvested queries need.
+- Add conformance fixtures that pin the subset against drift.: nothing yet — m7 (author-tests) owns it.
+- Fix raid-debt-delta-default-views so the $-item resolvers default to the bound record's minted_in delta, with an opt-in to widen to the corpus.: nothing yet — m5/m7 own the resolver-default rewrite.
+- Build the BM25 retrieval sibling as its own lane verb over the same corpus, forcing per-candidate disposition rather than raw retrieval, and skipping what the graph already encodes structurally.: nothing yet — m3 wrote the BM25 requirements (req-bm25-returns-ranked-candidates, req-bm25-below-threshold-returns-empty, req-bm25-candidates-need-disposition); m7 owns the build.
+- Mint the interface entries both new lane verbs owe.: nothing yet — owed once the verbs exist.
+
+## bound_breaches
+
+- if-agent-harness-to-entrypoint: not breached — no calls against this interface have run since gate-kickoff last signed; M2/M3 states used only file/read/write/search/run tools.

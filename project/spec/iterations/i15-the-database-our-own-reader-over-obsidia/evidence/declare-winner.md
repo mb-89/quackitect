@@ -1,7 +1,8 @@
 ---
 form: declare-winner
+reopened: "2026-08-19T17:38:51.891Z — same claims-registration gap, cascading fix through M5"
 by: agent
-signed_off: 2026-08-16T18:21:09.090Z
+signed_off: 2026-08-19T17:38:52.250Z
 authors: agent
 files: null
 ---

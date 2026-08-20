@@ -1,9 +1,9 @@
 ---
 form: gate-motivation
-amended: 2026-08-16T16:38:39.087Z by agent — draw-context's own claim rippled because gate-motivation's hash moved again after the prior amend; re-stamping once more with a real field change so the claim-guard clears
 bless: blessed by agent
 by: agent
-signed_off: 2026-08-16T16:34:32.367Z
+signed_off: 2026-08-19T17:21:13.469Z
+amended: 2026-08-16T16:38:39.087Z by agent — draw-context's own claim rippled because gate-motivation's hash moved again after the prior amend; re-stamping once more with a real field change so the claim-guard clears
 authors: agent
 files: null
 ---
@@ -80,7 +80,7 @@ Every open entry carries an owner and a trigger. The two draft-vision-sourced en
 
 ## verdict
 
-pass with overrides — the packet is sound once the ref-unreachable claim is corrected, which this walk did across every form that carried it. Two items stay open, neither blocking: raid-risk-i15-ships-without-a-live-prior-art-scan (no search tool legal yet) and raid-asm-v1-ref-for-spec-queries-is-reachable's own frontmatter (no write tool legal at this state). Both are reachable from a later state's tools, consistent with gate-kickoff's own precedent for the same two entries. change_size stays major, unchanged from gate-kickoff.
+pass with overrides — same overrides gate-kickoff carried, both open and neither blocking. raid-risk-i15-ships-without-a-live-prior-art-scan stays open until a state with a search tool is legal; raid-asm-v1-ref-for-spec-queries-is-reachable is content-closed everywhere except its own frontmatter, owed at the harvesting sub-step per this form's own follow_up. The vision, delta, scope, risks and PR-FAQ are all filled and signed, the ref-count correction (25 not 26) is now consistent across every M0/M1 form, and both new required fields (goals_served, bound_breaches) are honestly answered — nothing built yet is called built.
 
 ## follow_up
 
@@ -99,3 +99,17 @@ OWED AT write-requirements: the query-verb/BM25-sibling no-silent-case distincti
 Before this gate could be worked, a false claim was traced and killed at its root and in every form that repeated it: gate-kickoff, frame-delta, pressure-test, define-actual, log-risks, draft-vision, scope-non-goals. The ref does resolve; the file count is 25, not 26 — filed separately as note-4db90de22560 since the wrong count traces to record.md/version-planning.md, outside this walk's amend reach.
 
 The raid file's own frontmatter closed at draw-context, once se_file_patch became legal there. Two YAML-breaking colons the first patch introduced were fixed in the same state.
+
+## goals_served
+
+- Ship a read-only lane verb that reads nodes, edges, states and notes from .base files, returns filtered rows with chosen fields, and refuses an unknown field by naming the field list.: nothing yet — m2 (specify-build/build-chunks) owns the implementation.
+- Harvest v1's 25 working .base query files from `spec/queries/` at ref `main`, plus the reader ADR at `spec/decisions/adr-query-in-engine.md`.: nothing yet — the harvest itself is m2 scope; this M1 gate located and confirmed the source (ref main, 25 files) but has not copied anything.
+- Extend the pinned Bases subset only where a harvested query needs it, test-first, reopening the decision rather than smuggling in a silent extension.: nothing yet — m2/m3 own it, contingent on what the harvested queries actually need.
+- Add conformance fixtures that pin the subset against drift.: nothing yet — m2 (author-tests) owns it.
+- Fix raid-debt-delta-default-views so the $-item resolvers default to the bound record's minted_in delta, with an opt-in to widen to the corpus.: nothing yet — m2/m3 own the resolver-default rewrite; log-risks fixed the raid entry's own missing Repayment section, which is bookkeeping, not the fix itself.
+- Build the BM25 retrieval sibling as its own lane verb over the same corpus, forcing per-candidate disposition rather than raw retrieval, and skipping what the graph already encodes structurally.: nothing yet — m2 owns the build; frame-delta and pressure-test argued why it belongs, not built it.
+- Mint the interface entries both new lane verbs owe.: nothing yet — owed once the verbs exist, at or after specify-build.
+
+## bound_breaches
+
+- if-agent-harness-to-entrypoint: not breached — no calls against this interface have run since gate-kickoff last signed; M0/M1 states used only file/read/write/search tools, none of which exercise this interface.

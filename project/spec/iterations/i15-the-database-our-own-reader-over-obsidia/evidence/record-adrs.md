@@ -1,7 +1,8 @@
 ---
 form: record-adrs
+reopened: "2026-08-19T17:39:01.741Z — same claims-registration gap, cascading fix through M5"
 by: agent
-signed_off: 2026-08-16T18:21:48.765Z
+signed_off: 2026-08-19T17:39:02.129Z
 authors: agent
 files: null
 ---

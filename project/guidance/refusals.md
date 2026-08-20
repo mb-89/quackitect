@@ -8,7 +8,7 @@ statement: Every refusal clause, stated as feed-forward — know the rule before
 A refusal is typed. It carries the clause and the remedy — the feedback
 side. This page is the FEED-FORWARD side (owner ruling 2026-08-06):
 every clause in the registry has a section here, so the rule can be known
-before it fires. The registry lives in `deliverable/engine/errors.ts`.
+before it fires. The registry lives in `project/deliverable/engine/errors.ts`.
 
 The pairing rule: a new clause is not done until its section stands here.
 The mechanical enforcement of that rule is parked for the engine iterations;
@@ -429,6 +429,21 @@ hand. Nothing genuinely finished? Say what is actually blocking the item with
 `defer`, or close it `obsolete`. A checklist standing open for hours is the
 thing this stops.
 
+AN ITEM THAT SURVIVES TWO REFUSALS IS THE WRONG SHAPE, and the answer now says
+so by name. Surviving one refusal makes an item suspect; surviving two makes it
+wrong.
+
+THE FIX IS NOT ANOTHER RESOLVING OP. Such an item cannot close from where you
+stand, so there is no work to finish and no `done` to send. Drop it with
+`obsolete`, then send a FRESH PLAN whose items will close in THIS state.
+
+MEASURED ON THE i15 WALK: 59 refusals, every one SE-C-133, every one carrying
+the same two items — "walk boot reading loop", still open hours after boot
+ended, and "work milestones as served", which cannot close until the iteration
+does. The work was real and the narration was honest. The checklist was the
+wrong shape, and naming what was open sent the reader hunting for work to
+finish that did not exist.
+
 ### SE-C-135 — the write did not land as asked
 
 A write verb's payload is DATA. It must land in the file verbatim.
@@ -472,6 +487,16 @@ THE HOLE IT NEVER COVERED. It guarded five path-carrying tools and could not
 watch `se_run`'s shell commands, which are handed no path to judge. That is
 `raid-iss-the-shell-writes-method-with-no-path-to-judge`, and resolution does
 not close it either. A shell still writes wherever it is pointed.
+
+### SE-C-144 — a structured query names a field the matched kind does not carry
+`se_query` refuses by name rather than returning an empty column. The
+refusal lists the fields the matched kind actually carries, so the next
+call can ask correctly without a second guess.
+
+A KIND FILTERS WHICH FIELDS EXIST. `id`, `type` and `statement` are always
+legal; everything else comes from that kind's own frontmatter, so two
+kinds rarely carry the same field list. Asking a raid entry for a
+requirement's `verify_method` is this clause, not a bug in the corpus.
 
 ## Notes and prose
 
@@ -526,3 +551,57 @@ silence and paste, never honesty.
 ### SE-C-125 — a wall of prose
 Long prose carries line breaks. Paragraphs are the author's job — no
 renderer can invent them.
+
+## The same refusal, three times over
+
+A refusal carries a clause, what was expected, what it got, and an executable
+remedy. That is enough to recover in one turn WHEN THE READER TAKES IT.
+
+A reader who does not take it gets the identical answer again. From inside,
+the third identical answer looks exactly like the first, so nothing about the
+answer itself says a loop has started.
+
+SO THE ANSWER NOW COUNTS ITSELF. From the third identical refusal on — same
+tool, same clause, nothing that succeeded in between — the refusal carries a
+`repeated` block naming the count and saying the remedy is not landing.
+
+- AT THREE it points you past the remedy line to the CLAUSE. The clause says
+  what the engine wanted; the gap between that and what you sent is the thing
+  to change.
+- AT FIVE it stops advising another attempt. Say plainly what you were trying
+  to do and what stands in the way. No answer could unblock you? That is an
+  escape. An answer would? Ask where you stand and wait.
+
+A CALL THAT GETS THROUGH CLEARS IT. The memory is one slot deep on purpose:
+what matters is a refusal repeating BACK TO BACK, and a clause hit twice an
+hour apart is not a loop.
+
+A STATE GATE IS THE COMMON CASE, and it never opens by retrying. The tool is
+not legal where you stand, no argument to it changes that, and the state holds
+that job deliberately. Do the work the state names, or capture it with
+`se_note` and keep walking.
+
+MEASURED ON THE i15 WALK: `se_file_move` was refused 27 times with SE-C-110,
+the whole burst inside NINE SECONDS. The two guards that exist measure
+something else — the toll counts silence, the stall guard counts updates since
+anything closed — and both were satisfied throughout. The walk was narrating
+and the walk was busy. It was busy asking one question that had already been
+answered.
+
+### SE-C-145 — the search pattern is not a regex
+
+`se_file_search` runs a regular expression, and an ordinary source fragment is
+a regular expression with an unclosed group in it. `function route(` opens a
+group that never closes. `catch (e)` does the same.
+
+THE ESCAPED PATTERN RIDES THE REFUSAL. Escaping is mechanical, so the answer
+carries the version that would have worked, ready to send. Deciding whether a
+literal was meant is not mechanical, so it is offered rather than substituted —
+send it, or write a real pattern.
+
+WHY IT IS A CLAUSE AND NOT AN ERROR. This came back as raw ripgrep stderr with
+no clause, no remedy and nothing executable, which is the one thing every other
+refusal in this lane is not.
+
+MEASURED ON THE i15 WALK: three searches within a few minutes, all the same
+mistake, each one a thing the reader plainly meant literally.

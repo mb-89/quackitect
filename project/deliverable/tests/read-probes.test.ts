@@ -14,7 +14,7 @@
 // tests/one-probe-maths.test.ts is what keeps that true.
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { probesMissed, readingProbes } from "../engine/readproof.ts";
+import { probesMissed, proofFor, readingProbes, readingWords } from "../engine/readproof.ts";
 import { Session } from "../engine/session.ts";
 import { freshRoot, gitInit } from "./helpers.ts";
 
@@ -108,7 +108,7 @@ land or they change under it, and nothing written here goes stale behind.
 test("the probe that cost the calls is the probe this fixture serves", () => {
   const { ask, expect } = readingProbes(DASHED);
   assert.ok(
-    ask.some((a) => a.includes('FOLLOW "and NO vocabulary on"')),
+    ask.some((a) => a.includes("FOLLOW «and NO vocabulary on»")),
     `the fixture drifted off the shape it pins: ${ask.join(" / ")}`,
   );
   assert.ok(expect.includes("purpose those must come"), `the expected answer is no longer the dashless run: ${expect.join(" / ")}`);
@@ -132,4 +132,110 @@ test("punctuation the probe never counted cannot fail an answer", () => {
 test("a genuinely wrong answer is still refused after the filter loosens", () => {
   const { expect } = readingProbes(DASHED);
   assert.equal(probesMissed(expect, "— — — ...").length, expect.length, "punctuation alone passed for an answer");
+});
+
+// AN ANCHOR THAT APPEARS TWICE HAS TWO RIGHT ANSWERS (the i15 walk).
+//
+// front-desk.md carried "at the end of the" twice — "closes at the end of the
+// day, not at the end of the fix". The probe quoted it, the reader answered
+// past the FIRST occurrence, and the whole document came back. Nothing about
+// that answer was careless; the question had not decided which one it meant.
+//
+// THE FIXTURE IS BUILT, NOT WRITTEN, because the probe sits at a FRACTION of
+// the document. Hand-writing prose whose 30% mark lands on a repeated phrase
+// is guesswork that stops reproducing the moment a word is added.
+
+/** A document whose 30% probe anchor is a run planted earlier as well. */
+function withRepeatedAnchor(): string {
+  const n = 120;
+  const w = Array.from({ length: n }, (_, k) => `word${k}`);
+  const phrase = ["at", "the", "end", "of"];
+  const at30 = Math.floor(n * 0.3);
+  const earlier = Math.floor(n * 0.1);
+  for (let k = 0; k < phrase.length; k++) {
+    w[at30 + k] = phrase[k];
+    w[earlier + k] = phrase[k];
+  }
+  return w.join(" ");
+}
+
+/** How many times the run a probe quoted appears in the document. */
+function anchorHits(doc: string, ask: string): number {
+  const quoted = /FOLLOW [«"](.*)[»"]$/.exec(ask)?.[1];
+  assert.ok(quoted !== undefined, `a probe asked without quoting an anchor: ${ask}`);
+  const words = readingWords(doc).map((x) => x.toLowerCase());
+  const seq = readingWords(quoted).map((x) => x.toLowerCase());
+  let hits = 0;
+  for (let i = 0; i + seq.length <= words.length; i++) if (seq.every((s, k) => words[i + k] === s)) hits++;
+  return hits;
+}
+
+test("a probe never quotes a run the document carries twice", () => {
+  const doc = withRepeatedAnchor();
+  for (const ask of readingProbes(doc).ask) {
+    assert.equal(anchorHits(doc, ask), 1, `the anchor in "${ask}" is not unique — the question has more than one right answer`);
+  }
+});
+
+test("the honest reader's answer still satisfies every probe when an anchor grew", () => {
+  const doc = withRepeatedAnchor();
+  const { expect } = readingProbes(doc);
+  assert.deepEqual(probesMissed(expect, proofFor(doc)), [], "growing the anchor moved what the answer must contain");
+});
+
+// AN ANCHOR THAT CARRIES A QUOTE MARK USED TO HIDE ITS OWN END.
+//
+// Measured on the i15 walk: the ask read `FOLLOW "@ai/sya_kb chapter 01, "using"`
+// and nothing said which quote closed the anchor. That probe took three
+// attempts. 13 of the corpus's 687 probes quote an anchor containing a double
+// quote — about one boot in four serves one.
+test("the ask delimits its anchor with a character the anchor does not contain", () => {
+  const carriesAQuote = `# a card that quotes somebody
+
+Some opening prose so this document clears the sixteen-word floor and the
+probes land by fraction rather than serving the whole of it, exactly as a
+real guidance card written by somebody who meant every line reads.
+
+The verdict field wants a line like "rival wins credible" and nothing longer,
+because a verdict that runs on is a paragraph wearing a verdict's clothes and
+the reader cannot tell which half was the ruling.
+`;
+  for (const ask of readingProbes(carriesAQuote).ask) {
+    const opened = /FOLLOW («|")/.exec(ask);
+    assert.ok(opened !== null, `the ask does not delimit its anchor at all: ${ask}`);
+    const open = opened[1];
+    const close = open === "«" ? "»" : '"';
+    const anchor = ask.slice(ask.indexOf(open) + 1, ask.lastIndexOf(close));
+    assert.ok(anchor.length > 0, `the anchor came out empty: ${ask}`);
+    assert.ok(!anchor.includes(close), `the anchor contains its own closing delimiter, so its end is a guess: ${ask}`);
+  }
+});
+
+// A PROBE ANSWERED ONCE STAYS ANSWERED.
+//
+// The answer names WHICH probes missed, so a reader sends those. Judging that
+// reply against all three failed it for the ones it had already got right, and
+// the only way out was to notice the rule and resend everything every time.
+// The i15 walk worked that out the expensive way and wrote it into its field
+// report as a thing nothing had told it.
+test("answering only the probes that missed is enough, because the rest are banked", async () => {
+  const root = freshRoot();
+  gitInit(root);
+  const s = new Session(root);
+  const first = (await s.pull()) as { pull?: string; document?: { content: string; path: string } };
+  if (first.pull !== "read" || first.document === undefined) return;
+  const [a, b, c] = readingProbes(first.document.content).expect;
+
+  // One right, two wrong — the ordinary partial answer.
+  const partial = (await s.pull({ form: { read: a } })) as { pull?: string; missed?: string[] };
+  assert.equal(partial.pull, "read", "a partial answer credited the whole document");
+  assert.deepEqual(partial.missed, [b, c], `the answer does not name exactly what is still owed: ${JSON.stringify(partial.missed)}`);
+
+  // Now send ONLY what was named as missing. The first probe is not resent.
+  const rest = (await s.pull({ form: { read: `${b} ... ${c}` } })) as { pull?: string; document?: { path: string } };
+  assert.notEqual(
+    rest.document?.path,
+    first.document.path,
+    "answering the named probes served the same document again — the earlier probe was not banked",
+  );
 });

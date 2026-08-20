@@ -1,8 +1,8 @@
 ---
 form: write-requirements
-reopened: 2026-08-16T17:27:50.847Z — claim-guard flags 3 requirements as unresolved artifacts; investigating whether this is a genuine defect or a stale check during the ripple cascade
+reopened: "2026-08-19T17:23:40.939Z — same claims-registration gap, cascading fix through M3"
 by: agent
-signed_off: 2026-08-16T17:39:23.358Z
+signed_off: 2026-08-19T17:26:30.854Z
 authors: agent
 files: null
 ---
@@ -85,7 +85,6 @@ gate-inputs is signed and blessed pass with overrides. Seven new requirement row
 - project/spec/trace/requirement/req-drumroll-arms-deliberately.md
 - project/spec/trace/requirement/req-duplicate-stray-still-captured.md
 - project/spec/trace/requirement/req-emergency-sits-above-full.md
-- project/spec/trace/requirement/req-engine-folder-is-sealed.md
 - project/spec/trace/requirement/req-engine-port-fallback.md
 - project/spec/trace/requirement/req-entering-repairs-itself-or-names-the-remedy.md
 - project/spec/trace/requirement/req-entry-speaks-plainly.md

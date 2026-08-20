@@ -1,0 +1,12 @@
+filters:
+  and:
+    - 'type == "manifest"'
+    - 'mode == "deck"'
+    - 'kind == "ifu"'
+views:
+  - type: table
+    name: The IFUs, in reading order
+    order: [name, statement]
+    sort:
+      - property: file.name
+        direction: ASC
