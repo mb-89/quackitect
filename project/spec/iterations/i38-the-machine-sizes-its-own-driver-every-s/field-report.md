@@ -187,3 +187,53 @@ i38's scope.
   dependency, and a dependency edit is a reopen.
 - Five register entries were minted, three of them from the reviewer's findings.
 
+### F10 — the call log cannot be grouped by the state a call was made in
+
+MEASURED LIVE ON THIS BOX, 2026-08-20. `se_log_query {group_by: "visit"}`
+returns `{"(none)": 190}`. `{group_by: "state"}` returns `{"(none)": 191}`.
+Every record in one bucket, no exceptions. By contrast `{group_by: "actor"}`
+separates cleanly into `ui` 8, `agent` 181, `human` 3 — so the grouping
+mechanism works and the coordinate is simply absent.
+
+THE RETRO METHOD ALREADY KNOWS. Step 9 carries it from 2026-08-17 in its own
+words: per-step cost is not computable today, because the state a call was made
+in rides inside a narration record's arguments where `group_by` does not reach.
+
+WHY IT IS WORTH REPEATING HERE. It is currently written down as a limitation of
+one retro column. It is bigger than that: it is the reason nothing in this
+system can say what any state costs, which makes every "where does the process
+drag" question unanswerable from the record. i38 turned it up from a different
+direction entirely — an iteration about attributing a walk found that the
+walk's other coordinate is missing too.
+
+Registered as `raid-iss-a-call-cannot-be-attributed-to-the-state-it-was-made-in`.
+i38 has taken the fix into scope because its own fourth goal cannot be
+delivered without it.
+
+## Leads for whoever opens an engine iteration
+
+Collected here because none of them is i38's work and none would survive the
+box as a note.
+
+- `preflight` names `engine/bin/place-prompt-layer.ts` in its remedy where the
+  lane carries `se_prompt_place`. Following the remedy as written produced the
+  only shell call of the window.
+- `se-arrive` should place the prompt layer. It already fetches, installs,
+  places the cage and starts the lane, and the projection is deterministic — a
+  fresh clone can only be stale or identical.
+- `se_log_query {group_by: "clause"}` buckets every record under `(none)`. The
+  retro's first prescribed ranking cannot be produced with the prescribed tool.
+- `se_log_query` silently ignores an unknown key inside `filter`. A wrong
+  filter answers instead of refusing, and the answer looks real.
+- `project/guidance/method/tour.md:70` says the matrix has 50 rows. It has 53.
+- `project/guidance/method/subagents.md` needs the seam between a rated state
+  and an ad-hoc task written into it, or its 2026-07-11 grant and i38's fixed
+  list will read as a contradiction to the next person who finds both.
+- `project/guidance/method/retro.md` step 1 owes a sentence about a fresh-clone
+  window, where "since the last retro" means "since this session started" and
+  nothing says so.
+- `project/guidance/method/cloud-runner.md` owes the note half of its own push
+  ruling: on a box that gets reclaimed, `se_note` is the same kind of hole an
+  unpushed commit is.
+
+
