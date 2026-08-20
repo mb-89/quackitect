@@ -1,8 +1,8 @@
 ---
 form: specify-build
 by: agent
-signed_off: 2026-08-20T19:53:59.150Z
-reopened: "2026-08-20T19:53:57.316Z — the account of the ten unrealized crossings this state's law found was written into the next state's draft by mistake. It belongs here: it is what this state did, and the next state did not do it."
+signed_off: 2026-08-20T20:00:00.129Z
+reopened: "2026-08-20T19:59:58.159Z — the sizing spec did not say how a pair maps to one rung where the two figures disagree, and the build is about to write that mapping. The winner named the corner as a cost on its own face and the spec was silent on it."
 authors: agent
 files:
 ---
@@ -12,6 +12,8 @@ files:
 ## current_situation
 
 The six test specs are signed. This state says HOW the thing is designed below the architectural line, then says WHAT is built in which order.
+
+THE SIZING SPEC NOW CARRIES THE CORNER RULE, added before the build wrote it. A pair is two ordinal figures and a rung is one position; the rung is the HIGHER of the two, because under-driving produces a plausible wrong answer that passes and over-driving only costs money. That is the same asymmetry `req-a-weaker-driver-than-named-owes-a-recorded-reason` already encodes, applied one level down. The pair still goes out beside the rung, which is what makes the rule correctable by whoever reads it.
 
 TWO DESIGN SPECS AND TEN CHUNKS. The specs are two because the iteration touches two elements: `el-sizing`, which is new and is the whole of its cluster, and `el-account`, which stands and grows three fields.
 

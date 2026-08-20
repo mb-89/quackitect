@@ -55,6 +55,29 @@ redundancy was argued as a cost — two things to keep consistent — and it is 
 discharges `req-a-machine-decision-repeats`'s second half: the engine records
 what it read. A consumer that disagrees with our rung can still use the pair.
 
+## The corner where the two figures disagree
+
+A PAIR IS TWO ORDINAL FIGURES AND A RUNG IS ONE POSITION, so the mapping needs a
+rule for the corner. `cand-whoever-holds-the-hands-decides` named this cost on
+its own face: the mapping onto a one-dimensional ladder needs a rule where the
+two axes disagree, and `raid-asm-the-model-ladder-is-a-total-order` was already
+unproven.
+
+THE RULE IS THE HIGHER POSITION. A step whose judgement is easy and whose reading
+is enormous gets the hand the reading demands, and the other way round. Under-
+driving produces a plausible wrong answer that passes; over-driving costs money.
+The asymmetry is the same one `req-a-weaker-driver-than-named-owes-a-recorded-reason`
+already encodes, and this rule is that ruling applied one level down.
+
+THE PAIR STILL GOES OUT BESIDE THE RUNG, which is what makes the rule
+correctable. A consumer that reads a rung of `author` and a pair saying the
+judgement is trivial can see that the reading drove it, and choose otherwise.
+That is the redundancy this design paid two-things-to-keep-consistent for.
+
+A PAIR THE LADDER CANNOT PLACE AT ALL is the no-match value and not this rule's
+business. The rule maps positions that exist; a figure outside the vocabulary
+returns `NotApplicable` carrying the pair.
+
 ## Where a difficulty is read
 
 OFF THE STEP IN HAND, NEVER OFF THE MATRIX. The compiled machine carries the

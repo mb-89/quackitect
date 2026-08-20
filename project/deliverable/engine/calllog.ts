@@ -8,6 +8,13 @@ import { appendFileSync, existsSync, mkdirSync, readdirSync, readFileSync, renam
 import { dirname, join } from "node:path";
 import { stripBom } from "./jsonio.ts";
 
+/** THE PART A HAND PLAYED. Closed on purpose: an open vocabulary makes every
+ *  count a guess about what the words meant that day. Two was never the
+ *  property — req-acts-carry-role-and-channel's Detail fixed it at two until
+ *  2026-08-20, which is why no design about which of two agents walks a step
+ *  could ever score on it. */
+export type CallPart = "owner" | "walker" | "guide" | "reviewer" | "surface";
+
 export interface CallRecord {
   ref: string;
   ts: string;
@@ -20,6 +27,42 @@ export interface CallRecord {
   response?: unknown;
   /** see dsp-call-log.md#the-acting-role-is-stamped-where-the-call-is-served */
   actor?: "human" | "agent" | "ui";
+  /** WHICH PART THE WORK'S AUTHOR PLAYED — dsp-the-three-coordinates-on-a-call,
+   *  req-every-call-records-the-part-its-caller-played. A closed vocabulary
+   *  that tells the hand holding the walk apart from a hand it delegated to.
+   *  `actor` cannot: a walker and a guide are both `agent`.
+   *
+   *  NOT ENFORCED YET. The field is declared so the checks at
+   *  tests/call-attribution.test.ts compile and run red. Requiring it,
+   *  refusing a value outside the vocabulary, and taking it from the work's
+   *  AUTHOR rather than the caller are the chunks
+   *  the-call-record-grows-three-fields and
+   *  the-role-vocabulary-separates-two-hands. */
+  part?: CallPart;
+  /** WHO FILED IT, where that is not who authored it. A guide may work the
+   *  lane itself, and then this is absent. Where the walker carries a guide's
+   *  work back instead, `part` stays the guide's and this says who relayed. */
+  relayed_by?: CallPart;
+  /** THE MODEL THAT ANSWERED, taken from what SERVED the call rather than from
+   *  what was requested — req-every-call-records-the-model-that-answered-it. */
+  answered_by?: string;
+  /** THE STATE THE WALK STOOD IN, as a field of its own rather than inside an
+   *  argument, so the log can be grouped by it —
+   *  req-every-call-records-the-state-it-was-made-in. */
+  state?: string;
+  /** WHICH OF THE FIELDS ABOVE ARE SELF-REPORTED. The state is known where the
+   *  call is served; the model and the part are known only to the caller. A
+   *  field that reads like an observation and is a claim is worse than an
+   *  empty one, because nobody knows to doubt it. */
+  claimed?: CallPart extends never ? never : string[];
+  /** THE DRIVER THE MILESTONE NAMED, kept beside what answered so the two can
+   *  be compared without reconstructing either side. */
+  named_driver?: string;
+  /** WHY A WEAKER HAND WALKED IT — req-a-weaker-driver-than-named-owes-a-recorded-reason. */
+  weaker_reason?: string | null;
+  /** THE MARK THAT A REASON WAS OWED AND NOT GIVEN. Marked rather than
+   *  refused: refusing would be a different requirement. */
+  unreasoned?: boolean;
   se_version: string;
 }
 
