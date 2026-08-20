@@ -956,6 +956,76 @@ lost is the guarantee: F17 records that every measurement in this iteration ran
 through Bash rather than the lane, and this is why — Bash was available, because
 the cage was not applied. A caged session could not have made that mistake.
 
+## F29 — reopening a state behind the walk strands the walk, and the machine names the chain it cannot reach
+
+THE CLAIM GUARD'S REMEDY IS UNREACHABLE IN ONE DIRECTION. A reopened state can
+only be re-earned by arriving at it, the drawing has no backward edges, and a
+walk standing downstream of the state it reopened cannot get back to it.
+
+### What was done, and it was the right act
+
+evaluate-set scored a candidate set that was drawn incompletely: two of the four
+lines were silent on an axis all four can answer, because that axis carried one
+distinct value and the completeness check demanded a pick from nobody.
+reverse-sensitivity measured the cost — the winner led on two axes both fed by
+that one cell, and six of seven grafted worlds unseat it. The two candidates were
+redrawn, and evaluate-set was reopened so the scores would be re-earned against
+the corrected set. Contract rule 5: a comparison over incomplete things is not a
+comparison, and you solve it rather than scoring around it.
+
+### What the machine then said, exactly
+
+`se_why` on the state the walk was standing in:
+
+> graft-onto-the-winner's OWN claim may be fine. It is dropped because these
+> inputs are not standing: declare-winner. THE CHAIN STARTS AT evaluate-set:
+> evaluate-set → gate-candidates → converge-pugh → reverse-sensitivity →
+> declare-winner → graft-onto-the-winner. Fixing anything between changes
+> nothing until the root stands.
+
+That is a good diagnostic. It names the root, the chain and the rule. What it
+does not do is offer a way to reach the root.
+
+### Everything tried, and what each returned
+
+- `se_aim` at the root: `found: true` with a route — but the route it draws
+  starts at the machine's entry, not at the walk's position, and the walk does
+  not take it. Four consecutive pulls stayed put.
+- `se_pull` with the state's form filled: refused, `SE-C-110`, "a filled form,
+  but nothing asked for one". A dropped state is not served its own form, so the
+  state cannot be completed and cannot be left.
+- `se_reopen` from downstream: works, with `machine: i38` — that argument is what
+  makes a reopen possible from outside the state at all, and it is easy to miss.
+- `se_escape`: lands at the front desk and UNBINDS the record, after which every
+  `se_reopen` and `se_why` resolves state names against `main` instead of the
+  iteration and refuses with "a state of main with an evidence form". Re-entering
+  through the iterations container does not rebind; the walk's position persists
+  and the target yanks the walk forward again.
+- `se_reload`: legal only at idle, reboots the walk, and its own note promises the
+  walk "reboots at start and walks back to your target". It cleared the blockers
+  `se_why` reports and moved the position not at all.
+
+### Why this is worth an engine iteration
+
+THE ONE-WAY DRAWING IS DELIBERATE AND THE ASYMMETRY IS NOT. Forward-only routing
+is what makes a walk auditable. But `se_reopen` is documented as the way to send a
+standing claim back, and a claim sent back from downstream can never be re-earned
+by the agent who sent it. The tool and the drawing disagree about whether going
+back is possible.
+
+THE HONEST SHAPES OF A FIX, none of them chosen here:
+- A reopen that moves the walk to the state it reopened, since that is what the
+  caller plainly meant.
+- Or a reopen refused from downstream, naming the escape as the remedy — which at
+  least makes the wall visible before the claim is greyed.
+- Or a route drawing that can reach a grey state backwards, which is the largest
+  change and the one that keeps the guard's promise.
+
+WHAT IT LEAVES BEHIND MEANWHILE. i38's evaluate-set is grey on disk — signed
+13:16:33, reopened 13:42:26 — and the five states after it are dropped on the
+chain. The corpus is correct and the record says so; what cannot be done from
+inside the walk is make it stand again.
+
 ## Leads for whoever opens an engine iteration
 
 Collected here because none of them is i38's work and none would survive the

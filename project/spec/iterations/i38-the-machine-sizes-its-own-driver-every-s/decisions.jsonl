@@ -414,3 +414,4 @@
 {"ts":"2026-08-20T13:45:46.281Z","op":"done","visit":"iterations/i38/declare-winner@0","node":"d287","brief":"routing to the held gate so the fallen input is demanded"}
 {"ts":"2026-08-20T13:46:31.439Z","op":"plan","visit":"iterations/i38/derive-functions@0","parent":null,"nodes":[{"id":"d322","brief":"graft the receivers two mechanisms onto the winner"},{"id":"d323","brief":"walk to the held gate"},{"id":"d324","brief":"re-score evaluate-set against the redrawn set"}]}
 {"ts":"2026-08-20T13:47:14.275Z","op":"update","visit":"iterations/i38/derive-functions@0","node":"d325","brief":"grafting the receivers record-validity rule onto the winner"}
+{"ts":"2026-08-20T13:50:19.551Z","op":"update","visit":"iterations/i38/derive-functions@0","node":"d326","brief":"routing back to the grey evaluate-set"}
