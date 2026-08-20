@@ -1,8 +1,8 @@
 ---
 form: declare-winner
 by: agent
-signed_off: 2026-08-19T19:57:34.907Z
-reopened: "2026-08-19T19:56:07.556Z — the M6 spike proved the structural ceiling on probed ground, which is the trigger both blessed gates wrote in advance against the evidence-grade override"
+signed_off: 2026-08-20T07:25:25.074Z
+reopened: "2026-08-20T07:25:23.225Z — a feeder re-signed above it after the v3 merge moved the rigor matrix and the M6 spikes moved the winner"
 authors: agent
 files:
 ---

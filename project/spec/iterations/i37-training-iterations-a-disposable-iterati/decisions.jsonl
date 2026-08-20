@@ -220,3 +220,6 @@
 {"ts":"2026-08-20T07:23:57.439Z","op":"update","visit":"iterations/i37/gate-requirements@0","node":"d7","brief":"re-signing gate-requirements against the moved ground"}
 {"ts":"2026-08-20T07:24:09.541Z","op":"update","visit":"iterations/i37/derive-criteria@0","node":"d8","brief":"re-signing derive-criteria against the moved ground"}
 {"ts":"2026-08-20T07:24:19.625Z","op":"update","visit":"iterations/i37/partition-functions@0","node":"d9","brief":"re-signing partition-functions against the moved ground"}
+{"ts":"2026-08-20T07:25:13.363Z","op":"update","visit":"iterations/i37/reverse-sensitivity@0","node":"d10","brief":"answering the graft question the merge added"}
+{"ts":"2026-08-20T07:25:24.638Z","op":"update","visit":"iterations/i37/declare-winner@0","node":"d11","brief":"re-signing declare-winner against the moved ground"}
+{"ts":"2026-08-20T07:26:22.401Z","op":"update","visit":"iterations/i37/graft-onto-the-winner@0","node":"d12","brief":"the graft state records two grafts this iteration had already made by hand"}

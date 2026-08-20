@@ -1,7 +1,7 @@
 ---
 form: reverse-sensitivity
 by: agent
-signed_off: 2026-08-19T18:53:21.187Z
+signed_off: 2026-08-20T07:25:13.680Z
 authors: agent
 files:
 ---
@@ -39,3 +39,12 @@ WHAT WOULD FLIP IT IS NOT A WEIGHT AT ALL.
 SO THE SENSITIVITY THAT MATTERS IS TO FACTS, NOT TO PREFERENCES. This decision was made on what has been run, and it changes when what has been run changes.
 
 THE HONEST WEAKNESS THAT LEAVES. A decision insensitive to its weights can also mean the axes are too few to discriminate. Three axes over four curves that share nine of ten cells is thin, and the earlier observation stands: the cells should have been scored rather than the curves.
+
+## reverse_graft
+
+- the leader's structural ceiling, grafted onto cand-the-thin-run => it overtakes. The thin run's only weakness was a checked guard; give it the truncated history and it loses nothing and gains everything, because its other cells were already the cheap probed ones. THIS IS THE GRAFT THAT WON — the declared winner IS the thin run's cells with the guarded run's ceiling, arrived at from the other side.
+- the leader's bind-time conditions, grafted onto cand-the-refusing-run => it overtakes, and this graft was named before any score was written. The refusing run scored 1 on host-swap for one cell. Swap it and the curve totals 12 on entirely probed mechanisms.
+- the leader's forbidden request, grafted onto cand-the-guarded-run => no overtake, and it is worth saying why. Against a structural ceiling the forbidden request proves the TREE was truncated rather than proving a guard ran. It is still worth carrying, but it stops being what separates the candidates.
+- the leader's incremental report, grafted onto either rival => no overtake and no evidence either way. Nothing has tested writing a report as the walk goes, and it is the one cell of the winner that carries no measurement.
+- the leader's single visibility rule, grafted onto every rival => no overtake, because it is not the leader's to lend. It is a standing work token the owner has now ruled into this iteration's scope, so every curve gets it or none does.
+- REVERSED, the rivals' strengths tried on the leader => the thin run's cheapness is the only one, and the leader already has it. The structural ceiling costs nothing per resolution, so the leader is now cheaper than the candidate that won on cheapness.
