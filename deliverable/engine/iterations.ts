@@ -418,6 +418,18 @@ export function iterationDrift(root: string, it: Iteration): string[] {
   return movedDemands(pin.demands, demandsFor(readRigorMatrix(root), pin.change_size as ChangeColumn));
 }
 
+/** NO PIN YET, which is every iteration up to its kickoff bless.
+ *
+ *  Such a record has no stored column, so nothing about it can go stale — and
+ *  that is exactly the hole. Its M0 machine is compiled live from the matrix,
+ *  while the frame the walk stands on was snapshotted when the record was
+ *  entered. A matrix correction made from inside M0 therefore reached nothing
+ *  at all, because every refresh path is guarded by a pin that does not
+ *  exist. */
+export function pinIsUnset(it: Iteration): boolean {
+  return readPin(it)?.change_size === undefined;
+}
+
 /** see dsp-record-lifecycle.md#did-the-matrix-move-under-this-pin */
 export function pinIsStale(root: string, it: Iteration): boolean {
   const pin = readPin(it);

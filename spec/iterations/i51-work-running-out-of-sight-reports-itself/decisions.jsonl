@@ -1,0 +1,52 @@
+{"ts":"2026-08-20T20:52:06.290Z","op":"done","visit":"front_desk@0","node":"d1","brief":"swept the desk: 38 iterations open, 0 pending notes"}
+{"ts":"2026-08-20T20:52:47.143Z","op":"done","visit":"front_desk@0","node":"d2","brief":"entered i51; onboard-retro reached with an empty inbox"}
+{"ts":"2026-08-20T20:53:08.276Z","op":"plan","visit":"iterations/i51/onboard-retro@0","parent":null,"nodes":[{"id":"d4","brief":"establish the retro boundary from the call log"},{"id":"d5","brief":"fill onboard-retro honestly and submit"}]}
+{"ts":"2026-08-20T20:53:15.689Z","op":"done","visit":"front_desk@0","node":"d3","brief":"entered iterations/i51 and reached onboard-retro"}
+{"ts":"2026-08-20T20:53:39.183Z","op":"done","visit":"iterations/i51/onboard-retro@0","node":"d4","brief":"boundary is 2026-08-20T20:49:02Z; all 51 records are this session's"}
+{"ts":"2026-08-20T20:53:53.640Z","op":"plan","visit":"iterations/i51/gate-kickoff@0","parent":null,"nodes":[{"id":"d6","brief":"read the i51 seed and goals"},{"id":"d7","brief":"run the kickoff gate review rounds"},{"id":"d8","brief":"propose a change size and bless"}]}
+{"ts":"2026-08-20T20:53:59.046Z","op":"done","visit":"iterations/i51/onboard-retro@0","node":"d5","brief":"onboard-retro signed with the skip case recorded"}
+{"ts":"2026-08-20T20:54:05.904Z","op":"done","visit":"iterations/i51/gate-kickoff@0","node":"d6","brief":"read i51 record: three pieces, third made mandatory by a note"}
+{"ts":"2026-08-20T20:56:46.117Z","op":"fork","visit":"iterations/i51/gate-kickoff@0","parent":null,"node":"d9","brief":"ten gate rows lost evidence and tools to literal backslash-n","nodes":[]}
+{"ts":"2026-08-20T20:56:53.549Z","op":"update","visit":"iterations/i51/gate-kickoff@0","node":"d10","brief":"ten rows patched to real newlines; checking the served form recovers"}
+{"ts":"2026-08-20T20:57:09.131Z","op":"update","visit":"iterations/i51/gate-kickoff@0","node":"d11","brief":"probing whether the matrix is cached: se_log_query was one of the swallowed tools"}
+{"ts":"2026-08-20T20:57:16.181Z","op":"update","visit":"iterations/i51/gate-kickoff@0","node":"d12","brief":"matrix is cached at startup; reloading so the patched rows take effect"}
+{"ts":"2026-08-20T21:00:28.092Z","op":"update","visit":"iterations/i51/gate-kickoff@0","node":"d13","brief":"the M0 frame is frozen at entry; driftReopen is the only refresher and it needs a pin"}
+{"ts":"2026-08-20T21:00:50.739Z","op":"update","visit":"iterations/i51/gate-kickoff@0","node":"d14","brief":"pinIsStale returns false with no pin, so the unpinned M0 frame never refreshes"}
+{"ts":"2026-08-20T21:01:08.806Z","op":"done","visit":"iterations/i51/gate-kickoff@0","node":"d9","brief":"root cause found: unpinned records never refresh the M0 frame"}
+{"ts":"2026-08-20T21:01:24.828Z","op":"plan","visit":"iterations/i51/gate-kickoff@0","parent":null,"nodes":[{"id":"d15","brief":"patch the unpinned refresh hole"},{"id":"d16","brief":"restart the lane so the engine change loads"},{"id":"d17","brief":"confirm the kickoff form serves change_size"}]}
+{"ts":"2026-08-20T21:01:58.017Z","op":"done","visit":"iterations/i51/gate-kickoff@0","node":"d15","brief":"pinIsUnset added; driftReopen now swaps the frame for an unpinned record"}
+{"ts":"2026-08-20T21:03:26.974Z","op":"update","visit":"iterations/i51/start@1","node":"d22","brief":"back at i51 start; walking to the kickoff gate on a fresh machine"}
+{"ts":"2026-08-20T21:03:40.364Z","op":"done","visit":"iterations/i51/gate-kickoff@0","node":"d17","brief":"gate now serves change_size and all twelve legal tools; both fixes confirmed live"}
+{"ts":"2026-08-20T21:03:45.490Z","op":"plan","visit":"iterations/i51/gate-kickoff@1","parent":null,"nodes":[{"id":"d23","brief":"read both work tokens"},{"id":"d24","brief":"draft goals and scope"},{"id":"d25","brief":"pick the change size"},{"id":"d26","brief":"fill and bless the gate"}]}
+{"ts":"2026-08-20T21:04:07.024Z","op":"done","visit":"iterations/i51/gate-kickoff@1","node":"d23","brief":"both tokens read: a job listing with time left, and a non-freezing exit script"}
+{"ts":"2026-08-20T21:04:12.700Z","op":"update","visit":"iterations/i51/gate-kickoff@1","node":"d27","brief":"sizing the work against the existing job surface in tools-run.ts"}
+{"ts":"2026-08-20T21:04:19.684Z","op":"update","visit":"iterations/i51/gate-kickoff@1","node":"d28","brief":"reading the se_run job surface to name what exists and what is missing"}
+{"ts":"2026-08-20T21:05:14.758Z","op":"update","visit":"iterations/i51/gate-kickoff@1","node":"d29","brief":"checking the register shape to mint the estimate assumption"}
+{"ts":"2026-08-20T21:05:22.483Z","op":"update","visit":"iterations/i51/gate-kickoff@1","node":"d30","brief":"an assumption on battery timings already stands; reading before minting a duplicate"}
+{"ts":"2026-08-20T21:05:47.880Z","op":"done","visit":"iterations/i51/gate-kickoff@1","node":"d24","brief":"goals and scope drafted; the estimate assumption is minted"}
+{"ts":"2026-08-20T21:06:08.620Z","op":"update","visit":"iterations/i51/gate-kickoff@1","node":"d31","brief":"checking the size parser before wording the rationale"}
+{"ts":"2026-08-20T21:06:14.944Z","op":"update","visit":"iterations/i51/gate-kickoff@1","node":"d32","brief":"reading the size parser body"}
+{"ts":"2026-08-20T21:06:19.751Z","op":"update","visit":"iterations/i51/gate-kickoff@1","node":"d33","brief":"reading kickoffSizeFromForm at sessionforms.ts:442"}
+{"ts":"2026-08-20T21:06:25.887Z","op":"update","visit":"iterations/i51/gate-kickoff@1","node":"d34","brief":"reading chosenOption, the matcher that bit i8"}
+{"ts":"2026-08-20T21:06:32.453Z","op":"update","visit":"iterations/i51/gate-kickoff@1","node":"d35","brief":"reading choiceOf, which decides which words become the choice"}
+{"ts":"2026-08-20T21:07:09.229Z","op":"update","visit":"iterations/i51/gate-kickoff@1","node":"d36","brief":"grounding prior art: the first search did not support an ETA claim"}
+{"ts":"2026-08-20T21:07:16.492Z","op":"update","visit":"iterations/i51/gate-kickoff@1","node":"d37","brief":"fetching the Jenkins primary for its estimated-duration contract"}
+{"ts":"2026-08-20T21:07:27.284Z","op":"update","visit":"iterations/i51/gate-kickoff@1","node":"d38","brief":"the interface fetched carries no estimate; going to the class that does"}
+{"ts":"2026-08-20T21:07:35.500Z","op":"update","visit":"iterations/i51/gate-kickoff@1","node":"d39","brief":"searching the fetched page rather than paging 42KB by hand"}
+{"ts":"2026-08-20T21:08:44.101Z","op":"done","visit":"iterations/i51/gate-kickoff@0","node":"d7","brief":"gate review rounds written with prior art grounded and the assumption minted"}
+{"ts":"2026-08-20T21:08:59.809Z","op":"update","visit":"iterations/i51/gate-kickoff@1","node":"d40","brief":"the per-item key did not match; reading the checker"}
+{"ts":"2026-08-20T21:09:05.472Z","op":"update","visit":"iterations/i51/gate-kickoff@1","node":"d41","brief":"narrowing to stateform.ts for the answered check"}
+{"ts":"2026-08-20T21:09:12.152Z","op":"update","visit":"iterations/i51/gate-kickoff@1","node":"d42","brief":"searching for the exact unanswered-item message site"}
+{"ts":"2026-08-20T21:09:18.202Z","op":"update","visit":"iterations/i51/gate-kickoff@1","node":"d43","brief":"reading the per-item checker in stateform-problems.ts"}
+{"ts":"2026-08-20T21:09:31.256Z","op":"update","visit":"iterations/i51/gate-kickoff@1","node":"d44","brief":"the key is the expanded inbox label; finding how it is built"}
+{"ts":"2026-08-20T21:09:38.461Z","op":"update","visit":"iterations/i51/gate-kickoff@1","node":"d45","brief":"hunting the inbox label builder"}
+{"ts":"2026-08-20T21:09:45.038Z","op":"update","visit":"iterations/i51/gate-kickoff@1","node":"d46","brief":"reading inboxItems for the exact label format"}
+{"ts":"2026-08-20T21:10:03.391Z","op":"done","visit":"iterations/i51/gate-kickoff@1","node":"d25","brief":"major, with the walking core named as what it moves"}
+{"ts":"2026-08-20T21:10:20.628Z","op":"update","visit":"iterations/i51/gate-kickoff@1","node":"d47","brief":"bless refused for authority; looking for the dial's own control"}
+{"ts":"2026-08-20T21:10:26.472Z","op":"update","visit":"iterations/i51/gate-kickoff@1","node":"d48","brief":"no lane verb for the dial; checking the mirror and entrypoint paths"}
+{"ts":"2026-08-20T21:10:56.720Z","op":"update","visit":"iterations/i51/gate-kickoff@1","node":"d49","brief":"checking whether the claim stamped and only the thumb is owed"}
+{"ts":"2026-08-20T21:11:23.327Z","op":"done","visit":"iterations/i51/gate-kickoff@1","node":"d26","brief":"gate signed by agent; the bless alone is owed and sits above tactical"}
+{"ts":"2026-08-20T21:11:29.024Z","op":"plan","visit":"iterations/i51/gate-kickoff@1","parent":null,"nodes":[{"id":"d50","brief":"read the contract's rule 8 as it stands"},{"id":"d51","brief":"correct the handover line at the desk"},{"id":"d52","brief":"re-project the prompt layer"}]}
+{"ts":"2026-08-20T21:11:50.117Z","op":"done","visit":"iterations/i51/gate-kickoff@1","node":"d50","brief":"rule 8 read; the correction keeps both halves true"}
+{"ts":"2026-08-20T21:11:57.173Z","op":"update","visit":"iterations/i51/gate-kickoff@1","node":"d53","brief":"guidance edited; re-projecting so the prompt layer does not go stale"}
+{"ts":"2026-08-20T21:12:09.260Z","op":"done","visit":"iterations/i51/gate-kickoff@1","node":"d51","brief":"contract rule 8 corrected: the field report is owed, the agent handover is not"}

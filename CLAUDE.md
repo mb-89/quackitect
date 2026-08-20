@@ -1,5 +1,5 @@
 <!-- GENERATED at agent start. Do not edit — the next start overwrites it.
-     from guidance/contract.md c1e9d6861080
+     from guidance/contract.md acbe6e9f500d
      from guidance/walking.md aa037cd19661
      from guidance/method/lane.md fc4e6dfd660f
      from guidance/voice.md 2bbb7751a28c
@@ -159,14 +159,36 @@ where the machine reads it:
 - condition notes
 - the spec
 
-THERE IS NO HANDOVER FILE, and nobody writes one. The duty only ever discharged
-on a tidy exit, and sessions get killed instead. What replaced it is derived:
-boot describes the last session from the call log and puts it on the banner, so
-nothing is written on the way out and nothing is read on the way in.
+NOTHING IS WRITTEN FOR THE NEXT AGENT TO READ. The old handover file was read
+by the session that followed, it only ever got written on a tidy exit, and
+sessions get killed instead. What replaced it is derived: boot describes the
+last session from the call log and puts it on the banner.
 
 SO WHAT THE NEXT SESSION MUST KNOW GOES IN THE FOUR HOMES ABOVE, written when
 the thought occurs. A note, a parked to-do, or guidance — never saved for an
 exit that may never come.
+
+A FIELD REPORT IS OWED AT THE END OF EVERY RUN, and it is a different object
+(owner ruling 2026-08-20). This paragraph used to say no handover file is
+written at all, and the owner struck that: "I don't agree with this. This is an
+error in the guidance."
+
+THE TWO ARE NOT THE SAME THING, which is why both halves stand.
+
+- The handover file was for the next AGENT, and the call log replaced it.
+- The field report is for the PERSON, and nothing replaces it.
+
+WHAT GOES IN IT: everything that cannot be mapped onto the repository.
+Improvements you found, what fought you, what you struggled with, and anything
+you could not give a home in git.
+
+WHY IT CANNOT BE SKIPPED: notes are machine-local and die with the container.
+The report is the channel that reaches a person, so an unwritten one throws
+that away.
+
+WHERE IT GOES: `.se/field-report.md`, which is not committed, and PRINTED IN
+FULL as the closing message. The file is the convenience; the message is the
+delivery. `guidance/method/cloud-runner.md` carries the detail.
 
 ## 9. Never open a record unasked
 
