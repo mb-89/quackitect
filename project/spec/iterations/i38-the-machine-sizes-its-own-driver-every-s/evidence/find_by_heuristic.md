@@ -1,5 +1,6 @@
 ---
 form: find_by_heuristic
+amended: "2026-08-20T14:10:08.944Z by agent — three where two confirmed a requirement, caught by reading this form's own sweep table"
 by: agent
 signed_off: 2026-08-20T12:08:28.197Z
 authors: agent
@@ -42,7 +43,7 @@ yes
 
 ## follow_up
 
-FOUR OF EIGHT BIT, AND THE OTHER FOUR ARE NOT WASTE. Three of the silent four confirmed a standing requirement rather than proposing anything, and one found the chart already held both sides of its fork. A catalogue sweep that produced eight new options would be the suspicious result.
+FOUR OF EIGHT BIT, AND THE OTHER FOUR ARE NOT WASTE. Two of the silent four confirmed a standing requirement rather than proposing anything, one confirmed a measurement rather than a requirement — the cluster cut, two edges in and out — and one found the chart already held both sides of its fork. CORRECTED at gate-candidates by reading this form's own sweep table back. A catalogue sweep that produced eight new options would be the suspicious result.
 
 THE ACCOUNT CLUSTER CARRIES A HOLE THE OTHER FINDERS WALKED PAST. req-a-weaker-driver-than-named-owes-a-recorded-reason obliges a reason for a divergence no record can currently show, so as it stands the obligation is unenforceable, and both audit options depend on the same missing comparison. That is a defect in the requirement set, not only a candidate on the chart — it should be tested at gate-design and, if it survives, the requirement wants amending rather than the option winning.
 

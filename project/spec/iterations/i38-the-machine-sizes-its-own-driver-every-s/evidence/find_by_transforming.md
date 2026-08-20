@@ -1,5 +1,6 @@
 ---
 form: find_by_transforming
+amended: "2026-08-20T14:10:08.637Z by agent — three finders where five had run, contradicted by the same form's opening line"
 by: agent
 signed_off: 2026-08-20T12:14:02.798Z
 authors: agent
@@ -51,7 +52,7 @@ yes
 
 ## follow_up
 
-NINE OF TWELVE PRODUCED SOMETHING AND THAT RATE DESERVES SUSPICION, not celebration. It is high because the incumbent is a four-function block nobody has built yet, so every operator has an unconstrained thing to push on and none of them meets resistance from an implementation. The three finders that ran before this one were all bounded by something outside the design — what exists elsewhere, what the record already contradicts, what another domain settled — and this one is bounded by nothing. Treat the nine as a wide net, not as nine good ideas.
+NINE OF TWELVE PRODUCED SOMETHING AND THAT RATE DESERVES SUSPICION, not celebration. It is high because the incumbent is a four-function block nobody has built yet, so every operator has an unconstrained thing to push on and none of them meets resistance from an implementation. The FIVE finders that ran before this one were bounded by something outside the design in three cases and by something inside it in two — CORRECTED at gate-candidates, and the correction weakens the point rather than the count: prior art, contradiction and analogy are bounded outside, trimming and heuristics are not, and this form's own opening line says fifteen options stood from five finders — what exists elsewhere, what the record already contradicts, what another domain settled — and this one is bounded by nothing. Treat the nine as a wide net, not as nine good ideas.
 
 THREE OF THEM ARE THE STRONGEST THINGS ON THE CHART, WHICH IS THE OTHER HALF OF THE SAME OBSERVATION. Deriving difficulty from the row's own field count is the only candidate that cannot drift, because there is no declaration to raise. Publishing the difficulty rather than a driver removes two unproven assumptions and makes the design's safety rule hold by construction. Walking a sampled step twice is the only candidate on the chart that can return the answer that this whole record was not worth making.
 

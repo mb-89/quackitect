@@ -418,3 +418,31 @@
 {"ts":"2026-08-20T13:57:52.972Z","op":"update","visit":"iterations/i38/derive-functions@0","node":"d3","brief":"repairing four hostile-pass findings in the candidate nodes"}
 {"ts":"2026-08-20T13:59:27.525Z","op":"update","visit":"iterations/i38/derive-functions@0","node":"d4","brief":"repairing four hostile-pass findings in the candidate nodes"}
 {"ts":"2026-08-20T14:00:05.653Z","op":"update","visit":"iterations/i38/derive-functions@0","node":"d5","brief":"recording the unearned found_by and correcting an inflated impact"}
+{"ts":"2026-08-20T14:02:59.787Z","op":"update","visit":"iterations/i38/derive-functions@0","node":"d6","brief":"walking the route back toward the chain root"}
+{"ts":"2026-08-20T14:03:36.399Z","op":"update","visit":"iterations/i38/derive-functions@0","node":"d7","brief":"aiming at the chain root and reading the aim answer"}
+{"ts":"2026-08-20T14:05:33.513Z","op":"plan","visit":"iterations/i38/derive-functions@0","parent":null,"nodes":[{"id":"d8","brief":"close the dangling attribution flow"},{"id":"d9","brief":"sweep back to the chain root"},{"id":"d10","brief":"re-score against the redrawn set"}]}
+{"ts":"2026-08-20T14:05:56.895Z","op":"update","visit":"iterations/i38/evaluate-set@0","node":"d11","brief":"at the chain root, reading the recheck"}
+{"ts":"2026-08-20T14:06:39.496Z","op":"plan","visit":"iterations/i38/evaluate-set@0","parent":null,"nodes":[{"id":"d12","brief":"read the candidates"},{"id":"d13","brief":"score them"}]}
+{"ts":"2026-08-20T14:06:51.374Z","op":"update","visit":"iterations/i38/evaluate-set@0","node":"d14","brief":"paging seed-made-total spill"}
+{"ts":"2026-08-20T14:06:57.670Z","op":"update","visit":"iterations/i38/evaluate-set@0","node":"d15","brief":"paging seed-made-total spill"}
+{"ts":"2026-08-20T14:07:05.352Z","op":"update","visit":"iterations/i38/evaluate-set@0","node":"d16","brief":"finish seed-made-total"}
+{"ts":"2026-08-20T14:07:13.312Z","op":"update","visit":"iterations/i38/evaluate-set@0","node":"d17","brief":"read the derived ladder"}
+{"ts":"2026-08-20T14:07:29.168Z","op":"defer","visit":"iterations/i38/derive-functions@0","node":"d8","brief":"close the dangling attribution flow","to":"d13","hops":1,"trail":["iterations/i38/derive-functions","d13"]}
+{"ts":"2026-08-20T14:07:35.616Z","op":"update","visit":"iterations/i38/evaluate-set@0","node":"d18","brief":"read the reader beside the walk"}
+{"ts":"2026-08-20T14:07:40.674Z","op":"update","visit":"iterations/i38/evaluate-set@0","node":"d19","brief":"paging reader beside the walk"}
+{"ts":"2026-08-20T14:07:49.235Z","op":"update","visit":"iterations/i38/evaluate-set@0","node":"d20","brief":"finish reader beside the walk"}
+{"ts":"2026-08-20T14:07:56.853Z","op":"update","visit":"iterations/i38/evaluate-set@0","node":"d21","brief":"read the receiver decides"}
+{"ts":"2026-08-20T14:08:05.617Z","op":"update","visit":"iterations/i38/evaluate-set@0","node":"d22","brief":"paging receiver decides"}
+{"ts":"2026-08-20T14:08:10.786Z","op":"done","visit":"iterations/i38/evaluate-set@0","node":"d12","brief":"all four candidates read in full"}
+{"ts":"2026-08-20T14:08:17.666Z","op":"update","visit":"iterations/i38/evaluate-set@0","node":"d23","brief":"read the crippling attribution issue"}
+{"ts":"2026-08-20T14:08:34.947Z","op":"update","visit":"iterations/i38/evaluate-set@0","node":"d24","brief":"read the both-drivers option"}
+{"ts":"2026-08-20T14:09:13.536Z","op":"update","visit":"iterations/i38/evaluate-set@0","node":"d25","brief":"amending partition-functions two miscounts"}
+{"ts":"2026-08-20T14:10:08.305Z","op":"update","visit":"iterations/i38/evaluate-set@0","node":"d26","brief":"amending find_prior_art"}
+{"ts":"2026-08-20T14:10:08.554Z","op":"update","visit":"iterations/i38/evaluate-set@0","node":"d27","brief":"amending find_by_transforming"}
+{"ts":"2026-08-20T14:10:08.873Z","op":"update","visit":"iterations/i38/evaluate-set@0","node":"d28","brief":"amending find_by_heuristic"}
+{"ts":"2026-08-20T14:10:09.119Z","op":"update","visit":"iterations/i38/evaluate-set@0","node":"d29","brief":"amending find_by_probing"}
+{"ts":"2026-08-20T14:11:01.443Z","op":"update","visit":"iterations/i38/evaluate-set@0","node":"d30","brief":"amending build_chart: five figures and the two redrawn visits"}
+{"ts":"2026-08-20T14:11:36.454Z","op":"update","visit":"iterations/i38/evaluate-set@0","node":"d31","brief":"amending run-candidates"}
+{"ts":"2026-08-20T14:11:36.718Z","op":"update","visit":"iterations/i38/evaluate-set@0","node":"d32","brief":"amending the-reader-beside-the-walk"}
+{"ts":"2026-08-20T14:12:15.736Z","op":"update","visit":"iterations/i38/evaluate-set@0","node":"d33","brief":"check the separate-reader prior art"}
+{"ts":"2026-08-20T14:12:24.995Z","op":"update","visit":"iterations/i38/evaluate-set@0","node":"d34","brief":"check the double-walk comparison mechanism"}

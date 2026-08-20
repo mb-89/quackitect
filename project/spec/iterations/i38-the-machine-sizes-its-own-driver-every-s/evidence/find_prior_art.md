@@ -1,5 +1,6 @@
 ---
 form: find_prior_art
+amended: "2026-08-20T14:10:08.386Z by agent — three false figures and one fact this record had already corrected elsewhere and left standing here"
 by: agent
 signed_off: 2026-08-20T12:22:53.447Z
 reopened: "2026-08-20T12:21:02.589Z — the deep search it commissioned returned after it was signed, and named prior art it does not carry: XACML NotApplicable as a returned no-match value, compile-time totality checking over the mapping, and four shipped recommend-only reconcilers. The form claims a completed search over the sizing cluster and the search was still running."
@@ -15,7 +16,7 @@ M4's candidate space opens. The block being enumerated against is the one the pa
 
 THAT SEAM IS WHY THIS SEARCH IS NARROWER THAN THE KICKOFF'S. The kickoff scanned LLM routing and scheduler practice for the design as a whole. This one asks what else is shaped like a four-function block that resolves a declared class to a worker and publishes it without dispatching.
 
-THE COMMISSIONED SCAN REPORTED AFTER THIS FORM WAS SIGNED, and the form was reopened for it. The literature and shipped sections are the first pass unchanged, re-read from the kickoff's own primary sources. What the scan added lands in the options, the dry wells and the follow-up — and it did not confirm the first pass. It filled two of the three dry wells the first pass declared, which is the finding.
+THE COMMISSIONED SCAN REPORTED AFTER THIS FORM WAS SIGNED, and the form was reopened for it. The literature and shipped sections are the first pass unchanged, re-read from the kickoff's own primary sources. What the scan added lands in the options, the dry wells and the follow-up — and it did not confirm the first pass. It filled two of the FOUR dry wells the first pass declared, which is the finding. CORRECTED at gate-candidates: this form's dry_wells section holds four bullets, two marked FILLED and two still dry, and saying three inflated the surviving well into a lone survivor.
 
 ## applies
 
@@ -56,7 +57,7 @@ AND ONE SHIPPED BEHAVIOUR IS EVIDENCE AGAINST OUR OWN PORTABILITY ASSUMPTION rat
 
 ## dry_wells
 
-- Taking a maximum over a group and keeping the spread visible. STILL DRY AFTER THE DEEPER SCAN, and now precisely so. The first half is standard and named: Kubernetes computes a pod's effective request as the maximum over its containers, and the waste that follows is documented and accepted rather than mitigated. Nothing was found for the second half — reporting the spread the maximum hid — under any name, in any scheduler, in any router. That is either our contribution or our blind spot and the scan cannot say which.
+- Taking a maximum over a group and keeping the spread visible. STILL DRY AFTER THE DEEPER SCAN, and now precisely so. The first half is standard and named: Kubernetes computes a pod's effective request as the higher of the sum over its app containers and the maximum over its init containers, and the waste that follows is documented and accepted rather than mitigated. CORRECTED at gate-candidates: this sentence said a maximum over its containers. The record caught that at the re-signing and the correction never reached this form, which is worse than the original error because it was known. Nothing was found for the second half — reporting the spread the maximum hid — under any name, in any scheduler, in any router. That is either our contribution or our blind spot and the scan cannot say which.
 - Rating work a priori by whether a checker could catch a wrong answer. Searched at the kickoff, again in the first pass, and again by the deeper scan. The seam appears in training-pipeline domain splits and in post-hoc cascading, never as an a-priori rating.
 - FILLED, AND THE FIRST PASS WAS WRONG: recommendation-only reconciliation. Four shipped systems do exactly this — Kubernetes VPA in updateMode Off, Goldilocks, Robusta KRR, and Slurm's seff. Three of the four cannot act even in principle, because the recommender holds no write path into the thing it advises. Recorded as opt-a-separate-reader-recommends-and-never-acts.
 - FILLED, AND OLDER THAN EXPECTED: the name-and-do-not-spawn split. XACML's policy decision point has returned a decision for an enforcement point to act on since 2003, and its four-value vocabulary includes NotApplicable — a standardised value for no policy matched, distinct from an evaluation failure. Our unmatched case publishes an absence where a twenty-year-old standard publishes a value. Recorded as opt-the-no-match-is-a-returned-value-not-an-absence.
@@ -67,9 +68,9 @@ AND ONE SHIPPED BEHAVIOUR IS EVIDENCE AGAINST OUR OWN PORTABILITY ASSUMPTION rat
 
 - THE THIRD IS STILL THE ONE THAT COULD REPLACE THE PLAN. Deriving the rung from what will judge the output is the only option in the set that answers the standing drift risk, because a derived value is wrong only if a checkable declaration is wrong.
 
-- THE DEEPER SCAN'S REAL RESULT IS ABOUT THIS FORM, NOT ABOUT THE DESIGN. Two of three dry wells were filled, and both by prior art that is older and better documented than anything the first pass cited. A dry well written from the sources in hand is a statement about the sources in hand, and this form said so at the time — "either they are genuinely novel or the search was too narrow". It was the second, twice.
+- THE DEEPER SCAN'S REAL RESULT IS ABOUT THIS FORM, NOT ABOUT THE DESIGN. Two of four dry wells were filled, and both by prior art that is older and better documented than anything the first pass cited. A dry well written from the sources in hand is a statement about the sources in hand, and this form said so at the time — "either they are genuinely novel or the search was too narrow". It was the second, twice.
 
-- THE ONE THAT SURVIVED IS THEREFORE WORTH MORE THAN IT WAS. Keeping the spread visible after a maximum came back empty from a scan that filled the other two. The nearest named practice accepts the waste and documents it. That is the closest thing this record has to an original contribution, and it is a half-sentence in a requirement nobody has argued about.
+- THE ONE THAT SURVIVED IS THEREFORE WORTH MORE THAN IT WAS. Keeping the spread visible after a maximum came back empty from a scan that filled two of the other three. The fourth, rating work a priori by whether a checker could catch a wrong answer, came back empty as well and this paragraph used to write it out of existence. The nearest named practice accepts the waste and documents it. That is the closest thing this record has to an original contribution, and it is a half-sentence in a requirement nobody has argued about.
 
 - ONE FINDING WENT STRAIGHT INTO ANOTHER FINDER RATHER THAN HERE. Nix's requiredSystemFeatures is the closest structural match found anywhere — a declared property set on the work, resolved against workers — and its distinguishing property is that the worker may refuse. That is a reversal, not a mapping, so it is credited inside opt-the-driver-reads-the-difficulty-and-decides-whether-to-take-it where find_by_transforming had already reached it independently. Two finders arriving at one design from opposite directions is the strongest signal on the chart.
 

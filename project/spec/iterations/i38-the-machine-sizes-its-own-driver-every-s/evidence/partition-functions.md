@@ -1,5 +1,6 @@
 ---
 form: partition-functions
+amended: "2026-08-20T14:09:13.627Z by agent — two mutually consistent miscounts of the-walk's size, caught by a hostile pass recounting this form's own clusters table"
 by: agent
 signed_off: 2026-08-20T11:47:31.096Z
 authors: agent
@@ -72,11 +73,11 @@ ONE CLUSTER IS NEW, and it was decided by measuring the flows rather than by rea
 
 ## follow_up
 
-- THE NEW CLUSTER IS `the-sizing` AND IT WAS MEASURED. The four decision functions were first filed under `the-walk` alongside thirteen others. A search over every function node for the flows this change added shows they are coupled to each other by THREE flows nothing else in the corpus touches — flow-step-difficulty, flow-milestone-difficulty, flow-driver-recommendation — and to the rest of the system at exactly TWO points: flow-compiled-machine arriving at the first, flow-instruction leaving the last. Dense internally, two external interfaces. That is a cluster by the DSM's own test and not by anybody's judgment.
+- THE NEW CLUSTER IS `the-sizing` AND IT WAS MEASURED. The four decision functions were first filed under `the-walk` alongside nine others — CORRECTED at gate-candidates, where a hostile pass counted the clusters table in this form: nine rows read `the-walk`, so the cluster held thirteen functions before the four were cut out, not seventeen. A search over every function node for the flows this change added shows they are coupled to each other by THREE flows nothing else in the corpus touches — flow-step-difficulty, flow-milestone-difficulty, flow-driver-recommendation — and to the rest of the system at exactly TWO points: flow-compiled-machine arriving at the first, flow-instruction leaving the last. Dense internally, two external interfaces. That is a cluster by the DSM's own test and not by anybody's judgment.
 
 - THE FIFTH FUNCTION STAYS IN `the-account` and the same measurement says why. fn-...stamp-who-answered-and-where takes flow-dispatched-call, which five other functions also take, and emits flow-call-attribution, which nothing else touches. It is coupled outward on its input and exclusive on its output — the opposite shape from the sizing chain, and it belongs with the functions that write the record.
 
-- WHY THIS MATTERS BEYOND TIDINESS: M4 enumerates its candidate space from the function structure. A four-function block with two interfaces is a thing a candidate design can replace wholesale — a runtime router substitutes exactly that block and nothing else. Buried inside a seventeen-function `the-walk`, the same fact is invisible, and the candidate space would have been drawn around the wrong seam.
+- WHY THIS MATTERS BEYOND TIDINESS: M4 enumerates its candidate space from the function structure. A four-function block with two interfaces is a thing a candidate design can replace wholesale — a runtime router substitutes exactly that block and nothing else. Buried inside a thirteen-function `the-walk`, the same fact is invisible, and the candidate space would have been drawn around the wrong seam.
 
 - THE COUPLING MEASUREMENT ITSELF WENT WRONG ONCE AND IS WORTH RECORDING. The first read of it came from a STALE SPILL FILE — a previous search's answer still on disk under the same path — and returned rigor-matrix rows instead of function nodes. It was caught because the result was obviously the wrong shape. A quieter stale read would not have been.
 

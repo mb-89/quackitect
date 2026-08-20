@@ -1,5 +1,6 @@
 ---
 form: the-reader-beside-the-walk
+amended: "2026-08-20T14:12:48.549Z by agent — a claim that no finder had ever been hostile-passed, falsified by this record own evidence directory half an hour before this form signed"
 by: agent
 signed_off: 2026-08-20T12:50:52.912Z
 authors: agent
@@ -26,7 +27,7 @@ THE FEASIBILITY IS MEASURED BECAUSE MOST OF IT ALREADY RAN. Probe 2 read all 640
 
 THE ONGOING FAILURE MODE IS THAT NOBODY RUNS IT. Three of the four shipped systems this is modelled on are dashboards, and nothing in this record establishes that anyone here would read one. evaluate-set should treat "is useful on day one" and "is read on day two" as different claims.
 
-AND THE HISTORY SIGNAL'S CONFOUND IS THIS CANDIDATE'S CENTRAL RISK, not a footnote. All six finder states read as easy at zero reopens in six walks, and nothing has ever run a hostile pass over a finder. A row never checked is indistinguishable from a row never wrong, and this design would reward exactly the states whose errors went uncaught.
+AND THE HISTORY SIGNAL'S CONFOUND IS THIS CANDIDATE'S CENTRAL RISK, not a footnote. The finder states read as easy at or near zero reopens, and that is partly a record of where somebody chose to look. CORRECTED at gate-candidates: the claim that NOTHING has ever run a hostile pass over a finder was false when it was written. find_prior_art is a finder, it was reopened at 12:21 for exactly such a pass, and that was half an hour before this form signed at 12:50. Probe 2 measured the population 27 seconds before the reopen landed, so the measurement was honest and the sentence built on it was not. The confound is real and the absolute was not. A row never checked is indistinguishable from a row never wrong, and this design would reward exactly the states whose errors went uncaught.
 
 ## anything_else
 

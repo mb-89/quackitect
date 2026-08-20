@@ -38,6 +38,7 @@ inputs:
   - flow-sweep-result
   - flow-divergence-report
   - flow-failure-disposition
+  - flow-call-attribution
 outputs:
   - flow-call-log
   - flow-trace-graph
@@ -50,6 +51,19 @@ source_refs:
   - uc-trace-a-decision-to-its-origin
   - uc-research-and-record-an-answer
 ---
+
+## The attribution lands here, added at i38
+
+flow-call-attribution WAS PRODUCED AND NOTHING TOOK IT IN. i38 derived
+stamp-who-answered-and-where, which outputs which model answered a call and which
+state the walk stood in, and left the flow dangling — the closure check names it
+exactly: "nothing consumes it — either something is made that nothing wants, or it
+crosses out".
+
+IT WANTS THIS FUNCTION AND NO OTHER. The attribution is one more thing that has
+to reach the log, and keeping the log is what this function does; it already takes
+flow-dispatched-call and emits flow-call-log. Stamping and keeping are two acts,
+which is why they are two functions, and the flow between them is the handover.
 
 ## Rationale
 
