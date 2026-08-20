@@ -116,3 +116,9 @@
 {"ts":"2026-08-20T10:36:34.765Z","op":"update","visit":"iterations/i38/map-stakeholders@0","node":"d9","brief":"map-stakeholders: five roles, and the always-on classes ruled"}
 {"ts":"2026-08-20T10:37:00.044Z","op":"update","visit":"iterations/i38/map-stakeholders@0","node":"d10","brief":"registering the role-coverage hole this state left"}
 {"ts":"2026-08-20T10:37:00.162Z","op":"update","visit":"iterations/i38/map-stakeholders@0","node":"d11","brief":"map-stakeholders signed"}
+{"ts":"2026-08-20T10:37:55.483Z","op":"plan","visit":"iterations/i38/write-stories@0","parent":null,"nodes":[{"id":"d12","brief":"write the stories for the driver question"},{"id":"d13","brief":"generalize use cases"},{"id":"d14","brief":"gate inputs"}]}
+{"ts":"2026-08-20T10:39:33.798Z","op":"update","visit":"iterations/i38/generalize-use-cases@0","node":"d15","brief":"generalize-use-cases: reading the form"}
+{"ts":"2026-08-20T10:40:30.604Z","op":"update","visit":"iterations/i38/generalize-use-cases@0","node":"d16","brief":"minting the driver-naming use case"}
+{"ts":"2026-08-20T10:40:30.724Z","op":"update","visit":"iterations/i38/generalize-use-cases@0","node":"d17","brief":"minting the attribution use case"}
+{"ts":"2026-08-20T10:40:48.788Z","op":"update","visit":"iterations/i38/generalize-use-cases@0","node":"d18","brief":"generalize-use-cases: two minted, one standing one touched"}
+{"ts":"2026-08-20T10:41:02.888Z","op":"update","visit":"iterations/i38/generalize-use-cases@0","node":"d19","brief":"generalize-use-cases signed"}
