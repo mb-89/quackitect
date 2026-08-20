@@ -2,8 +2,8 @@
 form: gate-architecture
 bless: blessed by agent
 by: agent
-signed_off: 2026-08-19T20:12:46.179Z
-reopened: "2026-08-19T20:11:58.176Z — evaluate-architecture re-signed above it, and the milestone it blessed now carries a different ceiling and three fewer risks"
+signed_off: 2026-08-20T07:31:14.239Z
+reopened: "2026-08-20T07:31:11.829Z — a feeder re-signed above it after the v3 merge moved the rigor matrix and the M6 spikes moved the winner"
 authors: agent
 files:
 ---

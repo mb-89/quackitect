@@ -1,8 +1,8 @@
 ---
 form: rank-unknowns
 by: agent
-signed_off: 2026-08-19T20:13:10.569Z
-reopened: "2026-08-19T20:13:10.134Z — gate-architecture re-signed above it, and three of the five picked unknowns were answered by the spikes it seeded"
+signed_off: 2026-08-20T07:31:25.387Z
+reopened: "2026-08-20T07:31:18.958Z — a feeder re-signed above it after the v3 merge moved the rigor matrix and the M6 spikes moved the winner"
 authors: agent
 files:
 ---
