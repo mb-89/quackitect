@@ -740,6 +740,101 @@ in prose is unverifiable by anyone who was not there. A count bound to the
 command that produced it is verifiable forever. Seven times in one milestone, the
 difference mattered.
 
+## F24 — walking a sub-machine seeded mid-walk, the pull reports the wrong form
+
+This cost about eight calls and would strand a walker that trusted what it read.
+
+WHAT HAPPENED. `run-candidates` carries `runs: candidates`, and its drawing at
+`<record>/machines/candidates.md` was still a placeholder — build_chart's own
+guidance says it authors that drawing, and it had not. I wrote the drawing, then
+filled and submitted the placeholder's form.
+
+THE SUBMIT WORKED. `run-candidates.md` was written with a `signed_off` stamp, the
+sub-machine compiled, and the engine created `the-seed-made-total.md` for its
+first compose state.
+
+THE PULL WENT ON REPORTING `run-candidates`, with `exists: false` and
+`status: missing`, for a file that was on disk and signed. Every subsequent pull
+said the same. Reading the reported form, the correct conclusion was that the
+submit had silently failed — and it had not. The fields I sent next landed on
+`the-seed-made-total` while the pull was still describing `run-candidates`.
+
+HOW I FOUND THE TRUTH. `.se/decisions.jsonl` records a `visit` on every narration
+op, and it read `iterations/i38/run-candidates/the-seed-made-total@0`. The
+decision log knew where the walk stood; the pull did not say.
+
+WHAT I CHASED FIRST AND WAS WRONG ABOUT. I read `stateFormGet` at
+`sessionclaims.ts:320`, `formGet` at `session.ts:3141`, and the `exists` flag at
+`sessionclaims.ts:403`, and formed a theory that the machine root had shifted. It
+had not — `workRoot()` and `machineRoot()` both return `this.root`
+(`session.ts:869-876`). The theory was wrong and the reading was wasted; what
+settled it was noticing a file the engine had created that I had not.
+
+IT CLEARED ITSELF THE MOMENT THE SUB-MACHINE CLOSED. After the fourth compose
+state signed, the pull reported `cut-criteria` correctly. So the defect is
+specific to standing inside a sub-machine seeded during the walk.
+
+WORTH SAYING PLAINLY: the walk was never broken. Only the report was. That is the
+worse of the two failures, because a broken walk refuses and a wrong report is
+believed.
+
+## F25 — a criteria pool of 119 and five rows that discriminate
+
+cut-criteria hands over the standing should-and-could pool — 119 rows, ordered
+blind before any candidate existed — and asks where the line falls.
+
+FIVE ROWS SURVIVED. Everything else measures something all four candidates do
+identically: overlay resolution, setup paths, the newcomer's tour, what the panel
+shows a returning person. A criterion that cannot tell the candidates apart
+contributes nothing to a comparison; it adds a row that reads "identical under
+all four" and makes the score sheet look thorough.
+
+NONE OF THE RECORD'S OWN TEN REQUIREMENTS IS IN THE POOL, and that is right
+rather than an oversight. All ten are `priority: must`. A must is a constraint —
+a candidate satisfies it or is not a candidate — and only a row a candidate can
+score badly on while remaining a candidate discriminates. The distinction is
+worth naming because it looks like an omission: the iteration's own requirements
+appear nowhere in the comparison that decides the iteration's design.
+
+ONE MOVE, AND THE TEMPLATE MAKES A MOVE EXPENSIVE ON PURPOSE.
+`req-comparison-carries-both-sides` sat at 52 on a ranking sorted by damage
+grade. It is the sharpest discriminator on this chart — every candidate makes a
+comparative claim, the driver named against the driver that answered, and
+cand-the-receiver-decides is the only one that structurally cannot carry both
+sides. It moved to 10 with a written rationale. The whole project had made two
+moves before this one, across every record.
+
+WHY THE TEMPLATE IS RIGHT TO CHARGE FOR IT. The order was settled blind, which is
+what keeps it honest, and a move is the one edit that can be aimed at a
+favourite. Charging a rationale for it is the same instinct as binding a claim to
+its query: make the act that could be abused leave a trace.
+
+## F26 — the state that forbids the composer from judging
+
+evaluate-set's own row carries an owner ruling from 2026-08-10: a research agent
+scores, never the builder, and the research agent is SPAWNED. It receives the
+candidate records, the axes, the anchors and the prior-art list, and none of the
+composer's reasoning. Its scores land verbatim; a disagreement is recorded beside
+a score rather than written over it.
+
+THAT IS THE NEGATIVE CONTROL F11 SAID THIS PROCESS LACKED, and it was already in
+the matrix. F11 classified seven fabrications and found two that evidence-binding
+could not catch, because they were wrong inferences from sound evidence, and said
+those need a fresh reader. This state IS a fresh reader, mandated, for exactly
+the judgement most likely to be bent by having done the work.
+
+AND THE 4-AND-5 RULE IS EVIDENCE-BINDING IN THE SAME CLOTHES. A score above
+prior-art par requires a NAMED external comparison in its own column. No name, no
+score above 3. That is the same mechanism as the outward-search condition in F18:
+it does not check whether the claim is true, it requires the thing that would
+make it checkable to be present.
+
+SO THE PATTERN IS NOT NEW MACHINERY, IT IS ONE MECHANISM APPEARING THREE TIMES.
+An outward option owes a query in the log. A moved criterion owes a rationale. A
+score above par owes a name. Each makes the cheap, unfalsifiable version of an
+act impossible to record. What is missing is the fourth instance F16 asked for:
+a claim about our own work owing the query that produced it.
+
 ## Leads for whoever opens an engine iteration
 
 Collected here because none of them is i38's work and none would survive the

@@ -342,3 +342,10 @@
 {"ts":"2026-08-20T12:55:13.486Z","op":"plan","visit":"iterations/i38/cut-criteria@0","parent":null,"nodes":[{"id":"d226","brief":"aim the walk at ship"},{"id":"d227","brief":"evaluate the candidate set"},{"id":"d228","brief":"gate the design"}]}
 {"ts":"2026-08-20T12:55:20.277Z","op":"update","visit":"iterations/i38/cut-criteria@0","node":"d229","brief":"aiming the walk at the ship state"}
 {"ts":"2026-08-20T12:55:26.759Z","op":"update","visit":"iterations/i38/cut-criteria@0","node":"d230","brief":"aiming the walk at the ship state"}
+{"ts":"2026-08-20T12:59:13.064Z","op":"update","visit":"iterations/i38/evaluate-set@0","node":"d231","brief":"scoring four candidates against five requirements; reading option nodes"}
+{"ts":"2026-08-20T12:59:20.024Z","op":"update","visit":"iterations/i38/evaluate-set@0","node":"d232","brief":"reading option nodes named by the four candidates to score them"}
+{"ts":"2026-08-20T12:59:30.198Z","op":"update","visit":"iterations/i38/evaluate-set@0","node":"d233","brief":"reading the no-match option node"}
+{"ts":"2026-08-20T12:59:36.821Z","op":"update","visit":"iterations/i38/evaluate-set@0","node":"d234","brief":"reading the driver-claim-validity option node"}
+{"ts":"2026-08-20T12:59:42.121Z","op":"update","visit":"iterations/i38/evaluate-set@0","node":"d235","brief":"reading the record-is-the-channel option node"}
+{"ts":"2026-08-20T12:59:51.546Z","op":"update","visit":"iterations/i38/evaluate-set@0","node":"d236","brief":"reading the double-walk comparison option node"}
+{"ts":"2026-08-20T12:59:57.710Z","op":"update","visit":"iterations/i38/evaluate-set@0","node":"d237","brief":"reading the sample-audit option node"}
