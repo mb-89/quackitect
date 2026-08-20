@@ -48,7 +48,42 @@ export function controlFilesPresent(tree: string, otherIteration: string): numbe
   return n;
 }
 
-/* THE CONCEALMENT IS NOT BUILT AND CARRIES NO STUB.
+/** THE CONCEALMENT. `project/spec/benchmarks` is invisible while a run is
+ *  bound and visible everywhere else.
+ *
+ *  ASKED AT THE CALL SITES, NEVER ATTACHED TO A LIST. Four exclusion lists
+ *  decide what a lane verb may see, they disagree, and `search.ts` consults
+ *  none of them — it asks ripgrep and filters the answer itself. A rule riding
+ *  one list would hold in one quarter of the lane.
+ *
+ *  A RULE, NOT A SUBSTRING. `benchmarksomething/` is not the reports folder,
+ *  so the match is on a path SEGMENT.
+ *
+ *  WHY A BOUND RUN MUST NOT SEE THEM. A run that can read the previous run's
+ *  numbers can work toward them, and the measurement stops being one. */
+export function concealedFromLane(rel: string, bound: boolean): boolean {
+  if (!bound) return false;
+  const parts = rel.replace(/\\/g, "/").split("/");
+  for (let i = 0; i + 2 < parts.length + 1; i += 1) {
+    if (parts[i] === "project" && parts[i + 1] === "spec" && parts[i + 2] === "benchmarks") return true;
+  }
+  return false;
+}
+
+/** The call sites the mask covers, asserted so a verb added later fails its
+ *  check rather than escaping the rule silently. */
+export function concealmentCallSites(): string[] {
+  return ["engine/files.ts:fileGlob", "engine/files.ts:fileList", "engine/files.ts:fileRead", "engine/search.ts:fileSearch"];
+}
+
+/** WHETHER A RUN IS OPEN. Read from disk rather than held in memory, because
+ *  the verb that binds a run and the verb that reads a path are different
+ *  calls in different modules. */
+export function isBound(root: string): boolean {
+  return existsSync(join(root, ".se", "benchmark.json"));
+}
+
+/* THE OLD NOTE, kept because it records why this waited.
  *
  * It used to sit here as two functions returning `false` and `[]`. Nothing
  * called them, so they were dead code that made the design look half-present —

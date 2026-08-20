@@ -1732,3 +1732,14 @@
 {"ts":"2026-08-20T12:47:26.823Z","op":"update","visit":"iterations/i37/gate-implementation@0","node":"d970","brief":"probing the checklists this gate names"}
 {"ts":"2026-08-20T12:47:38.919Z","op":"update","visit":"iterations/i37/gate-implementation@0","node":"d971","brief":"discovering the exact items each checklist names"}
 {"ts":"2026-08-20T12:49:20.180Z","op":"update","visit":"iterations/i37/gate-implementation@0","node":"d972","brief":"gate-implementation: pass with two named overrides"}
+{"ts":"2026-08-20T12:50:08.680Z","op":"update","visit":"iterations/i37/run-demos@0","node":"d973","brief":"reading what run-demos asks"}
+{"ts":"2026-08-20T12:50:57.157Z","op":"update","visit":"iterations/i37/run-demos@0","node":"d974","brief":"the demo drawing is authored before run-demos can run it"}
+{"ts":"2026-08-20T12:51:20.882Z","op":"update","visit":"iterations/i37/build-steps/derive-what-the-walk-cost@6","node":"d975","brief":"at fill-story-evidence"}
+{"ts":"2026-08-20T12:55:06.031Z","op":"update","visit":"iterations/i37/gate-implementation@1","node":"d976","brief":"recording the surface ruling and what the missing piece actually is"}
+{"ts":"2026-08-20T12:55:21.940Z","op":"update","visit":"iterations/i37/gate-implementation@1","node":"d977","brief":"reading the stopped step"}
+{"ts":"2026-08-20T12:56:31.741Z","op":"update","visit":"iterations/i37/fill-story-evidence@1","node":"d978","brief":"the concealment is built at the four choke points"}
+{"ts":"2026-08-20T12:56:47.713Z","op":"update","visit":"iterations/i37/fill-story-evidence@1","node":"d979","brief":"the search verb asks the concealment where its answers arrive"}
+{"ts":"2026-08-20T12:57:12.443Z","op":"update","visit":"iterations/i37/fill-story-evidence@1","node":"d980","brief":"the listing and globbing verbs ask the concealment"}
+{"ts":"2026-08-20T12:57:30.874Z","op":"update","visit":"iterations/i37/fill-story-evidence@1","node":"d981","brief":"a read of a concealed path refuses rather than reading empty"}
+{"ts":"2026-08-20T12:58:00.851Z","op":"update","visit":"iterations/i37/fill-story-evidence@1","node":"d982","brief":"the concealment cases land with the chunk, as test-first asks"}
+{"ts":"2026-08-20T12:58:20.165Z","op":"update","visit":"iterations/i37/fill-story-evidence@1","node":"d983","brief":"the search opts carry no intent at this layer"}

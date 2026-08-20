@@ -8,13 +8,15 @@
 // These fail against the stubs and that is the point: a check green from birth
 // proves nothing.
 import { strict as assert } from "node:assert";
-import { existsSync, mkdirSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { describe, test } from "node:test";
 import { benchmarkBind, leastRecentlyBenchmarked, rewindPointFor, standRewoundTree } from "../engine/benchmark.ts";
-import { controlFilesPresent, resolvesInBoundTree } from "../engine/benchmark-guard.ts";
+import { concealedFromLane, concealmentCallSites, controlFilesPresent, resolvesInBoundTree } from "../engine/benchmark-guard.ts";
 import { conditionsStampDirs, costPerState, reportProblems, UNATTRIBUTED } from "../engine/benchmark-report.ts";
+import { fileGlob, fileList, fileRead } from "../engine/files.ts";
 import { git } from "../engine/gitlane.ts";
+import { search } from "../engine/search.ts";
 import { freshRoot, gitInit } from "./helpers.ts";
 
 const SUBJECT = "i90-the-iteration-under-benchmark";
@@ -216,6 +218,87 @@ test("a report with no stamp_covers at all is refused", () => {
 //
 // TEST-FIRST MEANS THE SPEC IS WRITTEN BEFORE THE BUILD, never that the cases
 // are. The spec is the artifact and it stands; the cases land with the chunk.
+
+describe("the benchmark reports are concealed while a run is bound", { concurrency: true }, () => {
+  const REPORT = "project/spec/benchmarks/bench-i33.md";
+
+  function boundRoot(): string {
+    const root = freshRoot();
+    write(root, REPORT, "iteration: i33\nran_at: 2026-01-01\n");
+    write(root, "project/spec/trace/requirement/req-plain.md", "nothing to hide\n");
+    mkdirSync(join(root, ".se"), { recursive: true });
+    writeFileSync(join(root, ".se", "benchmark.json"), JSON.stringify({ iteration: "i90" }), "utf8");
+    return root;
+  }
+
+  test("a reports path is invisible to the lane while a run is bound", () => {
+    assert.equal(concealedFromLane(REPORT, true), true);
+  });
+
+  test("the same path is visible with no run bound", () => {
+    // BOTH WAYS OR IT IS NOT A RULE. A mask that is always on satisfies half
+    // the requirement and breaks the system.
+    assert.equal(concealedFromLane(REPORT, false), false);
+  });
+
+  test("a path that merely RESEMBLES a reports path is never concealed", () => {
+    // The rule is a rule, not a substring.
+    assert.equal(concealedFromLane("project/spec/benchmarksomething/notes.md", true), false);
+    assert.equal(concealedFromLane("elsewhere/project/spec/benchmarks/x.md", true), true);
+  });
+
+  test("a read of a concealed path REFUSES, rather than reading empty", () => {
+    // A read asks for one named path, so the caller must be told it was
+    // refused — an empty answer is indistinguishable from an empty file.
+    const root = boundRoot();
+    assert.throws(() => fileRead(root, REPORT), /benchmark/i);
+  });
+
+  test("a search whose hit lies in the reports folder returns zero hits", () => {
+    const root = boundRoot();
+    const r = search(root, "iteration", {});
+    assert.deepEqual(
+      r.matches.filter((m) => m.path.includes("benchmarks")),
+      [],
+      "the verb that reaches no exclusion list is the one that must not leak",
+    );
+  });
+
+  test("a glob over the reports folder returns nothing while bound", () => {
+    const root = boundRoot();
+    assert.deepEqual(fileGlob(root, "project/spec/benchmarks/**").files, []);
+  });
+
+  test("a listing does not name the reports folder while bound", () => {
+    const root = boundRoot();
+    const names = fileList(root, "project/spec").entries.map((e) => e.name);
+    assert.ok(!names.includes("benchmarks"), `benchmarks was listed: ${names.join(", ")}`);
+  });
+
+  test("with no run bound every one of those four answers normally", () => {
+    const root = boundRoot();
+    rmSync(join(root, ".se", "benchmark.json"));
+    assert.ok(fileRead(root, REPORT).content.includes("i33"), "the read lands");
+    assert.ok(fileGlob(root, "project/spec/benchmarks/**").files.length > 0, "the glob finds it");
+    assert.ok(
+      fileList(root, "project/spec")
+        .entries.map((e) => e.name)
+        .includes("benchmarks"),
+      "the listing names it",
+    );
+  });
+
+  test("the mask covers every call site that was measured, and the count is asserted", () => {
+    // A verb added later fails HERE rather than escaping the rule silently,
+    // which is why the count is the assertion.
+    assert.deepEqual(concealmentCallSites().sort(), [
+      "engine/files.ts:fileGlob",
+      "engine/files.ts:fileList",
+      "engine/files.ts:fileRead",
+      "engine/search.ts:fileSearch",
+    ]);
+  });
+});
 
 describe("a benchmark report carries the conditions of its run", { concurrency: true }, () => {
   test("a report carrying every condition records", () => {

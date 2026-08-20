@@ -10,6 +10,7 @@
 import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync } from "node:fs";
 import { dirname, extname, join, relative, sep } from "node:path";
+import { concealedFromLane, isBound } from "./benchmark-guard.ts";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { guardParses } from "./guard.ts";
 import { contentHash } from "./hash.ts";
@@ -168,6 +169,23 @@ export function fileRead(
     maxChars?: number;
   } = {},
 ): ReadResult {
+  // THE CONCEALMENT REFUSES, IT DOES NOT RETURN EMPTY. A read is a request for
+  // one named path, so a caller who asked for it must be told it was refused
+  // rather than handed something that looks like an empty file. The listing
+  // verbs above omit instead, because omission IS their answer.
+  if (concealedFromLane(path, isBound(root))) {
+    throw new Rejection({
+      clause: CLAUSES.PATH_ESCAPE,
+      expected: "a path outside the benchmark reports, while a benchmark run is bound",
+      got: path,
+      remedy: {
+        tool: "se_benchmark",
+        args: { stop: true },
+        note: "a bound run may not read previous runs' numbers — a run that can read them can work toward them. End the run and the folder is visible again.",
+      },
+      source: SRC,
+    });
+  }
   // AN OPTIONAL READ FORGIVES ABSENCE AND NOTHING ELSE. Some documents are
   // allowed not to exist — the handover is why this exists, and a boot that
   // refuses over a file nobody promised is a boot that looks broken. The path
@@ -697,6 +715,9 @@ export function fileList(root: string, dir: string): { dir: string; entries: Lis
     // Inside a declared root a project-relative path is meaningless, so the
     // exclusion weighs the entry's own name.
     if (isExcluded(isRootRef(dir) ? e.name : relative(root, join(abs, e.name)))) continue;
+    // THE CONCEALMENT. A bound run may not see the reports folder, and this is
+    // the one point a listed entry becomes visible.
+    if (concealedFromLane(relative(root, join(abs, e.name)), isBound(root))) continue;
     if (e.isDirectory()) entries.push({ name: e.name, type: "dir" });
     else entries.push({ name: e.name, type: "file", bytes: statSync(join(abs, e.name)).size });
   }
@@ -766,7 +787,8 @@ export function fileGlob(
       .map((l) => l.trim())
       .filter((l) => l !== "" && rx.test(l))
       .sort();
-    return { glob, ref: opts.ref, files: files.slice(0, limit), truncated: files.length > limit };
+    const shown = files.filter((f) => !concealedFromLane(f, isBound(root)));
+    return { glob, ref: opts.ref, files: shown.slice(0, limit), truncated: shown.length > limit };
   }
   const out: string[] = [];
   const walk = (dir: string): void => {
@@ -782,5 +804,6 @@ export function fileGlob(
   walk(base);
   out.sort();
   const truncated = out.length > limit;
-  return { glob, files: out.slice(0, limit), truncated };
+  const visible = out.filter((f) => !concealedFromLane(f, isBound(root)));
+  return { glob, files: visible.slice(0, limit), truncated: truncated || visible.length > limit };
 }
