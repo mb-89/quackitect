@@ -40,6 +40,49 @@ the check on the sentence makes the two the same act.
 THE LINE IS `EVERY ACTIVE CELL CARRIES A COMPLEXITY.` in the matrix folder's
 own README, and the loader reads the file.
 
+## What the shipped product does today, said plainly
+
+NOTHING IS PUBLISHED. `strengthNeeded` refuses on every step, so no pull in the
+real product carries a `hand` field. A reader of
+`req-the-machine-names-a-driver-and-starts-nothing` or
+`req-a-milestone-takes-the-maximum-complexity-over-its-rows` needs that fact
+and not only the narrower one about which moment refuses.
+
+AND THE LOG ANSWERS `(none)` FOR THE PART COORDINATE until a server built from
+this code is running. The lane server in a session that predates the build does
+not know the argument exists.
+
+## One thing the day the line is written will do
+
+EVERY STANDING PIN GOES STALE AT ONCE. The matrix content hash now covers the
+rated flag, so writing the line changes the hash and every open record re-pins.
+
+`iterationDrift` REOPENS NOTHING, because a complexity reaches neither the
+demand digest nor the step shape — that is the fatal row holding. But a silent
+mass re-pin across the open records is unexercised behaviour, and whoever writes
+the line should watch it happen rather than discover it.
+
+## Repayment
+
+THREE ACTS, IN ORDER, AND THE THIRD IS ONE LINE.
+
+- RATE THE 154 ACTIVE CELLS. Each applied change-size cell takes a
+  `<column>_complexity: <judgement>/<reading>` — judgement one of C0..C4,
+  reading one of R0..R4. A row that RUNS a sub-machine takes none.
+- WATCH THE RE-PIN. Writing the README line moves the matrix content hash, so
+  every open record re-pins at once. `iterationDrift` reopens nothing, and
+  that should be observed rather than assumed.
+- WRITE `EVERY ACTIVE CELL CARRIES A COMPLEXITY.` into
+  `project/deliverable/machines/rigor_matrix/README.md`. The loader reads the
+  file, so the sentence and the binding are one act.
+
+WHAT REPAYMENT IS NOT. Deleting the point-of-use refusal because the load-time
+one now fires. They are the same demand at two moments, and the later one is
+what stops a walk proceeding on a guess.
+
+HOW A READER KNOWS IT IS PAID: a pull at any rated step carries a `hand`
+field, and `node --test tests/sizing-block.test.ts` still passes.
+
 ## What closes it
 
 RATING THE CELLS AND WRITING THE LINE. That is the matrix owner's judgement,

@@ -384,7 +384,10 @@ export function rigorMatrixContentHash(root: string): string {
 
 const MATRIX_CACHE = new Map<string, { stamp: string; matrix: RigorMatrix }>();
 
-/** CACHED AGAINST CONTENT, never against size and modification time
+/** CACHED AGAINST CONTENT — and the hash it is keyed on is itself memoised
+ *  against size and modification time, which is the thing this sentence used
+ *  to say must never happen. Both are true and the pair is the hazard:
+ *  raid-iss-the-matrix-cache-is-keyed-on-size-and-modification-time.
  *  (software.md). Hashing the 150 source files costs about a quarter of
  *  parsing them, and a single render asks for the matrix several times over
  *  - it was the largest read cost in the profile.
