@@ -1,8 +1,8 @@
 ---
 form: reverse-sensitivity
 by: agent
-signed_off: 2026-08-20T14:34:52.741Z
-reopened: "2026-08-20T14:32:18.151Z — it hunted the world where cand-the-seed-made-total loses, and that candidate is no longer the leader. The scores it perturbed have been re-earned against a redrawn candidate set and the leader is now cand-the-receiver-decides, whose strengths are structural rather than fed by one shared cell."
+signed_off: 2026-08-20T17:29:05.130Z
+reopened: "2026-08-20T17:29:04.296Z — its whole analysis is a trade between the leader and cand-the-reader-beside-the-walk, which the must-check has since eliminated, so its one credible flip is void: an ineligible line taking a strength does not move the decision. It also rests twice on the claim that the leader cannot record who acted at all, which the requirement own Detail contradicts."
 authors: agent
 files:
 ---
@@ -11,14 +11,48 @@ files:
 
 ## current_situation
 
-The engine redrew the flip conditions off the re-earned scores. The leader is cand-the-receiver-decides and the deficits are zero for cand-the-reader-beside-the-walk, one for cand-the-seed-made-total, one for cand-the-derived-ladder.
+The engine redrew the flip conditions off the re-earned scores. The leader is `cand-whoever-holds-the-hands-decides` at 12, and among ELIGIBLE lines the deficits are three for `cand-the-seed-made-total` and three for `cand-the-derived-ladder`.
 
-THE PREVIOUS RUN OF THIS STATE HUNTED A DIFFERENT LEADER AND IS SUPERSEDED. It found that cand-the-seed-made-total held two strengths fed by one shared cell and that six of seven grafted worlds unseated it. The comparison was then redrawn and re-scored, that candidate is dominated and off the front, and its two tripwires stand as history rather than as live watch-items.
+### Re-run 2026-08-20: the previous run's flip came from a line that is not a candidate
 
-A DEFICIT OF ZERO AGAIN, AND FOR A DIFFERENT REASON. Last time the runner-up was level because the leader's margin was an artefact. This time both are on the Pareto front and trade genuinely: the reader beats the leader on the actor axis, the leader beats the reader on host-swap, and nothing else separates them.
+WHAT THIS STATE FOUND LAST TIME. The leader's only structural advantage — `req-walk-survives-host-swap`, 4 against 3 — could be taken by `cand-the-reader-beside-the-walk` without that line becoming the leader, putting it ahead 13 to 11. Recorded as `raid-risk-the-reader-can-take-the-leaders-only-structural-advantage` and treated as the live watch-item going into declare-winner.
+
+THAT FLIP IS VOID AND THE REASON IS NOT THE ARITHMETIC. `cand-the-reader-beside-the-walk` violates two musts, on sentences it wrote about itself. A must gates: a line that is not a candidate cannot take a strength, cannot overtake, and is not perturbed.
+
+SO THE STATE'S OWN OUTPUT WAS COMPUTED OVER AN INELIGIBLE SET. That is the third time in this milestone a comparison ran over candidates that could not be compared, and the previous two were the same defect: nothing had held a must against a line.
+
+### The deficits, recomputed over eligible lines only
+
+Axes in order — a-wrong-act, host-swap, role-and-channel, actor, comparison. Weights are the axes' own damage grades: fatal 4, crippling 3, corrosive 2.
+
+- `cand-whoever-holds-the-hands-decides`: 4, 4, 0, 1, 3 — plain 12, weighted 36
+- `cand-the-seed-made-total`: 3, 2, 0, 1, 3 — plain 9, weighted 26
+- `cand-the-derived-ladder`: 3, 2, 0, 1, 3 — plain 9, weighted 26
+
+THE LEADER DOMINATES BOTH. Equal or better on every axis, strictly better on two. A dominated line cannot be brought level by taking a cell it is already losing without taking the mechanism behind it.
+
+### What would have to be true for either eligible line to flip it
+
+A DEFICIT OF THREE NEEDS THREE POINTS, and there are only two axes where either rival trails.
+
+- `req-a-wrong-act-never-passes-silently`, 3 against 4, worth one point. TAKEABLE, AND ALREADY PARTLY TAKEN: the seed grafted `opt-a-driver-claim-cannot-be-made-without-a-driver-or-a-reason` at graft-onto-the-winner. Its score of 3 was anchored on "the pin seam still awaits a gate ruling", and that seam is now closed — `req-the-complexity-value-is-read-live-and-never-pinned` was restated and `raid-iss-the-live-read-rule-forbids-more-than-its-own-reason-needs` is closed with it. SO THAT CELL IS STALE AND MAY BE WORTH 4. It is not re-scored here, because the hand running a sensitivity does not re-score the axis it is testing.
+- `req-walk-survives-host-swap`, 2 against 4, worth two points. NOT TAKEABLE BY EITHER. The leader wins there by holding no roster at all, and both rivals hold two — a mapping and a roster on two clocks. A line that drops its roster to take this cell has become the leader.
+
+SO EVEN GRANTING THE STALE CELL, the best either rival reaches is 10 against 12. THE LEADER IS UNFLIPPABLE AMONG ELIGIBLE LINES BY ANY COMPATIBLE GRAFT, which is a stronger position than any previous run of this state has reported and is worth less than it sounds — see below.
+
+### And the leader's own claim about itself was wrong
+
+THIS STATE'S PREVIOUS RUN RESTED TWICE ON "the leader cannot record who acted at all". `req-every-call-records-the-model-that-answered-it` says in its own Detail: "the transport hands the engine a client name and no model, so today the value can only come from the caller." EVERY LINE SELF-REPORTS. What the leader lacks is a roster to check the self-report against — the cross-check, not the record.
+
+THAT CORRECTION CUTS AGAINST THE LEADER RATHER THAN FOR IT. Its actor-axis score moved 0 to 1 because the anchor was false, which narrowed the gap the previous run called an asymmetry worth more than the margin.
 
 ## sensitivity
 
+- The leader's advantage on `req-walk-survives-host-swap` is its only structural one, 4 against 2 and 2 => NEITHER ELIGIBLE RIVAL CAN TAKE IT AND STAY ITSELF. Both hold a mapping and a roster on two clocks; the leader wins by holding neither. A line that drops its roster to take this cell IS the leader. NOT A FLIP.
+- The leader's advantage on `req-a-wrong-act-never-passes-silently`, 4 against 3 => TAKEABLE AND WORTH ONE POINT, WHICH IS NOT ENOUGH. `cand-the-seed-made-total` already grafted the mechanism at graft-onto-the-winner, and its 3 was anchored on a pin seam that has since been closed by the live-read restatement. THE CELL IS STALE AND MAY ALREADY BE 4. Even so the deficit is three and this closes one. NOT A FLIP, and the stale cell is recorded rather than re-scored here.
+- The previous run's credible flip — the reader taking the leader's rung-and-never-a-model and reaching 13 to 11 => VOID. `cand-the-reader-beside-the-walk` violates `req-the-machine-names-a-driver-and-starts-nothing` and `req-every-matrix-row-declares-its-complexity`. An ineligible line taking a strength moves nothing, and `raid-risk-the-reader-can-take-the-leaders-only-structural-advantage` is history rather than a watch-item.
+- THE ONE SENSITIVITY THAT IS STILL LIVE IS NOT ON A SCORE => IT IS ON THE ELIMINATION. Read `req-the-machine-names-a-driver-and-starts-nothing` as its no-spawn half alone and `cand-the-reader-beside-the-walk` is the STRONGEST of the four on it — "the recommender is not in the walk at all, so the rule holds by deployment" — and it returns to the front at 11 against 12 with a takeable strength. THE READING IS RECORDED AND REJECTED: the row's first clause says the lane publishes the named driver ON THE PULL, and a record that does not exist until after the call is not a publication. THAT IS THE WHOLE DECISION RESTING ON ONE CLAUSE OF ONE REQUIREMENT, and it is the thing a reader should press on rather than any cell on the chart.
+- AND THE OWNER'S RULING IS THE OTHER LIVE ONE => The leader publishes a rung and never a model. The kickoff's second goal asks for one fixed list mapping each rung to a model name, and the spec no longer enforces it. If that ruling is reinstated as a demand, the leader is out and both eligible rivals hold rosters. THAT IS A LARGER PERTURBATION THAN ANYTHING ON THIS CHART and it is not this state's to apply.
 
 ## reverse_graft
 
@@ -31,13 +65,15 @@ A DEFICIT OF ZERO AGAIN, AND FOR A DIFFERENT REASON. Last time the runner-up was
 
 ## follow_up
 
-THE LEAD IS ONE POINT ON ONE AXIS AND TWO PERTURBATIONS TAKE IT, so declare-winner is choosing between two candidates rather than confirming one.
+THE LEADER IS UNFLIPPABLE AMONG ELIGIBLE LINES AND THAT IS THE WEAKEST-SOUNDING STRONG RESULT THIS STATE HAS PRODUCED.
 
-WHAT SEPARATES THEM IS A TRADE THE GRADES ALMOST CANCEL. cand-the-receiver-decides removes host dependence by construction and cannot record who acted at all. cand-the-reader-beside-the-walk records who acted better than anything else on the chart and keeps a host-specific roster. Crippling against corrosive, one point against two.
+WHAT MAKES IT WEAK. The comparison became decisive by losing the line that made it interesting. `cand-the-reader-beside-the-walk` beat the leader on the actor axis, cost nothing on the walk, and could take the leader's only structural advantage without becoming it. It is out on two musts.
 
-AND THE GRAFT IS AVAILABLE TO ONE OF THEM AND NOT THE OTHER. The reader can take the leader's rung-and-never-a-model and stay itself. The leader cannot take the reader's actor-axis strength, because under the leader nothing of ours ever learns which model the rung resolved to — its own note says so. That asymmetry is worth more than the one-point margin, and graft-onto-the-winner is where it gets tested rather than asserted.
+SO declare-winner IS CONFIRMING ONE CANDIDATE RATHER THAN CHOOSING BETWEEN TWO, and the confirmation is only as good as the elimination.
 
-TWO TRIPWIRES FROM THE PREVIOUS RUN ARE SUPERSEDED AND ONE IS MINTED. The old leader's margin-of-one-cell risk and its weighting risk both described cand-the-seed-made-total and are marked as history. The new one describes a live flip against the current leader, with its fallback.
+WHAT graft-onto-the-winner SHOULD ASK, and it is a different question from last time. Not "which axis did a loser win" — the leader now wins or ties every axis among eligible lines. Ask instead what the ELIMINATED line was good at that nothing surviving carries: reading the acting role off the record, and costing nothing because it sits outside the walk. Neither is on the leader and neither is forbidden to it.
+
+ONE STALE CELL IS OWED A READER. `cand-the-seed-made-total` on `req-a-wrong-act-never-passes-silently` was scored 3 against an open pin seam that is now closed. It does not change the outcome — the deficit is three and this is worth one — and it should not stand as a figure whose reason has gone.
 
 ## anything_else
 

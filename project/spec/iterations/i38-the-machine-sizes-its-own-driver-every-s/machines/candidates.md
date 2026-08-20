@@ -13,7 +13,7 @@ steps:
     depends_on: []
     realization: document
   - id: the-receiver-decides
-    statement: "compose cand-the-receiver-decides - the seams, the rough costs, and what it leans on"
+    statement: "compose cand-whoever-holds-the-hands-decides - the seams, the rough costs, and what it leans on"
     depends_on: []
     realization: document
 ---

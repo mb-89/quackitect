@@ -2,7 +2,8 @@
 form: gate-inputs
 bless: blessed by agent
 by: agent
-signed_off: 2026-08-20T10:57:33.950Z
+signed_off: 2026-08-20T19:08:54.445Z
+reopened: "2026-08-20T19:08:50.504Z — two sentences in this form still contradict the correction written beside them: picture_judged keeps 'terminates in a room with nobody in it' immediately after the paragraph saying that is false, and current_situation still says the walker makes every lane call. A claim and its own correction in one paragraph is the defect shape this record has already named three times."
 authors: agent
 files:
 ---
@@ -17,6 +18,34 @@ ROUND 0 RAN BEFORE THIS FORM WAS FILLED AND FOUND TWO OF ITS OWN ERRORS, which i
 
 Five nodes were minted across the milestone: one neighbour, one stakeholder, two stories, two use cases, and one register entry — and the neighbour is minted EMPTY on purpose.
 
+### Re-earned from gate-candidates, 2026-08-20
+
+THIS GATE BLESSED THE PASSES, AND ONE OF THEM WAS A DESIGN. `uc-let-the-machine-name-the-driver` carried the seed's mechanism in its own steps — the maximum, one file in the repository, the model name on the pull — plus a precondition naming a model list and a guarantee promising a model name.
+
+FIVE REQUIREMENTS WERE DERIVED FAITHFULLY FROM IT and every one named a mechanism as a result. M4 then enumerated twenty-nine options across four candidate lines, every one of which violated at least one of the five. The design space was excluded before it was searched.
+
+THE USE CASE IS RESTATED TO OUTCOMES and this gate's `passes_concrete` reading is corrected below.
+
+WHAT THIS GATE HAD ASKED AND ANSWERED WELL: whether the passes are concrete enough to derive from. They were — concrete to the point of being a design, which is the failure this section did not have a question for.
+
+### Re-earned a second time, 2026-08-20, after the outbound neighbour was corrected
+
+THIS GATE BLESSED A CONTEXT DRAWING WHOSE OUTBOUND NEIGHBOUR WAS WRONG ABOUT WHAT IT COULD DO. `nbr-the-driver-that-performs-the-spawn` said the receiver reads and cannot act; a spike at M6 trusted it and returned a false verdict.
+
+THE PARTY IS THE WALKING AGENT AND IT CAN ACT. It delegates a step to a subagent on a stronger model — a GUIDE, in the owner's naming, against the WALKER that holds the session and does the daily work. Contract rule 11 grants the delegation; `project/guidance/method/subagents.md` carries an owner grant on which model a spawned agent gets.
+
+WHAT THIS GATE COULD NOT HAVE CAUGHT, said plainly. The capability lives in the harness and in the contract the walker obeys, not in `project/deliverable`, which is the only tree a lane search reaches. No question on this form looks outside it.
+
+WHAT IT COULD HAVE CAUGHT AND DID NOT: the drawing named no party for the most present actor in every session. The walker is outside the box and was never drawn, because it is the thing doing the drawing.
+
+### Either hand may work the lane — owner ruling, 2026-08-20
+
+THIS FORM SAID THE WALKER "MAKES EVERY LANE CALL". The owner rejected that arrangement: "the worker makes every lane call even for work the guide did, but I don't want that."
+
+SO THE GUIDE IS NOT BARRED FROM THE LANE. Where a step is the guide's, the guide can work it, and the lane sees the guide.
+
+AND A RELAY CARRIES ITS ORIGIN. Where the walker carries a guide's work back instead, the record says the work was the guide's. A walker filing a guide's judgment under its own name is the failure the new coordinate exists to make visible.
+
 ## picture_judged
 
 ARE THESE THE RIGHT JOURNEYS? Two, and they are the two halves of one loop rather than two features.
@@ -25,9 +54,9 @@ FORWARD: the machine names the hands before the work. BACKWARD: the record says 
 
 IS ANY ONE OF THEM WRONG? One is INCOMPLETE RATHER THAN WRONG, and it is worth stating as a judgment the counts cannot make.
 
-uc-let-the-machine-name-the-driver ends at "the receiver reads the name". On an unattended box there is no receiver. The pass is written correctly and terminates in a room with nobody in it, which means the journey as drawn is real for a person at a laptop and unreal for the host this iteration was written for.
+uc-let-the-machine-name-the-driver ends at the party reading the name. CORRECTED 2026-08-20: this form said "on an unattended box there is no receiver", and that was false in both halves. Something is always listening, and the party reading the name is the walking agent, which acts by handing the step to a stronger hand. THE PASS IS WRITTEN CORRECTLY AND ITS LAST STEP IS REAL ON BOTH HOSTS. At a laptop a person reads the name and relaunches. On an unattended box the walking agent reads it and delegates. The journey this gate called unreal for its target host is the one that host actually runs.
 
-I JUDGE THAT THE RIGHT WAY TO DRAW IT. The alternative was to write the receiver into the machine, which is the line the lane does not cross, or to leave the last step vague enough to look satisfied. Drawing it as an empty neighbour makes the hole a shape somebody can fill.
+DRAWING IT AS A NEIGHBOUR WAS STILL RIGHT, AND DRAWING IT EMPTY WAS NOT. The alternative was to write the acting party into the machine, which is the line the lane does not cross. But the neighbour was never empty: it is the agent already walking, and the capability it needs is one it already has and already uses.
 
 WHAT IS MISSING FROM THE PICTURE, and this is the judgment rather than the count: there is no journey for MAINTAINING the list. Somebody opens it, sees a model retired, and brings it current. That pass is the one the whole fixed-list design rests on, and it has no actor with a node — so it could not be written without writing it against the wrong actor and hiding the gap. Registered, not drawn.
 
@@ -62,6 +91,8 @@ THE BACKWARD CASE, PARTLY, AND THE PART THAT IS NOT IS NAMED. Steps 1 to 4 scrip
 THE STORY SLIDES ARE THE FORMULATED STAGE AND THEY CARRY THEIR PROOF. Every slide in both new decks has a claim and a proof beside it, and the two slides that do not fill say so in capitals rather than reading as satisfied — the driver with nobody listening, and the trust that rests on self-report.
 
 WHAT WOULD MAKE A SCRIPT LIE, and it is worth naming at M2 rather than at M6: a demo that stamps a model the harness was ASKED for rather than the one that ANSWERED would pass every assertion in the backward case and prove nothing. The distinction is the whole point of that case, so the M6 script must take the value from outside the agent or record that it could not.
+
+CORRECTED 2026-08-20 — CONCRETE WAS THE WRONG TEST TO PASS ALONE. `uc-let-the-machine-name-the-driver` was concrete because it had already chosen the design: the maximum, one file in the repository, a model name on the pull. A pass concrete enough to derive from and a pass that has decided the design are indistinguishable to this question, and this record derived five mechanism-naming requirements from the difference. THE SECOND TEST, added here and owed by every future reading of this box: could two honestly different designs both produce this pass? That is the question `derive-functions` puts to every function, and nothing puts it to a use case.
 
 ## round_0_verify
 
@@ -100,11 +131,12 @@ WHAT WOULD MAKE A SCRIPT LIE, and it is worth naming at M2 rather than at M6: a 
 - YOUR OWN NARRATION IS THE WORST-BEHAVED THING IN THE LOG: over 400 records, 36 failed, and 25 of those are narration clauses — SE-C-121 fourteen times and SE-C-133 eleven => CONFIRMED BY MEASUREMENT AND IT IS THE WALKER'S FAULT, NOT THE ENGINE'S. The 121s are node ids guessed from the order I had planned items in, when every result hands the open node map back. The 133s are a checklist that stopped closing while the reopen cascades ran. Neither cost the work anything and both made the log a worse witness, which on an unattended box is the only witness there is.
 - THE SIX PULLS BETWEEN FIFTEEN AND EIGHTEEN SECONDS ARE A NEW COST NOBODY HAS PRICED => TRUE AND WORTH THE OWNING MILESTONE KNOWING. They are reopen cascades — re-signing recomputes the demand ledger for the whole column and walks the downstream cone. i33's measurement of the standing shape has nothing like them, so a reopen is roughly five times a transition. This iteration made nine of them and would have made none if its evidence had been right the first time.
 - KILL-CRITERION FOR THIS GATE, NAMED AND LOOKED FOR: the inputs are wrong if the journeys describe a system nobody asked for — that is, if the actors would not recognise the passes as things they want to do => NOT MET, WITH ONE QUALIFICATION. stk-engineer-driving-agents wants both passes and nine of ten value props already point at that role, so the forward and backward journeys land where the product already builds. THE QUALIFICATION: the pass that the design most depends on — somebody keeping the list current — belongs to an actor with no node, so its want is asserted by nobody. That is registered rather than resolved, and it is the one place the picture is incomplete rather than wrong.
-- THE MILESTONE'S CENTRAL FINDING WAS WRONG AND AN OUTSIDER HAD TO SAY SO. M2's sharpest claim was that a milestone naming its driver names it into a room with nobody in it, and the neighbour was drawn empty to make the hole visible => FALSIFIED, AND THE CORRECTED VERSION IS BETTER. Something is always listening: the entrypoint spawns the lane, polls until it answers, dies if it never does, and only then launches an agent that pulls. se-pty even carries keystrokes into a running agent. THE ACTUAL HOLE IS NARROWER AND MORE ACTIONABLE — a live receiver can read a published name and has no way to become a different model, and the entrypoint that could have launched a different one has already returned. The fix is not "build a receiver"; it is a way for the driving side to act.
+- THE MILESTONE'S CENTRAL FINDING WAS WRONG AND AN OUTSIDER HAD TO SAY SO. M2's sharpest claim was that a milestone naming its driver names it into a room with nobody in it, and the neighbour was drawn empty to make the hole visible => FALSIFIED, AND THE CORRECTED VERSION IS BETTER. Something is always listening: the entrypoint spawns the lane, polls until it answers, dies if it never does, and only then launches an agent that pulls. se-pty even carries keystrokes into a running agent. THE ACTUAL HOLE IS NARROWER AGAIN, corrected 2026-08-20. A live reader can read a published name and has no way to BECOME a different model — and it does not need to. It DELEGATES the step to a subagent on a stronger hand, which contract rule 11 grants and project/guidance/method/subagents.md sizes. So the fix is not "build a party that can act" either. The remaining hole is that nothing in the log can tell the two hands apart, and that is where req-every-call-records-the-part-its-caller-played lands.
 - AND THE WAY IT WAS WRONG IS THE FINDING BEHIND THE FINDING => THE CLAIM WAS WRITTEN THROUGH A CLIENT FOR THE LISTENER IT DENIED. Every call of this iteration went over .se/se-call.mjs to the mirror port. The measurement underneath was sound — launch spawns, unrefs, main() returns — and it was carried to a conclusion it could not support. That is the second time in this iteration that real evidence produced a wrong inference, and both times what caught it was a negative control or a fresh reader, never more care.
 - THE ASSESSOR ROLE WAS MINTED ON AN INFLATED CASE => THREE REVIEWING AGENTS BECAME TWO, and one of the findings credited to them belonged to a researcher — a role the same ruling names separately and which no node carries. The mint survives on what is left, because it rests on the readers being SEPARATE rather than on them being many. But the case for it was counted over the wrong population, which is the identical error this iteration made at M1 with the pinned records and corrected there.
 - FOUR OF THE ROSTER'S ROLES HAVE NO NODE, NOT TWO => THE REGISTER ENTRY IS WIDENED. Guide and researcher stand uncovered beside communicator and project-owner. The researcher is the sharp one: this milestone USED one, credited its work elsewhere, and only a reader with no context noticed. A role that does work and has no node gets its work credited to whichever role does.
-- SO WHAT SURVIVES: the journeys are right, one of them ends at a receiver that can read and cannot act, and this milestone's evidence needed correcting in nine places across two passes before this form could be filled => PASS WITH OVERRIDES. The overrides are the receiver that cannot act, the actorless maintenance pass, four uncovered roster roles, and an error rate that discipline has now failed at three times in three milestones with the lesson written down each time.
+- SO WHAT SURVIVES: the journeys are right, one of them ends at a party this milestone described wrongly three times running, and this milestone's evidence needed correcting in nine places across two passes before this form could be filled => PASS WITH OVERRIDES. The overrides are the acting party, first drawn empty, then drawn powerless, and correct only on the owner's third correction, the actorless maintenance pass, four uncovered roster roles, and an error rate that discipline has now failed at three times in three milestones with the lesson written down each time.
+- THE PASS YOU BLESSED WAS THE SEED'S DESIGN WRITTEN AS A SCENARIO, AND NO QUESTION HERE COULD SEE IT => TRUE, AND IT IS THIS GATE'S ROOT MISS. `uc-let-the-machine-name-the-driver` step 3 read "It takes the MAXIMUM over those rows", step 4 "one file in the repository and the same file on every host", step 5 "It puts the model name on the pull", with a precondition naming a model list and a guarantee promising a model name. NOT ONE OF THOSE IS A THING THE ACTOR ACHIEVES; every one is a way of achieving it. WHAT THIS GATE ASKED INSTEAD was whether the passes are CONCRETE — and they were, spectacularly, which is exactly what made them undetectable here. A pass concrete enough to derive from and a pass that has already decided the design read identically to every question on this form. THE COST IS MEASURED: five requirements named mechanisms because their source did, and M4's four candidate lines all violated at least one of them, discovered at M5 by a must-check nobody had run. WHAT WOULD HAVE CAUGHT IT is the question `derive-functions` asks of every function and nothing asks of a use case: could two honestly different designs both produce this pass? Held against the old steps the answer was no. THE METHOD WRITES WHAT-NEVER-HOW FOR REQUIREMENTS AND ARGUES NEUTRALITY HARD FOR FUNCTIONS, and says nothing about the layer above both.
 
 ## raid_additions
 
@@ -114,7 +146,7 @@ WHAT WOULD MAKE A SCRIPT LIE, and it is worth naming at M2 rather than at M6: a 
 
 ## verdict
 
-pass with overrides — the two journeys are right and everything under them needed correcting: nine findings across two adversarial passes, the central one overturning this milestone's own headline claim, and the receiver turns out to read without being able to act.
+pass with overrides — the two journeys are right and everything under them needed correcting: nine findings across two adversarial passes, the central one overturning this milestone's own headline claim, and the party at the end of the pass turns out to read AND act, by delegating — which is the third and final correction this milestone needed on the same neighbour.
 
 ## follow_up
 

@@ -14,7 +14,7 @@ source_refs:
   - req-an-unmatched-rung-names-itself-and-publishes-no-driver
   - req-a-wrong-act-never-passes-silently
   - opt-the-no-match-is-a-returned-value-not-an-absence
-  - cand-the-receiver-decides
+  - cand-whoever-holds-the-hands-decides
 weighs_with: raid-dec-a-record-without-a-driver-or-a-reason-is-not-a-record
 weighs_against: none
 ---

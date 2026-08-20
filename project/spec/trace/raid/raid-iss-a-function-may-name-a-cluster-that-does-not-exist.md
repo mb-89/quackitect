@@ -8,8 +8,8 @@ owner: the walking agent
 trigger: "M4 partition-functions naming a new cluster, and any later form whose picks are drawn from the declared clusters"
 status: open
 impact: "This iteration declared the-sizing at partition-functions and signed the state. No cluster node was written. Every downstream form that offers the declared clusters offered eight and could not name the one the iteration was about, and the morphological chart's cluster lookup misses for every option that names a cluster rather than a design question — CORRECTED at gate-candidates, where a hostile pass caught this field claiming forty-nine FUNCTIONS. stateform.ts:333 filters to option nodes and function nodes never reach the lookup at :347, which the node's own body already said three paragraphs further down. The impact was inflated and the body was right."
-breaks_how_badly: degraded
-how_likely: certain
+breaks_how_badly: abrasive
+how_likely: expected
 probe: "THREE REPRESENTATIONS OF ONE FACT, each verified by reading. (1) The stored form is bare: every function node carries `cluster: the-walk`, measured across project/spec/trace/function — nine distinct values, none prefixed. (2) The offered form is a node id: stateform.ts:560 resolves $clusters to clusterItems, which is typedItems(traceRoot, 'cluster') and returns cluster-the-walk. Before cluster-the-sizing was written the offer list held eight entries and the corpus held nine cluster values on functions; after writing it, nine and nine. (3) The guard never looks: engine/guard.ts:18 lists nine REFERENCE_KEYS and cluster is not among them, and adding it would not help, because fileForId at vocabulary.ts:129 resolves by declared id prefix and returns undefined for the-sizing, which guard.ts:54 then skips silently. The same mismatch is visible in stateform.ts:347, where an option's cluster is looked up in a map keyed by node id."
 probed: 2026-08-20
 source_refs:
@@ -17,6 +17,26 @@ source_refs:
 weighs_with: none
 weighs_against: none
 ---
+
+## Graded off the scale, corrected 2026-08-20
+
+THIS ENTRY SAID \`how_likely: certain\`. THE SCALE OFFERS expected, plausible,
+conceivable. \`project/deliverable/engine/bin/grades-complete.ts\` refuses the
+whole register while any entry sits outside it, and it refused at
+\`rank-unknowns\`' exit — which is the first state that runs it.
+
+\`expected\` IS THE HIGHEST THE SCALE HAS and it is what this entry now carries.
+
+WHAT "CERTAIN" WAS TRYING TO SAY, and the scale cannot hold it: this is not
+something that MIGHT happen. It is a consequence the design chooses. A likelihood
+scale measures whether a thing occurs; it has no value for a thing that is true
+by construction.
+
+THE DISTINCTION IS REAL AND BELONGS SOMEWHERE ELSE. A consequence a design
+accepts is a decision's cost, recorded on the decision. A risk is something that
+might realise. Writing "certain" onto a likelihood field collapses the two, and
+four entries in this record did it independently — which is a vocabulary gap
+rather than four mistakes.
 
 ## The field is not a reference, so nothing treats it as one
 

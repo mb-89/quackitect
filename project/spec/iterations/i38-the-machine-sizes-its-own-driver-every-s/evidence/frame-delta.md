@@ -1,8 +1,8 @@
 ---
 form: frame-delta
 by: agent
-signed_off: 2026-08-20T10:05:52.233Z
-reopened: "2026-08-20T10:05:35.249Z — define-actual was re-signed after it, so it answered older ground: the sweep it rests on now names a standing crippling entry saying weak models cannot boot at all, which weakens its business case without moving its gap claim"
+signed_off: 2026-08-20T19:03:08.692Z
+reopened: "2026-08-20T19:03:06.923Z — The value proposition this state registered was widened: a finished walk must say which HAND did each part, not only which model. The owner named a WALKER doing the daily work and a GUIDE asked for the hard steps, and either may work the lane. Neither the model nor the state coordinate can tell them apart, so the proposition needed a third success criterion and its outcome restated."
 authors: agent
 files:
 ---

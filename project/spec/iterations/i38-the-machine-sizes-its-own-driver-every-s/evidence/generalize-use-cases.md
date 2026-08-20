@@ -1,8 +1,8 @@
 ---
 form: generalize-use-cases
 by: agent
-signed_off: 2026-08-20T10:56:25.787Z
-reopened: "2026-08-20T10:56:24.856Z — its feeders were re-signed after it and its own use case changed as a node: extension 6a now says the receiver reads and cannot act rather than that nobody is listening"
+signed_off: 2026-08-20T19:07:26.102Z
+reopened: "2026-08-20T19:07:24.579Z — draw-context was re-signed: the owner ruled that either hand may work the lane, and that a guide's work relayed by the walker is recorded as the guide's. Re-read against that."
 authors: agent
 files:
 ---
@@ -16,6 +16,51 @@ The stories are written. This state generalises them into the passes the machine
 FIFTY USE CASES STAND. Two are minted here, one per new story, and one that already stood is touched because this delta is the mechanism it was written against.
 
 Both new cases carry their extensions filled with what is TRUE TODAY rather than with what is hoped for — including the extension where nobody is listening.
+
+### Reopened from gate-candidates, 2026-08-20: the mechanism entered the spec here
+
+THIS STATE'S JOB IS TO GENERALIZE FROM THE STORY. `uc-let-the-machine-name-the-driver` copied the story.
+
+WHAT IT CARRIED, in its own steps and fields:
+
+- step 2: the complexity is read "live from the matrix, and never from a pin"
+- step 3: "It takes the MAXIMUM over those rows"
+- step 4: it looks the rung up "in the fixed list, which is one file in the repository and the same file on every host"
+- step 5: "It puts the model name on the pull"
+- precondition: "one model list stands in the repository"
+- guarantee: "the milestone publishes a model name a receiver can act on"
+
+TOGETHER THOSE ARE THE SEED'S DESIGN WRITTEN OUT AS A PASS. Not one of them is a thing the actor achieves; every one is a way of achieving it.
+
+### What it cost, measured rather than argued
+
+FIVE REQUIREMENTS WERE DERIVED FAITHFULLY FROM THOSE STEPS and every one named a mechanism as a result. `write-requirements` did its job correctly against a source that had already decided.
+
+M4 THEN ENUMERATED TWENTY-NINE OPTIONS FROM SEVEN FINDERS and composed four candidate lines. Every line on the chart violated at least one of the five. The design space was excluded before anybody compared anything, and no state held a must against a candidate until M5.
+
+THE REQUIREMENTS WERE REPAIRED FIRST AND THIS NODE WAS NOT. For most of a day five musts named outcomes while each cited a step here that mandated the mechanism it had dropped. `req-the-complexity-value-is-read-live-and-never-pinned` is the sharpest: it was restated to permit a pinned read, and its `source_refs` still pointed at a step reading "never from a pin".
+
+A FIFTH COLD PASS FOUND IT. Four earlier passes over the requirements, the candidates and the options did not, because none of them was looking upstream of the requirement layer.
+
+### What is restated and what is deliberately not
+
+THE CASE KEEPS ITS POINT: the machine names the hand its own work needs, at a milestone boundary, before anything is spawned; it publishes and starts nothing; a receiver acts or does not; the walk records what answered.
+
+IT RELEASES four decisions to M4: where the complexity is read from and when, how a milestone's rows become one figure, what holds the mapping from difficulty to hand, and whether what is published is a model name or a class.
+
+THE OWNER'S RULING IS NOT RELEASED AND IS NOT THIS STATE'S TO RELEASE. One fixed list, identical everywhere, maintained by hand, per-host resolution rejected. It stands, on `raid-asm-one-model-list-serves-every-host-the-engine-supports`.
+
+WHAT MOVED IS WHERE THE RULING SITS. A ruling is an input to a design choice; a guarantee is an obligation on every design. Writing the first into the second is what made M4's search a formality.
+
+SO A DESIGN PUBLISHING A CLASS RATHER THAN A MODEL NAME NOW CLEARS THIS CASE AND STILL OWES THE OWNER AN ARGUMENT. The spec stops deciding it. The record still has to say plainly that the leading design does not serve the kickoff's second goal, and it does.
+
+### The rule this yields, which is wider than one node
+
+A USE CASE IS THE FIRST PLACE A MECHANISM CAN ENTER A SPEC AND THE LAST PLACE ANYBODY LOOKS FOR ONE. The method's WHAT-NEVER-HOW rule is written for requirements. `derive-functions` argues neutrality hard for functions, and says why: a function naming a technology collapses M4's space to one point before anybody compared anything.
+
+NOTHING SAYS IT ABOUT USE CASES, and a use case sits above both.
+
+THE TEST IS THE SAME ONE derive-functions USES: could two honestly different designs both produce this pass? Held against the old steps the answer was no, and it took five milestones and a fifth cold reader to ask.
 
 ## use_cases
 

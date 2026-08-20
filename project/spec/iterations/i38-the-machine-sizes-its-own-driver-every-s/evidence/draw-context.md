@@ -1,8 +1,8 @@
 ---
 form: draw-context
 by: agent
-signed_off: 2026-08-20T10:55:08.840Z
-reopened: "2026-08-20T10:54:04.286Z — it says the one place this repository starts an agent is the entrypoint; se-pty.ts:275 starts one inside a pseudo-terminal with a keystroke channel back, and the boundary section rests on a receiver that does not exist when one does"
+signed_off: 2026-08-20T19:06:31.056Z
+reopened: "2026-08-20T19:05:46.938Z — gate-motivation was re-signed on a widened value proposition, and the owner corrected this state's own account of the two parties. This form said the guide never touches the lane and every lane call is the walker's. That is not the arrangement the owner wants: either hand may work the lane, and where the walker relays a guide's work it is recorded as the guide's."
 authors: agent
 files:
 ---
@@ -16,6 +16,68 @@ M1 is blessed with overrides. The vision is axiomatic from here.
 M2 asks who and what this change touches. The box is not the whole product — it is the product AS THIS CHANGE MOVES IT, so the boundary below is drawn around the sizing mechanism rather than around Quackitect.
 
 FOURTEEN NEIGHBOURS ALREADY STAND from earlier iterations. Five of them touch this change and are referenced rather than restated. ONE WAS MISSING and is minted here, because M1 established that it is empty rather than merely undrawn.
+
+### Reopened from M7 by an owner question: the outbound neighbour was wrong twice
+
+`nbr-the-driver-that-performs-the-spawn` HAS NOW BEEN CORRECTED TWICE ABOUT THE SAME PARTY.
+
+THE FIRST VERSION SAID THE NEIGHBOUR WAS EMPTY — that a milestone would name its driver into a room with nobody in it. It was written through the very channel it said did not exist.
+
+THE SECOND SAID THE RECEIVER READS AND CANNOT ACT. A spike at M6 trusted that: `exp-can-anything-act-on-a-published-driver` searched the engine for something that re-spawns the walker, found nothing, and concluded that no path exists by which a published driver changes what runs.
+
+### The owner named the shape both versions missed, and named the parties
+
+THE WALKER IS THE WEAK, PERSISTENT ONE. It holds the session, pulls, reads what comes back, fills forms, submits, and pays the narration toll. Most lane calls are the walker's.
+
+THE GUIDE IS THE STRONG, OCCASIONAL ONE. The walker hands it a step — "this state is C3, author the thing" — and it answers.
+
+BOTH ARE BOUND BY THE CAGE. The guide is not outside the rules; it is a delegate the walker is permitted to ask for.
+
+THE PATH IS SANCTIONED IN THIS REPOSITORY. Contract rule 11 grants spawning subagents without asking. `project/guidance/method/subagents.md` carries a "Which model" section under an owner grant of 2026-07-11: mechanical work rides a lower tier, judgment work inherits the session model, judged per subagent.
+
+### Why the context drawing kept getting this wrong
+
+BOTH ERRORS ARE THE SAME ERROR AT DIFFERENT DEPTHS: this state looked for the party in the SYSTEM, and the party is the one OPERATING the system.
+
+A CONTEXT DRAWING ASKS WHO IS OUTSIDE THE BOX. The walker is outside the box, it is the most present party in every session, and it was never drawn as a neighbour because it is the thing doing the drawing.
+
+AND A LANE SEARCH COULD NOT HAVE FOUND IT. The delegation capability lives in the harness and in the contract the walker obeys, not in `project/deliverable`, which is the only tree a lane search reaches.
+
+### Why "receiver" was the wrong word, and what it cost
+
+THE WORD IMPLIED A PARTY THAT RECEIVES A NAME AND SPAWNS A PROCESS. That framing sent a spike hunting for a spawner, and the answer was a delegate.
+
+"DRIVER", "RECEIVER" AND "WALKER" WERE DOING THREE JOBS BETWEEN THEM. The owner's naming separates them cleanly and this record adopts it: a WALKER that does the small daily work, and a GUIDE it asks when the machine says the step needs more.
+
+### What stays true, and it is narrower
+
+A RUNNING AGENT CANNOT BECOME A DIFFERENT ONE. `se-start.ts` fixes the walker's own model on the command line before the first pull, and nothing re-invokes the entrypoint mid-walk. A walk whose steps outgrow its walker must DELEGATE them; it cannot upgrade itself.
+
+AND THE OPEN QUESTION MOVES FROM CAPABILITY TO OBEDIENCE. Nothing makes the walker delegate. A weak walker that reads "this needs a stronger hand" and does the step itself leaves a record indistinguishable from one driven properly — which is exactly what `req-a-weaker-driver-than-named-owes-a-recorded-reason` marks rather than refuses.
+
+### Either hand may work the lane — owner ruling, 2026-08-20
+
+THIS SECTION SAID THE GUIDE NEVER TOUCHES THE LANE AND THAT EVERY LANE CALL IS THE WALKER'S. The owner rejected the arrangement rather than the wording: "the worker makes every lane call even for work the guide did, but I don't want that."
+
+SO NOTHING BARS THE GUIDE FROM THE LANE. Where a step is the guide's, the guide can pull, read and fill it, and the lane sees the guide.
+
+AND WHERE THE WALKER RELAYS INSTEAD, THE RELAY CARRIES ITS ORIGIN. The owner's words: "make sure that the walker relays information that is from the guide as information from the guide."
+
+TWO LEGAL ARRANGEMENTS AND ONE ILLEGAL ONE.
+
+- The guide calls the lane itself, stamped as the guide's.
+- The walker relays the guide's work, stamped as the guide's.
+- The walker files the guide's work under its own name. That is the failure.
+
+### And it lands on the log
+
+TODAY NEITHER ARRANGEMENT IS VISIBLE. `engine/tools.ts` stamps `actor: "agent"` on every lane call it serves, and `engine/calllog.ts:22` declares the vocabulary as `human | agent | ui`. A guide calling the lane reads as the walker; a guide's work relayed by the walker leaves no trace of the guide at all.
+
+THE RELAY CASE IS THE WORSE OF THE TWO. A direct call at least exists to be mislabelled. A relayed judgment simply appears under the walker, and nothing in the record says a stronger hand decided it.
+
+AND THE MODEL DOES NOT ANSWER IT EITHER. `project/guidance/method/subagents.md` § Which model says judgment work INHERITS the session model, so a guide can carry the walker's own model name. Grouping the log by model returns one bucket for two hands.
+
+THAT IS THE ATTRIBUTION HOLE IN ONE SENTENCE, and it is why the role vocabulary matters: the work was the guide's and the record says the walker, and today it cannot say otherwise.
 
 ## boundary
 

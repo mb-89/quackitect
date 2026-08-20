@@ -1,8 +1,9 @@
 ---
 form: partition-functions
-amended: "2026-08-20T14:09:13.627Z by agent — two mutually consistent miscounts of the-walk's size, caught by a hostile pass recounting this form's own clusters table"
 by: agent
-signed_off: 2026-08-20T11:47:31.096Z
+signed_off: 2026-08-20T19:11:22.212Z
+reopened: "2026-08-20T19:11:18.786Z — write-requirements was re-signed: a tenth requirement stands, req-every-call-records-the-part-its-caller-played, and req-acts-carry-role-and-channel's role vocabulary is corrected. Re-read against that."
+amended: "2026-08-20T14:09:13.627Z by agent — two mutually consistent miscounts of the-walk's size, caught by a hostile pass recounting this form's own clusters table"
 authors: agent
 files:
 ---
@@ -16,6 +17,45 @@ Forty-nine functions stand and this state boxes them. The partition is inherited
 THE DRAWING CAME BACK EMPTY, so the matrix below is rendered from the nodes' own `cluster` keys — the same treatment the compare cards got, and for the same reason: the answer lives on the node and the table is the rendering.
 
 ONE CLUSTER IS NEW, and it was decided by measuring the flows rather than by reading the names.
+
+### Rechecked 2026-08-20, after four musts and three function statements were restated
+
+WHAT MOVED: `obtain-a-step-s-difficulty`, `reduce-a-milestone-to-one-difficulty` and `resolve-a-difficulty-to-a-driver` lost the mechanisms their requirements had frozen. `flow-step-difficulty` lost one with them.
+
+THE PARTITION DOES NOT MOVE, and the reason is the measurement it was drawn from. The cluster was decided by counting flows, not by reading statements. The four functions couple to each other through `flow-step-difficulty`, `flow-milestone-difficulty` and `flow-driver-recommendation`, which nothing else in the corpus touches, and to the rest of the system at exactly two points.
+
+EVERY ONE OF THOSE SIX FACTS IS UNCHANGED. No flow was added, removed or rewired. The restatement edited what three nodes SAY, never what they consume or emit.
+
+THAT IS THE PARTITION EARNING ITS METHOD. A boxing drawn from names would have had to be redrawn when three names moved. One drawn from the flow graph did not, and this is the first evidence in this record that the difference is real rather than stylistic.
+
+
+### And once more, after the sizing must was corrected
+
+THE SIZING MUST WAS RESTATED A SECOND TIME. Its first restatement made the ENGINE the driver, which `req-the-machine-names-a-driver-and-starts-nothing` forbids the lane from being. It now names the engine own act: it sizes units and publishes a difficulty.
+
+NOTHING IN THIS FORM MOVES WITH IT. All four restated rows are musts, and a must is never an axis and never a cluster boundary. The correction narrows who performs an act and changes no flow, no weight and no coupling.
+
+
+### Rechecked again, after three requirement nodes had their prose corrected
+
+WHAT MOVED: prose inside three musts, not their statements. One Detail said the maximum is the only safe reduction where the statement licenses per-state naming. One cited the wrong function for its own verification. One recorded that it was minted as a scoring axis and gates instead.
+
+NOTHING IN THIS FORM MOVES WITH IT. No statement changed, no priority changed, no flow and no coupling changed. What changed is what a reader of those three nodes is told, which is the layer above this one.
+
+
+### And two more Details, found by a fourth pass
+
+TWO MORE REQUIREMENT DETAILS WERE PRESUMING MECHANISMS THEIR STATEMENTS HAD DROPPED. Five restatements, five orphaned Details, and the sweep that ran this morning found three of them.
+
+NOTHING IN THIS FORM MOVES. All five are musts, and a must is never an axis and never a cluster boundary.
+
+
+### And the source above all of it was restated last
+
+`uc-let-the-machine-name-the-driver` carried the seed mechanism in its own steps and every mechanism-naming requirement was a faithful derivation from it. Restated to outcomes; `gate-inputs` re-earned with the test it was missing.
+
+NOTHING IN THIS FORM MOVES. All five restated rows are musts, and a must is never an axis and never a cluster boundary.
+
 
 ## clusters
 

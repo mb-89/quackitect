@@ -1,8 +1,8 @@
 ---
 form: pressure-test
 by: agent
-signed_off: 2026-08-20T10:06:38.502Z
-reopened: "2026-08-20T10:06:02.578Z — it quotes a blast radius of thirteen of fourteen pinned records that is wrong by the wrong population, and it answered ground that moved when the register sweep found the standing weak-model entries"
+signed_off: 2026-08-20T19:04:46.055Z
+reopened: "2026-08-20T19:04:43.392Z — frame-delta was re-signed: its value proposition now asks a finished walk to say which HAND did each part, not only which model. The owner named a WALKER doing the daily work and a GUIDE asked for the hard steps; either may work the lane, and a relayed answer is recorded as the guide's. Re-read against that."
 authors: agent
 files:
 ---

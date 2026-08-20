@@ -7,15 +7,15 @@ statement: The sizing block publishes a rung name and holds no roster, so resolv
 owner: the owner
 trigger: "the first host that runs a model this project has never heard of, and the first vendor retirement"
 status: decided
-impact: "This is the defining choice of the winning architecture and everything else in it follows. It buys host portability by construction and pays for it with an attribution we can never make: nothing of ours learns which model answered, so the record can carry what we named and never what ran."
+impact: "This is the defining choice of the winning architecture and everything else in it follows. It buys host portability by construction and pays for it with a check we can never run: nothing of ours learns which model a rung resolved to, so the record carries what we named and a self-reported account of what ran, with nothing independent to compare them against."
 breaks_how_badly: crippling
-how_likely: unlikely
+how_likely: conceivable
 source_refs:
   - req-walk-survives-host-swap
   - raid-asm-one-model-list-serves-every-host-the-engine-supports
   - raid-asm-the-model-ladder-is-a-total-order
   - opt-the-block-names-a-rung-and-never-a-model
-  - cand-the-receiver-decides
+  - cand-whoever-holds-the-hands-decides
 weighs_with: none
 weighs_against: none
 ---
@@ -37,12 +37,39 @@ asked for both.
   `opt-the-driver-reads-the-difficulty-and-decides-whether-to-take-it`. Two
   finders reached it independently, from Nix's requiredSystemFeatures and from a
   SCAMPER reversal, which is the strongest convergence anywhere on the chart. It
-  is on no line because today's receiver reads and cannot act — see
-  `nbr-the-driver-that-performs-the-spawn`, rewritten in this record after the
-  first version claimed otherwise. If that ever changes, this decision is where
-  it lands.
+  is on no line because the reason recorded here — "today's receiver reads and
+  cannot act" — was believed at the time and is false. CORRECTED 2026-08-20: the
+  party reading a published rung is the walking agent, and it acts by delegating.
+  See `nbr-the-driver-that-performs-the-spawn`. The convergence therefore stands
+  unplaced for no good reason, and that is a live gap rather than a closed one.
 
 ## Consequences
+
+WHAT THIS COSTS, CORRECTED 2026-08-20. This node said the choice pays "with an
+attribution we can never make ... the record can carry what we named and never
+what ran". THAT IS WIDER THAN THE TRUTH AND IT TRAVELLED.
+
+`req-every-call-records-the-model-that-answered-it` says in its own Detail that
+"the transport hands the engine a client name and no model, so today the value
+can only come from the caller", and that the mark saying so "is part of the
+requirement, not a caveat on it". EVERY DESIGN ON THE CHART SELF-REPORTS,
+including the three that hold a roster.
+
+SO WHAT THIS DECISION GIVES UP IS THE CROSS-CHECK AND NOT THE RECORD. A line
+holding a roster can compare a self-reported model against what its own mapping
+resolved the rung to, and catch a caller reporting wrongly. This one holds none,
+so the self-report stands alone.
+
+THAT IS STILL A REAL COST and it is why the actor axis is this architecture's
+weakest. It is a narrower one than an absent field, and the difference decides
+whether `req-every-call-records-the-model-that-answered-it` is satisfied or
+violated — which is the difference between this being a candidate and not.
+
+WHERE THE OVER-STATEMENT CAME FROM AND HOW FAR IT GOT: one sentence in
+`cand-whoever-holds-the-hands-decides`, quoted into a scoring anchor, a cut's promotion
+argument, `el-account`,
+`raid-ar-the-actor-is-recorded-where-the-call-is-served` and this node. Five
+artifacts, none of which checked it against the requirement.
 
 TWO ASSUMPTIONS STOP BEING NEEDED RATHER THAN BEING WEAKENED. Neither
 `raid-asm-one-model-list-serves-every-host-the-engine-supports` nor

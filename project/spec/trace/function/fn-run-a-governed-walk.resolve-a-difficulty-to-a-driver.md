@@ -3,7 +3,7 @@ minted_in: i38-the-machine-sizes-its-own-driver-every-s
 id: fn-run-a-governed-walk.resolve-a-difficulty-to-a-driver
 type: "[[function]]"
 cluster: the-sizing
-statement: resolve a difficulty to the driver it calls for, from one standing mapping, or answer that none matches
+statement: resolve a difficulty to the driver it calls for, the same way on every supported host, or answer that none matches
 satisfies:
   - req-one-model-list-is-read-live-from-the-repository
   - req-an-unmatched-rung-names-itself-and-publishes-no-driver
@@ -15,6 +15,15 @@ outputs:
 ---
 
 ## Rationale
+
+RESTATED 2026-08-20, AFTER ITS REQUIREMENT WAS. The statement used to say "from
+one standing mapping". A single mapping is a mechanism, and
+`req-one-model-list-is-read-live-from-the-repository` stopped demanding one at
+gate-architecture.
+
+WHAT REPLACED IT IS THE OUTCOME THE MAPPING WAS THERE FOR: the same answer on
+every supported host for the same inputs. A design holding no roster at all can
+satisfy that, and one of the four candidates does.
 
 TWO OUTCOMES AND BOTH ARE ANSWERS. A driver, or the fact that nothing matched with the difficulty named. There is no third outcome and in particular no quiet substitution of whatever is already running.
 

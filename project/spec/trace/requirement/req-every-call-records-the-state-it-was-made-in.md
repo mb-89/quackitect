@@ -26,8 +26,13 @@ IT MUST BE A FIELD. The state rides inside a narration record's arguments today
 and grouping cannot reach it, which is why the retro's per-step cost column has
 stood documented as impossible since 2026-08-17.
 
-BOTH COORDINATES OR NEITHER. The record grows the model field and this one in
-one edit; shipping either alone looks like progress and moves nothing.
+EVERY COORDINATE OR NONE. The record grows the model field and this one in one
+edit; shipping either alone looks like progress and moves nothing.
+
+AND THERE ARE THREE OF THEM, corrected 2026-08-20. This line said "BOTH
+COORDINATES OR NEITHER" while the record had no way to say which hand made a
+call. `req-every-call-records-the-part-its-caller-played` is the third, and it
+joins this edit rather than queueing behind it.
 
 A NOTE ON HOW ITS ABSENCE IS ESTABLISHED, because this iteration got it wrong
 once: read the record's own declaration. Grouping by a missing key returns a

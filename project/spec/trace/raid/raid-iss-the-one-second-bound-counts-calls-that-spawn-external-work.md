@@ -7,13 +7,33 @@ statement: The agent-to-entrypoint bound of one second is measured against every
 owner: the driving agent
 trigger: any gate that reports bound breaches on if-agent-harness-to-entrypoint
 status: open
-breaks_how_badly: annoying
-how_likely: certain
+breaks_how_badly: abrasive
+how_likely: expected
 impact: Every breach report on this edge mixes lane overhead with runtimes the caller asked for, so a real slowdown in the lane itself cannot be seen against the noise.
 source_refs:
   - project/spec/trace/interface/if-agent-harness-to-entrypoint.md
   - project/spec/iterations/i36-the-harness-is-not-claude-measure-what-e/evidence/gate-implementation.md
 ---
+
+## Graded off the scale, corrected 2026-08-20
+
+THIS ENTRY SAID \`how_likely: certain\`. THE SCALE OFFERS expected, plausible,
+conceivable. \`project/deliverable/engine/bin/grades-complete.ts\` refuses the
+whole register while any entry sits outside it, and it refused at
+\`rank-unknowns\`' exit — which is the first state that runs it.
+
+\`expected\` IS THE HIGHEST THE SCALE HAS and it is what this entry now carries.
+
+WHAT "CERTAIN" WAS TRYING TO SAY, and the scale cannot hold it: this is not
+something that MIGHT happen. It is a consequence the design chooses. A likelihood
+scale measures whether a thing occurs; it has no value for a thing that is true
+by construction.
+
+THE DISTINCTION IS REAL AND BELONGS SOMEWHERE ELSE. A consequence a design
+accepts is a decision's cost, recorded on the decision. A risk is something that
+might realise. Writing "certain" onto a likelihood field collapses the two, and
+four entries in this record did it independently — which is a vocabulary gap
+rather than four mistakes.
 
 ## What was seen
 

@@ -15,7 +15,7 @@ source_refs:
   - raid-risk-the-weaker-model-asymmetry-has-nothing-enforcing-it
   - opt-a-driver-claim-cannot-be-made-without-a-driver-or-a-reason
   - opt-the-record-carries-both-the-named-driver-and-the-one-that-answered
-  - cand-the-receiver-decides
+  - cand-whoever-holds-the-hands-decides
 weighs_with: raid-dec-the-no-match-is-a-returned-value-not-a-silence
 weighs_against: none
 ---

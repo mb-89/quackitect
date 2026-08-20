@@ -33,5 +33,14 @@ produced by the mechanism rather than requested from a participant who has no
 incentive to write it.
 
 WHAT IT COSTS: a round trip and a protocol, where the incumbent has neither. It
-also needs a driver willing to refuse, and today's receiver reads and cannot act
-at all — so this option is the furthest of any from something we can ship alone.
+also needs a driver willing to refuse.
+
+CORRECTED 2026-08-20: this sentence ended "and today's receiver reads and cannot
+act at all — so this option is the furthest of any from something we can ship
+alone". That was false. The party reading the difficulty is the walking agent,
+and it acts by DELEGATING the step to a stronger hand — contract rule 11 and
+`project/guidance/method/subagents.md` § Which model.
+
+WHAT REMAINS A COST IS NARROWER AND IT IS ABOUT WILLINGNESS RATHER THAN
+CAPABILITY. Nothing makes a reader refuse, and a reader that quietly takes a step
+it should have handed on leaves a record indistinguishable from a correct one.

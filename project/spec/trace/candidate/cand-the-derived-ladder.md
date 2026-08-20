@@ -49,6 +49,180 @@ IT MATTERS MORE HERE THAN ON THE BASELINE. This line's accountability is the
 double walk, and comparing two walks needs both drivers on both records or there
 is nothing to compare them by.
 
+## The must gaps, filled at run-candidates 2026-08-20
+
+WHY THIS SECTION EXISTS. An independent must-check held all ten musts against
+all four candidates and found this one silent where a must needed an answer. A
+must is a constraint: a candidate satisfies it or is not a candidate. Silence is
+incompleteness, and contract rule 5 says fill it before judging it.
+
+### The fail-open switch is set to REFUSE
+
+SAME ANSWER AS `cand-the-seed-made-total`, WHICH IS WHY IT IS NOT ARGUED TWICE.
+Both lines pick `opt-a-declared-class-with-a-named-fallback-pool`, whose switch
+decides whether an unmatched class falls through or refuses, and both set it to
+REFUSE because `req-an-unmatched-rung-names-itself-and-publishes-no-driver`
+forbids falling back to whatever is running. The argument is written out once, on
+the seed.
+
+WHAT IS DIFFERENT HERE AND ONLY HERE. This line computes the difficulty rather
+than declaring it, and the totality option's own text names that as one of the
+two holes a compile-time check cannot see: "a mapping edited after the pin, a
+difficulty computed rather than declared". So the switch does more work on this
+line than on the seed, where the declared value is visible to the same check that
+validates the mapping.
+
+### A gap that was never here — withdrawn 2026-08-20, same day it was written
+
+A SECTION STOOD HERE CLAIMING THIS LINE WAS THE ONLY ONE OF FOUR NOT PICKING
+`opt-the-record-carries-both-the-named-driver-and-the-one-that-answered`, and
+adding it. THE CLAIM WAS FALSE. The option was already the last entry in this
+node's picks and had been since the line was composed.
+
+HOW THE FALSE CLAIM WAS MADE. The picks list was read through a call bounded at
+900 characters, which cut the list one entry short. The missing entry was the
+one the section then said was missing.
+
+THAT IS THE THIRD TRUNCATED READ IN THIS RECORD. A counting script that stopped
+at three thousand characters produced "forty-six of fifty-two rows" where the
+answer is forty-seven of fifty-three. A refusal count was taken over a window a
+query's own `limit` imposed. Now a picks list read to 900 characters.
+
+WHAT THE EDIT LEFT BEHIND AND WHAT WAS UNDONE. It appended a duplicate of the
+option to the frontmatter — removed. It asserted that the record carries "the
+state the call was made in", which no option this line picks provides and which
+`raid-iss-a-call-cannot-be-attributed-to-the-state-it-was-made-in` says does not
+exist — withdrawn. And it told the next scorer that this line's actor-axis score
+would move because of the addition. IT DOES NOT MOVE. A third scorer said why:
+the actor axis is about what a READER takes off the record, and adding a field to
+what the record WRITES does not touch it.
+
+WHAT ACTUALLY STANDS ON THE ACCOUNT MUSTS, unchanged and not by this section's
+doing: the picked option puts the named driver beside the answered one on every
+call record, and under it "the missing reason is a detectable omission".
+
+### Recording what the decision read — a gap this line shares with all three others
+
+`req-a-machine-decision-repeats` demands two things: the same decision on every
+machine for the same inputs, AND that the engine record what it read.
+
+THE FIRST HALF IS ANSWERED HERE. The difficulty is computed at compile time from a static row, which gives the same answer every time and can be printed for all fifty-three rows before anything runs.
+
+THE SECOND HALF WAS ANSWERED BY NO LINE ON THE CHART.
+`opt-the-record-carries-both-the-named-driver-and-the-one-that-answered` is
+picked by all four, and it records the DECISION and the OUTCOME — the driver
+named and the driver that answered. It records nothing about the INPUT the
+decision was made from.
+
+SO THE RECORD CARRIES THE DIFFICULTY THE DECISION READ, beside the driver it
+named. One field, on an option all four lines already take.
+
+THIS FILL SAYS THE SAME THING ON ALL FOUR LINES AND THAT IS DELIBERATE. The gap
+was uniform, so the repair is uniform, and it cannot move the comparison in any
+direction. A fill written differently for each line would be design smuggled in
+at a gate.
+
+IT IS NOT WORD-FOR-WORD IDENTICAL AND THIS SENTENCE USED TO CLAIM IT WAS,
+corrected 2026-08-20. Each line's determinism sentence names that line's own
+inputs, because that half of the demand IS line-specific; the second half — that
+the record carries the difficulty the decision read — is the same demand answered
+the same way everywhere.
+
+A COLD PASS CAUGHT THE CLAIM BEING FALSE IN TWO DIRECTIONS AT ONCE: it was
+absent from the fourth file, where it would have had to be true, and the three
+that carried it were not byte-identical either.
+
+WHY IT WAS MISSED FOR THE WHOLE OF M4. `req-a-machine-decision-repeats` was
+minted at derive-criteria as a scoring AXIS. It carries `priority: must`, so it
+never scored, and `cut-criteria` recorded that exclusion as correct. Nothing
+then put it to a candidate as a constraint until the second must-check.
+
+### The three account musts, and where they are actually satisfied
+
+THREE MUSTS ASK WHAT THE CALL RECORD HOLDS:
+`req-every-call-records-the-model-that-answered-it`,
+`req-every-call-records-the-state-it-was-made-in` and
+`req-a-weaker-driver-than-named-owes-a-recorded-reason`.
+
+THEY ARE NOT THIS LINE'S TO ANSWER AND NOT ANY LINE'S.
+`fn-run-a-governed-walk.stamp-who-answered-and-where` carries all three — its
+`satisfies` list names them — and it sits in `cluster: the-account`, not in
+`cluster-the-sizing` that these four candidates partition. It is implemented by
+`el-account`.
+
+SO EVERY LINE INHERITS THE SAME ANSWER UNCHANGED. None contributes to it, none
+obstructs it, and none differentiates on it.
+
+THAT REPLACES AN EARLIER PARAGRAPH THAT SAID THESE WERE "TAKEN" HERE, corrected
+2026-08-20. A cold reader called that a bare assertion made four times, and it
+was: no picked option on any line writes a self-reported mark or a state field,
+and declaring them taken did not change that. THE FUNCTION LAYER ALREADY HELD THE
+ANSWER and nobody had looked.
+
+AND THE STATE FIELD IS WHY THIS MATTERS RATHER THAN BEING TIDY.
+`req-every-call-records-the-state-it-was-made-in` says in its own Detail "BOTH
+COORDINATES OR NEITHER. The record grows the model field and this one in one
+edit; shipping either alone looks like progress and moves nothing." The earlier
+fill closed one coordinate on all four lines and left its twin open on all four,
+which is precisely the half-shipment that Detail forbids.
+
+WHAT IS STILL OPEN AND IS NOT THIS CHART'S TO CLOSE:
+`raid-iss-a-call-cannot-be-attributed-to-the-state-it-was-made-in` stands open
+and crippling. It is an account-cluster issue, it blocks the reconciliation every
+line would want, and no sizing design closes it.
+
+IT IS TAKEN, UNIFORMLY ACROSS ALL FOUR LINES, contributed by none of them. Stated
+on every line rather than on one, corrected 2026-08-20: the mark was settled in a
+single file on behalf of four, so a reader of any of the other three saw an open
+hole where a reader of the fourth saw it closed.
+
+### Where the difficulty lives relative to the demand ledger — the hard case
+
+`req-the-complexity-value-is-read-live-and-never-pinned` was restated: keep a
+step's complexity out of every record's demand ledger, so that a complexity
+changing reopens no standing claim.
+
+THIS LINE PICKS
+`opt-the-complexity-rides-the-cell-the-compiled-state-already-carries`, WHICH IS
+THE HARD CASE and not the easy one. That option's own text says a cell value
+already reaches the ledger: "engine/iterations.ts:294 puts it in the demand
+ledger as the first of three fields, and :356 reopens a record whenever its rank
+rises."
+
+THE ANSWER IS NOT IN THAT OPTION AND THIS SECTION SAID IT WAS. Corrected
+2026-08-20 by a cold reader that went and looked: the option contains no
+`demandsFor` at all, and two sentences after the passage above it says the
+opposite-facing thing — the riding value "is a value fixed when the record was
+blessed ... That is the thing
+req-the-complexity-value-is-read-live-and-never-pinned forbids in its first
+half."
+
+WHERE THE ANSWER ACTUALLY LIVES is the probe field of
+`raid-iss-the-live-read-rule-forbids-more-than-its-own-reason-needs`, which
+verified it against the engine: "`demandsFor` at :289 builds the record from
+three NAMED things, so a fourth cell key carrying a complexity is ignored by
+construction and moves no demand."
+
+THAT SENTENCE WAS LIFTED VERBATIM AND RE-LABELLED as the option's. It is a real
+verification, it is correct, and it was attributed to a source that does not
+carry it — which is the fabrication class this record has been repairing all day,
+committed while repairing it.
+
+SO THE LEDGER ADMITS `applies` AND ONLY `applies`. A complexity key beside it on
+the same cell reaches `demandsFor`'s three named fields nowhere, and `shapeOf` at
+:329 serialises four named keys it is not among.
+
+AND THE OPTION SAYS WHAT WOULD BREAK IT, which is the part worth keeping: because
+the ledger already carries one cell value, admitting a second is a one-line edit
+somebody could make without seeing the reopen consequence. That is a sharper
+version of the fear the requirement was written from than the requirement itself
+states, and it is why the demand keeps its fatal grade and its named test.
+
+THIS ANSWER WAS FILLED ON `cand-whoever-holds-the-hands-decides` FIRST, where it is easy —
+that line does not pick the riding option at all. A cold reader said so: the gap
+was filled where the answer was cheap and left open on the two lines where it is
+load-bearing. It is answered here now, on the harder case, from the register entry that verified it against the engine — which is where the sentence lives and where this section should have pointed the first time.
+
 ## Why this one
 
 IT IS THE ONLY CANDIDATE THAT CANNOT DRIFT, and drift is the failure the

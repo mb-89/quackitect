@@ -1,8 +1,8 @@
 ---
 form: evaluate-set
 by: agent
-signed_off: 2026-08-20T14:17:42.144Z
-reopened: "2026-08-20T13:42:26.791Z — the candidate set it scored was incomplete. cand-the-derived-ladder and cand-the-reader-beside-the-walk were drawn silent on what the call record holds, because that axis carried one distinct value and the completeness check demanded a pick from nobody, so both went to the scorer saying nothing about a question neither is prevented from answering. reverse-sensitivity measured the cost: the winner leads on two axes both fed by that one cell and six of seven grafted worlds unseat it. Both lines now carry the pick and the scores must be re-earned against the redrawn set."
+signed_off: 2026-08-20T17:01:54.280Z
+reopened: "2026-08-20T17:01:52.843Z — run-candidates re-signed after correcting an undercount of the invented-state references from two to five"
 authors: agent
 files:
 ---
@@ -26,46 +26,118 @@ AND A CORRECTION THE FIRST PASS'S NARRATIVE RESTED ON. That form said cand-the-d
 | cand-the-seed-made-total | req-a-wrong-act-never-passes-silently | 3 | Meets it and records its holes: a compile-time refusal plus the grafted validity rule, but the pin seam still awaits a gate ruling — "The compile refuses a mapping with a hole." | none |
 | cand-the-seed-made-total | req-walk-survives-host-swap | 2 | Demo path only, and the roster hole is the requirement itself rather than a side note — "What it already carries — the roster and the mapping as two records on two clocks — is the whole of the mitigation available to it." | none |
 | cand-the-seed-made-total | req-acts-carry-role-and-channel | 0 | Not addressed anywhere in the file; the nearest thing it says is that the axis is empty — "req-acts-carry-role-and-channel scores 0 across all four, so there is nothing to ask for." | none |
-| cand-the-seed-made-total | req-the-actor-is-recorded-where-the-call-is-served | 1 | Prose commitment to record-borne facts about drivers, nothing checkable about an acting role — "Every call record carries the driver named beside the driver that answered." | none |
-| cand-the-seed-made-total | req-comparison-carries-both-sides | 3 | Both sides of the named-versus-answered claim sit on one call record and the audit hole is stated — "An acceptable over-driving rate is stated in advance, and a sample is audited against it." | none |
+| cand-the-seed-made-total | req-the-actor-is-recorded-where-the-call-is-served | 1 | Stamps the record and names no reader that takes the acting role off it — "Every call record carries the driver named beside the driver that answered." | none |
+| cand-the-seed-made-total | req-comparison-carries-both-sides | 3 | Both sides sit on one call record and the line states plainly that it cannot find out whether the rung mattered — "A weaker hand does worse work on a harder step. Unmeasured. Probe 3 tried and could not." | none |
 | cand-the-derived-ladder | req-a-wrong-act-never-passes-silently | 3 | Totality check plus nothing typed to drift, but the file itself records a silent-wrongness mode — "a bad formula is worse than a bad declaration because it is wrong everywhere at once." | none |
 | cand-the-derived-ladder | req-walk-survives-host-swap | 2 | Difficulty is read from in-tree loader-validated data, yet the host-dependent roster comes along unaddressed — "THE ROSTER SPLIT IS INHERITED FROM THE SEED and carries the same coupling." | none |
 | cand-the-derived-ladder | req-acts-carry-role-and-channel | 0 | The only record change proposed is a driver field; role and channel are never mentioned — "Nothing about computing a difficulty from a matrix cell stops the record carrying the driver named beside the driver that answered." | none |
-| cand-the-derived-ladder | req-the-actor-is-recorded-where-the-call-is-served | 1 | Asserts that the comparison must read off the record rather than be reconstructed, but only for drivers — "comparing two walks needs both drivers on both records or there is nothing to compare them by." | none |
-| cand-the-derived-ladder | req-comparison-carries-both-sides | 3 | Two signed forms of one step give both sides, joined on evidence forms rather than the un-attributable call log, with the undefined threshold recorded — "the threshold is a design decision still open." | none |
+| cand-the-derived-ladder | req-the-actor-is-recorded-where-the-call-is-served | 1 | Same stamp, same absent reader; the state coordinate it would need is not provided by any option it picks — "the missing reason is a detectable omission." | none |
+| cand-the-derived-ladder | req-comparison-carries-both-sides | 3 | Two signed forms of one step give both sides, with the threshold recorded as open — "A sampled step is walked twice, once at the named rung and once a rung below, and the two signed forms are compared." | none |
 | cand-the-reader-beside-the-walk | req-a-wrong-act-never-passes-silently | 4 | Prevention by construction rather than by check: the component that could commit a wrong act holds no write path — "Here the recommender is not in the walk at all, so the rule holds by deployment." | Kubernetes VPA in updateMode Off, which writes a recommendation onto the object and never evicts a pod |
 | cand-the-reader-beside-the-walk | req-walk-survives-host-swap | 3 | Meets it by touching nothing host-specific, with the record-shape brittleness recorded as the standing hole — "Nothing has to be declared, compiled or published for this candidate to have something to say." | none |
 | cand-the-reader-beside-the-walk | req-acts-carry-role-and-channel | 0 | Writes findings into the record but proposes no role or channel stamp; the axis is not addressed — "A reader opens the record, counts each state's reopens against its walks, and writes its finding into the call record." | none |
-| cand-the-reader-beside-the-walk | req-the-actor-is-recorded-where-the-call-is-served | 2 | Reads the signer off the record on the demo path, but states no rule against deriving a role and records no hole — "two of those six were signed in this session by an agent that has never run a hostile pass over a finder." | none |
-| cand-the-reader-beside-the-walk | req-comparison-carries-both-sides | 3 | Reopens against walks gives both sides, and the blind side of the evidence is named rather than hidden — "A row never reopened because nobody checked is indistinguishable here from a row never reopened because it was easy." | none |
-| cand-the-receiver-decides | req-a-wrong-act-never-passes-silently | 4 | The invalid case is unrepresentable and the unmatched case is a returned value rather than a silence — "A RECORD CARRYING NEITHER A NAMED DRIVER NOR A STATED REASON IS NOT A VALID RECORD." | OASIS XACML 3.0's four-value decision vocabulary, which keeps NotApplicable distinct from Indeterminate |
-| cand-the-receiver-decides | req-walk-survives-host-swap | 4 | Host dependence removed by construction: the tree names an abstract rung and never a model, so a reopen under another host needs no repair — "nothing in our tree names a model, so there is nothing to be wrong about." | Nextflow label and withLabel, where the pipeline names a label and the site config maps it, so the same pipeline runs unchanged elsewhere |
-| cand-the-receiver-decides | req-acts-carry-role-and-channel | 0 | Publication carries difficulty, rung and no-match value only; role and channel are absent from the file — "publish-the-driver-outward publishes the pair and the rung, or the explicit no-match value carrying the difficulty that found none." | none |
-| cand-the-receiver-decides | req-the-actor-is-recorded-where-the-call-is-served | 0 | Does not address the axis, and by design keeps the acting party off any record of ours — "we cannot observe what actually answered, because under this line nothing of ours ever knew which model the rung resolved to." | none |
-| cand-the-receiver-decides | req-comparison-carries-both-sides | 3 | Carries no second side at all but takes the requirement's other path and names the reason plainly, twice — "THE MEASUREMENT SEAM IS BROKEN AND THE CANDIDATE ADMITS IT." | none |
+| cand-the-reader-beside-the-walk | req-the-actor-is-recorded-where-the-call-is-served | 2 | The only line containing a reader at all, and its source is the record alone — "THE READER AND THE WALK SHARE ONE ARTIFACT AND NOTHING ELSE. That artifact is the call record, and it is also the publication." | none |
+| cand-the-reader-beside-the-walk | req-comparison-carries-both-sides | 2 | Reopens against walks give both sides, and the bucket boundaries that turn a rate into a rung are still unchosen — "A reader opens the record, counts each state’s reopens against its walks, and writes its finding into the call record." | Kubernetes VPA in updateMode Off, Goldilocks, Robusta KRR and Slurm seff — four shipped recommend-only readers, load-bearing for this line |
+| cand-whoever-holds-the-hands-decides | req-a-wrong-act-never-passes-silently | 4 | The invalid case is unrepresentable and the unmatched case is a returned value rather than a silence — "A RECORD CARRYING NEITHER A NAMED DRIVER NOR A STATED REASON IS NOT A VALID RECORD." | OASIS XACML 3.0's four-value decision vocabulary, which keeps NotApplicable distinct from Indeterminate |
+| cand-whoever-holds-the-hands-decides | req-walk-survives-host-swap | 4 | Host dependence removed by construction: the tree names an abstract rung and never a model, so a reopen under another host needs no repair — "nothing in our tree names a model, so there is nothing to be wrong about." | Nextflow label and withLabel, where the pipeline names a label and the site config maps it, so the same pipeline runs unchanged elsewhere |
+| cand-whoever-holds-the-hands-decides | req-acts-carry-role-and-channel | 0 | Publication carries difficulty, rung and no-match value only; role and channel are absent from the file — "publish-the-driver-outward publishes the pair and the rung, or the explicit no-match value carrying the difficulty that found none." | none |
+| cand-whoever-holds-the-hands-decides | req-the-actor-is-recorded-where-the-call-is-served | 1 | Records what it named and touches no reader; its former 0 was anchored on a sentence this file now marks false — "It can record what it NAMED: the rung it published and the state it published it for." | none |
+| cand-whoever-holds-the-hands-decides | req-comparison-carries-both-sides | 3 | Both sides reach the record and the missing half is stated rather than hidden — "THE MEASUREMENT SEAM IS BROKEN AND THE CANDIDATE ADMITS IT." | OASIS XACML 3.0, where NotApplicable and Indeterminate are distinct returned results |
 
 ## front
 
 - [[cand-the-reader-beside-the-walk]]
-- [[cand-the-receiver-decides]]
+- [[cand-whoever-holds-the-hands-decides]]
 
 ## reading
 
-THE FRONT HALVED AND THE WINNER MOVED. Two candidates are dominated, both by the same rival, and both were on the front before the redraw.
+### Re-scored a third time, 2026-08-20, after the must gaps were filled
 
-cand-the-seed-made-total scores 3, 2, 0, 1, 3 and cand-the-derived-ladder scores 3, 2, 0, 1, 3 — identical. cand-the-reader-beside-the-walk scores 4, 3, 0, 2, 3, which is equal or better on every axis and better on three, so it dominates both. cand-the-receiver-decides scores 4, 4, 0, 0, 3 and trades with the reader: better on host-swap, worse on the actor axis.
+TWO AXES MOVED AND A THIRD SCORER MOVED THEM. `req-the-actor-is-recorded-where-the-call-is-served` and `req-comparison-carries-both-sides` were re-scored across all four lines by a reader with a clean context, told which sections had been added today, by whom, and to distrust them.
 
-I ACCEPT BOTH ELIMINATIONS, AND THE REASON MATTERS MORE THAN THE VERDICT. The previously declared winner is now dominated, and it is dominated because a scorer that was shown the record's own open crippling issue would not give it 4 for reconciling a named driver against a real one. Nothing about the candidate changed except one grafted cell, which helped it. What changed is that the axis it led on was scored against what this record already knows.
+WHY THESE TWO AND NOT THE OTHER THREE. cand-the-derived-ladder gained a pick it had been silent on rather than against, and cand-whoever-holds-the-hands-decides was found over-stating its own limit. Both bear on these two axes and on nothing else.
 
-THE DERIVED LADDER'S EARLIER ELIMINATION IS WITHDRAWN AND REPLACED. It was eliminated by cand-the-receiver-decides on a silence this record created; the silence is repaired, the redraw moved it from 9 to 9 by a different route, and it is now eliminated by the reader on merit. The first elimination was an artefact and this one is not.
+#### The actor axis is the READER'S half, and nothing on the chart touches a reader
 
-ONE AXIS SCORED ALIKE AND IT SCORED ZERO, FOR THE SECOND TIME. req-acts-carry-role-and-channel: 0, 0, 0, 0. Two independent scorers with clean contexts, four candidates, eight zeroes. The decision does not turn on it and it should have been struck at cut-criteria. It stays, because striking a criterion after seeing its scores is the one edit that cannot be honest, and it now costs nothing twice over.
+THE SCORER READ THE AXIS PROPERLY AND THIS RECORD HAD NOT. `req-the-actor-is-recorded-where-the-call-is-served` says in its own Detail "A STAMP THAT NOTHING READS IS NOT ACCOUNTABILITY", and its measure is readers that derive the role from a tool name.
 
-AND THE MISSING CRITERION IS STILL MISSING. Nothing in the surviving five measures spend. Of the 119 rows in the standing pool exactly one mentions cost and it is a process rule. Both candidates on the front are ones that spend nothing on the walk — the reader because it sits outside it, the receiver because it publishes and stops — and neither was chosen for that, because no axis asked.
+ALL FOUR CANDIDATES OPERATE ON THE WRITER'S HALF, which is the twin axis `req-acts-carry-role-and-channel` — the one that scored 0 across all four, twice, under two independent scorers.
 
-HOW FAR THE FRONT SITS FROM UTOPIA. Utopia is five on all five. The best score on any axis is four, on one axis it is zero for everybody, and no candidate exceeds 3 on more than two axes. Three 4s were awarded across twenty judgements against five in the first pass, and no 5. The front is two of four, against three of four before, which is what a front does when the axes are scored harder.
+SO NOTHING ON THIS AXIS SCORES ABOVE 2, and the ceiling is a property of the chart rather than of any line on it.
 
-ONE ANCHOR QUOTES A SENTENCE SINCE CORRECTED. The reader's score of 2 on the actor axis rests on "two of those six were signed in this session by an agent that has never run a hostile pass over a finder" — a sentence a hostile pass then falsified, since find_prior_art is a finder and was reopened for exactly such a pass. The quote is left as the scorer read it and the node is corrected; the score does not depend on the falsified half.
+#### What moved
+
+- cand-whoever-holds-the-hands-decides on the actor axis: 0 to 1. Its 0 was anchored on "can never record what answered", which is false against `req-every-call-records-the-model-that-answered-it`'s own Detail: "the transport hands the engine a client name and no model, so today the value can only come from the caller."
+- cand-the-reader-beside-the-walk on the comparison axis: 3 to 2. Its reader counts reopens against walks and writes the finding into the record; the bucket boundaries that turn a rate into a rung are still unchosen, which the candidate's own seams section already said.
+
+#### What did not move, and this is the part worth reading
+
+cand-the-derived-ladder gained the named-and-answered pick and its actor score DID NOT MOVE. The added section claimed it would. IT WAS WRONG, and the scorer said so: adding a driver pair to what the record WRITES does not move an axis about what a reader TAKES.
+
+THAT CORRECTION CAME BACK AT THE HAND THAT WROTE THE CLAIM, which is what commissioning it was for.
+
+#### The vectors after the re-score
+
+Axes in order: a-wrong-act-never-passes-silently, walk-survives-host-swap, acts-carry-role-and-channel, the-actor-is-recorded-where-the-call-is-served, comparison-carries-both-sides.
+
+- cand-the-seed-made-total: 3, 2, 0, 1, 3
+- cand-the-derived-ladder: 3, 2, 0, 1, 3
+- cand-the-reader-beside-the-walk: 4, 3, 0, 2, 2
+- cand-whoever-holds-the-hands-decides: 4, 4, 0, 1, 3
+
+#### The front, and it is not the front the last pass drew
+
+cand-whoever-holds-the-hands-decides is equal or better than cand-the-seed-made-total and cand-the-derived-ladder on every axis and strictly better on two, so it dominates both. Those two score identically to each other and neither dominates the other.
+
+cand-the-reader-beside-the-walk and cand-whoever-holds-the-hands-decides trade: the reader is better on the actor axis, the receiver on host-swap and on comparison. Neither dominates.
+
+SO THE FRONT IS THE SAME TWO LINES AND THE REASON IS DIFFERENT. Last pass the reader dominated the seed and the derived ladder and the receiver did not. This pass the receiver dominates both and the reader does not — the reader's drop on comparison is what released them from it.
+
+THAT IS WORTH SAYING PLAINLY: the front is unchanged and every relationship inside it changed. A reading that only reported the front would have reported nothing moved.
+
+#### One axis scored alike and it scored zero, for the third time
+
+`req-acts-carry-role-and-channel`: 0, 0, 0, 0. Three independent scorers with clean contexts, four candidates, twelve zeroes.
+
+IT STILL STAYS, for the reason it stayed twice before: striking a criterion after seeing its scores is the one edit that cannot be honest.
+
+AND ITS TWIN IS WHY THE ACTOR AXIS IS CAPPED. The writer's half scores zero everywhere and the reader's half cannot rise above 2 while it does. Two of the five surviving axes are measuring the two halves of something no candidate addresses.
+
+#### The missing criterion is still missing
+
+Nothing in the surviving five measures spend. Of the 119 rows in the standing pool exactly one mentions cost and it is a process rule. Both lines on the front spend nothing on the walk — the reader because it sits outside it, the receiver because it publishes and stops — and neither was chosen for that, because no axis asked.
+
+### The open host-swap question, resolved without re-scoring
+
+CUT-CRITERIA HANDED THIS STATE ONE QUESTION. `cand-the-seed-made-total` declines the fall-through branch of `opt-a-declared-class-with-a-named-fallback-pool`, because `req-an-unmatched-rung-names-itself-and-publishes-no-driver` forbids it. The branch carried a host-portability claim — "a default pool is what a host without the named worker falls to" — and the seed scores 2 on `req-walk-survives-host-swap`.
+
+IT IS NOT RE-SCORED AND THE FRONT IS UNAFFECTED, and the argument is arithmetic rather than judgment.
+
+DECLINING A PORTABILITY MECHANISM CAN ONLY LOWER THE SCORE OR HOLD IT. Nothing about refusing where you could have fallen through makes a design survive a host swap better.
+
+THE SEED IS ALREADY DOMINATED BY `cand-whoever-holds-the-hands-decides`: 3, 2, 0, 1, 3 against 4, 4, 0, 1, 3. Equal or better on every axis, strictly better on two.
+
+A LOWER HOST-SWAP SCORE KEEPS IT DOMINATED and cannot put it on the front. So the cell can only move in a direction that changes nothing, and re-scoring it would spend a fourth clean-context reader to confirm an ordering that already holds.
+
+WHAT THIS DOES NOT SETTLE, said rather than left implied: whether the seed's 2 is right. It is a standing figure from the third pass and it is not re-earned here. If the seed ever returns to the front, this cell is owed a reader.
+
+### One upstream claim withdrawn, and this state's score already did not rest on it
+
+CUT-CRITERIA WITHDREW ITS SENTENCE that `req-comparison-carries-both-sides` is "the row cand-whoever-holds-the-hands-decides fails structurally". Every line self-reports the answered driver, so every line carries both sides; what this one lacks is a roster to check the self-report against.
+
+THIS STATE'S SCORE FOR THAT PAIR WAS ALREADY 3 AND STAYS 3. The third scoring pass anchored it on the candidate's own "THE MEASUREMENT SEAM IS BROKEN AND THE CANDIDATE ADMITS IT" — a stated missing half, not a structural failure — which is exactly the reading cut-criteria has now adopted.
+
+SO THE WITHDRAWAL CHANGES AN ARGUMENT UPSTREAM AND NO NUMBER HERE. Recorded because a reader finding the two forms disagreeing yesterday should be able to see which one moved.
+
+### The anchors were re-checked against the files after the fourth pass
+
+A FABRICATED CITATION WAS FOUND IN THE CANDIDATE FILES and it is the kind of thing an anchor can inherit, so every anchor in the table above was re-read against its source.
+
+ALL EIGHT MOVED ANCHORS HOLD. The two axes re-scored by the third pass quote sentences that are still in the files they are attributed to.
+
+ONE OLDER ANCHOR DOES NOT AND IT WAS ALREADY REPLACED. The first scoring pass anchored `cand-the-seed-made-total` on the comparison axis to "An acceptable over-driving rate is stated in advance, and a sample is audited against it." That sentence was in the seed's prose and the seed does not pick the option it describes. The third pass replaced the anchor and the candidate now records what the missing half costs it.
+
+WHAT THIS ARGUES FOR, and it is cheap: an anchor is a quotation with a named source, so a check that the quoted string appears in the named file is mechanical. Nothing runs it. Both defects found in anchors this milestone — a sentence attributed to the wrong file, and a sentence describing an unpicked mechanism — would have been caught by different halves of the same check.
 
 ## follow_up
 

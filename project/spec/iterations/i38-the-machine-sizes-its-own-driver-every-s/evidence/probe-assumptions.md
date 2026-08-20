@@ -1,8 +1,8 @@
 ---
 form: probe-assumptions
 by: agent
-signed_off: 2026-08-20T11:43:22.505Z
-reopened: "2026-08-20T11:43:21.446Z — identify-assumptions was re-signed after it in the repair pass, so it answers older ground; its own content is unchanged"
+signed_off: 2026-08-20T19:10:35.924Z
+reopened: "2026-08-20T19:10:32.137Z — write-requirements was re-signed: a tenth requirement stands, req-every-call-records-the-part-its-caller-played, and req-acts-carry-role-and-channel's role vocabulary is corrected. Re-read against that."
 authors: agent
 files:
 ---
@@ -16,6 +16,47 @@ Seventy-two assumptions stand and the engine drew the table from each node's own
 THREE ROWS CHANGED BECAUSE THIS ITERATION RE-PROBED THEM, and one assumption left the list entirely by dying.
 
 The three this iteration minted carry their own probes: one raised to `expected` on alias evidence, one written and cheap but untestable until a list exists, and one — the per-column difficulty — falsified at this very state.
+
+### Rechecked 2026-08-20, after the requirements were restated
+
+WHAT MOVED: four musts dropped the mechanisms they had frozen.
+
+NO PROBE RESULT MOVED, and the reason is structural rather than lucky. A probe asks whether the world is as the design assumes. Restating a requirement changes what the design is obliged to do, not what the world does.
+
+THE ONE ROW WORTH RE-READING IS THE HOST ONE. `raid-asm-one-model-list-serves-every-host-the-engine-supports` was probed against the vendor's own alias documentation, and that evidence is untouched. Its status stays `expected`.
+
+WHAT DID CHANGE IS WHAT THE PROBE WOULD COST TO CLOSE. With the list no longer demanded by any must, a design that holds no roster closes this assumption by removing what it is about. That is recorded at identify-assumptions and belongs to M4.
+
+
+### And once more, after the sizing must was corrected
+
+THE SIZING MUST WAS RESTATED A SECOND TIME. Its first restatement made the ENGINE the driver, which `req-the-machine-names-a-driver-and-starts-nothing` forbids the lane from being. It now names the engine own act: it sizes units and publishes a difficulty.
+
+NOTHING IN THIS FORM MOVES WITH IT. The correction narrows who performs an act; it adds no source, changes no probe, and touches nothing this state recorded.
+
+
+### Rechecked again, after three requirement nodes had their prose corrected
+
+WHAT MOVED: prose inside three musts, not their statements. One Detail said the maximum is the only safe reduction where the statement licenses per-state naming. One cited the wrong function for its own verification. One recorded that it was minted as a scoring axis and gates instead.
+
+NOTHING IN THIS FORM MOVES WITH IT. No statement changed, no priority changed, no flow and no coupling changed. What changed is what a reader of those three nodes is told, which is the layer above this one.
+
+
+### And two more Details, found by a fourth pass
+
+TWO MORE REQUIREMENT DETAILS WERE PRESUMING MECHANISMS THEIR STATEMENTS HAD DROPPED — the model-list must and the matrix-row must. Five for five: every restated statement left one behind.
+
+NOTHING IN THIS FORM MOVES. No statement changed, no priority changed, no flow and no coupling changed. What changed is what a reader of those nodes is told.
+
+
+### And the source above all of it was restated last
+
+`uc-let-the-machine-name-the-driver` carried the seed mechanism in its own steps — the maximum, one file in the repository, the model name on the pull — and every mechanism-naming requirement was a faithful derivation from it. It is restated to outcomes.
+
+NOTHING IN THIS FORM MOVES. The demands were already the outcomes; what changed is that their sources now agree with them.
+
+AND THE REPAIR ORDER IS THE FINDING. Requirements were repaired first, then functions, then flows, then candidates, and the use case they all derive from last. Each layer was repaired against a layer that was still wrong, which is why the same defect kept reappearing somewhere new.
+
 
 ## probes
 

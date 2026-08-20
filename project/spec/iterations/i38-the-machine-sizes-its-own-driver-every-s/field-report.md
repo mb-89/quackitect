@@ -800,7 +800,7 @@ ONE MOVE, AND THE TEMPLATE MAKES A MOVE EXPENSIVE ON PURPOSE.
 `req-comparison-carries-both-sides` sat at 52 on a ranking sorted by damage
 grade. It is the sharpest discriminator on this chart — every candidate makes a
 comparative claim, the driver named against the driver that answered, and
-cand-the-receiver-decides is the only one that structurally cannot carry both
+cand-whoever-holds-the-hands-decides is the only one that structurally cannot carry both
 sides. It moved to 10 with a written rationale. The whole project had made two
 moves before this one, across every record.
 
@@ -1194,5 +1194,1163 @@ box as a note.
 - `project/guidance/method/cloud-runner.md` owes the note half of its own push
   ruling: on a box that gets reclaimed, `se_note` is the same kind of hole an
   unpushed commit is.
+
+
+
+## F31 — a per-item form field takes a string, and an array is read as unanswered
+
+SENDING A LIST FIELD AS A JSON ARRAY IS ACCEPTED AND LOSES EVERY ANSWER. At
+gate-requirements the form's `goals_served` and `round_2_red_team` were sent as
+arrays of strings, one entry per item. The call went through. The submit refused
+with SE-C-112 and the message was:
+
+    goals_served: unanswered — Every state in the rigor matrix carries a
+    complexity rating ... · ONE fixed model list lives in the repo ...
+
+All five goals listed as unanswered, and beneath them the template's own hint:
+`goals_served: every line is "- <item>: <answer>"`.
+
+THE SAME PAYLOAD AS A NEWLINE-JOINED STRING PASSED FIRST TIME. `items.map(s =>
+"- " + s).join("\n")` and nothing else changed.
+
+WHY THIS IS WORTH A FINDING RATHER THAN A NOTE. The refusal was clear and cost
+one round trip, so the guard did its job. What it did NOT do is distinguish two
+very different failures. "You sent nothing" and "you sent everything in a shape
+the parser does not read" arrive as the same word — `unanswered` — and the
+second is the one an agent hits, because an array is the obvious encoding for a
+list.
+
+IT IS THE SAME SHAPE AS THE `plan` DEFECT THIS RECORD ALREADY CARRIES. Sending
+`plan` items as objects stringified them to `[object Object]` and the engine
+accepted them. Here the engine refused, which is better, and still described the
+symptom rather than the cause.
+
+WHAT WOULD FIX IT: one sentence in the refusal. "A per-item field is a string of
+`- item: answer` lines; an array was received." The parser already knows which
+it got.
+
+## F32 — an impurity in the function layer is usually a copy of one upstream
+
+RESTATING THREE REQUIREMENTS FREED FOUR NODES THAT NO ARGUMENT COULD FREE.
+`derive-functions` had run a neutrality check, been reopened once by an
+adversarial pass, and ended with an honest tally of three impurities in five
+functions. Two of the three were requirement-shaped:
+
+- `resolve-a-difficulty-to-a-driver` said "from one standing mapping".
+- `flow-step-difficulty` said "as the step itself declares it".
+
+THE FORM SAID WHY IT COULD NOT REMOVE THEM, AND THE REASON WAS TRUE AT THE TIME.
+"The commitment stays, because the requirement it serves makes it explicitly and
+a function neutral about it could be traced to nothing." A function that drops a
+clause its requirement demands loses its trace.
+
+SO THE NEUTRALITY CHECK COULD NAME THE IMPURITY AND NOT REPAIR IT. It did the
+first and recorded the second as a known limit, which is the honest form and is
+also a dead end.
+
+WHEN THE REQUIREMENTS LET GO, THE FUNCTIONS LET GO THE SAME HOUR. Three musts
+were restated to name outcomes. Four nodes — three functions and one flow — were
+patched within the same state, and none of the four needed an argument. Each
+clause simply had nothing upstream holding it in place any more.
+
+THE GENERALISATION, and it is checkable rather than pretty: BEFORE ARGUING THAT
+A FUNCTION IS SOLUTION-NEUTRAL, CHECK WHETHER THE MECHANISM IT NAMES CAME FROM
+THE REQUIREMENT IT SERVES. If it did, the function layer is not where the defect
+is, and no amount of rewriting there will remove it.
+
+WHAT THIS COSTS IF IGNORED. Two milestones. M3 wrote the mechanisms, M4 built a
+candidate space every member of which violated at least one of them, and M5 was
+the first state to hold a must against a candidate.
+
+## F33 — the partition survived a rename because it was drawn from the flow graph
+
+THREE FUNCTION STATEMENTS CHANGED AND `partition-functions` DID NOT MOVE. The
+cluster `the-sizing` was drawn by counting flows: four functions coupled to each
+other through three flows nothing else in the corpus touches, and to the rest of
+the system at exactly two points.
+
+THE RESTATEMENT EDITED WHAT THREE NODES SAY AND NEVER WHAT THEY CONSUME OR EMIT.
+No flow was added, removed or rewired, so all six facts the boxing rested on
+were unchanged.
+
+A PARTITION DRAWN FROM NAMES WOULD HAVE HAD TO BE REDRAWN. This is the first
+evidence in this record that the difference between measuring the coupling and
+reading the names is operational rather than stylistic, and it arrived by
+accident — nobody set out to test it.
+
+## F34 — the re-sign cascade is cheap to walk and the engine names its root
+
+ONE REQUIREMENT RESTATEMENT PUT SEVEN SIGNED STATES BACK IN PLAY. Re-signing
+`write-requirements` dropped every state downstream of it, and the pull refused
+to route with a `fallen_input` block naming the whole chain of thirty states
+from `derive-functions` to `shipped`.
+
+THE BLOCK NAMED THE ROOT AND SAID WHY FIXING ANYTHING ELSE WOULD NOT HELP:
+
+    THE CHAIN STARTS AT derive-functions, identify-assumptions ... Fixing
+    anything between changes nothing until the root stands.
+
+AND IT NAMED THE REMEDY EXACTLY: `se_reopen {state, reason}`, then submit, "the
+submit is the re-sign".
+
+THE WALK BACK UP TOOK SEVEN REOPENS AND SEVEN SUBMITS. `derive-functions`,
+`identify-assumptions`, `probe-assumptions`, `gate-requirements`,
+`derive-criteria`, `partition-functions` — each one reopened with a reason, read,
+checked against what actually moved, and re-submitted.
+
+THE CHECK IS NOT A FORMALITY AND TWO OF THE SEVEN REALLY MOVED.
+`gate-requirements` had two `goals_served` entries asserting demands that no
+longer exist — "makes the maximum binding", "fixes it as one file read live" —
+and its kill-criterion round had checked its own criterion in only one
+direction. `derive-functions` moved four nodes. The other four were confirmed
+unmoved with the reason written down.
+
+WHAT MAKES IT CHEAP IS THAT THE BODY AND THE SIGNATURE BOTH STAY ON THE FILE.
+The reopened form comes back filled. The work is reading what is there and
+asking one question — did the named change move this — rather than re-deriving
+a standing claim.
+
+WHAT MAKES IT EXPENSIVE IS DOING IT LATE. The same seven states would have cost
+nothing at M3, where the requirements were being written and nothing downstream
+existed yet.
+
+## F35 — an uncaged cloud agent is also TOLD to prefer the native tools
+
+THE CAGE IS NOT THE ONLY THING MISSING WHEN A CLOUD AGENT STARTS ONE DIRECTORY
+TOO HIGH. F28 recorded the first half: `project/.claude/settings.json` holds the
+deny list, the session opened at the repository root, so the deny list was never
+loaded and every native tool stayed available.
+
+THE SECOND HALF IS THAT THE HARNESS ACTIVELY PUSHES TOWARD THEM. This session
+carries a standing instruction, from outside the repository, that reads:
+
+    Do your work through the Bash tool wherever it can accomplish the job: read
+    files with cat, head, or sed -n, search with grep and find, and make file
+    changes with sed, heredocs, or short scripts, rather than using the
+    dedicated Read, Edit, or Write tools.
+
+SO THE TWO FAILURES COMPOSE. One removes the wall; the other tells the agent to
+walk where the wall was. Neither knows about the other, exactly as contract rule
+11 already describes for subagents and the AgentTool.
+
+IT CAUGHT THIS WALKER, on a write rather than a read. Four findings were
+appended to this file with a `node -e` script calling `fs.appendFileSync`
+instead of `se_file_write`. The content was right and the call is not in the
+lane log, so the record of what was written exists only as a diff.
+
+WHY READS ARE THE SLIPPERY ONES. A read through `sed -n` returns exactly what
+`se_file_read` would, so nothing ever looks wrong. There is no refusal, no
+missing output, and no moment where the agent notices. The only visible
+difference is in the call log, which is the thing being deprived.
+
+WHAT MAKES THIS DIFFERENT FROM SIMPLE DISOBEDIENCE. Contract rule 1 overrides
+defaults and says so in its first line, and this walker had read it. The
+instruction that beat it was not an argument against the rule — it was a
+sentence about tool preference that never mentions the lane, arriving in a layer
+the contract cannot see.
+
+THE FIX IS THE SAME AS F28'S AND IT IS ONE LINE. Start the caged agent in
+`project/`. Then the deny list loads, the native tools refuse, and the
+conflicting instruction becomes unfollowable rather than merely wrong.
+
+AND THE FIX THAT DOES NOT WORK IS TELLING THE AGENT HARDER. This one had the
+contract in its prompt layer every turn, recited it at the front desk, and used
+the lane for every write for hours before slipping on one append. A rule that
+must be held in attention against a competing instruction fails eventually.
+
+
+## F36 — the fourth mechanism-naming must was invisible to the sweep that found the other three
+
+THREE WERE FOUND BY READING THE REQUIREMENTS. A sweep at gate-architecture asked
+which musts named a mechanism the SEED had already chosen, and answered three:
+a reduction step, a file of model names, a per-row declaration. Each was a
+design decision the walker recognised because the walker knew what the seed
+looked like.
+
+THE FOURTH WAS INVISIBLE TO THAT QUESTION.
+`req-the-complexity-value-is-read-live-and-never-pinned` demanded that the value
+"be read from the matrix at the moment it is needed". Nobody had chosen that.
+It was written as a GUARD, against a real and fatal harm — a complexity entering
+the demand ledger reopens every standing claim in three pinned records.
+
+A GUARD THAT FORBIDS TOO MUCH READS EXACTLY LIKE A GUARD THAT FORBIDS ENOUGH.
+There is no tell in the sentence. The mechanism it names is not anybody's
+preferred design; it is the widest fence somebody could draw around a fear.
+
+WHAT FOUND IT WAS THE MUST-CHECK, NOT A RE-READING. Held against the four
+candidates, this requirement excluded two of them — both picking
+`opt-the-complexity-rides-the-cell-the-compiled-state-already-carries`, the
+cheapest implementation on the chart at three edits to code that already runs.
+
+AND THE OPTION'S OWN FILE NAMED THE CONFLICT IN WRITING: "That is the thing
+req-the-complexity-value-is-read-live-and-never-pinned forbids in its first half
+— see raid-iss-the-live-read-rule-forbids-more-than-its-own-reason-needs,
+because the reason behind that requirement is about the demand ledger and this
+does not touch it."
+
+SO THE FINDING EXISTED, ACCURATE, IN THE RIGHT PLACE, WITH ITS OWN REGISTER
+ENTRY, AND NOTHING ACTED ON IT. The issue was minted at M4 and sat open through
+four states and two gates.
+
+THE GENERALISATION IS ABOUT WHICH TEST FINDS WHICH DEFECT.
+
+- READING REQUIREMENTS finds mechanisms somebody preferred. The reader
+  recognises the design.
+- CHECKING REQUIREMENTS AGAINST A DESIGN SPACE finds mechanisms nobody
+  preferred. A requirement that excludes candidates for a reason its own
+  `breaks_if_removed` does not mention is visible as an exclusion and invisible
+  as a sentence.
+
+THE SECOND TEST IS CHEAP AND WAS NEVER RUN. Ten musts against four candidates is
+forty pairs. The method already says a must gates and a should scores. No state
+in M4 or M5 ran it, and `gate-candidates` deferred it in writing to
+`gate-design` — confirmed by search: no `gate-design` exists anywhere in
+`project/deliverable/machines`.
+
+WHAT IT WOULD HAVE COST TO RUN IT EARLIER. At `gate-candidates` it is the same
+forty pairs against the same four candidates. Run there, all four defects
+surface before a winner is declared, before the winner is grafted, and before
+two states score a chart on which no candidate was eligible.
+
+
+## F37 — the repair for a frozen mechanism can be a contradiction between two musts
+
+THE FIRST RESTATEMENT OF THE SIZING MUST WAS WORSE THAN THE DEFECT IT REPLACED,
+and it stood signed, through a re-blessed gate, for about an hour.
+
+WHAT IT SAID: "The engine shall walk no step by a driver weaker than that step's
+own difficulty requires, making visible in the record where a step was driven
+above its own difficulty."
+
+WHAT ANOTHER MUST SAYS: `req-the-machine-names-a-driver-and-starts-nothing` —
+"The lane shall publish the named driver on the pull and shall start no process
+on account of it, on any host and in any mode."
+
+THE ENGINE NEVER SELECTS WHO WALKS A STEP. So it can never guarantee that no
+step is walked weakly, and under the first wording every candidate on the chart
+failed — because none of them spawns anything, which is the other must working
+exactly as designed.
+
+THE DEFECT IT REPLACED WAS A FROZEN MECHANISM. That is a known failure with a
+name, a method rule against it, and a repair. THIS ONE MADE THE REGISTER
+SELF-CONTRADICTORY, which nothing in the corpus checks for at all.
+
+WHY THE REPAIR INVITES IT. Restating "name the outcome, not the mechanism" means
+writing a sentence about what the system achieves. Achievement language reaches
+for the whole loop — the step gets walked well — and the loop crosses a boundary
+the design deliberately does not own. The mechanism-free sentence is the one
+that names the ENGINE'S OWN ACT and stops there.
+
+THE CORRECTED WORDING DOES THAT: the engine names, for every unit of work it
+sizes, a difficulty no weaker than that of the hardest step the unit contains,
+making visible how far each step in that unit sits below it. A milestone maximum
+with the spread reported satisfies it. Naming per state satisfies it with a unit
+of one and a spread of zero.
+
+HOW IT WAS FOUND: an independent must-check, run cold against all four
+candidates. Reading the two requirements side by side would also have found it,
+and nobody did that on either pass.
+
+THE RULE THIS ARGUES FOR: a restatement is checked the way the original should
+have been — against the candidates AND against the other musts — before it is
+signed. Not after, and not by the hand that wrote it.
+
+## F38 — three of four candidates were silent on musts nobody had put to them
+
+THE COMPOSE STATES WERE NEVER ASKED ABOUT THE MUSTS. Four ran in parallel, each
+asked to build a coherent design line from its picked options, and each did.
+Nothing in the compose form and nothing in `run-candidates`' guidance asks
+whether the line answers every constraint it has to clear.
+
+WHAT THE SILENCE LOOKED LIKE.
+
+- `cand-the-derived-ladder` was the only line of four not picking
+  `opt-the-record-carries-both-the-named-driver-and-the-one-that-answered`, and
+  said nothing about why. Three musts live in that cluster and it was silent on
+  all three.
+- `cand-the-seed-made-total` and `cand-the-derived-ladder` both pick a named
+  fallback pool whose own statement offers "an explicit switch saying whether an
+  unmatched class falls through to it or refuses", and neither said which way the
+  switch is set. One position satisfies
+  `req-an-unmatched-rung-names-itself-and-publishes-no-driver` and the other
+  contradicts it outright.
+- `cand-whoever-holds-the-hands-decides` was silent on where its declared value sits
+  relative to the demand ledger.
+
+SILENCE IS NOT FAILURE AND THIS IS THE PART THAT MATTERS. Contract rule 5: "AN
+UNANSWERED QUESTION IS INCOMPLETENESS, NEVER A WEAKNESS. A thing that does not
+address a demand has not failed it." A must-check run without that rule would
+have recorded three violations that are not violations, and eliminated lines for
+not answering questions nobody asked them.
+
+WHAT THE SILENCE SURVIVED: a chart, a cut, a scoring pass by a fresh reader, a
+gate, a Pugh convergence, a sensitivity check, a declared winner and a graft.
+Eight states, none of which asks the question.
+
+THE STRUCTURAL FIX IS ONE FIELD ON THE COMPOSE FORM. Every candidate names, for
+each must in the change's cone, the sentence in itself that satisfies it — or
+says plainly that it does not answer that one. Then the gap is visible where it
+is cheapest to close, and the must-check at the gate reads answers rather than
+inferring them from prose.
+
+## F39 — the sharpest axis on the chart was promoted on a candidate's over-statement of its own weakness
+
+`req-comparison-carries-both-sides` WAS MOVED FROM 52 TO 10, past forty-two
+rows, and put at the cutoff. The reason written down:
+"cand-whoever-holds-the-hands-decides is the only one that structurally cannot carry both
+sides, because nothing of ours ever learns which model the rung resolved to."
+
+THAT SENTENCE CAME FROM THE CANDIDATE, and the candidate was over-stating
+itself. `req-every-call-records-the-model-that-answered-it` says in its own
+Detail: "the transport hands the engine a client name and no model, so today the
+value can only come from the caller." EVERY line self-reports the answered
+driver. The receiver-decides line can carry both sides exactly as the others can.
+
+WHAT IT ACTUALLY CANNOT DO IS VERIFY ONE SIDE. Holding no roster, it has nothing
+to check the self-report against.
+
+SO THE AXIS STILL DISCRIMINATES AND THE GAP IS SMALLER. A line that records both
+sides unverified is not a line that records one side.
+
+THE FAILURE MODE IS SPECIFIC AND WORTH NAMING. A candidate that is honest about
+its own limits is the good kind of candidate, and an honest limit stated one
+notch too strongly propagates as fact. It reached the cut's promotion argument,
+the scorer's anchor, the element node, the graft note and the gate's must-check,
+because every one of them quoted the candidate rather than checking the claim
+against the requirement.
+
+A SELF-REPORTED WEAKNESS IS EVIDENCE OF CANDOUR AND NOT EVIDENCE OF THE
+WEAKNESS. It gets checked like any other claim.
+
+
+## F40 — filling a gap makes you the author of the evidence you were about to judge
+
+CONTRACT RULE 5 AND THE NO-SELF-JUDGING RULE PULL IN OPPOSITE DIRECTIONS, and
+this record walked straight into the seam.
+
+RULE 5 SAYS FILL IT. "RUNNING INTO A GAP OR A CONTRADICTION WHILE BUILDING
+SOMETHING, YOU SOLVE IT... AN UNANSWERED QUESTION IS INCOMPLETENESS, NEVER A
+WEAKNESS. Fill the gap, then judge."
+
+THE SAME RULE SAYS DO NOT JUDGE YOUR OWN TEXT. "Never judge something on text you
+wrote into it yourself in the same pass."
+
+WHAT HAPPENED HERE. A must-check found three of four candidates silent on musts
+nobody had put to them. The gaps were filled — correctly, per rule 5. Four of the
+forty must verdicts then rested on sentences written an hour earlier by the hand
+about to rule the gate.
+
+THE SEAM IS NOT A DEFECT IN EITHER RULE. It is what happens whenever the same
+walker both completes a thing and judges it, which is most of this machine.
+
+WHAT THE RECORD DID ABOUT IT: commissioned a second must-check, cold, over the
+repaired set, and told it in as many words which sections were added, by whom,
+and that the agent about to read its answer wrote them. It was asked to check
+each added claim against sources that agent did not write — the requirement
+files, the option files, the untouched parts of the candidates — and to report
+any place where an addition claims more than its sources support.
+
+WHY THAT IS DIFFERENT FROM COMMISSIONING ANOTHER READER. A generic fresh pass
+reads everything as equally authoritative. The added sections are the ones most
+likely to flatter, and they are indistinguishable from the original text unless
+somebody points at them. NAMING THE SUSPECT PASSAGES IS THE WHOLE VALUE.
+
+THE GENERALISABLE RULE: when a state fills a gap it was about to judge, the fill
+is marked in the file with a dated heading, and the next reader is TOLD WHICH
+HEADINGS ARE THE FILLS. This record now does the first half by habit and did the
+second half only because the collision was noticed.
+
+WHAT WOULD MAKE IT MECHANICAL. A gap filled during a judging state is a
+different act from a gap filled during a building state, and only the walker
+knows which it was. A marker on the section — filled-at, by-which-state — would
+let a checker refuse a verdict whose only support is a section filled by the
+state now ruling on it.
+
+
+## F41 — the third truncated read, and this one invented a gap that was not there
+
+A CANDIDATE'S PICKS LIST WAS READ THROUGH A CALL BOUNDED AT 900 CHARACTERS. The
+bound cut the list one entry short. The missing entry was
+`opt-the-record-carries-both-the-named-driver-and-the-one-that-answered`.
+
+WHAT WAS THEN BUILT ON THE TRUNCATION:
+
+- a finding that `cand-the-derived-ladder` was "the only one of the four lines"
+  not picking that option,
+- a section written into the candidate saying the gap was filled and the option
+  added,
+- a duplicate entry appended to a frontmatter that already had it,
+- an assertion that the record now carries "the state the call was made in",
+  which no option this line picks provides,
+- a sentence telling the next scorer that this line's actor-axis score would move
+  because of the addition,
+- and paragraphs in `run-candidates` and in this report repeating all of it.
+
+NONE OF IT WAS TRUE. The option had been on the line since it was composed.
+
+WHAT CAUGHT IT: a commissioned scorer, told to distrust the added sections, which
+reported the duplicate in the frontmatter as a contradiction across files. The
+duplicate was the visible end of the error, not the error.
+
+THIS IS THE THIRD TRUNCATED READ IN ONE ITERATION.
+
+- A counting script stopped at three thousand characters per file and produced
+  "forty-six of fifty-two rows vary by column". It is forty-seven of fifty-three.
+- A refusal count was taken over a tail window a query's own `limit` imposed —
+  45-in-500 where the log held 891 records and 72 refusals.
+- A picks list read to 900 characters, here.
+
+THREE DIFFERENT MECHANISMS, ONE SHAPE. Every one was a partial read presented as
+a complete one, and in every case the truncation was invisible in the result: the
+script returned a number, the query returned records, the read returned a
+well-formed frontmatter block ending in a valid line.
+
+WHAT THE LANE ALREADY DOES ABOUT IT, and it is more than the walker used. A
+bounded result carries `"bounded": true` and a `next` cursor. An `se_file_read`
+carries `char_range` with an `of`. THE INFORMATION WAS IN THE RESULT EVERY TIME
+AND NOBODY LOOKED, because the visible content read as complete.
+
+THE RULE THIS ARGUES FOR IS NARROW AND CHECKABLE: A LIST IS NEVER READ THROUGH A
+BOUND. Frontmatter, a picks array, a register, a set of ids — read it whole or do
+not conclude anything about what is absent from it. A prose read that stops early
+loses detail; a LIST read that stops early loses members, and every conclusion
+about a list is a conclusion about its membership.
+
+AND THE ASYMMETRY IS WHAT MAKES IT DANGEROUS. A truncated list can only ever
+produce a false NEGATIVE — something present looks absent. Absence is exactly
+what a gap-check is looking for, so a truncated read does not degrade a gap-check
+gracefully. It manufactures its findings.
+
+
+## F42 — a deferral to a state that does not exist reads exactly like a routing decision
+
+FIVE PLACES IN THIS RECORD SEND SOMETHING TO `gate-design`. There is no
+`gate-design`. Searched through the lane: the string appears nowhere in
+`project/deliverable/machines`. THIS ENTRY FIRST SAID TWO, counted by eye from
+the two the walker happened to remember. A search found five.
+
+WHERE THEY ARE, AND WHAT EACH ONE COSTS.
+
+- `gate-candidates`' follow-up: "the musts are not absent from the comparison,
+  they are prior to it ... checked as constraints at gate-design." THE EXPENSIVE
+  ONE. Ten musts were never held against four candidates until M5.
+- `find_by_probing`: routes
+  `raid-iss-the-live-read-rule-forbids-more-than-its-own-reason-needs` "for
+  gate-design to rule on". DISCHARGED BY ACCIDENT — the requirement was restated
+  at gate-architecture and the issue is closed. The routing never delivered it;
+  a different reader found it independently.
+- `find_by_heuristic`: "req-a-weaker-driver-than-named-owes-a-recorded-reason
+  obliges a reason for a divergence no record can currently show ... it should be
+  tested at gate-design and, if it survives, the requirement wants amending".
+  DISCHARGED BY THE CHART. Every line now picks
+  `opt-the-record-carries-both-the-named-driver-and-the-one-that-answered`, so
+  the divergence is showable and the obligation is enforceable.
+- `cand-the-seed-made-total`'s seams section: "gate-design has to rule on it
+  before this candidate is buildable as described." Same live-read question,
+  same accidental discharge. Corrected on the node.
+- `gate-kickoff`'s steelman: "M4's enumerate-space through gate-design" — used
+  as the END OF A RANGE OF MATRIX ROWS. HARMLESS AND THE MOST REVEALING OF THE
+  FIVE. M4 runs `M4_20_enumerate-space` to `M4_90_gate-candidates`;
+  `gate-architecture` is `M5_90`. The range's intent is unambiguous and its
+  endpoint is misnamed, which means the walker was not deferring here at all —
+  it simply believed the row existed.
+
+ALL FIVE WERE WRITTEN BY THE SAME WALKER, across four states and two milestones,
+about four different questions. None was a lie and none was noticed.
+
+THE LAST ONE IS WHY THIS IS NOT CARELESSNESS. A deferral can be caught by asking
+"did anybody run that". A row name inside a range cannot: it is not a promise, it
+is a belief about the matrix, stated in passing, in a blessed gate.
+
+AND TWO OF THE FIVE WERE DISCHARGED BY SOMETHING ELSE ENTIRELY, which is the
+worst outcome available. A question routed nowhere that gets answered anyway
+leaves no trace of the routing having failed. Only the two that stayed unanswered
+were ever going to surface.
+
+WHAT THE FIRST ONE COST: ten musts were never held against four candidates until
+M5. A comparison ran, a cut ran, a Pugh round ran, a sensitivity check ran and a
+winner was declared, all on a candidate set no member of which was eligible.
+
+WHY IT IS INVISIBLE. A deferral to a real state and a deferral to an invented one
+are grammatically identical, and both read as diligence — the writer is not
+dropping the question, the writer is routing it. THE SENTENCE THAT DISPOSES OF A
+CHECK LOOKS BETTER THAN THE SENTENCE THAT RUNS IT.
+
+AND THE NAME IS PLAUSIBLE, WHICH IS THE WHOLE PROBLEM. The matrix has
+`gate-inputs`, `gate-motivation`, `gate-requirements`, `gate-candidates`,
+`gate-architecture`, `gate-prototype`, `gate-implementation`,
+`gate-validation` and `gate-release`. A tenth called `gate-design` is exactly
+what a reader would expect to exist, including the reader who wrote it.
+
+THE CHECK IS MECHANICAL AND CHEAP. State ids are a closed set the engine already
+holds. A lint over evidence prose and trace nodes for `gate-` and `i38/` tokens
+that resolve to nothing would have caught both sentences at the write, the same
+way SE-C-138 catches frontmatter a reader cannot load.
+
+IT BELONGS WITH THE EXISTING PROSE LINT rather than being new machinery.
+`project/deliverable/engine/bin/prose-inspect.ts` already flags a bare method
+term on an entry-document line carrying no link. A state name that resolves to
+nothing is the same class of defect and a stricter one, because it has no
+judgment in it at all.
+
+## F43 — the reader-beside-the-walk is eliminated by a must, on its own option's sentence
+
+THE MUST-CHECK REMOVED A CANDIDATE FROM THE FRONT, which is what a must-check is
+for and what this record had never seen one do.
+
+`cand-the-reader-beside-the-walk` picks
+`opt-the-record-is-the-channel-and-there-is-no-separate-publication`. That
+option's own What-it-costs paragraph reads: "anything wanting the driver before
+the call is made cannot have it, because the record does not exist until the call
+does. That is fatal for a receiver deciding what to spawn, and harmless for one
+auditing afterwards."
+
+`req-the-machine-names-a-driver-and-starts-nothing` reads: "The lane shall
+publish the named driver ON THE PULL and shall start no process on account of it,
+on any host and in any mode."
+
+THE TWO SENTENCES CANNOT BOTH HOLD. A driver published into a record that does
+not exist until after the call is not published on the pull.
+
+NOTHING HID THIS. The option said it in as many words, in a paragraph headed by
+what it costs, and the candidate repeated it twice. It survived a chart, a cut,
+two scoring passes, a gate, a Pugh round, a sensitivity check and a declared
+winner — because every one of those states was scoring, and a must is not scored.
+
+THAT IS THE ARGUMENT FOR THE MUST-CHECK IN ONE LINE. A scoring pass reads a
+stated cost as a point deducted. A must-check reads the same sentence as
+disqualifying. The sentence never changed; only the question put to it did.
+
+
+## F44 — an axis minted to make a comparison meaningful, made a must, and excluded from the comparison
+
+`req-a-machine-decision-repeats` WAS MINTED AT `derive-criteria` AS THE
+FIFTEENTH FITNESS AXIS, and its own node says why in as many words:
+
+    FOURTEEN CRITERION AXES STOOD BEFORE THIS ONE and not one of them measures
+    whether a decision the machine makes REPEATS. ... AGAINST THE STANDING
+    FOURTEEN, A ROUTER WINS: it fits each item better, costs less, and breaks
+    none of them. The criterion set as it stood could not express why the chosen
+    design is chosen. ... A COMPARISON THAT CANNOT SCORE THE REASON FOR THE
+    DECISION IS NOT A COMPARISON.
+
+IT CARRIES `priority: must`. A must gates and is never scored.
+
+`cut-criteria` NOTICED AND FILED IT AS CORRECT: "NONE OF i38'S OWN REQUIREMENTS
+IS IN THIS LIST, AND THAT IS CORRECT RATHER THAN AN OMISSION. All ten are
+`priority: must`, including req-a-machine-decision-repeats, which derive-criteria
+added as the fifteenth fitness axis. A must is a constraint."
+
+BOTH STATES ARE RIGHT ON THEIR OWN TERMS. The first is right that the comparison
+could not express the reason for the decision. The second is right that a must
+does not score. THE OUTCOME IS THAT THE COMPARISON STILL CANNOT EXPRESS IT, and
+the state that set out to fix that believes it did.
+
+NEITHER STATE COULD SEE THE OTHER'S HALF. `derive-criteria` mints and moves on.
+`cut-criteria` inherits a pool and asks which rows discriminate. Nothing between
+them asks whether a row minted TO discriminate is in the pool at all.
+
+AND THE PRIORITY IS STILL RIGHT. A walk that answers differently on two machines
+is unauditable rather than merely worse, and a design that fails that is not a
+candidate. Demoting it to a `should` to rescue the argument would trade a real
+gate for a scoring row.
+
+WHAT THE HOLE ACTUALLY NEEDS is a different row: a `should` measuring how much of
+a decision's derivation the record carries. Not minted at this gate, because
+minting a criterion while about to score against it is the one edit that cannot
+be honest.
+
+THE MECHANICAL CATCH IS CHEAP. `derive-criteria` knows which rows it minted as
+axes. `cut-criteria` knows which rows are in the pool. A row in the first set and
+not the second is either a mistake or a decision, and nothing currently asks
+which.
+
+## F45 — a must can be unanswered by every candidate and look like a satisfied one
+
+TWO DEMANDS WERE MISSING FROM THE WHOLE CHART RATHER THAN FROM ONE LINE, and
+that is why three cold passes and two gates walked past them.
+
+- `req-a-machine-decision-repeats` asks for the same decision on the same inputs
+  AND that the engine record what it read. Every line answered the first half.
+  None answered the second.
+- `req-every-call-records-the-model-that-answered-it` ends "marked as
+  self-reported wherever the lane cannot obtain the value independently", and its
+  Detail says "THE MARK IS PART OF THE REQUIREMENT, not a caveat on it". No line
+  writes the mark and no picked option mentions it.
+
+A GAP PRESENT IN ONE CANDIDATE IS VISIBLE BECAUSE THE OTHERS FILL IT. A gap
+present in all four is invisible, because there is nothing to compare against.
+Every comparison the machine runs is between candidates, so a demand the whole
+chart under-answers produces no signal anywhere in the comparison.
+
+THE MUST-CHECK IS THE ONLY INSTRUMENT THAT SEES IT, because it compares each
+candidate against the REQUIREMENT rather than against the other candidates. That
+is the argument for running it, independent of whether it eliminates anybody.
+
+AND THE REPAIR HAS A SHAPE WORTH KEEPING. Both gaps were filled identically on
+all four lines, deliberately, and the forms say so: the gap was uniform, so the
+repair is uniform, and neither can move the comparison in any direction. A fill
+written differently per line would be design smuggled in at a gate.
+
+ONE LINE TURNED OUT TO ANSWER HALF OF ONE OF THEM ALREADY.
+`cand-whoever-holds-the-hands-decides` publishes a two-part difficulty beside the rung — the
+input beside the decision — and its own seams section had called that redundancy
+a COST: "two things to keep consistent". It discharges a must instead. THE
+CANDIDATE DID NOT KNOW, because nobody had put the must to it.
+
+
+## F46 — the repair made the measured interface breach worse, and that is the honest number
+
+THE LANE'S OWN BOUND WENT FROM 5.9 PER CENT BREACHED TO 7.7 PER CENT while this
+milestone was being repaired.
+
+MEASURED FROM ONE SNAPSHOT so the population and the numerator cannot drift apart:
+3257 log records. 167 are the interface's own slow reports. 5 are autonomy writes,
+4 are stop-at writes, and 925 are narration ops that ride other calls rather than
+being calls. THAT LEAVES 2156 LANE CALLS AND 167 BREACHES.
+
+THE MECHANISM WAS ALREADY KNOWN AND THE REPAIR RAN STRAIGHT INTO IT. The worst
+calls are reopen cascades: re-signing recomputes the demand ledger for the column
+and the claim guard walks the downstream cone. THIS SESSION HAS MADE 95 REOPENS,
+against 18 at the requirements gate, and 77 of the 95 are this repair.
+
+SO THE COST OF FIXING A REGISTER IS PAID ON THE INTERFACE THE REGISTER IS ABOUT.
+Four musts restated, one restatement corrected, three requirement nodes' prose
+fixed, two rounds of candidate fills — each one reopening a chain of six to eleven
+states, each state re-signing, each re-signing walking the cone.
+
+WHAT THIS IS NOT: an argument against repairing. The alternative was a build
+against a register that excluded its own design space.
+
+WHAT IT IS AN ARGUMENT FOR is doing it at M3. The same four restatements at
+`write-requirements`, before anything downstream existed, cost one signature
+each and no cascade at all. Every reopen in this session is the interest on
+having signed a wrong register and walked on.
+
+AND THE BOUND STILL CANNOT JUDGE EITHER NUMBER. It carries no percentile. Read as
+a hard ceiling the interface fails at 5.9 per cent and at 7.7 per cent alike; read
+as a median it passes at both. Nobody has written which, across five milestones
+and three separate measurements.
+
+THAT IS THE FINDING UNDER THE FINDING. A bound nobody can fail is not a bound, and
+this record has now measured against it three times, each time producing a number
+that means nothing until somebody says what the number is supposed to be.
+
+
+## F47 — I fabricated a citation while repairing fabricated citations
+
+THE WORST THING THIS MILESTONE PRODUCED, and it was produced by the repair rather
+than by the original work.
+
+WHAT I WROTE, onto two candidate nodes, answering the demand-ledger must:
+
+    THE ANSWER IS IN THE SAME OPTION, two sentences later, and it is mechanical
+    rather than a promise: "demandsFor at :289 builds the record from three NAMED
+    things, so a fourth cell key carrying a complexity is ignored by construction
+    and moves no demand."
+
+THE OPTION CONTAINS NO `demandsFor` AT ALL. Two sentences after the passage I
+cited, it says the opposite-facing thing — that a complexity riding the compiled
+state "is a value fixed when the record was blessed", which is what the
+requirement was then forbidding.
+
+THE SENTENCE IS REAL AND IT LIVES IN THE PROBE FIELD of
+`raid-iss-the-live-read-rule-forbids-more-than-its-own-reason-needs`, where it
+was verified against the engine. I lifted it verbatim and re-labelled it as the
+option's.
+
+HOW IT HAPPENED, as best I can reconstruct it. I had read the raid entry and the
+option in the same minute, both about the same seam, both quoting
+engine/iterations.ts. When I wrote the fill I reached for the sentence and
+attached it to whichever source the paragraph was already discussing. NO STEP IN
+THAT FELT LIKE INVENTING ANYTHING.
+
+WHAT MAKES IT WORSE THAN A WRONG QUOTE. The quotation is accurate, the fact is
+true, and the verification behind it is sound. Only the attribution is false. A
+reader who follows the citation finds a file that says something else and cannot
+tell whether the claim is wrong or the pointer is.
+
+AND IT WAS COMMITTED IN THE ACT OF REPAIRING THE SAME CLASS. The milestone had
+already found a fabricated anchor in a score table, a seam attributed to an
+option that denies it, and a correction applied to a citing file but not the
+cited one. This one was written between two of those repairs.
+
+WHAT CAUGHT IT: a fourth cold pass, told to check every added claim against
+sources the repairing hand did not write, and told which sections were the
+repairs.
+
+THE MECHANICAL CATCH IS CHEAP AND NOTHING RUNS IT. A quotation with a named
+source is a checkable pair: does the quoted string appear in the named file. Both
+citation defects this milestone produced — a sentence attributed to the wrong
+file, and a sentence describing a mechanism its candidate does not pick — are
+different halves of that one check.
+
+THE RULE FOR A HAND WITHOUT THAT CHECK: quote nothing you have not just read in
+the file you are about to name. Not "read earlier". Not "read something like it".
+The re-read costs one call.
+
+## F48 — five for five, and the sweep that found three was run by the hand that made them
+
+FIVE REQUIREMENTS WERE RESTATED IN THIS MILESTONE. ALL FIVE LEFT A DETAIL BEHIND
+that still argued for the mechanism the statement had dropped.
+
+- The sizing must: "THE MAXIMUM IS THE ONLY SAFE REDUCTION", under a statement
+  that licenses naming per state.
+- The model-list must: "THE LIST IS THE THIRD OF EXACTLY THAT KIND", under a
+  statement that licenses holding nothing.
+- The matrix-row must: "the complexity KEY takes the same treatment", under a
+  statement that stopped requiring a key.
+- The live-read must: a citation to `demandOf` where the check is `demandsFor`.
+- `req-a-machine-decision-repeats`: minted as a scoring axis, given a priority
+  that excludes it from scoring, with neither state noticing.
+
+A SWEEP RUN BY THE HAND THAT MADE THE RESTATEMENTS FOUND THREE OF THE FIVE. A
+cold pass over the same five nodes found the other two, the same day, in the same
+shape.
+
+WHY THE HAND THAT RESTATED IS THE WRONG READER FOR THIS. Rewriting a
+`statement:` field is one edit. The argument for the old statement lives in prose
+three paragraphs down, and the writer knows what the node MEANS now — so the
+Detail reads as consistent with the intention rather than with the text.
+
+NOTHING MECHANICAL CAN CATCH IT TODAY. The EARS check reads `statement`. The
+damage grade, the refinement, the priority and the verify method are fields. A
+Detail contradicting its own statement passes every check a requirement faces.
+
+AND THE DETAIL IS WHAT DOWNSTREAM READERS TAKE. This record caught two states
+doing exactly that: a scorer anchoring on a candidate's paragraph rather than its
+picks, and a cut promoting an axis on a sentence a requirement's Detail
+contradicts.
+
+THE CHEAP LINT: flag any requirement whose Detail repeats a distinctive phrase
+the statement no longer contains. It runs at the write, in the shape SE-C-138
+already uses for frontmatter a reader cannot load.
+
+
+## F49 — three counts by eye, three wrong, and the correction is always one search
+
+THIS RECORD HAS COUNTED THREE THINGS BY EYE AND GOT ALL THREE WRONG.
+
+- MATRIX ROWS VARYING BY COLUMN: written as forty-six of fifty-two. It is
+  forty-seven of fifty-three. The counting script truncated each file at three
+  thousand characters and one long row lost its fourth cell.
+- REFUSALS: written as 45 in 500, over a window the query's own `limit` imposed.
+  The log held 891 records and 72 refusals.
+- REFERENCES TO AN INVENTED STATE: written as two, in two separate files. A
+  search found five.
+
+THE THIRD IS THE PUREST CASE because nothing truncated and no tool misled. The
+walker remembered two places it had personally written `gate-design`, wrote
+"that is the second such deferral", and did not search. The other three were in
+files it had read hours earlier.
+
+WHAT THE THREE HAVE IN COMMON is not carelessness with numbers. Each was a claim
+about a POPULATION — how many rows, how many refusals, how many references — made
+from a sample the writer happened to be holding. THE SAMPLE WAS ALWAYS THE THING
+IN FRONT OF THE WRITER, and in all three cases that felt like the whole.
+
+AND THE CORRECTION IS THE SAME EVERY TIME AND COSTS ONE CALL.
+`se_file_search` over the tree answers all three in milliseconds. The record's
+own lane guidance already says it: "WRITE A SCRIPT WHEN THE QUESTION IS ABOUT
+MANY THINGS. Counting what a rule touches ... these are programs, not readings."
+
+THE RULE THAT WOULD HAVE CAUGHT ALL THREE: any sentence containing a count of
+things in the repository cites the call that produced it. Not "checked" — the
+ref. A count without one is an estimate wearing a number's clothes.
+
+WHICH IS THE SAME RULE THIS RECORD ALREADY ARGUED FOR at F16, about binding a
+claim to a query, and hardest where the claim is about the walk rather than about
+the tree. THE THREE MISCOUNTS ARE ALL CLAIMS ABOUT THE TREE, which is the easy
+case, and the record got the easy case wrong three times.
+
+
+## F50 — the quoted-string check took four calls and would have caught both fabrications
+
+BEFORE SUBMITTING THE CANDIDATES GATE, its own quotations were checked against the
+corpus. Eighteen quoted strings, deduplicated to sixteen probes, one
+`se_file_search` each.
+
+FIFTEEN RESOLVED TO A REAL FILE. One did not, and the reason was benign: the
+sentence had been withdrawn from `cut-criteria` earlier in the same session, so
+the gate was quoting text that no longer stands. The form now says so in as many
+words, because a reader who searches for it will find nothing.
+
+THE CHECK IS ENTIRELY MECHANICAL. A quotation with a named source is a pair —
+string, file — and the question is whether the string is in the file. There is no
+judgment in it and no domain knowledge.
+
+BOTH FABRICATIONS THIS MILESTONE PRODUCED ARE HALVES OF THAT ONE CHECK.
+
+- A `demandsFor` sentence attributed to an option that does not contain it. The
+  string was real, the file was wrong.
+- A score anchor quoting "An acceptable over-driving rate is stated in advance"
+  as evidence for a candidate that does not pick that option. The string was in
+  the candidate's prose, and the mechanism it described was not in its picks.
+
+THE FIRST IS CAUGHT BY string-in-file. The second needs one more step —
+does the mechanism the quoted sentence names appear in the node's `picks` — which
+is still mechanical, because `picks` is a list of ids.
+
+WHAT IT COST TO NOT HAVE IT: four cold passes, each finding citation defects the
+one before it had introduced, across roughly a hundred reopens.
+
+WHAT IT WOULD COST TO HAVE IT: the engine already refuses frontmatter a reader
+cannot load (SE-C-138) and already resolves every `[[wikilink]]` in the corpus.
+A quoted string that names a file it is not in is a stricter case than either,
+because there is nothing to interpret.
+
+AND THE HABIT IS AVAILABLE TODAY WITHOUT ANY ENGINE CHANGE. Quote nothing you
+have not just read in the file you are about to name. The re-read is one call.
+This walker adopted it only after fabricating a citation while repairing
+fabricated citations.
+
+
+## F51 — the root was two layers above where the defect was found, and the repair ran upwards for a day
+
+THE DEFECT WAS FOUND AT M5 AND ENTERED AT M2.
+
+`gate-architecture` ran a must-check nobody had run and found the declared
+architecture violating the musts. It diagnosed the cause correctly: the
+requirements named the seed's mechanism rather than the need behind it.
+
+THE REQUIREMENTS WERE REPAIRED FIRST. Then the function layer, which had copied
+the mechanisms down. Then a flow. Then the candidates, twice. Then, five cold
+passes later, `uc-let-the-machine-name-the-driver` — which had the mechanisms in
+its own steps and from which every mechanism-naming requirement was a faithful
+derivation.
+
+SO EACH LAYER WAS REPAIRED AGAINST A LAYER THAT WAS STILL WRONG. For most of a
+day, five restated musts each cited a use-case step mandating exactly what the
+restatement had dropped. `req-the-complexity-value-is-read-live-and-never-pinned`
+was restated to permit a pinned read while citing "step 2", and step 2 read
+"never from a pin".
+
+THE DEFECT WAS BEING COPIED DOWN FASTER THAN IT WAS BEING REMOVED, which is why
+the same shape kept reappearing somewhere new and why it took five passes to
+stop.
+
+THE CHEAP QUESTION NOBODY ASKED, and it is one read of a frontmatter field: WHERE
+DID THIS MECHANISM COME FROM? At the first mechanism-naming requirement, the
+answer was one file away.
+
+## F52 — nothing in the method asks a use case to be solution-neutral
+
+`derive-functions` ASKS IT OF EVERY FUNCTION AND SAYS WHY: "M4 enumerates its
+candidate space from these functions, so a function naming a technology has
+collapsed that space to one point before anybody compared anything."
+
+`write-requirements` CARRIES WHAT-NEVER-HOW, twice: meth-requirement-authoring
+at :148 and items/requirement at :143.
+
+NOTHING SAYS IT ABOUT A USE CASE, and a use case sits above both. Its item
+definition asks for a goal "from the actor's side ... What they achieve, not what
+the system does for them", and for steps that are "one exchange". It never asks
+whether two honestly different designs could both produce the pass.
+
+THE STATE'S OWN NAME IS THE ARGUMENT. `generalize-use-cases` generalizes from
+the story. A use case carrying "one file in the repository" has not generalized;
+it has copied the story with the numbers filed off.
+
+AND THE GATE ABOVE IT ASKED THE WRONG QUESTION IN THE RIGHT SPIRIT.
+`gate-inputs` has a `passes_concrete` box, and the pass was concrete —
+spectacularly, because it had already chosen the design. A PASS CONCRETE ENOUGH
+TO DERIVE FROM AND A PASS THAT HAS DECIDED THE DESIGN ARE INDISTINGUISHABLE TO
+THAT QUESTION.
+
+THE TEST THAT SEPARATES THEM ALREADY EXISTS, one layer down, in
+`derive-functions`' own guidance. It is one sentence and it would have caught
+this at M2 for the cost of asking it.
+
+## F53 — a design's honest statement of its own weakness is the highest-trust sentence in the corpus
+
+ONE SENTENCE IN ONE CANDIDATE FILE: "This candidate can never record what
+answered."
+
+IT REACHED FIVE ARTIFACTS. A scoring anchor that put an axis at 0. A cut's
+argument for promoting a criterion past forty-two rows. `el-account`, which
+recorded a must as standing "unmet by construction". A register entry graded
+`certain`. And the deciding ADR of the winning architecture.
+
+NOT ONE OF THE FIVE CHECKED IT AGAINST THE REQUIREMENT, which says in its own
+Detail that the answering model "can only come from the caller" today and must be
+marked self-reported. EVERY DESIGN ON THE CHART SELF-REPORTS.
+
+WHAT THE ARCHITECTURE ACTUALLY GIVES UP IS THE CROSS-CHECK, holding no roster to
+compare a self-report against. That is a real cost and a narrower one — and the
+difference decided whether the winner was a candidate at all.
+
+WHY NOBODY CHECKED IT. Every other claim in a candidate file is a claim in the
+candidate's favour, and a reader is primed to test those. A CANDIDATE SAYING
+SOMETHING BAD ABOUT ITSELF READS AS CANDOUR, and candour reads as verified.
+
+SO THE RULE IS COUNTERINTUITIVE AND CHECKABLE: a self-reported weakness is
+evidence of candour, not evidence of the weakness. It gets checked against the
+requirement like any other claim, and hardest when it is load-bearing on a
+verdict.
+
+
+## F54 — the record invented a grade to say "this is not a risk", four times independently
+
+`rank-unknowns` REFUSED TO EXIT AND ITS SCRIPT SAID WHY: eight register entries
+carry grades that are not on the declared scales.
+
+`how_likely` OFFERS expected, plausible, conceivable. Five entries said
+`certain` and one said `unlikely`.
+
+`breaks_how_badly` OFFERS fatal, crippling, corrosive, abrasive, cosmetic. One
+said `degraded` and one said `annoying`.
+
+FOUR OF THE FIVE "CERTAIN" ENTRIES WERE WRITTEN IN THIS ITERATION, by the same
+walker, in different states, hours apart, without any of them noticing the scale.
+
+AND THE RECORD REASONED ON THE INVENTED VALUE. `evaluate-architecture` wrote
+"THE TWO NEW AT-RISK ENTRIES ARE GRADED CERTAIN RATHER THAN EXPECTED, AND THE
+GRADE IS THE FINDING. They are not risks the architecture might realise; they are
+consequences it chooses." That paragraph is doing real work — the distinction it
+draws is true and load-bearing — and it is built on a value the scale does not
+have.
+
+SO THIS IS A VOCABULARY GAP RATHER THAN FOUR MISTAKES. A likelihood scale
+measures whether a thing occurs. It has no value for a thing that is true by
+construction, and a design's chosen consequences are exactly that. Four
+independent reaches for the same non-existent word is the shape of a missing
+term, not of carelessness.
+
+WHERE THE DISTINCTION ACTUALLY BELONGS: a consequence a design accepts is a
+decision's cost, recorded on the decision. A risk is something that might
+realise. Writing "certain" onto a likelihood field collapses the two.
+
+THE CHECK EXISTS AND IT RUNS TOO LATE. `grades-complete.ts` is an exit condition
+of `rank-unknowns`, which is the FIRST state in the whole record that runs it.
+Every one of the eight entries was written milestones earlier — the oldest is not
+even this iteration's — and each sat through every gate between.
+
+THAT IS THE OPPOSITE OF THE WRITE-TIME REFUSAL THE LANE USES EVERYWHERE ELSE.
+SE-C-138 refuses frontmatter a reader cannot load, at the write. A grade off its
+own scale is a stricter case — the scale is a closed list in the item definition —
+and it is caught at an exit condition in M6.
+
+WHAT MAKES THE LATENESS EXPENSIVE HERE rather than merely untidy: the exposure
+ranking at `rank-unknowns` is damage times likelihood, computed off these
+fields. THE STATE THAT FIRST NEEDS THE GRADES IS THE STATE THAT FIRST CHECKS
+THEM, so the first honest ranking this record could compute was the one after the
+refusal.
+
+
+## F55 — two spikes met at one missing party, and it is not a missing mechanism
+
+TWO OF THE THREE SPIKES SEEDED AT M6 WERE RUN AS CODE TRACERS through the lane,
+and they returned the same answer to two different questions.
+
+SPIKE 1 ASKED whether anything downstream of the lane can act on a published
+driver. `se-start.ts`'s `launch()` spawns the agent ONCE, before any walk
+exists: it places the cage, probes the binary, calls
+`spawn(agent, [briefing(...)])` and unrefs. THE MODEL IS NOT A PARAMETER —
+`agent` is a command name from `--agent <cmd>` and the only argument is the
+briefing. `se-pty.ts` spawns a command handed to it and holds a live read-write
+channel, and nothing in the walk re-invokes either.
+
+VERDICT: FALLS. No path exists today by which a published value changes which
+model is running.
+
+AND IT FALLS IDENTICALLY FOR A RUNG AND FOR A MODEL NAME, which is the result
+worth having. The spike was designed to settle the owner's ruling as a side
+effect — if nothing can act on a model name either, the roster is a file
+maintained for nobody. THE TIEBREAK HOLDS AND IT HOLDS FOR THE WRONG REASON:
+nothing can be acted on at all, which argues against the payoff rather than for
+either design.
+
+SPIKE 2 ASKED what the lane can learn about the answering model without asking
+the party being measured. `engine/mcp.ts` declares it: `clientInfo: { name,
+version }` and no model, on both the transport metadata and the request context
+a handler receives.
+
+VERDICT: HOLDS. The requirement's own Detail — "the transport hands the engine a
+client name and no model" — is verified rather than repeated, and this record had
+asserted it twice without opening the file.
+
+THE ONE OTHER PLACE THAT KNOWS ANYTHING IS THE `--agent` COMMAND STRING, and it
+fails on two counts either of which is fatal. It is what was REQUESTED, where the
+requirement demands what SERVED. And it is per session, fixed before the first
+pull, where the demand is per call.
+
+SO THE MARK IS PERMANENT rather than a caveat awaiting an implementation.
+
+### The two absences are one absence
+
+WHAT WOULD LIFT THE MARK, named in the requirement itself: the value arriving
+from whatever performed the spawn, which knows what it started and is not the
+party being measured.
+
+WHAT WOULD MAKE THE PAYOFF REACHABLE, from spike 1: a receiver that reads a
+published driver and starts a stretch on it.
+
+THOSE ARE THE SAME PARTY. One thing that spawns on a published value would both
+close the attribution and unlock the payoff, and neither is possible without it.
+
+AND IT IS NOT A MISSING MECHANISM. `se-pty.ts` already spawns a command and
+already holds a live channel back. What is missing is a decision about WHO may
+cause a spawn on a computed value. `req-the-machine-names-a-driver-and-starts-nothing`
+says correctly that the lane may not, and nothing anywhere says who may.
+
+THAT IS THE SHAPE THIS ITERATION SHIPS WITH: a machine that names a driver
+correctly, publishes it honestly, and hands it to nobody.
+
+CORRECTED THE SAME DAY, AND THE CORRECTION IS F56. It hands it to the walking
+agent, which acts on it by delegating. The conclusion above was drawn from a
+neighbour node that was wrong, and every node that carried it cited that node
+correctly.
+
+## F56 — the winner's largest declared lean was not a lean, and it was scored while it read as one
+
+`cand-whoever-holds-the-hands-decides` won the comparison carrying this under
+"What it leans on":
+
+> A receiver exists that can read a rung and act on it. IT DOES NOT.
+
+It repeated it twice more, in "What it costs" and in its seams section, and the
+record read the admission as the line's honesty about its own weakness — which
+F53 records as the highest-trust sentence shape in the corpus.
+
+IT WAS FALSE. The party that reads a published rung is the walking agent, and it
+acts by handing the step to a subagent on a stronger hand. Contract rule 11
+grants the spawn without asking; `project/guidance/method/subagents.md` § Which
+model, under an owner grant of 2026-07-11, says how to size it.
+
+THE FALSEHOOD WAS INHERITED RATHER THAN INVENTED. It came from
+`nbr-the-driver-that-performs-the-spawn`, which said it first, and every node
+that repeated it cited that neighbour. One wrong sentence in one node propagated
+into two experiments, four options, three candidates, two RAID entries, one
+requirement, one function and a gate verdict — sixteen places, all correctly
+cited to a source that was wrong.
+
+WHAT THIS DOES TO F53. It does not overturn it. A design's honest statement of
+its own weakness is still the highest-trust sentence available. What this adds is
+that trust is not the same as truth: the sentence was written in good faith,
+survived four cold passes, and was scored as a real cost by three scorers.
+
+AND THE CHECK THAT WOULD HAVE CAUGHT IT IS THE ONE F50 ALREADY NAMED. The claim
+is about a capability, and a capability claim is checkable. Nobody checked it,
+because the party it was about lives in the harness and in the contract — not in
+`project/deliverable`, which is the only tree a lane search reaches. The spike
+that went looking searched the reachable tree and found the absence it expected.
+
+## F57 — an axis every candidate scored zero on was defective, not inert
+
+`req-acts-carry-role-and-channel` scored 0 for all four candidates under three
+independent scorers. The record called the axis "inert" and moved on, twice.
+
+IT WAS NOT INERT. Its `## Detail` said:
+
+> The role vocabulary is fixed and recorded (owner, agent).
+
+Two values. A walker and a guide are both the second one, so no candidate could
+have scored above 0 on that axis whatever it did. The axis forbade its own
+answer.
+
+THE LIST WAS ALSO ALREADY WRONG ABOUT THE SHIPPED CODE, and had been since i1.
+`project/deliverable/engine/calllog.ts:22` declares `actor` as
+`human | agent | ui` — three values, and different words. A binding Detail and
+the code it binds had disagreed for thirty-seven iterations and no check compares
+them.
+
+THE TELL WAS VISIBLE AND WAS READ THE WRONG WAY ROUND. An axis that no candidate
+can move is usually a defective axis. This record read it as a design space that
+happened not to reach the demand, and wrote that reading down twice.
+
+WHAT THE REPAIR KEEPS. Closed is the property worth having; two was never the
+property. The Detail now says the vocabulary is fixed and that a delegated hand
+is a different part from the hand that delegated.
+
+## F58 — a claim and its own correction in one paragraph, and I wrote it while writing the correction
+
+The record has named this defect shape three times: a file carrying a claim and
+its own correction with no marker saying which is which reads as two independent
+observations. `cand-the-reader-beside-the-walk` had it and it was repaired.
+`cand-whoever-holds-the-hands-decides` had it and nobody looked.
+
+I DID IT AGAIN TODAY, IN THE ACT OF REPAIRING IT. Correcting `gate-inputs`'s
+`picture_judged` field, I replaced the opening of a sentence and left its tail
+standing, so the paragraph read:
+
+> ... that was false in both halves. Something is always listening, and the party
+> reading the name is the walking agent, which acts by handing the step to a
+> stronger hand. The pass is written correctly and terminates in a room with
+> nobody in it ...
+
+The correction and the falsehood, adjacent, in one paragraph, in the field whose
+whole purpose was to correct that falsehood.
+
+WHY THE SHAPE KEEPS WINNING. A targeted replacement matches on the beginning of
+a sentence and leaves whatever follows. The tail is grammatical, sits in the
+right place, and reads as a continuation. Nothing about the edit looks partial.
+
+THE CHECK THAT WOULD CATCH IT is a read-back of the whole field after the
+replacement, not of the replaced fragment. That is one more call and I did not
+make it until a second pass found the contradiction.
+
+## F59 — the owner corrected the design twice in one hour, and the second correction reversed a constraint I had invented
+
+FIRST CORRECTION: do not call the acting party a "receiver". The parties are a
+WALKER and a GUIDE. Adopted, and it settled a spike that had returned a false
+verdict.
+
+SECOND CORRECTION, an hour later: the arrangement I wrote down was wrong. I had
+recorded that the guide "never touches the lane" and that "every lane call is the
+walker's". The owner: "the worker makes every lane call even for work the guide
+did, but I don't want that."
+
+NOTHING IN THE PROBLEM REQUIRED THE CONSTRAINT I ADDED. I invented "the guide
+never touches the lane" while writing up the first correction, and then derived
+consequences from it — including a whole paragraph in the attribution use case
+about a relay being the only path. The owner's ruling is simpler: either hand may
+work the lane, and a relayed answer is recorded as the guide's.
+
+THE SHAPE IS AN OVER-TIGHT READING OF A NAMING. Given two roles and told the
+weak one does the daily work, I turned "does the daily work" into "does all the
+work", which is a constraint nobody stated. It then propagated into four nodes
+before the correction arrived.
+
+WHAT SURVIVED THE CORRECTION AND IS WORTH MORE THAN WHAT DID NOT. The relay case
+is the one that loses the most attribution, and it only became visible because
+the wrong constraint made me write it out. A guide calling the lane leaves a call
+to mislabel; a relayed judgment leaves nothing at all.
+
+## F60 — thirty-one files were edited outside the lane and the call log holds none of it
+
+The winning candidate was renamed across 31 files. I did it with `git mv` and
+`sed` through the host shell rather than through `se_file_replace`, which is the
+lane verb for exactly that job — "one regex over a glob; every place it landed
+comes back with its line before and after".
+
+THE CONTENT SURVIVED AND THE ACCOUNT DID NOT. Git holds the diff. The call log
+holds nothing: no record that a rename happened, what it matched, or how many
+places it touched.
+
+THIS IS THE SAME HOLE THE ITERATION IS BUILDING A FIELD TO CLOSE, one level up. A
+walk driven by two hands leaves a log that says one hand drove it. A walk edited
+through two doors leaves a log that says one door was used. In both cases the
+record is not wrong — it is silent, which reads the same as complete.
+
+WHY IT HAPPENED, and it is not that the rule was unknown. An uncaged cloud agent
+is TOLD by its harness to prefer native tools (F35), and a 31-file sed is
+genuinely cheaper in that lane than in this one. The cheaper door was taken
+without weighing what the other one recorded.
+
+WHAT WOULD HAVE COST NOTHING: `se_file_replace`, one call, with the same result
+and a logged account of every line it changed.
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

@@ -17,7 +17,12 @@ driver had to serve all of them. Name per state and there is nothing to reduce.
 
 WHAT GOES WITH IT, and this is why the trim is worth more than one function:
 
-- The maximum rule goes, and its requirement with it.
+- The maximum rule goes. ITS REQUIREMENT DOES NOT, corrected 2026-08-20.
+  `req-a-milestone-takes-the-maximum-complexity-over-its-rows` was restated to
+  name an outcome — a published figure no weaker than the hardest step inside the
+  unit it covers, with the distance to each step readable — and naming per state
+  SATISFIES it, with a unit of one and a spread of zero. This line told a reader
+  that a live must is dead, and three of the four candidates rest on it.
 - `raid-risk-a-submachine-maximum-drags-easy-items-onto-an-expensive-walker`
   closes — it describes a cost that only exists at milestone granularity.
 - `opt-split-a-submachine-where-the-spread-is-wide` becomes unnecessary; it was

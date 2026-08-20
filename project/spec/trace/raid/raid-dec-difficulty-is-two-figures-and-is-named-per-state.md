@@ -15,7 +15,7 @@ source_refs:
   - raid-risk-a-submachine-maximum-drags-easy-items-onto-an-expensive-walker
   - opt-difficulty-splits-into-judgement-and-reading
   - opt-name-the-driver-per-state-not-per-milestone
-  - cand-the-receiver-decides
+  - cand-whoever-holds-the-hands-decides
 weighs_with: none
 weighs_against: raid-dec-the-block-names-a-rung-and-never-a-model
 ---

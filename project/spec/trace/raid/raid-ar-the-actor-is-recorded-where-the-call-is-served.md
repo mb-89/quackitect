@@ -8,9 +8,10 @@ owner: the adjudicator
 trigger: a call record read for who acted, and the first attempt to answer which hand walked a finished record
 status: open
 looked: 2026-08-20
-impact: The declared architecture names a rung and never a model, so nothing in this tree learns which model served a call. The record can carry the driver the machine NAMED and never the one that answered, which is the acting party the scenario asks a reader to take from the record.
+impact: The declared architecture names a rung and never a model, so nothing in this tree learns which model a rung resolved to. The record carries both the named driver and the answering one, the second self-reported, and nothing independent can check the self-report. What the scenario asks a reader to take from the record is there and unverifiable.
 breaks_how_badly: corrosive
-how_likely: certain
+amended: "2026-08-20 — the impact said the answering driver can never be recorded. It can, self-reported, as it is on every line; what is lost is the cross-check. The over-statement came from the candidate node and reached five artifacts before a cold pass read the requirement instead of the citation."
+how_likely: expected
 source_refs:
   - evaluate-architecture, the scenario walk's verdict
   - req-the-actor-is-recorded-where-the-call-is-served
@@ -20,6 +21,26 @@ source_refs:
 weighs_with: none
 weighs_against: none
 ---
+
+## Graded off the scale, corrected 2026-08-20
+
+THIS ENTRY SAID \`how_likely: certain\`. THE SCALE OFFERS expected, plausible,
+conceivable. \`project/deliverable/engine/bin/grades-complete.ts\` refuses the
+whole register while any entry sits outside it, and it refused at
+\`rank-unknowns\`' exit — which is the first state that runs it.
+
+\`expected\` IS THE HIGHEST THE SCALE HAS and it is what this entry now carries.
+
+WHAT "CERTAIN" WAS TRYING TO SAY, and the scale cannot hold it: this is not
+something that MIGHT happen. It is a consequence the design chooses. A likelihood
+scale measures whether a thing occurs; it has no value for a thing that is true
+by construction.
+
+THE DISTINCTION IS REAL AND BELONGS SOMEWHERE ELSE. A consequence a design
+accepts is a decision's cost, recorded on the decision. A risk is something that
+might realise. Writing "certain" onto a likelihood field collapses the two, and
+four entries in this record did it independently — which is a vocabulary gap
+rather than four mistakes.
 
 ## It is certain rather than likely, and that is the point
 

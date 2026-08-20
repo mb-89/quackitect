@@ -11,7 +11,7 @@ form: call
 source_refs:
   - fn-run-a-governed-walk.obtain-a-step-s-difficulty
   - el-sizing
-  - cand-the-receiver-decides
+  - cand-whoever-holds-the-hands-decides
 ---
 
 THE SIZING ELEMENT READS A STEP, NEVER THE MATRIX. What crosses here is the

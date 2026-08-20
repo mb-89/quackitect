@@ -2,7 +2,7 @@
 minted_in: i38-the-machine-sizes-its-own-driver-every-s
 id: req-one-model-list-is-read-live-from-the-repository
 type: "[[requirement]]"
-statement: "Whatever the engine publishes about how strong a hand a step needs shall be the same on every supported host for the same inputs, with nothing about it discovered at run time."
+statement: "The engine shall publish the same statement of how strong a hand a step needs on every supported host for the same inputs, discovering nothing about it at run time."
 kind: constraint
 verify_method: inspection
 breaks_if_removed: "A system that answers differently on one machine than another cannot be replayed, and a walk that cannot be replayed is worth less here than one that is occasionally over-driven."
@@ -35,12 +35,26 @@ else's and cannot be constrained by us at all.
 
 ## Detail
 
-THE PATTERN IS ALREADY IN THE TREE, twice. `machines/scale.md` holds the
-autonomy rungs and `machines/stopat.md` holds the stop notches; both state at
-the top that the engine READS the file, both are edited by hand, and both put
-the meaning in the order of the lines rather than in numbers on the page.
+WHAT THIS SECTION USED TO ARGUE, AND WHY IT IS GONE. It said the pattern is
+already in the tree twice — `machines/scale.md` and `machines/stopat.md`, both
+read by the engine, both hand-edited — and that "THE LIST IS THE THIRD OF
+EXACTLY THAT KIND".
 
-THE LIST IS THE THIRD OF EXACTLY THAT KIND and needs no new mechanism.
+THAT PRESUMES A HELD LIST, AND THE STATEMENT ABOVE NO LONGER DEMANDS ONE. A
+reader taking this Detail rather than the statement requires a roster and
+mis-scores the two lines that hold none. Corrected 2026-08-20, by the fourth
+cold pass over this register, which found it the same day and in the same shape
+as the sizing must's Detail — one caught, one missed.
 
-WHAT IT MUST NOT DO is ask the host anything. Explicitly ruled: no capability
-probe, no roster, no discovery.
+WHAT IS ACTUALLY DEMANDED is that our answer about how strong a hand a step
+needs be the same on every supported host for the same inputs.
+
+TWO SHAPES SATISFY IT AND THE TREE ALREADY RUNS ONE OF THEM. A held file read
+live, in the manner of `machines/scale.md` — that pattern is real and it is
+available, and it is now an EXAMPLE rather than the demand. Or publishing a rung
+and holding nothing, because a rung is the same on every host by construction.
+
+WHAT NEITHER SHAPE MAY DO is ask the host anything. No capability probe, no
+discovery at run time. That clause survived the restatement because it is the
+demand rather than a mechanism: a value discovered from the host is a value that
+differs by host.

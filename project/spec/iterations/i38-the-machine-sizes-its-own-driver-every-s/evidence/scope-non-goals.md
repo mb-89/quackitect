@@ -1,8 +1,8 @@
 ---
 form: scope-non-goals
 by: agent
-signed_off: 2026-08-20T10:07:59.118Z
-reopened: "2026-08-20T10:07:58.061Z — frame-delta was re-signed after it, so it answered older ground: the business case now says the payoff waits on the boot door, which does not move the scope but is what the scope is scoping"
+signed_off: 2026-08-20T19:04:49.161Z
+reopened: "2026-08-20T19:04:43.105Z — frame-delta was re-signed: its value proposition now asks a finished walk to say which HAND did each part, not only which model. The owner named a WALKER doing the daily work and a GUIDE asked for the hard steps; either may work the lane, and a relayed answer is recorded as the guide's. Re-read against that."
 authors: agent
 files:
 ---

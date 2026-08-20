@@ -10,7 +10,7 @@ status: open
 looked: 2026-08-20
 impact: Attribution needs two coordinates and this architecture writes one. The stamp records the named driver and the state; the answering driver is outside our tree by construction. So an audit asked what a walk ran on answers from the log with what we asked for, never with what happened.
 breaks_how_badly: abrasive
-how_likely: certain
+how_likely: expected
 source_refs:
   - evaluate-architecture, the scenario walk's verdict
   - req-audit-answers-from-log
@@ -20,6 +20,26 @@ source_refs:
 weighs_with: none
 weighs_against: none
 ---
+
+## Graded off the scale, corrected 2026-08-20
+
+THIS ENTRY SAID \`how_likely: certain\`. THE SCALE OFFERS expected, plausible,
+conceivable. \`project/deliverable/engine/bin/grades-complete.ts\` refuses the
+whole register while any entry sits outside it, and it refused at
+\`rank-unknowns\`' exit — which is the first state that runs it.
+
+\`expected\` IS THE HIGHEST THE SCALE HAS and it is what this entry now carries.
+
+WHAT "CERTAIN" WAS TRYING TO SAY, and the scale cannot hold it: this is not
+something that MIGHT happen. It is a consequence the design chooses. A likelihood
+scale measures whether a thing occurs; it has no value for a thing that is true
+by construction.
+
+THE DISTINCTION IS REAL AND BELONGS SOMEWHERE ELSE. A consequence a design
+accepts is a decision's cost, recorded on the decision. A risk is something that
+might realise. Writing "certain" onto a likelihood field collapses the two, and
+four entries in this record did it independently — which is a vocabulary gap
+rather than four mistakes.
 
 ## It is certain rather than likely, and that is the point
 

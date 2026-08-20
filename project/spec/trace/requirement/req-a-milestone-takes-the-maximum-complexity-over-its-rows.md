@@ -2,7 +2,7 @@
 minted_in: i38-the-machine-sizes-its-own-driver-every-s
 id: req-a-milestone-takes-the-maximum-complexity-over-its-rows
 type: "[[requirement]]"
-statement: "No step shall be walked by a driver weaker than that step's own difficulty requires, and the record shall make visible where a step was driven above its own difficulty."
+statement: "The engine shall name, for every unit of work it sizes, a difficulty no weaker than that of the hardest step the unit contains, making visible in the record how far each step in that unit sits below it."
 kind: functional
 verify_method: test
 breaks_if_removed: "A milestone driven below its hardest row produces a plausible wrong answer at exactly the step where a checker cannot see it. Reporting only the maximum hides how much of the milestone was overpaid for."
@@ -17,7 +17,36 @@ priority: must
 ---
 
 
-## Restated at gate-architecture, 2026-08-20
+## Restated twice at gate-architecture, 2026-08-20
+
+THE FIRST RESTATEMENT WAS WRONG AND AN INDEPENDENT MUST-CHECK CAUGHT IT. It read
+"The engine shall walk no step by a driver weaker than that step's own
+difficulty requires."
+
+THAT MAKES THE ENGINE THE DRIVER, AND ANOTHER MUST FORBIDS EXACTLY THAT.
+`req-the-machine-names-a-driver-and-starts-nothing`: "The lane shall publish the
+named driver on the pull and shall start no process on account of it, on any
+host and in any mode." The engine never selects who walks a step, so it can
+never guarantee that no step is walked weakly.
+
+TWO MUSTS THAT CANNOT BOTH BIND IS A DEFECT WHATEVER THE DESIGN. Under the first
+wording every one of the four candidates fails, because none of them spawns
+anything — which is the other must working.
+
+THE SECOND RESTATEMENT NAMES THE ENGINE'S OWN ACT. The engine SIZES units of
+work and publishes a difficulty. The demand is that the published difficulty is
+never weaker than the hardest step inside the unit it covers, and that the
+distance between the unit's figure and each step's own is readable.
+
+WHAT SATISFIES IT. A milestone maximum with the spread reported satisfies it.
+Naming per state satisfies it with a unit of one and a spread of zero. Both
+were excluded by the original wording and neither is preferred by this one.
+
+WHO WROTE THE DEFECT: the walking agent, at this gate, one hour before the
+must-check found it. Recorded because a restatement that trades one frozen
+mechanism for a fresh contradiction is the failure mode this repair invites.
+
+## What the first restatement replaced
 
 THIS ROW NAMED A MECHANISM AND meth-requirement-authoring:148 FORBIDS IT: "a named
 mechanism is design frozen as obligation. Name the outcome; the mechanism is M4's
@@ -35,9 +64,22 @@ submachine where the spread is wide.
 
 ## Detail
 
-THE MAXIMUM IS THE ONLY SAFE REDUCTION. Anything lower bets that the hardest
+NO REDUCTION BELOW THE HARDEST ROW IS SAFE. Anything lower bets that the hardest
 row will not be reached, and a weak answer to a hard question looks like an
 answer.
+
+THIS SENTENCE USED TO READ "THE MAXIMUM IS THE ONLY SAFE REDUCTION", corrected
+2026-08-20. That is false and it contradicted this node's own restated
+statement, which licenses naming per state with a unit of one. A cold
+must-check found it and said what it would cost: a reader taking the Detail
+rather than the statement mis-scores three of the four candidates, exactly as
+the id does.
+
+THE MAXIMUM IS ONE SAFE REDUCTION AND NOT THE ONLY ONE. Naming per state never
+reduces at all. Driving everything at the top rung is safe and wasteful.
+Splitting a milestone where the spread is wide is safe and cheaper. What the
+demand forbids is a published figure weaker than the hardest step inside the
+unit it covers.
 
 THE SECOND HALF OF THIS REQUIREMENT IS WHAT MAKES THE COST VISIBLE. One hard
 row pulls every easy row beside it onto the same walker, and without the spread

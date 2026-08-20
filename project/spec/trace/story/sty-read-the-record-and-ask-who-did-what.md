@@ -2,7 +2,7 @@
 minted_in: i38-the-machine-sizes-its-own-driver-every-s
 id: sty-read-the-record-and-ask-who-did-what
 type: "[[story]]"
-statement: An engineer opens a finished record and asks which parts were walked by what, and the log answers instead of the engineer having to remember.
+statement: An engineer opens a finished record and asks which parts were walked by which hand and on what model, and the log answers instead of the engineer having to remember.
 actor: stk-engineer-driving-agents
 refines:
   - vp-a-finished-walk-can-say-who-did-which-part-of-it
@@ -29,9 +29,15 @@ THAT FIELD DOES NOT EXIST EITHER, and it is the half nobody had noticed. The sta
 
 ---
 
-With both stamped, the question becomes one query rather than a reconstruction.
+They ask which part the caller was playing.
 |||
-EITHER COORDINATE ALONE ANSWERS NOTHING. "This model answered 190 calls" and "190 calls happened somewhere" are the same non-answer from two directions. The record grows two fields in one edit or it grows neither.
+THAT FIELD DOES NOT EXIST EITHER, AND IT IS A THIRD COORDINATE RATHER THAN A DETAIL OF THE FIRST. engine/calllog.ts:22 declares actor as human, agent or ui, and engine/tools.ts stamps every lane call agent. Both hands are agents, so a guide working the lane reads as the walker. And where the walker relays the guide's work instead of the guide filing it, the origin is lost outright. The model does not answer it either: subagents.md says judgment work inherits the session model, so a guide can carry the walker's own model name.
+
+---
+
+With all three stamped, the question becomes one query rather than a reconstruction.
+|||
+ANY COORDINATE ALONE ANSWERS NOTHING. "This model answered 190 calls" and "190 calls happened somewhere" are the same non-answer from two directions. The record grows the fields it is missing in one edit or it grows none of them.
 
 ---
 

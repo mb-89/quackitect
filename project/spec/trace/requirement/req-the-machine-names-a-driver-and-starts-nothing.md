@@ -18,6 +18,27 @@ priority: must
 
 ## Detail
 
+WHAT "THE NAMED DRIVER" IS, after the use case was restated 2026-08-20. This
+requirement's own `source_refs` point at `uc-let-the-machine-name-the-driver`
+step 5, which used to read "It puts THE MODEL NAME on the pull" and now reads
+"It puts THAT STATEMENT on the pull" — the statement of how strong a hand the
+work requires.
+
+SO THE NAMED DRIVER IS WHATEVER THE DESIGN PUBLISHES AS THAT STATEMENT. A model
+name is one form of it. A rung, or a class, or a two-part difficulty and a rung
+together, are others. This requirement demands that it be published on the pull
+and that nothing be started on account of it; it does not demand which form it
+takes, and it never did — the form came in from the use case's own step.
+
+WHY THIS NOTE EXISTS. A cold pass held every must against every candidate and
+found the verdict on this one turning entirely on whether a rung counts as a
+named driver, with the equivalence asserted nowhere. It was asserted nowhere
+because the use case said "model name" and this row said "driver", and nobody
+reconciled them.
+
+WHAT IS UNCHANGED AND IS THE POINT OF THE ROW: the lane publishes and starts no
+process, on any host and in any mode.
+
 THE ENTRYPOINT MAY AND THE WALK MAY NOT, and the seam is when. `se-start.ts`
 starts an agent before any walk exists, and `se-pty.ts` starts one inside a
 pseudo-terminal for a person to watch. Neither is a walking state acting on a
@@ -28,5 +49,6 @@ something already listening decides what to do with it.
 
 AND SOMETHING IS LISTENING, corrected 2026-08-20: the lane answers over HTTP
 before an agent is ever launched, the launched agent pulls, and `se-pty` even
-carries keystrokes back into a running one. The receiver reads today; what no
-path does is start a new agent on a different model mid-walk.
+carries keystrokes back into a running one. The reader reads AND ACTS today, by
+handing the step to a stronger hand; what no path does is turn a running agent
+into a different model mid-walk, and nothing needs one to.

@@ -1,7 +1,8 @@
 ---
 form: evaluate-architecture
 by: agent
-signed_off: 2026-08-20T15:02:56.007Z
+signed_off: 2026-08-20T17:38:08.975Z
+reopened: "2026-08-20T17:38:07.426Z — two of the six scenario verdicts it moved rest on the claim that this architecture can never record what answered, which the requirement own Detail contradicts, and the five-of-five must violation it hands to the gate is now none"
 authors: agent
 files:
 ---
@@ -15,6 +16,24 @@ Forty-three quality scenarios stand and the declared architecture is walked thro
 SIX MOVE, AND TWO OF THE SIX MOVE THE WRONG WAY. One is narrowed, one is worsened and now measured, one is addressed by the new element, one is unmoved where a reader might expect movement, and two are newly unaddressed by a requirement this architecture actively defeats.
 
 THE INTERFACE DEBT IS ZERO. Three crossings were owed when the new element landed and all three are declared: two carrying flow-compiled-machine into el-sizing, and one pre-existing crossing this change surfaced rather than created.
+
+### Re-earned 2026-08-20: two of the six that moved, moved on a false sentence
+
+THIS FORM RECORDED TWO REQUIREMENTS AS NEWLY UNADDRESSED "by a requirement this architecture actively defeats" — `req-the-actor-is-recorded-where-the-call-is-served` and `req-audit-answers-from-log`.
+
+BOTH RESTED ON ONE SENTENCE from `cand-whoever-holds-the-hands-decides`: that it can never record what answered. `req-every-call-records-the-model-that-answered-it` says in its own Detail that the value "can only come from the caller" today and must be marked self-reported. EVERY DESIGN ON THE CHART SELF-REPORTS.
+
+WHAT THIS ARCHITECTURE ACTUALLY DEFEATS IS THE CROSS-CHECK, not the record. Holding no roster, it has nothing independent to compare a self-report against. The two entries stay AT RISK and their grade stays `certain`, because an unverifiable field is a real cost — but the cost is narrower than "the answering side of every attribution", and it is the difference between this architecture satisfying a must and violating it.
+
+### And the ruler this state was measuring against has been rebuilt
+
+WHEN THIS FORM WAS FIRST WRITTEN, the declared architecture violated five of the five musts bearing on it and every rival violated at least one. THAT DIAGNOSIS WAS RIGHT AND ITS CAUSE WAS UPSTREAM.
+
+Four musts named the seed's mechanism rather than the need behind it, and so did `uc-let-the-machine-name-the-driver`, which carried the maximum, the one file in the repository and the model name on the pull in its own steps. All are restated. The fifth apparent violation was the over-statement above.
+
+THE WINNER NOW VIOLATES NO MUSTS, checked three times by cold readers over all forty pairs. `cand-the-reader-beside-the-walk` violates two and is eliminated.
+
+SO THIS STATE'S JOB IS THE ONE ITS CARD DESCRIBES AGAIN: does this architecture answer the forty-three scenarios and the register as they now stand. It does, with sixteen standing at-risk entries it did not create and two it chooses.
 
 ## walk
 
@@ -68,13 +87,21 @@ THE INTERFACE DEBT IS ZERO. Three crossings were owed when the new element lande
 
 ## follow_up
 
-THE TWO NEW AT-RISK ENTRIES ARE GRADED CERTAIN RATHER THAN EXPECTED, and the grade is the finding. They are not risks the architecture might realise; they are consequences it chooses. raid-dec-the-block-names-a-rung-and-never-a-model buys host portability by giving up the answering side of every attribution, and req-the-actor-is-recorded-where-the-call-is-served and req-audit-answers-from-log are what that costs on the standing register.
+THE TWO NEW AT-RISK ENTRIES ARE GRADED CERTAIN RATHER THAN EXPECTED, and the grade is the finding. They are not risks the architecture might realise; they are consequences it chooses. raid-dec-the-block-names-a-rung-and-never-a-model buys host portability by giving up the CHECK on the answering side of every attribution — corrected 2026-08-20, the record itself is written and self-reported as it is on every line — and req-the-actor-is-recorded-where-the-call-is-served and req-audit-answers-from-log are what that costs on the standing register. An unverifiable field rather than an absent one, and still a cost this architecture chooses rather than risks.
 
-A CLEAN-CONTEXT SCORER SAW IT AND THE COMPARISON DECLARED ANYWAY. The winner scored 0 on the actor axis, worst of four, quoted from its own file. It was declared because that axis is one of five and it leads on two others. The scoring was honest and the criteria set was too narrow to stop it.
+A CLEAN-CONTEXT SCORER SAW IT AND THE COMPARISON DECLARED ANYWAY. The winner scored 0 on the actor axis, worst of four, quoted from its own file. A THIRD SCORER MOVED IT TO 1 on the ground that the quoted sentence is false, which ties it with both eligible rivals and leaves it trailing only the line the must-check eliminated. It was declared because that axis is one of five and it leads on two others. The scoring was honest and the criteria set was too narrow to stop it.
 
 AND THE LARGER CONFLICT DOES NOT APPEAR IN THIS DECK AT ALL, which is why it is stated here. Held against the ten musts this record wrote, the declared architecture violates five of the five that bear on it, and every rejected candidate violates at least one. The musts name the seed's mechanism — a milestone maximum, one file mapping rung to model, a loader that refuses an undeclared row — rather than the need behind it, so a design that improves on the mechanism necessarily fails the demand encoding it. The deck cannot surface this because these are constraints rather than quality scenarios, and no state before this one held them against a candidate. Written up as F30 in the record's field report, and it is gate-architecture's to rule on.
 
 WHAT I WOULD PUT TO THE GATE IN ONE LINE: the architecture is coherent, its costs are recorded, and it does not satisfy the requirements this iteration wrote — because those requirements describe the design it replaced.
+
+### What this state should be pressed on now, since the ruler is no longer the answer
+
+THE EASY CRITICISM IS SPENT. "The architecture is measured against requirements that name the seed's mechanism" was true, is repaired, and cannot be said again.
+
+WHAT IS LEFT IS HARDER AND SMALLER. Sixteen at-risk entries stand untouched because nothing in el-sizing bears on them; two more are chosen; three requirements are unaddressed. THE ARCHITECTURE IS NOT MEASURED AGAINST THE WRONG RULER ANY MORE, and it still does not move most of the register.
+
+AND THE ONE THING IT CANNOT ANSWER IS OUTSIDE ITSELF. `nbr-the-driver-that-performs-the-spawn` says the receiver reads and cannot act. Every scenario this architecture addresses is addressed on the assumption that publishing reaches somebody who can use it, and that assumption is M6's spike rather than this state's verdict.
 
 ## anything_else
 

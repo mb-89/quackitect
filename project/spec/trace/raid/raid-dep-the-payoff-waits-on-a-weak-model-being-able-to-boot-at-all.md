@@ -3,6 +3,7 @@ minted_in: i38-the-machine-sizes-its-own-driver-every-s
 id: raid-dep-the-payoff-waits-on-a-weak-model-being-able-to-boot-at-all
 type: "[[raid]]"
 kind: dependency
+restated: "2026-08-20 — the payoff waits on the walker delegating to a subagent on a named model, not on a weak model booting a different walker. The delegation path exists and carries an owner grant; what is missing is anything making the walker use it."
 statement: "Routing a cheaper driver to a cheaper state is worth nothing while a standing crippling issue says a weaker model cannot produce the boot reading proof at all, so this iteration's payoff waits on a door somebody else owns."
 owner: the owner
 trigger: "the first attempt to actually run a state on a model below the session default, and any close or re-probe of raid-the-read-proof-locks-weaker-models-out-of-the-system"
@@ -34,6 +35,14 @@ WHAT IT DOES NOT CONTROL is whether the named driver can walk in.
 THE MECHANISM IS STILL WORTH BUILDING and the sequencing is defensible. The
 ladder, the list and the stamp are useful the moment anything can act on them,
 and the boot door is a separate, already-registered piece of work.
+
+AND SOMETHING CAN ACT ON THEM TODAY, corrected 2026-08-20. This entry was read
+across the whole comparison as blocking every acting line on a capability nobody
+has. It does not. A walking agent that reads "this step needs a stronger hand"
+hands that step to a subagent on one — contract rule 11 and
+`project/guidance/method/subagents.md` § Which model. What still waits on the
+boot door is a WEAK WALKER STARTING AT ALL, which is a narrower dependency than
+this entry was quoted for.
 
 IT ALSO CUTS THE OTHER WAY. Until something names which states are cheap, there
 is no argument for spending effort on the boot door, because nobody can say

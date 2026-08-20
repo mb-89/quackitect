@@ -1,8 +1,8 @@
 ---
 form: derive-functions
 by: agent
-signed_off: 2026-08-20T11:39:45.220Z
-reopened: "2026-08-20T11:39:18.684Z — its neutrality section admitted one impurity and missed two, and a typing defect stood under it: reduce-a-milestone declared the same flow as input and output"
+signed_off: 2026-08-20T19:10:15.254Z
+reopened: "2026-08-20T19:10:07.906Z — write-requirements was re-signed: a tenth requirement stands, req-every-call-records-the-part-its-caller-played, and req-acts-carry-role-and-channel's role vocabulary is corrected. Re-read against that."
 authors: agent
 files:
 ---
@@ -35,28 +35,65 @@ Four of the five sit in the-walk cluster and one in the-account, which is the ho
 
 THE CHECK NO CHECK CATCHES: does any of these five name a solution rather than a need?
 
-WHAT WAS DELIBERATELY KEPT OUT OF THE WORDING.
+### Re-earned 2026-08-20, after write-requirements was re-signed
 
-- "obtain a step's difficulty" rather than "read the complexity key". A later design may DERIVE the value from what will judge the step's output instead of taking a typed one — which is the strongest recommendation this iteration's own prior-art scan produced — and that design satisfies this function unchanged. Naming the key would have written the fixed table into the function layer, where it does not belong.
-- "reduce a milestone to one difficulty" rather than "take the maximum". The maximum is the requirement's answer, not the function's. If the reduction ever becomes something else, the function survives.
-- "resolve a difficulty to a driver, from one standing mapping" rather than "look the rung up in the list". What the mapping holds is genuinely undecided — a vendor name, a capability word, or a row wide enough to differ by host — and the function is neutral across all three.
+THREE MUSTS WERE RESTATED TO NAME OUTCOMES INSTEAD OF MECHANISMS, and this layer had copied the mechanisms down. Four nodes moved.
+
+- `obtain-a-step-s-difficulty` ended "from the step's own declaration rather than from a judgment made at the time". Now: for every step that applies, refusing loudly where it cannot be obtained.
+- `reduce-a-milestone-to-one-difficulty` said "the single difficulty that milestone needs". Now: never weaker than any of them, and the spread kept.
+- `resolve-a-difficulty-to-a-driver` said "from one standing mapping". Now: the same way on every supported host.
+- `flow-step-difficulty` said "as the step itself declares it". Now it says how hard the work is, and nothing about where the number came from.
+
+TWO OF THE THREE ADMITTED IMPURITIES BELOW ARE GONE AS A RESULT, and neither was repaired by argument. Each was a mechanism this layer had inherited from a requirement, and it left when the requirement let go of it.
+
+THAT IS THE FINDING WORTH KEEPING. An impurity in the function layer is usually a copy of one upstream. The neutrality check here could name it and could not remove it, because the trace would break; only the requirement moving freed it.
+
+### What was deliberately kept out of the wording
+
+- "obtain a step's difficulty" rather than "read the complexity key". A later design may DERIVE the value from what will judge the step's output instead of taking a typed one — the strongest recommendation this iteration's prior-art scan produced — and that design satisfies this function unchanged.
+- "reduce to one difficulty" rather than "take the maximum". The maximum is one way to be no weaker than any step; driving everything at the top rung is another. Both satisfy the restated must, so the function names neither.
+- "resolve a difficulty to a driver" rather than "look the rung up in the list". What the mapping holds, and whether there is a standing mapping at all, is now genuinely undecided.
 - "publish outward" rather than "put a model name on the pull". The pull is the mechanism that exists; the need is that a reader can reach it.
 
-WHERE NEUTRALITY IS IMPERFECT AND I AM SAYING SO RATHER THAN CLAIMING OTHERWISE.
+### Where neutrality is still imperfect
 
-flow-step-difficulty's statement says "as the step itself declares it", which encodes the declared-versus-derived choice into the FLOW. That is a design decision sitting in the function layer. I have left it because the alternative — a flow neutral about where the value comes from — would make the constraint that it never enters the demand ledger unstatable, and that constraint is the one guarding three open pinned records. IT IS A KNOWN IMPURITY WITH A NAMED REASON, which is the honest form.
+`fn-...stamp-who-answered-and-where` names TWO things in one function, and a stricter reading would split it. It stays one because the two coordinates are worthless apart and the requirement says the record grows both or neither. Splitting the function would invite building half.
 
-fn-...stamp-who-answered-and-where names TWO things in one function, and a stricter reading would split it. It stays one because the two coordinates are worthless apart and the requirement says the record grows both or neither — splitting the function would invite building half.
+`flow-instruction` on `publish-the-driver-outward` is this form's own follow-up's "the flow a pull hands back". The statement avoids the pull; the OUTPUT TYPE wires it in. That impurity is unchanged by the restatement, because no must was hiding under it — it is this layer's own.
 
-THE TEST I APPLIED: could a completely different implementation satisfy these? THE FIRST ANSWER WAS "four of the five clear it cleanly" AND IT OVERSTATED BY ONE. An adversarial pass found two more impurities this section had missed while it was congratulating itself on admitting one.
+SO THE HONEST TALLY IS NOW TWO IMPURITIES IN FIVE FUNCTIONS, down from three, and the one that left with the requirements is not to this section's credit.
 
-SECOND IMPURITY, NOW ADMITTED. `resolve-a-difficulty-to-a-driver` says "from one standing mapping", which commits to the fixed-table decision — a runtime router or a per-host resolver cannot satisfy it. This section listed that phrase among the NEUTRAL ones, and its own test varied only what the mapping HOLDS, never whether there is one standing mapping at all. The commitment stays, because the requirement it serves makes it explicitly and a function neutral about it could be traced to nothing. But it is an impurity and it is named on the node now.
+### The history this section keeps, because the pattern outlives the count
 
-THIRD IMPURITY, AND IT IS THE SUBTLE ONE. This section claimed the pull was kept out — "publish outward" rather than "put a model name on the pull". The STATEMENT does avoid it. The NODE declares `outputs: flow-instruction`, which this form's own follow-up calls the flow a pull hands back. THE PULL IS WIRED IN THROUGH THE OUTPUT TYPE while the prose says it was kept out, and the disclosure sat two sections away in the same form.
-
-SO THE HONEST TALLY IS THREE IMPURITIES IN FIVE FUNCTIONS: one admitted at first writing, two found by somebody else. THE PATTERN IS WORTH MORE THAN THE COUNT — a neutrality check run by the author of the thing being checked found the impurity it had already decided to accept and missed the two it had not thought about.
+THE FIRST ANSWER WAS "four of the five clear it cleanly" AND IT OVERSTATED BY ONE. An adversarial pass found two more impurities this section had missed while it was congratulating itself on admitting one. A neutrality check run by the author of the thing being checked found the impurity it had already decided to accept and missed the two it had not thought about.
 
 AND A TYPING DEFECT STOOD UNDER THIS SECTION with no reading catching it. `reduce-a-milestone-to-one-difficulty` declared `flow-step-difficulty` as both its input and its output, so a milestone maximum travelled typed as a step-level value and the reduction was invisible. `flow-milestone-difficulty` now exists and carries the spread with it. A section claiming the layer was checked for exactly this class did not check the types.
+
+### Rechecked again 2026-08-20, after the live-read must was restated
+
+WHAT MOVED: `req-the-complexity-value-is-read-live-and-never-pinned` dropped "shall be read from the matrix at the moment it is needed". What it demands now is that a step's complexity stay out of every record's demand ledger.
+
+NO NODE IN THIS LAYER MOVED WITH IT, and the reason is that the clause which left had already been stripped from here an hour earlier. `obtain-a-step-s-difficulty` lost "from the step's own declaration" when its other requirement was restated, and `flow-step-difficulty` lost "as the step itself declares it" at the same time. Neither ever carried the timing clause.
+
+ONE SENTENCE ON THE FLOW IS NOW EXACTLY THE DEMAND RATHER THAN AN ECHO OF IT. `flow-step-difficulty` says "IT NEVER ENTERS A RECORD'S DEMANDS. It is a hint about who should drive, not a claim anything rests on." That was written as rationale beside a requirement demanding more. It is now the whole requirement, word for word in substance.
+
+THE TALLY OF TWO IMPURITIES IS UNCHANGED. Neither of the two — the double duty on `stamp-who-answered-and-where`, and `flow-instruction` wiring the pull in through an output type — has a requirement under it.
+
+### And once more, after the sizing must was corrected
+
+`req-a-milestone-takes-the-maximum-complexity-over-its-rows` was restated a second time. Its first restatement said the ENGINE walks no step by a weak driver, which claims an act `req-the-machine-names-a-driver-and-starts-nothing` forbids the lane from having.
+
+THIS LAYER HAD COPIED THAT DOWN TOO, within the hour. `reduce-a-milestone-to-one-difficulty` said the steps are "driven at" the reduced difficulty. It now says "sized together" and "published for them".
+
+THAT IS F32'S PATTERN A SECOND TIME AND IT IS WORTH THE REPEAT. The function layer copies whatever the requirement layer says, including a fresh error made one state earlier. The copy took under an hour and needed no argument in either direction.
+
+WHAT IT ARGUES FOR: checking the function layer AFTER every requirement change, not only after the ones that look like repairs. This one looked like a repair and carried a new defect.
+
+### The layer above this one had the same defect and was repaired last
+
+`uc-let-the-machine-name-the-driver` carried the seed mechanism in its own steps. THIS STATE ARGUES NEUTRALITY HARD AND SAYS WHY — a function naming a technology collapses M4 space to one point before anybody compared anything — and nothing in the method puts that question to a use case, which sits above both.
+
+SO THIS LAYER WAS CHECKED FOR EXACTLY THE DEFECT ITS SOURCE CARRIED, and passed, because it had faithfully copied a source nobody was checking. The test that would have caught it upstream is the one written into this state guidance: could two honestly different designs both do this?
 
 ## follow_up
 

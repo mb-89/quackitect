@@ -64,6 +64,35 @@ asks that the retro's counts be derivable from the log. This one asks that a
 DECISION be re-derivable from its inputs. A system could satisfy either without
 the other.
 
+## It was minted to be scored and it gates instead
+
+FOUND AT gate-candidates, 2026-08-20, BY HOLDING IT AGAINST THE CANDIDATES.
+
+THIS NODE'S OWN ARGUMENT FOR EXISTING is that the standing fourteen axes could
+not express why the chosen design is chosen — "A COMPARISON THAT CANNOT SCORE
+THE REASON FOR THE DECISION IS NOT A COMPARISON."
+
+IT CARRIES `priority: must`, SO IT NEVER SCORED ANYTHING. `cut-criteria` said
+so in as many words and treated it as correct: a must is a constraint, and only
+a row a candidate can score badly on and still be a candidate discriminates.
+
+SO THE COMPARISON STILL CANNOT SCORE THE REASON FOR THE DECISION. The axis was
+minted for that job, made a gate, and excluded from the job. Neither state was
+wrong on its own terms and the outcome is that nothing measures the thing this
+iteration exists to argue about.
+
+THE PRIORITY STAYS `must` AND THAT IS A JUDGMENT RATHER THAN AN OVERSIGHT. A
+walk that answers differently on two machines is not a worse walk, it is an
+unauditable one, and a design that fails this is not a candidate. What follows
+is that every candidate owes an answer to it, which none of them had given until
+this was found.
+
+WHAT WOULD ACTUALLY CLOSE THE HOLE derive-criteria NAMED: a `should` row that
+measures how much of a decision's derivation the record carries. That is a
+different demand from this one and it is not minted here, because minting a
+criterion at a gate that is about to score against it is the one edit that
+cannot be honest.
+
 ## The judgments behind its weight
 
 RANKED BELOW three axes and above three, with the rest left unjudged rather than

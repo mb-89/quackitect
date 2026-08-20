@@ -37,11 +37,24 @@ which is the point — the recommendation cannot be on the critical path if the 
 producing it is not.
 
 AND IT CHANGES THE PAYOFF'S SHAPE. raid-dep-the-payoff-waits-on-a-weak-model-being-able-to-boot-at-all
-blocks the value of a live recommendation on a receiver that can act. A reader
-that only reports has no such dependency: it is useful the day it runs, against
+blocks the value of a live recommendation on a party that can act. CORRECTED
+2026-08-20: that dependency is discharged rather than open — the walking agent
+acts by delegating. This option's advantage over a live recommendation is
+therefore smaller than this paragraph claimed. A reader that only reports still
+has no such dependency at all: it is useful the day it runs, against
 history, with nothing downstream of it.
 
 WHAT IT COSTS: it can only ever be advice, and the whole seed is written as though
 the machine will eventually be believed. It also cannot see a step before the step
-runs, so it answers what should have happened rather than what should happen —
-which is why three of the four shipped products above are dashboards.
+runs, so it answers what should have happened rather than what should happen.
+
+AND THE SENTENCE THAT USED TO END THIS PARAGRAPH WAS WRONG. It said "which is why
+three of the four shipped products above are dashboards". Corrected 2026-08-20:
+what the four have in common is that they hold NO WRITE PATH into the thing they
+advise, not that they render a screen. Slurm's `seff` is a command-line report.
+
+THE CORRECTION WAS MADE ONCE ALREADY, at gate-candidates, in the CANDIDATE that
+cites this option — `cand-the-reader-beside-the-walk` records fixing it "in all
+three places this candidate said DASHBOARDS". It was never applied here, which
+left the only surviving instance in the tree sitting in the source everybody
+quotes.

@@ -1,8 +1,8 @@
 ---
 form: identify-assumptions
 by: agent
-signed_off: 2026-08-20T11:40:54.607Z
-reopened: "2026-08-20T11:40:50.176Z — the states above it were re-signed during the M3 repairs, so it answers older ground"
+signed_off: 2026-08-20T19:10:10.929Z
+reopened: "2026-08-20T19:10:08.220Z — write-requirements was re-signed: a tenth requirement stands, req-every-call-records-the-part-its-caller-played, and req-acts-carry-role-and-channel's role vocabulary is corrected. Re-read against that."
 authors: agent
 files:
 ---
@@ -16,6 +16,54 @@ Eight requirements and five functions stand. This state asks what they lean on w
 TWO ASSUMPTIONS ARE MINTED HERE and four of the six sources turned up nothing new — three because the assumption was already registered and re-read rather than re-derived, one because nothing is leaned on there.
 
 THE SWEEP WAS ACTUALLY PERFORMED THIS TIME, which needs saying: this iteration has twice written a subset in the voice of a sweep, and both times a reader with no context caught it. Each line below names what was looked at and what it produced.
+
+### Rechecked 2026-08-20, after the register was restated
+
+WHAT MOVED UPSTREAM: four musts stopped naming mechanisms. The maximum, the file of model names, the per-row declaration, and the live read all left the requirement layer.
+
+NOTHING NEW IS MINTED AND HERE IS THE REASON FOR EACH.
+
+- The maximum leaving changes nothing this sweep saw. `raid-asm-a-state-is-equally-hard-at-every-change-size` is about the matrix varying a row's work by column, and the reduction over a group never bore on it.
+- The declaration leaving changes nothing either. What the people bullet found — that a hand-maintained table needs a maintainer nobody has named — is the same duty whether the value is typed or computed.
+- The live read leaving changes nothing, and this one is worth saying because it looks as though it should. The clause that left forbade a value riding a pinned structure. No source in this sweep leans on when the read happens; the environment bullet is about the matrix varying by column, and the toolchain bullet's one claim was verified live rather than assumed.
+- The model list leaving DOES change something, and it is a sharpening rather than a new assumption. See below.
+
+THE HOST ASSUMPTION NOW OUTLIVES THE REQUIREMENT THAT CARRIED IT. `raid-asm-one-model-list-serves-every-host-the-engine-supports` was minted against a must that named the list. That must no longer names one.
+
+THE ASSUMPTION STANDS ANYWAY, because it does not rest on the requirement. It rests on the OWNER'S RULING that there be one fixed list, which the restatement did not touch and could not.
+
+SO ITS STATUS IS UNCHANGED AND ITS STANDING IS NOT. It used to be an assumption under a demand. It is now an assumption under a ruling that the demand no longer encodes, which means a design satisfying every must could drop the list and leave this node pointing at nothing. That is a finding for M4, not a second assumption.
+
+
+### And once more, after the sizing must was corrected
+
+THE SIZING MUST WAS RESTATED A SECOND TIME. Its first restatement made the ENGINE the driver, which `req-the-machine-names-a-driver-and-starts-nothing` forbids the lane from being. It now names the engine own act: it sizes units and publishes a difficulty.
+
+NOTHING IN THIS FORM MOVES WITH IT. The correction narrows who performs an act; it adds no source, changes no probe, and touches nothing this state recorded.
+
+
+### Rechecked again, after three requirement nodes had their prose corrected
+
+WHAT MOVED: prose inside three musts, not their statements. One Detail said the maximum is the only safe reduction where the statement licenses per-state naming. One cited the wrong function for its own verification. One recorded that it was minted as a scoring axis and gates instead.
+
+NOTHING IN THIS FORM MOVES WITH IT. No statement changed, no priority changed, no flow and no coupling changed. What changed is what a reader of those three nodes is told, which is the layer above this one.
+
+
+### And two more Details, found by a fourth pass
+
+TWO MORE REQUIREMENT DETAILS WERE PRESUMING MECHANISMS THEIR STATEMENTS HAD DROPPED — the model-list must and the matrix-row must. Five for five: every restated statement left one behind.
+
+NOTHING IN THIS FORM MOVES. No statement changed, no priority changed, no flow and no coupling changed. What changed is what a reader of those nodes is told.
+
+
+### And the source above all of it was restated last
+
+`uc-let-the-machine-name-the-driver` carried the seed mechanism in its own steps — the maximum, one file in the repository, the model name on the pull — and every mechanism-naming requirement was a faithful derivation from it. It is restated to outcomes.
+
+NOTHING IN THIS FORM MOVES. The demands were already the outcomes; what changed is that their sources now agree with them.
+
+AND THE REPAIR ORDER IS THE FINDING. Requirements were repaired first, then functions, then flows, then candidates, and the use case they all derive from last. Each layer was repaired against a layer that was still wrong, which is why the same defect kept reappearing somewhere new.
+
 
 ## assumptions
 

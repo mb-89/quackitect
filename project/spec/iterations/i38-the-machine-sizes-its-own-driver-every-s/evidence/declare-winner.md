@@ -1,8 +1,8 @@
 ---
 form: declare-winner
 by: agent
-signed_off: 2026-08-20T14:36:18.341Z
-reopened: "2026-08-20T14:35:33.597Z — it declared cand-the-seed-made-total on a scoring that has since been re-earned against a redrawn candidate set. That candidate is dominated by cand-the-reader-beside-the-walk and off the front; the computed winner is now cand-the-receiver-decides, with the reader level at zero."
+signed_off: 2026-08-20T17:30:48.045Z
+reopened: "2026-08-20T17:30:47.296Z — converge-pugh and reverse-sensitivity were both re-run after the must-check eliminated the runner-up and two axes were re-scored: this form declares over a front of two where the eligible front is one, and its account of the previous declaration rests on figures that have since swapped"
 authors: agent
 files:
 ---
@@ -11,38 +11,64 @@ files:
 
 ## current_situation
 
-The seat holds and the winner is drawn: cand-the-receiver-decides. This state's guidance says nothing here recomputes or overrides it.
+The seat holds and the winner is drawn: `cand-whoever-holds-the-hands-decides`. This state's guidance says nothing here recomputes or overrides it, and nothing here does.
 
-THIS IS THE SECOND DECLARATION AND IT NAMES A DIFFERENT CANDIDATE. The first declared cand-the-seed-made-total with a finding recorded against it — that it led on two axes both fed by one cell, and that six of seven grafted worlds unseated it. The finding was acted on: the candidate set was redrawn, evaluate-set was reopened, a second clean-context scorer re-scored the corrected set, and the candidate that was declared is now dominated and off the front.
+### The third declaration, and the first one that is not a choice between two
 
-SO THE FIRST DECLARATION WAS NOT OVERTURNED BY ARGUMENT. It was overturned by the evidence it was made on being re-earned.
+THE FIRST DECLARED `cand-the-seed-made-total`, with a finding recorded against it: it led on two axes both fed by one cell, and six of seven grafted worlds unseated it.
+
+THE SECOND DECLARED `cand-whoever-holds-the-hands-decides` over a front of two, one point ahead on one axis, with the runner-up able to take that axis without becoming it. That was a choice, and reverse-sensitivity said so.
+
+THIS ONE IS A CONFIRMATION. Among lines that are candidates at all, the winner dominates: equal or better on every axis, strictly better on two. Plain sums 12 against 9 and 9; weighted by the axes' own damage grades, 36 against 26 and 26.
+
+### What changed is not the arithmetic, it is who was allowed in it
+
+`cand-the-reader-beside-the-walk` WAS THE RUNNER-UP AND IS NOT A CANDIDATE. It violates `req-the-machine-names-a-driver-and-starts-nothing` and `req-every-matrix-row-declares-its-complexity`, both on sentences it wrote about itself, and a must gates rather than scores.
+
+ITS GAPS WERE FILLED BEFORE IT WAS JUDGED. Three pairs stood at NOT ANSWERED and all three were answered from its own picks, because a line is not eliminated on questions nobody put to it.
+
+TEN MUSTS AGAINST FOUR CANDIDATES IS FORTY PAIRS, and until M5 no state in this record had run them. `cut-criteria` deferred the check in writing to `gate-design`, which does not exist anywhere in `project/deliverable`.
+
+### The declaration is only as good as the elimination, and that is where a reader should press
+
+THE WHOLE DECISION RESTS ON ONE CLAUSE OF ONE REQUIREMENT. `req-the-machine-names-a-driver-and-starts-nothing` reads "The lane shall publish the named driver ON THE PULL and shall start no process on account of it."
+
+READ AS THE NO-SPAWN HALF ALONE, the eliminated line is the STRONGEST of the four on it — "the recommender is not in the walk at all, so the rule holds by deployment" — and it returns at 11 against 12 with a takeable strength. THAT READING IS RECORDED AND REJECTED: a record that does not exist until after the call is not a publication on the pull.
+
+AND THE ELIMINATED LINE WAS GOOD AT THINGS NOTHING SURVIVING CARRIES. It read the acting role off the record better than anything else on the chart, and it cost nothing on the walk because it sat outside it. Neither is forbidden to the winner and `graft-onto-the-winner` is where that gets tested.
+
+### What the winner does not serve, said here rather than left to a reader
+
+IT PUBLISHES A RUNG AND NEVER A MODEL, and holds no roster at all. The kickoff's second goal asks for ONE fixed model list in the repo mapping each rung to a model name, and the owner ruled for exactly that.
+
+THE SPEC NO LONGER ENFORCES THE RULING and the ruling stands. `uc-let-the-machine-name-the-driver` carried it in its guarantee — "publishes a model name a receiver can act on" — which made an input to a design choice into an obligation on every design, and that is what made M4's search a formality. The use case is restated; the ruling is recorded on `raid-asm-one-model-list-serves-every-host-the-engine-supports`.
+
+SO THE WINNER CLEARS THE SPEC AND OWES THE OWNER AN ARGUMENT. That conflict is on the call log as an answered question. It is not this state's to settle and it is not hidden.
 
 ## winner
 
 
 ## comments
 
-THE WINNER IS DECLARED WITH ITS MARGIN STATED, because the margin is one point on one axis.
+THE WINNER SCORED 4 ON SURVIVING A HOST SWAP AGAINST 2 FOR EVERY ROSTER-HOLDING RIVAL, and that single cell is the whole of its structural lead. It wins there by holding nothing that can be wrong on another host.
 
-IT LEADS ON TWO AXES AND TRAILS ON A THIRD. On req-a-wrong-act-never-passes-silently it scores 4, tied with cand-the-reader-beside-the-walk which reaches the same score by a different mechanism. On req-walk-survives-host-swap it scores 4 against the reader's 3, and that single point is the whole of its lead. On req-the-actor-is-recorded-where-the-call-is-served it scores 0 and is WORST of four. On the remaining two axes all four candidates tie.
+THAT IS ALSO WHY IT DOES NOT SERVE THE SECOND GOAL. The same choice buys the host-swap point and gives up the roster, and no design on this chart has both.
 
-THE RIVAL LEVEL WITH IT CAN TAKE THE POINT. cand-the-reader-beside-the-walk is not prevented from publishing a rung rather than a model — it stands outside the walk either way, and what makes this winner the winner is publishing forward from inside it. Grafted, the reader reaches 13 against 11 and leads outright. Recorded as raid-risk-the-reader-can-take-the-leaders-only-structural-advantage, and graft-onto-the-winner runs next and is where it gets tested.
+TWO ASSUMPTIONS STOP BEING NEEDED RATHER THAN BEING WEAKENED. `raid-asm-one-model-list-serves-every-host-the-engine-supports` and `raid-asm-the-model-ladder-is-a-total-order` both concern a roster this line does not hold. THAT IS WORTH LESS THAN IT LOOKS: an assumption closed by removing what it is about is not an assumption tested.
 
-AND A WEIGHTING REACHES THE SAME RIVAL WITH NO GRAFT AT ALL. Fatal 4, crippling 3, corrosive 2 — the grades the axes already carry — gives reader 35 against this winner's 34. The lead is one crippling point against two corrosive ones, and the grades nearly cancel them.
-
-WHAT THIS WINNER CANNOT DO, AND ITS OWN RECORD SAYS SO. It cannot answer the actor axis in kind, because nothing of ours ever learns which model the rung resolved to. That is not a gap to be filled later; it is the consequence of the choice that earns it the host-swap point. The trade is the whole comparison: host portability by construction, bought with an attribution we can never make.
-
-WHAT IT IS NOT CHOSEN ON. No criterion in the pool measures spend. Both candidates on the front spend nothing on the walk — this one because it publishes and stops, the reader because it sits outside — and neither was chosen for that. A design meant to stop overspending has been selected on prevention, portability and auditability, and on nothing about cost.
-
-AND THE DEPENDENCY THIS WINNER CARRIES IS THE HEAVIEST ON THE CHART. raid-dep-the-payoff-waits-on-a-weak-model-being-able-to-boot-at-all blocks its value on a receiver that can read a rung and act, and nbr-the-driver-that-performs-the-spawn was rewritten in this record because the first version claimed one existed. The receiver reads and cannot act. This is the candidate furthest from anything shippable alone, and the arithmetic that chose it does not see that.
+AND ITS ADOPTION COST IS THE LARGEST OF THE FOUR. It needs a receiver that reads a rung and acts, and `nbr-the-driver-that-performs-the-spawn` says the receiver reads and cannot act. It is the furthest of the four from anything shippable alone, and that is the sentence M6's spike exists to test.
 
 ## follow_up
 
-graft-onto-the-winner IS NEXT AND IT HAS A REAL QUESTION THIS TIME. Every axis a loser beat this winner on gets asked, and there is exactly one: req-the-actor-is-recorded-where-the-call-is-served, where the reader scores 2 and the two eliminated candidates 1 against this winner's 0. Whether it can be taken is the whole of that state's work, and its own record says it cannot.
+M6 INHERITS ONE QUESTION THAT DECIDES WHETHER ANY OF THIS SHIPS. Can a receiver read a published rung and start a stretch on it? `nbr-the-driver-that-performs-the-spawn` says it reads and cannot act, and the winner's entire value is downstream of that sentence being fixable.
 
-THE TRIPWIRE POINTS THE OTHER WAY AND BOTH GET TESTED THERE. The graft state asks what the winner can take from a loser. The tripwire asks what a rival can take from the winner. The second is the one that changes the declaration, and the machine has no state for it — which is why it is a RAID entry with a fallback rather than a step.
+AND THAT SPIKE ALSO SETTLES THE OWNER'S RULING WITHOUT ANYBODY ARGUING ABOUT IT. If no receiver can act on a model name either, the roster is a file maintained for nobody and the class-publishing design is the honest answer. If one can, the ruling wins on its own merits rather than by having been written into the spec.
 
-THE MISSING COST AXIS IS NOW THE ONLY THING THAT WOULD SEPARATE THE FRONT ON PURPOSE. The two survivors differ by one point of host portability and two of attribution. They differ enormously in what they cost to build and what they save, and no axis asked.
+ONE STALE CELL IS OWED A READER AND DOES NOT CHANGE THE OUTCOME. `cand-the-seed-made-total` on `req-a-wrong-act-never-passes-silently` was scored 3 against an open pin seam that the live-read restatement has since closed. The deficit is three and this is worth one.
+
+ONE REGISTER ENTRY IS OWED A CLOSE and this state cannot write. `raid-risk-the-reader-can-take-the-leaders-only-structural-advantage` describes a graft by a line that is no longer a candidate; both perturbations in its impact field are void. `graft-onto-the-winner` is the next state that allows a write.
+
+AND THE COST AXIS IS STILL MISSING after three askings. Nothing in the surviving five measures spend, exactly one row in the 119-row pool mentions cost, and the winner happens to spend nothing on the walk without having been chosen for it.
 
 ## anything_else
 

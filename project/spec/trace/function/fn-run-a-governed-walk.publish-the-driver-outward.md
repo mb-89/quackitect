@@ -22,4 +22,4 @@ looked. Publishing the driver publishes the reading behind it.
 
 THE FUNCTION IS THE FULL STOP. Publishing is where the machine's part ends, and the requirement beside it forbids the obvious next step.
 
-SOMETHING IS ALREADY LISTENING, established 2026-08-20: the lane answers over HTTP before an agent is launched, and the agent that is launched pulls. What no receiver can do today is become a different model, which is a hole outside this function rather than inside it.
+SOMETHING IS ALREADY LISTENING AND IT CAN ACT, established 2026-08-20: the lane answers over HTTP before an agent is launched, the agent that is launched pulls, and that agent hands a step it should not take itself to a subagent on a stronger hand. What no reader can do is BECOME a different model, and nothing needs to. Both of those sit outside this function rather than inside it.

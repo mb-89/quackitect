@@ -1,8 +1,8 @@
 ---
 form: write-stories
 by: agent
-signed_off: 2026-08-20T10:54:45.945Z
-reopened: "2026-08-20T10:54:04.840Z — it says the ancestor decks last slide waits on the boot door; the last slide is about the morning read and the non-filling slide is the second to last and names no boot entry"
+signed_off: 2026-08-20T19:07:03.235Z
+reopened: "2026-08-20T19:07:01.015Z — draw-context was re-signed: the owner ruled that either hand may work the lane, and that a guide's work relayed by the walker is recorded as the guide's. Re-read against that."
 authors: agent
 files:
 ---

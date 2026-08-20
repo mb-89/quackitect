@@ -3,7 +3,7 @@ minted_in: i38-the-machine-sizes-its-own-driver-every-s
 id: fn-run-a-governed-walk.obtain-a-step-s-difficulty
 type: "[[function]]"
 cluster: the-sizing
-statement: obtain how hard a step's work is at the change size being walked, from the step's own declaration rather than from a judgment made at the time
+statement: obtain how hard a step's work is at the change size being walked, for every step that applies there, and refuse loudly where it cannot be obtained
 satisfies:
   - req-every-matrix-row-declares-its-complexity
   - req-the-complexity-value-is-read-live-and-never-pinned
@@ -14,6 +14,17 @@ outputs:
 ---
 
 ## Rationale
+
+RESTATED 2026-08-20, AFTER ITS REQUIREMENT WAS. The statement used to end "from
+the step's own declaration rather than from a judgment made at the time". That
+named the declaration mechanism, and
+`req-every-matrix-row-declares-its-complexity` dropped exactly that clause when
+it was restated at gate-architecture.
+
+WHAT IS DEMANDED NOW IS COVERAGE AND A LOUD REFUSAL. Every step that applies at
+the change size gets a difficulty, and a step that cannot get one stops the
+load. Where the number comes from is a design question and four candidates
+answer it differently.
 
 CLUSTERED AS `the-sizing` AT M4, ON A MEASUREMENT RATHER THAN A FEELING. The four
 functions of this chain are coupled to each other by three flows nothing else in

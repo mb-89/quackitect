@@ -12,7 +12,7 @@ implements:
   - fn-run-a-governed-walk.resolve-a-difficulty-to-a-driver
   - fn-run-a-governed-walk.publish-the-driver-outward
 source_refs:
-  - cand-the-receiver-decides
+  - cand-whoever-holds-the-hands-decides
   - raid-dec-the-block-names-a-rung-and-never-a-model
   - raid-dec-the-no-match-is-a-returned-value-not-a-silence
   - raid-dec-difficulty-is-two-figures-and-is-named-per-state

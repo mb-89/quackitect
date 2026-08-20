@@ -10,11 +10,11 @@ files:
 
 ## current_situation
 
-cand-the-receiver-decides was drawn at build_chart with four sections. This state adds the seams and a feasibility number, and the seams are where this candidate is most unlike the other three.
+cand-whoever-holds-the-hands-decides was drawn at build_chart with four sections. This state adds the seams and a feasibility number, and the seams are where this candidate is most unlike the other three.
 
 ## built
 
-cand-the-receiver-decides.md now carries five sections, with The seams new.
+cand-whoever-holds-the-hands-decides.md now carries five sections, with The seams new.
 
 THE RUNG VOCABULARY IS THE INTERFACE AND IT IS THE ONLY ONE. Everything published crosses a boundary we do not control, so the vocabulary has to be stable, documented and versioned in a way none of the other three need. That is not a function call; it is a published contract, and changing it later breaks a receiver we cannot see.
 

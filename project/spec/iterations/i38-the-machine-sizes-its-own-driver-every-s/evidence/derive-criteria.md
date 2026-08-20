@@ -1,8 +1,8 @@
 ---
 form: derive-criteria
 by: agent
-signed_off: 2026-08-20T11:45:11.826Z
-reopened: "2026-08-20T11:45:09.399Z — the requirements it draws its axes from were re-signed after it during the M3 repairs, including a tenth requirement minted for the extension the completeness criterion had skipped"
+signed_off: 2026-08-20T19:11:30.512Z
+reopened: "2026-08-20T19:11:18.496Z — write-requirements was re-signed: a tenth requirement stands, req-every-call-records-the-part-its-caller-played, and req-acts-carry-role-and-channel's role vocabulary is corrected. Re-read against that."
 authors: agent
 files:
 ---
@@ -16,6 +16,57 @@ M3 is blessed. This state asks which criteria will judge the candidate designs.
 FOURTEEN CRITERION AXES STAND, carried from earlier records, and the standing pairwise judgments already cover them — 123 of the 287 requirements carry a `weighs_against` and 24 carry a `weighs_with`, so both compare cards render with nothing owed.
 
 THE STATE'S OWN NOTE SAYS WHAT TO DO WITH THAT: standing criteria are reused where they still measure what matters, and the change usually adds one or two of its own. This change adds exactly one, and it had to.
+
+### Rechecked 2026-08-20, after the register was restated
+
+WHAT MOVED UPSTREAM: four musts stopped naming mechanisms. Nothing in the criterion pool moved with them.
+
+THE REASON IS THE MoSCoW SPLIT AND IT IS STRUCTURAL. A `must` is a demand and gates a candidate pass or fail. It is never scored. All four restated rows are musts, so none of them was ever an axis, before or after.
+
+THE ONE AXIS THIS CHANGE MINTED IS UNTOUCHED. `req-a-machine-decision-repeats` measures whether a decision the machine makes REPEATS, and it is a `should` with a characteristic and a fitness flag. The restatement did not touch it and its six weight judgments still hold.
+
+WHAT THE RESTATEMENT DOES CHANGE IS DOWNSTREAM OF HERE, and it is worth naming so the next reader does not look for it in this form. The four musts used to exclude designs by naming mechanisms, which meant the GATE on candidates was doing work the axes could not see. With the mechanisms gone, more candidates clear the musts and the axes carry more of the decision. That is a fact about gate-candidates, not about this pool.
+
+
+### And once more, after the sizing must was corrected
+
+THE SIZING MUST WAS RESTATED A SECOND TIME. Its first restatement made the ENGINE the driver, which `req-the-machine-names-a-driver-and-starts-nothing` forbids the lane from being. It now names the engine own act: it sizes units and publishes a difficulty.
+
+NOTHING IN THIS FORM MOVES WITH IT. All four restated rows are musts, and a must is never an axis and never a cluster boundary. The correction narrows who performs an act and changes no flow, no weight and no coupling.
+
+
+### Rechecked again, after three requirement nodes had their prose corrected
+
+WHAT MOVED: prose inside three musts, not their statements. One Detail said the maximum is the only safe reduction where the statement licenses per-state naming. One cited the wrong function for its own verification. One recorded that it was minted as a scoring axis and gates instead.
+
+NOTHING IN THIS FORM MOVES WITH IT. No statement changed, no priority changed, no flow and no coupling changed. What changed is what a reader of those three nodes is told, which is the layer above this one.
+
+### One of the three corrections is about this state's own mint
+
+`req-a-machine-decision-repeats` WAS MINTED HERE, as the fifteenth fitness axis, on the argument that the standing fourteen could not express why the chosen design is chosen.
+
+IT CARRIES `priority: must`, SO IT NEVER SCORED ANYTHING. cut-criteria said so and treated it as correct: a must is a constraint, and only a row a candidate can score badly on and still be a candidate discriminates.
+
+SO THIS STATE'S OWN ARGUMENT FOR MINTING IT IS DEFEATED BY THE FIELD IT MINTED IT WITH. The comparison still cannot score the reason for the decision.
+
+THE PRIORITY IS NOT CHANGED HERE AND THE REASON IS NOT TIMIDITY. A walk that answers differently on two machines is unauditable rather than merely worse, and a design that fails that is not a candidate. Demoting it to a `should` to make this state's argument come true would trade a real gate for a scoring row.
+
+WHAT WOULD ACTUALLY CLOSE THE HOLE is a different row: a `should` measuring how much of a decision's derivation the record carries. It is not minted at this re-signing, because the candidates already exist and weights fixed after the options can be tuned to make a favourite win — which is this state's own rule and the reason it depends only on gate-requirements.
+
+
+### And two more Details, found by a fourth pass
+
+TWO MORE REQUIREMENT DETAILS WERE PRESUMING MECHANISMS THEIR STATEMENTS HAD DROPPED. Five restatements, five orphaned Details, and the sweep that ran this morning found three of them.
+
+NOTHING IN THIS FORM MOVES. All five are musts, and a must is never an axis and never a cluster boundary.
+
+
+### And the source above all of it was restated last
+
+`uc-let-the-machine-name-the-driver` carried the seed mechanism in its own steps and every mechanism-naming requirement was a faithful derivation from it. Restated to outcomes; `gate-inputs` re-earned with the test it was missing.
+
+NOTHING IN THIS FORM MOVES. All five restated rows are musts, and a must is never an axis and never a cluster boundary.
+
 
 ## compounding
 
