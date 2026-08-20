@@ -1782,3 +1782,7 @@
 {"ts":"2026-08-20T13:28:41.839Z","op":"update","visit":"iterations/i37/package@0","node":"d1021","brief":"the dated reasoning moves to the design spec, and a pointer stays"}
 {"ts":"2026-08-20T13:28:42.133Z","op":"update","visit":"iterations/i37/package@0","node":"d1022","brief":"the pool reasoning lands where the pointer aims"}
 {"ts":"2026-08-20T13:28:42.293Z","op":"update","visit":"iterations/i37/package@0","node":"d1023","brief":"the stamp reasoning lands where the pointer aims"}
+{"ts":"2026-08-20T13:36:00.544Z","op":"done","visit":"iterations/i37/gate-validation@0","node":"d1014","brief":"package built and driven"}
+{"ts":"2026-08-20T13:36:00.971Z","op":"done","visit":"iterations/i37/gate-validation@0","node":"d1015","brief":"package built and driven"}
+{"ts":"2026-08-20T13:36:01.375Z","op":"done","visit":"iterations/i37/gate-validation@0","node":"d1016","brief":"package built and driven"}
+{"ts":"2026-08-20T13:36:10.137Z","op":"plan","visit":"iterations/i37/package@0","parent":null,"nodes":[{"id":"d1024","brief":"the package is built"},{"id":"d1025","brief":"unpacked"},{"id":"d1026","brief":"installed and driven"}]}
