@@ -611,6 +611,16 @@ export function buildServer(
     description:
       "WHO IS FILING WORK SOMEBODY ELSE DID. Send `as` naming the AUTHOR and this naming yourself.\n\nUSE IT WHENEVER YOU CARRY A DELEGATE'S ANSWER BACK. A guide that works the lane itself needs neither key. A walker that types a guide's judgment into a form needs both, or the record says the walker decided what the guide decided.\n\nIT MAY NOT EQUAL `as`. A record where the author and the relayer agree is a contradiction rather than a redundancy, and it is refused.",
   };
+  const NAMED_DRIVER_PROP = {
+    type: "string",
+    description:
+      "THE STRENGTH THIS STEP WAS TOLD IT NEEDS, as the machine published it. Send it back on the calls you make while walking that step, so the record can compare what was named against what answered without reconstructing either side.\n\nSENDING IT ARMS THE ASYMMETRY. A record carrying a named driver and no reason takes a mark saying a reason was owed and not given.",
+  };
+  const WEAKER_REASON_PROP = {
+    type: "string",
+    description:
+      "WHY A WEAKER HAND WALKED THIS STEP. A stronger hand than named needs no argument; a weaker one needs this sentence — req-a-weaker-driver-than-named-owes-a-recorded-reason.\n\nIT IS MARKED, NEVER REFUSED. Omitting it does not stop the call; it stamps the record `unreasoned`, so a walk that talked itself into staying cheap is visible instead of indistinguishable.",
+  };
   const ANSWERED_BY_PROP = {
     type: "string",
     description:
@@ -622,6 +632,8 @@ export function buildServer(
     props.as = AS_PROP;
     props.relayed_by = RELAYED_BY_PROP;
     props.answered_by = ANSWERED_BY_PROP;
+    props.named_driver = NAMED_DRIVER_PROP;
+    props.weaker_reason = WEAKER_REASON_PROP;
   }
   const server = new McpServer(
     { name: "se-mcp", version: SE_VERSION },
@@ -849,15 +861,25 @@ export function buildServer(
    *  RELAYED WORK NAMES ITS AUTHOR AND ITS RELAYER. Where the walker files work
    *  a guide authored, `part` is the guide's and `relayed_by` is the walker's —
    *  raid-risk-a-relayed-judgment-is-filed-under-the-hand-that-relayed-it. */
-  function whichHand(session: Session, args: unknown): { state: string; part: CallPart; answered_by: string; relayed_by?: CallPart } {
+  function whichHand(
+    session: Session,
+    args: unknown,
+  ): { state: string; part: CallPart; answered_by: string; relayed_by?: CallPart; named_driver?: string; weaker_reason?: string } {
     const a = (args ?? {}) as Record<string, unknown>;
     const declared = typeof a.as === "string" ? (a.as as CallPart) : undefined;
     const relayed = typeof a.relayed_by === "string" ? (a.relayed_by as CallPart) : undefined;
+    const named = typeof a.named_driver === "string" && a.named_driver !== "" ? a.named_driver : undefined;
+    // THE REASON ONLY MEANS ANYTHING BESIDE A NAMED STRENGTH. Carried alone it
+    // is a sentence about nothing, and it would suppress the `unreasoned` mark
+    // on a record that never named a driver to be weaker than.
+    const why = named !== undefined && typeof a.weaker_reason === "string" && a.weaker_reason !== "" ? a.weaker_reason : undefined;
     return {
       state: session.currentState(),
       part: declared ?? "walker",
       answered_by: typeof a.answered_by === "string" ? a.answered_by : UNREPORTED,
       ...(relayed !== undefined ? { relayed_by: relayed } : {}),
+      ...(named !== undefined ? { named_driver: named } : {}),
+      ...(why !== undefined ? { weaker_reason: why } : {}),
     };
   }
 

@@ -868,3 +868,4 @@
 {"ts":"2026-08-20T19:50:16.811Z","op":"update","visit":"iterations/i38/specify-build@0","node":"d40","brief":"walking the record"}
 {"ts":"2026-08-20T19:59:58.033Z","op":"update","visit":"iterations/i38/observe-red@0","node":"d41","brief":"walking the record"}
 {"ts":"2026-08-20T20:11:35.694Z","op":"update","visit":"iterations/i38/build-steps/the-call-record-grows-three-fields@0","node":"d42","brief":"walking the record"}
+{"ts":"2026-08-20T20:17:02.240Z","op":"update","visit":"iterations/i38/build-steps/the-log-answers-by-any-coordinate@0","node":"d43","brief":"walking the record"}

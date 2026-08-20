@@ -165,3 +165,73 @@ test("the hand vocabulary offered to a caller is the one the log enforces", asyn
     "an offer wider than the check refuses honest callers; one narrower hides parts nobody can name",
   );
 });
+
+// ── the log answers by any coordinate ─────────────────────────────────────
+//
+// Grouping by a key nothing carries returns one bucket, and so does grouping
+// by a key everybody shares. This iteration read the first as evidence of an
+// absence, and it is not evidence of anything.
+
+test("a grouping that reached nothing says so, and one that found one bucket does not", () => {
+  const log = logIn();
+  log.append({ ...base, actor: "agent", answered_by: "m", state: "s", part: "walker" });
+  log.append({ ...base, actor: "agent", answered_by: "m", state: "s", part: "walker" });
+
+  const nothing = log.query({ group_by: "banana" });
+  assert.deepEqual(nothing.groups, { "(none)": 2 });
+  assert.equal(nothing.group_by_reached_nothing, "banana", "the answer names the key nobody carries");
+
+  const shared = log.query({ group_by: "part" });
+  assert.deepEqual(shared.groups, { walker: 2 });
+  assert.equal(shared.group_by_reached_nothing, undefined, "one bucket everybody shares is a real answer");
+});
+
+test("a key some records carry is not reported as reaching nothing", () => {
+  const log = logIn();
+  log.append({ ...base, actor: "agent", answered_by: "m", state: "s", part: "walker", named_driver: "C3", weaker_reason: "because" });
+  log.append({ ...base, actor: "agent", answered_by: "m", state: "s", part: "walker" });
+  const partial = log.query({ group_by: "named_driver" });
+  assert.deepEqual(partial.groups, { C3: 1, "(none)": 1 });
+  assert.equal(partial.group_by_reached_nothing, undefined, "a partial miss is a finding, not an instrument failure");
+});
+
+test("an empty log does not claim the key reached nothing", () => {
+  const log = logIn();
+  const empty = log.query({ group_by: "part" });
+  assert.equal(empty.total, 0);
+  assert.equal(empty.group_by_reached_nothing, undefined, "nothing to reach is not the same as reaching nothing");
+});
+
+// ── a weaker walk carries its reason ──────────────────────────────────────
+//
+// The asymmetry is the design's one safety rule: a stronger hand than named
+// needs no argument, a weaker one owes a sentence. It is MARKED and never
+// refused, because refusing would be a different requirement — and because the
+// party being asked is the party being judged.
+
+test("a caller can state the named strength and the reason it went weaker", async () => {
+  const schemas = await laneSchemas();
+  for (const s of schemas) {
+    for (const key of ["named_driver", "weaker_reason"]) {
+      assert.ok(key in s.properties, `${s.name} does not accept ${key}, so the asymmetry can never be armed`);
+    }
+  }
+});
+
+test("a reason carried without a named strength is dropped, not recorded", () => {
+  const log = logIn();
+  const rec = log.append({
+    ...base,
+    actor: "agent",
+    answered_by: "m",
+    state: "s",
+    part: "walker",
+    weaker_reason: "no driver was ever named",
+  });
+  assert.equal((rec as unknown as Record<string, unknown>).unreasoned, undefined, "nothing was owed, so nothing is marked");
+  assert.equal(
+    (rec as unknown as Record<string, unknown>).weaker_reason,
+    "no driver was ever named",
+    "the field is kept as written — what is refused is letting it stand IN PLACE OF a named strength",
+  );
+});

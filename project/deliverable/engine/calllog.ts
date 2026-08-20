@@ -365,7 +365,17 @@ export class CallLog {
     group_by?: string;
     limit?: number;
     offset?: number;
-  }): { total: number; groups?: Record<string, number>; records?: CallRecord[]; offset?: number; older?: number } {
+  }): {
+    total: number;
+    groups?: Record<string, number>;
+    /** SET WHEN NO RECORD CARRIED THE KEY AT ALL. The groups then say
+     *  `(none)` and mean "asked for something nobody has", which is a
+     *  different answer from "everybody has the same value". */
+    group_by_reached_nothing?: string;
+    records?: CallRecord[];
+    offset?: number;
+    older?: number;
+  } {
     const dig = (obj: unknown, path: string): unknown =>
       path.split(".").reduce<unknown>((v, k) => (v && typeof v === "object" ? (v as Record<string, unknown>)[k] : undefined), obj);
     const f = q.filter ?? {};
@@ -376,11 +386,22 @@ export class CallLog {
     const records = this.filtered({ tool: f.tool, ok: f.ok, text: f.text, since, min_ms: f.min_ms });
     if (q.group_by !== undefined) {
       const groups: Record<string, number> = {};
+      let reached = 0;
       for (const r of records) {
-        const key = String(dig(r, q.group_by) ?? "(none)");
+        const raw = dig(r, q.group_by);
+        if (raw !== undefined && raw !== null) reached++;
+        const key = String(raw ?? "(none)");
         groups[key] = (groups[key] ?? 0) + 1;
       }
-      return { total: records.length, groups };
+      // A KEY NOTHING CARRIES AND A KEY EVERYTHING SHARES LOOK IDENTICAL from
+      // the groups alone: both are one bucket. This iteration read one as
+      // evidence of the other, so the answer now says which it is rather than
+      // leaving a reader to infer it — uc-attribute-a-finished-walk ext 2a.
+      return {
+        total: records.length,
+        groups,
+        ...(records.length > 0 && reached === 0 ? { group_by_reached_nothing: q.group_by } : {}),
+      };
     }
     // NEWEST FIRST, PAGED BACKWARDS. offset 0 is the newest page; offset 20
     // is the twenty before those. A window with no way to ask for the next
