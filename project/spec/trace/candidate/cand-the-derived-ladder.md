@@ -13,6 +13,7 @@ picks:
   - "[[opt-the-mapping-is-checked-for-totality-when-the-machine-compiles]]"
   - "[[opt-publish-the-driver-only-when-it-changes]]"
   - "[[opt-walk-a-sampled-step-twice-on-two-rungs-and-compare]]"
+  - "[[opt-the-record-carries-both-the-named-driver-and-the-one-that-answered]]"
 ---
 
 ## What it leans on
@@ -33,6 +34,20 @@ WHAT IT LEANS ON IS A FORMULA NOBODY HAS WRITTEN, and that is the whole risk.
 IT ALSO LEANS ON THE SAME UNMEASURED CLAIM AS EVERY OTHER LINE, with one
 difference: it is the only line that carries the experiment that would settle it,
 so it is the only line that can find out it was wrong.
+
+
+## Redrawn at build_chart, 2026-08-20
+
+THIS LINE WAS SILENT ON THE CALL RECORD AND HAD NO REASON TO BE. The axis `what
+the call record holds` carried one distinct value across all four lines, so the
+completeness check demanded a pick from nobody, and this candidate went to the
+scorer saying nothing about a question it is not prevented from answering.
+Nothing about computing a difficulty from a matrix cell stops the record carrying
+the driver named beside the driver that answered.
+
+IT MATTERS MORE HERE THAN ON THE BASELINE. This line's accountability is the
+double walk, and comparing two walks needs both drivers on both records or there
+is nothing to compare them by.
 
 ## Why this one
 

@@ -13,6 +13,7 @@ picks:
   - "[[opt-the-record-carries-both-the-named-driver-and-the-one-that-answered]]"
   - "[[opt-publish-the-driver-only-when-it-changes]]"
   - "[[opt-audit-a-sample-rather-than-reconcile-everything]]"
+  - "[[opt-a-driver-claim-cannot-be-made-without-a-driver-or-a-reason]]"
 ---
 
 ## What it leans on
@@ -34,6 +35,39 @@ AND IT LEANS ON TWO ASSUMPTIONS IT DID NOT CHOOSE.
 raid-asm-one-model-list-serves-every-host-the-engine-supports and
 raid-asm-the-model-ladder-is-a-total-order both stand under any line that holds
 a roster, which is this one and the derived ladder.
+
+
+## Grafted at graft-onto-the-winner, 2026-08-20
+
+TWO AXES WERE WON BY LOSERS AND THE QUESTION IS ASKED OF BOTH.
+
+req-a-wrong-act-never-passes-silently, where this line scores 3 and both
+cand-the-derived-ladder and cand-the-receiver-decides score 4. TAKEN, IN PART.
+The receiver's mechanism is that a record carrying neither a named driver nor a
+stated reason is not a valid record — the illegal made unrepresentable rather
+than merely checked — and nothing about holding a roster prevents it. Grafted:
+opt-a-driver-claim-cannot-be-made-without-a-driver-or-a-reason now sits on this
+line, on an axis it previously answered with nothing. The derived ladder's
+mechanism on the same axis CANNOT be taken: its strength is that no number is
+typed, and typing the number is what this candidate IS.
+
+ONE HALF OF THAT GRAFT IS BLOCKED BY THE CHART RATHER THAN BY THE DESIGN.
+opt-the-no-match-is-a-returned-value-not-an-absence sits on `what happens when no
+rung matches`, the axis this line already answers with the compile-time totality
+check. The two compose — the option's own note says taking both is belt and
+braces — but the chart makes them alternatives, so taking one displaces the
+other. Not grafted, and the reason is a drawing artefact of the same kind
+build_chart already recorded.
+
+req-walk-survives-host-swap, where this line scores 2 and is lowest of four.
+NOT TAKEN, AND IT CANNOT BE. The receiver wins there by holding no roster and the
+reader by sitting outside the walk; both are the thing this candidate is defined
+by not doing. What it already carries — the roster and the mapping as two records
+on two clocks — is the whole of the mitigation available to it. This axis is
+where the winner stays worst of four, and the graft state's answer is no.
+
+THE THIRD AXIS WAS WON BY NOBODY. req-acts-carry-role-and-channel scores 0 across
+all four, so there is nothing to ask for.
 
 ## Why this one
 

@@ -11,6 +11,7 @@ picks:
   - "[[opt-the-mapping-is-checked-for-totality-when-the-machine-compiles]]"
   - "[[opt-the-record-is-the-channel-and-there-is-no-separate-publication]]"
   - "[[opt-audit-a-sample-rather-than-reconcile-everything]]"
+  - "[[opt-the-record-carries-both-the-named-driver-and-the-one-that-answered]]"
 ---
 
 ## What it leans on
@@ -31,6 +32,21 @@ IT LEANS ON LESS THAN ANY OTHER LINE, WHICH IS ITS ARGUMENT.
 AND IT LEANS ON ADVICE BEING WORTH PRODUCING AT ALL. Three of the four shipped
 systems it is modelled on are dashboards, and nobody has established that anyone
 here would read one.
+
+
+## Redrawn at build_chart, 2026-08-20
+
+THIS LINE WAS SILENT ON THE CALL RECORD AND IT IS THE LINE MOST ABOUT THE RECORD.
+The axis `what the call record holds` carried one distinct value across all four
+lines, so the completeness check demanded a pick from nobody. A reader that tails
+the record, computes what each state should have run on, and writes its finding
+back into that record is a candidate whose whole architecture is the record's
+contents; leaving it silent about what the record holds was a drawing error.
+
+IT COMPOSES WITH THE CHANNEL CELL RATHER THAN COMPETING WITH IT.
+opt-the-record-is-the-channel-and-there-is-no-separate-publication says where the
+publication lands; this says what the line carries. Taking both puts the
+recommendation and the outcome on one line by construction.
 
 ## Why this one
 

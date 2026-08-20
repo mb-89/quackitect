@@ -2,7 +2,7 @@
 form: evaluate-set
 by: agent
 signed_off: 2026-08-20T13:16:33.471Z
-reopened: "2026-08-20T13:16:16.027Z — its current_situation says FOUR SCORES OF 4 WERE AWARDED and there are five: the seed takes 4 on actor-recorded and on comparison, the derived ladder 4 on wrong-act, the receiver 4 on wrong-act and on host-swap. The same paragraph then lists five named comparisons, so the form contradicts itself in two consecutive sentences."
+reopened: "2026-08-20T13:42:26.791Z — the candidate set it scored was incomplete. cand-the-derived-ladder and cand-the-reader-beside-the-walk were drawn silent on what the call record holds, because that axis carried one distinct value and the completeness check demanded a pick from nobody, so both went to the scorer saying nothing about a question neither is prevented from answering. reverse-sensitivity measured the cost: the winner leads on two axes both fed by that one cell and six of seven grafted worlds unseat it. Both lines now carry the pick and the scores must be re-earned against the redrawn set."
 authors: agent
 files:
 ---

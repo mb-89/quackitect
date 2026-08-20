@@ -410,3 +410,7 @@
 {"ts":"2026-08-20T13:31:29.440Z","op":"update","visit":"iterations/i38/declare-winner@0","node":"d291","brief":"reading declare-winner"}
 {"ts":"2026-08-20T13:32:38.675Z","op":"plan","visit":"iterations/i38/declare-winner@0","parent":null,"nodes":[{"id":"d292","brief":"recount M4 figures against the option and candidate nodes"},{"id":"d293","brief":"check engine citations at their cited lines"}]}
 {"ts":"2026-08-20T13:32:48.914Z","op":"update","visit":"iterations/i38/declare-winner@0","node":"d294","brief":"declare-winner signed"}
+{"ts":"2026-08-20T13:33:16.002Z","op":"plan","visit":"iterations/i38/graft-onto-the-winner@0","parent":null,"nodes":[{"id":"d295","brief":"escape to the desk"},{"id":"d296","brief":"reopen build_chart"},{"id":"d297","brief":"redraw the two silent lines"},{"id":"d298","brief":"re-score and re-derive"}]}
+{"ts":"2026-08-20T13:45:46.281Z","op":"done","visit":"iterations/i38/declare-winner@0","node":"d287","brief":"routing to the held gate so the fallen input is demanded"}
+{"ts":"2026-08-20T13:46:31.439Z","op":"plan","visit":"iterations/i38/derive-functions@0","parent":null,"nodes":[{"id":"d322","brief":"graft the receivers two mechanisms onto the winner"},{"id":"d323","brief":"walk to the held gate"},{"id":"d324","brief":"re-score evaluate-set against the redrawn set"}]}
+{"ts":"2026-08-20T13:47:14.275Z","op":"update","visit":"iterations/i38/derive-functions@0","node":"d325","brief":"grafting the receivers record-validity rule onto the winner"}
