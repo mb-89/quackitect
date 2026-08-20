@@ -1,8 +1,8 @@
 ---
 form: graft-onto-the-winner
 by: agent
-signed_off: 2026-08-20T17:32:42.195Z
-reopened: "2026-08-20T17:32:41.254Z — its whole question was which axis a loser beat the winner on, and the answer has changed: the actor axis was re-scored 0 to 1 by a third clean-context reader, the line that beat the winner there is eliminated on musts, and this form rests twice on the claim that the winner cannot record what answered, which the requirement own Detail contradicts"
+signed_off: 2026-08-20T19:28:20.022Z
+reopened: "2026-08-20T19:28:17.861Z — declare-winner was re-signed: the winner's adoption cost rested on a falsified sentence, and the question it handed M6 is answered — the walking agent acts on a published rung by delegating. Re-read against that."
 authors: agent
 files:
 ---

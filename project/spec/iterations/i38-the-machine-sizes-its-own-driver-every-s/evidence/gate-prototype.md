@@ -2,7 +2,8 @@
 form: gate-prototype
 bless: blessed by agent
 by: agent
-signed_off: 2026-08-20T18:14:04.671Z
+signed_off: 2026-08-20T19:36:05.818Z
+reopened: "2026-08-20T19:36:03.306Z — the spike verdict reversed and the states below it carried the old one. Re-read against that."
 authors: agent
 files:
 ---
@@ -72,7 +73,7 @@ WHAT MAKES IT BUILDABLE, checked rather than asserted. `el-sizing` is the whole 
 
 THE ONE TEST THAT MUST EXIST BEFORE ANYTHING ELSE is named on its own requirement: `req-the-complexity-value-is-read-live-and-never-pinned` is graded fatal and wants one assertion that a complexity key moves neither the demand digest nor the step shape. It is the cheapest high-value item in the set and it guards three open pinned records.
 
-WHAT IS NOT BUILDABLE AND IS NOT ASKED FOR. A receiver. Nothing in M7 builds a party that acts on a published driver, because no requirement demands one and `req-the-machine-names-a-driver-and-starts-nothing` forbids the lane being it.
+WHAT IS NOT BUILDABLE AND IS NOT ASKED FOR, AND THE REASON IS NOT THE ONE THIS FORM GAVE. Nothing in M7 builds a party that acts on a published driver — not because none exists, but because one already does and it is outside the box. The party is the walking agent, delegating. `req-the-machine-names-a-driver-and-starts-nothing` forbids the lane being it, and that stays right.
 
 AND ONE PROMOTION ARRIVES FROM A SPIKE. A placeholder row that seeds a sub-machine has no complexity of its own, and three such rows exist. Either the loader refuses a complexity there, or the rating attaches to the seeded states. THE SECOND IS BETTER AND COSTS MORE, and the build should rule rather than default.
 
@@ -124,13 +125,13 @@ AND ONE PROMOTION ARRIVES FROM A SPIKE. A placeholder row that seeds a sub-machi
 
 pass with overrides — the design is buildable and the half of the mechanism that lives outside it does not exist.
 
-WHAT THE SPIKES ESTABLISHED. Nothing can act on a published driver today, and nothing will after this build, because no requirement asks for a receiver and one requirement forbids the lane being it. The self-reported mark on the answering model is permanent on today's transport. A declared rung reproduces across two independent readers on rows that are one act.
+WHAT THE SPIKES ESTABLISHED, CORRECTED 2026-08-20. Something CAN act on a published driver today: the walking agent hands the step to a subagent on a stronger hand. The first spike returned the opposite because it searched `project/deliverable`, and the capability lives in the harness and in the contract the walker obeys. The self-reported mark on the answering model is permanent on today's transport. A declared rung reproduces across two independent readers on rows that are one act.
 
-WHAT THAT MAKES THIS. A build of a machine that names a driver correctly, publishes it honestly, and hands it to nobody. THAT IS WHAT WAS ASKED FOR and it is stated here rather than left for a reader to discover at M8.
+WHAT THAT MAKES THIS. A build of a machine that names a driver correctly, publishes it honestly, and hands it to a party that can act on it. WHAT IS STILL MISSING IS NOT THE PARTY BUT THE ACCOUNT OF IT: nothing makes the walker delegate, and nothing in the log can tell a walker's call from a guide's afterwards. `req-every-call-records-the-part-its-caller-played` is the second half and it is in this build's set.
 
 THE OVERRIDES.
 
-- The payoff waits on a party nobody has built, and building one is not this iteration's scope. Two spikes found the same absence from opposite directions.
+- WITHDRAWN 2026-08-20. This override said the payoff waits on a party nobody has built and that two spikes found the same absence from opposite directions. Both spikes searched the same tree and found the same blind spot, which is not two directions. The party exists.
 - The drift risk the third spike was seeded against is untested. Agreement is not drift, and the node says so.
 - Six cells of 154, all at `major`. A wider sample could find agreement is worse where rows inherit.
 - The assumption under every candidate — that a stronger hand does better work on a harder step — was never tested. Probe 3 tried at M4 and could not.
@@ -143,9 +144,9 @@ M7 BUILDS THE MECHANISM AND ONE TEST COMES FIRST. `req-the-complexity-value-is-r
 
 ONE PROMOTION ARRIVES FROM A SPIKE AND THE BUILD SHOULD RULE ON IT RATHER THAN DEFAULT. A placeholder row that seeds a sub-machine has no complexity of its own — `M4_25 run-candidates`, `M6_15 run-spikes`, `M7_40 build-steps`. Either the loader refuses a complexity there, or the rating attaches to the seeded states. The second is better and costs more.
 
-WHAT M7 MUST NOT QUIETLY BUILD is a receiver. No requirement asks for one and `req-the-machine-names-a-driver-and-starts-nothing` forbids the lane being it. If the build finds itself wanting one, that is a finding for a retro rather than a step to take.
+WHAT M7 MUST NOT QUIETLY BUILD is a spawner inside the lane. `req-the-machine-names-a-driver-and-starts-nothing` forbids it and that is unchanged. WHAT M7 MUST BUILD, and it is new since this gate first ran: the part-played coordinate on the call record. `req-every-call-records-the-part-its-caller-played` is a must, and its absence is why a walk driven by two hands leaves a log saying one hand drove it.
 
-AND THE QUESTION FOR WHOEVER PICKS THIS UP NEXT is one decision, not one mechanism: WHO MAY CAUSE A SPAWN ON A COMPUTED VALUE. `se-pty.ts` already spawns a command and holds a live read-write channel back. The lane may not, correctly. Nothing anywhere says who may, and that single sentence is what stands between this design and its payoff.
+AND THE QUESTION FOR WHOEVER PICKS THIS UP NEXT IS ANSWERED, corrected 2026-08-20. WHO MAY CAUSE A SPAWN ON A COMPUTED VALUE: the walking agent, and contract rule 11 says so in as many words. The lane may not, correctly. THE QUESTION THAT REPLACES IT is narrower and it is about obedience rather than capability: nothing makes the walker delegate when the machine says the step needs more, and a walker that quietly takes the step itself leaves a record indistinguishable from a correct one.
 
 ## anything_else
 

@@ -2,8 +2,8 @@
 form: gate-inputs
 bless: blessed by agent
 by: agent
-signed_off: 2026-08-20T19:08:54.445Z
-reopened: "2026-08-20T19:08:50.504Z — two sentences in this form still contradict the correction written beside them: picture_judged keeps 'terminates in a room with nobody in it' immediately after the paragraph saying that is false, and current_situation still says the walker makes every lane call. A claim and its own correction in one paragraph is the defect shape this record has already named three times."
+signed_off: 2026-08-20T19:36:53.463Z
+reopened: "2026-08-20T19:36:49.992Z — generalize-use-cases was re-signed with the third correction to the acting party. Re-read against that."
 authors: agent
 files:
 ---

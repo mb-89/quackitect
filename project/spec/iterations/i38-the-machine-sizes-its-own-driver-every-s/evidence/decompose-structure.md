@@ -1,8 +1,8 @@
 ---
 form: decompose-structure
 by: agent
-signed_off: 2026-08-20T17:36:38.829Z
-reopened: "2026-08-20T17:36:37.622Z — its elements entry repeats the over-statement that the account never records what answered, and its follow-up says the winner violates five of five musts where it now violates none — the requirements were restated and the dead function it allocated to show a conflict now shows a design choice instead"
+signed_off: 2026-08-20T19:28:32.912Z
+reopened: "2026-08-20T19:28:29.883Z — declare-winner was re-signed: the winner's adoption cost rested on a falsified sentence, and the question it handed M6 is answered — the walking agent acts on a published rung by delegating. Re-read against that."
 authors: agent
 files:
 ---

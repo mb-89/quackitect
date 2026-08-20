@@ -1,8 +1,8 @@
 ---
 form: record-adrs
 by: agent
-signed_off: 2026-08-20T17:35:21.051Z
-reopened: "2026-08-20T17:35:20.085Z — the deciding ADR stated its cost as an attribution that can never be made, which is wider than the truth: every design self-reports the answering model and what this architecture gives up is the cross-check. That over-statement reached five artifacts and decided whether this line was a candidate at all."
+signed_off: 2026-08-20T19:29:51.057Z
+reopened: "2026-08-20T19:29:49.252Z — the acting party is corrected: the walking agent reads a published complexity and acts on it by delegating the step to a subagent on a stronger hand. This form still carries the falsified claim that the receiver reads and cannot act."
 authors: agent
 files:
 ---
@@ -50,7 +50,7 @@ WHAT EACH DECISION LEAVES OPEN IS WRITTEN IN ITS OWN CONSEQUENCES, and three of 
 
 ONE REJECTED OPTION IS MARKED REVISITABLE RATHER THAN DEAD. A derived formula for the two difficulty figures would sit under this architecture without contradiction; it is rejected because nobody has designed the formula, not because the architecture refuses it.
 
-AND ONE REJECTED OPTION IS THE STRONGEST CONVERGENCE ON THE CHART. Two finders reached the driver reading the difficulty and deciding for itself, independently, from Nix and from a SCAMPER reversal. It is rejected because today's receiver reads and cannot act. That is a fact about the world rather than about the design, and `raid-dec-the-block-names-a-rung-and-never-a-model` names where it lands if the world changes.
+AND ONE REJECTED OPTION IS THE STRONGEST CONVERGENCE ON THE CHART. Two finders reached the driver reading the difficulty and deciding for itself, independently, from Nix and from a SCAMPER reversal. It is rejected on a reason that is FALSE, corrected 2026-08-20: today's reader reads and DELEGATES. That was a claim about our own tree rather than about the design, and `raid-dec-the-block-names-a-rung-and-never-a-model` names where it lands if the world changes.
 
 ## anything_else
 

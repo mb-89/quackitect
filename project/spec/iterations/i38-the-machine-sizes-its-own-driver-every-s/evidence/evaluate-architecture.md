@@ -1,8 +1,8 @@
 ---
 form: evaluate-architecture
 by: agent
-signed_off: 2026-08-20T17:38:08.975Z
-reopened: "2026-08-20T17:38:07.426Z — two of the six scenario verdicts it moved rest on the claim that this architecture can never record what answered, which the requirement own Detail contradicts, and the five-of-five must violation it hands to the gate is now none"
+signed_off: 2026-08-20T19:29:56.357Z
+reopened: "2026-08-20T19:29:52.465Z — the acting party is corrected: the walking agent reads a published complexity and acts on it by delegating the step to a subagent on a stronger hand. This form still carries the falsified claim that the receiver reads and cannot act."
 authors: agent
 files:
 ---
@@ -101,7 +101,7 @@ THE EASY CRITICISM IS SPENT. "The architecture is measured against requirements 
 
 WHAT IS LEFT IS HARDER AND SMALLER. Sixteen at-risk entries stand untouched because nothing in el-sizing bears on them; two more are chosen; three requirements are unaddressed. THE ARCHITECTURE IS NOT MEASURED AGAINST THE WRONG RULER ANY MORE, and it still does not move most of the register.
 
-AND THE ONE THING IT CANNOT ANSWER IS OUTSIDE ITSELF. `nbr-the-driver-that-performs-the-spawn` says the receiver reads and cannot act. Every scenario this architecture addresses is addressed on the assumption that publishing reaches somebody who can use it, and that assumption is M6's spike rather than this state's verdict.
+AND THE ONE THING IT CANNOT ANSWER IS OUTSIDE ITSELF, AND IT IS SMALLER THAN THIS FORM SAID. `nbr-the-driver-that-performs-the-spawn` said the receiver reads and cannot act; that node was rewritten and the party is the walking agent, which acts by delegating. Every scenario this architecture addresses is addressed on the assumption that publishing reaches somebody who can use it, and that assumption is M6's spike rather than this state's verdict.
 
 ## anything_else
 

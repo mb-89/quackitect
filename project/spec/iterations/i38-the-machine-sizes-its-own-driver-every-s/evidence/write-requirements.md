@@ -1,8 +1,8 @@
 ---
 form: write-requirements
 by: agent
-signed_off: 2026-08-20T19:09:38.827Z
-reopened: "2026-08-20T19:09:36.213Z — gate-inputs was re-signed on a corrected acting party and a widened attribution case. A tenth requirement is minted here: req-every-call-records-the-part-its-caller-played. The role vocabulary req-acts-carry-role-and-channel fixed at (owner, agent) cannot tell a walker from a guide, and its Detail is corrected."
+signed_off: 2026-08-20T19:37:11.517Z
+reopened: "2026-08-20T19:37:09.117Z — generalize-use-cases was re-signed with the third correction to the acting party. Re-read against that."
 authors: agent
 files:
 ---

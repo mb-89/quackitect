@@ -1,8 +1,8 @@
 ---
 form: generalize-use-cases
 by: agent
-signed_off: 2026-08-20T19:07:26.102Z
-reopened: "2026-08-20T19:07:24.579Z — draw-context was re-signed: the owner ruled that either hand may work the lane, and that a guide's work relayed by the walker is recorded as the guide's. Re-read against that."
+signed_off: 2026-08-20T19:36:34.056Z
+reopened: "2026-08-20T19:36:32.296Z — this form's follow-up still records the second wrong version of extension 6a as the current one. It has since been corrected a third time: the reader acts by delegating, and the pass now carries a step and an extension for it."
 authors: agent
 files:
 ---
@@ -80,7 +80,7 @@ THE TEST IS THE SAME ONE derive-functions USES: could two honestly different des
 
 - RE-EARNED AFTER write-stories WAS RE-SIGNED. Its own figure was recounted at the same time and holds: fifty use cases stood before this record and two were minted here. Nothing in this form moved.
 
-- RE-EARNED AFTER THE RECEIVER CORRECTION. uc-let-the-machine-name-the-driver changed as a node rather than through this form: extension 6a said nobody is listening and now says the receiver reads and cannot act, and a new 5a records that se-pty carries a keystroke channel into a running agent — the nearest standing thing to a receiver that could act on a published name. The pass itself, its seven steps and its guarantee are unchanged.
+- RE-EARNED THREE TIMES ON THE SAME PARTY, and each correction came from outside this state. uc-let-the-machine-name-the-driver changed as a node rather than through this form. Extension 6a said nobody is listening; then it said the receiver reads and cannot act; it now says the reader cannot BECOME a different model and does not need to, because it delegates the step to a subagent on a stronger hand. Step 6 and a new 6d carry the delegation and the account it owes. The pass's shape and its guarantee are unchanged. THE STATE THAT OWNS THE PASSES WAS NEVER THE STATE THAT FOUND THE ERROR, three times running, and that is the observation this line is worth keeping for.
 
 ## anything_else
 

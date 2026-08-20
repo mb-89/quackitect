@@ -2,8 +2,8 @@
 form: gate-requirements
 bless: blessed by agent
 by: agent
-signed_off: 2026-08-20T19:10:55.051Z
-reopened: "2026-08-20T19:10:51.401Z — write-requirements was re-signed: a tenth requirement stands, req-every-call-records-the-part-its-caller-played, and req-acts-carry-role-and-channel's role vocabulary is corrected. Re-read against that."
+signed_off: 2026-08-20T19:38:12.446Z
+reopened: "2026-08-20T19:38:08.949Z — generalize-use-cases was re-signed with the third correction to the acting party. Re-read against that."
 authors: agent
 files:
 ---

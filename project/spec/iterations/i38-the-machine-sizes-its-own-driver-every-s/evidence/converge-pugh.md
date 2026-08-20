@@ -1,8 +1,8 @@
 ---
 form: converge-pugh
 by: agent
-signed_off: 2026-08-20T17:27:32.257Z
-reopened: "2026-08-20T17:27:31.471Z — its arithmetic is over scores that have since moved and over a candidate the must-check has since eliminated: plain sums were reader 12 receiver 11 and are now receiver 12 reader 11, weighted was reader 35 receiver 34 and is now receiver 36 reader 33, and cand-the-reader-beside-the-walk violates two musts so it is not a candidate at all"
+signed_off: 2026-08-20T19:26:16.714Z
+reopened: "2026-08-20T19:26:14.848Z — gate-candidates was re-signed. This form's section headed 'What is inert, and it is inert for the third time' has the cause backwards: the axis was not inert, it forbade its own answer. Its Detail fixed the role vocabulary at two values, and every line on this chart is a design about which of two agents walks a step."
 authors: agent
 files:
 ---
@@ -50,11 +50,19 @@ DATUM IS THE STRONGEST ELIGIBLE RIVAL, which is `cand-the-seed-made-total` at 9,
 
 THE RECEIVER TAKES THE SEAT AND THE RUN IS STABLE AT ONE ITERATION. Re-running with it as datum returns the same ordering, because it is equal or better than both rivals on every axis and strictly better on two — it DOMINATES both, which the previous run's leader did not.
 
-### What is inert, and it is inert for the third time
+### What was called inert three times, and was defective
 
-`req-acts-carry-role-and-channel` contributes zero to every cell of every line under three independent scorings. Twelve zeroes. It moves nothing and it stays, because striking a criterion after seeing its scores cannot be honest.
+`req-acts-carry-role-and-channel` contributes zero to every cell of every line under four independent scorings. Twelve zeroes, now sixteen. It moves nothing and it stays, because striking a criterion after seeing its scores cannot be honest.
 
-AND ITS TWIN IS CAPPED BY IT. `req-the-actor-is-recorded-where-the-call-is-served` is the READER'S half of accountability and no candidate contains a reader of the acting role, so no line scores above 2 there. Two of five axes measure the two halves of something nobody addresses.
+THIS SECTION READ THE ZEROES AS FOUR SILENT CANDIDATES AND THE CAUSE WAS THE AXIS, corrected 2026-08-20. The requirement's Detail fixed the role vocabulary at exactly two values, `(owner, agent)`. Every line on this chart is a design about WHICH HAND walks a step, and under a two-value vocabulary a walker and a hand it delegates to are both the second value.
+
+SO NO CANDIDATE COULD HAVE SCORED ABOVE 0 WHATEVER IT PROPOSED. An axis that no line can move is usually a defective axis, and this record called it inert three times instead.
+
+THE DETAIL IS CORRECTED AND THE SCORES STILL DO NOT MOVE. A fourth scorer, told only what changed, put all four at 0 again. The number is identical and it now means the opposite thing: before, the zeroes carried no information about any candidate; now they are a real fact about four lines that are silent on an answerable demand.
+
+AND THE INFERENCE THIS SECTION DREW FROM THE WRONG CAUSE IS ALSO WRONG. It said `req-the-actor-is-recorded-where-the-call-is-served` is CAPPED by its twin because the writer's half is unaddressed. The writer's half was unaddressABLE. The cap is a fact about the pair of requirements, not about what the candidates chose to leave alone.
+
+WHAT SURVIVES UNCHANGED: two of five axes measure the two halves of something nobody addresses, and the ordering does not depend on either of them.
 
 ## matrix_runs
 

@@ -1,8 +1,8 @@
 ---
 form: evaluate-set
 by: agent
-signed_off: 2026-08-20T17:01:54.280Z
-reopened: "2026-08-20T17:01:52.843Z — run-candidates re-signed after correcting an undercount of the invented-state references from two to five"
+signed_off: 2026-08-20T19:23:32.780Z
+reopened: "2026-08-20T19:22:35.519Z — cut-criteria was re-signed. A fourth scoring pass, cold and told only what changed, re-judged both account axes against the corrected acting party. Eight cells, eight holds — but the reasons under six of them move, and the reading of the twelve zeroes on req-acts-carry-role-and-channel is now the opposite of what this form recorded."
 authors: agent
 files:
 ---
@@ -51,93 +51,78 @@ AND A CORRECTION THE FIRST PASS'S NARRATIVE RESTED ON. That form said cand-the-d
 
 ## reading
 
-### Re-scored a third time, 2026-08-20, after the must gaps were filled
+undefined
 
-TWO AXES MOVED AND A THIRD SCORER MOVED THEM. `req-the-actor-is-recorded-where-the-call-is-served` and `req-comparison-carries-both-sides` were re-scored across all four lines by a reader with a clean context, told which sections had been added today, by whom, and to distrust them.
+### A fourth scoring pass, 2026-08-20 — eight cells re-judged, eight hold
 
-WHY THESE TWO AND NOT THE OTHER THREE. cand-the-derived-ladder gained a pick it had been silent on rather than against, and cand-whoever-holds-the-hands-decides was found over-stating its own limit. Both bear on these two axes and on nothing else.
+WHAT PROMPTED IT. The claim "the receiver reads and cannot act" was falsified.
+The party that acts on a published complexity is the walking agent, which hands
+the step to a subagent on a stronger hand. A cold scorer, told only what changed
+and given no expectation, re-judged both account axes across all four lines.
 
-#### The actor axis is the READER'S half, and nothing on the chart touches a reader
+THE NUMBERS DO NOT MOVE. `req-comparison-carries-both-sides` stays 3, 3, 2, 3.
+`req-acts-carry-role-and-channel` stays 0, 0, 0, 0. Nothing on the front
+changes and the winner is unchanged.
 
-THE SCORER READ THE AXIS PROPERLY AND THIS RECORD HAD NOT. `req-the-actor-is-recorded-where-the-call-is-served` says in its own Detail "A STAMP THAT NOTHING READS IS NOT ACCOUNTABILITY", and its measure is readers that derive the role from a tool name.
+### What moves under axis 1, which is the argument rather than the score
 
-ALL FOUR CANDIDATES OPERATE ON THE WRITER'S HALF, which is the twin axis `req-acts-carry-role-and-channel` — the one that scored 0 across all four, twice, under two independent scorers.
+THE ROW WAS PROMOTED PAST FORTY-TWO OTHERS ON A REASON THAT HAS NOW FAILED
+TWICE, and the second failure is today's. The reason was that
+`cand-whoever-holds-the-hands-decides` structurally cannot carry both sides,
+because nothing of ours ever learns which model the rung resolved to. Our own
+walking agent picks the hand it spawns, so something of ours does learn it.
 
-SO NOTHING ON THIS AXIS SCORES ABOVE 2, and the ceiling is a property of the chart rather than of any line on it.
+AND THE ROW NO LONGER SEPARATES THE ELIGIBLE SET. All three eligible lines sit
+at 3. The only spread on the axis is one point on
+`cand-the-reader-beside-the-walk`, which is out on two must violations and is
+not a candidate.
 
-#### What moved
+WHAT THE COST ACTUALLY IS, and it is smaller and true. This line holds no
+roster, so it has nothing to check a self-report against. The record is
+complete; the cross-check is gone.
 
-- cand-whoever-holds-the-hands-decides on the actor axis: 0 to 1. Its 0 was anchored on "can never record what answered", which is false against `req-every-call-records-the-model-that-answered-it`'s own Detail: "the transport hands the engine a client name and no model, so today the value can only come from the caller."
-- cand-the-reader-beside-the-walk on the comparison axis: 3 to 2. Its reader counts reopens against walks and writes the finding into the record; the bucket boundaries that turn a rate into a rung are still unchosen, which the candidate's own seams section already said.
+### What moves under axis 2, which is the meaning of a zero
 
-#### What did not move, and this is the part worth reading
+TWELVE ZEROES WERE READ AS FOUR SILENT CANDIDATES AND THEY WERE AN AXIS THAT
+FORBADE ITS OWN ANSWER. `req-acts-carry-role-and-channel`'s Detail fixed the
+role vocabulary at (owner, agent). Every one of these four lines is a design
+about WHICH HAND walks a step, and under a two-value vocabulary a walker and a
+hand it delegates to are both the second value.
 
-cand-the-derived-ladder gained the named-and-answered pick and its actor score DID NOT MOVE. The added section claimed it would. IT WAS WRONG, and the scorer said so: adding a driver pair to what the record WRITES does not move an axis about what a reader TAKES.
+SO NO CANDIDATE COULD HAVE SCORED ABOVE 0 WHATEVER IT PROPOSED. The Detail is
+corrected and the axis is now answerable.
 
-THAT CORRECTION CAME BACK AT THE HAND THAT WROTE THE CLAIM, which is what commissioning it was for.
+IT IS STILL UNANSWERED BY ALL FOUR, and the zero now carries information it did
+not carry before. The closest miss is
+`cand-whoever-holds-the-hands-decides`, the only line whose text names both
+hands — "the party is the walking agent, and it acts by handing the step to a
+stronger hand" — but naming a party in a rationale is not proposing a stamp.
+What it says the record carries is exhaustive and role-free: "It can record what
+it NAMED: the rung it published and the state it published it for."
 
-#### The vectors after the re-score
+### One line's evidence becomes producible, and it still earns no point
 
-Axes in order: a-wrong-act-never-passes-silently, walk-survives-host-swap, acts-carry-role-and-channel, the-actor-is-recorded-where-the-call-is-served, comparison-carries-both-sides.
+`cand-the-derived-ladder` proves both sides by execution rather than by report:
+a sampled step walked twice, once at the named rung and once a rung below, and
+the two signed forms compared. Under the falsified claim that nothing could act
+on a published rung, that second walk had no executor and the experiment was
+un-runnable.
 
-- cand-the-seed-made-total: 3, 2, 0, 1, 3
-- cand-the-derived-ladder: 3, 2, 0, 1, 3
-- cand-the-reader-beside-the-walk: 4, 3, 0, 2, 2
-- cand-whoever-holds-the-hands-decides: 4, 4, 0, 1, 3
+THE CORRECTED PARTY SUPPLIES ONE. A walking agent delegating a step to a
+subagent on a chosen model is exactly "walked twice".
 
-#### The front, and it is not the front the last pass drew
+THE SCORE STILL DOES NOT MOVE, and the reason is the scale rather than the
+design. The cell already sits at "meets the requirement, holes recorded"; 4 and
+5 need a named external comparison and this cell's prior art is none. The
+strengthened reason is recorded instead of a point being invented for it.
 
-cand-whoever-holds-the-hands-decides is equal or better than cand-the-seed-made-total and cand-the-derived-ladder on every axis and strictly better on two, so it dominates both. Those two score identically to each other and neither dominates the other.
+### A new must exists and no line answers it
 
-cand-the-reader-beside-the-walk and cand-whoever-holds-the-hands-decides trade: the reader is better on the actor axis, the receiver on host-swap and on comparison. Neither dominates.
-
-SO THE FRONT IS THE SAME TWO LINES AND THE REASON IS DIFFERENT. Last pass the reader dominated the seed and the derived ladder and the receiver did not. This pass the receiver dominates both and the reader does not — the reader's drop on comparison is what released them from it.
-
-THAT IS WORTH SAYING PLAINLY: the front is unchanged and every relationship inside it changed. A reading that only reported the front would have reported nothing moved.
-
-#### One axis scored alike and it scored zero, for the third time
-
-`req-acts-carry-role-and-channel`: 0, 0, 0, 0. Three independent scorers with clean contexts, four candidates, twelve zeroes.
-
-IT STILL STAYS, for the reason it stayed twice before: striking a criterion after seeing its scores is the one edit that cannot be honest.
-
-AND ITS TWIN IS WHY THE ACTOR AXIS IS CAPPED. The writer's half scores zero everywhere and the reader's half cannot rise above 2 while it does. Two of the five surviving axes are measuring the two halves of something no candidate addresses.
-
-#### The missing criterion is still missing
-
-Nothing in the surviving five measures spend. Of the 119 rows in the standing pool exactly one mentions cost and it is a process rule. Both lines on the front spend nothing on the walk — the reader because it sits outside it, the receiver because it publishes and stops — and neither was chosen for that, because no axis asked.
-
-### The open host-swap question, resolved without re-scoring
-
-CUT-CRITERIA HANDED THIS STATE ONE QUESTION. `cand-the-seed-made-total` declines the fall-through branch of `opt-a-declared-class-with-a-named-fallback-pool`, because `req-an-unmatched-rung-names-itself-and-publishes-no-driver` forbids it. The branch carried a host-portability claim — "a default pool is what a host without the named worker falls to" — and the seed scores 2 on `req-walk-survives-host-swap`.
-
-IT IS NOT RE-SCORED AND THE FRONT IS UNAFFECTED, and the argument is arithmetic rather than judgment.
-
-DECLINING A PORTABILITY MECHANISM CAN ONLY LOWER THE SCORE OR HOLD IT. Nothing about refusing where you could have fallen through makes a design survive a host swap better.
-
-THE SEED IS ALREADY DOMINATED BY `cand-whoever-holds-the-hands-decides`: 3, 2, 0, 1, 3 against 4, 4, 0, 1, 3. Equal or better on every axis, strictly better on two.
-
-A LOWER HOST-SWAP SCORE KEEPS IT DOMINATED and cannot put it on the front. So the cell can only move in a direction that changes nothing, and re-scoring it would spend a fourth clean-context reader to confirm an ordering that already holds.
-
-WHAT THIS DOES NOT SETTLE, said rather than left implied: whether the seed's 2 is right. It is a standing figure from the third pass and it is not re-earned here. If the seed ever returns to the front, this cell is owed a reader.
-
-### One upstream claim withdrawn, and this state's score already did not rest on it
-
-CUT-CRITERIA WITHDREW ITS SENTENCE that `req-comparison-carries-both-sides` is "the row cand-whoever-holds-the-hands-decides fails structurally". Every line self-reports the answered driver, so every line carries both sides; what this one lacks is a roster to check the self-report against.
-
-THIS STATE'S SCORE FOR THAT PAIR WAS ALREADY 3 AND STAYS 3. The third scoring pass anchored it on the candidate's own "THE MEASUREMENT SEAM IS BROKEN AND THE CANDIDATE ADMITS IT" — a stated missing half, not a structural failure — which is exactly the reading cut-criteria has now adopted.
-
-SO THE WITHDRAWAL CHANGES AN ARGUMENT UPSTREAM AND NO NUMBER HERE. Recorded because a reader finding the two forms disagreeing yesterday should be able to see which one moved.
-
-### The anchors were re-checked against the files after the fourth pass
-
-A FABRICATED CITATION WAS FOUND IN THE CANDIDATE FILES and it is the kind of thing an anchor can inherit, so every anchor in the table above was re-read against its source.
-
-ALL EIGHT MOVED ANCHORS HOLD. The two axes re-scored by the third pass quote sentences that are still in the files they are attributed to.
-
-ONE OLDER ANCHOR DOES NOT AND IT WAS ALREADY REPLACED. The first scoring pass anchored `cand-the-seed-made-total` on the comparison axis to "An acceptable over-driving rate is stated in advance, and a sample is audited against it." That sentence was in the seed's prose and the seed does not pick the option it describes. The third pass replaced the anchor and the candidate now records what the missing half costs it.
-
-WHAT THIS ARGUES FOR, and it is cheap: an anchor is a quotation with a named source, so a check that the quoted string appears in the named file is mechanical. Nothing runs it. Both defects found in anchors this milestone — a sentence attributed to the wrong file, and a sentence describing an unpicked mechanism — would have been caught by different halves of the same check.
+`req-every-call-records-the-part-its-caller-played` was minted after this state
+last signed. A separate cold pass held it against all four: none answers it,
+none obstructs it, and it is fillable on all four identically — the same shape as
+the three account musts already handled uniformly. It changes no elimination and
+no score.
 
 ## follow_up
 

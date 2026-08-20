@@ -1,8 +1,8 @@
 ---
 form: derive-functions
 by: agent
-signed_off: 2026-08-20T19:10:15.254Z
-reopened: "2026-08-20T19:10:07.906Z — write-requirements was re-signed: a tenth requirement stands, req-every-call-records-the-part-its-caller-played, and req-acts-carry-role-and-channel's role vocabulary is corrected. Re-read against that."
+signed_off: 2026-08-20T19:37:33.358Z
+reopened: "2026-08-20T19:37:26.416Z — generalize-use-cases was re-signed with the third correction to the acting party. Re-read against that."
 authors: agent
 files:
 ---

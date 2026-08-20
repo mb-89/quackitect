@@ -1,7 +1,8 @@
 ---
 form: rank-unknowns
 by: agent
-signed_off: 2026-08-20T17:46:14.718Z
+signed_off: 2026-08-20T19:30:59.837Z
+reopened: "2026-08-20T19:30:53.686Z — gate-architecture was re-signed. This state seeded a spike on the sentence 'the receiver reads and cannot act', and that sentence is false. The spike ran, searched the reachable tree, and confirmed the falsehood. The pick was right and its stated reason was inherited from a wrong node."
 authors: agent
 files:
 ---
@@ -22,11 +23,11 @@ WHAT IS LEFT AFTER THAT FILTER is small, and it is exactly the set this iteratio
 
 `raid-dep-the-payoff-waits-on-a-weak-model-being-able-to-boot-at-all` — crippling, expected, open.
 
-THE WHOLE ARCHITECTURE IS DOWNSTREAM OF ONE SENTENCE. `nbr-the-driver-that-performs-the-spawn` says the receiver reads and cannot act, rewritten in this record after the first version claimed otherwise. Every scenario the declared architecture addresses is addressed on the assumption that publishing reaches somebody who can use it.
+THE WHOLE ARCHITECTURE IS DOWNSTREAM OF ONE SENTENCE, AND THE SENTENCE WAS FALSE. `nbr-the-driver-that-performs-the-spawn` said the receiver reads and cannot act. Every scenario the declared architecture addresses is addressed on the assumption that publishing reaches somebody who can use it, and it does. CORRECTED 2026-08-20: the party is the walking agent, which hands a step it should not take itself to a subagent on a stronger hand.
 
 IT IS SPIKEABLE AND CHEAP. `se-start.ts` spawns the lane and proves it answers before launching an agent; `se-pty.ts` runs an agent inside a pseudo-terminal with a live read-write channel. The probe is whether a published rung can reach either path and change what is started, inside a timebox, once.
 
-AND IT SETTLES THE OWNER'S RULING WITHOUT ANYBODY ARGUING ABOUT IT. If no receiver can act on a model name either, the roster is a file maintained for nobody and publishing a class is the honest answer. If one can, the ruling wins on merit rather than by having been written into the spec.
+AND IT SETTLED THE OWNER'S RULING WITHOUT ANYBODY ARGUING ABOUT IT, THE OTHER WAY. A party can act on a model name, so the roster is not a file maintained for nobody and the ruling wins on merit. WHAT THIS STATE GOT RIGHT AND WHY IT IS WORTH SAYING: the pick was correct and its stated reason was inherited from a node that was wrong. Seeding a spike on the load-bearing sentence is the right instinct even when the sentence is believed rather than checked — that is what a spike is for.
 
 #### 2. What the record can honestly say about who acted
 

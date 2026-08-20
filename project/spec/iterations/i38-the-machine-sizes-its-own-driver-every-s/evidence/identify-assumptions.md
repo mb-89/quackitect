@@ -1,8 +1,8 @@
 ---
 form: identify-assumptions
 by: agent
-signed_off: 2026-08-20T19:10:10.929Z
-reopened: "2026-08-20T19:10:08.220Z — write-requirements was re-signed: a tenth requirement stands, req-every-call-records-the-part-its-caller-played, and req-acts-carry-role-and-channel's role vocabulary is corrected. Re-read against that."
+signed_off: 2026-08-20T19:37:29.549Z
+reopened: "2026-08-20T19:37:26.697Z — generalize-use-cases was re-signed with the third correction to the acting party. Re-read against that."
 authors: agent
 files:
 ---
@@ -76,7 +76,7 @@ AND THE REPAIR ORDER IS THE FINDING. Requirements were repaired first, then func
 - toolchain: SWEPT, NOTHING NEW. The mechanism needs a file read, a comparison and two record fields; nothing about Node, the typechecker, the linter or the test runner is leaned on beyond what every other lane verb already assumes. The one toolchain-adjacent claim — that a test can assert complexity stays out of the demand digest — was verified live rather than assumed: demandOf serialises evidence-field structure and shapeOf reads four named keys today.
 - host: SWEPT, AND IT WAS ALREADY REGISTERED. raid-asm-one-model-list-serves-every-host-the-engine-supports stands at `expected` on the evidence that a model alias already resolves to different models on different providers, against three registered hosts of which two are a different vendor. Nothing new here; re-read rather than re-derived.
 - platform: SWEPT, AND ONE ASSUMPTION HAD NO NODE. The design rules that asking for a STRONGER driver needs no argument, which is only safe if model strength is a single well-ordered dimension. Nothing establishes that, and the lane's own guidance already warns that a capable model re-derives a drawn field or writes an essay where a pick was wanted — which is a stronger model doing a C1 state WORSE. Minted as raid-asm-the-model-ladder-is-a-total-order.
-- neighbours: SWEPT, AND THE ANSWER CHANGED AT THIS MILESTONE'S OWN GATE. nbr-the-driver-that-performs-the-spawn was drawn empty at M2 on the claim that nothing listens on an unattended box; that was falsified and the node now says the receiver reads and cannot act. THE ASSUMPTION UNDER IT is already carried by raid-dep-the-payoff-waits-on-a-weak-model-being-able-to-boot-at-all and by the neighbour itself. NOTHING NEW MINTED, because the correction did the work an assumption would have.
+- neighbours: SWEPT, AND THE ANSWER CHANGED AT THIS MILESTONE'S OWN GATE. nbr-the-driver-that-performs-the-spawn was drawn empty at M2 on the claim that nothing listens on an unattended box; that was falsified and the node then said the receiver reads and cannot act. THAT WAS FALSIFIED TOO, 2026-08-20: the party is the walking agent, which acts by delegating. THE NODE HAS NOW BEEN WRONG ABOUT THE SAME PARTY TWICE and each correction was found from outside this state. NOTHING NEW MINTED HERE and one thing minted since: raid-risk-a-relayed-judgment-is-filed-under-the-hand-that-relayed-it, because the delegation the correction reveals is unobservable in the log where the walker files the delegate's work.
 - people: SWEPT, AND THE HOLE IS OLDER THAN THIS ITERATION. The fixed list works only while somebody maintains it by hand, and the role that would has no node — one of four uncovered roles now, carried by raid-iss-two-always-on-roles-have-no-node-and-one-now-carries-a-duty. NOT RE-MINTED AS AN ASSUMPTION, because it is not something being treated as true; it is a duty with nobody assigned, which is an issue and already stands as one.
 
 ## follow_up

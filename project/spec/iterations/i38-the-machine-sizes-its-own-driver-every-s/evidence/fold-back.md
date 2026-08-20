@@ -1,7 +1,8 @@
 ---
 form: fold-back
 by: agent
-signed_off: 2026-08-20T18:10:45.755Z
+signed_off: 2026-08-20T19:35:01.369Z
+reopened: "2026-08-20T19:34:59.493Z — one paragraph in this form still says the iteration ships a machine that hands its driver to nobody, and the paragraph above it now says the opposite."
 authors: agent
 files:
 ---
@@ -16,13 +17,13 @@ Three experiments stand and each carries its own `folds_to` and `promote`. This 
 
 ONE `promote` IS NOT NONE. `exp-two-hands-rating-the-same-six-cells` promotes a loader change: a placeholder row that seeds a sub-machine should not carry a complexity of its own, or the rating should attach to the states the sub-machine seeds.
 
-THE OTHER TWO PROMOTE NOTHING, and both say why on their own faces rather than leaving a blank. What spike 1 settles is that the payoff needs a party nobody has built, and building one is not this iteration's scope. What spike 2 settles is that a mark the requirement already demands is permanent rather than temporary.
+TWO PROMOTIONS NOW, corrected 2026-08-20. This paragraph said spike 1 promotes nothing because the payoff needs a party nobody has built. THE VERDICT IS REVERSED. Spike 1 now HOLDS and promotes the party itself: the walking agent reads a published complexity and acts on it by delegating the step to a subagent on a stronger hand. What spike 2 settles is unchanged — a mark the requirement already demands is permanent rather than temporary.
 
-NOTHING IS REOPENED UPSTREAM and that is a finding rather than an omission. All three spikes CONFIRMED what the register already said — the dependency is real, the transport carries no model, a declared rung reproduces. A spike that confirms changes nothing upstream by definition, and this is the first state in the milestone that has not had to reopen something.
+THIS STATE SAID NOTHING IS REOPENED UPSTREAM AND CALLED THAT A FINDING. It was wrong, and the reason is the sharpest thing in this milestone: all three spikes were read as CONFIRMING what the register already said, and spike 1 confirmed a sentence that was false. A spike that confirms a false premise looks exactly like a spike that confirms a true one. WHAT IS REOPENED NOW: `raid-dep-the-payoff-waits-on-a-weak-model-being-able-to-boot-at-all` is misstated rather than confirmed, and the reopen ran from `frame-delta` down.
 
 ### What each folds to
 
-`exp-can-anything-act-on-a-published-driver` FOLDS TO `raid-dep-the-payoff-waits-on-a-weak-model-being-able-to-boot-at-all`, confirmed rather than settled. `nbr-the-driver-that-performs-the-spawn` is confirmed too: the receiver reads and cannot act, and now the cause is named — nothing re-spawns mid-walk, so the agent is chosen once by a person before the first pull.
+`exp-can-anything-act-on-a-published-driver` FOLDS TO `raid-dep-the-payoff-waits-on-a-weak-model-being-able-to-boot-at-all`, MISSTATED rather than confirmed. The dependency reads as blocking every acting design on a capability nobody has, and the capability exists: contract rule 11 grants the spawn and `project/guidance/method/subagents.md` § Which model sizes it. `nbr-the-driver-that-performs-the-spawn` is REWRITTEN rather than confirmed. WHAT SURVIVES AND IS NARROWER: nothing re-spawns mid-walk, so a running agent cannot become a different model — and it does not need to, because it delegates.
 
 `exp-what-the-lane-can-learn-about-the-answering-model` FOLDS TO `req-every-call-records-the-model-that-answered-it`, whose self-reported mark is now known to be permanent on today's transport. The requirement does not move; what moves is that a reader can stop treating the mark as a temporary state.
 
@@ -32,9 +33,9 @@ NOTHING IS REOPENED UPSTREAM and that is a finding rather than an omission. All 
 
 SPIKE 1 NEEDS A PARTY THAT SPAWNS ON A PUBLISHED VALUE. Spike 2 needs a party that reports what it started. THOSE ARE THE SAME PARTY, and neither spike was looking for the other's answer.
 
-IT IS NOT A MISSING MECHANISM. `se-pty.ts` already spawns a command and holds a live read-write channel back. What is missing is a decision about WHO MAY CAUSE A SPAWN on a computed value — `req-the-machine-names-a-driver-and-starts-nothing` says correctly that the lane may not, and nothing says who may.
+IT IS NOT A MISSING MECHANISM AND IT IS NOT A MISSING PARTY EITHER. `se-pty.ts` already spawns a command and holds a live read-write channel back, and contract rule 11 already says who may cause a spawn on a computed value: the walking agent, without asking. `req-the-machine-names-a-driver-and-starts-nothing` says correctly that the LANE may not.
 
-THAT IS NOT THIS ITERATION'S TO DECIDE and it is what `gate-prototype` should be made to say out loud: this ships a machine that names a driver correctly, publishes it honestly, and hands it to nobody.
+SO WHAT `gate-prototype` SHOULD SAY OUT LOUD IS THE OPPOSITE OF WHAT THIS PARAGRAPH FIRST CLAIMED, corrected 2026-08-20: this ships a machine that names a driver, publishes it, starts nothing, and hands it to a party that can act. THE HOLE THAT REPLACES IT is that nothing makes that party delegate, and nothing in the log can tell its calls from the walker's afterwards.
 
 ## folded
 

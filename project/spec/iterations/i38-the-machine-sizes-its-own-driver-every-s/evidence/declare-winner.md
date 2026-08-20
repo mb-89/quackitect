@@ -1,8 +1,8 @@
 ---
 form: declare-winner
 by: agent
-signed_off: 2026-08-20T17:30:48.045Z
-reopened: "2026-08-20T17:30:47.296Z — converge-pugh and reverse-sensitivity were both re-run after the must-check eliminated the runner-up and two axes were re-scored: this form declares over a front of two where the eligible front is one, and its account of the previous declaration rests on figures that have since swapped"
+signed_off: 2026-08-20T19:27:59.391Z
+reopened: "2026-08-20T19:27:57.590Z — one paragraph in the comments field still carries the falsified sentence: the winner needs a receiver that reads a rung and acts, and the neighbour says none can. That neighbour was rewritten. A claim and its correction standing in one form is the defect shape this record has now named five times."
 authors: agent
 files:
 ---
@@ -56,13 +56,13 @@ THAT IS ALSO WHY IT DOES NOT SERVE THE SECOND GOAL. The same choice buys the hos
 
 TWO ASSUMPTIONS STOP BEING NEEDED RATHER THAN BEING WEAKENED. `raid-asm-one-model-list-serves-every-host-the-engine-supports` and `raid-asm-the-model-ladder-is-a-total-order` both concern a roster this line does not hold. THAT IS WORTH LESS THAN IT LOOKS: an assumption closed by removing what it is about is not an assumption tested.
 
-AND ITS ADOPTION COST IS THE LARGEST OF THE FOUR. It needs a receiver that reads a rung and acts, and `nbr-the-driver-that-performs-the-spawn` says the receiver reads and cannot act. It is the furthest of the four from anything shippable alone, and that is the sentence M6's spike exists to test.
+AND ITS ADOPTION COST IS THE LARGEST OF THE FOUR, for a narrower reason than this form first gave. It needs a party that reads a rung and maps it to a hand. CORRECTED 2026-08-20: this paragraph said `nbr-the-driver-that-performs-the-spawn` proves no such party exists. That node was wrong and has been rewritten. The party is the walking agent, which acts by delegating the step to a subagent on a stronger hand — contract rule 11 and `project/guidance/method/subagents.md` § Which model. WHAT THE ADOPTION COST ACTUALLY IS: the rung vocabulary becomes a published contract that whoever holds the hands implements against, and for a consumer outside our tree we cannot audit the mapping. Inside our own deployment the mapper is our own walker, and the cost is that we hold no roster to check what it reports.
 
 ## follow_up
 
-M6 INHERITS ONE QUESTION THAT DECIDES WHETHER ANY OF THIS SHIPS. Can a receiver read a published rung and start a stretch on it? `nbr-the-driver-that-performs-the-spawn` says it reads and cannot act, and the winner's entire value is downstream of that sentence being fixable.
+M6 INHERITED ONE QUESTION THAT DECIDES WHETHER ANY OF THIS SHIPS, AND IT IS ANSWERED. Can a party read a published rung and start a stretch on it? YES. It does not relaunch itself; it hands the step to a subagent on a stronger hand. `exp-can-anything-act-on-a-published-driver` first returned the opposite verdict because it searched `project/deliverable` for a spawner, and the capability lives in the harness and in the contract the walker obeys.
 
-AND THAT SPIKE ALSO SETTLES THE OWNER'S RULING WITHOUT ANYBODY ARGUING ABOUT IT. If no receiver can act on a model name either, the roster is a file maintained for nobody and the class-publishing design is the honest answer. If one can, the ruling wins on its own merits rather than by having been written into the spec.
+AND THAT SPIKE ALSO SETTLES THE OWNER'S RULING WITHOUT ANYBODY ARGUING ABOUT IT, AND IT SETTLES IT THE OTHER WAY. A party CAN act on a model name, so the roster is not a file maintained for nobody and the ruling wins on merit. What the winner gives up is the roster itself, and with it the ability to check what the acting party reports back.
 
 ONE STALE CELL IS OWED A READER AND DOES NOT CHANGE THE OUTCOME. `cand-the-seed-made-total` on `req-a-wrong-act-never-passes-silently` was scored 3 against an open pin seam that the live-read restatement has since closed. The deficit is three and this is worth one.
 

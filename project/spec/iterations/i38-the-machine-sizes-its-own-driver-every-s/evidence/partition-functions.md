@@ -1,8 +1,8 @@
 ---
 form: partition-functions
 by: agent
-signed_off: 2026-08-20T19:11:22.212Z
-reopened: "2026-08-20T19:11:18.786Z — write-requirements was re-signed: a tenth requirement stands, req-every-call-records-the-part-its-caller-played, and req-acts-carry-role-and-channel's role vocabulary is corrected. Re-read against that."
+signed_off: 2026-08-20T19:38:36.400Z
+reopened: "2026-08-20T19:38:33.050Z — generalize-use-cases was re-signed with the third correction to the acting party. Re-read against that."
 amended: "2026-08-20T14:09:13.627Z by agent — two mutually consistent miscounts of the-walk's size, caught by a hostile pass recounting this form's own clusters table"
 authors: agent
 files:

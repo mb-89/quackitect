@@ -1,7 +1,8 @@
 ---
 form: can-a-receiver-act
 by: agent
-signed_off: 2026-08-20T18:03:39.215Z
+signed_off: 2026-08-20T19:35:46.114Z
+reopened: "2026-08-20T19:35:18.017Z — the verdict reversed"
 authors: agent
 files:
 ---
@@ -52,9 +53,9 @@ THAT MAKES IT A RATING THAT WILL BE WRONG FOR ONE OF TWO CAREFUL READERS however
 
 ONE PROMOTION COMES OUT OF THESE THREE and it is small, mechanical and not yet built: THE LOADER SHOULD REFUSE A COMPLEXITY ON A PLACEHOLDER ROW, or the rating should attach to the states the sub-machine seeds, where the work actually is. Three such rows already exist and each would otherwise carry a figure two careful readers disagree about.
 
-TWO REGISTER ENTRIES ARE NARROWED AND NEITHER CLOSES. `raid-dep-the-payoff-waits-on-a-weak-model-being-able-to-boot-at-all` is confirmed rather than settled — the dependency is real and its cause is now named as a missing party rather than a missing mechanism. `raid-risk-a-hand-declared-rung-drifts-upward-and-nothing-ever-says-so` is narrowed to rows that are one act, and drift over time is untested.
+TWO REGISTER ENTRIES ARE NARROWED AND NEITHER CLOSES. `raid-dep-the-payoff-waits-on-a-weak-model-being-able-to-boot-at-all` is MISSTATED rather than confirmed, corrected 2026-08-20. This line named the cause as a missing party. The party is not missing. What remains of the dependency is narrower: a weak walker still has to START, which is a boot question rather than an acting one. `raid-risk-a-hand-declared-rung-drifts-upward-and-nothing-ever-says-so` is narrowed to rows that are one act, and drift over time is untested.
 
-AND ONE THING GATE-PROTOTYPE SHOULD BE MADE TO SAY OUT LOUD. This iteration is about to bless a machine that names a driver correctly, publishes it honestly, and hands it to nobody. That is not a defect in the design — it is what `req-the-machine-names-a-driver-and-starts-nothing` demands and what the seed already assumed. IT IS STILL THE SHAPE OF WHAT SHIPS, and a gate that does not say so is letting a reader assume otherwise.
+AND ONE THING GATE-PROTOTYPE SHOULD SAY OUT LOUD, REWRITTEN 2026-08-20 BECAUSE THIS SPIKE'S OWN VERDICT REVERSED. This paragraph said the iteration ships a machine that hands its driver to nobody. It hands it to the walking agent, which acts on it by delegating the step to a subagent on a stronger hand — contract rule 11 and `project/guidance/method/subagents.md` § Which model. WHAT THE GATE SHOULD SAY INSTEAD: the machine names a driver, publishes it and starts nothing, which is what `req-the-machine-names-a-driver-and-starts-nothing` demands, and the party that acts on it is outside the box and already there. WHAT IS NOT THERE is any way to tell that party's calls from the walker's in the log.
 
 WHAT NO SPIKE COVERED, repeated here because it is the assumption under everything: nothing tested whether a stronger hand does better work on a harder step. Probe 3 tried at M4 and could not. Every candidate on the chart leans on it and this iteration ships without it.
 

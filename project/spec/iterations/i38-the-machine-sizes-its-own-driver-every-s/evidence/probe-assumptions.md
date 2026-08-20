@@ -1,8 +1,8 @@
 ---
 form: probe-assumptions
 by: agent
-signed_off: 2026-08-20T19:10:35.924Z
-reopened: "2026-08-20T19:10:32.137Z — write-requirements was re-signed: a tenth requirement stands, req-every-call-records-the-part-its-caller-played, and req-acts-carry-role-and-channel's role vocabulary is corrected. Re-read against that."
+signed_off: 2026-08-20T19:37:54.338Z
+reopened: "2026-08-20T19:37:50.629Z — generalize-use-cases was re-signed with the third correction to the acting party. Re-read against that."
 authors: agent
 files:
 ---

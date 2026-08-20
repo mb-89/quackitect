@@ -1,8 +1,8 @@
 ---
 form: reverse-sensitivity
 by: agent
-signed_off: 2026-08-20T17:29:05.130Z
-reopened: "2026-08-20T17:29:04.296Z — its whole analysis is a trade between the leader and cand-the-reader-beside-the-walk, which the must-check has since eliminated, so its one credible flip is void: an ineligible line taking a strength does not move the decision. It also rests twice on the claim that the leader cannot record who acted at all, which the requirement own Detail contradicts."
+signed_off: 2026-08-20T19:26:36.361Z
+reopened: "2026-08-20T19:26:34.461Z — converge-pugh was re-signed: the account axis was defective rather than inert, and a fourth cold scoring pass held all eight re-judged cells. The acting party is corrected — the walking agent delegates, so the claim that nothing can act on a published complexity is false. Re-read against that."
 authors: agent
 files:
 ---

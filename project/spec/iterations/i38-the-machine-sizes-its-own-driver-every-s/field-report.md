@@ -2219,10 +2219,13 @@ model, under an owner grant of 2026-07-11, says how to size it.
 
 THE FALSEHOOD WAS INHERITED RATHER THAN INVENTED. It came from
 `nbr-the-driver-that-performs-the-spawn`, which said it first, and every node
-that repeated it cited that neighbour. One wrong sentence in one node propagated
-into two experiments, four options, three candidates, two RAID entries, one
-requirement, one function and a gate verdict — sixteen places, all correctly
-cited to a source that was wrong.
+that repeated it cited that neighbour.
+
+ONE WRONG SENTENCE IN ONE NODE PROPAGATED INTO FIFTEEN ARTIFACTS, counted by
+listing the files repaired rather than by eye: the neighbour itself, one use
+case, two experiments, two options, three candidates, two register entries, one
+requirement, one function, one story and one gate's verdict. Every one of them
+cited its source correctly.
 
 WHAT THIS DOES TO F53. It does not overturn it. A design's honest statement of
 its own weakness is still the highest-trust sentence available. What this adds is
@@ -2339,6 +2342,109 @@ without weighing what the other one recorded.
 
 WHAT WOULD HAVE COST NOTHING: `se_file_replace`, one call, with the same result
 and a logged account of every line it changed.
+## F61 — an axis was promoted past forty-two rows on a reason that has now failed twice, and it separates nothing
+
+`req-comparison-carries-both-sides` was moved from rank 52 to rank 10 in the cut,
+past forty-two rows, and placed exactly at the cutoff. The move was recorded
+rather than smuggled, which is the discipline working. The REASON given was:
+
+> cand-whoever-holds-the-hands-decides is the only one that structurally cannot
+> carry both sides, because nothing of ours ever learns which model the rung
+> resolved to.
+
+THE REASON FAILED THE FIRST TIME BEFORE TODAY, in the same form that gave it.
+Sixteen lines below the cuts list, the follow-up withdraws it: every line
+self-reports the answered driver, so every line carries both sides; what this one
+cannot do is CHECK the self-report. Both sentences stood, unmarked, in one file.
+
+IT FAILED A SECOND TIME TODAY. The party that resolves a published rung to a
+concrete hand is our own walking agent, which picks the model it spawns and
+therefore knows what the rung resolved to. Something of ours does learn it.
+
+AND THE ROW DOES NOT SEPARATE THE ELIGIBLE SET. A fourth cold scorer put all
+three eligible lines at 3. The only spread on the axis is one point on
+`cand-the-reader-beside-the-walk`, which is out on two must violations and is not
+a candidate.
+
+WHAT THIS SAYS ABOUT PROMOTING A ROW PAST OTHERS. The promotion is a judgment
+that a row discriminates more than its damage grade suggests, made BEFORE the
+scoring that would show whether it does. Nothing in the method re-checks the
+promotion against the scores it produced. Here the scores say it discriminates
+nothing, and the row still sits at the cutoff displacing whatever was at 11.
+
+THE MOVE IS NOT WITHDRAWN AND SHOULD NOT BE. Striking a criterion after seeing
+its scores cannot be honest, and that rule is right. What is cheap and missing is
+a line in the record saying which promoted rows turned out to separate the set
+and which did not.
+
+## F62 — three spikes were read as confirming, and one confirmed a false premise
+
+`fold-back` recorded this as a finding rather than an omission:
+
+> NOTHING IS REOPENED UPSTREAM ... All three spikes CONFIRMED what the register
+> already said ... A spike that confirms changes nothing upstream by definition,
+> and this is the first state in the milestone that has not had to reopen
+> something.
+
+ONE OF THE THREE CONFIRMED A SENTENCE THAT WAS FALSE.
+`exp-can-anything-act-on-a-published-driver` was seeded against
+`nbr-the-driver-that-performs-the-spawn`'s claim that the receiver reads and
+cannot act. It searched `project/deliverable` for something that re-spawns the
+walker, found none, and returned the verdict the claim predicted.
+
+A SPIKE THAT CONFIRMS A FALSE PREMISE IS INDISTINGUISHABLE FROM ONE THAT
+CONFIRMS A TRUE ONE, and it is worth MORE than a spike that falsifies, because it
+converts a belief into a measured result and closes the question.
+
+THE SPIKE SEARCHED THE ONLY TREE IT COULD REACH. The capability it was looking
+for lives in the harness and in the contract the walker obeys — contract rule 11
+and `project/guidance/method/subagents.md` — neither of which a lane search
+under `project/deliverable` returns. The spike's own `faked` field says so and
+nobody read it as a limit on the verdict: "the harness's own delegation path was
+not searched at all — which is where the answer was."
+
+SO "ALL THREE CONFIRMED" WAS A COMFORT AND NOT A FINDING. The state that wrote
+it had one signal available — that no spike moved anything — and read it as the
+milestone finally being clean.
+
+WHAT WOULD HAVE CAUGHT IT: asking, of a confirming spike, whether it could have
+returned anything else. This one could not. It was pointed at a tree that does
+not contain the answer, and the answer it returned was the shape of the tree.
+
+## F63 — one node was wrong about the same party three times, and no correction came from the state that owns it
+
+`nbr-the-driver-that-performs-the-spawn` is M2's node, minted at `draw-context`.
+
+- VERSION ONE: the neighbour is EMPTY. A milestone would name its driver into a
+  room with nobody in it. Falsified at `gate-inputs`, by an adversarial pass.
+- VERSION TWO: the receiver READS AND CANNOT ACT. Falsified today, by the owner
+  asking what a receiver is.
+- VERSION THREE: the party is the walking agent, which acts by delegating.
+
+EVERY CORRECTION CAME FROM OUTSIDE THE STATE THAT OWNS THE NODE. The state that
+draws the context found the party wrong zero times out of three. The finders were
+a hostile reader at a gate, and a person outside the machine.
+
+THE REASON IS STRUCTURAL RATHER THAN CARELESS. A context drawing asks who is
+outside the box. The walking agent is outside the box, is the most present party
+in every session, and was never drawn — because it is the thing doing the
+drawing. A state cannot see the party it is.
+
+AND THE SECOND ERROR WAS CAUSED BY THE FIRST CORRECTION. Told the neighbour was
+not empty, the state wrote down the narrowest true thing it could measure — a
+running agent cannot become a different model — and generalised it into "cannot
+act". The measurement was right and the generalisation was not.
+
+THE COST, MEASURED. Version two propagated into fifteen artifacts across three
+milestones, every one citing the node correctly. A spike was seeded against it,
+ran, and confirmed it. A gate blessed a design whose declared largest weakness
+was that sentence. Repairing it took a walk from `frame-delta` to
+`gate-prototype`.
+
+WHAT A CHECK WOULD HAVE TO DO. Not verify citations — every citation here was
+correct. It would have to ask whether the CITED CLAIM is true, which is a
+different question and is the one nothing on any gate form asks.
+
 
 
 

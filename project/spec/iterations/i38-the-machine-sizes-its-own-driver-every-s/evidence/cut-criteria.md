@@ -1,8 +1,8 @@
 ---
 form: cut-criteria
 by: agent
-signed_off: 2026-08-20T17:01:51.659Z
-reopened: "2026-08-20T17:01:50.141Z — run-candidates re-signed after correcting an undercount of the invented-state references from two to five"
+signed_off: 2026-08-20T19:22:22.654Z
+reopened: "2026-08-20T19:22:19.624Z — a cold scoring pass re-judged both account axes against the corrected acting party. Nothing moves, and two things about this form do. Its cuts list still calls req-comparison-carries-both-sides the row the winner fails structurally, sixteen lines above the paragraph withdrawing exactly that sentence. And the residue of that reason is now false inside our own tree: the party that resolves a published rung is the walking agent, which picks the hand and therefore knows what it spawned."
 authors: agent
 files:
 ---
@@ -80,7 +80,7 @@ AND IT EXPLAINS AN EARLIER MISTAKE RATHER THAN EXCUSING IT. run-candidates spent
 7. [[req-walk-survives-host-swap]]
 8. [[req-acts-carry-role-and-channel]]
 9. [[req-the-actor-is-recorded-where-the-call-is-served]]
-10. [[req-comparison-carries-both-sides]] [moved: moved from 52 to 10, past forty-two rows, because it is the sharpest discriminator on the chart and the blind sort could not see that. Every candidate here makes a comparative claim — the driver we named against the driver that answered — and cand-whoever-holds-the-hands-decides is the only one that structurally cannot carry both sides, because nothing of ours ever learns which model the rung resolved to. The rough sort placed it on its damage grade alone, and its grade says nothing about how much it separates these four] [cutoff]
+10. [[req-comparison-carries-both-sides]] [moved: moved from 52 to 10, past forty-two rows, on a reason that has since failed twice. THE REASON GIVEN: every candidate makes a comparative claim, and cand-whoever-holds-the-hands-decides is the only one that structurally cannot carry both sides, because nothing of ours ever learns which model the rung resolved to. FIRST FAILURE, withdrawn in this form's own follow-up: every line self-reports and this one carries both sides like the rest; what it cannot do is CHECK the self-report. SECOND FAILURE, 2026-08-20: the party that resolves a published rung is our own walking agent, which picks the hand it spawns and therefore knows which model the rung resolved to. THE MOVE ITSELF IS NOT WITHDRAWN and the axis stays at the cutoff, because a row can be worth judging on a reason that later fails. What is withdrawn is the claim that it is the sharpest discriminator: the three eligible lines all score 3 on it] [cutoff]
 11. [[req-overlay-drift-reported]]
 12. [[req-trace-view-derived-from-files]]
 13. [[req-fresh-machine-runs]]
@@ -198,7 +198,7 @@ FIVE ROWS SURVIVE THE CUT AND EACH ONE SEPARATES THE FOUR DIFFERENTLY.
 - req-a-wrong-act-never-passes-silently divides prevention from detection. The totality check and the record-validity rule prevent by construction; the seed's sampled audit finds out afterwards.
 - req-walk-survives-host-swap divides the lines that hold a model roster from the one that does not. It is raid-asm-one-model-list-serves-every-host-the-engine-supports expressed as a criterion.
 - req-acts-carry-role-and-channel and req-the-actor-is-recorded-where-the-call-is-served are the account cluster's two rows, and they part the candidates by what the call record ends up holding.
-- req-comparison-carries-both-sides is the one that had to be moved, and it is the row cand-whoever-holds-the-hands-decides fails structurally.
+- req-comparison-carries-both-sides is the one that had to be moved. THIS LINE SAID IT IS THE ROW cand-whoever-holds-the-hands-decides FAILS STRUCTURALLY, and the paragraph headed "AND A SECOND CLAIM IN THIS FORM IS WITHDRAWN" below withdraws exactly that. Both stood unmarked in this form until a cold reader found them, which is the defect shape this record has now named five times: a claim and its own correction, adjacent, with nothing saying which is which.
 
 ONE MOVE IN A HUNDRED AND NINETEEN ROWS, and it is recorded as a move rather than smuggled in as a re-sort. The whole project has made two before this one.
 
@@ -215,6 +215,26 @@ WHERE THE CHECK ACTUALLY BELONGS is `gate-candidates`, and it runs there now. Te
 AND ONE OF THE THREE IT NAMED IS THE ONE THIS FORM ALREADY KNEW WAS BROKEN. `raid-iss-the-live-read-rule-forbids-more-than-its-own-reason-needs` said the fatal live-read rule ruled out two of the four candidates for a reason that does not apply to them. IT WAS RIGHT, IT SAT OPEN THROUGH FOUR STATES AND TWO GATES, and it was closed by the requirement being restated at gate-architecture — not by the routing this sentence promised.
 
 AND A SECOND CLAIM IN THIS FORM IS WITHDRAWN. The cuts list called `req-comparison-carries-both-sides` "the row cand-whoever-holds-the-hands-decides fails structurally". IT DOES NOT FAIL IT. `req-every-call-records-the-model-that-answered-it` says in its own Detail that "the transport hands the engine a client name and no model, so today the value can only come from the caller" — every line self-reports, and this one carries both sides like the rest. What it cannot do is CHECK the self-report, holding no roster to check it against. The axis still separates the lines and it separates them by less than this form claimed.
+
+### The axis no longer separates the eligible set, 2026-08-20
+
+A COLD SCORING PASS PUT ALL THREE ELIGIBLE LINES AT 3 on req-comparison-carries-both-sides. The only spread is one point on cand-the-reader-beside-the-walk, which is not a candidate — it is out on two must violations.
+
+SO THE ROW THAT WAS PROMOTED PAST FORTY-TWO OTHERS AS THE SHARPEST DISCRIMINATOR DISCRIMINATES NOTHING among the lines that can win. That is a fact about the promotion rather than about the row: it was moved on a claim of structural failure that this form had already withdrawn once and that today's correction kills again.
+
+AND THE SECOND FAILURE IS THE INTERESTING ONE. req-every-call-records-the-model-that-answered-it names the condition that lifts the self-reported mark: the value arriving from whatever performed the spawn, which knows what it started and is not the party being measured. That party is now identified — the walking agent — and it is inside our tree on every line, this one included.
+
+WHAT SURVIVES AS A REAL COST TO THIS LINE, said narrowly. It holds no roster, so it has nothing to check a self-report against. The record is complete; the cross-check is gone. That is a smaller thing than "structurally cannot carry both sides" and it is the true one.
+
+### The other account axis was defective rather than inert
+
+req-acts-carry-role-and-channel scored 0 for all four candidates under three independent scorers, and this record twice called the axis inert.
+
+IT WAS NOT INERT. Its Detail fixed the role vocabulary at (owner, agent). Every one of these four candidates is a design about WHICH HAND walks a step, and under a two-value vocabulary a walker and a hand it delegates to are both the second value. No candidate could have scored above 0 whatever it proposed.
+
+THE SCORE IS STILL 0 ACROSS THE BOARD and it now means something different. Before the correction the axis was unanswerable and the zeroes carried no information about any candidate. After it the axis is sound and unanswered, and the zeroes are a real fact about four silent lines.
+
+AND THE INFERENCE BUILT ON THE WRONG CAUSE IS ALSO WRONG. converge-pugh reasoned that this axis caps its twin — req-the-actor-is-recorded-where-the-call-is-served — because the writer's half was unaddressed. It was unaddressABLE.
 
 ## anything_else
 

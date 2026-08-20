@@ -2,7 +2,8 @@
 form: gate-architecture
 bless: blessed by agent
 by: agent
-signed_off: 2026-08-20T17:40:16.994Z
+signed_off: 2026-08-20T19:30:35.444Z
+reopened: "2026-08-20T19:30:32.727Z — one paragraph in the follow-up still hands M6 a question that is answered, and asks it in the falsified vocabulary. A claim and its correction standing unmarked in one form is the defect shape this record has named five times."
 authors: agent
 files:
 ---
@@ -56,7 +57,7 @@ THE WINNER VIOLATES NO MUSTS and dominates both eligible rivals on every axis. `
 - exercised against the goal: YES, AND AGAINST A REGISTER THAT HAS SINCE BEEN REBUILT. Forty-three quality scenarios, five should-axes, and now ten musts. The first run of this gate could say the architecture was measured against the wrong ruler; that criticism is spent.
 - missing: THE COST AXIS, after four askings. Nothing in the surviving five measures spend, exactly one row in the 119-row pool mentions cost, and the winner spends nothing on the walk without having been chosen for it. ALSO MISSING: any reader of the acting role, which is why two of five axes measure the two halves of something no design addresses.
 - wrong: THE ROOT WAS AT M2 AND THE REPAIR RAN UPWARDS FOR A DAY. Requirements, then functions, then flows, then candidates, then the use case they all derive from. Each layer was repaired against a layer still wrong, which is why the same defect kept reappearing somewhere new.
-- out of scope: the build, and the spike. `nbr-the-driver-that-performs-the-spawn` says the receiver reads and cannot act, and every scenario this architecture addresses assumes publishing reaches somebody who can use it. That is M6's to test.
+- out of scope: the build, and the spike. `nbr-the-driver-that-performs-the-spawn` said the receiver reads and cannot act, and every scenario this architecture addresses assumes publishing reaches somebody who can use it. CORRECTED 2026-08-20: it does. The party is the walking agent, delegating.
 - prior art: not re-scanned. The repair moved wordings and completed candidates; it produced no new design question. Every fill resolved to an option already on the chart or a clause already in a requirement's Detail.
 
 ## goals_served
@@ -104,11 +105,11 @@ THE OVERRIDES.
 - The rung readings behind the whole design remain judgments rather than measurements, unchanged since M3.
 - The winner does not serve the kickoff's second goal and the spec no longer enforces the owner's ruling. On the call log as an answered question, not settled here.
 - Every load-bearing finding in this repair came from a commissioned reader rather than from the walk, now true of four consecutive milestones.
-- `nbr-the-driver-that-performs-the-spawn` says the receiver reads and cannot act, and the winner's entire value is downstream of that being fixable. M6's spike.
+- `nbr-the-driver-that-performs-the-spawn` SAID the receiver reads and cannot act, and the winner's entire value is downstream of that being fixable. M6's spike ran and returned the wrong answer for the same reason: it searched `project/deliverable` and the capability lives in the harness. CORRECTED 2026-08-20 — the walking agent delegates.
 
 ## follow_up
 
-M6 INHERITS ONE QUESTION THAT DECIDES WHETHER ANY OF THIS SHIPS, and it also settles the owner's ruling without anybody arguing about it. Can a receiver read a published rung and start a stretch on it? If no receiver can act on a model name either, the roster is a file maintained for nobody and publishing a class is the honest answer. If one can, the ruling wins on merit rather than by having been written into the spec.
+M6 INHERITED ONE QUESTION THAT DECIDES WHETHER ANY OF THIS SHIPS AND IT IS ANSWERED. Can a party read a published rung and start a stretch on it? YES — it hands the step to a subagent on a stronger hand rather than relaunching itself, which contract rule 11 grants and `project/guidance/method/subagents.md` § Which model sizes. SO THE OWNER'S RULING WINS ON MERIT. A party can act on a model name too, so the roster is not a file maintained for nobody. What the winner gives up is the roster itself, and with it the ability to check what the acting party reports back.
 
 THREE MECHANICAL CHECKS ARE THE STRONGEST CONCRETE LEADS THIS MILESTONE PRODUCED and none is built, because building engine checks at a design gate is not this state's work.
 
