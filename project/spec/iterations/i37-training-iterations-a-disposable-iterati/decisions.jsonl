@@ -192,3 +192,19 @@
 {"ts":"2026-08-19T20:19:42.370Z","op":"update","visit":"iterations/i37/run-spikes/spike-the-truncated-history@2","node":"d54","brief":"re-signing spike-the-truncated-history"}
 {"ts":"2026-08-19T20:19:46.344Z","op":"update","visit":"iterations/i37/run-spikes/spike-the-ancestry-bound@0","node":"d55","brief":"re-signing spike-the-ancestry-bound"}
 {"ts":"2026-08-19T20:19:50.444Z","op":"update","visit":"iterations/i37/run-spikes/spike-the-log-attribution@0","node":"d56","brief":"re-signing spike-the-log-attribution"}
+{"ts":"2026-08-20T07:03:26.461Z","op":"update","visit":"iterations/i37/start@1","node":"d1","brief":"walking back in to the reopened run-spikes"}
+{"ts":"2026-08-20T07:03:47.665Z","op":"update","visit":"iterations/i37/enumerate-space/start@1","node":"d2","brief":"walking back in to the reopened run-spikes"}
+{"ts":"2026-08-20T07:03:47.809Z","op":"update","visit":"iterations/i37/enumerate-space/start@1","node":"d3","brief":"walking back in to the reopened run-spikes"}
+{"ts":"2026-08-20T07:03:47.964Z","op":"update","visit":"iterations/i37/enumerate-space/start@1","node":"d4","brief":"walking back in to the reopened run-spikes"}
+{"ts":"2026-08-20T07:03:48.130Z","op":"update","visit":"iterations/i37/enumerate-space/start@1","node":"d5","brief":"walking back in to the reopened run-spikes"}
+{"ts":"2026-08-20T07:03:48.292Z","op":"update","visit":"iterations/i37/enumerate-space/start@1","node":"d6","brief":"walking back in to the reopened run-spikes"}
+{"ts":"2026-08-20T07:04:20.142Z","op":"update","visit":"iterations/i37/run-spikes/end@1","node":"d7","brief":"aiming at the reopened parent placeholder"}
+{"ts":"2026-08-20T07:05:14.826Z","op":"update","visit":"iterations/i37/run-spikes/end@1","node":"d8","brief":"a placeholder whose claim is owed is walked to rather than through"}
+{"ts":"2026-08-20T07:05:29.087Z","op":"update","visit":"iterations/i37/run-spikes/end@1","node":"d9","brief":"escaping to where engine writes are legal"}
+{"ts":"2026-08-20T07:07:18.161Z","op":"update","visit":"iterations/i37/cut-criteria@0","node":"d1","brief":"aiming at run-spikes with the router fix loaded"}
+{"ts":"2026-08-20T07:07:33.681Z","op":"update","visit":"iterations/i37/cut-criteria@0","node":"d2","brief":"walking toward the reopened placeholder"}
+{"ts":"2026-08-20T07:07:34.255Z","op":"update","visit":"iterations/i37/cut-criteria@0","node":"d3","brief":"walking toward the reopened placeholder"}
+{"ts":"2026-08-20T07:07:34.832Z","op":"update","visit":"iterations/i37/cut-criteria@0","node":"d4","brief":"walking toward the reopened placeholder"}
+{"ts":"2026-08-20T07:07:35.363Z","op":"update","visit":"iterations/i37/cut-criteria@0","node":"d5","brief":"walking toward the reopened placeholder"}
+{"ts":"2026-08-20T07:07:35.933Z","op":"update","visit":"iterations/i37/cut-criteria@0","node":"d6","brief":"walking toward the reopened placeholder"}
+{"ts":"2026-08-20T07:07:36.548Z","op":"update","visit":"iterations/i37/cut-criteria@0","node":"d7","brief":"walking toward the reopened placeholder"}

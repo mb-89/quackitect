@@ -1409,8 +1409,35 @@ export class Session {
         const t = decl.states.find((s) => s.id === e.to);
         return t !== undefined && t.submachine === undefined;
       });
+    // A PLACEHOLDER WHOSE OWN CLAIM IS OWED IS WALKED TO, NOT THROUGH.
+    //
+    // Landing on the sub-machine's start is right while the placeholder's
+    // claim stands. It is wrong when the claim is owed, because the walk then
+    // dives, completes the sub-machine, and meets the claim guard at its END —
+    // where the placeholder's form can no longer be served, since the current
+    // machine is the sub-machine and the state is one frame out.
+    //
+    // MEASURED ON i37, 2026-08-19: the M6 spikes overturned the declared
+    // winner, the M5 chain re-signed beneath it, and run-spikes could not be
+    // re-signed. The walk sat at run-spikes/end answering the same refusal to
+    // every pull, with no route out and no verb able to address the state.
+    //
+    // FILLED IS NOT SIGNED, and that is what the old rule missed. A reopened
+    // placeholder keeps its fields and loses its signature, so it looked
+    // complete to the router and grey to the guard.
+    const itHere = this.declIteration(decl);
+    let doneHere: Set<string> | undefined;
+    const claimOwed = (t: StateDecl): boolean => {
+      if (itHere === undefined || !this.owesASignature(t, itHere)) return false;
+      doneHere ??= new Set(this.claims.recordDone(decl));
+      return !doneHere.has(t.id);
+    };
     const land = (pfx: string, t: StateDecl, tick: RouteNode["nexts"][number]["tick"]): void => {
       const at = Session.qual(pfx, t.id);
+      if (t.submachine !== undefined && claimOwed(t)) {
+        nexts.push({ to: at, tick });
+        return;
+      }
       if (t.submachine !== undefined) {
         // Only a GENERATED sub is a record. An authored sub-machine is part of
         // the method's own drawing and is walked through as it always was.
