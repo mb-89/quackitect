@@ -1,8 +1,8 @@
 ---
 form: decompose-structure
 by: agent
-signed_off: 2026-08-19T20:10:11.968Z
-reopened: "2026-08-19T20:10:11.530Z — record-adrs re-signed above it, and the ceiling decision it implements changed mechanism from a checked ancestry test to a truncated history"
+signed_off: 2026-08-20T07:29:40.040Z
+reopened: "2026-08-20T07:29:37.601Z — a feeder re-signed above it after the v3 merge moved the rigor matrix and the M6 spikes moved the winner"
 authors: agent
 files:
 ---

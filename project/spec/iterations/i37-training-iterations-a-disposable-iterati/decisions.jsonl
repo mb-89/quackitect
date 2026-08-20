@@ -229,3 +229,4 @@
 {"ts":"2026-08-20T07:28:32.545Z","op":"update","visit":"iterations/i37/decompose-structure@0","node":"d16","brief":"the crossing carries the live lane"}
 {"ts":"2026-08-20T07:29:14.951Z","op":"update","visit":"iterations/i37/decompose-structure@0","node":"d17","brief":"the crossing carries the harness profile, which is what it actually owes"}
 {"ts":"2026-08-20T07:29:31.642Z","op":"update","visit":"iterations/i37/decompose-structure@0","node":"d18","brief":"recording what the matrix says the crossing owes"}
+{"ts":"2026-08-20T07:29:39.577Z","op":"update","visit":"iterations/i37/decompose-structure@0","node":"d19","brief":"re-signing decompose-structure against the moved ground"}

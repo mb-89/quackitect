@@ -1,5 +1,6 @@
 ---
 form: evaluate-architecture
+amended: "2026-08-20T07:30:44.632Z by agent — the v3 merge brought ten new quality scenarios; each is ruled here"
 by: agent
 signed_off: 2026-08-19T20:10:47.288Z
 reopened: "2026-08-19T20:10:46.712Z — decompose-structure re-signed above it, and three of its at-risk rulings hinged on a guard that no longer runs a test"
@@ -17,6 +18,16 @@ Thirty-seven scenarios, dealt again. THREE MOVE FROM AT RISK TO ADDRESSED, and a
 
 ## walk
 
+- [[req-a-folder-is-driven-only-with-consent]] — addressed by [[raid-dec-a-benchmark-rewinds-content-and-never-the-machine]] · a benchmark run drives a throwaway tree it made itself from a commit in this repository, so no folder is driven that the person did not already consent to
+- [[req-boot-needs-no-manual-test-metadata-repair]] — addressed by [[raid-dec-a-benchmark-rewinds-content-and-never-the-machine]] · nothing this iteration adds touches boot or test metadata; a run binds after boot and adds no metadata a boot would have to repair
+- [[req-interrupted-call-names-the-stopping-layer]] — addressed by [[raid-dec-a-benchmark-rewinds-content-and-never-the-machine]] · a bound run adds one refusal shape, and it names its layer: the ceiling refuses in the resolver with the rewind commit in the message
+- [[req-native-project-tools-stay-outside-the-cage]] — addressed by [[raid-dec-a-benchmark-rewinds-content-and-never-the-machine]] · unchanged; a run adds no tool to the cage and its two git acts go through the lane's own verbs
+- [[req-oversized-results-remain-recoverable-through-the-lane]] — addressed by [[raid-dec-a-benchmark-rewinds-content-and-never-the-machine]] · unchanged, and this walk exercised it — the merged engine spilled every oversized pull to .se/answers and served it back by character range
+- [[req-stop-hook-yields-only-at-a-machine-stop]] — addressed by [[raid-dec-a-benchmark-rewinds-content-and-never-the-machine]] · unchanged; a benchmark run is a walk like any other and yields where the machine stops it, which is the thing being measured
+- [[req-supported-harness-serves-one-lane-contract]] — addressed by [[raid-dec-a-benchmark-rewinds-content-and-never-the-machine]] · strengthened rather than threatened: the report stamps the harness with every result, which is what makes a contract difference visible instead of silent
+- [[req-the-desk-is-usable-soon-after-the-folder-opens]] — addressed by [[raid-dec-a-benchmark-rewinds-content-and-never-the-machine]] · unchanged; a run is reached by a lane verb rather than a desk door, so the desk's offer does not grow
+- [[req-the-folder-shows-what-to-run]] — addressed by [[raid-dec-a-benchmark-rewinds-content-and-never-the-machine]] · unchanged; the training folder is ignored by git and shows nothing to run, which is the point of it being disposable
+- [[req-what-the-corpus-is-has-one-answer]] — addressed by [[raid-dec-a-benchmark-rewinds-content-and-never-the-machine]] · the crossing this iteration drew is the answer applied — el-entrypoint to el-walk-engine carries flow-harness-profile because the matrix computed it, not because anyone asserted it
 - [[req-a-bound-run-resolves-no-commit-newer-than-its-rewind-point]] — addressed by [[raid-dec-the-ceiling-is-an-ancestry-test-not-a-path-mask]]
 - [[req-a-ceiling-that-cannot-prove-ancestry-refuses]] — addressed by [[raid-dec-a-run-that-cannot-establish-its-guard-never-binds]]
 - [[req-a-wrong-act-never-passes-silently]] — addressed by [[raid-dec-the-ceiling-is-an-ancestry-test-not-a-path-mask]]
