@@ -208,6 +208,74 @@ THE RETRO'S FIELD-FEEDBACK QUESTION IS A STOP ON A LAPTOP AND NOT HERE. Ask it
 into the field report and keep going. Waiting for an answer nobody is present
 to give is the stall this whole card exists to prevent.
 
+## Five rulings a cloud runner needs and a laptop does not
+
+### 1. Nothing survives but what is committed
+
+THE CONTAINER IS CLONED FRESH and reclaimed when it goes idle. Nothing is
+waiting for you:
+
+- no previous session
+- no leftover config
+- no warm `node_modules`
+- no `.se/` state
+
+SO ANYTHING THE BOOT DEPENDS ON IS A COMMITTED FILE. A file a hook writes at
+startup is not configuration. It is too late for anything the client reads
+first, and the client reads its MCP server list first.
+
+THIS WAS PAID FOR ONCE. `.claude/settings.json` was tracked and `.mcp.json` was
+not, so a cloud clone got the cage and no lane: every native tool denied, and
+nothing to replace them. Both are tracked now.
+
+### 2. No `se_pull` tool means the lane never attached
+
+CHECK IT ON YOUR FIRST TURN. Look for `se_pull` by name.
+
+IF IT IS NOT THERE, three things follow.
+
+- STOP. Do not improvise a way in.
+- DO NOT READ THE PROJECT THROUGH THE HOST'S OWN TOOLS. Its GitHub verbs reach
+  the repository, and using them is working outside the cage while believing
+  you are following instructions. That is the failure rule 1 names.
+- REPORT which check you ran and what it returned.
+
+A MISSING LANE IS NOT A PUZZLE TO SOLVE FROM INSIDE. It is a broken boot, and
+the boot's own verdict line says so.
+
+### 3. The host's standing instructions conflict with the contract
+
+Rule 1 already names the "prefer native tools" line. A cloud host injects more,
+and each needs its ruling so you are not adjudicating alone at midnight.
+
+- A STOP HOOK DEMANDING COMMIT AND PUSH. The contract says the machine commits,
+  not you. THE CONTRACT WINS. Let the hook complain.
+- AN ASSIGNED BRANCH AND PULL-REQUEST DISCIPLINE. The machine owns git and a
+  record is a folder on trunk. Work on trunk, and say in the field report that
+  the host wanted a branch.
+- SUBAGENTS MAY BE DENIED. Rule 11 says they are yours to spawn, and it cannot
+  make a host allow them. A permission classifier has denied the Agent tool on
+  a real run. Where a state's guidance says to spawn one, do that work inline
+  and SAY THAT YOU DID.
+
+### 4. A subagent cannot attach a server its parent lacks
+
+MCP SERVERS ATTACH PER SESSION, and a subagent inherits its parent's set. So an
+uncaged agent cannot start the lane and hand it to a caged subagent inside one
+session. That design does not work and never did.
+
+THE WORKING SHAPE IS TWO SESSIONS. One prepares the repository; the next starts
+with the lane attached and the cage on. On a cloud runner the preparation is
+committed rather than performed at startup, which is ruling 1 again.
+
+### 5. Push is yours here, and only here
+
+THE LANE KEEPS PUSH WITH THE PERSON EVERYWHERE ELSE. On a cloud run there is no
+person, so the run pushes what it produced.
+
+CHECK WHAT THE GIT VERB ACTUALLY ALLOWS before relying on this. If it refuses,
+that is a finding for the field report, not a reason to reach around it.
+
 ## When something fails, look here first
 
 ### The lane is not answering

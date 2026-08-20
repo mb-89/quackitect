@@ -29,11 +29,17 @@ dist/
 deliverable/vscode-dist/
 
 
-# placed into the OPENED folder from deliverable/cage/ — never committed.
-# The extension does it locally. On a cloud host the arriving agent does it
-# itself, then spawns a caged subagent to walk (guidance/method/cloud-runner.md).
-.mcp.json
-.claude/settings.json
-.claude/output-styles/
+# THE CAGE AND THE LANE ARE COMMITTED, and .mcp.json is the reason.
+#
+# A cloud clone is all a cloud session gets. The editor client builds its MCP
+# server list from .mcp.json when the session STARTS, before any hook has run,
+# so a file a hook writes arrives too late to be read.
+#
+# .claude/settings.json was tracked already and .mcp.json was not, which is
+# exactly "the cage lands and the lane does not": every native tool denied,
+# and no se_ tool to replace them. Both are tracked now.
+#
+# The root .mcp.json is the STDIO form. It spawns the lane itself, so there is
+# no port to be listening and no race to lose.
 .copilot/
 .github/copilot-instructions.md

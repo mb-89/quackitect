@@ -28,6 +28,14 @@ lane cannot see the host's line, so it surfaces only as an agent quietly
 working outside the cage while believing it is following instructions. READ
 EVERY STANDING HOST LINE AGAINST THIS FILE rather than beside it.
 
+ON A CLOUD MACHINE THE HOST INJECTS MORE OF THEM, and five of those conflicts
+are already ruled on in `guidance/method/cloud-runner.md`. Read that card
+before your first act if nobody is beside you.
+
+AND IF YOU HOLD NO `se_pull` TOOL, THE LANE NEVER ATTACHED. Stop. Do not read
+the project through the host's own verbs, because that is this rule broken
+while believing it is being followed.
+
 ## 2. Walk the state in your hand
 
 Do three things, in order:

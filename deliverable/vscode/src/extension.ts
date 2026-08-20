@@ -181,7 +181,16 @@ function placeConfigs(root) {
     mkdirSync(destDir, { recursive: true });
     copyFileSync(path.join(cage, src), path.join(destDir, destName));
   };
-  place("mcp-http.json", opened, ".mcp.json"); // a claude run in the terminal attaches
+  // THE ROOT .mcp.json IS COMMITTED AND STDIO, AND NOTHING HERE TOUCHES IT.
+  //
+  // This line used to place the HTTP form over it on every activation. That
+  // made the tracked file dirty every session, and it is the form that cannot
+  // work on a cold machine: the client reads .mcp.json when the session starts,
+  // and nothing is listening on the port yet.
+  //
+  // A terminal claude run now spawns its own lane over stdio. The two below
+  // keep the HTTP form, because Copilot and agent mode genuinely share the
+  // headless lane this extension starts.
   place("mcp-http.json", path.join(opened, ".copilot"), "mcp-config.json"); // a copilot run attaches
   place("vscode-mcp.json", path.join(opened, ".vscode"), "mcp.json"); // agent mode attaches
   // AGENT MODE READS ITS ORDERS FROM .github. Without this the VS Code agent

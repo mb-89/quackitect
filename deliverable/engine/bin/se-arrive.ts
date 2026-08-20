@@ -1,9 +1,13 @@
 // se-arrive — ARRIVAL A IN ONE COMMAND.
 //
 // WHO THIS IS FOR: an agent that woke up inside a cloud chat session with a
-// checkout and no `se_` tools. Nobody ran the entrypoint, nobody is beside it,
-// and `.mcp.json` is not in git — so the lane it is supposed to work
-// through does not exist yet.
+// checkout and no `se_` tools. Nobody ran the entrypoint and nobody is beside
+// it.
+//
+// `.mcp.json` IS IN GIT NOW, so a cloud clone carries the lane's config and the
+// client attaches before this ever runs. What is left for this script is the
+// rest of the arrival: the refs, the runtime, the install and the headless
+// lane. It still writes the cage for a checkout older than that change.
 //
 // WHY IT EXISTS AT ALL. The five acts of Arrival A were written as prose in
 // guidance/method/cloud-runner.md and performed BY HAND on every cloud run.

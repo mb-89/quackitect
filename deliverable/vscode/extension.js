@@ -191,7 +191,6 @@ function placeConfigs(root) {
     mkdirSync(destDir, { recursive: true });
     copyFileSync(path.join(cage, src), path.join(destDir, destName));
   };
-  place("mcp-http.json", opened, ".mcp.json");
   place("mcp-http.json", path.join(opened, ".copilot"), "mcp-config.json");
   place("vscode-mcp.json", path.join(opened, ".vscode"), "mcp.json");
   place("vscode-instructions.md", path.join(opened, ".github"), "copilot-instructions.md");
