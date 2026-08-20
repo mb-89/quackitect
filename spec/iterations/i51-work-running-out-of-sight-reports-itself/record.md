@@ -42,3 +42,12 @@ AN OPTIONAL THIRD PIECE, and the owner has said it is not mandatory: the engine 
 - wt-a-step-whose-leaving-condition-runs-a-long-program-should-no
 - note-5781601b7e63
 - note-e60589fca3c2
+- note-d393a93e0112
+
+## The third piece is no longer optional
+
+note-d393a93e0112 carries the argument. The engine answers "no test covers this
+diff" by running every test, which cannot answer for the diff either.
+
+Ten batteries ran in one session on that fallback, most of them fired by
+changes to markdown alone.

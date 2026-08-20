@@ -68,3 +68,10 @@ EVERY MILESTONE PRODUCES A ONE-PAGER (owner, note-38c4557e996d). It shows in the
 
 - project/spec/version-planning.md
 - spec/man-guidance.md at ref main
+
+## Carried work tokens
+
+These stood in the options pool referenced by no iteration at all. Assigned
+here in a pass over the pool.
+
+- wt-the-report-saying-what-a-built-system-s-owner-has-changed-fo

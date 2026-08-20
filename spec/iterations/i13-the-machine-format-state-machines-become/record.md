@@ -104,3 +104,10 @@ items land here, where the drawing is rewritten anyway.
 - A render audit is owed: dead template branches, duplicated drawing
   paths, and drifted comments across render.ts, traceui.ts, tables.ts,
   trace-layout.ts and iterations-draw.ts.
+
+## Carried work tokens
+
+These stood in the options pool referenced by no iteration at all. Assigned
+here in a pass over the pool.
+
+- wt-editing-a-state-machine-while-its-iteration-is-open-reaches-

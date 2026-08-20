@@ -42,3 +42,21 @@ shape gets fixed, so it is the worst one to leave unscanned.
 Grant the two web verbs at every gate whose review demands a scan, or move the
 scan to the state before the gate and have the gate read its result. Then a
 check that every state naming meth-gate-review can reach a scan.
+
+## What has been paid, 2026-08-20
+
+HALF OF THE REPAYMENT IS DONE. Every gate row naming meth-gate-review now
+grants se_web_search and se_web_fetch. That is all ten of them, not only the
+kickoff: M0 kickoff, M1 motivation, M2 inputs, M3 requirements, M4 candidates,
+M5 architecture, M6 prototype, M7 implementation, M8 validation, M9 release.
+
+BEFORE THE CHANGE none of the ten carried either verb. Four working states did
+already, which is what made the absence at the gates look deliberate.
+
+WHAT IS STILL OWED is the second half the repayment names: a check that every
+state naming meth-gate-review can reach a scan. Nothing enforces the pairing
+today, so the next state added with that method can lose the verbs again in
+silence.
+
+THE STATUS IS LEFT AS IT STANDS. This raid's owner is the owner, and closing it
+is their call, not the call of the change that paid half of it.

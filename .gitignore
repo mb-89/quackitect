@@ -24,6 +24,11 @@ scratchpad/
 # built packages — assembled by engine/bin/package.ts, never committed
 dist/
 
+# the rendered VS Code extension — produced by esbuild.mjs, carries the real
+# product name where the source keeps placeholders, never committed
+deliverable/vscode-dist/
+
+
 # placed into the OPENED folder from deliverable/cage/ — never committed.
 # The extension does it locally. On a cloud host the arriving agent does it
 # itself, then spawns a caged subagent to walk (guidance/method/cloud-runner.md).

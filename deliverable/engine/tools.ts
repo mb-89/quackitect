@@ -44,19 +44,19 @@ export function sessionTools(session: Session): ToolDef[] {
       name: "se_pull",
       title: "se.pull",
       description:
-        'THE PULL — your ONLY verb. Pull, do what comes back, pull again.\n\nThe machine owns every decision about the walk. You never name a target, never name a path, never ask which state you are in, and never ask which tools are legal.\n\nBLOCKING IS AN INSTRUCTION, NOT AN ERROR. A pull does not refuse a walk that cannot move yet — it tells you what to do about it.\n\nFOUR ANSWERS, and `pull` names which one you got.\n\nREAD — a document rides in `document`, and `prove` asks THREE FILL-IN-THE-BLANK QUESTIONS about it. Each quotes a run of words and wants the FOUR WORDS THAT FOLLOW it. Answer all three in one string: form: {"read": "<the answers>"}.\n  - QUOTE GENEROUSLY. The check asks whether your answer CONTAINS the words it wants, never whether it matches them exactly. A whole sentence around each anchor passes; a clipped four-word count often misses.\n  - PUNCTUATION IS NOT A WORD. A dash, a bullet or a bare quote mark sitting between two words is skipped when the engine counts. That is the usual reason a careful answer fails.\n  - Case and spacing are ignored. A wrong answer names the probes it missed and serves the same document again.\n\nFILL — the machine BUILT the form and handed it to you in `forms`. Fill every required section and return it on the NEXT pull as form: {"<section>": "<text>"}.\n  - THERE IS NO SUBMIT VERB, AND THERE IS A SUBMIT FLAG. Three keys are ACTS, not sections: `submit: true` stamps it (every check runs, then it signs); `bless: true` or `bless: false` is the thumb on a gate; a fill carrying neither is saved and deliberately left unstamped, so you can finish it later.\n  - A FORM YOU MEAN TO FINISH CARRIES `submit: true`. Without it the fields land, nothing signs, and the same form comes back looking untouched — which reads like a refusal and is not one.\n  - A SAVE CLEARS AN EXISTING SIGNATURE. A changed claim is no longer the claim that was signed, so re-submit after any edit, however small.\n  - `refused.problems` NAMES YOUR OWN WORK: sections still empty or still failing. Do those.\n  - THE SAME FORM BACK WITH NO PROBLEMS MEANS THE BLESS IS OWED. Every section stands and nothing you can type will move it. Say which gate waits and stop, unless the dial puts the thumb in your hand.\n  - All three keys in one pull is legal.\n\nDO — the happy path was WALKED for you, every hop to the next branching point in one call. `here` is where you landed, with its guidance. Where the road split, the doors ride along in `options`: answer form: {"choice": "<to>"} only when a routed goal needs that door. A LIST is legal where work fans out — the first is walked, the rest come back as `not_walked`. A choice exists ONLY where one was offered. A `do` that did not move says so, and names what would move it.\n\nWAIT — the machine is out of work, or the next step weighs more than the session autonomy. Say plainly WHICH step waits, then STOP. The dial alone cannot wake you; the person must message you after moving it.\n\nNARRATE AS YOU WORK. Every call takes an `update`. Ride one on any pull that changes something, starting with a plan before your first edit in a state.\n\nA genuinely illegal call still refuses typed — a choice outside the offer, a form nothing asked for.',
+        'THE PULL — your only verb. Pull, do what comes back, pull again.\n\nThe machine owns the walk. You never name a target, a path or a state. Blocking is an instruction, not an error.\n\nFOUR ANSWERS, and `pull` names which one you got.\n\n- read — the document rides in `document`, and `prove` asks three fill-in-the-blank probes. Answer all three in one string: form: {"read": "..."}. Quote generously: the check is containment, and punctuation is not a word.\n- fill — the form rides in `forms`. Return it as form: {"<section>": "<text>"}. `submit: true` stamps it. `bless: true` or `bless: false` is the thumb on a gate. Neither key saves it unstamped, on purpose. A save clears an existing signature, so re-submit after any edit. The same form back with no problems means the bless is owed.\n- do — the happy path was walked for you, to the next branching point. `here` is where you landed. Doors ride in `options`; answer form: {"choice": "<to>"} only where a routed goal needs one.\n- wait — no work left, or the next step outweighs the dial. Say which step waits, then stop.\n\nA genuinely illegal call still refuses typed. Narrate with `update`; its own rules ride on that field.',
       inputSchema: {
         type: "object",
         properties: {
           form: {
             type: "object",
             description:
-              'the filled form the LAST pull handed you. A reading proof: {"read": "<your answers to all three probes, in one string>"}. Evidence: {"<section>": "<text>", ..., "submit": true}. An offered choice: {"choice": "<to>"} — or a list, where the work fans out. Which one is never your call: a proof while a document is owed, evidence while a step demands it, a choice only where one was offered.',
+              'the form the LAST pull handed you. A reading proof {"read": "..."}, evidence {"<section>": "<text>", "submit": true}, or an offered choice {"choice": "<to>"} — a list where work fans out. Which one is never your call.',
           },
           escape: {
             type: "string",
             description:
-              "step OUT with this reason — the ONE hatch for every kind of stepping out: the person said stop, the walk is MECHANICALLY stuck, earlier work no longer stands (say so — the person invalidates it, and the walk re-earns it). Lands at the FRONT DESK, where the person routes; recorded with its reason. A QUESTION IS NOT AN ESCAPE: waiting on an answer, stay where you stand, ask, and stop — escape only when you already know no answer could let the walk continue from here. Boot cannot be escaped.",
+              "step OUT with this reason, landing at the FRONT DESK where the person routes. Use it when the person says stop, when the walk is MECHANICALLY stuck, or when earlier work no longer stands. A question is not an escape: ask where you stand and stop. Boot cannot be escaped.",
           },
         },
       },
@@ -256,7 +256,7 @@ export function sessionTools(session: Session): ToolDef[] {
       name: "se_amend",
       title: "se.amend",
       description:
-        "FIX A SUBMITTED FORM WITHOUT REOPENING IT, by PATCHING it: ops:[{field, old_string, new_string}], the same shape se_file_patch takes. For the small correction that does not change what the claim says: a reference renamed under it, a path that moved, a typo. The signature stays, because nothing it attested to has changed — invalidating a whole tree to fix a spelling is the cost that leaves spellings wrong. The amend is RECORDED on the file, so a reader sees it happened, when, and why. THE CHECKS STILL RUN: an amend that breaks one is refused and the file is put back untouched, with se_reopen named as what to use instead. Judgement is yours — the engine only guarantees an amend cannot smuggle a reopen past the checks.",
+        "Fix a submitted form without reopening it. Patch fields with ops:[{field, old_string, new_string}], the shape se_file_patch takes.\n\nFor a correction that does not change what the claim says: a renamed reference, a moved path, a typo. The signature stays, and the amend is recorded on the file.\n\nEvery check still runs. An amend that breaks one is refused, the file is put back untouched, and se_reopen is named instead.",
       inputSchema: {
         type: "object",
         properties: {
@@ -264,7 +264,7 @@ export function sessionTools(session: Session): ToolDef[] {
           ops: {
             type: "array",
             description:
-              "the usual shape: patch a field in place. Each op is {field, old_string, new_string, all?}. old_string must match the field EXACTLY ONCE or the op refuses — pass all: true to replace every occurrence. Several ops chain, each seeing the last one's result.",
+              "patch a field in place: {field, old_string, new_string, all?}. old_string must match EXACTLY ONCE or the op refuses. all: true replaces every occurrence. Ops chain.",
             items: {
               type: "object",
               properties: {
@@ -279,14 +279,14 @@ export function sessionTools(session: Session): ToolDef[] {
           fills: {
             type: "object",
             description:
-              "rewrite fields WHOLE, as {field: text}. For a small correction prefer ops — resending two thousand characters to change eleven is how a paragraph nobody meant to touch goes missing. A fills entry wins over an op on the same field.",
+              "rewrite fields WHOLE, as {field: text}. Prefer ops for a small correction. A fills entry wins over an op on the same field.",
           },
           reason: { type: "string", description: "what was wrong — one line, and the file keeps it" },
           machine: { type: "string", description: "which machine the state belongs to — needed from outside it, e.g. i1" },
           chain: {
             type: "boolean",
             description:
-              "NOT IMPLEMENTED — accepted and ignored, and it is documented that way rather than removed so nobody rebuilds it from the same wrong premise. It was written when an amend re-greyed the chain below it, to re-freshen that chain in one act. The owner reversed that on 2026-08-17: an amendment does not re-grey, so there is normally nothing to re-freshen and this argument has no work to do. WHAT IS STILL WANTED, if anything, is a bulk RE-SIGN after a genuine reopen — a different act on a different trigger. See note-380d789f6f85 and note-fc18d2775583.",
+              "NOT IMPLEMENTED, accepted and ignored. Documented rather than removed so nobody rebuilds it from the same wrong premise. See note-380d789f6f85.",
           },
         },
         required: ["state", "reason"],
@@ -489,7 +489,7 @@ export function coreTools(
       name: "se_benchmark",
       title: "se.benchmark",
       description:
-        "OPEN OR CLOSE A BENCHMARK RUN. A run re-walks an ARCHIVED iteration from the commit before that iteration started, so what the machine costs can be measured against the walk that really happened. Name an iteration, or name none and the one benchmarked longest ago is taken \u2014 runs CYCLE rather than repeating, and the reports folder is the only scheduler state there is. A run BINDS OR IT REFUSES, once, at the earliest point the cause is knowable: no iteration, no rewind point, an empty tree, or a failed positive control. It never binds and then refuses per request, because a report full of refusals reads as a machine failure rather than as a guard. {stop: true} ends the open run and records WHERE IT ACTUALLY ENDED, which is the number this whole mechanism exists to collect \u2014 a run that died still leaves a result. WHAT IT MEASURES IS PROCESS OVERHEAD UNDER OBSERVATION, never production behaviour and never the quality of any decision: the agent is TOLD it is walking a benchmark. Never compare two single runs \u2014 report a median over at least three with the spread beside it.",
+        "OPEN OR CLOSE A BENCHMARK RUN. A run re-walks an ARCHIVED iteration from the commit before that iteration started, so what the machine costs can be measured against the walk that really happened.\n\nName an iteration, or name none and the one benchmarked longest ago is taken. Runs cycle rather than repeat.\n\nA RUN BINDS OR IT REFUSES, once, at the earliest point the cause is knowable: no iteration, no rewind point, an empty tree, or a failed positive control. It never binds and then refuses per request.\n\n{stop: true} ends the open run and records WHERE IT ACTUALLY ENDED. A run that died still leaves a result.\n\nIT MEASURES PROCESS OVERHEAD UNDER OBSERVATION, never production behaviour and never the quality of a decision: the agent is told it is walking a benchmark. Never compare two single runs. Report a median over at least three, with the spread.",
       inputSchema: {
         type: "object",
         properties: {
@@ -628,12 +628,22 @@ export function buildServer(
   // THE UPDATE FIELD — every lane tool accepts it: a decision-graph op
   // riding the call. Declared on every schema so harnesses send it as an
   // object (an undeclared property arrives as a JSON string — v2 lesson).
-  const UPDATE_PROP = {
+  const UPDATE_FULL = {
     type: "object",
     description:
       'NARRATE AS YOU WORK — a decision-graph op riding this call. Every lane tool takes it.\n\nWHAT TO SEND, and each op is one line:\n  - plan {items} — start the state\'s checklist. Send this BEFORE your first edit of any multi-step work.\n  - update {node, brief} — say what you are doing ON an item. The node is REQUIRED while any item stands open; with nothing open, a bare update is right.\n  - done | obsolete | revert {node, brief} — resolve a node. Everything started gets resolved. Abandoning one silently is illegal.\n  - fork {brief, items?} — an unplanned branch opens where you stand, and the current item cannot continue until it is done. Scope that merely GREW is another plan, not a fork.\n  - defer {node, to} — park a point for the state that can do it. It arrives there as an open to-do.\n\nTHE FIRST ONE IS ALWAYS A PLAN. Example: update: {op: "plan", items: ["read the record", "fill the gate", "submit"]}.\n\nTHE BRIEF IS ONE LINE, 90 characters, one thing.\n\nEvery call answers with `update_result`, carrying the open node map and any nudge. A volunteered update resets the toll; when the toll lapses, the next call must carry one.',
   };
-  for (const t of tools) (t.inputSchema.properties as Record<string, unknown>).update = UPDATE_PROP;
+  // THE PROSE RIDES ONCE, ON se_pull. Stamping it on every tool made the same
+  // 1,206 characters half of the entire tool surface. What the v2 lesson above
+  // needs is the DECLARATION on every schema, never the prose, so every other
+  // tool carries a pointer instead and the typing is untouched.
+  const UPDATE_REF = {
+    type: "object",
+    description: "Narration op riding this call: {op, brief?, items?, node?}. Ops and rules: see se_pull.",
+  };
+  for (const t of tools) {
+    (t.inputSchema.properties as Record<string, unknown>).update = t.name === "se_pull" ? UPDATE_FULL : UPDATE_REF;
+  }
   const server = new McpServer(
     { name: "se-mcp", version: SE_VERSION },
     tools,

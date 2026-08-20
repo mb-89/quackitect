@@ -118,3 +118,10 @@ obsolete on 2026-08-18.
 SO THAT ITEM DROPS and this iteration is smaller than its vision reads. Method
 now resolves to the machine root whichever record is bound, which is the
 resolution that replaced the old refusal.
+
+## Carried work tokens
+
+These stood in the options pool referenced by no iteration at all. Assigned
+here in a pass over the pool.
+
+- wt-enginesearchts-never-reaches-the-one-path-visibility-seam-in

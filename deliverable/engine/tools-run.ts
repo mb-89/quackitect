@@ -279,7 +279,7 @@ export function runTools(
     {
       name: "se_run",
       title: "se.run",
-      description: `Run a shell command from the project root (bash on POSIX, PowerShell on Windows) — for what ONLY a shell does: node, npm, builds, processes. WRITE A SCRIPT WHEN THE QUESTION IS ABOUT MANY THINGS: se_file_write it into scratchpad/ (the workbench, never committed), run it here, read the answer, change it, run it again. Counting, routing, measuring and applying one shape across a tree are programs, not readings. Have the script PRINT what you need and nothing has to be piped. THE LANE'S JOBS ARE REFUSED HERE: ${laneSummary()}. A first offence per category runs once with a warning; after that the category refuses (SE-C-129) with the lane call as the remedy. If the lane truly cannot do the job, pass no_tool_reason — the command runs once and your reason is logged for the retro.\n\nOutput is engine-captured and logged IN FULL under the returned call ref. Foreground waits for process completion. Background returns a job immediately. Use {job} for status or {job, stop: true} to cancel. {jobs: true} lists this session's jobs.\n\nNEVER call this session's own mirror over HTTP from here — the run blocks the server's event loop, so the mirror cannot answer itself.`,
+      description: `Run a shell command from the project root: bash on POSIX, PowerShell on Windows. For what ONLY a shell does, such as node, npm, builds and processes.\n\nWRITE A SCRIPT WHEN THE QUESTION IS ABOUT MANY THINGS. Put it in scratchpad/, run it here, change it, run it again. Counting, routing and measuring across a tree are programs, not readings. Have the script PRINT what you need, and nothing has to be piped.\n\nTHE LANE JOBS ARE REFUSED HERE: ${laneSummary()}. The refusal names the lane call as the remedy (SE-C-129). A first offence per category runs once with a warning. Pass no_tool_reason where the lane truly cannot do the job, and it is logged for the retro.\n\nOutput is captured and logged IN FULL under the call ref. Foreground waits. background returns a job at once: read it with {job}, cancel with {job, stop: true}, list with {jobs: true}.\n\nNever call this session own mirror over HTTP from here. The run blocks the server event loop, so the mirror cannot answer itself.`,
       inputSchema: {
         type: "object",
         properties: {
@@ -338,14 +338,14 @@ export function runTools(
       name: "se_test",
       title: "se.test",
       description:
-        "ASK FOR A TEST; THE ENGINE DECIDES WHAT RUNS (owner ruling 2026-08-16). You say WHAT YOU WANT TO KNOW and nothing else. The engine reads what actually changed, picks the scope — the whole battery, a named set of test files, or nothing at all — runs it, and the verdict SAYS what it picked and why, in `decided`. There is no argument that widens or narrows it, because choosing the scope was never the agent's job. NOTHING is a real answer: an unchanged tree keeps its last verdict, and the result says so rather than refusing. `force` is the one thing a person asks for directly — a flake hunt, which is the whole suite by definition. THE CONFORMANCE SWEEP RIDES THE SAME DECISION: where the diff is mostly DOCUMENTS, the engine sweeps the corpus alongside the tests and says so in `decided.sweep`, because a battery says nothing about prose and the sweep says everything. Structured as a durable job: starting returns a handle, and calling again with {job} reads its status or final verdict. EVERY RUN RECORDS ITS TIMINGS, one row per case, and the verdict says how many it timed so a silent instrument failure shows instead of passing as green.",
+        "ASK FOR A TEST; THE ENGINE DECIDES WHAT RUNS. You say what you want to know, and nothing else. The engine reads what changed, picks the scope, runs it, and `decided` says what it picked and why. No argument widens or narrows it.\n\nNOTHING IS A REAL ANSWER. An unchanged tree keeps its last verdict, and the result says so rather than refusing. `force` is a flake hunt, which is the whole suite by definition.\n\nWhere the diff is mostly DOCUMENTS the engine sweeps the corpus alongside the tests, and says so in `decided.sweep`.\n\nIt is a durable job. Starting returns a handle, and {job} reads its status or final verdict. Every run records its timings, so a silent instrument failure shows instead of passing as green.",
       inputSchema: {
         type: "object",
         properties: {
           question: {
             type: "string",
             description:
-              "what you want to know, in one line — 'did the frontier change break the token sync?'. REQUIRED, and recorded with the verdict. The engine says which tests ran; only this says why you asked.",
+              "what you want to know, in one line. REQUIRED, and recorded with the verdict. The engine says which tests ran; only this says why you asked.",
           },
           force: { type: "boolean", description: "a flake hunt: run the whole suite whatever the diff says" },
           job: {

@@ -589,10 +589,18 @@ test("a collection bar's prerequisites include every input, not just the nearest
 // state, without going through loadTrace at all. Two counters, two failure
 // shapes, neither standing in for the other.
 //
-// THE CLOCK STAYS AS A COARSE BACKSTOP, at a bound no healthy run approaches.
-// Hoisting the corpus load above the claimful test once measured 3683 ms here.
-// That class of regression is still worth a red, and 2500 ms catches it
-// without flaking on the honest cost.
+// THE CLOCK IS A CATASTROPHE BACKSTOP AND NOTHING MORE. It sat at 2500 ms to
+// catch a hoisted corpus load, measured once at 3683 ms.
+//
+// IT CANNOT DO THAT ANY MORE. Honest runs on a working machine reach 3922 ms,
+// so 2500 ms reds on whatever else the machine is doing rather than on the
+// defect. Any bound clear of that noise is also above 3683, so no setting of
+// this number both stays quiet and catches that regression.
+//
+// THE ACCESS CEILING BELOW CATCHES IT INSTEAD, at 800 against a per-state
+// sweep of about five thousand, and it does not move with load. What is left
+// for the clock is work that got slow WITHOUT reading more, such as a loop
+// that turned quadratic in memory.
 test("green reads the corpus once, and is computed against two hundred nodes", () => {
   const { root, it } = pinned();
   const decl = { ...compileColumn(readRigorMatrix(root), SIZE), id: itShortId(it.id) };
@@ -641,7 +649,7 @@ test("green reads the corpus once, and is computed against two hundred nodes", (
     `recordDone made only ${accesses} door accesses over ${FILLERS} filler nodes. It cannot have read the corpus it is meant to be judging — this guard would then be measuring an empty computation.`,
   );
   assert.ok(
-    took < 2500,
-    `recordDone took ${took} ms over ${FILLERS} nodes. This is the coarse backstop, not the bound — at this figure something is sweeping the corpus repeatedly, and the access count above says how often.`,
+    took < 10_000,
+    `recordDone took ${took} ms over ${FILLERS} nodes. This is the catastrophe backstop, not the bound — the access ceiling above is what catches a repeated sweep. At this figure the work got slow without reading more.`,
   );
 });

@@ -148,9 +148,65 @@ capture a note with `se_note` and keep walking.
 
 The retro reads every note. A question you could not ask is a note.
 
-THE DIAL IS STILL THEIRS. A step weighing more than the dial still stops you.
+### You have the autonomy, and you use it
 
-Say which step waits, plainly, and stop. The log carries it.
+YOU BLESS YOUR OWN GATES. Send `bless` with the submit and read the answer. The
+person is not coming to press it, and a gate left unblessed stops the whole run
+for nobody's benefit.
+
+YOU MAKE THE DECISIONS a step asks for. Sizing, scope, which option wins: these
+are the walk's questions and they are yours here. Record the reasoning in the
+form, which is where a reader will look for it.
+
+YOU RUN UNTIL SOMETHING BLOCKS YOU. Not until something is uncertain, and not
+until something is large. A block is mechanical: the machine refuses, or no
+answer you could give would let the walk continue.
+
+A REFUSAL NAMING TWO RUNGS IS A DIAL PROBLEM, not a decision for you to make.
+Say so plainly in the field report and carry on with what is left.
+
+### Fix what you find on the way
+
+SEE SOMETHING BROKEN THAT YOU CAN FIX? Fix it. A cloud run that walks past a
+one-line defect to protect its scope has cost more than it saved.
+
+THE LIMIT IS THE CONTRACT'S, unchanged: a defect in the work under your hands
+is the work, and a stray elsewhere is a note. What is new here is only that
+nobody is available to bless the difference, so you judge it.
+
+### Work on trunk
+
+A RECORD IS A FOLDER ON TRUNK, and a clone that has trunk has every record.
+You do not need a branch of your own to work in, and you should not make one.
+
+ONE AGENT WORKS ONE CLONE. That is what replaced the claim system, and it is
+why no branch is needed to keep two agents apart.
+
+### Write a field report, and it does not go in git
+
+THE FIELD REPORT IS YOUR REPORT FROM OUTSIDE THE MACHINE: what the walk felt
+like, what fought you, what the guidance failed to tell you. It is the one
+thing the call log cannot produce.
+
+IT IS NOT A CORPUS DOCUMENT and it is not committed. Write it to
+`.se/field-report.md`, and PRINT IT IN FULL as your closing message.
+
+PRINT IT EVEN IF YOU ALSO WROTE IT. The machine you are on goes away, and
+`.se/` goes with it. The message is the channel that reaches a person, so the
+file is the convenience and the message is the delivery.
+
+### Run a retro before you finish
+
+NOTES ARE MACHINE-LOCAL. `.se/notes.jsonl` is not committed, so every note you
+captured tonight dies with this machine unless a retro moves it into the repo.
+
+SO THE RETRO IS NOT OPTIONAL HERE. It is what carries the run's findings home.
+Drain what you can judge, and put what needs the owner into the field report by
+name.
+
+THE RETRO'S FIELD-FEEDBACK QUESTION IS A STOP ON A LAPTOP AND NOT HERE. Ask it
+into the field report and keep going. Waiting for an answer nobody is present
+to give is the stall this whole card exists to prevent.
 
 ## When something fails, look here first
 
@@ -196,10 +252,16 @@ does not say which one is hearsay.
 
 ### The host refused it before the lane ever saw it
 
-A REFUSAL WITH NO CLAUSE AND NO REMEDY IS NOT THE LANE'S. Every lane refusal
-is typed: a clause, what was expected, what it got, and the exact call to make
-instead. A denial carrying none of those came from the HOST's own permission
-layer, above the lane, and the engine never heard the call at all.
+A REFUSAL WITH NO CLAUSE AND NO REMEDY IS NOT THE LANE'S. Every lane refusal is
+typed, and carries four things:
+
+- the clause
+- what was expected
+- what it got
+- the exact call to make instead
+
+A denial carrying none of those came from the HOST's own permission layer,
+above the lane. The engine never heard the call at all.
 
 HOW TO TELL, and it takes one call. Pull again. The lane's own refusals leave
 the walk exactly where it was and say why; a host denial leaves the walk

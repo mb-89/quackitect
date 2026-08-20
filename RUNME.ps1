@@ -210,11 +210,9 @@ Write-Host "  $((git --version))  OK"
 # everything: the server, the attach configs, the engine's npm install. Opening
 # VS Code on project\ is enough from then on.
 #
-# THE ONE THING THAT BRINGS YOU BACK HERE is a change to the extension itself,
-# because VS Code loads the COPY under ~/.vscode/extensions rather than the
-# source. A junction would fix that, and cannot: brand.ts RENDERS this tree's
-# $PRODUCT$ placeholders into the copy, so the copy is what carries a name.
-# Moving that rendering to activation time is what would retire this step.
+# AND NOTHING BRINGS YOU BACK HERE. VS Code loads a JUNCTION to
+# deliverable/vscode-dist, which the build renders. A change to the shell needs
+# `npm run build` and a window reload.
 #
 # VS CODE IS THE HOST (owner, 2026-07-30). Ensure VS Code, put the extension
 # in place, open the workspace - the extension owns the rest: the server,
@@ -226,21 +224,36 @@ $classic = [bool]($forwarded | Where-Object { $_ -eq "--classic" })
 $forwarded = @($forwarded | Where-Object { $_ -notin @("--classic") })
 if (-not $classic) {
   if (-not (Ensure-Tool "code" "Microsoft.VisualStudioCode" "VS Code")) { exit 1 }
-  $extSrc = Join-Path $root "deliverable\vscode"
+  # THE BUILD RENDERS THE INSTALLABLE TREE, and this script LINKS to it. There
+  # is no copy to refresh, so a change to the shell needs `npm run build` and a
+  # window reload, never another run of this script.
+  $extSrc = Join-Path $root "deliverable\vscode-dist"
   $extDest = Join-Path $env:USERPROFILE ".vscode\extensions\$brandId.$brandId-0.1.0"
-  New-Item -ItemType Directory -Force -Path $extDest | Out-Null
-  robocopy $extSrc $extDest /MIR /NFL /NDL /NJH /NJS /NP | Out-Null
-  if ($LASTEXITCODE -ge 8) {
-    Write-Host "extension copy FAILED (robocopy $LASTEXITCODE)" -ForegroundColor Red
+  Push-Location (Join-Path $root "deliverable")
+  npm run build
+  $built = $LASTEXITCODE
+  Pop-Location
+  if ($built -ne 0 -or -not (Test-Path $extSrc)) {
+    Write-Host "building the extension FAILED - see above" -ForegroundColor Red
     exit 1
   }
-  # THE COPY IS WHAT CARRIES A NAME. The source keeps its placeholders, so
-  # there is one tree and a rename stays one file.
-  $rendered = node (Join-Path $root "deliverable\engine\bin\brand.ts") --root $root --dest $extDest
-  if ($LASTEXITCODE -ne 0) {
-    Write-Host "naming the extension FAILED - see above" -ForegroundColor Red
+  # A JUNCTION IS REMOVED WITH rmdir, NEVER WITH Remove-Item -Recurse. Older
+  # PowerShell follows the link and deletes what it points AT, which here is
+  # the build output inside the repository.
+  if (Test-Path $extDest) {
+    $existing = Get-Item $extDest -Force
+    if ($existing.Attributes -band [IO.FileAttributes]::ReparsePoint) {
+      cmd /c rmdir "$extDest" | Out-Null
+    } else {
+      Remove-Item $extDest -Recurse -Force
+    }
+  }
+  New-Item -ItemType Junction -Path $extDest -Target $extSrc | Out-Null
+  if (-not (Test-Path (Join-Path $extDest "package.json"))) {
+    Write-Host "linking the extension FAILED - $extDest" -ForegroundColor Red
     exit 1
   }
+  $rendered = (Get-Content (Join-Path $extSrc "package.json") -Raw | ConvertFrom-Json).displayName
   # SOME VS CODE BUILDS TRUST extensions.json once it exists and do not
   # discover new folder copies automatically. Upsert this local extension so
   # copy-based install works consistently without packaging.

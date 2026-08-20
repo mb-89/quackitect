@@ -124,7 +124,7 @@ export function fileTools(rootOf: (rel?: string) => string, model: ModelFileSyst
       name: "se_file_read",
       title: "se.file.read",
       description:
-        "Read a project file (root-relative path) — TEXT OR IMAGE. Returns the CAS hash writes will demand. Text comes back as numbered lines; pass offset/limit for line windows. Pass char_offset/char_limit for exact slices of generated files with one long line. An oversize whole-file read is refused with the remedy, never silently truncated. An IMAGE (png, jpg, gif, webp) comes back as the picture itself, so a sketch can be LOOKED AT rather than described to you. Any other binary is refused. A DECLARED ROOT is reachable as '@name/rest' (the owner declares roots in .se/roots.json; read-only unless the declaration says writable). Pass ref to read AT A COMMITTED REF ('main' reaches v1, 'v2' reaches v2) — pair with se_file_search/se_file_glob at the same ref. Pass optional: true for a file that is ALLOWED to be missing (the handover): absence answers exists: false rather than refusing. THE READING (.se/reading.md) is the one path the ENGINE writes: it holds every document the way ahead still demands, concatenated, and reading it CREDITS them all — one call instead of one per document, and no read_hashes to carry afterwards. The packet names it whenever anything is owed.",
+        "Read a project file, text or image. Returns the CAS hash writes will demand.\n\n- Text comes back as numbered lines. offset/limit take a line window.\n- char_offset/char_limit take an exact slice, for a generated file that is one long line.\n- An oversize whole-file read is refused with its remedy, never silently truncated.\n- An image (png, jpg, gif, webp) comes back as the picture. Any other binary is refused.\n- A declared root is reachable as @name/rest, read-only unless .se/roots.json says writable.\n\nTHE READING (.se/reading.md) holds every document the way ahead still demands. Reading it credits them all in one call.",
       inputSchema: {
         type: "object",
         properties: {
@@ -132,7 +132,7 @@ export function fileTools(rootOf: (rel?: string) => string, model: ModelFileSyst
           paths: {
             type: "array",
             description:
-              "read MANY in ONE call — a list of paths, or per-file windows with line or character ranges. Read-proof is a SET, so a state's whole reading list comes back in one envelope, each entry with its own hash. An unreadable path returns its refusal in place of its content and the others still arrive.",
+              "read MANY in ONE call: a list of paths, or per-file windows. Each entry carries its own hash. An unreadable path returns its refusal and the others still arrive.",
             items: { type: ["string", "object"] },
           },
           offset: { type: "number", description: "1-based first line" },
@@ -142,8 +142,7 @@ export function fileTools(rootOf: (rel?: string) => string, model: ModelFileSyst
           ref: { type: "string", description: "read from this committed git ref instead of the working tree" },
           optional: {
             type: "boolean",
-            description:
-              "the file is ALLOWED not to exist — absence comes back as exists: false instead of a refusal. Only absence is forgiven; a path outside the root still refuses. Per-entry in `paths` too.",
+            description: "the file is ALLOWED to be missing: absence answers exists: false instead of refusing. Per-entry in `paths` too.",
           },
         },
       },
@@ -292,7 +291,7 @@ export function fileTools(rootOf: (rel?: string) => string, model: ModelFileSyst
       name: "se_file_replace",
       title: "se.file.replace",
       description:
-        "SEARCH AND REPLACE ACROSS FILES — one regex, every file a glob reaches, one atomic call. se_file_patch's regex verb is the scalpel for a path you already hold; this is the sweep for a rename that runs through the tree.\n\nRUN IT WITH preview: true FIRST, AND READ WHAT COMES BACK. The preview computes everything and writes nothing: the places, and `by_file` — every file it would touch and how many places in each, BIGGEST FIRST. That list is the blast radius. A rule that hits one file four thousand times while its siblings take two looks fine in a sample of lines and obvious in `by_file`.\n\nIT HANDS BACK EVERY PLACE IT LANDED: path, line, and the line BEFORE and AFTER, so you judge the replace instead of trusting it. Read that list. A wide edit whose result is only a number is the one nobody can check, and undoing it costs more than reading it. `truncated: true` means you have NOT seen them all.\n\nCHANGE A RULE, PREVIEW AGAIN. A preview read before the last rule was added is not a preview of what runs.\n\nA pattern matching NOTHING is refused, never a quiet success. expect_count refuses unless the total is exactly that — use it when you already know how many places there are. Nothing is written unless every file passes every guard.",
+        "SEARCH AND REPLACE ACROSS FILES: one regex, every file a glob reaches, one atomic call. se_file_patch is the scalpel for a path you already hold. This is the sweep for a rename running through the tree.\n\nRUN IT WITH preview: true FIRST, AND READ WHAT COMES BACK. The preview writes nothing and returns `by_file`: every file it would touch and how many places in each, biggest first. That list is the blast radius.\n\nIT HANDS BACK EVERY PLACE IT LANDED: path, line, and the lines before and after. Read them, because a wide edit whose result is only a number is the one nobody can check. `truncated: true` means you have not seen them all.\n\nCHANGE THE RULE, PREVIEW AGAIN.\n\nA pattern matching nothing is refused, never a quiet success. expect_count refuses unless the total is exactly that. Nothing is written unless every file passes every guard.",
       inputSchema: {
         type: "object",
         properties: {

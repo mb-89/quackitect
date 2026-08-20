@@ -252,14 +252,19 @@ async function produceTree(kind, name, dest, abbr) {
     vscode.window.showErrorMessage(`${name} was not made. ${why}`);
     return;
   }
+  if (kind === "vehicle" && await ensureDeps(answer.result.dest) !== true) {
+    vscode.window.showWarningMessage(`${name} was made, but installing its dependencies failed. The output channel has the log.`);
+  }
   await vscode.commands.executeCommand("vscode.openFolder", vscode.Uri.file(answer.result.dest), { forceNewWindow: true });
 }
 async function askForAnEmptyFolder(title) {
+  const here = vscode.workspace.workspaceFolders?.[0]?.uri;
   const picked = await vscode.window.showOpenDialog({
     canSelectFolders: true,
     canSelectFiles: false,
     canSelectMany: false,
     openLabel: "Make it here",
+    defaultUri: here,
     title
   });
   return picked === void 0 || picked.length === 0 ? null : picked[0].fsPath;
@@ -591,7 +596,9 @@ var ICON = {
   book: '<svg viewBox="0 0 16 16"><path d="M2.4 3.1h3.9c.9 0 1.6.4 1.7.9.1-.5.8-.9 1.7-.9h3.9v9.3H9.7c-.9 0-1.6.4-1.7.9-.1-.5-.8-.9-1.7-.9H2.4z"/><path d="M8 4v9.3"/></svg>',
   log: '<svg viewBox="0 0 16 16"><path d="M2.6 4.2h10.8M2.6 8h10.8M2.6 11.8h6.8"/></svg>',
   card: '<svg viewBox="0 0 16 16"><rect x="2.6" y="2.6" width="10.8" height="10.8"/></svg>',
-  restart: '<svg viewBox="0 0 16 16"><path d="M13.2 8a5.2 5.2 0 1 1-1.7-3.85"/><path d="M13.6 1.9v3.3h-3.3"/></svg>'
+  restart: '<svg viewBox="0 0 16 16"><path d="M13.2 8a5.2 5.2 0 1 1-1.7-3.85"/><path d="M13.6 1.9v3.3h-3.3"/></svg>',
+  copy: '<svg viewBox="0 0 16 16"><rect x="2.6" y="2.6" width="8" height="8"/><path d="M5.4 13.4h8V5.4"/></svg>',
+  newFolder: '<svg viewBox="0 0 16 16"><path d="M2.2 12.6V3.9h4.2l1.4 1.7h6v7z"/><path d="M8 7.6v3.4M6.3 9.3h3.4"/></svg>'
 };
 function cardIcon(card) {
   if (card.widget === "machine") return ICON.machine;
@@ -864,6 +871,8 @@ var Strip = class {
       if (!inStrip(c)) continue;
       list.push({ cmd: `$PRODUCT_ID$.openCard${c.n}`, icon: cardIcon(c), label: titleOf(c), key: `ctrl+alt+${c.n}` });
     }
+    list.push({ cmd: "$PRODUCT_ID$.createVehicle", icon: ICON.copy, label: "Copy this system", key: "" });
+    list.push({ cmd: "$PRODUCT_ID$.createProject", icon: ICON.newFolder, label: "Start a project", key: "" });
     return list;
   }
   page() {

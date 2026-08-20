@@ -137,3 +137,10 @@ TWO THINGS TO WATCH. This seed itself mints worktree number 28 under today's cod
 - note-9391416c6203
 - note-238e5c575922
 - note-81168863130f
+
+## Carried work tokens
+
+These stood in the options pool referenced by no iteration at all. Assigned
+here in a pass over the pool.
+
+- wt-a-retired-concept-still-stands-in-the-design-corpus-as-thoug

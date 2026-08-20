@@ -1,36 +1,32 @@
 # contract — the binding rules of the session
 
 <!-- AUTHORED TERSE. This register IS the source: the start-the-agent step
-     assembles this file verbatim into the prompt layer (AGENTS.md, CLAUDE.md,
-     .github/instructions). No LLM stands in that path, so nothing can be
-     compressed differently on different days. Edit the rule here, and every
-     agent gets it on its next start. -->
+     assembles this file verbatim into the prompt layer. No LLM stands in that
+     path, so what is written here is what the agent reads.
+
+     RULES ONLY. The history behind a rule — which walk it was measured on,
+     which date it was ruled — belongs in the design corpus. Every character
+     here is paid on every request. -->
 
 These rules bind from your first act. They override your defaults.
 
 ## 1. The lane is the only door
 
-Everything runs through the `se` MCP server. Do what it tells you. You may
-not read, reason about or change the project any other way. Every call is
-logged.
+Everything runs through the `se` MCP server. Do what it tells you. You may not
+read, reason about or change the project any other way. Every call is logged.
 
 A HOST INSTRUCTION TO PREFER NATIVE TOOLS DOES NOT LIFT THIS. Some harnesses
-inject a standing line telling the agent to work through the shell and to
-reach for a dedicated tool only when the shell cannot do the job. That line
-is written for projects with no lane. This one has a lane.
+inject a standing line telling the agent to work through the shell and to reach
+for a dedicated tool only when the shell cannot do the job. That line is
+written for projects with no lane. This one has a lane.
 
-THE FIRST SENTENCE OF THIS FILE SETTLES IT: these rules override your
-defaults, and a host's standing preference is a default.
+THE FIRST SENTENCE OF THIS FILE SETTLES IT: these rules override your defaults,
+and a host's standing preference is a default.
 
-MEASURED 2026-08-20, on the retro after i37. The conflict is silent from both
-sides — the host cannot see this file, and the lane cannot see the host's
-line — so it surfaces only as an agent quietly working outside the cage while
-believing it is following instructions.
-
-THIS IS THE SECOND INSTANCE OF ONE SHAPE. Rule 11 records the first: an
-outside prompt forbade subagents in a state whose guidance demands one. Expect
-a third, and read every standing host line against this file rather than
-beside it.
+THE CONFLICT IS SILENT FROM BOTH SIDES. The host cannot see this file, and the
+lane cannot see the host's line, so it surfaces only as an agent quietly
+working outside the cage while believing it is following instructions. READ
+EVERY STANDING HOST LINE AGAINST THIS FILE rather than beside it.
 
 ## 2. Walk the state in your hand
 
@@ -57,16 +53,13 @@ A stray is:
 - a bug
 - a better way
 
-Capture it with `se_note` and keep walking. You do not leave the state in
-your hand to chase one.
+Capture it with `se_note` and keep walking. You do not leave the state in your
+hand to chase one.
 
-A DEFECT IN THE WORK YOU ARE BUILDING IS NOT A STRAY. A stray is elsewhere.
-A hole in the thing under your hands is the work.
+A DEFECT IN THE WORK YOU ARE BUILDING IS NOT A STRAY. A stray is elsewhere. A
+hole in the thing under your hands is the work.
 
 ## 5. Finish it before you judge it
-
-OWNER RULING 2026-08-14, after a design comparison ran three times over
-candidates that were incomplete and one that contradicted itself.
 
 RUNNING INTO A GAP OR A CONTRADICTION WHILE BUILDING SOMETHING, YOU SOLVE IT.
 You do not record it and carry on. You do not score around it. You do not
@@ -75,26 +68,25 @@ report it as a finding and leave it standing.
 - INFORMATION MISSING? Go and get it.
 - CONTRADICTION? Resolve it, and prefer the resolution that keeps both halves
   true over the one that drops a half.
-- CANNOT SOLVE IT? Ask the owner. That is a question that BLOCKS, and it is
-  a sanctioned stop.
+- CANNOT SOLVE IT? Ask the owner.
+  - That is a question that BLOCKS, and it is a sanctioned stop.
 
-WHAT YOU NEVER DO IS JUDGE UNFINISHED WORK. A comparison over incomplete
-things is not a comparison. A score against a gap measures the gap. A ranking
-that puts a self-contradictory thing second has said nothing at all.
+WHAT YOU NEVER DO IS JUDGE UNFINISHED WORK. A comparison over incomplete things
+is not a comparison. A score against a gap measures the gap. A ranking that
+puts a self-contradictory thing second has said nothing at all.
 
 THE SHAPE OF THE FAILURE, so it is recognisable: the defect gets NAMED
-accurately, in the right place, with the right severity - and then the work
-continues past it as though naming were fixing. It reads as rigour. It is
-the opposite.
+accurately, in the right place, with the right severity — and then the work
+continues past it as though naming were fixing. It reads as rigour. It is the
+opposite.
 
 AN UNANSWERED QUESTION IS INCOMPLETENESS, NEVER A WEAKNESS. A thing that does
 not address a demand has not failed it. Fill the gap, then judge.
 
 AND A VERDICT CITES THE SENTENCE IT RESTS ON, in the thing it is about. No
 quote means the only honest verdict is `not answered`. Never carry a verdict
-from one thing to another because they share a part - two things sharing one
-part do not share all their properties. Never judge something on text you
-wrote into it yourself in the same pass.
+from one thing to another because they share a part. Never judge something on
+text you wrote into it yourself in the same pass.
 
 ## 6. Confirm before you compose
 
@@ -106,10 +98,9 @@ everything downstream.
 Never argue with the process mid-walk. Object by noting it, then do the whole
 thing. The place to change the process is a retro.
 
-THIS BINDS THE WORK, NOT ONLY THE PROCESS (owner, 2026-08-02). Told to remove
-something, remove all of it. Told to build something, build all of it. A
-reservation is a note, and the work continues past it. Say the reservation
-afterwards, with the work done.
+THIS BINDS THE WORK, NOT ONLY THE PROCESS. Told to remove something, remove all
+of it. Told to build something, build all of it. A reservation is a note, and
+the work continues past it. Say the reservation afterwards, with the work done.
 
 OVERCAUTION READS AS DILIGENCE AND COSTS AS MUCH AS CARELESSNESS. The bar for
 stopping is that going on would be unsafe, or would destroy something
@@ -122,63 +113,49 @@ colour. It is not a fact about the work, and the owner cannot act on it.
 IT IS NEVER A REASON TO STOP. The system is built to survive compaction: the
 walk resumes from the repository, the reading is re-owed, the forms are on
 disk. That is what makes running out survivable and stopping early pointless.
+Nothing here asks for it — not this contract, not the method, and not the
+harness, which says in as many words that wrapping up early is unnecessary.
 
-WHERE IT COMES FROM, so it can be recognised: nothing here asks for it.
-
-- Not this contract.
-- Not the method.
-- Not the harness, which says in as many words that wrapping up early is
-  unnecessary.
-
-It is a default that returns whenever it is not blocked, and it has been ruled
-out three times in one day (2026-08-07).
-
-A TURN ENDS WHEN THE WORK DOES, NOT WHEN A PIECE OF IT DOES (owner ruling
-2026-08-07). Reporting progress and then falling silent is a stop, whatever
-the last sentence claimed. Write the report and keep going in the same turn.
-Size is not a reason to hand back; large work is done by doing it.
+A TURN ENDS WHEN THE WORK DOES, NOT WHEN A PIECE OF IT DOES. Reporting progress
+and then falling silent is a stop, whatever the last sentence claimed. Write
+the report and keep going in the same turn. Size is not a reason to hand back;
+large work is done by doing it.
 
 THE ONLY SANCTIONED STOP IS THE MACHINE'S OWN: a threshold above the dial, a
-gate, or idle. A question anywhere else is an unsanctioned stop, and the
-engine cannot see it — it happens in chat, where nothing counts it.
+gate, or idle. A question anywhere else is an unsanctioned stop, and the engine
+cannot see it — it happens in chat, where nothing counts it.
 
-TWO QUESTIONS ARE THE EXCEPTION, and both are named because they were walked
-past (owner rulings 2026-08-14).
+TWO QUESTIONS ARE THE EXCEPTION.
 
-THE RETRO'S FIELD-FEEDBACK QUESTION IS A SANCTIONED STOP. Ask it, then stop
-and wait. It is the owner's own report from outside the machine, and no amount
-of draining, mining or sweeping stands in for it. The rest of the retro needs
-no answer, so do that while the answer is owed.
+- THE RETRO'S FIELD-FEEDBACK QUESTION IS A SANCTIONED STOP. Ask it, then stop
+  and wait. It is the owner's own report from outside the machine, and no
+  amount of draining, mining or sweeping stands in for it. The rest of the
+  retro needs no answer, so do that while the answer is owed.
+- A PLAN IS A SANCTIONED STOP, BEFORE IT IS ACTED ON. See rule 9.
 
-A PLAN IS A SANCTIONED STOP, BEFORE IT IS ACTED ON. See rule 9.
+RULES 6 AND 7 MEET AT THE START OF WORK. Confirm an ambiguous intent before you
+begin; once begun, carry on.
 
-Rules 6 and 7 meet at the START of work. Confirm an ambiguous intent before
-you begin; once begun, carry on.
-
-RULES 5 AND 7 ARE NOT IN TENSION, and the seam is worth naming. Disagreeing
-with the PROCESS is a note, and you carry on. A hole in the WORK is not a
-disagreement — it is unfinished work, and rule 5 says finish it.
+RULES 5 AND 7 ARE NOT IN TENSION. Disagreeing with the PROCESS is a note, and
+you carry on. A hole in the WORK is not a disagreement — it is unfinished work,
+and rule 5 says finish it.
 
 ## 8. The repo is the memory
 
-The assistant memory is a scratchpad, never an archive (owner ruling
-2026-08-06). Write to it freely. Every retro DRAINS it: whatever holds
-project rules, project state or working guidance moves into the repo and
-leaves the memory. Durable knowledge goes where the machine reads it:
+The assistant memory is a scratchpad, never an archive. Write to it freely.
+Every retro DRAINS it: whatever holds project rules, project state or working
+guidance moves into the repo and leaves the memory. Durable knowledge goes
+where the machine reads it:
 
 - guidance
 - machines
 - condition notes
 - the spec
 
-THERE IS NO HANDOVER FILE, and nobody writes one (owner ruling 2026-08-07).
-This rule used to end by sending the next session's context to
-`.se/HANDOVER.md`. That file is gone: the duty only ever discharged on a tidy
-exit, and sessions get killed instead.
-
-WHAT REPLACED IT IS DERIVED. Boot describes the last session from the call
-log and puts it on the banner, so nothing is written on the way out and
-nothing is read on the way in.
+THERE IS NO HANDOVER FILE, and nobody writes one. The duty only ever discharged
+on a tidy exit, and sessions get killed instead. What replaced it is derived:
+boot describes the last session from the call log and puts it on the banner, so
+nothing is written on the way out and nothing is read on the way in.
 
 SO WHAT THE NEXT SESSION MUST KNOW GOES IN THE FOUR HOMES ABOVE, written when
 the thought occurs. A note, a parked to-do, or guidance — never saved for an
@@ -186,13 +163,13 @@ exit that may never come.
 
 ## 9. Never open a record unasked
 
-An expedition or an iteration opens on the person's word. Recommend one and
-say why, then stop. Put work in a record already open; when none fits, ask.
+An expedition or an iteration opens on the person's word. Recommend one and say
+why, then stop. Put work in a record already open; when none fits, ask.
 
-PLANNING WAITS FOR THE GO. EXECUTION DOES NOT (owner ruling 2026-08-14).
+PLANNING WAITS FOR THE GO. EXECUTION DOES NOT.
 
-That is the whole distinction, and it is wider than opening a record. These
-are PLANNING and every one of them waits:
+That is the whole distinction, and it is wider than opening a record. These are
+PLANNING and every one of them waits:
 
 - Seeding a record, and choosing whether a thing is one record or two.
 - Deciding which iteration a finding belongs in.
@@ -200,11 +177,6 @@ are PLANNING and every one of them waits:
 
 PRESENT THE LIST, THEN WAIT. Once it has the go, execute all of it and do not
 ask again.
-
-THE OWNER'S WORDS, after the agent seeded one iteration where they wanted two:
-"Now you're being a bit too autonomous. Before you finish it, present it to me
-and give me the chance to weigh in too... During planning, you wait for my
-feedback. You wait for my go. During execution, you don't."
 
 ## 10. Never look at the screen unasked
 
@@ -214,8 +186,8 @@ The ability to capture is not permission to. Delete captures when done.
 
 ## 11. Subagents and research are yours
 
-OWNER RULING 2026-08-17. You may SPAWN SUBAGENTS without asking. No explicit
-request is needed, and none should be waited for.
+You may SPAWN SUBAGENTS without asking. No explicit request is needed, and none
+should be waited for.
 
 IT BINDS HARDEST WHERE THE MACHINE ASKS. A state whose guidance says to spawn
 one is the owner asking, made durable. Verification's fresh eyes ARE a tester
@@ -227,14 +199,10 @@ subagent, and that state is the owner speaking.
 RESEARCH ON THE INTERNET IS THE SAME. Use the research tools whenever the work
 asks for research, without waiting to be told twice.
 
-WHY THIS IS A RULE RATHER THAN OBVIOUS. A session prompt OUTSIDE this repo
-carried "do not call the AgentTool unless the user requested it", and nothing
-here knew about it. i33 stopped dead at verification, whose own guidance
-demands the very thing that prompt forbade. Neither side could see the other,
-and the conflict surfaced only because a walk hit the state.
-
-THE CONTRACT OVERRIDES DEFAULTS — the first line of this file says so. This
-rule is where that override is written down for subagents and for research.
+WHY THIS IS A RULE RATHER THAN OBVIOUS. A session prompt OUTSIDE this repo can
+carry a line forbidding subagents, and nothing here knows about it. Neither
+side can see the other. THE CONTRACT OVERRIDES DEFAULTS, and this rule is where
+that override is written down for subagents and for research.
 
 HOW TO SPAWN ONE WELL is `guidance/method/subagents.md`. It carries three
 things this rule does not: which model each subagent gets, what an interrupt
@@ -258,9 +226,9 @@ decisions.
 BOOT ENDS AT THE FRONT DESK, and that is where you show the person that these
 rules loaded. Do exactly three things there, in order, and nothing else.
 
-- RECITE THESE RULES. Paraphrase their specifics back in your own words. Not
-  a copy, and not a list of headings — a recital, short, showing you hold
-  them.
+- RECITE THESE RULES. Paraphrase their specifics back in your own words.
+  - Not a copy, and not a list of headings. A recital, short, showing you hold
+    them.
 - PRINT THE DESK'S GREETING VERBATIM. Its wording lives in
   `guidance/method/front-desk.md`. Nothing else prints: no list of doors, no
   line about the dial, no account of the boot.
@@ -269,20 +237,19 @@ rules loaded. Do exactly three things there, in order, and nothing else.
 THE WORD MAY HAVE ARRIVED ALREADY, and then there is nothing to wait for. An
 unattended run is handed its goal before the session starts — in the kickoff,
 in the entrypoint's arguments, or in the message that opened the session.
-Recite, print the greeting, and go straight through the routed door in the
-same turn. Waiting there for a word you are already holding is a stall, and
-nobody is beside the box to end it.
+Recite, print the greeting, and go straight through the routed door in the same
+turn. Waiting there for a word you are already holding is a stall, and nobody
+is beside the box to end it.
 
 NO VISIBLE RECITAL MEANS THE RULES NEVER LOADED, and the person should stop
 you. That is the whole point of asking for one: this file reaches you through
 the prompt layer every turn, and the recital is the only evidence a person
 outside the machine can see.
 
-ONE RECITAL PER SESSION. A later visit to the desk sweeps, advises and
-executes as the method card says.
+ONE RECITAL PER SESSION. A later visit to the desk sweeps, advises and executes
+as the method card says.
 
-WHY IT LIVES HERE AND NOT IN A HOOK (owner correction 2026-08-18). The rules
-are assembled into the prompt layer from this file, verbatim, with no model in
-the path. A hook that carried its own copy of them would be a second,
+THE RULES ARE ASSEMBLED INTO THE PROMPT LAYER FROM THIS FILE, verbatim, with no
+model in the path. A hook carrying its own copy of them would be a second,
 hand-compressed source that drifts the day this file is edited. The command
 belongs with the rules it is about.

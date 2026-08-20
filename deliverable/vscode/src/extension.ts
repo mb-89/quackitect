@@ -297,17 +297,34 @@ async function produceTree(kind, name, dest, abbr) {
     vscode.window.showErrorMessage(`${name} was not made. ${why}`);
     return;
   }
+  // THE INSTALL IS THE MACHINE'S JOB, NEVER THE PERSON'S. A copy ships without
+  // node_modules and cannot run until something installs them, so leaving that
+  // to the person turns one button into a button plus a command line.
+  //
+  // ONLY A VEHICLE NEEDS IT. A project carries none of the method, so it has no
+  // deliverable/ to install into.
+  if (kind === "vehicle" && (await ensureDeps(answer.result.dest)) !== true) {
+    // IT STILL OPENS. A tree that is made but not installed is worth landing
+    // in, and the message says what is left to do rather than hiding it.
+    vscode.window.showWarningMessage(`${name} was made, but installing its dependencies failed. The output channel has the log.`);
+  }
   // IT ENDS WITH THE BUILDER INSIDE THE RESULT, in a NEW window. The window
   // they pressed it from is left exactly as they left it.
   await vscode.commands.executeCommand("vscode.openFolder", vscode.Uri.file(answer.result.dest), { forceNewWindow: true });
 }
 
+// IT OPENS WHERE THEY ALREADY ARE. The folder open in this window is the one
+// people mean by "here", so the dialog starts there and one click confirms it.
+// The dialog stays, because the open folder is usually NOT empty and producing
+// into it would refuse — better to see the place than to read a refusal.
 async function askForAnEmptyFolder(title) {
+  const here = vscode.workspace.workspaceFolders?.[0]?.uri;
   const picked = await vscode.window.showOpenDialog({
     canSelectFolders: true,
     canSelectFiles: false,
     canSelectMany: false,
     openLabel: "Make it here",
+    defaultUri: here,
     title,
   });
   return picked === undefined || picked.length === 0 ? null : picked[0].fsPath;
@@ -690,6 +707,8 @@ const ICON = {
   log: '<svg viewBox="0 0 16 16"><path d="M2.6 4.2h10.8M2.6 8h10.8M2.6 11.8h6.8"/></svg>',
   card: '<svg viewBox="0 0 16 16"><rect x="2.6" y="2.6" width="10.8" height="10.8"/></svg>',
   restart: '<svg viewBox="0 0 16 16"><path d="M13.2 8a5.2 5.2 0 1 1-1.7-3.85"/><path d="M13.6 1.9v3.3h-3.3"/></svg>',
+  copy: '<svg viewBox="0 0 16 16"><rect x="2.6" y="2.6" width="8" height="8"/><path d="M5.4 13.4h8V5.4"/></svg>',
+  newFolder: '<svg viewBox="0 0 16 16"><path d="M2.2 12.6V3.9h4.2l1.4 1.7h6v7z"/><path d="M8 7.6v3.4M6.3 9.3h3.4"/></svg>',
 };
 
 function cardIcon(card) {
@@ -1055,6 +1074,14 @@ class Strip {
       if (!inStrip(c)) continue;
       list.push({ cmd: `$PRODUCT_ID$.openCard${c.n}`, icon: cardIcon(c), label: titleOf(c), key: `ctrl+alt+${c.n}` });
     }
+    // THE TWO PRODUCING ACTS LIVE HERE, beside the doors (owner ruling). Both
+    // were declared and registered but placed nowhere, so the palette was the
+    // only way to reach them and nobody could find them.
+    //
+    // THEY SIT LAST because they are rare. A person opens the book daily and
+    // makes a copy once.
+    list.push({ cmd: "$PRODUCT_ID$.createVehicle", icon: ICON.copy, label: "Copy this system", key: "" });
+    list.push({ cmd: "$PRODUCT_ID$.createProject", icon: ICON.newFolder, label: "Start a project", key: "" });
     return list;
   }
   page() {

@@ -24,3 +24,10 @@ DONE LOOKS LIKE: gitInit, refusal() and the seed-an-iteration scaffold exist onc
 ## Inputs
 
 - spec/overhauls/2026-08-20/plan.md
+
+## Carried work tokens
+
+These stood in the options pool referenced by no iteration at all. Assigned
+here in a pass over the pool.
+
+- wt-restore-a-zero-failure-acceptance-baseline-by-repairing-the-

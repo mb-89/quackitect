@@ -95,3 +95,11 @@ A TABLE EDITOR IS A MATRIX EDITOR (note-195c34f89ac0). Each editor writes its ow
 - project/spec/version-planning.md
 - project/deliverable/engine/trace.ts
 - spec/man-verification-validation.md at ref main
+
+## Carried work tokens
+
+These stood in the options pool referenced by no iteration at all. Assigned
+here in a pass over the pool.
+
+- wt-an-extension-of-the-two-armed-diagram-idea-the-picture-carri
+- wt-show-an-iteration-s-footprint-as-the-two-armed-diagram-engin

@@ -117,3 +117,10 @@ spec/overhauls/2026-08-20/findings.md, engine-core section.
   which mergeEqualities turns into an equality judgment against a
   phantom node — i40 guards the crash path; the typed-field refusal that
   makes the shape unwritable is this record's work.
+
+## Carried work tokens
+
+These stood in the options pool referenced by no iteration at all. Assigned
+here in a pass over the pool.
+
+- wt-an-open-question-about-note-headers-wanting-a-ruling-rather-

@@ -114,3 +114,18 @@ have it."
 AND IT MUST NOT BLOCK THE OVERLAY. The rework may land later, in its own
 iteration. Their words: "We can do the folder rework later. That's also...
 that's fine."
+
+## Carried work tokens
+
+These stood in the options pool referenced by no iteration at all. Assigned
+here in a pass over the pool.
+
+- wt-a-standing-constraint-says-the-system-takes-its-own-name-fro
+- wt-no-standing-demand-says-that-a-lookup-with-several-layers-mu
+
+## Carried notes
+
+- note-061b447b2257 — RUNME must run once and never again. The extension copy
+  under the editor's own folder is what breaks that. Half-paid 2026-08-20: the
+  build renders a tree and RUNME links it, so a rebuild is now enough. The
+  owner's view is that the copy should go entirely.

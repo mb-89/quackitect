@@ -26,3 +26,10 @@ DONE LOOKS LIKE: an amend with chain:true touches no downstream file; a run past
 
 - spec/overhauls/2026-08-20/plan.md
 - spec/overhauls/2026-08-20/findings.md
+
+## Carried notes
+
+- note-b7c90887caa1 — a script was written to find orphan work tokens without
+  first checking whether a lane verb answers it. The engine already computes
+  the relation: se_file_delete returns cited_by for a trace node. It is exposed
+  only on a destructive call, so "who cites this" has no read-only verb.

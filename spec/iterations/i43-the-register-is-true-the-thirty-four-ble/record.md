@@ -26,3 +26,10 @@ DONE LOOKS LIKE: every closed entry cites what discharged it; the three merge fa
 
 - spec/overhauls/2026-08-20/plan.md
 - spec/overhauls/2026-08-20/findings.md
+
+## Carried work tokens
+
+These stood in the options pool referenced by no iteration at all. Assigned
+here in a pass over the pool.
+
+- wt-reshaping-a-system-can-leave-older-demands-untrue-and-no-ste

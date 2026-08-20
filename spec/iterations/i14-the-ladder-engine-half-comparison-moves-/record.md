@@ -78,3 +78,11 @@ ONE ENGINE PER PROJECT, MANY HANDS (owner design, note-ac0d51fafb55, kind B of t
 - i13-the-machine-format-state-machines-become
 - machines/scale.md
 - engine/machines/compile.ts asPriority
+
+## Carried work tokens
+
+These stood in the options pool referenced by no iteration at all. Assigned
+here in a pass over the pool.
+
+- wt-a-spawned-marker-is-told-to-lean-on-a-list-of-outside-compar
+- wt-an-ordering-of-decision-criteria-is-computed-from-a-damage-g

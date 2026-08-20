@@ -179,3 +179,11 @@ most, and repeating it here would be the joke writing itself.
 - project/spec/version-planning.md
 - spec/trace/requirement/req-mirror-stays-on-the-machine.md
 - project/deliverable/tests/route.test.ts
+
+## Carried work tokens
+
+These stood in the options pool referenced by no iteration at all. Assigned
+here in a pass over the pool.
+
+- wt-the-compare-card-form-field-s-empty-pool-case-gets-checked-a
+- wt-two-engine-faults-and-one-display-fault-found-together-when-

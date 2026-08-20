@@ -58,3 +58,11 @@ FULL CONTEXT: project/spec/version-planning.md, section J3.
 - project/spec/version-planning.md
 - i10-the-big-sweep-one-pass-over-one-key-a-mo
 - project/V2-INVENTORY.md
+
+## Carried work tokens
+
+These stood in the options pool referenced by no iteration at all. Assigned
+here in a pass over the pool.
+
+- wt-a-searcher-asks-one-question-and-comes-back-with-four-good-a
+- wt-big-investigations-belong-in-the-knowledge-base-rather-than-

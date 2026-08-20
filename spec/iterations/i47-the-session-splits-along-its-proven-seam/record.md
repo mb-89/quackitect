@@ -25,3 +25,18 @@ DONE LOOKS LIKE: session.ts near fifteen hundred lines of walk core; sessionrout
 ## Inputs
 
 - spec/overhauls/2026-08-20/plan.md
+
+## Carried work tokens
+
+These stood in the options pool referenced by no iteration at all. Assigned
+here in a pass over the pool.
+
+- wt-permission-granted-by-the-person-is-lost-whenever-the-server
+- wt-when-a-signature-is-turned-away-for-insufficient-authority-t
+
+## Carried notes
+
+- note-4476abf27591 — closing the editor window ends the session; a hot reload
+  inside a session does not. Today the engine cannot tell them apart, so a
+  close-and-reopen inherits the previous session whole, dials included. Pairs
+  with the two tokens above about permission lost on restart.

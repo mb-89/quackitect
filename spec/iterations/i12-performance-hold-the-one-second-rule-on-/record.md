@@ -146,3 +146,13 @@ THE RULE THIS WANTS TO BECOME. A goal item that measurement retires is STRUCK
 from the goal, with the measurement as its reason. Leaving it standing makes
 every later reader judge against a demand that was already answered, and
 contract rule 5 says a contradiction is resolved rather than recorded.
+
+## Carried notes
+
+Machine-local notes do not travel with git, so the ones that belong to this
+iteration are named here.
+
+- note-4a31cf236f23 — the spill page is sized for the worst escape case, and a
+  read that shrank to fit would roughly halve the calls spent paging. Measured
+  again 2026-08-20: paging was 21% of a day's calls, and the cursor restarts at
+  0 while the inline page already carried the first 3,500 characters.

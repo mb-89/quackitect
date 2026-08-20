@@ -14,9 +14,7 @@ legal_tools:
   - se_file_search
   - se_file_glob
   - se_file_list
-  - se_log_query
-  - se_answer
-  - se_test
+  - se_log_query\n  - se_answer\n  - se_web_search\n  - se_web_fetch\n  - se_test
 evidence:
   - name: quality_ok
     template: checklist

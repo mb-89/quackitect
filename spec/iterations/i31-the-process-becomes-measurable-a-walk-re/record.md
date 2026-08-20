@@ -60,3 +60,17 @@ THREE FAILURES LOOK ALIKE AND WANT DIFFERENT FIXES. High drag with repeated read
 WHY IT MATTERS NOW. The owner's complaint on 2026-08-14 was that running an iteration costs too much agent reasoning, and that the engine should simply work. Today that complaint has no measurement behind it. This iteration is what turns it into a ranked list of states.
 
 ONE JUDGMENT IS THE OWNER'S, not the implementer's. An adjudication recorded in a replayed history was given against the old state. Whether a replayed bless still stands or must be re-asked is theirs to decide.
+
+## Carried work tokens
+
+These stood in the options pool referenced by no iteration at all. Assigned
+here in a pass over the pool.
+
+- wt-running-an-experiment-costs-more-in-machine-setup-than-in-th
+- wt-two-connected-changes-about-throwaway-programs-first-the-mac
+
+## Carried notes
+
+- note-e6fab31e9173 — the retro should sweep scratchpad/ and delete every script
+  whose result has landed. Pairs with the throwaway-programs token above, which
+  asks the look-back to PROMOTE repeated scripts; this is the deletion half.

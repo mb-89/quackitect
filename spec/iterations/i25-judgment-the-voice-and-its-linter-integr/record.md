@@ -104,3 +104,10 @@ in spec/overhauls/2026-08-20/findings.md, prior-art-maintenance section.
   (rules' logic vs voice-lint.md data) are inventoried there too, with
   the forbidden-word collision measurement (972 'record' hits including
   the TypeScript type).
+
+## Carried notes
+
+- note-c1154068e80e — guidance carries the rule; provenance and motivation move
+  to a deeper-reading file. Measured: five stopping rules stood in both
+  contract.md and voice.md, and both ship in the prompt layer. Names a
+  mechanical check: no long run of words in two prompt-layer sources at once.

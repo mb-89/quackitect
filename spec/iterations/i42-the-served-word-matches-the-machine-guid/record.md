@@ -28,3 +28,10 @@ THE VOICE-LINT RULES THEMSELVES BELONG TO i25, which carries the owner's standin
 
 - spec/overhauls/2026-08-20/plan.md
 - spec/overhauls/2026-08-20/findings.md
+
+## Carried work tokens
+
+These stood in the options pool referenced by no iteration at all. Assigned
+here in a pass over the pool.
+
+- wt-two-related-guidance-gaps-cost-real-agent-effort-this-sessio

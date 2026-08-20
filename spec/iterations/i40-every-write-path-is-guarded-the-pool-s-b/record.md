@@ -25,3 +25,11 @@ DONE LOOKS LIKE: a backslash-spelled pool path refuses SE-C-140; patching frontm
 ## Inputs
 
 - spec/overhauls/2026-08-20/plan.md
+
+## Carried work tokens
+
+These stood in the options pool referenced by no iteration at all. Assigned
+here in a pass over the pool.
+
+- wt-a-chart-field-meant-to-be-drawn-accepts-typed-text-and-that-
+- wt-ungradeable-and-unreadable-ledger-entries-reach-the-shared-b
