@@ -229,6 +229,10 @@ export class Session {
   private _autonomy = 0;
   /** see dsp-walk-machine.md#every-engine-start-aims-at-the-front-desk */
   private _target = "front_desk";
+  /** A settings store was on disk and belonged to a DIFFERENT session, so
+   *  nothing was restored. Said once, because a default dial and a lowered one
+   *  are indistinguishable to a reader. */
+  private _staleSettings = false;
   /** THE STOP-AT NOTCH — how far the agent walks before handing back. The
    *  autonomy dial's neighbour: autonomy says what it may DECIDE alone, this
    *  says how far it may GO.
@@ -469,10 +473,17 @@ export class Session {
         reads?: Record<string, string>;
         reads_pid?: number;
         target?: string;
+        at?: string;
         stop_at?: number;
         session?: string;
       };
       const mine = process.env.SE_SESSION;
+      // A STORE THAT DID NOT MATCH IS WORTH SAYING OUT LOUD. Not restoring is
+      // correct — a fresh start takes the defaults on purpose — but a dial at
+      // default reads exactly like a dial the person set low, and the refusal
+      // it later produces says the hand is too small rather than that it was
+      // reset.
+      if (typeof s.session === "string" && s.session !== "" && s.session !== mine) this._staleSettings = true;
       if (mine !== undefined && mine !== "" && s.session === mine) {
         if (typeof s.autonomy === "number" && s.autonomy >= 0 && s.autonomy <= 1) this._autonomy = s.autonomy;
         // Emergency rides its rung: restored only beside a top-rung autonomy.
@@ -484,6 +495,7 @@ export class Session {
           this._narrationCalls = s.narration_calls;
         this.restoreReadCredit(s.reads, s.reads_pid);
         this.restoreTarget(s.target, s.reads_pid);
+        this.restoreAt(s.at, s.reads_pid);
         // THE NOTCH SURVIVES A RELOAD, and the release does not. Permission is
         // for one transition; carrying it across an engine swap would spend a
         // press the person made for a state that no longer stands.
@@ -505,6 +517,28 @@ export class Session {
   private aimAt(to: string): void {
     this._target = to;
     this.persistSettings();
+  }
+
+  /** AIM BACK AT WHERE THE WALK WAS STANDING, when nothing else is aimed.
+   *
+   *  THE POSITION IS STILL NOT REMEMBERED AS A POSITION. It comes back as a
+   *  DIRECTION, and the ordinary recompute walks there — one sweep, up to 64
+   *  hops, the same machinery every other route uses.
+   *
+   *  WHY IT IS NEEDED AT ALL. An arrival clears the target, so a walk that
+   *  reached its last aim and carried on working holds nothing aimed. A reload
+   *  there had no direction to recompute toward and came up at the front desk,
+   *  and the way back was walked by hand.
+   *
+   *  A REAL TARGET ALWAYS WINS. This fills the gap an arrival left; it never
+   *  overwrites an aim the person or the walk set.
+   *
+   *  see dsp-boot-and-power.md#the-target-survives-a-reload-the-position-does-not */
+  private restoreAt(at: string | undefined, pid: number | undefined): void {
+    if (pid === undefined || pid === process.pid) return;
+    if (this._target !== "" && this._target !== "front_desk") return;
+    if (typeof at !== "string" || at === "" || at === "front_desk") return;
+    this._target = at;
   }
 
   /** see dsp-boot-and-power.md#the-reading-credit-survives-a-reload */
@@ -530,6 +564,14 @@ export class Session {
           reads: this.reads.buffered(),
           reads_pid: process.pid,
           target: this._target,
+          // WHERE THE WALK STANDS, kept only so a reload can aim back at it.
+          // The position is still not RESTORED as a position — see restoreAt.
+          //
+          // ONLY ONCE BOOT IS DONE. A walk still inside boot has no position
+          // worth returning to, and aiming at one changes the route the boot
+          // READING is built from — which is a different document set, on a
+          // step whose whole job is to hand over the right documents.
+          at: this.isBooted() ? (this.active()[0] ?? "") : "",
           stop_at: this._stopAt,
         })}\n`,
         "utf8",
@@ -537,6 +579,14 @@ export class Session {
     } catch {
       /* a failed save never blocks the slider */
     }
+  }
+
+  /** Whether the sliders came up at their defaults because this is a NEW
+   *  session rather than a reload. Cleared once read, so it is said once. */
+  takeStaleSettings(): boolean {
+    const was = this._staleSettings;
+    this._staleSettings = false;
+    return was;
   }
 
   /** Boot is done — the toll arms on this; the reading room pays none. */

@@ -9,6 +9,8 @@
 // TO FORGET. It arms only from the top rung. It dies with that rung. It never
 // survives a restart. And nothing in the resting packet says it exists.
 import { strict as assert } from "node:assert";
+import { mkdirSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
 import { describe, test } from "node:test";
 import { Rejection } from "../engine/errors.ts";
 import { Session } from "../engine/session.ts";
@@ -199,5 +201,78 @@ describe("the surface", () => {
     const on = renderPanel(spec, { rungs, autonomy: 1, emergency: true, ints: {} });
     assert.equal((on.match(/>E</g) ?? []).length, 1);
     assert.match(on, />M</, "the lower rung keeps its own letter");
+  });
+});
+
+// A RELOAD USED TO LAND AT THE FRONT DESK WITH NOTHING AIMED.
+//
+// The design is deliberate: the position is not remembered, because evidence
+// gives the position and the target gives the direction, and the recompute
+// walks back on its own. The hole is that an ARRIVAL CLEARS THE TARGET. A walk
+// standing deep in an iteration, having reached whatever it last aimed at,
+// holds an empty target — so a reload there had no direction at all and came up
+// at the desk, with the way back walked by hand.
+//
+// THE SWEEP WAS NEVER THE PROBLEM. It already walks up to 64 hops in one call.
+// It had nowhere to walk TO.
+//
+// SO THE POSITION COMES BACK AS A DIRECTION, never as a position. The walk
+// still re-derives where it stands from evidence and still moves only by
+// routing.
+describe("a reload aims back at where the walk stood", () => {
+  const storeFor = (r: string, extra: Record<string, unknown>): void => {
+    mkdirSync(join(r, ".se"), { recursive: true });
+    writeFileSync(
+      join(r, ".se", "settings.json"),
+      `${JSON.stringify({
+        session: "reload-position-case",
+        autonomy: 0.6,
+        // A PID THAT IS NOT OURS is what says a process really restarted. Two
+        // Sessions in one test share a pid, so without this the restore
+        // correctly declines and the case would pass for the wrong reason.
+        reads_pid: process.pid + 1,
+        ...extra,
+      })}\n`,
+      "utf8",
+    );
+  };
+
+  test("an empty target is filled with the state the last engine stood on", () => {
+    const had = process.env.SE_SESSION;
+    process.env.SE_SESSION = "reload-position-case";
+    try {
+      const r = root();
+      storeFor(r, { target: "", at: "verification" });
+      assert.equal(new Session(r).target, "verification", "the walk knows where it was going again: back");
+    } finally {
+      if (had === undefined) delete process.env.SE_SESSION;
+      else process.env.SE_SESSION = had;
+    }
+  });
+
+  test("a real target always wins — this only fills the gap an arrival left", () => {
+    const had = process.env.SE_SESSION;
+    process.env.SE_SESSION = "reload-position-case";
+    try {
+      const r = root();
+      storeFor(r, { target: "gate-release", at: "verification" });
+      assert.equal(new Session(r).target, "gate-release", "an aim the person or the walk set is never overwritten");
+    } finally {
+      if (had === undefined) delete process.env.SE_SESSION;
+      else process.env.SE_SESSION = had;
+    }
+  });
+
+  test("a fresh start gets nothing back, position included", () => {
+    const had = process.env.SE_SESSION;
+    process.env.SE_SESSION = "a-different-session-entirely";
+    try {
+      const r = root();
+      storeFor(r, { target: "", at: "verification" });
+      assert.notEqual(new Session(r).target, "verification", "a new session takes the defaults, deliberately");
+    } finally {
+      if (had === undefined) delete process.env.SE_SESSION;
+      else process.env.SE_SESSION = had;
+    }
   });
 });

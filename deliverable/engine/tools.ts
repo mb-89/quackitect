@@ -776,17 +776,36 @@ export function buildServer(
   // means stale for certain; a matching one means nothing, because most engine
   // edits never touch the manifest. Said once: a banner on every call is
   // furniture within the hour.
+  //
+  // THE SLIDERS COMING UP AT THEIR DEFAULTS is the other thing a first pull
+  // should say. The settings store is stamped with the shim's session token and
+  // restores only on a match — a reload keeps the sliders, a fresh start takes
+  // the defaults, deliberately. What was missing is anyone saying so: a dial at
+  // default reads exactly like a dial the person set low, and the refusal it
+  // later produces says the hand is too small rather than that it was reset.
+  // Four calls went into auditing a correct form for want of this sentence.
+  //
+  // BOTH RIDE ONE KEY, so they are joined. Two decorators each setting
+  // `banner` would mean the second silently ate the first.
   let ageAnnounced = false;
   server.addDecorator((tool, result) => {
-    if (tool !== "se_pull" || ageAnnounced) return result;
-    const age = laneAge();
-    if (!age.stale) return result;
+    if (tool !== "se_pull") return result;
     if (typeof result !== "object" || result === null || Array.isArray(result)) return result;
-    ageAnnounced = true;
-    return {
-      ...(result as Record<string, unknown>),
-      banner: `THE RUNNING LANE IS NOT THE CODE ON DISK. It is serving ${age.served}; the tree says ${age.on_disk}. The process loaded the engine once and Node cached it, so every engine change since is invisible to this lane — including any this walk made. A green battery does not contradict this: se_test runs the files on disk. Restart the lane before trusting anything that depends on engine behaviour.`,
-    };
+    const notices: string[] = [];
+    const age = laneAge();
+    if (age.stale && !ageAnnounced) {
+      ageAnnounced = true;
+      notices.push(
+        `THE RUNNING LANE IS NOT THE CODE ON DISK. It is serving ${age.served}; the tree says ${age.on_disk}. The process loaded the engine once and Node cached it, so every engine change since is invisible to this lane — including any this walk made. A green battery does not contradict this: se_test runs the files on disk. se_reload restarts it onto these sources — a lane verb, legal at idle, that canary-loads first and refuses rather than killing a running engine for a tree that will not load. Restarting from OUTSIDE instead mints a new session and drops the dial.`,
+      );
+    }
+    if (session.takeStaleSettings()) {
+      notices.push(
+        "THE SLIDERS ARE AT THEIR DEFAULTS BECAUSE THIS IS A NEW SESSION, not because anyone lowered them. A settings store was on disk and belongs to an earlier lane, so nothing was restored — that is deliberate: se_reload keeps the sliders, a fresh start does not. If a gate later refuses a bless for want of authority, the dial was RESET rather than set low.",
+      );
+    }
+    if (notices.length === 0) return result;
+    return { ...(result as Record<string, unknown>), banner: notices.join("\n\n") };
   });
 
   // THE ON-CHANGE TYPECHECK'S REPORT rides every result while the tree is red.
