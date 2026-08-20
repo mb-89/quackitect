@@ -122,3 +122,34 @@ pass with overrides — the journeys are the right two and one of them terminate
 
 ## anything_else
 
+WHAT THIS ITERATION HAS MINTED SO FAR, counted by searching the trace for the
+record stamp rather than by remembering.
+
+NINETEEN NODES across six kinds: eleven register entries, two value props, two
+stories, two use cases, one stakeholder, one neighbour.
+
+THE REGISTER IS THE BULK OF IT and that is the shape of this iteration rather
+than an accident. Four risks, two assumptions, four issues, one dependency.
+
+- Four RISKS about the mechanism failing quietly: the milestone seam moving
+  step shapes, the rung drifting upward unnoticed, the submachine maximum
+  dragging easy items along, and the weaker-model asymmetry having nothing
+  enforcing it.
+- Two ASSUMPTIONS, both with their probes written at identification: one list
+  serving every host, and the answering model being recordable when only the
+  agent knows it.
+- Four ISSUES, present tense: the engine does spawn an agent while the seed
+  denies it; the seed counts a matrix that has moved; a call cannot be
+  attributed to its state; and two always-on roles have no node while one now
+  carries a duty.
+- One DEPENDENCY, and it is the one that decides whether any of this pays: the
+  payoff waits on a weak model being able to boot at all.
+
+TWO OF THE ELEVEN ARE ABOUT THE ITERATION'S OWN SEED being wrong, which is
+unusual enough to say out loud. They cannot be closed by any state below,
+because correcting a record's rulings is not a walking milestone's act.
+
+A NOTE ON HOW THIS FIGURE WAS ARRIVED AT, given the milestone's history: it was
+produced by a search over the record stamp and counted by program. The two
+numbers this milestone got wrong were both produced by reading a listing with
+my eyes.

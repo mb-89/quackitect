@@ -126,3 +126,10 @@
 {"ts":"2026-08-20T10:42:52.944Z","op":"update","visit":"iterations/i38/write-stories@1","node":"d23","brief":"round 0 found an incomplete sweep stated as complete"}
 {"ts":"2026-08-20T10:43:16.220Z","op":"update","visit":"iterations/i38/map-stakeholders@0","node":"d24","brief":"map-stakeholders re-signed with all ten value props swept"}
 {"ts":"2026-08-20T10:43:32.817Z","op":"update","visit":"iterations/i38/write-stories@1","node":"d25","brief":"write-stories re-signed with the count corrected"}
+{"ts":"2026-08-20T10:48:30.906Z","op":"done","visit":"iterations/i38/gate-inputs@0","node":"d20","brief":"both M2 numbers recounted; two were wrong and are fixed"}
+{"ts":"2026-08-20T10:48:40.046Z","op":"done","visit":"iterations/i38/write-stories@0","node":"d12","brief":"stories minted and the form signed"}
+{"ts":"2026-08-20T10:48:40.582Z","op":"done","visit":"iterations/i38/write-stories@0","node":"d13","brief":"use cases minted and the form signed"}
+{"ts":"2026-08-20T10:48:41.105Z","op":"done","visit":"iterations/i38/gate-inputs@0","node":"d21","brief":"acceptance items filled"}
+{"ts":"2026-08-20T10:48:41.632Z","op":"done","visit":"iterations/i38/gate-inputs@0","node":"d22","brief":"rounds and verdict written"}
+{"ts":"2026-08-20T10:48:42.162Z","op":"update","visit":"iterations/i38/gate-inputs@0","node":"d26","brief":"holding the submit until the adversarial pass reports"}
+{"ts":"2026-08-20T10:49:11.554Z","op":"update","visit":"iterations/i38/gate-inputs@0","node":"d27","brief":"gate carries the minted inventory, counted not recalled"}
