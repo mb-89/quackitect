@@ -1,7 +1,8 @@
 ---
 form: write-stories
 by: agent
-signed_off: 2026-08-20T10:39:14.078Z
+signed_off: 2026-08-20T10:43:33.108Z
+reopened: "2026-08-20T10:42:44.058Z — it says FORTY-FIVE STORIES STAND and forty-six did; the number was eyeballed off a listing rather than counted"
 authors: agent
 files:
 ---
@@ -12,7 +13,7 @@ files:
 
 The roles are mapped. This state says which stories this delta moved.
 
-FORTY-FIVE STORIES STAND. Two are minted here, one for each value prop the delta authors. One that already stood is touched rather than rewritten, because the delta gives it the mechanism it was always waiting for.
+FORTY-SIX STORIES STOOD BEFORE THIS ONE, counted rather than eyeballed. THE FIRST VERSION OF THIS FORM SAID FORTY-FIVE and the correction is kept: the number was read off a printed listing by eye instead of counted, which is the same failure class the motivation gate paid for one milestone earlier. Two are minted here, one for each value prop the delta authors. One that already stood is touched rather than rewritten, because the delta gives it the mechanism it was always waiting for.
 
 Both new decks carry their proof slots filled honestly, including the two slides that do not fill yet.
 
@@ -31,6 +32,10 @@ Both new decks carry their proof slots filled honestly, including the two slides
 - sty-a-smaller-model-walks-a-record is TOUCHED AND NOT REWRITTEN. It is the ancestor story and its deck already records measured failures from a real cheap-model run. What this delta gives it is the mechanism it was written against — but its own last slide still waits on the boot door, which is not this record's to open.
 
 - THE PATTERN ACROSS ALL THREE DECKS, worth naming because it is the honest shape of this iteration: every slide that describes the machine DECIDING fills today; every slide that describes something ACTING on the decision waits on somebody else. That is the sequencing argument made concrete, and it is the strongest form of it available.
+
+- RE-SIGNED DURING THE INPUTS GATE'S ROUND 0, which recounted the standing set and found this form off by one. Nothing else in it moved: the two minted stories, the one touched, and the pattern across the decks all stand.
+
+- WORTH RECORDING BECAUSE IT IS THE THIRD OF ITS KIND: forty-five was not a guess, it was a count of a list I had just been shown. A listing read by eye and a listing counted by a program are different acts, and only one of them is a measurement.
 
 ## anything_else
 

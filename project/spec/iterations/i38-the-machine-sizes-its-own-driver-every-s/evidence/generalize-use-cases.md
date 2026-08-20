@@ -1,7 +1,8 @@
 ---
 form: generalize-use-cases
 by: agent
-signed_off: 2026-08-20T10:41:03.226Z
+signed_off: 2026-08-20T10:44:48.012Z
+reopened: "2026-08-20T10:44:47.086Z — write-stories was re-signed after it, so it answered older ground: the story count it inherits moved from forty-five to forty-six"
 authors: agent
 files:
 ---
@@ -31,6 +32,8 @@ Both new cases carry their extensions filled with what is TRUE TODAY rather than
 - uc-walk-a-record-on-a-smaller-model is touched and not rewritten. Its actor is stk-agent and its guarantee already says the machine must name the step needing judgment it cannot supply and stop. This delta gives it the thing that decides which steps those are, and changes nothing about the case itself.
 
 - THE MISSING CASE, named rather than minted: nothing here covers the MAINTENANCE pass — somebody opening the model list and bringing it current. It has no actor with a node, which is exactly the hole raid-iss-two-always-on-roles-have-no-node-and-one-now-carries-a-duty registers. A use case whose actor does not exist is a case that cannot be written yet, and writing it against the wrong actor would hide the gap.
+
+- RE-EARNED AFTER write-stories WAS RE-SIGNED. Its own figure was recounted at the same time and holds: fifty use cases stood before this record and two were minted here. Nothing in this form moved.
 
 ## anything_else
 

@@ -291,6 +291,67 @@ derive a rung from what will judge the output — because the same idea has just
 been demonstrated on this milestone's own evidence, at this milestone's own
 expense.
 
+
+## F12 — a subset checked and written in the voice of a sweep, twice
+
+TWICE IN TWO MILESTONES, with the lesson already written down between them.
+
+AT M1, log-risks said the standing register was not re-derived. True, and not
+what the state asked — it asks for a RE-READ. The sweep had not happened, and
+it turned up an open crippling entry directly on the iteration's payoff.
+
+AT M2, map-stakeholders' coverage field swept THREE value props and read as
+though it had swept all of them. Ten stand. Nine name one role and the tenth
+names another, which the sample had hidden.
+
+BOTH TIMES THE CONCLUSION HAPPENED TO HOLD, so nothing downstream broke and
+nothing signalled. That is what makes the shape dangerous rather than merely
+sloppy: a subset stated as a sweep is indistinguishable in the text from a
+sweep, and it is only caught by somebody re-running the whole set.
+
+DISCIPLINE HAS NOW FAILED AT IT TWICE, by an agent that had just been burned by
+it. That is the argument for a mechanical check rather than for trying harder,
+and it is the same argument as F11.
+
+## F13 — a reopen costs about five times a state transition
+
+MEASURED AT i38's INPUTS GATE, 2026-08-20, over 400 call records. Twenty-six
+calls exceeded the one-second bound on `if-agent-harness-to-entrypoint`. Six of
+them sit between 15.2 and 18.4 seconds and every one is an `se_pull` that
+carried a reopen cascade: re-signing a state recomputes the demand ledger for
+the whole column and the claim guard walks the downstream cone.
+
+THE REST OF THE SLOW CALLS sit between 1 and 4 seconds and are ordinary
+transitions and form submits. No read, search, write or query came near the
+bound.
+
+WHY IT IS WORTH RECORDING. i33's standing measurement — 1834 slow calls in 8424
+— has nothing in this class, so the 15-to-18-second band is new information
+rather than the known shape. This iteration made nine reopens and would have
+made none if its evidence had been right the first time, which prices the
+fabrications in wall-clock as well as in trust.
+
+## F14 — the walker's own narration is the worst-behaved thing in the log
+
+OVER 400 RECORDS, 36 FAILED, AND 25 OF THOSE ARE NARRATION. SE-C-121 fourteen
+times, SE-C-133 eleven.
+
+THE 121s ARE NODE IDS GUESSED rather than read. Every result hands back the
+open node map, and the walker addressed `done` at ids inferred from the order
+it had planned items in. That is a self-inflicted refusal with the answer
+already in hand.
+
+THE 133s ARE THE STALL GUARD, fired while reopen cascades ran and nothing
+closed. The work was real and the checklist was the wrong shape — the same
+finding i15 recorded, arrived at independently.
+
+NEITHER COST THE WORK ANYTHING and both made the log a worse witness, which on
+a box nobody is watching is the only witness there is.
+
+ONE THING THE ENGINE COULD DO ABOUT THE FIRST, offered as a lead rather than a
+demand: the open node map rides every refusal already. A `done` naming an
+unknown id could name the closest open id instead of only listing them.
+
 ## Leads for whoever opens an engine iteration
 
 Collected here because none of them is i38's work and none would survive the
