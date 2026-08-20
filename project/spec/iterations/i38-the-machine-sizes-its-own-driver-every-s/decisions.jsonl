@@ -263,3 +263,53 @@
 {"ts":"2026-08-20T12:08:02.888Z","op":"update","visit":"iterations/i38/enumerate-space/find_by_heuristic@0","node":"d151","brief":"signing find_by_heuristic"}
 {"ts":"2026-08-20T12:08:27.993Z","op":"update","visit":"iterations/i38/enumerate-space/find_by_heuristic@0","node":"d152","brief":"submitting find_by_heuristic"}
 {"ts":"2026-08-20T12:09:07.057Z","op":"update","visit":"iterations/i38/enumerate-space/find_by_transforming@0","node":"d153","brief":"logging the cluster-reference defect as an issue"}
+{"ts":"2026-08-20T12:09:33.455Z","op":"update","visit":"iterations/i38/enumerate-space/find_by_transforming@0","node":"d154","brief":"find_by_transforming: reading the form"}
+{"ts":"2026-08-20T12:12:31.926Z","op":"update","visit":"iterations/i38/enumerate-space/find_by_transforming@0","node":"d155","brief":"transform finder: minting one-driver-named-per-record-at-kickoff"}
+{"ts":"2026-08-20T12:15:36.919Z","op":"obsolete","visit":"iterations/i38/derive-criteria@0","node":"d94","brief":"not an item — this is a downstream state, not a step I can close where I stand"}
+{"ts":"2026-08-20T12:15:37.361Z","op":"obsolete","visit":"iterations/i38/derive-criteria@0","node":"d95","brief":"not an item — this is a downstream state, not a step I can close where I stand"}
+{"ts":"2026-08-20T12:15:37.812Z","op":"obsolete","visit":"iterations/i38/derive-criteria@0","node":"d96","brief":"not an item — this is a downstream state, not a step I can close where I stand"}
+{"ts":"2026-08-20T12:15:38.215Z","op":"obsolete","visit":"iterations/i38/derive-criteria@0","node":"d97","brief":"not an item — this is a downstream state, not a step I can close where I stand"}
+{"ts":"2026-08-20T12:15:38.588Z","op":"obsolete","visit":"iterations/i38/derive-criteria@0","node":"d93","brief":"same — enumerate-space is the state I am in, not a checklist item"}
+{"ts":"2026-08-20T12:15:39.018Z","op":"plan","visit":"iterations/i38/enumerate-space/find_by_probing@0","parent":null,"nodes":[{"id":"d156","brief":"[object Object]"},{"id":"d157","brief":"[object Object]"},{"id":"d158","brief":"[object Object]"},{"id":"d159","brief":"[object Object]"},{"id":"d160","brief":"[object Object]"},{"id":"d161","brief":"[object Object]"}]}
+{"ts":"2026-08-20T12:15:50.433Z","op":"obsolete","visit":"iterations/i38/enumerate-space/find_by_probing@0","node":"d156","brief":"malformed plan item — objects were stringified to [object Object] and accepted"}
+{"ts":"2026-08-20T12:15:50.833Z","op":"obsolete","visit":"iterations/i38/enumerate-space/find_by_probing@0","node":"d157","brief":"malformed plan item — objects were stringified to [object Object] and accepted"}
+{"ts":"2026-08-20T12:15:51.262Z","op":"obsolete","visit":"iterations/i38/enumerate-space/find_by_probing@0","node":"d158","brief":"malformed plan item — objects were stringified to [object Object] and accepted"}
+{"ts":"2026-08-20T12:15:51.706Z","op":"obsolete","visit":"iterations/i38/enumerate-space/find_by_probing@0","node":"d159","brief":"malformed plan item — objects were stringified to [object Object] and accepted"}
+{"ts":"2026-08-20T12:15:52.146Z","op":"obsolete","visit":"iterations/i38/enumerate-space/find_by_probing@0","node":"d160","brief":"malformed plan item — objects were stringified to [object Object] and accepted"}
+{"ts":"2026-08-20T12:15:52.587Z","op":"obsolete","visit":"iterations/i38/enumerate-space/find_by_probing@0","node":"d161","brief":"malformed plan item — objects were stringified to [object Object] and accepted"}
+{"ts":"2026-08-20T12:15:53.011Z","op":"plan","visit":"iterations/i38/enumerate-space/find_by_probing@0","parent":null,"nodes":[{"id":"d162","brief":"probe 1: does the matrix already separate the rows"},{"id":"d163","brief":"probe 2: is there reopen history to feed a difficulty"},{"id":"d164","brief":"probe 3: can two signings of one state be compared"},{"id":"d165","brief":"probe 4: does a per-state property mechanism already exist"},{"id":"d166","brief":"sign find_by_probing"},{"id":"d167","brief":"reopen find_prior_art for the research report"}]}
+{"ts":"2026-08-20T12:16:09.554Z","op":"update","visit":"iterations/i38/enumerate-space/find_by_probing@0","node":"d168","brief":"probe 2 running"}
+{"ts":"2026-08-20T12:16:28.606Z","op":"update","visit":"iterations/i38/enumerate-space/find_by_probing@0","node":"d169","brief":"probe 2b: does the history discriminate"}
+{"ts":"2026-08-20T12:16:50.393Z","op":"update","visit":"iterations/i38/enumerate-space/find_by_probing@0","node":"d170","brief":"probe 3: comparing two signings of one state"}
+{"ts":"2026-08-20T12:17:11.120Z","op":"update","visit":"iterations/i38/enumerate-space/find_by_probing@0","node":"d171","brief":"probe 4: does the compiled step already carry a per-state property"}
+{"ts":"2026-08-20T12:17:22.906Z","op":"update","visit":"iterations/i38/enumerate-space/find_by_probing@0","node":"d172","brief":"probe 4b: does the size reach the walker"}
+{"ts":"2026-08-20T12:17:41.169Z","op":"update","visit":"iterations/i38/enumerate-space/find_by_probing@0","node":"d173","brief":"probe 4c: is the blessed change size readable at run time"}
+{"ts":"2026-08-20T12:18:13.564Z","op":"update","visit":"iterations/i38/enumerate-space/find_by_probing@0","node":"d174","brief":"probe 4d: which per-size info the loader keeps"}
+{"ts":"2026-08-20T12:19:22.869Z","op":"update","visit":"iterations/i38/enumerate-space/find_by_probing@0","node":"d175","brief":"probe 4 output: opt-the-complexity-rides-the-cell-the-compil"}
+{"ts":"2026-08-20T12:19:23.025Z","op":"update","visit":"iterations/i38/enumerate-space/find_by_probing@0","node":"d176","brief":"probe 4 output: raid-iss-the-live-read-rule-forbids-more-tha"}
+{"ts":"2026-08-20T12:20:16.010Z","op":"done","visit":"iterations/i38/enumerate-space/find_by_probing@0","node":"d162","brief":"probe 1: the declared word collapses at major, the field count does not"}
+{"ts":"2026-08-20T12:20:29.311Z","op":"done","visit":"iterations/i38/enumerate-space/find_by_probing@0","node":"d163","brief":"probe 2: the reopen history is durable and discriminates"}
+{"ts":"2026-08-20T12:20:35.219Z","op":"done","visit":"iterations/i38/enumerate-space/find_by_probing@0","node":"d166","brief":"find_by_probing signed"}
+{"ts":"2026-08-20T12:21:02.588Z","op":"done","visit":"iterations/i38/enumerate-space/find_by_probing@0","node":"d167","brief":"reopening find_prior_art for the research that landed late"}
+{"ts":"2026-08-20T12:22:03.956Z","op":"update","visit":"iterations/i38/enumerate-space/find_prior_art@0","node":"d177","brief":"prior-art reopen: minting the-no-match-is-a-returned-value-not-an-"}
+{"ts":"2026-08-20T12:22:04.121Z","op":"update","visit":"iterations/i38/enumerate-space/find_prior_art@0","node":"d178","brief":"prior-art reopen: minting the-mapping-is-checked-for-totality-when"}
+{"ts":"2026-08-20T12:22:04.292Z","op":"update","visit":"iterations/i38/enumerate-space/find_prior_art@0","node":"d179","brief":"prior-art reopen: minting a-separate-reader-recommends-and-never-a"}
+{"ts":"2026-08-20T12:22:37.052Z","op":"done","visit":"iterations/i38/enumerate-space/find_by_probing@0","node":"d164","brief":"prior-art amended: two dry wells filled by the deeper scan"}
+{"ts":"2026-08-20T12:22:52.710Z","op":"update","visit":"iterations/i38/enumerate-space/find_prior_art@0","node":"d180","brief":"prior-art: naming which sections the scan touched"}
+{"ts":"2026-08-20T12:22:53.264Z","op":"done","visit":"iterations/i38/enumerate-space/find_by_probing@0","node":"d165","brief":"find_prior_art re-signed with the scan folded in"}
+{"ts":"2026-08-20T12:23:28.358Z","op":"plan","visit":"iterations/i38/enumerate-space/find_prior_art@0","parent":null,"nodes":[{"id":"d181","brief":"read the outward-search condition"},{"id":"d182","brief":"run the prior-art searches through the lane"},{"id":"d183","brief":"re-sign find_prior_art"}]}
+{"ts":"2026-08-20T12:23:42.131Z","op":"update","visit":"iterations/i38/enumerate-space/find_prior_art@0","node":"d184","brief":"verifying the XACML four-value claim through the lane"}
+{"ts":"2026-08-20T12:23:50.556Z","op":"update","visit":"iterations/i38/enumerate-space/find_prior_art@0","node":"d185","brief":"fetching the XACML 3.0 core spec itself"}
+{"ts":"2026-08-20T12:23:57.969Z","op":"update","visit":"iterations/i38/enumerate-space/find_prior_art@0","node":"d186","brief":"reading the fetched XACML spec"}
+{"ts":"2026-08-20T12:24:20.785Z","op":"update","visit":"iterations/i38/enumerate-space/find_prior_art@0","node":"d187","brief":"checking the effective-request reduction: max or sum"}
+{"ts":"2026-08-20T12:25:01.144Z","op":"update","visit":"iterations/i38/enumerate-space/find_prior_art@0","node":"d188","brief":"correcting the k8s reduction claim against the primary"}
+{"ts":"2026-08-20T12:25:16.035Z","op":"update","visit":"iterations/i38/enumerate-space/find_prior_art@0","node":"d189","brief":"running the outward-search condition directly to see why it is red"}
+{"ts":"2026-08-20T12:25:22.492Z","op":"update","visit":"iterations/i38/enumerate-space/find_prior_art@0","node":"d190","brief":"running outward-search with node type-strip"}
+{"ts":"2026-08-20T12:25:28.096Z","op":"update","visit":"iterations/i38/enumerate-space/find_prior_art@0","node":"d191","brief":"checking where se_run stands"}
+{"ts":"2026-08-20T12:25:47.050Z","op":"update","visit":"iterations/i38/enumerate-space/find_prior_art@0","node":"d192","brief":"re-pulling to see whether the condition is still red"}
+{"ts":"2026-08-20T12:25:53.307Z","op":"update","visit":"iterations/i38/enumerate-space/build_chart@0","node":"d193","brief":"checking how a web call is stored in the log"}
+{"ts":"2026-08-20T12:26:03.751Z","op":"update","visit":"iterations/i38/enumerate-space/build_chart@0","node":"d194","brief":"finding where SE_HOME points"}
+{"ts":"2026-08-20T12:26:14.542Z","op":"done","visit":"iterations/i38/enumerate-space/find_prior_art@0","node":"d181","brief":"outward-search reads SE_HOME, not the repo .se"}
+{"ts":"2026-08-20T12:27:27.442Z","op":"update","visit":"iterations/i38/enumerate-space/build_chart@0","node":"d195","brief":"diagnosing the outward-search refusal"}
+{"ts":"2026-08-20T12:28:23.336Z","op":"update","visit":"iterations/i38/enumerate-space/build_chart@0","node":"d196","brief":"looking for the stored script_result timestamp"}
+{"ts":"2026-08-20T12:29:03.166Z","op":"update","visit":"iterations/i38/enumerate-space/build_chart@0","node":"d197","brief":"re-submitting to force a fresh condition run"}

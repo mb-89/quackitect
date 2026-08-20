@@ -1,7 +1,8 @@
 ---
 form: find_prior_art
 by: agent
-signed_off: 2026-08-20T11:51:37.338Z
+signed_off: 2026-08-20T12:22:53.447Z
+reopened: "2026-08-20T12:21:02.589Z — the deep search it commissioned returned after it was signed, and named prior art it does not carry: XACML NotApplicable as a returned no-match value, compile-time totality checking over the mapping, and four shipped recommend-only reconcilers. The form claims a completed search over the sizing cluster and the search was still running."
 authors: agent
 files:
 ---
@@ -14,7 +15,7 @@ M4's candidate space opens. The block being enumerated against is the one the pa
 
 THAT SEAM IS WHY THIS SEARCH IS NARROWER THAN THE KICKOFF'S. The kickoff scanned LLM routing and scheduler practice for the design as a whole. This one asks what else is shaped like a four-function block that resolves a declared class to a worker and publishes it without dispatching.
 
-A DEEPER SCAN WAS COMMISSIONED and had not reported when this form was filled. What is below comes from the kickoff's own primary sources, re-read rather than recalled; anything the scan adds folds in as further options.
+THE COMMISSIONED SCAN REPORTED AFTER THIS FORM WAS SIGNED, and the form was reopened for it. The literature and shipped sections are the first pass unchanged, re-read from the kickoff's own primary sources. What the scan added lands in the options, the dry wells and the follow-up — and it did not confirm the first pass. It filled two of the three dry wells the first pass declared, which is the finding.
 
 ## applies
 
@@ -27,6 +28,9 @@ yes — the block resolves a declared class to a worker, a shape older and bette
 - opt-derive-the-rung-from-what-will-judge-the-output
 - opt-a-rung-names-an-intensity-as-well-as-a-worker
 - opt-a-declared-class-with-a-named-fallback-pool
+- opt-the-no-match-is-a-returned-value-not-an-absence
+- opt-the-mapping-is-checked-for-totality-when-the-machine-compiles
+- opt-a-separate-reader-recommends-and-never-acts
 
 ## literature
 
@@ -52,18 +56,22 @@ AND ONE SHIPPED BEHAVIOUR IS EVIDENCE AGAINST OUR OWN PORTABILITY ASSUMPTION rat
 
 ## dry_wells
 
-- The name-and-do-not-spawn split. Nothing was found describing a component that computes a worker class and publishes it for something else to act on. The policy-decision-point pattern is the obvious neighbour and was not established as prior art for this by the sources in hand.
-- Recommendation-only reconciliation of a declared class against what the work needed. Nothing shipped was found that reports the gap and never acts on it.
-- Taking a maximum over a group and keeping the spread visible. No named practice was found for the second half, which is the half that makes the cost readable.
-- Rating work a priori by whether a checker could catch a wrong answer. Searched at the kickoff and again here; the seam appears in training-pipeline domain splits and in post-hoc cascading, never as an a-priori rating.
+- Taking a maximum over a group and keeping the spread visible. STILL DRY AFTER THE DEEPER SCAN, and now precisely so. The first half is standard and named: Kubernetes computes a pod's effective request as the maximum over its containers, and the waste that follows is documented and accepted rather than mitigated. Nothing was found for the second half — reporting the spread the maximum hid — under any name, in any scheduler, in any router. That is either our contribution or our blind spot and the scan cannot say which.
+- Rating work a priori by whether a checker could catch a wrong answer. Searched at the kickoff, again in the first pass, and again by the deeper scan. The seam appears in training-pipeline domain splits and in post-hoc cascading, never as an a-priori rating.
+- FILLED, AND THE FIRST PASS WAS WRONG: recommendation-only reconciliation. Four shipped systems do exactly this — Kubernetes VPA in updateMode Off, Goldilocks, Robusta KRR, and Slurm's seff. Three of the four cannot act even in principle, because the recommender holds no write path into the thing it advises. Recorded as opt-a-separate-reader-recommends-and-never-acts.
+- FILLED, AND OLDER THAN EXPECTED: the name-and-do-not-spawn split. XACML's policy decision point has returned a decision for an enforcement point to act on since 2003, and its four-value vocabulary includes NotApplicable — a standardised value for no policy matched, distinct from an evaluation failure. Our unmatched case publishes an absence where a twenty-year-old standard publishes a value. Recorded as opt-the-no-match-is-a-returned-value-not-an-absence.
 
 ## follow_up
 
-- FIVE OPTIONS, AND THEY ARE DELIBERATELY NOT VARIATIONS OF ONE. Two move WHEN the decision happens (at dispatch, or after the work). One moves WHO decides (derive the rung from a declared judge rather than typing it). Two move WHAT THE MAPPING HOLDS (a worker-and-intensity pair; a default pool with a fail-open switch).
+- EIGHT OPTIONS NOW, AND THEY ARE DELIBERATELY NOT VARIATIONS OF ONE. Two move WHEN the decision happens. One moves WHO decides. Two move WHAT THE MAPPING HOLDS. Two, from the deeper scan, move WHAT HAPPENS AT THE EDGE — the unmatched case, from an absence to a value and from a run-time event to a compile-time refusal. One moves WHERE THE DECIDER LIVES, out of the walk entirely.
 
-- THE THIRD IS THE ONE THAT COULD REPLACE THE PLAN. Deriving the rung from what will judge the output is the only option in the set that answers the standing drift risk, because a derived value is wrong only if a checkable declaration is wrong. It has been named as a candidate since the kickoff scan and it now has a node.
+- THE THIRD IS STILL THE ONE THAT COULD REPLACE THE PLAN. Deriving the rung from what will judge the output is the only option in the set that answers the standing drift risk, because a derived value is wrong only if a checkable declaration is wrong.
 
-- THREE DRY WELLS ARE ABOUT OUR OWN DISTINCTIVE CHOICES, which is worth noticing rather than filing. Name-and-do-not-spawn, recommendation-only reconciliation, and keeping the spread visible all came back empty. Either they are genuinely novel or the search was too narrow, and a commissioned deeper scan is the thing that will tell us which.
+- THE DEEPER SCAN'S REAL RESULT IS ABOUT THIS FORM, NOT ABOUT THE DESIGN. Two of three dry wells were filled, and both by prior art that is older and better documented than anything the first pass cited. A dry well written from the sources in hand is a statement about the sources in hand, and this form said so at the time — "either they are genuinely novel or the search was too narrow". It was the second, twice.
+
+- THE ONE THAT SURVIVED IS THEREFORE WORTH MORE THAN IT WAS. Keeping the spread visible after a maximum came back empty from a scan that filled the other two. The nearest named practice accepts the waste and documents it. That is the closest thing this record has to an original contribution, and it is a half-sentence in a requirement nobody has argued about.
+
+- ONE FINDING WENT STRAIGHT INTO ANOTHER FINDER RATHER THAN HERE. Nix's requiredSystemFeatures is the closest structural match found anywhere — a declared property set on the work, resolved against workers — and its distinguishing property is that the worker may refuse. That is a reversal, not a mapping, so it is credited inside opt-the-driver-reads-the-difficulty-and-decides-whether-to-take-it where find_by_transforming had already reached it independently. Two finders arriving at one design from opposite directions is the strongest signal on the chart.
 
 ## anything_else
 
