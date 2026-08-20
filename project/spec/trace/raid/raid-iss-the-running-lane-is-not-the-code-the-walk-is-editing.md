@@ -60,6 +60,29 @@ Any one of these, and the cheapest is the first.
 - A VERIFICATION-STATE CHECK. The battery already runs there. A check that
   the served version matches the built one would have caught this on i37.
 
+## The strongest proof, measured at the retro's step 10
+
+THE PREVIOUS RETRO'S IMPROVEMENTS CANNOT BE TALLIED, because none of them ran.
+
+Four landed in this working tree by merge at 09:50 on 2026-08-20, mid-walk.
+Measured against the same window's log:
+
+- The stall guard that names the item which cannot close: 0 of 115 stall
+  refusals carried it.
+- The served field that says whether the engine drew it or the agent writes it:
+  0 responses carried the hint.
+- SE-C-145, which types a search pattern that is not a regex: 0.
+
+TWENTY-FIVE STALL REFUSALS FIRED AFTER 09:50, every one carrying the old
+wording — "160 updates since anything closed, with 3 still open" — which is
+exactly the sentence the improvement was written to replace. The improved guard
+stands in `project/deliverable/engine/decisions.ts` line 541 and has never
+executed.
+
+SO THIS DEFECT DOES NOT ONLY BLIND THE WALK THAT MAKES A CHANGE. It blinds the
+retro that would judge whether the change was worth making, which is the loop
+this project improves itself through.
+
 ## What it does NOT ask for
 
 HOT RELOAD IS NOT WANTED HERE. A lane that swapped its engine mid-walk would
