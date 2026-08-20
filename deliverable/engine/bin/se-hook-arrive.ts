@@ -18,7 +18,7 @@
 // IT NEVER FAILS THE SESSION. A hook that breaks a session start is worse than
 // the hand-work it saves, so every ending here is a printed line and exit 0.
 // An agent that reads "arrive: FAILED" still has its native tools and the card.
-import { spawnSync } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -82,7 +82,7 @@ interface ServerSpec {
   args?: unknown;
 }
 
-function laneProblem(): string | undefined {
+async function laneProblem(): Promise<string | undefined> {
   const mcp = join(ROOT, ".mcp.json");
   if (!existsSync(mcp)) return ".mcp.json is missing at the project root";
   let command: string;
@@ -99,6 +99,11 @@ function laneProblem(): string | undefined {
   }
   if (!existsSync(join(ROOT, ".claude", "settings.json"))) return ".claude/settings.json is missing, so the cage never lands";
 
+  // IT WAITS FOR THE ANSWER, NEVER FOR THE EXIT. A lane that works keeps
+  // running, so waiting for the process to end waits for the timeout every
+  // time. An earlier version used spawnSync and would have stalled every
+  // session start by three minutes while the check passed.
+  //
   // THE TIMEOUT IS GENEROUS BECAUSE THE BOOT MAY INSTALL. A stdio server is
   // allowed to take as long as it likes to answer; it is not allowed to die.
   const initialize = `${JSON.stringify({
@@ -107,16 +112,43 @@ function laneProblem(): string | undefined {
     method: "initialize",
     params: { protocolVersion: "2024-11-05", capabilities: {}, clientInfo: { name: "se-boot-check", version: "1" } },
   })}\n`;
-  const r = spawnSync(command, args, { cwd: ROOT, input: initialize, encoding: "utf8", timeout: 180_000 });
-  if (r.error !== undefined) return `the lane could not be spawned: ${r.error.message}`;
-  if (!(r.stdout ?? "").includes('"result"')) {
-    const tail = (r.stderr ?? "").trim().split("\n").slice(-3).join(" ").slice(0, 300);
-    return tail === "" ? "the lane spawned and never answered initialize" : `the lane spawned and never answered initialize — ${tail}`;
-  }
-  return undefined;
+  return await new Promise<string | undefined>((resolve) => {
+    const child = spawn(command, args, { cwd: ROOT, stdio: ["pipe", "pipe", "pipe"] });
+    let out = "";
+    let err = "";
+    let settled = false;
+    const finish = (verdict: string | undefined): void => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      try {
+        child.kill();
+      } catch {
+        // it is already gone, which is the same outcome
+      }
+      resolve(verdict);
+    };
+    const tail = (): string => {
+      const t = err.trim().split("\n").slice(-3).join(" ").slice(0, 300);
+      return t === "" ? "" : ` — ${t}`;
+    };
+    const timer = setTimeout(() => finish(`the lane did not answer initialize within three minutes${tail()}`), 180_000);
+    child.stdout.on("data", (d: Buffer) => {
+      out += String(d);
+      if (out.includes('"result"')) finish(undefined);
+    });
+    child.stderr.on("data", (d: Buffer) => {
+      err += String(d);
+    });
+    child.on("error", (e: Error) => finish(`the lane could not be spawned: ${e.message}`));
+    child.on("exit", (code) =>
+      finish(out.includes('"result"') ? undefined : `the lane exited (${String(code)}) without answering initialize${tail()}`),
+    );
+    child.stdin.write(initialize);
+  });
 }
 
-const problem = laneProblem();
+const problem = await laneProblem();
 if (problem !== undefined) {
   say("");
   say("[se] THE LANE WILL NOT ATTACH.");

@@ -25,15 +25,26 @@ the lane is already up. `se_pull` exists.
 
 IF YOU ARE ARRIVAL B, skip to the next section. If you are Arrival A, read on.
 
-## Arrival A: you are not caged yet, and that is expected
+## Arrival A: no `se_` tools, and that now means something is wrong
 
-THE LANE IS NOT IN GIT. `.mcp.json` and `.claude/settings.json`
-are placed by the editor and never committed — `.gitignore` says so. A fresh
-clone has neither, so you start with your native tools and no `se` server.
+THE LANE IS IN GIT. `.mcp.json` and `.claude/settings.json` are both committed,
+and `.mcp.json` names a stdio server the client spawns itself through
+`se-mcp-boot.mjs`, which installs dependencies before it imports anything. So a
+fresh clone SHOULD arrive with the lane attached and the cage on.
+
+THIS SECTION USED TO SAY THE OPPOSITE, and it was true until 2026-08-20.
+`.claude/settings.json` was tracked while `.mcp.json` was not, so a cloud clone
+got the cage and no lane: every native tool denied, and nothing to replace
+them. Committing both is what fixed that.
+
+SO NO `se_pull` IS A BROKEN BOOT, NOT AN EXPECTED STATE. The arrival's own last
+line names which check failed.
 
 DO NOT WALK THE MACHINE LIKE THIS. An uncaged agent editing the repository
 directly is the one thing the contract forbids, and nothing here will stop
 you, because the thing that would stop you is what is missing.
+
+THE COMMAND BELOW STILL REPAIRS IT, and it is what to run before anything else.
 
 ## ONE COMMAND DOES ALL OF IT NOW
 
