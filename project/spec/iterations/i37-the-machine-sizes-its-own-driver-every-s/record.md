@@ -10,6 +10,8 @@ inputs:
   - note-dba076bddcc7
   - note-0247fc5445f5
   - note-aff2b84b165c
+  - note-6d26435d40e0
+  - note-93e49d6527b6
 depends_on: []
 ---
 
