@@ -43,15 +43,36 @@ THE SUBMIT IS HELD until the commissioned adversarial pass reports. That is the 
 
 ## round_2_red_team
 
+- STEELMAN, THE STRONGEST CASE THAT M3 IS PREMATURE: eight requirements, five functions and three flows have been authored for a mechanism whose central question — where the rating lives — was still moving on the day they were written, and whose second question, what the model list holds, is not settled at all. A sceptic would say the register has been bound to a design that is one probe away from changing again, and that binding it now buys a false sense of settledness => THE CHARGE LANDS ON ONE ARTIFACT AND NOT ON THE SET. The per-column probe DID move a requirement, a flow and a function, which is the charge coming true. But it moved them cheaply, before any rating existed, and it moved exactly the three artifacts that named the row as the unit — the other ten did not care. THAT IS WHAT SOLUTION-NEUTRALITY BOUGHT: a reduction, a lookup, a publication and a stamp are indifferent to where the number came from. The charge is that binding early is risky; the evidence is that it was cheap, and it was cheap because of a choice made deliberately one state earlier.
+- THE MILESTONE'S BEST RESULT IS AN ASSUMPTION IT KILLED, WHICH MEANS IT ALSO MINTED A WRONG ONE => YES, AND THAT IS THE MECHANISM WORKING RATHER THAN FAILING. An assumption is something being relied on without being established; writing it down and probing it inside one milestone is what the two states are for. WHAT WOULD HAVE BEEN A FAILURE is minting it and letting it stand — the register would have carried a crippling, expected entry against a schema fifty-three ratings were about to be written into.
+- THE PROBE IS A READING OF FOUR PROSE NOTES BY THE SAME AGENT THAT WANTED A RESULT => THE STRONGEST OBJECTION IN THIS ROUND, AND IT IS ONLY PARTLY ANSWERED. The rungs assigned to draft-vision's columns are a judgment, not a measurement: nobody has rated anything yet, so C1-at-major and C4-at-product are this walker's readings of two paragraphs. WHAT MAKES THEM MORE THAN CONVENIENT: the major note says INHERIT-WITH-JUDGMENT and asks the agent to point at a standing artifact and argue whether it bends, and the product note calls the packet a STANDING ARTIFACT that every smaller column inherits by pointer. Those are the ladder's own definitions of accept-what-was-drawn and frame-from-nothing, almost word for word. AND ONE INDEPENDENT DATA POINT EXISTS: this iteration WALKED draft-vision at major and the work was an inherit — point, argue a paragraph, rewrite nothing. THE OBJECTION SURVIVES IN ITS NARROW FORM and is sent to the adversarial pass explicitly.
+- THE NON-MONOTONICITY IS THE LOAD-BEARING HALF AND IT RESTS ON THE THINNEST READING => TRUE. Three rungs under one row name would be survivable with one number plus a per-column adjustment; what kills that repair is minor being HARDER than major, and minor's rung comes from one sentence about naming a goal conflict and ruling which wins. IF THAT READING IS WRONG the falsification still holds — three rungs is still three rungs — but the cheap repair comes back on the table. Recorded as the thing to re-check when the first real ratings are made rather than defended here.
+- YOU CORRECTED A COUNT THIS MILESTONE AND THE CORRECTION WAS ALSO PRODUCED BY A METHOD YOU HAD JUST CALLED BETTER => THAT IS THE FINDING, NOT AN EMBARRASSMENT BESIDE IT. M1 recalled, M2 read by eye, M3 ran a program that truncated. Each method was an improvement and each failed differently, which is why the conclusion in the field report is not count-more-carefully but bind-and-compare: the row count was already on this iteration's own kickoff form when a later state wrote a different one.
+- NOTHING IN M3 IS EXECUTABLE AND THE ITERATION IS FOUR MILESTONES OLD => TRUE AND ON SCHEDULE. M0 sizes, M1 frames, M2 draws the passes, M3 binds the register; the first thing that runs is M7's. WHAT WOULD MAKE THIS A REAL COMPLAINT is if the artifacts were not load-bearing, and three of them changed under a probe this week, which is the opposite of ornamental.
+- KILL-CRITERION FOR THIS GATE, NAMED AND LOOKED FOR: the register is wrong to bless if a requirement demands something the design has not decided, because that binds the build to a guess => NOT MET, AND ONE CAME CLOSE. req-one-model-list-is-read-live-from-the-repository fixes WHERE the mapping lives and is deliberately silent on WHAT it holds — a vendor name, a capability word, or a row wide enough to differ by host. That silence is the design question staying open rather than a requirement guessing at it. THE ONE THAT CAME CLOSE was req-every-matrix-row-declares-its-complexity, which did demand something undecided until the probe decided it. It is now per-column and the decision is on the record.
+- SO WHAT SURVIVES: eight requirements bound to two passes, five functions that a different implementation could satisfy, and one assumption dead by its own probe => PASS WITH OVERRIDES. The overrides are the rung readings that are judgments rather than measurements, the model list's contents still undecided, the error signal still absent after four milestones, and a count of mine that needed correcting at this gate.
 
 ## raid_additions
 
+- raid-asm-a-state-is-equally-hard-at-every-change-size
+- raid-asm-the-model-ladder-is-a-total-order
+- raid-asm-one-model-list-serves-every-host-the-engine-supports
 
 ## verdict
 
+pass with overrides — the register is bound to the two passes and one assumption died to its own probe before any rating was written, with the rung readings still judgments rather than measurements and the model list's contents deliberately undecided.
 
 ## follow_up
 
+- THE FIRST REAL RATING PASS MUST RE-CHECK draft-vision's NON-MONOTONICITY. Three rungs under one row name is established; minor being harder than major rests on one sentence, and if that reading is wrong the cheap repair — one row value plus a per-column adjustment — comes back on the table. It is one row's work and it is the first thing to do, not the last.
+
+- req-the-complexity-value-is-read-live-and-never-pinned IS STILL THE CHEAPEST HIGH-VALUE ITEM IN THE SET. One test assertion, graded fatal, standing between a later hand and a cascade across three open pinned records. It should be built before anything more interesting.
+
+- WHAT THE MODEL LIST HOLDS IS THE NEXT REAL DESIGN QUESTION and M4 owns it. A vendor name pins and fails closed; a capability word delegates and fails open; a wider row keeps one file while letting the entry differ by host. The requirement is silent on purpose and the assumption beside it is graded `expected`.
+
+- THE ERROR SIGNAL HAS BEEN MISSING FOR FOUR MILESTONES and every route to one is a non-goal. That is a deliberate, repeated choice rather than an oversight, and it should be stated as such at the design gate rather than discovered again.
+
+- FOR A RETRO, NOT FOR THIS ITERATION: bind a claim to a query, and hardest where the claim is about the walk rather than about the tree. The field report carries it as F16 with the owner's own sharpening. The call log is already the witness for process claims and nothing asks a claim to cite it — which is the same record this iteration is making attributable.
 
 ## anything_else
 
