@@ -1,0 +1,51 @@
+---
+minted_in: i38-the-machine-sizes-its-own-driver-every-s
+id: raid-risk-the-reader-can-take-the-leaders-only-structural-advantage
+type: "[[raid]]"
+kind: risk
+statement: "The Pugh leader leads on two axes, ties or trails on three, and the rival already level with it can take one of the two without giving up anything of its own — after which it leads outright."
+owner: the walking agent
+trigger: "declare-winner, and graft-onto-the-winner where the graft this entry describes is the machine's own next act"
+status: open
+looked: 2026-08-20
+impact: "A winner declared at cand-the-receiver-decides is declared one point ahead on one axis, over a rival that can erase the point by adopting a mechanism it is not prevented from adopting. Two independent perturbations - the graft and a weighting by the damage grades the axes already carry - both hand the lead to cand-the-reader-beside-the-walk."
+breaks_how_badly: crippling
+how_likely: expected
+probe: "COMPUTED OVER THE RE-EARNED SCORE TABLE, 2026-08-20, every graft the leader's strengths admit. Baseline sums are reader 12, receiver 11, seed 9, derived 9, the datum is the receiver and the totals against it are reader ZERO, seed minus one, derived minus one. THE LEADER HOLDS TWO STRENGTHS. On req-a-wrong-act-never-passes-silently it scores 4 and the reader already ties by a different mechanism, so there is nothing to take; granted free to either eliminated candidate, neither passes the reader. On req-walk-survives-host-swap it scores 4 against the reader's 3, and the reader taking opt-the-block-names-a-rung-and-never-a-model reaches 13 against 11 and LEADS OUTRIGHT. THE SECOND ROUTE NEEDS NO GRAFT AT ALL: weighting fatal 4, crippling 3, corrosive 2 gives reader 35, receiver 34. THE LEADER CANNOT ANSWER IN KIND — it scores 0 on req-the-actor-is-recorded-where-the-call-is-served and is worst of four there, and its own note says why: nothing of ours ever knew which model the rung resolved to."
+probed: 2026-08-20
+source_refs:
+  - i38-the-machine-sizes-its-own-driver-every-s
+  - "reverse-sensitivity reverse_graft, 2026-08-20"
+weighs_with: none
+weighs_against: none
+---
+
+## Why the graft is takeable, which is the whole question
+
+THE LEADER'S HOST-SWAP ADVANTAGE IS THAT NOTHING IN OUR TREE NAMES A MODEL. That
+is a property of what is published, not of where the publisher stands.
+
+cand-the-reader-beside-the-walk stands outside the walk and reads finished
+records. A reader that publishes a rung rather than a model is coherent and stays
+itself: what makes the leader the leader is publishing FORWARD from INSIDE the
+walk, and the reader does neither before or after the graft.
+
+SO THIS IS NOT THE INCOMPATIBLE CASE. The two eliminated candidates cannot take
+it — holding the roster is what they are — and the reader can.
+
+## The fallback
+
+DECLARE THE WINNER WITH THE GRAFT ALREADY TESTED, which is what
+graft-onto-the-winner exists for and which runs next. If the graft holds, the
+declared winner should be cand-the-reader-beside-the-walk and the margin is no
+longer one point on one axis.
+
+IF THE GRAFT IS REFUSED — and there is a real reason it might be, since a reader
+that names a rung has to publish a vocabulary it cannot enforce — then the
+declaration stands at the leader, and this entry is the record that the lead was
+one point wide and that a weighting alone reverses it.
+
+WHAT WOULD RETIRE THIS ENTRY: a cost axis. Both candidates on the front spend
+nothing on the walk, and neither was chosen for it. An axis that measured spend
+would separate them on the thing the record exists for, rather than on one point
+of host portability.

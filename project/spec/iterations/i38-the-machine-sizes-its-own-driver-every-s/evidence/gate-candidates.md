@@ -1,5 +1,6 @@
 ---
 form: gate-candidates
+bless: blessed by agent
 by: agent
 signed_off: 2026-08-20T14:22:54.170Z
 reopened: "2026-08-20T14:19:55.553Z — it blessed a milestone whose comparison has since been re-scored and whose winner has changed. The commissioned hostile pass returned after the bless and raised 24 findings, five of which this gate had already caught and nineteen of which it had not; eighteen are now amended into the forms that carried them. The scoring it blessed gave the seed 4 on an axis the record own open crippling issue says no candidate can compute, and a second clean-context scorer put it at 1. cand-the-seed-made-total is dominated and off the front. The verdict, the rounds and the goals reading all rest on evidence that has moved."

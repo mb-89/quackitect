@@ -7,6 +7,7 @@ statement: "The Pugh leader holds exactly two strengths and both are the same op
 owner: the walking agent
 trigger: "declare-winner, and again at graft-onto-the-winner where the graft this entry describes is the machine's own next act"
 status: open
+superseded: "2026-08-20 — this entry describes cand-the-seed-made-total as the Pugh leader. It no longer is: the candidate set was redrawn, a second clean-context scorer re-scored it, and that candidate is dominated and off the front. The finding was acted on rather than outlived — it is why the set was redrawn — and it stands as history. The live entry against the current leader is raid-risk-the-reader-can-take-the-leaders-only-structural-advantage."
 looked: 2026-08-20
 impact: "A winner declared on this margin is a winner declared on a drawing artefact. cand-the-seed-made-total leads on req-the-actor-is-recorded-where-the-call-is-served and req-comparison-carries-both-sides and on nothing else; it is weakest of four on host-swap and joint-lowest on wrong-act. Both of its strengths come from one cell, opt-the-record-carries-both-the-named-driver-and-the-one-that-answered, which sits alone on its axis because that axis held one distinct value and the completeness check demanded a pick from nobody."
 breaks_how_badly: crippling

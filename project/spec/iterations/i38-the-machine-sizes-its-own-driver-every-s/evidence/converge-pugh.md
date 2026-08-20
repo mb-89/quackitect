@@ -1,7 +1,8 @@
 ---
 form: converge-pugh
 by: agent
-signed_off: 2026-08-20T13:26:19.660Z
+signed_off: 2026-08-20T14:31:58.034Z
+reopened: "2026-08-20T14:31:57.254Z — it answered a scoring that has since been re-earned. The candidate set was redrawn, a second clean-context scorer re-scored it, and the datum, the totals and the leader all move: the receiver takes the seat, the reader ties it at zero, and the seed that held the seat sits at minus one."
 authors: agent
 files:
 ---
@@ -10,28 +11,26 @@ files:
 
 ## current_situation
 
-The front of three plus the eliminated fourth go into the matrix, and the engine drew it. Nothing here is typed: the axes are cut-criteria's live rows in its signed order with their damage grades, a cell is the sign of the rival's score minus the datum's, and the datum starts as the second candidate by plain score sum.
+The re-scored front of two and the two eliminated candidates go into the matrix, and the engine redrew it from the new scores. Nothing here is typed.
 
-THE DATUM IS cand-the-seed-made-total AND THE RULE PUT IT THERE. Plain sums are 13 for the seed, 13 for the receiver, 12 for the reader, 9 for the derived ladder; sorted, the seed is second and takes the seat. The leader after one run is the datum itself, so the seat holds and the run is stable at one iteration.
+THE DATUM MOVED AND SO DID THE LEADER. Plain sums are now reader 12, receiver 11, seed 9, derived 9; the receiver takes the datum seat as second by sum, and the totals against it are reader ZERO, seed minus one, derived minus one. The seat holds, so the run is stable at one iteration and the leader is cand-the-receiver-decides.
 
-THE SEAT HOLDING IS NOT THE SAME AS THE DATUM WINNING WELL. Totals against it are minus one, minus one, and ZERO — cand-the-receiver-decides is level with the datum, not behind it.
+THE PREVIOUS RUN RETURNED cand-the-seed-made-total AND THAT RUN IS SUPERSEDED. It was computed over a candidate set in which two lines had been drawn silent on an axis all four can answer, and over a scoring that gave the seed a 4 on a mechanism this record's own open crippling issue says no candidate can compute. Both are repaired. The seed now sits at minus one against the datum rather than holding the seat.
 
 ## matrix_runs
 
 
 ## follow_up
 
-THE ARITHMETIC RETURNS THE DATUM AND THE GRADES SAY SOMETHING ELSE. This is the reading declare-winner has to make, and it should arrive there already stated rather than discovered.
+THE ARITHMETIC AND THE GRADES AGREE THIS TIME, AND THEY DID NOT BEFORE. That is the difference worth carrying to declare-winner.
 
-cand-the-receiver-decides ties the datum at zero, and the tie is not made of small things. It is PLUS ONE on req-a-wrong-act-never-passes-silently, graded fatal, and PLUS ONE on req-walk-survives-host-swap, graded crippling, against MINUS ONE on req-the-actor-is-recorded-where-the-call-is-served and MINUS ONE on req-comparison-carries-both-sides, both graded corrosive.
+Unweighted, the receiver holds the datum seat and cand-the-reader-beside-the-walk is level with it at zero. Weighting by the damage grades the axes already carry — fatal 4, crippling 3, corrosive 2 — gives reader 35, receiver 34, seed 26, derived 26. The two readings pick the same two candidates and disagree only about which of the two leads, where the first run's two readings picked different winners outright.
 
-SO THE DATUM WINS ONLY BECAUSE THE TOTALS ARE UNWEIGHTED SIGN COUNTS, and the template says so in as many words: no band value is typed yet, so nothing is weighted by an invented number. That is the right default and it is not a neutral one. Under any ordering that respects the grades the axes already carry — fatal above crippling above corrosive — a candidate trading one fatal and one crippling gain for two corrosive losses is ahead, not level.
+SO THE OPEN QUESTION NARROWS FROM WHICH DESIGN TO WHICH OF TWO. The reader beats the receiver on the actor axis, 2 against 0, and loses to it on host-swap, 3 against 4. Under the grades those are corrosive against crippling, which is why the weighted reading tips to the receiver's rival rather than to the receiver. Neither margin is more than one point on one axis.
 
-I AM NOT GOING TO INVENT THE WEIGHTS, and the method card names why. Decision theater is weights chosen after the fact to justify a preferred option, and the mitigation is the recorded run. So the run stands as drawn, the datum is the computed leader, and the fact that the computation discards information the axes carry is recorded here rather than corrected here.
+THE INERT AXIS IS INERT TWICE OVER. req-acts-carry-role-and-channel contributes zero to every cell of every rival under both scorings — eight zeroes from two independent readers. It moves nothing and it is left where it is, because striking a criterion after seeing its scores cannot be honest.
 
-THE FIFTH AXIS IS INERT AND THE MATRIX SHOWS IT PLAINLY. req-acts-carry-role-and-channel contributes zero to every cell of every rival, because all four candidates scored zero on it. An axis that cannot move a sign is an axis that is not in the decision, which is what gate-candidates already recorded and what the drawn matrix now demonstrates rather than argues.
-
-WHAT reverse-sensitivity INHERITS. It does not have to hunt far for the world where the winner loses. That world is one line: count the grades the axes already carry. Its job is to judge that world's credibility out loud, and to say whether a tie broken by refusing to weigh is a tie the record should live with.
+WHAT reverse-sensitivity INHERITS IS A HARDER JOB THAN LAST TIME. The first run's leader held two strengths fed by one cell that two rivals could take, so six of seven grafted worlds unseated it. This leader's strengths are structural — no roster, and an unrepresentable invalid record — and the rival that ties it cannot take either without becoming it.
 
 ## anything_else
 

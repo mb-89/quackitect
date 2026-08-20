@@ -7,6 +7,7 @@ statement: "The leader wins on an unweighted count of signs while every axis alr
 owner: the owner
 trigger: "the first time anyone asks why the grades are drawn on the matrix if nothing reads them, and any future record that types a band value"
 status: open
+superseded: "2026-08-20 — this entry describes cand-the-seed-made-total as the Pugh leader. It no longer is: the candidate set was redrawn, a second clean-context scorer re-scored it, and that candidate is dominated and off the front. The finding was acted on rather than outlived — it is why the set was redrawn — and it stands as history. The live entry against the current leader is raid-risk-the-reader-can-take-the-leaders-only-structural-advantage."
 looked: 2026-08-20
 impact: "The decision turns on a modelling choice nobody made deliberately. The template refuses to weight because no band value is typed, which is the right default against decision theatre and is not a neutral one: it discards information the axes carry and the matrix displays."
 breaks_how_badly: corrosive
