@@ -480,11 +480,21 @@ function difficultyFor(
   root: string,
 ): { difficulty?: CellDifficulty } {
   const raw = fm[`${col}_complexity`];
-  if (row.seeds !== undefined) {
+  // A ROW THAT **RUNS** A SUB-MACHINE IS THE PLACEHOLDER, and a row that
+  // SEEDS one is not. Seeding is real work — `specify-build` authors the
+  // design specs and then draws the chunk machine — and it gets a rating like
+  // any other step. Running is where the walk DESCENDS, and the work happens
+  // in the states below.
+  //
+  // THIS READ `row.seeds` UNTIL THE CHECK CAUGHT IT. The promotion behind the
+  // rule names M4_25 run-candidates, M6_15 run-spikes and M7_40 build-steps —
+  // all three carry `runs`, and two of the four rows carrying `seeds` are
+  // neither.
+  if (row.runs !== undefined) {
     if (raw !== undefined) {
       throw new Error(
-        `matrix row ${row.name} seeds ${row.seeds} and carries a ${col}_complexity — a placeholder for work that happens ` +
-          `elsewhere has no difficulty of its own; rate the states it seeds`,
+        `matrix row ${row.name} runs ${row.runs} and carries a ${col}_complexity — a placeholder for work that happens ` +
+          `in the sub-machine below has no difficulty of its own; rate the states it descends into`,
       );
     }
     return {};
@@ -741,6 +751,10 @@ export function compileColumn(matrix: RigorMatrix, column: ChangeColumn): Machin
       ...rowState(row, column),
       guidance: [cell.body, row.guidance].filter(Boolean).join("\n\n"),
       ...(row.runs ? { submachine: row.runs } : {}),
+      // THE DIFFICULTY TRAVELS WITH THE STEP. Both interfaces into the sizing
+      // element hand it a compiled machine and neither hands it the matrix,
+      // which is what makes obtaining a step's difficulty a field read.
+      ...(cell.difficulty !== undefined ? { complexity: cell.difficulty } : {}),
       busbar: row.busbar,
       edges: edgesFrom.get(row.name) ?? [],
     };

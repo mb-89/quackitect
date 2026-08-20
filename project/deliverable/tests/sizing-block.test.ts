@@ -49,11 +49,11 @@ function declareRated(root: string): void {
   writeFileSync(abs, `${readFileSync(abs, "utf8")}\n\nEVERY ACTIVE CELL CARRIES A COMPLEXITY.\n`, "utf8");
 }
 
-function appliedRows(root: string): { name: string; file: string; seeds?: string }[] {
+function appliedRows(root: string): { name: string; file: string; runs?: string }[] {
   const matrix = readRigorMatrix(root);
   return matrix.rows
     .filter((r) => matrix.cells.get(r.name)?.get(SIZE)?.applies !== "none")
-    .map((r) => ({ name: r.name, file: r.file, seeds: r.seeds }));
+    .map((r) => ({ name: r.name, file: r.file, runs: r.runs }));
 }
 
 /** RATE EVERY CELL THAT OWES ONE, IN EVERY COLUMN. Rating only `major` leaves
@@ -63,7 +63,7 @@ function appliedRows(root: string): { name: string; file: string; seeds?: string
 function rateEverything(root: string, skip?: { name: string; column: string }): void {
   const matrix = readRigorMatrix(root);
   for (const row of matrix.rows) {
-    if (row.seeds !== undefined) continue;
+    if (row.runs !== undefined) continue;
     for (const col of CHANGE_COLUMNS) {
       if (matrix.cells.get(row.name)?.get(col)?.applies === "none") continue;
       if (skip !== undefined && skip.name === row.name && skip.column === col) continue;
@@ -77,13 +77,32 @@ test("every applied row yields a difficulty", async () => {
   rateEverything(root);
   const decl = compileColumn(readRigorMatrix(root), SIZE);
   const { difficultyOf } = await sizing();
-  const missing = decl.states.filter((s) => difficultyOf(s) === undefined).map((s) => s.id);
+  // START AND END ARE MECHANICAL. Every machine has them, nothing
+  // machine-specific belongs in them, and no matrix row declares them — so
+  // they carry no cell and owe no rating. A check that demanded one would be
+  // asking the walk's own scaffolding how hard it is.
+  // AND A STATE THAT DESCENDS IS NOT SIZED EITHER. It routes into a
+  // sub-machine and the work happens in the states below, which is the whole
+  // of exp-two-hands-rating-the-same-six-cells' promotion. Asking one how hard
+  // it is would be asking a doorway how far the room is.
+  const walked = decl.states.filter((s) => (s.kind === "work" || s.kind === "gate") && s.submachine === undefined);
+  assert.ok(walked.length > 0, "the column must compile some steps for this to mean anything");
+  const missing = walked
+    .filter((s) => {
+      try {
+        difficultyOf(s);
+        return false;
+      } catch {
+        return true;
+      }
+    })
+    .map((s) => s.id);
   assert.deepEqual(missing, [], "a step the walk will run must know how hard it is");
 });
 
 test("a row that applies and declares nothing is a loud refusal", () => {
   const root = freshRoot();
-  const victim = appliedRows(root).find((r) => r.seeds === undefined);
+  const victim = appliedRows(root).find((r) => r.runs === undefined);
   assert.ok(victim !== undefined, "the column must apply at least one non-seeding row");
   rateEverything(root, { name: victim.name, column: SIZE });
   declareRated(root);
@@ -129,7 +148,7 @@ test("an unrated matrix still loads, and refuses at the point of use instead", a
 
 test("an unreadable complexity refuses whether the matrix is rated or not", () => {
   const root = freshRoot();
-  const victim = appliedRows(root).find((r) => r.seeds === undefined);
+  const victim = appliedRows(root).find((r) => r.runs === undefined);
   assert.ok(victim !== undefined, "the column must apply at least one non-seeding row");
   const abs = join(matrixDir(root), "rows", victim.file);
   const text = readFileSync(abs, "utf8");
@@ -142,15 +161,28 @@ test("an unreadable complexity refuses whether the matrix is rated or not", () =
   );
 });
 
-test("a row that seeds a sub-machine may not carry a difficulty", () => {
+test("a row that runs a sub-machine may not carry a difficulty", () => {
   const root = freshRoot();
-  const seeder = appliedRows(root).find((r) => r.seeds !== undefined);
-  assert.ok(seeder !== undefined, "the matrix must carry at least one seeding row");
-  setComplexity(join(matrixDir(root), "rows", seeder.file), "C2", "R2");
+  const runner = appliedRows(root).find((r) => r.runs !== undefined);
+  assert.ok(runner !== undefined, "the matrix must carry at least one row that descends");
+  setComplexity(join(matrixDir(root), "rows", runner.file), "C2", "R2");
   assert.throws(
     () => readRigorMatrix(root),
-    (e: Error) => e.message.includes(seeder.name),
-    "a placeholder for work that happens elsewhere has no difficulty of its own — exp-two-hands-rating-the-same-six-cells",
+    (e: Error) => e.message.includes(runner.name),
+    "a placeholder for work that happens in the sub-machine below has no difficulty of its own — exp-two-hands-rating-the-same-six-cells",
+  );
+});
+
+test("a row that SEEDS a sub-machine is real work and owes a difficulty", () => {
+  const root = freshRoot();
+  const matrix = readRigorMatrix(root);
+  const seeder = matrix.rows.find((r) => r.seeds !== undefined && r.runs === undefined);
+  assert.ok(seeder !== undefined, "the matrix must carry a row that seeds without descending");
+  rateEverything(root);
+  declareRated(root);
+  assert.doesNotThrow(
+    () => readRigorMatrix(root),
+    `${seeder.name} authors a drawing and is walked like any other step — seeding is not descending`,
   );
 });
 
@@ -183,4 +215,25 @@ test("an unmatched pair never falls back", async () => {
   const out = rungFor({ judgement: "C9", reading: "R9" });
   assert.notEqual(out.rung, placed.rung, "a silent fallback is indistinguishable from a working lookup");
   assert.equal(out.rung, undefined, "and it is not the strongest entry either");
+});
+
+test("the compile carries the cell's difficulty onto the step", () => {
+  const root = freshRoot();
+  rateEverything(root);
+  const matrix = readRigorMatrix(root);
+  const decl = compileColumn(matrix, SIZE);
+  const walked = decl.states.filter((s) => s.kind === "work" || s.kind === "gate");
+  assert.ok(walked.length > 0, "the column must compile some steps for this to mean anything");
+  for (const s of walked) {
+    const declared: Difficulty | undefined = matrix.cells.get(s.id)?.get(SIZE)?.difficulty;
+    if (declared === undefined) continue;
+    assert.deepEqual(s.complexity, declared, `${s.id} lost its difficulty between the cell and the step`);
+  }
+});
+
+test("a step whose cell declared none carries none, rather than a default", () => {
+  const root = freshRoot();
+  const decl = compileColumn(readRigorMatrix(root), SIZE);
+  const withOne = decl.states.filter((s) => s.complexity !== undefined);
+  assert.deepEqual(withOne, [], "nothing is rated in this fixture, so nothing may claim a rating");
 });

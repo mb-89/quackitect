@@ -870,3 +870,4 @@
 {"ts":"2026-08-20T20:11:35.694Z","op":"update","visit":"iterations/i38/build-steps/the-call-record-grows-three-fields@0","node":"d42","brief":"walking the record"}
 {"ts":"2026-08-20T20:17:02.240Z","op":"update","visit":"iterations/i38/build-steps/the-log-answers-by-any-coordinate@0","node":"d43","brief":"walking the record"}
 {"ts":"2026-08-20T20:25:18.358Z","op":"update","visit":"iterations/i38/build-steps/complexity-stays-out-of-the-ledger@0","node":"d44","brief":"walking the record"}
+{"ts":"2026-08-20T20:35:53.928Z","op":"done","visit":"start@0","node":"d3","brief":"M1-M6 re-earned with the walker and guide vocabulary"}

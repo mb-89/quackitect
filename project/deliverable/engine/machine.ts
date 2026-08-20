@@ -223,6 +223,18 @@ export interface StateDecl {
   /** see dsp-the-goal-binds-the-walk.md#scxml-style-state-contract */
   entry?: Record<string, string[]>;
   exit?: Record<string, string[]>;
+  /** HOW STRONG A HAND THIS STEP NEEDS, carried onto the state at compile time
+   *  from the cell the row declared it on — dsp-the-sizing-block.
+   *
+   *  IT RIDES THE STEP SO THE SIZING BLOCK NEVER JOINS AGAINST THE MATRIX.
+   *  A join would make the answer depend on the matrix as it stands NOW rather
+   *  than on the machine the walk is running, and a rating edited mid-walk
+   *  would change what a running record is being sized against.
+   *
+   *  ABSENT WHERE THE CELL DECLARED NONE. `difficultyOf` refuses for a step
+   *  with none rather than defaulting — how strong a hand a step needs is an
+   *  explicit value, never a guess. */
+  complexity?: { judgement: string; reading: string };
   /** Tags join states to guidance (the pull system's tag rule). */
   tags?: string[];
   /** WHY the state exists — one authored line, shown on its evidence form. */
