@@ -865,3 +865,4 @@
 {"ts":"2026-08-20T19:36:50.388Z","op":"update","visit":"iterations/i38/gate-inputs@3","node":"d37","brief":"walking the record"}
 {"ts":"2026-08-20T19:38:14.523Z","op":"update","visit":"iterations/i38/derive-criteria@2","node":"d38","brief":"walking the record"}
 {"ts":"2026-08-20T19:43:17.728Z","op":"update","visit":"iterations/i38/author-tests@0","node":"d39","brief":"walking the record"}
+{"ts":"2026-08-20T19:50:16.811Z","op":"update","visit":"iterations/i38/specify-build@0","node":"d40","brief":"walking the record"}

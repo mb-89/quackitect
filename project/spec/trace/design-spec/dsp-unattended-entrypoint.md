@@ -5,10 +5,37 @@ type: "[[design-spec]]"
 statement: one command from a repository address and an iteration id to a walking agent, seven steps that each fail by name, with the runtime pinned and the lane released
 realizes:
   - el-entrypoint
+  - if-bootstrap-to-entrypoint
+  - if-preflight-to-entrypoint
+  - if-project-producer-to-entrypoint
+  - if-entrypoint-to-walk-engine
 files:
   - project/deliverable/engine/bin/se-start.ts
   - project/deliverable/package.json
 ---
+
+## The four crossings at the entrypoint, claimed 2026-08-20
+
+`specify-build` ran its law over the whole corpus and found ten crossings
+realized by no spec. Four are the entrypoint's and they divide cleanly.
+
+THREE ARE INBOUND AND THEY ARE THE SAME SHAPE: something that ran ONCE hands
+something to the path that runs EVERY TIME.
+
+- `if-bootstrap-to-entrypoint` — a toolchain and a scaffolded product.
+- `if-preflight-to-entrypoint` — the checks that ran before anything was
+  written.
+- `if-project-producer-to-entrypoint` — a folder that is a project.
+
+THE ENTRYPOINT LEARNS NOTHING ABOUT WHAT PRODUCED IT beyond the fact that a
+machine can run and a folder is a project. That is designed rather than
+incidental: it runs on machines the installer touched months ago.
+
+ONE IS OUTBOUND AND IT IS NEWER. `if-entrypoint-to-walk-engine` carries the
+connected harness identity and its measured limits, and it is here because the
+ENTRYPOINT is what implements identifying the harness — the name has to be
+available before the first work state, which is before the walk engine has run
+anything.
 
 ## Responsibility
 

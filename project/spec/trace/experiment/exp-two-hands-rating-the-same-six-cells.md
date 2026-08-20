@@ -11,6 +11,7 @@ promote: a placeholder row that seeds a sub-machine has no complexity of its own
 folds_to: raid-risk-a-hand-declared-rung-drifts-upward-and-nothing-ever-says-so is narrowed rather than closed — the ladder reproduces on rows that are one act and does not on rows that delegate
 faked: two agents rather than two people, and one session rather than two sittings — so this measures inter-reader agreement on the row text and not drift over time, which is what the risk is actually about
 fallback: if the two hands had disagreed widely, the declared architecture's 308 hand-typed figures would have been the wrong bet and the derived ladder would have come back onto the chart
+chunk: the-sizing-block-answers
 verdict: holds
 measured: 2026-08-20 — five of six ratings identical, one apart by two rungs
 source_refs:

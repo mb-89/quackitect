@@ -11,6 +11,7 @@ promote: the walker delegates — the party that acts on a published rung is the
 folds_to: raid-dep-the-payoff-waits-on-a-weak-model-being-able-to-boot-at-all is misstated rather than confirmed — the payoff waits on the WALKER DELEGATING, not on a weak model booting a different walker
 faked: nothing was spawned, the two ENGINE spawn paths were read at their source rather than exercised, and the harness's own delegation path was not searched at all — which is where the answer was
 fallback: not taken — a path exists, so the published value is not advisory by necessity
+chunk: the-call-record-grows-three-fields
 verdict: holds
 measured: 2026-08-20 — read through the lane at engine/bin/se-start.ts and engine/bin/se-pty.ts
 source_refs:

@@ -9,12 +9,24 @@ realizes:
   - if-holding-pen-to-account
   - if-method-compiler-to-account
   - if-record-store-to-account
+  - if-state-declaration-to-account
 files:
   - project/deliverable/engine/failure-shapes.ts
   - project/deliverable/engine/calllog.ts
   - project/deliverable/engine/version.ts
   - project/deliverable/engine/survey.ts
 ---
+
+## One more crossing into the account, claimed 2026-08-20
+
+`if-state-declaration-to-account` joins the four `*-to-account` crossings
+this spec already carries. It was realized by no spec until `specify-build`
+ran its law over the whole corpus.
+
+THE CONVENTION HERE IS THE DESTINATION'S. Every crossing that lands IN the
+account is designed here, because what a record holds is one design and not five.
+A crossing designed at its source would put the shape of an account record in a
+spec about something else.
 
 ## The acting role is stamped where the call is served
 

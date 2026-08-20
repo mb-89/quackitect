@@ -5,6 +5,10 @@ type: "[[design-spec]]"
 statement: One declaration says what the machine-state folder is called and which files inside it have a structured door, and every consumer is generated from it rather than written beside it.
 realizes:
   - el-state-declaration
+  - if-record-store-to-state-declaration
+  - if-walk-engine-to-state-declaration
+  - if-state-declaration-to-engine-delta
+  - if-state-declaration-to-method-compiler
 files:
   - project/deliverable/engine/statedecl.ts
   - project/deliverable/engine/paths.ts
@@ -13,6 +17,28 @@ files:
   - project/deliverable/engine/tables.ts
   - project/deliverable/engine/vault.ts
 ---
+
+## The four crossings this design carries
+
+CLAIMED 2026-08-20, when `specify-build` first ran its law over the whole
+corpus and found ten crossings realized by no spec. These four are this
+declaration's, and they are its by the sentence at the top: every consumer is
+GENERATED from the declaration rather than written beside it. A generated
+consumer is a crossing, and the generation is designed here.
+
+- `if-record-store-to-state-declaration` and
+  `if-walk-engine-to-state-declaration` are the inbound half. Both read the
+  declaration to learn what the folder is called and which files inside it have
+  a structured door. Neither carries its own copy, which is the whole point.
+- `if-state-declaration-to-engine-delta` and
+  `if-state-declaration-to-method-compiler` are the outbound half. Both take
+  what the declaration generates rather than a path written beside it.
+
+THE FIFTH CROSSING IS NOT HERE ON PURPOSE.
+`if-state-declaration-to-account` lands on `dsp-call-log`, which already
+carries every `*-to-account` crossing and describes what a record holds. The
+convention there is the destination's, and splitting it would leave one account
+crossing designed somewhere nobody looks for it.
 
 ## Responsibility
 

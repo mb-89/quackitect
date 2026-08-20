@@ -7,6 +7,7 @@ realizes:
   - el-vehicle-producer
   - el-project-producer
   - if-project-producer-to-resolution-seam
+  - if-project-producer-to-state-declaration
   - el-mirror
 files:
   - project/deliverable/engine/actbound.ts
@@ -15,6 +16,17 @@ files:
   - project/deliverable/engine/tools.ts
   - project/deliverable/vscode/src/extension.ts
 ---
+
+## The producer's second crossing, claimed 2026-08-20
+
+`if-project-producer-to-state-declaration` sits beside
+`if-project-producer-to-resolution-seam`, which this spec already carried. Both
+are outbound from the same act and both are designed by the same bounded write:
+a produced project is a folder that IS a machine state, so the producer asks the
+declaration what that folder is called rather than knowing.
+
+IT WAS REALIZED BY NO SPEC until `specify-build` ran its law over the whole
+corpus. The sibling crossing being here is what makes this the honest home.
 
 ## The bound travels with the act
 
