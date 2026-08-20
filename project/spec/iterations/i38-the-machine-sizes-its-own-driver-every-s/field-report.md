@@ -886,6 +886,76 @@ every row owes a reason per row, and `none` is a reason for exactly zero rows.
 The template already refuses a moved row with no rationale. It accepts a whole
 pool discarded with none.
 
+## F28 — a cloud agent must be started in `project/`, and this one was not
+
+READ THIS FIRST IF YOU ARE AN AGENT ON A CLOUD BOX. The symptom is that you have
+no `se_*` tools and reach the lane by shelling out to `node .se/se-call.mjs`. If
+that is true of you, you are running **uncaged and unwired**, and the fix is
+where you were started, not what you call.
+
+### What is wrong
+
+TWO FILES CARRY THE WIRING AND BOTH LIVE UNDER `project/`, not at the repo root.
+
+- `project/.mcp.json` registers the `se` MCP server. Its args are written for a
+  session whose working directory IS `project/`: `["../project/deliverable/engine/bin/se-mcp.ts", "--root", ".."]`.
+- `project/.claude/settings.json` carries `enableAllProjectMcpServers: true` and
+  the cage's deny list — Bash, Read, Write, Edit, Glob, Grep, WebFetch and the
+  rest.
+
+A SESSION OPENED AT THE REPO ROOT READS NEITHER. It finds
+`/…/quackitect/.claude/settings.json`, which holds hooks and nothing else, and
+no `.mcp.json` beside it. So the lane is not registered as a tool server and the
+native tools are not blocked. Both failures are silent.
+
+### What is NOT wrong
+
+THE SERVER IS FINE AND NOBODY KILLED IT. Measured on this box: `se-mcp.ts --root
+/home/user/quackitect --headless --mirror-port 7333 --autonomy tactical`, up
+since the session started, mirror answering 200 on 7333, and every one of this
+session's 1500-plus lane calls served and logged. Restarting it fixes nothing
+because nothing about it is broken.
+
+### The remedy, from the engine's own code
+
+`project/deliverable/engine/bin/se-start.ts` already does this correctly and its
+comment says why:
+
+> THE CAGE IS PLACED, not assumed. A fresh clone carries the template and not the
+> host's settings file, so an agent started here would run uncaged.
+
+At :235-239 it copies the cage template to `project/.claude/settings.json` when
+that file is missing. At :245-249 it spawns the agent:
+
+```
+spawn(agent, [briefing(iteration, card, pid)], { ...LANE_SPAWN, cwd: join(ROOT, "project"), … })
+```
+
+`cwd: join(ROOT, "project")`. THE LAUNCHER ALREADY KNOWS. What a cloud harness
+does instead is start its agent at the repo root, and that one difference is the
+whole failure.
+
+SO THE CLOUD AGENT'S FIRST JOB IS NOT TO WALK — IT IS TO START A CAGED AGENT IN
+THE RIGHT FOLDER. Either let `se-start.ts` spawn it, which places the cage and
+sets the directory in one act, or start it yourself with `project/` as the
+working directory. An agent that begins walking from the repo root has already
+lost the cage, and rule 1 of the contract is then true only by that agent's own
+discipline rather than by construction.
+
+### How to tell in one call
+
+`pwd`. If it does not end in `/project`, stop and fix that before anything else.
+The second tell is this document's opening symptom: reaching the lane through
+`node .se/se-call.mjs` rather than through `se_pull` as a tool.
+
+### What it cost here
+
+NOTHING WAS LOST AND EVERYTHING WAS HARDER. Every lane call still went through
+the lane and still landed in `.se/calls.jsonl`, so the record is intact. What was
+lost is the guarantee: F17 records that every measurement in this iteration ran
+through Bash rather than the lane, and this is why — Bash was available, because
+the cage was not applied. A caged session could not have made that mistake.
+
 ## Leads for whoever opens an engine iteration
 
 Collected here because none of them is i38's work and none would survive the
