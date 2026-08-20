@@ -69,34 +69,66 @@ say(out);
 // replace it. Green lines for steps that succeeded are worse than useless when
 // the thing they were building never arrived.
 //
-// WHAT THIS CAN AND CANNOT CHECK. It reads the two files the client needs. It
-// CANNOT ask the client whether it attached the server, because the client has
-// already built its list by the time a hook runs. So this reports the
-// precondition, and names the one check only the agent can make.
-function laneConfigProblem(): string | undefined {
+// IT SPAWNS THE LANE AND SHAKES ITS HAND. An earlier version only stat-ed the
+// two files, and both existed on a cloud run where the lane was dead — so it
+// printed "lane config is in place" over exactly the failure it was added to
+// catch. A file existing proves a file exists and nothing else.
+//
+// WHAT IT STILL CANNOT DO is ask the CLIENT whether it attached, because the
+// client built its list before any hook ran. So the agent's own check stays
+// the last word, and the line below tells it so.
+interface ServerSpec {
+  command?: unknown;
+  args?: unknown;
+}
+
+function laneProblem(): string | undefined {
   const mcp = join(ROOT, ".mcp.json");
   if (!existsSync(mcp)) return ".mcp.json is missing at the project root";
+  let command: string;
+  let args: string[];
   try {
-    const parsed = JSON.parse(readFileSync(mcp, "utf8")) as { mcpServers?: Record<string, unknown> };
-    if (parsed.mcpServers?.se === undefined) return ".mcp.json names no `se` server";
+    const parsed = JSON.parse(readFileSync(mcp, "utf8")) as { mcpServers?: Record<string, ServerSpec> };
+    const se = parsed.mcpServers?.se;
+    if (se === undefined) return ".mcp.json names no `se` server";
+    if (typeof se.command !== "string") return ".mcp.json's `se` server names no command to spawn";
+    command = se.command;
+    args = Array.isArray(se.args) ? se.args.map(String) : [];
   } catch {
     return ".mcp.json is not readable JSON";
   }
   if (!existsSync(join(ROOT, ".claude", "settings.json"))) return ".claude/settings.json is missing, so the cage never lands";
+
+  // THE TIMEOUT IS GENEROUS BECAUSE THE BOOT MAY INSTALL. A stdio server is
+  // allowed to take as long as it likes to answer; it is not allowed to die.
+  const initialize = `${JSON.stringify({
+    jsonrpc: "2.0",
+    id: 1,
+    method: "initialize",
+    params: { protocolVersion: "2024-11-05", capabilities: {}, clientInfo: { name: "se-boot-check", version: "1" } },
+  })}\n`;
+  const r = spawnSync(command, args, { cwd: ROOT, input: initialize, encoding: "utf8", timeout: 180_000 });
+  if (r.error !== undefined) return `the lane could not be spawned: ${r.error.message}`;
+  if (!(r.stdout ?? "").includes('"result"')) {
+    const tail = (r.stderr ?? "").trim().split("\n").slice(-3).join(" ").slice(0, 300);
+    return tail === "" ? "the lane spawned and never answered initialize" : `the lane spawned and never answered initialize — ${tail}`;
+  }
   return undefined;
 }
 
-const problem = laneConfigProblem();
+const problem = laneProblem();
 if (problem !== undefined) {
   say("");
   say("[se] THE LANE WILL NOT ATTACH.");
   say(`[se] ${problem}`);
-  say("[se] Both files are committed. A checkout missing one is the failure where the cage lands and the lane does not.");
+  say("[se] The cage may still have landed, which denies every native tool and gives you nothing to replace them.");
   say("[se] NO PROJECT WORK IS LEGAL until it is fixed. Report this and stop.");
   process.exit(0);
 }
 
 say("");
-say("[se] lane config is in place. CHECK IT YOURSELF ON YOUR FIRST TURN: if you hold no se_pull tool, the lane did not attach.");
+say(
+  "[se] the lane answered a handshake. CHECK IT YOURSELF ON YOUR FIRST TURN: if you hold no se_pull tool, the client still did not attach.",
+);
 say("[se] In that case stop, say which check you ran, and do not read the project any other way.");
 say(ARRIVED);

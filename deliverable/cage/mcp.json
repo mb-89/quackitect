@@ -3,7 +3,7 @@
     "se": {
       "command": "node",
       "args": [
-        "deliverable/engine/bin/se-mcp.ts",
+        "deliverable/engine/bin/se-mcp-boot.mjs",
         "--root",
         "."
       ]

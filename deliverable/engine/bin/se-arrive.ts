@@ -148,22 +148,40 @@ function install(): void {
 }
 
 // ── cage ────────────────────────────────────────────────────────────────────
-// PLACED, NEVER ASSUMED. Both files are gitignored on purpose, so a fresh
-// clone has neither and an agent that skips this is not caged at all.
+// WRITTEN ONLY WHEN IT WOULD CHANGE SOMETHING. Both files are committed now,
+// so on a current checkout they already match the template and this writes
+// nothing at all.
+//
+// WHY THAT MATTERS RATHER THAN BEING TIDINESS. Writing them every session left
+// every cloud run starting on a dirty tree, which the host's own stop hook then
+// complains about. Worse, a template that ever drifted from the committed file
+// would silently revert it on every boot — and the committed .mcp.json is the
+// one thing standing between a fresh clone and no lane at all.
+//
+// IT STILL PLACES A MISSING FILE, because a checkout older than the commit that
+// tracked them has neither, and an agent without the cage is not caged.
 function cage(): void {
   const from = join(ROOT, "deliverable", "cage");
   const placed: string[] = [];
+  const kept: string[] = [];
   for (const [src, dest] of [
     ["mcp.json", join(ROOT, ".mcp.json")],
     ["claude-settings.json", join(ROOT, ".claude", "settings.json")],
   ] as [string, string][]) {
     const source = join(from, src);
     if (!existsSync(source)) die("cage", `no template at ${source}`);
+    const want = readFileSync(source, "utf8");
+    const name = dest.slice(ROOT.length + 1);
+    if (existsSync(dest) && readFileSync(dest, "utf8") === want) {
+      kept.push(name);
+      continue;
+    }
     mkdirSync(dirname(dest), { recursive: true });
-    writeFileSync(dest, readFileSync(source, "utf8"));
-    placed.push(dest.slice(ROOT.length + 1));
+    writeFileSync(dest, want);
+    placed.push(name);
   }
-  say("cage", `placed ${placed.join(" and ")}`);
+  if (placed.length === 0) say("cage", `already in place: ${kept.join(" and ")}`);
+  else say("cage", `placed ${placed.join(" and ")}${kept.length === 0 ? "" : `; kept ${kept.join(" and ")}`}`);
 }
 
 // ── lane ────────────────────────────────────────────────────────────────────
