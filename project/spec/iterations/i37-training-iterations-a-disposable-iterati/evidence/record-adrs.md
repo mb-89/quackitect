@@ -1,8 +1,8 @@
 ---
 form: record-adrs
 by: agent
-signed_off: 2026-08-19T20:09:35.051Z
-reopened: "2026-08-19T20:09:12.260Z — declare-winner re-signed above it, so this claim answers a question that moved: the ceiling decision now describes a structural boundary rather than an ancestry test"
+signed_off: 2026-08-20T07:26:44.535Z
+reopened: "2026-08-20T07:26:42.728Z — a feeder re-signed above it after the v3 merge moved the rigor matrix and the M6 spikes moved the winner"
 authors: agent
 files:
 ---

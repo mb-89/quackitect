@@ -223,3 +223,9 @@
 {"ts":"2026-08-20T07:25:13.363Z","op":"update","visit":"iterations/i37/reverse-sensitivity@0","node":"d10","brief":"answering the graft question the merge added"}
 {"ts":"2026-08-20T07:25:24.638Z","op":"update","visit":"iterations/i37/declare-winner@0","node":"d11","brief":"re-signing declare-winner against the moved ground"}
 {"ts":"2026-08-20T07:26:22.401Z","op":"update","visit":"iterations/i37/graft-onto-the-winner@0","node":"d12","brief":"the graft state records two grafts this iteration had already made by hand"}
+{"ts":"2026-08-20T07:26:43.990Z","op":"update","visit":"iterations/i37/record-adrs@0","node":"d13","brief":"re-signing record-adrs against the moved ground"}
+{"ts":"2026-08-20T07:27:40.009Z","op":"update","visit":"iterations/i37/decompose-structure@0","node":"d14","brief":"drawing the crossing the merged element matrix names as owed"}
+{"ts":"2026-08-20T07:27:49.502Z","op":"update","visit":"iterations/i37/decompose-structure@0","node":"d15","brief":"re-stamping decompose-structure now the crossing is drawn"}
+{"ts":"2026-08-20T07:28:32.545Z","op":"update","visit":"iterations/i37/decompose-structure@0","node":"d16","brief":"the crossing carries the live lane"}
+{"ts":"2026-08-20T07:29:14.951Z","op":"update","visit":"iterations/i37/decompose-structure@0","node":"d17","brief":"the crossing carries the harness profile, which is what it actually owes"}
+{"ts":"2026-08-20T07:29:31.642Z","op":"update","visit":"iterations/i37/decompose-structure@0","node":"d18","brief":"recording what the matrix says the crossing owes"}
