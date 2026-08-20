@@ -31,3 +31,10 @@
 {"ts":"2026-08-20T09:35:34.543Z","op":"update","visit":"iterations/i38/gate-kickoff@0","node":"d35","brief":"six entries referenced and the verdict ruled"}
 {"ts":"2026-08-20T09:36:01.565Z","op":"update","visit":"iterations/i38/gate-kickoff@0","node":"d36","brief":"the scan's recommendations ride as input to the design states"}
 {"ts":"2026-08-20T09:36:19.354Z","op":"update","visit":"iterations/i38/gate-kickoff@0","node":"d37","brief":"anything_else broken into paragraphs the wall guard accepts"}
+{"ts":"2026-08-20T09:36:52.832Z","op":"plan","visit":"iterations/i38/gate-kickoff@0","parent":"d4","nodes":[{"id":"d38","brief":"push the branch"},{"id":"d39","brief":"walk M1 as the machine routes it"}]}
+{"ts":"2026-08-20T09:37:15.679Z","op":"update","visit":"iterations/i38/gate-kickoff@0","node":"d40","brief":"aimed at ship; letting the machine route M1"}
+{"ts":"2026-08-20T09:38:18.243Z","op":"update","visit":"iterations/i38/draft-vision@0","node":"d41","brief":"asking the machine for the draft-vision form"}
+{"ts":"2026-08-20T09:39:18.532Z","op":"plan","visit":"iterations/i38/draft-vision@0","parent":"d39","nodes":[{"id":"d42","brief":"fill the vision packet as an inherit with its delta"},{"id":"d43","brief":"submit draft-vision"}]}
+{"ts":"2026-08-20T09:39:36.148Z","op":"plan","visit":"iterations/i38/log-risks@0","parent":"d39","nodes":[{"id":"d44","brief":"reference the six standing entries at log-risks"},{"id":"d45","brief":"submit log-risks"}]}
+{"ts":"2026-08-20T09:40:35.823Z","op":"update","visit":"iterations/i38/log-risks@0","node":"d46","brief":"minting the submachine-maximum cost risk from conflict two"}
+{"ts":"2026-08-20T09:40:35.948Z","op":"update","visit":"iterations/i38/log-risks@0","node":"d47","brief":"minting the unenforced-asymmetry risk from conflict three"}
