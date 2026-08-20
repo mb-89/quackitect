@@ -72,7 +72,10 @@ obtain-a-step-s-difficulty computes from the compiled cell: how many evidence
 fields the row still asks for at this column, and whether the method it names is
 a judgement method or a stamp. reduce-a-milestone-to-one-difficulty does not
 run — every state carries its own. resolve-a-difficulty-to-a-driver maps to a
-rung naming both a worker and an intensity, with a named pool.
+rung with a named pool. CORRECTED at gate-candidates: this said the rung names an
+intensity as well as a worker, which is a cell this line does not pick and cannot,
+because it already answers that axis with the two-records-on-two-clocks split. The
+prose was describing an architecture the picks do not draw.
 publish-the-driver-outward emits on change, which matters more here because
 per-state naming multiplies the raw rate.
 
@@ -88,8 +91,9 @@ scale to sit against.
 
 THE FORMULA AND THE OMIT LISTS ARE THE SAME MECHANISM SEEN TWICE. A cell's field
 count is what the row asks for at that column after its omit lists are applied,
-and the omit lists are the only per-size information rigor-matrix.ts already
-validates (:200-206). So the formula is not reading a new thing; it is reading the
+and the omit lists are per-size information rigor-matrix.ts already validates
+(:200-206) — CORRECTED at gate-candidates, which said the ONLY, while cellsOf at
+:425-429 and compileColumn at :622-626 validate two more per-column things. So the formula is not reading a new thing; it is reading the
 thing the loader already checks. That is why this candidate is cheap.
 
 THE PER-STATE NAMING AND THE PUBLISH-ON-CHANGE CELL ARE ONE DESIGN, NOT TWO.
@@ -127,11 +131,3 @@ THE FORMULA IS A DESIGN DECISION NOBODY HAS MADE, and a bad formula is worse tha
 a bad declaration because it is wrong everywhere at once. Field count is a
 reading measure wearing a judgement label, and it cannot express a state that
 asks one field and needs deep judgement.
-
-THE FORMULA IS A DESIGN DECISION NOBODY HAS MADE, and a bad formula is worse
-than a bad declaration because it is wrong everywhere at once. Field count is a
-reading measure wearing a judgement label, and it cannot express a state that
-asks one field and needs deep judgement.
-
-DOUBLE-WALKING COSTS MONEY ON THE SAMPLE and needs an agreement rule nobody has
-written. Two signed forms are never byte-identical.

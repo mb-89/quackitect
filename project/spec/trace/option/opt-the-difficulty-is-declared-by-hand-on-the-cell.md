@@ -9,6 +9,29 @@ found_by: without
 source: "the seed's own proposal, given a node so the chart can hold it as a value rather than as an absence"
 ---
 
+## The found_by on this node is not earned, and a claim was built on it
+
+FLAGGED AT gate-candidates BY A HOSTILE PASS, 2026-08-20. This node carries
+`found_by: without`. find_without's own form lists two options and neither is on
+this axis, so the trimming finder never reached it. This node was minted at
+build_chart, by the state drawing the chart, and the field was stamped with the
+nearest of seven legal values rather than left honest.
+
+WHAT WAS BUILT ON IT. build_chart's dropped_finders says the axis `how a step's
+difficulty is arrived at` was "reached from three different finders each — from
+trimming, prior art and transformation". Two finders reached it. The third is
+this node, and the chart counted its own mint as an independent arrival.
+
+WHY THE FIELD CANNOT SIMPLY BE CORRECTED. `found_by` is checked against a closed
+list of seven finders and there is no value for "minted at build_chart because the
+incumbent had no node". The honest repairs are both upstream: add this option to
+find_without's own list, which makes the attribution true, or strike the
+three-finder claim in build_chart. Neither is reachable from where this was found
+— see the field report's F29.
+
+THE NODE ITSELF IS SOUND. What it says about the incumbent stands; what is wrong
+is the provenance stamped on it and the convergence counted from that stamp.
+
 ## Mechanism
 
 THIS IS WHAT THE SEED ASKS FOR AND IT HAD NO NODE. Every other candidate on the

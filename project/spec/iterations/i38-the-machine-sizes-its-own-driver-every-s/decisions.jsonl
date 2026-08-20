@@ -415,3 +415,6 @@
 {"ts":"2026-08-20T13:46:31.439Z","op":"plan","visit":"iterations/i38/derive-functions@0","parent":null,"nodes":[{"id":"d322","brief":"graft the receivers two mechanisms onto the winner"},{"id":"d323","brief":"walk to the held gate"},{"id":"d324","brief":"re-score evaluate-set against the redrawn set"}]}
 {"ts":"2026-08-20T13:47:14.275Z","op":"update","visit":"iterations/i38/derive-functions@0","node":"d325","brief":"grafting the receivers record-validity rule onto the winner"}
 {"ts":"2026-08-20T13:50:19.551Z","op":"update","visit":"iterations/i38/derive-functions@0","node":"d326","brief":"routing back to the grey evaluate-set"}
+{"ts":"2026-08-20T13:57:52.972Z","op":"update","visit":"iterations/i38/derive-functions@0","node":"d3","brief":"repairing four hostile-pass findings in the candidate nodes"}
+{"ts":"2026-08-20T13:59:27.525Z","op":"update","visit":"iterations/i38/derive-functions@0","node":"d4","brief":"repairing four hostile-pass findings in the candidate nodes"}
+{"ts":"2026-08-20T14:00:05.653Z","op":"update","visit":"iterations/i38/derive-functions@0","node":"d5","brief":"recording the unearned found_by and correcting an inflated impact"}

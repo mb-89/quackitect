@@ -30,8 +30,11 @@ IT LEANS ON LESS THAN ANY OTHER LINE, WHICH IS ITS ARGUMENT.
   indistinguishable from a row never wrong.
 
 AND IT LEANS ON ADVICE BEING WORTH PRODUCING AT ALL. Three of the four shipped
-systems it is modelled on are dashboards, and nobody has established that anyone
-here would read one.
+systems it is modelled on cannot act even in principle, because
+the recommender holds no write path into the thing it advises. CORRECTED at
+gate-candidates, in all three places this candidate said DASHBOARDS: the source
+says no write path, not a screen, and Slurm's seff is a command-line report. Nobody has established that anyone here
+would read what this one produces.
 
 
 ## Redrawn at build_chart, 2026-08-20
@@ -110,7 +113,9 @@ produced the ranking, in a script short enough to fit in one call. Nothing in th
 engine changes, nothing is compiled, nothing is pinned.
 
 THE ONGOING COST IS A PROGRAM SOMEBODY RUNS, and the failure mode is that nobody
-runs it. Three of the four shipped systems it is modelled on are dashboards.
+runs it. Three of the four shipped systems it is modelled on hold no write path
+into the thing they advise, and none of them is established here as something
+anyone reads.
 
 IT ANSWERS THE WRONG TENSE, which is the real price. A reader over history says
 what should have happened, so nothing it produces can size a step before that
@@ -123,8 +128,8 @@ a row never wrong.
 
 IT ANSWERS THE WRONG TENSE. A reader over history says what should have
 happened, not what should happen, so nothing it produces can size a step before
-that step runs. Three of the four shipped systems it is modelled on are
-dashboards, and that is not an accident.
+that step runs. Three of the four shipped systems it is modelled on hold no write
+path into the thing they advise, and that is not an accident.
 
 THE HISTORY SIGNAL CAN LIE IN BOTH DIRECTIONS, and probe 2 caught it doing so.
 The six finder states read as easy at zero reopens in six walks, and two of
