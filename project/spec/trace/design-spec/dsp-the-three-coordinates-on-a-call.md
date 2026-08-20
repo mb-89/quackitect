@@ -8,7 +8,9 @@ realizes:
 files:
   - project/deliverable/engine/calllog.ts
   - project/deliverable/engine/tools.ts
-  - project/deliverable/engine/query.ts
+  - project/deliverable/engine/tools-run.ts
+  - project/deliverable/engine/mirror.ts
+  - project/deliverable/engine/session.ts
 ---
 
 ## Three coordinates, and they ship together
@@ -19,7 +21,20 @@ the reason is that shipping one alone looks like progress and moves nothing.
 "This model answered 190 calls" and "190 calls happened somewhere" are the same
 non-answer from two directions, and "an agent made all of them" is a third.
 
-## Which of the three the server can see
+## Where the claimed files moved, 2026-08-20
+
+THIS SPEC CLAIMED `engine/query.ts` AND NOTHING LANDED THERE. The log's
+grouping lives on `CallLog.query` in `calllog.ts`; `query.ts` is the
+structured corpus query, which is a different thing wearing a similar name.
+
+THREE FILES JOIN THE CLAIM because the coordinates are stamped where each kind
+of call is SERVED, and that is three places rather than one: `tools.ts` for a
+lane call, `mirror.ts` for a person's press and the surface's own acts, and
+`tools-run.ts` for a test verdict the server files on its own behalf.
+
+`session.ts` JOINS IT for the one coordinate that is an observation.
+`currentState()` is where the server knows what it knows, and nothing
+downstream infers it.
 
 ONE OF THREE. The STATE is known where the call is served — the same place the
 acting role is already stamped, and for the same stated reason: the code that

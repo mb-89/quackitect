@@ -10,7 +10,6 @@ realizes:
   - if-state-declaration-to-engine-delta
   - if-state-declaration-to-method-compiler
 files:
-  - project/deliverable/engine/statedecl.ts
   - project/deliverable/engine/paths.ts
   - project/deliverable/engine/produce.ts
   - project/deliverable/engine/search.ts
@@ -39,6 +38,27 @@ THE FIFTH CROSSING IS NOT HERE ON PURPOSE.
 carries every `*-to-account` crossing and describes what a record holds. The
 convention there is the destination's, and splitting it would leave one account
 crossing designed somewhere nobody looks for it.
+
+## NOT BUILT YET — the one module this design turns on does not exist
+
+THIS SPEC CLAIMED `engine/statedecl.ts` FROM i9 AND NOTHING EVER LANDED THERE.
+Twenty-nine iterations later `trace-design` caught it, and only because i38
+added four interface crossings to this spec and pulled it into the check's
+scope. A planned name is legal while a spec is being written; what it may not do
+is survive the record unrealised, and this one survived twenty-nine of them.
+
+WHAT STANDS INSTEAD IS THE THING THE DESIGN EXISTS TO REMOVE.
+`engine/paths.ts` carries `EXCLUDED_DIRS` as its own copy of the folder's
+name — one of the five consumers this design says should be GENERATED. The claim
+now names where the fact lives today rather than where the design puts it.
+
+WHAT TO DO INSTEAD, TODAY: read `EXCLUDED_DIRS` in `paths.ts`. There is no
+declaration to ask, and each consumer keeps its own copy, which is exactly the
+drift this design was written to make impossible.
+
+WHEN IT IS BUILT, one module will answer both facts and the five consumers will
+be generated from it. Nothing below this line is built; it is the design, kept
+because it is still the right one.
 
 ## Responsibility
 

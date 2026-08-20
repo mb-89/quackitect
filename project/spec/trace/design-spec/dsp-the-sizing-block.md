@@ -10,7 +10,8 @@ realizes:
 files:
   - project/deliverable/engine/sizing.ts
   - project/deliverable/engine/rigor-matrix.ts
-  - project/deliverable/engine/pull.ts
+  - project/deliverable/engine/machine.ts
+  - project/deliverable/engine/session.ts
 ---
 
 ## Where a difficulty is declared
@@ -147,6 +148,17 @@ wire is indistinguishable from a crash and from never having run.
 AND THE UNMATCHED VALUE CARRIES THE RUNG IT COULD NOT PLACE, so a reader can see
 what was asked for. Falling back to the session's current hand is forbidden,
 because a silent fallback is indistinguishable from a working lookup.
+
+## Where the claimed files moved, 2026-08-20
+
+THIS SPEC CLAIMED `engine/pull.ts` AND THE PUBLISHING DID NOT LAND THERE.
+`pull.ts` scans and serves GUIDANCE documents; the pull's answer envelope is
+assembled in `session.ts`. A planned name that survives the record unrealised
+is what `trace-design` exists to catch, and this one was caught by it.
+
+`engine/machine.ts` JOINS THE CLAIM because `StateDecl` is where the
+difficulty rides. Carrying a value onto the compiled step is a change to what a
+step IS, and that declaration is machine.ts's.
 
 ## Where it lands on the pull
 

@@ -1,7 +1,8 @@
 ---
 form: a-weaker-walk-carries-its-reason
 by: agent
-signed_off: 2026-08-20T20:20:51.781Z
+signed_off: 2026-08-20T20:44:28.778Z
+reopened: "2026-08-20T20:44:27.168Z — the sizing half this chunk was missing now exists: the-answer-rides-the-pull is built, so the named driver a walker sends back is a value the walk already published rather than a string with nothing behind it."
 authors: agent
 files:
 ---
@@ -19,6 +20,16 @@ THIS CHUNK'S DRAWING NAMES TWO PREDECESSORS — `the-log-answers-by-any-coordina
 I DID NOT REDRAW THE MACHINE TO FIX IT. Re-seeding the chunk drawing would drop three signed chunk states to correct an edge that has already been crossed, which buys a tidier graph and loses the record of what actually happened.
 
 WHAT IT COSTS IS NAMED RATHER THAN HIDDEN. The account half of this chunk is complete and testable on its own. The sizing half — a named driver arriving from the block rather than from a caller's argument — is `the-answer-rides-the-pull`'s, and this state cannot assert it.
+
+### Re-signed after the sizing half arrived, 2026-08-20
+
+WHAT THIS FORM SAID: only one of the two predecessors was built, so a named driver was a string a caller repeated back with nothing behind it.
+
+BOTH ARE BUILT NOW. `the-answer-rides-the-pull` publishes `needs` carrying a rung and the pair it came from, so the value a walker sends back on `named_driver` is one the walk already holds.
+
+THE JOIN IS STILL NOT CLOSED BY A CHECK, and that is the honest residue. Nothing compares the `named_driver` a caller sends against the `needs` the pull published for that same state. A walker could name any rung it liked and the record would carry it.
+
+THAT IS THE SAME SHAPE AS THE MODEL COORDINATE and it takes the same answer: the value comes from the party being measured until it comes from the walk itself. The pull knows what it published, so a later iteration could stamp the named driver from the same place it stamps the state — and then the asymmetry stops being voluntary.
 
 ## built
 

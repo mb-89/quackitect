@@ -6,8 +6,30 @@ statement: One read-only check runs every precondition before the install writes
 realizes:
   - el-preflight
 files:
-  - project/deliverable/engine/bin/install-preflight.ts
+  - project/deliverable/engine/bin/preflight.ts
 ---
+
+## NOT BUILT YET as an INSTALL-time command — what exists is the boot check
+
+THIS SPEC CLAIMED `engine/bin/install-preflight.ts` FROM i9 AND NOTHING EVER
+LANDED THERE. `trace-design` caught it in i38, and only because that iteration
+added interface crossings elsewhere and pulled this spec into the check's scope.
+
+WHAT STANDS IS `engine/bin/preflight.ts`, THE BOOT CHECK. It runs precondition
+checks and refuses on a missing hard dependency, which is the same SHAPE at a
+different moment: boot rather than install. The claim now names it.
+
+THE DIFFERENCE IS THE MOMENT AND IT IS THE WHOLE POINT OF THIS DESIGN. A boot
+check keeps a broken machine from WALKING. An install check keeps a
+half-installed machine from EXISTING, which is the property the graft lost when
+it removed the declared image.
+
+WHAT TO DO INSTEAD, TODAY: `engine/bin/se-arrive.ts` performs the arrival's own
+runtime check, and `bin/preflight.ts` runs at boot. Neither runs before an
+install's first write, so `req-setup-stops-before-partial` is met by nothing.
+
+WHEN IT IS BUILT, one command will run before the installer's first write and be
+available afterwards on its own, answering with a list rather than a verdict.
 
 ## Responsibility
 
