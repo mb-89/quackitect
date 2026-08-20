@@ -446,3 +446,9 @@
 {"ts":"2026-08-20T14:11:36.718Z","op":"update","visit":"iterations/i38/evaluate-set@0","node":"d32","brief":"amending the-reader-beside-the-walk"}
 {"ts":"2026-08-20T14:12:15.736Z","op":"update","visit":"iterations/i38/evaluate-set@0","node":"d33","brief":"check the separate-reader prior art"}
 {"ts":"2026-08-20T14:12:24.995Z","op":"update","visit":"iterations/i38/evaluate-set@0","node":"d34","brief":"check the double-walk comparison mechanism"}
+{"ts":"2026-08-20T14:13:30.093Z","op":"done","visit":"iterations/i38/evaluate-set@0","node":"d13","brief":"twenty rows scored against the four candidate files"}
+{"ts":"2026-08-20T14:17:05.655Z","op":"done","visit":"iterations/i38/derive-functions@0","node":"d10","brief":"evaluate-set re-scored: the front halves and the winner moves"}
+{"ts":"2026-08-20T14:17:41.753Z","op":"update","visit":"iterations/i38/evaluate-set@0","node":"d35","brief":"evaluate-set re-signed"}
+{"ts":"2026-08-20T14:18:07.774Z","op":"update","visit":"iterations/i38/cut-criteria@1","node":"d36","brief":"after re-signing evaluate-set"}
+{"ts":"2026-08-20T14:18:23.186Z","op":"update","visit":"iterations/i38/cut-criteria@1","node":"d37","brief":"routing to the gate now the root stands"}
+{"ts":"2026-08-20T14:18:52.780Z","op":"update","visit":"iterations/i38/gate-candidates@0","node":"d38","brief":"correcting the never-a-hostile-pass absolute in the reader node"}

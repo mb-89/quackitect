@@ -25,8 +25,12 @@ IT LEANS ON LESS THAN ANY OTHER LINE, WHICH IS ITS ARGUMENT.
   evidence forms, 140 carrying a reopen mark, 197 distinct state names walked and
   146 never reopened, with judgement-heavy states ranking above enumeration ones.
 - The history means what it appears to mean. THIS IS THE WEAK JOINT, and probe 2
-  caught it: all six finder states sit at zero reopens in six walks, and nothing
-  has ever run a hostile pass over a finder. A row never checked is
+  caught it: all six
+  finder states sat at zero reopens in six walks when probe 2 measured them, and that
+  measurement was 27 seconds before the first hostile pass over a finder landed.
+  CORRECTED at gate-candidates: an earlier wording said NOTHING has ever run such a
+  pass, and find_prior_art is a finder that was reopened for exactly one at 12:21.
+  The confound stands and the absolute did not. A row never checked is
   indistinguishable from a row never wrong.
 
 AND IT LEANS ON ADVICE BEING WORTH PRODUCING AT ALL. Three of the four shipped
@@ -122,8 +126,11 @@ what should have happened, so nothing it produces can size a step before that
 step runs.
 
 AND THE HISTORY SIGNAL CAN LIE IN BOTH DIRECTIONS. Probe 2 caught it: all six
-finder states read as easy at zero reopens in six walks, and nothing has ever run
-a hostile pass over a finder. A row never checked is indistinguishable here from
+finder states sat at zero reopens in six walks when probe 2 measured them, and that
+measurement was 27 seconds before the first hostile pass over a finder landed.
+CORRECTED at gate-candidates: an earlier wording said NOTHING has ever run such a
+pass, and find_prior_art is a finder that was reopened for exactly one at 12:21.
+The confound stands and the absolute did not. A row never checked is indistinguishable here from
 a row never wrong.
 
 IT ANSWERS THE WRONG TENSE. A reader over history says what should have
