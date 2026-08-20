@@ -807,14 +807,20 @@ export function buildServer(
     if (age.stale && !ageAnnounced) {
       ageAnnounced = true;
       notices.push(
-        `THE RUNNING LANE IS NOT THE CODE ON DISK. It is serving ${age.served}; the tree says ${age.on_disk}. The process loaded the engine once and Node cached it, so every engine change since is invisible to this lane — including any this walk made. A green battery does not contradict this: se_test runs the files on disk. se_reload restarts it onto these sources — a lane verb, legal at idle, that canary-loads first and refuses rather than killing a running engine for a tree that will not load. Restarting from OUTSIDE instead mints a new session and drops the dial.`,
+        // A BANNER SAYS WHAT TO DO, NOT WHY THE MECHANISM WORKS. This one used
+        // to explain Node's module cache, what a green battery does and does
+        // not prove, and how the canary load behaves. None of that is
+        // actionable, and the reader is trying to start work.
+        `THE RUNNING LANE IS OLDER THAN THE CODE ON DISK. It serves ${age.served}; the tree is at ${age.on_disk}. Engine changes since then are invisible here, including any this walk made. Run se_reload at idle to restart it onto these sources.`,
       );
     }
-    if (session.takeStaleSettings()) {
-      notices.push(
-        "THE SLIDERS ARE AT THEIR DEFAULTS BECAUSE THIS IS A NEW SESSION, not because anyone lowered them. A settings store was on disk and belongs to an earlier lane, so nothing was restored — that is deliberate: se_reload keeps the sliders, a fresh start does not. If a gate later refuses a bless for want of authority, the dial was RESET rather than set low.",
-      );
-    }
+    // THE STALE-SETTINGS BANNER IS STRUCK (owner, 2026-08-20). It explained an
+    // earlier lane, a settings store and a design decision, to a person who
+    // had just opened the system and wanted to work. A banner is for something
+    // the reader must ACT on, and there was nothing to act on.
+    //
+    // The flag is still taken so it does not accumulate.
+    session.takeStaleSettings();
     if (notices.length === 0) return result;
     return { ...(result as Record<string, unknown>), banner: notices.join("\n\n") };
   });
