@@ -15,8 +15,8 @@
 // the record type declares `actor`, and an `as` assertion would suppress
 // exactly that — the case would then pass against no design at all.
 import { strict as assert } from "node:assert";
-import { readdirSync, readFileSync } from "node:fs";
-import { join } from "node:path";
+import { appendFileSync, mkdirSync, readdirSync, readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { CallLog } from "../engine/calllog.ts";
@@ -28,7 +28,29 @@ function logIn(root: string): CallLog {
   return new CallLog(seDir(root));
 }
 
-const base = { args: {}, ok: true, outcome: "result" as const, duration_ms: 1 };
+// THE THREE COORDINATES ARE REQUIRED SINCE i38 — a call with no part, no state
+// and no answering model does not become a record. They are here so these
+// cases can go on testing what they are about, which is the ACTING ROLE.
+const base = {
+  args: {},
+  ok: true,
+  outcome: "result" as const,
+  duration_ms: 1,
+  part: "walker" as const,
+  state: "a-state",
+  answered_by: "a-model",
+};
+
+/** A RECORD FROM BEFORE A FIELD EXISTED, written the only way it can be:
+ *  straight to the file. `append` refuses one today, and it should — the
+ *  requirement binds what the engine WRITES. History is what it READS. */
+function historical(log: CallLog, rec: Record<string, unknown>): void {
+  appendFileSync(
+    log.path,
+    `${JSON.stringify({ ref: `call-${Math.random().toString(16).slice(2)}`, ts: new Date().toISOString(), se_version: "0.0.0", ...rec })}\n`,
+    "utf8",
+  );
+}
 
 test("a record carries the acting role the handler stated", () => {
   const log = logIn(freshRoot());
@@ -55,8 +77,9 @@ test("a mirror-named tool stamped as the server's own is neither person nor agen
 
 test("a record with no stamp still reads, because history cannot be restamped", () => {
   const log = logIn(freshRoot());
-  log.append({ ...base, tool: "mirror_autonomy" });
-  log.append({ ...base, tool: "se_pull" });
+  mkdirSync(dirname(log.path), { recursive: true });
+  historical(log, { tool: "mirror_autonomy", args: {}, ok: true, outcome: "result", duration_ms: 1 });
+  historical(log, { tool: "se_pull", args: {}, ok: true, outcome: "result", duration_ms: 1 });
   const { rows } = feedRows(log, "1970-01-01T00:00:00.000Z");
   assert.deepEqual(
     rows.map((r) => r.src),

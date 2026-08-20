@@ -11,7 +11,7 @@ import { appendFileSync, existsSync, mkdirSync, readFileSync } from "node:fs";
 import { availableParallelism } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { CallLog } from "./calllog.ts";
+import { CallLog, UNREPORTED } from "./calllog.ts";
 import { BATTERY_QUESTION, decideScope, laneSummary, laneVerdict, parseTap, streakNudge, testRecord } from "./discipline.ts";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { gitLane } from "./gitlane.ts";
@@ -497,6 +497,9 @@ export function runTools(
                 tool: "se_test_verdict",
                 args: { job: id, battery, question: args.question },
                 actor: "ui",
+                part: "surface",
+                state: UNREPORTED,
+                answered_by: UNREPORTED,
                 ok: value.ok === true,
                 outcome: "result",
                 duration_ms: Date.now() - entry.started,
@@ -520,6 +523,9 @@ export function runTools(
                 tool: "se_test_verdict",
                 args: { job: id, battery, question: args.question },
                 actor: "ui",
+                part: "surface",
+                state: UNREPORTED,
+                answered_by: UNREPORTED,
                 ok: false,
                 outcome: "rejected",
                 duration_ms: Date.now() - entry.started,

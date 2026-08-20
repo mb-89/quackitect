@@ -34,7 +34,7 @@ export function visitState(visit: string): string {
 
 import { spawn, spawnSync } from "node:child_process";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { CallLog } from "./calllog.ts";
+import { CallLog, UNREPORTED } from "./calllog.ts";
 import type { CanvasData } from "./canvas.ts";
 import { conditionNotePath } from "./conditions.ts";
 import { Decisions } from "./decisions.ts";
@@ -541,6 +541,14 @@ export class Session {
   /** Boot is done — the toll arms on this; the reading room pays none. */
   isBooted(): boolean {
     return this.bannerShown;
+  }
+
+  /** THE STATE A CALL WAS MADE IN, as a field for the record rather than a
+   *  key for the graph — req-every-call-records-the-state-it-was-made-in.
+   *  Known where the call is SERVED, which is why it is the one coordinate of
+   *  three that is an observation and not a claim. */
+  currentState(): string {
+    return this.active()[0] ?? UNREPORTED;
   }
 
   /** The decision graph's key: the leaf state the walk stands in, plus how

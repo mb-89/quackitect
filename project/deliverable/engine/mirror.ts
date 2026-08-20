@@ -10,7 +10,7 @@ import { join } from "node:path";
 import { marked } from "marked";
 import { applyBaseOp, type BaseOp } from "./bases.ts";
 import { helpFor } from "./baseui.ts";
-import { type CallLog, slowMs } from "./calllog.ts";
+import { type CallLog, slowMs, UNREPORTED } from "./calllog.ts";
 import { loadCards } from "./cards.ts";
 import { replayVisitsText } from "./decisions.ts";
 import { CLAUSES, Rejection } from "./errors.ts";
@@ -127,6 +127,9 @@ export function startMirror(o: MirrorOptions): Server {
             tool,
             args,
             actor: "human",
+            part: "owner",
+            state: UNREPORTED,
+            answered_by: UNREPORTED,
             ok: true,
             outcome: "result",
             duration_ms: Date.now() - started,
@@ -143,6 +146,9 @@ export function startMirror(o: MirrorOptions): Server {
             tool,
             args,
             actor: "human",
+            part: "owner",
+            state: UNREPORTED,
+            answered_by: UNREPORTED,
             ok: false,
             outcome: "rejected",
             duration_ms: Date.now() - started,
@@ -368,6 +374,9 @@ export function startMirror(o: MirrorOptions): Server {
             tool,
             args,
             actor: "human",
+            part: "owner",
+            state: UNREPORTED,
+            answered_by: UNREPORTED,
             ok: true,
             outcome: "result",
             duration_ms: Date.now() - started,
@@ -381,6 +390,9 @@ export function startMirror(o: MirrorOptions): Server {
             tool,
             args,
             actor: "human",
+            part: "owner",
+            state: UNREPORTED,
+            answered_by: UNREPORTED,
             ok: false,
             outcome: "rejected",
             duration_ms: Date.now() - started,
@@ -863,6 +875,9 @@ export function startMirror(o: MirrorOptions): Server {
         tool: "mirror_profile",
         args: { path: url.pathname, widget, phases: profile },
         actor: "ui",
+        part: "surface",
+        state: UNREPORTED,
+        answered_by: UNREPORTED,
         ok: true,
         outcome: "result",
         duration_ms: performance.now() - started,
@@ -931,6 +946,9 @@ export function startMirror(o: MirrorOptions): Server {
               tool: "mirror_slow",
               args: { path: url.pathname, method: req.method ?? "", ms },
               actor: "ui",
+              part: "surface",
+              state: UNREPORTED,
+              answered_by: UNREPORTED,
               ok: true,
               outcome: "result",
               duration_ms: ms,

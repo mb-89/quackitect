@@ -12,7 +12,7 @@
 import { spawn } from "node:child_process";
 import { join } from "node:path";
 import { setAnswerSpill } from "./bound.ts";
-import { CallLog } from "./calllog.ts";
+import { CallLog, type CallPart, UNREPORTED } from "./calllog.ts";
 import { parseUpdate } from "./decisions.ts";
 import { CLAUSES, Rejection, type RejectionPayload } from "./errors.ts";
 import { contentHash } from "./hash.ts";
@@ -659,6 +659,7 @@ export function buildServer(
         tool: "se_update",
         args: { via: tool, visit, ...op },
         actor: "agent",
+        ...whichHand(session, raw),
         ok: true,
         outcome: "result",
         duration_ms: 0,
@@ -673,6 +674,7 @@ export function buildServer(
         tool: "se_update",
         args: { via: tool, refused: true },
         actor: "agent",
+        ...whichHand(session, raw),
         ok: false,
         outcome: "rejected",
         duration_ms: 0,
@@ -802,12 +804,43 @@ export function buildServer(
   // malformed, not as illegal-in-state.
   server.addGuard((tool, args) => session.gate(tool, args));
 
+  /** WHICH HAND MADE THIS CALL, AND ON WHAT — dsp-the-three-coordinates-on-a-call.
+   *
+   *  THE STATE IS AN OBSERVATION. The server knows where the walk stands, so it
+   *  writes it and nothing downstream infers it.
+   *
+   *  THE OTHER TWO ARE CLAIMS AND THE RECORD MARKS THEM. The transport hands the
+   *  engine a client name and no model, and one dispatcher serves every agent, so
+   *  neither the answering model nor the part played is visible from here.
+   *
+   *  THE DEFAULT PART IS THE WALKER, and that is a position rather than a
+   *  convenience. The hand holding the session IS the walker by definition; a
+   *  GUIDE is a hand that was asked for one step, and it says so. A default of
+   *  `guide` would let the strong hand's work hide in the weak hand's count,
+   *  which is the failure this coordinate exists to make visible.
+   *
+   *  RELAYED WORK NAMES ITS AUTHOR AND ITS RELAYER. Where the walker files work
+   *  a guide authored, `part` is the guide's and `relayed_by` is the walker's —
+   *  raid-risk-a-relayed-judgment-is-filed-under-the-hand-that-relayed-it. */
+  function whichHand(session: Session, args: unknown): { state: string; part: CallPart; answered_by: string; relayed_by?: CallPart } {
+    const a = (args ?? {}) as Record<string, unknown>;
+    const declared = typeof a.as === "string" ? (a.as as CallPart) : undefined;
+    const relayed = typeof a.relayed_by === "string" ? (a.relayed_by as CallPart) : undefined;
+    return {
+      state: session.currentState(),
+      part: declared ?? "walker",
+      answered_by: typeof a.answered_by === "string" ? a.answered_by : UNREPORTED,
+      ...(relayed !== undefined ? { relayed_by: relayed } : {}),
+    };
+  }
+
   // §9 — the single call path logs everything. se_run keeps its full output.
   server.addObserver((rec) => {
     log.append({
       tool: rec.tool,
       args: rec.args,
       actor: "agent",
+      ...whichHand(session, rec.args),
       ok: rec.ok,
       outcome: rec.outcome,
       duration_ms: rec.duration_ms,

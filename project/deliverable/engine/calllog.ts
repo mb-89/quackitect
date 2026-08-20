@@ -53,8 +53,13 @@ export interface CallRecord {
   /** WHICH OF THE FIELDS ABOVE ARE SELF-REPORTED. The state is known where the
    *  call is served; the model and the part are known only to the caller. A
    *  field that reads like an observation and is a claim is worse than an
-   *  empty one, because nobody knows to doubt it. */
-  claimed?: CallPart extends never ? never : string[];
+   *  empty one, because nobody knows to doubt it.
+   *
+   *  THE MARK COMES OFF when the value arrives from whatever performed the
+   *  spawn, which knows what it started and is not the party being measured.
+   *  That party is the walking agent and it is inside our walk, so this is a
+   *  trust boundary rather than a missing party. */
+  claimed?: string[];
   /** THE DRIVER THE MILESTONE NAMED, kept beside what answered so the two can
    *  be compared without reconstructing either side. */
   named_driver?: string;
@@ -97,6 +102,43 @@ const ROTATE_BYTES = 12 * 1024 * 1024;
  *  still a syscall on the hot path for nothing. */
 const STAT_EVERY = 50;
 
+/** THE CLOSED ROLE VOCABULARY, checked at run time and not only at compile
+ *  time. A vocabulary that holds for our own code and for nothing arriving
+ *  through a lane call is not closed — see
+ *  req-every-call-records-the-part-its-caller-played. */
+const PARTS: ReadonlySet<string> = new Set<CallPart>(["owner", "walker", "guide", "reviewer", "surface"]);
+
+/** THE TWO COORDINATES ONLY THE CALLER KNOWS. The state is written by the
+ *  handler that served the call; these two are claims and are marked. */
+const SELF_REPORTED = ["answered_by", "part"] as const;
+
+/** A DECLARED ABSENCE, never a silent one. A caller that cannot know what
+ *  answered says so in the value rather than leaving the field out, for the
+ *  same reason the sizing block returns a no-match instead of nothing: an
+ *  absence on the wire is indistinguishable from a crash and from never
+ *  having run. A missing field reads as complete; this one reads as unknown. */
+export const UNREPORTED = "unreported";
+
+/** EVERY COORDINATE OR NONE — req-every-call-records-the-state-it-was-made-in.
+ *  A record missing one reads as complete and answers nothing, which is worse
+ *  than an absent record because nothing looks wrong. The measure is explicit:
+ *  calls whose part is absent = 0. */
+function assertCoordinates(entry: { answered_by?: string; state?: string; part?: string; relayed_by?: string }): void {
+  for (const key of ["answered_by", "state", "part"] as const) {
+    const v = entry[key];
+    if (typeof v !== "string" || v === "") throw new Error(`a call record needs ${key} — every coordinate or none`);
+  }
+  for (const key of ["part", "relayed_by"] as const) {
+    const v = entry[key];
+    if (v !== undefined && !PARTS.has(v)) {
+      throw new Error(`${key} "${v}" is outside the closed vocabulary: ${[...PARTS].join(", ")}`);
+    }
+  }
+  if (entry.relayed_by !== undefined && entry.relayed_by === entry.part) {
+    throw new Error("relayed_by names who FILED work somebody else authored — it cannot be the author's own part");
+  }
+}
+
 export class CallLog {
   readonly path: string;
   private sinceStat = STAT_EVERY;
@@ -105,12 +147,15 @@ export class CallLog {
     this.path = join(seDir, "calls.jsonl");
   }
 
-  append(entry: Omit<CallRecord, "ref" | "ts" | "se_version">): CallRecord {
+  append(entry: Omit<CallRecord, "ref" | "ts" | "se_version" | "claimed">): CallRecord {
+    assertCoordinates(entry);
     const rec: CallRecord = {
       ref: `call-${randomBytes(6).toString("hex")}`,
       ts: new Date().toISOString(),
       se_version: SE_VERSION,
       ...entry,
+      claimed: [...SELF_REPORTED],
+      ...(entry.named_driver !== undefined && entry.weaker_reason === undefined ? { weaker_reason: null, unreasoned: true } : {}),
     };
     mkdirSync(dirname(this.path), { recursive: true });
     appendFileSync(this.path, `${JSON.stringify(rec)}\n`, "utf8");
