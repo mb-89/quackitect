@@ -1,6 +1,6 @@
 <!-- GENERATED at agent start. Do not edit — the next start overwrites it.
      from guidance/contract.md 515f7b968352
-     from guidance/walking.md 1546adce97aa
+     from guidance/walking.md 0b9eec58539e
      from guidance/method/lane.md fc4e6dfd660f
      from guidance/voice.md 2c7162a5966d
 -->
@@ -402,6 +402,11 @@ names which of four you got.
   mid-iteration aim arrives almost at once and leaves the walk with nothing
   routed. The agent then re-aims, arrives, re-aims. i36 spent a whole session
   in that loop on 2026-08-19.
+
+  THE JUMP IS ONE CALL: `se_aim {to}`. It walks every already-passing hop in
+  that same call and stops whole where something is owed. Going is the
+  default; `go: false` only aims. Re-entering a long record is this call,
+  never a pull per standing state.
 
   AN EMPTY TARGET IS EMPTY, and it never means the front desk. A pull with
   nothing routed reports that there is nothing to do here and shows the

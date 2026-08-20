@@ -187,26 +187,27 @@ export function sessionTools(session: Session): ToolDef[] {
       name: "se_aim",
       title: "se.aim",
       description:
-        "AIM THE WALK at a state, then pull and be carried there. The machine draws the route and walks every hop whose conditions already pass, stopping only where something is genuinely owed — so a state that is already green is walked THROUGH, never landed on. Name any state in the machine you stand in, or a fully qualified one like iterations/i1/write-requirements. THIS IS HOW YOU MOVE: taking an offered door aims one hop, which draws a route one segment long and lands you on every state in between. Aim far instead. Aiming is not walking and changes nothing — the pull still refuses whatever the conditions and the dial refuse.",
+        "AIM THE WALK at a state AND BE CARRIED THERE, in this one call. The machine draws the route and walks every hop whose conditions already pass, stopping only where something is genuinely owed — so a state that is already green is walked THROUGH, never landed on, and re-entering a long record costs ONE call rather than a pull per state. Name any state in the machine you stand in, or a fully qualified one like iterations/i1/write-requirements. GOING IS THE DEFAULT (owner ruling 2026-08-20): re-aiming one state at a time relitigates hops the machine would have walked through, and going is as safe as pulling — the sweep still refuses whatever the conditions and the dial refuse. The answer says whether it ARRIVED; stopped short, it stands whole on the state that owes something, never between two.",
       inputSchema: {
         type: "object",
         properties: {
-          to: { type: "string", description: "the state to aim at — the route is drawn to it and the pull follows it" },
+          to: { type: "string", description: "the state to aim at — the route is drawn to it and walked in this call" },
           go: {
             type: "boolean",
             description:
-              "TAKE ME THERE IN THIS CALL. Aiming alone only draws the route; with go the machine walks it and the answer says whether it ARRIVED. Nothing is owed on the way means one call and you are there. Something owed means it stops on that state and says which, and the walk stands where it stopped — never between two states.",
+              "DEFAULT TRUE — the machine walks the route in this call. Pass false to only set the direction and leave the walking to the next pull; that is almost never what you want.",
           },
         },
         required: ["to"],
       },
       handler: async (args) => {
         const aimed = session.setTarget(String(args.to));
-        if (args.go !== true) return aimed;
-        // req-a-clear-jump-is-one-call: the caller named the target and asked
-        // to be taken there in the SAME call, so the sweep runs here rather
-        // than waiting for a pull. The sweep is time-bounded, so this answers
-        // whether or not the whole route fits.
+        if (args.go === false) return aimed;
+        // req-a-clear-jump-is-one-call: the caller named the target, and going
+        // is the default — see guidance/walking.md's jump rule — so the sweep
+        // runs here rather than waiting for a pull. The sweep is time-bounded,
+        // so this answers whether or not the whole route fits. go: false opts
+        // out for the rare call that only sets direction.
         return { ...aimed, ...(await session.sweep(String(args.to), "agent")) };
       },
     },

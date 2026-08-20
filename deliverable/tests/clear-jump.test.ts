@@ -47,13 +47,28 @@ async function bootBoth(): Promise<{ s: Session; server: ReturnType<typeof build
 }
 
 describe("a clear jump is one call", { concurrency: true }, () => {
-  test("aiming ALONE still moves nothing — a target says where, never goes", async () => {
+  test("go: false aims WITHOUT moving — the direction-only call remains", async () => {
     const { s, server } = await bootBoth();
     const before = s.active();
 
-    await call(server, "se_aim", { to: "front_desk" });
+    await call(server, "se_aim", { to: "front_desk", go: false });
 
-    assert.deepEqual(s.active(), before, "aiming is not walking, and that law is unchanged");
+    assert.deepEqual(s.active(), before, "with go: false, aiming is not walking");
+  });
+
+  test("a BARE aim goes — going is the default (owner ruling 2026-08-20)", async () => {
+    const { s, server } = await bootBoth();
+
+    // The old default was the other way: a bare aim only set the target, and
+    // agents re-aimed one state at a time, relitigating hops the machine
+    // would have walked through. The sweep only advances through states whose
+    // conditions pass and whose weight fits the dial, so going by default is
+    // exactly as safe as pulling.
+    const r = await call(server, "se_aim", { to: "front_desk" });
+    const body = r.body as { arrived?: boolean; note?: string };
+
+    assert.equal(body.arrived, true, `a bare aim walks now — got ${body.note ?? "no note"}`);
+    assert.equal(s.active()[0], "front_desk", "and the walk really stands there afterwards");
   });
 
   test("aim with go LANDS the walk in the same call and answers that it arrived", async () => {
