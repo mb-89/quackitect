@@ -10,7 +10,7 @@ status: open
 looked: 2026-08-20
 impact: The paging loop is the largest single consumer of lane calls and it produces no work. It also wrecks any attribution that carries a state forward between narration records, because none of the pages narrates.
 breaks_how_badly: abrasive
-how_likely: certain
+how_likely: expected
 source_refs:
   - i37-training-iterations-a-disposable-iterati
 ---
