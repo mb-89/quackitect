@@ -89,6 +89,21 @@ export type ClaimsHost = Pick<
   | "autonomy"
 >;
 
+/** THE ONE EXCEPTION TO "REWRITE ONLY WHAT CHANGED", named where the rule is.
+ *
+ *  A section added to the form AFTER a claim signed was never written, so it
+ *  is not a field the change touched and the recheck advice says to leave it.
+ *  The submit then refuses, naming it empty. Measured on the i15 walk, which
+ *  met it twice at a gate that had grown goals_served and bound_breaches since
+ *  its first signature.
+ *
+ *  Empty when nothing is outstanding, so the ordinary recheck reads exactly as
+ *  it always did. */
+function grownSections(problems: string[]): string {
+  if (problems.length === 0) return "";
+  return ` ONE EXCEPTION APPLIES HERE: ${String(problems.length)} section(s) are empty or failing, and some may be NEW since you signed — those were never written, so write them. \`problems\` names each.`;
+}
+
 export class Claims {
   /** Claim verdicts, keyed to their inputs. Static on purpose: it is a pure
    *  function of (corpus, body, form), so two sessions on one root reach the
@@ -379,7 +394,7 @@ export class Claims {
         ? {
             was_signed: typeof fmData.signed_off === "string" ? fmData.signed_off : "",
             why: typeof fmData.reopened === "string" ? fmData.reopened : "",
-            do: "THIS CLAIM STOOD BEFORE. Read what is already written, decide only whether the change above moved it, and submit if it still holds. Rewrite ONLY the fields the change actually touched. Submitting re-runs every check and re-signs.",
+            do: `THIS CLAIM STOOD BEFORE. Read what is already written, decide only whether the change above moved it, and submit if it still holds. Rewrite ONLY the fields the change actually touched.${grownSections([...lint.problems, ...tp])} Submitting re-runs every check and re-signs.`,
           }
         : undefined,
       amended: typeof fmData.amended === "string" ? fmData.amended : "",
@@ -715,8 +730,19 @@ export class Claims {
     });
   }
 
+  /** A QUALIFIED ID NAMES ITS OWN MACHINE, and every form lookup takes the
+   *  bare name — the same normalisation whyGrey does, arrived at the same way.
+   *  A walk reads `iterations/i15/draft-vision` in its own answers, so that is
+   *  what it passes back, and the refusal then names a form-less state rather
+   *  than the prefix it should have dropped. Measured on the i15 walk: one
+   *  call spent, at the moment the walk was already stuck. */
+  private bareState(name: string): string {
+    return name.slice(name.lastIndexOf("/") + 1);
+  }
+
   /** see dsp-walk-machine.md#two-operations-on-a-standing-claim */
-  reopenClaim(name: string, reason: string, by: string, machineId?: string, confirm?: boolean): Record<string, unknown> {
+  reopenClaim(rawName: string, reason: string, by: string, machineId?: string, confirm?: boolean): Record<string, unknown> {
+    const name = this.bareState(rawName);
     this.host.forgetRoute();
     const m = this.formMachine(machineId);
     this.stateFormState(name, m); // refuses an undeclared or form-less state
@@ -1149,7 +1175,35 @@ export class Claims {
     // The dead fields migrate out as legacy instances are touched.
     raw = raw.replace(/^status: .*\n?/m, "").replace(/^opened: .*\n?/m, "");
     // A changed claim is neither the submitted nor the blessed claim.
-    if (Object.keys(fields).length > 0) raw = stripSignedOff(withBless(raw, undefined));
+    //
+    // AND THE ACCIDENTAL DOOR SAYS SO NOW. se_reopen does exactly this on
+    // purpose, and it refuses without confirmation, naming how many states
+    // fall. A field save does it in this one line and said nothing at all, so
+    // the guarded door was the deliberate one and the unguarded door was the
+    // one nobody meant to walk through.
+    //
+    // MEASURED ON THE i15 WALK: correcting a single wrong number on a signed
+    // kickoff gate — 26 query files where there are 25 — dropped 28 claims
+    // beneath it and cost a whole session re-earning states that were right.
+    // se_amend fixes a field and LEAVES THE TREE STANDING, and its name lived
+    // only on se_reopen's description, a verb that call never touched.
+    let cleared: Record<string, unknown> | undefined;
+    if (Object.keys(fields).length > 0) {
+      if (typeof parseStateNote(raw).frontmatter.signed_off === "string") {
+        const falls = this.wouldFall(name, m);
+        cleared = {
+          state: name,
+          falls: falls.length,
+          states: falls,
+          why: "a changed claim is not the claim that was signed, so the signature and any bless are gone",
+          instead:
+            falls.length > 0
+              ? `se_amend fixes a field and leaves these ${String(falls.length)} standing — use it where the claim's own content still passes, and re-submit only when the work is genuinely wrong`
+              : "se_amend fixes a field without clearing the signature, where the claim's own content still passes",
+        };
+      }
+      raw = stripSignedOff(withBless(raw, undefined));
+    }
     if (inputs_checked !== undefined) {
       raw = withChecked(
         raw,
@@ -1163,7 +1217,7 @@ export class Claims {
     mkdirSync(dirname(h.instanceAbs), { recursive: true });
     writeFileSync(h.instanceAbs, raw, "utf8");
     this.host.notifyChange();
-    return this.stateFormGet(name, m);
+    return { ...this.stateFormGet(name, m), ...(cleared === undefined ? {} : { signature_cleared: cleared }) };
   }
 
   /** see dsp-walk-machine.md#the-state-form-the-walk-itself-owes */
@@ -1261,6 +1315,43 @@ export class Claims {
     } catch {
       return false;
     }
+  }
+
+  /** WHY A SIGNED FEEDER IS STILL NOT AN INPUT — the root, with its own reason.
+   *
+   *  MEASURED ON THE i15 WALK: sweep-consistency refused with "unsigned
+   *  feeders: run-demos" while run-demos was signed, complete and correct. The
+   *  break was FOUR STATES UPSTREAM at trace-design, whose coverage claim had
+   *  stopped standing the moment an engine file was added with no design-spec.
+   *  The engine already knew that, in those words, and computed it on the same
+   *  pass.
+   *
+   *  THE ANSWER NAMED THE NEAREST LINK AND WAS USELESS. A reader sent to a
+   *  state that is signed, complete and correct concludes the check is broken -
+   *  which is what happened, and it cost the walk its endgame plus a note
+   *  filed against a defect that does not exist.
+   *
+   *  SO THE REFUSAL WALKS BACK. A feeder that is itself signed and complete is
+   *  never the fault; something it depends on is, and the walk back ends at the
+   *  first state that can say why. */
+  feederFault(fm: MachineDecl, state: StateDecl): { state: string; why: string[] } | undefined {
+    return walkBackToFault(
+      state.id,
+      (id) => {
+        const st = fm.states.find((x) => x.id === id);
+        return st === undefined ? [] : this.feedersUnsigned(fm, st);
+      },
+      (id) => {
+        try {
+          const f = this.stateFormGet(id, fm) as { signed?: boolean; met?: boolean; problems?: string[] };
+          return { ok: f.signed === true && f.met === true, why: f.problems ?? [] };
+        } catch {
+          // A state with no form of its own cannot say it is fine, so the walk
+          // back stops on it — which is right: it is as far as anything can see.
+          return { ok: false, why: [] };
+        }
+      },
+    );
   }
 
   feedersUnsigned(fm: MachineDecl, state: StateDecl): string[] {
@@ -1466,14 +1557,29 @@ export class Claims {
       const m = this.host.currentMachine();
       const gs = m.states.find((x) => x.id === stateId);
       const feeders = gs === undefined ? [] : this.feedersUnsigned(m, gs);
-      if (feeders.length > 0) {
+      if (feeders.length > 0 && gs !== undefined) {
+        // A SIGNED FEEDER IS NOT THE FAULT — see feederFault. The walk back is
+        // computed only where a refusal is already being built, so it costs
+        // nothing on the passing path.
+        const root = this.feederFault(m, gs);
+        const upstream =
+          root === undefined
+            ? ""
+            : ` — the break is upstream at ${root.state}${root.why.length > 0 ? `: ${root.why.join(" · ")}` : ", whose form is not signed"}`;
         out.push({
           kind: "unsigned_feeder",
           states: feeders,
           clause: CLAUSES.CONDITION_UNMET,
           expected: `a state requires ALL its inputs — every feeder form signed before ${stateId} passes`,
-          got: `unsigned feeders: ${feeders.join(", ")}`,
-          remedy: { tool: "se_pull", args: {}, note: "walk the named states and submit their forms; this one passes after" },
+          got: `unsigned feeders: ${feeders.join(", ")}${upstream}`,
+          remedy: {
+            tool: "se_pull",
+            args: {},
+            note:
+              root === undefined
+                ? "walk the named states and submit their forms; this one passes after"
+                : `go to ${root.state} and fix what it names — the feeder above it is already signed, so re-signing it changes nothing`,
+          },
           source: "engine/session.ts stateform",
         });
       }
@@ -1688,4 +1794,36 @@ export class Claims {
     const fields = { ...island.fields, inputs_checked: island.checked.join("\n") };
     return { ingested: name, author, ...this.stateFormSave(name, fields, author, m) };
   }
+}
+
+/** THE WALK BACK ALONG UNSIGNED INPUTS, to the first state that can say why.
+ *
+ *  Kept free of the machine so it can be driven over a chain several hops
+ *  long. The engine binding sits on Claims.feederFault; the shape it guards
+ *  cannot be built out of a freshly seeded fixture, where every chain is one
+ *  hop and the nearest link IS the root.
+ *
+ *  @param start        the state that refused
+ *  @param feedersOf    its unsigned inputs, and theirs
+ *  @param soundnessOf  whether a state can say it is fine, and why not
+ */
+export function walkBackToFault(
+  start: string,
+  feedersOf: (id: string) => string[],
+  soundnessOf: (id: string) => { ok: boolean; why: string[] },
+  seen: Set<string> = new Set(),
+): { state: string; why: string[] } | undefined {
+  if (seen.has(start)) return undefined; // a cycle in the drawing says nothing
+  seen.add(start);
+  for (const id of feedersOf(start)) {
+    const s = soundnessOf(id);
+    // NOT SOUND MEANS THIS IS AS FAR BACK AS ANYTHING CAN SEE. Its own reason
+    // is the answer the reader came for.
+    if (!s.ok) return { state: id, why: s.why };
+    // SOUND MEANS IT IS NOT THE FAULT. Something it depends on is, and naming
+    // it instead sends the reader to a state with nothing wrong with it.
+    const deeper = walkBackToFault(id, feedersOf, soundnessOf, seen);
+    if (deeper !== undefined) return deeper;
+  }
+  return undefined;
 }

@@ -22,13 +22,13 @@ the concrete tools, chosen for speed and for installing with plain
 - THE COMMIT HOOK (`deliverable/hooks/pre-commit`, wired by
   preflight via `core.hooksPath` every boot) runs the checker and
   `biome check --error-on-warnings` and BLOCKS. Boot runs no typecheck.
-- THE LANE'S FIXER (`engine/lintfix.ts`) runs Biome's SAFE fixes after
+- THE LANE'S FIXER (`deliverable/engine/lintfix.ts`) runs Biome's SAFE fixes after
   every lane write to a covered file and announces what changed. Its
   coverage is read live from biome.json — never mirrored.
 - `--write --unsafe` IS BANNED. The unsafe tier rewrote ~70 non-null
   assertions into optional chains and broke the strict build (2026-08-03).
   Safe fixes only, everywhere, including by hand.
-- THE SHELL BUNDLES: `vscode/src/extension.ts` → esbuild →
+- THE SHELL BUNDLES: `deliverable/vscode/src/extension.ts` → esbuild →
   `vscode/extension.js` (generated — edit the source, then
   `npm run build`). The manifest and install seam stay unchanged.
 - THE VERIFY LOOP for any refactor: checker → `biome check --write` →
@@ -59,7 +59,7 @@ a walk's work never silently vanishes, and neither does anyone else's.
 Configuration lives in DATA the running system reads — never in
 constants that demand a recompile. When a behavior will be tuned, give
 it a config home from day one. The reference case: the voice lint's
-thresholds live in `machines/lint/voice-lint.md`; edit the file and the
+thresholds live in `deliverable/machines/lint/voice-lint.md`; edit the file and the
 next `se_lint` call uses it, with no rebuild and no reload. The rules'
 LOGIC stays code — only their parameters are data.
 
@@ -78,7 +78,7 @@ arguments to another does NOT print a list of its own. It declares its
 flags in the same registry as the program it forwards to, and renders that
 one text. Two half-lists leave the reader stitching them together.
 
-The launcher's flags therefore live in `engine/bin/se-mcp.ts` beside the
+The launcher's flags therefore live in `deliverable/engine/bin/se-mcp.ts` beside the
 engine's, under a LAUNCH heading. The launcher consumes them and the server
 never sees them. Documenting them there costs nothing and it is the only
 place anybody has to look.
@@ -173,7 +173,7 @@ Cite where the capability is documented when a decision rests on it.
 ## Adding a control to the bar (owner ruling 2026-08-04)
 
 The bar's one truth is `deliverable/machines/panels/controls.md`.
-The renderer is `engine/params.ts`. Every surface fetches the rendered bar
+The renderer is `deliverable/engine/params.ts`. Every surface fetches the rendered bar
 from the engine (`/widget/controls`) — the VS Code sidebar included.
 
 - ONE ROW PER CONTROL. The row starts with its label; the controls follow.
@@ -250,15 +250,20 @@ WHAT THIS REPLACES: the standing verify loop in this file names a scoped test
 run after a checker pass. The checker half becomes automatic; the test half
 stays the agent's, because only the agent knows which question a run answers.
 
-## se_package builds the artifact
+## NOT BUILT YET — an se_package verb should build the artifact
+
+THERE IS NO `se_package` VERB TODAY. Do not call one. Until it exists, the M9
+package state builds its archive by running `deliverable/engine/bin/package.ts` through
+`se_run`, like any other script.
 
 OWNER RULING 2026-08-15, agreed at i12's retro. The M9 package state requires
 a versioned archive and the lane has no verb that builds one, so the agent
 reaches for the shell. It happened twice in i12, once refused for a bad
 argument.
 
-The verb wraps engine/bin/package.ts, answers with the artifact path, and the
-package state's file-ref field resolves it against disk as it already does.
+WHEN IT IS BUILT the verb wraps `deliverable/engine/bin/package.ts`, answers with the
+artifact path, and the package state's file-ref field resolves it against disk
+as it already does.
 
 ## A merge into trunk re-checks every open iteration
 

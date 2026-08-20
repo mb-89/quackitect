@@ -6,12 +6,13 @@ probes:
   - raid-risk-i15-query-latency-unmeasured-at-real-scale
 timebox: 45 minutes
 form: script
+chunk: "none"
 faked: the filter evaluator itself — a minimal regex-based frontmatter parser and a two-field AND predicate (kind==risk, status==open) stand in for the real filters.and/or evaluator; the corpus walked and read (spec/trace, 768 .md files at measurement time) is not faked, and no cache or index sits in front of it
 fallback: if over one second, reopen raid-dec-i15-query-answers-via-declarative-view-spec with opt-cache-corpus-read-invalidated-by-file-stat (cand-fast-path-plus-blocking's stat-invalidated cache) already on record
 verdict: holds
 measured: 31 ms wall-clock, 768 files walked, read and frontmatter-parsed, 40 matched — 2026-08-16, se_run on this session's container
 folds_to: raid-risk-i15-query-latency-unmeasured-at-real-scale — status moves open to mitigated, 31 ms measured against the 1000 ms bound is a 32x margin, comfortably absorbing the throttled-hardware discount raid-asm-the-target-machine-is-many-throttled-cores names
-promote: none — the real filters.and/or evaluator and YAML frontmatter parser are still owed at build time; this script is throwaway per the spike-tracer law
+promote: "none"
 source_refs:
   - rank-unknowns, the seeded pick
 ---

@@ -275,12 +275,7 @@ export function seDir(root: string): string {
 export type PathKind = "session" | "method" | "record" | "content";
 
 /** see dsp-resolution-seam.md#the-method-surfaces-as-root-relative-prefixes */
-export const METHOD_PREFIXES = [
-  "guidance/",
-  "deliverable/machines/",
-  "deliverable/engine/",
-  "deliverable/tests/",
-] as const;
+export const METHOD_PREFIXES = ["guidance/", "deliverable/machines/", "deliverable/engine/", "deliverable/tests/"] as const;
 
 /** The prompt layer is METHOD that does not live under a method folder. It is
  *  PROJECTED into each tree by place-prompt-layer, so every tree needs it and

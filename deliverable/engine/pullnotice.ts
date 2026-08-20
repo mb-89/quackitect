@@ -2,7 +2,7 @@
 
 /** The five answers, and the three habits. Every greeting ends with this. */
 export const PULL_NOTICE = [
-  "- read — the document rides along and `prove` names its last words. Read it, then pull again with form: {read: <those words>}.",
+  "- read — the document rides along and `prove` asks three fill-in-the-blank questions about it. Answer all three in one string: form: {read: <the answers>}. Quote generously — the check is containment, not an exact match.",
   "- fill — the machine built the form. Return it on the next pull as form: {...}. A form you mean to FINISH carries submit: true.",
   "- do — the happy path was walked for you. Do what the guidance asks, then pull again.",
   "- choose — options ride a `do`. Answer form: {choice: <to>} only when a routed goal needs that door.",

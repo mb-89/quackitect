@@ -8,8 +8,8 @@ owner: the maintainer
 trigger: every gate whose fields draw from a live source, in every minor record
 status: open
 impact: "i5's validation gate served 24 must stories and 9 value props for a delta of 5 requirements. Nineteen answers say the delta did not touch them. The signal a reader wants is buried in a form that is mostly filler, and filler is what teaches a reader to skim."
-breaks_how_badly: tolerable
-how_likely: certain
+breaks_how_badly: corrosive
+how_likely: expected
 source_refs:
   - i5-engine-hygiene-one-version-source-every-
 weighs_with: none

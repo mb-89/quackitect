@@ -46,12 +46,26 @@ export class ReadGate {
   }
 
   /** The document the last pull served, waiting on its probes. */
-  serving(): { path: string; hash: string; expect: string[] } | null {
+  serving(): { path: string; hash: string; expect: string[]; outstanding: string[] } | null {
     return this.pendingRead;
   }
 
   serve(path: string, hash: string, expect: string[]): void {
-    this.pendingRead = { path, hash, expect };
+    // RE-SERVING THE SAME DOCUMENT DOES NOT WIPE WHAT WAS ALREADY ANSWERED.
+    // A wrong answer serves the document again, and resetting here would hand
+    // back all three probes every time — which is the loop banking exists to
+    // end. A DIFFERENT document, or the same one changed under the reader,
+    // starts fresh because its probes are different questions.
+    const prev = this.pendingRead;
+    const same = prev !== null && prev.path === path && prev.hash === hash;
+    const outstanding = same && prev !== null ? prev.outstanding : [...expect];
+    this.pendingRead = { path, hash, expect, outstanding };
+  }
+
+  /** Bank what this attempt answered, and say what is still owed. */
+  bankProbes(missed: string[]): string[] {
+    if (this.pendingRead !== null) this.pendingRead.outstanding = missed;
+    return missed;
   }
 
   answered(): void {
@@ -69,8 +83,14 @@ export class ReadGate {
   /** Session-local read buffer: latest lane hash per path, auto-filled by
    *  se_file_read and re-used for later ticks unless stale. */
   readonly readBuffer = new Map<string, string>();
-  /** The document the last pull served, waiting on its probes. */
-  pendingRead: { path: string; hash: string; expect: string[] } | null = null;
+  /** The document the last pull served, waiting on its probes.
+   *
+   *  `outstanding` IS WHAT IS STILL OWED, never the whole set. A probe answered
+   *  on one attempt stays answered: an agent told which two it missed sends
+   *  those two, and judging that reply against all three would fail it for the
+   *  one it had already got right. Measured on the i15 walk, which learned the
+   *  rule the expensive way and wrote it into its own field report. */
+  pendingRead: { path: string; hash: string; expect: string[]; outstanding: string[] } | null = null;
 
   rememberRead(path: string, hash: string, ref?: string): void {
     if (ref !== undefined || path.trim() === "" || hash.trim() === "" || path.startsWith("@")) return;
@@ -252,7 +272,7 @@ export class ReadGate {
           ? {
               tool: "se_pull",
               args: {},
-              note: "pull — it serves each document and names the last words to hand back, one document at a time. Reading through se_file_read credits too.",
+              note: "pull — it serves each document and asks three fill-in-the-blank questions about it, one document at a time. Reading through se_file_read credits too.",
             }
           : {
               tool: "se_pull",

@@ -1,0 +1,17 @@
+# The pull law as a query: `referenced` is the emitter's link graph - only entries a
+# chapter actually links render in the book. Obsidian does not know the property, so the
+# preview shows ALL fundamentals (the superset); the book stays the truth.
+# The appendix view is a TABLE: one
+# row per fundamental, the full body one expand away - recognizable as the rendered
+# fundamental the chapters link to.
+filters:
+  and:
+    - 'file.inFolder("spec/fundamentals")'
+    - 'referenced != false'
+views:
+  - type: table
+    name: Fundamentals
+    order: [name, statement]
+  - type: table
+    name: Fundamentals in full
+    order: [name, statement]

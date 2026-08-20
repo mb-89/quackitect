@@ -1,8 +1,9 @@
 ---
 form: define-actual
+reopened: "2026-08-19T17:15:05.435Z — same claims-registration gap as draft-vision: route() treats define-actual as an unmet feeder of frame-delta despite the file being signed"
 amended: 2026-08-16T16:31:14.130Z by agent — ref "main" resolves — verified 2026-08-16; only the prior-art-scan question remains open
 by: agent
-signed_off: 2026-08-16T16:18:42.505Z
+signed_off: 2026-08-19T17:15:16.426Z
 authors: agent
 files: null
 ---

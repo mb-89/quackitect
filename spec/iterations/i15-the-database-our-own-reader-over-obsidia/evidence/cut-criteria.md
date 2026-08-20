@@ -1,7 +1,8 @@
 ---
 form: cut-criteria
+reopened: "2026-08-19T17:36:47.517Z — same claims-registration gap, cascading fix through M4"
 by: agent
-signed_off: 2026-08-16T18:07:25.315Z
+signed_off: 2026-08-19T17:37:25.424Z
 authors: agent
 files: null
 ---
@@ -22,7 +23,6 @@ All five i15 candidates composed. Each shares the identical 'unchanged baseline'
 6. [[req-overlay-survives-update]] [cut: overlay mechanism, untouched]
 7. [[req-reachable-capability-is-traced]] [cut: capability tracing, identical across all five]
 8. [[req-trace-view-derived-from-files]]
-9. [[req-engine-folder-is-sealed]] [cut: engine packaging, untouched]
 10. [[req-fresh-machine-runs]] [cut: bootstrap, untouched]
 11. [[req-open-notes-stay-visible]] [cut: notes UI, untouched]
 12. [[req-overlay-drift-reported]] [cut: overlay mechanism, untouched]

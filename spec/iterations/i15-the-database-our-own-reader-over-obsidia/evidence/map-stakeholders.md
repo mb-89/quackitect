@@ -1,7 +1,8 @@
 ---
 form: map-stakeholders
+reopened: "2026-08-19T17:22:01.036Z — same claims-registration gap, cascading fix through M2"
 by: agent
-signed_off: 2026-08-16T16:41:42.020Z
+signed_off: 2026-08-19T17:22:01.631Z
 authors: agent
 files: null
 ---

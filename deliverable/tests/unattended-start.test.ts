@@ -169,11 +169,7 @@ test("the fetch step proves the record by its folder on trunk", () => {
   const rel = join("spec", "iterations", id, "record.md");
   mkdirSync(join(root, dirname(rel)), { recursive: true });
   writeFileSync(join(root, rel), `---\nid: ${id}\nstatus: seeded\n---\n`, "utf8");
-  assert.equal(
-    recordOnTrunk(root, id),
-    `spec/iterations/${id}/record.md`,
-    "the folder IS the iteration, and the path is what comes back",
-  );
+  assert.equal(recordOnTrunk(root, id), `spec/iterations/${id}/record.md`, "the folder IS the iteration, and the path is what comes back");
 });
 
 // NO BRANCH IS CONSULTED ANY MORE, and that is the property the twenty-six

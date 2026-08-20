@@ -1,7 +1,8 @@
 ---
 form: evaluate-set
+reopened: "2026-08-19T17:37:34.990Z — same claims-registration gap, cascading fix through M4"
 by: agent
-signed_off: 2026-08-16T18:16:39.904Z
+signed_off: 2026-08-19T17:37:35.588Z
 authors: agent
 files: null
 ---

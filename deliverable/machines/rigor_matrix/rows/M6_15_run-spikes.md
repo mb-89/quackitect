@@ -43,7 +43,7 @@ specification_note: |
 
 ## Guidance
 
-rank-unknowns AUTHORS the spike drawing (`machines/spikes.md`). Entering this
+rank-unknowns AUTHORS the spike drawing (`<record>/machines/spikes.md`, in the record’s own folder). Entering this
 state RUNS it.
 
 One state per spike, in parallel, each within its timebox

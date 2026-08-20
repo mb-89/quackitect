@@ -7,7 +7,7 @@ It is a named, established method. Nielsen coined it for interaction
 design in 2006 ([[ref-progressive-disclosure]]).
 
 Its siblings for TEXT are BLUF and the inverted pyramid. They have their
-own card, `methods/bluf.md`.
+own card, `deliverable/machines/methods/bluf.md`.
 
 **When.** Any document past a few paragraphs, any report, any surface
 where readers differ in how much they need. The voice's pyramid rule is

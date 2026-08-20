@@ -35,8 +35,23 @@ export class Toll {
   }
 
   /** A hop the machine forced, which pays no call.
+   *
+   *  TWO SHAPES, AND ONE ARGUMENT COVERS BOTH. The machine forced the hop, no
+   *  judgment happened on it, and a toll falling due there could only ever be
+   *  paid with filler.
+   *
    *  see dsp-narration.md#the-reading-loop-pays-nothing */
   private static isReadingHop(tool: string, args: Record<string, unknown>): boolean {
+    // WAITING ON A JOB YOU ALREADY STARTED IS THE SAME SHAPE AS THE READING
+    // LOOP. The battery runs asynchronously and hands back a handle, so the
+    // only way to learn it finished is to ask — and asking is not work.
+    //
+    // MEASURED on the i15 walk: se_test was called 40 times. The 4 that
+    // STARTED a run were never refused. Of the 36 that polled a running job,
+    // 25 were refused by this toll — 62% of every se_test call in the
+    // session, none of them about testing. Each one had to be paid with an
+    // update saying nothing, or resent until it was.
+    if (tool === "se_test") return typeof args.job === "string" && args.job !== "";
     // FOLLOWING THE LANE'S OWN CURSOR IS THE SAME CASE. A bounded answer hands
     // back a page and the exact call that fetches the rest; making that call
     // is the engine's instruction being obeyed, not work to narrate. Charging

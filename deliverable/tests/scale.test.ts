@@ -16,7 +16,7 @@ import { parseStateNote } from "../engine/notes.ts";
 import { renderMirror } from "../engine/render.ts";
 import { DEFAULT_TIER, loadLevels, loadStopAt, notchName, tierOf, valueFor, weightName } from "../engine/scale.ts";
 import { Session } from "../engine/session.ts";
-import { GUIDANCE, freshRoot } from "./helpers.ts";
+import { freshRoot, GUIDANCE } from "./helpers.ts";
 
 const ROOT = fileURLToPath(new URL("../../", import.meta.url));
 

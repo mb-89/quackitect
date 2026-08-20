@@ -5,6 +5,8 @@ type: "[[design-spec]]"
 statement: the typed tool lane, carried by one registry of verbs with schemas, clauses and remedies
 realizes:
   - "el-walk-engine"
+  - "if-walk-engine-to-query-evaluator"
+  - "if-walk-engine-to-coupling-disposer"
 files:
   - "deliverable/engine/harness.ts"
   - "deliverable/engine/payload-limit.ts"
@@ -20,6 +22,8 @@ files:
   - "deliverable/engine/bound.ts"
   - "deliverable/engine/bin/se-mcp.ts"
   - "deliverable/engine/bin/se-manual.ts"
+  - "deliverable/engine/tools-query.ts"
+  - "deliverable/engine/repeat.ts"
 ---
 
 ## The entrypoint answers what it is, before it answers anything else
@@ -527,3 +531,32 @@ WHAT THE GROUPING DOES NOT CHANGE. The lane still assembles one array and
 dispatches from one table, so a verb's clause, remedy and log line are the
 same whichever file its entry is written in. The split is about where a
 reader looks, never about how a call is served.
+
+## A remedy that is not taken
+
+Every refusal carries a clause, what was expected, what it got, and an
+executable remedy. That is enough to recover in one turn WHEN THE READER TAKES
+IT.
+
+A reader who does not take it gets the identical answer again, and from inside
+the third identical answer looks exactly like the first. Nothing about a
+refusal said a loop had started.
+
+SO THE REFUSAL COUNTS ITSELF. `repeat.ts` holds one slot: the last refused
+tool and clause. From the third identical one on, the served refusal carries a
+`repeated` block naming the count and saying the remedy is not landing. At
+five it stops advising another attempt and names the two ways out — ask where
+you stand, or escape.
+
+A CALL THAT GETS THROUGH CLEARS IT. What matters is a refusal repeating back
+to back; a clause hit twice an hour apart is not a loop.
+
+IT RIDES ON THE REFUSAL RATHER THAN GUARDING THE CALL, because a refused call
+cannot be refused harder. The one place every rejection is serialised is where
+it attaches.
+
+MEASURED ON THE i15 WALK: `se_file_move` was refused 27 times with SE-C-110,
+the whole burst inside nine seconds. The toll counts silence and the stall
+guard counts updates since anything closed; both were satisfied throughout.
+The walk was narrating and the walk was busy. It was busy asking one question
+that had already been answered.

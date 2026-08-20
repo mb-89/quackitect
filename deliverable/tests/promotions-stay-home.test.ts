@@ -43,6 +43,17 @@ describe("a promotion stays in its own iteration", { concurrency: true }, () => 
 
   // THE ENGINE HALF. The filter must ask the owner, not merely whether the
   // experiment was promoted at all.
+  //
+  // basename(traceRoot) IS GONE (raid-debt-delta-default-views). Under the
+  // one-tree-one-path ADR, traceRoot resolves to the project root (or an
+  // iteration's own path, which IS the project root in the current single-
+  // tree layout) — never to a per-iteration directory whose basename is the
+  // iteration id. So the comparison this test used to pin never actually
+  // matched anything real; it happened to look right because nothing
+  // exercised it against a genuine second record. The fix threads the real
+  // owner in from the bound evidence folder instead (see boundOwner and
+  // node-scoping.test.ts's "the delta-default view", which proves the match
+  // against two records where this one only proved the shape of the code).
   test("the promotions filter matches on the owning record, not just on promote", () => {
     const src = readFileSync(STATEFORM, "utf8");
     const at = src.indexOf("function promotionItems(");
@@ -50,7 +61,7 @@ describe("a promotion stays in its own iteration", { concurrency: true }, () => 
     const body = src.slice(at, at + 700);
 
     assert.match(body, /minted_in/, "it reads the experiment's owner");
-    assert.match(body, /basename\(traceRoot\)/, "and compares it to the record being walked");
+    assert.match(body, /===\s*owner/, "and compares it to the bound record's own id");
 
     // The old rule was `promote` non-empty and not "none", and nothing else.
     // Keeping that alone is what let a promotion outlive its record.

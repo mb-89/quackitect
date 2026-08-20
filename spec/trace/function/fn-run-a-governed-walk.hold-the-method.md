@@ -26,6 +26,7 @@ satisfies:
   - req-a-check-binds-without-engine-code
   - req-an-unbound-rule-is-reported
   - req-no-state-demands-what-it-cannot-supply
+  - req-guidance-names-only-what-the-engine-has
 inputs:
   - flow-method-sources
   - flow-overlay

@@ -344,6 +344,11 @@ method(["file"], "hasProperty", (r, a) => {
   const v = (r as Record<string, unknown>)[toText(a[0])];
   return v !== undefined && v !== null;
 });
+method(["file"], "inFolder", (r, a) => {
+  const folder = String((r as Record<string, unknown>).folder ?? "");
+  const target = toText(a[0]).replace(/\/+$/, "");
+  return folder === target || folder.startsWith(`${target}/`);
+});
 method(
   ["file"],
   "asLink",

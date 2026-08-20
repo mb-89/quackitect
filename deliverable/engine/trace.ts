@@ -59,6 +59,9 @@ export interface TraceNode {
   hay?: string;
   /** Absolute path, so a checker can read what the loader did not keep. */
   file?: string;
+  /** raid-debt-delta-default-views: which record minted this node, so a
+   *  $-item resolver can default to it instead of the whole corpus. */
+  minted_in?: string;
 }
 
 export interface Placed extends TraceNode {
@@ -531,6 +534,7 @@ export function loadTrace(root: string): TraceNode[] {
       refines: [...asList(fm.refines), ...asList(fm.satisfies), ...asList(fm.implements), ...asList(fm.verifies), ...asList(fm.realizes)],
       hay: pairs,
       file,
+      ...(typeof fm.minted_in === "string" && fm.minted_in.trim() !== "" ? { minted_in: fm.minted_in.trim() } : {}),
     });
   }
   CORPUS.set(root, { stamp, nodes: out, epoch: era });

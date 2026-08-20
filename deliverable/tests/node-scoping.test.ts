@@ -10,6 +10,7 @@ import { join } from "node:path";
 import { describe, test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { ModelFileSystem } from "../engine/model-fs.ts";
+import { fieldArgsFor } from "../engine/stateform.ts";
 
 const BACKFILL = fileURLToPath(new URL("../engine/bin/backfill-minted.ts", import.meta.url));
 
@@ -38,6 +39,68 @@ describe("the mint stamp", { concurrency: true }, () => {
     model.write("spec/notes/plain.md", "---\nid: plain\n---\n", null);
     assert.doesNotMatch(readFileSync(join(lab, "spec", "trace", "requirement", "req-y.md"), "utf8"), /minted_in/);
     assert.doesNotMatch(readFileSync(join(lab, "spec", "notes", "plain.md"), "utf8"), /minted_in/);
+  });
+});
+
+// raid-debt-delta-default-views: THE VIEW HALF of req-nodes-scoped-to-iteration.
+// The stamp already lands (see "the mint stamp" above); this is the resolver
+// that reads it — a $-item source defaults to the BOUND record's own
+// minted_in, and `:all` on the source name is the explicit opt-in that
+// widens back to the whole corpus.
+describe("the delta-default view", { concurrency: true }, () => {
+  /** Two requirement nodes, minted in two different records, plus a bound
+   *  evidence folder for one of them — the exact shape the debt's own
+   *  closure bar names: "a reference table in a fresh record showing only
+   *  that record's own nodes until the opt-in is set". */
+  function twoRecordsRoot(): { root: string; traceRoot: string; evidenceDir: string } {
+    const root = mkdtempSync(join(tmpdir(), "se-delta-"));
+    const reqDir = join(root, "spec", "trace", "requirement");
+    mkdirSync(reqDir, { recursive: true });
+    writeFileSync(
+      join(reqDir, "req-own.md"),
+      '---\nminted_in: i9-the-fixture-record\nid: req-own\ntype: "[[requirement]]"\n---\n\n# own\n',
+    );
+    writeFileSync(join(reqDir, "req-other.md"), '---\nminted_in: i2-elsewhere\nid: req-other\ntype: "[[requirement]]"\n---\n\n# other\n');
+    const evidenceDir = join(root, "spec", "iterations", "i9-the-fixture-record", "evidence");
+    mkdirSync(evidenceDir, { recursive: true });
+    // loadTrace(traceDir(traceRoot)) appends spec/trace ITSELF —
+    // traceRoot is the PROJECT ROOT to resolve trace under, not the trace
+    // folder already joined on (see engine/trace.ts's traceDir). Passing the
+    // already-joined folder here would look one level too deep and silently
+    // find nothing, which is exactly the trap empty-source.test.ts's
+    // superficially similar helper never has to notice, because it wants
+    // empty regardless.
+    return { root, traceRoot: root, evidenceDir };
+  }
+
+  test("a bare $-item source defaults to the bound record's own nodes", () => {
+    const { root, traceRoot, evidenceDir } = twoRecordsRoot();
+    const args = fieldArgsFor(
+      { name: "reqs", template: "list", items: ["$requirements"] } as never,
+      root,
+      traceRoot,
+      undefined,
+      evidenceDir,
+    );
+    assert.deepEqual(args.items, ["req-own"], "only the bound record's own requirement shows, not the other record's");
+  });
+
+  test("the :all suffix is the explicit opt-in back to the whole corpus", () => {
+    const { root, traceRoot, evidenceDir } = twoRecordsRoot();
+    const args = fieldArgsFor(
+      { name: "reqs", template: "list", items: ["$requirements:all"] } as never,
+      root,
+      traceRoot,
+      undefined,
+      evidenceDir,
+    );
+    assert.deepEqual(args.items, ["req-other", "req-own"], "the opt-in widens the view to both records");
+  });
+
+  test("with nothing bound, a $-item source stays corpus-wide (unchanged legacy behaviour)", () => {
+    const { root, traceRoot } = twoRecordsRoot();
+    const args = fieldArgsFor({ name: "reqs", template: "list", items: ["$requirements"] } as never, root, traceRoot);
+    assert.deepEqual(args.items, ["req-other", "req-own"], "no bound record means nothing to scope against");
   });
 });
 

@@ -10,8 +10,8 @@ names one control, says what TYPE it is, and the type decides which widget
 gets drawn. Nobody places pixels, and nothing here can invent a slider —
 the renderer only knows the types listed under Types.
 
-This is the same shape the repo already uses twice. `machines/scale.md` holds
-the autonomy rungs as a list, and `machines/lint/voice-lint.md` holds the lint
+This is the same shape the repo already uses twice. `deliverable/machines/scale.md` holds
+the autonomy rungs as a list, and `deliverable/machines/lint/voice-lint.md` holds the lint
 thresholds.
 
 Markdown rather than JSON, because the WHY lives beside the WHAT. A person
@@ -20,8 +20,8 @@ edits it in the real world, and Obsidian reads it.
 ## Types
 
 - `rungs` — a bank of cumulative switches. Fields: source.
-  The source names where the rungs come from; `scale` is machines/scale.md and
-  `stopat` is machines/stopat.md.
+  The source names where the rungs come from; `scale` is deliverable/machines/scale.md and
+  `stopat` is deliverable/machines/stopat.md.
 - `int` — a line edit that takes whole numbers only. Fields: key, unit, min, max.
 - `action` — a button that posts and does nothing else. Fields: post.
 - `text` — a line edit for free text. Fields: key, placeholder, separator.
@@ -76,7 +76,7 @@ THE LABEL IS THE ROW'S, NOT THE BUTTONS'. `stop @` sits in front, once, the way
 `autonomy` does. Repeating it on each notch would make four long buttons out of
 four short ones, and the row already carries its own name by the rule above.
 
-THE NOTCHES ARE machines/stopat.md, which holds what each one means and why the
+THE NOTCHES ARE deliverable/machines/stopat.md, which holds what each one means and why the
 control exists at all. Editing that file moves the buttons on the next reload;
 nothing here restates them.
 

@@ -528,12 +528,7 @@ test("move fixes every reference form: root-relative, vault-relative, wiki link"
   const root = fresh();
   fileWrite(root, "guidance/old.md", "# Doc", null);
   fileWrite(root, "notes/uses.md", "See guidance/old.md and [[guidance/old|the doc]].", null);
-  fileWrite(
-    root,
-    "m/x.canvas",
-    '{"nodes":[{"id":"a","type":"file","file":"guidance/old.md","x":0,"y":0,"width":1,"height":1}]}',
-    null,
-  );
+  fileWrite(root, "m/x.canvas", '{"nodes":[{"id":"a","type":"file","file":"guidance/old.md","x":0,"y":0,"width":1,"height":1}]}', null);
   const r = fileMove(root, "guidance/old.md", "guidance/new/doc.md");
   assert.equal(r.rewritten.length, 2);
   assert.ok(readFileSync(join(root, "notes/uses.md"), "utf8").includes("guidance/new/doc.md"));

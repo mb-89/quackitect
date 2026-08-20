@@ -188,6 +188,17 @@ describe("lists, links and files", () => {
   test("file.hasTag ignores a leading hash", () => assert.equal(ev('file.hasTag("#book")'), true));
   test("file.hasLink finds a wikilink", () => assert.equal(ev('file.hasLink("Author")'), true));
   test("file.hasProperty", () => assert.equal(ev('file.hasProperty("folder")'), true));
+  test("file.inFolder matches the exact folder", () => assert.equal(ev('file.inFolder("lib")'), true));
+  test("file.inFolder matches a sub-folder", () =>
+    assert.equal(
+      ev(
+        'file.inFolder("lib")',
+        ctx({ row: row({ file: { name: "Textbook", path: "lib/sub/Textbook.md", folder: "lib/sub", ext: "md" } }) }),
+      ),
+      true,
+    ));
+  test("file.inFolder rejects a same-prefix sibling folder", () => assert.equal(ev('file.inFolder("li")'), false));
+  test("file.inFolder is false outside the folder", () => assert.equal(ev('file.inFolder("other")'), false));
   test("a link equals the file it resolves to", () => {
     assert.equal(ev('link("Textbook") == file'), true);
   });

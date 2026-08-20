@@ -62,13 +62,18 @@ describe("illegal stays illegal — the pull is not a way around the contract", 
     assert.ok(r.remedy !== undefined, "a refusal carries the corrected call, always");
   });
 
-  test("a choice while a target stands is a form nothing asked for", async () => {
-    // The session aims at the desk by default — the road has not split,
-    // so no choice was offered, and answering one is illegal.
+  test("a choice while a target stands is answered as a choice, with the way to move", async () => {
+    // The session aims at the desk by default — the road has not split, so no
+    // choice was offered and answering one is illegal.
+    //
+    // THIS USED TO ANSWER "a filled form, but nothing on the way wants one",
+    // which is true and is not about what the reader asked. See
+    // choice-refused.test.ts: the i15 walk sent one door three ways and got
+    // that sentence three times.
     const s = new Session(root());
     const r = await refusal(() => s.pull({ form: { choice: "front_desk" } }));
-    assert.match(r.got, /nothing on the way wants one/);
-    assert.equal(r.remedy?.tool, "se_pull");
+    assert.match(r.got, /a choice of/);
+    assert.match(`${r.remedy?.tool} ${r.remedy?.note}`, /se_aim|doors from here/);
   });
 
   test("an evidence form nothing asked for refuses, and the remedy is to pull empty", async () => {

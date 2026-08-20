@@ -2,7 +2,7 @@
 // should, because a placement that drifts from its source is worse than none.
 //
 //   node engine/bin/place-prompt-layer.ts --root <project root> [--opened <folder>]
-import { join, resolve } from "node:path";
+import { resolve } from "node:path";
 import { placeProtocol } from "../promptlayer.ts";
 
 function argValue(flag: string): string | undefined {

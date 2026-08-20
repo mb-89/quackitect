@@ -1,0 +1,11 @@
+# Quality requirements with their six-part scenarios, grouped by quality facet.
+# A quality without a measure is a mood - the response_measure column is the pass line.
+filters:
+  and:
+    - 'type == "requirement"'
+    - 'kind == "quality"'
+views:
+  - type: table
+    name: Qualities
+    order: [name, statement, stimulus, response, response_measure]
+    groupBy: quality

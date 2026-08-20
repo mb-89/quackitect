@@ -185,7 +185,7 @@ test("nodeList reads a block list, an inline list and a bare scalar", () => {
 // weighs_with group must collapse to ONE axis with a stable name, whichever
 // member you came in through.
 test("the criterion sources: pool, suspects, and axes collapsed by weighs_with", () => {
-  // traceDir joins root/project/spec/trace, so the root is the REPO root and
+  // traceDir joins root/spec/trace, so the root is the REPO root and
   // the fixture has to carry the project folder inside it.
   const root = mkdtempSync(join(tmpdir(), "se-cs-"));
   const reqDir = join(root, "spec", "trace", "requirement");

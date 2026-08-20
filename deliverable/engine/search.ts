@@ -138,6 +138,35 @@ function rgScope(root: string, opts: { path?: string }): { scope: string; base: 
   return { scope, base, show };
 }
 
+/** A PATTERN THAT IS NOT A REGEX, TYPED, WITH THE ESCAPED LITERAL IN HAND.
+ *
+ *  rg is a regex engine and an ordinary source fragment is a regex with an
+ *  unclosed group in it. The failure came back as raw stderr — no clause, no
+ *  remedy — which is the one thing every other refusal in this lane is not.
+ *
+ *  MEASURED ON THE i15 WALK: three searches, all the same mistake. `function
+ *  route(`, `private route(`, `aimAt()`. Every one is a thing a reader plainly
+ *  meant literally, and every one produced a parse error with nothing to act
+ *  on.
+ *
+ *  SO THE REFUSAL CARRIES THE PATTERN THAT WOULD HAVE WORKED. Escaping is
+ *  mechanical; deciding whether a literal was meant is not, so the escaped
+ *  form is offered rather than substituted. */
+function searchPatternRefusal(query: string, stderr: string): Rejection {
+  const literal = query.replace(/[.*+?^${}()|[\]\\]/g, (c) => `\\${c}`);
+  return new Rejection({
+    clause: CLAUSES.SEARCH_PATTERN,
+    expected: "a pattern that parses as a regular expression",
+    got: stderr.trim().split("\n").slice(0, 3).join(" "),
+    remedy: {
+      tool: "se_file_search",
+      args: { query: literal },
+      note: `the pattern reads like a LITERAL rather than a regex - a bracket or a brace in source text is a regex operator. Escaped, it is ${JSON.stringify(literal)}. Send that, or write a real pattern.`,
+    },
+    source: "engine/search.ts pattern",
+  });
+}
+
 function rgCommonArgs(opts: SearchOpts): string[] {
   const args: string[] = [];
   for (const d of [".se", "node_modules", "dist"]) args.push("--glob", `!${d}/**`);
@@ -151,7 +180,10 @@ function rgCount(root: string, query: string, opts: SearchOpts): { path: string;
   const { scope, base, show } = rgScope(root, opts);
   const args = ["--count", "--no-heading", "--with-filename", ...rgCommonArgs(opts), "--regexp", query, scope];
   const r = spawnSync(rgPath(), args, { cwd: base, encoding: "utf8", maxBuffer: 16 * 1024 * 1024 });
-  if (r.status !== 0 && r.status !== 1) throw new Error(`ripgrep failed: ${r.stderr}`);
+  if (r.status !== 0 && r.status !== 1) {
+    if (/regex parse error/.test(r.stderr ?? "")) throw searchPatternRefusal(query, r.stderr ?? "");
+    throw new Error(`ripgrep failed: ${r.stderr}`);
+  }
   const out: { path: string; count: number }[] = [];
   for (const line of (r.stdout ?? "").split("\n")) {
     const m = line.match(/^(.+?):(\d+)$/);
@@ -171,9 +203,12 @@ function contextFlags(opts: SearchOpts): string[] {
   return c > 0 ? ["--context", String(c)] : [];
 }
 
-function runRg(base: string, args: string[]): string {
+function runRg(base: string, args: string[], query: string): string {
   const r = spawnSync(rgPath(), args, { cwd: base, encoding: "utf8", maxBuffer: 16 * 1024 * 1024 });
-  if (r.status !== 0 && r.status !== 1) throw new Error(`ripgrep failed: ${r.stderr}`);
+  if (r.status !== 0 && r.status !== 1) {
+    if (/regex parse error/.test(r.stderr ?? "")) throw searchPatternRefusal(query, r.stderr ?? "");
+    throw new Error(`ripgrep failed: ${r.stderr}`);
+  }
   return r.stdout ?? "";
 }
 
@@ -229,7 +264,7 @@ function rgSearch(root: string, query: string, opts: SearchOpts, unreadable: str
   // for a hit.
   if (ctx.length > 0) {
     const args = ["--json", ...ctx, "--max-count", String(perFileCap(opts.limit)), ...rgCommonArgs(opts), "--regexp", query, scope];
-    return parseJsonEvents(runRg(base, args), show, unreadable);
+    return parseJsonEvents(runRg(base, args, query), show, unreadable);
   }
   // --with-filename: rg drops the filename for a single-file scope, which
   // starved the path:line:text parser — every match silently vanished.
@@ -253,7 +288,7 @@ function rgSearch(root: string, query: string, opts: SearchOpts, unreadable: str
     scope,
   ];
   // see dsp-file-lane.md#the-exclusion-globs-are-relative-to-the-working-directory
-  return parsePlainLines(runRg(base, args), show, unreadable);
+  return parsePlainLines(runRg(base, args, query), show, unreadable);
 }
 
 /** The include glob as a git pathspec, ANDed with the path scope when both

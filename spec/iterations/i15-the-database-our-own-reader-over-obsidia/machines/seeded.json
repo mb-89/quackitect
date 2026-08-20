@@ -1,6 +1,6 @@
 {
   "change_size": "major",
-  "rigor_matrix_hash": "dd5519b51596",
+  "rigor_matrix_hash": "58f8387fd0c6",
   "pinned_at": "2026-08-16T16:15:52.044Z",
   "demands": {
     "onboard-retro": {
@@ -10,7 +10,7 @@
     },
     "gate-kickoff": {
       "applies": "full",
-      "evidence": "[[\"retro_drained\",true,\"\",[],\"per-item\",\"\",[],[\"$inbox\"],[]],[\"goal\",true,\"\",[],\"\",\"\",[],[],[]],[\"pulled_in\",true,\"\",[],\"list\",\"\",[],[],[]],[\"left_out\",true,\"\",[],\"list\",\"\",[],[],[]],[\"change_size\",true,\"\",[],\"choice-with-rationale\",\"\",[\"patch\",\"minor\",\"major\",\"product\"],[],[]]]",
+      "evidence": "[[\"retro_drained\",true,\"\",[],\"per-item\",\"\",[],[\"$inbox\"],[]],[\"goals\",true,\"\",[],\"list\",\"\",[],[],[]],[\"pulled_in\",true,\"\",[],\"list\",\"\",[],[],[]],[\"left_out\",true,\"\",[],\"list\",\"\",[],[],[]],[\"change_size\",true,\"\",[],\"choice-with-rationale\",\"\",[\"patch\",\"minor\",\"major\",\"product\"],[],[]]]",
       "shape": "[[\"onboard-retro\"],true,\"\",\"\"]"
     },
     "draft-vision": {
@@ -241,7 +241,7 @@
     "sweep-consistency": {
       "applies": "full",
       "evidence": "[[\"swept\",true,\"\",[],\"checklist\",\"\",[],[\"$sweep_surfaces\"],[]]]",
-      "shape": "[[\"fill-story-evidence\"],false,\"\",\"\"]"
+      "shape": "[[\"run-demos\"],false,\"\",\"\"]"
     },
     "gate-validation": {
       "applies": "full",

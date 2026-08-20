@@ -53,7 +53,7 @@ export interface SupplyGap {
  *  four-line read beats threading one through. */
 function resolvesOf(root: string, template: string): string {
   // THE PROJECT ROOT, the one every other engine path takes — scalePath and
-  // the trace lookups all read `<root>/project/...`. Two roots in one check is
+  // the trace lookups all read `<root>/...`. Two roots in one check is
   // how a lookup starts finding nothing and reporting it as clean.
   const abs = join(root, "deliverable", "machines", "forms", "templates", `${template}.md`);
   if (!existsSync(abs)) return "";

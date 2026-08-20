@@ -153,7 +153,18 @@ leaves the memory. Durable knowledge goes where the machine reads it:
 - condition notes
 - the spec
 
-What the NEXT session must know goes to `.se/HANDOVER.md`.
+THERE IS NO HANDOVER FILE, and nobody writes one (owner ruling 2026-08-07).
+This rule used to end by sending the next session's context to
+`.se/HANDOVER.md`. That file is gone: the duty only ever discharged on a tidy
+exit, and sessions get killed instead.
+
+WHAT REPLACED IT IS DERIVED. Boot describes the last session from the call
+log and puts it on the banner, so nothing is written on the way out and
+nothing is read on the way in.
+
+SO WHAT THE NEXT SESSION MUST KNOW GOES IN THE FOUR HOMES ABOVE, written when
+the thought occurs. A note, a parked to-do, or guidance — never saved for an
+exit that may never come.
 
 ## 9. Never open a record unasked
 
@@ -236,6 +247,13 @@ rules loaded. Do exactly three things there, in order, and nothing else.
   `guidance/method/front-desk.md`. Nothing else prints: no list of doors, no
   line about the dial, no account of the boot.
 - END YOUR TURN. The desk waits for the person's word.
+
+THE WORD MAY HAVE ARRIVED ALREADY, and then there is nothing to wait for. An
+unattended run is handed its goal before the session starts — in the kickoff,
+in the entrypoint's arguments, or in the message that opened the session.
+Recite, print the greeting, and go straight through the routed door in the
+same turn. Waiting there for a word you are already holding is a stall, and
+nobody is beside the box to end it.
 
 NO VISIBLE RECITAL MEANS THE RULES NEVER LOADED, and the person should stop
 you. That is the whole point of asking for one: this file reaches you through

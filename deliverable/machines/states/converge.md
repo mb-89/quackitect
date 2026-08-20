@@ -7,7 +7,7 @@ guidance: |
   CONVERGE - cluster the harvest, then judge it.
 
   - Group ideas that are the same idea in different clothes.
-  - Run the pugh card at deliverable/machines/methods/pugh.md. A quick
+  - Run the pugh card at deliverable/machines/methods/meth-pugh-convergence.md. A quick
     matrix against the frame, a sensible datum, few criteria.
   - Keep the strong.
   - The weak DIE HERE, each with its reason recorded. Obsolete every one with

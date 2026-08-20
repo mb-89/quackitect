@@ -79,6 +79,6 @@ Sources for the pick: the RAID register, the M5 tripwires, any
 requirement whose verify_method is doubtful ([[meth-risk-based-testing]]).
 
 THE SEEDED LIST SEEDS THE SPIKE DRAWING: the record's
-`machines/spikes.md` gets one state per listed ref, all parallel, the
+`<record>/machines/spikes.md`, in the record’s own folder, gets one state per listed ref, all parallel, the
 join waiting for every one — the same shape as the candidate drawing.
 Each spike is timeboxed in its drawn statement ([[meth-spike-tracer]]).

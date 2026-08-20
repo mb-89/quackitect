@@ -213,11 +213,7 @@ test("seeded container: expeditions are the states, entering BINDS, one ending c
   //   THE RECORD'S OWN CONTENT rides the branch. That is what binding is for.
   assert.equal(s.laneRoot(anyGuidanceDoc()), root, "shared method belongs to the machine, never to a branch");
   assert.equal(s.laneRoot(".se/HANDOVER.md"), root, "the handover belongs to the root, whatever branch we stand on");
-  assert.equal(
-    s.laneRoot(`spec/expeditions/${b.created}/evidence/scratch.md`),
-    s.workRoot(),
-    "the record's own content rides the branch",
-  );
+  assert.equal(s.laneRoot(`spec/expeditions/${b.created}/evidence/scratch.md`), s.workRoot(), "the record's own content rides the branch");
   assert.equal(s.laneRoot(), s.workRoot(), "no path named — the work root, as before");
   // The leave gate holds until the page passes; then close, end, return.
   await assert.rejects(

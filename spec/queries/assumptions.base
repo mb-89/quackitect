@@ -1,0 +1,8 @@
+filters:
+  and:
+    - 'type == "raid"'
+    - 'kind == "assumption"'
+views:
+  - type: table
+    name: Design-relevant assumptions
+    order: [name, statement, status]

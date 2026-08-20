@@ -245,7 +245,7 @@ and left the three biggest readers untouched, because those readers called
 
 A DOOR THAT CAN BE WALKED AROUND IS A SUGGESTION. So the count of direct reads
 is held by a ratchet test: it may fall freely and cannot rise
-(`tests/files.test.ts`).
+(`deliverable/tests/files.test.ts`).
 
 A ban would be a lie. Ninety-nine of those reads are legitimate — JSON, a
 canvas, a git object, a one-shot script. What must never happen is the number
@@ -340,7 +340,7 @@ out of one day of measuring what the lane actually cost its callers.
 
 What a machine can check, a machine checks. What a machine can fix, the
 ENGINE fixes — and says so. The concrete tools and their flags are the
-project's own rulings, in `method/engineering.md`.
+project's own rulings, in `guidance/method/engineering.md`.
 
 - RUNNING IS NOT CHECKING. The runtime strips TypeScript's types without
   reading them. Only the typechecker reads them. A tree that runs clean can

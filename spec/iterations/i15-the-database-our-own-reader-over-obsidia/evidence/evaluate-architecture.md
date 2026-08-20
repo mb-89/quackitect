@@ -1,8 +1,8 @@
 ---
 form: evaluate-architecture
 by: agent
-signed_off: 2026-08-16T18:26:02.167Z
-reopened: 2026-08-16T18:25:45.238Z — the earlier walk fill did not use the required [[req-id]] bracket syntax deckLawProblems parses on, so all 25 scenarios registered unruled despite the claim signing
+signed_off: 2026-08-19T17:39:23.414Z
+reopened: "2026-08-19T17:39:23.000Z — same claims-registration gap, cascading fix through M5"
 authors: agent
 files: null
 ---
@@ -40,6 +40,14 @@ decompose-structure closed with zero interface debt, zero idle elements, zero un
 - [[req-newcomer-leaves-able-to-ask]]: addressed — el-mirror, unchanged by i15
 - [[req-newcomer-one-command]]: addressed — el-bootstrap/el-entrypoint, unchanged by i15
 - [[req-newcomer-orients-unaided]]: addressed — el-mirror, unchanged by i15
+
+- [[req-a-preflight-check-asks-the-reader-where-it-looked]]: addressed — verified this session via se_file_search: project/deliverable/engine/bin/preflight.ts exists as its own binary; el-bootstrap/el-entrypoint, unchanged by i15
+- [[req-a-slowness-signal-never-shortens-the-wait]]: addressed — verified this session via se_file_search: project/deliverable/tests/slow-work-signals.test.ts covers the panel's running-past-bound signal; el-satellite/el-walk-engine, unchanged by i15
+- [[req-a-windowed-pool-answer-says-that-it-was-windowed]]: addressed — verified this session via se_file_search: project/deliverable/tests/pool-offer.test.ts asserts backlog_window is set on a windowed answer and absent on a complete one; el-account, unchanged by i15
+- [[req-one-operation-reads-its-input-once]]: addressed — verified this session by reading engine/session.ts route(): "ONE PASS OVER DISK FOR THE WHOLE ROUTE", explicitly against this exact requirement's shape; el-walk-engine, unchanged by i15
+- [[req-the-actor-is-recorded-where-the-call-is-served]]: addressed — verified this session via se_file_search: project/guidance/method/lane.md states "THE RECORD CARRIES WHO ACTED", and the sibling req-acts-carry-role-and-channel above already traces to el-account; el-account, unchanged by i15
+- [[req-the-panel-s-paint-says-which-kind-of-green-it-is]]: addressed — verified this session via se_file_search: engine/render.ts carries a law_proven flag and paints "state done proven" apart from plain "state done"; el-mirror, unchanged by i15
+- [[req-work-past-its-bound-says-it-is-working]]: addressed — verified this session via se_file_search: project/deliverable/tests/slow-work-signals.test.ts, "a running operation past its bound is named on the panel"; el-satellite/el-walk-engine, unchanged by i15
 
 ## fitness_candidates
 

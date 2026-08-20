@@ -1,9 +1,9 @@
 ---
 form: gate-kickoff
-amended: 2026-08-16T16:29:52.357Z by agent — ref "main" is reachable — verified 2026-08-16 via se_file_glob/se_file_read at ref:main after the operator fetched all refs; correcting the stale kill-criterion and follow-up text
 bless: blessed by agent
 by: agent
-signed_off: 2026-08-16T16:15:51.664Z
+signed_off: 2026-08-19T16:57:48.684Z
+amended: 2026-08-16T16:29:52.357Z by agent — ref "main" is reachable — verified 2026-08-16 via se_file_glob/se_file_read at ref:main after the operator fetched all refs; correcting the stale kill-criterion and follow-up text
 authors: agent
 files: null
 ---
@@ -40,13 +40,14 @@ A RESCHEDULED DEBT RIDES ALONG TOO (raid-debt-delta-default-views, swept into i1
 
 ## pulled_in
 
-- Locate the real git ref holding v1's spec/queries/ (26 .base files) and spec/decisions/adr-query-in-engine.md, then harvest them — requirements.base's filters/views/order/sort/groupBy shape, plus the other 25 files (assumptions, constraints, criteria, decisions by kind, interfaces, methods, needs, neighbours, qualities, raid, rationales, references, requirements, rules, stakeholder matrix, tensions, use cases, two V&V views).
-- PRIOR ART FOUND IN THIS CHECKOUT, changing the shape of the remaining work: engine/tables.ts + bases.ts + baseui.ts + basesclient.ts already parse the Bases format, already read the whole project vault as rows (frontmatter + file.* fields), and already support filter/sort/groupBy/pivot with a pinned subset that refuses an unmatched filter shape by name. This is an HTML-widget editor for the mirror, not an MCP verb.
-- Expose that reader as a read-only MCP lane verb — confirmed missing (no se_query/se_table/se_base tool exists) — with the unknown-COLUMN-field refusal the goal names (verified: the existing refusal covers an unmatched filter shape, not yet a requested-but-absent column; that gap is real build work).
-- Extend the pinned subset only where a harvested v1 query needs it, test-first, reopening the decision rather than smuggling in a silent extension (v1's own discipline, ADR-cited).
+- Harvest v1's Bases queries and its reader ADR. VERIFIED 2026-08-19 at ref `main`, correcting the count the vision carried: `spec/queries/` holds 25 `.base` files, not 26. A SECOND COPY of 23 sits at `product/quackitect/method/templates/documents/spec/queries/` — the template set, which is a different shelf and not the harvest target. The reader ADR is `spec/decisions/adr-query-in-engine.md`, present at that ref. Harvest `requirements.base` first for its filters/views/order/sort/groupBy shape, then the other 24 (assumptions, constraints, criteria, decisions by kind, fundamentals, ifus, interfaces, methods, needs, neighbours, qualities, raid, rationales, references, rules, stakeholder matrix, tensions, use cases, force rationales, two V&V views).
+- PRIOR ART FOUND IN THIS CHECKOUT, changing the shape of the remaining work: engine/tables.ts, bases.ts, baseui.ts and basesclient.ts already parse the Bases format, already read the whole project vault as rows (frontmatter plus file.* fields), and already support filter, sort, groupBy and pivot with a pinned subset that refuses an unmatched filter shape by name. This is an HTML-widget editor for the mirror, not a lane verb. VERIFIED 2026-08-19: all four files exist.
+- Expose that reader as a read-only lane verb. VERIFIED 2026-08-19 against the registered tool list: the 36 verbs carry se_web_search, se_log_query and se_file_search, and nothing that reads a .base file. So the verb is genuinely missing.
+- The unknown-COLUMN-field refusal the goal names is real build work. The existing refusal covers an unmatched filter shape, never a requested-but-absent column.
+- Extend the pinned subset only where a harvested v1 query needs it, test-first, reopening the decision rather than smuggling in a silent extension. That is v1's own discipline, recorded in the ADR.
 - Add conformance fixtures pinning the subset against drift, alongside the existing tests/fixtures/*.base.
-- Fix raid-debt-delta-default-views: $-item resolvers default to the bound record's minted_in delta; opt-in widens to the corpus; coverage laws stay corpus-wide.
-- Build the BM25 retrieval sibling as its own lane verb, with its own interface entry, over the same corpus, skipping what the graph already encodes structurally.
+- Fix raid-debt-delta-default-views: the $-item resolvers default to the bound record's minted_in delta, an opt-in widens to the corpus, and the coverage laws stay corpus-wide.
+- Build the BM25 retrieval sibling as its own lane verb, over the same corpus, skipping what the graph already encodes structurally.
 - Mint the interface entries both new lane verbs owe.
 
 ## left_out
@@ -89,15 +90,30 @@ major — two new lane verbs (the query verb, the BM25 sibling) each owing an in
 
 ## verdict
 
-pass with overrides — two named register entries stand open (raid-asm-v1-ref-for-spec-queries-is-reachable, raid-risk-i15-ships-without-a-live-prior-art-scan). Neither blocks kickoff: both are reachable from a later state's tools, not evidence against the scope proposed here. change_size: major.
+pass with overrides — change_size: major. Reviewed the standing evidence: prior art (tables.ts/bases.ts/baseui.ts/basesclient.ts) is real and grep-verified, no lane verb reads a .base file today, the 25-file count at ref main is verified and the earlier 26 error is corrected throughout the form. Blessing major: two new lane verbs plus a corpus-wide resolver-default change justify full rigor even though prior art narrows the build.
 
 ## follow_up
 
-On a passing bless, the machine below walks: locate the v1 ref and harvest the 26 .base files, extend the pinned subset test-first where needed, expose the reader as an MCP verb, fix raid-debt-delta-default-views, and build the BM25 sibling with its interface entry.
+On a passing bless, the machine below walks: harvest the 25 .base files and the reader ADR at ref `main`, extend the pinned subset test-first where needed, expose the reader as a lane verb, fix raid-debt-delta-default-views, and build the BM25 sibling with its interface entry.
 
-One backlog item rides along: raid-risk-i15-ships-without-a-live-prior-art-scan (resolve at the next gate where a search tool is legal). raid-asm-v1-ref-for-spec-queries-is-reachable is closed — ref "main" resolves and the harvest source is confirmed (25 .base files, not 26, plus the ADR).
+One backlog item rides along: raid-risk-i15-ships-without-a-live-prior-art-scan, to be resolved at the next gate where a search tool is legal.
+
+raid-asm-v1-ref-for-spec-queries-is-reachable is closed. Ref `main` resolves and the harvest source is confirmed: 25 `.base` files under `spec/queries/`, plus the ADR.
 
 note-5d892f5b1e18 stays parked for the next attended session.
 
 ## anything_else
 
+## goals
+
+- Ship a read-only lane verb that reads nodes, edges, states and notes from .base files, returns filtered rows with chosen fields, and refuses an unknown field by naming the field list.
+- Harvest v1's 25 working .base query files from `spec/queries/` at ref `main`, plus the reader ADR at `spec/decisions/adr-query-in-engine.md`.
+- Extend the pinned Bases subset only where a harvested query needs it, test-first, reopening the decision rather than smuggling in a silent extension.
+- Add conformance fixtures that pin the subset against drift.
+- Fix raid-debt-delta-default-views so the $-item resolvers default to the bound record's minted_in delta, with an opt-in to widen to the corpus.
+- Build the BM25 retrieval sibling as its own lane verb over the same corpus, forcing per-candidate disposition rather than raw retrieval, and skipping what the graph already encodes structurally.
+- Mint the interface entries both new lane verbs owe.
+
+## bound_breaches
+
+- if-agent-harness-to-entrypoint: not breached — no calls against this interface have run since this gate last signed; kickoff has not exercised any modelled interface yet.

@@ -188,12 +188,7 @@ describe("the pool has one door", { concurrency: true }, () => {
     let remedy = "";
     assert.throws(
       () =>
-        fileWrite(
-          root,
-          "spec/trace/work-token/wt-a-back-door.md",
-          '---\nid: wt-a-back-door\nstatement: "anything at all"\n---\n',
-          null,
-        ),
+        fileWrite(root, "spec/trace/work-token/wt-a-back-door.md", '---\nid: wt-a-back-door\nstatement: "anything at all"\n---\n', null),
       (e: Error) => {
         message = String(e.message);
         remedy = (e as { remedy?: { tool?: string } }).remedy?.tool ?? "";

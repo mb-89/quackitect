@@ -76,3 +76,40 @@ test("a volunteered update still pays, and clears the count", () => {
   toll.check(true, "se_file_read", { path: "c.md" });
   assert.equal(toll.takeWarning(), undefined, "paying did not clear the call count");
 });
+
+// WAITING ON A JOB YOU ALREADY STARTED IS THE SAME SHAPE AS THE READING LOOP.
+//
+// MEASURED on the i15 walk: se_test was called 40 times. The 4 that STARTED a
+// run were never refused. Of the 36 that polled a running job, 25 were refused
+// by the toll — 62% of every se_test call in the session, none of them about
+// testing. Each had to be paid with an update saying nothing, or resent until
+// it was.
+//
+// The battery runs asynchronously and hands back a handle, so the only way to
+// learn it finished is to ask. The machine forced that hop, no judgment
+// happened on it, and a toll falling due there can only be paid with filler —
+// which is the reading loop's argument, word for word.
+test("polling a running job does not spend a call", () => {
+  const toll = new Toll({ cadence: () => ({ minutes: 60, calls: 3 }), now: () => 0 });
+  toll.check(true, "se_pull", {});
+  for (let i = 0; i < 30; i++) toll.check(true, "se_test", { job: "test-abc-1" });
+  // Three real calls is the whole budget; thirty polls in between must not
+  // have eaten any of it.
+  toll.check(true, "se_pull", {});
+  toll.check(true, "se_pull", {});
+  assert.doesNotThrow(() => toll.check(true, "se_pull", {}), "the polls spent the call budget");
+});
+
+test("STARTING a run still spends a call, because asking a question is work", () => {
+  const toll = new Toll({ cadence: () => ({ minutes: 60, calls: 2 }), now: () => 0 });
+  // The FIRST call arms the toll and is not counted, so the budget starts after it.
+  toll.check(true, "se_pull", {});
+  toll.check(true, "se_test", { question: "does the change hold" });
+  toll.check(true, "se_test", { question: "and again" });
+  toll.check(true, "se_test", { question: "past the budget, which earns the grace warning" });
+  assert.throws(
+    () => toll.check(true, "se_test", { question: "and ignoring the warning earns the refusal" }),
+    /SE-C-040|update/,
+    "a run that was STARTED rather than polled slipped the toll",
+  );
+});

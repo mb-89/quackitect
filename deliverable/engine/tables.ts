@@ -77,7 +77,23 @@ function groupLevels(v: unknown): { property: string; direction: string }[] {
 }
 
 export function parseBase(text: string): BaseSpec {
-  const doc = parse(text) as { properties?: Record<string, { displayName?: string }>; views?: BaseView[] };
+  const doc = parse(text) as {
+    properties?: Record<string, { displayName?: string }>;
+    views?: BaseView[];
+    filters?: unknown;
+  };
+  // A .base file's `filters:` is written ONCE, ABOVE `views:`, and shared by
+  // every view below it — that is the documented shape (adr-query-in-engine,
+  // record.md's own harvest note: "filters with an and-list of expressions,
+  // THEN views") and it is what all 26 harvested files under
+  // spec/queries/ actually write. A view MAY carry its own `filters:`
+  // instead (only the fixtures in tests/query.test.ts do this today, pinning
+  // the OTHER legal shape) and that always wins when present — a view
+  // narrowing its own rows is a deliberate override, not a mistake. Before
+  // this fix neither doc.filters nor any fallback was read at all, so a
+  // harvested file's top-level filters were silently dropped and every view
+  // matched the WHOLE VAULT — exactly the "looks complete and is wrong"
+  // failure this file's own header says a query language must never produce.
   return {
     properties: doc.properties ?? {},
     views: (doc.views ?? []).map((v) => ({
@@ -87,7 +103,7 @@ export function parseBase(text: string): BaseSpec {
       sort: Array.isArray(v.sort) ? v.sort.filter((s) => String(s?.property ?? "") !== "") : [],
       groupBy: groupLevels((v as { groupBy?: unknown }).groupBy),
       columnSize: ((v as { columnSize?: Record<string, number> }).columnSize ?? {}) as Record<string, number>,
-      ...(v.filters !== undefined ? { filters: v.filters } : {}),
+      ...(v.filters !== undefined ? { filters: v.filters } : doc.filters !== undefined ? { filters: doc.filters } : {}),
       ...(v.rows !== undefined ? { rows: String(v.rows) } : {}),
       ...(v.columns !== undefined ? { columns: String(v.columns) } : {}),
       ...(v.aggregate !== undefined ? { aggregate: String(v.aggregate) } : {}),
@@ -175,7 +191,11 @@ export function readVault(root: string): Row[] {
     }
     try {
       const note = parseStateNote(raw);
-      return { statement: note.statement, ...note.frontmatter, file };
+      // file.hasTag reads r.tags off the FILE object a method receives (see
+      // expr.ts). Obsidian synthesises file.tags from the note's own tags;
+      // this is that synthesis for a real vault row.
+      const fileWithTags = { ...file, tags: note.frontmatter.tags ?? [] };
+      return { statement: note.statement, ...note.frontmatter, file: fileWithTags };
     } catch (err) {
       return { file, unreadable: `${rel} does not parse — ${String((err as Error).message).split("\n")[0]}` };
     }

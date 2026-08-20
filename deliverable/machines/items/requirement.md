@@ -194,7 +194,7 @@ breaks_if_removed: TODO — what fails when this row is struck
 #   corrosive  — it still works, and people route around it every time
 #   abrasive   — noticed and complained about; nobody changes what they do
 #   cosmetic   — nobody would notice. This row is a deletion candidate.
-# The test for each is in machines/methods/meth-damage-scale.md.
+# The test for each is in deliverable/machines/methods/meth-damage-scale.md.
 breaks_how_badly: TODO — fatal | crippling | corrosive | abrasive | cosmetic
 #
 # The uc- ids this derives from. A cross-cutting quality names every use

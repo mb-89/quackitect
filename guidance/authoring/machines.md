@@ -14,14 +14,18 @@ paths it can only partially check.
 
 ## Paths — the rule that was broken
 
-**The Obsidian vault root is `project/`.** Every `file` reference in a
-canvas is VAULT-RELATIVE:
+**The Obsidian vault root is the repository root.** Every `file` reference in
+a canvas is VAULT-RELATIVE, and since the folder levels collapsed that is the
+same spelling as root-relative — one form, right in both places:
 
 - right: `"file": "deliverable/machines/states/idle.md"`
 - wrong: `"file": "states/idle.md"` (canvas-relative — Obsidian shows a
   broken node)
-- wrong: `"file": "deliverable/machines/states/idle.md"`
-  (root-relative — resolves in the engine, broken in Obsidian)
+
+THIS USED TO BE THREE FORMS. The vault root was a folder one level down, so a
+root-relative path carried its name in front and Obsidian could not follow it.
+That trap is gone, and the page keeps the note because a reader meeting an old
+canvas will still find the prefixed form in it.
 
 The compiler accepts the fallbacks, Obsidian does not. Author vault-relative,
 always.
@@ -80,7 +84,7 @@ priority: operational        # HUMAN INVOLVEMENT: the weight of ENTERING this
                              # below). Never a number.
 tags: review                 # optional; joins the state to guidance (the pull's tag rule)
 exit_read:                   # conditions are FLAT keys: <entry|exit>_<type>.
-  - workspace/AGENTS.md      # YAML lists render as chips in Obsidian —
+  - AGENTS.md      # YAML lists render as chips in Obsidian —
   - guidance/voice.md    # comma strings are accepted too
 exit_script:
   - deliverable/engine/bin/preflight.ts
@@ -127,7 +131,7 @@ at or below the dial. The human always may. Work INSIDE a state is never
 gated — only entering is.
 
 THE RUNGS ARE WORDS, and the words are the truth (owner cut-over ruling
-2026-08-12). The ladder LIVES in machines/scale.md; the engine reads it,
+2026-08-12). The ladder LIVES in deliverable/machines/scale.md; the engine reads it,
 and the numbers beside the rungs are transitional anchors for the
 weighing. Author `priority:` as a rung word:
 

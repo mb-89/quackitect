@@ -42,7 +42,7 @@ specification_note: |
 
 ## Guidance
 
-build-chart AUTHORS the candidate drawing (machines/candidates.md), one compose state per line drawn on the chart. Entering this state RUNS it.
+build-chart AUTHORS the candidate drawing (`<record>/machines/candidates.md`, in the record’s own folder), one compose state per line drawn on the chart. Entering this state RUNS it.
 
 - One compose state per candidate.
 - All of them in parallel.

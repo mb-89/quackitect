@@ -8,7 +8,7 @@ owner: the maintainer
 trigger: any state whose evidence list is empty, and any gate that refuses over one
 status: open
 impact: "The one state whose whole job is filling a story's evidence is the one state that cannot be sent back to do it. A must story reached the validation gate with seven empty evidence halves, and the repair had to be made at the gate instead of where it belongs."
-breaks_how_badly: serious
+breaks_how_badly: corrosive
 how_likely: expected
 source_refs:
   - raid-iss-reopening-inside-a-sub-machine-has-no-short-way-back

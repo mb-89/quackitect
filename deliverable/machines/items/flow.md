@@ -111,7 +111,7 @@ Both directions, mechanically, and neither is anybody's judgment.
 Both are holes in the function structure, and both are invisible until the
 flows are written down.
 
-The check is `engine/bin/flow-closure.ts`, and it runs as derive-functions'
+The check is `deliverable/engine/bin/flow-closure.ts`, and it runs as derive-functions'
 exit script.
 
 ## Fields

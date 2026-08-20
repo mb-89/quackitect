@@ -267,11 +267,7 @@ test("the voice lint: walls, sentences, chains and the pyramid - thresholds are 
   // A SPAN IS ONE THING. The separator set includes the slash, so a path
   // inside a code span split into an "item" per segment. Every card saying
   // where its node lives fired the chain rule on a path it could not fix.
-  assert.equal(
-    lintProse(root, "Lives in `spec/trace/raid/`. Written at M4.").length,
-    0,
-    "a path inside a code span is one item, not five",
-  );
+  assert.equal(lintProse(root, "Lives in `spec/trace/raid/`. Written at M4.").length, 0, "a path inside a code span is one item, not five");
   // A LIST MARKER IS NOT A SENTENCE. "1." ends in a full stop, so a numbered
   // item measured one sentence more than it had.
   assert.equal(

@@ -332,11 +332,36 @@ function correctChains(
   return { opOut, briefOut, itemsOut, corrected };
 }
 
+/** THE SAME BRIEF, CUT AT A WORD BOUNDARY SO IT FITS.
+ *
+ *  "101 chars, the cap is 90" is accurate and leaves the reader to compose a
+ *  second sentence for a line nobody will read twice.
+ *
+ *  MEASURED ON THE i15 WALK: ten refusals for length, every one between 91 and
+ *  112 characters. Not one was a rambling brief — each was an ordinary sentence
+ *  a handful of characters over, and each cost a round trip plus whatever the
+ *  model spent rewording it.
+ *
+ *  SO THE ANSWER HANDS BACK A VERSION THAT FITS. The author still chooses:
+ *  nothing is written, and a cut sentence is a suggestion, not a correction.
+ *  What it removes is the re-composition, not the judgment. */
+export function cutToFit(text: string, cap = 90): string {
+  if (text.length <= cap) return text;
+  const room = cap - 1; // the ellipsis takes one
+  const space = text.lastIndexOf(" ", room);
+  // A SINGLE UNBROKEN RUN HAS NO WORD BOUNDARY TO CUT AT — a path, a hash, a
+  // long identifier. Cutting mid-token beats returning something over the cap.
+  return `${text.slice(0, space > cap / 2 ? space : room).trimEnd()}…`;
+}
+
 // THE RENDER LINT (owner ruling 2026-07-27): the lane refuses what would
 // render weird — mechanically, at the boundary.
 function lintUpdateLine(text: string, what: string): void {
   if (/[\r\n]/.test(text)) throw malformed(`${what} carries line breaks — one line only. Got ${JSON.stringify(text)}`);
-  if (text.length > 90) throw malformed(`${what} is ${text.length} chars — the feed renders 90; tighten it. Got ${JSON.stringify(text)}`);
+  if (text.length > 90)
+    throw malformed(
+      `${what} is ${text.length} chars — the feed renders 90; tighten it. Got ${JSON.stringify(text)} — cut to fit: ${JSON.stringify(cutToFit(text))}`,
+    );
   const parts = chainOf(text);
   if (parts !== null) {
     throw malformed(
@@ -478,6 +503,22 @@ export class Decisions {
   private static readonly REFUSE_AFTER = 12;
   /** What attachTo corrected on THIS call — read once by apply(). */
   private lastCorrection: string | undefined;
+  /** WHICH ITEMS WERE ALREADY OPEN THE LAST TIME THIS GUARD BIT.
+   *
+   *  The guard names what is open, which is true and was not enough. An item
+   *  open across two separate refusals is not an item somebody has not got to
+   *  yet — it is an item that CANNOT close from where the walk stands, and no
+   *  amount of resolving ops will move it.
+   *
+   *  MEASURED ON THE i15 WALK: 59 refusals, every one of them SE-C-133, every
+   *  one carrying the same two items — "walk boot reading loop", still open
+   *  hours after boot ended, and "work milestones as served", which cannot
+   *  close until the iteration does. The work was real and the narration was
+   *  honest. The checklist was the wrong shape, and the answer never said so.
+   *
+   *  NO CLOCK IS NEEDED TO KNOW IT. Surviving one refusal is what makes an
+   *  item suspect; surviving two is what makes it wrong. */
+  private namedInLastStall = new Set<string>();
 
   /** see dsp-narration.md#the-nudge-grew-teeth */
   private refuseIfStalled(u: DecisionOp): void {
@@ -485,6 +526,19 @@ export class Decisions {
     if (this.sinceResolve < Decisions.REFUSE_AFTER) return;
     const openNodes = [...this.nodes.values()].filter((n) => n.status === "open").map((n) => ({ id: n.id, brief: n.brief }));
     if (openNodes.length === 0) return;
+    // AN ITEM THAT SURVIVED THE LAST REFUSAL IS THE WRONG SHAPE, not an item
+    // nobody got to. Naming it as merely open sends the reader looking for
+    // work to finish, and there is none to find — see namedInLastStall.
+    const stuck = openNodes.filter((n) => this.namedInLastStall.has(n.id));
+    this.namedInLastStall = new Set(openNodes.map((n) => n.id));
+    const shape =
+      stuck.length === 0
+        ? ""
+        : ` THESE WERE ALREADY OPEN AT THE LAST REFUSAL: ${stuck
+            .map((n) => `${n.id} (${n.brief})`)
+            .join(
+              " · ",
+            )}. An item that cannot close where you stand is not an item — it is the state you are in. Resolve it with obsolete, then send a fresh plan whose items will close in THIS state.`;
     throw new Rejection({
       clause: CLAUSES.NARRATION_STALLED,
       expected: "a resolving op — done, obsolete, revert or defer — because the checklist has not moved",
@@ -492,7 +546,7 @@ export class Decisions {
       remedy: {
         tool: "(the same call)",
         args: { update: { op: "done", node: openNodes[0].id, brief: "<what landed>" } },
-        note: `open now: ${openNodes.map((n) => `${n.id} (${n.brief})`).join(" · ")}. Nothing finished? defer {node, to} parks it, obsolete {node, brief} drops it. One of these, then carry on.`,
+        note: `open now: ${openNodes.map((n) => `${n.id} (${n.brief})`).join(" · ")}. Nothing finished? defer {node, to} parks it, obsolete {node, brief} drops it. One of these, then carry on.${shape}`,
       },
       source: "engine/decisions.ts stall",
     });

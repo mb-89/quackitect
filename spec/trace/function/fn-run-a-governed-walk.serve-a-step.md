@@ -40,6 +40,7 @@ satisfies:
   - req-refusal-carries-remedy
   - req-call-answers-in-one-second
   - req-one-operation-reads-its-input-once
+  - req-a-served-instruction-names-the-next-act
   - req-oversized-results-remain-recoverable-through-the-lane
 inputs:
   - flow-position

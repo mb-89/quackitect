@@ -339,3 +339,313 @@
 {"ts":"2026-08-16T19:57:59.565Z","op":"update","visit":"iterations/i15/verification@5","node":"d335","brief":"confirming valueFor/asPriority sanctioned carrier functions exist"}
 {"ts":"2026-08-16T19:58:09.275Z","op":"update","visit":"iterations/i15/verification@5","node":"d336","brief":"checking whether two-records-open-at-once build stands post i34"}
 {"ts":"2026-08-16T19:58:09.905Z","op":"update","visit":"iterations/i15/verification@5","node":"d337","brief":"reading the requirement tsp-bound-surface verifies"}
+{"ts":"2026-08-19T15:45:34.189Z","op":"plan","visit":"iterations/i15/gate-kickoff@0","parent":null,"nodes":[{"id":"d4","brief":"read spec/vision for i15"},{"id":"d5","brief":"fill gate-kickoff form"},{"id":"d6","brief":"submit gate, stop for bless"}]}
+{"ts":"2026-08-19T15:46:03.156Z","op":"done","visit":"iterations/i15/gate-kickoff@0","node":"d4","brief":"kickoff evidence was already read and filled by a prior walk"}
+{"ts":"2026-08-19T15:46:13.126Z","op":"done","visit":"iterations/i15/gate-kickoff@0","node":"d5","brief":"gate-kickoff form already stands signed, all 13 fields full"}
+{"ts":"2026-08-19T15:46:13.442Z","op":"defer","visit":"iterations/i15/gate-kickoff@0","node":"d6","brief":"submit gate, stop for bless","to":"the owner — bless owed on i15/gate-kickoff, stop-at=bless","hops":1,"trail":["iterations/i15/gate-kickoff","the owner — bless owed on i15/gate-kickoff, stop-at=bless"]}
+{"ts":"2026-08-19T15:56:05.695Z","op":"done","visit":"front_desk@0","node":"d1","brief":"entered i15 at iterations/i15/start"}
+{"ts":"2026-08-19T15:57:17.542Z","op":"update","visit":"iterations/i15/gate-kickoff@0","node":"d3","brief":"checking gate-kickoff state: evidence already signed 2026-08-19"}
+{"ts":"2026-08-19T16:12:15.345Z","op":"update","visit":"iterations/i15/gate-kickoff@0","node":"d4","brief":"verified the harvest counts at ref main before the kickoff bless"}
+{"ts":"2026-08-19T16:17:17.862Z","op":"update","visit":"iterations/i15/gate-kickoff@0","node":"d5","brief":"drained the classifier note into cloud-runner.md"}
+{"ts":"2026-08-19T16:37:05.389Z","op":"update","visit":"iterations/i15/gate-kickoff@0","node":"d6","brief":"correcting the query-file count from 26 to the verified 25"}
+{"ts":"2026-08-19T16:38:28.998Z","op":"update","visit":"iterations/i15/gate-kickoff@0","node":"d7","brief":"same correction in the follow-up field, so the form agrees with itself"}
+{"ts":"2026-08-19T16:39:25.228Z","op":"update","visit":"iterations/i15/gate-kickoff@0","node":"d8","brief":"blessing the kickoff at major, on checks run rather than on the form"}
+{"ts":"2026-08-19T16:57:48.519Z","op":"done","visit":"start@0","node":"d2","brief":"gate-kickoff already filled; reviewed and blessed"}
+{"ts":"2026-08-19T17:03:35.756Z","op":"update","visit":"iterations/i15/draft-vision@0","node":"d5","brief":"diagnosing why draft-vision cannot route forward to define-actual"}
+{"ts":"2026-08-19T17:09:20.401Z","op":"update","visit":"iterations/i15/draft-vision@0","node":"d6","brief":"escaping stuck draft-vision routing to reset session target"}
+{"ts":"2026-08-19T17:11:33.424Z","op":"update","visit":"iterations/i15/draft-vision@1","node":"d7","brief":"diagnosing why the offered define-actual door does not open"}
+{"ts":"2026-08-19T17:14:18.398Z","op":"update","visit":"iterations/i15/draft-vision@1","node":"d8","brief":"resubmitting draft-vision recheck to re-earn done status this session"}
+{"ts":"2026-08-19T17:15:16.282Z","op":"update","visit":"iterations/i15/define-actual@0","node":"d9","brief":"resubmitting define-actual recheck to re-earn done status"}
+{"ts":"2026-08-19T17:16:04.808Z","op":"done","visit":"start@0","node":"d3","brief":"kickoff evidence read and blessed; now walking milestones"}
+{"ts":"2026-08-19T17:18:11.026Z","op":"update","visit":"iterations/i15/frame-delta@0","node":"d10","brief":"reopen+resubmit cycle to unstick already-signed M0/M1 states"}
+{"ts":"2026-08-19T17:18:29.001Z","op":"update","visit":"iterations/i15/scope-non-goals@0","node":"d11","brief":"cascading reopen+resubmit through M1"}
+{"ts":"2026-08-19T17:18:36.956Z","op":"update","visit":"iterations/i15/pressure-test@0","node":"d12","brief":"cascading reopen+resubmit through M1"}
+{"ts":"2026-08-19T17:20:22.504Z","op":"update","visit":"iterations/i15/gate-motivation@0","node":"d13","brief":"filled new goals_served/bound_breaches fields on gate-motivation"}
+{"ts":"2026-08-19T17:21:01.897Z","op":"update","visit":"iterations/i15/gate-motivation@0","node":"d14","brief":"goals_served per-item using exact kickoff goal text"}
+{"ts":"2026-08-19T17:21:13.104Z","op":"update","visit":"iterations/i15/gate-motivation@0","node":"d15","brief":"reviewed and blessed gate-motivation"}
+{"ts":"2026-08-19T17:21:51.104Z","op":"update","visit":"iterations/i15/draw-context@0","node":"d16","brief":"cascading reopen+resubmit through M2 fan"}
+{"ts":"2026-08-19T17:22:01.441Z","op":"update","visit":"iterations/i15/map-stakeholders@0","node":"d17","brief":"cascading reopen+resubmit through M2 fan"}
+{"ts":"2026-08-19T17:22:20.716Z","op":"update","visit":"iterations/i15/write-stories@0","node":"d18","brief":"cascading reopen+resubmit through M2"}
+{"ts":"2026-08-19T17:22:37.444Z","op":"update","visit":"iterations/i15/generalize-use-cases@0","node":"d19","brief":"cascading reopen+resubmit through M2"}
+{"ts":"2026-08-19T17:23:03.344Z","op":"update","visit":"iterations/i15/gate-inputs@0","node":"d20","brief":"goals_served/bound_breaches for gate-inputs"}
+{"ts":"2026-08-19T17:23:15.327Z","op":"update","visit":"iterations/i15/gate-inputs@0","node":"d21","brief":"reviewed and blessed gate-inputs"}
+{"ts":"2026-08-19T17:27:51.554Z","op":"done","visit":"start@0","node":"d1","brief":"boot/reading loop completed long ago, gate-kickoff onward walked"}
+{"ts":"2026-08-19T17:28:10.213Z","op":"update","visit":"iterations/i15/derive-functions@0","node":"d22","brief":"reading derive-functions to add coverage for two corpus-drift requirements"}
+{"ts":"2026-08-19T17:28:21.573Z","op":"update","visit":"iterations/i15/derive-functions@0","node":"d23","brief":"checking if serve-a-step already covers the two drifted requirements"}
+{"ts":"2026-08-19T17:28:33.485Z","op":"update","visit":"iterations/i15/derive-functions@0","node":"d24","brief":"checking hold-the-method fit for the guidance-paths requirement"}
+{"ts":"2026-08-19T17:28:44.375Z","op":"update","visit":"iterations/i15/derive-functions@0","node":"d25","brief":"added coverage edges for two corpus-drift requirements onto existing functions"}
+{"ts":"2026-08-19T17:29:14.855Z","op":"update","visit":"iterations/i15/derive-functions@0","node":"d26","brief":"resubmitting derive-functions after corpus coverage fix"}
+{"ts":"2026-08-19T17:29:24.958Z","op":"update","visit":"iterations/i15/identify-assumptions@0","node":"d27","brief":"cascading reopen+resubmit through M3"}
+{"ts":"2026-08-19T17:30:04.741Z","op":"update","visit":"iterations/i15/probe-assumptions@0","node":"d28","brief":"cascading reopen+resubmit through M3"}
+{"ts":"2026-08-19T17:30:27.783Z","op":"update","visit":"iterations/i15/gate-requirements@0","node":"d29","brief":"goals_served/bound_breaches for gate-requirements"}
+{"ts":"2026-08-19T17:30:40.323Z","op":"update","visit":"iterations/i15/gate-requirements@0","node":"d30","brief":"reviewed and blessed gate-requirements"}
+{"ts":"2026-08-19T17:30:53.001Z","op":"update","visit":"iterations/i15/gate-requirements@0","node":"d31","brief":"reading meth-derive-criteria for M4"}
+{"ts":"2026-08-19T17:31:11.090Z","op":"update","visit":"iterations/i15/derive-criteria@0","node":"d32","brief":"cascading reopen+resubmit through M4"}
+{"ts":"2026-08-19T17:31:24.444Z","op":"update","visit":"iterations/i15/partition-functions@0","node":"d33","brief":"cascading reopen+resubmit through M4"}
+{"ts":"2026-08-19T17:34:41.220Z","op":"done","visit":"start@0","node":"d4","brief":"reached the live-search gate; running real outward searches next"}
+{"ts":"2026-08-19T17:36:15.838Z","op":"update","visit":"iterations/i15/enumerate-space/find_prior_art@0","node":"d34","brief":"verifying the live-search patch landed"}
+{"ts":"2026-08-19T17:36:30.312Z","op":"plan","visit":"iterations/i15/enumerate-space/find_prior_art@0","parent":null,"nodes":[{"id":"d35","brief":"satisfy find_prior_art outward-search condition"},{"id":"d36","brief":"complete M4-M8 milestones"},{"id":"d37","brief":"reach and pass gate-implementation prep"},{"id":"d38","brief":"build the actual verbs and fixes"}]}
+{"ts":"2026-08-19T17:36:47.745Z","op":"update","visit":"iterations/i15/cut-criteria@0","node":"d39","brief":"cascading reopen+resubmit through M4"}
+{"ts":"2026-08-19T17:37:04.594Z","op":"update","visit":"iterations/i15/cut-criteria@0","node":"d40","brief":"reading cut-criteria to fix the dead requirement reference"}
+{"ts":"2026-08-19T17:37:15.505Z","op":"update","visit":"iterations/i15/cut-criteria@0","node":"d41","brief":"removing dead req-engine-folder-is-sealed reference from cut-criteria"}
+{"ts":"2026-08-19T17:37:35.296Z","op":"update","visit":"iterations/i15/evaluate-set@0","node":"d42","brief":"cascading reopen+resubmit through M4"}
+{"ts":"2026-08-19T17:38:10.815Z","op":"update","visit":"iterations/i15/gate-candidates@0","node":"d43","brief":"goals_served/bound_breaches for gate-candidates"}
+{"ts":"2026-08-19T17:38:20.241Z","op":"update","visit":"iterations/i15/gate-candidates@0","node":"d44","brief":"reviewed and blessed gate-candidates"}
+{"ts":"2026-08-19T17:38:28.809Z","op":"update","visit":"iterations/i15/converge-pugh@0","node":"d45","brief":"cascading reopen+resubmit through M5"}
+{"ts":"2026-08-19T17:38:43.267Z","op":"update","visit":"iterations/i15/reverse-sensitivity@0","node":"d46","brief":"cascading reopen+resubmit through M5"}
+{"ts":"2026-08-19T17:38:52.116Z","op":"update","visit":"iterations/i15/declare-winner@0","node":"d47","brief":"cascading reopen+resubmit through M5"}
+{"ts":"2026-08-19T17:39:01.981Z","op":"update","visit":"iterations/i15/record-adrs@0","node":"d48","brief":"cascading reopen+resubmit through M5"}
+{"ts":"2026-08-19T17:39:11.128Z","op":"update","visit":"iterations/i15/decompose-structure@0","node":"d49","brief":"cascading reopen+resubmit through M5"}
+{"ts":"2026-08-19T17:40:59.918Z","op":"done","visit":"iterations/i15/enumerate-space/find_prior_art@0","node":"d35","brief":"ruled 7 corpus-drift quality scenarios in evaluate-architecture, all verified addressed"}
+{"ts":"2026-08-19T17:41:30.461Z","op":"update","visit":"iterations/i15/evaluate-architecture@0","node":"d50","brief":"resubmitting evaluate-architecture after ruling 7 corpus-drift scenarios"}
+{"ts":"2026-08-19T17:42:11.264Z","op":"update","visit":"iterations/i15/gate-architecture@0","node":"d51","brief":"goals_served/bound_breaches for gate-architecture"}
+{"ts":"2026-08-19T17:42:21.740Z","op":"update","visit":"iterations/i15/gate-architecture@0","node":"d52","brief":"reviewed and blessed gate-architecture"}
+{"ts":"2026-08-19T17:42:29.721Z","op":"update","visit":"iterations/i15/rank-unknowns@0","node":"d53","brief":"cascading reopen+resubmit through M6"}
+{"ts":"2026-08-19T17:42:40.083Z","op":"update","visit":"iterations/i15/rank-unknowns@0","node":"d54","brief":"reading paginated software.md read gate"}
+{"ts":"2026-08-19T17:42:47.840Z","op":"update","visit":"iterations/i15/rank-unknowns@0","node":"d55","brief":"reading full software.md guidance for the M6 read gate"}
+{"ts":"2026-08-19T17:45:22.365Z","op":"update","visit":"iterations/i15/rank-unknowns@0","node":"d56","brief":"reading remaining raid entries for grade-scale mapping"}
+{"ts":"2026-08-19T17:45:57.884Z","op":"update","visit":"iterations/i15/rank-unknowns@0","node":"d57","brief":"mapping 13 raid entries' off-scale grades to the fixed damage/likelihood vocabulary"}
+{"ts":"2026-08-19T17:46:31.317Z","op":"update","visit":"iterations/i15/rank-unknowns@0","node":"d58","brief":"resubmitting rank-unknowns after fixing 13 raid grade entries"}
+{"ts":"2026-08-19T17:47:04.500Z","op":"update","visit":"iterations/i15/gate-prototype@0","node":"d59","brief":"goals_served/bound_breaches for gate-prototype"}
+{"ts":"2026-08-19T17:47:11.577Z","op":"update","visit":"iterations/i15/gate-prototype@0","node":"d60","brief":"reviewed and blessed gate-prototype"}
+{"ts":"2026-08-19T17:47:38.728Z","op":"update","visit":"iterations/i15/gate-prototype@0","node":"d61","brief":"reading unprobed crippling/fatal assumptions blocking gate-prototype"}
+{"ts":"2026-08-19T17:49:10.706Z","op":"done","visit":"iterations/i15/enumerate-space/find_prior_art@0","node":"d36","brief":"M4-M8 milestones cascade largely complete; now at M7 author-tests"}
+{"ts":"2026-08-19T17:50:18.772Z","op":"update","visit":"iterations/i15/author-tests@0","node":"d62","brief":"cascading reopen+resubmit through M7"}
+{"ts":"2026-08-19T17:54:12.666Z","op":"update","visit":"iterations/i15/author-tests@0","node":"d63","brief":"reading author-tests to add the two new test-spec references"}
+{"ts":"2026-08-19T17:54:21.863Z","op":"update","visit":"iterations/i15/author-tests@0","node":"d64","brief":"adding the two new test-specs to author-tests checks"}
+{"ts":"2026-08-19T17:54:42.029Z","op":"update","visit":"iterations/i15/author-tests@0","node":"d65","brief":"resubmitting author-tests with the two new test-specs"}
+{"ts":"2026-08-19T17:55:12.183Z","op":"update","visit":"iterations/i15/specify-build@0","node":"d66","brief":"cascading reopen+resubmit through M7"}
+{"ts":"2026-08-19T17:55:26.186Z","op":"update","visit":"iterations/i15/observe-red@0","node":"d67","brief":"cascading reopen+resubmit through M7, observe-red will run the mechanical check"}
+{"ts":"2026-08-19T17:55:57.425Z","op":"update","visit":"iterations/i15/observe-red@0","node":"d68","brief":"reading observe-red to see current red_observed checklist content"}
+{"ts":"2026-08-19T17:56:42.056Z","op":"update","visit":"iterations/i15/observe-red@0","node":"d69","brief":"adding 6 corpus-drift non-test specs to observe-red checklist"}
+{"ts":"2026-08-19T17:56:56.832Z","op":"update","visit":"iterations/i15/observe-red@0","node":"d70","brief":"resubmitting observe-red after adding 6 non-test specs"}
+{"ts":"2026-08-19T17:57:07.487Z","op":"update","visit":"iterations/i15/observe-red@0","node":"d71","brief":"resubmitting observe-red after adding 6 non-test specs"}
+{"ts":"2026-08-19T18:00:25.732Z","op":"update","visit":"iterations/i15/verification@0","node":"d72","brief":"adding 6 corpus-drift non-test specs to verification checklist"}
+{"ts":"2026-08-19T18:06:57.967Z","op":"update","visit":"iterations/i15/gate-implementation@0","node":"d73","brief":"filling gate-implementation honestly: fail, 5 of 7 goals unbuilt"}
+{"ts":"2026-08-19T18:09:18.289Z","op":"done","visit":"iterations/i15/enumerate-space/find_prior_art@0","node":"d37","brief":"gate-implementation filled honestly with fail verdict, awaiting the person"}
+{"ts":"2026-08-19T18:20:12.782Z","op":"plan","visit":"iterations/i15/gate-implementation@0","parent":null,"nodes":[{"id":"d74","brief":"reopen specify-build, seed 5 chunks + interface entries"},{"id":"d75","brief":"wire se_query/se_bm25 lane tools"},{"id":"d76","brief":"harvest 25 .base files + ADR from ref main"},{"id":"d77","brief":"conformance fixtures"},{"id":"d78","brief":"fix raid-debt-delta-default-views resolvers"},{"id":"d79","brief":"mint 2 interface entries"},{"id":"d80","brief":"re-walk build-steps/trace-design/verification to gate-implementation"}]}
+{"ts":"2026-08-19T18:21:17.974Z","op":"update","visit":"iterations/i15/specify-build@1","node":"d81","brief":"studying tool registration pattern to wire the query and disposition verbs"}
+{"ts":"2026-08-19T18:24:14.878Z","op":"update","visit":"iterations/i15/specify-build@1","node":"d82","brief":"adding tools-query.ts to dsp-lane-door design spec files"}
+{"ts":"2026-08-19T18:25:05.411Z","op":"update","visit":"iterations/i15/specify-build@1","node":"d83","brief":"registered tools-query.ts as part of dsp-lane-door"}
+{"ts":"2026-08-19T18:29:29.529Z","op":"update","visit":"iterations/i15/specify-build@1","node":"d84","brief":"adding queryTools import to tools.ts"}
+{"ts":"2026-08-19T18:29:39.797Z","op":"update","visit":"iterations/i15/specify-build@1","node":"d85","brief":"checking typecheck status after import fix"}
+{"ts":"2026-08-19T18:29:53.838Z","op":"update","visit":"iterations/i15/specify-build@1","node":"d86","brief":"reading build-chunks.md before seeding 5 new chunks"}
+{"ts":"2026-08-19T18:34:18.445Z","op":"update","visit":"iterations/i15/observe-red@1","node":"d87","brief":"resigning observe-red after specify-build reopen"}
+{"ts":"2026-08-19T18:40:05.137Z","op":"fork","visit":"iterations/i15/build-steps/build-query-evaluator@1","parent":"d38","node":"d88","brief":"resolving the query-vs-Bases-format seam the coordinator flagged, before continuing build","nodes":[]}
+{"ts":"2026-08-19T18:40:51.415Z","op":"update","visit":"iterations/i15/build-steps/build-query-evaluator@1","node":"d89","brief":"reading tables.ts BaseSpec/BaseView types and parse function"}
+{"ts":"2026-08-19T18:41:13.593Z","op":"update","visit":"iterations/i15/build-steps/build-query-evaluator@1","node":"d90","brief":"finding the vault-rows reader function"}
+{"ts":"2026-08-19T18:41:40.283Z","op":"update","visit":"iterations/i15/build-steps/build-query-evaluator@1","node":"d91","brief":"checking basesCard for how it obtains rows without a pre-warmed cache"}
+{"ts":"2026-08-19T18:43:40.923Z","op":"update","visit":"iterations/i15/build-steps/build-query-evaluator@1","node":"d92","brief":"reading tables.ts vaultDir/listBases and selectRows implementation"}
+{"ts":"2026-08-19T18:44:07.300Z","op":"update","visit":"iterations/i15/build-steps/build-query-evaluator@1","node":"d93","brief":"reading baseui.test.ts fixture helper pattern for the new query.test.ts"}
+{"ts":"2026-08-19T18:46:09.666Z","op":"done","visit":"iterations/i15/gate-implementation@0","node":"d75","brief":"lane tools rewritten to execute .base views; count pin at 38"}
+{"ts":"2026-08-19T18:47:20.261Z","op":"update","visit":"iterations/i15/build-steps/wire-lane-tools@0","node":"d94","brief":"reading current query.test.ts before rewriting for the new .base-execution design"}
+{"ts":"2026-08-19T18:48:07.398Z","op":"update","visit":"iterations/i15/build-steps/wire-lane-tools@0","node":"d95","brief":"checking typecheck after rewriting query.test.ts"}
+{"ts":"2026-08-19T18:48:30.448Z","op":"update","visit":"iterations/i15/build-steps/wire-lane-tools@0","node":"d96","brief":"reading interface shape to model the two new entries"}
+{"ts":"2026-08-19T18:49:11.861Z","op":"update","visit":"iterations/i15/build-steps/wire-lane-tools@0","node":"d97","brief":"checking whether the use cases already name se_query/se_couplings"}
+{"ts":"2026-08-19T18:50:10.075Z","op":"update","visit":"iterations/i15/build-steps/wire-lane-tools@0","node":"d98","brief":"checking the coupling use case for verb name mention"}
+{"ts":"2026-08-19T18:51:30.700Z","op":"update","visit":"iterations/i15/build-steps/wire-lane-tools@0","node":"d99","brief":"linking the two new interfaces to dsp-lane-door realizes"}
+{"ts":"2026-08-19T18:52:21.111Z","op":"done","visit":"iterations/i15/gate-implementation@0","node":"d79","brief":"interface entries and use-case edits minted; verbs reachable and named"}
+{"ts":"2026-08-19T18:57:44.499Z","op":"update","visit":"iterations/i15/build-steps/harvest-v1-queries@0","node":"d100","brief":"harvesting v1 query files at ref main, batch 1"}
+{"ts":"2026-08-19T18:58:03.739Z","op":"update","visit":"iterations/i15/build-steps/harvest-v1-queries@0","node":"d101","brief":"harvesting v1 query files at ref main, batch 1"}
+{"ts":"2026-08-19T18:58:10.224Z","op":"update","visit":"iterations/i15/build-steps/harvest-v1-queries@0","node":"d102","brief":"harvesting v1 query files at ref main, batch 2"}
+{"ts":"2026-08-19T18:59:08.804Z","op":"update","visit":"iterations/i15/build-steps/harvest-v1-queries@0","node":"d103","brief":"harvest write 1/26: spec/queries/assumptions.base"}
+{"ts":"2026-08-19T18:59:08.816Z","op":"update","visit":"iterations/i15/build-steps/harvest-v1-queries@0","node":"d104","brief":"harvest write 2/26: spec/queries/constraints.base"}
+{"ts":"2026-08-19T18:59:08.819Z","op":"update","visit":"iterations/i15/build-steps/harvest-v1-queries@0","node":"d105","brief":"harvest write 3/26: spec/queries/criteria.base"}
+{"ts":"2026-08-19T18:59:08.824Z","op":"update","visit":"iterations/i15/build-steps/harvest-v1-queries@0","node":"d106","brief":"harvest write 4/26: spec/queries/decisions-architecture.base"}
+{"ts":"2026-08-19T18:59:08.827Z","op":"update","visit":"iterations/i15/build-steps/harvest-v1-queries@0","node":"d107","brief":"harvest write 5/26: spec/queries/decisions-project.base"}
+{"ts":"2026-08-19T18:59:08.829Z","op":"update","visit":"iterations/i15/build-steps/harvest-v1-queries@0","node":"d108","brief":"harvest write 6/26: spec/queries/decisions-strategy.base"}
+{"ts":"2026-08-19T18:59:08.832Z","op":"update","visit":"iterations/i15/build-steps/harvest-v1-queries@0","node":"d109","brief":"harvest write 7/26: spec/queries/decisions-waiver.base"}
+{"ts":"2026-08-19T18:59:08.835Z","op":"update","visit":"iterations/i15/build-steps/harvest-v1-queries@0","node":"d110","brief":"harvest write 8/26: spec/queries/force-rationales.base"}
+{"ts":"2026-08-19T18:59:08.838Z","op":"update","visit":"iterations/i15/build-steps/harvest-v1-queries@0","node":"d111","brief":"harvest write 9/26: spec/queries/fundamentals.base"}
+{"ts":"2026-08-19T18:59:23.872Z","op":"done","visit":"iterations/i15/gate-implementation@0","node":"d76","brief":"26 files harvested at ref main: 25 .base queries + adr-query-in-engine, hashes verified"}
+{"ts":"2026-08-19T18:59:38.027Z","op":"update","visit":"iterations/i15/build-steps/harvest-v1-queries@0","node":"d112","brief":"harvest chunk signed; conformance-fixtures next"}
+{"ts":"2026-08-19T18:59:44.308Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d113","brief":"reading engine/tables.ts and existing fixtures before writing conformance tests"}
+{"ts":"2026-08-19T18:59:50.667Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d114","brief":"reading tables.ts + query.test.ts for the pinned subset"}
+{"ts":"2026-08-19T19:00:36.981Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d115","brief":"checking project/spec root before fixing harvest path"}
+{"ts":"2026-08-19T19:01:01.950Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d116","brief":"moving harvested files into project/ 6/26"}
+{"ts":"2026-08-19T19:01:01.964Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d117","brief":"moving harvested files into project/ 12/26"}
+{"ts":"2026-08-19T19:01:01.973Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d118","brief":"moving harvested files into project/ 18/26"}
+{"ts":"2026-08-19T19:01:01.982Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d119","brief":"moving harvested files into project/ 24/26"}
+{"ts":"2026-08-19T19:01:01.985Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d120","brief":"moving harvested files into project/ 26/26"}
+{"ts":"2026-08-19T19:01:56.674Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d121","brief":"wrote all 26 harvested files under project/ root (fixing wrong-root mistake)"}
+{"ts":"2026-08-19T19:02:50.287Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d122","brief":"retry harvest write 1/6: project/spec/queries/rules.base"}
+{"ts":"2026-08-19T19:02:50.298Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d123","brief":"retry harvest write 2/6: project/spec/queries/stakeholder-matrix.base"}
+{"ts":"2026-08-19T19:05:05.547Z","op":"done","visit":"iterations/i15/build-steps/build-query-evaluator@1","node":"d88","brief":"query.ts already executes harvested .base files via tables.ts; seam resolved"}
+{"ts":"2026-08-19T19:05:14.927Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d124","brief":"reading tables.ts for the pinned Bases subset"}
+{"ts":"2026-08-19T19:05:41.451Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d125","brief":"reading expr.ts for the supported filter operators"}
+{"ts":"2026-08-19T19:06:08.241Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d126","brief":"scanning harvested filters batch 1"}
+{"ts":"2026-08-19T19:06:17.578Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d127","brief":"scanning harvested filters batch 2"}
+{"ts":"2026-08-19T19:06:32.819Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d128","brief":"listing tests dir to find expr.ts's test file"}
+{"ts":"2026-08-19T19:06:41.734Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d129","brief":"reading expr.test.ts to see hasTag test pattern"}
+{"ts":"2026-08-19T19:07:37.361Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d130","brief":"searching corpus for hasTag usage against readVault"}
+{"ts":"2026-08-19T19:08:01.435Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d131","brief":"reading tables.test.ts for readVault/fixture patterns"}
+{"ts":"2026-08-19T19:08:37.264Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d132","brief":"checking bases-syntax.md's inFolder spec"}
+{"ts":"2026-08-19T19:09:08.032Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d133","brief":"test-first: added file.inFolder cases to expr.test.ts before implementing"}
+{"ts":"2026-08-19T19:09:18.190Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d134","brief":"scoped test: confirm RED before implementing file.inFolder"}
+{"ts":"2026-08-19T19:09:29.549Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d135","brief":"fixing a typecheck error in the new file.inFolder test (Ctx.row.file, not Ctx.file)"}
+{"ts":"2026-08-19T19:10:07.623Z","op":"defer","visit":"iterations/i15/gate-implementation@0","node":"d78","brief":"fix raid-debt-delta-default-views resolvers","to":"after conformance-fixtures lands (this call is still mid-conformance-fixtures work)","hops":1,"trail":["iterations/i15/gate-implementation","after conformance-fixtures lands (this call is still mid-conformance-fixtures work)"]}
+{"ts":"2026-08-19T19:10:19.571Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d136","brief":"re-reading expr.test.ts to confirm the patch landed"}
+{"ts":"2026-08-19T19:10:31.640Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d137","brief":"scoped test 2: confirm RED before implementing file.inFolder"}
+{"ts":"2026-08-19T19:10:43.152Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d138","brief":"reading readVault precisely to patch file.tags wiring"}
+{"ts":"2026-08-19T19:11:00.643Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d139","brief":"reading helpers.ts's freshRoot before writing the file.tags test"}
+{"ts":"2026-08-19T19:11:30.041Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d140","brief":"test-first: added a real-vault file.hasTag test to tables.test.ts before wiring file.tags"}
+{"ts":"2026-08-19T19:11:39.221Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d141","brief":"checking inFolder RED job status"}
+{"ts":"2026-08-19T19:11:53.996Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d142","brief":"adding file.inFolder to expr.ts, needed by 3 of the 25 harvested queries"}
+{"ts":"2026-08-19T19:12:16.252Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d143","brief":"wired file.tags onto readVault"}
+{"ts":"2026-08-19T19:12:30.585Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d144","brief":"reading query.ts to design conformance fixtures against harvested shapes"}
+{"ts":"2026-08-19T19:13:06.256Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d145","brief":"reading query.test.ts's current fixture pattern"}
+{"ts":"2026-08-19T19:13:51.875Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d146","brief":"checking green status for file.inFolder and file.tags fixes"}
+{"ts":"2026-08-19T19:14:12.932Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d147","brief":"scoped test: new query.test.ts conformance fixtures"}
+{"ts":"2026-08-19T19:15:15.389Z","op":"defer","visit":"iterations/i15/gate-implementation@0","node":"d80","brief":"re-walk build-steps/trace-design/verification to gate-implementation","to":"after conformance-fixtures and fix-delta-default-resolvers land","hops":1,"trail":["iterations/i15/gate-implementation","after conformance-fixtures and fix-delta-default-resolvers land"]}
+{"ts":"2026-08-19T19:15:26.360Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d148","brief":"locating the $-item resolver code for the delta-default fix"}
+{"ts":"2026-08-19T19:15:39.832Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d149","brief":"searching for the reference-table renderer code"}
+{"ts":"2026-08-19T19:15:51.136Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d150","brief":"searching engine code for minted_in usage"}
+{"ts":"2026-08-19T19:16:08.099Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d151","brief":"reading stateform.ts around the minted_in owner check"}
+{"ts":"2026-08-19T19:16:26.635Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d152","brief":"enumerating all $-item resolver functions"}
+{"ts":"2026-08-19T19:16:39.520Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d153","brief":"reading the $-item dispatcher function's own signature"}
+{"ts":"2026-08-19T19:17:01.518Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d154","brief":"finding resolveSource call sites"}
+{"ts":"2026-08-19T19:17:13.571Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d155","brief":"reading the function around resolveSource's two call sites"}
+{"ts":"2026-08-19T19:17:45.866Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d156","brief":"reading EvidenceField's type definition"}
+{"ts":"2026-08-19T19:17:59.473Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d157","brief":"reading EvidenceField's full definition in machine.ts"}
+{"ts":"2026-08-19T19:18:58.605Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d158","brief":"reading the full TYPED_SOURCES map before scoping the fix"}
+{"ts":"2026-08-19T19:19:24.798Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d159","brief":"finding fieldArgsFor's call site to learn traceRoot's real value"}
+{"ts":"2026-08-19T19:24:38.746Z","op":"defer","visit":"iterations/i15/enumerate-space/find_prior_art@0","node":"d38","brief":"build the actual verbs and fixes","to":"gate-implementation, once all 5 chunks and interface entries land","hops":1,"trail":["iterations/i15/enumerate-space/find_prior_art","gate-implementation, once all 5 chunks and interface entries land"]}
+{"ts":"2026-08-19T19:25:21.968Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d160","brief":"adding fieldArgsFor import to node-scoping.test.ts"}
+{"ts":"2026-08-19T19:25:22.154Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d161","brief":"test-first: wrote the delta-default resolver tests before implementing"}
+{"ts":"2026-08-19T19:25:40.472Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d162","brief":"scoped test: confirm RED before implementing the delta-default fix"}
+{"ts":"2026-08-19T19:26:07.533Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d163","brief":"checking stateform.ts's existing imports for basename/dirname"}
+{"ts":"2026-08-19T19:26:17.987Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d164","brief":"implementing boundOwner/scopedToOwner and threading them through typedItems"}
+{"ts":"2026-08-19T19:26:41.739Z","op":"plan","visit":"iterations/i15/build-steps/conformance-fixtures@0","parent":"d77","nodes":[{"id":"d165","brief":"threaded owner/all through claimSpecItems"},{"id":"d166","brief":"mustStoryItems"},{"id":"d167","brief":"fixed promotionItems's owner bug"}]}
+{"ts":"2026-08-19T19:27:00.223Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d168","brief":"checking TraceNode's real frontmatter field name"}
+{"ts":"2026-08-19T19:27:14.830Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d169","brief":"reading TraceNode's full field list"}
+{"ts":"2026-08-19T19:27:25.221Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d170","brief":"checking traceFolder's return type"}
+{"ts":"2026-08-19T19:27:38.583Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d171","brief":"reading the rest of loadTrace's body for minted_in access"}
+{"ts":"2026-08-19T19:27:59.406Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d172","brief":"exposed minted_in as a structured TraceNode field instead of parsing it out of hay"}
+{"ts":"2026-08-19T19:28:24.186Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d173","brief":"made scopedToOwner generic via a mintedInOf callback instead of a shared .fm shape"}
+{"ts":"2026-08-19T19:28:36.259Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d174","brief":"checking current stateform.ts around lines 993-1020"}
+{"ts":"2026-08-19T19:29:31.950Z","op":"done","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d165","brief":"resolver wiring landed for the delta-default fix"}
+{"ts":"2026-08-19T19:29:44.253Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d175","brief":"checking the RED confirmation job for delta-default tests"}
+{"ts":"2026-08-19T19:30:00.062Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d176","brief":"polling the GREEN confirmation job for the delta-default fix"}
+{"ts":"2026-08-19T19:30:43.325Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d177","brief":"polling job 4, the query.test.ts conformance fixtures"}
+{"ts":"2026-08-19T19:30:55.408Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d178","brief":"polling the delta-default GREEN confirmation job again"}
+{"ts":"2026-08-19T19:31:17.233Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d179","brief":"waiting for the delta-default job to finish for full failure detail"}
+{"ts":"2026-08-19T19:33:31.329Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d180","brief":"found the real bug: my test's traceRoot double-joined project/spec/trace"}
+{"ts":"2026-08-19T19:33:43.290Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d181","brief":"locating the promotion test that regressed"}
+{"ts":"2026-08-19T19:33:52.742Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d182","brief":"reading promotions-stay-home.test.ts's full content"}
+{"ts":"2026-08-19T19:34:47.925Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d183","brief":"updated promotions-stay-home.test.ts's white-box check for the improved owner source"}
+{"ts":"2026-08-19T19:35:16.430Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d184","brief":"re-reading query.test.ts's exact fixture-note lines after the linter's reformat"}
+{"ts":"2026-08-19T19:35:29.624Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d185","brief":"reading query.test.ts's fixture-note-writing section"}
+{"ts":"2026-08-19T19:35:56.038Z","op":"done","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d166","brief":"mustStoryItems threading confirmed done via earlier resolveSource patch"}
+{"ts":"2026-08-19T19:36:16.883Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d186","brief":"checking whether d1/d4 are still open per the coordinator's note"}
+{"ts":"2026-08-19T19:36:37.570Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d187","brief":"filed the se_file_move/se_file_delete legal-tools note the coordinator asked for"}
+{"ts":"2026-08-19T19:36:49.233Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d188","brief":"polling the final green-check job for the three fixed tests"}
+{"ts":"2026-08-19T19:37:51.771Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d189","brief":"actually patching the SHAPES_BASE NotEquals filter this time"}
+{"ts":"2026-08-19T19:38:02.516Z","op":"done","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d167","brief":"promotionItems owner fix + regression test update landed"}
+{"ts":"2026-08-19T19:38:24.047Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d190","brief":"polling the whole-battery confirmation job"}
+{"ts":"2026-08-19T19:38:40.281Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d191","brief":"re-reading raid-debt-delta-default-views before adding the repayment sweep"}
+{"ts":"2026-08-19T19:39:05.592Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d192","brief":"documented the delta-default repayment honestly: 8 of 15 fixed, 7 deferred with rationale"}
+{"ts":"2026-08-19T19:39:21.139Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d193","brief":"polling the whole-battery confirmation job again"}
+{"ts":"2026-08-19T19:39:32.934Z","op":"update","visit":"iterations/i15/build-steps/conformance-fixtures@0","node":"d194","brief":"final poll of the whole-battery confirmation job"}
+{"ts":"2026-08-19T19:40:35.925Z","op":"update","visit":"iterations/i15/build-steps/fix-delta-default-resolvers@0","node":"d195","brief":"fix-delta-default-resolvers signed; built ahead of schedule under conformance work"}
+{"ts":"2026-08-19T19:41:02.397Z","op":"update","visit":"iterations/i15/build-steps/fix-delta-default-resolvers@0","node":"d196","brief":"fix-delta-default-resolvers signed; built ahead of schedule under conformance work"}
+{"ts":"2026-08-19T19:41:17.624Z","op":"update","visit":"iterations/i15/build-steps/mint-interface-entries@0","node":"d197","brief":"verifying the two interface entries still exist before signing this chunk"}
+{"ts":"2026-08-19T19:41:31.784Z","op":"done","visit":"iterations/i15/gate-implementation@0","node":"d74","brief":"all 5 build chunks + interface entries now signed"}
+{"ts":"2026-08-19T19:43:05.087Z","op":"update","visit":"iterations/i15/gate-implementation@0","node":"d198","brief":"reading the existing gate-implementation.md before rewriting the verdict"}
+{"ts":"2026-08-19T19:43:47.585Z","op":"update","visit":"iterations/i15/gate-implementation@0","node":"d199","brief":"reading the five-goals-unbuilt debt before closing it out"}
+{"ts":"2026-08-19T19:44:06.047Z","op":"update","visit":"iterations/i15/gate-implementation@0","node":"d200","brief":"checking closed-status vocabulary on other raid debt entries"}
+{"ts":"2026-08-19T19:44:20.773Z","op":"update","visit":"iterations/i15/gate-implementation@0","node":"d201","brief":"closing the five-goals-unbuilt debt now that all five chunks are real"}
+{"ts":"2026-08-19T19:45:20.228Z","op":"done","visit":"iterations/i15/gate-implementation@0","node":"d77","brief":"gate-implementation filled with a PASS verdict, submitted (bless left to the coordinator)"}
+{"ts":"2026-08-19T19:45:58.497Z","op":"update","visit":"iterations/i15/gate-implementation@0","node":"d202","brief":"re-reading gate-kickoff.md's goals section verbatim for goals_served"}
+{"ts":"2026-08-19T19:46:21.390Z","op":"update","visit":"iterations/i15/gate-implementation@0","node":"d203","brief":"finding the canonical quality checklist card"}
+{"ts":"2026-08-19T19:46:52.556Z","op":"update","visit":"iterations/i15/gate-implementation@0","node":"d204","brief":"reading the canonical quality_ok checklist card in full"}
+{"ts":"2026-08-19T19:52:18.157Z","op":"update","visit":"iterations/i15/gate-implementation@0","node":"d205","brief":"blessing gate-implementation on checks run against the code, not the form"}
+{"ts":"2026-08-19T20:03:34.833Z","op":"plan","visit":"iterations/i15/run-demos@0","parent":null,"nodes":[{"id":"d206","brief":"pull to see current state at run-demos"},{"id":"d207","brief":"do the run-demos work as handed"}]}
+{"ts":"2026-08-19T20:06:55.338Z","op":"update","visit":"iterations/i15/run-demos@0","node":"d208","brief":"found fill-story-evidence undone: demos.md still placeholder, must author it"}
+{"ts":"2026-08-19T20:07:02.886Z","op":"update","visit":"iterations/i15/run-demos@0","node":"d209","brief":"checking sibling iterations for an authored demos.md example"}
+{"ts":"2026-08-19T20:11:00.789Z","op":"plan","visit":"iterations/i15/run-demos@0","parent":null,"nodes":[{"id":"d210","brief":"author demos.md drawing for the 2 must stories i15 unblocked"},{"id":"d211","brief":"perform demo 1: structured query over decisions-architecture.base"},{"id":"d212","brief":"perform demo 2: BM25 coupling disposition end to end"},{"id":"d213","brief":"write rpt-answer-what-does-this-touch.md report"},{"id":"d214","brief":"write rpt-dispose-a-candidate-coupling.md report"},{"id":"d215","brief":"fill both stories evidence slides with report references"},{"id":"d216","brief":"fill+submit run-demos front-desk form"}]}
+{"ts":"2026-08-19T20:12:21.593Z","op":"update","visit":"iterations/i15/run-demos@0","node":"d217","brief":"wrote demo1 script exercising the real answerStructuredQuery function"}
+{"ts":"2026-08-19T20:12:27.356Z","op":"update","visit":"iterations/i15/run-demos@0","node":"d218","brief":"executing demo1 script for real against the built engine"}
+{"ts":"2026-08-19T20:13:03.332Z","op":"update","visit":"iterations/i15/run-demos@0","node":"d219","brief":"checking test fixtures for filters shape vs real harvested files"}
+{"ts":"2026-08-19T20:13:20.634Z","op":"update","visit":"iterations/i15/run-demos@0","node":"d220","brief":"confirmed real bug: top-level filters in .base files are never applied"}
+{"ts":"2026-08-19T20:13:35.671Z","op":"done","visit":"iterations/i15/run-demos@0","node":"d211","brief":"demo1 performed for real; surfaced a real bug: top-level .base filters are dropped"}
+{"ts":"2026-08-19T20:13:43.587Z","op":"plan","visit":"iterations/i15/run-demos@0","parent":null,"nodes":[{"id":"d221","brief":"patch parseBase in tables.ts to honor top-level filters"},{"id":"d222","brief":"add regression test pinning the harvested top-level-filters shape"},{"id":"d223","brief":"run tests to confirm green"},{"id":"d224","brief":"re-run demo1 to confirm the fix"}]}
+{"ts":"2026-08-19T20:13:53.515Z","op":"update","visit":"iterations/i15/run-demos@0","node":"d225","brief":"scanning harvested files to confirm fix shape before patching"}
+{"ts":"2026-08-19T20:14:41.926Z","op":"update","visit":"iterations/i15/run-demos@0","node":"d226","brief":"reverted a native-tool slip; redoing the patch through se_file_patch"}
+{"ts":"2026-08-19T20:15:02.635Z","op":"update","visit":"iterations/i15/run-demos@0","node":"d227","brief":"applied the top-level-filters fallback fix via se_file_patch"}
+{"ts":"2026-08-19T20:15:16.966Z","op":"update","visit":"iterations/i15/run-demos@0","node":"d228","brief":"applied the top-level-filters fallback fix via se_file_patch"}
+{"ts":"2026-08-19T20:15:26.624Z","op":"update","visit":"iterations/i15/run-demos@0","node":"d229","brief":"reading rest of query.test.ts to place the new regression case"}
+{"ts":"2026-08-19T20:15:37.797Z","op":"update","visit":"iterations/i15/run-demos@0","node":"d230","brief":"reading exact tail of query.test.ts before inserting the new case"}
+{"ts":"2026-08-19T20:16:17.359Z","op":"update","visit":"iterations/i15/run-demos@0","node":"d231","brief":"added two regression tests pinning top-level filters and view override"}
+{"ts":"2026-08-19T20:16:24.555Z","op":"done","visit":"iterations/i15/run-demos@0","node":"d221","brief":"parseBase fix landed: top-level filters now fall back correctly"}
+{"ts":"2026-08-19T20:16:54.952Z","op":"fork","visit":"iterations/i15/run-demos@0","parent":"d222","node":"d232","brief":"unrelated pre-existing typecheck error surfaced on pull; triaging before continuing","nodes":[]}
+{"ts":"2026-08-19T20:17:10.312Z","op":"update","visit":"iterations/i15/run-demos@0","node":"d233","brief":"kicking off scoped test run for the parseBase fix"}
+{"ts":"2026-08-19T20:17:34.829Z","op":"update","visit":"iterations/i15/run-demos@0","node":"d234","brief":"authoring the demos.md drawing for the two new must stories"}
+{"ts":"2026-08-19T20:18:08.577Z","op":"done","visit":"iterations/i15/run-demos@0","node":"d210","brief":"authored demos.md with the two must-story steps, scoped and reasoned"}
+{"ts":"2026-08-19T20:18:30.173Z","op":"update","visit":"iterations/i15/run-demos@0","node":"d235","brief":"executing demo2 script for real against the built engine"}
+{"ts":"2026-08-19T20:19:28.638Z","op":"done","visit":"iterations/i15/run-demos@0","node":"d223","brief":"battery green 1501/1501 after the fix"}
+{"ts":"2026-08-19T20:19:39.630Z","op":"update","visit":"iterations/i15/run-demos@0","node":"d236","brief":"printing all matched rows to see why adr-query-in-engine is missing"}
+{"ts":"2026-08-19T20:19:51.259Z","op":"update","visit":"iterations/i15/run-demos@0","node":"d237","brief":"re-running demo1 with row names printed"}
+{"ts":"2026-08-19T20:20:46.663Z","op":"update","visit":"iterations/i15/run-demos@0","node":"d238","brief":"reading statements of top-15 candidates to dispose each for real"}
+{"ts":"2026-08-19T20:20:55.334Z","op":"update","visit":"iterations/i15/run-demos@0","node":"d239","brief":"reading statements of the top-15 candidates to dispose each for real"}
+{"ts":"2026-08-19T20:21:20.486Z","op":"update","visit":"iterations/i15/run-demos@0","node":"d240","brief":"reading top-15 candidate statements to dispose each for real"}
+{"ts":"2026-08-19T20:22:01.126Z","op":"done","visit":"iterations/i15/run-demos@0","node":"d212","brief":"demo2 performed for real with top-15 candidates disposed"}
+{"ts":"2026-08-19T20:22:13.157Z","op":"done","visit":"iterations/i15/run-demos@0","node":"d232","brief":"stale cached field; fresh battery run showed no typecheck errors"}
+{"ts":"2026-08-19T20:22:17.989Z","op":"done","visit":"iterations/i15/run-demos@0","node":"d222","brief":"regression tests confirmed green in the full battery"}
+{"ts":"2026-08-19T20:22:23.307Z","op":"done","visit":"iterations/i15/run-demos@0","node":"d224","brief":"demo1 re-run confirmed the fix: 1907 rows dropped to 1 correctly filtered row"}
+{"ts":"2026-08-19T20:23:55.734Z","op":"done","visit":"iterations/i15/run-demos@0","node":"d213","brief":"demo1 report written and honestly documented"}
+{"ts":"2026-08-19T20:24:01.404Z","op":"done","visit":"iterations/i15/run-demos@0","node":"d214","brief":"demo2 report written with honest partial disposition and BM25 finding"}
+{"ts":"2026-08-19T20:24:08.524Z","op":"update","visit":"iterations/i15/run-demos@0","node":"d241","brief":"reading sty-answer-what-does-this-touch.md to fill its evidence slides"}
+{"ts":"2026-08-19T20:24:37.043Z","op":"update","visit":"iterations/i15/run-demos@0","node":"d242","brief":"filled sty-answer-what-does-this-touch evidence slides"}
+{"ts":"2026-08-19T20:24:57.981Z","op":"update","visit":"iterations/i15/run-demos@0","node":"d243","brief":"filled sty-dispose-a-candidate-coupling evidence slides"}
+{"ts":"2026-08-19T20:25:03.960Z","op":"done","visit":"iterations/i15/run-demos@0","node":"d215","brief":"both story decks filled with demonstrated evidence and report refs"}
+{"ts":"2026-08-19T20:25:17.877Z","op":"update","visit":"iterations/i15/run-demos@0","node":"d244","brief":"filling and submitting the run-demos front-desk form"}
+{"ts":"2026-08-19T20:25:31.198Z","op":"done","visit":"iterations/i15/run-demos@0","node":"d216","brief":"run-demos front-desk form signed; walked into the demos sub-machine"}
+{"ts":"2026-08-19T20:25:50.743Z","op":"plan","visit":"iterations/i15/run-demos/sty-answer-what-does-this-touch@0","parent":null,"nodes":[{"id":"d245","brief":"fill and submit sty-answer-what-does-this-touch evidence form"}]}
+{"ts":"2026-08-19T20:26:02.234Z","op":"done","visit":"iterations/i15/run-demos/sty-answer-what-does-this-touch@0","node":"d245","brief":"sty-answer-what-does-this-touch evidence form signed"}
+{"ts":"2026-08-19T20:26:21.331Z","op":"plan","visit":"iterations/i15/sweep-consistency@0","parent":null,"nodes":[{"id":"d246","brief":"read meth-consistency-sweep card"},{"id":"d247","brief":"list what i15 changed from the evidence trail"},{"id":"d248","brief":"sweep command and tool docs"},{"id":"d249","brief":"sweep engine-served strings"},{"id":"d250","brief":"sweep method cards"},{"id":"d251","brief":"sweep matrix rows"},{"id":"d252","brief":"sweep templates and skeletons"},{"id":"d253","brief":"sweep guidance chapters"},{"id":"d254","brief":"sweep book chapters"},{"id":"d255","brief":"sweep README and entry docs"},{"id":"d256","brief":"sweep panels and form help"},{"id":"d257","brief":"fill and submit sweep-consistency form"}]}
+{"ts":"2026-08-19T20:26:29.830Z","op":"done","visit":"iterations/i15/run-demos@0","node":"d206","brief":"stale leftover from an earlier state; resolving now"}
+{"ts":"2026-08-19T20:26:37.173Z","op":"done","visit":"iterations/i15/run-demos@0","node":"d207","brief":"stale leftover from run-demos; that work is complete"}
+{"ts":"2026-08-19T20:26:47.790Z","op":"done","visit":"iterations/i15/sweep-consistency@0","node":"d246","brief":"read the sweep method card; procedure and surface list understood"}
+{"ts":"2026-08-19T20:27:13.297Z","op":"update","visit":"iterations/i15/sweep-consistency@0","node":"d258","brief":"searching for a canonical tool-reference doc surface"}
+{"ts":"2026-08-19T20:27:56.612Z","op":"done","visit":"iterations/i15/sweep-consistency@0","node":"d248","brief":"no static tool-reference doc found; nothing stale to sweep"}
+{"ts":"2026-08-19T20:28:10.379Z","op":"done","visit":"iterations/i15/sweep-consistency@0","node":"d247","brief":"changes are se_query/se_couplings wiring plus the tables.ts filter fix"}
+{"ts":"2026-08-19T20:28:19.635Z","op":"update","visit":"iterations/i15/sweep-consistency@0","node":"d259","brief":"checking README tool count against the pinned test assertion"}
+{"ts":"2026-08-19T20:28:33.492Z","op":"done","visit":"iterations/i15/sweep-consistency@0","node":"d255","brief":"README tool count was stale (34); fixed to the pinned 38"}
+{"ts":"2026-08-19T20:28:41.256Z","op":"done","visit":"iterations/i15/sweep-consistency@0","node":"d249","brief":"tools-query.ts own description strings checked and accurate"}
+{"ts":"2026-08-19T20:28:46.501Z","op":"done","visit":"iterations/i15/sweep-consistency@0","node":"d250","brief":"meth-validation-container and the two matrix rows read; both accurate"}
+{"ts":"2026-08-19T20:28:55.479Z","op":"done","visit":"iterations/i15/sweep-consistency@0","node":"d251","brief":"M8_10 and M8_15 matrix rows already read; both accurate"}
+{"ts":"2026-08-19T20:29:00.757Z","op":"done","visit":"iterations/i15/sweep-consistency@0","node":"d252","brief":"no template or skeleton teaches query/coupling behavior; nothing to sweep"}
+{"ts":"2026-08-19T20:29:06.993Z","op":"done","visit":"iterations/i15/sweep-consistency@0","node":"d253","brief":"refusals.md SE-C-144 already correct; no other guidance touched"}
+{"ts":"2026-08-19T20:29:15.840Z","op":"done","visit":"iterations/i15/sweep-consistency@0","node":"d254","brief":"no book folder exists in this project yet; class not applicable"}
+{"ts":"2026-08-19T20:29:21.438Z","op":"done","visit":"iterations/i15/sweep-consistency@0","node":"d256","brief":"no panel or form help text describes query/coupling behavior yet"}
+{"ts":"2026-08-19T20:29:36.998Z","op":"update","visit":"iterations/i15/sweep-consistency@0","node":"d260","brief":"filling and submitting the sweep-consistency form"}
+{"ts":"2026-08-19T20:29:45.393Z","op":"update","visit":"iterations/i15/sweep-consistency@0","node":"d261","brief":"checking why run-demos shows as an unsigned feeder"}
+{"ts":"2026-08-19T20:29:52.432Z","op":"update","visit":"iterations/i15/sweep-consistency@0","node":"d262","brief":"submitting the sweep-consistency form now that fields are saved"}
+{"ts":"2026-08-19T20:29:58.933Z","op":"update","visit":"iterations/i15/sweep-consistency@0","node":"d263","brief":"reading run-demos.md directly to check its signed status"}
+{"ts":"2026-08-19T20:30:10.932Z","op":"update","visit":"iterations/i15/sweep-consistency@0","node":"d264","brief":"bare pull per the remedy note to see what run-demos still owes"}
+{"ts":"2026-08-19T20:30:50.346Z","op":"update","visit":"iterations/i15/sweep-consistency@0","node":"d265","brief":"retrying submit after a bare pull refresh"}
+{"ts":"2026-08-19T20:31:15.770Z","op":"update","visit":"iterations/i15/sweep-consistency@0","node":"d266","brief":"escaping to front desk to force a reload after the stuck feeder check"}
+{"ts":"2026-08-19T20:46:43.676Z","op":"done","visit":"iterations/select@2","node":"d269","brief":"entered i15, auto-walked to enumerate-space/start"}
+{"ts":"2026-08-19T20:49:17.364Z","op":"done","visit":"iterations/select@2","node":"d270","brief":"sweep-consistency submitted, now at gate-validation"}
+{"ts":"2026-08-19T20:51:49.757Z","op":"update","visit":"iterations/i15/gate-validation@0","node":"d275","brief":"gathering evidence to fill gate-validation form"}
+{"ts":"2026-08-19T20:56:51.165Z","op":"update","visit":"iterations/i15/gate-validation@0","node":"d276","brief":"minting the missing demonstration test-spec for sty-a-smaller-model-walks-a-record"}
+{"ts":"2026-08-19T20:56:56.893Z","op":"update","visit":"iterations/i15/gate-validation@0","node":"d277","brief":"minting the missing demonstration test-spec for sty-a-smaller-model-walks-a-record"}
+{"ts":"2026-08-19T20:57:02.623Z","op":"update","visit":"iterations/i15/gate-validation@0","node":"d278","brief":"minting the missing demonstration test-spec for sty-a-smaller-model-walks-a-record"}
+{"ts":"2026-08-19T20:57:07.937Z","op":"update","visit":"iterations/i15/gate-validation@0","node":"d279","brief":"minting the raid issue that names why the demo is owed"}
+{"ts":"2026-08-19T20:57:31.073Z","op":"update","visit":"iterations/i15/gate-validation@0","node":"d280","brief":"minting the raid issue that names why the demo is owed"}
+{"ts":"2026-08-19T20:57:47.927Z","op":"update","visit":"iterations/i15/gate-validation@0","node":"d281","brief":"resubmitting gate-validation now that the missing test-spec and raid entry exist"}
+{"ts":"2026-08-19T20:58:33.609Z","op":"done","visit":"iterations/select@2","node":"d271","brief":"gate-validation blessed; walked into M9 package"}
+{"ts":"2026-08-19T20:59:33.139Z","op":"plan","visit":"iterations/i15/package@0","parent":null,"nodes":[{"id":"d282","brief":"bump version to 6.0.0"},{"id":"d283","brief":"assemble the package by script"},{"id":"d284","brief":"check it works by using it"},{"id":"d285","brief":"fill and submit package form"}]}
+{"ts":"2026-08-19T20:59:40.073Z","op":"plan","visit":"iterations/i15/package@0","parent":null,"nodes":[]}
+{"ts":"2026-08-19T20:59:58.114Z","op":"update","visit":"iterations/i15/package@0","node":"d286","brief":"running the packaging script to assemble 6.0.0"}
+{"ts":"2026-08-19T21:00:12.353Z","op":"update","visit":"iterations/i15/package@0","node":"d287","brief":"running the packaging script from the true repo root"}
+{"ts":"2026-08-19T21:00:37.519Z","op":"update","visit":"iterations/i15/package@0","node":"d288","brief":"expanding the archive to check it"}
+{"ts":"2026-08-19T21:00:43.943Z","op":"update","visit":"iterations/i15/package@0","node":"d289","brief":"expanding the archive to check it"}
+{"ts":"2026-08-19T21:01:18.484Z","op":"update","visit":"iterations/i15/package@0","node":"d290","brief":"starting the entrypoint from inside the extracted artifact"}
+{"ts":"2026-08-19T21:01:25.214Z","op":"done","visit":"iterations/i15/package@0","node":"d284","brief":"entrypoint runs from inside the extracted artifact, exit 0"}
+{"ts":"2026-08-19T21:01:30.411Z","op":"done","visit":"iterations/i15/package@0","node":"d282","brief":"version bumped to 6.0.0 in package.json"}
+{"ts":"2026-08-19T21:02:08.252Z","op":"done","visit":"iterations/i15/package@0","node":"d283","brief":"6.0.0 zip built and checked; release notes entry added"}
+{"ts":"2026-08-19T21:02:15.832Z","op":"update","visit":"iterations/i15/package@0","node":"d291","brief":"rebuilding the archive so it carries the release notes entry too"}
+{"ts":"2026-08-19T21:02:30.717Z","op":"update","visit":"iterations/i15/package@0","node":"d292","brief":"re-checking the rebuilt archive works"}
+{"ts":"2026-08-19T21:03:17.971Z","op":"done","visit":"iterations/i15/package@0","node":"d285","brief":"package form filled and submitted"}
+{"ts":"2026-08-19T21:04:19.102Z","op":"update","visit":"iterations/i15/gate-release@0","node":"d293","brief":"filling and submitting gate-release"}

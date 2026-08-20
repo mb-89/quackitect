@@ -70,7 +70,7 @@ prefix it declares, the frontmatter keys its mint skeleton writes, and the body
 sections it lists. Nothing is declared twice.
 
 A node declares its type as a LINK to the template that governs it —
-`type: "[[value-prop]]"`, pointing at `machines/items/value-prop.md`. So the
+`type: "[[value-prop]]"`, pointing at `deliverable/machines/items/value-prop.md`. So the
 reader is one hop from the rules, and the check is a string compare.
 
 Without `of:`, any typed node resolves. Naming a type with no item template is
