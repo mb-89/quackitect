@@ -415,6 +415,13 @@ export class Decisions {
     return node;
   }
 
+  /** The open node ids, oldest first. The TOLL asks for these so its refusal
+   *  can name a real one instead of a placeholder — a remedy that costs a
+   *  second call to make executable is not executable. */
+  openNodeIds(): string[] {
+    return [...this.nodes.values()].filter((n) => n.status === "open").map((n) => n.id);
+  }
+
   /** The remedy's map: what is still open, so a wrong ref heals in one turn. */
   private openBriefs(): string {
     const open = [...this.nodes.values()].filter((n) => n.status === "open");

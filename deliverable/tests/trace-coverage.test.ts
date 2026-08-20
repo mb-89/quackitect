@@ -132,7 +132,10 @@ describe("the live offer against the trace", () => {
     // this line once, so somebody confirms the enumerator still sees every one
     // before moving it. Confirmed on 2026-08-18 — the enumerator saw both new
     // verbs and reported them as untraced, which is the check working.
-    assert.equal(registeredVerbs().length, 38, "the lane's verb count moved — confirm the enumerator still sees every one");
+    // 39 at this retro, when se_coverage put a door on the coverage anti-join
+    // the submit check already computed. Confirmed: the enumerator saw it and
+    // reported it untraced, which is this pair of checks working.
+    assert.equal(registeredVerbs().length, 39, "the lane's verb count moved — confirm the enumerator still sees every one");
     assert.ok(traceText().length > 10000, "the trace read as good as empty — the path or the walk is wrong");
     assert.ok(traceText("use-case").length > 10000, "the use-case layer read as good as empty");
   });

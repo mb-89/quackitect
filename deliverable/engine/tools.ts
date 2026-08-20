@@ -603,7 +603,11 @@ export function buildServer(
   );
   server.setAnswerSpillDir(seDir(root));
   const log = new CallLog(seDir(root));
-  const toll = new Toll({ ...tollOpts, cadence: () => ({ minutes: session.narrationMinutes, calls: session.narrationCalls }) });
+  const toll = new Toll({
+    ...tollOpts,
+    cadence: () => ({ minutes: session.narrationMinutes, calls: session.narrationCalls }),
+    openNodes: () => session.decisions.openNodeIds(),
+  });
 
   // Session read buffer: live se_file_read results feed later tick proofs.
   // Reads at a git ref are intentionally excluded.
@@ -699,6 +703,30 @@ export function buildServer(
     const w = toll.takeWarning();
     if (w === undefined || typeof result !== "object" || result === null || Array.isArray(result)) return result;
     return { ...(result as Record<string, unknown>), toll_warning: w };
+  });
+
+  // NOTES SINCE THE WALK LAST MOVED — see dsp-narration.md#the-toll for the
+  // sibling idea. A pull that answers resets it; anything else leaves it be,
+  // because a note taken between two real acts is the verb working.
+  //
+  // WHY A BANNER AND NOT A REFUSAL. Capturing a stray is meant to be cheap and
+  // must never be the thing that fails, or the thought is lost. What the loop
+  // needs is to be TOLD, once, that it is in one.
+  let notesSinceMove = 0;
+  server.addDecorator((tool, result) => {
+    if (tool === "se_pull") {
+      notesSinceMove = 0;
+      return result;
+    }
+    if (tool !== "se_note") return result;
+    notesSinceMove += 1;
+    if (notesSinceMove < 5) return result;
+    if (typeof result !== "object" || result === null || Array.isArray(result)) return result;
+    const banner =
+      notesSinceMove >= 10
+        ? `${notesSinceMove} notes and the walk has not moved. This is a loop, and notes are not the way out of it. Pull. If the pull refuses, its remedy is the next call — not another note.`
+        : `${notesSinceMove} notes since the walk last moved. A note is not a move: se_pull is. Capture the stray, then pull.`;
+    return { ...(result as Record<string, unknown>), banner };
   });
 
   // THE ON-CHANGE TYPECHECK'S REPORT rides every result while the tree is red.

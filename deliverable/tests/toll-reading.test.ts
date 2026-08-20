@@ -113,3 +113,63 @@ test("STARTING a run still spends a call, because asking a question is work", ()
     "a run that was STARTED rather than polled slipped the toll",
   );
 });
+
+// A REFUSED CALL DID NOT HAPPEN, SO IT IS NOT COUNTED.
+//
+// The counter was raised before the throw, so resending one refused call made
+// the number worse every time. A real walk's log carries the shape: "22 calls
+// since the last", then 23, then 24, then 25 — one call, four refusals, each
+// reporting a bigger debt than the last. A reader cannot tell that from an
+// agent that really made twenty-five calls.
+test("a refused call does not raise the count that refused it", () => {
+  const toll = new Toll({ cadence: () => ({ minutes: 60, calls: 2 }), now: () => 0 });
+  toll.check(true, "se_pull", {}); // arms, uncounted
+  toll.check(true, "se_pull", {}); // 1
+  toll.check(true, "se_pull", {}); // 2
+  toll.check(true, "se_pull", {}); // 3 — over budget, earns the grace warning
+
+  const said: string[] = [];
+  for (let i = 0; i < 4; i++) {
+    try {
+      toll.check(true, "se_pull", {});
+    } catch (e) {
+      said.push(String((e as { toJSON?: () => { got?: string } }).toJSON?.().got ?? ""));
+    }
+  }
+  assert.equal(said.length, 4, "every one of the four resends is refused");
+  assert.equal(new Set(said).size, 1, `the debt is the same each time, not climbing: ${said.join(" | ")}`);
+});
+
+// THE REMEDY IS THE EXACT CALL TO MAKE INSTEAD — the contract's words. A
+// placeholder where the id goes makes recovery two calls: find an open id,
+// then resend. The engine knows the ids; the stall guard beside this one
+// already names a real one.
+test("the toll's remedy names a real open node, and omits the key when none is open", () => {
+  const withOpen = new Toll({
+    cadence: () => ({ minutes: 60, calls: 1 }),
+    now: () => 0,
+    openNodes: () => ["d12", "d13"],
+  });
+  withOpen.check(true, "se_pull", {});
+  withOpen.check(true, "se_pull", {});
+  withOpen.check(true, "se_pull", {}); // grace
+  let remedy: { args?: { update?: { node?: string } } } | undefined;
+  try {
+    withOpen.check(true, "se_pull", {});
+  } catch (e) {
+    remedy = (e as { toJSON: () => { remedy?: { args?: { update?: { node?: string } } } } }).toJSON().remedy;
+  }
+  assert.equal(remedy?.args?.update?.node, "d13", "a real id, and the one most recently opened");
+
+  const withNone = new Toll({ cadence: () => ({ minutes: 60, calls: 1 }), now: () => 0, openNodes: () => [] });
+  withNone.check(true, "se_pull", {});
+  withNone.check(true, "se_pull", {});
+  withNone.check(true, "se_pull", {});
+  let bare: { args?: { update?: Record<string, unknown> } } | undefined;
+  try {
+    withNone.check(true, "se_pull", {});
+  } catch (e) {
+    bare = (e as { toJSON: () => { remedy?: { args?: { update?: Record<string, unknown> } } } }).toJSON().remedy;
+  }
+  assert.equal("node" in (bare?.args?.update ?? {}), false, "nothing open takes a bare update, and a node there would refuse");
+});

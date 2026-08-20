@@ -463,6 +463,12 @@ export interface ReplaceResult {
   places_total: number;
   files_scanned: number;
   truncated: boolean;
+  /** True when nothing was written. see dsp-file-lane.md#a-wide-replace-is-read-before-it-is-run */
+  preview?: boolean;
+  /** Every file the replace would touch and how many places in each, BIGGEST
+   *  FIRST. A rule hitting one file four thousand times while its siblings
+   *  take two is visible here and in no sample of lines. */
+  by_file?: { path: string; replacements: number }[];
   corrected?: string[];
   /** Linter findings the safe fixes could not reach (engine/lintfix.ts). */
   lint_findings?: string;
@@ -511,7 +517,7 @@ export function fileReplace(
   glob: string,
   pattern: string,
   replacement: string,
-  opts: { flags?: string; expect_count?: number } = {},
+  opts: { flags?: string; expect_count?: number; preview?: boolean } = {},
 ): ReplaceResult {
   const rx = compileReplacePattern(glob, pattern, replacement, opts.flags ?? "");
   const found = fileGlob(root, glob, { limit: 10000 });
@@ -557,6 +563,20 @@ export function fileReplace(
       remedy: { tool: "se_file_search", args: { query: pattern, intent: "see what the pattern really hits before replacing" } },
       source: SRC,
     });
+  }
+  // THE PREVIEW STOPS HERE, having computed everything and written nothing.
+  // It runs AFTER the no-match and expect_count refusals, so a preview that
+  // comes back at all is a replace that would really have landed.
+  if (opts.preview === true) {
+    return {
+      preview: true,
+      changed: [],
+      places,
+      places_total: total,
+      files_scanned: scanned,
+      truncated: total > places.length,
+      by_file: staged.map((s) => ({ path: s.path, replacements: s.replacements })).sort((a, b) => b.replacements - a.replacements),
+    };
   }
   for (const s of staged) {
     guardMachineNote(s.path, s.next);

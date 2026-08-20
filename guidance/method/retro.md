@@ -209,9 +209,24 @@ The trigger is a NOTE carrying "needs retro":
    about.
 
    THEN WALK THE se_run COMMANDS, AND KNOW WHAT THAT STEP IS FOR (owner
-   ruling 2026-08-07). It is not a survey. THE POINT IS TO DRIVE THE se_run
-   COUNT DOWN. Every shell command is a candidate sign of a MISSING lane
-   verb, and the retro is where that verb gets named.
+   ruling 2026-08-07). It is not a survey. THE POINT IS TO FIND THE MISSING
+   VERB: a command that did a LANE JOB by hand is a verb naming itself, and
+   the retro is where it gets named.
+
+   SORT THE COMMANDS INTO TWO PILES BEFORE READING THEM, because they are not
+   the same act and only one of them is a lead.
+
+   - A LANE JOB DONE IN THE SHELL is the lead. Reading a file, listing a
+     folder, searching the tree, parsing the call log. Each has a verb, and
+     reaching past it says the verb is missing, wrong or unfindable.
+   - A PROGRAM IS NOT A LEAD, and counting it down teaches the agent that
+     thinking costs it something. Counting what a rule touches, routing four
+     hundred blocks, applying one shape across a tree — these are programs,
+     the lane card says so in as many words, and a session that wrote none is
+     the finding rather than the good result.
+
+   SO THE NUMBER TO WATCH IS THE FIRST PILE. A session with twenty scripts
+   and no lane-job commands is healthier than one with neither.
 
    COUNT IT. `se_log_query {group_by: "tool"}` gives the whole
    distribution in one call.
@@ -373,5 +388,8 @@ method (`deliverable/machines/methods/meth-state-of-the-art.md`).
   re-drain it as `carried`.
 - Expedition reports are ruled AT CLOSE (applied | dismissed), not here —
   the retro is out of the expedition loop (owner ruling 2026-07-27).
-- se_log_query is the query lane. Never an ad-hoc script.
+- se_log_query is the query lane — parsing the call log by hand is the
+  lane job this step exists to catch. That is about the LOG, not about
+  scripts: a program over the corpus or the tree is the right instrument and
+  the lane card says so.
   since: "last_retro" scopes it to the current retro period.

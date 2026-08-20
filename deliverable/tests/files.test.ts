@@ -287,6 +287,41 @@ test("a wide replace sweeps every file the glob reaches, and names every place",
   rmSync(root, { recursive: true, force: true });
 });
 
+// THE PREVIEW IS THE GUARD THIS VERB WAS MISSING. It computed every place it
+// would land, wrote, and handed the list back afterwards — so the reader judged
+// a replace that had already happened.
+//
+// WHAT THAT COST, on this repository: a tree-wide rewrite whose last rule had
+// lost an escape stripped the separator out of every path in every live file.
+// A preview existed, in a hand-written script, and was read on four files
+// before the fatal rule was added.
+//
+// by_file IS THE PART THAT CATCHES IT. A rule hitting one file four thousand
+// times while its siblings take two reads as normal in a sample of lines and
+// is unmissable in a per-file count sorted biggest first.
+test("preview computes the whole sweep, writes nothing, and names the blast radius per file", () => {
+  const root = fresh();
+  fileWrite(root, "a/one.ts", 'const a = "old";\nconst b = "old";\nconst c = "old";\n', null);
+  fileWrite(root, "a/b/two.ts", 'const d = "old";\n', null);
+
+  const p = fileReplace(root, "**/*.ts", "old", "new", { preview: true });
+
+  assert.equal(p.preview, true, "the result says it wrote nothing");
+  assert.equal(p.changed.length, 0, "and nothing is reported as changed");
+  assert.equal(p.places_total, 4, "every place is still counted");
+  assert.ok(readFileSync(join(root, "a", "one.ts"), "utf8").includes('"old"'), "the tree is untouched");
+
+  const shape = (p.by_file ?? []).map((f) => f.replacements);
+  assert.deepEqual(shape, [3, 1], "biggest first — the lopsided rule is the one worth seeing");
+
+  // And the same call without the flag really does write.
+  const real = fileReplace(root, "**/*.ts", "old", "new", {});
+  assert.equal(real.preview, undefined, "a real run is not marked a preview");
+  assert.equal(real.changed.length, 2);
+  assert.ok(!readFileSync(join(root, "a", "one.ts"), "utf8").includes('"old"'), "and now it is written");
+  rmSync(root, { recursive: true, force: true });
+});
+
 test("a pattern that matches nothing REFUSES — a sweep that hit nothing is not a success", () => {
   const root = fresh();
   fileWrite(root, "a/one.ts", "const q = 1;\n", null);

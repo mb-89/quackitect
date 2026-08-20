@@ -151,24 +151,43 @@ export interface SearchResult {
   hits: SearchHit[];
 }
 
+/** Set once the keyless path has been proved unreachable on this machine.
+ *  A second attempt cannot succeed and should not spend the timeout finding
+ *  that out again. Cleared by nothing — a session is the right lifetime. */
+let keylessSearchIsDead: string | undefined;
+
 export async function webSearch(query: string, count = 8): Promise<SearchResult> {
   const key = process.env.SE_BRAVE_API_KEY;
   if (key !== undefined && key !== "") return braveSearch(query, count, key);
+  if (keylessSearchIsDead !== undefined) throw noProvider(query, keylessSearchIsDead, true);
   try {
     return await duckDuckGoSearch(query, count);
   } catch (cause) {
-    throw new Rejection({
-      clause: CLAUSES.NOT_CONFIGURED,
-      expected: "a configured Brave provider, a reachable keyless fallback, or a harness-native WebSearch tool",
-      got: `no server-side search provider answered: ${String(cause)}`,
-      remedy: {
-        tool: "WebSearch",
-        args: { query },
-        note: "Use native WebSearch when the harness exposes it. Otherwise fetch known primary URLs with se_web_fetch.",
-      },
-      source: "engine/web.ts",
-    });
+    keylessSearchIsDead = String(cause);
+    throw noProvider(query, keylessSearchIsDead, false);
   }
+}
+
+/** THE REFUSAL SAYS WHETHER THE ANSWER CAN CHANGE. "No provider answered"
+ *  reads like weather and invites a retry; "this machine has none, and that is
+ *  settled" ends the loop. Five calls in one measured session were four
+ *  retries of a question already answered. */
+function noProvider(query: string, cause: string, settled: boolean): Rejection {
+  return new Rejection({
+    clause: CLAUSES.NOT_CONFIGURED,
+    expected: "a configured Brave provider, a reachable keyless fallback, or a harness-native WebSearch tool",
+    got: settled
+      ? `this machine has no search provider — established earlier this session (${cause}). Retrying cannot change it.`
+      : `no server-side search provider answered: ${cause}`,
+    remedy: {
+      tool: "WebSearch",
+      args: { query },
+      note: settled
+        ? "SEARCH NATIVELY. The contract names WebSearch as the one research exception precisely because it cannot be self-hosted keylessly, and every query still reaches the feed through a hook. Set SE_BRAVE_API_KEY to route it back through the lane."
+        : "Use native WebSearch when the harness exposes it. Otherwise fetch known primary URLs with se_web_fetch.",
+    },
+    source: "engine/web.ts",
+  });
 }
 
 async function braveSearch(query: string, count: number, key: string): Promise<SearchResult> {

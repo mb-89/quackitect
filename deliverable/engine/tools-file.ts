@@ -292,7 +292,7 @@ export function fileTools(rootOf: (rel?: string) => string, model: ModelFileSyst
       name: "se_file_replace",
       title: "se.file.replace",
       description:
-        "SEARCH AND REPLACE ACROSS FILES — one regex, every file a glob reaches, one atomic call. se_file_patch's regex verb is the scalpel for a path you already hold; this is the sweep for a rename that runs through the tree.\n\nIT HANDS BACK EVERY PLACE IT LANDED: path, line, and the line BEFORE and AFTER, so you judge the replace instead of trusting it. Read that list. A wide edit whose result is only a number is the one nobody can check, and undoing it costs more than reading it.\n\nA pattern matching NOTHING is refused, never a quiet success. expect_count refuses unless the total is exactly that — use it when you already know how many places there are. Nothing is written unless every file passes every guard.",
+        "SEARCH AND REPLACE ACROSS FILES — one regex, every file a glob reaches, one atomic call. se_file_patch's regex verb is the scalpel for a path you already hold; this is the sweep for a rename that runs through the tree.\n\nRUN IT WITH preview: true FIRST, AND READ WHAT COMES BACK. The preview computes everything and writes nothing: the places, and `by_file` — every file it would touch and how many places in each, BIGGEST FIRST. That list is the blast radius. A rule that hits one file four thousand times while its siblings take two looks fine in a sample of lines and obvious in `by_file`.\n\nIT HANDS BACK EVERY PLACE IT LANDED: path, line, and the line BEFORE and AFTER, so you judge the replace instead of trusting it. Read that list. A wide edit whose result is only a number is the one nobody can check, and undoing it costs more than reading it. `truncated: true` means you have NOT seen them all.\n\nCHANGE A RULE, PREVIEW AGAIN. A preview read before the last rule was added is not a preview of what runs.\n\nA pattern matching NOTHING is refused, never a quiet success. expect_count refuses unless the total is exactly that — use it when you already know how many places there are. Nothing is written unless every file passes every guard.",
       inputSchema: {
         type: "object",
         properties: {
@@ -301,6 +301,10 @@ export function fileTools(rootOf: (rel?: string) => string, model: ModelFileSyst
           replacement: { type: "string" },
           flags: { type: "string", description: "flags from i m s — g is implied" },
           expect_count: { type: "number", description: "refuse unless the total match count across all files is exactly this" },
+          preview: {
+            type: "boolean",
+            description: "compute everything and write NOTHING — returns the places plus by_file, the per-file blast radius, biggest first",
+          },
         },
         required: ["glob", "pattern", "replacement"],
       },
@@ -308,6 +312,7 @@ export function fileTools(rootOf: (rel?: string) => string, model: ModelFileSyst
         model.replace(String(args.glob), String(args.pattern), String(args.replacement), {
           ...(args.flags !== undefined ? { flags: String(args.flags) } : {}),
           ...(args.expect_count !== undefined ? { expect_count: Number(args.expect_count) } : {}),
+          ...(args.preview === true ? { preview: true } : {}),
         }),
     },
     {

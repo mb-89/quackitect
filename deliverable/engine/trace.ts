@@ -490,6 +490,19 @@ export function corpusVersion(root: string): string {
   return corpusStamp(traceFiles(traceDir(root)));
 }
 
+/** WHICH NODES OF THESE TYPES NOTHING REFINES — the coverage anti-join.
+ *
+ *  One implementation, called by the form check at submit AND by se_coverage.
+ *  Two copies of a corpus law drift, and this repository has found that in its
+ *  own exclusion lists more than once.
+ *
+ *  see dsp-evidence-forms.md#coverage-is-mutual-and-both-sides-are-computed */
+export function uncoveredOf(corpus: TraceNode[], kinds: string[]): string[] {
+  const served = new Set<string>();
+  for (const n of corpus) for (const p of n.refines) served.add(p);
+  return corpus.filter((n) => kinds.includes(n.type) && !served.has(n.id)).map((n) => n.id);
+}
+
 export function loadTrace(root: string): TraceNode[] {
   CORPUS_ASKS += 1;
   const hit = CORPUS.get(root);

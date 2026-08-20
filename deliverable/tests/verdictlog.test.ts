@@ -104,3 +104,40 @@ test("naming a scope is refused, because choosing it was never the caller's job"
   assert.equal(scoped.body.kind, "rejected", `a scope argument refuses: ${JSON.stringify(scoped.body)}`);
   assert.match(JSON.stringify(scoped.body), /files/, "and the refusal names the argument that does not exist");
 });
+
+// THE RED VERDICT USED TO BE A TAIL SLICE, and a tail drops the beginning.
+//
+// The runner prints a stack under every failure, so the six thousand
+// characters the verdict kept held about three of them. A run with fifty red
+// reported three, and the cap landed mid-list so even the count was wrong.
+// The workaround was a hand-written script reading the job file off disk.
+//
+// WHAT A READER NEEDS FIRST is which files are red and how many in each, and
+// that is precisely what fell off the front.
+test("a red battery names every failing case, grouped by its file, most first", async () => {
+  const { failureSummary } = await import("../engine/testreporters.ts");
+  const M = String.fromCharCode(0x2716);
+  const runner = [
+    "test at tests/alpha.test.ts:10:1",
+    `${M} one thing broke (12.5ms)`,
+    "  AssertionError: nope",
+    "test at tests/alpha.test.ts:40:1",
+    `${M} another thing broke (3ms)`,
+    "test at tests/beta.test.ts:7:1",
+    `${M} beta broke (1ms)`,
+    // The runner repeats the names in a trailing block. A repeat is not a
+    // second failure.
+    `${M} failing tests:`,
+    `${M} one thing broke (12.5ms)`,
+    `${M} beta broke (1ms)`,
+  ].join("\n");
+
+  const said = failureSummary(runner);
+  assert.match(said, /3 failing case\(s\) across 2 file\(s\)/, "the repeats are not counted twice");
+  assert.match(said, /tests\/alpha\.test\.ts {2}\(2\)/, "the file with more red comes first, with its count");
+  assert.ok(said.indexOf("alpha") < said.indexOf("beta"), "most first");
+  for (const name of ["one thing broke", "another thing broke", "beta broke"]) {
+    assert.ok(said.includes(name), `every case is named, and ${name} is missing`);
+  }
+  assert.ok(!said.includes("failing tests:"), "the runner's own header is not a case");
+});

@@ -120,3 +120,37 @@ test("a coverage hole is still visible in the graph the check reads", async () =
   assert.deepEqual(elsewhere, [], `a prop with no story is a hole the corpus shows without anybody typing a list: ${JSON.stringify(hits)}`);
   assert.ok(hits.length > 0, "and the node itself IS there, so the search is not answering about nothing");
 });
+
+// THE ANTI-JOIN NOW HAS A DOOR, and the door must be the same computation.
+//
+// "Every A that no B refines" is the shape of three state laws, and it was
+// only reachable at submit — on a form whose template happens to declare
+// `covers`. An agent deciding what to build next could not ask it, so it was
+// asked seven times in seven throwaway scripts instead.
+//
+// WHAT THIS CASE GUARDS is not that the verb answers. It is that the verb and
+// the law are ONE function. A second implementation of a corpus law drifts,
+// and this repository has found exactly that in its own exclusion lists twice.
+test("se_coverage answers the same anti-join the submit check refuses on", async () => {
+  const { loadTrace, uncoveredOf } = await import("../engine/trace.ts");
+  const corpus = loadTrace(REPO_ROOT);
+
+  // A design spec realizes elements AND interfaces, so the law asks about both
+  // at once. Asking about one alone reads as a hole that is not there — the
+  // reason `covers` takes a comma list at all.
+  const both = uncoveredOf(corpus, ["element", "interface"]);
+  const apart = new Set([...uncoveredOf(corpus, ["element"]), ...uncoveredOf(corpus, ["interface"])]);
+  assert.deepEqual([...both].sort(), [...apart].sort(), "asking together and apart must agree");
+
+  // A type nobody carries answers empty, and an empty answer reads as full
+  // coverage — which is why the verb refuses the type rather than answering it.
+  assert.deepEqual(uncoveredOf(corpus, ["no-such-type"]), [], "an unknown type has no members, so the verb must refuse it upstream");
+
+  // And the ids it names are real nodes of the type asked for.
+  const byId = new Map(corpus.map((n) => [n.id, n]));
+  for (const id of both) {
+    const n = byId.get(id);
+    assert.ok(n !== undefined, `${id} is a real node`);
+    assert.ok(["element", "interface"].includes(n.type), `${id} is one of the types asked about`);
+  }
+});

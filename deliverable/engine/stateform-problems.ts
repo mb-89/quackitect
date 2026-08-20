@@ -25,7 +25,7 @@ import {
   templateMeta,
   unanswered,
 } from "./stateform.ts";
-import { conformance, duplicateIds, itemTemplateRel, loadTrace, refsIn, refsInRows, type TraceNode } from "./trace.ts";
+import { conformance, duplicateIds, itemTemplateRel, loadTrace, refsIn, refsInRows, type TraceNode, uncoveredOf } from "./trace.ts";
 import { edgeProblems, traceSchema } from "./traceschema.ts";
 
 // see dsp-evidence-forms.md#what-a-form-still-owes
@@ -624,9 +624,7 @@ function coverProblems(name: string, covers: string, refs: string[], byId: Map<s
   // THE COVERING SIDE IS COMPUTED FROM THE WHOLE CORPUS, not from `refs`.
   // Every node that refines something of the covered type counts, whether or
   // not anybody listed it.
-  const served = new Set<string>();
-  for (const n of corpus) for (const p of n.refines) served.add(p);
-  const bare = corpus.filter((n) => kinds.includes(n.type) && !served.has(n.id)).map((n) => n.id);
+  const bare = uncoveredOf(corpus, kinds);
   // AND THE HOLE IS STILL REFUSED. Computing both sides must not soften the
   // check into a report: a node of the covered type that NOTHING in the
   // corpus refines is a real gap, and it is still named by id.

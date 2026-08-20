@@ -16,6 +16,7 @@ import type { MirrorState } from "./render.ts";
 import { resolve as resolveSeam } from "./resolve.ts";
 import { survey } from "./survey.ts";
 import type { ReadingHook } from "./tools-file.ts";
+import { loadTrace, type TraceNode, uncoveredOf } from "./trace.ts";
 import { webFetch, webSearch } from "./web.ts";
 
 /** see dsp-lane-door.md#build-the-server */
@@ -62,7 +63,7 @@ export function deskTools(
       name: "se_web_search",
       title: "se.web.search",
       description:
-        "Web search through one lane verb. Uses Brave when configured, then a keyless provider, then points to native WebSearch only if server-side discovery is unavailable.",
+        "Web search through one lane verb. Uses Brave when SE_BRAVE_API_KEY is set, then a keyless provider.\n\nIT MAY NOT BE AVAILABLE HERE, and it says so on the FIRST call rather than the fifth: once the keyless path is proved unreachable, every later call refuses immediately with 'retrying cannot change it' instead of spending the timeout again. On such a machine, native WebSearch is the sanctioned route — the contract names it the one research exception because it cannot be self-hosted keylessly, and every query still reaches the feed through a hook.",
       inputSchema: {
         type: "object",
         properties: {
@@ -246,6 +247,48 @@ export function deskTools(
           args.statement === undefined ? undefined : String(args.statement),
           projectRoot,
         ),
+    },
+    {
+      name: "se_coverage",
+      title: "se.coverage",
+      description:
+        "WHICH NODES OF A TYPE NOTHING REFINES — the coverage anti-join, over the whole trace corpus.\n\nThis is the question three state laws ask: every element realized by a design spec, every requirement verified by a test spec, every must story carrying a demonstration. It is the SAME computation those laws run at submit, so the answer here and the refusal there can never disagree.\n\nPass one type or several, comma-separated — a design spec realizes elements AND interfaces, and asking about one of them alone reads as a hole that is not there. Answers the bare ids, the count, and how many of that type stand in total.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          covers: {
+            type: "string",
+            description: "the node type, or several comma-separated: element, interface, requirement, story",
+          },
+        },
+        required: ["covers"],
+      },
+      handler: (args) => {
+        const root = rootOf();
+        const kinds = String(args.covers)
+          .split(",")
+          .map((k) => k.trim())
+          .filter((k) => k !== "");
+        const corpus = loadTrace(root);
+        const known = [...new Set(corpus.map((n: TraceNode) => n.type))].sort();
+        const unknown = kinds.filter((k) => !known.includes(k));
+        if (unknown.length > 0) {
+          throw new Rejection({
+            clause: CLAUSES.QUERY_UNKNOWN_FIELD,
+            expected: `a node type the corpus carries: ${known.join(", ")}`,
+            got: unknown.join(", "),
+            remedy: {
+              tool: "se_coverage",
+              args: { covers: known[0] },
+              note: "an empty answer for a type nobody uses reads as full coverage",
+            },
+            source: "engine/tools-desk.ts se_coverage",
+          });
+        }
+        const bare = uncoveredOf(corpus, kinds);
+        const total = corpus.filter((n: TraceNode) => kinds.includes(n.type)).length;
+        return { covers: kinds, of: total, uncovered: bare.length, ids: bare };
+      },
     },
     {
       name: "se_survey",

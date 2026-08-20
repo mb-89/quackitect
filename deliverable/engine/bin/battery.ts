@@ -23,6 +23,7 @@
 import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+import { failureSummary } from "../testreporters.ts";
 
 function argValue(flag: string): string | undefined {
   const i = process.argv.indexOf(flag);
@@ -71,9 +72,14 @@ if (!existsSync(row)) {
     if (r.status === 0) {
       process.stdout.write(`battery green — ${command}\n`);
     } else {
-      // THE END CARRIES THE VERDICT, so the TAIL is what gets kept. A head
-      // slice would hold the run's opening banner and drop the failures.
-      process.stdout.write(`battery RED — ${command} exited ${String(r.status)}\n\n${out.slice(-6000)}\n`);
+      // EVERY FAILURE IS NAMED, GROUPED BY FILE, BEFORE THE TAIL.
+      //
+      // The tail alone used to be the whole verdict, and the runner prints a
+      // stack under each failure — so six thousand characters is about three
+      // of them, and a run with fifty red lost the rest. What a reader needs
+      // first is which files are red and how many in each, and that is the
+      // part a tail drops.
+      process.stdout.write(`battery RED — ${command} exited ${String(r.status)}\n\n${failureSummary(out)}\n${out.slice(-6000)}\n`);
       process.exitCode = 1;
     }
   }

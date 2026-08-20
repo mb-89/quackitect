@@ -9,7 +9,7 @@ import { test } from "node:test";
 import { parseUpdate } from "../engine/decisions.ts";
 import { Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
-import { anyGuidanceDoc, call, freshRoot } from "./helpers.ts";
+import { anyGuidanceDoc, bootedServer, call, freshRoot } from "./helpers.ts";
 
 // A CHAINED BRIEF IS CORRECTED WHATEVER OP CARRIES IT (i11, narration-grace).
 //
@@ -139,4 +139,30 @@ test("a failing update is named by the refusal, never masked by the toll", async
   assert.equal(r.isError, true, "a failed payment still refuses — the toll stays unpaid");
   assert.notEqual(String(r.body.clause), "SE-C-040", "the refusal is the update's own, not the toll mask");
   assert.match(JSON.stringify(r.body), /d9999/, "the refusal names the node that failed to apply");
+});
+
+// A NOTE IS THE ONE DOOR THAT NEVER REFUSES, so it becomes the pressure valve.
+//
+// MEASURED on a recovered inbox of 91 notes from one session: 43 are a single
+// pathology. An agent hit a refusal loop and wrote notes instead of moving —
+// "Stop note churn. Move the walk.", "final note before pull", "Now moving.",
+// "move". Nothing counted it, because every other verb refuses when the walk
+// cannot move and this one is deliberately cheap and always says yes.
+test("a run of notes with the walk standing still is told so, and never refused", async () => {
+  const root = freshRoot();
+  const server = await bootedServer(root);
+
+  const said: (string | undefined)[] = [];
+  for (let i = 0; i < 5; i++) {
+    const r = await call(server, "se_note", { title: `a stray, number ${i + 1}` });
+    said.push((r.body as { banner?: string }).banner);
+  }
+
+  assert.equal(said.filter((b) => b === undefined).length, 4, "the first four are ordinary captures and say nothing");
+  assert.match(String(said[4]), /note is not a move|se_pull/, "the fifth names the shape");
+
+  // AND IT IS NEVER A REFUSAL. A refused note is a lost thought, and the
+  // contract says capturing a stray stays cheap.
+  const last = await call(server, "se_note", { title: "still captured" });
+  assert.ok((last.body as { captured?: string }).captured !== undefined, "the note still landed");
 });

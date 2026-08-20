@@ -10,16 +10,27 @@ export class Toll {
   private readonly fixedWindowMs?: number;
   private readonly now: () => number;
   private readonly cadence: () => { minutes: number; calls: number };
+  /** The open decision-graph nodes, so the refusal can name one. Empty when
+   *  nothing is open, which is a legal state and takes a bare update. */
+  private readonly openNodes: () => string[];
   private armed = false;
   private lastTs = 0;
   private calls = 0;
   private warned = false;
   private pending?: string;
 
-  constructor(opts: { windowMs?: number; now?: () => number; cadence?: () => { minutes: number; calls: number } } = {}) {
+  constructor(
+    opts: {
+      windowMs?: number;
+      now?: () => number;
+      cadence?: () => { minutes: number; calls: number };
+      openNodes?: () => string[];
+    } = {},
+  ) {
     if (opts.windowMs !== undefined) this.fixedWindowMs = opts.windowMs;
     this.now = opts.now ?? Date.now;
     this.cadence = opts.cadence ?? (() => ({ minutes: NARRATION_DEFAULT_MINUTES, calls: NARRATION_DEFAULT_CALLS }));
+    this.openNodes = opts.openNodes ?? (() => []);
   }
 
   private minutes(ms: number): number {
@@ -79,15 +90,26 @@ export class Toll {
       return;
     }
     if (Toll.isReadingHop(tool, args)) return;
-    this.calls += 1;
+    // THE COUNT IS NOT COMMITTED UNTIL THE CALL IS SERVED. Raising it before
+    // the throw made every retry of one refused call worse than the last — the
+    // log showed 22, 23, 24, 25 for a single call being resent. A refused call
+    // did not happen. see dsp-narration.md#the-toll
+    const next = this.calls + 1;
     const budget = this.budget();
-    if (budget.ms === 0) return; // the control is off — nothing is ever owed
+    if (budget.ms === 0) {
+      this.calls = next;
+      return; // the control is off — nothing is ever owed
+    }
     const silent = this.now() - this.lastTs;
     const overTime = silent > budget.ms;
-    const overCalls = budget.calls > 0 && this.calls > budget.calls;
-    if (!overTime && !overCalls) return;
-    const since = overTime ? `${this.minutes(silent)} min since the last` : `${this.calls} calls since the last`;
+    const overCalls = budget.calls > 0 && next > budget.calls;
+    if (!overTime && !overCalls) {
+      this.calls = next;
+      return;
+    }
+    const since = overTime ? `${this.minutes(silent)} min since the last` : `${next} calls since the last`;
     if (!this.warned) {
+      this.calls = next;
       // Grace: the first lapsed call proceeds, carrying the warning on its
       // result — only ignoring it earns the refusal (v2 field ruling: a
       // smooth rhythm is never interrupted by a cold toll).
@@ -95,6 +117,7 @@ export class Toll {
       this.pending = `update overdue (${since}) — the NEXT call without an update field is refused; add update: {op, brief, ...} (any decision-graph op) to any call`;
       return;
     }
+    const open = this.openNodes();
     throw new Rejection({
       clause: CLAUSES.TOLL_DUE,
       expected:
@@ -106,13 +129,19 @@ export class Toll {
         tool,
         args: {
           ...args,
+          // THE NODE IS A REAL ID, not a placeholder. While a checklist stands
+          // an update without one is refused, so a remedy naming no id costs a
+          // second call to go and find one.
           update: {
             op: "update",
-            node: "<an OPEN node id — required while a checklist stands>",
+            ...(open.length > 0 ? { node: open[open.length - 1] } : {}),
             brief: "<one line: what you are doing right now>",
           },
         },
-        note: "pay by resending THIS call with the update field — the ops: plan {items}, fork {brief}, done|obsolete|revert {node, brief}, update {node, brief}. A volunteered update is never stopped.",
+        note:
+          open.length > 0
+            ? `pay by resending THIS call with the update field — the node above is open right now. Open: ${open.join(", ")}. The ops: plan {items}, fork {brief}, done|obsolete|revert {node, brief}, update {node, brief}. A volunteered update is never stopped.`
+            : "pay by resending THIS call with the update field — nothing is open, so a bare update {brief} is right. The ops: plan {items}, fork {brief}, update {brief}. A volunteered update is never stopped.",
       },
       source: "engine/toll.ts check",
     });

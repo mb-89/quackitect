@@ -82,3 +82,46 @@ export function timingReport(timed: number, total: number): Record<string, unkno
   if (timed >= total) return { timed };
   return { timed, timing_gap: `${String(total - timed)} of ${String(total)} cases left no timing record` };
 }
+
+/** Every failing case the runner named, grouped by the file that holds it.
+ *
+ *  The runner prints `test at <file>:<line>` immediately before each failure,
+ *  and repeats the names in a summary block at the end. Attributing each mark
+ *  to the most recent file line gets the grouping; the repeats are dropped by
+ *  the set. A case the runner named without a file still appears, under the
+ *  file it could not be placed in, because a silent drop here is the defect
+ *  this replaced. */
+export function failureSummary(out: string): string {
+  const MARK = String.fromCharCode(0x2716);
+  const byFile = new Map<string, Set<string>>();
+  let at = "(file not named by the runner)";
+  for (const raw of out.split("\n")) {
+    const line = raw.trim();
+    const where = /^test at (\S+?):\d+/.exec(line);
+    if (where !== null) {
+      at = where[1].replace(/\\/g, "/");
+      continue;
+    }
+    if (!line.startsWith(`${MARK} `)) continue;
+    const name = line
+      .slice(2)
+      .replace(/\s*\([\d.]+ms\)$/, "")
+      .trim();
+    // EVERYTHING PAST THIS HEADER IS A REPEAT. The runner closes with a
+    // block restating every failure, and those lines carry no file of their
+    // own — read on and they all land under whichever file came last.
+    if (name === "failing tests:") break;
+    if (name === "") continue;
+    if (!byFile.has(at)) byFile.set(at, new Set());
+    (byFile.get(at) as Set<string>).add(name);
+  }
+  if (byFile.size === 0) return "";
+  const total = [...byFile.values()].reduce((n, s) => n + s.size, 0);
+  const rows = [...byFile.entries()].sort((a, b) => b[1].size - a[1].size);
+  const lines = [`${total} failing case(s) across ${byFile.size} file(s), most first:`];
+  for (const [file, names] of rows) {
+    lines.push(`  ${file}  (${names.size})`);
+    for (const n of [...names].sort()) lines.push(`    ${n}`);
+  }
+  return `${lines.join("\n")}\n`;
+}

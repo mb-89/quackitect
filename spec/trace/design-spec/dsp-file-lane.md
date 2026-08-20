@@ -23,6 +23,31 @@ files:
   - "deliverable/engine/bin/se-hook-websearch.ts"
 ---
 
+## A wide replace is read before it is run
+
+A sweep over a glob is the one edit whose blast radius nobody can hold in their
+head. So the verb computes every place it would land, and `preview: true`
+returns that WITHOUT WRITING.
+
+THE PREVIEW RETURNS THE SHAPE, NOT ONLY THE PLACES. `by_file` names every file
+the replace would touch and how many places in each, biggest first. A sample of
+lines cannot show a lopsided rule; a per-file count cannot hide one.
+
+WHY IT IS NOT ENOUGH TO REPORT AFTERWARDS. The verb already handed back every
+place it landed, and that is genuinely useful — but by then the tree has moved.
+Undoing a wide edit costs more than reading one.
+
+WHAT IT COST TO LEARN. A tree-wide rewrite of this repository lost an escape in
+its last rule and stripped the separator out of every path in every live file:
+4,384 sites, every import broken, and backslashes eaten out of regex literals so
+the damage was not reversible by rule. A preview existed — in a hand-written
+script — and was read on four files. The rule that did the damage was added
+after those four were checked.
+
+SO THE RULE IS TWO SENTENCES. Preview a wide replace and read what comes back.
+Change a rule and preview again, because a preview read before the last rule
+was added is not a preview of what runs.
+
 ## Responsibility
 
 The file half of the lane: reads with content hashes, writes as
