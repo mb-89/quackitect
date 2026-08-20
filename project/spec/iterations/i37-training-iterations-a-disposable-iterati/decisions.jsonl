@@ -557,3 +557,76 @@
 {"ts":"2026-08-20T07:46:52.011Z","op":"update","visit":"iterations/i37/rank-unknowns@0","node":"d343","brief":"walking the re-signed chain forward"}
 {"ts":"2026-08-20T07:47:00.550Z","op":"update","visit":"iterations/i37/rank-unknowns@0","node":"d344","brief":"checking what holds at rank-unknowns"}
 {"ts":"2026-08-20T07:47:19.719Z","op":"update","visit":"iterations/i37/rank-unknowns@0","node":"d345","brief":"mapping three off-scale grades the merge brought onto the standing scale"}
+{"ts":"2026-08-20T07:47:32.539Z","op":"update","visit":"iterations/i37/rank-unknowns@0","node":"d346","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T07:47:44.006Z","op":"update","visit":"iterations/i37/run-spikes/end@0","node":"d347","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T07:47:44.810Z","op":"update","visit":"iterations/i37/run-spikes/end@0","node":"d348","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T07:47:45.894Z","op":"update","visit":"iterations/i37/run-spikes/end@0","node":"d349","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T07:47:47.262Z","op":"update","visit":"iterations/i37/run-spikes/end@0","node":"d350","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T07:47:47.774Z","op":"update","visit":"iterations/i37/run-spikes/end@0","node":"d351","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T07:47:55.840Z","op":"update","visit":"iterations/i37/run-spikes/end@0","node":"d352","brief":"at the spike sub-machine end again"}
+{"ts":"2026-08-20T07:48:15.586Z","op":"update","visit":"iterations/i37/start@1","node":"d353","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T07:48:37.966Z","op":"update","visit":"iterations/i37/write-requirements@2","node":"d354","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T07:48:59.958Z","op":"update","visit":"iterations/i37/evaluate-set@1","node":"d355","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T07:49:22.565Z","op":"update","visit":"iterations/i37/run-spikes/end@1","node":"d356","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T07:50:50.181Z","op":"update","visit":"iterations/i37/run-spikes/end@1","node":"d357","brief":"a reopened placeholder is owed even where recordDone calls it green"}
+{"ts":"2026-08-20T07:52:36.657Z","op":"update","visit":"iterations/i37/start@0","node":"d1","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T07:52:38.260Z","op":"update","visit":"iterations/i37/start@0","node":"d2","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T07:52:39.882Z","op":"update","visit":"iterations/i37/start@0","node":"d3","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T07:52:40.194Z","op":"update","visit":"iterations/i37/start@0","node":"d4","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T07:52:40.511Z","op":"update","visit":"iterations/i37/start@0","node":"d5","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T07:52:40.825Z","op":"update","visit":"iterations/i37/start@0","node":"d6","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T07:52:41.971Z","op":"update","visit":"iterations/i37/start@0","node":"d7","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T07:52:44.651Z","op":"update","visit":"iterations/i37/start@0","node":"d8","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T07:52:47.432Z","op":"update","visit":"iterations/i37/start@0","node":"d9","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T07:53:11.148Z","op":"update","visit":"iterations/i37/derive-functions@0","node":"d10","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T07:53:32.204Z","op":"update","visit":"iterations/i37/reverse-sensitivity@0","node":"d11","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T07:53:49.706Z","op":"update","visit":"iterations/i37/run-spikes/end@0","node":"d12","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T07:53:50.536Z","op":"update","visit":"iterations/i37/run-spikes/end@0","node":"d13","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T07:53:51.688Z","op":"update","visit":"iterations/i37/run-spikes/end@0","node":"d14","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T07:53:53.203Z","op":"update","visit":"iterations/i37/run-spikes/end@0","node":"d15","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T07:53:53.746Z","op":"update","visit":"iterations/i37/run-spikes/end@0","node":"d16","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T07:54:24.309Z","op":"update","visit":"iterations/i37/run-spikes/end@0","node":"d17","brief":"read the placeholder claim directly rather than through the current machine"}
+{"ts":"2026-08-20T07:56:12.227Z","op":"update","visit":"iterations/i37/start@0","node":"d1","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T07:56:13.795Z","op":"update","visit":"iterations/i37/start@0","node":"d2","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T07:56:15.321Z","op":"update","visit":"iterations/i37/start@0","node":"d3","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T07:56:15.628Z","op":"update","visit":"iterations/i37/start@0","node":"d4","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T07:56:15.932Z","op":"update","visit":"iterations/i37/start@0","node":"d5","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T07:56:16.229Z","op":"update","visit":"iterations/i37/start@0","node":"d6","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T07:56:17.231Z","op":"update","visit":"iterations/i37/start@0","node":"d7","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T07:56:19.567Z","op":"update","visit":"iterations/i37/start@0","node":"d8","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T07:56:22.174Z","op":"update","visit":"iterations/i37/start@0","node":"d9","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T07:56:44.475Z","op":"update","visit":"iterations/i37/derive-functions@0","node":"d10","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T07:57:05.964Z","op":"update","visit":"iterations/i37/declare-winner@0","node":"d11","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T07:57:22.592Z","op":"update","visit":"iterations/i37/run-spikes/end@0","node":"d12","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T07:57:23.356Z","op":"update","visit":"iterations/i37/run-spikes/end@0","node":"d13","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T07:57:24.493Z","op":"update","visit":"iterations/i37/run-spikes/end@0","node":"d14","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T07:57:26.020Z","op":"update","visit":"iterations/i37/run-spikes/end@0","node":"d15","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T07:57:26.602Z","op":"update","visit":"iterations/i37/run-spikes/end@0","node":"d16","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T07:58:28.708Z","op":"update","visit":"iterations/i37/run-spikes/end@0","node":"d17","brief":"the pop lands on a reopened parent rather than skipping it"}
+{"ts":"2026-08-20T07:59:30.829Z","op":"update","visit":"iterations/i37/start@0","node":"d1","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T07:59:32.421Z","op":"update","visit":"iterations/i37/start@0","node":"d2","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T07:59:33.997Z","op":"update","visit":"iterations/i37/start@0","node":"d3","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T07:59:34.318Z","op":"update","visit":"iterations/i37/start@0","node":"d4","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T07:59:34.625Z","op":"update","visit":"iterations/i37/start@0","node":"d5","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T07:59:34.945Z","op":"update","visit":"iterations/i37/start@0","node":"d6","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T07:59:36.014Z","op":"update","visit":"iterations/i37/start@0","node":"d7","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T07:59:38.541Z","op":"update","visit":"iterations/i37/start@0","node":"d8","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T07:59:41.443Z","op":"update","visit":"iterations/i37/start@0","node":"d9","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T08:00:03.306Z","op":"update","visit":"iterations/i37/write-requirements@0","node":"d10","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T08:00:25.058Z","op":"update","visit":"iterations/i37/converge-pugh@0","node":"d11","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T08:00:36.237Z","op":"update","visit":"iterations/i37/run-spikes/end@0","node":"d12","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T08:00:59.393Z","op":"update","visit":"iterations/i37/run-spikes/end@0","node":"d13","brief":"testing the pop fix"}
+{"ts":"2026-08-20T08:02:43.223Z","op":"update","visit":"iterations/i37/run-spikes/end@0","node":"d14","brief":"pop without completing a reopened placeholder, and do not dive back into it"}
+{"ts":"2026-08-20T08:05:45.989Z","op":"update","visit":"iterations/i37/start@0","node":"d1","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T08:05:47.586Z","op":"update","visit":"iterations/i37/start@0","node":"d2","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T08:05:49.125Z","op":"update","visit":"iterations/i37/start@0","node":"d3","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T08:05:49.423Z","op":"update","visit":"iterations/i37/start@0","node":"d4","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T08:05:49.772Z","op":"update","visit":"iterations/i37/start@0","node":"d5","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T08:05:50.091Z","op":"update","visit":"iterations/i37/start@0","node":"d6","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T08:05:51.167Z","op":"update","visit":"iterations/i37/start@0","node":"d7","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T08:05:53.577Z","op":"update","visit":"iterations/i37/start@0","node":"d8","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T08:05:56.305Z","op":"update","visit":"iterations/i37/start@0","node":"d9","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T08:06:18.430Z","op":"update","visit":"iterations/i37/write-requirements@0","node":"d10","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T08:06:39.757Z","op":"update","visit":"iterations/i37/evaluate-set@0","node":"d11","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T08:06:53.778Z","op":"update","visit":"iterations/i37/run-spikes@0","node":"d12","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T08:06:54.213Z","op":"update","visit":"iterations/i37/run-spikes@0","node":"d13","brief":"walking the re-signed chain forward"}

@@ -46,6 +46,7 @@ import {
   formTemplatePath,
   lintForm,
   parseFormTemplate,
+  reopenedAfterSigning,
   scaffoldInstance,
   withBy,
   withFieldContent,
@@ -65,7 +66,7 @@ import {
   pinIteration,
   readItRecord,
 } from "./iterations.ts";
-import { withPass } from "./notes.ts";
+import { noteOf, withPass } from "./notes.ts";
 import { pathKind, resolveInRoot, seDir } from "./paths.ts";
 import { type PulledDoc, pulledFor, scanGuidance } from "./pull.ts";
 import { probesMissed, readingProbes } from "./readproof.ts";
@@ -1410,31 +1411,12 @@ export class Session {
         return t !== undefined && t.submachine === undefined;
       });
     // A PLACEHOLDER WHOSE OWN CLAIM IS OWED IS WALKED TO, NOT THROUGH.
-    //
-    // Landing on the sub-machine's start is right while the placeholder's
-    // claim stands. It is wrong when the claim is owed, because the walk then
-    // dives, completes the sub-machine, and meets the claim guard at its END —
-    // where the placeholder's form can no longer be served, since the current
-    // machine is the sub-machine and the state is one frame out.
-    //
-    // MEASURED ON i37, 2026-08-19: the M6 spikes overturned the declared
-    // winner, the M5 chain re-signed beneath it, and run-spikes could not be
-    // re-signed. The walk sat at run-spikes/end answering the same refusal to
-    // every pull, with no route out and no verb able to address the state.
-    //
-    // FILLED IS NOT SIGNED, and that is what the old rule missed. A reopened
-    // placeholder keeps its fields and loses its signature, so it looked
-    // complete to the router and grey to the guard.
-    const itHere = this.declIteration(decl);
-    let doneHere: Set<string> | undefined;
-    const claimOwed = (t: StateDecl): boolean => {
-      if (itHere === undefined || !this.owesASignature(t, itHere)) return false;
-      doneHere ??= new Set(this.claims.recordDone(decl));
-      return !doneHere.has(t.id);
-    };
+    // Landing on its sub-machine's start is right while the claim stands and
+    // wrong when it is owed: the walk dives, completes the sub-machine, and
+    // is refused at its END where the form can no longer be served.
     const land = (pfx: string, t: StateDecl, tick: RouteNode["nexts"][number]["tick"]): void => {
       const at = Session.qual(pfx, t.id);
-      if (t.submachine !== undefined && claimOwed(t)) {
+      if (t.submachine !== undefined && this.placeholderOwesItsOwnClaim(decl, t)) {
         nexts.push({ to: at, tick });
         return;
       }
@@ -1455,21 +1437,7 @@ export class Session {
       if (t === undefined) continue;
       land(prefix, t, { from: q, to: e.to });
     }
-    // A TERMINAL closes the machine exactly as end does (machine.ts), so
-    // the pop out of it is a real hop the route must see — without it the
-    // walk wedges on a shipped state with no drawn way out.
-    if ((st.kind === "end" || st.kind === "terminal") && prefix !== "") {
-      const pcut = prefix.lastIndexOf("/");
-      const pprefix = pcut < 0 ? "" : prefix.slice(0, pcut);
-      const pid = pcut < 0 ? prefix : prefix.slice(pcut + 1);
-      const pdecl = this.declForPrefix(pprefix);
-      const pst = pdecl?.states.find((s) => s.id === pid);
-      for (const e of pst?.edges ?? []) {
-        const t = pdecl?.states.find((s) => s.id === e.to);
-        if (t === undefined) continue;
-        land(pprefix, t, { from: q, advance: true });
-      }
-    }
+    if (st.kind === "end" || st.kind === "terminal") this.popOutNexts(q, prefix, nexts, land);
     return {
       priority: this.entryWeight(prefix, decl, id, st.priority),
       demands: { ...(st.entry ?? {}) },
@@ -3495,6 +3463,46 @@ export class Session {
   /** Standing on the sub's end: this tick returns to the parent —
    *  whatever the parent's edges enter is what the threshold weighs
    *  and what the read gate demands proven. */
+  /** A TERMINAL closes the machine exactly as end does (machine.ts), so the
+   *  pop out of it is a real hop the route must see — without it the walk
+   *  wedges on a shipped state with no drawn way out.
+   *
+   *  THE POP LANDS ON THE PARENT ITSELF WHEN ITS OWN CLAIM IS OWED, so its
+   *  form is served instead of the walk being refused at the sub's end. */
+  private popOutNexts(
+    q: string,
+    prefix: string,
+    nexts: RouteNode["nexts"],
+    land: (pfx: string, t: StateDecl, tick: RouteNode["nexts"][number]["tick"]) => void,
+  ): void {
+    if (prefix === "") return;
+    const pcut = prefix.lastIndexOf("/");
+    const pprefix = pcut < 0 ? "" : prefix.slice(0, pcut);
+    const pid = pcut < 0 ? prefix : prefix.slice(pcut + 1);
+    const pdecl = this.declForPrefix(pprefix);
+    const pst = pdecl?.states.find((s) => s.id === pid);
+    if (pst === undefined || pdecl === undefined) return;
+    if (this.placeholderOwesItsOwnClaim(pdecl, pst)) {
+      nexts.push({ to: Session.qual(pprefix, pst.id), tick: { from: q, advance: true } });
+      return;
+    }
+    for (const e of pst.edges) {
+      const t = pdecl.states.find((s) => s.id === e.to);
+      if (t === undefined) continue;
+      land(pprefix, t, { from: q, advance: true });
+    }
+  }
+
+  /** see dsp-walk-machine.md#a-reopened-claim-is-owed-again — a placeholder
+   *  reopened after signing owes its OWN claim, whatever its sub-machine did. */
+  private placeholderOwesItsOwnClaim(m: MachineDecl, s: StateDecl): boolean {
+    if (s.submachine === undefined) return false;
+    const it = this.declIteration(m);
+    if (it === undefined || !this.owesASignature(s, it)) return false;
+    const fm = noteOf(this.claims.evidenceAbs(it, s.id))?.frontmatter;
+    return fm !== undefined && reopenedAfterSigning(fm);
+  }
+
   private advanceOutOfSub(channel: Channel, supplied: Record<string, string>, now: string): Record<string, unknown> {
     const top = this.top()!;
     const { machine: pm, instance: pi } = this.parentOfTop();
@@ -3511,6 +3519,14 @@ export class Session {
       channel,
       supplied,
     );
+    // POP WITHOUT COMPLETING when the parent's own claim was reopened: the
+    // walk then STANDS on the placeholder, its form is served, and the
+    // re-sign is what lets the next tick complete it.
+    if (this.placeholderOwesItsOwnClaim(pm, parent)) {
+      this.subs.pop();
+      this.notifyChange();
+      return this.landing();
+    }
     this.completeGuarded(pm, pi, top.parentState, "filled", now);
     this.subs.pop();
     if (pi !== this.instance) pi.history.push({ state: top.parentState, outcome: "filled", at: now });
@@ -3788,6 +3804,10 @@ export class Session {
     const { machine, ids } = this.leaves();
     const subState = ids.map((s) => this.state(machine, s)).find((s) => s.submachine !== undefined);
     if (subState === undefined) return;
+    // A REOPENED PLACEHOLDER IS NOT DIVED INTO. Its sub-machine already ran;
+    // what it owes now is its own signature, and diving would put the walk
+    // back at the sub's end where that form cannot be served.
+    if (this.placeholderOwesItsOwnClaim(machine, subState)) return;
     // The containers are GENERATED from the records — their drawn canvases
     // are stubs (owner design 2026-07-27). A generated machine's own sub
     // states (archive decades) come from its parent's subGen.
