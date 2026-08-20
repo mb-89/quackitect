@@ -153,3 +153,14 @@
 {"ts":"2026-08-20T10:57:16.478Z","op":"update","visit":"iterations/i38/gate-inputs@0","node":"d43","brief":"red team and verdict rewritten on the corrected ground"}
 {"ts":"2026-08-20T10:57:33.477Z","op":"done","visit":"iterations/i38/write-stories@0","node":"d14","brief":"inputs gate blessed on corrected evidence"}
 {"ts":"2026-08-20T10:58:15.205Z","op":"plan","visit":"iterations/i38/write-requirements@0","parent":null,"nodes":[{"id":"d44","brief":"write the requirements"},{"id":"d45","brief":"derive functions"},{"id":"d46","brief":"identify assumptions"},{"id":"d47","brief":"probe assumptions"},{"id":"d48","brief":"gate requirements"}]}
+{"ts":"2026-08-20T11:01:29.447Z","op":"update","visit":"iterations/i38/derive-functions@0","node":"d49","brief":"derive-functions: reading the form"}
+{"ts":"2026-08-20T11:02:53.040Z","op":"update","visit":"iterations/i38/derive-functions@0","node":"d50","brief":"minting flow-step-difficulty"}
+{"ts":"2026-08-20T11:02:53.175Z","op":"update","visit":"iterations/i38/derive-functions@0","node":"d51","brief":"minting flow-driver-recommendation"}
+{"ts":"2026-08-20T11:02:53.305Z","op":"update","visit":"iterations/i38/derive-functions@0","node":"d52","brief":"minting flow-call-attribution"}
+{"ts":"2026-08-20T11:02:53.430Z","op":"update","visit":"iterations/i38/derive-functions@0","node":"d53","brief":"minting obtain-a-step-s-difficulty"}
+{"ts":"2026-08-20T11:02:53.554Z","op":"update","visit":"iterations/i38/derive-functions@0","node":"d54","brief":"minting reduce-a-milestone-to-one-difficulty"}
+{"ts":"2026-08-20T11:02:53.680Z","op":"update","visit":"iterations/i38/derive-functions@0","node":"d55","brief":"minting resolve-a-difficulty-to-a-driver"}
+{"ts":"2026-08-20T11:02:53.814Z","op":"update","visit":"iterations/i38/derive-functions@0","node":"d56","brief":"minting publish-the-driver-outward"}
+{"ts":"2026-08-20T11:02:53.941Z","op":"update","visit":"iterations/i38/derive-functions@0","node":"d57","brief":"minting stamp-who-answered-and-where"}
+{"ts":"2026-08-20T11:03:22.421Z","op":"update","visit":"iterations/i38/derive-functions@0","node":"d58","brief":"derive-functions: five functions, three flows"}
+{"ts":"2026-08-20T11:03:36.371Z","op":"update","visit":"iterations/i38/derive-functions@0","node":"d59","brief":"derive-functions signed"}
