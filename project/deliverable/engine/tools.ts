@@ -595,7 +595,34 @@ export function buildServer(
     description:
       'NARRATE AS YOU WORK — a decision-graph op riding this call. Every lane tool takes it.\n\nWHAT TO SEND, and each op is one line:\n  - plan {items} — start the state\'s checklist. Send this BEFORE your first edit of any multi-step work.\n  - update {node, brief} — say what you are doing ON an item. The node is REQUIRED while any item stands open; with nothing open, a bare update is right.\n  - done | obsolete | revert {node, brief} — resolve a node. Everything started gets resolved. Abandoning one silently is illegal.\n  - fork {brief, items?} — an unplanned branch opens where you stand, and the current item cannot continue until it is done. Scope that merely GREW is another plan, not a fork.\n  - defer {node, to} — park a point for the state that can do it. It arrives there as an open to-do.\n\nTHE FIRST ONE IS ALWAYS A PLAN. Example: update: {op: "plan", items: ["read the record", "fill the gate", "submit"]}.\n\nTHE BRIEF IS ONE LINE, 90 characters, one thing.\n\nEvery call answers with `update_result`, carrying the open node map and any nudge. A volunteered update resets the toll; when the toll lapses, the next call must carry one.',
   };
-  for (const t of tools) (t.inputSchema.properties as Record<string, unknown>).update = UPDATE_PROP;
+  // WHICH HAND IS CALLING — req-every-call-records-the-part-its-caller-played.
+  // It rides every lane tool for the same reason `update` does: the answer is
+  // about the CALL rather than about any one verb, and a coordinate a caller
+  // can only supply on some verbs is a coordinate the log cannot be grouped by.
+  const AS_PROP = {
+    type: "string",
+    enum: ["owner", "walker", "guide", "reviewer", "surface"],
+    description:
+      "WHICH PART YOU ARE PLAYING. Omit it and the record says `walker`, which is right for the hand holding the session and making the daily calls.\n\nSAY `guide` WHEN YOU ARE THE HAND THAT WAS ASKED. A guide is delegated one step — a question, a comparison, a decision the walker will not take alone — and it says so, because a default of `guide` would let the strong hand's work hide in the weak hand's count.\n\nTHE VALUE IS RECORDED AS A CLAIM. Nothing here can check it: one dispatcher serves every agent, so the lane cannot tell two hands apart on its own.",
+  };
+  const RELAYED_BY_PROP = {
+    type: "string",
+    enum: ["owner", "walker", "guide", "reviewer", "surface"],
+    description:
+      "WHO IS FILING WORK SOMEBODY ELSE DID. Send `as` naming the AUTHOR and this naming yourself.\n\nUSE IT WHENEVER YOU CARRY A DELEGATE'S ANSWER BACK. A guide that works the lane itself needs neither key. A walker that types a guide's judgment into a form needs both, or the record says the walker decided what the guide decided.\n\nIT MAY NOT EQUAL `as`. A record where the author and the relayer agree is a contradiction rather than a redundancy, and it is refused.",
+  };
+  const ANSWERED_BY_PROP = {
+    type: "string",
+    description:
+      "WHAT MODEL ACTUALLY SERVED THIS CALL, not what was asked for — the two differ in practice and the difference is the interesting case.\n\nOMIT IT AND THE RECORD SAYS `unreported`, which is a declared absence rather than a missing field.\n\nTHE VALUE IS RECORDED AS A CLAIM. The transport hands the engine a client name and no model, so the only party who knows is the party being measured.",
+  };
+  for (const t of tools) {
+    const props = t.inputSchema.properties as Record<string, unknown>;
+    props.update = UPDATE_PROP;
+    props.as = AS_PROP;
+    props.relayed_by = RELAYED_BY_PROP;
+    props.answered_by = ANSWERED_BY_PROP;
+  }
   const server = new McpServer(
     { name: "se-mcp", version: SE_VERSION },
     tools,

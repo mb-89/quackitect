@@ -132,3 +132,36 @@ test("and an absent reason is marked rather than refused", () => {
   assert.equal((rec as unknown as Record<string, unknown>).weaker_reason, null, "a refusal here would be a different requirement");
   assert.equal((rec as unknown as Record<string, unknown>).unreasoned, true, "the mark says a reason was owed and not given");
 });
+
+// ── the declaration reaches the record ────────────────────────────────────
+//
+// The three coordinates are on the record and two of them are the CALLER'S to
+// state. A coordinate a caller has no way to send is a coordinate that is
+// always the default, and a log of defaults answers nothing.
+
+async function laneSchemas(): Promise<{ name: string; properties: Record<string, unknown> }[]> {
+  const { buildServer } = await import("../engine/tools.ts");
+  const server = buildServer(freshRoot());
+  const list = await server.handle({ jsonrpc: "2.0", id: 1, method: "tools/list" });
+  const tools = (list as { result: { tools: { name: string; inputSchema: { properties: Record<string, unknown> } }[] } }).result.tools;
+  return tools.map((t) => ({ name: t.name, properties: t.inputSchema.properties }));
+}
+
+test("every lane tool accepts the hand, the relay and the answering model", async () => {
+  const schemas = await laneSchemas();
+  assert.ok(schemas.length > 0, "the lane must offer tools for this to mean anything");
+  for (const s of schemas) {
+    for (const key of ["as", "relayed_by", "answered_by"]) {
+      assert.ok(key in s.properties, `${s.name} does not accept ${key}, so a caller cannot state it there`);
+    }
+  }
+});
+
+test("the hand vocabulary offered to a caller is the one the log enforces", async () => {
+  const offered = (await laneSchemas())[0].properties.as as { enum?: string[] };
+  assert.deepEqual(
+    [...(offered.enum ?? [])].sort(),
+    ["guide", "owner", "reviewer", "surface", "walker"],
+    "an offer wider than the check refuses honest callers; one narrower hides parts nobody can name",
+  );
+});
