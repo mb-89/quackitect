@@ -389,6 +389,81 @@ its own evidence needed correcting. Six pulls between 15 and 18 seconds are
 reopen cascades. The fabrications are not only a trust problem; they are the
 single largest wall-clock cost in the walk.
 
+
+## F16 — bind evidence to a query, and hardest where the claim is about the walk
+
+OWNER RULING, 2026-08-20, sharpening F11 and F15: bind evidence to a query,
+"especially if it is evidence about what we are doing."
+
+THAT SPLITS EVERY CLAIM IN TWO, and the halves need different checks.
+
+### Claims about the tree
+
+RE-VERIFIABLE BY ANYBODY, FOREVER. "Fifty-three rows exist." "`calllog.ts`
+ends at `actor` and `se_version`." "Nine of ten value props name one role."
+
+The artifact outlives the claim, so a reader with no context can re-run the
+check years later. This is the easy half and it is what an obvious
+evidence-binding design already covers.
+
+### Claims about what we are doing
+
+NOT RE-VERIFIABLE FROM THE TREE AT ALL.
+
+- "The standing register was re-read."
+- "All ten value props were swept."
+- "Three reviewing agents ran."
+- "The ancestor value prop is referenced from both new nodes."
+- "This figure was counted rather than eyeballed."
+
+NOTHING IN THE REPOSITORY RECORDS WHETHER ANY OF THOSE HAPPENED. The tree
+shows the result and is silent about the act.
+
+AND THIS IS WHERE THIS ITERATION'S ERRORS CLUSTERED. The costly ones were all
+process claims: a sweep asserted and never performed; a sample written in the
+voice of a sweep, twice; a count of one's own reviewers taken over the wrong
+population; an intention stated as an accomplishment.
+
+WHY THEY ARE THE DANGEROUS KIND. A false claim about the tree is falsified by
+the next reader who looks. A false claim about the ACT is falsified by nobody,
+because the only witness is a log nobody thought to consult. It reads as
+diligence and it is unfalsifiable — the worst pair available.
+
+### So the query is the call log, not a file search
+
+"I SWEPT THE REGISTER" BINDS TO THE REF OF THE SEARCH THAT SWEPT IT. "Three
+agents ran" binds to the records showing them run. "Counted, not eyeballed"
+binds to the call that did the counting.
+
+THE LOG IS ALREADY THE WITNESS. Nothing currently asks a claim to point at it,
+and every lane call already carries a ref.
+
+### And it closes on i38 rather than sitting beside it
+
+THIS ITERATION IS MAKING THE CALL LOG ATTRIBUTABLE — which model answered,
+which state the call was made in. THE SAME RECORD IS WHAT A PROCESS CLAIM WOULD
+HAVE TO CITE.
+
+An attributable log is not only for routing cheaper models. It is the substrate
+that makes a claim about the walk checkable at all, and that is a second reason
+to want both coordinates that the goals never stated.
+
+### One narrowing the third mechanism forces
+
+A TRUNCATING COUNT RE-RUNS TO THE SAME WRONG ANSWER, so binding it to its query
+proves nothing. Where the corpus already holds an authoritative figure, the
+binding must COMPARE against it rather than merely re-execute.
+
+CHEAP, AND THE CASE IN POINT: the row count was already on this iteration's own
+kickoff form when a later state wrote a different one.
+
+### What it still does not fix
+
+WRONG INFERENCE FROM SOUND EVIDENCE. A process claim bound to a real log record
+can still be read past what it supports, exactly as the `group_by` measurement
+was. That class needs a negative control or a reader with no shared context, and
+no binding reaches it.
+
 ## Leads for whoever opens an engine iteration
 
 Collected here because none of them is i38's work and none would survive the

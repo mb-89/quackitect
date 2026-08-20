@@ -190,3 +190,5 @@
 {"ts":"2026-08-20T11:13:46.066Z","op":"update","visit":"iterations/i38/gate-requirements@0","node":"d78","brief":"reading the requirements gate form"}
 {"ts":"2026-08-20T11:14:45.937Z","op":"plan","visit":"iterations/i38/gate-requirements@0","parent":"d48","nodes":[{"id":"d79","brief":"gate acceptance items"},{"id":"d80","brief":"rounds 0 and 1"},{"id":"d81","brief":"goals and bound"}]}
 {"ts":"2026-08-20T11:15:11.665Z","op":"update","visit":"iterations/i38/gate-requirements@0","node":"d82","brief":"field report takes the three-mechanisms finding"}
+{"ts":"2026-08-20T11:18:01.484Z","op":"update","visit":"iterations/i38/gate-requirements@0","node":"d83","brief":"recording the owner sharpening on process claims"}
+{"ts":"2026-08-20T11:18:29.192Z","op":"update","visit":"iterations/i38/gate-requirements@0","node":"d84","brief":"field report takes the process-claim distinction"}
