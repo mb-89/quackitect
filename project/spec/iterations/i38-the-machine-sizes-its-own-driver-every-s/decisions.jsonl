@@ -203,3 +203,7 @@
 {"ts":"2026-08-20T11:21:08.586Z","op":"done","visit":"iterations/i38/gate-requirements@0","node":"d87","brief":"verdict and follow-up written"}
 {"ts":"2026-08-20T11:21:10.346Z","op":"update","visit":"iterations/i38/gate-requirements@0","node":"d90","brief":"holding the submit for the M3 adversarial pass"}
 {"ts":"2026-08-20T11:21:50.337Z","op":"done","visit":"iterations/i38/write-requirements@0","node":"d48","brief":"requirements gate blessed; a bless does not outlive its evidence"}
+{"ts":"2026-08-20T11:22:21.526Z","op":"plan","visit":"iterations/i38/derive-criteria@0","parent":null,"nodes":[{"id":"d91","brief":"derive the criteria"},{"id":"d92","brief":"partition the functions"},{"id":"d93","brief":"enumerate the space"},{"id":"d94","brief":"run candidates"},{"id":"d95","brief":"cut criteria"},{"id":"d96","brief":"evaluate the set"},{"id":"d97","brief":"gate design"}]}
+{"ts":"2026-08-20T11:24:47.984Z","op":"update","visit":"iterations/i38/derive-criteria@0","node":"d98","brief":"criterion minted; re-reading the drawn cards"}
+{"ts":"2026-08-20T11:25:10.940Z","op":"update","visit":"iterations/i38/derive-criteria@0","node":"d99","brief":"criteria: standing set reused, one axis added"}
+{"ts":"2026-08-20T11:26:00.967Z","op":"update","visit":"iterations/i38/derive-criteria@0","node":"d100","brief":"compare cards rendered from the nodes"}
