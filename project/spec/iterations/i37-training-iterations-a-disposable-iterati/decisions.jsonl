@@ -793,3 +793,140 @@
 {"ts":"2026-08-20T08:45:26.104Z","op":"update","visit":"iterations/i37/run-spikes/end@0","node":"d30","brief":"popping out to the reopened placeholder"}
 {"ts":"2026-08-20T08:46:06.612Z","op":"update","visit":"iterations/i37/run-spikes/end@0","node":"d31","brief":"submitting the end form the sub-machine owes"}
 {"ts":"2026-08-20T08:52:33.045Z","op":"update","visit":"iterations/i37/run-spikes/end@0","node":"d32","brief":"moving the reasoning out of the engine comments into the design spec"}
+{"ts":"2026-08-20T09:08:50.201Z","op":"done","visit":"front_desk@1","node":"d34","brief":"engine fix pushed"}
+{"ts":"2026-08-20T09:08:51.283Z","op":"done","visit":"front_desk@1","node":"d35","brief":"1518 of 1518 pass"}
+{"ts":"2026-08-20T09:08:52.352Z","op":"done","visit":"front_desk@1","node":"d36","brief":"walk reached gate-prototype"}
+{"ts":"2026-08-20T09:12:56.820Z","op":"update","visit":"iterations/i37/gate-prototype@0","node":"d37","brief":"authoring gate-prototype, the M6 gate"}
+{"ts":"2026-08-20T09:15:10.879Z","op":"update","visit":"iterations/i37/gate-prototype@0","node":"d38","brief":"minting the assumptions the red-team round found"}
+{"ts":"2026-08-20T09:15:11.061Z","op":"update","visit":"iterations/i37/gate-prototype@0","node":"d39","brief":"minting the assumptions the red-team round found"}
+{"ts":"2026-08-20T09:15:11.215Z","op":"update","visit":"iterations/i37/gate-prototype@0","node":"d40","brief":"minting the assumptions the red-team round found"}
+{"ts":"2026-08-20T09:16:27.321Z","op":"update","visit":"iterations/i37/gate-prototype@0","node":"d41","brief":"gate-prototype, reformatted to the field templates"}
+{"ts":"2026-08-20T09:16:39.123Z","op":"update","visit":"iterations/i37/gate-prototype@0","node":"d42","brief":"the assumption template names the probe heading"}
+{"ts":"2026-08-20T09:16:44.835Z","op":"update","visit":"iterations/i37/gate-prototype@0","node":"d43","brief":"the assumption template names the probe heading"}
+{"ts":"2026-08-20T09:16:51.726Z","op":"update","visit":"iterations/i37/gate-prototype@0","node":"d44","brief":"the assumption template names the probe heading"}
+{"ts":"2026-08-20T09:16:58.245Z","op":"update","visit":"iterations/i37/gate-prototype@0","node":"d45","brief":"the assumption template names the probe heading"}
+{"ts":"2026-08-20T09:17:04.030Z","op":"update","visit":"iterations/i37/gate-prototype@0","node":"d46","brief":"gate-prototype, reformatted to the field templates"}
+{"ts":"2026-08-20T09:17:24.538Z","op":"update","visit":"iterations/i37/gate-prototype@0","node":"d47","brief":"checking trunk before author-tests"}
+{"ts":"2026-08-20T09:17:31.166Z","op":"update","visit":"iterations/i37/gate-prototype@0","node":"d48","brief":"checking trunk before author-tests"}
+{"ts":"2026-08-20T09:17:38.522Z","op":"update","visit":"iterations/i37/gate-prototype@0","node":"d49","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T09:17:50.724Z","op":"update","visit":"iterations/i37/cut-criteria@2","node":"d50","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T09:17:51.472Z","op":"update","visit":"iterations/i37/cut-criteria@2","node":"d51","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T09:18:14.660Z","op":"update","visit":"iterations/i37/cut-criteria@2","node":"d52","brief":"aiming at the ship state, which is the iterations one target"}
+{"ts":"2026-08-20T09:18:21.430Z","op":"update","visit":"iterations/i37/cut-criteria@2","node":"d53","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T09:18:36.065Z","op":"update","visit":"iterations/i37/gate-prototype@0","node":"d54","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T09:18:43.388Z","op":"update","visit":"iterations/i37/gate-prototype@0","node":"d55","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T09:18:44.095Z","op":"update","visit":"iterations/i37/gate-prototype@0","node":"d56","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T09:18:44.780Z","op":"update","visit":"iterations/i37/gate-prototype@0","node":"d57","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T09:18:45.506Z","op":"update","visit":"iterations/i37/gate-prototype@0","node":"d58","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T09:18:46.157Z","op":"update","visit":"iterations/i37/gate-prototype@0","node":"d59","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T09:18:46.788Z","op":"update","visit":"iterations/i37/gate-prototype@0","node":"d60","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T09:18:47.474Z","op":"update","visit":"iterations/i37/gate-prototype@0","node":"d61","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T09:18:48.115Z","op":"update","visit":"iterations/i37/gate-prototype@0","node":"d62","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T09:18:48.785Z","op":"update","visit":"iterations/i37/gate-prototype@0","node":"d63","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T09:18:49.442Z","op":"update","visit":"iterations/i37/gate-prototype@0","node":"d64","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T09:18:50.092Z","op":"update","visit":"iterations/i37/gate-prototype@0","node":"d65","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T09:18:50.756Z","op":"update","visit":"iterations/i37/gate-prototype@0","node":"d66","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T09:18:57.881Z","op":"update","visit":"iterations/i37/gate-prototype@0","node":"d67","brief":"reading what the gate still asks"}
+{"ts":"2026-08-20T09:19:03.996Z","op":"update","visit":"iterations/i37/gate-prototype@0","node":"d68","brief":"reading the stopped step"}
+{"ts":"2026-08-20T09:22:18.392Z","op":"update","visit":"iterations/i37/gate-prototype@0","node":"d69","brief":"probing the two crippling assumptions that hold the gate"}
+{"ts":"2026-08-20T09:22:40.039Z","op":"update","visit":"iterations/i37/gate-prototype@0","node":"d70","brief":"deferring the started-commit assumption with its until"}
+{"ts":"2026-08-20T09:22:45.547Z","op":"update","visit":"iterations/i37/gate-prototype@0","node":"d71","brief":"gate-prototype, reformatted to the field templates"}
+{"ts":"2026-08-20T09:22:52.784Z","op":"update","visit":"iterations/i37/gate-prototype@0","node":"d72","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T09:22:53.774Z","op":"update","visit":"iterations/i37/author-tests@0","node":"d73","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T09:22:55.687Z","op":"update","visit":"iterations/i37/author-tests@0","node":"d74","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T09:23:06.200Z","op":"update","visit":"iterations/i37/author-tests@0","node":"d75","brief":"checking trunk before author-tests, as the owner asked"}
+{"ts":"2026-08-20T09:23:38.615Z","op":"update","visit":"iterations/i37/author-tests@0","node":"d76","brief":"recording where the trunk merge lands and why"}
+{"ts":"2026-08-20T09:23:46.241Z","op":"update","visit":"iterations/i37/author-tests@0","node":"d77","brief":"reading what author-tests asks"}
+{"ts":"2026-08-20T09:23:57.808Z","op":"update","visit":"iterations/i37/author-tests@0","node":"d78","brief":"reading the prefilled checks register"}
+{"ts":"2026-08-20T09:25:59.260Z","op":"update","visit":"iterations/i37/author-tests@0","node":"d79","brief":"the demonstration template wants a Procedure and a files key"}
+{"ts":"2026-08-20T09:25:59.553Z","op":"update","visit":"iterations/i37/author-tests@0","node":"d80","brief":"the demonstration template wants a Procedure and a files key"}
+{"ts":"2026-08-20T09:25:59.833Z","op":"update","visit":"iterations/i37/author-tests@0","node":"d81","brief":"the demonstration template wants a Procedure and a files key"}
+{"ts":"2026-08-20T09:27:00.429Z","op":"update","visit":"iterations/i37/author-tests@0","node":"d82","brief":"authoring i37 test specs, test-first before the build"}
+{"ts":"2026-08-20T09:27:00.591Z","op":"update","visit":"iterations/i37/author-tests@0","node":"d83","brief":"authoring i37 test specs, test-first before the build"}
+{"ts":"2026-08-20T09:27:00.739Z","op":"update","visit":"iterations/i37/author-tests@0","node":"d84","brief":"authoring i37 test specs, test-first before the build"}
+{"ts":"2026-08-20T09:27:00.902Z","op":"update","visit":"iterations/i37/author-tests@0","node":"d85","brief":"authoring i37 test specs, test-first before the build"}
+{"ts":"2026-08-20T09:27:29.081Z","op":"update","visit":"iterations/i37/author-tests@0","node":"d86","brief":"author-tests: four specs minted, three fixed"}
+{"ts":"2026-08-20T09:27:38.200Z","op":"update","visit":"iterations/i37/author-tests@0","node":"d87","brief":"re-reading the checks table to carry it back"}
+{"ts":"2026-08-20T09:27:48.886Z","op":"update","visit":"iterations/i37/author-tests@0","node":"d88","brief":"submitting author-tests"}
+{"ts":"2026-08-20T09:28:06.429Z","op":"update","visit":"iterations/i37/author-tests@0","node":"d89","brief":"carrying the rendered checks table into the form"}
+{"ts":"2026-08-20T09:28:08.600Z","op":"update","visit":"iterations/i37/author-tests@0","node":"d90","brief":"submitting author-tests with the register carried"}
+{"ts":"2026-08-20T09:28:17.833Z","op":"update","visit":"iterations/i37/author-tests@0","node":"d91","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T09:28:19.033Z","op":"update","visit":"iterations/i37/specify-build@0","node":"d92","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T09:28:20.624Z","op":"update","visit":"iterations/i37/specify-build@0","node":"d93","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T09:28:28.330Z","op":"update","visit":"iterations/i37/specify-build@0","node":"d94","brief":"reading the specify-build form"}
+{"ts":"2026-08-20T09:28:35.941Z","op":"update","visit":"iterations/i37/specify-build@0","node":"d95","brief":"reading the promotions and design-spec tables"}
+{"ts":"2026-08-20T09:28:52.336Z","op":"update","visit":"iterations/i37/specify-build@0","node":"d96","brief":"checking element coverage in the design-spec register"}
+{"ts":"2026-08-20T09:30:51.558Z","op":"update","visit":"iterations/i37/specify-build@0","node":"d97","brief":"design specs for the three benchmark elements"}
+{"ts":"2026-08-20T09:30:51.718Z","op":"update","visit":"iterations/i37/specify-build@0","node":"d98","brief":"design specs for the three benchmark elements"}
+{"ts":"2026-08-20T09:30:51.877Z","op":"update","visit":"iterations/i37/specify-build@0","node":"d99","brief":"design specs for the three benchmark elements"}
+{"ts":"2026-08-20T09:31:11.892Z","op":"update","visit":"iterations/i37/specify-build@0","node":"d100","brief":"seeding the chunk machine now that the build is known"}
+{"ts":"2026-08-20T09:31:12.181Z","op":"update","visit":"iterations/i37/specify-build@0","node":"d101","brief":"assigning each promoted spike to the chunk it enters as"}
+{"ts":"2026-08-20T09:31:12.477Z","op":"update","visit":"iterations/i37/specify-build@0","node":"d102","brief":"assigning each promoted spike to the chunk it enters as"}
+{"ts":"2026-08-20T09:31:12.778Z","op":"update","visit":"iterations/i37/specify-build@0","node":"d103","brief":"assigning each promoted spike to the chunk it enters as"}
+{"ts":"2026-08-20T09:31:20.018Z","op":"update","visit":"iterations/i37/specify-build@0","node":"d104","brief":"seeding the chunk machine now that the build is known"}
+{"ts":"2026-08-20T09:31:44.672Z","op":"update","visit":"iterations/i37/specify-build@0","node":"d105","brief":"carrying the two registers into the form"}
+{"ts":"2026-08-20T09:31:46.158Z","op":"update","visit":"iterations/i37/specify-build@0","node":"d106","brief":"specify-build: three design specs, five chunks"}
+{"ts":"2026-08-20T09:31:54.176Z","op":"update","visit":"iterations/i37/specify-build@0","node":"d107","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T09:31:54.704Z","op":"update","visit":"iterations/i37/specify-build@0","node":"d108","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T09:31:55.271Z","op":"update","visit":"iterations/i37/specify-build@0","node":"d109","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T09:31:55.813Z","op":"update","visit":"iterations/i37/specify-build@0","node":"d110","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T09:31:56.351Z","op":"update","visit":"iterations/i37/specify-build@0","node":"d111","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T09:31:56.936Z","op":"update","visit":"iterations/i37/specify-build@0","node":"d112","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T09:31:57.499Z","op":"update","visit":"iterations/i37/specify-build@0","node":"d113","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T09:31:58.002Z","op":"update","visit":"iterations/i37/specify-build@0","node":"d114","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T09:31:58.498Z","op":"update","visit":"iterations/i37/specify-build@0","node":"d115","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T09:31:59.028Z","op":"update","visit":"iterations/i37/specify-build@0","node":"d116","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T09:31:59.491Z","op":"update","visit":"iterations/i37/specify-build@0","node":"d117","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T09:31:59.948Z","op":"update","visit":"iterations/i37/specify-build@0","node":"d118","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T09:32:00.405Z","op":"update","visit":"iterations/i37/specify-build@0","node":"d119","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T09:32:00.864Z","op":"update","visit":"iterations/i37/specify-build@0","node":"d120","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T09:32:01.349Z","op":"update","visit":"iterations/i37/specify-build@0","node":"d121","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T09:32:01.865Z","op":"update","visit":"iterations/i37/specify-build@0","node":"d122","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T09:32:08.029Z","op":"update","visit":"iterations/i37/specify-build@0","node":"d123","brief":"reading the stopped step at specify-build"}
+{"ts":"2026-08-20T09:33:32.121Z","op":"update","visit":"iterations/i37/specify-build@0","node":"d124","brief":"every crossing named by a design spec that actually carries it"}
+{"ts":"2026-08-20T09:33:32.424Z","op":"update","visit":"iterations/i37/specify-build@0","node":"d125","brief":"every crossing named by a design spec that actually carries it"}
+{"ts":"2026-08-20T09:33:32.723Z","op":"update","visit":"iterations/i37/specify-build@0","node":"d126","brief":"every crossing named by a design spec that actually carries it"}
+{"ts":"2026-08-20T09:33:33.497Z","op":"update","visit":"iterations/i37/specify-build@0","node":"d127","brief":"every crossing named by a design spec that actually carries it"}
+{"ts":"2026-08-20T09:35:58.546Z","op":"update","visit":"iterations/i37/specify-build@0","node":"d128","brief":"exporting the coverage half so the battery can sweep the real corpus"}
+{"ts":"2026-08-20T09:36:22.791Z","op":"update","visit":"iterations/i37/specify-build@0","node":"d129","brief":"a sweep so an uncovered crossing fails where it was minted"}
+{"ts":"2026-08-20T09:36:47.339Z","op":"update","visit":"iterations/i37/specify-build@0","node":"d130","brief":"recording why a corpus-wide law needs a sweep"}
+{"ts":"2026-08-20T09:37:19.812Z","op":"update","visit":"iterations/i37/specify-build@0","node":"d131","brief":"recording how interfaces shipped with no design spec"}
+{"ts":"2026-08-20T09:37:39.437Z","op":"update","visit":"iterations/i37/specify-build@0","node":"d132","brief":"recording how uncovered interfaces shipped, and the sweep that stops it"}
+{"ts":"2026-08-20T09:37:48.504Z","op":"update","visit":"iterations/i37/specify-build@0","node":"d133","brief":"carrying the two registers into the form"}
+{"ts":"2026-08-20T09:37:49.962Z","op":"update","visit":"iterations/i37/observe-red@0","node":"d134","brief":"specify-build: three design specs, five chunks"}
+{"ts":"2026-08-20T09:37:50.384Z","op":"update","visit":"iterations/i37/observe-red@0","node":"d135","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T09:37:51.324Z","op":"update","visit":"iterations/i37/observe-red@0","node":"d136","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T09:38:10.413Z","op":"update","visit":"iterations/i37/observe-red@0","node":"d137","brief":"reading what observe-red asks"}
+{"ts":"2026-08-20T09:39:18.337Z","op":"update","visit":"iterations/i37/observe-red@0","node":"d138","brief":"stubs so the new checks fail on their expectation, not on an import"}
+{"ts":"2026-08-20T09:39:18.621Z","op":"update","visit":"iterations/i37/observe-red@0","node":"d139","brief":"stubs so the new checks fail on their expectation, not on an import"}
+{"ts":"2026-08-20T09:39:18.880Z","op":"update","visit":"iterations/i37/observe-red@0","node":"d140","brief":"stubs so the new checks fail on their expectation, not on an import"}
+{"ts":"2026-08-20T09:39:53.628Z","op":"update","visit":"iterations/i37/observe-red@0","node":"d141","brief":"the new checks, written to fail before the build"}
+{"ts":"2026-08-20T09:40:02.108Z","op":"update","visit":"iterations/i37/observe-red@0","node":"d142","brief":"observing the red before the build"}
+{"ts":"2026-08-20T09:40:16.509Z","op":"update","visit":"iterations/i37/observe-red@0","node":"d143","brief":"observing the red before the build"}
+{"ts":"2026-08-20T09:40:32.750Z","op":"update","visit":"iterations/i37/observe-red@0","node":"d144","brief":"reading the red_observed checklist items"}
+{"ts":"2026-08-20T09:41:08.451Z","op":"update","visit":"iterations/i37/observe-red@0","node":"d145","brief":"observe-red: 19 of 22 fail, every one an assertion"}
+{"ts":"2026-08-20T09:42:45.662Z","op":"update","visit":"iterations/i37/observe-red@0","node":"d146","brief":"a checklist over the whole corpus asks for a lie"}
+{"ts":"2026-08-20T09:42:52.582Z","op":"update","visit":"iterations/i37/observe-red@0","node":"d147","brief":"typechecking the claim-specs scoping"}
+{"ts":"2026-08-20T09:43:00.215Z","op":"update","visit":"iterations/i37/observe-red@0","node":"d148","brief":"typechecking the claim-specs scoping"}
+{"ts":"2026-08-20T09:43:39.456Z","op":"update","visit":"iterations/i37/observe-red@0","node":"d149","brief":"recording why a checklist is scoped to its record"}
+{"ts":"2026-08-20T09:43:39.640Z","op":"update","visit":"iterations/i37/observe-red@0","node":"d150","brief":"pinning the checklist scoping so an edit cannot restore it"}
+{"ts":"2026-08-20T09:43:46.944Z","op":"update","visit":"iterations/i37/observe-red@0","node":"d151","brief":"checking the two new sweeps and the precedent they mirror"}
+{"ts":"2026-08-20T09:43:53.488Z","op":"update","visit":"iterations/i37/observe-red@0","node":"d152","brief":"checking the new sweeps"}
+{"ts":"2026-08-20T09:44:04.641Z","op":"update","visit":"iterations/i37/observe-red@0","node":"d153","brief":"re-reading the checklist after scoping it"}
+{"ts":"2026-08-20T09:44:30.312Z","op":"update","visit":"iterations/i37/observe-red@0","node":"d154","brief":"reloading so the engine picks up the scoped checklist"}
+{"ts":"2026-08-20T09:44:53.530Z","op":"update","visit":"iterations/i37/observe-red@0","node":"d155","brief":"the class is not the instance, so the entry stays open"}
+{"ts":"2026-08-20T09:45:11.059Z","op":"update","visit":"iterations/i37/observe-red@0","node":"d156","brief":"the class is not the instance, so the entry stays open"}
+{"ts":"2026-08-20T09:45:38.863Z","op":"update","visit":"iterations/i37/observe-red@0","node":"d157","brief":"building the checklist from the items the form names"}
+{"ts":"2026-08-20T09:45:39.864Z","op":"update","visit":"iterations/i37/observe-red@0","node":"d158","brief":"observe-red: one observed, twenty owed against an open entry"}
+{"ts":"2026-08-20T09:45:54.422Z","op":"update","visit":"iterations/i37/observe-red@0","node":"d159","brief":"building the checklist from the items the form names"}
+{"ts":"2026-08-20T09:45:55.892Z","op":"update","visit":"iterations/i37/observe-red@0","node":"d160","brief":"observe-red: one observed, twenty owed against an open entry"}
+{"ts":"2026-08-20T09:46:18.105Z","op":"update","visit":"iterations/i37/observe-red@0","node":"d161","brief":"observe-red: one observed, twenty owed against an open entry"}
+{"ts":"2026-08-20T09:46:27.573Z","op":"update","visit":"iterations/i37/observe-red@0","node":"d162","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T09:46:30.633Z","op":"update","visit":"iterations/i37/build-steps/derive-what-the-walk-cost@0","node":"d163","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T09:46:30.994Z","op":"update","visit":"iterations/i37/build-steps/derive-what-the-walk-cost@0","node":"d164","brief":"walking the re-signed chain forward"}
+{"ts":"2026-08-20T09:46:39.261Z","op":"update","visit":"iterations/i37/build-steps/derive-what-the-walk-cost@0","node":"d165","brief":"merging trunk before the build, as the owner asked"}
+{"ts":"2026-08-20T09:46:50.950Z","op":"update","visit":"iterations/i37/build-steps/derive-what-the-walk-cost@0","node":"d166","brief":"merging trunk into the i37 branch"}
+{"ts":"2026-08-20T09:46:58.183Z","op":"update","visit":"iterations/i37/build-steps/derive-what-the-walk-cost@0","node":"d167","brief":"committing M7 work before the merge"}
+{"ts":"2026-08-20T09:47:08.731Z","op":"update","visit":"iterations/i37/build-steps/derive-what-the-walk-cost@0","node":"d168","brief":"reading what biome refuses"}
+{"ts":"2026-08-20T09:47:22.547Z","op":"update","visit":"iterations/i37/build-steps/derive-what-the-walk-cost@0","node":"d169","brief":"the cycling goal had no case, so it gets one"}
+{"ts":"2026-08-20T09:47:30.323Z","op":"update","visit":"iterations/i37/build-steps/derive-what-the-walk-cost@0","node":"d170","brief":"re-checking lint before the commit"}

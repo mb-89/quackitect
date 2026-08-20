@@ -1,7 +1,8 @@
 ---
 form: fold-back
+reopened: "2026-08-20T09:07:09.195Z — a feeder re-signed above it"
 by: agent
-signed_off: 2026-08-19T19:55:44.797Z
+signed_off: 2026-08-20T09:07:13.207Z
 authors: agent
 files:
 ---

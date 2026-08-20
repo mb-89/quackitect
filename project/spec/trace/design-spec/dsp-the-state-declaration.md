@@ -5,6 +5,12 @@ type: "[[design-spec]]"
 statement: One declaration says what the machine-state folder is called and which files inside it have a structured door, and every consumer is generated from it rather than written beside it.
 realizes:
   - el-state-declaration
+  - if-project-producer-to-state-declaration
+  - if-record-store-to-state-declaration
+  - if-state-declaration-to-account
+  - if-state-declaration-to-engine-delta
+  - if-state-declaration-to-method-compiler
+  - if-walk-engine-to-state-declaration
 files:
   - project/deliverable/engine/statedecl.ts
   - project/deliverable/engine/paths.ts

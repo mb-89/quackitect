@@ -16,6 +16,7 @@ source_refs:
   - el-benchmark-report
   - if-benchmark-binding-to-report
   - req-a-benchmark-report-carries-the-conditions-of-its-run
+chunk: derive-what-the-walk-cost
 ---
 
 ## The run

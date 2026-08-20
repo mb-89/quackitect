@@ -7,6 +7,8 @@ method: "demonstration"
 demonstrates:
   - "sty-run-deep-research-across-harnesses"
 verifies: "none — demonstrates: carries the edge; the harness-contract requirements behind this story are verify_method: test and are carried by tsp-supported-harness-serves-one-lane-contract"
+files:
+  - "none — a demonstration judged on the reference document and register entries a real run left behind"
 ---
 
 ## Scope
@@ -36,7 +38,7 @@ DEPTH: medium. A weak run is visible immediately — the report is thin or the
 gaps are missing. The subtle failure is a confident report with no ledger,
 which is exactly what the steps below check for.
 
-## Steps
+## Procedure
 
 - Confirm the workflow read is the project's own projected copy.
 - Confirm every query appears in the call log.

@@ -3,10 +3,10 @@ minted_in: i37-training-iterations-a-disposable-iterati
 id: raid-iss-a-placeholder-that-runs-a-sub-machine-can-never-be-re-signed
 type: "[[raid]]"
 kind: issue
-statement: "A refusal names the wrong remedy: reopening a placeholder from inside the sub-machine that shares its name refuses, and the refusal points at se_pull instead of at the machine argument that actually resolves it."
+statement: "A reopened placeholder could not be re-signed — the walk popped past it and no verb could serve its form — and the refusal that showed it named the wrong remedy, pointing at se_pull instead of at se_reopen's machine argument. The walk defect is fixed; the remedy-naming one is not."
 owner: the owner
 trigger: any reopen upstream of run-spikes, build-steps, run-candidates, enumerate-space or run-demos
-status: open
+status: mitigated
 impact: "The walk appears permanently pinned to an agent following the refusals. This one cost a full unattended run: the agent tried six remedies, reported a fatal blocker, and stopped one state short of a gate."
 breaks_how_badly: corrosive
 how_likely: expected
@@ -135,3 +135,65 @@ NOTHING IS UNREACHABLE. The walk was never actually stuck, so no iteration is
 blocked and no data is at risk. What it destroys is an agent's afternoon, and
 it does it silently, which is exactly the shape this iteration exists to
 measure.
+
+## CORRECTED AGAIN 2026-08-20 — there were TWO defects, and the second one was real
+
+THE SECTION ABOVE IS HALF RIGHT. `machine: "i37"` does reopen the placeholder,
+so the FIRST diagnosis — unaddressable state — was wrong and the remedy-naming
+defect it found is real and still open.
+
+BUT THE WALK STAYED PINNED AFTER THE REOPEN. Reopening `run-spikes` moved the
+claim into the owed shape and the walk still could not complete it, answering
+at `iterations/i37/run-spikes/end` with an `unsubmitted` blocker and no verb
+that could serve the form.
+
+THREE MECHANISMS DISAGREED ABOUT WHETHER A PLACEHOLDER WAS GREEN.
+
+- `recordDone` greened it as soon as its sub-machine's DRAWING was done,
+  whatever its own signature said.
+- The claim guard in `completeGuarded` asked whether its own claim STOOD, and
+  a reopen makes it not stand.
+- The pop out of a sub-machine landed on the parent's SUCCESSORS, so the parent
+  itself had no landing site.
+
+THE THREE MADE A CIRCLE. The parent could only go green once the drawing
+finished, and the drawing could not finish because the parent was not green.
+This is the "fallback, when nothing nameable holds the claim" branch the
+section above correctly identified — it was reached for a reason that section
+did not find.
+
+## The fix, shipped
+
+`placeholderOwesItsOwnClaim` in `engine/session.ts` is now asked by three
+paths: the router lands ON a reopened placeholder rather than diving past it,
+the aim resolves to it, and the pop out of its sub-machine stands the walk on
+it WITHOUT completing it, so its form is served and the re-sign is what lets
+the next tick complete.
+
+The narrowing to the REOPENED case only is deliberate: treating a merely stale
+placeholder the same way was tried and left the walk standing on the
+placeholder with the sub-machine unfinished and no drawn path back in. The
+reasoning is at `dsp-walk-machine.md#a-reopened-placeholder-is-walked-to-not-through`.
+
+MEASURED: `run-spikes` re-signed, `fold-back` signed, and the walk reached
+`gate-prototype` on the first drive after the fix. 1518 of 1518 tests pass.
+
+## What is still open
+
+TWO THINGS, both smaller than what was fixed.
+
+- THE REMEDY-NAMING DEFECT. `stateFormState` still says `se_pull` where it
+  should say `se_reopen {state, machine}`. The fix is drawn in the section
+  above and is not this iteration's work.
+- A FALSE `unsubmitted` BLOCKER. `engine/sessionclaims.ts` guards on
+  `here.evidence_form.length > 0` where it means `owesASignature`, so a
+  formless `end` state reports as unsubmitted. It is a wrong word rather than
+  a wrong walk, and it is what made the pin above read as unfixable.
+
+## Grade, after the second correction
+
+STAYS CORROSIVE, and the reason changed. It is no longer "an agent's afternoon"
+alone: a real engine defect sat underneath a wrong diagnosis, and the wrong
+diagnosis is what stopped the looking. The cost of the pair, measured: one
+stopped unattended run, one register entry graded fatal in error, and one field
+report written around a blocker that had a fix.

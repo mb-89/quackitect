@@ -17,6 +17,7 @@ source_refs:
   - el-benchmark-binding
   - raid-dec-a-benchmark-rewinds-content-and-never-the-machine
   - exp-can-the-lane-read-from-a-history-that-ends-at-the-rewind-point
+chunk: stand-the-rewound-tree
 ---
 
 ## The run

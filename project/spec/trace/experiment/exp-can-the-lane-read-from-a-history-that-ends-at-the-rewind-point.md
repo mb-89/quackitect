@@ -17,6 +17,7 @@ source_refs:
   - cand-the-guarded-run
   - cand-the-refusing-run-with-recorded-conditions
   - raid-dec-the-ceiling-is-an-ancestry-test-not-a-path-mask
+chunk: stand-the-rewound-tree
 ---
 
 ## The run

@@ -312,3 +312,57 @@ The riskiest assumptions are validated — gate-prototype's law (owner
  ruling 2026-08-10). An assumption in the worst two damage grades must
  carry a probe result, a conscious acceptance, or a deferral WITH its
  until — a deferral without one is a silent pass wearing a status.
+
+
+## The law is swept, not only triggered
+
+THE DESIGN-COVERAGE LAW IS CORPUS-WIDE IN SCOPE AND WAS STATE-LOCAL IN TRIGGER,
+and that pair is what let interfaces ship with no design spec.
+
+WHAT IT READS. Every element and every interface in the trace, against every
+design spec's `realizes:`. Nothing about that is scoped to one iteration.
+
+WHAT USED TO FIRE IT. One line in `stateform-problems.ts`:
+
+    if (s.id.endsWith("specify-build")) out.push(...specifyBuildLawProblems(...))
+
+and the same coverage half again at trace-design. Nowhere else.
+
+## What that combination costs
+
+THE LAW LANDED AS A RULING AND NOTHING SWEPT WHAT CAME BEFORE IT. Every element
+and interface already in the corpus on that day became debt that nobody was
+billed for.
+
+THE BILL ARRIVES ON A STRANGER. It lands on whichever iteration next stands on
+a specify-build state, as a wall of ids that iteration did not mint. Measured on
+i37: fourteen crossings named at once, and NINE OF THEM WERE MINTED IN i9 —
+an iteration that shipped before the law existed.
+
+THE BATTERY DID NOT CATCH IT, AND THIS IS THE PART WORTH REMEMBERING. Eleven
+test cases exercise this law. Every one of them mints a fresh synthetic root.
+So the battery proved the law WORKED and never once asked whether the real
+corpus PASSED it.
+
+A LAW TESTED ONLY AGAINST FIXTURES IS A LAW ABOUT FIXTURES. The logic was
+green the whole time the corpus was in breach.
+
+## The sweep
+
+`tests/design-coverage-sweep.test.ts` runs `designCoverageProblems` over the
+REAL trace, at `project/spec/trace`, and demands an empty list.
+
+WHAT CHANGES. An uncovered crossing now fails the battery on the day it is
+minted, in the iteration that minted it, where the person who drew it still
+knows which design carries it. It no longer waits for a walk to stand on one
+particular state.
+
+WHY A TEST AND NOT ANOTHER STATE CHECK. Adding a second state would move the
+trigger without removing the shape — corpus-wide debt surfacing on whoever
+happens to walk there. The battery runs on every change, which is the only
+cadence that matches a law about the whole corpus.
+
+THIS IS THE SECOND TIME ONE SHAPE HAS BILLED i37. The register's exit condition
+made this iteration grade seventeen entries it did not write, recorded as
+note-83835912bf27. Same mechanism: a corpus-wide condition with a state-local
+trigger and no sweep.

@@ -7,6 +7,8 @@ method: "demonstration"
 demonstrates:
   - "sty-turn-a-failed-call-into-improvement-work"
 verifies: "none — demonstrates: carries the edge; req-repeated-failure-shape-becomes-durable-work is verify_method: test and is carried by tsp-repeated-failure-shape-becomes-durable-work"
+files:
+  - "none — a demonstration over a live walk; the trail is the call log, the register and the iteration evidence, and no file carries it"
 ---
 
 ## Scope
@@ -32,7 +34,7 @@ the durable work, and the iteration evidence holds the trail between them.
 DEPTH: medium. The recovery half fails loudly. The derivation half fails
 silently, which is why the steps below ask who performed each one.
 
-## Steps
+## Procedure
 
 - A refused call carries an executable remedy and is recovered in one turn.
 - A shape seen once produces no durable work.

@@ -527,7 +527,7 @@ function resolveSource(i: string, root: string, traceRoot: string, instanceRaw?:
   const catalog = CATALOG_SOURCES[i];
   if (catalog !== undefined) return catalogItems(root, catalog);
   if (i === "$promotions") return promotionItems(traceRoot, evidenceDir);
-  if (i === "$claim-specs") return claimSpecItems(traceRoot);
+  if (i === "$claim-specs") return claimSpecItems(traceRoot, evidenceDir);
   if (i === "$must-stories") return mustStoryItems(traceRoot);
   if (i === "$candidates") return candidateItems(traceRoot);
   if (i === "$triz_parameters") return trizParameterItems(root);
@@ -974,11 +974,16 @@ export function candidateItems(traceRoot: string): string[] {
 }
 
 /** $claim-specs, resolved live: the specs no run can prove — every
- *  method but test. Verification observes these green by fresh eyes. */
-function claimSpecItems(traceRoot: string): string[] {
+ *  method but test. Verification observes these green by fresh eyes.
+ *
+ *  SCOPED TO THE RECORD, exactly like $promotions one function below.
+ *  see dsp-evidence-forms.md#a-checklist-over-the-whole-corpus-asks-for-a-lie */
+function claimSpecItems(traceRoot: string, evidenceDir?: string): string[] {
+  const owner = evidenceDir === undefined ? basename(traceRoot) : basename(dirname(evidenceDir));
   return (
     traceFolder(traceRoot, "test-spec")
       .filter((n) => String(n.fm.method ?? "") !== "test")
+      .filter((n) => String(n.fm.minted_in ?? "").trim() === owner)
       // A demonstrates-only spec belongs to VALIDATION: its run is M8's demo
       // machine and the gate's musts_demonstrated. Verification's checklist
       // holds only specs that verify requirements.

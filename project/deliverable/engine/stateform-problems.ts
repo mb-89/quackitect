@@ -205,8 +205,9 @@ export function specifyBuildLawProblems(
 }
 
 /** The coverage half, shared with trace-design: edges resolve, every
- *  element and interface realized, every spec names files. */
-function designCoverageProblems(corpus: { id: string; type: string; file?: string }[]): string[] {
+ *  element and interface realized, every spec names files.
+ *  see dsp-the-goal-binds-the-walk.md#the-law-is-swept-not-only-triggered */
+export function designCoverageProblems(corpus: { id: string; type: string; file?: string }[]): string[] {
   const out: string[] = [];
   const targets = new Set<string>();
   for (const n of corpus) if (n.type === "element" || n.type === "interface") targets.add(n.id);
