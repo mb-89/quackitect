@@ -264,12 +264,22 @@ export class Claims {
   stateFormState(name: string, m: MachineDecl = this.host.currentMachine()): StateDecl {
     const s = m.states.find((x) => x.id === name);
     if (s === undefined) {
+      // NAME THE STATES THAT ACTUALLY CARRY A FORM. "The walk's own states
+      // carry the forms" is true and sends the reader away to find out which.
+      const withForms = m.states.filter((x) => x.evidence_form.length > 0).map((x) => x.id);
+      // AND NAME THE RIGHT VERB. A state that exists but sits BEHIND the walk
+      // is reached with se_reopen, never with another pull — the router only
+      // draws routes forward. This remedy said se_pull and bit three times.
       throw new Rejection({
         clause: CLAUSES.NOT_LEGAL_IN_STATE,
-        expected: `a state of ${m.id} with an evidence form`,
+        expected: `a state of ${m.id} carrying an evidence form: ${withForms.join(", ")}`,
         got: name,
-        remedy: { tool: "se_pull", args: {}, note: "the walk's own states carry the forms" },
-        source: "engine/session.ts stateform",
+        remedy: {
+          tool: "se_reopen",
+          args: { state: withForms[0] ?? name, machine: m.id },
+          note: `${m.id} has no state "${name}". If you meant one of the states above and it sits BEHIND the walk, se_reopen reaches it — a pull cannot, because routes are drawn forward only. If you meant a state of a DIFFERENT machine, name that machine.`,
+        },
+        source: "engine/sessionclaims.ts stateFormState",
       });
     }
     return s;

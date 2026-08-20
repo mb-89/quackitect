@@ -133,7 +133,16 @@ test("no new file read bypasses the door — the count may fall, never rise", ()
   //   - benchmark-guard.ts controlFilesPresent: markdown in the REWOUND TREE,
   //     which is a fetched checkout and not this vault. No door could serve it
   //     even in principle, exactly as at 107 and 111.
-  const CEILING = 115;
+  // 116 since 2026-08-20: version.ts reads the manifest a SECOND time, and the
+  // second read is the whole point. SE_VERSION beside it is an IIFE evaluated
+  // once at import and frozen for the life of the process — correct for a
+  // stamp, and precisely why a running lane cannot notice that the code on
+  // disk has moved past it. versionOnDisk() re-reads so the two can be
+  // compared and a stale lane can say so on the banner.
+  //   A DOOR WOULD DEFEAT IT. Every door shares one read and one parse, which
+  //   is the caching this read exists to see through. This is the rare case
+  //   where sharing the read would remove the measurement.
+  const CEILING = 116;
   let found = 0;
   const offenders: string[] = [];
   const walk = (dir: URL, rel: string): void => {

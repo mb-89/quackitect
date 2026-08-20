@@ -5,11 +5,11 @@
 // 2026-08-14 returned between 280 and 350 KB and could not be read, and two
 // fills were misdirected as a direct result.
 import { strict as assert } from "node:assert";
-import { mkdtempSync, readFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
-import { ANSWER_BOUND_BYTES, boundAnswer, setAnswerSpill } from "../engine/bound.ts";
+import { ANSWER_BOUND_BYTES, boundAnswer, SPILL_PAGE_CHARS, setAnswerSpill } from "../engine/bound.ts";
 import { smallestInlineOutputBytes } from "../engine/harness.ts";
 
 const SE = mkdtempSync(join(tmpdir(), "se-bound-"));
@@ -56,7 +56,7 @@ test("the cursor names a verb that pages, so following it cannot recurse", () =>
   const page = JSON.parse(answered.text);
   assert.equal(page.next.tool, "se_file_read", "se_log_query would return the whole answer and be cut again");
   assert.equal(page.next.args.char_offset, 0);
-  assert.equal(page.next.args.char_limit, 3_000, "character paging survives one huge escaped JSON line");
+  assert.equal(page.next.args.char_limit, SPILL_PAGE_CHARS, "character paging survives one huge escaped JSON line");
   assert.equal(page.next.args.path, ".se/answers/se_pull.json");
 });
 
@@ -131,4 +131,61 @@ test("the bound is one mechanism, so every exit answers in the same shape", () =
     return Object.keys(page).sort().join(",");
   });
   assert.equal(new Set(shapes).size, 1, "a caller must not have to learn three shapes to read one engine");
+});
+
+// THE PAGE THE CURSOR SUGGESTS WAS A LITERAL 3,000 AND NOBODY HAD MEASURED IT.
+//
+// 40% of all lane calls in one measured session were paging spilled answers
+// back — 6,433 of 16,157 — and a 22 KB answer cost eight round trips.
+//
+// RAISING IT WAS REFUSED FOR THE RIGHT REASON AND THE WRONG NUMBER. The worry
+// was escaping: a slice comes back inside a JSON envelope and every quote and
+// newline is escaped again, so the belief was that 3,000 could serialise near
+// 6,000. Measured on the text that actually spills — an already-serialised
+// answer, sliced and serialised a second time — it costs 1.066, not 2. The real
+// constraint was an envelope ALLOWANCE of 2,500 against a measured envelope of
+// 162 characters.
+//
+// THIS CASE MEASURES rather than asserting a number, because a number typed
+// into a test is the same mistake one layer along.
+test("the suggested spill page keeps a read's own answer inside the bound", async () => {
+  const { SPILL_PAGE_CHARS } = await import("../engine/bound.ts");
+  const { fileRead } = await import("../engine/files.ts");
+
+  // DERIVED, AND SIZED SO THE WORST CASE STILL FITS. A page of P costs at most
+  // 2P once escaped, because a spill file is JSON text and the densest thing
+  // left in it is backslash and quote. So 2P plus the envelope must clear the
+  // bound, and this asserts the derivation rather than a number.
+  assert.ok(SPILL_PAGE_CHARS < ANSWER_BOUND_BYTES, "the page cannot exceed the bound it is derived from");
+  assert.ok(
+    SPILL_PAGE_CHARS * 2 + 200 <= ANSWER_BOUND_BYTES,
+    `a page of ${SPILL_PAGE_CHARS} could serialise to ${SPILL_PAGE_CHARS * 2} in the worst case, which would spill again`,
+  );
+
+  const root = mkdtempSync(join(tmpdir(), "spill-page-"));
+  // Two shapes that really spill: quote-dense records, and long source lines.
+  // Both are written ALREADY SERIALISED, which is what a spill file holds.
+  const dense = JSON.stringify(
+    { notes: Array.from({ length: 300 }, (_, i) => ({ id: `n-${i}`, body: 'a "quoted" line\nwith breaks\tand tabs' })) },
+    null,
+    1,
+  );
+  const source = JSON.stringify({ content: readFileSync(new URL("../engine/bound.ts", import.meta.url), "utf8") }, null, 1);
+
+  for (const [name, body] of [
+    ["dense", dense],
+    ["source", source],
+  ]) {
+    writeFileSync(join(root, `${name}.json`), body, "utf8");
+    let worst = 0;
+    for (let off = 0; off + SPILL_PAGE_CHARS <= body.length; off += SPILL_PAGE_CHARS) {
+      const r = fileRead(root, `${name}.json`, { charOffset: off, charLimit: SPILL_PAGE_CHARS });
+      worst = Math.max(worst, JSON.stringify(r, null, 1).length);
+    }
+    assert.ok(
+      worst <= ANSWER_BOUND_BYTES,
+      `a ${name} page of ${SPILL_PAGE_CHARS} serialised to ${worst}, over the ${ANSWER_BOUND_BYTES} bound — the derivation is wrong`,
+    );
+  }
+  rmSync(root, { recursive: true, force: true });
 });

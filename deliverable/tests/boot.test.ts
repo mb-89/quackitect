@@ -223,3 +223,35 @@ describe("boot", { concurrency: true }, () => {
     );
   });
 });
+
+// THE LANE COULD NOT NOTICE ITS OWN AGE.
+//
+// The process loads the engine once and Node caches it, so the source on disk
+// and the code in memory part company at the first edit. SE_VERSION is the
+// clearest instance: an IIFE evaluated at import, frozen for the life of the
+// process, and stamped by the call log onto every record written after.
+//
+// MEASURED on a real box: the manifest said 6.0.0 while every record written
+// that day said 5.0.0, one of them minutes later. i37's whole deliverable —
+// cost per state — is derived from a stamp that has therefore never run.
+//
+// WHAT THIS PROMISES AND WHAT IT DOES NOT. A differing version proves the lane
+// is stale. A matching one proves nothing, because most engine edits never
+// touch the manifest. It is a smoke alarm, not an inventory, and the test says
+// so rather than letting a later reader assume more.
+test("the lane can compare the version it serves against the one on disk", async () => {
+  const { SE_VERSION, laneAge, versionOnDisk } = await import("../engine/version.ts");
+
+  const disk = versionOnDisk();
+  assert.notEqual(disk, "", "the manifest is readable from the engine");
+  assert.match(disk, /^\d+\.\d+\.\d+$|^unknown$/, "a version or an honest unknown, never a throw");
+
+  const age = laneAge();
+  assert.equal(age.served, SE_VERSION, "served is the frozen stamp, which is what the log carries");
+  assert.equal(age.on_disk, disk, "on_disk is read fresh");
+
+  // In a test the two are the same process, so this run is never stale. What
+  // matters is that the comparison is real rather than hardcoded false.
+  assert.equal(age.stale, disk !== "unknown" && disk !== SE_VERSION);
+  assert.equal(age.stale, false, "a freshly imported engine matches its own manifest");
+});

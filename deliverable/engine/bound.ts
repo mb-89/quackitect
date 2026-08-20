@@ -21,9 +21,38 @@ export const ANSWER_BOUND_BYTES = Math.min(OWN_CEILING, smallestInlineOutputByte
 /** A first guess at what the envelope costs. The real cost is measured. */
 const ENVELOPE = 2_500;
 
+/** What an se_file_read response weighs AROUND its content. MEASURED at 162
+ *  characters across three answer shapes; 200 is that with room. Not the same
+ *  number as ENVELOPE above, which covers a bounded answer of any tool. */
+const READ_ENVELOPE = 200;
+
+/** What a slice of an already-serialised answer costs when the read's own
+ *  response serialises it AGAIN.
+ *
+ *  IT IS THE WORST CASE AND NOT THE TYPICAL ONE. Measured over real answers —
+ *  survey notes, engine source, log records — the second escape costs 1.066.
+ *  Sizing the page on that number is wrong, because a read whose own answer
+ *  exceeds the bound spills AGAIN, and a spill of a spill is the recursion the
+ *  cursor exists to avoid. A page that usually fits is not good enough when
+ *  not fitting costs a loop.
+ *
+ *  THE WORST CASE INSIDE A SPILL FILE IS 2. The file holds JSON text, so it
+ *  carries no raw control characters — those are already escaped, and only
+ *  those cost more than double. What is left is backslash and quote, and each
+ *  of those doubles. */
+const SECOND_ESCAPE = 2;
+
 /** The smallest page worth sending. Below this the answer is all envelope,
  *  and the caller is better served by the cursor alone. */
 const MIN_PAGE = 500;
+
+/** THE PAGE THE CURSOR SUGGESTS, derived rather than chosen.
+ *
+ *  It moves with the bound: a host measured tighter than our own ceiling
+ *  lowers ANSWER_BOUND_BYTES, and this lowers with it. A literal could not.
+ *
+ *  see dsp-lane-door.md#the-answers-bound */
+export const SPILL_PAGE_CHARS = Math.max(MIN_PAGE, Math.floor((ANSWER_BOUND_BYTES - READ_ENVELOPE) / SECOND_ESCAPE));
 
 /** Where an oversized answer spills. Set by whoever knows the project root;
  *  until it is set, the bound still holds and the cursor names the call log
@@ -67,7 +96,7 @@ export function boundAnswer(tool: string, payload: unknown, seDir?: string): Bou
         }
       : {
           tool: "se_file_read",
-          args: { path: spilled, char_offset: 0, char_limit: 3_000 },
+          args: { path: spilled, char_offset: 0, char_limit: SPILL_PAGE_CHARS },
           note: "Read the exact spill text by character. Continue at char_range.to until it reaches char_range.of.",
         };
 

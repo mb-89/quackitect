@@ -50,10 +50,44 @@ That is the failure the walk-position stamp was built to remove
 ([[raid-iss-the-running-lane-is-not-the-code-the-walk-is-editing]] explains
 why the stamp has not yet run).
 
+## The escape ratio, measured
+
+MEASURED 2026-08-20, because this entry named it as the cheap half. It is not
+a cheap half, and the caution above was right.
+
+ON REAL SPILLS the second escape costs 1.066 — measured over survey-shaped
+notes, engine source and log records, taking every page-sized window of each
+already-serialised answer. The read's own envelope is 162 characters, against
+an `ENVELOPE` allowance of 2,500 in the same file.
+
+BOTH NUMBERS SAY THE PAGE COULD NEARLY DOUBLE, and a test says otherwise. A
+page set to 5,420 serialised an escape-dense payload to 6,808, over the bound.
+
+WHY THE TYPICAL RATIO IS THE WRONG NUMBER TO SIZE ON. Every tool payload goes
+through `boundAnswer`, so a read whose own answer exceeds the bound spills
+AGAIN — the spill of a spill this cursor exists to avoid. A page that usually
+fits is not good enough when not fitting costs a loop.
+
+SO THE BOUND IS THE WORST CASE, AND INSIDE A SPILL FILE THAT IS 2. The file
+holds JSON text and therefore no raw control characters — those cost six and
+are already escaped. What is left is backslash and quote, and each doubles.
+The worst-case-safe page is 2,900, so the literal 3,000 was marginally above
+it rather than half of what was available.
+
+WHAT CHANGED: the page is now DERIVED from the bound rather than typed
+(`SPILL_PAGE_CHARS`), so a host measured tighter lowers the bound and the page
+follows.
+
 ## What would close it
 
-- MEASURE THE ESCAPE RATIO on real spills, then raise the suggested page to
-  the largest size that reliably fits. This is the cheap half.
+- A READ THAT SHRINKS TO FIT. This is the fix. `boundAnswer` already measures
+  its own serialised length and shrinks until it fits — its comment says
+  "MEASURE THE SERIALISED LENGTH, never assume it" — and the read path does
+  not use that for choosing its slice. Ask for a large page, get back the
+  largest slice that fits, with the cursor advanced to match. The typical
+  answer then pages at roughly 5,400 instead of 2,900, close to half the
+  calls, and the pathological one still cannot recurse because the shrink
+  happens before the answer is served rather than after.
 - OR SERVE THE WHOLE SPILL IN ONE CALL. A read of a path under `.se/answers/`
   is already exempt from the state gate and the narration toll, because the
   lane handed the caller that exact call. A lane that is willing to hand out

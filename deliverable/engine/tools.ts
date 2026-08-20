@@ -35,7 +35,7 @@ import type { ReadingHook } from "./tools-file.ts";
 import { fileTools } from "./tools-file.ts";
 import { queryTools } from "./tools-query.ts";
 import { runTools } from "./tools-run.ts";
-import { SE_VERSION } from "./version.ts";
+import { laneAge, SE_VERSION } from "./version.ts";
 
 /** THE TICK — the machinery's one tool, legal in every state. */
 export function sessionTools(session: Session): ToolDef[] {
@@ -764,6 +764,29 @@ export function buildServer(
         ? `${notesSinceMove} notes and the walk has not moved. This is a loop, and notes are not the way out of it. Pull. If the pull refuses, its remedy is the next call — not another note.`
         : `${notesSinceMove} notes since the walk last moved. A note is not a move: se_pull is. Capture the stray, then pull.`;
     return { ...(result as Record<string, unknown>), banner };
+  });
+
+  // THE LANE SAYS HOW OLD IT IS, ONCE, ON A PULL.
+  //
+  // The process loaded the engine at start and Node cached it. Every engine
+  // change a walk makes is invisible to that same walk, and nothing said so —
+  // a box was measured serving 5.0.0 out of a tree that said 6.0.0 all day.
+  //
+  // ONE COMPARISON, AND IT ONLY EVER PROVES THE BAD CASE. A differing version
+  // means stale for certain; a matching one means nothing, because most engine
+  // edits never touch the manifest. Said once: a banner on every call is
+  // furniture within the hour.
+  let ageAnnounced = false;
+  server.addDecorator((tool, result) => {
+    if (tool !== "se_pull" || ageAnnounced) return result;
+    const age = laneAge();
+    if (!age.stale) return result;
+    if (typeof result !== "object" || result === null || Array.isArray(result)) return result;
+    ageAnnounced = true;
+    return {
+      ...(result as Record<string, unknown>),
+      banner: `THE RUNNING LANE IS NOT THE CODE ON DISK. It is serving ${age.served}; the tree says ${age.on_disk}. The process loaded the engine once and Node cached it, so every engine change since is invisible to this lane — including any this walk made. A green battery does not contradict this: se_test runs the files on disk. Restart the lane before trusting anything that depends on engine behaviour.`,
+    };
   });
 
   // THE ON-CHANGE TYPECHECK'S REPORT rides every result while the tree is red.
