@@ -27,6 +27,12 @@ import {
 import { bumpDrawingEpoch, compileMachine, compileMachineCached, resolveRef } from "./machines/compile.ts";
 import { computeRoute, type RouteNode, type RouteResult, type RouteStep, routeWraps } from "./route.ts";
 
+/** HOW LONG A CALL WAITS FOR A STEP'S LEAVING JUDGMENT before answering. It is
+ *  the bound a lane call is promised, so a judgment that settles fast is still
+ *  answered in one call and a slow one never holds the caller.
+ *  see dsp-the-work-account.md#responsibility */
+const JUDGMENT_HANDBACK_MS = 1000;
+
 /** see dsp-walk-machine.md#the-state-a-recorded-visit-names */
 export function visitState(visit: string): string {
   return visit.split("@")[0].split("/").pop() ?? "";
@@ -3683,7 +3689,12 @@ export class Session {
   ): Promise<void> {
     // see dsp-walk-machine.md#a-fallback-is-the-drawn-path-for-the-condition
     const escaping = to !== undefined && from.edges.some((e) => e.to === to && (e.role === "fallback" || e.role === "error"));
-    if (from.exit?.script !== undefined && !escaping) await this.scripts.scriptRun(from.id); // a tick attempt runs the script
+    // THE JUDGMENT STARTS AND THE CALL ANSWERS. A leaving check that runs a
+    // battery used to hold the pull for its whole duration; it is now waited on
+    // for at most the bound a person or an agent is promised, and the verdict
+    // lands against the step on a later call.
+    // see dsp-the-work-account.md#responsibility
+    if (from.exit?.script !== undefined && !escaping) await this.scripts.scriptSettleWithin(from.id, JUDGMENT_HANDBACK_MS);
     for (const [key, args] of Object.entries(from.exit ?? {})) {
       if (key === "read" || key === "read_consume") continue; // channel-proven below, not evidence
       if (escaping) continue;

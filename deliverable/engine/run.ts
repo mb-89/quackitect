@@ -486,6 +486,43 @@ export function jobList(root?: string): JobView[] {
   return [...found.values()].sort((a, b) => b.started - a.started).map(view);
 }
 
+/** REGISTER a piece of work the table cannot spawn for itself. A step's
+ *  leaving judgment is started by the walk and runs as its own children, so it
+ *  enters the table by name rather than by spawn.
+ *  see dsp-the-work-account.md#interface */
+export function openOperation(o: { id: string; kind: OperationKind; command: string; state?: string; root?: string }): void {
+  if (jobs.has(o.id)) return;
+  const j: Job = {
+    id: o.id,
+    kind: o.kind,
+    command: o.command,
+    started: Date.now(),
+    exit: null,
+    running: true,
+    ...(o.state === undefined ? {} : { state: o.state }),
+    out: "",
+    err: "",
+    ...(o.root === undefined ? {} : { root: o.root }),
+    done: Promise.resolve(),
+    settle: () => {},
+  };
+  jobs.set(o.id, j);
+  persist(j);
+}
+
+/** SETTLE a registered operation. A judgment whose process is gone settles as
+ *  failed rather than deciding for ever — absence is unambiguous, measured in
+ *  exp-does-a-left-check-survive-its-call. */
+export function settleOperation(id: string, ok: boolean): void {
+  const j = jobs.get(id);
+  if (j === undefined || !j.running) return;
+  j.running = false;
+  j.ended = Date.now();
+  j.exit = ok ? 0 : 1;
+  j.outcome = ok ? "passed" : "not passed";
+  persist(j);
+}
+
 /** Ids whose outcome has already been handed to a caller — the third standing.
  *  An operation is running, then finished, then read.
  *  see dsp-the-work-account.md#behavior-and-constraints */

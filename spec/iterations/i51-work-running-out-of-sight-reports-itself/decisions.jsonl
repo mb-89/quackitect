@@ -279,3 +279,10 @@
 {"ts":"2026-08-21T11:18:38.527Z","op":"done","visit":"iterations/i51/build-steps/the-account-rides-every-answer@0","node":"d210","brief":"the account rides from buildServer's own decorator chain"}
 {"ts":"2026-08-21T11:19:12.988Z","op":"done","visit":"iterations/i51/build-steps/the-account-rides-every-answer@0","node":"d211","brief":"five of five account cases green, typechecker clean"}
 {"ts":"2026-08-21T11:19:22.453Z","op":"done","visit":"iterations/i51/build-steps/the-account-rides-every-answer@0","node":"d212","brief":"the rider chunk is signed and the account strand is finished"}
+{"ts":"2026-08-21T11:20:03.817Z","op":"update","visit":"iterations/i51/build-steps/the-account-rides-every-answer@0","node":"d213","brief":"opening the handback strand, pushed as b99811d3"}
+{"ts":"2026-08-21T11:21:16.516Z","op":"plan","visit":"iterations/i51/build-steps/the-leaving-judgment-stops-holding-the-call@0","parent":null,"nodes":[{"id":"d214","brief":"give the table a register and settle pair"},{"id":"d215","brief":"start the judgment and answer inside the bound"},{"id":"d216","brief":"run the handback cases"}]}
+{"ts":"2026-08-21T11:21:37.579Z","op":"done","visit":"iterations/i51/build-steps/the-leaving-judgment-stops-holding-the-call@0","node":"d214","brief":"openOperation and settleOperation are the register-and-settle pair"}
+{"ts":"2026-08-21T11:21:59.362Z","op":"done","visit":"iterations/i51/build-steps/the-leaving-judgment-stops-holding-the-call@0","node":"d215","brief":"the call waits up to the promised second, then answers"}
+{"ts":"2026-08-21T11:22:16.853Z","op":"update","visit":"iterations/i51/build-steps/the-leaving-judgment-stops-holding-the-call@0","node":"d217","brief":"both handback cases green, checking the walk's blast radius"}
+{"ts":"2026-08-21T11:24:13.197Z","op":"done","visit":"iterations/i51/build-steps/the-leaving-judgment-stops-holding-the-call@0","node":"d216","brief":"battery green at 1725 of 1725 with both handback reds closed"}
+{"ts":"2026-08-21T11:24:19.428Z","op":"done","visit":"iterations/i51/build-steps/a-diff-nothing-answers-for-runs-nothing@0","node":"d194","brief":"the handback is built and the freeze is gone"}

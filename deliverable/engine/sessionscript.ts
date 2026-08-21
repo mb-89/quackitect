@@ -10,6 +10,7 @@ import { spawn } from "node:child_process";
 import { CLAUSES, Rejection } from "./errors.ts";
 import type { MachineDecl, StateDecl } from "./machine.ts";
 import { resolveInRoot, seDir } from "./paths.ts";
+import { openOperation, settleOperation } from "./run.ts";
 import { evidenceKey } from "./sessionforms.ts";
 
 /** What a script run needs of the walk: two roots, the standing check, where
@@ -157,6 +158,58 @@ export class Scripts {
     this.scriptRuns.set(key, run);
     this.host.notifyChange(); // the mirror learns a run started
     return run;
+  }
+
+  /** START a step's leaving judgment and hand the promise back UNAWAITED.
+   *  Returns undefined where the state declares no judgment to start.
+   *  see dsp-the-work-account.md#responsibility */
+  scriptStart(stateId: string): Promise<Record<string, unknown>> | undefined {
+    const { machine } = this.host.leaves();
+    const s = this.host.state(machine, stateId);
+    if ((s.exit?.script ?? []).length === 0 && (s.entry?.script ?? []).length === 0) return undefined;
+    const key = evidenceKey(machine, s.id);
+    const already = this.scriptRuns.has(key);
+    const run = this.scriptRun(stateId);
+    if (already) return run;
+    // THE JUDGMENT ENTERS THE ONE TABLE, against the step it belongs to.
+    // Without the state a settled verdict has nowhere to land.
+    const id = `judgment-${machine.id}-${s.id}`;
+    openOperation({
+      id,
+      kind: "judgment",
+      command: `the leaving judgment of ${s.id}`,
+      state: `${machine.id}/${s.id}`,
+      root: this.host.machineRoot(),
+    });
+    void run.then(
+      (r) => settleOperation(id, (r.script_result as { ok?: boolean } | undefined)?.ok === true),
+      () => settleOperation(id, false),
+    );
+    return run;
+  }
+
+  /** START THE JUDGMENT AND ANSWER INSIDE THE BOUND. The call waits up to `ms`
+   *  for a verdict and hands back whatever it has; it is never held for as long
+   *  as the judgment runs, which is the defect this record exists to end.
+   *  see dsp-the-work-account.md#responsibility */
+  async scriptSettleWithin(stateId: string, ms: number): Promise<void> {
+    const run = this.scriptStart(stateId);
+    if (run === undefined) return;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const capped = new Promise<void>((res) => {
+      timer = setTimeout(res, ms);
+    });
+    await Promise.race([run.then(() => undefined).catch(() => undefined), capped]);
+    if (timer !== undefined) clearTimeout(timer);
+  }
+
+  /** WHERE A STEP STANDS, one word from a closed set of three.
+   *  see dsp-the-work-account.md#behavior-and-constraints */
+  scriptStanding(m: MachineDecl, s: StateDecl): "passed" | "not passed" | "deciding" {
+    const key = evidenceKey(m, s.id);
+    if (this.scriptRuns.has(key)) return "deciding";
+    const r = this.host.evidence.get(key)?.script_result as { ok?: boolean } | undefined;
+    return r?.ok === true ? "passed" : "not passed";
   }
 
   /** Any condition script currently running — the mirror's follow signal. */
