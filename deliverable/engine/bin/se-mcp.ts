@@ -155,6 +155,14 @@ ENGINE — read by the server (this file is where they are defined).
                  autonomy). 0: every step is the human's; 1: fully autonomous.
                  Default 0.4. Env: SE_AUTONOMY. Live-adjustable in the mirror.
                  (--threshold and SE_THRESHOLD are the old spelling.)
+  --stop-at      how far the walk may GO before it hands back, BY NAME:
+                 state end, agent judgement (the default), bless, blockers
+                 only. The notches live in machines/stopat.md. Env:
+                 SE_STOP_AT. Live-adjustable in the mirror.
+                 THE DIAL IS STILL THE PERSON'S. This only lets the person
+                 set it where there is no mirror to press — an unattended
+                 box, whose settings store never restores a stored notch
+                 because it recognises no session token.
   --mirror-port  the embedded mirror's HTTP port (the human's hand on the
                  same walk). Default 7333. 0 disables. Env: SE_MIRROR_PORT.
   --headless     no stdio lane — agents attach over HTTP instead, at /mcp
@@ -273,6 +281,14 @@ if (argv.includes("--child") || process.env.SE_HOT_DISABLE === "1") {
   }
 
   const autonomyRaw = argValue("--autonomy") ?? argValue("--threshold") ?? process.env.SE_AUTONOMY ?? process.env.SE_THRESHOLD;
+  // HOW FAR THE WALK MAY GO, beside the rung saying what it may decide.
+  //
+  // AUTONOMY HAD A FLAG AND AN ENVIRONMENT VARIABLE AND THIS HAD NEITHER. The
+  // notch was hard-coded, and the settings store only restores a stored one for
+  // a session whose token it recognises — which a fresh container never has. So
+  // on a box with no mirror to press, nobody could move it: not the agent, who
+  // may not, and not the person, who has no surface.
+  const stopAtRaw = argValue("--stop-at") ?? process.env.SE_STOP_AT;
 
   // WHERE SATELLITES RUN, for THIS run only. One architecture, three
   // transports — process, thread, inline — and the argument wins over the
@@ -282,6 +298,7 @@ if (argv.includes("--child") || process.env.SE_HOT_DISABLE === "1") {
   // A BAD VALUE STOPS THE LAUNCH, and that is deliberate: an unreadable stored
   const session = new Session(root); // fails fast on a misdrawn machine
   if (autonomyRaw !== undefined) session.setAutonomy(autonomyRaw); // a rung by name or a bare value; refuses either out of range
+  if (stopAtRaw !== undefined) session.setStopAt(stopAtRaw); // a notch by name or a bare value; refuses either out of range
   // SESSION OVER — reaching end stops everything. The grace period lets the
   // closing tool response flush to stdout and the mirror serve its red page.
   session.onClosed = () => {

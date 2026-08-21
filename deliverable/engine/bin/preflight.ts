@@ -7,7 +7,7 @@
 //   node engine/bin/preflight.ts --root <project root>
 
 import { spawnSync } from "node:child_process";
-import { accessSync, constants, existsSync, mkdirSync, readdirSync, readFileSync } from "node:fs";
+import { accessSync, chmodSync, constants, existsSync, mkdirSync, readdirSync, readFileSync } from "node:fs";
 import { dirname, join, relative, resolve, sep } from "node:path";
 import { brandPath, palettePath } from "../brand.ts";
 import { readKeys } from "../frontmatter.ts";
@@ -83,21 +83,27 @@ try {
       // conveniences, and a host that is not installed leaves none behind.
       if (t.path.endsWith("AGENTS.md"))
         failures.push(
-          `${t.path} is MISSING — the prompt layer was never placed, so nothing carries the contract. Run engine/bin/place-prompt-layer.ts.`,
+          `${t.path} is MISSING — the prompt layer was never placed, so nothing carries the contract. Call se_prompt_place; outside the lane, run engine/bin/place-prompt-layer.ts.`,
         );
       continue;
     }
     if (readFileSync(t.path, "utf8") !== textFor(t, projection)) {
-      failures.push(`${t.path} is STALE — it is not the projection of guidance/. Run engine/bin/place-prompt-layer.ts.`);
+      failures.push(
+        `${t.path} is STALE — it is not the projection of guidance/. Call se_prompt_place; outside the lane, run engine/bin/place-prompt-layer.ts.`,
+      );
     }
   }
   for (const skill of SKILL_SOURCES) {
     const expected = readFileSync(join(root, skill.path), "utf8");
     for (const target of skillTargets(root, skill.name)) {
       if (!existsSync(target)) {
-        failures.push(`${target} is MISSING — the ${skill.name} skill was not placed. Run engine/bin/place-prompt-layer.ts.`);
+        failures.push(
+          `${target} is MISSING — the ${skill.name} skill was not placed. Call se_prompt_place; outside the lane, run engine/bin/place-prompt-layer.ts.`,
+        );
       } else if (readFileSync(target, "utf8") !== expected) {
-        failures.push(`${target} is STALE — it differs from ${skill.path}. Run engine/bin/place-prompt-layer.ts.`);
+        failures.push(
+          `${target} is STALE — it differs from ${skill.path}. Call se_prompt_place; outside the lane, run engine/bin/place-prompt-layer.ts.`,
+        );
       }
     }
   }
@@ -145,6 +151,21 @@ if (spawnSync("git", ["--version"], { stdio: "ignore" }).status !== 0) failures.
 // every preflight re-points it. Idempotent, ~50ms, and no clone can forget.
 if (existsSync(join(root, "deliverable", "hooks", "pre-commit"))) {
   spawnSync("git", ["config", "core.hooksPath", "deliverable/hooks"], { cwd: root, stdio: "ignore" });
+  // POINTING AT THE HOOK IS NOT ENOUGH ON POSIX. Git skips a hook that is not
+  // executable and says so in a hint nobody reads, so the tree looks guarded
+  // while nothing runs. Two separate cloud runs hit this and one of them tried
+  // chmod by hand. The bit is set here instead, beside the wiring, because this
+  // is the one place that already runs on every clone at every boot.
+  //
+  // WINDOWS HAS NO SUCH BIT and git there ignores the mode entirely, so the
+  // call is skipped rather than made harmless.
+  if (process.platform !== "win32") {
+    try {
+      chmodSync(join(root, "deliverable", "hooks", "pre-commit"), 0o755);
+    } catch {
+      // a read-only checkout is not a reason to fail the boot
+    }
+  }
   // Windows caps paths at 260 chars and the seeded record path carries the
   // iteration id twice — a deep product root crosses the cap and git answers
   // "Filename too long" (raid-issue-windows-longpaths).

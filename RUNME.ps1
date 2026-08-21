@@ -205,6 +205,17 @@ Write-Host "  node $nodeVersion  OK"
 if (-not (Ensure-Tool "git" "Git.Git" "git")) { exit 1 }
 Write-Host "  $((git --version))  OK"
 
+# THE PROMPT LAYER AND THE SKILLS ARE GENERATED, and the packaging list leaves
+# them out on purpose - a generated file in a package is a file that can arrive
+# stale. Every part of that chain worked except the call, so a brand-new
+# person's very first boot came up red on two skill files nobody had placed.
+# This is the installer, so this is where the call belongs.
+Write-Host "$P - projecting the prompt layer from guidance" -ForegroundColor Cyan
+node (Join-Path $root "deliverable\engine\bin\place-prompt-layer.ts") --root $root
+if ($LASTEXITCODE -ne 0) {
+  Write-Host "  placing the prompt layer FAILED - the first boot will name which projection is stale" -ForegroundColor Yellow
+}
+
 # RUNME IS THE INSTALL, AND YOU RUN IT ONCE (owner ruling 2026-08-02). It puts
 # the extension in place and opens the editor. After that the extension owns
 # everything: the server, the attach configs, the engine's npm install. Opening

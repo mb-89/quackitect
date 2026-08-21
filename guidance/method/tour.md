@@ -67,7 +67,7 @@ guide.
      iterations (planned work).
 3. A RECORD. Open one expedition: its goal, its decision trail, its
    report. Every claim links to evidence; nothing is prose alone.
-4. THE RIGOR MATRIX. The whole process as data: 50 rows of steps, five
+4. THE RIGOR MATRIX. The whole process as data: over fifty rows of steps, five
    columns of change size. A cell says what a step demands at that size;
    a struck cell says why it does not apply. The machine the walk runs
    is COMPILED from this, live, at every kickoff.

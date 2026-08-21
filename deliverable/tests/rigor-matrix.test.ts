@@ -3,7 +3,7 @@
 // compiling a change-size column yields a valid iteration machine with
 // struck states contracted out of the dependency graph.
 import { strict as assert } from "node:assert";
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
@@ -293,6 +293,34 @@ test("evidence is frontmatter data: every non-terminal row carries fields", () =
   const kickoff = m.rows.find((r) => r.name === "gate-kickoff");
   assert.ok(kickoff?.evidence_form.some((f) => f.name === "retro_drained" && f.required !== false));
   assert.ok(kickoff?.evidence_form.some((f) => f.name === "change_size" && f.required));
+});
+
+test("no matrix row's frontmatter carries a literal escape where a newline belonged", () => {
+  // TEN ROWS WERE CORRUPTED THIS WAY AND NOTHING NAMED IT. One write folded a
+  // frontmatter block onto a single line with literal backslash-n between the
+  // keys. In five rows the escaped run swallowed the `evidence:` key itself, so
+  // its fields parsed as more legal_tools entries — and the kickoff gate, whose
+  // whole job is to set the change size, could no longer ask for one. Its only
+  // visible symptom was `[object Object]` inside a refusal message.
+  //
+  // THE RULE IS ABOUT UNQUOTED SCALARS. YAML gives the escape a meaning inside
+  // a double-quoted value and none at all outside one, so an escape on a line
+  // carrying no quote is always the corruption and never the author.
+  const dir = join(ROOT, "deliverable", "machines", "rigor_matrix", "rows");
+  const bad: string[] = [];
+  for (const file of readdirSync(dir).filter((f) => f.endsWith(".md"))) {
+    const text = readFileSync(join(dir, file), "utf8");
+    if (!text.startsWith("---")) continue;
+    const end = text.indexOf("\n---", 3);
+    if (end < 0) continue;
+    text
+      .slice(4, end)
+      .split("\n")
+      .forEach((line, i) => {
+        if (line.includes("\\n") && !line.includes('"')) bad.push(`${file}:${i + 2} ${line.slice(0, 80)}`);
+      });
+  }
+  assert.deepEqual(bad, [], `a literal escape stands in matrix-row frontmatter where a newline belonged:\n${bad.join("\n")}`);
 });
 
 test("a body evidence section is refused — the frontmatter block is the single truth", () => {

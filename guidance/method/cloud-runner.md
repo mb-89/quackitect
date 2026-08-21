@@ -173,8 +173,30 @@ YOU RUN UNTIL SOMETHING BLOCKS YOU. Not until something is uncertain, and not
 until something is large. A block is mechanical: the machine refuses, or no
 answer you could give would let the walk continue.
 
-A REFUSAL NAMING TWO RUNGS IS A DIAL PROBLEM, not a decision for you to make.
-Say so plainly in the field report and carry on with what is left.
+A REFUSAL NAMING TWO RUNGS IS A BOOT FAULT, never a sanctioned stop.
+
+WHAT IT MEANS: the lane came up at a rung that cannot finish the job it was
+given. Nobody on this box can move the dial. The agent may not, and there is no
+person to press the slider.
+
+THIS OVERRIDES RULE 3 HERE, and only here. On a laptop a step above the dial is
+the person's and stopping is right, because they are sitting there. On an
+unattended box the same stop is a dead run.
+
+SAY SO AT THE TOP OF THE FIELD REPORT, naming both rungs and the gate that
+refused. Then carry on with whatever does not need that gate. Where the gate is
+the FIRST one, there is nothing left to carry on with — say that plainly rather
+than filing it as a stop somebody chose.
+
+WHAT PREVENTS IT: the lane is STARTED at a rung strictly above the heaviest
+gate the run has to bless. `--autonomy` and `SE_AUTONOMY` set the rung.
+`--stop-at` and `SE_STOP_AT` set how far the walk may go before it hands back.
+Whoever launches an unattended run sets both, and the launcher is the only
+place either can be set.
+
+MEASURED ON THE i51 CLOUD RUN: the kickoff gate was filled and signed, the
+bless was refused for want of authority, the agent read this paragraph, and the
+run ended with one gate between it and the work.
 
 ### Fix what you find on the way
 
@@ -432,7 +454,12 @@ THE LOG IS THE ONLY WITNESS. Nobody watched you work, so what you record is
 the whole account.
 
 - NARRATE WITH `update` on the calls that change something.
-- CAPTURE EVERY STRAY with `se_note`. A question you could not ask is a note.
+- CAPTURE EVERY STRAY with `se_note`, AND KNOW WHERE IT LANDS. `.se/notes.jsonl`
+  is machine-local and never committed, so on this box a note is a scratchpad
+  entry that dies when the container is reclaimed. It is still worth writing:
+  the retro drains it, and a retro before the run ends carries it home.
+- WHAT MUST OUTLIVE THE BOX GOES IN THE FIELD REPORT TOO, in the same breath.
+  A question you could not ask is a note AND a line in the report.
 - RECORD EVERY ANSWER with `se_answer`, even when the question came from
   yourself.
 

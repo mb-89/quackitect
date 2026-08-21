@@ -32,6 +32,7 @@
 // already answering rather than starting a second one.
 import { spawn, spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { createConnection } from "node:net";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -57,6 +58,10 @@ if (process.argv.some((a) => a === "--help" || a === "-h" || a === "-?")) {
                  gates is launched at strategic, and that is the owner's call.
                  The rungs and what each means are machines/scale.md.
   --mirror-port  the lane's HTTP port. Default 7333.
+  --stop-at      how far the walk may GO before it hands back, BY NAME:
+                 state end, agent judgement, bless, blockers only. Passed
+                 through to the lane. Env: SE_STOP_AT. Nothing is invented
+                 here — with no notch named, the lane keeps its own default.
   --help         this text (-h, -?)
 `);
   process.exit(0);
@@ -68,6 +73,11 @@ const PORT = Number(argValue("--mirror-port") ?? process.env.SE_MIRROR_PORT ?? 7
 // The engine resolves it against machines/scale.md, so a caller never has to
 // know what range the ladder runs over.
 const AUTONOMY = argValue("--autonomy") ?? process.env.SE_AUTONOMY ?? "tactical";
+// THE NOTCH IS PASSED THROUGH AND NEVER INVENTED. A rung has a sensible
+// arrival default because a lane with none comes up unable to decide anything.
+// A notch does not: the lane's own default is right for a person sitting
+// beside it, and only an unattended run wants another one.
+const STOP_AT = argValue("--stop-at") ?? process.env.SE_STOP_AT;
 
 /** Every step says its name and what happened, in se-start's own shape. */
 function say(step: string, what: string): void {
@@ -194,6 +204,26 @@ async function answering(): Promise<boolean> {
   }
 }
 
+/** IS SOMETHING SITTING ON THE PORT? A lane that never came up and a port held
+ *  by a stranger look identical from outside, and only one of them is a crash.
+ *
+ *  MEASURED ON THE i51 CLOUD RUN: the arrival reported that the lane did not
+ *  answer while the client's own stdio lane held the port, which sent the
+ *  reader hunting a failure that had not happened. */
+function portHeld(): Promise<boolean> {
+  return new Promise((done) => {
+    const socket = createConnection({ host: "127.0.0.1", port: PORT });
+    const settle = (held: boolean): void => {
+      socket.destroy();
+      done(held);
+    };
+    socket.setTimeout(2000);
+    socket.on("connect", () => settle(true));
+    socket.on("timeout", () => settle(false));
+    socket.on("error", () => settle(false));
+  });
+}
+
 // HEADLESS IS THE POINT. A stdio lane needs a host holding the pipe, and an
 // agent that is already running is not that host — it cannot register an MCP
 // server into a session that has already started. `--headless` serves the same
@@ -206,7 +236,17 @@ async function lane(): Promise<void> {
   }
   const child = spawn(
     process.execPath,
-    [join(HERE, "se-mcp.ts"), "--root", ROOT, "--headless", "--mirror-port", String(PORT), "--autonomy", AUTONOMY],
+    [
+      join(HERE, "se-mcp.ts"),
+      "--root",
+      ROOT,
+      "--headless",
+      "--mirror-port",
+      String(PORT),
+      "--autonomy",
+      AUTONOMY,
+      ...(STOP_AT === undefined ? [] : ["--stop-at", STOP_AT]),
+    ],
     {
       cwd: ROOT,
       detached: true,
@@ -222,7 +262,15 @@ async function lane(): Promise<void> {
     }
     await new Promise((r) => setTimeout(r, 500));
   }
-  die("lane", `the lane did not answer on ${PORT} within 60s`);
+  // THE FAILURE NAMES WHICH OF THE TWO IT IS, because the remedies are
+  // opposite: one moves the port, the other looks for a crash.
+  const held = await portHeld();
+  die(
+    "lane",
+    held
+      ? `port ${PORT} is held by a process that does not answer the mirror — another lane is probably already up on it. Give this one another port with --mirror-port, or stop the holder.`
+      : `the lane did not answer on ${PORT} within 60s and nothing is listening there — the spawn failed or exited. Run it in the foreground to see why: node deliverable/engine/bin/se-mcp.ts --root . --headless --mirror-port ${PORT}`,
+  );
 }
 
 // ── client ──────────────────────────────────────────────────────────────────
@@ -264,11 +312,38 @@ console.log(j.result?.content?.[0]?.text ?? JSON.stringify(j.result, null, 1));
   return path;
 }
 
+/** THE PROMPT LAYER, PLACED BEFORE THE WALK EVER MEETS IT.
+ *
+ *  A FRESH CLONE ARRIVES STALE, EVERY TIME. The projection is deterministic
+ *  from guidance/, so a checkout can only be identical to it or behind it — and
+ *  boot's own exit check goes red on the difference before the walk can do
+ *  anything at all. It is the first thing an unattended run meets, and one call
+ *  removes it.
+ *
+ *  IT NEVER FAILS THE ARRIVAL. A projection that will not place is a red boot
+ *  check, which is a loud failure in the right place. Making it fatal here
+ *  would take the lane away with it. */
+function promptLayer(): void {
+  const r = spawnSync(process.execPath, [join(HERE, "place-prompt-layer.ts"), "--root", ROOT], { cwd: ROOT, encoding: "utf8" });
+  if (r.status === 0) say("prompt", "projected from guidance/");
+  else
+    say(
+      "prompt",
+      `FAILED — boot will name which projection is stale: ${
+        String(r.stderr ?? "")
+          .trim()
+          .split("\n")
+          .pop() ?? "no output"
+      }`,
+    );
+}
+
 // ── the arrival ─────────────────────────────────────────────────────────────
 refs();
 runtime();
 install();
 cage();
+promptLayer();
 await lane();
 const call = client();
 
@@ -282,6 +357,12 @@ logged, and the machine says what to do next. The opening instruction an
 unattended walk is given is deliverable/cage/kickoff.txt.
 
 IF A STEP ANSWERS 'wait', it weighs more than this session's dial (${AUTONOMY}).
-Nobody is beside the box to move it, so say which step waits and stop — or
-re-run with --autonomy raised, which is the owner's call to make, not yours.
+Nobody is beside the box to move it. On an unattended box that is a BOOT FAULT
+rather than a stop somebody chose: the lane was started at a rung which cannot
+finish the job it was given. Report it at the top of the field report, naming
+both rungs and the gate that refused.
+
+THE TWO DIALS ARE SET AT LAUNCH AND NOWHERE ELSE. --autonomy or SE_AUTONOMY
+sets the rung; --stop-at or SE_STOP_AT sets how far the walk may go before it
+hands back. Both are the owner's call to make, never yours.
 `);

@@ -142,7 +142,12 @@ test("no new file read bypasses the door — the count may fall, never rise", ()
   //   A DOOR WOULD DEFEAT IT. Every door shares one read and one parse, which
   //   is the caching this read exists to see through. This is the rare case
   //   where sharing the read would remove the measurement.
-  const CEILING = 116;
+  // 117 AT THE i38 MERGE: rigor-matrix.ts complexityRequiredIn reads the matrix
+  // README looking for one marker sentence, which arms the complexity refusal
+  // once every active cell carries a rating. A README is not a note and has no
+  // door; the read wants a substring of raw text, not a parse, and it is
+  // wrapped in a try so an absent file answers false rather than throwing.
+  const CEILING = 117;
   let found = 0;
   const offenders: string[] = [];
   const walk = (dir: URL, rel: string): void => {

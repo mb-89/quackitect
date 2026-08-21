@@ -6,6 +6,7 @@
 import { randomBytes } from "node:crypto";
 import { appendFileSync, existsSync, mkdirSync, readdirSync, readFileSync, renameSync, statSync } from "node:fs";
 import { dirname, join } from "node:path";
+import { CLAUSES, Rejection } from "./errors.ts";
 import { stripBom } from "./jsonio.ts";
 
 /** THE PART A HAND PLAYED. Closed on purpose: an open vocabulary makes every
@@ -437,16 +438,42 @@ export class CallLog {
     const dig = (obj: unknown, path: string): unknown =>
       path.split(".").reduce<unknown>((v, k) => (v && typeof v === "object" ? (v as Record<string, unknown>)[k] : undefined), obj);
     const f = q.filter ?? {};
+    // AN UNKNOWN KEY INSIDE `filter` ANSWERED INSTEAD OF REFUSING, and a wrong
+    // filter reads exactly like a real one. SE-C-101 refuses an unknown
+    // argument at the top level of a call; one nested a single level down was
+    // dropped in silence, so asking for rejected records by a key this filter
+    // does not have returned every record and looked like the truth.
+    const FILTER_KEYS = ["tool", "ok", "since", "text", "min_ms"];
+    const unknown = Object.keys(f).filter((k) => !FILTER_KEYS.includes(k));
+    if (unknown.length > 0) {
+      throw new Rejection({
+        clause: CLAUSES.UNKNOWN_ARGS,
+        expected: `filter keys from: ${FILTER_KEYS.join(", ")}`,
+        got: unknown.join(", "),
+        remedy: {
+          tool: "se_log_query",
+          args: { filter: { ok: false } },
+          note: "ok: false is how you ask for refusals; a refusal's clause is a group_by, never a filter",
+        },
+        source: "engine/calllog.ts query",
+      });
+    }
+    // `clause` IS THE WORD A READER USES, and the value lives one level down in
+    // a rejected record's response. The retro's own step asks for refusal
+    // clauses by frequency and names this verb for it, so the word it asks with
+    // has to reach the value — grouping by `clause` used to put every record
+    // under `(none)`.
+    const groupBy = q.group_by === "clause" ? "response.clause" : q.group_by;
     // since: "last_retro" — the newest judgment drain marks the previous
     // retro; the retro mines only its own period (the raw log is kept,
     // owner ruling: forever-until-1GB).
     const since = f.since === "last_retro" ? this.lastRetroMark() : f.since;
     const records = this.filtered({ tool: f.tool, ok: f.ok, text: f.text, since, min_ms: f.min_ms });
-    if (q.group_by !== undefined) {
+    if (groupBy !== undefined) {
       const groups: Record<string, number> = {};
       let reached = 0;
       for (const r of records) {
-        const raw = dig(r, q.group_by);
+        const raw = dig(r, groupBy);
         if (raw !== undefined && raw !== null) reached++;
         const key = String(raw ?? "(none)");
         groups[key] = (groups[key] ?? 0) + 1;
@@ -458,7 +485,7 @@ export class CallLog {
       return {
         total: records.length,
         groups,
-        ...(records.length > 0 && reached === 0 ? { group_by_reached_nothing: q.group_by } : {}),
+        ...(records.length > 0 && reached === 0 ? { group_by_reached_nothing: groupBy } : {}),
       };
     }
     // NEWEST FIRST, PAGED BACKWARDS. offset 0 is the newest page; offset 20
