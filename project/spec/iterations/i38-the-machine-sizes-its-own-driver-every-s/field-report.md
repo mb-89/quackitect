@@ -2819,6 +2819,39 @@ SO THE MEASUREMENT EXISTS AND MEASURES NOTHING YET. Both halves of that
 sentence belong in the release notes, and both are in the gate's overrides.
 A vocabulary is not a measurement until a second hand uses it.
 
+## F79 — the ship seeded a handover into a file the container had already eaten
+
+`M9_99_shipped` SAYS IT PLAINLY: "shipping seeds the 'needs retro' note, and
+the next kickoff's onboard-retro drains it." The close did exactly that. i38
+shipped, `itCloseShipped` appended `needs retro — iteration i38 shipped` to
+`.se/notes.jsonl`, and the handover was made.
+
+THEN THE CONTAINER WAS RECLAIMED. On the next boot `.se/notes.jsonl` does not
+exist. `se_survey` counts zero pending notes. The marker the shipped row
+promises to leave for the next kickoff is gone, and nothing anywhere says it
+was ever written.
+
+THIS IS THE REPORT'S OWN THESIS ARRIVING FROM A NEW DIRECTION. F1 says a note
+on a cloud box writes into a hole. That was about the AGENT's strays. This is
+the MACHINE's own handover, seeded by the engine at the one moment the walk is
+guaranteed to end, into the same hole.
+
+THE SILENCE IS THE DEFECT, NOT THE LOSS. A drain that finds nothing is
+indistinguishable from a drain with nothing to find. The next `onboard-retro`
+will report an empty inbox and be telling the truth about the file while being
+wrong about the world.
+
+AND THE SAME BOOT LOST MORE THAN THE NOTE. The container came back re-cloned
+at an old commit, with the working tree at i38 M2 and `field-report.md` at
+12 KB and one finding. The 149 KB version came back by fast-forwarding to the
+pushed branch, which is the only reason this file exists to write F79 into.
+
+SO THE RULE THE RUN ACTUALLY PROVED: on a cloud box, anything not pushed is
+not written. Not the notes, not the tree, not the machine's own handover. The
+report survived because it is a committed file in the record; the note did not
+because it is machine-local state the design assumes will still be there.
+
+
 
 
 
