@@ -16,7 +16,11 @@ legal_tools:
   - se_file_search
   - se_file_glob
   - se_file_list
-  - se_log_query\n  - se_answer\n  - se_web_search\n  - se_web_fetch\nevidence:
+  - se_log_query
+  - se_answer
+  - se_web_search
+  - se_web_fetch
+evidence:
   - name: picture_judged
     description: the judgment the counts cannot make — are these the right journeys, and is any one of them wrong?
   - name: unspecified_capability

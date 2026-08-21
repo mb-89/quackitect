@@ -1,7 +1,7 @@
 <!-- GENERATED at agent start. Do not edit — the next start overwrites it.
-     from guidance/contract.md c1e9d6861080
-     from guidance/walking.md aa037cd19661
-     from guidance/method/lane.md fc4e6dfd660f
+     from guidance/contract.md acbe6e9f500d
+     from guidance/walking.md 09417a5c44e4
+     from guidance/method/lane.md f00d120bd8f3
      from guidance/voice.md 2bbb7751a28c
 -->
 
@@ -159,14 +159,36 @@ where the machine reads it:
 - condition notes
 - the spec
 
-THERE IS NO HANDOVER FILE, and nobody writes one. The duty only ever discharged
-on a tidy exit, and sessions get killed instead. What replaced it is derived:
-boot describes the last session from the call log and puts it on the banner, so
-nothing is written on the way out and nothing is read on the way in.
+NOTHING IS WRITTEN FOR THE NEXT AGENT TO READ. The old handover file was read
+by the session that followed, it only ever got written on a tidy exit, and
+sessions get killed instead. What replaced it is derived: boot describes the
+last session from the call log and puts it on the banner.
 
 SO WHAT THE NEXT SESSION MUST KNOW GOES IN THE FOUR HOMES ABOVE, written when
 the thought occurs. A note, a parked to-do, or guidance — never saved for an
 exit that may never come.
+
+A FIELD REPORT IS OWED AT THE END OF EVERY RUN, and it is a different object
+(owner ruling 2026-08-20). This paragraph used to say no handover file is
+written at all, and the owner struck that: "I don't agree with this. This is an
+error in the guidance."
+
+THE TWO ARE NOT THE SAME THING, which is why both halves stand.
+
+- The handover file was for the next AGENT, and the call log replaced it.
+- The field report is for the PERSON, and nothing replaces it.
+
+WHAT GOES IN IT: everything that cannot be mapped onto the repository.
+Improvements you found, what fought you, what you struggled with, and anything
+you could not give a home in git.
+
+WHY IT CANNOT BE SKIPPED: notes are machine-local and die with the container.
+The report is the channel that reaches a person, so an unwritten one throws
+that away.
+
+WHERE IT GOES: `.se/field-report.md`, which is not committed, and PRINTED IN
+FULL as the closing message. The file is the convenience; the message is the
+delivery. `guidance/method/cloud-runner.md` carries the detail.
 
 ## 9. Never open a record unasked
 
@@ -457,6 +479,23 @@ refusing, and the agent's pull is what moves.
 - READ SERIALLY FOR NOW. A retreat, not a preference: a Copilot harness appears
   to cancel itself on parallel batches.
 
+## Attribution — who you are rides every call too
+
+SIX ARGUMENTS RIDE EVERY LANE TOOL, the way `update` does.
+
+- `as` — WHICH HAND YOU ARE: owner, walker, guide, reviewer, surface. Omit it
+  and the record says `walker`, which is right for the hand holding the
+  session. Say `guide` when you are the hand that was ASKED for one step.
+- `relayed_by` — WHO IS FILING WORK SOMEBODY ELSE DID. Send `as` for the
+  AUTHOR and this for yourself.
+- `answered_by` — what actually SERVED the call. Omit it and the record says
+  `unreported`, which is a declared absence rather than a missing field.
+- `named_driver`, `went_weaker`, `weaker_reason` — the safety rule. Going
+  weaker with no reason marks the record `unreasoned`: marked, never refused.
+
+NOTHING CHECKS ANY OF IT, and the record marks `as` and `answered_by` as
+claims. `guidance/method/lane.md` carries why.
+
 ## Narration — the update rides every call
 
 `update: {...}` on ANY lane call carries a decision-graph op. Ride one on every
@@ -623,11 +662,37 @@ path that names a folder the product does not have is the tell.
 
 Every call is logged raw to `.se/calls.jsonl`.
 
-THE RECORD CARRIES WHO ACTED. The acting role — a person, an agent, the
-surface itself — is stamped on the record where the call is SERVED, by the
-code that knows. Nothing downstream infers it from the tool name: a reader
-guessing the actor from which verb was called gets it wrong the moment one
-verb serves two callers, and it did.
+THE RECORD CARRIES WHO ACTED, WHERE, AND ON WHAT. Four coordinates, and only
+one of them is something the server can see for itself.
+
+- `actor` — a person, an agent, or the surface itself. Stamped where the call
+  is SERVED, by the code that knows. Nothing downstream infers it from the tool
+  name: a reader guessing the actor from which verb was called gets it wrong
+  the moment one verb serves two callers, and it did.
+- `state` — where the walk stood. Also the server's own observation.
+- `part` — WHICH HAND, from a closed vocabulary: owner, walker, guide,
+  reviewer, surface. Two agents are both `actor: agent`, and this is what
+  tells them apart.
+- `answered_by` — the model that served the call, not the one that was asked
+  for.
+
+YOU DECLARE THE LAST TWO AND THE RECORD MARKS THEM AS CLAIMS. Every lane tool
+takes `as`, `relayed_by` and `answered_by`, the same way every one takes
+`update`. Omit `as` and the record says `walker`, which is right for the
+hand holding the session.
+
+SAY `as: "guide"` WHEN YOU ARE THE HAND THAT WAS ASKED. A guide is delegated
+one step and says so — a default of `guide` would let the strong hand's work
+hide in the weak hand's count.
+
+AND WHEN YOU FILE WORK SOMEBODY ELSE DID, say `as` for the AUTHOR and
+`relayed_by` for yourself. A walker typing a guide's judgment into a form
+under its own name erases the only thing the coordinate is for.
+
+THREE MORE RIDE EVERY TOOL AND CARRY THE SAFETY RULE. `named_driver` is the
+strength the step was told it needs; `went_weaker` is your own word that a
+weaker hand took it; `weaker_reason` is why. Saying you went weaker and
+giving no reason marks the record `unreasoned` — marked, never refused.
 
 TWO DOORS LEAD OUTSIDE THE ROOT, and neither is a path. A past version of this
 repo is read at a committed ref — `se_file_read`, `se_file_search` and

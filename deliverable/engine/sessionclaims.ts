@@ -59,7 +59,7 @@ import {
   withReopened,
 } from "./forms.ts";
 import { pendingNotes } from "./inbox.ts";
-import { type Iteration, iterationDrift, itList, itShortId, pinIsStale, repinColumn } from "./iterations.ts";
+import { type Iteration, iterationDrift, itList, itShortId, pinIsStale, pinIsUnset, repinColumn } from "./iterations.ts";
 import { parseStateNote, readNode, section, writeNode } from "./notes.ts";
 import { seDir } from "./paths.ts";
 import { scanGuidance } from "./pull.ts";
@@ -740,7 +740,22 @@ export class Claims {
     // where a demand moved with it. Returning early on an empty reopen list
     // left the record walking a snapshot taken before the correction, which
     // is how i3 kept skipping a state the column already required.
-    if (!pinIsStale(this.host.machineRoot(), it)) return;
+    if (!pinIsStale(this.host.machineRoot(), it)) {
+      // AN UNPINNED RECORD CANNOT GO STALE, AND THAT IS THE HOLE. Every
+      // iteration walks M0 before its kickoff bless writes a pin, and M0 is
+      // compiled live from the rigor matrix. The frame under the walk's feet
+      // is a snapshot taken when the record was entered, and repinSwap is the
+      // only thing that ever replaces it — so a matrix correction made from
+      // inside M0 reached nothing, and the kickoff kept serving the form the
+      // broken matrix had produced.
+      //
+      // NOTHING IS REOPENED HERE. A pin that does not exist cannot have moved
+      // a demand, so the swap is the whole fix. It is self-guarding: it
+      // returns when the regenerated machine is identical, and it refuses to
+      // swap a frame that would drop the state the walk stands in.
+      if (pinIsUnset(it)) this.host.repinSwap();
+      return;
+    }
     const moved = iterationDrift(this.host.machineRoot(), it);
     // ONLY A STANDING CLAIM CAN BE REOPENED, and standing is the RECORD's
     // word, not this session's. Reading the instance's own history instead
