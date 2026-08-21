@@ -26,16 +26,24 @@ import type { ReadingHook } from "./tools-file.ts";
 
 const BIOME_BIN = fileURLToPath(new URL("../node_modules/@biomejs/biome/bin/biome", import.meta.url));
 
-/** The last battery's measured wall, phrased for a caller sizing a wait.
- *  An expectation is measured or absent — never guessed. */
-function batteryPace(se: string): string {
+/** The last battery's measured wall and file count, in ONE read. The wall is
+ *  phrased for a caller sizing a wait; the count is what a progress figure
+ *  divides into. An expectation is measured or absent — never guessed. */
+function batteryRecord(se: string): { pace: string; total?: number } {
   try {
-    const rec = JSON.parse(readFileSync(join(se, "test-last-run.json"), "utf8")) as { wall_ms?: number };
+    const rec = JSON.parse(readFileSync(join(se, "test-last-run.json"), "utf8")) as {
+      wall_ms?: number;
+      files?: unknown[];
+    };
+    const total = Array.isArray(rec.files) ? { total: rec.files.length } : {};
     if (typeof rec.wall_ms === "number")
-      return ` The last battery took ${Math.round(rec.wall_ms / 1000)}s wall — expect the verdict on that scale.`;
-    return " The last battery on record has no wall clock; the next completed run records one.";
+      return {
+        pace: ` The last battery took ${Math.round(rec.wall_ms / 1000)}s wall — expect the verdict on that scale.`,
+        ...total,
+      };
+    return { pace: " The last battery on record has no wall clock; the next completed run records one.", ...total };
   } catch {
-    return " No earlier battery is on record to size the wait.";
+    return { pace: " No earlier battery is on record to size the wait." };
   }
 }
 /** The job side of se_run: list, stop, wait or status. Undefined when the
@@ -99,12 +107,20 @@ interface TestJobEntry {
   done: Promise<void>;
   verdict?: Record<string, unknown>;
   started: number;
+  /** When the verdict landed. Without it a finished run reports the time since
+   *  it started rather than how long it took. */
+  ended?: number;
   pace: string;
+  /** The count this run's progress divides into, from the last battery on
+   *  record. see dsp-the-work-account.md#interface */
+  total?: number;
 }
 interface PersistedTestJob {
   id: string;
   started: number;
+  ended?: number;
   pace: string;
+  total?: number;
   verdict?: Record<string, unknown>;
 }
 const testVerdicts = new Map<string, TestJobEntry>();
@@ -119,7 +135,9 @@ function persistTestJob(se: string, id: string, entry: TestJobEntry): void {
   const record: PersistedTestJob = {
     id,
     started: entry.started,
+    ...(entry.ended === undefined ? {} : { ended: entry.ended }),
     pace: entry.pace,
+    ...(entry.total === undefined ? {} : { total: entry.total }),
     ...(entry.verdict === undefined ? {} : { verdict: entry.verdict }),
   };
   appendFileSync(testJobPath(se, id), `${JSON.stringify(record)}\n`, "utf8");
@@ -484,16 +502,18 @@ export function runTools(
         // battery caller is told how long the previous one took — measured,
         // never guessed — or told plainly that no record exists.
         const battery = decision.scope === "battery";
-        const pace = battery ? batteryPace(se) : "";
+        const measured = battery ? batteryRecord(se) : { pace: "", total: undefined };
         const entry: TestJobEntry = {
           done: undefined as unknown as Promise<void>,
           started: Date.now(),
-          pace,
+          pace: measured.pace,
+          ...(measured.total === undefined ? {} : { total: measured.total }),
         };
         // FIRE AND FORGET: completion records the verdict through the job promise.
         entry.done = work.then(
           (value) => {
             entry.verdict = { job: id, running: false, ...value };
+            entry.ended = Date.now();
             persistTestJob(se, id, entry);
             try {
               // see dsp-lane-door.md#the-record-carries-the-question-it-answered
@@ -550,7 +570,7 @@ export function runTools(
         return {
           handed_off: true,
           job: id,
-          note: `running in the background. Call se_test with {job: "${id}"} to read status. The final verdict records itself.${pace}`,
+          note: `running in the background. Call se_test with {job: "${id}"} to read status. The final verdict records itself.${measured.pace}`,
         };
       },
     },

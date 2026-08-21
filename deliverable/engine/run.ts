@@ -64,23 +64,50 @@ function spawnShell(root: string, command: string, cwd?: string): ChildProcess {
 // hold the MCP client either: a client that gives up on a slow call kills
 // the CALL, not the command, so the work carries on unwatched. A background
 // job is the honest shape — start it, get a handle, ask it how it is doing.
+// ONE TABLE, EVERY KIND. see dsp-the-work-account.md#responsibility, a shell
+// job, a test run and a step's leaving judgment are three kinds of the same
+// thing, and a caller asking what is running is told about all of them.
+export type OperationKind = "shell" | "test" | "judgment";
+
 export interface JobView {
   job: string;
+  kind: OperationKind;
   command: string;
   running: boolean;
   exit: number | null;
   duration_ms: number;
+  /** The step this work belongs to, where it belongs to one. Without it a
+   *  settled verdict has nowhere to land. */
+  state?: string;
+  /** Where this kind of work writes its own progress, where it writes any. */
+  progress?: string;
+  /** The count that progress divides into. */
+  total?: number;
+  /** What happened, for an operation whose outcome is not its streams. A
+   *  caller that missed the moment learns it here. */
+  outcome?: string;
+  /** How much longer this piece of work needs. Absent where nothing can be
+   *  computed — and `basis` then says why. */
+  remaining_ms?: number;
+  /** What the figure rests on, or why there is no figure. It is never absent:
+   *  a duration a reader cannot discount is believed more than it deserves. */
+  basis: string;
   stdout: string;
   stderr: string;
   truncated: boolean;
 }
 interface Job {
   id: string;
+  kind: OperationKind;
   command: string;
   started: number;
   ended?: number;
   exit: number | null;
   running: boolean;
+  state?: string;
+  progress?: string;
+  total?: number;
+  outcome?: string;
   out: string;
   err: string;
   child?: ChildProcess;
@@ -91,12 +118,26 @@ interface Job {
 }
 interface PersistedJob {
   id: string;
+  kind?: OperationKind;
   command: string;
   started: number;
   ended?: number;
   exit: number | null;
   running: boolean;
+  state?: string;
+  progress?: string;
+  total?: number;
   pid?: number;
+}
+/** A test run's own record, kept beside the shell jobs since before this table
+ *  existed. It is read back as an operation rather than rewritten. */
+interface PersistedTestOperation {
+  id: string;
+  started: number;
+  ended?: number;
+  pace?: string;
+  total?: number;
+  verdict?: { ok?: boolean; question?: string; tests?: { total?: number; pass?: number; fail?: number } };
 }
 const jobs = new Map<string, Job>();
 let jobSeq = 0;
@@ -114,11 +155,15 @@ function persist(j: Job): void {
   mkdirSync(jobDir(j.root), { recursive: true });
   const record: PersistedJob = {
     id: j.id,
+    kind: j.kind,
     command: j.command,
     started: j.started,
     ...(j.ended === undefined ? {} : { ended: j.ended }),
     exit: j.exit,
     running: j.running,
+    ...(j.state === undefined ? {} : { state: j.state }),
+    ...(j.progress === undefined ? {} : { progress: j.progress }),
+    ...(j.total === undefined ? {} : { total: j.total }),
     ...(j.pid === undefined ? {} : { pid: j.pid }),
   };
   appendFileSync(jobPath(j.root, j.id, "jsonl"), `${JSON.stringify(record)}\n`, "utf8");
@@ -144,6 +189,9 @@ function persisted(root: string, id: string): Job | undefined {
   };
   return {
     ...record,
+    // A record written before this table existed carries no kind, and a shell
+    // job is what it was.
+    kind: record.kind ?? "shell",
     root,
     out: output("stdout"),
     err: output("stderr"),
@@ -156,14 +204,118 @@ function view(j: Job): JobView {
   const cap = (s: string): string => capMiddle(s, OUT_CAP);
   return {
     job: j.id,
+    kind: j.kind,
     command: j.command,
     running: j.running,
     exit: j.exit,
     duration_ms: (j.ended ?? Date.now()) - j.started,
+    ...(j.state === undefined ? {} : { state: j.state }),
+    ...(j.progress === undefined ? {} : { progress: j.progress }),
+    ...(j.total === undefined ? {} : { total: j.total }),
+    ...(j.outcome === undefined ? {} : { outcome: j.outcome }),
+    ...timeRemaining(j),
     stdout: cap(j.out),
     stderr: cap(j.err),
     truncated: j.out.length > OUT_CAP || j.err.length > OUT_CAP,
   };
+}
+
+/** HOW MUCH LONGER, AND WHAT THAT RESTS ON, as ONE value rather than two
+ *  fields a build could drift apart.
+ *  see dsp-the-work-account.md#behavior-and-constraints */
+function timeRemaining(j: Job): { remaining_ms?: number; basis: string } {
+  if (!j.running) return { basis: "finished" };
+  if (j.progress === undefined || j.total === undefined || j.total <= 0) {
+    return { basis: "no measurement of comparable work exists, so no time remaining is given" };
+  }
+  const seen = new Set<string>();
+  let elapsed = 0;
+  try {
+    for (const line of readFileSync(j.progress, "utf8").trimEnd().split("\n")) {
+      try {
+        const row = JSON.parse(line) as { file?: string; t?: number };
+        if (typeof row.file === "string") seen.add(row.file);
+        if (typeof row.t === "number") elapsed = row.t;
+      } catch {
+        // A half-written line says nothing about the ones before it.
+      }
+    }
+  } catch {
+    return { basis: "this work writes no progress that can be read, so no time remaining is given" };
+  }
+  if (seen.size === 0 || elapsed === 0) {
+    return { basis: `nothing has finished yet of ${String(j.total)}, so no time remaining is given` };
+  }
+  const predicted = Math.round(elapsed / (seen.size / j.total));
+  return {
+    remaining_ms: Math.max(0, predicted - elapsed),
+    basis: `a linear projection over ${String(seen.size)} of ${String(j.total)} finished, measured on this run and dependable in neither direction`,
+  };
+}
+
+/** The last line that parses. An incomplete final append never hides the
+ *  preceding valid state. */
+function lastRecord(path: string): PersistedTestOperation | undefined {
+  const lines = readFileSync(path, "utf8").trimEnd().split("\n");
+  for (let index = lines.length - 1; index >= 0; index--) {
+    try {
+      return JSON.parse(lines[index]) as PersistedTestOperation;
+    } catch {
+      // keep walking backwards
+    }
+  }
+  return undefined;
+}
+
+/** WHAT HAPPENED, FOR SOMEBODY WHO MISSED THE MOMENT. A test run's outcome is
+ *  a verdict rather than a stream, so it says so in one line — otherwise the
+ *  caller is told a run finished and never told how. */
+function testOutcome(record: PersistedTestOperation): string | undefined {
+  const verdict = record.verdict;
+  if (verdict === undefined) return undefined;
+  const colour = verdict.ok === true ? "green" : "red";
+  const counted = verdict.tests;
+  if (counted === undefined) return colour;
+  return `${colour} — ${String(counted.pass ?? 0)} of ${String(counted.total ?? 0)} passed, ${String(counted.fail ?? 0)} failed`;
+}
+
+/** One test run, read back as an operation in the one table. */
+function testOperation(root: string, record: PersistedTestOperation): Job {
+  const settled = record.verdict !== undefined;
+  const outcome = testOutcome(record);
+  return {
+    id: record.id,
+    kind: "test",
+    command: record.verdict?.question ?? "a test run",
+    started: record.started,
+    ...(record.ended === undefined ? {} : { ended: record.ended }),
+    exit: settled ? (record.verdict?.ok === true ? 0 : 1) : null,
+    running: !settled,
+    progress: join(seDir(root), "test-progress.jsonl"),
+    ...(record.total === undefined ? {} : { total: record.total }),
+    ...(outcome === undefined ? {} : { outcome }),
+    out: "",
+    err: "",
+    root,
+    done: Promise.resolve(),
+    settle: () => {},
+  };
+}
+
+/** EVERY TEST RUN THIS ROOT REMEMBERS, read back as an operation. Its record
+ *  predates the one table and is left in its own folder rather than migrated:
+ *  a rewrite would lose the runs already on disk. */
+function testOperations(root: string): Job[] {
+  const dir = join(seDir(root), "test-jobs");
+  if (!existsSync(dir)) return [];
+  const found: Job[] = [];
+  for (const name of readdirSync(dir)) {
+    if (!name.endsWith(".jsonl")) continue;
+    const record = lastRecord(join(dir, name));
+    if (record === undefined) continue;
+    found.push(testOperation(root, record));
+  }
+  return found;
 }
 
 function knownJob(id: string, root?: string): Job {
@@ -221,13 +373,33 @@ export function runBackground(root: string, command: string, opts: { cwd?: strin
 
 /** REGISTER any child in the one job registry — se_test's runs live here
  *  too, so the shutdown reap and {jobs: true} see every spawned process. */
-export function startJob(command: string, spawnFn: () => ChildProcess, root?: string): JobView {
+export function startJob(
+  command: string,
+  spawnFn: () => ChildProcess,
+  root?: string,
+  opts: { kind?: OperationKind; state?: string; progress?: string; total?: number } = {},
+): JobView {
   const id = `job-${Date.now().toString(36)}-${++jobSeq}`;
   let settle = (): void => {};
   const done = new Promise<void>((res) => {
     settle = res;
   });
-  const j: Job = { id, command, started: Date.now(), exit: null, running: true, out: "", err: "", root, done, settle };
+  const j: Job = {
+    id,
+    kind: opts.kind ?? "shell",
+    command,
+    started: Date.now(),
+    exit: null,
+    running: true,
+    ...(opts.state === undefined ? {} : { state: opts.state }),
+    ...(opts.progress === undefined ? {} : { progress: opts.progress }),
+    ...(opts.total === undefined ? {} : { total: opts.total }),
+    out: "",
+    err: "",
+    root,
+    done,
+    settle,
+  };
   jobs.set(id, j);
   let child: ChildProcess;
   try {
@@ -306,7 +478,38 @@ export function jobList(root?: string): JobView[] {
       }
     }
   }
+  // THE OTHER KIND. A test run keeps its own record, and a caller asking what
+  // is running was told about one table and never learned the other existed.
+  if (root !== undefined) {
+    for (const op of testOperations(root)) if (!found.has(op.id)) found.set(op.id, op);
+  }
   return [...found.values()].sort((a, b) => b.started - a.started).map(view);
+}
+
+/** Ids whose outcome has already been handed to a caller — the third standing.
+ *  An operation is running, then finished, then read.
+ *  see dsp-the-work-account.md#behavior-and-constraints */
+const reported = new Set<string>();
+const seenRunning = new Set<string>();
+
+/** THE ACCOUNT THAT RIDES A LANE ANSWER: everything still running, plus
+ *  anything that finished since the last look. Never the whole history — a
+ *  caller learns each outcome ONCE and is not told it again, and work that
+ *  ended before this session looked answers to se_run {jobs: true} instead. */
+export function workAccount(root?: string): JobView[] {
+  const out: JobView[] = [];
+  for (const entry of jobList(root)) {
+    if (entry.running) {
+      seenRunning.add(entry.job);
+      out.push(entry);
+      continue;
+    }
+    if (!jobs.has(entry.job) && !seenRunning.has(entry.job)) continue;
+    if (reported.has(entry.job)) continue;
+    reported.add(entry.job);
+    out.push(entry);
+  }
+  return out;
 }
 
 /** Stop everything still running — the server is going down. */

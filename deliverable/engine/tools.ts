@@ -26,7 +26,7 @@ import { openPanel } from "./panel.ts";
 import { seDir } from "./paths.ts";
 import { produceProject, produceVehicle } from "./produce.ts";
 import type { MirrorState } from "./render.ts";
-import { runToCompletion } from "./run.ts";
+import { runToCompletion, workAccount } from "./run.ts";
 import { requiredDependsOn } from "./seed.ts";
 import { type AmendOp, Session } from "./session.ts";
 import { Toll } from "./toll.ts";
@@ -884,6 +884,16 @@ export function buildServer(
   server.addDecorator((_tool, result) => {
     if (TYPECHECK.report === "" || typeof result !== "object" || result === null || Array.isArray(result)) return result;
     return { ...(result as Record<string, unknown>), typecheck_error: TYPECHECK.report };
+  });
+
+  // THE ACCOUNT RIDES BESIDE THE ANSWER, never replacing it. The caller asked
+  // for something and gets it unchanged; `work` is a second field.
+  // An EMPTY ACCOUNT IS AN EMPTY LIST, never an absent field — absent cannot be
+  // told apart from a build that never emitted one.
+  // see dsp-the-work-account.md#interface
+  server.addDecorator((_tool, result) => {
+    if (typeof result !== "object" || result === null || Array.isArray(result)) return result;
+    return { ...(result as Record<string, unknown>), work: workAccount(root) };
   });
 
   // see dsp-write-guard.md#and-so-does-the-accepted-one

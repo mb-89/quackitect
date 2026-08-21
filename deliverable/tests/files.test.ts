@@ -147,7 +147,15 @@ test("no new file read bypasses the door — the count may fall, never rise", ()
   // once every active cell carries a rating. A README is not a note and has no
   // door; the read wants a substring of raw text, not a parse, and it is
   // wrapped in a try so an absent file answers false rather than throwing.
-  const CEILING = 117;
+  // 118 AT i51: run.ts testOperations reads a test run's own record out of
+  // .se/test-jobs so the ONE operation table can list it beside the shell jobs.
+  // A job record is not a note and has no door; the read wants one JSONL line of
+  // machine-local state, not a parsed trace node, and it sits beside persisted()
+  // in the same file doing the same thing for the other kind.
+  // AND 119: run.ts timeRemaining reads the running work's own progress file to
+  // project how much longer it needs. Same shape and same reason — machine-local
+  // JSONL, no door, no parse of a trace node.
+  const CEILING = 119;
   let found = 0;
   const offenders: string[] = [];
   const walk = (dir: URL, rel: string): void => {

@@ -14,7 +14,7 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
-import { jobList } from "../engine/run.ts";
+import { jobList, workAccount } from "../engine/run.ts";
 
 /** A root holding one shell job and one test job, both already finished. */
 function rootWithBothKinds(): string {
@@ -75,6 +75,71 @@ test("every entry states how much longer it needs and what that figure rests on"
         assert.equal(typeof seen.basis, "string", `${entry.job} gives a time remaining with no basis beside it`);
       }
     }
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+// A caller that missed the moment still learns what happened. A test run's
+// outcome is a verdict rather than a stream, so an entry that carried only
+// `running: false` told them a run ended and never told them how.
+test("a settled operation keeps what happened, for a caller that missed it", () => {
+  const root = mkdtempSync(join(tmpdir(), "se-settled-"));
+  try {
+    mkdirSync(join(root, ".se", "test-jobs"), { recursive: true });
+    writeFileSync(
+      join(root, ".se", "test-jobs", "test-settled-1.jsonl"),
+      `${JSON.stringify({
+        id: "test-settled-1",
+        started: 1_787_308_851_348,
+        ended: 1_787_308_951_348,
+        pace: " measured",
+        verdict: { ok: false, question: "did the edit break the trace", tests: { total: 1722, pass: 1719, fail: 3 } },
+      })}\n`,
+      "utf8",
+    );
+    const entry = jobList(root).find((j) => j.job === "test-settled-1");
+    assert.ok(entry !== undefined, "the settled run is still listed");
+    assert.equal(entry.running, false, "and it is not running");
+    assert.equal(
+      entry.outcome,
+      "red — 1719 of 1722 passed, 3 failed",
+      `the outcome says what happened rather than only that it stopped: ${JSON.stringify(entry)}`,
+    );
+    assert.equal(entry.duration_ms, 100_000, "and the duration is how long it took, not how long ago it started");
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+// THE RIDER. An empty account is an empty LIST, never an absent field: absent
+// cannot be told apart from a build that never emitted one, which is the first
+// of the two findings the re-scoring pass raised against this design.
+test("an account with nothing in it is an empty list, not an absent one", () => {
+  const root = mkdtempSync(join(tmpdir(), "se-empty-"));
+  try {
+    const account = workAccount(root);
+    assert.ok(Array.isArray(account), "the account is always a list");
+    assert.equal(account.length, 0, `nothing is running in a fresh root: ${JSON.stringify(account)}`);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+// History is not news. A run that ended before this session looked answers to
+// se_run {jobs: true}; it does not ride on every answer for ever.
+test("work that ended before this session looked does not ride", () => {
+  const root = rootWithBothKinds();
+  try {
+    assert.ok(
+      jobList(root).some((j) => j.job === "job-shell-1"),
+      "the finished shell job is still in the table",
+    );
+    assert.equal(
+      workAccount(root).some((j) => j.job === "job-shell-1"),
+      false,
+      "but it is history rather than something to tell the caller again",
+    );
   } finally {
     rmSync(root, { recursive: true, force: true });
   }
