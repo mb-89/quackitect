@@ -1,6 +1,7 @@
 ---
 id: i38-the-machine-sizes-its-own-driver-every-s
-status: open
+status: shipped
+closed: 2026-08-21T00:19:18.909Z
 started: 2026-08-20T09:13:33.214Z
 opened: 2026-08-20T07:17:57.705Z
 goal: "The machine sizes its own driver: every state says how hard it is, one fixed list says which model that needs, and the lane records which model actually answered."
