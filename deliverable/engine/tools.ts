@@ -891,10 +891,17 @@ export function buildServer(
   // An EMPTY ACCOUNT IS AN EMPTY LIST, never an absent field — absent cannot be
   // told apart from a build that never emitted one.
   // see dsp-the-work-account.md#interface
-  server.addDecorator((_tool, result) => {
-    if (typeof result !== "object" || result === null || Array.isArray(result)) return result;
-    return { ...(result as Record<string, unknown>), work: workAccount(root) };
-  });
+  // AND IT RIDES A REFUSAL TOO — the one answer where a caller most needs to
+  // know a judgment is still in flight, because the condition that refused it
+  // is often the very check still running. It reads and spends nothing, which
+  // is what makes it safe to run there.
+  server.addDecorator(
+    (_tool, result) => {
+      if (typeof result !== "object" || result === null || Array.isArray(result)) return result;
+      return { ...(result as Record<string, unknown>), work: workAccount(root) };
+    },
+    { onRefusal: true },
+  );
 
   // see dsp-write-guard.md#and-so-does-the-accepted-one
   server.addDecorator((_tool, result) => {

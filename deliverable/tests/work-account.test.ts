@@ -202,16 +202,36 @@ test("a running entry states how much longer it needs, projected from its own co
 });
 
 // req-a-time-remaining-names-its-basis: "The entry says which measurement is not
-// advancing rather than repeating a stale number in silence." Reporting the
-// same figure twice looks identical to a working estimate.
+// advancing rather than repeating a stale number in silence."
+//
+// MEASURED AGAINST THE RUN'S OWN CLOCK. This run started 60s ago and its last
+// file finished 2s in, so nothing has finished for 58s. A first version counted
+// READS of this table instead, which made a healthy run read as stalled the
+// moment anything looked at it twice.
 test("a figure that has stopped moving says so instead of repeating in silence", () => {
-  const root = rootWithLiveRun("test-stall-1", Date.now());
+  const root = rootWithLiveRun("test-stall-1", Date.now() - 60_000);
   try {
-    const first = jobList(root).find((j) => j.job === "test-stall-1");
-    assert.ok(first !== undefined && /finished on this run/.test(first.basis), `the first look projects: ${JSON.stringify(first)}`);
-    const second = jobList(root).find((j) => j.job === "test-stall-1");
-    assert.ok(second !== undefined, "the run is still listed");
-    assert.match(second.basis, /has not moved since the last look/, `the second look names the stall: ${second.basis}`);
+    const entry = jobList(root).find((j) => j.job === "test-stall-1");
+    assert.ok(entry !== undefined, "the run is still listed");
+    assert.match(entry.basis, /nothing has finished for \d+s/, `the basis names the stall: ${entry.basis}`);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+// ONE ANSWER READS THIS TABLE TWICE. se_run {jobs: true} composes `jobs` from
+// jobList, and the account decorator then calls workAccount, which calls
+// jobList again — milliseconds apart, with nothing appended in between. A stall
+// detector with a memory of earlier reads made those two passes contradict each
+// other inside a single JSON answer about the same job.
+test("two looks at the same live run agree with each other", () => {
+  const root = rootWithLiveRun("test-agree-1", Date.now());
+  try {
+    const first = jobList(root).find((j) => j.job === "test-agree-1");
+    const second = jobList(root).find((j) => j.job === "test-agree-1");
+    assert.ok(first !== undefined && second !== undefined, "the run is listed on both looks");
+    assert.equal(first.basis, second.basis, `two reads of one table must not contradict each other: ${first.basis} vs ${second.basis}`);
+    assert.match(second.basis, /finished on this run/, `and neither calls healthy work a stall: ${second.basis}`);
   } finally {
     rmSync(root, { recursive: true, force: true });
   }
@@ -241,7 +261,7 @@ test("progress left by an earlier run is not projected as this run's", () => {
 test("a run this session started reports its outcome even if it settled unseen", () => {
   const root = rootWithSettledRun("test-quick-1");
   try {
-    noteStarted("test-quick-1");
+    noteStarted("test-quick-1", root);
     const entry = workAccount(root).find((j) => j.job === "test-quick-1");
     assert.ok(entry !== undefined, "the run this session started reaches the caller");
     assert.equal(entry.standing, "finished", `and its outcome has not been handed over before: ${JSON.stringify(entry)}`);
@@ -258,7 +278,7 @@ test("a run this session started reports its outcome even if it settled unseen",
 test("an entry never leaves the table, and a second look marks it read", () => {
   const root = rootWithSettledRun("test-twice-1");
   try {
-    noteStarted("test-twice-1");
+    noteStarted("test-twice-1", root);
     const first = workAccount(root).find((j) => j.job === "test-twice-1");
     assert.equal(first?.standing, "finished", "the first look hands the outcome over");
     const second = workAccount(root).find((j) => j.job === "test-twice-1");

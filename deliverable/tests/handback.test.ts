@@ -171,13 +171,25 @@ test("the call answers in under a second while a long judgment is still running"
     evidence: new Map<string, Record<string, unknown>>(),
   };
   const scripts = new Scripts(host);
+  // THE BOUND COMES FROM THE SERVING PATH'S OWN CONSTANT, never a copy. A
+  // duplicated literal here lets that number rise back to 1000 with this case
+  // still passing, which is the exact regression the case exists to catch.
+  // It is read from the source rather than imported so this file keeps testing
+  // session.ts without loading it.
+  const declared = source("session.ts").match(/export const JUDGMENT_HANDBACK_MS = (\d+);/);
+  assert.ok(declared !== null, "the bound is a named exported constant, so a test can hold it to the measure");
+  const bound = Number(declared[1]);
+  assert.ok(
+    bound < 1000,
+    `the bound must sit under the second the measure names, with room for the rest of the call; it is ${String(bound)}ms`,
+  );
   // THE SKIP WOULD MAKE THIS PASS WITHOUT MEASURING ANYTHING. With it set the
   // judgment returns instantly and the clock proves nothing about the bound.
   const skip = process.env.SE_SCRIPT_SKIP;
   delete process.env.SE_SCRIPT_SKIP;
   try {
     const at = Date.now();
-    await scripts.scriptSettleWithin(slow.id, 900);
+    await scripts.scriptSettleWithin(slow.id, bound);
     const took = Date.now() - at;
     assert.ok(took < 1000, `the answering call must return in UNDER a second whatever the check's own duration; it took ${String(took)}ms`);
     assert.equal(scripts.scriptStanding(box, slow), "deciding", "and the step says its judgment is still being reached");
@@ -186,4 +198,28 @@ test("the call answers in under a second while a long judgment is still running"
     else process.env.SE_SCRIPT_SKIP = skip;
     rmSync(lab, { recursive: true, force: true });
   }
+});
+
+// THE GATE MUST ASK BOTH QUESTIONS.
+// req-a-pending-verdict-is-recorded-against-its-state binds the gate row to
+// "are my feeders green, AND is any of them still deciding", and names the
+// consequence of asking only the first: "a gate below it reads a green it has
+// not earned." The signature lands when a form stamps; the leaving judgment can
+// still be running behind it.
+//
+// THIS READS SOURCE, and says so. Standing up a whole ClaimsHost to drive
+// feedersUnsigned would be a fixture larger than the claim; what can decay here
+// is the WIRING, and the wiring is what these two assertions hold.
+test("the gate asks whether a feeder is still deciding, not only whether it signed", () => {
+  const text = source("sessionclaims.ts");
+  assert.match(text, /\|\s*"stepStanding"/, "the claims layer is given a way to ask where a step stands");
+  const body = text.slice(
+    text.indexOf("feedersUnsigned("),
+    text.indexOf("/** see dsp-walk-machine.md#every-condition-holding-a-state-grey"),
+  );
+  assert.match(
+    body,
+    /stepStanding\([^)]*\) === "deciding"/,
+    "a feeder whose leaving judgment is in flight must not count as finished, or the gate reads a green nobody earned",
+  );
 });

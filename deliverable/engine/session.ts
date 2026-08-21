@@ -31,11 +31,22 @@ import { computeRoute, type RouteNode, type RouteResult, type RouteStep, routeWr
  *  the bound a lane call is promised, so a judgment that settles fast is still
  *  answered in one call and a slow one never holds the caller.
  *  see dsp-the-work-account.md#responsibility */
-// UNDER a second, not AT one. req-a-leaving-check-does-not-hold-the-call
-// measures "the answering call returns in under 1 second", and a timer of
-// exactly 1000 fires at or after 1000 — never before — with the condition loop
-// still to run after it. A bound equal to the measure cannot meet the measure.
-const JUDGMENT_HANDBACK_MS = 900;
+/** HOW LONG A LEAVING JUDGMENT MAY HOLD THE CALL, and it is well under the
+ *  second the measure names.
+ *
+ *  req-a-leaving-check-does-not-hold-the-call measures "the answering call
+ *  returns in under 1 second". A timer of exactly 1000 fires at or after 1000,
+ *  never before, so a bound equal to the measure cannot meet it.
+ *
+ *  AND THE BOUND IS NOT THE CALL. After this wait the attempt still runs the
+ *  exit-condition loop, the read gate and the entry-condition loop before the
+ *  caller sees anything. The headroom here is for that work, and it is why the
+ *  number is not 999.
+ *
+ *  EXPORTED SO THE TIMING CASE MEASURES THIS CONSTANT rather than a copy of it.
+ *  A duplicated literal in the test lets this number rise without the test
+ *  noticing, which is exactly the regression the case exists to catch. */
+export const JUDGMENT_HANDBACK_MS = 750;
 
 /** see dsp-walk-machine.md#the-state-a-recorded-visit-names */
 export function visitState(visit: string): string {
@@ -3651,6 +3662,13 @@ export class Session {
       // it was false too — a second attempt JOINS the running judgment rather
       // than re-running the script.
       const deciding = this.scripts.scriptStanding(m, s) === "deciding";
+      // A RE-RUN MUST NOT HIDE WHAT THE LAST RUN SAID. A long check that goes
+      // red is started again by the next attempt, and while that second run is
+      // in flight the standing reads `deciding` — so "still running" was the
+      // only thing a caller could ever see and the RED OUTPUT was unreachable.
+      // The evidence still holds the previous verdict, because a run writes it
+      // only when it settles. Carry it, named as the previous run's.
+      const lastSaid = deciding && st.ran && st.output !== "" ? `\n\nTHE PREVIOUS RUN OF THIS CHECK SAID:\n${st.output}` : "";
       const fixIt =
         door === undefined
           ? { tool: "se_pull", args: {}, note: "fix what the output names, then pull again — the script re-runs on every attempt" }
@@ -3663,7 +3681,7 @@ export class Session {
         clause: CLAUSES.CONDITION_UNMET,
         expected: `${which} condition 'script' of ${stateId} — ${args.join(", ")} exits 0 (see ${note})`,
         got: deciding
-          ? "the check is STILL RUNNING — this call was answered without waiting for it, and its outcome is not in yet"
+          ? `the check is STILL RUNNING — this call was answered without waiting for it, and its outcome is not in yet${lastSaid}`
           : st.ran
             ? st.output
             : "not run yet",

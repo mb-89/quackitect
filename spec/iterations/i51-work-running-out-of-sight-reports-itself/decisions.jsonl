@@ -378,3 +378,57 @@
 {"ts":"2026-08-21T12:09:01.247Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d301","brief":"re-run the three touched files after the git status fix"}
 {"ts":"2026-08-21T12:09:15.621Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d302","brief":"see the tree before staging, to keep the vanished files out"}
 {"ts":"2026-08-21T12:09:28.500Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d303","brief":"stage the fix pass"}
+{"ts":"2026-08-21T12:09:36.359Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d304","brief":"keep the 13 unexplained deletions out of this commit"}
+{"ts":"2026-08-21T12:09:58.129Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d305","brief":"commit the whole fix pass"}
+{"ts":"2026-08-21T12:10:11.073Z","op":"done","visit":"iterations/i51/build-steps/a-fresh-session-knows-a-deciding-step@0","node":"d227","brief":"the fix pass is committed as 494d608b with 69 of 69 green on the touched files"}
+{"ts":"2026-08-21T12:10:18.970Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d306","brief":"read the cloud card's ruling on pushing"}
+{"ts":"2026-08-21T12:10:55.516Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d307","brief":"tester re-verifying the fix pass against the standing findings"}
+{"ts":"2026-08-21T12:11:02.290Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d308","brief":"locating the account fixes in run.ts"}
+{"ts":"2026-08-21T12:11:08.512Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d309","brief":"reading the reworked workAccount"}
+{"ts":"2026-08-21T12:11:14.675Z","op":"done","visit":"iterations/i51/verification@0","node":"d246","brief":"all fourteen findings fixed in one pass and committed"}
+{"ts":"2026-08-21T12:11:25.936Z","op":"update","visit":"iterations/i51/cut-criteria@4","node":"d310","brief":"reading the reworked timeRemaining and its stale and stall branches"}
+{"ts":"2026-08-21T12:11:30.992Z","op":"update","visit":"iterations/i51/cut-criteria@4","node":"d311","brief":"reading the stall basis text"}
+{"ts":"2026-08-21T12:11:31.734Z","op":"done","visit":"iterations/i51/fix-findings@0","node":"d272","brief":"the battery ran green on the submit and fix-findings is signed"}
+{"ts":"2026-08-21T12:13:48.011Z","op":"update","visit":"iterations/i51/gate-implementation@0","node":"d312","brief":"read the standing field report before adding this round"}
+{"ts":"2026-08-21T12:14:47.032Z","op":"update","visit":"iterations/i51/gate-implementation@0","node":"d313","brief":"correct the stale header and add this round's findings"}
+{"ts":"2026-08-21T12:15:09.909Z","op":"update","visit":"iterations/i51/gate-implementation@0","node":"d314","brief":"stage the field report"}
+{"ts":"2026-08-21T12:15:22.931Z","op":"update","visit":"iterations/i51/gate-implementation@0","node":"d315","brief":"round 0 needs a citable answer on the tree at rest"}
+{"ts":"2026-08-21T12:15:35.028Z","op":"done","visit":"iterations/i51/identify-assumptions@0","node":"d49","brief":"identify-assumptions was submitted and signed at M3"}
+{"ts":"2026-08-21T12:16:13.580Z","op":"plan","visit":"iterations/i51/gate-implementation@0","parent":null,"nodes":[{"id":"d316","brief":"make the gate see a feeder still deciding"},{"id":"d317","brief":"judge a stall on wall time, not on reads"},{"id":"d318","brief":"key the started and progress marks by root"},{"id":"d319","brief":"run only refusal-safe decorators on a refusal"},{"id":"d320","brief":"link the timing test to the constant and leave headroom"},{"id":"d321","brief":"record the route drawer as debt with its trigger"},{"id":"d322","brief":"re-run and show the tester the second deltas"}]}
+{"ts":"2026-08-21T12:16:27.404Z","op":"update","visit":"iterations/i51/gate-implementation@0","node":"d323","brief":"find where the session can hand the gate the standing"}
+{"ts":"2026-08-21T12:16:33.728Z","op":"update","visit":"iterations/i51/gate-implementation@0","node":"d324","brief":"locate the session's claims and scripts fields"}
+{"ts":"2026-08-21T12:16:41.035Z","op":"update","visit":"iterations/i51/gate-implementation@0","node":"d325","brief":"find the declarations to wire the hook beside"}
+{"ts":"2026-08-21T12:16:53.092Z","op":"update","visit":"iterations/i51/gate-implementation@0","node":"d326","brief":"read the claim host interface"}
+{"ts":"2026-08-21T12:17:00.047Z","op":"update","visit":"iterations/i51/gate-implementation@0","node":"d327","brief":"read the ClaimsHost members"}
+{"ts":"2026-08-21T12:17:08.077Z","op":"update","visit":"iterations/i51/gate-implementation@0","node":"d328","brief":"read the picked host members"}
+{"ts":"2026-08-21T12:18:04.255Z","op":"done","visit":"iterations/i51/gate-implementation@0","node":"d317","brief":"the stall is computed from the run's own clock, so no read history is kept"}
+{"ts":"2026-08-21T12:18:36.507Z","op":"fork","visit":"iterations/i51/gate-implementation@0","parent":"d316","node":"d329","brief":"the owner ruled the field report out of git; I put it in spec","nodes":[]}
+{"ts":"2026-08-21T12:19:01.415Z","op":"update","visit":"iterations/i51/gate-implementation@0","node":"d330","brief":"state the privacy reason so the rule cannot be argued away again"}
+{"ts":"2026-08-21T12:19:22.961Z","op":"update","visit":"iterations/i51/gate-implementation@0","node":"d331","brief":"ruling recorded and the card now carries the reason"}
+{"ts":"2026-08-21T12:19:57.861Z","op":"done","visit":"iterations/i51/gate-implementation@0","node":"d318","brief":"started marks are keyed by root and the progress memory is gone entirely"}
+{"ts":"2026-08-21T12:20:07.805Z","op":"update","visit":"iterations/i51/gate-implementation@0","node":"d332","brief":"read the decorators to find which are safe on a refusal"}
+{"ts":"2026-08-21T12:20:20.104Z","op":"update","visit":"iterations/i51/gate-implementation@0","node":"d333","brief":"read the decorator registration signature"}
+{"ts":"2026-08-21T12:20:50.214Z","op":"done","visit":"iterations/i51/gate-implementation@0","node":"d319","brief":"only the account rides a refusal now, so nothing spends state on one"}
+{"ts":"2026-08-21T12:21:43.938Z","op":"done","visit":"iterations/i51/gate-implementation@0","node":"d320","brief":"the timing case reads the constant out of the source instead of copying it"}
+{"ts":"2026-08-21T12:21:53.989Z","op":"update","visit":"iterations/i51/gate-implementation@0","node":"d334","brief":"read a risk entry's shape before writing two"}
+{"ts":"2026-08-21T12:22:16.495Z","op":"update","visit":"iterations/i51/gate-implementation@0","node":"d335","brief":"record the route drawer as debt with the reason it is the safe direction"}
+{"ts":"2026-08-21T12:22:34.760Z","op":"done","visit":"iterations/i51/gate-implementation@0","node":"d321","brief":"both residuals stand in the register with triggers and what would close them"}
+{"ts":"2026-08-21T12:22:49.945Z","op":"update","visit":"iterations/i51/gate-implementation@0","node":"d336","brief":"confirm the second pass"}
+{"ts":"2026-08-21T12:23:01.346Z","op":"update","visit":"iterations/i51/gate-implementation@0","node":"d337","brief":"read the earlier battery's verdict while this one runs"}
+{"ts":"2026-08-21T12:48:28.217Z","op":"update","visit":"iterations/i51/start@0","node":"d6","brief":"re-earn the read credits the restarted engine lost"}
+{"ts":"2026-08-21T12:48:42.796Z","op":"update","visit":"iterations/i51/start@0","node":"d7","brief":"credit the owed reading in one call rather than twelve"}
+{"ts":"2026-08-21T12:54:24.122Z","op":"done","visit":"front_desk@0","node":"d1","brief":"twelve documents re-read and the walk is back inside the record"}
+{"ts":"2026-08-21T12:54:59.625Z","op":"update","visit":"iterations/i51/gate-architecture@0","node":"d8","brief":"sweep on toward the implementation gate"}
+{"ts":"2026-08-21T12:55:19.767Z","op":"update","visit":"iterations/i51/rank-unknowns@0","node":"d9","brief":"the debt entry used a word off the likelihood scale"}
+{"ts":"2026-08-21T12:55:25.862Z","op":"update","visit":"iterations/i51/rank-unknowns@0","node":"d10","brief":"sweep on with the grade corrected"}
+{"ts":"2026-08-21T12:55:51.526Z","op":"update","visit":"iterations/i51/rank-unknowns@0","node":"d11","brief":"the damage grade was off its scale too"}
+{"ts":"2026-08-21T12:55:57.425Z","op":"update","visit":"iterations/i51/rank-unknowns@0","node":"d12","brief":"sweep on with both grades on their scales"}
+{"ts":"2026-08-21T12:56:27.860Z","op":"done","visit":"front_desk@0","node":"d2","brief":"the battery is running live as verification's own leaving judgment"}
+{"ts":"2026-08-21T12:56:36.315Z","op":"update","visit":"iterations/i51/verification@0","node":"d13","brief":"take the last owed reading while the battery runs"}
+{"ts":"2026-08-21T12:57:21.956Z","op":"update","visit":"iterations/i51/verification@0","node":"d14","brief":"read the battery's verdict and move to the gate"}
+{"ts":"2026-08-21T12:57:50.259Z","op":"update","visit":"iterations/i51/verification@0","node":"d15","brief":"capture the judgment-sizing gap while the battery finishes"}
+{"ts":"2026-08-21T12:57:59.871Z","op":"update","visit":"iterations/i51/verification@0","node":"d16","brief":"the battery is red; read what it names"}
+{"ts":"2026-08-21T12:58:26.967Z","op":"update","visit":"iterations/i51/verification@0","node":"d17","brief":"read the red battery's output"}
+{"ts":"2026-08-21T12:59:02.316Z","op":"update","visit":"iterations/i51/verification@0","node":"d18","brief":"take the drawn fallback rather than restart the battery each pull"}
+{"ts":"2026-08-21T12:59:55.905Z","op":"fork","visit":"iterations/i51/verification@0","parent":"d5","node":"d19","brief":"a re-run of one judgment is invisible and masks the first run's output","nodes":[]}
+{"ts":"2026-08-21T13:00:10.207Z","op":"done","visit":"iterations/i51/verification@0","node":"d19","brief":"both findings captured; the workaround is one pull after it settles"}

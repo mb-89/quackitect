@@ -513,7 +513,7 @@ export function runTools(
         // THIS SESSION STARTED IT, and the account cannot tell that from the
         // record on disk alone. Without this a run that settles between two
         // lane calls reads back as history and never reaches the caller.
-        noteStarted(id);
+        noteStarted(id, root);
         // THE LAST RUN SIZES THE EXPECTATION (owner ruling 2026-08-03): a
         // battery caller is told how long the previous one took — measured,
         // never guessed — or told plainly that no record exists.

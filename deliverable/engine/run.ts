@@ -260,10 +260,9 @@ function progressOfRun(path: string, since: number): { files: number; elapsed: n
   return { files: seen.size, elapsed };
 }
 
-/** The reading before this one, per operation, so a figure that has stopped
- *  moving can say so instead of repeating in silence
- *  (req-a-time-remaining-names-its-basis). */
-const lastProgress = new Map<string, { files: number; elapsed: number }>();
+/** HOW LONG NOTHING MAY FINISH before the figure says it is not advancing.
+ *  Below this a slow test file is ordinary work rather than a stall. */
+const STALL_AFTER_MS = 30_000;
 
 /** HOW MUCH LONGER, AND WHAT THAT RESTS ON, as ONE value rather than two
  *  fields a build could drift apart.
@@ -283,15 +282,23 @@ function timeRemaining(j: Job): { remaining_ms?: number; basis: string } {
   if (now.files === 0 || now.elapsed === 0) {
     return { basis: `nothing has finished yet of ${String(j.total)}, so no time remaining is given` };
   }
-  const before = lastProgress.get(j.id);
-  lastProgress.set(j.id, now);
-  const moved = before === undefined || before.files !== now.files || before.elapsed !== now.elapsed;
+  // THE STALL IS MEASURED AGAINST THE RUN'S OWN CLOCK, never against the
+  // previous READ of this table.
+  //
+  // `elapsed` is how far into the run the last file finished. Subtract it from
+  // how long the run has actually been going and what is left is how long
+  // nothing has finished for. No memory of earlier reads is needed, so two
+  // looks a millisecond apart cannot disagree with each other — which is what a
+  // read-counting version did, inside a single answer that reads the table
+  // twice.
+  const silentFor = Date.now() - j.started - now.elapsed;
   const predicted = Math.round(now.elapsed / (now.files / j.total));
   return {
     remaining_ms: Math.max(0, predicted - now.elapsed),
-    basis: moved
-      ? `a linear projection over ${String(now.files)} of ${String(j.total)} finished on this run, dependable in neither direction`
-      : `${String(now.files)} of ${String(j.total)} finished, and the count has not moved since the last look, so this figure is not advancing`,
+    basis:
+      silentFor >= STALL_AFTER_MS
+        ? `${String(now.files)} of ${String(j.total)} finished, and nothing has finished for ${String(Math.round(silentFor / 1000))}s, so this figure is not advancing`
+        : `a linear projection over ${String(now.files)} of ${String(j.total)} finished on this run, dependable in neither direction`,
   };
 }
 
@@ -533,7 +540,13 @@ export function jobList(root?: string): JobView[] {
  *  enters the table by name rather than by spawn.
  *  see dsp-the-work-account.md#interface */
 export function openOperation(o: { id: string; kind: OperationKind; command: string; state?: string; root?: string }): void {
-  if (jobs.has(o.id)) return;
+  // A LIVE ENTRY IS LEFT ALONE; A SETTLED ONE IS REPLACED. A judgment's id is
+  // derived from its step, so every re-run of one step reuses it. Returning
+  // early on ANY existing id meant the second run never entered the table, and
+  // the account went on showing the first run's settled record as though it
+  // were current — measured on i51's own verification, 98 seconds stale.
+  const standing = jobs.get(o.id);
+  if (standing?.running === true) return;
   const j: Job = {
     id: o.id,
     kind: o.kind,
@@ -570,11 +583,14 @@ export function settleOperation(id: string, ok: boolean): void {
  *  `jobs`, so without this set a run that started AND settled between two lane
  *  calls was dropped before any caller ever saw it
  *  (req-one-call-reports-every-piece-of-work-out-of-sight). */
-const startedHere = new Set<string>();
+const startedHere = new Map<string, Set<string>>();
 
-/** SAY THAT THIS SESSION STARTED A PIECE OF WORK the table cannot see. */
-export function noteStarted(id: string): void {
-  startedHere.add(id);
+/** SAY THAT THIS SESSION STARTED A PIECE OF WORK the table cannot see.
+ *  KEYED BY ROOT for the same reason the read marks are: two trees can hold
+ *  the same job id, and one set shared between them lets one tree's work
+ *  answer for the other's. */
+export function noteStarted(id: string, root?: string): void {
+  marksFor(startedHere, root).add(id);
 }
 
 /** THE TWO MARKS THE ACCOUNT KEEPS, both PER ROOT. Two trees can hold the same
@@ -602,6 +618,7 @@ function marksFor(store: Map<string, Set<string>>, root?: string): Set<string> {
 export function workAccount(root?: string): JobView[] {
   const read = marksFor(handedOut, root);
   const running = marksFor(runningSeen, root);
+  const mine = marksFor(startedHere, root);
   const out: JobView[] = [];
   for (const entry of jobList(root)) {
     if (entry.running) {
@@ -609,7 +626,7 @@ export function workAccount(root?: string): JobView[] {
       out.push({ ...entry, standing: "running" });
       continue;
     }
-    if (!jobs.has(entry.job) && !startedHere.has(entry.job) && !running.has(entry.job)) continue;
+    if (!jobs.has(entry.job) && !mine.has(entry.job) && !running.has(entry.job)) continue;
     const already = read.has(entry.job);
     read.add(entry.job);
     out.push({ ...entry, standing: already ? "read" : "finished" });
