@@ -15,7 +15,7 @@ THE PROBLEM. A surface that takes thirty seconds and a surface that has hung
 look identical, so the person spends the wait deciding whether to keep waiting
 instead of doing anything useful.
 |||
-STILL TRUE, AND THIS ITERATION'S OWN WALK IS THE CLEAREST INSTANCE ON FILE. Six pulls timed out entirely on the hop into a gate, because that hop's exit script fires the full battery — about a minute of real work behind a single call, with nothing on screen to say so. The record that wrote this story failed it while writing it.
+STILL TRUE, AND THIS ITERATION'S OWN WALK IS THE CLEAREST INSTANCE ON FILE. Six pulls timed out entirely on the hop into a gate, because that hop's exit script fires the full battery — about a minute of real work behind a single call, with nothing on screen to say so. The record that wrote this story failed it while writing it. i51 TAKES THE AGENT'S HALF OF THE SAME CAUSE: sty-the-step-that-hands-the-walk-back makes the hop answer at once instead of holding the call, so the timeouts recorded on this slide stop happening. This story keeps the PERSON's half, which is what a surface shows while it waits, and that half is untouched.
 
 ---
 

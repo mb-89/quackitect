@@ -37,6 +37,40 @@ rather than to add a verb for fetching it.
 THE TEST OF A REMEDY: could somebody act on it without asking a second
 question? If not, it is a diagnosis rather than a remedy.
 
+## NO BLANKET ERROR MESSAGE (owner ruling 2026-08-21)
+
+The owner's words: "Errors need to be specific and so need to be the remedy for
+them."
+
+A BLANKET MESSAGE IS ONE THAT COVERS SEVERAL CAUSES WITH ONE SENTENCE. It says
+something went wrong, or that a check failed, and leaves the reader to find out
+which thing and why. It is the shape of an error with the error taken out.
+
+TWO THINGS ARE OWED, NOT ONE.
+
+- THE ERROR NAMES ITS OWN CAUSE, specifically. Which check, which file, which
+  value, which line.
+- THE REMEDY IS SPECIFIC TO THAT CAUSE. A remedy that would fit any failure of
+  this kind is a blanket message wearing a remedy's clothes.
+
+A WRAPPER NEVER SWALLOWS WHAT IT WRAPS. Where one check runs several others,
+the failing one's OUTPUT rides out with the verdict. "The battery failed" is
+not a report; "tests/work-account.test.ts:278 expected 'finished', got
+undefined" is.
+
+AND A RE-RUN NEVER HIDES THE LAST RESULT. A long check that goes red gets
+started again by the next attempt, and while the second run is in flight the
+only honest answer carries BOTH: that it is running again, and what the
+previous run said.
+
+MEASURED 2026-08-21, and it is why this section exists. i51's verification
+battery went red and its reason was unreachable for several calls: every
+attempt to read the output started another 98-second run that masked it. The
+failure was one test with a one-word fix.
+
+THE COST IS ALWAYS THE SAME. A reader who cannot see the cause guesses at it,
+and every guess is a call spent proving something the message already knew.
+
 ## The git lane
 
 ### SE-C-002 — no history rewrite

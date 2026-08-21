@@ -1,17 +1,17 @@
 ---
-minted_in: i51
+minted_in: i51-work-running-out-of-sight-reports-itself
 id: raid-asm-a-first-run-has-timings-to-estimate-from
 type: "[[raid]]"
-kind: assumption
+kind: issue
 statement: A job asked how much longer it needs can answer from work already recorded, because a previous run of the same job left its figures behind.
 owner: the driving agent
 trigger: the first time a job is asked for a time remaining on a machine that has never run it
 status: open
-probed: "unprobed 2026-08-21 — i51 owns the background-job status path needed for the fresh-timing-store check; this i45 test-maintenance iteration does not alter or delete that store."
+probed: "2026-08-21, and it is FALSE. Both timing records were absent on this fresh container and the product said so rather than guessing. The kind is now issue, because it has already happened."
 probe: "Start a battery on a container with no recorded timings and ask it how much longer it needs. Read what the answer says."
 impact: "The estimate is the whole point of the first goal. Where no history exists the arithmetic has no inputs, so the answer is either absent or invented, and an invented one is worse than none."
 breaks_how_badly: corrosive
-how_likely: likely
+how_likely: expected
 source_refs:
   - wt-one-lane-call-should-report-the-state-of-every-piece-of-work
   - i51
@@ -54,3 +54,33 @@ Two outcomes, both useful.
   handled.
 - The answer names a figure, and where that figure came from is the next
   question.
+
+## PROBED 2026-08-21 — IT IS FALSE, AND THE KIND IS NOW ISSUE
+
+It has already happened, on this very run, so it is no longer something merely
+believed.
+
+WHAT WAS CHECKED. `.se/test-timings.jsonl` and `.se/test-last-run.json` on this
+container. Both absent, reported as ENOENT.
+
+WHAT THE PRODUCT SAID WHEN ASKED. The handoff note read "No earlier battery is
+on record to size the wait." That is the honest answer this entry hoped for,
+and it is already the house behaviour rather than something to build.
+
+SO THE ASSUMPTION IS FALSE AND THE DEMAND SURVIVES. A first run genuinely has
+no history to estimate from. What changed is that history turned out not to be
+needed.
+
+## WHAT NOW RESTS ON NOTHING, AND WHAT REPLACES IT
+
+THE VISION'S WORDING RESTS ON THIS. i51's rough vision says a battery knows its
+case count from the previous run, so the estimate is arithmetic rather than a
+guess. The clause "from the previous run" is now known false.
+
+THE DEMAND DOES NOT REST ON IT. `req-a-time-remaining-names-its-basis` asks for
+a basis and for honesty where none exists. It never named history as the basis.
+
+THE REPLACEMENT IS PROBED AND STANDS. A running job reports its own progress
+live, with its denominator in the first line of the record.
+`raid-asm-work-under-way-records-progress-before-it-ends` was probed the same
+day and holds, and the arithmetic was run against a live run.

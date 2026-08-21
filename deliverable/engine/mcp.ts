@@ -132,12 +132,20 @@ export class McpServer {
     return harnessFor(this.client?.name);
   }
 
+  /** DECORATORS THAT MAY ALSO RUN ON A REFUSAL. A refusal is not the answer
+   *  the others were computed for, and two of them SPEND state when they run:
+   *  the stale-settings flag is TAKEN and the update result is CLEARED. A
+   *  refusal consuming either loses it for the answer that was owed it. So a
+   *  decorator opts in rather than the whole list running. */
+  private readonly refusalDecorators: ResultDecorator[] = [];
+
   addGuard(guard: DispatchGuard): void {
     this.guards.push(guard);
   }
 
-  addDecorator(decorator: ResultDecorator): void {
+  addDecorator(decorator: ResultDecorator, opts: { onRefusal?: boolean } = {}): void {
     this.decorators.push(decorator);
+    if (opts.onRefusal === true) this.refusalDecorators.push(decorator);
   }
 
   addObserver(observer: CallObserver): void {
@@ -158,7 +166,20 @@ export class McpServer {
    *  no cheap question answers it. */
   private refused(id: number | string, name: string, args: Record<string, unknown>, e: Rejection, started: number): JsonRpcResponse {
     const again = this.repeats.refused(name, String(e.toJSON().clause ?? "(unnamed)"));
-    const body = again === undefined ? e.toJSON() : { ...e.toJSON(), repeated: again };
+    // THE CAST IS THE BOUNDARY. A rejection payload is a closed shape and a
+    // decorator takes an open one; they meet exactly here and nowhere else.
+    let body = { ...e.toJSON(), ...(again === undefined ? {} : { repeated: again }) } as Record<string, unknown>;
+    // THE REFUSAL-SAFE DECORATORS RUN HERE TOO, and until now none did. A
+    // refusal is the ONE answer where a caller most needs to know a judgment is
+    // still in flight — the condition that refused it is often the very check
+    // still running. Only the opted-in ones run: see refusalDecorators.
+    for (const d of this.refusalDecorators) {
+      try {
+        body = d(name, body) as Record<string, unknown>;
+      } catch {
+        // A decorator never turns a refusal into something worse than a refusal.
+      }
+    }
     this.observe({ tool: name, args, ok: false, duration_ms: Date.now() - started, outcome: "rejected", response: body });
     return this.ok(id, {
       content: [{ type: "text", text: boundAnswer(`${name}-refused`, body, this.seDir).text }],

@@ -23,10 +23,21 @@ a compiled step in, produces a two-part difficulty — how hard the judgement is
 and how much has to be read — resolves that pair to a rung, and publishes the
 rung outward. It names no model, holds no roster, and starts nothing.
 
-Boundary: two interfaces and no more. `flow-compiled-machine` arrives from the
-walk engine; `flow-instruction` leaves toward the agent harness. That narrowness
-is measured rather than asserted — the three flows between its four functions are
+Boundary: three interfaces. The compiled step arrives through
+[[if-method-compiler-to-sizing]] and [[if-engine-delta-to-sizing]]. The sized
+instruction leaves through [[if-sizing-to-walk-engine]]. That narrowness is
+measured rather than asserted — the three flows between its four functions are
 touched by nothing else in the corpus.
+
+THIS PARAGRAPH SAID "TWO INTERFACES AND NO MORE" UNTIL i51, and it named the
+walk engine as where the compiled step comes from. Both were wrong when
+written: the inbound contract was already two nodes, and neither is the walk
+engine.
+
+WHAT i51 ADDED IS THE OUTBOUND NODE. `hand-back-a-step-still-deciding` is the
+first function in this tree to consume `flow-instruction`, so the return leg
+became a crossing the element matrix computes. The exchange itself is as old as
+the element.
 
 ## One function it implements and never calls
 

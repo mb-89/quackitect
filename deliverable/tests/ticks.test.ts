@@ -39,7 +39,12 @@ describe("walk mechanics", { concurrency: true }, () => {
     const deskRoot = freshRoot();
     const desk = new Session(deskRoot);
     const deskServer = buildServer(deskRoot, desk);
-    await pullBoot(deskServer, desk);
+    // NO SESSION ARGUMENT, ON PURPOSE. Passing one aims the walk at idle, and
+    // the three lines below need it OFF idle, resting at the desk. The call
+    // used to pass `desk` and still land at the desk by timing alone; once the
+    // boot helper stopped racing a deciding judgment it landed at idle instead
+    // and the assertion below caught it.
+    await pullBoot(deskServer);
     assert.equal(desk.active()[0], "front_desk");
     const refused = await call(deskServer, "se_reload", {});
     assert.equal(refused.body.clause, "SE-C-110", "the desk is not idle");

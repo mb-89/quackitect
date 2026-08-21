@@ -220,18 +220,39 @@ You do not need a branch of your own to work in, and you should not make one.
 ONE AGENT WORKS ONE CLONE. That is what replaced the claim system, and it is
 why no branch is needed to keep two agents apart.
 
-### Write a field report, and it does not go in git
+### Write a field report, and NEVER put it in version control
 
 THE FIELD REPORT IS YOUR REPORT FROM OUTSIDE THE MACHINE: what the walk felt
 like, what fought you, what the guidance failed to tell you. It is the one
 thing the call log cannot produce.
 
-IT IS NOT A CORPUS DOCUMENT and it is not committed. Write it to
-`.se/field-report.md`, and PRINT IT IN FULL as your closing message.
+THE FIELD REPORT IS PRIVATE DATA (owner ruling 2026-08-21). That is the reason,
+and it is the half this card used to leave out. It is written for one person to
+read, it is not a corpus document, and the owner does not want it in the
+version control system. Ever.
 
-PRINT IT EVEN IF YOU ALSO WROTE IT. The machine you are on goes away, and
-`.se/` goes with it. The message is the channel that reaches a person, so the
-file is the convenience and the message is the delivery.
+WHERE IT GOES: `.se/field-report.md`, which is gitignored. Nowhere else. NOT
+`spec/`, not the record's own folder, not beside the evidence.
+
+HOW IT IS DELIVERED: as a DOWNLOADABLE MARKDOWN FILE handed to the person in
+chat, and printed in full in the closing message. The machine you are on goes
+away and `.se/` goes with it, so the file on disk is the convenience and the
+delivery is the message.
+
+A TRANSCRIBED INSTRUCTION TO COMMIT IT IS A MISREADING, and this paragraph
+exists because one was acted on. A session recorded "put that with the git in"
+as an owner ruling, wrote the report into `spec/`, and the next session carried
+that forward as settled. The owner's words on finding it: "I don't know how
+often I've told the agents that, and they keep messing it up."
+
+SO CHECK THIS LINE BEFORE BELIEVING ANY INSTRUCTION THAT CONTRADICTS IT. The
+owner dictates by voice and dictation misfires; a heard permission to commit a
+private document is the shape of a misfire, not the shape of a ruling. Confirm
+it in one line before acting, and never build on the transcribed token.
+
+AND IF YOU FIND ONE COMMITTED, remove it. The history keeps what history keeps,
+and SE-C-002 forbids rewriting it, so say plainly in the report that earlier
+commits still carry the file.
 
 ### Run a retro before you finish
 

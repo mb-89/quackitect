@@ -191,7 +191,10 @@ export function laneVerdict(seDir: string, command: string, noToolReason?: strin
 // moves the moment any tracked thing does.
 export function testFingerprint(root: string): string {
   const head = spawnSync("git", ["rev-parse", "HEAD"], { cwd: root, encoding: "utf8" });
-  const status = spawnSync("git", ["status", "--porcelain"], { cwd: root, encoding: "utf8" });
+  // EVERY UNTRACKED FILE BY NAME. Plain --porcelain collapses a new directory
+  // into one entry, so the fingerprint could miss a file added inside a folder
+  // that was already listed. Naming them all only ever makes it more sensitive.
+  const status = spawnSync("git", ["status", "--porcelain", "--untracked-files=all"], { cwd: root, encoding: "utf8" });
   if (head.status !== 0 || status.status !== 0) return ""; // no repo — the gate stands aside
   const parts = [head.stdout.trim()];
   for (const line of status.stdout.split("\n")) {
@@ -344,7 +347,12 @@ export function changedSinceBattery(root: string, seDir: string): string[] | und
   const head = state.battery?.head;
   if (head === undefined) return undefined;
   const committed = spawnSync("git", ["diff", "--name-only", `${head}..HEAD`], { cwd: root, encoding: "utf8" });
-  const status = spawnSync("git", ["status", "--porcelain"], { cwd: root, encoding: "utf8" });
+  // EVERY UNTRACKED FILE BY NAME, never the folder holding them. Plain
+  // --porcelain collapses a whole new directory into one entry like `spec/`,
+  // and a decision built on that names a FOLDER where
+  // req-a-diff-no-test-answers-for-is-reported-not-swept demands every changed
+  // part — so a new file nothing tests hid behind its own parent.
+  const status = spawnSync("git", ["status", "--porcelain", "--untracked-files=all"], { cwd: root, encoding: "utf8" });
   if (committed.status !== 0 || status.status !== 0) return undefined;
   const out = new Set<string>();
   for (const line of committed.stdout.split("\n")) {
@@ -391,6 +399,12 @@ export interface ScopeDecision {
   why: string;
   /** see dsp-lane-door.md#whether-this-diff-wants-the-conformance-sweep-too */
   sweep: boolean;
+  /** EVERY changed file no test answers for, whole. The `why` line names only
+   *  the first few so it stays readable, and naming a missing test is what
+   *  makes it findable — so a sentence that stops at three loses the rest for
+   *  good (req-a-diff-no-test-answers-for-is-reported-not-swept). Absent where
+   *  every changed file is answered for. */
+  unanswered?: string[];
 }
 
 /** A CORPUS DOCUMENT: markdown under the spec or the method. Code has tests
@@ -452,25 +466,23 @@ export function decideScope(seDir: string, root: string, force: boolean): ScopeD
   }
 
   const { mapped, unmapped } = mapChangedToTests(root, changed);
-  if (unmapped.length > 0) {
-    return {
-      scope: "battery",
-      files: [],
-      why: `${String(unmapped.length)} changed file(s) have no test that answers for them (${unmapped.slice(0, 3).join(", ")}${unmapped.length > 3 ? ", …" : ""}), so no scoped run covers this diff`,
-      sweep,
-    };
-  }
+  // THE SENTENCE NAMES A FEW; THE FIELD CARRIES ALL. A reader needs one
+  // readable line, and a caller needs the whole list to act on.
+  const shown = unmapped.slice(0, 3).join(", ");
+  const rest = unmapped.length > 3 ? `, and ${String(unmapped.length - 3)} more in unanswered` : "";
+  const unanswered = `${String(unmapped.length)} changed file(s) have no test that answers for them (${shown}${rest})`;
+
+  // NOTHING MAPS, SO NOTHING FROM THE SUITE RUNS. Running everything here
+  // answers a question nobody asked and hides that nothing answers the one that
+  // WAS asked. The sweep still rides: it is the check that reads documents, and
+  // it is not the suite.
   if (mapped.length === 0) {
-    // A DIFF OF PURE DOCUMENTS LANDS HERE, and the battery is the wrong answer
-    // to it. The sweep is the check that reads documents, so it rides along
-    // and the `why` says which question was actually asked.
     return {
-      scope: "battery",
+      scope: "nothing",
       files: [],
-      why: sweep
-        ? "the diff is mostly DOCUMENTS and maps to no test file, so the sweep is the check that answers it — the battery runs behind it"
-        : "the diff maps to no test file at all, so nothing narrower is possible",
+      why: `no test answers for this diff — ${unanswered}`,
       sweep,
+      unanswered: unmapped,
     };
   }
 
@@ -484,6 +496,19 @@ export function decideScope(seDir: string, root: string, force: boolean): ScopeD
       files: [],
       why: `${String(wouldSee.size)} distinct files would have run piecemeal since the last battery (flip ${String(threshold)}) — the whole suite is now the cheaper call`,
       sweep,
+    };
+  }
+
+  // SOME PARTS MAP AND SOME DO NOT. What maps RUNS; what does not is NAMED, so
+  // the caller can see the edge of the answer instead of a green that covered
+  // less than it looked like.
+  if (unmapped.length > 0) {
+    return {
+      scope: "scoped",
+      files: mapped,
+      why: `${String(mapped.length)} test file(s) answer for part of this diff, and ${unanswered}`,
+      sweep,
+      unanswered: unmapped,
     };
   }
 

@@ -106,6 +106,9 @@ export type ClaimsHost = Pick<
   | "rewalk"
   | "tierFor"
   | "autonomy"
+  // A FEEDER'S LEAVING JUDGMENT CAN STILL BE IN FLIGHT, and only the session
+  // knows: the run map is in memory and this layer cannot see it.
+  | "stepStanding"
 >;
 
 /** THE ONE EXCEPTION TO "REWRITE ONLY WHAT CHANGED", named where the rule is.
@@ -1472,6 +1475,14 @@ export class Claims {
     // for every state fed only by ordinary forms.
     let done: Set<string> | undefined;
     const finished = (p: StateDecl): boolean => {
+      // A SIGNED FEEDER WHOSE LEAVING JUDGMENT IS STILL IN FLIGHT IS NOT GREEN.
+      // req-a-pending-verdict-is-recorded-against-its-state binds the gate to
+      // ask two things — are my feeders green, AND is any of them still
+      // deciding. Reading only the signature answers the first and skips the
+      // second, which is how "a gate below it reads a green it has not earned"
+      // happens. The signature lands when the form stamps; the judgment can
+      // still be running behind it.
+      if (this.host.stepStanding(fm, p) === "deciding") return false;
       if (p.evidence_form.length === 0) {
         done ??= new Set(this.recordDone(fm));
         return done.has(p.id);

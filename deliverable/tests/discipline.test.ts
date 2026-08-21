@@ -497,13 +497,22 @@ test("a change that maps to a test file is answered by that file, and the decisi
   rmSync(root, { recursive: true, force: true });
 });
 
-test("an unmapped change buys the battery — no scoped run answers for it", () => {
+// THIS CASE'S CLAIM REVERSED AT i51. It read "an unmapped change buys the
+// battery" and asserted scope "battery".
+// req-a-diff-no-test-answers-for-is-reported-not-swept says the opposite:
+// running everything answers a question nobody asked, and hides that nothing
+// answers the one that was asked.
+//
+// THE `why` ASSERTION IS UNCHANGED. Naming the gap was always right; only what
+// happens after naming it moved.
+test("an unmapped change runs nothing from the suite and names the gap", () => {
   const root = productRoot();
   const se = join(root, ".se");
   testRecord(se, root, true);
   writeFileSync(join(root, "deliverable", "engine", "render.ts"), "// no test file exists for render\n");
   const d = decideScope(se, root, false);
-  assert.equal(d.scope, "battery");
+  assert.equal(d.scope, "nothing", `nothing answers for this diff, so nothing from the suite runs: ${JSON.stringify(d)}`);
+  assert.equal(d.files.length, 0, "and no file is named to run");
   assert.match(d.why, /no test that answers/, "the reason names the gap rather than a threshold");
   rmSync(root, { recursive: true, force: true });
 });
@@ -700,4 +709,131 @@ test("the full battery formats before preflight and stops on format failure", ()
   assert.ok(formatAt < preflightAt, "formatting precedes preflight and selftest");
   assert.ok(failureAt > formatAt && returnAt > failureAt && returnAt < preflightAt, "a format failure stops the battery");
   assert.equal((battery.match(/BIOME_BIN/g) ?? []).length, 1, "formatting runs once per full battery");
+});
+
+// A DIFF NO TEST ANSWERS FOR IS REPORTED, NOT SWEPT, authored test-first at
+// i51's author-tests.
+//
+// BOTH CASES ARE RED against the second branch of
+// req-a-diff-no-test-answers-for-is-reported-not-swept: nothing maps, so the
+// engine runs everything. Measured 2026-08-21 on this record's own run — 131
+// changed files had no test that answers for them and the whole battery fired
+// for a diff of markdown nodes.
+//
+// THE FULL SUITE STILL RUNS AT VERIFICATION. This row governs a question asked
+// mid-walk, never the release evidence.
+
+/** A git root whose only changes since the last green are markdown DOCUMENTS.
+ *
+ *  UNDER `spec/`, and three of them. A leading spec, machines or guidance
+ *  segment is what makes a markdown file a corpus document (discipline.ts
+ *  isDocument), and the sweep asks for half the diff and at least three. A lone
+ *  `notes.md` at the root satisfied neither, so this fixture used to exercise
+ *  the plain unmapped branch while its cases were named for the documents one. */
+function docsOnlyRoot(): string {
+  const root = gitRoot();
+  mkdirSync(join(root, "spec"), { recursive: true });
+  for (const name of ["notes", "second", "third"]) {
+    writeFileSync(join(root, "spec", `${name}.md`), "a paragraph nobody tests\n");
+  }
+  return root;
+}
+
+/** A git root whose diff has six changes nothing answers for — past the three
+ *  the sentence can name. */
+function manyUnmappedRoot(): string {
+  const root = gitRoot();
+  for (const name of ["one", "two", "three", "four", "five", "six"]) {
+    writeFileSync(join(root, `${name}.ts`), "// nothing answers for this\n");
+  }
+  return root;
+}
+
+/** A git root whose diff has one change a test answers for and three it does
+ *  not — the partition that runs what maps and names the rest. */
+function mixedRoot(): string {
+  const root = gitRoot();
+  mkdirSync(join(root, "deliverable", "tests"), { recursive: true });
+  mkdirSync(join(root, "deliverable", "engine"), { recursive: true });
+  writeFileSync(join(root, "deliverable", "tests", "thing.test.ts"), "// the test that answers for thing.ts\n");
+  writeFileSync(join(root, "deliverable", "engine", "thing.ts"), "// answered for by name\n");
+  for (const name of ["one", "two", "three"]) {
+    writeFileSync(join(root, `${name}.ts`), "// nothing answers for this\n");
+  }
+  return root;
+}
+
+test("a documents-only change starts no test file at all", () => {
+  const root = docsOnlyRoot();
+  const se = join(root, ".se");
+  testRecord(se, root, true);
+  const d = decideScope(se, root, false);
+  assert.notEqual(d.scope, "battery", `a markdown edit fired the whole suite, which answers a question nobody asked: ${JSON.stringify(d)}`);
+  assert.equal(d.files.length, 0, `nothing answers for a markdown edit, so nothing runs: ${JSON.stringify(d.files)}`);
+  rmSync(root, { recursive: true, force: true });
+});
+
+test("the answer names every changed part that no test covers", () => {
+  const root = docsOnlyRoot();
+  const se = join(root, ".se");
+  testRecord(se, root, true);
+  const d = decideScope(se, root, false);
+  assert.match(d.why, /notes\.md/, `the unanswered part is named rather than swept past: ${d.why}`);
+  rmSync(root, { recursive: true, force: true });
+});
+
+// req-a-diff-no-test-answers-for-is-reported-not-swept measures "the answer
+// names EVERY changed part that no test covers", and the sentence stopped at
+// three with an ellipsis. The other 128 on this record's own run were
+// unrecoverable by the caller, and naming a missing test is what makes it
+// findable.
+test("the whole unmapped list rides the decision, not the three the sentence names", () => {
+  const root = manyUnmappedRoot();
+  const se = join(root, ".se");
+  testRecord(se, root, true);
+  const d = decideScope(se, root, false);
+  assert.ok(d.unanswered !== undefined, `the decision carries the list itself: ${JSON.stringify(d)}`);
+  for (const name of ["one.ts", "two.ts", "three.ts", "four.ts", "five.ts", "six.ts"]) {
+    assert.ok(d.unanswered.includes(name), `${name} is on the list: ${JSON.stringify(d.unanswered)}`);
+  }
+  assert.match(d.why, /more in unanswered/, `and the sentence points at the list rather than trailing off: ${d.why}`);
+  rmSync(root, { recursive: true, force: true });
+});
+
+// THE MIDDLE PARTITION of the same requirement: what maps RUNS, what does not
+// is NAMED. tsp-a-diff-nothing-answers-for-is-named parked this case because a
+// decision that always returned the battery could not show a partial answer.
+// The branch exists now, so the reason has expired.
+test("a change that partly maps runs what maps and names what does not", () => {
+  const root = mixedRoot();
+  const se = join(root, ".se");
+  testRecord(se, root, true);
+  const d = decideScope(se, root, false);
+  assert.equal(d.scope, "scoped", `what maps runs rather than buying the battery: ${JSON.stringify(d)}`);
+  assert.ok(d.files.includes("deliverable/tests/thing.test.ts"), `the test that answers is the one chosen: ${JSON.stringify(d.files)}`);
+  assert.ok(d.unanswered !== undefined, `and the edge of the answer is carried: ${JSON.stringify(d)}`);
+  for (const name of ["one.ts", "two.ts", "three.ts"]) {
+    assert.ok(d.unanswered.includes(name), `${name} is named as uncovered: ${JSON.stringify(d.unanswered)}`);
+  }
+  rmSync(root, { recursive: true, force: true });
+});
+
+// A WHOLE NEW DIRECTORY IS NOT ONE CHANGED PART. Plain `git status --porcelain`
+// collapses untracked directories into a single entry, so a diff of new files
+// under one folder was reported as the folder — and the answer named a
+// directory where the requirement demands every changed part.
+test("a new directory is reported as its files, not as the directory", () => {
+  const root = gitRoot();
+  mkdirSync(join(root, "fresh"), { recursive: true });
+  for (const name of ["one", "two"]) {
+    writeFileSync(join(root, "fresh", `${name}.ts`), "// nothing answers for this\n");
+  }
+  const se = join(root, ".se");
+  testRecord(se, root, true);
+  const d = decideScope(se, root, false);
+  assert.ok(d.unanswered !== undefined, `the decision carries the list: ${JSON.stringify(d)}`);
+  assert.ok(d.unanswered.includes("fresh/one.ts"), `each new file is named: ${JSON.stringify(d.unanswered)}`);
+  assert.ok(d.unanswered.includes("fresh/two.ts"), `each new file is named: ${JSON.stringify(d.unanswered)}`);
+  assert.ok(!d.unanswered.includes("fresh/"), `and the folder is not offered in their place: ${JSON.stringify(d.unanswered)}`);
+  rmSync(root, { recursive: true, force: true });
 });

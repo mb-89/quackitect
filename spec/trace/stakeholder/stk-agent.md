@@ -33,6 +33,16 @@ weight: 0.8
 - IT CANNOT DIAGNOSE A GENERIC CANCELLATION. The lane must distinguish server
   loss, transport loss, host cancellation and stop-hook action. Otherwise the
   next recovery is guesswork (added at i36, 2026-08-19).
+- IT CANNOT SEE THE WORK IT STARTED. A job running out of sight can only be
+  asked about one handle at a time, and the answer names a rate rather than a
+  time remaining. So the only strategy available to it is polling, which fills
+  the one witness of an unattended run with nothing (added at i51,
+  2026-08-21).
+- A STEP CAN HOLD ITS ONLY VERB. Where a leaving condition runs a program, the
+  pull does not return until the program does. Measured at sixty-eight seconds,
+  with two calls expiring at the harness boundary and one of those having
+  already landed — so the role was told its work failed while the work had
+  moved (added at i51, 2026-08-21).
 
 ## Notes (not load-bearing)
 

@@ -10,6 +10,7 @@ import { spawn } from "node:child_process";
 import { CLAUSES, Rejection } from "./errors.ts";
 import type { MachineDecl, StateDecl } from "./machine.ts";
 import { resolveInRoot, seDir } from "./paths.ts";
+import { openOperation, settleOperation } from "./run.ts";
 import { evidenceKey } from "./sessionforms.ts";
 
 /** What a script run needs of the walk: two roots, the standing check, where
@@ -22,6 +23,9 @@ export interface ScriptHost {
   leaves(): { machine: MachineDecl; ids: string[] };
   state(m: MachineDecl, id: string): StateDecl;
   notifyChange(): void;
+  /** WRITE A SETTLED JUDGMENT WHERE THE STEP'S OTHER STANDINGS LIVE. The
+   *  evidence map below dies with the process; this does not. */
+  recordVerdict(m: MachineDecl, s: StateDecl, ok: boolean): void;
   readonly evidence: Map<string, Record<string, unknown>>;
 }
 
@@ -140,23 +144,95 @@ export class Scripts {
       for (const rel of scripts) {
         const abs = resolveInRoot(this.host.machineRoot(), rel, "engine/session.ts script");
         const r = await this.spawnScript(abs);
-        // THE TAIL, BECAUSE ENDS CARRY VERDICTS. A head slice keeps the run's
-        // opening banner and drops the failing tests block, which is the only
-        // part of a red anybody needs. Seen on this state's own first red:
-        // 4000 characters of passing cases and not one failure.
+        // BOTH ENDS, BECAUSE EACH CARRIES HALF THE VERDICT.
+        //
+        // The TAIL carries the counts — exit codes, totals, units. A head slice
+        // alone keeps the opening banner and drops them.
+        //
+        // The HEAD carries the NAMED FAILURES. battery.ts writes
+        // failureSummary(out) before the runner's own output, precisely so a
+        // reader learns which files are red without reading the whole run.
+        //
+        // KEEPING ONLY THE TAIL DROPPED THAT SUMMARY. Measured on i51's own
+        // confirm run: `fail 2` arrived with 4000 characters of passing cases
+        // and neither failure named. An error that will not say what failed is
+        // the blanket error the house rule forbids.
         const whole = r.out.trim();
-        const out = whole.length <= 4000 ? whole : `…[${String(whole.length - 4000)} earlier chars]\n${whole.slice(-4000)}`;
+        const ends = 2500;
+        const out =
+          whole.length <= ends * 2
+            ? whole
+            : `${whole.slice(0, ends)}\n…[${String(whole.length - ends * 2)} characters between the named failures and the counts]\n${whole.slice(-ends)}`;
         outputs.push(`${rel} → exit ${r.status}${out === "" ? "" : `\n${out}`}`);
         if (r.status !== 0) ok = false;
       }
       const result = { ok, output: outputs.join("\n"), at: new Date().toISOString() };
       this.host.evidence.set(key, { ...(this.host.evidence.get(key) ?? {}), script_result: result });
+      // AND IT LANDS SOMEWHERE THAT OUTLIVES THE PROCESS. The map above is
+      // memory; a step left deciding when the session ends needs the verdict on
+      // disk or the repository cannot settle the word.
+      this.host.recordVerdict(machine, s, ok);
       this.host.notifyChange();
       return { state: `${machine.id}/${s.id}`, script_result: result };
     })().finally(() => this.scriptRuns.delete(key));
     this.scriptRuns.set(key, run);
+    // THE JUDGMENT ENTERS THE ONE TABLE, against the step it belongs to. It is
+    // registered HERE, where the run is created, rather than in scriptStart.
+    // The mirror's own /script endpoint calls this method directly, so a run
+    // started from the surface set the step to `deciding` while the account
+    // showed nothing running at all. Measured on i51's own verification: a
+    // live battery process, and the account reporting it settled 92 seconds
+    // earlier. see dsp-the-work-account.md#interface
+    const id = `judgment-${machine.id}-${s.id}`;
+    openOperation({
+      id,
+      kind: "judgment",
+      command: `the leaving judgment of ${s.id}`,
+      state: `${machine.id}/${s.id}`,
+      root: this.host.machineRoot(),
+    });
+    void run.then(
+      (r) => settleOperation(id, (r.script_result as { ok?: boolean } | undefined)?.ok === true),
+      () => settleOperation(id, false),
+    );
     this.host.notifyChange(); // the mirror learns a run started
     return run;
+  }
+
+  /** START a step's leaving judgment and hand the promise back UNAWAITED.
+   *  Returns undefined where the state declares no judgment to start.
+   *  The run registers itself in the account; this method only decides
+   *  whether there is a judgment to start at all.
+   *  see dsp-the-work-account.md#responsibility */
+  scriptStart(stateId: string): Promise<Record<string, unknown>> | undefined {
+    const { machine } = this.host.leaves();
+    const s = this.host.state(machine, stateId);
+    if ((s.exit?.script ?? []).length === 0 && (s.entry?.script ?? []).length === 0) return undefined;
+    return this.scriptRun(stateId);
+  }
+
+  /** START THE JUDGMENT AND ANSWER INSIDE THE BOUND. The call waits up to `ms`
+   *  for a verdict and hands back whatever it has; it is never held for as long
+   *  as the judgment runs, which is the defect this record exists to end.
+   *  see dsp-the-work-account.md#responsibility */
+  async scriptSettleWithin(stateId: string, ms: number): Promise<void> {
+    const run = this.scriptStart(stateId);
+    if (run === undefined) return;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const capped = new Promise<void>((res) => {
+      timer = setTimeout(res, ms);
+    });
+    await Promise.race([run.then(() => undefined).catch(() => undefined), capped]);
+    if (timer !== undefined) clearTimeout(timer);
+  }
+
+  /** WHERE A STEP STANDS, one word from a closed set of three.
+   *  see dsp-the-work-account.md#behavior-and-constraints */
+  scriptStanding(m: MachineDecl, s: StateDecl): "passed" | "not passed" | "deciding" {
+    const key = evidenceKey(m, s.id);
+    if (this.scriptRuns.has(key)) return "deciding";
+    const r = this.host.evidence.get(key)?.script_result as { ok?: boolean } | undefined;
+    return r?.ok === true ? "passed" : "not passed";
   }
 
   /** Any condition script currently running — the mirror's follow signal. */
