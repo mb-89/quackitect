@@ -17,7 +17,7 @@
 //
 // THE SOURCE KEEPS ITS $PRODUCT$ PLACEHOLDERS, which is what makes producing a
 // vehicle a rename rather than a find-and-replace.
-import { cpSync, rmSync } from "node:fs";
+import { cpSync, existsSync, rmSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { build } from "esbuild";
@@ -46,5 +46,26 @@ cpSync(join(here, "vscode"), dist, {
   recursive: true,
   filter: (src) => !src.includes("node_modules"),
 });
+
+// THE RUNTIME DEPENDENCY TRAVELS WITH THE INSTALL. VS Code loads this folder
+// and resolves `require` from it, so a dependency left behind is a dependency
+// that does not exist at runtime.
+//
+// koffi IS THE KEY SENDER, and it is marked `external` in the bundle above, so
+// the bundled file requires it by name. Without it here, `keys.available()`
+// answers false, the kickoff stops at the clipboard, and Start the Agent opens
+// Claude with an empty box.
+//
+// MEASURED 2026-08-21: the install went from a copy of `vscode/` to a link to
+// this folder, and the button stopped sending from that moment. The copy had
+// node_modules; the render filtered it out.
+const modules = join(here, "vscode", "node_modules");
+if (existsSync(modules)) {
+  cpSync(modules, join(dist, "node_modules"), { recursive: true });
+} else {
+  console.warn("  WARNING: vscode/node_modules is missing — the key sender will not load.");
+  console.warn("  run `npm install` in deliverable/vscode, then build again.");
+}
+
 renderExtension(dist, loadBrand(root));
 console.log(`  rendered ${dist}`);

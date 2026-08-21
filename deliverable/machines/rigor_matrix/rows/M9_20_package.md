@@ -46,16 +46,16 @@ minor_note: |
   Applies: minor version bump, the package assembles by script, the
   check uses it.
 patch_note: |
-  The patch version bump and its changelog line. Nothing repackages beyond
-  what the release lane already does.
+  The patch version bump. Nothing repackages beyond what the release lane
+  already does, and no notes file is written.
 product_note: |
   STANDING ARTIFACT: the released package - versioned, with a README and
   a one-script installer that work on a fresh machine, and the editor
   extension inside. The product at rest is installable, not just correct.
 specification_note: |
   DOCUMENT FORM: README and the installer script, shipped IN the
-  package; release notes per version. The README is an ENTRY document -
-  plain language, no method jargon (owner law).
+  package. The README is an ENTRY document - plain language, no method
+  jargon (owner law).
 ---
 
 ## Guidance

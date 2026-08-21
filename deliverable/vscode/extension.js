@@ -870,8 +870,8 @@ var Strip = class {
       if (!inStrip(c)) continue;
       list.push({ cmd: `$PRODUCT_ID$.openCard${c.n}`, icon: cardIcon(c), label: titleOf(c), key: `ctrl+alt+${c.n}` });
     }
-    list.push({ cmd: "$PRODUCT_ID$.createVehicle", icon: ICON.copy, label: "Copy this system", key: "" });
-    list.push({ cmd: "$PRODUCT_ID$.createProject", icon: ICON.newFolder, label: "Start a project", key: "" });
+    list.push({ cmd: "$PRODUCT_ID$.createVehicle", icon: ICON.copy, label: "Create a vehicle", key: "" });
+    list.push({ cmd: "$PRODUCT_ID$.createProject", icon: ICON.newFolder, label: "Create a project", key: "" });
     return list;
   }
   page() {

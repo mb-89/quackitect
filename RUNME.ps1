@@ -216,19 +216,73 @@ if ($LASTEXITCODE -ne 0) {
   Write-Host "  placing the prompt layer FAILED - the first boot will name which projection is stale" -ForegroundColor Yellow
 }
 
+# THE DEPENDENCIES INSTALL BEFORE ANYTHING USES THEM, on both paths.
+#
+# THIS USED TO SIT BELOW THE VS CODE BRANCH, which exits when it is done. So
+# only --classic ever reached it, and the default path ran `npm run build` on a
+# tree with no node_modules at all.
+#
+# MEASURED 2026-08-21 on a fresh clone: the build died with "Cannot find
+# package 'esbuild'" and RUNME stopped there. A first run is exactly the run
+# that has nothing installed, so this is the only order that works.
+
+# Engine dependencies. @vscode/ripgrep ships the rg binary via npm.
+Write-Host "$P - installing engine dependencies" -ForegroundColor Cyan
+Push-Location (Join-Path $root "deliverable")
+try {
+  npm install --no-audit --no-fund --loglevel=error
+  if ($LASTEXITCODE -ne 0) {
+    Write-Host "npm install FAILED - the engine cannot run without it." -ForegroundColor Red
+    exit 1
+  }
+  # ripgrep is a HARD dependency (owner ruling 2026-07-26): no fallback engine.
+  $rgPath = node -p "try { require('@vscode/ripgrep').rgPath } catch { '' }"
+  if ([string]::IsNullOrWhiteSpace($rgPath) -or -not (Test-Path $rgPath)) {
+    # npm should have provided it; when it did not, RUNME installs the
+    # system ripgrep itself - hard dependencies install, never instruct.
+    if (-not (Ensure-Tool "rg" "BurntSushi.ripgrep.MSVC" "ripgrep")) { exit 1 }
+    Write-Host "  ripgrep (PATH) $((rg --version) -split "`n" | Select-Object -First 1)  OK"
+  } else {
+    Write-Host "  ripgrep (npm) $rgPath  OK"
+  }
+} finally {
+  Pop-Location
+}
+
+# Extension dependencies. koffi is how the extension presses a key: VS Code
+# will not synthesise one for an extension, and Claude's chat box belongs to
+# another extension, so the kickoff has to be sent through the operating
+# system.
+#
+# THE BUILD COPIES THIS INTO vscode-dist, so it has to be here FIRST. A missing
+# koffi is not fatal - the launcher falls back to leaving the kickoff in the
+# box for the reader to send by hand.
+Write-Host "$P - installing extension dependencies" -ForegroundColor Cyan
+Push-Location (Join-Path $root "deliverable\vscode")
+try {
+  npm install --no-audit --no-fund --loglevel=error
+  if ($LASTEXITCODE -ne 0) {
+    Write-Host "  koffi did not install - the agent still starts, but you press Enter yourself." -ForegroundColor Yellow
+  } else {
+    Write-Host "  koffi (key sender)  OK"
+  }
+} finally {
+  Pop-Location
+}
+
 # RUNME IS THE INSTALL, AND YOU RUN IT ONCE (owner ruling 2026-08-02). It puts
-# the extension in place and opens the editor. After that the extension owns
-# everything: the server, the attach configs, the engine's npm install. Opening
-# VS Code on project\ is enough from then on.
+# the dependencies in, builds the shell, links it, and opens the editor. After
+# that the extension owns everything: the server and the attach configs.
+# Opening VS Code on project\ is enough from then on.
 #
 # AND NOTHING BRINGS YOU BACK HERE. VS Code loads a JUNCTION to
 # deliverable/vscode-dist, which the build renders. A change to the shell needs
 # `npm run build` and a window reload.
 #
 # VS CODE IS THE HOST (owner, 2026-07-30). Ensure VS Code, put the extension
-# in place, open the workspace - the extension owns the rest: the server,
-# the attach configs, the engine's npm install. A session already running is
-# fine - the extension attaches to it instead of spawning a second one.
+# in place, open the workspace - the extension owns the rest: the server and
+# the attach configs. A session already running is fine - the extension
+# attaches to it instead of spawning a second one.
 # It is the DEFAULT now, not a flag (owner, 2026-07-30). --classic is the
 # opt-out and takes the old terminal-and-browser path further down.
 $classic = [bool]($forwarded | Where-Object { $_ -eq "--classic" })
@@ -314,47 +368,6 @@ if ($busy.Count -gt 0) {
   Write-Host ""
   Write-Host "  (meant to keep it? the running session is in your browser: http://localhost:7333)" -ForegroundColor Cyan
   exit 1
-}
-
-# Engine dependencies. @vscode/ripgrep ships the rg binary via npm.
-Write-Host "$P - installing engine dependencies" -ForegroundColor Cyan
-Push-Location (Join-Path $root "deliverable")
-try {
-  npm install --no-audit --no-fund --loglevel=error
-  if ($LASTEXITCODE -ne 0) {
-    Write-Host "npm install FAILED - the engine cannot run without it." -ForegroundColor Red
-    exit 1
-  }
-  # ripgrep is a HARD dependency (owner ruling 2026-07-26): no fallback engine.
-  $rgPath = node -p "try { require('@vscode/ripgrep').rgPath } catch { '' }"
-  if ([string]::IsNullOrWhiteSpace($rgPath) -or -not (Test-Path $rgPath)) {
-    # npm should have provided it; when it did not, RUNME installs the
-    # system ripgrep itself - hard dependencies install, never instruct.
-    if (-not (Ensure-Tool "rg" "BurntSushi.ripgrep.MSVC" "ripgrep")) { exit 1 }
-    Write-Host "  ripgrep (PATH) $((rg --version) -split "`n" | Select-Object -First 1)  OK"
-  } else {
-    Write-Host "  ripgrep (npm) $rgPath  OK"
-  }
-} finally {
-  Pop-Location
-}
-
-# Extension dependencies. koffi is how the extension presses a key: VS Code
-# will not synthesise one for an extension, and Claude's chat box belongs to
-# another extension, so the kickoff has to be sent through the operating
-# system. A FAILURE HERE IS NOT FATAL - the launcher falls back to leaving the
-# kickoff in the box for the reader to send by hand.
-Write-Host "$P - installing extension dependencies" -ForegroundColor Cyan
-Push-Location (Join-Path $root "deliverable\vscode")
-try {
-  npm install --no-audit --no-fund --loglevel=error
-  if ($LASTEXITCODE -ne 0) {
-    Write-Host "  koffi did not install - the agent still starts, but you press Enter yourself." -ForegroundColor Yellow
-  } else {
-    Write-Host "  koffi (key sender)  OK"
-  }
-} finally {
-  Pop-Location
 }
 
 # Install the cage. .mcp.json and .claude\settings.json cannot be written by
