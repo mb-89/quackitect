@@ -85,6 +85,9 @@ test("feed rows carry the click keys the panel needs", () => {
   const root = freshRoot();
   const log = new CallLog(seDir(root));
   log.append({
+    part: "walker",
+    state: "a-state",
+    answered_by: "a-model",
     tool: "se_update",
     args: { via: "se_pull", visit: "idle@0", op: "update", brief: "x" },
     ok: true,

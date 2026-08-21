@@ -323,9 +323,30 @@ test("the unified feed derives src, type and brief — and the mirror carries th
   const root = freshRoot();
   const session = new Session(root);
   const log = new CallLog(seDir(root));
-  log.append({ tool: "se_file_read", args: { path: "x.md" }, ok: true, outcome: "result", duration_ms: 1 });
-  log.append({ tool: "mirror_check", args: { path: anyGuidanceDoc() }, ok: true, outcome: "result", duration_ms: 1 });
   log.append({
+    tool: "se_file_read",
+    args: { path: "x.md" },
+    ok: true,
+    outcome: "result",
+    duration_ms: 1,
+    part: "walker",
+    state: "a-state",
+    answered_by: "a-model",
+  });
+  log.append({
+    tool: "mirror_check",
+    args: { path: anyGuidanceDoc() },
+    ok: true,
+    outcome: "result",
+    duration_ms: 1,
+    part: "walker",
+    state: "a-state",
+    answered_by: "a-model",
+  });
+  log.append({
+    part: "walker",
+    state: "a-state",
+    answered_by: "a-model",
     tool: "se_update",
     args: { via: "se_pull", visit: "idle@0", op: "plan", nodes: [{ id: "d1", brief: "x" }] },
     ok: true,
@@ -333,14 +354,29 @@ test("the unified feed derives src, type and brief — and the mirror carries th
     duration_ms: 0,
   });
   log.append({
+    part: "walker",
+    state: "a-state",
+    answered_by: "a-model",
     tool: "se_update",
     args: { via: "se_pull", visit: "idle@0", op: "update", brief: "working" },
     ok: true,
     outcome: "result",
     duration_ms: 0,
   });
-  log.append({ tool: "se_note", args: { text: "stray" }, ok: true, outcome: "result", duration_ms: 0 });
   log.append({
+    tool: "se_note",
+    args: { text: "stray" },
+    ok: true,
+    outcome: "result",
+    duration_ms: 0,
+    part: "walker",
+    state: "a-state",
+    answered_by: "a-model",
+  });
+  log.append({
+    part: "walker",
+    state: "a-state",
+    answered_by: "a-model",
     tool: "se_run",
     args: { command: "boom" },
     ok: false,

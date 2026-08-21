@@ -32,5 +32,9 @@ weight: 1
 This role absorbed two earlier candidates, the team architect and the solo
 engineer. They turned out to be one role wearing two names: the same person
 with the same accountability, differing only in how many other people share
-it. Four of the five value props serve this role, which is a fair sign the
-product has one primary audience and should say so.
+it. NINE OF THE TEN VALUE PROPS serve this role — it read four of five until
+i38 minted two more and a sweep at that iteration's M2 counted the standing set
+properly. The ratio held and the figure did not, which is a fair sign the
+product has one primary audience and a fairer one that a count in prose goes
+stale without saying so. The tenth is `vp-vendoring`, which serves the
+acquirer.

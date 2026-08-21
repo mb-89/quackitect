@@ -8,6 +8,13 @@ import { appendFileSync, existsSync, mkdirSync, readdirSync, readFileSync, renam
 import { dirname, join } from "node:path";
 import { stripBom } from "./jsonio.ts";
 
+/** THE PART A HAND PLAYED. Closed on purpose: an open vocabulary makes every
+ *  count a guess about what the words meant that day. Two was never the
+ *  property — req-acts-carry-role-and-channel's Detail fixed it at two until
+ *  2026-08-20, which is why no design about which of two agents walks a step
+ *  could ever score on it. */
+export type CallPart = "owner" | "walker" | "guide" | "reviewer" | "surface";
+
 export interface CallRecord {
   ref: string;
   ts: string;
@@ -32,6 +39,56 @@ export interface CallRecord {
    *  cannot answer which state cost what.
    *  see dsp-call-log.md#the-walk-position-is-stamped-not-inferred */
   where?: string[];
+  /** WHICH PART THE WORK'S AUTHOR PLAYED — dsp-the-three-coordinates-on-a-call,
+   *  req-every-call-records-the-part-its-caller-played. A closed vocabulary
+   *  that tells the hand holding the walk apart from a hand it delegated to.
+   *  `actor` cannot: a walker and a guide are both `agent`.
+   *
+   *  NOT ENFORCED YET. The field is declared so the checks at
+   *  tests/call-attribution.test.ts compile and run red. Requiring it,
+   *  refusing a value outside the vocabulary, and taking it from the work's
+   *  AUTHOR rather than the caller are the chunks
+   *  the-call-record-grows-three-fields and
+   *  the-role-vocabulary-separates-two-hands. */
+  part?: CallPart;
+  /** WHO FILED IT, where that is not who authored it. A guide may work the
+   *  lane itself, and then this is absent. Where the walker carries a guide's
+   *  work back instead, `part` stays the guide's and this says who relayed. */
+  relayed_by?: CallPart;
+  /** THE MODEL THAT ANSWERED, taken from what SERVED the call rather than from
+   *  what was requested — req-every-call-records-the-model-that-answered-it. */
+  answered_by?: string;
+  /** THE STATE THE WALK STOOD IN, as a field of its own rather than inside an
+   *  argument, so the log can be grouped by it —
+   *  req-every-call-records-the-state-it-was-made-in. */
+  state?: string;
+  /** WHICH OF THE FIELDS ABOVE ARE SELF-REPORTED. The state is known where the
+   *  call is served; the model and the part are known only to the caller. A
+   *  field that reads like an observation and is a claim is worse than an
+   *  empty one, because nobody knows to doubt it.
+   *
+   *  THE MARK COMES OFF when the value arrives from whatever performed the
+   *  spawn, which knows what it started and is not the party being measured.
+   *  That party is the walking agent and it is inside our walk, so this is a
+   *  trust boundary rather than a missing party. */
+  claimed?: string[];
+  /** THE DRIVER THE MILESTONE NAMED, kept beside what answered so the two can
+   *  be compared without reconstructing either side. */
+  named_driver?: string;
+  /** WHY A WEAKER HAND WALKED IT — req-a-weaker-driver-than-named-owes-a-recorded-reason. */
+  weaker_reason?: string | null;
+  /** THE CALLER'S OWN WORD THAT A WEAKER HAND THAN NAMED WALKED THIS STEP.
+   *  Not computable here: `named_driver` is a rung and `answered_by` is a
+   *  model name, and no mapping between them exists in this tree. */
+  went_weaker?: boolean;
+  /** THE MARK THAT A REASON WAS OWED AND NOT GIVEN. Marked rather than
+   *  refused: refusing would be a different requirement.
+   *
+   *  IT FIRES ON A WEAKER WALK, NOT ON A NAMED ONE. It used to fire whenever
+   *  a driver was named and no reason came with it, which marked a step walked
+   *  at or above its named strength identically to one that went below — and
+   *  the lane asks for `named_driver` on every call. */
+  unreasoned?: boolean;
   se_version: string;
 }
 
@@ -70,6 +127,43 @@ const ARCHIVE_SCAN = 12;
  *  still a syscall on the hot path for nothing. */
 const STAT_EVERY = 50;
 
+/** THE CLOSED ROLE VOCABULARY, checked at run time and not only at compile
+ *  time. A vocabulary that holds for our own code and for nothing arriving
+ *  through a lane call is not closed — see
+ *  req-every-call-records-the-part-its-caller-played. */
+const PARTS: ReadonlySet<string> = new Set<CallPart>(["owner", "walker", "guide", "reviewer", "surface"]);
+
+/** THE TWO COORDINATES ONLY THE CALLER KNOWS. The state is written by the
+ *  handler that served the call; these two are claims and are marked. */
+const SELF_REPORTED = ["answered_by", "part"] as const;
+
+/** A DECLARED ABSENCE, never a silent one. A caller that cannot know what
+ *  answered says so in the value rather than leaving the field out, for the
+ *  same reason the sizing block returns a no-match instead of nothing: an
+ *  absence on the wire is indistinguishable from a crash and from never
+ *  having run. A missing field reads as complete; this one reads as unknown. */
+export const UNREPORTED = "unreported";
+
+/** EVERY COORDINATE OR NONE — req-every-call-records-the-state-it-was-made-in.
+ *  A record missing one reads as complete and answers nothing, which is worse
+ *  than an absent record because nothing looks wrong. The measure is explicit:
+ *  calls whose part is absent = 0. */
+function assertCoordinates(entry: { answered_by?: string; state?: string; part?: string; relayed_by?: string }): void {
+  for (const key of ["answered_by", "state", "part"] as const) {
+    const v = entry[key];
+    if (typeof v !== "string" || v === "") throw new Error(`a call record needs ${key} — every coordinate or none`);
+  }
+  for (const key of ["part", "relayed_by"] as const) {
+    const v = entry[key];
+    if (v !== undefined && !PARTS.has(v)) {
+      throw new Error(`${key} "${v}" is outside the closed vocabulary: ${[...PARTS].join(", ")}`);
+    }
+  }
+  if (entry.relayed_by !== undefined && entry.relayed_by === entry.part) {
+    throw new Error("relayed_by names who FILED work somebody else authored — it cannot be the author's own part");
+  }
+}
+
 export class CallLog {
   readonly path: string;
   private sinceStat = STAT_EVERY;
@@ -78,12 +172,15 @@ export class CallLog {
     this.path = join(seDir, "calls.jsonl");
   }
 
-  append(entry: Omit<CallRecord, "ref" | "ts" | "se_version">): CallRecord {
+  append(entry: Omit<CallRecord, "ref" | "ts" | "se_version" | "claimed">): CallRecord {
+    assertCoordinates(entry);
     const rec: CallRecord = {
       ref: `call-${randomBytes(6).toString("hex")}`,
       ts: new Date().toISOString(),
       se_version: SE_VERSION,
       ...entry,
+      claimed: [...SELF_REPORTED],
+      ...(entry.went_weaker === true && entry.weaker_reason === undefined ? { weaker_reason: null, unreasoned: true } : {}),
     };
     mkdirSync(dirname(this.path), { recursive: true });
     appendFileSync(this.path, `${JSON.stringify(rec)}\n`, "utf8");
@@ -326,7 +423,17 @@ export class CallLog {
     group_by?: string;
     limit?: number;
     offset?: number;
-  }): { total: number; groups?: Record<string, number>; records?: CallRecord[]; offset?: number; older?: number } {
+  }): {
+    total: number;
+    groups?: Record<string, number>;
+    /** SET WHEN NO RECORD CARRIED THE KEY AT ALL. The groups then say
+     *  `(none)` and mean "asked for something nobody has", which is a
+     *  different answer from "everybody has the same value". */
+    group_by_reached_nothing?: string;
+    records?: CallRecord[];
+    offset?: number;
+    older?: number;
+  } {
     const dig = (obj: unknown, path: string): unknown =>
       path.split(".").reduce<unknown>((v, k) => (v && typeof v === "object" ? (v as Record<string, unknown>)[k] : undefined), obj);
     const f = q.filter ?? {};
@@ -337,11 +444,22 @@ export class CallLog {
     const records = this.filtered({ tool: f.tool, ok: f.ok, text: f.text, since, min_ms: f.min_ms });
     if (q.group_by !== undefined) {
       const groups: Record<string, number> = {};
+      let reached = 0;
       for (const r of records) {
-        const key = String(dig(r, q.group_by) ?? "(none)");
+        const raw = dig(r, q.group_by);
+        if (raw !== undefined && raw !== null) reached++;
+        const key = String(raw ?? "(none)");
         groups[key] = (groups[key] ?? 0) + 1;
       }
-      return { total: records.length, groups };
+      // A KEY NOTHING CARRIES AND A KEY EVERYTHING SHARES LOOK IDENTICAL from
+      // the groups alone: both are one bucket. This iteration read one as
+      // evidence of the other, so the answer now says which it is rather than
+      // leaving a reader to infer it — uc-attribute-a-finished-walk ext 2a.
+      return {
+        total: records.length,
+        groups,
+        ...(records.length > 0 && reached === 0 ? { group_by_reached_nothing: q.group_by } : {}),
+      };
     }
     // NEWEST FIRST, PAGED BACKWARDS. offset 0 is the newest page; offset 20
     // is the twenty before those. A window with no way to ask for the next

@@ -303,15 +303,27 @@ The trigger is a NOTE carrying "needs retro":
    - WHAT COST is the round trips, the refusals, the rework, the
      re-reading. The log has the numbers and this column takes them.
 
-     PER-STEP COST IS NOT COMPUTABLE TODAY, measured 2026-08-17. The call log
-     cannot be grouped by state: the state a call was made in rides inside a
-     narration record's arguments, and se_log_query's group_by does not reach
-     it. Grouping by `visit` returns a single group holding everything.
+     PER-STEP COST IS COMPUTABLE SINCE i38, and it was not before. The call
+     log now carries `state` as a field of its own, so
+     `se_log_query {group_by: "state"}` answers directly. It also carries
+     `answered_by` — the model that served the call — and `part`, which
+     hand made it, so the same window splits three ways.
 
-     So take this column from what IS available — the refusal clauses, the
-     slow calls, the shell shapes, the test timings — and SAY PLAINLY where a
-     number is a whole-window figure rather than that step's own. Never divide
-     a total by the step count and present the result as measurement.
+     A GROUPING THAT REACHED NOTHING SAYS SO. The answer carries
+     `group_by_reached_nothing` when no record in the window holds the key,
+     which is a different answer from one bucket everybody shares. Before i38
+     the two looked identical, and this card's own claim was read off a
+     grouping that could not have returned anything else.
+
+     TWO OF THE THREE ARE CLAIMS AND THE RECORD SAYS WHICH. `claimed` lists
+     `answered_by` and `part`: the state is what the server observed, and
+     the other two are what the caller said. A cost table built on them is
+     reading a self-report.
+
+     RECORDS FROM BEFORE i38 CARRY NONE OF IT, so a window spanning the change
+     answers for part of itself. SAY PLAINLY where a number is a whole-window
+     figure rather than that step's own, and never divide a total by the step
+     count and present the result as measurement.
    - MECHANIZABLE names the check, the refusal or the prefill that would
      have removed the cost. Empty is a legal answer and a common one.
 

@@ -14,6 +14,9 @@ source_refs:
   - el-entrypoint
   - el-walk-engine
   - if-agent-harness-to-entrypoint
+  - fn-arrive-on-a-machine.identify-the-harness
+  - req-supported-harness-serves-one-lane-contract
+  - if-arrival-to-walk-engine
 ---
 
 MINTED FROM i37 RATHER THAN FROM ITS OWN ITERATION, and that is why this note
@@ -76,3 +79,21 @@ from the process that started under it.
 
 `flow-live-lane` IS KEPT BESIDE IT because the pair genuinely exchanges it, and
 because a reader looking for how the lane comes up should find it here.
+
+## The owed crossing i38 also drew
+
+i38 minted this same node independently, and its reasoning is kept because it
+names the allocation question this node leaves open.
+
+`fn-arrive-on-a-machine.identify-the-harness` is allocated to el-entrypoint. The
+element named for that work, el-arrival, implements nothing at all and shows in
+the matrix as idle, and the interface minted for it — if-arrival-to-walk-engine —
+shows as undemanded. So one flow has an interface nobody sends across and a
+crossing nobody had an interface for.
+
+BOTH PREDATE BOTH ITERATIONS and neither is in either cone; the element matrix
+simply did not surface them until a new element made it recompute. This node
+clears the owed side. The idle element and its undemanded interface are left
+standing, because deciding whether identifying the harness belongs to arrival or
+to the entrypoint is an allocation question that belongs to whoever owns that
+cone.

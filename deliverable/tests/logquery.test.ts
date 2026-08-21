@@ -147,9 +147,36 @@ test("with only one sitting in the log there is nothing to hand over", async () 
 test("min_ms filters the log to what was at least that slow", () => {
   const dir = mkdtempSync(join(tmpdir(), "se-log-"));
   const log = new CallLog(dir);
-  log.append({ tool: "se_pull", args: {}, ok: true, outcome: "result", duration_ms: 12 });
-  log.append({ tool: "se_file_read", args: {}, ok: true, outcome: "result", duration_ms: 1450 });
-  log.append({ tool: "mirror_slow", args: { path: "/x" }, ok: true, outcome: "result", duration_ms: 2100 });
+  log.append({
+    tool: "se_pull",
+    args: {},
+    ok: true,
+    outcome: "result",
+    duration_ms: 12,
+    part: "walker",
+    state: "a-state",
+    answered_by: "a-model",
+  });
+  log.append({
+    tool: "se_file_read",
+    args: {},
+    ok: true,
+    outcome: "result",
+    duration_ms: 1450,
+    part: "walker",
+    state: "a-state",
+    answered_by: "a-model",
+  });
+  log.append({
+    tool: "mirror_slow",
+    args: { path: "/x" },
+    ok: true,
+    outcome: "result",
+    duration_ms: 2100,
+    part: "walker",
+    state: "a-state",
+    answered_by: "a-model",
+  });
   const slow = log.query({ filter: { min_ms: 1000 } });
   assert.equal(slow.total, 2, "only the breaches");
   assert.deepEqual(

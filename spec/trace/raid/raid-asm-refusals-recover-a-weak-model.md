@@ -11,12 +11,59 @@ impact: The refusal contract is doctrine without a check. A clause whose remedy 
 breaks_how_badly: corrosive
 how_likely: plausible
 probe: "one-sided evidence, i35 on 2026-08-17, and the model was not weak. Every typed refusal hit recovered in one turn: SE-C-040, 105, 110, 112, 120, 125, 129, 137. TWO DID NOT RECOVER CLEANLY: a per-item refusal printed truncated item strings its own matcher would not accept, and a do instruction repeated indefinitely carrying no remedy at all."
-probed: 2026-08-17
+probed: 2026-08-20
 source_refs:
   - engine/errors.ts lines 2-3, where the contract is written
   - guidance/refusals.md, the feed-forward side of every clause
   - "the owner's ruling 2026-08-12: hand validation, never automation"
 ---
+
+## A SECOND ONE-SIDED DATA POINT, i38 on 2026-08-20 — CORRECTED THE SAME DAY
+
+STILL NOT A WEAK MODEL, so this narrows nothing that matters.
+
+THE FIGURES BELOW REPLACE A WRONG SET, and the wrong set is kept because how it
+was wrong is the useful part.
+
+FIRST REPORTED: "forty-five refusals over five hundred calls", with a clause
+list naming SE-C-046, 101, 110, 112, 120, 125, 133, 138. BOTH HALVES WERE
+WRONG.
+
+- THE POPULATION WAS A TAIL WINDOW. The measuring call passed `limit: 500` while
+  the log held more than seven hundred records, so it measured the last five
+  hundred and the form reported it as the session.
+- THE CLAUSE LIST WAS RECALLED, NOT READ. SE-C-125 and SE-C-138 never fired at
+  all this session; they were carried over from this node's own earlier probe
+  describing the i35 run. SE-C-102 and SE-C-122 did fire and were missing.
+
+MEASURED PROPERLY, over the whole file: 891 records, 72 refusals.
+SE-C-121 ×28, SE-C-133 ×20, SE-C-110 ×4, SE-C-120 ×4, SE-C-101 ×3, SE-C-102 ×3,
+SE-C-122 ×3, SE-C-046 ×1, SE-C-112 ×1, and five whose response this parse could
+not read.
+
+AND THE COUNT HAD TO BE TAKEN TWICE. A first parse required the `response` field
+to be an object and reported a different distribution; fifteen records store it
+as a JSON STRING instead. TWO HONEST PARSES OF ONE FILE DISAGREED because the
+log is not uniformly shaped, which is worth knowing before anyone ranks clauses
+from it.
+
+THE RECOVERY CLAIM IS WITHDRAWN. The form said every typed clause recovered in
+one turn except the narration ones. NOTHING MEASURED THAT — recovery is a
+property of the NEXT call, and no pass over the log was made to check it. It
+was an assertion in the shape of a measurement, and at least one counter-example
+is in the walker's own trail: a state-gate refusal whose remedy named a
+different door was answered by re-sending the identical call.
+
+THE EXCEPTION IS WORTH THE ENTRY. SE-C-121 fired sixteen times and SE-C-133
+twenty, and both are NARRATION clauses. The 121s were node ids guessed rather
+than read, and the open node map rides every result — the remedy was already in
+hand and was not taken. THAT IS THE FAILURE MODE THIS ASSUMPTION IS ABOUT,
+arriving in a capable model: a remedy that is present, correct, and not used
+because the answer looked obvious.
+
+SO THE CLAIM TO TEST IS NARROWER THAN "does the remedy work". It is whether the
+remedy is placed where a reader who thinks they already know the answer will
+still see it. On this evidence, for the narration clauses, it is not.
 
 ## The claim
 

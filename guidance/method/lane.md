@@ -53,11 +53,37 @@ path that names a folder the product does not have is the tell.
 
 Every call is logged raw to `.se/calls.jsonl`.
 
-THE RECORD CARRIES WHO ACTED. The acting role — a person, an agent, the
-surface itself — is stamped on the record where the call is SERVED, by the
-code that knows. Nothing downstream infers it from the tool name: a reader
-guessing the actor from which verb was called gets it wrong the moment one
-verb serves two callers, and it did.
+THE RECORD CARRIES WHO ACTED, WHERE, AND ON WHAT. Four coordinates, and only
+one of them is something the server can see for itself.
+
+- `actor` — a person, an agent, or the surface itself. Stamped where the call
+  is SERVED, by the code that knows. Nothing downstream infers it from the tool
+  name: a reader guessing the actor from which verb was called gets it wrong
+  the moment one verb serves two callers, and it did.
+- `state` — where the walk stood. Also the server's own observation.
+- `part` — WHICH HAND, from a closed vocabulary: owner, walker, guide,
+  reviewer, surface. Two agents are both `actor: agent`, and this is what
+  tells them apart.
+- `answered_by` — the model that served the call, not the one that was asked
+  for.
+
+YOU DECLARE THE LAST TWO AND THE RECORD MARKS THEM AS CLAIMS. Every lane tool
+takes `as`, `relayed_by` and `answered_by`, the same way every one takes
+`update`. Omit `as` and the record says `walker`, which is right for the
+hand holding the session.
+
+SAY `as: "guide"` WHEN YOU ARE THE HAND THAT WAS ASKED. A guide is delegated
+one step and says so — a default of `guide` would let the strong hand's work
+hide in the weak hand's count.
+
+AND WHEN YOU FILE WORK SOMEBODY ELSE DID, say `as` for the AUTHOR and
+`relayed_by` for yourself. A walker typing a guide's judgment into a form
+under its own name erases the only thing the coordinate is for.
+
+THREE MORE RIDE EVERY TOOL AND CARRY THE SAFETY RULE. `named_driver` is the
+strength the step was told it needs; `went_weaker` is your own word that a
+weaker hand took it; `weaker_reason` is why. Saying you went weaker and
+giving no reason marks the record `unreasoned` — marked, never refused.
 
 TWO DOORS LEAD OUTSIDE THE ROOT, and neither is a path. A past version of this
 repo is read at a committed ref — `se_file_read`, `se_file_search` and

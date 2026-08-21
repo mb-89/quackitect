@@ -13,7 +13,7 @@ import { spawn } from "node:child_process";
 import { join } from "node:path";
 import { benchmarkBind, benchmarkEnd } from "./benchmark.ts";
 import { setAnswerSpill } from "./bound.ts";
-import { CallLog } from "./calllog.ts";
+import { CallLog, type CallPart, UNREPORTED } from "./calllog.ts";
 import { parseUpdate } from "./decisions.ts";
 import { CLAUSES, Rejection, type RejectionPayload } from "./errors.ts";
 import { contentHash } from "./hash.ts";
@@ -641,8 +641,51 @@ export function buildServer(
     type: "object",
     description: "Narration op riding this call: {op, brief?, items?, node?}. Ops and rules: see se_pull.",
   };
+  // WHICH HAND IS CALLING — req-every-call-records-the-part-its-caller-played.
+  // It rides every lane tool for the same reason `update` does: the answer is
+  // about the CALL rather than about any one verb, and a coordinate a caller
+  // can only supply on some verbs is a coordinate the log cannot be grouped by.
+  const AS_PROP = {
+    type: "string",
+    enum: ["owner", "walker", "guide", "reviewer", "surface"],
+    description:
+      "WHICH PART YOU ARE PLAYING. Omit it and the record says `walker`, which is right for the hand holding the session and making the daily calls.\n\nSAY `guide` WHEN YOU ARE THE HAND THAT WAS ASKED. A guide is delegated one step — a question, a comparison, a decision the walker will not take alone — and it says so, because a default of `guide` would let the strong hand's work hide in the weak hand's count.\n\nTHE VALUE IS RECORDED AS A CLAIM. Nothing here can check it: one dispatcher serves every agent, so the lane cannot tell two hands apart on its own.",
+  };
+  const RELAYED_BY_PROP = {
+    type: "string",
+    enum: ["owner", "walker", "guide", "reviewer", "surface"],
+    description:
+      "WHO IS FILING WORK SOMEBODY ELSE DID. Send `as` naming the AUTHOR and this naming yourself.\n\nUSE IT WHENEVER YOU CARRY A DELEGATE'S ANSWER BACK. A guide that works the lane itself needs neither key. A walker that types a guide's judgment into a form needs both, or the record says the walker decided what the guide decided.\n\nIT MAY NOT EQUAL `as`. A record where the author and the relayer agree is a contradiction rather than a redundancy, and it is refused.",
+  };
+  const NAMED_DRIVER_PROP = {
+    type: "string",
+    description:
+      "THE STRENGTH THIS STEP WAS TOLD IT NEEDS, as the machine published it. Send it back on the calls you make while walking that step, so the record can compare what was named against what answered without reconstructing either side.\n\nSENDING IT ARMS THE ASYMMETRY. A record carrying a named driver and no reason takes a mark saying a reason was owed and not given.",
+  };
+  const WENT_WEAKER_PROP = {
+    type: "boolean",
+    description:
+      "SAY SO WHEN A WEAKER HAND THAN NAMED WALKED THIS STEP. Nothing here can work it out: `named_driver` is a rung and `answered_by` is a model name, and no mapping between them exists in this tree.\n\nSENDING IT WITHOUT `weaker_reason` MARKS THE RECORD `unreasoned`. A stronger hand than named needs no argument, so leaving this off is the ordinary case and costs nothing.",
+  };
+  const WEAKER_REASON_PROP = {
+    type: "string",
+    description:
+      "WHY A WEAKER HAND WALKED THIS STEP. A stronger hand than named needs no argument; a weaker one needs this sentence — req-a-weaker-driver-than-named-owes-a-recorded-reason.\n\nIT IS MARKED, NEVER REFUSED. Omitting it does not stop the call; it stamps the record `unreasoned`, so a walk that talked itself into staying cheap is visible instead of indistinguishable.",
+  };
+  const ANSWERED_BY_PROP = {
+    type: "string",
+    description:
+      "WHAT MODEL ACTUALLY SERVED THIS CALL, not what was asked for — the two differ in practice and the difference is the interesting case.\n\nOMIT IT AND THE RECORD SAYS `unreported`, which is a declared absence rather than a missing field.\n\nTHE VALUE IS RECORDED AS A CLAIM. The transport hands the engine a client name and no model, so the only party who knows is the party being measured.",
+  };
   for (const t of tools) {
-    (t.inputSchema.properties as Record<string, unknown>).update = t.name === "se_pull" ? UPDATE_FULL : UPDATE_REF;
+    const props = t.inputSchema.properties as Record<string, unknown>;
+    props.update = t.name === "se_pull" ? UPDATE_FULL : UPDATE_REF;
+    props.as = AS_PROP;
+    props.relayed_by = RELAYED_BY_PROP;
+    props.answered_by = ANSWERED_BY_PROP;
+    props.named_driver = NAMED_DRIVER_PROP;
+    props.weaker_reason = WEAKER_REASON_PROP;
+    props.went_weaker = WENT_WEAKER_PROP;
   }
   const server = new McpServer(
     { name: "se-mcp", version: SE_VERSION },
@@ -711,6 +754,17 @@ export function buildServer(
         tool: "se_update",
         args: { via: tool, visit, ...op },
         actor: "agent",
+        // THE CALL'S OWN COORDINATES, NOT THE UPDATE PAYLOAD'S. This read
+        // `raw` — the {op, node, brief} object — so an `se_update` record took
+        // its part and its answering model out of a place they never appear.
+        // Every one of them said `walker` and `unreported` however the caller
+        // declared itself, and a coordinate placed INSIDE the update object
+        // reached the record while bypassing the vocabulary guard entirely.
+        // `se_update` is the second most common tool in the log.
+        //
+        // FOUND BY A RED TEAM AT i38's implementation gate, by probing rather
+        // than reading: `as: "guide"` on the call, `walker` on the record.
+        ...whichHand(session, args),
         ok: true,
         outcome: "result",
         duration_ms: 0,
@@ -725,6 +779,7 @@ export function buildServer(
         tool: "se_update",
         args: { via: tool, refused: true },
         actor: "agent",
+        ...whichHand(session, args),
         ok: false,
         outcome: "rejected",
         duration_ms: 0,
@@ -879,6 +934,61 @@ export function buildServer(
       },
     ]),
   );
+  // THE HAND A CALLER DECLARES IS CHECKED HERE AND NOT AT THE LOG.
+  //
+  // WHY IT MOVED. `CallLog.append` refuses a part outside the closed
+  // vocabulary, which is right — but the dispatch's log hook catches and
+  // discards whatever the append throws, because a log hook must never break
+  // dispatch. So a call carrying `as: "sorcerer"` was ANSWERED NORMALLY and
+  // never reached calls.jsonl. Refusing the CALL is correct; losing the RECORD
+  // is not, and req-every-call-logged is unconditional.
+  //
+  // FOUND BY A FRESH-EYES TESTER AT i38's verification, by probing the lane
+  // rather than by reading the check — the case that was supposed to hold this
+  // asserted on `append` directly, and the property is false one layer up.
+  server.addGuard((tool, args) => {
+    for (const key of ["as", "relayed_by"] as const) {
+      const v = args[key];
+      if (v === undefined) continue;
+      if (typeof v !== "string" || !PART_WORDS.has(v)) {
+        throw new Rejection({
+          clause: CLAUSES.UNKNOWN_ARGS,
+          expected: `${key} is one of: ${[...PART_WORDS].join(", ")}`,
+          got: `${key}: ${JSON.stringify(v)}`,
+          remedy: {
+            tool,
+            args: { [key]: "walker" },
+            note: "omit it and the record says `walker`, which is right for the hand holding the session",
+          },
+          source: "engine/tools.ts which-hand",
+        });
+      }
+    }
+    // THE COMPARISON IS ON THE RESOLVED PARTS, NOT THE RAW ARGUMENTS. It read
+    // `args.relayed_by === args.as`, and `as` is undefined when the caller
+    // omits it — so `relayed_by: "walker"` with no `as` passed the guard, the
+    // part defaulted to `walker`, and the log's own rule then threw inside the
+    // observer. The dispatch swallows an observer's throw, so the record
+    // vanished. On a REFUSED call it took the refusal record with it, which is
+    // exactly the defect this guard was added to close.
+    //
+    // FOUND BY A RED TEAM AT i38's implementation gate.
+    const partNow = typeof args.as === "string" ? args.as : "walker";
+    if (args.relayed_by !== undefined && args.relayed_by === partNow) {
+      throw new Rejection({
+        clause: CLAUSES.UNKNOWN_ARGS,
+        expected: "relayed_by to name a DIFFERENT part from the one filing — it says who FILED work somebody else authored",
+        got: `both are ${JSON.stringify(partNow)}${args.as === undefined ? " (`as` omitted, so the part is `walker`)" : ""}`,
+        remedy: {
+          tool,
+          args: {},
+          note: 'a guide filing its own work needs neither key; a walker relaying a guide\'s work sends as: "guide", relayed_by: "walker"',
+        },
+        source: "engine/tools.ts which-hand",
+      });
+    }
+  });
+
   server.addGuard((tool, args) => {
     const shape = shapes.get(tool);
     if (shape === undefined) return;
@@ -926,6 +1036,92 @@ export function buildServer(
   // malformed, not as illegal-in-state.
   server.addGuard((tool, args) => session.gate(tool, args));
 
+  /** WHICH HAND MADE THIS CALL, AND ON WHAT — dsp-the-three-coordinates-on-a-call.
+   *
+   *  THE STATE IS AN OBSERVATION. The server knows where the walk stands, so it
+   *  writes it and nothing downstream infers it.
+   *
+   *  THE OTHER TWO ARE CLAIMS AND THE RECORD MARKS THEM. The transport hands the
+   *  engine a client name and no model, and one dispatcher serves every agent, so
+   *  neither the answering model nor the part played is visible from here.
+   *
+   *  THE DEFAULT PART IS THE WALKER, and that is a position rather than a
+   *  convenience. The hand holding the session IS the walker by definition; a
+   *  GUIDE is a hand that was asked for one step, and it says so. A default of
+   *  `guide` would let the strong hand's work hide in the weak hand's count,
+   *  which is the failure this coordinate exists to make visible.
+   *
+   *  RELAYED WORK NAMES ITS AUTHOR AND ITS RELAYER. Where the walker files work
+   *  a guide authored, `part` is the guide's and `relayed_by` is the walker's —
+   *  raid-risk-a-relayed-judgment-is-filed-under-the-hand-that-relayed-it. */
+  const PART_WORDS: ReadonlySet<string> = new Set<CallPart>(["owner", "walker", "guide", "reviewer", "surface"]);
+
+  function whichHand(
+    session: Session,
+    args: unknown,
+  ): {
+    state: string;
+    part: CallPart;
+    answered_by: string;
+    relayed_by?: CallPart;
+    named_driver?: string;
+    went_weaker?: boolean;
+    weaker_reason?: string;
+  } {
+    const a = (args ?? {}) as Record<string, unknown>;
+    // THE LOG NEVER REFUSES A RECORD IT IS ASKED TO WRITE. The guard above has
+    // already refused any call carrying a part outside the vocabulary — and a
+    // REFUSED call is still observed, so this runs for it too. Passing the bad
+    // value through to `append` would throw inside the log hook, the dispatch
+    // would swallow it, and the refusal record would vanish. Losing the record
+    // of a refusal is the same defect as losing the record of a call.
+    //
+    // SO AN UNKNOWN VALUE FALLS BACK, AND THE CLAIM IS STILL VISIBLE: the raw
+    // arguments ride the same record, so a reader sees both what was declared
+    // and what the record settled on.
+    const word = (v: unknown): CallPart | undefined => (typeof v === "string" && PART_WORDS.has(v) ? (v as CallPart) : undefined);
+    const declared = word(a.as);
+    const part: CallPart = declared ?? "walker";
+    // COMPARED AGAINST THE RESOLVED PART, not the declared one. With `as`
+    // omitted, `declared` is undefined and every relay looked distinct from
+    // it — so a `relayed_by: "walker"` produced a record whose relayer WAS its
+    // author, which the log refuses, inside the hook that must never throw.
+    const relayed = word(a.relayed_by) === part ? undefined : word(a.relayed_by);
+    const named = typeof a.named_driver === "string" && a.named_driver !== "" ? a.named_driver : undefined;
+    // THE REASON ONLY MEANS ANYTHING BESIDE A NAMED STRENGTH. Carried alone it
+    // is a sentence about nothing, and it would suppress the `unreasoned` mark
+    // on a record that never named a driver to be weaker than.
+    // A BLANK REASON IS NOT A REASON. `" "` passed a `!== ""` test and
+    // suppressed the mark, which is the smallest possible way to owe a
+    // sentence and give none.
+    const said = typeof a.weaker_reason === "string" ? a.weaker_reason.trim() : "";
+    const why = said !== "" ? said : undefined;
+    // THE MARK IS ABOUT GOING WEAKER, AND ONLY THE CALLER KNOWS. `named_driver`
+    // is a rung and `answered_by` is a model name; nothing in this tree maps
+    // one to the other, so "weaker" is not computable here.
+    //
+    // IT USED TO FIRE ON ANY NAMED DRIVER WITH NO REASON, which marked a step
+    // walked at or above its named strength identically to one that went below
+    // it — and the schema tells callers to send `named_driver` on every call.
+    // A mark that fires on nearly everything counts nothing. Found by a
+    // fresh-eyes tester at i38's verification.
+    // `went_weaker: true` IS A COMPLETE STATEMENT ON ITS OWN. This required a
+    // `named_driver` beside it, and a caller who said in as many words that a
+    // weaker hand walked the step, while omitting the echo of the rung, left a
+    // record carrying no trace of it at all — which is the outcome the
+    // requirement's own breaks_if_removed describes.
+    const weaker = a.went_weaker === true;
+    return {
+      state: session.currentState(),
+      part,
+      answered_by: typeof a.answered_by === "string" ? a.answered_by : UNREPORTED,
+      ...(relayed !== undefined ? { relayed_by: relayed } : {}),
+      ...(named !== undefined ? { named_driver: named } : {}),
+      ...(weaker ? { went_weaker: true } : {}),
+      ...(why !== undefined ? { weaker_reason: why } : {}),
+    };
+  }
+
   // §9 — the single call path logs everything. se_run keeps its full output.
   server.addObserver((rec) => {
     log.append({
@@ -939,6 +1135,7 @@ export function buildServer(
       // before any move, because the guards throw ahead of the handler.
       // see dsp-call-log.md#the-walk-position-is-stamped-not-inferred
       where: session.active(),
+      ...whichHand(session, rec.args),
       ok: rec.ok,
       outcome: rec.outcome,
       duration_ms: rec.duration_ms,

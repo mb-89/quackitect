@@ -34,7 +34,7 @@ export function visitState(visit: string): string {
 
 import { spawn, spawnSync } from "node:child_process";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { CallLog } from "./calllog.ts";
+import { CallLog, UNREPORTED } from "./calllog.ts";
 import type { CanvasData } from "./canvas.ts";
 import { conditionNotePath } from "./conditions.ts";
 import { Decisions } from "./decisions.ts";
@@ -80,6 +80,7 @@ import { Liveness } from "./sessionlive.ts";
 import { ReadGate } from "./sessionreads.ts";
 import { Scripts } from "./sessionscript.ts";
 import { Views } from "./sessionviews.ts";
+import { difficultyOf, publish } from "./sizing.ts";
 import { NARRATION_DEFAULT_CALLS, NARRATION_DEFAULT_MINUTES } from "./toll.ts";
 import type { loadTrace } from "./trace.ts";
 
@@ -592,6 +593,54 @@ export class Session {
   /** Boot is done — the toll arms on this; the reading room pays none. */
   isBooted(): boolean {
     return this.bannerShown;
+  }
+
+  /** HOW STRONG A HAND THE STEP IN HAND NEEDS — el-sizing's whole outbound
+   *  half, riding the pull beside the state and the tier.
+   *
+   *  THE LANE SAYS AND DOES NOT DO. Publishing is where the machine's part
+   *  ends: nothing here starts a process, and nothing downstream of this
+   *  value inside the box starts one either
+   *  (req-the-machine-names-a-driver-and-starts-nothing).
+   *
+   *  A RUNG AND THE PAIR IT CAME FROM, NEVER A MODEL. Resolving a rung to a
+   *  concrete hand is whoever holds the fleet's business — in our own
+   *  deployment, the walking agent, which acts by delegating the step to a
+   *  subagent on a stronger hand.
+   *
+   *  A STEP WITH NO RATING PUBLISHES NOTHING RATHER THAN A GUESS. The field is
+   *  absent, and the walk carries on exactly as it did before this existed. A
+   *  fallback to whatever is running would be indistinguishable from a working
+   *  lookup, which is what
+   *  req-an-unmatched-rung-names-itself-and-publishes-no-driver forbids. */
+  private strengthNeeded(): Record<string, unknown> {
+    // THE FIELD IS `hand`, NOT `needs`. The pull already serves a `needs` on
+    // each OPTION, meaning "this door needs the person, because the work is
+    // above the dial". One answer carrying one word for two things is a
+    // vocabulary an agent has to disambiguate by level.
+    //
+    // THERE IS NO BLANKET CATCH HERE ANY MORE, and that is the point. A catch
+    // that turned every failure into "unrated" hid a lookup that had never
+    // worked for a whole iteration, because unrated IS the ordinary case and
+    // the two are indistinguishable from inside. An unrated step is now tested
+    // for by NAME, and anything else is a bug that will surface.
+    const { machine, ids } = this.leaves();
+    const id = ids[0];
+    if (id === undefined) return {};
+    // A STATE THE MACHINE DOES NOT DECLARE is not a sizing question. `state()`
+    // refuses one, and a pull must not.
+    const step = machine.states.find((s) => s.id === id);
+    if (step === undefined || step.submachine !== undefined) return {};
+    if (step.complexity === undefined) return {};
+    return { hand: publish(difficultyOf(step)) };
+  }
+
+  /** THE STATE A CALL WAS MADE IN, as a field for the record rather than a
+   *  key for the graph — req-every-call-records-the-state-it-was-made-in.
+   *  Known where the call is SERVED, which is why it is the one coordinate of
+   *  three that is an observation and not a claim. */
+  currentState(): string {
+    return this.active()[0] ?? UNREPORTED;
   }
 
   /** The decision graph's key: the leaf state the walk stands in, plus how
@@ -2327,6 +2376,7 @@ export class Session {
       // (owner ruling 2026-08-14).
       ...this.tierFor(this._autonomy),
       narration: { minutes: this._narrationMinutes, calls: this._narrationCalls },
+      ...this.strengthNeeded(),
     });
 
     // STEPPING OUT stays the agent's decision — the machine cannot know
@@ -3189,7 +3239,7 @@ export class Session {
   }
 
   formGet(name: string, machineId?: string): Record<string, unknown> {
-    const fm = this.claims.formMachine(machineId);
+    const fm = this.claims.formMachine(machineId, name);
     if (this.claims.isStateForm(name, fm)) return this.claims.stateFormGet(name, fm);
     if (this.bound === undefined) {
       // No expedition bound — the TEMPLATE is still viewable (owner ruling:
@@ -3229,7 +3279,7 @@ export class Session {
 
   formSave(name: string, fields: Record<string, string>, by = "agent", machineId?: string): Record<string, unknown> {
     this.forgetRoute();
-    const fm = this.claims.formMachine(machineId);
+    const fm = this.claims.formMachine(machineId, name);
     if (this.claims.isStateForm(name, fm)) return this.claims.stateFormSave(name, fields, by, fm);
     const h = this.formHome(name);
     let raw = existsSync(h.instanceAbs) ? readFileSync(h.instanceAbs, "utf8") : scaffoldInstance(h.template, `${this.bound?.id} — ${name}`);
@@ -3241,7 +3291,7 @@ export class Session {
   }
 
   formConfirm(name: string, field: string, index: number, machineId?: string): Record<string, unknown> {
-    const fm = this.claims.formMachine(machineId);
+    const fm = this.claims.formMachine(machineId, name);
     if (this.claims.isStateForm(name, fm)) {
       const sh = this.claims.stateFormHome(name, fm);
       if (existsSync(sh.instanceAbs)) {
@@ -3260,7 +3310,7 @@ export class Session {
 
   formDone(name: string, by: Channel, machineId?: string): Record<string, unknown> {
     this.forgetRoute();
-    const fm = this.claims.formMachine(machineId);
+    const fm = this.claims.formMachine(machineId, name);
     if (this.claims.isStateForm(name, fm)) {
       this.claims.assertStateFormActive(name, fm, "submit");
       // SUBMIT is the checking act: an unmet form THROWS, so the log line
@@ -3700,6 +3750,7 @@ export class Session {
       ...(this._emergency ? { emergency: true } : {}),
       power: this.power,
       narration: { minutes: this._narrationMinutes, calls: this._narrationCalls },
+      ...this.strengthNeeded(),
       // WHERE THIS IS HEADED. Carried on every packet so neither hand has
       // to ask, and so a walk that drifts off the way is visibly off it.
       target: this._target,
@@ -4140,6 +4191,7 @@ export class Session {
       ...(this._emergency ? { emergency: true } : {}),
       power: this.power,
       narration: { minutes: this._narrationMinutes, calls: this._narrationCalls },
+      ...this.strengthNeeded(),
       legal_tools: this._emergency ? "all" : all ? "all" : [...ALWAYS_LEGAL, ...tools],
       history: this.instance.history.slice(-10),
     };

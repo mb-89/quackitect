@@ -17,6 +17,25 @@ import { contentHash } from "./hash.ts";
 import { claimFeeders, downstreamCone, fallenChain, type MachineDecl, reopenStates, type StateDecl } from "./machine.ts";
 import { compileMachineCached, resolveRef } from "./machines/compile.ts";
 
+/** WHICH STATE OWES THE FORM THE PULL SERVES, from where the walk stands.
+ *
+ *  NORMALLY THE LEAF. Machinery owes nothing — start, end, terminal and join
+ *  never sign, and asking one for a form throws from formForAgent on the
+ *  pull's own path.
+ *
+ *  A SUB-MACHINE'S MACHINERY ASCENDS TO THE STATE THAT RUNS IT. That state is
+ *  the only one owing a signature from there, and its form is otherwise
+ *  served only while the sub is still unseeded.
+ *
+ *  WITHOUT THE ASCENT A RE-SIGN CASCADE IS A DEAD END.
+ *  see dsp-walk-machine.md#machinery-ascends-to-the-state-that-runs-the-sub
+ */
+export function formBearer(leaf: StateDecl | undefined, parent: StateDecl | undefined, parentReopened: boolean): StateDecl | undefined {
+  const signs = (s: StateDecl | undefined): boolean => s !== undefined && (s.kind === "work" || s.kind === "gate");
+  if (signs(leaf)) return leaf;
+  return parentReopened && signs(parent) ? parent : undefined;
+}
+
 /** see dsp-walk-machine.md#the-state-a-recorded-visit-names */
 export function visitState(visit: string): string {
   return visit.split("@")[0].split("/").pop() ?? "";
@@ -232,13 +251,32 @@ export class Claims {
   /** ANY state's form is always fetchable (owner ruling 2026-08-04) —
    *  for export to a colleague wherever the walk stands. The machine on
    *  display resolves the name; the walk's machine is the default. */
-  formMachine(machineId?: string): MachineDecl {
-    if (machineId === undefined || machineId === "" || machineId === this.host.currentMachine().id) return this.host.currentMachine();
+  /** THE MACHINE THAT DECLARES THIS STATE FORM.
+   *
+   *  The leaf's machine holds it in every ordinary case. Standing on a
+   *  sub-machine's own machinery it does not, and the frame above does — the
+   *  same ascent formBearer makes over states, made over machines so the
+   *  lookup can actually find the form it named.
+   *  see dsp-walk-machine.md#machinery-ascends-to-the-state-that-runs-the-sub */
+  machineHolding(name: string): MachineDecl {
+    const cur = this.host.currentMachine();
+    if (cur.states.some((s) => s.id === name)) return cur;
+    // ONE STATE ONLY, and never a search up the whole stack. A wide lookup
+    // resolved every outer name and served an iteration's container form to a
+    // walk standing at that iteration's start; ten cases named it.
+    const up = this.subParentFrame();
+    return up !== undefined && up.state.id === name ? up.machine : cur;
+  }
+
+  formMachine(machineId?: string, name?: string): MachineDecl {
+    if (machineId === undefined || machineId === "" || machineId === this.host.currentMachine().id) {
+      return name === undefined ? this.host.currentMachine() : this.machineHolding(name);
+    }
     return this.host.views.viewFor(machineId)?.decl ?? this.host.currentMachine();
   }
 
   /** see dsp-walk-machine.md#the-dispatch-between-the-two-form-kinds */
-  isStateForm(name: string, m: MachineDecl = this.host.currentMachine()): boolean {
+  isStateForm(name: string, m: MachineDecl = this.machineHolding(name)): boolean {
     if (existsSync(join(this.host.machineRoot(), formTemplatePath(name)))) return false;
     return m.states.some((s) => s.id === name && (s.kind === "work" || s.kind === "gate"));
   }
@@ -246,7 +284,7 @@ export class Claims {
   /** Where the instance lives: the record whose machine carries the state
    *  (its evidence folder ON ITS BRANCH), the bound record as fallback,
    *  or the session store when neither exists. */
-  stateFormHome(name: string, m: MachineDecl = this.host.currentMachine()): { instanceAbs: string; instanceRel: string } {
+  stateFormHome(name: string, m: MachineDecl = this.machineHolding(name)): { instanceAbs: string; instanceRel: string } {
     const it = itList(this.host.machineRoot()).find((x) => x.open && itShortId(x.id) === m.id);
     if (it !== undefined) {
       const rel = `spec/iterations/${it.id}/evidence/${name}.md`;
@@ -261,7 +299,7 @@ export class Claims {
     return { instanceAbs: join(this.host.machineRoot(), rel), instanceRel: rel };
   }
 
-  stateFormState(name: string, m: MachineDecl = this.host.currentMachine()): StateDecl {
+  stateFormState(name: string, m: MachineDecl = this.machineHolding(name)): StateDecl {
     const s = m.states.find((x) => x.id === name);
     if (s === undefined) {
       // NAME THE STATES THAT ACTUALLY CARRY A FORM. "The walk's own states
@@ -296,7 +334,7 @@ export class Claims {
     }
   }
 
-  stateFormHeader(name: string, raw: string | undefined, m: MachineDecl = this.host.currentMachine()): Record<string, string> {
+  stateFormHeader(name: string, raw: string | undefined, m: MachineDecl = this.machineHolding(name)): Record<string, string> {
     const fm = raw === undefined ? ({} as Record<string, unknown>) : parseStateNote(raw).frontmatter;
     // The priority wears its RUNG NAME (owner ruling 2026-08-04) — the
     // numerical scale stays internal.
@@ -327,7 +365,7 @@ export class Claims {
     }
   }
 
-  stateFormGet(name: string, m: MachineDecl = this.host.currentMachine()): Record<string, unknown> {
+  stateFormGet(name: string, m: MachineDecl = this.machineHolding(name)): Record<string, unknown> {
     const s = this.stateFormState(name, m);
     const h = this.stateFormHome(name, m);
     const raw = existsSync(h.instanceAbs) ? readFileSync(h.instanceAbs, "utf8") : undefined;
@@ -726,7 +764,13 @@ export class Claims {
    *  no lint can see what a skipped step would have shown. */
   stateFormActive(name: string, m: MachineDecl): boolean {
     const { machine, ids } = this.host.leaves();
-    return machine.id === m.id && ids.includes(name);
+    if (machine.id === m.id && ids.includes(name)) return true;
+    // A WALK INSIDE A SUB IS STANDING IN THE STATE THAT RUNS IT. Without this
+    // the ascent served a form whose own submit then refused, which is the
+    // same dead end one step later.
+    // see dsp-walk-machine.md#machinery-ascends-to-the-state-that-runs-the-sub
+    const up = this.subParentFrame();
+    return up !== undefined && up.state.id === name && up.machine.id === m.id && this.subParentReopened();
   }
 
   assertStateFormActive(name: string, m: MachineDecl, verb: string): void {
@@ -1230,12 +1274,44 @@ export class Claims {
     return { ...this.stateFormGet(name, m), ...(cleared === undefined ? {} : { signature_cleared: cleared }) };
   }
 
+  /** The state that RUNS the sub the walk stands in, with the machine that
+   *  declares it. Undefined outside a sub. */
+  subParentFrame(): { state: StateDecl; machine: MachineDecl } | undefined {
+    const top = this.host.top();
+    if (top === undefined) return undefined;
+    const below = this.host.subs[this.host.subs.length - 2];
+    const machine = below === undefined ? this.host.machine : below.decl;
+    const state = machine.states.find((x) => x.id === top.parentState);
+    return state === undefined ? undefined : { state, machine };
+  }
+
+  /** Whether the state running this sub had its claim sent back AFTER it was
+   *  signed. That is the one condition the ascent exists for, and gating on it
+   *  is what keeps a never-signed parent — an iteration's own container state,
+   *  every time a walk enters one — out of the answer. */
+  subParentReopened(): boolean {
+    const up = this.subParentFrame();
+    if (up === undefined) return false;
+    try {
+      const it = this.host.declIteration(up.machine);
+      if (it === undefined) return false;
+      const fm = noteOf(this.evidenceAbs(it, up.state.id))?.frontmatter;
+      return fm !== undefined && reopenedAfterSigning(fm);
+    } catch {
+      return false;
+    }
+  }
+
   /** see dsp-walk-machine.md#the-state-form-the-walk-itself-owes */
   standingStateFormOwed(): string | undefined {
     if (!this.host.subs.some((s) => s.decl.id === "iterations")) return undefined;
     const { machine, ids } = this.host.leaves();
-    const s = machine.states.find((x) => x.id === ids[0]);
     // see dsp-walk-machine.md#the-fourth-place-this-proxy-lived
+    const s = formBearer(
+      machine.states.find((x) => x.id === ids[0]),
+      this.subParentFrame()?.state,
+      this.subParentReopened(),
+    );
     if (s === undefined) return undefined;
     // MACHINERY OWES NOTHING, and that is the only test needed here. start,
     // end, terminal and join never sign; asking them for a form throws from
@@ -1247,7 +1323,6 @@ export class Claims {
     // the catch turns that into "owes nothing". So no test of FIELDS belongs
     // here: a state with a form and no fields is owed like any other, which is
     // what makes a bare submit reachable at all.
-    if (s.kind !== "work" && s.kind !== "gate") return undefined;
     try {
       // Owed until SUBMITTED and still COMPLETE — a live input growing back
       // (a new inbox item) re-opens a signed form instead of leaving it

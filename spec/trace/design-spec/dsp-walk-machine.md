@@ -1648,6 +1648,61 @@ The state form the walk itself owes: standing in an iteration's
  being a starved join. Anywhere else the route's own demand covered for
  the missing standing form, so the fault sat hidden behind it.
 
+## Machinery ascends to the state that runs the sub
+
+A state's own form is served only while the walk stands ON it with its
+ sub-machine unseeded. Once the sub is seeded the leaf is inside it, and a
+ lookup reading the LEAF alone finds machinery: a sub's start, end and join
+ never sign, so the answer is "nothing is owed".
+
+ THAT MADE A RE-SIGN CASCADE A DEAD END (i38, 2026-08-20). verification was
+ re-signed, which dropped gate-implementation. The blocker named that gate as
+ the chain root and handed over the exact reopen call. Re-signing it dropped
+ run-demos, whose sub-machine had already been walked — and there the walk
+ stopped for good.
+
+ THE LOOP THAT COULD NOT BE BROKEN. Leaving the sub runs the parent's claim
+ guard, the guard wants the claim standing, the claim wants the form, and the
+ form was unreachable from inside the sub. Nothing the agent or the person
+ could press moved it.
+
+ SO MACHINERY ASCENDS. When the leaf cannot sign, the lookup asks the state
+ that RUNS the sub instead. That state is the only one owing a signature from
+ there, and the ascent restores exactly what the walk had before the sub was
+ seeded.
+
+ IT IS NOT A LICENCE. A parent that does not sign is not invented into one,
+ and machinery outside a sub still owes nothing.
+
+ THE MACHINE ASCENDS WITH THE STATE, and forgetting that half left the fix
+ answering nothing. Every state-form lookup resolved its machine as "the one
+ the walk is currently in", which is the LEAF's — and the leaf's machine does
+ not declare the parent. So the ascent named a form the lookup then failed to
+ find, threw, and the catch turned it back into "nothing is owed".
+
+ SO A STATE FORM RESOLVES ITS OWN MACHINE FROM ITS NAME: the leaf's where the
+ leaf declares it, and the ONE frame above where it does not. That is identical
+ to the old behaviour everywhere the leaf holds the state, which is every
+ ordinary case.
+
+ BOTH HALVES ARE GATED ON THE CLAIM HAVING BEEN SENT BACK, and writing them
+ ungated broke ten cases. Every entry into an iteration stands at a machinery
+ leaf under a container state that has never signed, so an ungated ascent
+ served that container's form to a walk that had just arrived. A parent that
+ was never signed is not in a dead end: the walk got into its sub legitimately.
+ The condition the ascent exists for is a claim REOPENED AFTER SIGNING, and
+ that is the condition it now asks about.
+
+ THE WIDE LOOKUP WAS THE OTHER HALF OF THE SAME MISTAKE. Searching the whole
+ sub stack for a name resolved every outer state; only the immediate parent is
+ unreachable from the leaf, so only the immediate parent is looked up.
+
+ AND THE SUBMIT ASKS THE SAME QUESTION, so it takes the same answer. A form may
+ only be stamped where the walk stands, and that guard read the leaf alone too:
+ the ascent served the parent's form and its own submit refused it, which is
+ the dead end moved one step later rather than removed. A walk inside a sub IS
+ standing in the state that runs it.
+
 ## The fourth place this proxy lived
 
 THE FOURTH PLACE THIS PROXY LIVED (owner, 2026-08-17). Asking

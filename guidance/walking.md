@@ -202,6 +202,23 @@ refusing, and the agent's pull is what moves.
 - READ SERIALLY FOR NOW. A retreat, not a preference: a Copilot harness appears
   to cancel itself on parallel batches.
 
+## Attribution — who you are rides every call too
+
+SIX ARGUMENTS RIDE EVERY LANE TOOL, the way `update` does.
+
+- `as` — WHICH HAND YOU ARE: owner, walker, guide, reviewer, surface. Omit it
+  and the record says `walker`, which is right for the hand holding the
+  session. Say `guide` when you are the hand that was ASKED for one step.
+- `relayed_by` — WHO IS FILING WORK SOMEBODY ELSE DID. Send `as` for the
+  AUTHOR and this for yourself.
+- `answered_by` — what actually SERVED the call. Omit it and the record says
+  `unreported`, which is a declared absence rather than a missing field.
+- `named_driver`, `went_weaker`, `weaker_reason` — the safety rule. Going
+  weaker with no reason marks the record `unreasoned`: marked, never refused.
+
+NOTHING CHECKS ANY OF IT, and the record marks `as` and `answered_by` as
+claims. `guidance/method/lane.md` carries why.
+
 ## Narration — the update rides every call
 
 `update: {...}` on ANY lane call carries a decision-graph op. Ride one on every

@@ -31,7 +31,15 @@ weighs_against:
 
 ## Detail
 
-- The role vocabulary is fixed and recorded (owner, agent).
+- The role vocabulary is fixed and recorded. FIXED IS THE PROPERTY; the size of
+  the list is not. This line read "(owner, agent)" from i1 until 2026-08-20 and
+  the two-value list was wrong twice over — the shipped code carries three
+  (`engine/calllog.ts:22`: `human | agent | ui`), and no value in either list
+  can tell two agents apart.
+- A DELEGATED HAND IS A DIFFERENT PART FROM THE HAND THAT DELEGATED. Where a
+  walk asks a stronger hand for a step, both are agents and the record must
+  still separate them. `req-every-call-records-the-part-its-caller-played`
+  carries that demand; this row is the one that must stop forbidding it.
 - The channel is recorded per act (lane, board, phone, chat).
 - Usernames, hostnames and other personal identifiers are never recorded.
 

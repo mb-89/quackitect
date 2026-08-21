@@ -241,12 +241,39 @@ test("last_retro means the previous RETRO, not the last desk drain", async () =>
   const root = fresh();
   const log = new CallLog(join(root, ".se"));
   const drain = (disposition: string) =>
-    log.append({ tool: "se_note_drain", args: { disposition }, ok: true, outcome: "result", duration_ms: 1 });
+    log.append({
+      tool: "se_note_drain",
+      args: { disposition },
+      ok: true,
+      outcome: "result",
+      duration_ms: 1,
+      part: "walker",
+      state: "a-state",
+      answered_by: "a-model",
+    });
 
   drain("backlog"); // a RETRO: the desk is refused this disposition
-  log.append({ tool: "se_pull", args: {}, ok: true, outcome: "result", duration_ms: 1 });
+  log.append({
+    tool: "se_pull",
+    args: {},
+    ok: true,
+    outcome: "result",
+    duration_ms: 1,
+    part: "walker",
+    state: "a-state",
+    answered_by: "a-model",
+  });
   drain("obsolete"); // the front desk may do this one
-  log.append({ tool: "se_run", args: {}, ok: true, outcome: "result", duration_ms: 1 });
+  log.append({
+    tool: "se_run",
+    args: {},
+    ok: true,
+    outcome: "result",
+    duration_ms: 1,
+    part: "walker",
+    state: "a-state",
+    answered_by: "a-model",
+  });
 
   // All four, because the window opens at the retro. Before the fix the desk
   // drain moved it and only two records survived.
@@ -263,11 +290,47 @@ test("with no retro drain the window opens at the live log's start, not at a don
   const root = fresh();
   const log = new CallLog(join(root, ".se"));
 
-  log.append({ tool: "se_pull", args: {}, ok: true, outcome: "result", duration_ms: 1 });
-  log.append({ tool: "se_file_read", args: {}, ok: true, outcome: "result", duration_ms: 1 });
+  log.append({
+    tool: "se_pull",
+    args: {},
+    ok: true,
+    outcome: "result",
+    duration_ms: 1,
+    part: "walker",
+    state: "a-state",
+    answered_by: "a-model",
+  });
+  log.append({
+    tool: "se_file_read",
+    args: {},
+    ok: true,
+    outcome: "result",
+    duration_ms: 1,
+    part: "walker",
+    state: "a-state",
+    answered_by: "a-model",
+  });
   // A `done` drain is a check anyone can run. It must not mark a retro.
-  log.append({ tool: "se_note_drain", args: { disposition: "done" }, ok: true, outcome: "result", duration_ms: 1 });
-  log.append({ tool: "se_run", args: {}, ok: true, outcome: "result", duration_ms: 1 });
+  log.append({
+    tool: "se_note_drain",
+    args: { disposition: "done" },
+    ok: true,
+    outcome: "result",
+    duration_ms: 1,
+    part: "walker",
+    state: "a-state",
+    answered_by: "a-model",
+  });
+  log.append({
+    tool: "se_run",
+    args: {},
+    ok: true,
+    outcome: "result",
+    duration_ms: 1,
+    part: "walker",
+    state: "a-state",
+    answered_by: "a-model",
+  });
 
   // All four. The old fallback answered 1, counting only what followed the done.
   assert.equal(log.query({ filter: { since: "last_retro" } }).total, 4);
@@ -281,9 +344,36 @@ test("a refused carried drain does not mark a retro", async () => {
   const root = fresh();
   const log = new CallLog(join(root, ".se"));
 
-  log.append({ tool: "se_pull", args: {}, ok: true, outcome: "result", duration_ms: 1 });
-  log.append({ tool: "se_note_drain", args: { disposition: "carried" }, ok: false, outcome: "rejected", duration_ms: 1 });
-  log.append({ tool: "se_file_read", args: {}, ok: true, outcome: "result", duration_ms: 1 });
+  log.append({
+    tool: "se_pull",
+    args: {},
+    ok: true,
+    outcome: "result",
+    duration_ms: 1,
+    part: "walker",
+    state: "a-state",
+    answered_by: "a-model",
+  });
+  log.append({
+    tool: "se_note_drain",
+    args: { disposition: "carried" },
+    ok: false,
+    outcome: "rejected",
+    duration_ms: 1,
+    part: "walker",
+    state: "a-state",
+    answered_by: "a-model",
+  });
+  log.append({
+    tool: "se_file_read",
+    args: {},
+    ok: true,
+    outcome: "result",
+    duration_ms: 1,
+    part: "walker",
+    state: "a-state",
+    answered_by: "a-model",
+  });
 
   assert.equal(log.query({ filter: { since: "last_retro" } }).total, 3);
 });
