@@ -1,0 +1,12 @@
+{"ts":"2026-08-21T11:08:07.243Z","op":"update","visit":"expeditions/e1@0","node":"d14","brief":"searching vscode extension for command visibility wiring"}
+{"ts":"2026-08-21T11:10:25.450Z","op":"update","visit":"expeditions/e1@0","node":"d15","brief":"gated the tools strip behind the readiness flag"}
+{"ts":"2026-08-21T11:10:29.342Z","op":"update","visit":"expeditions/e1@0","node":"d16","brief":"building extension.js from src/extension.ts"}
+{"ts":"2026-08-21T11:10:33.975Z","op":"update","visit":"expeditions/e1@0","node":"d17","brief":"linting after the extension.ts change"}
+{"ts":"2026-08-21T11:10:38.224Z","op":"update","visit":"expeditions/e1@0","node":"d18","brief":"running biome check on the edited file"}
+{"ts":"2026-08-21T11:10:43.532Z","op":"done","visit":"front_desk@0","node":"d5","brief":"wired command visibility, State machine/Trace graph pattern found"}
+{"ts":"2026-08-21T11:10:48.870Z","op":"done","visit":"front_desk@0","node":"d6","brief":"cards fetched-then-shown was the existing pattern; extended to static tools"}
+{"ts":"2026-08-21T11:11:32.252Z","op":"done","visit":"front_desk@0","node":"d8","brief":"verified via se_run build+biome, both clean"}
+{"ts":"2026-08-21T11:11:35.676Z","op":"done","visit":"front_desk@0","node":"d7","brief":"applied readiness gate to Strip.tools() and activate()"}
+{"ts":"2026-08-21T11:11:39.184Z","op":"done","visit":"start@0","node":"d2","brief":"root cause found: static strip items lacked the cards' readiness gate"}
+{"ts":"2026-08-21T11:11:42.600Z","op":"done","visit":"start@0","node":"d3","brief":"fixed and verified; filling the leave form now"}
+{"ts":"2026-08-21T11:11:42.885Z","op":"done","visit":"start@0","node":"d1","brief":"boot completed earlier this session"}

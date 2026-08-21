@@ -50,6 +50,10 @@ let disposed = false;
 // reload makes it look again — so the launch has to know which case it is in.
 let serverJustStarted = false;
 let cards = [];
+// Nothing in the tools strip is shown before this flips — a button visible
+// before the engine's first readiness probe resolves is a button that can
+// be clicked into an error nobody asked for.
+let toolsReady = false;
 let levels = null;
 let packet = null;
 let strip = null;
@@ -191,8 +195,6 @@ function placeConfigs(root) {
   // A terminal claude run now spawns its own lane over stdio. The two below
   // keep the HTTP form, because Copilot and agent mode genuinely share the
   // headless lane this extension starts.
-  place("mcp-http.json", path.join(opened, ".copilot"), "mcp-config.json"); // a copilot run attaches
-  place("vscode-mcp.json", path.join(opened, ".vscode"), "mcp.json"); // agent mode attaches
   // AGENT MODE READS ITS ORDERS FROM .github. Without this the VS Code agent
   // gets no first action, no tool activation and no serial-read rule — which
   // is exactly how a fresh machine looks like it is broken.
@@ -200,6 +202,23 @@ function placeConfigs(root) {
   place("claude-settings.json", path.join(opened, ".claude"), "settings.json"); // the cage
   placeVoiceProjections(root, opened);
   placePromptLayer(root, opened);
+}
+
+// THE TWO FILES BELOW ARE WATCHED BY AN MCP CLIENT, AND NOTHING ELSE HERE IS.
+// Writing either one is what makes a client dial `http://localhost:PORT/mcp`,
+// so writing it before the engine is listening is the whole race: the client
+// sees a fresh file (or a touched mtime) and dials while the port is still
+// closed, logging a fetch failure that clears itself once the port opens.
+// Callers place these ONLY once probeServer (or the post-spawn wait loop) has
+// already confirmed the engine answers, never up front with the rest.
+function placeConnectionConfigs(root, opened) {
+  const cage = path.join(root, "deliverable", "cage");
+  const place = (src, destDir, destName) => {
+    mkdirSync(destDir, { recursive: true });
+    copyFileSync(path.join(cage, src), path.join(destDir, destName));
+  };
+  place("mcp-http.json", path.join(opened, ".copilot"), "mcp-config.json"); // a copilot run attaches
+  place("vscode-mcp.json", path.join(opened, ".vscode"), "mcp.json"); // agent mode attaches
 }
 
 // THE PROMPT LAYER is assembled by the ENGINE, not here. One assembler, so a
@@ -448,6 +467,7 @@ async function ensureServer() {
         return false;
       }
     } else {
+      placeConnectionConfigs(root, root);
       return true;
     }
   }
@@ -472,7 +492,10 @@ async function ensureServer() {
   startServer(root, runner);
   serverJustStarted = true;
   for (let i = 0; i < 75; i++) {
-    if ((await probeServer()).state === "up") return true;
+    if ((await probeServer()).state === "up") {
+      placeConnectionConfigs(root, root);
+      return true;
+    }
     await new Promise((r) => setTimeout(r, 200));
   }
   void vscode.window.showErrorMessage("$PRODUCT$: the engine did not come up — details in Output → $PRODUCT$ Engine.");
@@ -1075,6 +1098,9 @@ class Strip {
     this.view = null;
   }
   tools() {
+    // Hidden until toolsReady flips, the same way the cards below are absent
+    // until fetched. Nothing here is worth showing before we know it works.
+    if (!toolsReady) return [];
     const list = [
       { cmd: "$PRODUCT_ID$.help", icon: ICON.help, label: "What this is", key: "ctrl+alt+/" },
       { cmd: "$PRODUCT_ID$.startAgent", icon: ICON.play, label: "Start the agent", key: "ctrl+alt+enter" },
@@ -2092,6 +2118,10 @@ function activate(context) {
   // The sidebar must be usable before anything is clicked, so the engine
   // comes up with the window rather than on the first card.
   void ensureServer().then(async (ok) => {
+    // Flip the strip on regardless of outcome: a failed probe still lets the
+    // person retry Start the agent, and a stale-hidden strip helps nobody.
+    toolsReady = true;
+    if (strip !== null) strip.render();
     if (!ok) return;
     await refreshCards();
     startPolling();

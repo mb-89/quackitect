@@ -97,6 +97,7 @@ var output = null;
 var disposed = false;
 var serverJustStarted = false;
 var cards = [];
+var toolsReady = false;
 var levels = null;
 var packet = null;
 var strip = null;
@@ -191,12 +192,19 @@ function placeConfigs(root) {
     mkdirSync(destDir, { recursive: true });
     copyFileSync(path.join(cage, src), path.join(destDir, destName));
   };
-  place("mcp-http.json", path.join(opened, ".copilot"), "mcp-config.json");
-  place("vscode-mcp.json", path.join(opened, ".vscode"), "mcp.json");
   place("vscode-instructions.md", path.join(opened, ".github"), "copilot-instructions.md");
   place("claude-settings.json", path.join(opened, ".claude"), "settings.json");
   placeVoiceProjections(root, opened);
   placePromptLayer(root, opened);
+}
+function placeConnectionConfigs(root, opened) {
+  const cage = path.join(root, "deliverable", "cage");
+  const place = (src, destDir, destName) => {
+    mkdirSync(destDir, { recursive: true });
+    copyFileSync(path.join(cage, src), path.join(destDir, destName));
+  };
+  place("mcp-http.json", path.join(opened, ".copilot"), "mcp-config.json");
+  place("vscode-mcp.json", path.join(opened, ".vscode"), "mcp.json");
 }
 function placePromptLayer(root, opened) {
   const script = path.join(root, "deliverable", "engine", "bin", "place-prompt-layer.ts");
@@ -367,6 +375,7 @@ async function ensureServer() {
         return false;
       }
     } else {
+      placeConnectionConfigs(root, root);
       return true;
     }
   }
@@ -387,7 +396,10 @@ async function ensureServer() {
   startServer(root, runner);
   serverJustStarted = true;
   for (let i = 0; i < 75; i++) {
-    if ((await probeServer()).state === "up") return true;
+    if ((await probeServer()).state === "up") {
+      placeConnectionConfigs(root, root);
+      return true;
+    }
     await new Promise((r) => setTimeout(r, 200));
   }
   void vscode.window.showErrorMessage("$PRODUCT$: the engine did not come up \u2014 details in Output \u2192 $PRODUCT$ Engine.");
@@ -862,6 +874,7 @@ var Strip = class {
     this.view = null;
   }
   tools() {
+    if (!toolsReady) return [];
     const list = [
       { cmd: "$PRODUCT_ID$.help", icon: ICON.help, label: "What this is", key: "ctrl+alt+/" },
       { cmd: "$PRODUCT_ID$.startAgent", icon: ICON.play, label: "Start the agent", key: "ctrl+alt+enter" }
@@ -1683,6 +1696,8 @@ function activate(context) {
     );
   }
   void ensureServer().then(async (ok) => {
+    toolsReady = true;
+    if (strip !== null) strip.render();
     if (!ok) return;
     await refreshCards();
     startPolling();
