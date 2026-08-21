@@ -10,6 +10,7 @@ import { dirname, join } from "node:path";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { stripBom } from "./jsonio.ts";
 import { mintToken } from "./pool.ts";
+import { clearRetroOwed } from "./records.ts";
 
 /** MoSCoW, minus the fourth bucket. "Won't" already exists here as a drain
  *  disposition, so a note never needs to carry it. */
@@ -113,7 +114,7 @@ export function drainNote(
   statement?: string,
   projectRoot?: string,
   mintedIn?: string,
-): { drained: string; disposition: string; inbox: number; minted?: string } {
+): { drained: string; disposition: string; inbox: number; minted?: string; retro_cleared?: string[] } {
   if (!DISPOSITIONS.includes(disposition)) {
     throw new Rejection({
       clause: CLAUSES.REQUIRED_ARGS,
@@ -213,11 +214,17 @@ export function drainNote(
   }
   hit.drained = { at: new Date().toISOString(), disposition, ...(where !== undefined && where !== "" ? { where } : {}) };
   writeFileSync(notesPath(seDirPath), `${all.map((n) => JSON.stringify(n)).join("\n")}\n`, "utf8");
+  // A JUDGMENT DRAIN IS THE RETRO'S SIGNATURE — nothing else may make one — so
+  // the retro a shipped record was owed comes off here rather than at a step
+  // somebody has to remember. The stamp lives in the record, in git, because a
+  // note lives on a disk the next box does not have.
+  const retros = JUDGMENT.has(disposition) && projectRoot !== undefined ? clearRetroOwed(projectRoot) : [];
   return {
     drained: ref,
     disposition,
     inbox: all.filter((n) => n.drained === undefined).length,
     ...(minted !== undefined ? { minted } : {}),
+    ...(retros.length > 0 ? { retro_cleared: retros } : {}),
   };
 }
 

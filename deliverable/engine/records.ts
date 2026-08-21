@@ -340,6 +340,43 @@ function carriedStamp(standing: { item: string; ref: string; where: string }[]):
 
 // see dsp-record-lifecycle.md#mergeandretire-and-mergetotrunk-are-gone
 
+/** WHICH SHIPPED RECORDS STILL OWE A RETRO, read from the REPOSITORY.
+ *
+ *  SHIPPING USED TO SAY THIS IN A NOTE, and a note lives in `.se/notes.jsonl`,
+ *  which is machine-local and never committed. On a box whose disk is reclaimed
+ *  the machine's own handover went with it, and the next kickoff drained an
+ *  empty inbox — truthfully about the file, and wrong about the world.
+ *
+ *  A DRAIN THAT FINDS NOTHING AND A DRAIN WITH NOTHING TO FIND ARE THE SAME
+ *  ANSWER, which is why the note could not carry this. The stamp is on the
+ *  record, the record is committed, and every clone reads the same thing. */
+export function retroOwed(root: string): string[] {
+  const dir = join(root, "spec", "iterations");
+  if (!existsSync(dir)) return [];
+  const owed: string[] = [];
+  for (const e of readdirSync(dir, { withFileTypes: true })) {
+    if (!e.isDirectory()) continue;
+    const p = join(dir, e.name, "record.md");
+    if (!existsSync(p)) continue;
+    if (/^retro_owed: /m.test(readNode(p))) owed.push(e.name);
+  }
+  return owed.sort();
+}
+
+/** THE RETRO'S OWN CLEAR. A judgment drain is the retro's signature — nothing
+ *  else may make one — so the stamps come off there rather than by a step
+ *  somebody has to remember. Returns what it cleared, so the answer can say. */
+export function clearRetroOwed(root: string): string[] {
+  const cleared: string[] = [];
+  for (const id of retroOwed(root)) {
+    const p = join(root, "spec", "iterations", id, "record.md");
+    const raw = readNode(p);
+    writeNode(p, raw.replace(/^retro_owed: .*\n/m, ""));
+    cleared.push(id);
+  }
+  return cleared;
+}
+
 /** see dsp-record-lifecycle.md#close-the-shipped-iteration */
 export function itCloseShipped(
   root: string,
@@ -357,7 +394,13 @@ export function itCloseShipped(
   // door, and the evidence said three times that the close would refuse.
   const standing = owedStanding(root, `spec/iterations/${rec.id}`);
   if (raw !== "" && !/^closed: /m.test(raw)) {
-    writeNode(recAbs, raw.replace(/^status: .*$/m, `status: shipped\nclosed: ${new Date().toISOString()}${carriedStamp(standing)}`));
+    writeNode(
+      recAbs,
+      raw.replace(
+        /^status: .*$/m,
+        `status: shipped\nclosed: ${new Date().toISOString()}\nretro_owed: ${new Date().toISOString()}${carriedStamp(standing)}`,
+      ),
+    );
   }
   if (git(root, ["status", "--porcelain"], "status").trim() !== "") {
     git(root, ["add", "-A"], "add");

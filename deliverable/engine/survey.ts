@@ -3,10 +3,15 @@ import { byPriority, DEFAULT_PRIORITY, headline, type Priority, pendingNotes, pr
 import { itList, readItRecord } from "./iterations.ts";
 import { seDir } from "./paths.ts";
 import { standingTokens } from "./pool.ts";
-import { expList, readRecord } from "./records.ts";
+import { expList, readRecord, retroOwed } from "./records.ts";
 
 export interface Survey {
   counts: { expeditions: number; iterations: number; notes: number; backlog: number };
+  /** SHIPPED RECORDS THAT STILL OWE A RETRO, read from the repository rather
+   *  than from the local note store. A clone that never held the notes can see
+   *  this, which is the whole point: an empty inbox and an inbox that was never
+   *  here used to give the same answer. */
+  retro_owed?: string[];
   expeditions: { id: string; goal: string }[];
   iterations: { id: string; goal: string }[];
   notes: { ref: string; at: string; title: string; priority: Priority; text?: string }[];
@@ -73,8 +78,12 @@ export function survey(projectRoot: string, opts: SurveyOptions = {}): Survey {
     ...(withText ? { text: o.statement } : {}),
   }));
   const backlog = windowed ? allBacklog.slice(offset, offset + (opts.limit ?? allBacklog.length)) : allBacklog;
+  // READ FROM THE REPOSITORY, never from the local note store. Shipping used to
+  // say this in a note, and a note dies with the box that held it.
+  const owedRetros = retroOwed(projectRoot);
   return {
     counts: { expeditions: exps.length, iterations: its.length, notes: allNotes.length, backlog: allBacklog.length },
+    ...(owedRetros.length > 0 ? { retro_owed: owedRetros } : {}),
     ...(windowed
       ? {
           // PAST THE END, `remaining` MUST NOT READ AS "you have seen it all".
