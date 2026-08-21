@@ -512,3 +512,6 @@
 {"ts":"2026-08-21T14:19:11.755Z","op":"update","visit":"iterations/i51/gate-implementation@0","node":"d91","brief":"reaching a state where git is legal, to push"}
 {"ts":"2026-08-21T14:19:37.478Z","op":"update","visit":"iterations/i51/fix-findings@1","node":"d92","brief":"checking whether git is legal where the walk landed"}
 {"ts":"2026-08-21T14:19:47.755Z","op":"update","visit":"iterations/i51/fix-findings@1","node":"d93","brief":"committing the record's evidence"}
+{"ts":"2026-08-21T14:20:04.508Z","op":"done","visit":"iterations/i51/fix-findings@0","node":"d84","brief":"record committed at 3f4cb458"}
+{"ts":"2026-08-21T14:20:39.624Z","op":"update","visit":"iterations/i51/fix-findings@1","node":"d94","brief":"checking what is still uncommitted"}
+{"ts":"2026-08-21T14:20:47.622Z","op":"update","visit":"iterations/i51/fix-findings@1","node":"d95","brief":"committing the narration log"}
