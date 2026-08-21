@@ -336,6 +336,58 @@ out of one day of measuring what the lane actually cost its callers.
   engine could carry is a defect with a deadline. The reading loop, the
   update ruling and the auto-corrections are all this law being applied.
 
+## A file another program owns
+
+SOME FILES BELONG TO SOMETHING ELSE. An editor's registry, a package manager's
+lock file, a runtime's cache. We sometimes have to add a line to one. We never
+get to decide what the rest of it means.
+
+THREE RULES, AND EACH ONE COST A REAL BREAK.
+
+- DROP THE ELEMENT YOU CANNOT IDENTIFY. Never carry it through a rewrite.
+  - Carrying it makes the damage permanent, because every later run writes it
+    back.
+  - This is about elements, not about keys. Keys you do not recognise on an
+    element you DO recognise are carried verbatim.
+- WRITE THE SHAPE, NEVER THE SERIALISER'S GUESS AT IT. A list of one is still
+  a list.
+- VERIFY WHAT WAS ALREADY THERE, not what you added. Read the file back, check
+  that every entry you found is still findable, and roll the write back if one
+  is not.
+
+CHECKING ONLY YOUR OWN ENTRY IS THE TRAP. It passes while everything else is
+gone, which is the exact state it was meant to catch.
+
+### The break that set this
+
+Measured 2026-08-21. VS Code listed no extensions at all and printed `Invalid
+extensions content` at its own registry file. Seven extensions sat on disk,
+correctly built, and none loaded.
+
+The installer had rewritten `extensions.json` through a PowerShell JSON round
+trip. Three defects, in one block of forty lines.
+
+- It kept an element carrying no identifier, so no later run could undo a bad
+  one.
+- It serialised a one-entry list as an object, because piping an array of one
+  into `ConvertTo-Json` unrolls it.
+- It verified only that our own id was present, which it was.
+
+THE WRITE MOVED INTO THE ENGINE, where JSON is JSON. The module is
+`vscoderegistry.ts` and the guard is `vscoderegistry.test.ts`.
+
+### Structured data does not go through a text-shaped language
+
+POWERSHELL'S `ConvertFrom-Json` AND `ConvertTo-Json` ARE NOT A ROUND TRIP.
+They reshape what passes through them.
+
+- A collection inside a collection comes back wrapped under a `value` key.
+- An array of one comes back as an object.
+
+NODE IS ALREADY A HARD DEPENDENCY of every install path here. Where a script
+has to touch structured data, hand the job to node. Keep the shell for what
+only a shell does.
+
 ## The toolchain is mechanical
 
 What a machine can check, a machine checks. What a machine can fix, the

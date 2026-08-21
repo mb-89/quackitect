@@ -147,7 +147,12 @@ test("no new file read bypasses the door — the count may fall, never rise", ()
   // once every active cell carries a rating. A README is not a note and has no
   // door; the read wants a substring of raw text, not a parse, and it is
   // wrapped in a try so an absent file answers false rather than throwing.
-  const CEILING = 117;
+  // 119 WITH THE VS CODE REGISTRY WRITER: vscoderegistry.ts reads
+  // extensions.json twice — once to see what is already listed, once to judge
+  // what it has just written. VS Code owns that file, it lives outside the
+  // project, and it is not a note, so no door could hold it. The second read
+  // is the rollback check and must see the disk rather than a cache.
+  const CEILING = 119;
   let found = 0;
   const offenders: string[] = [];
   const walk = (dir: URL, rel: string): void => {
@@ -205,7 +210,12 @@ test("no new file write bypasses the door — the count may fall, never rise", (
   // machine-local, gitignored, and deleted when the run ends. The one thing a
   // benchmark COMMITS is its report, and that is a note written through the
   // item template rather than by this call.
-  const CEILING = 42;
+  // 46 WITH THE VS CODE REGISTRY WRITER: vscoderegistry.ts writes
+  // extensions.json, its backup, a rescue copy when the file it found was
+  // damaged, and the restore when the new file would have lost an id. VS Code
+  // owns that file and it sits outside the project, so the door can never
+  // hold it.
+  const CEILING = 46;
   let found = 0;
   const offenders: string[] = [];
   const walk = (dir: URL, rel: string): void => {
