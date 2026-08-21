@@ -1,6 +1,8 @@
 ---
 id: i45-the-suite-carries-its-own-weight-helpers
-status: open
+status: shipped
+closed: 2026-08-21T13:53:10.346Z
+retro_owed: 2026-08-21T13:53:10.346Z
 started: 2026-08-21T11:46:16.850Z
 opened: 2026-08-20T16:49:57.394Z
 goal: "The suite carries its own weight: helpers live in one home, refusal-only cases share a boot, the dead guard pin retargets to frontmatter, and testlint refuses the next local copy."
