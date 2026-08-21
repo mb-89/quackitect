@@ -1,5 +1,6 @@
 ---
 form: gate-kickoff
+bless: blessed by agent
 by: agent
 signed_off: 2026-08-20T21:10:03.815Z
 authors: agent

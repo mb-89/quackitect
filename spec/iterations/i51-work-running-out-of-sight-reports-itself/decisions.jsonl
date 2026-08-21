@@ -50,3 +50,7 @@
 {"ts":"2026-08-20T21:11:50.117Z","op":"done","visit":"iterations/i51/gate-kickoff@1","node":"d50","brief":"rule 8 read; the correction keeps both halves true"}
 {"ts":"2026-08-20T21:11:57.173Z","op":"update","visit":"iterations/i51/gate-kickoff@1","node":"d53","brief":"guidance edited; re-projecting so the prompt layer does not go stale"}
 {"ts":"2026-08-20T21:12:09.260Z","op":"done","visit":"iterations/i51/gate-kickoff@1","node":"d51","brief":"contract rule 8 corrected: the field report is owed, the agent handover is not"}
+{"ts":"2026-08-21T08:39:42.357Z","op":"done","visit":"front_desk@0","node":"d3","brief":"arrived at iterations/i51/start"}
+{"ts":"2026-08-21T08:40:17.245Z","op":"done","visit":"front_desk@0","node":"d2","brief":"recital and greeting printed at the desk"}
+{"ts":"2026-08-21T08:40:27.558Z","op":"plan","visit":"iterations/i51/gate-kickoff@0","parent":null,"nodes":[{"id":"d5","brief":"read the i51 record"},{"id":"d6","brief":"read gate-review method"},{"id":"d7","brief":"fill and submit the kickoff gate"}]}
+{"ts":"2026-08-21T08:40:57.707Z","op":"done","visit":"iterations/i51/gate-kickoff@0","node":"d5","brief":"record and signed kickoff form read; only the bless is owed"}
