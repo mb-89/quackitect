@@ -13,7 +13,7 @@ source_refs:
   - raid-dec-serve-the-overlay-and-report-the-drift
   - raid-dec-a-copy-is-a-clone-that-keeps-its-history
   - cand-the-program-route
-  - vp-vendoring
+  - vp-the-engine
 ---
 
 ## What it does

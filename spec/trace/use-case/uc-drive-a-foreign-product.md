@@ -3,7 +3,7 @@ minted_in: i16-the-vehicle-overlay-a-vehicle-vendors-th
 id: uc-drive-a-foreign-product
 type: "[[use-case]]"
 statement: Drive a product that is not the system's own, with the method coming from the system's tree and the work living in the other product's.
-actor: stk-vehicle-owner
+actor: stk-engineer-driving-agents
 trigger: a builder has the system and a product of their own that they want the method applied to
 precondition: the system is installed and running; the product to be driven exists as its own tree, with its own history
 guarantee: the work's records, evidence and signatures land in the driven product's tree; the method served is the builder's own; and neither tree's content resolves into the other

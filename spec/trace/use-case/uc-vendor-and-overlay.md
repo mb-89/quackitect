@@ -3,7 +3,7 @@ minted_in: i1
 id: uc-vendor-and-overlay
 type: "[[use-case]]"
 statement: Take the whole system as a copy that is entirely yours, lay your own method over what it carries, and keep taking what the source changes later.
-actor: stk-vehicle-owner
+actor: stk-engineer-driving-agents
 trigger: a builder wants the machine but not all of the method that ships with it
 precondition: the source is reachable once, and the target machine holds nothing of it
 guarantee: they hold a complete independent copy they may change entirely, their own cards are served where their identities collide with the source's, an update reaches them without taking away changes they did not decide to give up, and nothing the copy does reaches the source
@@ -52,6 +52,6 @@ raid-iss-a-must-value-prop-is-served-only-by-coulds and it is the owner's. -->
 - 3c. The artifact they replace is one of the less obvious classes - an item template, a form template, the refusals document. Served the same way. req-overlay-resolution's second clause is absolute: the system serves ZERO method artifacts that an overlay file cannot replace, and step 3 is written to match it rather than to the three classes an earlier draft named.
 - 4a. Two of their own cards claim the same identity. The chain has an order, and the order decides - it is never ambiguous.
 - 6a. They never take an update. The copy keeps working, unchanged, indefinitely. This is the fork case and it is legal; what it costs is everything the source learned since.
-- 7a. They decide against their own change. That is a decision rather than a loss, which is the distinction vp-vendoring's third success criterion measures.
+- 7a. They decide against their own change. That is a decision rather than a loss, which is the distinction vp-the-engine's third success criterion measures.
 - 8a. An identity their content claims no longer exists upstream at all. Reported, never silently defaulted to the source's own card.
 - ANY STEP. An operation started in the copy would resolve outside the copy's own tree, toward the source. Refused, by construction rather than by policy: no path exists for it to follow.

@@ -13,7 +13,7 @@ refines:
 source_refs:
   - uc-quality-flexibility step 4
   - uc-quality-flexibility ext 4a
-  - stk-vehicle-owner
+  - stk-engineer-driving-agents
   - i34 2026-08-16, deleted in error and restored the same day
 priority: must
 ---

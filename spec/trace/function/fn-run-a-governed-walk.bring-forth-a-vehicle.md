@@ -21,7 +21,7 @@ controls:
 source_refs:
   - uc-vendor-and-overlay
   - raid-dec-an-import-is-read-only-and-a-vendored-copy-is-yours
-  - vp-vendoring
+  - vp-the-engine
 ---
 
 ## Renamed 2026-08-18 on the owner's ruling

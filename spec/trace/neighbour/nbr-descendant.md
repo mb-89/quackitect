@@ -36,7 +36,7 @@ AND THAT IS A REQUIREMENT RATHER THAN A HAPPY FACT, which is a correction this
 iteration's own pressure-test surfaced. "We could not find you if we tried" is
 only true while nothing ever tries. The clause is owed at write-requirements.
 
-THE AUDIENCE ASKED FOR IT FIRST. [[stk-vehicle-owner]]'s concerns already state
+THE AUDIENCE ASKED FOR IT FIRST. [[stk-engineer-driving-agents]]'s concerns already state
 it in both directions: what the engine writes must never land inside their
 tree, and what they write must never land inside the engine's.
 
@@ -45,7 +45,7 @@ tree, and what they write must never land inside the engine's.
 NOT A PEER MACHINE. [[nbr-peer-machine]] is another machine running this same
 product with no lineage. A descendant carries lineage and a different name.
 
-NOT A USER. [[stk-vehicle-owner]] is the person who holds a descendant. The
+NOT A PERSON. [[stk-engineer-driving-agents]] is the person who holds a descendant. The
 person is a stakeholder and the copy is a neighbour, and conflating them is how
 a boundary picks up intentions it cannot have.
 

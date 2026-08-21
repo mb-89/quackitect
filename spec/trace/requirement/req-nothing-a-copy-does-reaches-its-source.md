@@ -14,7 +14,7 @@ source_refs:
   - uc-vendor-and-overlay ext ANY STEP
   - raid-dec-an-import-is-read-only-and-a-vendored-copy-is-yours
   - sty-nothing-i-do-reaches-what-it-came-from
-  - stk-vehicle-owner
+  - stk-engineer-driving-agents
 priority: must
 weighs_against:
   - req-desk-states-the-folder-rule > — a copy reaching back into its source damages a tree nobody was working in; an unstated folder rule costs one person one confusion

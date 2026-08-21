@@ -60,7 +60,7 @@ problem and should not be a global halt.
 
 PIN THE OVERLAY TO AN ENGINE VERSION, so drift cannot happen. REJECTED because
 it is forking again by another name — the builder stops receiving upstream
-improvements, which is the exact cost vp-vendoring exists to remove.
+improvements, which is the exact cost vp-the-engine exists to remove.
 
 ## Consequences
 

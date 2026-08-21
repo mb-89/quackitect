@@ -15,7 +15,7 @@ how_likely: plausible
 impact: Everything this iteration builds after the copy exists is worth nothing if the channel stops being used. A copy whose owner has quietly stopped updating is a fork, and it looks identical to a working one from here - which is the whole reason this is an assumption rather than a risk we could watch.
 source_refs:
   - raid-risk-ownership-and-receiving-pull-against-each-other
-  - stk-vehicle-owner
+  - stk-engineer-driving-agents
   - uc-vendor-and-overlay
 ---
 
@@ -50,7 +50,7 @@ THERE IS NO CHEAP MECHANICAL ANSWER, and pretending otherwise is how an
 assumption becomes decoration. Three probes are possible and they differ in
 cost and honesty.
 
-- ASK ONE. The audience is real - stk-vehicle-owner's node records the owner
+- ASK ONE. The audience is real - the engineer's own node records the owner
   correcting an agent who assumed otherwise. One conversation with somebody who
   holds a vendored dependency today, about what they do when an update
   conflicts, answers more than any measurement here.

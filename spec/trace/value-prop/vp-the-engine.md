@@ -31,6 +31,16 @@ priority: must
   IT IS NOT AN ORDER EITHER. The machine recommends and the agent judges. A recommendation the agent may not refuse would put the sizing decision inside the very state whose difficulty is in question.
   THE SPENDING HALF of the same proposition sits with [[vp-rigor-without-toil]].
 
+- A COPY OF THE WHOLE SYSTEM IS ENTIRELY ITS OWNER'S, and still takes improvements from where it came from.
+  Metric: the copy's dependencies on the source working tree. Target: none.
+  Metric: writes, links, mounts or install steps from a copy that resolve outside its own tree. Target: zero.
+  Metric: the copy's own changes lost to an update it did not decide to lose. Target: none.
+  Metric: identities resolving two ways on one load. Target: zero.
+  ABSORBED FROM A PROPOSITION OF ITS OWN, at the owner's ruling. It used to name a separate audience, and that audience was this one under another name: an engineer overlaying their own method is the engineer this proposition already serves.
+  UNLIKE A FORK, which buys the same freedom and loses every improvement from the day it is taken. The difference is the overlay chain. The owner's method sits on top, and the engine underneath keeps moving.
+  WHY IT IS LOAD-BEARING RATHER THAN A CONVENIENCE. This product goes open source while company-specific method stays inside the company. Without a copy that is genuinely its owner's, those two facts cannot both hold.
+  THE RULE IS THE DIRECTION OF WRITES, never a folder. A vendored copy is yours to change entirely; what may never be reached is the source it came from. The argument stands at raid-dec-an-import-is-read-only-and-a-vendored-copy-is-yours.
+
 BOTH MEASURES USED TO COUNT CLAIMS, and i34 retired the claim system whole.
 The first read "double-claimed iterations" and the second "acts from clone to
 first claimed iteration". Neither counts anything now.

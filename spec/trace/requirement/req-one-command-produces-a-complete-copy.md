@@ -14,7 +14,7 @@ source_refs:
   - uc-vendor-and-overlay step 2
   - uc-vendor-and-overlay ext 2a
   - sty-vendor-it-into-my-product
-  - vp-vendoring
+  - vp-the-engine
 priority: must
 ---
 
@@ -32,7 +32,7 @@ an editor extension.
 | independent | It shall be its own repository, with its own history, and no dependency declared on the source. |
 | named | Its name shall be written once, in the brand fact at its root, per [[req-the-product-name-is-one-fact]]. |
 | one act | It shall be produced by a single act, with no manual assembly step afterwards. |
-| the count | Its dependencies on the source's working copy shall be zero, which is [[vp-vendoring]]'s own first success criterion. |
+| the count | Its dependencies on the source's working copy shall be zero, which is [[vp-the-engine]]'s own first success criterion. |
 
 ## What already exists, and what it lacks
 

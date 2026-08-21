@@ -15,7 +15,7 @@ source_refs:
   - raid-dec-a-copy-is-a-clone-that-keeps-its-history
   - raid-dec-an-import-is-read-only-and-a-vendored-copy-is-yours
   - el-vehicle-producer
-  - vp-vendoring
+  - vp-the-engine
 ---
 
 ## The ruling

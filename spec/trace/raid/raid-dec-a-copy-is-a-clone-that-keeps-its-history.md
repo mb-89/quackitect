@@ -14,7 +14,7 @@ source_refs:
   - req-method-reuse-is-vendoring
   - opt-a-clone-that-keeps-its-history
   - uc-vendor-and-overlay
-  - vp-vendoring
+  - vp-the-engine
 ---
 
 ## The choice

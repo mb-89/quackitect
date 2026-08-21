@@ -8,7 +8,7 @@ crosses: out
 source_refs:
   - req-one-command-produces-a-complete-copy
   - nbr-descendant
-  - vp-vendoring
+  - vp-the-engine
 ---
 
 ## Renamed 2026-08-18, and the old prose hid a hole

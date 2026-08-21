@@ -11,7 +11,7 @@ breaks_how_badly: crippling
 how_likely: plausible
 impact: "A home-made channel costs the time it takes to build and keeps costing it. It also fails the way home-made merge logic always fails - on the case nobody thought of - and the descendant's owner pays that, not us. If it fails badly enough to be abandoned, a descendant gets exactly what a fork gets: it works, it is theirs, and the channel silently stops being usable."
 source_refs:
-  - vp-vendoring
+  - vp-the-engine
   - raid-dec-an-import-is-read-only-and-a-vendored-copy-is-yours
   - i16 define-actual as_is — the git-subtree witness
 ---

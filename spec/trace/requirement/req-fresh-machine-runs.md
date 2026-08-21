@@ -14,7 +14,7 @@ source_refs:
   - uc-quality-flexibility ext 1a
   - ".se/req-mine-v2.md: distribution (v2-098)"
   - ".se/req-mine-v1.md: lifecycle and distribution"
-  - stk-vehicle-owner
+  - stk-engineer-driving-agents
 priority: should
 weighs_against:
   - req-setup-floor-editor-shell >

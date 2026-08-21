@@ -30,7 +30,7 @@ THAT ANSWER IS NOT AVAILABLE HERE for two reasons that arrived after v1.
 - THE PATH JAIL. `engine/paths.ts` refuses anything resolving outside the
   project root, and declared roots are read surfaces rather than write targets.
   A data home outside the tree is a write target outside the root.
-- A COPY MUST BE CLONEABLE. `stk-vehicle-owner`'s own concern is that a
+- A COPY MUST BE CLONEABLE. `stk-engineer-driving-agents`'s own concern is that a
   colleague clones the copy and runs it. Content in a per-machine data
   directory does not travel with a clone, so the colleague would get the method
   without the overlay.

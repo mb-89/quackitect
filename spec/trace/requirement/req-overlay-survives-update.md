@@ -13,7 +13,7 @@ source_refs:
   - uc-quality-flexibility step 3
   - uc-quality-flexibility ext 2a
   - uc-quality-flexibility ext 3a
-  - stk-vehicle-owner
+  - stk-engineer-driving-agents
 priority: should
 weighs_against:
   - req-overlay-drift-reported >

@@ -3,7 +3,7 @@ minted_in: i5-engine-hygiene-one-version-source-every-
 id: uc-prove-an-install
 type: "[[use-case]]"
 statement: Confirm that an installed copy is the one that was intended, without starting it.
-actor: stk-vehicle-owner
+actor: stk-engineer-driving-agents
 trigger: an installer has finished on a machine, and nothing has yet said whether it worked
 precondition: the product's files are on disk and its dependencies are installed
 guarantee: the version the entrypoint reports is known, and nothing was started to learn it

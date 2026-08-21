@@ -13,7 +13,7 @@ source_refs:
   - raid-tripwire-i16-a-structural-migration-cannot-be-written
   - raid-dec-a-copy-is-a-clone-that-keeps-its-history
   - cand-the-program-route
-  - vp-vendoring
+  - vp-the-engine
 ---
 
 ## What it does

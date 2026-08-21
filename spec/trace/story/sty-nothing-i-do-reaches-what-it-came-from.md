@@ -3,9 +3,9 @@ minted_in: i16-the-vehicle-overlay-a-vehicle-vendors-th
 id: sty-nothing-i-do-reaches-what-it-came-from
 type: "[[story]]"
 statement: When a builder is about to let an unfamiliar system sit beside repositories they care about, they want proof that nothing it does can reach outside itself, so they can gut their copy without checking what else moved.
-actor: stk-vehicle-owner
+actor: stk-engineer-driving-agents
 refines:
-  - vp-vendoring
+  - vp-the-engine
 priority: must
 ---
 
@@ -25,7 +25,7 @@ THE TEST FIXTURE BUILDS EXACTLY THIS SHAPE, in a temporary directory: a produced
 
 They delete half of what the descendant shipped with - guidance, method cards, whole directories - because it is theirs and they were told nothing is sealed.
 |||
-NOTHING IS SEALED, and that is now the recorded law rather than an inversion of it. `raid-dec-an-import-is-read-only-and-a-vendored-copy-is-yours` carries v2's ruling verbatim: the rule names the DIRECTION of writes, never a folder. vp-vendoring's outcome line used to say the opposite and was amended at this iteration's frame-delta. NOT OBSERVED: nobody has gutted a produced copy and kept it running.
+NOTHING IS SEALED, and that is now the recorded law rather than an inversion of it. `raid-dec-an-import-is-read-only-and-a-vendored-copy-is-yours` carries v2's ruling verbatim: the rule names the DIRECTION of writes, never a folder. vp-the-engine's outcome line used to say the opposite and was amended at this iteration's frame-delta. NOT OBSERVED: nobody has gutted a produced copy and kept it running.
 
 ---
 

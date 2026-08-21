@@ -11,9 +11,9 @@ refines:
   - uc-vendor-and-overlay
 source_refs:
   - uc-vendor-and-overlay step 1
-  - stk-vehicle-owner
+  - stk-engineer-driving-agents
   - nbr-descendant
-  - vp-vendoring
+  - vp-the-engine
 priority: should
 weighs_against:
   - req-the-product-name-is-one-fact > — a registry breaks the promise that made this role vendor rather than contribute; a scattered name costs conflicts on every update, which is expensive rather than disqualifying
@@ -40,11 +40,11 @@ only true while nothing ever tries, and the first person to want a support
 channel will try.
 
 THE AUDIENCE ASKED FOR IT before this iteration rediscovered it.
-[[stk-vehicle-owner]]'s concerns state it in both directions: what the engine
+[[stk-engineer-driving-agents]]'s concerns state it in both directions: what the engine
 writes must never land inside their tree, and what they write must never land
 inside the engine's.
 
-AND THE COMMERCIAL REASON IS ON [[vp-vendoring]]. The product goes open source
+AND THE COMMERCIAL REASON IS ON [[vp-the-engine]]. The product goes open source
 while company-specific guidance stays inside the company. A registry of who
 holds a copy is the first step toward that guidance having somewhere to leak
 to.

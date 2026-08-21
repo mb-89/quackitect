@@ -36,7 +36,7 @@ engine tree beside it.
 
 DEPTH IS ONE PASS PER PRODUCING ACT, and it is re-run whenever an act gains a
 new output. The register grades this crippling, and the reason is on
-vp-vendoring: this is the promise that made the audience vendor rather than
+vp-the-engine: this is the promise that made the audience vendor rather than
 contribute, and it fails silently.
 
 ## Checklist

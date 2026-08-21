@@ -12,7 +12,7 @@ source_refs:
   - raid-dec-a-vehicle-is-a-copy-with-a-one-way-upstream-link
   - opt-the-bound-travels-with-the-act
   - raid-dec-a-producing-act-is-bounded-by-the-tree-it-produces
-  - vp-vendoring
+  - vp-the-engine
   - cand-the-program-route
 ---
 

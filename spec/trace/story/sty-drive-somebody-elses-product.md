@@ -3,9 +3,9 @@ minted_in: i16-the-vehicle-overlay-a-vehicle-vendors-th
 id: sty-drive-somebody-elses-product
 type: "[[story]]"
 statement: When a builder has this system and a product of their own, they want to point one at the other, so the method runs on the work they actually care about.
-actor: stk-vehicle-owner
+actor: stk-engineer-driving-agents
 refines:
-  - vp-vendoring
+  - vp-the-engine
 priority: must
 ---
 
@@ -19,7 +19,7 @@ THE SECOND ACT EXISTS NOW. `produceProject` makes a plain work tree and records 
 
 Their descendant is installed and running. Their own guidance is written. Their product sits in a different folder entirely, with its own history, its own build and no knowledge that any of this exists.
 |||
-HALF OF THIS STARTING STATE IS NOT REACHABLE TODAY. "Their own guidance is written" needs the overlay, and no overlay mechanism exists — that is vp-vendoring's fourth criterion and this iteration's largest gap. The other half is real and tested: a produced project carries none of the method, and the produced tree has its own git history.
+HALF OF THIS STARTING STATE IS NOT REACHABLE TODAY. "Their own guidance is written" needs the overlay, and no overlay mechanism exists — that is vp-the-engine's fourth criterion and this iteration's largest gap. The other half is real and tested: a produced project carries none of the method, and the produced tree has its own git history.
 
 ---
 

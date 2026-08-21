@@ -3,9 +3,9 @@ minted_in: i5-engine-hygiene-one-version-source-every-
 id: sty-ask-the-package-what-it-is
 type: "[[story]]"
 statement: When a builder has just run the installer out of a release package, they want to ask the entrypoint which version it is, so they know the install worked before they trust anything it tells them.
-actor: stk-vehicle-owner
+actor: stk-engineer-driving-agents
 refines:
-  - vp-vendoring
+  - vp-the-engine
 priority: must
 ---
 

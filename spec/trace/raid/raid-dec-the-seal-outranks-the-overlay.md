@@ -9,11 +9,11 @@ trigger: any design that would let a host write under the engine folder to expre
 status: superseded
 breaks_how_badly: crippling
 how_likely: expected
-impact: This is the ordering every later design decision inherits. Reversed, an update stops being a replacement and becomes a merge, which is the exact cost vp-vendoring exists to avoid, and the failure is silent until the next version arrives.
+impact: This is the ordering every later design decision inherits. Reversed, an update stops being a replacement and becomes a merge, which is the exact cost vp-the-engine exists to avoid, and the failure is silent until the next version arrives.
 source_refs:
   - req-nothing-a-copy-does-reaches-its-source
   - req-overlay-resolution
-  - vp-vendoring
+  - vp-the-engine
 ---
 
 ## The conflict, and it was already recorded
@@ -75,7 +75,7 @@ something a builder wants, the answer is to widen what an overlay may replace,
 never to let it write inward.
 
 AND THE SEAL BECOMES MECHANICALLY CHECKABLE, which is the practical payoff:
-vp-vendoring's first success criterion is writes under the engine during a
+vp-the-engine's first success criterion is writes under the engine during a
 vehicle run, target zero. A count of zero is a test. "Only in the sanctioned
 zone" is a judgment.
 

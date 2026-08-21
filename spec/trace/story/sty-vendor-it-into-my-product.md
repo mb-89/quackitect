@@ -2,10 +2,10 @@
 minted_in: i1
 id: sty-vendor-it-into-my-product
 type: "[[story]]"
-statement: When a builder wants this machine but not our way of working, they want a copy of it that is entirely theirs, so they can change anything in it and still take what we fix later.
-actor: stk-vehicle-owner
+statement: When an engineer builds on this system but their additions cannot be contributed back to an open-source project, they want a copy that is entirely theirs, so their own method stays private and they still take what we fix later.
+actor: stk-engineer-driving-agents
 refines:
-  - vp-vendoring
+  - vp-the-engine
 priority: must
 ---
 
@@ -17,6 +17,12 @@ nothing of theirs inside it and an update replacing that folder whole. The
 owner withdrew that model - "at no point is there any sealing" - and the method
 says a story the change invalidates is revised rather than silently outgrown.
 The id is kept because five closed iterations' signed evidence points at it. -->
+
+<!-- REVISED AGAIN 2026-08-21, on the owner's ruling. The statement said the
+builder wanted the machine but not our way of working. The real motive is
+narrower and stronger: the product is open source and what they add to it
+often cannot be. This story is now where that promise lives, because the
+proposition it used to refine folded into vp-the-engine at the same ruling. -->
 
 A builder wants this machine and not the way of working that ships with it. Today their only option is a fork, which costs them every improvement we make from that day on.
 |||

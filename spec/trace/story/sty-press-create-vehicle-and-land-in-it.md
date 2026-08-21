@@ -3,9 +3,9 @@ minted_in: i16-the-vehicle-overlay-a-vehicle-vendors-th
 id: sty-press-create-vehicle-and-land-in-it
 type: "[[story]]"
 statement: When somebody wants their own copy of this system, they want to ask for it from the surface they are already looking at, so they end up working in it without ever finding a script.
-actor: stk-vehicle-owner
+actor: stk-engineer-driving-agents
 refines:
-  - vp-vendoring
+  - vp-the-engine
 priority: must
 ---
 
