@@ -1,0 +1,9 @@
+{"ts":"2026-08-21T11:46:58.209Z","op":"update","visit":"iterations/i45/start@0","node":"d8","brief":"Entering iteration retro"}
+{"ts":"2026-08-21T11:47:42.120Z","op":"update","visit":"iterations/i45/onboard-retro@0","node":"d9","brief":"Surveying retro inbox"}
+{"ts":"2026-08-21T11:47:58.759Z","op":"update","visit":"iterations/i45/onboard-retro@0","node":"d10","brief":"Completing retro evidence"}
+{"ts":"2026-08-21T11:48:03.970Z","op":"update","visit":"iterations/i45/onboard-retro@0","node":"d11","brief":"Establishing retro interval"}
+{"ts":"2026-08-21T11:48:08.252Z","op":"update","visit":"iterations/i45/onboard-retro@0","node":"d12","brief":"Mining retro log counts"}
+{"ts":"2026-08-21T11:48:20.438Z","op":"done","visit":"iterations/select@0","node":"d5","brief":"Completed iteration retro"}
+{"ts":"2026-08-21T11:48:45.715Z","op":"update","visit":"iterations/i45/gate-kickoff@0","node":"d13","brief":"Preparing kickoff gate"}
+{"ts":"2026-08-21T11:49:02.188Z","op":"update","visit":"iterations/i45/gate-kickoff@0","node":"d14","brief":"Reading i45 implementation plan"}
+{"ts":"2026-08-21T11:49:22.612Z","op":"done","visit":"iterations/select@0","node":"d6","brief":"Parked responsiveness work"}
