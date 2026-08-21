@@ -43,11 +43,6 @@ names which of four you got.
   mistakes: type prose over a computation, or stamp one unread. Both were
   walked on i15.
 
-  CONCRETELY: the engine says the flips are these three, you say which are
-  credible. It says the clusters are these, you move the rows it got wrong.
-  Re-deriving the drawing by hand is the waste; an essay where a pick was
-  wanted is the other one.
-
   - `submit: true` — stamp it. Runs every check, then signs.
   - `bless: true` or `bless: false` — the gate's thumb, up or down.
   - a bare fill with neither — SAVED and NOT stamped, on purpose. Fill half a
@@ -55,8 +50,7 @@ names which of four you got.
 
   SO A FORM YOU MEAN TO FINISH CARRIES `submit: true`. Without it the fields
   land, nothing signs, and the same form comes back looking untouched — which
-  reads exactly like a refusal and is not one. This cost four round trips on
-  2026-08-09 before anybody read the engine.
+  reads exactly like a refusal and is not one.
 
   A GATE IS THE SAME MECHANISM. It takes `submit` and `bless` like any other
   form, and at high autonomy the agent uses both (owner ruling 2026-08-09).
@@ -86,11 +80,9 @@ names which of four you got.
   mark by itself. Nothing is skipped and nothing can be waved through: a claim
   the change really did break refuses, and names what broke.
 
-  RE-DERIVING A STANDING CLAIM IS WASTE, and it is the waste this block exists
-  to stop. A reopened form used to arrive looking exactly like a fresh one.
 - OPTIONS RIDE A `do` — there is no separate `choose` instruction, and the
-  engine has never emitted one. Where the road splits; the options ride along with weight and
-  openness. Answer `form: {"choice": "<to>"}` only when a routed goal needs
+  engine has never emitted one. Where the road splits, the options ride along
+  with weight and openness. Answer `form: {"choice": "<to>"}` only when a routed goal needs
   that door. A LIST is legal where work fans out; one is walked, the rest
   come back as `not_walked`. You never choose unasked, and you do not choose
   just because options were offered.
@@ -108,18 +100,13 @@ names which of four you got.
   iteration. You set it to ship, and then you let the machine pull you there.
   Everything that you need to do on the way there, you do."
 
-  SO THE DIVISION IS PLAIN. The machine routes. The agent works whatever the
-  route lands on, and pulls again. Aiming one state further on, over and over,
-  is the agent doing the router's job by hand.
-
   WHAT IT COSTS WHEN IGNORED. Every arrival clears the target, so a
   mid-iteration aim arrives almost at once and leaves the walk with nothing
   routed. The agent then re-aims, arrives, re-aims. i36 spent a whole session
   in that loop on 2026-08-19.
 
-  AN EMPTY TARGET IS EMPTY, and it never means the front desk. A pull with
-  nothing routed reports that there is nothing to do here and shows the
-  options, exactly as this document already says.
+  AN EMPTY TARGET IS EMPTY, and it never means the front desk. The pull
+  reports there is nothing to do here and shows the options.
 
   A `wait` IS NOT PROOF THERE IS NO DOOR. It reports that the route to the
   STANDING target could not be drawn, which says nothing about the doors from
@@ -155,8 +142,8 @@ plainly and stop; their reply resumes you there. Escape only when
 MECHANICALLY stuck — when no answer could let the walk continue from here.
 Earlier work no longer standing is also an escape: say what fell.
 
-There is no position to assert and no route to draw. The pull recomputes from
-wherever the walk stands, so the person's hand can never race you.
+The pull recomputes from wherever the walk stands, so the person's hand can
+never race you.
 
 ## The person's hand
 
@@ -182,8 +169,7 @@ refusing, and the agent's pull is what moves.
   92% marks, so all of it has to be in hand.
 - THE ANCHOR SITS BETWEEN `«` AND `»`. Those marks are the delimiters and are
   never part of the anchor. Plain quotes are used only where the anchor itself
-  carries a guillemet, so the delimiter is always a character the anchor does
-  not hold — an anchor ending in a quote mark used to hide its own end.
+  carries a guillemet, so the delimiter is never a character the anchor holds.
 - ANSWER ALL THREE IN ONE STRING, as `form: {"read": "..."}`. Join them any
   way you like. Order does not matter and separators do not matter.
 - QUOTE GENEROUSLY. The check asks whether your answer CONTAINS the words it
@@ -200,9 +186,6 @@ refusing, and the agent's pull is what moves.
 - The same document comes again with each wrong answer. Read the probes it
   names rather than the whole file: the answer is in the text you already
   hold.
-- WHY PROBES AND NOT A HASH: you cannot compute one, and one the engine handed
-  you would prove only that a message arrived. Spread probes are the cheapest
-  thing that a host which truncated the text cannot answer.
 - ONE DOCUMENT AT A TIME, on purpose: a host that moves a large result to disk
   hands you a preview, and a single document cannot be eaten.
 - You never name a path and never work out what you owe.
@@ -213,32 +196,20 @@ to cancel itself on parallel batches. The lane serves parallel reads fine.
 
 ## Attribution — who you are rides every call too
 
-THREE ARGUMENTS RIDE EVERY LANE TOOL, the same way `update` does, because the
-answer is about the CALL rather than about any one verb.
+SIX ARGUMENTS RIDE EVERY LANE TOOL, the way `update` does.
 
-- `as` — WHICH HAND YOU ARE, from a closed vocabulary: owner, walker, guide,
-  reviewer, surface. Omit it and the record says `walker`, which is right for
-  the hand holding the session and making the daily calls.
-- `relayed_by` — WHO IS FILING WORK SOMEBODY ELSE DID. Send `as` naming the
-  AUTHOR and this naming yourself.
-- `answered_by` — WHAT ACTUALLY SERVED THE CALL, not what was asked for.
-  Omit it and the record says `unreported`, which is a declared absence rather
-  than a missing field.
+- `as` — WHICH HAND YOU ARE: owner, walker, guide, reviewer, surface. Omit it
+  and the record says `walker`, which is right for the hand holding the
+  session. Say `guide` when you are the hand that was ASKED for one step.
+- `relayed_by` — WHO IS FILING WORK SOMEBODY ELSE DID. Send `as` for the
+  AUTHOR and this for yourself.
+- `answered_by` — what actually SERVED the call. Omit it and the record says
+  `unreported`, which is a declared absence rather than a missing field.
+- `named_driver`, `went_weaker`, `weaker_reason` — the safety rule. Going
+  weaker with no reason marks the record `unreasoned`: marked, never refused.
 
-SAY `as: "guide"` WHEN YOU ARE THE HAND THAT WAS ASKED. A guide is delegated
-one step — a question, a comparison, a decision the walker will not take alone.
-A default of `guide` would let the strong hand's work hide in the weak hand's
-count, which is the failure this coordinate exists to make visible.
-
-NOTHING CHECKS ANY OF IT. One dispatcher serves every agent, so the record
-marks `as` and `answered_by` as claims. That is honest rather than weak: a
-field that reads like an observation and is a claim is worse than an empty one.
-
-THREE MORE CARRY THE SAFETY RULE. `named_driver` is the strength the step was
-told it needs; `went_weaker` is your own word that a weaker hand took it;
-`weaker_reason` is why. Going weaker with no reason marks the record
-`unreasoned` — marked, never refused, because the party being asked is the
-party being judged.
+NOTHING CHECKS ANY OF IT, and the record marks `as` and `answered_by` as
+claims. `project/guidance/method/lane.md` carries why.
 
 ## Narration — the update rides every call
 
@@ -349,8 +320,7 @@ IT DOES NOT BLOCK. The answer comes back `handed_off: true` with a job handle;
 `se_test {job: "..."}` reads its status.
 
 POLLING PAYS NO CALL. The toll skips a poll for the reason it skips the reading
-loop: the machine forced the hop and no judgment happened on it. Before that
-skip, 25 of a session's 40 `se_test` calls were refused, every one a poll.
+loop: the machine forced the hop and no judgment happened on it.
 
 SO DO OTHER WORK WHILE IT RUNS and read the verdict when it lands. The answer
 names how long the last battery took. What you never do is sit polling in a

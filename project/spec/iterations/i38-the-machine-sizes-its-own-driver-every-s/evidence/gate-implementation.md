@@ -1,8 +1,9 @@
 ---
 form: gate-implementation
 bless: blessed by agent
+reopened: "2026-08-20T23:56:12.843Z — verification was re-signed below it: the machinery-ascends rule moved onto dsp-walk-machine.md with a test guarding it, and the battery ran green over the tree that carries both. No shipped behaviour changed for this gate to answer differently."
 by: agent
-signed_off: 2026-08-20T21:55:52.698Z
+signed_off: 2026-08-20T23:56:15.554Z
 authors: agent
 files:
 ---

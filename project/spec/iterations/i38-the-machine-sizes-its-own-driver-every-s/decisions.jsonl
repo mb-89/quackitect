@@ -996,3 +996,19 @@
 {"ts":"2026-08-20T21:54:27.259Z","op":"update","visit":"iterations/i38/gate-implementation@0","node":"d167","brief":"walking the record"}
 {"ts":"2026-08-20T21:59:47.478Z","op":"update","visit":"iterations/i38/run-demos/sty-the-machine-picks-the-hands@0","node":"d168","brief":"walking the record"}
 {"ts":"2026-08-20T22:05:07.854Z","op":"update","visit":"iterations/i38/gate-validation@0","node":"d169","brief":"walking the record"}
+{"ts":"2026-08-20T22:13:18.965Z","op":"update","visit":"iterations/i38/verification@3","node":"d170","brief":"walking the record"}
+{"ts":"2026-08-20T22:21:20.785Z","op":"update","visit":"iterations/i38/verification@3","node":"d171","brief":"walking the record"}
+{"ts":"2026-08-20T22:28:00.249Z","op":"update","visit":"iterations/i38/verification@3","node":"d172","brief":"walking the record"}
+{"ts":"2026-08-20T22:34:34.473Z","op":"update","visit":"iterations/i38/verification@3","node":"d173","brief":"walking the record"}
+{"ts":"2026-08-20T22:42:42.135Z","op":"update","visit":"iterations/i38/verification@3","node":"d174","brief":"walking the record"}
+{"ts":"2026-08-20T22:49:22.516Z","op":"update","visit":"iterations/i38/verification@3","node":"d175","brief":"walking the record"}
+{"ts":"2026-08-20T23:01:42.117Z","op":"update","visit":"iterations/i38/gate-implementation@1","node":"d176","brief":"walking the record"}
+{"ts":"2026-08-20T23:10:18.995Z","op":"update","visit":"iterations/i38/run-demos/end@0","node":"d177","brief":"walking the record"}
+{"ts":"2026-08-20T23:10:44.194Z","op":"fork","visit":"iterations/i38/run-demos/end@0","parent":null,"node":"d178","brief":"the re-sign cascade dead-ends on a state that runs a sub-machine","nodes":[]}
+{"ts":"2026-08-20T23:26:00.006Z","op":"update","visit":"iterations/i38/verification@0","node":"d1","brief":"walking the record"}
+{"ts":"2026-08-20T23:31:44.053Z","op":"update","visit":"iterations/i38/gate-implementation@0","node":"d2","brief":"walking the record"}
+{"ts":"2026-08-20T23:42:25.067Z","op":"update","visit":"iterations/i38/trace-design@1","node":"d1","brief":"walking the record"}
+{"ts":"2026-08-20T23:47:58.135Z","op":"update","visit":"iterations/i38/gate-implementation@0","node":"d2","brief":"walking the record"}
+{"ts":"2026-08-20T23:57:13.033Z","op":"update","visit":"iterations/i38/gate-validation@0","node":"d1","brief":"walking the record"}
+{"ts":"2026-08-21T00:11:28.109Z","op":"update","visit":"iterations/i38/package@0","node":"d2","brief":"the packaged tree's first boot is red; running the remedy preflight names"}
+{"ts":"2026-08-21T00:17:35.592Z","op":"update","visit":"iterations/i38/gate-release@0","node":"d3","brief":"walking the record"}

@@ -2,6 +2,26 @@
 
 One entry per shipped version, newest first.
 
+## 7.0.0 — 2026-08-20
+
+Every step of the walk now says how strong a hand its own work needs, and every entry in the log says which hand made it.
+
+- Each step can carry a difficulty, set per size of change, and the machine publishes what it reads: a rung, and the two figures it came from. A reader who disagrees with the rung can still use the figures.
+- The machine says it and starts nothing. Nothing is spawned, nothing is switched, and no model is named anywhere in the answer.
+- A step with no difficulty publishes nothing at all, rather than guessing. A guess is impossible to tell apart from a working lookup, which is the failure this avoids.
+- Every call records which hand made it — the one holding the session, a stronger one it asked for help, a reviewer, or the person. Work done by one hand and filed by another is recorded as the doer's, not the filer's.
+- The two the machine cannot see for itself are marked as claims rather than dressed up as observations.
+- Going to a weaker hand than the step asked for leaves a mark when no reason was given. It is marked, never refused: the party being asked is the party being judged.
+
+### A repair the walk found while shipping
+
+- Sending a claim back on a step that runs its own sub-machine used to stop the walk for good. The step's form could only be reached before that sub-machine started, so nothing could earn the claim again and nothing could leave. It is reachable now, and can be stamped from inside.
+
+### What this release does not change
+
+- Nothing in the shipped matrix is rated yet, so most steps publish nothing. The rating is real work and it is recorded as owed.
+- Whether a weaker hand actually hands a step on to a stronger one is obedience, and nothing here compels it.
+
 ## 6.0.0 — 2026-08-19
 
 An agent can now ask the database a structured question instead of grepping for it, and can ask it which of a change's ripples actually matter instead of reading every one by hand.

@@ -3189,7 +3189,7 @@ export class Session {
   }
 
   formGet(name: string, machineId?: string): Record<string, unknown> {
-    const fm = this.claims.formMachine(machineId);
+    const fm = this.claims.formMachine(machineId, name);
     if (this.claims.isStateForm(name, fm)) return this.claims.stateFormGet(name, fm);
     if (this.bound === undefined) {
       // No expedition bound — the TEMPLATE is still viewable (owner ruling:
@@ -3229,7 +3229,7 @@ export class Session {
 
   formSave(name: string, fields: Record<string, string>, by = "agent", machineId?: string): Record<string, unknown> {
     this.forgetRoute();
-    const fm = this.claims.formMachine(machineId);
+    const fm = this.claims.formMachine(machineId, name);
     if (this.claims.isStateForm(name, fm)) return this.claims.stateFormSave(name, fields, by, fm);
     const h = this.formHome(name);
     let raw = existsSync(h.instanceAbs) ? readFileSync(h.instanceAbs, "utf8") : scaffoldInstance(h.template, `${this.bound?.id} — ${name}`);
@@ -3241,7 +3241,7 @@ export class Session {
   }
 
   formConfirm(name: string, field: string, index: number, machineId?: string): Record<string, unknown> {
-    const fm = this.claims.formMachine(machineId);
+    const fm = this.claims.formMachine(machineId, name);
     if (this.claims.isStateForm(name, fm)) {
       const sh = this.claims.stateFormHome(name, fm);
       if (existsSync(sh.instanceAbs)) {
@@ -3260,7 +3260,7 @@ export class Session {
 
   formDone(name: string, by: Channel, machineId?: string): Record<string, unknown> {
     this.forgetRoute();
-    const fm = this.claims.formMachine(machineId);
+    const fm = this.claims.formMachine(machineId, name);
     if (this.claims.isStateForm(name, fm)) {
       this.claims.assertStateFormActive(name, fm, "submit");
       // SUBMIT is the checking act: an unmet form THROWS, so the log line

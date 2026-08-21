@@ -1,7 +1,7 @@
 <!-- GENERATED at agent start. Do not edit — the next start overwrites it.
      from project/guidance/contract.md 808e6defe6a3
-     from project/guidance/walking.md 5eea148fd1c1
-     from project/guidance/method/lane.md 73eb9c0258aa
+     from project/guidance/walking.md 5d1f0dca3233
+     from project/guidance/method/lane.md 0f8bd62cafab
      from project/guidance/voice.md f59715f4ccc4
 -->
 
@@ -311,11 +311,6 @@ names which of four you got.
   mistakes: type prose over a computation, or stamp one unread. Both were
   walked on i15.
 
-  CONCRETELY: the engine says the flips are these three, you say which are
-  credible. It says the clusters are these, you move the rows it got wrong.
-  Re-deriving the drawing by hand is the waste; an essay where a pick was
-  wanted is the other one.
-
   - `submit: true` — stamp it. Runs every check, then signs.
   - `bless: true` or `bless: false` — the gate's thumb, up or down.
   - a bare fill with neither — SAVED and NOT stamped, on purpose. Fill half a
@@ -323,8 +318,7 @@ names which of four you got.
 
   SO A FORM YOU MEAN TO FINISH CARRIES `submit: true`. Without it the fields
   land, nothing signs, and the same form comes back looking untouched — which
-  reads exactly like a refusal and is not one. This cost four round trips on
-  2026-08-09 before anybody read the engine.
+  reads exactly like a refusal and is not one.
 
   A GATE IS THE SAME MECHANISM. It takes `submit` and `bless` like any other
   form, and at high autonomy the agent uses both (owner ruling 2026-08-09).
@@ -354,11 +348,9 @@ names which of four you got.
   mark by itself. Nothing is skipped and nothing can be waved through: a claim
   the change really did break refuses, and names what broke.
 
-  RE-DERIVING A STANDING CLAIM IS WASTE, and it is the waste this block exists
-  to stop. A reopened form used to arrive looking exactly like a fresh one.
 - OPTIONS RIDE A `do` — there is no separate `choose` instruction, and the
-  engine has never emitted one. Where the road splits; the options ride along with weight and
-  openness. Answer `form: {"choice": "<to>"}` only when a routed goal needs
+  engine has never emitted one. Where the road splits, the options ride along
+  with weight and openness. Answer `form: {"choice": "<to>"}` only when a routed goal needs
   that door. A LIST is legal where work fans out; one is walked, the rest
   come back as `not_walked`. You never choose unasked, and you do not choose
   just because options were offered.
@@ -376,18 +368,13 @@ names which of four you got.
   iteration. You set it to ship, and then you let the machine pull you there.
   Everything that you need to do on the way there, you do."
 
-  SO THE DIVISION IS PLAIN. The machine routes. The agent works whatever the
-  route lands on, and pulls again. Aiming one state further on, over and over,
-  is the agent doing the router's job by hand.
-
   WHAT IT COSTS WHEN IGNORED. Every arrival clears the target, so a
   mid-iteration aim arrives almost at once and leaves the walk with nothing
   routed. The agent then re-aims, arrives, re-aims. i36 spent a whole session
   in that loop on 2026-08-19.
 
-  AN EMPTY TARGET IS EMPTY, and it never means the front desk. A pull with
-  nothing routed reports that there is nothing to do here and shows the
-  options, exactly as this document already says.
+  AN EMPTY TARGET IS EMPTY, and it never means the front desk. The pull
+  reports there is nothing to do here and shows the options.
 
   A `wait` IS NOT PROOF THERE IS NO DOOR. It reports that the route to the
   STANDING target could not be drawn, which says nothing about the doors from
@@ -423,8 +410,8 @@ plainly and stop; their reply resumes you there. Escape only when
 MECHANICALLY stuck — when no answer could let the walk continue from here.
 Earlier work no longer standing is also an escape: say what fell.
 
-There is no position to assert and no route to draw. The pull recomputes from
-wherever the walk stands, so the person's hand can never race you.
+The pull recomputes from wherever the walk stands, so the person's hand can
+never race you.
 
 ## The person's hand
 
@@ -450,8 +437,7 @@ refusing, and the agent's pull is what moves.
   92% marks, so all of it has to be in hand.
 - THE ANCHOR SITS BETWEEN `«` AND `»`. Those marks are the delimiters and are
   never part of the anchor. Plain quotes are used only where the anchor itself
-  carries a guillemet, so the delimiter is always a character the anchor does
-  not hold — an anchor ending in a quote mark used to hide its own end.
+  carries a guillemet, so the delimiter is never a character the anchor holds.
 - ANSWER ALL THREE IN ONE STRING, as `form: {"read": "..."}`. Join them any
   way you like. Order does not matter and separators do not matter.
 - QUOTE GENEROUSLY. The check asks whether your answer CONTAINS the words it
@@ -468,9 +454,6 @@ refusing, and the agent's pull is what moves.
 - The same document comes again with each wrong answer. Read the probes it
   names rather than the whole file: the answer is in the text you already
   hold.
-- WHY PROBES AND NOT A HASH: you cannot compute one, and one the engine handed
-  you would prove only that a message arrived. Spread probes are the cheapest
-  thing that a host which truncated the text cannot answer.
 - ONE DOCUMENT AT A TIME, on purpose: a host that moves a large result to disk
   hands you a preview, and a single document cannot be eaten.
 - You never name a path and never work out what you owe.
@@ -478,6 +461,23 @@ refusing, and the agent's pull is what moves.
 
 READ SERIALLY FOR NOW. A RETREAT, not a preference: a Copilot harness appears
 to cancel itself on parallel batches. The lane serves parallel reads fine.
+
+## Attribution — who you are rides every call too
+
+SIX ARGUMENTS RIDE EVERY LANE TOOL, the way `update` does.
+
+- `as` — WHICH HAND YOU ARE: owner, walker, guide, reviewer, surface. Omit it
+  and the record says `walker`, which is right for the hand holding the
+  session. Say `guide` when you are the hand that was ASKED for one step.
+- `relayed_by` — WHO IS FILING WORK SOMEBODY ELSE DID. Send `as` for the
+  AUTHOR and this for yourself.
+- `answered_by` — what actually SERVED the call. Omit it and the record says
+  `unreported`, which is a declared absence rather than a missing field.
+- `named_driver`, `went_weaker`, `weaker_reason` — the safety rule. Going
+  weaker with no reason marks the record `unreasoned`: marked, never refused.
+
+NOTHING CHECKS ANY OF IT, and the record marks `as` and `answered_by` as
+claims. `project/guidance/method/lane.md` carries why.
 
 ## Narration — the update rides every call
 
@@ -588,8 +588,7 @@ IT DOES NOT BLOCK. The answer comes back `handed_off: true` with a job handle;
 `se_test {job: "..."}` reads its status.
 
 POLLING PAYS NO CALL. The toll skips a poll for the reason it skips the reading
-loop: the machine forced the hop and no judgment happened on it. Before that
-skip, 25 of a session's 40 `se_test` calls were refused, every one a poll.
+loop: the machine forced the hop and no judgment happened on it.
 
 SO DO OTHER WORK WHILE IT RUNS and read the verdict when it lands. The answer
 names how long the last battery took. What you never do is sit polling in a
@@ -659,11 +658,37 @@ path that names a folder the product does not have is the tell.
 
 Every call is logged raw to `.se/calls.jsonl`.
 
-THE RECORD CARRIES WHO ACTED. The acting role — a person, an agent, the
-surface itself — is stamped on the record where the call is SERVED, by the
-code that knows. Nothing downstream infers it from the tool name: a reader
-guessing the actor from which verb was called gets it wrong the moment one
-verb serves two callers, and it did.
+THE RECORD CARRIES WHO ACTED, WHERE, AND ON WHAT. Four coordinates, and only
+one of them is something the server can see for itself.
+
+- `actor` — a person, an agent, or the surface itself. Stamped where the call
+  is SERVED, by the code that knows. Nothing downstream infers it from the tool
+  name: a reader guessing the actor from which verb was called gets it wrong
+  the moment one verb serves two callers, and it did.
+- `state` — where the walk stood. Also the server's own observation.
+- `part` — WHICH HAND, from a closed vocabulary: owner, walker, guide,
+  reviewer, surface. Two agents are both `actor: agent`, and this is what
+  tells them apart.
+- `answered_by` — the model that served the call, not the one that was asked
+  for.
+
+YOU DECLARE THE LAST TWO AND THE RECORD MARKS THEM AS CLAIMS. Every lane tool
+takes `as`, `relayed_by` and `answered_by`, the same way every one takes
+`update`. Omit `as` and the record says `walker`, which is right for the
+hand holding the session.
+
+SAY `as: "guide"` WHEN YOU ARE THE HAND THAT WAS ASKED. A guide is delegated
+one step and says so — a default of `guide` would let the strong hand's work
+hide in the weak hand's count.
+
+AND WHEN YOU FILE WORK SOMEBODY ELSE DID, say `as` for the AUTHOR and
+`relayed_by` for yourself. A walker typing a guide's judgment into a form
+under its own name erases the only thing the coordinate is for.
+
+THREE MORE RIDE EVERY TOOL AND CARRY THE SAFETY RULE. `named_driver` is the
+strength the step was told it needs; `went_weaker` is your own word that a
+weaker hand took it; `weaker_reason` is why. Saying you went weaker and
+giving no reason marks the record `unreasoned` — marked, never refused.
 
 TWO DOORS LEAD OUTSIDE THE ROOT, and neither is a path. A past version of this
 repo is read at a committed ref — `se_file_read`, `se_file_search` and

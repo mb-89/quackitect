@@ -1,8 +1,8 @@
 ---
 form: verification
 by: agent
-signed_off: 2026-08-20T21:31:27.661Z
-reopened: "2026-08-20T21:31:25.664Z — the tester's nine findings are fixed. One was a live defect this build introduced — a lane call with a bad part vanished from the log — and one was a lookup that had never worked, which is why deleting it changed no test. The battery re-runs against the fixed tree."
+signed_off: 2026-08-20T23:56:11.729Z
+reopened: "2026-08-20T23:56:09.727Z — trace-design was re-signed after this state: the machinery-ascends rule moved out of an engine comment and onto dsp-walk-machine.md, and tests/reopen-past-a-sub.test.ts now guards it. The battery re-runs against the tree that carries both."
 authors: agent
 files:
 ---

@@ -1,8 +1,9 @@
 ---
 form: gate-validation
 bless: blessed by agent
+reopened: "2026-08-20T23:57:13.034Z — the machinery-ascends repair landed below this: a reopened claim on a state that runs a sub-machine is reachable from inside that sub, and its submit is legal there. dsp-walk-machine.md carries the design and tests/reopen-past-a-sub.test.ts guards it. No shipped behaviour this state answers for changed."
 by: agent
-signed_off: 2026-08-20T22:04:17.084Z
+signed_off: 2026-08-20T23:57:15.806Z
 authors: agent
 files:
 ---

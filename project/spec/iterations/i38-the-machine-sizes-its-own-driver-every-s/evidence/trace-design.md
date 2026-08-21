@@ -1,7 +1,8 @@
 ---
 form: trace-design
 by: agent
-signed_off: 2026-08-20T20:45:33.435Z
+signed_off: 2026-08-20T23:53:36.694Z
+reopened: "2026-08-20T23:49:47.754Z — the walk standing inside a sub is standing in the state that RUNS it, and the submit guard did not know that: the form was served at run-demos/end and its own submit refused."
 authors: agent
 files:
 ---
@@ -20,6 +21,15 @@ BOTH SPECS CLAIMED A FILE NOTHING LANDED IN, and this is the state that catches 
 | --- | --- | --- |
 | [[dsp-the-sizing-block]] | el-sizing · if-engine-delta-to-sizing · if-method-compiler-to-sizing | project/deliverable/engine/sizing.ts · project/deliverable/engine/rigor-matrix.ts · project/deliverable/engine/machine.ts · project/deliverable/engine/session.ts |
 | [[dsp-the-three-coordinates-on-a-call]] | el-account | project/deliverable/engine/calllog.ts · project/deliverable/engine/tools.ts · project/deliverable/engine/tools-run.ts · project/deliverable/engine/mirror.ts · project/deliverable/engine/session.ts |
+
+### THE SUBMIT GUARD TOOK THE SAME ASCENT
+
+Serving the parent's form at the sub's end was half the repair: the stamp then
+refused, because "the walk stands in this state" also read the leaf alone. A
+walk inside a sub IS standing in the state that runs it.
+
+WHERE IT LIVES: `dsp-walk-machine.md` § Machinery ascends to the state that
+runs the sub, closing paragraph.
 
 ## follow_up
 
