@@ -20,26 +20,15 @@
 import { strict as assert } from "node:assert";
 import { spawnSync } from "node:child_process";
 import { test } from "node:test";
-import { Rejection } from "../engine/errors.ts";
 import { Session } from "../engine/session.ts";
-import { bootedServer, call, freshRoot, gitInit, readEverything } from "./helpers.ts";
-
-async function refusal(fn: () => Promise<unknown>): Promise<Rejection> {
-  try {
-    await fn();
-  } catch (e) {
-    if (e instanceof Rejection) return e;
-    throw e;
-  }
-  throw new Error("expected a refusal, got a value");
-}
+import { bootedServer, call, freshRoot, gitInit, readEverything, refusalAsync } from "./helpers.ts";
 
 test("a choice where the road has not split is answered as a choice, not as a form", async () => {
   // A fresh session aims at the desk, so the road has not split and no choice
   // was offered — which is exactly the position the i15 walk kept sending
   // doors from.
   const s = new Session(freshRoot());
-  const r = await refusal(() => s.pull({ form: { choice: "front_desk" } }));
+  const r = await refusalAsync(() => s.pull({ form: { choice: "front_desk" } }));
   assert.match(r.got, /a choice of/, `the refusal still describes a form nobody asked for: "${r.got}"`);
   assert.doesNotMatch(r.got, /a filled form/, "a choice is still reported as a filled form");
   assert.match(r.got, /branching point/, "the refusal never says why a choice is not readable here");
@@ -47,7 +36,7 @@ test("a choice where the road has not split is answered as a choice, not as a fo
 
 test("it hands over the doors it computed, or the verb that aims when there are none", async () => {
   const s = new Session(freshRoot());
-  const r = await refusal(() => s.pull({ form: { choice: "front_desk" } }));
+  const r = await refusalAsync(() => s.pull({ form: { choice: "front_desk" } }));
   const said = `${r.remedy?.tool} ${r.remedy?.note}`;
   assert.match(said, /se_aim|doors from here/, `the refusal names no way to move at all: "${said}"`);
   // The remedy tool is se_pull where doors exist — sending one IS a pull — so
@@ -65,7 +54,7 @@ test("the same door sent three ways gets three answers about the door", async ()
   // flag beside it. None of them may come back as an unwanted-form refusal.
   for (const shape of [["front_desk"], "front_desk", "main/front_desk"]) {
     const s = new Session(freshRoot());
-    const r = await refusal(() => s.pull({ form: { choice: shape } as Record<string, unknown> }));
+    const r = await refusalAsync(() => s.pull({ form: { choice: shape } as Record<string, unknown> }));
     assert.doesNotMatch(r.got, /a filled form, but nothing/, `a choice shaped as ${JSON.stringify(shape)} is answered as an unwanted form`);
   }
 });
@@ -74,7 +63,7 @@ test("a payload with no choice in it still gets the form refusal", async () => {
   // The other branch must not regress. A section nobody asked for is not an
   // aim, and the old wording is the right answer for it.
   const s = new Session(freshRoot());
-  const r = await refusal(() => s.pull({ form: { some_section_nobody_asked_for: "text" } }));
+  const r = await refusalAsync(() => s.pull({ form: { some_section_nobody_asked_for: "text" } }));
   assert.match(r.got, /filled form/, `a non-choice payload is now answered as a choice: "${r.got}"`);
 });
 
@@ -98,7 +87,7 @@ test("a choice while a form is owed says so, and names the ways forward and back
   await s.pull({ form: { choice: door } });
   await readEverything(s);
 
-  const r = await refusal(() => s.pull({ form: { choice: "there-is-no-such-state-here" } }));
+  const r = await refusalAsync(() => s.pull({ form: { choice: "there-is-no-such-state-here" } }));
   assert.match(r.got, /a choice/, `the refusal does not mention the choice: "${r.got}"`);
   assert.match(r.got, /nothing was saved/, "the refusal does not say the payload was dropped");
   assert.match(String(r.remedy?.note ?? ""), /go FORWARD|se_reopen/, "the refusal names no way to move");

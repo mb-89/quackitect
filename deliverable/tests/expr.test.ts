@@ -9,9 +9,9 @@
 // unit of parallelism and nothing inside it needs isolating.
 import { strict as assert } from "node:assert";
 import { describe, test } from "node:test";
-import { Rejection } from "../engine/errors.ts";
 import { type Ctx, evalExpr, passes, registerGlobal } from "../engine/expr.ts";
 import { type Duration, Link, parseDuration, toText, typeOf } from "../engine/expr-value.ts";
+import { refusal } from "./helpers.ts";
 
 const row = (over: Record<string, unknown> = {}): Ctx["row"] => ({
   status: "open",
@@ -25,17 +25,6 @@ const row = (over: Record<string, unknown> = {}): Ctx["row"] => ({
 const ctx = (over: Partial<Ctx> = {}): Ctx => ({ row: row(), ...over });
 
 const ev = (src: string, c: Ctx = ctx()): unknown => evalExpr(src, c);
-
-/** assert.throws cannot hand the error back, and these refusals say things worth reading. */
-function refusal(fn: () => unknown): Rejection {
-  try {
-    fn();
-  } catch (e) {
-    if (e instanceof Rejection) return e;
-    throw e;
-  }
-  throw new Error("expected a refusal, got a value");
-}
 
 describe("call-by-name — the constraint that shapes the evaluator", () => {
   test("filter binds `value` per element", () => {
@@ -254,7 +243,7 @@ describe("filters over rows — what a view actually runs", () => {
     assert.equal(passes('kind == "matrix-row"', ctx({ row: row({ kind: "matrix-row" }) })), true);
     assert.equal(passes('kind == "matrix-row"', ctx({ row: row({ kind: "other" }) })), false);
   });
-  test("a bare property means it carries something", () => {
+  test("the expression evaluator treats a bare property as presence", () => {
     assert.equal(passes("status", ctx()), true);
     assert.equal(passes("missing", ctx()), false);
   });

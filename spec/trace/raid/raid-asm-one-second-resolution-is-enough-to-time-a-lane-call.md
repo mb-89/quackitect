@@ -7,6 +7,7 @@ statement: "The one-second convention that bounds every modelled interface is fi
 owner: the maintainer of the machine
 trigger: the first report that ranks states by cost
 status: open
+probed: "unprobed 2026-08-21 — the required resolution study belongs with benchmark work; i45 does not change the timing convention or benchmark reporting."
 impact: "A ranking built on a clock coarser than the thing it measures orders states by rounding. Improvements smaller than the tick are invisible, which is most of them."
 breaks_how_badly: corrosive
 how_likely: plausible

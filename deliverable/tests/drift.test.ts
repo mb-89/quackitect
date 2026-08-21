@@ -6,7 +6,6 @@
 // against a question that no longer existed. These tests hold the recomputed
 // answer: on a look, and on the walk's arrival.
 import { strict as assert } from "node:assert";
-import { spawnSync } from "node:child_process";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
@@ -28,27 +27,14 @@ import { type ChangeColumn, compileColumn, readRigorMatrix } from "../engine/rig
 import { Session } from "../engine/session.ts";
 import { Claims } from "../engine/sessionclaims.ts";
 import { corpusAsks } from "../engine/trace.ts";
-import { freshRoot } from "./helpers.ts";
+import { freshRoot, gitInit } from "./helpers.ts";
 
 const SIZE: ChangeColumn = "minor";
-
-function gitInit(root: string): void {
-  for (const a of [
-    ["init"],
-    ["config", "user.email", "se@test.local"],
-    ["config", "user.name", "se test"],
-    ["add", "-A"],
-    ["commit", "-q", "-m", "seed"],
-  ]) {
-    const r = spawnSync("git", a, { cwd: root, encoding: "utf8", windowsHide: true });
-    if (r.status !== 0) throw new Error(`git ${a.join(" ")} failed: ${r.stderr}`);
-  }
-}
 
 /** A root with one seeded iteration, pinned from the matrix as it stands. */
 function pinned(): { root: string; it: Iteration; pinAbs: string } {
   const root = freshRoot();
-  gitInit(root);
+  gitInit(root, true);
   const it = itSeed(root, "drift", "the matrix moves under a standing pin", ["e13"]);
   pinIteration(root, it, SIZE);
   return { root, it, pinAbs: join(it.path, itPinRel(it.id)) };

@@ -18,21 +18,10 @@
 // corrected call returned.
 import { strict as assert } from "node:assert";
 import { describe, test } from "node:test";
-import { Rejection } from "../engine/errors.ts";
 import { Session } from "../engine/session.ts";
-import { freshRoot, sessionAtIdle } from "./helpers.ts";
+import { freshRoot, refusalAsync, sessionAtIdle } from "./helpers.ts";
 
 const root = (): string => freshRoot();
-
-async function refusal(fn: () => Promise<unknown>): Promise<Rejection> {
-  try {
-    await fn();
-  } catch (e) {
-    if (e instanceof Rejection) return e;
-    throw e;
-  }
-  throw new Error("expected a refusal, got a value");
-}
 
 describe("the multi-agent seam stays open", { concurrency: true }, () => {
   test("a LIST of offered doors takes the first and hands the rest back", async () => {
@@ -57,7 +46,7 @@ describe("illegal stays illegal — the pull is not a way around the contract", 
     // so the offer is tiny and the boundary is the same one idle has.
     const s = new Session(root());
     s.setTarget("");
-    const r = await refusal(() => s.pull({ form: { choice: "a-state-that-does-not-exist" } }));
+    const r = await refusalAsync(() => s.pull({ form: { choice: "a-state-that-does-not-exist" } }));
     assert.match(String(r.expected), /offered doors/);
     assert.ok(r.remedy !== undefined, "a refusal carries the corrected call, always");
   });
@@ -71,14 +60,14 @@ describe("illegal stays illegal — the pull is not a way around the contract", 
     // choice-refused.test.ts: the i15 walk sent one door three ways and got
     // that sentence three times.
     const s = new Session(root());
-    const r = await refusal(() => s.pull({ form: { choice: "front_desk" } }));
+    const r = await refusalAsync(() => s.pull({ form: { choice: "front_desk" } }));
     assert.match(r.got, /a choice of/);
     assert.match(`${r.remedy?.tool} ${r.remedy?.note}`, /se_aim|doors from here/);
   });
 
   test("an evidence form nothing asked for refuses, and the remedy is to pull empty", async () => {
     const s = new Session(root());
-    const r = await refusal(() => s.pull({ form: { "What was done": "something" } }));
+    const r = await refusalAsync(() => s.pull({ form: { "What was done": "something" } }));
     assert.match(r.got, /nothing on the way wants one/);
     assert.equal(r.remedy?.tool, "se_pull");
   });
@@ -86,6 +75,6 @@ describe("illegal stays illegal — the pull is not a way around the contract", 
   test("an empty choice is a malformed call, not a silent no-op", async () => {
     const s = new Session(root());
     s.setTarget("");
-    await refusal(() => s.pull({ form: { choice: [] } }));
+    await refusalAsync(() => s.pull({ form: { choice: [] } }));
   });
 });

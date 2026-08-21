@@ -63,9 +63,9 @@ describe("the standard review rounds", () => {
         for (const g of gates) {
           const names = g.evidence_form.map((f) => f.name);
           for (const r of ROUND_NAMES) {
-            // THE KICKOFF IS EXEMPT FROM goals_served, and from that alone.
-            // It is where the goals are written, so it has produced nothing
-            // to measure against them yet. roundsFor holds the rule.
+            // KICKOFF DEFINES the goals, so no prior step can serve them.
+            // Motivation still checks the completed vision, frame, scope and
+            // risk steps. roundsFor holds the sole kickoff exemption.
             if (r === "goals_served" && g.id === "gate-kickoff") continue;
             assert.ok(names.includes(r), `${column}/${g.id} is missing ${r} — the compiler must add it, not the row author`);
           }

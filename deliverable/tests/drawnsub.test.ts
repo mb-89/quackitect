@@ -9,7 +9,6 @@
 // The walk and the view disagreeing about what exists is the worst shape for
 // this: nothing errors, and the reader concludes the state is empty.
 import { strict as assert } from "node:assert";
-import { spawnSync } from "node:child_process";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
@@ -17,26 +16,13 @@ import { itFind, pinIteration } from "../engine/iterations.ts";
 import { compileMachine } from "../engine/machines/compile.ts";
 import { renderMirror } from "../engine/render.ts";
 import { Session } from "../engine/session.ts";
-import { checkDocs, freshRoot } from "./helpers.ts";
-
-function gitInit(root: string): void {
-  for (const a of [
-    ["init"],
-    ["config", "user.email", "se@test.local"],
-    ["config", "user.name", "se test"],
-    ["add", "-A"],
-    ["commit", "-q", "-m", "seed"],
-  ]) {
-    const r = spawnSync("git", a, { cwd: root, encoding: "utf8", windowsHide: true });
-    if (r.status !== 0) throw new Error(`git ${a.join(" ")} failed: ${r.stderr}`);
-  }
-}
+import { checkDocs, freshRoot, gitInit } from "./helpers.ts";
 
 /** A root with one iteration open and its column pinned to major, which is
  *  the only column that carries enumerate-space. */
 async function rootWithMajorIteration(): Promise<{ session: Session; root: string; id: string }> {
   const root = freshRoot();
-  gitInit(root);
+  gitInit(root, true);
   // THE CHART'S OPTIONS EXIST BEFORE THE SESSION DOES. A morph-box field
   // declares `resolves: artifact`, so the two options the fixture draws must be
   // real nodes — and the corpus is stamped, so writing them after the session

@@ -11,25 +11,14 @@
 // that has stopped is exactly what idle means.
 import { strict as assert } from "node:assert";
 import { describe, test } from "node:test";
-import { Rejection } from "../engine/errors.ts";
 import { loadPanel, type PanelValues, parsePanel, renderPanel, toggleKey } from "../engine/params.ts";
 import { Session } from "../engine/session.ts";
 import { Liveness } from "../engine/sessionlive.ts";
-import { freshRoot } from "./helpers.ts";
+import { freshRoot, refusal } from "./helpers.ts";
 
 const VALUES: PanelValues = { rungs: [], autonomy: 0, ints: {} };
 
 const panel = (line: string): ReturnType<typeof parsePanel> => parsePanel(`## Parameters\n\n- ${line}\n`);
-
-function refusal(fn: () => unknown): Rejection {
-  try {
-    fn();
-  } catch (e) {
-    if (e instanceof Rejection) return e;
-    throw e;
-  }
-  throw new Error("expected a refusal, got a value");
-}
 
 describe("the toggles parameter type", () => {
   test("a key falls out of the label, so the spec stays readable prose", () => {

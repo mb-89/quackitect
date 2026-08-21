@@ -12,20 +12,9 @@ import { join } from "node:path";
 import { describe, test } from "node:test";
 import { setSource, toggleProperty } from "../engine/bases.ts";
 import { basesCard, HELP_TOPICS, helpFor, propertyInventory } from "../engine/baseui.ts";
-import { Rejection } from "../engine/errors.ts";
 import { GLOBALS } from "../engine/expr.ts";
 import { type Row, Vault } from "../engine/vault.ts";
-
-/** assert.throws cannot hand the error back, and these refusals say things worth reading. */
-function refusal(fn: () => unknown): Rejection {
-  try {
-    fn();
-  } catch (e) {
-    if (e instanceof Rejection) return e;
-    throw e;
-  }
-  throw new Error("expected a refusal, got a value");
-}
+import { refusal } from "./helpers.ts";
 
 const BASE = `views:
   - type: table

@@ -7,7 +7,7 @@ statement: A job asked how much longer it needs can answer from work already rec
 owner: the driving agent
 trigger: the first time a job is asked for a time remaining on a machine that has never run it
 status: open
-probed: ""
+probed: "unprobed 2026-08-21 — i51 owns the background-job status path needed for the fresh-timing-store check; this i45 test-maintenance iteration does not alter or delete that store."
 probe: "Start a battery on a container with no recorded timings and ask it how much longer it needs. Read what the answer says."
 impact: "The estimate is the whole point of the first goal. Where no history exists the arithmetic has no inputs, so the answer is either absent or invented, and an invented one is worse than none."
 breaks_how_badly: corrosive
