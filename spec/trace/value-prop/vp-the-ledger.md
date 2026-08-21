@@ -19,6 +19,12 @@ priority: must
 - A new session resumes without re-deriving settled decisions.
   Metric: settled questions reopened after a compaction or a session change. Target: zero.
 
+- A FINISHED WALK SAYS WHICH HAND DID WHICH PART OF IT, and on what model.
+  Metric: states in a completed record whose calls carry no part and no answering model. Target: zero.
+  ABSORBED FROM A PROPOSITION OF ITS OWN, at the owner's ruling. Four coordinates make the answer: the model that ANSWERED rather than the one asked for, the state the call was made in, the PART the caller played, and the origin of a relay where one hand files another's work.
+  THE PART IS THE COORDINATE THE MODEL CANNOT STAND IN FOR. A guide inherits the session model, so grouping by model returns one bucket for two hands. A walker filing a guide's judgment under its own name defeats this entirely.
+  IT IS NOT A CLAIM THAT THE RECORD IS TRUSTWORTHY YET. The only party who knows which model answered is the party being measured, so this rests on self-report with an open assumption under it.
+
 ## Unlike
 
 An agent runtime with an audit log. Those record who ran what, never whether the work earned its way. The difference is that this record is refusable — a claim can be rejected, and the rejection is itself recorded.

@@ -23,6 +23,14 @@ priority: must
   Metric: engine code changed to add a new bound check. Target: none, on the same reasoning as the first criterion above. A check binds to an el- element or a dsp- design spec the way a machine compiles from a drawing.
   Added by i6.
 
+- THE MACHINE NAMES THE DRIVER EACH STEP NEEDS. That is a fifth consequence the drawing attaches, beside a state refusing tools, a gate refusing passage and a write refusing a break.
+  Metric: states carrying no driver rating. Target: none.
+  Metric: the same milestone naming two different drivers on two machines. Target: zero.
+  ABSORBED FROM A PROPOSITION OF ITS OWN, at the owner's ruling. THE MACHINE SAYS AND DOES NOT DO: it names the driver, and starting a process stays outside the lane with pushing and opening records.
+  IT IS NOT A ROUTER. Nothing predicts a difficulty per request or learns from outcomes. The rating is declared in the repository and read live, which buys reproducibility and gives up fitness, deliberately.
+  IT IS NOT AN ORDER EITHER. The machine recommends and the agent judges. A recommendation the agent may not refuse would put the sizing decision inside the very state whose difficulty is in question.
+  THE SPENDING HALF of the same proposition sits with [[vp-rigor-without-toil]].
+
 BOTH MEASURES USED TO COUNT CLAIMS, and i34 retired the claim system whole.
 The first read "double-claimed iterations" and the second "acts from clone to
 first claimed iteration". Neither counts anything now.

@@ -5,7 +5,7 @@ type: "[[story]]"
 statement: An engineer sends a night's work to a cloud box on a cheap model, and wakes up to signed states rather than to a transcript of an agent failing to understand its own instructions.
 actor: stk-engineer-driving-agents
 refines:
-  - vp-a-cheaper-model-does-the-mechanical-work
+  - vp-rigor-without-toil
 priority: must
 ---
 

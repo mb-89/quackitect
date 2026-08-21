@@ -5,7 +5,7 @@ type: "[[story]]"
 statement: An engineer opens a finished record and asks which parts were walked by which hand and on what model, and the log answers instead of the engineer having to remember.
 actor: stk-engineer-driving-agents
 refines:
-  - vp-a-finished-walk-can-say-who-did-which-part-of-it
+  - vp-the-ledger
 priority: should
 ---
 

@@ -18,6 +18,42 @@ Lives in `spec/trace/value-prop/`. It is a STANDING ARTIFACT: it
 outlives the iteration that authored it, lands on trunk when that record
 closes, and a later record may change it.
 
+## AN AGENT NEVER MINTS ONE UNASKED
+
+Owner ruling 2026-08-21. A value proposition is added ONLY where the person
+asked for one, in words. No amount of "this one clearly deserves it"
+substitutes for being asked.
+
+THIS IS A PERMISSION RULE AND NOT A TASTE RULE, which is what makes it
+different from everything below it. The two rulings on this page already ask
+for restraint: mint sparingly, and keep it high-level. Both were in force
+while four propositions were minted that the owner later had to fold away by
+hand.
+
+- Attribution, which was ledger material.
+- A cheaper model doing the mechanical work, which was the engineer's bill.
+- The machine sizing its own driver, which was engine and bill in one.
+- Vendoring, which was the engine.
+
+EVERY ONE OF THEM READ AS OBVIOUSLY WARRANTED TO ITS AUTHOR. That is why
+restraint failed. An instruction to be conservative is applied by the same
+judgment that wanted the proposition, so it never bites. A permission rule
+does, because it does not ask the author to weigh anything.
+
+WHAT TO DO INSTEAD, because the detail is usually real and only homeless.
+
+- A promise about how the machine itself runs is a criterion under
+  vp-the-engine.
+- Anything about the person's time, budget or capability spend is a criterion
+  under vp-rigor-without-toil.
+- Anything the record must answer afterwards is a criterion under
+  vp-the-ledger.
+- Everything else is a story, a use case, a requirement, or a quality row.
+
+RECOMMEND IT AND STOP, exactly as with opening a record. Name the proposition
+you would mint, say why in a sentence, and carry on with the work. The
+person's word is what mints it.
+
 MINT ONE SPARINGLY (owner ruling 2026-08-19). A value proposition is something you would take to a CUSTOMER and market. If you would not put it in front of somebody deciding whether to use the product, it is not one.
 
 THE TEST, and it is deliberately hard to pass. Would this sentence persuade a buyer? Internal machinery, process hygiene and engineering tidiness all fail it, however useful they are. They are requirements, functions or qualities instead, and each of those has its own home lower in the trace.

@@ -5,7 +5,7 @@ type: "[[story]]"
 statement: An engineer starts a walk without choosing a model for it, and each milestone opens by naming the hands its own work needs.
 actor: stk-engineer-driving-agents
 refines:
-  - vp-the-machine-says-how-strong-a-hand-each-step-needs
+  - vp-the-engine
 priority: must
 ---
 

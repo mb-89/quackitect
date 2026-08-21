@@ -38,6 +38,16 @@ priority: must
   Added by i37. Every criterion above this one measures a thing that should FALL toward zero. This one measures whether the falling is real, because until now nothing compared two machine versions on the same work. THE OWNER'S FRAMING, 2026-08-19: "does a weak model with an improved machine work similarly to an old model with the old machine? If we improve the system, can we use weaker and weaker models to do the same work?"
   WHAT IT DELIBERATELY DOES NOT CLAIM. A benchmark measures process overhead and never production behaviour, because the agent is told the output is discarded. That limit is carried by raid-asm-an-agent-told-its-work-is-discarded-still-walks-the-machine-the-same-way rather than left to be discovered.
 
+- THE MECHANICS COST NO CAPABILITY. A record walks to its gates on a small model, reaching the same signed states, and the difference shows in the bill rather than in the record.
+  Metric: states a small model cannot sign that a large one can. Target: zero.
+  Metric: a walk's calls spent working out what the machine wanted rather than doing the state in hand. Target: falling.
+  ABSORBED FROM A PROPOSITION OF ITS OWN, at the owner's ruling. The strong model is still worth its price. It buys better judgment INSIDE a state, and it should not have to buy the ability to read the instructions.
+  WHERE THE COST ACTUALLY LANDS IS NOT WHERE IT LOOKS. A capable model reads a wrong instruction, ignores it, and reads the live answer instead. A smaller one believes the instruction. So guidance that has drifted from the engine is invisible until a small model is pointed at it, and guidance quality IS the mechanism this rests on.
+
+- CAPABILITY IS SPENT WHERE THE WORK IS HARD, never everywhere. Asking for a stronger hand is free and asking for a weaker one costs a recorded sentence, so the asymmetry runs the safe way.
+  Metric: milestones walked by a driver stronger than the step was rated for. Target: falling.
+  THIS IS THE SPENDING HALF of a proposition whose deciding half now sits with [[vp-the-engine]]. The machine names the driver; this one is the bill that naming saves.
+
 ## Unlike
 
 Requirements-management suites, which hold the input-quality corner for human authors and expect the human to do the writing. The difference is that the method is carried by the agent, and the person is left the one job a person is better at.

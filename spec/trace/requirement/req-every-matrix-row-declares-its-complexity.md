@@ -11,7 +11,7 @@ refines:
   - uc-let-the-machine-name-the-driver
 source_refs:
   - "uc-let-the-machine-name-the-driver step 2"
-  - "vp-the-machine-says-how-strong-a-hand-each-step-needs"
+  - "vp-the-engine"
   - "raid-risk-a-hand-declared-rung-drifts-upward-and-nothing-ever-says-so"
 priority: must
 ---

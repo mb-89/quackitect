@@ -17,7 +17,7 @@ source_refs:
   - i38-the-machine-sizes-its-own-driver-every-s
   - raid-the-read-proof-locks-weaker-models-out-of-the-system
   - raid-asm-refusals-recover-a-weak-model
-  - vp-a-cheaper-model-does-the-mechanical-work
+  - vp-rigor-without-toil
 weighs_with: raid-the-read-proof-locks-weaker-models-out-of-the-system
 weighs_against: none
 ---

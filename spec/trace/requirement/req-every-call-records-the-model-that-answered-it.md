@@ -13,7 +13,7 @@ source_refs:
   - "uc-attribute-a-finished-walk step 3"
   - "uc-attribute-a-finished-walk ext 3a"
   - "raid-asm-the-answering-model-can-be-recorded-when-only-the-agent-knows-it"
-  - "vp-a-finished-walk-can-say-who-did-which-part-of-it"
+  - "vp-the-ledger"
 priority: must
 ---
 

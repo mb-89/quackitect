@@ -38,14 +38,20 @@ product: full
 specification: full
 major_note: |
   Applies in full for the change: the gap claim for what the major
-  answers and the why-now. Then the value props it extends or creates, and the needs with
+  answers and the why-now. Then the value props it EXTENDS - creating one needs
+  the person's word - and the needs with
   pass lines. The resident frame inherits where the change does not touch
   it. This is where a major proves it deserves its cost.
 minor_note: |
   THE CENTER OF GRAVITY BEGINS HERE, and only the new half is asked. The
-  delta's new needs are written in full: which value prop they extend (or
-  the one new prop they create), their need|outcome lines, and their PASS
-  LINES - a criterion nothing will check is not a criterion, at any size.
+  delta's new needs are written in full: which value prop they extend, their
+  need|outcome lines, and their PASS LINES - a criterion nothing will check is
+  not a criterion, at any size.
+
+  A NEW PROP IS NOT YOURS TO MINT (owner ruling 2026-08-21). Extend one that
+  already stands. Where none fits, name the proposition you would mint and say
+  why in one sentence, then carry on with the work - the person's word is what
+  mints it. The value-prop item template carries the reasoning.
 
   THE GAP CLAIM AND THE WHY-NOW ARE NOT ASKED (owner ruling 2026-08-13).
   They stand from the resident frame, and the form drops them mechanically

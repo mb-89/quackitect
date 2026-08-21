@@ -14,7 +14,7 @@ refines:
 source_refs:
   - uc-let-the-machine-name-the-driver
   - req-one-model-list-is-read-live-from-the-repository
-  - vp-the-machine-says-how-strong-a-hand-each-step-needs
+  - vp-the-engine
   - i38-the-machine-sizes-its-own-driver-every-s
 priority: must
 weighs_against:
