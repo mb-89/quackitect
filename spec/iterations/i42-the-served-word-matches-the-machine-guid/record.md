@@ -29,6 +29,12 @@ THE VOICE-LINT RULES THEMSELVES BELONG TO i25, which carries the owner's standin
 - spec/overhauls/2026-08-20/plan.md
 - spec/overhauls/2026-08-20/findings.md
 
+## Boundary with i59
+
+THE voice_matrix FOLD MEETS i59 IN ONE FILE. i59 adds the trunk-hygiene rules to voice-lint.md and arms them on its `blocking:` list. Whichever of the two lands second preserves the other's rows rather than rewriting the file.
+
+NEITHER ORDER IS FORCED. The fold is a move; the rules are content. They only collide if one is written as a whole-file replacement.
+
 ## Carried work tokens
 
 These stood in the options pool referenced by no iteration at all. Assigned

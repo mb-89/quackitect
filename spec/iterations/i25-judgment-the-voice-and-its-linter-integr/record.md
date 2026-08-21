@@ -39,6 +39,8 @@ inputs:
   - spec/decisions/adr-glossary-discipline.md at ref main
   - product/engine-go/autolink.go at ref main
   - project/guidance/voice.md
+depends_on:
+  - i59-trunk-states-the-present-provenance-argu
 ---
 
 # i25-judgment-the-voice-and-its-linter-integr
@@ -46,6 +48,14 @@ inputs:
 ## Goal
 
 JUDGMENT — the voice and its linter: integrate Vale, teach it ASD-STE100, arm it at zero debt, and bring back the glossary discipline and the link graph.
+
+## Boundary
+
+THE ZERO COMES FROM i59. That iteration drains provenance, superseded text and dated attributions off trunk. Arming here needs that drain finished, which is why this record now depends on it.
+
+THE STE ISSUE IS THE NEWEST ONE. The input above is Issue 9 and that stands; do not drop to an earlier issue because a vendor page lists one.
+
+THE FINDING IN THE VISION ABOVE IS i59'S SUBJECT. Prose that reaches for history to explain a rule is the same defect from the writing side. This record owns the linter; i59 owns the surface rule and the corpus.
 
 ## Rough vision
 
