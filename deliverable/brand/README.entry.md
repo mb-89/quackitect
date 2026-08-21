@@ -33,7 +33,7 @@ Open the command palette and run "$PRODUCT$: How to Attach Your Agent".
 
 ## Give it to someone else
 
-Open the command palette and run "$PRODUCT$: Make a Copy of This System".
+Open the command palette and run "$PRODUCT$: Create a Vehicle".
 
 It asks where to put it, what to call it, and a short name of two or three
 letters. It makes a fresh copy under that name, with its own empty git repo,

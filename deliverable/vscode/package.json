@@ -60,12 +60,12 @@
       },
       {
         "command": "$PRODUCT_ID$.createVehicle",
-        "title": "$PRODUCT$: Make a Copy of This System",
+        "title": "$PRODUCT$: Create a Vehicle",
         "icon": "$(repo-clone)"
       },
       {
         "command": "$PRODUCT_ID$.createProject",
-        "title": "$PRODUCT$: Start a Project This System Drives",
+        "title": "$PRODUCT$: Create a Project",
         "icon": "$(new-folder)"
       },
       {

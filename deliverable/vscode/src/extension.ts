@@ -1089,8 +1089,8 @@ class Strip {
     //
     // THEY SIT LAST because they are rare. A person opens the book daily and
     // makes a copy once.
-    list.push({ cmd: "$PRODUCT_ID$.createVehicle", icon: ICON.copy, label: "Copy this system", key: "" });
-    list.push({ cmd: "$PRODUCT_ID$.createProject", icon: ICON.newFolder, label: "Start a project", key: "" });
+    list.push({ cmd: "$PRODUCT_ID$.createVehicle", icon: ICON.copy, label: "Create a vehicle", key: "" });
+    list.push({ cmd: "$PRODUCT_ID$.createProject", icon: ICON.newFolder, label: "Create a project", key: "" });
     return list;
   }
   page() {

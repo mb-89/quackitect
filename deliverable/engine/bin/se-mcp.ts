@@ -128,9 +128,8 @@ LAUNCH — read by RUNME.ps1 before the server starts.
                  your browser, with no VS Code. It still works exactly as it
                  did. It is simply no longer what you get by default.
   (no --export)  making a copy is a BUTTON now. Open the command palette and
-                 run "Make a Copy of This System", or "Start a Project This
-                 System Drives". Each asks for what it needs and opens what it
-                 made in a new window.
+                 run "Create a Vehicle", or "Create a Project". Each asks for
+                 what it needs and opens what it made in a new window.
                  THE FLAG IS GONE ON PURPOSE. A second way to do it, in the
                  document a newcomer reads first, is exactly the problem the
                  button was built to remove.

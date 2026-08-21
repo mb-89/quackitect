@@ -76,7 +76,7 @@ time; until that rendering moves to activation time, this row stands.
 
 ## Give it to someone else
 
-Open the command palette and run **Make a Copy of This System**.
+Open the command palette and run **Create a Vehicle**.
 
 It asks for three things:
 
@@ -95,7 +95,7 @@ When it is made, it opens in a new window. This one is left as you left it.
 
 ## Start a project it drives
 
-Open the command palette and run **Start a Project This System Drives**.
+Open the command palette and run **Create a Project**.
 
 The work lives in its own tree, carrying none of the method. One small file in
 it says which copy drives it, by identity rather than by location, so moving
