@@ -1,5 +1,5 @@
 ---
-minted_in: i51
+minted_in: i51-work-running-out-of-sight-reports-itself
 id: if-work-registry-to-walk-engine
 type: "[[interface]]"
 statement: The account of work out of sight is handed to the lane's own answer, riding beside whatever the caller asked for.

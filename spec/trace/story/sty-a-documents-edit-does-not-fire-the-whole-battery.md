@@ -1,5 +1,5 @@
 ---
-minted_in: i51
+minted_in: i51-work-running-out-of-sight-reports-itself
 id: sty-a-documents-edit-does-not-fire-the-whole-battery
 type: "[[story]]"
 statement: When I ask a test question after changing only documents, I want the engine to say that no test answers for the diff rather than running every test it has, so the answer costs what the question is worth.

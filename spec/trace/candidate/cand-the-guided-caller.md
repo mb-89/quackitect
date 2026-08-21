@@ -1,5 +1,5 @@
 ---
-minted_in: i51
+minted_in: i51-work-running-out-of-sight-reports-itself
 id: cand-the-guided-caller
 type: "[[candidate]]"
 name: "The guided caller"

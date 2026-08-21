@@ -1,5 +1,5 @@
 ---
-minted_in: i51
+minted_in: i51-work-running-out-of-sight-reports-itself
 id: tsp-the-account-of-work-out-of-sight
 type: "[[test-spec]]"
 statement: One call lists every kind of work the session has started, and every entry states how much longer it needs together with what that figure rests on.

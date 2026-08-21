@@ -1,5 +1,5 @@
 ---
-minted_in: i51
+minted_in: i51-work-running-out-of-sight-reports-itself
 id: raid-asm-starting-a-judgment-is-far-cheaper-than-answering
 type: "[[raid]]"
 kind: assumption

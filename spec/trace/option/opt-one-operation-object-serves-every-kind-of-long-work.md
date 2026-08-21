@@ -1,5 +1,5 @@
 ---
-minted_in: i51
+minted_in: i51-work-running-out-of-sight-reports-itself
 id: opt-one-operation-object-serves-every-kind-of-long-work
 type: "[[option]]"
 statement: every method that may run long returns the same operation object, and one shared service answers about all of them, so no caller ever learns a second door

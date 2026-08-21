@@ -23,6 +23,9 @@ export interface ScriptHost {
   leaves(): { machine: MachineDecl; ids: string[] };
   state(m: MachineDecl, id: string): StateDecl;
   notifyChange(): void;
+  /** WRITE A SETTLED JUDGMENT WHERE THE STEP'S OTHER STANDINGS LIVE. The
+   *  evidence map below dies with the process; this does not. */
+  recordVerdict(m: MachineDecl, s: StateDecl, ok: boolean): void;
   readonly evidence: Map<string, Record<string, unknown>>;
 }
 
@@ -152,6 +155,10 @@ export class Scripts {
       }
       const result = { ok, output: outputs.join("\n"), at: new Date().toISOString() };
       this.host.evidence.set(key, { ...(this.host.evidence.get(key) ?? {}), script_result: result });
+      // AND IT LANDS SOMEWHERE THAT OUTLIVES THE PROCESS. The map above is
+      // memory; a step left deciding when the session ends needs the verdict on
+      // disk or the repository cannot settle the word.
+      this.host.recordVerdict(machine, s, ok);
       this.host.notifyChange();
       return { state: `${machine.id}/${s.id}`, script_result: result };
     })().finally(() => this.scriptRuns.delete(key));

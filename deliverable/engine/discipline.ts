@@ -191,7 +191,10 @@ export function laneVerdict(seDir: string, command: string, noToolReason?: strin
 // moves the moment any tracked thing does.
 export function testFingerprint(root: string): string {
   const head = spawnSync("git", ["rev-parse", "HEAD"], { cwd: root, encoding: "utf8" });
-  const status = spawnSync("git", ["status", "--porcelain"], { cwd: root, encoding: "utf8" });
+  // EVERY UNTRACKED FILE BY NAME. Plain --porcelain collapses a new directory
+  // into one entry, so the fingerprint could miss a file added inside a folder
+  // that was already listed. Naming them all only ever makes it more sensitive.
+  const status = spawnSync("git", ["status", "--porcelain", "--untracked-files=all"], { cwd: root, encoding: "utf8" });
   if (head.status !== 0 || status.status !== 0) return ""; // no repo — the gate stands aside
   const parts = [head.stdout.trim()];
   for (const line of status.stdout.split("\n")) {
@@ -344,7 +347,12 @@ export function changedSinceBattery(root: string, seDir: string): string[] | und
   const head = state.battery?.head;
   if (head === undefined) return undefined;
   const committed = spawnSync("git", ["diff", "--name-only", `${head}..HEAD`], { cwd: root, encoding: "utf8" });
-  const status = spawnSync("git", ["status", "--porcelain"], { cwd: root, encoding: "utf8" });
+  // EVERY UNTRACKED FILE BY NAME, never the folder holding them. Plain
+  // --porcelain collapses a whole new directory into one entry like `spec/`,
+  // and a decision built on that names a FOLDER where
+  // req-a-diff-no-test-answers-for-is-reported-not-swept demands every changed
+  // part — so a new file nothing tests hid behind its own parent.
+  const status = spawnSync("git", ["status", "--porcelain", "--untracked-files=all"], { cwd: root, encoding: "utf8" });
   if (committed.status !== 0 || status.status !== 0) return undefined;
   const out = new Set<string>();
   for (const line of committed.stdout.split("\n")) {
@@ -391,6 +399,12 @@ export interface ScopeDecision {
   why: string;
   /** see dsp-lane-door.md#whether-this-diff-wants-the-conformance-sweep-too */
   sweep: boolean;
+  /** EVERY changed file no test answers for, whole. The `why` line names only
+   *  the first few so it stays readable, and naming a missing test is what
+   *  makes it findable — so a sentence that stops at three loses the rest for
+   *  good (req-a-diff-no-test-answers-for-is-reported-not-swept). Absent where
+   *  every changed file is answered for. */
+  unanswered?: string[];
 }
 
 /** A CORPUS DOCUMENT: markdown under the spec or the method. Code has tests
@@ -452,7 +466,11 @@ export function decideScope(seDir: string, root: string, force: boolean): ScopeD
   }
 
   const { mapped, unmapped } = mapChangedToTests(root, changed);
-  const unanswered = `${String(unmapped.length)} changed file(s) have no test that answers for them (${unmapped.slice(0, 3).join(", ")}${unmapped.length > 3 ? ", …" : ""})`;
+  // THE SENTENCE NAMES A FEW; THE FIELD CARRIES ALL. A reader needs one
+  // readable line, and a caller needs the whole list to act on.
+  const shown = unmapped.slice(0, 3).join(", ");
+  const rest = unmapped.length > 3 ? `, and ${String(unmapped.length - 3)} more in unanswered` : "";
+  const unanswered = `${String(unmapped.length)} changed file(s) have no test that answers for them (${shown}${rest})`;
 
   // NOTHING MAPS, SO NOTHING FROM THE SUITE RUNS. Running everything here
   // answers a question nobody asked and hides that nothing answers the one that
@@ -464,6 +482,7 @@ export function decideScope(seDir: string, root: string, force: boolean): ScopeD
       files: [],
       why: `no test answers for this diff — ${unanswered}`,
       sweep,
+      unanswered: unmapped,
     };
   }
 
@@ -489,6 +508,7 @@ export function decideScope(seDir: string, root: string, force: boolean): ScopeD
       files: mapped,
       why: `${String(mapped.length)} test file(s) answer for part of this diff, and ${unanswered}`,
       sweep,
+      unanswered: unmapped,
     };
   }
 

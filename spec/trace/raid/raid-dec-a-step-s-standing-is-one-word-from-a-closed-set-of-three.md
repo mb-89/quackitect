@@ -1,5 +1,5 @@
 ---
-minted_in: i51
+minted_in: i51-work-running-out-of-sight-reports-itself
 id: raid-dec-a-step-s-standing-is-one-word-from-a-closed-set-of-three
 type: "[[raid]]"
 kind: decision

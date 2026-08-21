@@ -1,5 +1,5 @@
 ---
-minted_in: i51
+minted_in: i51-work-running-out-of-sight-reports-itself
 id: req-a-pending-verdict-is-recorded-against-its-state
 type: "[[requirement]]"
 statement: While a state's leaving check is running, the product shall record that a verdict is owed against that state, and shall report that condition to every reader of the state's standing.

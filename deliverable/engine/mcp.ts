@@ -158,7 +158,20 @@ export class McpServer {
    *  no cheap question answers it. */
   private refused(id: number | string, name: string, args: Record<string, unknown>, e: Rejection, started: number): JsonRpcResponse {
     const again = this.repeats.refused(name, String(e.toJSON().clause ?? "(unnamed)"));
-    const body = again === undefined ? e.toJSON() : { ...e.toJSON(), repeated: again };
+    // THE CAST IS THE BOUNDARY. A rejection payload is a closed shape and a
+    // decorator takes an open one; they meet exactly here and nowhere else.
+    let body = { ...e.toJSON(), ...(again === undefined ? {} : { repeated: again }) } as Record<string, unknown>;
+    // THE DECORATORS RUN ON A REFUSAL TOO, and until now they ran only on the
+    // success path. A refusal is the ONE answer where a caller most needs to
+    // know a judgment is still in flight — the condition that refused it is
+    // often the very check still running.
+    for (const d of this.decorators) {
+      try {
+        body = d(name, body) as Record<string, unknown>;
+      } catch {
+        // A decorator never turns a refusal into something worse than a refusal.
+      }
+    }
     this.observe({ tool: name, args, ok: false, duration_ms: Date.now() - started, outcome: "rejected", response: body });
     return this.ok(id, {
       content: [{ type: "text", text: boundAnswer(`${name}-refused`, body, this.seDir).text }],

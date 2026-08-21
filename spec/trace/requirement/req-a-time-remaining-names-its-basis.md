@@ -1,5 +1,5 @@
 ---
-minted_in: i51
+minted_in: i51-work-running-out-of-sight-reports-itself
 id: req-a-time-remaining-names-its-basis
 type: "[[requirement]]"
 statement: When the product reports how much longer a piece of work needs, it shall name the measurement that figure was computed from, and where no measurement exists it shall report that it cannot estimate rather than a figure.

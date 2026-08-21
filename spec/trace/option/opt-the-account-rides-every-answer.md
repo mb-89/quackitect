@@ -1,5 +1,5 @@
 ---
-minted_in: i51
+minted_in: i51-work-running-out-of-sight-reports-itself
 id: opt-the-account-rides-every-answer
 type: "[[option]]"
 statement: the account of work out of sight rides on every answer the lane gives, so a caller doing other work learns a job finished without ever asking about it

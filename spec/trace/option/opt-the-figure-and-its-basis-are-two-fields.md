@@ -1,5 +1,5 @@
 ---
-minted_in: i51
+minted_in: i51-work-running-out-of-sight-reports-itself
 id: opt-the-figure-and-its-basis-are-two-fields
 type: "[[option]]"
 statement: the duration and the thing it was computed from are two separate fields on the entry, so a caller that wants a number gets one and a caller that wants to judge it gets the working

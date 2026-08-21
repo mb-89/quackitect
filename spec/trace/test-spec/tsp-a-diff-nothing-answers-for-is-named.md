@@ -1,5 +1,5 @@
 ---
-minted_in: i51
+minted_in: i51-work-running-out-of-sight-reports-itself
 id: tsp-a-diff-nothing-answers-for-is-named
 type: "[[test-spec]]"
 statement: A change that maps to no test starts no test file, and the answer names every changed part that nothing covers.

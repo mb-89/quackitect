@@ -1,5 +1,5 @@
 ---
-minted_in: i51
+minted_in: i51-work-running-out-of-sight-reports-itself
 id: opt-acknowledge-inside-a-second-then-report-every-minute
 type: "[[option]]"
 statement: work that will run long emits an acknowledgement inside the first second and then reports its progress at least once a minute, so the caller is never left guessing and never has to ask

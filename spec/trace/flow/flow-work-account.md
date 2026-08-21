@@ -1,5 +1,5 @@
 ---
-minted_in: i51
+minted_in: i51-work-running-out-of-sight-reports-itself
 id: flow-work-account
 type: "[[flow]]"
 statement: what a caller is told about the work it cannot see — each piece, whether it is still going, how much longer, and what that figure rests on

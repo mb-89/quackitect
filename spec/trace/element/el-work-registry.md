@@ -1,5 +1,5 @@
 ---
-minted_in: i51
+minted_in: i51-work-running-out-of-sight-reports-itself
 id: el-work-registry
 type: "[[element]]"
 statement: Holds every piece of long work the session has started, and answers in one call what is still going, how much longer each piece needs, and what that figure rests on.

@@ -1,5 +1,5 @@
 ---
-minted_in: i51
+minted_in: i51-work-running-out-of-sight-reports-itself
 id: sty-the-step-that-hands-the-walk-back
 type: "[[story]]"
 statement: When I leave a state whose leaving condition runs a long program, I want the call to answer at once and the verdict to arrive later, so my only verb is never held and I am never told the work failed while it was still moving.

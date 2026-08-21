@@ -1,5 +1,5 @@
 ---
-minted_in: i51
+minted_in: i51-work-running-out-of-sight-reports-itself
 id: exp-what-a-fresh-session-sees
 type: "[[experiment]]"
 statement: Can a session that has only the repository learn that a step's leaving judgment was running, and read its verdict once it lands?

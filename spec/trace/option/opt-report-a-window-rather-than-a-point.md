@@ -1,5 +1,5 @@
 ---
-minted_in: i51
+minted_in: i51-work-running-out-of-sight-reports-itself
 id: opt-report-a-window-rather-than-a-point
 type: "[[option]]"
 statement: the entry reports a range with a lower edge a caller can safely wait, rather than a single number that is precise and wrong

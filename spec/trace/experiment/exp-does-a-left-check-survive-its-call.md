@@ -1,5 +1,5 @@
 ---
-minted_in: i51
+minted_in: i51-work-running-out-of-sight-reports-itself
 id: exp-does-a-left-check-survive-its-call
 type: "[[experiment]]"
 statement: Does a step's leaving check, started the way the engine starts one today, run to completion and leave a readable verdict after the call that started it has answered?

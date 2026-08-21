@@ -1,5 +1,5 @@
 ---
-minted_in: i51
+minted_in: i51-work-running-out-of-sight-reports-itself
 id: if-walk-engine-to-work-registry
 type: "[[interface]]"
 statement: A step's leaving judgment registers itself when it starts, and its verdict lands back against the step it belongs to.

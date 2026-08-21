@@ -1,5 +1,5 @@
 ---
-minted_in: i51
+minted_in: i51-work-running-out-of-sight-reports-itself
 id: raid-risk-a-time-remaining-is-believed-more-than-it-deserves
 type: "[[raid]]"
 kind: risk

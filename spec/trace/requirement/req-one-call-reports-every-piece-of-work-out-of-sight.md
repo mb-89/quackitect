@@ -1,5 +1,5 @@
 ---
-minted_in: i51
+minted_in: i51-work-running-out-of-sight-reports-itself
 id: req-one-call-reports-every-piece-of-work-out-of-sight
 type: "[[requirement]]"
 statement: When asked what work is running, the product shall answer with every piece of work the session started, whatever kind it is, in one answer.

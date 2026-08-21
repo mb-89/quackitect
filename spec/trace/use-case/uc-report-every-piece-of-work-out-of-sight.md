@@ -1,5 +1,5 @@
 ---
-minted_in: i51
+minted_in: i51-work-running-out-of-sight-reports-itself
 id: uc-report-every-piece-of-work-out-of-sight
 type: "[[use-case]]"
 statement: Learn what work this session started is still running, and how much longer each piece needs.

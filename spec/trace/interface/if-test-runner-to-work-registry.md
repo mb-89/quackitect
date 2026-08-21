@@ -1,5 +1,5 @@
 ---
-minted_in: i51
+minted_in: i51-work-running-out-of-sight-reports-itself
 id: if-test-runner-to-work-registry
 type: "[[interface]]"
 statement: A scoped run registers itself the moment it starts, and says where its own progress is written.

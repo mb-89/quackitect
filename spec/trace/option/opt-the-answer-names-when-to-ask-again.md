@@ -1,5 +1,5 @@
 ---
-minted_in: i51
+minted_in: i51-work-running-out-of-sight-reports-itself
 id: opt-the-answer-names-when-to-ask-again
 type: "[[option]]"
 statement: the entry says when it is worth asking again, so the interval between asks is decided by the thing that knows how the work is going rather than guessed by the caller

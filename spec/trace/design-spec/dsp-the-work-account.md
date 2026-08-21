@@ -1,5 +1,5 @@
 ---
-minted_in: i51
+minted_in: i51-work-running-out-of-sight-reports-itself
 id: dsp-the-work-account
 type: "[[design-spec]]"
 statement: how every kind of long work becomes one operation in one table, how a duration is computed with its basis beside it, and how the account rides back on the lane's own answer
@@ -9,7 +9,7 @@ realizes:
   - if-walk-engine-to-work-registry
   - if-work-registry-to-walk-engine
 files:
-  - deliverable/engine/workregistry.ts
+  - deliverable/engine/run.ts
   - deliverable/engine/tools-run.ts
   - deliverable/engine/sessionscript.ts
   - deliverable/engine/session.ts

@@ -1,5 +1,5 @@
 ---
-minted_in: i51
+minted_in: i51-work-running-out-of-sight-reports-itself
 id: raid-risk-a-narrower-test-scope-misses-a-break
 type: "[[raid]]"
 kind: risk

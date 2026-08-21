@@ -1,5 +1,5 @@
 ---
-minted_in: i51
+minted_in: i51-work-running-out-of-sight-reports-itself
 id: opt-the-duration-is-computed-when-asked-not-when-started
 type: "[[option]]"
 statement: the time remaining is computed at the moment somebody asks for it, from what the work has done by then, rather than being decided when the work started and carried along unchanged

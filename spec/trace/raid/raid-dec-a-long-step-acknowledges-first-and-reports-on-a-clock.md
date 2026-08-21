@@ -1,5 +1,5 @@
 ---
-minted_in: i51
+minted_in: i51-work-running-out-of-sight-reports-itself
 id: raid-dec-a-long-step-acknowledges-first-and-reports-on-a-clock
 type: "[[raid]]"
 kind: decision

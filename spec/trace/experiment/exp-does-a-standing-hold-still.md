@@ -1,5 +1,5 @@
 ---
-minted_in: i51
+minted_in: i51-work-running-out-of-sight-reports-itself
 id: exp-does-a-standing-hold-still
 type: "[[experiment]]"
 statement: While a verdict is being reached, does the durable record give a reader the same answer it will give afterwards, and can the reader tell the window is open?

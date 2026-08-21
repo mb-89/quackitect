@@ -1,5 +1,5 @@
 ---
-minted_in: i51
+minted_in: i51-work-running-out-of-sight-reports-itself
 id: opt-the-judgment-is-owed-at-the-leaving-not-at-the-asking
 type: "[[option]]"
 statement: the leaving judgment is owed at the moment the walk actually leaves, not at the moment somebody asks to leave, so the asking is answered at once and the judgment takes as long as it takes

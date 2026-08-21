@@ -1,5 +1,5 @@
 ---
-minted_in: i51
+minted_in: i51-work-running-out-of-sight-reports-itself
 id: raid-asm-work-under-way-records-progress-before-it-ends
 type: "[[raid]]"
 kind: assumption

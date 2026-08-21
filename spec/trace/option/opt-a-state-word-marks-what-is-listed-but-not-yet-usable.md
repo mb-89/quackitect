@@ -1,5 +1,5 @@
 ---
-minted_in: i51
+minted_in: i51-work-running-out-of-sight-reports-itself
 id: opt-a-state-word-marks-what-is-listed-but-not-yet-usable
 type: "[[option]]"
 statement: a thing with work still running on it stays in every listing and carries a word saying it is not usable yet, rather than being hidden or shown as ready

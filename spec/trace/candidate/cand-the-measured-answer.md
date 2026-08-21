@@ -1,5 +1,5 @@
 ---
-minted_in: i51
+minted_in: i51-work-running-out-of-sight-reports-itself
 id: cand-the-measured-answer
 type: "[[candidate]]"
 name: "The measured answer"

@@ -1,5 +1,5 @@
 ---
-minted_in: i51
+minted_in: i51-work-running-out-of-sight-reports-itself
 id: req-a-leaving-check-does-not-hold-the-call
 type: "[[requirement]]"
 statement: When a walk attempt starts a state's leaving check, the product shall answer that attempt without waiting for the check to finish.

@@ -1,5 +1,5 @@
 ---
-minted_in: i51
+minted_in: i51-work-running-out-of-sight-reports-itself
 id: sty-ask-once-what-is-still-running
 type: "[[story]]"
 statement: When I have started work that runs out of sight, I want one call that lists all of it with how much longer each piece needs, so I can wait that long instead of polling every few seconds.

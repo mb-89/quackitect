@@ -1,5 +1,5 @@
 ---
-minted_in: i51
+minted_in: i51-work-running-out-of-sight-reports-itself
 id: opt-ship-the-non-freezing-exit-and-no-estimate-at-all
 type: "[[option]]"
 statement: build only the deferred leaving verdict and the one-call listing, and report no time remaining at all, because the estimate is the second-order want and the freeze is the first

@@ -1,5 +1,5 @@
 ---
-minted_in: i51
+minted_in: i51-work-running-out-of-sight-reports-itself
 id: opt-the-estimate-is-linear-on-the-work-s-own-count
 type: "[[option]]"
 statement: the time remaining is elapsed time divided by the fraction of the work's own countable unit that is finished, and the measured error is on the safe side and shrinks as the work proceeds

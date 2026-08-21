@@ -1,5 +1,5 @@
 ---
-minted_in: i51
+minted_in: i51-work-running-out-of-sight-reports-itself
 id: uc-leave-a-state-whose-check-is-still-running
 type: "[[use-case]]"
 statement: Leave a state whose leaving condition runs a program, without the call that starts it waiting for it to end.

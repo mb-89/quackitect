@@ -1,5 +1,5 @@
 ---
-minted_in: i51
+minted_in: i51-work-running-out-of-sight-reports-itself
 id: raid-asm-a-check-left-running-survives-on-every-platform
 type: "[[raid]]"
 kind: assumption

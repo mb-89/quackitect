@@ -19,7 +19,7 @@ import { capMiddle } from "./jsonio.ts";
 import type { ToolDef } from "./mcp.ts";
 import { resolveInRoot, seDir } from "./paths.ts";
 import { type MirrorState, renderMirror } from "./render.ts";
-import { jobDone, jobList, jobStatus, jobStop, runBackground, runToCompletion, startJob } from "./run.ts";
+import { jobDone, jobList, jobStatus, jobStop, noteStarted, runBackground, runToCompletion, startJob } from "./run.ts";
 import { shoot } from "./shoot.ts";
 import { TIMINGS_DIR_ENV, testConcurrency, testReporterArgs, timedSince, timingReport } from "./testreporters.ts";
 import type { ReadingHook } from "./tools-file.ts";
@@ -408,7 +408,13 @@ export function runTools(
           const result = await jobDone(started.job);
           return { status: result.exit, out };
         };
-        const runScoped = async (question: string, chosen: string[], why: string, sweep: boolean): Promise<Record<string, unknown>> => {
+        const runScoped = async (
+          question: string,
+          chosen: string[],
+          why: string,
+          sweep: boolean,
+          unanswered?: string[],
+        ): Promise<Record<string, unknown>> => {
           const files = chosen;
           const scope = files.join(",");
           const argv = [
@@ -432,7 +438,7 @@ export function runTools(
           return {
             ok,
             question,
-            decided: { scope: "scoped", files, why, sweep },
+            decided: { scope: "scoped", files, why, sweep, ...(unanswered === undefined ? {} : { unanswered }) },
             ...(swept.length > 0 ? { results: swept } : {}),
             tests: { total: tap.total, pass: tap.pass, fail: tap.fail },
             ...timingReport(timed, tap.total),
@@ -489,20 +495,35 @@ export function runTools(
             ok: true,
             ran: decision.sweep,
             question: scopedQuestion(args.question),
-            decided: { scope: "nothing", files: [], why: decision.why, sweep: decision.sweep },
+            decided: {
+              scope: "nothing",
+              files: [],
+              why: decision.why,
+              sweep: decision.sweep,
+              ...(decision.unanswered === undefined ? {} : { unanswered: decision.unanswered }),
+            },
             ...(swept.length > 0 ? { results: swept } : {}),
           };
         }
         const work =
           decision.scope === "scoped"
-            ? runScoped(scopedQuestion(args.question), decision.files, decision.why, decision.sweep)
+            ? runScoped(scopedQuestion(args.question), decision.files, decision.why, decision.sweep, decision.unanswered)
             : runBattery(decision.why, decision.sweep);
         const id = `test-${Date.now().toString(36)}-${++testSeq}`;
+        // THIS SESSION STARTED IT, and the account cannot tell that from the
+        // record on disk alone. Without this a run that settles between two
+        // lane calls reads back as history and never reaches the caller.
+        noteStarted(id);
         // THE LAST RUN SIZES THE EXPECTATION (owner ruling 2026-08-03): a
         // battery caller is told how long the previous one took — measured,
         // never guessed — or told plainly that no record exists.
         const battery = decision.scope === "battery";
-        const measured = battery ? batteryRecord(se) : { pace: "", total: undefined };
+        // A SCOPED RUN IS SIZED BY ITS OWN FILE LIST. Only a battery has a
+        // previous run to be paced against, but every scoped run knows how many
+        // files it will work through, and that count is what the projection
+        // divides by (req-a-time-remaining-names-its-basis). Without it every
+        // scoped run — the common case — could only ever say it cannot estimate.
+        const measured = battery ? batteryRecord(se) : { pace: "", total: decision.files.length === 0 ? undefined : decision.files.length };
         const entry: TestJobEntry = {
           done: undefined as unknown as Promise<void>,
           started: Date.now(),

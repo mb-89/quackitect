@@ -1,5 +1,5 @@
 ---
-minted_in: i51
+minted_in: i51-work-running-out-of-sight-reports-itself
 id: opt-a-standing-is-one-closed-word
 type: "[[option]]"
 statement: a step's standing is one value from a closed set of three, so a reader cannot express passed-and-also-deciding and cannot forget the third case, rather than a boolean with a flag beside it

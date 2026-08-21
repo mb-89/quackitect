@@ -1,5 +1,5 @@
 ---
-minted_in: i51
+minted_in: i51-work-running-out-of-sight-reports-itself
 id: raid-dec-the-account-rides-beside-the-door-rather-than-replacing-it
 type: "[[raid]]"
 kind: decision

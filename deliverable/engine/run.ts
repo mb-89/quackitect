@@ -69,6 +69,11 @@ function spawnShell(root: string, command: string, cwd?: string): ChildProcess {
 // thing, and a caller asking what is running is told about all of them.
 export type OperationKind = "shell" | "test" | "judgment";
 
+/** THE THREE STANDINGS OF AN ENTRY: running, then finished, then read. `read`
+ *  is a MARK on the entry and never a reason to drop it.
+ *  see dsp-the-work-account.md#behavior-and-constraints */
+export type Standing = "running" | "finished" | "read";
+
 export interface JobView {
   job: string;
   kind: OperationKind;
@@ -92,6 +97,10 @@ export interface JobView {
   /** What the figure rests on, or why there is no figure. It is never absent:
    *  a duration a reader cannot discount is believed more than it deserves. */
   basis: string;
+  /** WHICH OF THE THREE STANDINGS this entry is in. The account always sets it.
+   *  se_run {jobs: true} is the history door and sets none.
+   *  see dsp-the-work-account.md#behavior-and-constraints */
+  standing?: Standing;
   stdout: string;
   stderr: string;
   truncated: boolean;
@@ -220,6 +229,42 @@ function view(j: Job): JobView {
   };
 }
 
+/** WHAT THE PROGRESS FILE SAYS ABOUT THIS RUN, and nothing about an earlier
+ *  one. Every test operation writes to the SAME path, and the file is rewritten
+ *  per run behind a `start` header — see bin/selftest.ts. Without that check a
+ *  figure is projected from the previous run's lines while the basis claims it
+ *  was measured on this one. */
+function progressOfRun(path: string, since: number): { files: number; elapsed: number } | "unreadable" | "stale" {
+  let text: string;
+  try {
+    text = readFileSync(path, "utf8");
+  } catch {
+    return "unreadable";
+  }
+  const seen = new Set<string>();
+  let elapsed = 0;
+  let start: number | undefined;
+  for (const line of text.trimEnd().split("\n")) {
+    try {
+      const row = JSON.parse(line) as { file?: string; t?: number; start?: string };
+      if (typeof row.start === "string") start = Date.parse(row.start);
+      if (typeof row.file === "string") seen.add(row.file);
+      if (typeof row.t === "number") elapsed = row.t;
+    } catch {
+      // A half-written line says nothing about the ones before it.
+    }
+  }
+  // A SECOND OF SLACK. The header and the job record are stamped by two
+  // processes moments apart, so exact ordering between them is not available.
+  if (start === undefined || start < since - 1_000) return "stale";
+  return { files: seen.size, elapsed };
+}
+
+/** The reading before this one, per operation, so a figure that has stopped
+ *  moving can say so instead of repeating in silence
+ *  (req-a-time-remaining-names-its-basis). */
+const lastProgress = new Map<string, { files: number; elapsed: number }>();
+
 /** HOW MUCH LONGER, AND WHAT THAT RESTS ON, as ONE value rather than two
  *  fields a build could drift apart.
  *  see dsp-the-work-account.md#behavior-and-constraints */
@@ -228,28 +273,25 @@ function timeRemaining(j: Job): { remaining_ms?: number; basis: string } {
   if (j.progress === undefined || j.total === undefined || j.total <= 0) {
     return { basis: "no measurement of comparable work exists, so no time remaining is given" };
   }
-  const seen = new Set<string>();
-  let elapsed = 0;
-  try {
-    for (const line of readFileSync(j.progress, "utf8").trimEnd().split("\n")) {
-      try {
-        const row = JSON.parse(line) as { file?: string; t?: number };
-        if (typeof row.file === "string") seen.add(row.file);
-        if (typeof row.t === "number") elapsed = row.t;
-      } catch {
-        // A half-written line says nothing about the ones before it.
-      }
-    }
-  } catch {
+  const now = progressOfRun(j.progress, j.started);
+  if (now === "unreadable") {
     return { basis: "this work writes no progress that can be read, so no time remaining is given" };
   }
-  if (seen.size === 0 || elapsed === 0) {
+  if (now === "stale") {
+    return { basis: "the progress on disk belongs to an earlier run, so no time remaining is given" };
+  }
+  if (now.files === 0 || now.elapsed === 0) {
     return { basis: `nothing has finished yet of ${String(j.total)}, so no time remaining is given` };
   }
-  const predicted = Math.round(elapsed / (seen.size / j.total));
+  const before = lastProgress.get(j.id);
+  lastProgress.set(j.id, now);
+  const moved = before === undefined || before.files !== now.files || before.elapsed !== now.elapsed;
+  const predicted = Math.round(now.elapsed / (now.files / j.total));
   return {
-    remaining_ms: Math.max(0, predicted - elapsed),
-    basis: `a linear projection over ${String(seen.size)} of ${String(j.total)} finished, measured on this run and dependable in neither direction`,
+    remaining_ms: Math.max(0, predicted - now.elapsed),
+    basis: moved
+      ? `a linear projection over ${String(now.files)} of ${String(j.total)} finished on this run, dependable in neither direction`
+      : `${String(now.files)} of ${String(j.total)} finished, and the count has not moved since the last look, so this figure is not advancing`,
   };
 }
 
@@ -523,28 +565,54 @@ export function settleOperation(id: string, ok: boolean): void {
   persist(j);
 }
 
-/** Ids whose outcome has already been handed to a caller — the third standing.
- *  An operation is running, then finished, then read.
- *  see dsp-the-work-account.md#behavior-and-constraints */
-const reported = new Set<string>();
-const seenRunning = new Set<string>();
+/** WORK THIS SESSION STARTED that the in-memory table cannot see for itself. A
+ *  test operation is rebuilt from its record on every read and never enters
+ *  `jobs`, so without this set a run that started AND settled between two lane
+ *  calls was dropped before any caller ever saw it
+ *  (req-one-call-reports-every-piece-of-work-out-of-sight). */
+const startedHere = new Set<string>();
 
-/** THE ACCOUNT THAT RIDES A LANE ANSWER: everything still running, plus
- *  anything that finished since the last look. Never the whole history — a
- *  caller learns each outcome ONCE and is not told it again, and work that
- *  ended before this session looked answers to se_run {jobs: true} instead. */
+/** SAY THAT THIS SESSION STARTED A PIECE OF WORK the table cannot see. */
+export function noteStarted(id: string): void {
+  startedHere.add(id);
+}
+
+/** THE TWO MARKS THE ACCOUNT KEEPS, both PER ROOT. Two trees can hold the same
+ *  job id, and one set shared between them makes one tree's read hide the other
+ *  tree's outcome. */
+const handedOut = new Map<string, Set<string>>();
+const runningSeen = new Map<string, Set<string>>();
+
+function marksFor(store: Map<string, Set<string>>, root?: string): Set<string> {
+  const key = root ?? "";
+  const found = store.get(key);
+  if (found !== undefined) return found;
+  const fresh = new Set<string>();
+  store.set(key, fresh);
+  return fresh;
+}
+
+/** THE ACCOUNT THAT RIDES A LANE ANSWER: every operation THIS SESSION started,
+ *  running and finished alike, each saying which of the three standings it is
+ *  in. AN ENTRY NEVER LEAVES THE TABLE INSIDE ONE SESSION — a second look marks
+ *  it `read` rather than dropping it, so a caller that missed the moment can
+ *  still find the outcome. Work that ended BEFORE this session looked is
+ *  history rather than news, and answers to se_run {jobs: true} instead.
+ *  see dsp-the-work-account.md#behavior-and-constraints */
 export function workAccount(root?: string): JobView[] {
+  const read = marksFor(handedOut, root);
+  const running = marksFor(runningSeen, root);
   const out: JobView[] = [];
   for (const entry of jobList(root)) {
     if (entry.running) {
-      seenRunning.add(entry.job);
-      out.push(entry);
+      running.add(entry.job);
+      out.push({ ...entry, standing: "running" });
       continue;
     }
-    if (!jobs.has(entry.job) && !seenRunning.has(entry.job)) continue;
-    if (reported.has(entry.job)) continue;
-    reported.add(entry.job);
-    out.push(entry);
+    if (!jobs.has(entry.job) && !startedHere.has(entry.job) && !running.has(entry.job)) continue;
+    const already = read.has(entry.job);
+    read.add(entry.job);
+    out.push({ ...entry, standing: already ? "read" : "finished" });
   }
   return out;
 }

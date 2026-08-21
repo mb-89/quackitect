@@ -1,5 +1,5 @@
 ---
-minted_in: i51
+minted_in: i51-work-running-out-of-sight-reports-itself
 id: raid-dec-the-duration-and-its-basis-are-one-return-value
 type: "[[raid]]"
 kind: decision

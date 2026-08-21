@@ -1,5 +1,5 @@
 ---
-minted_in: i51
+minted_in: i51-work-running-out-of-sight-reports-itself
 id: opt-the-estimate-may-rise-and-says-so
 type: "[[option]]"
 statement: a reported time remaining is allowed to grow between two asks, and the report treats a rise as an ordinary revision rather than hiding it behind a counter that only falls
