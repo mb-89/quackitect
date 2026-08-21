@@ -3,6 +3,7 @@ import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { parse as parseYaml } from "yaml";
 import { CLAUSES, Rejection } from "./errors.ts";
+import { clusterId } from "./morphbox.ts";
 import { brokenHere, rulesOf } from "./rules.ts";
 import { fileForId, outsideVocabulary } from "./vocabulary.ts";
 
@@ -25,6 +26,11 @@ const REFERENCE_KEYS = [
   "source_refs",
   "weighs_with",
   "weighs_against",
+  // A CLUSTER IS A REFERENCE LIKE ANY OTHER, and it was the one nobody checked.
+  // A function could name a group nobody had declared and nothing said so — the
+  // offer a placement picks from is a list of real clusters, and the stored
+  // value never had to come from it.
+  "cluster",
 ];
 
 /** A REFERENCE THE CORPUS DOES NOT HOLD. It REPORTS and never refuses.
@@ -42,9 +48,15 @@ export function danglingReferences(root: string, frontmatter: Record<string, unk
     const raw = frontmatter[key];
     const values = Array.isArray(raw) ? raw : raw === undefined || raw === null ? [] : [raw];
     for (const v of values) {
-      const id = String(v)
-        .trim()
-        .replace(/^\[\[|\]\]$/g, "");
+      // A CLUSTER IS STORED BARE — `cluster: the-arrival` — and the node it
+      // names carries the prefix, so the value is resolved before it is looked
+      // up. Every other key already holds a full id.
+      const id =
+        key === "cluster"
+          ? clusterId(String(v))
+          : String(v)
+              .trim()
+              .replace(/^\[\[|\]\]$/g, "");
       if (id === "") continue;
       // ONLY WHAT LOOKS LIKE AN ID IS CHECKED. A source_refs line carrying a
       // sentence, a URL or a quoted ruling is not a reference and reporting it

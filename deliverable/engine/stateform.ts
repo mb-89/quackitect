@@ -9,7 +9,7 @@ import { type ElementMatrixView, elementMatrixView } from "./elematrix.ts";
 import type { FormTemplate } from "./forms.ts";
 import { pendingNotes } from "./inbox.ts";
 import type { EvidenceField, MachineDecl, StateDecl } from "./machine.ts";
-import { bare, type MorphBox, type MorphCell, type MorphLine, type MorphRow, orderLines, storedOrder } from "./morphbox.ts";
+import { bare, clusterId, type MorphBox, type MorphCell, type MorphLine, type MorphRow, orderLines, storedOrder } from "./morphbox.ts";
 import { noteOf, parseStateNote, readNode, section } from "./notes.ts";
 import { type ParetoView, pareto, readScores } from "./pareto.ts";
 import { seDir } from "./paths.ts";
@@ -344,7 +344,10 @@ export function fieldBox(f: EvidenceField, traceRoot: string, stored: string): M
         byQuestion.set(q, r);
         continue;
       }
-      (byCluster.get(bare(at(n, "cluster"))) ?? unplaced).cells.push(cell);
+      // THE MAP IS KEYED BY NODE ID and the field carries a bare name, so the
+      // two only meet through clusterId. Before it, this lookup missed every
+      // time and the chart's cluster rows were dead.
+      (byCluster.get(clusterId(at(n, "cluster"))) ?? unplaced).cells.push(cell);
     }
     // THE BOX IS THE CURRENT SOLUTION'S, never the whole product's (owner
     // ruling 2026-08-11): once any question row exists, the cluster rows -

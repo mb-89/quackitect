@@ -43,6 +43,20 @@ export function bare(v: string): string {
   return last.replace(/\.md$/i, "").replace(/["']$/, "").trim();
 }
 
+/** A CLUSTER VALUE AS THE ID OF THE NODE IT NAMES.
+ *
+ *  A FUNCTION STORES ITS CLUSTER BARE — `cluster: the-arrival` — while the node
+ *  it names is `cluster-the-arrival`, and every map and every offer is keyed by
+ *  that id. Nothing bridged the two, so the morph chart's cluster rows matched
+ *  nothing and every function fell into the unplaced row.
+ *
+ *  BOTH SPELLINGS RESOLVE. A value written the long way is not wrong, and a
+ *  rule that accepted only one of them would break whichever half moved first. */
+export function clusterId(v: string): string {
+  const b = bare(v);
+  return b === "" || b.startsWith("cluster-") ? b : `cluster-${b}`;
+}
+
 /** The candidate ids named in a stored table, in file order.
  *
  *  IT DECIDES THE LINE ORDER, and the line order decides the colours. The

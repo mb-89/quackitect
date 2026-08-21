@@ -449,6 +449,16 @@ export class Session {
     this._machine = compileMachine(root, mainMachinePath(root));
     this.instance = newInstance(this._machine);
     this.decisions = new Decisions(seDir(root));
+    // A DEFER NAMES A STATE, and only the session knows which are drawn. Every
+    // reachable machine counts, because a point deferred from inside a record
+    // legitimately names one of that record's own states.
+    this.decisions.stateExists = (id: string): boolean => {
+      try {
+        return this.views.reachableMachines().some((m) => m.states.some((s) => s.id === id));
+      } catch {
+        return true; // nothing compiled yet — say nothing rather than say something false
+      }
+    };
     // THE DIAL STARTS AT A NAMED RUNG, looked up in machines/scale.md like
     // any other rung. It is set here rather than at the field because the
     // scale is read from the root, and there is no root at initialiser time.
@@ -3592,11 +3602,28 @@ export class Session {
     const note = conditionNotePath(key);
     if (key === "script") {
       const st = this.scripts.scriptStatus(m, s);
+      // THE FALLBACK IS THE DOOR, AND A RED SCRIPT IS WHEN IT OPENS. A fallback
+      // edge skips this failing check by design, so the repair state is
+      // reachable while the script is red — the walk never has to go backwards
+      // to find write verbs.
+      //
+      // THE REMEDY DID NOT SAY SO, and "fix what the output names" was said in
+      // a state whose tools are read-only. The i38 walk read it, went backwards
+      // through trace-design to reach a state that could write, and came
+      // forwards again, re-running the whole battery each way.
+      const door = s.edges.find((e) => e.role === "fallback" || e.role === "error")?.to;
       throw new Rejection({
         clause: CLAUSES.CONDITION_UNMET,
         expected: `${which} condition 'script' of ${stateId} — ${args.join(", ")} exits 0 (see ${note})`,
         got: st.ran ? st.output : "not run yet",
-        remedy: { tool: "se_pull", args: {}, note: "fix what the output names, then pull again — the script re-runs on every attempt" },
+        remedy:
+          door === undefined
+            ? { tool: "se_pull", args: {}, note: "fix what the output names, then pull again — the script re-runs on every attempt" }
+            : {
+                tool: "se_pull",
+                args: { form: { choice: door } },
+                note: `${door} is the drawn path for this failure and it carries the write verbs. Taking it SKIPS this check rather than satisfying it, which is what a fallback is for. Fix everything the output names there, in one pass; its own exit re-runs the same script.`,
+              },
         source: "engine/session.ts conditions",
       });
     }

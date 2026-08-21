@@ -256,7 +256,18 @@ if (-not $classic) {
     if ($existing.Attributes -band [IO.FileAttributes]::ReparsePoint) {
       cmd /c rmdir "$extDest" | Out-Null
     } else {
-      Remove-Item $extDest -Recurse -Force
+      # A LOADED EXTENSION CANNOT BE DELETED. VS Code holds its native terminal
+      # binding open, and the raw failure here names a .node file rather than
+      # the cause. Say the cause instead: this is the one step that needs the
+      # editor closed, and it is why the copy could go stale in the first place.
+      try {
+        Remove-Item $extDest -Recurse -Force -ErrorAction Stop
+      } catch {
+        Write-Host "the installed extension is LOCKED - VS Code is still running it." -ForegroundColor Red
+        Write-Host "  close every VS Code window, then run .\RUNME.ps1 again." -ForegroundColor Yellow
+        Write-Host "  $extDest" -ForegroundColor DarkGray
+        exit 1
+      }
     }
   }
   New-Item -ItemType Junction -Path $extDest -Target $extSrc | Out-Null

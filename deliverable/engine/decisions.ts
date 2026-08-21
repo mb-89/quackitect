@@ -510,6 +510,21 @@ export class Decisions {
   private static readonly REFUSE_AFTER = 12;
   /** What attachTo corrected on THIS call — read once by apply(). */
   private lastCorrection: string | undefined;
+
+  /** DOES A STATE BY THIS NAME EXIST? Set by the session, which is the only
+   *  thing that knows.
+   *
+   *  A DEFER NAMES THE STATE THAT CAN DO THE POINT, and nothing checked the
+   *  name. A to-do parked for a state nobody drew is delivered when the walk
+   *  reaches it, which is never, and it reads exactly like a to-do that is
+   *  waiting its turn. Five places in one record sent work to a `gate-design`
+   *  that has never been drawn, and the most expensive of them meant ten musts
+   *  were never held against four candidates.
+   *
+   *  IT MARKS AND NEVER REFUSES. Narration must not become somewhere a walk can
+   *  get stuck, and the mark rides the same `corrected` line every other
+   *  narration correction uses. */
+  stateExists?: (id: string) => boolean;
   /** WHICH ITEMS WERE ALREADY OPEN THE LAST TIME THIS GUARD BIT.
    *
    *  The guard names what is open, which is true and was not enough. An item
@@ -731,6 +746,12 @@ export class Decisions {
         remedy: { tool: "(the same call)", args: { update: { op: "defer", node: "<child id>", to: u.to } }, note: SHAPE_NOTE },
         source: "engine/decisions.ts defer",
       });
+    }
+    // THE PARK IS STILL MADE. A point deferred to a name nobody drew is better
+    // recorded with the mark than refused into thin air, and the walker can
+    // re-home it once the mark says so.
+    if (this.stateExists?.(u.to!) === false) {
+      this.lastCorrection = `no state is called ${u.to!} — this point is parked for something nobody has drawn, so nothing will ever deliver it`;
     }
     this.close(n, "deferred", `deferred to ${u.to}`);
     this.parked.push({ state: u.to!, brief: n.brief, hops, trail });

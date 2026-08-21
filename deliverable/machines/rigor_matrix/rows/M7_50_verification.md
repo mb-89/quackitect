@@ -12,7 +12,6 @@ exit_script:
 entry_read:
   - deliverable/machines/methods/meth-verification-discipline.md
 legal_tools: se_file_read, se_file_search, se_file_glob
-repair_tools: se_file_read, se_file_search, se_file_glob, se_file_list, se_file_patch, se_file_write, se_run
 floor: true
 evidence:
   - name: claims
@@ -50,11 +49,17 @@ Failure opens the fallback into fix-findings - collect everything, fix in
 one pass, one confirm run. The command is the project's battery; each
 project declares its own.
 
-WHILE THE BATTERY STANDS RED, THE REPAIR TOOLS ARE LEGAL HERE. A state whose
-check fails and whose tools are read-only cannot be repaired where it fires.
-The walk had to go backwards through trace-design to reach a state that could
-write, and then forwards again to re-run - three round trips on one red, each
-of them re-running the whole battery.
+THE TOOLS HERE STAY READ-ONLY ON PURPOSE, and a red battery is not a reason to
+widen them. fix-findings is the drawn path for the failure, it carries the
+write verbs, and a fallback edge reaches it WITHOUT satisfying this exit. Giving
+this row the write verbs would let a walk repair in place and skip the one rule
+the fallback exists to hold: collect every finding first, fix them in one pass,
+confirm in one run.
+
+WHAT WAS ACTUALLY MISSING WAS THE SIGNPOST. The refusal said "fix what the
+output names" and said it here, where nothing can write, so a walk went
+backwards looking for a state that could. The refusal now names the fallback
+and the call that takes it.
 
 THE SUBMIT FIRES IT, and until i11 nothing did. `filled_by: engine` reached
 three places in the code - a validation error, a priority, and a copied
