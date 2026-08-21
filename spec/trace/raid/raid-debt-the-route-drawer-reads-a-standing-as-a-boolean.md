@@ -34,7 +34,10 @@ refuses a hop is redrawn on the next pull, and the judgment settles meanwhile.
 THE OTHER DIRECTION WOULD BE THE DEFECT. A reader that treated `deciding` as
 passing would walk past a check nobody has answered.
 
-## What it would take to clear
+## Repayment
+
+REPAYING THIS IS ONE CHANGE: give the route drawer its own question about a
+step's standing, and leave `conditionMet` alone.
 
 `conditionMet` returns a boolean and is called from many places. Widening it to
 the three-word standing touches every caller, and the only one that wants the

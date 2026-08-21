@@ -18,6 +18,7 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { withJudgment } from "../engine/forms.ts";
 import type { MachineDecl, StateDecl } from "../engine/machine.ts";
+import { workAccount } from "../engine/run.ts";
 import { type ScriptHost, Scripts } from "../engine/sessionscript.ts";
 
 const source = (name: string): string => readFileSync(fileURLToPath(new URL(`../engine/${name}`, import.meta.url)), "utf8");
@@ -222,4 +223,50 @@ test("the gate asks whether a feeder is still deciding, not only whether it sign
     /stepStanding\([^)]*\) === "deciding"/,
     "a feeder whose leaving judgment is in flight must not count as finished, or the gate reads a green nobody earned",
   );
+});
+
+// EVERY STARTER REGISTERS, not only the walk's.
+//
+// The mirror's /script endpoint calls Session.scriptRun directly
+// (deliverable/engine/mirror.ts line 178), which is a second way into the same
+// run. Registration used to sit in scriptStart, the OTHER way in, so a judgment
+// started from the surface set its step to `deciding` while the account showed
+// nothing running at all.
+//
+// req-one-call-reports-every-piece-of-work-out-of-sight says EVERY piece. A
+// second caller that skips the table breaks that promise for the one work kind
+// the account was built for. Measured on i51's own verification: a live battery
+// process, and the account reporting that judgment settled 92 seconds earlier.
+test("a judgment started outside the walk still enters the account", async () => {
+  const lab = mkdtempSync(join(tmpdir(), "se-surface-"));
+  writeFileSync(join(lab, "slow.mjs"), "await new Promise((r) => setTimeout(r, 1200));\n", "utf8");
+  const slow = { id: "verification", exit: { script: ["slow.mjs"] } } as unknown as StateDecl;
+  const box = { id: "surface", states: [slow] } as unknown as MachineDecl;
+  const host: ScriptHost = {
+    workRoot: () => lab,
+    machineRoot: () => lab,
+    assertStanding: () => {},
+    leaves: () => ({ machine: box, ids: [slow.id] }),
+    state: () => slow,
+    notifyChange: () => {},
+    recordVerdict: () => {},
+    evidence: new Map<string, Record<string, unknown>>(),
+  };
+  const scripts = new Scripts(host);
+  // The skip would settle the run before the account is ever looked at, and the
+  // case would pass without a running judgment existing.
+  const skip = process.env.SE_SCRIPT_SKIP;
+  delete process.env.SE_SCRIPT_SKIP;
+  try {
+    const run = scripts.scriptRun(slow.id); // the mirror's own path, never scriptStart
+    const seen = workAccount(lab).find((r) => r.job === "judgment-surface-verification");
+    assert.equal(seen?.standing, "running", "a judgment the surface started reads as running in the account");
+    await run;
+    const after = workAccount(lab).find((r) => r.job === "judgment-surface-verification");
+    assert.equal(after?.running, false, "and it settles in the same entry rather than vanishing");
+  } finally {
+    if (skip === undefined) delete process.env.SE_SCRIPT_SKIP;
+    else process.env.SE_SCRIPT_SKIP = skip;
+    rmSync(lab, { recursive: true, force: true });
+  }
 });

@@ -163,23 +163,13 @@ export class Scripts {
       return { state: `${machine.id}/${s.id}`, script_result: result };
     })().finally(() => this.scriptRuns.delete(key));
     this.scriptRuns.set(key, run);
-    this.host.notifyChange(); // the mirror learns a run started
-    return run;
-  }
-
-  /** START a step's leaving judgment and hand the promise back UNAWAITED.
-   *  Returns undefined where the state declares no judgment to start.
-   *  see dsp-the-work-account.md#responsibility */
-  scriptStart(stateId: string): Promise<Record<string, unknown>> | undefined {
-    const { machine } = this.host.leaves();
-    const s = this.host.state(machine, stateId);
-    if ((s.exit?.script ?? []).length === 0 && (s.entry?.script ?? []).length === 0) return undefined;
-    const key = evidenceKey(machine, s.id);
-    const already = this.scriptRuns.has(key);
-    const run = this.scriptRun(stateId);
-    if (already) return run;
-    // THE JUDGMENT ENTERS THE ONE TABLE, against the step it belongs to.
-    // Without the state a settled verdict has nowhere to land.
+    // THE JUDGMENT ENTERS THE ONE TABLE, against the step it belongs to. It is
+    // registered HERE, where the run is created, rather than in scriptStart.
+    // The mirror's own /script endpoint calls this method directly, so a run
+    // started from the surface set the step to `deciding` while the account
+    // showed nothing running at all. Measured on i51's own verification: a
+    // live battery process, and the account reporting it settled 92 seconds
+    // earlier. see dsp-the-work-account.md#interface
     const id = `judgment-${machine.id}-${s.id}`;
     openOperation({
       id,
@@ -192,7 +182,20 @@ export class Scripts {
       (r) => settleOperation(id, (r.script_result as { ok?: boolean } | undefined)?.ok === true),
       () => settleOperation(id, false),
     );
+    this.host.notifyChange(); // the mirror learns a run started
     return run;
+  }
+
+  /** START a step's leaving judgment and hand the promise back UNAWAITED.
+   *  Returns undefined where the state declares no judgment to start.
+   *  The run registers itself in the account; this method only decides
+   *  whether there is a judgment to start at all.
+   *  see dsp-the-work-account.md#responsibility */
+  scriptStart(stateId: string): Promise<Record<string, unknown>> | undefined {
+    const { machine } = this.host.leaves();
+    const s = this.host.state(machine, stateId);
+    if ((s.exit?.script ?? []).length === 0 && (s.entry?.script ?? []).length === 0) return undefined;
+    return this.scriptRun(stateId);
   }
 
   /** START THE JUDGMENT AND ANSWER INSIDE THE BOUND. The call waits up to `ms`

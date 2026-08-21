@@ -432,3 +432,40 @@
 {"ts":"2026-08-21T12:59:02.316Z","op":"update","visit":"iterations/i51/verification@0","node":"d18","brief":"take the drawn fallback rather than restart the battery each pull"}
 {"ts":"2026-08-21T12:59:55.905Z","op":"fork","visit":"iterations/i51/verification@0","parent":"d5","node":"d19","brief":"a re-run of one judgment is invisible and masks the first run's output","nodes":[]}
 {"ts":"2026-08-21T13:00:10.207Z","op":"done","visit":"iterations/i51/verification@0","node":"d19","brief":"both findings captured; the workaround is one pull after it settles"}
+{"ts":"2026-08-21T13:25:23.975Z","op":"update","visit":"iterations/i51/start@0","node":"d19","brief":"sweep to verification"}
+{"ts":"2026-08-21T13:25:44.609Z","op":"update","visit":"iterations/i51/start@0","node":"d20","brief":"re-earn the reading the restart wiped"}
+{"ts":"2026-08-21T13:28:17.921Z","op":"done","visit":"front_desk@0","node":"d13","brief":"twelve documents re-read and the walk is back inside the record"}
+{"ts":"2026-08-21T13:29:12.594Z","op":"update","visit":"iterations/i51/evaluate-architecture@0","node":"d21","brief":"sweep on toward verification"}
+{"ts":"2026-08-21T13:29:31.602Z","op":"update","visit":"iterations/i51/verification@0","node":"d22","brief":"sweep through the build states"}
+{"ts":"2026-08-21T13:29:44.558Z","op":"update","visit":"iterations/i51/verification@0","node":"d23","brief":"last reading, then the battery"}
+{"ts":"2026-08-21T13:31:00.489Z","op":"update","visit":"iterations/i51/verification@0","node":"d24","brief":"read the battery's verdict"}
+{"ts":"2026-08-21T13:31:52.713Z","op":"done","visit":"front_desk@0","node":"d14","brief":"the battery is green and the walk stands at the implementation gate"}
+{"ts":"2026-08-21T13:32:22.219Z","op":"update","visit":"iterations/i51/gate-implementation@0","node":"d25","brief":"land on the gate so it offers its form"}
+{"ts":"2026-08-21T13:32:36.106Z","op":"update","visit":"iterations/i51/gate-implementation@0","node":"d26","brief":"clear the target so the gate offers its form"}
+{"ts":"2026-08-21T13:33:08.704Z","op":"update","visit":"iterations/i51/gate-implementation@0","node":"d27","brief":"fill the gate's three rounds and bless it"}
+{"ts":"2026-08-21T13:35:07.839Z","op":"plan","visit":"iterations/i51/gate-implementation@0","parent":null,"nodes":[{"id":"d28","brief":"add the Repayment section to the debt entry"},{"id":"d29","brief":"re-submit and bless gate-implementation"},{"id":"d30","brief":"walk validation and release"},{"id":"d31","brief":"write the field report"}]}
+{"ts":"2026-08-21T13:35:16.068Z","op":"update","visit":"iterations/i51/gate-implementation@0","node":"d32","brief":"the debt entry now declares its repayment"}
+{"ts":"2026-08-21T13:35:23.581Z","op":"update","visit":"iterations/i51/gate-implementation@0","node":"d33","brief":"re-reading the gate form before submitting"}
+{"ts":"2026-08-21T13:36:46.783Z","op":"update","visit":"iterations/i51/cut-criteria@1","node":"d34","brief":"aiming at the ship state to walk validation and release"}
+{"ts":"2026-08-21T13:37:42.641Z","op":"update","visit":"iterations/i51/build-steps/start@1","node":"d35","brief":"taking both build-step doors at the fan"}
+{"ts":"2026-08-21T13:37:51.061Z","op":"update","visit":"iterations/i51/build-steps/start@1","node":"d36","brief":"taking the operation-table door with its full id"}
+{"ts":"2026-08-21T13:38:05.439Z","op":"update","visit":"iterations/i51/build-steps/start@1","node":"d37","brief":"pulling along the drawn route instead of choosing a door"}
+{"ts":"2026-08-21T13:41:11.135Z","op":"update","visit":"iterations/i51/verification@1","node":"d38","brief":"checking whether the battery has landed"}
+{"ts":"2026-08-21T13:41:52.972Z","op":"fork","visit":"iterations/i51/verification@1","parent":null,"node":"d39","brief":"verification is stuck: condition says running, account says nothing runs","nodes":[{"id":"d40","brief":"reach a state that can write"},{"id":"d41","brief":"find which of the two is lying"},{"id":"d42","brief":"fix it and re-run"}]}
+{"ts":"2026-08-21T13:42:06.565Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d43","brief":"looking for the battery process the condition claims is running"}
+{"ts":"2026-08-21T13:42:13.961Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d44","brief":"asking the OS whether any battery process exists"}
+{"ts":"2026-08-21T13:48:23.190Z","op":"done","visit":"iterations/i51/verification@1","node":"d41","brief":"the account was right; the mirror's own endpoint starts an unregistered run"}
+{"ts":"2026-08-21T13:48:32.539Z","op":"done","visit":"iterations/i51/verification@1","node":"d40","brief":"standing in fix-findings with the write verbs"}
+{"ts":"2026-08-21T13:49:08.293Z","op":"done","visit":"iterations/i51/gate-implementation@0","node":"d28","brief":"the debt entry carries its Repayment section"}
+{"ts":"2026-08-21T13:49:15.655Z","op":"done","visit":"iterations/i51/gate-implementation@0","node":"d29","brief":"gate-implementation is submitted, blessed and signed"}
+{"ts":"2026-08-21T13:49:26.986Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d45","brief":"scoped run over the two touched suites"}
+{"ts":"2026-08-21T13:49:41.622Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d46","brief":"confirm run fired; battery is the exit of this state"}
+{"ts":"2026-08-21T13:50:07.924Z","op":"update","visit":"iterations/i51/cut-criteria@3","node":"d47","brief":"aiming at ship so leaving verification fires a battery over the new code"}
+{"ts":"2026-08-21T13:50:34.809Z","op":"update","visit":"iterations/i51/observe-red@3","node":"d48","brief":"walking to verification so its exit fires the battery"}
+{"ts":"2026-08-21T13:50:47.831Z","op":"update","visit":"iterations/i51/verification@3","node":"d49","brief":"firing the battery over the changed engine"}
+{"ts":"2026-08-21T13:52:09.886Z","op":"update","visit":"iterations/i51/verification@3","node":"d50","brief":"reading what the battery runs while it runs"}
+{"ts":"2026-08-21T13:52:33.409Z","op":"update","visit":"iterations/i51/verification@3","node":"d51","brief":"battery is over time; going where I can inspect it"}
+{"ts":"2026-08-21T13:52:41.974Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d52","brief":"scoped run of the suite carrying the new case"}
+{"ts":"2026-08-21T13:53:04.594Z","op":"done","visit":"iterations/i51/verification@1","node":"d42","brief":"12 of 12 pass in a fresh process, new case included"}
+{"ts":"2026-08-21T13:53:12.676Z","op":"plan","visit":"iterations/i51/fix-findings@0","parent":null,"nodes":[{"id":"d53","brief":"commit the fix and the gate evidence"},{"id":"d54","brief":"walk validation and release to shipped"},{"id":"d55","brief":"write and hand over the field report"}]}
+{"ts":"2026-08-21T13:53:20.707Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d56","brief":"staging only the six files this pass touched"}
