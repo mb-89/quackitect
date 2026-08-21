@@ -4,6 +4,7 @@ id: nbr-vscode
 type: "[[neighbour]]"
 statement: VS Code, the host the mirror runs inside — it draws the panels and owns the editor the walk opens files in.
 direction: both
+group: supported-products
 ---
 
 ## Interface

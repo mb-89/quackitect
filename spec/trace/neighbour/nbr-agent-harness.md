@@ -4,6 +4,7 @@ id: nbr-agent-harness
 type: "[[neighbour]]"
 statement: The AI agent harness that drives the walk across supported hosts.
 direction: in
+group: supported-products
 ---
 
 ## Interface

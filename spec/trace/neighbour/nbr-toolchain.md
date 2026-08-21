@@ -4,6 +4,7 @@ id: nbr-toolchain
 type: "[[neighbour]]"
 statement: The local toolchain the checks run on — Node, the typechecker, the linter-formatter and the test runner.
 direction: out
+group: required-toolchain
 ---
 
 ## Interface

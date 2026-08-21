@@ -4,6 +4,7 @@ id: nbr-peer-machine
 type: "[[neighbour]]"
 statement: A peer machine - another install of this product, with its own engine, agent and minted machine id, working the same remote.
 direction: both
+group: lineage
 ---
 
 ## Interface

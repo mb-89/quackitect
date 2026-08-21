@@ -4,6 +4,7 @@ id: nbr-output-tools
 type: "[[neighbour]]"
 statement: The discipline's own output tools — the LLM coding harnesses for software, and each other field's generators.
 direction: out
+group: supported-products
 ---
 
 ## Interface

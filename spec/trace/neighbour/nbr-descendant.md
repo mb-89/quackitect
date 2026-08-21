@@ -4,6 +4,7 @@ id: nbr-descendant
 type: "[[neighbour]]"
 statement: A complete independent copy of this product under its own name, spawned once and then out of reach.
 direction: out
+group: lineage
 ---
 
 ## Why this neighbour is new

@@ -4,6 +4,7 @@ id: nbr-obsidian
 type: "[[neighbour]]"
 statement: Obsidian, where a person draws the machines and edits the markdown that is the system's truth.
 direction: in
+group: supported-products
 ---
 
 ## Interface

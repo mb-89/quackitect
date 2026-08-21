@@ -4,6 +4,7 @@ id: nbr-driven-project
 type: "[[neighbour]]"
 statement: Somebody else's product, whose work the engine drives while the method and the machinery stay in the engine's own tree.
 direction: both
+group: lineage
 ---
 
 ## Why this neighbour is new

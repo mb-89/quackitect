@@ -4,6 +4,7 @@ id: nbr-parent-engine
 type: "[[neighbour]]"
 statement: The engine a descendant came from, standing in a repository the descendant has no path to.
 direction: in
+group: lineage
 ---
 
 ## Why this neighbour is new

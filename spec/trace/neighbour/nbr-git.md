@@ -4,6 +4,7 @@ id: nbr-git
 type: "[[neighbour]]"
 statement: Git, which holds the history, the branches and the worktree every record is walked in.
 direction: out
+group: required-toolchain
 ---
 
 ## Interface

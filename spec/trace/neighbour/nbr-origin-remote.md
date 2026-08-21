@@ -4,6 +4,7 @@ id: nbr-origin-remote
 type: "[[neighbour]]"
 statement: The git remote - the coordination surface parallel machines meet on, and the serializer the claim lock leans on.
 direction: out
+group: lineage
 ---
 
 ## Interface

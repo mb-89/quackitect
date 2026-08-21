@@ -19,9 +19,53 @@ closes, and a later record may change it.
 
 The context diagram is a BLACK BOX in the middle and its neighbours around
 it. The box is the system; each neighbour is one of these nodes; each
-connection is the neighbour's own `direction` and its Interface section. The
-figure DERIVES from these nodes — nobody hand-draws the interface list, and
-nobody writes it twice.
+connection is the neighbour's own `direction` and its Interface section.
+
+THE FIGURE IS NOT BUILT YET. Nothing in the engine reads this type: the word
+`neighbour` appears in one test file and nowhere else in the code. When it is
+built, the figure will derive from these nodes rather than being hand-drawn.
+Until then these nodes are the record of the boundary and no surface shows
+them.
+
+## Groups
+
+A neighbour MAY name a group, and neighbours sharing one are the same kind
+of thing. Fifteen loose nodes around one box is unreadable, and the count only
+grows.
+
+```yaml
+group: supported-products
+```
+
+THE FIELD IS OPTIONAL and a neighbour without one stands on its own. Three
+groups are in use.
+
+- `supported-products` — third-party products this system works with or
+  recommends. VS Code, Obsidian, the agent harness, a wireframe editor.
+- `required-toolchain` — what the checks will not run without. Node, git, the
+  typechecker, the linter, the test runner.
+- `lineage` — trees and machines related to this one. A descendant, a parent,
+  a peer, a driven project, the remote they meet on.
+
+A PERSON IS NEVER IN A GROUP. Roles stand alone, because grouping them with
+tools is how a boundary picks up intentions it cannot have.
+
+IT IS `group` AND NOT `cluster`, DELIBERATELY. A cluster is already a thing
+here: a partition of FUNCTIONS, carrying a coupling class from a fixed list,
+written at M4 from the function matrix. The engine wires that word to the
+design structure matrix in dozens of places, so a neighbour landing in
+`spec/trace/cluster/` would feed a non-function into machinery that partitions
+functions.
+
+MEASURED WHILE WRITING THIS, 2026-08-21. A neighbour carrying
+`cluster: supported-products` was accepted, and the write answered
+`cluster-supported-products resolves to nothing`, naming a path under the
+function-cluster folder. The word was already taken; the grouping still needed
+a name.
+
+WHEN THE FIGURE IS BUILT, a group will draw as one shape that opens. That is
+what the field is for, and it is why the field is worth carrying before the
+renderer exists.
 
 ## The boundary is a claim, and it is checkable
 
@@ -53,6 +97,11 @@ statement: TODO — what this neighbour is, in one sentence
 #          reaches.
 #   both — traffic runs each way, and neither side is only a caller.
 direction: TODO — in | out | both
+#
+# Optional. Which group this neighbour belongs to, where it is one of a
+# kind: supported-products, required-toolchain, lineage. A person is never
+# in a group. Omit it and the neighbour stands on its own.
+group: TODO — omit unless it belongs to one
 ---
 
 ## Interface
