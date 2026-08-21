@@ -189,8 +189,18 @@ The session was given `claude/iteration-fifty-one-xdrwvp` and told to develop
 and push there. `guidance/method/cloud-runner.md` rules the other way: a record
 is a folder on trunk, one agent works one clone, no branch of its own.
 
-I FOLLOWED THE CARD and worked on trunk. The card asks for this to be reported
-and here it is.
+I WROTE HERE THAT I FOLLOWED THE CARD AND WORKED ON TRUNK. That was wrong, and
+I only found out by checking before a commit.
+
+`git rev-parse --abbrev-ref HEAD` says `claude/iteration-fifty-one-xdrwvp`. The
+container was handed the branch already checked out, so the session has been on
+the host's branch the whole way. Nothing I did chose either side.
+
+THE DISAGREEMENT IS REAL AND IT WAS NEVER ADJUDICATED. I believed I had ruled on
+it and I had not, which is worse than ruling either way.
+
+WHAT I DID ONCE I KNEW: committed and pushed to that branch, because it is where
+the work already sat and because the owner asked for the work to be committed.
 
 ### The stop hook
 
@@ -289,3 +299,71 @@ WHAT CAME BACK FROM THE FIELD since the last look? Nothing in the machine can
 answer that, and no amount of draining or mining stands in for it.
 
 This run could not stop to ask, so it is asked here.
+
+## Added after M5 and the spikes, 2026-08-21
+
+### Thirteen candidate files vanished and nothing in the lane did it
+
+AT 09:35:43Z a glob of `spec/trace/candidate/*` returned thirteen files, all
+from earlier records, and none of this record's four. The folder now holds this
+record's four and nothing else.
+
+NO LANE VERB REMOVED THEM. `se_file_delete` and `se_shoot` both have zero calls
+this session. The removal happened inside the chart or candidate machinery.
+
+IT MAY BE DELIBERATE. `deliverable/machines/items/candidate.md` line 76 says a
+candidate's colour is a function of its POSITION among the candidates, which
+only works if the folder holds one record's set at a time.
+
+IT IS STILL A DEFECT. `spec/trace/element/el-sizing.md` carries
+`source_refs: cand-whoever-holds-the-hands-decides`, and i38's own evidence cites
+the same node. Elements are standing artifacts. Both references now dangle.
+
+I LEFT THE DELETIONS OUT OF THE COMMIT so history still holds the files. The
+working tree is still missing them. Captured as `note-67f43216996d`.
+
+### Arriving clears the target, and the target lands on the front desk
+
+After the second spike arrived, the pull came back with `target: "front_desk"`.
+Nothing asked for that.
+
+THIS IS THE SAME SORE SPOT the owner raised by voice today: aiming at the desk
+should step OUT of the machine rather than route through it. Here the machine
+aimed itself at the desk, which is the other half of the same confusion.
+
+I RE-AIMED AT THE NEXT SPIKE and the walk carried on. It costs a call each time
+and it is easy to miss.
+
+### The pace string is the design's own idea, already half-built
+
+A test job's record on disk reads:
+
+    {"id":"test-mt2tjjx0-2","started":1787308851348,
+     "pace":" The last battery took 92s wall — expect the verdict on that scale."}
+
+THE FIGURE AND ITS BASIS ARE BOTH THERE and they are one English sentence. This
+record's decision `raid-dec-the-duration-and-its-basis-are-one-return-value`
+asks for the same two things as two fields.
+
+SO THE BUILD IS SMALLER THAN IT LOOKED. What exists is the right idea in the
+wrong shape, and turning a sentence into two fields is a smaller job than
+inventing an estimator.
+
+### What the two spikes found together
+
+THE WORK SURVIVES AND ITS ANSWER HAS NOWHERE TO GO. An orphaned judgment ran to
+completion after its starter exited. A leaving verdict lives in an in-memory Map
+that deletes its own entry on settle, so it never reaches disk at all.
+
+A JOB RECORD CARRIES NO STATE AND NO TOTAL. Without the first a verdict has
+nowhere to land. Without the second no duration can be computed for that kind of
+work.
+
+THAT TURNS A FATAL RISK WITH AN UNKNOWN FIX INTO A FATAL RISK WITH A TWO-FIELD
+FIX. It is the most useful thing this record has produced so far.
+
+### Two job tables, on disk, side by side
+
+`.se/jobs` holds 35 entries and `.se/test-jobs` holds 1. Neither can see the
+other. The split this record exists to end is two directories, and it took one
+`readdirSync` to show it.

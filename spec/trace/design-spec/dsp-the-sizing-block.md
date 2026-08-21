@@ -7,6 +7,7 @@ realizes:
   - el-sizing
   - if-engine-delta-to-sizing
   - if-method-compiler-to-sizing
+  - if-sizing-to-walk-engine
 files:
   - deliverable/engine/sizing.ts
   - deliverable/engine/rigor-matrix.ts
@@ -181,3 +182,20 @@ and it is not written into the requirement.
 HOW A RUNG MAPS TO A HAND. Outside this tree by design. What this block owes is
 a vocabulary stable enough to implement against, which is the cost of not
 asserting a roster.
+
+## The return leg became a named crossing in i51
+
+THIS SPEC ALWAYS DETAILED THE RETURN and nothing named it. The sized instruction
+goes back to the walk engine, which is what hands it to the caller.
+
+WHY IT ONLY BECAME A CROSSING NOW. The element matrix computes an owed cell where
+a flow's producer and consumer sit in different elements. Nothing in the function
+model CONSUMED `flow-instruction` inside this tree until i51 minted
+`hand-back-a-step-still-deciding`, which does.
+
+SO [[if-sizing-to-walk-engine]] IS DECLARED AND THIS SPEC REALIZES IT. The
+exchange is as old as the element; only the node is new.
+
+NOTHING ABOUT THE SIZING CHANGES. It still names a rung and never a model, it
+still starts nothing, and a no-match is still a returned value rather than a
+silence.

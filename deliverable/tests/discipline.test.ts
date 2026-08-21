@@ -497,13 +497,22 @@ test("a change that maps to a test file is answered by that file, and the decisi
   rmSync(root, { recursive: true, force: true });
 });
 
-test("an unmapped change buys the battery — no scoped run answers for it", () => {
+// THIS CASE'S CLAIM REVERSED AT i51. It read "an unmapped change buys the
+// battery" and asserted scope "battery".
+// req-a-diff-no-test-answers-for-is-reported-not-swept says the opposite:
+// running everything answers a question nobody asked, and hides that nothing
+// answers the one that was asked.
+//
+// THE `why` ASSERTION IS UNCHANGED. Naming the gap was always right; only what
+// happens after naming it moved.
+test("an unmapped change runs nothing from the suite and names the gap", () => {
   const root = productRoot();
   const se = join(root, ".se");
   testRecord(se, root, true);
   writeFileSync(join(root, "deliverable", "engine", "render.ts"), "// no test file exists for render\n");
   const d = decideScope(se, root, false);
-  assert.equal(d.scope, "battery");
+  assert.equal(d.scope, "nothing", `nothing answers for this diff, so nothing from the suite runs: ${JSON.stringify(d)}`);
+  assert.equal(d.files.length, 0, "and no file is named to run");
   assert.match(d.why, /no test that answers/, "the reason names the gap rather than a threshold");
   rmSync(root, { recursive: true, force: true });
 });
@@ -700,4 +709,42 @@ test("the full battery formats before preflight and stops on format failure", ()
   assert.ok(formatAt < preflightAt, "formatting precedes preflight and selftest");
   assert.ok(failureAt > formatAt && returnAt > failureAt && returnAt < preflightAt, "a format failure stops the battery");
   assert.equal((battery.match(/BIOME_BIN/g) ?? []).length, 1, "formatting runs once per full battery");
+});
+
+// A DIFF NO TEST ANSWERS FOR IS REPORTED, NOT SWEPT, authored test-first at
+// i51's author-tests.
+//
+// BOTH CASES ARE RED against the second branch of
+// req-a-diff-no-test-answers-for-is-reported-not-swept: nothing maps, so the
+// engine runs everything. Measured 2026-08-21 on this record's own run — 131
+// changed files had no test that answers for them and the whole battery fired
+// for a diff of markdown nodes.
+//
+// THE FULL SUITE STILL RUNS AT VERIFICATION. This row governs a question asked
+// mid-walk, never the release evidence.
+
+/** A git root whose only change since the last green is one markdown file. */
+function docsOnlyRoot(): string {
+  const root = gitRoot();
+  writeFileSync(join(root, "notes.md"), "a paragraph nobody tests\n");
+  return root;
+}
+
+test("a documents-only change starts no test file at all", () => {
+  const root = docsOnlyRoot();
+  const se = join(root, ".se");
+  testRecord(se, root, true);
+  const d = decideScope(se, root, false);
+  assert.notEqual(d.scope, "battery", `a markdown edit fired the whole suite, which answers a question nobody asked: ${JSON.stringify(d)}`);
+  assert.equal(d.files.length, 0, `nothing answers for a markdown edit, so nothing runs: ${JSON.stringify(d.files)}`);
+  rmSync(root, { recursive: true, force: true });
+});
+
+test("the answer names every changed part that no test covers", () => {
+  const root = docsOnlyRoot();
+  const se = join(root, ".se");
+  testRecord(se, root, true);
+  const d = decideScope(se, root, false);
+  assert.match(d.why, /notes\.md/, `the unanswered part is named rather than swept past: ${d.why}`);
+  rmSync(root, { recursive: true, force: true });
 });

@@ -464,11 +464,15 @@ export function runTools(
         // last verdict, and saying so plainly beats SE-C-130's old refusal:
         // the caller learns the same thing and the walk does not stop.
         if (decision.scope === "nothing") {
+          // THE SWEEP IS NOT THE SUITE. A diff that maps to no test runs no
+          // test file, and the check that READS documents still answers for it.
+          const swept = decision.sweep ? [await runSweep()] : [];
           return {
             ok: true,
-            ran: false,
+            ran: decision.sweep,
             question: scopedQuestion(args.question),
-            decided: { scope: "nothing", files: [], why: decision.why },
+            decided: { scope: "nothing", files: [], why: decision.why, sweep: decision.sweep },
+            ...(swept.length > 0 ? { results: swept } : {}),
           };
         }
         const work =

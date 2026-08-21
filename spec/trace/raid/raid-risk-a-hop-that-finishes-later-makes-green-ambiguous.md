@@ -47,3 +47,18 @@ than once.
 A named answer for the pending state, carried in every place green is read,
 with a test that walks a state whose exit is still running and asserts what
 each reader sees.
+
+## No longer a design worry, 2026-08-21
+
+IT IS AN OBSERVABLE STATE OF THE PRODUCT TODAY, measured in
+[[exp-does-a-standing-hold-still]].
+
+AT 86,079 ms INTO A RUN the live progress read 175 of 175 files and 1716 of 1716
+cases, and the same call reported `running: true`. Every unit of work was done
+and the verdict was not in.
+
+THE GAP IS NOT SMALL. The run settled about fourteen seconds later.
+
+AND THE DURABLE RECORD WAS WORSE. `.se/test-state.json` said `ok: true` with a
+timestamp 88 minutes old, throughout a window in which a red was being computed.
+A reader had no way to tell a live window from a settled answer.

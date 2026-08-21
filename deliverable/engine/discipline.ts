@@ -452,24 +452,17 @@ export function decideScope(seDir: string, root: string, force: boolean): ScopeD
   }
 
   const { mapped, unmapped } = mapChangedToTests(root, changed);
-  if (unmapped.length > 0) {
-    return {
-      scope: "battery",
-      files: [],
-      why: `${String(unmapped.length)} changed file(s) have no test that answers for them (${unmapped.slice(0, 3).join(", ")}${unmapped.length > 3 ? ", …" : ""}), so no scoped run covers this diff`,
-      sweep,
-    };
-  }
+  const unanswered = `${String(unmapped.length)} changed file(s) have no test that answers for them (${unmapped.slice(0, 3).join(", ")}${unmapped.length > 3 ? ", …" : ""})`;
+
+  // NOTHING MAPS, SO NOTHING FROM THE SUITE RUNS. Running everything here
+  // answers a question nobody asked and hides that nothing answers the one that
+  // WAS asked. The sweep still rides: it is the check that reads documents, and
+  // it is not the suite.
   if (mapped.length === 0) {
-    // A DIFF OF PURE DOCUMENTS LANDS HERE, and the battery is the wrong answer
-    // to it. The sweep is the check that reads documents, so it rides along
-    // and the `why` says which question was actually asked.
     return {
-      scope: "battery",
+      scope: "nothing",
       files: [],
-      why: sweep
-        ? "the diff is mostly DOCUMENTS and maps to no test file, so the sweep is the check that answers it — the battery runs behind it"
-        : "the diff maps to no test file at all, so nothing narrower is possible",
+      why: `no test answers for this diff — ${unanswered}`,
       sweep,
     };
   }
@@ -483,6 +476,18 @@ export function decideScope(seDir: string, root: string, force: boolean): ScopeD
       scope: "battery",
       files: [],
       why: `${String(wouldSee.size)} distinct files would have run piecemeal since the last battery (flip ${String(threshold)}) — the whole suite is now the cheaper call`,
+      sweep,
+    };
+  }
+
+  // SOME PARTS MAP AND SOME DO NOT. What maps RUNS; what does not is NAMED, so
+  // the caller can see the edge of the answer instead of a green that covered
+  // less than it looked like.
+  if (unmapped.length > 0) {
+    return {
+      scope: "scoped",
+      files: mapped,
+      why: `${String(mapped.length)} test file(s) answer for part of this diff, and ${unanswered}`,
       sweep,
     };
   }

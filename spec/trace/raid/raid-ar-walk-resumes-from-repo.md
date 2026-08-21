@@ -7,7 +7,7 @@ statement: The architecture leaves req-walk-resumes-from-repo at risk — the re
 owner: the adjudicator
 trigger: a session ending while any step's leaving judgment is still deciding
 status: open
-impact: A step left at the third standing has no live judgment behind it after the session ends. The repository says deciding, and nothing in the structure says who settles it.
+impact: "A step left at the third standing has its judgment finish and its verdict reach nobody. Measured 2026-08-21 — the work survives losing its parent, and the answer has no route back into the record."
 breaks_how_badly: fatal
 how_likely: expected
 source_refs:
@@ -52,3 +52,26 @@ THAT DECISION BELONGS TO M7, and this entry is what carries it there.
 The ATAM walk, not a build. Nothing was measured, because there is nothing to
 measure yet — this is a hole in what the structure says, and the entry says so
 rather than pretending a number exists.
+
+## Sharpened by two spikes, 2026-08-21
+
+THIS ENTRY SAID THE WORK WAS LOST. It is not. Both halves were measured and the
+truth is narrower and more fixable.
+
+[[exp-does-a-left-check-survive-its-call]] SHOWED THE WORK SURVIVES. An orphaned
+judgment whose starter had exited ran to completion and wrote its verdict.
+
+[[exp-what-a-fresh-session-sees]] SHOWED THE ANSWER HAS NOWHERE TO GO. A running
+job is recorded only under `.se/jobs/`, which `.gitignore` line 3 excludes. A
+leaving verdict is weaker still: `deliverable/engine/sessionscript.ts` line 105
+holds it in an in-memory Map and line 156 deletes the entry on settle, so it
+never reaches disk at all.
+
+SO THE FIX IS TWO FIELDS AND A SETTLE PATH. The operation record needs the state
+it belongs to and the total its progress divides into. The verdict then lands in
+the evidence form's frontmatter, where every other durable standing already
+lives.
+
+THE GRADE STAYS FATAL. `req-walk-resumes-from-repo` is fatal, and until the
+settle path is built a fresh session still cannot serve the walk from the
+repository alone.
