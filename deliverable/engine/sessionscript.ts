@@ -144,12 +144,25 @@ export class Scripts {
       for (const rel of scripts) {
         const abs = resolveInRoot(this.host.machineRoot(), rel, "engine/session.ts script");
         const r = await this.spawnScript(abs);
-        // THE TAIL, BECAUSE ENDS CARRY VERDICTS. A head slice keeps the run's
-        // opening banner and drops the failing tests block, which is the only
-        // part of a red anybody needs. Seen on this state's own first red:
-        // 4000 characters of passing cases and not one failure.
+        // BOTH ENDS, BECAUSE EACH CARRIES HALF THE VERDICT.
+        //
+        // The TAIL carries the counts — exit codes, totals, units. A head slice
+        // alone keeps the opening banner and drops them.
+        //
+        // The HEAD carries the NAMED FAILURES. battery.ts writes
+        // failureSummary(out) before the runner's own output, precisely so a
+        // reader learns which files are red without reading the whole run.
+        //
+        // KEEPING ONLY THE TAIL DROPPED THAT SUMMARY. Measured on i51's own
+        // confirm run: `fail 2` arrived with 4000 characters of passing cases
+        // and neither failure named. An error that will not say what failed is
+        // the blanket error the house rule forbids.
         const whole = r.out.trim();
-        const out = whole.length <= 4000 ? whole : `…[${String(whole.length - 4000)} earlier chars]\n${whole.slice(-4000)}`;
+        const ends = 2500;
+        const out =
+          whole.length <= ends * 2
+            ? whole
+            : `${whole.slice(0, ends)}\n…[${String(whole.length - ends * 2)} characters between the named failures and the counts]\n${whole.slice(-ends)}`;
         outputs.push(`${rel} → exit ${r.status}${out === "" ? "" : `\n${out}`}`);
         if (r.status !== 0) ok = false;
       }

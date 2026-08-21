@@ -111,9 +111,25 @@ function gitSeed(root: string): void {
 
 async function bootHuman(s: Session): Promise<void> {
   checkDocs(s);
-  for (let i = 0; i < 10; i++) {
+  // A LEAVING CHECK HANDS THE CALL BACK NOW, and this helper predated that.
+  //
+  // prepare_idle runs five scripts. They outlast the handback bound whenever
+  // the machine is busy, so the attempt is REFUSED with "still running"
+  // instead of blocking until the verdict is in. That refusal is an
+  // instruction to pull again, not an error.
+  //
+  // A HELPER THAT WANTS THE JUDGMENT SETTLED THEREFORE RETRIES. Without this
+  // the case passed alone and failed inside the full suite, where the same
+  // five scripts compete with 153 other suites for the machine.
+  for (let i = 0; i < 400; i++) {
     if (s.active()[0] === "idle") return;
-    await s.advance();
+    try {
+      await s.advance();
+    } catch (e) {
+      const deciding = (e as { clause?: string }).clause === "SE-C-112" && String((e as Error).message).includes("STILL RUNNING");
+      if (!deciding) throw e;
+      await new Promise((r) => setTimeout(r, 100));
+    }
   }
   throw new Error("boot did not reach idle");
 }
