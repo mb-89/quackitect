@@ -4,13 +4,13 @@
 // it is the only hook a fresh cloud clone can fire. A hook placed by the
 // arrival cannot help the session that performs the arrival.
 //
-// .mcp.json IS COMMITTED TOO, since 2026-08-20. Before that it was not, and
+// .mcp.json IS COMMITTED TOO. Before that it was not, and
 // only the settings file was — so a cloud clone got the cage and no lane, which
 // denied every native tool and supplied nothing to replace them. Committing one
 // of the pair and not the other is the whole of that failure.
 //
 // WHAT IT REPLACES. Prose. cloud-runner.md described five acts and every cloud
-// run performed them by hand. MEASURED on the i35 run, 2026-08-17: most of an
+// run performed them by hand. MEASURED on the i35 run: most of an
 // hour before the first se_pull, spent on a runtime, an install, a shallow
 // clone with no `main`, a cage, and a hand-written JSON-RPC client. None of
 // that is judgment, so none of it should be an agent's problem.
@@ -24,7 +24,7 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 // THE GREETING IS SHARED WITH THE CAGED HOOK, se-hook-start. Both used to
 // carry their own copy of the pull instruction, which is two sources for one
-// text (2026-08-18).
+// text.
 import { ARRIVED } from "../pullnotice.ts";
 
 const HERE = dirname(fileURLToPath(import.meta.url));

@@ -141,7 +141,6 @@ function start(port: number): number {
   const child = spawn(process.execPath, [lane, "--root", ROOT, "--headless", "--mirror-port", String(port)], {
     ...LANE_SPAWN,
     cwd: DELIVERABLE,
-    env: { ...process.env, SE_PANEL_SUPPRESS: "1" },
   });
   if (child.pid === undefined) die("start", "the lane process did not spawn");
   child.unref();

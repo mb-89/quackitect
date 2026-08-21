@@ -421,6 +421,10 @@ if ($manual) {
   node (Join-Path $root "deliverable\engine\bin\se-manual.ts") --root $root @forwarded
   exit $LASTEXITCODE
 }
+# CLASSIC IS THE ONE MODE THAT ASKS FOR A BROWSER WINDOW. There is no VS Code
+# shell here, so the Mirror is the only surface the person gets. Every other
+# starter of the lane has its own surface and opens nothing.
+$env:SE_PANEL_OPEN = "1"
 $env:SE_ARGS = ($forwarded -join "`n")
 $argNote = if ($forwarded.Count -gt 0) { " (args: $($forwarded -join ' '))" } else { "" }
 Write-Host "$P - launching caged agent$argNote" -ForegroundColor Cyan

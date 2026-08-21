@@ -325,7 +325,7 @@ function startServer(root, runner) {
     cwd: root,
     // The headless lane survives an extension-host restart. Deactivation
     // still owns deliberate shutdown through the process-tree kill below.
-    env: { ...process.env, ...runner.env, SE_SESSION: sessionToken, SE_PANEL_SUPPRESS: "1" },
+    env: { ...process.env, ...runner.env, SE_SESSION: sessionToken },
     stdio: ["ignore", "pipe", "pipe"],
     shell: runner.shell,
     windowsHide: true

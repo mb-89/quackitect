@@ -55,5 +55,7 @@ session.onClosed = () => {
 };
 startMirror({ session, root, port, log: new CallLog(seDir(root)), mode: "manual" });
 process.stderr.write(`se-manual: walking ${root}\nse-manual: open http://localhost:${port}\n`);
-// Manual mode has no other surface — the mirror IS the session, so it opens.
-if (process.env.SE_PANEL_SUPPRESS !== "1") openPanel(`http://localhost:${port}/`);
+// Manual mode has no other surface — the mirror IS the session, so it opens
+// without being asked. SE_PANEL_DISABLE=1 is the hard off, for a box with no
+// browser for the panel to reach.
+openPanel(`http://localhost:${port}/`);

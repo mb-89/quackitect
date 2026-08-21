@@ -335,10 +335,23 @@ if (argv.includes("--child") || process.env.SE_HOT_DISABLE === "1") {
         const url = `http://localhost:${mirrorPort}/`;
         session.mirrorUrl = url;
         process.stderr.write(`se-mcp: mirror (the human's hand) at ${url}\n`);
-        // The server's first act once the panel exists: put it in front of
-        // the user — but only once per session, not on every reload (the
-        // open page reloads itself). se_panel reopens it any time.
-        if (process.env.SE_PANEL_SUPPRESS !== "1") openPanel(url);
+        // A WINDOW OPENS ONLY WHEN SOMETHING ASKED FOR ONE.
+        //
+        // The lane is started by TOOLS far more often than by a person. The
+        // arrival hook, the VS Code shell and se-start each spawn it, and each
+        // already has a surface of its own. Opening by default put a browser
+        // window in front of the person on every VS Code start, and two windows
+        // when two starters raced — the second showing the same walk, with
+        // nothing saying which one was live.
+        //
+        // WHO ASKS. RUNME --classic, which has no other surface. se_panel,
+        // which is the person asking in as many words. Manual mode opens on its
+        // own, because there the mirror IS the session.
+        //
+        // A RELOAD IS NOT A NEW SESSION. The shim clears this flag on every
+        // respawn, so se_reload never opens a second window — the page that is
+        // already open reloads itself.
+        if (process.env.SE_PANEL_OPEN === "1") openPanel(url);
       });
     };
     bootMirror();
@@ -377,7 +390,10 @@ if (argv.includes("--child") || process.env.SE_HOT_DISABLE === "1") {
     if (child === null) {
       const c = spawn(process.execPath, [join(binDir, "se-mcp.ts"), ...process.argv.slice(2), "--child"], {
         stdio: ["pipe", "pipe", "inherit"],
-        env: { ...process.env, SE_SESSION: sessionToken, ...(spawnedOnce ? { SE_PANEL_SUPPRESS: "1" } : {}) },
+        // The FIRST child may open a window if something asked for one; every
+        // respawn after it must not, so the flag is cleared rather than dropped
+        // — the child inherits this environment, and dropping a key keeps it.
+        env: { ...process.env, SE_SESSION: sessionToken, ...(spawnedOnce ? { SE_PANEL_OPEN: "0" } : {}) },
         windowsHide: true,
       });
       spawnedOnce = true;

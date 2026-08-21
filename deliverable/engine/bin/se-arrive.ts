@@ -11,7 +11,7 @@
 //
 // WHY IT EXISTS AT ALL. The five acts of Arrival A were written as prose in
 // guidance/method/cloud-runner.md and performed BY HAND on every cloud run.
-// MEASURED on the i35 run, 2026-08-17: the hand-performed version cost most of
+// MEASURED on the i35 run: the hand-performed version cost most of
 // an hour before the first `se_pull` — a runtime below the pin, an install, a
 // shallow clone with no `main`, a cage to place, and finally a hand-written
 // JSON-RPC client because the agent had no other way to reach the lane. Every
@@ -64,7 +64,7 @@ if (process.argv.some((a) => a === "--help" || a === "-h" || a === "-?")) {
 
 const ROOT = resolve(argValue("--root") ?? process.cwd());
 const PORT = Number(argValue("--mirror-port") ?? process.env.SE_MIRROR_PORT ?? 7333);
-// THE RUNG TRAVELS AS A WORD, never as a number (owner ruling 2026-08-18).
+// THE RUNG TRAVELS AS A WORD, never as a number.
 // The engine resolves it against machines/scale.md, so a caller never has to
 // know what range the ladder runs over.
 const AUTONOMY = argValue("--autonomy") ?? process.env.SE_AUTONOMY ?? "tactical";
