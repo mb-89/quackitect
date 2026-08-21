@@ -2649,6 +2649,177 @@ SO THE ASYMMETRY IS TWICE VOLUNTARY: the walker declares that it went weaker,
 and then owes a sentence. `raid-risk-the-weaker-model-asymmetry-has-nothing-enforcing-it`
 stands at crippling and this build does not retire it.
 
+## F72 — the machine handed out a remedy that destroyed the walk following it
+
+THE BLOCKER NAMED A CHAIN ROOT AND GAVE THE EXACT CALL. `se_reopen {state:
+"gate-implementation"}`, with a note explaining that re-earning it was cheaper
+than it sounded. I made that call. It dropped `run-demos`, and the walk never
+moved again.
+
+WHY IT COULD NOT MOVE. A state's own form is served only while the walk stands
+ON it with its sub-machine unseeded. Once the sub is seeded the walk is inside
+it, and the lookup read the LEAF alone: a sub's start, end and join are
+machinery, machinery never signs, so the answer was "nothing is owed". Leaving
+the sub runs the parent's claim guard, the guard wants the claim, the claim
+wants the form, and the form was unreachable.
+
+EVERY DOOR WAS CLOSED, AND I TRIED THEM. A bare pull answered `do` with two
+options and no form. A submit was refused as a form nothing asked for. A
+reopen of the parent moved the parent's token and left the walk where it was.
+A reopen of a state with write rights moved that token too — and not the walk,
+because the sub stack holds the position.
+
+THE SHAPE WORTH KEEPING: a remedy that cannot be served is worse than no
+remedy. No remedy leaves you looking for a door. A remedy that reads like a
+door and is a wall spends your calls and your confidence, and this one is
+printed by the engine with an air of reassurance.
+
+NOTHING CHECKS THAT A REMEDY THE ENGINE OFFERS IS ONE THE ENGINE CAN THEN
+SERVE. The sub-machine case is fixed. The class is open, and it is on the
+release gate's follow-up.
+
+## F73 — the same repair was written three times, and the first two were confidently wrong
+
+FIRST WRITING: ascend from the leaf's machinery to the state that runs the
+sub. It typechecked, its own cases passed, and it answered nothing. The state
+resolved; the MACHINE did not. Every form lookup asks "which machine am I in",
+the answer is the leaf's, and the leaf's machine does not declare its parent.
+So the ascent named a form the lookup then failed to find, threw, and a catch
+turned it back into "nothing is owed".
+
+SECOND WRITING: resolve a form's machine from its name, searching up the sub
+stack. Ten cases went red at once, and they were right. Every entry into an
+iteration stands at a machinery leaf under a container state that has never
+signed, so the ungated ascent served that container's form to a walk that had
+just arrived.
+
+THIRD WRITING: ascend ONE frame, and only when the parent's claim was
+REOPENED AFTER SIGNING. That is the condition the dead end is made of, and
+nothing else. Then a fourth place had to take the same ascent — the guard
+saying where a form may be STAMPED — because serving a form whose submit
+refuses is the dead end moved one step rather than removed.
+
+WHAT THE THREE WRITINGS HAVE IN COMMON: each was a correct statement of the
+rule with too little of the system in view. The first knew about states. The
+second knew about machines. Only the third knew WHEN.
+
+THE TEN RED CASES WERE THE CHEAPEST THING THAT HAPPENED ALL SESSION. Without
+them the second writing would have shipped, and it breaks the ordinary case —
+every walk entering an iteration — while fixing the rare one.
+
+## F74 — the cage could not repair the cage
+
+THE DEADLOCK MADE EVERY WRITE TOOL ILLEGAL. The tool gate reads the state the
+walk stands in, the walk stood at a sub's `end`, and that state allows
+`se_pull` and `se_file_read`. The fix was an engine change. There was no
+state with write rights the walk could reach, because reaching one is what it
+could not do.
+
+I TRIED THE HONEST DOORS FIRST and they are worth listing, because the next
+agent will try them too. `no_tool_reason` is not an argument `se_file_patch`
+accepts. A reopen of a state with write rights does not move a walk held
+inside a sub. An escape lands at the front desk and clears the sub stack, but
+it is a stop and it re-enters the container from scratch.
+
+WHAT WORKED IS THE MACHINE'S OWN SWITCH. `POST /emergency {"on": true}` on
+the mirror lifts the tool gate everywhere, and it refuses unless the autonomy
+sits at its top rung. The owner had granted the dial in as many words. So the
+repair went through the LANE, logged like everything else, rather than around
+it.
+
+THAT DISTINCTION IS THE WHOLE POINT AND IT IS EASY TO LOSE. Going around the
+cage with native tools would have produced the same files and no record. The
+emergency switch produces the same files WITH one, and the record says the
+gate was lifted, by whom, and when.
+
+## F75 — a red check cannot be repaired where it fires
+
+`verification` HAS TWO PROPERTIES THAT DO NOT COMPOSE. Its exit script is the
+full battery, so a red battery holds the walk there. Its `legal_tools` are
+read-only. And `fix-findings`, the state whose whole job is repairing what
+verification found, sits BEHIND that same exit.
+
+SO A RED BATTERY AT VERIFICATION IS REPAIRED BY GOING BACKWARD, and the only
+state upstream with patch rights is `trace-design`. Each round trip costs a
+reopen, a submit, a battery run and two more submits to get back.
+
+I MADE THAT ROUND TRIP THREE TIMES. Roughly twenty minutes of it is the
+battery running the same 1,657 tests to tell me about one comment and then one
+guard.
+
+`boot/prepare_idle` ALREADY HAS THE SHAPE THAT FIXES THIS, and says so in its
+own guidance: "While a check stands red, the repair tools are legal HERE."
+Verification is the state that most needs that sentence and does not have it.
+
+## F76 — a fresh package's first boot is red, on files the package excludes on purpose
+
+I EXPANDED THE ARCHIVE, INSTALLED ITS DEPENDENCIES AND STARTED THE PRODUCT
+AGAINST ITS OWN ROOT. It walked its whole boot reading loop and then refused:
+two `deep-research` skill files MISSING.
+
+EVERY PART OF THAT IS WORKING AS DESIGNED, WHICH IS WHY IT SURVIVED. The
+skills are GENERATED, so the packaging list excludes them deliberately and
+says why in a comment. Preflight demands them and names the script that places
+them. The script exists and works.
+
+WHAT NOBODY OWNS IS THE CALL. `RUNME.ps1` never runs it — the string does not
+appear in the installer. So the first thing a new person sees is a red check
+with a remedy they have to run by hand.
+
+FOUND BY USING THE PACKAGE, WHICH IS THE ONLY WAY IT COULD BE FOUND. Building
+it green proves the archive assembles. Running it is what asks whether it
+works, and the state's own guidance says the human-shaped work here is the
+check.
+
+THE FIX IS ONE LINE IN THE INSTALLER. It is on the emit-back list rather than
+made here, because the installer is a Windows script this box cannot run and a
+blind edit to an unexercised install path is worse than a named finding.
+
+## F77 — a page I improved crossed a line the corpus measures
+
+THE CONSISTENCY SWEEP GREW `walking.md` BY SIX HUNDRED BYTES and the battery
+went red. A guidance page had crossed the tightest measured host payload limit,
+and a ratchet holding the count at three named the fourth by name.
+
+THE MEASUREMENT IS ON THE WIRE, NOT THE FILE. JSON escaping plus the envelope
+adds about fourteen per cent to a prose page, so 18,692 raw bytes is 21,323 on
+the wire against a limit of 20,480. I trimmed the file once by feel and it was
+still over — the gap between the two numbers is exactly the trap the module's
+own comment warns about.
+
+WHAT I CUT, AND THE RULE I USED. Only text that repeated a rule already stated
+elsewhere on the same page. One paragraph even admitted it: "exactly as this
+document already says". Four blocks of restatement and three sentences of
+history came out; every binding rule stayed.
+
+THE PAGE NOW SITS 350 BYTES UNDER THE LINE, which is about one paragraph of
+headroom. That is thin, and it is recorded here so the next editor knows the
+page is nearly full rather than discovering it through a red battery.
+
+A RATCHET THAT NAMES WHAT CROSSED IS WORTH FOUR THAT COUNT. The failure
+message listed all four oversized pages, so the one I had just edited was
+obvious. A bare count would have sent me reading the whole corpus.
+
+## F78 — the coordinate is live, and the hand it was built to count has never appeared
+
+929 RECORDS IN THE SHIPPED LOG NOW CARRY `part`, `state` AND `answered_by`.
+By part: 843 walker, 74 surface, 12 owner. That is the feature working, on a
+server built from this code, counted out of the file rather than argued from
+the source.
+
+NOT ONE RECORD CARRIES `guide`. The whole reason this requirement was minted
+mid-record — the owner's ruling that a walker's work and a guide's must be
+countable apart — has no datum behind it, because this walk had one hand.
+
+`answered_by` READS `unreported` ON ALL 929. That is the designed answer when
+nothing self-reports, and it is also the honest picture: a field that can only
+ever be a claim, with nobody yet making one.
+
+SO THE MEASUREMENT EXISTS AND MEASURES NOTHING YET. Both halves of that
+sentence belong in the release notes, and both are in the gate's overrides.
+A vocabulary is not a measurement until a second hand uses it.
+
+
 
 
 
