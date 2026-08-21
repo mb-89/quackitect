@@ -469,3 +469,46 @@
 {"ts":"2026-08-21T13:53:04.594Z","op":"done","visit":"iterations/i51/verification@1","node":"d42","brief":"12 of 12 pass in a fresh process, new case included"}
 {"ts":"2026-08-21T13:53:12.676Z","op":"plan","visit":"iterations/i51/fix-findings@0","parent":null,"nodes":[{"id":"d53","brief":"commit the fix and the gate evidence"},{"id":"d54","brief":"walk validation and release to shipped"},{"id":"d55","brief":"write and hand over the field report"}]}
 {"ts":"2026-08-21T13:53:20.707Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d56","brief":"staging only the six files this pass touched"}
+{"ts":"2026-08-21T13:53:40.960Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d57","brief":"aiming at ship"}
+{"ts":"2026-08-21T13:54:22.413Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d58","brief":"field report drafted while the write verbs are in hand"}
+{"ts":"2026-08-21T13:54:45.677Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d59","brief":"report records the live running entry and the honest absent estimate"}
+{"ts":"2026-08-21T13:54:53.126Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d60","brief":"proving the field report cannot enter version control"}
+{"ts":"2026-08-21T13:55:00.151Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d61","brief":"walking toward ship as the confirm run settles"}
+{"ts":"2026-08-21T13:55:14.932Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d62","brief":"checking how far into the confirm run we are"}
+{"ts":"2026-08-21T13:56:01.211Z","op":"fork","visit":"iterations/i51/fix-findings@0","parent":null,"node":"d63","brief":"the battery says fail 2 and hides which two","nodes":[{"id":"d64","brief":"make the battery print its failures"},{"id":"d65","brief":"find and fix the two"},{"id":"d66","brief":"re-run"}]}
+{"ts":"2026-08-21T13:56:34.218Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d67","brief":"the lane keeps both ends so the named failures survive"}
+{"ts":"2026-08-21T13:56:47.564Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d68","brief":"a script that prints the failures the truncation hid"}
+{"ts":"2026-08-21T13:56:53.549Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d69","brief":"running the suite to learn which two are red"}
+{"ts":"2026-08-21T13:58:00.389Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d70","brief":"backgrounding the run; the host caps a call at 60s"}
+{"ts":"2026-08-21T13:58:07.631Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d71","brief":"one suite run at a time"}
+{"ts":"2026-08-21T14:03:10.504Z","op":"done","visit":"iterations/i51/fix-findings@0","node":"d64","brief":"the summariser reads TAP and the lane keeps both ends of the output"}
+{"ts":"2026-08-21T14:03:27.342Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d72","brief":"reading the shared boot helpers"}
+{"ts":"2026-08-21T14:04:02.323Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d73","brief":"both shared boot helpers wait out a deciding judgment"}
+{"ts":"2026-08-21T14:04:21.714Z","op":"done","visit":"iterations/i51/fix-findings@0","node":"d65","brief":"both failures traced to boot helpers that die on the handback"}
+{"ts":"2026-08-21T14:04:33.496Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d74","brief":"confirm run over the helper fixes"}
+{"ts":"2026-08-21T14:05:00.980Z","op":"obsolete","visit":"front_desk@0","node":"d15","brief":"superseded: the gate is signed"}
+{"ts":"2026-08-21T14:05:07.289Z","op":"obsolete","visit":"iterations/i51/gate-implementation@0","node":"d30","brief":"duplicate of d54, kept as one item"}
+{"ts":"2026-08-21T14:05:18.374Z","op":"obsolete","visit":"iterations/i51/gate-implementation@0","node":"d31","brief":"duplicate of d55, kept as one item"}
+{"ts":"2026-08-21T14:05:23.951Z","op":"done","visit":"iterations/i51/verification@1","node":"d39","brief":"the account was right; the second caller was the hole"}
+{"ts":"2026-08-21T14:05:30.382Z","op":"obsolete","visit":"front_desk@0","node":"d16","brief":"duplicate of d54, kept as one item"}
+{"ts":"2026-08-21T14:05:36.148Z","op":"obsolete","visit":"front_desk@0","node":"d17","brief":"duplicate of d55, kept as one item"}
+{"ts":"2026-08-21T14:05:42.658Z","op":"done","visit":"iterations/i51/fix-findings@0","node":"d53","brief":"committed as 2726dcdf"}
+{"ts":"2026-08-21T14:06:33.262Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d75","brief":"one failure left, in ticks"}
+{"ts":"2026-08-21T14:07:00.829Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d76","brief":"a refusal riding inside a good answer is a wait, not a move"}
+{"ts":"2026-08-21T14:07:11.513Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d77","brief":"the block printer sees nested failures too"}
+{"ts":"2026-08-21T14:07:20.364Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d78","brief":"gates before the next confirm run"}
+{"ts":"2026-08-21T14:07:29.882Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d79","brief":"confirm run number two"}
+{"ts":"2026-08-21T14:09:51.847Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d80","brief":"the desk case stops aiming at idle it does not want"}
+{"ts":"2026-08-21T14:10:17.949Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d81","brief":"gates plus the one changed case"}
+{"ts":"2026-08-21T14:10:35.075Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d82","brief":"staging the five files of the reporting and helper fixes"}
+{"ts":"2026-08-21T14:10:46.937Z","op":"done","visit":"iterations/i51/fix-findings@0","node":"d66","brief":"reporting and helper fixes committed"}
+{"ts":"2026-08-21T14:11:22.887Z","op":"plan","visit":"iterations/i51/fix-findings@0","parent":null,"nodes":[{"id":"d83","brief":"confirm run green"},{"id":"d84","brief":"walk to shipped"},{"id":"d85","brief":"push and hand over the field report"}]}
+{"ts":"2026-08-21T14:14:43.459Z","op":"done","visit":"iterations/i51/fix-findings@0","node":"d83","brief":"the fix-findings confirm run went green"}
+{"ts":"2026-08-21T14:16:05.360Z","op":"update","visit":"iterations/i51/gate-implementation@0","node":"d86","brief":"verification needs re-signing after its own judgment write"}
+{"ts":"2026-08-21T14:17:03.175Z","op":"update","visit":"iterations/i51/cut-criteria@4","node":"d87","brief":"forward again; the backward aim reset the walk"}
+{"ts":"2026-08-21T14:17:52.336Z","op":"update","visit":"iterations/i51/gate-implementation@0","node":"d88","brief":"reading what the judgment write did to verification's signature"}
+{"ts":"2026-08-21T14:18:17.778Z","op":"update","visit":"iterations/i51/gate-implementation@0","node":"d89","brief":"the three unfixed items go in the report as debt"}
+{"ts":"2026-08-21T14:18:59.057Z","op":"update","visit":"iterations/i51/gate-implementation@0","node":"d90","brief":"staging the record's own files"}
+{"ts":"2026-08-21T14:19:11.755Z","op":"update","visit":"iterations/i51/gate-implementation@0","node":"d91","brief":"reaching a state where git is legal, to push"}
+{"ts":"2026-08-21T14:19:37.478Z","op":"update","visit":"iterations/i51/fix-findings@1","node":"d92","brief":"checking whether git is legal where the walk landed"}
+{"ts":"2026-08-21T14:19:47.755Z","op":"update","visit":"iterations/i51/fix-findings@1","node":"d93","brief":"committing the record's evidence"}
