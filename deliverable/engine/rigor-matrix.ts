@@ -56,6 +56,11 @@ export interface RigorMatrixRow {
   evidence_form: EvidenceField[];
   /** Narrows what the compiled state may call. Absent means every lane tool. */
   legal_tools?: string[];
+  /** WHAT BECOMES LEGAL WHILE THIS ROW'S OWN EXIT CHECK STANDS RED. A state
+   *  whose check fails and whose tools are read-only cannot be repaired where
+   *  it fires, so the repair costs a walk backwards. `boot/prepare_idle` has
+   *  carried this since it was drawn; a matrix row could not declare it. */
+  repair_tools?: string[];
   /** Set when the row IS another machine's state, by reference. */
   same_as?: string;
   /** Entry conditions inherited from the referenced state note. */
@@ -431,6 +436,7 @@ function parseMatrixRow(
     guidance: section(note.body, "Guidance"),
     evidence_form: parseEvidence(fm, file, note.body),
     legal_tools: fm.legal_tools === undefined ? undefined : asList(fm.legal_tools),
+    repair_tools: fm.repair_tools === undefined ? undefined : asList(fm.repair_tools),
     motivation: typeof fm.motivation === "string" ? fm.motivation : undefined,
     inputs: parseDoInputs(fm.inputs),
     follow_up_label: typeof fm.follow_up_label === "string" ? fm.follow_up_label : undefined,
@@ -646,6 +652,7 @@ function rowState(row: RigorMatrixRow, column?: ChangeColumn): Omit<StateDecl, "
     // A state must declare enough to execute the remedy its own refusal hands
     // back, or SE-C-112 answers with SE-C-110 and the walk cannot recover.
     ...(row.legal_tools !== undefined ? { legal_tools: row.legal_tools } : {}),
+    ...(row.repair_tools !== undefined ? { repair_tools: row.repair_tools } : {}),
     ...(row.same_as !== undefined ? { same_as: row.same_as } : {}),
     ...(row.entry !== undefined ? { entry: row.entry } : {}),
     ...(row.exit !== undefined ? { exit: row.exit } : {}),

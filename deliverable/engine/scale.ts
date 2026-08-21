@@ -98,8 +98,22 @@ export function loadStopAt(root: string): AutonomyLevel[] {
   return loadRungs(stopAtPath(root), "The notches", "stopat.md", counted);
 }
 
-/** see dsp-walk-machine.md#the-default-rung */
-export const DEFAULT_TIER = "tactical";
+/** THE RUNG EVERY LANE COMES UP ON, wherever it was started from: the client's
+ *  stdio lane, the VS Code shell's, and the arrival's. One constant, so the
+ *  three cannot disagree.
+ *
+ *  IT SITS ABOVE A GATE ON PURPOSE. Every gate in the rigor matrix weighs
+ *  exactly `tactical`, and the gate refuses when the state weighs AT LEAST as
+ *  much as the dial. A lane resting at `tactical` therefore reaches its first
+ *  gate, fills it, signs it, and can never bless it — which on a box with
+ *  nobody beside it is a dead run, not a handover.
+ *
+ *  THE PERSON STILL OWNS THE DIAL. This is where it RESTS, not a ceiling. The
+ *  mirror's control moves it either way mid-session, and rule 9 forbids opening
+ *  a record unasked at any rung, so the rung buys a bless and nothing else.
+ *
+ *  see dsp-walk-machine.md#the-default-rung */
+export const DEFAULT_TIER = "strategic";
 
 /** The default dial position, resolved against the live scale. Falls back to
  *  the top of the ladder only if the scale cannot be read at all. */

@@ -72,7 +72,11 @@ const PORT = Number(argValue("--mirror-port") ?? process.env.SE_MIRROR_PORT ?? 7
 // THE RUNG TRAVELS AS A WORD, never as a number.
 // The engine resolves it against machines/scale.md, so a caller never has to
 // know what range the ladder runs over.
-const AUTONOMY = argValue("--autonomy") ?? process.env.SE_AUTONOMY ?? "tactical";
+// THE LITERAL IS DELIBERATE, and a test binds it to the engine's DEFAULT_TIER.
+// This script runs BEFORE the install it performs, so it may not import a
+// module that could need a dependency; scale.ts reads a note and notes.ts is
+// not dependency-free. The test is what keeps the two in step.
+const AUTONOMY = argValue("--autonomy") ?? process.env.SE_AUTONOMY ?? "strategic";
 // THE NOTCH IS PASSED THROUGH AND NEVER INVENTED. A rung has a sensible
 // arrival default because a lane with none comes up unable to decide anything.
 // A notch does not: the lane's own default is right for a person sitting
@@ -356,13 +360,9 @@ THE CONTRACT BINDS FROM HERE. Everything goes through the lane, every call is
 logged, and the machine says what to do next. The opening instruction an
 unattended walk is given is deliverable/cage/kickoff.txt.
 
-IF A STEP ANSWERS 'wait', it weighs more than this session's dial (${AUTONOMY}).
-Nobody is beside the box to move it. On an unattended box that is a BOOT FAULT
-rather than a stop somebody chose: the lane was started at a rung which cannot
-finish the job it was given. Report it at the top of the field report, naming
-both rungs and the gate that refused.
-
-THE TWO DIALS ARE SET AT LAUNCH AND NOWHERE ELSE. --autonomy or SE_AUTONOMY
-sets the rung; --stop-at or SE_STOP_AT sets how far the walk may go before it
-hands back. Both are the owner's call to make, never yours.
+IF A STEP ANSWERS 'wait', it weighs more than this session's dial (${AUTONOMY}),
+and on an unattended box that is a BOOT FAULT rather than a stop somebody chose.
+The lane rests above a gate, so a walk that cannot bless one means the dial was
+LOWERED — by SE_AUTONOMY in the environment, or by a hand on the mirror. Say so
+at the top of the field report, naming both rungs and the gate that refused.
 `);

@@ -12,6 +12,7 @@ exit_script:
 entry_read:
   - deliverable/machines/methods/meth-verification-discipline.md
 legal_tools: se_file_read, se_file_search, se_file_glob
+repair_tools: se_file_read, se_file_search, se_file_glob, se_file_list, se_file_patch, se_file_write, se_run
 floor: true
 evidence:
   - name: claims
@@ -48,6 +49,12 @@ The one place the full battery runs ([[meth-test-first]]), engine-filled.
 Failure opens the fallback into fix-findings - collect everything, fix in
 one pass, one confirm run. The command is the project's battery; each
 project declares its own.
+
+WHILE THE BATTERY STANDS RED, THE REPAIR TOOLS ARE LEGAL HERE. A state whose
+check fails and whose tools are read-only cannot be repaired where it fires.
+The walk had to go backwards through trace-design to reach a state that could
+write, and then forwards again to re-run - three round trips on one red, each
+of them re-running the whole battery.
 
 THE SUBMIT FIRES IT, and until i11 nothing did. `filled_by: engine` reached
 three places in the code - a validation error, a priority, and a copied

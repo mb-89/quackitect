@@ -50,8 +50,14 @@ if (!existsSync(arrive)) {
 }
 
 // see dsp-the-arrival.md#the-dial-is-the-owners
-const autonomy = process.env.SE_AUTONOMY ?? "tactical";
-const r = spawnSync(process.execPath, [arrive, "--root", ROOT, "--autonomy", autonomy], { encoding: "utf8", cwd: ROOT });
+// NOTHING HAS TO BE SET FOR A WALK TO FINISH. The rung the lane rests on is the
+// engine's own default, and the arrival carries it; naming one here would be a
+// third opinion about the same number.
+const autonomy = process.env.SE_AUTONOMY;
+const r = spawnSync(process.execPath, [arrive, "--root", ROOT, ...(autonomy === undefined ? [] : ["--autonomy", autonomy])], {
+  encoding: "utf8",
+  cwd: ROOT,
+});
 const out = `${r.stdout ?? ""}${r.stderr ?? ""}`.trim();
 
 if (r.error !== undefined || r.status !== 0) {

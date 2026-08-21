@@ -48,16 +48,22 @@ THE COMMAND BELOW STILL REPAIRS IT, and it is what to run before anything else.
 
 ## ONE COMMAND DOES ALL OF IT NOW
 
-    node deliverable/engine/bin/se-arrive.ts --autonomy tactical
+    node deliverable/engine/bin/se-arrive.ts
 
-THAT IS THE WHOLE ARRIVAL. It fetches the refs, checks the runtime against the
-pin, installs, places the cage, starts the lane headless, and writes
-`.se/se-call.mjs` so you can call the lane with no `se_` tools of your own. It
-is idempotent: run it twice and the second run reuses the lane already up.
+THAT IS THE WHOLE ARRIVAL, and it takes no arguments. It fetches the refs,
+checks the runtime against the pin, installs, places the cage, projects the
+prompt layer, starts the lane headless, and writes `.se/se-call.mjs` so you can
+call the lane with no `se_` tools of your own. It is idempotent: run it twice
+and the second run reuses the lane already up.
+
+NOTHING HAS TO BE SET FOR THE WALK TO FINISH. The lane rests one rung above a
+gate, so an unattended run can bless its own and keep going. That rung is the
+engine's own default and it is the same everywhere.
 
 THE ROOT `.claude/settings.json` FIRES IT AT SESSION START, so on most cloud
-hosts it has already run before you read this. `SE_NO_ARRIVE=1` opts out;
-`SE_AUTONOMY` sets the dial the lane comes up on.
+hosts it has already run before you read this. `SE_NO_ARRIVE=1` opts out.
+`SE_AUTONOMY` and `SE_STOP_AT` still override the two dials for anyone who
+wants LESS than the default; neither is needed to get a run through.
 
 AND THEN CALL THE LANE:
 
@@ -188,15 +194,14 @@ refused. Then carry on with whatever does not need that gate. Where the gate is
 the FIRST one, there is nothing left to carry on with — say that plainly rather
 than filing it as a stop somebody chose.
 
-WHAT PREVENTS IT: the lane is STARTED at a rung strictly above the heaviest
-gate the run has to bless. `--autonomy` and `SE_AUTONOMY` set the rung.
-`--stop-at` and `SE_STOP_AT` set how far the walk may go before it hands back.
-Whoever launches an unattended run sets both, and the launcher is the only
-place either can be set.
+IT SHOULD NOT HAPPEN ANY MORE. The lane rests one rung above a gate, so an
+unattended run blesses its own and carries on. A two-rung refusal now means
+something LOWERED the dial — an `SE_AUTONOMY` in the environment, or a hand on
+the mirror — and the report should say which.
 
-MEASURED ON THE i51 CLOUD RUN: the kickoff gate was filled and signed, the
-bless was refused for want of authority, the agent read this paragraph, and the
-run ended with one gate between it and the work.
+MEASURED ON THE i51 CLOUD RUN, BEFORE THAT CHANGE: the kickoff gate was filled
+and signed, the bless was refused for want of authority, the agent read this
+paragraph, and the run ended with one gate between it and the work.
 
 ### Fix what you find on the way
 

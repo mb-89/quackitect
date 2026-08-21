@@ -153,7 +153,9 @@ ENGINE — read by the server (this file is where they are defined).
                  host launching from a fixed .mcp.json reads.
   --autonomy     0..1 — which states the AGENT enters by itself (priority <=
                  autonomy). 0: every step is the human's; 1: fully autonomous.
-                 Default 0.4. Env: SE_AUTONOMY. Live-adjustable in the mirror.
+                 Defaults to the rung machines/scale.md rests on, which sits
+                 above a gate so a walk can bless its own and finish. Env:
+                 SE_AUTONOMY. Live-adjustable in the mirror.
                  (--threshold and SE_THRESHOLD are the old spelling.)
   --stop-at      how far the walk may GO before it hands back, BY NAME:
                  state end, agent judgement (the default), bless, blockers
