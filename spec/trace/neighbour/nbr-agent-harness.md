@@ -33,3 +33,25 @@ The lane must report the active harness and distinguish these endings:
 - transport interruption
 - host cancellation
 - stop-hook action
+
+## What i51 adds, 2026-08-21
+
+THE CANCELLATION LIMIT IS THE ONE CROSSING THIS ITERATION TURNS ON, and it was
+listed above without its consequence.
+
+The harness decides how long it waits for a lane call. We do not set that
+number and cannot read it. When it expires the harness reports a failure to
+the agent, and the lane never hears about it.
+
+SO A LONG ANSWER IS NOT SLOW, IT IS WRONG. Measured once: two calls expired at
+this boundary, and one of them had ALREADY LANDED. The agent was told its work
+failed while the work had moved.
+
+THAT IS WHY A DEFERRED VERDICT IS A BOUNDARY CONCERN RATHER THAN A COMFORT.
+Answering at once and handing the verdict back later is how a call stays
+inside a limit somebody else owns.
+
+THE ENGINE'S OWN NUMBERS SIT EITHER SIDE OF IT. A condition script may run for
+600,000 ms (deliverable/engine/sessionscript.ts line 87), and the pull that
+started it is awaited inline (deliverable/engine/session.ts line 3686). No
+harness waits that long.

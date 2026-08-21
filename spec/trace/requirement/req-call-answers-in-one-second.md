@@ -28,6 +28,7 @@ weighs_with:
   - req-a-clear-jump-is-one-call ! — one measures per-call response latency, the other whether aim-plus-move fits in a single call; different axes of performance-efficiency
   - req-surface-answers-in-one-second ! — one times a driver's lane call at dispatch, the other a person's surface render at the mirror's HTTP boundary; different verify boundaries, per that row's own "sibling rather than a widening" section
 weighs_against:
+  - req-a-diff-no-test-answers-for-is-reported-not-swept > — this row heads the standing chain and governs every call's latency; the other governs which tests answer one question, which is a cost inside one call rather than the bound on all of them
   - req-resume-needs-no-person >
 ---
 

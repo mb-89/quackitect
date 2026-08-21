@@ -8,6 +8,7 @@ weighs_with:
   - req-a-clear-jump-is-one-call ! — one is a signal emitted during a long wait, the other is how many calls a jump costs; different quantities entirely
 statement: While an admitted call or a surface render is still running past the bound named for it, the product shall show that it is working, without taking the surface over.
 kind: quality
+fitness_candidate: true
 characteristic: performance-efficiency
 measure: the signal appears within 1 second of the bound being passed, on every operation that passes it
 verify_method: test

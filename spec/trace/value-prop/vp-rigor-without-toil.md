@@ -38,6 +38,14 @@ priority: must
   Added by i37. Every criterion above this one measures a thing that should FALL toward zero. This one measures whether the falling is real, because until now nothing compared two machine versions on the same work. THE OWNER'S FRAMING, 2026-08-19: "does a weak model with an improved machine work similarly to an old model with the old machine? If we improve the system, can we use weaker and weaker models to do the same work?"
   WHAT IT DELIBERATELY DOES NOT CLAIM. A benchmark measures process overhead and never production behaviour, because the agent is told the output is discarded. That limit is carried by raid-asm-an-agent-told-its-work-is-discarded-still-walks-the-machine-the-same-way rather than left to be discovered.
 
+- WORK THAT RUNS OUT OF SIGHT SAYS SO, AND SAYS HOW MUCH LONGER. Nothing the agent starts is invisible, and no step holds the agent's only verb while it waits.
+  Metric: lane calls that block longer than a second on work the caller could have been told about instead. Target: zero.
+  Metric: pieces of background work a single call cannot report. Target: zero.
+  Metric: a reported time remaining that does not name the basis it was computed from. Target: zero.
+  Added by i51. This is the AGENT's half of the i33 criterion above it, which was written for a person at a screen. The two ask the same question of different readers, and only the person's half was checkable.
+  MEASURED BEFORE IT WAS ADDED: one step held the pull for sixty-eight seconds, and two calls timed out at the tool boundary. One of those had partly landed, so the caller was told the work failed while it had in fact moved. The engine's own kill timer for such a script is 600,000 ms (deliverable/engine/sessionscript.ts line 87), which is the declared upper bound on that silence.
+  THE THIRD METRIC IS THE HONESTY CLAUSE, and it exists because the timings behind any estimate are known to be wrong. raid-asm-battery-timings-measure-work records summed case time of 1,534,695 ms against a wall of 76,985 ms. A figure with no stated basis is worse than no figure.
+
 ## Unlike
 
 Requirements-management suites, which hold the input-quality corner for human authors and expect the human to do the writing. The difference is that the method is carried by the agent, and the person is left the one job a person is better at.
