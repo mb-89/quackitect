@@ -47,8 +47,13 @@ groups are in use.
 - `lineage` — trees and machines related to this one. A descendant, a parent,
   a peer, a driven project, the remote they meet on.
 
-A PERSON IS NEVER IN A GROUP. Roles stand alone, because grouping them with
-tools is how a boundary picks up intentions it cannot have.
+A GROUP NEEDS MORE THAN ONE MEMBER, so some neighbours stand alone and the
+reasons differ.
+
+- A PERSON IS NEVER IN A GROUP. Grouping a person with tools is how a boundary
+  picks up intentions it cannot have.
+- A PARTY OF ITS OWN KIND stands alone until a second one exists. Naming a
+  group of one is filing, not grouping.
 
 IT IS `group` AND NOT `cluster`, DELIBERATELY. A cluster is already a thing
 here: a partition of FUNCTIONS, carrying a coupling class from a fixed list,

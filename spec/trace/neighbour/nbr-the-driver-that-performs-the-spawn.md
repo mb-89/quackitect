@@ -6,6 +6,27 @@ direction: out
 statement: "The GUIDE — whoever is asked for a hand stronger than the walker has, and gives it. The walker never becomes the guide; it delegates. The guide may work the lane itself, and where it does not, whatever the walker carries back is recorded as the guide's work and not the walker's."
 ---
 
+## The guide is an AGENT, and this node is the boundary rather than the role
+
+RULING 2026-08-21, after the guide was called a person in passing and the
+owner refused it. It is not one. The section below says so in its own second
+line: two AGENTS walk the system rather than one.
+
+THE ROLE AND THE BOUNDARY ARE DIFFERENT NODES. The guide as a ROLE belongs
+beside [[stk-agent]], the walker, and [[stk-reviewing-agent]], the reviewer.
+This node is the party OUTSIDE that receives a spawn and answers, which is a
+boundary and belongs here.
+
+THE ROLE NODE DOES NOT EXIST YET, and its absence is already recorded at
+[[raid-iss-two-always-on-roles-have-no-node-and-one-now-carries-a-duty]]. That
+entry names four roles the roster ruling gives and two that resolve to nothing:
+the guide and the researcher. It also says what closes it, and it is a
+product-level stakeholder pass rather than a paragraph.
+
+SO THIS NODE'S STATEMENT LEADS WITH THE GUIDE because nothing else carries the
+word. That is a symptom of the gap above, not a claim that a boundary and a
+role are the same thing.
+
 ## Two parties, and the record had a word for neither
 
 THE OWNER'S NAMING IS BETTER THAN ANYTHING THE TRACE HAD. Two agents walk the

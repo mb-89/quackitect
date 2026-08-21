@@ -275,6 +275,56 @@ describe("a vehicle producing a project", () => {
   });
 });
 
+// THE CHAIN IS RUN, NOT ONLY ASSEMBLED. The owner asked for this on
+// 2026-08-21: the vehicle creates a project "and run it".
+//
+// EVERY CASE ABOVE CHECKS SHAPE. They prove the produced tree is complete,
+// named, a repository of its own and correctly recorded. Not one of them
+// starts anything, so a vehicle whose engine could not run at all would pass
+// the lot of them.
+//
+// WHAT MAKES A RUN HERMETIC HERE. `node_modules` does not travel, so a fresh
+// vehicle cannot start its server without a network install. Its ENTRYPOINT
+// still runs: se-mcp.ts imports node builtins and version.ts and nothing
+// else, and --version answers before it resolves a root, a port or a lane.
+// So the produced engine can be executed from its own files with nothing
+// installed, which is the strongest run this file can make hermetically.
+//
+// WHAT IS STILL NOT A TEST, and the file header says it already: a genuinely
+// foreign machine holding nothing of this source. That stays a demonstration.
+describe("the chain runs, not only assembles", () => {
+  test("the produced vehicle's own engine executes, from its own files, with nothing installed", () => {
+    const vehicle = aVehicle();
+    const entry = join(vehicle.dest, "deliverable", "engine", "bin", "se-mcp.ts");
+    assert.ok(existsSync(entry), "the entrypoint has to have travelled for anything else to matter");
+    // NOTHING IS INSTALLED IN IT, and that is the point of running it anyway.
+    assert.ok(!existsSync(join(vehicle.dest, "deliverable", "node_modules")), "a produced vehicle carries no dependencies");
+
+    // execFileSync THROWS ON A NON-ZERO EXIT, so reaching the next line is
+    // itself the assertion that the produced engine ran and exited clean.
+    const printed = execFileSync(process.execPath, [entry, "--version"], { cwd: vehicle.dest, encoding: "utf8" }).trim();
+    assert.match(printed, /^\d+\.\d+\.\d+$/, `the copy's own engine answers a version, and it said: ${printed}`);
+  });
+
+  test("the project the vehicle produced names the vehicle that drives it, by identity", () => {
+    const vehicle = aVehicle();
+    const project = emptyDir();
+    produceProject(vehicle.dest, { dest: project, name: "A Driven Thing" }, "produce.test");
+
+    const answer = drivenBy(project);
+    assert.equal(answer.driven, true, "the project knows it is driven");
+    assert.ok(String(answer.identity).includes(vehicle.id), "and it names WHICH copy drives it");
+    assert.ok(String(answer.identity).includes(vehicle.instance), "by instance, so two copies sharing a name cannot be confused");
+
+    // RESOLVED IS FALSE EVEN HERE, where this machine made both trees. Turning
+    // an identity into a tree needs a register of copies and there is none, so
+    // the answer says why rather than guessing. Asserting it stops a later
+    // change from quietly making the answer optimistic.
+    assert.equal(answer.resolved, false, "identity is recorded; resolving it is a capability that does not exist");
+    assert.ok(String(answer.why).length > 0, "and the reason travels with the answer");
+  });
+});
+
 // THE ACTS HAVE TO BE REACHABLE, and a function nobody wired is not an act.
 //
 // THIS CHECKS THE WIRING RATHER THAN THE BEHAVIOUR, which is the same shape
