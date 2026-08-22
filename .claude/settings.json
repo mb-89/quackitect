@@ -22,7 +22,7 @@
     "MAX_THINKING_TOKENS": "31999"
   },
   "alwaysThinkingEnabled": true,
-  "outputStyle": "voice",
+  "outputStyle": "Concise",
   "enableAllProjectMcpServers": true,
   "hooks": {
     "Stop": [
