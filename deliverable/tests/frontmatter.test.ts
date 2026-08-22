@@ -7,10 +7,10 @@ import { strict as assert } from "node:assert";
 import { readFileSync } from "node:fs";
 import { describe, test } from "node:test";
 import { fileURLToPath } from "node:url";
-import { Rejection } from "../engine/errors.ts";
 import { coerce, formatNote, kindOf, readKeys, setKeys, splitNote } from "../engine/frontmatter.ts";
 import { parseStateNote } from "../engine/notes.ts";
 import { readVault } from "../engine/tables.ts";
+import { refusalChecked } from "./helpers.ts";
 
 const REPO_ROOT = fileURLToPath(new URL("../..", import.meta.url));
 const WHERE = "a-note.md";
@@ -18,16 +18,6 @@ const WHERE = "a-note.md";
 const NOTE = ["---", "id: one", "depends_on:", "  - a", "  - b", "count: 3", "open: true", "---", "", "# A note", "", "body text", ""].join(
   "\n",
 );
-
-function refusal(fn: () => unknown): Rejection {
-  try {
-    fn();
-  } catch (e) {
-    assert.ok(e instanceof Rejection, `a typed refusal, not ${String(e)}`);
-    return e;
-  }
-  throw new assert.AssertionError({ message: "expected a refusal, got a result" });
-}
 
 describe("splitting a note", { concurrency: true }, () => {
   test("the body is everything past the closing fence", () => {
@@ -99,8 +89,8 @@ describe("writing a key", { concurrency: true }, () => {
   });
 
   test("frontmatter that does not parse refuses rather than being rewritten", () => {
-    assert.match(refusal(() => readKeys("---\nid: [unclosed\n---\nbody\n", WHERE)).got, /a-note\.md/);
-    assert.match(refusal(() => readKeys("---\n- a\n- b\n---\n", WHERE)).got, /a list/);
+    assert.match(refusalChecked(() => readKeys("---\nid: [unclosed\n---\nbody\n", WHERE)).got, /a-note\.md/);
+    assert.match(refusalChecked(() => readKeys("---\n- a\n- b\n---\n", WHERE)).got, /a list/);
   });
 });
 
@@ -124,9 +114,9 @@ describe("what a typed cell accepts", { concurrency: true }, () => {
   });
 
   test("a wrong type refuses instead of writing nonsense", () => {
-    assert.match(refusal(() => coerce(3, "seven")).expected, /number/);
-    assert.match(refusal(() => coerce(false, "maybe")).expected, /yes or no/);
-    assert.match(refusal(() => coerce({ a: 1 }, "x")).got, /nested/);
+    assert.match(refusalChecked(() => coerce(3, "seven")).expected, /number/);
+    assert.match(refusalChecked(() => coerce(false, "maybe")).expected, /yes or no/);
+    assert.match(refusalChecked(() => coerce({ a: 1 }, "x")).got, /nested/);
   });
 
   test("the kind is read off the value, which is what picks the editor", () => {

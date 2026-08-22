@@ -11,26 +11,12 @@
 //
 // Sequential: it walks one session through boot and into an iteration.
 import { strict as assert } from "node:assert";
-import { spawnSync } from "node:child_process";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { itFind, pinIteration } from "../engine/iterations.ts";
 import { Session } from "../engine/session.ts";
-import { checkDocs, freshRoot } from "./helpers.ts";
-
-function gitInit(root: string): void {
-  for (const a of [
-    ["init"],
-    ["config", "user.email", "se@test.local"],
-    ["config", "user.name", "se test"],
-    ["add", "-A"],
-    ["commit", "-q", "-m", "seed"],
-  ]) {
-    const r = spawnSync("git", a, { cwd: root, encoding: "utf8", windowsHide: true });
-    if (r.status !== 0) throw new Error(`git ${a.join(" ")} failed: ${r.stderr}`);
-  }
-}
+import { checkDocs, freshRoot, gitInit } from "./helpers.ts";
 
 /** One session, positioned inside an iteration, with one claimful step
  *  standing signed on disk. The shared ground both operations act on. */
@@ -45,7 +31,7 @@ async function standingClaim(): Promise<{
   id: string;
 }> {
   const root = freshRoot();
-  gitInit(root);
+  gitInit(root, true);
   const session = new Session(root);
   await session.advance();
   await session.advance();

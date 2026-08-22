@@ -11,8 +11,8 @@
 import { strict as assert } from "node:assert";
 import { describe, test } from "node:test";
 import { fileURLToPath } from "node:url";
-import { Rejection } from "../engine/errors.ts";
 import { assertFloor, CHANGE_COLUMNS, type ChangeColumn, compileColumn, readRigorMatrix } from "../engine/rigor-matrix.ts";
+import { refusal } from "./helpers.ts";
 
 const REPO = fileURLToPath(new URL("../..", import.meta.url));
 
@@ -28,16 +28,6 @@ function matrix(): ReturnType<typeof readRigorMatrix> {
     rows: src.rows.map((r) => ({ ...r })),
     cells: new Map([...src.cells].map(([name, row]) => [name, new Map([...row].map(([col, cell]) => [col, { ...cell }]))])),
   } as ReturnType<typeof readRigorMatrix>;
-}
-
-function refusal(fn: () => unknown): Rejection {
-  try {
-    fn();
-  } catch (e) {
-    if (e instanceof Rejection) return e;
-    throw e;
-  }
-  throw new Error("expected a refusal, got a value");
 }
 
 const FLOOR = ["gate-kickoff", "verification", "sweep-consistency", "gate-release"];

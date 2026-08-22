@@ -137,7 +137,7 @@ export const STANDARD_ROUNDS: EvidenceField[] = [
   {
     name: "goals_served",
     description:
-      "GOALS: what THIS milestone produced, against each goal the kickoff blessed. Name the artifacts by id — the stories, requirements, chunks or commits that serve the goal. DO NOT ANSWER FROM THE SCOPE: the scope is what was promised, not what was built. `nothing yet — <the milestone that owns it>` is legal. `nothing, and nothing will` FAILS the gate: it means the walk has drifted off its own kickoff.",
+      "GOALS: for each kickoff goal, show how the steps before THIS gate serve it. Name the evidence that already stands: a vision, delta, scope, risk entry, story, requirement, chunk, test, or commit. Motivation therefore cites its completed planning steps; later gates cite the work they have completed. DO NOT answer from a future plan alone. `nothing yet — <the later milestone that owns it>` is legal only when no earlier step could have served the goal. `nothing, and nothing will` FAILS the gate: it means the walk has drifted off its own kickoff.",
     required: true,
     template: "per-item",
     items: ["$goals"],
@@ -179,9 +179,10 @@ export const STANDARD_ROUNDS: EvidenceField[] = [
 
 /** THE ROUNDS ONE GATE GETS. All of them, except at the kickoff.
  *
- *  THE KICKOFF DEFINES THE GOALS, so asking what it produced for each one is
- *  circular: nothing has been produced yet, and the list itself is being
- *  written in the same form. Every gate BELOW it answers.
+ *  THE KICKOFF DEFINES THE GOALS, so asking what prior steps served each one is
+ *  circular: the list itself is being written in the same form. MOTIVATION
+ *  still answers goals_served from its completed vision, frame, scope and risk
+ *  steps. Every gate below it answers from the work completed before that gate.
  *
  *  IT LIVES HERE, beside the rounds, because there are TWO compilers and a
  *  rule owned by one of them reaches only half the gates — which is the exact

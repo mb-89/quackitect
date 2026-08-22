@@ -27,6 +27,27 @@ import {
 import { bumpDrawingEpoch, compileMachine, compileMachineCached, resolveRef } from "./machines/compile.ts";
 import { computeRoute, type RouteNode, type RouteResult, type RouteStep, routeWraps } from "./route.ts";
 
+/** HOW LONG A CALL WAITS FOR A STEP'S LEAVING JUDGMENT before answering. It is
+ *  the bound a lane call is promised, so a judgment that settles fast is still
+ *  answered in one call and a slow one never holds the caller.
+ *  see dsp-the-work-account.md#responsibility */
+/** HOW LONG A LEAVING JUDGMENT MAY HOLD THE CALL, and it is well under the
+ *  second the measure names.
+ *
+ *  req-a-leaving-check-does-not-hold-the-call measures "the answering call
+ *  returns in under 1 second". A timer of exactly 1000 fires at or after 1000,
+ *  never before, so a bound equal to the measure cannot meet it.
+ *
+ *  AND THE BOUND IS NOT THE CALL. After this wait the attempt still runs the
+ *  exit-condition loop, the read gate and the entry-condition loop before the
+ *  caller sees anything. The headroom here is for that work, and it is why the
+ *  number is not 999.
+ *
+ *  EXPORTED SO THE TIMING CASE MEASURES THIS CONSTANT rather than a copy of it.
+ *  A duplicated literal in the test lets this number rise without the test
+ *  noticing, which is exactly the regression the case exists to catch. */
+export const JUDGMENT_HANDBACK_MS = 750;
+
 /** see dsp-walk-machine.md#the-state-a-recorded-visit-names */
 export function visitState(visit: string): string {
   return visit.split("@")[0].split("/").pop() ?? "";
@@ -50,6 +71,7 @@ import {
   scaffoldInstance,
   withBy,
   withFieldContent,
+  withJudgment,
   withSignedOff,
   withStatus,
 } from "./forms.ts";
@@ -66,7 +88,7 @@ import {
   pinIteration,
   readItRecord,
 } from "./iterations.ts";
-import { noteOf, withPass } from "./notes.ts";
+import { noteOf, readNode, withPass, writeNode } from "./notes.ts";
 import { pathKind, resolveInRoot, seDir } from "./paths.ts";
 import { type PulledDoc, pulledFor, scanGuidance } from "./pull.ts";
 import { probesMissed, readingProbes } from "./readproof.ts";
@@ -420,6 +442,27 @@ export class Session {
    *  interface, and Scripts reads this through its host. */
   notifyChange(): void {
     this.live.notifyChange();
+  }
+
+  /** A SETTLED LEAVING JUDGMENT LANDS WHERE THE STEP'S OTHER STANDINGS LIVE.
+   *  The evidence map is memory and dies with the process; a step left deciding
+   *  when a session ends needs its verdict on disk or the repository cannot
+   *  settle the word (raid-ar-walk-resumes-from-repo).
+   *  Not private because a private member cannot satisfy a structural
+   *  interface, and Scripts reads this through its host.
+   *  see dsp-the-work-account.md#interface */
+  recordVerdict(m: MachineDecl, s: StateDecl, ok: boolean): void {
+    const { instanceAbs } = this.claims.stateFormHome(s.id, m);
+    // THROUGH THE DOOR, both ways. An evidence form is a node like any other,
+    // and a read that walks around the door is a read nothing else can share.
+    const raw = readNode(instanceAbs);
+    if (raw === "") return;
+    const next = withJudgment(raw, ok ? "passed" : "not passed", new Date().toISOString());
+    // A JUDGMENT THAT KEEPS AGREEING WITH ITSELF NEVER REWRITES THE FILE. Most
+    // pulls re-reach the same verdict, and a write per pull would dirty the
+    // tree for nothing.
+    if (next === raw) return;
+    writeNode(instanceAbs, next);
   }
 
   private readonly reads = new ReadGate({
@@ -3612,18 +3655,43 @@ export class Session {
       // through trace-design to reach a state that could write, and came
       // forwards again, re-running the whole battery each way.
       const door = s.edges.find((e) => e.role === "fallback" || e.role === "error")?.to;
+      // A JUDGMENT STILL IN FLIGHT IS NOT ONE THAT NEVER STARTED. Saying "not
+      // run yet" while one runs is the failure req-a-leaving-check-does-not-
+      // hold-the-call names in its own words: an answer that says nothing
+      // actionable satisfies the clock and fails the demand. The remedy below
+      // it was false too — a second attempt JOINS the running judgment rather
+      // than re-running the script.
+      const deciding = this.scripts.scriptStanding(m, s) === "deciding";
+      // A RE-RUN MUST NOT HIDE WHAT THE LAST RUN SAID. A long check that goes
+      // red is started again by the next attempt, and while that second run is
+      // in flight the standing reads `deciding` — so "still running" was the
+      // only thing a caller could ever see and the RED OUTPUT was unreachable.
+      // The evidence still holds the previous verdict, because a run writes it
+      // only when it settles. Carry it, named as the previous run's.
+      const lastSaid = deciding && st.ran && st.output !== "" ? `\n\nTHE PREVIOUS RUN OF THIS CHECK SAID:\n${st.output}` : "";
+      const fixIt =
+        door === undefined
+          ? { tool: "se_pull", args: {}, note: "fix what the output names, then pull again — the script re-runs on every attempt" }
+          : {
+              tool: "se_pull",
+              args: { form: { choice: door } },
+              note: `${door} is the drawn path for this failure and it carries the write verbs. Taking it SKIPS this check rather than satisfying it, which is what a fallback is for. Fix everything the output names there, in one pass; its own exit re-runs the same script.`,
+            };
       throw new Rejection({
         clause: CLAUSES.CONDITION_UNMET,
         expected: `${which} condition 'script' of ${stateId} — ${args.join(", ")} exits 0 (see ${note})`,
-        got: st.ran ? st.output : "not run yet",
-        remedy:
-          door === undefined
-            ? { tool: "se_pull", args: {}, note: "fix what the output names, then pull again — the script re-runs on every attempt" }
-            : {
-                tool: "se_pull",
-                args: { form: { choice: door } },
-                note: `${door} is the drawn path for this failure and it carries the write verbs. Taking it SKIPS this check rather than satisfying it, which is what a fallback is for. Fix everything the output names there, in one pass; its own exit re-runs the same script.`,
-              },
+        got: deciding
+          ? `the check is STILL RUNNING — this call was answered without waiting for it, and its outcome is not in yet${lastSaid}`
+          : st.ran
+            ? st.output
+            : "not run yet",
+        remedy: deciding
+          ? {
+              tool: "se_pull",
+              args: {},
+              note: "the judgment is in flight, and this attempt joined it rather than starting a second one. Pull again to learn its outcome; se_run {jobs: true} says how much longer it needs and what that rests on.",
+            }
+          : fixIt,
         source: "engine/session.ts conditions",
       });
     }
@@ -3674,6 +3742,17 @@ export class Session {
     });
   }
 
+  /** WHERE A STEP STANDS, one word from a closed set of three. A reader that
+   *  flattens still-deciding into either of the other two gets a WRONG answer
+   *  rather than a coarse one: flattened toward passed a gate opens on evidence
+   *  that does not exist, and flattened toward failed a walk is refused for
+   *  doing nothing wrong.
+   *  see dsp-the-work-account.md#behavior-and-constraints */
+  stepStanding(m: MachineDecl, s: StateDecl): "passed" | "not passed" | "deciding" {
+    if (s.exit?.script !== undefined && this.scripts.scriptStanding(m, s) === "deciding") return "deciding";
+    return this.conditionMet(m, s, "leave") ? "passed" : "not passed";
+  }
+
   private async assertConditions(
     m: MachineDecl,
     from: StateDecl,
@@ -3683,7 +3762,12 @@ export class Session {
   ): Promise<void> {
     // see dsp-walk-machine.md#a-fallback-is-the-drawn-path-for-the-condition
     const escaping = to !== undefined && from.edges.some((e) => e.to === to && (e.role === "fallback" || e.role === "error"));
-    if (from.exit?.script !== undefined && !escaping) await this.scripts.scriptRun(from.id); // a tick attempt runs the script
+    // THE JUDGMENT STARTS AND THE CALL ANSWERS. A leaving check that runs a
+    // battery used to hold the pull for its whole duration; it is now waited on
+    // for at most the bound a person or an agent is promised, and the verdict
+    // lands against the step on a later call.
+    // see dsp-the-work-account.md#responsibility
+    if (from.exit?.script !== undefined && !escaping) await this.scripts.scriptSettleWithin(from.id, JUDGMENT_HANDBACK_MS);
     for (const [key, args] of Object.entries(from.exit ?? {})) {
       if (key === "read" || key === "read_consume") continue; // channel-proven below, not evidence
       if (escaping) continue;
@@ -3722,6 +3806,7 @@ export class Session {
         ...(s.entry !== undefined ? { entry: this.conditionStatus(machine, s, "enter") } : {}),
         ...(s.exit !== undefined ? { exit: this.conditionStatus(machine, s, "leave") } : {}),
         exit_met: this.conditionMet(machine, s, "leave"),
+        standing: this.stepStanding(machine, s),
         // WHAT THIS STEP WILL ASK FOR. Without it an agent walked a step
         // never having been told what evidence it wanted, and found out only
         // when a gate refused. Seventy of the hundred and twenty-two fields
@@ -4044,6 +4129,7 @@ export class Session {
       ...(s.entry !== undefined ? { entry: this.conditionStatus(home, s, "enter") } : {}),
       ...(s.exit !== undefined ? { exit: this.conditionStatus(home, s, "leave") } : {}),
       exit_met: this.conditionMet(home, s, "leave"),
+      standing: this.stepStanding(home, s),
       ...(s.evidence_form.length > 0 ? { evidence_form: s.evidence_form.filter((f) => f.type !== "derived") } : {}),
       pulled: this.pulled(home, s).map((p) => ({ path: p.path, sources: p.sources })),
       lookahead_read: this.reads.lookaheadRequirements(home, s),

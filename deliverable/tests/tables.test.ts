@@ -13,7 +13,6 @@ import { join } from "node:path";
 import { describe, test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { CallLog } from "../engine/calllog.ts";
-import { Rejection } from "../engine/errors.ts";
 import { readKeys } from "../engine/frontmatter.ts";
 import { seDir } from "../engine/paths.ts";
 import { Session } from "../engine/session.ts";
@@ -31,7 +30,7 @@ import {
   TABLE_SCRIPT,
   unreadableRows,
 } from "../engine/tables.ts";
-import { freshRoot } from "./helpers.ts";
+import { freshRoot, refusalChecked } from "./helpers.ts";
 
 const REPO_ROOT = fileURLToPath(new URL("../..", import.meta.url));
 const RIGOR = `${REPO_ROOT}/deliverable/tests/fixtures/rigor-matrix.base`;
@@ -53,17 +52,6 @@ const view = (over: Partial<BaseView>): BaseView => ({
   ...over,
 });
 const pivot = (over: Partial<BaseView>): BaseView => view({ type: "pivot", filters: 'kind == "matrix-row"', ...over });
-
-/** assert.throws cannot hand the error back, and these refusals say things worth reading. */
-function refusal(fn: () => unknown): Rejection {
-  try {
-    fn();
-  } catch (e) {
-    assert.ok(e instanceof Rejection, `a typed refusal, not ${String(e)}`);
-    return e;
-  }
-  throw new assert.AssertionError({ message: "expected a refusal, got a result" });
-}
 
 const SPEC = parseBase("properties:\n  file.name:\n    displayName: Step\nviews: []\n");
 
@@ -118,10 +106,10 @@ describe("the base format", { concurrency: true }, () => {
   // EVERY type, so anything registered there leaked — and a typo on a number
   // would have answered false instead of naming the type error.
   test("contains on a number still refuses by type", () => {
-    assert.match(refusal(() => matches('count.contains("x")', { count: 3 })).got, /number\.contains/);
+    assert.match(refusalChecked(() => matches('count.contains("x")', { count: 3 })).got, /number\.contains/);
   });
 
-  test("a bare property means it carries something", () => {
+  test("the table filter treats a bare property as presence", () => {
     assert.equal(matches("depends_on", ROWS[0]), true);
     assert.equal(matches("depends_on", ROWS[2]), false);
   });
@@ -129,12 +117,12 @@ describe("the base format", { concurrency: true }, () => {
   // THE POINT OF THE WHOLE MODULE. A clause we cannot evaluate must never be
   // treated as false: rows would vanish and the table would look finished.
   test("an expression outside the subset REFUSES rather than hiding rows", () => {
-    assert.match(refusal(() => matches('patch =~ "no.*"', ROWS[0])).got, /=~/);
-    assert.match(refusal(() => matches({ xor: [] }, ROWS[0])).got, /xor/);
+    assert.match(refusalChecked(() => matches('patch =~ "no.*"', ROWS[0])).got, /=~/);
+    assert.match(refusalChecked(() => matches({ xor: [] }, ROWS[0])).got, /xor/);
   });
 
   test("a view type we cannot draw refuses by name", () => {
-    assert.match(refusal(() => renderView(SPEC, view({ type: "cards" }), ROWS)).got, /cards/);
+    assert.match(refusalChecked(() => renderView(SPEC, view({ type: "cards" }), ROWS)).got, /cards/);
   });
 });
 
@@ -171,14 +159,17 @@ describe("the pivot", { concurrency: true }, () => {
     const r = renderView(SPEC, pivot({ rows: "state_kind", columns: "patch", aggregate: "list", value: "file.name" }), ROWS);
     assert.match(r.html, /one/);
     assert.match(
-      refusal(() => renderView(SPEC, pivot({ rows: "state_kind", columns: "patch", aggregate: "list" }), ROWS)).expected,
+      refusalChecked(() => renderView(SPEC, pivot({ rows: "state_kind", columns: "patch", aggregate: "list" }), ROWS)).expected,
       /value/,
     );
   });
 
   test("one dimension is a table, and an unknown aggregate refuses", () => {
-    assert.match(refusal(() => renderView(SPEC, pivot({ rows: "state_kind" }), ROWS)).got, /absent/);
-    assert.match(refusal(() => renderView(SPEC, pivot({ rows: "state_kind", columns: "patch", aggregate: "median" }), ROWS)).got, /median/);
+    assert.match(refusalChecked(() => renderView(SPEC, pivot({ rows: "state_kind" }), ROWS)).got, /absent/);
+    assert.match(
+      refusalChecked(() => renderView(SPEC, pivot({ rows: "state_kind", columns: "patch", aggregate: "median" }), ROWS)).got,
+      /median/,
+    );
   });
 });
 
@@ -361,14 +352,14 @@ describe("editing a cell", { concurrency: true }, () => {
   test("a wrong type refuses and the note is untouched", () => {
     const v = vault();
     const before = readFileSync(v.abs, "utf8");
-    assert.match(refusal(() => editCell(v.root, { path: v.rel, key: "count", text: "seven" })).expected, /number/);
+    assert.match(refusalChecked(() => editCell(v.root, { path: v.rel, key: "count", text: "seven" })).expected, /number/);
     assert.equal(readFileSync(v.abs, "utf8"), before);
   });
 
   test("a cell may not write outside the vault, or write anything but a note", () => {
     const v = vault();
-    assert.match(refusal(() => editCell(v.root, { path: "../../secrets.md", key: "k", text: "x" })).expected, /inside the vault/);
-    assert.match(refusal(() => editCell(v.root, { path: "rows/one.txt", key: "k", text: "x" })).expected, /markdown note/);
+    assert.match(refusalChecked(() => editCell(v.root, { path: "../../secrets.md", key: "k", text: "x" })).expected, /inside the vault/);
+    assert.match(refusalChecked(() => editCell(v.root, { path: "rows/one.txt", key: "k", text: "x" })).expected, /markdown note/);
   });
 });
 

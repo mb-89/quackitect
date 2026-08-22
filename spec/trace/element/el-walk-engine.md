@@ -9,6 +9,7 @@ group: the-walk
 implements:
   - fn-run-a-governed-walk
   - fn-run-a-governed-walk.serve-a-step
+  - fn-run-a-governed-walk.hand-back-a-step-still-deciding
   - fn-run-a-governed-walk.judge-a-claim
   - fn-run-a-governed-walk.guard-a-write
   - fn-run-a-governed-walk.help-find-a-capability
@@ -54,3 +55,20 @@ SO IT SITS ON serve-a-step, which this element already implements. A delete is
 something the actor does; naming what it breaks is what the product does back,
 before the act lands. That is serve-a-step's sentence, and no interface is
 owed because no new crossing appears.
+
+## Handing back a still-deciding step lands here (i51, 2026-08-21)
+
+THE FUNCTION'S FLOWS DECIDE IT. `hand-back-a-step-still-deciding` consumes and
+produces `flow-instruction`, which is `serve-a-step`'s own flow, and this
+element already implements `serve-a-step`.
+
+SO NO NEW CROSSING APPEARS on the instruction side, and no interface is owed
+for it. The same reasoning as the deletion warning above.
+
+ONE NEW CROSSING DOES APPEAR, outward: the leaving judgment is long work, so it
+registers itself with [[el-work-registry]] through
+[[if-walk-engine-to-work-registry]].
+
+THE THIRD STANDING IS THIS ELEMENT'S TO KEEP. A step is passed, not passed, or
+still deciding. The thing that started the judgment is the only thing that
+knows the third value exists, and that is the pull loop, here.

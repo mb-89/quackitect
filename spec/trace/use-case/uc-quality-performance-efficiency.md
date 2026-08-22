@@ -46,3 +46,5 @@ Its sub-characteristics, so nobody has to open the standard to use this:
 - 6a. The surface exceeds the bound: the excess is recorded where somebody reads it, rather than being paid silently on every look.
 - 3a. The record has grown past what the shape can serve: the growth is the finding, and the fix is the shape rather than a bigger machine.
 - 4a. The handed-off work never finishes: the handle says it is still running, and the person can stop it and everything it spawned.
+- 4b. The long call is a state's leaving check, which today does NOT hand off: it is awaited inline, so step 4 was promised here and never delivered for this case. i51 delivers it, and uc-leave-a-state-whose-check-is-still-running is where that pass is told. Found at i51's inputs gate by walking this use case against the live surface.
+- 5a. The asking is one handle at a time, and the answer names a rate rather than a time remaining. uc-report-every-piece-of-work-out-of-sight replaces that with one list, each entry carrying a time remaining and the measurement it came from. Step 5 stands; what it returns gets better.

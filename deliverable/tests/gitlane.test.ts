@@ -24,7 +24,7 @@ test("a recorded visit yields its state, however deep the container", () => {
   assert.equal(visitState("iterations/i1/walk@7"), "walk", "and it reaches the innermost state at any depth");
 });
 
-import { anyGuidanceDoc, bootedServer, call, freshRoot } from "./helpers.ts";
+import { anyGuidanceDoc, bootedServer, call, freshRoot, gitInit } from "./helpers.ts";
 
 // A narrated call writes the record's decision trail INTO the record,
 // so a walk that is narrating can never present a clean tree. A sync is wanted
@@ -52,16 +52,6 @@ test("the dirty gate excuses the engine's own trail, and nothing else", () => {
 // BOTH VERBS ARE GONE. There is only ever one tree now, so they refused every
 // call — and there is nothing for them to do: work is written on trunk from
 // the first keystroke, so it is landed by construction and cannot go stale.
-
-function gitInit(root: string): void {
-  const g = (...a: string[]): void => {
-    const r = spawnSync("git", a, { cwd: root, encoding: "utf8", windowsHide: true });
-    if (r.status !== 0) throw new Error(`git ${a.join(" ")} failed: ${r.stderr}`);
-  };
-  g("init");
-  g("config", "user.email", "se@test.local");
-  g("config", "user.name", "se test");
-}
 
 test("se_git: the status/add/commit flow works through the lane", async () => {
   const root = freshRoot();

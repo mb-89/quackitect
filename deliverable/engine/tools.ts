@@ -26,7 +26,7 @@ import { openPanel } from "./panel.ts";
 import { seDir } from "./paths.ts";
 import { produceProject, produceVehicle } from "./produce.ts";
 import type { MirrorState } from "./render.ts";
-import { runToCompletion } from "./run.ts";
+import { runToCompletion, workAccount } from "./run.ts";
 import { requiredDependsOn } from "./seed.ts";
 import { type AmendOp, Session } from "./session.ts";
 import { Toll } from "./toll.ts";
@@ -885,6 +885,23 @@ export function buildServer(
     if (TYPECHECK.report === "" || typeof result !== "object" || result === null || Array.isArray(result)) return result;
     return { ...(result as Record<string, unknown>), typecheck_error: TYPECHECK.report };
   });
+
+  // THE ACCOUNT RIDES BESIDE THE ANSWER, never replacing it. The caller asked
+  // for something and gets it unchanged; `work` is a second field.
+  // An EMPTY ACCOUNT IS AN EMPTY LIST, never an absent field — absent cannot be
+  // told apart from a build that never emitted one.
+  // see dsp-the-work-account.md#interface
+  // AND IT RIDES A REFUSAL TOO — the one answer where a caller most needs to
+  // know a judgment is still in flight, because the condition that refused it
+  // is often the very check still running. It reads and spends nothing, which
+  // is what makes it safe to run there.
+  server.addDecorator(
+    (_tool, result) => {
+      if (typeof result !== "object" || result === null || Array.isArray(result)) return result;
+      return { ...(result as Record<string, unknown>), work: workAccount(root) };
+    },
+    { onRefusal: true },
+  );
 
   // see dsp-write-guard.md#and-so-does-the-accepted-one
   server.addDecorator((_tool, result) => {

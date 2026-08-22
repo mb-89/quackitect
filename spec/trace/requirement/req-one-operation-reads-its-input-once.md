@@ -4,6 +4,7 @@ id: req-one-operation-reads-its-input-once
 type: "[[requirement]]"
 statement: When one operation needs the same corpus in more than one of its parts, the engine shall read and parse that corpus once and pass it down, for every operation that serves a call.
 kind: quality
+fitness_candidate: true
 characteristic: performance-efficiency
 verify_method: test
 breaks_if_removed: The cost of an operation grows with how many times it asks for its input rather than with how much work it does, so making each ask faster never fixes it.

@@ -152,7 +152,15 @@ test("no new file read bypasses the door — the count may fall, never rise", ()
   // what it has just written. VS Code owns that file, it lives outside the
   // project, and it is not a note, so no door could hold it. The second read
   // is the rollback check and must see the disk rather than a cache.
-  const CEILING = 119;
+  // 120 AT i51: run.ts testOperations reads a test run's own record out of
+  // .se/test-jobs so the ONE operation table can list it beside the shell jobs.
+  // A job record is not a note and has no door; the read wants one JSONL line of
+  // machine-local state, not a parsed trace node, and it sits beside persisted()
+  // in the same file doing the same thing for the other kind.
+  // AND 121: run.ts timeRemaining reads the running work's own progress file to
+  // project how much longer it needs. Same shape and same reason — machine-local
+  // JSONL, no door, no parse of a trace node.
+  const CEILING = 121;
   let found = 0;
   const offenders: string[] = [];
   const walk = (dir: URL, rel: string): void => {

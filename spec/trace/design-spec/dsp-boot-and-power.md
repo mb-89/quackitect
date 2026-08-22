@@ -12,6 +12,8 @@ files:
   - "deliverable/engine/bin/se-pty.ts"
   - "deliverable/engine/bin/se-hook-stop.ts"
   - "deliverable/engine/bin/se-hook-start.ts"
+  - "deliverable/engine/bin/register-extension.ts"
+  - "deliverable/engine/vscoderegistry.ts"
   - "deliverable/engine/pullnotice.ts"
   - "deliverable/engine/bin/package.ts"
   - "deliverable/engine/version.ts"
@@ -22,8 +24,9 @@ files:
 
 The seam between the engine and the host it lives in: the pty bridge
 that keeps a terminal session alive, the stop hook that reports the
-session's trail when a host turn ends, and the boot bench that keeps
-standing up fast. The packager assembles the shippable archive - the
+session's trail when a host turn ends, the VS Code registry writer that
+preserves other installed extensions while registering a linked folder, and the
+boot bench that keeps standing up fast. The packager assembles the shippable archive - the
 same tree the export copies, zipped, with the entry README rendered
 in - so standing up can start from one file. The shutdown-at-idle countdown and the end-state
 trigger land here when they are built — the requirement stands

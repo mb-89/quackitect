@@ -3,7 +3,6 @@
 // machine, standing in M0. The kickoff's bless pins the column and the
 // machine grows in place; no gate holds the first start.
 import { strict as assert } from "node:assert";
-import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
@@ -13,24 +12,11 @@ import { type MachineDecl, type StateDecl, validateMachine } from "../engine/mac
 import { type ChangeColumn, compileColumn, readRigorMatrix } from "../engine/rigor-matrix.ts";
 import { Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
-import { call, checkDocs, freshRoot, GUIDANCE, proofFor } from "./helpers.ts";
-
-function gitInit(root: string): void {
-  for (const a of [
-    ["init"],
-    ["config", "user.email", "se@test.local"],
-    ["config", "user.name", "se test"],
-    ["add", "-A"],
-    ["commit", "-q", "-m", "seed"],
-  ]) {
-    const r = spawnSync("git", a, { cwd: root, encoding: "utf8", windowsHide: true });
-    if (r.status !== 0) throw new Error(`git ${a.join(" ")} failed: ${r.stderr}`);
-  }
-}
+import { call, checkDocs, freshRoot, GUIDANCE, gitInit, proofFor } from "./helpers.ts";
 
 test("a seed stands in the container at once — its machine is M0", () => {
   const root = freshRoot();
-  gitInit(root);
+  gitInit(root, true);
   const it = itSeed(root, "first visible iteration", "the container shows it standing in M0", ["e13"]);
   assert.match(it.id, /^i1-/);
   const rec = readFileSync(join(it.path, "spec", "iterations", it.id, "record.md"), "utf8");
@@ -76,7 +62,7 @@ test("a seed stands in the container at once — its machine is M0", () => {
 
 test("any state's form is fetchable by its machine — the walk elsewhere", () => {
   const root = freshRoot();
-  gitInit(root);
+  gitInit(root, true);
   const it = itSeed(root, "browse the form", "the reader fetches it from the desk");
   const s = new Session(root);
   // The walk stands at main; the view names the iteration's machine.
@@ -110,7 +96,7 @@ test("any state's form is fetchable by its machine — the walk elsewhere", () =
 
 test("the graph is evidence: an open decision point blocks the leave form", () => {
   const root = freshRoot();
-  gitInit(root);
+  gitInit(root, true);
   const s = new Session(root);
   const minted = s.expeditionNew("spike", "graph evidence") as { created: string };
   s.expeditionOpen(minted.created);
@@ -158,7 +144,7 @@ test("the graph is evidence: an open decision point blocks the leave form", () =
 
 test("the pin: the bless compiles the change size live; escalation only grows it", () => {
   const root = freshRoot();
-  gitInit(root);
+  gitInit(root, true);
   const it = itSeed(root, "pin the machine", "the kickoff compiles and pins");
   const res = pinIteration(root, it, "patch") as { pinned: string; rigor_matrix_hash: string };
   assert.equal(res.pinned, "patch");
@@ -195,7 +181,7 @@ test("the pin: the bless compiles the change size live; escalation only grows it
 
 test("the chunk machine: refused when unseeded, compiled with realization tags and the join", () => {
   const root = freshRoot();
-  gitInit(root);
+  gitInit(root, true);
   const it = itSeed(root, "chunks compile", "the drawing becomes the machine");
   // Unseeded: the typed refusal, never a plain serve.
   assert.throws(() => generateSeeded(root, it, "build-steps", "build-chunks"), /without visible steps/);
@@ -244,7 +230,7 @@ test("the chunk machine: refused when unseeded, compiled with realization tags a
 
 test("an explicit none in the drawing passes the run state without ceremony", () => {
   const root = freshRoot();
-  gitInit(root);
+  gitInit(root, true);
   const it = itSeed(root, "no unknowns", "zero spikes is a normal outcome");
   const abs = join(it.path, itSeededRel(it.id, "spikes"));
   mkdirSync(dirname(abs), { recursive: true });
@@ -263,7 +249,7 @@ test("an explicit none in the drawing passes the run state without ceremony", ()
 
 test("escalation reopens exactly the grown steps", () => {
   const root = freshRoot();
-  gitInit(root);
+  gitInit(root, true);
   const it = itSeed(root, "reopen the grown steps", "escalation re-earns thin evidence");
   pinIteration(root, it, "patch");
   // The expectation comes from the rigor matrix itself: steps applied at both
@@ -290,7 +276,7 @@ test("the bless pins the machine and it grows in place — no wrapper, fills car
   // test drives the kickoff seam: M0 at seed, the refusal without a
   // change_size, the pin, and the in-place growth.
   const root = freshRoot();
-  gitInit(root);
+  gitInit(root, true);
   const session = new Session(root);
   await session.advance();
   await session.advance();
@@ -423,7 +409,7 @@ test("the bless pins the machine and it grows in place — no wrapper, fills car
 
 test("the kickoff serves the rigor matrix's live evidence form, rounds included", () => {
   const root = freshRoot();
-  gitInit(root);
+  gitInit(root, true);
   itSeed(root, "the form rides", "the kickoff carries the gate fields");
   const kick = generateIterations(root)
     .subGen!.i1()
@@ -438,7 +424,7 @@ test("the kickoff serves the rigor matrix's live evidence form, rounds included"
 
 test("the seed refuses a missing vision — the seed is a small form", () => {
   const root = freshRoot();
-  gitInit(root);
+  gitInit(root, true);
   assert.throws(
     () => itSeed(root, "goal only", "  "),
     (e) => (e as { clause?: string }).clause === "SE-C-046",
@@ -447,7 +433,7 @@ test("the seed refuses a missing vision — the seed is a small form", () => {
 
 test("the agent's pull SERVES the reading a sub state demands — no wedge", async () => {
   const root = freshRoot();
-  gitInit(root);
+  gitInit(root, true);
   const session = new Session(root);
   await session.advance();
   await session.advance();
@@ -472,7 +458,7 @@ test("the agent's pull SERVES the reading a sub state demands — no wedge", asy
 
 test("no gate holds the first start — entering binds, stamps started, and M0 stands", async () => {
   const root = freshRoot();
-  gitInit(root);
+  gitInit(root, true);
   const session = new Session(root);
   const server = buildServer(root, session);
   await session.advance();
@@ -513,7 +499,7 @@ test("no gate holds the first start — entering binds, stamps started, and M0 s
 // refuses, and the remedy names the reopen as the sanctioned way back.
 test("a choice while a form is owed refuses and names the reopen", async () => {
   const root = freshRoot();
-  gitInit(root);
+  gitInit(root, true);
   const session = new Session(root);
   for (let i = 0; i < 2; i++) await session.advance();
   checkDocs(session);
@@ -548,7 +534,7 @@ test("a choice while a form is owed refuses and names the reopen", async () => {
 // this guard closes the class at the one gate every completion passes.
 test("completing a claimful state without its claim refuses, and the walk stands", async () => {
   const root = freshRoot();
-  gitInit(root);
+  gitInit(root, true);
   const session = new Session(root);
   for (let i = 0; i < 2; i++) await session.advance();
   checkDocs(session);

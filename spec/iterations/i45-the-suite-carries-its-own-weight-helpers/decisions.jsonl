@@ -1,0 +1,277 @@
+{"ts":"2026-08-21T11:46:58.209Z","op":"update","visit":"iterations/i45/start@0","node":"d8","brief":"Entering iteration retro"}
+{"ts":"2026-08-21T11:47:42.120Z","op":"update","visit":"iterations/i45/onboard-retro@0","node":"d9","brief":"Surveying retro inbox"}
+{"ts":"2026-08-21T11:47:58.759Z","op":"update","visit":"iterations/i45/onboard-retro@0","node":"d10","brief":"Completing retro evidence"}
+{"ts":"2026-08-21T11:48:03.970Z","op":"update","visit":"iterations/i45/onboard-retro@0","node":"d11","brief":"Establishing retro interval"}
+{"ts":"2026-08-21T11:48:08.252Z","op":"update","visit":"iterations/i45/onboard-retro@0","node":"d12","brief":"Mining retro log counts"}
+{"ts":"2026-08-21T11:48:20.438Z","op":"done","visit":"iterations/select@0","node":"d5","brief":"Completed iteration retro"}
+{"ts":"2026-08-21T11:48:45.715Z","op":"update","visit":"iterations/i45/gate-kickoff@0","node":"d13","brief":"Preparing kickoff gate"}
+{"ts":"2026-08-21T11:49:02.188Z","op":"update","visit":"iterations/i45/gate-kickoff@0","node":"d14","brief":"Reading i45 implementation plan"}
+{"ts":"2026-08-21T11:49:22.612Z","op":"done","visit":"iterations/select@0","node":"d6","brief":"Parked responsiveness work"}
+{"ts":"2026-08-21T11:49:40.855Z","op":"update","visit":"iterations/i45/gate-kickoff@0","node":"d15","brief":"Advancing kickoff gate"}
+{"ts":"2026-08-21T11:49:55.839Z","op":"update","visit":"iterations/i45/gate-kickoff@0","node":"d16","brief":"Routing through i45 milestones"}
+{"ts":"2026-08-21T11:50:02.784Z","op":"update","visit":"iterations/i45/gate-kickoff@0","node":"d17","brief":"Entering i45 draft vision"}
+{"ts":"2026-08-21T11:50:16.623Z","op":"update","visit":"iterations/i45/draft-vision@0","node":"d18","brief":"Reading product goals for i45"}
+{"ts":"2026-08-21T11:51:38.557Z","op":"update","visit":"iterations/i45/log-risks@0","node":"d19","brief":"Recording i45 risk review"}
+{"ts":"2026-08-21T11:52:28.048Z","op":"update","visit":"iterations/i45/frame-delta@0","node":"d20","brief":"Framing i45 value proposition"}
+{"ts":"2026-08-21T11:53:06.209Z","op":"update","visit":"iterations/i45/scope-non-goals@0","node":"d21","brief":"Defining i45 scope boundary"}
+{"ts":"2026-08-21T11:53:11.065Z","op":"done","visit":"iterations/select@0","node":"d7","brief":"Completed i45 initial design"}
+{"ts":"2026-08-21T11:53:46.843Z","op":"plan","visit":"iterations/i45/gate-motivation@0","parent":null,"nodes":[{"id":"d22","brief":"Complete motivation gate"},{"id":"d23","brief":"Write i45 requirements"},{"id":"d24","brief":"Implement and verify i45"}]}
+{"ts":"2026-08-21T11:54:02.244Z","op":"update","visit":"iterations/i45/gate-motivation@0","node":"d25","brief":"Completing motivation gate"}
+{"ts":"2026-08-21T11:54:09.202Z","op":"update","visit":"iterations/i45/gate-motivation@0","node":"d26","brief":"Correcting motivation evidence"}
+{"ts":"2026-08-21T12:03:36.383Z","op":"update","visit":"iterations/i45/gate-motivation@0","node":"d27","brief":"Reading goals field selection"}
+{"ts":"2026-08-21T12:03:41.571Z","op":"update","visit":"iterations/i45/gate-motivation@0","node":"d28","brief":"Reading round selection tests"}
+{"ts":"2026-08-21T12:03:50.493Z","op":"update","visit":"iterations/i45/gate-motivation@0","node":"d29","brief":"Reading gate round assertions"}
+{"ts":"2026-08-21T12:04:02.341Z","op":"update","visit":"iterations/i45/gate-motivation@0","node":"d30","brief":"Exempting pre-build goals review"}
+{"ts":"2026-08-21T12:04:10.094Z","op":"update","visit":"iterations/i45/gate-motivation@0","node":"d31","brief":"Checking motivation gate fields"}
+{"ts":"2026-08-21T12:04:17.714Z","op":"fork","visit":"iterations/i45/gate-motivation@0","parent":"d24","node":"d32","brief":"Reload stale gate rule","nodes":[{"id":"d33","brief":"Reach idle"},{"id":"d34","brief":"Reload engine"},{"id":"d35","brief":"Resume motivation gate"}]}
+{"ts":"2026-08-21T12:12:59.969Z","op":"update","visit":"iterations/i45/gate-motivation@0","node":"d13","brief":"Reading rounds regression"}
+{"ts":"2026-08-21T12:13:04.487Z","op":"update","visit":"iterations/i45/gate-motivation@0","node":"d14","brief":"Locating pinned i45 machine"}
+{"ts":"2026-08-21T12:13:17.942Z","op":"fork","visit":"iterations/i45/gate-motivation@0","parent":"d5","node":"d15","brief":"Reload restored round rule","nodes":[{"id":"d16","brief":"Reach idle"},{"id":"d17","brief":"Reload engine"},{"id":"d18","brief":"Verify motivation fields"}]}
+{"ts":"2026-08-21T12:15:12.867Z","op":"update","visit":"iterations/i45/gate-kickoff@0","node":"d6","brief":"Restoring motivation form"}
+{"ts":"2026-08-21T12:15:27.737Z","op":"done","visit":"idle@0","node":"d3","brief":"Verified motivation goal review"}
+{"ts":"2026-08-21T12:15:33.816Z","op":"update","visit":"iterations/i45/gate-motivation@0","node":"d7","brief":"Tracing goal evidence matcher"}
+{"ts":"2026-08-21T12:15:39.887Z","op":"update","visit":"iterations/i45/gate-motivation@0","node":"d8","brief":"Locating per-item validator"}
+{"ts":"2026-08-21T12:16:06.737Z","op":"update","visit":"iterations/i45/gate-motivation@0","node":"d9","brief":"Locating checklist validator"}
+{"ts":"2026-08-21T12:16:18.486Z","op":"done","visit":"idle@0","node":"d4","brief":"Submitted prior-step goal evidence"}
+{"ts":"2026-08-21T12:16:53.933Z","op":"update","visit":"iterations/i45/gate-motivation@0","node":"d10","brief":"Completing requirement method proof"}
+{"ts":"2026-08-21T12:17:00.220Z","op":"done","visit":"idle@0","node":"d5","brief":"Completed requirement method proof"}
+{"ts":"2026-08-21T12:17:22.274Z","op":"update","visit":"iterations/i45/gate-motivation@0","node":"d11","brief":"Completing story method proof"}
+{"ts":"2026-08-21T12:17:27.027Z","op":"plan","visit":"iterations/i45/gate-motivation@0","parent":null,"nodes":[{"id":"d12","brief":"Write i45 story evidence"},{"id":"d13","brief":"Write i45 requirements"},{"id":"d14","brief":"Implement i45 changes"}]}
+{"ts":"2026-08-21T12:17:45.473Z","op":"update","visit":"iterations/i45/write-stories@0","node":"d15","brief":"Inspecting i45 story scope"}
+{"ts":"2026-08-21T12:17:50.538Z","op":"done","visit":"iterations/i45/gate-motivation@0","node":"d12","brief":"Recorded no i45 story delta"}
+{"ts":"2026-08-21T12:18:15.680Z","op":"update","visit":"iterations/i45/write-stories@0","node":"d16","brief":"Completing use-case method proof"}
+{"ts":"2026-08-21T12:18:21.297Z","op":"update","visit":"iterations/i45/write-stories@0","node":"d17","brief":"Submitting use-case proof"}
+{"ts":"2026-08-21T12:18:42.188Z","op":"update","visit":"iterations/i45/generalize-use-cases@0","node":"d18","brief":"Inspecting i45 use-case scope"}
+{"ts":"2026-08-21T12:18:46.459Z","op":"done","visit":"iterations/i45/gate-motivation@0","node":"d13","brief":"Recorded no i45 use-case delta"}
+{"ts":"2026-08-21T12:19:21.741Z","op":"update","visit":"iterations/i45/write-requirements@0","node":"d19","brief":"Inspecting i45 requirement scope"}
+{"ts":"2026-08-21T12:19:34.287Z","op":"update","visit":"iterations/i45/write-requirements@0","node":"d20","brief":"Recording no requirement delta"}
+{"ts":"2026-08-21T12:19:59.985Z","op":"update","visit":"iterations/i45/write-requirements@0","node":"d21","brief":"Completing assumption method proof"}
+{"ts":"2026-08-21T12:20:07.435Z","op":"update","visit":"iterations/i45/write-requirements@0","node":"d22","brief":"Completing function method proof"}
+{"ts":"2026-08-21T12:20:25.220Z","op":"update","visit":"iterations/i45/derive-functions@0","node":"d23","brief":"Inspecting i45 function scope"}
+{"ts":"2026-08-21T12:20:29.790Z","op":"update","visit":"iterations/i45/derive-functions@0","node":"d24","brief":"Recording no function delta"}
+{"ts":"2026-08-21T12:21:26.428Z","op":"fork","visit":"iterations/i45/identify-assumptions@0","parent":"d14","node":"d25","brief":"Re-evaluate use-case delta","nodes":[{"id":"d26","brief":"Inspect existing workflows"},{"id":"d27","brief":"Record affected use cases"},{"id":"d28","brief":"Re-earn downstream claims"}]}
+{"ts":"2026-08-21T12:21:32.401Z","op":"update","visit":"iterations/i45/generalize-use-cases@1","node":"d29","brief":"Inspecting existing test workflows"}
+{"ts":"2026-08-21T12:21:39.450Z","op":"update","visit":"iterations/i45/generalize-use-cases@1","node":"d30","brief":"Checking use-case coverage"}
+{"ts":"2026-08-21T12:21:46.548Z","op":"done","visit":"iterations/i45/identify-assumptions@0","node":"d26","brief":"Completed workflow inspection"}
+{"ts":"2026-08-21T12:21:52.142Z","op":"done","visit":"iterations/i45/identify-assumptions@0","node":"d27","brief":"Recorded evaluated use-case delta"}
+{"ts":"2026-08-21T12:22:27.879Z","op":"update","visit":"iterations/i45/write-requirements@2","node":"d31","brief":"Re-earning requirement evidence"}
+{"ts":"2026-08-21T12:22:44.012Z","op":"update","visit":"iterations/i45/write-requirements@2","node":"d32","brief":"Walking re-earned analyses"}
+{"ts":"2026-08-21T12:22:58.310Z","op":"update","visit":"iterations/i45/write-requirements@2","node":"d33","brief":"Reopening requirements recheck"}
+{"ts":"2026-08-21T12:23:01.738Z","op":"update","visit":"iterations/i45/write-requirements@2","node":"d34","brief":"Submitting requirements recheck"}
+{"ts":"2026-08-21T12:23:05.849Z","op":"done","visit":"iterations/i45/identify-assumptions@0","node":"d28","brief":"Re-signed requirements claim"}
+{"ts":"2026-08-21T12:23:16.221Z","op":"update","visit":"iterations/i45/derive-functions@0","node":"d35","brief":"Re-signing function derivation"}
+{"ts":"2026-08-21T12:23:20.225Z","op":"update","visit":"iterations/i45/derive-functions@0","node":"d36","brief":"Opening function recheck"}
+{"ts":"2026-08-21T12:23:36.799Z","op":"update","visit":"iterations/i45/derive-functions@0","node":"d37","brief":"Entering requirements gate"}
+{"ts":"2026-08-21T12:23:52.351Z","op":"update","visit":"iterations/i45/derive-functions@0","node":"d38","brief":"Routing to assumption probes"}
+{"ts":"2026-08-21T12:24:05.152Z","op":"update","visit":"iterations/i45/identify-assumptions@0","node":"d39","brief":"Opening assumption probe path"}
+{"ts":"2026-08-21T12:24:13.800Z","op":"update","visit":"iterations/i45/identify-assumptions@0","node":"d40","brief":"Recording no new assumptions"}
+{"ts":"2026-08-21T12:24:31.390Z","op":"update","visit":"iterations/i45/identify-assumptions@0","node":"d41","brief":"Completing assumption probe proof"}
+{"ts":"2026-08-21T12:24:42.816Z","op":"update","visit":"iterations/i45/probe-assumptions@0","node":"d42","brief":"Reading timing assumptions"}
+{"ts":"2026-08-21T12:25:02.527Z","op":"update","visit":"iterations/i45/probe-assumptions@0","node":"d43","brief":"Opening timing assumption probes"}
+{"ts":"2026-08-21T12:26:14.559Z","op":"plan","visit":"iterations/i45/probe-assumptions@0","parent":null,"nodes":[{"id":"d44","brief":"Resolve timing assumption probes"},{"id":"d45","brief":"Close requirements gate"},{"id":"d46","brief":"Implement i45 test changes"}]}
+{"ts":"2026-08-21T12:26:41.767Z","op":"update","visit":"iterations/i45/probe-assumptions@0","node":"d47","brief":"Locating missing probe rows"}
+{"ts":"2026-08-21T12:26:55.691Z","op":"update","visit":"iterations/i45/probe-assumptions@0","node":"d48","brief":"Recording timing probe outcomes"}
+{"ts":"2026-08-21T12:26:59.731Z","op":"done","visit":"iterations/i45/probe-assumptions@0","node":"d44","brief":"Validated timing probe outcomes"}
+{"ts":"2026-08-21T12:27:07.574Z","op":"update","visit":"iterations/i45/probe-assumptions@0","node":"d49","brief":"Submitting completed assumption probes"}
+{"ts":"2026-08-21T12:27:30.171Z","op":"fork","visit":"iterations/i45/probe-assumptions@0","parent":"d45","node":"d50","brief":"Check node table persistence","nodes":[{"id":"d51","brief":"Test minimal live table"},{"id":"d52","brief":"Repair table form if needed"}]}
+{"ts":"2026-08-21T12:28:22.605Z","op":"update","visit":"iterations/i45/derive-functions@0","node":"d53","brief":"Re-signing function derivation"}
+{"ts":"2026-08-21T12:28:39.240Z","op":"update","visit":"iterations/i45/derive-functions@0","node":"d54","brief":"Entering requirements gate"}
+{"ts":"2026-08-21T12:28:49.950Z","op":"update","visit":"iterations/i45/derive-functions@0","node":"d55","brief":"Reopening function derivation"}
+{"ts":"2026-08-21T12:28:53.214Z","op":"update","visit":"iterations/i45/derive-functions@0","node":"d56","brief":"Returning to function recheck"}
+{"ts":"2026-08-21T12:28:58.253Z","op":"update","visit":"iterations/i45/derive-functions@0","node":"d57","brief":"Opening function recheck form"}
+{"ts":"2026-08-21T12:29:43.602Z","op":"update","visit":"iterations/i45/gate-requirements@0","node":"d58","brief":"Opening requirements gate review"}
+{"ts":"2026-08-21T12:30:33.490Z","op":"update","visit":"iterations/i45/gate-requirements@0","node":"d59","brief":"Completing test design proof"}
+{"ts":"2026-08-21T12:30:39.940Z","op":"update","visit":"iterations/i45/gate-requirements@0","node":"d60","brief":"Submitting test design proof"}
+{"ts":"2026-08-21T12:31:09.673Z","op":"update","visit":"iterations/i45/decompose-structure@0","node":"d61","brief":"Inspecting i45 structure scope"}
+{"ts":"2026-08-21T12:31:17.916Z","op":"update","visit":"iterations/i45/decompose-structure@0","node":"d62","brief":"Recording no structure delta"}
+{"ts":"2026-08-21T12:31:50.926Z","op":"update","visit":"iterations/i45/author-tests@0","node":"d63","brief":"Inspecting i45 test-spec scope"}
+{"ts":"2026-08-21T12:31:56.757Z","op":"update","visit":"iterations/i45/author-tests@0","node":"d64","brief":"Recording no test-spec delta"}
+{"ts":"2026-08-21T12:32:44.073Z","op":"done","visit":"iterations/i45/identify-assumptions@0","node":"d25","brief":"Completed use-case audit"}
+{"ts":"2026-08-21T12:33:16.965Z","op":"done","visit":"iterations/i45/probe-assumptions@0","node":"d51","brief":"Minimal live table passed"}
+{"ts":"2026-08-21T12:33:26.925Z","op":"obsolete","visit":"iterations/i45/probe-assumptions@0","node":"d52","brief":"No table repair needed"}
+{"ts":"2026-08-21T12:33:55.984Z","op":"update","visit":"iterations/i45/observe-red@0","node":"d65","brief":"Inspecting red observation scope"}
+{"ts":"2026-08-21T12:34:04.593Z","op":"update","visit":"iterations/i45/observe-red@0","node":"d66","brief":"Recording no red-observation delta"}
+{"ts":"2026-08-21T12:34:34.303Z","op":"update","visit":"iterations/i45/build-steps@0","node":"d67","brief":"Opening Seed 7 implementation"}
+{"ts":"2026-08-21T12:34:57.185Z","op":"fork","visit":"iterations/i45/build-steps@0","parent":"d14","node":"d68","brief":"Seed i45 build chunks","nodes":[{"id":"d69","brief":"Reopen build specification"},{"id":"d70","brief":"Author Seed 7 chunks"},{"id":"d71","brief":"Run implementation chunks"}]}
+{"ts":"2026-08-21T12:35:01.839Z","op":"update","visit":"iterations/i45/specify-build@1","node":"d72","brief":"Reading i45 chunk drawing"}
+{"ts":"2026-08-21T12:35:11.403Z","op":"update","visit":"iterations/i45/specify-build@1","node":"d73","brief":"Finding chunk drawing format"}
+{"ts":"2026-08-21T12:35:22.563Z","op":"done","visit":"iterations/i45/build-steps@0","node":"d70","brief":"Authored Seed 7 chunk drawing"}
+{"ts":"2026-08-21T12:35:28.812Z","op":"done","visit":"iterations/i45/build-steps@0","node":"d69","brief":"Seeded build chunks"}
+{"ts":"2026-08-21T12:36:11.169Z","op":"update","visit":"iterations/i45/observe-red@1","node":"d74","brief":"Re-signing red observation"}
+{"ts":"2026-08-21T12:36:26.828Z","op":"update","visit":"iterations/i45/observe-red@1","node":"d75","brief":"Starting Seed 7 chunks"}
+{"ts":"2026-08-21T12:36:46.014Z","op":"fork","visit":"iterations/i45/observe-red@1","parent":"d71","node":"d76","brief":"Fix chunk seeding","nodes":[{"id":"d77","brief":"Inspect seeded drawing format"},{"id":"d78","brief":"Use authored seed path"},{"id":"d79","brief":"Run i45 chunks"}]}
+{"ts":"2026-08-21T12:36:52.992Z","op":"done","visit":"iterations/i45/observe-red@1","node":"d77","brief":"Corrected chunk drawing key"}
+{"ts":"2026-08-21T12:36:58.925Z","op":"update","visit":"iterations/i45/observe-red@1","node":"d80","brief":"Returning to seeded build spec"}
+{"ts":"2026-08-21T12:37:21.727Z","op":"update","visit":"iterations/i45/specify-build@2","node":"d81","brief":"Opening corrected build recheck"}
+{"ts":"2026-08-21T12:37:50.067Z","op":"update","visit":"iterations/i45/observe-red@1","node":"d82","brief":"Opening red recheck"}
+{"ts":"2026-08-21T12:38:06.987Z","op":"update","visit":"iterations/i45/observe-red@1","node":"d83","brief":"Launching Seed 7 chunk machine"}
+{"ts":"2026-08-21T12:38:25.890Z","op":"fork","visit":"iterations/i45/observe-red@1","parent":"d79","node":"d84","brief":"Find chunk seed operation","nodes":[{"id":"d85","brief":"Trace seed guard"},{"id":"d86","brief":"Use supported chunk seeding"}]}
+{"ts":"2026-08-21T12:38:37.325Z","op":"update","visit":"iterations/i45/observe-red@1","node":"d87","brief":"Reading chunk seed guard"}
+{"ts":"2026-08-21T12:38:42.002Z","op":"update","visit":"iterations/i45/observe-red@1","node":"d88","brief":"Tracing submachine completion"}
+{"ts":"2026-08-21T12:38:52.430Z","op":"update","visit":"iterations/i45/observe-red@1","node":"d89","brief":"Tracing drawing author marker"}
+{"ts":"2026-08-21T12:39:01.190Z","op":"fork","visit":"iterations/i45/observe-red@1","parent":"d85","node":"d90","brief":"Reload chunk submachine","nodes":[{"id":"d91","brief":"Reach idle"},{"id":"d92","brief":"Reload engine"},{"id":"d93","brief":"Run seeded chunks"}]}
+{"ts":"2026-08-21T12:41:40.088Z","op":"update","visit":"iterations/i45/start@0","node":"d5","brief":"Restoring seeded build route"}
+{"ts":"2026-08-21T12:42:28.978Z","op":"update","visit":"iterations/i45/draft-vision@0","node":"d6","brief":"Walking seeded route branch"}
+{"ts":"2026-08-21T12:42:43.450Z","op":"update","visit":"iterations/i45/draft-vision@0","node":"d7","brief":"Retrying offered route branch"}
+{"ts":"2026-08-21T12:42:49.303Z","op":"fork","visit":"iterations/i45/draft-vision@0","parent":"d2","node":"d8","brief":"Recover stale route marker","nodes":[{"id":"d9","brief":"Aim at offered branch"},{"id":"d10","brief":"Resume seeded route"}]}
+{"ts":"2026-08-21T12:42:58.321Z","op":"done","visit":"iterations/i45/draft-vision@0","node":"d9","brief":"Recovered route branch"}
+{"ts":"2026-08-21T12:43:47.450Z","op":"done","visit":"iterations/i45/draft-vision@0","node":"d10","brief":"Resumed seeded route"}
+{"ts":"2026-08-21T12:44:19.628Z","op":"fork","visit":"iterations/i45/observe-red@0","parent":"d8","node":"d11","brief":"Repair chunk authoring path","nodes":[{"id":"d12","brief":"Read drawing compiler"},{"id":"d13","brief":"Add build chunk seed action"},{"id":"d14","brief":"Validate i45 submachine"}]}
+{"ts":"2026-08-21T12:44:27.854Z","op":"update","visit":"iterations/i45/observe-red@0","node":"d15","brief":"Reading drawing loader"}
+{"ts":"2026-08-21T12:44:33.320Z","op":"done","visit":"iterations/i45/observe-red@0","node":"d12","brief":"Identified seeded submachine route"}
+{"ts":"2026-08-21T12:44:45.794Z","op":"update","visit":"iterations/i45/observe-red@0","node":"d16","brief":"Opening red observation recheck"}
+{"ts":"2026-08-21T12:45:00.658Z","op":"update","visit":"iterations/i45/observe-red@0","node":"d17","brief":"Reopening red observation"}
+{"ts":"2026-08-21T12:45:04.105Z","op":"update","visit":"iterations/i45/observe-red@0","node":"d18","brief":"Opening red observation form"}
+{"ts":"2026-08-21T12:45:31.727Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d19","brief":"Locating shared test helpers"}
+{"ts":"2026-08-21T12:46:13.858Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d20","brief":"Resuming shared helper migration"}
+{"ts":"2026-08-21T12:46:23.983Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d21","brief":"Reading shared helper module"}
+{"ts":"2026-08-21T12:46:32.378Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d22","brief":"Comparing helper implementations"}
+{"ts":"2026-08-21T12:46:40.766Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d23","brief":"Reading shared git helper"}
+{"ts":"2026-08-21T12:46:50.551Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d24","brief":"Migrating committed git helper"}
+{"ts":"2026-08-21T12:46:59.222Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d25","brief":"Testing shared git helper migration"}
+{"ts":"2026-08-21T12:47:08.498Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d26","brief":"Reading next git helper copy"}
+{"ts":"2026-08-21T12:47:15.582Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d27","brief":"Reading shared helper test"}
+{"ts":"2026-08-21T12:47:47.937Z","op":"done","visit":"iterations/i45/observe-red@0","node":"d13","brief":"Used seeded chunk drawing"}
+{"ts":"2026-08-21T12:48:13.068Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d28","brief":"Reading git helper migration test"}
+{"ts":"2026-08-21T12:48:22.257Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d29","brief":"Checking drawnsub helper use"}
+{"ts":"2026-08-21T12:48:32.672Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d30","brief":"Migrating drawnsub git helper"}
+{"ts":"2026-08-21T12:48:45.445Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d31","brief":"Testing two git helper migrations"}
+{"ts":"2026-08-21T12:48:58.407Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d32","brief":"Finding remaining git helpers"}
+{"ts":"2026-08-21T12:49:11.331Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d33","brief":"Comparing drift git helper"}
+{"ts":"2026-08-21T12:49:22.650Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d34","brief":"Migrating drift git helper"}
+{"ts":"2026-08-21T12:49:32.279Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d35","brief":"Testing three git helper migrations"}
+{"ts":"2026-08-21T12:49:40.869Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d36","brief":"Comparing gitlane helper"}
+{"ts":"2026-08-21T12:49:52.234Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d37","brief":"Checking gitlane helper use"}
+{"ts":"2026-08-21T12:50:05.953Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d38","brief":"Migrating gitlane init helper"}
+{"ts":"2026-08-21T12:50:15.139Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d39","brief":"Reading gitlane import block"}
+{"ts":"2026-08-21T12:50:34.876Z","op":"done","visit":"iterations/i45/observe-red@0","node":"d14","brief":"Validated seeded chunk machine"}
+{"ts":"2026-08-21T12:50:53.743Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d40","brief":"Migrating gitlane init helper"}
+{"ts":"2026-08-21T12:51:01.441Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d41","brief":"Testing four git helper migrations"}
+{"ts":"2026-08-21T12:51:14.826Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d42","brief":"Comparing reopen git helper"}
+{"ts":"2026-08-21T12:51:23.878Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d43","brief":"Checking reopen helper use"}
+{"ts":"2026-08-21T12:51:32.481Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d44","brief":"Migrating reopen git helper"}
+{"ts":"2026-08-21T12:51:41.879Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d45","brief":"Migrating reopen git roots"}
+{"ts":"2026-08-21T12:51:49.608Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d46","brief":"Migrating reopen git roots"}
+{"ts":"2026-08-21T13:09:02.416Z","op":"update","visit":"iterations/i45/draft-vision@0","node":"d9","brief":"Recovering M0 branch"}
+{"ts":"2026-08-21T13:09:12.385Z","op":"update","visit":"iterations/i45/log-risks@0","node":"d10","brief":"Returning to helper chunk"}
+{"ts":"2026-08-21T13:09:47.954Z","op":"update","visit":"iterations/i45/gate-requirements@0","node":"d11","brief":"Restoring shared helper chunk"}
+{"ts":"2026-08-21T13:10:12.427Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d12","brief":"Removing reopen helper residue"}
+{"ts":"2026-08-21T13:10:16.473Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d13","brief":"Testing all git helper migrations"}
+{"ts":"2026-08-21T13:10:22.638Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d14","brief":"Comparing iterations git helper"}
+{"ts":"2026-08-21T13:10:31.338Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d15","brief":"Checking iterations helper use"}
+{"ts":"2026-08-21T13:10:41.652Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d16","brief":"Migrating iterations git helper"}
+{"ts":"2026-08-21T13:10:51.019Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d17","brief":"Reading helper migration regression"}
+{"ts":"2026-08-21T13:10:58.232Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d18","brief":"Comparing fallback git helper"}
+{"ts":"2026-08-21T13:11:15.002Z","op":"done","visit":"front_desk@0","node":"d5","brief":"Repaired reopen helper migration"}
+{"ts":"2026-08-21T13:11:24.368Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d19","brief":"Testing complete git helper migration"}
+{"ts":"2026-08-21T13:11:32.326Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d20","brief":"Locating refusal helper variants"}
+{"ts":"2026-08-21T13:11:37.210Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d21","brief":"Checking shared refusal dependencies"}
+{"ts":"2026-08-21T13:11:41.850Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d22","brief":"Reading synchronous refusal helper"}
+{"ts":"2026-08-21T13:11:51.992Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d23","brief":"Sharing synchronous refusal helper"}
+{"ts":"2026-08-21T13:12:00.790Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d24","brief":"Testing synchronous refusal migration"}
+{"ts":"2026-08-21T13:12:10.146Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d25","brief":"Reading git fixture regression"}
+{"ts":"2026-08-21T13:12:22.951Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d26","brief":"Reviewing next refusal helper"}
+{"ts":"2026-08-21T13:12:30.967Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d27","brief":"Migrating emergency refusal helper"}
+{"ts":"2026-08-21T13:12:39.154Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d28","brief":"Testing current helper migrations"}
+{"ts":"2026-08-21T13:12:51.985Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d29","brief":"Reading async refusal helper"}
+{"ts":"2026-08-21T13:13:03.308Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d30","brief":"Sharing async refusal strategy"}
+{"ts":"2026-08-21T13:13:18.756Z","op":"obsolete","visit":"start@0","node":"d2","brief":"Superseded by current validation"}
+{"ts":"2026-08-21T13:13:34.895Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d31","brief":"Reading updated git migration test"}
+{"ts":"2026-08-21T13:13:42.032Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d32","brief":"Reading refusal migration test"}
+{"ts":"2026-08-21T13:13:52.098Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d33","brief":"Mapping remaining test helpers"}
+{"ts":"2026-08-21T13:13:59.595Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d34","brief":"Reading async refusal test"}
+{"ts":"2026-08-21T13:14:12.608Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d35","brief":"Reviewing pull seam refusal helper"}
+{"ts":"2026-08-21T13:14:21.775Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d36","brief":"Migrating pull seam async helper"}
+{"ts":"2026-08-21T13:14:29.526Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d37","brief":"Testing complete helper migration"}
+{"ts":"2026-08-21T13:14:40.219Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d38","brief":"Checking remaining git helper copies"}
+{"ts":"2026-08-21T13:14:48.922Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d39","brief":"Checking remaining refusal copies"}
+{"ts":"2026-08-21T13:14:57.169Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d40","brief":"Reading expr refusal import"}
+{"ts":"2026-08-21T13:15:04.815Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d41","brief":"Reading expr imports"}
+{"ts":"2026-08-21T13:15:15.296Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d42","brief":"Migrating expr and floor refusals"}
+{"ts":"2026-08-21T13:15:39.292Z","op":"defer","visit":"start@0","node":"d3","brief":"Investigate UI isolation","to":"onboard-retro","hops":1,"trail":["start","onboard-retro"]}
+{"ts":"2026-08-21T13:15:54.896Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d43","brief":"Reading expanded helper regression"}
+{"ts":"2026-08-21T13:16:08.227Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d44","brief":"Reviewing frontmatter refusal helper"}
+{"ts":"2026-08-21T13:16:18.350Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d45","brief":"Migrating power refusal helper"}
+{"ts":"2026-08-21T13:16:27.661Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d46","brief":"Testing final helper migration set"}
+{"ts":"2026-08-21T13:16:35.755Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d47","brief":"Reading first helper regression"}
+{"ts":"2026-08-21T13:16:56.318Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d48","brief":"Reviewing tables refusal helper"}
+{"ts":"2026-08-21T13:17:04.497Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d49","brief":"Reading latest helper regression"}
+{"ts":"2026-08-21T13:17:16.447Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d50","brief":"Mapping refusal-only boot setups"}
+{"ts":"2026-08-21T13:17:25.325Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d51","brief":"Reading comprehensive helper test"}
+{"ts":"2026-08-21T13:17:37.891Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d52","brief":"Reading Seed 7 boot targets"}
+{"ts":"2026-08-21T13:17:45.471Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d53","brief":"Reading helper regression progress"}
+{"ts":"2026-08-21T13:17:53.645Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d54","brief":"Mapping seed and drain setup"}
+{"ts":"2026-08-21T13:18:18.647Z","op":"done","visit":"start@0","node":"d4","brief":"Resumed active helper chunk"}
+{"ts":"2026-08-21T13:18:34.511Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d55","brief":"Reading helper regression result"}
+{"ts":"2026-08-21T13:18:44.473Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d56","brief":"Inspecting readDocs cleanup"}
+{"ts":"2026-08-21T13:18:52.608Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d57","brief":"Reading helper regression progress"}
+{"ts":"2026-08-21T13:19:02.596Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d58","brief":"Reading readDocs cleanup slice"}
+{"ts":"2026-08-21T13:19:06.442Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d59","brief":"Reading testlint helper comment"}
+{"ts":"2026-08-21T13:19:16.542Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d60","brief":"Removing unused readDocs helper"}
+{"ts":"2026-08-21T13:19:26.759Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d61","brief":"Testing final helper cleanup"}
+{"ts":"2026-08-21T13:19:34.738Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d62","brief":"Mapping next boot-sharing slice"}
+{"ts":"2026-08-21T13:19:42.466Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d63","brief":"Reading final helper validation"}
+{"ts":"2026-08-21T13:19:50.273Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d64","brief":"Reading writeguard boot cases"}
+{"ts":"2026-08-21T13:19:59.926Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d65","brief":"Reading helper validation status"}
+{"ts":"2026-08-21T13:20:13.003Z","op":"update","visit":"iterations/i45/build-steps/shared-test-helpers@0","node":"d66","brief":"Reading testlint extension point"}
+{"ts":"2026-08-21T13:20:30.519Z","op":"defer","visit":"front_desk@0","node":"d6","brief":"Validate shared helper migrations","to":"verification","hops":1,"trail":["front_desk","verification"]}
+{"ts":"2026-08-21T13:20:45.416Z","op":"done","visit":"front_desk@0","node":"d7","brief":"Completed shared helper chunk"}
+{"ts":"2026-08-21T13:23:41.690Z","op":"update","visit":"iterations/i45/build-steps/share-refusal-boots@0","node":"d67","brief":"Sharing writeguard refusal boot"}
+{"ts":"2026-08-21T13:23:51.157Z","op":"plan","visit":"iterations/i45/build-steps/share-refusal-boots@0","parent":null,"nodes":[{"id":"d68","brief":"Validate shared writeguard boot"},{"id":"d69","brief":"Share matching MCP refusal boots"},{"id":"d70","brief":"Verify boot-sharing changes"}]}
+{"ts":"2026-08-21T13:24:00.291Z","op":"update","visit":"iterations/i45/build-steps/share-refusal-boots@0","node":"d71","brief":"Reading MCP refusal boot cases"}
+{"ts":"2026-08-21T13:24:15.432Z","op":"done","visit":"iterations/i45/build-steps/share-refusal-boots@0","node":"d69","brief":"Shared MCP refusal boot"}
+{"ts":"2026-08-21T13:24:27.066Z","op":"update","visit":"iterations/i45/build-steps/share-refusal-boots@0","node":"d72","brief":"Testing boot-sharing changes"}
+{"ts":"2026-08-21T13:24:36.670Z","op":"update","visit":"iterations/i45/build-steps/share-refusal-boots@0","node":"d73","brief":"Reading fallback outcome assertion"}
+{"ts":"2026-08-21T13:24:45.859Z","op":"update","visit":"iterations/i45/build-steps/share-refusal-boots@0","node":"d74","brief":"Reading fallback row frontmatter"}
+{"ts":"2026-08-21T13:24:58.726Z","op":"update","visit":"iterations/i45/build-steps/share-refusal-boots@0","node":"d75","brief":"Retargeting fallback row assertion"}
+{"ts":"2026-08-21T13:25:08.861Z","op":"update","visit":"iterations/i45/build-steps/share-refusal-boots@0","node":"d76","brief":"Testing fallback YAML assertion"}
+{"ts":"2026-08-21T13:25:25.486Z","op":"update","visit":"iterations/i45/build-steps/share-refusal-boots@0","node":"d77","brief":"Reading boot-sharing regression"}
+{"ts":"2026-08-21T13:25:36.376Z","op":"defer","visit":"iterations/i45/build-steps/share-refusal-boots@0","node":"d68","brief":"Validate shared writeguard boot","to":"verification","hops":1,"trail":["iterations/i45/build-steps/share-refusal-boots","verification"]}
+{"ts":"2026-08-21T13:25:53.332Z","op":"done","visit":"iterations/i45/build-steps/share-refusal-boots@0","node":"d70","brief":"Completed boot-sharing chunk"}
+{"ts":"2026-08-21T13:30:53.015Z","op":"update","visit":"iterations/i45/build-steps/repair-fallback-outcome@0","node":"d78","brief":"Completing fallback YAML chunk"}
+{"ts":"2026-08-21T13:31:51.420Z","op":"plan","visit":"iterations/i45/build-steps/guard-test-hygiene@0","parent":null,"nodes":[{"id":"d79","brief":"Add helper ownership lint"},{"id":"d80","brief":"Add duplicate test-name lint"},{"id":"d81","brief":"Verify Seed 7 guard changes"}]}
+{"ts":"2026-08-21T13:31:59.671Z","op":"update","visit":"iterations/i45/build-steps/guard-test-hygiene@0","node":"d82","brief":"Locating testlint implementation"}
+{"ts":"2026-08-21T13:32:31.729Z","op":"update","visit":"iterations/i45/build-steps/guard-test-hygiene@0","node":"d83","brief":"Scanning testlint targets"}
+{"ts":"2026-08-21T13:32:43.564Z","op":"update","visit":"iterations/i45/build-steps/guard-test-hygiene@0","node":"d84","brief":"Writing testlint inspection script"}
+{"ts":"2026-08-21T13:32:49.694Z","op":"update","visit":"iterations/i45/build-steps/guard-test-hygiene@0","node":"d85","brief":"Running testlint target scan"}
+{"ts":"2026-08-21T13:33:07.318Z","op":"update","visit":"iterations/i45/build-steps/guard-test-hygiene@0","node":"d86","brief":"Adding checked refusal strategy"}
+{"ts":"2026-08-21T13:33:22.464Z","op":"update","visit":"iterations/i45/build-steps/guard-test-hygiene@0","node":"d87","brief":"Adding duplicate name locations"}
+{"ts":"2026-08-21T13:33:29.903Z","op":"update","visit":"iterations/i45/build-steps/guard-test-hygiene@0","node":"d88","brief":"Running duplicate name scan"}
+{"ts":"2026-08-21T13:33:35.318Z","op":"update","visit":"iterations/i45/build-steps/guard-test-hygiene@0","node":"d89","brief":"Reading boot duplicate names"}
+{"ts":"2026-08-21T13:33:55.650Z","op":"update","visit":"iterations/i45/build-steps/guard-test-hygiene@0","node":"d90","brief":"Fixing duplicate name parser"}
+{"ts":"2026-08-21T13:34:05.769Z","op":"update","visit":"iterations/i45/build-steps/guard-test-hygiene@0","node":"d91","brief":"Checking quote-aware scan"}
+{"ts":"2026-08-21T13:34:15.000Z","op":"update","visit":"iterations/i45/build-steps/guard-test-hygiene@0","node":"d92","brief":"Correcting duplicate name key"}
+{"ts":"2026-08-21T13:35:00.039Z","op":"done","visit":"iterations/i45/build-steps/guard-test-hygiene@0","node":"d79","brief":"Added helper ownership lint"}
+{"ts":"2026-08-21T13:35:13.738Z","op":"done","visit":"iterations/i45/build-steps/guard-test-hygiene@0","node":"d80","brief":"Added duplicate test-name lint"}
+{"ts":"2026-08-21T13:35:27.931Z","op":"defer","visit":"iterations/i45/build-steps/guard-test-hygiene@0","node":"d81","brief":"Verify Seed 7 guard changes","to":"verification","hops":1,"trail":["iterations/i45/build-steps/guard-test-hygiene","verification"]}
+{"ts":"2026-08-21T13:37:22.621Z","op":"update","visit":"iterations/i45/build-steps/end@0","node":"d93","brief":"Completing seeded build machine"}
+{"ts":"2026-08-21T13:37:45.599Z","op":"fork","visit":"iterations/i45/build-steps/end@0","parent":null,"node":"d94","brief":"Re-sign build parent","nodes":[{"id":"d95","brief":"Reopen build parent"},{"id":"d96","brief":"Submit completed chunk machine"}]}
+{"ts":"2026-08-21T13:37:49.790Z","op":"done","visit":"iterations/i45/build-steps/end@0","node":"d95","brief":"Opened build parent recheck"}
+{"ts":"2026-08-21T13:38:02.829Z","op":"update","visit":"iterations/i45/build-steps@0","node":"d97","brief":"Opening build parent form"}
+{"ts":"2026-08-21T13:38:16.468Z","op":"done","visit":"iterations/i45/build-steps/end@0","node":"d96","brief":"Submitted completed chunk machine"}
+{"ts":"2026-08-21T13:39:01.686Z","op":"done","visit":"iterations/i45/build-steps/end@0","node":"d94","brief":"Re-signed build parent"}
+{"ts":"2026-08-21T13:39:42.133Z","op":"update","visit":"iterations/i45/trace-design@0","node":"d98","brief":"Recording no design trace delta"}
+{"ts":"2026-08-21T13:40:11.275Z","op":"update","visit":"iterations/i45/trace-design@0","node":"d99","brief":"Tracing unclaimed engine files"}
+{"ts":"2026-08-21T13:40:20.343Z","op":"update","visit":"iterations/i45/trace-design@0","node":"d100","brief":"Reading register extension responsibility"}
+{"ts":"2026-08-21T13:40:31.491Z","op":"update","visit":"iterations/i45/trace-design@0","node":"d101","brief":"Tracing extension registry ownership"}
+{"ts":"2026-08-21T13:40:57.860Z","op":"update","visit":"iterations/i45/trace-design@0","node":"d102","brief":"Checking trace-design blockers"}
+{"ts":"2026-08-21T13:41:05.118Z","op":"update","visit":"iterations/i45/trace-design@0","node":"d103","brief":"Reading element trace template"}
+{"ts":"2026-08-21T13:41:13.639Z","op":"update","visit":"iterations/i45/trace-design@0","node":"d104","brief":"Tracing extension registration function"}
+{"ts":"2026-08-21T13:41:22.963Z","op":"update","visit":"iterations/i45/trace-design@0","node":"d105","brief":"Reading installation function"}
+{"ts":"2026-08-21T13:41:30.626Z","op":"update","visit":"iterations/i45/trace-design@0","node":"d106","brief":"Locating bootstrap design spec"}
+{"ts":"2026-08-21T13:41:42.577Z","op":"update","visit":"iterations/i45/trace-design@0","node":"d107","brief":"Reading bootstrap design spec"}
+{"ts":"2026-08-21T13:41:55.408Z","op":"update","visit":"iterations/i45/trace-design@0","node":"d108","brief":"Claiming VS Code registry files"}
+{"ts":"2026-08-21T13:42:04.941Z","op":"update","visit":"iterations/i45/trace-design@0","node":"d109","brief":"Rechecking design trace"}
+{"ts":"2026-08-21T13:42:11.725Z","op":"update","visit":"iterations/i45/trace-design@0","node":"d110","brief":"Opening trace recheck form"}
+{"ts":"2026-08-21T13:44:47.157Z","op":"update","visit":"iterations/i45/verification@0","node":"d111","brief":"Submitting full verification battery"}
+{"ts":"2026-08-21T13:48:20.975Z","op":"plan","visit":"iterations/i45/gate-implementation@0","parent":null,"nodes":[{"id":"d112","brief":"Collect durable test verdicts"},{"id":"d113","brief":"Complete implementation gate"},{"id":"d114","brief":"Package i45 results"}]}
+{"ts":"2026-08-21T13:49:17.177Z","op":"done","visit":"iterations/i45/gate-implementation@0","node":"d112","brief":"Collected green battery verdict"}
+{"ts":"2026-08-21T13:49:27.858Z","op":"update","visit":"iterations/i45/gate-implementation@0","node":"d115","brief":"Correcting implementation gate checklist"}
+{"ts":"2026-08-21T13:50:07.513Z","op":"update","visit":"iterations/i45/sweep-consistency@0","node":"d116","brief":"Completing consistency sweep"}
+{"ts":"2026-08-21T13:50:45.526Z","op":"done","visit":"iterations/i45/gate-implementation@0","node":"d113","brief":"Blessing validation gate"}
+{"ts":"2026-08-21T13:51:15.633Z","op":"update","visit":"iterations/i45/package@0","node":"d117","brief":"Reading package scripts"}
+{"ts":"2026-08-21T13:51:23.826Z","op":"update","visit":"iterations/i45/package@0","node":"d118","brief":"Locating package command"}
+{"ts":"2026-08-21T13:51:32.083Z","op":"update","visit":"iterations/i45/package@0","node":"d119","brief":"Building package artifact"}
+{"ts":"2026-08-21T13:51:59.877Z","op":"update","visit":"iterations/i45/package@0","node":"d120","brief":"Reading package check mode"}
+{"ts":"2026-08-21T13:52:08.693Z","op":"update","visit":"iterations/i45/package@0","node":"d121","brief":"Inspecting package contents"}
+{"ts":"2026-08-21T13:52:17.630Z","op":"done","visit":"iterations/i45/gate-implementation@0","node":"d114","brief":"Packaged i45 artifact"}

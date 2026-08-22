@@ -243,6 +243,20 @@ export function withSignedOff(instanceRaw: string, when: string): string {
   return afterAnchor(raw, `signed_off: ${when}`);
 }
 
+/** A LEAVING JUDGMENT'S VERDICT, beside the signature. A step's other durable
+ *  standings live in this frontmatter, and before i51 the third one lived in an
+ *  in-memory map that deleted its own entry the moment the judgment settled.
+ *  Returns the raw unchanged where the verdict already reads the same, so a
+ *  judgment that keeps agreeing with itself never rewrites the file.
+ *  see dsp-the-work-account.md#interface */
+export function withJudgment(instanceRaw: string, verdict: string, when: string): string {
+  const line = `judgment: ${verdict} at ${when}`;
+  const standing = /^judgment: (.+?) at /m.exec(instanceRaw)?.[1];
+  if (standing === verdict) return instanceRaw;
+  if (/^judgment:/m.test(instanceRaw)) return instanceRaw.replace(/^judgment:.*$/m, line);
+  return afterAnchor(instanceRaw, line);
+}
+
 /** see dsp-evidence-forms.md#nothing-writes-a-suspect-mark-any-more */
 export function stripSuspect(instanceRaw: string): string {
   return instanceRaw.replace(/^suspect:.*\n?/m, "");

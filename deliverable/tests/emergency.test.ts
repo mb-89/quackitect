@@ -12,21 +12,10 @@ import { strict as assert } from "node:assert";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, test } from "node:test";
-import { Rejection } from "../engine/errors.ts";
 import { Session } from "../engine/session.ts";
-import { freshRoot } from "./helpers.ts";
+import { freshRoot, refusal } from "./helpers.ts";
 
 const root = (): string => freshRoot();
-
-function refusal(fn: () => unknown): Rejection {
-  try {
-    fn();
-  } catch (e) {
-    if (e instanceof Rejection) return e;
-    throw e;
-  }
-  throw new Error("expected a refusal, got a value");
-}
 
 /** A tool no state makes legal at boot, so the gate is the only thing deciding. */
 const GUARDED = "se_file_write";

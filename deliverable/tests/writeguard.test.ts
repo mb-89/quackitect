@@ -18,7 +18,7 @@ function frontmatter(body: string): string {
   return `---\nminted_in: i6\nid: raid-probe-written-by-the-guard-test\ntype: "[[raid]]"\nkind: issue\n${body}\nowner: the driving agent\ntrigger: never — this node exists only inside a test fixture\nimpact: none\nbreaks_how_badly: crippling\nhow_likely: plausible\n---\n\nA fixture node.\n`;
 }
 
-test("a write carrying an unquoted colon is refused before it lands", async () => {
+test("an unquoted colon is refused before landing and names the repair", async () => {
   const root = freshRoot();
   gitInit(root);
   const server = await bootedServer(root);
@@ -31,22 +31,9 @@ test("a write carrying an unquoted colon is refused before it lands", async () =
     content: frontmatter("statement: The second is worse: it taxes an unrelated edit."),
   });
 
-  assert.equal(r.body.kind, "rejected", `the write is refused, not accepted: ${JSON.stringify(r.body)}`);
-  assert.ok(!existsSync(join(root, NODE)), "nothing landed on disk");
-});
-
-test("the parse refusal names the file, the line, the value and the fix", async () => {
-  const root = freshRoot();
-  gitInit(root);
-  const server = await bootedServer(root);
-
-  const r = await call(server, "se_file_write", {
-    path: NODE,
-    base_hash: null,
-    content: frontmatter("statement: The second is worse: it taxes an unrelated edit."),
-  });
-
   const said = JSON.stringify(r.body);
+  assert.equal(r.body.kind, "rejected", `the write is refused, not accepted: ${said}`);
+  assert.ok(!existsSync(join(root, NODE)), "nothing landed on disk");
   assert.match(said, /raid-probe-written-by-the-guard-test/, "the refusal names the file");
   assert.match(said, /\bline\b/i, "the refusal names the line");
   assert.match(said, /worse: it/, "the refusal quotes the offending value back");

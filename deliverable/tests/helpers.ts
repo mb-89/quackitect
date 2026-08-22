@@ -2,6 +2,7 @@
 // machine (copied from this repo), so buildServer() compiles the same
 // drawing the shipped server does.
 
+import { strict as assert } from "node:assert";
 import { spawnSync } from "node:child_process";
 import {
   chmodSync,
@@ -20,6 +21,7 @@ import { createRequire } from "node:module";
 import { tmpdir } from "node:os";
 import { join, sep } from "node:path";
 import { fileURLToPath } from "node:url";
+import { Rejection } from "../engine/errors.ts";
 import { contentHash } from "../engine/hash.ts";
 import { proofFor } from "../engine/readproof.ts";
 import { Session } from "../engine/session.ts";
@@ -283,16 +285,6 @@ export async function waitForTestJob(server: Server, job: string): Promise<Recor
   }
 }
 
-/** WHAT THE WALK OWES, ASKED — NEVER NAMED (owner ruling 2026-08-06:
- *  moving guidance must never break a test. It broke 18 assertions, every
- *  one pinning a path no rule guarantees). The engine's route carries the
- *  way's reading list, so the suite asks IT. A doc joins or leaves this
- *  answer by joining or leaving the machine — no list here to go stale. */
-export function readDocs(root: string): string[] {
-  const s = new Session(root);
-  return (s.packet() as { route_reads?: string[] }).route_reads ?? [];
-}
-
 /** The craft guidance, derived from its folder — a moved or added card
  *  changes the answer instead of falsifying a list. Sorted, so software
  *  precedes ux by name and callers may index. */
@@ -428,7 +420,7 @@ export function guidanceDocs(): string[] {
  *  git spawns per case became one directory copy; every case still owns a
  *  fresh, isolated repository, so nothing a test proves changes. */
 let gitTemplate: string | undefined;
-export function gitInit(root: string): void {
+export function gitInit(root: string, commit = false): void {
   const g = (cwd: string, ...a: string[]): void => {
     const r = spawnSync("git", a, { cwd, encoding: "utf8", windowsHide: true });
     if (r.status !== 0) throw new Error(`git ${a.join(" ")} failed: ${r.stderr}`);
@@ -442,6 +434,10 @@ export function gitInit(root: string): void {
     gitTemplate = t;
   }
   cpSync(join(gitTemplate, ".git"), join(root, ".git"), { recursive: true });
+  if (commit) {
+    g(root, "add", "-A");
+    g(root, "commit", "-q", "-m", "seed");
+  }
 }
 
 // proofFor IS RE-EXPORTED, NEVER MIRRORED (owner, 2026-08-18). It used to be a
@@ -450,6 +446,39 @@ export function gitInit(root: string): void {
 // It is imported at the top of this file and re-exported here, because callers
 // inside this file use it too.
 export { proofFor };
+
+/** Return the structured refusal a synchronous operation is expected to throw. */
+export function refusal(fn: () => unknown): Rejection {
+  try {
+    fn();
+  } catch (error) {
+    if (error instanceof Rejection) return error;
+    throw error;
+  }
+  throw new Error("expected a refusal, got a value");
+}
+
+/** Return the structured refusal an asynchronous operation is expected to reject with. */
+export async function refusalAsync(fn: () => Promise<unknown>): Promise<Rejection> {
+  try {
+    await fn();
+  } catch (error) {
+    if (error instanceof Rejection) return error;
+    throw error;
+  }
+  throw new Error("expected a refusal, got a value");
+}
+
+/** Return a refusal after asserting that no untyped error escaped the test boundary. */
+export function refusalChecked(fn: () => unknown): Rejection {
+  try {
+    fn();
+  } catch (error) {
+    assert.ok(error instanceof Rejection, `a typed refusal, not ${String(error)}`);
+    return error;
+  }
+  throw new assert.AssertionError({ message: "expected a refusal, got a result" });
+}
 
 /** Serve ONE document through the pull and prove it, handing back what the
  *  pull answered with. */
@@ -487,6 +516,22 @@ export async function readEverything(s: Session): Promise<Record<string, unknown
   return r;
 }
 
+/** A LEAVING JUDGMENT IS STILL BEING REACHED.
+ *
+ *  Since i51 the engine ANSWERS the call rather than holding it, so an attempt
+ *  to leave a step whose check is still running is refused with SE-C-112. That
+ *  refusal is an instruction to try again, never a failure.
+ *
+ *  A BOOT HELPER THAT TREATS IT AS A FAILURE DIES WHENEVER THE MACHINE IS BUSY.
+ *  Measured in the full suite: prepare_idle runs five scripts, and against 153
+ *  other suites they outlast the handback bound, so a case that passed alone
+ *  failed in the battery. */
+export function judgmentStillRunning(x: unknown): boolean {
+  const o = x as { clause?: string; got?: string; message?: string } | null;
+  if (o?.clause !== "SE-C-112") return false;
+  return `${o.got ?? ""} ${o.message ?? ""}`.includes("STILL RUNNING");
+}
+
 /** A SESSION standing at idle, reached by pulling rather than ticking.
  *  Idle is where most pull questions are actually asked, because it is the
  *  switchboard: several doors, and one of them heavier than any slider a
@@ -499,10 +544,32 @@ export async function sessionAtIdle(root: string): Promise<Session> {
   const s = new Session(root);
   s.setAutonomy(1);
   s.setTarget("idle");
-  for (let i = 0; i < 8; i++) {
+  // A PULL THAT ANSWERS "still running" HAS NOT MOVED, so it must not spend one
+  // of the bounded attempts. The two counters keep the move budget honest while
+  // letting the walk wait for a judgment that is still being reached.
+  let moves = 0;
+  let waits = 0;
+  while (moves < 8 && waits < 300) {
     await readEverything(s);
     if (s.active()[0] === "idle") return s;
-    await s.pull();
+    let packet: unknown;
+    try {
+      packet = await s.pull();
+    } catch (e) {
+      if (!judgmentStillRunning(e)) throw e;
+      waits++;
+      await new Promise((r) => setTimeout(r, 100));
+      continue;
+    }
+    // A REFUSAL CAN RIDE INSIDE A GOOD ANSWER. The pull reports the stopped
+    // step rather than throwing, so a "still running" that arrives this way
+    // looks like an ordinary answer and would spend a move for no movement.
+    if (judgmentStillRunning((packet as { refusal?: unknown } | undefined)?.refusal)) {
+      waits++;
+      await new Promise((r) => setTimeout(r, 100));
+      continue;
+    }
+    moves++;
     if (s.active()[0] === "idle") return s;
   }
   throw new Error(`the pull did not reach idle: ${JSON.stringify(s.active())}`);
@@ -515,9 +582,19 @@ export async function sessionAtIdle(root: string): Promise<Session> {
  *  and rests at the front desk. */
 export async function pullBoot(server: Server, session?: Session): Promise<void> {
   if (session !== undefined) session.setTarget("idle");
-  for (let i = 0; i < 12; i++) {
+  let moves = 0;
+  let waits = 0;
+  while (moves < 12 && waits < 300) {
     const r = await call(server, "se_pull");
+    // EITHER SHAPE IS A WAIT, NEVER A MOVE: the refusal can arrive as the whole
+    // answer, or ride inside a good one as the stopped step's own reason.
+    if (judgmentStillRunning(r.body) || judgmentStillRunning((r.body as { refusal?: unknown }).refusal)) {
+      waits++;
+      await new Promise((res) => setTimeout(res, 100));
+      continue;
+    }
     if (r.isError) throw new Error(`boot pull failed: ${JSON.stringify(r.body)}`);
+    moves++;
     if (r.body.pull === "read") {
       const doc = r.body.document as { content?: string } | undefined;
       if (doc?.content === undefined) throw new Error(`read with no document: ${JSON.stringify(r.body)}`);

@@ -31,8 +31,8 @@ import {
   toExpression,
   toggleProperty,
 } from "../engine/bases.ts";
-import { Rejection } from "../engine/errors.ts";
 import { parseBase } from "../engine/tables.ts";
+import { refusal } from "./helpers.ts";
 
 const RICH = `filters:
   and:
@@ -69,16 +69,6 @@ function root(body = RICH): { root: string; rel: string; read: () => string; doc
   writeFileSync(join(dir, rel), body);
   const read = (): string => readFileSync(join(dir, rel), "utf8");
   return { root: dir, rel, read, doc: () => parse(read()) as Record<string, unknown> };
-}
-
-function refusal(fn: () => unknown): Rejection {
-  try {
-    fn();
-  } catch (e) {
-    if (e instanceof Rejection) return e;
-    throw e;
-  }
-  throw new Error("expected a refusal, got a value");
 }
 
 const view = (d: Record<string, unknown>, name = "The matrix"): Record<string, unknown> =>

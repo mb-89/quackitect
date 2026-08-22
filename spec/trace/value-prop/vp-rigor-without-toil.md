@@ -48,6 +48,14 @@ priority: must
   Metric: milestones walked by a driver stronger than the step was rated for. Target: falling.
   THIS IS THE SPENDING HALF of a proposition whose deciding half now sits with [[vp-the-engine]]. The machine names the driver; this one is the bill that naming saves.
 
+- WORK THAT RUNS OUT OF SIGHT SAYS SO, AND SAYS HOW MUCH LONGER. Nothing the agent starts is invisible, and no step holds the agent's only verb while it waits.
+  Metric: lane calls that block longer than a second on work the caller could have been told about instead. Target: zero.
+  Metric: pieces of background work a single call cannot report. Target: zero.
+  Metric: a reported time remaining that does not name the basis it was computed from. Target: zero.
+  Added by i51. This is the AGENT's half of the i33 criterion above it, which was written for a person at a screen. The two ask the same question of different readers, and only the person's half was checkable.
+  MEASURED BEFORE IT WAS ADDED: one step held the pull for sixty-eight seconds, and two calls timed out at the tool boundary. One of those had partly landed, so the caller was told the work failed while it had in fact moved. The engine's own kill timer for such a script is 600,000 ms (deliverable/engine/sessionscript.ts line 87), which is the declared upper bound on that silence.
+  THE THIRD METRIC IS THE HONESTY CLAUSE, and it exists because the timings behind any estimate are known to be wrong. raid-asm-battery-timings-measure-work records summed case time of 1,534,695 ms against a wall of 76,985 ms. A figure with no stated basis is worse than no figure.
+
 ## Unlike
 
 Requirements-management suites, which hold the input-quality corner for human authors and expect the human to do the writing. The difference is that the method is carried by the agent, and the person is left the one job a person is better at.

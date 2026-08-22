@@ -50,3 +50,468 @@
 {"ts":"2026-08-20T21:11:50.117Z","op":"done","visit":"iterations/i51/gate-kickoff@1","node":"d50","brief":"rule 8 read; the correction keeps both halves true"}
 {"ts":"2026-08-20T21:11:57.173Z","op":"update","visit":"iterations/i51/gate-kickoff@1","node":"d53","brief":"guidance edited; re-projecting so the prompt layer does not go stale"}
 {"ts":"2026-08-20T21:12:09.260Z","op":"done","visit":"iterations/i51/gate-kickoff@1","node":"d51","brief":"contract rule 8 corrected: the field report is owed, the agent handover is not"}
+{"ts":"2026-08-21T08:39:42.357Z","op":"done","visit":"front_desk@0","node":"d3","brief":"arrived at iterations/i51/start"}
+{"ts":"2026-08-21T08:40:17.245Z","op":"done","visit":"front_desk@0","node":"d2","brief":"recital and greeting printed at the desk"}
+{"ts":"2026-08-21T08:40:27.558Z","op":"plan","visit":"iterations/i51/gate-kickoff@0","parent":null,"nodes":[{"id":"d5","brief":"read the i51 record"},{"id":"d6","brief":"read gate-review method"},{"id":"d7","brief":"fill and submit the kickoff gate"}]}
+{"ts":"2026-08-21T08:40:57.707Z","op":"done","visit":"iterations/i51/gate-kickoff@0","node":"d5","brief":"record and signed kickoff form read; only the bless is owed"}
+{"ts":"2026-08-21T08:41:43.334Z","op":"update","visit":"iterations/i51/gate-kickoff@0","node":"d8","brief":"kickoff blessed; aiming the walk at the ship state"}
+{"ts":"2026-08-21T08:41:52.559Z","op":"done","visit":"iterations/i51/gate-kickoff@0","node":"d7","brief":"kickoff gate blessed at major; walk stands at draft-vision"}
+{"ts":"2026-08-21T08:41:57.338Z","op":"done","visit":"front_desk@0","node":"d1","brief":"desk swept, iteration entered"}
+{"ts":"2026-08-21T08:42:01.220Z","op":"obsolete","visit":"iterations/i51/gate-kickoff@0","node":"d6","brief":"gate-review method not needed; the gate was already signed"}
+{"ts":"2026-08-21T08:43:29.130Z","op":"plan","visit":"iterations/i51/draft-vision@0","parent":null,"nodes":[{"id":"d9","brief":"fill draft-vision"},{"id":"d10","brief":"define-actual and log-risks"},{"id":"d11","brief":"frame-delta and scope"}]}
+{"ts":"2026-08-21T08:43:56.741Z","op":"plan","visit":"iterations/i51/log-risks@0","parent":null,"nodes":[{"id":"d12","brief":"read an existing raid entry for shape"},{"id":"d13","brief":"write i51's raid entries"},{"id":"d14","brief":"fill raid_opened and submit"}]}
+{"ts":"2026-08-21T08:44:05.705Z","op":"done","visit":"iterations/i51/log-risks@0","node":"d12","brief":"raid entry shape read from the first-run assumption"}
+{"ts":"2026-08-21T08:44:36.006Z","op":"update","visit":"iterations/i51/log-risks@0","node":"d15","brief":"writing the first register entry from conflict one"}
+{"ts":"2026-08-21T08:44:49.494Z","op":"update","visit":"iterations/i51/log-risks@0","node":"d16","brief":"second entry written, from conflict two"}
+{"ts":"2026-08-21T08:45:02.319Z","op":"done","visit":"iterations/i51/log-risks@0","node":"d13","brief":"three register entries written from the three named conflicts"}
+{"ts":"2026-08-21T08:45:07.532Z","op":"fork","visit":"iterations/i51/log-risks@0","parent":null,"node":"d17","brief":"the first-run assumption carries a likelihood word the scale does not have","nodes":[]}
+{"ts":"2026-08-21T08:45:50.632Z","op":"done","visit":"iterations/i51/log-risks@0","node":"d17","brief":"i51's own bad grade fixed; two elsewhere captured as a note"}
+{"ts":"2026-08-21T08:46:10.423Z","op":"done","visit":"iterations/i51/log-risks@0","node":"d14","brief":"raid_opened filled with three new entries and two carried forward"}
+{"ts":"2026-08-21T08:48:22.154Z","op":"done","visit":"iterations/i51/draft-vision@0","node":"d10","brief":"as-is written from the engine, every claim carrying a file and line"}
+{"ts":"2026-08-21T08:48:30.462Z","op":"plan","visit":"iterations/i51/frame-delta@0","parent":null,"nodes":[{"id":"d18","brief":"list the standing value props"},{"id":"d19","brief":"write the gap claim and why-now"},{"id":"d20","brief":"submit frame-delta"}]}
+{"ts":"2026-08-21T08:48:34.972Z","op":"done","visit":"iterations/i51/frame-delta@0","node":"d18","brief":"ten standing value props listed"}
+{"ts":"2026-08-21T08:48:54.681Z","op":"update","visit":"iterations/i51/frame-delta@0","node":"d21","brief":"extended vp-rigor-without-toil with the agent's half of the slow-interface rule"}
+{"ts":"2026-08-21T08:49:30.037Z","op":"done","visit":"iterations/i51/frame-delta@0","node":"d19","brief":"gap claim, why-now and the extended proposition written"}
+{"ts":"2026-08-21T08:50:02.949Z","op":"done","visit":"iterations/i51/frame-delta@0","node":"d20","brief":"frame-delta signed and scope-non-goals filled"}
+{"ts":"2026-08-21T08:50:53.907Z","op":"done","visit":"iterations/i51/draft-vision@0","node":"d11","brief":"scope-non-goals signed and the PR-FAQ written"}
+{"ts":"2026-08-21T08:55:10.397Z","op":"plan","visit":"iterations/i51/draw-context@0","parent":null,"nodes":[{"id":"d22","brief":"extend the harness neighbour with the cancellation crossing"},{"id":"d23","brief":"fill draw-context"}]}
+{"ts":"2026-08-21T08:55:47.973Z","op":"done","visit":"iterations/i51/draw-context@0","node":"d22","brief":"harness neighbour now carries the cancellation consequence"}
+{"ts":"2026-08-21T08:56:09.070Z","op":"update","visit":"iterations/i51/map-stakeholders@0","node":"d24","brief":"added the two i51 concerns to the agent role"}
+{"ts":"2026-08-21T08:56:36.935Z","op":"done","visit":"iterations/i51/draw-context@0","node":"d23","brief":"draw-context signed and the stakeholder map re-checked"}
+{"ts":"2026-08-21T08:57:12.120Z","op":"plan","visit":"iterations/i51/write-stories@0","parent":null,"nodes":[{"id":"d25","brief":"write the deferred-exit story"},{"id":"d26","brief":"write the one-call report story"},{"id":"d27","brief":"write the test-scope story"},{"id":"d28","brief":"submit write-stories"}]}
+{"ts":"2026-08-21T08:57:28.148Z","op":"done","visit":"iterations/i51/write-stories@0","node":"d25","brief":"deferred-exit story written as a six-slide deck"}
+{"ts":"2026-08-21T08:57:42.319Z","op":"done","visit":"iterations/i51/write-stories@0","node":"d26","brief":"one-call report story written"}
+{"ts":"2026-08-21T08:57:55.677Z","op":"done","visit":"iterations/i51/write-stories@0","node":"d27","brief":"test-scope story written and the resident slow-call story linked to it"}
+{"ts":"2026-08-21T08:58:14.041Z","op":"done","visit":"iterations/i51/write-stories@0","node":"d28","brief":"three stories referenced and graded"}
+{"ts":"2026-08-21T08:58:58.706Z","op":"plan","visit":"iterations/i51/generalize-use-cases@0","parent":null,"nodes":[{"id":"d29","brief":"write the deferred-exit use case"},{"id":"d30","brief":"write the report use case"},{"id":"d31","brief":"write the scope use case"},{"id":"d32","brief":"submit generalize-use-cases"}]}
+{"ts":"2026-08-21T08:59:15.466Z","op":"done","visit":"iterations/i51/generalize-use-cases@0","node":"d29","brief":"deferred-exit use case written with eight extensions"}
+{"ts":"2026-08-21T08:59:32.160Z","op":"done","visit":"iterations/i51/generalize-use-cases@0","node":"d30","brief":"report use case written with seven extensions"}
+{"ts":"2026-08-21T08:59:51.186Z","op":"done","visit":"iterations/i51/generalize-use-cases@0","node":"d31","brief":"scope use case written; three extensions found holes the stories missed"}
+{"ts":"2026-08-21T08:59:56.686Z","op":"done","visit":"iterations/i51/generalize-use-cases@0","node":"d32","brief":"submitting the use-case form, which saved without stamping"}
+{"ts":"2026-08-21T09:01:01.696Z","op":"plan","visit":"iterations/i51/gate-inputs@0","parent":null,"nodes":[{"id":"d33","brief":"walk the live surface against the use cases"},{"id":"d34","brief":"fill and bless the inputs gate"}]}
+{"ts":"2026-08-21T09:02:21.023Z","op":"done","visit":"iterations/i51/gate-inputs@0","node":"d33","brief":"live surface walked argument by argument against four use cases"}
+{"ts":"2026-08-21T09:03:33.694Z","op":"plan","visit":"iterations/i51/write-requirements@0","parent":null,"nodes":[{"id":"d35","brief":"write the five requirement rows"},{"id":"d36","brief":"answer the set criteria"},{"id":"d37","brief":"submit write-requirements"}]}
+{"ts":"2026-08-21T09:03:50.371Z","op":"update","visit":"iterations/i51/write-requirements@0","node":"d38","brief":"two rows written for the leaving-check use case"}
+{"ts":"2026-08-21T09:04:07.017Z","op":"update","visit":"iterations/i51/write-requirements@0","node":"d39","brief":"third row written for the report use case"}
+{"ts":"2026-08-21T09:04:23.821Z","op":"update","visit":"iterations/i51/write-requirements@0","node":"d40","brief":"fourth row written: the honesty clause on any reported duration"}
+{"ts":"2026-08-21T09:04:41.675Z","op":"done","visit":"iterations/i51/write-requirements@0","node":"d35","brief":"five requirement rows written across the three use cases"}
+{"ts":"2026-08-21T09:05:30.231Z","op":"done","visit":"iterations/i51/write-requirements@0","node":"d36","brief":"set criteria answered including the nine-characteristic sweep"}
+{"ts":"2026-08-21T09:06:34.393Z","op":"plan","visit":"iterations/i51/derive-functions@0","parent":null,"nodes":[{"id":"d41","brief":"write the two new functions"},{"id":"d42","brief":"extend the test-answering function"},{"id":"d43","brief":"fill derive-functions"}]}
+{"ts":"2026-08-21T09:06:50.303Z","op":"done","visit":"iterations/i51/derive-functions@0","node":"d41","brief":"two functions written, both solution-neutral"}
+{"ts":"2026-08-21T09:07:02.048Z","op":"done","visit":"iterations/i51/derive-functions@0","node":"d42","brief":"test-answering function now carries the fifth row and its reasoning"}
+{"ts":"2026-08-21T09:07:23.189Z","op":"update","visit":"iterations/i51/derive-functions@0","node":"d44","brief":"minting the two flows the new functions name"}
+{"ts":"2026-08-21T09:07:32.260Z","op":"update","visit":"iterations/i51/derive-functions@0","node":"d45","brief":"minting the two flows the new functions name"}
+{"ts":"2026-08-21T09:07:44.306Z","op":"update","visit":"iterations/i51/derive-functions@0","node":"d46","brief":"the account flow minted with its honesty clause"}
+{"ts":"2026-08-21T09:07:55.951Z","op":"done","visit":"iterations/i51/derive-functions@0","node":"d43","brief":"three flows minted for the two new functions"}
+{"ts":"2026-08-21T09:09:14.767Z","op":"plan","visit":"iterations/i51/identify-assumptions@0","parent":null,"nodes":[{"id":"d47","brief":"write the four assumption nodes"},{"id":"d48","brief":"answer the six-source sweep"},{"id":"d49","brief":"submit identify-assumptions"}]}
+{"ts":"2026-08-21T09:09:32.819Z","op":"update","visit":"iterations/i51/identify-assumptions@0","node":"d50","brief":"second assumption written: progress readable mid-run"}
+{"ts":"2026-08-21T09:09:51.711Z","op":"update","visit":"iterations/i51/identify-assumptions@0","node":"d51","brief":"third assumption written: the platform seam nothing has exercised"}
+{"ts":"2026-08-21T09:10:09.062Z","op":"done","visit":"iterations/i51/identify-assumptions@0","node":"d47","brief":"four assumption nodes written, each with a writable probe"}
+{"ts":"2026-08-21T09:10:40.191Z","op":"done","visit":"iterations/i51/identify-assumptions@0","node":"d48","brief":"six sources answered, four with findings and two with reasons"}
+{"ts":"2026-08-21T09:11:06.590Z","op":"plan","visit":"iterations/i51/probe-assumptions@0","parent":null,"nodes":[{"id":"d52","brief":"list every standing assumption"},{"id":"d53","brief":"probe the cheap ones for real"},{"id":"d54","brief":"write outcomes back to the nodes"},{"id":"d55","brief":"fill probe-assumptions"}]}
+{"ts":"2026-08-21T09:11:42.208Z","op":"update","visit":"iterations/i51/probe-assumptions@0","node":"d56","brief":"starting a run so the mid-run progress probe has something to read"}
+{"ts":"2026-08-21T09:12:55.518Z","op":"update","visit":"iterations/i51/probe-assumptions@0","node":"d57","brief":"running the resolution probe the i37 assumption asks for"}
+{"ts":"2026-08-21T09:13:25.077Z","op":"update","visit":"iterations/i51/probe-assumptions@0","node":"d58","brief":"first probe outcome written back: progress is readable mid-run"}
+{"ts":"2026-08-21T09:13:44.148Z","op":"update","visit":"iterations/i51/probe-assumptions@0","node":"d59","brief":"the first-run assumption is false and became an issue"}
+{"ts":"2026-08-21T09:13:57.390Z","op":"update","visit":"iterations/i51/probe-assumptions@0","node":"d60","brief":"caller-limit assumption holds on the one harness measured"}
+{"ts":"2026-08-21T09:14:11.972Z","op":"done","visit":"iterations/i51/probe-assumptions@0","node":"d52","brief":"seven assumptions carried an empty probed field; six were open"}
+{"ts":"2026-08-21T09:14:26.086Z","op":"update","visit":"iterations/i51/probe-assumptions@0","node":"d61","brief":"platform assumption partly probed on Linux and left open"}
+{"ts":"2026-08-21T09:14:44.152Z","op":"done","visit":"iterations/i51/probe-assumptions@0","node":"d53","brief":"six probes run against the real channel, two came back false"}
+{"ts":"2026-08-21T09:15:33.466Z","op":"done","visit":"iterations/i51/probe-assumptions@0","node":"d54","brief":"six probe outcomes written back with their fallout"}
+{"ts":"2026-08-21T09:16:35.737Z","op":"done","visit":"iterations/i51/probe-assumptions@0","node":"d55","brief":"probe-assumptions signed and the requirements gate filled"}
+{"ts":"2026-08-21T09:17:51.453Z","op":"plan","visit":"iterations/i51/derive-criteria@0","parent":null,"nodes":[{"id":"d62","brief":"measure the standing criterion pool"},{"id":"d63","brief":"write the compounding and comparison answers"},{"id":"d64","brief":"submit derive-criteria"}]}
+{"ts":"2026-08-21T09:18:51.395Z","op":"update","visit":"iterations/i51/derive-criteria@0","node":"d65","brief":"placing the new criterion in the standing pairwise order"}
+{"ts":"2026-08-21T09:19:21.290Z","op":"done","visit":"iterations/i51/derive-criteria@0","node":"d63","brief":"one row joins a 98-row pool with four comparisons"}
+{"ts":"2026-08-21T09:20:27.327Z","op":"plan","visit":"iterations/i51/partition-functions@0","parent":null,"nodes":[{"id":"d66","brief":"place the two new functions by their flows"},{"id":"d67","brief":"fill partition-functions"}]}
+{"ts":"2026-08-21T09:20:51.146Z","op":"done","visit":"iterations/i51/partition-functions@0","node":"d66","brief":"one function moved to the-walk on its flows, the other stayed"}
+{"ts":"2026-08-21T09:23:34.682Z","op":"plan","visit":"iterations/i51/enumerate-space/find_prior_art@0","parent":null,"nodes":[{"id":"d68","brief":"mint the prior-art options"},{"id":"d69","brief":"fill find_prior_art"}]}
+{"ts":"2026-08-21T09:23:52.914Z","op":"update","visit":"iterations/i51/enumerate-space/find_prior_art@0","node":"d70","brief":"second option minted from the standard's state-enum rule"}
+{"ts":"2026-08-21T09:24:12.752Z","op":"done","visit":"iterations/i51/enumerate-space/find_prior_art@0","node":"d68","brief":"three options minted, one of them from v1's own guide"}
+{"ts":"2026-08-21T09:25:04.209Z","op":"done","visit":"iterations/i51/enumerate-space/find_prior_art@0","node":"d69","brief":"prior art swept: one standard read to primary, one predecessor finding"}
+{"ts":"2026-08-21T09:25:30.510Z","op":"plan","visit":"iterations/i51/enumerate-space/find_prior_art@0","parent":null,"nodes":[{"id":"d71","brief":"walk find_contradiction"},{"id":"d72","brief":"walk find_analogy"},{"id":"d73","brief":"walk find_without"},{"id":"d74","brief":"walk find_by_heuristic"},{"id":"d75","brief":"walk find_by_transforming"},{"id":"d76","brief":"walk find_by_probing"},{"id":"d77","brief":"build the chart"}]}
+{"ts":"2026-08-21T09:27:13.080Z","op":"update","visit":"iterations/i51/enumerate-space/find_contradiction@0","node":"d78","brief":"first contradiction dissolved by a separation in time"}
+{"ts":"2026-08-21T09:27:31.813Z","op":"update","visit":"iterations/i51/enumerate-space/find_contradiction@0","node":"d79","brief":"second contradiction dissolved by a separation in space"}
+{"ts":"2026-08-21T09:27:52.568Z","op":"done","visit":"iterations/i51/enumerate-space/find_prior_art@0","node":"d71","brief":"three contradictions stated, all dissolved on a separation"}
+{"ts":"2026-08-21T09:28:03.936Z","op":"update","visit":"iterations/i51/enumerate-space/find_contradiction@0","node":"d80","brief":"both option nodes now carry the Mechanism section the template demands"}
+{"ts":"2026-08-21T09:28:43.146Z","op":"update","visit":"iterations/i51/enumerate-space/find_analogy@0","node":"d81","brief":"first analogy transferred from arrival estimates"}
+{"ts":"2026-08-21T09:29:02.923Z","op":"update","visit":"iterations/i51/enumerate-space/find_analogy@0","node":"d82","brief":"second analogy transferred from delivery windows"}
+{"ts":"2026-08-21T09:30:22.370Z","op":"update","visit":"iterations/i51/enumerate-space/find_without@0","node":"d83","brief":"trimming the estimate, which is the expensive half"}
+{"ts":"2026-08-21T09:31:29.832Z","op":"update","visit":"iterations/i51/enumerate-space/find_by_heuristic@0","node":"d84","brief":"heuristic four bit: the duration is decided at the earliest moment today"}
+{"ts":"2026-08-21T09:31:50.634Z","op":"done","visit":"iterations/i51/enumerate-space/find_prior_art@0","node":"d74","brief":"sixteen heuristic rows swept, two options minted"}
+{"ts":"2026-08-21T09:32:46.867Z","op":"update","visit":"iterations/i51/enumerate-space/find_by_transforming@0","node":"d85","brief":"reverse and task unification produced the riding account"}
+{"ts":"2026-08-21T09:33:05.264Z","op":"update","visit":"iterations/i51/enumerate-space/find_by_transforming@0","node":"d86","brief":"attribute dependency produced the next-ask time"}
+{"ts":"2026-08-21T09:33:33.109Z","op":"done","visit":"iterations/i51/enumerate-space/find_prior_art@0","node":"d75","brief":"twenty-four transformation rows swept, two options minted"}
+{"ts":"2026-08-21T09:33:51.813Z","op":"update","visit":"iterations/i51/enumerate-space/find_by_probing@0","node":"d87","brief":"probing whether a linear estimate tracks the real remaining time"}
+{"ts":"2026-08-21T09:34:41.145Z","op":"update","visit":"iterations/i51/enumerate-space/find_by_probing@0","node":"d88","brief":"probe measured: linear estimate over-predicts and converges to 1 percent"}
+{"ts":"2026-08-21T09:35:11.263Z","op":"done","visit":"iterations/i51/enumerate-space/find_prior_art@0","node":"d76","brief":"three probes run against the real channel, one option and two dead ends"}
+{"ts":"2026-08-21T09:36:01.949Z","op":"update","visit":"iterations/i51/enumerate-space/build_chart@0","node":"d89","brief":"drawing the first candidate through the box"}
+{"ts":"2026-08-21T09:36:18.695Z","op":"update","visit":"iterations/i51/enumerate-space/build_chart@0","node":"d90","brief":"second candidate drawn: the measured answer"}
+{"ts":"2026-08-21T09:36:34.191Z","op":"update","visit":"iterations/i51/enumerate-space/build_chart@0","node":"d91","brief":"third candidate drawn: the guided caller"}
+{"ts":"2026-08-21T09:36:51.348Z","op":"update","visit":"iterations/i51/enumerate-space/build_chart@0","node":"d92","brief":"fourth candidate drawn: the account that follows you"}
+{"ts":"2026-08-21T09:37:34.924Z","op":"done","visit":"iterations/i51/enumerate-space/find_prior_art@0","node":"d77","brief":"chart built over all seven finders with four candidates drawn"}
+{"ts":"2026-08-21T09:38:36.996Z","op":"update","visit":"iterations/i51/enumerate-space/build_chart@0","node":"d93","brief":"re-cut two coarse clusters into four rows with real alternatives"}
+{"ts":"2026-08-21T09:38:53.691Z","op":"update","visit":"iterations/i51/enumerate-space/build_chart@0","node":"d94","brief":"each candidate now takes exactly one cell per row"}
+{"ts":"2026-08-21T09:39:52.762Z","op":"plan","visit":"iterations/i51/run-candidates@0","parent":null,"nodes":[{"id":"d95","brief":"fill run-candidates"},{"id":"d96","brief":"cut the criteria against the four"},{"id":"d97","brief":"evaluate the set"}]}
+{"ts":"2026-08-21T09:40:28.674Z","op":"update","visit":"iterations/i51/run-candidates@0","node":"d98","brief":"authoring the candidate drawing, one compose step per line"}
+{"ts":"2026-08-21T09:40:34.269Z","op":"done","visit":"iterations/i51/enumerate-space/find_prior_art@0","node":"d72","brief":"candidate drawing authored with four compose steps"}
+{"ts":"2026-08-21T09:40:53.456Z","op":"update","visit":"iterations/i51/run-candidates/the-quiet-handback@0","node":"d99","brief":"composing the quiet handback: the seam between the verdict and the standing"}
+{"ts":"2026-08-21T09:41:27.900Z","op":"update","visit":"iterations/i51/run-candidates/the-measured-answer@0","node":"d100","brief":"composing the measured answer: three seams meet on the basis field"}
+{"ts":"2026-08-21T09:42:07.741Z","op":"update","visit":"iterations/i51/run-candidates/the-guided-caller@0","node":"d101","brief":"composing the guided caller: the next-ask time is not the estimate"}
+{"ts":"2026-08-21T09:42:49.682Z","op":"update","visit":"iterations/i51/run-candidates/the-account-that-follows-you@0","node":"d102","brief":"composing the rider candidate: three rules hold the rider in place"}
+{"ts":"2026-08-21T09:43:58.174Z","op":"done","visit":"iterations/i51/run-candidates@0","node":"d95","brief":"four candidates composed with their seams"}
+{"ts":"2026-08-21T09:46:08.499Z","op":"done","visit":"iterations/i51/run-candidates@0","node":"d96","brief":"120-row pool cut to three axes with the line drawn and one move recorded"}
+{"ts":"2026-08-21T09:48:50.409Z","op":"obsolete","visit":"iterations/i51/draft-vision@0","node":"d9","brief":"draft-vision signed long ago; the item outlived its state"}
+{"ts":"2026-08-21T09:51:24.905Z","op":"fork","visit":"iterations/i51/evaluate-set@0","parent":null,"node":"d103","brief":"two candidate records say one thing in prose and another in their picks","nodes":[]}
+{"ts":"2026-08-21T09:51:54.173Z","op":"fork","visit":"iterations/i51/evaluate-set@0","parent":"d103","node":"d104","brief":"two candidate records said one thing in prose and another in their picks","nodes":[]}
+{"ts":"2026-08-21T09:52:48.371Z","op":"done","visit":"iterations/i51/evaluate-set@0","node":"d104","brief":"both records corrected; the picks were authoritative and were what was scored"}
+{"ts":"2026-08-21T09:55:35.441Z","op":"update","visit":"iterations/i51/converge-pugh@0","node":"d105","brief":"field report written into the record folder so git keeps it"}
+{"ts":"2026-08-21T09:56:32.720Z","op":"done","visit":"iterations/i51/run-candidates@0","node":"d97","brief":"Pugh converged on the account that follows you, with three reservations recorded"}
+{"ts":"2026-08-21T09:57:08.420Z","op":"update","visit":"iterations/i51/reverse-sensitivity@0","node":"d106","brief":"git is legal in four states and none before M7; recorded in the report"}
+{"ts":"2026-08-21T09:57:34.383Z","op":"plan","visit":"iterations/i51/reverse-sensitivity@0","parent":"d103","nodes":[{"id":"d107","brief":"jumping to the desk"},{"id":"d108","brief":"where git is legal"},{"id":"d109","brief":"to commit on the owner's word"}]}
+{"ts":"2026-08-21T09:57:58.993Z","op":"update","visit":"iterations/i51/cut-criteria@1","node":"d110","brief":"the desk route ran backwards through the record; re-aiming at the ship state"}
+{"ts":"2026-08-21T09:58:38.615Z","op":"update","visit":"iterations/i51/reverse-sensitivity@0","node":"d111","brief":"the reverse graft found the leader's strengths are both takeable"}
+{"ts":"2026-08-21T10:00:14.058Z","op":"plan","visit":"iterations/i51/graft-onto-the-winner@0","parent":null,"nodes":[{"id":"d112","brief":"graft the two cells onto the winner"},{"id":"d113","brief":"spawn the second hand to re-score"},{"id":"d114","brief":"submit the graft"}]}
+{"ts":"2026-08-21T10:02:59.680Z","op":"done","visit":"iterations/i51/graft-onto-the-winner@0","node":"d112","brief":"two cells grafted; the winner is now the runner-up plus a rider"}
+{"ts":"2026-08-21T10:04:19.493Z","op":"update","visit":"iterations/i51/graft-onto-the-winner@0","node":"d115","brief":"three stale passages corrected against the grafted picks"}
+{"ts":"2026-08-21T10:04:43.656Z","op":"update","visit":"iterations/i51/graft-onto-the-winner@0","node":"d116","brief":"a third cell grafted: the listing the rider was already leaning on"}
+{"ts":"2026-08-21T10:04:55.966Z","op":"done","visit":"iterations/i51/graft-onto-the-winner@0","node":"d113","brief":"the rising-figure disclosure now travels with the cell rather than a candidate"}
+{"ts":"2026-08-21T10:05:35.447Z","op":"done","visit":"iterations/i51/graft-onto-the-winner@0","node":"d114","brief":"graft submitted with the re-scored numbers landed verbatim"}
+{"ts":"2026-08-21T10:06:28.026Z","op":"plan","visit":"iterations/i51/record-adrs@0","parent":null,"nodes":[{"id":"d117","brief":"write the four deciding ADRs"},{"id":"d118","brief":"submit record-adrs"}]}
+{"ts":"2026-08-21T10:06:52.165Z","op":"update","visit":"iterations/i51/record-adrs@0","node":"d119","brief":"second ADR: the closed standing word"}
+{"ts":"2026-08-21T10:07:24.711Z","op":"update","visit":"iterations/i51/record-adrs@0","node":"d120","brief":"third ADR: the duration and its basis as one return value"}
+{"ts":"2026-08-21T10:07:52.884Z","op":"done","visit":"iterations/i51/record-adrs@0","node":"d117","brief":"four deciding ADRs written, one per row the winner settles"}
+{"ts":"2026-08-21T10:08:13.331Z","op":"done","visit":"iterations/i51/record-adrs@0","node":"d118","brief":"four ADRs recorded with their rejected options and consequences"}
+{"ts":"2026-08-21T10:10:52.175Z","op":"update","visit":"iterations/i51/decompose-structure@0","node":"d121","brief":"reorienting after compaction at decompose-structure"}
+{"ts":"2026-08-21T10:12:09.145Z","op":"plan","visit":"iterations/i51/decompose-structure@0","parent":null,"nodes":[{"id":"d122","brief":"find the producers of the four new flows"},{"id":"d123","brief":"write the new element node"},{"id":"d124","brief":"allocate the two functions"},{"id":"d125","brief":"name the owed interfaces"},{"id":"d126","brief":"submit decompose-structure"}]}
+{"ts":"2026-08-21T10:14:42.472Z","op":"done","visit":"iterations/i51/decompose-structure@0","node":"d122","brief":"flow-test-timings crosses; flow-work-under-way had no producer"}
+{"ts":"2026-08-21T10:15:08.691Z","op":"update","visit":"iterations/i51/decompose-structure@0","node":"d127","brief":"allocating the two functions and minting the crossings they open"}
+{"ts":"2026-08-21T10:15:33.700Z","op":"done","visit":"iterations/i51/decompose-structure@0","node":"d125","brief":"three interfaces minted, two demanded by crossings and one by the rider"}
+{"ts":"2026-08-21T10:16:28.578Z","op":"update","visit":"iterations/i51/decompose-structure@0","node":"d128","brief":"submitting decompose-structure with one new element and three interfaces"}
+{"ts":"2026-08-21T10:17:17.542Z","op":"fork","visit":"iterations/i51/decompose-structure@0","parent":"d126","node":"d129","brief":"two standing crossings opened by allocating the handback","nodes":[{"id":"d130","brief":"mint if-record-store-to-walk-engine"},{"id":"d131","brief":"mint if-sizing-to-walk-engine"},{"id":"d132","brief":"correct el-sizing's two-interfaces claim"}]}
+{"ts":"2026-08-21T10:17:37.644Z","op":"fork","visit":"iterations/i51/decompose-structure@0","parent":"d129","node":"d133","brief":"two standing crossings opened by allocating the handback","nodes":[{"id":"d134","brief":"widen if-record-store-to-walk-engine"},{"id":"d135","brief":"mint if-sizing-to-walk-engine"},{"id":"d136","brief":"correct el-sizing's two-interfaces claim"}]}
+{"ts":"2026-08-21T10:17:58.108Z","op":"done","visit":"iterations/i51/decompose-structure@0","node":"d134","brief":"flow-worktree joins the record store's contract with the walk engine"}
+{"ts":"2026-08-21T10:18:03.446Z","op":"done","visit":"iterations/i51/decompose-structure@0","node":"d135","brief":"if-sizing-to-walk-engine minted, carrying the sized instruction back"}
+{"ts":"2026-08-21T10:18:19.999Z","op":"done","visit":"iterations/i51/decompose-structure@0","node":"d136","brief":"el-sizing now names its three interfaces and the real source of the compiled step"}
+{"ts":"2026-08-21T10:18:47.501Z","op":"done","visit":"iterations/i51/decompose-structure@0","node":"d133","brief":"both standing crossings named, and el-sizing's stale boundary claim corrected"}
+{"ts":"2026-08-21T10:19:29.315Z","op":"done","visit":"iterations/i51/decompose-structure@0","node":"d130","brief":"the tree joined the record store's standing contract instead of a new node"}
+{"ts":"2026-08-21T10:19:37.711Z","op":"done","visit":"iterations/i51/decompose-structure@0","node":"d131","brief":"if-sizing-to-walk-engine minted for the sized instruction's return leg"}
+{"ts":"2026-08-21T10:19:44.010Z","op":"done","visit":"iterations/i51/decompose-structure@0","node":"d132","brief":"el-sizing's boundary paragraph rewritten to name three interfaces"}
+{"ts":"2026-08-21T10:19:58.304Z","op":"done","visit":"iterations/i51/decompose-structure@0","node":"d129","brief":"both crossings named and the standing element corrected"}
+{"ts":"2026-08-21T10:20:29.774Z","op":"plan","visit":"iterations/i51/evaluate-architecture@0","parent":null,"nodes":[{"id":"d137","brief":"read a prior ATAM walk for shape"},{"id":"d138","brief":"page the dealt deck"},{"id":"d139","brief":"rule every card"},{"id":"d140","brief":"flag fitness candidates"},{"id":"d141","brief":"submit evaluate-architecture"}]}
+{"ts":"2026-08-21T10:20:42.228Z","op":"done","visit":"iterations/i51/evaluate-architecture@0","node":"d137","brief":"i38 inherited 37 of 43 verdicts and moved six"}
+{"ts":"2026-08-21T10:21:43.698Z","op":"done","visit":"iterations/i51/evaluate-architecture@0","node":"d138","brief":"the 48-card deck read off the trace and the standing verdicts off i38"}
+{"ts":"2026-08-21T10:23:47.394Z","op":"update","visit":"iterations/i51/evaluate-architecture@0","node":"d142","brief":"reading the cards inside this change's cone before ruling them"}
+{"ts":"2026-08-21T10:25:03.175Z","op":"update","visit":"iterations/i51/evaluate-architecture@0","node":"d143","brief":"two new risks minted where the third standing moves a standing verdict"}
+{"ts":"2026-08-21T10:25:29.913Z","op":"done","visit":"iterations/i51/evaluate-architecture@0","node":"d140","brief":"two scenarios flagged whose measures can run as checks in M7"}
+{"ts":"2026-08-21T10:27:03.897Z","op":"done","visit":"iterations/i51/evaluate-architecture@0","node":"d139","brief":"48 cards ruled, seven moved and five ruled for the first time"}
+{"ts":"2026-08-21T10:27:10.735Z","op":"done","visit":"iterations/i51/evaluate-architecture@0","node":"d141","brief":"evaluate-architecture stamped"}
+{"ts":"2026-08-21T10:27:23.621Z","op":"plan","visit":"iterations/i51/gate-architecture@0","parent":null,"nodes":[{"id":"d144","brief":"read the gate form's item names"},{"id":"d145","brief":"run the three review rounds"},{"id":"d146","brief":"fill and bless gate-architecture"}]}
+{"ts":"2026-08-21T10:29:11.346Z","op":"plan","visit":"iterations/i51/rank-unknowns@0","parent":null,"nodes":[{"id":"d147","brief":"list this record's register entries"},{"id":"d148","brief":"pick the spikes over exposure"},{"id":"d149","brief":"draw the spike machine"},{"id":"d150","brief":"submit rank-unknowns"}]}
+{"ts":"2026-08-21T10:29:46.508Z","op":"done","visit":"iterations/i51/rank-unknowns@0","node":"d147","brief":"fifteen entries stand from this record, five of them spikeable unknowns"}
+{"ts":"2026-08-21T10:30:28.745Z","op":"done","visit":"iterations/i51/rank-unknowns@0","node":"d148","brief":"three spikes picked off the hot corner, five excluded by the filters"}
+{"ts":"2026-08-21T10:30:43.418Z","op":"done","visit":"iterations/i51/rank-unknowns@0","node":"d149","brief":"spike drawing written with three parallel timeboxed states"}
+{"ts":"2026-08-21T10:32:42.190Z","op":"plan","visit":"iterations/i51/run-spikes/does-a-left-check-survive-its-call@0","parent":null,"nodes":[{"id":"d151","brief":"read how a leaving script is spawned today"},{"id":"d152","brief":"write and run the survival probe"},{"id":"d153","brief":"write the experiment node"},{"id":"d154","brief":"submit the spike"}]}
+{"ts":"2026-08-21T10:33:20.087Z","op":"done","visit":"iterations/i51/run-spikes/does-a-left-check-survive-its-call@0","node":"d151","brief":"the condition script spawns undetached with piped stdio at sessionscript.ts:50"}
+{"ts":"2026-08-21T10:33:24.718Z","op":"update","visit":"iterations/i51/run-spikes/does-a-left-check-survive-its-call@0","node":"d155","brief":"running the three-part survival probe"}
+{"ts":"2026-08-21T10:34:29.934Z","op":"done","visit":"iterations/i51/run-spikes/does-a-left-check-survive-its-call@0","node":"d152","brief":"the call answered in 4 ms and an orphaned judgment still wrote its verdict"}
+{"ts":"2026-08-21T10:34:46.689Z","op":"done","visit":"iterations/i51/run-spikes/does-a-left-check-survive-its-call@0","node":"d153","brief":"exp-does-a-left-check-survive-its-call written, verdict holds"}
+{"ts":"2026-08-21T10:35:01.424Z","op":"plan","visit":"iterations/i51/run-spikes/does-a-left-check-survive-its-call@0","parent":null,"nodes":[{"id":"d156","brief":"check the tree and branch"},{"id":"d157","brief":"commit the M5 and M6 work"},{"id":"d158","brief":"push it"},{"id":"d159","brief":"walk the second spike"}]}
+{"ts":"2026-08-21T10:37:13.140Z","op":"done","visit":"iterations/i51/run-spikes/does-a-left-check-survive-its-call@0","node":"d156","brief":"branch is claude/iteration-fifty-one-xdrwvp, thirteen deletions held back"}
+{"ts":"2026-08-21T10:37:25.818Z","op":"update","visit":"iterations/i51/run-spikes/does-a-left-check-survive-its-call@0","node":"d160","brief":"committing M5 and the first spike"}
+{"ts":"2026-08-21T10:37:38.192Z","op":"done","visit":"iterations/i51/run-spikes/does-a-left-check-survive-its-call@0","node":"d157","brief":"116 files committed as bb49341c"}
+{"ts":"2026-08-21T10:37:49.650Z","op":"done","visit":"iterations/i51/run-spikes/does-a-left-check-survive-its-call@0","node":"d158","brief":"pushed as a new branch on origin"}
+{"ts":"2026-08-21T10:37:56.010Z","op":"update","visit":"iterations/i51/run-spikes/does-a-left-check-survive-its-call@0","node":"d161","brief":"aiming at the second spike, the join needs all three"}
+{"ts":"2026-08-21T10:38:31.348Z","op":"plan","visit":"iterations/i51/run-spikes/what-a-fresh-session-sees@0","parent":null,"nodes":[{"id":"d162","brief":"start a piece of work out of sight"},{"id":"d163","brief":"check what the repository records about it"},{"id":"d164","brief":"find where a step's standing actually lives"},{"id":"d165","brief":"write the experiment node and submit"}]}
+{"ts":"2026-08-21T10:38:37.126Z","op":"done","visit":"iterations/i51/run-spikes/what-a-fresh-session-sees@0","node":"d162","brief":"job-mt2tgjw4-16 running, 25 seconds of work out of sight"}
+{"ts":"2026-08-21T10:39:03.900Z","op":"done","visit":"iterations/i51/run-spikes/what-a-fresh-session-sees@0","node":"d163","brief":"the repository records nothing about a running job; .se holds it and is ignored"}
+{"ts":"2026-08-21T10:39:27.458Z","op":"done","visit":"iterations/i51/run-spikes/what-a-fresh-session-sees@0","node":"d164","brief":"a leaving verdict lives in an in-memory map that clears itself on settle"}
+{"ts":"2026-08-21T10:40:17.169Z","op":"done","visit":"iterations/i51/run-spikes/what-a-fresh-session-sees@0","node":"d165","brief":"exp-what-a-fresh-session-sees written, verdict falls with the missing fields named"}
+{"ts":"2026-08-21T10:40:27.114Z","op":"plan","visit":"iterations/i51/run-spikes/what-a-fresh-session-sees@0","parent":null,"nodes":[{"id":"d166","brief":"measure whether a standing is time-dependent today"},{"id":"d167","brief":"write the third experiment node"},{"id":"d168","brief":"submit and close the join"}]}
+{"ts":"2026-08-21T10:40:51.322Z","op":"update","visit":"iterations/i51/run-spikes/does-a-standing-hold-still@0","node":"d169","brief":"firing a real deferred verdict to read its standing twice"}
+{"ts":"2026-08-21T10:43:21.752Z","op":"done","visit":"iterations/i51/run-spikes/what-a-fresh-session-sees@0","node":"d166","brief":"the record gave a confidently wrong green for the whole 100-second window"}
+{"ts":"2026-08-21T10:43:40.464Z","op":"done","visit":"iterations/i51/run-spikes/what-a-fresh-session-sees@0","node":"d167","brief":"exp-does-a-standing-hold-still written, verdict falls"}
+{"ts":"2026-08-21T10:44:08.274Z","op":"update","visit":"iterations/i51/cut-criteria@2","node":"d170","brief":"the walk routed backwards to M4 again, re-aiming at the ship state"}
+{"ts":"2026-08-21T10:45:19.951Z","op":"plan","visit":"iterations/i51/fold-back@0","parent":null,"nodes":[{"id":"d171","brief":"give the sizing return leg its design spec"},{"id":"d172","brief":"write the work-account design spec"},{"id":"d173","brief":"re-run the failing check"}]}
+{"ts":"2026-08-21T10:45:57.449Z","op":"done","visit":"iterations/i51/fold-back@0","node":"d171","brief":"the sizing block now realizes its own return leg"}
+{"ts":"2026-08-21T10:46:06.071Z","op":"done","visit":"iterations/i51/fold-back@0","node":"d172","brief":"dsp-the-work-account written, realizing the element and three interfaces"}
+{"ts":"2026-08-21T10:46:15.260Z","op":"done","visit":"iterations/i51/fold-back@0","node":"d173","brief":"no test verb at fold-back; the sweep re-runs at verification"}
+{"ts":"2026-08-21T10:46:43.880Z","op":"plan","visit":"iterations/i51/fold-back@0","parent":null,"nodes":[{"id":"d174","brief":"fold the measurements into the two risks"},{"id":"d175","brief":"fill the fold-back table"},{"id":"d176","brief":"submit fold-back"}]}
+{"ts":"2026-08-21T10:47:05.293Z","op":"done","visit":"iterations/i51/fold-back@0","node":"d174","brief":"both risks rewritten against what the spikes measured"}
+{"ts":"2026-08-21T10:47:11.860Z","op":"update","visit":"iterations/i51/fold-back@0","node":"d177","brief":"the form refused; asking the machine where the walk stands"}
+{"ts":"2026-08-21T10:47:57.459Z","op":"done","visit":"iterations/i51/fold-back@0","node":"d175","brief":"three experiment rows filled with what each folds to"}
+{"ts":"2026-08-21T10:48:57.581Z","op":"done","visit":"iterations/i51/fold-back@0","node":"d176","brief":"fold-back signed with all three folds recorded"}
+{"ts":"2026-08-21T10:49:07.811Z","op":"update","visit":"iterations/i51/gate-prototype@0","node":"d178","brief":"blessing gate-prototype with the platform gap named"}
+{"ts":"2026-08-21T10:50:36.436Z","op":"plan","visit":"iterations/i51/author-tests@0","parent":null,"nodes":[{"id":"d179","brief":"find the test files that will carry the cases"},{"id":"d180","brief":"write the handback test-spec"},{"id":"d181","brief":"write the work-account test-spec"},{"id":"d182","brief":"write the scope-honesty test-spec"},{"id":"d183","brief":"submit author-tests"}]}
+{"ts":"2026-08-21T10:53:30.537Z","op":"done","visit":"iterations/i51/author-tests@0","node":"d179","brief":"jobList and decideScope are the exported surfaces the red cases can drive"}
+{"ts":"2026-08-21T10:53:54.212Z","op":"update","visit":"iterations/i51/author-tests@0","node":"d184","brief":"two red cases written for the handback and its standing"}
+{"ts":"2026-08-21T10:54:12.211Z","op":"done","visit":"iterations/i51/author-tests@0","node":"d182","brief":"two red cases appended where decideScope's own fixture already lives"}
+{"ts":"2026-08-21T10:54:40.620Z","op":"done","visit":"iterations/i51/author-tests@0","node":"d180","brief":"the handback spec written over tests/handback.test.ts"}
+{"ts":"2026-08-21T10:55:02.691Z","op":"done","visit":"iterations/i51/author-tests@0","node":"d181","brief":"the account spec written over tests/work-account.test.ts"}
+{"ts":"2026-08-21T10:55:42.837Z","op":"done","visit":"iterations/i51/author-tests@0","node":"d183","brief":"three test-specs and six red cases written for the five requirements"}
+{"ts":"2026-08-21T10:56:37.934Z","op":"plan","visit":"iterations/i51/specify-build@0","parent":null,"nodes":[{"id":"d185","brief":"read the chunk machine's shape"},{"id":"d186","brief":"draw the build chunks and their edges"},{"id":"d187","brief":"submit specify-build"}]}
+{"ts":"2026-08-21T10:57:21.016Z","op":"done","visit":"iterations/i51/specify-build@0","node":"d185","brief":"the chunk drawing takes the same shape as the candidate and spike ones"}
+{"ts":"2026-08-21T10:57:39.695Z","op":"done","visit":"iterations/i51/specify-build@0","node":"d186","brief":"nine chunks in three strands, edges drawn and lenses recorded"}
+{"ts":"2026-08-21T10:57:59.853Z","op":"done","visit":"iterations/i51/specify-build@0","node":"d187","brief":"specify-build signed with the design specs and the chunk machine"}
+{"ts":"2026-08-21T10:58:47.692Z","op":"plan","visit":"iterations/i51/build-steps/a-diff-nothing-answers-for-runs-nothing@0","parent":null,"nodes":[{"id":"d188","brief":"read decideScope whole"},{"id":"d189","brief":"make a documents-only diff run nothing"},{"id":"d190","brief":"run the two new cases green"}]}
+{"ts":"2026-08-21T10:59:30.262Z","op":"done","visit":"iterations/i51/build-steps/a-diff-nothing-answers-for-runs-nothing@0","node":"d189","brief":"the nothing branch returns before the sweep, so the caller changes too"}
+{"ts":"2026-08-21T11:00:33.815Z","op":"done","visit":"iterations/i51/build-steps/a-diff-nothing-answers-for-runs-nothing@0","node":"d188","brief":"decideScope read whole, both fallback branches located"}
+{"ts":"2026-08-21T11:00:43.793Z","op":"update","visit":"iterations/i51/build-steps/a-diff-nothing-answers-for-runs-nothing@0","node":"d191","brief":"asking whether the scope change turned its two cases green"}
+{"ts":"2026-08-21T11:02:33.661Z","op":"done","visit":"iterations/i51/build-steps/a-diff-nothing-answers-for-runs-nothing@0","node":"d190","brief":"both scope cases green; one standing case's claim reversed and is rewritten"}
+{"ts":"2026-08-21T11:03:00.147Z","op":"plan","visit":"iterations/i51/build-steps/a-diff-nothing-answers-for-runs-nothing@0","parent":null,"nodes":[{"id":"d192","brief":"submit the scope chunk"},{"id":"d193","brief":"build the operation table"},{"id":"d194","brief":"build the handback"},{"id":"d195","brief":"commit and push build-steps"}]}
+{"ts":"2026-08-21T11:03:15.675Z","op":"done","visit":"iterations/i51/build-steps/a-diff-nothing-answers-for-runs-nothing@0","node":"d192","brief":"the scope chunk is signed"}
+{"ts":"2026-08-21T11:03:48.504Z","op":"update","visit":"iterations/i51/build-steps/a-diff-nothing-answers-for-runs-nothing@0","node":"d196","brief":"pushing the M6 checkpoint"}
+{"ts":"2026-08-21T11:03:58.456Z","op":"done","visit":"iterations/i51/build-steps/a-diff-nothing-answers-for-runs-nothing@0","node":"d195","brief":"pushed as ce179615"}
+{"ts":"2026-08-21T11:04:07.017Z","op":"plan","visit":"iterations/i51/build-steps/the-table-holds-every-kind@0","parent":null,"nodes":[{"id":"d197","brief":"read the job record's shape"},{"id":"d198","brief":"widen the entry with kind"},{"id":"d199","brief":"state"},{"id":"d200","brief":"progress and total"},{"id":"d201","brief":"make the account read both folders"},{"id":"d202","brief":"prove it with the two account cases"}]}
+{"ts":"2026-08-21T11:05:38.838Z","op":"done","visit":"iterations/i51/build-steps/the-table-holds-every-kind@0","node":"d197","brief":"the record is a flat line per job with no kind and no state"}
+{"ts":"2026-08-21T11:05:57.979Z","op":"done","visit":"iterations/i51/build-steps/the-table-holds-every-kind@0","node":"d198","brief":"the entry carries its kind, and old records read back as shell"}
+{"ts":"2026-08-21T11:06:37.914Z","op":"done","visit":"iterations/i51/build-steps/the-table-holds-every-kind@0","node":"d201","brief":"jobList reads test-jobs too, and the typechecker is clean"}
+{"ts":"2026-08-21T11:09:12.892Z","op":"done","visit":"iterations/i51/build-steps/the-table-holds-every-kind@0","node":"d200","brief":"the total comes from the last battery's own file count, in the read already made"}
+{"ts":"2026-08-21T11:09:22.603Z","op":"done","visit":"iterations/i51/build-steps/the-table-holds-every-kind@0","node":"d199","brief":"state rides startJob's options and the handback chunk sets it"}
+{"ts":"2026-08-21T11:11:20.395Z","op":"update","visit":"iterations/i51/build-steps/the-table-holds-every-kind@0","node":"d203","brief":"re-running after the ceiling and the pointer fix"}
+{"ts":"2026-08-21T11:13:21.333Z","op":"done","visit":"iterations/i51/build-steps/a-diff-nothing-answers-for-runs-nothing@0","node":"d193","brief":"the one operation table is built and signed"}
+{"ts":"2026-08-21T11:13:58.219Z","op":"plan","visit":"iterations/i51/build-steps/the-account-answers-in-one-call@0","parent":null,"nodes":[{"id":"d204","brief":"give a settled operation its outcome in one line"},{"id":"d205","brief":"typecheck and run"},{"id":"d206","brief":"submit the account chunk"}]}
+{"ts":"2026-08-21T11:14:28.844Z","op":"done","visit":"iterations/i51/build-steps/the-account-answers-in-one-call@0","node":"d204","brief":"a settled run says green or red with its counts, in one line"}
+{"ts":"2026-08-21T11:14:58.077Z","op":"done","visit":"iterations/i51/build-steps/the-account-answers-in-one-call@0","node":"d205","brief":"typechecker and linter both clean on the split function"}
+{"ts":"2026-08-21T11:15:34.262Z","op":"done","visit":"iterations/i51/build-steps/the-account-answers-in-one-call@0","node":"d206","brief":"the account chunk is written and its new case passes"}
+{"ts":"2026-08-21T11:16:15.321Z","op":"plan","visit":"iterations/i51/build-steps/the-figure-carries-its-basis@0","parent":null,"nodes":[{"id":"d207","brief":"compute the figure from the work's own progress"},{"id":"d208","brief":"raise the read ceiling again with its reason"},{"id":"d209","brief":"run the account file"}]}
+{"ts":"2026-08-21T11:16:48.777Z","op":"done","visit":"iterations/i51/build-steps/the-figure-carries-its-basis@0","node":"d209","brief":"all three account cases green, typechecker and linter clean"}
+{"ts":"2026-08-21T11:18:12.611Z","op":"plan","visit":"iterations/i51/build-steps/the-account-rides-every-answer@0","parent":null,"nodes":[{"id":"d210","brief":"attach the account at the one composition seam"},{"id":"d211","brief":"check the two rider cases"},{"id":"d212","brief":"submit the rider chunk"}]}
+{"ts":"2026-08-21T11:18:38.527Z","op":"done","visit":"iterations/i51/build-steps/the-account-rides-every-answer@0","node":"d210","brief":"the account rides from buildServer's own decorator chain"}
+{"ts":"2026-08-21T11:19:12.988Z","op":"done","visit":"iterations/i51/build-steps/the-account-rides-every-answer@0","node":"d211","brief":"five of five account cases green, typechecker clean"}
+{"ts":"2026-08-21T11:19:22.453Z","op":"done","visit":"iterations/i51/build-steps/the-account-rides-every-answer@0","node":"d212","brief":"the rider chunk is signed and the account strand is finished"}
+{"ts":"2026-08-21T11:20:03.817Z","op":"update","visit":"iterations/i51/build-steps/the-account-rides-every-answer@0","node":"d213","brief":"opening the handback strand, pushed as b99811d3"}
+{"ts":"2026-08-21T11:21:16.516Z","op":"plan","visit":"iterations/i51/build-steps/the-leaving-judgment-stops-holding-the-call@0","parent":null,"nodes":[{"id":"d214","brief":"give the table a register and settle pair"},{"id":"d215","brief":"start the judgment and answer inside the bound"},{"id":"d216","brief":"run the handback cases"}]}
+{"ts":"2026-08-21T11:21:37.579Z","op":"done","visit":"iterations/i51/build-steps/the-leaving-judgment-stops-holding-the-call@0","node":"d214","brief":"openOperation and settleOperation are the register-and-settle pair"}
+{"ts":"2026-08-21T11:21:59.362Z","op":"done","visit":"iterations/i51/build-steps/the-leaving-judgment-stops-holding-the-call@0","node":"d215","brief":"the call waits up to the promised second, then answers"}
+{"ts":"2026-08-21T11:22:16.853Z","op":"update","visit":"iterations/i51/build-steps/the-leaving-judgment-stops-holding-the-call@0","node":"d217","brief":"both handback cases green, checking the walk's blast radius"}
+{"ts":"2026-08-21T11:24:13.197Z","op":"done","visit":"iterations/i51/build-steps/the-leaving-judgment-stops-holding-the-call@0","node":"d216","brief":"battery green at 1725 of 1725 with both handback reds closed"}
+{"ts":"2026-08-21T11:24:19.428Z","op":"done","visit":"iterations/i51/build-steps/a-diff-nothing-answers-for-runs-nothing@0","node":"d194","brief":"the handback is built and the freeze is gone"}
+{"ts":"2026-08-21T11:25:43.418Z","op":"plan","visit":"iterations/i51/build-steps/a-step-stands-in-one-of-three-words@0","parent":null,"nodes":[{"id":"d218","brief":"give the pull's reader the third word"},{"id":"d219","brief":"check the closed set is closed"},{"id":"d220","brief":"submit the standing chunk"}]}
+{"ts":"2026-08-21T11:25:58.922Z","op":"done","visit":"iterations/i51/build-steps/a-step-stands-in-one-of-three-words@0","node":"d218","brief":"standing rides beside exit_met at both sites that report it"}
+{"ts":"2026-08-21T11:26:28.709Z","op":"done","visit":"iterations/i51/build-steps/a-step-stands-in-one-of-three-words@0","node":"d219","brief":"four cases pass, and the count case stops the readers drifting apart"}
+{"ts":"2026-08-21T11:28:29.395Z","op":"plan","visit":"iterations/i51/build-steps/the-verdict-lands-against-its-step@0","parent":null,"nodes":[{"id":"d221","brief":"write the verdict beside the signature"},{"id":"d222","brief":"settle a dead judgment as failed"},{"id":"d223","brief":"run the battery"}]}
+{"ts":"2026-08-21T11:28:50.167Z","op":"done","visit":"iterations/i51/build-steps/the-verdict-lands-against-its-step@0","node":"d221","brief":"the verdict lands in the form's frontmatter, and only when it changes"}
+{"ts":"2026-08-21T11:29:40.977Z","op":"done","visit":"iterations/i51/build-steps/the-verdict-lands-against-its-step@0","node":"d222","brief":"a dead child always settles through spawnScript's close and error handlers"}
+{"ts":"2026-08-21T11:30:00.464Z","op":"update","visit":"iterations/i51/build-steps/the-verdict-lands-against-its-step@0","node":"d224","brief":"seven handback cases green, running the battery over the form writer"}
+{"ts":"2026-08-21T11:31:03.164Z","op":"done","visit":"iterations/i51/build-steps/the-verdict-lands-against-its-step@0","node":"d223","brief":"two ratchets caught a read and a write walking around the door"}
+{"ts":"2026-08-21T11:31:33.678Z","op":"update","visit":"iterations/i51/build-steps/the-verdict-lands-against-its-step@0","node":"d225","brief":"the verdict now goes through the door both ways"}
+{"ts":"2026-08-21T11:33:32.613Z","op":"done","visit":"iterations/i51/build-steps/a-step-stands-in-one-of-three-words@0","node":"d220","brief":"the verdict is durable and the battery is green at 1730"}
+{"ts":"2026-08-21T11:34:26.527Z","op":"plan","visit":"iterations/i51/build-steps/a-fresh-session-knows-a-deciding-step@0","parent":null,"nodes":[{"id":"d226","brief":"show a fresh process never reports deciding"},{"id":"d227","brief":"run the battery once more"}]}
+{"ts":"2026-08-21T11:37:12.150Z","op":"done","visit":"iterations/i51/build-steps/a-fresh-session-knows-a-deciding-step@0","node":"d226","brief":"two cases prove a fresh process never reports a step deciding"}
+{"ts":"2026-08-21T11:37:37.231Z","op":"update","visit":"iterations/i51/cut-criteria@3","node":"d228","brief":"re-aim at shipped; the submit reset the target to front_desk again"}
+{"ts":"2026-08-21T11:38:16.563Z","op":"update","visit":"iterations/i51/trace-design@0","node":"d229","brief":"at trace-design; check the design register before verification"}
+{"ts":"2026-08-21T11:38:41.764Z","op":"done","visit":"iterations/i51/build-steps/the-table-holds-every-kind@0","node":"d202","brief":"the two work-account cases are green and the chunk is signed"}
+{"ts":"2026-08-21T11:38:54.595Z","op":"fork","visit":"iterations/i51/trace-design@0","parent":"d227","node":"d230","brief":"the design register drew empty while 41 specs stand on disk","nodes":[]}
+{"ts":"2026-08-21T11:39:00.013Z","op":"update","visit":"iterations/i51/trace-design@0","node":"d231","brief":"read the typed-source resolver in stateform"}
+{"ts":"2026-08-21T11:39:13.483Z","op":"update","visit":"iterations/i51/trace-design@0","node":"d232","brief":"read typedItems and boundOwner to see what scopes the register"}
+{"ts":"2026-08-21T11:39:22.008Z","op":"update","visit":"iterations/i51/trace-design@0","node":"d233","brief":"check whether the new design spec carries minted_in"}
+{"ts":"2026-08-21T11:39:33.083Z","op":"update","visit":"iterations/i51/trace-design@0","node":"d234","brief":"minted_in reads i51, and the owner key is the full record folder name"}
+{"ts":"2026-08-21T11:39:46.245Z","op":"update","visit":"iterations/i51/trace-design@0","node":"d235","brief":"the owner key is the full folder name; find every node I minted short"}
+{"ts":"2026-08-21T11:40:15.361Z","op":"update","visit":"iterations/i51/trace-design@0","node":"d236","brief":"settle the minted_in convention from whatever writes it"}
+{"ts":"2026-08-21T11:40:22.142Z","op":"update","visit":"iterations/i51/trace-design@0","node":"d237","brief":"find the mint stamp in the engine itself"}
+{"ts":"2026-08-21T11:40:36.227Z","op":"done","visit":"iterations/i51/build-steps/the-figure-carries-its-basis@0","node":"d208","brief":"the read ceiling stands at 120 with its reason recorded"}
+{"ts":"2026-08-21T11:40:49.056Z","op":"update","visit":"iterations/i51/trace-design@0","node":"d238","brief":"list every file carrying the short owner key"}
+{"ts":"2026-08-21T11:41:30.622Z","op":"update","visit":"iterations/i51/trace-design@0","node":"d239","brief":"check the engine half keys on the same owner string"}
+{"ts":"2026-08-21T11:42:24.517Z","op":"update","visit":"iterations/i51/trace-design@0","node":"d240","brief":"stamp the full record id onto all 60 nodes this record minted"}
+{"ts":"2026-08-21T11:42:33.542Z","op":"done","visit":"iterations/i51/trace-design@0","node":"d230","brief":"all 60 nodes now carry the record id the engine actually matches on"}
+{"ts":"2026-08-21T11:42:47.672Z","op":"fork","visit":"iterations/i51/trace-design@0","parent":"d227","node":"d241","brief":"the design spec may name a file that does not exist","nodes":[]}
+{"ts":"2026-08-21T11:42:57.004Z","op":"update","visit":"iterations/i51/trace-design@0","node":"d242","brief":"workregistry.ts is a phantom; the code lives in run.ts"}
+{"ts":"2026-08-21T11:43:06.638Z","op":"done","visit":"iterations/i51/trace-design@0","node":"d241","brief":"the spec now names run.ts, the file the work actually landed in"}
+{"ts":"2026-08-21T11:43:26.966Z","op":"update","visit":"iterations/i51/trace-design@0","node":"d243","brief":"submit trace-design with the corrected register"}
+{"ts":"2026-08-21T11:44:28.653Z","op":"plan","visit":"iterations/i51/verification@0","parent":null,"nodes":[{"id":"d244","brief":"spawn the tester and read the claims checklist"},{"id":"d245","brief":"observe every claim spec green"},{"id":"d246","brief":"fold the tester's findings in"},{"id":"d247","brief":"submit verification and run the battery"},{"id":"d248","brief":"commit and push"},{"id":"d249","brief":"close the field report"}]}
+{"ts":"2026-08-21T11:44:40.012Z","op":"update","visit":"iterations/i51/verification@0","node":"d250","brief":"check whether every test spec here is machine-runnable"}
+{"ts":"2026-08-21T11:44:58.762Z","op":"update","visit":"iterations/i51/verification@0","node":"d251","brief":"count the cases in the three test files this record owns"}
+{"ts":"2026-08-21T11:45:30.572Z","op":"update","visit":"iterations/i51/verification@0","node":"d252","brief":"check what asserts on the mint stamp before the battery runs"}
+{"ts":"2026-08-21T11:45:45.726Z","op":"update","visit":"iterations/i51/verification@0","node":"d253","brief":"confirm the lane stamps minted_in and skips a hand-written one"}
+{"ts":"2026-08-21T11:46:02.742Z","op":"done","visit":"iterations/i51/verification@0","node":"d244","brief":"tester is running and the claims checklist is correctly empty"}
+{"ts":"2026-08-21T11:46:21.442Z","op":"done","visit":"iterations/i51/gate-inputs@0","node":"d34","brief":"the inputs gate was filled and blessed at M2"}
+{"ts":"2026-08-21T11:46:41.811Z","op":"done","visit":"iterations/i51/write-requirements@0","node":"d37","brief":"write-requirements was submitted and signed at M3"}
+{"ts":"2026-08-21T11:49:14.963Z","op":"update","visit":"iterations/i51/verification@0","node":"d254","brief":"tester reading the i51 scope cases against their test spec"}
+{"ts":"2026-08-21T11:49:32.784Z","op":"update","visit":"iterations/i51/verification@0","node":"d255","brief":"reading the standing scope cases for overlap"}
+{"ts":"2026-08-21T11:49:46.057Z","op":"update","visit":"iterations/i51/verification@0","node":"d256","brief":"checking the i51 register entries against the built account"}
+{"ts":"2026-08-21T11:49:53.708Z","op":"update","visit":"iterations/i51/verification@0","node":"d257","brief":"reading the caller-limit assumption behind the one-second bound"}
+{"ts":"2026-08-21T11:50:07.384Z","op":"update","visit":"iterations/i51/verification@0","node":"d258","brief":"checking the test progress file and total against the basis branches"}
+{"ts":"2026-08-21T11:50:12.528Z","op":"update","visit":"iterations/i51/verification@0","node":"d259","brief":"reading where a scoped run records its total"}
+{"ts":"2026-08-21T11:50:24.675Z","op":"update","visit":"iterations/i51/verification@0","node":"d260","brief":"confirming where the battery total comes from"}
+{"ts":"2026-08-21T11:52:54.796Z","op":"update","visit":"iterations/i51/verification@0","node":"d261","brief":"the claims list is empty because every test spec here runs mechanically"}
+{"ts":"2026-08-21T11:54:36.745Z","op":"update","visit":"iterations/i51/verification@0","node":"d262","brief":"into fix-findings with all fourteen collected"}
+{"ts":"2026-08-21T11:55:07.127Z","op":"update","visit":"iterations/i51/gate-implementation@0","node":"d263","brief":"route to fix-findings; the gate may not judge work with findings standing"}
+{"ts":"2026-08-21T11:55:51.060Z","op":"done","visit":"iterations/i51/verification@0","node":"d247","brief":"verification signed and the battery ran green over the whole tree"}
+{"ts":"2026-08-21T11:56:04.181Z","op":"plan","visit":"iterations/i51/fix-findings@0","parent":null,"nodes":[{"id":"d264","brief":"make the account keep every operation and carry a standing"},{"id":"d265","brief":"make the basis check the progress file is this run's"},{"id":"d266","brief":"add stall detection to the duration"},{"id":"d267","brief":"make a timed-out judgment say the check is running"},{"id":"d268","brief":"attach the account to a refusal"},{"id":"d269","brief":"bring the handback bound under one second"},{"id":"d270","brief":"name every unmapped file, not three"},{"id":"d271","brief":"write the four missing tests"},{"id":"d272","brief":"run the battery and show the tester the deltas"}]}
+{"ts":"2026-08-21T11:56:09.086Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d273","brief":"read the account's suppression before removing it"}
+{"ts":"2026-08-21T11:56:20.550Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d274","brief":"take the standing's vocabulary from the design spec's own words"}
+{"ts":"2026-08-21T11:56:39.943Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d275","brief":"read the account tests that pin the behaviour about to change"}
+{"ts":"2026-08-21T11:57:29.941Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d276","brief":"read timeRemaining exactly before changing its basis"}
+{"ts":"2026-08-21T11:57:49.866Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d277","brief":"find what writes the progress file and whether it stamps a start"}
+{"ts":"2026-08-21T11:59:04.329Z","op":"done","visit":"iterations/i51/fix-findings@0","node":"d265","brief":"the basis now proves the progress on disk belongs to this run"}
+{"ts":"2026-08-21T11:59:11.984Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d278","brief":"wire noteStarted into where a test job is created"}
+{"ts":"2026-08-21T11:59:23.384Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d279","brief":"find the run module import lines to extend"}
+{"ts":"2026-08-21T11:59:44.684Z","op":"done","visit":"iterations/i51/fix-findings@0","node":"d264","brief":"the account keeps every operation this session started and marks its standing"}
+{"ts":"2026-08-21T11:59:50.682Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d280","brief":"read the scope decision's shape before adding the full unmapped list"}
+{"ts":"2026-08-21T11:59:56.899Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d281","brief":"read the two branches that build the unanswered sentence"}
+{"ts":"2026-08-21T12:00:23.182Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d282","brief":"carry the whole unmapped list on the decision, not three in prose"}
+{"ts":"2026-08-21T12:00:29.242Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d283","brief":"find every composer of the decision so the field is not dropped"}
+{"ts":"2026-08-21T12:00:38.059Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d284","brief":"read the scoped runner so the list can travel to its answer"}
+{"ts":"2026-08-21T12:00:47.481Z","op":"done","visit":"iterations/i51/fix-findings@0","node":"d270","brief":"the whole unmapped list now rides the answer, not three names in prose"}
+{"ts":"2026-08-21T12:00:56.957Z","op":"done","visit":"iterations/i51/fix-findings@0","node":"d266","brief":"the basis now names a count that has stopped moving instead of repeating it"}
+{"ts":"2026-08-21T12:01:35.297Z","op":"done","visit":"iterations/i51/fix-findings@0","node":"d267","brief":"a refusal now says the check is running instead of that it never started"}
+{"ts":"2026-08-21T12:01:42.374Z","op":"done","visit":"iterations/i51/fix-findings@0","node":"d269","brief":"the bound is 900ms, so the answer lands under the second the measure names"}
+{"ts":"2026-08-21T12:01:47.695Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d285","brief":"read the decorator pass and the refusal branch"}
+{"ts":"2026-08-21T12:02:02.085Z","op":"done","visit":"iterations/i51/fix-findings@0","node":"d268","brief":"the account now rides a refusal, where a caller most needs it"}
+{"ts":"2026-08-21T12:02:24.184Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d286","brief":"read how a test operation is rebuilt so the fixtures are right"}
+{"ts":"2026-08-21T12:02:41.577Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d287","brief":"the refusal payload needs a cast to cross the decorator boundary"}
+{"ts":"2026-08-21T12:02:55.398Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d288","brief":"typecheck the ten fixes before writing their tests"}
+{"ts":"2026-08-21T12:03:50.088Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d289","brief":"five cases for the account findings"}
+{"ts":"2026-08-21T12:03:56.439Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d290","brief":"read the scope-decision fixtures before adding cases"}
+{"ts":"2026-08-21T12:04:09.588Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d291","brief":"find how a changed file maps to a test file"}
+{"ts":"2026-08-21T12:04:16.117Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d292","brief":"read how a changed file is mapped to the test that answers for it"}
+{"ts":"2026-08-21T12:04:33.124Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d293","brief":"confirm how the suite is enumerated for the fixture"}
+{"ts":"2026-08-21T12:05:21.828Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d294","brief":"scope-decision cases plus the documents fixture that tested no document"}
+{"ts":"2026-08-21T12:05:36.995Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d295","brief":"read how a judgment starts so the timing case can measure it"}
+{"ts":"2026-08-21T12:05:57.519Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d296","brief":"read scriptRun's host use before building the timing fixture"}
+{"ts":"2026-08-21T12:06:15.623Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d297","brief":"read the handback test's imports and stub host"}
+{"ts":"2026-08-21T12:07:09.459Z","op":"done","visit":"iterations/i51/fix-findings@0","node":"d271","brief":"eight cases written and the whole tree typechecks at exit 0"}
+{"ts":"2026-08-21T12:07:45.741Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d298","brief":"name the two red cases before touching anything"}
+{"ts":"2026-08-21T12:08:06.193Z","op":"fork","visit":"iterations/i51/fix-findings@0","parent":"d272","node":"d299","brief":"an untracked directory is reported as one name instead of its files","nodes":[]}
+{"ts":"2026-08-21T12:08:25.256Z","op":"done","visit":"iterations/i51/fix-findings@0","node":"d299","brief":"status now lists untracked files individually instead of collapsing a folder"}
+{"ts":"2026-08-21T12:08:32.016Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d300","brief":"see both status call sites before changing either"}
+{"ts":"2026-08-21T12:09:01.247Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d301","brief":"re-run the three touched files after the git status fix"}
+{"ts":"2026-08-21T12:09:15.621Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d302","brief":"see the tree before staging, to keep the vanished files out"}
+{"ts":"2026-08-21T12:09:28.500Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d303","brief":"stage the fix pass"}
+{"ts":"2026-08-21T12:09:36.359Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d304","brief":"keep the 13 unexplained deletions out of this commit"}
+{"ts":"2026-08-21T12:09:58.129Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d305","brief":"commit the whole fix pass"}
+{"ts":"2026-08-21T12:10:11.073Z","op":"done","visit":"iterations/i51/build-steps/a-fresh-session-knows-a-deciding-step@0","node":"d227","brief":"the fix pass is committed as 494d608b with 69 of 69 green on the touched files"}
+{"ts":"2026-08-21T12:10:18.970Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d306","brief":"read the cloud card's ruling on pushing"}
+{"ts":"2026-08-21T12:10:55.516Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d307","brief":"tester re-verifying the fix pass against the standing findings"}
+{"ts":"2026-08-21T12:11:02.290Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d308","brief":"locating the account fixes in run.ts"}
+{"ts":"2026-08-21T12:11:08.512Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d309","brief":"reading the reworked workAccount"}
+{"ts":"2026-08-21T12:11:14.675Z","op":"done","visit":"iterations/i51/verification@0","node":"d246","brief":"all fourteen findings fixed in one pass and committed"}
+{"ts":"2026-08-21T12:11:25.936Z","op":"update","visit":"iterations/i51/cut-criteria@4","node":"d310","brief":"reading the reworked timeRemaining and its stale and stall branches"}
+{"ts":"2026-08-21T12:11:30.992Z","op":"update","visit":"iterations/i51/cut-criteria@4","node":"d311","brief":"reading the stall basis text"}
+{"ts":"2026-08-21T12:11:31.734Z","op":"done","visit":"iterations/i51/fix-findings@0","node":"d272","brief":"the battery ran green on the submit and fix-findings is signed"}
+{"ts":"2026-08-21T12:13:48.011Z","op":"update","visit":"iterations/i51/gate-implementation@0","node":"d312","brief":"read the standing field report before adding this round"}
+{"ts":"2026-08-21T12:14:47.032Z","op":"update","visit":"iterations/i51/gate-implementation@0","node":"d313","brief":"correct the stale header and add this round's findings"}
+{"ts":"2026-08-21T12:15:09.909Z","op":"update","visit":"iterations/i51/gate-implementation@0","node":"d314","brief":"stage the field report"}
+{"ts":"2026-08-21T12:15:22.931Z","op":"update","visit":"iterations/i51/gate-implementation@0","node":"d315","brief":"round 0 needs a citable answer on the tree at rest"}
+{"ts":"2026-08-21T12:15:35.028Z","op":"done","visit":"iterations/i51/identify-assumptions@0","node":"d49","brief":"identify-assumptions was submitted and signed at M3"}
+{"ts":"2026-08-21T12:16:13.580Z","op":"plan","visit":"iterations/i51/gate-implementation@0","parent":null,"nodes":[{"id":"d316","brief":"make the gate see a feeder still deciding"},{"id":"d317","brief":"judge a stall on wall time, not on reads"},{"id":"d318","brief":"key the started and progress marks by root"},{"id":"d319","brief":"run only refusal-safe decorators on a refusal"},{"id":"d320","brief":"link the timing test to the constant and leave headroom"},{"id":"d321","brief":"record the route drawer as debt with its trigger"},{"id":"d322","brief":"re-run and show the tester the second deltas"}]}
+{"ts":"2026-08-21T12:16:27.404Z","op":"update","visit":"iterations/i51/gate-implementation@0","node":"d323","brief":"find where the session can hand the gate the standing"}
+{"ts":"2026-08-21T12:16:33.728Z","op":"update","visit":"iterations/i51/gate-implementation@0","node":"d324","brief":"locate the session's claims and scripts fields"}
+{"ts":"2026-08-21T12:16:41.035Z","op":"update","visit":"iterations/i51/gate-implementation@0","node":"d325","brief":"find the declarations to wire the hook beside"}
+{"ts":"2026-08-21T12:16:53.092Z","op":"update","visit":"iterations/i51/gate-implementation@0","node":"d326","brief":"read the claim host interface"}
+{"ts":"2026-08-21T12:17:00.047Z","op":"update","visit":"iterations/i51/gate-implementation@0","node":"d327","brief":"read the ClaimsHost members"}
+{"ts":"2026-08-21T12:17:08.077Z","op":"update","visit":"iterations/i51/gate-implementation@0","node":"d328","brief":"read the picked host members"}
+{"ts":"2026-08-21T12:18:04.255Z","op":"done","visit":"iterations/i51/gate-implementation@0","node":"d317","brief":"the stall is computed from the run's own clock, so no read history is kept"}
+{"ts":"2026-08-21T12:18:36.507Z","op":"fork","visit":"iterations/i51/gate-implementation@0","parent":"d316","node":"d329","brief":"the owner ruled the field report out of git; I put it in spec","nodes":[]}
+{"ts":"2026-08-21T12:19:01.415Z","op":"update","visit":"iterations/i51/gate-implementation@0","node":"d330","brief":"state the privacy reason so the rule cannot be argued away again"}
+{"ts":"2026-08-21T12:19:22.961Z","op":"update","visit":"iterations/i51/gate-implementation@0","node":"d331","brief":"ruling recorded and the card now carries the reason"}
+{"ts":"2026-08-21T12:19:57.861Z","op":"done","visit":"iterations/i51/gate-implementation@0","node":"d318","brief":"started marks are keyed by root and the progress memory is gone entirely"}
+{"ts":"2026-08-21T12:20:07.805Z","op":"update","visit":"iterations/i51/gate-implementation@0","node":"d332","brief":"read the decorators to find which are safe on a refusal"}
+{"ts":"2026-08-21T12:20:20.104Z","op":"update","visit":"iterations/i51/gate-implementation@0","node":"d333","brief":"read the decorator registration signature"}
+{"ts":"2026-08-21T12:20:50.214Z","op":"done","visit":"iterations/i51/gate-implementation@0","node":"d319","brief":"only the account rides a refusal now, so nothing spends state on one"}
+{"ts":"2026-08-21T12:21:43.938Z","op":"done","visit":"iterations/i51/gate-implementation@0","node":"d320","brief":"the timing case reads the constant out of the source instead of copying it"}
+{"ts":"2026-08-21T12:21:53.989Z","op":"update","visit":"iterations/i51/gate-implementation@0","node":"d334","brief":"read a risk entry's shape before writing two"}
+{"ts":"2026-08-21T12:22:16.495Z","op":"update","visit":"iterations/i51/gate-implementation@0","node":"d335","brief":"record the route drawer as debt with the reason it is the safe direction"}
+{"ts":"2026-08-21T12:22:34.760Z","op":"done","visit":"iterations/i51/gate-implementation@0","node":"d321","brief":"both residuals stand in the register with triggers and what would close them"}
+{"ts":"2026-08-21T12:22:49.945Z","op":"update","visit":"iterations/i51/gate-implementation@0","node":"d336","brief":"confirm the second pass"}
+{"ts":"2026-08-21T12:23:01.346Z","op":"update","visit":"iterations/i51/gate-implementation@0","node":"d337","brief":"read the earlier battery's verdict while this one runs"}
+{"ts":"2026-08-21T12:48:28.217Z","op":"update","visit":"iterations/i51/start@0","node":"d6","brief":"re-earn the read credits the restarted engine lost"}
+{"ts":"2026-08-21T12:48:42.796Z","op":"update","visit":"iterations/i51/start@0","node":"d7","brief":"credit the owed reading in one call rather than twelve"}
+{"ts":"2026-08-21T12:54:24.122Z","op":"done","visit":"front_desk@0","node":"d1","brief":"twelve documents re-read and the walk is back inside the record"}
+{"ts":"2026-08-21T12:54:59.625Z","op":"update","visit":"iterations/i51/gate-architecture@0","node":"d8","brief":"sweep on toward the implementation gate"}
+{"ts":"2026-08-21T12:55:19.767Z","op":"update","visit":"iterations/i51/rank-unknowns@0","node":"d9","brief":"the debt entry used a word off the likelihood scale"}
+{"ts":"2026-08-21T12:55:25.862Z","op":"update","visit":"iterations/i51/rank-unknowns@0","node":"d10","brief":"sweep on with the grade corrected"}
+{"ts":"2026-08-21T12:55:51.526Z","op":"update","visit":"iterations/i51/rank-unknowns@0","node":"d11","brief":"the damage grade was off its scale too"}
+{"ts":"2026-08-21T12:55:57.425Z","op":"update","visit":"iterations/i51/rank-unknowns@0","node":"d12","brief":"sweep on with both grades on their scales"}
+{"ts":"2026-08-21T12:56:27.860Z","op":"done","visit":"front_desk@0","node":"d2","brief":"the battery is running live as verification's own leaving judgment"}
+{"ts":"2026-08-21T12:56:36.315Z","op":"update","visit":"iterations/i51/verification@0","node":"d13","brief":"take the last owed reading while the battery runs"}
+{"ts":"2026-08-21T12:57:21.956Z","op":"update","visit":"iterations/i51/verification@0","node":"d14","brief":"read the battery's verdict and move to the gate"}
+{"ts":"2026-08-21T12:57:50.259Z","op":"update","visit":"iterations/i51/verification@0","node":"d15","brief":"capture the judgment-sizing gap while the battery finishes"}
+{"ts":"2026-08-21T12:57:59.871Z","op":"update","visit":"iterations/i51/verification@0","node":"d16","brief":"the battery is red; read what it names"}
+{"ts":"2026-08-21T12:58:26.967Z","op":"update","visit":"iterations/i51/verification@0","node":"d17","brief":"read the red battery's output"}
+{"ts":"2026-08-21T12:59:02.316Z","op":"update","visit":"iterations/i51/verification@0","node":"d18","brief":"take the drawn fallback rather than restart the battery each pull"}
+{"ts":"2026-08-21T12:59:55.905Z","op":"fork","visit":"iterations/i51/verification@0","parent":"d5","node":"d19","brief":"a re-run of one judgment is invisible and masks the first run's output","nodes":[]}
+{"ts":"2026-08-21T13:00:10.207Z","op":"done","visit":"iterations/i51/verification@0","node":"d19","brief":"both findings captured; the workaround is one pull after it settles"}
+{"ts":"2026-08-21T13:25:23.975Z","op":"update","visit":"iterations/i51/start@0","node":"d19","brief":"sweep to verification"}
+{"ts":"2026-08-21T13:25:44.609Z","op":"update","visit":"iterations/i51/start@0","node":"d20","brief":"re-earn the reading the restart wiped"}
+{"ts":"2026-08-21T13:28:17.921Z","op":"done","visit":"front_desk@0","node":"d13","brief":"twelve documents re-read and the walk is back inside the record"}
+{"ts":"2026-08-21T13:29:12.594Z","op":"update","visit":"iterations/i51/evaluate-architecture@0","node":"d21","brief":"sweep on toward verification"}
+{"ts":"2026-08-21T13:29:31.602Z","op":"update","visit":"iterations/i51/verification@0","node":"d22","brief":"sweep through the build states"}
+{"ts":"2026-08-21T13:29:44.558Z","op":"update","visit":"iterations/i51/verification@0","node":"d23","brief":"last reading, then the battery"}
+{"ts":"2026-08-21T13:31:00.489Z","op":"update","visit":"iterations/i51/verification@0","node":"d24","brief":"read the battery's verdict"}
+{"ts":"2026-08-21T13:31:52.713Z","op":"done","visit":"front_desk@0","node":"d14","brief":"the battery is green and the walk stands at the implementation gate"}
+{"ts":"2026-08-21T13:32:22.219Z","op":"update","visit":"iterations/i51/gate-implementation@0","node":"d25","brief":"land on the gate so it offers its form"}
+{"ts":"2026-08-21T13:32:36.106Z","op":"update","visit":"iterations/i51/gate-implementation@0","node":"d26","brief":"clear the target so the gate offers its form"}
+{"ts":"2026-08-21T13:33:08.704Z","op":"update","visit":"iterations/i51/gate-implementation@0","node":"d27","brief":"fill the gate's three rounds and bless it"}
+{"ts":"2026-08-21T13:35:07.839Z","op":"plan","visit":"iterations/i51/gate-implementation@0","parent":null,"nodes":[{"id":"d28","brief":"add the Repayment section to the debt entry"},{"id":"d29","brief":"re-submit and bless gate-implementation"},{"id":"d30","brief":"walk validation and release"},{"id":"d31","brief":"write the field report"}]}
+{"ts":"2026-08-21T13:35:16.068Z","op":"update","visit":"iterations/i51/gate-implementation@0","node":"d32","brief":"the debt entry now declares its repayment"}
+{"ts":"2026-08-21T13:35:23.581Z","op":"update","visit":"iterations/i51/gate-implementation@0","node":"d33","brief":"re-reading the gate form before submitting"}
+{"ts":"2026-08-21T13:36:46.783Z","op":"update","visit":"iterations/i51/cut-criteria@1","node":"d34","brief":"aiming at the ship state to walk validation and release"}
+{"ts":"2026-08-21T13:37:42.641Z","op":"update","visit":"iterations/i51/build-steps/start@1","node":"d35","brief":"taking both build-step doors at the fan"}
+{"ts":"2026-08-21T13:37:51.061Z","op":"update","visit":"iterations/i51/build-steps/start@1","node":"d36","brief":"taking the operation-table door with its full id"}
+{"ts":"2026-08-21T13:38:05.439Z","op":"update","visit":"iterations/i51/build-steps/start@1","node":"d37","brief":"pulling along the drawn route instead of choosing a door"}
+{"ts":"2026-08-21T13:41:11.135Z","op":"update","visit":"iterations/i51/verification@1","node":"d38","brief":"checking whether the battery has landed"}
+{"ts":"2026-08-21T13:41:52.972Z","op":"fork","visit":"iterations/i51/verification@1","parent":null,"node":"d39","brief":"verification is stuck: condition says running, account says nothing runs","nodes":[{"id":"d40","brief":"reach a state that can write"},{"id":"d41","brief":"find which of the two is lying"},{"id":"d42","brief":"fix it and re-run"}]}
+{"ts":"2026-08-21T13:42:06.565Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d43","brief":"looking for the battery process the condition claims is running"}
+{"ts":"2026-08-21T13:42:13.961Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d44","brief":"asking the OS whether any battery process exists"}
+{"ts":"2026-08-21T13:48:23.190Z","op":"done","visit":"iterations/i51/verification@1","node":"d41","brief":"the account was right; the mirror's own endpoint starts an unregistered run"}
+{"ts":"2026-08-21T13:48:32.539Z","op":"done","visit":"iterations/i51/verification@1","node":"d40","brief":"standing in fix-findings with the write verbs"}
+{"ts":"2026-08-21T13:49:08.293Z","op":"done","visit":"iterations/i51/gate-implementation@0","node":"d28","brief":"the debt entry carries its Repayment section"}
+{"ts":"2026-08-21T13:49:15.655Z","op":"done","visit":"iterations/i51/gate-implementation@0","node":"d29","brief":"gate-implementation is submitted, blessed and signed"}
+{"ts":"2026-08-21T13:49:26.986Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d45","brief":"scoped run over the two touched suites"}
+{"ts":"2026-08-21T13:49:41.622Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d46","brief":"confirm run fired; battery is the exit of this state"}
+{"ts":"2026-08-21T13:50:07.924Z","op":"update","visit":"iterations/i51/cut-criteria@3","node":"d47","brief":"aiming at ship so leaving verification fires a battery over the new code"}
+{"ts":"2026-08-21T13:50:34.809Z","op":"update","visit":"iterations/i51/observe-red@3","node":"d48","brief":"walking to verification so its exit fires the battery"}
+{"ts":"2026-08-21T13:50:47.831Z","op":"update","visit":"iterations/i51/verification@3","node":"d49","brief":"firing the battery over the changed engine"}
+{"ts":"2026-08-21T13:52:09.886Z","op":"update","visit":"iterations/i51/verification@3","node":"d50","brief":"reading what the battery runs while it runs"}
+{"ts":"2026-08-21T13:52:33.409Z","op":"update","visit":"iterations/i51/verification@3","node":"d51","brief":"battery is over time; going where I can inspect it"}
+{"ts":"2026-08-21T13:52:41.974Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d52","brief":"scoped run of the suite carrying the new case"}
+{"ts":"2026-08-21T13:53:04.594Z","op":"done","visit":"iterations/i51/verification@1","node":"d42","brief":"12 of 12 pass in a fresh process, new case included"}
+{"ts":"2026-08-21T13:53:12.676Z","op":"plan","visit":"iterations/i51/fix-findings@0","parent":null,"nodes":[{"id":"d53","brief":"commit the fix and the gate evidence"},{"id":"d54","brief":"walk validation and release to shipped"},{"id":"d55","brief":"write and hand over the field report"}]}
+{"ts":"2026-08-21T13:53:20.707Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d56","brief":"staging only the six files this pass touched"}
+{"ts":"2026-08-21T13:53:40.960Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d57","brief":"aiming at ship"}
+{"ts":"2026-08-21T13:54:22.413Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d58","brief":"field report drafted while the write verbs are in hand"}
+{"ts":"2026-08-21T13:54:45.677Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d59","brief":"report records the live running entry and the honest absent estimate"}
+{"ts":"2026-08-21T13:54:53.126Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d60","brief":"proving the field report cannot enter version control"}
+{"ts":"2026-08-21T13:55:00.151Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d61","brief":"walking toward ship as the confirm run settles"}
+{"ts":"2026-08-21T13:55:14.932Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d62","brief":"checking how far into the confirm run we are"}
+{"ts":"2026-08-21T13:56:01.211Z","op":"fork","visit":"iterations/i51/fix-findings@0","parent":null,"node":"d63","brief":"the battery says fail 2 and hides which two","nodes":[{"id":"d64","brief":"make the battery print its failures"},{"id":"d65","brief":"find and fix the two"},{"id":"d66","brief":"re-run"}]}
+{"ts":"2026-08-21T13:56:34.218Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d67","brief":"the lane keeps both ends so the named failures survive"}
+{"ts":"2026-08-21T13:56:47.564Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d68","brief":"a script that prints the failures the truncation hid"}
+{"ts":"2026-08-21T13:56:53.549Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d69","brief":"running the suite to learn which two are red"}
+{"ts":"2026-08-21T13:58:00.389Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d70","brief":"backgrounding the run; the host caps a call at 60s"}
+{"ts":"2026-08-21T13:58:07.631Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d71","brief":"one suite run at a time"}
+{"ts":"2026-08-21T14:03:10.504Z","op":"done","visit":"iterations/i51/fix-findings@0","node":"d64","brief":"the summariser reads TAP and the lane keeps both ends of the output"}
+{"ts":"2026-08-21T14:03:27.342Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d72","brief":"reading the shared boot helpers"}
+{"ts":"2026-08-21T14:04:02.323Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d73","brief":"both shared boot helpers wait out a deciding judgment"}
+{"ts":"2026-08-21T14:04:21.714Z","op":"done","visit":"iterations/i51/fix-findings@0","node":"d65","brief":"both failures traced to boot helpers that die on the handback"}
+{"ts":"2026-08-21T14:04:33.496Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d74","brief":"confirm run over the helper fixes"}
+{"ts":"2026-08-21T14:05:00.980Z","op":"obsolete","visit":"front_desk@0","node":"d15","brief":"superseded: the gate is signed"}
+{"ts":"2026-08-21T14:05:07.289Z","op":"obsolete","visit":"iterations/i51/gate-implementation@0","node":"d30","brief":"duplicate of d54, kept as one item"}
+{"ts":"2026-08-21T14:05:18.374Z","op":"obsolete","visit":"iterations/i51/gate-implementation@0","node":"d31","brief":"duplicate of d55, kept as one item"}
+{"ts":"2026-08-21T14:05:23.951Z","op":"done","visit":"iterations/i51/verification@1","node":"d39","brief":"the account was right; the second caller was the hole"}
+{"ts":"2026-08-21T14:05:30.382Z","op":"obsolete","visit":"front_desk@0","node":"d16","brief":"duplicate of d54, kept as one item"}
+{"ts":"2026-08-21T14:05:36.148Z","op":"obsolete","visit":"front_desk@0","node":"d17","brief":"duplicate of d55, kept as one item"}
+{"ts":"2026-08-21T14:05:42.658Z","op":"done","visit":"iterations/i51/fix-findings@0","node":"d53","brief":"committed as 2726dcdf"}
+{"ts":"2026-08-21T14:06:33.262Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d75","brief":"one failure left, in ticks"}
+{"ts":"2026-08-21T14:07:00.829Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d76","brief":"a refusal riding inside a good answer is a wait, not a move"}
+{"ts":"2026-08-21T14:07:11.513Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d77","brief":"the block printer sees nested failures too"}
+{"ts":"2026-08-21T14:07:20.364Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d78","brief":"gates before the next confirm run"}
+{"ts":"2026-08-21T14:07:29.882Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d79","brief":"confirm run number two"}
+{"ts":"2026-08-21T14:09:51.847Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d80","brief":"the desk case stops aiming at idle it does not want"}
+{"ts":"2026-08-21T14:10:17.949Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d81","brief":"gates plus the one changed case"}
+{"ts":"2026-08-21T14:10:35.075Z","op":"update","visit":"iterations/i51/fix-findings@0","node":"d82","brief":"staging the five files of the reporting and helper fixes"}
+{"ts":"2026-08-21T14:10:46.937Z","op":"done","visit":"iterations/i51/fix-findings@0","node":"d66","brief":"reporting and helper fixes committed"}
+{"ts":"2026-08-21T14:11:22.887Z","op":"plan","visit":"iterations/i51/fix-findings@0","parent":null,"nodes":[{"id":"d83","brief":"confirm run green"},{"id":"d84","brief":"walk to shipped"},{"id":"d85","brief":"push and hand over the field report"}]}
+{"ts":"2026-08-21T14:14:43.459Z","op":"done","visit":"iterations/i51/fix-findings@0","node":"d83","brief":"the fix-findings confirm run went green"}
+{"ts":"2026-08-21T14:16:05.360Z","op":"update","visit":"iterations/i51/gate-implementation@0","node":"d86","brief":"verification needs re-signing after its own judgment write"}
+{"ts":"2026-08-21T14:17:03.175Z","op":"update","visit":"iterations/i51/cut-criteria@4","node":"d87","brief":"forward again; the backward aim reset the walk"}
+{"ts":"2026-08-21T14:17:52.336Z","op":"update","visit":"iterations/i51/gate-implementation@0","node":"d88","brief":"reading what the judgment write did to verification's signature"}
+{"ts":"2026-08-21T14:18:17.778Z","op":"update","visit":"iterations/i51/gate-implementation@0","node":"d89","brief":"the three unfixed items go in the report as debt"}
+{"ts":"2026-08-21T14:18:59.057Z","op":"update","visit":"iterations/i51/gate-implementation@0","node":"d90","brief":"staging the record's own files"}
+{"ts":"2026-08-21T14:19:11.755Z","op":"update","visit":"iterations/i51/gate-implementation@0","node":"d91","brief":"reaching a state where git is legal, to push"}
+{"ts":"2026-08-21T14:19:37.478Z","op":"update","visit":"iterations/i51/fix-findings@1","node":"d92","brief":"checking whether git is legal where the walk landed"}
+{"ts":"2026-08-21T14:19:47.755Z","op":"update","visit":"iterations/i51/fix-findings@1","node":"d93","brief":"committing the record's evidence"}
+{"ts":"2026-08-21T14:20:04.508Z","op":"done","visit":"iterations/i51/fix-findings@0","node":"d84","brief":"record committed at 3f4cb458"}
+{"ts":"2026-08-21T14:20:39.624Z","op":"update","visit":"iterations/i51/fix-findings@1","node":"d94","brief":"checking what is still uncommitted"}
+{"ts":"2026-08-21T14:20:47.622Z","op":"update","visit":"iterations/i51/fix-findings@1","node":"d95","brief":"committing the narration log"}

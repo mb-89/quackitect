@@ -53,6 +53,14 @@ depends_on: null
 
 # i29-frontmatter-is-typed-and-the-engine-writ
 
+## A commit message is an engine-written artifact too
+
+THE SAME RULE REACHES IT. The agent fills fields and the engine composes the message, exactly as this record rules for frontmatter. Nothing composes one today, so the decision behind a change has no structured home and lands as free prose or not at all.
+
+WHY IT BELONGS HERE. Git history is where a decision is supposed to live once trunk stops carrying it. A free-text message cannot be relied on for that, and a template can.
+
+i59 OWNS THE LINT ON THE RESULT. This record owns the template and its field types.
+
 ## Goal
 
 Frontmatter is typed and the engine writes it: a field declares its type in one place, the agent selects rather than composes, and a wrong value refuses at the boundary.

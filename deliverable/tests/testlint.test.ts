@@ -5,9 +5,9 @@
 // The rule, made mechanical as the note demanded:
 //
 // - No test file names a REAL guidance path. helpers.ts is the one home:
-//   it derives what the walk owes from the engine's own route (readDocs,
-//   checkDocs), the craft list from its folder (craftDocs), and holds the
-//   few named SUBJECT pages tests are genuinely about.
+//   checkDocs asks the engine for what the walk owes, craftDocs derives the
+//   craft list from its folder, and helpers hold the few named SUBJECT pages
+//   tests are genuinely about.
 // - A synthetic path in a throwaway root cannot break on a move, so only
 //   paths that exist in the repository count as offences.
 import { strict as assert } from "node:assert";
@@ -37,4 +37,23 @@ test("no test names a real guidance path — helpers.ts is the one home", () => 
     }
   }
   assert.deepEqual(offenders, [], "a real guidance path in a test pins layout no rule guarantees — ask helpers for it");
+});
+
+test("test helpers have one home and test names are unique", () => {
+  const localHelpers: string[] = [];
+  const names = new Map<string, string[]>();
+  for (const file of readdirSync(HERE).filter((entry) => entry.endsWith(".test.ts"))) {
+    const text = readFileSync(join(HERE, file), "utf8");
+    for (const match of text.matchAll(/\bfunction\s+(gitInit(?:Loop)?|refusal)\b/g)) {
+      localHelpers.push(`${file}: ${match[1]}`);
+    }
+    for (const match of text.matchAll(/\btest\(\s*(["'])(.*?)\1/g)) {
+      const files = names.get(match[2]) ?? [];
+      files.push(file);
+      names.set(match[2], files);
+    }
+  }
+  const duplicateNames = [...names].filter(([, files]) => files.length > 1).map(([name, files]) => `${name}: ${files.join(", ")}`);
+  assert.deepEqual(localHelpers, [], "shared Git and refusal helpers belong in helpers.ts");
+  assert.deepEqual(duplicateNames, [], "test names must identify one assertion across the suite");
 });

@@ -80,29 +80,27 @@ test("the server declares listChanged, so a reload can add a tool", async () => 
   assert.equal(caps.tools?.listChanged, true, "without this a client may ignore the notification");
 });
 
-test("required args enforced at dispatch (R8) — missing arg refused with remedy", async () => {
+test("argument refusals name required and alternative ways to satisfy a call", async () => {
   const server = await bootedServer(fresh());
+
   // se_answer is the example because both its fields are genuinely required.
   // se_note used to be, and stopped when a TITLE became able to stand in for
   // the body — either satisfies it, which no `required` list can say.
-  const r = await call(server, "se_answer", {});
-  assert.equal(r.isError, true);
-  assert.equal(r.body.clause, "SE-C-046");
-  assert.ok(String(r.body.got).includes("missing: question"), String(r.body.got));
-});
+  const required = await call(server, "se_answer", {});
+  assert.equal(required.isError, true);
+  assert.equal(required.body.clause, "SE-C-046");
+  assert.ok(String(required.body.got).includes("missing: question"), String(required.body.got));
 
-test("a tool with ALTERNATIVE required args refuses in its handler, and says both", async () => {
-  const server = await bootedServer(fresh());
-  const r = await call(server, "se_file_read", {});
-  assert.equal(r.isError, true);
-  assert.match(String(r.body.expected), /path .*or paths/, "the refusal names both ways to satisfy it");
-  assert.ok(r.body.remedy, "and carries a remedy like every other refusal");
+  const alternative = await call(server, "se_file_read", {});
+  assert.equal(alternative.isError, true);
+  assert.match(String(alternative.body.expected), /path .*or paths/, "the refusal names both ways to satisfy it");
+  assert.ok(alternative.body.remedy, "and carries a remedy like every other refusal");
 
   // se_note joined this shape when a title became able to stand in for a body.
-  const n = await call(server, "se_note", {});
-  assert.equal(n.isError, true);
-  assert.match(String(n.body.expected), /text, or a title/, "and it names both ways too");
-  assert.ok(n.body.remedy);
+  const note = await call(server, "se_note", {});
+  assert.equal(note.isError, true);
+  assert.match(String(note.body.expected), /text, or a title/, "and it names both ways too");
+  assert.ok(note.body.remedy);
 });
 
 // A SIBLING VERB'S WORD IS UNDERSTOOD, AND THE REPAIR IS ANNOUNCED (i11).

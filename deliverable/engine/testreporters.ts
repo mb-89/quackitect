@@ -115,6 +115,45 @@ export function failureSummary(out: string): string {
     if (!byFile.has(at)) byFile.set(at, new Set());
     (byFile.get(at) as Set<string>).add(name);
   }
+  if (byFile.size === 0) return tapFailures(out);
+  return render(byFile);
+}
+
+/** THE SAME SUMMARY, READ FROM TAP.
+ *
+ *  The pass above reads the SPEC reporter's mark lines. `node --test` with no
+ *  reporter named prints TAP instead, which carries no such mark, so that pass
+ *  found nothing and this function used to return an empty string.
+ *
+ *  THE BATTERY THEN PRINTED `fail 2` AND NAMED NEITHER. Measured on i51's own
+ *  confirm run: 1742 of 1744 passed, two failed, and the summary was blank. An
+ *  error that will not say what failed is the blanket error the house forbids. */
+function tapFailures(out: string): string {
+  const byFile = new Map<string, Set<string>>();
+  const lines = out.split("\n");
+  for (let i = 0; i < lines.length; i++) {
+    const named = /^not ok \d+ - (.+)$/.exec(lines[i].trim());
+    if (named === null) continue;
+    // THE FILE RIDES IN THE FAILURE'S OWN YAML BLOCK, a few lines below the
+    // mark. Reading forward stops at the next mark so one failure never
+    // borrows the next one's file.
+    let at = "(file not named by the runner)";
+    for (let j = i + 1; j < lines.length; j++) {
+      const here = lines[j].trim();
+      if (/^not ok \d+ - /.test(here)) break;
+      const where = /^location: '(.+?):\d+/.exec(here) ?? /^\s*at .*\((.+?):\d+:\d+\)/.exec(here);
+      if (where !== null) {
+        at = where[1].replace(/\\/g, "/");
+        break;
+      }
+    }
+    if (!byFile.has(at)) byFile.set(at, new Set());
+    (byFile.get(at) as Set<string>).add(named[1].trim());
+  }
+  return render(byFile);
+}
+
+function render(byFile: Map<string, Set<string>>): string {
   if (byFile.size === 0) return "";
   const total = [...byFile.values()].reduce((n, s) => n + s.size, 0);
   const rows = [...byFile.entries()].sort((a, b) => b[1].size - a[1].size);

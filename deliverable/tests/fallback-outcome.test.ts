@@ -16,28 +16,15 @@
 // failed outcome, then it must be marked red"). settledStates counts a state
 // green only where its LATEST history outcome is "filled".
 import { strict as assert } from "node:assert";
-import { spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { activeStates, completeState, type MachineDecl, type MachineInstance, type StateDecl, settledStates } from "../engine/machine.ts";
+import { parseStateNote } from "../engine/notes.ts";
 import { CHANGE_COLUMNS, compileColumn, readRigorMatrix } from "../engine/rigor-matrix.ts";
 import { Session } from "../engine/session.ts";
-import { checkDocs, freshRoot, readEverything } from "./helpers.ts";
-
-function gitInitLoop(root: string): void {
-  for (const a of [
-    ["init"],
-    ["config", "user.email", "se@test.local"],
-    ["config", "user.name", "se test"],
-    ["add", "-A"],
-    ["commit", "-q", "-m", "seed"],
-  ]) {
-    const r = spawnSync("git", a, { cwd: root, encoding: "utf8", windowsHide: true });
-    if (r.status !== 0) throw new Error(`git ${a.join(" ")} failed: ${r.stderr}`);
-  }
-}
+import { checkDocs, freshRoot, gitInit, readEverything } from "./helpers.ts";
 
 /** The repository root — three levels above this file (tests/ → deliverable/ → project/ → root). */
 const REPO_ROOT = fileURLToPath(new URL("../..", import.meta.url));
@@ -201,13 +188,14 @@ test("the shipped matrix wires verification's fallback loop, and the loop walks 
 // counting, which is the day the promise becomes true and the escape path
 // below it has to exist. Raising the counter without an escape edge turns
 // the fourth red battery into the SE-C-123 wedge this file exists to prevent.
-test("the fix-findings guard names a counter, and nothing in the engine writes one", () => {
-  const row = readFileSync(join(REPO_ROOT, "deliverable/machines/rigor_matrix/rows/M7_60_fix-findings.md"), "utf8");
-  assert.match(row, /guard: verification_attempts < 3/, "the row still guards the fallback on a counter");
+test("fix-findings relies on its fallback edge, not a stale counter guard", () => {
+  const row = parseStateNote(readFileSync(join(REPO_ROOT, "deliverable/machines/rigor_matrix/rows/M7_60_fix-findings.md"), "utf8"));
+  assert.equal(row.frontmatter.guard, undefined, "no counter guard survives in the row frontmatter");
+  assert.equal(row.frontmatter.edge_role, "fallback", "the repair path is the row's fallback edge");
   const kernel = readFileSync(join(REPO_ROOT, "deliverable/engine/machine.ts"), "utf8");
   const session = readFileSync(join(REPO_ROOT, "deliverable/engine/session.ts"), "utf8");
   const writes = /counters\[[^\]]+\]\s*(=|\+\+|\+=)/.test(kernel + session);
-  assert.equal(writes, false, "nothing writes a counter yet — when this fails, give the exhausted guard an escape edge before landing it");
+  assert.equal(writes, false, "the retired counter mechanism is not reintroduced");
 });
 
 // ── THE LOOP, DRIVEN THROUGH A SESSION RATHER THAN THE KERNEL ──────────────
@@ -306,7 +294,7 @@ function fillFor(form: {
 
 test("the benchmark walk: one session, walked once, asserting at each stop it passes", async () => {
   const root = freshRoot();
-  gitInitLoop(root);
+  gitInit(root, true);
   const session = new Session(root);
   await session.advance();
   await session.advance();
