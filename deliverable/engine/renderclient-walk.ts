@@ -215,7 +215,7 @@ function morph(from, to) {
   for (const a of to.attributes) if (!(keepsStyle && a.name === "style") && from.getAttribute(a.name) !== a.value) from.setAttribute(a.name, a.value);
   for (const a of [...from.attributes]) if (!to.hasAttribute(a.name) && !(keepsStyle && a.name === "style")) from.removeAttribute(a.name);
   // A control under the reader's hand stays theirs until they leave it.
-  if (from.tagName === "INPUT" && from !== document.activeElement && to.hasAttribute("value")) from.value = to.getAttribute("value");
+  if (from.tagName === "INPUT" && !sePlaceIsEdited(from) && to.hasAttribute("value")) from.value = to.getAttribute("value");
   const byId = new Map();
   for (const c of from.children) if (c.id !== "") byId.set(c.id, c);
   let cur = from.firstChild;

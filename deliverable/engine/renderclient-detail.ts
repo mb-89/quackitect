@@ -110,11 +110,11 @@ function showDetails(title, html) {
   DETAIL_HTML = html;
   // Same subject with new content keeps the reader's place. A DIFFERENT
   // subject starts at the top, because a position in the old one means
-  // nothing here.
-  const top = sameSubject ? el.scrollTop : 0;
-  document.getElementById("details-title").textContent = title;
-  el.innerHTML = html;
-  el.scrollTop = top;
+  // nothing here. sePlaceKeepScrollForSubject is the one decider.
+  sePlaceKeepScrollForSubject(el, sameSubject, () => {
+    document.getElementById("details-title").textContent = title;
+    el.innerHTML = html;
+  });
   queueMicrotask(() => { void loadRecDecisions(); void loadStateTodos(); });
 }
 // THE MODAL — one surface over the grayed page (forms, tool calls,

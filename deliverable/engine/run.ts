@@ -658,8 +658,24 @@ export async function jobDone(id: string): Promise<JobView> {
  * long build with nobody watching is not idle, and shutting the computer down
  * under it would throw the work away.
  */
-export function anyJobRunning(): boolean {
-  for (const j of jobs.values()) if (j.running) return true;
+export function anyJobRunning(maxAgeMs?: number): boolean {
+  const now = Date.now();
+  for (const j of jobs.values()) {
+    if (!j.running) continue;
+    // A JOB OLDER THAN THE BOUND IS A LEAK, NOT WORK (2026-08-23).
+    //
+    // WHY THE BOUND EXISTS. A background job that never exits stays `running`
+    // for ever, and one of those vetoed the idle shutdown indefinitely. A
+    // profiling script that kept a watcher alive held the machine awake for
+    // twenty-four minutes and counting, with the walk resting and the log
+    // silent, which is exactly the case the shutdown was built for.
+    //
+    // THE CALLER CHOOSES WHETHER TO APPLY IT. Without a bound this answers the
+    // old question unchanged, so a caller that genuinely wants "is anything
+    // running at all" still gets it.
+    if (maxAgeMs !== undefined && now - j.started > maxAgeMs) continue;
+    return true;
+  }
   return false;
 }
 

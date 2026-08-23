@@ -34,7 +34,6 @@ function renderLog() {
   const rows = LOG_ROWS.filter((r) => !f || (r.ts + " " + r.src + " " + r.type + " " + r.brief + " " + (r.clause || "")).toLowerCase().includes(f));
   // NEWEST ON TOP (owner ruling): the feed reads downward into the past;
   // the scroll pins to the top while the reader is there.
-  const stick = logPanel.scrollTop < 40;
   const html = rows.slice().reverse().map((r) =>
     '<div class="logrow ' + r.type + (r.ok ? "" : " failed") + '" data-ref="' + r.ref + '">' +
       '<span class="lt">' + (r.pending ? r.ts.slice(5, 10) : r.ts.slice(11, 19)) + "</span>" +
@@ -49,10 +48,9 @@ function renderLog() {
   // as the details pane, on a surface that repaints far more often.
   if (html === LOG_HTML) return;
   LOG_HTML = html;
-  const top = logPanel.scrollTop;
-  logPanel.innerHTML = html;
-  // Sticking to the top is the reader's place TOO, when that is where they are.
-  logPanel.scrollTop = stick ? 0 : top;
+  // Sticking to the top is the reader's place TOO, when that is where they are,
+  // and sePlaceKeepScroll is the one decider for both cases.
+  sePlaceKeepScroll(logPanel, () => { logPanel.innerHTML = html; }, { stickWithin: 40 });
 }
 async function refreshLog() {
   if (!logPanel) return;

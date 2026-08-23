@@ -622,6 +622,48 @@ anything closed — and both were satisfied throughout. The walk was narrating
 and the walk was busy. It was busy asking one question that had already been
 answered.
 
+### SE-C-146 — the write would add a second surface
+
+WHAT IT MEANS. The write would leave an engine module emitting widget markup
+while the editor registry does not name it and the exemption list does not
+declare it.
+
+WHY IT REFUSES. A second surface accreted once over months and nothing
+objected, because nothing could. Both halves kept working, and only their
+disagreement was visible.
+
+THE RULE, in one sentence: only a module the editor registry names may emit
+widget markup.
+
+WHAT COUNTS AS EMITTING. A template literal carrying an opening block tag —
+div, section, main, aside, table, ul, ol, form, button or svg — or a tag with a
+class attribute.
+
+### It refuses the addition, never the edit
+
+A FILE THAT ALREADY EMITS STAYS EDITABLE. The check asks whether THIS write
+turned a quiet file into an emitter, so a file already on the list is untouched
+by it.
+
+THAT IS DELIBERATE. Eighteen engine files emitted on 2026-08-23 and folding
+them into the one surface is the work; a guard that froze them would block the
+fix as well as the fault.
+
+### The three ways past it
+
+- IT IS A FORM EDITOR. Register it in
+  [editors/index.ts](deliverable/engine/editors/index.ts).
+- IT IS GENUINELY NOT A SECOND SURFACE — a test fixture, a diagnostic page, a
+  vendored component. Declare it in
+  [widget-exemptions.md](deliverable/machines/widget-exemptions.md) with its
+  reason. A bullet with no reason is ignored.
+- IT IS PART OF THE ONE SURFACE. Put the markup where that surface emits it,
+  rather than opening a second place that emits.
+
+THE SWEEP ASKS THE SAME QUESTION about the whole tree, for a break no write
+arrived with — a rename, a merge, a registry line deleted out from under a
+module still emitting. One rule, two callers, no second copy.
+
 ### SE-C-145 — the search pattern is not a regex
 
 `se_file_search` runs a regular expression, and an ordinary source fragment is

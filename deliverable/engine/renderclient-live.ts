@@ -283,7 +283,7 @@ function applyAlive(a) {
     if (armed) b.textContent = "E";
     else if (b.textContent === "E") b.textContent = "I";
   }
-  if (thr && document.activeElement !== thr && Number(thr.value) !== a.autonomy) {
+  if (thr && !sePlaceIsEdited(thr) && Number(thr.value) !== a.autonomy) {
     thr.value = a.autonomy;
     const lbl = document.getElementById("thr-val");
     if (lbl) lbl.textContent = Number(a.autonomy).toFixed(2);

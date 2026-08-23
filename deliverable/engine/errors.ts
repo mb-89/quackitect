@@ -102,4 +102,9 @@ export const CLAUSES = {
   // an unclosed group in it. It came back as raw rg stderr with no clause and
   // no remedy, which is the one thing every other refusal in this lane is not.
   SEARCH_PATTERN: "SE-C-145", // the search pattern does not parse as a regex — the escaped literal rides the refusal // a structured query names a field the matched kind does not carry — refused by name, listing the fields that ARE legal, rather than silently returning an empty column
+  // A WRITE THAT ADDS A SECOND SURFACE. An engine module that emits widget
+  // markup while the editor registry does not name it and the exemption list
+  // does not declare it. A second surface accreted once over months and
+  // nothing objected, because nothing could.
+  UNREGISTERED_EMITTER: "SE-C-146",
 } as const;

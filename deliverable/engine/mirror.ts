@@ -839,7 +839,7 @@ export function startMirror(o: MirrorOptions): Server {
         tables: { running: tasksTable(runningWork()) },
         emergency: state.session.emergency,
         ints: { narration_minutes: state.session.narrationMinutes, narration_calls: state.session.narrationCalls },
-        toggles: { "block-auto-sleep": power.block_sleep, "shutdown-at-idle": power.shutdown_at_idle },
+        toggles: { "block-auto-sleep": power.block_sleep, "shutdown-at-front-desk": power.shutdown_at_idle },
       };
       // EVERY PANEL RIDES ALONG, in the one order there is. renderSidebar
       // decides it, so the sidebar needs one fetch and neither surface writes

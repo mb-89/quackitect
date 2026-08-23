@@ -14,6 +14,9 @@ import { FORM } from "./renderclient-form.ts";
 import { LIVE } from "./renderclient-live.ts";
 import { LOG } from "./renderclient-log.ts";
 import { PANEL } from "./renderclient-panel.ts";
+import { PLACE } from "./renderclient-place.ts";
 import { WALK } from "./renderclient-walk.ts";
 
-export const SCRIPT = [DETAIL, WALK, FORM, PANEL, LOG, LIVE].join("\n");
+// PLACE IS FIRST because every other part asks it what the reader's place is,
+// and a declaration in an earlier part is in scope for every later one.
+export const SCRIPT = [PLACE, DETAIL, WALK, FORM, PANEL, LOG, LIVE].join("\n");

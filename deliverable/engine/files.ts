@@ -20,6 +20,7 @@ import { forgetPath, parseStateNote, readNodeBytes, writeNode } from "./notes.ts
 import { isExcluded, isRootRef, resolveDeclaredRoot, resolveForRead, resolveInRoot } from "./paths.ts";
 import { guardNoSecondDoor } from "./pool.ts";
 import { search } from "./search.ts";
+import { guardNoUnregisteredEmitter } from "./widgets.ts";
 
 /** Whole-file read budget (chars). Beyond this, offset/limit is required. */
 export const READ_BUDGET = 50_000;
@@ -442,6 +443,10 @@ export function fileWrite(root: string, path: string, content: string, baseHash:
   // name through this very function, in one call, skipping every demand the
   // mint makes — which is the whole privacy boundary gone round.
   guardNoSecondDoor(path, SRC);
+  // A SECOND SURFACE CANNOT BE WRITTEN, rather than being discouraged. The
+  // rule lives in widgets.ts and the sweep asks it the same question about the
+  // whole tree (see el-widget-guard).
+  guardNoUnregisteredEmitter(root, path, content, SRC);
   // THE WRITE GUARD STANDS HERE, with the other two, because this is the last
   // point before anything lands (req-a-write-that-breaks-the-corpus-refuses).
   // THE GUARD ANSWERS TWICE. It THROWS on a break this write made, and RETURNS

@@ -43,7 +43,7 @@ steps:
     depends_on: []
     realization: code
   - id: the-eighteen-are-decided
-    statement: each of the eighteen unregistered emitters is routed into the one surface or removed, and the widget check goes green for the first time
+    statement: every unregistered emitter is routed into the one surface or removed, and the widget check goes green for the first time
     depends_on:
       - the-guard-at-the-write
       - the-view-model
@@ -58,6 +58,25 @@ chain are independent until the last step, so they fan out to separate hands.
 
 FOUR CHUNKS DEPEND ON NOTHING and start together: the predicate, the view
 model, the spawn no-op and the marker sweep.
+
+## Two chunks were added here and taken out again
+
+THE BATTERY AND THE SHUTDOWN CONTROL were added to this list mid-walk, on the
+owner's word, and the machine would not walk them.
+
+A STEP ADDED TO A SEEDED DRAWING GETS NO EDGE. The router knew the new state
+existed — it named it as the step it stopped at — and `start`'s own edge set did
+not contain it, so the hop was refused as illegal. Two places holding one
+truth, which is the shape this whole round is about.
+
+SO BOTH ARE DONE AS WORK RATHER THAN AS CHUNKS. The drawing is back to the ten
+it was seeded with, and the evidence that carries them says where they were
+done.
+
+THE CHUNK ID SAYS EIGHTEEN AND THE MEASURED NUMBER IS 21. The id was minted
+from a spike whose registry reader was rougher than the built one. The id is
+left alone because the machine walks by id; the statement carries no number,
+and the count that matters is whatever the sweep prints on the day.
 
 ## The lenses that shaped the order
 

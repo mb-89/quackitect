@@ -20,11 +20,21 @@ import { test } from "node:test";
 
 // The list does not vary per state, so it is fetched once for the whole
 // render. A second call site is the quadratic bug coming back.
+//
+// THE CALL MOVED IN i4 and this test followed it. Building the model and
+// drawing it are two files now, and the fetch belongs to the model half. What
+// is pinned is unchanged: ONE call across the whole render path, wherever in
+// that path it sits.
+//
+// BOTH FILES ARE COUNTED TOGETHER on purpose. Checking only the new home would
+// let a second call site reappear in the old one and say nothing.
+const RENDER_PATH = ["../engine/render.ts", "../engine/viewmodel.ts"];
+
 test("the render fetches the expedition list once, not once per state", () => {
-  const src = readFileSync(new URL("../engine/render.ts", import.meta.url), "utf8");
+  const src = RENDER_PATH.map((rel) => readFileSync(new URL(rel, import.meta.url), "utf8")).join("\n");
   // Match the CALL (a receiver, then the method) so prose about it does not count.
   const calls = src.match(/\.expeditionList\(\)/g) ?? [];
-  assert.equal(calls.length, 1, "one expeditionList call for the whole render");
+  assert.equal(calls.length, 1, "one expeditionList call across the whole render path");
 });
 
 // THE BRANCH-CACHE CASE IS DELETED (i34). It pinned that a closed record was

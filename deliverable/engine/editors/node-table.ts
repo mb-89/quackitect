@@ -194,7 +194,7 @@ export const NODE_TABLE_EDITOR: EditorKind = {
       // keystroke into an empty cell makes the row non-missing, and the next
       // tick would hide it mid-edit. While focus is in the table, the view
       // holds still.
-      if (tbl.contains(document.activeElement)) return;
+      if (sePlaceHasFocus(tbl)) return;
       const rows = Array.prototype.slice.call(tbl.querySelectorAll("tr.sfntrow"));
       // MISSING MEANS AN EMPTY CELL: no value, or still the template comment.
       const missing = function (tr) {

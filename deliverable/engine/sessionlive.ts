@@ -79,6 +79,18 @@ export class Liveness {
 
   /** How long nothing may happen before an armed idle shutdown fires. */
   static IDLE_MINUTES = 5;
+  /** HOW OLD A RUNNING JOB MAY BE AND STILL VETO THE SHUTDOWN.
+   *
+   *  A JOB THAT NEVER EXITS IS WHY THIS NEVER FIRED. It stays `running` for
+   *  ever, and a shutdown any leak can veto is a shutdown that never happens.
+   *  Measured 2026-08-23: a profiling script kept a watcher alive and held the
+   *  machine awake for twenty-four minutes with the walk resting and the log
+   *  silent.
+   *
+   *  AN HOUR IS GENEROUS ON PURPOSE. The longest real job measured here is the
+   *  full test battery at about a hundred seconds, so an hour cuts nothing
+   *  that is actually working. */
+  static JOB_MAX_AGE_MS = 60 * 60_000;
 
   get power(): { block_sleep: boolean; shutdown_at_idle: boolean } {
     return { block_sleep: this._blockSleep, shutdown_at_idle: this._shutdownAtIdle };
@@ -86,7 +98,9 @@ export class Liveness {
 
   setPower(key: string, on: boolean): Record<string, unknown> {
     if (key === "block-auto-sleep") this._blockSleep = on;
-    else if (key === "shutdown-at-idle") this._shutdownAtIdle = on;
+    // THE OLD KEY IS STILL ACCEPTED. The control was renamed on 2026-08-23 and
+    // a panel served before the rename still posts the old one.
+    else if (key === "shutdown-at-front-desk" || key === "shutdown-at-idle") this._shutdownAtIdle = on;
     else {
       throw new Rejection({
         clause: CLAUSES.REQUIRED_ARGS,
@@ -118,7 +132,7 @@ export class Liveness {
   /** All three must hold: parked, quiet, and nothing of ours still running. */
   idleFor(ms: number): boolean {
     if (Date.now() - this.lastActivity < ms) return false;
-    if (anyJobRunning()) return false;
+    if (anyJobRunning(Liveness.JOB_MAX_AGE_MS)) return false;
     const active = this.host.describe().active as string[];
     return active.length > 0 && active.every((a) => Liveness.RESTING.has(a.split("/").pop()!));
   }

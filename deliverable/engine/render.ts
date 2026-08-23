@@ -670,10 +670,13 @@ function crumbsFor(m: MirrorState, decl: MachineDecl): string {
  *
  *  NOTHING ROUTED SHOWS AS NOTHING, never as a dash. An empty target is a real
  *  state of the walk, and the absence of the arrow says it. */
-function aimChipFor(aimed: string): string {
-  if (aimed === "") return "";
-  const leaf = aimed.split("/").pop() ?? aimed;
-  return `<span class="aim" title="the walk is aimed at ${esc(aimed)}" style="display:inline-flex;align-items:center;gap:4px;color:var(--se-accent);white-space:nowrap">→ ${esc(leaf)}</span>`;
+function aimChipFor(aim: { path: string; machine: string; leaf: string } | undefined): string {
+  if (aim === undefined) return "";
+  // IT IS A BUTTON NOW (owner ruling 2026-08-23), drawn like the position
+  // button beside it. Jumping the view to where the walk is AIMED is the same
+  // thing a reader wants as jumping to where it STANDS, so it is the same
+  // control wearing a different arrow.
+  return `<button class="ghost cur-state aim" data-machine="${esc(aim.machine)}" data-state="${esc(aim.leaf)}" title="the walk is aimed at ${esc(aim.path)} — click: jump the view to it">→ ${esc(aim.leaf)}</button>`;
 }
 
 export function renderMirror(
@@ -789,7 +792,7 @@ export function renderMirror(
   // IT IS NOT A BUTTON. The position is clickable because jumping the view to
   // it is a thing a reader wants; the target is a fact, and nothing happens if
   // you press a fact.
-  const aimChip = aimChipFor(m.session.target);
+  const aimChip = aimChipFor(model.aim);
   const machineWidget = `<div class="widget" id="w-machine"><div class="widget-head"><span class="crumbs">${crumbs}</span><span class="head-controls" style="display:flex;align-items:center;gap:10px">${curBtn}${aimChip}<span class="head-sliders" style="display:flex;align-items:center;gap:10px">${slider}${nrBar}</span>${escapeBtn}<button class="expand" data-widget="w-machine" data-url="/widget/machine?view=${encodeURIComponent(decl.id)}" title="expand · ctrl-click: new tab · shift-click: new window — both open frozen on what this card is showing">⛶</button></span></div><div class="widget-body">${svg}</div></div>`;
   const detailsWidget = `<div class="widget" id="w-details">${widgetHead("details", "w-details", "/widget/details")}
     ${info.status === "closed" ? '<div class="meta" style="color:var(--se-fail)">machine closed</div>' : ""}
