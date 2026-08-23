@@ -20,6 +20,7 @@ import { capMiddle } from "./jsonio.ts";
 import type { ToolDef } from "./mcp.ts";
 import { resolveInRoot, seDir } from "./paths.ts";
 import { type MirrorState, renderMirror } from "./render.ts";
+import { readRigorMatrix } from "./rigor-matrix.ts";
 import {
   jobAcknowledge,
   jobAcknowledgeSettled,
@@ -27,9 +28,12 @@ import {
   jobList,
   jobStatus,
   jobStop,
+  noteModel,
   noteProgress,
+  noteRole,
   noteStarted,
   openOperation,
+  retireOtherMilestones,
   runBackground,
   runToCompletion,
   settleOperation,
@@ -68,7 +72,12 @@ function batteryRecord(se: string): { pace: string; total?: number } {
  *  reader to stop looking. An estimate revised upward later is honest; silence
  *  is not. */
 function stepsAsked(args: Record<string, unknown>, verb: string): number {
-  const n = args.steps;
+  // A HOST MAY SEND THE COUNT AS TEXT. Some harnesses serialise a numeric
+  // argument as a string, and this check is the only place that reads one
+  // strictly, so the agent verb refused a count the shell verb accepted.
+  // A string that IS a number is an answer; anything else still refuses.
+  const raw = args.steps;
+  const n = typeof raw === "string" && raw.trim() !== "" ? Number(raw) : raw;
   if (typeof n === "number" && Number.isFinite(n) && n > 0) return Math.round(n);
   throw new Rejection({
     clause: CLAUSES.REQUIRED_ARGS,
@@ -83,20 +92,100 @@ function stepsAsked(args: Record<string, unknown>, verb: string): number {
   });
 }
 
+/** WHICH MODEL ANSWERS FOR THIS HAND, and a refusal when nobody says.
+ *
+ *  THE RETRO CANNOT WEIGH SPAWNING WITHOUT IT. The question it must answer is
+ *  whether putting work on a second hand paid for itself, and that is a
+ *  question about tokens, which is a question about which model ran.
+ *
+ *  A LABEL IS NOT A RECORD. Naming the model inside the description works only
+ *  while somebody remembers, and the first hand spawned under this roster was
+ *  registered without one. */
+function modelAsked(args: Record<string, unknown>): string {
+  const m = args.model;
+  if (typeof m === "string" && m.trim() !== "") return m.trim();
+  throw new Rejection({
+    clause: CLAUSES.REQUIRED_ARGS,
+    expected: "model: which model answers for this hand, so the retro can weigh what the spawn cost",
+    got: m === undefined ? "no model" : String(m),
+    remedy: {
+      tool: "se_run",
+      args: { agent: "<what it is for>", steps: 5, model: "sonnet" },
+      note: "a shell run needs none and records as script; only a spawned hand is asked",
+    },
+    source: "engine/tools-run.ts modelAsked",
+  });
+}
+
+/** WHERE A SPAWNED JOB SITS, so it can be stamped without the caller
+ *  declaring a state — a declared state is a claim that can be wrong. The
+ *  milestone follows from the rigor matrix row whose name matches the
+ *  state's last segment — the same join the matrix uses everywhere else. */
+function agentPosition(root: string, positionOf?: () => string): { state?: string; milestone?: string } {
+  const state = positionOf?.();
+  if (state === undefined) return {};
+  const milestone = readRigorMatrix(root).rows.find((r) => r.name === state.split("/").pop())?.milestone;
+  return { state, ...(milestone === undefined ? {} : { milestone }) };
+}
+
+/** WHICH HAND IS BEING REGISTERED — walker, reviewer or researcher.
+ *
+ *  ONLY A WALKER COUNTS AGAINST THE RECORD'S CEILING (owner ruling
+ *  2026-08-23). A reviewer buys separation and a researcher buys reading
+ *  nobody has done; neither competes for the walking slot, and neither should
+ *  be able to strand the next phase by filling it.
+ *
+ *  IT DEFAULTS TO `walker`, which is the conservative direction: an unnamed
+ *  hand counts, so a forgotten role can never quietly raise the ceiling. */
+function roleAsked(args: Record<string, unknown>): string {
+  const raw = args.role;
+  if (raw === "walker" || raw === "reviewer" || raw === "researcher") return raw;
+  return "walker";
+}
+
 /** The job side of se_run: list, stop, wait or status. Undefined when the
  *  call names no job — the command side handles it. */
-function jobArm(args: Record<string, unknown>, root: string): unknown {
+function jobArm(args: Record<string, unknown>, root: string, positionOf?: () => string): unknown {
   if (args.jobs === true) return { jobs: jobList(root) };
   // A SUBAGENT IS WORK OUT OF SIGHT, so it belongs on the same list. Nothing
   // here can observe one, so the agent that spawned it registers it and closes
   // it. An unclosed one shows as running, which is the honest answer.
   if (typeof args.agent === "string" && args.agent !== "") {
     const id = `agent-${Date.now().toString(36)}`;
-    openOperation({ id, kind: "agent", command: args.agent, root, steps: stepsAsked(args, "agent") });
+    const model = modelAsked(args);
+    const role = roleAsked(args);
+    const at = agentPosition(root, positionOf);
+    // ONE WALKER PER MILESTONE, AND THE HANDOVER IS VISIBLE. Registering a hand
+    // for a new milestone retires the hands of every other one, so the table
+    // shows the M1 walker going as the M2 walker arrives rather than both
+    // standing for ever.
+    //
+    // THIS IS THE ONE MOMENT THE ENGINE RELIABLY LEARNS the previous milestone
+    // is over. It cannot see a spawned hand die — the harness owns that process
+    // — so a row otherwise reads `running` long after the agent is gone.
+    const retired = at.milestone === undefined ? [] : retireOtherMilestones(at.milestone);
+    openOperation({
+      id,
+      kind: "agent",
+      command: args.agent,
+      root,
+      steps: stepsAsked(args, "agent"),
+      ...at,
+    });
+    noteModel(id, model, root);
+    noteRole(id, role, root);
     noteStarted(id, root);
     return {
       agent: id,
-      note: 'report with se_run {job: "<id>", did: <n>} and close with se_run {agent_done: "<id>"}',
+      ...(retired.length === 0 ? {} : { retired }),
+      // THIS USED TO POINT A SPAWNED HAND AT se_run TO REPORT PROGRESS, and
+      // se_run IS LEGAL ONLY IN THE SPAWN STATE — nowhere the hand itself
+      // ever stands. The instruction refused on the hand's first attempt,
+      // silently: it read like working guidance because nothing checked
+      // whether the tool it named was one the hand could actually call.
+      // The real channel is the update system, which rides every lane call
+      // a hand already makes; its opening plan sets the job's length.
+      note: 'report through update: {op: "plan", items: [...]} on your first lane call, then update: {op: "done", node, brief} as each item resolves — the plan\'s item count sets this job\'s length. Close with se_run {agent_done: "<id>"}',
     };
   }
   // SAY HOW FAR ALONG, and revise the total where the work turned out bigger.
@@ -278,6 +367,10 @@ export function runTools(
   projectRoot: string,
   _reading?: ReadingHook,
   mirror?: () => MirrorState,
+  /** WHERE THE WALK STANDS, for stamping a spawned job's milestone at
+   *  registration. The engine reads its own position; a caller-declared
+   *  state would be a claim that can be wrong. */
+  positionOf?: () => string,
 ): ToolDef[] {
   return [
     {
@@ -365,7 +458,12 @@ export function runTools(
           agent: {
             type: "string",
             description:
-              "REGISTER A SUBAGENT YOU JUST SPAWNED, saying in one line what it is doing. It then rides the work account and the panel like every other background task. Nothing here can see a subagent for itself — the harness spawns it, so you are the one who knows.",
+              "REGISTER A SUBAGENT YOU JUST SPAWNED, saying in one line what it is doing, and NAME ITS MODEL with the model argument. It then rides the work account and the panel like every other background task. Nothing here can see a subagent for itself — the harness spawns it, so you are the one who knows. HAND IT THE RETURNED ID so it can report progress; a hand that never reports reads as idle whatever it is doing.",
+          },
+          model: {
+            type: "string",
+            description:
+              "WHICH MODEL ANSWERS FOR THIS HAND. Required alongside agent, because the retro's question is whether spawning paid for itself, and that cannot be answered without knowing what ran. A shell run needs none and records as script.",
           },
           agent_done: { type: "string", description: "close a registered subagent by its id; pass ok: false where it failed" },
           ok: { type: "boolean", description: "with agent_done: whether the subagent succeeded" },
@@ -384,12 +482,18 @@ export function runTools(
               "with job: how many steps are behind you now. Pass steps alongside to revise the total where the work turned out bigger.",
           },
           timeout_ms: { type: "number" },
+          role: {
+            type: "string",
+            enum: ["walker", "reviewer", "researcher"],
+            description:
+              "with agent: which hand this is. Only a walker counts against the record's ceiling — a reviewer and a researcher are a different purchase. Defaults to walker.",
+          },
           cwd: { type: "string", description: "root-relative working directory" },
         },
       },
       handler: async (args) => {
         const root = rootOf();
-        const job = jobArm(args, root);
+        const job = jobArm(args, root, positionOf);
         if (job !== undefined) return job;
         if (args.command === undefined) {
           throw new Rejection({

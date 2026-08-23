@@ -13,6 +13,23 @@
 //
 // IT FALLS THROUGH WITH NO ITEMS, like per-item: an empty source becomes a
 // plain text box rather than an empty box pretending to be a form.
+//
+// A REFERENCE IS A LINK, NEVER TEXT (owner ruling 2026-08-23). An item ending
+// in a bracketed path renders that path as a clickable link, in the same
+// `doclink` shape the mirror already uses everywhere else.
+//
+// THE RULE IS GENERAL AND THIS IS ONE PLACE IT LANDS. Wherever a surface holds
+// a path, an id or a URL, it is rendered as something a reader can follow. A
+// path printed as plain text asks the reader to go and find it by hand, which
+// is a worse version of a job the page could have done.
+//
+// THE LINK SITS OUTSIDE THE LABEL, on purpose. A link inside a `<label>` toggles
+// the checkbox when clicked, so following a reference would silently tick the
+// box it was explaining.
+//
+// `data-item` KEEPS THE WHOLE ORIGINAL LINE, including the bracketed path, so
+// what the collector writes back is byte-identical to the catalog's own item.
+// Only the DISPLAY splits.
 import type { EditorKind } from "./kinds.ts";
 
 export const CHECKLIST_EDITOR: EditorKind = {
@@ -25,7 +42,10 @@ export const CHECKLIST_EDITOR: EditorKind = {
         const owed = lines.filter(function (l) { return l.indexOf("- [owed] " + it + " ") === 0; })[0] || "";
         const mark = owed !== "" ? ' disabled data-owed="' + escText(owed) + '"' : "";
         const tail = owed !== "" ? ' <span class="muted">' + escText(owed.slice(("- [owed] " + it + " ").length)) + "</span>" : "";
-        return '<div class="sfrow"><label class="sfck"><input type="checkbox" class="sfckbox" data-field="' + name + '" data-item="' + escText(it) + '"' + mark + (done ? " checked" : "") + '> <span>' + escText(it) + "</span>" + tail + "</label></div>";
+        const ref = /(([^()\\s]+\\.[A-Za-z0-9]+))\\s*$/.exec(it);
+        const label = ref ? it.slice(0, ref.index).trim() : it;
+        const link = ref ? ' <a class="doclink" data-path="' + escText(ref[1]) + '">' + escText(ref[1]) + "</a>" : "";
+        return '<div class="sfrow"><label class="sfck"><input type="checkbox" class="sfckbox" data-field="' + name + '" data-item="' + escText(it) + '"' + mark + (done ? " checked" : "") + '> <span>' + escText(label) + "</span>" + tail + "</label>" + link + "</div>";
       }).join("") + "</div>";
     }
   `,

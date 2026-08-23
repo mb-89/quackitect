@@ -14,7 +14,7 @@ import { stripBom } from "./jsonio.ts";
  *  property — req-acts-carry-role-and-channel's Detail fixed it at two until
  *  2026-08-20, which is why no design about which of two agents walks a step
  *  could ever score on it. */
-export type CallPart = "owner" | "walker" | "guide" | "reviewer" | "surface";
+export type CallPart = "owner" | "walker" | "guide" | "reviewer" | "researcher" | "surface";
 
 export interface CallRecord {
   ref: string;
@@ -63,6 +63,12 @@ export interface CallRecord {
    *  argument, so the log can be grouped by it —
    *  req-every-call-records-the-state-it-was-made-in. */
   state?: string;
+  /** SOLO OR SPAWNED, at the moment this call was served. `.se/settings.json`
+   *  is session-global and gets rewritten, so a retro reading it later learns
+   *  which arm the LAST session ran — not which arm THIS record ran. The
+   *  call log is the archive; this stamp is what makes the two arms
+   *  comparable per record rather than per session. */
+  hands?: "solo" | "spawned";
   /** WHICH OF THE FIELDS ABOVE ARE SELF-REPORTED. The state is known where the
    *  call is served; the model and the part are known only to the caller. A
    *  field that reads like an observation and is a claim is worse than an
@@ -132,7 +138,12 @@ const STAT_EVERY = 50;
  *  time. A vocabulary that holds for our own code and for nothing arriving
  *  through a lane call is not closed — see
  *  req-every-call-records-the-part-its-caller-played. */
-const PARTS: ReadonlySet<string> = new Set<CallPart>(["owner", "walker", "guide", "reviewer", "surface"]);
+// `researcher` JOINED ON 2026-08-23. It was left out on the reasoning that a
+// researcher need not report to the log — true of the log, false of liveness.
+// A hand whose part is not in this set cannot have its narration attributed to
+// it, so the work table marked a working researcher idle and could not be told
+// otherwise.
+const PARTS: ReadonlySet<string> = new Set<CallPart>(["owner", "walker", "guide", "reviewer", "researcher", "surface"]);
 
 /** THE TWO COORDINATES ONLY THE CALLER KNOWS. The state is written by the
  *  handler that served the call; these two are claims and are marked. */

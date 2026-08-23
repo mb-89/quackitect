@@ -55,6 +55,78 @@ milestone starts from what this one found rather than searching from nothing.
 - A bless does not outlive its evidence. When an input under the claim moves, the sign-off and the bless come off and a `suspect:` line goes on, naming what moved.
 - A gate refuses while any FEEDER state is unsigned. The review covers the input cone, so the cone must stand before the gate can be judged.
 
+## THREE HANDS READ A GATE, AND NONE OF THEM GRADES ITS OWN WORK
+
+Owner ruling 2026-08-23, after a gate was authored and blessed by one hand.
+
+THE WALKER AUTHORS the fields, because it walked the phase they describe.
+
+THE REVIEWER JUDGES IT COLD. It is spawned for the gate with no shared
+context and reads only the artifacts. That is what makes it worth spawning:
+it cannot be told that something was already discussed.
+
+SO IT IS SPAWNED AT THE GATE, NEVER EARLIER (owner ruling 2026-08-23). A hand
+started back at the milestone's spawn state would sit through the whole phase.
+The shared context it picked up there is the one thing a reviewer must not
+have, so starting it early destroys the only reason to start it at all.
+
+THE GATE THEREFORE REGISTERS ITS OWN HAND. `se_run` is legal in a gate state
+for that reason, and outside a spawn state it is legal nowhere else.
+
+A SPAWN STATE STARTS THE WALKER AND NOTHING ELSE. Each hand is started where
+its work begins: the researcher where the research happens, the reviewer here.
+
+THE REVIEWER RE-READS WHAT THE PHASE READ. It is a different reader, so a
+reading proof the walker gave says nothing about what this hand holds. NOT
+BUILT YET — the reading ledger is still per record, so it will report the
+reading as already done. Until it is per hand, tell the reviewer what to read
+rather than trusting the ledger to ask.
+
+## A REVIEWER IS NEVER WEAKER THAN THE GUIDE (owner ruling 2026-08-23)
+
+JUDGMENT CANNOT BE DELEGATED DOWNWARD. The reviewer decides whether work
+stands, so the hand that judges is at least as strong as the hand that wrote.
+
+- IT TAKES THE GUIDE'S OWN MODEL, or a stronger one. Never a cheaper one.
+- THIS BINDS EVERY JUDGING STEP, not only a gate: a review round, a red team,
+  a verdict, a recommendation, a score.
+- WALKING IS DIFFERENT, and that is why the rule is narrow. A walker
+  transcribes, fills and moves the record, and the machine checks its work. A
+  cheaper hand is legitimate there.
+
+MEASURED THE DAY IT WAS WRITTEN. A strong guide handed a weaker hand the job
+of judging a gate that guide had authored. The review was useful — it found
+two real gaps — and the arrangement was still wrong.
+
+WHY IT IS WORSE THAN IT LOOKS. A weak judge that MISSES something leaves no
+trace of having missed it. The gate reads green, the record moves on, and
+nothing downstream ever re-opens the question. A weak walker's mistake shows
+up as a refusal; a weak judge's mistake shows up as nothing at all.
+
+THE REVIEWER DOES NOT COUNT AGAINST THE RECORD'S CEILING, and neither does a
+researcher (same ruling). Only walkers do. Register it as
+`se_run {agent: "…", model: "…", role: "reviewer"}` so the count is right — a
+reviewer that filled the walking slot stranded the next phase outright.
+
+THE GUIDE LOOKS FOR DRIFT, and for nothing else. It held the record across the
+phase, so it is the only hand that can see a gate answering a question that
+was superseded, or quietly dropping a ruling made mid-phase. Neither is
+visible in the artifacts, so neither is visible to the reviewer.
+
+THE GUIDE'S PASS IS ONE QUESTION: does this contradict anything I watched
+happen? It is not a second review. A guide that re-reviews pays the reviewer's
+price without the reviewer's independence, and it agrees with itself.
+
+IT COSTS ALMOST NOTHING, which is why both run. The reviewer's expense is
+loading a fresh context in order to read cold. The guide is already carrying
+the record, so its pass is nearly free. This is one expensive read and one
+cheap one, not double tokens.
+
+AND THE GUIDE MUST NOT BLESS. Where it answered the walker's questions during
+the phase, it co-authored the work, and its bless would be the i15 failure
+wearing a better name. The bless belongs to the reviewer or to the person, as
+the dial decides.
+
 ## AN OVERRIDE IS A REGISTER ENTRY OR IT IS A SENTENCE
 
 Owner ruling 2026-08-15: "If pass with overrides needs to declare action items

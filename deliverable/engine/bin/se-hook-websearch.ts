@@ -19,8 +19,14 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { SE_VERSION } from "../version.ts";
 
-// bin -> engine -> deliverable -> product -> the project root.
-const root = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..", "..", "..");
+// bin -> engine -> deliverable -> the project root. THREE hops, not four.
+//
+// IT CLIMBED FOUR UNTIL 2026-08-23, landing outside the repository. The layout
+// once carried a `product/` folder between the root and `deliverable/`, and the
+// hop survived its removal. Every search this hook was built to record reached
+// a folder that is not the project. Its sibling se-hook-stop.ts carried the
+// same line and the same silence.
+const root = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
 
 let raw = "";
 process.stdin.setEncoding("utf8");

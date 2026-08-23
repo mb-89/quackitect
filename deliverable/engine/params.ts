@@ -304,14 +304,20 @@ function clock(ms: number): string {
  *  THE ELAPSED TIME RIDES THE ETA CELL when there is no estimate, because a
  *  person watching wants to tell a slow task from a hung one either way. */
 function taskRow(r: RunningRow): PanelCell[] {
-  // THE NAME CARRIES THE WHAT ON ITS TOOLTIP. The description has no column:
-  // a person scanning wants how far along and when, and reaches for what it is
-  // only when one row surprises them.
-  const name = { text: r.name, title: r.what };
+  // THE TOOLTIP CARRIES WHAT IT IS DOING NOW (owner ruling 2026-08-23). The
+  // LATEST narration beats the spawn line: the spawn line never changes and
+  // answers nothing after the first minute, while a person hovering wants to
+  // know the current step.
+  //
+  // THE SPAWN LINE STILL RIDES ALONG, after it, because a reader who has just
+  // opened the panel needs to know what this hand is FOR as well as what it is
+  // doing this second.
+  const doing = r.last_brief === undefined ? r.what : `${r.last_brief} — ${r.what}`;
+  const name = { text: r.name, title: doing };
   const progress =
     r.steps_total === undefined
       ? { text: "—", title: "this task did not say how many steps it has" }
-      : { text: `${r.steps_done ?? 0}/${r.steps_total}`, title: r.what };
+      : { text: `${r.steps_done ?? 0}/${r.steps_total}`, title: doing };
   const eta =
     r.remaining_ms === undefined
       ? { text: "—", title: r.basis ?? "not enough done yet to project" }
@@ -322,7 +328,24 @@ function taskRow(r: RunningRow): PanelCell[] {
     r.status === "idle"
       ? { text: "idle", title: "nothing reported for two minutes — this helper is free" }
       : { text: "working", title: "reporting as it goes" };
-  return [name, status, progress, eta];
+  // THE MODEL IS A COLUMN, NOT A LABEL. A shell run says `script`, so a reader
+  // never has to work out which rows are agents and which are not.
+  const model =
+    r.model === undefined
+      ? { text: "unreported", title: "registered before the model was asked for" }
+      : { text: r.model, title: r.model === "script" ? "not an agent — a shell run or a battery" : "the model that answered" };
+  // THE MILESTONE IS NOT A COLUMN (owner ruling 2026-08-23). This table is
+  // GENERIC: a shell run and a battery belong in it too, and neither has a
+  // milestone. A column that is empty for whole classes of row teaches the
+  // reader to ignore it.
+  //
+  // IT RIDES THE NAME INSTEAD, where the caller already writes it — "walker M2:
+  // …". The engine still RECORDS the milestone on the job, because retiring
+  // the previous milestone's hands depends on knowing it.
+  //
+  // THE MODEL STAYS, and only because every row can answer it: a shell run
+  // reads `script`, so that column is never blank.
+  return [name, model, status, progress, eta];
 }
 
 /** THE SIDEBAR'S PANELS, IN THE ONE ORDER THERE IS.
@@ -343,7 +366,7 @@ export function renderSidebar(root: string, v: PanelValues): string {
  *  than in the job registry: what a person reads is this file's business. */
 export function tasksTable(rows: RunningRow[]): PanelTable {
   return {
-    columns: ["task", "status", "progress", "eta"],
+    columns: ["task", "model", "status", "progress", "eta"],
     rows: rows.map(taskRow),
     empty: "nothing running",
   };

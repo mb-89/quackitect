@@ -1,7 +1,8 @@
 ---
 form: onboard-retro
+reopened: "2026-08-23T14:25:12.393Z — spawn-the-hands was re-signed with drawn checkbox evidence and the corrected spawn rules, so onboard-retro answered older ground"
 by: agent
-signed_off: 2026-08-23T12:16:59.061Z
+signed_off: 2026-08-23T14:25:30.557Z
 authors: agent
 files:
 ---

@@ -2,7 +2,9 @@
 form: gate-kickoff
 bless: blessed by agent
 by: agent
-signed_off: 2026-08-23T12:25:40.415Z
+signed_off: 2026-08-23T15:06:23.002Z
+reopened: "2026-08-23T14:26:24.405Z — onboard-retro was re-signed after it, so gate-kickoff answered older ground"
+amended: "2026-08-23T12:39:02.523Z by agent — a pass-with-overrides verdict may not answer none, per meth-gate-review line 63; both overrides now carry a standing register entry"
 authors: agent
 files:
 ---
@@ -17,10 +19,10 @@ Its scope was reset by the owner at this gate: i23 keeps only what needs their j
 
 ## retro_drained
 
-- inbox: zero, drained at onboard-retro in this sitting
-- note-f2e9176a0c01: backlog, minted as a token this record can pull
-- note-abe4e5e0213f: backlog, minted as a token this record can pull
-- field feedback: given live by the owner through the session, recorded on the retro form
+- note-b4ea4a950b4f: DONE. The stop hook climbed four levels from bin/ to a `product/` folder this tree no longer has, so it read a call log outside the repository, found none, and took its no-pull-on-record pass every time. Fixed to three levels 2026-08-23 and verified live — it blocked this session's own stop twice.
+- note-ebf5ec31f1e6: OBSOLETE as written. `se_run` being refused inside work states is the design, not a fault. What the note actually hit was guidance telling hands to REPORT with `se_run`; that was wrong and is fixed, and a hand now reports through the update system riding every lane call.
+- note-4dcd87224364: DONE in part. Gates can now register the reviewer they spawn, which was the missing half. The reviewer spawns AT the gate, never earlier, so it cannot inherit the context it exists to lack.
+- note-2c2ee6a829d1: DONE. Both pieces the blocked hand could not land have landed — the milestone stamped on a registered hand with its own table column, and the walker dial stamped on the call record.
 
 ## goals
 
@@ -79,7 +81,8 @@ major — the archived record must render through the same sub-machine as a live
 
 ## raid_additions
 
-- none
+- raid-r-the-panel-round-carries-more-than-it-opened-with
+- raid-r-two-records-reach-the-same-two-renderers
 
 ## verdict
 
@@ -99,3 +102,16 @@ THE OWNER'S OWN PRIORITY WAS EXPLICITLY NOT IMPORTANCE. They named it first to c
 
 ## anything_else
 
+## walkers
+
+1 — the norm, one guide and one walker, as a CEILING rather than a quota.
+
+WHAT THE NUMBER MEANS HERE. At most one walker stands against this record at a time. The guide decides at each spawn state whether that phase earns a hand at all, and spawning none is a legitimate answer needing no excuse.
+
+WHY ONE AND NOT MORE. Nothing in this record fans out. It is a sequence of named edits in engine files, and parallel hands would contend over the same files rather than cover more ground.
+
+WHY NOT ZERO. Zero removes separation entirely: the guide would author and bless every gate with no cold hand reading anything. Keeping the ceiling at one leaves that available where it is worth buying, which is at a gate.
+
+WHAT WILL ACTUALLY BE SPAWNED, stated honestly rather than promised. Probably very little. Measured on 2026-08-23, three hands each spent roughly fifteen minutes reading before their first edit, on tasks where the guide had already supplied file names and line numbers. That is the shape of work that must NOT go to a hand, and most of this record has that shape.
+
+WHAT WILL GO TO A HAND. Trivial work only: walking states already met, filling what already stands, one shape repeated across many files, or breadth the guide has not read. The rule is now written into the spawn card so it binds every phase rather than living in this rationale.

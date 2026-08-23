@@ -5,7 +5,7 @@ statement: "Converge on the winner: Pugh controlled convergence over the front."
 state_kind: work
 filled_by: agent
 depends_on:
-  - gate-candidates
+  - spawn-for-architecture
 legal_tools:
   - se_file_read
   - se_file_write

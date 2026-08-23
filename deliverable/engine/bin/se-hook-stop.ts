@@ -49,9 +49,20 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { recordLifecycle } from "../lifecycle.ts";
 
-// bin -> engine -> deliverable -> product -> the project root. The env
-// override is the test seam — the suite points the hook at a crafted log.
-const root = process.env.SE_HOOK_ROOT ?? resolve(dirname(fileURLToPath(import.meta.url)), "..", "..", "..", "..");
+// bin -> engine -> deliverable -> the project root. THREE hops, not four.
+//
+// IT CLIMBED FOUR AND LANDED OUTSIDE THE REPOSITORY. The layout once carried a
+// `product/` folder between the root and `deliverable/`, and the extra hop
+// survived its removal. The root then resolved to the repository's PARENT,
+// where no call log exists.
+//
+// THE FAILURE WAS SILENT AND TOTAL. No log means no pull on record, which is
+// one of the three sanctioned stops, so the hook allowed every stop it was
+// built to refuse. A tooth aimed at an empty folder bites nothing, and the
+// swallow-everything exit made a broken check look like a permitted stop.
+//
+// The env override is the test seam — the suite points the hook at a crafted log.
+const root = process.env.SE_HOOK_ROOT ?? resolve(dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
 
 // The newest pull can carry a whole document, so the tail window is wide.
 const TAIL_BYTES = 4 * 1024 * 1024;

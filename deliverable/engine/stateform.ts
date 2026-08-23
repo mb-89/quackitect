@@ -521,6 +521,7 @@ const CATALOG_SOURCES: Record<string, string> = {
   $heuristics: "heuristics",
   $transform_operators: "transform_operators",
   $triz_separations: "triz_separations",
+  $spawn_hands: "spawn_hands",
 };
 
 /** see dsp-the-goal-binds-the-walk.md#the-iterations-own-goals */

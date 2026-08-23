@@ -5,7 +5,7 @@ statement: Draft the vision packet. It holds the big idea and the world it makes
 state_kind: work
 filled_by: agent
 depends_on:
-  - gate-kickoff
+  - spawn-for-motivation
 legal_tools:
   - se_file_read
   - se_file_write

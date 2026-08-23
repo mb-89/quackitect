@@ -5,7 +5,7 @@ statement: "The criteria fall out of the register: pairwise judgments in, the we
 state_kind: work
 filled_by: agent
 depends_on:
-  - gate-requirements
+  - spawn-for-candidates
 entry_read:
   - deliverable/machines/methods/meth-derive-criteria.md
 legal_tools:

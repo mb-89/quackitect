@@ -5,7 +5,7 @@ statement: Rank the unknowns and timebox the spikes - seeded from RAID, tripwire
 state_kind: work
 filled_by: agent
 depends_on:
-  - gate-architecture
+  - spawn-for-prototype
 seeds: spikes
 exit_script:
   - deliverable/engine/bin/grades-complete.ts

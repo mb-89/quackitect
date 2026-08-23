@@ -265,6 +265,20 @@ export class Session {
    *  two notches above it unlock one press at a time, exactly like the autonomy
    *  rungs above the resting one. machines/stopat.md holds what each means. */
   private _stopAt = 2;
+  /** WHICH ARM THIS SESSION IS RUNNING, as a label on every call record so a
+   *  retro can compare records walked with hands against records walked
+   *  without them.
+   *
+   *  IT IS AN ANNOTATION AND NEVER THE ENFORCEMENT. How many walkers a record
+   *  may run with is decided at its kickoff gate and read from that record's
+   *  own evidence by `hands-spawned.ts`. There is exactly one place to change
+   *  it and one place to read it.
+   *
+   *  THE COUNT WAS BRIEFLY KEPT HERE TOO AND THAT WAS WRONG (owner ruling
+   *  2026-08-23). Session state is global to the session, so a per-record
+   *  number kept here leaks into every other record, and two sources that can
+   *  disagree are worse than the one that is right. */
+  private _hands: "solo" | "spawned" = "spawned";
   /** ONE RELEASE, GRANTED BY THE PERSON. Under `state end` the engine holds
    *  every transition; a press spends one. It is permission, never a move —
    *  the agent's pull is still what walks (req-controls-never-advance-walk). */
@@ -516,6 +530,14 @@ export class Session {
   /** THE LAST ENGINE'S SETTINGS, restored only under the same session stamp.
    *  Its own phase, and its own function: the constructor crossed the
    *  complexity ceiling when the reading credit joined it. */
+  /** THE ARM LABEL, RESTORED. It annotates the call log and enforces nothing.
+   *
+   *  IT IS ITS OWN METHOD because restoreSettings already sits at the
+   *  complexity ceiling, and one more branch inside it crosses. */
+  private restoreDial(hands: unknown): void {
+    if (hands === "solo" || hands === "spawned") this._hands = hands;
+  }
+
   private restoreSettings(): void {
     try {
       const s = JSON.parse(readFileSync(join(seDir(this.machineRoot()), "settings.json"), "utf8")) as {
@@ -530,6 +552,7 @@ export class Session {
         target?: string;
         at?: string;
         stop_at?: number;
+        hands?: string;
         session?: string;
       };
       const mine = process.env.SE_SESSION;
@@ -541,6 +564,7 @@ export class Session {
       if (typeof s.session === "string" && s.session !== "" && s.session !== mine) this._staleSettings = true;
       if (mine !== undefined && mine !== "" && s.session === mine) {
         if (typeof s.autonomy === "number" && s.autonomy >= 0 && s.autonomy <= 1) this._autonomy = s.autonomy;
+        this.restoreDial(s.hands);
         // Emergency rides its rung: restored only beside a top-rung autonomy.
         if (s.emergency === true && this._autonomy >= 1) this._emergency = true;
         this.live.restore(s.block_sleep, s.shutdown_at_idle);
@@ -612,6 +636,10 @@ export class Session {
         `${JSON.stringify({
           session: process.env.SE_SESSION ?? null,
           autonomy: this._autonomy,
+          // ON DISK BECAUSE A SEPARATE PROCESS ASKS. The exit script that
+          // enforces spawning cannot see this session's memory, so the dial
+          // has to reach it through the settings file.
+          hands: this._hands,
           emergency: this._emergency,
           ...this.live.power,
           narration_minutes: this._narrationMinutes,
@@ -1507,6 +1535,13 @@ export class Session {
   inRetro(): boolean {
     const { machine, ids } = this.leaves();
     return ids.some((id) => id === "retro" || machine.states.find((s) => s.id === id)?.same_as === "retro");
+  }
+
+  /** SOLO OR SPAWNED, for the call record. `_hands` is private so a caller
+   *  cannot mutate it through this getter — only the settings-file read path
+   *  inside this class ever flips it. */
+  hands(): "solo" | "spawned" {
+    return this._hands;
   }
 
   /** The machine standing behind a qualified prefix ("" is main). A prefix
@@ -3002,6 +3037,7 @@ export class Session {
         .startsWith(".se/answers/")
     )
       return;
+
     // EMERGENCY OPENS EVERY DOOR, including on a closed machine — a machine
     // that will not move is precisely when the repair is needed.
     if (this._emergency) return;

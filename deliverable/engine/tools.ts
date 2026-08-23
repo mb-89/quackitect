@@ -26,7 +26,7 @@ import { openPanel } from "./panel.ts";
 import { seDir } from "./paths.ts";
 import { produceProject, produceVehicle } from "./produce.ts";
 import type { MirrorState } from "./render.ts";
-import { runToCompletion, workAccount } from "./run.ts";
+import { noteAlive, runToCompletion, workAccount } from "./run.ts";
 import { requiredDependsOn } from "./seed.ts";
 import { type AmendOp, Session } from "./session.ts";
 import { Toll } from "./toll.ts";
@@ -477,6 +477,10 @@ export function coreTools(
    *  a path. Defaults to nothing, which stamps nothing, exactly as writing
    *  outside a record always did. */
   boundRecord: () => string | undefined = () => undefined,
+  /** WHERE THE WALK STANDS, threaded to runTools so a spawned job can be
+   *  stamped with its milestone at registration without the caller declaring
+   *  one. */
+  positionOf: () => string = () => "",
   // `whereNow` IS DELETED (i6). It existed for one caller: the battery refusal
   // that asked WHERE the walk stood before deciding whether an agent-initiated
   // battery was legal. The owner's ruling moved that decision into the engine
@@ -522,7 +526,7 @@ export function coreTools(
     },
 
     ...fileTools(rootOf, model, reading),
-    ...runTools(rootOf, projectRoot, reading, mirror),
+    ...runTools(rootOf, projectRoot, reading, mirror, positionOf),
     ...deskTools(rootOf, projectRoot, model, judgmentDrainAllowed, reading, doors, mirror),
     ...queryTools(rootOf),
   ];
@@ -590,6 +594,7 @@ export function buildServer(
       () => session.doors(),
       () => ({ session, root, lastPacket: undefined, mode: "manual" }),
       () => session.boundRecordId(),
+      () => session.currentState(),
     ),
   ];
   // WIRED HERE, NOT INSIDE coreTools. searchHelp needs the FULL assembled
@@ -771,6 +776,25 @@ export function buildServer(
         response: result,
       });
       toll.paid();
+      // A DELEGATED HAND'S CHECKLIST IS ITS PROGRESS BAR. A `plan` says how many
+      // steps there are; a resolution says one landed. That is the only
+      // countable thing a spawned hand ever emits, and the work table's
+      // estimate is built from it.
+      //
+      // THE GUIDE'S OWN UPDATES ARE EXCLUDED ON PURPOSE. This session is not a
+      // background job, so counting its narration would advance whichever hand
+      // happened to be newest and report its manager's pace as its own.
+      const counted = whichHand(session, args).part;
+      if (counted === "walker" || counted === "reviewer" || counted === "researcher") {
+        const items = (op as { items?: unknown }).items;
+        const said = (op as { brief?: unknown }).brief;
+        noteAlive(
+          (op as { op?: string }).op,
+          Array.isArray(items) ? items.length : undefined,
+          counted,
+          typeof said === "string" ? said : undefined,
+        );
+      }
     } catch (e) {
       if (!(e instanceof Rejection)) throw e;
       updateRejection = e;
@@ -1141,6 +1165,7 @@ export function buildServer(
 
   // §9 — the single call path logs everything. se_run keeps its full output.
   server.addObserver((rec) => {
+    const hand = whichHand(session, rec.args);
     log.append({
       tool: rec.tool,
       args: rec.args,
@@ -1152,7 +1177,8 @@ export function buildServer(
       // before any move, because the guards throw ahead of the handler.
       // see dsp-call-log.md#the-walk-position-is-stamped-not-inferred
       where: session.active(),
-      ...whichHand(session, rec.args),
+      hands: session.hands(),
+      ...hand,
       ok: rec.ok,
       outcome: rec.outcome,
       duration_ms: rec.duration_ms,
@@ -1162,6 +1188,15 @@ export function buildServer(
       // very file they are already reading.
       response: rec.tool === "se_run" ? rec.response : capJson(rec.response, 500),
     });
+    // A DELEGATED HAND'S NARRATION IS ITS PROGRESS REPORT. A call that
+    // carried an update just proved a walking hand is still walking, so it
+    // refreshes the newest running agent job — the only cure for `statusOf`
+    // reading a busy hand's silence as idle.
+    // A GUIDE, THE OWNER OR THE SURFACE NEVER REFRESH ANYTHING: narrating
+    // ABOUT a walker is not the walker itself narrating.
+    if ((updateResult !== undefined || updateComplaint !== undefined) && (hand.part === "walker" || hand.part === "reviewer")) {
+      noteAlive();
+    }
     if (rec.ok && EDIT_TOOLS.has(rec.tool) && JSON.stringify(rec.args ?? {}).includes(".ts")) kickTypecheck(root);
   });
 

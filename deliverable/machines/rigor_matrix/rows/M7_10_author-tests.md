@@ -5,7 +5,7 @@ statement: Author an executable check for every requirement in scope; examples t
 state_kind: work
 filled_by: agent
 depends_on:
-  - gate-prototype
+  - spawn-for-implementation
 entry_read:
   - deliverable/machines/methods/meth-test-design.md
 legal_tools:

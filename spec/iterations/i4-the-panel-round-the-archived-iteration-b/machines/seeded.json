@@ -1,22 +1,32 @@
 {
   "change_size": "major",
-  "rigor_matrix_hash": "2a02b12ec420",
+  "rigor_matrix_hash": "d70ac371189f",
   "pinned_at": "2026-08-23T12:25:42.351Z",
   "demands": {
+    "spawn-the-hands": {
+      "applies": "full",
+      "evidence": "[[\"hands\",false,\"\",[],\"checklist\",\"\",[],[\"$spawn_hands\"],[]]]",
+      "shape": "[[],false,\"\",\"\"]"
+    },
     "onboard-retro": {
       "applies": "full",
       "evidence": "[[\"field_feedback\",true,\"\",[],\"\",\"\",[],[],[]],[\"notes_drained\",true,\"\",[],\"per-item\",\"\",[],[\"$inbox\"],[]],[\"call_log_mined\",true,\"\",[],\"list\",\"\",[],[],[]],[\"waste_leads\",false,\"\",[],\"list\",\"\",[],[],[]],[\"promotions\",true,\"\",[],\"list\",\"\",[],[],[]],[\"process_stale\",true,\"\",[],\"\",\"\",[],[],[]]]",
-      "shape": "[[],false,\"\",\"\"]"
+      "shape": "[[\"spawn-the-hands\"],false,\"\",\"\"]"
     },
     "gate-kickoff": {
       "applies": "full",
-      "evidence": "[[\"retro_drained\",true,\"\",[],\"per-item\",\"\",[],[\"$inbox\"],[]],[\"goals\",true,\"\",[],\"list\",\"\",[],[],[]],[\"pulled_in\",true,\"\",[],\"list\",\"\",[],[],[]],[\"left_out\",true,\"\",[],\"list\",\"\",[],[],[]],[\"change_size\",true,\"\",[],\"choice-with-rationale\",\"\",[\"patch\",\"minor\",\"major\",\"product\"],[],[]]]",
+      "evidence": "[[\"retro_drained\",true,\"\",[],\"per-item\",\"\",[],[\"$inbox\"],[]],[\"goals\",true,\"\",[],\"list\",\"\",[],[],[]],[\"pulled_in\",true,\"\",[],\"list\",\"\",[],[],[]],[\"left_out\",true,\"\",[],\"list\",\"\",[],[],[]],[\"walkers\",true,\"\",[],\"choice-with-rationale\",\"\",[\"0\",\"1\",\"2\",\"3\"],[],[]],[\"change_size\",true,\"\",[],\"choice-with-rationale\",\"\",[\"patch\",\"minor\",\"major\",\"product\"],[],[]]]",
       "shape": "[[\"onboard-retro\"],true,\"\",\"\"]"
+    },
+    "spawn-for-motivation": {
+      "applies": "full",
+      "evidence": "[[\"hands\",false,\"\",[],\"checklist\",\"\",[],[\"$spawn_hands\"],[]]]",
+      "shape": "[[\"gate-kickoff\"],false,\"\",\"\"]"
     },
     "draft-vision": {
       "applies": "tailored",
       "evidence": "[[\"big_idea\",true,\"\",[],\"\",\"\",[],[],[]],[\"to_be_world\",true,\"\",[],\"\",\"\",[],[],[]],[\"goal_system\",true,\"\",[],\"\",\"\",[],[],[]],[\"moore_pitch\",true,\"\",[],\"\",\"\",[],[],[]]]",
-      "shape": "[[\"gate-kickoff\"],false,\"\",\"\"]"
+      "shape": "[[\"spawn-for-motivation\"],false,\"\",\"\"]"
     },
     "define-actual": {
       "applies": "tailored",
@@ -48,20 +58,25 @@
       "evidence": "[[\"vision_scope_stated\",true,\"\",[],\"\",\"\",[],[],[]],[\"problem_agreed\",true,\"\",[],\"\",\"\",[],[],[]],[\"prior_art_positioned\",true,\"\",[],\"\",\"\",[],[],[]],[\"success_measurable\",true,\"\",[],\"\",\"\",[],[],[]],[\"risks_logged\",true,\"\",[],\"\",\"\",[],[],[]]]",
       "shape": "[[\"log-risks\",\"pressure-test\",\"scope-non-goals\"],true,\"\",\"\"]"
     },
+    "spawn-for-inputs": {
+      "applies": "full",
+      "evidence": "[[\"hands\",false,\"\",[],\"checklist\",\"\",[],[\"$spawn_hands\"],[]]]",
+      "shape": "[[\"gate-motivation\"],false,\"\",\"\"]"
+    },
     "draw-context": {
       "applies": "full",
       "evidence": "[[\"boundary\",true,\"\",[],\"\",\"\",[],[],[]],[\"neighbours\",true,\"\",[],\"refs\",\"neighbour\",[],[],[]],[\"intended_use\",true,\"\",[],\"\",\"\",[],[],[]],[\"excluded_use\",true,\"\",[],\"\",\"\",[],[],[]]]",
-      "shape": "[[\"gate-motivation\"],false,\"\",\"\"]"
+      "shape": "[[\"spawn-for-inputs\"],false,\"\",\"\"]"
     },
     "map-stakeholders": {
       "applies": "tailored",
       "evidence": "[[\"roles\",true,\"\",[],\"refs\",\"stakeholder\",[],[],[]],[\"coverage\",true,\"\",[],\"\",\"\",[],[],[]]]",
-      "shape": "[[\"gate-motivation\"],false,\"\",\"\"]"
+      "shape": "[[\"spawn-for-inputs\"],false,\"\",\"\"]"
     },
     "write-stories": {
       "applies": "full",
       "evidence": "[[\"stories\",true,\"\",[],\"refs\",\"story\",[],[],[]]]",
-      "shape": "[[\"gate-motivation\"],false,\"\",\"\"]"
+      "shape": "[[\"spawn-for-inputs\"],false,\"\",\"\"]"
     },
     "generalize-use-cases": {
       "applies": "full",
@@ -73,10 +88,15 @@
       "evidence": "[[\"picture_judged\",true,\"\",[],\"\",\"\",[],[],[]],[\"unspecified_capability\",true,\"\",[],\"\",\"\",[],[],[]],[\"passes_concrete\",true,\"\",[],\"\",\"\",[],[],[]]]",
       "shape": "[[\"draw-context\",\"generalize-use-cases\",\"map-stakeholders\"],true,\"\",\"\"]"
     },
+    "spawn-for-requirements": {
+      "applies": "full",
+      "evidence": "[[\"hands\",false,\"\",[],\"checklist\",\"\",[],[\"$spawn_hands\"],[]]]",
+      "shape": "[[\"gate-inputs\"],false,\"\",\"\"]"
+    },
     "write-requirements": {
       "applies": "full",
       "evidence": "[[\"register\",true,\"\",[],\"refs\",\"requirement\",[],[],[]],[\"set_criteria\",true,\"\",[],\"per-item\",\"\",[],[\"complete\",\"consistent\",\"affordable\",\"bounded\",\"comprehensible\",\"no_tbd\",\"behaviour_modelled\",\"quality_groups_swept\"],[]]]",
-      "shape": "[[\"gate-inputs\"],false,\"\",\"\"]"
+      "shape": "[[\"spawn-for-requirements\"],false,\"\",\"\"]"
     },
     "derive-functions": {
       "applies": "full",
@@ -98,15 +118,20 @@
       "evidence": "[]",
       "shape": "[[\"derive-functions\",\"probe-assumptions\"],true,\"\",\"\"]"
     },
+    "spawn-for-candidates": {
+      "applies": "full",
+      "evidence": "[[\"hands\",false,\"\",[],\"checklist\",\"\",[],[\"$spawn_hands\"],[]]]",
+      "shape": "[[\"gate-requirements\"],false,\"\",\"\"]"
+    },
     "derive-criteria": {
       "applies": "full",
       "evidence": "[[\"compounding\",true,\"\",[],\"compare-card\",\"\",[],[\"$compounding_suspects\"],[]],[\"comparisons\",true,\"\",[],\"compare-card\",\"\",[],[\"$criterion_axes\"],[]]]",
-      "shape": "[[\"gate-requirements\"],false,\"\",\"\"]"
+      "shape": "[[\"spawn-for-candidates\"],false,\"\",\"\"]"
     },
     "partition-functions": {
       "applies": "full",
       "evidence": "[[\"clusters\",true,\"\",[],\"dsm\",\"function\",[\"shared-data\",\"sequence\",\"timing\",\"shared-failure-mode\",\"same-actor\",\"same-policy\",\"same-external-interface\",\"same-lifecycle\"],[\"$functions\"],[]]]",
-      "shape": "[[\"gate-requirements\"],false,\"\",\"\"]"
+      "shape": "[[\"spawn-for-candidates\"],false,\"\",\"\"]"
     },
     "enumerate-space": {
       "applies": "full",
@@ -133,10 +158,15 @@
       "evidence": "[[\"reasons_hold\",true,\"\",[],\"free-form\",\"\",[],[],[]]]",
       "shape": "[[\"evaluate-set\"],true,\"\",\"\"]"
     },
+    "spawn-for-architecture": {
+      "applies": "full",
+      "evidence": "[[\"hands\",false,\"\",[],\"checklist\",\"\",[],[\"$spawn_hands\"],[]]]",
+      "shape": "[[\"gate-candidates\"],false,\"\",\"\"]"
+    },
     "converge-pugh": {
       "applies": "full",
       "evidence": "[[\"matrix_runs\",true,\"\",[],\"decision-matrix\",\"\",[],[],[]]]",
-      "shape": "[[\"gate-candidates\"],false,\"\",\"\"]"
+      "shape": "[[\"spawn-for-architecture\"],false,\"\",\"\"]"
     },
     "reverse-sensitivity": {
       "applies": "full",
@@ -173,10 +203,15 @@
       "evidence": "[]",
       "shape": "[[\"evaluate-architecture\"],false,\"\",\"\"]"
     },
+    "spawn-for-prototype": {
+      "applies": "full",
+      "evidence": "[[\"hands\",false,\"\",[],\"checklist\",\"\",[],[\"$spawn_hands\"],[]]]",
+      "shape": "[[\"gate-architecture\"],false,\"\",\"\"]"
+    },
     "rank-unknowns": {
       "applies": "full",
       "evidence": "[[\"seeded\",true,\"\",[],\"exposure-pick\",\"raid\",[],[],[]]]",
-      "shape": "[[\"gate-architecture\"],false,\"spikes\",\"\"]"
+      "shape": "[[\"spawn-for-prototype\"],false,\"spikes\",\"\"]"
     },
     "run-spikes": {
       "applies": "full",
@@ -193,10 +228,15 @@
       "evidence": "[[\"buildable\",true,\"\",[],\"choice-with-rationale\",\"\",[\"yes\",\"no\"],[],[]]]",
       "shape": "[[\"fold-back\"],true,\"\",\"\"]"
     },
+    "spawn-for-implementation": {
+      "applies": "full",
+      "evidence": "[[\"hands\",false,\"\",[],\"checklist\",\"\",[],[\"$spawn_hands\"],[]]]",
+      "shape": "[[\"gate-prototype\"],false,\"\",\"\"]"
+    },
     "author-tests": {
       "applies": "full",
       "evidence": "[[\"checks\",true,\"\",[\"method\",\"verifies\"],\"node-table\",\"test-spec\",[],[\"$test-specs\"],[]]]",
-      "shape": "[[\"gate-prototype\"],false,\"\",\"\"]"
+      "shape": "[[\"spawn-for-implementation\"],false,\"\",\"\"]"
     },
     "specify-build": {
       "applies": "full",
@@ -233,10 +273,15 @@
       "evidence": "[[\"quality_ok\",true,\"\",[],\"checklist\",\"\",[],[\"$iq_checklist\"],[]],[\"debt_taken\",true,\"\",[],\"refs\",\"raid\",[],[],[]],[\"risks_acceptable\",true,\"\",[],\"choice-with-rationale\",\"\",[\"acceptable\",\"not-acceptable\"],[],[]]]",
       "shape": "[[\"verification\"],true,\"\",\"\"]"
     },
+    "spawn-for-validation": {
+      "applies": "full",
+      "evidence": "[[\"hands\",false,\"\",[],\"checklist\",\"\",[],[\"$spawn_hands\"],[]]]",
+      "shape": "[[\"gate-implementation\"],false,\"\",\"\"]"
+    },
     "fill-story-evidence": {
       "applies": "full",
       "evidence": "[]",
-      "shape": "[[\"gate-implementation\"],false,\"demos\",\"\"]"
+      "shape": "[[\"spawn-for-validation\"],false,\"demos\",\"\"]"
     },
     "run-demos": {
       "applies": "full",
@@ -253,10 +298,15 @@
       "evidence": "[[\"meets_need\",true,\"\",[],\"per-item\",\"\",[],[\"$value-props\"],[]],[\"musts_demonstrated\",true,\"\",[],\"per-item\",\"\",[],[\"$must-stories\"],[]],[\"market_tier\",false,\"\",[],\"\",\"\",[],[],[]]]",
       "shape": "[[\"run-demos\",\"sweep-consistency\"],true,\"\",\"\"]"
     },
+    "spawn-for-release": {
+      "applies": "full",
+      "evidence": "[[\"hands\",false,\"\",[],\"checklist\",\"\",[],[\"$spawn_hands\"],[]]]",
+      "shape": "[[\"gate-validation\"],false,\"\",\"\"]"
+    },
     "package": {
       "applies": "full",
       "evidence": "[[\"package\",true,\"\",[],\"file-ref\",\"\",[],[],[]],[\"works\",true,\"\",[],\"choice-with-rationale\",\"\",[\"yes\",\"no\"],[],[\"yes\"]],[\"emit_back\",true,\"\",[],\"list\",\"\",[],[],[]]]",
-      "shape": "[[\"gate-validation\"],false,\"\",\"\"]"
+      "shape": "[[\"spawn-for-release\"],false,\"\",\"\"]"
     },
     "gate-release": {
       "applies": "full",

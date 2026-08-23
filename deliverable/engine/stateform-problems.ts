@@ -782,10 +782,31 @@ type ChecklistStatus =
   | { kind: "checked" }
   | { kind: "owed"; ref: string }
   | { kind: "owed_unresolved"; ref: string }
+  | { kind: "declined"; why: string }
   | { kind: "unchecked" };
 
 function checklistItemStatus(item: string, lines: Set<string>, corpus?: TraceNode[]): ChecklistStatus {
   if (lines.has(`- [x] ${item}`)) return { kind: "checked" };
+  // AN UNTICKED BOX WITH A REASON IS AN ANSWER, not a blank (owner ruling
+  // 2026-08-23). Some drawn lists offer a thing the state MAY use and need
+  // not: a spawn state lists the cast, and a phase that honestly earns no
+  // hand must be able to say so.
+  //
+  // IT REFUSED THAT ANSWER AND TRAPPED THE WALK. The ceiling rule says
+  // spawning none is legitimate and needs no excuse, while this check demanded
+  // every box ticked. Both were written the same day and neither knew about
+  // the other. The only way past was to spawn a hand the phase did not need,
+  // which is the exact waste the ceiling exists to stop.
+  //
+  // THE REASON IS REQUIRED, and that is the whole guard. A list where every
+  // box may be blank enforces nothing; a list where declining costs a sentence
+  // still does.
+  const declinedPrefix = `- [ ] ${item} — `;
+  const declinedLine = [...lines].find((l) => l.startsWith(declinedPrefix));
+  if (declinedLine !== undefined) {
+    const why = declinedLine.slice(declinedPrefix.length).trim();
+    if (why !== "") return { kind: "declined", why };
+  }
   const prefix = `- [owed] ${item} — `;
   const owedLine = [...lines].find((l) => l.startsWith(prefix));
   if (owedLine === undefined) return { kind: "unchecked" };

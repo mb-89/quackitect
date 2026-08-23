@@ -5,7 +5,7 @@ statement: "Partition the functions: the shared function DSM before any enumerat
 state_kind: work
 filled_by: agent
 depends_on:
-  - gate-requirements
+  - spawn-for-candidates
 legal_tools:
   - se_file_read
   - se_file_write

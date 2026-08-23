@@ -39,7 +39,7 @@ export class Scripts {
   /** One script, ASYNC — spawnSync would freeze the whole server (and the
    *  mirror with it) for the run's duration; found when the suite's eight
    *  seconds read as a crashed browser window. */
-  spawnScript(abs: string): Promise<{ status: number | null; out: string }> {
+  spawnScript(abs: string, machineId = ""): Promise<{ status: number | null; out: string }> {
     return new Promise((resolve) => {
       // A CONDITION JUDGES THE CORPUS THE LANE WRITES TO, never the repo
       // root. Judged against the wrong one, the agent is asked to satisfy a
@@ -53,7 +53,14 @@ export class Scripts {
       const where = this.host.workRoot();
       const child = spawn("node", [abs, "--root", where], {
         cwd: where,
-        env: { ...process.env, SE_HOME: seDir(this.host.machineRoot()) },
+        // WHICH RECORD IS BEING JUDGED. A check that reads something the record
+        // DECIDED — the kickoff's walker ceiling, say — has to know which record
+        // it stands in, and only the walk knows that.
+        //
+        // IT IS NOT COPIED INTO SESSION STATE. `.se/settings.json` is global to
+        // the session, so a per-record number kept there leaks across records
+        // and is a second place to disagree with the first.
+        env: { ...process.env, SE_HOME: seDir(this.host.machineRoot()), SE_MACHINE: machineId },
       });
       let out = "";
       let pending = "";
@@ -143,7 +150,7 @@ export class Scripts {
       let ok = true;
       for (const rel of scripts) {
         const abs = resolveInRoot(this.host.machineRoot(), rel, "engine/session.ts script");
-        const r = await this.spawnScript(abs);
+        const r = await this.spawnScript(abs, machine.id);
         // BOTH ENDS, BECAUSE EACH CARRIES HALF THE VERDICT.
         //
         // The TAIL carries the counts — exit codes, totals, units. A head slice

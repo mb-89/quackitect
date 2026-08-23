@@ -74,6 +74,45 @@ be told apart from a build that never emitted one.
 
 ## Behavior and constraints
 
+### The estimate grades itself
+
+EVERY PREDICTION IS SCORED AGAINST WHAT ACTUALLY HAPPENED (owner ruling
+2026-08-23). An estimate nobody grades never gets better, and the first version
+of this estimator was exactly that: it extrapolated from the pace so far and
+stopped there.
+
+THE FIRST GUESS IS THE ONE KEPT. A prediction made seconds before a job ends is
+right by construction and teaches nothing, so the entry remembers what the
+engine said the FIRST time it said anything, and when it said it.
+
+THE RATIO IS MEASURED FROM THAT MOMENT, never from the start of the job. The
+engine said "this much longer" at a point in time. What it is graded against is
+how much longer it actually took FROM THAT POINT. Comparing against the whole
+duration would grade a sentence it never said.
+
+THE GRADES LIVE IN `.se/estimates.jsonl`, one line per finished job, machine
+local and never committed. Each line carries the job, its kind, the MODEL that
+answered for it, what was predicted, what happened, and the ratio between them.
+
+THE MODEL IS ON EVERY LINE BECAUSE THE BIAS IS PER MODEL. A hand that
+consistently overruns and one that consistently finishes early need opposite
+corrections, and averaging them together produces a number that is wrong for
+both.
+
+THE CORRECTION IS THE MEDIAN RATIO, not the mean. One job that hung for an hour
+would otherwise set the correction for every job after it.
+
+THREE GRADED RUNS ARE NEEDED BEFORE A CORRECTION IS APPLIED. Below that the
+figure is reported raw and the basis SAYS SO, naming how many runs are still
+wanted. Two samples of a model is superstition rather than calibration.
+
+A STALLED FIGURE IS NOT GRADED. The engine has already said the number is not
+advancing. Scoring it would teach the calibration that the model is slow, when
+what happened was a stall.
+
+THE BASIS ALWAYS SAYS WHICH IT IS. A reader can tell a corrected estimate from
+a raw one without opening anything.
+
 ### The three standings of an entry
 
 - `running` — registered and not yet finished.

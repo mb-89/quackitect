@@ -116,8 +116,11 @@ export interface AccountEntry {
   remaining_ms?: number;
   basis: string;
   standing: Standing;
-  /** How much output there is, and the exact call that serves it. */
-  output: { stdout_bytes: number; stderr_bytes: number; truncated: boolean; read: string };
+  /** THE CALL THAT SERVES THE OUTPUT, and how much there is WHEN THERE IS ANY.
+   *  The three counts are optional because a job that said nothing has nothing
+   *  to count, and three zeroes on every row of every lane result is pure
+   *  weight. */
+  output: { stdout_bytes?: number; stderr_bytes?: number; truncated?: boolean; read: string };
   /** The last of what a FAILING job said. Absent where the job succeeded. */
   tail?: string;
   /** WHAT A RUNNING BATTERY HAS FOUND, so nobody polls a verb for it. How far
@@ -189,22 +192,33 @@ function batteryFound(progress: string, ranForMs: number): Record<string, unknow
   }
 }
 
+/** HOW MUCH OF A COMMAND THE ACCOUNT CARRIES. Enough to recognise the job,
+ *  never the whole thing — the ref serves that. */
+const COMMAND_HANDLE = 72;
+
 function asAccount(entry: JobView, standing: Standing): AccountEntry {
   const { stdout, stderr, truncated, ...rest } = entry;
   const failed = !entry.running && entry.exit !== null && entry.exit !== 0;
   const said = stderr.trim() === "" ? stdout : stderr;
+  // THE ACCOUNT IS A LITTLE TEXT AND SOME REFERENCES (owner ruling 2026-08-23).
+  // It rides EVERY lane result, so anything carried here is paid for on every
+  // call of the session rather than once.
+  //
+  // THE COMMAND IS CUT TO A HANDLE. A shell job's command is the whole script,
+  // several hundred characters of it, repeated on every call until the job
+  // settles. The ref below serves the whole thing to whoever wants it.
+  //
+  // THE COUNTS RIDE ONLY WHEN THERE IS OUTPUT. Three zeroes and a false say
+  // nothing and cost the same as something.
+  const quiet = stdout.length === 0 && stderr.length === 0 && !truncated;
+  // WHERE THE WHOLE THING IS. A battery keeps its verdict, failure names and
+  // all, in its own record under .se/test-jobs.
+  const read = entry.kind === "test" ? `se_file_read {path: ".se/test-last.json"}` : `se_run {job: "${entry.job}"}`;
   return {
     ...rest,
+    command: entry.command.length > COMMAND_HANDLE ? `${entry.command.slice(0, COMMAND_HANDLE - 1)}…` : entry.command,
     standing,
-    output: {
-      stdout_bytes: stdout.length,
-      stderr_bytes: stderr.length,
-      truncated,
-      // WHERE THE WHOLE THING IS. The account carries counts; this is the call
-      // that serves the text behind them. A battery keeps its verdict, failure
-      // names and all, in its own record under .se/test-jobs.
-      read: entry.kind === "test" ? `se_file_read {path: ".se/test-last.json"}` : `se_run {job: "${entry.job}"}`,
-    },
+    output: quiet ? { read } : { stdout_bytes: stdout.length, stderr_bytes: stderr.length, truncated, read },
     ...(entry.kind === "test" && entry.progress !== undefined ? batteryFound(entry.progress, entry.duration_ms) : {}),
     ...(failed && said.trim() !== "" ? { tail: said.slice(-TAIL_CHARS) } : {}),
   };
@@ -220,6 +234,9 @@ export interface JobView {
   /** The step this work belongs to, where it belongs to one. Without it a
    *  settled verdict has nowhere to land. */
   state?: string;
+  /** Which milestone group (M0..M9) the state belongs to, from the rigor
+   *  matrix. Absent where the state carries no matching row. */
+  milestone?: string;
   /** Where this kind of work writes its own progress, where it writes any. */
   progress?: string;
   /** The count that progress divides into. */
@@ -242,6 +259,27 @@ export interface JobView {
   truncated: boolean;
 }
 interface Job {
+  /** WHICH HAND THIS IS — walker, reviewer, researcher (owner ruling
+   *  2026-08-23). ONLY WALKERS COUNT AGAINST THE RECORD'S CEILING. A reviewer
+   *  and a researcher are a different purchase: one buys separation, the other
+   *  buys reading nobody has done, and neither competes for the walking slot. */
+  role?: string;
+  /** THE LAST THING THIS HAND SAID IT WAS DOING. Its narration's newest brief,
+   *  shown on the row's tooltip so a person hovering learns the current step
+   *  rather than the spawn line. */
+  last_brief?: string;
+  /** WHAT THE ENGINE PREDICTED, AND WHEN IT SAID SO. Kept so the guess can be
+   *  GRADED when the job ends, which is the only way an estimate ever improves.
+   *  Set once, on the first prediction — a prediction made seconds before the
+   *  end is trivially right and would flatter the record. */
+  predicted_ms?: number;
+  predicted_at?: number;
+  /** WHICH SESSION REGISTERED THIS JOB. `hands-spawned.ts` reads it back (via
+   *  `.se/settings.json`) to tell a hand spawned THIS session from one left
+   *  over from an earlier session that a reload cannot erase. A boot record
+   *  gets a fresh id on every reload, which is what made the old check trap
+   *  the walk; the session id does not. */
+  session?: string;
   id: string;
   kind: OperationKind;
   command: string;
@@ -250,6 +288,9 @@ interface Job {
   exit: number | null;
   running: boolean;
   state?: string;
+  /** WHICH MILESTONE GROUP THE STATE BELONGS TO (M0..M9), read from the rigor
+   *  matrix at registration. Absent where the state carries no matching row. */
+  milestone?: string;
   progress?: string;
   total?: number;
   /** THE DECLARED STEP COUNT AND WHAT IS BEHIND IT. Every background job says
@@ -260,6 +301,10 @@ interface Job {
    *  it runs inside the harness, not as a child of this process — so the only
    *  evidence it is still working is that it keeps reporting. */
   last_report?: number;
+  /** WHICH HAND ANSWERED. A spawned agent names its model; a shell run and a
+   *  battery record `script`, because neither is an agent at all. The retro
+   *  cannot weigh whether spawning paid for itself without this. */
+  model?: string;
   outcome?: string;
   out: string;
   err: string;
@@ -270,6 +315,16 @@ interface Job {
   settle: () => void;
 }
 interface PersistedJob {
+  session?: string;
+  /** THE STASHED GUESS, CARRIED TO DISK. An agent entry is rebuilt from this
+   *  record on every read (see `persisted()` below), so a prediction kept
+   *  only in the in-memory `Job` is discarded before `settleOperation` can
+   *  ever grade it. Writing it here is what lets the guess survive a reload
+   *  and reach the grader at all. */
+  predicted_ms?: number;
+  predicted_at?: number;
+  role?: string;
+  last_brief?: string;
   id: string;
   kind?: OperationKind;
   command: string;
@@ -278,11 +333,13 @@ interface PersistedJob {
   exit: number | null;
   running: boolean;
   state?: string;
+  milestone?: string;
   progress?: string;
   total?: number;
   steps_done?: number;
   steps_total?: number;
   last_report?: number;
+  model?: string;
   pid?: number;
 }
 /** A test run's own record, kept beside the shell jobs since before this table
@@ -314,14 +371,21 @@ function persist(j: Job): void {
     kind: j.kind,
     command: j.command,
     started: j.started,
+    ...(j.session === undefined ? {} : { session: j.session }),
+    ...(j.role === undefined ? {} : { role: j.role }),
+    ...(j.last_brief === undefined ? {} : { last_brief: j.last_brief }),
+    ...(j.predicted_ms === undefined ? {} : { predicted_ms: j.predicted_ms }),
+    ...(j.predicted_at === undefined ? {} : { predicted_at: j.predicted_at }),
     ...(j.ended === undefined ? {} : { ended: j.ended }),
     exit: j.exit,
     running: j.running,
     ...(j.state === undefined ? {} : { state: j.state }),
+    ...(j.milestone === undefined ? {} : { milestone: j.milestone }),
     ...(j.progress === undefined ? {} : { progress: j.progress }),
     ...(j.total === undefined ? {} : { total: j.total }),
     ...(j.steps_done === undefined ? {} : { steps_done: j.steps_done }),
     ...(j.steps_total === undefined ? {} : { steps_total: j.steps_total }),
+    ...(j.model === undefined ? {} : { model: j.model }),
     ...(j.pid === undefined ? {} : { pid: j.pid }),
   };
   appendFileSync(jobPath(j.root, j.id, "jsonl"), `${JSON.stringify(record)}\n`, "utf8");
@@ -368,6 +432,7 @@ function view(j: Job): JobView {
     exit: j.exit,
     duration_ms: (j.ended ?? Date.now()) - j.started,
     ...(j.state === undefined ? {} : { state: j.state }),
+    ...(j.milestone === undefined ? {} : { milestone: j.milestone }),
     ...(j.progress === undefined ? {} : { progress: j.progress }),
     ...(j.total === undefined ? {} : { total: j.total }),
     ...(j.outcome === undefined ? {} : { outcome: j.outcome }),
@@ -418,6 +483,40 @@ const STALL_AFTER_MS = 30_000;
  *  see dsp-the-work-account.md#behavior-and-constraints */
 function timeRemaining(j: Job): { remaining_ms?: number; basis: string } {
   if (!j.running) return { basis: "finished" };
+  // A COUNTED HAND IS ESTIMATED FROM ITS OWN CHECKLIST. A spawned agent writes
+  // no progress file, so the file-reading path below can never speak for one.
+  // Its narration is the only signal it sends, and `noteAlive` turns that into
+  // these two counters.
+  //
+  // THE TWO PAIRS WERE NEVER JOINED UNTIL 2026-08-23. `progress`/`total` are a
+  // FILE and a file count; `steps_done`/`steps_total` are a checklist. An agent
+  // filled the second pair and was measured against the first, so every hand
+  // reported "no comparable work" for its whole life.
+  if (j.progress === undefined && j.steps_total !== undefined && j.steps_total > 0 && (j.steps_done ?? 0) > 0) {
+    const done = j.steps_done ?? 0;
+    const per = (Date.now() - j.started) / done;
+    const left = Math.max(0, j.steps_total - done);
+    const model = modelOf(j);
+    const cal = calibrationFor(model, j.root);
+    const remaining = per * left * cal.factor;
+    // REMEMBER THE FIRST GUESS SO IT CAN BE GRADED. Only the first: a guess
+    // made just before the end is right by construction and teaches nothing.
+    if (j.predicted_ms === undefined) {
+      j.predicted_ms = remaining;
+      j.predicted_at = Date.now();
+      // WRITE IT THROUGH NOW. The guard above means this runs once per job,
+      // so the estimate stays a cheap read on every later call while the
+      // guess still reaches disk, and from there the grader.
+      persist(j);
+    }
+    return {
+      remaining_ms: Math.round(remaining),
+      basis:
+        cal.n >= CALIBRATION_MIN
+          ? `${String(done)} of ${String(j.steps_total)} steps reported, corrected by ${cal.factor.toFixed(2)}x from ${String(cal.n)} graded runs of ${model}`
+          : `${String(done)} of ${String(j.steps_total)} steps reported, at the pace so far and UNCORRECTED — ${String(cal.n)} of ${String(CALIBRATION_MIN)} graded runs of ${model} needed before the engine trusts a correction`,
+    };
+  }
   if (j.progress === undefined || j.total === undefined || j.total <= 0) {
     return { basis: "no measurement of comparable work exists, so no time remaining is given" };
   }
@@ -441,12 +540,25 @@ function timeRemaining(j: Job): { remaining_ms?: number; basis: string } {
   // read-counting version did, inside a single answer that reads the table
   // twice.
   const silentFor = Date.now() - j.started - now.elapsed;
-  const predicted = Math.round(now.elapsed / (now.files / j.total));
+  const projected = Math.round(now.elapsed / (now.files / j.total));
+  const stalled = silentFor >= STALL_AFTER_MS;
+  const model = modelOf(j);
+  const cal = calibrationFor(model, j.root);
+  const remaining = Math.max(0, projected - now.elapsed) * cal.factor;
+  // A STALLED FIGURE IS NOT A PREDICTION, so it is not graded. The engine has
+  // already said the number is not advancing; scoring it would teach the
+  // calibration that this model is slow when what happened was a stall.
+  if (j.predicted_ms === undefined && !stalled) {
+    j.predicted_ms = remaining;
+    j.predicted_at = Date.now();
+    persist(j);
+  }
   return {
-    remaining_ms: Math.max(0, predicted - now.elapsed),
-    basis:
-      silentFor >= STALL_AFTER_MS
-        ? `${String(now.files)} of ${String(j.total)} finished, and nothing has finished for ${String(Math.round(silentFor / 1000))}s, so this figure is not advancing`
+    remaining_ms: Math.round(remaining),
+    basis: stalled
+      ? `${String(now.files)} of ${String(j.total)} finished, and nothing has finished for ${String(Math.round(silentFor / 1000))}s, so this figure is not advancing`
+      : cal.n >= CALIBRATION_MIN
+        ? `a projection over ${String(now.files)} of ${String(j.total)} finished, corrected by ${cal.factor.toFixed(2)}x from ${String(cal.n)} graded runs of ${model}`
         : `a linear projection over ${String(now.files)} of ${String(j.total)} finished on this run, dependable in neither direction`,
   };
 }
@@ -574,6 +686,16 @@ export interface RunningRow {
    *  not a finished one — it is a helper free to be given the next piece of
    *  work. The row stays so a person can see it standing there. */
   status?: string;
+  /** The model that answered, or `script` where the work was never an agent.
+   *  Optional like `status`, so a caller building a row by hand need not know
+   *  about it; runningWork always fills it. */
+  model?: string;
+  /** THE LAST THING THIS HAND SAID IT WAS DOING, for the row's tooltip. */
+  last_brief?: string;
+  /** Which milestone (M0..M9) the work was registered under, from the rigor
+   *  matrix row matching the state at the time it started. Absent for work
+   *  outside the milestone spine, or started before a position was known. */
+  milestone?: string;
   since_ms: number;
   percent?: number;
   remaining_ms?: number;
@@ -639,6 +761,20 @@ function statusOf(j: Job, now: number): string {
   return now - (j.last_report ?? j.started) >= IDLE_AFTER_MS ? "idle" : "working";
 }
 
+/** WHAT ANSWERED FOR THIS JOB.
+ *
+ *  A SHELL RUN IS NOT AN AGENT and says so. Writing `script` in the same
+ *  column keeps the distinction visible rather than leaving a reader to infer
+ *  it from a blank.
+ *
+ *  AN AGENT WITHOUT ONE IS `unreported`, which is a declared absence rather
+ *  than a missing field. It only happens for a job registered before the model
+ *  was asked for. */
+function modelOf(j: Job): string {
+  if (j.kind !== "agent") return "script";
+  return j.model ?? "unreported";
+}
+
 /** HOW LONG THE REST WILL TAKE, from what this job has already done.
  *
  *  THE ENGINE COMPUTES IT, never the agent. A job says how many steps it has
@@ -677,6 +813,9 @@ export function runningWork(): RunningRow[] {
       ...nameOf(j),
       ...steps,
       status: statusOf(j, now),
+      model: modelOf(j),
+      ...(j.last_brief === undefined ? {} : { last_brief: j.last_brief }),
+      ...(j.milestone === undefined ? {} : { milestone: j.milestone }),
       since_ms: ran,
       ...(eta === undefined ? {} : { remaining_ms: eta.remaining_ms, basis: eta.basis }),
     });
@@ -709,6 +848,87 @@ export function noteProgress(id: string, done: number, total?: number, root?: st
   if (total !== undefined) j.steps_total = total;
   j.last_report = Date.now();
   persist(j);
+  return true;
+}
+
+/** NAME WHAT ANSWERS FOR A HAND. Set once, when the hand is registered.
+ *
+ *  IT RIDES BESIDE openOperation RATHER THAN INSIDE IT, so nothing about the
+ *  registry's own shape has to know that agents are special. */
+export function noteModel(id: string, model: string, root?: string): boolean {
+  const j = jobs.get(id) ?? (root === undefined ? undefined : persisted(root, id));
+  if (j === undefined) return false;
+  jobs.set(id, j);
+  j.model = model;
+  persist(j);
+  return true;
+}
+
+/** NAME WHICH HAND THIS IS. It rides beside noteModel for the same reason:
+ *  nothing about the registry's own shape has to know that agents are special.
+ *
+ *  THE RECORD'S CEILING COUNTS WALKERS AND NOTHING ELSE (owner ruling
+ *  2026-08-23). Before this, a reviewer spawned at a gate filled the walking
+ *  slot, and the next phase could not start a walker at all — measured the
+ *  same day, on the state that stranded the walk. */
+export function noteRole(id: string, role: string, root?: string): boolean {
+  const j = jobs.get(id) ?? (root === undefined ? undefined : persisted(root, id));
+  if (j === undefined) return false;
+  jobs.set(id, j);
+  j.role = role;
+  persist(j);
+  return true;
+}
+
+/** A DELEGATED HAND'S OWN NARRATION IS ITS PROGRESS REPORT. `statusOf` reads
+ *  silence as idle, and nothing else ever touches a spawned agent's
+ *  `last_report` — an `update` riding a lane call is the only signal that
+ *  hand ever sends, so it stands in for a beat file.
+ *
+ *  THE NEWEST RUNNING AGENT, because the caller has no job id in hand —
+ *  only the fact that some delegated hand just spoke. */
+export function noteAlive(op?: string, planned?: number, role?: string, brief?: string): boolean {
+  // THE NARRATION BELONGS TO THE HAND THAT SENT IT, and the role is what tells
+  // them apart. Matching only "the newest running agent" was right while one
+  // hand ran at a time and wrong the moment two did: a working researcher was
+  // marked idle because a walker's update refreshed the walker instead.
+  //
+  // AN UNMATCHED ROLE FALLS BACK TO THE NEWEST, which is the old behaviour and
+  // is right for a hand registered before roles existed.
+  const agents = [...jobs.values()].filter((j) => j.kind === "agent" && j.running);
+  const byRole = role === undefined ? [] : agents.filter((j) => j.role === role);
+  const running = byRole.length > 0 ? byRole : agents;
+  if (running.length === 0) return false;
+  const newest = running.reduce((a, b) => (b.started > a.started ? b : a));
+  newest.last_report = Date.now();
+  // WHAT IT IS DOING RIGHT NOW, for the row's tooltip. A person hovering wants
+  // the LATEST thing the hand said, not the sentence it was spawned with — the
+  // spawn line never changes and answers nothing after the first minute.
+  if (brief !== undefined && brief.trim() !== "") newest.last_brief = brief.trim();
+  // THE CHECKLIST IS THE PROGRESS BAR. A plan says how many steps there are; a
+  // resolution says one of them landed. Nothing else a hand does is countable,
+  // and asking a hand to report a percentage would be asking it to guess.
+  if (op === "plan" && planned !== undefined && planned > 0) {
+    // A SECOND PLAN EXTENDS THE WORK, IT DOES NOT RESTART IT. Resetting here
+    // made a hand that re-planned mid-flight read as though it had just begun:
+    // the total jumped to the new plan's size and the count fell to zero, so
+    // the work already finished vanished and the estimate trebled.
+    //
+    // MEASURED THE DAY IT WAS WRITTEN. A hand given four briefs re-planned
+    // three times and reported "1 of 13 steps" after twelve minutes of real
+    // work, projecting two hours. The owner did not believe the number, and
+    // the number was wrong.
+    newest.steps_total = (newest.steps_total ?? 0) + planned;
+    newest.steps_done = newest.steps_done ?? 0;
+  } else if (op === "done" || op === "obsolete" || op === "revert") {
+    newest.steps_done = (newest.steps_done ?? 0) + 1;
+    // WORK FOUND WHILE WORKING IS REAL. A total the hand has already passed is
+    // the lie, so the total rises to meet the count rather than capping it.
+    if (newest.steps_total !== undefined && newest.steps_done > newest.steps_total) {
+      newest.steps_total = newest.steps_done;
+    }
+  }
+  persist(newest);
   return true;
 }
 
@@ -843,8 +1063,10 @@ export function openOperation(o: {
   kind: OperationKind;
   command: string;
   state?: string;
+  milestone?: string;
   root?: string;
   steps?: number;
+  model?: string;
 }): void {
   // A LIVE ENTRY IS LEFT ALONE; A SETTLED ONE IS REPLACED. A judgment's id is
   // derived from its step, so every re-run of one step reuses it. Returning
@@ -861,6 +1083,10 @@ export function openOperation(o: {
     exit: null,
     running: true,
     ...(o.state === undefined ? {} : { state: o.state }),
+    ...(o.milestone === undefined ? {} : { milestone: o.milestone }),
+    // STAMPED FROM THE ENVIRONMENT AT REGISTRATION, not read back later — a
+    // session that ends leaves no process behind to ask.
+    ...(process.env.SE_SESSION === undefined ? {} : { session: process.env.SE_SESSION }),
     out: "",
     err: "",
     ...(o.root === undefined ? {} : { root: o.root }),
@@ -869,6 +1095,101 @@ export function openOperation(o: {
   };
   jobs.set(o.id, j);
   persist(j);
+}
+
+/** WHERE PREDICTIONS ARE GRADED. One line per finished job: what the engine
+ *  said, what actually happened, and which model was answering.
+ *
+ *  AN ESTIMATE NOBODY GRADES NEVER GETS BETTER. The first version of this
+ *  estimator extrapolated from the pace so far and stopped there, so a hand
+ *  that spent its first minutes reading projected hours of work that never
+ *  came. Nothing in the system could notice, because nothing compared the
+ *  guess to the outcome. */
+function estimateLog(root: string): string {
+  return join(seDir(root), "estimates.jsonl");
+}
+
+/** HOW MANY GRADED RUNS BEFORE THE CORRECTION IS TRUSTED. Below this the
+ *  estimate is reported raw and says so, because two samples of a model is
+ *  superstition rather than calibration. */
+const CALIBRATION_MIN = 3;
+
+/** The parsed grades, per root. Re-read only when a grade is appended — the
+ *  estimate is computed on EVERY lane call, and reading the file each time
+ *  would put a disk read on the hot path for a number that barely moves. */
+let grades: { root: string; rows: { model: string; ratio: number }[] } | null = null;
+
+function gradesFor(root: string): { model: string; ratio: number }[] {
+  if (grades !== null && grades.root === root) return grades.rows;
+  const rows: { model: string; ratio: number }[] = [];
+  let text = "";
+  try {
+    text = readFileSync(estimateLog(root), "utf8");
+  } catch {
+    text = "";
+  }
+  for (const line of text.split("\n")) {
+    if (line.trim() === "") continue;
+    try {
+      const r = JSON.parse(line) as { model?: unknown; ratio?: unknown };
+      // A TORN LINE IS SKIPPED, NEVER FATAL. This log is appended to from a
+      // process that can be killed mid-write, and a broken estimate must never
+      // take a walk down with it.
+      if (typeof r.model === "string" && typeof r.ratio === "number" && r.ratio > 0) {
+        rows.push({ model: r.model, ratio: r.ratio });
+      }
+    } catch {}
+  }
+  grades = { root, rows };
+  return rows;
+}
+
+/** HOW WRONG THIS MODEL'S ESTIMATES HAVE BEEN, as a multiplier to apply to the
+ *  next one. The MEDIAN rather than the mean: one job that hung for an hour
+ *  would otherwise set the correction for every job after it. */
+function calibrationFor(model: string, root?: string): { factor: number; n: number } {
+  if (root === undefined) return { factor: 1, n: 0 };
+  const ratios = gradesFor(root)
+    .filter((r) => r.model === model)
+    .map((r) => r.ratio)
+    .sort((a, b) => a - b);
+  if (ratios.length < CALIBRATION_MIN) return { factor: 1, n: ratios.length };
+  const mid = Math.floor(ratios.length / 2);
+  const median = ratios.length % 2 === 1 ? (ratios[mid] ?? 1) : ((ratios[mid - 1] ?? 1) + (ratios[mid] ?? 1)) / 2;
+  return { factor: median, n: ratios.length };
+}
+
+/** GRADE THE PREDICTION AGAINST WHAT HAPPENED, on the way out.
+ *
+ *  THE RATIO IS MEASURED FROM WHEN THE PREDICTION WAS MADE, not from when the
+ *  job started. The engine said "this much longer" at a moment, and what it
+ *  should be graded against is how much longer it actually took FROM THAT
+ *  MOMENT. Comparing against the whole duration would grade a different
+ *  sentence than the one it said. */
+function gradePrediction(j: Job): void {
+  if (j.root === undefined || j.predicted_ms === undefined || j.predicted_at === undefined) return;
+  const ended = j.ended ?? Date.now();
+  const actual = ended - j.predicted_at;
+  if (actual <= 0 || j.predicted_ms <= 0) return;
+  const record = {
+    id: j.id,
+    kind: j.kind,
+    model: modelOf(j),
+    at: new Date(ended).toISOString(),
+    predicted_ms: Math.round(j.predicted_ms),
+    actual_ms: Math.round(actual),
+    ratio: Number((actual / j.predicted_ms).toFixed(4)),
+    ...(j.steps_total === undefined ? {} : { steps_total: j.steps_total }),
+    ...(j.steps_done === undefined ? {} : { steps_done: j.steps_done }),
+  };
+  try {
+    mkdirSync(seDir(j.root), { recursive: true });
+    appendFileSync(estimateLog(j.root), `${JSON.stringify(record)}\n`);
+    grades = null;
+  } catch {
+    // THE GRADE IS A NICETY AND THE SETTLE IS NOT. A job must close even where
+    // the record of how well it was predicted cannot be written.
+  }
 }
 
 /** SETTLE a registered operation. A judgment whose process is gone settles as
@@ -887,7 +1208,39 @@ export function settleOperation(id: string, ok: boolean, root?: string): void {
   j.ended = Date.now();
   j.exit = ok ? 0 : 1;
   j.outcome = ok ? "passed" : "not passed";
+  gradePrediction(j);
   persist(j);
+}
+
+/** RETIRE THE HANDS OF EVERY OTHER MILESTONE, and say which went.
+ *
+ *  ONE WALKER PER MILESTONE IS THE ARRANGEMENT (owner ruling 2026-08-23), and
+ *  the handover should be visible: the M1 walker goes as the M2 walker
+ *  arrives, rather than both standing for ever.
+ *
+ *  THE ENGINE CANNOT SEE A SPAWNED HAND DIE. The harness owns that process, so
+ *  nothing tells the registry it ended and a row can read `running` long after
+ *  the agent is gone — measured at 29 minutes on 2026-08-23. Retiring on the
+ *  NEXT registration is the one moment the engine reliably learns that the
+ *  previous milestone is over.
+ *
+ *  A HAND WITH NO MILESTONE IS LEFT ALONE. It was registered before the engine
+ *  knew its own position, and guessing which phase it belonged to would close
+ *  work that may still be running. */
+export function retireOtherMilestones(milestone: string): string[] {
+  const gone: string[] = [];
+  for (const j of jobs.values()) {
+    if (j.kind !== "agent" || !j.running) continue;
+    if (j.milestone === undefined || j.milestone === milestone) continue;
+    j.running = false;
+    j.ended = Date.now();
+    j.exit = 0;
+    j.outcome = "passed";
+    gradePrediction(j);
+    persist(j);
+    gone.push(j.id);
+  }
+  return gone;
 }
 
 /** WORK THIS SESSION STARTED that the in-memory table cannot see for itself. A

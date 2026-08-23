@@ -443,6 +443,7 @@ function parseMatrixRow(
   };
   refuseBadRow(row);
   mergeSameAs(dir, row, fm);
+  mergeSharedGuidance(dir, row, fm);
   return { row, fm };
 }
 
@@ -459,6 +460,38 @@ function mergeSameAs(dir: string, row: RigorMatrixRow, fm: Record<string, unknow
   if (typeof nfm.follow_up_label === "string" && nfm.follow_up_label !== "") row.follow_up_label = nfm.follow_up_label;
   const di = parseDoInputs(nfm.inputs);
   if (di !== undefined) row.inputs = di;
+}
+
+// A ROW MAY NAME A SHARED CARD instead of writing its own paragraph twice.
+// Ten spawn rows once carried the identical guidance body, copy-pasted, and
+// editing it meant editing ten files. `shared_guidance` names a method card
+// by its `card:` key; the card's own "## Guidance" section is read and
+// PREPENDED — the same ordering `mergeSameAs` already uses for a referenced
+// state's guidance, so the shared doctrine leads and the row's own
+// phase-specific text follows it.
+//
+// A row that names no card is untouched: this returns before `row.guidance`
+// is read or written, so every other row in the matrix behaves exactly as it
+// did before this existed.
+//
+// A NAMED CARD THAT DOES NOT EXIST REFUSES LOUDLY rather than splicing in an
+// empty string. A silent empty splice would read as "this row has nothing to
+// say", which is never true — a row naming a card always means to say
+// something through it, and a typo'd name deserves a build error, not a
+// state that quietly lost half its guidance.
+function mergeSharedGuidance(dir: string, row: RigorMatrixRow, fm: Record<string, unknown>): void {
+  if (typeof fm.shared_guidance !== "string" || fm.shared_guidance === "") return;
+  const name = fm.shared_guidance;
+  const methods = join(dir, "..", "methods");
+  const files = readdirSync(methods).filter((f) => f.endsWith(".md"));
+  const hit = files.find((f) => parseStateNote(readFileSync(join(methods, f), "utf8")).frontmatter.card === name);
+  if (hit === undefined) {
+    throw new Error(
+      `matrix row ${row.name} names shared_guidance "${name}", and no method card under deliverable/machines/methods declares card: ${name}`,
+    );
+  }
+  const shared = section(parseStateNote(readFileSync(join(methods, hit), "utf8")).body, "Guidance");
+  row.guidance = [shared, row.guidance].filter(Boolean).join("\n\n");
 }
 
 // A CELL IS FRONTMATTER ON ITS ROW. It used to be a file of its own, and

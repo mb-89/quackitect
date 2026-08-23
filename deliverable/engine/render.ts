@@ -571,7 +571,20 @@ function oneLine(s: string): string {
 /** see dsp-mirror-render.md#the-server-acting-on-its-own-behalf */
 const SELF_SERVED = new Set(["mirror_slow", "mirror_narration_now", "mirror_profile"]);
 
-function srcOf(tool: string, actor?: string): string {
+/** THE HAND BEATS THE ACTOR WHERE THERE IS ONE (owner ruling 2026-08-23).
+ *
+ *  Every agent call already records the PART it played — guide, walker,
+ *  reviewer — and the feed printed "agent" for every one of them, which tells
+ *  a reader nothing they had not already assumed.
+ *
+ *  A LOG THAT CANNOT TELL THE GUIDE FROM THE WALKER cannot answer whether
+ *  delegating was worth its tokens, and that is the question the roster exists
+ *  to settle. The coordinate was being recorded and never shown.
+ *
+ *  `human` AND `ui` ARE UNTOUCHED. A person is a person however the record
+ *  labels the hand, and the surface acting on its own behalf is not a hand. */
+function srcOf(tool: string, actor?: string, part?: string): string {
+  if (actor === "agent" && (part === "guide" || part === "walker" || part === "reviewer")) return part;
   // THE RECORD WINS. A stamp is what the handler that served the call KNEW;
   // the rule below is a guess from a string, kept only for records written
   // before the stamp existed, because history cannot be restamped.
@@ -594,7 +607,7 @@ export function feedRows(
   const rows = records.slice(-500).map((rec) => ({
     ref: rec.ref,
     ts: rec.ts,
-    src: srcOf(rec.tool, rec.actor),
+    src: srcOf(rec.tool, rec.actor, rec.part),
     // Updates are NARRATION (bold), whatever their op — only se_note
     // strays are retro notes (italic). Two kinds, never conflated.
     type:
@@ -890,19 +903,59 @@ function crumbsFor(m: MirrorState, decl: MachineDecl): string {
     subs.length === 0
       ? ""
       : `<span class="crumb-arrow">›<span class="crumb-menu">${subs.map((s) => `<a href="/?view=${encodeURIComponent(s)}">${esc(s)}</a>`).join("")}</span></span>`;
+  // WHERE THE WALK STANDS, AND WHERE IT IS AIMED (owner ruling 2026-08-23).
+  //
+  // THE CRUMBS DESCRIBE THE VIEW, and the view is independent of the walk on
+  // purpose. So a reader could see which machine was on screen and still not
+  // know whether anything was routed at all.
+  //
+  // THE ROUTE LINE ALONE WAS NOT ENOUGH. It draws only where the target sits in
+  // the SAME drawing, and an iteration aimed at its ship state is routed across
+  // machines — so the blue line went missing exactly when a target existed.
+  //
+  // AN EMPTY TARGET SHOWS AS NOTHING, never as a dash. Nothing routed is a real
+  // state of the walk, and the absence of the arrow says it.
+  // THE WALK CAN STAND IN MORE THAN ONE PLACE, when a fan is open, so the
+  // position is a list and all of it shows. The target is one.
+  const here = m.session.active().join(" · ");
+  const aim = m.session.target;
+  const walk =
+    here === ""
+      ? ""
+      : `<span style="padding:0 4px 0 10px;color:var(--se-muted)">·</span><span>${esc(here)}</span>${
+          aim === ""
+            ? ""
+            : `<span style="padding:0 5px;color:var(--se-muted)">→</span><span style="color:var(--se-accent)">${esc(aim)}</span>`
+        }`;
   const chain = m.session.viewChain(decl.id);
-  return chain
-    .map((id, i) => {
-      const label = i === chain.length - 1 ? `<b class="here">${esc(id)}</b>` : `<a href="/?view=${encodeURIComponent(id)}">${esc(id)}</a>`;
-      const arrow =
-        i === 0
-          ? crumbArrow(mainSubs)
-          : i === chain.length - 1
-            ? crumbArrow(decl.states.filter((s) => s.submachine !== undefined).map((s) => s.id))
-            : '<span style="color:var(--se-muted);padding:0 3px">›</span>';
-      return label + arrow;
-    })
-    .join("");
+  return (
+    chain
+      .map((id, i) => {
+        const label =
+          i === chain.length - 1 ? `<b class="here">${esc(id)}</b>` : `<a href="/?view=${encodeURIComponent(id)}">${esc(id)}</a>`;
+        const arrow =
+          i === 0
+            ? crumbArrow(mainSubs)
+            : i === chain.length - 1
+              ? crumbArrow(decl.states.filter((s) => s.submachine !== undefined).map((s) => s.id))
+              : '<span style="color:var(--se-muted);padding:0 3px">›</span>';
+        return label + arrow;
+      })
+      .join("") + walk
+  );
+}
+
+/** WHERE THE WALK IS AIMED, for the chip beside where it stands.
+ *
+ *  IT IS ITS OWN FUNCTION because renderMirror sits at the complexity ceiling
+ *  and one more branch inside it crosses.
+ *
+ *  NOTHING ROUTED SHOWS AS NOTHING, never as a dash. An empty target is a real
+ *  state of the walk, and the absence of the arrow says it. */
+function aimChipFor(aimed: string): string {
+  if (aimed === "") return "";
+  const leaf = aimed.split("/").pop() ?? aimed;
+  return `<span class="aim" title="the walk is aimed at ${esc(aimed)}" style="display:inline-flex;align-items:center;gap:4px;color:var(--se-accent);white-space:nowrap">→ ${esc(leaf)}</span>`;
 }
 
 export function renderMirror(
@@ -1032,7 +1085,20 @@ export function renderMirror(
         `<button class="ghost cur-state" data-machine="${esc(walkMachine.id)}" data-state="${esc(leaf)}" title="the walk stands here — click: jump the view to it">☉ ${esc(leaf)}</button>`,
     )
     .join("");
-  const machineWidget = `<div class="widget" id="w-machine"><div class="widget-head"><span class="crumbs">${crumbs}</span><span class="head-controls" style="display:flex;align-items:center;gap:10px">${curBtn}<span class="head-sliders" style="display:flex;align-items:center;gap:10px">${slider}${nrBar}</span>${escapeBtn}<button class="expand" data-widget="w-machine" data-url="/widget/machine?view=${encodeURIComponent(decl.id)}" title="expand · ctrl-click: new tab · shift-click: new window — both open frozen on what this card is showing">⛶</button></span></div><div class="widget-body">${svg}</div></div>`;
+  // WHERE THE WALK IS AIMED, beside where it stands (owner ruling 2026-08-23).
+  //
+  // THE ROUTE LINE WAS NOT ENOUGH. It draws only where the target sits in the
+  // SAME drawing, and an iteration aimed at its ship state routes across
+  // machines — so the blue line went missing exactly when a target existed.
+  //
+  // NOTHING ROUTED SHOWS AS NOTHING, never as a dash. An empty target is a real
+  // state of the walk, and the absence of the arrow says it.
+  //
+  // IT IS NOT A BUTTON. The position is clickable because jumping the view to
+  // it is a thing a reader wants; the target is a fact, and nothing happens if
+  // you press a fact.
+  const aimChip = aimChipFor(m.session.target);
+  const machineWidget = `<div class="widget" id="w-machine"><div class="widget-head"><span class="crumbs">${crumbs}</span><span class="head-controls" style="display:flex;align-items:center;gap:10px">${curBtn}${aimChip}<span class="head-sliders" style="display:flex;align-items:center;gap:10px">${slider}${nrBar}</span>${escapeBtn}<button class="expand" data-widget="w-machine" data-url="/widget/machine?view=${encodeURIComponent(decl.id)}" title="expand · ctrl-click: new tab · shift-click: new window — both open frozen on what this card is showing">⛶</button></span></div><div class="widget-body">${svg}</div></div>`;
   const detailsWidget = `<div class="widget" id="w-details">${widgetHead("details", "w-details", "/widget/details")}
     ${info.status === "closed" ? '<div class="meta" style="color:var(--se-fail)">machine closed</div>' : ""}
     <div class="meta" id="details-title" data-morph-ignore>—</div>

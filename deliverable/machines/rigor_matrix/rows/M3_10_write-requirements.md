@@ -40,7 +40,7 @@ specification_note: |
   design-input chapter transcludes the register. Never a hand-maintained
   table.
 depends_on:
-  - gate-inputs
+  - spawn-for-requirements
 entry_read:
   - deliverable/machines/methods/meth-requirement-authoring.md
 legal_tools:
