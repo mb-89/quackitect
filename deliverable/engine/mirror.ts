@@ -23,7 +23,7 @@ import { beginPass, endPass } from "./notes.ts";
 import { renderSidebar, tasksTable } from "./params.ts";
 import { resolveInRoot, seDir } from "./paths.ts";
 import { produce } from "./produce.ts";
-import { ENGINE_LIFE, feedRows, type MirrorState, renderMirror } from "./render.ts";
+import { ENGINE_LIFE, feedRows, linkDocRefs, type MirrorState, renderMirror } from "./render.ts";
 import { runningWork } from "./run.ts";
 import { loadLevels, loadStopAt } from "./scale.ts";
 import type { Session } from "./session.ts";
@@ -657,15 +657,8 @@ export function startMirror(o: MirrorOptions): Server {
       }
       raw = raw.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n/, ""); // frontmatter is machine-facing
       let html = p.endsWith(".md") ? (marked.parse(raw) as string) : `<pre>${raw.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</pre>`;
-      // see dsp-legible-controls.md#a-reference-in-prose-is-a-link-not-dead
-      if (p.endsWith(".md")) {
-        const links = state.session.docRefPaths(p);
-        const escAttr = (s: string): string => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
-        html = html.replace(/\[\[([^\]\n]+)\]\]/g, (whole: string, id: string) => {
-          const path = links[id.trim()];
-          return path === undefined ? whole : `<a class="doclink" data-path="${escAttr(path)}">${escAttr(id.trim())}</a>`;
-        });
-      }
+      // THE SURFACE MAKES THE LINK, not the server. see linkDocRefs.
+      if (p.endsWith(".md")) html = linkDocRefs(html, state.session.docRefPaths(p));
       if (url.searchParams.get("page") === "1") {
         // A standalone page — ctrl/shift-click targets (new tab, new window).
         res.writeHead(200, { "content-type": "text/html; charset=utf-8" });

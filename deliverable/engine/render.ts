@@ -580,6 +580,21 @@ const ELEMENTS = '<script type="module" src="/vendor/vscode-elements.js"></scrip
 // see dsp-mirror-render.md#the-palette-is-configuration
 const PALETTE_FALLBACK = ":root{--se-bg:#14171a;--se-fg:#d8dde2}";
 
+/** TURN `[[refs]]` IN RENDERED PROSE INTO LINKS THE READER CAN FOLLOW.
+ *
+ *  IT LIVES HERE BECAUSE MARKUP LIVES HERE (i4, 2026-08-23). The server used to
+ *  build this anchor itself, which made the server a place markup came from.
+ *  Every reference the panel shows now comes out of the one surface.
+ *
+ *  see dsp-legible-controls.md#a-reference-in-prose-is-a-link-not-dead */
+export function linkDocRefs(html: string, links: Record<string, string>): string {
+  const attr = (s: string): string => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
+  return html.replace(/\[\[([^\]\n]+)\]\]/g, (whole: string, id: string) => {
+    const path = links[id.trim()];
+    return path === undefined ? whole : `<a class="doclink" data-path="${attr(path)}">${attr(id.trim())}</a>`;
+  });
+}
+
 export function palette(root: string): string {
   try {
     return readFileSync(palettePath(root), "utf8");

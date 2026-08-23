@@ -74,12 +74,12 @@ describe("parameter panels", { concurrency: true }, () => {
       ...VALUES,
       autonomy: 1,
       emergency: true,
-      toggles: { "block-auto-sleep": true, "shutdown-at-idle": false },
+      toggles: { "block-auto-sleep": true, "shutdown-at-front-desk": false },
     });
     assert.match(armed, />E</, "the armed top rung says so on itself");
     assert.match(armed, /class="rung on danger emergency"/);
     assert.match(armed, /data-toggle="block-auto-sleep"[^>]*aria-pressed="true"/);
-    assert.match(armed, /data-toggle="shutdown-at-idle"[^>]*aria-pressed="false"/);
+    assert.match(armed, /data-toggle="shutdown-at-front-desk"[^>]*aria-pressed="false"/);
   });
 
   test("the shipped control bar is read from its spec, not from code", () => {
@@ -116,7 +116,7 @@ describe("parameter panels", { concurrency: true }, () => {
     // The shutdown row: two buttons that do not exclude each other, which is
     // why it is `toggles` and not `choice`.
     assert.match(html, /data-toggle="block-auto-sleep"/);
-    assert.match(html, /data-toggle="shutdown-at-idle"/);
+    assert.match(html, /data-toggle="shutdown-at-front-desk"/);
   });
 
   // THE LOAD-BEARING GUARANTEE. Skipping an unknown type quietly would let a

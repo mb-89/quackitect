@@ -20,7 +20,20 @@ files:
   - deliverable/engine/sessionreads.ts
   - deliverable/engine/sessionviews.ts
   - deliverable/engine/sessionscript.ts
+  - deliverable/engine/bin/hands-spawned.ts
 ---
+
+## The spawn check belongs here, and was unclaimed until i4
+
+`bin/hands-spawned.ts` IS THE LEAVING JUDGMENT OF EVERY SPAWN STATE. It reads
+the record's own walker ceiling and reports what stands registered against it.
+
+IT BELONGS TO THE WALK MACHINE BY ITS SUBJECT. The roster of hands is part of
+how a record is walked, and the spawn states are states of this machine like
+any other. No other spec's design serves it.
+
+THE LANE STILL STARTS NOTHING. The script reads the job registry and reports;
+the spawn is the guide's own act through the harness.
 
 ## Two files were unclaimed, and one of them is where green is decided
 

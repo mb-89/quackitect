@@ -239,7 +239,7 @@ export const NODE_TABLE_EDITOR: EditorKind = {
       const cbar = c.closest(".sfntpager");
       sfntMiss[cbar.dataset.field] = c.checked;
       sfntPage[cbar.dataset.field] = 0;
-      if (document.activeElement) document.activeElement.blur();
+      sePlaceRelease();
       sfntApply();
       return;
     }

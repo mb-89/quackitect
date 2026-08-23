@@ -38,8 +38,10 @@ function markerHits(dir: string, out: { path: string; line: number; says: string
       continue;
     }
     if (!name.endsWith(".md")) continue;
-    const lines = readFileSync(full, "utf8").split("\n");
-    if (lines[0] !== "---") continue;
+    // A BYTE-ORDER MARK IS NOT CONTENT. Comparing the raw first line meant a
+    // file saved with one was skipped silently, which reads as green.
+    const lines = readFileSync(full, "utf8").replace(/^﻿/, "").split("\n");
+    if (lines[0].trim() !== "---") continue;
     const close = lines.indexOf("---", 1);
     if (close < 0) continue;
     for (let i = 1; i < close; i++) {
@@ -72,10 +74,11 @@ process.stdout.write(`sweep: ${String(r.scanned)} node(s) under ${rel} in ${Stri
 //
 // SAME RULE, SAME LISTS. widgets.ts owns the question and both callers ask it,
 // so there is no second copy to drift.
-// THE MARKER SWEEP RUNS OVER `spec/` ONLY, and that is deliberate. The item
-// templates under `deliverable/machines/` LIST these markers as banned, so
-// sweeping them would flag the rule for stating itself.
-const markers = markerHits(join(root, "spec"));
+// THE MARKER SWEEP RUNS OVER THE SAME TREE THE CORPUS SWEEP DOES, so `--under`
+// moves both rather than one. Pointing it at `deliverable/machines/` would
+// flag the item templates for LISTING these markers as banned, which is the
+// rule stating itself.
+const markers = markerHits(join(root, rel));
 if (markers.length > 0) {
   process.stdout.write(`\nunresolved markers — ${String(markers.length)} in signed artifacts\n`);
   for (const h of markers.slice(0, 40)) process.stdout.write(`- ${h.path}:${String(h.line)} — ${h.says}\n`);

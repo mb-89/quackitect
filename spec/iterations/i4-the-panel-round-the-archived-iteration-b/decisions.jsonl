@@ -298,3 +298,29 @@
 {"ts":"2026-08-23T19:45:39.383Z","op":"done","visit":"iterations/i4/build-steps/the-set-building-call@0","node":"d103","brief":"the control names the front desk, and a hung job no longer vetoes the shutdown"}
 {"ts":"2026-08-23T19:45:54.386Z","op":"done","visit":"iterations/i4/build-steps/the-set-building-call@0","node":"d104","brief":"eight of the ten chunks are signed; the collapse and the battery are what is left"}
 {"ts":"2026-08-23T19:46:17.024Z","op":"update","visit":"iterations/i4/build-steps/the-widget-predicate@1","node":"d110","brief":"the power test follows the renamed control"}
+{"ts":"2026-08-23T19:47:11.077Z","op":"plan","visit":"iterations/i4/build-steps/the-widget-predicate@1","parent":null,"nodes":[{"id":"d111","brief":"make the rule reachability from the panel's renderer"},{"id":"d112","brief":"run the sweep and read what is left"},{"id":"d113","brief":"decide whatever is left over"}]}
+{"ts":"2026-08-23T19:48:53.132Z","op":"update","visit":"iterations/i4/build-steps/the-widget-predicate@1","node":"d114","brief":"the doclink markup moves out of the server and into the surface"}
+{"ts":"2026-08-23T19:49:47.761Z","op":"update","visit":"iterations/i4/build-steps/the-widget-predicate@1","node":"d115","brief":"a placeholder in prose is not markup; the diagnostic page is declared"}
+{"ts":"2026-08-23T19:50:20.039Z","op":"done","visit":"iterations/i4/build-steps/the-set-building-call@0","node":"d105","brief":"the sweep is green: markers, widget guard and corpus all clean"}
+{"ts":"2026-08-23T19:51:17.610Z","op":"update","visit":"iterations/i4/build-steps/the-eighteen-are-decided@0","node":"d116","brief":"the design spec and the test spec carry the owner's rule now"}
+{"ts":"2026-08-23T19:51:43.016Z","op":"update","visit":"iterations/i4/build-steps/the-eighteen-are-decided@0","node":"d117","brief":"the design spec and the test spec carry the owner's rule now"}
+{"ts":"2026-08-23T19:52:12.293Z","op":"update","visit":"iterations/i4/build-steps/the-eighteen-are-decided@0","node":"d118","brief":"the design spec carries the owner's rule"}
+{"ts":"2026-08-23T19:52:59.495Z","op":"update","visit":"iterations/i4/trace-design@0","node":"d119","brief":"claiming the new files so the dead-code sweep has no orphan"}
+{"ts":"2026-08-23T19:54:16.769Z","op":"update","visit":"iterations/i4/trace-design@0","node":"d120","brief":"the spawn check is claimed by the walk machine, whose roster it enforces"}
+{"ts":"2026-08-23T19:56:38.077Z","op":"done","visit":"iterations/i4/build-steps/the-widget-predicate@1","node":"d113","brief":"the collapse landed: 21 strays down to zero, sweep green"}
+{"ts":"2026-08-23T19:56:40.212Z","op":"update","visit":"iterations/i4/verification@0","node":"d121","brief":"tester: tracing the surface closure from render.ts to check the widget guard"}
+{"ts":"2026-08-23T19:57:03.479Z","op":"update","visit":"iterations/i4/verification@0","node":"d122","brief":"tester: counting the sites that ask the reader's place"}
+{"ts":"2026-08-23T19:57:30.347Z","op":"plan","visit":"iterations/i4/fix-findings@0","parent":null,"nodes":[{"id":"d123","brief":"collect every battery finding"},{"id":"d124","brief":"fix them in one pass"},{"id":"d125","brief":"confirm in one run"}]}
+{"ts":"2026-08-23T19:57:55.208Z","op":"update","visit":"iterations/i4/fix-findings@0","node":"d126","brief":"tester: checking the resolver seam in render.ts"}
+{"ts":"2026-08-23T19:58:34.282Z","op":"update","visit":"iterations/i4/fix-findings@0","node":"d127","brief":"tester: last check — does render.ts read the walk directly below the resolver call"}
+{"ts":"2026-08-23T20:03:53.003Z","op":"update","visit":"iterations/i4/fix-findings@0","node":"d128","brief":"the fixture forges a signed file the field checks never saw"}
+{"ts":"2026-08-23T20:04:24.274Z","op":"update","visit":"iterations/i4/fix-findings@0","node":"d129","brief":"walking to the claimful state before signing, at full rigor"}
+{"ts":"2026-08-23T20:04:34.580Z","op":"update","visit":"iterations/i4/fix-findings@0","node":"d130","brief":"does walking to the claimful state let the door sign it"}
+{"ts":"2026-08-23T20:04:52.601Z","op":"update","visit":"iterations/i4/fix-findings@0","node":"d131","brief":"checking the reading the retro demands, then signing"}
+{"ts":"2026-08-23T20:05:06.540Z","op":"plan","visit":"iterations/i4/fix-findings@0","parent":"d123","nodes":[{"id":"d132","brief":"the full fixture path: walk"},{"id":"d133","brief":"prove the reading"},{"id":"d134","brief":"sign"}]}
+{"ts":"2026-08-23T20:05:31.082Z","op":"update","visit":"iterations/i4/fix-findings@0","node":"d135","brief":"reading the demand out of the refusal rather than hard-coding it"}
+{"ts":"2026-08-23T20:05:40.933Z","op":"update","visit":"iterations/i4/fix-findings@0","node":"d136","brief":"does reading the demand out of the refusal get the fixture through"}
+{"ts":"2026-08-23T20:05:58.065Z","op":"plan","visit":"iterations/i4/fix-findings@0","parent":"d123","nodes":[{"id":"d137","brief":"the fixture now walks like a real walk: fill"},{"id":"d138","brief":"submit"},{"id":"d139","brief":"prove"},{"id":"d140","brief":"advance"}]}
+{"ts":"2026-08-23T20:06:06.190Z","op":"update","visit":"iterations/i4/fix-findings@0","node":"d141","brief":"filling each form on the way, as a real walk does"}
+{"ts":"2026-08-23T20:06:53.806Z","op":"update","visit":"iterations/i4/fix-findings@0","node":"d142","brief":"recording the claimops diagnosis so it is not re-derived"}
+{"ts":"2026-08-23T20:09:07.417Z","op":"done","visit":"iterations/i4/fix-findings@0","node":"d124","brief":"six tester findings fixed; the claimops fixture needs a redesign"}
