@@ -122,7 +122,7 @@ describe("the idle clock", () => {
   // would strand it.
   test("a walk that is not at idle is never idle, however long the silence", () => {
     const s = new Session(root());
-    assert.notEqual(s.active()[0], "idle", "a fresh session stands at start, not idle");
+    assert.notEqual(s.active()[0], "front_desk", "a fresh session stands at start, not idle");
     assert.equal(s.idleFor(0), false, "zero silence required, and it still refuses");
   });
 

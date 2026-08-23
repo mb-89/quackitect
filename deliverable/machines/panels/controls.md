@@ -32,6 +32,15 @@ edits it in the real world, and Obsidian reads it.
 - `actions` — a bank of one-shot buttons: caption then route, repeated.
   Each press posts its route and nothing else. Not an `action`: an action
   joins the row above, and a bank IS its own row, label first.
+- `table` — rows of plain text under named columns. Fields: key.
+  The key names which table in the values gets drawn.
+  It is READ-ONLY and nothing in it can be pressed.
+  ONE LINE PER ROW. The last column is the wide one and the surface truncates
+  it, so short scannable facts go first and the long description goes last.
+  THE FULL TEXT OF EVERY CELL IS ON ITS TOOLTIP, which is where a truncated
+  line can still be read.
+  The label stands whether or not there are rows, like every other row. An
+  empty table is the ordinary case and says so in words.
 
 A type this renderer does not know is a REFUSAL, not a guess. That is the
 whole point: the drawing decides, and an unlisted widget cannot appear by
@@ -65,6 +74,17 @@ screen twice, which is the same two-drawings fault the sliders had.
 THE NOTE ROW IS ITS OWN PANEL (note-entry.md) and the sidebar draws it under
 this one. It is a separate control with a separate spec, so it is not
 restated here.
+
+## A panel whose height changes goes last
+
+THE BACKGROUND TABLE IS ITS OWN PANEL (tasks.md) and the sidebar draws it
+under everything, including the note row. Its height follows how many jobs are
+running, so anywhere else it would push the controls below it up and down
+while a person is reaching for one (owner ruling 2026-08-23).
+
+A NEW CONTROL BELONGS IN THIS FILE, not after that one. `renderSidebar` in
+`deliverable/engine/params.ts` fixes the order, so adding a row here can never
+push the table off the bottom.
 
 ## The stop-at row
 

@@ -14,6 +14,8 @@ how_likely: expected
 source_refs:
   - deliverable/engine/editors/checklist.ts
   - deliverable/machines/forms/templates/checklist.md
+last_looked: 2026-08-23
+look_verdict: rescheduled
 ---
 
 Found during i8's M8 sweep-consistency pass, surface class "panels and

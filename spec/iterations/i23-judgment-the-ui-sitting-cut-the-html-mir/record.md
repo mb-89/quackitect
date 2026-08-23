@@ -7,6 +7,12 @@ goal: "JUDGMENT — the UI sitting: cut the HTML mirror, settle the VS Code shel
 vision: |-
   NEEDS THE OWNER AT THE SCREEN. Visual design is his, and several items here are one-surface-versus-two decisions that only make sense while looking at them.
 
+  THE SPLIT RULE (owner ruling 2026-08-23). This record holds ONLY what needs the owner's judgment. Everything already ruled, and every item shaped like a defect with one right answer, belongs to i4 and is struck from here.
+
+  STRUCK AND MOVED TO i4: the HTML mirror cut, ruled 2026-08-06; the shell defect list, including the two renderers that draw the same controls and disagree silently; honest degradation, ruled in; the no-green-ocean law; the UI rulings of 2026-08-10; no silent drops in the trace graph; both autonomy-control defects; and the table-editor extraction. Read them here for their argument; build them there.
+
+  WHAT STAYS IS JUDGMENT: the coverage dashboard's design, v1's filter-column trick as a proposal to adopt, the owner's own layout and the log-placement test, the five-files-per-level law as something to adopt, the deferred layout direction with its technology question, v1's open risk that an item-level node-link graph has no tooling precedent, and the open question of where a contract-only interface hangs.
+
   THE MIRROR CUT IS ALREADY RULED (2026-08-06): the HTML mirror goes out. The pre-cut checks ride the backlog — the widget and doc routes, the twin form renderers, and the finding that code serve-web never surfaces a folder-dropped extension's contributions, which decides the shape.
 
   THE DASHBOARD IS THE COVERAGE SURFACE WE LACK. The mechanical coverage checks already exist in engine/trace.ts; what is missing is the live view. The owner's own words: humans cannot read the data in the database without visualisations, so we need them.
@@ -57,6 +63,12 @@ JUDGMENT — the UI sitting: cut the HTML mirror, settle the VS Code shell, and 
 ## Rough vision
 
 NEEDS THE OWNER AT THE SCREEN. Visual design is his, and several items here are one-surface-versus-two decisions that only make sense while looking at them.
+
+THE SPLIT RULE (owner ruling 2026-08-23). This record holds ONLY what needs the owner's judgment. Everything already ruled, and every item shaped like a defect with one right answer, belongs to i4 and is struck from here.
+
+STRUCK AND MOVED TO i4: the HTML mirror cut, ruled 2026-08-06; the shell defect list, including the two renderers that draw the same controls and disagree silently; honest degradation, ruled in; the no-green-ocean law; the UI rulings of 2026-08-10; no silent drops in the trace graph; both autonomy-control defects; and the table-editor extraction. Read them here for their argument; build them there.
+
+WHAT STAYS IS JUDGMENT: the coverage dashboard's design, v1's filter-column trick as a proposal to adopt, the owner's own layout and the log-placement test, the five-files-per-level law as something to adopt, the deferred layout direction with its technology question, v1's open risk that an item-level node-link graph has no tooling precedent, and the open question of where a contract-only interface hangs.
 
 THE MIRROR CUT IS ALREADY RULED (2026-08-06): the HTML mirror goes out. The pre-cut checks ride the backlog — the widget and doc routes, the twin form renderers, and the finding that code serve-web never surfaces a folder-dropped extension's contributions, which decides the shape.
 

@@ -7,6 +7,7 @@ statement: state what work the session has under way that the caller cannot see,
 satisfies:
   - req-one-call-reports-every-piece-of-work-out-of-sight
   - req-a-time-remaining-names-its-basis
+  - req-responsiveness
 inputs:
   - flow-work-under-way
   - flow-test-timings

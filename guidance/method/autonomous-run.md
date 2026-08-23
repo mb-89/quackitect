@@ -61,7 +61,7 @@ planned. So the tidy-up runs a second time over what it added.
 
 ## Phase 5 — done
 
-Back at idle with nothing left, follow the shutdown policy. Say plainly what
+Back at the front desk with nothing left, follow the shutdown policy. Say plainly what
 was done and what was left.
 
 ## The shape worth noticing

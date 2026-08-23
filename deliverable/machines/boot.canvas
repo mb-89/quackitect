@@ -15,7 +15,7 @@
 			"height":160
 		},
 		{"id":"n-read-contract","type":"file","file":"deliverable/machines/states/read_contract.md","x":-1100,"y":-160,"width":620,"height":640},
-		{"id":"n-prepare-idle","type":"file","file":"deliverable/machines/states/prepare_idle.md","x":-340,"y":-160,"width":620,"height":640},
+		{"id":"n-prepare-desk","type":"file","file":"deliverable/machines/states/prepare_desk.md","x":-340,"y":-160,"width":620,"height":640},
 		{
 			"id":"n-end",
 			"type":"file",
@@ -30,7 +30,7 @@
 	],
 	"edges":[
 		{"id":"e-start-read","fromNode":"n-start","fromSide":"right","toNode":"n-read-contract","toSide":"left"},
-		{"id":"e-read-prepare","fromNode":"n-read-contract","fromSide":"right","toNode":"n-prepare-idle","toSide":"left"},
-		{"id":"e-prepare-end","fromNode":"n-prepare-idle","fromSide":"right","toNode":"n-end","toSide":"left"}
+		{"id":"e-read-prepare","fromNode":"n-read-contract","fromSide":"right","toNode":"n-prepare-desk","toSide":"left"},
+		{"id":"e-prepare-end","fromNode":"n-prepare-desk","fromSide":"right","toNode":"n-end","toSide":"left"}
 	]
 }

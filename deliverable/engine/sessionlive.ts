@@ -113,7 +113,7 @@ export class Liveness {
    * A walk standing anywhere else is work in progress, and shutting the
    * machine down under it would strand that work.
    */
-  private static readonly RESTING = new Set(["idle", "front_desk"]);
+  private static readonly RESTING = new Set(["front_desk"]);
 
   /** All three must hold: parked, quiet, and nothing of ours still running. */
   idleFor(ms: number): boolean {

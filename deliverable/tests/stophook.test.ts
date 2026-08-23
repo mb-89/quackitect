@@ -126,7 +126,7 @@ test("a wait with an EMPTY target still passes — that is genuine idle", () => 
 });
 
 test("a wait with a whitespace target passes — blank is blank", () => {
-  assert.equal(verdict([pullRecord({ pull: "wait", where: ["idle"], target: "   " })], {}), "");
+  assert.equal(verdict([pullRecord({ pull: "wait", where: ["front_desk"], target: "   " })], {}), "");
 });
 
 test("a targeted wait already blocked once passes — the valve covers it too", () => {

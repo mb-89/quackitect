@@ -53,7 +53,7 @@ nothing arrives to end it, and the run is spent.
 
 Read the LIVE machinery, in this order. Never answer from memory.
 
-- The doors: `se_survey` carries them as `doors` — idle's live offer,
+- The doors: `se_survey` carries them as `doors` — this state's own live offer,
   statement and weight each. That list is the current vocabulary, and it
   arrives with the same call that lists the work.
 - The open work: the survey's expeditions and iterations — what stands,

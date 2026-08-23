@@ -1,6 +1,6 @@
 <!-- GENERATED at agent start. Do not edit — the next start overwrites it.
-     from guidance/contract.md acbe6e9f500d
-     from guidance/walking.md 09417a5c44e4
+     from guidance/contract.md a6a655923593
+     from guidance/walking.md 33d5cae6ee1c
      from guidance/method/lane.md f00d120bd8f3
      from guidance/voice.md 2bbb7751a28c
 -->
@@ -129,7 +129,7 @@ the report and keep going in the same turn. Size is not a reason to hand back;
 large work is done by doing it.
 
 THE ONLY SANCTIONED STOP IS THE MACHINE'S OWN: a threshold above the dial, a
-gate, or idle. A question anywhere else is an unsanctioned stop, and the engine
+gate, or the front desk. A question anywhere else is an unsanctioned stop, and the engine
 cannot see it — it happens in chat, where nothing counts it.
 
 TWO QUESTIONS ARE THE EXCEPTION.
@@ -168,10 +168,19 @@ SO WHAT THE NEXT SESSION MUST KNOW GOES IN THE FOUR HOMES ABOVE, written when
 the thought occurs. A note, a parked to-do, or guidance — never saved for an
 exit that may never come.
 
-A FIELD REPORT IS OWED AT THE END OF EVERY RUN, and it is a different object
+A FIELD REPORT IS OWED ON AN UNATTENDED RUN, and it is a different object
 (owner ruling 2026-08-20). This paragraph used to say no handover file is
 written at all, and the owner struck that: "I don't agree with this. This is an
 error in the guidance."
+
+BESIDE A PERSON, THE CHAT IS THE CHANNEL AND NO FILE IS WRITTEN (owner ruling
+2026-08-23). This line used to say EVERY run, and an attended session dutifully
+wrote one nobody wanted. The owner's words: "You don't need a field report.
+Only cloud agents need a field report."
+
+THE REASON THE RULE GIVES IS ITS OWN SCOPE. Notes die with the container, so
+the report is the only channel that reaches a person. Where the person is
+reading the chat, that channel is already open.
 
 THE TWO ARE NOT THE SAME THING, which is why both halves stand.
 
@@ -496,11 +505,20 @@ SIX ARGUMENTS RIDE EVERY LANE TOOL, the way `update` does.
 NOTHING CHECKS ANY OF IT, and the record marks `as` and `answered_by` as
 claims. `guidance/method/lane.md` carries why.
 
-## Narration — the update rides every call
+## Narration — the update rides the call the ENGINE asks for
 
-`update: {...}` on ANY lane call carries a decision-graph op. Ride one on every
-call that changes something. The toll is the enforcement floor, never the
-rhythm; the log should tell the story without gaps.
+`update: {...}` on ANY lane call carries a decision-graph op.
+
+NARRATE WHEN THE ENGINE ASKS. It asks by warning that the toll is due, by
+refusing a call without one, or by nudging that the checklist has not moved.
+The rest of the time it is not asking, and you do not answer.
+
+THE BAND IS ONE A MINUTE TO ONE EVERY FIVE. Above it you are filling the log;
+below it the log has gaps. Most calls therefore carry nothing.
+
+RIDING ONE ON EVERY CALL IS THE HABIT THIS RULE EXISTS TO STOP. Measured over
+one window: 1445 ops against 124 pulls, twelve per step of walking, none of
+them demanded.
 
 YOUR FIRST ONE IS A PLAN, and it rides the pull that starts the work:
 
@@ -586,6 +604,25 @@ the machine holding that job, not an obstacle to route around.
 
 ## Tests
 
+THE AGENT DOES NOT RUN TESTS. It writes them; the engine runs them. Asking the
+shell to run a test is refused outright, and `no_tool_reason` does not open it.
+
+THE ENGINE DECIDES THE SCOPE, and its answer is the answer. It reads what
+changed, follows the dependencies, and picks a named set of files, the whole
+battery, or NOTHING. Nothing is a real answer: an unchanged tree keeps its last
+verdict.
+
+IN DOUBT IT RUNS LESS, NOT MORE. A test the engine did not run is a test the
+gate review will run when something it depends on changes. Catching a break at
+the review is the design, not a failure of it.
+
+YOU DO NOT SECOND-GUESS THE SCOPE. Not by narrowing it, not by widening it, and
+not by reaching around it. If the scope looks wrong, that is a defect in the
+engine's dependency reading and it goes in a note.
+
+THE TYPECHECKER IS THE SAME. The lane runs it after every edit to a source file
+and hands the errors back on your next answer. Running it yourself is refused.
+
 Test to answer a question — did THIS change break THAT — never to reassure. A
 red is understood and fixed properly, then you move.
 
@@ -593,11 +630,22 @@ A SCOPED RUN IS THE ONLY ONE YOU MAKE. Ask it as a QUESTION — `se_test
 {question: "did X break Y"}` — and the engine decides what to run.
 
 IT DOES NOT BLOCK. The answer comes back `handed_off: true` with a job handle,
-and `se_test {job: "..."}` reads its status.
+and then the run reports itself.
 
-POLLING PAYS NO CALL, for the reason the reading loop pays nothing. SO DO OTHER
-WORK WHILE IT RUNS and read the verdict when it lands. What you never do is sit
-polling in a tight loop.
+THERE IS NO POLL, AND ASKING FOR ONE IS REFUSED. `se_test` takes a question and
+nothing else.
+
+THE RUN RIDES THE `work` ACCOUNT on every lane call you make. It carries how
+far along it is, how many have failed, the first failures by name, and how much
+longer it needs with the basis for that figure. The JOB makes the estimate, not
+you.
+
+SO CARRY ON WORKING. The news finds you on whatever call you were making
+anyway, and the verdict records itself when the run ends.
+
+THIS PAGE USED TO SAY POLLING PAYS NO CALL, and that sentence bought a habit
+nobody wanted. i11 measured it: 494 `se_test` calls produced 66 verdicts, and
+428 of them were polls.
 
 THE FULL BATTERY IS THE ENGINE'S. It runs once, at verification, fired by that
 state's own exit script. You never call it and there is no state where you may.

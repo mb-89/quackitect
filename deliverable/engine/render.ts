@@ -23,7 +23,7 @@ import { bindings, loadCards } from "./cards.ts";
 import type { StrayNote } from "./inbox.ts";
 import type { MachineDecl } from "./machine.ts";
 import { compileMachineCached, resolveRef } from "./machines/compile.ts";
-import { loadPanel, renderPanel } from "./params.ts";
+import { renderSidebar } from "./params.ts";
 import { SCRIPT } from "./renderclient.ts";
 import { STYLE } from "./renderstyle.ts";
 import { loadLevels } from "./scale.ts";
@@ -1008,9 +1008,10 @@ export function renderMirror(
     autonomy: thr,
     ints: { narration_minutes: m.session.narrationMinutes, narration_calls: m.session.narrationCalls },
   };
-  // THE NOTE ROW IS ITS OWN PANEL, drawn right after the controls. Both
-  // surfaces read the same two specs, so neither can drift from the other.
-  const slider = renderPanel(loadPanel(m.root, "controls"), panelValues) + renderPanel(loadPanel(m.root, "note-entry"), panelValues);
+  // ONE FUNCTION STACKS THE PANELS, and both surfaces call it. Concatenating
+  // the specs by hand here is what let the background table go missing from
+  // this surface while the other one carried it.
+  const slider = renderSidebar(m.root, panelValues);
   // see dsp-mirror-render.md#the-shutdown-control-is-gone
 
   const nrBar = "";

@@ -296,23 +296,27 @@ the comparison is set operations over the realizes and files edges. The one
 constraint that matters: the graph must be built from TRUNK, never from the
 merging iteration's own tree.
 
-## A failed gate returns the walk to idle
+## A failed gate returns the walk to the front desk
 
 OWNER RULING 2026-08-15: "A fail of a gate, in my opinion, lands you back at
 idle, and then you need to decide how you go about it. Sometimes you can go
 back maybe only one gate, sometimes we need to go back two gates. A dismissed
 gate goes back to idle."
 
+THE POSITION THE RULING NAMES IS NOW THE FRONT DESK. The idle state was
+removed on 2026-08-23 and the desk took its place as home. The ruling stands
+unchanged; only the name of the place it lands did.
+
 TODAY A FAILED GATE HAS NOWHERE TO GO. gate-implementation's only successor
 is the next state, so a verdict of `fail` stamps nothing and moves nothing.
 When the owner failed i12's implementation gate the walk did not move, and
 the agent had to route around it by hand.
 
-WHY IDLE AND NOT A NAMED PREDECESSOR. How far back a fail should send the
+WHY HOME AND NOT A NAMED PREDECESSOR. How far back a fail should send the
 walk is a judgment that depends on what failed, and the machine cannot know
-it. Idle is the one position from which every route can be drawn, so it is
-the honest destination.
+it. The desk is the one position from which every route can be drawn, so it
+is the honest destination.
 
 THE VERDICT STILL STANDS ON THE FORM. The fail is recorded with its
 rationale; only the POSITION moves. Nothing about the ruling is lost by
-returning to idle.
+returning to the desk.

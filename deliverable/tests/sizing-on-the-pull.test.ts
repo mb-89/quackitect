@@ -66,7 +66,7 @@ test("an unrated step produces nothing rather than a guess", () => {
 test("a pull standing where nothing is rated is unchanged from before this existed", async () => {
   const s = new Session(freshRoot());
   s.setAutonomy(1);
-  await pullTo(s, "idle");
+  await pullTo(s, "front_desk");
   const body = (await s.pull()) as Record<string, unknown>;
   assert.equal(body.hand, undefined, "no rating, no statement — and no refusal either");
   assert.ok("where" in body, "the walk carries on exactly as it did");

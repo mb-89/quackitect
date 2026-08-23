@@ -160,7 +160,15 @@ test("no new file read bypasses the door — the count may fall, never rise", ()
   // AND 121: run.ts timeRemaining reads the running work's own progress file to
   // project how much longer it needs. Same shape and same reason — machine-local
   // JSONL, no door, no parse of a trace node.
-  const CEILING = 121;
+  // AND 122: bound.ts readHostCap reads .se/harness-cap.json, the cap measured
+  // for THIS host by se_probe_cap. It is machine-local, it is read before the
+  // door exists, and bound.ts is below the door in the stack — the door's own
+  // answers are serialised through it.
+  // AND 123: run.ts batteryFound reads the running battery's beat file so the
+  // work account can carry its progress and its failures. That replaced a
+  // status verb agents polled instead of working; the same file was already
+  // read here for the projection.
+  const CEILING = 123;
   let found = 0;
   const offenders: string[] = [];
   const walk = (dir: URL, rel: string): void => {
@@ -223,7 +231,16 @@ test("no new file write bypasses the door — the count may fall, never rise", (
   // damaged, and the restore when the new file would have lost an id. VS Code
   // owns that file and it sits outside the project, so the door can never
   // hold it.
-  const CEILING = 46;
+  // 47 WITH THE MEASURED HOST CAP: bound.ts recordHostCap writes
+  // .se/harness-cap.json. It is machine-local and gitignored, it records what
+  // one host was measured to accept, and bound.ts sits below the door — the
+  // door's answers are serialised through it.
+  // 48 WITH THE LAST BATTERY'S RESULTS: tools-run.ts storeLastResults writes
+  // .se/test-last.json. The work account carries only a failure COUNT, so the
+  // full list has to live somewhere the account can point at. Session state of
+  // exactly the shape of 39, 40 and 42: machine-local, gitignored, and
+  // overwritten by the next run.
+  const CEILING = 48;
   let found = 0;
   const offenders: string[] = [];
   const walk = (dir: URL, rel: string): void => {

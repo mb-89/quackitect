@@ -1,5 +1,5 @@
 // see dsp-lane-door.md#the-answers-bound
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { smallestInlineOutputBytes } from "./harness.ts";
 
@@ -16,7 +16,66 @@ const OWN_CEILING = 6_000;
  *
  *  A host that truncates gives back nothing the engine can act on; this gives
  *  back content plus a cursor. */
-export const ANSWER_BOUND_BYTES = Math.min(OWN_CEILING, smallestInlineOutputBytes() ?? OWN_CEILING);
+/** THE MOST WE WILL SEND EVEN WHERE A HOST TAKES MORE. A cap measured very
+ *  high is still a cap on ONE answer, and a caller reading in pages of a
+ *  quarter megabyte is not reading, it is dumping. */
+const HARD_MAX = 60_000;
+
+/** The size no answer may exceed.
+ *
+ *  THREE NUMBERS DECIDE IT, and the measured one wins where it exists. A cap
+ *  measured on THIS host through se_probe_cap is the truth about this host; a
+ *  registry entry is the truth about hosts somebody measured earlier; and our
+ *  own ceiling is the fallback where neither exists.
+ *
+ *  IT IS A `let` ON PURPOSE. The measured cap is read from disk, and the disk
+ *  is not reachable until somebody tells this module where the session lives.
+ *  setAnswerSpill does that, and reopens the number then. */
+export let ANSWER_BOUND_BYTES = Math.min(OWN_CEILING, smallestInlineOutputBytes() ?? OWN_CEILING);
+
+/** THE ONE ANSWER THAT IS NEVER BOUND. The cap probe exists to find where the
+ *  HOST cuts, so bounding it would measure our own ceiling instead. */
+const UNBOUNDED_TOOLS = new Set(["se_probe_cap"]);
+
+/** WHERE A MEASURED CAP IS KEPT, per checkout.
+ *
+ *  IT IS MEASURED, NOT DECLARED. Only the agent can see whether an answer
+ *  arrived whole, because the cut happens between the host and the model and
+ *  the engine never hears about it. se_probe_cap is the ladder that finds the
+ *  number, and this file is where the answer lands so later sessions inherit
+ *  it instead of guessing again. */
+function capFile(seDir: string): string {
+  return join(seDir, "harness-cap.json");
+}
+
+export function recordHostCap(seDir: string, cap: number): Record<string, unknown> {
+  const clean = Math.max(2_000, Math.floor(cap));
+  mkdirSync(seDir, { recursive: true });
+  writeFileSync(capFile(seDir), JSON.stringify({ inlineOutputBytes: clean }, null, 1), "utf8");
+  return {
+    recorded: clean,
+    note: "the answer bound moves to this on the next engine start — se_reload puts it into effect now",
+  };
+}
+
+export function hostCapState(seDir: string): Record<string, unknown> {
+  return {
+    own_ceiling: OWN_CEILING,
+    measured_for_this_host: readHostCap(seDir),
+    in_effect: ANSWER_BOUND_BYTES,
+    how: "climb se_probe_cap {bytes} until the END-OF-PROBE marker stops arriving, then se_probe_cap {cap: <largest intact>}",
+  };
+}
+
+export function readHostCap(seDir: string): number | undefined {
+  try {
+    const raw = readFileSync(capFile(seDir), "utf8");
+    const n = (JSON.parse(raw) as { inlineOutputBytes?: unknown }).inlineOutputBytes;
+    return typeof n === "number" && n > 0 ? n : undefined;
+  } catch {
+    return undefined;
+  }
+}
 
 /** A first guess at what the envelope costs. The real cost is measured. */
 const ENVELOPE = 2_500;
@@ -36,11 +95,17 @@ const READ_ENVELOPE = 200;
  *  cursor exists to avoid. A page that usually fits is not good enough when
  *  not fitting costs a loop.
  *
- *  THE WORST CASE INSIDE A SPILL FILE IS 2. The file holds JSON text, so it
- *  carries no raw control characters — those are already escaped, and only
- *  those cost more than double. What is left is backslash and quote, and each
- *  of those doubles. */
-const SECOND_ESCAPE = 2;
+ *  IT USED TO BE THE WORST CASE, 2, AND THAT WAS THE WRONG TRADE. A page
+ *  sized on the worst case is less than half of what fits, so every reading
+ *  loop paid about twice the calls it needed. MEASURED: boot's four
+ *  documents come to 61,439 bytes, which is about 29 page reads at the old
+ *  page and about 14 at this one.
+ *
+ *  THE RECURSION IT GUARDED AGAINST IS GONE. characterRead now serialises its
+ *  answer and shrinks the slice until it fits, reporting what actually came
+ *  back in char_range.to. A page that would not fit is trimmed rather than
+ *  spilled, so an optimistic suggestion costs nothing. */
+const SECOND_ESCAPE = 1.15;
 
 /** The smallest page worth sending. Below this the answer is all envelope,
  *  and the caller is better served by the cursor alone. */
@@ -52,7 +117,11 @@ const MIN_PAGE = 500;
  *  lowers ANSWER_BOUND_BYTES, and this lowers with it. A literal could not.
  *
  *  see dsp-lane-door.md#the-answers-bound */
-export const SPILL_PAGE_CHARS = Math.max(MIN_PAGE, Math.floor((ANSWER_BOUND_BYTES - READ_ENVELOPE) / SECOND_ESCAPE));
+function pageFor(bound: number): number {
+  return Math.max(MIN_PAGE, Math.floor((bound - READ_ENVELOPE) / SECOND_ESCAPE));
+}
+
+export let SPILL_PAGE_CHARS = pageFor(ANSWER_BOUND_BYTES);
 
 /** Where an oversized answer spills. Set by whoever knows the project root;
  *  until it is set, the bound still holds and the cursor names the call log
@@ -66,6 +135,11 @@ let spillDir: string | undefined;
 
 export function setAnswerSpill(seDir: string): void {
   spillDir = join(seDir, "answers");
+  // THE MEASURED CAP TAKES EFFECT HERE, which is the first moment this module
+  // knows where to look for it.
+  const measured = readHostCap(seDir);
+  if (measured !== undefined) ANSWER_BOUND_BYTES = Math.min(HARD_MAX, measured);
+  SPILL_PAGE_CHARS = pageFor(ANSWER_BOUND_BYTES);
 }
 
 export interface BoundedAnswer {
@@ -84,6 +158,7 @@ export interface BoundedAnswer {
  *  even when the spill cannot be written. */
 export function boundAnswer(tool: string, payload: unknown, seDir?: string): BoundedAnswer {
   const whole = JSON.stringify(payload, null, 1);
+  if (UNBOUNDED_TOOLS.has(tool)) return { text: whole, cut: false, bytes: whole.length };
   if (whole.length <= ANSWER_BOUND_BYTES) return { text: whole, cut: false, bytes: whole.length };
 
   const spilled = spill(tool, whole, seDir === undefined ? spillDir : join(seDir, "answers"));

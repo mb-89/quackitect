@@ -124,6 +124,7 @@ const ALWAYS_LEGAL: ReadonlySet<string> = new Set([
   "se_reopen",
   "se_amend",
   "se_why",
+  "se_reload",
 ]);
 /** Nothing is restricted today. see dsp-lane-door.md#nothing-is-restricted-today */
 const RESTRICTED: ReadonlySet<string> = new Set<string>();
@@ -971,20 +972,18 @@ export class Session {
 
   /** see dsp-walk-machine.md#the-ordered-reload */
   requestReload(): Record<string, unknown> {
-    const leaf = this.active()[0] ?? "";
-    if (leaf !== "idle" && !this._emergency) {
-      throw new Rejection({
-        clause: CLAUSES.NOT_LEGAL_IN_STATE,
-        expected: "the walk at idle — a reload reboots it, nothing mid-flight may be lost",
-        got: `standing in ${leaf || "(nowhere)"}`,
-        remedy: {
-          tool: "se_pull",
-          args: {},
-          note: "reach idle first — answer the offered doors with idle, or ask the person to aim the mirror — then se_reload",
-        },
-        source: "engine/session.ts reload",
-      });
-    }
+    // A RELOAD IS LEGAL WHEREVER THE WALK STANDS.
+    //
+    // IT USED TO DEMAND THE FRONT DESK. An agent that had just fixed the
+    // engine then had to leave its record and walk back in to put that fix
+    // into effect, which is the walk doing paperwork for the machine.
+    //
+    // NOTHING MID-RECORD IS LOST. The forms are on disk and the pull
+    // recomputes the position from the repository, which is the same property
+    // that makes a killed session survivable.
+    //
+    // THE CANARY BELOW IS THE GUARD THAT MATTERS, and it is untouched: a tree
+    // whose module graph will not load never kills a running engine.
     const engineDir = dirname(fileURLToPath(import.meta.url));
     const entry = pathToFileURL(join(engineDir, "tools.ts")).href;
     const probe = `import(${JSON.stringify(entry)}).then(()=>process.exit(0),(e)=>{console.error("se canary: "+(e&&e.message||e));process.exit(1)})`;
@@ -2336,15 +2335,10 @@ export class Session {
       });
     }
     const { machine, ids } = this.leaves();
-    if (this._target === "" && !this.inSub() && ids.length === 1 && ids[0] === "front_desk") {
-      // The desk borrows idle's doors, and a borrowed offer loses the hub
-      // itself. Idle is the one state with no owed work — the reload's
-      // home — and every borrowed door sails PAST it, the nearest being
-      // end, which shuts the server down. So the hub is offered too.
-      const hub = this.machine.states.find((s) => s.id === "idle");
-      const doors = this.optionsAt(this.machine, "idle");
-      return hub === undefined ? doors : [this.doorOption(this.machine, hub, "idle", "normal"), ...doors];
-    }
+    // THE DESK USED TO BORROW IDLE'S DOORS and graft the hub back on, because
+    // every borrowed door sailed past the resting state. The desk IS the
+    // resting state now, so its own edges are the
+    // offer and the special case is gone.
     return ids.flatMap((id) => this.optionsAt(machine, id));
   }
 
@@ -2912,14 +2906,18 @@ export class Session {
     return `nothing is owed here and the walk did not move${why}. Aim at where you are going with se_aim${doors}, then pull. se_why names what holds any state grey.`;
   }
 
-  /** THE DOORS — idle's edges of the main machine, with statement, kind
-   *  and weight. The switchboard's offer is the system's live vocabulary:
+  /** THE DOORS — the FRONT DESK's edges of the main machine, with statement,
+   *  kind and weight. The switchboard's offer is the system's live vocabulary:
    *  the desk advises FROM it (via the survey), so a lane that lands or
-   *  changes shows up without anybody editing a document. */
+   *  changes shows up without anybody editing a document.
+   *
+   *  THESE USED TO BE IDLE'S EDGES, with the desk one hop past the hub. The
+   *  hub was removed and the desk took its place, so the offer is now the
+   *  desk's own. */
   doors(): Record<string, unknown>[] {
-    const idle = this.machine.states.find((s) => s.id === "idle");
-    if (idle === undefined) return [];
-    return idle.edges.map((e) => {
+    const desk = this.machine.states.find((s) => s.id === "front_desk");
+    if (desk === undefined) return [];
+    return desk.edges.map((e) => {
       const t = this.machine.states.find((x) => x.id === e.to);
       return t === undefined
         ? { to: e.to }
@@ -2996,7 +2994,7 @@ export class Session {
     // FOLLOWING THE LANE'S OWN CURSOR IS ALWAYS LEGAL. A bounded answer hands
     // back a page and the exact call that fetches the rest. A state that
     // serves one and then forbids the read makes its own answer unreadable —
-    // and boot/prepare_idle, which allows no tools at all, does exactly that.
+    // and boot/prepare_desk, which allows no tools at all, does exactly that.
     if (
       tool === "se_file_read" &&
       String(args.path ?? "")
@@ -3704,7 +3702,7 @@ export class Session {
         remedy: {
           tool: "se_pull",
           args: {},
-          note: "run the RETRO first (idle → retro): its drain dispositions these notes, then this gate opens",
+          note: "run the RETRO first (front_desk → retro): its drain dispositions these notes, then this gate opens",
         },
         source: "engine/session.ts conditions",
       });
@@ -4186,7 +4184,7 @@ export class Session {
       };
     }
     const info = this.packet();
-    if (!this.bannerShown && !this.inSub() && activeStates(this.instance).includes("idle")) {
+    if (!this.bannerShown && !this.inSub() && activeStates(this.instance).includes("front_desk")) {
       this.bannerShown = true;
       const brief = this.lastSessionBriefing();
       return {

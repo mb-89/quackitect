@@ -14,6 +14,8 @@ how_likely: plausible
 source_refs:
   - note-0c5b06e4d056
   - tsp — trace-design's own guidance names the grain and its cost
+last_looked: 2026-08-23
+look_verdict: rescheduled
 ---
 
 Quality traded for speed, consciously: v1 went finer with `// design:`

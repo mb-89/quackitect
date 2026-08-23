@@ -177,7 +177,7 @@ are drawn as pills.
 sharing the same two notes; the machinery walks out of start and the
 machine is done when end activates. **The MAIN machine** (`main.canvas`)
 runs every session: `start → boot → idle → end`, where **boot is a
-sub-machine** (`boot.canvas`: `start → read_contract → prepare_idle → end`)
+sub-machine** (`boot.canvas`: `start → read_contract → prepare_desk → end`)
 and future work states branch from idle. `se_pull` walks it — the whole
 happy path per call; the SessionStart hook makes the agent pull
 immediately and show the landing banner verbatim; THE STATE GATE makes

@@ -1,0 +1,4 @@
+{"ts":"2026-08-23T12:15:15.262Z","op":"plan","visit":"iterations/i4/start@0","parent":null,"nodes":[{"id":"d1","brief":"enter i4 onboarding"},{"id":"d2","brief":"drain the inbox"},{"id":"d3","brief":"reach the kickoff gate"}]}
+{"ts":"2026-08-23T12:16:34.420Z","op":"done","visit":"iterations/i4/start@0","node":"d2","brief":"inbox drained to zero, both notes minted as tokens"}
+{"ts":"2026-08-23T12:23:42.946Z","op":"update","visit":"iterations/i4/gate-kickoff@0","node":"d4","brief":"rewriting i4's vision to the owner's scope ruling"}
+{"ts":"2026-08-23T12:25:04.117Z","op":"update","visit":"iterations/i4/gate-kickoff@0","node":"d5","brief":"applying the judgment split across i4 and i23"}

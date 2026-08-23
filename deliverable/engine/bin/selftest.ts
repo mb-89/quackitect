@@ -1,11 +1,11 @@
 // The full engine suite — an ordinary SCRIPT condition (exit 0 = green).
 //
 // BOOT DOES NOT RUN THIS. Boot runs the PREFLIGHT and the SMOKE test, and
-// nothing else: machines/states/prepare_idle.md names those two, and together
+// nothing else: machines/states/prepare_desk.md names those two, and together
 // they cost about half a second. This file is the full battery, ~74s over 359
 // tests, and it is run deliberately — by se_test, or by hand before landing.
 //
-// THIS COMMENT USED TO SAY THE OPPOSITE, claiming prepare_idle listed it here
+// THIS COMMENT USED TO SAY THE OPPOSITE, claiming prepare_desk listed it here
 // beside the preflight. It does not, and has not: the owner's rule is that
 // only smoke tests gate boot. A stale comment about what boot costs is worth
 // correcting, because it is what anyone reads before deciding to restart.
@@ -37,7 +37,7 @@ if (process.argv.some((a) => a === "--help" || a === "-h" || a === "-?")) {
   process.exit(0);
 }
 // RECURSION GUARD: the suite itself walks boot machines in temp roots,
-// and those walks hit prepare_idle's exit scripts — which would spawn the
+// and those walks hit prepare_desk's exit scripts — which would spawn the
 // suite again, forever. The test helpers set this before any walk.
 if (process.env.SE_SELFTEST_SKIP === "1") {
   process.stdout.write("selftest skipped — already inside a selftest run\n");

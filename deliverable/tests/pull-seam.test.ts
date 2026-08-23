@@ -27,7 +27,10 @@ describe("the multi-agent seam stays open", { concurrency: true }, () => {
   test("a LIST of offered doors takes the first and hands the rest back", async () => {
     const s = await sessionAtIdle(root());
     s.setAutonomy(1);
-    const r = (await s.pull({ form: { choice: ["front_desk", "retro", "overhaul"] } })) as Record<string, unknown>;
+    // Boot lands ON the front desk directly now (idle is gone), so it can no
+    // longer be one of the offered doors chosen FROM here. Any other door
+    // stands in for the walked entry; the rest of the list is unaffected.
+    const r = (await s.pull({ form: { choice: ["iterations", "retro", "overhaul"] } })) as Record<string, unknown>;
     assert.deepEqual(r.not_walked, ["retro", "overhaul"], "the rest come back rather than vanishing");
     assert.match(String(r.note), /only the first/, "and the answer says so plainly");
   });
@@ -35,7 +38,9 @@ describe("the multi-agent seam stays open", { concurrency: true }, () => {
   test("a single choice is the same form with one door, and reports no leftovers", async () => {
     const s = await sessionAtIdle(root());
     s.setAutonomy(1);
-    const r = (await s.pull({ form: { choice: "front_desk" } })) as Record<string, unknown>;
+    // front_desk is where the walk already stands (idle is gone), so it is
+    // not an offered door here — pick a real one instead.
+    const r = (await s.pull({ form: { choice: "retro" } })) as Record<string, unknown>;
     assert.equal("not_walked" in r, false, "nothing was left over, so nothing is reported");
   });
 });

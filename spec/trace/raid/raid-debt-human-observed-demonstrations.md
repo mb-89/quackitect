@@ -17,6 +17,8 @@ source_refs:
   - tsp-tour-run
   - tsp-desk-and-gates
   - meth-verification-discipline
+last_looked: 2026-08-23
+look_verdict: rescheduled
 ---
 
 ## What is actually owed

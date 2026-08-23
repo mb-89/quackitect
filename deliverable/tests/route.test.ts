@@ -50,13 +50,17 @@ test("the blue line: from a cold start to the front desk, every hop named", () =
   // Two of these moves are drawn NOWHERE and are the reason the route needs
   // its own model: entering boot lands on the submachine's start, and
   // reaching its end pops back out to the parent's next state.
+  // idle used to sit between boot/end and front_desk. It is gone from the
+  // state machine, so boot lands on front_desk in one hop, not two, and the
+  // stop no longer repeats.
   assert.deepEqual(
     r.steps.map((h) => h.to),
-    ["boot/start", "boot/read_contract", "boot/prepare_idle", "boot/end", "idle", "front_desk"],
+    ["boot/start", "boot/read_contract", "boot/prepare_desk", "boot/end", "front_desk"],
   );
   assert.deepEqual(r.steps[0].tick, { from: "start", to: "boot" }, "each hop carries the exact tick that performs it");
   assert.deepEqual(r.steps[4].tick, { from: "boot/end", advance: true }, "popping out of a submachine is an advance");
-  assert.equal(r.steps[5].priority, 0.2, "and every hop carries the weight of ENTERING it");
+  // Five hops now, not six, so the last one sits at index 4.
+  assert.equal(r.steps[4].priority, 0.2, "and every hop carries the weight of ENTERING it");
 });
 
 // THE DESK STOPPED BEING A BLOCKABLE TARGET (owner tier cut-over 2026-08-12).
@@ -138,7 +142,7 @@ test("the sweep stops at the slider, and the target defaults to the front desk",
   await readEverything(s);
   const out = await s.sweep("expeditions", "agent");
   assert.equal(out.arrived, false, "a sweep never walks past the dial");
-  assert.deepEqual(s.active(), ["idle"], "it goes as far as it may and stops there");
+  assert.deepEqual(s.active(), ["front_desk"], "it goes as far as it may and stops there");
   assert.equal((out.refusal as { clause: string }).clause, "SE-C-113");
   // Aiming somewhere the drawing cannot reach is refused, not stored.
   assert.throws(() => s.setTarget("nowhere-at-all"));
@@ -152,7 +156,9 @@ test("the drawing carries the route: a spline OVER the nodes, its stops, an arro
   // The projection gives the ORDERED stops. Hops running around inside one
   // state make it a WAYPOINT, which is what a submachine entered and left is.
   const { waypoints, path } = routeOverlay(s.route("front_desk").steps, "");
-  assert.deepEqual(path, ["start", "boot", "idle", "front_desk"]);
+  // idle used to project to its own repeated front_desk stop. Gone now, so
+  // the projected path is one stop shorter.
+  assert.deepEqual(path, ["start", "boot", "front_desk"]);
   assert.deepEqual([...waypoints], ["boot"], "boot is passed through, so it is a waypoint");
   const html = renderMirror({ session: s, root, lastPacket: undefined, mode: "manual" });
 

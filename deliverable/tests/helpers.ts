@@ -39,7 +39,7 @@ try {
   // no npm install — rgPath() falls back to PATH rg and fails loudly if absent
 }
 
-// Walks in tests hit prepare_idle's exit scripts, and one of those IS the
+// Walks in tests hit prepare_desk's exit scripts, and one of those IS the
 // suite (engine/bin/selftest.ts) — without this guard every booted walk
 // would spawn the whole suite again, recursively.
 process.env.SE_SELFTEST_SKIP = "1";
@@ -273,14 +273,17 @@ async function readBoundedAnswer(server: Server, bounded: Record<string, unknown
   }
 }
 
+/** WAIT FOR A RUN BY READING THE ACCOUNT, which is how a walker learns it too.
+ *  There is no status verb: a run reports itself on the `work` block of every
+ *  lane answer, so any call will do and se_pull is the cheapest. */
 export async function waitForTestJob(server: Server, job: string): Promise<Record<string, unknown>> {
   for (;;) {
-    const response = await call(server, "se_test", {
-      job,
-      update: { op: "update", brief: "Read durable test verdict" },
+    const response = await call(server, "se_pull", {
+      update: { op: "update", brief: "Read the run off the account" },
     });
-    if (response.isError) throw new Error(JSON.stringify(response.body));
-    if (response.body.running === false) return response.body;
+    const account = (response.body.work ?? []) as { job?: string; running?: boolean }[];
+    const entry = account.find((e) => e.job === job);
+    if (entry !== undefined && entry.running === false) return entry as Record<string, unknown>;
     await new Promise<void>((resolve) => setImmediate(resolve));
   }
 }
@@ -523,7 +526,7 @@ export async function readEverything(s: Session): Promise<Record<string, unknown
  *  refusal is an instruction to try again, never a failure.
  *
  *  A BOOT HELPER THAT TREATS IT AS A FAILURE DIES WHENEVER THE MACHINE IS BUSY.
- *  Measured in the full suite: prepare_idle runs five scripts, and against 153
+ *  Measured in the full suite: prepare_desk runs five scripts, and against 153
  *  other suites they outlast the handback bound, so a case that passed alone
  *  failed in the battery. */
 export function judgmentStillRunning(x: unknown): boolean {
@@ -543,7 +546,7 @@ export function judgmentStillRunning(x: unknown): boolean {
 export async function sessionAtIdle(root: string): Promise<Session> {
   const s = new Session(root);
   s.setAutonomy(1);
-  s.setTarget("idle");
+  s.setTarget("front_desk");
   // A PULL THAT ANSWERS "still running" HAS NOT MOVED, so it must not spend one
   // of the bounded attempts. The two counters keep the move budget honest while
   // letting the walk wait for a judgment that is still being reached.
@@ -551,7 +554,7 @@ export async function sessionAtIdle(root: string): Promise<Session> {
   let waits = 0;
   while (moves < 8 && waits < 300) {
     await readEverything(s);
-    if (s.active()[0] === "idle") return s;
+    if (s.active()[0] === "front_desk") return s;
     let packet: unknown;
     try {
       packet = await s.pull();
@@ -570,9 +573,9 @@ export async function sessionAtIdle(root: string): Promise<Session> {
       continue;
     }
     moves++;
-    if (s.active()[0] === "idle") return s;
+    if (s.active()[0] === "front_desk") return s;
   }
-  throw new Error(`the pull did not reach idle: ${JSON.stringify(s.active())}`);
+  throw new Error(`the pull did not reach the front desk: ${JSON.stringify(s.active())}`);
 }
 
 /** Boot an EXISTING server by pulling, exactly as a real agent does: do
@@ -581,7 +584,7 @@ export async function sessionAtIdle(root: string): Promise<Session> {
  *  offered); WITHOUT one, the walk follows the session's default target
  *  and rests at the front desk. */
 export async function pullBoot(server: Server, session?: Session): Promise<void> {
-  if (session !== undefined) session.setTarget("idle");
+  if (session !== undefined) session.setTarget("front_desk");
   let moves = 0;
   let waits = 0;
   while (moves < 12 && waits < 300) {
@@ -603,7 +606,7 @@ export async function pullBoot(server: Server, session?: Session): Promise<void>
       continue;
     }
     const where = r.body.where as string[];
-    if (where.includes("idle") || where.includes("front_desk")) return;
+    if (where.includes("front_desk")) return;
   }
   throw new Error("the pull did not reach a resting place");
 }

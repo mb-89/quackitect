@@ -12,6 +12,7 @@ breaks_how_badly: corrosive
 refines:
   - uc-quality-performance-efficiency
 source_refs:
+  - req-responsiveness, the register this budget is drawn from
   - vp-rigor-without-toil
   - req-call-answers-in-one-second
   - i12

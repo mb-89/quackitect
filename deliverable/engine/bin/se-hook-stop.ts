@@ -44,7 +44,7 @@
 // A hook must never break the turn, so every failure is swallowed and the
 // exit is always clean.
 
-import { closeSync, fstatSync, openSync, readSync } from "node:fs";
+import { closeSync, existsSync, fstatSync, openSync, readdirSync, readFileSync, readSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { recordLifecycle } from "../lifecycle.ts";
@@ -67,6 +67,55 @@ function tailOf(path: string): string {
   } finally {
     closeSync(fd);
   }
+}
+
+/** A BACKGROUND RUN STILL GOING, named for the refusal. Undefined when none is.
+ *
+ *  THE HOOK CANNOT ASK THE SERVER — calling the session's own mirror over HTTP
+ *  deadlocks it. So it reads what a run WRITES: the job records under
+ *  .se/test-jobs, one file per run, whose last line gains an `ended` stamp when
+ *  the verdict lands.
+ *
+ *  STALE RECORDS ARE NOT NEWS. A run older than the window belongs to a session
+ *  that is gone, and blocking on it would wedge every later turn. */
+const RUNNING_WINDOW_MS = 30 * 60 * 1000;
+
+function runningWork(): string | undefined {
+  const dir = join(root, ".se", "test-jobs");
+  if (!existsSync(dir)) return undefined;
+  for (const name of readdirSync(dir)) {
+    if (!name.endsWith(".jsonl")) continue;
+    try {
+      const lines = readFileSync(join(dir, name), "utf8").trimEnd().split("\n");
+      const last = JSON.parse(lines[lines.length - 1]) as { started?: number; ended?: number };
+      if (typeof last.started !== "number" || last.ended !== undefined) continue;
+      if (Date.now() - last.started > RUNNING_WINDOW_MS) continue;
+      const secs = Math.round((Date.now() - last.started) / 1000);
+      return `a test run has been going ${secs}s and its verdict is not in yet`;
+    } catch {
+      // A torn or half-written record is not evidence that anything is running.
+    }
+  }
+  return undefined;
+}
+
+/** Has this stop already been blocked once? Both hosts spell the flag their
+ *  own way, and either spelling means the same thing. */
+function bitesOnce(payload: string): boolean {
+  const p = JSON.parse(payload || "{}") as { stop_hook_active?: boolean; stopHookActive?: boolean };
+  return p.stop_hook_active === true || p.stopHookActive === true;
+}
+
+/** Refuse the stop while a run is going, and say what to do instead. True when
+ *  it wrote the refusal, so the caller exits without deciding anything else. */
+function blockedByRunningWork(): boolean {
+  const busy = runningWork();
+  if (busy === undefined) return false;
+  const reason =
+    `[se] ${busy}. Do not end the turn on it. The run reports itself on the \`work\` account of your next lane call — ` +
+    "how far along, how many failed, and the first failures by name. Read it there, act on the verdict, then stop.";
+  process.stdout.write(`${JSON.stringify({ decision: "block", reason })}\n`);
+  return true;
 }
 
 interface LastPull {
@@ -127,12 +176,17 @@ process.stdin.on("data", (c: string) => {
 });
 process.stdin.on("end", () => {
   try {
-    const p = JSON.parse(raw || "{}") as { stop_hook_active?: boolean; stopHookActive?: boolean };
     // The bites-once valve: a stop already blocked once passes, so a
     // genuinely blocking question can be asked and the turn ended.
-    if (p.stop_hook_active === true || p.stopHookActive === true) {
-      process.exit(0);
-    }
+    if (bitesOnce(raw)) process.exit(0);
+    // A BACKGROUND RUN STILL GOING OUTRANKS EVERY SANCTIONED STOP BELOW. Its
+    // verdict is seconds away and nobody reads a job nobody asked about, so a
+    // turn that ends first throws the answer away.
+    //
+    // IT CANNOT WEDGE A SESSION. The bites-once valve above lets the very next
+    // stop attempt through, so the cost of a run that never finishes is one
+    // extra turn.
+    if (blockedByRunningWork()) process.exit(0);
     const last = lastPull() ?? {};
     const pull = last.pull;
     if (pull === undefined) process.exit(0);

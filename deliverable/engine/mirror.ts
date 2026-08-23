@@ -20,11 +20,11 @@ import { bumpDrawingEpoch } from "./machines/compile.ts";
 import { handleHttp, type McpServer } from "./mcp.ts";
 import { subscribeModelMutations } from "./model-fs.ts";
 import { beginPass, endPass } from "./notes.ts";
-import { loadPanel, renderPanel } from "./params.ts";
+import { renderSidebar, tasksTable } from "./params.ts";
 import { resolveInRoot, seDir } from "./paths.ts";
 import { produce } from "./produce.ts";
 import { ENGINE_LIFE, feedRows, type MirrorState, renderMirror } from "./render.ts";
-import { runningJob } from "./run.ts";
+import { runningWork } from "./run.ts";
 import { loadLevels, loadStopAt } from "./scale.ts";
 import type { Session } from "./session.ts";
 import { survey } from "./survey.ts";
@@ -833,18 +833,18 @@ export function startMirror(o: MirrorOptions): Server {
         // buttons, which is the hole the comment above this block records.
         stopat: loadStopAt(state.root),
         stop_at: state.session.stopAtValue,
-        // WORK STILL RUNNING, so a person watching a still surface can tell a
-        // slow operation from a hung one. Absent when nothing is running, which
-        // is the ordinary case and draws nothing.
-        running: runningJob(),
+        // EVERY PIECE OF WORK STILL RUNNING, so a person watching a still
+        // surface can tell a slow operation from a hung one and can see how
+        // many things are going. Empty is the ordinary case and draws nothing.
+        tables: { running: tasksTable(runningWork()) },
         emergency: state.session.emergency,
         ints: { narration_minutes: state.session.narrationMinutes, narration_calls: state.session.narrationCalls },
         toggles: { "block-auto-sleep": power.block_sleep, "shutdown-at-idle": power.shutdown_at_idle },
       };
-      // THE NOTE ROW RIDES ALONG. It is its own panel with its own spec
-      // (note-entry.md), and serving it here means the sidebar needs one
-      // fetch rather than two, with neither surface writing markup.
-      const bar = renderPanel(loadPanel(state.root, "controls"), values) + renderPanel(loadPanel(state.root, "note-entry"), values);
+      // EVERY PANEL RIDES ALONG, in the one order there is. renderSidebar
+      // decides it, so the sidebar needs one fetch and neither surface writes
+      // markup or picks an order of its own.
+      const bar = renderSidebar(state.root, values);
       res.writeHead(200, { "content-type": "text/html; charset=utf-8", "access-control-allow-origin": "*" });
       res.end(bar);
     },

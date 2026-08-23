@@ -130,7 +130,7 @@ the report and keep going in the same turn. Size is not a reason to hand back;
 large work is done by doing it.
 
 THE ONLY SANCTIONED STOP IS THE MACHINE'S OWN: a threshold above the dial, a
-gate, or idle. A question anywhere else is an unsanctioned stop, and the engine
+gate, or the front desk. A question anywhere else is an unsanctioned stop, and the engine
 cannot see it — it happens in chat, where nothing counts it.
 
 TWO QUESTIONS ARE THE EXCEPTION.
@@ -169,10 +169,19 @@ SO WHAT THE NEXT SESSION MUST KNOW GOES IN THE FOUR HOMES ABOVE, written when
 the thought occurs. A note, a parked to-do, or guidance — never saved for an
 exit that may never come.
 
-A FIELD REPORT IS OWED AT THE END OF EVERY RUN, and it is a different object
+A FIELD REPORT IS OWED ON AN UNATTENDED RUN, and it is a different object
 (owner ruling 2026-08-20). This paragraph used to say no handover file is
 written at all, and the owner struck that: "I don't agree with this. This is an
 error in the guidance."
+
+BESIDE A PERSON, THE CHAT IS THE CHANNEL AND NO FILE IS WRITTEN (owner ruling
+2026-08-23). This line used to say EVERY run, and an attended session dutifully
+wrote one nobody wanted. The owner's words: "You don't need a field report.
+Only cloud agents need a field report."
+
+THE REASON THE RULE GIVES IS ITS OWN SCOPE. Notes die with the container, so
+the report is the only channel that reaches a person. Where the person is
+reading the chat, that channel is already open.
 
 THE TWO ARE NOT THE SAME THING, which is why both halves stand.
 

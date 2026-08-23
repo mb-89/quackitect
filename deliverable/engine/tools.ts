@@ -1160,14 +1160,7 @@ export function buildServer(
       // because that is the one a caller comes back for. Everything else is
       // capped here — so the cut says so, rather than sending a reader to the
       // very file they are already reading.
-      response:
-        rec.tool === "se_run"
-          ? rec.response
-          : capJson(
-              rec.response,
-              500,
-              "cut from the LOG's copy — the caller received this answer whole, and only se_run's output is kept in full",
-            ),
+      response: rec.tool === "se_run" ? rec.response : capJson(rec.response, 500),
     });
     if (rec.ok && EDIT_TOOLS.has(rec.tool) && JSON.stringify(rec.args ?? {}).includes(".ts")) kickTypecheck(root);
   });

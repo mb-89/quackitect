@@ -12,6 +12,8 @@ how_likely: expected
 impact: "Any drawing that fans into a submachine is unwalkable by one agent. The walk reaches the join with the other leg never taken, and every legal move is closed: the pull refuses SE-C-123, a choice refuses SE-C-110, the router draws a route the whole way round the record and moves zero hops, and se_reopen would take the walked leg down with it. The only ways out are editing the drawing or editing the engine."
 source_refs:
   - note-ec92cfa43897
+last_looked: 2026-08-23
+look_verdict: rescheduled
 ---
 
 ## What was taken, and by whom

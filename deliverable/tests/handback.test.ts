@@ -197,7 +197,20 @@ test("the call answers in under a second while a long judgment is still running"
   } finally {
     if (skip === undefined) delete process.env.SE_SCRIPT_SKIP;
     else process.env.SE_SCRIPT_SKIP = skip;
-    rmSync(lab, { recursive: true, force: true });
+    // The 2000ms script is still running past the 1000ms bound this case
+    // means to prove, so on Windows the directory can still be held open
+    // when teardown runs. Retry briefly rather than failing on a race the
+    // test itself set up on purpose.
+    for (let i = 0; i < 20; i++) {
+      try {
+        rmSync(lab, { recursive: true, force: true });
+        break;
+      } catch {
+        // A throw from inside finally would bury whatever the try block
+        // above actually decided, so this gives up quietly after ~3s.
+        await new Promise((r) => setTimeout(r, 150));
+      }
+    }
   }
 });
 

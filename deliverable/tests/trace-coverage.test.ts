@@ -139,7 +139,10 @@ describe("the live offer against the trace", () => {
     // seeing the other — so taking either wholesale would have left the ratchet
     // one short, and the next verb to arrive would have "confirmed" a number
     // that was already stale. Confirmed here: the enumerator sees both.
-    assert.equal(registeredVerbs().length, 40, "the lane's verb count moved — confirm the enumerator still sees every one");
+    // 41 WITH se_probe_cap, the ladder that measures what a host will actually
+    // take. Confirmed: the enumerator saw it and reported it as untraced until
+    // uc-quality-performance-efficiency named it, which is the check working.
+    assert.equal(registeredVerbs().length, 41, "the lane's verb count moved — confirm the enumerator still sees every one");
     assert.ok(traceText().length > 10000, "the trace read as good as empty — the path or the walk is wrong");
     assert.ok(traceText("use-case").length > 10000, "the use-case layer read as good as empty");
   });

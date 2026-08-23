@@ -60,7 +60,7 @@ guide.
    click a line for its detail. The dial is the human's grip: it sets
    how far the agent may walk alone.
 2. THE MAIN MACHINE.
-   - Idle is the switchboard.
+   - The front desk is home and the switchboard.
    - The front desk advises.
    - The retro turns what happened into rules.
    - The containers hold the work: expeditions (a day's bucket) and

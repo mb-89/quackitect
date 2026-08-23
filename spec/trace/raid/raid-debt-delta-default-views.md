@@ -14,6 +14,8 @@ impact: Every reference table in a record lists the standing corpus beside the d
 source_refs:
   - req-nodes-scoped-to-iteration
   - note-db7c72bd519c
+last_looked: 2026-08-23
+look_verdict: rescheduled
 ---
 
 Taken knowingly at the b10 signing: the stamp at mint and the corpus

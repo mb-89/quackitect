@@ -15,6 +15,8 @@ source_refs:
   - spec/trace/requirement/req-repeated-failure-shape-becomes-durable-work.md
   - spec/trace/test-spec/tsp-interrupted-call-names-the-stopping-layer.md
   - spec/trace/test-spec/tsp-repeated-failure-shape-becomes-durable-work.md
+last_looked: 2026-08-23
+look_verdict: rescheduled
 ---
 
 ## Graded off the scale, corrected 2026-08-20

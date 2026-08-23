@@ -35,11 +35,10 @@ interface RawCanvas {
 
 test("the drawing is data: a state note edited on disk binds the next call, no reload", async () => {
   const root = freshRoot();
-  // STANDING IN IDLE IS THE PREMISE of these cases, so the helper that
-  // guarantees it is the one to use: pullBoot rests at idle OR at the
-  // front desk, whichever the walk reaches first.
+  // STANDING AT THE FRONT DESK IS THE PREMISE of these cases, and the desk is
+  // where boot now lands. The helper that guarantees it is the one to use.
   const session = await sessionAtIdle(root);
-  const notePath = join(root, "deliverable", "machines", "states", "idle.md");
+  const notePath = join(root, "deliverable", "machines", "states", "front_desk.md");
   const before = readFileSync(notePath, "utf8");
   // IDLE IS AUTHORED AS A TIER WORD NOW (owner cut-over ruling 2026-08-12,
   // machines/scale.md). The line used to read `priority: 0.01`.
@@ -51,38 +50,36 @@ test("the drawing is data: a state note edited on disk binds the next call, no r
   const after = before.replace(/^priority: mechanical$/m, "priority: 0.75000000");
   assert.equal(after.length, before.length, "the edit changes no byte count");
   writeFileSync(notePath, after);
-  const idle = (session.packet() as { states: { id: string; priority: number }[] }).states.find((s) => s.id === "idle");
+  const idle = (session.packet() as { states: { id: string; priority: number }[] }).states.find((s) => s.id === "front_desk");
   assert.equal(idle?.priority, 0.75, "the running lane reads the edited note");
 });
 
 test("a drawing that will not compile leaves the last good one standing", async () => {
   const root = freshRoot();
-  // STANDING IN IDLE IS THE PREMISE of these cases, so the helper that
-  // guarantees it is the one to use: pullBoot rests at idle OR at the
-  // front desk, whichever the walk reaches first.
+  // STANDING AT THE FRONT DESK IS THE PREMISE of these cases, and the desk is
+  // where boot now lands. The helper that guarantees it is the one to use.
   const session = await sessionAtIdle(root);
   const server = buildServer(root, session);
   writeFileSync(mainMachinePath(root), "{ this is not a canvas");
   const survived = await call(server, "se_pull", {});
   assert.equal(survived.isError, false, "a broken drawing never stops the walk");
-  assert.deepEqual(survived.body.where, ["idle"], "and the walk stands where it stood");
+  assert.deepEqual(survived.body.where, ["front_desk"], "and the walk stands where it stood");
 });
 
 test("an edit that deletes the state the walk stands in waits until it has moved on", async () => {
   const root = freshRoot();
-  // STANDING IN IDLE IS THE PREMISE of these cases, so the helper that
-  // guarantees it is the one to use: pullBoot rests at idle OR at the
-  // front desk, whichever the walk reaches first.
+  // STANDING AT THE FRONT DESK IS THE PREMISE of these cases, and the desk is
+  // where boot now lands. The helper that guarantees it is the one to use.
   const session = await sessionAtIdle(root);
   const server = buildServer(root, session);
-  // Drop idle out of the drawing while the walk is standing in it.
+  // Drop the desk out of the drawing while the walk is standing in it.
   const canvasPath = mainMachinePath(root);
   const raw = JSON.parse(readFileSync(canvasPath, "utf8")) as RawCanvas;
-  raw.nodes = raw.nodes.filter((n) => n.file === undefined || !n.file.endsWith("idle.md"));
+  raw.nodes = raw.nodes.filter((n) => n.file === undefined || !n.file.endsWith("front_desk.md"));
   writeFileSync(canvasPath, JSON.stringify(raw, null, "\t"));
   const stood = await call(server, "se_pull", {});
   assert.equal(stood.isError, false, "the walk is not stranded");
-  assert.deepEqual(stood.body.where, ["idle"], "idle still holds it, because it still holds the walk");
+  assert.deepEqual(stood.body.where, ["front_desk"], "the desk still holds it, because it still holds the walk");
 });
 
 /** Redraw main.canvas the way the owner's Obsidian hand did on 2026-07-28:
@@ -92,14 +89,14 @@ function redrawLikeObsidian(root: string): string {
   const p = mainMachinePath(root);
   const canvas = JSON.parse(readFileSync(p, "utf8")) as RawCanvas;
   for (const e of canvas.edges) {
-    if (e.id === "e-ideation-idle" || e.id === "e-front_desk-idle") e.styleAttributes = {};
+    if (e.id === "e-desk-ideation" || e.id === "e-desk-retro") e.styleAttributes = {};
   }
   canvas.edges.push({
-    id: "dup-ideation-idle",
+    id: "dup-ideation-desk",
     styleAttributes: {},
     fromNode: "n-ideation",
     fromSide: "left",
-    toNode: "n-idle",
+    toNode: "n-front_desk",
     toSide: "right",
   });
   writeFileSync(p, JSON.stringify(canvas));
@@ -111,21 +108,19 @@ test("a plain reverse edge compiles as a return, and a duplicate collapses", () 
   const p = redrawLikeObsidian(root);
   const m = compileMachine(root, p);
   const ideation = m.states.find((s) => s.id === "ideation")!;
-  const toIdle = ideation.edges.filter((e) => e.to === "idle");
+  const toIdle = ideation.edges.filter((e) => e.to === "front_desk");
   assert.equal(toIdle.length, 1, "the duplicate collapsed to one edge");
   assert.equal(toIdle[0].role, "alternative", "the plain return infers alternative");
-  const desk = m.states.find((s) => s.id === "front_desk")!;
-  assert.equal(desk.edges.find((e) => e.to === "idle")?.role, "alternative");
   // The authored returns stay what they are.
   const exp = m.states.find((s) => s.id === "expeditions")!;
-  assert.equal(exp.edges.find((e) => e.to === "idle")?.role, "alternative");
+  assert.equal(exp.edges.find((e) => e.to === "front_desk")?.role, "alternative");
 });
 
-test("the owner's redraw no longer strands the walk: boot completes into idle", async () => {
+test("the owner's redraw no longer strands the walk: boot completes into the desk", async () => {
   const root = freshRoot();
   redrawLikeObsidian(root);
   const server = buildServer(root);
-  await pullBoot(server); // throws if the walk strands anywhere short of idle
+  await pullBoot(server); // throws if the walk strands short of the front desk
 });
 
 test("a drawn JOIN synchronizes: a starving join refuses the tick, the walk stands", async () => {
@@ -135,18 +130,18 @@ test("a drawn JOIN synchronizes: a starving join refuses the tick, the walk stan
   // The drawn machine now carries ONE double-headed arrow per pair, so the
   // ideation return is derived rather than authored. Draw it explicitly as a
   // NORMAL edge instead: the same pair drawn twice collapses to one, and an
-  // authored role wins, so idle gains a second inbound edge.
+  // authored role wins, so the desk gains a second inbound edge.
   canvas.edges.push({
-    id: "e-ideation-idle",
+    id: "e-ideation-desk",
     fromNode: "n-ideation",
     fromSide: "bottom",
-    toNode: "n-idle",
+    toNode: "n-front_desk",
     toSide: "top",
     styleAttributes: { role: "normal" },
   } as (typeof canvas.edges)[number]);
   writeFileSync(p, JSON.stringify(canvas));
-  // idle becomes a drawn JOIN — it now waits for boot AND ideation.
-  const idleNote = join(root, "deliverable", "machines", "states", "idle.md");
+  // The desk becomes a drawn JOIN — it now waits for boot AND ideation.
+  const idleNote = join(root, "deliverable", "machines", "states", "front_desk.md");
   writeFileSync(idleNote, readFileSync(idleNote, "utf8").replace("state_kind: work", "state_kind: join"));
   const session = new Session(root);
   await session.advance();
@@ -157,7 +152,7 @@ test("a drawn JOIN synchronizes: a starving join refuses the tick, the walk stan
   assert.deepEqual(session.active(), ["boot/end"]);
   await assert.rejects(
     () => session.advance(),
-    (e) => (e as { clause?: string }).clause === "SE-C-123" && /idle/.test(String((e as { got?: string }).got)),
+    (e) => (e as { clause?: string }).clause === "SE-C-123" && /front_desk/.test(String((e as { got?: string }).got)),
   );
   assert.deepEqual(session.active(), ["boot/end"], "the wedge guard leaves the walk standing");
 });
@@ -227,7 +222,7 @@ test("the hatch always works: a booted walk escapes to the DESK, ungated, from a
   await session.advance();
   await session.advance();
   await session.advance();
-  assert.deepEqual(session.active(), ["idle"]);
+  assert.deepEqual(session.active(), ["front_desk"]);
   // A legacy strand (empty token set) escapes home — to the desk, with no
   // gate on the way: no slider weighing, no read demand. The reading the
   // desk wants arrives on the NEXT pull, as an instruction.
@@ -441,9 +436,8 @@ test("the close COMMITS the trunk's strays rather than refusing, and says which"
 
 test("a broken sub-canvas refuses typed at entry; fixing it heals on the next tick", async () => {
   const root = freshRoot();
-  // STANDING IN IDLE IS THE PREMISE of these cases, so the helper that
-  // guarantees it is the one to use: pullBoot rests at idle OR at the
-  // front desk, whichever the walk reaches first.
+  // STANDING AT THE FRONT DESK IS THE PREMISE of these cases, and the desk is
+  // where boot now lands. The helper that guarantees it is the one to use.
   const session = await sessionAtIdle(root);
   const server = buildServer(root, session);
   session.setAutonomy(1);

@@ -11,11 +11,12 @@
 // half rides the call result and is checked where that result is built.
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { type PanelValues, parsePanel, renderPanel } from "../engine/params.ts";
+import { type PanelValues, parsePanel, renderPanel, tasksTable } from "../engine/params.ts";
 
 const PANEL = `## Parameters
 
 - stop @ | rungs | stopat | how far the agent walks before handing back
+- BG tasks | table | running | what is running out of sight
 `;
 
 const NOTCHES = [
@@ -38,10 +39,14 @@ function panelWith(extra: Record<string, unknown>): string {
   return renderPanel(parsePanel(PANEL), values);
 }
 
-// RED. Nothing carries a running operation onto the panel today, so the person
-// watching a thirty-second pull sees exactly what they see during a hung one.
+// The person watching a thirty-second pull must not see what they see during a
+// hung one. RUNNING IS A LIST because more than one thing runs at a time.
 test("a running operation past its bound is named on the panel", () => {
-  const html = panelWith({ running: { what: "walking to gate-implementation", since_ms: 4200 } });
+  const html = panelWith({
+    tables: {
+      running: tasksTable([{ name: "pull", what: "walking to gate-implementation", since_ms: 4200 }]),
+    },
+  });
   assert.match(
     html,
     /walking to gate-implementation/,
@@ -59,11 +64,17 @@ test("a running operation past its bound is named on the panel", () => {
 // exactly that: green from birth proves nothing. The assertion now demands the
 // signal be PRESENT and CONTAINED, which stays one question with one reason to
 // fail — does it ride beside what is already there.
+//
+// THE ASSERTION MOVED WHEN THE ROW BECAME A DECLARED PARAMETER. Containment of
+// the whole quiet panel only held while the signal was appended after it. The
+// row now sits among the controls, so the question is asked control by control:
+// every label the quiet panel draws still stands, and the task joined them.
 test("the running signal does not take the panel over", () => {
   const quiet = panelWith({});
-  const busy = panelWith({ running: { what: "walking", since_ms: 4200 } });
-  assert.ok(
-    busy !== quiet && busy.includes(quiet.trim()),
-    "the signal must ride BESIDE what the panel already shows: either none was added, or it replaced the panel instead of joining it",
-  );
+  const busy = panelWith({ tables: { running: tasksTable([{ name: "pull", what: "walking", since_ms: 4200 }]) } });
+  assert.ok(busy !== quiet, "the panel says nothing about work that is running");
+  assert.match(busy, /walking/, "the running task is not named");
+  for (const label of ["stop @", "BG tasks"]) {
+    assert.ok(quiet.includes(label) && busy.includes(label), `the signal replaced the panel instead of joining it — "${label}" is gone`);
+  }
 });

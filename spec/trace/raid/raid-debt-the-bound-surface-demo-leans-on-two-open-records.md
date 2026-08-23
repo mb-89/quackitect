@@ -15,6 +15,8 @@ source_refs:
   - tsp-bound-surface
   - req-a-surface-resolves-to-what-it-shows
   - raid-debt-human-observed-demonstrations
+last_looked: 2026-08-23
+look_verdict: decided already
 ---
 
 ## What is owed

@@ -36,10 +36,10 @@ async function bootBoth(): Promise<{ s: Session; server: ReturnType<typeof build
   const s = new Session(root);
   checkDocs(s);
   for (let i = 0; i < 10; i++) {
-    if (s.active()[0] === "idle") break;
+    if (s.active()[0] === "front_desk") break;
     await s.advance();
   }
-  assert.equal(s.active()[0], "idle", "boot did not reach idle");
+  assert.equal(s.active()[0], "front_desk", "boot did not reach the front desk");
 
   const server = buildServer(root, s);
   await creditReading(server, call);
@@ -74,12 +74,16 @@ describe("a clear jump is one call", { concurrency: true }, () => {
   test("aim with go LANDS the walk in the same call and answers that it arrived", async () => {
     const { s, server } = await bootBoth();
 
-    const r = await call(server, "se_aim", { to: "front_desk", go: true });
+    // BOOT LANDS ON THE DESK NOW, so the desk is no longer somewhere to walk
+    // TO. A door off it is, and expeditions is the plainest.
+    const r = await call(server, "se_aim", { to: "expeditions", go: true });
     const body = r.body as { arrived?: boolean; swept?: string[]; note?: string };
 
     assert.equal(body.arrived, true, `nothing was owed on the way, so one call is enough — got ${body.note ?? "no note"}`);
     assert.ok((body.swept ?? []).length > 0, "it WALKED, rather than only pointing at the target");
-    assert.equal(s.active()[0], "front_desk", "and the walk really stands there afterwards");
+    // A container has no bare state of its own. Entering "expeditions" lands
+    // on its own start substate, "expeditions/start".
+    assert.equal(s.active()[0], "expeditions/start", "and the walk really stands there afterwards");
   });
 
   test("the sweep stops ON A STATE at its budget, never cut off between two", async () => {
@@ -88,7 +92,7 @@ describe("a clear jump is one call", { concurrency: true }, () => {
     // A zero budget stops it after the FIRST whole hop. The guard is checked
     // between hops on purpose: that is the only moment the walk stands on one
     // state with nothing half-applied.
-    const out = (await s.sweep("front_desk", "agent", 0)) as { swept?: string[]; arrived?: boolean; note?: string };
+    const out = (await s.sweep("expeditions", "agent", 0)) as { swept?: string[]; arrived?: boolean; note?: string };
 
     // THE INVARIANT, not the hop count: however far it got, it ANSWERED and
     // the walk stands on ONE whole state. Being cut off is what leaves it
@@ -100,12 +104,14 @@ describe("a clear jump is one call", { concurrency: true }, () => {
   test("a sweep stopped at its budget resumes and arrives — nothing is lost", async () => {
     const { s } = await bootBoth();
 
-    await s.sweep("front_desk", "agent", 0);
+    await s.sweep("expeditions", "agent", 0);
     // The route recomputes from wherever the first sweep stopped, so a second
     // one carries on rather than starting over.
-    const again = (await s.sweep("front_desk", "agent")) as { arrived?: boolean; note?: string };
+    const again = (await s.sweep("expeditions", "agent")) as { arrived?: boolean; note?: string };
 
     assert.equal(again.arrived, true, `the route recomputes from where it stopped — ${again.note ?? ""}`);
-    assert.equal(s.active()[0], "front_desk");
+    // The target is the container's start substate, not "front_desk". Boot
+    // rests at front_desk now, so a sweep TOWARD front_desk never applies here.
+    assert.equal(s.active()[0], "expeditions/start");
   });
 });

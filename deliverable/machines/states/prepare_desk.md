@@ -1,5 +1,5 @@
 ---
-state: prepare_idle
+state: prepare_desk
 state_kind: work
 priority: mechanical
 tags: boot
@@ -13,7 +13,11 @@ repair_tools: se_file_read, se_file_search, se_file_glob, se_file_list, se_file_
 guidance: BOOT METHOD rides in from guidance/method/boot.md by tag - follow it. Preflight, the SMOKE test and the CONFORMANCE SWEEP run on exit, and all three are quick - the sweep reads about a thousand nodes in a third of a second. If this state allows no tools, pull to run them. Do not read or search here. A failure is named in the refusal. While a check stands red, the repair tools are legal HERE - fix what the output names, then pull again.
 ---
 
-# Prepare idle
+# Prepare the desk
+
+THE NAME USED TO BE `prepare_idle`, because boot rested on a hub state called
+`idle` and this step made that position ready. The hub was removed and the
+front desk took its place, so the name followed.
 
 THE SWEEP RUNS HERE BECAUSE THERE IS NO VERB FOR IT (owner ruling
 2026-08-16). A verb an agent can call is a verb an agent will call, over

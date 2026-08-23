@@ -17,6 +17,17 @@ export interface LaneRule {
   hint: string;
   /** Warned runs allowed before the category refuses. */
   threshold: number;
+  /** THE ENGINE OWNS THIS ACT, and no reason opens it.
+   *
+   *  Most rules are a nudge with a valve: say why the lane cannot do it and the
+   *  shell runs once. Two acts are not the agent's at all — running the tests
+   *  and running the typechecker. The agent writes tests; the engine decides
+   *  which run and when, and the answer is accepted rather than second-guessed.
+   *
+   *  MEASURED: 45 hand-run test invocations and 25 hand-run typechecks in one
+   *  window, every one of them through the valve. A valve everybody opens is
+   *  not a guard. */
+  owned?: true;
   rx: RegExp;
 }
 
@@ -29,9 +40,19 @@ export const LANE_RULES: LaneRule[] = [
     id: "run-tests",
     category: "tests",
     tool: "se_test",
-    hint: "se_test runs SCOPED ({files: ['pull'], name_pattern?}) with structured counts and only the failures' detail — no temp file, no grep; no arguments is the battery, which must be earned",
-    threshold: 1,
+    hint: "se_test takes a QUESTION and nothing else. The engine reads what changed and decides what runs — a named set of files, the battery, or nothing at all — and its answer is the answer",
+    threshold: 0,
+    owned: true,
     rx: /\b(npm|npx)\s+(run\s+)?test\b|\bnode\s+(-[^\s]+\s+)*--test\b|selftest\.ts|preflight\.ts|smoketest\.ts/i,
+  },
+  {
+    id: "run-typecheck",
+    category: "typechecking",
+    tool: "se_file_patch",
+    hint: "the lane typechecks after every edit to a .ts file and rides the errors back on your next answer as `typecheck_error` — there is nothing to ask for",
+    threshold: 0,
+    owned: true,
+    rx: /\btsc\b|\bvue-tsc\b/i,
   },
   {
     id: "run-edit",
@@ -142,6 +163,21 @@ export function laneVerdict(seDir: string, command: string, noToolReason?: strin
   const rule = classifyCommand(command);
   if (rule === undefined) return undefined;
   const state = loadState(seDir);
+  // AN OWNED ACT HAS NO VALVE. The reason is not the point: this is not the
+  // agent's job to do well or badly, it is the engine's job entirely.
+  if (rule.owned === true) {
+    throw new Rejection({
+      clause: CLAUSES.RUN_LANE_JOB,
+      expected: `the engine owns ${rule.category}`,
+      got: "a shell command doing it by hand",
+      remedy: {
+        tool: rule.tool,
+        args: {},
+        note: `${rule.hint}. no_tool_reason does not open this one.`,
+      },
+      source: SRC,
+    });
+  }
   if (noToolReason !== undefined && noToolReason.trim() !== "") {
     // The valve. The run happens, the reason is EVIDENCE — filed for the
     // retro, not counted against the grace. Abuse is visible in the same file.
@@ -448,8 +484,18 @@ export function decideScope(seDir: string, root: string, force: boolean): ScopeD
   }
 
   const changed = changedSinceBattery(root, seDir);
+  // IN DOUBT THE ENGINE RUNS LESS, NOT MORE (owner ruling). This used to reach
+  // for the whole battery when git could not say what moved, which is the most
+  // expensive answer to a question nobody asked. A break that slips past here
+  // is caught at the gate review, and that is the design rather than a hole in
+  // it. The reason says plainly that nothing was proven.
   if (changed === undefined) {
-    return { scope: "battery", files: [], why: "git cannot say what changed, so the safe answer is everything", sweep: true };
+    return {
+      scope: "nothing",
+      files: [],
+      why: "git cannot say what changed, so nothing is proven here — the gate review runs the battery",
+      sweep: true,
+    };
   }
   // THE DIFF ANSWERS ONE MORE QUESTION while it is open. Documents get the
   // sweep whatever the test scope turns out to be.

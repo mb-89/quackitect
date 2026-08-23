@@ -18,6 +18,8 @@ source_refs:
   - "deliverable/engine/rigor-matrix.ts"
 weighs_with: none
 weighs_against: none
+last_looked: 2026-08-23
+look_verdict: rescheduled
 ---
 
 ## The shape of it

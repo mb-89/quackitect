@@ -1,5 +1,5 @@
 // The boot preflight — an ordinary condition SCRIPT (exit 0 = green).
-// prepare_idle names it in its exit condition:
+// prepare_desk names it in its exit condition:
 //   exit:
 //     script: deliverable/engine/bin/preflight.ts
 // The state declares WHAT runs; the engine only knows HOW to run scripts.
