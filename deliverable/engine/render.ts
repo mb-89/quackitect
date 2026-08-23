@@ -18,18 +18,24 @@ import { BASES_SCRIPT, BASES_STYLE, BASES_TABLE_STYLE } from "./basesclient.ts";
 import { basesCard } from "./baseui.ts";
 import { LOOK_FILES, lookPath, palettePath } from "./brand.ts";
 import type { CallLog, CallRecord } from "./calllog.ts";
-import { type CanvasData, type CanvasElement, loadCanvas, subLabel } from "./canvas.ts";
+import { type CanvasData, type CanvasElement, subLabel } from "./canvas.ts";
 import { bindings, loadCards } from "./cards.ts";
 import type { StrayNote } from "./inbox.ts";
 import type { MachineDecl } from "./machine.ts";
-import { compileMachineCached, resolveRef } from "./machines/compile.ts";
 import { renderSidebar } from "./params.ts";
 import { SCRIPT } from "./renderclient.ts";
 import { STYLE } from "./renderstyle.ts";
-import { loadLevels } from "./scale.ts";
-import { mainMachinePath, type Session } from "./session.ts";
+import type { Session } from "./session.ts";
 import { TABLE_SCRIPT, TABLE_STYLE } from "./tables.ts";
 import { TRACE_SCRIPT, TRACE_STYLE, traceCard } from "./traceui.ts";
+import type { RouteMarks } from "./viewmodel.ts";
+import { view as resolveView, routeOverlay, statePaint } from "./viewmodel.ts";
+
+export type { RouteMarks };
+// ONE PLACE DECIDES WHAT A GREEN MEANS, and it is the resolver. Re-exported
+// here because callers older than the move ask this module for them, and a
+// caller should not have to learn where a function went.
+export { routeOverlay, statePaint };
 
 function esc(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -148,49 +154,6 @@ export interface StateMeta {
   subtitle?: string;
 }
 
-/** see dsp-mirror-render.md#the-drawing-is-the-truth */
-export function routeOverlay(
-  steps: { from: string; to: string }[],
-  /** The view's QUALIFIED chain below main ("" is main). A nested machine
-   *  is "iterations/i1", never its bare leaf id — hops speak full chains. */
-  prefix: string,
-): { waypoints: Set<string>; path: string[] } {
-  const local = (q: string): string | undefined => {
-    if (prefix === "") return q.split("/")[0];
-    if (!q.startsWith(`${prefix}/`)) return undefined;
-    return q.slice(prefix.length + 1).split("/")[0];
-  };
-  const waypoints = new Set<string>();
-  const path: string[] = [];
-  const visit = (id: string): void => {
-    if (path[path.length - 1] !== id) path.push(id);
-  };
-  for (const s of steps) {
-    const a = local(s.from);
-    const b = local(s.to);
-    if (a === undefined || b === undefined) continue;
-    visit(a);
-    if (a === b) waypoints.add(a);
-    else visit(b);
-  }
-  return { waypoints, path };
-}
-
-interface RouteMarks {
-  waypoints: Set<string>;
-  /** The stops in order. The spline runs through their anchors. */
-  path: string[];
-  /** A bar's owed legs the path does not run through — each drawn as its
-   *  own line into the bar, so the fan shows whole. */
-  fan?: { from: string; to: string }[];
-  /** The destination, if it is in this drawing. */
-  target?: string;
-  /** The walk STANDS in this drawing — the one view that draws the here-arrow. */
-  here?: boolean;
-  /** The hop the walk cannot pass, and why. Drawn as a road closure. */
-  blocked?: { at: string; why: string };
-}
-
 /** A Catmull-Rom spline through every stop, emitted as cubic Beziers — the
  *  line BENDS through the stops instead of hinging at them. */
 function splinePath(p: [number, number][]): string {
@@ -252,34 +215,6 @@ function svgEdges(canvas: CanvasData, byId: Map<string, CNode>, skip: Set<string
     }
   }
   return parts;
-}
-
-/** SUSPECT BEATS DONE. The claim was filed and it still stands on disk. What
- *  it answered has moved, so the state is not green — it is a lapsed pass,
- *  and the drawing has to say so before anybody trusts the colour.
- *
- *  ONE WORD FOR ONE IDEA. The trace graph marks a node standing on moved
- *  ground with the same word and the same style. A reader who learns the mark
- *  once reads it everywhere. */
-/** ONE PLACE DECIDES WHAT A GREEN MEANS. Three rules said it and three test
- *  files enforced parts of them, so nobody could say which parts were covered.
- *  see dsp-mirror-render.md#one-decider-says-which-kind-of-green-it-is */
-export function statePaint(
-  sid: string,
-  activeIds: Set<string>,
-  doneIds: Set<string>,
-  meta: Record<string, StateMeta>,
-): { cls: string; marks: string[] } {
-  const m = meta[sid];
-  // SUSPECT BEATS EVERY GREEN. A colour standing on moved ground is no longer
-  // earned, and the drawing says so before anybody trusts it.
-  if (activeIds.has(sid)) return { cls: "state active", marks: [] };
-  if (m?.suspect === true) return { cls: "state suspect", marks: [] };
-  if (!doneIds.has(sid)) return { cls: "state", marks: [] };
-  // A LAW-PROVEN GREEN SIGNED NOTHING. It rides the same green — a pass is a
-  // pass — and carries its own word, so the two are told apart at a glance.
-  const cls = m?.law_proven === true ? "state done proven" : "state done";
-  return { cls, marks: m?.blessed === true ? ["bless"] : [] };
 }
 
 function stateClass(sid: string, activeIds: Set<string>, doneIds: Set<string>, meta: Record<string, StateMeta>): string {
@@ -637,30 +572,6 @@ export function feedRows(
   return { capped, rows: [...noteRows, ...rows] };
 }
 
-/** Resolve a viewable machine by id: main itself, or one of its subs. */
-function viewedMachine(m: MirrorState, view: string | undefined): { decl: MachineDecl; canvas: CanvasData } {
-  const mainPath = mainMachinePath(m.root);
-  if (view === undefined || view === m.session.machine.id) {
-    return { decl: m.session.machine, canvas: loadCanvas(mainPath) };
-  }
-  const subState = m.session.machine.states.find((s) => s.submachine !== undefined && s.id === view);
-  if (subState === undefined) {
-    // Nested generated machines (archive decades) are viewable too.
-    const nested = m.session.viewFor(view);
-    return nested ?? { decl: m.session.machine, canvas: loadCanvas(mainPath) };
-  }
-  // Generated machines serve their own drawing (continue_expedition).
-  const generated = m.session.generatedView(subState.id);
-  if (generated !== undefined) return generated;
-  const path = resolveRef(m.root, mainPath, subState.submachine!);
-  // CACHED, and live all the same. compileMachineCached memoises against the
-  // CONTENT of every file the compile read, so an edited canvas or state note
-  // recompiles on the next render and an untouched one does not. The mirror
-  // re-renders on every poll, and recompiling the machine each time cost a
-  // full second per render — paid by the VS Code panel, not just the tests.
-  return { decl: compileMachineCached(m.root, path), canvas: loadCanvas(path) };
-}
-
 // THE COMPONENT LIBRARY, on every page the mirror serves. The engine serves
 // the bundle itself (mirror.ts, /vendor), so this is an ordinary script tag
 // rather than a webview asset URI — no bundler and no build step.
@@ -720,180 +631,6 @@ const NATIVE = `
   body.solo aside, body.solo main { background: transparent; }
 `;
 
-/** The per-state detail objects the page's data island carries. */
-function stateDetails(m: MirrorState, decl: MachineDecl, done: Set<string>, archived: { id: string }[]): Record<string, unknown> {
-  const states: Record<string, unknown> = {};
-  for (const s of decl.states) {
-    states[s.id] = {
-      id: s.id,
-      kind: s.kind,
-      statement: s.statement,
-      guidance: s.guidance,
-      priority: s.priority,
-      // A state with evidence fields IS its form — the details render it.
-      has_form: s.evidence_form.length > 0,
-      legal_tools: s.legal_tools ?? [],
-      ...(s.submachine !== undefined ? { submachine: s.submachine } : {}),
-      ...(s.entry !== undefined ? { entry: m.session.conditionStatus(decl, s, "enter") } : {}),
-      ...(s.exit !== undefined ? { exit: m.session.conditionStatus(decl, s, "leave") } : {}),
-      exit_met: m.session.conditionMet(decl, s, "leave"),
-      was_filled: done.has(s.id),
-      // An archive-record state carries ITS closed record for the detail.
-      ...(s.tags?.includes("archive-record")
-        ? { archive_record: archived.find((e) => e.id === s.id || e.id.startsWith(`${s.id}-`)) ?? null }
-        : {}),
-      ...(s.exit?.script !== undefined || s.entry?.script !== undefined ? { script: m.session.scriptStatus(decl, s) } : {}),
-      pulled: m.session.pulled(decl, s),
-      next: s.edges.map((e) => stateEdgeDetail(m, decl, e)),
-    };
-  }
-  return states;
-}
-
-function stateEdgeDetail(m: MirrorState, decl: MachineDecl, e: MachineDecl["states"][number]["edges"][number]): Record<string, unknown> {
-  const t = decl.states.find((st) => st.id === e.to);
-  const ready = t === undefined ? true : m.session.entryReadyHuman(decl, t);
-  return {
-    to: e.to,
-    role: e.role,
-    ...(e.guard !== undefined ? { guard: e.guard } : {}),
-    ...(t !== undefined ? { kind: t.kind, statement: t.statement, priority: t.priority } : {}),
-    // The human's ▶ lock: explicit entry conditions AND the pull —
-    // every doc entering demands, checked at its current version. A
-    // locked edge carries WHAT is missing (the tooltip names it).
-    // ASKED ONCE. This ran entryReadyHuman twice per edge, and each
-    // call walks the target's whole reading list.
-    enter_met: ready,
-    ...(t !== undefined && !ready ? { missing: m.session.entryMissingHuman(decl, t) } : {}),
-  };
-}
-
-/** RECORD-COMPLETE, derived: every claimful state stands green, and every
- *  drawn sub-machine is record-complete in turn. A machine with nothing
- *  claimful anywhere proves nothing and stays incomplete, as does an
- *  unwalked branch's machine — a false grey, never a false green. Memoised
- *  per drawing; the memo doubles as the cycle guard. */
-function recordComplete(m: MirrorState, d: MachineDecl, rc: Map<string, boolean>, green?: Set<string>): boolean {
-  const known = rc.get(d.id);
-  if (known !== undefined) return known;
-  rc.set(d.id, false); // a cycle proves nothing
-  const g = green ?? new Set(m.session.recordPaint(d));
-  let provable = false;
-  for (const s of d.states) {
-    const claimful = s.evidence_form.length > 0;
-    if (claimful || s.submachine !== undefined) provable = true;
-    if (claimful && !g.has(s.id)) return false;
-    if (s.submachine !== undefined && !subComplete(m, s.id, rc)) return false;
-  }
-  rc.set(d.id, provable);
-  return provable;
-}
-
-/** A container's derived green: its drawing resolves AND that machine is
- *  record-complete. A seeded sub-machine with no drawing yet proves nothing. */
-function subComplete(m: MirrorState, id: string, rc: Map<string, boolean>): boolean {
-  const sub = m.session.viewFor(id);
-  return sub !== undefined && recordComplete(m, sub.decl, rc);
-}
-
-/** Highlights follow the WALK; the view may be elsewhere. */
-function drawingSets(
-  m: MirrorState,
-  decl: MachineDecl,
-  info: { active: string[] },
-  viewingWalk: boolean,
-): {
-  leafActive: Set<string>;
-  done: Set<string>;
-  paint: Set<string>;
-  subIds: Set<string>;
-  openIds: Set<string>;
-  meta: Record<string, StateMeta>;
-} {
-  const leafActive = viewingWalk ? new Set(info.active.map((a) => a.split("/").pop()!)) : new Set<string>();
-  if (!viewingWalk && decl.id === m.session.machine.id) {
-    // Viewing main while the walk is inside a sub: the sub state is the live one.
-    leafActive.add(m.session.breadcrumb()[1]);
-  }
-  // RE-ENTRY RESETS (owner ruling 2026-07-27): the drawing shows the LIVE
-  // run only — a machine entered again starts gray; past passes live in
-  // the record, not on the drawing.
-  const run = m.session.viewRun(decl.id);
-  const done = new Set(run.done.map((s) => s.split("/").pop()!));
-  // An end state is never "filled" — it turns green when its machine completed.
-  if (run.completed) for (const s of decl.states) if (s.kind === "end") done.add(s.id);
-  // see dsp-mirror-render.md#only-record-backed-states-paint
-  const paint = new Set(m.session.recordPaint(decl));
-  const blessed = new Set(m.session.blessedGates(decl, paint));
-  const proven = new Set(m.session.lawProvenStates(decl));
-  // see dsp-mirror-render.md#drift-is-computed-on-the-way-to-the-screen
-  const suspect = new Set(m.session.suspectStates(decl));
-  const subIds = new Set(decl.states.filter((s) => s.submachine !== undefined).map((s) => s.id));
-  // WHICH OF THEM CAN ACTUALLY BE OPENED. A seeded sub-machine has no drawing
-  // until its authoring state has run, and asking the resolver is the only way
-  // to know — the declaration alone says nothing about whether it exists.
-  const openIds = new Set([...subIds].filter((id) => m.session.viewFor(id) !== undefined));
-  // see dsp-mirror-render.md#a-walked-sub-machine-must-not-look-unstarted
-  const rc = new Map<string, boolean>();
-  if (decl.states.some((s) => s.kind === "end") && recordComplete(m, decl, rc, paint)) {
-    for (const s of decl.states) if (s.kind === "end") paint.add(s.id);
-  }
-  const meta: Record<string, StateMeta> = {};
-  for (const s of decl.states) {
-    meta[s.id] = {
-      suspect: suspect.has(s.id),
-      ...(blessed.has(s.id) ? { blessed: true } : {}),
-      ...(proven.has(s.id) ? { law_proven: true } : {}),
-      has_exit: s.exit !== undefined,
-      exit_met: m.session.conditionMet(decl, s, "leave"),
-      has_entry: s.entry !== undefined,
-      entry_met: m.session.conditionMet(decl, s, "enter"),
-      // The STATEMENT is the subtitle (owner ruling 2026-07-28): authored
-      // meaning renders small under the name; empty renders nothing.
-      ...(s.statement !== "" && s.statement !== s.id ? { subtitle: s.statement } : {}),
-    };
-  }
-  return { leafActive, done, paint, subIds, openIds, meta };
-}
-
-// THE ROUTE, PROJECTED ONTO THIS DRAWING. A broken or unreachable target
-// must never take the picture down with it, so the marks simply go
-// missing and the machine still renders.
-function routeMarksFor(m: MirrorState, decl: MachineDecl): RouteMarks | undefined {
-  try {
-    const r = m.session.route(m.session.target);
-    const prefix = decl.id === m.session.machine.id ? "" : m.session.viewChain(decl.id).slice(1).join("/");
-    const { waypoints, path: hops } = routeOverlay(r.steps, prefix);
-    const localOf = (q: string): string | undefined => {
-      if (prefix === "") return q.split("/")[0];
-      return q.startsWith(`${prefix}/`) ? q.slice(prefix.length + 1).split("/")[0] : undefined;
-    };
-    // The fan's legs, projected onto this drawing like every other mark.
-    const fan: { from: string; to: string }[] = [];
-    for (const f of r.fan ?? []) {
-      const to = localOf(f.at);
-      if (to === undefined) continue;
-      for (const l of f.legs) {
-        const from = localOf(l);
-        if (from !== undefined && from !== to) fan.push({ from, to });
-      }
-    }
-    const shutAt = r.stops_at === undefined ? undefined : localOf(r.stops_at.at);
-    const rest = prefix === "" ? r.from : r.from.startsWith(`${prefix}/`) ? r.from.slice(prefix.length + 1) : undefined;
-    return {
-      waypoints,
-      path: hops,
-      ...(fan.length > 0 ? { fan } : {}),
-      here: rest !== undefined && !rest.includes("/"),
-      ...(r.found && localOf(r.target) !== undefined ? { target: localOf(r.target) } : {}),
-      ...(shutAt !== undefined && r.stops_at !== undefined ? { blocked: { at: shutAt, why: r.stops_at.why } } : {}),
-    };
-  } catch {
-    /* no route, no marks - the drawing stands either way */
-    return undefined;
-  }
-}
-
 // Breadcrumbs describe the VIEW: main [›subs] [ › sub [›its subs] ].
 // The crumbs walk the PARENT CHAIN — a nested machine shows under its
 // real parent, never directly under main (owner ruling 2026-07-28).
@@ -903,46 +640,27 @@ function crumbsFor(m: MirrorState, decl: MachineDecl): string {
     subs.length === 0
       ? ""
       : `<span class="crumb-arrow">›<span class="crumb-menu">${subs.map((s) => `<a href="/?view=${encodeURIComponent(s)}">${esc(s)}</a>`).join("")}</span></span>`;
-  // WHERE THE WALK STANDS, AND WHERE IT IS AIMED (owner ruling 2026-08-23).
+  // THE CRUMBS SAY THE PATH ONCE (owner ruling 2026-08-23).
   //
-  // THE CRUMBS DESCRIBE THE VIEW, and the view is independent of the walk on
-  // purpose. So a reader could see which machine was on screen and still not
-  // know whether anything was routed at all.
+  // THEY USED TO PRINT THE POSITION AGAIN beside themselves, as a full
+  // qualified path. It carried nothing the crumbs did not already show, and
+  // the leaf it added is on the position button two elements to the right.
   //
-  // THE ROUTE LINE ALONE WAS NOT ENOUGH. It draws only where the target sits in
-  // the SAME drawing, and an iteration aimed at its ship state is routed across
-  // machines — so the blue line went missing exactly when a target existed.
-  //
-  // AN EMPTY TARGET SHOWS AS NOTHING, never as a dash. Nothing routed is a real
-  // state of the walk, and the absence of the arrow says it.
-  // THE WALK CAN STAND IN MORE THAN ONE PLACE, when a fan is open, so the
-  // position is a list and all of it shows. The target is one.
-  const here = m.session.active().join(" · ");
-  const aim = m.session.target;
-  const walk =
-    here === ""
-      ? ""
-      : `<span style="padding:0 4px 0 10px;color:var(--se-muted)">·</span><span>${esc(here)}</span>${
-          aim === ""
-            ? ""
-            : `<span style="padding:0 5px;color:var(--se-muted)">→</span><span style="color:var(--se-accent)">${esc(aim)}</span>`
-        }`;
+  // WHERE THE WALK IS AIMED IS THE AIM CHIP'S, beside that button. Nothing was
+  // lost by removing the repeat.
   const chain = m.session.viewChain(decl.id);
-  return (
-    chain
-      .map((id, i) => {
-        const label =
-          i === chain.length - 1 ? `<b class="here">${esc(id)}</b>` : `<a href="/?view=${encodeURIComponent(id)}">${esc(id)}</a>`;
-        const arrow =
-          i === 0
-            ? crumbArrow(mainSubs)
-            : i === chain.length - 1
-              ? crumbArrow(decl.states.filter((s) => s.submachine !== undefined).map((s) => s.id))
-              : '<span style="color:var(--se-muted);padding:0 3px">›</span>';
-        return label + arrow;
-      })
-      .join("") + walk
-  );
+  return chain
+    .map((id, i) => {
+      const label = i === chain.length - 1 ? `<b class="here">${esc(id)}</b>` : `<a href="/?view=${encodeURIComponent(id)}">${esc(id)}</a>`;
+      const arrow =
+        i === 0
+          ? crumbArrow(mainSubs)
+          : i === chain.length - 1
+            ? crumbArrow(decl.states.filter((s) => s.submachine !== undefined).map((s) => s.id))
+            : '<span style="color:var(--se-muted);padding:0 3px">›</span>';
+      return label + arrow;
+    })
+    .join("");
 }
 
 /** WHERE THE WALK IS AIMED, for the chip beside where it stands.
@@ -981,64 +699,43 @@ export function renderMirror(
   };
   const skin = embed === true ? NATIVE : "";
   const bodyClass = embed === true ? ` class="embed${widget === undefined ? "" : " solo"}"` : "";
-  const info = m.session.describe() as { active: string[]; status: string };
-  // The scale is READ from machines/scale.md — the Obsidian-editable
-  // truth; an owner edit shows on the next reload.
-  const levels = loadLevels(m.root);
-  const walkMachine = m.session.currentMachine();
-  const { decl, canvas } = viewedMachine(m, view ?? walkMachine.id);
-  const viewingWalk = decl.id === walkMachine.id;
-  phase("session");
-  const history = m.session.instance.history ?? [];
+  // THE SURFACE ASKS FOR THE VIEW. Everything below this line DRAWS what came
+  // back; nothing below it works out an answer of its own.
+  //
+  // THE PHASE NAMES AND THE WORK THEY MEASURE ARE UNCHANGED. The resolver
+  // reports the ones it now owns, so a reader comparing timings across the
+  // move is measuring the same thing. Their ORDER changed: machine.states now
+  // comes before machine.svg, because the model is built before it is drawn.
+  const machineStarted = performance.now();
+  const model = resolveView(m, { widget, view, onPhase: phase });
+  const { canvas, decl, viewingWalk } = model;
+  const info = model.describe;
+  const levels = model.levels;
+  const packet = model.packet;
+  const checkedDocs = model.checkedDocs;
+  const states = model.states;
+  const comment = model.comment;
   let svg = "";
   let crumbs = "";
-  let states: ReturnType<typeof stateDetails> = {};
-  let comment = "";
-  // THE MACHINE PHASE IS REPORTED WHOLE AND IN PARTS. The parts are new; the
-  // total keeps its old name and its old span, so a reader comparing across
-  // runs is not silently handed a different measurement.
-  const machineStarted = performance.now();
-  if (widget !== "trace") {
-    const { leafActive, done, paint, subIds, openIds, meta } = drawingSets(m, decl, info, viewingWalk);
-    const marks = routeMarksFor(m, decl);
-    phase("machine.sets");
-    const INPUT_ROLES = new Set(["normal", "approval"]);
-    const busbars = decl.states
-      .filter((gate) => gate.busbar === true)
-      .map((gate) => ({
-        into: gate.id,
-        feeders: decl.states
-          .filter((parent) => parent.edges.some((edge) => edge.to === gate.id && INPUT_ROLES.has(edge.role ?? "normal")))
-          .map((parent) => parent.id),
-      }))
-      .filter((bar) => bar.feeders.length >= 2);
-    svg = machineSvg(canvas, leafActive, paint, subIds, openIds, meta, busbars, marks);
+  if (model.drawing !== undefined) {
+    const d = model.drawing;
+    svg = machineSvg(canvas, d.leafActive, d.paint, d.subIds, d.openIds, d.meta, d.busbars, d.marks);
     phase("machine.svg");
     crumbs = crumbsFor(m, decl);
-    const archived = decl.states.some((state) => state.tags?.includes("archive-record"))
-      ? (m.session.expeditionList() as { archive: { id: string }[] }).archive
-      : [];
-    states = stateDetails(m, decl, done, archived);
-    phase("machine.states");
-    comment = (canvas.nodes ?? []).find((node) => node.type === "text")?.text ?? "";
   }
   phase("machine.rest");
   onPhase?.("machine", performance.now() - machineStarted);
-  const packet = widget === "trace" ? { legal_tools: [] } : m.session.packet();
-  phase("packet");
-  const checkedDocs = m.session.humanCheckedPaths();
-  phase("checked_docs");
   const data = `<script type="application/json" id="se-data">${JSON.stringify({
     build: ENGINE_LIFE,
-    target: m.session.target,
+    target: model.target,
     describe: info,
     packet,
-    lastPacket: m.lastPacket ?? null,
+    lastPacket: model.lastPacket,
     states,
     comment,
     viewingWalk,
-    viewed: { id: decl.id, reentry: decl.reentry, initial: decl.initial, states: decl.states.map((s) => s.id) },
-    history: history.slice(-20),
+    viewed: model.viewed,
+    history: model.history,
     levels,
     // Every doc the reader has checked AT ITS CURRENT VERSION. A condition
     // names docs that are not always in the state's own pulled list, so the
@@ -1055,12 +752,7 @@ export function renderMirror(
   // Nothing here decides how a control looks; the spec names the parameters
   // and params.ts draws the types it knows. A type it does not know refuses,
   // so a control cannot appear that the drawing never asked for.
-  const thr = m.session.autonomy;
-  const panelValues = {
-    rungs: levels,
-    autonomy: thr,
-    ints: { narration_minutes: m.session.narrationMinutes, narration_calls: m.session.narrationCalls },
-  };
+  const panelValues = model.panel;
   // ONE FUNCTION STACKS THE PANELS, and both surfaces call it. Concatenating
   // the specs by hand here is what let the background table go missing from
   // this surface while the other one carried it.
@@ -1082,7 +774,7 @@ export function renderMirror(
     .filter((leaf) => leaf !== "")
     .map(
       (leaf) =>
-        `<button class="ghost cur-state" data-machine="${esc(walkMachine.id)}" data-state="${esc(leaf)}" title="the walk stands here — click: jump the view to it">☉ ${esc(leaf)}</button>`,
+        `<button class="ghost cur-state" data-machine="${esc(model.walkMachineId)}" data-state="${esc(leaf)}" title="the walk stands here — click: jump the view to it">☉ ${esc(leaf)}</button>`,
     )
     .join("");
   // WHERE THE WALK IS AIMED, beside where it stands (owner ruling 2026-08-23).
