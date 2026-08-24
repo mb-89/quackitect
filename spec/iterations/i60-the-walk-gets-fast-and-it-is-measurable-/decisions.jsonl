@@ -1,0 +1,5 @@
+{"ts":"2026-08-24T14:37:33.949Z","op":"done","visit":"front_desk@1","node":"d16","brief":"i60 now names only the hot path and its two siblings"}
+{"ts":"2026-08-24T14:38:04.236Z","op":"obsolete","visit":"front_desk@1","node":"d13","brief":"answered in chat; the narration system is being replaced anyway"}
+{"ts":"2026-08-24T14:38:45.551Z","op":"plan","visit":"iterations/i60/onboard-retro@0","parent":null,"nodes":[{"id":"d20","brief":"confirm the inbox is empty"},{"id":"d21","brief":"pull past the onboard retro"},{"id":"d22","brief":"propose the change size at the kickoff gate"}]}
+{"ts":"2026-08-24T14:38:49.911Z","op":"done","visit":"iterations/i60/onboard-retro@0","node":"d20","brief":"inbox confirmed empty, so the onboard retro is skipped by its own rule"}
+{"ts":"2026-08-24T14:40:12.658Z","op":"done","visit":"iterations/i60/onboard-retro@0","node":"d21","brief":"onboard-retro signed, recording the retro that already ran"}
