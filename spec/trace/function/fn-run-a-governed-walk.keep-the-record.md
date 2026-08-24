@@ -28,6 +28,7 @@ satisfies:
   - req-vendor-page-claim-only
   - req-missing-provider-named
   - req-no-agent-act-destroys-work
+  - req-registering-a-spawned-hand-is-accepted-wherever-the-walk-stands
 inputs:
   - flow-resolved-target
   - flow-dispatched-call

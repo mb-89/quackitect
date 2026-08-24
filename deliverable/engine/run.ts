@@ -4,6 +4,7 @@
 // state machine lands, run legality becomes a per-state decision.
 import { type ChildProcess, spawn } from "node:child_process";
 import { appendFileSync, existsSync, mkdirSync, readdirSync, readFileSync } from "node:fs";
+import { createServer, type Server } from "node:net";
 import { join } from "node:path";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { capMiddle } from "./jsonio.ts";
@@ -86,6 +87,48 @@ export type Standing = "running" | "finished" | "read";
 /** How much of a FAILING job's last words ride the account. */
 const TAIL_CHARS = 400;
 
+/** HOW LONG A WAIT WAITS when nothing comparable has been measured. Every
+ *  entry carries a bound, because a wait with no end is indistinguishable from
+ *  a hang and on an unattended machine nobody is there to tell them apart.
+ *  see dsp-the-entry-that-closes-itself.md#the-bound */
+const DEFAULT_BOUND_MS = 30 * 60 * 1000;
+
+/** THE SHORTEST GAP BETWEEN TWO SWEEPS. The sweep runs opportunistically, on
+ *  the reads that compose the account, so this is what stops a burst of reads
+ *  asking the same handles a hundred times a second.
+ *
+ *  IT MAY RUN ON THE LOOP THAT SERVES CALLERS, and only because of what it
+ *  asks. MEASURED on linux: 20 handles in 78 microseconds, 100 in
+ *  147. A sweep that read a file per piece of work would not have this
+ *  licence — see raid-asm-asking-every-held-handle-on-an-interval-costs-nothing-measurable. */
+const SWEEP_MIN_MS = 250;
+
+/** WHEN EACH FOLDER WAS LAST SWEPT. One number for the whole process let a
+ *  read of one folder throttle the sweep of another, and two folders' work has
+ *  nothing to do with each other. */
+const lastSweep = new Map<string, number>();
+
+/** IS THIS PROCESS STILL THERE? Asked of the handle first and the number
+ *  second, because they are not equally good.
+ *
+ *  THE HANDLE NAMES HOW IT ENDED. A process number only says whether something
+ *  with that number is there, and numbers are REUSED — so a reaped child's
+ *  number can come back attached to an unrelated process and report a dead run
+ *  as alive.
+ *
+ *  UNKNOWN IS A REAL ANSWER. Where neither channel can be asked, the caller
+ *  must not read silence as death. */
+function stillThere(j: Job): "there" | "gone" | "unknown" {
+  if (j.child !== undefined) return j.child.exitCode === null && j.child.signalCode === null ? "there" : "gone";
+  if (j.pid === undefined) return "unknown";
+  try {
+    process.kill(j.pid, 0);
+    return "there";
+  } catch (e) {
+    return (e as NodeJS.ErrnoException).code === "ESRCH" ? "gone" : "unknown";
+  }
+}
+
 /** Room between a job's own start and its reporter's first beat, before the
  *  beat file is judged to belong to an earlier run. */
 const STALE_SLACK_MS = 2_000;
@@ -114,6 +157,15 @@ export interface AccountEntry {
   total?: number;
   outcome?: string;
   remaining_ms?: number;
+  /** HOW LONG THE WAIT ON THIS ENTRY WILL WAIT, with the word saying whether
+   *  the figure was measured or defaulted.
+   *
+   *  IT IS DECLARED HERE BECAUSE A READER IS PROMISED IT. A wait that carries a
+   *  duration is worth nothing if the answer does not say what the duration is,
+   *  and a field reaching a reader only through an untyped spread is a field
+   *  nothing defends. */
+  bound_ms?: number;
+  bound_basis?: "measured" | "default";
   basis: string;
   standing: Standing;
   /** THE CALL THAT SERVES THE OUTPUT, and how much there is WHEN THERE IS ANY.
@@ -247,6 +299,11 @@ export interface JobView {
   /** How much longer this piece of work needs. Absent where nothing can be
    *  computed — and `basis` then says why. */
   remaining_ms?: number;
+  /** HOW LONG THE WAIT ON THIS ENTRY WILL WAIT, with the word that says where
+   *  the figure came from. A default and a measurement are acted on
+   *  differently, so the provenance is never dropped. */
+  bound_ms?: number;
+  bound_basis?: "measured" | "default";
   /** What the figure rests on, or why there is no figure. It is never absent:
    *  a duration a reader cannot discount is believed more than it deserves. */
   basis: string;
@@ -307,6 +364,20 @@ interface Job {
    *  cannot weigh whether spawning paid for itself without this. */
   model?: string;
   outcome?: string;
+  /** HOW LONG THE WAIT ON THIS ENTRY WILL WAIT, and whether that figure was
+   *  measured or defaulted. The provenance travels with the figure, exactly as
+   *  it does for a time remaining. */
+  bound_ms?: number;
+  bound_basis?: "measured" | "default";
+  /** THE BOUND CLOSED THIS ENTRY AND THE WORK NEVER ANSWERED. It marks the
+   *  outcome as the account giving up rather than the work's own verdict, so a
+   *  real ending arriving later REPLACES it instead of fighting it.
+   *  see req-every-wait-declares-a-bound-and-expiry-acts */
+  expired?: boolean;
+  /** WHY THE LAST WRITE OF THIS ENTRY FAILED, where one did. The sweep writes
+   *  on the path that composes every lane answer, so a throw there has to be
+   *  recorded rather than raised. */
+  persist_error?: string;
   out: string;
   err: string;
   child?: ChildProcess;
@@ -342,6 +413,10 @@ interface PersistedJob {
   last_report?: number;
   model?: string;
   pid?: number;
+  /** THE WAIT'S BOUND, CARRIED TO DISK. An entry rebuilt after a reload keeps
+   *  its bound and the word saying where the figure came from. */
+  bound_ms?: number;
+  bound_basis?: "measured" | "default";
   /** THE LAST ENGINE DIED WITHOUT CLOSING THIS ONE, and the engine that came
    *  after closed it instead. It says the exit code is unknown BECAUSE nobody
    *  was there to read it, which is a different fact from a job that ended. */
@@ -392,8 +467,30 @@ function persist(j: Job): void {
     ...(j.steps_total === undefined ? {} : { steps_total: j.steps_total }),
     ...(j.model === undefined ? {} : { model: j.model }),
     ...(j.pid === undefined ? {} : { pid: j.pid }),
+    ...(j.outcome === undefined ? {} : { outcome: j.outcome }),
+    ...(j.bound_ms === undefined ? {} : { bound_ms: j.bound_ms }),
+    ...(j.bound_basis === undefined ? {} : { bound_basis: j.bound_basis }),
   };
   appendFileSync(jobPath(j.root, j.id, "jsonl"), `${JSON.stringify(record)}\n`, "utf8");
+}
+
+/** WRITE THE ENTRY, AND NEVER FAIL A CALLER FOR IT.
+ *
+ *  THE SWEEP RUNS ON THE PATH THAT COMPOSES EVERY LANE ANSWER. A write that
+ *  throws there fails every call rather than one verb, which turns a full disk
+ *  into a dead lane.
+ *
+ *  THE FAILURE IS NOT SWALLOWED. It is stamped on the entry and said once on
+ *  the error stream, because a folder that silently stops recording its work is
+ *  worse than one that says so. */
+function persistQuietly(j: Job): void {
+  try {
+    persist(j);
+  } catch (e) {
+    const why = e instanceof Error ? e.message : String(e);
+    if (j.persist_error !== why) process.stderr.write(`se: could not record job ${j.id} — ${why}\n`);
+    j.persist_error = why;
+  }
 }
 
 function persisted(root: string, id: string): Job | undefined {
@@ -436,6 +533,8 @@ function view(j: Job): JobView {
     running: j.running,
     exit: j.exit,
     duration_ms: (j.ended ?? Date.now()) - j.started,
+    ...(j.bound_ms === undefined ? {} : { bound_ms: j.bound_ms }),
+    ...(j.bound_basis === undefined ? {} : { bound_basis: j.bound_basis }),
     ...(j.state === undefined ? {} : { state: j.state }),
     ...(j.milestone === undefined ? {} : { milestone: j.milestone }),
     ...(j.progress === undefined ? {} : { progress: j.progress }),
@@ -983,6 +1082,11 @@ export function startJob(
     ...(opts.progress === undefined ? {} : { progress: opts.progress }),
     ...(opts.total === undefined ? {} : { total: opts.total }),
     ...(opts.steps === undefined ? {} : { steps_total: opts.steps, steps_done: 0 }),
+    // EVERY WAIT DECLARES A BOUND, and a spawned job is a wait like any other.
+    // Leaving this to the registration path only would have made the bound the
+    // exception rather than the rule, which is the shape the demand refuses.
+    bound_ms: DEFAULT_BOUND_MS,
+    bound_basis: "default",
     out: "",
     err: "",
     root,
@@ -1028,10 +1132,17 @@ export function startJob(
     j.settle();
   });
   child.on("close", (code) => {
+    // A RUN THE BOUND ALREADY CLOSED STILL REPORTS HOW IT WENT. Leaving the
+    // bound's string standing beside a real exit code made the entry say two
+    // things at once, and the one a reader wanted was the exit code.
+    if (j.expired === true) {
+      j.outcome = code === 0 ? "passed" : "not passed";
+      rideAgain(j);
+    }
     j.exit = code;
     j.running = false;
     j.ended = Date.now();
-    persist(j);
+    persistQuietly(j);
     j.settle();
   });
   return view(j);
@@ -1056,6 +1167,11 @@ export function jobStop(id: string, root?: string): JobView {
 
 /** EVERY job this session started, newest first. */
 export function jobList(root?: string): JobView[] {
+  // THE SWEEP RIDES THE READ. Composing the account is the one moment the
+  // engine reliably has both the handles and a reason to look, and asking them
+  // costs microseconds. The throttle is what stops a burst of reads asking the
+  // same handles a hundred times a second.
+  sweepGoneOperations(false, root);
   const found = new Map(jobs);
   if (root !== undefined && existsSync(jobDir(root))) {
     for (const name of readdirSync(jobDir(root))) {
@@ -1109,6 +1225,15 @@ export function openOperation(o: {
   root?: string;
   steps?: number;
   model?: string;
+  /** THE LIVE END OF THE WORK. A handle names how the process ended; a number
+   *  only says whether something with that number is there. Give the handle
+   *  where one exists — numbers are reused, and a reused number reports a dead
+   *  run as alive. */
+  child?: ChildProcess;
+  pid?: number;
+  /** How long the wait on this entry may run before expiry acts. Omitted takes
+   *  the default, and the entry says the figure was defaulted. */
+  bound_ms?: number;
 }): void {
   // A LIVE ENTRY IS LEFT ALONE; A SETTLED ONE IS REPLACED. A judgment's id is
   // derived from its step, so every re-run of one step reuses it. Returning
@@ -1131,12 +1256,140 @@ export function openOperation(o: {
     ...(process.env.SE_SESSION === undefined ? {} : { session: process.env.SE_SESSION }),
     out: "",
     err: "",
+    ...(o.child === undefined ? {} : { child: o.child }),
+    // THE PARENTHESES ARE THE POINT. `===` binds tighter than `??`, so the
+    // unbracketed form asks whether the CHILD's number is undefined and then
+    // discards an explicitly given one — which is the fallback channel a
+    // recovered entry depends on.
+    ...((o.pid ?? o.child?.pid) === undefined ? {} : { pid: o.pid ?? o.child?.pid }),
+    bound_ms: o.bound_ms ?? DEFAULT_BOUND_MS,
+    bound_basis: o.bound_ms === undefined ? "default" : "measured",
     ...(o.root === undefined ? {} : { root: o.root }),
     done: Promise.resolve(),
     settle: () => {},
   };
   jobs.set(o.id, j);
   persist(j);
+  // THE WORK CLOSES ITS OWN ENTRY. This is the cheap half of the design: the
+  // exit is already observed, and what was missing is the write that follows
+  // it. The sweep below is the backstop for work that never reaches this,
+  // because it crashed or was killed.
+  o.child?.once("exit", (code, signal) => {
+    // THE LISTENER SETTLES THE JOB IT WAS MADE FOR, never whatever holds the id
+    // now. An id may be registered again once its entry is settled, and the old
+    // process can still be alive when that happens — so a listener that only
+    // looked the id up would close the NEW run with the OLD run's outcome.
+    const live = jobs.get(o.id);
+    if (live !== j) return;
+    // AN EXPIRED ENTRY IS STILL OWED ITS REAL ENDING. The bound stopped the
+    // ACCOUNT waiting; the exit code is what the reader actually asked for, and
+    // the wait's own table puts the work's outcome above the bound's.
+    if (!live.running && live.expired !== true) return;
+    const correcting = live.expired === true;
+    live.running = false;
+    live.ended = Date.now();
+    live.exit = code;
+    live.outcome = signal === null && code === 0 ? "passed" : "not passed";
+    if (correcting) rideAgain(live);
+    gradePrediction(live);
+    persistQuietly(live);
+  });
+}
+
+/** ASK EVERY HELD HANDLE WHETHER ITS PROCESS IS STILL THERE, and settle the
+ *  ones that are gone.
+ *
+ *  IT ASKS EXISTENCE, NEVER RESPONSIVENESS. A process that is alive and silent
+ *  is left alone: silence is not evidence of death, and a supervisor that
+ *  treats it as such ends work that was running. A hung process is caught by
+ *  the entry's bound instead, which is a different question asked on purpose.
+ *
+ *  UNKNOWN IS NOT GONE. Where neither the handle nor the number can be asked,
+ *  the entry stands — reading silence as death on such a host would end work
+ *  on a machine that merely could not answer.
+ *  see dsp-the-entry-that-closes-itself.md#two-closers-and-neither-is-optional */
+
+/** WHY THIS ENTRY SHOULD CLOSE, or nothing where it should stand. The sweep
+ *  asks two questions of every entry and this holds the answer to both, so the
+ *  loop below is left with what to WRITE rather than what to decide. */
+function closingReason(j: Job, now: number, root?: string): "gone" | "bound" | undefined {
+  // ONE FOLDER'S SWEEP NEVER CLOSES ANOTHER FOLDER'S WORK. The table is
+  // per-process and holds every folder this server has served, so an entry
+  // belonging to a folder nobody asked about must be left where it stands.
+  if (root !== undefined && j.root !== undefined && j.root !== root) return undefined;
+  const there = j.child !== undefined || j.pid !== undefined ? stillThere(j) : "unknown";
+  if (there === "gone") return "gone";
+  // EXISTENCE BEATS THE CLOCK. A handle saying the process is THERE outranks a
+  // bound that has passed: a process the engine can see running is better
+  // evidence than a default nobody measured. Only where existence cannot be
+  // asked, or answers `gone` too late, does the clock decide.
+  const past = j.bound_ms !== undefined && now - j.started > j.bound_ms;
+  return past && there !== "there" ? "bound" : undefined;
+}
+
+export function sweepGoneOperations(force = false, root?: string): string[] {
+  const now = Date.now();
+  const folder = root ?? "";
+  if (!force && now - (lastSweep.get(folder) ?? 0) < SWEEP_MIN_MS) return [];
+  lastSweep.set(folder, now);
+  const closed: string[] = [];
+  for (const j of jobs.values()) {
+    if (!j.running) continue;
+    // ONE BAD ENTRY NEVER STOPS THE SWEEP. The loop walks the table in insertion
+    // order, so a throw on an early entry left every LATER one unswept — which
+    // is the fault this whole sweep exists to remove, reintroduced by the sweep
+    // itself. Anything a close touches can fail: a handle can refuse to be
+    // asked, and a folder can be gone by the time its record is written.
+    try {
+      if (closeIfEnded(j, now, root)) closed.push(j.id);
+    } catch (e) {
+      j.persist_error = e instanceof Error ? e.message : String(e);
+    }
+  }
+  return closed;
+}
+
+/** CLOSE ONE ENTRY IF IT HAS ENDED, saying whether it did. */
+function closeIfEnded(j: Job, now: number, root?: string): boolean {
+  const why = closingReason(j, now, root);
+  if (why === undefined) return false;
+  j.running = false;
+  j.ended = now;
+  // EXPIRY ACTS. A wait that passes its bound produces an outcome naming the
+  // bound, so a reader can tell a timeout from a verdict. It settles the
+  // ENTRY and never kills the process: the bound says how long the account
+  // will wait, not how long the work is allowed to take.
+  if (why === "bound") {
+    // THE BASIS RIDES THE OUTCOME. A reader who cannot tell a measured bound
+    // from a blanket default trusts the figure more than it has earned —
+    // req-every-wait-declares-a-bound-and-expiry-acts asks for the word.
+    j.outcome = `bound reached after ${j.bound_ms} ms, ${j.bound_basis ?? "default"}`;
+    // THE BOUND ENDS THE WAIT, NEVER THE TRUTH. Nothing answered, so this is
+    // the account giving up rather than a verdict, and the work's own ending
+    // is still allowed to replace it.
+    j.expired = true;
+    persistQuietly(j);
+    return true;
+  }
+  // A HANDLE THAT HAS EXITED STILL KNOWS HOW. The sweep and the work's own
+  // exit listener race whenever a child ends between two reads, and the
+  // sweep must not win by throwing the exit code away. Where the handle has
+  // it, the outcome is the real one; only a bare process number leaves
+  // `gone` as the honest answer.
+  const code = j.child?.exitCode ?? null;
+  const signal = j.child?.signalCode ?? null;
+  if (j.child !== undefined) {
+    j.exit = code;
+    j.outcome = signal === null && code === 0 ? "passed" : "not passed";
+  } else {
+    j.outcome = "gone";
+  }
+  // A GONE ENTRY IS A REAL ENDING, so an expiry that beat it to the record is
+  // corrected here and the entry rides an answer again.
+  if (j.expired === true) rideAgain(j);
+  gradePrediction(j);
+  persistQuietly(j);
+  return true;
 }
 
 /** WHERE PREDICTIONS ARE GRADED. One line per finished job: what the engine
@@ -1244,7 +1497,45 @@ export function settleOperation(id: string, ok: boolean, root?: string): void {
   // quietly, and the panel went on showing the work as running for ever.
   // Measured on an agent row that survived a reload.
   const j = jobs.get(id) ?? (root === undefined ? undefined : persisted(root, id));
-  if (j === undefined || !j.running) return;
+  if (j === undefined) return;
+  // TWO CLOSERS CAN REACH ONE ENTRY, by design. The first outcome stands, and a
+  // second that DISAGREES leaves a trace — two closers agreeing and two closers
+  // fighting look identical without one, and only the second is worth knowing
+  // about. see dsp-the-entry-that-closes-itself.md#settling-twice
+  if (!j.running) {
+    // AN EXPIRY IS NOT A CLOSER, so this is not a second closer arriving. The
+    // bound recorded that the account stopped waiting; the work's own ending is
+    // the answer the wait's table asks for, so it REPLACES the bound's string
+    // rather than being filed as a disagreement with it.
+    if (j.expired === true) {
+      jobs.set(id, j);
+      j.ended = Date.now();
+      j.exit = ok ? 0 : 1;
+      j.outcome = ok ? "passed" : "not passed";
+      rideAgain(j);
+      gradePrediction(j);
+      persistQuietly(j);
+      return;
+    }
+    const already = j.outcome ?? (j.exit === 0 ? "passed" : "not passed");
+    const arriving = ok ? "passed" : "not passed";
+    if (already !== arriving && j.root !== undefined) {
+      try {
+        // NOT THE JOB'S OWN LOG. That file IS the entry's state of record, and
+        // an entry is rebuilt from its LAST parseable line. A conflict line
+        // carries no running, no started and no kind, so writing it there would
+        // replace the entry with a shell of itself.
+        appendFileSync(
+          jobPath(j.root, j.id, "conflicts.log"),
+          `${JSON.stringify({ id: j.id, at: Date.now(), conflict: true, standing: already, arriving })}\n`,
+          "utf8",
+        );
+      } catch {
+        // The record of a disagreement is worth having and is never worth failing a settle for.
+      }
+    }
+    return;
+  }
   jobs.set(id, j);
   j.running = false;
   j.ended = Date.now();
@@ -1366,6 +1657,22 @@ export function workAccount(root?: string): AccountEntry[] {
 
 /** What a caller has said it has seen, and will not be shown again. */
 const settled = new Map<string, Set<string>>();
+
+/** PUT AN ENTRY BACK IN FRONT OF A READER, because its real ending has arrived.
+ *
+ *  A FINISHED ENTRY RIDES EXACTLY ONE ANSWER and is then dropped for good. An
+ *  entry the bound closed has already spent that one ride saying the wait
+ *  expired, so without this the true outcome reaches nobody.
+ *
+ *  FORGETTING BOTH MARKS IS THE WHOLE ACT. The account decides what to show
+ *  from them alone, so clearing them is what makes the corrected entry news
+ *  again. */
+function rideAgain(j: Job): void {
+  j.expired = false;
+  for (const store of [handedOut, settled]) {
+    for (const marks of store.values()) marks.delete(j.id);
+  }
+}
 
 /** THE WHOLE ROSTER, IN THE ACCOUNT'S OWN SHAPE.
  *
@@ -1516,4 +1823,115 @@ export function reapAbandonedJobs(root: string): string[] {
     reaped.push(id);
   }
   return reaped;
+}
+
+/** THE WORKSPACE HOLDS THIS INSTANCE TAKES, kept only in memory. Nothing is
+ *  written to disk on purpose: a record of a hold outlives the process that
+ *  made it, and a crash would then turn a recoverable failure into a workspace
+ *  nobody can start in. */
+const holds = new Map<string, Server>();
+
+/** THE PORT THAT STANDS FOR ONE WORKSPACE. Derived from the folder, so two
+ *  instances pointed at one folder ask for one port and two instances on
+ *  different folders never collide. */
+export function workspacePort(root: string): number {
+  let h = 2_166_136_261;
+  for (const ch of root) {
+    h ^= ch.charCodeAt(0);
+    h = Math.imul(h, 16_777_619) >>> 0;
+  }
+  return 41_000 + (h % 20_000);
+}
+
+/** TAKE A WORKSPACE, OR BE TOLD WHAT HOLDS IT.
+ *
+ *  THE BIND IS THE HOLD AND THERE IS NO SECOND RECORD OF IT. A live listener is
+ *  a fact the operating system keeps; a lock file is a guess that outlives its
+ *  writer.
+ *
+ *  A CRASH RELEASES IT, MEASURED on linux: a child
+ *  took a port and was killed with SIGKILL. Rebinding read EADDRINUSE while
+ *  held, then ok immediately after the kill and ok again after a pause — see
+ *  raid-asm-a-crash-releases-whatever-carries-the-workspace-hold.
+ *
+ *  IT DOES NOT WAIT AND RETRY. Waiting would mean two instances racing for one
+ *  workspace every time the first restarts.
+ *  see dsp-one-instance-holds-the-workspace.md#the-hold-is-the-port-and-nothing-else */
+export async function takeWorkspace(root: string): Promise<{ held: boolean; by?: string }> {
+  const port = workspacePort(root);
+  if (holds.has(root)) return { held: false, by: `this instance already serves ${root} on port ${port}` };
+  const server = createServer();
+  return await new Promise((resolve) => {
+    server.once("error", () => {
+      resolve({ held: false, by: `another instance serves ${root} on port ${port}` });
+    });
+    server.listen(port, "127.0.0.1", () => {
+      holds.set(root, server);
+      server.unref();
+      resolve({ held: true });
+    });
+  });
+}
+
+/** GIVE A WORKSPACE BACK. Only for a shutdown this process chooses; a crash
+ *  needs no counterpart, which is the whole point of the mechanism. */
+export function releaseWorkspace(root: string): void {
+  holds.get(root)?.close();
+  holds.delete(root);
+}
+
+/** IS THIS ARGUMENT RECORDABLE WHEREVER THE WALK STANDS?
+ *
+ *  A HAND THAT WAS STARTED IS A FACT ABOUT THE WORLD. Refusing to record a fact
+ *  does not make it untrue; it makes the account wrong, and the account is what
+ *  a person reads to see whether a run is working. Measured on i62's own first
+ *  milestone: a hand was started and the record refused to count it.
+ *
+ *  THE WIDENING IS PER ARGUMENT AND NOT PER VERB. Starting and closing a hand
+ *  become legal everywhere. Running a command, listing jobs and acknowledging
+ *  settled work do not move, because the state gate's whole value is that a
+ *  tool being illegal where you stand means the engine holds that job
+ *  elsewhere.
+ *  see dsp-one-instance-holds-the-workspace.md#the-registration-exemption */
+export function registrationExempt(arg: string): boolean {
+  return arg === "agent" || arg === "agent_done";
+}
+
+/** WHAT ELSE A REGISTRATION CALL MAY CARRY. These describe the hand being
+ *  recorded; none of them makes the call do anything but record. */
+const REGISTRATION_COMPANIONS = new Set([
+  "agent",
+  "agent_done",
+  "model",
+  "role",
+  "steps",
+  "ok",
+  "as",
+  "relayed_by",
+  "answered_by",
+  "named_driver",
+  "went_weaker",
+  "weaker_reason",
+  "update",
+]);
+
+/** IS THIS WHOLE CALL A REGISTRATION, and nothing else besides?
+ *
+ *  ASKING WHETHER AN EXEMPT KEY IS PRESENT IS NOT ENOUGH, and getting that
+ *  wrong opens every door. A call carrying an empty `agent` beside a shell
+ *  command has an exempt key and is not a registration: it is a command
+ *  wearing one.
+ *
+ *  SO BOTH HALVES ARE CHECKED. An exempt argument must hold a real name, and
+ *  every other argument in the call must be one that only describes the hand.
+ *  Anything else — a command, a job listing, an acknowledgement — keeps the
+ *  call gated exactly as it was.
+ *
+ *  THE MODEL IS THE READ EXEMPTION BESIDE IT in the gate, which pins the VALUE
+ *  of the one argument it lets through rather than its presence. */
+export function isRegistrationCall(args: Record<string, unknown>): boolean {
+  const keys = Object.keys(args);
+  const named = keys.some((k) => registrationExempt(k) && typeof args[k] === "string" && args[k] !== "");
+  if (!named) return false;
+  return keys.every((k) => REGISTRATION_COMPANIONS.has(k));
 }

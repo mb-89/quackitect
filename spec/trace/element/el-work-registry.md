@@ -8,6 +8,8 @@ realization: make
 group: the-record-life
 implements:
   - fn-run-a-governed-walk.account-for-work-out-of-sight
+  - fn-run-a-governed-walk.keep-the-account-true
+  - fn-run-a-governed-walk.bound-a-wait
 source_refs:
   - cand-the-account-that-follows-you
   - opt-one-operation-object-serves-every-kind-of-long-work
@@ -63,3 +65,32 @@ The linear estimate over a run's own progress file is the first basis, measured
 on this session's 175-file battery and recorded in
 [[raid-asm-battery-timings-measure-work]]. It over-predicts throughout and
 converges, which is the safe direction for somebody waiting.
+
+## What i62 added, and why it is the same element
+
+THE REGISTRY ALREADY DECIDED WHEN AN ENTRY STARTS. What it never decided was
+when an entry STOPS, and that gap is what left entries reporting work that no
+longer existed.
+
+SO TWO MORE FUNCTIONS LAND HERE rather than in a new element. Keeping the
+account true and bounding a wait are both about the entry's own life, and the
+entry lives here.
+
+WHAT THAT MEANS CONCRETELY.
+
+- The registry holds the live end of what was launched, not only a record that
+  it was.
+- It settles an entry when the work ends, whichever of the two ways notices
+  first, and settling twice changes nothing.
+- Every wait it enters carries a bound, and reaching that bound produces an
+  outcome that says so.
+
+ASK THE HANDLE, NOT THE NUMBER. Measured 2026-08-24 on linux, node v22.22.2: a
+held handle reports exitCode 0 after a normal exit and signalCode SIGKILL after
+a kill, while the process number only says whether something with that number
+is there. Numbers are reused, so a number-based design can report a dead run as
+alive.
+
+THE STATES AN ENTRY MOVES THROUGH ARE UNCHANGED. Running, finished, read. What
+changes is that the move to finished no longer depends on the work choosing to
+announce it.

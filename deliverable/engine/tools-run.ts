@@ -465,7 +465,7 @@ export function runTools(
           agent: {
             type: "string",
             description:
-              "REGISTER A SUBAGENT YOU JUST SPAWNED, saying in one line what it is doing, and NAME ITS MODEL with the model argument. It then rides the work account and the panel like every other background task. Nothing here can see a subagent for itself — the harness spawns it, so you are the one who knows. HAND IT THE RETURNED ID so it can report progress; a hand that never reports reads as idle whatever it is doing.",
+              "REGISTER A SUBAGENT YOU JUST SPAWNED, saying in one line what it is doing, and NAME ITS MODEL with the model argument. It then rides the work account and the panel like every other background task. Nothing here can see a subagent for itself — the harness spawns it, so you are the one who knows. HAND IT THE RETURNED ID so it can report progress; a hand that never reports reads as idle whatever it is doing. THIS ONE CALL IS LEGAL WHEREVER THE WALK STANDS, even where se_run itself is not: a hand is spawned at whatever state the work asked for one, and a record the engine refuses to take is a hand that has to be stood down again.",
           },
           model: {
             type: "string",
