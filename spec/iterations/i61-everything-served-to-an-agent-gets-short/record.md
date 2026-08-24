@@ -2,7 +2,6 @@
 id: i61-everything-served-to-an-agent-gets-short
 status: shipped
 closed: 2026-08-24T19:32:18.898Z
-retro_owed: 2026-08-24T19:32:18.898Z
 started: 2026-08-24T14:46:17.279Z
 opened: 2026-08-24T14:32:42.659Z
 goal: "Everything served to an agent gets shorter: 63 tool descriptions, the refusal payloads, and the 9,229-word prompt layer that rides every turn."
