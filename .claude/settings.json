@@ -60,7 +60,7 @@
         ]
       },
       {
-        "matcher": "startup|resume|clear",
+        "matcher": "startup|resume",
         "hooks": [
           {
             "type": "command",

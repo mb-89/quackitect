@@ -251,7 +251,12 @@ test("no new file write bypasses the door — the count may fall, never rise", (
   // full list has to live somewhere the account can point at. Session state of
   // exactly the shape of 39, 40 and 42: machine-local, gitignored, and
   // overwritten by the next run.
-  const CEILING = 48;
+  // 49 WITH THE COMPACTION MARKER: compaction.ts writes `.se/compacted`, the
+  // one thing a SessionStart hook can leave behind. The hook holds no lane
+  // connection, so a file is the only channel it has to the engine, and the
+  // next pull deletes it as it collects it. Session state of the same shape as
+  // 39, 40, 42, 47 and 48: machine-local, gitignored, and gone within one call.
+  const CEILING = 49;
   let found = 0;
   const offenders: string[] = [];
   const walk = (dir: URL, rel: string): void => {
