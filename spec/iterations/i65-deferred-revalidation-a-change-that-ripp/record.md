@@ -67,6 +67,8 @@ ONE SWITCH IN THE CONFIG (owner ruling 2026-08-24, given against i64 and extende
 
 OFF IS TODAY, EXACTLY. With the switch off, a change invalidates downstream on contact exactly as it does now: the claim goes grey and everything below it falls. No suspect standing, no deferred check, no gate arbitration.
 
-THE EXTENSION IS MINE AND IS FLAGGED AS SUCH. The owner said ONE switch, speaking about the orchestrator. This iteration carries its OWN switch, separate from i64's, because an A/B test of deferred revalidation has to run while the orchestrator is already on. Two independent switches are what that needs.
+TWO SWITCHES, ONE PER ITERATION (owner ruling 2026-08-24, confirmed): "The switch should be in both. Let's make two switches, one for each."
 
-IF THE OWNER MEANT ONE SWITCH COVERING BOTH, this is the line to correct, and it should be corrected before either is built.
+THIS ITERATION'S SWITCH IS ITS OWN, separate from i64's. An A/B test of deferred revalidation has to run while the orchestrator is already on, so the two behaviours need independent toggles or neither can be measured alone.
+
+WHAT IS STILL ONE: each switch covers the WHOLE of its own iteration's behaviour. Not a family of flags, and not one knob per effect.

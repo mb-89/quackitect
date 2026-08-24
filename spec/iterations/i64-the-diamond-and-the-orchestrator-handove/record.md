@@ -81,3 +81,19 @@ OFF IS TODAY, EXACTLY. With the switch off the machine behaves as it does now: n
 WHY THE OWNER ASKED FOR IT, in their own words: "I had bad experience with the walker and the guide." The switch is what makes this reversible without a revert.
 
 THE A/B TEST IS THE POINT, not a nice-to-have. The switch exists so the two behaviours can be run against each other and measured. Anything that lets the OFF path drift from today's behaviour destroys the control arm, and with it the experiment.
+
+TWO SWITCHES, ONE PER ITERATION (owner ruling 2026-08-24, confirmed): "The switch should be in both. Let's make two switches, one for each." i65 carries its own, so either behaviour can be measured while the other is on.
+
+## Also in scope: the POSIX branch of the VS Code registry writer
+
+ROUTED HERE BY THE OWNER, 2026-08-24. It is unrelated to the diamond and it is the tree's only standing red, so it rides the first iteration that will be walked rather than waiting for a home of its own.
+
+WHAT FAILS. `deliverable/tests/vscoderegistry.test.ts` line 160 asserts the entry's `relativeLocation` is the bare folder name `brand.brand-0.1.0`. On Linux it comes back as the whole path, `C:\Users\someone\.vscode\extensions\brand.brand-0.1.0`.
+
+THE CAUSE, read rather than inferred. `deliverable/engine/vscoderegistry.ts` line 155 computes `relativeLocation: basename(dir)`. On POSIX `basename` splits only on a forward slash, so a path carrying backslashes has no separator to find and the whole string survives. On Windows it splits on both and the same call is correct.
+
+THE FIXTURE IS RIGHT AND MUST NOT MOVE. It holds a Windows path on purpose, because VS Code's own registry on Windows holds one. Line 161, which asserts `location.path`, is not what failed.
+
+THE FIX IS ONE LINE, AND THE FILE ALREADY SHOWS ITS OWN IDIOM. Line 154 normalises first — `path: `/${dir.replace(/\\/g, "/")}`` — so the author handled backslashes there and missed it one line below. Normalise before taking the basename, or take it with the Windows-aware variant.
+
+WHY IT WAS NEVER SEEN. guidance/method/cloud-runner.md says it plainly: "Every machine that has run this engine was Windows, so the POSIX path is written and unexercised", against exp-the-posix-branches-have-never-run. This looks like that expedition's trigger firing for real, and the walk should ask whether OTHER POSIX branches carry the same shape rather than fixing this one line and moving on.
