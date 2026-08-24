@@ -36,7 +36,7 @@ const UPSTREAM_FILE = ["deliverable", "vendor", "upstream", "upstream.json"] as 
  *  is NOT.
  *
  *  A FILE THAT CANNOT BE READ MUST NEVER PASS FOR AN ABSENT ONE. That is the
- *  lesson `declaredRoots` learned the hard way on 2026-07-29, and it is worse
+ *  lesson `declaredRoots` learned the hard way, and it is worse
  *  here: a swallowed parse error would silently switch the source guard off,
  *  and the guard going quiet looks exactly like the guard passing. */
 function identityIn(dir: string, parts: readonly string[], source: string): string | undefined {

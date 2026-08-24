@@ -6,7 +6,7 @@ statement: Overhaul — sweep everything active against the standard as it now s
 
 # overhaul — the method
 
-Overhaul is a FUNCTION, not a project. Fire it at idle when the system has
+Overhaul is a FUNCTION, not a project. Fire it at the front desk when the system has
 drifted. Fire it at the end of an unattended run, when there is nothing
 left to build.
 
@@ -110,6 +110,27 @@ Ours is SORTED. Mark every candidate with exactly one letter.
 - Drifted — it was true, and the code moved out from under it.
 
 Take the Erroneous first. A wrong document is worse than no document.
+
+## Migration cost is never a reason to keep something wrong
+
+OWNER RULING 2026-08-21, in their own framing: if we discover that something
+we did in the past is not correct, we do not leave it in because fixing it
+would be an effort. We fix it. If we always fix what is bad, then nothing bad
+stays in the system.
+
+THE COROLLARY IS THE HALF THAT BINDS US. We must be able to make changes like
+this without being afraid of them. Where the fear comes from a missing
+capability, we build the capability. The owner's words: "If that means we need
+to build tools for that, then we do it."
+
+WHAT PROVOKED IT. A frontmatter key was measured on 1,650 files, a better name
+was judged, and the rename was then recommended against on migration risk. The
+owner overruled that reasoning directly.
+
+SO A RECOMMENDATION AGAINST A FIX MAY NOT REST ON ITS SIZE. Say what is wrong,
+say what the fix costs, and say what tool would make the cost small. The
+decision to defer is the owner's, and it is never the agent's to make on the
+grounds that the change is large.
 
 A candidate that fits no letter is KEPT. Record that it was looked at.
 

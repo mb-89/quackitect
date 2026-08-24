@@ -20,11 +20,11 @@ import { bumpDrawingEpoch } from "./machines/compile.ts";
 import { handleHttp, type McpServer } from "./mcp.ts";
 import { subscribeModelMutations } from "./model-fs.ts";
 import { beginPass, endPass } from "./notes.ts";
-import { loadPanel, renderPanel } from "./params.ts";
+import { renderSidebar, tasksTable } from "./params.ts";
 import { resolveInRoot, seDir } from "./paths.ts";
 import { produce } from "./produce.ts";
-import { ENGINE_LIFE, feedRows, type MirrorState, renderMirror } from "./render.ts";
-import { runningJob } from "./run.ts";
+import { ENGINE_LIFE, feedRows, linkDocRefs, type MirrorState, renderMirror } from "./render.ts";
+import { reapAbandonedJobs, runningWork } from "./run.ts";
 import { loadLevels, loadStopAt } from "./scale.ts";
 import type { Session } from "./session.ts";
 import { survey } from "./survey.ts";
@@ -310,7 +310,7 @@ export function startMirror(o: MirrorOptions): Server {
         result: state.session.formBless(String(body.name ?? ""), body.ok === true, "human", String(body.machine ?? "")),
       }),
     ],
-    // THE PRIORITY RIDES THE NOTE (owner, 2026-08-01). The note row draws
+    // THE PRIORITY RIDES THE NOTE (owner). The note row draws
     // a MoSCoW choice, and a capture that dropped it made every stray a
     // "could" whatever the reader picked.
     "/note": [
@@ -450,7 +450,7 @@ export function startMirror(o: MirrorOptions): Server {
         }),
         (e) => (e instanceof Rejection ? e.toJSON() : { error: whyOf(e) }),
       ),
-    // SET TARGET, the bar's button (owner design 2026-08-04): aims at the
+    // SET TARGET, the bar's button: aims at the
     // SELECTED state — the one whose details the machine page reported.
     "/target/selected": (req, res) =>
       jsonPost(
@@ -657,15 +657,8 @@ export function startMirror(o: MirrorOptions): Server {
       }
       raw = raw.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n/, ""); // frontmatter is machine-facing
       let html = p.endsWith(".md") ? (marked.parse(raw) as string) : `<pre>${raw.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</pre>`;
-      // see dsp-legible-controls.md#a-reference-in-prose-is-a-link-not-dead
-      if (p.endsWith(".md")) {
-        const links = state.session.docRefPaths(p);
-        const escAttr = (s: string): string => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
-        html = html.replace(/\[\[([^\]\n]+)\]\]/g, (whole: string, id: string) => {
-          const path = links[id.trim()];
-          return path === undefined ? whole : `<a class="doclink" data-path="${escAttr(path)}">${escAttr(id.trim())}</a>`;
-        });
-      }
+      // THE SURFACE MAKES THE LINK, not the server. see linkDocRefs.
+      if (p.endsWith(".md")) html = linkDocRefs(html, state.session.docRefPaths(p));
       if (url.searchParams.get("page") === "1") {
         // A standalone page — ctrl/shift-click targets (new tab, new window).
         res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
@@ -770,7 +763,7 @@ export function startMirror(o: MirrorOptions): Server {
       res.writeHead(200, { "content-type": "application/json; charset=utf-8", "access-control-allow-origin": "*" });
       res.end(JSON.stringify({ cards: loadCards(o.root) }));
     },
-    // BOTH HANDS ASK IT (owner ruling 2026-07-28): the agent through
+    // BOTH HANDS ASK IT: the agent through
     // se_survey, the person through the machine header's button.
     "/api/survey": (_url, _req, res) => {
       json(res, survey(o.root));
@@ -833,18 +826,18 @@ export function startMirror(o: MirrorOptions): Server {
         // buttons, which is the hole the comment above this block records.
         stopat: loadStopAt(state.root),
         stop_at: state.session.stopAtValue,
-        // WORK STILL RUNNING, so a person watching a still surface can tell a
-        // slow operation from a hung one. Absent when nothing is running, which
-        // is the ordinary case and draws nothing.
-        running: runningJob(),
+        // EVERY PIECE OF WORK STILL RUNNING, so a person watching a still
+        // surface can tell a slow operation from a hung one and can see how
+        // many things are going. Empty is the ordinary case and draws nothing.
+        tables: { running: tasksTable(runningWork()) },
         emergency: state.session.emergency,
         ints: { narration_minutes: state.session.narrationMinutes, narration_calls: state.session.narrationCalls },
-        toggles: { "block-auto-sleep": power.block_sleep, "shutdown-at-idle": power.shutdown_at_idle },
+        toggles: { "block-auto-sleep": power.block_sleep, "shutdown-at-front-desk": power.shutdown_at_idle },
       };
-      // THE NOTE ROW RIDES ALONG. It is its own panel with its own spec
-      // (note-entry.md), and serving it here means the sidebar needs one
-      // fetch rather than two, with neither surface writing markup.
-      const bar = renderPanel(loadPanel(state.root, "controls"), values) + renderPanel(loadPanel(state.root, "note-entry"), values);
+      // EVERY PANEL RIDES ALONG, in the one order there is. renderSidebar
+      // decides it, so the sidebar needs one fetch and neither surface writes
+      // markup or picks an order of its own.
+      const bar = renderSidebar(state.root, values);
       res.writeHead(200, { "content-type": "text/html; charset=utf-8", "access-control-allow-origin": "*" });
       res.end(bar);
     },
@@ -1023,6 +1016,17 @@ export function startMirror(o: MirrorOptions): Server {
   // A reset is the CLIENT's socket dying, and it now leaves a line. Before
   // this, telling it from a server exit meant checking a PID by hand.
   recordClientFailures(o.root, server);
+  // THE LAST ENGINE'S GHOSTS DIE HERE, BEFORE ANYBODY CAN READ THEM.
+  //
+  // A job records itself as running and only the engine that owns it writes
+  // the closing record. An engine that was killed never did, so without this
+  // the next one inherits jobs that report progress and never finish.
+  //
+  // IT RUNS BEFORE listen ON PURPOSE. The first lane answer already carries
+  // the work account, so a reap after the port opens is a reap the first
+  // caller can race.
+  const reaped = reapAbandonedJobs(o.root);
+  if (reaped.length > 0) recordLifecycle(o.root, "reaped", `jobs=${String(reaped.length)} ${reaped.join(" ")}`);
   server.listen(o.port, "127.0.0.1", () => recordLifecycle(o.root, "listening", `port=${String(o.port)}`));
   return server;
 }

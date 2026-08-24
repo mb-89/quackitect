@@ -130,7 +130,7 @@ function asList(v: unknown): string[] {
 }
 
 /** Every markdown file under the trace corpus, at any depth. ONE SUBFOLDER
- *  PER TYPE is the shape a person reads (owner, 2026-08-05); the loader does
+ *  PER TYPE is the shape a person reads (owner); the loader does
  *  not depend on it, so a flat file still loads and a new type needs no code. */
 function traceFiles(dir: string, depth = 0): string[] {
   if (depth > 4) return [];
@@ -210,6 +210,14 @@ export interface ItemTemplate {
   folder: string;
   /** see dsp-radial-layout.md#mechanical-checks-the-template-declares */
   checks: TemplateCheck[];
+  /** The fields a node MAY LEAVE OUT. This subtracts from the required list;
+   *  it never re-declares it. The skeleton still names every key and the mint
+   *  still offers them all.
+   *
+   *  A neighbour's `group` is the case that found it. That template says in as
+   *  many words that a person is never in a group, and the checker demanded
+   *  one from the engineer anyway. */
+  optional: string[];
 }
 
 /** One declared check. Exactly one of its rule keys is set.
@@ -313,6 +321,7 @@ function buildItemTemplate(path: string, type: string): ItemTemplate | undefined
     fields: pairs.map((m) => m[1] ?? ""),
     defaults: Object.fromEntries(pairs.filter((m) => !(m[2] ?? "").includes("TODO")).map((m) => [m[1] ?? "", (m[2] ?? "").trim()])),
     sections: Array.isArray(note.frontmatter.sections) ? note.frontmatter.sections.map(String) : [],
+    optional: Array.isArray(note.frontmatter.optional) ? note.frontmatter.optional.map(String) : [],
     folder: typeof note.frontmatter.folder === "string" ? note.frontmatter.folder : "",
     checks: checkList(note.frontmatter.checks),
   };
@@ -403,6 +412,7 @@ export function conformance(root: string, node: TraceNode): string[] {
   const out: string[] = [];
   if (tpl.id_prefix !== "" && !node.id.startsWith(tpl.id_prefix)) out.push(`${node.id}: a ${tpl.type} id starts with ${tpl.id_prefix}`);
   const missing = tpl.fields.filter((k) => {
+    if (tpl.optional.includes(k)) return false;
     const s = fieldValue(tpl, note.frontmatter, k);
     return s.trim() === "" || s.includes("TODO");
   });

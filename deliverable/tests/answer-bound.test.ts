@@ -152,15 +152,17 @@ test("the suggested spill page keeps a read's own answer inside the bound", asyn
   const { SPILL_PAGE_CHARS } = await import("../engine/bound.ts");
   const { fileRead } = await import("../engine/files.ts");
 
-  // DERIVED, AND SIZED SO THE WORST CASE STILL FITS. A page of P costs at most
-  // 2P once escaped, because a spill file is JSON text and the densest thing
-  // left in it is backslash and quote. So 2P plus the envelope must clear the
-  // bound, and this asserts the derivation rather than a number.
+  // THE PAGE IS SIZED ON THE MEASURED COST, NOT THE WORST CASE (2026-08-23).
+  // Sizing on 2 made the page less than half of what fits, so every reading
+  // loop paid about twice the calls it needed — boot's four documents cost
+  // about 29 page reads instead of about 14.
+  //
+  // WHAT MAKES THE OPTIMISM SAFE is not a bigger margin. characterRead
+  // serialises its own answer and shrinks the slice until it fits, reporting
+  // what actually came back in char_range.to. The cases below are the proof:
+  // they push the densest real shapes through fileRead and check the answer
+  // stayed inside the bound.
   assert.ok(SPILL_PAGE_CHARS < ANSWER_BOUND_BYTES, "the page cannot exceed the bound it is derived from");
-  assert.ok(
-    SPILL_PAGE_CHARS * 2 + 200 <= ANSWER_BOUND_BYTES,
-    `a page of ${SPILL_PAGE_CHARS} could serialise to ${SPILL_PAGE_CHARS * 2} in the worst case, which would spill again`,
-  );
 
   const root = mkdtempSync(join(tmpdir(), "spill-page-"));
   // Two shapes that really spill: quote-dense records, and long source lines.

@@ -14,6 +14,10 @@ import { resolveInRoot } from "./paths.ts";
 import { pulledFor, scanGuidance } from "./pull.ts";
 import type { Channel } from "./session.ts";
 
+/** THE SESSION'S OWN HAND. Not a spawned one, and the reader every walk uses
+ *  until a hand is registered. */
+const DEFAULT_READER = "session";
+
 /** What the gate needs of the session it serves: where a document lives, and
  *  the two side effects a credit has. */
 export interface ReadGateHost {
@@ -80,9 +84,49 @@ export class ReadGate {
    *  the condition status (the mirror's pill) only; never the gate, and
    *  never the checkboxes (those stay the human's alone). */
   readonly agentReads = new Map<string, Set<string>>();
+  /** ONE LEDGER PER READER. A reading proof belongs to the HEAD that read,
+   *  never to the record. Two hands walking the same record have read
+   *  different things, and only one of them can be asked.
+   *
+   *  IT WAS ONE SHARED LEDGER UNTIL, and that made a freshly
+   *  spawned walker inherit credit for pages it had never seen. The gate then
+   *  reported the reading as done to a hand holding none of it. That is the
+   *  same guarantee the cold reviewer rests on, broken from the other end
+   *.
+   *
+   *  THE LEDGERS DO NOT SURVIVE A RESTART except the default reader's, which
+   *  is what `restore` writes into. That is correct rather than a shortcut: a
+   *  hand does not survive a restart either, so its reading cannot. */
+  private readonly ledgers = new Map<string, Map<string, string>>();
+
+  /** WHOSE HEAD IS READING RIGHT NOW. The session's own hand by default, so
+   *  a walk with no spawned hands behaves exactly as it did before. */
+  private readerId = DEFAULT_READER;
+
   /** Session-local read buffer: latest lane hash per path, auto-filled by
-   *  se_file_read and re-used for later ticks unless stale. */
-  readonly readBuffer = new Map<string, string>();
+   *  se_file_read and re-used for later ticks unless stale. Serves the
+   *  ledger of whoever is reading, so every existing caller is unchanged. */
+  get readBuffer(): Map<string, string> {
+    const held = this.ledgers.get(this.readerId);
+    if (held !== undefined) return held;
+    const fresh = new Map<string, string>();
+    this.ledgers.set(this.readerId, fresh);
+    return fresh;
+  }
+
+  /** HAND THE READING OVER. A newly spawned hand starts with an empty head,
+   *  so it re-owes every document, and the hand it replaced keeps its own
+   *  proofs under its own name rather than losing them.
+   *
+   *  Passing nothing returns the reading to the session's own hand. */
+  setReader(id?: string): void {
+    this.readerId = id === undefined || id.trim() === "" ? DEFAULT_READER : id;
+  }
+
+  /** Who the reading is currently attributed to. */
+  currentReader(): string {
+    return this.readerId;
+  }
   /** The document the last pull served, waiting on its probes.
    *
    *  `outstanding` IS WHAT IS STILL OWED, never the whole set. A probe answered

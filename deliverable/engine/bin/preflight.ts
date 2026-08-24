@@ -1,5 +1,5 @@
 // The boot preflight — an ordinary condition SCRIPT (exit 0 = green).
-// prepare_idle names it in its exit condition:
+// prepare_desk names it in its exit condition:
 //   exit:
 //     script: deliverable/engine/bin/preflight.ts
 // The state declares WHAT runs; the engine only knows HOW to run scripts.
@@ -9,7 +9,7 @@
 import { spawnSync } from "node:child_process";
 import { accessSync, chmodSync, constants, existsSync, mkdirSync, readdirSync, readFileSync } from "node:fs";
 import { dirname, join, relative, resolve, sep } from "node:path";
-import { brandPath, palettePath } from "../brand.ts";
+import { brandPath, fill, loadBrand, palettePath } from "../brand.ts";
 import { readKeys } from "../frontmatter.ts";
 import type { MachineDecl } from "../machine.ts";
 import { compileMachine } from "../machines/compile.ts";
@@ -219,6 +219,55 @@ try {
   accessSync(dirname(join(seDir(root), "calls.jsonl")), constants.W_OK);
 } catch {
   failures.push("the call log location is not writable (.se/)");
+}
+
+// THE INSTALLED EXTENSION IS A RENDER OF THE SOURCE, and nothing checked that
+// it still was. VS Code loads vscode-dist through a link in its own extensions
+// folder, so what runs is whatever that folder last held.
+//
+// TWO WAYS IT GOES WRONG, and they look identical from outside. The render is
+// STALE, or the render never happened and the raw bundle sits there with its
+// placeholders intact.
+//
+// THE SECOND ONE IS SILENT AND TOTAL. package.json declares the views as
+// <id>.tools, and an unrendered extension.js registers providers for the
+// placeholder id instead. Nothing matches, nothing errors, and the panel draws
+// empty. The extension looks uninstalled.
+//
+// IT HAS HAPPENED. vscode-dist/extension.js carried 47 placeholders and was
+// byte-identical to the unrendered bundle, while package.json beside it was
+// rendered clean. It was reported as the plugin being gone.
+//
+// THE CHECK IS THE BUILDER RULE RUN BACKWARDS: render the source here and
+// compare. One comparison catches staleness and a missed render both, and it
+// cannot drift from the builder because it calls the same fill.
+// ONLY WHERE THIS ROOT HAS ITS OWN PRODUCT CONFIGURATION. Rendering the source
+// against a fallback brand and comparing it to a folder rendered against a real
+// one reports a stale install for every checkout that simply has no product
+// configured — a test fixture root above all. The missing-configuration check
+// above already speaks for that case, and it speaks about the right thing.
+const distDir = join(root, "deliverable", "vscode-dist");
+if (existsSync(distDir) && existsSync(brandPath(root))) {
+  const srcDir = join(root, "deliverable", "vscode");
+  const brand = loadBrand(root);
+  for (const rel of ["package.json", "extension.js", "ATTACH.md"]) {
+    const src = join(srcDir, rel);
+    const dist = join(distDir, rel);
+    if (!existsSync(src)) continue;
+    if (!existsSync(dist)) {
+      failures.push(`deliverable/vscode-dist/${rel} is missing — the installed extension is incomplete; run npm run build in deliverable`);
+      continue;
+    }
+    const want = fill(readFileSync(src, "utf8"), brand);
+    const got = readFileSync(dist, "utf8");
+    if (want === got) continue;
+    const holes = got.match(/\$[A-Z_]+\$/g) ?? [];
+    const why =
+      holes.length > 0
+        ? `it still carries ${holes.length} unrendered placeholder(s) — every id it declares is wrong, so the panel draws empty`
+        : "it does not match the source rendered against this product's own name — the install is stale";
+    failures.push(`deliverable/vscode-dist/${rel}: ${why}. Run npm run build in deliverable, then reload the VS Code window`);
+  }
 }
 
 // see dsp-quality-toolchain.md#the-corpus-is-what-every-query-and-coverage-check

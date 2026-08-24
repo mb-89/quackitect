@@ -20,7 +20,20 @@ files:
   - deliverable/engine/sessionreads.ts
   - deliverable/engine/sessionviews.ts
   - deliverable/engine/sessionscript.ts
+  - deliverable/engine/bin/hands-spawned.ts
 ---
+
+## The spawn check belongs here, and was unclaimed until i4
+
+`bin/hands-spawned.ts` IS THE LEAVING JUDGMENT OF EVERY SPAWN STATE. It reads
+the record's own walker ceiling and reports what stands registered against it.
+
+IT BELONGS TO THE WALK MACHINE BY ITS SUBJECT. The roster of hands is part of
+how a record is walked, and the spawn states are states of this machine like
+any other. No other spec's design serves it.
+
+THE LANE STILL STARTS NOTHING. The script reads the job registry and reports;
+the spawn is the guide's own act through the harness.
 
 ## Two files were unclaimed, and one of them is where green is decided
 
@@ -1929,6 +1942,31 @@ evidence; the test files whose job is proving the scripts delete
 the guard at their top.
 
 ## The read proof
+
+── A PROOF BELONGS TO THE HAND THAT GAVE IT (owner ruling 2026-08-23).
+   The ledger keys on WHO read, never on the record. Two hands walking
+   one record have read different things, and only one of them can be
+   asked.
+
+   SO A NEWLY SPAWNED WALKER RE-OWES EVERYTHING. When the M2 walker
+   starts, the M1 walker's proofs say nothing about what it holds. It
+   begins with an empty head, and a proof standing from the hand before
+   it is a claim about somebody else's memory.
+
+   IT IS THE COLD REVIEWER'S GUARANTEE, FROM THE OTHER END. A reviewer
+   is spawned without shared context precisely so it cannot be told that
+   something was already discussed. A walker inheriting reading credit
+   breaks the same rule.
+
+   A PERSON IS A SEPARATE READER TOO. A person and an agent are never
+   the same reader, whatever the document.
+
+   PARTLY BUILT. `deliverable/engine/sessionreads.ts` keeps one ledger
+   per reader and can hand the reading over. What is NOT built yet is
+   the key that tells one walker from the next, so nothing switches
+   readers and the old shared behaviour still stands. Until it does, a
+   guide handing a fresh hand its phase tells it what to read rather
+   than trusting the gate to ask.
 
 ── THE READ PROOF (owner ruling 2026-07-26). A doc's hash is a TOKEN
    held only by reading through the lane: se_file_read returns it, the

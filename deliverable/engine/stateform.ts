@@ -72,7 +72,7 @@ export function fieldTemplateRel(name: string): string {
 }
 
 /** A template's MECHANICS, from its frontmatter. Templates stay GENERIC
- *  (owner ruling 2026-08-04): the editor shape and the line grammar live
+ *: the editor shape and the line grammar live
  *  here; the concrete options and items are the FIELD's arguments. */
 export interface TemplateMeta {
   editor: string;
@@ -305,7 +305,7 @@ export const NO_ARGS: FieldArgs = {
  *  options serving them, lines are the candidates.
  *
  *  IT IS DERIVED, so there is no table to fill and no second copy to drift.
- *  Every option already carries the cluster it serves; before 2026-08-08 the
+ *  Every option already carries the cluster it serves; before the
  *  state kept a flat table repeating that, and the owner asked why the chart
  *  was not simply built.
  *
@@ -326,7 +326,7 @@ export function fieldBox(f: EvidenceField, traceRoot: string, stored: string): M
     // so the chart shows it — a search whose result vanishes is worse than an
     // untidy chart.
     const unplaced: MorphRow = { id: "", name: "unplaced", cells: [] };
-    // A DECISION ROW BEATS A CLUSTER ROW (owner ruling 2026-08-11): an option
+    // A DECISION ROW BEATS A CLUSTER ROW: an option
     // naming its design question lands in that question's row, so a scoped
     // iteration's choices stand apart instead of lumping into one cluster.
     const byQuestion = new Map<string, MorphRow>();
@@ -350,7 +350,7 @@ export function fieldBox(f: EvidenceField, traceRoot: string, stored: string): M
       (byCluster.get(clusterId(at(n, "cluster"))) ?? unplaced).cells.push(cell);
     }
     // THE BOX IS THE CURRENT SOLUTION'S, never the whole product's (owner
-    // ruling 2026-08-11): once any question row exists, the cluster rows -
+    // ruling ): once any question row exists, the cluster rows -
     // the resident corpus - leave the chart entirely.
     const questionRows = [...byQuestion.values()].sort((a, b) => a.id.localeCompare(b.id));
     if (questionRows.length > 0) rows.length = 0;
@@ -408,7 +408,7 @@ function fieldDsm(f: EvidenceField, traceRoot: string, items: string[]): Dsm | n
 
 /** EVERY ANSWER ON EVERY NODE, and no filtering by what is being ordered.
  *
- *  THERE IS NO POOL HERE (owner ruling 2026-08-19). Take the notes, take their
+ *  THERE IS NO POOL HERE. Take the notes, take their
  *  comparisons, sort them. The filtering belongs where SCORING happens, never
  *  where the order is computed.
  *
@@ -440,8 +440,8 @@ function cardJudgments(files: Map<string, string>, writes: string): Judgment[] {
   return js;
 }
 
-/** A MERGE IS AN EQUAL RANK, and the order walk has to be told (owner ruling
- *  2026-08-19).
+/** A MERGE IS AN EQUAL RANK, and the order walk has to be told (
+ *  ).
  *
  *  The merge is recorded under `weighs_with` and the ordering card writes
  *  `weighs_against`, so without this the order walk cannot see a merge at all
@@ -514,13 +514,14 @@ const TYPED_SOURCES: Record<string, string> = {
 
 /** THE CATALOGUES. A known set is never typed from memory and never hard
  *  coded — it is read from the method card that holds it, so editing the card
- *  edits the offer (owner ruling 2026-08-08). catalogs.ts says how. */
+ *  edits the offer. catalogs.ts says how. */
 const CATALOG_SOURCES: Record<string, string> = {
   $iq_checklist: "iq_checklist",
   $sweep_surfaces: "sweep_surfaces",
   $heuristics: "heuristics",
   $transform_operators: "transform_operators",
   $triz_separations: "triz_separations",
+  $spawn_hands: "spawn_hands",
 };
 
 /** see dsp-the-goal-binds-the-walk.md#the-iterations-own-goals */
@@ -653,7 +654,7 @@ const FOLLOW_UP = {
   description: "What this work produces as next steps — work, or notes parked with their ready-when.",
   required: true,
 };
-// THE LAST BOX IS ALWAYS OPEN (owner ruling 2026-08-04): whoever fills a
+// THE LAST BOX IS ALWAYS OPEN: whoever fills a
 // form is asked whether anything is left unsaid. A form must never be the
 // reason something went unrecorded.
 const ANYTHING_ELSE = {
@@ -743,7 +744,7 @@ function derivedViews(
     sensitivity: f.template !== "sensitivity" || evidenceDir === undefined ? null : sensitivityView(...m5Inputs(evidenceDir, traceRoot)),
     ematrix: f.template !== "element-matrix" ? null : elementMatrixArgs(traceRoot),
     scenario: f.template !== "scenario-deck" ? null : scenarioDeckArgs(traceRoot),
-    // INFORMATION ONLY, riding the deck's field (owner ruling 2026-08-10):
+    // INFORMATION ONLY, riding the deck's field:
     // the numbers render beneath the deck and nothing about them is typed.
     smetrics: f.template !== "scenario-deck" ? null : structureMetricsArgs(traceRoot),
     exposure: f.template !== "exposure-pick" ? null : exposureArgs(traceRoot),
@@ -1199,7 +1200,7 @@ export function criterionAxisItems(traceRoot: string): string[] {
   // THE ORDER IS THE HINT'S, NOT THE ALPHABET'S. Sorting here would throw
   // away the very thing that makes the first pass affordable.
   //
-  // EVERY ROW APPEARS, INCLUDING MERGED ONES (owner ruling 2026-08-19). Two
+  // EVERY ROW APPEARS, INCLUDING MERGED ONES. Two
   // rows that measure the same thing SHARE A RANK rather than one of them
   // vanishing into the other. Collapsing hid rows from the list a reader was
   // looking at, and cut every chain that ran through a hidden member.

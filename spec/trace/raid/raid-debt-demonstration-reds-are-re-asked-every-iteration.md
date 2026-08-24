@@ -22,6 +22,8 @@ source_refs:
   - tsp-unattended-start
   - raid-debt-human-observed-demonstrations
   - i35-the-cloud-run-s-findings-land-the-fix-fi
+last_looked: 2026-08-23
+look_verdict: re-accepted
 ---
 
 ## Why this is not [[raid-debt-human-observed-demonstrations]]

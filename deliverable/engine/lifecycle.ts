@@ -14,7 +14,7 @@ import { join } from "node:path";
 
 /** One line in the lifecycle log. The layer word is what a later reader
  *  matches on, so it is a closed set rather than free prose. */
-export type LifecycleEvent = "start" | "exit" | "client-reset" | "client-error" | "listening" | "stop-block";
+export type LifecycleEvent = "start" | "exit" | "client-reset" | "client-error" | "listening" | "stop-block" | "reaped";
 
 /** Append one lifecycle line. Never throws: a postmortem that cannot be
  *  written must not become the cause of death. */

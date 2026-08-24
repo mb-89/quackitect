@@ -80,6 +80,27 @@ specification_note: |
 
 ## Guidance
 
+THE CRITERIA ARE THE DELTA'S, NEVER THE WHOLE PRODUCT'S (owner ruling
+2026-08-23). A round cuts the axes ITS OWN candidates are compared on. The
+resident corpus is not the pool, and treating it as one is a known defect.
+
+THE OWNER'S WORDS: "the criteria are supposed to be only the criteria in this
+iteration, and you cut the criteria for the candidates in this iteration. You
+only look at the delta. You don't look at the whole product."
+
+WHAT GOING WRONG LOOKS LIKE. The pool arrives holding every criterion the
+product ever had. A round whose candidates differ in one decision then cuts
+eighty-odd rows by position and calls it a cut. It reaches the right answer by
+accident, and it spends judgment on rows that were never in play.
+
+SO ASK ONE QUESTION FIRST: which axes do THESE candidates actually differ on?
+That set is the pool. Everything else is out before the ranking starts, and
+needs no reason of its own.
+
+THE POOL IS NOT YET COMPUTED FROM THE DELTA. Until it is, cut by position and
+say in the follow-up how many rows went that way, so the size of the mismatch
+is on the record rather than hidden inside a clean-looking cut.
+
 THREE ACTS LIVE HERE, AND THE ORDER BETWEEN THEM IS THE WHOLE POINT (owner ruling 2026-08-09).
 
 - ONE, CUT. Strike every axis no candidate differentiates on. Blind to importance.

@@ -13,3 +13,9 @@ source_refs:
 ---
 
 The drawing derives; an edit that recompiles shows on the next look.
+
+## Superseded by i4
+
+THE COMPILED MACHINE NOW REACHES THE SURFACE THROUGH THE RESOLVER, at
+if-method-compiler-to-view-resolver. Leaving this crossing live would keep the
+drawing derived on the surface, which is the one thing the decision removes.

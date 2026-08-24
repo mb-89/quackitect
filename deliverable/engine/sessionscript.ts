@@ -39,7 +39,7 @@ export class Scripts {
   /** One script, ASYNC — spawnSync would freeze the whole server (and the
    *  mirror with it) for the run's duration; found when the suite's eight
    *  seconds read as a crashed browser window. */
-  spawnScript(abs: string): Promise<{ status: number | null; out: string }> {
+  spawnScript(abs: string, machineId = ""): Promise<{ status: number | null; out: string }> {
     return new Promise((resolve) => {
       // A CONDITION JUDGES THE CORPUS THE LANE WRITES TO, never the repo
       // root. Judged against the wrong one, the agent is asked to satisfy a
@@ -53,7 +53,14 @@ export class Scripts {
       const where = this.host.workRoot();
       const child = spawn("node", [abs, "--root", where], {
         cwd: where,
-        env: { ...process.env, SE_HOME: seDir(this.host.machineRoot()) },
+        // WHICH RECORD IS BEING JUDGED. A check that reads something the record
+        // DECIDED — the kickoff's walker ceiling, say — has to know which record
+        // it stands in, and only the walk knows that.
+        //
+        // IT IS NOT COPIED INTO SESSION STATE. `.se/settings.json` is global to
+        // the session, so a per-record number kept there leaks across records
+        // and is a second place to disagree with the first.
+        env: { ...process.env, SE_HOME: seDir(this.host.machineRoot()), SE_MACHINE: machineId },
       });
       let out = "";
       let pending = "";
@@ -88,17 +95,45 @@ export class Scripts {
       // battery, which tools.ts already records as "long BY DESIGN now that
       // boot walks read real guidance — 150s killed it mid-run". A cap that
       // kills the battery reads as a red that never happened.
-      const timer = setTimeout(() => child.kill(), 600_000);
-      child.on("error", (e) => {
-        clearTimeout(timer);
+      //
+      // THE RUN ENDS ITSELF, WHICHEVER WAY IT ENDS. Three paths reach the
+      // verdict and each has to be able to fire alone, so they share one
+      // settle that only the first caller gets through.
+      let settled = false;
+      let timer: ReturnType<typeof setTimeout> | undefined;
+      let abandon: ReturnType<typeof setTimeout> | undefined;
+      const end = (status: number | null, text: string): void => {
+        if (settled) return;
+        settled = true;
+        if (timer !== undefined) clearTimeout(timer);
+        if (abandon !== undefined) clearTimeout(abandon);
         this.clearProgress();
-        resolve({ status: null, out: String(e) });
-      });
-      child.on("close", (code) => {
-        clearTimeout(timer);
-        this.clearProgress();
-        resolve({ status: code, out: out + pending });
-      });
+        resolve({ status, out: text });
+      };
+      // KILLING THE CHILD IS NOT THE END OF THE STORY. `kill` ends the child
+      // and leaves its grandchildren holding the output pipes, so `close` can
+      // fail to arrive and the promise never settles at all.
+      //
+      // A RUN STUCK THAT WAY OUTLIVES EVERYTHING THAT COULD CLEAR IT. The step
+      // reads `deciding` for the life of the process, no job record stands
+      // behind it, and every later attempt joins the ghost instead of starting
+      // a real run.
+      //
+      // IT WAS MEASURED, NOT IMAGINED. A walk sat at its repair step reporting
+      // a battery still running, nineteen minutes after that battery's last
+      // case finished, with no battery process alive anywhere on the machine.
+      //
+      // SO THE KILL ARMS A SECOND CLOCK. Half a minute later the run reports
+      // what it has, whatever the pipes are doing.
+      timer = setTimeout(() => {
+        child.kill();
+        abandon = setTimeout(
+          () => end(null, `${out}${pending}\nthe run passed its ceiling, was killed, and never closed its output`),
+          30_000,
+        );
+      }, 600_000);
+      child.on("error", (e) => end(null, String(e)));
+      child.on("close", (code) => end(code, out + pending));
     });
   }
 
@@ -107,6 +142,27 @@ export class Scripts {
    *  when repeated clicks on an unresponsive button queued whole extra
    *  suite runs behind the first. */
   readonly scriptRuns = new Map<string, Promise<Record<string, unknown>>>();
+
+  /** WHEN EACH IN-FLIGHT RUN STARTED. The map above cannot say how old its
+   *  entries are, and a run that never settles is indistinguishable from one
+   *  that started a second ago. */
+  private readonly runStartedAt = new Map<string, number>();
+
+  /** THE AGE PAST WHICH A RUN IS A GHOST. The child is killed at its ceiling
+   *  and given half a minute to close; anything older than both ended in a way
+   *  no clock inside the run can reach. */
+  private static readonly GHOST_MS = 700_000;
+
+  /** FORGET A RUN NOTHING CAN STILL FINISH. Dropping it is what lets the next
+   *  attempt start a real run rather than join a promise that will never
+   *  resolve — the difference between a slow step and a stuck one. */
+  private dropIfGhost(key: string): void {
+    const at = this.runStartedAt.get(key);
+    if (at === undefined) return;
+    if (Date.now() - at < Scripts.GHOST_MS) return;
+    this.scriptRuns.delete(key);
+    this.runStartedAt.delete(key);
+  }
 
   /** RUN a state's condition script — legal only while standing in it.
    *  The result is engine-observed evidence; nobody can claim it. */
@@ -125,6 +181,7 @@ export class Scripts {
       });
     }
     const key = evidenceKey(machine, s.id);
+    this.dropIfGhost(key);
     const inFlight = this.scriptRuns.get(key);
     if (inFlight !== undefined) return inFlight;
     const run = (async () => {
@@ -143,7 +200,7 @@ export class Scripts {
       let ok = true;
       for (const rel of scripts) {
         const abs = resolveInRoot(this.host.machineRoot(), rel, "engine/session.ts script");
-        const r = await this.spawnScript(abs);
+        const r = await this.spawnScript(abs, machine.id);
         // BOTH ENDS, BECAUSE EACH CARRIES HALF THE VERDICT.
         //
         // The TAIL carries the counts — exit codes, totals, units. A head slice
@@ -174,8 +231,12 @@ export class Scripts {
       this.host.recordVerdict(machine, s, ok);
       this.host.notifyChange();
       return { state: `${machine.id}/${s.id}`, script_result: result };
-    })().finally(() => this.scriptRuns.delete(key));
+    })().finally(() => {
+      this.scriptRuns.delete(key);
+      this.runStartedAt.delete(key);
+    });
     this.scriptRuns.set(key, run);
+    this.runStartedAt.set(key, Date.now());
     // THE JUDGMENT ENTERS THE ONE TABLE, against the step it belongs to. It is
     // registered HERE, where the run is created, rather than in scriptStart.
     // The mirror's own /script endpoint calls this method directly, so a run
@@ -230,6 +291,7 @@ export class Scripts {
    *  see dsp-the-work-account.md#behavior-and-constraints */
   scriptStanding(m: MachineDecl, s: StateDecl): "passed" | "not passed" | "deciding" {
     const key = evidenceKey(m, s.id);
+    this.dropIfGhost(key);
     if (this.scriptRuns.has(key)) return "deciding";
     const r = this.host.evidence.get(key)?.script_result as { ok?: boolean } | undefined;
     return r?.ok === true ? "passed" : "not passed";
@@ -240,7 +302,7 @@ export class Scripts {
     return this.scriptRuns.size > 0;
   }
 
-  /** THE WAIT BAR MEASURES SOMETHING (owner ruling, 2026-07-30). A running
+  /** THE WAIT BAR MEASURES SOMETHING. A running
    *  script reports its own steps; indeterminate is the FALLBACK, for work
    *  that genuinely cannot count itself, never the default. */
   progressAt: { done: number; total: number; label: string } | undefined;

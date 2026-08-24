@@ -14,6 +14,8 @@ how_likely: expected
 source_refs:
   - note-142563382cf5
   - note-ed999c4b64b1
+last_looked: 2026-08-23
+look_verdict: rescheduled
 ---
 
 The owner's ruling stands on record: seeding is essentially just drawing

@@ -12,7 +12,9 @@ files:
 
 The boundary is drawn and the excluded list is binding.
 
-The map is inherited and re-checked rather than re-derived. Five stakeholder nodes stand, and this change creates none.
+The map is inherited and re-checked rather than re-derived. Four stakeholder nodes stand, and this change creates none.
+
+THE VEHICLE-OWNER ROLE FOLDED INTO THE ENGINEER (owner ruling 2026-08-23). `stk-vehicle-owner` is outdated and its file is gone. The engineer IS the vehicle owner, so `stk-engineer-driving-agents` carries that role now. Nothing was dropped; one role absorbed another.
 
 One role's concerns were extended. `stk-agent` is the role that pays for both defects, and neither was written down.
 
@@ -21,18 +23,17 @@ One role's concerns were extended. `stk-agent` is the role that pays for both de
 - [[stk-agent]]
 - [[stk-engineer-driving-agents]]
 - [[stk-reviewing-agent]]
-- [[stk-vehicle-owner]]
 - [[stk-newcomer]]
 
 ## coverage
 
-EVERY VALUE PROP'S AUDIENCE RESOLVES. Ten propositions stand. Nine name `stk-engineer-driving-agents` and one, `vp-vendoring`, names `stk-vehicle-owner`. Both files exist under `spec/trace/stakeholder/`. No proposition points at a role that is not there.
+EVERY VALUE PROP'S AUDIENCE RESOLVES. Ten propositions stand. They resolve to `stk-engineer-driving-agents`, which now carries the vehicle-owner role as well as its own. No proposition points at a role that is not there.
 
 A ROLE NO PROPOSITION SERVES IS WORTH NOTICING, and there are three: `stk-agent`, `stk-reviewing-agent` and `stk-newcomer`. That is not a hole. The propositions are written for the people who choose to use this product, and these three are roles the product must SERVE without any of them buying it.
 
 THE ALWAYS-ON CLASSES, kept or struck deliberately.
 
-- acquirer: struck. Nobody funds or buys this. `stk-vehicle-owner` covers adoption of a produced vehicle, which is the nearest live thing.
+- acquirer: kept, as `stk-engineer-driving-agents`. Nobody funds or buys this, and adoption of a produced vehicle is decided by the same engineer who drives the machine.
 - user: kept, as `stk-engineer-driving-agents`. The person who operates the thing.
 - newcomer: kept, as `stk-newcomer`.
 - communicator: struck. Nothing here is explained to a third party by a distinct role today, and the book that would need one is not built.

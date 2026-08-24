@@ -8,8 +8,8 @@ import { type Owner, resolveForRead, resolveInActBound, resolveInRoot, routeToOw
 // modules importing each other.
 export { withActBound };
 
-/** THE STORE A CALL CAN REACH, and there is exactly one (owner ruling
- *  2026-08-16). A record is a folder on trunk, so no path has a second place
+/** THE STORE A CALL CAN REACH, and there is exactly one (
+ *  ). A record is a folder on trunk, so no path has a second place
  *  it could resolve to. */
 export interface Roots {
   /** The project root. Everything lives here. */

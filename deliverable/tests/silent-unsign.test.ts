@@ -33,11 +33,14 @@ async function atTheFirstForm(): Promise<{ s: Session; state: string }> {
   const s = new Session(root);
   await readEverything(s);
   s.setTarget("iterations");
-  const first = (await s.pull()) as { options?: { to: string }[] };
+  // ENTERING THE CONTAINER OWES A READING. The hop that used to absorb it was a
+  // hub state between boot and the desk, and that state is gone. A bare pull
+  // here answers `read`, so the offer must be read off the answer that stopped
+  // the reading rather than off a fresh pull.
+  const first = (await readEverything(s)) as { options?: { to: string }[] };
   const door = (first.options ?? []).map((o) => o.to).find((to) => !to.endsWith("/end")) ?? "";
   await s.pull({ form: { choice: door } });
-  await readEverything(s);
-  const at = (await s.pull()) as { where?: string[] };
+  const at = (await readEverything(s)) as { where?: string[] };
   const where = (at.where ?? [])[0] ?? "";
   return { s, state: where.slice(where.lastIndexOf("/") + 1) };
 }

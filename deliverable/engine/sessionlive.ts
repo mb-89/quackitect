@@ -79,6 +79,18 @@ export class Liveness {
 
   /** How long nothing may happen before an armed idle shutdown fires. */
   static IDLE_MINUTES = 5;
+  /** HOW OLD A RUNNING JOB MAY BE AND STILL VETO THE SHUTDOWN.
+   *
+   *  A JOB THAT NEVER EXITS IS WHY THIS NEVER FIRED. It stays `running` for
+   *  ever, and a shutdown any leak can veto is a shutdown that never happens.
+   *  Measured: a profiling script kept a watcher alive and held the
+   *  machine awake for twenty-four minutes with the walk resting and the log
+   *  silent.
+   *
+   *  AN HOUR IS GENEROUS ON PURPOSE. The longest real job measured here is the
+   *  full test battery at about a hundred seconds, so an hour cuts nothing
+   *  that is actually working. */
+  static JOB_MAX_AGE_MS = 60 * 60_000;
 
   get power(): { block_sleep: boolean; shutdown_at_idle: boolean } {
     return { block_sleep: this._blockSleep, shutdown_at_idle: this._shutdownAtIdle };
@@ -86,7 +98,9 @@ export class Liveness {
 
   setPower(key: string, on: boolean): Record<string, unknown> {
     if (key === "block-auto-sleep") this._blockSleep = on;
-    else if (key === "shutdown-at-idle") this._shutdownAtIdle = on;
+    // THE OLD KEY IS STILL ACCEPTED. The control was renamed and
+    // a panel served before the rename still posts the old one.
+    else if (key === "shutdown-at-front-desk" || key === "shutdown-at-idle") this._shutdownAtIdle = on;
     else {
       throw new Rejection({
         clause: CLAUSES.REQUIRED_ARGS,
@@ -113,12 +127,12 @@ export class Liveness {
    * A walk standing anywhere else is work in progress, and shutting the
    * machine down under it would strand that work.
    */
-  private static readonly RESTING = new Set(["idle", "front_desk"]);
+  private static readonly RESTING = new Set(["front_desk"]);
 
   /** All three must hold: parked, quiet, and nothing of ours still running. */
   idleFor(ms: number): boolean {
     if (Date.now() - this.lastActivity < ms) return false;
-    if (anyJobRunning()) return false;
+    if (anyJobRunning(Liveness.JOB_MAX_AGE_MS)) return false;
     const active = this.host.describe().active as string[];
     return active.length > 0 && active.every((a) => Liveness.RESTING.has(a.split("/").pop()!));
   }
@@ -156,7 +170,7 @@ export class Liveness {
     }).unref();
   }
 
-  /** THE PING (owner, 2026-07-30): the agent points at a mirror surface and
+  /** THE PING (owner): the agent points at a mirror surface and
    *  it pulses YELLOW in every open window — the tour's pointing finger,
    *  and "look HERE" for refusals and diffs. Targets: a card id (machine,
    *  log, details, terminal, chat), a drawn state id, or an element id.

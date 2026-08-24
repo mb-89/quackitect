@@ -21,7 +21,7 @@ export interface Survey {
   notes_window?: { offset: number; shown: number; remaining: number };
   /** The backlog windows WITH the notes — one limit, both lists. It once
    *  rode along whole on every windowed call and overflowed the host
-   *  (2026-08-02, at 44 parked items). */
+   *  (, at 44 parked items). */
   backlog_window?: { offset: number; shown: number; remaining: number };
 }
 

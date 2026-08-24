@@ -48,15 +48,18 @@ test("a run's verdict logs itself, whatever the engine decided to run", async ()
   // back a handle rather than blocking.
   assert.equal(body.handed_off, true, `the battery hands off: ${JSON.stringify(body)}`);
 
+  // THE HANDLE READS BACK OFF THE ACCOUNT, not off a status verb. There is no
+  // poll: a run reports itself on the `work` block of every lane answer.
   const job = String(body.job);
-  const recovered = await call(server, "se_test", { job });
-  assert.equal(recovered.body.job, job, "the handle reads back");
+  const onAccount = (r: Record<string, unknown>): boolean => ((r.work ?? []) as { job?: string }[]).some((e) => e.job === job);
+  const recovered = await call(server, "se_pull", {});
+  assert.ok(onAccount(recovered.body), "the handle reads back off the work account");
 
-  // A SECOND SERVER READS THE SAME HANDLE. The verdict lives in the log rather
+  // A SECOND SERVER SEES THE SAME HANDLE. The verdict lives on disk rather
   // than in one process's memory, which is what makes it survivable.
   const secondServer = await bootedServer(root);
-  const elsewhere = await call(secondServer, "se_test", { job });
-  assert.equal(elsewhere.body.job, job, "and reads back from a different process");
+  const elsewhere = await call(secondServer, "se_pull", {});
+  assert.ok(onAccount(elsewhere.body), "and reads back from a different process");
 });
 
 // req-test-run-carries-its-question: the engine says which tests ran, and only

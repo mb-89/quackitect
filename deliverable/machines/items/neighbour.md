@@ -5,6 +5,8 @@ id_prefix: nbr-
 folder: spec/trace/neighbour
 sections:
   - Interface
+optional:
+  - group
 applies_rigor:
   - systematic
 applies_type:

@@ -139,8 +139,8 @@ test("the render lint: the update lane refuses what renders weird", () => {
     () => parseUpdate({ op: "defer", node: "d1" }),
     (e) => (e as { clause?: string }).clause === "SE-C-120",
   );
-  const d = parseUpdate({ op: "defer", node: "d1", to: "idle" });
-  assert.equal(d.to, "idle");
+  const d = parseUpdate({ op: "defer", node: "d1", to: "front_desk" });
+  assert.equal(d.to, "front_desk");
 });
 
 // THE MOST-HIT REFUSAL BECAME A CORRECTION (owner ruling 2026-08-02). The
@@ -236,7 +236,7 @@ test("replay: parked defers and open points survive an engine life", () => {
         ],
       }),
       JSON.stringify({ op: "done", visit: "e1@0", node: "d1" }),
-      JSON.stringify({ op: "defer", visit: "e1@0", node: "d2", brief: "b", to: "idle" }),
+      JSON.stringify({ op: "defer", visit: "e1@0", node: "d2", brief: "b", to: "front_desk" }),
     ].join("\n")}\n`,
     "utf8",
   );
@@ -244,11 +244,13 @@ test("replay: parked defers and open points survive an engine life", () => {
   const before = replayFile(join(dir, "decisions.jsonl"));
   assert.equal(before.open.length, 0, "d1 done, d2 deferred — no open point");
   assert.equal(before.parked.length, 1);
-  assert.equal(before.parked[0].state, "idle");
+  assert.equal(before.parked[0].state, "front_desk");
   assert.equal(before.parked[0].brief, "b");
-  // A fresh engine life: the parked point re-arms and arrives at idle.
+  // A fresh engine life: the parked point re-arms and arrives at the front
+  // desk. Boot lands there directly now (idle was removed), so that is the
+  // state the deferred point re-materializes on.
   const s = new Session(root);
-  const arrived = s.decisions.graph("idle@0").nodes;
+  const arrived = s.decisions.graph("front_desk@0").nodes;
   assert.equal(arrived.length, 1);
   assert.equal(arrived[0].brief, "b");
   assert.equal(arrived[0].status, "open");
@@ -263,16 +265,18 @@ test("defer parks a point for a later state — it arrives there as an open to-d
   const s = new Session(freshRoot());
   s.decisions.apply("e1@0", { op: "plan", items: ["doable here", "needs idle"] });
   const park = s.decisions.graph("e1@0").nodes.find((n) => n.brief === "needs idle")!;
-  s.decisions.apply("e1@0", { op: "defer", node: park.id, to: "idle" });
+  s.decisions.apply("e1@0", { op: "defer", node: park.id, to: "front_desk" });
   assert.equal(s.decisions.graph("e1@0").nodes.find((n) => n.id === park.id)?.status, "deferred");
   // Deferred is not open — the evidence check passes over it.
   assert.equal(s.decisions.openFor(["e1"]).length, 1, "only the doable point stays open");
-  // First touch of the target state materializes it — once.
-  const arrived = s.decisions.graph("idle@0").nodes;
+  // First touch of the target state materializes it — once. Boot lands on
+  // the front desk directly now (idle was removed), so that is the state
+  // that owes the touch.
+  const arrived = s.decisions.graph("front_desk@0").nodes;
   assert.equal(arrived.length, 1);
   assert.equal(arrived[0].brief, "needs idle");
   assert.equal(arrived[0].status, "open");
-  assert.equal(s.decisions.graph("idle@0").nodes.length, 1);
+  assert.equal(s.decisions.graph("front_desk@0").nodes.length, 1);
 });
 
 test("replayVisitsText: a record's history renders per visit with statuses", () => {
@@ -288,7 +292,7 @@ test("replayVisitsText: a record's history renders per visit with statuses", () 
     }),
     JSON.stringify({ op: "done", visit: "e9@0", node: "d1" }),
     JSON.stringify({ op: "update", visit: "e9-leave@0", node: "d3", brief: "closing" }),
-    JSON.stringify({ op: "defer", visit: "e9@0", node: "d2", brief: "verify", to: "idle" }),
+    JSON.stringify({ op: "defer", visit: "e9@0", node: "d2", brief: "verify", to: "front_desk" }),
   ].join("\n")}\n`;
   const visits = replayVisitsText(text);
   assert.deepEqual(

@@ -12,6 +12,8 @@ breaks_how_badly: abrasive
 how_likely: expected
 source_refs:
   - req-a-pending-verdict-is-recorded-against-its-state
+last_looked: 2026-08-23
+look_verdict: rescheduled
 ---
 
 ## Why it stands

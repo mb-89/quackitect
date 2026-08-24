@@ -689,7 +689,7 @@ function nodeTableProblems(name: string, args: FieldArgs, content: string): stri
 }
 
 /** Which ROW each option belongs to: its design question where it names one,
- *  its cluster otherwise (owner ruling 2026-08-11 - a row is a DECISION, and
+ *  its cluster otherwise (- a row is a DECISION, and
  *  a scoped iteration's decisions are finer than the product's clusters). */
 function optionClusters(corpus: TraceNode[]): Map<string, string> {
   const out = new Map<string, string>();
@@ -711,7 +711,7 @@ function chartProblems(name: string, content: string, corpus?: TraceNode[]): str
   }
   if (corpus === undefined) return [];
   const serves = optionClusters(corpus);
-  // A ROW IS A DECISION (owner ruling 2026-08-11): demanded rows are those
+  // A ROW IS A DECISION: demanded rows are those
   // where the LINES' OWN picks offer at least two live alternatives. A
   // one-cell row is a settled ruling, and inherited clusters never re-demand.
   const lines: { id: string; byKey: Map<string, number> }[] = [];
@@ -782,10 +782,31 @@ type ChecklistStatus =
   | { kind: "checked" }
   | { kind: "owed"; ref: string }
   | { kind: "owed_unresolved"; ref: string }
+  | { kind: "declined"; why: string }
   | { kind: "unchecked" };
 
 function checklistItemStatus(item: string, lines: Set<string>, corpus?: TraceNode[]): ChecklistStatus {
   if (lines.has(`- [x] ${item}`)) return { kind: "checked" };
+  // AN UNTICKED BOX WITH A REASON IS AN ANSWER, not a blank
+  // Some drawn lists offer a thing the state MAY use and need
+  // not: a spawn state lists the cast, and a phase that honestly earns no
+  // hand must be able to say so.
+  //
+  // IT REFUSED THAT ANSWER AND TRAPPED THE WALK. The ceiling rule says
+  // spawning none is legitimate and needs no excuse, while this check demanded
+  // every box ticked. Both were written the same day and neither knew about
+  // the other. The only way past was to spawn a hand the phase did not need,
+  // which is the exact waste the ceiling exists to stop.
+  //
+  // THE REASON IS REQUIRED, and that is the whole guard. A list where every
+  // box may be blank enforces nothing; a list where declining costs a sentence
+  // still does.
+  const declinedPrefix = `- [ ] ${item} — `;
+  const declinedLine = [...lines].find((l) => l.startsWith(declinedPrefix));
+  if (declinedLine !== undefined) {
+    const why = declinedLine.slice(declinedPrefix.length).trim();
+    if (why !== "") return { kind: "declined", why };
+  }
   const prefix = `- [owed] ${item} — `;
   const owedLine = [...lines].find((l) => l.startsWith(prefix));
   if (owedLine === undefined) return { kind: "unchecked" };

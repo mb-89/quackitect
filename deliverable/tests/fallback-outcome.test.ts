@@ -259,6 +259,16 @@ function fillFor(form: {
   const out: Record<string, unknown> = {};
   for (const f of form.fields ?? []) {
     if (f.required === false) continue;
+    // A CHOICE FIELD IS ANSWERED BY NAME, ahead of any template. The kickoff
+    // gate asks how many walkers the record runs and takes one of its own
+    // options; a sentence is refused whatever template the field carries.
+    if (f.name === "walkers") {
+      // THE CHOICE CARRIES ITS REASON ON THE SAME LINE. A bare option is
+      // refused: the form wants `<option> — <why>`, so that a reader of the
+      // record sees the judgement rather than only the number.
+      out[f.name] = "0 — a fixture root, walked by one hand and spawning none";
+      continue;
+    }
     const t = form.field_templates?.[f.name] ?? "free-form";
     const items = form.field_args?.[f.name]?.items ?? [];
     switch (t) {
@@ -284,7 +294,11 @@ function fillFor(form: {
             : "patch — the smallest column that still has a verification";
         break;
       default:
-        out[f.name] = "a fixture root, walked by the benchmark";
+        // A CHOICE FIELD TAKES ONE OF ITS OWN OPTIONS, never a sentence. The
+        // kickoff gate now asks how many walkers the record runs, and a
+        // fixture that runs none answers zero — which is the roster row's own
+        // default, and the honest answer for a walk with no hands spawned.
+        out[f.name] = f.name === "walkers" ? "0" : "a fixture root, walked by the benchmark";
     }
   }
   if (form.gate === true) out.bless = true;
@@ -354,7 +368,7 @@ test("the benchmark walk: one session, walked once, asserting at each stop it pa
   await walkTo("gate-kickoff");
   assert.deepEqual(
     session.currentMachine().states.map((s) => s.id),
-    ["start", "onboard-retro", "gate-kickoff", "end"],
+    ["start", "spawn-the-hands", "onboard-retro", "gate-kickoff", "end"],
     "before the bless the machine is M0 alone — the column is not pinned by seeding",
   );
   await walkTo("log-risks");

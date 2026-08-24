@@ -23,7 +23,7 @@ describe("boot", { concurrency: true }, () => {
     assert.equal(m.states.find((s) => s.id === "end")?.kind, "end");
     const boot = m.states.find((s) => s.id === "boot")!;
     assert.ok(boot.submachine?.endsWith("boot.canvas"), "boot is a sub-machine state");
-    assert.deepEqual(m.states.find((s) => s.id === "idle")?.legal_tools, ["all"]);
+    assert.deepEqual(m.states.find((s) => s.id === "front_desk")?.legal_tools, ["all", "se_note_drain"]);
   });
 
   test("the boot sub-machine compiles with its own mechanical start/end", () => {
@@ -112,21 +112,36 @@ describe("boot", { concurrency: true }, () => {
     assert.equal(later.body.banners, undefined);
   });
 
-  test("idle opens the whole lane; pulling to end closes it; after the close the pull still answers", async () => {
+  // PULL UNTIL THE WALK SETTLES, answering any reading it owes on the way.
+  // A route can owe one, and a test that treats that as a failure is testing
+  // the route rather than the thing it names.
+  async function settle(server: Parameters<typeof call>[0]): Promise<Record<string, unknown>> {
+    for (let i = 0; i < 12; i++) {
+      const r = await call(server, "se_pull");
+      if (r.body.pull === "read") {
+        const doc = r.body.document as { content?: string } | undefined;
+        if (doc?.content === undefined) return r.body;
+        await call(server, "se_pull", { form: { read: proofFor(doc.content) } });
+        continue;
+      }
+      if (r.body.pull !== "do") return r.body;
+    }
+    throw new Error("the walk never settled");
+  }
+
+  test("the desk opens the whole lane; pulling to end closes it; after the close the pull still answers", async () => {
     const root = freshRoot();
     const server = await bootedServer(root);
     const w = await call(server, "se_file_write", { path: "x.md", content: "hi", base_hash: null });
     assert.equal(w.isError, false);
-    // With no target, idle comes home to the desk first. The desk then waits
-    // with the live doors as options, and end is answered as a form.
-    const first = await call(server, "se_pull");
-    const offer = first.body.pull === "do" ? await call(server, "se_pull") : first;
-    assert.equal(offer.body.pull, "wait", JSON.stringify(offer.body));
+    // Boot lands ON the desk now. With no target it waits there, with the live
+    // doors as options, and end is answered as a form.
+    const offer = await settle(server);
+    assert.equal(offer.pull, "wait", JSON.stringify(offer));
     const exit = await call(server, "se_pull", { form: { choice: "end" } });
     assert.equal(exit.isError, false, JSON.stringify(exit.body));
-    const rest0 = await call(server, "se_pull");
-    const rest = rest0.body.pull === "do" ? await call(server, "se_pull") : rest0;
-    assert.equal(rest.body.pull, "wait", JSON.stringify(rest.body));
+    const rest = await settle(server);
+    assert.equal(rest.pull, "wait", JSON.stringify(rest));
     const after = await call(server, "se_file_read", { path: "x.md" });
     assert.equal(after.isError, true);
     assert.equal(after.body.clause, "SE-C-110");
@@ -161,11 +176,11 @@ describe("boot", { concurrency: true }, () => {
     // simply has nothing to check.
     checkDocs(s);
     await s.advance();
-    assert.deepEqual(s.active(), ["boot/prepare_idle"]);
-    await s.advance(); // prepare_idle -> boot's visible end position
+    assert.deepEqual(s.active(), ["boot/prepare_desk"]);
+    await s.advance(); // prepare_desk -> boot's visible end position
     assert.deepEqual(s.active(), ["boot/end"]);
     await s.advance(); // pop back to main: boot filled, idle
-    assert.deepEqual(s.active(), ["idle"]);
+    assert.deepEqual(s.active(), ["front_desk"]);
     // idle is a hub now: an unnamed advance is refused, the step must choose
     await assert.rejects(
       () => s.advance(),
@@ -177,7 +192,7 @@ describe("boot", { concurrency: true }, () => {
     await s.advance(); // nothing open: start runs to end
     assert.deepEqual(s.active(), ["expeditions/end"]);
     await s.advance(); // pop: filled, back at idle
-    assert.deepEqual(s.active(), ["idle"]);
+    assert.deepEqual(s.active(), ["front_desk"]);
     await s.advance("end");
     assert.equal((s.describe() as { status: string }).status, "closed");
   });
@@ -218,7 +233,7 @@ describe("boot", { concurrency: true }, () => {
     );
     assert.ok(Array.isArray(state.lookahead_read), "packet carries preread hint field");
     assert.ok(
-      (state.next ?? []).some((n) => n.to === "prepare_idle" && Array.isArray(n.entry_read)),
+      (state.next ?? []).some((n) => n.to === "prepare_desk" && Array.isArray(n.entry_read)),
       "each next edge carries its own read requirement list",
     );
   });

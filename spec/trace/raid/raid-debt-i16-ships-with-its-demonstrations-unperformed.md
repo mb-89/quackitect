@@ -15,6 +15,8 @@ source_refs:
   - tsp-a-vehicle-is-made-and-then-drives-something-else
   - req-one-command-produces-a-complete-copy
   - req-the-system-runs-in-a-tree-that-is-not-its-own
+last_looked: 2026-08-23
+look_verdict: rescheduled
 ---
 
 ## What was taken, and by whom

@@ -240,7 +240,10 @@ test("a morph leaves untouched everything the change did not touch", () => {
   const html = renderMirror({ session: new Session(root), root, lastPacket: undefined, mode: "manual" });
   assert.ok(html.includes('from.hasAttribute("data-morph-ignore")'), "client-filled subtrees are never overwritten");
   assert.ok(html.includes('from.hasAttribute("data-keep-style")'), "a size the reader dragged is never snapped back");
-  assert.ok(html.includes("from !== document.activeElement"), "a control under the reader's hand stays theirs");
+  // THE RULE IS UNCHANGED AND THE MECHANISM MOVED. Focus used to be compared
+  // inline at each of seven sites; it is now one decider, and the morph ASKS
+  // it. Asserting the old inline comparison would demand the duplication back.
+  assert.ok(html.includes("sePlaceIsEdited(from)"), "a control under the reader's hand stays theirs");
   assert.match(html, /<div class="cards" data-keep-style/, "the card split is a dragged size, so it is kept");
   // A full reload throws away every one of the above at once. Exactly two
   // survive: the reader's manual retry on a stalled loading bar, and the
@@ -267,13 +270,21 @@ test("the details pane is not rewritten when its content did not change", () => 
     html.includes("if (DETAIL_TITLE === title && DETAIL_HTML === html) return;"),
     "an unchanged details render touches no DOM at all",
   );
-  assert.ok(html.includes("const top = sameSubject ? el.scrollTop : 0;"), "and a changed one still keeps the reader's place");
+  // SAME MOVE, SAME RULE. Keeping the scroll for the same subject is the one
+  // decider's job now, so the details pane asks it rather than reading the
+  // scroll position itself.
+  assert.ok(html.includes("sePlaceKeepScrollForSubject("), "and a changed one still keeps the reader's place");
   assert.ok(html.includes("el.scrollTop = top;"), "the kept position is actually restored");
   // The feed polls constantly, so it repaints far more often than anything
   // else. A reader scrolled down into the past was snapped to the top by a
   // poll that found nothing new.
   assert.ok(html.includes("if (html === LOG_HTML) return;"), "an unchanged feed repaints nothing");
-  assert.ok(html.includes("logPanel.scrollTop = stick ? 0 : top;"), "and a changed feed keeps the reader where they were");
+  // THE ONE DECIDER KEEPS THE FEED'S PLACE TOO. The feed used to write
+  // scrollTop itself, with sticking to the top as a ternary at the call site.
+  // Both moved inside sePlaceKeepScroll, so this surface asks rather than
+  // decides — which is the whole point of having one decider.
+  assert.ok(html.includes("sePlaceKeepScroll(logPanel,"), "and a changed feed asks the one decider where the reader was");
+  assert.ok(html.includes("stickWithin: 40"), "a reader already at the top is kept at the top");
 });
 
 // THE CLASS, NOT THE INSTANCE (owner, 2026-07-29). The reader's place has now

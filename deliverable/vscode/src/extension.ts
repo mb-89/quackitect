@@ -1190,6 +1190,18 @@ class Controls {
   .param-row { display: flex; align-items: center; gap: 6px; }
   .param-label { flex: 0 0 6.2em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--vscode-descriptionForeground); text-transform: uppercase; letter-spacing: .07em; font-size: .8em; cursor: pointer; }
   .param-label:hover { color: var(--vscode-foreground); }
+  /* A TABLE PARAMETER: an ordinary labelled row whose right side is a table.
+     ONE LINE PER ROW. table-layout is fixed so the columns do not jump when a
+     job with a long command arrives, and the last column takes what is left
+     and truncates. The whole cell is on its own tooltip. */
+  .param-table { flex: 1 1 auto; min-width: 0; font-size: .85em; }
+  .param-table.empty { color: var(--vscode-descriptionForeground); }
+  .param-table table { width: 100%; table-layout: fixed; border-collapse: collapse; }
+  .param-table th { text-align: left; font-weight: normal; color: var(--vscode-descriptionForeground); padding: 0 6px 1px 0; }
+  .param-table td { padding: 0 6px 0 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .param-table .col0 { width: 9em; }
+  .param-table .col1 { width: 5em; color: var(--vscode-descriptionForeground); font-variant-numeric: tabular-nums; }
+  .param-table .col2 { width: 6em; color: var(--vscode-descriptionForeground); font-variant-numeric: tabular-nums; }
   .rungs { display: flex; gap: 4px; flex: 1 1 auto; }
   .rung { flex: 1 1 auto; padding: 3px 4px; font: inherit; font-size: .85em; cursor: pointer; background: var(--vscode-button-secondaryBackground); color: var(--vscode-button-secondaryForeground); border: 1px solid var(--vscode-panel-border); border-radius: 4px; }
   .rung:hover { background: var(--vscode-button-secondaryHoverBackground); }

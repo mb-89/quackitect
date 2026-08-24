@@ -23,24 +23,24 @@ const panel = (line: string): ReturnType<typeof parsePanel> => parsePanel(`## Pa
 describe("the toggles parameter type", () => {
   test("a key falls out of the label, so the spec stays readable prose", () => {
     assert.equal(toggleKey("block auto-sleep"), "block-auto-sleep");
-    assert.equal(toggleKey("shutdown at idle"), "shutdown-at-idle");
+    assert.equal(toggleKey("shutdown at front desk"), "shutdown-at-front-desk");
   });
 
   test("every field becomes its own button", () => {
-    const html = renderPanel(panel("shutdown | toggles | block auto-sleep | shutdown at idle | help"), VALUES);
+    const html = renderPanel(panel("shutdown | toggles | block auto-sleep | shutdown at front desk | help"), VALUES);
     assert.match(html, /data-toggle="block-auto-sleep"/);
-    assert.match(html, /data-toggle="shutdown-at-idle"/);
+    assert.match(html, /data-toggle="shutdown-at-front-desk"/);
   });
 
   test("both can be on at once, which is the whole reason it is not a choice", () => {
-    const on: PanelValues = { ...VALUES, toggles: { "block-auto-sleep": true, "shutdown-at-idle": true } };
-    const html = renderPanel(panel("shutdown | toggles | block auto-sleep | shutdown at idle | help"), on);
+    const on: PanelValues = { ...VALUES, toggles: { "block-auto-sleep": true, "shutdown-at-front-desk": true } };
+    const html = renderPanel(panel("shutdown | toggles | block auto-sleep | shutdown at front desk | help"), on);
     assert.equal((html.match(/aria-pressed="true"/g) ?? []).length, 2);
     assert.ok(!html.includes("<select"), "a select would say they exclude each other");
   });
 
   test("none pressed is a state, not a missing value", () => {
-    const html = renderPanel(panel("shutdown | toggles | block auto-sleep | shutdown at idle | help"), VALUES);
+    const html = renderPanel(panel("shutdown | toggles | block auto-sleep | shutdown at front desk | help"), VALUES);
     assert.equal((html.match(/aria-pressed="false"/g) ?? []).length, 2);
     assert.equal((html.match(/class="rung param-toggle"/g) ?? []).length, 2, "neither carries the on class");
   });
@@ -62,7 +62,7 @@ describe("the shipped controls spec", () => {
     const row = params.find((p) => p.name === "shutdown");
     assert.ok(row !== undefined, "the controls panel declares a shutdown row");
     assert.equal(row.type, "toggles");
-    assert.deepEqual(row.fields, ["block auto-sleep", "shutdown at idle"]);
+    assert.deepEqual(row.fields, ["block auto-sleep", "shutdown at front desk"]);
   });
 });
 
@@ -122,7 +122,7 @@ describe("the idle clock", () => {
   // would strand it.
   test("a walk that is not at idle is never idle, however long the silence", () => {
     const s = new Session(root());
-    assert.notEqual(s.active()[0], "idle", "a fresh session stands at start, not idle");
+    assert.notEqual(s.active()[0], "front_desk", "a fresh session stands at start, not idle");
     assert.equal(s.idleFor(0), false, "zero silence required, and it still refuses");
   });
 

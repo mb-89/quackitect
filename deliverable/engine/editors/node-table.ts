@@ -116,7 +116,7 @@ export const NODE_TABLE_EDITOR: EditorKind = {
       '<span class="sfntwhere"></span>' +
       '<button type="button" class="sfntnext" style="' + btn + '" title="next page">›</button>' +
       '<select class="sfntper" style="' + btn + 'padding:0 4px;">' + opts + "</select>" +
-      // THE MISSING-ONLY FILTER (owner, 2026-08-10): show only the rows with
+      // THE MISSING-ONLY FILTER (owner): show only the rows with
       // an empty cell — for the checks table, the requirements no test
       // covers yet. It filters what SHOWS; the save still reads every row.
       '<label style="display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="checkbox" class="sfntmiss" style="accent-color:var(--se-accent);margin:0;"> missing only</label></div>';
@@ -143,8 +143,8 @@ export const NODE_TABLE_EDITOR: EditorKind = {
   });
   `,
   behaviour: `
-  // THE PAGER — previous, next, and how big a page is (owner ruling
-  // 2026-08-08). It shows one page and HIDES the rest. Hides, never removes:
+  // THE PAGER — previous, next, and how big a page is
+  // It shows one page and HIDES the rest. Hides, never removes:
   // the save reads every row in the DOM, so a pager that pruned them would
   // silently drop the answers on every page but the one showing.
   //
@@ -194,7 +194,7 @@ export const NODE_TABLE_EDITOR: EditorKind = {
       // keystroke into an empty cell makes the row non-missing, and the next
       // tick would hide it mid-edit. While focus is in the table, the view
       // holds still.
-      if (tbl.contains(document.activeElement)) return;
+      if (sePlaceHasFocus(tbl)) return;
       const rows = Array.prototype.slice.call(tbl.querySelectorAll("tr.sfntrow"));
       // MISSING MEANS AN EMPTY CELL: no value, or still the template comment.
       const missing = function (tr) {
@@ -239,7 +239,7 @@ export const NODE_TABLE_EDITOR: EditorKind = {
       const cbar = c.closest(".sfntpager");
       sfntMiss[cbar.dataset.field] = c.checked;
       sfntPage[cbar.dataset.field] = 0;
-      if (document.activeElement) document.activeElement.blur();
+      sePlaceRelease();
       sfntApply();
       return;
     }

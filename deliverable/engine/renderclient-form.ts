@@ -164,7 +164,7 @@ function renderStateForm(f) {
   }).join(""), false);
   const tail = ["current_situation", "follow_up", "anything_else"];
   h += sfBox("Evidence", (f.fields || []).filter(function (x) { return tail.indexOf(x.name) < 0; }).map(function (x) { return sfOne(f, x); }).join(""), false);
-  // ANYTHING ELSE IS A FOLLOW-UP, not evidence (owner, 2026-08-05). It is
+  // ANYTHING ELSE IS A FOLLOW-UP, not evidence (owner). It is
   // what the boxes above had no room for, so it belongs beside what happens
   // next — never among the claims the gate judges.
   h += sfBox(

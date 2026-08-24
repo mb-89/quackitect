@@ -8,7 +8,7 @@
 import { strict as assert } from "node:assert";
 import { spawnSync } from "node:child_process";
 import { test } from "node:test";
-import { bootedServer, call, freshRoot, gitInit } from "./helpers.ts";
+import { bootedServer, call, freshRoot, gitInit, proofFor } from "./helpers.ts";
 
 // A SECOND seed needs a HEAD that points at something. gitInit leaves the
 // default branch unborn, so the first seed succeeds and the second refuses
@@ -54,11 +54,26 @@ test("a container holding two open iterations offers them rather than entering o
   const second = await seed(server, 2);
   assert.notEqual(first, second, "two distinct iterations stand open");
 
-  const answer = (await call(server, "se_pull", { form: { choice: "iterations" } })).body as {
+  // Boot lands directly on front_desk now (idle was removed from the state
+  // machine), so the walk reaches iterations/select one hop later than it
+  // used to, and entering "iterations" first owes a reading proof it did not
+  // owe before. Drain any owed read and pull forward until the offer
+  // actually appears, rather than assuming a fixed number of hops.
+  let answer = (await call(server, "se_pull", { form: { choice: "iterations" } })).body as {
     pull: string;
     options?: { to: string }[];
     where: string[];
+    document?: { content?: string };
   };
+  for (let i = 0; i < 40 && (answer.options ?? []).length === 0; i++) {
+    if (answer.pull === "read") {
+      const doc = answer.document;
+      if (doc?.content === undefined) throw new Error(`the pull answered read with no document: ${JSON.stringify(answer)}`);
+      answer = (await call(server, "se_pull", { form: { read: proofFor(doc.content) } })).body as typeof answer;
+    } else {
+      answer = (await call(server, "se_pull", {})).body as typeof answer;
+    }
+  }
 
   // THE ENGINE HAS NO `choose` INSTRUCTION. The contract names five and the
   // code emits four: an offer rides as `options` on the answer, which is what

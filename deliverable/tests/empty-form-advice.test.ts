@@ -33,7 +33,16 @@ async function atAnUntouchedForm(): Promise<{ s: Session; state: string }> {
   const s = new Session(root);
   await readEverything(s);
   s.setTarget("iterations");
-  const first = (await s.pull()) as { options?: { to: string }[] };
+  // Boot lands directly on front_desk now (idle was removed from the state
+  // machine), so entering "iterations" owes a reading proof before the walk
+  // reaches this branching point, one hop later than it used to.
+  // readEverything drains any owed read and returns the answer that stopped
+  // the reading; loop it until the offer actually appears, rather than
+  // assuming a fixed number of hops.
+  let first = (await readEverything(s)) as { options?: { to: string }[] };
+  for (let i = 0; i < 5 && (first.options ?? []).length === 0; i++) {
+    first = (await readEverything(s)) as { options?: { to: string }[] };
+  }
   const door = (first.options ?? []).map((o) => o.to).find((to) => !to.endsWith("/end")) ?? "";
   await s.pull({ form: { choice: door } });
   await readEverything(s);

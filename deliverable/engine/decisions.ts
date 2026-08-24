@@ -43,7 +43,7 @@ const SHAPE_NOTE =
   "update {brief, node?} says what you are doing · " +
   "defer {node, to: <state>} parks a point for the state that can do it — it arrives there as an open to-do";
 
-/** REPLAY (owner ruling 2026-07-27): the jsonl re-arms what an engine
+/** REPLAY: the jsonl re-arms what an engine
  *  life left standing — parked defers that never arrived, and points
  *  still open. Sequential; a re-minted node id shadows its ancestor (the
  *  per-part history stays in the file for the retro). */
@@ -354,7 +354,7 @@ export function cutToFit(text: string, cap = 90): string {
   return `${text.slice(0, space > cap / 2 ? space : room).trimEnd()}…`;
 }
 
-// THE RENDER LINT (owner ruling 2026-07-27): the lane refuses what would
+// THE RENDER LINT: the lane refuses what would
 // render weird — mechanically, at the boundary.
 function lintUpdateLine(text: string, what: string): void {
   if (/[\r\n]/.test(text)) throw malformed(`${what} carries line breaks — one line only. Got ${JSON.stringify(text)}`);
@@ -721,7 +721,7 @@ export class Decisions {
 
   private applyDefer(u: DecisionOp): void {
     const n = this.openNode(u.node!);
-    // THE CAP (owner ruling 2026-07-27): three defers, then the wall —
+    // THE CAP: three defers, then the wall —
     // the fourth forces a decision. Every out stays legal and honest.
     const hops = (n.hops ?? 0) + 1;
     const trail = [...(n.trail ?? [n.visit.split("@")[0]]), u.to!];
@@ -775,7 +775,7 @@ export class Decisions {
       });
     }
     if (u.node !== undefined) this.activeId = this.attachTo(u.node);
-    // EVERY update changes the RENDER (owner ruling 2026-07-27): the
+    // EVERY update changes the RENDER: the
     // brief lands as a checked point under the active node — the log
     // line and the tree always tell the same story, mechanically.
     const point = this.add(visit, this.activeId ?? null, u.brief ?? "");

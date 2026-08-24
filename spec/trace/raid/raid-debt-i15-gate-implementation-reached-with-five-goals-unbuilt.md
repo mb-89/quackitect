@@ -10,6 +10,8 @@ status: closed
 impact: The iteration cannot honestly bless past gate-implementation in this state. The two chunks that were seeded and built (the query-answering function, the BM25 ranking and disposition function) are real and tested, but the goal record.md names — a served, callable lane verb — is not met by a function nobody can call.
 breaks_how_badly: crippling
 how_likely: expected
+last_looked: 2026-08-23
+look_verdict: closed already
 ---
 
 ## Repayment

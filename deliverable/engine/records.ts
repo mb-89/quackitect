@@ -273,7 +273,7 @@ function settleTrunk(root: string, expeditionId: string): string[] {
 function stampRecordClosed(root: string, e: Expedition, merge: boolean, override?: string): void {
   const recAbs = join(root, recordRel(e.id));
   if (!existsSync(recAbs)) return;
-  // The expedition ends with a REPORT (owner ruling 2026-07-27); the
+  // The expedition ends with a REPORT; the
   // close ruling stamps it: applied (merged) or dismissed (unmerged).
   const repRel = `spec/expeditions/${e.id}/report.md`;
   if (!existsSync(join(root, repRel))) {
@@ -420,7 +420,7 @@ export function itCloseShipped(
  *
  *  THE WORK ALREADY STANDS, because there is one tree — so there is no branch
  *  to merge and no checkout to remove. `merge` is the RULING alone rather than
- *  a ruling that also moves bytes.
+ *  A ruling that also moves bytes.
  *
  *  DISMISS NO LONGER DISCARDS ANYTHING, and that is a real change worth
  *  naming: an unmerged branch used to keep a dismissed expedition's changes

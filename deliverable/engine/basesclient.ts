@@ -127,7 +127,7 @@ export const BASES_SCRIPT = `
         var freshCode = doc.querySelector(".bs-code-text");
         var code = document.querySelector(".bs-code-text");
         // The query is the same act seen twice, so it follows every control.
-        if (freshCode !== null && code !== null && document.activeElement !== code) code.value = freshCode.value;
+        if (freshCode !== null && code !== null && !sePlaceIsEdited(code)) code.value = freshCode.value;
         if (pane !== null) pane.classList.remove("bs-busy");
       })
       .catch(function (e) {

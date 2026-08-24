@@ -338,7 +338,7 @@ export function benchmarkBind(root: string, opts: { iteration?: string; stop_at?
     rewind,
     tree,
     controlled,
-    // THE WHOLE WALK IS THE DEFAULT, by owner ruling. A stop point is a
+    // THE WHOLE WALK IS THE DEFAULT, and it is ruled so. A stop point is a
     // narrowing somebody asked for, never the normal case.
     stop_at: opts.stop_at ?? "shipped",
     ended_at: "",

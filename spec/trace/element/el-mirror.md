@@ -24,3 +24,22 @@ renders what the engine holds and never advances the walk.
 Boundary: the interfaces the element matrix mints for its flows.
 
 Realization: the mirror server and the panel.
+
+## Superseded by i4
+
+TWO REALIZATIONS BECOME ONE. The mirror server goes and the editor panel
+stays. Everything this element shows is drawn by the surviving surface or
+dropped with a signed reason, one widget at a time.
+
+IT NO LONGER DERIVES WHAT IT SHOWS. el-view-resolver computes the whole view
+and this element draws it, so what a person reads and what the engine holds
+are the same object rather than two agreeing ones.
+
+NOTHING ELSE MAY DRAW. el-widget-guard refuses any module outside the one
+entry point that emits widget markup.
+
+THE NAME IS NOW WRONG and is left alone deliberately. Renaming an element is
+not this round's work, and a rename with no other change would cost every
+reference for nothing.
+
+Decided at raid-the-surface-repeats-a-computed-view-behind-a-guard.

@@ -14,6 +14,8 @@ source_refs:
   - spec/references/ref-agent-harness-portability-2026-08-19.md
   - spec/trace/raid/raid-host-payload-offload-breaks-read-proof.md
   - spec/trace/raid/raid-mcp-stop-is-not-diagnosable.md
+last_looked: 2026-08-23
+look_verdict: rescheduled
 ---
 
 ## Repayment

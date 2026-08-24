@@ -57,7 +57,7 @@ function evidenceForm(machineId: string, noteName: string, fm: Record<string, un
 
 /** File refs are VAULT-RELATIVE (the Obsidian vault root is the repository
  *  root since the folder levels collapsed —
- *  owner fix 2026-07-26): "deliverable/machines/states/x.md". Canvas-dir-
+ *  owner fix ): "deliverable/machines/states/x.md". Canvas-dir-
  *  relative and root-relative are accepted as fallbacks. */
 export function resolveRef(root: string, canvasPath: string, ref: string): string {
   if (isAbsolute(ref)) return ref;
@@ -431,7 +431,7 @@ function asList(v: unknown): string[] | undefined {
 const BLOCKED_PRIORITY = 1.5;
 
 function asPriority(v: unknown, root: string): number | undefined {
-  // A TIER WORD IS THE AUTHORED TRUTH (owner cut-over ruling 2026-08-12);
+  // A TIER WORD IS THE AUTHORED TRUTH (owner cut-over ruling );
   // its number is the transitional anchor from the drawn scale. Numeric
   // stays legal while the sweep runs.
   if (typeof v === "string" && v.trim() !== "" && Number.isNaN(Number(v))) {
@@ -451,7 +451,7 @@ function asPriority(v: unknown, root: string): number | undefined {
 
 /** Conditions are FLAT frontmatter keys — exit_read, exit_script,
  *  entry_<type> — because nested dictionaries render as JSON blobs in
- *  Obsidian Properties (owner ruling: Obsidian-editable). */
+ *  Obsidian Properties. */
 function conditionDict(
   machineId: string,
   ref: string,

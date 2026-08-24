@@ -56,7 +56,7 @@ export interface EvidenceField {
   options?: string[];
   items?: string[];
   passing?: string[];
-  /** WHICH CHOICES OWE A REASON (owner ruling 2026-08-08). Absent means ALL
+  /** WHICH CHOICES OWE A REASON. Absent means ALL
    *  of them, which is what a gate verdict wants. A finder's `applies` names
    *  only the skip: saying yes needs no essay, saying no does. */
   rationale_for?: string[];
@@ -211,7 +211,7 @@ export interface StateDecl {
   group?: string;
   /** see dsp-walk-machine.md#authored-meaning-or-empty */
   statement: string;
-  /** Optional: a human might fill a state too (owner ruling — v3 drops the requirement). */
+  /** Optional: a human might fill a state too. */
   filled_by?: "agent" | "engine";
   /** Declared on the state, never invented at run time (engine-filled only). */
   command?: string;
@@ -253,7 +253,7 @@ export interface StateDecl {
   /** Legal ONLY while the state's exit script stands red (repair mode). */
   repair_tools?: string[];
   /** Set when the state IS another machine's state, by reference — a mirror
-   *  is a reference, never a copy (owner law 2026-08-04). Anything asking
+   *  is a reference, never a copy. Anything asking
    *  WHICH state this is must follow it, not the id. */
   same_as?: string;
   edges: EdgeDecl[];

@@ -5,7 +5,7 @@ statement: "Package: the versioned artifact assembles by script - README, the on
 state_kind: work
 filled_by: agent
 depends_on:
-  - gate-validation
+  - spawn-for-release
 legal_tools:
   - se_file_read
   - se_file_write

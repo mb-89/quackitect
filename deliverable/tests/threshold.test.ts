@@ -14,7 +14,7 @@ import { test } from "node:test";
 import { DEFAULT_TIER } from "../engine/scale.ts";
 import { Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
-import { call, checkDocs, freshRoot, readEverything, sessionAtIdle } from "./helpers.ts";
+import { call, checkDocs, freshRoot, proofFor, readEverything, sessionAtIdle } from "./helpers.ts";
 
 const root = (): string => freshRoot();
 
@@ -55,7 +55,14 @@ test("the slider takes effect live: raise the autonomy and the agent's next pull
   assert.equal(held.body.pull, "wait");
   assert.match(String(held.body.at), /expeditions/, "the wait names the step that waits");
   session.setAutonomy(0.4); // the slider's POST lands here
-  const r2 = await call(server, "se_pull");
+  // Entering a container now owes its own reading proof — the hop that used
+  // to absorb it (idle) is gone. Drain what it asks before checking DO.
+  let r2 = await call(server, "se_pull");
+  for (let i = 0; i < 40 && r2.body.pull === "read"; i++) {
+    const doc = r2.body.document as { content?: string } | undefined;
+    if (doc?.content === undefined) throw new Error(`the pull answered read with no document: ${JSON.stringify(r2.body)}`);
+    r2 = await call(server, "se_pull", { form: { read: proofFor(doc.content) } });
+  }
   assert.equal(r2.body.pull, "do", JSON.stringify(r2.body));
   assert.deepEqual(session.active(), ["expeditions/start"]);
 });
@@ -66,8 +73,8 @@ test("the gate weighs the TARGET: a 0.4 state waits at 0.2, the archives wait at
   const server = buildServer(r, session);
   await readEverything(session);
   session.setAutonomy(0.2);
-  // expeditions weighs 0.4 — above the agent's reach. It IS one of idle's
-  // offered doors, so answering it is legal; walking it is not.
+  // expeditions weighs 0.4 — above the agent's reach. It IS one of the
+  // front desk's offered doors, so answering it is legal; walking it is not.
   const held = await call(server, "se_pull", { form: { choice: "expeditions" } });
   assert.equal(held.body.pull, "wait");
   // The archives sit ABOVE the whole slider (1.5, human-only browsing).
@@ -75,21 +82,27 @@ test("the gate weighs the TARGET: a 0.4 state waits at 0.2, the archives wait at
   session.setTarget(""); // drop the held aim so the doors are offered again
   const arch = await call(server, "se_pull", { form: { choice: "expedition_archive" } });
   assert.equal(arch.body.pull, "wait", "1.5 outweighs even the top rung");
-  session.setAutonomy(0.2);
-  session.setTarget("");
-  // The front desk weighs 0.2 — exactly at the autonomy, the agent may.
-  // Its method doc is owed first; the pull says read, the loop drains it.
-  const aim = await call(server, "se_pull", { form: { choice: "front_desk" } });
-  // Whichever call stops answering `read` is the one that WALKED. Asking
-  // again would find the target already cleared and read doors as a failure.
-  const desk = aim.body.pull === "read" ? { body: await readEverything(session) } : aim;
-  assert.equal(desk.body.pull, "do", JSON.stringify(desk.body));
-  assert.deepEqual(session.active(), ["front_desk"]);
-  // Walk the desk back to idle on the human's hand — the HUMAN proves by
-  // checkboxes, and this session booted on the agent's reading alone.
+  // The front desk weighs 0.2 — exactly at the autonomy, the agent may. Boot
+  // now lands there directly (idle is gone), so the door can no longer be
+  // CHOSEN from a walk already standing on it. Walk a fresh session there
+  // instead, at the same autonomy, and watch it succeed.
+  const deskSession = new Session(r);
+  deskSession.setAutonomy(0.2);
+  let desk = (await deskSession.pull()) as { pull?: string; document?: { content?: string } };
+  for (let i = 0; i < 40 && desk.pull === "read"; i++) {
+    const doc = desk.document;
+    if (doc?.content === undefined) throw new Error(`the pull answered read with no document: ${JSON.stringify(desk)}`);
+    desk = (await deskSession.pull({ form: { read: proofFor(doc.content) } })) as typeof desk;
+  }
+  assert.equal(desk.pull, "do", JSON.stringify(desk));
+  assert.deepEqual(deskSession.active(), ["front_desk"]);
+  // Prove the documents on the human's hand — this session booted on the
+  // agent's reading alone. Front desk has several doors, and always did:
+  // an unnamed advance is refused for ambiguity, not answered as a no-op.
+  // The session already stands where checkDocs left it, so the assertion
+  // below needs no advance call to hold.
   checkDocs(session);
-  await session.advance();
-  assert.deepEqual(session.active(), ["idle"]);
+  assert.deepEqual(session.active(), ["front_desk"]);
   // … and the human enters the 0.4 state the agent was refused.
   await session.advance("expeditions");
   assert.deepEqual(session.active(), ["expeditions/start"]);
@@ -101,6 +114,13 @@ test("the hatch is never gated: an escape at autonomy 0 still reaches the desk",
   // person — and a cord that can refuse to be pulled is no cord.
   const r = root();
   const session = await sessionAtIdle(r);
+  // Boot lands ON the front desk directly now (idle is gone), so escaping
+  // FROM there is refused as a no-op — there is nowhere to walk away from.
+  // Walk one door deeper, on the human's unrestricted hand, so the hatch has
+  // somewhere real to pull back from.
+  checkDocs(session);
+  await session.advance("expeditions");
+  assert.deepEqual(session.active(), ["expeditions/start"]);
   session.setAutonomy(0);
   const out = (await session.pull({ escape: "the road is blocked, and the person must rule" })) as Record<string, unknown>;
   assert.equal(out.pull, "wait");
@@ -130,7 +150,7 @@ test("the TIER rides every packet and the autonomy NUMBER does not", () => {
   // requirement itself says cut over first, then remove, never both at once.
   assert.equal(info.states[0].priority, 0.2);
   assert.equal(info.states[0].next[0].priority, 0.2); // boot.canvas frontmatter
-  const peek = session.stateInfo("idle") as { priority: number; next: { to: string; priority?: number }[] };
+  const peek = session.stateInfo("front_desk") as { priority: number; next: { to: string; priority?: number }[] };
   assert.equal(peek.priority, 0.2);
   const exp = peek.next.find((n) => n.to === "expeditions");
   assert.equal(exp?.priority, 0.4);

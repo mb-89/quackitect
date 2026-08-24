@@ -5,7 +5,8 @@ statement: "Onboarding opens with the retro: the field-feedback question first, 
 state_kind: work
 filled_by: agent
 same_as: retro
-depends_on: []
+depends_on:
+  - spawn-the-hands
 evidence:
   - name: field_feedback
     description: what came back from the field, or an explicit "nothing yet"

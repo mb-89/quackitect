@@ -13,7 +13,7 @@
 // because the cage's .mcp.json is fixed template text and cannot carry
 // per-launch arguments.
 //
-// ORDERED RELOADS ONLY (owner ruling 2026-07-27, after automatic swaps
+// ORDERED RELOADS ONLY (after automatic swaps
 // churned the walk): the shim holds the harness connection and forwards
 // JSON-RPC lines; the CHILD runs the engine, the session, and the mirror.
 // The shim NEVER watches sources and never swaps on its own. se_reload —
@@ -235,7 +235,7 @@ if (argv.includes("--child") || process.env.SE_HOT_DISABLE === "1") {
   // VS Code only calls deactivate on an orderly close, so a killed or crashed
   // window never says anything. The survivor keeps the port AND its in-memory
   // session, so the next morning reopened yesterday's autonomy and yesterday's
-  // checked documents (found live 2026-07-30). Watch the parent instead.
+  // checked documents (found live ). Watch the parent instead.
   //
   // Only a host that CLAIMS a parent gets this. The classic launcher detaches
   // its terminal host on purpose and must go on outliving its window.

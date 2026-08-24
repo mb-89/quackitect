@@ -1,6 +1,6 @@
 {
   "name": "se-engine",
-  "version": "7.0.0",
+  "version": "8.0.0",
   "private": true,
   "type": "module",
   "description": "The se MCP server: caged-agent tool lane, call log, state machine kernel.",

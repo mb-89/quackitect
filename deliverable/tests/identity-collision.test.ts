@@ -7,7 +7,7 @@
 // records discuss that agent by name on nearly every page.
 //
 // WHAT THAT COST. 64 findings, every one of them false, on the first run of a
-// fresh cloud clone. prose-inspect is an EXIT SCRIPT of boot/prepare_idle, so
+// fresh cloud clone. prose-inspect is an EXIT SCRIPT of boot/prepare_desk, so
 // boot could not finish — and that state grants no tools, so the check could not
 // be repaired from inside the lane either.
 //

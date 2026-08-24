@@ -41,7 +41,14 @@ const ATTRIBUTION = /\bowner (ruling|law|design|report|correction|verdict|discus
  *  comments to the engine while under their own ceiling, and merging them sums
  *  both. Nothing was authored here — the number is what the merged tree holds,
  *  and the ratchet starts falling again from it. */
-const CEILING = 160;
+// 0 SINCE THE STRIP. Every date and every owner attribution came out of the
+// engine's comments in one pass; the reasoning stayed exactly where it was and
+// only the stamp went. The ground is banked here so it cannot be given back.
+//
+// A DATE MEANS NOTHING TO A READER OF CODE, and an attribution is a claim about
+// a person standing at an application site. Those are the two things the
+// standard forbids, and they are the two things that were removed.
+const CEILING = 0;
 
 function tsFilesUnder(dir: string): string[] {
   const out: string[] = [];

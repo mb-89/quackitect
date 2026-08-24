@@ -13,7 +13,7 @@
 import { smallestInlineOutputBytes } from "./harness.ts";
 
 /** What a bare envelope costs around a served document, measured off a plain
- *  pull on 2026-08-18. */
+ *  pull. */
 export const ENVELOPE_BYTES = 2_310;
 
 export interface Payload {
@@ -62,7 +62,7 @@ export function measuredLimit(): number | undefined {
  *
  *  WHY A MARGIN AND NOT A PASS. A page one edit away from the limit crosses
  *  it silently, on a host nobody is testing on. retro.md sat at 19,460
- *  against 20,480 on 2026-08-18 — inside, and one paragraph from outside. */
+ *  against 20,480 — inside, and one paragraph from outside. */
 export function worstMargin(payloads: Payload[], limit: number | undefined): number | undefined {
   if (limit === undefined || payloads.length === 0) return undefined;
   const worst = Math.max(...payloads.map((p) => onWireBytes(p.text)));

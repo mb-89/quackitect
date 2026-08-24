@@ -83,11 +83,11 @@ test("the reading credit survives a reload", async () => {
 test("the aimed target survives a reload, and a fresh session starts unaimed", () => {
   const root = freshRoot();
   const before = new Session(root);
-  before.setTarget("idle");
-  assert.equal(before.target, "idle", "the aim did not take, so this case would prove nothing");
+  before.setTarget("front_desk");
+  assert.equal(before.target, "front_desk", "the aim did not take, so this case would prove nothing");
 
   simulateReload(root);
-  assert.equal(new Session(root).target, "idle", "a reload keeps the aim, so the recompute walks back with no call from the agent");
+  assert.equal(new Session(root).target, "front_desk", "a reload keeps the aim, so the recompute walks back with no call from the agent");
 
   // A DIFFERENT SESSION HAS AIMED AT NOTHING. Every real start still lands at
   // the desk (owner ruling 2026-07-29), because only a matching session stamp

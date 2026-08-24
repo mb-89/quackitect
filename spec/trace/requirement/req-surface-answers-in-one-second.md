@@ -12,15 +12,16 @@ breaks_how_badly: corrosive
 refines:
   - uc-quality-performance-efficiency
 source_refs:
+  - req-responsiveness, the register this budget is drawn from
   - vp-rigor-without-toil
   - req-call-answers-in-one-second
   - i12
 priority: should
-weighs_against:
-  - req-only-a-file-with-its-own-door-is-withheld > — a slow surface is paid on every look; a file served through its own verb instead of directly is paid once, by somebody who wanted to read it raw
 weighs_with:
   - req-a-clear-jump-is-one-call ! — one measures a person's render latency at the mirror's HTTP boundary, the other measures call count for the walk; different boundaries
   - req-call-answers-in-one-second ! — one times a person's surface render at the mirror's HTTP boundary, the other a driver's lane call at dispatch; different verify boundaries, per this row's own "sibling rather than a widening" section
+weighs_against:
+  - req-only-a-file-with-its-own-door-is-withheld > — a slow surface is paid on every look; a file served through its own verb instead of directly is paid once, by somebody who wanted to read it raw
 ---
 
 ## Scenario

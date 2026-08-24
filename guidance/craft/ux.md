@@ -16,6 +16,29 @@ applies_to:
 These rules bind every surface a person looks at. How you WRITE the words
 on it is voice.md. How you write the CODE behind it is software.md.
 
+## A REFERENCE IS A LINK, NEVER TEXT (owner ruling 2026-08-23)
+
+Wherever a surface shows a path, a node id, a ref or a URL, it renders as
+something the reader can follow.
+
+- A PATH PRINTED AS PLAIN TEXT asks the reader to go and find the file by
+  hand. The page already knew where it was.
+- THIS BINDS EVERY SURFACE, not only prose. Form fields, checklists, tables,
+  job rows, refusal messages, guidance blocks.
+- voice.md ALREADY SAYS IT FOR WORDS: "Link the referent." This is the same
+  rule, binding the RENDER.
+
+The panel's link is `<a class="doclink" data-path="...">`. Use that shape and
+nothing else, so one click handler serves every link on the page.
+
+TWO TRAPS, BOTH MEASURED.
+
+- A LINK INSIDE A `<label>` TOGGLES THE CONTROL. Following a reference then
+  silently ticks the checkbox it was explaining. Put the link outside.
+- THE STORED VALUE KEEPS THE WHOLE ORIGINAL LINE. Only the DISPLAY splits the
+  label from the reference. A collector that writes back what it rendered
+  corrupts the value it was showing.
+
 ## THE BROWSER IS OUT (owner ruling 2026-08-07)
 
 The surface is the editor panel. That is the only place a person looks, and

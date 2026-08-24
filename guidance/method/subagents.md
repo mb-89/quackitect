@@ -12,6 +12,43 @@ happens to one when the session is interrupted.
 BOTH RULES LIVED IN THE ASSISTANT MEMORY until 2026-08-19. The repo is the
 memory, so they moved here at that retro.
 
+## Spawn one to save context or to raise quality, never to go faster
+
+TWO REASONS ARE GOOD AND ONE IS NOT.
+
+- SAVING CONTEXT is a reason. A subagent has its own window, so what it reads
+  never enters yours and only its answer does.
+- RAISING QUALITY is a reason. Fresh eyes that never saw your reasoning catch
+  what you cannot, which is why verification asks for them by name.
+- GOING FASTER IS NOT A REASON ON ITS OWN. A subagent on YOUR model doing work
+  you would have done costs the whole job twice: its window and yours. Parallel
+  wall-clock is not a saving when nobody is waiting on the clock.
+
+SO THE TEST IS: would this work have entered my context anyway? If the answer
+is yes and the model is the same, do it yourself.
+
+THE SAVING IS CONTEXT, NEVER KEYSTROKES. The work worth handing over is the
+work whose READING is long and whose ANSWER is short.
+
+DELEGATE A QUESTION LIKE THESE:
+
+- Which use case names the lane verbs, and what shape does an entry take?
+- Where is this rendered, and who calls it?
+- What do three existing nodes of this kind look like?
+
+DO NOT DELEGATE A JUDGMENT. What a changed contract should now mean, whether
+an assertion still proves its point, which of two readings the owner meant —
+these are yours, and a weaker hand returns a confident wrong answer.
+
+DO NOT DELEGATE A SWEEP THE LANE HAS A VERB FOR. `se_file_replace` renames
+across a tree in one call with a preview. A subagent doing the same is slower
+and less checkable.
+
+MEASURED 2026-08-23. A session fixed about forty test failures and spawned no
+subagent until the owner asked why. Almost none of the fixes were mechanical,
+so handing them over would have saved little — but the READING behind them was
+most of the session's cost, and every page of it stayed in context.
+
 ## Pass the lane rule to every subagent
 
 A subagent has your tools and none of your context. Give it the cage.

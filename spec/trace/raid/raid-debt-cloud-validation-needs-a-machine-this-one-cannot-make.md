@@ -13,6 +13,8 @@ breaks_how_badly: corrosive
 how_likely: expected
 source_refs:
   - i28-the-cloud-runs-from-its-seed-alone-a-fre
+last_looked: 2026-08-23
+look_verdict: rescheduled
 ---
 
 ## Repayment

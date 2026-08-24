@@ -14,6 +14,8 @@ how_likely: expected
 source_refs:
   - raid-issue-the-corpus-wide-inspections-have-no-runner
   - i33 verification, tester rounds one to four
+last_looked: 2026-08-23
+look_verdict: rescheduled
 ---
 
 TAKEN DELIBERATELY AT i33 (owner ruling 2026-08-17: "note all the others as

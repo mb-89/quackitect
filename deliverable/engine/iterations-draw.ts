@@ -150,7 +150,7 @@ export function generateSeeded(_root: string, it: Iteration, machineId: string, 
       statement: c.statement,
       guidance: `A build chunk — realization: ${c.realization}. The tag pulls the discipline's guidance.`,
       // A SPIKE'S EVIDENCE IS ITS EXPERIMENT REF, never free text (owner
-      // ruling 2026-08-10) — the result lives on the exp- node, and the
+      // ruling ) — the result lives on the exp- node, and the
       // form links it.
       evidence_form:
         kind === "spikes"
@@ -607,7 +607,7 @@ export function pinnedCanvas(m: MachineDecl): CanvasData {
 }
 
 /** THE ITERATION ARCHIVE, generated like the expedition archive — the
- *  same decade shape (owner ruling: both archives). */
+ *  same decade shape. */
 export function generateIterationArchive(root: string): GeneratedMachine {
   let closed: Iteration[] = [];
   try {

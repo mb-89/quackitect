@@ -5,7 +5,7 @@ statement: Write the user stories as decks - one actor, one concrete pass, a cla
 state_kind: work
 filled_by: agent
 depends_on:
-  - gate-motivation
+  - spawn-for-inputs
 entry_read:
   - deliverable/machines/methods/meth-story-slideshow.md
 legal_tools:

@@ -16,6 +16,13 @@ source_refs:
 The override list is the point. It is short by construction — usually
 empty, and never larger than what one agent has changed.
 
+## Superseded by i4
+
+THE OVERRIDE LIST NOW REACHES THE SURFACE THROUGH THE RESOLVER, at
+if-engine-delta-to-view-resolver. This crossing bore on
+req-panel-shows-the-machine by its own source refs, so leaving it live would
+have left the requirement the decision serves being answered on the surface.
+
 ## What crosses
 
 Per record, the files served from that record's own folder

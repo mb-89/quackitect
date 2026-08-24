@@ -327,7 +327,7 @@ export function buildPortableForm(
   const docIndex = new Map(docs.map((d, i) => [d.path, i]));
   const done = new Set(checked);
   const follow = model.follow_up_label === "" ? "" : `<span class="concrete">/ ${esc(model.follow_up_label)}</span> `;
-  // ANYTHING ELSE IS FOLLOW-UP, NOT EVIDENCE (owner, 2026-08-06). It asks
+  // ANYTHING ELSE IS FOLLOW-UP, NOT EVIDENCE (owner). It asks
   // what is left over, which is the same question box 6 asks.
   const TAIL = ["current_situation", "follow_up", "anything_else"];
   const one = (f: FormTemplate["fields"][number]): string => {

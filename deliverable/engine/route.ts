@@ -1,4 +1,4 @@
-// THE ROUTE — a target state, and the way there (owner design 2026-07-29).
+// THE ROUTE — a target state, and the way there.
 //
 // IT IS SCHEDULING, AND NOTHING ELSE. A route removes no guard, no
 // condition and no autonomy rule. It collapses model ROUND TRIPS: today

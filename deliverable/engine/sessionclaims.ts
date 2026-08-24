@@ -251,7 +251,7 @@ export class Claims {
     };
   }
 
-  /** ANY state's form is always fetchable (owner ruling 2026-08-04) —
+  /** ANY state's form is always fetchable —
    *  for export to a colleague wherever the walk stands. The machine on
    *  display resolves the name; the walk's machine is the default. */
   /** THE MACHINE THAT DECLARES THIS STATE FORM.
@@ -339,7 +339,7 @@ export class Claims {
 
   stateFormHeader(name: string, raw: string | undefined, m: MachineDecl = this.machineHolding(name)): Record<string, string> {
     const fm = raw === undefined ? ({} as Record<string, unknown>) : parseStateNote(raw).frontmatter;
-    // The priority wears its RUNG NAME (owner ruling 2026-08-04) — the
+    // The priority wears its RUNG NAME — the
     // numerical scale stays internal.
     const s = m.states.find((st) => st.id === name);
     return {
@@ -463,7 +463,7 @@ export class Claims {
       met: lint.met && tp.length === 0,
       // NAMED, NOT JUST COUNTED. A debt visible only as a number invites a
       // reader to skim past it; the ref is what lets the next person go
-      // look (owner ruling 2026-08-13).
+      // look.
       owed_count: owed.length,
       owed,
     };
@@ -656,8 +656,8 @@ export class Claims {
     return done;
   }
 
-  /** The panel's colour truth: green means SUBMITTED (owner ruling
-   *  2026-08-11) — a signed gate paints before its bless, and the bless
+  /** The panel's colour truth: green means SUBMITTED (
+   *  ) — a signed gate paints before its bless, and the bless
    *  rides as the thumbs-up. The route never reads this. */
   recordPaint(decl: MachineDecl): string[] {
     return this.recordDone(decl, new Set(), Claims.newPass(), true);
@@ -698,7 +698,7 @@ export class Claims {
     return out;
   }
 
-  /** THE DRIFT (owner ruling 2026-08-05): which states were passed against a
+  /** THE DRIFT: which states were passed against a
    *  demand that has since moved, plus everything downstream of them.
    *
    *  GREEN MUST MEAN STILL GREEN NOW. The demand diff used to run only when a
@@ -1024,7 +1024,7 @@ export class Claims {
     };
   }
 
-  /** THE BLESS (owner design 2026-08-04, v1's thumbs reborn): a gate's
+  /** THE BLESS: a gate's
    *  submitted form needs a hand ABOVE it — the human always, or an agent
    *  whose autonomy stands strictly above the gate's own weight. */
   formBless(name: string, ok: boolean, by: string, machineId?: string): Record<string, unknown> {
@@ -1071,7 +1071,7 @@ export class Claims {
     const s = this.stateFormState(name, m);
     // A CHART WRITES NOTES, and it is the only field that CREATES and DELETES
     // them. Drawing a line mints a candidate; deleting the row throws the note
-    // away (owner ruling 2026-08-08).
+    // away.
     const charted: string[] = [];
     for (const f of s.evidence_form.filter((x) => x.template === "morph-box" && fields[x.name] !== undefined)) {
       charted.push(...bindChart(this.host, String(fields[f.name]), m));
@@ -1161,8 +1161,8 @@ export class Claims {
     return this.stateFormGet(name, m);
   }
 
-  /** ONE CLICK, ONE TRIPWIRE (owner ruling 2026-08-10). The flip deck posts
-   *  a ruling as it is made; the line lands in the sensitivity section and
+  /** ONE CLICK, ONE TRIPWIRE. The flip deck posts
+   *  A ruling as it is made: the line lands in the sensitivity section and
    *  the save mints its node before the page redraws. Idempotent: a cell
    *  already ruled answers with the standing form. The field name is the
    *  method's own — the deck lives on the sensitivity reading. */
@@ -1178,7 +1178,7 @@ export class Claims {
     return this.stateFormSave(name, { sensitivity: current === "" ? line : `${current}\n${line}` }, by, m);
   }
 
-  /** ONE CLICK, ONE VERDICT (owner ruling 2026-08-10). The scenario deck
+  /** ONE CLICK, ONE VERDICT. The scenario deck
    *  posts a verdict as it is made; the line lands in the walk section and
    *  the save mints the register entry for at-risk and unaddressed before
    *  the page redraws. A fitness click files the requirement in
@@ -1197,7 +1197,7 @@ export class Claims {
     const raw = readNode(h.instanceAbs);
     const field = kind === "fitness" ? "fitness_candidates" : "walk";
     const current = raw === "" ? "" : section(parseStateNote(raw).body, field).trim();
-    // THE FLAG LIVES ON THE REQUIREMENT NODE (owner ruling 2026-08-10):
+    // THE FLAG LIVES ON THE REQUIREMENT NODE:
     // fitness_candidate: true in its frontmatter, so the mark outlives the
     // form. The list line below shows the same fact where the reader is.
     if (kind === "fitness") {
@@ -1607,7 +1607,7 @@ export class Claims {
       ];
     }
     // AND WHEN NOTHING UPSTREAM FELL, SAY WHAT IS WRONG WITH THIS ONE (owner
-    // instruction 2026-08-13). The content check knows which field failed and
+    // instruction ). The content check knows which field failed and
     // what it wanted; a check reports in the words of the question IT asked.
     const own = this.ownClaimProblems(stateId, m);
     if (own.length > 0) {

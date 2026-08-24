@@ -26,7 +26,7 @@ export interface CanvasData {
   nodes?: CanvasElement[];
   edges?: CanvasEdge[];
   metadata?: { frontmatter?: Record<string, unknown> };
-  /** OPT-IN routed arrows (owner ruling 2026-08-04): centre-to-centre
+  /** OPT-IN routed arrows: centre-to-centre
    *  lines with band-detour waypoints. Generated machines set it; an
    *  authored canvas keeps its drawn side anchors. */
   routed?: boolean;

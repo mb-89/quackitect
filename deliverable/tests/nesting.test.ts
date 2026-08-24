@@ -8,7 +8,7 @@ delete process.env.SE_SCRIPT_SKIP;
 // more", state to-do lists, and the se_test tool.
 import { strict as assert } from "node:assert";
 import { spawnSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
@@ -113,7 +113,7 @@ async function bootHuman(s: Session): Promise<void> {
   checkDocs(s);
   // A LEAVING CHECK HANDS THE CALL BACK NOW, and this helper predated that.
   //
-  // prepare_idle runs five scripts. They outlast the handback bound whenever
+  // prepare_desk runs five scripts. They outlast the handback bound whenever
   // the machine is busy, so the attempt is REFUSED with "still running"
   // instead of blocking until the verdict is in. That refusal is an
   // instruction to pull again, not an error.
@@ -122,7 +122,7 @@ async function bootHuman(s: Session): Promise<void> {
   // the case passed alone and failed inside the full suite, where the same
   // five scripts compete with 153 other suites for the machine.
   for (let i = 0; i < 400; i++) {
-    if (s.active()[0] === "idle") return;
+    if (s.active()[0] === "front_desk") return;
     try {
       await s.advance();
     } catch (e) {
@@ -158,7 +158,7 @@ test("nesting: the walk descends into an archive decade and climbs back out", as
   await s.advance();
   assert.deepEqual(s.active(), ["expedition_archive/end"], "leaving the decade returns to the archive container");
   await s.advance();
-  assert.deepEqual(s.active(), ["idle"], "leaving the archive returns to main");
+  assert.deepEqual(s.active(), ["front_desk"], "leaving the archive returns to main");
   // The nested machines stay viewable from idle — decl and drawing.
   const dec = s.viewFor("e11-e12");
   assert.ok(dec !== undefined);
@@ -175,31 +175,33 @@ test("nesting: the walk descends into an archive decade and climbs back out", as
   assert.ok(html.includes('class="ghost cur-state"'), "the header names the walk's current state");
 });
 
-test("the front desk and ideation stand as idle doors with their drawn shapes", () => {
+// THE HUB THIS USED TO ASK ABOUT IS GONE. A state called `idle` sat between
+// boot and the desk, and every door hung off it. The desk carries them now, so
+// the question is asked of the desk directly.
+//
+// TWO ASSERTIONS DIED WITH IT. One wanted an edge from the hub TO the desk, and
+// a state has no edge to itself. The other wanted an empty statement, which was
+// the hub's, not the desk's — the desk has carried "In doubt, go here" all along.
+test("the front desk's doors stand with their drawn shapes", () => {
   const root = freshRoot();
   const m = compileMachine(root, mainMachinePath(root));
-  const idle = m.states.find((s) => s.id === "idle")!;
-  assert.ok(
-    idle.edges.some((e) => e.to === "front_desk"),
-    "idle reaches the front desk",
-  );
-  assert.ok(
-    idle.edges.some((e) => e.to === "ideation"),
-    "idle reaches ideation",
-  );
-  const fd = m.states.find((s) => s.id === "front_desk")!;
-  assert.equal(fd.priority, 0.2);
-  assert.equal(fd.submachine, undefined, "the one-state rule: the desk is a plain state");
-  assert.match(fd.statement, /in doubt, go here/i, "the statement IS the subtitle");
-  assert.ok((fd.tags ?? []).includes("front-desk"), "the method doc pulls by this tag");
+  const desk = m.states.find((s) => s.id === "front_desk")!;
+  for (const door of ["ideation", "expeditions", "iterations", "retro", "end"]) {
+    assert.ok(
+      desk.edges.some((e) => e.to === door),
+      `the desk reaches ${door}`,
+    );
+  }
+  assert.equal(desk.priority, 0.2);
+  assert.equal(desk.submachine, undefined, "the one-state rule: the desk is a plain state");
+  assert.match(desk.statement, /in doubt, go here/i, "the statement IS the subtitle");
+  assert.ok((desk.tags ?? []).includes("front-desk"), "the method doc pulls by this tag");
   const retro = m.states.find((s) => s.id === "retro")!;
   assert.equal(retro.submachine, undefined, "the retro converted under the same rule");
   assert.ok((retro.legal_tools ?? []).includes("se_note_drain"), "the legality zone rides legal_tools");
   const idea = m.states.find((s) => s.id === "ideation")!;
   assert.equal(idea.priority, 1, "the ideation door sits at the slider's top notch");
   assert.equal(idea.statement, "Diverge on purpose.", "authored door statement rides up");
-  const idle2 = m.states.find((s) => s.id === "idle")!;
-  assert.equal(idle2.statement, "", "filler statements are struck - empty beats an echo");
   const ideaM = compileMachine(root, join(root, "deliverable", "machines", "ideation.canvas"));
   assert.deepEqual(
     ideaM.states.map((s) => s.id),
@@ -399,7 +401,13 @@ test("se_test: one job formats, runs both scripts and sweeps, with structured ve
   const started = await call(server, "se_test", { force: true });
   assert.equal(started.isError, false, JSON.stringify(started.body));
   assert.equal(started.body.handed_off, true, JSON.stringify(started.body));
-  const body = await waitForTestJob(server, String(started.body.job));
+  const entry = await waitForTestJob(server, String(started.body.job));
+  assert.equal(entry.outcome, "green", JSON.stringify(entry));
+  // THE ACCOUNT CARRIES A COUNT, NEVER THE LIST. It rides every lane answer and
+  // the answer has a byte bound. The whole result is written to one stable path
+  // instead, and that is where a reader follows the count.
+  const { seDir: se } = await import("../engine/paths.ts");
+  const body = JSON.parse(readFileSync(join(se(root), "test-last.json"), "utf8")) as Record<string, unknown>;
   const results = body.results as { script: string; ok: boolean; output: string }[];
   // FOUR SINCE i6: the CONFORMANCE SWEEP rides the battery. There is no verb
   // for it, so the engine runs it where it decides — the boot, this row's

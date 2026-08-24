@@ -5,7 +5,7 @@ statement: "Map the stakeholders by role: who the value props serve, and who els
 state_kind: work
 filled_by: agent
 depends_on:
-  - gate-motivation
+  - spawn-for-inputs
 entry_read:
   - deliverable/machines/methods/meth-stakeholder-analysis.md
 legal_tools:

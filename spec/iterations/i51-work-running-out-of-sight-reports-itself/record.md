@@ -1,6 +1,7 @@
 ---
 id: i51-work-running-out-of-sight-reports-itself
-status: open
+status: shipped
+closed: 2026-08-23T12:10:54.368Z
 started: 2026-08-20T20:51:56.298Z
 opened: 2026-08-20T19:30:59.867Z
 goal: "Work running out of sight reports itself: one call lists every background job with how much longer it needs, and a long exit script stops freezing the pull."

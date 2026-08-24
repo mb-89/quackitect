@@ -6,7 +6,7 @@ statement: The retro. Look back and drain the inbox, then walk the backlog and e
 # retro — the method
 
 A retro is a FUNCTION, not a state: fire it at its trigger points, or
-freely at idle. It is blameless. Fix the system — guidance, machines,
+freely at the front desk. It is blameless. Fix the system — guidance, machines,
 conditions, forms, the engine. Never a person.
 
 The retro EMITS; it adopts almost nothing. A lead becomes a note. The
@@ -21,7 +21,7 @@ The trigger is a NOTE carrying "needs retro":
 - The owner asks for one — the agent writes a "needs retro" note.
 - While such a note pends, start_iteration's entry gate refuses; the
   retro's drain dispositions it and the gate opens.
-- At idle, freely, with no trigger note at all. Allowed, never required.
+- At the front desk, freely, with no trigger note at all. Allowed, never required.
 
 ## The steps
 
@@ -387,7 +387,7 @@ method (`deliverable/machines/methods/meth-state-of-the-art.md`).
 
 - se_note_drain marks a note drained with its disposition; drained notes
   leave the inbox count and the pending feed. Draining is legal only in
-  the retro's drain state — entering it is free from idle, so "drain
+  the retro's drain state — entering it is free from the front desk, so "drain
   whenever" is one pull away, inside the machine's discipline.
 - a drained note's LOCAL half stays on file (.se/notes.jsonl, disposition
   backlog) so the two ends of a crossing can be found from each other. It

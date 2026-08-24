@@ -5,7 +5,7 @@ statement: "Draw the context: boundary, neighbours, intended use - and the bindi
 state_kind: work
 filled_by: agent
 depends_on:
-  - gate-motivation
+  - spawn-for-inputs
 legal_tools:
   - se_file_read
   - se_file_write

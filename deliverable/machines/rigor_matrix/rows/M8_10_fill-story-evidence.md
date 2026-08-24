@@ -5,7 +5,7 @@ statement: "Fill the stories: every slide's evidence side, all stories, all iter
 state_kind: work
 filled_by: agent
 depends_on:
-  - gate-implementation
+  - spawn-for-validation
 seeds: demos
 legal_tools:
   - se_file_read

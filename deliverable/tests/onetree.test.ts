@@ -11,7 +11,7 @@ import { join } from "node:path";
 import { test } from "node:test";
 import { itList } from "../engine/iterations.ts";
 import { itCloseShipped } from "../engine/records.ts";
-import { bootedServer, call, freshRoot, gitInit } from "./helpers.ts";
+import { bootedServer, call, freshRoot, gitInit, proofFor } from "./helpers.ts";
 
 // SEEDING NEEDS A HEAD THAT POINTS AT SOMETHING, so the fixture commits once
 // before any seed. Copied from containerchoice.test.ts, which found it the hard
@@ -60,7 +60,19 @@ test("a bare pull at the container enters no iteration", async () => {
   assert.notEqual(first, second, "two distinct iterations stand open");
 
   // Reach the container the legitimate way, through a choice.
-  const entered = (await call(server, "se_pull", { form: { choice: "iterations" } })).body as { where: string[] };
+  // Boot lands directly on front_desk now (idle was removed from the state
+  // machine), so entering "iterations" owes a reading proof it did not owe
+  // before. Drain any owed read and pull forward until the offer appears.
+  let entered = (await call(server, "se_pull", { form: { choice: "iterations" } })).body as {
+    pull: string;
+    where: string[];
+    document?: { content?: string };
+  };
+  for (let i = 0; i < 40 && entered.pull === "read"; i++) {
+    const doc = entered.document;
+    if (doc?.content === undefined) throw new Error(`the pull answered read with no document: ${JSON.stringify(entered)}`);
+    entered = (await call(server, "se_pull", { form: { read: proofFor(doc.content) } })).body as typeof entered;
+  }
   assert.deepEqual(entered.where, ["iterations/select"], "the choice lands on the selection state");
 
   // NOW THE RECOVERY PULL. No form, no choice, nothing to say which door.
@@ -124,7 +136,17 @@ test("one open iteration is offered, never entered and never skipped past", asyn
   const only = await seed(server, 1);
   assert.equal(itList(root).filter((i) => i.open).length, 1, "exactly one iteration stands open");
 
-  const entered = (await call(server, "se_pull", { form: { choice: "iterations" } })).body as { where: string[] };
+  // Same read-draining as above: entering "iterations" now owes a proof.
+  let entered = (await call(server, "se_pull", { form: { choice: "iterations" } })).body as {
+    pull: string;
+    where: string[];
+    document?: { content?: string };
+  };
+  for (let i = 0; i < 40 && entered.pull === "read"; i++) {
+    const doc = entered.document;
+    if (doc?.content === undefined) throw new Error(`the pull answered read with no document: ${JSON.stringify(entered)}`);
+    entered = (await call(server, "se_pull", { form: { read: proofFor(doc.content) } })).body as typeof entered;
+  }
   assert.deepEqual(entered.where, ["iterations/select"], "the choice lands on the selection state");
 
   const bare = (await call(server, "se_pull", {})).body as { where: string[]; options?: { to: string }[] };
@@ -178,9 +200,18 @@ test("a record stamped shipped leaves the container, whatever stands on disk", a
   const short = shipped.match(/^(i\d+)-/)?.[1] ?? shipped;
   assert.notEqual(short, shipped, "the short id really is shorter — the fixture ids carry the i<N>- prefix");
 
-  const answer = (await call(server, "se_pull", { form: { choice: "iterations" } })).body as {
+  // Same read-draining as the other cases in this file: entering "iterations"
+  // now owes a proof before the offer comes back.
+  let answer = (await call(server, "se_pull", { form: { choice: "iterations" } })).body as {
+    pull?: string;
     options?: { to: string }[];
+    document?: { content?: string };
   };
+  for (let i = 0; i < 40 && answer.pull === "read"; i++) {
+    const doc = answer.document;
+    if (doc?.content === undefined) throw new Error(`the pull answered read with no document: ${JSON.stringify(answer)}`);
+    answer = (await call(server, "se_pull", { form: { read: proofFor(doc.content) } })).body as typeof answer;
+  }
   const offered = (answer.options ?? []).map((o) => o.to);
   assert.ok(offered.length > 0, `the container offers something at all: ${JSON.stringify(offered)}`);
   assert.ok(!offered.includes(`iterations/${short}`), `a shipped record is off the container's offer: ${JSON.stringify(offered)}`);

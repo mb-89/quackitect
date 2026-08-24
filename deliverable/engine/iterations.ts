@@ -437,7 +437,7 @@ export function pinIsStale(root: string, it: Iteration): boolean {
   return pin.rigor_matrix_hash !== rigorMatrixContentHash(root);
 }
 
-/** tailored is always tailored DOWN (owner ruling 2026-07-30); inherit
+/** tailored is always tailored DOWN; inherit
  *  defers to the fuller content, so it ranks with full. */
 const APPLIES_RANK: Record<string, number> = { none: 0, tailored: 1, inherit: 2, full: 2 };
 

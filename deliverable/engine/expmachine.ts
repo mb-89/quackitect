@@ -183,7 +183,7 @@ function recordState(e: ArchiveEntry, kindWord: string): StateDecl {
     statement: e.goal !== "" ? e.goal : e.full,
     guidance: `An archived ${kindWord} — read-only. Its record and report are in the details.`,
     evidence_form: [],
-    // Human-only (owner ruling 2026-07-27): 1.5 sits above the whole
+    // Human-only: 1.5 sits above the whole
     // slider — there is nothing for an agent to do in the archive, so no
     // autonomy ever admits it.
     priority: 1.5,
@@ -253,7 +253,7 @@ function buildDecades(machineId: string, entries: ArchiveEntry[], kindWord: stri
   type GenNode = CanvasElement & { styleAttributes?: Record<string, unknown> };
   const nodes: GenNode[] = [];
   const edges: CanvasEdge[] = [];
-  // TOP TO BOTTOM (owner ruling 2026-07-28): decades stack vertically —
+  // TOP TO BOTTOM: decades stack vertically —
   // the reading direction for records is downward at every nesting level;
   // a new decade lands at the bottom.
   const decCount = Math.ceil(entries.length / 10);

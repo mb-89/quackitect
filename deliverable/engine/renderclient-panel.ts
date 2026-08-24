@@ -45,7 +45,7 @@ function detailFor(key) {
     const id = at[0];
     const mac = at[1] || "";
     const known = D.states[id];
-    // ONE TRUTH, TWO RENDERS (owner ruling 2026-08-04): a state with an
+    // ONE TRUTH, TWO RENDERS: a state with an
     // evidence form shows THE FORM as its details — the old detail view
     // stays only for form-less states. A state this page's view does not
     // know still resolves through its carried machine.
@@ -91,7 +91,7 @@ document.addEventListener("click", (ev) => {
     const [t, h] = detailFor(CURRENT_DETAIL); showDetails(t, h);
   }
 });
-// A GRID CELL OPENS ITS DETAIL (owner, 2026-08-09): the score grid shows
+// A GRID CELL OPENS ITS DETAIL (owner): the score grid shows
 // the value; the anchor and the prior-art name sit behind the click, in
 // the details pane like every other detail.
 document.addEventListener("click", (ev) => {
@@ -265,7 +265,7 @@ function promoteCard(id) {
   q.set("card", id);
   history.replaceState(null, "", location.pathname + "?" + q.toString());
 }
-// NUMBER KEYS, NOT FUNCTION KEYS (owner 2026-07-29). F1, F5, F6, F11 and F12
+// NUMBER KEYS, NOT FUNCTION KEYS (owner ). F1, F5, F6, F11 and F12
 // belong to the browser, and a laptop needs an Fn chord for them. A key never
 // fires while the reader is typing — chat is a card you type in.
 addEventListener("keydown", (ev) => {
@@ -294,7 +294,7 @@ addEventListener("keydown", (ev) => {
   ev.preventDefault();
   promoteCard(card.id);
 });
-// THE NUMBER IS A CONTROL, NOT A LABEL (owner 2026-07-29). Whatever the key
+// THE NUMBER IS A CONTROL, NOT A LABEL (owner ). Whatever the key
 // does, clicking the badge does — including the press-again toggle back.
 addEventListener("click", (ev) => {
   const badge = ev.target !== null && ev.target.closest !== undefined ? ev.target.closest(".cardnum") : null;
@@ -305,7 +305,7 @@ addEventListener("click", (ev) => {
   ev.stopPropagation();
   promoteCard(card.id.replace(/^card-/, ""));
 });
-// 58/42 to start (owner 2026-07-29), then wherever the reader drags it,
+// 58/42 to start (owner ), then wherever the reader drags it,
 // remembered exactly the way every other pane already is.
 const CARDS_KEY = PANE_KEY + "cards-main";
 const cardsEl = document.querySelector(".cards");
