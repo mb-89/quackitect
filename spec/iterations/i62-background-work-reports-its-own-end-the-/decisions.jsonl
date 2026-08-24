@@ -1,0 +1,14 @@
+{"ts":"2026-08-24T15:32:20.516Z","op":"plan","visit":"iterations/i62/start@0","parent":null,"nodes":[{"id":"d4","brief":"read the i62 record"},{"id":"d5","brief":"walk M0: retro onboard and kickoff"},{"id":"d6","brief":"work the milestones the machine serves"}]}
+{"ts":"2026-08-24T15:33:02.133Z","op":"update","visit":"iterations/i62/spawn-the-hands@0","node":"d7","brief":"reading the i62 record's vision in full"}
+{"ts":"2026-08-24T15:34:23.874Z","op":"plan","visit":"iterations/i62/spawn-the-hands@0","parent":null,"nodes":[{"id":"d8","brief":"pull and read what the state hands over"},{"id":"d9","brief":"do the state's work"},{"id":"d10","brief":"author its evidence and submit"}]}
+{"ts":"2026-08-24T15:36:25.428Z","op":"done","visit":"iterations/i62/spawn-the-hands@0","node":"d8","brief":"read the record and the spawn-hands method card"}
+{"ts":"2026-08-24T15:36:26.569Z","op":"update","visit":"iterations/i62/spawn-the-hands@0","node":"d11","brief":"walker spawned for M0; reading the engine's job code while it walks"}
+{"ts":"2026-08-24T15:37:20.097Z","op":"update","visit":"iterations/i62/spawn-the-hands@0","node":"d12","brief":"guide takes the walk on from spawn-the-hands"}
+{"ts":"2026-08-24T15:38:10.286Z","op":"update","visit":"iterations/i62/spawn-the-hands@0","node":"d13","brief":"closed the M0 hand: the kickoff has not set a walker ceiling yet"}
+{"ts":"2026-08-24T15:38:43.104Z","op":"done","visit":"iterations/i62/spawn-the-hands@0","node":"d9","brief":"spawn-the-hands evidence stands and the over-ceiling hand is closed"}
+{"ts":"2026-08-24T15:39:22.635Z","op":"plan","visit":"iterations/i62/onboard-retro@0","parent":null,"nodes":[{"id":"d14","brief":"survey the inbox"},{"id":"d15","brief":"drain every pending note"},{"id":"d16","brief":"mine the call log"},{"id":"d17","brief":"fill the onboard-retro evidence"}]}
+{"ts":"2026-08-24T15:39:59.827Z","op":"done","visit":"iterations/i62/onboard-retro@0","node":"d15","brief":"inbox drained to zero; the note minted a work token on trunk"}
+{"ts":"2026-08-24T15:40:24.360Z","op":"update","visit":"iterations/i62/onboard-retro@0","node":"d18","brief":"finding the previous retro's drain to set the mining window"}
+{"ts":"2026-08-24T15:42:26.010Z","op":"done","visit":"iterations/i62/onboard-retro@0","node":"d16","brief":"mined 110 calls: 6 rejections, and the reading loop is the biggest cost"}
+{"ts":"2026-08-24T15:42:41.490Z","op":"done","visit":"iterations/i62/onboard-retro@0","node":"d17","brief":"onboard-retro evidence submitted and signed"}
+{"ts":"2026-08-24T15:43:53.991Z","op":"done","visit":"iterations/i62/start@0","node":"d5","brief":"M0 walked: onboard retro signed and the kickoff gate filled"}

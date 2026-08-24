@@ -2,7 +2,6 @@
 id: i4-the-panel-round-the-archived-iteration-b
 status: shipped
 closed: 2026-08-24T13:13:40.901Z
-retro_owed: 2026-08-24T13:13:40.901Z
 started: 2026-08-14T06:30:20.991Z
 opened: 2026-08-11T15:23:08.567Z
 goal: "The panel round: the archived iteration browses like the live one, a bless repaints without a reload, and a grey state says why."
