@@ -354,6 +354,18 @@ far along it is, how many have failed, the first failures by name, and how much
 longer it needs with the basis for that figure. The JOB makes the estimate, not
 you.
 
+AN OUTCOME SAYING `bound reached` IS THE ACCOUNT GIVING UP, never a verdict.
+Every entry declares how long the account will wait, and passing that bound ends
+the WAIT rather than the work. The process is not touched.
+
+SO THE WORK MAY STILL REPORT, and when it does its own outcome replaces the
+bound's and the entry rides an answer again. A handle the engine can see running
+is never expired at all.
+
+THE WORD AFTER THE FIGURE SAYS WHERE IT CAME FROM — `measured` or `default`.
+Everything in the product carries the default today, registered as
+raid-risk-one-blanket-bound-is-given-to-work-nobody-measured.
+
 SO CARRY ON WORKING. The news finds you on whatever call you were making
 anyway, and the verdict records itself when the run ends.
 

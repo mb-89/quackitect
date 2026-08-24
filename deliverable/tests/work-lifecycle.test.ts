@@ -376,3 +376,23 @@ test("the answer an agent reads says how long the wait is bounded to", () => {
     rmSync(root, { recursive: true, force: true });
   }
 });
+
+// GREEN TODAY, and it pins an ORDER rather than a behaviour. The predicate
+// above is well covered; what nothing covered is WHERE the gate consults it.
+//
+// THE EXEMPTION MUST SIT BELOW THE CLOSED-MACHINE GUARD. A machine that has
+// ended records nothing, and an edit moving those two lines past each other
+// would reopen i62's worst defect with every existing case still green.
+//
+// WHY THE SOURCE AND NOT THE BEHAVIOUR. Reaching the closed branch needs a
+// whole session machine driven to its end. The two lines are code rather than
+// formatting, so a reflow does not move them relative to each other — only a
+// deliberate edit does, which is the thing being guarded.
+test("the registration exemption is consulted after the closed-machine guard", () => {
+  const gate = readFileSync(new URL("../engine/session.ts", import.meta.url), "utf8");
+  const closed = gate.indexOf('status === "closed"');
+  const exempt = gate.indexOf("isRegistrationCall(args)");
+  assert.ok(closed > 0, "the closed-machine guard is findable in the gate");
+  assert.ok(exempt > 0, "the registration exemption is findable in the gate");
+  assert.ok(closed < exempt, "a closed machine refuses a registration, so its guard comes first");
+});

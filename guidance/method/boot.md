@@ -61,15 +61,20 @@ THE ENGINE CLOSES THEM NOW, and noticing is not the agent's job.
 you already know is pointless. A job going long after its ceiling is hung
 rather than working, and the reap is what that is for.
 
-THE SUGGESTED PAGE IS ALSO SMALLER THAN IT NEEDS TO BE.
-`deliverable/engine/bound.ts` line 55 computes it as (6000 - 200) / 2, and
-line 33 of the same file says the measured escape cost is 1.066 rather than
-2. Passing your own larger `char_limit` is legal; the risk is one extra call
-when a page does not fit, never a loop.
+THE SUGGESTED PAGE WAS ALSO TOO SMALL, AND THAT IS FIXED (routed 2026-08-24).
+`deliverable/engine/bound.ts` sized the page on the WORST-CASE escape cost of
+2, which is less than half of what actually fits, so every reading loop paid
+about twice the calls it needed.
 
-BOTH ARE ENGINE WORK, NOT WALKING WORK. They are captured as a note for a
-retro to route. This section exists so the next boot knows what it is paying
-for while they stand.
+IT IS 1.15 NOW, and the read trims a page that would not fit rather than
+spilling again. MEASURED: boot's four documents come to 61,439 bytes, which was
+about 29 page reads at the old size and is about 14 at this one.
+
+PASSING YOUR OWN LARGER `char_limit` IS STILL LEGAL, and now rarely worth it.
+
+WHAT STILL COSTS, and it is the one to watch: a document that spills is read
+BACK a page at a time, so a long guidance page is several calls whatever the
+page size. Measured on the i62 walk: 244 file reads against 123 pulls.
 
 ## Goal
 
