@@ -37,3 +37,21 @@ WHY THESE TWO ARE ONE PIECE. Both are the same defect in the same layer: a form 
 
 - wt-a-judgment-step-presents-its-whole-inherited-catalogue-with-
 - wt-the-chart-a-step-fills-draws-every-question-and-every-line-h
+
+## Carried in by the retro of 2026-08-24
+
+THE CRITERION POOL SHOULD BE THE ROUND'S OWN, not the product's whole history.
+
+WHAT HAPPENS TODAY. The step that cuts criteria offers every criterion the
+product ever had. One round's candidates differed in a single decision each,
+so eighty-odd rows were struck by position rather than by judgment.
+
+WHY IT BELONGS HERE. This record already says a form draws what the open
+record owns. That is the same rule, and the criterion step is a third state
+breaking it.
+
+THE SAME SHAPE PROBABLY BINDS THREE MORE. Deriving criteria, probing
+assumptions and partitioning functions all draw from the whole corpus today.
+
+THE RULE IS ALREADY WRITTEN into the cutting step's own guidance. The
+mechanism is what is missing.

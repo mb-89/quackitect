@@ -58,7 +58,7 @@ export function readItRecord(root: string, it: Iteration): Record<string, unknow
 }
 
 /** see dsp-record-lifecycle.md#the-statuses-a-record-cannot-be-walked-from */
-export const RECORD_FINISHED: ReadonlySet<string> = new Set(["shipped", "closed"]);
+export const RECORD_FINISHED: ReadonlySet<string> = new Set(["shipped", "closed", "abandoned"]);
 
 /** EVERY RECORD IS A FOLDER, and OPEN comes from its own status.
  *

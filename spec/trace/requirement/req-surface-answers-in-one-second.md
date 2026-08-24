@@ -2,11 +2,11 @@
 minted_in: i12
 id: req-surface-answers-in-one-second
 type: "[[requirement]]"
-statement: When a person opens a surface, the mirror shall answer within 1 second, for every surface request.
+statement: When a person opens a surface, the mirror shall answer within 1 second, or within that same bound say what it is doing and finish in the background, for every surface request.
 kind: quality
 characteristic: performance-efficiency
 verify_method: test
-measure: every surface request answers within 1000 ms
+measure: every surface request answers within 1000 ms, or within 1000 ms shows what it is doing and completes in the background
 breaks_if_removed: The person pays a wait on every look, and the wait is invisible because nothing counts a render as cost.
 breaks_how_badly: corrosive
 refines:
@@ -31,9 +31,30 @@ weighs_against:
   form.
 - Artifact: the serving mirror.
 - Environment: normal operation on the reference machine.
-- Response: the rendered surface.
+- Response: the rendered surface, or feedback naming the work and a
+  background completion.
 - Response measure: the answer arrives within 1000 ms for every surface
-  request.
+  request. Where it cannot, feedback naming the work arrives within the
+  same 1000 ms and the work completes in the background.
+
+## Past a second the person is told, never left waiting
+
+A SURFACE MAY TAKE LONGER THAN A SECOND. What it may not do is go silent,
+and it may not hold the loop that draws the interface.
+
+TWO THINGS ARE OWED TOGETHER, and one without the other fails this row.
+
+- IT SAYS WHAT IT IS DOING, inside the same 1000 ms. Real progress where
+  progress exists, an indeterminate bar otherwise. `guidance/craft/ux.md`
+  carries the shape under "Nothing ever hangs".
+- IT FINISHES IN THE BACKGROUND. Anything past a second leaves the drawing
+  loop, because a rule about showing feedback is worth nothing when the
+  loop that would render it is frozen.
+
+THE LANE ROW ALREADY SAID THIS and this one did not. `req-call-answers-in-one-second`
+has carried "or return a background handle whose completion the driver
+observes" since i1, so the agent's side has been covered and the person's
+side has not.
 
 ## Why it is a sibling rather than a widening
 

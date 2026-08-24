@@ -118,6 +118,16 @@ applies to advice).
 LANDING WORK DOES NOT NEED A CLOSE. Work reaches trunk while its
 expedition stays open, so a day's bundle keeps collecting.
 
+A RECORD CAN BE PUT DOWN. Set its status to `abandoned` and say why in the
+record. Use it when the work is no longer wanted, or when its outcome arrived
+by another road while its own walk stood unfinished.
+
+- `shipped` would claim gates that never happened.
+- `seeded` would present finished work as work never begun.
+- Nothing is deleted. The folder and its evidence stay.
+
+The standing is the owner's call, never the desk's.
+
 ## 3. Execute — the desk carries the paperwork
 
 THE DESK ENTERS NOTHING ON ITS OWN JUDGMENT. It recommends, then it

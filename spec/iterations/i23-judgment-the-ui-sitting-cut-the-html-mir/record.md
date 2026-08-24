@@ -1,7 +1,6 @@
 ---
 id: i23-judgment-the-ui-sitting-cut-the-html-mir
-status: open
-started: 2026-08-14T19:56:05.196Z
+status: seeded
 opened: 2026-08-12T19:47:09.097Z
 goal: "JUDGMENT — the UI sitting: cut the HTML mirror, settle the VS Code shell, and build the coverage dashboard, with the owner at the screen."
 vision: |-
@@ -115,3 +114,61 @@ here in a pass over the pool.
 
 - wt-an-extension-of-the-two-armed-diagram-idea-the-picture-carri
 - wt-show-an-iteration-s-footprint-as-the-two-armed-diagram-engin
+
+## Carried in by the retro of 2026-08-24
+
+TWO JUDGMENTS ABOUT SURFACES, both needing the owner at the screen.
+
+### Every custom editor is checked against a native one first
+
+THE RULE. Before an editor is built or kept, name the native control that would
+do the job. Build the custom one only where no native control fits, and record
+which one was ruled out.
+
+THE OWNER'S CAVEAT, kept because it cuts against the rule: their experience is
+that this has not worked so far. So the check must record WHY a native control
+failed, or the next round repeats the same disappointment.
+
+WHICH EDITORS IT REACHES: the checklist, the node table, the compare card, the
+dependency matrix and the table editor.
+
+THE COMPARE CARD IS THE SHARPEST CASE. It is a two-button question over a set,
+which is exactly what a native quick pick answers.
+
+### Source nobody modelled could be refused at the write
+
+HALF OF IT STANDS. Every design spec declares its files, and one state sweeps
+for files no spec claims.
+
+TWO THINGS ARE MISSING: teeth and timing. It reports instead of refusing, and
+it reports at the end of a record instead of at the write.
+
+THE COST NEEDS PRICING BEFORE IT IS BUILT. Every new file would need its design
+spec first, including a helper split out during a refactor.
+
+## The editor is the only surface that counts (owner ruling 2026-08-23)
+
+THIS NEEDS NO JUDGMENT, and the owner said so plainly on 2026-08-24. It is here
+because this is the record that owns the surfaces, not because anything about it
+is still open to debate.
+
+THE OWNER'S WORDS: whenever you work on markup, it must be the markup the editor
+panel renders. Rendering the same files somewhere else for an agent to look at
+is fine. Carrying files that do not show up in the panel is not.
+
+THE TEST IS NOT WHETHER A FILE IS REGISTERED. It is whether the panel actually
+uses it. A file the panel does not use may not exist.
+
+WHAT KEEPS GOING WRONG, in the owner's words again: the agent repeatedly says it
+has fixed something that cannot be seen in the editor, because it was fixed
+somewhere else. That has to stop.
+
+SO THE SORTING QUESTION IS ONE, NOT THREE. Does the panel use this file. Yes, it
+stays. No, it goes.
+
+THE SECOND SURFACE MAY STILL SERVE THE SAME FILES. What it may not do is carry
+anything the panel does not.
+
+THE GENERAL FORM IS A SIBLING AND STILL NEEDS JUDGMENT: which surfaces a person
+looks at are declared once, where both a person and a check can read them. That
+one is above, with the other judgment items.

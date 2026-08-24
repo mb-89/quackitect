@@ -41,3 +41,25 @@ These stood in the options pool referenced by no iteration at all. Assigned
 here in a pass over the pool.
 
 - wt-two-related-guidance-gaps-cost-real-agent-effort-this-sessio
+
+## Carried in by the retro of 2026-08-24
+
+THE WORK ACCOUNT'S DESIGN DOCUMENT TEACHES A RETIRED BEHAVIOUR, and so does a
+comment inside the code that implements it.
+
+TWO RULINGS OVERTOOK IT on 2026-08-24. A finished entry now hands its outcome
+over once and then leaves the table. The listing now answers with what is
+running and a count of what has settled.
+
+WHERE THE STALE TEXT SITS.
+
+- `spec/trace/design-spec/dsp-the-work-account.md` line 122 still says an entry
+  never leaves the table inside one session.
+- `deliverable/engine/run.ts` line 76 says the same thing in a comment, and
+  line 1344 of the SAME FILE states the current behaviour correctly.
+
+THE TWO COMMENTS CONTRADICT EACH OTHER, which is the sharper finding. A reader
+landing on the first one has no way to know the second exists.
+
+ONE LINE STILL STANDS and was kept deliberately: a figure is never returned
+without what it rests on.

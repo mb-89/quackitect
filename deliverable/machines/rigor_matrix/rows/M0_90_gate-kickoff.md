@@ -39,7 +39,7 @@ evidence:
     description: what explicitly stays out, and where it went
     template: list
   - name: walkers
-    description: how many walkers this record runs with, and why - 0 is the guide alone, 1 is the norm
+    description: how many walkers this record runs with, and why - 0 is the DEFAULT and is the guide alone; a record asks for more deliberately
     template: choice-with-rationale
     options:
       - "0"

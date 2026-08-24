@@ -156,6 +156,15 @@ The trigger is a NOTE carrying "needs retro":
    - READ THE FOLDER THROUGH THE DECLARED ROOT. This is the first move, not
      the fallback. Read `.se/roots.json`, find the root that covers the
      harness's memory path, and glob or read under it.
+   - THEN DELETE WHAT YOU DRAINED. A drain that only reads leaves the next
+     retro the same pile to judge again, and the owner has said plainly that
+     nobody else uses the memory.
+     - The retro state carries `se_file_delete` for exactly this.
+     - The memory root is declared WRITABLE, which is what makes the delete
+       land. It was read-only until 2026-08-24, so no earlier retro could
+       finish this step however well it read.
+     - Delete only after the content has a home, or has been shown to be
+       carried already.
    - DRAIN WHAT THE HARNESS SURFACED. Memories handed to the agent in context
      are readable and drainable too.
    - DECLARE A ROOT for a folder no existing one covers. `.se/roots.json`

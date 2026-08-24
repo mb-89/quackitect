@@ -219,6 +219,31 @@ THE STATUSES A RECORD CANNOT BE WALKED FROM. One definition, because two
  the survey read the status and the container read the filesystem, so i28
  stood in one list and not the other on 2026-08-16.
 
+THERE ARE THREE, AND `abandoned` IS THE THIRD (owner ruling 2026-08-24).
+
+- `shipped` — the walk reached the end and the work is delivered.
+- `closed` — the same for a record that does not ship.
+- `abandoned` — THE RECORD IS PUT DOWN. It will not be walked, and nobody
+  is waiting for it.
+
+WHAT `abandoned` IS FOR. A record whose work is no longer wanted, or whose
+outcome arrived by another road while its own walk stood unfinished. Neither
+of the other two words can say that: `shipped` claims gates that never
+happened, and returning it to `seeded` claims work that was never begun.
+
+THE GAP IT CLOSES, measured 2026-08-24. One record stood open for four days
+with every one of its goals satisfied in the tree and three of its ten gates
+never walked. No word in the vocabulary fitted it, so it could not leave the
+open set at all.
+
+AN ABANDONED RECORD KEEPS EVERYTHING. Its folder, its evidence and its
+decisions stay exactly where they are. The standing is a statement about the
+future, never an erasure of the past.
+
+IT SAYS WHY, IN THE RECORD. A standing that does not carry its reason leaves
+the next reader to guess whether the work was wrong, overtaken, or merely
+dropped.
+
 ## The container is a dag
 
 THE CONTAINER IS A DAG, AND THIS KEY IS ITS ONLY INPUT (owner ruling

@@ -3,7 +3,7 @@ state: retro
 state_kind: work
 priority: strategic
 statement: Turn what happened into rules.
-legal_tools: se_note_drain, se_survey, se_log_query, se_answer, se_help, se_test, se_run, se_file_read, se_file_search, se_file_glob, se_file_list, se_file_patch, se_file_write, se_prompt_place, se_seed_expedition, se_seed_iteration, se_web_search, se_web_fetch
+legal_tools: se_note_drain, se_survey, se_log_query, se_answer, se_help, se_test, se_run, se_file_read, se_file_search, se_file_glob, se_file_list, se_file_patch, se_file_write, se_file_delete, se_prompt_place, se_seed_expedition, se_seed_iteration, se_web_search, se_web_fetch
 entry_read: guidance/method/retro.md
 motivation: Lessons expire. A stray nobody judges rots into noise, and a mistake nobody names repeats. The retro turns what happened into rules while it is cheap, and it empties the inbox so the next decision starts clean.
 inputs:
@@ -18,6 +18,10 @@ guidance: |
   - Drain every pending note with se_note_drain, including the needs-retro
     triggers. This state is the ONE place draining is legal.
   - Aim improvements at durable homes.
+  - DRAINING THE ASSISTANT MEMORY MEANS EMPTYING IT. Whatever holds project
+    rules, project state or working guidance moves into the repository, and the
+    memory file is then DELETED. A drain that only reads leaves the next retro
+    the same pile to judge again.
   - Re-project the prompt layer with se_prompt_place after editing guidance.
     Editing guidance/ makes AGENTS.md, CLAUDE.md and the Copilot
     instructions stale, and preflight goes red at the next verdict.

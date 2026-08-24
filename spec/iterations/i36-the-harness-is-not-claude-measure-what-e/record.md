@@ -1,6 +1,7 @@
 ---
 id: i36-the-harness-is-not-claude-measure-what-e
-status: open
+status: shipped
+closed: 2026-08-24T13:59:37.370Z
 started: 2026-08-19T08:17:54.813Z
 opened: 2026-08-18T19:07:59.624Z
 goal: "The harness is not Claude: measure what every host actually gives us, close the five breaks the measuring found, and make the lane say which harness it is talking to."
@@ -71,3 +72,27 @@ THE HOOKS ANSWER IS BETTER THAN THE EARLIER PART SAID, and Part 9 is corrected. 
 - project/spec/trace/interface/if-agent-harness-to-entrypoint.md
 - project/spec/trace/raid/raid-obsidian-and-harness.md
 - project/spec/trace/raid/raid-harness-half-life.md
+
+## The close, stamped by hand on the owner's instruction
+
+THE WORK FINISHED ON 2026-08-19. Every one of the ten gates is filled, signed
+and blessed, the last of them the release gate at 19:06:40, blessed on the
+owner's own instruction to ship. Nothing was owed after it.
+
+THE SESSION THEN ENDED WITHOUT CLOSING THE RECORD, and it stood open for five
+days.
+
+THE CLOSE STAMP CARRIES TODAY'S TIME rather than the time the work ended,
+because that is when the close happened. The gate signatures above are where the
+finishing date is read from.
+
+WHY IT WAS NOT RE-WALKED. The owner ruled on 2026-08-24 that a finished round is
+not walked again because somebody forgot to close it. A close writes exactly two
+things, a status and a stamp, and both were written here to match what the
+machine writes on the records it closed itself.
+
+NOTHING WAS CARRIED. Records closing with items still owed carry them forward in
+their own frontmatter. This one had none.
+
+THE MISSING PIECE IS A VERB, not a decision. There is no lane call that closes a
+finished record, so this was a hand edit. That gap is captured as its own item.
