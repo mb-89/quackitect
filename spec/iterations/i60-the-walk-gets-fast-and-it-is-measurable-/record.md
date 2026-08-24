@@ -1,6 +1,15 @@
 ---
 id: i60-the-walk-gets-fast-and-it-is-measurable-
-status: open
+status: shipped
+closed: 2026-08-24T20:08:36.025Z
+retro_owed: 2026-08-24T20:08:36.025Z
+carried_count: 5
+carried:
+  - the surface answers no worse while the engine is busy — raid-iss-the-surface-row-has-no-harness-that-could-fail-it (observe-red.md)
+  - three chunks are built and UNREDDENED — each carries a guard, and none was watched failing — spec/trace/raid/raid-iss-three-chunks-landed-with-no-check-and-no-observed-red.md (verification.md)
+  - re-signing an answer knocks down what rests on it EVERY time — spec/trace/raid/raid-iss-the-knock-down-has-no-reproduction-of-the-case-that-fails.md (verification.md)
+  - a slow answer does not freeze the surface beside it — spec/trace/raid/raid-iss-the-surface-row-has-no-harness-that-could-fail-it.md (verification.md)
+  - the failed-route row is checked under load — spec/trace/raid/raid-iss-the-loaded-half-of-the-failed-route-row-is-not-implemented.md (verification.md)
 started: 2026-08-24T14:37:20.758Z
 opened: 2026-08-24T13:52:40.083Z
 goal: "The walk gets fast, and it is measurable first: every interface a person or an agent meets is named, each one carries its own timing instrument, and only then are the slow paths repaired."
