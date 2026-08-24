@@ -1,0 +1,9 @@
+{"ts":"2026-08-24T14:46:33.418Z","op":"done","visit":"iterations/select@0","node":"d1","brief":"Iteration 61 entered"}
+{"ts":"2026-08-24T14:46:58.812Z","op":"done","visit":"iterations/select@0","node":"d2","brief":"First iteration state completed"}
+{"ts":"2026-08-24T14:47:34.560Z","op":"plan","visit":"iterations/i61/spawn-the-hands@0","parent":null,"nodes":[{"id":"d3","brief":"inspect the open work"},{"id":"d4","brief":"submit the prescribed hand roster"}]}
+{"ts":"2026-08-24T14:47:41.309Z","op":"plan","visit":"iterations/i61/spawn-the-hands@0","parent":null,"nodes":[]}
+{"ts":"2026-08-24T15:00:04.080Z","op":"update","visit":"iterations/i61/onboard-retro@0","node":"d5","brief":"Capture stop-at continuation defect"}
+{"ts":"2026-08-24T15:00:07.906Z","op":"update","visit":"iterations/i61/onboard-retro@0","node":"d6","brief":"Inspect remaining retro notes"}
+{"ts":"2026-08-24T15:00:23.910Z","op":"update","visit":"iterations/i61/onboard-retro@0","node":"d7","brief":"Carry stop-at defect into iteration"}
+{"ts":"2026-08-24T15:00:45.927Z","op":"done","visit":"iterations/i61/spawn-the-hands@0","node":"d3","brief":"Inspected and drained retro inbox"}
+{"ts":"2026-08-24T15:02:26.805Z","op":"done","visit":"iterations/i61/spawn-the-hands@0","node":"d4","brief":"Submitted zero-worker kickoff proposal"}
