@@ -474,6 +474,14 @@ export class Claims {
     return join(it.path, `spec/iterations/${it.id}/evidence/${state}.md`);
   }
 
+  private passStateKey(it: Iteration, decl: MachineDecl, stateId: string): string {
+    return [it.id, decl.id, stateId].join("\0");
+  }
+
+  private passDoneKey(it: Iteration, decl: MachineDecl, paint: boolean): string {
+    return [...(paint ? ["paint"] : []), it.id, decl.id].join("\0");
+  }
+
   standingClaims(decl: MachineDecl, it: Iteration, claimful: Set<string>, pass: GreenPass, paint = false): Set<string> {
     // THE CORPUS IS LOADED ONCE, NOT ONCE PER STATE. claimProblems takes it as
     // an argument for exactly this reason and recordDone was not passing it,
@@ -512,14 +520,14 @@ export class Claims {
         if (note === undefined) continue;
         const fm = note.frontmatter;
         if (typeof fm.signed_off !== "string") continue;
-        // see dsp-walk-machine.md#the-signature-time-comes-out-of-this-read
-        pass.times ??= new Map();
-        pass.times.set(s.id, claimTime(fm));
         // A REOPEN IS THE FOURTH WAY A CLAIM STOPS STANDING. The other three
         // are the claim's own doing; this one is somebody deciding it must be
         // re-earned. The downstream ripple is free — the fixed point below
         // drops everything fed by a state that just left this set.
         if (reopenedAfterSigning(fm)) continue;
+        // see dsp-walk-machine.md#the-signature-time-comes-out-of-this-read
+        pass.times ??= new Map();
+        pass.times.set(this.passStateKey(it, decl, s.id), claimTime(fm));
         const key = [traceRoot, s.id, version, contentHash(note.body), contentHash(JSON.stringify(s.evidence_form))].join("\0");
         let failed = Claims.VERDICTS.get(key);
         if (failed === undefined) {
@@ -561,22 +569,19 @@ export class Claims {
   }
 
   /** see dsp-walk-machine.md#green-is-calculated */
-  drawingDone(id: string, seen: Set<string>, pass: GreenPass, paint = false): boolean {
+  drawingDone(id: string, seen: Set<string>, pass: GreenPass, paint = false, ownerId?: string, iteration?: Iteration): boolean {
     if (seen.has(id)) return false; // a cycle proves nothing
     seen.add(id);
-    // AN UNSEEDED DRAWING PROVES NOTHING, and asking for one THROWS: viewFor
-    // raises the typed refusal that tells an agent to seed it. That refusal is
-    // right where the walk asked to enter, and wrong here — this is only
-    // colouring a box, and a question about green must never take the walk
-    // down with it.
+    // Generated children share their host state's id. Resolve from the owner,
+    // because another open iteration can carry the same generated state name.
     let sub: MachineDecl | undefined;
     try {
-      sub = this.host.views.viewFor(id)?.decl;
+      sub = ownerId === undefined ? this.host.views.viewFor(id)?.decl : this.host.views.generatedChild(ownerId, id)?.decl;
     } catch {
       return false;
     }
     if (sub === undefined) return false;
-    const done = new Set(this.recordDone(sub, seen, pass, paint));
+    const done = new Set(this.recordDone(sub, seen, pass, paint, iteration));
     for (const s of sub.states) {
       if (s.evidence_form.length === 0 && s.submachine === undefined) continue;
       if (!done.has(s.id)) return false;
@@ -587,7 +592,7 @@ export class Claims {
 
   /** see dsp-walk-machine.md#collect-the-input-once */
   static newPass(): GreenPass {
-    return { done: new Map() };
+    return { done: new Map(), iterations: new Map() };
   }
 
   /** THE FEEDERS THIS CLAIM IS OLDER THAN — the ripple's time half, seen from
@@ -622,19 +627,33 @@ export class Claims {
     return out;
   }
 
-  recordDone(decl: MachineDecl, seen: Set<string> = new Set(), pass: GreenPass = Claims.newPass(), paint = false): string[] {
-    const memoKey = paint ? `${decl.id}\0paint` : decl.id;
+  recordDone(
+    decl: MachineDecl,
+    seen: Set<string> = new Set(),
+    pass: GreenPass = Claims.newPass(),
+    paint = false,
+    iteration?: Iteration,
+  ): string[] {
+    let it = iteration;
+    if (it === undefined) {
+      if (pass.iterations.has(decl)) it = pass.iterations.get(decl);
+      else {
+        it = this.host.declIteration(decl);
+        pass.iterations.set(decl, it);
+      }
+    }
+    if (it === undefined) return [];
+    const memoKey = this.passDoneKey(it, decl, paint);
     const memo = pass.done.get(memoKey);
     if (memo !== undefined) return memo;
-    const it = this.host.declIteration(decl);
-    if (it === undefined) return [];
     // see dsp-walk-machine.md#the-ripple-covers-containers-too
     const claimful = new Set(decl.states.filter((s) => this.host.owesASignature(s, it)).map((s) => s.id));
     const green = this.standingClaims(decl, it, claimful, pass, paint);
     for (const s of decl.states) {
       if (s.submachine === undefined) continue;
       claimful.add(s.id);
-      if (this.drawingDone(s.id, seen, pass, paint)) green.add(s.id);
+      const ownerId = s.submachine?.endsWith(".canvas") === false ? decl.id : undefined;
+      if (this.drawingDone(s.id, seen, pass, paint, ownerId, it)) green.add(s.id);
     }
     // see dsp-walk-machine.md#green-stops-at-the-first-input-that-is-not
     const signedAt = pass.times ?? new Map<string, string>();
@@ -642,8 +661,8 @@ export class Claims {
       changed = false;
       for (const id of [...green]) {
         const feeders = claimFeeders(decl, id, claimful);
-        const mine = signedAt.get(id);
-        const stale = mine !== undefined && feeders.some((f) => (signedAt.get(f) ?? "") > mine);
+        const mine = signedAt.get(this.passStateKey(it, decl, id));
+        const stale = mine !== undefined && feeders.some((f) => (signedAt.get(this.passStateKey(it, decl, f)) ?? "") > mine);
         if (!stale && feeders.every((f) => green.has(f))) continue;
         green.delete(id);
         changed = true;

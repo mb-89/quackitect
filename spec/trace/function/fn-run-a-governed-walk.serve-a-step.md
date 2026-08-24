@@ -42,6 +42,10 @@ satisfies:
   - req-one-operation-reads-its-input-once
   - req-a-served-instruction-names-the-next-act
   - req-oversized-results-remain-recoverable-through-the-lane
+  - req-session-serves-only-applicable-guidance
+  - req-zero-worker-ceiling-satisfies-spawn-state
+  - req-state-entry-delivers-its-required-form
+  - req-blockers-only-stops-only-at-a-blocker
 inputs:
   - flow-position
   - flow-compiled-machine

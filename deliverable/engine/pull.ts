@@ -17,6 +17,8 @@ import type { MachineDecl, StateDecl } from "./machine.ts";
 import { parseStateNote } from "./notes.ts";
 import { PROMPT_SOURCES } from "./promptlayer.ts";
 
+export type SessionMode = "attended" | "unattended" | "cloud";
+
 export interface GuidanceDoc {
   /** Root-relative path, forward slashes. */
   path: string;
@@ -24,6 +26,7 @@ export interface GuidanceDoc {
   applies?: string;
   applies_to: string[];
   tags: string[];
+  sessions: SessionMode[];
 }
 
 export interface PulledDoc {
@@ -135,6 +138,7 @@ export function scanGuidance(root: string): GuidanceDoc[] {
         ...(typeof fm.applies === "string" ? { applies: fm.applies } : {}),
         applies_to: list(fm.applies_to),
         tags: list(fm.tags),
+        sessions: list(fm.sessions).filter((mode): mode is SessionMode => mode === "attended" || mode === "unattended" || mode === "cloud"),
       });
     }
   };
@@ -151,7 +155,7 @@ function matchesSelector(sel: string, machineId: string, s: StateDecl): boolean 
   return false;
 }
 
-export function pulledFor(root: string, docs: GuidanceDoc[], m: MachineDecl, s: StateDecl): PulledDoc[] {
+export function pulledFor(root: string, docs: GuidanceDoc[], m: MachineDecl, s: StateDecl, mode: SessionMode = "attended"): PulledDoc[] {
   const byPath = new Map<string, PulledDoc>();
   const add = (path: string, hash: string, source: string): void => {
     const cur = byPath.get(path);
@@ -161,6 +165,7 @@ export function pulledFor(root: string, docs: GuidanceDoc[], m: MachineDecl, s: 
   const rootDir = guidanceDir(root);
   for (const d of docs) {
     if (PROMPT_SOURCES.includes(d.path)) continue;
+    if (d.sessions.length > 0 && !d.sessions.includes(mode)) continue;
     const isRoot = dirname(join(root, d.path)) === rootDir;
     if (isRoot) add(d.path, d.hash, "root");
     else if (d.applies === "always") add(d.path, d.hash, "applies: always");
@@ -176,5 +181,11 @@ export function pulledFor(root: string, docs: GuidanceDoc[], m: MachineDecl, s: 
       add(p, doc?.hash ?? "", "read");
     }
   }
-  return [...byPath.values()];
+  const pulled = [...byPath.values()];
+  if (mode !== "cloud") return pulled;
+  return pulled.sort((a, b) => {
+    const aCloud = docs.find((d) => d.path === a.path)?.sessions.includes("cloud") === true;
+    const bCloud = docs.find((d) => d.path === b.path)?.sessions.includes("cloud") === true;
+    return Number(bCloud) - Number(aCloud);
+  });
 }

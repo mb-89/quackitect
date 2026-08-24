@@ -65,19 +65,19 @@ function benchRepo(): { root: string; rewind: string; futureCommit: string } {
   write(root, `spec/trace/requirement/req-the-older-neighbour-left-a-trace.md`, `about ${OLDER}\n`);
   write(root, `spec/trace/requirement/req-known-before-the-rewind.md`, `about ${CONTROL} and the past\n`);
   write(root, "deliverable/engine/today.ts", "export const now = 1;\n");
-  git(root, "add", "-A");
+  git(root, "add", "spec");
   git(root, "commit", "-q", "-m", "the past");
   const rewind = git(root, "rev-parse", "HEAD").stdout;
 
   git(root, "commit", "-q", "--allow-empty", "-m", `iteration ${SUBJECT}: started`);
 
   write(root, "spec/trace/requirement/req-the-answer-the-benchmark-must-not-see.md", "the future\n");
-  git(root, "add", "-A");
+  git(root, "add", "spec");
   git(root, "commit", "-q", "-m", "the future");
   return { root, rewind, futureCommit: git(root, "rev-parse", "HEAD").stdout };
 }
 
-describe("a bound run cannot reach past its rewind point", { concurrency: true }, () => {
+describe("a bound run cannot reach past its rewind point", () => {
   test("the rewind point is the parent of the commit that named the iteration started", () => {
     const { root, rewind } = benchRepo();
     assert.equal(rewindPointFor(root, SUBJECT), rewind, "the parent of the started commit, exactly");

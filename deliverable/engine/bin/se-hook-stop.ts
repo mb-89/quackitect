@@ -117,6 +117,10 @@ function bitesOnce(payload: string): boolean {
   return p.stop_hook_active === true || p.stopHookActive === true;
 }
 
+function bypassesStop(payload: string, notch: string, last: LastPull): boolean {
+  return bitesOnce(payload) && (notch !== "blockers only" || last.ok === false);
+}
+
 /** Refuse the stop while a run is going, and say what to do instead. True when
  *  it wrote the refusal, so the caller exits without deciding anything else. */
 function blockedByRunningWork(): boolean {
@@ -187,9 +191,6 @@ process.stdin.on("data", (c: string) => {
 });
 process.stdin.on("end", () => {
   try {
-    // The bites-once valve: a stop already blocked once passes, so a
-    // genuinely blocking question can be asked and the turn ended.
-    if (bitesOnce(raw)) process.exit(0);
     // A BACKGROUND RUN STILL GOING OUTRANKS EVERY SANCTIONED STOP BELOW. Its
     // verdict is seconds away and nobody reads a job nobody asked about, so a
     // turn that ends first throws the answer away.
@@ -203,6 +204,9 @@ process.stdin.on("end", () => {
     if (pull === undefined) process.exit(0);
     // see dsp-boot-and-power.md#the-notch-decides
     const notch = typeof last.stop_at === "string" ? last.stop_at.trim().toLowerCase() : "";
+    // The valve may release a question about a standing blocker. It cannot
+    // release a newer runnable pull under blockers only.
+    if (bypassesStop(raw, notch, last)) process.exit(0);
     // STATE END: the ENGINE holds every transition and refuses to move. The
     // agent stopping is then not a failure of nerve, it is the machine's own
     // stop — exactly what this hook exists to let through.

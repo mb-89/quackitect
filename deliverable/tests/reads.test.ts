@@ -24,6 +24,19 @@ import { bootedServer, call, checkDocs, craftDocs, freshRoot, GUIDANCE, readOne 
 // THEY LEFT THE GUIDANCE ROOT (owner ruling 2026-08-06). A root doc is pulled
 // into every packet, and neither of these binds a design-input step. The step
 // that maps stakeholders was reading how to write code.
+test("session-restricted guidance reaches only its declared session mode", () => {
+  const machine = { id: "test" } as Parameters<typeof pulledFor>[2];
+  const state = { id: "work", kind: "work", tags: [] } as unknown as Parameters<typeof pulledFor>[3];
+  const docs = [
+    { path: "guidance/method/every.md", hash: "", applies: "always", applies_to: [], tags: [], sessions: [] },
+    { path: "guidance/method/attended.md", hash: "", applies: "always", applies_to: [], tags: [], sessions: ["attended"] },
+    { path: "guidance/method/cloud.md", hash: "", applies: "always", applies_to: [], tags: [], sessions: ["cloud"] },
+  ] as Parameters<typeof pulledFor>[1];
+  const paths = (mode: "attended" | "cloud"): string[] => pulledFor("", docs, machine, state, mode).map((doc) => doc.path);
+  assert.deepEqual(paths("attended"), ["guidance/method/every.md", "guidance/method/attended.md"]);
+  assert.deepEqual(paths("cloud"), ["guidance/method/cloud.md", "guidance/method/every.md"]);
+});
+
 test("the guidance splits three ways, and every home reaches the reader", () => {
   const root = freshRoot();
   const s = new Session(root);

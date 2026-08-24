@@ -537,6 +537,14 @@ export function goalItems(evidenceDir?: string): string[] {
     .filter((l) => l !== "");
 }
 
+function spawnHandItems(root: string, evidenceDir?: string): string[] {
+  if (evidenceDir === undefined) return catalogItems(root, "spawn_hands");
+  const note = noteOf(join(evidenceDir, "gate-kickoff.md"));
+  if (note === undefined) return catalogItems(root, "spawn_hands");
+  const walkers = /\d+/.exec(section(note.body, "walkers"));
+  return walkers?.[0] === "0" ? [] : catalogItems(root, "spawn_hands");
+}
+
 /** ONE SOURCE RESOLVER, so a `$name` means the same thing wherever it is
  *  written. Items and picks both come through here; a literal passes
  *  straight out, which is what makes a fixed list legal beside a live one. */
@@ -566,6 +574,7 @@ function resolveSource(i: string, root: string, traceRoot: string, instanceRaw?:
   if (name === "$options") return optionItems(traceRoot);
   const typed = TYPED_SOURCES[name];
   if (typed !== undefined) return typedItems(traceRoot, typed, owner, all);
+  if (name === "$spawn_hands") return spawnHandItems(root, evidenceDir);
   const catalog = CATALOG_SOURCES[name];
   if (catalog !== undefined) return catalogItems(root, catalog);
   if (name === "$promotions") return promotionItems(traceRoot, owner);

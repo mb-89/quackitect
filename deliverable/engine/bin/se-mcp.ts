@@ -164,6 +164,8 @@ ENGINE — read by the server (this file is where they are defined).
                  set it where there is no mirror to press — an unattended
                  box, whose settings store never restores a stored notch
                  because it recognises no session token.
+  --session-mode which guidance applies: attended (the default), unattended,
+                 or cloud. Env: SE_SESSION_MODE.
   --mirror-port  the embedded mirror's HTTP port (the human's hand on the
                  same walk). Default 7333. 0 disables. Env: SE_MIRROR_PORT.
   --headless     no stdio lane — agents attach over HTTP instead, at /mcp
@@ -290,6 +292,10 @@ if (argv.includes("--child") || process.env.SE_HOT_DISABLE === "1") {
   // on a box with no mirror to press, nobody could move it: not the agent, who
   // may not, and not the person, who has no surface.
   const stopAtRaw = argValue("--stop-at") ?? process.env.SE_STOP_AT;
+  const sessionMode = argValue("--session-mode") ?? process.env.SE_SESSION_MODE ?? "attended";
+  if (sessionMode !== "attended" && sessionMode !== "unattended" && sessionMode !== "cloud") {
+    throw new Error(`se-mcp: --session-mode must be attended, unattended, or cloud; got ${sessionMode}`);
+  }
 
   // WHERE SATELLITES RUN, for THIS run only. One architecture, three
   // transports — process, thread, inline — and the argument wins over the
@@ -298,6 +304,7 @@ if (argv.includes("--child") || process.env.SE_HOT_DISABLE === "1") {
   //
   // A BAD VALUE STOPS THE LAUNCH, and that is deliberate: an unreadable stored
   const session = new Session(root); // fails fast on a misdrawn machine
+  session.setSessionMode(sessionMode);
   if (autonomyRaw !== undefined) session.setAutonomy(autonomyRaw); // a rung by name or a bare value; refuses either out of range
   if (stopAtRaw !== undefined) session.setStopAt(stopAtRaw); // a notch by name or a bare value; refuses either out of range
   // SESSION OVER — reaching end stops everything. The grace period lets the

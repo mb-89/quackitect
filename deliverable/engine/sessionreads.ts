@@ -11,7 +11,7 @@ import { CLAUSES, Rejection } from "./errors.ts";
 import { contentHash } from "./hash.ts";
 import type { MachineDecl, StateDecl } from "./machine.ts";
 import { resolveInRoot } from "./paths.ts";
-import { pulledFor, scanGuidance } from "./pull.ts";
+import { pulledFor, type SessionMode, scanGuidance } from "./pull.ts";
 import type { Channel } from "./session.ts";
 
 /** THE SESSION'S OWN HAND. Not a spawned one, and the reader every walk uses
@@ -23,6 +23,7 @@ const DEFAULT_READER = "session";
 export interface ReadGateHost {
   laneRoot(rel?: string): string;
   machineRoot(): string;
+  mode(): SessionMode;
   persist(): void;
   notify(): void;
 }
@@ -274,7 +275,7 @@ export class ReadGate {
   entryRequirements(m: MachineDecl, t: StateDecl): string[] {
     const req = new Set<string>(t.entry?.read ?? []);
     if (!this.pullGateExempt(m, t)) {
-      for (const d of pulledFor(this.paths.machineRoot(), scanGuidance(this.paths.machineRoot()), m, t)) req.add(d.path);
+      for (const d of pulledFor(this.paths.machineRoot(), scanGuidance(this.paths.machineRoot()), m, t, this.paths.mode())) req.add(d.path);
     }
     for (const p of t.exit?.read ?? []) req.delete(p);
     return [...req];

@@ -90,7 +90,7 @@ import {
 } from "./iterations.ts";
 import { noteOf, readNode, withPass, writeNode } from "./notes.ts";
 import { pathKind, resolveInRoot, seDir } from "./paths.ts";
-import { type PulledDoc, pulledFor, scanGuidance } from "./pull.ts";
+import { type PulledDoc, pulledFor, type SessionMode, scanGuidance } from "./pull.ts";
 import { probesMissed, readingProbes } from "./readproof.ts";
 import { type Expedition, expClose, expFind, expList, expNew, itCloseShipped, readRecord } from "./records.ts";
 import { CHANGE_COLUMNS } from "./rigor-matrix.ts";
@@ -159,6 +159,7 @@ export interface GreenPass {
   corpus?: Map<string, ReturnType<typeof loadTrace>>;
   version?: Map<string, string>;
   done: Map<string, string[]>;
+  iterations: Map<MachineDecl, Iteration | undefined>;
   /** WHEN EACH CLAIM WAS SIGNED, collected once for the whole operation. One
    *  operation paints more than once, and reading every claim's signature per
    *  call put recordDone at 1117 ms over 200 nodes against a 1000 ms budget —
@@ -279,6 +280,7 @@ export class Session {
    *  number kept here leaks into every other record, and two sources that can
    *  disagree are worse than the one that is right. */
   private _hands: "solo" | "spawned" = "spawned";
+  private _sessionMode: SessionMode = "attended";
   /** ONE RELEASE, GRANTED BY THE PERSON. Under `state end` the engine holds
    *  every transition; a press spends one. It is permission, never a move —
    *  the agent's pull is still what walks (req-controls-never-advance-walk). */
@@ -483,6 +485,7 @@ export class Session {
   private readonly reads = new ReadGate({
     laneRoot: (rel?: string) => this.laneRoot(rel),
     machineRoot: () => this.machineRoot(),
+    mode: () => this._sessionMode,
     persist: () => this.persistSettings(),
     notify: () => this.notifyChange(),
   });
@@ -817,6 +820,10 @@ export class Session {
     this.persistSettings();
     this.notifyChange();
     return { emergency: on, was };
+  }
+
+  setSessionMode(mode: SessionMode): void {
+    this._sessionMode = mode;
   }
 
   setAutonomy(input: number | string): Record<string, unknown> {
@@ -1736,10 +1743,7 @@ export class Session {
     // see dsp-walk-machine.md#a-reopened-placeholder-is-walked-to-not-through
     if (decl?.submachine !== undefined) {
       const owner = this.declForPrefix(cut < 0 ? "" : target.slice(0, cut));
-      const it = owner === undefined ? undefined : this.declIteration(owner);
-      const owed =
-        owner !== undefined && it !== undefined && this.owesASignature(decl, it) && !new Set(this.claims.recordDone(owner)).has(decl.id);
-      if (owed) return target;
+      if (owner !== undefined && this.placeholderOwesItsOwnClaim(owner, decl)) return target;
     }
     return decl?.submachine !== undefined ? Session.qual(target, this.declForPrefix(target)?.initial ?? "start") : target;
   }
@@ -2844,6 +2848,45 @@ export class Session {
   /** What the sweep's outcome means to the caller: a wall further along the
    *  way is the same law as at the first hop, and an unmet condition arrives
    *  as read or fill — never as a rejection wearing a walk. */
+  private conditionUnmetResponse(
+    swept: Record<string, unknown>,
+    head: () => Record<string, unknown>,
+    extra: () => Record<string, unknown>,
+  ): Record<string, unknown> | undefined {
+    const ref = swept.refusal as { clause?: string } | undefined;
+    if (ref?.clause !== CLAUSES.CONDITION_UNMET) return undefined;
+
+    const servedNow = this.serveReading();
+    if (servedNow !== null) {
+      return {
+        pull: "read",
+        ...head(),
+        walked: swept.swept ?? [],
+        ...servedNow,
+        ...(swept.banners !== undefined ? { banners: swept.banners } : {}),
+        do: 'read the document, then pull again answering every probe in `prove` as form: {"read": "<the answers, in one string>"}',
+        ...extra(),
+      };
+    }
+    const formsNow = this.pullFormsOwed().filter((name) => !this.formsMet([name]));
+    if (formsNow.length === 0) return undefined;
+
+    return {
+      pull: "fill",
+      ...head(),
+      ...this.refusedBlock(formsNow),
+      walked: swept.swept ?? [],
+      for: swept.stopped_at,
+      forms: formsNow.map((name) => this.formForAgent(name)),
+      ...(swept.banners !== undefined ? { banners: swept.banners } : {}),
+      do: this.fillAdvice(
+        formsNow,
+        'fill every required section, then return it on the next pull as form: {"<section>": "<text>", "submit": true} — there is no submit verb, and a pull without the submit FLAG hands back this same form',
+      ),
+      ...extra(),
+    };
+  }
+
   private pullAfterSweep(
     swept: Record<string, unknown>,
     head: () => Record<string, unknown>,
@@ -2862,37 +2905,25 @@ export class Session {
         ...extra(),
       };
     }
-    if (ref?.clause === CLAUSES.CONDITION_UNMET) {
-      const servedNow = this.serveReading();
-      if (servedNow !== null) {
-        return {
-          pull: "read",
-          ...head(),
-          walked: swept.swept ?? [],
-          ...servedNow,
-          ...(swept.banners !== undefined ? { banners: swept.banners } : {}),
-          do: 'read the document, then pull again answering every probe in `prove` as form: {"read": "<the answers, in one string>"}',
-          ...extra(),
-        };
-      }
-      const formsNow = this.pullFormsOwed().filter((n) => !this.formsMet([n]));
-      if (formsNow.length > 0) {
-        return {
-          pull: "fill",
-          ...head(),
-          ...this.refusedBlock(formsNow),
-          walked: swept.swept ?? [],
-          for: swept.stopped_at,
-          forms: formsNow.map((n) => this.formForAgent(n)),
-          ...(swept.banners !== undefined ? { banners: swept.banners } : {}),
-          do: this.fillAdvice(
-            formsNow,
-            'fill every required section, then return it on the next pull as form: {"<section>": "<text>", "submit": true} — there is no submit verb, and a pull without the submit FLAG hands back this same form',
-          ),
-          ...extra(),
-        };
-      }
+    const conditionResponse = this.conditionUnmetResponse(swept, head, extra);
+    if (conditionResponse !== undefined) return conditionResponse;
+
+    const formsNow = this.pullFormsOwed();
+    if (formsNow.length > 0) {
+      return {
+        pull: "fill",
+        ...head(),
+        ...this.refusedBlock(formsNow),
+        walked: swept.swept ?? [],
+        forms: formsNow.map((name) => this.formForAgent(name)),
+        do: this.fillAdvice(
+          formsNow,
+          'fill every required section, then return it on the next pull as form: {"<section>": "<text>", "submit": true} — there is no submit verb, and a pull without the submit FLAG hands back this same form',
+        ),
+        ...extra(),
+      };
     }
+
     // A BRANCH POINT SHOWS ITS DOORS. `do` means the happy path was walked up
     // TO the next branch, and the walker then has to know what the branch is.
     //
@@ -3623,7 +3654,7 @@ export class Session {
    *  every time (no cache): an edited doc must show its fresh hash, or a
    *  stale check could pass forever. `checked` is the human's ledger. */
   pulled(m: MachineDecl, s: StateDecl): (PulledDoc & { checked: boolean })[] {
-    const out = pulledFor(this.machineRoot(), scanGuidance(this.machineRoot()), m, s).map((d) => {
+    const out = pulledFor(this.machineRoot(), scanGuidance(this.machineRoot()), m, s, this._sessionMode).map((d) => {
       const hash = d.hash !== "" ? d.hash : this.reads.diskHash(d.path);
       return { ...d, hash, checked: this.reads.humanChecked(d.path, hash) };
     });

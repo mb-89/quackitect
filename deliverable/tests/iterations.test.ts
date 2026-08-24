@@ -663,3 +663,25 @@ test("a fallback state rides beside the state it recovers", () => {
   assert.ok(Number.isFinite(at("fix").x), "a wantless node lands at the cursor, never at negative infinity");
   assert.ok(at("gate").y > at("verify").y, "the flow continues below");
 });
+
+test("a generated child view requires its owning iteration", () => {
+  const root = freshRoot();
+  gitInit(root, true);
+  const first = itSeed(root, "first child owner", "one generated child stays with its owner", ["e13"]);
+  const second = itSeed(root, "second child owner", "a matching child must not collide", ["e13"]);
+  pinIteration(root, first, "minor");
+  pinIteration(root, second, "minor");
+  const session = new Session(root);
+
+  assert.equal(session.viewFor("build-steps"), undefined, "a bare generated child cannot select an arbitrary open iteration");
+  for (const iteration of [first, second]) {
+    const address = `${iteration.id}/build-steps`;
+    const view = session.viewFor(address);
+    assert.equal(view?.decl.id, "build-steps", `${address} resolves its generated child`);
+    assert.deepEqual(
+      session.viewChain(address),
+      ["main", "iterations", iteration.id, "build-steps"],
+      `${address} keeps its owner in breadcrumbs`,
+    );
+  }
+});

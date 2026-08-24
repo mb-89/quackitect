@@ -67,3 +67,33 @@ describe("the pull instructs where a refusal would have thrown", { concurrency: 
     assert.deepEqual(s.active(), ["front_desk"]);
   });
 });
+
+test("a successful sweep returns the entered state's required form", () => {
+  const session = {
+    pullFormsOwed: () => ["entered-state"],
+    formsMet: () => false,
+    refusedBlock: () => ({}),
+    formForAgent: (name: string) => ({ form: name }),
+    fillAdvice: () => "fill the entered state",
+    conditionUnmetResponse: () => undefined,
+    pullOptions: () => [],
+    pullHere: () => [],
+    doAdvice: () => "continue",
+  };
+  const result = (
+    Session.prototype as unknown as {
+      pullAfterSweep: (
+        swept: Record<string, unknown>,
+        head: () => Record<string, unknown>,
+        extra: () => Record<string, unknown>,
+      ) => Record<string, unknown>;
+    }
+  ).pullAfterSweep.call(
+    session,
+    { swept: ["entered-state"], arrived: true },
+    () => ({}),
+    () => ({}),
+  );
+  assert.equal(result.pull, "fill");
+  assert.deepEqual(result.forms, [{ form: "entered-state" }]);
+});

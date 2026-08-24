@@ -245,6 +245,8 @@ async function lane(): Promise<void> {
       "--root",
       ROOT,
       "--headless",
+      "--session-mode",
+      "cloud",
       "--mirror-port",
       String(PORT),
       "--autonomy",

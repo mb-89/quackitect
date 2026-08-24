@@ -108,6 +108,9 @@ test("stop @ blockers only passes a REFUSED pull and blocks a working one", () =
   const d = JSON.parse(verdict([working], {})) as { decision: string; reason: string };
   assert.equal(d.decision, "block");
   assert.match(d.reason, /blockers only/);
+  const afterBlock = JSON.parse(verdict([refused, working], { stop_hook_active: true })) as { decision: string; reason: string };
+  assert.equal(afterBlock.decision, "block");
+  assert.match(afterBlock.reason, /blockers only/);
 });
 
 test("a wait WITH A TARGET blocks — an escape does not launder a stop", () => {

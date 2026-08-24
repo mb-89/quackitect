@@ -210,6 +210,15 @@ if (r.killed) {
       else partial.push(`  ${f} (${got.cases}${base !== undefined ? ` of ${base.cases}` : ""} cases, ${(got.ms / 1000).toFixed(1)}s)`);
     }
     process.stdout.write(`complete ${complete.length} of ${expectedFiles.length} files, by last-run case counts.\n`);
+    if (complete.length > 0)
+      process.stdout.write(
+        `completed before the kill:\n${complete
+          .map((f) => {
+            const got = seen.get(f)!;
+            return `  ${f} (${got.cases} cases, ${(got.ms / 1000).toFixed(1)}s)`;
+          })
+          .join("\n")}\n`,
+      );
     if (partial.length > 0) process.stdout.write(`MID-FLIGHT at the kill:\n${partial.join("\n")}\n`);
     if (untouched.length > 0) process.stdout.write(`never started:\n${untouched.map((f) => `  ${f}`).join("\n")}\n`);
     const over = complete.filter((f) => {
