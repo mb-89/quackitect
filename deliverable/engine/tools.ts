@@ -187,7 +187,7 @@ export function sessionTools(session: Session): ToolDef[] {
       name: "se_aim",
       title: "se.aim",
       description:
-        "AIM THE WALK at a state AND BE CARRIED THERE, in this one call. The machine draws the route and walks every hop whose conditions already pass, stopping only where something is genuinely owed — so a state that is already green is walked THROUGH, never landed on, and re-entering a long record costs ONE call rather than a pull per state. Name any state in the machine you stand in, or a fully qualified one like iterations/i1/write-requirements. GOING IS THE DEFAULT (owner ruling 2026-08-20): re-aiming one state at a time relitigates hops the machine would have walked through, and going is as safe as pulling — the sweep still refuses whatever the conditions and the dial refuse. The answer says whether it ARRIVED; stopped short, it stands whole on the state that owes something, never between two.",
+        "AIM THE WALK at a state AND BE CARRIED THERE, in this one call. The machine draws the route and walks every hop whose conditions already pass, stopping only where something is genuinely owed — so a state that is already green is walked THROUGH, never landed on, and re-entering a long record costs ONE call rather than a pull per state. Name any state in the machine you stand in, or a fully qualified one like iterations/i1/write-requirements. GOING IS THE DEFAULT (owner ruling 2026-08-20): re-aiming one state at a time relitigates hops the machine would have walked through, and going is as safe as pulling — the sweep still refuses whatever the conditions and the dial refuse. The answer says whether it ARRIVED; stopped short, it stands whole on the state that owes something, never between two. IT ALSO SAYS WHAT IT COST: `swept_ms` names each hop and its milliseconds, and `visited` says how many states the search looked at. Read those rather than timing the call yourself.",
       inputSchema: {
         type: "object",
         properties: {
@@ -201,6 +201,9 @@ export function sessionTools(session: Session): ToolDef[] {
         required: ["to"],
       },
       handler: async (args) => {
+        // A BARE AIM DRAWS AND DOES NOT WALK. The drawing answers whether the
+        // target is reachable; the sweep is what pointing must not pay for.
+        // see req-aiming-returns-before-the-walking-starts
         const aimed = session.setTarget(String(args.to));
         if (args.go === false) return aimed;
         // req-a-clear-jump-is-one-call: the caller named the target, and going

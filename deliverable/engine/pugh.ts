@@ -134,9 +134,29 @@ export function pughView(scoresMd: string, cutsMd: string, gradeOf: (id: string)
     const holes = axisIds.filter((a) => c.scores[a] === undefined);
     if (holes.length > 0) problems.push(`${c.id} is unscored on ${holes.join(", ")}`);
   }
-  // The first datum is the strongest rival: second by plain score sum over
-  // the live axes. The presumptive leader then has to beat it.
-  const total = (c: Scored): number => axisIds.reduce((t, a) => t + (c.scores[a] ?? 0), 0);
+  // The first datum is the strongest rival: second by score over the live axes.
+  // The presumptive leader then has to beat it.
+  //
+  // A HOLE IS NOT A ZERO, and it used to be. Summing `?? 0` over every live axis
+  // charged a candidate for each axis nobody had scored, so honest silence read
+  // as worst in class and could push a real contender out of the datum seat over
+  // words nobody ever put on the page.
+  //
+  // A MEAN OVER SCORED AXES IS THE OPPOSITE BUG, and a reviewer caught it before
+  // it stood: a candidate scored on ONE axis at 5 beats one scored on five axes
+  // at 4 each. That rewards silence rather than punishing it, which is no better.
+  //
+  // SO THE COMPARISON RUNS ON THE AXES EVERY CANDIDATE HAS SCORED. Nobody is
+  // charged for a hole and nobody profits from one, because the axes where holes
+  // live are not in the comparison at all. Everyone is measured on the same
+  // basis, which is the only way a sum across candidates means anything.
+  //
+  // WITH NO COMMON AXIS there is no honest ranking, so the order falls to the id
+  // and `problems` above already names every unscored pair. An invented number
+  // would read exactly like a measured one.
+  // see wt-a-score-cell-with-no-evidence-behind-it-may-say-so-in-words-
+  const common = axisIds.filter((a) => candidates.every((c) => c.scores[a] !== undefined));
+  const total = (c: Scored): number => common.reduce((t, a) => t + (c.scores[a] as number), 0);
   const byTotal = [...candidates].sort((x, y) => total(y) - total(x) || x.id.localeCompare(y.id));
   let datum = byTotal[1];
   const runs: PughRun[] = [];

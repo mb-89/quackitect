@@ -1130,7 +1130,19 @@ var Controls = class {
           return;
         }
       }
-      if (rung.classList.contains("locked")) return;
+      // A LOCKED RUNG SAYS WHY IT DECLINED. This returned in silence, and a
+      // control that declines without a word cannot be told from a broken one.
+      // It has been reported as a broken button three times: the emergency
+      // rung, the shutdown row, and the stop-at notches.
+      //
+      // THE RUNG ALREADY KNOWS THE REASON. rungWhy() puts it on the title,
+      // covering both cases: unlock the one below first, or the control was
+      // never told where it stands. Opening that help is the smallest honest
+      // answer to a press, and it uses a channel that already exists.
+      if (rung.classList.contains("locked")) {
+        vsapi.postMessage({ se: "scale-help", which: bank, level: Number(rung.dataset.rung) });
+        return;
+      }
       const level = Number(rung.dataset.level);
       pending[bank] = level;
       paintRungs(bank, level);

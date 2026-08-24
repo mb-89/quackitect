@@ -14,7 +14,19 @@ import { join } from "node:path";
 
 /** One line in the lifecycle log. The layer word is what a later reader
  *  matches on, so it is a closed set rather than free prose. */
-export type LifecycleEvent = "start" | "exit" | "client-reset" | "client-error" | "listening" | "stop-block" | "reaped";
+export type LifecycleEvent =
+  | "start"
+  | "exit"
+  | "client-reset"
+  | "client-error"
+  | "listening"
+  // THE STOP HOOK'S THREE OUTCOMES, and it needs all three. `stop-block` alone
+  // meant a permitted stop and a hook that broke on the way to deciding looked
+  // identical from outside — both simply left no line.
+  | "stop-block"
+  | "stop-pass"
+  | "stop-error"
+  | "reaped";
 
 /** Append one lifecycle line. Never throws: a postmortem that cannot be
  *  written must not become the cause of death. */

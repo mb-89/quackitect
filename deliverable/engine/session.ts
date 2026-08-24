@@ -11,6 +11,7 @@
 // the next refused call's remedy re-boots the agent in one turn.
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
+import { benchmarkNoteHops } from "./benchmark.ts";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { contentHash } from "./hash.ts";
 import {
@@ -24,7 +25,15 @@ import {
   reopenStates,
   type StateDecl,
 } from "./machine.ts";
-import { bumpDrawingEpoch, compileMachine, compileMachineCached, resolveRef } from "./machines/compile.ts";
+import {
+  bumpDrawingEpoch,
+  compileMachine,
+  compileMachineCached,
+  drawingChangedUnderUs,
+  holdDrawing,
+  releaseDrawing,
+  resolveRef,
+} from "./machines/compile.ts";
 import { computeRoute, type RouteNode, type RouteResult, type RouteStep, routeWraps } from "./route.ts";
 
 /** HOW LONG A CALL WAITS FOR A STEP'S LEAVING JUDGMENT before answering. It is
@@ -65,6 +74,7 @@ import {
   type FormLint,
   type FormTemplate,
   formTemplatePath,
+  judgmentOf,
   lintForm,
   parseFormTemplate,
   reopenedAfterSigning,
@@ -105,6 +115,16 @@ import { Views } from "./sessionviews.ts";
 import { difficultyOf, publish } from "./sizing.ts";
 import { NARRATION_DEFAULT_CALLS, NARRATION_DEFAULT_MINUTES } from "./toll.ts";
 import type { loadTrace } from "./trace.ts";
+
+/** PHASE TIMING FOR ONE HOP, off unless asked for.
+ *
+ *  A HOP COSTS SECONDS AND EVERY PIECE OF IT MEASURED IN MILLISECONDS, which is
+ *  the shape of a cost nobody has found yet. Guessing at it is what this round
+ *  already had to revert once, so the hop reports its own phases instead.
+ *
+ *  OFF BY DEFAULT because it writes a line per phase per hop. Set `SE_HOP_TRACE`
+ *  to turn it on for one run. */
+const HOP_TRACE = process.env.SE_HOP_TRACE !== undefined;
 
 /** Legal in every state. see dsp-lane-door.md#always-legal-whatever-the-state */
 export interface AmendOp {
@@ -466,18 +486,35 @@ export class Session {
    *  Not private because a private member cannot satisfy a structural
    *  interface, and Scripts reads this through its host.
    *  see dsp-the-work-account.md#interface */
-  recordVerdict(m: MachineDecl, s: StateDecl, ok: boolean): void {
+  recordVerdict(m: MachineDecl, s: StateDecl, ok: boolean, stamp = ""): void {
     const { instanceAbs } = this.claims.stateFormHome(s.id, m);
     // THROUGH THE DOOR, both ways. An evidence form is a node like any other,
     // and a read that walks around the door is a read nothing else can share.
     const raw = readNode(instanceAbs);
     if (raw === "") return;
-    const next = withJudgment(raw, ok ? "passed" : "not passed", new Date().toISOString());
+    const next = withJudgment(raw, ok ? "passed" : "not passed", new Date().toISOString(), stamp);
     // A JUDGMENT THAT KEEPS AGREEING WITH ITSELF NEVER REWRITES THE FILE. Most
     // pulls re-reach the same verdict, and a write per pull would dirty the
     // tree for nothing.
     if (next === raw) return;
     writeNode(instanceAbs, next);
+  }
+
+  /** THE VERDICT ON DISK, and what it was reached with.
+   *
+   *  THE EVIDENCE MAP IS MEMORY AND DIES WITH THE PROCESS, so a session that
+   *  re-enters a record holds no verdict for any step and re-runs every judgment
+   *  it walks over. This is the half that survives.
+   *  see dsp-the-walk-knows-what-its-own-hops-cost.md#a-green-state-walked-over-keeps-its-verdict */
+  standingJudgment(m: MachineDecl, s: StateDecl): { verdict: string; stamp: string } | undefined {
+    try {
+      const { instanceAbs } = this.claims.stateFormHome(s.id, m);
+      const raw = readNode(instanceAbs);
+      return raw === "" ? undefined : judgmentOf(raw);
+    } catch {
+      // A form nobody can read is not a verdict, so the script runs.
+      return undefined;
+    }
   }
 
   private readonly reads = new ReadGate({
@@ -1683,6 +1720,10 @@ export class Session {
       this.aimAt("");
       return { ...this.route(this.active()[0] ?? this.machine.initial), target: this._target };
     }
+    // EVERY AIM DRAWS, and the drawing is what answers whether the target can
+    // be reached at all. A form that skipped it saved a search this graph does
+    // not feel, and gave up that answer.
+    // see dsp-the-walk-knows-what-its-own-hops-cost.md#the-bare-aim
     const r = this.route(wanted);
     if (!r.found && wanted !== this.active()[0]) {
       // THE SHORT NAME IS THE NAME. Try it against what is actually reachable
@@ -1872,6 +1913,10 @@ export class Session {
           tick: { from: localFrom, back_to: branch },
           priority: 0,
           demands: {},
+          // NOTHING IS DRAWN FOR THIS HOP. The branch is read straight off the
+          // declaration, so zero is the truth rather than a placeholder. The
+          // hops after it carry their own.
+          ms: 0,
         },
         ...onward.steps,
       ],
@@ -2201,8 +2246,32 @@ export class Session {
    *  ground moved, the way is worked out again FROM WHERE THE WALK NOW
    *  STANDS rather than followed off a cliff. */
   async sweep(target: string, channel: Channel, budgetMs: number = Session.SWEEP_BUDGET_MS): Promise<Record<string, unknown>> {
+    // A SWEEP IS ONE CALL, however many hops it walks. Holding here is what
+    // turns thirty validations into one — every hop inside re-uses the drawing
+    // this call already verified.
+    // see dsp-method-compilation.md#one-validation-per-call
+    bumpDrawingEpoch();
+    holdDrawing();
+    try {
+      return await this.sweptHeld(target, channel, budgetMs);
+    } finally {
+      releaseDrawing();
+      if (drawingChangedUnderUs().length > 0) bumpDrawingEpoch();
+    }
+  }
+
+  private async sweptHeld(target: string, channel: Channel, budgetMs: number): Promise<Record<string, unknown>> {
     const started = Date.now();
     const walked: string[] = [];
+    // WHAT EACH HOP COST TO WALK, which is a different figure from what it cost
+    // to DRAW and is the one that matters.
+    //
+    // MEASURED, and this is why it exists: drawing a hop costs about 8 ms, and
+    // WALKING one costs about 5,400. Three hops of boot took 16,179 ms while
+    // their drawing took under 30. A per-hop figure that timed only the drawing
+    // pointed at a thousandth of the cost and read like an instrument.
+    // see dsp-the-walk-knows-what-its-own-hops-cost.md#the-walking-is-the-cost
+    const spent: { to: string; ms: number }[] = [];
     // A BANNER EARNED MID-SWEEP MUST SURVIVE THE SWEEP. advance hands
     // its banner back per hop, and a sweep that swallowed it lost the boot
     // banner every time — the harness rule says show banners verbatim, and
@@ -2223,6 +2292,7 @@ export class Session {
         return {
           ...this.packet(),
           swept: walked,
+          ...this.sweptMs(spent),
           arrived: false,
           ...carry(),
           note: `swept ${walked.length} hop(s) and stopped ON A STATE at the ${budgetMs} ms budget rather than being cut off mid-hop — sweep again and the route recomputes from here`,
@@ -2230,9 +2300,17 @@ export class Session {
       }
       const r = this.route(target);
       if (r.steps.length === 0) {
-        return { ...this.packet(), swept: walked, arrived: r.found, ...carry(), ...(r.found ? {} : { note: r.note }) };
+        return {
+          ...this.packet(),
+          swept: walked,
+          ...this.sweptMs(spent),
+          arrived: r.found,
+          ...carry(),
+          ...(r.found ? {} : { note: r.note }),
+        };
       }
       const step = r.steps[0];
+      const hopBegan = performance.now();
       try {
         // A BACK HOP IS NOT AN EDGE, so advance cannot walk it. It un-picks a
         // leg the fan handed out and puts the walk on the branching point
@@ -2240,27 +2318,35 @@ export class Session {
         if (typeof step.tick.back_to === "string") {
           this.stepBackTo(String(step.tick.back_to));
           walked.push(step.to);
+          spent.push({ to: step.to, ms: performance.now() - hopBegan });
           continue;
         }
-        const one = await this.advance(step.tick.to === undefined ? undefined : String(step.tick.to), channel);
+        // MORE STEPS AFTER THIS ONE MEANS THIS ONE IS NOT WHERE THE WALK LANDS,
+        // so its reading is not owed. The last step of the route is the landing
+        // and owes its reading in full.
+        // SAVED AND RESTORED, never cleared to false. Clearing it would let an
+        // inner sweep un-skip an outer sweep's reads on the way out, and the
+        // mirror shares this session, so a second sweep is not hypothetical.
+        const wasWalkingOver = this.walkingOver;
+        this.walkingOver = r.steps.length > 1;
+        let one: Record<string, unknown>;
+        try {
+          one = await this.advance(step.tick.to === undefined ? undefined : String(step.tick.to), channel);
+        } finally {
+          this.walkingOver = wasWalkingOver;
+        }
         if (typeof one.banner === "string") banners.push(one.banner);
       } catch (e) {
         if (!(e instanceof Rejection)) throw e;
-        return {
-          ...this.packet(),
-          swept: walked,
-          arrived: false,
-          stopped_at: step.to,
-          refusal: e.toJSON(),
-          ...carry(),
-          note: `swept ${walked.length} hop(s), then ${step.to} refused — answer it and sweep again; the route recomputes from here`,
-        };
+        return { ...this.sweepRefused(walked, spent, step.to, e), ...carry() };
       }
       walked.push(step.to);
+      spent.push({ to: step.to, ms: performance.now() - hopBegan });
     }
     return {
       ...this.packet(),
       swept: walked,
+      ...this.sweptMs(spent),
       arrived: false,
       ...carry(),
       note: "64 hops without arriving — the sweep stops rather than looping",
@@ -2431,9 +2517,24 @@ export class Session {
     payload: { form?: Record<string, unknown>; escape?: string } = {},
     channel: Channel = "agent",
   ): Promise<Record<string, unknown>> {
-    // ONE DRAWING VALIDATION PER WALK STEP — the epoch makes "the next
-    // call" the unit of the read-it-live law (see machines/compile.ts).
+    // ONE DRAWING VALIDATION PER CALL, and this is the call. Everything below
+    // works from the warm model; the after-check at the bottom says whether it
+    // was still valid when the call ended.
+    // see dsp-method-compilation.md#one-validation-per-call
     bumpDrawingEpoch();
+    holdDrawing();
+    try {
+      return await this.pullHeld(payload, channel);
+    } finally {
+      // AN EDIT DURING THE CALL IS CAUGHT HERE, not guarded against by throwing
+      // the model away thousands of times. Where something did move, the next
+      // call re-reads it, which is what the bump is for.
+      releaseDrawing();
+      if (drawingChangedUnderUs().length > 0) bumpDrawingEpoch();
+    }
+  }
+
+  private async pullHeld(payload: { form?: Record<string, unknown>; escape?: string }, channel: Channel): Promise<Record<string, unknown>> {
     this.claims.driftReopen();
     // see dsp-walk-machine.md#the-aim-is-read-after-the-payload-lands
     const choiceHere = (): boolean => {
@@ -2457,6 +2558,12 @@ export class Session {
       // The tier word IS the autonomy. No number rides any answer
       //.
       ...this.tierFor(this._autonomy),
+      // THE NOTCH RIDES EVERY PULL, and it has to: the stop hook's only ground
+      // truth is the call log, so a setting the packet does not carry is a
+      // setting the hook cannot obey. head() is the home because every pull
+      // shape spreads it.
+      // see dsp-boot-and-power.md#the-notch-decides
+      stop_at: this.stopAtName(),
       narration: { minutes: this._narrationMinutes, calls: this._narrationCalls },
       ...this.strengthNeeded(),
     });
@@ -3787,6 +3894,87 @@ export class Session {
     return this.conditionMet(m, s, "leave") ? "passed" : "not passed";
   }
 
+  /** The hop timings, on their way out AND into the bound benchmark run.
+   *
+   *  ONE PLACE, because every one of the sweep's four exits carries them and a
+   *  second caller would be a second chance to forget.
+   *
+   *  THE NOTE IS A NO-OP WHEN NO RUN IS BOUND, which is every ordinary walk.
+   *  see req-a-hop-of-the-walk-carries-its-own-time-budget */
+  private sweptMs(spent: { to: string; ms: number }[]): Record<string, unknown> {
+    benchmarkNoteHops(this.machineRoot(), spent);
+    return { swept_ms: spent };
+  }
+
+  /** The sweep's answer when a hop would not go through.
+   *
+   *  STILL DECIDING IS NOT REFUSED. The state being left may have a judgment in
+   *  flight, and then nothing is wrong and nothing needs redrawing — the answer
+   *  simply has not arrived. Saying so is what stops a caller treating this as a
+   *  dead end and paying for a fresh route on the request path.
+   *  see raid-debt-the-route-drawer-reads-a-standing-as-a-boolean
+   *
+   *  SPLIT OUT OF sweep() because the decision pushed it over the complexity
+   *  ceiling, and the fix for that is naming a phase rather than suppressing it. */
+  private sweepRefused(walked: string[], spent: { to: string; ms: number }[], stoppedAt: string, e: Rejection): Record<string, unknown> {
+    const standing = this.leavingStanding();
+    return {
+      ...this.packet(),
+      swept: walked,
+      // The refused hop is NOT in here. It did not complete, so timing it would
+      // put the cost of a refusal beside the cost of a walk.
+      ...this.sweptMs(spent),
+      arrived: false,
+      stopped_at: stoppedAt,
+      ...(standing === "deciding" ? { deciding: true } : {}),
+      refusal: e.toJSON(),
+      note:
+        standing === "deciding"
+          ? `swept ${walked.length} hop(s) and stopped because the state being left is STILL DECIDING — nothing is owed and nothing is wrong; its judgment has not landed yet, so sweep again rather than redrawing`
+          : `swept ${walked.length} hop(s), then ${stoppedAt} refused — answer it and sweep again; the route recomputes from here`,
+    };
+  }
+
+  /** THE ROUTE DRAWER'S OWN QUESTION about the state it is trying to leave.
+   *
+   *  IT ASKED A BOOLEAN AND GOT TWO ANSWERS FOR THREE CASES. `conditionMet`
+   *  returns true or false, so a step whose leaving judgment is still being
+   *  reached reads as FAILED. The route is then abandoned and redrawn on the
+   *  next pull, and the redraw is paid on the request path while somebody waits.
+   *
+   *  THE SHARED BOOLEAN IS LEFT ALONE, deliberately. It has many callers and only
+   *  this one wants the third word; widening it would touch every one of them.
+   *  see raid-debt-the-route-drawer-reads-a-standing-as-a-boolean
+   *
+   *  WHAT IT IS WORTH, from that entry's own count: a route-failing pull ran past
+   *  thirty seconds 36 per cent of the time, against 2 per cent for every other
+   *  pull, and the surface shares the loop. */
+  leavingStanding(): "passed" | "not passed" | "deciding" {
+    const here = this.active()[0];
+    // A LOOKUP FAILURE IS NOT A VERDICT, and these two exits say `not passed`
+    // anyway. A reviewer called that the same collapse this function exists to
+    // undo, and the objection is right in general.
+    //
+    // IT IS SAFE HERE BECAUSE OF WHAT THE CALLER ASKS. The only reader tests for
+    // `deciding`, so anything else means "do not claim nothing is owed" — which
+    // is the direction that errs toward telling somebody to look, and the same
+    // direction the debt itself calls the safe one.
+    if (here === undefined) return "not passed";
+    const { machine } = this.leaves();
+    const bare = here.slice(here.lastIndexOf("/") + 1);
+    const decl = machine.states.find((s) => s.id === bare);
+    if (decl === undefined) return "not passed";
+    return this.stepStanding(machine, decl);
+  }
+
+  /** TRUE ONLY WHILE A SWEEP IS WALKING OVER A HOP IT WILL NOT LAND ON.
+   *
+   *  IT IS A PROPERTY OF THE ACT, never a mode. The sweep sets it around one hop
+   *  and clears it in a `finally`, so a throw cannot leave it standing. Anything
+   *  outside a sweep reads it false, which is what a test gets and what is right.
+   *  see dsp-the-walk-knows-what-its-own-hops-cost.md#walking-over-is-not-entering */
+  private walkingOver = false;
+
   private async assertConditions(
     m: MachineDecl,
     from: StateDecl,
@@ -3801,17 +3989,31 @@ export class Session {
     // for at most the bound a person or an agent is promised, and the verdict
     // lands against the step on a later call.
     // see dsp-the-work-account.md#responsibility
-    if (from.exit?.script !== undefined && !escaping) await this.scripts.scriptSettleWithin(from.id, JUDGMENT_HANDBACK_MS);
+    if (from.exit?.script !== undefined && !escaping) {
+      await this.scripts.scriptSettleWithin(from.id, JUDGMENT_HANDBACK_MS, this.walkingOver);
+    }
     for (const [key, args] of Object.entries(from.exit ?? {})) {
       if (key === "read" || key === "read_consume") continue; // channel-proven below, not evidence
       if (escaping) continue;
       if (!this.conditionKeyMet(m, from, key, "leave")) this.refuseCondition(m, from, "exit", key, args);
     }
     const targetId = to ?? (from.edges.length === 1 ? from.edges[0].to : undefined);
-    this.reads.assertReads(m, from, targetId === undefined ? [] : [targetId], channel, supplied);
+    // A HOP BEING WALKED OVER DOES NOT OWE ITS READING. Only a state the walk
+    // LANDS on is worked, and only worked states need their material.
+    // see dsp-the-walk-knows-what-its-own-hops-cost.md#walking-over-is-not-entering
+    if (!this.walkingOver) {
+      this.reads.assertReads(m, from, targetId === undefined ? [] : [targetId], channel, supplied);
+    }
     // Leaving through the main machine's end is where the next handover is
     // owed. Sub-machines have their own end and owe nothing.
-    if (targetId === undefined) return;
+    if (targetId !== undefined) this.assertEntryConditions(m, targetId);
+  }
+
+  /** The arriving state's own entry conditions, minus the reading.
+   *
+   *  THE READ KEYS ARE SKIPPED HERE because reading is proven on a channel rather
+   *  than held as evidence, and its own demand runs above. */
+  private assertEntryConditions(m: MachineDecl, targetId: string): void {
     const target = m.states.find((s) => s.id === targetId);
     if (target === undefined) return;
     for (const [key, args] of Object.entries(target.entry ?? {})) {
@@ -3886,9 +4088,9 @@ export class Session {
       status: this.instance.status,
       // see dsp-walk-machine.md#the-tier-is-the-answer
       tier: tierOf(loadLevels(this.machineRoot()), this._autonomy),
-      // THE NOTCH RIDES EVERY PULL, and it has to: the stop hook's only ground
-      // truth is the call log, so a setting the packet does not carry is a
-      // setting the hook cannot obey.
+      // The mirror's copy, for the surface to render the notch it is on. The
+      // HOOK's copy is the one in pull()'s head() — this packet never reaches
+      // it, and a comment here once claimed otherwise.
       stop_at: this.stopAtName(),
       // The server's clock, so no hand ever shells for the time (note-8acddaec).
       now: new Date().toISOString(),
@@ -4091,14 +4293,24 @@ export class Session {
       if (this.bootEntered) this.reads.clearReadBuffer();
       this.bootEntered = true;
     }
+    const began = HOP_TRACE ? performance.now() : 0;
+    const at = (phase: string): void => {
+      if (HOP_TRACE) process.stderr.write(`[main] ${phase.padEnd(21)} ${Math.round(performance.now() - began)} ms\n`);
+    };
     if (target !== undefined) this.gatePriority(this.machine, [target], channel);
+    at("gatePriority");
     await this.assertConditions(this.machine, this.state(this.machine, cur), to, channel, supplied);
+    at("assertConditions");
     const outcome = this.outcomeFor(this.machine, cur, to);
     this.completeGuarded(this.machine, this.instance, cur, outcome, now, to);
+    at("completeGuarded");
     this.reads.consumeDocs(this.state(this.machine, cur));
     this.instance.history.push({ state: cur, outcome, at: now });
     this.seedSubs();
-    return this.landing();
+    at("seedSubs");
+    const landed = this.landing();
+    at("landing");
+    return landed;
   }
 
   /** THE ENGINE'S OWN STEP — complete the current state and move on.
@@ -4108,9 +4320,27 @@ export class Session {
    *  and se_file_read fill the buffer); the human proves via checkboxes.
    *  Reached through the pull and the mirror — never a tool of its own. */
   async advance(to?: string, channel: Channel = "human"): Promise<Record<string, unknown>> {
+    // ONE VALIDATION PER CALL, AND A HOP IS NOT A CALL. The bump is a no-op
+    // while anything holds, so a sweep of thirty hops validates once rather
+    // than thirty times.
+    // see dsp-method-compilation.md#one-validation-per-call
     bumpDrawingEpoch();
+    holdDrawing();
+    try {
+      return await this.advanceHeld(to, channel);
+    } finally {
+      releaseDrawing();
+    }
+  }
+
+  private async advanceHeld(to: string | undefined, channel: Channel): Promise<Record<string, unknown>> {
+    const hopBegan = HOP_TRACE ? performance.now() : 0;
+    const mark = (phase: string): void => {
+      if (HOP_TRACE) process.stderr.write(`[hop] ${phase.padEnd(22)} ${Math.round(performance.now() - hopBegan)} ms\n`);
+    };
     const now = new Date().toISOString();
     const supplied = this.reads.readProofs(channel);
+    mark("readProofs");
     if (this.instance.status === "closed") {
       throw new Rejection({
         clause: CLAUSES.NOT_LEGAL_IN_STATE,
@@ -4125,16 +4355,23 @@ export class Session {
     // one visible step.
     const depthBefore = this.subs.length;
     this.seedSubs();
+    mark("seedSubs");
     if (this.subs.length > depthBefore) {
       this.notifyChange();
-      return this.packet();
+      const healed = this.packet();
+      mark("healed packet");
+      return healed;
     }
     // ONE VISIBLE STEP PER TICK: you are only
     // ever in one state, and a tick moves exactly one position — including
     // the mechanical start/end positions of a sub-machine.
-    if (!this.inSub()) return this.advanceMain(to, channel, supplied, now);
-    if (this.top()!.instance.status !== "open") return this.advanceOutOfSub(channel, supplied, now);
-    return this.advanceInSub(to, channel, supplied, now);
+    const stepped = !this.inSub()
+      ? await this.advanceMain(to, channel, supplied, now)
+      : this.top()!.instance.status !== "open"
+        ? await this.advanceOutOfSub(channel, supplied, now)
+        : await this.advanceInSub(to, channel, supplied, now);
+    mark("the whole hop");
+    return stepped;
   }
 
   /** The agent's "click on a state": full information about any state of
@@ -4201,7 +4438,12 @@ export class Session {
   }
 
   private landing(): Record<string, unknown> {
+    const lit = HOP_TRACE ? performance.now() : 0;
+    const on = (phase: string): void => {
+      if (HOP_TRACE) process.stderr.write(`[land] ${phase.padEnd(21)} ${Math.round(performance.now() - lit)} ms\n`);
+    };
     this.notifyChange(); // every landing is a change a holding hand should see
+    on("notifyChange");
     if (this.instance.status === "closed" && !this.closedFired) {
       this.closedFired = true;
       // Shutdown control at END: the keep-awake dies with the session; at

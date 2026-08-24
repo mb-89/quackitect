@@ -14,6 +14,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
+import { freshRoot } from "./helpers.ts";
 
 const HOOK = fileURLToPath(new URL("../engine/bin/se-hook-stop.ts", import.meta.url));
 
@@ -213,4 +214,44 @@ test("a truncated wait WITH a target still blocks", () => {
   const d = JSON.parse(out) as { decision: string; reason: string };
   assert.equal(d.decision, "block");
   assert.match(d.reason, /A target is set/);
+});
+
+// THE SEAM THIS FILE COULD NOT SEE, measured 2026-08-24.
+//
+// EVERY TEST ABOVE HANDS THE HOOK A PULL RESPONSE WRITTEN BY HAND. That proves
+// the hook reads what it is given. It proves nothing about what the engine
+// actually gives it, and the two drifted apart for four days.
+//
+// WHAT DRIFTED. Commit c318aeda stamped the notch onto packet(), which serves
+// the mirror. The hook reads PULLS. Measured across the live call log: 338 of
+// 338 pulls carried no stop_at at all. So the hook's notch always read empty,
+// `state end`, `bless` and `blockers only` were unreachable branches, and the
+// person's stop-at control changed nothing about when the agent handed back.
+//
+// A GREEN SUITE THE WHOLE TIME. Both halves were correct in isolation.
+//
+// SO THIS TEST JOINS THEM: a real session produces a real pull, and that exact
+// object is what the hook is fed.
+
+test("a REAL pull carries the notch, and the hook obeys it end to end", async () => {
+  const { Session } = await import("../engine/session.ts");
+  const s = new Session(freshRoot());
+
+  // THE CONTROL THE PERSON PRESSES, set by name the way the surface sets it.
+  const set = s.setStopAt("blockers only") as { stop_at?: string };
+  assert.equal(set.stop_at, "blockers only", "the notch is settable by name");
+
+  const packet = (await s.pull()) as Record<string, unknown>;
+
+  // THE ASSERTION THAT WAS MISSING, and the only one here that is new in kind:
+  // it reads the PRODUCER's own output rather than a fixture.
+  assert.equal(packet.stop_at, "blockers only", "a pull must carry the notch — the call log is the hook's only ground truth");
+
+  // Fed that real packet, the hook honours the notch. `blockers only` waits for
+  // a refused pull and nothing else, so a refused newest pull passes.
+  const refused = { ...pullRecord(packet), ok: false };
+  assert.equal(verdict([pullRecord(packet), refused], {}), "", "under `blockers only` a refused pull is the blocker the notch waits for");
+
+  // And with nothing refused the walk can still go on, so the stop is refused.
+  assert.notEqual(verdict([pullRecord(packet)], {}), "", "under `blockers only` an unrefused pull is not a blocker");
 });

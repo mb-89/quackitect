@@ -60,7 +60,7 @@ import {
 } from "./forms.ts";
 import { pendingNotes } from "./inbox.ts";
 import { type Iteration, iterationDrift, itList, itShortId, pinIsStale, pinIsUnset, repinColumn } from "./iterations.ts";
-import { parseStateNote, readNode, section, writeNode } from "./notes.ts";
+import { noteOf as heldNote, parseStateNote, passEpoch, readNode, readNodeIfPresent, section, writeNode } from "./notes.ts";
 import { seDir } from "./paths.ts";
 import { scanGuidance } from "./pull.ts";
 import { levelName, loadLevels } from "./scale.ts";
@@ -84,6 +84,17 @@ import { corpusVersion, loadTrace, noteOf, traceDir } from "./trace.ts";
 /** What the claims need of the walk: where things live, where it stands, and
  *  the one call that tells a held mirror something moved. Session satisfies
  *  it structurally. */
+
+/** IS THIS FRONTMATTER SIGNED. One expression, because two callers ask it: the
+ *  whole state form, and the cheap signature read the route's input check uses.
+ *
+ *  A PRESENT-BUT-EMPTY `signed_off` IS UNSIGNED. Reading the key's mere presence
+ *  as a stamp is the same defect as withSignedOff's, mirrored. */
+function isSignedOff(fm: Record<string, unknown>): boolean {
+  const s = fm.signed_off;
+  return typeof s === "string" && s.trim() !== "";
+}
+
 export type ClaimsHost = Pick<
   Session,
   | "machineRoot"
@@ -368,10 +379,67 @@ export class Claims {
     }
   }
 
+  /** ONE STATE FORM, BUILT ONCE PER PASS. The answer is a pure function of the
+   *  instance text, the template, the guidance and the trace corpus, and a pass
+   *  is synchronous, so none of the four can move inside one.
+   *
+   *  WHY IT IS WORTH A CACHE. Drawing a route asks `feedersUnsigned` for every
+   *  state on the way and every state feeding one, and the leaving check asks
+   *  again. Measured on a three-hop sweep: 1,034 ms of 6,113 ms was this method,
+   *  answering the same question about the same file hundreds of times.
+   *
+   *  THE KEY IS THE TEXT, not just the pass. A pass writes generated containers
+   *  while it walks, so a form written mid-pass must not be served from before
+   *  the write. The door forgets a file it wrote, so the text comes back changed
+   *  and the entry misses by itself.
+   *  see dsp-the-walk-knows-what-its-own-hops-cost.md#a-state-form-is-built-once-per-pass */
+  private static readonly FORMS = new Map<string, { pass: number; raw: string | undefined; value: Record<string, unknown> }>();
+
+  /** IS THIS STATE'S FORM SIGNED, and nothing else. The same answer
+   *  `stateFormGet` puts on its `signed` key, reached without building the rest
+   *  of the form.
+   *
+   *  WHY IT IS SEPARATE. Drawing a route asks this about every state on the way
+   *  and every state feeding one, and the whole form is a template, a lint, a
+   *  bound view, a problems list and an owed list. Measured on a three-hop
+   *  sweep: 914 ms of 5,772 ms went to building forms nobody read a second
+   *  field of.
+   *
+   *  THE DOOR PARSES THE NOTE ONCE and holds it, so a repeat ask inside a pass
+   *  costs a map lookup.
+   *  see dsp-the-walk-knows-what-its-own-hops-cost.md#a-signature-is-read-without-building-the-form */
+  stateSigned(name: string, m: MachineDecl): boolean {
+    let abs: string;
+    try {
+      abs = this.stateFormHome(name, m).instanceAbs;
+    } catch {
+      return false;
+    }
+    return isSignedOff(heldNote(abs)?.frontmatter ?? {});
+  }
+
   stateFormGet(name: string, m: MachineDecl = this.machineHolding(name)): Record<string, unknown> {
     const s = this.stateFormState(name, m);
     const h = this.stateFormHome(name, m);
-    const raw = existsSync(h.instanceAbs) ? readFileSync(h.instanceAbs, "utf8") : undefined;
+    const raw = readNodeIfPresent(h.instanceAbs);
+    const pass = passEpoch();
+    const memoKey = `${m.id}::${name}::${h.instanceAbs}`;
+    if (pass !== 0) {
+      const hit = Claims.FORMS.get(memoKey);
+      if (hit !== undefined && hit.pass === pass && hit.raw === raw) return hit.value;
+    }
+    const value = this.stateFormBuild(name, m, s, h, raw);
+    if (pass !== 0) Claims.FORMS.set(memoKey, { pass, raw, value });
+    return value;
+  }
+
+  private stateFormBuild(
+    name: string,
+    m: MachineDecl,
+    s: StateDecl,
+    h: { instanceAbs: string; instanceRel: string },
+    raw: string | undefined,
+  ): Record<string, unknown> {
     const model = stateFormModel(
       this.host.machineRoot(),
       scanGuidance(this.host.machineRoot()),
@@ -432,9 +500,10 @@ export class Claims {
       checked: stateFormChecked(raw),
       active: this.stateFormActive(name, m),
       gate: s.kind === "gate",
-      // A present-but-EMPTY signed_off is unsigned. Reading the key's mere
-      // presence as a stamp is the same defect as withSignedOff's, mirrored.
-      signed: typeof fmData.signed_off === "string" && fmData.signed_off.trim() !== "",
+      // ONE EXPRESSION, TWO CALLERS. `stateSigned` answers the same question
+      // without building the rest of this form, and two copies of the rule
+      // would drift the day either is edited.
+      signed: isSignedOff(fmData),
       // THE SIGNATURE SURVIVES A REOPEN, so the two are reported apart. The
       // page still shows who signed and when; `reopened_after` is what makes
       // the form owed again and the state grey.
@@ -506,7 +575,10 @@ export class Claims {
     for (const s of decl.states) {
       if (!claimful.has(s.id)) continue;
       const abs = this.evidenceAbs(it, s.id);
-      if (!existsSync(abs)) continue;
+      // NO existsSync AHEAD OF THE DOOR. The door answers undefined for a file
+      // that is not there, so asking the filesystem first pays a syscall for an
+      // answer the very next line gets for free. This ran per claimful state per
+      // machine per hop.
       try {
         const note = noteOf(abs);
         if (note === undefined) continue;
@@ -1487,11 +1559,7 @@ export class Claims {
         done ??= new Set(this.recordDone(fm));
         return done.has(p.id);
       }
-      try {
-        return (this.stateFormGet(p.id, fm) as { signed?: boolean }).signed === true;
-      } catch {
-        return false;
-      }
+      return this.stateSigned(p.id, fm);
     };
     const unsigned = feeders.filter((p) => !finished(p));
     // THE BAR IS THE AND: every input signed, or the state does not stamp.

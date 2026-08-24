@@ -266,3 +266,83 @@ test("the preview MOVES NOTHING", () => {
   s.route("nowhere-at-all");
   assert.deepEqual(s.active(), before, "looking is not walking");
 });
+
+// TSP-EVERY-HOP-RECORDS-HOW-LONG-IT-TOOK. A call may carry many hops, so one
+// duration for the call cannot answer what a hop cost. The unit is the hop.
+test("every hop the search returns carries how long it took", () => {
+  const g = graph({ a: ["b"], b: ["c"], c: [] });
+  const began = performance.now();
+  const r = computeRoute("a", "c", g);
+  const whole = performance.now() - began;
+
+  assert.equal(r.found, true);
+  assert.equal(r.steps.length, 2, "two hops from a to c");
+
+  let sum = 0;
+  for (const s of r.steps) {
+    const ms = (s as { ms?: unknown }).ms;
+    // FINITE AND NOT NEGATIVE, never merely "a number". `typeof NaN` is
+    // "number", so the weaker check stays green on a duration that was never
+    // computed — which is the one failure this row exists to catch.
+    assert.ok(typeof ms === "number" && Number.isFinite(ms) && ms >= 0, `hop to ${s.to} records ${String(ms)} rather than a real duration`);
+    sum += ms;
+  }
+
+  // THE HOPS FIT INSIDE THE CALL. A per-hop figure that outgrew the call it
+  // came from would be measuring something other than the hop.
+  //
+  // THIS HOLDS BY CONSTRUCTION TODAY and a reviewer said so: `whole` times the
+  // same call whose hops produced `sum`, so each figure is a sub-interval of it.
+  // Keep it anyway — it bites the day somebody makes `ms` cumulative or sources
+  // it from somewhere other than the hop. Do not count it as a second
+  // independent guard.
+  //
+  // NOT ASSERTED ABOVE ZERO, deliberately. A hop times one expand, a warm
+  // expand costs about a tenth of a millisecond, and a memoized one rounds to
+  // zero. Demanding a positive number would make the test fail on the machine
+  // doing the least work.
+  assert.ok(sum <= whole, `the hops sum to ${sum} ms inside a call that took ${whole} ms`);
+});
+
+// TSP-A-FAILED-ROUTE-ANSWERS-NO-SLOWER-THAN-A-DRAWN-ONE. The id keeps an older
+// name and the row no longer means it: "no slower than a drawn one" was struck
+// as impossible, because saying there is no way means looking everywhere
+// reachable while finding one stops at the first.
+//
+// WHAT THE ROW DEMANDS NOW is that a failed search stays bounded by the graph —
+// each reachable state expanded once, never twice — which is what catches a
+// search that runs on. Timing in a unit test is flaky, so this asserts the COUNT
+// the timing is about.
+//
+// REPORTING THE COUNT IS NOT THE CLAIM, and an earlier version of this case
+// asserted only that both counts were numbers. A failed search could have
+// expanded four hundred thousand states and stayed green.
+test("a search that finds nothing costs no more than exhausting the graph", () => {
+  const REACHABLE = 41; // n0 through n40
+  const wide: Record<string, string[]> = {};
+  for (let i = 0; i < 40; i++) wide[`n${i}`] = [`n${i + 1}`];
+  wide.n40 = [];
+  const g = graph(wide);
+
+  const near = computeRoute("n0", "n1", g);
+  const none = computeRoute("n0", "nowhere", g);
+  assert.equal(near.found, true);
+  assert.equal(none.found, false);
+
+  // THE BOUND IS THE GRAPH. Each state is expanded at most once, so a search
+  // for something absent walks every reachable state and then stops. Expanding
+  // more than that means it revisited, which is the unbounded case.
+  assert.ok(
+    none.visited <= REACHABLE,
+    `a failed search expanded ${none.visited} of ${REACHABLE} reachable states — above that it is revisiting`,
+  );
+
+  // AND THE SUCCESSFUL SEARCH LEAVES EARLY. It stops at the first way it finds,
+  // so it expands strictly fewer states than one that has to exhaust the set.
+  //
+  // THIS IS NOT THE REQUIREMENT'S MEASURE, and an earlier version read as though
+  // it were — which had the case asserting the reverse of what the row demanded.
+  // The row demands the FAILED search stay bounded, and that is the assertion
+  // above. This one shows the early return.
+  assert.ok(near.visited < none.visited, `finding at one hop expanded ${near.visited} against ${none.visited} for finding nothing`);
+});

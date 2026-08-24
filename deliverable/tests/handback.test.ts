@@ -112,6 +112,7 @@ function freshScripts(): { scripts: Scripts; machine: MachineDecl; state: StateD
     state: () => state,
     notifyChange: () => {},
     recordVerdict: () => {},
+    standingJudgment: () => undefined,
     evidence: new Map<string, Record<string, unknown>>(),
   };
   return { scripts: new Scripts(host), machine, state };
@@ -169,6 +170,7 @@ test("the call answers in under a second while a long judgment is still running"
     state: () => slow,
     notifyChange: () => {},
     recordVerdict: () => {},
+    standingJudgment: () => undefined,
     evidence: new Map<string, Record<string, unknown>>(),
   };
   const scripts = new Scripts(host);
@@ -263,6 +265,7 @@ test("a judgment started outside the walk still enters the account", async () =>
     state: () => slow,
     notifyChange: () => {},
     recordVerdict: () => {},
+    standingJudgment: () => undefined,
     evidence: new Map<string, Record<string, unknown>>(),
   };
   const scripts = new Scripts(host);

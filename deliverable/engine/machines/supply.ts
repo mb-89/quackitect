@@ -30,9 +30,9 @@
  *  a check starts refusing correct machines.
  *
  *  req-no-state-demands-what-it-cannot-supply */
-import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { EvidenceField, MachineDecl, StateDecl } from "../machine.ts";
+import { passEpoch, readNode } from "../notes.ts";
 
 /** THE VERBS THAT BRING SOMETHING INTO BEING. A state holding none of them can
  *  only cite what already exists. */
@@ -48,17 +48,38 @@ export interface SupplyGap {
   wants: string[];
 }
 
-/** A template's `resolves`, or "" when it declares none. Read straight off the
- *  frontmatter — the compile has no parsed template to hand here, and a
- *  four-line read beats threading one through. */
+/** A template's `resolves`, or "" when it declares none.
+ *
+ *  THROUGH THE DOOR AND HELD FOR THE PASS. It used to read the file straight off
+ *  disk, with a comment saying a four-line read beats threading a parsed
+ *  template through. The read is cheap; the NUMBER of them was not.
+ *
+ *  MEASURED WITH A PROFILER: this one function spent 3,743 ms of a single walk
+ *  in `existsSync` and `readFileSync` — more than half of all the syscall time
+ *  in the whole walk. It is called once per required evidence
+ *  field, of every state, on every route drawing, and a route is drawn on every
+ *  hop. There are about a dozen templates and their `resolves:` line does not
+ *  change while a call is running.
+ *
+ *  OUTSIDE A PASS nothing is held and every call asks, which is what a test gets
+ *  and what is right. */
+const RESOLVES = new Map<string, { pass: number; value: string }>();
+
 function resolvesOf(root: string, template: string): string {
   // THE PROJECT ROOT, the one every other engine path takes — scalePath and
   // the trace lookups all read `<root>/...`. Two roots in one check is
   // how a lookup starts finding nothing and reporting it as clean.
   const abs = join(root, "deliverable", "machines", "forms", "templates", `${template}.md`);
-  if (!existsSync(abs)) return "";
-  const m = /^resolves:[ \t]*(\S+)[ \t]*$/m.exec(readFileSync(abs, "utf8"));
-  return m === null ? "" : m[1];
+  const pass = passEpoch();
+  if (pass !== 0) {
+    const hit = RESOLVES.get(abs);
+    if (hit !== undefined && hit.pass === pass) return hit.value;
+  }
+  const text = readNode(abs);
+  const m = text === "" ? null : /^resolves:[ \t]*(\S+)[ \t]*$/m.exec(text);
+  const value = m === null ? "" : m[1];
+  if (pass !== 0) RESOLVES.set(abs, { pass, value });
+  return value;
 }
 
 /** What one field demands, and which verbs could supply it. An empty `wants`

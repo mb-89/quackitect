@@ -54,3 +54,16 @@ an iteration named for speed came to build only the honesty half.
 - 5a. The act is slow only sometimes, and unpredictably. That is worse than
   uniformly slow, because the actor cannot learn which acts to batch and starts
   batching all of them — the tool shaping the work instead of serving it.
+- 3c. The act's cost is dominated by a SEARCH THAT FINDS NOTHING. The work is
+  not large; the not-finding is. This is 3b rather than 3a, because the size
+  does not follow from what was asked — it follows from what is absent.
+  Measured: an act that could not draw a route ran past thirty seconds 36 per
+  cent of the time, against 2 per cent for every other act.
+- 3d. The act is one HOP of a walk rather than a single call. Then the bound is
+  per hop and the walk multiplies it, so an act comfortably inside a second can
+  still leave a re-entry costing minutes. The guarantee above is necessary and
+  not sufficient at this grain.
+- 4b. Several acts of the same kind run at once, and the loop that answers is
+  shared with the one that draws the surface. Then a slow act is not slow alone:
+  it takes the surface down with it, and the actor sees a frozen screen rather
+  than a waiting one.

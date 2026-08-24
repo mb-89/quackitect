@@ -53,9 +53,10 @@ interface HeldFile {
 const HELD = new Map<string, HeldFile>();
 const STATS = { hits: 0, misses: 0 };
 
-/** The door's own meter: entries held, served from held, read from disk. */
-export function doorStats(): { held: number; hits: number; misses: number } {
-  return { held: HELD.size, ...STATS };
+/** The door's own meter: entries held, served from held, read from disk, and
+ *  how many times a write has moved every derived answer. */
+export function doorStats(): { held: number; hits: number; misses: number; derived: number } {
+  return { held: HELD.size, ...STATS, derived: DERIVED };
 }
 
 /** see dsp-note-pen.md#there-is-no-watcher-here */
@@ -196,6 +197,33 @@ function textOf(h: HeldFile): string {
 export function readNode(path: string): string {
   const h = held(path);
   return h === undefined ? "" : textOf(h);
+}
+
+/** THE FILE'S STAMP — size, modified time, created time — as the door holds it.
+ *
+ *  FOR THE CALLER THAT ONLY WANTS TO KNOW WHETHER SOMETHING MOVED. Inside a pass
+ *  the door has already stat'd the file, so this costs a map lookup; a raw
+ *  `statSync` per file pays the syscall again.
+ *
+ *  MEASURED: the trace corpus stamped itself with 2,790 stats per check, on a
+ *  corpus whose every file the pass was already holding.
+ *
+ *  IT IS THE SAME CHECK, not a weaker one. The string compared is the one the
+ *  door itself compares before deciding a held file is still good. */
+export function nodeStamp(path: string): string {
+  return held(path)?.stamp ?? "gone";
+}
+
+/** The file's whole text, or undefined where there is no file. The one read
+ *  that tells a MISSING file from an EMPTY one, which `readNode` cannot: both
+ *  come back as the empty string there.
+ *
+ *  A caller that branches on existence wants this rather than `existsSync` plus
+ *  its own `readFileSync`. Two syscalls become none inside a pass, and the text
+ *  is the same text every other reader in the pass is holding. */
+export function readNodeIfPresent(path: string): string | undefined {
+  const h = held(path);
+  return h === undefined ? undefined : textOf(h);
 }
 
 /** The raw bytes — the base layer, for the reader that serves images and

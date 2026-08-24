@@ -8,13 +8,13 @@
 // see dsp-record-lifecycle.md#a-generated-machine-is-drawn-from-the-record
 
 import { existsSync, readFileSync } from "node:fs";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { type CanvasData, type CanvasEdge, type CanvasElement, nodeSize } from "./canvas.ts";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { buildArchive, type GeneratedMachine } from "./expmachine.ts";
 import { type Iteration, itList, itPinRel, itSeededRel, itShortId, readItRecord, SCAFFOLD_NONE, SRC } from "./iterations.ts";
 import { type MachineDecl, type StateDecl, validateMachine } from "./machine.ts";
-import { parseStateNote, readNode } from "./notes.ts";
+import { parseStateNote, passEpoch, readNode } from "./notes.ts";
 import { CHANGE_COLUMNS, type ChangeColumn, compileColumn, compileM0, readRigorMatrix } from "./rigor-matrix.ts";
 
 /** see dsp-record-lifecycle.md#the-seeded-machine */
@@ -205,8 +205,34 @@ export function generateSeeded(_root: string, it: Iteration, machineId: string, 
   return { decl, canvas: pinnedCanvas(decl), expByState: {} };
 }
 
+/** The container, held for the pass that built it. see generateIterations. */
+const CONTAINER = new Map<string, { pass: number; made: GeneratedMachine }>();
+
 /** see dsp-record-lifecycle.md#the-iterations-container */
 export function generateIterations(root: string): GeneratedMachine {
+  // DERIVED FROM MANY FILES, so it keys on the pass that built it, the same way
+  // `itList` does. It is called once per node the route drawing expands, and a
+  // route is drawn on every hop.
+  //
+  // MEASURED with a profiler: 1,767 ms of one three-hop walk's syscall time,
+  // second only to the template read that was fixed beside it. Rebuilding the
+  // same container from the same unchanged records, over and over, inside one
+  // call.
+  //
+  // OUTSIDE A PASS nothing is held and every call rebuilds, which is what a test
+  // gets and what is right.
+  const pass = passEpoch();
+  const key = resolve(root);
+  if (pass !== 0) {
+    const hit = CONTAINER.get(key);
+    if (hit !== undefined && hit.pass === pass) return hit.made;
+  }
+  const made = generateIterationsNow(root);
+  if (pass !== 0) CONTAINER.set(key, { pass, made });
+  return made;
+}
+
+function generateIterationsNow(root: string): GeneratedMachine {
   let open: Iteration[] = [];
   try {
     open = itList(root).filter((it) => it.open);

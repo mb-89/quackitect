@@ -23,6 +23,7 @@ source_refs:
 priority: must
 weighs_with:
   - req-call-answers-in-one-second ! — one measures whether aim-plus-move fits in a single call, the other measures per-call response latency; different axes of performance-efficiency
+  - req-aiming-returns-before-the-walking-starts ! — that row bounds a BARE aim, this one bounds an aim that also asks to go; asking to jump is an addition to aiming rather than a replacement, so both forms stand and each keeps its own bound
   - req-surface-answers-in-one-second ! — one measures call count for the walk, the other measures a person's render latency at the mirror's HTTP boundary; different boundaries
 ---
 

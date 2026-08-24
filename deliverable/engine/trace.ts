@@ -2,7 +2,7 @@
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
 import { contentHash } from "./hash.ts";
-import { nodeLines, noteOf, parseStateNote, passEpoch, readNode } from "./notes.ts";
+import { nodeLines, nodeStamp, noteOf, parseStateNote, passEpoch, readNode } from "./notes.ts";
 
 /** THE SHARED SPINE, in ring order from the centre outward. Every wedge holds
  *  these whole, and nothing branches until the last of them.
@@ -473,15 +473,14 @@ export { nodeLines, noteOf, readNode };
 
 /** see dsp-trace-corpus.md#the-corpuss-version */
 function corpusStamp(files: string[]): string {
+  // THROUGH THE DOOR, which has already stat'd every one of these inside a pass.
+  // A raw stat per file paid that syscall a second time: 2,790 of them, every
+  // time a write moved the derived answers, four times a hop.
+  //
+  // THE CHECK IS UNCHANGED. The door's stamp is the same size-and-times string
+  // it compares before trusting a held file.
   const parts: string[] = [];
-  for (const f of files) {
-    try {
-      const s = statSync(f);
-      parts.push(`${f}:${s.size}:${s.mtimeMs}`);
-    } catch {
-      parts.push(`${f}:gone`);
-    }
-  }
+  for (const f of files) parts.push(`${f}:${nodeStamp(f)}`);
   return contentHash(parts.join("\n"));
 }
 

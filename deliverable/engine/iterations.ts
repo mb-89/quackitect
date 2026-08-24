@@ -7,10 +7,10 @@
 
 import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { CLAUSES, Rejection } from "./errors.ts";
 import type { EvidenceField } from "./machine.ts";
-import { noteOf } from "./notes.ts";
+import { noteOf, passEpoch } from "./notes.ts";
 import { slug } from "./records.ts";
 import { CHANGE_COLUMNS, type ChangeColumn, compileColumn, readRigorMatrix, rigorMatrixContentHash } from "./rigor-matrix.ts";
 import { dependsOnLines } from "./seed.ts";
@@ -69,6 +69,26 @@ export const RECORD_FINISHED: ReadonlySet<string> = new Set(["shipped", "closed"
  *  still name it and nothing yet reads it as a place to fetch from. It goes
  *  when the branches do. */
 export function itList(root: string): Iteration[] {
+  // DERIVED FROM MANY FILES, so it keys on the pass that built it. This is the
+  // pattern software.md names for exactly this shape, and this function is the
+  // reason it was needed.
+  //
+  // WHAT IT COST WITHOUT IT: two `existsSync` calls, a read and a YAML parse per
+  // iteration EVER CREATED, every time the route drawing expanded the iterations
+  // container — which is once per node, per hop. The archived records were read
+  // in full only to be discarded for being archived.
+  //
+  // MEASURED on one hop that does no work: 3,454 ms of `existsSync` and 1,403 ms
+  // of `readFileUtf8`, 55 per cent of the hop.
+  //
+  // OUTSIDE A PASS `passEpoch()` is 0 and nothing is held, which is what a test
+  // gets and what is right.
+  const pass = passEpoch();
+  const key = resolve(root);
+  if (pass !== 0) {
+    const hit = IT_LIST.get(key);
+    if (hit !== undefined && hit.pass === pass) return hit.list;
+  }
   const dir = join(root, "spec", "iterations");
   if (!existsSync(dir)) return [];
   const out: Iteration[] = [];
@@ -83,8 +103,13 @@ export function itList(root: string): Iteration[] {
     const status = String(noteOf(abs)?.frontmatter.status ?? "");
     out.push({ id, branch: `it/${id}`, path: root, open: !RECORD_FINISHED.has(status) });
   }
-  return out.sort((a, b) => Number(a.id.match(/^i(\d+)/)?.[1] ?? 0) - Number(b.id.match(/^i(\d+)/)?.[1] ?? 0));
+  out.sort((a, b) => Number(a.id.match(/^i(\d+)/)?.[1] ?? 0) - Number(b.id.match(/^i(\d+)/)?.[1] ?? 0));
+  if (pass !== 0) IT_LIST.set(key, { pass, list: out });
+  return out;
 }
+
+/** The iteration list, held for the pass that built it. see itList. */
+const IT_LIST = new Map<string, { pass: number; list: Iteration[] }>();
 
 // NOTHING IS MISSING ON A CLONE. A record is a folder, so a clone has every
 // record by construction, and there is no half

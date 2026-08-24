@@ -8,6 +8,7 @@ satisfies:
   - req-the-panel-s-paint-says-which-kind-of-green-it-is
   - req-the-actor-is-recorded-where-the-call-is-served
   - req-surface-answers-in-one-second
+  - req-a-slow-answer-does-not-freeze-the-surface-beside-it
   - req-survey-counts-only-open-records
   - req-panel-shows-the-machine
   - req-selected-node-shows-its-claim

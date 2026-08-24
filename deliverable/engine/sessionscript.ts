@@ -8,7 +8,9 @@
 // see dsp-walk-machine.md#the-suites-spawn-skip
 import { spawn } from "node:child_process";
 import { CLAUSES, Rejection } from "./errors.ts";
+import { contentHash } from "./hash.ts";
 import type { MachineDecl, StateDecl } from "./machine.ts";
+import { readNode } from "./notes.ts";
 import { resolveInRoot, seDir } from "./paths.ts";
 import { openOperation, settleOperation } from "./run.ts";
 import { evidenceKey } from "./sessionforms.ts";
@@ -25,7 +27,9 @@ export interface ScriptHost {
   notifyChange(): void;
   /** WRITE A SETTLED JUDGMENT WHERE THE STEP'S OTHER STANDINGS LIVE. The
    *  evidence map below dies with the process; this does not. */
-  recordVerdict(m: MachineDecl, s: StateDecl, ok: boolean): void;
+  recordVerdict(m: MachineDecl, s: StateDecl, ok: boolean, stamp?: string): void;
+  /** The verdict standing on the step's form, which outlives this process. */
+  standingJudgment(m: MachineDecl, s: StateDecl): { verdict: string; stamp: string } | undefined;
   readonly evidence: Map<string, Record<string, unknown>>;
 }
 
@@ -223,12 +227,12 @@ export class Scripts {
         outputs.push(`${rel} → exit ${r.status}${out === "" ? "" : `\n${out}`}`);
         if (r.status !== 0) ok = false;
       }
-      const result = { ok, output: outputs.join("\n"), at: new Date().toISOString() };
+      const result = { ok, output: outputs.join("\n"), at: new Date().toISOString(), stamp: this.scriptStamp(scripts) };
       this.host.evidence.set(key, { ...(this.host.evidence.get(key) ?? {}), script_result: result });
       // AND IT LANDS SOMEWHERE THAT OUTLIVES THE PROCESS. The map above is
       // memory; a step left deciding when the session ends needs the verdict on
       // disk or the repository cannot settle the word.
-      this.host.recordVerdict(machine, s, ok);
+      this.host.recordVerdict(machine, s, ok, result.stamp);
       this.host.notifyChange();
       return { state: `${machine.id}/${s.id}`, script_result: result };
     })().finally(() => {
@@ -260,15 +264,61 @@ export class Scripts {
     return run;
   }
 
+  /** WHAT A VERDICT WAS REACHED WITH, so it can be told apart from a verdict
+   *  reached against different scripts. Content, not size and time, for the same
+   *  reason the drawing cache stamps that way: a same-size edit inside one
+   *  filesystem tick would go unseen.
+   *
+   *  THROUGH THE DOOR, so a pass reads each script once however many states cite
+   *  it. */
+  private scriptStamp(scripts: readonly string[]): string {
+    return scripts
+      .map((rel) => {
+        const abs = resolveInRoot(this.host.machineRoot(), rel, "engine/session.ts script");
+        const text = readNode(abs);
+        return text === "" ? `${rel}@gone` : `${rel}@${contentHash(text)}`;
+      })
+      .join("|");
+  }
+
   /** START a step's leaving judgment and hand the promise back UNAWAITED.
    *  Returns undefined where the state declares no judgment to start.
    *  The run registers itself in the account; this method only decides
    *  whether there is a judgment to start at all.
    *  see dsp-the-work-account.md#responsibility */
-  scriptStart(stateId: string): Promise<Record<string, unknown>> | undefined {
+  scriptStart(stateId: string, passingThrough = false): Promise<Record<string, unknown>> | undefined {
     const { machine } = this.host.leaves();
     const s = this.host.state(machine, stateId);
-    if ((s.exit?.script ?? []).length === 0 && (s.entry?.script ?? []).length === 0) return undefined;
+    const scripts = [...(s.exit?.script ?? []), ...(s.entry?.script ?? [])];
+    if (scripts.length === 0) return undefined;
+    // A GREEN STATE WALKED OVER KEEPS THE VERDICT IT ALREADY HAS.
+    //
+    // Walking over a state re-judged it, so a fast-forward through finished work
+    // paid for every judgment it already had on file. Measured: 2,455 ms of a
+    // 6,084 ms three-hop sweep was the call waiting on scripts whose states were
+    // already signed.
+    //
+    // THREE THINGS MUST ALL HOLD, and each closes a way this could turn a red
+    // hop green.
+    //
+    // - THE WALK IS PASSING THROUGH, not landing. A state the walk actually
+    //   works always re-judges, because that is where the judgment is about to
+    //   be relied on.
+    // - THE STANDING VERDICT SAYS PASSED. Anything else re-runs, so a red never
+    //   survives on a stale answer.
+    // - THE SCRIPTS HAVE NOT MOVED. A verdict reached with a different script is
+    //   a verdict about a different question.
+    // see dsp-the-walk-knows-what-its-own-hops-cost.md#a-green-state-walked-over-keeps-its-verdict
+    if (passingThrough) {
+      const stamp = this.scriptStamp(scripts);
+      const held = this.host.evidence.get(evidenceKey(machine, s.id))?.script_result as { ok?: boolean; stamp?: string } | undefined;
+      if (held?.ok === true && held.stamp === stamp) return undefined;
+      // NOTHING IN MEMORY IS THE ORDINARY CASE for a session that re-entered a
+      // record. The verdict on the form is the same verdict, reached by the same
+      // script, and it outlived the process that reached it.
+      const onDisk = held === undefined ? this.host.standingJudgment(machine, s) : undefined;
+      if (onDisk?.verdict === "passed" && onDisk.stamp !== "" && onDisk.stamp === stamp) return undefined;
+    }
     return this.scriptRun(stateId);
   }
 
@@ -276,8 +326,8 @@ export class Scripts {
    *  for a verdict and hands back whatever it has; it is never held for as long
    *  as the judgment runs, which is the defect this record exists to end.
    *  see dsp-the-work-account.md#responsibility */
-  async scriptSettleWithin(stateId: string, ms: number): Promise<void> {
-    const run = this.scriptStart(stateId);
+  async scriptSettleWithin(stateId: string, ms: number, passingThrough = false): Promise<void> {
+    const run = this.scriptStart(stateId, passingThrough);
     if (run === undefined) return;
     let timer: ReturnType<typeof setTimeout> | undefined;
     const capped = new Promise<void>((res) => {

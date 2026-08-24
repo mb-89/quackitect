@@ -14,6 +14,9 @@ const step = (from: string, to: string): RouteStep => ({
   tick: { from, to: to.split("/").pop() ?? to },
   priority: 0.2,
   demands: {},
+  // The wrap detector reads only from and to, so the drawing cost is
+  // irrelevant here and is fixed rather than measured.
+  ms: 0,
 });
 
 describe("the wrap detector", { concurrency: true }, () => {

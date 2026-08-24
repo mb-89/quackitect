@@ -11,6 +11,7 @@ import { type GeneratedMachine, generateContinueExpedition, generateExpeditionAr
 import { generateIterationArchive, generateIterations, pinnedCanvas } from "./iterations-draw.ts";
 import type { MachineDecl, MachineInstance } from "./machine.ts";
 import { compileMachineCached, resolveRef } from "./machines/compile.ts";
+import { passEpoch } from "./notes.ts";
 import { mainMachinePath, type SubRun } from "./session.ts";
 
 /** What the drawings need of the walk: where the machines live, which one is
@@ -125,6 +126,31 @@ export class Views {
    *  iteration's own machine is one of those, and that is where a matrix row
    *  carrying a drawn sub-machine lives. */
   reachableMachines(): MachineDecl[] {
+    // BUILT ONCE PER PASS. Every container here is GENERATED, so answering this
+    // draws the iteration walk, its pinned canvas and every row and group on it.
+    //
+    // WHY IT IS WORTH A CACHE. The route search asks `declIteration` about every
+    // node it expands, and that falls through to here. Measured on a three-hop
+    // sweep: 498 ms, redrawing containers that had not moved since the hop
+    // before.
+    //
+    // THE KEY CARRIES THE STACK, because walking into a sub adds a machine to
+    // the answer. A pass is synchronous, so nothing else can move underneath.
+    // see dsp-the-walk-knows-what-its-own-hops-cost.md#the-reachable-machines-are-drawn-once-per-pass
+    const pass = passEpoch();
+    const key = `${this.host.machine.id}::${this.host.subs.map((s) => s.decl.id).join("/")}`;
+    if (pass !== 0) {
+      const hit = Views.REACHABLE.get(key);
+      if (hit?.pass === pass) return hit.value;
+    }
+    const value = this.reachableMachinesNow();
+    if (pass !== 0) Views.REACHABLE.set(key, { pass, value });
+    return value;
+  }
+
+  private static readonly REACHABLE = new Map<string, { pass: number; value: MachineDecl[] }>();
+
+  private reachableMachinesNow(): MachineDecl[] {
     const out: MachineDecl[] = [this.host.machine, ...this.host.subs.map((s) => s.decl)];
     for (const cid of Views.NESTING_CONTAINERS) {
       let gen: GeneratedMachine | undefined;

@@ -115,8 +115,9 @@ export const STYLE = `
   .state { fill: var(--se-raised); stroke: var(--se-border-strong); stroke-width: 2; }
   /** see dsp-mirror-render.md#done-is-green-where-a-record-stands-behind-it */
   .state.done { fill: color-mix(in srgb, var(--se-ok) 16%, var(--se-bg)); stroke: var(--se-ok); }
-  /** see dsp-mirror-render.md#one-decider-says-which-kind-of-green-it-is */
-  .state.done.proven { stroke-dasharray: 10 5; }
+  /* A LAW-PROVEN STATE IS DRAWN LIKE ANY OTHER GREEN ONE. There is no dashed
+     state, and the distinction it drew is computed but never stroked.
+     see dsp-mirror-render.md#one-decider-says-which-kind-of-green-it-is */
   /* THE CURRENT STATES BLINK YELLOW (v1's pulse
      reborn) — half the emergency pace, so alarm still outranks attention. */
   .state.active { fill: color-mix(in srgb, var(--se-warn, #d7a72a) 16%, var(--se-bg)); stroke: var(--se-warn, #d7a72a); stroke-width: 3.5; animation: se-current 2.2s ease-in-out infinite; }

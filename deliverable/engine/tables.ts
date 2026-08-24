@@ -135,7 +135,12 @@ export function loadBase(path: string): BaseSpec {
 // `dist` holds extracted release trees. It sat beside the vault until the
 // folder levels collapsed; inside it, its 479 notes are counted as vault
 // content and every table reports three times the rows it has.
-const SKIP_DIRS = new Set(["node_modules", ".git", ".obsidian", ".se", ".worktrees", "dist", "tests"]);
+// `scratchpad` is the workbench and is never committed. THE SAME FAULT AS
+// `dist`, found again: a full copy of the project sat under it, so every rigor
+// row was counted twice and the matrix reported 126 rows where 63 stand. The
+// suite's own file walker already skipped it and this one did not, so two
+// walkers disagreed about what the repository contains.
+const SKIP_DIRS = new Set(["node_modules", ".git", ".obsidian", ".se", ".worktrees", "dist", "scratchpad", "tests"]);
 
 export function vaultDir(root: string): string {
   return root;

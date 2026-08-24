@@ -25,6 +25,13 @@ export interface RouteStep {
   /** The target's entry conditions, by type. What will be ASKED — never a
    *  claim that it will pass; a script has to run to answer. */
   demands: Record<string, string[]>;
+  /** What DRAWING this hop cost, in milliseconds.
+   *
+   *  THE HOP IS THE UNIT, not the call. One call may carry many hops, so a
+   *  duration on the call cannot answer what a hop cost, and a budget stated
+   *  per hop cannot be checked against one.
+   *  see dsp-the-walk-knows-what-its-own-hops-cost.md#timing-a-hop */
+  ms: number;
 }
 
 export interface RouteNode {
@@ -42,6 +49,14 @@ export interface RouteResult {
   target: string;
   found: boolean;
   steps: RouteStep[];
+  /** How many states the search looked at before answering.
+   *
+   *  IT IS REPORTED ON EVERY PATH, including the ones that find nothing. A
+   *  search that fails cannot be compared against one that succeeds unless
+   *  both say what they did, and an unbounded search cannot be held to
+   *  anything at all.
+   *  see req-a-target-that-cannot-be-reached-is-refused-quickly */
+  visited: number;
   /** Set when the search gave up rather than proved unreachability. */
   note?: string;
 }
@@ -68,7 +83,7 @@ export function computeRoute(
   expand: (qualified: string) => RouteNode | undefined,
   maxVisited = 512,
 ): RouteResult {
-  if (start === target) return { target, found: true, steps: [] };
+  if (start === target) return { target, found: true, steps: [], visited: 0 };
   const cameFrom = new Map<string, RouteStep>();
   const seen = new Set<string>([start]);
   let frontier = [start];
@@ -81,6 +96,7 @@ export function computeRoute(
           target,
           found: false,
           steps: [],
+          visited,
           note: `gave up after ${maxVisited} states — the graph is larger than a route should search`,
         };
       }
@@ -89,6 +105,7 @@ export function computeRoute(
       for (const e of node.nexts) {
         if (seen.has(e.to)) continue;
         seen.add(e.to);
+        const began = performance.now();
         const arriving = expand(e.to);
         cameFrom.set(e.to, {
           from: q,
@@ -96,14 +113,15 @@ export function computeRoute(
           tick: e.tick,
           priority: arriving?.priority ?? 0,
           demands: mergeDemands(node.exit_demands, arriving?.demands),
+          ms: performance.now() - began,
         });
-        if (e.to === target) return { target, found: true, steps: trace(cameFrom, start, target) };
+        if (e.to === target) return { target, found: true, steps: trace(cameFrom, start, target), visited };
         next.push(e.to);
       }
     }
     frontier = next;
   }
-  return { target, found: false, steps: [], note: `no drawn path from ${start} to ${target}` };
+  return { target, found: false, steps: [], visited, note: `no drawn path from ${start} to ${target}` };
 }
 
 /** Both ends of a transition, under one key each. A doc demanded by the

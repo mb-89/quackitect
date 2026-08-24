@@ -251,3 +251,116 @@ what the first left.
 
 THE ORDER INSIDE THIS ROUND IS NOT NEGOTIABLE. The route-drawer test comes
 first, because it costs two calls and may remove the need for most of the rest.
+## The stop-at control is taken into this round (owner ruling 2026-08-24)
+
+REPORTED LIVE, MID-WALK. The control that sets how far the walk may go before
+handing back does not respond when its bless or its blockers-only setting is
+pressed. The owner wanted the machine to stop only on blockers and could not
+ask for it.
+
+THE TWO BROKEN SETTINGS ARE THE TWO THAT ASK FOR LESS INTERRUPTION. The notches
+that hand back more often work fine.
+
+IT IS NOT SPEED WORK, AND IT IS TAKEN ANYWAY, on the owner's word. A control the
+owner cannot set is the one thing that stops them running the machine the way
+they want, which makes it a walk-cost defect of a different kind.
+
+IT IS THE THIRD SIGHTING OF ONE SHAPE. The proposition this round extends
+already records this control declining a press in silence, with two earlier
+victims of the identical silence beside it. A pattern that recurs after being
+written down is not waiting for a better description.
+
+IT IS A NOTE AND NOT A REGISTER ENTRY (owner ruling 2026-08-24). One was written
+and struck the same minute. A live defect somebody is about to fix does not need
+an owner, a trigger and a damage grade; it needs recording and doing.
+
+THE ONE CHECK THAT SPLITS THE TWO CANDIDATE FAULTS: whether the press reaches
+the engine at all. Refused-and-silent and lost-before-arrival look identical
+from the outside and need different fixes.
+
+WHAT IT DOES NOT CHANGE. The round's size, its ordering, or its module
+separation. The control lives on the surface and neither sibling round touches
+it.
+## The distribution, measured 2026-08-24, and it is THREE problems not one
+
+THE OWNER'S OUTSIDE CLOCK CLOSED THE INSTRUMENT QUESTION, so these figures are
+estimates rather than floors. Across 1,905 agent calls that make a round trip.
+
+| verb | n | min | tenth | median | ninetieth |
+| --- | --- | --- | --- | --- | --- |
+| aim | 45 | 430 | 568 | **20,741** | 27,891 |
+| pull | 323 | 290 | 537 | 1,625 | 8,355 |
+| read a file | 501 | 285 | 331 | 439 | 633 |
+| write a file | 142 | 296 | 334 | 442 | 550 |
+| patch a file | 177 | 280 | 334 | 510 | 625 |
+| search | 239 | **13** | 348 | 471 | 673 |
+
+### One: pointing the walk costs twenty seconds at the median
+
+NOT THE TAIL. THE MEDIAN. Half of all aims run longer than 20.7 seconds, and
+nine in ten run under 27.9, so this is not a few bad cases dragging an average.
+It is what aiming normally costs.
+
+THIS IS THE OWNER'S ORIGINAL COMPLAINT, and it is the largest single number in
+the round. It is also the one thing measured here that has a ruling attached
+already.
+
+### What became of it
+
+THIS SECTION USED TO COMPARE THE FIGURE ABOVE WITH A PROPOSED FIFTY
+MILLISECONDS PER HOP. That number was superseded twice over and the comparison
+was wrong in both directions.
+
+THE BUDGET IS 250 MILLISECONDS AND IT BINDS THE FLIP, not the whole hop.
+`req-a-hop-of-the-walk-carries-its-own-time-budget` sets both, and its table at
+lines 42 to 45 is what splits them.
+
+THE AIM IS NO LONGER TWENTY SECONDS. A profiler found four reads repeated
+hundreds of times per hop, and a three-hop sweep fell from 15,404 milliseconds
+to 2,562 in a cold process. Warm, which is what a live engine is, those same
+three hops cost 34, 66 and 59.
+
+THE FLIP ITSELF IS 20 MILLISECONDS, measured by phase trace, against the 250 it
+is bound by.
+
+WHAT REMAINS is the cold price a fresh process pays at boot. The owner ruled
+that boot may take as long as it takes provided the person is told something is
+happening, which is a different row.
+
+### Two: every call pays a floor of about three hundred milliseconds
+
+READING A SMALL FILE HAS A MINIMUM OF 285 MS and a median of 439. Reading two
+kilobytes is not 439 milliseconds of work.
+
+ONE CALL PROVES THE FLOOR IS NOT PHYSICS. A search once answered in 13
+milliseconds. So the machinery CAN reply in a few milliseconds, and nearly
+never does.
+
+WHAT IT COSTS. At the tenth percentile of 348 ms across 1,905 calls, the floor
+alone is 663 seconds of the session's 4,213 stamped seconds. Sixteen per cent
+of all measured time is spent on a threshold one call showed is avoidable.
+
+### Three: the pull's tail, which is what this round has been chasing
+
+MEDIAN 1,625 MS, NINETIETH 8,355. The tail past thirty seconds is where the
+route-drawing finding lives, and it is real.
+
+IT IS ALSO THE SMALLEST OF THE THREE. Aims cost more per call and the floor
+costs more in total.
+
+## What this changes about the round
+
+THE ROUND WAS ORDERED AROUND THE THIRD PROBLEM because that is what the first
+measurement surfaced. The first two were invisible until the distribution was
+read by verb rather than by threshold.
+
+NOTHING IN SCOPE IS WRONG. The route work, the aim split and the per-hop budget
+all still stand, and the aim split now has a number behind it rather than a
+ruling alone.
+
+WHAT IS MISSING FROM SCOPE IS THE FLOOR. Nothing in this round addresses why a
+two-kilobyte read costs three hundred milliseconds, and on the numbers it is the
+second largest thing available.
+
+THAT IS A SCOPE DECISION AND IT IS THE OWNER'S. It is named here rather than
+quietly taken.

@@ -52,6 +52,30 @@ SO THE PAINT BECOMES ONE FUNCTION of what is known about a state, returning a
 class and its marks. Suspect still beats every green, because a colour
 standing on moved ground is no longer earned.
 
+### The third kind is computed and NOT BUILT YET as anything a reader sees
+
+THE DASHED STROKE IS GONE (owner ruling 2026-08-24). A law-proven state carried
+`stroke-dasharray` and now paints exactly like a stamped one.
+
+THE OWNER'S WORDS: "We don't have dashed states. I don't know what this is. I
+want this removed."
+
+THE RULING IS RIGHT ABOUT THE STROKE. No panel card named the dash, so a reader
+met a fourth stroke in a vocabulary of three with nowhere to look it up. A
+distinction nobody can read is not a distinction, whatever the renderer intended.
+
+WHAT THAT COSTS, said plainly: the paragraph above calls this "the one
+distinction a reader most needs", and right now nothing on the panel draws it. A
+check that RAN and a claim somebody stamped are the same colour again.
+
+THE DECIDER IS UNTOUCHED. `lawProvenStates` still computes the third kind, and
+the paint function still returns it. Only the stroke is gone, so restoring a
+readable form of it needs no new computation.
+
+WHEN IT IS BUILT, IT WILL BE A MARK RATHER THAN A STROKE. The bless already works
+that way, and a mark is a thing a reader can point at and ask about. That is the
+failure the stroke had, and it is the one worth not repeating.
+
 ## Responsibility
 
 The mirror serves what the engine holds — the machine drawing, the
