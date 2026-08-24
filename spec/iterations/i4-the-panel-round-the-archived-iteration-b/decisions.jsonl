@@ -324,3 +324,4 @@
 {"ts":"2026-08-23T20:06:06.190Z","op":"update","visit":"iterations/i4/fix-findings@0","node":"d141","brief":"filling each form on the way, as a real walk does"}
 {"ts":"2026-08-23T20:06:53.806Z","op":"update","visit":"iterations/i4/fix-findings@0","node":"d142","brief":"recording the claimops diagnosis so it is not re-derived"}
 {"ts":"2026-08-23T20:09:07.417Z","op":"done","visit":"iterations/i4/fix-findings@0","node":"d124","brief":"six tester findings fixed; the claimops fixture needs a redesign"}
+{"ts":"2026-08-23T20:09:46.067Z","op":"update","visit":"iterations/i4/fix-findings@0","node":"d143","brief":"the field report, then the front desk"}
