@@ -11,6 +11,7 @@
 // the next refused call's remedy re-boots the agent in one turn.
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
+import { takeCompacted } from "./compaction.ts";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { contentHash } from "./hash.ts";
 import {
@@ -2431,6 +2432,15 @@ export class Session {
     payload: { form?: Record<string, unknown>; escape?: string } = {},
     channel: Channel = "agent",
   ): Promise<Record<string, unknown>> {
+    // THE COMPACTION IS COLLECTED HERE, before anything else reads the gate.
+    // The hook that saw it could not call the lane, so it left a marker; this
+    // is the first moment the engine can act on it (see compaction.ts).
+    //
+    // THE PULL IS THE RIGHT PLACE AND THE ONLY ONE NEEDED. Every form, every
+    // choice and every document goes through this verb, so a walk cannot make
+    // progress around it — and the notice the hook prints sends the agent here
+    // by name.
+    if (takeCompacted(this.machineRoot())) this.reads.clearReadBuffer();
     // ONE DRAWING VALIDATION PER WALK STEP — the epoch makes "the next
     // call" the unit of the read-it-live law (see machines/compile.ts).
     bumpDrawingEpoch();
