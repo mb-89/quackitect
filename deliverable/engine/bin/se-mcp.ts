@@ -17,7 +17,7 @@
 // churned the walk): the shim holds the harness connection and forwards
 // JSON-RPC lines; the CHILD runs the engine, the session, and the mirror.
 // The shim NEVER watches sources and never swaps on its own. se_reload —
-// canary-guarded, idle-only, either hand — makes the child exit with code
+// canary-guarded, legal wherever the walk stands, either hand — makes the child exit with code
 // 42; the shim reads that as "respawn me on the new sources". The walk
 // reboots; boot re-proves the new engine green. SE_HOT_DISABLE=1 runs the
 // engine in-process instead (tests, debugging) — then a reload needs a
