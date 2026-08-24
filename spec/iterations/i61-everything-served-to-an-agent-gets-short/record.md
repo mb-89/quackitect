@@ -44,3 +44,39 @@ A SIBLING ROUND ALREADY OWNS THE CORPUS-WIDE PROSE SWEEP, counted at 3,572 flagg
 
 - retro 2026-08-24
 - wt-a-document-handed-to-an-agent-for-reading-arrives-whole-rath
+
+
+## Retrospective Correction
+
+Window: `2026-08-21T13:55:57.328Z` through the i61 release on 2026-08-24.
+
+Field feedback: no additional field input was reported.
+
+The initial retrospective drained the inbox. It did not complete the required log review or milestone table.
+
+### Log Review
+
+- Calls: 2,933 in the reconstructed window.
+- Demand log: empty.
+- Top lane activity: `se_update` 612, `se_file_read` 387, `se_pull` 298, `se_file_search` 237.
+- Highest i61 state costs: verification 367 calls, observe-red 107, fix-findings 102, specify-build 101, session-guidance 80.
+- Test summary: 1,806 passed, 0 failed. `deliverable/tests/refs.test.ts` had the highest summed file cost at 229,762ms.
+- Battery duration remains a work token. The full condition scan found 84 tokens, each with a future re-entry condition. None applies to the closed i61 scope.
+
+### Milestone Improvements
+
+| step | what went well | what cost | mechanizable |
+| --- | --- | --- | --- |
+| M0: onboarding and kickoff | The retro carried session guidance and blockers-only behavior into i61 before implementation began. | 105 calls across start, roster, onboard retro, and kickoff. | Return required entry forms in the same pull; stored in `wt-return-a-required-state-form-in-the-same-entry-response-that`. |
+| M1: motivation and framing | The vision, risk log, and scope artifacts made the implementation target explicit. | 89 calls across motivation spawning, vision drafting, and risk logging. | Empty worker rosters now pass without inventing a worker. |
+| M2: requirements | Stories, use cases, requirements, functions, and assumptions were all captured before implementation. | 111 calls, concentrated in `write-requirements` at 43. | No new improvement beyond existing evidence-form work tokens. |
+| M3: design and implementation | The generated-child collision repair, fixture staging repair, and guidance ordering repair were implemented and reviewed. | 525 calls across implementation, authored tests, build specification, red observation, and trace design. | Preserve the qualified child lookup; no additional mechanism identified. |
+| M4: verification and repair | A fresh review passed and the governed confirmation finished 179 files green. | 469 calls across verification and finding repair; the machine judgments also exceeded the expected duration. | Investigate duration and stale-worker accounting through `wt-measure-governed-test-duration-by-file-and-remove-the-schedu`. |
+| M5: validation and release | Validation, source-only packaging, and release gates were signed. | 26 calls after verification, including three source-only release forms. | Keep source-only packaging as an explicit `none` path. |
+
+### Required Follow-Through
+
+- Backlog migration: 84 tokens inspected. Every token has a future `ready when` condition. None is ready in this closed iteration.
+- Debt sweep: 19 debt entries were found. Their individual dated dispositions are still required.
+- Memory drain: still required.
+- Contract audit: still required.
