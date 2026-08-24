@@ -71,3 +71,13 @@ WHAT IS NOT KNOWN. Whether an orchestrator survives a long wait on a cloud box i
 - deliverable/engine/sessionreads.ts
 - guidance/method/subagents.md
 - guidance/method/cloud-runner.md
+
+## Owner rulings
+
+ONE SWITCH IN THE CONFIG, AND IT MUST BE ONE (owner ruling 2026-08-24). The whole of this iteration's behaviour sits behind a single toggle. Not a family of flags, and not one knob per effect.
+
+OFF IS TODAY, EXACTLY. With the switch off the machine behaves as it does now: no diamond effect, no handover, no credit dropped, no orchestrator. Somebody reading the off path must not be able to tell it from the current build.
+
+WHY THE OWNER ASKED FOR IT, in their own words: "I had bad experience with the walker and the guide." The switch is what makes this reversible without a revert.
+
+THE A/B TEST IS THE POINT, not a nice-to-have. The switch exists so the two behaviours can be run against each other and measured. Anything that lets the OFF path drift from today's behaviour destroys the control arm, and with it the experiment.

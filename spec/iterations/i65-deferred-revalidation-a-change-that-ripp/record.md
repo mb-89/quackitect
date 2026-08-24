@@ -60,3 +60,13 @@ PROVENANCE. Owner's design, 2026-08-24, in their own framing: when a change ripp
 - opt-a-row-s-difficulty-tracks-its-own-reopen-history
 - tsp-claims-and-drift
 - spec/trace/design-spec/dsp-walk-machine.md
+
+## Owner rulings
+
+ONE SWITCH IN THE CONFIG (owner ruling 2026-08-24, given against i64 and extended to here). This iteration's behaviour sits behind a single toggle.
+
+OFF IS TODAY, EXACTLY. With the switch off, a change invalidates downstream on contact exactly as it does now: the claim goes grey and everything below it falls. No suspect standing, no deferred check, no gate arbitration.
+
+THE EXTENSION IS MINE AND IS FLAGGED AS SUCH. The owner said ONE switch, speaking about the orchestrator. This iteration carries its OWN switch, separate from i64's, because an A/B test of deferred revalidation has to run while the orchestrator is already on. Two independent switches are what that needs.
+
+IF THE OWNER MEANT ONE SWITCH COVERING BOTH, this is the line to correct, and it should be corrected before either is built.
