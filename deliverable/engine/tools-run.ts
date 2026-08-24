@@ -427,9 +427,15 @@ export function runTools(
         },
       },
       handler: async (args) => {
-        const root = rootOf(".se");
-        if (args.cap !== undefined) return recordHostCap(root, Number(args.cap));
-        if (args.bytes === undefined) return hostCapState(root);
+        // THE CAP FILE LIVES IN `.se/`, NOT BESIDE IT. `recordHostCap` and
+        // `readHostCap` both take the MACHINE-STATE folder, and `setAnswerSpill`
+        // reads it from there. Passing the project root wrote the measurement to
+        // an untracked file at the top of the repository, where nothing reads it:
+        // the probe reported success, the bound never moved, and the next session
+        // inherited nothing.
+        const home = seDir(rootOf(".se"));
+        if (args.cap !== undefined) return recordHostCap(home, Number(args.cap));
+        if (args.bytes === undefined) return hostCapState(home);
         const asked = Math.max(1, Math.min(4_000_000, Number(args.bytes)));
         const marker = `END-OF-PROBE-${asked}`;
         const filler = "x".repeat(Math.max(0, asked - marker.length - 200));
