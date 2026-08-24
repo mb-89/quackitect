@@ -56,3 +56,119 @@ Green stays computable in advance for everything except a token somebody drops i
 - i55-narration-gets-lean-the-decision-graph-s
 - i38-the-machine-sizes-its-own-driver-every-s
 - i17-the-options-pool-triage-a-raw-note-into-
+
+## What was settled in conversation, 2026-08-24
+
+The owner dictated this design at the front desk. Everything below is a ruling,
+not a suggestion. It is written here because the conversation itself does not
+reach version control.
+
+### The name collision, and the ruling that clears it
+
+THE WALK'S MARKER IS CALLED A TOKEN TODAY. `SE-C-123` in `guidance/refusals.md`
+says "a three-way join used to be unreachable by a single token". The engine
+and the guidance both use the word that way.
+
+THE OWNER RULED IT: rename the walk's marker to THE POSITION. It was called a
+token because several agents walking at once were expected, and that
+expectation is dropped.
+
+SO "TOKEN" MEANS WORK TOKEN, everywhere, once this lands. Every other use is
+renamed rather than qualified.
+
+### A token can be in work, and that is what replaces narration
+
+A TOKEN HAS AN IN-WORK STATE. Before the agent does anything with a token, it
+says it is working on that token.
+
+THAT IS THE CHECKLIST. What the agent is doing is always known, from the token
+itself, so the decision graph stops being a second machine driven by hand.
+
+FIVE REFUSAL CLAUSES GO WITH IT, and they exist only to police narration:
+
+- `SE-C-040` — the narration toll is due.
+- `SE-C-120` — the update is malformed.
+- `SE-C-121` — the node is unknown or resolved.
+- `SE-C-122` — done over open children.
+- `SE-C-133` — the checklist stopped moving.
+
+This is what answers `i55-narration-gets-lean-the-decision-graph-s`.
+
+### Gates read tokens
+
+A GATE LOOKS AT THE TOKENS MINTED AND FINISHED BEFORE IT. That is the basis it
+judges on, in place of the evidence it reads today.
+
+### The pool has no exit door today, and this iteration builds one
+
+`deliverable/engine/pool.ts` exports exactly two acts: `mintToken` at line 145
+and `standingTokens` at line 255. Nothing removes a token, edits one, or merges
+two. `spec/trace/design-spec/dsp-the-options-pool.md` lines 87 to 92 say that
+was deliberate: no merge, no wake, no delete, no surface.
+
+THE DOOR OUT IS ASSIGNMENT. Either hand moves a token onto a state, and that is
+how it leaves the pool.
+
+MOVING IS THE ORDINARY ACT. A token moves between states as normal work, not as
+an exception.
+
+### Priority is half-built already
+
+`deliverable/engine/survey.ts:77` stamps `DEFAULT_PRIORITY` on every token, so
+all 49 standing tokens read "could". The `WorkToken` type carries id, statement,
+ready_when and source, and no priority at all (`pool.ts:7-12`).
+
+The survey already has the column. Nothing fills it.
+
+### Removing the two ladders costs nothing to migrate
+
+NOT ONE MATRIX CELL IS RATED. A search for a `<column>_complexity` carrying a
+`C0-4/R0-4` value across all 53 rows in `deliverable/machines/rigor_matrix/rows/`
+returns zero hits. The word "complexity" appears twice in that whole folder and
+neither is a rating.
+
+SO THE REMOVAL IS A CODE AND PROSE CHANGE, with no data behind it. The pair is
+declared at `rigor-matrix.ts:98-99`, parsed at `rigor-matrix.ts:104-123`, and
+reduced to a rung at `sizing.ts:55-66`. The rung vocabulary is `sizing.ts:52`.
+
+REMOVE ALL OF IT. Reading goes. The rung goes. Judgement is renamed to
+complexity, because the letter C already stands for complexity and the name
+"judgement" was a mistake.
+
+WHAT SURVIVES IS TWO INDEPENDENT LADDERS, and the iteration must keep them
+independent:
+
+- COMPLEXITY — how hard the thinking is.
+- AUTONOMY — whether the agent may decide alone.
+
+THEY DO NOT TRACK EACH OTHER. Mechanical work can demand hard thinking. A
+tactical decision can be easy.
+
+THIS ALSO DISSOLVES `raid-risk-a-submachine-maximum-drags-easy-items-onto-an-expensive-walker`.
+A submachine takes the maximum complexity over its rows today, so one hard item
+drags every easy one onto an expensive hand. When each token declares its own
+complexity there is no maximum left to take.
+
+AND IT CLEARS `raid-debt-the-load-time-complexity-refusal-is-off-until-the-matrix-is-rated`,
+which is waiting on 154 cells nobody has rated.
+
+### One thing the iteration must decide, and the owner accepted the cost
+
+GREEN STOPS BEING FULLY KNOWABLE IN ADVANCE. A state seeds its tokens on first
+entry, so almost everything is still computable ahead of the walk. What cannot
+be predicted is a token a person drops in by hand.
+
+THE OWNER ACCEPTED THAT: "we're not gonna refuse a late drop", and dropping in
+is expected to be occasional and small.
+
+SO A LATE DROP IS NEVER REFUSED. Green is recomputed instead.
+
+### One correction the corpus still owes
+
+`dsp-the-options-pool.md` still teaches the retired noun. It says the node lives
+at `spec/trace/option/opt-<slug>.md` with type `[[option]]` at lines 34, 45 and
+46. The engine writes `spec/trace/work-token/` with the `wt-` prefix
+(`pool.ts:17` and `pool.ts:22`).
+
+`i44-the-corpus-resolves-duplicate-headings-a` already owns that rename. Do not
+do it here, and do not be misled by it while reading the design spec.
