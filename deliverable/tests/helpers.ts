@@ -657,6 +657,13 @@ export async function pullTo(session: Session, state: string): Promise<void> {
 export function mirrorSources(): { rel: string; text: string }[] {
   return [
     "render.ts",
+    // THE SURFACE IS SEVERAL FILES NOW. The resolver moved the whole view
+    // computation out of the renderer, and the reader's place moved out with
+    // it. A guard that reads only render.ts is reading a fraction of the
+    // surface, and it reports the code it cannot see as missing rather than as
+    // moved — which is exactly what four of these cases did.
+    "viewmodel.ts",
+    "renderclient-place.ts",
     "renderclient.ts",
     "renderclient-detail.ts",
     "renderclient-walk.ts",

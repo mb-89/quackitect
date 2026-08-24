@@ -24,7 +24,7 @@ import { renderSidebar, tasksTable } from "./params.ts";
 import { resolveInRoot, seDir } from "./paths.ts";
 import { produce } from "./produce.ts";
 import { ENGINE_LIFE, feedRows, linkDocRefs, type MirrorState, renderMirror } from "./render.ts";
-import { runningWork } from "./run.ts";
+import { reapAbandonedJobs, runningWork } from "./run.ts";
 import { loadLevels, loadStopAt } from "./scale.ts";
 import type { Session } from "./session.ts";
 import { survey } from "./survey.ts";
@@ -310,7 +310,7 @@ export function startMirror(o: MirrorOptions): Server {
         result: state.session.formBless(String(body.name ?? ""), body.ok === true, "human", String(body.machine ?? "")),
       }),
     ],
-    // THE PRIORITY RIDES THE NOTE (owner, 2026-08-01). The note row draws
+    // THE PRIORITY RIDES THE NOTE (owner). The note row draws
     // a MoSCoW choice, and a capture that dropped it made every stray a
     // "could" whatever the reader picked.
     "/note": [
@@ -450,7 +450,7 @@ export function startMirror(o: MirrorOptions): Server {
         }),
         (e) => (e instanceof Rejection ? e.toJSON() : { error: whyOf(e) }),
       ),
-    // SET TARGET, the bar's button (owner design 2026-08-04): aims at the
+    // SET TARGET, the bar's button: aims at the
     // SELECTED state — the one whose details the machine page reported.
     "/target/selected": (req, res) =>
       jsonPost(
@@ -763,7 +763,7 @@ export function startMirror(o: MirrorOptions): Server {
       res.writeHead(200, { "content-type": "application/json; charset=utf-8", "access-control-allow-origin": "*" });
       res.end(JSON.stringify({ cards: loadCards(o.root) }));
     },
-    // BOTH HANDS ASK IT (owner ruling 2026-07-28): the agent through
+    // BOTH HANDS ASK IT: the agent through
     // se_survey, the person through the machine header's button.
     "/api/survey": (_url, _req, res) => {
       json(res, survey(o.root));
@@ -1016,6 +1016,17 @@ export function startMirror(o: MirrorOptions): Server {
   // A reset is the CLIENT's socket dying, and it now leaves a line. Before
   // this, telling it from a server exit meant checking a PID by hand.
   recordClientFailures(o.root, server);
+  // THE LAST ENGINE'S GHOSTS DIE HERE, BEFORE ANYBODY CAN READ THEM.
+  //
+  // A job records itself as running and only the engine that owns it writes
+  // the closing record. An engine that was killed never did, so without this
+  // the next one inherits jobs that report progress and never finish.
+  //
+  // IT RUNS BEFORE listen ON PURPOSE. The first lane answer already carries
+  // the work account, so a reap after the port opens is a reap the first
+  // caller can race.
+  const reaped = reapAbandonedJobs(o.root);
+  if (reaped.length > 0) recordLifecycle(o.root, "reaped", `jobs=${String(reaped.length)} ${reaped.join(" ")}`);
   server.listen(o.port, "127.0.0.1", () => recordLifecycle(o.root, "listening", `port=${String(o.port)}`));
   return server;
 }

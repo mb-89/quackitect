@@ -266,7 +266,7 @@ interface ScopeVerdict {
   ts: string;
   /** Consecutive green runs of this scope, this one included. The nudge
    *  rides the result: a long streak means the caller keeps re-proving the
-   *  proven — test on change, not on anxiety (owner ruling 2026-08-02). */
+   *  proven — test on change, not on anxiety. */
   streak?: number;
   /** WHAT THIS RUN WAS ASKED (req-test-run-carries-its-question). The scope
    *  says which tests ran; only the question says why. Without it a later
@@ -484,7 +484,7 @@ export function decideScope(seDir: string, root: string, force: boolean): ScopeD
   }
 
   const changed = changedSinceBattery(root, seDir);
-  // IN DOUBT THE ENGINE RUNS LESS, NOT MORE (owner ruling). This used to reach
+  // IN DOUBT THE ENGINE RUNS LESS, NOT MORE. This used to reach
   // for the whole battery when git could not say what moved, which is the most
   // expensive answer to a question nobody asked. A break that slips past here
   // is caught at the gate review, and that is the design rather than a hole in

@@ -226,7 +226,7 @@ export function stateDetails(m: MirrorState, decl: MachineDecl, done: Set<string
 /** Highlights follow the WALK; the view may be elsewhere.
  *
  *  IT REPORTS ITS OWN PARTS. This one call was 1163.6 ms of a 1190.2 ms render
- *  on 2026-08-23, and the whole rest of the render was under 27 ms. A single
+ *, and the whole rest of the render was under 27 ms. A single
  *  total says which call to look at and nothing about where inside it the time
  *  goes, so the parts are named and timed the same way the render's are. */
 export function drawingSets(
@@ -248,7 +248,7 @@ export function drawingSets(
     // Viewing main while the walk is inside a sub: the sub state is the live one.
     leafActive.add(m.session.breadcrumb()[1]);
   }
-  // RE-ENTRY RESETS (owner ruling 2026-07-27): the drawing shows the LIVE
+  // RE-ENTRY RESETS: the drawing shows the LIVE
   // run only — a machine entered again starts gray; past passes live in
   // the record, not on the drawing.
   const phase = onPhase ?? ((): void => {});
@@ -289,7 +289,7 @@ export function drawingSets(
       exit_met: m.session.conditionMet(decl, s, "leave"),
       has_entry: s.entry !== undefined,
       entry_met: m.session.conditionMet(decl, s, "enter"),
-      // The STATEMENT is the subtitle (owner ruling 2026-07-28): authored
+      // The STATEMENT is the subtitle: authored
       // meaning renders small under the name; empty renders nothing.
       ...(s.statement !== "" && s.statement !== s.id ? { subtitle: s.statement } : {}),
     };

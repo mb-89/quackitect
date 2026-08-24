@@ -1,5 +1,6 @@
 ---
 form: derive-functions
+judgment: passed at 2026-08-24T11:11:41.289Z
 reopened: "2026-08-23T16:52:41.216Z — write-requirements was re-signed after it, so it answered older ground"
 by: agent
 signed_off: 2026-08-23T16:52:47.244Z

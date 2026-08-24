@@ -7,7 +7,7 @@ kind: new
 realization: make
 group: the-account
 implements:
-  - fn-run-a-governed-walk.show-where-it-stands
+  - fn-run-a-governed-walk.resolve-the-view
 satisfies:
   - req-panel-shows-the-machine
   - req-controls-draw-from-their-spec

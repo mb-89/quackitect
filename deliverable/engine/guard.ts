@@ -170,7 +170,7 @@ export function guardParses(root: string, path: string, content: string): string
   //
   // THIS IS THE CASE THE PARSE CHECK EXPLICITLY SENDS AWAY. `status:
   // part-closed` is perfect YAML and a word nothing accepts. It was written on
-  // 2026-08-16, accepted, and trapped the walk eleven calls later naming a
+  //, accepted, and trapped the walk eleven calls later naming a
   // state that was entirely fine.
   //
   // req-a-value-outside-its-vocabulary-refuses

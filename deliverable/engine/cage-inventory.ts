@@ -5,7 +5,7 @@
 //
 // THE BLACKLIST IS EXPLICIT, which is the whole risk. A tool the host adds
 // later is not blocked by itself, so the cage silently develops a hole and
-// nothing says so. On 2026-08-19 a diff against GitHub's own hooks reference
+// nothing says so. On a diff against GitHub's own hooks reference
 // found five documented built-ins missing from ours, two of which — `bash`
 // and `rg` — were an uncaged shell and an uncaged search.
 

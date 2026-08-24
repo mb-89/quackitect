@@ -32,7 +32,7 @@ function renderLog() {
   const fEl = document.getElementById("log-filter");
   const f = fEl ? fEl.value.toLowerCase() : "";
   const rows = LOG_ROWS.filter((r) => !f || (r.ts + " " + r.src + " " + r.type + " " + r.brief + " " + (r.clause || "")).toLowerCase().includes(f));
-  // NEWEST ON TOP (owner ruling): the feed reads downward into the past;
+  // NEWEST ON TOP: the feed reads downward into the past;
   // the scroll pins to the top while the reader is there.
   const html = rows.slice().reverse().map((r) =>
     '<div class="logrow ' + r.type + (r.ok ? "" : " failed") + '" data-ref="' + r.ref + '">' +

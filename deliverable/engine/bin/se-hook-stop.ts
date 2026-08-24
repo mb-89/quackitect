@@ -1,6 +1,6 @@
 // se-hook-stop — THE UNSANCTIONED STOP IS REFUSED MECHANICALLY.
 //
-// The contract has said it in prose since 2026-08-07: a turn ends when the
+// The contract has said it in prose since: a turn ends when the
 // work does, a report is not a checkpoint, size is not a reason. Prose
 // failed four recorded times in two days. This hook is the tooth.
 //
@@ -21,7 +21,7 @@
 //   stop: idle, the desk with nothing routed, or a step above the slider;
 //
 //   THE TARGET HALF WAS MISSING AND AN ESCAPE WALKED STRAIGHT THROUGH THE
-//   GAP (owner instruction 2026-08-14). The escape hatch lands at the front
+//   GAP (owner instruction ). The escape hatch lands at the front
 //   desk, and the desk answers "wait". So the sequence was: escape for a
 //   real reason, land at the desk, stop — and the tooth had nothing to
 //   bite, because the last pull said "wait".

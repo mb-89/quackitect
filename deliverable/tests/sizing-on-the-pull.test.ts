@@ -117,7 +117,10 @@ test("a live pull inside a rated, pinned iteration carries the published strengt
   session.setAutonomy(1);
   await session.advance("iterations");
   await session.advance(sid);
-  await pullTo(session, `iterations/${sid}/onboard-retro`);
+  // THE ROSTER STATE IS M0'S FIRST, and it is rated like any other, so it is
+  // where a live pull can be caught carrying the published strength. Walking
+  // past it would mean filling its form, which this case is not about.
+  await pullTo(session, `iterations/${sid}/spawn-the-hands`);
   const body = (await session.pull({}, "agent")) as Record<string, unknown>;
   const hand = body.hand as { rung?: string; pair?: Difficulty } | undefined;
   assert.ok(hand !== undefined, "the head consults the sizing block — delete that line and this is the case that goes red");

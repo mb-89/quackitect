@@ -1,4 +1,4 @@
-// THE READER'S PLACE, IN ONE PLACE (i4, 2026-08-23).
+// THE READER'S PLACE, IN ONE PLACE (i4).
 //
 // Focus, scroll and an unsubmitted edit are the browser's own state. They
 // change on every keystroke, so they stay on the surface rather than crossing

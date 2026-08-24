@@ -74,6 +74,11 @@ The last row is the trap. VS Code loads the extension **copy** under
 edit. The copy exists because the product's name is rendered into it at install
 time; until that rendering moves to activation time, this row stands.
 
+Startup now checks that copy for you. It renders the source and compares, so a
+copy that is stale, or one that never had the name rendered into it at all,
+stops the start and says which file. The editor showing nothing was that second
+case, and nothing had caught it.
+
 ## Give it to someone else
 
 Open the command palette and run **Create a Vehicle**.

@@ -816,7 +816,7 @@ export function buildServer(
   // THE PAYMENT'S OWN REFUSAL OUTRANKS THE TOLL (note-c883db8c6e12): a call
   // that carried an update which failed to apply must hear what was wrong
   // with the payment — the bare toll clause sent five identical resends
-  // into the same wall, live, on 2026-08-03.
+  // into the same wall, live,.
   server.addGuard((tool, args) => {
     try {
       toll.check(session.isBooted(), tool, args);
@@ -893,7 +893,7 @@ export function buildServer(
         `THE RUNNING LANE IS OLDER THAN THE CODE ON DISK. It serves ${age.served}; the tree is at ${age.on_disk}. Engine changes since then are invisible here, including any this walk made. Run se_reload at idle to restart it onto these sources.`,
       );
     }
-    // THE STALE-SETTINGS BANNER IS STRUCK (owner, 2026-08-20). It explained an
+    // THE STALE-SETTINGS BANNER IS STRUCK (owner). It explained an
     // earlier lane, a settings store and a design decision, to a person who
     // had just opened the system and wanted to work. A banner is for something
     // the reader must ACT on, and there was nothing to act on.

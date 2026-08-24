@@ -271,19 +271,24 @@ test("a run this session started reports its outcome even if it settled unseen",
   }
 });
 
-// dsp-the-work-account.md: "AN ENTRY NEVER LEAVES THE TABLE INSIDE ONE SESSION.
-// The account is the whole list, not the tail of it." The code used to drop a
-// read entry, which left a reader unable to tell finished from read — it just
-// stopped appearing.
-test("an entry never leaves the table, and a second look marks it read", () => {
+// THE OUTCOME RIDES ONCE, AND THEN THE ENTRY DROPS ITSELF.
+//
+// IT USED TO RIDE UNTIL ACKNOWLEDGED, and an entry nobody acknowledged was paid
+// for on every call for the rest of the session. That is what made the account
+// grow without limit: the caller had already read the outcome and went on
+// carrying it.
+//
+// THE NEWS IS STILL UNMISSABLE. It rides in full on the first answer after the
+// job ends. Delivering it a second time was never what made it reliable, and
+// se_run {job} serves the whole record afterwards.
+test("a finished entry hands its outcome over once, then leaves the table", () => {
   const root = rootWithSettledRun("test-twice-1");
   try {
     noteStarted("test-twice-1", root);
     const first = workAccount(root).find((j) => j.job === "test-twice-1");
     assert.equal(first?.standing, "finished", "the first look hands the outcome over");
     const second = workAccount(root).find((j) => j.job === "test-twice-1");
-    assert.ok(second !== undefined, "the entry is still in the table on the second look");
-    assert.equal(second.standing, "read", `and it says the outcome has already been handed over: ${JSON.stringify(second)}`);
+    assert.equal(second, undefined, `and the second look no longer carries it: ${JSON.stringify(second)}`);
   } finally {
     rmSync(root, { recursive: true, force: true });
   }

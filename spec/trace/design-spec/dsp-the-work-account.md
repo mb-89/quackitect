@@ -158,6 +158,25 @@ never absent. The entry lists and its basis says no measurement was found.
 A JUDGMENT THAT DIES WITHOUT SETTLING is settled as failed. The table reads the
 process, finds it gone, and never leaves an entry deciding for ever.
 
+THAT CLAIM WAS NOT HONOURED ON ONE PATH, and the path is named here because it
+looks identical from outside. A run whose child is killed can fail to close its
+output pipes, so the promise behind the step never settles at all. There was
+nothing left to read: the process was gone, no record stood behind the step, and
+the step reported `deciding` for the life of the engine.
+
+TWO GUARDS CLOSE IT.
+
+- THE RUN ENDS ITSELF. Killing the child arms a second clock, and the run
+  reports what it has when that clock fires, whatever the pipes are doing.
+- A RUN PAST ITS CEILING IS DROPPED. The in-flight table records when each run
+  started, and one older than the kill ceiling plus its grace is forgotten, so
+  the next attempt starts a real run rather than joining a promise that will
+  never resolve.
+
+MEASURED: a walk sat at its repair step reporting a battery still running,
+nineteen minutes after that battery's last case finished, with no battery
+process alive anywhere on the machine.
+
 THE SIGNAL IS UNAMBIGUOUS AND WAS MEASURED. In
 [[exp-does-a-left-check-survive-its-call]] a killed judgment closed with
 `code=null signal=SIGTERM` and left no verdict file at all, so absence plus a dead

@@ -2,7 +2,7 @@
 //
 // AGENTS.md used to carry a "logging duty": after every native search, the
 // agent was to record the query itself. That is discipline, and discipline
-// is exactly what the owner did not want to depend on (ruling 2026-07-28).
+// is exactly what the owner did not want to depend on (ruling ).
 // Claude Code runs this after every WebSearch instead, so the query lands in
 // the same log the lane writes and the mirror tells the whole story — no
 // matter who did the searching or whether they remembered.
@@ -21,7 +21,7 @@ import { SE_VERSION } from "../version.ts";
 
 // bin -> engine -> deliverable -> the project root. THREE hops, not four.
 //
-// IT CLIMBED FOUR UNTIL 2026-08-23, landing outside the repository. The layout
+// IT CLIMBED FOUR UNTIL, landing outside the repository. The layout
 // once carried a `product/` folder between the root and `deliverable/`, and the
 // hop survived its removal. Every search this hook was built to record reached
 // a folder that is not the project. Its sibling se-hook-stop.ts carried the

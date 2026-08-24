@@ -88,11 +88,11 @@ export class ReadGate {
    *  never to the record. Two hands walking the same record have read
    *  different things, and only one of them can be asked.
    *
-   *  IT WAS ONE SHARED LEDGER UNTIL 2026-08-23, and that made a freshly
+   *  IT WAS ONE SHARED LEDGER UNTIL, and that made a freshly
    *  spawned walker inherit credit for pages it had never seen. The gate then
    *  reported the reading as done to a hand holding none of it. That is the
    *  same guarantee the cold reviewer rests on, broken from the other end
-   *  (owner ruling 2026-08-23).
+   *.
    *
    *  THE LEDGERS DO NOT SURVIVE A RESTART except the default reader's, which
    *  is what `restore` writes into. That is correct rather than a shortcut: a

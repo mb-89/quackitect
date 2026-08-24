@@ -22,6 +22,7 @@ legal_tools:
   - se_log_query
   - se_answer
   - se_run
+  - se_test
   - se_lint
   - se_git
 major: full
@@ -32,6 +33,15 @@ specification: tailored
 major_note: |
   Applies as drawn. Collect them all, fix in one pass, confirm in one run. The
   confirm run is the exit: red keeps the walk here.
+
+  THE SCOPED QUESTION IS LEGAL HERE, and it has to be. This is the state whose
+  whole job is understanding failures, and without se_test its only instrument
+  was the confirm run — the whole battery, ninety seconds, fired by every pull
+  that tried to advance. A walker checking one fix had to run everything.
+
+  SO ASK NARROWLY WHILE FIXING, AND CONFIRM ONCE AT THE END. The engine still
+  decides what a scoped question runs, and the confirm run still holds the
+  state. Nothing about the hold changes.
 minor_note: |
   Applies as drawn. Collect them all and fix in one pass, then one confirm run.
   The confirm run is the exit: red keeps the walk here.

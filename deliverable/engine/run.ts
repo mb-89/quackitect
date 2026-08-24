@@ -67,7 +67,7 @@ function spawnShell(root: string, command: string, cwd?: string): ChildProcess {
 // ONE TABLE, EVERY KIND. see dsp-the-work-account.md#responsibility, a shell
 // job, a test run and a step's leaving judgment are three kinds of the same
 // thing, and a caller asking what is running is told about all of them.
-// A SUBAGENT IS A BACKGROUND TASK TOO (owner ruling). The harness spawns it,
+// A SUBAGENT IS A BACKGROUND TASK TOO. The harness spawns it,
 // not the lane, so the engine cannot see it for itself — the driving agent says
 // it started one and says when it ends. Registered, it rides the account and
 // the panel beside every other piece of work out of sight.
@@ -200,7 +200,7 @@ function asAccount(entry: JobView, standing: Standing): AccountEntry {
   const { stdout, stderr, truncated, ...rest } = entry;
   const failed = !entry.running && entry.exit !== null && entry.exit !== 0;
   const said = stderr.trim() === "" ? stdout : stderr;
-  // THE ACCOUNT IS A LITTLE TEXT AND SOME REFERENCES (owner ruling 2026-08-23).
+  // THE ACCOUNT IS A LITTLE TEXT AND SOME REFERENCES.
   // It rides EVERY lane result, so anything carried here is paid for on every
   // call of the session rather than once.
   //
@@ -250,8 +250,9 @@ export interface JobView {
   /** What the figure rests on, or why there is no figure. It is never absent:
    *  a duration a reader cannot discount is believed more than it deserves. */
   basis: string;
-  /** WHICH OF THE THREE STANDINGS this entry is in. The account always sets it.
-   *  se_run {jobs: true} is the history door and sets none.
+  /** WHICH OF THE THREE STANDINGS this entry is in. The account always sets it,
+   *  and so does the listing — which sets `running`, because running is the only
+   *  thing it lists.
    *  see dsp-the-work-account.md#behavior-and-constraints */
   standing?: Standing;
   stdout: string;
@@ -259,8 +260,8 @@ export interface JobView {
   truncated: boolean;
 }
 interface Job {
-  /** WHICH HAND THIS IS — walker, reviewer, researcher (owner ruling
-   *  2026-08-23). ONLY WALKERS COUNT AGAINST THE RECORD'S CEILING. A reviewer
+  /** WHICH HAND THIS IS — walker, reviewer, researcher (
+   *  ). ONLY WALKERS COUNT AGAINST THE RECORD'S CEILING. A reviewer
    *  and a researcher are a different purchase: one buys separation, the other
    *  buys reading nobody has done, and neither competes for the walking slot. */
   role?: string;
@@ -341,6 +342,10 @@ interface PersistedJob {
   last_report?: number;
   model?: string;
   pid?: number;
+  /** THE LAST ENGINE DIED WITHOUT CLOSING THIS ONE, and the engine that came
+   *  after closed it instead. It says the exit code is unknown BECAUSE nobody
+   *  was there to read it, which is a different fact from a job that ended. */
+  reaped?: boolean;
 }
 /** A test run's own record, kept beside the shell jobs since before this table
  *  existed. It is read back as an operation rather than rewritten. */
@@ -488,7 +493,7 @@ function timeRemaining(j: Job): { remaining_ms?: number; basis: string } {
   // Its narration is the only signal it sends, and `noteAlive` turns that into
   // these two counters.
   //
-  // THE TWO PAIRS WERE NEVER JOINED UNTIL 2026-08-23. `progress`/`total` are a
+  // THE TWO PAIRS WERE NEVER JOINED UNTIL. `progress`/`total` are a
   // FILE and a file count; `steps_done`/`steps_total` are a checklist. An agent
   // filled the second pair and was measured against the first, so every hand
   // reported "no comparable work" for its whole life.
@@ -639,7 +644,7 @@ function knownJob(id: string, root?: string): Job {
     clause: CLAUSES.JOB_UNKNOWN,
     expected: "a job started in this session",
     got: `${id} (unknown)`,
-    remedy: { tool: "se_run", args: { jobs: true }, note: "list the jobs this session started" },
+    remedy: { tool: "se_run", args: { jobs: true }, note: "list what is running right now" },
     source: "engine/run.ts jobs",
   });
 }
@@ -662,7 +667,7 @@ export function anyJobRunning(maxAgeMs?: number): boolean {
   const now = Date.now();
   for (const j of jobs.values()) {
     if (!j.running) continue;
-    // A JOB OLDER THAN THE BOUND IS A LEAK, NOT WORK (2026-08-23).
+    // A JOB OLDER THAN THE BOUND IS A LEAK, NOT WORK.
     //
     // WHY THE BOUND EXISTS. A background job that never exits stays `running`
     // for ever, and one of those vetoed the idle shutdown indefinitely. A
@@ -883,8 +888,8 @@ export function noteModel(id: string, model: string, root?: string): boolean {
 /** NAME WHICH HAND THIS IS. It rides beside noteModel for the same reason:
  *  nothing about the registry's own shape has to know that agents are special.
  *
- *  THE RECORD'S CEILING COUNTS WALKERS AND NOTHING ELSE (owner ruling
- *  2026-08-23). Before this, a reviewer spawned at a gate filled the walking
+ *  THE RECORD'S CEILING COUNTS WALKERS AND NOTHING ELSE (
+ *  ). Before this, a reviewer spawned at a gate filled the walking
  *  slot, and the next phase could not start a walker at all — measured the
  *  same day, on the state that stranded the walk. */
 export function noteRole(id: string, role: string, root?: string): boolean {
@@ -1064,8 +1069,29 @@ export function jobList(root?: string): JobView[] {
   }
   // THE OTHER KIND. A test run keeps its own record, and a caller asking what
   // is running was told about one table and never learned the other existed.
+  //
+  // A SETTLED RECORD ON DISK BEATS A RUNNING ONE IN MEMORY, and that is the
+  // whole of this fix. The in-memory entry used to win unconditionally, so a
+  // battery that finished and wrote its verdict went on reporting itself as
+  // running for the rest of the session.
+  //
+  // MEASURED. A battery wrote `ended` and a verdict of
+  // `running: false` at 92 seconds. The account still called it running at 326
+  // seconds, reporting 179 of 179 files finished and nothing advancing. Three
+  // jobs in that state survived overnight and taxed every answer of the next
+  // session — which taxed the session that followed.
+  //
+  // WHY THE RECORD IS THE AUTHORITY. It is written when the run ENDS, by the
+  // code that has the verdict in its hand. The memory entry is written when the
+  // run STARTS. Only one of the two knows how it turned out.
+  //
+  // NEVER THE OTHER WAY. A record with no verdict does not un-finish a job that
+  // memory knows has ended, so the override is one-directional.
   if (root !== undefined) {
-    for (const op of testOperations(root)) if (!found.has(op.id)) found.set(op.id, op);
+    for (const op of testOperations(root)) {
+      const held = found.get(op.id);
+      if (held === undefined || (held.running && !op.running)) found.set(op.id, op);
+    }
   }
   return [...found.values()].sort((a, b) => b.started - a.started).map(view);
 }
@@ -1230,13 +1256,13 @@ export function settleOperation(id: string, ok: boolean, root?: string): void {
 
 /** RETIRE THE HANDS OF EVERY OTHER MILESTONE, and say which went.
  *
- *  ONE WALKER PER MILESTONE IS THE ARRANGEMENT (owner ruling 2026-08-23), and
+ *  ONE WALKER PER MILESTONE IS THE ARRANGEMENT, and
  *  the handover should be visible: the M1 walker goes as the M2 walker
  *  arrives, rather than both standing for ever.
  *
  *  THE ENGINE CANNOT SEE A SPAWNED HAND DIE. The harness owns that process, so
  *  nothing tells the registry it ended and a row can read `running` long after
- *  the agent is gone — measured at 29 minutes on 2026-08-23. Retiring on the
+ *  the agent is gone — measured at 29 minutes. Retiring on the
  *  NEXT registration is the one moment the engine reliably learns that the
  *  previous milestone is over.
  *
@@ -1291,10 +1317,15 @@ function marksFor(store: Map<string, Set<string>>, root?: string): Set<string> {
 
 /** THE ACCOUNT THAT RIDES A LANE ANSWER: every operation THIS SESSION started,
  *  running and finished alike, each saying which of the three standings it is
- *  in. AN ENTRY NEVER LEAVES THE TABLE INSIDE ONE SESSION — a second look marks
- *  it `read` rather than dropping it, so a caller that missed the moment can
- *  still find the outcome. Work that ended BEFORE this session looked is
- *  history rather than news, and answers to se_run {jobs: true} instead.
+ *  in.
+ *
+ *  A FINISHED ENTRY RIDES EXACTLY ONE ANSWER AND THEN DROPS ITSELF. The caller
+ *  has been told, and telling them again on every later call is the noise this
+ *  table exists to remove. The record stays reachable by its id with
+ *  se_run {job}, so nothing is lost by dropping it from the ride.
+ *
+ *  WORK THAT ENDED BEFORE THIS SESSION LOOKED is history rather than news, and
+ *  never joins the table at all.
  *  see dsp-the-work-account.md#behavior-and-constraints */
 export function workAccount(root?: string): AccountEntry[] {
   const read = marksFor(handedOut, root);
@@ -1310,15 +1341,71 @@ export function workAccount(root?: string): AccountEntry[] {
       continue;
     }
     if (!jobs.has(entry.job) && !mine.has(entry.job) && !running.has(entry.job)) continue;
-    const already = read.has(entry.job);
+    // A FINISHED JOB RIDES EXACTLY ONE ANSWER, then drops itself. Work that is
+    // done does not show up again.
+    //
+    // IT USED TO RIDE UNTIL ACKNOWLEDGED, and an entry nobody acknowledged rode
+    // for the rest of the session. That is what made the account grow: the
+    // caller had already read the outcome and kept paying for it on every call.
+    //
+    // THE NEWS IS STILL UNMISSABLE. The outcome rides once, in full, on the
+    // first answer after the job ends. Delivering it twice was never what made
+    // it reliable.
+    //
+    // NOTHING IS LOST. se_run {job} serves the whole record afterwards, and the
+    // call log keeps the output under its ref for good.
+    if (read.has(entry.job)) {
+      gone.add(entry.job);
+      continue;
+    }
     read.add(entry.job);
-    out.push(asAccount(entry, already ? "read" : "finished"));
+    out.push(asAccount(entry, "finished"));
   }
   return out;
 }
 
 /** What a caller has said it has seen, and will not be shown again. */
 const settled = new Map<string, Set<string>>();
+
+/** THE WHOLE ROSTER, IN THE ACCOUNT'S OWN SHAPE.
+ *
+ *  se_run {jobs: true} used to answer with the raw job records, output and
+ *  all. MEASURED: 1.1 MB for 553 jobs, against a 6 KB answer bound,
+ *  so the listing spilled to disk and the caller paged it back a screen at a
+ *  time to read a handful of ids.
+ *
+ *  THE RULE WAS ALREADY WRITTEN, one function above: the account is a little
+ *  text and some references. The listing simply did not go through it.
+ *
+ *  SO IT GOES THROUGH IT NOW. Every row carries its id, its kind, a command
+ *  handle, how it ended, and the CALL THAT SERVES THE REST. Nothing carries a
+ *  payload.
+ *
+ *  IT LISTS WHAT IS RUNNING, AND NOTHING ELSE.
+ *  That is the question this verb is asked: what is going on right now.
+ *
+ *  IT USED TO LIST EVERY JOB THE SESSION EVER STARTED. MEASURED:
+ *  521 jobs, TWO of them running, and 1.1 MB of answer against a 6 KB bound.
+ *  Reducing every row to the account's shape still left 132 KB, because 519 of
+ *  the rows were finished work nobody had asked about. The shape was never the
+ *  problem. The rows were.
+ *
+ *  A FINISHED JOB IS FOUND BY NAME. se_run {job: "<id>"} serves its whole
+ *  record, and the call log keeps its output under its ref for good. The
+ *  account already delivered the outcome once, on the first answer after the
+ *  job ended, so this listing is never the only chance to learn it.
+ *
+ *  THE COUNT OF THE REST IS ONE INTEGER, never a listing. It says the history
+ *  is there, and spends nothing saying it. */
+export function jobRoster(root?: string): { jobs: AccountEntry[]; running: number; settled: number } {
+  const all = jobList(root);
+  const live = all.filter((e) => e.running);
+  return {
+    jobs: live.map((e) => asAccount(e, "running")),
+    running: live.length,
+    settled: all.length - live.length,
+  };
+}
 
 /** DROP SETTLED WORK FROM THE ACCOUNT.
  *
@@ -1375,4 +1462,58 @@ export async function runToCompletion(root: string, command: string, opts: { cwd
     duration_ms: result.duration_ms,
     truncated: result.truncated,
   };
+}
+
+/** EVERY JOB THE LAST ENGINE LEFT BEHIND, CLOSED AT STARTUP.
+ *
+ *  A job persists to .se/jobs/<id>.jsonl WITH its pid, and its last record says
+ *  running: true until the engine that owns it writes the closing one. An
+ *  engine that is killed never writes that record, so it stays running for
+ *  ever and the next engine reads a ghost.
+ *
+ *  WHAT A GHOST COSTS. It rides the work account on every lane answer, and the
+ *  account shares the answer bound with the actual content. MEASURED:
+ *  three ghosts, fifteen hours old, reporting 179 of 179 files
+ *  finished and not advancing. They took roughly 1.8 KB of a 6 KB bound away
+ *  from every call in the session, and se_run {jobs: true} came back 1.1 MB.
+ *
+ *  IT IS RULED MECHANICAL: the engine kills them at startup, because noticing
+ *  them is not the agent's work.
+ *
+ *  IT IS SAFE BECAUSE A JOB BELONGS TO ONE ENGINE. Only one engine holds the
+ *  port, so nothing else is waiting on a process its predecessor started.
+ *
+ *  A KILL THAT FAILS NEVER STOPS THE CLOSE. The pid may have been recycled by
+ *  an unrelated process, or the process may be long gone; either way the record
+ *  is the thing that must stop lying, and killTree already ignores a pid it
+ *  cannot reach. */
+export function reapAbandonedJobs(root: string): string[] {
+  const dir = jobDir(root);
+  if (!existsSync(dir)) return [];
+  const reaped: string[] = [];
+  for (const name of readdirSync(dir)) {
+    if (!name.endsWith(".jsonl")) continue;
+    const id = name.slice(0, -".jsonl".length);
+    const j = persisted(root, id);
+    if (j === undefined || !j.running) continue;
+    try {
+      killTree(j.pid);
+    } catch {
+      // The record still gets closed. See the note above.
+    }
+    const closing: PersistedJob = {
+      id,
+      kind: j.kind,
+      command: j.command,
+      started: j.started,
+      ended: Date.now(),
+      exit: null,
+      running: false,
+      reaped: true,
+    };
+    appendFileSync(jobPath(root, id, "jsonl"), `${JSON.stringify(closing)}\n`, "utf8");
+    jobs.delete(id);
+    reaped.push(id);
+  }
+  return reaped;
 }

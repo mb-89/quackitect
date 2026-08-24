@@ -83,7 +83,7 @@ export class Liveness {
    *
    *  A JOB THAT NEVER EXITS IS WHY THIS NEVER FIRED. It stays `running` for
    *  ever, and a shutdown any leak can veto is a shutdown that never happens.
-   *  Measured 2026-08-23: a profiling script kept a watcher alive and held the
+   *  Measured: a profiling script kept a watcher alive and held the
    *  machine awake for twenty-four minutes with the walk resting and the log
    *  silent.
    *
@@ -98,7 +98,7 @@ export class Liveness {
 
   setPower(key: string, on: boolean): Record<string, unknown> {
     if (key === "block-auto-sleep") this._blockSleep = on;
-    // THE OLD KEY IS STILL ACCEPTED. The control was renamed on 2026-08-23 and
+    // THE OLD KEY IS STILL ACCEPTED. The control was renamed and
     // a panel served before the rename still posts the old one.
     else if (key === "shutdown-at-front-desk" || key === "shutdown-at-idle") this._shutdownAtIdle = on;
     else {
@@ -170,7 +170,7 @@ export class Liveness {
     }).unref();
   }
 
-  /** THE PING (owner, 2026-07-30): the agent points at a mirror surface and
+  /** THE PING (owner): the agent points at a mirror surface and
    *  it pulses YELLOW in every open window — the tour's pointing finger,
    *  and "look HERE" for refusals and diffs. Targets: a card id (machine,
    *  log, details, terminal, chat), a drawn state id, or an element id.

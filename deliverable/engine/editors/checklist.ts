@@ -14,7 +14,7 @@
 // IT FALLS THROUGH WITH NO ITEMS, like per-item: an empty source becomes a
 // plain text box rather than an empty box pretending to be a form.
 //
-// A REFERENCE IS A LINK, NEVER TEXT (owner ruling 2026-08-23). An item ending
+// A REFERENCE IS A LINK, NEVER TEXT. An item ending
 // in a bracketed path renders that path as a clickable link, in the same
 // `doclink` shape the mirror already uses everywhere else.
 //

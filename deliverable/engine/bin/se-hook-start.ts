@@ -1,7 +1,7 @@
 // se-hook-start — THE CAGED SESSION'S SessionStart NOTICE. Not the prompt layer.
 //
 // KNOW THE DIFFERENCE, because getting it wrong puts a second copy of the
-// rules in the tree (owner correction 2026-08-18).
+// rules in the tree.
 //
 // THE PROMPT LAYER IS THE SESSION PROMPT. `engine/promptlayer.ts` assembles
 // guidance/contract.md, walking.md, method/lane.md and voice.md

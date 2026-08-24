@@ -49,7 +49,7 @@ export class Views {
 
   /** The PARENT CHAIN of a viewable machine, main first — the mirror's
    *  breadcrumbs render it, so a nested decade reads
-   *  main › expedition_archive › e1-e10 (owner ruling 2026-07-28). */
+   *  main › expedition_archive › e1-e10. */
   viewChain(id: string): string[] {
     if (id === this.host.machine.id) return [this.host.machine.id];
     const idx = this.host.subs.findIndex((s) => s.decl.id === id);

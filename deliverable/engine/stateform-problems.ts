@@ -689,7 +689,7 @@ function nodeTableProblems(name: string, args: FieldArgs, content: string): stri
 }
 
 /** Which ROW each option belongs to: its design question where it names one,
- *  its cluster otherwise (owner ruling 2026-08-11 - a row is a DECISION, and
+ *  its cluster otherwise (- a row is a DECISION, and
  *  a scoped iteration's decisions are finer than the product's clusters). */
 function optionClusters(corpus: TraceNode[]): Map<string, string> {
   const out = new Map<string, string>();
@@ -711,7 +711,7 @@ function chartProblems(name: string, content: string, corpus?: TraceNode[]): str
   }
   if (corpus === undefined) return [];
   const serves = optionClusters(corpus);
-  // A ROW IS A DECISION (owner ruling 2026-08-11): demanded rows are those
+  // A ROW IS A DECISION: demanded rows are those
   // where the LINES' OWN picks offer at least two live alternatives. A
   // one-cell row is a settled ruling, and inherited clusters never re-demand.
   const lines: { id: string; byKey: Map<string, number> }[] = [];
@@ -787,8 +787,8 @@ type ChecklistStatus =
 
 function checklistItemStatus(item: string, lines: Set<string>, corpus?: TraceNode[]): ChecklistStatus {
   if (lines.has(`- [x] ${item}`)) return { kind: "checked" };
-  // AN UNTICKED BOX WITH A REASON IS AN ANSWER, not a blank (owner ruling
-  // 2026-08-23). Some drawn lists offer a thing the state MAY use and need
+  // AN UNTICKED BOX WITH A REASON IS AN ANSWER, not a blank
+  // Some drawn lists offer a thing the state MAY use and need
   // not: a spawn state lists the cast, and a phase that honestly earns no
   // hand must be able to say so.
   //

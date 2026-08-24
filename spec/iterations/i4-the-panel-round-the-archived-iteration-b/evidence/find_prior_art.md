@@ -1,5 +1,6 @@
 ---
 form: find_prior_art
+judgment: passed at 2026-08-24T11:12:27.355Z
 by: agent
 signed_off: 2026-08-23T17:11:52.663Z
 authors: agent

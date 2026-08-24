@@ -193,7 +193,7 @@ export interface SubRun {
   gen?: GeneratedMachine;
 }
 
-/** WHOSE HAND is on the tick. The channel rule (owner ruling 2026-07-26):
+/** WHOSE HAND is on the tick. The channel rule:
  *  HTTP is the human, MCP is the agent. The threshold gates only the
  *  agent's hand — the human always may. */
 export type Channel = "human" | "agent";
@@ -274,8 +274,8 @@ export class Session {
    *  own evidence by `hands-spawned.ts`. There is exactly one place to change
    *  it and one place to read it.
    *
-   *  THE COUNT WAS BRIEFLY KEPT HERE TOO AND THAT WAS WRONG (owner ruling
-   *  2026-08-23). Session state is global to the session, so a per-record
+   *  THE COUNT WAS BRIEFLY KEPT HERE TOO AND THAT WAS WRONG (
+   *  ). Session state is global to the session, so a per-record
    *  number kept here leaks into every other record, and two sources that can
    *  disagree are worse than the one that is right. */
   private _hands: "solo" | "spawned" = "spawned";
@@ -805,7 +805,7 @@ export class Session {
       throw new Rejection({
         clause: CLAUSES.ABOVE_THRESHOLD,
         expected: "the autonomy at its top rung before emergency arms — it is a step past full delegation, never a way around it",
-        // THE WORD, NEVER THE NUMBER (owner ruling 2026-08-14). Three refusal
+        // THE WORD, NEVER THE NUMBER. Three refusal
         // lines still carried the raw dial after i27 moved the rest.
         got: `the autonomy sits at ${this.tierFor(this._autonomy).tier ?? "a lower rung"}`,
         remedy: { tool: "se_pull", args: {}, note: "raise the autonomy to the top rung first" },
@@ -855,8 +855,8 @@ export class Session {
     if (value < 1) this._emergency = false;
     this.persistSettings();
     this.notifyChange(); // a holding agent wakes and re-reads the packet
-    // THE ANSWER IS THE WORD, and the word for what it was (owner ruling
-    // 2026-08-14). The person's control sends a number in; nothing sends one
+    // THE ANSWER IS THE WORD, and the word for what it was
+    // The person's control sends a number in; nothing sends one
     // back out.
     return { ...this.tierFor(value), was: this.tierFor(was).tier ?? "", ...(this._emergency ? { emergency: true } : {}) };
   }
@@ -1224,7 +1224,7 @@ export class Session {
   expeditionOpen(id: string): Record<string, unknown> {
     this.bound = expFind(this.machineRoot(), id);
     // While bound, decision ops ALSO land in the record: the reasoning is
-    // part of the persistent walk (owner ruling 2026-07-27), parts per visit.
+    // part of the persistent walk, parts per visit.
     this.decisions.setExtraSink(join(this.bound.path, "spec", "expeditions", this.bound.id, "decisions.jsonl"));
     return { bound: this.bound.id, note: "the lane now works inside this expedition's folder" };
   }
@@ -1475,7 +1475,7 @@ export class Session {
 
   /** A sub governs as long as it stands — including its visible end
    *  position; it is popped when its parent state completes. Machines
-   *  nest to ANY depth (owner order 2026-07-28): the walk is a stack. */
+   *  nest to ANY depth (owner order ): the walk is a stack. */
   private inSub(): boolean {
     return this.subs.length > 0;
   }
@@ -1887,7 +1887,7 @@ export class Session {
         judgments.push({
           at: s.to,
           needs: "the slider, or the person's own hand",
-          // THE WORD, NEVER THE NUMBER (owner ruling 2026-08-14). A served
+          // THE WORD, NEVER THE NUMBER. A served
           // string is an answer like any other.
           why: `entering ${s.to} is ${this.tierFor(s.priority).tier ?? "heavier"} work, above this session's ${this.tierFor(this._autonomy).tier ?? "dial"}`,
         });
@@ -1923,7 +1923,7 @@ export class Session {
   /** see dsp-the-goal-binds-the-walk.md#the-route-collects-every-judgment-up-front-and-moves-nothing */
   route(target: string): RouteResult & {
     from: string;
-    /** The tier WORD. No number rides an answer (owner ruling 2026-08-14). */
+    /** The tier WORD. No number rides an answer. */
     tier?: string;
     judgments: { at: string; needs: string; why: string }[];
     reads: string[];
@@ -1982,7 +1982,7 @@ export class Session {
       ...this.tierFor(this._autonomy),
       judgments,
       reads: this.routeReadList(r.steps),
-      // THE FAN AT A BAR RIDES THE ROUTE (owner, 2026-08-09): one drawn
+      // THE FAN AT A BAR RIDES THE ROUTE (owner): one drawn
       // path hid the other legs, and the walk met them one refusal at a
       // time — the three-way join cost an aim per leg before this.
       fan: this.routeFan(r.steps),
@@ -2177,7 +2177,7 @@ export class Session {
   }
 
   // THE PROBE MATHS LIVES IN engine/readproof.ts, and nothing here keeps a
-  // copy of it (owner, 2026-08-18). The test suite answers the probes from
+  // copy of it (owner). The test suite answers the probes from
   // that same module, so the two cannot drift.
 
   /** HOW LONG A SWEEP MAY RUN BEFORE IT ANSWERS.
@@ -2267,7 +2267,7 @@ export class Session {
     };
   }
 
-  // ── THE PULL (owner design 2026-08-01) — the agent's ONE verb ───────
+  // ── THE PULL — the agent's ONE verb ───────
   //
   // THE LAW IT KEEPS is v2 §6's, and it is the whole point: BLOCKING IS
   // AN INSTRUCTION RETURNED, NOT AN ERROR. The tick refuses. A threshold,
@@ -2280,11 +2280,11 @@ export class Session {
   // pulls again. Options appear ONLY where the machine offers them.
   //
   // THERE IS NO SUBMIT VERB. A pull carrying a filled form IS the submit
-  // (owner, 2026-08-01). Pulling again without it returns the same form,
+  // (owner). Pulling again without it returns the same form,
   // so there is no way forward except filling it.
   //
   // THE FLAG IS NOT THE VERB, and confusing the two cost four round trips on
-  // 2026-08-09. `submit` and `bless` ride IN the form as acts rather than
+  //. `submit` and `bless` ride IN the form as acts rather than
   // sections (pullSaveOrChoose). A fill without `submit` SAVES and does not
   // stamp, which is deliberate — a half-filled form survives to be finished —
   // but it answers with the same form and no problems, so it reads exactly
@@ -2455,14 +2455,14 @@ export class Session {
       ...(this.bound !== undefined ? { expedition: this.bound.id } : {}),
       target: targetNow(),
       // The tier word IS the autonomy. No number rides any answer
-      // (owner ruling 2026-08-14).
+      //.
       ...this.tierFor(this._autonomy),
       narration: { minutes: this._narrationMinutes, calls: this._narrationCalls },
       ...this.strengthNeeded(),
     });
 
     // STEPPING OUT stays the agent's decision — the machine cannot know
-    // the work should stop. ONE hatch (owner ruling 2026-08-02), landing
+    // the work should stop. ONE hatch, landing
     // at the front desk; the reason is the whole story.
     if (payload.escape !== undefined) {
       const out = this.escape(String(payload.escape), channel);
@@ -2679,7 +2679,7 @@ export class Session {
     if (form?.read === undefined || pending === null) return null;
     // WHICH PROBE MISSED, not merely that one did. "That did not answer every
     // probe" over three probes is a one-in-three guess, and the field report
-    // of 2026-08-17 names it as friction that cost a round trip each time.
+    // of names it as friction that cost a round trip each time.
     // JUDGE THE REPLY AGAINST WHAT IS STILL OWED, never against all three.
     // The answer names which probes missed, so an agent sends those — and
     // judging that reply against the whole set fails it for the ones it had
@@ -2781,7 +2781,7 @@ export class Session {
     });
   }
 
-  /** THE SHORT NAME IS THE NAME (owner ruling). A state is called what its
+  /** THE SHORT NAME IS THE NAME. A state is called what its
    *  drawing calls it, and the machine path in front of it is the engine's
    *  bookkeeping rather than the reader's vocabulary.
    *
@@ -2979,7 +2979,7 @@ export class Session {
     return [this.machine.id, ...this.subs.map((s) => s.decl.id)];
   }
 
-  /** The machine to DISPLAY: only ever one (owner ruling 2026-07-26). */
+  /** The machine to DISPLAY: only ever one. */
   currentMachine(): MachineDecl {
     return this.top()?.decl ?? this.machine;
   }
@@ -3010,7 +3010,7 @@ export class Session {
       const s = this.state(machine, id);
       // Mechanical states: the machinery's drivers are what is legal.
       if (s.kind === "start" || s.kind === "end") for (const t of MACHINERY) tools.add(t);
-      // REPAIR MODE (owner ruling 2026-07-27): while the state's exit
+      // REPAIR MODE: while the state's exit
       // script stands RED, its repair tools are legal — the remedy "fix
       // what the output names" must be dischargeable from inside.
       const ev = this.evidence.get(evidenceKey(machine, id));
@@ -3329,7 +3329,7 @@ export class Session {
     const fm = this.claims.formMachine(machineId, name);
     if (this.claims.isStateForm(name, fm)) return this.claims.stateFormGet(name, fm);
     if (this.bound === undefined) {
-      // No expedition bound — the TEMPLATE is still viewable (owner ruling:
+      // No expedition bound — the TEMPLATE is still viewable (
       // any form may be inspected at any time); filling needs a bound record.
       const template = this.loadFormTemplate(name);
       return {
@@ -3470,7 +3470,7 @@ export class Session {
     return { opened: h.evidenceRel };
   }
 
-  // ── State forms (owner rulings 2026-08-04): form = f(state), stored ──
+  // ── State forms: form = f(state), stored ──
 
   /** see dsp-walk-machine.md#every-trace-nodes-id-against-the-path-that-holds */
   /** INTERNAL to the session pair. sessionforms.ts takes these paths as an
@@ -3659,7 +3659,7 @@ export class Session {
     const key = evidenceKey(machine, s.id);
     const record = { ...(this.evidence.get(key) ?? {}), ...data, at: new Date().toISOString() };
     this.evidence.set(key, record);
-    // THE STORED FORM IS THE DURABLE COPY (owner rulings 2026-08-04): a
+    // THE STORED FORM IS THE DURABLE COPY: a
     // state with evidence fields lands every fill in its instance too.
     if (s.evidence_form.length > 0 && this.claims.isStateForm(s.id)) {
       // submit and bless are not sections — they ride the fill as their
@@ -3999,7 +3999,7 @@ export class Session {
     const prefix = this.subs.map((s) => s.decl.id).join("/");
     this.instance.history.push({ state: prefix === "" ? top.parentState : `${prefix}/${top.parentState}`, outcome: "filled", at: now });
     if (!this.inSub()) this.unbind(); // leaving the outermost sub leaves the context
-    // THE SHIPPED ITERATION ARCHIVES ITSELF (owner ruling 2026-08-11): the
+    // THE SHIPPED ITERATION ARCHIVES ITSELF: the
     // walk leaving through the terminal is the trigger; the blessed release
     // gate was the ruling, and the route cannot pass an unblessed gate.
     if (pm.id === "iterations") this.closeShippedIteration(top.parentState);
@@ -4129,7 +4129,7 @@ export class Session {
       this.notifyChange();
       return this.packet();
     }
-    // ONE VISIBLE STEP PER TICK (owner ruling 2026-07-26): you are only
+    // ONE VISIBLE STEP PER TICK: you are only
     // ever in one state, and a tick moves exactly one position — including
     // the mechanical start/end positions of a sub-machine.
     if (!this.inSub()) return this.advanceMain(to, channel, supplied, now);
@@ -4314,7 +4314,7 @@ export class Session {
         source: "engine/session.ts seed",
       });
     }
-    // RE-ENTRY RESETS (owner ruling 2026-07-27): a machine left through its
+    // RE-ENTRY RESETS: a machine left through its
     // end starts over — evidence from the previous pass is cleared; the old
     // walk stays in the main record, the new walk earns its own.
     for (const key of [...this.evidence.keys()]) {
@@ -4333,7 +4333,7 @@ export class Session {
       active: this.active(),
       ...(this.inSub() ? { submachine: { id: this.top()!.decl.id, active: activeStates(this.top()!.instance) } } : {}),
       status: this.instance.status,
-      // The tier word, and no number (owner ruling 2026-08-14).
+      // The tier word, and no number.
       ...this.tierFor(this._autonomy),
       ...(this._emergency ? { emergency: true } : {}),
       power: this.power,

@@ -40,7 +40,7 @@ ${CARD_PARTS}
       const implHtml = c.implementers.length > 0 ? c.implementers.map(link).join("<br>") : '<span style="color:var(--se-accent);">nothing carries this scenario \\u2014 unaddressed is one click away</span>';
       const path = '<div style="' + cardCel + 'flex:1;"><div style="' + cardMeta + 'padding-bottom:2px;">the path</div><div style="font-size:11px;color:var(--se-muted);">functions</div><div style="font-size:12px;line-height:1.5;">' + fnsHtml + '</div><div style="font-size:11px;color:var(--se-muted);margin-top:6px;">elements and interfaces</div><div style="font-size:12px;line-height:1.5;">' + implHtml + "</div></div>";
       // Panel three: the verdict — THREE PARTS SEPARATED BY OR, explainer
-      // first in each (owner feedback 2026-08-10). Fitness sits apart below.
+      // first in each (owner feedback ). Fitness sits apart below.
       const explain = function (t) { return '<div style="font-size:10.5px;color:var(--se-muted);line-height:1.4;">' + t + "</div>"; };
       const controls = function (inner) { return '<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:4px;">' + inner + "</div>"; };
       const orBar = '<div style="font-size:12px;font-weight:600;letter-spacing:.2em;color:var(--se-muted);text-align:center;padding:6px 0;">OR</div>';

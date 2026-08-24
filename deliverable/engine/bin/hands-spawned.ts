@@ -18,10 +18,10 @@ const jobs = join(root, ".se", "jobs");
 
 /** THE MOST WALKERS THIS RECORD MAY RUN WITH, READ FROM THE RECORD ITSELF.
  *
- *  IT IS A CEILING, NOT A QUOTA (owner ruling 2026-08-23). The kickoff sets
+ *  IT IS A CEILING, NOT A QUOTA. The kickoff sets
  *  the maximum; the guide spawns fewer whenever fewer is right.
  *
- *  ZERO IS THE DEFAULT (owner ruling 2026-08-23, taken on the evidence).
+ *  ZERO IS THE DEFAULT.
  *  Delegated WRITING was measured over a full day and lost: three hands each
  *  spent about fifteen minutes rebuilding context the guide already held. The
  *  prior art agrees — reads parallelise and writes do not — so a record asks
@@ -38,8 +38,8 @@ const jobs = join(root, ".se", "jobs");
  *
  *  IT WAS BRIEFLY KEPT IN `.se/settings.json` AND THAT WAS WRONG. Session state
  *  is global to the session, so a per-record number kept there leaks into every
- *  other record and gives two sources that can disagree. Owner ruling, same
- *  day: build it so it works, rather than building it twice.
+ *  other record and gives two sources that can disagree. The ruling came the
+ *  same day: build it so it works, rather than building it twice.
  *
  *  THE ENGINE NAMES THE RECORD in SE_MACHINE, because only the walk knows
  *  which one it stands in. A record folder is `<machine-id>-<slug>`.
@@ -133,7 +133,7 @@ function currentSession(): string | undefined {
   }
 }
 
-// THE NUMBER IS A CEILING, NEVER A QUOTA (owner ruling 2026-08-23). The
+// THE NUMBER IS A CEILING, NEVER A QUOTA. The
 // kickoff sets the MOST hands this record may run with. Spawning fewer is
 // always allowed, and spawning none at a given state is allowed too.
 //
@@ -162,7 +162,7 @@ const session = currentSession();
 // call succeeded and changed nothing. The walk was trapped at a read-only
 // state by a check whose own advice was impossible to follow.
 const stale = records.filter((r) => r.kind === "agent" && r.session !== undefined && r.session !== session);
-// ONLY WALKERS COUNT (owner ruling 2026-08-23). A reviewer buys separation at
+// ONLY WALKERS COUNT. A reviewer buys separation at
 // a gate and a researcher buys reading nobody has done. Neither competes for
 // the walking slot, and a reviewer that filled it stranded the next phase
 // outright — measured the same day, on the state this check guards.

@@ -12,7 +12,7 @@ import { stripBom } from "./jsonio.ts";
 /** THE PART A HAND PLAYED. Closed on purpose: an open vocabulary makes every
  *  count a guess about what the words meant that day. Two was never the
  *  property — req-acts-carry-role-and-channel's Detail fixed it at two until
- *  2026-08-20, which is why no design about which of two agents walks a step
+ *, which is why no design about which of two agents walks a step
  *  could ever score on it. */
 export type CallPart = "owner" | "walker" | "guide" | "reviewer" | "researcher" | "surface";
 
@@ -138,7 +138,7 @@ const STAT_EVERY = 50;
  *  time. A vocabulary that holds for our own code and for nothing arriving
  *  through a lane call is not closed — see
  *  req-every-call-records-the-part-its-caller-played. */
-// `researcher` JOINED ON 2026-08-23. It was left out on the reasoning that a
+// `researcher` JOINED ON. It was left out on the reasoning that a
 // researcher need not report to the log — true of the log, false of liveness.
 // A hand whose part is not in this set cannot have its narration attributed to
 // it, so the work table marked a working researcher idle and could not be told
@@ -242,7 +242,7 @@ export class CallLog {
     return total;
   }
 
-  /** ONE PARSE, NOT FOUR THOUSAND (owner, 2026-07-29: clicking a log line
+  /** ONE PARSE, NOT FOUR THOUSAND (owner: clicking a log line
    *  took seconds). This walked records(), which JSON.parses EVERY line of
    *  the whole log into an object, to return exactly one of them. At five
    *  megabytes that is thousands of parses per click, synchronously, on the
@@ -316,7 +316,7 @@ export class CallLog {
    *  refused, so the newest of those marks a retro.
    *
    *  THE FALLBACK IS THE LIVE FILE'S START, NEVER ANOTHER DRAIN (owner
-   *  instruction 2026-08-18). A `done` or `obsolete` drain is a check anyone
+   *  instruction ). A `done` or `obsolete` drain is a check anyone
    *  can run and every walk makes them, so taking the newest drain of ANY
    *  disposition puts the mark wherever the last walk happened to tidy up.
    *
@@ -331,7 +331,7 @@ export class CallLog {
    *  truncated mining window reports almost nothing and reads as finished,
    *  and retro.md step 1 already promised the behaviour this now has.
    *
-   *  THE SCAN CROSSES ROTATIONS, corrected 2026-08-20. It used to read the
+   *  THE SCAN CROSSES ROTATIONS, corrected. It used to read the
    *  LIVE FILE ALONE and call the live file's start "the honest answer" for a
    *  drain older than it. That reasoning assumed a rotation lands between
    *  retros. It does not: this log rotates every 12 MB, which this project
@@ -368,7 +368,7 @@ export class CallLog {
     for (const line of lines) {
       // The first parseable record dates the live file. Only this one line is
       // parsed speculatively — the whole-log parse is what killed the server
-      // in 2026-08-09, and the substring guard below still holds for the rest.
+      // in, and the substring guard below still holds for the rest.
       if (first === undefined) {
         try {
           first = (JSON.parse(line) as CallRecord).ts;
@@ -476,8 +476,8 @@ export class CallLog {
     // under `(none)`.
     const groupBy = q.group_by === "clause" ? "response.clause" : q.group_by;
     // since: "last_retro" — the newest judgment drain marks the previous
-    // retro; the retro mines only its own period (the raw log is kept,
-    // owner ruling: forever-until-1GB).
+    // retro; the retro mines only its own period. The raw log itself is kept
+    // for good, or until it reaches a gigabyte.
     const since = f.since === "last_retro" ? this.lastRetroMark() : f.since;
     const records = this.filtered({ tool: f.tool, ok: f.ok, text: f.text, since, min_ms: f.min_ms });
     if (groupBy !== undefined) {
@@ -592,7 +592,7 @@ export class CallLog {
     };
   }
 
-  /** ~1 GB: surface a cleanup decision, never auto-delete (owner ruling, v2). */
+  /** ~1 GB: surface a cleanup decision, never auto-delete. */
   cleanupDue(): boolean {
     return existsSync(this.path) && statSync(this.path).size >= GB;
   }

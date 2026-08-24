@@ -652,7 +652,7 @@ fix as well as the fault.
 ### The three ways past it
 
 - IT IS A FORM EDITOR. Register it in
-  [editors/index.ts](deliverable/engine/editors/index.ts).
+  [deliverable/engine/editors/index.ts](deliverable/engine/editors/index.ts).
 - IT IS GENUINELY NOT A SECOND SURFACE — a test fixture, a diagnostic page, a
   vendored component. Declare it in
   [widget-exemptions.md](deliverable/machines/widget-exemptions.md) with its

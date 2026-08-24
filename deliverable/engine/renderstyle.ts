@@ -34,7 +34,7 @@ export const STYLE = `
   .crumb-arrow.open .crumb-menu { display: block; }
   .crumb-menu a { display: block; padding: 6px 10px; border-radius: 6px; }
   .crumb-menu a:hover { background: var(--se-hover); }
-  /* THE RUNGS. Dense on purpose (owner sketch): the row reads as one control,
+  /* THE RUNGS. Dense on purpose: the row reads as one control,
      so the buttons touch and only the lit ones carry weight. */
   .rungbar .rungs { display: inline-flex; gap: 1px; margin: 0 6px; }
   .rung { font: inherit; font-size: 11px; line-height: 1; padding: 3px 7px; border: 1px solid var(--se-border); background: var(--se-bg); color: var(--se-dim); cursor: pointer; }
@@ -117,7 +117,7 @@ export const STYLE = `
   .state.done { fill: color-mix(in srgb, var(--se-ok) 16%, var(--se-bg)); stroke: var(--se-ok); }
   /** see dsp-mirror-render.md#one-decider-says-which-kind-of-green-it-is */
   .state.done.proven { stroke-dasharray: 10 5; }
-  /* THE CURRENT STATES BLINK YELLOW (owner ruling 2026-08-04, v1's pulse
+  /* THE CURRENT STATES BLINK YELLOW (v1's pulse
      reborn) — half the emergency pace, so alarm still outranks attention. */
   .state.active { fill: color-mix(in srgb, var(--se-warn, #d7a72a) 16%, var(--se-bg)); stroke: var(--se-warn, #d7a72a); stroke-width: 3.5; animation: se-current 2.2s ease-in-out infinite; }
   @keyframes se-current { 0%, 100% { stroke-opacity: 1; } 50% { stroke-opacity: 0.35; } }
@@ -198,7 +198,7 @@ export const STYLE = `
   .docline { display: flex; align-items: center; gap: 6px; padding: 3px 0; }
   .collbody { padding: 4px 10px 8px; }
   .fval { min-width: 0; overflow-wrap: anywhere; line-height: 1.35; }
-  /* THE FRONT MATTER SITS TIGHT (owner ruling 2026-07-30). The element
+  /* THE FRONT MATTER SITS TIGHT. The element
      library spaces a form group for a settings page. A receipt is a dense
      record, and the reader wants more of it on screen at once. */
   vscode-form-group { margin: 0 !important; padding: 0 !important; }
@@ -241,11 +241,11 @@ export const STYLE = `
   #loadbar { position: fixed; top: 0; left: 0; right: 0; height: 3px; background: var(--se-raised); z-index: 99; }
   #loadbar .fill { height: 100%; width: 30%; background: var(--se-accent); animation: loadslide 1s linear infinite; }
   @keyframes loadslide { 0% { margin-left: -30%; } 100% { margin-left: 100%; } }
-  /* A BAR THAT MEASURES SOMETHING (owner ruling, 2026-07-30). Work that can
+  /* A BAR THAT MEASURES SOMETHING. Work that can
      count its steps says so, and the fill shows how far it has got. The
      sliding animation is the FALLBACK, for work that genuinely cannot. */
   #loadbar .fill.determinate { animation: none; margin-left: 0; transition: width .18s linear; }
-  /* THE PING — the agent's pointing finger (owner, 2026-07-30): v2's pulse,
+  /* THE PING — the agent's pointing finger (owner): v2's pulse,
      made yellow. A card blinks its outline; an SVG node blinks its opacity.
      It PULSES ON, and stays lit while the guide talks about it. */
   .se-ping { outline: 3px solid var(--se-accent); outline-offset: 2px; animation: se-ping-blink 1.6s ease-in-out infinite; }

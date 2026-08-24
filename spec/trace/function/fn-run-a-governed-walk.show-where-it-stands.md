@@ -29,6 +29,7 @@ satisfies:
   - req-work-past-its-bound-says-it-is-working
   - req-a-slowness-signal-never-shortens-the-wait
 inputs:
+  - flow-view-model
   - flow-position
   - flow-trace-graph
   - flow-filter

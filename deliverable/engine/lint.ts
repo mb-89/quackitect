@@ -86,7 +86,7 @@ const DEFAULTS: Cfg = {
 
 export const LINT_CONFIG = "deliverable/machines/lint/voice-lint.md";
 
-/** REFERENCES ARE NOTES (owner ruling 2026-08-04). An external source is ONE
+/** REFERENCES ARE NOTES. An external source is ONE
  *  note under this folder, and a claim anywhere else cites that note. Links
  *  spread through the prose are links nobody can keep from rotting. */
 export const REFERENCE_HOME = "spec/references/";

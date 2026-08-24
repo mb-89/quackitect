@@ -168,7 +168,18 @@ test("no new file read bypasses the door — the count may fall, never rise", ()
   // work account can carry its progress and its failures. That replaced a
   // status verb agents polled instead of working; the same file was already
   // read here for the projection.
-  const CEILING = 123;
+  // AND 128: five one-shot reads that cannot go through the door.
+  //
+  // bin/hands-spawned.ts reads the roster records to answer whether this phase's
+  // hands were spawned. It is a condition SCRIPT: it runs as its own process,
+  // before and outside any session, so there is no door to share.
+  //
+  // bin/preflight.ts reads the extension source and the installed copy to
+  // compare them. Boot is the only moment that comparison is worth making, it
+  // reads each file exactly once, and preflight runs before the lane is up.
+  //
+  // ONE-SHOT AND BELOW THE DOOR IS THE WHOLE TEST, and these are both.
+  const CEILING = 128;
   let found = 0;
   const offenders: string[] = [];
   const walk = (dir: URL, rel: string): void => {

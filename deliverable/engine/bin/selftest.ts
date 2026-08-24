@@ -62,7 +62,7 @@ if (!existsSync(testsDir)) {
 const files = readdirSync(testsDir)
   .filter((f) => f.endsWith(".test.ts"))
   .map((f) => join("tests", f));
-// EVERY RUN IS TIMED (owner ruling 2026-07-31). The reporter pair is built in
+// EVERY RUN IS TIMED. The reporter pair is built in
 // engine/testreporters.ts, shared with the scoped path so the two cannot drift
 // apart again — the scoped one carried no timing reporter at all until i12.
 const REPORTERS = testReporterArgs("spec");
@@ -70,7 +70,7 @@ const REPORTERS = testReporterArgs("spec");
 const CAP_MS = 300_000;
 // The cap kills the WHOLE TREE — spawnSync killed only the runner and left
 // its per-file workers orphaned (two held a folder lock for four hours,
-// 2026-08-02).
+// ).
 const lastRunPath = join(seHome, "test-last-run.json");
 const prior = (() => {
   try {
@@ -105,7 +105,7 @@ try {
 }
 // The cap's last act before the kill: photograph the still-living workers.
 // What refuses to exit IS the diagnosis, and the kill destroys the evidence —
-// the 60-file stall of 2026-08-03 died unnamed exactly this way.
+// the 60-file stall of died unnamed exactly this way.
 let stuckWorkers = "";
 function snapshotWorkers(): string {
   try {

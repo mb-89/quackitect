@@ -71,7 +71,7 @@ function sidePoint(el: CanvasElement, side: string | undefined, other: CanvasEle
   }
 }
 
-/** THE ROUTED LAW (owner ruling 2026-08-04, opt-in): arrows run centre
+/** THE ROUTED LAW: arrows run centre
  *  to centre and clip at the borders — the tip always lands ON the
  *  target's edge, pointing at its heart. */
 function borderPoint(el: CanvasElement, toward: [number, number]): [number, number] {
@@ -139,8 +139,8 @@ export function reservedColours(root: string): string[] {
 export interface StateMeta {
   /** Passed against a demand that has since moved — no longer green. */
   suspect?: boolean;
-  /** A blessed gate — the thumbs-up rides the green (owner ruling
-   *  2026-08-11: green means submitted; green plus thumb means blessed). */
+  /** A blessed gate — the thumbs-up rides the green (
+   *: green means submitted; green plus thumb means blessed). */
   blessed?: boolean;
   /** Green because a LAW passed, with no form signed. The third kind, and the
    *  one that used to look exactly like the first — see
@@ -272,7 +272,7 @@ function svgStateNode(
  *  every alive answer; a mismatch reloads the page. */
 export const ENGINE_LIFE = Date.now().toString(36);
 
-// THE FAN IS DRAWN WHOLE (owner, 2026-08-09): every leg a bar still owes
+// THE FAN IS DRAWN WHOLE (owner): every leg a bar still owes
 // gets its own dashed line into it and its own dot, so the one drawn path
 // cannot hide the others.
 function svgFanLegs(route: RouteMarks | undefined, nodeOfState: Map<string, CNode>): string[] {
@@ -487,7 +487,7 @@ const BRIEFS: Record<string, (a: Record<string, unknown>) => string> = {
   se_exp_list: () => "expeditions",
 };
 
-/** One feed line's brief — the unified feed's middle column (owner ruling,
+/** One feed line's brief — the unified feed's middle column (
  *  v2 i9 notes: time | src | brief | result; the full record is one click
  *  away, so the brief only has to say WHAT, never everything). */
 function briefFor(rec: CallRecord): string {
@@ -506,7 +506,7 @@ function oneLine(s: string): string {
 /** see dsp-mirror-render.md#the-server-acting-on-its-own-behalf */
 const SELF_SERVED = new Set(["mirror_slow", "mirror_narration_now", "mirror_profile"]);
 
-/** THE HAND BEATS THE ACTOR WHERE THERE IS ONE (owner ruling 2026-08-23).
+/** THE HAND BEATS THE ACTOR WHERE THERE IS ONE.
  *
  *  Every agent call already records the PART it played — guide, walker,
  *  reviewer — and the feed printed "agent" for every one of them, which tells
@@ -535,7 +535,7 @@ export function feedRows(
 ): { capped: boolean; rows: Array<Record<string, unknown>> } {
   const q = log.query({ filter: { since }, limit: 501 });
   // The reader's selection is view state — logged, never shown as a feed row.
-  // Self-served polls and timings never show either (owner ruling 2026-08-12:
+  // Self-served polls and timings never show either (
   // a poll is not an act) — the log keeps them for the slowness mine.
   const records = (q.records ?? []).filter((r) => r.tool !== "mirror_select" && !SELF_SERVED.has(r.tool));
   const capped = records.length > 500;
@@ -582,7 +582,7 @@ const PALETTE_FALLBACK = ":root{--se-bg:#14171a;--se-fg:#d8dde2}";
 
 /** TURN `[[refs]]` IN RENDERED PROSE INTO LINKS THE READER CAN FOLLOW.
  *
- *  IT LIVES HERE BECAUSE MARKUP LIVES HERE (i4, 2026-08-23). The server used to
+ *  IT LIVES HERE BECAUSE MARKUP LIVES HERE (i4). The server used to
  *  build this anchor itself, which made the server a place markup came from.
  *  Every reference the panel shows now comes out of the one surface.
  *
@@ -648,14 +648,14 @@ const NATIVE = `
 
 // Breadcrumbs describe the VIEW: main [›subs] [ › sub [›its subs] ].
 // The crumbs walk the PARENT CHAIN — a nested machine shows under its
-// real parent, never directly under main (owner ruling 2026-07-28).
+// real parent, never directly under main.
 function crumbsFor(m: MirrorState, decl: MachineDecl): string {
   const mainSubs = m.session.machine.states.filter((s) => s.submachine !== undefined).map((s) => s.id);
   const crumbArrow = (subs: string[]): string =>
     subs.length === 0
       ? ""
       : `<span class="crumb-arrow">›<span class="crumb-menu">${subs.map((s) => `<a href="/?view=${encodeURIComponent(s)}">${esc(s)}</a>`).join("")}</span></span>`;
-  // THE CRUMBS SAY THE PATH ONCE (owner ruling 2026-08-23).
+  // THE CRUMBS SAY THE PATH ONCE.
   //
   // THEY USED TO PRINT THE POSITION AGAIN beside themselves, as a full
   // qualified path. It carried nothing the crumbs did not already show, and
@@ -687,7 +687,7 @@ function crumbsFor(m: MirrorState, decl: MachineDecl): string {
  *  state of the walk, and the absence of the arrow says it. */
 function aimChipFor(aim: { path: string; machine: string; leaf: string } | undefined): string {
   if (aim === undefined) return "";
-  // IT IS A BUTTON NOW (owner ruling 2026-08-23), drawn like the position
+  // IT IS A BUTTON NOW, drawn like the position
   // button beside it. Jumping the view to where the walk is AIMED is the same
   // thing a reader wants as jumping to where it STANDS, so it is the same
   // control wearing a different arrow.
@@ -781,7 +781,7 @@ export function renderMirror(
   // Escape has a hand-side affordance too (parity law): only while a
   // sub-machine other than boot is being walked.
   const crumbTrail = m.session.breadcrumb();
-  // ESCAPE STANDS BESIDE THE POSITION, ALWAYS (owner ruling 2026-07-30). It
+  // ESCAPE STANDS BESIDE THE POSITION, ALWAYS. It
   // used to appear and vanish with the walk, which moved everything else in
   // the row under the reader's hand. Not applicable is DISABLED, not absent.
   const canEscape = crumbTrail.length > 1 && crumbTrail[1] !== "boot";
@@ -795,7 +795,7 @@ export function renderMirror(
         `<button class="ghost cur-state" data-machine="${esc(model.walkMachineId)}" data-state="${esc(leaf)}" title="the walk stands here — click: jump the view to it">☉ ${esc(leaf)}</button>`,
     )
     .join("");
-  // WHERE THE WALK IS AIMED, beside where it stands (owner ruling 2026-08-23).
+  // WHERE THE WALK IS AIMED, beside where it stands.
   //
   // THE ROUTE LINE WAS NOT ENOUGH. It draws only where the target sits in the
   // SAME drawing, and an iteration aimed at its ship state routes across
@@ -814,7 +814,7 @@ export function renderMirror(
     <div class="meta" id="details-title" data-morph-ignore>—</div>
     <div class="panel" id="details" data-morph-ignore></div>
   </div>`;
-  // The unified feed sits ABOVE details (owner ruling 2026-07-26) — rows
+  // The unified feed sits ABOVE details — rows
   // load and refresh client-side off /api/log; only present with a log.
   const logWidget =
     m.log === undefined
@@ -830,7 +830,7 @@ export function renderMirror(
   </div>`;
   // see dsp-mirror-render.md#the-chat-card-keeps-its-slot
   const terminalWidget = termWidget(true);
-  // THE TABLE (owner ask 2026-08-01) — every view every .base in the vault
+  // THE TABLE (owner ask ) — every view every.base in the vault
   // declares, drawn here so Obsidian is not the only thing that can read
   // them. The vault is re-read per render for the same reason the palette is.
   // A FUNCTION, NOT A VALUE, and that is the whole point: building it reads

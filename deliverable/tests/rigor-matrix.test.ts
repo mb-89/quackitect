@@ -65,7 +65,11 @@ test("readMatrix: the real matrix is complete", () => {
   // mechanisms exist.
   // 53 since 2026-08-19: M5_27 graft-onto-the-winner, added by i9 between
   // declare-winner and record-adrs.
-  assert.equal(m.rows.length, 53);
+  // 63 since spawn-the-hands: the roster row stands at position 05 of EVERY
+  // milestone, M0 through M9, because the hands a phase needs differ per phase
+  // and the rung comes from that milestone. Ten rows, one per milestone, is
+  // what "once per milestone" costs the count.
+  assert.equal(m.rows.length, 63);
   for (const row of m.rows) {
     for (const col of ALL_COLUMNS) {
       const cell = m.cells.get(row.name)?.get(col);
@@ -96,9 +100,9 @@ test("compileColumn major: every row seeds; the machine validates", () => {
   const m = readRigorMatrix(ROOT);
   const decl = compileColumn(m, "major");
   validateMachine(decl);
-  // 53 rows + the mechanical start. finalize-docs and ship-review are not in
+  // 63 rows + the mechanical start. finalize-docs and ship-review are not in
   // the matrix until the book and vendoring mechanisms exist.
-  assert.equal(decl.states.length, 54);
+  assert.equal(decl.states.length, 64);
   // Only a state that RUNS a machine descends; authoring states do not.
   assert.ok(decl.states.some((s) => s.id === "build-steps" && s.submachine === "build-chunks"));
   assert.ok(decl.states.some((s) => s.id === "run-spikes" && s.submachine === "spikes"));
@@ -151,15 +155,21 @@ test("compileColumn patch: struck states vanish and dependencies contract", () =
       .filter((s) => s.edges.some((e) => e.to === to))
       .map((s) => s.id)
       .sort();
-  assert.deepEqual(incoming("write-requirements"), ["frame-delta", "log-risks"]);
-  // author-tests contracts through the whole struck M4-M6 stretch.
-  assert.deepEqual(incoming("author-tests"), ["probe-assumptions", "write-requirements"]);
-  // 19 applied rows + start. identify-assumptions applies at patch too: when a
+  // THE ROSTER ROW ABSORBS THE CONTRACTION. It stands at position 05 of every
+  // milestone and is FLOOR, so it always survives — and the struck stretch
+  // above it collapses onto IT rather than reaching past it. That is why this
+  // set is one entry rather than the two the strike used to leave.
+  assert.deepEqual(incoming("write-requirements"), ["spawn-for-requirements"]);
+  // author-tests contracts through the whole struck M4-M6 stretch, onto its
+  // own milestone's roster row.
+  assert.deepEqual(incoming("author-tests"), ["spawn-for-implementation"]);
+  // 29 applied rows + start. identify-assumptions applies at patch too: when a
   // patch exists BECAUSE something stopped holding, that is an assumption
   // turning into an issue, and it is the one case patch-size must record.
   // log-gaps left the matrix entirely (owner ruling 2026-08-11): gaps ride
   // the gate's raid_additions, and run-demos does not apply at patch.
-  assert.equal(decl.states.length, 20);
+  // The roster row is FLOOR and never struck, so all ten copies apply here.
+  assert.equal(decl.states.length, 30);
 });
 
 test("compileColumn: the verification loop compiles as fallback and recovery", () => {
@@ -241,8 +251,9 @@ test("compileColumn minor: exploration, architecture and prototyping are all str
   for (const kept of ["write-requirements", "gate-requirements", "decompose-structure", "fill-story-evidence", "gate-validation"]) {
     assert.ok(ids.has(kept), `minor must keep ${kept}`);
   }
-  // 28 applied rows, plus start and end.
-  assert.equal(decl.states.length, 30);
+  // 38 applied rows, plus start and end. The roster row is FLOOR, so all ten
+  // of its milestone copies survive every strike.
+  assert.equal(decl.states.length, 40);
 });
 
 test("the columns are monotone: what a smaller column walks, every larger column walks", () => {

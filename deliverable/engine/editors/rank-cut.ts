@@ -113,7 +113,7 @@ export const RANK_CUT_EDITOR: EditorKind = {
         const cutBox = tr.querySelector(".sfrccut");
         const isCut = cutBox && cutBox.value.trim() !== "";
         const pos = tr.querySelector(".sfrcpos");
-        // A STRUCK ROW TAKES NO RANK (owner, 2026-08-09): the numbers count
+        // A STRUCK ROW TAKES NO RANK (owner): the numbers count
         // what is KEPT, so the cutoff's number reads as what it keeps. The
         // stored lines keep their positional numbering — this is the read.
         if (pos) pos.textContent = isCut ? "\\u2014" : String(++rank);
@@ -194,7 +194,7 @@ export const RANK_CUT_EDITOR: EditorKind = {
   });
   // REVERT PUTS THE TABLE BACK TO THE LAST SAVE. Reordering rows is the one
   // edit a person cannot undo by hand — the arrows move one place at a time
-  // and nothing remembers where a row started (owner report 2026-08-08).
+  // and nothing remembers where a row started.
   document.addEventListener("click", function (ev) {
     const r = ev.target.closest ? ev.target.closest(".sfrcrevert") : null;
     if (!r) return;

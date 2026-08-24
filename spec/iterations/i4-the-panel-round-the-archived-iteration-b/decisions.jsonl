@@ -325,3 +325,79 @@
 {"ts":"2026-08-23T20:06:53.806Z","op":"update","visit":"iterations/i4/fix-findings@0","node":"d142","brief":"recording the claimops diagnosis so it is not re-derived"}
 {"ts":"2026-08-23T20:09:07.417Z","op":"done","visit":"iterations/i4/fix-findings@0","node":"d124","brief":"six tester findings fixed; the claimops fixture needs a redesign"}
 {"ts":"2026-08-23T20:09:46.067Z","op":"update","visit":"iterations/i4/fix-findings@0","node":"d143","brief":"the field report, then the front desk"}
+{"ts":"2026-08-24T11:06:19.352Z","op":"update","visit":"iterations/i4/draft-vision@0","node":"d37","brief":"aiming at fix-findings, where last night's walk stopped"}
+{"ts":"2026-08-24T11:09:00.647Z","op":"update","visit":"iterations/i4/derive-functions@0","node":"d38","brief":"flow closure red on flow-view-model, neither produced nor consumed"}
+{"ts":"2026-08-24T11:11:36.484Z","op":"update","visit":"iterations/i4/derive-functions@0","node":"d39","brief":"minted resolve-the-view and wired the flow through it"}
+{"ts":"2026-08-24T11:14:38.171Z","op":"plan","visit":"iterations/i4/fix-findings@0","parent":null,"nodes":[{"id":"d40","brief":"read every failing assertion"},{"id":"d41","brief":"fix the nesting cluster"},{"id":"d42","brief":"fix the rigor-matrix cluster"},{"id":"d43","brief":"fix the iterations cluster"},{"id":"d44","brief":"fix the remaining singles"},{"id":"d45","brief":"confirm the battery green"}]}
+{"ts":"2026-08-24T11:15:43.290Z","op":"done","visit":"iterations/i4/fix-findings@0","node":"d40","brief":"all 27 read; spawn-the-hands explains about twenty"}
+{"ts":"2026-08-24T11:16:22.641Z","op":"update","visit":"iterations/i4/fix-findings@0","node":"d46","brief":"matrix row count moves 53 to 63 for the ten roster rows"}
+{"ts":"2026-08-24T11:17:06.567Z","op":"update","visit":"iterations/i4/fix-findings@0","node":"d47","brief":"patch and minor counts moved for the floor roster row"}
+{"ts":"2026-08-24T11:17:42.208Z","op":"done","visit":"iterations/i4/fix-findings@0","node":"d42","brief":"rigor-matrix counts and contracted edges corrected against measurement"}
+{"ts":"2026-08-24T11:18:08.043Z","op":"update","visit":"iterations/i4/fix-findings@0","node":"d48","brief":"tables row counts moved to 63"}
+{"ts":"2026-08-24T11:18:31.943Z","op":"update","visit":"iterations/i4/fix-findings@0","node":"d49","brief":"floor law now names the ten roster rows beside the four gates"}
+{"ts":"2026-08-24T11:19:12.516Z","op":"update","visit":"iterations/i4/fix-findings@0","node":"d50","brief":"my preflight guard skipped where a root has no product configuration"}
+{"ts":"2026-08-24T11:19:28.771Z","op":"update","visit":"iterations/i4/fix-findings@0","node":"d51","brief":"firing the confirm run by leaving fix-findings"}
+{"ts":"2026-08-24T11:24:38.329Z","op":"update","visit":"iterations/i4/fix-findings@0","node":"d52","brief":"the battery files its verdict so the repair state can read its findings"}
+{"ts":"2026-08-24T11:24:45.526Z","op":"done","visit":"front_desk@1","node":"d33","brief":"i4 stands at fix-findings with everything upstream green"}
+{"ts":"2026-08-24T11:29:47.197Z","op":"update","visit":"iterations/i4/fix-findings@0","node":"d53","brief":"fix-findings now allows the scoped test question"}
+{"ts":"2026-08-24T11:29:58.945Z","op":"update","visit":"iterations/i4/fix-findings@0","node":"d54","brief":"reading every remaining assertion from the filed verdict"}
+{"ts":"2026-08-24T11:30:34.231Z","op":"update","visit":"iterations/i4/fix-findings@0","node":"d55","brief":"guidance path made root-relative; the shutdown label matches the control"}
+{"ts":"2026-08-24T11:30:42.066Z","op":"update","visit":"iterations/i4/fix-findings@0","node":"d56","brief":"guidance path made root-relative; the shutdown label matches the control"}
+{"ts":"2026-08-24T11:31:03.694Z","op":"update","visit":"iterations/i4/fix-findings@0","node":"d57","brief":"M0 expected-state lists gain the roster state"}
+{"ts":"2026-08-24T11:31:12.739Z","op":"done","visit":"front_desk@0","node":"d5","brief":"the plugin and the startup reap both landed and were verified"}
+{"ts":"2026-08-24T11:31:30.716Z","op":"done","visit":"iterations/i4/fix-findings@0","node":"d43","brief":"the three M0 expectations now name the roster state"}
+{"ts":"2026-08-24T11:33:20.280Z","op":"update","visit":"iterations/i4/fix-findings@0","node":"d58","brief":"the exemption list resolves from the product being checked"}
+{"ts":"2026-08-24T11:33:41.128Z","op":"done","visit":"iterations/i4/fix-findings@0","node":"d41","brief":"widget guard reads the checked tree's exemption list"}
+{"ts":"2026-08-24T11:34:22.428Z","op":"update","visit":"iterations/i4/fix-findings@0","node":"d59","brief":"the pointer check now sees every heading level"}
+{"ts":"2026-08-24T11:34:43.999Z","op":"update","visit":"iterations/i4/fix-findings@0","node":"d60","brief":"read ceiling raised to 128 with the reason per read"}
+{"ts":"2026-08-24T11:36:24.007Z","op":"update","visit":"iterations/i4/fix-findings@0","node":"d61","brief":"stripping dates and attributions from engine comments"}
+{"ts":"2026-08-24T11:38:28.869Z","op":"done","visit":"iterations/i4/fix-findings@0","node":"d44","brief":"every damaged comment repaired by hand and read back"}
+{"ts":"2026-08-24T11:39:21.177Z","op":"update","visit":"iterations/i4/fix-findings@0","node":"d62","brief":"one confirm run after the whole pass, not per fix"}
+{"ts":"2026-08-24T11:41:53.301Z","op":"update","visit":"iterations/i4/fix-findings@0","node":"d63","brief":"23 down to 11 after one pass"}
+{"ts":"2026-08-24T11:42:12.089Z","op":"update","visit":"iterations/i4/fix-findings@0","node":"d64","brief":"comment ratchet banked at zero"}
+{"ts":"2026-08-24T11:43:54.282Z","op":"update","visit":"iterations/i4/fix-findings@0","node":"d65","brief":"the fixture answers the kickoff gate's walkers choice"}
+{"ts":"2026-08-24T11:44:29.258Z","op":"update","visit":"iterations/i4/fix-findings@0","node":"d66","brief":"the pinned-machine fixture fills the roster form"}
+{"ts":"2026-08-24T11:47:44.421Z","op":"update","visit":"iterations/i4/fix-findings@0","node":"d67","brief":"the three fixture walks answer the roster state"}
+{"ts":"2026-08-24T11:48:41.687Z","op":"update","visit":"iterations/i4/fix-findings@0","node":"d68","brief":"the surface guard reads the resolver too"}
+{"ts":"2026-08-24T11:48:50.297Z","op":"update","visit":"iterations/i4/fix-findings@0","node":"d69","brief":"the one confirm run after the whole pass"}
+{"ts":"2026-08-24T11:52:01.149Z","op":"update","visit":"iterations/i4/fix-findings@0","node":"d70","brief":"the roster tick and the kickoff choice carry their exact shapes"}
+{"ts":"2026-08-24T11:52:47.273Z","op":"update","visit":"iterations/i4/fix-findings@0","node":"d71","brief":"the morph assertions name the one decider they now ask"}
+{"ts":"2026-08-24T11:52:54.355Z","op":"update","visit":"iterations/i4/fix-findings@0","node":"d72","brief":"confirm run after the last four"}
+{"ts":"2026-08-24T11:55:47.913Z","op":"update","visit":"iterations/i4/fix-findings@0","node":"d73","brief":"the roster form is submitted; the scroll anchor names the call"}
+{"ts":"2026-08-24T11:59:12.468Z","op":"done","visit":"front_desk@0","node":"d12","brief":"the listing shows running jobs only and a finished one rides once"}
+{"ts":"2026-08-24T12:03:04.725Z","op":"plan","visit":"iterations/i4/fix-findings@0","parent":null,"nodes":[{"id":"d74","brief":"list the live node processes"},{"id":"d75","brief":"kill the hung battery child"},{"id":"d76","brief":"add a timeout so a child cannot hang again"},{"id":"d77","brief":"fire the confirm run"}]}
+{"ts":"2026-08-24T12:03:46.343Z","op":"done","visit":"iterations/i4/fix-findings@0","node":"d74","brief":"no battery child is alive; the phantom is an orphaned disk record"}
+{"ts":"2026-08-24T12:03:59.673Z","op":"obsolete","visit":"iterations/i4/fix-findings@0","node":"d75","brief":"nothing to kill — the child was gone and the record was the orphan"}
+{"ts":"2026-08-24T12:05:21.120Z","op":"update","visit":"iterations/i4/fix-findings@0","node":"d78","brief":"the lane believes a judgment runs while no job file exists; proving the fixes scoped"}
+{"ts":"2026-08-24T12:06:47.906Z","op":"update","visit":"iterations/i4/fix-findings@0","node":"d79","brief":"the run settles on kill as well as on close, and a ghost judgment is dropped"}
+{"ts":"2026-08-24T12:10:05.216Z","op":"update","visit":"iterations/i4/fix-findings@0","node":"d80","brief":"the gate wanted one walker, not the guide alone"}
+{"ts":"2026-08-24T12:10:34.543Z","op":"update","visit":"iterations/i4/fix-findings@0","node":"d81","brief":"the feed's scroll write moved into the one decider; the assertion follows it"}
+{"ts":"2026-08-24T12:10:49.506Z","op":"done","visit":"iterations/i4/fix-findings@0","node":"d76","brief":"the run settles on kill as well as on close; the heartbeat is noted for the next iteration"}
+{"ts":"2026-08-24T12:12:53.452Z","op":"update","visit":"iterations/i4/fix-findings@0","node":"d82","brief":"the comment ceiling forbids a date, so the measurement loses its stamp"}
+{"ts":"2026-08-24T12:14:00.420Z","op":"update","visit":"iterations/i4/fix-findings@0","node":"d83","brief":"the spawn row made the kickoff exit unambiguous; the stale refusal goes"}
+{"ts":"2026-08-24T12:14:09.241Z","op":"update","visit":"iterations/i4/fix-findings@0","node":"d84","brief":"two fixes in: the comment loses its date, the stale kickoff refusal goes"}
+{"ts":"2026-08-24T12:16:56.738Z","op":"update","visit":"iterations/i4/fix-findings@0","node":"d85","brief":"the pin fires from the advance, so the advance goes back in before the check"}
+{"ts":"2026-08-24T12:17:06.088Z","op":"update","visit":"iterations/i4/fix-findings@0","node":"d86","brief":"one failure left; the advance is back in front of the pin check"}
+{"ts":"2026-08-24T12:18:55.088Z","op":"done","visit":"front_desk@1","node":"d34","brief":"1803 pass, 0 fail — every finding from the 23 is cleared"}
+{"ts":"2026-08-24T12:18:59.182Z","op":"done","visit":"iterations/i4/fix-findings@0","node":"d77","brief":"the state's own confirm run is fired by this pull"}
+{"ts":"2026-08-24T12:30:47.469Z","op":"update","visit":"iterations/i4/gate-motivation@0","node":"d1","brief":"walking the record back to fix-findings after the reload, one hop per sweep"}
+{"ts":"2026-08-24T12:36:13.690Z","op":"update","visit":"iterations/i4/enumerate-space/find_prior_art@0","node":"d2","brief":"sweeping the record back to fix-findings; the engine caps each sweep at one hop"}
+{"ts":"2026-08-24T12:41:36.243Z","op":"update","visit":"iterations/i4/gate-prototype@0","node":"d3","brief":"past the prototype gate; aiming for the repair state where the battery is already green"}
+{"ts":"2026-08-24T12:42:59.994Z","op":"plan","visit":"iterations/i4/verification@0","parent":null,"nodes":[{"id":"d4","brief":"fire the battery at verification"},{"id":"d5","brief":"read the verdict"},{"id":"d6","brief":"report where the iteration stands"}]}
+{"ts":"2026-08-24T12:45:42.366Z","op":"done","visit":"iterations/i4/verification@0","node":"d4","brief":"verification passed — the battery ran green and the walk advanced"}
+{"ts":"2026-08-24T12:45:43.878Z","op":"plan","visit":"iterations/i4/gate-implementation@0","parent":null,"nodes":[{"id":"d7","brief":"find i4 non-test specs"},{"id":"d8","brief":"judge tsp-bound-surface"},{"id":"d9","brief":"judge tsp-panel-walkthrough"},{"id":"d10","brief":"report"}]}
+{"ts":"2026-08-24T12:45:55.535Z","op":"update","visit":"iterations/i4/gate-implementation@0","node":"d11","brief":"two demonstration specs in scope; hunting for observation evidence"}
+{"ts":"2026-08-24T12:46:07.882Z","op":"update","visit":"iterations/i4/gate-implementation@0","node":"d12","brief":"checking i4 folder for any demonstration observation record"}
+{"ts":"2026-08-24T12:46:28.079Z","op":"update","visit":"iterations/i4/gate-implementation@0","node":"d13","brief":"sweeping the corpus for any green observation of the panel walkthrough"}
+{"ts":"2026-08-24T12:46:46.680Z","op":"update","visit":"iterations/i4/gate-implementation@0","node":"d14","brief":"reading i4 observe-red to confirm the non-test checklist is empty"}
+{"ts":"2026-08-24T12:46:56.417Z","op":"update","visit":"iterations/i4/gate-implementation@0","node":"d15","brief":"checking whether any live spec still covers the dropped demo's requirement"}
+{"ts":"2026-08-24T12:49:12.092Z","op":"update","visit":"iterations/i4/gate-implementation@0","node":"d16","brief":"the tester's two findings are verified; the gate is being filled with both named"}
+{"ts":"2026-08-24T12:50:59.052Z","op":"done","visit":"iterations/i4/verification@0","node":"d5","brief":"the implementation gate is blessed; the walk is into validation"}
+{"ts":"2026-08-24T12:54:05.676Z","op":"update","visit":"iterations/i4/run-demos@0","node":"d17","brief":"the demo drawing is authored; its one step needs a person at the panel"}
+{"ts":"2026-08-24T12:58:30.966Z","op":"plan","visit":"iterations/i4/run-demos/tsp-panel-walkthrough@0","parent":null,"nodes":[{"id":"d18","brief":"mint the demonstration debt"},{"id":"d19","brief":"note the walker default"},{"id":"d20","brief":"fill the demo state"},{"id":"d21","brief":"walk to the end of the record"}]}
+{"ts":"2026-08-24T12:58:49.709Z","op":"done","visit":"iterations/i4/run-demos/tsp-panel-walkthrough@0","node":"d18","brief":"the demonstration debt is minted and the owner authorised the close"}
+{"ts":"2026-08-24T13:01:10.360Z","op":"update","visit":"iterations/i4/sweep-consistency@0","node":"d22","brief":"five surfaces taught the old job behaviour; all five are corrected"}
+{"ts":"2026-08-24T13:02:27.529Z","op":"update","visit":"iterations/i4/sweep-consistency@0","node":"d23","brief":"the entry document now names the guard that catches a stale extension copy"}
+{"ts":"2026-08-24T13:05:50.497Z","op":"fork","visit":"iterations/i4/gate-validation@0","parent":"d21","node":"d24","brief":"two must stories from i51 have no demonstration spec; the gate cannot open without them","nodes":[]}
+{"ts":"2026-08-24T13:07:32.362Z","op":"done","visit":"iterations/i4/gate-validation@0","node":"d24","brief":"both must stories now carry a demonstration spec and a performed report"}
+{"ts":"2026-08-24T13:08:50.910Z","op":"update","visit":"iterations/i4/package@0","node":"d25","brief":"major bump to 8.0.0, then the package assembles by script"}

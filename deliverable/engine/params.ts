@@ -304,7 +304,7 @@ function clock(ms: number): string {
  *  THE ELAPSED TIME RIDES THE ETA CELL when there is no estimate, because a
  *  person watching wants to tell a slow task from a hung one either way. */
 function taskRow(r: RunningRow): PanelCell[] {
-  // THE TOOLTIP CARRIES WHAT IT IS DOING NOW (owner ruling 2026-08-23). The
+  // THE TOOLTIP CARRIES WHAT IT IS DOING NOW. The
   // LATEST narration beats the spawn line: the spawn line never changes and
   // answers nothing after the first minute, while a person hovering wants to
   // know the current step.
@@ -334,7 +334,7 @@ function taskRow(r: RunningRow): PanelCell[] {
     r.model === undefined
       ? { text: "unreported", title: "registered before the model was asked for" }
       : { text: r.model, title: r.model === "script" ? "not an agent — a shell run or a battery" : "the model that answered" };
-  // THE MILESTONE IS NOT A COLUMN (owner ruling 2026-08-23). This table is
+  // THE MILESTONE IS NOT A COLUMN. This table is
   // GENERIC: a shell run and a battery belong in it too, and neither has a
   // milestone. A column that is empty for whole classes of row teaches the
   // reader to ignore it.

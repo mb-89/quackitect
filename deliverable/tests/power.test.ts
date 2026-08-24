@@ -62,7 +62,7 @@ describe("the shipped controls spec", () => {
     const row = params.find((p) => p.name === "shutdown");
     assert.ok(row !== undefined, "the controls panel declares a shutdown row");
     assert.equal(row.type, "toggles");
-    assert.deepEqual(row.fields, ["block auto-sleep", "shutdown at idle"]);
+    assert.deepEqual(row.fields, ["block auto-sleep", "shutdown at front desk"]);
   });
 });
 

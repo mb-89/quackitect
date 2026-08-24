@@ -123,7 +123,7 @@ document.addEventListener("click", (ev) => {
       return;
     }
     // A JSON-answering control reports its refusal IN PLACE — the target
-    // button used to swallow it (owner report 2026-08-09). A redirecting
+    // button used to swallow it. A redirecting
     // control answers HTML, and reading it as JSON just stays quiet.
     void fetch(act.dataset.post, { method: "POST", headers: { "content-type": "application/json" }, body: "{}" }).then(async (r) => {
       try {
@@ -304,7 +304,7 @@ function applyAlive(a) {
   else if (litTarget !== null && !document.querySelector(".se-ping, .se-ping-svg")) applyPing();
   if (a.trace_trail && window.seTraceTrail) window.seTraceTrail(a.trace_trail);
   if (logPanel && a.acts !== lastActs) { lastActs = a.acts; refreshLog(); }
-  // THE PERSON PULLED (owner design 2026-08-04): the answer lands in the
+  // THE PERSON PULLED: the answer lands in the
   // details, and a form the walk owes gets a panel of its own — the inline
   // details pane is ephemeral on purpose.
   if (lastPullSeq === null) lastPullSeq = a.last_pull ? a.last_pull.seq : 0;

@@ -130,7 +130,7 @@ function asList(v: unknown): string[] {
 }
 
 /** Every markdown file under the trace corpus, at any depth. ONE SUBFOLDER
- *  PER TYPE is the shape a person reads (owner, 2026-08-05); the loader does
+ *  PER TYPE is the shape a person reads (owner); the loader does
  *  not depend on it, so a flat file still loads and a new type needs no code. */
 function traceFiles(dir: string, depth = 0): string[] {
   if (depth > 4) return [];

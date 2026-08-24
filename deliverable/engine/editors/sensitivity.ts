@@ -44,7 +44,7 @@ ${CARD_PARTS}
         else ledger.push(link(r.id) + " over " + link(sv.winner) + " on " + link(c.axis) + (ref === "pending" ? " \\u2014 minting" : " \\u2014 " + link(ref)));
       });
     });
-    // ONE DECK PER FLIPPABLE RIVAL (owner ruling 2026-08-10): each rival
+    // ONE DECK PER FLIPPABLE RIVAL: each rival
     // that stands within reach deals its own stack, and the arrows browse a
     // stack without deciding anything.
     const decks = [];

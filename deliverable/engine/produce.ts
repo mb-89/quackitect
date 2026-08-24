@@ -62,7 +62,7 @@ const PROMPT_LAYER_IN_GITHUB = join(".github", "instructions", "protocol.instruc
  *  vehicle, plus the one file below that must NOT be dropped.
  *
  *  `.claude` IS THE ONE EXCEPTION TO ITS OWN EXCLUSION, and it is the wire
- *  without which the arrival hook is dead weight (i35, 2026-08-17).
+ *  without which the arrival hook is dead weight (i35).
  *
  *  IT USED TO BE TWO FOLDERS. The repository root held a committed one and the
  *  opened folder below it held a generated one, and only the committed one

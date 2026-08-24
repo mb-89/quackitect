@@ -47,9 +47,38 @@ async function standingClaim(): Promise<{
 
   pinIteration(root, itFind(root, id), "patch");
   const decl = session.currentMachine();
-  const state = decl.states.find((s) => s.evidence_form.length > 0 && s.kind !== "gate");
-  assert.ok(state !== undefined, "the column must ask for evidence somewhere");
-  const field = state.evidence_form[0].name;
+  // THE STATE THIS FIXTURE SIGNS MUST BE ONE A FORGED FILE CAN MAKE GREEN, and
+  // that is a narrow thing. At `patch` rigor this column has exactly TWO
+  // claimful states, and only one of them qualifies.
+  //
+  // IT USED TO TAKE THE FIRST STATE CARRYING AN EVIDENCE FORM, which held only
+  // while the first such state happened to be an ordinary one. BROKE
+  // 2026-08-23, when the rigor matrix grew a `spawn-the-hands` row at position
+  // 05 of every milestone. It is work rather than a gate, so it became the
+  // first claimful state — and its only field is a CHECKLIST, which refuses the
+  // sentence this fixture writes. Twenty-four tests went red on that one line.
+  //
+  // THREE RULES DECIDE THIS, each measured on 2026-08-24 rather than reasoned:
+  //
+  //   - A CLAIM IS GREEN ONLY IF ITS FEEDERS ARE. Signing one state in the
+  //     middle of the column can never make it stand, so this fixture signs
+  //     every other claim first — see the call below.
+  //   - A BARE SIGNED NOTE IS A WHOLE CLAIM. A note carrying no sections at all
+  //     stands; that is what every other state gets.
+  //   - A SECTION IS CHECKED AGAINST ITS FIELD'S TEMPLATE. A checklist wants a
+  //     ticked line and a per-item field wants its declared items, so a
+  //     sentence fails both. ONLY A FIELD WITH NO TEMPLATE accepts one.
+  //
+  // SO THE CANDIDATE NEEDS A PROSE FIELD, and it is that field the amend test
+  // rewrites. The predicate names that requirement instead of describing
+  // whichever state used to come first.
+  const proseField = (s: (typeof decl.states)[number]) => s.evidence_form.find((f) => f.template === undefined);
+  const state = decl.states.find((s) => s.evidence_form.length > 0 && s.kind !== "gate" && proseField(s) !== undefined);
+  assert.ok(
+    state !== undefined,
+    `no state in this column can hold a forged claim: the fixture needs one that asks for evidence, is not a gate, and has at least one field with no template. Checked ${String(decl.states.length)} states.`,
+  );
+  const field = (proseField(state) as { name: string }).name;
 
   // AN ISO STAMP, because the reopen mark is compared against it as a string.
   // A claim stamped by a much older engine carries prose here, and prose does
@@ -59,9 +88,22 @@ async function standingClaim(): Promise<{
   // ONE TREE SINCE i34: a record's evidence stands under the root.
   const ev = join(root, "spec", "iterations", id, "evidence", `${state.id}.md`);
   mkdirSync(dirname(ev), { recursive: true });
+  // EVERY OTHER CLAIM STANDS FIRST, because a claim whose feeders are not
+  // green is dropped from the green set. The chosen state cannot stand alone,
+  // however its own file is written.
+  signEveryClaim(root, id, decl, signedAt, state.id);
+  // ITS OWN FILE IS A BARE CLAIM PLUS ONE PROSE SECTION.
+  //
+  // THE BARE BODY IS WHAT MAKES IT STAND. A signed note carrying no sections is
+  // a whole claim. A note carrying SOME sections is a half-filled form, and a
+  // half-filled form counts as nothing at all — measured 2026-08-24 as
+  // `done = []` against a state wanting five fields, not four of five.
+  //
+  // THE ONE SECTION IS WHAT THE AMEND ACTS ON, and it names a field with no
+  // template, because a checklist or a per-item field refuses a sentence.
   writeFileSync(
     ev,
-    `---\nsigned_off: ${signedAt}\nby: agent\nauthors: human\n---\n\n## ${field}\n\nwhat was claimed the first time\n`,
+    `---\nsigned_off: ${signedAt}\nby: agent\nauthors: human\n---\n\nthe claim, in full\n\n## ${field}\n\nwhat was claimed the first time\n`,
     "utf8",
   );
   assert.ok(session.recordDone(decl).includes(state.id), "green from the record before anything touches it");

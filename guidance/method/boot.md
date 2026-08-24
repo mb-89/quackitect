@@ -46,13 +46,20 @@ answer of 20,451 bytes and spilled to disk.
 THE CONTENT WAS 200 BYTES. The rest was the `work` block, which carries the
 full stdout of every job the session knows about.
 
-SO A NOISY JOB LIST TAXES EVERY CALL. Two hung `cold-clone.mjs` runs, going
-59 hours, each carried about 800 characters of stdout. That took roughly
-2,800 of the 6,000-byte bound away from every call in the reading loop.
+SO A NOISY JOB LIST USED TO TAX EVERY CALL. Two hung `cold-clone.mjs` runs,
+going 59 hours, each carried about 800 characters of stdout. That took
+roughly 2,800 of the 6,000-byte bound away from every call in the reading
+loop.
 
-CHECK THE JOB LIST WHEN THE READING FEELS SLOW. `se_run {jobs: true}` lists
-them, and `se_run {job, stop: true}` ends one. A job that has run for hours
-with a timeout already fired is hung, not working.
+THE ENGINE CLOSES THEM NOW, and noticing is not the agent's job.
+
+- Every record still marked running is reaped when the engine starts.
+- A finished entry rides one answer and then drops itself.
+- The listing shows what is running and nothing else.
+
+`se_run {job, stop: true}` STILL ENDS ONE BY HAND, which is right for a run
+you already know is pointless. A job going long after its ceiling is hung
+rather than working, and the reap is what that is for.
 
 THE SUGGESTED PAGE IS ALSO SMALLER THAN IT NEEDS TO BE.
 `deliverable/engine/bound.ts` line 55 computes it as (6000 - 200) / 2, and

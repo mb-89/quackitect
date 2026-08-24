@@ -25,7 +25,7 @@ const BLOCK_TAGS = ["div", "section", "main", "aside", "table", "ul", "ol", "for
 //
 // A TAG PRECEDED BY A QUOTE IS A PLACEHOLDER, NOT MARKUP. Prose describing a
 // payload writes things like {"<section>": "<text>"}, and the angle brackets
-// there stand for a name the reader supplies. Measured 2026-08-23: that one
+// there stand for a name the reader supplies. Measured: that one
 // shape was the only false positive left after the reachability rule landed.
 const BLOCK = new RegExp("`[^`]*(?<![\"'])<(?:" + BLOCK_TAGS.join("|") + ")\\b");
 const CLASSED = /`[^`]*(?<!["'])<[a-z]+\s+class=/;
@@ -63,7 +63,7 @@ const SURFACE_ENTRY = "render.ts";
 
 /** The files the panel actually uses, followed rather than listed.
  *
- *  THE RULE IS THE OWNER'S (2026-08-23): "check which files are used by VS
+ *  THE RULE IS THE OWNER'S: "check which files are used by VS
  *  Code. These files can exist. Any other files cannot exist."
  *
  *  IT IS FOLLOWED, NEVER DECLARED. A hand-kept list of the surface's parts is a
@@ -109,11 +109,25 @@ export function surfaceFiles(): Set<string> {
  *  decide whether the exemption still holds, so a bare path buys nothing.
  *
  *  A MISSING FILE MEANS NO EXEMPTIONS, never a crash. The guard has to answer
- *  even where nobody has written the list yet. */
-export function exempted(): Set<string> {
+ *  even where nobody has written the list yet.
+ *
+ *  THE LIST BELONGS TO THE PRODUCT BEING CHECKED, so a caller that knows the
+ *  root says so. Falling back to the path beside this file is right only when
+ *  the engine sits inside the tree it is checking.
+ *
+ *  IT DOES NOT ALWAYS SIT THERE. A test root BORROWS the engine as a link, and
+ *  a linked module resolves its own directory to where it REALLY lives — the
+ *  template, which carries the engine and nothing else. The list was copied
+ *  into the case root and the guard read the template, found no list, and
+ *  reported every declared exemption as an unregistered emitter.
+ *
+ *  THAT FAILED A CHECK RATHER THAN SKIPPING ONE, which is the worse direction:
+ *  it held boot short of the front desk in every fixture that walks. */
+export function exempted(root?: string): Set<string> {
+  const from = root === undefined ? EXEMPTIONS_FILE : join(root, "deliverable", "machines", "widget-exemptions.md");
   let text: string;
   try {
-    text = readFileSync(EXEMPTIONS_FILE, "utf8");
+    text = readFileSync(from, "utf8");
   } catch {
     return new Set();
   }
@@ -135,7 +149,7 @@ export function guardNoUnregisteredEmitter(root: string, rootRelativePath: strin
   const path = rootRelativePath.replace(/\\/g, "/");
   if (!path.startsWith(`${ENGINE_PREFIX}/`) || !path.endsWith(".ts")) return;
   if (!emitsWidget(content)) return;
-  if (surfaceFiles().has(path) || exempted().has(path)) return;
+  if (surfaceFiles().has(path) || exempted(root).has(path)) return;
   const abs = join(root, path);
   if (existsSync(abs) && emitsWidget(readFileSync(abs, "utf8"))) return;
   throw new Rejection({
@@ -164,8 +178,8 @@ export function guardNoUnregisteredEmitter(root: string, rootRelativePath: strin
  *  IT IS A SECOND SURFACE BY DEFINITION. The person looks at the panel; markup
  *  the panel cannot reach is markup nobody sees, and it is the place an agent
  *  goes to "fix" something the person will never see fixed. */
-export function strays(): string[] {
+export function strays(root?: string): string[] {
   const surface = surfaceFiles();
-  const allowed = exempted();
+  const allowed = exempted(root);
   return emitters().filter((path) => !surface.has(path) && !allowed.has(path));
 }

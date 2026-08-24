@@ -9,7 +9,7 @@ export interface RejectionPayload {
   /** Executable: the exact call to make instead. */
   remedy: { tool: string; args: Record<string, unknown>; note?: string };
   source: string;
-  /** FEED-FORWARD (owner ruling 2026-08-06): where the rule is stated ahead
+  /** FEED-FORWARD: where the rule is stated ahead
    *  of the refusal. Computed from the clause, never passed by a caller.
    *  refusals.test.ts enforces that the section exists. */
   guidance: string;

@@ -278,7 +278,7 @@ function optionalKeys(file: string, f: Record<string, unknown>): Partial<Evidenc
     ...list("items"),
     ...list("passing"),
     ...list("columns"),
-    // WHICH CHOICES OWE A REASON (owner ruling 2026-08-08). Absent means
+    // WHICH CHOICES OWE A REASON. Absent means
     // ALL of them, which is what a gate verdict wants. A finder's `applies`
     // names only the skip: saying yes needs no essay, saying no does.
     ...list("rationale_for"),
@@ -320,8 +320,8 @@ export function matrixDir(root: string): string {
 }
 
 /** The matrix CONTENT hash — a pin records it, so drift between a pinned
- *  machine and the live matrix stays detectable (and silent until asked —
- *  owner verdict 2026-07-30). Data only; the Bases view is presentation. */
+ *  machine and the live matrix stays detectable, and silent until asked.
+ *  Data only; the Bases view is presentation. */
 const HASH_CACHE = new Map<string, { stamp: string; hash: string; epoch: number }>();
 
 /** THE HASH IS THE HONEST KEY, AND THE STAMP IS THE HONEST KEY FOR THE HASH.

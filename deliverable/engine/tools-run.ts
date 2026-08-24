@@ -25,7 +25,7 @@ import {
   jobAcknowledge,
   jobAcknowledgeSettled,
   jobDone,
-  jobList,
+  jobRoster,
   jobStatus,
   jobStop,
   noteModel,
@@ -130,8 +130,8 @@ function agentPosition(root: string, positionOf?: () => string): { state?: strin
 
 /** WHICH HAND IS BEING REGISTERED — walker, reviewer or researcher.
  *
- *  ONLY A WALKER COUNTS AGAINST THE RECORD'S CEILING (owner ruling
- *  2026-08-23). A reviewer buys separation and a researcher buys reading
+ *  ONLY A WALKER COUNTS AGAINST THE RECORD'S CEILING (
+ *  ). A reviewer buys separation and a researcher buys reading
  *  nobody has done; neither competes for the walking slot, and neither should
  *  be able to strand the next phase by filling it.
  *
@@ -146,7 +146,7 @@ function roleAsked(args: Record<string, unknown>): string {
 /** The job side of se_run: list, stop, wait or status. Undefined when the
  *  call names no job — the command side handles it. */
 function jobArm(args: Record<string, unknown>, root: string, positionOf?: () => string): unknown {
-  if (args.jobs === true) return { jobs: jobList(root) };
+  if (args.jobs === true) return jobRoster(root);
   // A SUBAGENT IS WORK OUT OF SIGHT, so it belongs on the same list. Nothing
   // here can observe one, so the agent that spawned it registers it and closes
   // it. An unclosed one shows as running, which is the honest answer.
@@ -219,7 +219,10 @@ function jobArm(args: Record<string, unknown>, root: string, positionOf?: () => 
     // remove. An explicit list still gets its ids back, because the caller
     // named them and is owed the answer.
     const done = jobAcknowledgeSettled(root);
-    return { acknowledged: done.length, note: "settled work no longer rides answers; se_run {jobs: true} still has all of it" };
+    return {
+      acknowledged: done.length,
+      note: "settled work no longer rides answers; each record stays reachable by its id with se_run {job}",
+    };
   }
   if (Array.isArray(args.ack)) return jobAcknowledge(args.ack.map(String), root);
   if (typeof args.ack === "string" && args.ack !== "") return jobAcknowledge([args.ack], root);
@@ -249,7 +252,7 @@ function shapedRemedy(command: string): { tool: string; args: Record<string, unk
   if (/--test\b|\bnpm\b.*\btest\b|\bjest\b|\bvitest\b/i.test(command)) {
     return {
       tool: "se_test",
-      // NO SCOPE ARGUMENT, since the owner's ruling (2026-08-16). You say what
+      // NO SCOPE ARGUMENT, and that is ruled. You say what
       // you want to know; the engine reads what changed and decides whether
       // that is the battery, a named set, or nothing at all.
       args: { question: "<what this run answers>" },
@@ -454,7 +457,11 @@ export function runTools(
           background: { type: "boolean", description: "start it detached and return a job handle IMMEDIATELY — for work you know is long" },
           job: { type: "string", description: "ask an existing job how it is doing: its output so far, whether it still runs" },
           stop: { type: "boolean", description: "with job: kill it and every process it spawned" },
-          jobs: { type: "boolean", description: "list every job this session started, newest first" },
+          jobs: {
+            type: "boolean",
+            description:
+              'list what is RUNNING right now, newest first, and NOTHING else. A finished job is served whole by se_run {job: "<id>"}; how many there are rides as `settled`.',
+          },
           agent: {
             type: "string",
             description:
@@ -702,7 +709,7 @@ export function runTools(
         // record on disk alone. Without this a run that settles between two
         // lane calls reads back as history and never reaches the caller.
         noteStarted(id, root);
-        // THE LAST RUN SIZES THE EXPECTATION (owner ruling 2026-08-03): a
+        // THE LAST RUN SIZES THE EXPECTATION: a
         // battery caller is told how long the previous one took — measured,
         // never guessed — or told plainly that no record exists.
         const battery = decision.scope === "battery";

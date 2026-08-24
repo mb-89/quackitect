@@ -24,7 +24,7 @@ function jsonTable(v) {
     }
     const escaped = v.replace(/&/g,"&amp;").replace(/</g,"&lt;");
     // Paragraphs survive the pane: a multi-line string keeps its breaks
-    // (HTML collapses raw newlines - the wall-of-text bug, owner 2026-07-28).
+    // (HTML collapses raw newlines - the wall-of-text bug, owner ).
     if (v.includes("\\n")) return '<div class="vstr prewrap">' + escaped + "</div>";
     return '<span class="vstr">' + escaped + "</span>";
   }

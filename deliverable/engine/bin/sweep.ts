@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { sweepCorpus } from "../sweep.ts";
 import { strays } from "../widgets.ts";
 
-// AN UNRESOLVED MARKER IN A SIGNED ARTIFACT (i4, 2026-08-23).
+// AN UNRESOLVED MARKER IN A SIGNED ARTIFACT (i4).
 //
 // The item templates ban these in a node's `statement`, and the write guard
 // refuses one there. Everywhere else in the same file they landed silently and
@@ -17,7 +17,7 @@ const MARKERS = /(^|[^A-Za-z])(TBD|TBC|TBR|\?\?\?)([^A-Za-z]|$)/;
 // IT READS FIELDS, NOT PROSE, and that is the whole difference between a
 // finding and a false positive.
 //
-// MEASURED 2026-08-23. The first version scanned whole files and returned 33
+// MEASURED. The first version scanned whole files and returned 33
 // hits, of which nearly every one was an evidence form SAYING the marker sweep
 // found nothing. A check that flags the rule for stating itself is noise.
 //
@@ -88,7 +88,10 @@ if (markers.length > 0) {
   process.stdout.write("markers green\n");
 }
 
-const emitters = strays();
+// THE SWEEP KNOWS WHICH TREE IT IS CHECKING, so the guard reads that tree's
+// exemption list rather than the one beside its own file. Those are the same
+// place only when the engine sits inside the product it checks.
+const emitters = strays(root);
 if (emitters.length > 0) {
   process.stdout.write(`\nwidget guard RED — ${String(emitters.length)} unregistered emitter(s)\n`);
   for (const path of emitters) process.stdout.write(`- ${path}\n`);

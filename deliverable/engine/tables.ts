@@ -11,7 +11,7 @@
 // wrong, which is worse than no table.
 //
 // THE PIVOT IS OURS, and it is the one place we go past Obsidian (owner ask
-// 2026-08-01). `type: pivot` crosses a row property with a column property
+// ). `type: pivot` crosses a row property with a column property
 // and puts an aggregate in the cell. A LIST-VALUED property spreads across
 // its elements, which is the whole point: pivoting the notes by name against
 // their own depends_on IS the dependency matrix, with no second data model
@@ -124,7 +124,7 @@ export function loadBase(path: string): BaseSpec {
 // opens with `kind == "matrix-row"`. So we hand the renderer the same thing:
 // every note, as a row of its own frontmatter.
 //
-// 169 notes and 442 KB, measured 2026-08-01. Reading all of them costs less
+// 169 notes and 442 KB, measured. Reading all of them costs less
 // than one render, so nothing is cached — an edit shows on the next load,
 // the same rule the palette follows.
 // ---------------------------------------------------------------------------
