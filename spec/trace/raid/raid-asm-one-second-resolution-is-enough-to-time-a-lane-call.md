@@ -7,12 +7,11 @@ statement: "The one-second convention that bounds every modelled interface is fi
 owner: the maintainer of the machine
 trigger: the first report that ranks states by cost
 status: open
-probed: "unprobed 2026-08-21 — the required resolution study belongs with benchmark work; i45 does not change the timing convention or benchmark reporting."
 impact: "A ranking built on a clock coarser than the thing it measures orders states by rounding. Improvements smaller than the tick are invisible, which is most of them."
 breaks_how_badly: corrosive
 how_likely: plausible
 probe: "the probe below was run on 2026-08-21 over 290 calls. The median is 1 ms, a thousandth of the convention's unit, so a one-second bound cannot express a demand about a typical lane call."
-probed: "2026-08-21, and it is FALSE for the median call. The kind is now issue."
+probed: "2026-08-21, and it is FALSE for the median call. The kind is now issue. The remaining resolution study belongs with benchmark work; i45 does not change the timing convention or benchmark reporting."
 source_refs:
   - i37-training-iterations-a-disposable-iterati
 weighs_with: none
