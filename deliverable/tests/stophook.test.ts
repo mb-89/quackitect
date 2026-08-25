@@ -364,7 +364,14 @@ async function deskedSession(notch?: string) {
   return { s, packet };
 }
 
-test("an idle desk does NOT pass under blockers only — the notch outranks it", async () => {
+// THE DESK IS A STOP AT EVERY NOTCH (owner ruling 2026-08-25). The owner's
+// words: "being at the front desk is a valid stop... especially after a boot,
+// you just stop."
+//
+// THIS CASE ASSERTED THE OPPOSITE FOR ONE DAY. The notch was made to outrank
+// the desk, which fixed a real defect — four stops passing mid-work — and
+// overshot onto a session that had genuinely finished.
+test("an idle desk passes under blockers only — the desk outranks the notch", async () => {
   const { packet } = await deskedSession("blockers only");
 
   // THE EXACT SHAPE THE LIVE LOG HELD: standing at the desk, nothing aimed.
@@ -372,11 +379,31 @@ test("an idle desk does NOT pass under blockers only — the notch outranks it",
   assert.equal(packet.target, "", "with nothing routed");
   assert.equal(packet.stop_at, "blockers only", "and the notch rides the pull");
 
-  const out = verdict([pullRecord(packet)], {});
-  assert.notEqual(out, "", "an idle desk is not a blocker, so the stop is refused");
+  assert.equal(verdict([pullRecord(packet)], {}), "", "the desk with nothing routed is the machine's own stop");
+});
+
+test("the desk under blockers only still blocks WITH a target — a routed goal outranks the desk", async () => {
+  const { packet } = await deskedSession("blockers only");
+  const aimed = { ...packet, target: "iterations/i27" };
+  const out = verdict([pullRecord(aimed)], {});
+  assert.notEqual(out, "", "the desk is not a hiding place from a goal the person routed");
   const d = JSON.parse(out) as { decision: string; reason: string };
-  assert.equal(d.decision, "block");
-  assert.match(d.reason, /blockers only/, "and the refusal says which notch is asking");
+  assert.match(d.reason, /iterations\/i27/, "and the refusal names it");
+});
+
+// AN EMPTY TARGET MUST NOT RENDER AS A SET ONE. `aimed` was `pull === "wait"`
+// alone, so a blank target printed as `A target is set ()` and the reader was
+// told to take the door leading toward it. There was no such door.
+//
+// CAUGHT 2026-08-25 by the tooth biting its own author, who read the sentence,
+// went looking for the target, and found none.
+test("an idle wait away from the desk never claims a target is set", () => {
+  const out = verdict([pullRecord({ pull: "wait", where: ["iterations/i27/build"], stop_at: "blockers only" })], {});
+  assert.notEqual(out, "", "a wait mid-machine under this notch is not a sanctioned stop");
+  const d = JSON.parse(out) as { decision: string; reason: string };
+  assert.doesNotMatch(d.reason, /A target is set \(\s*\)/, "an empty target must never print as a set one");
+  assert.match(d.reason, /the target is empty/, "it says what is actually true");
+  assert.doesNotMatch(d.reason, /door that leads toward the target/, "and does not point at a door that cannot exist");
 });
 
 test("an idle desk still passes with no notch set — it is the machine's own stop", async () => {

@@ -349,18 +349,31 @@ function lastPull(): LastPull | undefined {
  *  genuinely nowhere to walk, and the desk's own guidance says to stay there.
  *  see dsp-boot-and-power.md#the-desk-with-nothing-routed-is-the-machines-own
  *
- *  `blockers only` OUTRANKS IT, and it is the only notch that does. That notch
- *  means one thing: come back when the walk CANNOT GO ON. An idle desk is not a
+ *  THE DESK IS A STOP AT EVERY NOTCH, and after a boot the walk stops there
+ *  rather than picking up whatever work is lying around. Standing there with
+ *  nothing routed passes, and no notch overrides it.
+ *  see dsp-blockers-only-stop-behavior.md#the-front-desk-outranks-every-notch
+ *
+ *  A TARGET STILL OUTRANKS THE DESK. A routed goal is the person's standing
+ *  instruction, and the desk is not a hiding place from one.
+ *
+ *  `blockers only` OUTRANKS AN IDLE WAIT ANYWHERE ELSE. That notch means one
+ *  thing: come back when the walk CANNOT GO ON. A wait mid-machine is not a
  *  blocker, it is the absence of one.
  *
  *  MEASURED ON A LIVE SESSION'S OWN LOG: four stops in a row passed as "nothing
  *  routed" while the notch stood at `blockers only` and the agent had work in
  *  hand. The notch was read correctly and then never consulted, because this
- *  rule sat below it and passed unconditionally. */
+ *  rule sat below it and passed unconditionally.
+ *
+ *  THE FIRST FIX OVERSHOT. Letting the notch outrank everything made the desk
+ *  bite too, so a session that had genuinely finished was pushed back in with
+ *  nowhere to go. */
 function nothingRouted(notch: string, target: string, pull: string, at: string): boolean {
-  if (notch === "blockers only") return false;
   if (target !== "") return false;
-  return pull === "wait" || at.split(",").some((w) => w.trim() === "front_desk");
+  if (at.split(",").some((w) => w.trim() === "front_desk")) return true;
+  if (notch === "blockers only") return false;
+  return pull === "wait";
 }
 
 function notchSanction(notch: string, last: LastPull, at: string): [string, string] | undefined {
@@ -376,6 +389,73 @@ function notchSanction(notch: string, last: LastPull, at: string): [string, stri
   // only place that is true, and the walk's own position names it.
   if (notch === "bless" && /(^|\/)gate[-_]/.test(at)) return ["notch: bless", `a gate is owed at ${at}`];
   return undefined;
+}
+
+// see dsp-boot-and-power.md#the-only-stops-that-are-sanctioned
+const SANCTIONED =
+  "FOUR STOPS ARE SANCTIONED AND NOTHING ELSE IS. " +
+  "(1) A GATE THE PERSON OWNS — gate-implementation is theirs to bless; the rest are yours at this dial. " +
+  "(2) A DECISION ONLY THEY CAN MAKE — no answer you could pick would let the walk continue honestly. " +
+  "(3) SOMETHING BROKE and no remedy gets you past it. " +
+  "(4) THE RETRO'S FIELD-FEEDBACK QUESTION — ask it, then STOP and wait. It is the owner's own report from outside the machine, " +
+  "nothing else in the retro can stand in for it, and walking on past it has quietly skipped it for several retros running. " +
+  "(5) A PLAN, BEFORE IT IS ACTED ON. PLANNING WAITS FOR THE OWNER'S GO; EXECUTION DOES NOT (owner ruling 2026-08-14). " +
+  "Seeding a record, splitting or merging one, deciding which iteration a finding belongs to, choosing scope — all planning. Present the list and WAIT. " +
+  "Once the plan has the go, execute the whole of it without asking again. " +
+  "Being unsure is not one. Having a lot left is not one. Having just finished a piece is not one. " +
+  'STOPPING FOR ONE OF THOSE? SAY SO ON THE RECORD: se_stop {because: "<which one, and why>"}, then stop again. ' +
+  "Saying it in chat is not enough and never was — the tooth cannot read your message, only the call log. " +
+  "ONE FORCE RELEASES ONE STOP. The next pull spends it, so this is a decision rather than a switch. " +
+  "NO se_stop IN YOUR TOOL LIST? The running engine is older than this hook. se_reload is legal everywhere — reload, and the verb is there.";
+
+/** WHAT THE REFUSAL SAYS, given the four things that shape the wording.
+ *
+ *  SEPARATE FROM THE DECISION BECAUSE THEY ARE SEPARATE JOBS. `decide` answers
+ *  whether to block; this answers how to say so. Holding both in one function
+ *  put it over the linter's complexity ceiling the moment a third wording was
+ *  needed, which is the linter reporting a seam rather than a nuisance.
+ *
+ *  THREE WORDINGS, and the difference is what the reader can actually do.
+ *
+ *  - A WAIT WITH A TARGET is a routing failure. There is a door toward it.
+ *  - A WAIT WITH NO TARGET is an idle desk. There is no such door, so saying
+ *    "take the door toward the target" would be advice nobody can act on.
+ *  - ANYTHING ELSE is mid-work, and the answer is to pull again.
+ *
+ *  THE MIDDLE ONE USED TO PRINT AS THE FIRST, rendering an empty target as
+ *  `A target is set ()`, which sent the reader looking for a target that was
+ *  not there.
+ *  see dsp-blockers-only-stop-behavior.md#an-empty-target-is-never-printed-as-a-set-one */
+function blockReason(notch: string, pull: string, target: string, where: string): string {
+  // WHAT THE NOTCH IS ASKING FOR, said in the refusal rather than left for the
+  // reader to infer from a setting they may not have looked at.
+  const NOTCHED: Record<string, string> = {
+    bless: "[se] stop @ bless: you run until a BLESS is owed, and no gate is owed here. ",
+    "blockers only": "[se] stop @ blockers only: you stop only when the walk CANNOT go on, and the last pull was not refused. ",
+  };
+  const prefix = NOTCHED[notch] ?? "";
+  if (pull === "wait" && target !== "") {
+    return (
+      `${prefix}[se] A target is set (${target}) and the walk is not on it` +
+      (where === "" ? "" : `, standing at ${where}`) +
+      '. The pull answered "wait" because nothing routed FROM HERE, which is not the same as nothing to do. ' +
+      `Take the door that leads toward the target and keep walking. ${SANCTIONED}`
+    );
+  }
+  if (pull === "wait") {
+    return (
+      `${prefix}[se] Nothing is routed — the target is empty` +
+      (where === "" ? "" : `, and the walk stands at ${where}`) +
+      '. The pull answered "wait", and this notch does not read an idle desk as work finished. ' +
+      "Two things end this honestly. The person routes a door, or the stop is one of the sanctioned ones below and you claim it on the record. " +
+      SANCTIONED
+    );
+  }
+  return (
+    `${prefix}[se] The walk stands mid-work: the last pull answered "${pull}"` +
+    (where === "" ? "" : ` at ${where}`) +
+    `. A report is not a checkpoint and size is not a reason — call se_pull and keep walking. ${SANCTIONED}`
+  );
 }
 
 /** THE WHOLE DECISION, from the payload and whatever the root holds.
@@ -416,30 +496,6 @@ export function decide(payload: string): Verdict {
       return pass("nothing routed", `no target, and the pull answered "${pull}"${at === "" ? "" : ` at ${at}`}`);
     }
     const where = at;
-    const aimed = pull === "wait";
-    // WHAT THE NOTCH IS ASKING FOR, said in the refusal rather than left for
-    // the reader to infer from a setting they may not have looked at.
-    const NOTCHED: Record<string, string> = {
-      bless: "[se] stop @ bless: you run until a BLESS is owed, and no gate is owed here. ",
-      "blockers only": "[se] stop @ blockers only: you stop only when the walk CANNOT go on, and the last pull was not refused. ",
-    };
-    const prefix = NOTCHED[notch] ?? "";
-    // see dsp-boot-and-power.md#the-only-stops-that-are-sanctioned
-    const SANCTIONED =
-      "FOUR STOPS ARE SANCTIONED AND NOTHING ELSE IS. " +
-      "(1) A GATE THE PERSON OWNS — gate-implementation is theirs to bless; the rest are yours at this dial. " +
-      "(2) A DECISION ONLY THEY CAN MAKE — no answer you could pick would let the walk continue honestly. " +
-      "(3) SOMETHING BROKE and no remedy gets you past it. " +
-      "(4) THE RETRO'S FIELD-FEEDBACK QUESTION — ask it, then STOP and wait. It is the owner's own report from outside the machine, " +
-      "nothing else in the retro can stand in for it, and walking on past it has quietly skipped it for several retros running. " +
-      "(5) A PLAN, BEFORE IT IS ACTED ON. PLANNING WAITS FOR THE OWNER'S GO; EXECUTION DOES NOT (owner ruling 2026-08-14). " +
-      "Seeding a record, splitting or merging one, deciding which iteration a finding belongs to, choosing scope — all planning. Present the list and WAIT. " +
-      "Once the plan has the go, execute the whole of it without asking again. " +
-      "Being unsure is not one. Having a lot left is not one. Having just finished a piece is not one. " +
-      'STOPPING FOR ONE OF THOSE? SAY SO ON THE RECORD: se_stop {because: "<which one, and why>"}, then stop again. ' +
-      "Saying it in chat is not enough and never was — the tooth cannot read your message, only the call log. " +
-      "ONE FORCE RELEASES ONE STOP. The next pull spends it, so this is a decision rather than a switch. " +
-      "NO se_stop IN YOUR TOOL LIST? The running engine is older than this hook. se_reload is legal everywhere — reload, and the verb is there.";
     // The veto is now observable after the fact. Without a line here, a turn
     // the hook ended looks exactly like one the transport ended.
     try {
@@ -447,21 +503,7 @@ export function decide(payload: string): Verdict {
     } catch {
       // a hook must never break the turn
     }
-    return {
-      block: true,
-      reason:
-        prefix +
-        (aimed
-          ? `[se] A target is set (${target}) and the walk is not on it` +
-            (where !== "" ? `, standing at ${where}` : "") +
-            '. The pull answered "wait" because nothing routed FROM HERE, which is not the same as nothing to do. ' +
-            "Take the door that leads toward the target and keep walking. " +
-            SANCTIONED
-          : `[se] The walk stands mid-work: the last pull answered "${pull}"` +
-            (where !== "" ? ` at ${where}` : "") +
-            ". A report is not a checkpoint and size is not a reason — call se_pull and keep walking. " +
-            SANCTIONED),
-    };
+    return { block: true, reason: blockReason(notch, pull, target, where) };
   }
 }
 

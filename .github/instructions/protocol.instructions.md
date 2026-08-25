@@ -5,8 +5,8 @@ applyTo: '**'
 ---
 
 <!-- GENERATED at agent start. Do not edit — the next start overwrites it.
-     from guidance/contract.md c779bb4e75f5
-     from guidance/walking.md 834b1f2efe4a
+     from guidance/contract.md cc0a3ca81812
+     from guidance/walking.md 8915f0c2f118
      from guidance/method/lane.md 3881abeb4b1a
      from guidance/voice.md 2bbb7751a28c
 -->
@@ -145,6 +145,23 @@ TWO QUESTIONS ARE THE EXCEPTION.
   amount of draining, mining or sweeping stands in for it. The rest of the
   retro needs no answer, so do that while the answer is owed.
 - A PLAN IS A SANCTIONED STOP, BEFORE IT IS ACTED ON. See rule 9.
+
+CLAIMING A STOP IS A CALL. `se_stop {because}` names which of them applies and
+why, and it is what actually releases the turn.
+
+SAYING IT IN CHAT PROVES NOTHING. The tooth that refuses a stop reads the call
+log and cannot read your message, so a sentence naming a sanctioned stop was
+only ever addressed to the person.
+
+THE ORDER IS: BE REFUSED, THEN FORCE. A force before the refusal does nothing,
+which is what stops it becoming the ordinary way to end a turn.
+
+ONE FORCE RELEASES ONE STOP, and the next pull spends it.
+
+THIS USED TO HAPPEN BY ITSELF, and that was the defect. The harness sets a flag
+when it retries a blocked stop, the valve read that flag as a claim, and every
+second attempt went through with nothing named. Measured on one session: four
+blocks, four immediate releases.
 
 RULES 6 AND 7 MEET AT THE START OF WORK. Confirm an ambiguous intent before you
 begin; once begun, carry on.
@@ -591,6 +608,21 @@ THE READING LOOP PAYS NOTHING. A pull carrying only a read proof does not spend
 a call: the machine forced the hop and no judgment happened on it. The minutes
 clock still runs, and a pull carrying evidence beside the proof pays like any
 other work.
+
+## Stopping, and looking at the surface
+
+THREE VERBS ARE LEGAL WHEREVER THE WALK STANDS, because none of them is a move.
+
+- `se_stop {because}` FORCES A STOP THE TOOTH REFUSED. Name which sanctioned
+  stop applies and why. It changes nothing about the walk; only the turn ends.
+  - THE TOOTH MUST HAVE BITTEN FIRST. A force before the refusal does nothing.
+  - ONE FORCE RELEASES ONE STOP, and the next pull spends it.
+  - SAYING IT IN CHAT PROVES NOTHING. The tooth reads the call log.
+- `se_surface` PRINTS THE PERSON'S SURFACE AS TEXT — where the walk stands, the
+  dials, what is legal here, every state with its marks. This is the everyday
+  way to see it, and it needs nobody's permission.
+- `se_shoot` DRAWS THE SURFACE AS A PICTURE, for a question about LAYOUT. It
+  looks at a screen, so ask the person each time (rule 10).
 
 ## Notes
 
