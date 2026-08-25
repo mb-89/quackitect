@@ -4,6 +4,9 @@ statement: "What to do when you are the agent on a cloud machine: how you got st
 applies_to:
   - boot
   - front_desk
+sessions:
+  - cloud
+  - unattended
 ---
 
 # cloud-runner — you are on a machine nobody is watching
