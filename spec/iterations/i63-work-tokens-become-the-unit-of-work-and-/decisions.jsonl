@@ -1,0 +1,78 @@
+{"ts":"2026-08-25T13:07:54.635Z","op":"update","visit":"iterations/i63/start@0","node":"d9","brief":"i63 bound and started, walking M0 toward the kickoff gate"}
+{"ts":"2026-08-25T13:09:14.080Z","op":"update","visit":"iterations/i63/spawn-the-hands@0","node":"d10","brief":"fetching primary Scrum Guide for ordered-vs-prioritized backlog wording"}
+{"ts":"2026-08-25T13:09:17.653Z","op":"update","visit":"iterations/i63/spawn-the-hands@0","node":"d11","brief":"five researchers registered against M0, filling the spawn form with no walker"}
+{"ts":"2026-08-25T13:09:19.966Z","op":"update","visit":"iterations/i63/spawn-the-hands@0","node":"d12","brief":"fetching CrewAI Tasks concept page for the full Task field list"}
+{"ts":"2026-08-25T13:09:22.556Z","op":"update","visit":"iterations/i63/spawn-the-hands@0","node":"d13","brief":"fetching LangGraph persistence page for checkpoint contents"}
+{"ts":"2026-08-25T13:11:02.736Z","op":"update","visit":"iterations/i63/onboard-retro@0","node":"d14","brief":"web verbs open at the kickoff gate, not before — researchers spawned one state early"}
+{"ts":"2026-08-25T13:12:20.517Z","op":"fork","visit":"iterations/i63/onboard-retro@0","parent":"d7","node":"d15","brief":"make the outward verbs legal in every state","nodes":[]}
+{"ts":"2026-08-25T13:13:19.815Z","op":"update","visit":"iterations/i63/onboard-retro@0","node":"d16","brief":"stripping the per-state web listings that now teach a falsehood"}
+{"ts":"2026-08-25T13:15:03.604Z","op":"done","visit":"iterations/i63/onboard-retro@0","node":"d15","brief":"the outward verbs are legal in every state now"}
+{"ts":"2026-08-25T13:20:47.427Z","op":"update","visit":"iterations/i63/onboard-retro@0","node":"d17","brief":"draining the inbox so the onboarding retro can sign"}
+{"ts":"2026-08-25T13:20:54.851Z","op":"update","visit":"iterations/i63/onboard-retro@0","node":"d18","brief":"five notes left in the inbox"}
+{"ts":"2026-08-25T13:21:01.840Z","op":"update","visit":"iterations/i63/onboard-retro@0","node":"d19","brief":"five notes left in the inbox"}
+{"ts":"2026-08-25T13:21:25.555Z","op":"update","visit":"iterations/i63/onboard-retro@0","node":"d20","brief":"last two notes, then the retro form signs"}
+{"ts":"2026-08-25T13:21:39.937Z","op":"update","visit":"iterations/i63/onboard-retro@0","node":"d21","brief":"last two notes, then the retro form signs"}
+{"ts":"2026-08-25T13:21:53.197Z","op":"done","visit":"front_desk@0","node":"d7","brief":"all five researchers reported and closed"}
+{"ts":"2026-08-25T13:24:59.678Z","op":"done","visit":"front_desk@0","node":"d6","brief":"at gate-kickoff with the form filled and unstamped"}
+{"ts":"2026-08-25T13:31:09.578Z","op":"update","visit":"iterations/i63/gate-kickoff@0","node":"d22","brief":"reloading so the outward verbs go live"}
+{"ts":"2026-08-25T13:35:06.701Z","op":"done","visit":"boot/prepare_desk@0","node":"d2","brief":"ten primaries read, four conclusions changed"}
+{"ts":"2026-08-25T13:36:49.789Z","op":"done","visit":"boot/prepare_desk@0","node":"d4","brief":"answered the five pushbacks concretely"}
+{"ts":"2026-08-25T13:37:13.191Z","op":"plan","visit":"iterations/i63/gate-kickoff@0","parent":null,"nodes":[{"id":"d6","brief":"read the remaining primaries"},{"id":"d7","brief":"save the research to a file"},{"id":"d8","brief":"update the gate"},{"id":"d9","brief":"report by what it applies to"}]}
+{"ts":"2026-08-25T13:37:54.555Z","op":"update","visit":"iterations/i63/gate-kickoff@0","node":"d10","brief":"crewai guardrails and gitlab field caps are the two sharpest yet"}
+{"ts":"2026-08-25T13:39:57.903Z","op":"done","visit":"iterations/i63/gate-kickoff@0","node":"d6","brief":"twenty pages read in full"}
+{"ts":"2026-08-25T13:51:48.128Z","op":"plan","visit":"iterations/i63/gate-kickoff@0","parent":null,"nodes":[{"id":"d11","brief":"capture the boot design"},{"id":"d12","brief":"answer the priority question"},{"id":"d13","brief":"carry on through the states"}]}
+{"ts":"2026-08-25T13:52:05.971Z","op":"done","visit":"iterations/i63/gate-kickoff@0","node":"d12","brief":"priority failure mode is inconsistency between labellers, which mostly misses this case"}
+{"ts":"2026-08-25T13:55:54.013Z","op":"update","visit":"iterations/i63/gate-kickoff@0","node":"d14","brief":"slots, global read evidence and the guidance constraint captured"}
+{"ts":"2026-08-25T14:01:46.352Z","op":"update","visit":"iterations/i63/gate-kickoff@0","node":"d15","brief":"method steps become outgoing tokens, marking format still open"}
+{"ts":"2026-08-25T14:02:16.154Z","op":"update","visit":"iterations/i63/gate-kickoff@0","node":"d16","brief":"ephemeral by default, persistent only inside a record"}
+{"ts":"2026-08-25T14:02:37.417Z","op":"update","visit":"iterations/i63/gate-kickoff@0","node":"d17","brief":"retro same shape, and a person-held token replaces the sanctioned-stop list"}
+{"ts":"2026-08-25T14:05:40.818Z","op":"plan","visit":"iterations/i63/gate-kickoff@0","parent":"d13","nodes":[{"id":"d18","brief":"heading per token settled"},{"id":"d19","brief":"evidence spec as subheadings"},{"id":"d20","brief":"ideation needs nothing new"}]}
+{"ts":"2026-08-25T14:09:22.350Z","op":"update","visit":"iterations/i63/gate-kickoff@0","node":"d21","brief":"iterations: every evidence field becomes a token, two sections dropped"}
+{"ts":"2026-08-25T14:12:52.905Z","op":"done","visit":"iterations/i63/gate-kickoff@0","node":"d18","brief":"heading per token settled"}
+{"ts":"2026-08-25T14:18:16.225Z","op":"done","visit":"iterations/i63/gate-kickoff@0","node":"d19","brief":"evidence spec as subheadings, settled"}
+{"ts":"2026-08-25T14:20:32.718Z","op":"done","visit":"iterations/i63/gate-kickoff@0","node":"d20","brief":"ideation needs nothing new"}
+{"ts":"2026-08-25T14:25:06.970Z","op":"done","visit":"iterations/i63/gate-kickoff@0","node":"d13","brief":"walked every state, plus the bubble surface"}
+{"ts":"2026-08-25T14:29:11.710Z","op":"plan","visit":"iterations/i63/gate-kickoff@0","parent":null,"nodes":[{"id":"d22","brief":"fix the holder error"},{"id":"d23","brief":"capture status and place"},{"id":"d24","brief":"carry the surface rulings"}]}
+{"ts":"2026-08-25T14:38:09.505Z","op":"done","visit":"iterations/i63/gate-kickoff@0","node":"d22","brief":"holder error fixed in the file"}
+{"ts":"2026-08-25T14:39:33.005Z","op":"plan","visit":"iterations/i63/gate-kickoff@0","parent":"d23","nodes":[{"id":"d25","brief":"distribution empties the slot"},{"id":"d26","brief":"no cycle"},{"id":"d27","brief":"agent's objection struck"}]}
+{"ts":"2026-08-25T14:40:55.970Z","op":"update","visit":"iterations/i63/gate-kickoff@0","node":"d28","brief":"folding today's design input into the kickoff gate while the owner sketches"}
+{"ts":"2026-08-25T14:43:13.743Z","op":"done","visit":"iterations/i63/gate-kickoff@0","node":"d24","brief":"today's rulings folded into the gate, still unstamped"}
+{"ts":"2026-08-25T14:43:48.041Z","op":"done","visit":"iterations/i63/gate-kickoff@0","node":"d8","brief":"gate carries every ruling from today"}
+{"ts":"2026-08-25T15:04:49.644Z","op":"update","visit":"iterations/i63/gate-kickoff@0","node":"d29","brief":"reading the owner's editor drawing"}
+{"ts":"2026-08-25T15:05:24.839Z","op":"update","visit":"iterations/i63/gate-kickoff@0","node":"d30","brief":"paging past the embedded font to reach the drawing markup"}
+{"ts":"2026-08-25T15:05:40.471Z","op":"update","visit":"iterations/i63/gate-kickoff@0","node":"d31","brief":"reading the editor's column labels"}
+{"ts":"2026-08-25T15:05:51.378Z","op":"update","visit":"iterations/i63/gate-kickoff@0","node":"d32","brief":"last slice of the drawing"}
+{"ts":"2026-08-25T15:06:25.968Z","op":"update","visit":"iterations/i63/gate-kickoff@0","node":"d33","brief":"moving the drawing out of the scratchpad, it is a spec"}
+{"ts":"2026-08-25T15:16:10.706Z","op":"update","visit":"iterations/i63/gate-kickoff@0","node":"d34","brief":"bucket vocabulary settled and recorded as superseding"}
+{"ts":"2026-08-25T15:19:29.079Z","op":"done","visit":"iterations/i63/gate-kickoff@0","node":"d26","brief":"done is a filter over status, not a place"}
+{"ts":"2026-08-25T15:19:50.641Z","op":"update","visit":"iterations/i63/gate-kickoff@0","node":"d35","brief":"finding the existing database view code to reuse"}
+{"ts":"2026-08-25T15:20:06.793Z","op":"update","visit":"iterations/i63/gate-kickoff@0","node":"d36","brief":"reading the editor registry"}
+{"ts":"2026-08-25T15:20:30.528Z","op":"update","visit":"iterations/i63/gate-kickoff@0","node":"d37","brief":"checking whether filter controls already exist"}
+{"ts":"2026-08-25T15:21:32.228Z","op":"done","visit":"iterations/i63/gate-kickoff@0","node":"d25","brief":"distribution empties the outgoing bucket"}
+{"ts":"2026-08-25T15:21:44.491Z","op":"done","visit":"iterations/i63/gate-kickoff@0","node":"d27","brief":"the deadlock objection is struck in the file"}
+{"ts":"2026-08-25T15:21:58.159Z","op":"done","visit":"iterations/i63/gate-kickoff@0","node":"d23","brief":"node-table is the reuse target for the cells"}
+{"ts":"2026-08-25T15:22:30.390Z","op":"done","visit":"boot/prepare_desk@0","node":"d3","brief":"the gate carries the rulings"}
+{"ts":"2026-08-25T15:22:59.696Z","op":"done","visit":"iterations/i63/gate-kickoff@0","node":"d7","brief":"the research and design input both stand as files"}
+{"ts":"2026-08-25T15:24:23.177Z","op":"done","visit":"iterations/i63/gate-kickoff@0","node":"d9","brief":"the design input is written down whole"}
+{"ts":"2026-08-25T15:25:01.640Z","op":"done","visit":"iterations/i63/gate-kickoff@0","node":"d11","brief":"the boot design is captured in the design input file"}
+{"ts":"2026-08-25T15:25:23.858Z","op":"update","visit":"iterations/i63/gate-kickoff@0","node":"d38","brief":"the last drag ruling is on disk"}
+{"ts":"2026-08-25T16:34:34.727Z","op":"update","visit":"iterations/i63/spawn-the-hands@0","node":"d1","brief":"captured the owner's manual-walking feedback as a note"}
+{"ts":"2026-08-25T16:34:50.188Z","op":"update","visit":"iterations/i63/spawn-the-hands@0","node":"d2","brief":"holding at the owner's order while they drive the walk by hand"}
+{"ts":"2026-08-25T16:38:22.303Z","op":"plan","visit":"iterations/i63/spawn-the-hands@0","parent":null,"nodes":[{"id":"d3","brief":"write the three manual-walking findings as notes"},{"id":"d4","brief":"aim the walk at the kickoff gate of iteration 63"},{"id":"d5","brief":"show the owner what the gate asks and hold"}]}
+{"ts":"2026-08-25T16:38:31.899Z","op":"update","visit":"iterations/i63/spawn-the-hands@0","node":"d6","brief":"second finding written: the surface loses ticked checkboxes"}
+{"ts":"2026-08-25T16:38:54.097Z","op":"done","visit":"iterations/i63/spawn-the-hands@0","node":"d3","brief":"three manual-walking findings captured as notes"}
+{"ts":"2026-08-25T16:39:07.010Z","op":"update","visit":"iterations/i63/spawn-the-hands@0","node":"d7","brief":"aiming at gate-kickoff through onboard-retro"}
+{"ts":"2026-08-25T16:40:10.994Z","op":"done","visit":"iterations/i63/spawn-the-hands@0","node":"d4","brief":"the walk stands at onboard-retro; the aim stopped there on the reading"}
+{"ts":"2026-08-25T16:40:17.694Z","op":"update","visit":"iterations/i63/onboard-retro@0","node":"d8","brief":"captured the surface hop-printing defect before reporting"}
+{"ts":"2026-08-25T16:40:47.776Z","op":"done","visit":"iterations/i63/spawn-the-hands@0","node":"d5","brief":"reported the block at onboard-retro and held for the owner's word"}
+{"ts":"2026-08-25T16:42:01.066Z","op":"plan","visit":"iterations/i63/onboard-retro@0","parent":null,"nodes":[{"id":"d9","brief":"find the UX iteration the owner means"},{"id":"d10","brief":"drain all 15 pending notes"},{"id":"d11","brief":"submit the onboard-retro form"},{"id":"d12","brief":"fill and bless the kickoff gate"}]}
+{"ts":"2026-08-25T16:43:29.245Z","op":"done","visit":"iterations/i63/onboard-retro@0","node":"d9","brief":"the UI sitting record is the home for the surface findings"}
+{"ts":"2026-08-25T16:43:36.940Z","op":"update","visit":"iterations/i63/onboard-retro@0","node":"d13","brief":"three of fifteen drained so far"}
+{"ts":"2026-08-25T16:43:51.488Z","op":"update","visit":"iterations/i63/onboard-retro@0","node":"d14","brief":"four drained; the reading block and its mechanism merge into one token"}
+{"ts":"2026-08-25T16:43:56.523Z","op":"update","visit":"iterations/i63/onboard-retro@0","node":"d15","brief":"five drained; the mechanism note folded into the demand token"}
+{"ts":"2026-08-25T16:44:05.302Z","op":"update","visit":"iterations/i63/onboard-retro@0","node":"d16","brief":"six drained; the manual-driving view goes to the details-panel record"}
+{"ts":"2026-08-25T16:44:13.896Z","op":"update","visit":"iterations/i63/onboard-retro@0","node":"d17","brief":"seven drained; the unrendered hop list goes to the UI record"}
+{"ts":"2026-08-25T16:44:20.411Z","op":"update","visit":"iterations/i63/onboard-retro@0","node":"d18","brief":"seven drained; the unrendered movement list goes to the UI record"}
+{"ts":"2026-08-25T16:46:50.140Z","op":"done","visit":"iterations/i63/onboard-retro@0","node":"d10","brief":"all fifteen notes drained and the inbox is empty"}
+{"ts":"2026-08-25T16:47:30.477Z","op":"update","visit":"iterations/i63/onboard-retro@0","node":"d19","brief":"submitting the retro with the drain, the field feedback and the follow-up rewritten"}
+{"ts":"2026-08-25T16:48:06.642Z","op":"done","visit":"iterations/i63/onboard-retro@0","node":"d11","brief":"onboard-retro signed with the drain, the feedback and the follow-up rewritten"}
