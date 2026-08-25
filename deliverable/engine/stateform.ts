@@ -640,11 +640,7 @@ export function rationaleOf(content: string): string {
 export const unanswered = (v: string): boolean => v.trim() === "" || /^<!--[\s\S]*-->$/.test(v.trim());
 
 function templateStatement(root: string, name: string): string {
-  try {
-    return parseStateNote(readFileSync(join(root, fieldTemplateRel(name)), "utf8")).statement;
-  } catch {
-    return "";
-  }
+  return noteOf(join(root, fieldTemplateRel(name)))?.statement ?? "";
 }
 
 /** "Read <name>" from a document path — the input list's verb-object label. */

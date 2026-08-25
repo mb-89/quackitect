@@ -13,7 +13,7 @@ import {
   validateMachine,
 } from "./machine.ts";
 import { assertCanSupply } from "./machines/supply.ts";
-import { parseStateNote, passEpoch, section } from "./notes.ts";
+import { noteOf, passEpoch, section } from "./notes.ts";
 
 const SRC = "engine/rigor-matrix.ts";
 
@@ -407,7 +407,11 @@ function parseMatrixRow(
   file: string,
   byName: Map<string, RigorMatrixRow>,
 ): { row: RigorMatrixRow; fm: Record<string, unknown> } {
-  const note = parseStateNote(readFileSync(join(dir, "rows", file), "utf8"));
+  // THROUGH THE DOOR. A matrix row is a NOTE, and the door parses each one
+  // once and shares it with every other reader in the pass. Read cold, the
+  // matrix re-parsed 63 rows for every caller that asked about any of them.
+  const note = noteOf(join(dir, "rows", file));
+  if (note === undefined) throw new Error(`matrix row ${file} cannot be read`);
   const fm = note.frontmatter;
   const name = typeof fm.name === "string" ? fm.name : "";
   if (!name) throw new Error(`matrix row ${file} declares no name`);
@@ -450,7 +454,8 @@ function parseMatrixRow(
 /** see dsp-method-compilation.md#a-mirror-is-a-reference-never-a-copy */
 function mergeSameAs(dir: string, row: RigorMatrixRow, fm: Record<string, unknown>): void {
   if (typeof fm.same_as !== "string" || fm.same_as === "") return;
-  const note = parseStateNote(readFileSync(join(dir, "..", "states", `${fm.same_as}.md`), "utf8"));
+  const note = noteOf(join(dir, "..", "states", `${fm.same_as}.md`));
+  if (note === undefined) throw new Error(`matrix row ${row.name} mirrors state ${fm.same_as}, and that state cannot be read`);
   const nfm = note.frontmatter;
   row.same_as = fm.same_as;
   if (nfm.legal_tools !== undefined) row.legal_tools = asList(nfm.legal_tools);
@@ -484,13 +489,13 @@ function mergeSharedGuidance(dir: string, row: RigorMatrixRow, fm: Record<string
   const name = fm.shared_guidance;
   const methods = join(dir, "..", "methods");
   const files = readdirSync(methods).filter((f) => f.endsWith(".md"));
-  const hit = files.find((f) => parseStateNote(readFileSync(join(methods, f), "utf8")).frontmatter.card === name);
+  const hit = files.find((f) => noteOf(join(methods, f))?.frontmatter.card === name);
   if (hit === undefined) {
     throw new Error(
       `matrix row ${row.name} names shared_guidance "${name}", and no method card under deliverable/machines/methods declares card: ${name}`,
     );
   }
-  const shared = section(parseStateNote(readFileSync(join(methods, hit), "utf8")).body, "Guidance");
+  const shared = section(noteOf(join(methods, hit))?.body ?? "", "Guidance");
   row.guidance = [shared, row.guidance].filter(Boolean).join("\n\n");
 }
 

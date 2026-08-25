@@ -7,14 +7,14 @@
 //
 // see dsp-record-lifecycle.md#a-generated-machine-is-drawn-from-the-record
 
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { type CanvasData, type CanvasEdge, type CanvasElement, nodeSize } from "./canvas.ts";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { buildArchive, type GeneratedMachine } from "./expmachine.ts";
 import { type Iteration, itList, itPinRel, itSeededRel, itShortId, readItRecord, SCAFFOLD_NONE, SRC } from "./iterations.ts";
 import { type MachineDecl, type StateDecl, validateMachine } from "./machine.ts";
-import { parseStateNote, passEpoch, readNode } from "./notes.ts";
+import { noteOf, passEpoch, readNode } from "./notes.ts";
 import { CHANGE_COLUMNS, type ChangeColumn, compileColumn, compileM0, readRigorMatrix } from "./rigor-matrix.ts";
 
 /** see dsp-record-lifecycle.md#the-seeded-machine */
@@ -41,7 +41,7 @@ export function generateSeeded(_root: string, it: Iteration, machineId: string, 
       source: SRC,
     });
   }
-  const fm = parseStateNote(readFileSync(abs, "utf8")).frontmatter;
+  const fm: Record<string, unknown> = noteOf(abs)?.frontmatter ?? {};
   const raw = Array.isArray(fm.steps) ? fm.steps : Array.isArray(fm.chunks) ? fm.chunks : [];
   interface Chunk {
     id: string;

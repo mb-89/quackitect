@@ -1,7 +1,6 @@
 // see dsp-quality-toolchain.md#the-voice-lint
-import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { parseStateNote } from "./notes.ts";
+import { noteOf, readNode } from "./notes.ts";
 
 /** see dsp-quality-toolchain.md#a-list-marker-is-not-a-sentence */
 const MARKER = /^\s*(?:[-*+]|\d+[.)])\s+/;
@@ -104,7 +103,9 @@ function linkFinding(line: string, i: number): LintFinding | undefined {
 
 function loadCfg(root: string): Cfg {
   try {
-    const fm = parseStateNote(readFileSync(join(root, ...LINT_CONFIG.split("/")), "utf8")).frontmatter;
+    // A MISSING CONFIG LEAVES EVERY KEY AT ITS DEFAULT, which is what the
+    // catch below was doing for the whole object.
+    const fm = noteOf(join(root, ...LINT_CONFIG.split("/")))?.frontmatter ?? {};
     const num = (k: keyof Cfg): number => (typeof fm[k] === "number" && (fm[k] as number) > 0 ? (fm[k] as number) : DEFAULTS[k]);
     return {
       long_sentence_words: num("long_sentence_words"),
@@ -302,12 +303,11 @@ export function lintProse(root: string, text: string, rel?: string): LintFinding
  *  AN UNREADABLE CARD BLOCKS NOTHING. A missing file must not silently start
  *  refusing every submit in the product. */
 export function blockingRules(root: string): string[] {
-  let text: string;
-  try {
-    text = readFileSync(join(root, ...LINT_CONFIG.split("/")), "utf8");
-  } catch {
-    return [];
-  }
+  // THROUGH THE DOOR, which answers the empty string for a file that cannot be
+  // read — the same nothing the catch returned. This wants the RAW text rather
+  // than a parse, because it reads the frontmatter block by hand.
+  const text = readNode(join(root, ...LINT_CONFIG.split("/")));
+  if (text === "") return [];
   const lines = text.split(/\r?\n/);
   const end = lines.indexOf("---", 1);
   const front = lines.slice(0, end < 0 ? lines.length : end);

@@ -1,8 +1,8 @@
 // The trace graph, drawn radially. see dsp-radial-layout.md#no-layout-library
-import { readdirSync, readFileSync, statSync } from "node:fs";
+import { readdirSync, statSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
 import { contentHash } from "./hash.ts";
-import { nodeLines, nodeStamp, noteOf, parseStateNote, passEpoch, readNode } from "./notes.ts";
+import { nodeLines, nodeStamp, noteOf, passEpoch, readNode } from "./notes.ts";
 
 /** THE SHARED SPINE, in ring order from the centre outward. Every wedge holds
  *  these whole, and nothing branches until the last of them.
@@ -307,12 +307,11 @@ export function itemTemplate(root: string, type: string): ItemTemplate | undefin
 }
 
 function buildItemTemplate(path: string, type: string): ItemTemplate | undefined {
-  let note: { frontmatter: Record<string, unknown>; body: string };
-  try {
-    note = parseStateNote(readFileSync(path, "utf8"));
-  } catch {
-    return undefined;
-  }
+  // THROUGH THE DOOR. A template is a note, and the door answers undefined for
+  // one that cannot be read — the same answer the try/catch was reaching for,
+  // without a second read of a file the pass is already holding.
+  const note = noteOf(path);
+  if (note === undefined) return undefined;
   const fence = /```skeleton\r?\n([\s\S]*?)```/.exec(note.body);
   const pairs = fence === null ? [] : [...(fence[1] ?? "").matchAll(/^([a-z_]+):[ \t]*(.*)$/gm)];
   return {
@@ -583,11 +582,7 @@ export function visionText(root: string): string {
   };
   for (const r of roots) hunt(r, 0);
   if (found.length === 0) return "No vision is written down yet.";
-  try {
-    return parseStateNote(readFileSync(found[0], "utf8")).body.trim();
-  } catch {
-    return "No vision is written down yet.";
-  }
+  return noteOf(found[0])?.body.trim() ?? "No vision is written down yet.";
 }
 
 /** see dsp-radial-layout.md#no-layout-library */

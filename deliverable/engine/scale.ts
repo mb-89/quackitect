@@ -1,7 +1,6 @@
 // see dsp-walk-machine.md#the-autonomy-scale
-import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { parseStateNote, section } from "./notes.ts";
+import { noteOf, section } from "./notes.ts";
 
 export interface AutonomyLevel {
   value: number;
@@ -58,7 +57,8 @@ export function valueFor(levels: AutonomyLevel[], word: string): number | undefi
 /** One rungs file, parsed. Both banks share the grammar on purpose: a reader
  *  who has understood one control has understood the other. */
 function loadRungs(path: string, heading: string, what: string, valueAt: (i: number, n: number) => number): AutonomyLevel[] {
-  const note = parseStateNote(readFileSync(path, "utf8"));
+  const note = noteOf(path);
+  if (note === undefined) throw new Error(`${what}: ${path} cannot be read`);
   const rows = section(note.body, heading)
     .split("\n")
     .filter((l) => l.trim() !== "");

@@ -203,7 +203,25 @@ test("no new file read bypasses the door — the count may fall, never rise", ()
   // is a JSON file with one reader and one writer, not a node — the door shares
   // one read and one parse between readers of NODES, and there is nobody here to
   // share with. The rest of that file already reads it the same way.
-  const CEILING = 129;
+  // 116, DOWN FROM 129 — and this is the first time the number has ever fallen.
+  //
+  // EVERY LINE ABOVE ARGUES AN INCREMENT. The ceiling went 100, 101, 102 and on
+  // to 129, each rise reasoned and none ever revisited. A ratchet holds a line;
+  // it never asks whether the line could move.
+  //
+  // SO SOMEBODY WALKED IT. Thirteen of the 129 were the shape
+  // `parseStateNote(readFileSync(path))` — a cold read AND a cold parse of a
+  // NOTE, which is exactly what the door exists to share. They sat in the
+  // matrix, the trace, the cards, the drawer, the lint, the scale, the forms
+  // and the state form.
+  //
+  // THE COUNT ALONE COULD NOT HAVE SAID THAT. It says 129 and nothing about
+  // which of the 129 belong. Reading them is what tells the two apart.
+  //
+  // WHAT A COLD READER COSTS BESIDES TIME: it cannot be invalidated, so it
+  // disagrees with the warm copy the moment a file changes under it, and
+  // nothing reports the disagreement.
+  const CEILING = 116;
   let found = 0;
   const offenders: string[] = [];
   const walk = (dir: URL, rel: string): void => {

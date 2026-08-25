@@ -441,7 +441,8 @@ export function stateFormScaffold(name: string, t: FormTemplate): string {
 /** The blessed size may live in the kickoff's own stored form. */
 export function kickoffSizeFromForm(it: Iteration): string | undefined {
   const abs = join(it.path, `spec/iterations/${it.id}/evidence/gate-kickoff.md`);
-  if (!existsSync(abs)) return undefined;
-  const txt = stripComments(section(parseStateNote(readFileSync(abs, "utf8")).body, "change_size")).toLowerCase();
+  const note = noteOf(abs);
+  if (note === undefined) return undefined;
+  const txt = stripComments(section(note.body, "change_size")).toLowerCase();
   return chosenOption(txt, CHANGE_COLUMNS);
 }
