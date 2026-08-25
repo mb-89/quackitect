@@ -438,7 +438,8 @@ export function decide(payload: string): Verdict {
       "Being unsure is not one. Having a lot left is not one. Having just finished a piece is not one. " +
       'STOPPING FOR ONE OF THOSE? SAY SO ON THE RECORD: se_stop {because: "<which one, and why>"}, then stop again. ' +
       "Saying it in chat is not enough and never was — the tooth cannot read your message, only the call log. " +
-      "ONE FORCE RELEASES ONE STOP. The next pull spends it, so this is a decision rather than a switch.";
+      "ONE FORCE RELEASES ONE STOP. The next pull spends it, so this is a decision rather than a switch. " +
+      "NO se_stop IN YOUR TOOL LIST? The running engine is older than this hook. se_reload is legal everywhere — reload, and the verb is there.";
     // The veto is now observable after the fact. Without a line here, a turn
     // the hook ended looks exactly like one the transport ended.
     try {
