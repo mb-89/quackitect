@@ -168,36 +168,50 @@ export interface Verdict {
 // stop. The notch answers the question that actually matters, so the read and
 // the branch both went.
 
-/** THE BITES-ONCE VALVE, and who it is for.
+/** WAS THE STOP FORCED, deliberately, since the walk last moved?
  *
- *  A STOP ALREADY BLOCKED ONCE PASSES. This hook's own refusal ends by inviting
- *  the agent to name which sanctioned stop it is and stop again, so the second
- *  attempt IS the claim. The invitation is a lie if that attempt cannot get
- *  through.
+ *  `stop_hook_active` IS NOT A CLAIM, and treating it as one was the defect.
+ *  The HARNESS sets that flag when it retries a blocked stop — the agent never
+ *  chose anything. So the valve released automatically, and the log reads
+ *  `stop-block` then `stop-pass bites once per stop`, over and over. From
+ *  outside that is indistinguishable from a hook that does not work.
  *
- *  `blockers only` IS THE EXCEPTION, ATTENDED OR NOT. The notch means one
- *  thing: come back when the walk CANNOT GO ON. A stop that was refused once
- *  and repeated is not a blocker — it is the same stop, tried twice.
+ *  A FORCE IS A LANE CALL, so it is an act and it is on the record. The agent
+ *  says which sanctioned stop applies and why; the claim lands in the call log
+ *  like everything else, and this reads it back.
  *
- *  MEASURED ON A LIVE SESSION: block, continue, stop, released. Four times in
- *  a row the log reads `stop-block` then `stop-pass bites once per stop`, so
- *  the tooth bit and the valve immediately undid it. From outside that looks
- *  exactly like a hook that is not working.
+ *  IT IS SPENT BY THE NEXT PULL. The scan stops at the newest successful pull,
+ *  exactly as the aim reader above does, so one force releases one stop and
+ *  never the one after it. */
+function forcedSinceLastPull(): string | undefined {
+  const lines = logLines();
+  for (let i = lines.length - 1; i >= 0; i--) {
+    const line = lines[i].trim();
+    if (line === "") continue;
+    let rec: { tool?: string; ok?: boolean; args?: unknown };
+    try {
+      rec = JSON.parse(line) as { tool?: string; ok?: boolean; args?: unknown };
+    } catch {
+      continue;
+    }
+    if (rec.tool === "se_pull" && rec.ok === true) return undefined;
+    if (rec.tool !== "se_stop" || rec.ok !== true) continue;
+    const why = (rec.args as { because?: unknown } | undefined)?.because;
+    return typeof why === "string" && why.trim() !== "" ? why.trim() : "no reason given";
+  }
+  return undefined;
+}
+
+/** THE VALVE: BLOCKED ONCE, AND FORCED ON PURPOSE.
  *
- *  THE VALVE USED TO TURN ON ATTENDANCE, on the theory that a person is there
- *  to read the claim. Being read is not the question the notch asks. A person
- *  who wanted to be told things would not have set `blockers only`.
+ *  BOTH HALVES ARE REQUIRED. The harness flag proves this stop was already
+ *  refused, so a force cannot pre-empt the tooth. The lane call proves a hand
+ *  decided to stop anyway, which the flag alone never proved.
  *
- *  A REAL BLOCKER STILL GETS THROUGH WITHOUT THIS. The walk that cannot go on
- *  has a REFUSED pull, and notchSanction passes that on its own — so the
- *  legitimate case never needed the valve.
- *
- *  WHAT IT COSTS, said plainly: an agent that must present a plan and wait
- *  (contract rule 9) cannot stop under this notch. The person moves the dial
- *  for that, which is what the dial is for. */
-function bypassesStop(payload: string, notch: string): boolean {
-  if (!bitesOnce(payload)) return false;
-  return notch !== "blockers only";
+ *  THE REFUSAL'S INVITATION IS NOW TRUE. It ends by asking the agent to name
+ *  which sanctioned stop applies — and naming it is what opens the valve. */
+function bypassesStop(payload: string): boolean {
+  return bitesOnce(payload) && forcedSinceLastPull() !== undefined;
 }
 
 /** Refuse the stop while a run is going, and say what to do instead. True when
@@ -386,9 +400,9 @@ export function decide(payload: string): Verdict {
     if (pull === undefined) return pass("no pull on record", "the engine never ran here");
     // see dsp-boot-and-power.md#the-notch-decides
     const notch = typeof last.stop_at === "string" ? last.stop_at.trim().toLowerCase() : "";
-    // The valve may release a question about a standing blocker. It cannot
-    // release a newer runnable pull under blockers only.
-    if (bypassesStop(payload, notch)) return pass("bites once per stop", "this stop was already blocked once");
+    // A FORCED STOP GOES THROUGH, and forcing is a lane call rather than a
+    // retry. see dsp-boot-and-power.md#the-only-stops-that-are-sanctioned
+    if (bypassesStop(payload)) return pass("forced", forcedSinceLastPull() ?? "");
     const at = Array.isArray(last.where) ? (last.where as unknown[]).map(String).join(", ") : String(last.where ?? "");
     const sanctioned = notchSanction(notch, last, at);
     if (sanctioned !== undefined) return pass(sanctioned[0], sanctioned[1]);
@@ -422,7 +436,9 @@ export function decide(payload: string): Verdict {
       "Seeding a record, splitting or merging one, deciding which iteration a finding belongs to, choosing scope — all planning. Present the list and WAIT. " +
       "Once the plan has the go, execute the whole of it without asking again. " +
       "Being unsure is not one. Having a lot left is not one. Having just finished a piece is not one. " +
-      "Stopping for one of the four? Say which, in one line, and stop again — this tooth bites once per stop.";
+      'STOPPING FOR ONE OF THOSE? SAY SO ON THE RECORD: se_stop {because: "<which one, and why>"}, then stop again. ' +
+      "Saying it in chat is not enough and never was — the tooth cannot read your message, only the call log. " +
+      "ONE FORCE RELEASES ONE STOP. The next pull spends it, so this is a decision rather than a switch.";
     // The veto is now observable after the fact. Without a line here, a turn
     // the hook ended looks exactly like one the transport ended.
     try {

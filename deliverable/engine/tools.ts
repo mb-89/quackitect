@@ -615,6 +615,39 @@ export function buildServer(
       () => session.currentState(),
     ),
   ];
+  tools.push({
+    name: "se_stop",
+    title: "se.stop",
+    description:
+      "FORCE A STOP THE TOOTH REFUSED, on the record.\n\nWHEN TO REACH FOR IT. The stop hook blocked your turn and you judge that one of the sanctioned stops genuinely applies. Say which one, and why, and stop again.\n\nWHY IT IS A CALL AND NOT A SENTENCE. The hook cannot read your message — it reads the call log. Saying which stop applies in chat proved nothing to it, and the retry flag the harness sets proved nothing either, because you did not choose it.\n\nONE FORCE RELEASES ONE STOP. The next se_pull spends it, so this is a decision rather than a switch you leave on.\n\nIT DOES NOT MOVE THE WALK. The walk stands exactly where it stood; only the turn ends.\n\nNOT AN ESCAPE. se_pull {escape} lands the walk at the front desk because you are mechanically stuck. This ends a turn and changes nothing.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        because: { type: "string", description: "which sanctioned stop applies, and why — one line" },
+      },
+      required: ["because"],
+    },
+    handler: (args) => {
+      const because = typeof args.because === "string" ? args.because.trim() : "";
+      if (because === "") {
+        throw new Rejection({
+          clause: CLAUSES.REQUIRED_ARGS,
+          expected: "se_stop requires: because — which sanctioned stop applies, and why",
+          got: `received: ${Object.keys(args).join(", ") || "nothing"}`,
+          remedy: {
+            tool: "se_stop",
+            args: { because: "<which sanctioned stop, and why>" },
+            note: "an unreasoned force is the thing this replaces — the reason is the whole point",
+          },
+          source: "engine/tools.ts se_stop",
+        });
+      }
+      return {
+        forced: because,
+        note: "the next stop is released once. A pull spends this, so force again if you pull first.",
+      };
+    },
+  });
   // WIRED HERE, NOT INSIDE coreTools. searchHelp needs the FULL assembled
   // catalog (session + expedition + core tools), which exists only once
   // the array above is built (dsp-help-search.md's own interface note).

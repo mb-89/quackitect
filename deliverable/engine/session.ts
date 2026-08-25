@@ -155,6 +155,9 @@ const ALWAYS_LEGAL: ReadonlySet<string> = new Set([
   // agent back towards asking for a screenshot — which needs a person's word
   // every time, and is the thing this verb exists to replace.
   "se_surface",
+  // FORCING A STOP IS LEGAL WHEREVER A STOP IS. The tooth can bite in any
+  // state, so the answer to it cannot be gated by one.
+  "se_stop",
 ]);
 /** Nothing is restricted today. see dsp-lane-door.md#nothing-is-restricted-today */
 const RESTRICTED: ReadonlySet<string> = new Set<string>();

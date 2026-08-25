@@ -132,36 +132,58 @@ test("stop @ blockers only passes a REFUSED pull and blocks a working one", () =
   assert.match(d.reason, /blockers only/);
 });
 
-// THE VALVE DOES NOT UNDO THE NOTCH, and it used to.
+/** A forced stop, recorded the way the lane records one. */
+const forceRecord = (because: string): object => ({
+  ref: "call-000000000002",
+  ts: "2026-08-09T16:00:01.000Z",
+  tool: "se_stop",
+  args: { because },
+  ok: true,
+  outcome: "result",
+  response: { forced: because },
+});
+
+// RETRYING IS NOT CLAIMING, and the valve used to treat it as though it were.
 //
 // WHAT THE LIVE LOG SHOWED, four times in a row: `stop-block do at front_desk`
 // and then, on the very next attempt, `stop-pass bites once per stop`. The
-// tooth bit and the valve immediately released it. From outside that reads as
-// a hook that is not working.
+// tooth bit and the valve immediately released it.
 //
-// THE VALVE USED TO TURN ON ATTENDANCE, on the theory that a person is there to
-// read the claim. Being read is not the question this notch asks. A person who
-// wanted to be told things would not have set `blockers only`.
-//
-// THE LEGITIMATE CASE NEVER NEEDED THE VALVE. A walk that cannot go on has a
-// REFUSED pull, and the case above proves that passes on its own.
-test("under blockers only a second attempt is still refused — the valve does not release", () => {
-  const working = pullRecord({ pull: "do", where: ["retro"], stop_at: "blockers only" });
-  const first = JSON.parse(verdict([working], {})) as { decision: string };
-  assert.equal(first.decision, "block", "the first attempt blocks and prints the sanctioned stops");
-
-  const second = JSON.parse(verdict([working], { stop_hook_active: true })) as { decision: string; reason: string };
-  assert.equal(second.decision, "block", "and so does the second — the same stop tried twice is not a blocker");
-  assert.match(second.reason, /blockers only/, "the refusal names the notch that is asking");
-});
-
-test("at every other notch the valve still releases the second attempt", () => {
-  // THE INVITATION STAYS REAL WHERE THE NOTCH ALLOWS IT. The refusal ends by
-  // asking the agent to name a sanctioned stop and stop again, and that has to
-  // be possible or the invitation is a lie.
+// THE FLAG IS THE HARNESS'S, NOT THE AGENT'S. `stop_hook_active` is set when a
+// blocked stop is retried. Nothing was decided, so nothing was claimed — and
+// the refusal's invitation to name a sanctioned stop went unanswered while the
+// stop went through anyway.
+test("a retry alone no longer releases a stop — the flag is the harness's, not a claim", () => {
   const working = pullRecord({ pull: "do", where: ["retro"] });
   assert.equal(JSON.parse(verdict([working], {})).decision, "block", "the first attempt blocks");
-  assert.equal(verdict([working], { stop_hook_active: true }), "", "the second carries the claim and gets through");
+  const again = JSON.parse(verdict([working], { stop_hook_active: true })) as { decision: string };
+  assert.equal(again.decision, "block", "and the retry blocks too, because nobody claimed anything");
+});
+
+test("a stop forced on the record passes, blockers only included", () => {
+  const working = pullRecord({ pull: "do", where: ["retro"], stop_at: "blockers only" });
+  const forced = forceRecord("the retro's field-feedback question, and only the owner can answer it");
+  assert.equal(
+    verdict([working, forced], { stop_hook_active: true }),
+    "",
+    "blocked once and forced on purpose is the pair that opens the valve",
+  );
+});
+
+test("a force cannot pre-empt the tooth — it must have bitten first", () => {
+  const working = pullRecord({ pull: "do", where: ["retro"] });
+  const forced = forceRecord("a decision only the owner can make");
+  const out = JSON.parse(verdict([working, forced], {})) as { decision: string };
+  assert.equal(out.decision, "block", "without the retry flag the first attempt still blocks");
+});
+
+test("a pull spends the force — one force releases one stop", () => {
+  const forced = forceRecord("something broke and no remedy gets past it");
+  const working = pullRecord({ pull: "do", where: ["retro"] });
+  // The pull is NEWER than the force, so the walk moved on and the claim is
+  // spent. A force that outlived its pull would be a switch, not a decision.
+  const out = JSON.parse(verdict([forced, working], { stop_hook_active: true })) as { decision: string };
+  assert.equal(out.decision, "block", "the walk moved after the force, so the force is gone");
 });
 
 test("a wait WITH A TARGET blocks — an escape does not launder a stop", () => {
@@ -183,12 +205,18 @@ test("a wait with a whitespace target passes — blank is blank", () => {
   assert.equal(verdict([pullRecord({ pull: "wait", where: ["front_desk"], target: "   " })], {}), "");
 });
 
-test("a targeted wait already blocked once passes — the valve covers it too", () => {
-  assert.equal(verdict([pullRecord({ pull: "wait", where: ["front_desk"], target: "iterations/i27" })], { stop_hook_active: true }), "");
+test("a targeted wait, blocked once and FORCED, passes — the valve covers it too", () => {
+  const waiting = pullRecord({ pull: "wait", where: ["front_desk"], target: "iterations/i27" });
+  assert.notEqual(verdict([waiting], { stop_hook_active: true }), "", "the retry alone leaves the target standing");
+  const forced = forceRecord("a gate the person owns is waiting on their thumb");
+  assert.equal(verdict([waiting, forced], { stop_hook_active: true }), "", "and the force releases it");
 });
 
-test("a stop already blocked once passes — the valve for a blocking question", () => {
-  assert.equal(verdict([pullRecord({ pull: "fill", where: ["work"] })], { stop_hook_active: true }), "");
+test("a mid-form stop, blocked once and FORCED, passes — the valve for a blocking question", () => {
+  const filling = pullRecord({ pull: "fill", where: ["work"] });
+  assert.notEqual(verdict([filling], { stop_hook_active: true }), "", "the retry alone is not a claim");
+  const forced = forceRecord("a decision only the owner can make");
+  assert.equal(verdict([filling, forced], { stop_hook_active: true }), "", "and the force releases it");
 });
 
 test("no pull on record passes — the engine never ran here", () => {
