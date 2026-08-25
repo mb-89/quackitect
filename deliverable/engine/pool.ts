@@ -1,8 +1,8 @@
 // see dsp-the-options-pool.md#the-options-pool
-import { existsSync, mkdirSync, readdirSync, statSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { CLAUSES, Rejection } from "./errors.ts";
-import { parseStateNote, readNode } from "./notes.ts";
+import { parseStateNote, readNode, writeNode } from "./notes.ts";
 
 export interface WorkToken {
   id: string;
@@ -241,8 +241,11 @@ export function mintToken(
       source: "engine/pool.ts mint",
     });
   }
+  // THROUGH THE DOOR. A work token IS a node, and writeNode writes AND TELLS —
+  // so a reader later in the same pass gets the token that was just minted
+  // rather than the absence the door remembers from before it.
   mkdirSync(poolDir(root), { recursive: true });
-  writeFileSync(join(poolDir(root), `${id}.md`), front, "utf8");
+  writeNode(join(poolDir(root), `${id}.md`), front);
   return node;
 }
 

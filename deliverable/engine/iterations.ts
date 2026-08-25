@@ -26,10 +26,19 @@ export const SRC = "engine/iterations.ts";
 function git(root: string, args: string[], what: string): string {
   const r = spawnSync("git", args, { cwd: root, encoding: "utf8", maxBuffer: 8 * 1024 * 1024 });
   if (r.status !== 0) {
+    // THE STATUS LEADS, and the output follows it.
+    //
+    // IT USED TO SHOW STDERR ALONE, cut at 500 characters. A call that failed
+    // while printing hundreds of harmless warnings then reported nothing but
+    // warnings, and read as though a warning had caused the failure. A killed
+    // process, which reports a null status and no message at all, read the
+    // same way.
+    const how = r.signal !== null && r.signal !== undefined ? `killed by ${r.signal}` : `exit ${String(r.status)}`;
+    const said = (r.stderr ?? "").trim().slice(0, 500);
     throw new Rejection({
       clause: CLAUSES.NOT_CONFIGURED,
       expected: `git ${what} to succeed`,
-      got: (r.stderr ?? "").trim().slice(0, 500) || `exit ${r.status}`,
+      got: said === "" ? how : `${how} — ${said}`,
       remedy: { tool: "se_git", args: { args: ["status"] }, note: "inspect the repository state" },
       source: SRC,
     });

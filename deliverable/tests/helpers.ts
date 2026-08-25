@@ -504,6 +504,18 @@ export function gitInit(root: string, commit = false): void {
     g(t, "init");
     g(t, "config", "user.email", "se@test.local");
     g(t, "config", "user.name", "se test");
+    // GIT DOES NOT REWRITE LINE ENDINGS IN A TEST REPOSITORY.
+    //
+    // ON WINDOWS THE GLOBAL DEFAULT TURNS EVERY LF INTO CRLF on checkout, and
+    // `git add` then prints a warning per file about the round trip. A fixture
+    // repository holds a copy of the product tree, so that is hundreds of
+    // warning lines on one call, for a conversion no case is about.
+    //
+    // MEASURED: a pin inside sizing-on-the-pull failed with `git add` reporting
+    // nothing but LF-will-be-replaced warnings. Whatever made the status
+    // non-zero, the noise is what made the failure unreadable.
+    g(t, "config", "core.autocrlf", "false");
+    g(t, "config", "core.safecrlf", "false");
     gitTemplate = t;
   }
   cpSync(join(gitTemplate, ".git"), join(root, ".git"), { recursive: true });

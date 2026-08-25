@@ -305,7 +305,18 @@ test("no new file write bypasses the door — the count may fall, never rise", (
   // status word, and markStarted writes it back when the record is resumed.
   // Both are the same act as the `started:` stamp two lines above them in that
   // file, on the same file, through the same regex replacement.
-  const CEILING = 52;
+  //
+  // 51, DOWN FROM 52. This ratchet was walked the same way the read one above
+  // was, and it came back almost clean: of 52 direct writes, exactly ONE was
+  // writing a NODE. A work token is a node, and writeNode writes AND TELLS, so
+  // a reader later in the same pass now sees the token that was just minted
+  // rather than the absence the door remembers from before it.
+  //
+  // THE ASYMMETRY IS THE FINDING. The read ratchet gave up thirteen entries
+  // that belonged behind the door; this one gave up one. The write door has
+  // been respected all along and the read door was walked around — which is
+  // what a count cannot say and reading the entries can.
+  const CEILING = 51;
   let found = 0;
   const offenders: string[] = [];
   const walk = (dir: URL, rel: string): void => {
