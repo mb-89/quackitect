@@ -325,6 +325,26 @@ function lastPull(): LastPull | undefined {
  *
  *  SPLIT OUT OF THE HANDLER so the decision reads as three named cases rather
  *  than three more branches in an already long function. */
+/** IS THIS THE MACHINE'S OWN IDLE STOP?
+ *
+ *  THE DESK WITH NOTHING ROUTED IS SANCTIONED in the ordinary case. There is
+ *  genuinely nowhere to walk, and the desk's own guidance says to stay there.
+ *  see dsp-boot-and-power.md#the-desk-with-nothing-routed-is-the-machines-own
+ *
+ *  `blockers only` OUTRANKS IT, and it is the only notch that does. That notch
+ *  means one thing: come back when the walk CANNOT GO ON. An idle desk is not a
+ *  blocker, it is the absence of one.
+ *
+ *  MEASURED ON A LIVE SESSION'S OWN LOG: four stops in a row passed as "nothing
+ *  routed" while the notch stood at `blockers only` and the agent had work in
+ *  hand. The notch was read correctly and then never consulted, because this
+ *  rule sat below it and passed unconditionally. */
+function nothingRouted(notch: string, target: string, pull: string, at: string): boolean {
+  if (notch === "blockers only") return false;
+  if (target !== "") return false;
+  return pull === "wait" || at.split(",").some((w) => w.trim() === "front_desk");
+}
+
 function notchSanction(notch: string, last: LastPull, at: string): [string, string] | undefined {
   // STATE END: the ENGINE holds every transition and refuses to move. The
   // agent stopping is then not a failure of nerve, it is the machine's own
@@ -374,9 +394,7 @@ export function decide(payload: string): Verdict {
     // AN AIM SINCE THE LAST PULL WINS. It is the newer statement of where the
     // walk is meant to be going.
     const target = aimedSinceLastPull() ?? (typeof last.target === "string" ? last.target.trim() : "");
-    // see dsp-boot-and-power.md#the-desk-with-nothing-routed-is-the-machines-own
-    const atDesk = at.split(",").some((w) => w.trim() === "front_desk");
-    if (target === "" && (pull === "wait" || atDesk)) {
+    if (nothingRouted(notch, target, pull, at)) {
       return pass("nothing routed", `no target, and the pull answered "${pull}"${at === "" ? "" : ` at ${at}`}`);
     }
     const where = at;

@@ -15,7 +15,7 @@ import { join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { decide } from "../engine/bin/se-hook-stop.ts";
-import { freshRoot } from "./helpers.ts";
+import { freshRoot, pullBoot } from "./helpers.ts";
 
 const HOOK = fileURLToPath(new URL("../engine/bin/se-hook-stop.ts", import.meta.url));
 
@@ -302,6 +302,54 @@ test("a REAL pull carries the notch, and the hook obeys it end to end", async ()
 
   // And with nothing refused the walk can still go on, so the stop is refused.
   assert.notEqual(verdict([pullRecord(packet)], {}), "", "under `blockers only` an unrefused pull is not a blocker");
+});
+
+// THE SECOND SEAM, and it hid in the same shape as the first.
+//
+// THE NOTCH ARRIVED AND WAS THEN NEVER CONSULTED. A rule below it — the desk
+// with nothing routed — passed every stop unconditionally. Measured on a live
+// session's own lifecycle log: four stops in a row recorded
+// `stop-pass nothing routed` while the notch stood at `blockers only` and the
+// agent had work in hand.
+//
+// BOTH HALVES WERE CORRECT IN ISOLATION, again. The notch rides the pull, and
+// the idle-desk rule is right wherever the person has not asked for more. The
+// defect was only ever visible where the two meet, so this case drives a REAL
+// session and feeds the hook that session's own pull.
+/** A session walked all the way to the desk, the way a real boot leaves it.
+ *  ONE PULL IS NOT ENOUGH: a fresh session stands at `start` and owes its
+ *  reading, so a case asserting about the desk has to walk there first. */
+async function deskedSession(notch?: string) {
+  const { Session } = await import("../engine/session.ts");
+  const { buildServer } = await import("../engine/tools.ts");
+  const root = freshRoot();
+  const s = new Session(root);
+  const server = buildServer(root, s);
+  await pullBoot(server, s);
+  if (notch !== undefined) s.setStopAt(notch);
+  const packet = (await s.pull()) as Record<string, unknown>;
+  return { s, packet };
+}
+
+test("an idle desk does NOT pass under blockers only — the notch outranks it", async () => {
+  const { packet } = await deskedSession("blockers only");
+
+  // THE EXACT SHAPE THE LIVE LOG HELD: standing at the desk, nothing aimed.
+  assert.ok((packet.where as string[]).includes("front_desk"), `the walk stands at the desk, got ${JSON.stringify(packet.where)}`);
+  assert.equal(packet.target, "", "with nothing routed");
+  assert.equal(packet.stop_at, "blockers only", "and the notch rides the pull");
+
+  const out = verdict([pullRecord(packet)], {});
+  assert.notEqual(out, "", "an idle desk is not a blocker, so the stop is refused");
+  const d = JSON.parse(out) as { decision: string; reason: string };
+  assert.equal(d.decision, "block");
+  assert.match(d.reason, /blockers only/, "and the refusal says which notch is asking");
+});
+
+test("an idle desk still passes with no notch set — it is the machine's own stop", async () => {
+  const { packet } = await deskedSession();
+  assert.ok((packet.where as string[]).includes("front_desk"), `the walk stands at the desk, got ${JSON.stringify(packet.where)}`);
+  assert.equal(verdict([pullRecord(packet)], {}), "", "with no notch set, the desk with nothing routed is sanctioned");
 });
 
 // THE ONE CASE THAT SPAWNS, and the only thing it is about is the WIRING.
