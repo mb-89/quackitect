@@ -111,5 +111,6 @@ export const CLAUSES = {
   // record; wanting two at once means a second checkout. The refusal names
   // what is held and the verb that sets it aside, so it has an exit that is
   // neither finishing nor abandoning the work.
+  PARK_NOWHERE: "SE-C-148", // a point parked for a name the walk never reaches — nothing could ever deliver it
   SECOND_RECORD_OPEN: "SE-C-147",
 } as const;

@@ -482,6 +482,37 @@ Updates name an OPEN node. Check the node map that rides every result.
 ### SE-C-122 — done over open children
 Everything started gets resolved. Resolve or re-home the children first.
 
+### SE-C-147 — a second piece of work is already open
+One engine walks one record. Something else is open and unfinished.
+
+Park the standing one with `se_park {id, why}`, or finish it. Wanting both at
+once is wanting two engines, and that is a clone.
+
+A parked record resumes by starting it again. Nothing is lost.
+
+### SE-C-148 — the point is parked for nowhere
+`defer {to}` names ONE THING, not a sentence. Three shapes answer:
+
+- A STATE, by its plain name. `verification` is enough.
+- A FULL ADDRESS, where you need to be exact.
+- A RECORD, so the point arrives when that iteration starts.
+
+PROSE IS NOT A TARGET. "the owner", "after the fixtures land", "once the gate
+stands" — nothing delivers those, so the point waits forever.
+
+WAITING ON A PERSON IS NOT A PARK. Say so and stop; their answer resumes you
+where you stand.
+
+WAITING ON OTHER WORK IS NOT A PARK EITHER. Name the state that work ends in,
+or seed it.
+
+THIS USED TO BE A MARK RATHER THAN A REFUSAL, and 8 of 28 abandoned points came
+in through it.
+
+A WELL-SHAPED NAME NOTHING ANSWERS TO IS STILL ONLY MARKED. A park written
+inside a record names that record's own states, and those are drawn only while
+it is bound.
+
 ### SE-C-133 — the checklist stopped moving
 Narration that never closes anything records intent, not progress.
 

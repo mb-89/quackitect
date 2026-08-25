@@ -8,7 +8,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
 import { CallLog } from "../engine/calllog.ts";
-import { Decisions, parseUpdate, replayFile, replayVisitsText } from "../engine/decisions.ts";
+import { Decisions, parkMatches, parseUpdate, replayFile, replayVisitsText } from "../engine/decisions.ts";
 import { readNotes } from "../engine/inbox.ts";
 import { seDir } from "../engine/paths.ts";
 import { feedRows, renderMirror } from "../engine/render.ts";
@@ -277,6 +277,38 @@ test("defer parks a point for a later state — it arrives there as an open to-d
   assert.equal(arrived[0].brief, "needs idle");
   assert.equal(arrived[0].status, "open");
   assert.equal(s.decisions.graph("front_desk@0").nodes.length, 1);
+});
+
+test("a park written the way a person writes one still arrives", () => {
+  // THE BUG THIS PINS. A park names `verification`; the arrival carries
+  // `iterations/i45/verification`. String equality never matched, so 20 of the
+  // 28 points left standing across the whole history were parked correctly and
+  // simply never delivered.
+  assert.ok(parkMatches("verification", "iterations/i45/verification"));
+  assert.ok(parkMatches("iterations/i45/verification", "iterations/i45/verification"));
+
+  // A RECORD DELIVERS AT ITS FIRST STATE. This is what makes collection
+  // mechanical when an iteration is seeded.
+  assert.ok(parkMatches("iterations/i63", "iterations/i63/draft-vision"));
+  assert.ok(parkMatches("i63", "iterations/i63/draft-vision"));
+
+  // AND IT STAYS A MATCH, not a substring hunt.
+  assert.ok(!parkMatches("verify", "iterations/i45/verification"));
+  assert.ok(!parkMatches("i6", "iterations/i63/draft-vision"));
+  assert.ok(!parkMatches("", "iterations/i63/draft-vision"));
+});
+
+test("a point parked for prose is refused where it is written", () => {
+  const s = new Session(freshRoot());
+  s.decisions.apply("e1@0", { op: "plan", items: ["waits on somebody"] });
+  const park = s.decisions.graph("e1@0").nodes[0];
+  assert.throws(
+    () => s.decisions.apply("e1@0", { op: "defer", node: park.id, to: "the owner, once the gate stands" }),
+    (e) => clause(e) === "SE-C-148",
+  );
+  // THE POINT IS STILL OPEN. A refused park changes nothing, so the walker can
+  // name a real target on the next call.
+  assert.equal(s.decisions.graph("e1@0").nodes[0].status, "open");
 });
 
 test("replayVisitsText: a record's history renders per visit with statuses", () => {

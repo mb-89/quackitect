@@ -622,7 +622,7 @@ export function buildServer(
     name: "se_help",
     title: "se.help",
     description:
-      "Search the lane's tools and guidance by plain words — ranked word-overlap over each tool's name/title/description and each guidance page's path/statement. A miss (zero matches) is appended to a durable ranked demand log; se_help {demands: true} reads that log back, grouped by shape, most-demanded first. Does not do synonym or stem matching, does not replace reading a tool's full schema, and does not search the codebase or the web — se_file_search and se_web_search do that.",
+      "Search the lane's tools and guidance by plain words.\n\nWHAT IS SEARCHED. Every tool's name, title and full description. Every guidance page, INCLUDING METHOD CARDS AND THE REFUSALS PAGE, split at its own headings — so an answer names the section, not just the file. Asking about one refusal clause lands on that clause.\n\nHOW IT RANKS. BM25, the same ranker the coupling proposer uses. A word appearing everywhere counts for almost nothing; a rare one counts for a lot. A name match outranks the same word buried in prose.\n\nWHEN IT SAYS NOTHING. An answer must cover most of your words AND share at least one uncommon word with you. Coincidence on common words is a miss, not a match.\n\nA MISS IS RECORDED. It lands in a durable demand log; se_help {demands: true} reads that back, grouped by shape, most-demanded first.\n\nWHAT IT IS NOT. No synonyms and no stemming. Not a substitute for a tool's full schema. Not a code or web search — se_file_search and se_web_search do that.",
     inputSchema: {
       type: "object",
       properties: {

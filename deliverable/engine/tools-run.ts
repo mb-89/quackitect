@@ -18,6 +18,7 @@ import { CLAUSES, Rejection } from "./errors.ts";
 import { gitLane } from "./gitlane.ts";
 import { capMiddle } from "./jsonio.ts";
 import type { ToolDef } from "./mcp.ts";
+import { mirrorText } from "./mirrortext.ts";
 import { resolveInRoot, seDir } from "./paths.ts";
 import { type MirrorState, renderMirror } from "./render.ts";
 import { readRigorMatrix } from "./rigor-matrix.ts";
@@ -377,10 +378,34 @@ export function runTools(
 ): ToolDef[] {
   return [
     {
+      name: "se_surface",
+      title: "se.surface",
+      description:
+        "READ THE PERSON'S SURFACE, IN WORDS. Prints what the mirror is showing — where the walk stands, the dials, what is legal here, every state with its marks, and the last hops.\n\nTHIS IS THE EVERYDAY WAY TO SEE THE SURFACE. It costs nothing and needs nobody's permission.\n\nse_shoot IS FOR LAYOUT ONLY, and it looks at a screen, so it is asked for each time.\n\nview: names a machine to print instead of the one being walked.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          view: { type: "string", description: "print this machine instead of the one the walk stands in" },
+        },
+      },
+      handler: (args) => {
+        if (mirror === undefined) {
+          throw new Rejection({
+            clause: CLAUSES.CONDITION_UNMET,
+            expected: "a server built with a mirror surface",
+            got: "no mirror on this build",
+            remedy: { tool: "se_pull", args: {}, note: "the full engine serves the mirror; this build has none to print" },
+            source: "engine/tools.ts se_surface",
+          });
+        }
+        return { text: mirrorText(mirror(), args.view === undefined ? {} : { view: String(args.view) }) };
+      },
+    },
+    {
       name: "se_shoot",
       title: "se.shoot",
       description:
-        "LOOK AT THE MIRROR. Renders the surface to an image and hands back the PICTURE, so a change to a pane can be judged by seeing it rather than by reading its HTML. Shoot the whole page, or one widget with widget: 'machine' | 'details' | 'log' | 'terminal'. view: names a machine to draw instead of the one being walked. Nothing is served over HTTP and no browser window opens.",
+        "LOOK AT THE MIRROR, AS A PICTURE. Renders the surface to an image, so a question about LAYOUT can be judged by seeing it.\n\nASK THE PERSON FIRST, EVERY TIME. This looks at a screen, and contract rule 10 makes that theirs to grant. Delete the capture when you are done with it.\n\nFOR ANYTHING THAT IS NOT ABOUT LAYOUT, se_surface prints the same facts as text and needs no permission.\n\nShoot the whole page, or one widget with widget: 'machine' | 'details' | 'log' | 'terminal'. view: names a machine to draw instead of the one being walked. Nothing is served over HTTP and no browser window opens.",
       inputSchema: {
         type: "object",
         properties: {

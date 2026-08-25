@@ -150,6 +150,11 @@ const ALWAYS_LEGAL: ReadonlySet<string> = new Set([
   "se_amend",
   "se_why",
   "se_reload",
+  // READING THE SURFACE IS NEVER AN ACT. It prints what the person is already
+  // looking at and changes nothing, so gating it by state would only push the
+  // agent back towards asking for a screenshot — which needs a person's word
+  // every time, and is the thing this verb exists to replace.
+  "se_surface",
 ]);
 /** Nothing is restricted today. see dsp-lane-door.md#nothing-is-restricted-today */
 const RESTRICTED: ReadonlySet<string> = new Set<string>();
@@ -555,9 +560,16 @@ export class Session {
     // A DEFER NAMES A STATE, and only the session knows which are drawn. Every
     // reachable machine counts, because a point deferred from inside a record
     // legitimately names one of that record's own states.
+    //
+    // A RECORD COUNTS TOO, and that is the shape the owner asked for: a point
+    // that waits for an iteration is delivered when that iteration starts. The
+    // address of its first state carries the record id as a segment, so
+    // parkMatches finds it without anything else being wired up.
     this.decisions.stateExists = (id: string): boolean => {
       try {
-        return this.views.reachableMachines().some((m) => m.states.some((s) => s.id === id));
+        const leaf = id.slice(id.lastIndexOf("/") + 1);
+        if (this.views.reachableMachines().some((m) => m.states.some((s) => s.id === id || s.id === leaf))) return true;
+        return itList(this.machineRoot()).some((x) => x.id === leaf || itShortId(x.id) === leaf);
       } catch {
         return true; // nothing compiled yet — say nothing rather than say something false
       }
@@ -4212,7 +4224,9 @@ export class Session {
       // Your advances must prove the same docs (paths only — the hashes
       // are earned by reading).
       human_checked: this.reads.humanCheckedPaths(),
-      legal_tools: all ? "all" : [...ALWAYS_LEGAL, ...tools],
+      // DEDUPED, because the two lists overlap. se_pull is always legal AND is
+      // machinery, so it was named twice on every packet that carried a list.
+      legal_tools: all ? "all" : [...new Set([...ALWAYS_LEGAL, ...tools])],
       states,
     };
   }
@@ -4670,7 +4684,7 @@ export class Session {
       power: this.power,
       narration: { minutes: this._narrationMinutes, calls: this._narrationCalls },
       ...this.strengthNeeded(),
-      legal_tools: this._emergency ? "all" : all ? "all" : [...ALWAYS_LEGAL, ...tools],
+      legal_tools: this._emergency ? "all" : all ? "all" : [...new Set([...ALWAYS_LEGAL, ...tools])],
       history: this.instance.history.slice(-10),
     };
   }

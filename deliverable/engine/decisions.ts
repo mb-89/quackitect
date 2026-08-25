@@ -50,6 +50,30 @@ const SHAPE_NOTE =
 type ReplayLiveNode = { visit: string; brief: string; open: boolean };
 type ReplayParked = { state: string; brief: string; hops?: number; trail?: string[] };
 
+/** DOES THIS ARRIVAL DELIVER THAT PARK?
+ *
+ *  A PARK NAMES A STATE THE WAY A PERSON SAYS IT, and an arrival carries the
+ *  full address. `verification` is what gets parked; `iterations/i45/verification`
+ *  is what arrives. Comparing the two strings can never match, so every park
+ *  written in the ordinary way sat in the list forever.
+ *
+ *  MEASURED ACROSS THE WHOLE HISTORY: 28 parks were still waiting, and 20 of
+ *  them named a state that had already been walked past several times.
+ *
+ *  THREE SHAPES ANSWER, and all three are things people actually wrote.
+ *
+ *  - THE WHOLE ADDRESS, which always worked.
+ *  - A RECORD, so `iterations/i63` is delivered by that record's first state.
+ *    This is the shape that makes collection mechanical at seeding.
+ *  - ANY SEGMENT, which covers both the bare state name and the short record
+ *    id a person says out loud. */
+export function parkMatches(target: string, state: string): boolean {
+  const t = target.trim();
+  if (t === "" || state === "") return false;
+  if (t === state || state.startsWith(`${t}/`)) return true;
+  return state.split("/").includes(t);
+}
+
 function replayFileOp(nodes: Map<string, ReplayLiveNode>, parked: ReplayParked[], rec: Record<string, unknown>): void {
   const op = String(rec.op ?? "");
   if (op === "plan" || op === "fork") {
@@ -82,7 +106,7 @@ function replayDeferOps(nodes: Map<string, ReplayLiveNode>, parked: ReplayParked
   if (op === "defer_arrived") {
     const brief = String(rec.brief ?? "");
     const state = String(rec.visit ?? "").split("@")[0];
-    const i = parked.findIndex((p) => p.state === state && p.brief === brief);
+    const i = parked.findIndex((p) => parkMatches(p.state, state) && p.brief === brief);
     if (i >= 0) parked.splice(i, 1);
     if (rec.node !== undefined) nodes.set(String(rec.node), { visit: String(rec.visit ?? ""), brief, open: true });
   }
@@ -476,9 +500,9 @@ export class Decisions {
    *  a prefilled to-do, open like any planned item. */
   private materialize(visit: string): void {
     const state = visit.split("@")[0];
-    const due = this.parked.filter((p) => p.state === state);
+    const due = this.parked.filter((p) => parkMatches(p.state, state));
     if (due.length === 0) return;
-    const keep = this.parked.filter((p) => p.state !== state);
+    const keep = this.parked.filter((p) => !parkMatches(p.state, state));
     this.parked.splice(0, this.parked.length, ...keep);
     for (const p of due) {
       const n = this.add(visit, null, p.brief, "deferred");
@@ -747,11 +771,32 @@ export class Decisions {
         source: "engine/decisions.ts defer",
       });
     }
-    // THE PARK IS STILL MADE. A point deferred to a name nobody drew is better
-    // recorded with the mark than refused into thin air, and the walker can
-    // re-home it once the mark says so.
+    // PROSE IS REFUSED; AN UNKNOWN NAME IS ONLY MARKED. The two halves are
+    // knowable to different degrees, so they get different answers.
+    //
+    // SHAPE IS ALWAYS KNOWABLE. A state or record id is one token. Eight of the
+    // parks left standing named a sentence — "the owner", "after the fixtures
+    // land" — and nothing could ever have delivered those.
+    //
+    // EXISTENCE IS NOT. A park written inside an iteration names one of that
+    // iteration's own states, and those are only drawn while that record is
+    // bound. Refusing on existence would refuse a correct park for standing in
+    // the wrong place, which is worse than the bug this replaces.
+    if (!/^[\w./-]+$/.test(u.to!)) {
+      throw new Rejection({
+        clause: CLAUSES.PARK_NOWHERE,
+        expected: "defer {to} names one state or record — a bare state name is fine",
+        got: `a sentence, not a name: ${u.to!}`,
+        remedy: {
+          tool: "(the same call)",
+          args: { update: { op: "defer", node: n.id, to: "<a state or record id>" } },
+          note: "a point waiting on a person or on other work is not a park — resolve it, or seed it as real work",
+        },
+        source: "engine/decisions.ts defer",
+      });
+    }
     if (this.stateExists?.(u.to!) === false) {
-      this.lastCorrection = `no state is called ${u.to!} — this point is parked for something nobody has drawn, so nothing will ever deliver it`;
+      this.lastCorrection = `nothing reachable from here is called ${u.to!} — correct inside its own record, and delivered nowhere if not`;
     }
     this.close(n, "deferred", `deferred to ${u.to}`);
     this.parked.push({ state: u.to!, brief: n.brief, hops, trail });

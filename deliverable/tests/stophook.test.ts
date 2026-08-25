@@ -34,7 +34,15 @@ function verdict(records: object[], payload: object, mode?: string): string {
     env: { ...process.env, SE_HOOK_ROOT: root },
     windowsHide: true,
   });
-  assert.equal(r.status, 0, `the hook always exits clean — stderr: ${r.stderr}`);
+  // THE WHOLE SPAWN GOES IN THE MESSAGE. This assertion fired once under the
+  // parallel battery with an empty stderr, and "stderr:" followed by nothing
+  // said only that the hook wrote nothing. Signal, stdout and the spawn error
+  // are what tell a killed process from a crashed one.
+  assert.equal(
+    r.status,
+    0,
+    `the hook always exits clean — signal ${String(r.signal)}, error ${r.error?.message ?? "none"}, stdout ${JSON.stringify(r.stdout)}, stderr ${JSON.stringify(r.stderr)}`,
+  );
   return r.stdout.trim();
 }
 
