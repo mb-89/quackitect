@@ -7,6 +7,7 @@ statement: "The release package is proved by five commands typed at the package 
 owner: the maintainer
 trigger: the next record that reaches the package state, and any change to what the archive excludes
 status: open
+looked: 2026-08-24
 impact: "A release gate reads a story about a check instead of a result. A packaging change that drops a needed file is caught only if the next agent happens to run the same five commands in the same order, and nothing tells them which five."
 breaks_how_badly: corrosive
 how_likely: expected
@@ -47,3 +48,26 @@ call. Three records have now paid for the same procedure.
 WHAT IT MUST NOT DO is start the lane from the extracted copy. Running what
 the package built would destroy the lane the check runs in, which is the same
 trade the version flag's own story accepts on its last slide.
+
+## Looked at 2026-08-24, when the trigger fired
+
+THE TRIGGER FIRED and this is the re-look it asks for. i62 was the next record
+to reach the package state, and it found the entry with no `looked:` field at
+all while every entry that record minted carried one.
+
+STILL OPEN, AND THE WARNING WAS ACCURATE. The proof behind the 8.1.0 release is
+exactly the hand-typed proof this entry is about. Nothing re-runs it.
+
+WHAT CHANGED, AND IT IS SMALL. The five commands are no longer the shape of the
+proof. i62 checked the package by unpacking it, installing its dependencies,
+and driving the packaged engine over its own protocol until it walked its own
+boot states. That is a better proof and it is still typed by hand.
+
+SO THE ENTRY'S OWN WORDS NEED ONE CORRECTION. `nothing tells them which five`
+is now `nothing tells them which proof at all`, and the next agent will invent
+a third shape.
+
+WHAT WOULD CLOSE IT: a check that unpacks the produced archive and drives it,
+run by the engine rather than by whoever is walking. The driver i62 wrote is a
+scratchpad script and dies with its container, which is the failure this entry
+describes happening again.

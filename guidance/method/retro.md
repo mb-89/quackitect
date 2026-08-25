@@ -46,6 +46,20 @@ The trigger is a NOTE carrying "needs retro":
    BACKLOG drain, and those are judgment dispositions the desk is
    refused, so only a retro can set the mark (deliverable/engine/calllog.ts).
 
+   ON A FRESH CLONE THE WINDOW IS ONLY THIS SESSION, and it looks exactly like
+   a genuinely quiet period. A cloud container starts `.se/calls.jsonl` EMPTY,
+   so there is no earlier drain and no earlier record: `last_retro` opens at
+   this session's first call. An onboard-retro then mines boot and itself.
+
+   SAY SO RATHER THAN SIGNING AN EMPTY MINE AS A CLEAN ONE. The step cannot
+   tell the two apart from inside, and only the record COUNT does.
+
+   THE ARRIVAL'S OWN WORK IS NOT IN THE WINDOW AT ALL. `se-arrive.ts` writes
+   nothing to the call log, so the fetch, the install, the cage placement, the
+   projection and the lane start are invisible to the record. For a system whose
+   premise is that every call is logged, the first minutes of every headless run
+   are unlogged.
+
    WITH NO SUCH DRAIN IN THE LIVE LOG, the window opens at the log file's
    FIRST record. Never at another drain (fixed 2026-08-18 on the owner's
    instruction). A `done` or `obsolete` drain is a check any walk makes, so
@@ -168,8 +182,9 @@ The trigger is a NOTE carrying "needs retro":
    - DRAIN WHAT THE HARNESS SURFACED. Memories handed to the agent in context
      are readable and drainable too.
    - DECLARE A ROOT for a folder no existing one covers. `.se/roots.json`
-     makes a folder available as `@name`, read-only by default. Ask the
-     owner before declaring one; the refusal's own remedy says so.
+     makes a folder available as `@name`, read-only by default. DECLARE IT
+     YOURSELF and carry on (owner ruling 2026-08-24) — this step used to stop
+     here to ask, which reported the drain unreachable and moved on.
    - WHAT IS NOT ALLOWED is ticking this step because nothing was surfaced.
      Say what you could reach and what you could not.
 

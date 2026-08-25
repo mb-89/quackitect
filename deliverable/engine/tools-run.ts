@@ -427,9 +427,15 @@ export function runTools(
         },
       },
       handler: async (args) => {
-        const root = rootOf(".se");
-        if (args.cap !== undefined) return recordHostCap(root, Number(args.cap));
-        if (args.bytes === undefined) return hostCapState(root);
+        // THE CAP FILE LIVES IN `.se/`, NOT BESIDE IT. `recordHostCap` and
+        // `readHostCap` both take the MACHINE-STATE folder, and `setAnswerSpill`
+        // reads it from there. Passing the project root wrote the measurement to
+        // an untracked file at the top of the repository, where nothing reads it:
+        // the probe reported success, the bound never moved, and the next session
+        // inherited nothing.
+        const home = seDir(rootOf(".se"));
+        if (args.cap !== undefined) return recordHostCap(home, Number(args.cap));
+        if (args.bytes === undefined) return hostCapState(home);
         const asked = Math.max(1, Math.min(4_000_000, Number(args.bytes)));
         const marker = `END-OF-PROBE-${asked}`;
         const filler = "x".repeat(Math.max(0, asked - marker.length - 200));
@@ -465,7 +471,7 @@ export function runTools(
           agent: {
             type: "string",
             description:
-              "REGISTER A SUBAGENT YOU JUST SPAWNED, saying in one line what it is doing, and NAME ITS MODEL with the model argument. It then rides the work account and the panel like every other background task. Nothing here can see a subagent for itself — the harness spawns it, so you are the one who knows. HAND IT THE RETURNED ID so it can report progress; a hand that never reports reads as idle whatever it is doing.",
+              "REGISTER A SUBAGENT YOU JUST SPAWNED, saying in one line what it is doing, and NAME ITS MODEL with the model argument. It then rides the work account and the panel like every other background task. Nothing here can see a subagent for itself — the harness spawns it, so you are the one who knows. HAND IT THE RETURNED ID so it can report progress; a hand that never reports reads as idle whatever it is doing. THIS ONE CALL IS LEGAL WHEREVER THE WALK STANDS, even where se_run itself is not: a hand is spawned at whatever state the work asked for one, and a record the engine refuses to take is a hand that has to be stood down again.",
           },
           model: {
             type: "string",

@@ -5,13 +5,13 @@ type: "[[raid]]"
 kind: assumption
 statement: Only one agent works a given clone at a time, so one working tree is enough and two agents never need separate trees on one machine.
 owner: the owner
-trigger: the first time two agents are asked to work the same checkout, or the first time a background worker needs its own tree
+trigger: "the first time two agents WRITE to the same checkout by different paths, or the first time a background worker needs its own tree. A second READER no longer fires it, and neither does a second writer going through the one lane: both have been exercised and both held."
 status: open
 impact: If two agents share one clone, they overwrite each other's uncommitted work with nothing to detect it. The dirty-tree signal is the only guard and it is not a lock.
 breaks_how_badly: crippling
 how_likely: conceivable
 probe: "HOLDS, both halves probed 2026-08-16. THE INTENT HALF: the owner's own words that two agents run on two clones, never on two worktrees of one. THE CODE HALF: a search of satellite.ts, supervisor.ts, core.ts and channel.ts for a spawn, a fork or a cwd naming a worktree returns five hits and none of them starts a worker in its own tree. satellite.ts takes an injected GitRun(args, cwd) over the git lane's allowlist rather than spawning anything itself. So nothing in the engine today needs a second tree on one machine. WHAT WOULD FALSIFY IT LATER: a background worker that builds or tests while the main walk edits, which i27's satellite design is the shape of."
-probed: 2026-08-20
+probed: 2026-08-24
 source_refs:
   - req-every-record-path-resolves-in-one-tree
   - raid-dec-one-tree-beats-a-record-travelling-between-machines
@@ -68,3 +68,31 @@ WHY IT IS RECORDED RATHER THAN ASSUMED SILENTLY. i34 removes the only
 mechanism that made two trees possible. If this turns out false later, the way
 back is two clones — never worktrees again — and that path is written on
 raid-dec-one-tree-beats-a-record-travelling-between-machines.
+
+## THE TRIGGER FIRED AGAIN, 2026-08-24 — AND THIS TIME IN THE WRITER FORM
+
+WHAT THE ENTRY SAID WAS MISSING, in its own words: the hazard of two agents
+overwriting each other's uncommitted work was never exercised, because every
+second agent so far had been read-only by instruction.
+
+THAT GAP IS NOW CLOSED, AND IT HELD. On i62's walk a second agent was spawned
+with no read-only instruction, on the same checkout, while the first still held
+the record. It filled and submitted an evidence form. Two writers, one tree.
+
+NOTHING COLLIDED, AND LUCK IS NOT THE REASON. Both agents wrote through one
+lane served by one engine process, so their writes were serialised by the
+thing serving them rather than by care on either side.
+
+SO THE EVIDENCE IS STRONGER THAN BEFORE AND NARROWER THAN IT LOOKS. Two writers
+on one tree are safe WHILE both go through one engine. Two writers that reach
+the tree by any other path are still unexercised, and that is where the
+assumption's hazard actually lives.
+
+WHAT THIS TIES TO. The serialisation depends on there being exactly one engine
+on the folder, which is `req-one-instance-holds-a-folder-and-its-port`. That
+row was written as a logging concern; this probe shows it is also what keeps
+this assumption true.
+
+THE SHARPENING FROM 2026-08-20 STILL STANDS AND IS NOW OVERDUE. The trigger
+fires on any second agent and should distinguish a second reader from a second
+writer. It has now fired three times on the safe case and once on the real one.

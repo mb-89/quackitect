@@ -36,6 +36,7 @@ import {
   resolveRef,
 } from "./machines/compile.ts";
 import { computeRoute, type RouteNode, type RouteResult, type RouteStep, routeWraps } from "./route.ts";
+import { isRegistrationCall } from "./run.ts";
 
 /** HOW LONG A CALL WAITS FOR A STEP'S LEAVING JUDGMENT before answering. It is
  *  the bound a lane call is promised, so a judgment that settles fast is still
@@ -3186,7 +3187,6 @@ export class Session {
         .startsWith(".se/answers/")
     )
       return;
-
     // EMERGENCY OPENS EVERY DOOR, including on a closed machine — a machine
     // that will not move is precisely when the repair is needed.
     if (this._emergency) return;
@@ -3199,6 +3199,22 @@ export class Session {
         source: "engine/session.ts gate",
       });
     }
+    // RECORDING THAT A HAND WAS STARTED IS LEGAL WHEREVER THE WALK STANDS, and
+    // it is the same shape of exemption as the cursor above. The registration
+    // rides se_run, which most states forbid, so the call was refused exactly
+    // where a hand had just been spawned.
+    //
+    // A HAND THAT WAS STARTED IS A FACT ABOUT THE WORLD. Refusing to record a
+    // fact makes the account wrong rather than the hand unspawned.
+    //
+    // THE WHOLE CALL IS CHECKED, NOT ONE KEY. A command carrying an empty
+    // `agent` beside it is not a registration, and asking only whether an
+    // exempt key was PRESENT would have let it through in every state.
+    //
+    // IT SITS BELOW THE CLOSED-MACHINE GUARD ON PURPOSE. A machine that has
+    // ended records nothing.
+    // see dsp-one-instance-holds-the-workspace.md#the-registration-exemption
+    if (tool === "se_run" && isRegistrationCall(args)) return;
     const { all, tools } = this.legal();
     if (tools.has(tool)) return;
     if (all && !RESTRICTED.has(tool)) return;

@@ -196,9 +196,23 @@ WHY IT CANNOT BE SKIPPED: notes are machine-local and die with the container.
 The report is the channel that reaches a person, so an unwritten one throws
 that away.
 
-WHERE IT GOES: `.se/field-report.md`, which is not committed, and PRINTED IN
-FULL as the closing message. The file is the convenience; the message is the
-delivery. `guidance/method/cloud-runner.md` carries the detail.
+WHERE IT GOES: `.se/field-report.md`, which is gitignored. NOWHERE ELSE. Not
+`spec/`, not the record's own folder, not beside the evidence.
+
+HOW IT IS DELIVERED, and it is BOTH: handed over as a DOWNLOADABLE FILE, and
+printed in full as the closing message. The person keeps the file and passes it
+on; the message is what they read now.
+
+IT IS PRIVATE DATA, and that is the reason rather than a preference (owner
+ruling 2026-08-21). It is written for one person and it is not a corpus
+document.
+
+A CHECK ENFORCES THIS NOW (2026-08-24). `record-inspect` goes red on a field
+report found anywhere in version control, and names the folder it belongs in.
+The rule stood in prose and was broken twice: 3,584 lines across two records,
+which nothing ever cited.
+
+`guidance/method/cloud-runner.md` carries the detail.
 
 ## 9. Never open a record unasked
 

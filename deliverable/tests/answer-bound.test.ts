@@ -191,3 +191,26 @@ test("the suggested spill page keeps a read's own answer inside the bound", asyn
   }
   rmSync(root, { recursive: true, force: true });
 });
+
+test("the cap probe records into the machine-state folder, not beside it", () => {
+  // MEASURED 2026-08-24. The handler passed `rootOf(".se")` — the PROJECT ROOT —
+  // to a pair of functions whose parameter is the `.se` folder itself. The probe
+  // answered `recorded: 38000`, the file landed untracked at the top of the
+  // repository, and the bound never moved.
+  //
+  // A MEASUREMENT THAT REPORTS SUCCESS AND CHANGES NOTHING is the worst shape a
+  // bug can take, because the agent stops looking. Nothing else in the engine
+  // would have caught it: both sides of the read/write pair agree with each
+  // other, so only the call site is wrong.
+  const src = readFileSync(new URL("../engine/tools-run.ts", import.meta.url), "utf8");
+  const start = src.indexOf('name: "se_probe_cap"');
+  assert.ok(start > 0, "se_probe_cap is still a tool");
+  const block = src.slice(start, src.indexOf('name: "se_run"', start));
+  const folder = /const (\w+) = seDir\(/.exec(block);
+  assert.ok(folder, "the probe derives the machine-state folder with seDir");
+  for (const verb of ["recordHostCap", "hostCapState"]) {
+    const call = new RegExp(`${verb}\\((\\w+)`).exec(block);
+    assert.ok(call, `se_probe_cap still calls ${verb}`);
+    assert.equal(call[1], folder[1], `${verb} must be handed the machine-state folder, and it got ${call[1]}`);
+  }
+});

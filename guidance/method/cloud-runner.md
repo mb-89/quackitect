@@ -338,6 +338,21 @@ person, so the run pushes what it produced.
 CHECK WHAT THE GIT VERB ACTUALLY ALLOWS before relying on this. If it refuses,
 that is a finding for the field report, not a reason to reach around it.
 
+## A second engine on this folder stops instead of starting
+
+THE MESSAGE READS: `this server is stopping rather than sharing the folder`.
+It is on the error stream, and the process exits 1.
+
+THAT IS THE GUARD WORKING. One instance serves one folder, because two write
+one call log and one state folder and neither is the whole trail. The hold is a
+port derived from the folder itself.
+
+WHAT TO DO. Find the engine that already has it, and use that one. Nothing is
+written to disk to carry the hold, so there is no stale lock to clear.
+
+AFTER A CRASH THERE IS NOTHING TO CLEAR EITHER. The hold dies with the process
+that made it, which is why it is a port and not a file.
+
 ## When something fails, look here first
 
 ### The lane is not answering

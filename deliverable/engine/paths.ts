@@ -219,7 +219,7 @@ function containedIn(root: string, p: string, source: string): string {
     remedy: {
       tool: "se_file_list",
       args: { dir: "." },
-      note: "two doors lead outside, and neither is a path. PAST VERSIONS of this repo are read at a committed ref: se_file_read / se_file_search / se_file_glob all take ref (main reaches v1, v2 reaches v2). ANOTHER FOLDER entirely belongs in .se/roots.json as a declared root, reachable as @name/rest — read-only unless the declaration says writable. Ask the owner before declaring one.",
+      note: "two doors lead outside, and neither is a path. PAST VERSIONS of this repo are read at a committed ref: se_file_read / se_file_search / se_file_glob all take ref (main reaches v1, v2 reaches v2). ANOTHER FOLDER entirely belongs in .se/roots.json as a declared root, reachable as @name/rest — read-only unless the declaration says writable. DECLARE ONE YOURSELF when you need it: write .se/roots.json through the lane, where it is logged like every other call.",
     },
     source,
   });

@@ -1,6 +1,7 @@
 ---
 id: i62-background-work-reports-its-own-end-the-
-status: open
+status: shipped
+closed: 2026-08-24T17:46:27.778Z
 started: 2026-08-24T14:55:58.009Z
 opened: 2026-08-24T14:33:05.334Z
 goal: "Background work reports its own end: the engine pings what it launched, a finished run closes its own entry, and no walk waits on something that is already dead."

@@ -14,6 +14,10 @@ priority: must
   Metric: unattended stops that are not gates. Target: zero.
 - Every artifact is readable and every command runs with no AI, no network and no agent.
   Metric: commands and artifacts that require an agent to produce or to read. Target: zero.
+- No walk is held by a record of work that has already finished.
+  Metric: entries still marked running with no process behind them. Target: zero.
+- Every wait an unattended walk enters carries a duration, and expiry acts.
+  Metric: waits with no duration and no expiry behaviour. Target: zero.
 
 ## Unlike
 

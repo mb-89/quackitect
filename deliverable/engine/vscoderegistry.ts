@@ -21,7 +21,6 @@
 //   entry arrived passes while every other extension is gone.
 
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
-import { basename } from "node:path";
 
 export type Identifier = { id: string; uuid?: string };
 
@@ -148,11 +147,16 @@ export function problemsIn(text: string, mustContain: string[]): string[] {
 /** The entry for an extension folder, in the shape VS Code writes for itself.
  *  `dir` is the folder inside the extensions directory, linked or copied. */
 export function entryFor(dir: string, pkg: { name: string; publisher: string; version: string }, installedAt: number): ExtensionEntry {
+  // THE PATH IS THE ONE VS CODE RECORDED, and it may use either separator
+  // whatever host is reading it. Taking the last segment with the platform's
+  // own rule returns the WHOLE string for a Windows path read on POSIX, so the
+  // entry's relativeLocation comes out as the full path with backslashes in it.
+  const slashed = dir.replace(/\\/g, "/");
   return {
     identifier: { id: `${pkg.publisher}.${pkg.name}` },
     version: pkg.version,
-    location: { $mid: 1, path: `/${dir.replace(/\\/g, "/")}`, scheme: "file" },
-    relativeLocation: basename(dir),
+    location: { $mid: 1, path: `/${slashed}`, scheme: "file" },
+    relativeLocation: slashed.slice(slashed.lastIndexOf("/") + 1),
     metadata: { installedTimestamp: installedAt, source: "vsix" },
   };
 }

@@ -34,6 +34,7 @@ import { appendFileSync, existsSync, mkdirSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { createInterface } from "node:readline";
 import { fileURLToPath } from "node:url";
+import { takeWorkspace } from "../run.ts";
 import { SE_VERSION } from "../version.ts";
 
 const argv = [
@@ -331,6 +332,32 @@ if (argv.includes("--child") || process.env.SE_HOT_DISABLE === "1") {
   const headless = argv.includes("--headless");
   if (headless && mirrorPort <= 0) {
     process.stderr.write("se-mcp: --headless serves the lane at /mcp on the mirror port — it cannot run with the mirror disabled\n");
+    process.exit(1);
+  }
+  // ONE INSTANCE SERVES ONE FOLDER. The workspace hold is a port derived from
+  // the folder itself, and it is NOT the mirror port below: the mirror is one
+  // shared window that a second agent may evict, while the workspace is this
+  // folder's own and a second server on it must stop.
+  //
+  // TWO SERVERS ON ONE FOLDER WRITE ONE CALL LOG AND ONE STATE FOLDER, so
+  // neither log is the whole trail. Settling entries a previous instance left
+  // behind is also only safe because one instance serves the folder.
+  //
+  // NOTHING IS WRITTEN DOWN TO CARRY THE HOLD. A record of it would outlive the
+  // process that made it, and a crash would leave a folder nobody can start in.
+  // see dsp-one-instance-holds-the-workspace.md
+  // THE HOLD IS DECIDED BEFORE ANYTHING TOUCHES THE FOLDER, and the await is
+  // the whole point. Booting first and asking afterwards let a refused second
+  // instance reap the FIRST instance's live jobs on its way out: the mirror's
+  // start reaps abandoned work synchronously, and a take that resolves from a
+  // socket callback cannot answer until a turn later.
+  //
+  // IT DOES NOT DEPEND ON THE MIRROR. The workspace port is derived from the
+  // folder alone, so a server started with the mirror disabled shares the
+  // folder just as dangerously and has to be stopped just the same.
+  const hold = await takeWorkspace(root);
+  if (!hold.held) {
+    process.stderr.write(`se-mcp: ${hold.by} — this server is stopping rather than sharing the folder\n`);
     process.exit(1);
   }
   const mcpServer = buildServer(root, session);

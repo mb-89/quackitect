@@ -1,5 +1,5 @@
 // see dsp-lane-door.md#the-prompt-layer
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { contentHash } from "./hash.ts";
 
@@ -102,7 +102,26 @@ export function placeProtocol(root: string, opened: string): string[] {
   const written: string[] = [];
   for (const t of protocolTargets(opened)) {
     mkdirSync(dirname(t.path), { recursive: true });
-    writeFileSync(t.path, textFor(t, projection), "utf8");
+    const text = textFor(t, projection);
+    // AN OVERWRITE THAT DESTROYS SOMETHING SAYS SO. The projection is written
+    // unconditionally, so a file somebody edited by hand is replaced without a
+    // word and the edit is simply gone.
+    //
+    // THE FILE SAYS `Do not edit` IN ITS FIRST LINE, and that was not enough:
+    // a patch verb names a string to replace and never shows the head, so an
+    // edit 600 lines down never meets the warning. Measured on the i62 walk,
+    // where two paragraphs written into AGENTS.md and CLAUDE.md vanished at the
+    // next arrival and nothing reported it.
+    //
+    // THE LINE IS NOISE RIGHT AFTER A GUIDANCE EDIT, when the difference is
+    // only the older projection. It is telling the reader which of the two
+    // happened that matters, so it names both readings rather than guessing.
+    if (existsSync(t.path) && readFileSync(t.path, "utf8") !== text) {
+      process.stderr.write(
+        `prompt layer: ${t.path} differed and was overwritten — expected right after a guidance edit, and a LOST HAND EDIT otherwise. The source is guidance/.\n`,
+      );
+    }
+    writeFileSync(t.path, text, "utf8");
     written.push(t.path);
   }
   written.push(...placeSkills(root, opened));

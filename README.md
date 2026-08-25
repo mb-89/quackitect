@@ -65,7 +65,7 @@ which edit. Here is the whole rule.
 | you changed | you need |
 | --- | --- |
 | `deliverable/brand/palette.css` | nothing. It is read on every render. |
-| a machine drawing, guidance, a rigor-matrix row | nothing. They are read live. |
+| a machine drawing, guidance, a [rigor-matrix](deliverable/machines/rigor_matrix/README.md) row | nothing. They are read live. |
 | `deliverable/engine/**.ts` | restart the se server. Node caches modules at import, so a correct file on disk means nothing to a process already running. |
 | `deliverable/vscode/src/extension.ts` | re-run `RUNME.ps1`. |
 
@@ -129,10 +129,15 @@ The Mirror's buttons drive the same core by the person's hand.
 
 `.claude/settings.json` **denies the current native tools by
 name** — Bash, BashOutput, KillShell, Read, Write, Edit, NotebookEdit,
-Glob, Grep, WebSearch, WebFetch, Skill (an explicit blacklist by owner
+Glob, Grep, WebFetch, Skill (an explicit blacklist by owner
 ruling: a tool added in the future is NOT blocked automatically; blocking it
 is a deliberate edit to this list). Bare-name deny removes the tool from the
-model's context entirely. `mcp__se__*` is allowlisted. Subagents (Task)
+model's context entirely.
+
+**WebSearch is deliberately NOT denied.** It runs on the provider's backend and
+cannot be self-hosted without a key, so blocking it would remove the capability
+rather than route it. Every query reaches the log through a hook instead, and
+the settings file names it as a hook matcher rather than as a deny. `mcp__se__*` is allowlisted. Subagents (Task)
 stay available and inherit the same denies — they are caged too.
 
 The settings file and `.mcp.json` are GENERATED: edit the templates in
@@ -143,7 +148,7 @@ generated copies are gitignored).
 installs ripgrep via npm (`@vscode/ripgrep`) and fails red without either —
 there is no fallback search engine.
 
-## The lane (38 tools; the twelve below are the drop-in replacements)
+## The lane (41 tools; the twelve below are the drop-in replacements)
 
 | native | se | better because |
 | --- | --- | --- |
@@ -211,7 +216,7 @@ WHAT RUNS TODAY:
   step asking for the evidence it needs and refusing what does not pass.
 - The live view. A browser page shows where the work stands, updating as it
   moves, with the same content the driver sees.
-- The record. Twenty-six pieces of work carry their own folders of evidence,
+- The record. Sixty-three pieces of work carry their own folders of evidence,
   and the links between what was asked for and what was built are checked by
   machine in both directions.
 - The test battery. It runs on its own at one point in the process, and

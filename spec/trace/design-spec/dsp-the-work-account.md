@@ -185,6 +185,46 @@ process cannot be mistaken for a judgment still thinking.
 A TREE THAT CANNOT BE RESOLVED refuses the handback rather than starting a
 judgment with nowhere to run. The caller sees that refusal inside its second.
 
+## How long a settled entry's files are kept
+
+SEVEN DAYS AFTER THE ENTRY SETTLES. That is the ruling this record owes, and
+no code acts on it yet — the sweep that clears the pile is a named non-goal.
+
+NOT BUILT YET. Until the sweep exists the pile keeps growing, and whoever
+builds it uses this number rather than picking a new one.
+
+### Why seven and not seven hundred
+
+A SETTLED ENTRY'S FILE ANSWERS ONE QUESTION: `se_run {job}` asked by id. Nobody
+asks that about work they have forgotten, and a working week is the span over
+which somebody still says "that run on Monday".
+
+THE OUTPUT IS NOT WHAT IS AT STAKE. A run's output stays under its call-log ref
+for good, so clearing the job file loses the entry's metadata and nothing else.
+
+THE PILE IS REAL. It stood at 598 one morning and 1,245 that afternoon, which
+is roughly 650 files in half a day. At that rate a year of keeping everything
+is hundreds of thousands of files in one folder.
+
+### What is never cleared
+
+AN ENTRY WHOSE LAST RECORD SAYS RUNNING. The next engine reads exactly those to
+close what its predecessor left behind, so clearing one turns a recoverable
+ghost into an invisible one.
+
+AGE IS MEASURED FROM THE SETTLING, never from the start. A run that took two
+days is not two days closer to being cleared than one that took a minute.
+
+### Who owns this number
+
+THE DRIVING AGENT CHOSE IT, alone, because the record's scope committed to a
+ruling and none had been written. It rests on the reasoning above and on no
+measurement of how often an old entry is actually asked for.
+
+THAT MEASUREMENT WOULD SETTLE IT PROPERLY. Counting `se_run {job}` calls
+against the age of what they ask for is cheap, and the call log already holds
+every one.
+
 ## Rationale
 
 ### Why one table and not one per kind

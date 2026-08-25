@@ -1,7 +1,7 @@
 <!-- GENERATED at agent start. Do not edit — the next start overwrites it.
-     from guidance/contract.md a6a655923593
-     from guidance/walking.md 33d5cae6ee1c
-     from guidance/method/lane.md f00d120bd8f3
+     from guidance/contract.md c779bb4e75f5
+     from guidance/walking.md 7ec0d9f8cb05
+     from guidance/method/lane.md 3881abeb4b1a
      from guidance/voice.md 2bbb7751a28c
 -->
 
@@ -195,9 +195,23 @@ WHY IT CANNOT BE SKIPPED: notes are machine-local and die with the container.
 The report is the channel that reaches a person, so an unwritten one throws
 that away.
 
-WHERE IT GOES: `.se/field-report.md`, which is not committed, and PRINTED IN
-FULL as the closing message. The file is the convenience; the message is the
-delivery. `guidance/method/cloud-runner.md` carries the detail.
+WHERE IT GOES: `.se/field-report.md`, which is gitignored. NOWHERE ELSE. Not
+`spec/`, not the record's own folder, not beside the evidence.
+
+HOW IT IS DELIVERED, and it is BOTH: handed over as a DOWNLOADABLE FILE, and
+printed in full as the closing message. The person keeps the file and passes it
+on; the message is what they read now.
+
+IT IS PRIVATE DATA, and that is the reason rather than a preference (owner
+ruling 2026-08-21). It is written for one person and it is not a corpus
+document.
+
+A CHECK ENFORCES THIS NOW (2026-08-24). `record-inspect` goes red on a field
+report found anywhere in version control, and names the folder it belongs in.
+The rule stood in prose and was broken twice: 3,584 lines across two records,
+which nothing ever cited.
+
+`guidance/method/cloud-runner.md` carries the detail.
 
 ## 9. Never open a record unasked
 
@@ -640,6 +654,18 @@ far along it is, how many have failed, the first failures by name, and how much
 longer it needs with the basis for that figure. The JOB makes the estimate, not
 you.
 
+AN OUTCOME SAYING `bound reached` IS THE ACCOUNT GIVING UP, never a verdict.
+Every entry declares how long the account will wait, and passing that bound ends
+the WAIT rather than the work. The process is not touched.
+
+SO THE WORK MAY STILL REPORT, and when it does its own outcome replaces the
+bound's and the entry rides an answer again. A handle the engine can see running
+is never expired at all.
+
+THE WORD AFTER THE FIGURE SAYS WHERE IT CAME FROM — `measured` or `default`.
+Everything in the product carries the default today, registered as
+raid-risk-one-blanket-bound-is-given-to-work-nobody-measured.
+
 SO CARRY ON WORKING. The news finds you on whatever call you were making
 anyway, and the verdict records itself when the run ends.
 
@@ -747,7 +773,11 @@ repo is read at a committed ref — `se_file_read`, `se_file_search` and
 `se_file_glob` all take `ref`.
 
 Another folder entirely belongs in `.se/roots.json`, as a declared root. It is
-reachable as `@name/rest`. Ask the owner before declaring one.
+reachable as `@name/rest`.
+
+DECLARE ONE YOURSELF WHEN YOU NEED IT (owner ruling 2026-08-24). Write the
+file through the lane; the declaration is logged like every other call, and
+nobody has to be woken to approve a path.
 
 A DECLARED ROOT IS READ-ONLY BY DEFAULT. Declaring one writable is how this
 system drives a project that is not itself. The one thing it may never reach
