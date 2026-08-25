@@ -26,6 +26,8 @@ shows one.
 - a ref
 - a URL
 
+THREE THINGS FOLLOW FROM THAT.
+
 - A PATH PRINTED AS PLAIN TEXT asks the reader to go and find the file by
   hand. The page already knew where it was.
 - THIS BINDS EVERY SURFACE, not only prose. Form fields, checklists, tables,
