@@ -43,6 +43,7 @@ import {
 import { shoot } from "./shoot.ts";
 import { TIMINGS_DIR_ENV, testConcurrency, testReporterArgs, timedSince, timingReport } from "./testreporters.ts";
 import type { ReadingHook } from "./tools-file.ts";
+import { isWidgetKind, WIDGET_LIST } from "./widget-kinds.ts";
 
 const BIOME_BIN = fileURLToPath(new URL("../node_modules/@biomejs/biome/bin/biome", import.meta.url));
 
@@ -404,19 +405,19 @@ export function runTools(
     {
       name: "se_shoot",
       title: "se.shoot",
-      description:
-        "LOOK AT THE MIRROR, AS A PICTURE. Renders the surface to an image, so a question about LAYOUT can be judged by seeing it.\n\nASK THE PERSON FIRST, EVERY TIME. This looks at a screen, and contract rule 10 makes that theirs to grant. Delete the capture when you are done with it.\n\nFOR ANYTHING THAT IS NOT ABOUT LAYOUT, se_surface prints the same facts as text and needs no permission.\n\nShoot the whole page, or one widget with widget: 'machine' | 'details' | 'log' | 'terminal'. view: names a machine to draw instead of the one being walked. Nothing is served over HTTP and no browser window opens.",
+      description: `LOOK AT THE MIRROR, AS A PICTURE. Renders the surface to an image, so a question about LAYOUT can be judged by seeing it.\n\nASK THE PERSON FIRST, EVERY TIME. This looks at a screen, and contract rule 10 makes that theirs to grant. Delete the capture when you are done with it.\n\nFOR ANYTHING THAT IS NOT ABOUT LAYOUT, se_surface prints the same facts as text and needs no permission.\n\nShoot the whole page, or one widget with widget: ${WIDGET_LIST}. view: names a machine to draw instead of the one being walked. Nothing is served over HTTP and no browser window opens.`,
       inputSchema: {
         type: "object",
         properties: {
-          widget: { type: "string", description: "machine | details | log | terminal — omit for the whole page" },
+          widget: { type: "string", description: `${WIDGET_LIST} — omit for the whole page` },
           view: { type: "string", description: "draw this machine instead of the one the walk stands in" },
           width: { type: "number", description: "viewport width, default 1600" },
           height: { type: "number", description: "viewport height, default 1000" },
         },
       },
       handler: (args) => {
-        const w = args.widget === undefined ? undefined : (String(args.widget) as "machine" | "details" | "log" | "terminal" | "table");
+        const raw = args.widget === undefined ? undefined : String(args.widget);
+        const w = raw !== undefined && isWidgetKind(raw) ? raw : undefined;
         if (mirror === undefined) {
           throw new Rejection({
             clause: CLAUSES.CONDITION_UNMET,

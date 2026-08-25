@@ -31,6 +31,7 @@ import { survey } from "./survey.ts";
 import { editCell } from "./tables.ts";
 import { recordTraceWrites, traceWriteTrail } from "./trace.ts";
 import { warmVault } from "./vault.ts";
+import { WIDGET_KINDS, type WidgetKind } from "./widget-kinds.ts";
 
 export interface MirrorOptions {
   session: Session;
@@ -851,7 +852,12 @@ export function startMirror(o: MirrorOptions): Server {
   // THE PAGE WAS A SECOND INTERFACE NOBODY USED, and its cost was never the
   // code. An agent would fix a pane, open the standalone page, see the fix, and
   // report the interface repaired — while the sidebar still showed the fault.
-  const WIDGETS = new Set(["machine", "details", "log", "terminal", "table", "trace", "controls"]);
+  // THE GATE TAKES ITS VOCABULARY FROM THE RENDERER, so it cannot admit a kind
+  // the renderer has no branch for. It admitted `controls` while the cast one
+  // line below had no such member, and `/widget/controls` has its own route
+  // above — so the entry did nothing but keep a way through to the whole page
+  // this file says is no longer served.
+  const WIDGETS: ReadonlySet<string> = new Set<string>(WIDGET_KINDS);
 
   // RENDER FIRST, THEN WRITE THE HEAD. See the note at the dispatcher's catch.
   const serveWidget = (widget: string, url: URL, res: Res): void => {
@@ -859,7 +865,7 @@ export function startMirror(o: MirrorOptions): Server {
     const started = performance.now();
     const html = renderMirror(
       state,
-      widget as "machine" | "details" | "log" | "terminal" | "table" | "trace",
+      widget as WidgetKind,
       url.searchParams.get("view") ?? undefined,
       undefined,
       url.searchParams.get("embed") === "1",

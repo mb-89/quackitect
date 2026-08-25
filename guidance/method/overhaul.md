@@ -306,8 +306,8 @@ doctrine as the forbidden-words list in voice.md.
 - REGISTRY. Does a list grow by editing code in N places instead of
   registering one entry? The exemplars are the editors and the condition
   types: an unknown entry refuses, a new one is one file.
-- TEMPLATE METHOD. Do two procedures share most steps and differ in one? The
-  tell: a copied block with a long comment duplicated verbatim.
+- TEMPLATE METHOD. Do two procedures share most steps and differ in one, with
+  a copied block and its long comment duplicated verbatim?
 - ADAPTER. Are host differences handled inline where they occur instead of at
   one seam? The exemplar is the harness registry.
 - INVALIDATE ON THE EVENT. Does a write path have to remember to clear a

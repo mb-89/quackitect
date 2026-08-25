@@ -14,11 +14,12 @@ import { compileMachineCached, resolveRef } from "./machines/compile.ts";
 import type { MirrorState, StateMeta } from "./render.ts";
 import { loadLevels } from "./scale.ts";
 import { mainMachinePath } from "./session.ts";
+import type { WidgetKind } from "./widget-kinds.ts";
 
 /** What the surface is being asked for. */
 export interface Intent {
   /** Which widget, or the whole page when absent. */
-  widget?: "machine" | "details" | "log" | "terminal" | "table" | "trace";
+  widget?: WidgetKind;
   /** Which machine is on screen. Absent means the one the walk is in. */
   view?: string;
   /** Where a phase timing goes. The caller owns the clock; this only reports. */
