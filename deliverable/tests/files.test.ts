@@ -45,13 +45,32 @@ test("no binary file lives in the tree — an unreadable figure is not an artifa
   // `dist` JOINS THEM for the same reason the scratchpad is here: it is
   // build output, it is gitignored, and it came into range only when the
   // folder levels collapsed.
-  const skip = new Set(["node_modules", ".git", ".obsidian", "scratchpad", "dist"]);
+  // `.se` JOINS THEM, and it is the one that made this case flaky. It holds
+  // machine-local state that OTHER CASES create and delete while this walk is
+  // running, so the walk trips on a folder that vanished between the listing
+  // and the descent. It is gitignored and the product owns nothing in it.
+  const skip = new Set(["node_modules", ".git", ".obsidian", "scratchpad", "dist", ".se"]);
   const offenders: string[] = [];
+  // A FOLDER THAT VANISHED IS NOT A BINARY FILE. Something else deleted it
+  // mid-walk, and this case has nothing to say about that.
+  const listing = (dir: URL) => {
+    try {
+      return readdirSync(dir, { withFileTypes: true });
+    } catch {
+      return [];
+    }
+  };
   const walk = (dir: URL, rel: string): void => {
-    for (const e of readdirSync(dir, { withFileTypes: true })) {
+    for (const e of listing(dir)) {
       if (skip.has(e.name)) continue;
       if (e.isDirectory()) walk(new URL(`${e.name}/`, dir), `${rel}${e.name}/`);
-      else if (readFileSync(new URL(e.name, dir)).includes(0)) offenders.push(rel + e.name);
+      else {
+        try {
+          if (readFileSync(new URL(e.name, dir)).includes(0)) offenders.push(rel + e.name);
+        } catch {
+          // likewise for a file that went away while this walk was reading
+        }
+      }
     }
   };
   walk(new URL("../../", import.meta.url), "");
@@ -264,7 +283,11 @@ test("no new file write bypasses the door — the count may fall, never rise", (
   // connection, so a file is the only channel it has to the engine, and the
   // next pull deletes it as it collects it. Session state of the same shape as
   // 39, 40, 42, 47 and 48: machine-local, gitignored, and gone within one call.
-  const CEILING = 50;
+  // 51 AND 52 WITH SETTING A RECORD ASIDE: iterations.ts parkRecord writes the
+  // status word, and markStarted writes it back when the record is resumed.
+  // Both are the same act as the `started:` stamp two lines above them in that
+  // file, on the same file, through the same regex replacement.
+  const CEILING = 52;
   let found = 0;
   const offenders: string[] = [];
   const walk = (dir: URL, rel: string): void => {

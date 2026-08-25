@@ -129,6 +129,26 @@ test("punctuation the probe never counted cannot fail an answer", () => {
   assert.deepEqual(probesMissed(expect, peppered), [], "standalone punctuation between the right words was read as a wrong answer");
 });
 
+// PUNCTUATION ATTACHED TO A WORD IS THE HALF THE HINT PROMISED AND THE CHECK
+// DID NOT KEEP. The tokeniser keeps it attached, so `stands,` and `stands`
+// were different words while the hint said punctuation does not count. Two
+// probes in one boot were answered correctly and refused, 2026-08-25.
+test("punctuation attached to a word cannot fail an answer", () => {
+  const { expect } = readingProbes(DASHED);
+  const commaed = expect.map((e) => `${e.split(" ").join(", ")}.`).join("\n\n");
+  assert.deepEqual(probesMissed(expect, commaed), [], "a comma attached to the right words was read as a wrong answer");
+});
+
+test("the expected run's own punctuation does not have to be reproduced", () => {
+  // The source side carries the punctuation and the answer side does not.
+  // Both go through the one normaliser, so neither has to match the other's
+  // commas — which is the whole promise the hint makes to a reader.
+  const withCommas = "alpha beta, gamma delta, epsilon zeta eta theta iota kappa lambda mu nu xi omicron pi rho sigma tau upsilon";
+  const { expect } = readingProbes(withCommas);
+  const bare = expect.map((e) => e.replace(/[^\p{L}\p{N} ]/gu, "")).join(" ");
+  assert.deepEqual(probesMissed(expect, bare), [], "an answer that dropped the source's commas was refused");
+});
+
 test("a genuinely wrong answer is still refused after the filter loosens", () => {
   const { expect } = readingProbes(DASHED);
   assert.equal(probesMissed(expect, "— — — ...").length, expect.length, "punctuation alone passed for an answer");

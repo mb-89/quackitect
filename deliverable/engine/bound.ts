@@ -1,11 +1,20 @@
 // see dsp-lane-door.md#the-answers-bound
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { smallestInlineOutputBytes } from "./harness.ts";
+import { harnessFor, registryCapFor } from "./harness.ts";
 
 /** The ceiling this project sets for itself, in characters of serialised
- *  JSON. req-oversized-results-remain-recoverable-through-the-lane names it. */
-const OWN_CEILING = 6_000;
+ *  JSON. req-oversized-results-remain-recoverable-through-the-lane names it.
+ *
+ *  IT IS A MEASUREMENT NOW, NOT A CAUTIOUS GUESS. The old figure of 6,000 was
+ *  chosen without measuring any host, and it cost a session 208 of its 549
+ *  reads: every answer above it spilled to disk and was paged back a slice at
+ *  a time. A ladder on a real host settled at 50,000, and a cloud box settled
+ *  higher still.
+ *
+ *  THE SMALLEST MEASURED HOST STILL WINS over this number, so raising it
+ *  cannot push an answer past a host that was measured tighter. */
+const OWN_CEILING = 50_000;
 
 /** The size no answer may exceed.
  *
@@ -31,7 +40,23 @@ const HARD_MAX = 60_000;
  *  IT IS A `let` ON PURPOSE. The measured cap is read from disk, and the disk
  *  is not reachable until somebody tells this module where the session lives.
  *  setAnswerSpill does that, and reopens the number then. */
-export let ANSWER_BOUND_BYTES = Math.min(OWN_CEILING, smallestInlineOutputBytes() ?? OWN_CEILING);
+/** WHAT TO USE WHERE THIS MACHINE HAS NEVER BEEN MEASURED.
+ *
+ *  IT IS A STARTING POINT, NOT A CEILING FOR EVERYBODY. The bound belongs to
+ *  the host it is running on: a box that cuts at twenty thousand should cut at
+ *  twenty thousand, and one that carries fifty thousand should carry fifty
+ *  thousand. Taking the smallest figure measured across ALL known hosts made
+ *  every machine as slow as the tightest one ever seen.
+ *
+ *  SEEING A HOST OFFLOAD AN ANSWER MEANS THIS NUMBER IS TOO HIGH HERE. Climb
+ *  the ladder in guidance/method/boot.md and record what it settles at. */
+const UNMEASURED_DEFAULT = 20_000;
+
+/** The size no answer may exceed ON THIS MACHINE.
+ *
+ *  THE MEASURED FIGURE WINS, and it is read from disk by setAnswerSpill once
+ *  the session knows where it lives. Until then this is the starting point. */
+export let ANSWER_BOUND_BYTES = Math.min(OWN_CEILING, UNMEASURED_DEFAULT);
 
 /** THE ONE ANSWER THAT IS NEVER BOUND. The cap probe exists to find where the
  *  HOST cuts, so bounding it would measure our own ceiling instead. */
@@ -48,12 +73,45 @@ function capFile(seDir: string): string {
   return join(seDir, "harness-cap.json");
 }
 
-export function recordHostCap(seDir: string, cap: number): Record<string, unknown> {
+/** WHICH KIND OF PLACE THIS IS, rather than which machine.
+ *
+ *  A CONTAINER IS REBUILT FOR EVERY SESSION, so a key naming one machine never
+ *  finds its own entry and pays the ladder every time. The key is therefore a
+ *  CATEGORY wherever one can be found.
+ *
+ *  THE HARNESS AND THE PLATFORM ARE THE CATEGORY. Two runs of the same client
+ *  on the same kind of operating system cut an answer in the same place, and
+ *  nothing finer has ever been measured to differ. */
+export function hostCategory(clientName?: string): string {
+  const harness = harnessFor(clientName);
+  return `${harness?.id ?? "unknown"}/${process.platform}`;
+}
+
+interface CapFile {
+  /** The flat value, kept so a file written before categories still reads. */
+  inlineOutputBytes?: number;
+  /** What was measured, per category of host. */
+  hosts?: Record<string, number>;
+}
+
+function readCapFile(seDir: string): CapFile {
+  try {
+    return JSON.parse(readFileSync(capFile(seDir), "utf8")) as CapFile;
+  } catch {
+    return {};
+  }
+}
+
+export function recordHostCap(seDir: string, cap: number, category?: string): Record<string, unknown> {
   const clean = Math.max(2_000, Math.floor(cap));
+  const key = category ?? hostCategory();
+  const held = readCapFile(seDir);
+  const hosts = { ...(held.hosts ?? {}), [key]: clean };
   mkdirSync(seDir, { recursive: true });
-  writeFileSync(capFile(seDir), JSON.stringify({ inlineOutputBytes: clean }, null, 1), "utf8");
+  writeFileSync(capFile(seDir), JSON.stringify({ inlineOutputBytes: clean, hosts }, null, 1), "utf8");
   return {
     recorded: clean,
+    category: key,
     note: "the answer bound moves to this on the next engine start — se_reload puts it into effect now",
   };
 }
@@ -67,14 +125,27 @@ export function hostCapState(seDir: string): Record<string, unknown> {
   };
 }
 
-export function readHostCap(seDir: string): number | undefined {
-  try {
-    const raw = readFileSync(capFile(seDir), "utf8");
-    const n = (JSON.parse(raw) as { inlineOutputBytes?: unknown }).inlineOutputBytes;
-    return typeof n === "number" && n > 0 ? n : undefined;
-  } catch {
-    return undefined;
-  }
+/** WHAT WAS MEASURED FOR THIS KIND OF HOST, from the machine-local file first
+ *  and the committed registry second.
+ *
+ *  THE REGISTRY IS THE HALF THAT SURVIVES A FRESH CONTAINER. `.se/` dies with
+ *  the box, so a cloud run inherits nothing from the last one; the registry is
+ *  in version control and every clone reads the same answer. That is what lets
+ *  a category be measured once rather than once per session. */
+export function readHostCap(seDir: string, category?: string): number | undefined {
+  const key = category ?? hostCategory();
+  const held = readCapFile(seDir);
+  const mine = held.hosts?.[key];
+  if (typeof mine === "number" && mine > 0) return mine;
+  const flat = held.inlineOutputBytes;
+  if (typeof flat === "number" && flat > 0) return flat;
+  return registryCapFor(key);
+}
+
+/** True when nothing has ever measured this kind of host, which is the boot
+ *  step's whole question. */
+export function hostCapIsUnmeasured(seDir: string, category?: string): boolean {
+  return readHostCap(seDir, category) === undefined;
 }
 
 /** A first guess at what the envelope costs. The real cost is measured. */

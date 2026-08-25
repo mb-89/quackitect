@@ -21,6 +21,7 @@ import { test } from "node:test";
 import {
   isRegistrationCall,
   jobList,
+  killTree,
   openOperation,
   registrationExempt,
   releaseWorkspace,
@@ -38,19 +39,19 @@ const wait = (ms: number): Promise<void> => new Promise((r) => setTimeout(r, ms)
  *  there, and numbers are reused. */
 const open = openOperation;
 
-/** A child that outlives the case unless something kills it. */
+/** A child that outlives the case unless something kills it.
+ *
+ *  THE RUNTIME IS THE ONE PROGRAM EVERY HOST HAS. This used to spawn a POSIX
+ *  shell and sleep, which does not exist on Windows: four cases here failed
+ *  with a missing-file error on 2026-08-25, having never been run anywhere but
+ *  a linux container. The engine's own floor already requires this runtime, so
+ *  spawning it cannot be the thing that is absent. */
 function longChild(): { pid: number; stop: () => void } {
-  const c = spawn("/bin/bash", ["-c", "sleep 30"], { detached: true, stdio: "ignore" });
+  const c = spawn(process.execPath, ["-e", "setTimeout(() => {}, 30000)"], { detached: true, stdio: "ignore" });
   const pid = c.pid as number;
   return {
     pid,
-    stop: () => {
-      try {
-        process.kill(-pid, "SIGKILL");
-      } catch {
-        /* already gone */
-      }
-    },
+    stop: () => killTree(pid),
   };
 }
 
@@ -100,7 +101,7 @@ test("an entry whose process is alive and silent is left alone", async () => {
 // leaves its entry open until the next engine starts.
 test("a run that exits normally settles its own entry without waiting for a sweep", async () => {
   const root = freshRoot();
-  const c = spawn("/bin/bash", ["-c", "exit 0"], { detached: true, stdio: "ignore" });
+  const c = spawn(process.execPath, ["-e", "process.exit(0)"], { detached: true, stdio: "ignore" });
   try {
     // THE HANDLE, NOT THE NUMBER. Only the handle carries the exit CODE; a
     // number can say the process is gone and never how it went.
@@ -217,11 +218,17 @@ test("a workspace held by another process refuses the take by the bind itself", 
     assert.equal(taken.held, false, "a workspace another process holds cannot be taken");
     assert.match(String(taken.by), new RegExp(String(port)), "and the refusal names the port that is held");
   } finally {
-    try {
-      process.kill(-(holder.pid as number), "SIGKILL");
-    } catch {
-      /* already gone */
-    }
+    // WINDOWS HAS NO PROCESS GROUP, so killing the negated pid throws there and
+    // the holder survives every run. It keeps a port for ever, and it keeps
+    // THIS process's pipe to its stdout open, which is what stops the runner
+    // exiting once every case has passed.
+    //
+    // MEASURED 2026-08-25: the cases finished at 37 seconds and the run sat
+    // for another six minutes with no beat, twice, until it was killed by hand.
+    // The lane already owns a killer that works on both platforms.
+    killTree(holder.pid);
+    holder.stdout?.destroy();
+    holder.unref();
     releaseWorkspace(root);
     rmSync(root, { recursive: true, force: true });
   }

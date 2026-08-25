@@ -5,7 +5,7 @@ type: "[[raid]]"
 kind: debt
 statement: The consistency sweep was rewired to run after the demonstrations rather than beside them, because the walker cannot resume a fan leg once the leg it took was a submachine, so the method lost a parallel branch to get past an engine defect.
 owner: the owner
-looked: 2026-08-20
+looked: 2026-08-25
 status: open
 breaks_how_badly: corrosive
 how_likely: expected

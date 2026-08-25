@@ -32,11 +32,16 @@ export const HARNESSES: Harness[] = [
     id: "claude-code",
     clientNames: ["claude-code", "claude code", "claude-cli"],
     label: "Claude Code",
-    // No output-offload threshold has been seen to bite below the answer
-    // bound, and no stop-block ceiling exists. Both are absences that were
-    // looked for, which is why they are recorded rather than left blank.
-    limits: {},
-    measured: "spec/harness-portability.md, audit of 2026-08-18",
+    limits: {
+      // Climbed on a Windows desktop: 20,000 and 40,000 and 50,000 all arrived
+      // whole, 52,500 and above were written to disk and handed back as a
+      // preview. The cut therefore sits between 50,000 and 52,500, and the
+      // largest figure that survived is what is recorded.
+      inlineOutputBytes: 50_000,
+    },
+    // No stop-block ceiling exists. That is an absence somebody looked for,
+    // which is why it is recorded rather than left blank.
+    measured: "ladder climbed 2026-08-25 on Windows; earlier audit in spec/harness-portability.md, 2026-08-18",
   },
   {
     id: "copilot-cli",
@@ -59,6 +64,20 @@ export const HARNESSES: Harness[] = [
     measured: "not measured — behaviours recorded in cage/vscode-instructions.md, thresholds still owed",
   },
 ];
+
+/** WHAT WAS MEASURED FOR A CATEGORY OF HOST, from the committed registry.
+ *
+ *  THE REGISTRY IS THE HALF THAT SURVIVES A FRESH BOX. A machine-local file
+ *  dies with the container, so a category measured once and committed here is
+ *  what stops every cloud run paying the ladder again.
+ *
+ *  THE KEY IS `<harness id>/<platform>`, and a registry entry covers every
+ *  platform unless somebody measures them apart. */
+export function registryCapFor(category: string): number | undefined {
+  const id = category.split("/")[0];
+  const n = HARNESSES.find((h) => h.id === id)?.limits.inlineOutputBytes;
+  return typeof n === "number" && n > 0 ? n : undefined;
+}
 
 /** The harness a client name belongs to, or undefined when nothing matches.
  *

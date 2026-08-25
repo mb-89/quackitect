@@ -107,4 +107,9 @@ export const CLAUSES = {
   // does not declare it. A second surface accreted once over months and
   // nothing objected, because nothing could.
   UNREGISTERED_EMITTER: "SE-C-146",
+  // A SECOND RECORD OPENED WHILE ONE IS ALREADY HELD. One engine walks one
+  // record; wanting two at once means a second checkout. The refusal names
+  // what is held and the verb that sets it aside, so it has an exit that is
+  // neither finishing nor abandoning the work.
+  SECOND_RECORD_OPEN: "SE-C-147",
 } as const;

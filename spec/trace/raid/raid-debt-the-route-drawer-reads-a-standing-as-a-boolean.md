@@ -3,6 +3,7 @@ minted_in: i51-work-running-out-of-sight-reports-itself
 id: raid-debt-the-route-drawer-reads-a-standing-as-a-boolean
 type: "[[raid]]"
 kind: debt
+looked: 2026-08-25
 statement: "The route drawer asks whether a hop passes and receives a boolean, so a step whose leaving judgment is still being reached reads to it as failed rather than as deciding."
 owner: the driving agent
 trigger: a walk that redraws its route repeatedly while one long judgment is in flight
@@ -110,3 +111,13 @@ than the known cause.
 AND THE SIGNAL IS ONLY IN THE TAIL. At a five-second threshold there is no
 difference worth reporting. Repaying this may leave ordinary slowness exactly
 where it is.
+
+## Looked 2026-08-25 — the trigger fired and the fix held
+
+The trigger was a walk redrawing its route while one long judgment is in
+flight. That happened at the desk-preparation step of this session's start-up:
+five checks ran for several seconds and the walk pulled repeatedly against them.
+
+Every answer said the check was still running and named the previous run's
+output. None of them read the in-flight judgment as a failure, which is what
+this entry was about. Re-affirmed closed on live evidence.

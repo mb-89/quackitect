@@ -188,7 +188,9 @@ refusing, and the agent's pull is what moves.
 - QUOTE GENEROUSLY. The check asks whether your answer CONTAINS the words it
   wants, never whether it matches them exactly. Unsure? Paste the whole
   sentence.
-- PUNCTUATION IS NOT A WORD. Only tokens carrying a letter or a digit count.
+- PUNCTUATION NEVER COUNTS. Both sides are lowercased and stripped of every
+  character that is not a letter or a digit, inside a word too, so `stands,`
+  and `stands` are the same word.
   Quoting generously makes this stop mattering.
 - CASE AND SPACING ARE IGNORED.
 - A WRONG ANSWER NAMES EXACTLY WHICH PROBES MISSED, and the ones you got right

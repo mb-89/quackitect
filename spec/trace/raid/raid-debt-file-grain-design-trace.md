@@ -7,7 +7,7 @@ statement: The design-to-code sweep runs at file grain, so dead code inside a cl
 owner: the driving agent
 trigger: when the file-grain sweep stops finding anything new, or when a region-marker mechanism lands
 status: open
-looked: 2026-08-20
+looked: 2026-08-25
 impact: A dead function inside a live file never surfaces as an unclaimed finding, and only a reachability probe or a reader catches it.
 breaks_how_badly: corrosive
 how_likely: plausible

@@ -7,7 +7,7 @@ statement: Ten verification checks and two boundary timings cannot be answered b
 owner: the owner
 trigger: when the work-token system can carry a task to a person; or at the first verification after 2026-10-01, whichever comes first
 status: open
-looked: 2026-08-20
+looked: 2026-08-25
 impact: A check nobody can run is marked owed every iteration and eventually stops being read, which is how four factual errors sat in the README while its own inspection was marked owed.
 breaks_how_badly: abrasive
 how_likely: expected

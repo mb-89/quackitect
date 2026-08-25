@@ -18,11 +18,16 @@ import { freshRoot } from "./helpers.ts";
 
 const HOOK = fileURLToPath(new URL("../engine/bin/se-hook-stop.ts", import.meta.url));
 
-/** Run the hook against a crafted root, feeding the stop payload. */
-function verdict(records: object[], payload: object): string {
+/** Run the hook against a crafted root, feeding the stop payload.
+ *
+ *  `mode` writes the settings file the hook reads to learn whether anybody is
+ *  there to read a claim. Omitted, no settings file is written at all, which
+ *  is the case a real session must survive. */
+function verdict(records: object[], payload: object, mode?: string): string {
   const root = mkdtempSync(join(tmpdir(), "se-stop-"));
   mkdirSync(join(root, ".se"), { recursive: true });
   writeFileSync(join(root, ".se", "calls.jsonl"), `${records.map((r) => JSON.stringify(r)).join("\n")}\n`, "utf8");
+  if (mode !== undefined) writeFileSync(join(root, ".se", "settings.json"), JSON.stringify({ mode }), "utf8");
   const r = spawnSync(process.execPath, [HOOK], {
     input: JSON.stringify(payload),
     encoding: "utf8",
@@ -109,9 +114,33 @@ test("stop @ blockers only passes a REFUSED pull and blocks a working one", () =
   const d = JSON.parse(verdict([working], {})) as { decision: string; reason: string };
   assert.equal(d.decision, "block");
   assert.match(d.reason, /blockers only/);
-  const afterBlock = JSON.parse(verdict([refused, working], { stop_hook_active: true })) as { decision: string; reason: string };
+  // UNATTENDED IS WHERE THE NOTCH HOLDS THE VALVE SHUT. Nobody reads a claim
+  // there, so a second attempt must not end a run that can still walk.
+  const afterBlock = JSON.parse(verdict([refused, working], { stop_hook_active: true }, "unattended")) as {
+    decision: string;
+    reason: string;
+  };
   assert.equal(afterBlock.decision, "block");
   assert.match(afterBlock.reason, /blockers only/);
+});
+
+// ATTENDED, THE VALVE STILL RELEASES, and this case is why the rule turns on
+// attendance rather than on the notch. MEASURED 2026-08-25: an attended
+// session at this notch presented a plan and could not end its turn. The
+// tooth's own refusal invites the agent to name a sanctioned stop and stop
+// again, and the notch alone made that invitation impossible to accept.
+test("stop @ blockers only still bites ONCE where a person is reading", () => {
+  const working = pullRecord({ pull: "do", where: ["retro"], stop_at: "blockers only" });
+  const first = JSON.parse(verdict([working], {}, "attended")) as { decision: string };
+  assert.equal(first.decision, "block", "the first attempt always blocks and prints the sanctioned stops");
+  assert.equal(verdict([working], { stop_hook_active: true }, "attended"), "", "the second attempt carries the claim and gets through");
+});
+
+test("with no settings file the session counts as attended", () => {
+  // A MISSING FILE MUST NOT SILENTLY MAKE A SESSION UNATTENDED. An attended
+  // laptop is the ordinary case and it writes no mode on some paths.
+  const working = pullRecord({ pull: "do", where: ["retro"], stop_at: "blockers only" });
+  assert.equal(verdict([working], { stop_hook_active: true }), "", "absent attendance reads as present");
 });
 
 test("a wait WITH A TARGET blocks — an escape does not launder a stop", () => {

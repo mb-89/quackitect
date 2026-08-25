@@ -373,6 +373,21 @@ export function expeditionTools(session: Session): ToolDef[] {
         ),
     },
     {
+      name: "se_park",
+      title: "se.park",
+      description:
+        "SET THE OPEN RECORD ASIDE, so another can be entered. One engine walks one record; wanting two at once means a second checkout.\n\nIT IS NOT A VERDICT. Shipping would claim gates that never happened and abandoning would say the work is no longer wanted. Parking says neither: entering the record again resumes it exactly as it was, with every signature standing.\n\nTHE REASON IS RECORDED on the record itself, so the archive shows why it was set down.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          id: { type: "string", description: "the record to set aside; omit to park whichever one is held" },
+          why: { type: "string", description: "why it is being set down, in one line" },
+        },
+        required: ["why"],
+      },
+      handler: (args) => session.recordPark(args.id === undefined ? undefined : String(args.id), String(args.why)),
+    },
+    {
       name: "se_exp_close",
       title: "se.exp.close",
       description:

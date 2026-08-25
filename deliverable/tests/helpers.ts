@@ -357,7 +357,12 @@ export async function creditReading(
 ): Promise<void> {
   let previous = -1;
   for (let round = 0; round < 60; round++) {
-    const r = await call(server as never, "se_file_read", { path: ".se/reading.md", offset: 1, limit: 400 });
+    // A WIDE PAGE, because the cost here is the number of ROUNDS and not the
+    // size of one. The surface shrinks as it is credited, so a narrow page is
+    // re-read from the top many times over. MEASURED 2026-08-25: this setup is
+    // paid once per case and clear-jump.test.ts spent 85 seconds on 8 cases,
+    // a fifth of the whole battery's floor.
+    const r = await call(server as never, "se_file_read", { path: ".se/reading.md", offset: 1, limit: 5000 });
     const body = r.body as { content?: string; total_lines?: number };
     if (typeof body.content !== "string") break;
     const lines = body.total_lines ?? 0;

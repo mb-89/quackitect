@@ -17,10 +17,20 @@ const SE = mkdtempSync(join(tmpdir(), "se-bound-"));
 /** An answer far past the bound, shaped like the scenario deck that caused it. */
 const oversized = (): unknown => ({ rows: Array.from({ length: 20_000 }, (_, i) => `row ${i} of a scenario deck`) });
 
+// THE BOUND BELONGS TO THE MACHINE IT RUNS ON (owner ruling). A box that cuts
+// at twenty thousand should cut there, and one that carries fifty thousand
+// should carry fifty thousand. The figure below is the STARTING POINT for a
+// machine nobody has climbed a ladder on, not a ceiling for everybody.
+//
+// THE TRADEOFF, STATED RATHER THAN HIDDEN. This assertion used to demand 6,000
+// or less, because one host was seen offloading at 8 KB. An unmeasured host
+// that behaves that way will now offload until somebody measures it, and the
+// ladder in guidance/method/boot.md is the answer: a host writing an answer to
+// disk is the trigger to climb, once.
 test("the engine declares a bound for an answer", () => {
   assert.equal(typeof ANSWER_BOUND_BYTES, "number");
   assert.equal(ANSWER_BOUND_BYTES > 0, true, "a bound of zero would send nothing at all");
-  assert.equal(ANSWER_BOUND_BYTES <= 6_000, true, "the bound must beat the 8 KB host offload observed in i36");
+  assert.equal(ANSWER_BOUND_BYTES, 20_000, "the starting point for a machine nobody has measured");
 });
 
 test("an answer within the bound is returned whole", () => {

@@ -42,6 +42,10 @@ export interface Iteration {
   branch: string;
   path: string;
   open: boolean;
+  /** The record's own status word, carried rather than re-read. The listing
+   *  already reads it to work out `open`, and a caller asking a second time
+   *  would open the same file again for a value it was just handed. */
+  status: string;
   /** Whether the seed's stub push reached the remote in the seeding act. */
   announced?: boolean;
 }
@@ -101,7 +105,7 @@ export function itList(root: string): Iteration[] {
     const abs = join(dir, id, "record.md");
     if (!existsSync(abs)) continue;
     const status = String(noteOf(abs)?.frontmatter.status ?? "");
-    out.push({ id, branch: `it/${id}`, path: root, open: !RECORD_FINISHED.has(status) });
+    out.push({ id, branch: `it/${id}`, path: root, open: !RECORD_FINISHED.has(status), status });
   }
   out.sort((a, b) => Number(a.id.match(/^i(\d+)/)?.[1] ?? 0) - Number(b.id.match(/^i(\d+)/)?.[1] ?? 0));
   if (pass !== 0) IT_LIST.set(key, { pass, list: out });
@@ -182,7 +186,7 @@ export function itSeed(root: string, goal: string, vision: string, inputs: strin
   );
   git(root, ["add", "--", itRecordRel(id)], "add");
   git(root, ["commit", "-q", "-m", `iteration ${id}: seed`, "--", itRecordRel(id)], "commit");
-  return { id, branch: `it/${id}`, path: root, open: true };
+  return { id, branch: `it/${id}`, path: root, open: true, status: "seeded" };
 }
 
 export function itFind(root: string, id: string): Iteration {
@@ -206,16 +210,79 @@ export function itFind(root: string, id: string): Iteration {
   return it;
 }
 
+/** THE RECORD THIS ENGINE IS HOLDING, if any.
+ *
+ *  ONE ENGINE WALKS ONE RECORD. Wanting two at once means a second checkout,
+ *  and that is the owner's ruling rather than a limitation. A record that has
+ *  been set aside is not held, which is what makes the refusal below survivable
+ *  without finishing or abandoning anything. */
+export function heldRecord(root: string): Iteration | undefined {
+  return itList(root).find((x) => x.status === "open");
+}
+
 /** First entry stamps `started:` — from then on the needs-retro gate no
- *  longer holds this iteration (re-entering running work is never blocked). */
+ *  longer holds this iteration (re-entering running work is never blocked).
+ *
+ *  IT ALSO REFUSES A SECOND OPEN RECORD, and resumes one that was set aside. */
 export function markStarted(_root: string, it: Iteration): void {
   const recAbs = join(it.path, itRecordRel(it.id));
   if (!existsSync(recAbs)) return;
+  const held = heldRecord(it.path);
+  if (held !== undefined && held.id !== it.id) {
+    throw new Rejection({
+      clause: CLAUSES.SECOND_RECORD_OPEN,
+      expected: `no other record open — ${held.id} is held`,
+      got: it.id,
+      remedy: {
+        tool: "se_park",
+        args: { id: held.id, why: "<why it is being set aside>" },
+        note: "set the held record aside first, then enter this one. Two at once means a second checkout of the repository.",
+      },
+      source: SRC,
+    });
+  }
   const raw = readFileSync(recAbs, "utf8");
+  // RESUMING ONE THAT WAS SET ASIDE. It already carries `started:`, so the
+  // early return below would leave it parked while the walk stood inside it.
+  if (/^status: parked$/m.test(raw)) {
+    writeFileSync(recAbs, raw.replace(/^status: parked$/m, "status: open"), "utf8");
+    git(it.path, ["add", "-A"], "add");
+    git(it.path, ["commit", "-q", "-m", `iteration ${it.id}: resumed`], "commit");
+    return;
+  }
   if (/^started: /m.test(raw)) return;
   writeFileSync(recAbs, raw.replace(/^status: seeded$/m, `status: open\nstarted: ${new Date().toISOString()}`), "utf8");
   git(it.path, ["add", "-A"], "add");
   git(it.path, ["commit", "-q", "-m", `iteration ${it.id}: started`], "commit");
+}
+
+/** SET A RECORD ASIDE without finishing or abandoning it.
+ *
+ *  THE REFUSAL ABOVE NEEDS AN EXIT THAT IS NOT A VERDICT. Shipping claims
+ *  gates that never happened and abandoning says the work is no longer wanted;
+ *  parking says neither, and the record comes back exactly as it was. */
+export function parkRecord(root: string, id: string, why: string): Record<string, unknown> {
+  const it = itFind(root, id);
+  const recAbs = join(it.path, itRecordRel(it.id));
+  const raw = readFileSync(recAbs, "utf8");
+  if (!/^status: open$/m.test(raw)) {
+    throw new Rejection({
+      clause: CLAUSES.SECOND_RECORD_OPEN,
+      expected: "a record that is open — only an open one can be set aside",
+      got: `${id} is ${it.status || "unreadable"}`,
+      remedy: { tool: "se_survey", args: {}, note: "the survey lists what stands open" },
+      source: SRC,
+    });
+  }
+  const parked = raw.replace(/^status: open$/m, "status: parked").replace(/^---$/m, "---");
+  writeFileSync(
+    recAbs,
+    parked.includes("parked_why:") ? parked : parked.replace(/^status: parked$/m, `status: parked\nparked_why: ${JSON.stringify(why)}`),
+    "utf8",
+  );
+  git(it.path, ["add", "-A"], "add");
+  git(it.path, ["commit", "-q", "-m", `iteration ${it.id}: parked`], "commit");
+  return { parked: it.id, why, note: "another record may be entered now; entering this one again resumes it exactly as it was" };
 }
 
 export function itPinRel(id: string): string {

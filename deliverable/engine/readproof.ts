@@ -75,9 +75,22 @@ export function readingProbes(body: string): { ask: string[]; expect: string[] }
   return { ask, expect };
 }
 
-/** see dsp-walk-machine.md#the-comparison-rule */
+/** THE ONE NORMALISER, AND BOTH SIDES GO THROUGH IT.
+ *
+ *  Lowercase, then drop every character that is not a letter or a digit. A
+ *  word keeps only its letters and digits, and the runs are compared on that.
+ *
+ *  WHY IT STRIPS INSIDE A WORD AND NOT ONLY BETWEEN WORDS. The tokeniser
+ *  keeps punctuation attached, so "stands," and "stands" were different words
+ *  to the check while the hint told the reader punctuation does not count.
+ *  The reader answered correctly and was refused.
+ *
+ *  see dsp-walk-machine.md#the-comparison-rule */
 export function normWords(s: string): string {
-  return readingWords(s).join(" ").toLowerCase();
+  return readingWords(s)
+    .map((x) => x.toLowerCase().replace(/[^\p{L}\p{N}]/gu, ""))
+    .filter((x) => x !== "")
+    .join(" ");
 }
 
 /** Which probes an answer did NOT satisfy. Empty means the reading is proven. */

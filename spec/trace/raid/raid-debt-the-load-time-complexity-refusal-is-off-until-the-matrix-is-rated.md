@@ -3,6 +3,7 @@ minted_in: i38-the-machine-sizes-its-own-driver-every-s
 id: raid-debt-the-load-time-complexity-refusal-is-off-until-the-matrix-is-rated
 type: "[[raid]]"
 kind: debt
+looked: 2026-08-25
 statement: "The engine refuses a missing complexity at the point of use rather than when the matrix is loaded, because turning the load-time refusal on before the 154 active cells are rated would make the product unloadable."
 owner: the owner
 trigger: "the matrix owner rating the cells, and any reader who takes req-every-matrix-row-declares-its-complexity at its word"

@@ -6,7 +6,7 @@ kind: debt
 statement: The owner authorised a push out loud and the lane refuses every push without exception, so i16 and its merge with i17 stand committed on the local v3 and reach nobody until a person runs one command.
 owner: the owner
 status: closed
-looked: 2026-08-19
+looked: 2026-08-25
 breaks_how_badly: corrosive
 how_likely: expected
 impact: "Nine commits sit ahead of origin/v3, including the whole of i16 and a 49-commit merge that resolved 35 conflicts and renumbered a clause. None of it is visible to another machine or another person. A second agent starting from origin gets a tree where SE-C-143 does not exist and i16 never happened, and would mint over the same numbers again."

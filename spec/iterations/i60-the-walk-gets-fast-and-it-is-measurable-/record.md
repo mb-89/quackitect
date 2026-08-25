@@ -2,7 +2,6 @@
 id: i60-the-walk-gets-fast-and-it-is-measurable-
 status: shipped
 closed: 2026-08-24T20:08:36.025Z
-retro_owed: 2026-08-24T20:08:36.025Z
 carried_count: 5
 carried:
   - the surface answers no worse while the engine is busy — raid-iss-the-surface-row-has-no-harness-that-could-fail-it (observe-red.md)

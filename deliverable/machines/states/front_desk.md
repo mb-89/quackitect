@@ -53,9 +53,11 @@ guidance: |
   person plainly that a message from them - continue is enough - resumes you.
   The dial alone cannot wake a stopped agent.
 
-  END THE SESSION with form {choice "end"} when the person says it is done. Do
-  the same at shutdown level 4 (end-on-done) or 5 (power-off-on-done) with
-  nothing left to do - end deliberately, and say why.
+  END THE SESSION with form {choice "end"} when the person says it is done.
+
+  DO THE SAME WHEN THE SHUTDOWN-AT-IDLE TOGGLE IS SET and nothing is left to
+  do - end deliberately, and say why. That toggle and the block-sleep one are
+  the whole control; there is no numbered scale behind them.
 
   SMALL FIXES THE OWNER ORDERS IN CHAT run directly from here, with no
   expedition, while the project stays pre-ledger (owner ruling 2026-07-27).

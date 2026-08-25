@@ -3,6 +3,7 @@ minted_in: i15-the-database-our-own-reader-over-obsidia
 id: raid-debt-i15-gate-implementation-reached-with-five-goals-unbuilt
 type: "[[raid]]"
 kind: debt
+looked: 2026-08-25
 statement: gate-implementation was reached and filled honestly while five of the kickoff's seven goals (lane-tool registration for both verbs, the v1 harvest, the subset extension, conformance fixtures, and the delta-default resolver fix) were never seeded as build-chunk work, and lint/complexity were not run against the two files that were built.
 owner: the driving agent
 trigger: specify-build is reopened to seed the five missing chunks, or the owner rules the scope out of this iteration
@@ -21,3 +22,18 @@ Reopen specify-build and seed five chunks: (1) register both verbs on the lane's
 ## Closed 2026-08-19
 
 All five chunks landed: se_query and se_couplings are both registered lane tools (engine/tools-query.ts), tested green. The 25 .base files and the ADR are harvested at spec/queries/ and spec/decisions/adr-query-in-engine.md. The pinned subset was extended test-first (file.inFolder, and readVault's file.hasTag wiring to real notes). Conformance fixtures pin five filter/sort shapes mirroring the harvested files. raid-debt-delta-default-views's $-item resolvers now default to the bound record (partial repayment, tracked separately — that debt stays open on its own terms). Both interface entries are minted. Lint (biome check) and the whole battery ran clean: 1492/1492 green.
+
+## Looked 2026-08-25 — closed here, and the same shape came back
+
+FIRST DATED LOOK. This entry had never been re-read.
+
+THE SHAPE RECURRED IN i61. A round reached its gates with the aims of its own
+record untouched, and every gate passed. The reason it passed is that the
+review compares against the aims list written at the opening checkpoint, not
+against the reason the record was opened for, and that list had been replaced
+with four unrelated aims sixteen minutes in.
+
+SO CLOSING THIS ENTRY DID NOT PREVENT THE RECURRENCE, because the entry was
+about one round and the cause is in the mechanism. The mechanism fix is a work
+token of its own: a second hand reviews the opening checkpoint, and it refuses
+an aims list that does not serve what the record was opened for.

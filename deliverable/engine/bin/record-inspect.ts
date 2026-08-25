@@ -103,9 +103,9 @@ const SKIP = new Set([".git", ".worktrees", "node_modules", "dist", "scratchpad"
 
 /** ITEM 13 — no field report is in version control.
  *
- *  THE FIELD REPORT IS PRIVATE DATA (owner ruling 2026-08-21). It is written
- *  for one person, it is not a corpus document, and it is delivered as a file
- *  the person downloads rather than as something the repository keeps.
+ *  THE FIELD REPORT IS PRIVATE DATA. It is written for one person, it is not a
+ *  corpus document, and it is delivered as a file the person downloads rather
+ *  than as something the repository keeps.
  *
  *  WHY IT IS A CHECK AND NOT A SENTENCE. The rule is stated in the contract
  *  and twice in the cloud-runner card, and two reports were committed anyway —
@@ -121,7 +121,9 @@ function noFieldReportIsInVersionControl(): void {
         if (!SKIP.has(entry.name)) walk(join(dir, entry.name));
         continue;
       }
-      if (!/^field-report.*\.md$/i.test(entry.name)) continue;
+      // THE SPELLING ON DISK, not the one in the author's head: a pattern
+      // demanding the hyphen misses every file that omits it.
+      if (!/^field[-_ ]?report.*\.md$/i.test(entry.name)) continue;
       const where = relative(root, join(dir, entry.name));
       findings.push(
         `item 13 · ${where} — a field report is private data and never goes in version control. Move it to ${REPORT_HOME}/field-report.md, which is gitignored, and hand it to the person as a downloadable file.`,

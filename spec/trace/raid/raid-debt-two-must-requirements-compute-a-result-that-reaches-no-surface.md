@@ -3,6 +3,7 @@ minted_in: i36
 id: raid-debt-two-must-requirements-compute-a-result-that-reaches-no-surface
 type: "[[raid]]"
 kind: debt
+looked: 2026-08-25
 statement: The stopping-layer diagnosis and the recurring-failure-shape detector are built and tested, but no production path calls either, so neither requirement's promised report actually reaches anyone.
 owner: the driving agent
 trigger: the next iteration that opens the lane's reporting surfaces

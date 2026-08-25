@@ -12,6 +12,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { benchmarkNoteHops } from "./benchmark.ts";
+import { hostCapIsUnmeasured } from "./bound.ts";
 import { takeCompacted } from "./compaction.ts";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { contentHash } from "./hash.ts";
@@ -89,6 +90,7 @@ import {
 } from "./forms.ts";
 import { appendNote, drainNote } from "./inbox.ts";
 import {
+  heldRecord,
   type Iteration,
   itFind,
   itList,
@@ -97,6 +99,7 @@ import {
   itSeed,
   itShortId,
   markStarted,
+  parkRecord,
   pinIteration,
   readItRecord,
 } from "./iterations.ts";
@@ -698,6 +701,10 @@ export class Session {
           // step whose whole job is to hand over the right documents.
           at: this.isBooted() ? (this.active()[0] ?? "") : "",
           stop_at: this._stopAt,
+          // WHETHER ANYBODY IS THERE TO READ A CLAIM. The stop tooth invites
+          // the agent to name which sanctioned stop it is and stop again, and
+          // that invitation only means something where a person reads it.
+          mode: this._sessionMode,
         })}\n`,
         "utf8",
       );
@@ -1139,6 +1146,23 @@ export class Session {
     const it = itSeed(this.machineRoot(), goal, vision, inputs, dependsOn);
     this.bumpGeneration(); // a new record changes what the container expands to
     return { seeded: it.id, branch: it.branch, note: "it stands in the iterations container as its kickoff" };
+  }
+
+  /** SET THE HELD RECORD ASIDE so another can be entered.
+   *
+   *  NAMING NOTHING PARKS WHATEVER IS HELD, because that is the case the
+   *  refusal points at and asking the agent to repeat an id it was just given
+   *  is bookkeeping the engine can carry. */
+  recordPark(id: string | undefined, why: string): Record<string, unknown> {
+    const root = this.machineRoot();
+    const target = id ?? heldRecord(root)?.id;
+    if (target === undefined) {
+      return { parked: null, note: "no record is open, so there is nothing to set aside" };
+    }
+    const out = parkRecord(root, target, why);
+    if (this.bound?.id === target) this.bound = undefined;
+    this.bumpGeneration();
+    return out;
   }
 
   /** ENTERING AN ITERATION BINDS IT AND STAMPS IT STARTED. That is all it
@@ -2506,6 +2530,13 @@ export class Session {
         id: this.inSub() ? `${machine.id}/${s.id}` : s.id,
         ...(s.statement !== "" ? { statement: s.statement } : {}),
         guidance: s.guidance,
+        // THE ONE STANDING CONDITION A PULL CARRIES, and it clears itself the
+        // moment somebody measures it, so it cannot turn into wallpaper. An
+        // unmeasured host is bounded by a cautious guess, which cost one
+        // measured session 208 of its 549 reads.
+        ...(hostCapIsUnmeasured(seDir(this.machineRoot()))
+          ? { answer_limit: "unmeasured for this kind of host — climb it with se_probe_cap before the rest of the walk" }
+          : {}),
         legal_tools: s.kind === "start" || s.kind === "end" || s.kind === "join" ? [...MACHINERY] : (s.legal_tools ?? []),
         ...(s.evidence_form.length > 0
           ? {
@@ -2765,7 +2796,7 @@ export class Session {
               // pendingRead survives a wrong answer — only a correct one clears it.
               note: `${this.readMissed.length} of ${this.reads.serving()?.expect.length ?? 0} probe(s) were not answered — here is the document again`,
               missed: this.readMissed,
-              hint: "QUOTE MORE, NOT LESS. The check asks whether your answer CONTAINS each expected run, never whether it matches exactly, so pasting the whole sentence around the anchor always passes. Punctuation is not a word: a dash or a bullet between two words is skipped when the engine counts, which is the usual reason a careful four-word answer misses. Case and line breaks are flattened before comparing.",
+              hint: "QUOTE MORE, NOT LESS. The check asks whether your answer CONTAINS each expected run, never whether it matches exactly, so pasting the whole sentence around the anchor always passes. BOTH SIDES ARE NORMALISED THE SAME WAY, and this is exactly what it does: lowercase everything, then delete every character that is not a letter or a digit. Commas, dashes, quotes, brackets and bullets all vanish, inside a word as well as between words, so you never have to reproduce them.",
             }
           : {}),
         do: 'read the WHOLE document, then pull again answering every probe in `prove` as form: {"read": "<the answers, in one string>"}',

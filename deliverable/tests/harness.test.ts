@@ -35,10 +35,19 @@ describe("the harness registry", () => {
   });
 
   test("an unmeasured limit is absent, never zero and never a pretend ceiling", () => {
-    const claude = HARNESSES.find((h) => h.id === "claude-code");
-    assert.ok(claude !== undefined);
-    assert.equal(claude.limits.inlineOutputBytes, undefined, "absent means nobody measured it");
+    // THE HOST NOBODY HAS CLIMBED A LADDER ON. Claude Code used to be this
+    // case; a ladder settled it, so the absence has to be shown somewhere it
+    // is still true rather than quietly deleted.
+    const vscode = HARNESSES.find((h) => h.id === "vscode-copilot");
+    assert.ok(vscode !== undefined);
+    assert.equal(vscode.limits.inlineOutputBytes, undefined, "absent means nobody measured it");
     const cli = HARNESSES.find((h) => h.id === "copilot-cli");
     assert.equal(cli?.limits.stopBlockCeiling, 8, "the CLI overrides the stop hook after eight blocks");
+  });
+
+  test("a host somebody climbed a ladder on carries the figure it settled at", () => {
+    const claude = HARNESSES.find((h) => h.id === "claude-code");
+    assert.ok(claude !== undefined);
+    assert.equal(claude.limits.inlineOutputBytes, 50_000, "the largest payload that arrived whole");
   });
 });

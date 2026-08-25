@@ -6,8 +6,8 @@ kind: debt
 statement: This iteration ships its bootstrap without validating it on a genuinely fresh machine, because the machine walking it cannot produce one.
 owner: the owner
 trigger: the first cloud run after this iteration ships
-status: mitigated
-looked: 2026-08-20
+status: closed
+looked: 2026-08-25
 impact: The acceptance criterion is that a fresh machine, a seed id and one command produce a walking agent. Everything else can be verified here; the freshness cannot. So the criterion is proven in parts and not end to end, and a step that only fails on a clean host stays undetected until somebody uses one.
 breaks_how_badly: corrosive
 how_likely: expected
@@ -165,3 +165,11 @@ re-asked.
 THE TRIGGER IS NARROWED, not dropped: a cloud run on a host this project has
 not run on before.
 
+
+## Looked 2026-08-25 — the trigger fired and it held
+
+The trigger was the first cloud run after this shipped. It happened: i62 was
+walked start to finish on a linux cloud container and shipped from there.
+
+The fresh machine produced a walking agent, so the criterion this entry said
+could only be proven in parts is now proven end to end. Closed.

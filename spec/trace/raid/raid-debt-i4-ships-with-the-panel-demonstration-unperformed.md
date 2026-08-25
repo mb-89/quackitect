@@ -5,7 +5,7 @@ type: "[[raid]]"
 kind: debt
 statement: The one demonstration this round owes watches a person browse the panel, and it was not performed, so the round ships with the claim about its own subject standing on a drawing rather than on an observation.
 owner: the owner
-looked: 2026-08-24
+looked: 2026-08-25
 status: open
 breaks_how_badly: serious
 how_likely: expected

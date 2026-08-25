@@ -5,7 +5,7 @@ type: "[[raid]]"
 kind: debt
 statement: The four demonstrations this iteration authored are drawn and none of them has been performed, so the iteration ships with every claim that needs a person watching standing on a drawing rather than on an observation.
 owner: the owner
-looked: 2026-08-20
+looked: 2026-08-25
 status: open
 breaks_how_badly: crippling
 how_likely: expected

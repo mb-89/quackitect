@@ -7,7 +7,7 @@ statement: The core and satellite cluster is built and tested, and nothing the r
 owner: the driving agent
 trigger: when the run mode is first flipped away from inline, or at the code-review iteration
 status: open
-looked: 2026-08-20
+looked: 2026-08-25
 impact: A whole subsystem drifts from the engine it is meant to carry, and its green tests read as proof it works.
 breaks_how_badly: corrosive
 how_likely: expected
