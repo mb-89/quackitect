@@ -193,14 +193,20 @@ design half.
   is their view.
 
 THE TRACE IS COMPLETE, ON TWO PATHS (owner ruling 2026-08-10: a trace with
-residue cannot show the changes). Most requirements reach the structure
-TRANSITIVELY — served by functions, implemented by elements — and no
-requirement id is written onto structure for that path. A requirement the
-function chain cannot carry — a structural quality answered by the SHAPE,
-an imposed constraint binding a choice — is named DIRECTLY by the element
-or interface that answers it, in `satisfies`. The union is the law: every
-requirement reached by one path or the other, zero unreached. Perturb any
-node and the affected cone is in the graph, whole.
+residue cannot show the changes).
+
+MOST REQUIREMENTS REACH THE STRUCTURE TRANSITIVELY — served by functions,
+implemented by elements — and no requirement id is written onto structure
+for that path.
+
+A REQUIREMENT THE FUNCTION CHAIN CANNOT CARRY is named DIRECTLY by the
+element or interface that answers it, in `satisfies`. That covers a
+structural quality answered by the SHAPE, and an imposed constraint binding
+a choice.
+
+THE UNION IS THE LAW: every requirement reached by one path or the other,
+zero unreached. Perturb any node and the affected cone is in the graph,
+whole.
 
 ## Each edge's key is the frontmatter it lives under
 
@@ -288,7 +294,9 @@ THE FILES ARE REALIZATION, NOT TRACE — the same law as test specs. A
 spec's `files:` names the code it lands in. The seam is checked
 MECHANICALLY and outside the graph, at trace-design:
 
-- every design spec names files that exist BY THE END OF THE RECORD THAT AUTHORED IT. A planned name is legal while the spec is being written; it may not survive the record unrealised. Corrected 2026-08-19, where it read "names files that exist" and contradicted both the item card and the engine.
+- every design spec names files that exist BY THE END OF THE RECORD THAT AUTHORED IT.
+  - A planned name is legal while the spec is being written.
+  - It may not survive the record unrealised.
 - every deliverable code file is claimed by at least one spec — the
   unclaimed list is the dead-code view
 

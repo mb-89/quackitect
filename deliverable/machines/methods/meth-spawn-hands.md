@@ -22,13 +22,18 @@ where the review actually happens. A RESEARCHER, spawned at whichever state
 the work actually asks for research. Nothing else spawns.
 
 A SPAWN STATE STARTS THE WALKER, and that is ALL it starts (owner ruling
-2026-08-23). This card used to say a gate later in the phase "gets a reviewer
-with no shared context" — written here, at the spawn state. That read as the
-reviewer being named or readied early, and it was wrong. THE REVIEWER SPAWNS
-AT THE GATE, when the review actually happens, never before it. A researcher
-spawns the same way: at the state doing the research, never up front. Each
-row's own gate or research state registers its own hand when it gets there —
-this state registers the walker and nothing else.
+2026-08-23).
+
+WHAT IT USED TO SAY. That a gate later in the phase "gets a reviewer with no
+shared context" — written here, at the spawn state. That read as the reviewer
+being named or readied early, and it was wrong.
+
+THE REVIEWER SPAWNS AT THE GATE, when the review actually happens, never
+before it. A researcher spawns the same way: at the state doing the research,
+never up front.
+
+Each row's own gate or research state registers its own hand when it gets
+there. This state registers the walker and nothing else.
 
 THE WALKER MAY DIFFER PER MILESTONE. It reads the guidance for its own phase,
 and its rung comes from that milestone — that variation is the reason this

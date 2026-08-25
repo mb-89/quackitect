@@ -1,6 +1,6 @@
 <!-- GENERATED at agent start. Do not edit — the next start overwrites it.
-     from guidance/contract.md c779bb4e75f5
-     from guidance/walking.md 834b1f2efe4a
+     from guidance/contract.md 84d970810e6e
+     from guidance/walking.md dac641db0f4d
      from guidance/method/lane.md 3881abeb4b1a
      from guidance/voice.md 2bbb7751a28c
 -->
@@ -140,6 +140,23 @@ TWO QUESTIONS ARE THE EXCEPTION.
   retro needs no answer, so do that while the answer is owed.
 - A PLAN IS A SANCTIONED STOP, BEFORE IT IS ACTED ON. See rule 9.
 
+CLAIMING A STOP IS A CALL. `se_stop {because}` names which of them applies and
+why, and it is what actually releases the turn.
+
+SAYING IT IN CHAT PROVES NOTHING. The tooth that refuses a stop reads the call
+log and cannot read your message, so a sentence naming a sanctioned stop was
+only ever addressed to the person.
+
+THE ORDER IS: BE REFUSED, THEN FORCE. A force before the refusal does nothing,
+which is what stops it becoming the ordinary way to end a turn.
+
+ONE FORCE RELEASES ONE STOP, and the next pull spends it.
+
+THIS USED TO HAPPEN BY ITSELF, and that was the defect. The harness sets a flag
+when it retries a blocked stop, the valve read that flag as a claim, and every
+second attempt went through with nothing named. Measured on one session: four
+blocks, four immediate releases.
+
 RULES 6 AND 7 MEET AT THE START OF WORK. Confirm an ambiguous intent before you
 begin; once begun, carry on.
 
@@ -188,8 +205,11 @@ THE TWO ARE NOT THE SAME THING, which is why both halves stand.
 - The field report is for the PERSON, and nothing replaces it.
 
 WHAT GOES IN IT: everything that cannot be mapped onto the repository.
-Improvements you found, what fought you, what you struggled with, and anything
-you could not give a home in git.
+
+- Improvements you found.
+- What fought you.
+- What you struggled with.
+- Anything you could not give a home in git.
 
 WHY IT CANNOT BE SKIPPED: notes are machine-local and die with the container.
 The report is the channel that reaches a person, so an unwritten one throws
@@ -586,6 +606,21 @@ a call: the machine forced the hop and no judgment happened on it. The minutes
 clock still runs, and a pull carrying evidence beside the proof pays like any
 other work.
 
+## Stopping, and looking at the surface
+
+THREE VERBS ARE LEGAL WHEREVER THE WALK STANDS, because none of them is a move.
+
+- `se_stop {because}` FORCES A STOP THE TOOTH REFUSED. Name which sanctioned
+  stop applies and why. It changes nothing about the walk; only the turn ends.
+  - THE TOOTH MUST HAVE BITTEN FIRST. A force before the refusal does nothing.
+  - ONE FORCE RELEASES ONE STOP, and the next pull spends it.
+  - SAYING IT IN CHAT PROVES NOTHING. The tooth reads the call log.
+- `se_surface` PRINTS THE PERSON'S SURFACE AS TEXT — where the walk stands, the
+  dials, what is legal here, every state with its marks. This is the everyday
+  way to see it, and it needs nobody's permission.
+- `se_shoot` DRAWS THE SURFACE AS A PICTURE, for a question about LAYOUT. It
+  looks at a screen, so ask the person each time (rule 10).
+
 ## Notes
 
 - `se_note {text}` captures a stray anywhere; keep walking.
@@ -651,10 +686,15 @@ and then the run reports itself.
 THERE IS NO POLL, AND ASKING FOR ONE IS REFUSED. `se_test` takes a question and
 nothing else.
 
-THE RUN RIDES THE `work` ACCOUNT on every lane call you make. It carries how
-far along it is, how many have failed, the first failures by name, and how much
-longer it needs with the basis for that figure. The JOB makes the estimate, not
-you.
+THE RUN RIDES THE `work` ACCOUNT on every lane call you make. It carries four
+things.
+
+- how far along it is
+- how many have failed
+- the first failures by name
+- how much longer it needs, with the basis for that figure
+
+The JOB makes the estimate, not you.
 
 AN OUTCOME SAYING `bound reached` IS THE ACCOUNT GIVING UP, never a verdict.
 Every entry declares how long the account will wait, and passing that bound ends

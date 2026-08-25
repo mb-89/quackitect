@@ -95,12 +95,17 @@ THE SET QUESTIONS, one argument each:
 - bounded - every row sits inside scope and answers to a source; nothing gold-plated.
 - comprehensible - a reader from any involved discipline can say what the system must do, from the set alone.
 - no_tbd - the sweep for TBD | TBC | TBR | ??? found zero, and you ran it.
-- behaviour_modelled - the LOOK is owed, never the model. Name the rows where a sequence, a state model or a lifecycle earned its place in `## Behaviour`, and name the rows where one would have been noise. "None here wanted one" is a complete answer. A model on every row is slop and worse than the gap it closes (owner correction 2026-08-13); the test and the shapes are in [[meth-requirement-authoring]].
-- quality_groups_swept - walk the nine ISO/IEC 25010:2023 characteristics and answer every one. Name the rows that cover it, or say plainly that this change does not touch it. The nine are listed whole in [[sty-what-a-quality-is]] and stand as nodes in spec/trace/use-case/.
+- behaviour_modelled - the LOOK is owed, never the model.
+  - Name the rows where a sequence, a state model or a lifecycle earned its place in `## Behaviour`, and name the rows where one would have been noise.
+  - "None here wanted one" is a complete answer.
+  - A model on every row is slop and worse than the gap it closes (owner correction 2026-08-13). The test and the shapes are in [[meth-requirement-authoring]].
+- quality_groups_swept - walk the nine ISO/IEC 25010:2023 characteristics and answer every one.
+  - Name the rows that cover it, or say plainly that this change does not touch it.
+  - The nine are listed whole in [[sty-what-a-quality-is]] and stand as nodes in spec/trace/use-case/.
 
 THE SWEEP IS NINE ANSWERS, NEVER NINE SCENARIOS (owner instruction 2026-08-19). Walking the whole tree INTO scenarios produces confusion rather than coverage, and that rule stands unchanged in [[meth-requirement-authoring]]. This asks for one line per characteristic saying whether the change touches it. An untouched characteristic is a recorded answer, not a hole to fill.
 
-WHY IT LIVES HERE AND NOT ON THE GATE. The gate carries no fields of its own by owner ruling 2026-08-07, because a check already settled elsewhere teaches people to skim when it is asked a second time. The sweep is answered here and ADJUDICATED at gate-requirements, which is where the owner asked to see it.
+WHY IT LIVES HERE AND NOT ON THE GATE. The gate carries no fields of its own by owner ruling 2026-08-07. A check already settled elsewhere teaches people to skim when it is asked a second time. The sweep is answered here and ADJUDICATED at gate-requirements, which is where the owner asked to see it.
 
 Position the concrete set against the standard checklists for this deliverable kind ([[meth-state-of-the-art]]). Expect iteration with the functions ([[meth-twin-peaks]]).
 

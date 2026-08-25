@@ -366,10 +366,15 @@ and then the run reports itself.
 THERE IS NO POLL, AND ASKING FOR ONE IS REFUSED. `se_test` takes a question and
 nothing else.
 
-THE RUN RIDES THE `work` ACCOUNT on every lane call you make. It carries how
-far along it is, how many have failed, the first failures by name, and how much
-longer it needs with the basis for that figure. The JOB makes the estimate, not
-you.
+THE RUN RIDES THE `work` ACCOUNT on every lane call you make. It carries four
+things.
+
+- how far along it is
+- how many have failed
+- the first failures by name
+- how much longer it needs, with the basis for that figure
+
+The JOB makes the estimate, not you.
 
 AN OUTCOME SAYING `bound reached` IS THE ACCOUNT GIVING UP, never a verdict.
 Every entry declares how long the account will wait, and passing that bound ends

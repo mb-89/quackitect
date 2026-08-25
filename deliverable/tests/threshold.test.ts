@@ -207,8 +207,13 @@ test("the mirror over HTTP: slider served, POST /autonomy moves the gate, /api/a
   const port = (server.address() as { port: number }).port;
   const base = `http://127.0.0.1:${port}`;
   try {
-    const page = await (await fetch(`${base}/`)).text();
-    assert.ok(page.includes('id="thr"'), "the slider is served");
+    // TWO SURFACES, TWO FETCHES, because `/` is gone and what replaced it is
+    // not one page. `controls` answers with the sidebar FRAGMENT that carries
+    // the bank; `machine` answers with a document that carries the client
+    // script. A fragment has no script tag at all.
+    const bank = await (await fetch(`${base}/widget/controls`)).text();
+    assert.ok(bank.includes('id="thr"'), "the slider is served");
+    const page = await (await fetch(`${base}/widget/machine`)).text();
     assert.ok(page.includes("SESSION OVER"), "the over overlay ships in the script");
     const set = await fetch(`${base}/autonomy`, {
       method: "POST",

@@ -47,7 +47,7 @@ specification_note: |
 
 ## Guidance
 
-The placeholder the seeded demo machine fills. fill-story-evidence authors the drawing; entering this state runs it, one state per must story, parallel where independent.
+The placeholder the seeded demo machine fills. fill-story-evidence authors the drawing, and entering this state runs it. One state per must story, parallel where independent.
 
 Each demo state does three things:
 

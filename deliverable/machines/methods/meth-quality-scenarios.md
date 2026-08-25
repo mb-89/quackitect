@@ -13,12 +13,15 @@ ISO/IEC 25010:2023 names nine. Each stands as a node in spec/trace/use-case/, ca
 - FUNCTIONAL SUITABILITY. The functions the need calls for, under stated conditions.
 - PERFORMANCE EFFICIENCY. Time and resources spent doing that.
 - COMPATIBILITY. Sharing an environment, and exchanging information with what is there.
-- INTERACTION CAPABILITY. Specified users working it through its interface. Replaced usability in 2023.
+- INTERACTION CAPABILITY. Specified users working it through its interface.
+  - Replaced usability in 2023.
 - RELIABILITY. Performing over a stated period, and surviving a fault.
 - SECURITY. Access matching authorisation, and an act staying attributable.
 - MAINTAINABILITY. Being changed to improve, correct or adapt.
-- FLEXIBILITY. Being adapted to a new requirement, context or environment. Replaced portability in 2023.
-- SAFETY. Avoiding a state that endangers life, health, property or the environment. New in 2023.
+- FLEXIBILITY. Being adapted to a new requirement, context or environment.
+  - Replaced portability in 2023.
+- SAFETY. Avoiding a state that endangers life, health, property or the environment.
+  - New in 2023.
 
 WALK ALL NINE, WRITE SCENARIOS FOR FEW. The walk is the elicitation aid and it is now a set question at write-requirements, answered one line per characteristic. A characteristic the change does not touch is answered and left alone.
 

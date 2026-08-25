@@ -11,13 +11,16 @@ scanned_at: i1/gate-inputs
 THE THREE THAT MATTER, by mindshare in the application requirements-management
 category as of 2026-05.
 
-- POLARION. 16.0%, up from 14.7% year on year. Traceability rated 9.7. The
-  default where Siemens PLM already runs.
-- JAMA CONNECT. 11.1%, DOWN from 15.8%. Sells "Living Requirements" and Live
-  Traceability, plus an NLP advisor that grades requirement TEXT quality.
-  Ease of use rated 8.3.
-- IBM DOORS NEXT. The incumbent. Ease of use rated 7.4, the lowest of the
-  three, and the reason teams migrate off it.
+- POLARION. 16.0%, up from 14.7% year on year.
+  - Traceability rated 9.7.
+  - The default where Siemens PLM already runs.
+- JAMA CONNECT. 11.1%, DOWN from 15.8%.
+  - Sells "Living Requirements" and Live Traceability, plus an NLP advisor
+    that grades requirement TEXT quality.
+  - Ease of use rated 8.3.
+- IBM DOORS NEXT. The incumbent.
+  - Ease of use rated 7.4, the lowest of the three, and the reason teams
+    migrate off it.
 
 WHAT IS EVIDENCED, AND WHAT IS NOT.
 

@@ -25,9 +25,12 @@ priority: must
 
 - `se_seed_iteration` opens the iteration.
 - `se_seed_expedition` opens the larger vehicle, for work that outgrows one iteration.
+- `se_park` sets the record already open aside, so this one can be entered.
 
 ## Extensions
 
+- 1a. Another record is already open. One engine walks one record, so entering is refused and names the one it holds.
+- 1b. The person wants the held record set down rather than finished. `se_park` records why on the record itself, and starting that record again resumes it with every signature standing.
 - 3a. The inbox still has pending notes. The kickoff refuses until they are drained, and says so.
 - 4a. The product has no standing baseline — this is its first iteration. The proposal is `product`, because the vision, the stakeholders and the baseline all have to be authored.
 - 5a. The person rejects the proposal and names a different size. The engine compiles what they chose.

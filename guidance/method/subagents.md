@@ -84,9 +84,15 @@ WHAT TO TELL A SUBAGENT INSTEAD, until the lane reaches children:
 - Say the lane exists and that it cannot drive it. A child that has been told
   to use `se_` verbs wastes its first calls discovering they are absent.
 
-WHY IT MATTERS BEYOND CONVENIENCE. Fresh eyes see a DIFFERENT PROJECT than
-the walk does: no state gate, no narration toll, no typed refusals, no call
-log. Every finding a subagent makes about LANE BEHAVIOUR is second-hand by
+WHY IT MATTERS BEYOND CONVENIENCE. Fresh eyes see a DIFFERENT PROJECT than the
+walk does. Four things are missing from theirs.
+
+- no state gate
+- no narration toll
+- no typed refusals
+- no call log
+
+Every finding a subagent makes about LANE BEHAVIOUR is second-hand by
 construction.
 
 So weigh a subagent's lane findings accordingly, and re-check the ones that

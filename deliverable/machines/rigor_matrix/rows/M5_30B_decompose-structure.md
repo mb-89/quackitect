@@ -85,14 +85,17 @@ LOOP, all in this one state because each moves the others:
   direction.
 
 THE TRACE IS COMPLETE, ON TWO PATHS (owner ruling 2026-08-10: residue is
-not allowed — a trace with holes cannot show the changes). Most
-requirements reach the structure transitively: served by functions,
-implemented by elements, and nothing is written twice. A requirement the
-function chain cannot carry — a structural quality the shape answers, an
-imposed constraint binding a choice — is named DIRECTLY in the answering
-element's or interface's `satisfies`. The union is the bar: every
-requirement reached by one path or the other, zero unreached, counted in
-the trace_complete field.
+not allowed — a trace with holes cannot show the changes).
+
+MOST REQUIREMENTS REACH THE STRUCTURE TRANSITIVELY: served by functions,
+implemented by elements, and nothing is written twice.
+
+A REQUIREMENT THE FUNCTION CHAIN CANNOT CARRY is named DIRECTLY in the
+answering element's or interface's `satisfies`. That covers a structural
+quality the shape answers, and an imposed constraint binding a choice.
+
+THE UNION IS THE BAR: every requirement reached by one path or the other,
+zero unreached, counted in the trace_complete field.
 
 THE BASELINE WORD survives only for the closing act: what stood before is
 superseded, and change from here means a new baseline (the CM law).

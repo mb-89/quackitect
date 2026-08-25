@@ -234,10 +234,11 @@ with ruff is another. Markdown is another.
 THREE OUTCOMES ON A WRITE, and only the third reaches the agent.
 
 - CLEAN. The write lands and nothing is said.
-- FIXABLE. The engine applies the fix and says so on the result. It does not
-  ask. The linter already behaves this way on se_file_patch, which is the
-  proof the shape works: "the linter's safe fixes ran on <path> — the
-  returned hashes are the fixed content".
+- FIXABLE. The engine applies the fix and says so on the result.
+  - It does not ask.
+  - The linter already behaves this way on se_file_patch, which is the proof
+    the shape works: "the linter's safe fixes ran on <path> — the returned
+    hashes are the fixed content".
 - NOT FIXABLE. The write is REFUSED, with the tool's own message and an
   executable remedy, like every other refusal in the lane.
 

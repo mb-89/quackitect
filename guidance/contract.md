@@ -206,8 +206,11 @@ THE TWO ARE NOT THE SAME THING, which is why both halves stand.
 - The field report is for the PERSON, and nothing replaces it.
 
 WHAT GOES IN IT: everything that cannot be mapped onto the repository.
-Improvements you found, what fought you, what you struggled with, and anything
-you could not give a home in git.
+
+- Improvements you found.
+- What fought you.
+- What you struggled with.
+- Anything you could not give a home in git.
 
 WHY IT CANNOT BE SKIPPED: notes are machine-local and die with the container.
 The report is the channel that reaches a person, so an unwritten one throws

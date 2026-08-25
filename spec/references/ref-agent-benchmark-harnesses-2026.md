@@ -98,8 +98,10 @@ generator plus a decision about whether the seed is written down.
 ### Synthetic monitoring runs fake work through a real system on purpose
 
 APPLICATION MONITORING TOOLS RUN SCRIPTED FAKE TRANSACTIONS against
-production on a schedule. RECALLED. The results are thrown away. The timing
-is kept.
+production on a schedule. RECALLED, so treat it as a lead.
+
+- The results are thrown away.
+- The timing is kept.
 
 THE POINT IS REGRESSION DETECTION, not correctness. Nobody cares that the
 synthetic checkout bought nothing. They care that it took 4 seconds when it
@@ -195,8 +197,12 @@ TWO HONEST ANSWERS EXIST.
 - Blind the agent, so the training iteration is indistinguishable from a real
   one. Highest fidelity. It costs the honesty rules this project runs on.
 - Tell the agent, and narrow the claim. The benchmark then measures PROCESS
-  OVERHEAD — boot, reading, form mechanics, refusal loops, routing — and not
-  judgment quality.
+  OVERHEAD rather than judgment quality.
+  - boot
+  - reading
+  - form mechanics
+  - refusal loops
+  - routing
 
 THE SECOND IS RECOMMENDED, and the narrowing must be written into the
 record. A training-iteration number is a statement about the machine, never
@@ -227,15 +233,17 @@ result.
 
 ## Part D — what the scan supports
 
-- ONE GENERATOR, ONE SEED. A named seed reproduces a run. No seed draws a
-  fresh one. Fixed and random stop being two features.
+- ONE GENERATOR, ONE SEED. A named seed reproduces a run, and no seed draws a
+  fresh one.
+  - Fixed and random stop being two features.
 - SIZE IS THE SCALE FACTOR. The change-size column already decides how many
   states the walk visits. It is the size lever, and it belongs in the
   result's name.
 - THE POOL IS AUTHORED AND VERSIONED. A generated workload nobody wrote down
   cannot be compared with itself later.
-- REPLAY IS NOT THIS. i31 owns replay. A training iteration is a fresh
-  invocation over synthetic work, and it needs its own word.
+- REPLAY IS NOT THIS, and i31 owns replay.
+  - A training iteration is a fresh invocation over synthetic work, and it
+    needs its own word.
 - THE OLD ITERATION IS A SILHOUETTE, NOT A SCRIPT. Reusing an archived
   iteration's SHAPE is cheap and safe. Reusing its CONTENT hands the agent
   the answers, because that content is committed and searchable.

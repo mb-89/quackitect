@@ -8,4 +8,10 @@ tags:
   - architecture
   - cost
 ---
-Barry Boehm's classic finding, standard engineering knowledge since: the cost of fixing a defect grows by orders of magnitude with each lifecycle phase it survives — a requirements or architecture error caught in operation costs 10 to 100 times its early fix. The witness behind "a wrong architectural decision made early costs a thousandfold later".
+Barry Boehm's classic finding, standard engineering knowledge since. The cost
+of fixing a defect grows by orders of magnitude with each lifecycle phase it
+survives.
+
+A requirements or architecture error caught in operation costs 10 to 100
+times its early fix. This is the witness behind "a wrong architectural
+decision made early costs a thousandfold later".

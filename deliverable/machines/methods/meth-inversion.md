@@ -32,8 +32,8 @@ Turn the question inside out. Three shapes, and the first is the cheapest.
 2. FIND WHERE IT IS WRITTEN DOWN. A standing demand, a design decision, a line
    of code, or nowhere at all. Nowhere is the most common answer and the most
    informative one.
-3. ASK WHETHER THE WRITTEN THING SAYS WHAT PEOPLE THINK IT SAYS. Quote it. A
-   remembered constraint drifts stricter than the recorded one every time.
+3. ASK WHETHER THE WRITTEN THING SAYS WHAT PEOPLE THINK IT SAYS. Quote it.
+   - A remembered constraint drifts stricter than the recorded one every time.
 4. INVERT. Take one of the three shapes above and answer it honestly.
 5. RULE ON WHAT COMES BACK. Either the constraint survives with its reason
    restated, or it was an implementation detail and the block is gone.

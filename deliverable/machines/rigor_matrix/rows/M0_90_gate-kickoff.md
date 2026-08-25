@@ -180,8 +180,10 @@ Three rules on the list itself:
 - ENGINE IMPROVEMENTS is a standing goal, always available. It is where the
   iteration pulls in the machine's own repairs. It needs no argument.
 - MORE THAN HALF A DOZEN GOALS IS TOO BIG. Split the iteration.
-- THE COUNT INFORMS THE COLUMN. One goal has a patch's shape. Two or three
-  have a minor's. More than that argues for major.
+- THE COUNT INFORMS THE COLUMN.
+  - One goal has a patch's shape.
+  - Two or three have a minor's.
+  - More than that argues for major.
 
 WHY THE GOALS LIVE HERE AND NOT IN THE TRACE (owner ruling 2026-08-17): a goal
 is not an artifact that anything refines. It is what every artifact is measured

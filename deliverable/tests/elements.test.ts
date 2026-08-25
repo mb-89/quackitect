@@ -21,7 +21,14 @@ test("the mirror asks for the component library and serves it", async () => {
   const root = freshRoot();
   const server = startMirror({ session: new Session(root), root, port: PORT, log: new CallLog(root), mode: "manual" });
   try {
-    const page = await (await fetch(`http://127.0.0.1:${PORT}/`)).text();
+    // THE WHOLE-PAGE ROUTE IS GONE. `/` served the standalone mirror and every
+    // unknown GET fell through to it; what remains is `/mcp`, the API, and
+    // `/widget/*`, which IS the editor's sidebar.
+    //
+    // ASK A WIDGET THAT SERVES A PAGE. `controls` answers with a bare fragment
+    // for the sidebar to slot in, and a fragment has no head to carry a script
+    // tag. `machine` serves a document.
+    const page = await (await fetch(`http://127.0.0.1:${PORT}/widget/machine`)).text();
     assert.match(page, /<script type="module" src="\/vendor\/vscode-elements\.js">/, "the page must ask for the library");
 
     const res = await fetch(`http://127.0.0.1:${PORT}/vendor/vscode-elements.js`);

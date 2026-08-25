@@ -55,10 +55,16 @@ The trigger is a NOTE carrying "needs retro":
    tell the two apart from inside, and only the record COUNT does.
 
    THE ARRIVAL'S OWN WORK IS NOT IN THE WINDOW AT ALL. `se-arrive.ts` writes
-   nothing to the call log, so the fetch, the install, the cage placement, the
-   projection and the lane start are invisible to the record. For a system whose
-   premise is that every call is logged, the first minutes of every headless run
-   are unlogged.
+   nothing to the call log, so five acts are invisible to the record.
+
+   - the fetch
+   - the install
+   - the cage placement
+   - the projection
+   - the lane start
+
+   For a system whose premise is that every call is logged, the first minutes
+   of every headless run are unlogged.
 
    WITH NO SUCH DRAIN IN THE LIVE LOG, the window opens at the log file's
    FIRST record. Never at another drain (fixed 2026-08-18 on the owner's

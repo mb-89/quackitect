@@ -1,6 +1,6 @@
 ---
 kind: method
-statement: "Structural decomposition: the winner's picks become elements, every function lands on one, every boundary crossing gets its contract, and every requirement lands on the structure."
+statement: "Structural decomposition: the winner's picks become elements. Every function, boundary crossing and requirement then lands on that structure."
 ---
 
 ## Situation
@@ -24,8 +24,8 @@ Three sources, in order of how much they decide for you:
 - THE WINNER'S PICKS. Each pick names a mechanism; each mechanism becomes
   one or more elements. Mostly derivation — the decisions were made at
   compose time.
-- THE STANDING SYSTEM. Brownfield joins as it is. Integrate useful legacy
-  rather than redrawing it.
+- THE STANDING SYSTEM. Brownfield joins as it is.
+  - Integrate useful legacy rather than redrawing it.
 - THE GROUPING JUDGMENT. Substrate several picks lean on becomes its own
   element. Cohesion up, coupling down; volatility separated from
   stability; an element not overloaded; separation of concerns.
@@ -39,14 +39,17 @@ functions, written by the same editor.
 
 Every element names the functions it realizes in `implements` — the
 node-borne DMM, pointing the same way `refines` points on a requirement:
-the newer artifact names what it derives from. THE MATCH IS NOT ONE TO
-ONE: several elements or interfaces may implement one function. Software
-tends to one-to-one; systems spread a function across sensor, converter
-and filter, and the spread is exactly what the DSM shows. Checked: every
-function implemented at least once, and nothing implementing nothing —
-the four-holes logic, review-class now, engine-computed later. Elements
-and interfaces both stand in the trace graph's design half, one radius
-past the functions.
+the newer artifact names what it derives from.
+
+THE MATCH IS NOT ONE TO ONE: several elements or interfaces may implement
+one function. Software tends to one-to-one; systems spread a function across
+sensor, converter and filter, and the spread is exactly what the DSM shows.
+
+CHECKED: every function implemented at least once, and nothing implementing
+nothing — the four-holes logic, review-class now, engine-computed later.
+
+Elements and interfaces both stand in the trace graph's design half, one
+radius past the functions.
 
 An element that turns out to need a support function sends you back one
 act, and that is the loop working, not a failure.

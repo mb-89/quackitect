@@ -80,8 +80,8 @@ THE CONFORMANCE SWEEP IS THIS ROW'S EXIT SCRIPT, and it is the engine's rather t
 
 THE CHECKED BOXES ARE THE JUDGMENT AND THE SWEEP IS THE ARITHMETIC. A person decides whether a document still teaches the current behaviour. Nobody has to decide whether a frontmatter word is in its own list, so nobody is asked.
 
-THERE IS NO VERB FOR IT, ON PURPOSE (owner ruling 2026-08-16). A check that moved out of the write because it costs too much per write must not come back as something an agent can call whenever it feels uncertain. The engine decides when it runs.
+THERE IS NO VERB FOR IT, ON PURPOSE (owner ruling 2026-08-16). A check moves out of the write when it costs too much per write. It must not come back as a verb an agent calls whenever it feels uncertain. The engine decides when it runs.
 
-IT BLOCKS HERE AND ONLY HERE. The write guard REPORTS a standing break and lands the write; the sweep is where that break finally stops something, and the thing it stops is leaving the state whose job was to clear it.
+IT BLOCKS HERE AND ONLY HERE. The write guard REPORTS a standing break and lands the write. The sweep is where that break finally stops something, and what it stops is leaving the state whose job was to clear it.
 
 MEASURED 2026-08-16: 1015 nodes in 388 ms.

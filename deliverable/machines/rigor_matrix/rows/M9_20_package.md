@@ -32,7 +32,7 @@ evidence:
     rationale_for:
       - no
   - name: emit_back
-    description: what this record learned about the SHARED method - a matrix row, a form, a method card, a refusal, a missing check - one line each naming the target and the change, or none-found stated plainly
+    description: what this record learned about the SHARED method, one line each, naming the target and the change. State none-found plainly where there is nothing, and see the guidance below for the kinds worth naming.
     template: list
 major: full
 minor: full
@@ -62,7 +62,12 @@ specification_note: |
 
 Per [[meth-ship-package]]: the packaging is AUTOMATED - a script assembles the artifact, and assembling by hand is the defect. The human-shaped work is the check: use the package and record what was observed.
 
-The package holds a README, the one-time installer script, and the editor extension, with the versioned engine and method underneath them.
+The package holds four things.
+
+- a README
+- the one-time installer script
+- the editor extension
+- the versioned engine and method underneath them
 
 ## The emit
 
@@ -70,7 +75,13 @@ THE OUTPUT PHASE EMITS BACK (owner ruling 2026-08-13). A record is input, proces
 
 `emit_back` is that debt, and [[meth-emit-back]] holds the shape.
 
-What to name: a state whose guidance was wrong or missing while you walked it, a form that asked for the wrong evidence, a method card that did not answer its own question, a refusal that blocked without a remedy, a check that should exist.
+What to name:
+
+- a state whose guidance was wrong or missing while you walked it
+- a form that asked for the wrong evidence
+- a method card that did not answer its own question
+- a refusal that blocked without a remedy
+- a check that should exist
 
 What not to name: anything about this record's own subject. That is the product's output, not the method's.
 

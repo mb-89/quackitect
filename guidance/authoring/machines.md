@@ -136,8 +136,11 @@ THE RUNGS ARE WORDS, and the words are the truth (owner cut-over ruling
 and the numbers beside the rungs are transitional anchors for the
 weighing. Author `priority:` as a rung word:
 
-- **mechanical** — what mainly the engine does, carried out as decided:
-  start/end pills, boot's steps, the front desk, the route.
+- **mechanical** — what mainly the engine does, carried out as decided.
+  - start and end pills
+  - boot's steps
+  - the front desk
+  - the route
 - **operational** — single steps and submitting: the work and find
   states, frame, diverge, converge.
 - **tactical** — running iterations and expeditions, seeding and

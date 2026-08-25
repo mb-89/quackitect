@@ -8,4 +8,12 @@ tags:
   - evidence
   - why-now
 ---
-Analysis of 211M+ changed lines, 2022-2026: copy-paste rose from 9.4% to 15.7% of new code, refactored code collapsed from 21% to 3.8%, error-masking constructs up 47%, long-term legacy maintenance down 74%. The measured shape of ungoverned AI output at ecosystem scale — the as-is claim's witness for structural decay.
+Analysis of 211M+ changed lines, 2022-2026. Four measurements.
+
+- copy-paste rose from 9.4% to 15.7% of new code
+- refactored code collapsed from 21% to 3.8%
+- error-masking constructs up 47%
+- long-term legacy maintenance down 74%
+
+This is the measured shape of ungoverned AI output at ecosystem scale, and
+the as-is claim's witness for structural decay.

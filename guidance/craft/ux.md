@@ -18,8 +18,13 @@ on it is voice.md. How you write the CODE behind it is software.md.
 
 ## A REFERENCE IS A LINK, NEVER TEXT (owner ruling 2026-08-23)
 
-Wherever a surface shows a path, a node id, a ref or a URL, it renders as
-something the reader can follow.
+Four things render as something the reader can follow, wherever a surface
+shows one.
+
+- a path
+- a node id
+- a ref
+- a URL
 
 - A PATH PRINTED AS PLAIN TEXT asks the reader to go and find the file by
   hand. The page already knew where it was.

@@ -154,8 +154,13 @@ spelling hides it.
 
 Owner ruling 2026-08-09, and it OUTRANKS the section above.
 
-COLLECT THE INPUT ONCE. PROCESS IT. OUTPUT IT. Where it matters, check ONCE at
-the end whether the input moved while you worked, and redo or refuse if it did.
+Four acts, in order.
+
+- COLLECT THE INPUT ONCE.
+- PROCESS IT.
+- OUTPUT IT.
+- CHECK AT THE END, where it matters, whether the input moved while you
+  worked. Redo or refuse if it did.
 
 WHAT YOU DO NOT DO is ask an outside system the same question sixty-six times.
 

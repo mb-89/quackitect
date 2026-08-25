@@ -33,14 +33,15 @@ edits it in the real world, and Obsidian reads it.
   Each press posts its route and nothing else. Not an `action`: an action
   joins the row above, and a bank IS its own row, label first.
 - `table` — rows of plain text under named columns. Fields: key.
-  The key names which table in the values gets drawn.
-  It is READ-ONLY and nothing in it can be pressed.
-  ONE LINE PER ROW. The last column is the wide one and the surface truncates
-  it, so short scannable facts go first and the long description goes last.
-  THE FULL TEXT OF EVERY CELL IS ON ITS TOOLTIP, which is where a truncated
-  line can still be read.
-  The label stands whether or not there are rows, like every other row. An
-  empty table is the ordinary case and says so in words.
+  - The key names which table in the values gets drawn.
+  - It is READ-ONLY and nothing in it can be pressed.
+  - ONE LINE PER ROW. The last column is the wide one and the surface
+    truncates it, so short scannable facts go first and the long description
+    goes last.
+  - THE FULL TEXT OF EVERY CELL IS ON ITS TOOLTIP, which is where a truncated
+    line can still be read.
+  - The label stands whether or not there are rows, like every other row. An
+    empty table is the ordinary case and says so in words.
 
 A type this renderer does not know is a REFUSAL, not a guess. That is the
 whole point: the drawing decides, and an unlisted widget cannot appear by

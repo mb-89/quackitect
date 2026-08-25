@@ -677,8 +677,14 @@ renderer can invent them.
 
 ## The same refusal, three times over
 
-A refusal carries a clause, what was expected, what it got, and an executable
-remedy. That is enough to recover in one turn WHEN THE READER TAKES IT.
+A refusal carries four things.
+
+- the clause
+- what was expected
+- what it got
+- an executable remedy
+
+That is enough to recover in one turn WHEN THE READER TAKES IT.
 
 A reader who does not take it gets the identical answer again. From inside,
 the third identical answer looks exactly like the first, so nothing about the

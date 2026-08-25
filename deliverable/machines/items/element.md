@@ -68,15 +68,16 @@ Three sources, per [[meth-decompose-structure]]:
 - `realization` — make, reuse or buy.
 - `group` — the grouping this element belongs to. The same node-borne
   mechanism the function clusters use; the DSM editor writes it.
-- `implements` — the function ids this element implements. THE ALLOCATION
-  EDGE, and it points the same way `refines` does on a requirement: the
-  newer artifact names what it derives from. NOT ONE TO ONE: several
-  elements may implement one function — software tends to one-to-one,
-  systems spread, and the spread is what the DSM makes visible. What is
-  checked: every function implemented by at least one element or
-  interface, and no element implementing nothing. Requirements reach the
-  structure through this chain — a requirement is served by functions,
-  and its functions are implemented here.
+- `implements` — the function ids this element implements.
+  - THE ALLOCATION EDGE, and it points the same way `refines` does on a
+    requirement: the newer artifact names what it derives from.
+  - NOT ONE TO ONE: several elements may implement one function. Software
+    tends to one-to-one, systems spread, and the spread is what the DSM
+    makes visible.
+  - WHAT IS CHECKED: every function implemented by at least one element or
+    interface, and no element implementing nothing.
+  - Requirements reach the structure through this chain. A requirement is
+    served by functions, and its functions are implemented here.
 - `satisfies` — requirement ids this element answers DIRECTLY, used only
   where no function carries the requirement: a structural quality the
   shape answers (modularity, replaceability), an imposed constraint

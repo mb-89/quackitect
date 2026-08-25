@@ -77,14 +77,19 @@ write verbs it already has. That is the owner's rule in one mechanism —
 verification fixes, it does not loop — and it keeps the ruling above exactly
 as it stands: there is still nothing for anyone to answer.
 
-THE ATTEMPT GUARD IS GONE, and it was never real. The row carried
-`guard: verification_attempts < 3` and promised an escape when it exhausted.
-Nothing in the engine ever wrote that counter, so the guard was permanently
-true and the escape could never fire. Making the counter real without an
-escape path is worse than not having it: the fourth red would fire no edge,
-activate nothing, and throw. The hold above bounds the loop properly — the
-walk waits here until the battery is green, rather than bouncing between two
-states at seventy-eight seconds a round.
+THE ATTEMPT GUARD IS GONE, and it was never real.
+
+WHAT IT CLAIMED. The row carried `guard: verification_attempts < 3` and
+promised an escape when it exhausted. Nothing in the engine ever wrote that
+counter, so the guard was permanently true and the escape could never fire.
+
+WHY NOT JUST WRITE THE COUNTER. Making it real without an escape path is
+worse than not having it: the fourth red would fire no edge, activate
+nothing, and throw.
+
+THE HOLD ABOVE BOUNDS THE LOOP PROPERLY. The walk waits here until the
+battery is green, rather than bouncing between two states at seventy-eight
+seconds a round.
 
 THE GATEKEEPER WATCHES THE FIXES ([[meth-verification-discipline]]).
 The same tester that verified stays across the rounds. Show it the

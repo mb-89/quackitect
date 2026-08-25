@@ -52,8 +52,8 @@ Three answers are legal, and only two of them pass:
 - NAMED ARTIFACTS. The goal is served, and the row says by what.
 - `nothing yet`, naming the milestone that owns it. A goal need not be served
   everywhere.
-- `nothing, and nothing will`. This FAILS the gate. The walk has drifted off
-  its own kickoff.
+- `nothing, and nothing will`. This FAILS the gate.
+  - The walk has drifted off its own kickoff.
 
 DO NOT ANSWER FROM THE SCOPE. The scope is what was promised. This round asks
 what was BUILT.
@@ -64,9 +64,13 @@ Iteration 33 answered it "the scope answers both halves of the owner's
 framing" - true of the scope, and never a check on the register.
 
 EVERY OTHER COVERAGE CHECK IN THIS SYSTEM COMPARES A NODE TO ITS NEIGHBOUR.
-Story to value prop. Requirement to use case. Chunk to design spec. A chain
-that is perfectly linked and serves a quarter of the kickoff passes all of
-them, because not one of them looks UP.
+
+- story to value prop
+- requirement to use case
+- chunk to design spec
+
+A chain that is perfectly linked and serves a quarter of the kickoff passes
+all of them, because not one of them looks UP.
 
 This is the only round that looks up, and it is per-item so it cannot be
 answered in general.

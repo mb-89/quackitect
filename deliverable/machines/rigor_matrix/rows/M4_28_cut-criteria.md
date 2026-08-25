@@ -103,24 +103,30 @@ is on the record rather than hidden inside a clean-looking cut.
 
 THREE ACTS LIVE HERE, AND THE ORDER BETWEEN THEM IS THE WHOLE POINT (owner ruling 2026-08-09).
 
-- ONE, CUT. Strike every axis no candidate differentiates on. Blind to importance.
+- ONE, CUT. Strike every axis no candidate differentiates on.
+  - Blind to importance.
 - TWO, SORT. Rough it out mechanically by what each row BREAKS, then CHECK it.
 - THREE, THRESHOLD. Draw the line across the sorted survivors.
 
 THE SORT IS TWO STEPS, NOT ONE (owner ruling 2026-08-09).
 
-- THE ROUGH SORT IS THE MACHINE'S. It reads `breaks_how_badly` and orders worst first. Nobody types it.
+- THE ROUGH SORT IS THE MACHINE'S. It reads `breaks_how_badly` and orders worst first.
+  - Nobody types it.
 - THE CHECK IS A JUDGMENT, and the agent makes it exactly as a person would. Read the rough order and push a row up or down where it is wrong.
 
 A MOVE IS THE SAME ACT WHOEVER MAKES IT. Agent or person, it is one row past another and it owes its reason. The submit refuses a move with no rationale, and the gate reads a move apart from the boundary.
 
 WHY THE CHECK EXISTS. A five-level scale puts dozens of rows in one band, and inside a band the machine has nothing to say. That is where the judgment belongs, and it is cheap because it is local: a row only ever argues with its neighbours.
 
-WHY THE CUT COMES FIRST. Sorting a pool that is about to lose half its rows spends judgment on rows that are leaving, and it puts a struck axis above a live one on the page.
+WHY THE CUT COMES FIRST. Sorting a pool that is about to lose half its rows spends judgment on rows that are leaving. It also puts a struck axis above a live one on the page.
 
-WHY THE SORT IS NOT DERIVE-CRITERIA'S. That state produces the POOL: which requirements are criteria, and which of them compound into one axis. The order it happens to enumerate in is not an importance claim, and reading it as one is what put a response-time row above the foundations of the system.
+WHY THE SORT IS NOT DERIVE-CRITERIA'S. That state produces the POOL: which requirements are criteria, and which of them compound into one axis.
 
-THE SORT IS MECHANICAL, SO IT CANNOT BE AIMED. It reads `breaks_how_badly`, which every requirement carries and which is authored at M3, before any candidate exists. Moving the sort to this state therefore costs nothing in blindness: the KEY is still fixed before the options are known, and that is what the guard was ever protecting.
+The order it happens to enumerate in is not an importance claim. Reading it as one is what put a response-time row above the foundations of the system.
+
+THE SORT IS MECHANICAL, SO IT CANNOT BE AIMED. It reads `breaks_how_badly`, which every requirement carries and which is authored at M3, before any candidate exists.
+
+So moving the sort to this state costs nothing in blindness. The KEY is still fixed before the options are known, and that is what the guard was ever protecting.
 
 WHY IT IS ITS OWN STATE (owner ruling 2026-08-08). The cut needs the candidates, so it cannot run at derive-criteria. Run inside evaluate-set it would be made with the totals already visible, which is the same poisoning the weights-first order exists to prevent, arriving one step later. The house already rules that composing and evaluating never share a state. Cutting and evaluating do not either.
 

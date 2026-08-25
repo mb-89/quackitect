@@ -54,13 +54,15 @@ evidence:
       4 and 5 need that name. No name, no score above 3.
 
       A research agent scores, never the builder — and the research
-      agent is SPAWNED (owner ruling 2026-08-10). The walking agent
-      starts a subagent with a clean context to fill this table. It
-      receives the candidate records, the surviving axes, these anchors
-      and the prior-art list. It receives nothing of the composer's
-      reasoning. Its scores land verbatim; a disagreement is recorded
-      beside a score, never written over it. See
-      [[meth-scoring-anchors]].
+      agent is SPAWNED (owner ruling 2026-08-10).
+
+      The walking agent starts a subagent with a clean context to fill
+      this table. It receives the candidate records, the surviving axes,
+      these anchors and the prior-art list.
+
+      IT RECEIVES NOTHING OF THE COMPOSER'S REASONING. Its scores land
+      verbatim; a disagreement is recorded beside a score, never written
+      over it. See [[meth-scoring-anchors]].
   - name: front
     template: pareto-plot
     reads: scores
