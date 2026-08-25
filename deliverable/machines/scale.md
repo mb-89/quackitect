@@ -25,7 +25,7 @@ rungs are both: positions to click, and words to calibrate a state's
 would let it run at the blocked SETTING, which is the one thing that setting
 promises cannot happen.
 
-THE LADDER IS THE OWNER'S CUT-OVER RULING (2026-08-12): none, then
+THE LADDER IS THE OWNER'S CUT-OVER RULING: none, then
 mechanical, operational, tactical, strategic, ideation — emergency rides
 with ideation.
 

@@ -65,7 +65,7 @@ LIST WHAT THE ITERATION CHANGED first - the evidence trail has it. Then walk the
 
 THE SWEEP DOCUMENTS WHAT THE DEMONSTRATIONS PRODUCED. Their reports are documents like any other, so sweeping before they are performed sweeps an unfinished corpus.
 
-IT USED TO FAN FROM fill-story-evidence, in parallel with run-demos. That drawing cannot be walked by one agent (2026-08-18). A fan hands out one leg and reports the rest as not walked, and run-demos is a SUBMACHINE, so walking it leaves the walk at that submachine's `end`. The engine's escape for an unwalked leg asks whether the state it stands on owes a form. An `end` owes none. So the offer is never made, and the validation busbar starves for good.
+IT USED TO FAN FROM fill-story-evidence, in parallel with run-demos. That drawing cannot be walked by one agent. A fan hands out one leg and reports the rest as not walked, and run-demos is a SUBMACHINE, so walking it leaves the walk at that submachine's `end`. The engine's escape for an unwalked leg asks whether the state it stands on owes a form. An `end` owes none. So the offer is never made, and the validation busbar starves for good.
 
 The chain costs nothing here. Both legs are walked by the same agent either way, and this order is the one that makes sense.
 

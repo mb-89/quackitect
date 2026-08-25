@@ -129,7 +129,7 @@ meaningless, and comparison is the only reason the dial exists.
 
 SAY WHY IN THE RATIONALE, because that is the half a later reader needs.
 Spawning buys separation — a hand that authors cannot also bless — and costs
-tokens and wall-clock. Measured on 2026-08-23, three hands each spent roughly
+tokens and wall-clock. Measured, three hands each spent roughly
 fifteen minutes re-reading files the guide already held, for edits the guide
 had already located by line number. Whether that trade is worth making is what
 the A/B is for, and the call log now carries which arm each record ran.

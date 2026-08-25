@@ -82,7 +82,7 @@ server actually returns: the radii, the coordinates, the emitted classes. It
 is one call, and it is the difference between reporting a fact and reporting
 a hope.
 
-WHY THIS IS A RULE. Every drawing change on 2026-08-07 took two tries. Each
+WHY THIS IS A RULE. Every drawing change took two tries. Each
 time the source was right, the claim was made from the source, and the owner
 found the gap on the screen. That is work handed back for no reason.
 
@@ -103,7 +103,7 @@ classes aligns only while its stylesheet arrives.
 
 Cosmetics may live in a stylesheet. Structure may not.
 
-This was learned twice on 2026-08-07, on the same table, in one afternoon.
+This was learned twice, on the same table, in one afternoon.
 
 ## Nothing ever hangs
 
@@ -201,7 +201,7 @@ A surface behavior is never one change. It spans four things:
 
 Fixing one leg and shipping is the failure this project repeats most.
 
-Four times in one day (2026-08-04) a change landed with one leg missing:
+Four times in one day a change landed with one leg missing:
 
 - Colours: the data was right. The CSS rule never existed.
 - The route line: the route was right. The projection matched the wrong prefix.
@@ -230,7 +230,7 @@ A second surface for a job one surface already does is the most expensive
 mistake on this page. Both halves keep working, and only their disagreement
 is visible.
 
-Three came out of one afternoon on the trace graph (2026-08-05):
+Three came out of one afternoon on the trace graph:
 
 - A second details panel was built beside the real one. The page already routes every click through `clickable` and `data-detail`.
 - The nodes were styled from scratch and came out black on black. The machine view's `state` and `label` classes already carry the host's palette.

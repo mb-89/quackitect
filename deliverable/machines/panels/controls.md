@@ -135,7 +135,7 @@ RESTING IS THREE CONDITIONS, all of them.
 - Nothing has reached the log for five minutes, by any hand.
 - Nothing this session started in the last hour is still running.
 
-THE HOUR ON THE THIRD ONE IS NEW (2026-08-23) and it is why this never fired.
+THE HOUR ON THE THIRD ONE IS NEW and it is why this never fired.
 A background job that hangs stays "running" for ever, and one of those held the
 machine awake indefinitely. A job silent for an hour is a leak rather than
 work, and a shutdown that any leak can veto is a shutdown that never happens.

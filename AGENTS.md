@@ -1,5 +1,5 @@
 <!-- GENERATED at agent start. Do not edit — the next start overwrites it.
-     from guidance/contract.md 84d970810e6e
+     from guidance/contract.md 234854575240
      from guidance/walking.md 9c01727a76d8
      from guidance/method/lane.md 0f7559c796b0
      from guidance/voice.md 2bbb7751a28c
@@ -152,10 +152,9 @@ which is what stops it becoming the ordinary way to end a turn.
 
 ONE FORCE RELEASES ONE STOP, and the next pull spends it.
 
-THIS USED TO HAPPEN BY ITSELF, and that was the defect. The harness sets a flag
-when it retries a blocked stop, the valve read that flag as a claim, and every
-second attempt went through with nothing named. Measured on one session: four
-blocks, four immediate releases.
+A FLAG IS NOT A CLAIM. The harness sets one when it retries a blocked stop, and
+a valve that reads it as a claim releases every second attempt with nothing
+named. Measured: four blocks, four immediate releases in one session.
 
 RULES 6 AND 7 MEET AT THE START OF WORK. Confirm an ambiguous intent before you
 begin; once begun, carry on.
@@ -185,15 +184,12 @@ SO WHAT THE NEXT SESSION MUST KNOW GOES IN THE FOUR HOMES ABOVE, written when
 the thought occurs. A note, a parked to-do, or guidance — never saved for an
 exit that may never come.
 
-A FIELD REPORT IS OWED ON AN UNATTENDED RUN, and it is a different object
-(owner ruling 2026-08-20). This paragraph used to say no handover file is
-written at all, and the owner struck that: "I don't agree with this. This is an
-error in the guidance."
+A FIELD REPORT IS OWED ON AN UNATTENDED RUN, and it is a different object from
+the handover. No handover file is written; a field report is.
 
-BESIDE A PERSON, THE CHAT IS THE CHANNEL AND NO FILE IS WRITTEN (owner ruling
-2026-08-23). This line used to say EVERY run, and an attended session dutifully
-wrote one nobody wanted. The owner's words: "You don't need a field report.
-Only cloud agents need a field report."
+BESIDE A PERSON, THE CHAT IS THE CHANNEL AND NO FILE IS WRITTEN. Only an
+unattended run owes one, and an attended session that writes one has written a
+report nobody wanted.
 
 THE REASON THE RULE GIVES IS ITS OWN SCOPE. Notes die with the container, so
 the report is the only channel that reaches a person. Where the person is
@@ -222,14 +218,12 @@ HOW IT IS DELIVERED, and it is BOTH: handed over as a DOWNLOADABLE FILE, and
 printed in full as the closing message. The person keeps the file and passes it
 on; the message is what they read now.
 
-IT IS PRIVATE DATA, and that is the reason rather than a preference (owner
-ruling 2026-08-21). It is written for one person and it is not a corpus
-document.
+IT IS PRIVATE DATA, and that is the reason rather than a preference. It is
+written for one person and it is not a corpus document.
 
-A CHECK ENFORCES THIS NOW (2026-08-24). `record-inspect` goes red on a field
-report found anywhere in version control, and names the folder it belongs in.
-The rule stood in prose and was broken twice: 3,584 lines across two records,
-which nothing ever cited.
+A CHECK ENFORCES THIS. `record-inspect` goes red on a field report found
+anywhere in version control, and names the folder it belongs in. In prose
+alone the rule was broken twice, for 3,584 lines nothing ever cited.
 
 `guidance/method/cloud-runner.md` carries the detail.
 

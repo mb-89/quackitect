@@ -162,4 +162,4 @@ mechanism, and a rule without a mechanism loses. The mechanism:
 - The returned scores land verbatim. A disagreement is recorded beside the
   disputed score, never over it.
 - A score table authored by the composer is the breach i1 recorded as an
-  issue on 2026-08-09. Its cost is a full second-hand re-score.
+  issue. Its cost is a full second-hand re-score.

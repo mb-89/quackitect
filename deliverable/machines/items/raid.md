@@ -224,7 +224,7 @@ The note does not fail a check. It fails to LOAD, so every test that asks for
 it reports the node missing. The symptom names the wrong thing entirely, and
 the real cause is one character in a prompt nobody was looking at.
 
-Costed 13 red tests on 2026-08-08, all of them reading `req-clean loads`.
+Costed 13 red tests, all of them reading `req-clean loads`.
 
 Use a dash where a colon wants to go. `one line per pair — a pool id, then >
 or =` says the same thing and parses.

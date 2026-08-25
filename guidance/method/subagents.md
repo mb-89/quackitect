@@ -44,7 +44,7 @@ DO NOT DELEGATE A SWEEP THE LANE HAS A VERB FOR. `se_file_replace` renames
 across a tree in one call with a preview. A subagent doing the same is slower
 and less checkable.
 
-MEASURED 2026-08-23. A session fixed about forty test failures and spawned no
+MEASURED. A session fixed about forty test failures and spawned no
 subagent until the owner asked why. Almost none of the fixes were mechanical,
 so handing them over would have saved little — but the READING behind them was
 most of the session's cost, and every page of it stayed in context.

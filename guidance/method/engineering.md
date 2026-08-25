@@ -25,8 +25,8 @@ the concrete tools, chosen for speed and for installing with plain
 - THE LANE'S FIXER (`deliverable/engine/lintfix.ts`) runs Biome's SAFE fixes after
   every lane write to a covered file and announces what changed. Its
   coverage is read live from biome.json — never mirrored.
-- `--write --unsafe` IS BANNED. The unsafe tier rewrote ~70 non-null
-  assertions into optional chains and broke the strict build (2026-08-03).
+- `--write --unsafe` IS BANNED. The unsafe tier once rewrote about seventy
+  non-null assertions into optional chains and broke the strict build.
   Safe fixes only, everywhere, including by hand.
 - THE SHELL BUNDLES: `deliverable/vscode/src/extension.ts` → esbuild →
   `vscode/extension.js` (generated — edit the source, then
@@ -178,9 +178,9 @@ from the engine (`/widget/controls`) — the VS Code sidebar included.
 
 - ONE ROW PER CONTROL. The row starts with its label; the controls follow.
   The Types section in controls.md lists what a row may declare.
-- NEVER write bar markup in a surface. A surface that drew its own copy
-  drifted silently, and it cost the owner corrections. The spec is the
-  only place a control is born.
+- NEVER write bar markup in a surface. A surface that draws its own copy
+  drifts silently, and the drift is caught by a person rather than a check.
+  The spec is the only place a control is born.
 - A BUTTON POSTS A ROUTE. Give it `data-post` (the `action` and `actions`
   types do); the sidebar forwards any such press with no extension edit.
 - THE LABEL EXPLAINS ITSELF ON CLICK. The renderer puts the row's help
@@ -197,7 +197,7 @@ from the engine (`/widget/controls`) — the VS Code sidebar included.
 ## A UI change is not done until the engine restarts on it
 
 THE OWNER MUST SEE A UI CHANGE ON THE NEXT LOOK. Anything less costs them a
-round of "I still do not see it", and it cost several in one morning.
+round of "I still do not see it", and those rounds come in runs.
 
 The failure has a TELL, and it is worth knowing by sight. The surface shows
 NEW DATA drawn by OLD CODE — a template's raw `{token}` on screen, a
@@ -219,10 +219,9 @@ always the part that made a change visible.
 
 ## The engine checks a written file, and the agent never asks
 
-OWNER RULING 2026-08-15. "We are going to have a register of checking tools
-in the engine. The engine says: I am editing a TypeScript file, I am applying
-all the checks for TypeScript on it, and then I continue. Auto-formatting,
-like ruff for Python — the engine would just do that. It would not even ask.
+THE ENGINE HOLDS A REGISTER OF CHECKING TOOLS. Editing a TypeScript file, it
+applies every check for TypeScript and continues. Formatting is the same: the
+engine does it and does not ask.
 But if it detects a problem it cannot auto-format, it will reject with a
 decent remedy."
 
@@ -257,19 +256,15 @@ THERE IS NO `se_package` VERB TODAY. Do not call one. Until it exists, the M9
 package state builds its archive by running `deliverable/engine/bin/package.ts` through
 `se_run`, like any other script.
 
-OWNER RULING 2026-08-15, agreed at i12's retro. The M9 package state requires
-a versioned archive and the lane has no verb that builds one, so the agent
-reaches for the shell. It happened twice in i12, once refused for a bad
-argument.
+WHY THE HOLE IS NAMED RATHER THAN LEFT. The M9 package state requires a
+versioned archive and the lane has no verb that builds one, so an agent reaches
+for the shell and sometimes gets the arguments wrong.
 
 WHEN IT IS BUILT the verb wraps `deliverable/engine/bin/package.ts`, answers with the
 artifact path, and the package state's file-ref field resolves it against disk
 as it already does.
 
 ## A merge into trunk re-checks every open iteration
-
-OWNER RULING 2026-08-15, at i12's retro: "rechecking every open iteration, I
-think makes sense. We can do that."
 
 WHEN AN ITERATION'S BRANCH MERGES INTO TRUNK, the files it changed are files
 other open iterations have already signed claims against. Nothing re-checks
@@ -305,7 +300,7 @@ back maybe only one gate, sometimes we need to go back two gates. A dismissed
 gate goes back to idle."
 
 THE POSITION THE RULING NAMES IS NOW THE FRONT DESK. The idle state was
-removed on 2026-08-23 and the desk took its place as home. The ruling stands
+removed and the desk took its place as home. The ruling stands
 unchanged; only the name of the place it lands did.
 
 TODAY A FAILED GATE HAS NOWHERE TO GO. gate-implementation's only successor

@@ -46,9 +46,9 @@ It lands on the one copy. It cannot land in a record's own tree and fan out
 over trunk from there — and since i34 there is no other tree it could land in.
 
 THAT USED TO BE A REFUSAL. SE-C-134 blocked the write outright. The reason was
-real: on 2026-08-07 such a write pushed a record's copy over trunk and deleted
+real: such a write pushed a record's copy over trunk and deleted
 two lane verbs. The resolution seam removed the danger by construction, so the
-owner retired the clause on 2026-08-14.
+owner retired the clause.
 
 SO THE EMIT IS STILL OWED, FOR A DIFFERENT REASON. The write fixes the method.
 It tells the next record nothing. `promotions` at onboard-retro reads this

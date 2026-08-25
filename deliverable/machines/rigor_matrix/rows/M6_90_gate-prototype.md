@@ -57,7 +57,7 @@ RESULTS RECORDED is struck as mechanical:
 every seeded spike leaves an experiment node, and fold-back's submit
 refuses while any node's fold keys stand unanswered.
 
-ASSUMPTIONS VALIDATED is UNDER DISCUSSION with the owner (2026-08-10) —
+ASSUMPTIONS VALIDATED is UNDER DISCUSSION with the owner —
 its shape here is not settled. Until it is, the bless reads the
 register's assumptions and their probe results as data.
 

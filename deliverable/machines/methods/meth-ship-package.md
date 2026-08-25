@@ -29,6 +29,6 @@ that the package works.
 ## Waiting outside the matrix
 
 finalize-docs (the emitted book) and ship-review (dependency rulings)
-left the matrix on 2026-08-11 until their mechanisms exist. When the
+left the matrix until their mechanisms exist. When the
 book pipeline lands, the docs duty returns as its own row; until then
 the consistency sweep at M8 carries the teaching surfaces.

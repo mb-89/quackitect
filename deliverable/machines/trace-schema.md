@@ -277,7 +277,7 @@ demonstration spec - the M8 law refuses the validation gate while one
 is not. Running such a spec mints a report in the record, and the
 story's evidence slides cite that report.
 
-A first cut (2026-08-10) derived per-file test nodes from `verified_by`
+A first cut derived per-file test nodes from `verified_by`
 addresses written on the requirements. That inverted the edge — the parent
 held the mapping — and drew at file grain. Both retired with this ruling;
 `verified_by` is no longer written.

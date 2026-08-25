@@ -69,7 +69,7 @@ WORKED EXAMPLE, on a Windows desktop. The ladder ran seven rungs.
 
 Largest whole is 50,000 and smallest cut is 52,500, so the answer is 50,000.
 
-A LINUX CLOUD BOX MEASURED THE SAME SEVEN RUNGS on 2026-08-25, and settled on
+A LINUX CLOUD BOX MEASURED THE SAME SEVEN RUNGS, and settled on
 the same figure.
 
 NEVER STOP AT THE FIRST SIZE THAT HAPPENS TO WORK. A figure that merely
@@ -96,7 +96,7 @@ That is the trigger to climb again, once, and record what it settles at.
 
 ## The reading loop costs more calls than it should, and the cause is not the page size
 
-MEASURED 2026-08-23. An `se_file_read` of 200 characters came back as an
+MEASURED. An `se_file_read` of 200 characters came back as an
 answer of 20,451 bytes and spilled to disk.
 
 THE CONTENT WAS 200 BYTES. The rest was the `work` block, which carries the

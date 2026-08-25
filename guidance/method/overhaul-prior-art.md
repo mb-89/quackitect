@@ -15,7 +15,7 @@ is wanted once, by whoever doubts a rule.
 ## The maintenance-engineering half, adapted
 
 THE METHOD PAGE SAID THIS WAS OWED for as long as it existed. It was
-delivered on 2026-08-25.
+delivered.
 
 Maintenance engineering does not ask whether to overhaul a thing. It asks,
 PER FAILURE MODE, which of a closed set of policies applies. The founding

@@ -63,7 +63,7 @@ at, which is how a register fills up with entries nobody can close.
 AND CHECK THE KIND BEFORE THE TITLE. If the thing has already happened, it is
 an ISSUE, not an assumption — present tense, hurting now. Recording an
 observed failure as an assumption hides that it already bit. This was got
-wrong on 2026-08-07 with the reload's tool list, which had been seen to fail
+wrong with the reload's tool list, which had been seen to fail
 before it was written down as something merely believed.
 
 ## THREE SMELLS THAT MEAN AN ASSUMPTION IS HIDING

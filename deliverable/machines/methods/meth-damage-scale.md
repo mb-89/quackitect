@@ -105,7 +105,7 @@ with its neighbours.
 
 WHY IT WAS SPECIFIED THIS WAY. Ordered from nothing, a response-time
 requirement came out above the foundations of the system (owner report
-2026-08-08). It was still there on 2026-08-09, ranked first of seventy-two
+2026-08-08). It was still there, ranked first of seventy-two
 while graded corrosive — third of five — because a stored order from an
 earlier pass overrode the computed one. Two lessons, and both are load-bearing.
 
