@@ -174,6 +174,32 @@ could always find more retro to do and kept walking past the question.
 Only the FIRST retro step that needs a person gets named here; the rest
 of the retro proceeds while the answer is owed.
 
+### Claiming one is a call, not a sentence
+
+A STOP IS RELEASED BY `se_stop {because}`, and by nothing else. The agent says
+which sanctioned stop applies and why, the claim lands in the call log, and the
+tooth reads it there.
+
+RETRYING IS NOT CLAIMING, and the valve used to treat it as though it were.
+`stop_hook_active` is set by the HARNESS when a blocked stop is retried, so the
+agent chose nothing. The refusal invited a claim and then released the stop
+whether or not one came.
+
+MEASURED ON A LIVE SESSION: four times in a row the lifecycle log reads
+`stop-block do at front_desk` and then `stop-pass bites once per stop`. The
+tooth bit and the valve immediately undid it, which from outside is
+indistinguishable from a hook that does not run at all.
+
+BOTH HALVES ARE STILL REQUIRED. The harness flag proves the stop was already
+refused, so a force cannot pre-empt the tooth. The lane call proves a hand
+decided to stop anyway.
+
+ONE FORCE RELEASES ONE STOP. The next pull spends it, exactly as a pull spends
+an aim, so this is a decision rather than a switch left on.
+
+THE HOOK CANNOT READ A MESSAGE. It reads the call log, which is why saying
+which stop applies in chat never proved anything to it.
+
 ## The session cleans up after itself
 
 THE SESSION CLEANS UP AFTER ITSELF (owner, 2026-07-30): when the
