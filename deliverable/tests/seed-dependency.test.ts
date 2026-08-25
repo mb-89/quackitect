@@ -1,6 +1,6 @@
 // i6's seed demand, written before the build so it is watched failing.
 //
-// MEASURED 2026-08-13: twenty-seven iterations seeded and the key set on seven.
+// MEASURED: twenty-seven iterations seeded and the key set on seven.
 // Three stated a wait in their own vision prose and carried no edge for it. The
 // rule stood in the seed tool's own argument description the whole time.
 import { strict as assert } from "node:assert";

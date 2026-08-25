@@ -1,4 +1,4 @@
-// THE DRIFT (owner ruling 2026-08-05): green must mean STILL GREEN NOW.
+// THE DRIFT: green must mean STILL GREEN NOW.
 //
 // The demand diff used to run only when a pin was rewritten, and a pin is only
 // rewritten on an escalation. So editing a matrix row under a standing
@@ -154,7 +154,7 @@ test("a step that was never green is not painted suspect", () => {
 });
 
 // GREEN STOPS AT THE FIRST INPUT THAT IS NOT GREEN, and the claim that stops
-// being green KEEPS ITS SIGNATURE (owner ruling 2026-08-07, v1's design).
+// being green KEEPS ITS SIGNATURE.
 //
 // The old code wrote a `suspect:` line onto the claim and stripped the stamps
 // to do it. That stored a derived value, which then went stale between the
@@ -228,8 +228,7 @@ test("a claim signed before its feeder's signature is stale, and the bless falls
   assert.ok(!new Session(root).recordDone(decl).includes(gate.id), "but it is NOT green — it answered older ground");
   assert.ok(!new Session(root).blessedGates(decl).includes(gate.id), "and the thumbs-up falls with the green");
 
-  // AND AN AMEND DOES NOT CLEAR IT. THIS BLOCK ONCE ASSERTED THE OPPOSITE
-  // (owner ruling 2026-08-17, correcting what stood here the same day).
+  // AND AN AMEND DOES NOT CLEAR IT. THIS BLOCK ONCE ASSERTED THE OPPOSITE.
   //
   // It read "an amend re-freshens the claim against the ground as it now
   // stands", which made every correction anywhere count as a fresh answer —
@@ -507,7 +506,7 @@ test("the drift rips down — everything downstream of a moved step goes with it
   assert.ok(!cone.has("unrelated"), "a step off the path is untouched");
 });
 
-// THE FAN-IN IS AN AND (owner design 2026-08-04, note-bb6d1cb6b75d): in most
+// THE FAN-IN IS AN AND: in most
 // machines every branch must be covered. The route used to be breadth-first
 // shortest path, which finds ONE way to a gate and never mentions the other
 // branch — so the walk marched at a gate that then refused, naming a feeder
@@ -614,7 +613,7 @@ test("green reads the corpus once, and is computed against two hundred nodes", (
     1,
     `recordDone asked for the corpus ${asks} time(s) over ${claimful} claimful states. It collects its input ONCE and hands it down; ${claimful} asks would mean every state fetching its own, which is the defect this guards and which no cache hides.`,
   );
-  // MEASURED, 2026-08-17: 245 accesses over 200 fillers and 25 claimful
+  // MEASURED: 245 accesses over 200 fillers and 25 claimful
   // states. That is ONE sweep — the corpus, plus the root's own nodes, plus
   // each state instance and its templates on top. A per-state sweep at 25
   // states would be about five thousand.

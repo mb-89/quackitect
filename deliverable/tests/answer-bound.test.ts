@@ -203,7 +203,7 @@ test("the suggested spill page keeps a read's own answer inside the bound", asyn
 });
 
 test("the cap probe records into the machine-state folder, not beside it", () => {
-  // MEASURED 2026-08-24. The handler passed `rootOf(".se")` — the PROJECT ROOT —
+  // MEASURED. The handler passed `rootOf(".se")` — the PROJECT ROOT —
   // to a pair of functions whose parameter is the `.se` folder itself. The probe
   // answered `recorded: 38000`, the file landed untracked at the top of the
   // repository, and the bound never moved.

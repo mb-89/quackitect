@@ -1,4 +1,4 @@
-// THE THRESHOLD (owner ruling 2026-07-26): every state carries a priority
+// THE THRESHOLD: every state carries a priority
 // (0.2 mechanical .. 0.8 strategic, 1 ideation — the rungs of machines/scale.md,
 // re-anchored by the owner's tier cut-over of 2026-08-12); the AGENT enters a
 // state by itself only

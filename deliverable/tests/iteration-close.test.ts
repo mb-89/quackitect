@@ -1,4 +1,4 @@
-// THE SHIPPED ITERATION ARCHIVES ITSELF (owner ruling 2026-08-11): after the
+// THE SHIPPED ITERATION ARCHIVES ITSELF: after the
 // last bless the walk leaves through the terminal and the close runs. This
 // pins the mechanics; the walk's trigger rides advanceOutOfSub.
 //
@@ -52,7 +52,7 @@ test("closing a shipped iteration stamps the record and leaves its folder standi
   assert.match(String(rec?.closed ?? ""), /2\d{3}-/, "and carries its closed stamp");
 });
 
-// AN ABANDONED RECORD LEAVES THE OPEN SET (owner ruling 2026-08-24).
+// AN ABANDONED RECORD LEAVES THE OPEN SET.
 //
 // WHY THE WORD EXISTS. A record whose work is no longer wanted, or whose
 // outcome arrived by another road, fits neither of the other two. `shipped`

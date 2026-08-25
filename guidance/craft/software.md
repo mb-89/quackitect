@@ -317,6 +317,20 @@ turn it into a check.
 A DELIBERATE CHOICE THAT MUST SURVIVE FUTURE EDITS GETS A TEST OR A LINT,
 never a comment. A comment is the weakest guard there is.
 
+### The rule has a ratchet, and it names the tree it watches
+
+`deliverable/tests/comment-rule.test.ts` counts every comment line carrying a
+date or an owner attribution, per tree, and refuses a rise. The count may fall
+freely and may never grow.
+
+A CEILING PER TREE, never one number for all of them. The engine stands at
+zero, and a shared ceiling would let test debt spend that.
+
+AIM IT AT EVERY TREE THE RULE BINDS. It watched the engine alone for months,
+so the engine reached zero while the tests reached 521 under a guard that
+looked like it covered them. A ratchet over half a tree measures the half that
+was already clean.
+
 ## Guards that teach
 
 A guard exists to move the work on, never to prove a rule. These four came

@@ -79,7 +79,7 @@ test("se_log_query narrows by text, so finding a topic is not reading every reco
   assert.equal(none.total, 0, "a filter that matches nothing reports nothing, not the whole log");
 });
 
-// THE HANDOVER, DERIVED RATHER THAN WRITTEN (owner ruling 2026-08-07). The
+// THE HANDOVER, DERIVED RATHER THAN WRITTEN. The
 // written one had its gate at the `end` state, so a session that was simply
 // killed never produced one — which the owner confirmed is how they always
 // worked. The log already knows what happened, so it gets asked instead.

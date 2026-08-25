@@ -158,7 +158,7 @@ describe("a clear jump is one call", () => {
 // TSP-POINTING-THE-WALK-COSTS-THE-SAME-WHATEVER-THE-DISTANCE.
 //
 // THE TWO FORMS ARE ONE VERB WITH A FLAG, and both stand. Asking to jump is an
-// ADDITION to aiming (owner ruling 2026-08-24), so the case above keeps its
+// ADDITION to aiming, so the case above keeps its
 // meaning and this one is about the OTHER form.
 //
 // THIS ROW ONCE ASSERTED THAT A BARE AIM DRAWS NO ROUTE, on the premise that

@@ -1,6 +1,6 @@
 // The cage's live inventory (tsp-native-project-tools-stay-outside-the-cage).
 //
-// SMALL FILES ON PURPOSE (owner ruling, 2026-07-30). See guidance/craft/software.md.
+// SMALL FILES ON PURPOSE. See guidance/craft/software.md.
 import { strict as assert } from "node:assert";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";

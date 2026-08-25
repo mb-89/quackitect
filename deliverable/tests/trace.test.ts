@@ -181,7 +181,7 @@ describe("the radial trace graph", { concurrency: true }, () => {
     assert.equal(layoutTrace(all).rings.length, traceRings().length);
   });
 
-  // AN EMPTY RING IS NOISE (owner, 2026-08-06). A level nothing has reached
+  // AN EMPTY RING IS NOISE. A level nothing has reached
   // draws a circle around nothing and pushes the rest inward.
   test("a level with nothing on it draws NO ring, and gets one the moment it does", () => {
     assert.equal(layoutTrace([prop("vp-a")]).rings.length, 1, "props alone, one ring");
@@ -194,7 +194,7 @@ describe("the radial trace graph", { concurrency: true }, () => {
     );
   });
 
-  // THE SPAN IS WHAT THE ITEMS NEED (owner, 2026-08-06). Spreading them across
+  // THE SPAN IS WHAT THE ITEMS NEED. Spreading them across
   // the whole wedge flung two stories to opposite sides the moment a filter
   // left one prop standing — the drawing changed shape without the data
   // changing.
@@ -514,7 +514,7 @@ describe("the pieces you click reach the lines you see", { concurrency: true }, 
   });
 });
 
-// THE THREE GESTURES (owner ruling 2026-08-07). Client script, so a test can
+// THE THREE GESTURES. Client script, so a test can
 // only hold the WIRING honest — that each gesture exists and does its own job.
 // Cytoscape owns the wheel and drag; this is what stops those from being dropped silently.
 test("the wheel zooms, the drag pans, the double-click centres", async () => {

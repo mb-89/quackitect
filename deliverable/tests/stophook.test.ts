@@ -1,4 +1,4 @@
-// THE STOP TOOTH (owner order 2026-08-09). The contract's stop rules failed
+// THE STOP TOOTH. The contract's stop rules failed
 // as prose four recorded times, so the Stop hook refuses an unsanctioned
 // stop mechanically — on Claude Code via .claude/settings.json, on Copilot
 // CLI via the same cross-tool file plus .github/hooks/se-stop.json.
@@ -94,7 +94,7 @@ test("the desk with a target set still blocks — a routed goal is a standing in
   assert.equal(JSON.parse(out).decision, "block", "the desk is not a hiding place from a goal the person routed");
 });
 
-// THE STOP-AT NOTCH DECIDES (owner design 2026-08-16, machines/stopat.md).
+// THE STOP-AT NOTCH DECIDES.
 //
 // One fixed rule was right about eight stops in a day and wrong about five,
 // and no tuning lets it tell them apart: the REASON a stop happened is not in
@@ -187,7 +187,7 @@ test("a pull spends the force — one force releases one stop", () => {
 });
 
 test("a wait WITH A TARGET blocks — an escape does not launder a stop", () => {
-  // MEASURED 2026-08-14: the escape hatch lands at the front desk, the desk
+  // MEASURED: the escape hatch lands at the front desk, the desk
   // answers wait, and the tooth had nothing to bite. Two stops that day were
   // post-escape and both passed, while a routed goal stood the whole time.
   const out = verdict([pullRecord({ pull: "wait", where: ["front_desk"], target: "iterations/i27" })], {});

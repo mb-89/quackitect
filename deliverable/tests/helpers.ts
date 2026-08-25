@@ -93,7 +93,7 @@ const COPIED = [
   // point: engine, tests and the vscode sources — never the copied machines
   // and guidance a test root also carries.
   //
-  // MEASURED 2026-08-17, in a root that had biome but not its config: 133 files
+  // MEASURED, in a root that had biome but not its config: 133 files
   // checked instead of the product's set, 47 warnings, and --error-on-warnings
   // turned that into a non-zero exit. se_test's battery returns early on a
   // failed format step, so tests/nesting.test.ts saw 1 result where it expects 4.
@@ -113,7 +113,7 @@ const YAML_REL = join("deliverable", "node_modules", "yaml");
 // the link to its real path — so it looks inside this template and finds a
 // node_modules holding exactly one package.
 //
-// MEASURED 2026-08-17: tests/nesting.test.ts read 1 !== 4 for that reason, on
+// MEASURED: tests/nesting.test.ts read 1 !== 4 for that reason, on
 // both platforms, since the link resolves the same way on each.
 const BIOME_REL = join("deliverable", "node_modules", "@biomejs");
 
@@ -149,7 +149,7 @@ function freeze(dir: string): void {
 
 let templateDir: string | undefined;
 
-// THE TEMPLATE LIVES IN .se, NOT IN TEMP (owner ruling, 2026-07-30). It
+// THE TEMPLATE LIVES IN .se, NOT IN TEMP. It
 // is machine-local, already ignored by git, and about 1.2 MB — the engine
 // plus the yaml package. It is never deleted: if the fingerprint matches
 // it is reused, and if it does not, a new one is built beside it. Keeping
@@ -527,7 +527,7 @@ export function gitInit(root: string, commit = false): void {
   }
 }
 
-// proofFor IS RE-EXPORTED, NEVER MIRRORED (owner, 2026-08-18). It used to be a
+// proofFor IS RE-EXPORTED, NEVER MIRRORED. It used to be a
 // hand-kept copy of the engine's probe maths with a comment saying so, and the
 // comment did not stop it going stale. engine/readproof.ts is the one source.
 // It is imported at the top of this file and re-exported here, because callers

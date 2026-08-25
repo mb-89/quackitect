@@ -1,4 +1,4 @@
-// THE DRAWING IS THE TRUTH, SIZE INCLUDED (owner ruling 2026-07-28).
+// THE DRAWING IS THE TRUTH, SIZE INCLUDED.
 //
 // The render used to compute its own box sizes, on the reasoning that a label
 // needs less room than a note. The cost was that the mirror and Obsidian
@@ -70,7 +70,7 @@ test("a new node is born the size of its title and subtitle", () => {
   assert.ok(withSub.height < 640, "the 620x640 birth size is struck");
 });
 
-// A GENERATED BOX IS SIZED BY WHAT IT SHOWS (owner ruling 2026-07-28). An
+// A GENERATED BOX IS SIZED BY WHAT IT SHOWS. An
 // expedition's subtitle is its whole goal statement, and sizing from that made
 // e20's box 10793px wide to display 48 characters. Nobody could fix it in
 // Obsidian either, because the node is generated on every render.

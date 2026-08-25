@@ -1,4 +1,4 @@
-// ONE ARROW, BOTH WAYS (owner ruling 2026-07-28). Drawing a forward edge and
+// ONE ARROW, BOTH WAYS. Drawing a forward edge and
 // a return edge as two separate arrows is what Obsidian makes tedious, so a
 // DOUBLE-HEADED arrow means exactly that pair.
 //

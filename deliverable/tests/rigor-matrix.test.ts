@@ -12,7 +12,7 @@ import { ALL_COLUMNS, CHANGE_COLUMNS, compileColumn, readRigorMatrix } from "../
 
 const ROOT = join(import.meta.dirname, "..", "..");
 
-// EVERY JOIN DECIDES ABOUT ITS BAR (owner ruling 2026-08-06).
+// EVERY JOIN DECIDES ABOUT ITS BAR.
 //
 // A state with two or more inputs meets them as an AND only when a busbar is
 // authored above it. Without one they are an OR, and any single arriving
@@ -52,18 +52,18 @@ test("readMatrix: the real matrix is complete", () => {
   // 51 since identify-assumptions split off probe-assumptions (owner ruling
   // 2026-08-06): probing assumed somebody had written assumptions, and
   // nothing forced anybody to.
-  // 52 since cut-criteria split off evaluate-set (owner ruling 2026-08-08):
+  // 52 since cut-criteria split off evaluate-set:
   // cutting an axis inside evaluate-set means cutting with the totals
   // already visible, which is the poisoning the weights-first order exists
   // to prevent, arriving one step later.
-  // 54 since trace-design (owner ruling 2026-08-11): the design trace's
+  // 54 since trace-design: the design trace's
   // mechanical half stands between build-steps and verification.
-  // 53 since declare-winner (owner ruling 2026-08-10): the selection is
+  // 53 since declare-winner: the selection is
   // recorded on its own state rather than implied by arithmetic.
-  // 52 since the M9 cut (owner ruling 2026-08-11): finalize-docs and
+  // 52 since the M9 cut: finalize-docs and
   // ship-review wait outside the matrix until the book and vendoring
   // mechanisms exist.
-  // 53 since 2026-08-19: M5_27 graft-onto-the-winner, added by i9 between
+  // 53: M5_27 graft-onto-the-winner, added by i9 between
   // declare-winner and record-adrs.
   // 63 since spawn-the-hands: the roster row stands at position 05 of EVERY
   // milestone, M0 through M9, because the hands a phase needs differ per phase
@@ -114,7 +114,7 @@ test("compileColumn major: every row seeds; the machine validates", () => {
   // like boot: the same five searches every time, so the drawing is method
   // rather than content and lives in machines/enumerate-space.canvas.
   //
-  // THE .canvas SUFFIX IS WHAT TELLS THEM APART (owner ruling 2026-08-08). A
+  // THE .canvas SUFFIX IS WHAT TELLS THEM APART. A
   // seeded name is looked for in the record; a file name is compiled from
   // machines/. Without the suffix the walk refused with "a run without
   // visible steps" and pointed at a file nobody was ever going to write.
@@ -140,7 +140,7 @@ test("compileColumn patch: struck states vanish and dependencies contract", () =
   // Struck at patch: no vision, no architecture walk.
   assert.ok(!ids.has("gate-motivation"));
   assert.ok(!ids.has("enumerate-space"));
-  // Every iteration opens with the retro — patch included (owner 2026-08-04).
+  // Every iteration opens with the retro — patch included.
   assert.ok(ids.has("onboard-retro"));
   // The floor holds. Every size is checked below; this is the patch case,
   // which is the one that strikes the most.
@@ -166,7 +166,7 @@ test("compileColumn patch: struck states vanish and dependencies contract", () =
   // 29 applied rows + start. identify-assumptions applies at patch too: when a
   // patch exists BECAUSE something stopped holding, that is an assumption
   // turning into an issue, and it is the one case patch-size must record.
-  // log-gaps left the matrix entirely (owner ruling 2026-08-11): gaps ride
+  // log-gaps left the matrix entirely: gaps ride
   // the gate's raid_additions, and run-demos does not apply at patch.
   // The roster row is FLOOR and never struck, so all ten copies apply here.
   assert.equal(decl.states.length, 30);
@@ -270,22 +270,22 @@ test("evidence is frontmatter data: every non-terminal row carries fields", () =
   const m = readRigorMatrix(ROOT);
   for (const row of m.rows) {
     if (row.state_kind === "terminal") continue;
-    // A GATE MAY CARRY NONE (owner ruling 2026-08-07). The compiler gives it
+    // A GATE MAY CARRY NONE. The compiler gives it
     // the four standard rounds, and those are evidence. A gate whose own
     // fields all reduced to mechanical checks SHOULD end up empty — a field
     // that can only ever say yes teaches the reader to skim, and then the
     // fields that could have said no get skimmed with it.
     //
-    // A SUB-MACHINE STATE MUST CARRY NONE (owner ruling 2026-08-08), for the
+    // A SUB-MACHINE STATE MUST CARRY NONE, for the
     // opposite reason: its evidence lives one level down, in the sub-machine's
     // own states. Four rows carried a field here that nothing could ever
     // serve, because the walk descends past this state and completes it on
     // the way out.
-    // A FALLBACK STATE MAY CARRY NONE (owner ruling 2026-08-11): its proof
+    // A FALLBACK STATE MAY CARRY NONE: its proof
     // is the state it recovers re-passing. fix-findings' findings are the
     // red verifications, generated — a form here would re-ask what the
     // confirm run answers.
-    // A LAW-PROVEN STATE MAY CARRY NONE (owner ruling 2026-08-11):
+    // A LAW-PROVEN STATE MAY CARRY NONE:
     // fill-story-evidence's claim is computed — every slide's evidence half
     // non-empty — and a field here would re-ask what the law answers.
     if (row.state_kind !== "gate" && row.runs === undefined && row.edge_role !== "fallback" && row.name !== "fill-story-evidence") {

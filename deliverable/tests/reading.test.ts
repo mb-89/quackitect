@@ -43,7 +43,7 @@ test("the first packet hands over one file, not a list of chores", () => {
 
 test("one read of the reading carries the whole walk, with nothing handed in", async () => {
   const { session, server } = pair();
-  // THE EXPECTATION IS ASKED, NEVER NAMED (owner ruling 2026-08-06): the
+  // THE EXPECTATION IS ASKED, NEVER NAMED: the
   // route's own list, captured before the read consumes it, is what the
   // reading must carry — two mechanisms cross-checked, no path pinned.
   const wants = [...(session.packet() as { route_reads: string[] }).route_reads];

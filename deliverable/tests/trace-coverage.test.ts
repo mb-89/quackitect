@@ -1,5 +1,4 @@
-// THE TRACE IS CHECKED BOTH WAYS, AT EVERY LAYER, OVER THE WHOLE TRACE
-// (owner ruling 2026-08-06).
+// THE TRACE IS CHECKED BOTH WAYS, AT EVERY LAYER, OVER THE WHOLE TRACE.
 //
 // A REGISTER BELONGS TO ONE ITERATION. A node written in an earlier iteration
 // is not in this iteration's register and never will be. So register

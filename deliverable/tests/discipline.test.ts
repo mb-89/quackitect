@@ -1,4 +1,4 @@
-// The discipline round (owner ruling 2026-08-02), tested against the harvest
+// The discipline round, tested against the harvest
 // that ruled it: 2,589 logged se_run calls, 46% of them improvised text tools
 // — Select-String for the searcher, Get-Content for the reader, Set-/Add-
 // Content for the writer, every one uninstrumented. The lane grows the
@@ -21,7 +21,7 @@ function fresh(): string {
   return mkdtempSync(join(tmpdir(), "se-v3-disc-"));
 }
 
-// THE SLIDER IS THE PERSON'S ALONE (owner ruling 2026-08-10). No lane verb
+// THE SLIDER IS THE PERSON'S ALONE. No lane verb
 // may reach the autonomy dial — it moves through the mirror's human route
 // and the boot flag, nowhere else. This guard refuses the verb before it
 // can exist.
@@ -37,7 +37,7 @@ test("no lane verb reaches the autonomy dial", () => {
 // at the top level as "1 subtest failed" with the suite's location. The one
 // line that says WHAT failed was dropped, every time.
 //
-// MEASURED 2026-08-16: three failures had to be re-run through the shell with
+// MEASURED: three failures had to be re-run through the shell with
 // a different reporter to be read at all — each a logged escape from the lane
 // that exists to replace exactly that.
 test("a failure inside a suite reports its own assertion, not the parent's roll-up", () => {
@@ -70,7 +70,7 @@ test("a failure inside a suite reports its own assertion, not the parent's roll-
   assert.equal(only.failures.length, 1, "nothing more specific means the parent still reports");
 });
 
-// A TRUNCATING SHAPE IS REFUSED, NOT ANNOTATED (owner ruling 2026-08-16).
+// A TRUNCATING SHAPE IS REFUSED, NOT ANNOTATED.
 //
 // The lane warned about this for months and the warning did not work: an agent
 // piped a test run through Select-String IN THIS ITERATION, while building the
@@ -675,7 +675,7 @@ test("the streak counts consecutive greens per scope and a red resets it", () =>
 });
 
 // ── the cut law ────────────────────────────────────────────────────────────
-// CUT THE MIDDLE, NEVER THE END (owner law 2026-08-02). Incident: a
+// CUT THE MIDDLE, NEVER THE END. Incident: a
 // head-only cap turned "(425.501917ms)" into "(425.501", the unit died with
 // the tail, and milliseconds were diagnosed as seconds — three documents
 // carried the wrong number before the owner caught it. The end of an output

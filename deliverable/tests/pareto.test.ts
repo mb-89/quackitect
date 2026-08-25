@@ -137,7 +137,7 @@ describe("the drawing", { concurrency: true }, () => {
     assert.match(draw([], AXES), /Fill the score table and the front draws itself/);
   });
 
-  // A DERIVED FIELD STORES NOTHING (owner ruling 2026-08-08). The first cut
+  // A DERIVED FIELD STORES NOTHING. The first cut
   // wrote the front into the field so the gate could read it without
   // recomputing — which is the second copy this design exists to avoid, and it
   // drifts from the scores the moment one number changes.

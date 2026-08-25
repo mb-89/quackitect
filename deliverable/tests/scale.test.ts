@@ -28,7 +28,7 @@ test("the scale offers a notch at zero, so a full block is one click away", () =
   assert.equal(Math.min(...levels.map((l) => l.value)), 0, "nothing sits below it");
 });
 
-// THE TIER LADDER IS THE VOCABULARY (owner cut-over ruling 2026-08-12):
+// THE TIER LADDER IS THE VOCABULARY:
 // mechanical, operational, tactical, strategic, ideation — the words are
 // the truth, the numbers their transitional anchors.
 test("the ladder speaks the owner's tiers in order, and the words map to their anchors", () => {
@@ -84,7 +84,7 @@ test("the shipped stop-at notches parse, and say what the owner specified", () =
   assert.equal(notchName(notches, 99), "", "an unknown value names nothing rather than guessing a notch");
 });
 
-// BLOCKED IS NOT A BUTTON (owner, 2026-08-01). It is what no rung being
+// BLOCKED IS NOT A BUTTON. It is what no rung being
 // pressed MEANS, so it is reachable by RELEASING the lowest rung rather than
 // by a switch of its own. The control is switches, never a slider.
 test("the mirror reaches blocked by releasing the lowest rung", () => {
@@ -172,7 +172,7 @@ test("no state is authored at priority zero, or the block would not block", () =
   }
 });
 
-// THE RUNG TRAVELS AS A WORD, AND THE DIAL HAS TO SPEAK IT — i17, 2026-08-18.
+// THE RUNG TRAVELS AS A WORD, AND THE DIAL HAS TO SPEAK IT — i17.
 //
 // The 2026-08-18 ruling took the numbers off the rungs, and se-arrive was moved
 // with it: it launches the lane with `--autonomy tactical`. se-mcp was NOT, and

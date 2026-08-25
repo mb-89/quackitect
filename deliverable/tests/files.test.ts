@@ -35,7 +35,7 @@ function fresh(): string {
 // The owner's reason, in their words: if it is not human readable it is not a
 // first-class artifact.
 test("no binary file lives in the tree — an unreadable figure is not an artifact", () => {
-  // THE SCRATCHPAD IS EXEMPT (owner ruling 2026-08-12): it is the agent's
+  // THE SCRATCHPAD IS EXEMPT: it is the agent's
   // workbench and may hold whatever the work needs — a standards PDF, a heap
   // profile, a rendered probe. It is gitignored, and package.ts already keeps
   // it out of the shipped archive, so nothing here reaches the PRODUCT.
@@ -94,22 +94,22 @@ test("no binary file lives in the tree — an unreadable figure is not an artifa
 // bin/ IS EXEMPT. A one-shot script reads its input and exits; there is no
 // second ask for a door to save.
 test("no new file read bypasses the door — the count may fall, never rise", () => {
-  // 100 since 2026-08-10: the vault's watcher reads .se/quack-watch.json direct —
+  // 100: the vault's watcher reads .se/quack-watch.json direct —
   // JSON config, not a note, so no door saves a shared parse.
-  // 101 since 2026-08-12: claims.ts reads the machine-id file — one tiny
+  // 101: claims.ts reads the machine-id file — one tiny
   // id outside the note system, minted once.
-  // 102 since 2026-08-13: help.ts reads the demand log (.se/help-demand.jsonl)
+  // 102: help.ts reads the demand log (.se/help-demand.jsonl)
   // direct — a JSONL log outside the note system, same shape as the two above.
-  // 103 since 2026-08-14: mode.ts reads .se/mode.json — the run mode, one tiny
+  // 103: mode.ts reads .se/mode.json — the run mode, one tiny
   // JSON object of session state, read at start. Same shape as the three
   // above, and no door would ever hold it.
-  // 104 since 2026-08-14: version.ts reads the package manifest ONCE at import,
+  // 104: version.ts reads the package manifest ONCE at import,
   // for the product's own version. It was hardcoded as "3.0.0-bootstrap" in
   // four places and stopped following the product at the 4.0.0 release, so
   // every logged call across v4 carried a version the product had left behind.
   // There is no node here to route through a door — only the manifest, which
   // the packaging script already reads for the same fact.
-  // 105 since 2026-08-15: testreporters.ts reads .se/test-timings.jsonl to
+  // 105: testreporters.ts reads .se/test-timings.jsonl to
   // count what a run recorded. A JSONL append log outside the note system,
   // read once per run to answer one question — did the bookkeeping land. The
   // read is the POINT: it is what makes a silent instrument failure visible,
@@ -118,28 +118,28 @@ test("no new file read bypasses the door — the count may fall, never rise", ()
   // /vendor/cytoscape.min.js. A one-shot read of a static asset outside the
   // note system, the same shape as every increment above it — and the read
   // exists because the alternative was fetching it from unpkg on every open.
-  // 107 since 2026-08-18: paths.ts reads an identity file — brand.json for a
+  // 107: paths.ts reads an identity file — brand.json for a
   // tree's own id, upstream.json for the id it was produced from. Two tiny
   // JSON objects, and the brand one is read in a FOREIGN tree that is not this
   // vault at all, so no note door could serve it even in principle. What the
   // read decides is whether a write target is the tree this system came from,
   // which is the one law a vehicle may never breach.
-  // 111 since 2026-08-18: produce.ts reads four files direct — the brand fact
+  // 111: produce.ts reads four files direct — the brand fact
   // of the tree it is producing from, the README template it renders, the
   // brand fact again when it has to mint its own identity, and a driven
   // record. None is a note. Two of them are read in trees that are not this
   // vault at all, and the README template is a template rather than a node, so
   // no door could share a parse with any of them.
-  // THE TWO INCREMENTS ARE INDEPENDENT and the merge kept both, 2026-08-18.
+  // THE TWO INCREMENTS ARE INDEPENDENT and the merge kept both.
   // i17 took 105 to 106 and i16 took 105 to 110, so the merged ceiling is 111.
-  // 112 since 2026-08-19: stopping-layer.ts reads .se/engine.log to say which
+  // 112: stopping-layer.ts reads .se/engine.log to say which
   // layer ended an interrupted call. A plain append-only text file outside the
   // note system, with no frontmatter to parse, read once to answer one
   // question. Routing it through a note door would share a parse with nobody,
   // and the door would have to parse a log as a node to do it.
-  // THAT ONE ARRIVED ON TOP OF 111 AT THE i36 MERGE, 2026-08-20. Its own branch
+  // THAT ONE ARRIVED ON TOP OF 111 AT THE i36 MERGE. Its own branch
   // counted it as 107 because it never saw the five increments above it.
-  // 115 since 2026-08-20: the benchmark run reads three things no door holds.
+  // 115: the benchmark run reads three things no door holds.
   // FIVE WERE WRITTEN AND TWO WERE GIVEN BACK, which is what this ratchet is
   // for: a record and a benchmark report are both NOTES, so they went through
   // noteOf, and the engine version already has its one reader in version.ts.
@@ -152,7 +152,7 @@ test("no new file read bypasses the door — the count may fall, never rise", ()
   //   - benchmark-guard.ts controlFilesPresent: markdown in the REWOUND TREE,
   //     which is a fetched checkout and not this vault. No door could serve it
   //     even in principle, exactly as at 107 and 111.
-  // 116 since 2026-08-20: version.ts reads the manifest a SECOND time, and the
+  // 116: version.ts reads the manifest a SECOND time, and the
   // second read is the whole point. SE_VERSION beside it is an IIFE evaluated
   // once at import and frozen for the life of the process — correct for a
   // stamp, and precisely why a running lane cannot notice that the code on
@@ -255,25 +255,25 @@ test("no new file read bypasses the door — the count may fall, never rise", ()
 // bin/ IS EXEMPT for the read ratchet's reason. notes.ts is exempt because
 // writeNode's own write IS the door.
 test("no new file write bypasses the door — the count may fall, never rise", () => {
-  // 38 since 2026-08-12: claims.ts mints the machine-id file, and the pin
+  // 38: claims.ts mints the machine-id file, and the pin
   // scaffolds seeded placeholder drawings — generated files the door never
   // holds, the same class as the pin's own write.
   //
-  // 39 since 2026-08-14: bound.ts spills an oversized answer to
+  // 39: bound.ts spills an oversized answer to
   // `.se/answers/<tool>.json`. That is SESSION state — machine-local,
   // gitignored, overwritten by the next big answer and read back only by the
   // cursor on the answer that wrote it. The door holds corpus, so this is a
   // file it can never hold.
   //
-  // 40 since 2026-08-14: mode.ts writes `.se/mode.json`, the run mode the
+  // 40: mode.ts writes `.se/mode.json`, the run mode the
   // person chose. Session state again — host-local, uncommitted, one small
   // object, and deliberately NOT corpus: what suits one machine's cores is not
   // a fact about the product.
-  // 41 since 2026-08-19: promptlayer.ts gained placeSkills, which writes one
+  // 41: promptlayer.ts gained placeSkills, which writes one
   // skill file into three host directories from a single loop. It is a
   // projection of guidance, placed exactly like the protocol files beside it,
   // and no note door could hold a file whose shape the host owns.
-  // 42 since 2026-08-20: benchmark.ts writes `.se/benchmark.json` when a run
+  // 42: benchmark.ts writes `.se/benchmark.json` when a run
   // binds — which run is open, where its history was cut, and the three
   // conditions no log holds. SESSION state, exactly the shape of 39 and 40:
   // machine-local, gitignored, and deleted when the run ends. The one thing a
@@ -366,7 +366,7 @@ test("a file too binary to search is REPORTED, never silently empty", () => {
 });
 
 // CORRECT WHAT IS MECHANICAL, ANNOUNCE WHAT YOU CORRECTED, REFUSE ONLY THE
-// AMBIGUOUS (owner ruling 2026-08-02). The walking test above catches a raw
+// AMBIGUOUS. The walking test above catches a raw
 // NUL after it has landed. These catch it at the write, which is the last
 // moment it is still cheap.
 //
@@ -410,7 +410,7 @@ test("the patch door closes the same way, and names it on the result", () => {
   rmSync(root, { recursive: true, force: true });
 });
 
-// SEARCH AND REPLACE ACROSS FILES (owner, 2026-08-02). The per-file regex op
+// SEARCH AND REPLACE ACROSS FILES. The per-file regex op
 // is the scalpel; this is the sweep. What makes a sweep safe to offer is the
 // REPORT rather than a cleverer pattern: a wide edit whose result is only a
 // number is the one nobody can check.
@@ -783,7 +783,7 @@ test("move leaves markdown reference forms out of source, and spares longer name
 // A SKETCH IS A CONTRACT (ux.md) and the reader could not open one. It read
 // every file as utf8, so the owner had to describe a drawing the agent was
 // holding the path to. Nothing ever ruled the reader text-only; it was only
-// ever written that way (owner, 2026-07-29).
+// ever written that way.
 const PNG_1X1 = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==", "base64");
 
 test("an image reads back as the PICTURE, not as lines", () => {
@@ -876,7 +876,7 @@ test("a declared root serves reads; an undeclared one refuses with the vocabular
 // live the day this landed). PowerShell wrote roots.json with a UTF-8 BOM,
 // JSON.parse refused it, and a swallowing catch reported the owner's own root
 // as undeclared. Two failures in one: the BOM, and the silence about it.
-// A ROOT YOU CANNOT BROWSE IS HALF A FEATURE (owner, 2026-07-29). Reading by
+// A ROOT YOU CANNOT BROWSE IS HALF A FEATURE. Reading by
 // exact path is useless for a folder you are exploring, so list, glob and
 // search all reach a declared root — and every one of them reports hits in the
 // SAME "@name/rel" address the reader accepts back.

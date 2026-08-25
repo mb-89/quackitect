@@ -1,6 +1,6 @@
 // what the mirror shows and how the agent points at it
 //
-// SMALL FILES ON PURPOSE (owner ruling, 2026-07-30). A test file is the
+// SMALL FILES ON PURPOSE. A test file is the
 // only unit that reaches a second core, so themes get their own file and
 // the suite uses the machine it runs on. See guidance/software.md.
 import { strict as assert } from "node:assert";

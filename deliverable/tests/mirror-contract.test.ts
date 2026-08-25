@@ -129,11 +129,11 @@ test("the loading bar settles: it can come down, it times out, and one action lo
   assert.equal(bare.length, 0, "view navigation goes through navigateTo, never a bare location.href");
 });
 
-// THE TERMINAL EARNS ITS SPACE (owner ruling 2026-07-28). It sat tiny because
+// THE TERMINAL EARNS ITS SPACE. It sat tiny because
 // flex:none with no height sizes to CONTENT, and max-height only capped that.
 //
 // The half-a-column splitter that fixed it is retired with the column itself
-// (owner 2026-07-29). The ruling survives in a stronger form: the terminal
+// The ruling survives in a stronger form: the terminal
 // fills its whole card, and promoted it takes the big slot — more room than
 // the splitter ever gave it. What must never come back is a rule that sizes
 // it to its content or caps it.
@@ -148,7 +148,7 @@ test("the terminal fills its card, uncapped, and cannot chase its own resize", (
 });
 
 // THE FLICKER CAME BACK, because the first fix caught the wrong loop shape
-// (owner report 2026-07-28, second round). It refused a resize that changed
+// It refused a resize that changed
 // NOTHING, but the loop alternated between two DIFFERENT sizes: padding made
 // the grid too wide, xterm overflowed, the pane grew a scrollbar, the box
 // shrank, and round it went. Each guard below cuts one link in that chain.
@@ -170,7 +170,7 @@ test("the terminal pane cannot flicker between two sizes", () => {
   assert.ok(html.includes("trailing = setTimeout(sync"), "with one trailing look, so a drag ending in the window is not lost");
 });
 
-// PROMOTION MOVES NOTHING (owner design 2026-07-29). The whole layout is ONE
+// PROMOTION MOVES NOTHING. The whole layout is ONE
 // grid, so a card grows by changing CLASS, never by changing parent. This is
 // the reason it is a grid and not two panes: a moved widget is a recreated
 // widget, and a recreated terminal loses its scrollback and its focus.
@@ -214,7 +214,7 @@ test("the number keys yield to a text field and pin their choice in the URL", ()
     html.includes("if (id === CARD_NOW) { if (CARD_PREV !== null) promoteCard(CARD_PREV); return; }"),
     "the same key returns to the previous card",
   );
-  // THE NUMBER IS A CONTROL, NOT A LABEL (owner 2026-07-29). A badge that
+  // THE NUMBER IS A CONTROL, NOT A LABEL. A badge that
   // names a shortcut but does nothing when clicked is a label pretending.
   assert.ok(html.includes('ev.target.closest(".cardnum")'), "the badge is wired to the click");
   assert.ok(html.includes('promoteCard(card.id.replace(/^card-/, ""))'), "and it promotes the card it sits on");
@@ -287,7 +287,7 @@ test("the details pane is not rewritten when its content did not change", () => 
   assert.ok(html.includes("stickWithin: 40"), "a reader already at the top is kept at the top");
 });
 
-// THE CLASS, NOT THE INSTANCE (owner, 2026-07-29). The reader's place has now
+// THE CLASS, NOT THE INSTANCE. The reader's place has now
 // been thrown away four different ways, and the rule against it was written in
 // prose four times. Prose is the weakest guard this repo has.
 //
@@ -322,7 +322,7 @@ test("every place the reader can pin is registered, so navigation carries it", (
   assert.ok(html.includes("pinPlace(q);"), "and the refresh path uses it instead of its own list");
 });
 
-// THE CHAT CARD KEEPS ITS SLOT (owner 2026-07-29). This SUPERSEDES the earlier
+// THE CHAT CARD KEEPS ITS SLOT. This SUPERSEDES the earlier
 // rule that the terminal pane ships hidden until a host answers. Hiding was
 // safe while the pane lived in a column of its own. As a numbered card it is
 // not: an agent can connect or drop MID-SESSION, and a card that vanishes
@@ -339,7 +339,7 @@ test("the chat card holds its slot and its number with no agent connected", () =
   assert.match(html, /<span class="cardnum"[^>]*>1<\/span>/, "carrying the number that promotes it");
 });
 
-// THE END IS SHOWN, NOT GUESSED (owner ruling 2026-07-28). Quitting at the
+// THE END IS SHOWN, NOT GUESSED. Quitting at the
 // console left a mirror that looked perfectly alive: the page tried to close
 // its own tab, the browsers that refused waited out a twenty-second timeout,
 // and the sentence it finally showed blamed an end the walk never reached.
@@ -367,7 +367,7 @@ test("the session's departure is a signal of its own, separate from end", () => 
   assert.equal(session.instance.status, "open", "and the unfinished walk is NOT recorded as complete");
 });
 
-// ONE SURFACE NEVER RESETS ANOTHER (owner ruling 2026-07-28). Switching the
+// ONE SURFACE NEVER RESETS ANOTHER. Switching the
 // machine on screen used to throw the details pane away, because the view URL
 // carried only the view. The reader had a log entry open; changing what they
 // were looking at NEXT to it is no reason to close it.
@@ -386,7 +386,7 @@ test("a machine switch carries the reader's open detail with it", () => {
   assert.ok(html.includes('new URLSearchParams(location.search).get("detail")'), "the page it lands on restores it");
 });
 
-// A PANE THE READER SIZED KEEPS THAT SIZE (owner ruling 2026-07-28). Walking
+// A PANE THE READER SIZED KEEPS THAT SIZE. Walking
 // into a sub-state is a full page load, and a dragged width is an inline
 // style, which no page load survives. Every entry into a sub-machine snapped
 // the layout back to its defaults, the machine drawing with it.
@@ -426,7 +426,7 @@ test("the default split gives a promoted terminal its 80 columns", () => {
   assert.ok(Number(m[1]) >= 50, "and the main card is the bigger half, which is the point of promoting it");
 });
 
-// HUMAN-RUNNABLE TOOLS RIDE THE LEGAL-TOOLS LINKS (owner ruling 2026-07-28).
+// HUMAN-RUNNABLE TOOLS RIDE THE LEGAL-TOOLS LINKS.
 // The survey had a button of its own in the machine header, and the owner
 // never found it there among the crumbs, the slider and the escape control.
 // No lane tool earns bespoke chrome; the per-state list is the surface.
@@ -519,7 +519,7 @@ test("the checklist warns once when narration outruns it, then refuses", () => {
     last = s.decisions.apply("idle@0", { op: "update", node: items[0].id, brief: `still working ${i}` }) as Record<string, unknown>;
     assert.equal(last.update, "update", `update ${i + 1} is inside the grace and must land`);
   }
-  // IGNORE IT LONG ENOUGH AND IT REFUSES (owner ruling 2026-08-07). It took
+  // IGNORE IT LONG ENOUGH AND IT REFUSES. It took
   // the toll's shape because advice lost: in one 15-hour window the nudge
   // fired five times and was ignored five times.
   assert.throws(
@@ -553,7 +553,7 @@ test("a deferred point reads as owed elsewhere, never as struck out", () => {
   assert.match(html, /deferred: "→"/, "the badge is an arrow");
 });
 
-// A POPPED-OUT CARD IS A SNAPSHOT (owner ruling 2026-07-29). The pop-out
+// A POPPED-OUT CARD IS A SNAPSHOT. The pop-out
 // opened a URL baked in at draw time, so it showed the server's default
 // while the live card showed whatever the reader had clicked — a state
 // against an answered question. Fifth time the reader's place was lost.
@@ -602,7 +602,7 @@ test("the mirror binds loopback only, so the record never leaves the machine", (
   assert.equal(listens.filter((a) => !/127\.0\.0\.1|localhost/.test(a)).length, 0, "no listen call binds every interface");
 });
 
-// A [[REFERENCE]] IN PROSE IS A LINK (owner report 2026-08-09). The /doc
+// A [[REFERENCE]] IN PROSE IS A LINK. The /doc
 // render used to hand [[cand-…]] back as literal text, so a reference in a
 // free-form field was a dead end exactly where a reader wants to check the
 // claim. A resolved id becomes the same doclink the structured editors emit;
@@ -630,7 +630,7 @@ test("/doc resolves wiki links to doclinks and leaves unresolved ones as text", 
   }
 });
 
-// SET TARGET ANSWERS IN PLACE (owner report 2026-08-09). As a redirecting
+// SET TARGET ANSWERS IN PLACE. As a redirecting
 // POST the button swallowed its own rejection: success and refusal both
 // 303ed, and the clicking page read nothing — "the button does nothing".
 // The refusal now rides back as JSON for the client to toast.

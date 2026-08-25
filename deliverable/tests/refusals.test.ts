@@ -1,4 +1,4 @@
-// THE CLAUSE-GUIDANCE PAIRING (owner ruling 2026-08-06): a refusal clause
+// THE CLAUSE-GUIDANCE PAIRING: a refusal clause
 // without guidance is incomplete. Every clause in the registry must have a
 // feed-forward section in guidance/refusals.md, and every section there must
 // name a clause the registry still carries. The payload carries the pointer,

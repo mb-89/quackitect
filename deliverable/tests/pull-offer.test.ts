@@ -3,7 +3,7 @@
 // Two properties, and they pull against each other on purpose.
 //
 // THE BATCH: a pull does not hand over one step. It hands over every step
-// on the happy path up to the next branching point (owner, 2026-08-01).
+// on the happy path up to the next branching point.
 // Start to front desk has no branch in it, so it must not cost a round trip
 // per hop.
 //

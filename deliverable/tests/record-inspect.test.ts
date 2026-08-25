@@ -1,7 +1,7 @@
 // Item 12 of the record inspection: boot must not stall on a test record that
 // predates the metadata it looks for.
 //
-// SMALL FILES ON PURPOSE (owner ruling, 2026-07-30). See guidance/craft/software.md.
+// SMALL FILES ON PURPOSE. See guidance/craft/software.md.
 import { strict as assert } from "node:assert";
 import { spawnSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";

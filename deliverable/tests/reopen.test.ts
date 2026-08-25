@@ -56,7 +56,7 @@ test("a matrix that moves under a standing claim reopens it WITHOUT touching its
   // ONE PULL. Nothing else.
   await session.pull();
 
-  // THE REOPEN WRITES NOTHING ONTO THE CLAIM (owner ruling 2026-08-07). It
+  // THE REOPEN WRITES NOTHING ONTO THE CLAIM. It
   // used to strip the signature and stamp a reason in its place, which stored
   // a derived value and destroyed a person's act in one move.
   const after = readFileSync(ev, "utf8");
@@ -81,7 +81,7 @@ test("a matrix that moves under a standing claim reopens it WITHOUT touching its
   assert.deepEqual(session.suspectStates(decl), [], "and the drift has settled");
 });
 
-// A RECHECK IS NOT A REWRITE (owner ruling 2026-08-07). A reopened claim used
+// A RECHECK IS NOT A REWRITE. A reopened claim used
 // to arrive looking exactly like a fresh one, so the agent answered it from
 // scratch and re-derived evidence that had already been earned.
 //

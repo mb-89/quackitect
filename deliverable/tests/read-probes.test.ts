@@ -1,6 +1,6 @@
 // THE READING PROOF ASKS FOR WORDS, SO IT MUST ASK FOR WORDS.
 //
-// MEASURED AT BOOT, 2026-08-18. Four round trips on
+// MEASURED AT BOOT. Four round trips on
 // guidance/method/cloud-runner.md, where the probe's expected answer was
 // `remedy; follow it. -` — three words a reader sees, plus the list marker of
 // the NEXT bullet. Every answer a person would give was refused.
@@ -132,7 +132,7 @@ test("punctuation the probe never counted cannot fail an answer", () => {
 // PUNCTUATION ATTACHED TO A WORD IS THE HALF THE HINT PROMISED AND THE CHECK
 // DID NOT KEEP. The tokeniser keeps it attached, so `stands,` and `stands`
 // were different words while the hint said punctuation does not count. Two
-// probes in one boot were answered correctly and refused, 2026-08-25.
+// probes in one boot were answered correctly and refused.
 test("punctuation attached to a word cannot fail an answer", () => {
   const { expect } = readingProbes(DASHED);
   const commaed = expect.map((e) => `${e.split(" ").join(", ")}.`).join("\n\n");

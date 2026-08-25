@@ -1,4 +1,4 @@
-// THE ROUTE (owner design 2026-07-29) — a target state and the way there.
+// THE ROUTE — a target state and the way there.
 // It is SCHEDULING ONLY: it removes no guard and no autonomy rule, it
 // collapses round trips. The preview moves nothing at all.
 import { strict as assert } from "node:assert";
@@ -63,7 +63,7 @@ test("the blue line: from a cold start to the front desk, every hop named", () =
   assert.equal(r.steps[4].priority, 0.2, "and every hop carries the weight of ENTERING it");
 });
 
-// THE DESK STOPPED BEING A BLOCKABLE TARGET (owner tier cut-over 2026-08-12).
+// THE DESK STOPPED BEING A BLOCKABLE TARGET.
 // This case used to run at 0.1 and shut at the front desk, back when mechanical
 // was 0.01 and the desk 0.2. Both sit on the mechanical rung now, so no dial
 // opens the boot lane and shuts the desk.
@@ -184,7 +184,7 @@ test("the drawing carries the route: a spline OVER the nodes, its stops, an arro
   assert.match(html, /\.route-line \{ fill: none; stroke: var\(--se-walk\)/);
 });
 
-// THE ONE MOMENT THE MAP LIES (owner ruling 2026-07-29). An unbroken blue
+// THE ONE MOMENT THE MAP LIES. An unbroken blue
 // line to the destination says the whole way is open. When the slider blocks a
 // hop it is not, and the reader has no way to see that the walk will stop
 // short and wait for their hand.

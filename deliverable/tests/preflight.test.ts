@@ -1,6 +1,6 @@
 // The boot preflight's own guards.
 //
-// SMALL FILES ON PURPOSE (owner ruling, 2026-07-30). A test file is the only
+// SMALL FILES ON PURPOSE. A test file is the only
 // unit that reaches a second core, so themes get their own file. See
 // guidance/software.md.
 import { strict as assert } from "node:assert";

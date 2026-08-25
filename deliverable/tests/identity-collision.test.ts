@@ -1,4 +1,4 @@
-// THE IDENTITY CHECK MUST NOT MISTAKE THE VOCABULARY FOR A LEAK — i17, 2026-08-18.
+// THE IDENTITY CHECK MUST NOT MISTAKE THE VOCABULARY FOR A LEAK — i17.
 //
 // prose-inspect item 3 hunts a username, an email, a home directory or a
 // machine name that got written into a stored record. The needles are read from

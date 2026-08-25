@@ -23,7 +23,7 @@ test("se_file_patch refuses unknown op fields by name, mapping the common aliase
 // in one period over a difference nobody can see on screen, and the remedy was
 // "copy the exact text" — advice the caller had no way to act on.
 //
-// It is now CORRECTED AND ANNOUNCED (owner ruling 2026-08-02): the patch lands
+// It is now CORRECTED AND ANNOUNCED: the patch lands
 // in the file's own endings and the result says what was changed for you. A
 // refusal over an invisible difference spends a round to teach nothing.
 test("a patch that misses only on line endings is APPLIED, and says what it corrected", async () => {
