@@ -31,7 +31,7 @@
 // It is IDEMPOTENT. Run it twice and the second run re-uses the lane that is
 // already answering rather than starting a second one.
 import { spawn, spawnSync } from "node:child_process";
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, openSync, readFileSync, writeFileSync } from "node:fs";
 import { createConnection } from "node:net";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -238,6 +238,12 @@ async function lane(): Promise<void> {
     say("lane", `already answering on ${PORT} — reusing it`);
     return;
   }
+  // THE CHILD'S REASON GOES TO A FILE, never to a pipe. A pipe held by this
+  // process breaks the moment arrival exits, and a lane that started perfectly
+  // well would take EPIPE on its next stderr line. A file survives the detach.
+  const laneLog = join(ROOT, ".se", "arrive-lane.log");
+  mkdirSync(dirname(laneLog), { recursive: true });
+  const laneErr = openSync(laneLog, "w");
   const child = spawn(
     process.execPath,
     [
@@ -256,9 +262,22 @@ async function lane(): Promise<void> {
     {
       cwd: ROOT,
       detached: true,
-      stdio: ["ignore", "ignore", "ignore"],
+      stdio: ["ignore", "ignore", laneErr],
     },
   );
+  // WATCH THE CHILD, NOT ONLY THE PORT. A second lane on a folder another
+  // instance already holds exits in under a second, because run.ts
+  // takeWorkspace refuses to share a folder. Nothing will ever answer after
+  // that, so every remaining poll is spent on a process that is already dead.
+  //
+  // WAITING OUT THE WHOLE MINUTE IS WHAT BREAKS A HOST. A client that gives its
+  // subprocess sixty seconds to finish starting runs out exactly here, while
+  // the session it is racing works fine — that one already won the folder.
+  // see dsp-one-instance-holds-the-workspace.md#the-hold-is-the-port-and-nothing-else
+  const spawned: { code: number | null } = { code: null };
+  child.on("exit", (code) => {
+    spawned.code = code ?? 1;
+  });
   child.unref();
   const until = Date.now() + 60_000;
   while (Date.now() < until) {
@@ -266,7 +285,19 @@ async function lane(): Promise<void> {
       say("lane", `up on ${PORT}, autonomy ${AUTONOMY}`);
       return;
     }
+    if (spawned.code !== null) break;
     await new Promise((r) => setTimeout(r, 500));
+  }
+  // THE FAILURE NAMES WHICH OF THE THREE IT IS, because the remedies differ:
+  // one reads the child's own refusal, one moves the port, one hunts a crash.
+  if (spawned.code !== null) {
+    const said = (existsSync(laneLog) ? readFileSync(laneLog, "utf8") : "").trim();
+    die(
+      "lane",
+      said === ""
+        ? `the lane exited with code ${spawned.code} before answering on ${PORT}, and gave no reason. Run it in the foreground to see why: node deliverable/engine/bin/se-mcp.ts --root . --headless --mirror-port ${PORT}`
+        : `the lane exited with code ${spawned.code} before answering on ${PORT} — it said: ${said}`,
+    );
   }
   // THE FAILURE NAMES WHICH OF THE TWO IT IS, because the remedies are
   // opposite: one moves the port, the other looks for a crash.

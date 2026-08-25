@@ -509,24 +509,39 @@ if (argv.includes("--child") || process.env.SE_HOT_DISABLE === "1") {
     process.stderr.write(
       `se-mcp shim: a server already walks this root — attaching to ${target}/mcp as a proxy, not raising a second engine\n`,
     );
+    // EVERY LINE IN GETS A LINE BACK, or the caller waits on an answer that is
+    // never coming. A client cannot tell silence from slowness, so silence is
+    // the one thing the proxy may never do.
+    const answerError = (line: string, message: string): void => {
+      let id: number | string | null = null;
+      try {
+        id = (JSON.parse(line) as { id?: number | string | null }).id ?? null;
+      } catch {
+        // unparseable — the server would have answered the parse error; gone, nobody can
+      }
+      if (id !== null) process.stdout.write(`${JSON.stringify({ jsonrpc: "2.0", id, error: { code: -32000, message } })}\n`);
+    };
     const rl = createInterface({ input: process.stdin, terminal: false });
     rl.on("line", (line) => {
       if (line.trim() === "") return;
       void (async () => {
         try {
-          const r = await fetch(`${target}/mcp`, { method: "POST", headers: { "content-type": "application/json" }, body: line });
+          // THE PROXY CALL IS BOUNDED, like the aliveness check above it. It
+          // used to carry no timeout at all, so an engine that was listening
+          // but not answering held every client request open for good.
+          const r = await fetch(`${target}/mcp`, {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: line,
+            signal: AbortSignal.timeout(120_000),
+          });
+          // A NON-200 IS STILL AN ANSWER OWED. fetch resolves rather than
+          // throwing on one, so the catch below never saw it and the reply was
+          // simply dropped.
           if (r.status === 200) process.stdout.write(`${await r.text()}\n`);
+          else answerError(line, `the attached se server answered ${r.status} on ${target}/mcp`);
         } catch (e) {
-          let id: number | string | null = null;
-          try {
-            id = (JSON.parse(line) as { id?: number | string | null }).id ?? null;
-          } catch {
-            // unparseable — the server would have answered the parse error; gone, nobody can
-          }
-          if (id !== null)
-            process.stdout.write(
-              `${JSON.stringify({ jsonrpc: "2.0", id, error: { code: -32000, message: `the attached se server went away: ${String(e)}` } })}\n`,
-            );
+          answerError(line, `the attached se server went away: ${String(e)}`);
         }
       })();
     });
