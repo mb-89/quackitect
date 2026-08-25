@@ -649,7 +649,7 @@ const NATIVE = `
 // Breadcrumbs describe the VIEW: main [›subs] [ › sub [›its subs] ].
 // The crumbs walk the PARENT CHAIN — a nested machine shows under its
 // real parent, never directly under main.
-function crumbsFor(m: MirrorState, decl: MachineDecl): string {
+function crumbsFor(m: MirrorState, decl: MachineDecl, address = decl.id): string {
   const mainSubs = m.session.machine.states.filter((s) => s.submachine !== undefined).map((s) => s.id);
   const crumbArrow = (subs: string[]): string =>
     subs.length === 0
@@ -663,7 +663,7 @@ function crumbsFor(m: MirrorState, decl: MachineDecl): string {
   //
   // WHERE THE WALK IS AIMED IS THE AIM CHIP'S, beside that button. Nothing was
   // lost by removing the repeat.
-  const chain = m.session.viewChain(decl.id);
+  const chain = m.session.viewChain(address);
   return chain
     .map((id, i) => {
       const label = i === chain.length - 1 ? `<b class="here">${esc(id)}</b>` : `<a href="/?view=${encodeURIComponent(id)}">${esc(id)}</a>`;
@@ -739,7 +739,7 @@ export function renderMirror(
     const d = model.drawing;
     svg = machineSvg(canvas, d.leafActive, d.paint, d.subIds, d.openIds, d.meta, d.busbars, d.marks);
     phase("machine.svg");
-    crumbs = crumbsFor(m, decl);
+    crumbs = crumbsFor(m, decl, view);
   }
   phase("machine.rest");
   onPhase?.("machine", performance.now() - machineStarted);

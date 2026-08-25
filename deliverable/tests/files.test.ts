@@ -259,7 +259,12 @@ test("no new file write bypasses the door — the count may fall, never rise", (
   // 49: benchmark.ts writes the run binding back after appending a sweep's hop
   // timings. Same file, same reason as the read above — a JSON binding with one
   // writer, which the rest of that file already writes directly.
-  const CEILING = 49;
+  // 50 WITH THE COMPACTION MARKER: compaction.ts writes `.se/compacted`, the
+  // one thing a SessionStart hook can leave behind. The hook holds no lane
+  // connection, so a file is the only channel it has to the engine, and the
+  // next pull deletes it as it collects it. Session state of the same shape as
+  // 39, 40, 42, 47 and 48: machine-local, gitignored, and gone within one call.
+  const CEILING = 50;
   let found = 0;
   const offenders: string[] = [];
   const walk = (dir: URL, rel: string): void => {

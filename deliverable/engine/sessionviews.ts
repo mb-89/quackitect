@@ -40,6 +40,65 @@ export class Views {
     return gen === undefined ? undefined : { decl: gen.decl, canvas: gen.canvas };
   }
 
+  private nestedGenerated(container: string, id: string): GeneratedMachine | undefined {
+    const generated = this.genFor(container);
+    const stateId = Object.entries(generated?.expByState ?? {}).find(([, publicId]) => publicId === id)?.[0];
+    const direct = generated?.subGen?.[stateId ?? id];
+    return direct?.();
+  }
+
+  private uniqueGeneratedChild(id: string): GeneratedMachine | undefined {
+    let found: GeneratedMachine | undefined;
+    for (const container of Views.NESTING_CONTAINERS) {
+      for (const make of Object.values(this.genFor(container)?.subGen ?? {})) {
+        let child: (() => GeneratedMachine) | undefined;
+        try {
+          child = make().subGen?.[id];
+        } catch {
+          continue;
+        }
+        if (child === undefined) continue;
+        if (found !== undefined) return undefined;
+        found = child();
+      }
+    }
+    return found;
+  }
+
+  generatedChild(ownerId: string, id: string): { decl: MachineDecl; canvas: CanvasData } | undefined {
+    const direct = this.genFor(ownerId)?.subGen?.[id];
+    if (direct !== undefined) {
+      const child = direct();
+      return { decl: child.decl, canvas: child.canvas };
+    }
+    for (const sub of this.host.subs) {
+      const make = sub.decl.id === ownerId ? sub.gen?.subGen?.[id] : undefined;
+      if (make !== undefined) {
+        const child = make();
+        return { decl: child.decl, canvas: child.canvas };
+      }
+    }
+    for (const container of Views.NESTING_CONTAINERS) {
+      const owner = this.nestedGenerated(container, ownerId);
+      const make = owner?.subGen?.[id];
+      if (make !== undefined) {
+        const child = make();
+        return { decl: child.decl, canvas: child.canvas };
+      }
+    }
+    return undefined;
+  }
+
+  generatedAddress(ownerId: string, id: string): string {
+    return `${ownerId}/${id}`;
+  }
+
+  private generatedAddressParts(address: string): { ownerId: string; id: string } | undefined {
+    const slash = address.lastIndexOf("/");
+    if (slash <= 0 || slash === address.length - 1) return undefined;
+    return { ownerId: address.slice(0, slash), id: address.slice(slash + 1) };
+  }
+
   genFor(id: string): GeneratedMachine | undefined {
     if (id === "expeditions") return generateContinueExpedition(this.host.machineRoot());
     if (id === "iterations") return generateIterations(this.host.machineRoot());
@@ -52,6 +111,8 @@ export class Views {
    *  breadcrumbs render it, so a nested decade reads
    *  main › expedition_archive › e1-e10. */
   viewChain(id: string): string[] {
+    const generated = this.generatedAddressParts(id);
+    if (generated !== undefined) return [...this.viewChain(generated.ownerId), generated.id];
     if (id === this.host.machine.id) return [this.host.machine.id];
     const idx = this.host.subs.findIndex((s) => s.decl.id === id);
     if (idx >= 0) return [this.host.machine.id, ...this.host.subs.slice(0, idx + 1).map((s) => s.decl.id)];
@@ -60,7 +121,7 @@ export class Views {
       if (sub.gen?.subGen?.[id] !== undefined) return [...this.viewChain(sub.decl.id), id];
     }
     for (const cid of Views.NESTING_CONTAINERS) {
-      if (this.genFor(cid)?.subGen?.[id] !== undefined) return [this.host.machine.id, cid, id];
+      if (this.nestedGenerated(cid, id) !== undefined) return [this.host.machine.id, cid, id];
     }
     // A drawn sub-machine reads as a child of whatever hangs it, so the
     // breadcrumbs say main > iterations > i1 > enumerate-space rather than
@@ -78,47 +139,22 @@ export class Views {
   /** Resolve ANY machine id to a viewable drawing: the walked stack
    *  first, then the top-level containers, then their nested generated
    *  sub-machines (archive decades). */
-  viewFor(id: string): { decl: MachineDecl; canvas: CanvasData } | undefined {
-    const direct = this.generatedView(id);
+  viewFor(address: string): { decl: MachineDecl; canvas: CanvasData } | undefined {
+    const direct = this.generatedView(address);
     if (direct !== undefined) return direct;
+    // A record or archive decade is one generated level below its container.
+    // Its own generated children still require an owner-qualified address.
+    for (const container of Views.NESTING_CONTAINERS) {
+      const child = this.nestedGenerated(container, address);
+      if (child !== undefined) return { decl: child.decl, canvas: child.canvas };
+    }
     // see dsp-walk-machine.md#a-static-sub-machine-is-a-drawing
-    const drawn = this.drawnSubmachine(id);
+    const drawn = this.drawnSubmachine(address);
     if (drawn !== undefined) return drawn;
-    for (const sub of this.host.subs) {
-      const nested = sub.gen?.subGen?.[id];
-      if (nested !== undefined) {
-        const g = nested();
-        return { decl: g.decl, canvas: g.canvas };
-      }
-    }
-    for (const cid of Views.NESTING_CONTAINERS) {
-      const nested = this.genFor(cid)?.subGen?.[id];
-      if (nested !== undefined) {
-        const g = nested();
-        return { decl: g.decl, canvas: g.canvas };
-      }
-    }
-    // see dsp-walk-machine.md#a-seeded-container-inside-an-open-record-resolves-without
-    for (const cid of Views.NESTING_CONTAINERS) {
-      let gen: GeneratedMachine | undefined;
-      try {
-        gen = this.genFor(cid);
-      } catch {
-        continue;
-      }
-      for (const make of Object.values(gen?.subGen ?? {})) {
-        try {
-          const nested = make().subGen?.[id];
-          if (nested !== undefined) {
-            const g = nested();
-            return { decl: g.decl, canvas: g.canvas };
-          }
-        } catch {
-          // an ungenerable child colours nothing
-        }
-      }
-    }
-    return undefined;
+    const unique = this.uniqueGeneratedChild(address);
+    if (unique !== undefined) return { decl: unique.decl, canvas: unique.canvas };
+    const generated = this.generatedAddressParts(address);
+    return generated === undefined ? undefined : this.generatedChild(generated.ownerId, generated.id);
   }
 
   /** EVERY MACHINE THE MIRROR CAN REACH, main first. The walked stack, then

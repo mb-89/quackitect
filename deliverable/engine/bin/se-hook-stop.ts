@@ -143,6 +143,19 @@ function pass(why: string, detail = ""): never {
   process.exit(0);
 }
 
+/** THE BITES-ONCE VALVE, with the notch's say in it.
+ *
+ *  A STOP ALREADY BLOCKED ONCE NORMALLY PASSES, so a genuinely blocking
+ *  question can be asked and the turn ended.
+ *
+ *  BLOCKERS ONLY IS THE EXCEPTION. There the valve releases only a stop the
+ *  walk cannot come back from, which the newest pull being refused is. A
+ *  runnable pull keeps the turn going, whatever the valve would otherwise
+ *  allow. */
+function bypassesStop(payload: string, notch: string, last: LastPull): boolean {
+  return bitesOnce(payload) && (notch !== "blockers only" || last.ok === false);
+}
+
 /** Refuse the stop while a run is going, and say what to do instead. True when
  *  it wrote the refusal, so the caller exits without deciding anything else. */
 function blockedByRunningWork(): boolean {
@@ -294,22 +307,22 @@ process.stdin.on("data", (c: string) => {
 });
 process.stdin.on("end", () => {
   try {
-    // The bites-once valve: a stop already blocked once passes, so a
-    // genuinely blocking question can be asked and the turn ended.
-    if (bitesOnce(raw)) pass("bites once per stop", "this stop was already blocked once");
     // A BACKGROUND RUN STILL GOING OUTRANKS EVERY SANCTIONED STOP BELOW. Its
     // verdict is seconds away and nobody reads a job nobody asked about, so a
     // turn that ends first throws the answer away.
     //
-    // IT CANNOT WEDGE A SESSION. The bites-once valve above lets the very next
-    // stop attempt through, so the cost of a run that never finishes is one
-    // extra turn.
+    // A RUN THAT NEVER FINISHES COSTS ONE WINDOW, NOT THE SESSION. Only a run
+    // started inside the window counts as going, so a hung one stops blocking
+    // by itself.
     if (blockedByRunningWork()) process.exit(0);
     const last = lastPull() ?? {};
     const pull = last.pull;
     if (pull === undefined) pass("no pull on record", "the engine never ran here");
     // see dsp-boot-and-power.md#the-notch-decides
     const notch = typeof last.stop_at === "string" ? last.stop_at.trim().toLowerCase() : "";
+    // The valve may release a question about a standing blocker. It cannot
+    // release a newer runnable pull under blockers only.
+    if (bypassesStop(raw, notch, last)) pass("bites once per stop", "this stop was already blocked once");
     const at = Array.isArray(last.where) ? (last.where as unknown[]).map(String).join(", ") : String(last.where ?? "");
     const sanctioned = notchSanction(notch, last, at);
     if (sanctioned !== undefined) pass(sanctioned[0], sanctioned[1]);

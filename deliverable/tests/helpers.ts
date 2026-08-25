@@ -438,7 +438,9 @@ export function gitInit(root: string, commit = false): void {
   }
   cpSync(join(gitTemplate, ".git"), join(root, ".git"), { recursive: true });
   if (commit) {
-    g(root, "add", "-A");
+    const seedPaths = ["deliverable/machines", "deliverable/brand", "deliverable/biome.json", "guidance", "AGENTS.md"];
+    if (existsSync(join(root, "spec"))) seedPaths.push("spec");
+    g(root, "add", ...seedPaths);
     g(root, "commit", "-q", "-m", "seed");
   }
 }
