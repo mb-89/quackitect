@@ -482,6 +482,19 @@ Updates name an OPEN node. Check the node map that rides every result.
 ### SE-C-122 — done over open children
 Everything started gets resolved. Resolve or re-home the children first.
 
+### The stop tooth refused your turn
+It is not a typed refusal — it arrives as hook feedback, not as a clause.
+
+THE WALK CAN STILL GO ON. That is what the refusal is saying. Pull and keep
+walking; a report is not a checkpoint and size is not a reason.
+
+GENUINELY ONE OF THE SANCTIONED STOPS? Claim it: `se_stop {because: "<which
+one, and why>"}`, then stop again.
+
+THE ORDER MATTERS. The tooth must have bitten first, so a force cannot become
+the ordinary way to end a turn. One force releases one stop, and the next pull
+spends it.
+
 ### SE-C-147 — a second piece of work is already open
 One engine walks one record. Something else is open and unfinished.
 

@@ -286,6 +286,21 @@ a call: the machine forced the hop and no judgment happened on it. The minutes
 clock still runs, and a pull carrying evidence beside the proof pays like any
 other work.
 
+## Stopping, and looking at the surface
+
+THREE VERBS ARE LEGAL WHEREVER THE WALK STANDS, because none of them is a move.
+
+- `se_stop {because}` FORCES A STOP THE TOOTH REFUSED. Name which sanctioned
+  stop applies and why. It changes nothing about the walk; only the turn ends.
+  - THE TOOTH MUST HAVE BITTEN FIRST. A force before the refusal does nothing.
+  - ONE FORCE RELEASES ONE STOP, and the next pull spends it.
+  - SAYING IT IN CHAT PROVES NOTHING. The tooth reads the call log.
+- `se_surface` PRINTS THE PERSON'S SURFACE AS TEXT — where the walk stands, the
+  dials, what is legal here, every state with its marks. This is the everyday
+  way to see it, and it needs nobody's permission.
+- `se_shoot` DRAWS THE SURFACE AS A PICTURE, for a question about LAYOUT. It
+  looks at a screen, so ask the person each time (rule 10).
+
 ## Notes
 
 - `se_note {text}` captures a stray anywhere; keep walking.

@@ -141,6 +141,23 @@ TWO QUESTIONS ARE THE EXCEPTION.
   retro needs no answer, so do that while the answer is owed.
 - A PLAN IS A SANCTIONED STOP, BEFORE IT IS ACTED ON. See rule 9.
 
+CLAIMING A STOP IS A CALL. `se_stop {because}` names which of them applies and
+why, and it is what actually releases the turn.
+
+SAYING IT IN CHAT PROVES NOTHING. The tooth that refuses a stop reads the call
+log and cannot read your message, so a sentence naming a sanctioned stop was
+only ever addressed to the person.
+
+THE ORDER IS: BE REFUSED, THEN FORCE. A force before the refusal does nothing,
+which is what stops it becoming the ordinary way to end a turn.
+
+ONE FORCE RELEASES ONE STOP, and the next pull spends it.
+
+THIS USED TO HAPPEN BY ITSELF, and that was the defect. The harness sets a flag
+when it retries a blocked stop, the valve read that flag as a claim, and every
+second attempt went through with nothing named. Measured on one session: four
+blocks, four immediate releases.
+
 RULES 6 AND 7 MEET AT THE START OF WORK. Confirm an ambiguous intent before you
 begin; once begun, carry on.
 
