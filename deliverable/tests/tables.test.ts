@@ -173,9 +173,22 @@ describe("the pivot", { concurrency: true }, () => {
   });
 });
 
+/** THE VAULT, READ ONCE FOR THE WHOLE FILE.
+ *
+ *  SEVEN CASES BELOW EACH READ IT FROM SCRATCH, and the vault is the entire
+ *  spec corpus — 2,966 notes. Measured: those seven cost 33.5 of the battery's
+ *  296 seconds of work, the heaviest file in the run, and every second of it
+ *  was the same parse repeated.
+ *
+ *  SHARING IS SAFE HERE BECAUSE NOTHING WRITES. These cases render views from
+ *  the rows and assert about what came back. The cases that EDIT a note build
+ *  their own throwaway root and never touch this. */
+let vaultRows: ReturnType<typeof readVault> | undefined;
+const sharedVault = (): ReturnType<typeof readVault> => (vaultRows ??= readVault(REPO_ROOT));
+
 describe("the vault", { concurrency: true }, () => {
   test("every note is a row, and none of them fail to parse", () => {
-    const rows = readVault(REPO_ROOT);
+    const rows = sharedVault();
     assert.ok(rows.length > 100, `the vault has notes in it — got ${rows.length}`);
     assert.deepEqual(unreadableRows(rows), [], "no note in the vault has broken frontmatter");
   });
@@ -185,7 +198,7 @@ describe("the vault", { concurrency: true }, () => {
     const matrix = spec.views.find((v) => v.name === "The matrix");
     assert.ok(matrix !== undefined, "the shipped base declares The matrix");
     // 63 since the roster row: position 05 of every milestone, M0 through M9.
-    assert.equal(renderView(spec, matrix, readVault(REPO_ROOT)).rows, 63);
+    assert.equal(renderView(spec, matrix, sharedVault()).rows, 63);
   });
 
   // The pivot and the flat view read ONE set of notes. Each rigor row carries
@@ -193,7 +206,7 @@ describe("the vault", { concurrency: true }, () => {
   // back the same rows the table lists — a disagreement means one of the two
   // is filtering differently, which is the bug worth catching here.
   test("the pivot agrees with the flat view it pivots", () => {
-    const rows = readVault(REPO_ROOT);
+    const rows = sharedVault();
     const spec = loadBase(RIGOR);
     const struck = spec.views.find((v) => v.name === "Struck at patch");
     assert.ok(struck !== undefined);
@@ -209,7 +222,7 @@ describe("the vault", { concurrency: true }, () => {
   // onboard-retro. Zero of the 50 row labels appeared among the 49 column
   // labels, so a 50x49 grid was drawn with no diagonal anywhere in it.
   test("the dependency pivot crosses ONE vocabulary with itself", () => {
-    const rows = readVault(REPO_ROOT);
+    const rows = sharedVault();
     const spec = loadBase(`${REPO_ROOT}/deliverable/tests/fixtures/depends.base`);
     const waits = spec.views[0];
     const r = renderView(spec, waits, rows);
@@ -224,7 +237,7 @@ describe("the vault", { concurrency: true }, () => {
   // it away: 31 of 58 marks landed above the diagonal in a graph with no
   // cycles at all. The view declares the order; the renderer obeys it.
   test("the authored order is kept, so the matrix stays triangular", () => {
-    const rows = readVault(REPO_ROOT);
+    const rows = sharedVault();
     const spec = loadBase(`${REPO_ROOT}/deliverable/tests/fixtures/depends.base`);
     const r = renderView(spec, spec.views[0], rows);
     const labels = [...r.html.matchAll(/pv-row">([^<]+)</g)].map((m) => m[1]);
@@ -248,7 +261,7 @@ describe("the vault", { concurrency: true }, () => {
   });
 
   test("every declared view in the vault draws", () => {
-    const rows = readVault(REPO_ROOT);
+    const rows = sharedVault();
     const bases = listBases(REPO_ROOT);
     assert.ok(bases.length >= 1, "the vault ships a base file");
     for (const rel of bases) {
@@ -261,7 +274,7 @@ describe("the vault", { concurrency: true }, () => {
   // than taking the card down. Today nothing in the vault refuses, and this is
   // what says so out loud. The card itself is covered in baseui.test.ts.
   test("no view the vault ships is beyond the renderer", () => {
-    const rows = readVault(REPO_ROOT);
+    const rows = sharedVault();
     for (const rel of listBases(REPO_ROOT)) {
       const spec = loadBase(`${REPO_ROOT}/${rel}`);
       for (const v of spec.views) assert.doesNotMatch(renderView(spec, v, rows).html, /tbl-refused/);
