@@ -130,33 +130,38 @@ test("stop @ blockers only passes a REFUSED pull and blocks a working one", () =
   const d = JSON.parse(verdict([working], {})) as { decision: string; reason: string };
   assert.equal(d.decision, "block");
   assert.match(d.reason, /blockers only/);
-  // UNATTENDED IS WHERE THE NOTCH HOLDS THE VALVE SHUT. Nobody reads a claim
-  // there, so a second attempt must not end a run that can still walk.
-  const afterBlock = JSON.parse(verdict([refused, working], { stop_hook_active: true }, "unattended")) as {
-    decision: string;
-    reason: string;
-  };
-  assert.equal(afterBlock.decision, "block");
-  assert.match(afterBlock.reason, /blockers only/);
 });
 
-// ATTENDED, THE VALVE STILL RELEASES, and this case is why the rule turns on
-// attendance rather than on the notch. MEASURED 2026-08-25: an attended
-// session at this notch presented a plan and could not end its turn. The
-// tooth's own refusal invites the agent to name a sanctioned stop and stop
-// again, and the notch alone made that invitation impossible to accept.
-test("stop @ blockers only still bites ONCE where a person is reading", () => {
+// THE VALVE DOES NOT UNDO THE NOTCH, and it used to.
+//
+// WHAT THE LIVE LOG SHOWED, four times in a row: `stop-block do at front_desk`
+// and then, on the very next attempt, `stop-pass bites once per stop`. The
+// tooth bit and the valve immediately released it. From outside that reads as
+// a hook that is not working.
+//
+// THE VALVE USED TO TURN ON ATTENDANCE, on the theory that a person is there to
+// read the claim. Being read is not the question this notch asks. A person who
+// wanted to be told things would not have set `blockers only`.
+//
+// THE LEGITIMATE CASE NEVER NEEDED THE VALVE. A walk that cannot go on has a
+// REFUSED pull, and the case above proves that passes on its own.
+test("under blockers only a second attempt is still refused — the valve does not release", () => {
   const working = pullRecord({ pull: "do", where: ["retro"], stop_at: "blockers only" });
-  const first = JSON.parse(verdict([working], {}, "attended")) as { decision: string };
-  assert.equal(first.decision, "block", "the first attempt always blocks and prints the sanctioned stops");
-  assert.equal(verdict([working], { stop_hook_active: true }, "attended"), "", "the second attempt carries the claim and gets through");
+  const first = JSON.parse(verdict([working], {})) as { decision: string };
+  assert.equal(first.decision, "block", "the first attempt blocks and prints the sanctioned stops");
+
+  const second = JSON.parse(verdict([working], { stop_hook_active: true })) as { decision: string; reason: string };
+  assert.equal(second.decision, "block", "and so does the second — the same stop tried twice is not a blocker");
+  assert.match(second.reason, /blockers only/, "the refusal names the notch that is asking");
 });
 
-test("with no settings file the session counts as attended", () => {
-  // A MISSING FILE MUST NOT SILENTLY MAKE A SESSION UNATTENDED. An attended
-  // laptop is the ordinary case and it writes no mode on some paths.
-  const working = pullRecord({ pull: "do", where: ["retro"], stop_at: "blockers only" });
-  assert.equal(verdict([working], { stop_hook_active: true }), "", "absent attendance reads as present");
+test("at every other notch the valve still releases the second attempt", () => {
+  // THE INVITATION STAYS REAL WHERE THE NOTCH ALLOWS IT. The refusal ends by
+  // asking the agent to name a sanctioned stop and stop again, and that has to
+  // be possible or the invitation is a lie.
+  const working = pullRecord({ pull: "do", where: ["retro"] });
+  assert.equal(JSON.parse(verdict([working], {})).decision, "block", "the first attempt blocks");
+  assert.equal(verdict([working], { stop_hook_active: true }), "", "the second carries the claim and gets through");
 });
 
 test("a wait WITH A TARGET blocks — an escape does not launder a stop", () => {

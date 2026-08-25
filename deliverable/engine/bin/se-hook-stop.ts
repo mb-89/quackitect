@@ -163,18 +163,10 @@ export interface Verdict {
   reason?: string;
 }
 
-/** IS ANYBODY THERE TO READ A CLAIM? Absent, the answer is yes: an attended
- *  laptop is the ordinary case, and a missing file must not silently turn a
- *  session into an unattended one. */
-function sessionMode(): string {
-  try {
-    const raw = readFileSync(join(hookRoot(), ".se", "settings.json"), "utf8");
-    const m = (JSON.parse(raw) as { mode?: unknown }).mode;
-    return typeof m === "string" && m !== "" ? m : "attended";
-  } catch {
-    return "attended";
-  }
-}
+// ATTENDANCE IS NO LONGER ASKED. The valve used to turn on whether a person
+// was there to read a claim, which meant reading .se/settings.json on every
+// stop. The notch answers the question that actually matters, so the read and
+// the branch both went.
 
 /** THE BITES-ONCE VALVE, and who it is for.
  *
@@ -183,17 +175,29 @@ function sessionMode(): string {
  *  attempt IS the claim. The invitation is a lie if that attempt cannot get
  *  through.
  *
- *  UNATTENDED IS THE EXCEPTION, AND ONLY AT BLOCKERS ONLY. There nobody reads
- *  the claim, so releasing on it would let a run end itself for a reason no
- *  human ever sees. That notch exists for exactly those runs.
+ *  `blockers only` IS THE EXCEPTION, ATTENDED OR NOT. The notch means one
+ *  thing: come back when the walk CANNOT GO ON. A stop that was refused once
+ *  and repeated is not a blocker — it is the same stop, tried twice.
  *
- *  BOTH HALVES HAVE BITTEN. Making the notch the whole test leaves an attended
- *  session unable to present a plan and stop, since the tooth then bites every
- *  attempt. Ignoring the notch lets an unattended run end a turn it should have
- *  kept walking. Attendance is what actually separates the two. */
-function bypassesStop(payload: string, notch: string, mode: string): boolean {
+ *  MEASURED ON A LIVE SESSION: block, continue, stop, released. Four times in
+ *  a row the log reads `stop-block` then `stop-pass bites once per stop`, so
+ *  the tooth bit and the valve immediately undid it. From outside that looks
+ *  exactly like a hook that is not working.
+ *
+ *  THE VALVE USED TO TURN ON ATTENDANCE, on the theory that a person is there
+ *  to read the claim. Being read is not the question the notch asks. A person
+ *  who wanted to be told things would not have set `blockers only`.
+ *
+ *  A REAL BLOCKER STILL GETS THROUGH WITHOUT THIS. The walk that cannot go on
+ *  has a REFUSED pull, and notchSanction passes that on its own — so the
+ *  legitimate case never needed the valve.
+ *
+ *  WHAT IT COSTS, said plainly: an agent that must present a plan and wait
+ *  (contract rule 9) cannot stop under this notch. The person moves the dial
+ *  for that, which is what the dial is for. */
+function bypassesStop(payload: string, notch: string): boolean {
   if (!bitesOnce(payload)) return false;
-  return !(mode !== "attended" && notch === "blockers only");
+  return notch !== "blockers only";
 }
 
 /** Refuse the stop while a run is going, and say what to do instead. True when
@@ -384,7 +388,7 @@ export function decide(payload: string): Verdict {
     const notch = typeof last.stop_at === "string" ? last.stop_at.trim().toLowerCase() : "";
     // The valve may release a question about a standing blocker. It cannot
     // release a newer runnable pull under blockers only.
-    if (bypassesStop(payload, notch, sessionMode())) return pass("bites once per stop", "this stop was already blocked once");
+    if (bypassesStop(payload, notch)) return pass("bites once per stop", "this stop was already blocked once");
     const at = Array.isArray(last.where) ? (last.where as unknown[]).map(String).join(", ") : String(last.where ?? "");
     const sanctioned = notchSanction(notch, last, at);
     if (sanctioned !== undefined) return pass(sanctioned[0], sanctioned[1]);
