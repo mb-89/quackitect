@@ -6,7 +6,7 @@
 // its failure is SILENT by nature: nothing throws, nothing is red, the agent
 // simply has a tool it should not have.
 //
-// SMALL FILES ON PURPOSE (owner ruling, 2026-07-30): this theme gets its own
+// SMALL FILES ON PURPOSE: this theme gets its own
 // file. See guidance/craft/software.md.
 //
 // NOTHING HERE STARTS A LANE. Raising a lane is a spawn, a port and a wait, and

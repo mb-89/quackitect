@@ -16,7 +16,8 @@ drifts from intent, hallucinates APIs, and decays as a project scales.
 WHO IS IN IT. By 2026 every major AI coding tool ships a flavour — GitHub Spec
 Kit, AWS Kiro, Claude Code, Cursor, OpenSpec, BMAD, Tessl, Google Antigravity.
 
-- GITHUB SPEC KIT. The most adopted open-source option. A Python CLI, 93,000+
+- GITHUB SPEC KIT. The most adopted open-source option.
+  - A Python CLI, 93,000+
   stars, v0.8.7 on 2026-05-07, supporting 30+ agent harnesses. Its named
   differentiator is an agent HOOKS system: event-driven automations firing when
   files are saved or created, handling test updates, README refreshes and

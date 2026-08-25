@@ -1,4 +1,4 @@
-// THE WRITER FORMATS, IT DOES NOT SPLICE (owner ruling 2026-08-01).
+// THE WRITER FORMATS, IT DOES NOT SPLICE.
 //
 // The property that matters is a round trip: reprinting a note's frontmatter
 // must not change what it MEANS, on every note in the vault, not on a fixture.

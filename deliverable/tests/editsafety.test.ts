@@ -1,4 +1,4 @@
-// EDIT SAFETY — the machines-are-drawn law (owner ruling 2026-07-28): the
+// EDIT SAFETY — the machines-are-drawn law: the
 // engine accepts what a person naturally draws in Obsidian, and (owner
 // ruling 2026-07-29) reads it LIVE — a drawing edited on disk binds the
 // running lane on its next call, with no reload. Regression
@@ -157,7 +157,7 @@ test("a drawn JOIN synchronizes: a starving join refuses the tick, the walk stan
   assert.deepEqual(session.active(), ["boot/end"], "the wedge guard leaves the walk standing");
 });
 
-// THE BUSBAR IS THE AND, and it is the ONLY one (owner ruling 2026-08-08).
+// THE BUSBAR IS THE AND, and it is the ONLY one.
 // This used to read `state_kind: join`, which the kernel checked while the
 // rigor matrix checked `busbar` — one idea in two words, enforced in two
 // places, with nothing making them agree. The kind survives as drawing
@@ -287,12 +287,12 @@ test("the close leaves the root tree clean, because it merges nothing", () => {
   assert.ok(!/Unmerged|MERGING|both added/.test(st), `the root tree stands clean: ${st}`);
 });
 
-// A DIRTY TRUNK IS SETTLED, NOT REFUSED (owner ruling 2026-07-28). git will
+// A DIRTY TRUNK IS SETTLED, NOT REFUSED. git will
 // not overwrite uncommitted local changes, so e18's close-merge failed - and
 // the abort after it failed too, because no merge had started. Refusing was
 // the first fix; the owner ruled it too blunt. The close already commits the
 // RECORD's leftovers on the principle that a walk's work never silently
-// AN OVERRIDE IS LOUDER THAN COMPLIANCE (owner ruling 2026-07-29, option 1).
+// AN OVERRIDE IS LOUDER THAN COMPLIANCE.
 // The report stamps whose hand finished it, and for two expeditions nothing
 // read that stamp: e20 and e21 were closed on reports the agent wrote and
 // finished itself, on the owner's word in chat, and the archive kept no trace

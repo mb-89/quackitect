@@ -42,7 +42,7 @@ Its four outputs, and where each lands:
   the hinge.
 - sensitivity point - the HINGE itself: the element or interface where
   one quality's response is decided. It rides the risk's body. No
-  separate register kind (owner ruling 2026-08-10).
+  separate register kind.
 - tradeoff - the same entry, where the hinge serves two qualities in
   opposite directions. The verdict line carries the tradeoff in one line.
 - non-risk - an "addressed" verdict. The path is the evidence; a

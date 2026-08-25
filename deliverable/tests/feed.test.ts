@@ -143,7 +143,7 @@ test("the render lint: the update lane refuses what renders weird", () => {
   assert.equal(d.to, "front_desk");
 });
 
-// THE MOST-HIT REFUSAL BECAME A CORRECTION (owner ruling 2026-08-02). The
+// THE MOST-HIT REFUSAL BECAME A CORRECTION. The
 // engine computed the split and threw it away — 174 refusals in one window.
 // Narration that chains IS the plan it wanted to be, applied and announced.
 test("a chained update brief is applied as the plan it wanted to be", () => {
@@ -458,7 +458,7 @@ test("the unified feed derives src, type and brief — and the mirror carries th
   const withLog = renderMirror({ session, root, lastPacket: undefined, mode: "manual", log });
   assert.ok(withLog.includes('id="w-log"'));
   assert.ok(withLog.includes('id="log-filter"'));
-  // THE CONTROLS ARE SWITCHES, NEVER SLIDERS (owner sketch, 2026-08-01).
+  // THE CONTROLS ARE SWITCHES, NEVER SLIDERS.
   // The rungs carry the authored levels, the cadence is two typed integers,
   // and the shutdown control is gone — it was a preference for something
   // that should never have been one.
@@ -498,7 +498,7 @@ test("the update rides any tool call, is stripped before the handler, and never 
   const r = await call(server, "se_file_list", { dir: ".", update: { op: "fork", brief: "looking around" } });
   assert.equal(r.isError, false, JSON.stringify(r.body));
   assert.equal(session.decisions.graph(session.currentVisit()).nodes.length, 1);
-  // A MALFORMED UPDATE NEVER DESTROYS ITS CALL (owner ruling 2026-07-28).
+  // A MALFORMED UPDATE NEVER DESTROYS ITS CALL.
   // This used to refuse the whole call, throwing the payload away over the
   // punctuation of a label riding beside it. The work lands; the complaint
   // rides home on the result, carrying the shape in its remedy as before.

@@ -38,7 +38,7 @@ function register(root: string): string {
   return dir;
 }
 
-// THE ORDERING STARTS FROM DAMAGE (owner report 2026-08-08). Ordered from
+// THE ORDERING STARTS FROM DAMAGE. Ordered from
 // MoSCoW alone, a response-time requirement came out above the foundations of
 // the system, and no pairwise comparison discovers that — the comparison never
 // reads what breaks.
@@ -153,7 +153,7 @@ test("a multi-line answer folds onto one frontmatter line", () => {
 });
 
 test("a key owns its block list, so a scalar write does not leave the old items dangling", () => {
-  // THE DEFECT THIS PINS, 2026-08-09. The chart wrote picks as a scalar over
+  // THE DEFECT THIS PINS. The chart wrote picks as a scalar over
   // a block list. The key line was replaced and the indented items stayed, so
   // the file stopped being YAML. Five candidate notes lost their picks, and
   // the five lines vanished off the chart with no error anywhere.
@@ -232,7 +232,7 @@ test("a cell still carrying its comment is unanswered, exactly like an empty one
   assert.match(claimProblems(root, state, "## probes\n\n| raid | probe |\n| --- | --- |\n", corpus).join(" "), /raid-a-holds \(no row\)/);
 });
 
-// A FILE REFERENCE RESOLVES ON DISK (owner ruling 2026-08-11). The package
+// A FILE REFERENCE RESOLVES ON DISK. The package
 // field points at a built ZIP, and a path naming nothing is the lie this
 // check exists to refuse.
 test("a file-ref field demands the named file on disk", () => {

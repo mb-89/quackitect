@@ -11,7 +11,7 @@ exit_script:
   - deliverable/engine/bin/record-inspect.ts
 legal_tools: se_probe_cap
 repair_tools: se_file_read, se_file_search, se_file_glob, se_file_list, se_file_patch, se_file_write, se_run
-guidance: "BOOT METHOD rides in from guidance/method/boot.md by tag - follow it. Preflight, the SMOKE test and the CONFORMANCE SWEEP run on exit, and all three are quick - the sweep reads about a thousand nodes in a third of a second. If this state allows no tools, pull to run them. Do not read or search here. A failure is named in the refusal. While a check stands red, the repair tools are legal HERE - fix what the output names, then pull again. THE ANSWER LIMIT IS MEASURED HERE WHEN IT IS UNKNOWN. The pull says answer_limit unmeasured when this kind of host has no figure yet. Climb the ladder before anything else: se_probe_cap with 20000, then double while the END-OF-PROBE marker still arrives and halve when it stops, then se_probe_cap with cap set to the largest that arrived whole. A cautious guess costs a session hundreds of paged reads, so this is the first thing you do, not the last."
+guidance: "BOOT METHOD rides in from guidance/method/boot.md by tag - follow it. Preflight, the SMOKE test and the CONFORMANCE SWEEP run on exit. All three are quick. The sweep reads about a thousand nodes in a third of a second. If this state allows no tools, pull to run them. Do not read or search here. A failure is named in the refusal. While a check stands red, the repair tools are legal HERE - fix what the output names, then pull again. THE ANSWER LIMIT IS MEASURED HERE WHEN IT IS UNKNOWN. The pull says answer_limit unmeasured when this kind of host has no figure yet. Climb the ladder before anything else. Start at se_probe_cap with 20000. Double while the END-OF-PROBE marker still arrives, and halve when it stops. Then send se_probe_cap with cap set to the largest that arrived whole. A cautious guess costs a session hundreds of paged reads, so this is the first thing you do, not the last."
 ---
 
 # Prepare the desk
@@ -47,7 +47,7 @@ module that owns them, so a moved file fails the check by the same path that
 would have failed the product — and the failure says what it costs, not just
 that something is absent.
 
-THE FULL BATTERY IS NOT HERE (owner ruling, 2026-07-30). Boot asks whether
+THE FULL BATTERY IS NOT HERE. Boot asks whether
 this engine can run, not whether every behaviour is correct. The battery
 answers the second question and belongs to validation — se_test, and the
 end of an expedition. It was measured at fifty-three seconds for one file

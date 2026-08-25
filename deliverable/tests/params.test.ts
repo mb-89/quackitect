@@ -94,7 +94,7 @@ describe("parameter panels", { concurrency: true }, () => {
     assert.match(html, /id="narration-minutes"[^>]*value="5"/);
     assert.match(html, /id="narration-calls"[^>]*value="20"/);
     assert.match(html, /class="rung param-action" data-post="\/narration-now"/);
-    // The walk row (owner design 2026-08-04): one row, label first, two
+    // The walk row: one row, label first, two
     // one-shot buttons — aim at the selected state, and the person's pull.
     assert.match(html, /class="rung param-action" data-post="\/target\/selected"/);
     assert.match(html, /class="rung param-action" data-post="\/pull"/);

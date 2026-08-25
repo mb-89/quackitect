@@ -33,14 +33,15 @@ edits it in the real world, and Obsidian reads it.
   Each press posts its route and nothing else. Not an `action`: an action
   joins the row above, and a bank IS its own row, label first.
 - `table` — rows of plain text under named columns. Fields: key.
-  The key names which table in the values gets drawn.
-  It is READ-ONLY and nothing in it can be pressed.
-  ONE LINE PER ROW. The last column is the wide one and the surface truncates
-  it, so short scannable facts go first and the long description goes last.
-  THE FULL TEXT OF EVERY CELL IS ON ITS TOOLTIP, which is where a truncated
-  line can still be read.
-  The label stands whether or not there are rows, like every other row. An
-  empty table is the ordinary case and says so in words.
+  - The key names which table in the values gets drawn.
+  - It is READ-ONLY and nothing in it can be pressed.
+  - ONE LINE PER ROW. The last column is the wide one and the surface
+    truncates it, so short scannable facts go first and the long description
+    goes last.
+  - THE FULL TEXT OF EVERY CELL IS ON ITS TOOLTIP, which is where a truncated
+    line can still be read.
+  - The label stands whether or not there are rows, like every other row. An
+    empty table is the ordinary case and says so in words.
 
 A type this renderer does not know is a REFUSAL, not a guess. That is the
 whole point: the drawing decides, and an unlisted widget cannot appear by
@@ -80,7 +81,7 @@ restated here.
 THE BACKGROUND TABLE IS ITS OWN PANEL (tasks.md) and the sidebar draws it
 under everything, including the note row. Its height follows how many jobs are
 running, so anywhere else it would push the controls below it up and down
-while a person is reaching for one (owner ruling 2026-08-23).
+while a person is reaching for one.
 
 A NEW CONTROL BELONGS IN THIS FILE, not after that one. `renderSidebar` in
 `deliverable/engine/params.ts` fixes the order, so adding a row here can never
@@ -134,7 +135,7 @@ RESTING IS THREE CONDITIONS, all of them.
 - Nothing has reached the log for five minutes, by any hand.
 - Nothing this session started in the last hour is still running.
 
-THE HOUR ON THE THIRD ONE IS NEW (2026-08-23) and it is why this never fired.
+THE HOUR ON THE THIRD ONE IS NEW and it is why this never fired.
 A background job that hangs stays "running" for ever, and one of those held the
 machine awake indefinitely. A job silent for an hour is a leak rather than
 work, and a shutdown that any leak can veto is a shutdown that never happens.

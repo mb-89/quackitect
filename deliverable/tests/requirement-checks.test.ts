@@ -1,4 +1,4 @@
-// THE DECLARED CHECKS FIRE FOR EVERY HAND (owner order 2026-08-06): the
+// THE DECLARED CHECKS FIRE FOR EVERY HAND: the
 // requirement template declares its rules in frontmatter, and conformance()
 // applies them — the same path the agent's submit and a person's panel edit
 // both run through. THE FIXTURE IS MINTED FROM THE TEMPLATE, never written by
@@ -70,7 +70,7 @@ describe("the requirement template's declared checks", () => {
     assert.deepEqual(findings(root, "req-clean"), []);
   });
 
-  // A REQUIREMENT CANNOT BE WRITTEN UNGRADED (owner ruling 2026-08-08). The
+  // A REQUIREMENT CANNOT BE WRITTEN UNGRADED. The
   // ordering reads the grade, and a row without one sorts as the middle — so
   // leaving it blank would be the quiet way to land anywhere in the ranking.
   test("a row with no damage grade is unanswered, and a wrong one is refused", () => {
@@ -208,7 +208,7 @@ function mintTyped(root: string, folder: string, id: string, type: string, extra
   );
 }
 
-// THE AUTHOR-TESTS LAW (owner ruling 2026-08-11): test-spec nodes carry the
+// THE AUTHOR-TESTS LAW: test-spec nodes carry the
 // verifies edge, the method must match the requirement's verify_method, and
 // a test spec's files must exist. Coverage is both-ways at spec grain.
 describe("the test-spec law", { concurrency: true }, () => {
@@ -251,7 +251,7 @@ describe("the test-spec law", { concurrency: true }, () => {
   });
 });
 
-// THE SPECIFY-BUILD AND TRACE-DESIGN LAWS (owner ruling 2026-08-11):
+// THE SPECIFY-BUILD AND TRACE-DESIGN LAWS:
 // design-spec nodes carry the realizes edge, every element is realized,
 // files are named before the build and exist after it, and the reverse
 // sweep lists every engine file no spec claims.
@@ -380,7 +380,7 @@ describe("the design-spec law", { concurrency: true }, () => {
 });
 
 describe("the checklist field", { concurrency: true }, () => {
-  // CHECKING IS THE CLAIM (owner ruling 2026-08-11): a checklist field
+  // CHECKING IS THE CLAIM: a checklist field
   // refuses while any named item stands unchecked. The observation tables
   // at observe-red and verification ride this — no text, one deliberate
   // click per row.

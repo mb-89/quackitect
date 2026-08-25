@@ -153,7 +153,7 @@ test("the assumption law refuses the hot and unprobed, and honours accept and de
   }
 });
 
-// EVERY method is covered by a spec now (owner ruling 2026-08-11) — the
+// EVERY method is covered by a spec now — the
 // verified_by shape this case guarded is retired. The full law lives in
 // tests/requirement-checks.test.ts; this holds the dispatch-level claim.
 test("a requirement of any method refuses uncovered, and a matching spec covers it", () => {

@@ -48,12 +48,12 @@ minor_note: |
   need|outcome lines, and their PASS LINES - a criterion nothing will check is
   not a criterion, at any size.
 
-  A NEW PROP IS NOT YOURS TO MINT (owner ruling 2026-08-21). Extend one that
+  A NEW PROP IS NOT YOURS TO MINT. Extend one that
   already stands. Where none fits, name the proposition you would mint and say
   why in one sentence, then carry on with the work - the person's word is what
   mints it. The value-prop item template carries the reasoning.
 
-  THE GAP CLAIM AND THE WHY-NOW ARE NOT ASKED (owner ruling 2026-08-13).
+  THE GAP CLAIM AND THE WHY-NOW ARE NOT ASKED.
   They stand from the resident frame, and the form drops them mechanically
   at this size rather than asking anyone to be brief about them.
 patch_note: |

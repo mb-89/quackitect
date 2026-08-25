@@ -44,7 +44,7 @@ DO NOT DELEGATE A SWEEP THE LANE HAS A VERB FOR. `se_file_replace` renames
 across a tree in one call with a preview. A subagent doing the same is slower
 and less checkable.
 
-MEASURED 2026-08-23. A session fixed about forty test failures and spawned no
+MEASURED. A session fixed about forty test failures and spawned no
 subagent until the owner asked why. Almost none of the fixes were mechanical,
 so handing them over would have saved little — but the READING behind them was
 most of the session's cost, and every page of it stayed in context.
@@ -84,9 +84,15 @@ WHAT TO TELL A SUBAGENT INSTEAD, until the lane reaches children:
 - Say the lane exists and that it cannot drive it. A child that has been told
   to use `se_` verbs wastes its first calls discovering they are absent.
 
-WHY IT MATTERS BEYOND CONVENIENCE. Fresh eyes see a DIFFERENT PROJECT than
-the walk does: no state gate, no narration toll, no typed refusals, no call
-log. Every finding a subagent makes about LANE BEHAVIOUR is second-hand by
+WHY IT MATTERS BEYOND CONVENIENCE. Fresh eyes see a DIFFERENT PROJECT than the
+walk does. Four things are missing from theirs.
+
+- no state gate
+- no narration toll
+- no typed refusals
+- no call log
+
+Every finding a subagent makes about LANE BEHAVIOUR is second-hand by
 construction.
 
 So weigh a subagent's lane findings accordingly, and re-check the ones that
@@ -124,7 +130,7 @@ claims.
 
 ## Which model
 
-JUDGE IT PER SUBAGENT (owner grant 2026-07-11). There is no fixed mapping and
+JUDGE IT PER SUBAGENT. There is no fixed mapping and
 none should be invented.
 
 - MECHANICAL WORK rides a lower tier. Counting, collecting, listing, reading

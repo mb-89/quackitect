@@ -15,26 +15,31 @@ exactly one hand.
 
 ## Guidance
 
-THE CAST IS FIXED and it is four (owner ruling 2026-08-20, i38). A GUIDE, which
+THE CAST IS FIXED and it is four. A GUIDE, which
 enters the record and stays across it, never pulls and holds no position. A
 WALKER, the only role that calls the pull. A REVIEWER, spawned at its own gate
 where the review actually happens. A RESEARCHER, spawned at whichever state
 the work actually asks for research. Nothing else spawns.
 
 A SPAWN STATE STARTS THE WALKER, and that is ALL it starts (owner ruling
-2026-08-23). This card used to say a gate later in the phase "gets a reviewer
-with no shared context" — written here, at the spawn state. That read as the
-reviewer being named or readied early, and it was wrong. THE REVIEWER SPAWNS
-AT THE GATE, when the review actually happens, never before it. A researcher
-spawns the same way: at the state doing the research, never up front. Each
-row's own gate or research state registers its own hand when it gets there —
-this state registers the walker and nothing else.
+2026-08-23).
+
+WHAT IT USED TO SAY. That a gate later in the phase "gets a reviewer with no
+shared context" — written here, at the spawn state. That read as the reviewer
+being named or readied early, and it was wrong.
+
+THE REVIEWER SPAWNS AT THE GATE, when the review actually happens, never
+before it. A researcher spawns the same way: at the state doing the research,
+never up front.
+
+Each row's own gate or research state registers its own hand when it gets
+there. This state registers the walker and nothing else.
 
 THE WALKER MAY DIFFER PER MILESTONE. It reads the guidance for its own phase,
 and its rung comes from that milestone — that variation is the reason this
 state exists at all, once per milestone.
 
-THE WALKER DOES THE WORK OF THE STATES IT WALKS (owner ruling 2026-08-23).
+THE WALKER DOES THE WORK OF THE STATES IT WALKS.
 Authoring a state's evidence IS the walker's job. The guide looks over it.
 
 DO NOT SEND A WALKER TO A STATE AND FORBID IT TO WRITE. That leaves a hand
@@ -42,7 +47,7 @@ standing at a form it was sent to fill, reporting back for permission it
 already had. Measured twice the day this was written.
 
 A WALKER PULLS AND DOES WHAT COMES BACK. It never needs to know where it is,
-and it cannot be raced (owner ruling 2026-08-23).
+and it cannot be raced.
 
 - THE PULL RECOMPUTES FROM WHEREVER THE WALK STANDS. The position moving under
   a hand is not a problem, because the hand holds no position of its own.
@@ -86,7 +91,7 @@ SEPARATION IS A DIFFERENT PURCHASE and it still holds. A reviewer at a gate
 must not have written what it judges. That is bought with tokens and time on
 purpose, and it is not covered by this rule.
 
-AND IT IS NOT COUNTED EITHER (owner ruling 2026-08-23). The ceiling counts
+AND IT IS NOT COUNTED EITHER. The ceiling counts
 WALKERS. A reviewer and a researcher are registered with their own role and
 stand outside the number, because neither competes for the walking slot.
 
@@ -138,7 +143,7 @@ WHAT IT DELIBERATELY DOES NOT PROVE is that the hand did the work. A guide
 could spawn a walker and then walk anyway. That is caught in the RETRO, which
 weighs how much each part did from the part stamped on every call, and a guide
 doing too much is a signal to fix the system rather than a refusal in the
-moment (owner ruling 2026-08-23).
+moment.
 
 THE RUNG COMES FROM THE MILESTONE, not from taste. sizing.ts publishes the
 difficulty and the rung; a submachine takes the maximum over its items, so one

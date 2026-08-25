@@ -179,7 +179,7 @@ test("the shipped matrix wires verification's fallback loop, and the loop walks 
 //
 // M7_60_fix-findings.md carries `guard: verification_attempts < 3` and its
 // prose promises "the machine escapes to a human when the guard exhausts".
-// MEASURED 2026-08-17: `counters` is initialised to {} in session.ts, carried
+// MEASURED: `counters` is initialised to {} in session.ts, carried
 // across a repin, read by evalGuard — and assigned nowhere. The name
 // `verification_attempts` does not occur in the engine at all.
 //

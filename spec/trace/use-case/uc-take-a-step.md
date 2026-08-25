@@ -44,6 +44,10 @@ Step 3 is done through the lane, never through the host's own tools:
 Extension 6a is answered by `se_why`. It names every condition holding a
 state grey, each with its own remedy, rather than only the first to fail.
 
+Extension 6b is answered by `se_stop`. It names which sanctioned stop applies
+and why, on the record, because the tooth that refused the turn reads the call
+log rather than the message.
+
 ## Extensions
 
 - 2a. Something is owed as reading. The machine hands over one document and asks for proof before the work opens.
@@ -54,3 +58,4 @@ state grey, each with its own remedy, rather than only the first to fail.
 - 4d. An owed item names no open register entry. The submit refuses it, because a disposition nobody agreed to is not a disposition.
 - 5a. A required field is empty. The submit names which, and nothing is stamped.
 - 6a. The next state's entry conditions do not hold. The walk stops here and names what is missing.
+- 6b. The turn has to end while the walk still has legal work. Ending is refused until one of the sanctioned stops is named on the record, and one naming releases one stop.

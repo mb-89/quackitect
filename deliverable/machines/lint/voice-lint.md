@@ -69,7 +69,7 @@ The chain rules count separators INSIDE one sentence. So the way past them
 is a full stop, and the same buried list gets written as "Open it. Read it.
 Fill both cells."
 
-That evasion ran three times in one afternoon on 2026-08-07, each time after
+That evasion ran three times in one afternoon, each time after
 the author had been told. List items were not linted at all, so a bullet
 carrying three sentences met no rule either.
 

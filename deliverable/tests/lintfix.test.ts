@@ -1,4 +1,4 @@
-// THE LANE FIXES WHAT IS MECHANICAL (owner ruling 2026-08-03): a write to a
+// THE LANE FIXES WHAT IS MECHANICAL: a write to a
 // file the project's linter covers comes back formatted and safe-fixed, and
 // the result SAYS SO. These cases run the real fixer binary against fixture
 // roots, so they prove the wiring, not a mock.

@@ -1,6 +1,6 @@
 // THE PULL — the choice is a form, and the multi-agent seam stays open.
 //
-// THE RULE (owner ruling 2026-08-02): you never choose unasked. A choice
+// THE RULE: you never choose unasked. A choice
 // is a FORM the machine hands over where the road splits, answered on the
 // next pull as form: {choice: "<to>"} — and only a door from the offer is
 // legal. The free-aimed choice died with this rule; long-range aiming is

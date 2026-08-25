@@ -223,7 +223,7 @@ test("a workspace held by another process refuses the take by the bind itself", 
     // THIS process's pipe to its stdout open, which is what stops the runner
     // exiting once every case has passed.
     //
-    // MEASURED 2026-08-25: the cases finished at 37 seconds and the run sat
+    // MEASURED: the cases finished at 37 seconds and the run sat
     // for another six minutes with no beat, twice, until it was killed by hand.
     // The lane already owns a killer that works on both platforms.
     killTree(holder.pid);

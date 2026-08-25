@@ -22,13 +22,13 @@ that the package works.
   product; improving it is packaging work.
 - Check it WORKS by using it: install from the package, reach the desk's
   greeting. What was observed is the evidence - never "should install".
-- NO RELEASE NOTES FILE (owner ruling 2026-08-21). Nothing writes one and
+- NO RELEASE NOTES FILE. Nothing writes one and
   nothing ships one. The commit history is the record of what changed.
 - A gap the check cannot close is named plainly, never papered over.
 
 ## Waiting outside the matrix
 
 finalize-docs (the emitted book) and ship-review (dependency rulings)
-left the matrix on 2026-08-11 until their mechanisms exist. When the
+left the matrix until their mechanisms exist. When the
 book pipeline lands, the docs duty returns as its own row; until then
 the consistency sweep at M8 carries the teaching surfaces.

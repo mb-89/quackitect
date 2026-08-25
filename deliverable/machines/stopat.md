@@ -20,7 +20,7 @@ the autonomy rungs above the resting one. You do not jump to `blockers only`.
 ## Why it exists
 
 THE STOP HOOK READS THE WALK'S POSITION AND CANNOT SEE THE REASON. So a stop
-the contract REQUIRES looks exactly like an overcautious one, and on 2026-08-16
+the contract REQUIRES looks exactly like an overcautious one, and
 the hook overrode a rule-9 stop five times — the agent had correctly refused to
 open an iteration unasked, said so, and was pushed past it anyway.
 

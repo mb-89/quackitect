@@ -1,6 +1,6 @@
 ---
 id: template-decision-matrix
-statement: The Pugh convergence drawn from the scores — criteria with their damage grade, the datum column, signed cells per rival, totals and the leader marked.
+statement: The Pugh convergence drawn from the scores. It carries the criteria with their damage grade and the datum column. Signed cells stand per rival, with totals and the leader marked.
 editor: decision-matrix
 line_pattern: ""
 line_help: the runs, written by the arithmetic — nothing here is typed

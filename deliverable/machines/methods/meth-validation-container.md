@@ -1,6 +1,6 @@
 ---
 kind: method
-statement: "Validation fills the story: every slide's evidence half, all stories, all iterations - the must stories demonstrated for real, each run minting its report."
+statement: "Validation fills the story. Every slide's evidence half is filled, for all stories and all iterations. The must stories are demonstrated for real, and each run mints its report."
 ---
 
 ## Situation

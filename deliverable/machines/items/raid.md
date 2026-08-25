@@ -113,7 +113,7 @@ design-input chapter at once.
 | decision | a choice made and relied on | it was decided — it can only be superseded |
 | debt | quality traded for speed, consciously | you chose it, and it stays until repaid |
 
-## Debt is the sixth kind (owner ruling 2026-08-11)
+## Debt is the sixth kind
 
 Every conscious quick-and-dirty becomes an entry of kind `debt`, graded
 like the rest. DEBT IS VISIBLE OR IT IS LYING ([[meth-internal-quality]]).
@@ -121,11 +121,11 @@ like the rest. DEBT IS VISIBLE OR IT IS LYING ([[meth-internal-quality]]).
 - The `trigger` is WHEN it comes back — debt without one is filed and
   forgotten.
 - The Repayment SECTION is WHAT CLOSES IT, and the two are different
-  sentences (owner ruling 2026-08-15).
+  sentences.
 - `mitigated` means repaid; `accepted` means lived with, on the record.
 - The implementation gate lists what the iteration took, in debt_taken.
 
-AN ADR IS NOT ITS OWN KIND OF THING (owner ruling 2026-08-10). It is a
+AN ADR IS NOT ITS OWN KIND OF THING. It is a
 decision whose damage grade is high — crippling or worse. The decisions
 chapter derives from this register, filtered by kind and grade.
 
@@ -135,7 +135,7 @@ later at most superseded. The other statuses belong to the other kinds.
 A FALSIFIED ASSUMPTION BECOMES AN ISSUE, not a risk — it has already
 happened. Change the kind, keep the id, and say so in the body.
 
-## THE TITLE STATES THE CLAIM, NOT THE TOPIC (owner ruling 2026-08-07)
+## THE TITLE STATES THE CLAIM, NOT THE TOPIC
 
 An entry's id and statement say the THING HELD TRUE, phrased so it could be
 falsified. Not the subject area, not the test status, not the name of a gap.
@@ -200,7 +200,7 @@ test.
   Written at M4. See [[meth-derive-criteria]].
 - `weighs_against` — the pairwise importance judgments. Written at M4.
 
-## A COMMENT IS THE UNANSWERED STATE (owner ruling 2026-08-07)
+## A COMMENT IS THE UNANSWERED STATE
 
 `probe` and `probed` are minted carrying a markdown comment. The comment says
 what belongs there. Replacing it with plain text is what answers the field.
@@ -224,7 +224,7 @@ The note does not fail a check. It fails to LOAD, so every test that asks for
 it reports the node missing. The symptom names the wrong thing entirely, and
 the real cause is one character in a prompt nobody was looking at.
 
-Costed 13 red tests on 2026-08-08, all of them reading `req-clean loads`.
+Costed 13 red tests, all of them reading `req-clean loads`.
 
 Use a dash where a colon wants to go. `one line per pair — a pool id, then >
 or =` says the same thing and parses.
@@ -232,7 +232,7 @@ or =` says the same thing and parses.
 This is the same convention the evidence forms already use for prefilled
 text: a comment is a suggestion, and confirming it is what makes it a claim.
 
-## `probe` IS THE FORM'S FIELD (owner ruling 2026-08-07)
+## `probe` IS THE FORM'S FIELD
 
 The probe-assumptions step does not keep its own copy of this. Its `probes`
 field is a VIEW: one line per standing assumption, and the answer on each line
@@ -252,7 +252,7 @@ The state stands exactly while every standing assumption carries this field.
 Nothing else is counted, so a new assumption turns the state grey the moment
 it is written, which is what a standing artifact means.
 
-## The Repayment section, on every debt (owner ruling 2026-08-15)
+## The Repayment section, on every debt
 
 A debt declares WHAT REPAYING IT CONSISTS OF at the moment it is taken, not
 when somebody gets round to it. This is the assumption's Probe rule, applied

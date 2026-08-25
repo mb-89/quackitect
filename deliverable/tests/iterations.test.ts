@@ -76,7 +76,7 @@ test("any state's form is fetchable by its machine — the walk elsewhere", () =
   assert.ok(existsSync(inst), "the instance lives in the record's folder");
   assert.match(readFileSync(inst, "utf8"), /seen from the desk/);
   // A browse-save is never stamped and a browse-submit refuses — questions
-  // are answered in order, in the state (owner ruling 2026-08-04).
+  // are answered in order, in the state.
   assert.ok(!/^signed_off:/m.test(readFileSync(inst, "utf8")), "a save never stamps; submit does, and only in the state");
   assert.throws(
     () => s.formDone("onboard-retro", "human", "i1"),
@@ -292,7 +292,7 @@ test("the bless pins the machine and it grows in place — no wrapper, fills car
   await session.advance(sid);
   // Entering the node descends into the iteration's OWN machine — M0.
   assert.deepEqual(session.breadcrumb(), ["main", "iterations", sid]);
-  // The METHOD guards the door (owner 2026-08-04) — the person proves by
+  // The METHOD guards the door — the person proves by
   // checkbox, and only then does the retro open.
   session.humanCheck(GUIDANCE.retroMethod);
   // start → spawn-the-hands: the roster row stands at position 05 of every
@@ -316,7 +316,7 @@ test("the bless pins the machine and it grows in place — no wrapper, fills car
   // state, which is the same law this case asserts for the retro below.
   session.formDone("spawn-the-hands", "human");
   await session.advance(); // spawn-the-hands → onboard-retro
-  // THE EXIT IS THE HARD GATE (owner 2026-08-04): the retro's stored form
+  // THE EXIT IS THE HARD GATE: the retro's stored form
   // must stand complete before the walk moves.
   await assert.rejects(
     () => session.advance(),
@@ -559,7 +559,7 @@ test("a choice while a form is owed refuses and names the reopen", async () => {
   assert.equal(out.remedy?.tool, "se_reopen", "and the remedy names the way back");
 });
 
-// A CLAIMFUL STATE COMPLETES ON ITS CLAIM (owner rule 2026-08-09). The walk
+// A CLAIMFUL STATE COMPLETES ON ITS CLAIM. The walk
 // once passed build_chart unsigned and reached the candidates gate — a
 // sub-machine skipped whole. The route-side fix stopped the observed case;
 // this guard closes the class at the one gate every completion passes.
@@ -613,7 +613,7 @@ test("completing a claimful state without its claim refuses, and the walk stands
 
 // The recovery edge made the fallback pair a cycle; the cycle guard cut the
 // walk mid-way and the half-computed layer was memoized, so fix-findings drew
-// rows above the verification it serves (owner report 2026-08-11).
+// rows above the verification it serves.
 test("a fallback state rides beside the state it recovers", () => {
   const work = (id: string, edges: StateDecl["edges"]): StateDecl => ({
     id,

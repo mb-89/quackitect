@@ -1,6 +1,6 @@
 // Naming the layer that ended a call (tsp-interrupted-call-names-the-stopping-layer).
 //
-// SMALL FILES ON PURPOSE (owner ruling, 2026-07-30). See guidance/craft/software.md.
+// SMALL FILES ON PURPOSE. See guidance/craft/software.md.
 import { strict as assert } from "node:assert";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";

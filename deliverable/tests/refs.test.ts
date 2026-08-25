@@ -102,7 +102,7 @@ describe("typed references", { concurrency: true }, () => {
     assert.equal(tpl?.defaults.audience, undefined, "a TODO is the mint asking, never an answer");
   });
 
-  // ONE CORPUS ROOT, FOR EVERY READER (owner, 2026-08-06). The form check and
+  // ONE CORPUS ROOT, FOR EVERY READER. The form check and
   // the green light both resolve references, and they used to read the trace
   // from different trees: a form passed its own submit while the state it
   // belongs to stayed grey, and nothing said so. A second answer is the
@@ -160,7 +160,7 @@ describe("typed references", { concurrency: true }, () => {
   });
 
   // FOUR HONEST WAYS TO NAME A FILE, and the machine takes all of them
-  // (owner, 2026-08-06). A person has the file in front of them; refusing
+  // A person has the file in front of them; refusing
   // three shapes teaches nothing and reads as broken.
   test("a path from the project root resolves", () => {
     assert.deepEqual(check(corpus(), "value-prop", "- spec/trace/value-prop/vp-a.md"), []);

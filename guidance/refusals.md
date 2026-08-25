@@ -6,9 +6,8 @@ statement: Every refusal clause, stated as feed-forward — know the rule before
 # refusals — the rules ahead of the refusal
 
 A refusal is typed. It carries the clause and the remedy — the feedback
-side. This page is the FEED-FORWARD side (owner ruling 2026-08-06):
-every clause in the registry has a section here, so the rule can be known
-before it fires. The registry lives in `deliverable/engine/errors.ts`.
+side. This page is the FEED-FORWARD side: every clause in the registry has a
+section here, so the rule can be known before it fires. The registry lives in `deliverable/engine/errors.ts`.
 
 The pairing rule: a new clause is not done until its section stands here.
 The mechanical enforcement of that rule is parked for the engine iterations;
@@ -16,7 +15,7 @@ until it lands, authorship carries it.
 
 ## ANYTHING THAT BLOCKS OWES A REMEDY, NOT ONLY A TYPED REFUSAL
 
-Owner ruling 2026-08-07, and it generalises the rule above.
+It generalises the rule above.
 
 A typed refusal is one shape of block. There are others, and they owe the
 same thing. A `fill` that comes back unchanged is a refusal wearing an
@@ -30,17 +29,15 @@ clearly enough to act on.
 
 PUT IT WHERE A TRUNCATING HOST STILL SHOWS IT. A large result is moved to disk
 by some hosts, which hand back the HEAD of it. A remedy buried deep in a big
-payload is a remedy nobody receives. This cost five calls of guessing at a
-one-word mistake on 2026-08-07, and the fix was to move the block to the top
-rather than to add a verb for fetching it.
+payload is a remedy nobody receives, so it goes at the top rather than behind a
+verb for fetching it.
 
 THE TEST OF A REMEDY: could somebody act on it without asking a second
 question? If not, it is a diagnosis rather than a remedy.
 
-## NO BLANKET ERROR MESSAGE (owner ruling 2026-08-21)
+## NO BLANKET ERROR MESSAGE
 
-The owner's words: "Errors need to be specific and so need to be the remedy for
-them."
+Errors are specific, and so are the remedies for them.
 
 A BLANKET MESSAGE IS ONE THAT COVERS SEVERAL CAUSES WITH ONE SENTENCE. It says
 something went wrong, or that a check failed, and leaves the reader to find out
@@ -63,11 +60,6 @@ started again by the next attempt, and while the second run is in flight the
 only honest answer carries BOTH: that it is running again, and what the
 previous run said.
 
-MEASURED 2026-08-21, and it is why this section exists. i51's verification
-battery went red and its reason was unreachable for several calls: every
-attempt to read the output started another 98-second run that masked it. The
-failure was one test with a one-word fix.
-
 THE COST IS ALWAYS THE SAME. A reader who cannot see the cause guesses at it,
 and every guess is a call spent proving something the message already knew.
 
@@ -80,11 +72,9 @@ forward with a new commit.
 ### SE-C-003 — the agent never pushes
 Pushing is the owner's act. Do not attempt it, and do not ask the shell to.
 
-NOTHING PUSHES ANY MORE, not even the engine (i34). The machinery used to push
-the iteration seed stub, the expedition seed stub and the claim file, as acts
-of the claim lane. A record is a folder on trunk now and the claim system is
-retired, so there is no stub to announce and no claim file to write. Every push
-refuses here, without exception.
+NOTHING PUSHES, not even the engine. A record is a folder on trunk, so there is
+no stub to announce and no claim file to write. Every push refuses here,
+without exception.
 
 ### SE-C-004 — git beyond the allowlist
 `se_git` covers an allowlist of verbs. A job outside it belongs to the
@@ -136,9 +126,9 @@ the author is present and one edit closes it. A break the corpus already
 carried lands and reports instead — that is the seam, and it turns on who
 caused it rather than on how serious it is.
 
-MEASURED, on 2026-08-16: a write carrying this shape was accepted, and the
-next pull threw naming a line and a column in no particular file. Four calls
-to find and fix. One refusal here costs none.
+WITHOUT THE REFUSAL the write lands and the NEXT pull throws, naming a line and
+a column in no particular file. One refusal here costs nothing; the alternative
+costs four calls of hunting.
 
 ### SE-C-102 — the path escapes the root
 Paths are root-relative to the project root. Outside the root there are two
@@ -176,19 +166,16 @@ said, and hands back the pair of calls that fixes it.
 A SHALLOW CLONE IS THE ORDINARY CAUSE. A cloud box clones one branch, so `main`
 and `v2` do not exist locally at all.
 
-A FETCH ALONE IS NOT ENOUGH, and that is the part that surprises people.
-Measured on the i35 cloud run, 2026-08-17: after `git fetch --all --prune`,
-`ref: main` still failed with `unknown revision`. The local branch has to be
-created from the remote-tracking one.
+A FETCH ALONE IS NOT ENOUGH, and that is the part that surprises people. After
+`git fetch --all --prune`, `ref: main` still fails with `unknown revision`. The
+local branch has to be created from the remote-tracking one.
 
 - `se_git {args: ["fetch", "--all", "--prune"]}`
 - `se_git {args: ["branch", "main", "origin/main"]}`
 
-WHY IT IS TYPED NOW. It was the ONE place in the lane where the typed-rejection
-law did not hold: the search threw raw git text with no clause and no remedy.
-Raw git text reads as "the file is missing" when what is missing is the BRANCH,
-and that misreading cost the i15 run a wrongly-minted assumption carried through
-six evidence forms.
+WHY IT IS TYPED. Raw git text reads as "the file is missing" when what is
+missing is the BRANCH. That misreading mints a wrong assumption, and a wrong
+assumption spreads through every evidence form that cites it.
 
 A GIT FAILURE THAT IS NOT ABOUT THE REF STAYS AN ERROR. A broken pattern is an
 internal fault rather than something the caller can fix, and a remedy that does
@@ -197,24 +184,18 @@ not apply is worse than none.
 ### SE-C-127 — the root is not declared
 `@name` reaches only roots declared in `.se/roots.json`.
 
-DECLARE IT YOURSELF AND CARRY ON (owner ruling 2026-08-24). The agent writes
-the declaration through the lane, where it is logged like every other call. The
-owner's words: "I'm getting tired of agents telling me that they can't declare
-roots. It's not the human. The human doesn't care about the roots."
+DECLARE IT YOURSELF AND CARRY ON. The agent writes the declaration through the
+lane, where it is logged like every other call. Nobody has to be woken to
+approve a path.
 
-THIS CARD USED TO SAY ASK FIRST, and that cost real runs. The retro's memory
-drain reaches the harness's folder through a declared root, so an agent that
-stopped to ask reported the step unreachable and moved on — which is the step
-saying nothing at all.
+STOPPING TO ASK COSTS THE STEP. The retro's memory drain reaches the harness's
+folder through a declared root, and an agent that waits for permission reports
+that step unreachable — which is the step saying nothing at all.
 
 A DECLARED ROOT IS STILL READ-ONLY BY DEFAULT, and the guard on writing back
 into the tree a vehicle came from is untouched (SE-C-143).
 
 ### SE-C-143 — the write target is the tree this one came from
-IT WAS MINTED AS SE-C-140 ON THE i16 BRANCH and renumbered when that branch
-merged, 2026-08-18. i17 shipped SE-C-140 first, and a clause number that has
-reached a log can never be reused. The number moved; nothing else did.
-
 A declared root may be made writable, and that is how this system drives a
 project that is not itself. What it may never reach is the tree it was
 produced from.
@@ -307,9 +288,8 @@ the output is expected to be long and every long thing has a verb for it.
 - Anything else: run it whole. The lane captures the full output under the
   call's ref, and `se_log_query {ref}` serves it back a page at a time.
 
-`no_tool_reason` RUNS IT ANYWAY and logs why. It was a warning until
-2026-08-16, and the warning failed twice — the second time inside the
-iteration that was building this refusal.
+`no_tool_reason` RUNS IT ANYWAY and logs why. A warning stood here first and
+failed twice, the second time inside the work that was building this refusal.
 
 ### SE-C-129 — the shell asked to do a lane tool's job
 `se_run` is for what the lane cannot do. The lane's own jobs stay in the
@@ -329,19 +309,18 @@ Say what you want to know, in one line. The engine says which tests ran; only
 this says why you asked, and the record keeps it.
 
 ### Two retired clauses — the test scope, once SE-C-130 and SE-C-131
-RETIRED by owner ruling, 2026-08-16. THE AGENT ASKS FOR A TEST AND THE ENGINE
-DECIDES WHAT RUNS. Neither number is reused, and nothing here claims them.
+RETIRED. THE AGENT ASKS FOR A TEST AND THE ENGINE DECIDES WHAT RUNS. Neither
+number is reused, and nothing here claims them.
 
 WHAT THEY WERE FOR. SE-C-130 refused a re-run over an unchanged tree.
 SE-C-131 graded the scope: it refused the battery while every change mapped to
 a scoped run, and refused scoped runs once piecemeal coverage crossed a flip.
 
-WHY THEY ARE GONE. They guarded the same decision from opposite sides, and on
-2026-08-16 they closed on each other. At i6's sixth build chunk the odometer
-stood at 42 and the battery was illegal outside verification, so NO TEST CALL
-WAS LEGAL — with four milestones still to walk before the state that fires the
-battery. Each refusal's remedy was the other refusal. Narrowing to one file
-changed nothing, because the flip counts the odometer rather than the call.
+WHY THEY ARE GONE. They guarded the same decision from opposite sides, and they
+closed on each other. With the odometer past the flip and the battery illegal
+outside verification, NO TEST CALL WAS LEGAL at all. Each refusal's remedy was
+the other refusal, and narrowing to one file changed nothing, because the flip
+counts the odometer rather than the call.
 
 THE CAUSE WAS NOT THE THRESHOLD. It was that the AGENT chose the scope and the
 ENGINE graded the choice. Two graders with different subjects eventually
@@ -372,7 +351,7 @@ stands in the way and how to work it.
 TWO PATHS UNDER THIS CLAUSE SURPRISE PEOPLE, and both are about the two acts
 on a standing claim.
 
-AN AMEND DOES NOT RE-GREY. A REOPEN DOES (owner ruling 2026-08-17).
+AN AMEND DOES NOT RE-GREY. A REOPEN DOES.
 
 - An AMEND corrects a claim that still stands: a wrong figure, a stale
   sentence, a typo. The signature is kept, and nothing below it is disturbed.
@@ -406,9 +385,8 @@ the one an agent reaches for first.
 
 WHAT PASSES: `items.map((s) => "- " + s).join("\n")` and nothing else changed.
 
-MEASURED on the i38 cloud run at gate-requirements, on `goals_served` and
-`round_2_red_team`, and it cost a full round trip. The parser knows which of the
-two it got, so this belongs in the refusal itself rather than here.
+THE PARSER KNOWS WHICH OF THE TWO IT GOT, so this belongs in the refusal itself
+rather than here.
 
 ### SE-C-113 — the step outweighs the dial
 A step weighing more than the session autonomy is the person's. Present it,
@@ -428,29 +406,26 @@ iteration, refusing with "a state of main with an evidence form". Re-entering
 through the iterations container does not rebind it.
 
 A RELOAD DOES NOT MOVE THE WALK. Its own note promises the walk reboots and
-walks back to the target. Measured on the i38 cloud run: it cleared the blockers
-`se_why` reported and moved the position not at all.
-
-WHAT THAT COST: four consecutive pulls and five tool trials, on one run, to
-learn both.
+walks back to the target. What it actually does is clear the blockers `se_why`
+reported, leaving the position exactly where it stood.
 
 ### SE-C-123 — a dead end in the drawing
 Completing this state would leave the machine open with nothing active — a
 starved join. Fix the drawing, not the walk.
 
-A GREEN BRANCH NO LONGER COUNTS AGAINST YOU (owner ruling 2026-08-09). A
-busbar waits only for the inbound edges whose source is not already filled.
+A GREEN BRANCH DOES NOT COUNT AGAINST YOU. A busbar waits only for the inbound
+edges whose source is not already filled.
 A branch that stands green has nothing left to deliver, so it is not walked
 again to satisfy the bar.
 
 What still fires this clause is a branch that is genuinely owed. Walk that
 one.
 
-WHY THE RULE CHANGED. A three-way join used to be unreachable by a single
-token. Walking one branch fired one edge; reaching a sibling routed BACK
-through the fork, and the re-walk cleared the fuel the last leg had just laid
-down. Measured in iteration one on 2026-08-09: all three branches walked, the
-gate still shut, and stepping out to re-enter reset the count to zero.
+WHY THE RULE IS SHAPED THIS WAY. Counting every inbound edge makes a three-way
+join unreachable by a single token: walking one branch fires one edge, reaching
+a sibling routes BACK through the fork, and the re-walk clears the fuel the last
+leg laid down. All three branches walk, the gate stays shut, and stepping out to
+re-enter resets the count to zero.
 
 ### SE-C-124 — the canvas fails to compile
 The walk stands where it is. Fix the drawing; the walk resumes.
@@ -519,8 +494,8 @@ where you stand.
 WAITING ON OTHER WORK IS NOT A PARK EITHER. Name the state that work ends in,
 or seed it.
 
-THIS USED TO BE A MARK RATHER THAN A REFUSAL, and 8 of 28 abandoned points came
-in through it.
+A MARK IS NOT ENOUGH HERE. While this was only marked, 8 of 28 abandoned points
+came in through it.
 
 A WELL-SHAPED NAME NOTHING ANSWERS TO IS STILL ONLY MARKED. A park written
 inside a record names that record's own states, and those are drawn only while
@@ -534,10 +509,10 @@ TWO THRESHOLDS, AND THE GAP BETWEEN THEM IS THE GRACE.
 - FIVE updates with nothing resolved: a warning rides the result as a `nudge`.
 - TWELVE: the next non-resolving update refuses.
 
-BOTH USED TO BE FIVE, so the warning and the refusal arrived one call apart.
-That is not a warning, it is a two-stage refusal — and the counter measures
-updates since anything CLOSED, which real work legitimately runs past while
-reading its way to a root cause.
+THE GAP IS THE POINT. A warning one call ahead of the refusal is not a warning,
+it is a two-stage refusal — and the counter measures updates since anything
+CLOSED, which real work legitimately runs past while reading its way to a root
+cause.
 
 The way out is always open. A resolving op is never refused, because it is the
 remedy:
@@ -572,22 +547,20 @@ finish that did not exist.
 A write verb's payload is DATA. It must land in the file verbatim.
 
 This refusal fires when the applied text does not contain the payload. That
-means something between the tool boundary and the buffer transformed it —
-the class that spliced two engine files into themselves in 2026-08-07 and
-reported success both times.
+means something between the tool boundary and the buffer transformed it — the
+class that splices a file into itself and reports success.
 
 Nothing was written. Read the file, then report the payload that triggered
 this: the escape-eating class has a new member, and the payload is the
 evidence.
 
 ### A retired clause — the method write, once SE-C-134
-RETIRED by owner ruling, 2026-08-14. It refused a method write made from
-inside a record. The number is retired and is not reused, and no section here
-claims it: this is history, not a rule you can trip.
+RETIRED. It refused a method write made from inside a record. The number is not
+reused, and no section here claims it: this is history, not a rule you can trip.
 
 WHAT IT WAS FOR. Back when a record was its own checkout, a method write made
-inside one landed there and fanned out at the merge. On 2026-08-07 that
-overwrote the shared tool list and deleted two lane verbs.
+inside one landed there and fanned out at the merge, once overwriting the shared
+tool list and deleting two lane verbs.
 
 WHY IT IS GONE. The refusal was REPLACED BY A RESOLUTION, never merely
 dropped. Shared method resolves to the MACHINE ROOT whichever record is bound,
@@ -600,11 +573,6 @@ SHARED MEANS THESE:
 - the engine
 - the tests
 - the prompt layer
-
-WHAT IT COST WHILE IT STOOD. Escape to the desk, edit there, aim back — and
-the walk back re-walked the whole machine, timing out on the first pull and
-erroring on the second. Six times in one session, and twice more on the day it
-was removed.
 
 THE HOLE IT NEVER COVERED. It guarded five path-carrying tools and could not
 watch `se_run`'s shell commands, which are handed no path to judge. That is
@@ -641,10 +609,9 @@ holding that line. A note is written mid-walk by whoever noticed something and
 may carry anything — a path, a name, a customer. An option lands on trunk,
 where SE-C-002 means it can never be taken off again.
 
-THERE IS A SECOND BRANCH AND THE SIX-WORD RULE DOES NOT DESCRIBE IT (added
-2026-08-19, after it fired three times unexpectedly in one retro). A DISTINCTIVE
-SINGLE WORD carried over is refused on its own, because an address, a path or a
-name is one word and one word is enough to leak.
+THERE IS A SECOND BRANCH AND THE SIX-WORD RULE DOES NOT DESCRIBE IT. A
+DISTINCTIVE SINGLE WORD carried over is refused on its own, because an address,
+a path or a name is one word, and one word is enough to leak.
 
 THREE THAT FIRED, each alone and each with no run around it: `reachability`,
 `implementation`, `documentation`. None is secret and that is the point — the
@@ -677,8 +644,14 @@ renderer can invent them.
 
 ## The same refusal, three times over
 
-A refusal carries a clause, what was expected, what it got, and an executable
-remedy. That is enough to recover in one turn WHEN THE READER TAKES IT.
+A refusal carries four things.
+
+- the clause
+- what was expected
+- what it got
+- an executable remedy
+
+That is enough to recover in one turn WHEN THE READER TAKES IT.
 
 A reader who does not take it gets the identical answer again. From inside,
 the third identical answer looks exactly like the first, so nothing about the
@@ -734,9 +707,9 @@ A FILE THAT ALREADY EMITS STAYS EDITABLE. The check asks whether THIS write
 turned a quiet file into an emitter, so a file already on the list is untouched
 by it.
 
-THAT IS DELIBERATE. Eighteen engine files emitted on 2026-08-23 and folding
-them into the one surface is the work; a guard that froze them would block the
-fix as well as the fault.
+THAT IS DELIBERATE. Eighteen engine files already emit, and folding them into
+the one surface is the work. A guard that froze them would block the fix as well
+as the fault.
 
 ### The three ways past it
 

@@ -1,4 +1,4 @@
-// A DRAWN SUB-MACHINE IS VIEWABLE (owner report 2026-08-08).
+// A DRAWN SUB-MACHINE IS VIEWABLE.
 //
 // Clicking enumerate-space in the drawing landed the reader back on the main
 // machine. Every resolver the mirror had knew only GENERATED children —
@@ -84,7 +84,7 @@ test("every finder carries its applies field", () => {
   }
 });
 
-// ONE EVIDENCE LANGUAGE (owner ruling 2026-08-08). The canvas compiler used
+// ONE EVIDENCE LANGUAGE. The canvas compiler used
 // to have its own: one line per field, carrying a name, a description and
 // required-or-optional, and nothing else. So a drawn state could never ask
 // for what a matrix row asks for every day, and the five finders — the first
@@ -209,7 +209,7 @@ test("a sub-machine is double-clickable exactly when its drawing resolves", asyn
   assert.match(html, /data-detail="state:run-candidates"[\s\S]{0,400}class="[^"]*inner"/, "it still draws as a sub-machine");
 });
 
-// A WALKED SUB-MACHINE MUST NOT LOOK UNSTARTED (owner report 2026-08-09).
+// A WALKED SUB-MACHINE MUST NOT LOOK UNSTARTED.
 // From trunk, i1 read "not done" although every claim under its last gate
 // stood signed and blessed on disk. Two mechanisms, both fixed together:
 // a drawn sub-machine browsed from the desk resolved to NO iteration (only
@@ -300,7 +300,7 @@ test("an aim at the front desk never descends into an open record", async () => 
   }
 });
 
-// THE ROUTE CARRIES THE WHOLE FAN (owner, 2026-08-09). One drawn path named
+// THE ROUTE CARRIES THE WHOLE FAN. One drawn path named
 // one leg of the three-way join and the walk met the other legs one refusal
 // at a time. The route now reports every unsigned leg of a bar it runs
 // through or feeds, and the drawing draws them all.

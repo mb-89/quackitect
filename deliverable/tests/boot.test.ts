@@ -1,6 +1,6 @@
 // the gate and the walk: what is legal before boot, and boot pulled end to end
 //
-// SMALL FILES ON PURPOSE (owner ruling, 2026-07-30). A test file is the
+// SMALL FILES ON PURPOSE. A test file is the
 // only unit that reaches a second core, so themes get their own file and
 // the suite uses the machine it runs on. See guidance/software.md.
 import { strict as assert } from "node:assert";
@@ -37,7 +37,7 @@ describe("boot", { concurrency: true }, () => {
     // placed is not the projection of the guidance root, so the promotion is
     // guarded mechanically rather than by trust.
     //
-    // AND NOW IT READS NOTHING ON THE WAY OUT (owner ruling 2026-08-07). The
+    // AND NOW IT READS NOTHING ON THE WAY OUT. The
     // handover used to be consumed here. It is gone: boot DERIVES the last
     // session from the call log and puts it on the banner, so there is no
     // document to read, no proof to earn and no file anyone must remember to
@@ -217,7 +217,7 @@ describe("boot", { concurrency: true }, () => {
     ).states[0];
     // BOOT OWES NOTHING ON THE WAY OUT. The contract, the walk, the lane and
     // the voice went to the prompt layer, and the handover was retired
-    // outright (owner ruling 2026-08-07) — the last session is derived from
+    // outright — the last session is derived from
     // the call log now and rides the banner. An absent dictionary is the shape
     // of a boot that owes nothing, which is the whole point.
     assert.deepEqual(Object.keys(state.exit ?? {}), [], "nothing is demanded on the way out any more");

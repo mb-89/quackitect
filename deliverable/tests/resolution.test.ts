@@ -263,7 +263,7 @@ test("a second act cannot open a bound while one is open", async () => {
 
 // WHERE THE BOUND IS ENFORCED, which is not where it is most obvious.
 //
-// Measured 2026-08-18: the seam is imported by engine/tools.ts and by this
+// Measured: the seam is imported by engine/tools.ts and by this
 // file, and tools.ts reaches it twice, both times for se_lint READS. Every
 // file WRITE verb calls resolveInRoot directly. A bound placed only at the
 // seam would therefore guard two reads and nothing else.

@@ -78,7 +78,7 @@ can be fatal — genuinely load-bearing and genuinely not scheduled yet.
 
 ## WHAT M4 DOES WITH IT
 
-IT IS THE SORT KEY AT cut-criteria, worst first (owner ruling 2026-08-09). Not
+IT IS THE SORT KEY AT cut-criteria, worst first. Not
 a hint for something else to improve on — the order itself.
 
 THE SORT IS THEREFORE MECHANICAL, and that is the property worth protecting.
@@ -91,7 +91,7 @@ because the KEY is authored at M3 on the requirement itself. A person who
 wanted a favourite axis to rise would have to re-grade what breaks without it,
 in the register, against the strike test, where anybody can check it.
 
-THE SORT IS TWO STEPS, AND THIS IS THE FIRST (owner ruling 2026-08-09). The
+THE SORT IS TWO STEPS, AND THIS IS THE FIRST. The
 grade roughs the order out. Then somebody CHECKS it and pushes rows up or down
 where it came out wrong.
 
@@ -105,7 +105,7 @@ with its neighbours.
 
 WHY IT WAS SPECIFIED THIS WAY. Ordered from nothing, a response-time
 requirement came out above the foundations of the system (owner report
-2026-08-08). It was still there on 2026-08-09, ranked first of seventy-two
+2026-08-08). It was still there, ranked first of seventy-two
 while graded corrosive — third of five — because a stored order from an
 earlier pass overrode the computed one. Two lessons, and both are load-bearing.
 

@@ -9,4 +9,18 @@ tags:
   - venn
   - governor
 ---
-The product's founding motivation, authored in the predecessor's vault. Carries the Venn argument — the competent-at-rigor set and the tolerant-of-rigor set barely overlap in people; the agent is the overlap, competent and tireless — and the governor insight: the pain of rigor throttled low-value work, the agent feels no pain, so the throttle is rebuilt as explicit quality bars (ratchet-up, length-as-budget, risk-proportional rigor, never efficiency alone). The figure: venn-competent-tolerant.svg beside the chapter.
+The product's founding motivation, authored in the predecessor's vault.
+
+## The Venn argument
+
+The competent-at-rigor set and the tolerant-of-rigor set
+barely overlap in people. The agent is the overlap, competent and tireless.
+
+## The governor insight
+
+The pain of rigor throttled low-value work, and the
+agent feels no pain. So the throttle is rebuilt as explicit quality bars:
+ratchet-up, length-as-budget, and risk-proportional rigor. Never efficiency
+alone.
+
+THE FIGURE is venn-competent-tolerant.svg, beside the chapter.

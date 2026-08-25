@@ -31,8 +31,7 @@ downstream matters.
 ## The rules
 
 - Write for the user. They do not care which attempt this is.
-- Keep the packet free of history and lineage. No method words either
-  (owner law, 2026-08-04).
+- Keep the packet free of history and lineage. No method words either.
 - A claim about the world carries evidence or is marked as belief.
   Dated sources beside dated claims.
 - Ask the falsifying question and keep it in the packet: what

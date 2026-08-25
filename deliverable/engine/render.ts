@@ -30,6 +30,7 @@ import { TABLE_SCRIPT, TABLE_STYLE } from "./tables.ts";
 import { TRACE_SCRIPT, TRACE_STYLE, traceCard } from "./traceui.ts";
 import type { RouteMarks } from "./viewmodel.ts";
 import { view as resolveView, routeOverlay, statePaint } from "./viewmodel.ts";
+import type { WidgetKind } from "./widget-kinds.ts";
 
 export type { RouteMarks };
 // ONE PLACE DECIDES WHAT A GREEN MEANS, and it is the resolver. Re-exported
@@ -696,7 +697,7 @@ function aimChipFor(aim: { path: string; machine: string; leaf: string } | undef
 
 export function renderMirror(
   m: MirrorState,
-  widget?: "machine" | "details" | "log" | "terminal" | "table" | "trace",
+  widget?: WidgetKind,
   view?: string,
   card?: string,
   embed?: boolean,

@@ -60,9 +60,9 @@ guidance: |
   the whole control; there is no numbered scale behind them.
 
   SMALL FIXES THE OWNER ORDERS IN CHAT run directly from here, with no
-  expedition, while the project stays pre-ledger (owner ruling 2026-07-27).
+  expedition, while the project stays pre-ledger.
 
-  THERE IS NO HANDOVER (owner ruling 2026-08-07). The briefing on the last
+  THERE IS NO HANDOVER. The briefing on the last
   session is DERIVED from the call log and rides the boot banner, so nothing is
   written on the way out and nothing is read at boot. What must outlive a
   session belongs in guidance, in a note or in a record.
@@ -75,11 +75,11 @@ stay; the agent carries the paperwork.
 
 ## It is also home
 
-THERE USED TO BE AN IDLE STATE IN FRONT OF THIS ONE, and the desk borrowed its
+NO STATE STANDS IN FRONT OF THIS ONE. An earlier shape had the desk borrow its
 doors. The engine said so in as many words, and a borrowed offer had to graft
 the hub back on as an extra option.
 
-THAT INDIRECTION IS GONE (owner ruling 2026-08-23). Boot lands here, the doors
+THAT INDIRECTION IS GONE. Boot lands here, the doors
 are this state's own edges, and a reload is legal from here because this is
 where a session rests.
 

@@ -130,7 +130,7 @@ describe("the catalogues", { concurrency: true }, () => {
 // THE MIDDLE LAYER, which had no test and was where the silence lived.
 //
 // Every cluster column was declared right and every one of them read as free
-// text (owner, 2026-08-08). Both ends were fine: the note declared its picks,
+// text. Both ends were fine: the note declared its picks,
 // and the editor drew what it was given. Nothing checked what came out between.
 describe("the offers a finder actually makes", { concurrency: true }, () => {
   const tableField = (state: string, field: string): EvidenceField => {

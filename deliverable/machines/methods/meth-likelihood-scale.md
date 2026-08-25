@@ -20,10 +20,10 @@ argued with, and neither wears a number nobody measured.
 
 ## The test for each
 
-- EXPECTED. Name the standing condition that produces it. If that condition
-  already holds today, the grade is expected.
-- PLAUSIBLE. Tell the story in one sentence with no coincidence in it. If
-  the sentence needs an "and also", the grade is conceivable.
+- EXPECTED. Name the standing condition that produces it.
+  - If that condition already holds today, the grade is expected.
+- PLAUSIBLE. Tell the story in one sentence with no coincidence in it.
+  - If the sentence needs an "and also", the grade is conceivable.
 - CONCEIVABLE. The story needs two or more independent things to go wrong
   at once.
 

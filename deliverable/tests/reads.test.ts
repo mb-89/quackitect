@@ -12,7 +12,7 @@ import { Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
 import { bootedServer, call, checkDocs, craftDocs, freshRoot, GUIDANCE, readOne } from "./helpers.ts";
 
-// THREE HOMES, NOT ONE (owner ruling 2026-07-29). voice.md is about HOW YOU
+// THREE HOMES, NOT ONE. voice.md is about HOW YOU
 // TALK. It had accumulated rules about writing SOFTWARE and building
 // INTERFACES, and a reader looking for one had to sift the other two.
 //
@@ -21,7 +21,7 @@ import { bootedServer, call, checkDocs, craftDocs, freshRoot, GUIDANCE, readOne 
 // so the pull serves them THERE and nowhere else. voice is PROMOTED: the
 // prompt layer carries it on every turn, so the pull skips it.
 //
-// THEY LEFT THE GUIDANCE ROOT (owner ruling 2026-08-06). A root doc is pulled
+// THEY LEFT THE GUIDANCE ROOT. A root doc is pulled
 // into every packet, and neither of these binds a design-input step. The step
 // that maps stakeholders was reading how to write code.
 test("session-restricted guidance reaches only its declared session mode", () => {
@@ -110,7 +110,7 @@ test("a check pins the VERSION: editing the doc unchecks it and the gate asks ag
   assert.deepEqual(s.active(), ["retro"]);
 });
 
-// THE WRITTEN HANDOVER IS GONE (owner ruling 2026-08-07). It was demanded at
+// THE WRITTEN HANDOVER IS GONE. It was demanded at
 // the `end` state, and sessions do not end there — they get killed, so the
 // gate almost never fired. The owner put it plainly: they kill the session, so
 // there was never a handover. Boot DERIVES the briefing from the call log now
@@ -248,7 +248,7 @@ test("the pill turns green from the machine: the agent's reading records its pro
   const root = freshRoot();
   // WHAT read_contract OWES IS ITS TAG-PULLED GUIDANCE. The contract, the
   // walk, the lane and the voice went to the prompt layer, and the handover
-  // was retired outright (owner ruling 2026-08-07) — what remains is the boot
+  // was retired outright — what remains is the boot
   // method reading, demanded by tag rather than named on the state.
   const session = new Session(root);
   const server = buildServer(root, session);

@@ -170,7 +170,7 @@ test("nesting: the walk descends into an archive decade and climbs back out", as
   assert.ok(html.includes('<b class="here">e11-e12</b>'), "the decade is the here-crumb");
   assert.ok(html.includes('href="/?view=expedition_archive"'), "its parent archive is a crumb link");
   // ONE BUTTON PER STANDING STATE, so the hook is a class rather than an id
-  // (owner ruling 2026-08-08, when finders became a fan). Here the walk
+  // Here the walk
   // stands in one state, so there is exactly one button.
   assert.ok(html.includes('class="ghost cur-state"'), "the header names the walk's current state");
 });
@@ -209,7 +209,7 @@ test("the front desk's doors stand with their drawn shapes", () => {
   );
 });
 
-// SETTINGS BELONG TO A SESSION (owner rulings 2026-07-28). A RELOAD is the
+// SETTINGS BELONG TO A SESSION. A RELOAD is the
 // same session and keeps the sliders; a session that ended and started again
 // is a new one and takes the defaults. The shim stamps each engine life with
 // the session's token, and matching it is what tells the two apart.

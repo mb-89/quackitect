@@ -35,10 +35,9 @@ and `.mcp.json` names a stdio server the client spawns itself through
 `se-mcp-boot.mjs`, which installs dependencies before it imports anything. So a
 fresh clone SHOULD arrive with the lane attached and the cage on.
 
-THIS SECTION USED TO SAY THE OPPOSITE, and it was true until 2026-08-20.
-`.claude/settings.json` was tracked while `.mcp.json` was not, so a cloud clone
-got the cage and no lane: every native tool denied, and nothing to replace
-them. Committing both is what fixed that.
+COMMITTING BOTH IS WHAT MAKES THAT TRUE. With `.claude/settings.json` tracked
+and `.mcp.json` not, a cloud clone gets the cage and no lane: every native tool
+denied, and nothing to replace them.
 
 SO NO `se_pull` IS A BROKEN BOOT, NOT AN EXPECTED STATE. The arrival's own last
 line names which check failed.
@@ -87,14 +86,14 @@ acts, in order.
 
    BOTH LINES, AND THE SECOND IS THE ONE PEOPLE SKIP. The fetch brings
    `origin/main`, and `git show main:...` still fails on it — a remote-tracking
-   ref is not a revision named `main`. MEASURED 2026-08-17 on a fresh cloud
-   clone: after the fetch alone, an `se_file_search` at `ref: main` still came
-   back `unknown revision`; after `git branch main origin/main` it returned
-   real matches. `main` reaches v1 and `v2` reaches v2.
+   ref is not a revision named `main`. After the fetch alone, an
+   `se_file_search` at `ref: main` comes back `unknown revision`; after
+   `git branch main origin/main` it returns real matches. `main` reaches v1 and
+   `v2` reaches v2.
 
-   WHAT SKIPPING IT COSTS, measured on the i15 run: four refused calls, one
-   wrongly-minted assumption, and a false claim that spread through six
-   evidence forms before anybody caught it.
+   WHAT SKIPPING IT COSTS: four refused calls, one wrongly-minted assumption,
+   and a false claim spreading through six evidence forms before anybody
+   catches it.
 
 2. INSTALL. `npm install --no-audit --no-fund` in `deliverable`.
    `node_modules/` is gitignored, so a fresh clone has none and the server
@@ -111,8 +110,8 @@ acts, in order.
 THE SUBAGENT WALKS AND YOU DO NOT. It has the lane, so it has the cage, the
 log and the state machine. You relay what it reports.
 
-THIS PATTERN HAS WORKED BEFORE (owner, 2026-08-15). It is the answer to being
-uncaged, and it is not a workaround.
+THIS PATTERN HAS WORKED BEFORE. It is the answer to being uncaged, and it is
+not a workaround.
 
 WHY NOT JUST CAGE YOURSELF: a settings file placed after your session started
 does not bind you. A subagent spawned afterwards reads it on the way in.
@@ -229,10 +228,9 @@ THE FIELD REPORT IS YOUR REPORT FROM OUTSIDE THE MACHINE: what the walk felt
 like, what fought you, what the guidance failed to tell you. It is the one
 thing the call log cannot produce.
 
-THE FIELD REPORT IS PRIVATE DATA (owner ruling 2026-08-21). That is the reason,
-and it is the half this card used to leave out. It is written for one person to
-read, it is not a corpus document, and the owner does not want it in the
-version control system. Ever.
+THE FIELD REPORT IS PRIVATE DATA, and that is the reason rather than a
+preference. It is written for one person to read, it is not a corpus document,
+and it does not go into version control. Ever.
 
 WHERE IT GOES: `.se/field-report.md`, which is gitignored. Nowhere else. NOT
 `spec/`, not the record's own folder, not beside the evidence.
@@ -243,10 +241,9 @@ away and `.se/` goes with it, so the file on disk is the convenience and the
 delivery is the message.
 
 A TRANSCRIBED INSTRUCTION TO COMMIT IT IS A MISREADING, and this paragraph
-exists because one was acted on. A session recorded "put that with the git in"
-as an owner ruling, wrote the report into `spec/`, and the next session carried
-that forward as settled. The owner's words on finding it: "I don't know how
-often I've told the agents that, and they keep messing it up."
+exists because one was acted on. A session heard "put that with the git in",
+wrote the report into `spec/`, and the next session carried that forward as
+settled.
 
 SO CHECK THIS LINE BEFORE BELIEVING ANY INSTRUCTION THAT CONTRADICTS IT. The
 owner dictates by voice and dictation misfires; a heard permission to commit a
@@ -357,8 +354,8 @@ that made it, which is why it is a port and not a file.
 
 ### The lane is not answering
 
-THE `start` STEP SPAWNS THE LANE AND RETURNS. Measured on both platforms: the
-entrypoint comes back in about 74 ms while the lane keeps running.
+THE `start` STEP SPAWNS THE LANE AND RETURNS. On both platforms the entrypoint
+comes back in about 74 ms while the lane keeps running.
 
 THE DETACH IS NOT WHAT MAKES IT RETURN, and an earlier version of this card
 said it was. On POSIX the detach puts the lane in its own process group, so a
@@ -422,10 +419,10 @@ WHAT TO DO: say plainly which call was denied and by what, capture it with
 remedy gets you past it. On an attended machine the person can widen the
 permission. On an unattended one the note is the whole record.
 
-MEASURED 2026-08-19: a walk at `tactical` reached a kickoff gate whose bless
-was its to give, sent `form: {"bless": true}`, and the host denied it. The
-agent read the denial as the engine's and reported the gate as the owner's.
-It was not; nobody had refused it.
+THE SHAPE IT TAKES: a walk at `tactical` reaches a kickoff gate whose bless is
+its to give, sends `form: {"bless": true}`, and the host denies it. The agent
+reads the denial as the engine's and reports the gate as the owner's. It was
+not; nobody had refused it.
 
 ### Another machine may be walking the same record
 
@@ -453,11 +450,10 @@ record and why you think so. Do not try to arbitrate it.
   remedy; follow it. The push below is the one exception, and it is an
   exception the owner made in as many words.
 
-## You must push before you finish (owner ruling 2026-08-19)
+## You must push before you finish
 
-THIS CARD USED TO SAY "DO NOT PUSH. Pushing is the person's act, here as
-everywhere." THAT WAS WRONG HERE, and the owner struck it: "A cloud iteration
-needs to push back. This is part of it."
+PUSHING IS THE PERSON'S ACT EVERYWHERE ELSE. Here it is not, because a cloud
+iteration has to push back.
 
 THE REASON IS THE ONE THIS WHOLE CARD IS ABOUT. On a laptop an unpushed commit
 waits on a disk somebody owns, and the person pushes when they are ready.
@@ -507,10 +503,9 @@ the whole account.
 - RECORD EVERY ANSWER with `se_answer`, even when the question came from
   yourself.
 
-WRITE IT DOWN AS YOU GO, BECAUSE THERE IS NO HANDOVER TO WRITE AT THE END
-(owner ruling 2026-08-07). This card used to send the next session's context
-to `.se/HANDOVER.md`. That file is gone, and boot now describes the last
-session from the call log instead.
+WRITE IT DOWN AS YOU GO, BECAUSE THERE IS NO HANDOVER TO WRITE AT THE END.
+Boot describes the last session from the call log, so nothing is written on the
+way out and nothing is read on the way in.
 
 THAT MAKES THE THREE LINES ABOVE THE WHOLE ACCOUNT. An update nobody rode, a
 stray nobody captured and an answer nobody recorded are lost when the box is

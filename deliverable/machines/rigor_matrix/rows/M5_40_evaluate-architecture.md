@@ -35,7 +35,7 @@ major_note: |
   fitness candidates flagged for M7. The structure numbers render as
   information beside the walk.
 minor_note: |
-  Does not apply (owner ruling 2026-08-13). The architecture is not under
+  Does not apply. The architecture is not under
   review at this size. It is assumed to hold, and decompose-structure is
   where that assumption breaks if it is going to.
 

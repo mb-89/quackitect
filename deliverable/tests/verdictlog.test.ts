@@ -4,7 +4,7 @@
 // The second test guards the other half of the same seam: a call that can
 // never run must refuse AT THE CALL, not become a job that fails quietly.
 //
-// THE CALLER NO LONGER CHOOSES THE SCOPE (owner ruling 2026-08-16). These cases
+// THE CALLER NO LONGER CHOOSES THE SCOPE. These cases
 // passed `files: ["tiny"]` to make a run scoped, and se_test has no scope
 // argument any more: the agent says what it wants to know, and `decideScope`
 // reads what CHANGED to pick the battery, a named set, or nothing.

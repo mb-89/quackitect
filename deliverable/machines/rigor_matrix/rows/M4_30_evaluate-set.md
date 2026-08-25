@@ -54,13 +54,15 @@ evidence:
       4 and 5 need that name. No name, no score above 3.
 
       A research agent scores, never the builder — and the research
-      agent is SPAWNED (owner ruling 2026-08-10). The walking agent
-      starts a subagent with a clean context to fill this table. It
-      receives the candidate records, the surviving axes, these anchors
-      and the prior-art list. It receives nothing of the composer's
-      reasoning. Its scores land verbatim; a disagreement is recorded
-      beside a score, never written over it. See
-      [[meth-scoring-anchors]].
+      agent is SPAWNED.
+
+      The walking agent starts a subagent with a clean context to fill
+      this table. It receives the candidate records, the surviving axes,
+      these anchors and the prior-art list.
+
+      IT RECEIVES NOTHING OF THE COMPOSER'S REASONING. Its scores land
+      verbatim; a disagreement is recorded beside a score, never written
+      over it. See [[meth-scoring-anchors]].
   - name: front
     template: pareto-plot
     reads: scores
@@ -122,7 +124,7 @@ Per [[meth-set-based-pareto]]:
 The formulated examples are walked through each candidate (exercised). No
 winner is picked here.
 
-NOBODY TYPES THE FRONT (owner report 2026-08-08). Domination is one line of
+NOBODY TYPES THE FRONT. Domination is one line of
 arithmetic: at least as good on every axis, and better on one.
 
 So the front, every elimination and both corners are a FUNCTION of the score
@@ -146,7 +148,7 @@ all-options-equal signal arriving as a number.
 
 A DISTANCE IS NOT A WINNER. Ranking the front by nearness to utopia is the early collapse into one number this method exists to prevent, wearing a geometric disguise.
 
-THE SECOND HAND IS SPAWNED, NOT HOPED FOR (owner ruling 2026-08-10).
+THE SECOND HAND IS SPAWNED, NOT HOPED FOR.
 
 The i1 walk broke the research-agent rule: one session, one agent, and the
 same hands composed and scored. The rule stood as one prose line with no
@@ -160,4 +162,4 @@ mechanism, and a rule without a mechanism loses. The mechanism:
 - The returned scores land verbatim. A disagreement is recorded beside the
   disputed score, never over it.
 - A score table authored by the composer is the breach i1 recorded as an
-  issue on 2026-08-09. Its cost is a full second-hand re-score.
+  issue. Its cost is a full second-hand re-score.

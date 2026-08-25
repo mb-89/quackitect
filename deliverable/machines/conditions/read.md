@@ -7,15 +7,15 @@ condition: read
 Arguments: the documents (root-relative paths) that must be READ before the
 state can be left (exit) or entered (entry).
 
-A PULLED DOCUMENT IS A READ DEMAND. There is no second kind of obligation
-(owner ruling 2026-07-31). Guidance bound to a state by a tag or by the root
-joins the same list, is proven the same way, and is refused the same way.
+A PULLED DOCUMENT IS A READ DEMAND. There is no second kind of obligation.
+Guidance bound to a state by a tag or by the root joins the same list, is
+proven the same way, and is refused the same way.
 What differs is only PROVENANCE, and every document carries its own
 `sources` saying what put it there — authored on the state, bound by a tag,
 or consumed. Boot is the one exemption, and it is a bootstrap rule: guidance
 cannot be demanded before the contract explaining guidance has been read.
 
-THERE IS NO SESSION HANDOVER TO READ ANY MORE (owner ruling 2026-08-07).
+THERE IS NO SESSION HANDOVER TO READ ANY MORE.
 `.se/HANDOVER.md` used to join boot's exit list and be destroyed as the state
 was left, with a matching demand refusing `end` until one was written. Both
 are gone. The duty only discharged on the tidy path, and sessions are killed

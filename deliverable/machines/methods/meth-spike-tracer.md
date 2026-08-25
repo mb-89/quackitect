@@ -5,7 +5,7 @@ statement: "Spikes, tracer bullets and probes: timeboxed executable evidence —
 
 ## Situation
 
-ONE CARD, TWO USES (owner ruling 2026-08-08). A probe and a spike are the
+ONE CARD, TWO USES. A probe and a spike are the
 same act — build the cheapest runnable thing that settles a question — so
 they share this card and an improvement to either improves both.
 
@@ -69,9 +69,15 @@ the finding.
 - The spike drawing deals one state per picked unknown, ALL PARALLEL. No
   spike waits on another, and the join waits for every one — the same
   shape as the candidate drawing.
-- Each spike writes ONE EXPERIMENT NODE ([[experiment]] item template):
-  the question, the timebox, the form, what was faked, the pre-agreed
-  fallback, the measured result, the verdict.
+- Each spike writes ONE EXPERIMENT NODE ([[experiment]] item template),
+  carrying seven things.
+  - the question
+  - the timebox
+  - the form
+  - what was faked
+  - the pre-agreed fallback
+  - the measured result
+  - the verdict
 - The finding also lands in the REGISTER ENTRY the spike probes — the
   entry's body takes the dated measurement, and its status or likelihood
   moves if the finding moves it. The experiment node is the run's record;

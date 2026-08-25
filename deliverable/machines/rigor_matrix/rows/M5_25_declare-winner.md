@@ -45,8 +45,7 @@ specification_note: |
 ## Guidance
 
 The selection is the decision model's own closing step - "select one" - and
-it is RECORDED here rather than implied by arithmetic two states back
-(owner ruling 2026-08-10).
+it is RECORDED here rather than implied by arithmetic two states back.
 
 The card draws the computed winner: the same decision-matrix reading
 converge-pugh shows, with the seat held. Nothing here recomputes or

@@ -79,7 +79,7 @@ Written down or running. A shipped product is prior art. So is the paper
 about it, the standard that governs it, and the post-mortem of the time it
 failed.
 
-THIS USED TO BE TWO STATES (owner ruling 2026-08-08). One was told to find
+THIS USED TO BE TWO STATES. One was told to find
 what was written and the other what shipped, which needed a rule to decide
 which one a shipped-product-with-a-paper belonged to. A split whose main job
 is adjudicating its own overlap is not a split.

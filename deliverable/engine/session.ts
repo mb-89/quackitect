@@ -60,12 +60,9 @@ import { isRegistrationCall } from "./run.ts";
  *  noticing, which is exactly the regression the case exists to catch. */
 export const JUDGMENT_HANDBACK_MS = 750;
 
-/** see dsp-walk-machine.md#the-state-a-recorded-visit-names */
-export function visitState(visit: string): string {
-  return visit.split("@")[0].split("/").pop() ?? "";
-}
+export { visitState } from "./visit.ts";
 
-import { spawn, spawnSync } from "node:child_process";
+import { spawnSync } from "node:child_process";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { CallLog, UNREPORTED } from "./calllog.ts";
 import type { CanvasData } from "./canvas.ts";
@@ -104,6 +101,7 @@ import {
   readItRecord,
 } from "./iterations.ts";
 import { noteOf, readNode, withPass, writeNode } from "./notes.ts";
+import { openInHost } from "./panel.ts";
 import { pathKind, resolveInRoot, seDir } from "./paths.ts";
 import { type PulledDoc, pulledFor, type SessionMode, scanGuidance } from "./pull.ts";
 import { probesMissed, readingProbes } from "./readproof.ts";
@@ -3681,8 +3679,7 @@ export class Session {
   formFolder(name: string): Record<string, unknown> {
     const h = this.formHome(name);
     mkdirSync(h.evidenceAbs, { recursive: true });
-    const cmd = process.platform === "win32" ? "explorer" : process.platform === "darwin" ? "open" : "xdg-open";
-    spawn(cmd, [h.evidenceAbs], { detached: true, stdio: "ignore" }).unref();
+    openInHost(h.evidenceAbs);
     return { opened: h.evidenceRel };
   }
 

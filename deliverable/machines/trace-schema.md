@@ -80,7 +80,7 @@ which.
 An edge not listed here is a defect. Not a warning, not a convention — the
 node is wrong, and the check that reads this file says so.
 
-## A LINK IS A CONTRIBUTION (owner ruling 2026-08-11)
+## A LINK IS A CONTRIBUTION
 
 An edge says the child ACTUALLY SERVES the parent. Nothing else earns one.
 
@@ -116,7 +116,7 @@ Read it downward as a question, one hop at a time:
 
 ## A QUALITY IS A REQUIREMENT, AND HAS NO TYPE OF ITS OWN
 
-There is no quality node and no quality edge (owner ruling 2026-08-07).
+There is no quality node and no quality edge.
 
 A quality is a requirement whose `kind` is quality. It hangs under a use
 case like any other, and a function satisfies it like any other. One
@@ -141,7 +141,7 @@ is not an interaction.
 So the level holds two things under one name, and that is a known cost
 rather than an oversight. The `kind` facet on use-case says which is which.
 
-## FUNCTIONS DO NOT TOUCH USE CASES (owner ruling 2026-08-07)
+## FUNCTIONS DO NOT TOUCH USE CASES
 
 There is no edge from a function to a use case, and adding one would be a
 defect rather than a shortcut.
@@ -171,11 +171,11 @@ WHY `satisfies` AND NOT `implements`. An implementation names a mechanism,
 and a function is solution-neutral by construction. SysML uses «satisfy» for
 exactly this relation, so the word already travels.
 
-ONE LEVEL DOWN THE SAME ARGUMENT FLIPS (owner ruling 2026-08-10). An element
+ONE LEVEL DOWN THE SAME ARGUMENT FLIPS. An element
 IS a mechanism, so what it does to a function is `implements`. An interface
 implements a function too, where the function lives on the boundary itself.
 
-## The design slice grew on 2026-08-10
+## The design slice
 
 Elements and interfaces stand one radius past the functions, both in the
 design half.
@@ -193,14 +193,20 @@ design half.
   is their view.
 
 THE TRACE IS COMPLETE, ON TWO PATHS (owner ruling 2026-08-10: a trace with
-residue cannot show the changes). Most requirements reach the structure
-TRANSITIVELY — served by functions, implemented by elements — and no
-requirement id is written onto structure for that path. A requirement the
-function chain cannot carry — a structural quality answered by the SHAPE,
-an imposed constraint binding a choice — is named DIRECTLY by the element
-or interface that answers it, in `satisfies`. The union is the law: every
-requirement reached by one path or the other, zero unreached. Perturb any
-node and the affected cone is in the graph, whole.
+residue cannot show the changes).
+
+MOST REQUIREMENTS REACH THE STRUCTURE TRANSITIVELY — served by functions,
+implemented by elements — and no requirement id is written onto structure
+for that path.
+
+A REQUIREMENT THE FUNCTION CHAIN CANNOT CARRY is named DIRECTLY by the
+element or interface that answers it, in `satisfies`. That covers a
+structural quality answered by the SHAPE, and an imposed constraint binding
+a choice.
+
+THE UNION IS THE LAW: every requirement reached by one path or the other,
+zero unreached. Perturb any node and the affected cone is in the graph,
+whole.
 
 ## Each edge's key is the frontmatter it lives under
 
@@ -232,7 +238,7 @@ Today there are two.
 - `test` holds what VERIFIES it: the test-spec nodes, authored at M7
   author-tests — see the next section.
 
-THE DIVISION HAPPENS ONCE (owner design 2026-08-07). A requirement is the
+THE DIVISION HAPPENS ONCE. A requirement is the
 last node every slice can see. It may be pointed at from several slices, and
 that is the one place an item belongs to more than one.
 
@@ -248,7 +254,7 @@ AN EMPTY SLICE STILL HOLDS ITS ARC. The space is reserved so a new level
 lands without moving anything already drawn. The test level landed this way
 on 2026-08-10.
 
-## The test slice holds test-spec nodes (owner ruling 2026-08-11)
+## The test slice holds test-spec nodes
 
 A test-spec is an AUTHORED node ([[test-spec]]), one per verification
 collection, written test-first at M7 author-tests. It carries the upward
@@ -264,19 +270,19 @@ seam is checked MECHANICALLY and outside the graph — every test file
 referenced by at least one spec, every referenced file existing — so the
 graph stays at spec grain and never blows up to files or cases.
 
-THE DEMONSTRATES EDGE (owner ruling 2026-08-11). A demonstration-method
+THE DEMONSTRATES EDGE. A demonstration-method
 spec may also carry `demonstrates:` naming the sty- ids its Procedure
 shows end to end. Every MUST story is named by this key on some
 demonstration spec - the M8 law refuses the validation gate while one
 is not. Running such a spec mints a report in the record, and the
 story's evidence slides cite that report.
 
-A first cut (2026-08-10) derived per-file test nodes from `verified_by`
+A first cut derived per-file test nodes from `verified_by`
 addresses written on the requirements. That inverted the edge — the parent
 held the mapping — and drew at file grain. Both retired with this ruling;
 `verified_by` is no longer written.
 
-## The design slice ends in design-spec nodes (owner ruling 2026-08-11)
+## The design slice ends in design-spec nodes
 
 A design-spec is an AUTHORED node ([[design-spec]]), one per design
 concern below the architectural line, written at M7 specify-build. It
@@ -288,7 +294,9 @@ THE FILES ARE REALIZATION, NOT TRACE — the same law as test specs. A
 spec's `files:` names the code it lands in. The seam is checked
 MECHANICALLY and outside the graph, at trace-design:
 
-- every design spec names files that exist BY THE END OF THE RECORD THAT AUTHORED IT. A planned name is legal while the spec is being written; it may not survive the record unrealised. Corrected 2026-08-19, where it read "names files that exist" and contradicted both the item card and the engine.
+- every design spec names files that exist BY THE END OF THE RECORD THAT AUTHORED IT.
+  - A planned name is legal while the spec is being written.
+  - It may not survive the record unrealised.
 - every deliverable code file is claimed by at least one spec — the
   unclaimed list is the dead-code view
 

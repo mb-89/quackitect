@@ -65,7 +65,7 @@ THE REVIEWER JUDGES IT COLD. It is spawned for the gate with no shared
 context and reads only the artifacts. That is what makes it worth spawning:
 it cannot be told that something was already discussed.
 
-SO IT IS SPAWNED AT THE GATE, NEVER EARLIER (owner ruling 2026-08-23). A hand
+SO IT IS SPAWNED AT THE GATE, NEVER EARLIER. A hand
 started back at the milestone's spawn state would sit through the whole phase.
 The shared context it picked up there is the one thing a reviewer must not
 have, so starting it early destroys the only reason to start it at all.
@@ -82,7 +82,7 @@ BUILT YET — the reading ledger is still per record, so it will report the
 reading as already done. Until it is per hand, tell the reviewer what to read
 rather than trusting the ledger to ask.
 
-## A REVIEWER IS NEVER WEAKER THAN THE GUIDE (owner ruling 2026-08-23)
+## A REVIEWER IS NEVER WEAKER THAN THE GUIDE
 
 JUDGMENT CANNOT BE DELEGATED DOWNWARD. The reviewer decides whether work
 stands, so the hand that judges is at least as strong as the hand that wrote.

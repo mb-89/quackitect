@@ -7,7 +7,7 @@ statement: The background-task table, its own panel so it always sits last. The 
 
 ONE PANEL, ONE ROW. It is separate from `controls.md` for one reason: it must
 be the LAST thing in the sidebar, under the note row and under anything added
-later (owner ruling 2026-08-23).
+later.
 
 ITS HEIGHT FOLLOWS THE WORK. A job starts and the table grows; a job ends and
 it shrinks. Anywhere but the bottom, that movement pushes whatever sits below

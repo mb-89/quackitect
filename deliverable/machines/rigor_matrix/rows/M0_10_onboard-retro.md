@@ -23,7 +23,7 @@ evidence:
     template: list
     required: false
   - name: promotions
-    description: local changes worth promoting to the template they came from, one per line, or none-found stated - the previous record's emit_back list is the first place to look, never the only one
+    description: local changes worth promoting to the template they came from. One per line, or none-found stated. The previous record's emit_back list is the first place to look, and never the only one.
     template: list
   - name: process_stale
     description: the standing state-of-the-art check on the process itself
@@ -60,7 +60,7 @@ specification_note: |
 
 The seam this row adds: onboarding OPENS with the retro - the field-feedback question first - and the kickoff refuses while the inbox pends. Everything else about the retro is the referenced state's truth (same_as: retro), never restated here.
 
-AN EMPTY INBOX SKIPS THIS ROW (owner ruling 2026-08-16). Survey first. If nothing pends, do not run it - pull onward.
+AN EMPTY INBOX SKIPS THIS ROW. Survey first. If nothing pends, do not run it - pull onward.
 
 THE DOUBLE-FIRE IS WHY. A retro at the desk, then an iteration opened straight after, ran the whole retro twice within minutes with nothing left to drain the second time. The owner's words: "if the onboarding retro doesn't fire, then you just skip it. If we have just done a retro, we don't need another one."
 

@@ -1,5 +1,4 @@
-// THE TRACE IS CHECKED BOTH WAYS, AT EVERY LAYER, OVER THE WHOLE TRACE
-// (owner ruling 2026-08-06).
+// THE TRACE IS CHECKED BOTH WAYS, AT EVERY LAYER, OVER THE WHOLE TRACE.
 //
 // A REGISTER BELONGS TO ONE ITERATION. A node written in an earlier iteration
 // is not in this iteration's register and never will be. So register
@@ -142,7 +141,11 @@ describe("the live offer against the trace", () => {
     // 41 WITH se_probe_cap, the ladder that measures what a host will actually
     // take. Confirmed: the enumerator saw it and reported it as untraced until
     // uc-quality-performance-efficiency named it, which is the check working.
-    assert.equal(registeredVerbs().length, 41, "the lane's verb count moved — confirm the enumerator still sees every one");
+    // 44 WITH THREE MORE: se_couplings, se_park and se_stop. Confirmed by an
+    // overhaul sweep — the enumerator saw all three, se_couplings was already
+    // traced, and the other two were reported as untraced until
+    // uc-open-an-iteration and uc-take-a-step named them. The check working.
+    assert.equal(registeredVerbs().length, 44, "the lane's verb count moved — confirm the enumerator still sees every one");
     assert.ok(traceText().length > 10000, "the trace read as good as empty — the path or the walk is wrong");
     assert.ok(traceText("use-case").length > 10000, "the use-case layer read as good as empty");
   });

@@ -23,7 +23,7 @@ verification is EXECUTED.
 - THE BUILDER DOES NOT VERIFY THEIR OWN BUILD. Familiarity is exactly
   what hides the fault.
 
-## Fresh eyes (owner ruling 2026-08-11)
+## Fresh eyes
 
 - A PERSON verifying adheres to this card directly.
 - An AGENT verifying SPAWNS A TESTER SUBAGENT: fresh context, another

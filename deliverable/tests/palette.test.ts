@@ -1,4 +1,4 @@
-// ONE COLOUR PER ROLE IN THE FEED (owner ruling 2026-07-28). The aq kind
+// ONE COLOUR PER ROLE IN THE FEED. The aq kind
 // wore the agent's blue and the update kind wore the human's amber, so two
 // of the feed's three columns said the same thing twice and an answered
 // question did not stand out.

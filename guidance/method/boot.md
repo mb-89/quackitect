@@ -18,10 +18,15 @@ Boot exists to reach the front desk fast and clean.
 
 - Keep boot calls serial.
 - Avoid parallel search and read batches in boot.
-- BOOT IS ONE INSTRUCTION, REPEATED. The pull answers `read` and carries the document. Read it, then pull again with `form: {"read": "<your answers>"}`.
-  - THE ANSWERS GO IN ONE STRING. `prove` asks three questions, each quoting a run of words between `«` and `»` and wanting the FOUR WORDS THAT FOLLOW it. Join the three answers any way you like.
-  - QUOTE GENEROUSLY. The check asks whether your answer CONTAINS what it wants, never whether it matches exactly. Paste the whole sentence around each anchor and you cannot get it wrong.
-  - PUNCTUATION NEVER COUNTS, inside a word or between words. Counting four words by eye and including a dash still leaves you a word short, which is the single most common boot refusal. Quoting the whole sentence removes the problem.
+- BOOT IS ONE INSTRUCTION, REPEATED. The pull answers `read` and carries the document.
+  - Read it, then pull again with `form: {"read": "<your answers>"}`.
+  - THE ANSWERS GO IN ONE STRING. `prove` asks three questions, each quoting a run of words between `«` and `»` and wanting the FOUR WORDS THAT FOLLOW it.
+    - Join the three answers any way you like.
+  - QUOTE GENEROUSLY. The check asks whether your answer CONTAINS what it wants, never whether it matches exactly.
+    - Paste the whole sentence around each anchor and you cannot get it wrong.
+  - PUNCTUATION NEVER COUNTS, inside a word or between words.
+    - Counting four words by eye and including a dash still leaves you a word short, which is the single most common boot refusal.
+    - Quoting the whole sentence removes the problem.
   - Keep pulling. The machine walks boot itself and lands you at the target.
 - Each reading call carries one document and credits it. Boot's reading is a handful of calls, and none of them can be truncated.
 - Do not read the guidance files yourself. The loop knows what you owe.
@@ -47,14 +52,25 @@ THE LADDER, and it takes four or five calls.
 - Double while it arrives whole.
 - On the first cut, BISECT between the largest that survived and the smallest
   that did not.
-- STOP WHEN THE TWO ARE WITHIN 1,000 OF EACH OTHER. Finer than that buys
-  nothing.
+- STOP WHEN THE TWO ARE WITHIN 2,500 OF EACH OTHER. Finer than that buys
+  nothing, and every extra rung costs a full-size answer.
 - Record the largest that arrived whole: `se_probe_cap {cap: N}`.
 - Then `se_reload`, which puts the number into effect.
 
-WORKED EXAMPLE, on a Windows desktop: 20,000 whole, 40,000 whole, 80,000 cut,
-60,000 cut, 50,000 whole, 55,000 cut, 52,500 cut. Largest whole is 50,000 and
-the gap to the smallest cut is 2,500, so the answer is 50,000.
+WORKED EXAMPLE, on a Windows desktop. The ladder ran seven rungs.
+
+- 20,000 whole
+- 40,000 whole
+- 80,000 cut
+- 60,000 cut
+- 50,000 whole
+- 55,000 cut
+- 52,500 cut
+
+Largest whole is 50,000 and smallest cut is 52,500, so the answer is 50,000.
+
+A LINUX CLOUD BOX MEASURED THE SAME SEVEN RUNGS, and settled on
+the same figure.
 
 NEVER STOP AT THE FIRST SIZE THAT HAPPENS TO WORK. A figure that merely
 arrived is not the limit, and the whole point is to know where the limit is.
@@ -80,7 +96,7 @@ That is the trigger to climb again, once, and record what it settles at.
 
 ## The reading loop costs more calls than it should, and the cause is not the page size
 
-MEASURED 2026-08-23. An `se_file_read` of 200 characters came back as an
+MEASURED. An `se_file_read` of 200 characters came back as an
 answer of 20,451 bytes and spilled to disk.
 
 THE CONTENT WAS 200 BYTES. The rest was the `work` block, which carries the

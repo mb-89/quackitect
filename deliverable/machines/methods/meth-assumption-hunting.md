@@ -42,7 +42,7 @@ WALK THE REQUIREMENTS, NOT YOUR MEMORY. The register is the input. A
 requirement with a number in it usually rests on something; a requirement
 about a boundary almost always does.
 
-## WRITE THE CLAIM, NOT THE SUBJECT (owner ruling 2026-08-07)
+## WRITE THE CLAIM, NOT THE SUBJECT
 
 This step COLLECTS ASSUMPTIONS. So each entry it opens says the thing being
 relied on, phrased so it could turn out false.
@@ -63,7 +63,7 @@ at, which is how a register fills up with entries nobody can close.
 AND CHECK THE KIND BEFORE THE TITLE. If the thing has already happened, it is
 an ISSUE, not an assumption — present tense, hurting now. Recording an
 observed failure as an assumption hides that it already bit. This was got
-wrong on 2026-08-07 with the reload's tool list, which had been seen to fail
+wrong with the reload's tool list, which had been seen to fail
 before it was written down as something merely believed.
 
 ## THREE SMELLS THAT MEAN AN ASSUMPTION IS HIDING

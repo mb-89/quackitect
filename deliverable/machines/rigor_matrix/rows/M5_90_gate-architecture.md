@@ -28,7 +28,7 @@ major_note: |
   as data. M7 builds inside this baseline; a new element found mid-build
   returns HERE.
 minor_note: |
-  Does not apply (owner ruling 2026-08-13). Only decompose-structure
+  Does not apply. Only decompose-structure
   survives M5 at this size, and it allocates new functions into standing
   structure. A gate over one allocation reviews nothing M3's gate did not.
 
@@ -52,7 +52,7 @@ specification_note: |
 
 ## Guidance
 
-THE GATE ASKS NOTHING OF ITS OWN (owner ruling 2026-08-10). Everything it
+THE GATE ASKS NOTHING OF ITS OWN. Everything it
 once asked is produced mechanically upstream:
 
 - the choice trace — the Pugh card computes both runs from the signed

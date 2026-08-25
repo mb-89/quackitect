@@ -29,7 +29,7 @@ the same:
 >
 > New here? I can give you a tour of the whole system. Just say "tour".
 
-NOTHING FOLLOWS IT (owner ruling 2026-08-18). A generated list of doors
+NOTHING FOLLOWS IT. A generated list of doors
 and a closing line about the autonomy dial used to print underneath.
 Both are gone. The recital and those two lines are the whole first
 visit.

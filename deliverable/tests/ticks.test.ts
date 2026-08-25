@@ -9,7 +9,7 @@ delete process.env.SE_SCRIPT_SKIP;
 // hand, exactly as the mirror drives it. The agent's verb is the pull,
 // tested in the pull*.test.ts files.
 //
-// SMALL FILES ON PURPOSE (owner ruling, 2026-07-30). A test file is the
+// SMALL FILES ON PURPOSE. A test file is the
 // only unit that reaches a second core, so themes get their own file and
 // the suite uses the machine it runs on. See guidance/software.md.
 import { strict as assert } from "node:assert";

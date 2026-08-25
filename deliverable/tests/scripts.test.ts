@@ -25,7 +25,7 @@ function scriptsOf(html: string): string[] {
   return out;
 }
 
-// EVERY TEMPLATE THE CHECKER KNOWS HAS AN EDITOR (owner report 2026-08-08).
+// EVERY TEMPLATE THE CHECKER KNOWS HAS AN EDITOR.
 //
 // `table` had a branch in stateform.ts that counts cells and refuses prose,
 // and NO branch in the renderer — so the field fell through to the generic
@@ -121,7 +121,7 @@ test("the table a person sees carries the same row buttons and classes as the re
   assert.equal((html.match(/<tr class="sfrow"/g) ?? []).length, 1, "the stored header row is not shown a second time");
 });
 
-// THE DEFECT THAT PROMPTED ALL THIS (owner, 2026-08-08). Every cluster column
+// THE DEFECT THAT PROMPTED ALL THIS. Every cluster column
 // was already wired to $clusters, and every one of them read as free text —
 // because partition-functions had not run, so the offer was empty and an empty
 // offer is invisible. A chooser that says nothing is indistinguishable from no
@@ -303,7 +303,7 @@ test("a node table shows the node's own value, and marks an unanswered cell", ()
 // The header comments above an editor may hold all the backticks they like.
 // This reads only BETWEEN the line that opens a body and the line that closes
 // it, which is the convention every editor already follows.
-// THE RANKED LIST WITH A CUTOFF (owner design 2026-08-08). It replaced four
+// THE RANKED LIST WITH A CUTOFF. It replaced four
 // columns that asked the same question of every row — cut_proposed,
 // cut_verdict, cut_reason, criterion_band — which over ninety rows let ninety
 // answers disagree about one line.
@@ -334,7 +334,7 @@ test("the ranked list draws its arrows, its cutoff and its two reasons", () => {
   assert.ok(!/cut_proposed|cut_verdict|criterion_band/.test(html), "the four columns are gone");
 });
 
-// THE MARKS ARE THE FILE'S, THE ORDER IS NOT (owner ruling 2026-08-09). A
+// THE MARKS ARE THE FILE'S, THE ORDER IS NOT. A
 // strike and a cutoff are decisions somebody made and they come back. A bare
 // row number is an accident of when the file was last written, and it does not.
 test("the stored marks come back, and the stored order does not", () => {
@@ -358,11 +358,11 @@ test("an empty ranking says why it is empty rather than drawing a blank table", 
   assert.match(drawRankCut({ content: "" }, { items: [] }), /derive-criteria settles the order/);
 });
 
-// A MOVE CANNOT BE UNDONE BY HAND (owner report 2026-08-08). The arrows go one
+// A MOVE CANNOT BE UNDONE BY HAND. The arrows go one
 // place at a time and nothing remembers where a row started, so the editor has
 // to carry the last saved state with it.
 test("the computed order wins over a stored one, and only a recorded move overrides it", () => {
-  // THE DEFECT THIS PINS, 2026-08-09. A stored number beat the computed sort
+  // THE DEFECT THIS PINS. A stored number beat the computed sort
   // forever, so a corrosive row sat first of seventy-two above every fatal
   // one. The items arrive already sorted worst-breakage first; a bare stored
   // position must not reorder them.
@@ -381,7 +381,7 @@ test("the computed order wins over a stored one, and only a recorded move overri
 test("the ranking carries its last saved state, so it can be reverted to", () => {
   const stored = ["1. [[req-b]] [cutoff] [moved: it gates the must set]", "2. [[req-a]] [cut: measured identically everywhere]"].join("\n");
   const html = drawRankCut({ content: stored }, { items: ["req-a", "req-b"] });
-  // THE ACT CLASSES RIDE ALONG (owner, 2026-08-09). Save and revert wear the
+  // THE ACT CLASSES RIDE ALONG. Save and revert wear the
   // accent so they read as the two acts on offer, rather than as decoration.
   assert.match(html, /class="sfrcsave sfact save"/, "changes are kept on purpose, and it looks like it");
   assert.match(html, /class="sfrcrevert sfact revert"/, "or thrown away");

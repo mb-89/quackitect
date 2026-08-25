@@ -36,7 +36,7 @@ major_note: |
   redrawn for the change. Architecture moves ripple to the boundary more
   often than predicted - this is the cheap place to catch it.
 minor_note: |
-  Does not apply (owner ruling 2026-08-13). Boundary and neighbours do not
+  Does not apply. Boundary and neighbours do not
   move at this size, so the state could only ever answer "unchanged" - and
   a step whose only honest answer is nothing is a step that teaches skimming.
 

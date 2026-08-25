@@ -61,7 +61,7 @@ specification_note: |
 
 ## Guidance
 
-THE SPEC IS THE ARTIFACT (owner ruling 2026-08-11). This state authors
+THE SPEC IS THE ARTIFACT. This state authors
 TEST-SPEC nodes ([[test-spec]]): one per verification collection, minted
 from the item template's skeleton into spec/trace/test-spec/.
 The spec carries the trace edge — `verifies:` names the requirement ids —

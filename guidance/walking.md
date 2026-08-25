@@ -366,10 +366,15 @@ and then the run reports itself.
 THERE IS NO POLL, AND ASKING FOR ONE IS REFUSED. `se_test` takes a question and
 nothing else.
 
-THE RUN RIDES THE `work` ACCOUNT on every lane call you make. It carries how
-far along it is, how many have failed, the first failures by name, and how much
-longer it needs with the basis for that figure. The JOB makes the estimate, not
-you.
+THE RUN RIDES THE `work` ACCOUNT on every lane call you make. It carries four
+things.
+
+- how far along it is
+- how many have failed
+- the first failures by name
+- how much longer it needs, with the basis for that figure
+
+The JOB makes the estimate, not you.
 
 AN OUTCOME SAYING `bound reached` IS THE ACCOUNT GIVING UP, never a verdict.
 Every entry declares how long the account will wait, and passing that bound ends
@@ -386,9 +391,9 @@ raid-risk-one-blanket-bound-is-given-to-work-nobody-measured.
 SO CARRY ON WORKING. The news finds you on whatever call you were making
 anyway, and the verdict records itself when the run ends.
 
-THIS PAGE USED TO SAY POLLING PAYS NO CALL, and that sentence bought a habit
-nobody wanted. i11 measured it: 494 `se_test` calls produced 66 verdicts, and
-428 of them were polls.
+POLLING PAYS LIKE ANY OTHER CALL, and it is worth saying because the opposite
+rule bought a habit nobody wanted: 494 `se_test` calls produced 66 verdicts,
+and 428 of them were polls.
 
 THE FULL BATTERY IS THE ENGINE'S. It runs once, at verification, fired by that
 state's own exit script. You never call it and there is no state where you may.

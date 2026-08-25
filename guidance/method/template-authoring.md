@@ -5,7 +5,7 @@ statement: The rules for writing a template - consulted when authoring, pulled n
 
 # Template authoring — the rules
 
-## A template IS the file it mints (owner ruling 2026-08-06)
+## A template IS the file it mints
 
 One fence. Nothing beside it.
 

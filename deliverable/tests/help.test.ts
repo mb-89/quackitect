@@ -1,4 +1,4 @@
-// EVERY COMMAND-LINE SWITCH APPEARS IN HELP (owner ruling 2026-07-28).
+// EVERY COMMAND-LINE SWITCH APPEARS IN HELP.
 //
 // --one-screen had lived in RUNME for weeks without ever being mentioned by
 // --help, because RUNME's help only forwarded to the server's help and the
@@ -71,7 +71,7 @@ function runmeFlags(src: string): Set<string> {
   return flags;
 }
 
-// ONE HELP, NOT TWO (owner ruling 2026-07-28). RUNME printed its own list and
+// ONE HELP, NOT TWO. RUNME printed its own list and
 // then the server's, and the reader had to stitch them together. The launch
 // flags are now declared next to the engine's in se-mcp.ts, which is the one
 // place anybody has to look — so that is where this guard checks for them.
@@ -128,7 +128,7 @@ test("manual mode runs the mirror alone, and a missing LLM falls into it", () =>
   assert.match(src, /\$manual = \$true/, "the no-LLM fallback must set manual mode, not exit");
 });
 
-// TWO HOSTS (owner 2026-07-29): the project ships to a colleague running
+// TWO HOSTS: the project ships to a colleague running
 // GitHub Copilot CLI on Windows. Claude wins when both are installed.
 test("the launcher detects its agent host, and Claude wins when both are there", () => {
   const src = readFileSync(join(repoRoot, "RUNME.ps1"), "utf8");

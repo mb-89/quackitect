@@ -47,9 +47,9 @@ evidence:
       a criterion. Everything below is out by position and owes no
       reason of its own.
 
-      THE TARGET IS THE VITAL FEW. Eleven is the reference, not a rule
-      (owner ruling 2026-08-09). Go above it where the rows genuinely
-      earn it, and say which ones did.
+      THE TARGET IS THE VITAL FEW. Eleven is the reference, not a rule.
+      Go above it where the rows genuinely earn it, and say which ones
+      did.
 
       FIFTY IS NOT A CUT. A line that leaves most of the pool standing
       has drawn nothing, and neither has a cutoff on the last row.
@@ -101,30 +101,36 @@ THE POOL IS NOT YET COMPUTED FROM THE DELTA. Until it is, cut by position and
 say in the follow-up how many rows went that way, so the size of the mismatch
 is on the record rather than hidden inside a clean-looking cut.
 
-THREE ACTS LIVE HERE, AND THE ORDER BETWEEN THEM IS THE WHOLE POINT (owner ruling 2026-08-09).
+THREE ACTS LIVE HERE, AND THE ORDER BETWEEN THEM IS THE WHOLE POINT.
 
-- ONE, CUT. Strike every axis no candidate differentiates on. Blind to importance.
+- ONE, CUT. Strike every axis no candidate differentiates on.
+  - Blind to importance.
 - TWO, SORT. Rough it out mechanically by what each row BREAKS, then CHECK it.
 - THREE, THRESHOLD. Draw the line across the sorted survivors.
 
-THE SORT IS TWO STEPS, NOT ONE (owner ruling 2026-08-09).
+THE SORT IS TWO STEPS, NOT ONE.
 
-- THE ROUGH SORT IS THE MACHINE'S. It reads `breaks_how_badly` and orders worst first. Nobody types it.
+- THE ROUGH SORT IS THE MACHINE'S. It reads `breaks_how_badly` and orders worst first.
+  - Nobody types it.
 - THE CHECK IS A JUDGMENT, and the agent makes it exactly as a person would. Read the rough order and push a row up or down where it is wrong.
 
 A MOVE IS THE SAME ACT WHOEVER MAKES IT. Agent or person, it is one row past another and it owes its reason. The submit refuses a move with no rationale, and the gate reads a move apart from the boundary.
 
 WHY THE CHECK EXISTS. A five-level scale puts dozens of rows in one band, and inside a band the machine has nothing to say. That is where the judgment belongs, and it is cheap because it is local: a row only ever argues with its neighbours.
 
-WHY THE CUT COMES FIRST. Sorting a pool that is about to lose half its rows spends judgment on rows that are leaving, and it puts a struck axis above a live one on the page.
+WHY THE CUT COMES FIRST. Sorting a pool that is about to lose half its rows spends judgment on rows that are leaving. It also puts a struck axis above a live one on the page.
 
-WHY THE SORT IS NOT DERIVE-CRITERIA'S. That state produces the POOL: which requirements are criteria, and which of them compound into one axis. The order it happens to enumerate in is not an importance claim, and reading it as one is what put a response-time row above the foundations of the system.
+WHY THE SORT IS NOT DERIVE-CRITERIA'S. That state produces the POOL: which requirements are criteria, and which of them compound into one axis.
 
-THE SORT IS MECHANICAL, SO IT CANNOT BE AIMED. It reads `breaks_how_badly`, which every requirement carries and which is authored at M3, before any candidate exists. Moving the sort to this state therefore costs nothing in blindness: the KEY is still fixed before the options are known, and that is what the guard was ever protecting.
+The order it happens to enumerate in is not an importance claim. Reading it as one is what put a response-time row above the foundations of the system.
 
-WHY IT IS ITS OWN STATE (owner ruling 2026-08-08). The cut needs the candidates, so it cannot run at derive-criteria. Run inside evaluate-set it would be made with the totals already visible, which is the same poisoning the weights-first order exists to prevent, arriving one step later. The house already rules that composing and evaluating never share a state. Cutting and evaluating do not either.
+THE SORT IS MECHANICAL, SO IT CANNOT BE AIMED. It reads `breaks_how_badly`, which every requirement carries and which is authored at M3, before any candidate exists.
 
-THE BAND IS ONE MARK, NOT A COLUMN (owner ruling 2026-08-08).
+So moving the sort to this state costs nothing in blindness. The KEY is still fixed before the options are known, and that is what the guard was ever protecting.
+
+WHY IT IS ITS OWN STATE. The cut needs the candidates, so it cannot run at derive-criteria. Run inside evaluate-set it would be made with the totals already visible, which is the same poisoning the weights-first order exists to prevent, arriving one step later. The house already rules that composing and evaluating never share a state. Cutting and evaluating do not either.
+
+THE BAND IS ONE MARK, NOT A COLUMN.
 
 It used to ask four things of every row:
 
@@ -154,7 +160,7 @@ WHAT IS NOT A LEGAL REASON TO CUT: it looks like they are all about the same, th
 
 THE LINE IS DRAWN HERE, AND ONLY HERE. One drawing is enough because the ORDER under it is mechanical: the boundary takes a prefix of a computed sort and cannot promote anything past it.
 
-THE VITAL FEW IS THE TARGET, and eleven is the reference rather than the rule (owner ruling 2026-08-09). More than eleven is right where the extra rows genuinely earn it; fifty is not a cut, and a cutoff on the last row is not one either.
+THE VITAL FEW IS THE TARGET, and eleven is the reference rather than the rule. More than eleven is right where the extra rows genuinely earn it; fifty is not a cut, and a cutoff on the last row is not one either.
 
 DRAW THE LINE ON THE SCALE, NOT ON A COUNT. A boundary between two damage levels says something a reader can check: everything above ends the product or stops a use case, everything below is routed around. A boundary at a number says only that somebody stopped counting.
 
@@ -162,7 +168,7 @@ DRAW THE LINE ON THE SCALE, NOT ON A COUNT. A boundary between two damage levels
 
 SO THE GAMEABLE SURFACE IS ONE NUMBER: how deep the cut goes. That is visible at a glance, and the gate reads it.
 
-THE OVERRIDE IS A DOOR THROUGH THE METHOD, DELIBERATELY (owner ruling 2026-08-08, made with the risk named). It is the only place a person catches a criteria set that came out wrong, and that check is worth the door.
+THE OVERRIDE IS A DOOR THROUGH THE METHOD, DELIBERATELY. It is the only place a person catches a criteria set that came out wrong, and that check is worth the door.
 
 ONE EDIT IS SHARPER THAN THE OTHERS. Pulling a single row across the line out of rank order jumps the blind ordering, and it is the edit that can be aimed at a favourite. The gate reads it apart from a boundary move.
 

@@ -127,7 +127,7 @@ meaningless, and comparison is the only reason the dial exists.
 
 SAY WHY IN THE RATIONALE, because that is the half a later reader needs.
 Spawning buys separation — a hand that authors cannot also bless — and costs
-tokens and wall-clock. Measured on 2026-08-23, three hands each spent roughly
+tokens and wall-clock. Measured, three hands each spent roughly
 fifteen minutes re-reading files the guide already held, for edits the guide
 had already located by line number. Whether that trade is worth making is what
 the A/B is for, and the call log now carries which arm each record ran.
@@ -178,10 +178,12 @@ Three rules on the list itself:
 - ENGINE IMPROVEMENTS is a standing goal, always available. It is where the
   iteration pulls in the machine's own repairs. It needs no argument.
 - MORE THAN HALF A DOZEN GOALS IS TOO BIG. Split the iteration.
-- THE COUNT INFORMS THE COLUMN. One goal has a patch's shape. Two or three
-  have a minor's. More than that argues for major.
+- THE COUNT INFORMS THE COLUMN.
+  - One goal has a patch's shape.
+  - Two or three have a minor's.
+  - More than that argues for major.
 
-WHY THE GOALS LIVE HERE AND NOT IN THE TRACE (owner ruling 2026-08-17): a goal
+WHY THE GOALS LIVE HERE AND NOT IN THE TRACE: a goal
 is not an artifact that anything refines. It is what every artifact is measured
 against. It travels with the iteration, like the change size and a probed
 assumption, and it never enters the trace graph.

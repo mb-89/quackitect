@@ -64,7 +64,7 @@ specification_note: |
 
 SET-BASED DISCIPLINE: convergence happens at M5, never here. The front is blessed, never a winner. Review per [[meth-gate-review]].
 
-THIS GATE ASKED FOR SEVEN THINGS AND SIX OF THEM WERE ALREADY TRUE (owner ruling 2026-08-08). Each was either computed by the engine or refused upstream before the walk could reach here.
+THIS GATE ASKED FOR SEVEN THINGS AND SIX OF THEM WERE ALREADY TRUE. Each was either computed by the engine or refused upstream before the walk could reach here.
 
 - viable_set. The front's size is counted.
 - complete_allocation. A candidate visits every cluster or the chart draws it unfinished.

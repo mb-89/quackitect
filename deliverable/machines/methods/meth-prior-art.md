@@ -35,7 +35,7 @@ description, or did you LOOK at the artifact? Reading is here. Looking is
 benchmarking.
 
 THIS CARD USED TO SAY "somebody shipped this already" AND TO SWEEP "products
-that do it" (owner ruling 2026-08-08). That was benchmarking's territory
+that do it". That was benchmarking's territory
 written into prior art's card, and it left the two finders with no rule that
 could separate them.
 
@@ -73,7 +73,7 @@ That is why both run. Each one's blind spot is the other's evidence.
 
 ## STORING A BIG SWEEP
 
-EXTENSIVE RESEARCH IS NEVER THROWN AWAY (owner instruction 2026-08-18).
+EXTENSIVE RESEARCH IS NEVER THROWN AWAY.
 
 - IT IS STORED LOCALLY, under `scratchpad/research/`, and never
   committed. The scratchpad is the workbench.
@@ -93,7 +93,7 @@ the pool, because a finding with no reader is landfill.
 
 This card is the FRONT end: research before invention.
 
-THERE IS A BACK END TOO (owner ruling 2026-08-18). A chosen design that
+THERE IS A BACK END TOO. A chosen design that
 re-derives existing prior art owes a study of the original. What does the
 original do better than ours? What cost did it pay that we have not paid yet?
 

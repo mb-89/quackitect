@@ -1,7 +1,7 @@
 <!-- GENERATED at agent start. Do not edit — the next start overwrites it.
-     from guidance/contract.md cc0a3ca81812
-     from guidance/walking.md 8915f0c2f118
-     from guidance/method/lane.md 3881abeb4b1a
+     from guidance/contract.md 234854575240
+     from guidance/walking.md 9c01727a76d8
+     from guidance/method/lane.md 0f7559c796b0
      from guidance/voice.md 2bbb7751a28c
 -->
 
@@ -152,10 +152,9 @@ which is what stops it becoming the ordinary way to end a turn.
 
 ONE FORCE RELEASES ONE STOP, and the next pull spends it.
 
-THIS USED TO HAPPEN BY ITSELF, and that was the defect. The harness sets a flag
-when it retries a blocked stop, the valve read that flag as a claim, and every
-second attempt went through with nothing named. Measured on one session: four
-blocks, four immediate releases.
+A FLAG IS NOT A CLAIM. The harness sets one when it retries a blocked stop, and
+a valve that reads it as a claim releases every second attempt with nothing
+named. Measured: four blocks, four immediate releases in one session.
 
 RULES 6 AND 7 MEET AT THE START OF WORK. Confirm an ambiguous intent before you
 begin; once begun, carry on.
@@ -185,15 +184,12 @@ SO WHAT THE NEXT SESSION MUST KNOW GOES IN THE FOUR HOMES ABOVE, written when
 the thought occurs. A note, a parked to-do, or guidance — never saved for an
 exit that may never come.
 
-A FIELD REPORT IS OWED ON AN UNATTENDED RUN, and it is a different object
-(owner ruling 2026-08-20). This paragraph used to say no handover file is
-written at all, and the owner struck that: "I don't agree with this. This is an
-error in the guidance."
+A FIELD REPORT IS OWED ON AN UNATTENDED RUN, and it is a different object from
+the handover. No handover file is written; a field report is.
 
-BESIDE A PERSON, THE CHAT IS THE CHANNEL AND NO FILE IS WRITTEN (owner ruling
-2026-08-23). This line used to say EVERY run, and an attended session dutifully
-wrote one nobody wanted. The owner's words: "You don't need a field report.
-Only cloud agents need a field report."
+BESIDE A PERSON, THE CHAT IS THE CHANNEL AND NO FILE IS WRITTEN. Only an
+unattended run owes one, and an attended session that writes one has written a
+report nobody wanted.
 
 THE REASON THE RULE GIVES IS ITS OWN SCOPE. Notes die with the container, so
 the report is the only channel that reaches a person. Where the person is
@@ -205,8 +201,11 @@ THE TWO ARE NOT THE SAME THING, which is why both halves stand.
 - The field report is for the PERSON, and nothing replaces it.
 
 WHAT GOES IN IT: everything that cannot be mapped onto the repository.
-Improvements you found, what fought you, what you struggled with, and anything
-you could not give a home in git.
+
+- Improvements you found.
+- What fought you.
+- What you struggled with.
+- Anything you could not give a home in git.
 
 WHY IT CANNOT BE SKIPPED: notes are machine-local and die with the container.
 The report is the channel that reaches a person, so an unwritten one throws
@@ -219,14 +218,12 @@ HOW IT IS DELIVERED, and it is BOTH: handed over as a DOWNLOADABLE FILE, and
 printed in full as the closing message. The person keeps the file and passes it
 on; the message is what they read now.
 
-IT IS PRIVATE DATA, and that is the reason rather than a preference (owner
-ruling 2026-08-21). It is written for one person and it is not a corpus
-document.
+IT IS PRIVATE DATA, and that is the reason rather than a preference. It is
+written for one person and it is not a corpus document.
 
-A CHECK ENFORCES THIS NOW (2026-08-24). `record-inspect` goes red on a field
-report found anywhere in version control, and names the folder it belongs in.
-The rule stood in prose and was broken twice: 3,584 lines across two records,
-which nothing ever cited.
+A CHECK ENFORCES THIS. `record-inspect` goes red on a field report found
+anywhere in version control, and names the folder it belongs in. In prose
+alone the rule was broken twice, for 3,584 lines nothing ever cited.
 
 `guidance/method/cloud-runner.md` carries the detail.
 
@@ -683,10 +680,15 @@ and then the run reports itself.
 THERE IS NO POLL, AND ASKING FOR ONE IS REFUSED. `se_test` takes a question and
 nothing else.
 
-THE RUN RIDES THE `work` ACCOUNT on every lane call you make. It carries how
-far along it is, how many have failed, the first failures by name, and how much
-longer it needs with the basis for that figure. The JOB makes the estimate, not
-you.
+THE RUN RIDES THE `work` ACCOUNT on every lane call you make. It carries four
+things.
+
+- how far along it is
+- how many have failed
+- the first failures by name
+- how much longer it needs, with the basis for that figure
+
+The JOB makes the estimate, not you.
 
 AN OUTCOME SAYING `bound reached` IS THE ACCOUNT GIVING UP, never a verdict.
 Every entry declares how long the account will wait, and passing that bound ends
@@ -703,9 +705,9 @@ raid-risk-one-blanket-bound-is-given-to-work-nobody-measured.
 SO CARRY ON WORKING. The news finds you on whatever call you were making
 anyway, and the verdict records itself when the run ends.
 
-THIS PAGE USED TO SAY POLLING PAYS NO CALL, and that sentence bought a habit
-nobody wanted. i11 measured it: 494 `se_test` calls produced 66 verdicts, and
-428 of them were polls.
+POLLING PAYS LIKE ANY OTHER CALL, and it is worth saying because the opposite
+rule bought a habit nobody wanted: 494 `se_test` calls produced 66 verdicts,
+and 428 of them were polls.
 
 THE FULL BATTERY IS THE ENGINE'S. It runs once, at verification, fired by that
 state's own exit script. You never call it and there is no state where you may.
@@ -809,7 +811,7 @@ repo is read at a committed ref — `se_file_read`, `se_file_search` and
 Another folder entirely belongs in `.se/roots.json`, as a declared root. It is
 reachable as `@name/rest`.
 
-DECLARE ONE YOURSELF WHEN YOU NEED IT (owner ruling 2026-08-24). Write the
+DECLARE ONE YOURSELF WHEN YOU NEED IT. Write the
 file through the lane; the declaration is logged like every other call, and
 nobody has to be woken to approve a path.
 
@@ -895,7 +897,7 @@ applying one shape across a tree — these are programs, not readings. Reading
 the files one at a time to answer them costs a hundred calls and gets the
 count wrong.
 
-THIS IS ENCOURAGED, NOT TOLERATED (owner ruling 2026-08-18). A shell command
+THIS IS ENCOURAGED, NOT TOLERATED. A shell command
 that runs a script is the shell doing what ONLY a shell does. It is not a
 missing lane verb, it is not a smell, and it does not count against you.
 

@@ -36,10 +36,9 @@ export function formBearer(leaf: StateDecl | undefined, parent: StateDecl | unde
   return parentReopened && signs(parent) ? parent : undefined;
 }
 
-/** see dsp-walk-machine.md#the-state-a-recorded-visit-names */
-export function visitState(visit: string): string {
-  return visit.split("@")[0].split("/").pop() ?? "";
-}
+import { visitState } from "./visit.ts";
+
+export { visitState };
 
 import { replayFile } from "./decisions.ts";
 import { shortId } from "./expmachine.ts";

@@ -45,7 +45,7 @@ test("a product with no card table still gets a mirror", () => {
   assert.equal(cards[0].n, 1, "and it is numbered the same way");
 });
 
-// THE LEGEND RENDERS FROM THE REGISTRY (owner, 2026-07-29). A hand-kept list
+// THE LEGEND RENDERS FROM THE REGISTRY. A hand-kept list
 // drifts, and a stale legend is worse than none.
 test("every card contributes its key to the registry by itself", () => {
   const cards = loadCards(ROOT);

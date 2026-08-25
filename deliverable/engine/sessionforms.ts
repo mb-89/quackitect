@@ -7,18 +7,12 @@
 // see dsp-evidence-forms.md#the-form-is-bound-to-the-corpus
 import { existsSync, mkdirSync, readdirSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
 import { dirname, join, relative, sep } from "node:path";
-import type { MachineDecl, StateDecl } from "./machine.ts";
-import { chartPlan } from "./morphbox.ts";
-
-/** see dsp-walk-machine.md#the-state-a-recorded-visit-names */
-export function visitState(visit: string): string {
-  return visit.split("@")[0].split("/").pop() ?? "";
-}
-
 import { mintScenarioLines } from "./atamwalk.ts";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { type FormTemplate, fieldContent, stripComments, withFrontmatter, withFrontmatterList } from "./forms.ts";
 import type { Iteration } from "./iterations.ts";
+import type { MachineDecl, StateDecl } from "./machine.ts";
+import { chartPlan } from "./morphbox.ts";
 import { parseStateNote, section, writeNode } from "./notes.ts";
 import { mintFlipLines } from "./pugh.ts";
 import { CHANGE_COLUMNS } from "./rigor-matrix.ts";
