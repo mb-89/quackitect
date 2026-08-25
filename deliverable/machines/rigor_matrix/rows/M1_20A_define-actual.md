@@ -15,8 +15,6 @@ legal_tools:
   - se_file_list
   - se_log_query
   - se_answer
-  - se_web_search
-  - se_web_fetch
 evidence:
   - name: as_is
     description: where we stand, good and bad, witnesses named

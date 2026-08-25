@@ -19,8 +19,6 @@ legal_tools:
   - se_test
   - se_log_query
   - se_answer
-  - se_web_search
-  - se_web_fetch
 evidence:
   - name: probes
     template: node-table

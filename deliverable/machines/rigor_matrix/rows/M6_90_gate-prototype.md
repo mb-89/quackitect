@@ -17,8 +17,6 @@ legal_tools:
   - se_log_query
   - se_answer
   - se_run
-  - se_web_search
-  - se_web_fetch
 evidence:
   - name: buildable
     template: choice-with-rationale

@@ -18,8 +18,6 @@ legal_tools:
   - se_file_list
   - se_log_query
   - se_answer
-  - se_web_search
-  - se_web_fetch
 evidence:
   - name: seeded
     template: exposure-pick

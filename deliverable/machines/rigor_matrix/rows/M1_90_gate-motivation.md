@@ -19,8 +19,6 @@ legal_tools:
   - se_log_query
   - se_answer
   - se_run
-  - se_web_search
-  - se_web_fetch
 evidence:
   - name: vision_scope_stated
     description: the packet is complete, every part of it

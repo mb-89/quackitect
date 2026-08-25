@@ -18,8 +18,6 @@ legal_tools:
   - se_log_query
   - se_answer
   - se_run
-  - se_web_search
-  - se_web_fetch
   - se_test
   # THE GATE RUNS THE BATTERY, so it owns the one failure the battery can
   # raise that no code change fixes: a stale prompt layer. Without this the

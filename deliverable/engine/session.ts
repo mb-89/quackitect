@@ -155,6 +155,12 @@ const ALWAYS_LEGAL: ReadonlySet<string> = new Set([
   // agent back towards asking for a screenshot — which needs a person's word
   // every time, and is the thing this verb exists to replace.
   "se_surface",
+  // LOOKING OUTWARD IS NEVER GATED. Reading the internet changes nothing here,
+  // and a state that forbids it can only make the walk answer from memory,
+  // which is the failure the outward verbs exist to prevent.
+  // see dsp-walk-machine.md#the-outward-verbs-are-legal-everywhere
+  "se_web_search",
+  "se_web_fetch",
   // FORCING A STOP IS LEGAL WHEREVER A STOP IS. The tooth can bite in any
   // state, so the answer to it cannot be gated by one.
   "se_stop",

@@ -19,8 +19,6 @@ legal_tools:
   - se_log_query
   - se_answer
   - se_run
-  - se_web_search
-  - se_web_fetch
 evidence:
   - name: picture_judged
     description: the judgment the counts cannot make — are these the right journeys, and is any one of them wrong?

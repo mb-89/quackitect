@@ -575,6 +575,24 @@ THE ORDERED RELOAD (owner ruling 2026-07-27): engine swaps fire only
  home first: reaching idle costs an escape, and the escape costs the
  target.
 
+## The outward verbs are legal everywhere
+
+The engine holds a set of verbs no state may forbid. The state gate returns early for anything on it.
+
+Membership is decided by one question. Does the state change what this verb is allowed to do?
+
+Where the answer is no, the verb is state-independent and belongs on the set. Reading the internet does not depend on where the walk stands. Neither does printing the surface, or forcing a stop the tooth refused.
+
+Where the answer is yes, the verb stays gated. Writing a file very much depends on where the walk stands, which is why the file verbs are not on the set.
+
+### A per-state listing of an always-legal verb is a defect
+
+A state that names the verb teaches, by omission, that the states which do not name it forbid it. Both halves must stay swept, and a check holds the line.
+
+The web verbs were listed by hand in fourteen matrix rows and three state files. Every state that forgot them silently forbade research, and nothing reported it.
+
+The loss surfaced only when a spawned researcher came back with a refusal instead of findings. A spawned hand holds exactly the guide's tools, so the state the guide stood in decided what the researcher could reach.
+
 ## Where the lane works
 
 Where the LANE works. ONE TREE, so this is the root and nothing else
