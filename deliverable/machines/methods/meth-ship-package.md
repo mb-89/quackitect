@@ -22,7 +22,7 @@ that the package works.
   product; improving it is packaging work.
 - Check it WORKS by using it: install from the package, reach the desk's
   greeting. What was observed is the evidence - never "should install".
-- NO RELEASE NOTES FILE (owner ruling 2026-08-21). Nothing writes one and
+- NO RELEASE NOTES FILE. Nothing writes one and
   nothing ships one. The commit history is the record of what changed.
 - A gap the check cannot close is named plainly, never papered over.
 

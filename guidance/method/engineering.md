@@ -5,7 +5,7 @@ statement: General software rules the project builds by - referenced, never pull
 
 # Engineering rules
 
-## The TypeScript toolchain (owner ruling 2026-08-03)
+## The TypeScript toolchain
 
 The universal law is software.md's "The toolchain is mechanical". These are
 the concrete tools, chosen for speed and for installing with plain
@@ -35,7 +35,7 @@ the concrete tools, chosen for speed and for installing with plain
   scoped `se_test` → commit. The battery only where the test economics
   flip (software.md).
 
-## Commit what is on disk (owner ruling 2026-07-29)
+## Commit what is on disk
 
 A dirty tree left behind is not caution. It is unfinished work.
 
@@ -54,7 +54,7 @@ The close already works this way — it commits trunk's strays before it
 merges, and names every file it took. The principle is the same one:
 a walk's work never silently vanishes, and neither does anyone else's.
 
-## Data is not code (owner ruling 2026-07-28)
+## Data is not code
 
 Configuration lives in DATA the running system reads — never in
 constants that demand a recompile. When a behavior will be tuned, give
@@ -63,7 +63,7 @@ thresholds live in `deliverable/machines/lint/voice-lint.md`; edit the file and 
 next `se_lint` call uses it, with no rebuild and no reload. The rules'
 LOGIC stays code — only their parameters are data.
 
-## Every switch appears in help (owner ruling 2026-07-28)
+## Every switch appears in help
 
 Every command-line switch a program parses is listed by that program's
 `--help`. No exceptions, including internal ones — mark those as internal
@@ -73,7 +73,7 @@ A switch nobody can discover is a switch nobody has. `--one-screen` sat
 in the launcher for weeks, undocumented, because the launcher's help only
 forwarded to the server's help and the server had never heard of it.
 
-ONE HELP, NOT TWO (owner ruling 2026-07-28). A program that forwards
+ONE HELP, NOT TWO. A program that forwards
 arguments to another does NOT print a list of its own. It declares its
 flags in the same registry as the program it forwards to, and renders that
 one text. Two half-lists leave the reader stitching them together.
@@ -116,7 +116,7 @@ warnings do. An advisory nobody heeds is noise — measure whether lint
 findings lead to edits, then promote the ignored ones to refusals or
 delete them.
 
-## Churn is acceptable (owner ruling 2026-07-04)
+## Churn is acceptable
 
 Backward churn — ripple, migrations, rewriting what already stands — is
 acceptable. Churn-aversion is a human-team instinct. It must not decide
@@ -142,7 +142,7 @@ keeps getting worked on.
 It is a tiebreaker, never a trump. It cannot excuse a real cost or
 correctness gap.
 
-## Method tooling lives in the lane (owner ruling 2026-07-07, scoped 2026-07-10)
+## Method tooling lives in the lane
 
 Any migration, converter or fix the PROCESS depends on becomes a real
 tool in the lane, with a test and a registration. Never a sidecar script
@@ -159,7 +159,7 @@ in the repo.
 The tell that the rule is being broken: a shell command doing what a
 lane tool should do. Treat it as a missing tool, not a solved problem.
 
-## Library capabilities are read, not guessed (owner correction 2026-07-31)
+## Library capabilities are read, not guessed
 
 A claim about what a library can do comes from its documentation or its
 source. Never from recall.
@@ -170,7 +170,7 @@ design before anyone checks it.
 
 Cite where the capability is documented when a decision rests on it.
 
-## Adding a control to the bar (owner ruling 2026-08-04)
+## Adding a control to the bar
 
 The bar's one truth is `deliverable/machines/panels/controls.md`.
 The renderer is `deliverable/engine/params.ts`. Every surface fetches the rendered bar
@@ -194,7 +194,7 @@ from the engine (`/widget/controls`) — the VS Code sidebar included.
 - Adding a control therefore means: a row in controls.md, at most a new
   type in params.ts — and NO extension edit in the normal case.
 
-## A UI change is not done until the engine restarts on it (owner ruling 2026-08-06)
+## A UI change is not done until the engine restarts on it
 
 THE OWNER MUST SEE A UI CHANGE ON THE NEXT LOOK. Anything less costs them a
 round of "I still do not see it", and it cost several in one morning.

@@ -6,8 +6,8 @@ applyTo: '**'
 
 <!-- GENERATED at agent start. Do not edit — the next start overwrites it.
      from guidance/contract.md 84d970810e6e
-     from guidance/walking.md dac641db0f4d
-     from guidance/method/lane.md 3881abeb4b1a
+     from guidance/walking.md 9c01727a76d8
+     from guidance/method/lane.md 0f7559c796b0
      from guidance/voice.md 2bbb7751a28c
 -->
 
@@ -717,9 +717,9 @@ raid-risk-one-blanket-bound-is-given-to-work-nobody-measured.
 SO CARRY ON WORKING. The news finds you on whatever call you were making
 anyway, and the verdict records itself when the run ends.
 
-THIS PAGE USED TO SAY POLLING PAYS NO CALL, and that sentence bought a habit
-nobody wanted. i11 measured it: 494 `se_test` calls produced 66 verdicts, and
-428 of them were polls.
+POLLING PAYS LIKE ANY OTHER CALL, and it is worth saying because the opposite
+rule bought a habit nobody wanted: 494 `se_test` calls produced 66 verdicts,
+and 428 of them were polls.
 
 THE FULL BATTERY IS THE ENGINE'S. It runs once, at verification, fired by that
 state's own exit script. You never call it and there is no state where you may.
@@ -823,7 +823,7 @@ repo is read at a committed ref — `se_file_read`, `se_file_search` and
 Another folder entirely belongs in `.se/roots.json`, as a declared root. It is
 reachable as `@name/rest`.
 
-DECLARE ONE YOURSELF WHEN YOU NEED IT (owner ruling 2026-08-24). Write the
+DECLARE ONE YOURSELF WHEN YOU NEED IT. Write the
 file through the lane; the declaration is logged like every other call, and
 nobody has to be woken to approve a path.
 
@@ -909,7 +909,7 @@ applying one shape across a tree — these are programs, not readings. Reading
 the files one at a time to answer them costs a hundred calls and gets the
 count wrong.
 
-THIS IS ENCOURAGED, NOT TOLERATED (owner ruling 2026-08-18). A shell command
+THIS IS ENCOURAGED, NOT TOLERATED. A shell command
 that runs a script is the shell doing what ONLY a shell does. It is not a
 missing lane verb, it is not a smell, and it does not count against you.
 

@@ -35,13 +35,32 @@ const ITEMS_REL = join("deliverable", "machines", "items");
  *  says so. A write happens often and the templates change rarely. */
 const CACHE = new Map<string, { stamp: string; templates: ItemTemplate[] }>();
 
+/** STAMP THE FILES, NEVER THE FOLDER. A folder's own size and mtime do not
+ *  move when a file inside it is edited — only when one is added or removed.
+ *  A folder stamp is therefore blind to exactly the change this cache exists
+ *  to see, and an edited template stays out of reach for the process's life.
+ *
+ *  The sibling stamps do it this way already: rigor-matrix.ts's `rowsStamp`
+ *  and trace.ts's `itemTemplate` both stat the files. */
 function stampOf(dir: string): string {
+  let names: string[];
   try {
-    const s = statSync(dir);
-    return `${String(s.size)}:${String(s.mtimeMs)}`;
+    names = readdirSync(dir)
+      .filter((n) => n.endsWith(".md"))
+      .sort();
   } catch {
     return "gone";
   }
+  const parts: string[] = [];
+  for (const n of names) {
+    try {
+      const s = statSync(join(dir, n));
+      parts.push(`${n}:${String(s.size)}:${String(s.mtimeMs)}`);
+    } catch {
+      parts.push(`${n}:gone`);
+    }
+  }
+  return parts.join("|");
 }
 
 /** `checks: [{field, one_of: [...]}]` is the declaration. Everything else in

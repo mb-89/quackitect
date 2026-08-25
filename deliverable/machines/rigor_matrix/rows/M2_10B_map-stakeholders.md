@@ -35,7 +35,7 @@ major_note: |
   its disposition re-marked. New roles recorded; the rest stands by
   pointer.
 minor_note: |
-  Does not apply (owner ruling 2026-08-13). The stakeholder set stands at
+  Does not apply. The stakeholder set stands at
   this size, so the state could only ever answer "unchanged".
 
   ESCALATE: a new stakeholder brings a new value proposition with it, and
@@ -66,4 +66,4 @@ SO THE ROLES ARE NODES, shaped by [[stakeholder]]. This field carries REFERENCES
 
 COVERAGE IS WHAT THIS STEP PROVES, and it is what the M2 gate reads. Every value prop's audience resolves. Every always-on class is present or ruled out with its reason. At M3 every requirement sources to a role that exists here.
 
-TENSIONS ARE RAID ENTRIES (owner ruling 2026-08-06). Two roles pulling against each other is a risk with an owner and a trigger, logged in the register. It is not a field here.
+TENSIONS ARE RAID ENTRIES. Two roles pulling against each other is a risk with an owner and a trigger, logged in the register. It is not a field here.

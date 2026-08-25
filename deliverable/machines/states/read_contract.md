@@ -47,7 +47,7 @@ before.
 ## The handover, which nobody writes any more
 
 There used to be a `.se/HANDOVER.md`, read here and destroyed on the way out.
-It is gone (owner ruling 2026-08-07).
+It is gone.
 
 WHY IT WENT. The duty to write one was enforced at the `end` state. Sessions
 do not end there. They get killed — the host closes, the person walks away,

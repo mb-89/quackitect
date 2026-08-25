@@ -24,7 +24,7 @@ Lives in `spec/trace/use-case/`. It is a STANDING ARTIFACT: it outlives
 the iteration that authored it, lands on trunk when that record closes, and a
 later record may change it.
 
-## THE LEVEL CARRIES TWO KINDS (owner ruling 2026-08-07)
+## THE LEVEL CARRIES TWO KINDS
 
 `kind: interaction` is the original: one actor, one goal, every pass.
 

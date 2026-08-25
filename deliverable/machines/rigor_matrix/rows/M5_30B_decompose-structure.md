@@ -33,7 +33,7 @@ specification: full
 major_note: |
   Applies in full: the element tree from the winner's picks, the standing
   system and the grouping judgment; every function allocated to at least
-  one element — many-to-many is legal (owner ruling 2026-08-10), and the
+  one element — many-to-many is legal, and the
   spread shows in the matrix; every owed interface named at both ends;
   every requirement satisfied by an element or an interface. What stood before is
   superseded, never left ambiguous.

@@ -155,3 +155,32 @@ primary source found none: no peer-reviewed origin, no published evaluation,
 every citation an agency or vendor page.
 
 MUSTIE is the one with a profession behind it.
+
+## Where SORTED comes from, and what is not evidence
+
+Weeding practice in libraries has run on MUSTIE since 1976. It is the source
+SORTED is modelled on: a fixed named list, so two passes reach the same
+verdict rather than two tastes.
+
+ROT IS FOLK METHOD. No primary source exists for it. It stays an influence and
+never evidence, and the overhaul card cites MUSTIE instead.
+
+## Why the backstory leaves a loaded page
+
+Two separate reasons, and the rule holds on either one alone.
+
+- THE AGENT PAYS FOR EVERY LINE, every turn, on the pages the prompt layer
+  assembles. Backstory is the largest thing on those pages that no walk ever
+  acts on.
+- THE READER CANNOT TELL RULE FROM STORY when the two are interleaved. A card
+  opening three sections with what it once said reads as a changelog wearing a
+  rule's clothes.
+
+WHAT THE FIRST SWEEP MEASURED: 659 provenance lines across 119 of the 247
+pages the engine loads. The worst four were the refusal register at 44 lines,
+the engineering card at 33, the retro card at 33 and the software card at 26.
+
+THE DETECTOR HAS A FALSE-POSITIVE RATE AND IT IS NOT SMALL. Run against the
+overhaul card itself, 5 of its 16 hits were the card's own rule text naming the
+shapes to look for. About a third. So the script ranks pages for a person to
+cut, and it may never cut by itself.

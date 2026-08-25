@@ -61,7 +61,7 @@ specification_note: |
 
 The battery law's fix half ([[meth-test-first]]). FALLBACK from verification; the recovery edge re-runs verification ONCE. Collect EVERY finding the run surfaced before fixing anything; fix them all; then the single confirm run.
 
-NO EVIDENCE OF ITS OWN (owner ruling 2026-08-11). The findings ARE the
+NO EVIDENCE OF ITS OWN. The findings ARE the
 red verifications — a generated list, nothing anyone answers here. The
 proof is the confirm run going green, and verification records that.
 

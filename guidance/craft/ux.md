@@ -16,7 +16,7 @@ applies_to:
 These rules bind every surface a person looks at. How you WRITE the words
 on it is voice.md. How you write the CODE behind it is software.md.
 
-## A REFERENCE IS A LINK, NEVER TEXT (owner ruling 2026-08-23)
+## A REFERENCE IS A LINK, NEVER TEXT
 
 Four things render as something the reader can follow, wherever a surface
 shows one.
@@ -46,7 +46,7 @@ TWO TRAPS, BOTH MEASURED.
   label from the reference. A collector that writes back what it rendered
   corrupts the value it was showing.
 
-## THE BROWSER IS OUT (owner ruling 2026-08-07)
+## THE BROWSER IS OUT
 
 The surface is the editor panel. That is the only place a person looks, and
 the only place a change is proven.
@@ -130,7 +130,7 @@ bug somewhere else.
 - STAY VERY CLOSE TO THE DRAWING. This is not a style preference, it is a known weakness.
   - The assistant's visual judgment under this harness is not good enough to improvise with, and every departure from the sketch has been a step backwards.
   - When the drawing and your taste disagree, the drawing wins.
-- NO SLIDERS UNLESS THE SKETCH DRAWS ONE (owner, 2026-08-01). A slider implies a continuum and a total order.
+- NO SLIDERS UNLESS THE SKETCH DRAWS ONE. A slider implies a continuum and a total order.
   - Most of what has been built with one was really a set of named CATEGORIES, and it wanted buttons and line edits instead.
   - The autonomy, shutdown and narration controls were all this mistake.
 - A prefill is a suggestion, never content. Anything the AI prefills for a person stays inert (commented out) until that person confirms it — one confirmation per prefill, never in bulk.
@@ -154,7 +154,7 @@ bug somewhere else.
 - ONE DECIDER PER PAINT.
   - Every rule deciding how one thing is drawn lives in ONE function, and every surface drawing that thing calls it.
   - A second caller deciding a mark for itself is how one surface starts disagreeing with the next about what is proven.
-- COLOUR IS CONFIGURATION, NEVER CODE (owner ruling 2026-07-30).
+- COLOUR IS CONFIGURATION, NEVER CODE.
   - One palette file holds every colour the product chooses.
   - A person edits that file. Changing a colour never means changing code.
   - The surfaces read it LIVE. An edit shows without reloading the machinery.

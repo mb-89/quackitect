@@ -54,7 +54,7 @@ RECOMMEND IT AND STOP, exactly as with opening a record. Name the proposition
 you would mint, say why in a sentence, and carry on with the work. The
 person's word is what mints it.
 
-MINT ONE SPARINGLY (owner ruling 2026-08-19). A value proposition is something you would take to a CUSTOMER and market. If you would not put it in front of somebody deciding whether to use the product, it is not one.
+MINT ONE SPARINGLY. A value proposition is something you would take to a CUSTOMER and market. If you would not put it in front of somebody deciding whether to use the product, it is not one.
 
 THE TEST, and it is deliberately hard to pass. Would this sentence persuade a buyer? Internal machinery, process hygiene and engineering tidiness all fail it, however useful they are. They are requirements, functions or qualities instead, and each of those has its own home lower in the trace.
 

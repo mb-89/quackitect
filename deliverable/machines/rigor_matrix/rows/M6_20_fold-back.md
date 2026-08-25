@@ -34,7 +34,7 @@ major_note: |
   Applies in full: evidence updates requirements and architecture through
   the reopen path, keepers marked for promotion into the build.
 minor_note: |
-  Does not apply (owner ruling 2026-08-13). Nothing was spiked at this
+  Does not apply. Nothing was spiked at this
   size, so there is nothing to fold back.
 patch_note: |
   Does not apply. No spikes ran, nothing folds back. STRIKE PROPOSAL -
@@ -52,7 +52,7 @@ specification_note: |
 
 ## Guidance
 
-THE ANSWERS LIVE ON THE EXPERIMENT NODES (owner ruling 2026-08-10). The
+THE ANSWERS LIVE ON THE EXPERIMENT NODES. The
 form is a VIEW — one row per experiment, editing the node's own two keys,
 exactly like the assumption probes:
 

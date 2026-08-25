@@ -27,7 +27,7 @@ major_note: |
   Applies in full: every must story's demonstration performed against
   the shipped system, every run minting its report.
 minor_note: |
-  Does not apply (owner ruling 2026-08-13). The package state already ends
+  Does not apply. The package state already ends
   with a person using the built artifact and recording what they saw. At
   this size a demo is that same act done twice.
 

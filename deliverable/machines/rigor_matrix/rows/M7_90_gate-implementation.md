@@ -67,7 +67,7 @@ specification_note: |
 ## Guidance
 
 Review per [[meth-gate-review]]. FIVE CHECKS LEFT THIS FORM because the
-machine proves them upstream (owner ruling 2026-08-11):
+machine proves them upstream:
 
 - build planned — the seeded drawing refuses build-steps when absent
 - red observed — observe-red's law, per spec, at its birth

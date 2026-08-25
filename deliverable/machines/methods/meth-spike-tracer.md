@@ -5,7 +5,7 @@ statement: "Spikes, tracer bullets and probes: timeboxed executable evidence —
 
 ## Situation
 
-ONE CARD, TWO USES (owner ruling 2026-08-08). A probe and a spike are the
+ONE CARD, TWO USES. A probe and a spike are the
 same act — build the cheapest runnable thing that settles a question — so
 they share this card and an improvement to either improves both.
 

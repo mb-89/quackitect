@@ -35,7 +35,7 @@ major_note: |
   Applies in full: the riskiest assumptions validated by evidence, the
   design buildable, every spike's evidence pinned.
 minor_note: |
-  Does not apply (owner ruling 2026-08-13). M6 is struck whole at this
+  Does not apply. M6 is struck whole at this
   size, so this gate would guard an empty milestone.
 patch_note: |
   Does not apply. Nothing was proved because nothing needed proving.
@@ -53,7 +53,7 @@ specification_note: |
 
 BUILDABLE is the gate's judgment — yes or no with the why.
 
-RESULTS RECORDED is struck as mechanical (owner ruling 2026-08-10):
+RESULTS RECORDED is struck as mechanical:
 every seeded spike leaves an experiment node, and fold-back's submit
 refuses while any node's fold keys stand unanswered.
 

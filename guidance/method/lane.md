@@ -92,7 +92,7 @@ repo is read at a committed ref — `se_file_read`, `se_file_search` and
 Another folder entirely belongs in `.se/roots.json`, as a declared root. It is
 reachable as `@name/rest`.
 
-DECLARE ONE YOURSELF WHEN YOU NEED IT (owner ruling 2026-08-24). Write the
+DECLARE ONE YOURSELF WHEN YOU NEED IT. Write the
 file through the lane; the declaration is logged like every other call, and
 nobody has to be woken to approve a path.
 
@@ -178,7 +178,7 @@ applying one shape across a tree — these are programs, not readings. Reading
 the files one at a time to answer them costs a hundred calls and gets the
 count wrong.
 
-THIS IS ENCOURAGED, NOT TOLERATED (owner ruling 2026-08-18). A shell command
+THIS IS ENCOURAGED, NOT TOLERATED. A shell command
 that runs a script is the shell doing what ONLY a shell does. It is not a
 missing lane verb, it is not a smell, and it does not count against you.
 

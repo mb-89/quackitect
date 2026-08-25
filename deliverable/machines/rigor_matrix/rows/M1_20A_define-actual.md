@@ -30,7 +30,7 @@ major_note: |
   witnesses - a major usually exists because the recorded as-is no longer
   tells the whole story. The untouched baseline inherits by pointer.
 minor_note: |
-  Does not apply (owner ruling 2026-08-13). The as-is baseline stands: a
+  Does not apply. The as-is baseline stands: a
   minor changes what the system DOES, not the record of the pains it was
   built to answer.
 

@@ -130,7 +130,7 @@ claims.
 
 ## Which model
 
-JUDGE IT PER SUBAGENT (owner grant 2026-07-11). There is no fixed mapping and
+JUDGE IT PER SUBAGENT. There is no fixed mapping and
 none should be invented.
 
 - MECHANICAL WORK rides a lower tier. Counting, collecting, listing, reading

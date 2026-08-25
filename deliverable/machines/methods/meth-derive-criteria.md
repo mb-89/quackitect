@@ -7,7 +7,7 @@ statement: "Deriving the decision criteria: the criteria list is never typed. It
 
 Guidance for M4 derive-criteria. This is the one card the step draws from.
 
-AN AGENT MAY WRITE THE ORDER DIRECTLY (owner ruling 2026-08-18). The pairwise
+AN AGENT MAY WRITE THE ORDER DIRECTLY. The pairwise
 feed exists because a person cannot hold twenty rows in their head at once. An
 agent can, and walking pairs to reach an order it already holds is a tax rather
 than a method.
@@ -28,8 +28,8 @@ The list is a VIEW over the requirement register, the same way the RAID
 register is a view over its nodes. You edit frontmatter until the right list
 falls out.
 
-This is the [[node-table]] shape, and probe-assumptions already runs it
-(owner ruling 2026-08-07). The rows are nodes. The columns are frontmatter
+This is the [[node-table]] shape, and probe-assumptions already runs it.
+The rows are nodes. The columns are frontmatter
 keys. Typing in a cell writes that key on that node, and editing the note
 shows in the form. There is no second copy to drift.
 
@@ -160,7 +160,7 @@ the same as late weighting.
 CUTTING TO THE VITAL FEW belongs to cut-criteria too, and it wants the
 computed order to cut from.
 
-ELEVEN IS THE REFERENCE, NOT THE RULE (owner ruling 2026-08-09). Above it is
+ELEVEN IS THE REFERENCE, NOT THE RULE. Above it is
 right where the extra rows earn it. Fifty is not a cut.
 
 WHAT IT COSTS IS A RANGE, NEVER ONE NUMBER. Ordering n items never costs
@@ -323,7 +323,7 @@ apart from a boundary move.
 
 `criterion_band` on the node, written by the engine when the boundary lands.
 
-NOT `priority` (owner ruling 2026-08-08). That field is MoSCoW, authored at
+NOT `priority`. That field is MoSCoW, authored at
 M3, and it answers a different question: demand or wish. The band answers how
 much a wish matters, and it is learned at M4. One field holding both means one
 of them goes stale.
@@ -358,7 +358,7 @@ THE WALK GOES FORWARD ONLY. Nothing reopens, because the cut never touches a
 weight. It removes an axis from the score table and leaves every surviving
 weight exactly where this state put it.
 
-WHY THE CUT IS ITS OWN STATE (owner ruling 2026-08-08). Doing it inside
+WHY THE CUT IS ITS OWN STATE. Doing it inside
 evaluate-set would mean cutting with the totals already visible. That is the
 same poisoning the weights-first order exists to prevent, arriving one step
 later. The house already rules that composing and evaluating never share a

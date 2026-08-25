@@ -28,7 +28,7 @@ row.
 One node carries one verify_method and one pass line. A table whose rows would
 fail independently under different methods is several requirements.
 
-THE FAN-OUT HEURISTIC (owner, 2026-08-06). A use case refined by MORE THAN
+THE FAN-OUT HEURISTIC. A use case refined by MORE THAN
 FIVE rows is a clustering candidate. Look for facet families: rows sharing
 one kind, one verify_method and one concern, differing only in which facet
 they pin. Fold such a family into ONE row — the statement names the family's
@@ -162,7 +162,7 @@ single-source — and it held across every review round they ran.)
   confusion, not coverage.
 
   WALKING THE TREE AND WRITING SCENARIOS ARE DIFFERENT ACTS, and only the
-  second is discouraged here (owner instruction 2026-08-19). The nine
+  second is discouraged here. The nine
   characteristics are SWEPT at write-requirements as a checklist, one line
   each, under the `quality_groups_swept` set question. A characteristic
   nothing touches is answered and left alone. It never becomes a scenario

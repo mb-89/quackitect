@@ -44,7 +44,7 @@ The retro is one state (the one-state rule) - its legality zone rides
 legal_tools, its method rides the entry read. Leaving it should leave
 the inbox empty.
 
-## An empty inbox skips the retro (owner ruling 2026-08-16)
+## An empty inbox skips the retro
 
 THE CADENCE DOUBLE-FIRES AND THE OWNER NAMED IT. Run a retro at the desk, then
 open an iteration, and the iteration's own onboard-retro runs a second one
@@ -98,7 +98,7 @@ stale projections, and the verb that fixes it refused under SE-C-110. The
 repair went through the shell with its reason logged, which is a refusal doing
 its job and a grant that was wrong.
 
-## The outward doors are legal here (owner ruling 2026-08-15)
+## The outward doors are legal here
 
 `se_web_search` and `se_web_fetch` were missing from this state's tools, and
 the gap surfaced the moment the retro tried to do its own job.

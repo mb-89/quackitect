@@ -38,9 +38,9 @@ The trigger is a NOTE carrying "needs retro":
    and the window is empty. The boundary must be taken while it still
    names the PREVIOUS retro.
 
-   THE DESK'S OWN DRAINS NO LONGER POISON IT. Since e22 the front desk
-   drains too, and a desk drain from an hour ago used to hand the retro
-   a window far too short.
+   THE DESK'S OWN DRAINS DO NOT POISON IT. The desk drains too, and a desk
+   drain from an hour ago would otherwise hand the retro a window far too
+   short.
 
    The engine settles this now: "last_retro" means the newest CARRIED or
    BACKLOG drain, and those are judgment dispositions the desk is
@@ -67,28 +67,26 @@ The trigger is a NOTE carrying "needs retro":
    of every headless run are unlogged.
 
    WITH NO SUCH DRAIN IN THE LIVE LOG, the window opens at the log file's
-   FIRST record. Never at another drain (fixed 2026-08-18 on the owner's
-   instruction). A `done` or `obsolete` drain is a check any walk makes, so
-   falling back to the newest drain of any kind put the mark wherever the
-   last walk happened to tidy up.
+   FIRST record. Never at another drain. A `done` or `obsolete` drain is a
+   check any walk makes, so falling back to the newest drain of any kind puts
+   the mark wherever the last walk happened to tidy up.
 
-   WHAT THAT COST, MEASURED at i16's onboard-retro the morning it was fixed:
-   68 records returned where 2804 stood, hiding every call of the session
-   the retro existed to mine. It failed SILENTLY, so the retro read as
-   finished over an almost empty window.
+   WHAT THAT COSTS: 68 records returned where 2,804 stood, hiding every call
+   of the session the retro existed to mine. It fails SILENTLY, so the retro
+   reads as finished over an almost empty window.
 
    THE SHAPE THAT CAUSED IT is worth knowing, because it will recur: the
    live log held one `carried` drain and it had been REFUSED under SE-C-110
    for draining outside a retro. A refused record is skipped, so no judged
    mark existed at all.
 
-   Take the timestamp and use it. Checking it by hand is no longer work
-   this step owes.
+   Take the timestamp and use it. Checking it by hand is not work this step
+   owes.
 2. Field feedback. Ask the owner what came back from the
    field since the last look. Capture every answer as a note.
 
-   THIS IS A SANCTIONED STOP, AND THE ONLY ONE THE RETRO HAS (owner ruling
-   2026-08-14). Ask the question, then STOP and wait for the answer.
+   THIS IS A SANCTIONED STOP, AND THE ONLY ONE THE RETRO HAS. Ask the
+   question, then STOP and wait for the answer.
 
    WHY IT NEEDED SAYING. The step was walked past in several retros running.
    The owner: "in the last few retros, you never asked me for field feedback.
@@ -104,8 +102,8 @@ The trigger is a NOTE carrying "needs retro":
    with se_note_drain, routing it to exactly ONE home.
 
    CHECK BEFORE YOU JUDGE, and check CHEAPLY. Most of what pends is often
-   ALREADY BUILT — on 2026-07-31 the twelve smallest notes were sampled
-   and most had shipped, some days earlier.
+   ALREADY BUILT. Sampled once, the twelve smallest notes had mostly shipped,
+   some of them days earlier.
 
    A note describing a gap is a claim about the code, and the code
    answers in seconds: call the tool, grep the fix, read the state.
@@ -145,30 +143,27 @@ The trigger is a NOTE carrying "needs retro":
    keep it (condition still unmet), pull it
    (re-drain as carried, into this round's scope), or drop it (re-drain
    as obsolete, reason recorded). Re-draining IS the migration mechanism.
-5. Sweep the register for DEBTS (owner ruling 2026-08-12). List every
+5. Sweep the register for DEBTS. List every
    raid entry of kind `debt`. Each one is repaid now, rescheduled with
    its trigger re-affirmed, or consciously re-accepted - and the look is
    recorded on the entry, dated. A debt nobody re-reads is a lie in the
    ledger.
-6. Drain the assistant's persistent memory (owner rule 2026-08-06,
-   supersedes the 2026-07-27 rule). The agent may write memory freely
+6. Drain the assistant's persistent memory. The agent may write memory freely
    between retros; the retro is where it drains. Read every memory entry:
    whatever holds project rules, project state, or working guidance moves
    INTO the repo (guidance, machines, prompts) and leaves the memory.
    Memory keeps only personal data and harness mechanics the repo cannot
    hold. The agent runs this sweep itself.
 
-   THE LANE REACHES THE MEMORY FILES ALREADY, corrected 2026-08-18.
+   THE LANE REACHES THE MEMORY FILES ALREADY.
 
-   An earlier measurement said it could not. The memory lives outside the
-   project root, and a bare path to it refuses under SE-C-102.
-
-   That is true of a bare path and not of the lane. `.se/roots.json` already
+   The memory lives outside the project root, and a bare path to it refuses
+   under SE-C-102. That is true of a bare path and not of the lane. `.se/roots.json` already
    declares `sessions` as the harness's projects folder, and the memory sits
    under it. So `@sessions/<project-slug>/memory/` reads.
 
-   MEASURED at i16's onboard-retro. That path answered `exists: false` for
-   MEMORY.md rather than refusing — a real answer about a real folder.
+   THAT PATH ANSWERS `exists: false` for a missing MEMORY.md rather than
+   refusing — a real answer about a real folder.
 
    SO CHECK THE DECLARED ROOTS BEFORE CONCLUDING ANYTHING. Three ways through
    are honest and a fourth is not.
@@ -181,27 +176,25 @@ The trigger is a NOTE carrying "needs retro":
      nobody else uses the memory.
      - The retro state carries `se_file_delete` for exactly this.
      - The memory root is declared WRITABLE, which is what makes the delete
-       land. It was read-only until 2026-08-24, so no earlier retro could
-       finish this step however well it read.
+       land. A read-only root cannot finish this step however well it reads.
      - Delete only after the content has a home, or has been shown to be
        carried already.
    - DRAIN WHAT THE HARNESS SURFACED. Memories handed to the agent in context
      are readable and drainable too.
    - DECLARE A ROOT for a folder no existing one covers. `.se/roots.json`
      makes a folder available as `@name`, read-only by default. DECLARE IT
-     YOURSELF and carry on (owner ruling 2026-08-24) — this step used to stop
-     here to ask, which reported the drain unreachable and moved on.
+     YOURSELF and carry on. Stopping here to ask reports the drain unreachable
+     and moves on, which is the step saying nothing.
    - WHAT IS NOT ALLOWED is ticking this step because nothing was surfaced.
      Say what you could reach and what you could not.
 
-   NAME THE FOLDER AND COUNT THE FILES (added 2026-08-19, after this step was
-   ticked against the wrong one). "Nothing to drain" and "I looked in the wrong
-   place" produce the same clean-looking result, and only the count tells them
-   apart.
+   NAME THE FOLDER AND COUNT THE FILES. "Nothing to drain" and "I looked in
+   the wrong place" produce the same clean-looking result, and only the count
+   tells them apart.
 
-   WHAT HAPPENED. The i16 retro reported the memory folder empty. It read the
-   slug for the CURRENT project path, which holds nothing. Eight memory files
-   sat under the older slug, and the drain was recorded as satisfied.
+   THE WAY IT GOES WRONG. A retro reads the slug for the CURRENT project path,
+   which holds nothing, reports the memory folder empty, and records the drain
+   as satisfied. Eight memory files sit under the older slug.
 
    SO GLOB WIDER THAN ONE SLUG. `@sessions/**/memory/*.md` finds every project's
    memory folder, and a project renamed or moved leaves its memories behind
@@ -239,7 +232,7 @@ The trigger is a NOTE carrying "needs retro":
    about.
 
    THEN WALK THE se_run COMMANDS, AND KNOW WHAT THAT STEP IS FOR (owner
-   ruling 2026-08-07). It is not a survey. THE POINT IS TO FIND THE MISSING
+   It is not a survey. THE POINT IS TO FIND THE MISSING
    VERB: a command that did a LANE JOB by hand is a verb naming itself, and
    the retro is where it gets named.
 
@@ -261,11 +254,9 @@ The trigger is a NOTE carrying "needs retro":
    COUNT IT. `se_log_query {group_by: "tool"}` gives the whole
    distribution in one call.
 
-   DO NOT COMPARE IT TO AN OLD RETRO'S NUMBER (owner ruling 2026-08-16:
-   "stop comparing se_run against an old retro... this is not useful. We're
-   beyond that"). A ratio against a stale baseline says nothing about
-   whether THIS window's shell calls were avoidable, which is the only
-   question this step asks.
+   DO NOT COMPARE IT TO AN OLD RETRO'S NUMBER. A ratio against a stale
+   baseline says nothing about whether THIS window's shell calls were
+   avoidable, which is the only question this step asks.
 
    ASK INSTEAD: what did the shell do this window that a lane verb could
    have done? Name the verb.
@@ -274,10 +265,9 @@ The trigger is a NOTE carrying "needs retro":
    missing verb, not four incidents. Name the verb, and if it is cheap
    enough, build it in the retro.
 
-   The raw log is KEPT (owner ruling: forever-until-1GB; a garbage collector
-   may harvest it later).
+   The raw log is KEPT, forever until it reaches a gigabyte.
 
-   THEN AUDIT THE TOOLS THEMSELVES (owner ruling 2026-08-07). The same
+   THEN AUDIT THE TOOLS THEMSELVES. The same
    grouping answers a second question the retro owes: which lane verbs are
    DEAD, and which are worth improving.
 
@@ -297,7 +287,7 @@ The trigger is a NOTE carrying "needs retro":
    maintenance and one more wrong turn available. Retire what is dead; the
    leverage is in the missing verbs, not the surplus ones.
 
-   THEN MINE THE TEST TIMINGS (owner ruling 2026-07-31). Every run
+   THEN MINE THE TEST TIMINGS. Every run
    records every test's duration to .se/test-timings.jsonl — file, name,
    ms, pass — and the LAST run stands summarized in .se/test-last-run.json,
    files ranked by summed cost. Read the summary first; the append log is
@@ -315,14 +305,12 @@ The trigger is a NOTE carrying "needs retro":
      SPLIT before anything clever is attempted inside it.
    COMPARE ACROSS RUNS, not within one. The record appends, so a test that
    has been getting slower for a fortnight is visible here and nowhere else.
-9. WALK THE MILESTONES, one iteration at a time (owner ruling 2026-08-15).
-   Every iteration that closed in this window gets its milestone steps
-   walked in order, and the walk lands as a TABLE the owner reads.
+9. WALK THE MILESTONES, one iteration at a time. Every iteration that closed
+   in this window gets its milestone steps walked in order, and the walk lands
+   as a TABLE the owner reads.
 
-   THE OWNER'S WORDS: "walk over all milestone steps of all iterations
-   that we did and give me tabulated information about all the milestone
-   steps. What went well from M1 to M2, from M2 to M3, and so on. Where
-   do you see improvements? Where can you mechanize?"
+   THE QUESTION IT ANSWERS: what went well from one milestone to the next,
+   where the improvements are, and what can be mechanised.
 
    ONE ROW PER STEP, in walk order, with four columns.
 
@@ -366,8 +354,6 @@ The trigger is a NOTE carrying "needs retro":
    that is the whole value. Which step cost the most is a question prose
    cannot answer at a glance.
 
-   WHY IT IS A STEP AND NOT A REQUEST. The owner asked for this list and
-   then had to ask again, because nothing in the method held it.
 10. Tally the previous retro's improvements, and promote the wins. Dismiss
    the duds WITH the reason recorded, so a dud is never re-proposed.
 11. Check the contract. Walk the contract rule by rule against the
@@ -429,7 +415,7 @@ method (`deliverable/machines/methods/meth-state-of-the-art.md`).
   whose conditions then disagree. To pull a parked item into scope,
   re-drain it as `carried`.
 - Expedition reports are ruled AT CLOSE (applied | dismissed), not here —
-  the retro is out of the expedition loop (owner ruling 2026-07-27).
+  the retro is out of the expedition loop.
 - se_log_query is the query lane — parsing the call log by hand is the
   lane job this step exists to catch. That is about the LOG, not about
   scripts: a program over the corpus or the tree is the right instrument and

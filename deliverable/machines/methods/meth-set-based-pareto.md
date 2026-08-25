@@ -27,7 +27,7 @@ Domination is the one-line rule above, so the front and every elimination are
 a FUNCTION of the score table. The person scores; the arithmetic does the
 rest.
 
-This matters more than it sounds (owner report 2026-08-08). A typed front can
+This matters more than it sounds. A typed front can
 be wrong with nothing checking it, and worse, it can DISAGREE with the scores
 sitting in the same form. What the person owes is the judgment arithmetic
 cannot make: whether an elimination is accepted, and anything the numbers do

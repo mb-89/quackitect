@@ -80,7 +80,7 @@ which.
 An edge not listed here is a defect. Not a warning, not a convention — the
 node is wrong, and the check that reads this file says so.
 
-## A LINK IS A CONTRIBUTION (owner ruling 2026-08-11)
+## A LINK IS A CONTRIBUTION
 
 An edge says the child ACTUALLY SERVES the parent. Nothing else earns one.
 
@@ -116,7 +116,7 @@ Read it downward as a question, one hop at a time:
 
 ## A QUALITY IS A REQUIREMENT, AND HAS NO TYPE OF ITS OWN
 
-There is no quality node and no quality edge (owner ruling 2026-08-07).
+There is no quality node and no quality edge.
 
 A quality is a requirement whose `kind` is quality. It hangs under a use
 case like any other, and a function satisfies it like any other. One
@@ -141,7 +141,7 @@ is not an interaction.
 So the level holds two things under one name, and that is a known cost
 rather than an oversight. The `kind` facet on use-case says which is which.
 
-## FUNCTIONS DO NOT TOUCH USE CASES (owner ruling 2026-08-07)
+## FUNCTIONS DO NOT TOUCH USE CASES
 
 There is no edge from a function to a use case, and adding one would be a
 defect rather than a shortcut.
@@ -171,11 +171,11 @@ WHY `satisfies` AND NOT `implements`. An implementation names a mechanism,
 and a function is solution-neutral by construction. SysML uses «satisfy» for
 exactly this relation, so the word already travels.
 
-ONE LEVEL DOWN THE SAME ARGUMENT FLIPS (owner ruling 2026-08-10). An element
+ONE LEVEL DOWN THE SAME ARGUMENT FLIPS. An element
 IS a mechanism, so what it does to a function is `implements`. An interface
 implements a function too, where the function lives on the boundary itself.
 
-## The design slice grew on 2026-08-10
+## The design slice
 
 Elements and interfaces stand one radius past the functions, both in the
 design half.
@@ -238,7 +238,7 @@ Today there are two.
 - `test` holds what VERIFIES it: the test-spec nodes, authored at M7
   author-tests — see the next section.
 
-THE DIVISION HAPPENS ONCE (owner design 2026-08-07). A requirement is the
+THE DIVISION HAPPENS ONCE. A requirement is the
 last node every slice can see. It may be pointed at from several slices, and
 that is the one place an item belongs to more than one.
 
@@ -254,7 +254,7 @@ AN EMPTY SLICE STILL HOLDS ITS ARC. The space is reserved so a new level
 lands without moving anything already drawn. The test level landed this way
 on 2026-08-10.
 
-## The test slice holds test-spec nodes (owner ruling 2026-08-11)
+## The test slice holds test-spec nodes
 
 A test-spec is an AUTHORED node ([[test-spec]]), one per verification
 collection, written test-first at M7 author-tests. It carries the upward
@@ -270,7 +270,7 @@ seam is checked MECHANICALLY and outside the graph — every test file
 referenced by at least one spec, every referenced file existing — so the
 graph stays at spec grain and never blows up to files or cases.
 
-THE DEMONSTRATES EDGE (owner ruling 2026-08-11). A demonstration-method
+THE DEMONSTRATES EDGE. A demonstration-method
 spec may also carry `demonstrates:` naming the sty- ids its Procedure
 shows end to end. Every MUST story is named by this key on some
 demonstration spec - the M8 law refuses the validation gate while one
@@ -282,7 +282,7 @@ addresses written on the requirements. That inverted the edge — the parent
 held the mapping — and drew at file grain. Both retired with this ruling;
 `verified_by` is no longer written.
 
-## The design slice ends in design-spec nodes (owner ruling 2026-08-11)
+## The design slice ends in design-spec nodes
 
 A design-spec is an AUTHORED node ([[design-spec]]), one per design
 concern below the architectural line, written at M7 specify-build. It

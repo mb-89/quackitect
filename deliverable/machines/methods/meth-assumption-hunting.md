@@ -42,7 +42,7 @@ WALK THE REQUIREMENTS, NOT YOUR MEMORY. The register is the input. A
 requirement with a number in it usually rests on something; a requirement
 about a boundary almost always does.
 
-## WRITE THE CLAIM, NOT THE SUBJECT (owner ruling 2026-08-07)
+## WRITE THE CLAIM, NOT THE SUBJECT
 
 This step COLLECTS ASSUMPTIONS. So each entry it opens says the thing being
 relied on, phrased so it could turn out false.

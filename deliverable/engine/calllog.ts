@@ -45,12 +45,9 @@ export interface CallRecord {
    *  that tells the hand holding the walk apart from a hand it delegated to.
    *  `actor` cannot: a walker and a guide are both `agent`.
    *
-   *  NOT ENFORCED YET. The field is declared so the checks at
-   *  tests/call-attribution.test.ts compile and run red. Requiring it,
-   *  refusing a value outside the vocabulary, and taking it from the work's
-   *  AUTHOR rather than the caller are the chunks
-   *  the-call-record-grows-three-fields and
-   *  the-role-vocabulary-separates-two-hands. */
+   *  ENFORCED BY `assertCoordinates` in this file: a record reaching `append`
+   *  without it throws. The type stays optional because a caller composes the
+   *  record before the door checks it. */
   part?: CallPart;
   /** WHO FILED IT, where that is not who authored it. A guide may work the
    *  lane itself, and then this is absent. Where the walker carries a guide's

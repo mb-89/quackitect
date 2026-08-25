@@ -47,7 +47,7 @@ specification_note: |
 
 Per [[meth-pugh-convergence]] and steps 5-8 of [[meth-eight-step-decision]]. Datum = strongest viable rival; iterate with the winner as new datum — all computed, drawn by the decision-matrix card.
 
-THERE IS NO WINNER FIELD (owner ruling 2026-08-10). The veto is withholding
+THERE IS NO WINNER FIELD. The veto is withholding
 the submit: a person who disagrees with the computed winner does not sign.
 Anything beyond the arithmetic goes to follow_up here and into the deciding
 ADRs at record-adrs, where the why lives on.

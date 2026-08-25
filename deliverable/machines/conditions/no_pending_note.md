@@ -5,7 +5,7 @@ marker phrases. The arguments are the markers; matching is
 case-insensitive substring over pending (undrained) notes.
 
 No state carries it today. The former use — a pending "needs retro" note
-gating an iteration's first start — was dropped (owner 2026-08-04):
+gating an iteration's first start — was dropped:
 every iteration opens with its own onboard-retro inside M0, and that
 retro drains the pending notes, the "needs retro" markers included.
 

@@ -26,7 +26,7 @@ major_note: |
   Applies in full: every seeded spike runs here, parallel, each within
   its timebox; the machine joins before the evidence folds back.
 minor_note: |
-  Does not apply (owner ruling 2026-08-13). No spikes are seeded at this
+  Does not apply. No spikes are seeded at this
   size, so there are none to run.
 
   ESCALATE: needing a spike is the tell that this is a major.

@@ -70,6 +70,6 @@ SEVERAL STORIES MAY SERVE ONE VALUE PROP, and most do. `refines` names the prop,
 
 COVERAGE IS CHECKED, NEVER WRITTEN DOWN. The field declares `covers: value-prop`, so the engine refuses this state while any story refines no proposition, and while any proposition is refined by no story.
 
-THERE IS NO COVERAGE FIELD, deliberately (owner ruling 2026-08-06). A form field asking whoever fills it to restate a computed result gets a paragraph that agrees with the engine until the day it does not. What is NOT computed - which stories are MUSTS, and why each earns its demonstration - is judgment, and it goes under `anything_else`.
+THERE IS NO COVERAGE FIELD, deliberately. A form field asking whoever fills it to restate a computed result gets a paragraph that agrees with the engine until the day it does not. What is NOT computed - which stories are MUSTS, and why each earns its demonstration - is judgment, and it goes under `anything_else`.
 
 THE SET IS NEVER COMPLETE, and does not have to be. Coverage is not the same as completeness: every proposition having a story does not mean every pass is told. A missing story surfaces later the same way a missing value prop does - something gets built that no story covers. Add it then, rather than stalling here for exhaustiveness.

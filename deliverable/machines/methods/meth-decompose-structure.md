@@ -66,7 +66,7 @@ a hole; an interface no crossing demands is a question the other way.
 
 ## The trace is complete, on two paths
 
-NO RESIDUE (owner ruling 2026-08-10): a trace with holes cannot show the
+NO RESIDUE: a trace with holes cannot show the
 changes, and change visibility is what the graph is FOR.
 
 - THE TRANSITIVE PATH carries most requirements: a requirement is served

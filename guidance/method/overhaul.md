@@ -10,9 +10,6 @@ Overhaul is a FUNCTION, not a project. Fire it at the front desk when the
 system has drifted. Fire it at the end of an unattended run, when there is
 nothing left to build.
 
-THE NAME (owner ruling 2026-07-29). This was called pruning, and the name was
-smaller than the job.
-
 A mechanical engineer overhauls a machine:
 
 - strip it
@@ -24,8 +21,8 @@ That is this, exactly.
 
 ## Step zero: overhaul the method before anything else
 
-OWNER RULING 2026-08-25. The first thing an overhaul touches is its own
-method. Not the corpus, not the code, not the guidance it is about to sweep.
+The first thing an overhaul touches is its own method. Not the corpus, not the
+code, not the guidance it is about to sweep.
 
 WHY IT COMES FIRST. Every later step is judged against this page. A stale
 method does not merely miss things; it teaches the sweep to miss them, the
@@ -48,6 +45,42 @@ pointed at this page. The retro asks it of the way we WORK; this asks it of
 the way we CATCH UP.
 
 A METHOD THAT NEVER CHANGES IS NOT A STABLE METHOD. It is one nobody checked.
+
+## THE MARKDOWN THE AGENT RUNS IS CODE
+
+The markdown that describes the machine is also code, and it is cleaned up
+like code.
+
+WHAT COUNTS. Anything the engine LOADS and an agent READS AS INSTRUCTION.
+
+- `guidance/**` — the contract, the craft cards, the method cards.
+- `deliverable/machines/**` — state notes, method cards, item templates, form
+  templates, rigor-matrix rows, condition notes.
+
+SO THE COMMENT RULES IN `guidance/craft/software.md` BIND IT. That card bans
+provenance in a comment, and it binds every artifact rather than source alone.
+
+FOUR SHAPES ARE STRUCK FROM A LOADED PAGE.
+
+- A DATE. `(owner ruling 2026-08-21)` says who and when, and the rule is the
+  same rule without it.
+- AN ATTRIBUTION at the rule it produced.
+- CHANGE NARRATION. "This card used to say the opposite."
+- THE MEASURED ANECDOTE. "Measured on the i15 walk: four refused calls."
+
+THE RULE STAYS. Only the backstory moves. Deleting the ruling with its date
+would lose the ruling, which is the opposite of what this asks for.
+
+WHERE IT MOVES: a sibling page with NO `tags:` key, linked from the rule it
+belongs to. An untagged page is never served by the reading loop, so the agent
+pays for it only when it goes looking.
+
+[overhaul-prior-art.md](guidance/method/overhaul-prior-art.md) is the worked
+example. This card's own evidence sits there, and the reasons for the move sit
+there with it.
+
+MEASURE IT RATHER THAN JUDGING BY EYE. A script over the loaded trees counts
+the four shapes and ranks the pages, so the sweep has a work list.
 
 ## The three jobs
 
@@ -98,13 +131,9 @@ delta of the standard does not.
 
 ### WITH NO PREVIOUS OVERHAUL ON RECORD, SWEEP EVERYTHING
 
-OWNER RULING 2026-08-25, in their own framing: an overhaul is a heavy
-operation, and it is fine to recheck important rules. Where an earlier
-overhaul stands, take it into account. Where none does, do everything.
-
-WHY IT NEEDED SAYING. Measured 2026-08-25: no commit, no note and no log
-record marked any previous overhaul, so the rule above named a boundary that
-did not exist and left the agent no legal move.
+An overhaul is a heavy operation, and it is fine to recheck important rules.
+Where an earlier overhaul stands, take it into account. Where none does, do
+everything.
 
 SAY WHICH ONE YOU RAN. A whole-corpus sweep and a delta sweep look identical
 from their findings.
@@ -179,10 +208,7 @@ lint applies it and says so, as this lane already does for a formatter.
 ## The criteria — SORTED
 
 Weeding practice does not trust taste. It uses a fixed named list, so two
-passes reach the same verdict. Libraries have run on MUSTIE since 1976.
-
-ROT IS FOLK METHOD and this page used to cite it as prior art. No primary
-source exists for it. It stays an influence, never evidence.
+passes reach the same verdict.
 
 Ours is SORTED. Mark every candidate with exactly one letter.
 
@@ -248,8 +274,8 @@ lint, both green before the run is called done.
 
 ## Migration cost is never a reason to keep something wrong
 
-OWNER RULING 2026-08-21. Where something we did in the past is not correct,
-we fix it rather than leave it because fixing is an effort.
+Where something we did in the past is not correct, we fix it rather than leave
+it because fixing is an effort.
 
 THE COROLLARY BINDS US. Where the fear of a change comes from a missing
 capability, we build the capability.
@@ -260,9 +286,8 @@ is the owner's decision, never the agent's.
 
 ## The pattern checklist
 
-OWNER RULING 2026-08-20. The overhaul asks one more fixed question set, about
-the CODE: would a named design pattern, applied where we do not use it,
-improve us?
+The overhaul asks one more fixed question set, about the CODE: would a named
+design pattern, applied where we do not use it, improve us?
 
 HOW TO RUN IT, beside the rule sweep. For each pattern, name ONE place where
 applying it would delete code or a defect class.
@@ -302,9 +327,8 @@ doctrine as the forbidden-words list in voice.md.
 
 ## Every finding goes to one of four places
 
-OWNER RULING 2026-08-25. THE OVERHAUL DOES THE WORK. It used to produce
-findings and notes and stop there, which left the system exactly as it found
-it and spent a day saying so.
+THE OVERHAUL DOES THE WORK. A run that produces findings and notes and stops
+there leaves the system exactly as it found it, and spends a day saying so.
 
 ### A REFACTOR — the overhaul does it, now, itself
 
@@ -386,9 +410,7 @@ SEVEN THINGS, and a missing one is a hole rather than brevity.
 
 ## The field scan
 
-STEP ZERO'S RECORD LIVES IN
-[overhaul-prior-art.md](guidance/method/overhaul-prior-art.md), with its
-sources. Three of its rulings bind here.
+Three of the prior art's rulings bind the scan itself.
 
 - REPORT FINDINGS, NEVER COVERAGE. An agent-run sweep cannot claim it looked
   at everything, and "nothing found" reads the same as "nothing looked at".

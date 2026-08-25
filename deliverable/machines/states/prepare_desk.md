@@ -47,7 +47,7 @@ module that owns them, so a moved file fails the check by the same path that
 would have failed the product — and the failure says what it costs, not just
 that something is absent.
 
-THE FULL BATTERY IS NOT HERE (owner ruling, 2026-07-30). Boot asks whether
+THE FULL BATTERY IS NOT HERE. Boot asks whether
 this engine can run, not whether every behaviour is correct. The battery
 answers the second question and belongs to validation — se_test, and the
 end of an expedition. It was measured at fifty-three seconds for one file

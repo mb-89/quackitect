@@ -185,7 +185,7 @@ Three rules on the list itself:
   - Two or three have a minor's.
   - More than that argues for major.
 
-WHY THE GOALS LIVE HERE AND NOT IN THE TRACE (owner ruling 2026-08-17): a goal
+WHY THE GOALS LIVE HERE AND NOT IN THE TRACE: a goal
 is not an artifact that anything refines. It is what every artifact is measured
 against. It travels with the iteration, like the change size and a probed
 assumption, and it never enters the trace graph.

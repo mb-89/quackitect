@@ -3,7 +3,7 @@ state: overhaul
 state_kind: work
 priority: strategic
 statement: Everything catches up.
-legal_tools: se_survey, se_log_query, se_run, se_test, se_lint, se_git, se_file_read, se_file_search, se_file_glob, se_file_list, se_file_patch, se_file_write, se_file_delete, se_file_move, se_note, se_note_drain, se_answer, se_prompt_place, se_web_search, se_web_fetch, se_seed_expedition, se_seed_iteration
+legal_tools: se_survey, se_log_query, se_run, se_test, se_lint, se_git, se_file_read, se_file_search, se_file_glob, se_file_list, se_file_patch, se_file_replace, se_file_write, se_file_delete, se_file_move, se_note, se_note_drain, se_answer, se_prompt_place, se_web_search, se_web_fetch, se_seed_expedition, se_seed_iteration
 entry_read: guidance/method/overhaul.md
 motivation: Every good retro raises the bar, and the moment it rises everything written before it is out of compliance. Overhaul is where the system pays that debt off instead of carrying it. It is heavy on purpose, and it runs seldom.
 inputs:
@@ -42,6 +42,11 @@ guidance: |
   Anything a machine could have caught becomes a LINT rather than a finding.
   Seen twice, it was always a lint.
 
+  ONE SHAPE ACROSS THE TREE IS se_file_replace, not a patch per file. A
+  provenance sweep or a rename touches a hundred pages, and a hundred patches
+  is the same edit made a hundred times. Preview first and READ the places it
+  reports; a wide edit whose only result is a number cannot be checked.
+
   Re-project the prompt layer with se_prompt_place after editing guidance,
   or preflight goes red at the next verdict.
 
@@ -63,7 +68,7 @@ opened.
 It was called pruning until 2026-07-29. The owner renamed it because the
 scope was always all three jobs, and pruning only names the first.
 
-## It executes, and it no longer only reports (owner ruling 2026-08-25)
+## It executes, and it no longer only reports
 
 THE OWNER'S FRAMING: everything that is just a refactor, the overhaul does
 itself. Everything that is a new function, it seeds an iteration for.

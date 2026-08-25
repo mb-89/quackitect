@@ -7,7 +7,7 @@ Lives in `guidance/authoring/`. The three layers are:
 - the engine — code
 
 The authoring rules for drawn machines. Written after the first canvas
-shipped with paths Obsidian could not resolve (owner fix 2026-07-26) — so
+shipped with paths Obsidian could not resolve — so
 the mistakes stay fixed. Follow this EVERY time a canvas is created or
 edited; the compiler enforces most of it and refuses loudly, but layout and
 paths it can only partially check.
@@ -117,7 +117,7 @@ Two types exist today:
 - `script` — args are scripts the engine runs, and exit 0 is the evidence.
   The STATE names what runs, as boot does with its preflight and selftest.
 
-THE PULL GATES ENTRY (owner ruling 2026-07-26): outside boot, entering a
+THE PULL GATES ENTRY: outside boot, entering a
 state also demands its pulled guidance proven read, the same way — hashes
 from the agent, checks from the human. Boot is exempt (it is where the
 first reads happen); a state's own `exit_read` list is excluded from its
@@ -182,7 +182,7 @@ visibility — only conditions gate. Never author `pulled`.
 - A NEW NODE IS BORN THE SIZE OF ITS LABEL. Make it just big enough for the
   title and the subtitle. Nothing more.
 - The old rule sized a node to display its whole NOTE, around 620 × 640. It
-  is struck (owner ruling 2026-07-28). A note-reading box is far too big for
+  is struck. A note-reading box is far too big for
   what a machine drawing shows.
 - THE SIZE YOU DRAW IS THE SIZE THAT RENDERS. The render takes the geometry
   verbatim now. Adjust a node in Obsidian and the mirror agrees on reload.

@@ -64,8 +64,7 @@ minor_note: |
   ONE QUESTION SURVIVES AT THIS SIZE: the goal system. A minor cannot move
   the big idea, the to-be world or the pitch - a product whose identity
   changed is not a minor - so the form drops those three mechanically
-  (owner ruling 2026-08-13) rather than asking anyone to answer them
-  briefly.
+  rather than asking anyone to answer them briefly.
 
   WHAT IS STILL WORTH ASKING: a delta can pull an existing goal against
   another one. Naming that conflict, and ruling which wins, is cheap here

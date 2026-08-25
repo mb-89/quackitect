@@ -81,7 +81,7 @@ restated here.
 THE BACKGROUND TABLE IS ITS OWN PANEL (tasks.md) and the sidebar draws it
 under everything, including the note row. Its height follows how many jobs are
 running, so anywhere else it would push the controls below it up and down
-while a person is reaching for one (owner ruling 2026-08-23).
+while a person is reaching for one.
 
 A NEW CONTROL BELONGS IN THIS FILE, not after that one. `renderSidebar` in
 `deliverable/engine/params.ts` fixes the order, so adding a row here can never
