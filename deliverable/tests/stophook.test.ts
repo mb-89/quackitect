@@ -14,36 +14,44 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
+import { decide } from "../engine/bin/se-hook-stop.ts";
 import { freshRoot } from "./helpers.ts";
 
 const HOOK = fileURLToPath(new URL("../engine/bin/se-hook-stop.ts", import.meta.url));
 
-/** Run the hook against a crafted root, feeding the stop payload.
+/** A crafted product root holding only the call log the hook reads.
  *
  *  `mode` writes the settings file the hook reads to learn whether anybody is
  *  there to read a claim. Omitted, no settings file is written at all, which
  *  is the case a real session must survive. */
-function verdict(records: object[], payload: object, mode?: string): string {
+function craftRoot(records: object[], mode?: string): string {
   const root = mkdtempSync(join(tmpdir(), "se-stop-"));
   mkdirSync(join(root, ".se"), { recursive: true });
   writeFileSync(join(root, ".se", "calls.jsonl"), `${records.map((r) => JSON.stringify(r)).join("\n")}\n`, "utf8");
   if (mode !== undefined) writeFileSync(join(root, ".se", "settings.json"), JSON.stringify({ mode }), "utf8");
-  const r = spawnSync(process.execPath, [HOOK], {
-    input: JSON.stringify(payload),
-    encoding: "utf8",
-    env: { ...process.env, SE_HOOK_ROOT: root },
-    windowsHide: true,
-  });
-  // THE WHOLE SPAWN GOES IN THE MESSAGE. This assertion fired once under the
-  // parallel battery with an empty stderr, and "stderr:" followed by nothing
-  // said only that the hook wrote nothing. Signal, stdout and the spawn error
-  // are what tell a killed process from a crashed one.
-  assert.equal(
-    r.status,
-    0,
-    `the hook always exits clean — signal ${String(r.signal)}, error ${r.error?.message ?? "none"}, stdout ${JSON.stringify(r.stdout)}, stderr ${JSON.stringify(r.stderr)}`,
-  );
-  return r.stdout.trim();
+  return root;
+}
+
+/** What the hook decides: the JSON it would write, or empty for a pass.
+ *
+ *  ASKED IN THIS PROCESS. Every case used to spawn a node that type-stripped
+ *  the hook again — twenty processes to answer twenty questions. Under the
+ *  parallel battery one of them exited 1 having written nothing at all, and no
+ *  amount of reading the hook explained it, because the hook never ran.
+ *
+ *  THE SPAWN IS STILL PROVEN, once, at the bottom of this file. That case is
+ *  for the WIRING — stdin, stdout, exit code. Every other case is about the
+ *  DECISION, and a decision needs no process. */
+function verdict(records: object[], payload: object, mode?: string): string {
+  const held = process.env.SE_HOOK_ROOT;
+  process.env.SE_HOOK_ROOT = craftRoot(records, mode);
+  try {
+    const v = decide(JSON.stringify(payload));
+    return v.block ? JSON.stringify({ decision: "block", reason: v.reason ?? "" }) : "";
+  } finally {
+    if (held === undefined) delete process.env.SE_HOOK_ROOT;
+    else process.env.SE_HOOK_ROOT = held;
+  }
 }
 
 const pullRecord = (response: object): object => ({
@@ -294,4 +302,43 @@ test("a REAL pull carries the notch, and the hook obeys it end to end", async ()
 
   // And with nothing refused the walk can still go on, so the stop is refused.
   assert.notEqual(verdict([pullRecord(packet)], {}), "", "under `blockers only` an unrefused pull is not a blocker");
+});
+
+// THE ONE CASE THAT SPAWNS, and the only thing it is about is the WIRING.
+//
+// EVERY OTHER CASE ABOVE ASKS `decide` IN THIS PROCESS. That is what a decision
+// is, and it needs no process. What a process still proves is the three things
+// a function cannot: the payload arrives on stdin, the block lands on stdout,
+// and the exit code is clean whatever was decided.
+//
+// ONE SPAWN, NOT TWENTY. The old file paid for a node per case, each one
+// type-stripping the hook again, and under the parallel battery one of them
+// occasionally exited 1 having written nothing.
+test("the entrypoint reads stdin, writes the block to stdout, and always exits clean", () => {
+  const blocking = craftRoot([pullRecord({ pull: "do", where: ["retro"] })]);
+  const spawned = spawnSync(process.execPath, [HOOK], {
+    input: JSON.stringify({}),
+    encoding: "utf8",
+    env: { ...process.env, SE_HOOK_ROOT: blocking },
+    windowsHide: true,
+  });
+  assert.equal(
+    spawned.status,
+    0,
+    `the hook always exits clean — signal ${String(spawned.signal)}, error ${spawned.error?.message ?? "none"}, stderr ${JSON.stringify(spawned.stderr)}`,
+  );
+  const d = JSON.parse(spawned.stdout.trim()) as { decision: string; reason: string };
+  assert.equal(d.decision, "block", "the decision reached stdout");
+  assert.match(d.reason, /"do" at retro/, "and it is the same reason the function gives");
+
+  // A PASS WRITES NOTHING AT ALL. An empty stdout is how the host reads consent.
+  const passing = craftRoot([pullRecord({ pull: "wait", where: ["front_desk"] })]);
+  const quiet = spawnSync(process.execPath, [HOOK], {
+    input: JSON.stringify({}),
+    encoding: "utf8",
+    env: { ...process.env, SE_HOOK_ROOT: passing },
+    windowsHide: true,
+  });
+  assert.equal(quiet.status, 0);
+  assert.equal(quiet.stdout.trim(), "", "a sanctioned stop is silent consent");
 });

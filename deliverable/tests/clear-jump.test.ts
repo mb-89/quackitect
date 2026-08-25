@@ -15,38 +15,28 @@ import { strict as assert } from "node:assert";
 import { describe, test } from "node:test";
 import { Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
-import { call, checkDocs, creditReading, freshRoot } from "./helpers.ts";
+import { call, sharedDesk } from "./helpers.ts";
 
-/** Boot to idle with BOTH proofs in hand.
+/** ONE BOOTED SESSION FOR THE WHOLE FILE, reset between cases.
  *
- *  The human's proof is checkDocs. The AGENT's is earned by reading through
- *  the lane: `.se/reading.md` IS the reading, and reading it credits every
- *  document it carries.
+ *  EVERY CASE HERE NEEDS THE SAME THING: a session standing at the front desk
+ *  with both read proofs in hand. That costs about 900 ms alone and seven
+ *  seconds under the parallel battery, and this file paid it eight times — 65
+ *  of the battery's 361 seconds, the largest single share of any file.
  *
- *  IT IS READ PAGED, NOT WHOLE (i6). One whole-file read worked until the
- *  guidance corpus crossed the read cap on 2026-08-16 — 120,452 characters
- *  against 120,000. Every read was then refused, nothing was credited, and
- *  these cases failed pointing at front_desk while having nothing to do with
- *  front_desk.
- *
- *  Both are needed here because a sweep on the agent channel weighs the
- *  agent's reading, and boot alone leaves that owed. */
+ *  THE CASES RUN SERIALLY, and that is not a preference. One session cannot be
+ *  in two places, so neither `describe` below carries `concurrency: true`. */
 async function bootBoth(): Promise<{ s: Session; server: ReturnType<typeof buildServer> }> {
-  const root = freshRoot();
-  const s = new Session(root);
-  checkDocs(s);
-  for (let i = 0; i < 10; i++) {
-    if (s.active()[0] === "front_desk") break;
-    await s.advance();
-  }
-  assert.equal(s.active()[0], "front_desk", "boot did not reach the front desk");
-
-  const server = buildServer(root, s);
-  await creditReading(server, call);
-  return { s, server };
+  const desk = await sharedDesk(
+    (root) => new Session(root) as never,
+    (root, s) => buildServer(root, s as unknown as Session),
+    call,
+  );
+  await desk.reset();
+  return { s: desk.s as unknown as Session, server: desk.server as ReturnType<typeof buildServer> };
 }
 
-describe("a clear jump is one call", { concurrency: true }, () => {
+describe("a clear jump is one call", () => {
   test("go: false aims WITHOUT moving — the direction-only call remains", async () => {
     const { s, server } = await bootBoth();
     const before = s.active();

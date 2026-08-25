@@ -843,7 +843,15 @@ export function startMirror(o: MirrorOptions): Server {
     },
   };
 
-  const WIDGETS = new Set(["machine", "details", "log", "terminal", "table", "trace"]);
+  // THE WIDGETS STAY, AND THE WHOLE PAGE DOES NOT.
+  //
+  // A WIDGET IS THE SIDEBAR. The editor's panes are these routes, framed. Take
+  // them away and the surface people actually use goes with them.
+  //
+  // THE PAGE WAS A SECOND INTERFACE NOBODY USED, and its cost was never the
+  // code. An agent would fix a pane, open the standalone page, see the fix, and
+  // report the interface repaired — while the sidebar still showed the fault.
+  const WIDGETS = new Set(["machine", "details", "log", "terminal", "table", "trace", "controls"]);
 
   // RENDER FIRST, THEN WRITE THE HEAD. See the note at the dispatcher's catch.
   const serveWidget = (widget: string, url: URL, res: Res): void => {
@@ -878,27 +886,6 @@ export function startMirror(o: MirrorOptions): Server {
     }
     res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
     res.end(html);
-  };
-
-  // GET / — tick without arguments: information about where we are.
-  // ?view=<machine> browses a machine without moving the walk.
-  const servePage = (url: URL, res: Res): void => {
-    state.lastPacket = state.session.packet();
-    const page = renderMirror(
-      state,
-      undefined,
-      url.searchParams.get("view") ?? undefined,
-      url.searchParams.get("card") ?? undefined,
-      url.searchParams.get("embed") === "1",
-      undefined,
-      url.searchParams.get("tp") ?? undefined,
-      url.searchParams.get("tt") ?? undefined,
-      url.searchParams.get("tq") ?? undefined,
-      url.searchParams.get("tc") ?? undefined,
-      url.searchParams.get("to") ?? undefined,
-    );
-    res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
-    res.end(page);
   };
 
   /** True when a POST table answered the request. */
@@ -973,15 +960,16 @@ export function startMirror(o: MirrorOptions): Server {
         serveWidget(widget, url, res);
         return;
       }
-      // AN UNKNOWN POST ANSWERS 404, NEVER THE PAGE. The fallthrough used to
-      // serve the page to every method, so a retired route kept returning a
-      // 200 full of HTML and its caller kept believing in it.
-      if (req.method !== "GET" && req.method !== "HEAD") {
-        res.writeHead(404, { "content-type": "text/plain; charset=utf-8" });
-        res.end(`no such route: ${req.method} ${url.pathname}`);
-        return;
-      }
-      servePage(url, res);
+      // NO WHOLE PAGE IS SERVED HERE ANY MORE. `/` used to answer with the
+      // entire mirror, and every unknown GET fell through to it.
+      //
+      // WHAT REMAINS: `/mcp`, `/widget/*` — which IS the editor's sidebar — and
+      // the API those panes read and post their controls to.
+      //
+      // AND `se_shoot` STILL DRAWS THE SURFACE, without HTTP in the path at
+      // all, while `se_surface` prints the same facts as text.
+      res.writeHead(404, { "content-type": "text/plain; charset=utf-8" });
+      res.end(`no such route: ${req.method ?? "GET"} ${url.pathname}`);
     } catch (e) {
       // A BLACK WINDOW IS THE WORST WAY TO REPORT A FAULT, and it is what this
       // used to do. The 200 head went out BEFORE the render ran, so a throw

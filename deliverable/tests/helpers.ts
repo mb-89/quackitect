@@ -390,6 +390,71 @@ export async function creditReading(
   }
 }
 
+/** A BOOTED SESSION, BUILT ONCE FOR A WHOLE FILE.
+ *
+ *  WHY THIS EXISTS. Standing a session at the front desk with both read proofs
+ *  in hand costs about 900 ms of pure I/O: 400 to lay down the product tree,
+ *  330 to read the guidance corpus, the rest to compile and walk. Under the
+ *  parallel battery that same work takes seven seconds, because forty-two files
+ *  are doing it at once. A file paying it per case pays it eight times.
+ *
+ *  MEASURED: clear-jump.test.ts spent 65 of the battery's 361 seconds, and
+ *  every one of its eight cases opened with the identical boot.
+ *
+ *  IT CANNOT BE COPIED, and that was tried first. The walk's position and BOTH
+ *  read proofs live on the Session, not on disk — a fresh session opened on a
+ *  copy of a booted root lands back at `start` owing three reads. So the thing
+ *  that is shared is the session itself.
+ *
+ *  SO THE CASES SHARE ONE, AND EACH RESETS IT. `reset()` walks back to the
+ *  front desk in about 100 ms, against 900 for a fresh boot.
+ *
+ *  A FILE USING THIS RUNS ITS CASES SERIALLY. One session cannot be in two
+ *  places, so `describe` must not carry `concurrency: true`. */
+export interface SharedDesk {
+  s: SessionLike;
+  server: unknown;
+  /** Walk back to the front desk, so the next case starts where the last began. */
+  reset: () => Promise<void>;
+}
+
+type SessionLike = {
+  active: () => string[];
+  advance: () => Promise<unknown>;
+  humanCheck: (p: string) => unknown;
+  packet: () => unknown;
+};
+
+let deskPromise: Promise<SharedDesk> | undefined;
+
+export function sharedDesk(
+  makeSession: (root: string) => SessionLike,
+  makeServer: (root: string, s: SessionLike) => unknown,
+  call: (s: never, name: string, args: Record<string, unknown>) => Promise<{ body: Record<string, unknown> }>,
+): Promise<SharedDesk> {
+  deskPromise ??= (async (): Promise<SharedDesk> => {
+    const root = freshRoot();
+    const s = makeSession(root);
+    checkDocs(s);
+    for (let i = 0; i < 10; i++) {
+      if (s.active()[0] === "front_desk") break;
+      await s.advance();
+    }
+    if (s.active()[0] !== "front_desk") throw new Error(`boot did not reach the front desk, it reached ${s.active()[0]}`);
+    const server = makeServer(root, s);
+    await creditReading(server, call);
+    const reset = async (): Promise<void> => {
+      if (s.active()[0] === "front_desk") return;
+      await call(server as never, "se_aim", { to: "front_desk", go: true });
+      if (s.active()[0] !== "front_desk") {
+        throw new Error(`the shared desk could not be reset — it stands at ${s.active().join(", ")}`);
+      }
+    };
+    return { s, server, reset };
+  })();
+  return deskPromise;
+}
+
 /** The guidance root documents, derived from the folder rather than named. A
  *  doc joins the set by existing there — the same rule checkDocs uses, so the
  *  two cannot drift apart. */

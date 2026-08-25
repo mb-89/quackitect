@@ -189,7 +189,6 @@ export interface GreenPass {
   corpus?: Map<string, ReturnType<typeof loadTrace>>;
   version?: Map<string, string>;
   done: Map<string, string[]>;
-  iterations: Map<MachineDecl, Iteration | undefined>;
   /** WHEN EACH CLAIM WAS SIGNED, collected once for the whole operation. One
    *  operation paints more than once, and reading every claim's signature per
    *  call put recordDone at 1117 ms over 200 nodes against a 1000 ms budget —

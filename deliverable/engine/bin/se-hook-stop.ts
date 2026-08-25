@@ -62,7 +62,12 @@ import { recordLifecycle } from "../lifecycle.ts";
 // swallow-everything exit made a broken check look like a permitted stop.
 //
 // The env override is the test seam — the suite points the hook at a crafted log.
-const root = process.env.SE_HOOK_ROOT ?? resolve(dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
+// READ PER CALL, NOT AT LOAD. A check asks the decision about several crafted
+// roots inside one process, and a constant captured at import time would pin
+// every one of them to whichever root happened to be set first.
+function hookRoot(): string {
+  return process.env.SE_HOOK_ROOT ?? resolve(dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
+}
 
 // The newest pull can carry a whole document, so the tail window is wide.
 const TAIL_BYTES = 4 * 1024 * 1024;
@@ -84,7 +89,7 @@ function tailOf(path: string): string {
 let cachedLines: string[] | undefined;
 
 function logLines(): string[] {
-  cachedLines ??= tailOf(join(root, ".se", "calls.jsonl")).split("\n");
+  cachedLines ??= tailOf(join(hookRoot(), ".se", "calls.jsonl")).split("\n");
   return cachedLines;
 }
 
@@ -100,7 +105,7 @@ function logLines(): string[] {
 const RUNNING_WINDOW_MS = 30 * 60 * 1000;
 
 function runningWork(): string | undefined {
-  const dir = join(root, ".se", "test-jobs");
+  const dir = join(hookRoot(), ".se", "test-jobs");
   if (!existsSync(dir)) return undefined;
   for (const name of readdirSync(dir)) {
     if (!name.endsWith(".jsonl")) continue;
@@ -134,13 +139,28 @@ function bitesOnce(payload: string): boolean {
  *  refuse. Nothing was written either way, so nobody could see it.
  *
  *  The record is the answer to "why did the hook not bite", asked afterwards. */
-function pass(why: string, detail = ""): never {
+function pass(why: string, detail = ""): Verdict {
   try {
-    recordLifecycle(root, "stop-pass", detail === "" ? why : `${why} — ${detail}`);
+    recordLifecycle(hookRoot(), "stop-pass", detail === "" ? why : `${why} — ${detail}`);
   } catch {
     // a hook must never break the turn
   }
-  process.exit(0);
+  return { block: false };
+}
+
+/** WHAT THE HOOK DECIDED. Blocking carries the reason the agent will read.
+ *
+ *  IT IS A VALUE, NOT AN EXIT. The decision used to call `process.exit` from
+ *  wherever it landed, so the ONLY way to ask what the hook thinks was to spawn
+ *  it and read its exit code.
+ *
+ *  WHAT THAT COST. Twenty cases, twenty node processes, each type-stripping
+ *  this file again — and under the parallel battery one of them occasionally
+ *  exited 1 having written nothing at all, which no amount of reading the hook
+ *  could explain. A red that vanishes on a re-run teaches people to re-run. */
+export interface Verdict {
+  block: boolean;
+  reason?: string;
 }
 
 /** IS ANYBODY THERE TO READ A CLAIM? Absent, the answer is yes: an attended
@@ -148,7 +168,7 @@ function pass(why: string, detail = ""): never {
  *  session into an unattended one. */
 function sessionMode(): string {
   try {
-    const raw = readFileSync(join(root, ".se", "settings.json"), "utf8");
+    const raw = readFileSync(join(hookRoot(), ".se", "settings.json"), "utf8");
     const m = (JSON.parse(raw) as { mode?: unknown }).mode;
     return typeof m === "string" && m !== "" ? m : "attended";
   } catch {
@@ -186,7 +206,7 @@ function blockedByRunningWork(): boolean {
     "how far along, how many failed, and the first failures by name. Read it there, act on the verdict, then stop.";
   process.stdout.write(`${JSON.stringify({ decision: "block", reason })}\n`);
   try {
-    recordLifecycle(root, "stop-block", `a test run is still going: ${busy}`);
+    recordLifecycle(hookRoot(), "stop-block", `a test run is still going: ${busy}`);
   } catch {
     // The block is already written, so the decision stands either way. Guarded
     // like the one in pass(), so a throw here cannot relabel a block an error.
@@ -320,13 +340,15 @@ function notchSanction(notch: string, last: LastPull, at: string): [string, stri
   return undefined;
 }
 
-let raw = "";
-process.stdin.setEncoding("utf8");
-process.stdin.on("data", (c: string) => {
-  raw += c;
-});
-process.stdin.on("end", () => {
-  try {
+/** THE WHOLE DECISION, from the payload and whatever the root holds.
+ *
+ *  EXPORTED SO A CHECK CAN ASK IT DIRECTLY, in this process, with no spawn in
+ *  the way. Point `SE_HOOK_ROOT` at a crafted log and call it. */
+export function decide(payload: string): Verdict {
+  // THE CALL LOG IS READ ONCE PER DECISION, not once per process. A second ask
+  // about a second root must not be served the first root's log.
+  cachedLines = undefined;
+  {
     // A BACKGROUND RUN STILL GOING OUTRANKS EVERY SANCTIONED STOP BELOW. Its
     // verdict is seconds away and nobody reads a job nobody asked about, so a
     // turn that ends first throws the answer away.
@@ -334,18 +356,18 @@ process.stdin.on("end", () => {
     // A RUN THAT NEVER FINISHES COSTS ONE WINDOW, NOT THE SESSION. Only a run
     // started inside the window counts as going, so a hung one stops blocking
     // by itself.
-    if (blockedByRunningWork()) process.exit(0);
+    if (blockedByRunningWork()) return { block: false };
     const last = lastPull() ?? {};
     const pull = last.pull;
-    if (pull === undefined) pass("no pull on record", "the engine never ran here");
+    if (pull === undefined) return pass("no pull on record", "the engine never ran here");
     // see dsp-boot-and-power.md#the-notch-decides
     const notch = typeof last.stop_at === "string" ? last.stop_at.trim().toLowerCase() : "";
     // The valve may release a question about a standing blocker. It cannot
     // release a newer runnable pull under blockers only.
-    if (bypassesStop(raw, notch, sessionMode())) pass("bites once per stop", "this stop was already blocked once");
+    if (bypassesStop(payload, notch, sessionMode())) return pass("bites once per stop", "this stop was already blocked once");
     const at = Array.isArray(last.where) ? (last.where as unknown[]).map(String).join(", ") : String(last.where ?? "");
     const sanctioned = notchSanction(notch, last, at);
-    if (sanctioned !== undefined) pass(sanctioned[0], sanctioned[1]);
+    if (sanctioned !== undefined) return pass(sanctioned[0], sanctioned[1]);
     // A TARGET IS A STANDING INSTRUCTION FROM THE PERSON. While one is set,
     // the walk has somewhere to be, and "nothing to route" is false whatever
     // the desk answered.
@@ -355,7 +377,7 @@ process.stdin.on("end", () => {
     // see dsp-boot-and-power.md#the-desk-with-nothing-routed-is-the-machines-own
     const atDesk = at.split(",").some((w) => w.trim() === "front_desk");
     if (target === "" && (pull === "wait" || atDesk)) {
-      pass("nothing routed", `no target, and the pull answered "${pull}"${at === "" ? "" : ` at ${at}`}`);
+      return pass("nothing routed", `no target, and the pull answered "${pull}"${at === "" ? "" : ` at ${at}`}`);
     }
     const where = at;
     const aimed = pull === "wait";
@@ -379,35 +401,57 @@ process.stdin.on("end", () => {
       "Once the plan has the go, execute the whole of it without asking again. " +
       "Being unsure is not one. Having a lot left is not one. Having just finished a piece is not one. " +
       "Stopping for one of the four? Say which, in one line, and stop again — this tooth bites once per stop.";
-    process.stdout.write(
-      JSON.stringify({
-        decision: "block",
-        reason:
-          prefix +
-          (aimed
-            ? `[se] A target is set (${target}) and the walk is not on it` +
-              (where !== "" ? `, standing at ${where}` : "") +
-              '. The pull answered "wait" because nothing routed FROM HERE, which is not the same as nothing to do. ' +
-              "Take the door that leads toward the target and keep walking. " +
-              SANCTIONED
-            : `[se] The walk stands mid-work: the last pull answered "${pull}"` +
-              (where !== "" ? ` at ${where}` : "") +
-              ". A report is not a checkpoint and size is not a reason — call se_pull and keep walking. " +
-              SANCTIONED),
-      }),
-    );
     // The veto is now observable after the fact. Without a line here, a turn
     // the hook ended looks exactly like one the transport ended.
-    recordLifecycle(root, "stop-block", where === "" ? pull : `${pull} at ${where}`);
-  } catch (err) {
-    // A HOOK MUST NEVER BREAK THE TURN, so the failure is swallowed — but it is
-    // no longer silent. A swallowed throw permits the stop, which is the exact
-    // shape of the root-path defect this file already carries a scar from.
     try {
-      recordLifecycle(root, "stop-error", String(err).slice(0, 300));
+      recordLifecycle(hookRoot(), "stop-block", where === "" ? pull : `${pull} at ${where}`);
     } catch {
-      // nothing left to try
+      // a hook must never break the turn
     }
+    return {
+      block: true,
+      reason:
+        prefix +
+        (aimed
+          ? `[se] A target is set (${target}) and the walk is not on it` +
+            (where !== "" ? `, standing at ${where}` : "") +
+            '. The pull answered "wait" because nothing routed FROM HERE, which is not the same as nothing to do. ' +
+            "Take the door that leads toward the target and keep walking. " +
+            SANCTIONED
+          : `[se] The walk stands mid-work: the last pull answered "${pull}"` +
+            (where !== "" ? ` at ${where}` : "") +
+            ". A report is not a checkpoint and size is not a reason — call se_pull and keep walking. " +
+            SANCTIONED),
+    };
   }
-  process.exit(0);
-});
+}
+
+// THE ENTRYPOINT, and the only place that touches a stream or an exit code.
+// Everything above is a question with an answer.
+//
+// ONLY WHEN RUN AS THE PROGRAM. A check imports this file to ask `decide`, and
+// wiring stdin there would leave a listener holding the runner's own input
+// open — a test process that finishes its cases and never exits.
+if (process.argv[1] !== undefined && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  let raw = "";
+  process.stdin.setEncoding("utf8");
+  process.stdin.on("data", (c: string) => {
+    raw += c;
+  });
+  process.stdin.on("end", () => {
+    try {
+      const verdict = decide(raw);
+      if (verdict.block) process.stdout.write(JSON.stringify({ decision: "block", reason: verdict.reason ?? "" }));
+    } catch (err) {
+      // A HOOK MUST NEVER BREAK THE TURN, so the failure is swallowed — but it
+      // is no longer silent. A swallowed throw permits the stop, which is the
+      // exact shape of the root-path defect this file carries a scar from.
+      try {
+        recordLifecycle(hookRoot(), "stop-error", String(err).slice(0, 300));
+      } catch {
+        // nothing left to try
+      }
+    }
+    process.exit(0);
+  });
+}
