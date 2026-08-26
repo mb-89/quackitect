@@ -1,11 +1,11 @@
 ---
 form: evaluate-architecture
-amended: "2026-08-20T07:30:44.632Z by agent — the v3 merge brought ten new quality scenarios; each is ruled here"
+amended: 2026-08-20T07:30:44.632Z by agent — the v3 merge brought ten new quality scenarios; each is ruled here
 by: agent
 signed_off: 2026-08-20T08:26:47.481Z
-reopened: "2026-08-20T08:26:38.394Z — a feeder re-signed above it"
+reopened: 2026-08-20T08:26:38.394Z — a feeder re-signed above it
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / evaluate-architecture

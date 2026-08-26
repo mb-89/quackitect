@@ -6,7 +6,7 @@ statement: A person waiting on work that has passed its bound can tell from the 
 method: demonstration
 demonstrates:
   - sty-the-slow-call-that-says-it-is-working
-verifies: "none — demonstrates carries the edge; req-work-past-its-bound-says-it-is-working is verify method test and is carried by tsp-work-past-its-bound-signals"
+verifies: none — demonstrates carries the edge; req-work-past-its-bound-says-it-is-working is verify method test and is carried by tsp-work-past-its-bound-signals
 files:
   - none — the procedure below is the definition, because the pass is what a person perceives while waiting
 ---

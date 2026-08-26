@@ -1,10 +1,10 @@
 ---
 form: derive-functions
-reopened: "2026-08-19T11:16:57.499Z — write-requirements was re-signed after one row was split into the reader half, so this state answered ground that moved"
+reopened: 2026-08-19T11:16:57.499Z — write-requirements was re-signed after one row was split into the reader half, so this state answered ground that moved
 by: agent
 signed_off: 2026-08-19T11:16:57.967Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / derive-functions

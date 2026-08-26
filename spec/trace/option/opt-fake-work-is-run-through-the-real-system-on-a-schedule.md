@@ -5,8 +5,8 @@ type: "[[option]]"
 cluster: cluster-the-benchmark-run
 question: how a run is triggered
 found_by: prior-art
-statement: "Scripted work is pushed through the live system at intervals, its output discarded and its timing kept, so a regression shows up before a person notices it."
-source: "ref-agent-benchmark-harnesses-2026 \u2014 synthetic monitoring in application performance tooling; RECALLED rather than fetched"
+statement: Scripted work is pushed through the live system at intervals, its output discarded and its timing kept, so a regression shows up before a person notices it.
+source: ref-agent-benchmark-harnesses-2026 — synthetic monitoring in application performance tooling; RECALLED rather than fetched
 ---
 
 ## What it buys

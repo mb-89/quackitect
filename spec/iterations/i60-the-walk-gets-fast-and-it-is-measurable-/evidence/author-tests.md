@@ -4,7 +4,7 @@ by: agent
 signed_off: 2026-08-24T17:39:33.015Z
 reopened: "2026-08-24T17:34:56.059Z — The owner ruled reopen. Three specs were amended after their tests and two moved away from requirements that were left standing, so the spec layer and the requirement layer disagree. The failed-route requirement also carries a contradiction the owner has struck: its measure demands that reporting no route costs no more than reporting one, which no graph search can satisfy, and the test under it asserts the opposite ordering. The owner's ruling is to rework or remove it, and to leave no requirement standing with a contradiction in it."
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / author-tests

@@ -1,10 +1,10 @@
 ---
 form: derive-functions
-reopened: "2026-08-21T12:28:49.957Z — write-requirements was re-signed after the reviewed use-case audit. The empty function derivation must be re-signed against that current input."
+reopened: 2026-08-21T12:28:49.957Z — write-requirements was re-signed after the reviewed use-case audit. The empty function derivation must be re-signed against that current input.
 by: agent
 signed_off: 2026-08-21T12:29:04.320Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / derive-functions

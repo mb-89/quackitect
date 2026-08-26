@@ -4,9 +4,9 @@ id: opt-difficulty-splits-into-judgement-and-reading
 type: "[[option]]"
 cluster: the-sizing
 question: what shape the difficulty has
-statement: "difficulty is two numbers rather than one — how hard the judgement is and how much has to be read to make it — because a step can be extreme in either without being hard in the other"
+statement: difficulty is two numbers rather than one — how hard the judgement is and how much has to be read to make it — because a step can be extreme in either without being hard in the other
 found_by: transform
-source: "SIT Division applied to cluster-the-sizing — split the difficulty and rearrange what depends on each part"
+source: SIT Division applied to cluster-the-sizing — split the difficulty and rearrange what depends on each part
 ---
 
 ## Mechanism

@@ -1,11 +1,11 @@
 ---
 form: gate-kickoff
 bless: blessed by agent
-amended: "2026-08-26T10:57:34.278Z by agent — Two sentences in the merged form contradicted the scope box and the run's own facts, and both are corrected without changing what the gate rules."
+amended: 2026-08-26T10:57:34.278Z by agent — Two sentences in the merged form contradicted the scope box and the run's own facts, and both are corrected without changing what the gate rules.
 by: agent
 signed_off: 2026-08-26T10:55:45.549Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / gate-kickoff

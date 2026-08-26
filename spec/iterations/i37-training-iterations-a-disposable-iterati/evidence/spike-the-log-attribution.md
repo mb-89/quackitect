@@ -2,9 +2,9 @@
 form: spike-the-log-attribution
 by: agent
 signed_off: 2026-08-19T20:19:50.563Z
-reopened: "2026-08-19T20:19:50.160Z — rank-unknowns re-signed above the sub-machine, so every spike claim is re-stamped against the same ground"
+reopened: 2026-08-19T20:19:50.160Z — rank-unknowns re-signed above the sub-machine, so every spike claim is re-stamped against the same ground
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / spike-the-log-attribution

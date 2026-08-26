@@ -3,11 +3,11 @@ minted_in: i5-engine-hygiene-one-version-source-every-
 id: raid-asm-a-host-shows-the-output-of-a-command-that-exits-at-once
 type: "[[raid]]"
 kind: assumption
-statement: "A host that runs the entrypoint hands back the output of a command that prints one line and exits immediately."
+statement: A host that runs the entrypoint hands back the output of a command that prints one line and exits immediately.
 owner: the maintainer
 trigger: the first release check run on a host other than the developing machine
 status: open
-impact: "The version check prints into nothing. The release step reports a pass because the process exited zero, and nobody sees that the line was never read."
+impact: The version check prints into nothing. The release step reports a pass because the process exited zero, and nobody sees that the line was never read.
 breaks_how_badly: abrasive
 how_likely: conceivable
 probed: 2026-08-19

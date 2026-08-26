@@ -3,7 +3,7 @@ form: generalize-use-cases
 by: agent
 signed_off: 2026-08-24T16:00:55.282Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / generalize-use-cases

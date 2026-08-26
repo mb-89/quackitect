@@ -3,9 +3,9 @@ minted_in: i36
 id: tsp-interrupted-call-names-the-stopping-layer
 type: "[[test-spec]]"
 statement: A lane call that ends without a normal result reports which layer ended it — server, transport, host or stop hook — or reports the layer as unknown, and never infers a cause nobody observed.
-method: "test"
+method: test
 verifies:
-  - "req-interrupted-call-names-the-stopping-layer"
+  - req-interrupted-call-names-the-stopping-layer
 files:
   - tests/stophook.test.ts
   - tests/ptyend.test.ts

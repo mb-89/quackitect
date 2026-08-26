@@ -4,7 +4,7 @@ by: agent
 signed_off: 2026-08-20T19:29:56.357Z
 reopened: "2026-08-20T19:29:52.465Z — the acting party is corrected: the walking agent reads a published complexity and acts on it by delegating the step to a subagent on a stronger hand. This form still carries the falsified claim that the receiver reads and cannot act."
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / evaluate-architecture

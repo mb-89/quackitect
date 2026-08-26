@@ -3,20 +3,20 @@ minted_in: i38-the-machine-sizes-its-own-driver-every-s
 id: raid-iss-the-live-read-rule-forbids-more-than-its-own-reason-needs
 type: "[[raid]]"
 kind: issue
-statement: "The fatal live-read requirement forbids pinning the complexity anywhere, but the harm it was written against is confined to the demand ledger, and the ledger is a narrow structure that a cell value cannot reach."
+statement: The fatal live-read requirement forbids pinning the complexity anywhere, but the harm it was written against is confined to the demand ledger, and the ledger is a narrow structure that a cell value cannot reach.
 owner: the walking agent
-trigger: "any candidate that carries the complexity on the compiled machine, which is every candidate riding the cell"
+trigger: any candidate that carries the complexity on the compiled machine, which is every candidate riding the cell
 looked: 2026-08-20
 closed: 2026-08-20
 status: closed
-impact: "As written the requirement rules out the cheapest implementation on the chart — three edits to code that already runs — and rules it out for a reason that does not apply to it. A must-priority constraint that over-reaches costs the design its best candidate at gate-candidates, silently, because a constraint is checked and not argued."
+impact: As written the requirement rules out the cheapest implementation on the chart — three edits to code that already runs — and rules it out for a reason that does not apply to it. A must-priority constraint that over-reaches costs the design its best candidate at gate-candidates, silently, because a constraint is checked and not argued.
 breaks_how_badly: degraded
 how_likely: expected
 probe: "MEASURED AT probe 4 AND CORRECTED AT gate-candidates, both 2026-08-20. THE FIRST READING WAS WRONG IN A WAY THAT MAKES THIS ISSUE NARROWER AND THE REQUIREMENT BETTER FOUNDED. It said a cell value reaches nothing in the demand ledger. One already does. engine/iterations.ts:294 builds each demand as three fields — an `applies`, an `evidence` and a `shape` — and the first of them IS the cell value for that column. engine/iterations.ts:356 reopens a record when the applies RANK rises, before shape or evidence is compared at :360 and :361. So the ledger admits a cell value today, it is ranked, and a rise in it reopens standing claims. WHAT SURVIVES, AND IT IS THE POINT: `demandsFor` at :289 builds the record from three NAMED things, so a fourth cell key carrying a complexity is ignored by construction and moves no demand. The conclusion holds; the reason given for it did not. AND THE CORRECTION CUTS BOTH WAYS: because the ledger already carries one cell value, admitting a second is a one-line edit somebody could make without seeing the reopen consequence, which is a sharper version of the fear the requirement was written from than the requirement itself states. engine/iterations.ts:329 shapeOf serialises four keys — depends_on sorted, busbar, seeds, runs — and a complexity key reaches none of those four. It reaches the compiled StateDecl, by the same path engine/rigor-matrix.ts:612 already uses for the cell's prose, and the compiled machine is written to the pin at iterations.ts:236. So the value would be PINNED, which the statement forbade WHEN THIS WAS WRITTEN and no longer does — the requirement was restated to its own harm on 2026-08-20 and the pin is legal — and would NOT move a demand, which is the only harm the requirement records."
 probed: 2026-08-20
 source_refs:
   - i38-the-machine-sizes-its-own-driver-every-s
-  - "probe 4 at find_by_probing, 2026-08-20"
+  - probe 4 at find_by_probing, 2026-08-20
 weighs_with: none
 weighs_against: none
 ---

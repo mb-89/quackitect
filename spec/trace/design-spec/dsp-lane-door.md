@@ -4,26 +4,26 @@ id: dsp-lane-door
 type: "[[design-spec]]"
 statement: the typed tool lane, carried by one registry of verbs with schemas, clauses and remedies
 realizes:
-  - "el-walk-engine"
-  - "if-walk-engine-to-query-evaluator"
-  - "if-walk-engine-to-coupling-disposer"
+  - el-walk-engine
+  - if-walk-engine-to-query-evaluator
+  - if-walk-engine-to-coupling-disposer
 files:
-  - "deliverable/engine/harness.ts"
-  - "deliverable/engine/payload-limit.ts"
-  - "deliverable/engine/tools.ts"
-  - "deliverable/engine/tools-file.ts"
-  - "deliverable/engine/tools-run.ts"
-  - "deliverable/engine/tools-desk.ts"
-  - "deliverable/engine/mcp.ts"
-  - "deliverable/engine/errors.ts"
-  - "deliverable/engine/discipline.ts"
-  - "deliverable/engine/promptlayer.ts"
-  - "deliverable/engine/params.ts"
-  - "deliverable/engine/bound.ts"
-  - "deliverable/engine/bin/se-mcp.ts"
-  - "deliverable/engine/bin/se-manual.ts"
-  - "deliverable/engine/tools-query.ts"
-  - "deliverable/engine/repeat.ts"
+  - deliverable/engine/harness.ts
+  - deliverable/engine/payload-limit.ts
+  - deliverable/engine/tools.ts
+  - deliverable/engine/tools-file.ts
+  - deliverable/engine/tools-run.ts
+  - deliverable/engine/tools-desk.ts
+  - deliverable/engine/mcp.ts
+  - deliverable/engine/errors.ts
+  - deliverable/engine/discipline.ts
+  - deliverable/engine/promptlayer.ts
+  - deliverable/engine/params.ts
+  - deliverable/engine/bound.ts
+  - deliverable/engine/bin/se-mcp.ts
+  - deliverable/engine/bin/se-manual.ts
+  - deliverable/engine/tools-query.ts
+  - deliverable/engine/repeat.ts
 ---
 
 ## The entrypoint answers what it is, before it answers anything else

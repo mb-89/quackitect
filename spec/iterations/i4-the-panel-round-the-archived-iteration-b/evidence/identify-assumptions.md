@@ -2,9 +2,9 @@
 form: identify-assumptions
 by: agent
 signed_off: 2026-08-23T16:54:46.768Z
-reopened: "2026-08-23T16:54:31.683Z — two assumptions ride the code this session shipped and the sweep missed both"
+reopened: 2026-08-23T16:54:31.683Z — two assumptions ride the code this session shipped and the sweep missed both
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / identify-assumptions

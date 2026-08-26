@@ -5,8 +5,8 @@ type: "[[requirement]]"
 statement: When a change maps to no test that answers for it, the product shall report which parts are unanswered rather than running every test it has.
 kind: functional
 verify_method: test
-measure: "a documents-only change starts zero test files, and the answer names every changed part that no test covers"
-breaks_if_removed: "Every documents-only edit fires the whole suite, which answers a question nobody asked and hides the fact that nothing answers the question that was asked."
+measure: a documents-only change starts zero test files, and the answer names every changed part that no test covers
+breaks_if_removed: Every documents-only edit fires the whole suite, which answers a question nobody asked and hides the fact that nothing answers the question that was asked.
 breaks_how_badly: corrosive
 priority: should
 weighs_against:

@@ -3,7 +3,7 @@ form: evaluate-architecture
 by: agent
 signed_off: 2026-08-19T13:41:58.818Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / evaluate-architecture

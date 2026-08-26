@@ -3,9 +3,9 @@ minted_in: i36
 id: tsp-stop-hook-yields-only-at-a-machine-stop
 type: "[[test-spec]]"
 statement: While the walk holds executable unblocked work the stop hook refuses to let the session end, and it yields only when the machine itself reports a wait, a blocker or a reached target.
-method: "test"
+method: test
 verifies:
-  - "req-stop-hook-yields-only-at-a-machine-stop"
+  - req-stop-hook-yields-only-at-a-machine-stop
 files:
   - tests/stophook.test.ts
 ---

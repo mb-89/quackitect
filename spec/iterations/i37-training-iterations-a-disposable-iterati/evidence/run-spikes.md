@@ -2,9 +2,9 @@
 form: run-spikes
 by: agent
 signed_off: 2026-08-20T09:07:05.355Z
-reopened: "2026-08-20T08:43:45.238Z — stale after rank-unknowns re-signed; the reopen is what puts the claim in a shape the pop can honour"
+reopened: 2026-08-20T08:43:45.238Z — stale after rank-unknowns re-signed; the reopen is what puts the claim in a shape the pop can honour
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / run-spikes

@@ -7,9 +7,9 @@ statement: The one demonstration this round owes watches a person browse the pan
 owner: the owner
 looked: 2026-08-25
 status: open
-breaks_how_badly: serious
+breaks_how_badly: crippling
 how_likely: expected
-impact: "The panel is what this round is about. Every other claim it makes is checked by the battery, which is green at 1803 of 1803. The one claim no machine can check is the one aimed squarely at the subject, and it stands unobserved."
+impact: The panel is what this round is about. Every other claim it makes is checked by the battery, which is green at 1803 of 1803. The one claim no machine can check is the one aimed squarely at the subject, and it stands unobserved.
 source_refs:
   - tsp-panel-walkthrough
   - raid-debt-ten-checks-wait-on-a-person-or-a-second-machine

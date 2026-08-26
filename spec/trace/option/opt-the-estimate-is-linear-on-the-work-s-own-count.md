@@ -5,7 +5,7 @@ type: "[[option]]"
 statement: the time remaining is elapsed time divided by the fraction of the work's own countable unit that is finished, and the measured error is on the safe side and shrinks as the work proceeds
 cluster: cluster-the-estimate
 found_by: probe
-source: "a probe run at i51 find_by_probing on 2026-08-21, replaying this session's own recorded run of 175 test files"
+source: a probe run at i51 find_by_probing on 2026-08-21, replaying this session's own recorded run of 175 test files
 ---
 
 ## Mechanism

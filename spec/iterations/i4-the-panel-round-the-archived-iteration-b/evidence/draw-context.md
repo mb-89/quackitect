@@ -1,10 +1,10 @@
 ---
 form: draw-context
-reopened: "2026-08-23T15:48:06.520Z — spawn-for-inputs was re-signed after it, so draw-context answered older ground"
+reopened: 2026-08-23T15:48:06.520Z — spawn-for-inputs was re-signed after it, so draw-context answered older ground
 by: agent
 signed_off: 2026-08-23T15:48:32.654Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / draw-context

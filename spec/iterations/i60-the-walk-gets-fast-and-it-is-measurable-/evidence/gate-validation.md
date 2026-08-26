@@ -1,11 +1,11 @@
 ---
 form: gate-validation
 bless: blessed by agent
-amended: "2026-08-24T20:03:36.720Z by agent — the verdict said pass while the must story is only partly demonstrated and four register entries stand open, which is an override rather than a clean pass"
+amended: 2026-08-24T20:03:36.720Z by agent — the verdict said pass while the must story is only partly demonstrated and four register entries stand open, which is an override rather than a clean pass
 by: agent
 signed_off: 2026-08-24T20:03:17.062Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / gate-validation

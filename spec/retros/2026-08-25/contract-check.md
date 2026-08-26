@@ -1,6 +1,6 @@
 ---
 id: retro-2026-08-25-contract-check
-statement: "The contract walked rule by rule against this window's recorded trail, with two breaches named."
+statement: The contract walked rule by rule against this window's recorded trail, with two breaches named.
 ---
 
 # Contract check — the window opening 2026-08-24T14:23:57Z

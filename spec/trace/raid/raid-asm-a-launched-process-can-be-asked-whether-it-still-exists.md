@@ -3,13 +3,13 @@ minted_in: i62-background-work-reports-its-own-end-the-
 id: raid-asm-a-launched-process-can-be-asked-whether-it-still-exists
 type: "[[raid]]"
 kind: assumption
-statement: "The engine can ask, cheaply and on both platforms, whether a process it launched still exists, without the process having been written to answer."
+statement: The engine can ask, cheaply and on both platforms, whether a process it launched still exists, without the process having been written to answer.
 owner: the maintainer
-trigger: "the first heartbeat implementation, and any move to a host the engine has not run on"
+trigger: the first heartbeat implementation, and any move to a host the engine has not run on
 status: probed
 looked: 2026-08-24
 probed: 2026-08-24
-impact: "The whole heartbeat rests on this. If existence cannot be asked without cooperation, the design collapses back to a timeout, which is a guess about something quiet and is exactly what this record set out to replace."
+impact: The whole heartbeat rests on this. If existence cannot be asked without cooperation, the design collapses back to a timeout, which is a guess about something quiet and is exactly what this record set out to replace.
 breaks_how_badly: fatal
 how_likely: conceivable
 probe: "NOT PROBED YET. The probe is one measurement per platform: launch a child, let it exit, and check that the held handle reports it gone within one interval. The POSIX branch is the one to watch, because it has never run here. deliverable/engine/run.ts line 59 detaches on POSIX and not on Windows, and guidance/method/cloud-runner.md records that every machine that has run this engine was Windows."

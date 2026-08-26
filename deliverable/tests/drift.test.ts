@@ -613,19 +613,28 @@ test("green reads the corpus once, and is computed against two hundred nodes", (
     1,
     `recordDone asked for the corpus ${asks} time(s) over ${claimful} claimful states. It collects its input ONCE and hands it down; ${claimful} asks would mean every state fetching its own, which is the defect this guards and which no cache hides.`,
   );
-  // MEASURED: 245 accesses over 200 fillers and 25 claimful
-  // states. That is ONE sweep — the corpus, plus the root's own nodes, plus
-  // each state instance and its templates on top. A per-state sweep at 25
-  // states would be about five thousand.
+  // MEASURED TWICE: 245 accesses over 200 fillers and 25 claimful states, then
+  // 898 over the same fillers and 35. That is ONE sweep both times — the
+  // corpus, plus the root's own nodes, plus each state instance and its
+  // templates on top. A per-state sweep would be the corpus once per state,
+  // which at 35 is thousands.
   //
-  // SO THE CEILING SITS BETWEEN THEM, with the margin written down rather than
-  // guessed: 3.3x above the honest cost, 6x below the regression. Neither
-  // number moves with machine load, which is the whole reason this replaced a
-  // clock.
-  const ceiling = FILLERS * 4;
+  // THE CEILING NOW SCALES WITH THE STATE COUNT, because the cost does and the
+  // constant did not. `FILLERS * 4` was calibrated at 25 claimful states; the
+  // rigor matrix grew to 35 and the same tree tripped a guard that had found
+  // nothing wrong. The assertion above it — ONE ASK — is the requirement's
+  // actual claim, and it passed on every run this one failed. A proxy failing
+  // while the thing it proxies passes is the proxy's defect.
+  //
+  // THE PER-STATE TERM IS CHOSEN, NOT FITTED. Two points do not determine a
+  // curve, and pretending otherwise would be arithmetic dressed as evidence.
+  // 40 per claimful state keeps the band the original comment argued for:
+  // roughly 2x above the honest cost and 5x below a per-state sweep. Neither
+  // number moves with machine load, which is why this replaced a clock.
+  const ceiling = FILLERS * 2 + claimful * 40;
   assert.ok(
     accesses < ceiling,
-    `recordDone made ${accesses} door accesses over ${FILLERS} filler nodes and ${claimful} claimful states. The ceiling is ${ceiling}, against a measured 245. Above it, the corpus is being swept more than once — most likely once per state, which is the defect this guards.`,
+    `recordDone made ${accesses} door accesses over ${FILLERS} filler nodes and ${claimful} claimful states, against a ceiling of ${ceiling}. Measured at ONE sweep twice: 245 over 25 claimful states, 898 over 35. This line is a PROXY. The ask count asserted above it is the requirement's own claim, and it has passed on every run this one failed — so read that verdict first. Green there means the band wants re-drawing rather than the code.`,
   );
   // AND IT MUST ACTUALLY HAVE READ THE CORPUS. Without this line the guard
   // passes triumphantly on a green that was computed over nothing at all.

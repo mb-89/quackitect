@@ -6,7 +6,7 @@ statement: Ship one self-contained executable that needs no runtime on the machi
 cluster: the-bootstrap
 question: how the product reaches a machine that has nothing on it
 found_by: prior-art
-source: "live scan at i9's candidates gate, 2026-08-19 — what a self-contained binary and a multi-channel release actually look like in tools with users"
+source: live scan at i9's candidates gate, 2026-08-19 — what a self-contained binary and a multi-channel release actually look like in tools with users
 ---
 
 ## Mechanism

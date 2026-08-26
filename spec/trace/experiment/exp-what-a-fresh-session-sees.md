@@ -7,8 +7,8 @@ probes:
   - raid-ar-walk-resumes-from-repo
 timebox: 45 minutes
 form: script
-promote: "none"
-folds_to: "the operation record owes two fields, the state it belongs to and the total its progress divides into, plus a settle path that writes where a fresh session looks"
+promote: none
+folds_to: the operation record owes two fields, the state it belongs to and the total its progress divides into, plus a settle path that writes where a fresh session looks
 faked: The third standing itself, which is not built. What was measured instead is every place a running piece of work IS recorded today, and where a leaving script's verdict actually goes. Both are the real mechanisms, read off disk and off the source.
 fallback: If nothing durable can hold the third standing, the fallback is that a fresh session re-runs the judgment rather than trusting a word it cannot settle.
 verdict: falls

@@ -1,11 +1,11 @@
 ---
 form: scope-non-goals
-amended: "2026-08-19T12:45:21.205Z by agent — the M2 gate found the owner's no-migration-mechanism ruling missing from the exclusion list"
+amended: 2026-08-19T12:45:21.205Z by agent — the M2 gate found the owner's no-migration-mechanism ruling missing from the exclusion list
 by: agent
 signed_off: 2026-08-19T12:06:16.128Z
-reopened: "2026-08-19T12:05:44.987Z — The blessed goals changed twice above it — the collapse became the first goal and the column went major — so its scope list is for an iteration that no longer exists."
+reopened: 2026-08-19T12:05:44.987Z — The blessed goals changed twice above it — the collapse became the first goal and the column went major — so its scope list is for an iteration that no longer exists.
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / scope-non-goals

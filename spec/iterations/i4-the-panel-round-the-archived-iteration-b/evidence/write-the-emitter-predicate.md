@@ -3,7 +3,7 @@ form: write-the-emitter-predicate
 by: agent
 signed_off: 2026-08-23T18:31:14.396Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / write-the-emitter-predicate

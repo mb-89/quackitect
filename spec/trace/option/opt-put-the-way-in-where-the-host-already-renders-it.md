@@ -6,7 +6,7 @@ statement: Put the first instruction in a file some host already surfaces on its
 cluster: the-bootstrap
 question: how a newcomer is shown the one thing to run
 found_by: prior-art
-source: "GitHub content/repositories/.../about-readmes.md — a README in the root, the .github directory or docs is recognised and automatically surfaced to repository visitors; VS Code blogs/2022/03/08/the-tutorial-problem.md — a devcontainer file makes the editor prompt on open"
+source: GitHub content/repositories/.../about-readmes.md — a README in the root, the .github directory or docs is recognised and automatically surfaced to repository visitors; VS Code blogs/2022/03/08/the-tutorial-problem.md — a devcontainer file makes the editor prompt on open
 ---
 
 ## Mechanism

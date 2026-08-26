@@ -1,10 +1,10 @@
 ---
 form: build-steps
-reopened: "2026-08-21T13:37:45.608Z — All seeded chunks are signed, but the parent build-steps claim is stale and must be re-signed against the completed submachine."
+reopened: 2026-08-21T13:37:45.608Z — All seeded chunks are signed, but the parent build-steps claim is stale and must be re-signed against the completed submachine.
 by: agent
 signed_off: 2026-08-21T13:38:17.743Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / build-steps

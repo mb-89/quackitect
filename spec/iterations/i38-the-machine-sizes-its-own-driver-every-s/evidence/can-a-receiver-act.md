@@ -2,9 +2,9 @@
 form: can-a-receiver-act
 by: agent
 signed_off: 2026-08-20T19:35:46.114Z
-reopened: "2026-08-20T19:35:18.017Z — the verdict reversed"
+reopened: 2026-08-20T19:35:18.017Z — the verdict reversed
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / can-a-receiver-act

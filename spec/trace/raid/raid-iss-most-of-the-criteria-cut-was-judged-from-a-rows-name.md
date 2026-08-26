@@ -3,18 +3,18 @@ minted_in: i9
 id: raid-iss-most-of-the-criteria-cut-was-judged-from-a-rows-name
 type: "[[raid]]"
 kind: issue
-statement: "Ninety-nine criterion axes were cut as non-differentiating, twenty were checked against their written statements, and of the ten the gate re-read afterwards two were wrong."
+statement: Ninety-nine criterion axes were cut as non-differentiating, twenty were checked against their written statements, and of the ten the gate re-read afterwards two were wrong.
 owner: the driving agent
-trigger: "the next cut-criteria run, and before M5 leans on the surviving twelve"
+trigger: the next cut-criteria run, and before M5 leans on the surviving twelve
 status: open
-impact: "A wrongly cut axis is an axis no candidate is ever scored on. Two were found by sampling ten. Seventy-nine were never read at all, so the number still wrong is unknown rather than zero."
+impact: A wrongly cut axis is an axis no candidate is ever scored on. Two were found by sampling ten. Seventy-nine were never read at all, so the number still wrong is unknown rather than zero.
 breaks_how_badly: crippling
 how_likely: expected
 probe: "RUN AT i9, ALL 99 STATEMENTS READ, AND FIVE MORE WERE STRUCK WRONGLY. All five share one blind spot: the cut never checked the bootstrap cluster, where the third line deletes the installer AND the scaffold. Two of the five also carry a reason that does not engage their statement at all, and that reason is repeated verbatim across a block of adjacent rows. Four more are unsure and named."
 probed: 2026-08-19
 source_refs:
-  - "cut-criteria at i9, 2026-08-19, amended at the candidates gate the same day"
-  - "req-setup-stops-before-partial and req-close-leaves-trunk-clean, both restored"
+  - cut-criteria at i9, 2026-08-19, amended at the candidates gate the same day
+  - req-setup-stops-before-partial and req-close-leaves-trunk-clean, both restored
 ---
 
 ## What was measured

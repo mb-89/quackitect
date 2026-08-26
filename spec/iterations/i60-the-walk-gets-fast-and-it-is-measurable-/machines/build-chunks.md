@@ -1,37 +1,37 @@
 ---
 steps:
   - id: a-hop-carries-its-own-time
-    statement: "Every hop of a drawn route records what the drawing cost, and every search reports how many states it looked at, so a slow route names the slow hop instead of only its total"
+    statement: Every hop of a drawn route records what the drawing cost, and every search reports how many states it looked at, so a slow route names the slow hop instead of only its total
     depends_on: []
     realization: code
   - id: the-notch-reaches-the-tooth
-    statement: "The stop-at notch rides every pull so the stop hook can obey it, and the hook records all three of its outcomes so a stop it permitted can be told apart from one it failed to judge"
+    statement: The stop-at notch rides every pull so the stop hook can obey it, and the hook records all three of its outcomes so a stop it permitted can be told apart from one it failed to judge
     depends_on: []
     realization: code
   - id: the-built-surface-matches-its-source
-    statement: "The generated editor extension is rebuilt from its source, and a check refuses a committed build that its source no longer produces"
+    statement: The generated editor extension is rebuilt from its source, and a check refuses a committed build that its source no longer produces
     depends_on: []
     realization: code
   - id: pointing-keeps-the-reachability-answer
-    statement: "Pointing the walk draws its route and skips only the walking, because the measurement showed the drawing costs almost nothing and is the only thing that can say whether the target is reachable"
+    statement: Pointing the walk draws its route and skips only the walking, because the measurement showed the drawing costs almost nothing and is the only thing that can say whether the target is reachable
     depends_on:
       - a-hop-carries-its-own-time
     realization: code
   - id: the-drawer-tells-deciding-from-failed
-    statement: "The route drawer stops reading a step whose judgment is still being reached as a step that failed, so a route is not abandoned because an answer had not arrived yet"
+    statement: The route drawer stops reading a step whose judgment is still being reached as a step that failed, so a route is not abandoned because an answer had not arrived yet
     depends_on: []
     realization: code
   - id: a-record-that-holds-still-to-measure-against
-    statement: "A committed record of fixed size stands as the yardstick, so a walk that got slower can be told apart from a record that got bigger"
+    statement: A committed record of fixed size stands as the yardstick, so a walk that got slower can be told apart from a record that got bigger
     depends_on:
       - a-hop-carries-its-own-time
     realization: code
   - id: re-signing-an-answer-knocks-down-what-rests-on-it
-    statement: "Signing an answer again knocks down every answer that rested on it, so nothing keeps standing on ground that moved underneath it"
+    statement: Signing an answer again knocks down every answer that rested on it, so nothing keeps standing on ground that moved underneath it
     depends_on: []
     realization: code
   - id: a-score-cell-can-say-it-has-no-evidence
-    statement: "A score cell with nothing behind it says so in words, rather than carrying a number that reads exactly like a measured one"
+    statement: A score cell with nothing behind it says so in words, rather than carrying a number that reads exactly like a measured one
     depends_on: []
     realization: code
 ---

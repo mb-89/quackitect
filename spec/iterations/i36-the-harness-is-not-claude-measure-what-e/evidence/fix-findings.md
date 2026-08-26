@@ -2,9 +2,9 @@
 form: fix-findings
 by: agent
 signed_off: 2026-08-19T17:56:23.205Z
-reopened: "2026-08-19T17:53:31.497Z — Types and lint are not in the battery and no commit has run the pre-commit hook since the build edits, so round 0 cannot be answered from evidence."
+reopened: 2026-08-19T17:53:31.497Z — Types and lint are not in the battery and no commit has run the pre-commit hook since the build edits, so round 0 cannot be answered from evidence.
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / fix-findings

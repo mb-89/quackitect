@@ -6,7 +6,7 @@ statement: An agent holding a test run and a shell command makes one call and ge
 method: demonstration
 demonstrates:
   - sty-ask-once-what-is-still-running
-verifies: "none — demonstrates carries the edge; req-one-call-reports-every-piece-of-work-out-of-sight is verify method test and is carried by the test-method specs beside it"
+verifies: none — demonstrates carries the edge; req-one-call-reports-every-piece-of-work-out-of-sight is verify method test and is carried by the test-method specs beside it
 files:
   - none — the procedure below is the definition, because the pass is what one real answer holds
 ---

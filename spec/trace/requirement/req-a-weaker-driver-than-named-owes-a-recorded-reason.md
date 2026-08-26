@@ -2,10 +2,10 @@
 minted_in: i38-the-machine-sizes-its-own-driver-every-s
 id: req-a-weaker-driver-than-named-owes-a-recorded-reason
 type: "[[requirement]]"
-statement: "Where a milestone is walked by a driver weaker than the one it named, the record shall carry a stated reason, and shall mark the milestone as unreasoned where none was given."
+statement: Where a milestone is walked by a driver weaker than the one it named, the record shall carry a stated reason, and shall mark the milestone as unreasoned where none was given.
 kind: functional
 verify_method: test
-breaks_if_removed: "The design's only safety rule becomes a convention. A cheap driver can walk a state rated above it and leave a record indistinguishable from one that was driven correctly, which is the exact failure the asymmetry was written to stop."
+breaks_if_removed: The design's only safety rule becomes a convention. A cheap driver can walk a state rated above it and leave a record indistinguishable from one that was driven correctly, which is the exact failure the asymmetry was written to stop.
 breaks_how_badly: crippling
 refines:
   - uc-let-the-machine-name-the-driver

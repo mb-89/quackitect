@@ -5,7 +5,7 @@ type: "[[test-spec]]"
 statement: A person at the autonomy bank's bottom rung drives every step themselves - the machine advances on their acts alone and never walks ahead of them, verified by demonstration at the live panel.
 method: demonstration
 verifies:
-  - "none — demonstrates sty-walk-it-by-hand carries the edge; the mechanics are test-verified by tsp-walk-discipline"
+  - none — demonstrates sty-walk-it-by-hand carries the edge; the mechanics are test-verified by tsp-walk-discipline
 demonstrates:
   - sty-walk-it-by-hand
 files:

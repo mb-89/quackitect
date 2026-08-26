@@ -3,7 +3,7 @@ form: the-tbd-sweep-is-mechanical
 by: agent
 signed_off: 2026-08-23T19:40:16.339Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / the-tbd-sweep-is-mechanical

@@ -3,7 +3,7 @@ form: mint-interface-entries
 by: agent
 signed_off: 2026-08-19T19:41:31.909Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / mint-interface-entries

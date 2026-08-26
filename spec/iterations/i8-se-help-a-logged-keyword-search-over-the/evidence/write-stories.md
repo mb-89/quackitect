@@ -3,7 +3,7 @@ form: write-stories
 by: agent
 signed_off: 2026-08-12T21:00:54.967Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / write-stories

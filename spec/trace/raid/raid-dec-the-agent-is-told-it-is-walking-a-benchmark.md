@@ -3,11 +3,11 @@ minted_in: i37-training-iterations-a-disposable-iterati
 id: raid-dec-the-agent-is-told-it-is-walking-a-benchmark
 type: "[[raid]]"
 kind: decision
-statement: "A benchmark run is never disguised as real work. The agent is told, and the claim the result makes is narrowed to match."
+statement: A benchmark run is never disguised as real work. The agent is told, and the claim the result makes is narrowed to match.
 owner: the owner
-trigger: "the first time a benchmark number is quoted as production behaviour rather than as process overhead"
+trigger: the first time a benchmark number is quoted as production behaviour rather than as process overhead
 status: decided
-impact: "An agent that knows its output is discarded works differently from one that does not, so the number understates. It is a floor rather than an estimate. Blinding would fix the transfer and would require the machine to lie to the agent it governs."
+impact: An agent that knows its output is discarded works differently from one that does not, so the number understates. It is a floor rather than an estimate. Blinding would fix the transfer and would require the machine to lie to the agent it governs.
 breaks_how_badly: crippling
 how_likely: expected
 weighs_with: none
@@ -16,7 +16,7 @@ source_refs:
   - req-the-benchmark-history-is-unreadable-while-a-run-is-bound
   - "owner ruling 2026-08-19: open, not blind"
   - "i37 find_analogy: blinding domains show the honest alternative is to state what an unblinded measurement supports"
-  - "ref-agent-benchmark-harnesses-2026"
+  - ref-agent-benchmark-harnesses-2026
 ---
 
 ## What it settles

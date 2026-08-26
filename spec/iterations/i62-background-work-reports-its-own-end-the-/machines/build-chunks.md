@@ -1,25 +1,25 @@
 ---
 steps:
   - id: the-registration-takes-the-live-end
-    statement: "A registration accepts the running process itself and the registry keeps it, so the account can ask whether the work is still there rather than waiting to be told"
+    statement: A registration accepts the running process itself and the registry keeps it, so the account can ask whether the work is still there rather than waiting to be told
     depends_on: []
     realization: code
   - id: the-workspace-is-taken-by-one-instance
-    statement: "An instance takes a workspace by binding the port that stands for it, a second instance is refused with what holds it, and nothing is written down that could outlive its holder"
+    statement: An instance takes a workspace by binding the port that stands for it, a second instance is refused with what holds it, and nothing is written down that could outlive its holder
     depends_on: []
     realization: code
   - id: the-work-closes-its-own-entry
-    statement: "A process that ends settles the entry it belongs to with the outcome it ended with, without waiting for anything else to notice"
+    statement: A process that ends settles the entry it belongs to with the outcome it ended with, without waiting for anything else to notice
     depends_on:
       - the-registration-takes-the-live-end
     realization: code
   - id: the-sweep-settles-what-is-gone
-    statement: "Every held process is asked whether it still exists, the ones that are gone are settled, and one that is alive and silent is left alone"
+    statement: Every held process is asked whether it still exists, the ones that are gone are settled, and one that is alive and silent is left alone
     depends_on:
       - the-registration-takes-the-live-end
     realization: code
   - id: the-bound-and-the-disagreement-are-recorded
-    statement: "Every entry carries the bound its wait will reach with the word saying where that figure came from, and a second settle that disagrees about the outcome leaves a trace instead of vanishing"
+    statement: Every entry carries the bound its wait will reach with the word saying where that figure came from, and a second settle that disagrees about the outcome leaves a trace instead of vanishing
     depends_on:
       - the-registration-takes-the-live-end
     realization: code

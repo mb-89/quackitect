@@ -1,19 +1,19 @@
 ---
 steps:
   - id: the-seed-made-total
-    statement: "compose cand-the-seed-made-total - the seams, the rough costs, and what it leans on"
+    statement: compose cand-the-seed-made-total - the seams, the rough costs, and what it leans on
     depends_on: []
     realization: document
   - id: the-derived-ladder
-    statement: "compose cand-the-derived-ladder - the seams, the rough costs, and what it leans on"
+    statement: compose cand-the-derived-ladder - the seams, the rough costs, and what it leans on
     depends_on: []
     realization: document
   - id: the-reader-beside-the-walk
-    statement: "compose cand-the-reader-beside-the-walk - the seams, the rough costs, and what it leans on"
+    statement: compose cand-the-reader-beside-the-walk - the seams, the rough costs, and what it leans on
     depends_on: []
     realization: document
   - id: the-receiver-decides
-    statement: "compose cand-whoever-holds-the-hands-decides - the seams, the rough costs, and what it leans on"
+    statement: compose cand-whoever-holds-the-hands-decides - the seams, the rough costs, and what it leans on
     depends_on: []
     realization: document
 ---

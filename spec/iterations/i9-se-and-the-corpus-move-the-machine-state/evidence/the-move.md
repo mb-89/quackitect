@@ -2,9 +2,9 @@
 form: the-move
 by: agent
 signed_off: 2026-08-20T10:55:06.406Z
-reopened: "2026-08-20T10:44:55.303Z — bundleStale compares modification times, which git does not preserve, so a fresh clone can be refused a launch for a current bundle"
+reopened: 2026-08-20T10:44:55.303Z — bundleStale compares modification times, which git does not preserve, so a fresh clone can be refused a launch for a current bundle
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / the-move

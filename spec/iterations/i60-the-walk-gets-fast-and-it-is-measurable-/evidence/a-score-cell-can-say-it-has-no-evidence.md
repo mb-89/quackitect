@@ -1,10 +1,10 @@
 ---
 form: a-score-cell-can-say-it-has-no-evidence
-amended: "2026-08-24T19:58:53.811Z by agent — this form describes the mean-over-scored-axes version, which a reviewer caught as the mirror bug and which was replaced; the check it called owed now exists"
+amended: 2026-08-24T19:58:53.811Z by agent — this form describes the mean-over-scored-axes version, which a reviewer caught as the mirror bug and which was replaced; the check it called owed now exists
 by: agent
 signed_off: 2026-08-24T17:58:57.826Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / a-score-cell-can-say-it-has-no-evidence

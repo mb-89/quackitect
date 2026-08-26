@@ -2,10 +2,10 @@
 form: run-candidates
 by: agent
 signed_off: 2026-08-20T17:01:33.830Z
-reopened: "2026-08-20T17:01:32.100Z — its report of the invented-state finding says two references where a search found five, which is the same undercount-by-eye the record has now made three times"
-amended: "2026-08-20T14:11:36.521Z by agent — three-of-four where four of four, and two shared cells where nine are shared"
+reopened: 2026-08-20T17:01:32.100Z — its report of the invented-state finding says two references where a search found five, which is the same undercount-by-eye the record has now made three times
+amended: 2026-08-20T14:11:36.521Z by agent — three-of-four where four of four, and two shared cells where nine are shared
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / run-candidates

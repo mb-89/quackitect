@@ -3,12 +3,12 @@ minted_in: i62-background-work-reports-its-own-end-the-
 id: raid-risk-two-closers-reach-one-entry-and-disagree
 type: "[[raid]]"
 kind: risk
-statement: "A run closing its own entry and a heartbeat closing the same entry can reach it at once, and the second closer can reopen or double-count what the first already settled."
+statement: A run closing its own entry and a heartbeat closing the same entry can reach it at once, and the second closer can reopen or double-count what the first already settled.
 owner: the maintainer
-trigger: "the first entry observed with two close records, and any change that adds a third way to close one"
+trigger: the first entry observed with two close records, and any change that adds a third way to close one
 status: open
 looked: 2026-08-24
-impact: "A reopened entry is the original fault wearing the fix's clothes. A double-counted one corrupts the figures the account reports, and those figures are what a walk acts on."
+impact: A reopened entry is the original fault wearing the fix's clothes. A double-counted one corrupts the figures the account reports, and those figures are what a walk acts on.
 breaks_how_badly: corrosive
 how_likely: plausible
 source_refs:

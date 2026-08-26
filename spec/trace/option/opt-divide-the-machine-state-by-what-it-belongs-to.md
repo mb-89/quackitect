@@ -6,7 +6,7 @@ statement: Split the machine-state folder by what each part belongs to, resolvin
 cluster: the-walk
 question: how everything agrees where the machine state is
 found_by: transform
-source: "SIT Division, applied to the incumbent"
+source: SIT Division, applied to the incumbent
 ---
 
 ## Mechanism

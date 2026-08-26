@@ -3,10 +3,10 @@ form: gate-kickoff
 bless: blessed by agent
 by: agent
 signed_off: 2026-08-23T15:06:23.002Z
-reopened: "2026-08-23T14:26:24.405Z — onboard-retro was re-signed after it, so gate-kickoff answered older ground"
-amended: "2026-08-23T12:39:02.523Z by agent — a pass-with-overrides verdict may not answer none, per meth-gate-review line 63; both overrides now carry a standing register entry"
+reopened: 2026-08-23T14:26:24.405Z — onboard-retro was re-signed after it, so gate-kickoff answered older ground
+amended: 2026-08-23T12:39:02.523Z by agent — a pass-with-overrides verdict may not answer none, per meth-gate-review line 63; both overrides now carry a standing register entry
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / gate-kickoff

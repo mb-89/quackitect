@@ -8,8 +8,8 @@ probes:
   - raid-risk-a-hop-that-finishes-later-makes-green-ambiguous
 timebox: 45 minutes
 form: script
-promote: "none"
-folds_to: "a reader needs the operation's start time on the standing itself, because a stale answer and a live window look identical without it"
+promote: none
+folds_to: a reader needs the operation's start time on the standing itself, because a stale answer and a live window look identical without it
 faked: Nothing. The run is a real `se_test` handoff over the real corpus, and both reads are of the real durable record on disk.
 fallback: If the record cannot mark an open window, the build owes a recorded start time on the operation, so a reader can tell a live window from a stale answer.
 verdict: falls

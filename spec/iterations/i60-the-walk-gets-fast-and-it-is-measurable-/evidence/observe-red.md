@@ -1,12 +1,12 @@
 ---
 form: observe-red
-amended: "2026-08-24T20:01:50.594Z by agent — one checked row records a red for a demand the round then reverted, and the line read as a live demand"
+amended: 2026-08-24T20:01:50.594Z by agent — one checked row records a red for a demand the round then reverted, and the line read as a live demand
 by: agent
 signed_off: 2026-08-24T17:55:29.477Z
 reopened: "2026-08-24T17:54:25.303Z — specify-build was re-signed after this state, so it answered older ground. What changed above it: the chunk drawing gained the four items the phase brief says are owed and the first drawing omitted, and three requirements were amended so each says what the spec under it actually checks. This state has something of its own to record too — the four added items were built before their red could be observed, which is a real break in the test-first order and belongs in its evidence rather than in a green box."
 judgment: passed at 2026-08-24T15:47:47.595Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / observe-red

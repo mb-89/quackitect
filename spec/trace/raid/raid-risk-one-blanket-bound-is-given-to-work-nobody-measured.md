@@ -3,14 +3,14 @@ minted_in: i62-background-work-reports-its-own-end-the-
 id: raid-risk-one-blanket-bound-is-given-to-work-nobody-measured
 type: "[[raid]]"
 kind: risk
-statement: "Every wait site takes the same thirty-minute default, so the bound measures duration rather than trouble and no site has yet chosen its own."
+statement: Every wait site takes the same thirty-minute default, so the bound measures duration rather than trouble and no site has yet chosen its own.
 owner: the maintainer
-trigger: "the first entry that expires while its work was healthy, and any wait site added without choosing a bound"
+trigger: the first entry that expires while its work was healthy, and any wait site added without choosing a bound
 status: open
 looked: 2026-08-24
 impact: "An expiry on healthy work costs a reader one wrong answer rather than the work itself, because a real ending replaces it. What it costs instead is trust in the outcome: a bound that fires on ordinary duration teaches a reader to ignore the word."
-breaks_how_badly: annoying
-how_likely: likely
+breaks_how_badly: abrasive
+how_likely: expected
 source_refs:
   - i62-background-work-reports-its-own-end-the-
 weighs_with: raid-risk-the-heartbeat-ends-a-process-that-is-alive-but-quiet

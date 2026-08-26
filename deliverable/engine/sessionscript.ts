@@ -337,6 +337,25 @@ export class Scripts {
     if (timer !== undefined) clearTimeout(timer);
   }
 
+  /**
+   * A VERDICT REACHED AGAINST THESE SCRIPTS THAT OUTLIVED THE PROCESS.
+   *
+   * THE RUNNER ALREADY CONSULTS IT, in scriptStart, to decide there is nothing
+   * to run. A checker that asked only the in-memory evidence then refused
+   * forever: the runner said nothing needed running and the checker said nothing
+   * had run, so a re-entered record could not leave any state whose exit carries
+   * a script. One truth, two readers, and they read different stores.
+   *
+   * THE STAMP IS COMPARED THE SAME WAY, so a verdict reached against different
+   * scripts cannot green a hop.
+   */
+  scriptPassedOnDisk(m: MachineDecl, s: StateDecl): boolean {
+    const scripts = [...(s.exit?.script ?? []), ...(s.entry?.script ?? [])];
+    if (scripts.length === 0) return false;
+    const onDisk = this.host.standingJudgment(m, s);
+    return onDisk?.verdict === "passed" && onDisk.stamp !== "" && onDisk.stamp === this.scriptStamp(scripts);
+  }
+
   /** WHERE A STEP STANDS, one word from a closed set of three.
    *  see dsp-the-work-account.md#behavior-and-constraints */
   scriptStanding(m: MachineDecl, s: StateDecl): "passed" | "not passed" | "deciding" {

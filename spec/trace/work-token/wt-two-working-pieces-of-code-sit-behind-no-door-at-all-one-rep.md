@@ -1,9 +1,9 @@
 ---
 id: wt-two-working-pieces-of-code-sit-behind-no-door-at-all-one-rep
 type: "[[work-token]]"
-statement: "Two working pieces of code sit behind no door at all. One reports which of three conditions a given folder is in. The other lists what a built system has altered by itself since it was made. Tests exercise both. No surface exposes either, so nobody can ask them anything. Give each an entry point, record it in the design corpus and in a use case, and widen the guard that hunts for unexposed entry points beyond the two making commands it covers today."
-ready_when: "ready when a record opens that may add lane verbs to the making commands"
-source: "note-c1c3a1142cb1"
+statement: Two working pieces of code sit behind no door at all. One reports which of three conditions a given folder is in. The other lists what a built system has altered by itself since it was made. Tests exercise both. No surface exposes either, so nobody can ask them anything. Give each an entry point, record it in the design corpus and in a use case, and widen the guard that hunts for unexposed entry points beyond the two making commands it covers today.
+ready_when: ready when a record opens that may add lane verbs to the making commands
+source: note-c1c3a1142cb1
 ---
 
 ## Why it stands

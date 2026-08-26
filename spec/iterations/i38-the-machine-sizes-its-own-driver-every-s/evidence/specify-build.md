@@ -4,7 +4,7 @@ by: agent
 signed_off: 2026-08-20T22:06:35.480Z
 reopened: "2026-08-20T22:06:33.792Z — author-tests was re-signed: a seventh spec, tsp-a-walk-opens-each-step-by-naming-the-hand-it-needs, carries the must story under demonstrates: — the law at gate-validation asked for it and the two inspection specs did not answer. Re-read against that."
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / specify-build

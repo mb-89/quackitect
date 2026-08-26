@@ -3,7 +3,7 @@ form: the-guarded-collapse
 by: agent
 signed_off: 2026-08-23T17:26:32.555Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / the-guarded-collapse

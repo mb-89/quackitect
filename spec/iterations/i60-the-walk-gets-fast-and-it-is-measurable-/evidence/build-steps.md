@@ -4,7 +4,7 @@ by: agent
 signed_off: 2026-08-24T18:00:00.919Z
 reopened: "2026-08-24T17:35:13.317Z — The owner ruled reopen and ruled that nothing leaves scope. Four of the seven items this phase's own brief says are owed here were not built and their withdrawal was recorded nowhere: the route-drawer repayment, the committed yardstick, the knock-down of answers that rest on a re-signed one, and the score cell that can say it has no evidence. The build drawing was authored after the build, so it listed exactly the work that happened and could not show the gap."
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / build-steps

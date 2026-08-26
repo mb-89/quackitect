@@ -6,7 +6,7 @@ statement: When a process the product launched exits, the product shall settle t
 kind: functional
 verify_method: test
 measure: "runs that exit normally and whose entry is still recorded as running one second later: zero. Kinds of launched work whose exit does not settle its own entry: zero."
-breaks_if_removed: "The heartbeat becomes the only guard, so every ordinary exit waits up to a full interval to be noticed and the account is wrong for that whole window."
+breaks_if_removed: The heartbeat becomes the only guard, so every ordinary exit waits up to a full interval to be noticed and the account is wrong for that whole window.
 breaks_how_badly: corrosive
 priority: must
 refines:

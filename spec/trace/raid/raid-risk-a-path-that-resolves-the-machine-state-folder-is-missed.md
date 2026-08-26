@@ -3,17 +3,17 @@ minted_in: i9
 id: raid-risk-a-path-that-resolves-the-machine-state-folder-is-missed
 type: "[[raid]]"
 kind: risk
-statement: "One place that builds a path from the machine-state folder is missed in the move, and it then reads an empty folder as a fresh start rather than as an error."
+statement: One place that builds a path from the machine-state folder is missed in the move, and it then reads an empty folder as a fresh start rather than as an error.
 owner: the driving agent
-trigger: "the first walk after the move, and again the first time a clone is made from a moved tree"
+trigger: the first walk after the move, and again the first time a clone is made from a moved tree
 status: open
-impact: "A missed caller writes to the old location or finds nothing at the new one. Finding nothing is the dangerous half, because an absent log or an absent set of notes looks exactly like a machine that has not run yet."
+impact: A missed caller writes to the old location or finds nothing at the new one. Finding nothing is the dangerous half, because an absent log or an absent set of notes looks exactly like a machine that has not run yet.
 breaks_how_badly: corrosive
 how_likely: plausible
-probe: "COUNTED. Forty-seven code sites in the engine, not the three the record claimed. One real resolver, three scripts that re-implement it, seventeen consumers and twenty-six hard-codes that never ask a resolver. Four more hard-codes outside the engine, one of them .gitignore. Twenty-four test files and about twenty documentation files name it directly."
+probe: COUNTED. Forty-seven code sites in the engine, not the three the record claimed. One real resolver, three scripts that re-implement it, seventeen consumers and twenty-six hard-codes that never ask a resolver. Four more hard-codes outside the engine, one of them .gitignore. Twenty-four test files and about twenty documentation files name it directly.
 probed: 2026-08-19
 source_refs:
-  - "the record claims the resolver is three lines; a search finds the folder path threaded as an argument through at least four other modules"
+  - the record claims the resolver is three lines; a search finds the folder path threaded as an argument through at least four other modules
   - raid-iss-this-records-cited-line-numbers-moved-under-it
 ---
 

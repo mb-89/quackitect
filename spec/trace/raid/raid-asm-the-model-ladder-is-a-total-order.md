@@ -3,9 +3,9 @@ minted_in: i38-the-machine-sizes-its-own-driver-every-s
 id: raid-asm-the-model-ladder-is-a-total-order
 type: "[[raid]]"
 kind: assumption
-statement: "The design treats models as a ladder where a higher rung is strictly better, so that asking for a stronger driver is always safe and needs no argument, while nothing establishes that model strength is a single ordered dimension."
+statement: The design treats models as a ladder where a higher rung is strictly better, so that asking for a stronger driver is always safe and needs no argument, while nothing establishes that model strength is a single ordered dimension.
 owner: the owner
-trigger: "the first time the fixed list is written and a rung has to be filled, and any occasion where a nominally stronger model does a rated state worse"
+trigger: the first time the fixed list is written and a rung has to be filled, and any occasion where a nominally stronger model does a rated state worse
 status: open
 impact: "If strength is not one dimension, the safety asymmetry has no meaning: escalating is not free, the recommendation cannot be read as a floor, and a list of one model per rung cannot express what the work actually needs."
 breaks_how_badly: corrosive

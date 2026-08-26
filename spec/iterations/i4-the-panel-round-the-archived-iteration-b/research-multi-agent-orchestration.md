@@ -1,6 +1,6 @@
 ---
 kind: research
-statement: "What the field knows about multi-agent orchestration, read against the four-walker session of 2026-08-23, and what this system should change."
+statement: What the field knows about multi-agent orchestration, read against the four-walker session of 2026-08-23, and what this system should change.
 ---
 
 # Multi-agent orchestration — prior art against a measured failure

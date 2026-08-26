@@ -3,11 +3,11 @@ minted_in: i60-the-walk-gets-fast-and-it-is-measurable-
 id: raid-iss-the-failed-route-test-asserts-the-converse-of-its-requirement
 type: "[[raid]]"
 kind: issue
-statement: "The requirement demands that reporting no route costs no more than reporting one, and the test under it asserts the opposite ordering; on the test's own fixture the requirement's measure is false while the test is green."
+statement: The requirement demands that reporting no route costs no more than reporting one, and the test under it asserts the opposite ordering; on the test's own fixture the requirement's measure is false while the test is green.
 owner: the driving agent
 trigger: it has happened, and a cold reviewer found it at the implementation gate
 status: closed
-impact: "A green test stands under a demand it contradicts. Anyone reading the trace sees the row verified, and the demand as written cannot be met by any graph search."
+impact: A green test stands under a demand it contradicts. Anyone reading the trace sees the row verified, and the demand as written cannot be met by any graph search.
 breaks_how_badly: corrosive
 how_likely: expected
 source_refs:

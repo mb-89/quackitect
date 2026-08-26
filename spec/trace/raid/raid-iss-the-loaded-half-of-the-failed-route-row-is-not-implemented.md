@@ -3,11 +3,11 @@ minted_in: i60-the-walk-gets-fast-and-it-is-measurable-
 id: raid-iss-the-loaded-half-of-the-failed-route-row-is-not-implemented
 type: "[[raid]]"
 kind: issue
-statement: "The spec that says a failed route answers no slower than a drawn one carries a step that runs both cases under load, and only the quiet case is implemented."
+statement: The spec that says a failed route answers no slower than a drawn one carries a step that runs both cases under load, and only the quiet case is implemented.
 owner: the driving agent
 trigger: it has happened, and a tester with fresh eyes found it at verification
 status: open
-impact: "The quiet case is the control and the loaded case is the actual condition. With only the control implemented, the row goes green while saying nothing about the situation it was written for."
+impact: The quiet case is the control and the loaded case is the actual condition. With only the control implemented, the row goes green while saying nothing about the situation it was written for.
 breaks_how_badly: corrosive
 how_likely: expected
 source_refs:

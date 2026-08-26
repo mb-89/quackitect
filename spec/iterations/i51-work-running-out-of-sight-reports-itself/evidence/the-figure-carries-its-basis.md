@@ -3,7 +3,7 @@ form: the-figure-carries-its-basis
 by: agent
 signed_off: 2026-08-21T11:16:48.976Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / the-figure-carries-its-basis

@@ -2,9 +2,9 @@
 form: probe-assumptions
 by: agent
 signed_off: 2026-08-19T11:30:32.353Z
-reopened: "2026-08-19T11:30:16.766Z — the probes field is a window on the register and was answered as prose; it is re-answered as the node table the field asks for"
+reopened: 2026-08-19T11:30:16.766Z — the probes field is a window on the register and was answered as prose; it is re-answered as the node table the field asks for
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / probe-assumptions

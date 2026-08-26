@@ -2,11 +2,11 @@
 minted_in: i37-training-iterations-a-disposable-iterati
 id: req-a-benchmark-run-modifies-no-record-and-appears-in-no-survey
 type: "[[requirement]]"
-statement: "While a benchmark run is bound, the engine shall change zero bytes of the iteration it re-walks, mint zero records, and add zero entries to the survey's counts."
+statement: While a benchmark run is bound, the engine shall change zero bytes of the iteration it re-walks, mint zero records, and add zero entries to the survey's counts.
 kind: constraint
 verify_method: inspection
 fitness_candidate: false
-breaks_if_removed: "A measuring instrument that alters what it measures corrupts the archive it depends on, and the pool stops being a record of what the project did."
+breaks_if_removed: A measuring instrument that alters what it measures corrupts the archive it depends on, and the pool stops being a record of what the project did.
 breaks_how_badly: fatal
 refines:
   - uc-measure-a-machine-change-against-a-finished-iteration

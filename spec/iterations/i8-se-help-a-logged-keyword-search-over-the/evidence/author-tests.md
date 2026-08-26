@@ -2,9 +2,9 @@
 form: author-tests
 by: agent
 signed_off: 2026-08-13T10:51:05.186Z
-reopened: "2026-08-13T10:50:32.151Z — sty-ask-the-lane-what-it-can-do's Deck evidence halves are empty, another gate-validation law gap to fix"
+reopened: 2026-08-13T10:50:32.151Z — sty-ask-the-lane-what-it-can-do's Deck evidence halves are empty, another gate-validation law gap to fix
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / author-tests

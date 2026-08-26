@@ -2,13 +2,13 @@
 minted_in: i37-training-iterations-a-disposable-iterati
 id: tsp-every-door-to-the-future-closes-while-a-run-is-bound
 type: "[[test-spec]]"
-statement: "From inside a bound run, every door to the future is shut by the lane itself — the git objects are absent and the previous reports are refused or omitted — and every one reopens when the run closes."
-method: "demonstration"
+statement: From inside a bound run, every door to the future is shut by the lane itself — the git objects are absent and the previous reports are refused or omitted — and every one reopens when the run closes.
+method: demonstration
 demonstrates:
-  - "sty-walk-a-past-tree-without-reaching-its-future"
+  - sty-walk-a-past-tree-without-reaching-its-future
 verifies: "none — demonstrates: carries the edge; the requirements behind this story are verify_method: test and are carried by the test-method specs beside it"
 files:
-  - "none — a demonstration performed against this repository's own archive; what it observes is a run, not a file"
+  - none — a demonstration performed against this repository's own archive; what it observes is a run, not a file
 ---
 
 ## Scope

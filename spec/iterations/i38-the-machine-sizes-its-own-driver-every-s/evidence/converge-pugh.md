@@ -4,7 +4,7 @@ by: agent
 signed_off: 2026-08-20T19:26:16.714Z
 reopened: "2026-08-20T19:26:14.848Z — gate-candidates was re-signed. This form's section headed 'What is inert, and it is inert for the third time' has the cause backwards: the axis was not inert, it forbade its own answer. Its Detail fixed the role vocabulary at two values, and every line on this chart is a design about which of two agents walks a step."
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / converge-pugh

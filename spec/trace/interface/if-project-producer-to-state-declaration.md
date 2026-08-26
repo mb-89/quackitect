@@ -12,7 +12,7 @@ form: call
 source_refs:
   - decompose-structure at i9, the element matrix's owed cell
   - raid-dec-a-produced-copy-is-built-from-an-include-list
-  - "probe P3 at i9 M4, 2026-08-19"
+  - probe P3 at i9 M4, 2026-08-19
 ---
 
 The crossing that makes the produced tree's exclusion derive rather than repeat.

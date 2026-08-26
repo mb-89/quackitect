@@ -1,10 +1,10 @@
 ---
 form: map-stakeholders
-reopened: "2026-08-23T15:50:05.781Z — spawn-for-inputs was re-signed after it, so map-stakeholders answered older ground"
+reopened: 2026-08-23T15:50:05.781Z — spawn-for-inputs was re-signed after it, so map-stakeholders answered older ground
 by: agent
 signed_off: 2026-08-23T15:50:29.092Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / map-stakeholders

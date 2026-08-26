@@ -3,7 +3,7 @@ form: boot-tolerates-stale-test-record
 by: agent
 signed_off: 2026-08-19T16:20:04.715Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / boot-tolerates-stale-test-record

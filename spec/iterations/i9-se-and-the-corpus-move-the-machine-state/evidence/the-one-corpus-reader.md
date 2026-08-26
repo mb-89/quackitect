@@ -2,9 +2,9 @@
 form: the-one-corpus-reader
 by: agent
 signed_off: 2026-08-20T10:56:08.633Z
-reopened: "2026-08-20T10:45:02.505Z — the four enumerated readers disagree on an unreadable file, nothing pins the count, and a private split survives in mirror.ts"
+reopened: 2026-08-20T10:45:02.505Z — the four enumerated readers disagree on an unreadable file, nothing pins the count, and a private split survives in mirror.ts
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / the-one-corpus-reader

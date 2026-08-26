@@ -1,6 +1,6 @@
 ---
 kind: method
-statement: "When the walk is stuck, invert the question. Ask what would have to be true for the blocked thing to work, instead of asking again why it does not."
+statement: When the walk is stuck, invert the question. Ask what would have to be true for the blocked thing to work, instead of asking again why it does not.
 ---
 
 ## Situation

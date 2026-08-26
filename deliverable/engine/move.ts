@@ -10,10 +10,10 @@
 // REPORTED rather than passed over — an empty `rewritten` must never be the
 // only thing distinguishing "no references" from "references left dangling".
 // Nothing is written unless the move itself succeeds.
-import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, statSync } from "node:fs";
 import { dirname, join, relative, sep } from "node:path";
 import { CLAUSES, Rejection } from "./errors.ts";
-import { guardRawNul } from "./files.ts";
+import { guardRawNul, guardWriteContent } from "./files.ts";
 import { forgetPath, writeNode } from "./notes.ts";
 import { isExcluded, resolveInRoot } from "./paths.ts";
 
@@ -114,6 +114,26 @@ export function fileMove(root: string, from: string, to: string): MoveResult {
   }
   const fromRel = relative(root, absFrom).split(sep).join("/");
   const toRel = relative(root, absTo).split(sep).join("/");
+  // A DIRECTORY REFUSES TYPED. `existsSync` is true for a folder, so reading
+  // the source below threw a raw EISDIR the caller could do nothing with.
+  if (statSync(absFrom).isDirectory()) {
+    throw new Rejection({
+      clause: CLAUSES.PATH_ESCAPE,
+      expected: "an existing FILE to move",
+      got: `${from} is a directory`,
+      remedy: {
+        tool: "se_file_list",
+        args: { dir: from },
+        note: "move its files one at a time. A directory move would leave every reference inside it unrewritten, which is the one thing this verb exists to prevent",
+      },
+      source: SRC,
+    });
+  }
+  // A MOVE IS A WRITE AT THE DESTINATION. Carrying a quiet file into
+  // deliverable/engine makes it engine source, so every content rule that
+  // governs the NEW path is asked before the rename lands. Before this stood
+  // here, move was the one write verb that asked nothing at all.
+  guardWriteContent(root, toRel, readFileSync(absFrom, "utf8"));
   mkdirSync(dirname(absTo), { recursive: true });
   renameSync(absFrom, absTo);
   forgetPath(absFrom);
@@ -160,6 +180,9 @@ export function fileMove(root: string, from: string, to: string): MoveResult {
     if (prose || source) {
       const r = applyPairs(content, prose ? pairs : sourcePairs);
       if (r.count > 0 && r.after !== content) {
+        // THE SECOND PHASE IS A WRITE TOO, and it was the one path in the lane
+        // that asked nothing. One move rewrites an unbounded number of files.
+        guardWriteContent(root, rel, r.after);
         writeNode(abs, r.after);
         rewritten.push({ path: rel, replacements: r.count });
         content = r.after;

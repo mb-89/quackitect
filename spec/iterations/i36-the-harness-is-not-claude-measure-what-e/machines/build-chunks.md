@@ -1,48 +1,48 @@
 ---
 steps:
   - id: server-lifecycle-logging
-    statement: "PROMOTED from exp-copilot-connection-reset-keeps-server-alive - durable server lifecycle logging and an explicit HTTP keep-alive policy, so a transport reset is distinguishable from a server exit"
+    statement: PROMOTED from exp-copilot-connection-reset-keeps-server-alive - durable server lifecycle logging and an explicit HTTP keep-alive policy, so a transport reset is distinguishable from a server exit
     depends_on: []
     realization: code
   - id: harness-registry
-    statement: "One place naming every supported harness and the limits measured for it, read by the engine rather than copied into it"
+    statement: One place naming every supported harness and the limits measured for it, read by the engine rather than copied into it
     depends_on: []
     realization: code
   - id: harness-identification
-    statement: "The lane names which harness it is running in, and the name is available before the first work state"
+    statement: The lane names which harness it is running in, and the name is available before the first work state
     depends_on:
       - harness-registry
     realization: code
   - id: payload-limit-guard
-    statement: "No instruction text and no tool description served to a harness exceeds that harness's measured limit"
+    statement: No instruction text and no tool description served to a harness exceeds that harness's measured limit
     depends_on:
       - harness-registry
     realization: code
   - id: cage-inventory-check
-    statement: "The live tool inventory of a caged session holds zero native project tools and keeps the permitted web-search exception"
+    statement: The live tool inventory of a caged session holds zero native project tools and keeps the permitted web-search exception
     depends_on:
       - harness-registry
     realization: code
   - id: stopping-layer-report
-    statement: "A call ending without a normal result names the layer that ended it - server, transport, host or stop hook - or says unknown"
+    statement: A call ending without a normal result names the layer that ended it - server, transport, host or stop hook - or says unknown
     depends_on:
       - server-lifecycle-logging
     realization: code
   - id: bound-ties-to-measured-limit
-    statement: "The answer bound reads the smallest measured inline host limit, and cursor paging reconstructs the whole result byte for byte"
+    statement: The answer bound reads the smallest measured inline host limit, and cursor paging reconstructs the whole result byte for byte
     depends_on:
       - harness-registry
     realization: code
   - id: boot-tolerates-stale-test-record
-    statement: "Boot reaches the front desk over a stale or malformed test record, with no manual repair and no check silenced"
+    statement: Boot reaches the front desk over a stale or malformed test record, with no manual repair and no check silenced
     depends_on: []
     realization: code
   - id: recurring-failure-becomes-work
-    statement: "A non-misuse failure shape repeating inside the window mints exactly one piece of durable work carrying an owner and a trigger"
+    statement: A non-misuse failure shape repeating inside the window mints exactly one piece of durable work carrying an owner and a trigger
     depends_on: []
     realization: code
   - id: spill-is-per-server
-    statement: "The answer spill directory belongs to the server that wrote it, not to a module global, so parallel servers at different roots stop reading each other's spill"
+    statement: The answer spill directory belongs to the server that wrote it, not to a module global, so parallel servers at different roots stop reading each other's spill
     depends_on: []
     realization: code
 ---

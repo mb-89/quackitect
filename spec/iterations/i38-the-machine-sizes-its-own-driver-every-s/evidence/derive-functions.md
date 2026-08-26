@@ -2,9 +2,9 @@
 form: derive-functions
 by: agent
 signed_off: 2026-08-20T19:37:33.358Z
-reopened: "2026-08-20T19:37:26.416Z — generalize-use-cases was re-signed with the third correction to the acting party. Re-read against that."
+reopened: 2026-08-20T19:37:26.416Z — generalize-use-cases was re-signed with the third correction to the acting party. Re-read against that.
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / derive-functions

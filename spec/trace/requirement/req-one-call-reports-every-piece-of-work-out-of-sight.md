@@ -5,8 +5,8 @@ type: "[[requirement]]"
 statement: When asked what work is running, the product shall answer with every piece of work the session started, whatever kind it is, in one answer.
 kind: functional
 verify_method: test
-measure: "one call returns every piece of work the session started; the count of kinds the answer omits is zero"
-breaks_if_removed: "The caller asks each kind of work through a different door and can never know it has asked about all of them, so the only reliable strategy left is to keep asking."
+measure: one call returns every piece of work the session started; the count of kinds the answer omits is zero
+breaks_if_removed: The caller asks each kind of work through a different door and can never know it has asked about all of them, so the only reliable strategy left is to keep asking.
 breaks_how_badly: corrosive
 priority: must
 refines:

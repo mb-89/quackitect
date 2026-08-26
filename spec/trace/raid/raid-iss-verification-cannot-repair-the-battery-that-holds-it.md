@@ -3,9 +3,9 @@ minted_in: i62-background-work-reports-its-own-end-the-
 id: raid-iss-verification-cannot-repair-the-battery-that-holds-it
 type: "[[raid]]"
 kind: issue
-statement: "Verification's exit is the full battery and its tools are read-only, so a red battery holds the walk in a state that cannot fix what the battery found."
+statement: Verification's exit is the full battery and its tools are read-only, so a red battery holds the walk in a state that cannot fix what the battery found.
 owner: the maintainer
-trigger: "every record that reaches verification with a red battery, and any change to that state's tools or exit script"
+trigger: every record that reaches verification with a red battery, and any change to that state's tools or exit script
 status: open
 looked: 2026-08-24
 impact: "The walk oscillates between verification and fix-findings, and each crossing re-runs the whole battery. Measured on i62: verification took 97 calls and fix-findings 58, for a build that took 56."

@@ -1,10 +1,10 @@
 ---
 form: decompose-structure
-amended: "2026-08-21T10:19:09.851Z by agent — the allocation section did not record the two standing crossings the matrix demanded, nor the stale boundary claim that fixing them caught"
+amended: 2026-08-21T10:19:09.851Z by agent — the allocation section did not record the two standing crossings the matrix demanded, nor the stale boundary claim that fixing them caught
 by: agent
 signed_off: 2026-08-21T10:16:28.930Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / decompose-structure

@@ -7,9 +7,8 @@ statement: A conformance check bound to the trace corpus can run on every write 
 owner: the driving agent
 trigger: the first bound check that reads more than the file being written
 status: probed
-probed_on: 2026-08-16
-probe: Time a write through se_file_write with one corpus-reading check armed, on the largest realistic corpus. Compare against the same write with no check. If the armed write stays under a second, the write path carries the checks. If it does not, the checks move to a batched runner and the write reports rather than refuses.
-probed: 2026-08-16, and it HOLDS with two orders of magnitude of margin for a content-only check. The call log records duration_ms on every write. Twelve consecutive se_file_write calls of 2251 to 3086 bytes ran in 4 to 12 ms against a 1000 ms budget. What stays open is the corpus-READING half, which no check exercises yet.
+probed_on: 2026-08-26
+probe: holds with fifty times the headroom — reading 1782 corpus files before a write costs 18 to 20 ms against a 1000 ms bound
 impact: The whole thesis rests on it. Conformance runs at the WRITE precisely so a broken rule is heard when it is cheap. If a check cannot fit in a write, the checks fall back to a review and this iteration has rebuilt what it set out to replace.
 breaks_how_badly: crippling
 how_likely: plausible
@@ -66,3 +65,36 @@ One bound check whose armed write exceeds a second on this corpus.
 
 That single measurement settles it, and no amount of reasoning about
 caching substitutes for taking it.
+
+## Probe result, 2026-08-26
+
+HOLDS, WITH ABOUT FIFTY TIMES THE HEADROOM.
+
+`scratchpad/spikes.mjs` timed three shapes, three runs each, against the 1782
+files under `spec/trace`.
+
+| what was timed | three runs |
+| --- | --- |
+| a bare write | 0.1 / 0.1 / 0.3 ms |
+| a write after reading ONE file | 0.3 / 0.2 / 0.2 ms |
+| a write after reading the WHOLE corpus | 18.2 / 18.1 / 19.7 ms |
+
+THE BOUND IS 1000 ms PER ADMITTED CALL. A corpus-reading check at write time
+costs about 2% of it.
+
+WHAT THIS DOES TO A DESIGN CHOICE ALREADY MADE. i54's winning candidate was
+shaped so the write-time guard reads at most one file, and its cost section
+said a corpus-reading check had never been exercised. It has now, and it would
+have fitted.
+
+THE CHOICE IS NOT THEREBY WRONG. Reading one file is still cheaper, and the
+seam it buys — the two callers differing by REACH — is what the comparison was
+won on. What is no longer true is that the budget forced it.
+
+## Probe result, 2026-08-16
+
+The content-only half was measured first, and it HOLDS.
+
+The call log records `duration_ms` on every write. Twelve consecutive `se_file_write` calls of 2251 to 3086 bytes ran in 4 to 12 ms against a 1000 ms budget.
+
+What stayed open then was the corpus-READING half, which no check exercised. That half is measured in the 2026-08-26 section above.

@@ -5,7 +5,7 @@ type: "[[option]]"
 statement: the account of work out of sight rides on every answer the lane gives, so a caller doing other work learns a job finished without ever asking about it
 cluster: cluster-the-telling
 found_by: transform
-source: "SCAMPER Reverse and SIT Task Unification, via meth-scamper — invert who initiates, and give an existing answer a second job"
+source: SCAMPER Reverse and SIT Task Unification, via meth-scamper — invert who initiates, and give an existing answer a second job
 ---
 
 ## Mechanism

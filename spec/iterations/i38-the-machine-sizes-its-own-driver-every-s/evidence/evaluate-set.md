@@ -2,9 +2,9 @@
 form: evaluate-set
 by: agent
 signed_off: 2026-08-20T19:23:32.780Z
-reopened: "2026-08-20T19:22:35.519Z — cut-criteria was re-signed. A fourth scoring pass, cold and told only what changed, re-judged both account axes against the corrected acting party. Eight cells, eight holds — but the reasons under six of them move, and the reading of the twelve zeroes on req-acts-carry-role-and-channel is now the opposite of what this form recorded."
+reopened: 2026-08-20T19:22:35.519Z — cut-criteria was re-signed. A fourth scoring pass, cold and told only what changed, re-judged both account axes against the corrected acting party. Eight cells, eight holds — but the reasons under six of them move, and the reading of the twelve zeroes on req-acts-carry-role-and-channel is now the opposite of what this form recorded.
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / evaluate-set

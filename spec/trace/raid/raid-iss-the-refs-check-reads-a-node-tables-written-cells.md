@@ -3,11 +3,11 @@ minted_in: i5-engine-hygiene-one-version-source-every-
 id: raid-iss-the-refs-check-reads-a-node-tables-written-cells
 type: "[[raid]]"
 kind: issue
-statement: "The reference check reads the first two cells of a bound table's row, so a register whose second column holds ids has them checked as references of the wrong type."
+statement: The reference check reads the first two cells of a bound table's row, so a register whose second column holds ids has them checked as references of the wrong type.
 owner: the maintainer
 trigger: any evidence field bound as a node table whose columns carry ids, and any bound table whose live source is empty
 status: open
-impact: "The state cannot close. The refusal names every value in the column as the wrong kind of node, which reads as a corpus full of mistyped edges rather than as one check counting one cell too many."
+impact: The state cannot close. The refusal names every value in the column as the wrong kind of node, which reads as a corpus full of mistyped edges rather than as one check counting one cell too many.
 breaks_how_badly: corrosive
 how_likely: expected
 source_refs:

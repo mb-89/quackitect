@@ -6,7 +6,7 @@ statement: Route every corpus question through one reader whose answer is comput
 cluster: the-query
 question: how callers come to agree about the corpus
 found_by: contradiction
-source: "TRIZ separation IN TIME, on improving 27 Reliability against degrading 25 Loss of time"
+source: TRIZ separation IN TIME, on improving 27 Reliability against degrading 25 Loss of time
 ---
 
 ## Mechanism

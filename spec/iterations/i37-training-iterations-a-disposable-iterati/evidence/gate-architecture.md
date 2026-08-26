@@ -3,9 +3,9 @@ form: gate-architecture
 bless: blessed by agent
 by: agent
 signed_off: 2026-08-20T08:26:57.490Z
-reopened: "2026-08-20T08:26:53.581Z — a feeder re-signed above it"
+reopened: 2026-08-20T08:26:53.581Z — a feeder re-signed above it
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / gate-architecture

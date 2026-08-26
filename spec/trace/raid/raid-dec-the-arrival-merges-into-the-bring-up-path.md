@@ -5,14 +5,14 @@ type: "[[raid]]"
 kind: decision
 statement: "The arrival stops being a separate cluster: one path brings the product up, and whether a person is present becomes an input to it rather than a second code path."
 owner: the driving agent
-trigger: "before the merged path is built, and at any report of an agent believing it is caged when it is not"
+trigger: before the merged path is built, and at any report of an agent believing it is caged when it is not
 status: decided
 breaks_how_badly: fatal
 how_likely: plausible
 source_refs:
   - req-resume-needs-no-person
   - req-a-wrong-act-never-passes-silently
-  - "the function DSM edge this iteration created, from bringing the product up to the live lane the arrival consumes"
+  - the function DSM edge this iteration created, from bringing the product up to the live lane the arrival consumes
 ---
 
 ## Rejected options

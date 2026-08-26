@@ -3309,7 +3309,9 @@ export class Session {
       return this.claims.blockingNotes(markers).length === 0;
     }
     const ev = this.evidence.get(evidenceKey(m, s.id));
-    if (key === "script") return (ev?.script_result as { ok?: boolean } | undefined)?.ok === true;
+    // THE SAME QUESTION THE RUNNER ASKS, and it has to be, or the two disagree
+    // forever on a record re-entered after a reload.
+    if (key === "script") return (ev?.script_result as { ok?: boolean } | undefined)?.ok === true || this.scripts.scriptPassedOnDisk(m, s);
     return false;
   }
 

@@ -3,15 +3,15 @@ minted_in: i37-training-iterations-a-disposable-iterati
 id: raid-asm-the-rigor-matrix-hash-identifies-what-changes-walk-cost
 type: "[[raid]]"
 kind: assumption
-statement: "The rigor matrix hash stamped on a report identifies the machine's shape, so two reports carrying different hashes were taken on genuinely different machines and two carrying the same hash were not."
+statement: The rigor matrix hash stamped on a report identifies the machine's shape, so two reports carrying different hashes were taken on genuinely different machines and two carrying the same hash were not.
 owner: the maintainer of the machine
 trigger: the first comparison of two benchmark reports taken across a machine change
 status: open
 probed: 2026-08-20
-impact: "Two runs read as comparable when the machine moved underneath them, or as incomparable when it did not. The central question — does a weaker model on an improved machine do the same work — is answered against a control that does not control."
+impact: Two runs read as comparable when the machine moved underneath them, or as incomparable when it did not. The central question — does a weaker model on an improved machine do the same work — is answered against a control that does not control.
 breaks_how_badly: crippling
 how_likely: expected
-probe: "FALSE, read 2026-08-20. rigorMatrixContentHash in engine/rigor-matrix.ts hashes rows/*.md and nothing else. Guidance, form templates, item templates, method cards and the engine all change walk cost and none of them moves the hash."
+probe: FALSE, read 2026-08-20. rigorMatrixContentHash in engine/rigor-matrix.ts hashes rows/*.md and nothing else. Guidance, form templates, item templates, method cards and the engine all change walk cost and none of them moves the hash.
 source_refs:
   - i37-training-iterations-a-disposable-iterati
 weighs_with: none

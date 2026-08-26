@@ -3,11 +3,11 @@ minted_in: i60-the-walk-gets-fast-and-it-is-measurable-
 id: raid-risk-a-faster-walk-must-not-turn-a-red-hop-green
 type: "[[raid]]"
 kind: risk
-statement: "A change made to speed the walk skips a check rather than reusing its answer, so a hop that should have refused passes instead."
+statement: A change made to speed the walk skips a check rather than reusing its answer, so a hop that should have refused passes instead.
 owner: the driving agent
 trigger: any change that lets a hop be entered without its conditions being evaluated afresh, without a recorded verdict being found, or without the reading credit its state demands
 status: open
-impact: "The rigor is the product. A walk that checks less is a different and worse product wearing the same name, and nothing from outside can tell the two apart."
+impact: The rigor is the product. A walk that checks less is a different and worse product wearing the same name, and nothing from outside can tell the two apart.
 breaks_how_badly: fatal
 how_likely: plausible
 source_refs:

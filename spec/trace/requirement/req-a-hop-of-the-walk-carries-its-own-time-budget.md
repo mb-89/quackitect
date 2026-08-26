@@ -18,6 +18,9 @@ source_refs:
   - req-call-answers-in-one-second
 weighs_with:
   - req-call-answers-in-one-second ! — that bounds ONE answer at the lane's boundary, this bounds ONE HOP inside a walk; a call may hold many hops, so satisfying that one says nothing about this one
+  - req-responsiveness ! — that row is the budget table for a whole answer; a call may hold many hops, so meeting the table says nothing about any hop inside it
+  - req-aiming-returns-before-the-walking-starts ! — an aim walks nothing, so it contains no hop for this row to bound
+  - req-surface-answers-in-one-second ! — one is a transition inside the engine, the other a render at the mirror's HTTP boundary; different places, different instruments
 ---
 
 ## Scenario

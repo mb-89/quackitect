@@ -1,7 +1,7 @@
 ---
 steps:
   - id: tsp-panel-walkthrough
-    statement: "A person opens the panel, walks a record through it, and watches the surface stay where they left it."
+    statement: A person opens the panel, walks a record through it, and watches the surface stay where they left it.
     depends_on: []
     realization: demonstration
 ---

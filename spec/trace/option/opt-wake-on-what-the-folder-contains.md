@@ -6,7 +6,7 @@ statement: Let the host start the product only when the folder being opened cont
 cluster: the-bootstrap
 question: what happens when a folder is opened
 found_by: prior-art
-source: "VS Code api/references/activation-events.md — workspaceContains fires when a folder is opened and contains at least one file matching a glob"
+source: VS Code api/references/activation-events.md — workspaceContains fires when a folder is opened and contains at least one file matching a glob
 ---
 
 ## Mechanism

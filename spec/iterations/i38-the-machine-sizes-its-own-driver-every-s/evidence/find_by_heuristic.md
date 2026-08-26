@@ -1,10 +1,10 @@
 ---
 form: find_by_heuristic
-amended: "2026-08-20T14:10:08.944Z by agent — three where two confirmed a requirement, caught by reading this form's own sweep table"
+amended: 2026-08-20T14:10:08.944Z by agent — three where two confirmed a requirement, caught by reading this form's own sweep table
 by: agent
 signed_off: 2026-08-20T12:08:28.197Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / find_by_heuristic

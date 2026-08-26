@@ -4,18 +4,18 @@ id: dsp-live-register
 type: "[[design-spec]]"
 statement: notes as one live table, carried by base view files evaluated over the vault on every look
 realizes:
-  - "el-mirror"
+  - el-mirror
 files:
-  - "deliverable/engine/bases.ts"
-  - "deliverable/engine/basesclient.ts"
-  - "deliverable/engine/baseui.ts"
-  - "deliverable/engine/tables.ts"
-  - "deliverable/engine/vault.ts"
-  - "deliverable/engine/expr.ts"
-  - "deliverable/engine/expr-parse.ts"
-  - "deliverable/engine/expr-value.ts"
-  - "deliverable/engine/bin/format-vault.ts"
-  - "deliverable/engine/signals.ts"
+  - deliverable/engine/bases.ts
+  - deliverable/engine/basesclient.ts
+  - deliverable/engine/baseui.ts
+  - deliverable/engine/tables.ts
+  - deliverable/engine/vault.ts
+  - deliverable/engine/expr.ts
+  - deliverable/engine/expr-parse.ts
+  - deliverable/engine/expr-value.ts
+  - deliverable/engine/bin/format-vault.ts
+  - deliverable/engine/signals.ts
 ---
 
 ## Responsibility

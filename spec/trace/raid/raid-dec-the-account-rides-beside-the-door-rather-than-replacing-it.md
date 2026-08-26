@@ -9,7 +9,7 @@ trigger: the first completion a caller misses because it relied on a rider that 
 status: decided
 how_likely: plausible
 breaks_how_badly: crippling
-impact: "An absent rider is indistinguishable from a rider that was never emitted. A caller relying on the rider alone can miss a completion inside an answer that reported success, which is the forbidden shape of the fatal-graded axis."
+impact: An absent rider is indistinguishable from a rider that was never emitted. A caller relying on the rider alone can miss a completion inside an answer that reported success, which is the forbidden shape of the fatal-graded axis.
 source_refs:
   - req-one-call-reports-every-piece-of-work-out-of-sight
   - opt-the-account-rides-every-answer

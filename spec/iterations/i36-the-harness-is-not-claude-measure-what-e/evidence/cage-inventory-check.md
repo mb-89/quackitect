@@ -3,7 +3,7 @@ form: cage-inventory-check
 by: agent
 signed_off: 2026-08-19T16:41:14.979Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / cage-inventory-check

@@ -5,7 +5,7 @@ type: "[[option]]"
 statement: a reported time remaining is allowed to grow between two asks, and the report treats a rise as an ordinary revision rather than hiding it behind a counter that only falls
 cluster: cluster-the-estimate
 found_by: analogy
-source: "air traffic and scheduled transport, where an arrival estimate is revised in both directions in public — and this project's own meth-derive-criteria, which already rules the same way for its question counter"
+source: air traffic and scheduled transport, where an arrival estimate is revised in both directions in public — and this project's own meth-derive-criteria, which already rules the same way for its question counter
 ---
 
 ## Mechanism

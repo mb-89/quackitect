@@ -2,12 +2,12 @@
 minted_in: i38-the-machine-sizes-its-own-driver-every-s
 id: req-a-machine-decision-repeats
 type: "[[requirement]]"
-statement: "While the inputs a decision reads are unchanged, the engine shall return the same decision on every machine and at every repetition, and shall record what it read."
+statement: While the inputs a decision reads are unchanged, the engine shall return the same decision on every machine and at every repetition, and shall record what it read.
 kind: quality
 fitness_candidate: true
 characteristic: reliability
 verify_method: test
-breaks_if_removed: "A walk stops being replayable. Two machines given the same record reach different answers with nothing to say why, and a finished record can no longer be audited — only re-run and hoped over."
+breaks_if_removed: A walk stops being replayable. Two machines given the same record reach different answers with nothing to say why, and a finished record can no longer be audited — only re-run and hoped over.
 breaks_how_badly: crippling
 refines:
   - uc-quality-reliability
@@ -26,6 +26,30 @@ weighs_against:
   - req-the-answer-never-exceeds-its-bound >
 weighs_with: none
 ---
+
+## Scenario
+
+- Source: anybody re-deriving a decision the machine made - an auditor reading a
+  closed record, a second machine walking the same tree, the same machine
+  running again.
+- Stimulus: the decision is asked for a second time, with the inputs it reads
+  unchanged.
+- Artifact: the deciding part of the engine, and the record of what it read.
+- Environment: a different machine, a different session, or the same one
+  repeated. No process from the first answer survives.
+- Response: the same answer comes back, and the record names the inputs it was
+  derived from.
+- Response measure: differing answers over unchanged inputs = 0, across
+  repetitions and across machines. Answers whose recorded inputs are absent = 0.
+
+WHY THE SECOND HALF OF THE MEASURE IS THERE. An answer that repeats but cannot
+say what it read is reproducible only by luck, and nobody can tell whether it
+repeated because the inputs held or because nothing looked.
+
+THIS SECTION WAS ADDED IN i54, at evaluate-architecture. The row was minted
+without one, and the ATAM deck reported it as a card with nothing to judge. The
+six parts are derived from the statement and the two sections below; no demand
+is added or changed.
 
 ## Why this axis did not exist and why it is needed now
 

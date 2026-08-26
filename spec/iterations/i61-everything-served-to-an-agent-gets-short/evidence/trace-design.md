@@ -1,11 +1,11 @@
 ---
 form: trace-design
-reopened: "2026-08-24T18:01:32.048Z — The initial trace used a delimiter that treated each files list as one nonexistent path."
-amended: "2026-08-24T18:01:09.729Z by agent — Use the node-table list separator so each declared file resolves independently."
+reopened: 2026-08-24T18:01:32.048Z — The initial trace used a delimiter that treated each files list as one nonexistent path.
+amended: 2026-08-24T18:01:09.729Z by agent — Use the node-table list separator so each declared file resolves independently.
 by: agent
 signed_off: 2026-08-24T18:01:39.328Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / trace-design

@@ -3,11 +3,11 @@ minted_in: i60-the-walk-gets-fast-and-it-is-measurable-
 id: raid-risk-three-rounds-run-at-once-over-one-declaration-file
 type: "[[raid]]"
 kind: risk
-statement: "Three rounds run at the same time on three hands, and one file is reachable by two of them, so a landing can silently drop the other's work."
+statement: Three rounds run at the same time on three hands, and one file is reachable by two of them, so a landing can silently drop the other's work.
 owner: the owner, who assigns the hands
 trigger: the second of the two siblings preparing to land anything that touches the file where tools are declared
 status: open
-impact: "A dropped description reads as an oversight rather than a merge fault, so nobody looks for the rest of what went with it."
+impact: A dropped description reads as an oversight rather than a merge fault, so nobody looks for the rest of what went with it.
 breaks_how_badly: abrasive
 how_likely: plausible
 ---

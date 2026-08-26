@@ -3,7 +3,7 @@ form: the-bound-and-the-disagreement-are-recorded
 by: agent
 signed_off: 2026-08-24T16:30:36.921Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / the-bound-and-the-disagreement-are-recorded

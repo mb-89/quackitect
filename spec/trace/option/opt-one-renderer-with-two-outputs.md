@@ -6,7 +6,7 @@ statement: one renderer holds every widget, and an output adapter decides where 
 cluster: the-account
 question: how the walk is shown to a person
 found_by: contradiction
-source: "separation in condition, over the move that deletes the second surface"
+source: separation in condition, over the move that deletes the second surface
 ---
 
 ## The contradiction it dissolves

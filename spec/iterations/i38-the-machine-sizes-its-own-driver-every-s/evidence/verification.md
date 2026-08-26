@@ -4,7 +4,7 @@ by: agent
 signed_off: 2026-08-20T23:56:11.729Z
 reopened: "2026-08-20T23:56:09.727Z — trace-design was re-signed after this state: the machinery-ascends rule moved out of an engine comment and onto dsp-walk-machine.md, and tests/reopen-past-a-sub.test.ts now guards it. The battery re-runs against the tree that carries both."
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / verification

@@ -221,7 +221,35 @@ test("no new file read bypasses the door — the count may fall, never rise", ()
   // WHAT A COLD READER COSTS BESIDES TIME: it cannot be invalidated, so it
   // disagrees with the warm copy the moment a file changes under it, and
   // nothing reports the disagreement.
-  const CEILING = 116;
+  // 120, UP FROM 116, AND THE FOUR ARE THE DOOR RULE'S OWN.
+  //
+  // doors.ts reads four times and doorguard.ts none. THE DOOR CANNOT HOLD
+  // WHAT THEY READ: readNode, noteOf and nodeLines share one read and one parse
+  // of a corpus NODE, and these read engine SOURCE and a machine list. Routing
+  // them through a node reader would ask it to parse a TypeScript file as
+  // frontmatter.
+  //
+  // THE GUARD'S OWN READ MOVED INTO THE RULE MODULE rather than being added to
+  // it. doorguard.ts opened files to ask whether a module already reached, which
+  // made the thing that refuses an undeclared reach one itself. That read is
+  // now doors.ts's, and doorguard.ts imports no filesystem at all.
+  //
+  // ONE READ IS GENUINELY NEW, at move.ts. A move is a write at its
+  // destination, so the content rules that govern the new path have to be asked
+  // before the rename lands, and asking needs the bytes. It is one-shot, at a
+  // write boundary, and there is nothing for a node reader to share.
+  //
+  // IT IS ALSO THE ONE READ THAT CANNOT GO THROUGH A DOOR ON PRINCIPLE. The
+  // rule that decides who may read and write has to read the tree to answer,
+  // and a door that could not reach its own conversation could not exist. The
+  // departure list records exactly that, with the same reason.
+  //
+  // 122 SINCE THE RULE MODULE LEARNED WHERE AN UNREASONED LINE STANDS. The
+  // departure guard hands back a patch, and a patch aimed at a line the refused
+  // write never landed on matches nothing — the remedy failing in exactly the
+  // case it exists for. One read answers which of two ops repairs it, and it is
+  // one-shot on a refusal path.
+  const CEILING = 122;
   let found = 0;
   const offenders: string[] = [];
   const walk = (dir: URL, rel: string): void => {

@@ -2,12 +2,12 @@
 minted_in: i37-training-iterations-a-disposable-iterati
 id: tsp-a-benchmark-run-leaves-the-archive-untouched
 type: "[[test-spec]]"
-statement: "A bound benchmark run changes no bytes of the iteration it re-walks, mints no records, and adds nothing to the survey's counts."
-method: "inspection"
+statement: A bound benchmark run changes no bytes of the iteration it re-walks, mints no records, and adds nothing to the survey's counts.
+method: inspection
 verifies:
   - req-a-benchmark-run-modifies-no-record-and-appears-in-no-survey
 files:
-  - "none — the checklist below is the whole definition; what it examines is the state of a tree and a count, not the behaviour of a running system"
+  - none — the checklist below is the whole definition; what it examines is the state of a tree and a count, not the behaviour of a running system
 ---
 
 ## Scope

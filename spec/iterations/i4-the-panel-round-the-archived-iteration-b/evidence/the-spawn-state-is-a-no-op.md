@@ -3,7 +3,7 @@ form: the-spawn-state-is-a-no-op
 by: agent
 signed_off: 2026-08-23T19:38:38.180Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / the-spawn-state-is-a-no-op

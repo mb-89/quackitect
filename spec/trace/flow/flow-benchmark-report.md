@@ -2,7 +2,7 @@
 minted_in: i37-training-iterations-a-disposable-iterati
 id: flow-benchmark-report
 type: "[[flow]]"
-statement: "the filled report, the only thing a run commits"
+statement: the filled report, the only thing a run commits
 kind: signal
 crosses: out
 source_refs:

@@ -3,7 +3,7 @@ minted_in: i60-the-walk-gets-fast-and-it-is-measurable-
 id: raid-iss-nothing-shipped-this-round-makes-the-walk-faster
 type: "[[raid]]"
 kind: issue
-statement: "The round shipped the measurable half first and nothing faster, and that stood until a profile found the cost; four measured fixes then cut a three-hop sweep from 15,404 to 2,562 milliseconds."
+statement: The round shipped the measurable half first and nothing faster, and that stood until a profile found the cost; four measured fixes then cut a three-hop sweep from 15,404 to 2,562 milliseconds.
 owner: the driving agent
 trigger: it has happened, and the implementation gate's own red team raised it
 status: closed

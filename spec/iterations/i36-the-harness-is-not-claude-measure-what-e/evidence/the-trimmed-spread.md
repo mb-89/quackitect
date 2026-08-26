@@ -3,7 +3,7 @@ form: the-trimmed-spread
 by: agent
 signed_off: 2026-08-19T12:02:23.798Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / the-trimmed-spread

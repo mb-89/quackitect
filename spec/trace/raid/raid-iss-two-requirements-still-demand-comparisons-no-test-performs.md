@@ -3,11 +3,11 @@ minted_in: i60-the-walk-gets-fast-and-it-is-measurable-
 id: raid-iss-two-requirements-still-demand-comparisons-no-test-performs
 type: "[[raid]]"
 kind: issue
-statement: "Three test specs were amended off timing comparisons and onto countable oracles, and the two requirements those specs verify still carry the timing language, so the spec layer and the requirement layer now disagree."
+statement: Three test specs were amended off timing comparisons and onto countable oracles, and the two requirements those specs verify still carry the timing language, so the spec layer and the requirement layer now disagree.
 owner: the driving agent
 trigger: it has happened, and a cold reviewer found it at the implementation gate
 status: closed
-impact: "The specs record why they moved and the requirements do not, so a reader following the trace downward meets a demand that nothing under it checks. The coverage check cannot see it, because a spec resolving to a requirement is all it asks."
+impact: The specs record why they moved and the requirements do not, so a reader following the trace downward meets a demand that nothing under it checks. The coverage check cannot see it, because a spec resolving to a requirement is all it asks.
 breaks_how_badly: corrosive
 how_likely: expected
 source_refs:

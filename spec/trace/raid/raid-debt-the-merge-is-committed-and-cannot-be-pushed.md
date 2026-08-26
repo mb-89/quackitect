@@ -9,7 +9,7 @@ status: closed
 looked: 2026-08-25
 breaks_how_badly: corrosive
 how_likely: expected
-impact: "Nine commits sit ahead of origin/v3, including the whole of i16 and a 49-commit merge that resolved 35 conflicts and renumbered a clause. None of it is visible to another machine or another person. A second agent starting from origin gets a tree where SE-C-143 does not exist and i16 never happened, and would mint over the same numbers again."
+impact: Nine commits sit ahead of origin/v3, including the whole of i16 and a 49-commit merge that resolved 35 conflicts and renumbered a clause. None of it is visible to another machine or another person. A second agent starting from origin gets a tree where SE-C-143 does not exist and i16 never happened, and would mint over the same numbers again.
 source_refs:
   - raid-debt-a-parallel-fan-is-serialised-to-get-past-the-walker
 last_looked: 2026-08-23

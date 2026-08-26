@@ -1,10 +1,10 @@
 ---
 form: scope-non-goals
-reopened: "2026-08-23T15:22:28.931Z — frame-delta was re-signed after it, so scope-non-goals answered older ground"
+reopened: 2026-08-23T15:22:28.931Z — frame-delta was re-signed after it, so scope-non-goals answered older ground
 by: agent
 signed_off: 2026-08-23T15:22:37.516Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / scope-non-goals

@@ -1,10 +1,10 @@
 ---
 form: draft-vision
-reopened: "2026-08-23T15:19:01.125Z — spawn-for-motivation was re-signed after it, so draft-vision answered older ground"
+reopened: 2026-08-23T15:19:01.125Z — spawn-for-motivation was re-signed after it, so draft-vision answered older ground
 by: agent
 signed_off: 2026-08-23T15:19:10.084Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / draft-vision

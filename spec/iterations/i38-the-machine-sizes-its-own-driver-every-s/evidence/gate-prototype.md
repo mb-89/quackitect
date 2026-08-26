@@ -3,9 +3,9 @@ form: gate-prototype
 bless: blessed by agent
 by: agent
 signed_off: 2026-08-20T19:36:05.818Z
-reopened: "2026-08-20T19:36:03.306Z — the spike verdict reversed and the states below it carried the old one. Re-read against that."
+reopened: 2026-08-20T19:36:03.306Z — the spike verdict reversed and the states below it carried the old one. Re-read against that.
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / gate-prototype

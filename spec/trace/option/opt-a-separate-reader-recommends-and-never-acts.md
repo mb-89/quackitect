@@ -4,9 +4,9 @@ id: opt-a-separate-reader-recommends-and-never-acts
 type: "[[option]]"
 cluster: the-account
 question: who resolves a rung to a worker
-statement: "the sizing decision is made by a component that only ever reads the record and publishes advice, kept out of the walk entirely, so nothing in the walking path can spend anything on the strength of it"
+statement: the sizing decision is made by a component that only ever reads the record and publishes advice, kept out of the walk entirely, so nothing in the walking path can spend anything on the strength of it
 found_by: prior-art
-source: "four shipped recommend-only reconcilers found by the commissioned deep scan, 2026-08-20 — Kubernetes VPA in updateMode Off, Goldilocks, Robusta KRR, and Slurm's seff"
+source: four shipped recommend-only reconcilers found by the commissioned deep scan, 2026-08-20 — Kubernetes VPA in updateMode Off, Goldilocks, Robusta KRR, and Slurm's seff
 ---
 
 ## Mechanism

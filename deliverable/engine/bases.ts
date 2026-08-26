@@ -22,6 +22,7 @@ import { isAbsolute, resolve } from "node:path";
 import { parse, stringify } from "yaml";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { type Node, parseExpr } from "./expr-parse.ts";
+import { isInside } from "./paths.ts";
 import { vaultDir } from "./tables.ts";
 
 const SRC = "engine/bases.ts";
@@ -35,7 +36,10 @@ export type Layout = (typeof LAYOUTS)[number];
 function baseFile(root: string, rel: string): string {
   const dir = vaultDir(root);
   const abs = isAbsolute(rel) ? rel : resolve(dir, rel);
-  if (!abs.startsWith(resolve(dir))) {
+  // THE SEPARATOR IS THE RULE, and a bare prefix test does not carry it: this
+  // guard accepted a sibling directory whose name merely started with the
+  // vault's. It asks the one predicate now.
+  if (!isInside(dir, abs)) {
     throw new Rejection({
       clause: CLAUSES.PATH_ESCAPE,
       expected: "a .base file inside the vault",

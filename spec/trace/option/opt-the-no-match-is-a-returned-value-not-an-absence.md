@@ -4,9 +4,9 @@ id: opt-the-no-match-is-a-returned-value-not-an-absence
 type: "[[option]]"
 cluster: the-sizing
 question: what happens when no rung matches
-statement: "the block always returns a value and no-match is one of the values it can return, named in the same vocabulary as a driver, so a receiver never has to distinguish a silence from a failure"
+statement: the block always returns a value and no-match is one of the values it can return, named in the same vocabulary as a driver, so a receiver never has to distinguish a silence from a failure
 found_by: prior-art
-source: "XACML's four-value decision vocabulary, where NotApplicable is a standardised returned result rather than an absent one — commissioned deep scan, 2026-08-20"
+source: XACML's four-value decision vocabulary, where NotApplicable is a standardised returned result rather than an absent one — commissioned deep scan, 2026-08-20
 ---
 
 ## Mechanism

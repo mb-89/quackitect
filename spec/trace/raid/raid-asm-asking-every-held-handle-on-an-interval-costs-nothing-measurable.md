@@ -3,9 +3,9 @@ minted_in: i62-background-work-reports-its-own-end-the-
 id: raid-asm-asking-every-held-handle-on-an-interval-costs-nothing-measurable
 type: "[[raid]]"
 kind: assumption
-statement: "The number of pieces of work a session has under way at once stays small enough that asking every one of them, on every interval, costs nothing a caller would notice."
+statement: The number of pieces of work a session has under way at once stays small enough that asking every one of them, on every interval, costs nothing a caller would notice.
 owner: the maintainer
-trigger: "the first session where the count of work under way at once exceeds ten, and any lane answer that slows measurably after the interval lands"
+trigger: the first session where the count of work under way at once exceeds ten, and any lane answer that slows measurably after the interval lands
 status: probed
 looked: 2026-08-24
 probed: 2026-08-24

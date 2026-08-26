@@ -3,15 +3,15 @@ minted_in: i54-everything-exported-has-a-door-a-sweep-o
 id: raid-asm-the-widget-guards-shape-generalises-to-a-second-rule
 type: "[[raid]]"
 kind: assumption
-statement: "The widget guard's shape — one rule, one registry naming who may, one declared hatch carrying a reason per entry, and two callers sharing no second copy — is general rather than particular to widgets, so a second and third rule can be built from it instead of from scratch."
+statement: The widget guard's shape — one rule, one registry naming who may, one declared hatch carrying a reason per entry, and two callers sharing no second copy — is general rather than particular to widgets, so a second and third rule can be built from it instead of from scratch.
 owner: the owner
 trigger: the first attempt to express a second rule in that shape, which is this record's own exports rule
 status: open
-probe: "Express the exports rule in the widget guard's shape and count what had to be written that the widget guard did not already provide. A shape that generalises leaves the rule itself as the only new authoring."
+probe: Express the exports rule in the widget guard's shape and count what had to be written that the widget guard did not already provide. A shape that generalises leaves the rule itself as the only new authoring.
 probed: not yet. The generalisation does not exist, so nothing can be expressed in it.
-impact: "If the shape does not generalise, every rule of this kind costs its own refusal clause, its own sweep and its own hatch format, and the one-door principle becomes three unrelated mechanisms that happen to rhyme."
-breaks_how_badly: serious
-how_likely: possible
+impact: If the shape does not generalise, every rule of this kind costs its own refusal clause, its own sweep and its own hatch format, and the one-door principle becomes three unrelated mechanisms that happen to rhyme.
+breaks_how_badly: corrosive
+how_likely: plausible
 source_refs:
   - raid-asm-a-break-made-outside-the-lane-is-caught-by-the-sweep
 ---
@@ -50,7 +50,8 @@ NOBODY HAS TRIED. One instance is not evidence of generality, and the widget
 guard was built to solve widgets rather than to be a template.
 
 TWO PARTS LOOK PARTICULAR ON INSPECTION, and they are why this is graded
-possible rather than unlikely.
+plausible rather than conceivable. Either one is a single nameable story with
+no coincidence in it.
 
 - THE REGISTRY IS A TYPESCRIPT MODULE LIST. A disk rule's "who may" is more
   likely a path shape than a named list.

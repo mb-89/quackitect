@@ -3,9 +3,9 @@ minted_in: i36
 id: tsp-oversized-results-remain-recoverable-through-the-lane
 type: "[[test-spec]]"
 statement: A lane result larger than the smallest measured inline host limit comes back bounded, and a lane-owned cursor rebuilds the complete result byte for byte.
-method: "test"
+method: test
 verifies:
-  - "req-oversized-results-remain-recoverable-through-the-lane"
+  - req-oversized-results-remain-recoverable-through-the-lane
 files:
   - tests/answer-bound.test.ts
 ---

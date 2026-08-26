@@ -1,10 +1,10 @@
 ---
 form: the-drawer-tells-deciding-from-failed
-amended: "2026-08-24T18:15:58.017Z by agent — A second reviewer corrected the word. Saying \"untested\" tells a later reader there is no guard there, and there is one — the case in clear-jump.test.ts. What is missing is the red, not the check, and the two standings call for different work."
+amended: 2026-08-24T18:15:58.017Z by agent — A second reviewer corrected the word. Saying "untested" tells a later reader there is no guard there, and there is one — the case in clear-jump.test.ts. What is missing is the red, not the check, and the two standings call for different work.
 by: agent
 signed_off: 2026-08-24T17:57:01.073Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / the-drawer-tells-deciding-from-failed

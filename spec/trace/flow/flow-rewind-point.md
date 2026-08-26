@@ -2,7 +2,7 @@
 minted_in: i37-training-iterations-a-disposable-iterati
 id: flow-rewind-point
 type: "[[flow]]"
-statement: "the commit before the chosen iteration started"
+statement: the commit before the chosen iteration started
 kind: signal
 source_refs:
   - req-a-bound-run-resolves-no-commit-newer-than-its-rewind-point

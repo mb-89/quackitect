@@ -1,10 +1,10 @@
 ---
 form: declare-winner
-amended: "2026-08-19T18:01:26.522Z by agent — this declared a seat held by a tie and a flip that was cheap, and three later states moved both"
+amended: 2026-08-19T18:01:26.522Z by agent — this declared a seat held by a tie and a flip that was cheap, and three later states moved both
 by: agent
 signed_off: 2026-08-19T16:57:12.188Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / declare-winner

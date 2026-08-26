@@ -3,12 +3,12 @@ minted_in: i36
 id: tsp-a-finding-outlives-the-box
 type: "[[test-spec]]"
 statement: A finding captured on an unattended machine is still readable by an engineer on a different clone after that machine is gone.
-method: "demonstration"
+method: demonstration
 demonstrates:
-  - "sty-a-finding-outlives-the-box-that-found-it"
+  - sty-a-finding-outlives-the-box-that-found-it
 verifies: "none — demonstrates: carries the edge; the pool and mint requirements behind this story are verify_method: test and are carried by tsp-the-mint-crosses-the-boundary and tsp-one-door-into-the-pool"
 files:
-  - "none — a demonstration across two clones; what it observes is what survives outside any one working copy"
+  - none — a demonstration across two clones; what it observes is what survives outside any one working copy
 ---
 
 ## Scope

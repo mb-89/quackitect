@@ -2,18 +2,18 @@
 minted_in: i38-the-machine-sizes-its-own-driver-every-s
 id: req-every-call-records-the-model-that-answered-it
 type: "[[requirement]]"
-statement: "When the lane records a call, the record shall carry the model that answered it, taken from what served the call rather than from what was requested, and marked as self-reported wherever the lane cannot obtain the value independently."
+statement: When the lane records a call, the record shall carry the model that answered it, taken from what served the call rather than from what was requested, and marked as self-reported wherever the lane cannot obtain the value independently.
 kind: functional
 verify_method: test
-breaks_if_removed: "Without it a walk that went badly and a walk that cost too much leave the same undifferentiated trail, and the rule that a weaker driver owes a recorded reason has nothing to check against."
+breaks_if_removed: Without it a walk that went badly and a walk that cost too much leave the same undifferentiated trail, and the rule that a weaker driver owes a recorded reason has nothing to check against.
 breaks_how_badly: crippling
 refines:
   - uc-attribute-a-finished-walk
 source_refs:
-  - "uc-attribute-a-finished-walk step 3"
-  - "uc-attribute-a-finished-walk ext 3a"
-  - "raid-asm-the-answering-model-can-be-recorded-when-only-the-agent-knows-it"
-  - "vp-the-ledger"
+  - uc-attribute-a-finished-walk step 3
+  - uc-attribute-a-finished-walk ext 3a
+  - raid-asm-the-answering-model-can-be-recorded-when-only-the-agent-knows-it
+  - vp-the-ledger
 priority: must
 ---
 

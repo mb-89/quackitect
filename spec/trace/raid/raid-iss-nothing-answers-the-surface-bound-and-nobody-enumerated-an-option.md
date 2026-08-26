@@ -3,17 +3,17 @@ minted_in: i9
 id: raid-iss-nothing-answers-the-surface-bound-and-nobody-enumerated-an-option
 type: "[[raid]]"
 kind: issue
-statement: "No element in the chosen structure makes any checkable claim about a surface answering within a second, and no option was ever enumerated for it, so the architecture cannot be said to address the row at all."
+statement: No element in the chosen structure makes any checkable claim about a surface answering within a second, and no option was ever enumerated for it, so the architecture cannot be said to address the row at all.
 owner: the driving agent
-trigger: "before M7 builds anything the mirror renders, and at the next enumerate-space that touches the drawn surface"
+trigger: before M7 builds anything the mirror renders, and at the next enumerate-space that touches the drawn surface
 status: open
-impact: "A person opening a surface is the most frequent interaction the product has. The row is graded corrosive, the structure answers nothing, and the build would proceed with a bound nobody designed against."
+impact: A person opening a surface is the most frequent interaction the product has. The row is graded corrosive, the structure answers nothing, and the build would proceed with a bound nobody designed against.
 breaks_how_badly: corrosive
 how_likely: expected
 source_refs:
   - req-surface-answers-in-one-second
-  - "evaluate-architecture at i9, 2026-08-19 — the only card ruled unaddressed"
-  - "evaluate-set at i9 — the only axis where the utopia point falls below solid baseline"
+  - evaluate-architecture at i9, 2026-08-19 — the only card ruled unaddressed
+  - evaluate-set at i9 — the only axis where the utopia point falls below solid baseline
 ---
 
 ## Two independent findings landed on the same square

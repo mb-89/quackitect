@@ -3,11 +3,11 @@ minted_in: i60-the-walk-gets-fast-and-it-is-measurable-
 id: raid-risk-changing-the-two-verbs-reaches-the-hands-walking-with-them
 type: "[[raid]]"
 kind: risk
-statement: "This round changes what the two walking verbs promise, and two sibling rounds are being walked with those verbs at the same time, so a change here reaches them whatever files it touched."
+statement: This round changes what the two walking verbs promise, and two sibling rounds are being walked with those verbs at the same time, so a change here reaches them whatever files it touched.
 owner: the owner, who assigns the hands
 trigger: the first change that alters when either walking verb returns, before both siblings have closed
 status: open
-impact: "A sibling hand meets new behaviour mid-walk with no warning, and reports it as a machine fault rather than as a change somebody made."
+impact: A sibling hand meets new behaviour mid-walk with no warning, and reports it as a machine fault rather than as a change somebody made.
 breaks_how_badly: corrosive
 how_likely: expected
 source_refs:

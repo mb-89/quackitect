@@ -2,20 +2,20 @@
 minted_in: i38-the-machine-sizes-its-own-driver-every-s
 id: req-every-call-records-the-part-its-caller-played
 type: "[[requirement]]"
-statement: "When the lane records a call, the record shall carry the part its caller played from a closed vocabulary that tells the hand holding the walk apart from a hand it delegated to, and shall carry that part on relayed work as the delegate's rather than the relayer's."
+statement: When the lane records a call, the record shall carry the part its caller played from a closed vocabulary that tells the hand holding the walk apart from a hand it delegated to, and shall carry that part on relayed work as the delegate's rather than the relayer's.
 kind: functional
 verify_method: test
-breaks_if_removed: "A walk driven by two hands leaves a log that says it was driven by one, so nobody can tell whether asking a strong hand for the hard steps paid for itself. That is the arrangement this whole line of work exists to make cheap, and it would ship unmeasurable."
+breaks_if_removed: A walk driven by two hands leaves a log that says it was driven by one, so nobody can tell whether asking a strong hand for the hard steps paid for itself. That is the arrangement this whole line of work exists to make cheap, and it would ship unmeasurable.
 breaks_how_badly: crippling
 refines:
   - uc-attribute-a-finished-walk
 source_refs:
-  - "uc-attribute-a-finished-walk step 4"
-  - "uc-attribute-a-finished-walk ext 4a"
-  - "uc-attribute-a-finished-walk ext 4b"
-  - "uc-attribute-a-finished-walk ext 4c"
-  - "nbr-the-driver-that-performs-the-spawn"
-  - "deliverable/engine/calllog.ts:22"
+  - uc-attribute-a-finished-walk step 4
+  - uc-attribute-a-finished-walk ext 4a
+  - uc-attribute-a-finished-walk ext 4b
+  - uc-attribute-a-finished-walk ext 4c
+  - nbr-the-driver-that-performs-the-spawn
+  - deliverable/engine/calllog.ts:22
   - "guidance/method/subagents.md: Which model"
 priority: must
 weighs_against:

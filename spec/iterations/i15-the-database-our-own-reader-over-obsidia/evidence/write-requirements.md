@@ -1,6 +1,6 @@
 ---
 form: write-requirements
-reopened: "2026-08-19T17:23:40.939Z — same claims-registration gap, cascading fix through M3"
+reopened: 2026-08-19T17:23:40.939Z — same claims-registration gap, cascading fix through M3
 by: agent
 signed_off: 2026-08-19T17:26:30.854Z
 authors: agent

@@ -3,9 +3,9 @@ minted_in: i38-the-machine-sizes-its-own-driver-every-s
 id: raid-asm-a-state-is-equally-hard-at-every-change-size
 type: "[[raid]]"
 kind: issue
-statement: "A row's difficulty varies with change size while the design gives each row ONE complexity value. The SPREAD is established; the NON-MONOTONICITY this entry first claimed was manufactured by quoting half a note and is withdrawn."
+statement: A row's difficulty varies with change size while the design gives each row ONE complexity value. The SPREAD is established; the NON-MONOTONICITY this entry first claimed was manufactured by quoting half a note and is withdrawn.
 owner: the owner
-trigger: "the first rating pass over the matrix, and the first walk at a change size other than the one the ratings were judged against"
+trigger: the first rating pass over the matrix, and the first walk at a change size other than the one the ratings were judged against
 status: open
 looked: 2026-08-20
 impact: "A rating judged against the column it was written for is wrong at every other column, in the expensive direction at the small end: a patch walk pays a major walk's driver for a state the matrix itself has already tailored down."

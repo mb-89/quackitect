@@ -6,7 +6,7 @@ statement: When an entry that is already settled is settled again, the product s
 kind: functional
 verify_method: test
 measure: "entries returned to running by a second settle: zero. Entries counted more than once in the account after a double settle: zero."
-breaks_if_removed: "A second closer reopens an entry the first one settled, which is the original fault wearing the fix's clothes, or counts the work twice and corrupts the figures a walk acts on."
+breaks_if_removed: A second closer reopens an entry the first one settled, which is the original fault wearing the fix's clothes, or counts the work twice and corrupts the figures a walk acts on.
 breaks_how_badly: corrosive
 priority: must
 refines:

@@ -7,6 +7,7 @@ realizes:
   - el-walk-engine
 files:
   - deliverable/engine/help.ts
+  - deliverable/engine/bm25.ts
   - deliverable/engine/tools.ts
 ---
 

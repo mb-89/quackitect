@@ -4,7 +4,7 @@ by: agent
 signed_off: 2026-08-20T19:26:36.361Z
 reopened: "2026-08-20T19:26:34.461Z — converge-pugh was re-signed: the account axis was defective rather than inert, and a fourth cold scoring pass held all eight re-judged cells. The acting party is corrected — the walking agent delegates, so the claim that nothing can act on a published complexity is false. Re-read against that."
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / reverse-sensitivity

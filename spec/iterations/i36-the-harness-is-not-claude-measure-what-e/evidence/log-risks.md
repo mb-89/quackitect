@@ -2,9 +2,9 @@
 form: log-risks
 by: agent
 signed_off: 2026-08-19T09:10:04.051Z
-reopened: "2026-08-19T09:09:48.135Z — Fresh research and the reported possible MCP stop added one new RAID issue; re-sign the register references."
+reopened: 2026-08-19T09:09:48.135Z — Fresh research and the reported possible MCP stop added one new RAID issue; re-sign the register references.
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / log-risks

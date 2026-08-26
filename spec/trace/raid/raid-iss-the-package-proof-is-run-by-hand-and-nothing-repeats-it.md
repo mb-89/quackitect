@@ -3,12 +3,12 @@ minted_in: i5-engine-hygiene-one-version-source-every-
 id: raid-iss-the-package-proof-is-run-by-hand-and-nothing-repeats-it
 type: "[[raid]]"
 kind: issue
-statement: "The release package is proved by five commands typed at the package state, and no check re-runs them, so the proof is only as old as the last person who bothered."
+statement: The release package is proved by five commands typed at the package state, and no check re-runs them, so the proof is only as old as the last person who bothered.
 owner: the maintainer
 trigger: the next record that reaches the package state, and any change to what the archive excludes
 status: open
 looked: 2026-08-24
-impact: "A release gate reads a story about a check instead of a result. A packaging change that drops a needed file is caught only if the next agent happens to run the same five commands in the same order, and nothing tells them which five."
+impact: A release gate reads a story about a check instead of a result. A packaging change that drops a needed file is caught only if the next agent happens to run the same five commands in the same order, and nothing tells them which five.
 breaks_how_badly: corrosive
 how_likely: expected
 source_refs:

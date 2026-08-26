@@ -3,15 +3,15 @@ minted_in: i37-training-iterations-a-disposable-iterati
 id: raid-asm-one-second-resolution-is-enough-to-time-a-lane-call
 type: "[[raid]]"
 kind: issue
-statement: "The one-second convention that bounds every modelled interface is fine enough to time a lane call, so a benchmark built on it can tell a fast machine from a slow one."
+statement: The one-second convention that bounds every modelled interface is fine enough to time a lane call, so a benchmark built on it can tell a fast machine from a slow one.
 owner: the maintainer of the machine
 trigger: the first report that ranks states by cost
 status: open
-impact: "A ranking built on a clock coarser than the thing it measures orders states by rounding. Improvements smaller than the tick are invisible, which is most of them."
+impact: A ranking built on a clock coarser than the thing it measures orders states by rounding. Improvements smaller than the tick are invisible, which is most of them.
 breaks_how_badly: corrosive
 how_likely: plausible
-probe: "the probe below was run on 2026-08-21 over 290 calls. The median is 1 ms, a thousandth of the convention's unit, so a one-second bound cannot express a demand about a typical lane call."
-probed: "2026-08-21, and it is FALSE for the median call. The kind is now issue. An earlier line on this entry still read unprobed, left over from i45, which changed neither the timing convention nor benchmark reporting."
+probe: the probe below was run on 2026-08-21 over 290 calls. The median is 1 ms, a thousandth of the convention's unit, so a one-second bound cannot express a demand about a typical lane call.
+probed: 2026-08-21, and it is FALSE for the median call. The kind is now issue. An earlier line on this entry still read unprobed, left over from i45, which changed neither the timing convention nor benchmark reporting.
 source_refs:
   - i37-training-iterations-a-disposable-iterati
 weighs_with: none

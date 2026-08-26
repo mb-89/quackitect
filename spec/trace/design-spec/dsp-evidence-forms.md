@@ -4,13 +4,13 @@ id: dsp-evidence-forms
 type: "[[design-spec]]"
 statement: evidence forms built from state declarations and checked at every save, carried by one form model over markdown sections
 realizes:
-  - "el-walk-engine"
+  - el-walk-engine
 files:
-  - "deliverable/engine/stateform.ts"
-  - "deliverable/engine/forms.ts"
-  - "deliverable/engine/sessionforms.ts"
-  - "deliverable/engine/stateform-problems.ts"
-  - "deliverable/engine/stateform-sheet.ts"
+  - deliverable/engine/stateform.ts
+  - deliverable/engine/forms.ts
+  - deliverable/engine/sessionforms.ts
+  - deliverable/engine/stateform-problems.ts
+  - deliverable/engine/stateform-sheet.ts
 ---
 
 ## A live source that resolves to nothing says so

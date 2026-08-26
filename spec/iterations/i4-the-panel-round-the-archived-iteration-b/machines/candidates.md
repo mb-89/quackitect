@@ -1,15 +1,15 @@
 ---
 steps:
   - id: the-guarded-collapse
-    statement: "compose cand-the-guarded-collapse - the seams, the rough costs, and what it leans on"
+    statement: compose cand-the-guarded-collapse - the seams, the rough costs, and what it leans on
     depends_on: []
     realization: document
   - id: the-repeater-surface
-    statement: "compose cand-the-repeater-surface - the seams, the rough costs, and what it leans on"
+    statement: compose cand-the-repeater-surface - the seams, the rough costs, and what it leans on
     depends_on: []
     realization: document
   - id: the-host-first-surface
-    statement: "compose cand-the-host-first-surface - the seams, the rough costs, and what it leans on"
+    statement: compose cand-the-host-first-surface - the seams, the rough costs, and what it leans on
     depends_on: []
     realization: document
 ---

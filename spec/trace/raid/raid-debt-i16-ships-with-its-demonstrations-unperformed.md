@@ -9,7 +9,7 @@ looked: 2026-08-25
 status: open
 breaks_how_badly: crippling
 how_likely: expected
-impact: "Both headline capabilities are proved only inside this repository. The pass line of the two must requirements is a machine holding nothing of the source, and nothing has ever been run on one. A vehicle that works here and fails there looks identical from here."
+impact: Both headline capabilities are proved only inside this repository. The pass line of the two must requirements is a machine holding nothing of the source, and nothing has ever been run on one. A vehicle that works here and fails there looks identical from here.
 source_refs:
   - raid-iss-the-vehicle-demonstration-has-never-been-performed
   - tsp-a-vehicle-is-made-and-then-drives-something-else

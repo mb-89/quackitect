@@ -6,7 +6,7 @@ statement: exactly one function may emit a widget, and a check refuses any other
 cluster: the-account
 question: what stops a second surface being written
 found_by: heuristic
-source: "make the illegal unrepresentable, not merely checked — held against the-account"
+source: make the illegal unrepresentable, not merely checked — held against the-account
 ---
 
 ## Mechanism

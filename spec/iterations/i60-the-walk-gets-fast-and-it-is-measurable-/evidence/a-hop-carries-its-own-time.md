@@ -1,10 +1,10 @@
 ---
 form: a-hop-carries-its-own-time
-amended: "2026-08-24T19:53:36.666Z by agent — the budget comparison it carried measured the whole hop against a budget that binds the flip, and the flip has now been measured"
+amended: 2026-08-24T19:53:36.666Z by agent — the budget comparison it carried measured the whole hop against a budget that binds the flip, and the flip has now been measured
 by: agent
 signed_off: 2026-08-24T16:31:58.968Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / a-hop-carries-its-own-time

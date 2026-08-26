@@ -4,7 +4,7 @@ by: agent
 signed_off: 2026-08-20T19:27:59.391Z
 reopened: "2026-08-20T19:27:57.590Z — one paragraph in the comments field still carries the falsified sentence: the winner needs a receiver that reads a rung and acts, and the neighbour says none can. That neighbour was rewritten. A claim and its correction standing in one form is the defect shape this record has now named five times."
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / declare-winner

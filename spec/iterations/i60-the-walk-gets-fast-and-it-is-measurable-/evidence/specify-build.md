@@ -4,7 +4,7 @@ by: agent
 signed_off: 2026-08-24T17:43:33.982Z
 reopened: "2026-08-24T17:43:11.364Z — author-tests was re-signed after this state, so it answered older ground. What changed above it: three requirements were amended so each says what the spec under it actually checks, and the failed-route row was reworked on the owner's ruling because its measure was impossible. This state's own content also moved in the same pass — the chunk drawing gained the four items the phase brief says are owed and the first drawing omitted."
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / specify-build

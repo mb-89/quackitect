@@ -3,9 +3,9 @@ form: gate-architecture
 bless: blessed by agent
 by: agent
 signed_off: 2026-08-20T19:30:35.444Z
-reopened: "2026-08-20T19:30:32.727Z — one paragraph in the follow-up still hands M6 a question that is answered, and asks it in the falsified vocabulary. A claim and its correction standing unmarked in one form is the defect shape this record has named five times."
+reopened: 2026-08-20T19:30:32.727Z — one paragraph in the follow-up still hands M6 a question that is answered, and asks it in the falsified vocabulary. A claim and its correction standing unmarked in one form is the defect shape this record has named five times.
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / gate-architecture

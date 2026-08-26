@@ -3,7 +3,7 @@ minted_in: i38-the-machine-sizes-its-own-driver-every-s
 id: nbr-the-driver-that-performs-the-spawn
 type: "[[neighbour]]"
 direction: out
-statement: "The GUIDE — whoever is asked for a hand stronger than the walker has, and gives it. The walker never becomes the guide; it delegates. The guide may work the lane itself, and where it does not, whatever the walker carries back is recorded as the guide's work and not the walker's."
+statement: The GUIDE — whoever is asked for a hand stronger than the walker has, and gives it. The walker never becomes the guide; it delegates. The guide may work the lane itself, and where it does not, whatever the walker carries back is recorded as the guide's work and not the walker's.
 ---
 
 ## The guide is an AGENT, and this node is the boundary rather than the role

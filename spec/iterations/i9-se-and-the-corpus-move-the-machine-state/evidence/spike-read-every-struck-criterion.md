@@ -3,7 +3,7 @@ form: spike-read-every-struck-criterion
 by: agent
 signed_off: 2026-08-19T19:05:55.939Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / spike-read-every-struck-criterion

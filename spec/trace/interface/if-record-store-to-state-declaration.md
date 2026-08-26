@@ -10,7 +10,7 @@ carries:
 form: call
 source_refs:
   - decompose-structure at i9, the element matrix's owed cell
-  - "probe P1 at i9 M4, 2026-08-19 — one machine-state folder per checkout, before and after the collapse"
+  - probe P1 at i9 M4, 2026-08-19 — one machine-state folder per checkout, before and after the collapse
 ---
 
 The crossing where the branch question actually lives.

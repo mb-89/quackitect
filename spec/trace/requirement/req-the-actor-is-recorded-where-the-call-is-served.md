@@ -13,12 +13,12 @@ refines:
   - uc-trace-a-decision-to-its-origin
   - uc-act-on-a-control-and-know-what-it-did
 source_refs:
-  - "engine/render.ts: srcOf returns tool.startsWith(\"mirror_\") ? \"human\" : \"agent\""
+  - 'engine/render.ts: srcOf returns tool.startsWith("mirror_") ? "human" : "agent"'
   - "engine/render.ts: SELF_SERVED is a hand-kept set of three tool names"
   - "i34 retro: the derived actor was wrong for 52 records in one measured window"
 priority: should
 weighs_with:
-  - "req-acts-carry-role-and-channel — the same axis, accountability of a recorded act, split by who is responsible for the truth"
+  - req-acts-carry-role-and-channel — the same axis, accountability of a recorded act, split by who is responsible for the truth
 ---
 
 ## Scenario

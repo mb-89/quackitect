@@ -5,8 +5,8 @@ type: "[[option]]"
 cluster: cluster-the-benchmark-run
 question: how the past state is made to stand up
 found_by: probe
-statement: "Only the content the work is made of is materialised at the past point, exported into an empty directory, so nothing about the machine itself moves."
-source: "PROBE run 2026-08-19, timeboxed at minutes \u2014 git archive of spec at 5f85977f^ into an empty directory"
+statement: Only the content the work is made of is materialised at the past point, exported into an empty directory, so nothing about the machine itself moves.
+source: PROBE run 2026-08-19, timeboxed at minutes — git archive of spec at 5f85977f^ into an empty directory
 ---
 
 ## What the probe showed

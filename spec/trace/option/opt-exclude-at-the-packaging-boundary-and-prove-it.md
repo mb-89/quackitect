@@ -6,7 +6,7 @@ statement: Let the machine-state folder sit inside the tree for whoever is worki
 cluster: the-bootstrap
 question: how a produced copy withholds the machine state
 found_by: contradiction
-source: "TRIZ separation IN RELATION, on improving 33 Ease of operation against degrading 23 Loss of substance"
+source: TRIZ separation IN RELATION, on improving 33 Ease of operation against degrading 23 Loss of substance
 ---
 
 ## Mechanism

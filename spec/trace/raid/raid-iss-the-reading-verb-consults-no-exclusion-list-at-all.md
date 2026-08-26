@@ -3,11 +3,11 @@ minted_in: i37-training-iterations-a-disposable-iterati
 id: raid-iss-the-reading-verb-consults-no-exclusion-list-at-all
 type: "[[raid]]"
 kind: issue
-statement: "Three separate lists decide which paths a lane verb may see, two of them disagree with each other, and se_file_read consults none of them."
+statement: Three separate lists decide which paths a lane verb may see, two of them disagree with each other, and se_file_read consults none of them.
 owner: the maintainer of the machine
 trigger: any work that needs a path concealed from more than one verb, which this iteration needs for the benchmarks folder
 status: mitigated
-impact: "A conditional mask cannot be built over three disagreeing lists. Written once per verb it will disagree with itself the same way, and a concealment that leaks through one verb conceals nothing."
+impact: A conditional mask cannot be built over three disagreeing lists. Written once per verb it will disagree with itself the same way, and a concealment that leaks through one verb conceals nothing.
 breaks_how_badly: crippling
 how_likely: expected
 source_refs:

@@ -113,4 +113,13 @@ export const CLAUSES = {
   // neither finishing nor abandoning the work.
   PARK_NOWHERE: "SE-C-148", // a point parked for a name the walk never reaches — nothing could ever deliver it
   SECOND_RECORD_OPEN: "SE-C-147",
+  // A WRITE THAT ADDS A REACH NOBODY DECLARED. A module that holds a governed
+  // conversation while no departure records it. It refuses the ADDITION and
+  // never the edit, so the modules that already reach stay fixable.
+  UNDECLARED_REACH: "SE-C-149",
+  // A DEPARTURE THAT STATES NO REASON. The reason is the entry rather than
+  // metadata on it, so a bare path is not a line. Every compared system lets
+  // somebody bypass a boundary; this is the one that makes the bypass explain
+  // itself.
+  DEPARTURE_WITHOUT_REASON: "SE-C-150",
 } as const;

@@ -2,7 +2,7 @@
 minted_in: i37-training-iterations-a-disposable-iterati
 id: flow-run-conditions
 type: "[[flow]]"
-statement: "the model, the effort, the harness, the change size, the rigor matrix hash and the se version"
+statement: the model, the effort, the harness, the change size, the rigor matrix hash and the se version
 kind: signal
 source_refs:
   - req-a-benchmark-report-carries-the-conditions-of-its-run

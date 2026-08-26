@@ -3,13 +3,13 @@ minted_in: i60-the-walk-gets-fast-and-it-is-measurable-
 id: raid-asm-the-slow-tail-and-the-undrawn-route-share-one-cause
 type: "[[raid]]"
 kind: assumption
-statement: "The pulls that run past thirty seconds are slow BECAUSE the route could not be drawn, rather than both being caused by something else."
+statement: The pulls that run past thirty seconds are slow BECAUSE the route could not be drawn, rather than both being caused by something else.
 owner: the driving agent
 trigger: the first per-hop timing that attributes a slow pull to something other than drawing the route
 status: open
-probe: "SCHEDULED to the spike milestone, 2026-08-24. The controlled probe must hold a judgment live across BOTH halves while varying only whether a route can be drawn, which is staging rather than minutes. WHAT CHANGED WHILE IT SAT - the sibling assumption about a shared loop was probed the same day and held, which promotes contention from a rated-unlikely rival to the only one of the three with a confirmed mechanism. It does not explain the SHAPE of the tail, since contention would slow every call rather than one kind. So the two are probably both true and the spike separates their contributions rather than picking a winner."
+probe: SCHEDULED to the spike milestone, 2026-08-24. The controlled probe must hold a judgment live across BOTH halves while varying only whether a route can be drawn, which is staging rather than minutes. WHAT CHANGED WHILE IT SAT - the sibling assumption about a shared loop was probed the same day and held, which promotes contention from a rated-unlikely rival to the only one of the three with a confirmed mechanism. It does not explain the SHAPE of the tail, since contention would slow every call rather than one kind. So the two are probably both true and the spike separates their contributions rather than picking a winner.
 probed: 2026-08-24
-impact: "This round is ordered around it. If it is false, the repayment lands and the walk stays slow, and the round has spent its first milestone on the wrong suspect."
+impact: This round is ordered around it. If it is false, the repayment lands and the walk stays slow, and the round has spent its first milestone on the wrong suspect.
 breaks_how_badly: corrosive
 how_likely: plausible
 source_refs:

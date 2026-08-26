@@ -4,9 +4,9 @@ id: opt-the-block-names-a-rung-and-never-a-model
 type: "[[option]]"
 cluster: the-sizing
 question: who resolves a rung to a worker
-statement: "the block publishes a rung name and holds no roster at all, so resolving that rung to a concrete model is entirely the receiver's business and no model name ever appears in our tree"
+statement: the block publishes a rung name and holds no roster at all, so resolving that rung to a concrete model is entirely the receiver's business and no model name ever appears in our tree
 found_by: transform
-source: "SIT Subtraction applied to cluster-the-sizing — remove the roster, which looked essential"
+source: SIT Subtraction applied to cluster-the-sizing — remove the roster, which looked essential
 ---
 
 ## Mechanism

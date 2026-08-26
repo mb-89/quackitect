@@ -1,10 +1,10 @@
 ---
 form: reverse-sensitivity
-amended: "2026-08-19T18:00:02.085Z by agent — both axes the reference line led on turned out to be scoring artefacts, so the credible flip no longer reaches the seat"
+amended: 2026-08-19T18:00:02.085Z by agent — both axes the reference line led on turned out to be scoring artefacts, so the credible flip no longer reaches the seat
 by: agent
 signed_off: 2026-08-19T16:56:41.071Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / reverse-sensitivity

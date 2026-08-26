@@ -4,6 +4,7 @@ id: flow-existence-answer
 type: "[[flow]]"
 statement: whether a piece of work the session started is still there, asked of the work itself rather than inferred from what it last said
 kind: signal
+crosses: in
 source_refs:
   - req-the-engine-holds-what-it-launched-and-asks-whether-it-exists
   - fn-run-a-governed-walk.keep-the-account-true

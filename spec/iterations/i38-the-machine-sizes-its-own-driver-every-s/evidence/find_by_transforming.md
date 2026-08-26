@@ -1,10 +1,10 @@
 ---
 form: find_by_transforming
-amended: "2026-08-20T14:10:08.637Z by agent — three finders where five had run, contradicted by the same form's opening line"
+amended: 2026-08-20T14:10:08.637Z by agent — three finders where five had run, contradicted by the same form's opening line
 by: agent
 signed_off: 2026-08-20T12:14:02.798Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / find_by_transforming

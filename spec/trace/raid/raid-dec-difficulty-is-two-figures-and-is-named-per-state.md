@@ -5,9 +5,9 @@ type: "[[raid]]"
 kind: decision
 statement: A step's difficulty is two figures rather than one - how hard the judgement is and how much has to be read - and it is published per state, with nothing reduced over a milestone.
 owner: the owner
-trigger: "the first state that is short and hard, and the first milestone whose steps do not resemble each other"
+trigger: the first state that is short and hard, and the first milestone whose steps do not resemble each other
 status: decided
-impact: "One scalar conflates two independent things and a milestone maximum hides the spread between them. Together they put a state that reads two files and thinks hard on the same hand as one that reads forty and stamps a form, and nothing in the record says the two were treated alike."
+impact: One scalar conflates two independent things and a milestone maximum hides the spread between them. Together they put a state that reads two files and thinks hard on the same hand as one that reads forty and stamps a form, and nothing in the record says the two were treated alike.
 breaks_how_badly: crippling
 how_likely: expected
 source_refs:

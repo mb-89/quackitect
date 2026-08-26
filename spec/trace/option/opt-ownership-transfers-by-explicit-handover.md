@@ -6,7 +6,7 @@ statement: Have whatever starts the system STATE which tree it is handing over, 
 cluster: the-walk
 question: how the product's root is decided
 found_by: analogy
-source: "air traffic control — sector handover, where an aircraft is owned by exactly one controller and ownership moves only by an explicit transfer that the receiving controller acknowledges"
+source: air traffic control — sector handover, where an aircraft is owned by exactly one controller and ownership moves only by an explicit transfer that the receiving controller acknowledges
 ---
 
 ## Mechanism

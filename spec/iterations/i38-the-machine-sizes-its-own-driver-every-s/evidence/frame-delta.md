@@ -4,7 +4,7 @@ by: agent
 signed_off: 2026-08-20T19:03:08.692Z
 reopened: "2026-08-20T19:03:06.923Z — The value proposition this state registered was widened: a finished walk must say which HAND did each part, not only which model. The owner named a WALKER doing the daily work and a GUIDE asked for the hard steps, and either may work the lane. Neither the model nor the state coordinate can tell them apart, so the proposition needed a third success criterion and its outcome restated."
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / frame-delta

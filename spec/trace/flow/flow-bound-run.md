@@ -2,7 +2,7 @@
 minted_in: i37-training-iterations-a-disposable-iterati
 id: flow-bound-run
 type: "[[flow]]"
-statement: "a benchmark run standing over a throwaway tree, with its ceiling in force"
+statement: a benchmark run standing over a throwaway tree, with its ceiling in force
 kind: signal
 source_refs:
   - req-a-bound-run-resolves-no-commit-newer-than-its-rewind-point

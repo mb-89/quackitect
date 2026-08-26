@@ -4,20 +4,20 @@ id: dsp-the-computed-view
 type: "[[design-spec]]"
 statement: one engine-side resolver computes the whole view a surface shows, and the surface repeats it without deriving anything about the walk
 realizes:
-  - "el-view-resolver"
-  - "if-account-to-view-resolver"
-  - "if-engine-delta-to-view-resolver"
-  - "if-front-desk-to-view-resolver"
-  - "if-holding-pen-to-view-resolver"
-  - "if-method-compiler-to-view-resolver"
-  - "if-mirror-to-view-resolver"
-  - "if-record-store-to-view-resolver"
-  - "if-view-resolver-to-mirror"
-  - "if-walk-engine-to-view-resolver"
+  - el-view-resolver
+  - if-account-to-view-resolver
+  - if-engine-delta-to-view-resolver
+  - if-front-desk-to-view-resolver
+  - if-holding-pen-to-view-resolver
+  - if-method-compiler-to-view-resolver
+  - if-mirror-to-view-resolver
+  - if-record-store-to-view-resolver
+  - if-view-resolver-to-mirror
+  - if-walk-engine-to-view-resolver
 files:
-  - "deliverable/engine/viewmodel.ts"
-  - "deliverable/engine/mirror.ts"
-  - "deliverable/engine/renderclient-place.ts"
+  - deliverable/engine/viewmodel.ts
+  - deliverable/engine/mirror.ts
+  - deliverable/engine/renderclient-place.ts
 ---
 
 ## Responsibility

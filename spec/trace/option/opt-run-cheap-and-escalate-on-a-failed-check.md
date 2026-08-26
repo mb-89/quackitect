@@ -6,7 +6,7 @@ cluster: the-sizing
 question: what happens on a failed check
 statement: "no strength is chosen in advance at all: the cheapest worker attempts the work, a check reads the result, and only a failed check escalates to a stronger one"
 found_by: prior-art
-source: "the LLM cascading literature surveyed in arxiv.org/html/2603.04445v2, which distinguishes routing — one decision mapping the query to one model — from cascading, which escalates after a quality estimate on the produced answer; FrugalGPT is the ancestor of the pattern"
+source: the LLM cascading literature surveyed in arxiv.org/html/2603.04445v2, which distinguishes routing — one decision mapping the query to one model — from cascading, which escalates after a quality estimate on the produced answer; FrugalGPT is the ancestor of the pattern
 ---
 
 ## Mechanism

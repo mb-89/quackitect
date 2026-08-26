@@ -3,13 +3,13 @@ minted_in: i17-the-options-pool-triage-a-raw-note-into-
 id: tsp-a-parked-finding-reaches-another-clone
 type: "[[test-spec]]"
 statement: A finding parked on one machine is offered to an engineer on a clone that never held it, verified by demonstration across two clones of one origin.
-method: "demonstration"
+method: demonstration
 demonstrates:
-  - "sty-see-what-the-other-machine-may-pull-from"
+  - sty-see-what-the-other-machine-may-pull-from
 verifies:
-  - "none — this spec demonstrates a story end to end, so the demonstrates edge above carries its trace; the one requirement mentioning either story is req-open-work-is-answered-from-the-repository-not-a-local-store and its verify method is test; every requirement was checked for a mention of either story"
+  - none — this spec demonstrates a story end to end, so the demonstrates edge above carries its trace; the one requirement mentioning either story is req-open-work-is-answered-from-the-repository-not-a-local-store and its verify method is test; every requirement was checked for a mention of either story
 files:
-  - "none — the procedure below is the definition; the observed sessions are the evidence"
+  - none — the procedure below is the definition; the observed sessions are the evidence
 ---
 
 ## Why this spec exists

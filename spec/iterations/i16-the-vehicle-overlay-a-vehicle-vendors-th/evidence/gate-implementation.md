@@ -1,11 +1,11 @@
 ---
 form: gate-implementation
 bless: blessed by agent
-amended: "2026-08-18T20:03:01.002Z by agent — the owner authorised the bless explicitly after the form was signed, so the closing line was true when written and is not now"
+amended: 2026-08-18T20:03:01.002Z by agent — the owner authorised the bless explicitly after the form was signed, so the closing line was true when written and is not now
 by: agent
 signed_off: 2026-08-18T20:02:14.700Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / gate-implementation

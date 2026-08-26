@@ -281,3 +281,45 @@ test("a read stays unbounded even though it shares the containment rule", async 
   const read = withActBound(produced, "test", () => paths.resolveForRead(ROOT, GUIDE, "test"));
   assert.ok(read.startsWith(ROOT), `resolveForRead must stay on the project root during an act, and it read ${read}`);
 });
+
+// THE CONTAINMENT RULE HAS ONE HOME, and the separator is the whole of it.
+//
+// FIVE SITES HELD THIS QUESTION and they did not agree. One tested a bare
+// prefix, which puts `/x/vaultevil` inside `/x/vault`, and it guarded a write.
+// scope-non-goals graded that crippling and put it in scope even if every door
+// were dismissed.
+test("a sibling whose name merely starts with the directory's is not inside it", () => {
+  const home = join(tmpdir(), "jail");
+  assert.equal(
+    paths.isInside(home, join(tmpdir(), "jailbreak", "x.md")),
+    false,
+    "a bare prefix test would call this contained, and one did",
+  );
+  assert.equal(paths.isInside(home, join(home, "x.md")), true, "and a real child is still inside");
+});
+
+// THE COPIES DISAGREED ABOUT THE DIRECTORY ITSELF TOO, and that difference is
+// real rather than an accident: a jail admits its own root, and a guard over a
+// recursive delete must not.
+test("whether a directory is inside itself is the caller's to say", () => {
+  const home = join(tmpdir(), "jail");
+  assert.equal(paths.isInside(home, home), true, "a jail admits its own root by default");
+  assert.equal(paths.isInside(home, home, false), false, "and the bench guard asks for strictly under");
+});
+
+// BOTH SHAPES OF ESCAPE, because the copies caught different ones.
+test("climbing out is refused whether the target is relative or absolute", () => {
+  const home = join(tmpdir(), "jail");
+  assert.equal(paths.isInside(home, join("..", "elsewhere", "x.md")), false, "a relative climb leaves the directory");
+  assert.equal(paths.isInside(home, join(tmpdir(), "elsewhere", "x.md")), false, "and so does an absolute path pointing away");
+});
+
+// AND THE COPIES MUST NOT COME BACK. A ratchet, not a style rule: each of these
+// files held its own containment test, and one of them was wrong.
+test("no module writes its own containment test", () => {
+  for (const file of ["bases.ts", "tables.ts", "benchmark.ts"]) {
+    const src = readFileSync(new URL(`../engine/${file}`, import.meta.url), "utf8");
+    assert.ok(src.includes("isInside("), `${file} asks the one predicate`);
+    assert.ok(!src.includes('startsWith("..")'), `${file} tests containment by hand again, which is how the five disagreed`);
+  }
+});

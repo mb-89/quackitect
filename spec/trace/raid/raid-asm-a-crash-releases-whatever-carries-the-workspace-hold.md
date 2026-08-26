@@ -3,13 +3,13 @@ minted_in: i62-background-work-reports-its-own-end-the-
 id: raid-asm-a-crash-releases-whatever-carries-the-workspace-hold
 type: "[[raid]]"
 kind: assumption
-statement: "Whatever carries an instance's exclusive hold on a workspace is released by the operating system when that instance dies, including when it is killed without warning."
+statement: Whatever carries an instance's exclusive hold on a workspace is released by the operating system when that instance dies, including when it is killed without warning.
 owner: the maintainer
-trigger: "the first start refused on a workspace with nothing serving it, and any move to a host the product has not run on"
+trigger: the first start refused on a workspace with nothing serving it, and any move to a host the product has not run on
 status: probed
 looked: 2026-08-24
 probed: 2026-08-24
-impact: "If the hold survives its holder, a crash leaves a workspace nobody can start in. On an unattended machine there is no person to clear it, so the run ends there and the next one cannot begin."
+impact: If the hold survives its holder, a crash leaves a workspace nobody can start in. On an unattended machine there is no person to clear it, so the run ends there and the next one cannot begin.
 breaks_how_badly: crippling
 how_likely: conceivable
 probe: "NOT PROBED YET. Start an instance, take the hold, kill it without letting it clean up, and start another at once. The second must succeed. Run it on both platforms, and run it twice on each: immediately after the kill, and again after a pause, because a hold that lingers briefly and a hold that never releases look the same in one attempt."

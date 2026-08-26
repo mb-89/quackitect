@@ -1,6 +1,6 @@
 ---
 form: frame-delta
-reopened: "2026-08-19T17:17:22.566Z — same claims-registration gap as draft-vision/define-actual/log-risks"
+reopened: 2026-08-19T17:17:22.566Z — same claims-registration gap as draft-vision/define-actual/log-risks
 amended: 2026-08-16T16:31:02.257Z by agent — ref "main" resolves — verified 2026-08-16; correcting the stale "does not yet resolve" claim and its downstream follow_up
 by: agent
 signed_off: 2026-08-19T17:18:11.179Z

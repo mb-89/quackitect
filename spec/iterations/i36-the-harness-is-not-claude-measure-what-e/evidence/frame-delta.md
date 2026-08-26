@@ -2,9 +2,9 @@
 form: frame-delta
 by: agent
 signed_off: 2026-08-19T09:25:06.447Z
-reopened: "2026-08-19T09:23:52.815Z — Four technical-detail value props were removed. I36 now extends existing value props through stories and use cases instead of authoring new propositions."
+reopened: 2026-08-19T09:23:52.815Z — Four technical-detail value props were removed. I36 now extends existing value props through stories and use cases instead of authoring new propositions.
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / frame-delta

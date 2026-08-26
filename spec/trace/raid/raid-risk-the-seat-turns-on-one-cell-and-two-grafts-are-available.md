@@ -3,20 +3,20 @@ minted_in: i9
 id: raid-risk-the-seat-turns-on-one-cell-and-two-grafts-are-available
 type: "[[raid]]"
 kind: risk
-statement: "The chosen architecture led its nearest rival by zero and two of its strengths were takeable, so either graft would have reversed the seat. Consistent rescoring took the margin to minus two and neither graft reaches it any more."
+statement: The chosen architecture led its nearest rival by zero and two of its strengths were takeable, so either graft would have reversed the seat. Consistent rescoring took the margin to minus two and neither graft reaches it any more.
 owner: the driving agent
-trigger: "before the architecture gate blesses, and again at any state that would change a cell on the root row or the withholding row"
+trigger: before the architecture gate blesses, and again at any state that would change a cell on the root row or the withholding row
 status: closed
-impact: "While it stood, the decision was one cell wide and the reverse graft named two ways to produce that cell deliberately. Building the chosen line without ruling would have meant building a choice nobody confirmed."
+impact: While it stood, the decision was one cell wide and the reverse graft named two ways to produce that cell deliberately. Building the chosen line without ruling would have meant building a choice nobody confirmed.
 breaks_how_badly: crippling
 how_likely: expected
 source_refs:
-  - "converge-pugh at i9, 2026-08-19 — computed totals of 0 and minus 4 against the datum"
-  - "reverse-sensitivity at i9, 2026-08-19 — the reverse graft's first two lines"
-  - "the owner's ruling of 2026-08-19 that the reverse graft belongs before the declaration"
-  - "graft-onto-the-winner at i9, 2026-08-19 — the adopted install cell moved the margin from nought to minus one"
-  - "gate-architecture at i9, 2026-08-19 — three axes rescored across BOTH lines by one hand"
-  - "scratchpad/pugh-recount.mjs — the signs recounted from the stored table with every rescore applied"
+  - converge-pugh at i9, 2026-08-19 — computed totals of 0 and minus 4 against the datum
+  - reverse-sensitivity at i9, 2026-08-19 — the reverse graft's first two lines
+  - the owner's ruling of 2026-08-19 that the reverse graft belongs before the declaration
+  - graft-onto-the-winner at i9, 2026-08-19 — the adopted install cell moved the margin from nought to minus one
+  - gate-architecture at i9, 2026-08-19 — three axes rescored across BOTH lines by one hand
+  - scratchpad/pugh-recount.mjs — the signs recounted from the stored table with every rescore applied
 ---
 
 ## What closed it

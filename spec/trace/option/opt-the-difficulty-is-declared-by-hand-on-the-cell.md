@@ -4,9 +4,9 @@ id: opt-the-difficulty-is-declared-by-hand-on-the-cell
 type: "[[option]]"
 cluster: the-sizing
 question: how a step's difficulty is arrived at
-statement: "a person writes the difficulty into the matrix cell beside the rigor word, and nothing derives, computes or observes it"
+statement: a person writes the difficulty into the matrix cell beside the rigor word, and nothing derives, computes or observes it
 found_by: without
-source: "the seed's own proposal, given a node so the chart can hold it as a value rather than as an absence"
+source: the seed's own proposal, given a node so the chart can hold it as a value rather than as an absence
 ---
 
 ## The found_by on this node is not earned, and a claim was built on it

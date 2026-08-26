@@ -7,7 +7,7 @@ method: demonstration
 demonstrates:
   - sty-the-run-that-died-while-nobody-was-holding-it
   - sty-the-wait-that-says-how-long-it-will-wait
-verifies: "none — demonstrates carries the edge; the requirements behind these two stories are verify method test and are carried by tsp-background-work-reports-its-own-end"
+verifies: none — demonstrates carries the edge; the requirements behind these two stories are verify method test and are carried by tsp-background-work-reports-its-own-end
 files:
   - none — the procedure below is the definition, because the pass is what an agent reads back from a live registry rather than what an assertion reads
 priority: must

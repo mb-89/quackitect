@@ -3,7 +3,7 @@ form: find_contradiction
 by: agent
 signed_off: 2026-08-23T17:13:37.580Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / find_contradiction

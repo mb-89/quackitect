@@ -1,10 +1,10 @@
 ---
 form: log-risks
-reopened: "2026-08-23T15:19:23.884Z — draft-vision was re-signed after it, so log-risks answered older ground"
+reopened: 2026-08-23T15:19:23.884Z — draft-vision was re-signed after it, so log-risks answered older ground
 by: agent
 signed_off: 2026-08-23T15:19:36.723Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / log-risks

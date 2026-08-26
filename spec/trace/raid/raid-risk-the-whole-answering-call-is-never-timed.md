@@ -3,11 +3,11 @@ minted_in: i51-work-running-out-of-sight-reports-itself
 id: raid-risk-the-whole-answering-call-is-never-timed
 type: "[[raid]]"
 kind: risk
-statement: "Nothing measures the whole answering call, only the bounded wait inside it, so the call can breach the second the requirement names while every check stays green."
+statement: Nothing measures the whole answering call, only the bounded wait inside it, so the call can breach the second the requirement names while every check stays green.
 owner: the driving agent
 trigger: a caller reporting a pull that took longer than a second while a leaving judgment was running
 status: open
-impact: "The requirement measures the answering call and the tests measure a helper it awaits. A regression in the work that follows the wait would not turn anything red."
+impact: The requirement measures the answering call and the tests measure a helper it awaits. A regression in the work that follows the wait would not turn anything red.
 breaks_how_badly: corrosive
 how_likely: plausible
 source_refs:

@@ -6,7 +6,7 @@ statement: While a piece of work it launched is recorded as running, the product
 kind: functional
 verify_method: test
 measure: "answers reporting an entry as running whose process was already gone when the answer was composed: zero. Entries settled while their process still exists: zero."
-breaks_if_removed: "A process that dies without writing a closing record leaves an entry that says running for ever, and a leaving judgment reads as still deciding while such an entry stands, so the walk stops at the step that owns it."
+breaks_if_removed: A process that dies without writing a closing record leaves an entry that says running for ever, and a leaving judgment reads as still deciding while such an entry stands, so the walk stops at the step that owns it.
 breaks_how_badly: crippling
 priority: must
 refines:

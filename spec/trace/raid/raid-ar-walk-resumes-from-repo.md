@@ -7,7 +7,7 @@ statement: The architecture leaves req-walk-resumes-from-repo at risk — the re
 owner: the adjudicator
 trigger: a session ending while any step's leaving judgment is still deciding
 status: open
-impact: "A step left at the third standing has its judgment finish and its verdict reach nobody. Measured 2026-08-21 — the work survives losing its parent, and the answer has no route back into the record."
+impact: A step left at the third standing has its judgment finish and its verdict reach nobody. Measured 2026-08-21 — the work survives losing its parent, and the answer has no route back into the record.
 breaks_how_badly: fatal
 how_likely: expected
 source_refs:

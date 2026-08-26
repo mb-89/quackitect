@@ -7,8 +7,8 @@ legal_tools: se_survey, se_log_query, se_run, se_test, se_lint, se_git, se_file_
 entry_read: guidance/method/overhaul.md
 motivation: Every good retro raises the bar, and the moment it rises everything written before it is out of compliance. Overhaul is where the system pays that debt off instead of carrying it. It is heavy on purpose, and it runs seldom.
 inputs:
-  - "Open with the survey | Run se_survey. One call lists every open record, every pending note and every work token standing in the pool."
-  - "Run the machines | The whole battery and the voice lint. Collect what fails before judging anything."
+  - Open with the survey | Run se_survey. One call lists every open record, every pending note and every work token standing in the pool.
+  - Run the machines | The whole battery and the voice lint. Collect what fails before judging anything.
 follow_up_label: findings executed
 guidance: |
   OVERHAUL, applied. Follow `guidance/method/overhaul.md` step by step.

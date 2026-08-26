@@ -2,9 +2,9 @@
 form: scope-non-goals
 by: agent
 signed_off: 2026-08-19T09:25:40.891Z
-reopened: "2026-08-19T09:25:25.735Z — Frame-delta now inherits existing marketing-level value props; confirm the already bounded scope still holds."
+reopened: 2026-08-19T09:25:25.735Z — Frame-delta now inherits existing marketing-level value props; confirm the already bounded scope still holds.
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / scope-non-goals

@@ -20,7 +20,7 @@ source_refs:
   - ".se/req-mine-sebots.md: rejections need memory"
   - "owner ruling 2026-08-16: the close hands over rather than refusing"
 priority: must
-ears: "exempt — owner ruling 2026-08-16 split one close-time rule into two dispositions (refuse on unlanded work, carry an unruled finding); the statement states both halves and no single EARS shape covers a two-branch rule. See Detail."
+ears: exempt — owner ruling 2026-08-16 split one close-time rule into two dispositions (refuse on unlanded work, carry an unruled finding); the statement states both halves and no single EARS shape covers a two-branch rule. See Detail.
 ---
 
 ## Detail

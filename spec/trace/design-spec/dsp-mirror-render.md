@@ -4,34 +4,36 @@ id: dsp-mirror-render
 type: "[[design-spec]]"
 statement: the one surface a person looks at, carried by a loopback server rendering the machine, the forms, the feed and the tour
 realizes:
-  - "el-mirror"
-  - "if-account-to-mirror"
-  - "if-front-desk-to-mirror"
-  - "if-holding-pen-to-mirror"
-  - "if-method-compiler-to-mirror"
-  - "if-record-store-to-mirror"
-  - "if-walk-engine-to-mirror"
+  - el-mirror
+  - if-account-to-mirror
+  - if-front-desk-to-mirror
+  - if-holding-pen-to-mirror
+  - if-method-compiler-to-mirror
+  - if-record-store-to-mirror
+  - if-walk-engine-to-mirror
 files:
-  - "deliverable/engine/render.ts"
-  - "deliverable/engine/renderclient.ts"
-  - "deliverable/engine/renderclient-detail.ts"
-  - "deliverable/engine/renderclient-walk.ts"
-  - "deliverable/engine/renderclient-form.ts"
-  - "deliverable/engine/renderclient-panel.ts"
-  - "deliverable/engine/renderclient-log.ts"
-  - "deliverable/engine/renderclient-live.ts"
-  - "deliverable/engine/renderstyle.ts"
-  - "deliverable/engine/mirror.ts"
-  - "deliverable/engine/panel.ts"
-  - "deliverable/engine/brand.ts"
-  - "deliverable/engine/card-parts.ts"
-  - "deliverable/engine/cards.ts"
-  - "deliverable/engine/traceui.ts"
-  - "deliverable/engine/gitgraph.ts"
-  - "deliverable/engine/shoot.ts"
-  - "deliverable/engine/bin/brand.ts"
-  - "deliverable/engine/bin/mermaid-check.ts"
-  - "deliverable/engine/bin/place-prompt-layer.ts"
+  - deliverable/engine/render.ts
+  - deliverable/engine/mirrortext.ts
+  - deliverable/engine/widget-kinds.ts
+  - deliverable/engine/renderclient.ts
+  - deliverable/engine/renderclient-detail.ts
+  - deliverable/engine/renderclient-walk.ts
+  - deliverable/engine/renderclient-form.ts
+  - deliverable/engine/renderclient-panel.ts
+  - deliverable/engine/renderclient-log.ts
+  - deliverable/engine/renderclient-live.ts
+  - deliverable/engine/renderstyle.ts
+  - deliverable/engine/mirror.ts
+  - deliverable/engine/panel.ts
+  - deliverable/engine/brand.ts
+  - deliverable/engine/card-parts.ts
+  - deliverable/engine/cards.ts
+  - deliverable/engine/traceui.ts
+  - deliverable/engine/gitgraph.ts
+  - deliverable/engine/shoot.ts
+  - deliverable/engine/bin/brand.ts
+  - deliverable/engine/bin/mermaid-check.ts
+  - deliverable/engine/bin/place-prompt-layer.ts
 ---
 
 ## One decider says which kind of green it is

@@ -16,6 +16,11 @@ source_refs:
   - "engine/session.ts recordDone: the GreenPass parameter and its comment"
   - "software.md: collect the input once, process, output (owner ruling 2026-08-09)"
 priority: must
+weighs_with:
+  - req-a-hop-of-the-walk-carries-its-own-time-budget ! — that bounds the CLOCK on one transition, this bounds how many times an operation re-reads the same input; an operation can re-read freely and still be fast on a small corpus
+  - req-a-slow-answer-does-not-freeze-the-surface-beside-it ! — one is redundant reading inside a single operation, the other is whether a second surface keeps answering while the first runs long
+  - req-a-target-that-cannot-be-reached-is-refused-quickly ! — both are shape claims rather than durations, but one is about re-reading an input and the other about never revisiting a state in a search
+  - req-aiming-returns-before-the-walking-starts ! — an aim walks nothing and reads little, so re-reading is not what makes an aim slow
 ---
 
 ## Scenario

@@ -4,6 +4,7 @@ id: flow-workspace-hold
 type: "[[flow]]"
 statement: the exclusive claim one instance has on a workspace, held only while that instance is alive
 kind: signal
+crosses: in
 source_refs:
   - req-one-instance-holds-a-folder-and-its-port
   - fn-run-a-governed-walk.hold-a-workspace-alone

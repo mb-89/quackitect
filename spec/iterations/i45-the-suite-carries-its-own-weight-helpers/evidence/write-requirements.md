@@ -1,10 +1,10 @@
 ---
 form: write-requirements
-reopened: "2026-08-21T12:22:58.317Z — generalize-use-cases was re-signed after a complete workflow review. The requirements claim must be re-signed against that reviewed input."
+reopened: 2026-08-21T12:22:58.317Z — generalize-use-cases was re-signed after a complete workflow review. The requirements claim must be re-signed against that reviewed input.
 by: agent
 signed_off: 2026-08-21T12:23:07.281Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / write-requirements

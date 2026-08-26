@@ -3,7 +3,7 @@ form: spike-can-the-host-state-the-folder
 by: agent
 signed_off: 2026-08-19T19:06:26.430Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / spike-can-the-host-state-the-folder

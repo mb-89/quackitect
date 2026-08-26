@@ -3,9 +3,9 @@ form: gate-motivation
 bless: blessed by agent
 by: agent
 signed_off: 2026-08-19T09:44:52.030Z
-reopened: "2026-08-19T09:44:07.115Z — Quality behavior moved from freely authored stories and use cases into requirements under fixed ISO 25010 quality use cases."
+reopened: 2026-08-19T09:44:07.115Z — Quality behavior moved from freely authored stories and use cases into requirements under fixed ISO 25010 quality use cases.
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / gate-motivation

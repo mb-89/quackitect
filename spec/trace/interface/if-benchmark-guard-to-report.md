@@ -2,7 +2,7 @@
 minted_in: i37-training-iterations-a-disposable-iterati
 id: if-benchmark-guard-to-report
 type: "[[interface]]"
-statement: "The guard hands the report the outcome of the run's deliberately forbidden request, and a report without it is not a result."
+statement: The guard hands the report the outcome of the run's deliberately forbidden request, and a report without it is not a result.
 source: el-benchmark-guard
 destination: el-benchmark-report
 carries:

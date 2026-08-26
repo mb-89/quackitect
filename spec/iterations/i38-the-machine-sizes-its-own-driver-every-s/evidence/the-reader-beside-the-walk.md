@@ -1,10 +1,10 @@
 ---
 form: the-reader-beside-the-walk
-amended: "2026-08-20T14:12:48.549Z by agent — a claim that no finder had ever been hostile-passed, falsified by this record own evidence directory half an hour before this form signed"
+amended: 2026-08-20T14:12:48.549Z by agent — a claim that no finder had ever been hostile-passed, falsified by this record own evidence directory half an hour before this form signed
 by: agent
 signed_off: 2026-08-20T12:50:52.912Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / the-reader-beside-the-walk

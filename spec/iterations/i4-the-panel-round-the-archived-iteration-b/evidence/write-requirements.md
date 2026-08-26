@@ -2,9 +2,9 @@
 form: write-requirements
 by: agent
 signed_off: 2026-08-23T16:48:10.328Z
-reopened: "2026-08-23T16:47:14.240Z — the surface collapse has no standing row; the register said none while a fourth scope piece is unbound"
+reopened: 2026-08-23T16:47:14.240Z — the surface collapse has no standing row; the register said none while a fourth scope piece is unbound
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / write-requirements

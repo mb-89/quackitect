@@ -1,6 +1,8 @@
 // see dsp-write-guard.md#the-conformance-sweep
+// see dsp-the-door-rule.md#responsibility
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
+import { DOORS, strays as doorStrays, entryPoints, governedCount, unreachedEntryPoints } from "../doors.ts";
 import { sweepCorpus } from "../sweep.ts";
 import { strays } from "../widgets.ts";
 
@@ -102,8 +104,66 @@ if (emitters.length > 0) {
   process.stdout.write("widget guard green\n");
 }
 
+// THE DOOR RULE'S OWN HALF. The write guard answers about one file and cannot
+// see a break no write arrived with, nor a reach made through a spawned
+// process. This is the complete check.
+//
+// IT SHIPS AT WARN. A new guard warns first and only starts refusing once its
+// warn rate is near zero, which is the craft rule's own ladder. Most of the
+// engine reaches the disk conversation and moving them is a record of its own, so
+// blocking now would fail every boot for a state nobody has had a chance to
+// fix. What it would take to block is written into the line it prints.
+// A SWEEP THAT LOOKED AT NOTHING MUST NOT REPORT GREEN. dsp-the-door-sweep
+// says so by name, and note-c545c46b8e56 records the same defect elsewhere.
+// The root is caller-supplied, so a typo in it emptied every list at once.
+let doorWarnings = 0;
+let unchecked = 0;
+for (const d of DOORS) {
+  if (governedCount(d.id, root) === 0) {
+    unchecked += 1;
+    process.stdout.write(`\ndoor ${d.id} UNCHECKED — it governs no file under ${root}\n`);
+    process.stdout.write(
+      "an empty finding list here means nothing was looked at, not that nothing is wrong. Check the root names the repository root.\n",
+    );
+    continue;
+  }
+  const undeclared = doorStrays(d.id, root);
+  doorWarnings += undeclared.length;
+  if (undeclared.length === 0) {
+    process.stdout.write(`door ${d.id} green\n`);
+    continue;
+  }
+  process.stdout.write(`\ndoor ${d.id} WARNS — ${String(undeclared.length)} undeclared reach(es)\n`);
+  for (const path of undeclared.slice(0, 10)) process.stdout.write(`- ${path}\n`);
+  if (undeclared.length > 10) process.stdout.write(`  and ${String(undeclared.length - 10)} more\n`);
+  process.stdout.write(
+    `declare each in deliverable/machines/doors.md with its reason, or route the reach through the door. It warns rather than refusing while the count is this high, and blocks once it is near zero. What this rule cannot see: ${d.governs}\n`,
+  );
+}
+
+// GOAL TWO OF THIS RECORD, ANSWERED EVERY RUN. An entry point nothing invokes
+// is working code nobody can reach, which is the shape that went unnoticed
+// while a hand-written list of six stood for twenty-nine.
+const unreached = unreachedEntryPoints(root);
+if (entryPoints(root).length === 0) {
+  unchecked += 1;
+  process.stdout.write(`\nentry points UNCHECKED — none found under ${root}\n`);
+} else if (unreached.length > 0) {
+  process.stdout.write(`\nentry points WARN — ${String(unreached.length)} that nothing invokes\n`);
+  for (const path of unreached) process.stdout.write(`- ${path}\n`);
+  process.stdout.write("answer each with a door, a deletion, or the invocation somebody forgot\n");
+} else {
+  process.stdout.write("entry points green\n");
+}
+
+if (unchecked > 0) {
+  process.stdout.write(`\nsweep NOT GREEN — ${String(unchecked)} rule(s) looked at nothing\n`);
+  process.exit(1);
+}
+
 if (r.findings.length === 0 && emitters.length === 0 && markers.length === 0) {
-  process.stdout.write("sweep green\n");
+  const warns = doorWarnings + unreached.length;
+  process.stdout.write(warns === 0 ? "sweep green\n" : `sweep green, with ${String(warns)} warning(s) above\n`);
   process.exit(0);
 }
 

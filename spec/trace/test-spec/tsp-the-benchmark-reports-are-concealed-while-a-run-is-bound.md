@@ -2,12 +2,12 @@
 minted_in: i37-training-iterations-a-disposable-iterati
 id: tsp-the-benchmark-reports-are-concealed-while-a-run-is-bound
 type: "[[test-spec]]"
-statement: "The benchmark reports folder returns zero results from every lane verb while a run is bound, and returns them normally when none is."
-method: "test"
+statement: The benchmark reports folder returns zero results from every lane verb while a run is bound, and returns them normally when none is.
+method: test
 verifies:
   - req-the-benchmark-history-is-unreadable-while-a-run-is-bound
 files:
-  - "tests/benchmark-run.test.ts"
+  - tests/benchmark-run.test.ts
 ---
 
 ## Scope

@@ -2,17 +2,17 @@
 minted_in: i38-the-machine-sizes-its-own-driver-every-s
 id: req-every-matrix-row-declares-its-complexity
 type: "[[requirement]]"
-statement: "When the rigor matrix is loaded, the engine shall obtain a complexity for every row in every change-size column in which that row applies, refusing loudly where it cannot rather than proceeding without one."
+statement: When the rigor matrix is loaded, the engine shall obtain a complexity for every row in every change-size column in which that row applies, refusing loudly where it cannot rather than proceeding without one.
 kind: functional
 verify_method: test
-breaks_if_removed: "A rating that is optional is a rating most rows will not carry, and a maximum taken over a partly-rated milestone is not a maximum. The mechanism degrades to nothing without saying so."
+breaks_if_removed: A rating that is optional is a rating most rows will not carry, and a maximum taken over a partly-rated milestone is not a maximum. The mechanism degrades to nothing without saying so.
 breaks_how_badly: crippling
 refines:
   - uc-let-the-machine-name-the-driver
 source_refs:
-  - "uc-let-the-machine-name-the-driver step 2"
-  - "vp-the-engine"
-  - "raid-risk-a-hand-declared-rung-drifts-upward-and-nothing-ever-says-so"
+  - uc-let-the-machine-name-the-driver step 2
+  - vp-the-engine
+  - raid-risk-a-hand-declared-rung-drifts-upward-and-nothing-ever-says-so
 priority: must
 ---
 

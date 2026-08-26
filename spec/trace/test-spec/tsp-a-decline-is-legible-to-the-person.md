@@ -6,7 +6,7 @@ statement: A person presses a control that declines, and the surface tells them 
 method: demonstration
 demonstrates:
   - sty-the-control-that-says-why-it-declined
-verifies: "none — demonstrates carries the edge; the three requirements behind this story are verify method test and are carried by tsp-a-control-is-legible"
+verifies: none — demonstrates carries the edge; the three requirements behind this story are verify method test and are carried by tsp-a-control-is-legible
 files:
   - none — the procedure below is the definition, because the pass is what a person can tell from the screen
 ---

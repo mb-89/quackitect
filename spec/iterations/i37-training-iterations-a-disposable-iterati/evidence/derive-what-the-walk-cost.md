@@ -3,7 +3,7 @@ form: derive-what-the-walk-cost
 by: agent
 signed_off: 2026-08-20T09:57:38.438Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / derive-what-the-walk-cost

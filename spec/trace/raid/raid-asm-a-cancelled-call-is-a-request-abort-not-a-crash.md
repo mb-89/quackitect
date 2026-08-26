@@ -8,7 +8,7 @@ owner: the driving agent
 trigger: any report that the mirror stopped answering after a cancelled call, and every MCP server restart observed during an iteration
 status: open
 probe: "Cheapest real check ran this session: the mirror's process (pid 20652) stayed listed on Get-NetTCPConnection -LocalPort 7333 and answered HTTP 200 on / immediately after a se_pull tool call was cancelled mid-flight, and the next se_pull succeeded normally with no restart. HOLDS for a host-cancelled call on this session's harness (VS Code / Copilot chat over HTTP). Other harnesses' cancellation behaviour is unprobed."
-probed: "2026-08-19"
+probed: 2026-08-19
 breaks_how_badly: corrosive
 how_likely: plausible
 source_refs:

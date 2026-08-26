@@ -1,11 +1,11 @@
 ---
 form: gate-motivation
 bless: blessed by agent
-amended: "2026-08-19T12:16:47.503Z by agent — The owner accepted the existing-checkout risk with a hand migration, so it is no longer an open override and the verdict said it was."
+amended: 2026-08-19T12:16:47.503Z by agent — The owner accepted the existing-checkout risk with a hand migration, so it is no longer an open override and the verdict said it was.
 by: agent
 signed_off: 2026-08-19T12:09:35.879Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / gate-motivation

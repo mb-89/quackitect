@@ -2,9 +2,9 @@
 form: decompose-structure
 by: agent
 signed_off: 2026-08-20T08:26:33.505Z
-reopened: "2026-08-20T08:26:28.707Z — a feeder re-signed above it"
+reopened: 2026-08-20T08:26:28.707Z — a feeder re-signed above it
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / decompose-structure

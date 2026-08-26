@@ -3,15 +3,15 @@ minted_in: i9
 id: raid-risk-opening-a-hidden-file-changes-what-a-walk-in-flight-can-see
 type: "[[raid]]"
 kind: risk
-statement: "Serving files the lane has always hidden gives an agent a second way to read what a structured verb was the only door to, and the two answers can disagree."
+statement: Serving files the lane has always hidden gives an agent a second way to read what a structured verb was the only door to, and the two answers can disagree.
 owner: the driving agent
-trigger: "the first time an agent reads one of the newly served files instead of calling the verb that serves it"
+trigger: the first time an agent reads one of the newly served files instead of calling the verb that serves it
 status: open
-impact: "A raw read returns whatever is on disk, unpaged and unfiltered, with none of the ordering or the windowing the verb applies. An agent that reaches for the file will sometimes get a different answer from the one the machine would have given it, and nothing says which is right."
+impact: A raw read returns whatever is on disk, unpaged and unfiltered, with none of the ordering or the windowing the verb applies. An agent that reaches for the file will sometimes get a different answer from the one the machine would have given it, and nothing says which is right.
 breaks_how_badly: abrasive
 how_likely: expected
 source_refs:
-  - "the ruling in this iteration's goal system, hide what has a door and serve what does not"
+  - the ruling in this iteration's goal system, hide what has a door and serve what does not
 ---
 
 ## What the risk is

@@ -3,15 +3,15 @@ minted_in: i38-the-machine-sizes-its-own-driver-every-s
 id: raid-dep-the-payoff-waits-on-a-weak-model-being-able-to-boot-at-all
 type: "[[raid]]"
 kind: dependency
-restated: "2026-08-20 — the payoff waits on the walker delegating to a subagent on a named model, not on a weak model booting a different walker. The delegation path exists and carries an owner grant; what is missing is anything making the walker use it."
-statement: "Routing a cheaper driver to a cheaper state is worth nothing while a standing crippling issue says a weaker model cannot produce the boot reading proof at all, so this iteration's payoff waits on a door somebody else owns."
+restated: 2026-08-20 — the payoff waits on the walker delegating to a subagent on a named model, not on a weak model booting a different walker. The delegation path exists and carries an owner grant; what is missing is anything making the walker use it.
+statement: Routing a cheaper driver to a cheaper state is worth nothing while a standing crippling issue says a weaker model cannot produce the boot reading proof at all, so this iteration's payoff waits on a door somebody else owns.
 owner: the owner
-trigger: "the first attempt to actually run a state on a model below the session default, and any close or re-probe of raid-the-read-proof-locks-weaker-models-out-of-the-system"
+trigger: the first attempt to actually run a state on a model below the session default, and any close or re-probe of raid-the-read-proof-locks-weaker-models-out-of-the-system
 status: open
-impact: "The mechanism can be built, tested and shipped in full and still deliver no saving, because the models it would route work to cannot reach the first state of any session. The value proposition it serves is unreachable until the boot door opens."
+impact: The mechanism can be built, tested and shipped in full and still deliver no saving, because the models it would route work to cannot reach the first state of any session. The value proposition it serves is unreachable until the boot door opens.
 breaks_how_badly: crippling
 how_likely: expected
-probe: "FOUND BY SWEEPING THE STANDING REGISTER AT i38's MOTIVATION GATE, 2026-08-20, after the log-risks form claimed a re-read it had not performed. raid-the-read-proof-locks-weaker-models-out-of-the-system, minted in i28 and still open, is graded crippling and expected, and states in its own words that weaker models cannot produce the boot reading proof at all — that the first step of the first thing every machine does makes the system unavailable to them entirely. raid-asm-refusals-recover-a-weak-model stands beside it, open, and its own probe records that the one measurement taken was against a model that was not weak."
+probe: FOUND BY SWEEPING THE STANDING REGISTER AT i38's MOTIVATION GATE, 2026-08-20, after the log-risks form claimed a re-read it had not performed. raid-the-read-proof-locks-weaker-models-out-of-the-system, minted in i28 and still open, is graded crippling and expected, and states in its own words that weaker models cannot produce the boot reading proof at all — that the first step of the first thing every machine does makes the system unavailable to them entirely. raid-asm-refusals-recover-a-weak-model stands beside it, open, and its own probe records that the one measurement taken was against a model that was not weak.
 probed: 2026-08-20
 source_refs:
   - i38-the-machine-sizes-its-own-driver-every-s

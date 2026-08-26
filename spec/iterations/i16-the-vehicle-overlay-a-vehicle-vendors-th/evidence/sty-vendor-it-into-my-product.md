@@ -3,7 +3,7 @@ form: sty-vendor-it-into-my-product
 by: agent
 signed_off: 2026-08-18T20:27:00.096Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / sty-vendor-it-into-my-product

@@ -1,6 +1,6 @@
 ---
 form: author-tests
-reopened: "2026-08-19T17:50:18.541Z — same claims-registration gap, cascading fix through M7"
+reopened: 2026-08-19T17:50:18.541Z — same claims-registration gap, cascading fix through M7
 by: agent
 signed_off: 2026-08-19T17:50:18.960Z
 authors: agent

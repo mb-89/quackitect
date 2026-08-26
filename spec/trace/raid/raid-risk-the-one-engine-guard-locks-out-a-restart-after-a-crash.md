@@ -3,12 +3,12 @@ minted_in: i62-background-work-reports-its-own-end-the-
 id: raid-risk-the-one-engine-guard-locks-out-a-restart-after-a-crash
 type: "[[raid]]"
 kind: risk
-statement: "A guard strong enough to stop a second engine on one folder is strong enough to stop a legitimate restart after the first one crashed."
+statement: A guard strong enough to stop a second engine on one folder is strong enough to stop a legitimate restart after the first one crashed.
 owner: the maintainer
-trigger: "the first engine that refuses to start on a folder with no engine running on it"
+trigger: the first engine that refuses to start on a folder with no engine running on it
 status: open
 looked: 2026-08-24
-impact: "A folder nobody can start an engine on is a folder nobody can work in. On an unattended machine there is no person to clear the obstruction, so the run is over."
+impact: A folder nobody can start an engine on is a folder nobody can work in. On an unattended machine there is no person to clear the obstruction, so the run is over.
 breaks_how_badly: crippling
 how_likely: conceivable
 source_refs:

@@ -3,11 +3,11 @@ minted_in: i38-the-machine-sizes-its-own-driver-every-s
 id: raid-iss-two-always-on-roles-have-no-node-and-one-now-carries-a-duty
 type: "[[raid]]"
 kind: issue
-statement: "Four roles the method and the roster ruling name have no node — communicator, project-owner, guide and researcher — and this iteration has put a standing maintenance duty on the project-owner and credited a researcher's work to a role it did mint."
+statement: Four roles the method and the roster ruling name have no node — communicator, project-owner, guide and researcher — and this iteration has put a standing maintenance duty on the project-owner and credited a researcher's work to a role it did mint.
 owner: the owner
-trigger: "the next product-level stakeholder pass, and the first time anybody asks who is answerable for the model list being current"
+trigger: the next product-level stakeholder pass, and the first time anybody asks who is answerable for the model list being current
 status: open
-impact: "A duty with no role to carry it is a duty nobody is answerable for. The fixed model list only works while somebody maintains it by hand, and the design names that duty without naming who holds it."
+impact: A duty with no role to carry it is a duty nobody is answerable for. The fixed model list only works while somebody maintains it by hand, and the design names that duty without naming who holds it.
 breaks_how_badly: corrosive
 how_likely: expected
 probe: "WALKED THE ALWAYS-ON CLASSES AT i38's map-stakeholders, 2026-08-20, against the four standing nodes. meth-stakeholder-analysis names seven: acquirer, user, newcomer, communicator, assessor, project-owner, agent. Four resolve — stk-engineer-driving-agents, stk-engineer-driving-agents, stk-newcomer, stk-agent. The assessor was minted at that state as stk-reviewing-agent. COMMUNICATOR AND PROJECT-OWNER RESOLVE TO NOTHING, and a glob of spec/trace/stakeholder returns only those five afterwards."

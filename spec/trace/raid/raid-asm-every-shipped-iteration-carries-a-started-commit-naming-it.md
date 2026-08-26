@@ -3,15 +3,15 @@ minted_in: i37-training-iterations-a-disposable-iterati
 id: raid-asm-every-shipped-iteration-carries-a-started-commit-naming-it
 type: "[[raid]]"
 kind: assumption
-statement: "Every shipped iteration has exactly one commit whose message names it as started, so a rewind point can be found for any of them mechanically."
+statement: Every shipped iteration has exactly one commit whose message names it as started, so a rewind point can be found for any of them mechanically.
 owner: the maintainer of the machine
 trigger: the first benchmark run that names an iteration other than i33
 status: probed
 defer_until: "M7 reaches a state where se_git is legal — the check is one log query, `git log --format=%s | grep '^iteration .*: started$'`, compared against the fifteen shipped records"
-impact: "A benchmark cannot be pointed at part of the archive, and which part fails is discovered one run at a time rather than known."
+impact: A benchmark cannot be pointed at part of the archive, and which part fails is discovered one run at a time rather than known.
 breaks_how_badly: crippling
 how_likely: plausible
-probe: "FALSE, measured 2026-08-20 at run-demos. 16 shipped iterations, 6 with exactly one started commit, 10 with none, 0 with two. rewindPointFor resolves 6 of 16, so the benchmark pool is six."
+probe: FALSE, measured 2026-08-20 at run-demos. 16 shipped iterations, 6 with exactly one started commit, 10 with none, 0 with two. rewindPointFor resolves 6 of 16, so the benchmark pool is six.
 probed: 2026-08-19
 source_refs:
   - req-a-bound-run-resolves-no-commit-newer-than-its-rewind-point

@@ -5,8 +5,8 @@ type: "[[requirement]]"
 statement: While a state's leaving check is running, the product shall record that a verdict is owed against that state, and shall report that condition to every reader of the state's standing.
 kind: functional
 verify_method: test
-measure: "every reader of a state's standing returns the owed condition as its own answer, distinct from passed and from not-yet-attempted, on 100% of readers"
-breaks_if_removed: "A state with a check still running is indistinguishable from one that never attempted to leave, so a gate below it reads a green it has not earned."
+measure: every reader of a state's standing returns the owed condition as its own answer, distinct from passed and from not-yet-attempted, on 100% of readers
+breaks_if_removed: A state with a check still running is indistinguishable from one that never attempted to leave, so a gate below it reads a green it has not earned.
 breaks_how_badly: crippling
 priority: must
 refines:

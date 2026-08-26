@@ -6,7 +6,7 @@ statement: Remove the arrival as a separate cluster and have bringing a product 
 cluster: the-arrival
 question: how the bootstrap and the arrival are cut
 found_by: without
-source: "trimming the arrival cluster, prompted by the flow edge this delta created between bringing the product up and handing over the means to call"
+source: trimming the arrival cluster, prompted by the flow edge this delta created between bringing the product up and handing over the means to call
 ---
 
 ## Mechanism

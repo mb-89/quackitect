@@ -3,7 +3,7 @@ form: frame-delta
 by: agent
 signed_off: 2026-08-24T14:47:54.220Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / frame-delta

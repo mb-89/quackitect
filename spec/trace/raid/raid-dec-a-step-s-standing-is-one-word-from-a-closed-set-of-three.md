@@ -3,13 +3,13 @@ minted_in: i51-work-running-out-of-sight-reports-itself
 id: raid-dec-a-step-s-standing-is-one-word-from-a-closed-set-of-three
 type: "[[raid]]"
 kind: decision
-statement: "A step's standing is one value from a closed set of three, so passed-and-also-deciding cannot be expressed and a reader that does not know the third word sees a word it does not recognise."
+statement: A step's standing is one value from a closed set of three, so passed-and-also-deciding cannot be expressed and a reader that does not know the third word sees a word it does not recognise.
 owner: the driving agent
 trigger: the first reader that has to be told what the third word means, rather than failing loudly on meeting it
 status: decided
 how_likely: conceivable
 breaks_how_badly: crippling
-impact: "Every reader of a step's standing changes. Get the representation wrong and a gate opens on evidence that does not exist, which is the one failure this whole iteration must not introduce."
+impact: Every reader of a step's standing changes. Get the representation wrong and a gate opens on evidence that does not exist, which is the one failure this whole iteration must not introduce.
 source_refs:
   - req-a-pending-verdict-is-recorded-against-its-state
   - raid-risk-a-hop-that-finishes-later-makes-green-ambiguous

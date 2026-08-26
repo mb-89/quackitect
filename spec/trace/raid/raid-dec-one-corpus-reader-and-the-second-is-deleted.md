@@ -5,14 +5,14 @@ type: "[[raid]]"
 kind: decision
 statement: "The second corpus reader is deleted rather than made to agree: the one place that walks trace folders itself calls the canonical loader and filters its result, so a malformed node has one answer by construction."
 owner: the driving agent
-trigger: "any new caller that needs trace nodes, and any change to what a malformed node does"
+trigger: any new caller that needs trace nodes, and any change to what a malformed node does
 status: decided
 breaks_how_badly: crippling
 how_likely: expected
 source_refs:
   - req-what-the-corpus-is-has-one-answer
   - req-query-is-deterministic
-  - "probe P4 at i9 M4, 2026-08-19 — one loader, twenty callers, and one live second reader"
+  - probe P4 at i9 M4, 2026-08-19 — one loader, twenty callers, and one live second reader
 ---
 
 ## Rejected options

@@ -2,13 +2,13 @@
 minted_in: i37-training-iterations-a-disposable-iterati
 id: tsp-a-machine-change-becomes-a-paired-number
 type: "[[test-spec]]"
-statement: "A run against a real archived iteration binds, stands a rewound tree, records every condition, and closes saying where it actually ended — so a paired number becomes reachable where before there was none."
-method: "demonstration"
+statement: A run against a real archived iteration binds, stands a rewound tree, records every condition, and closes saying where it actually ended — so a paired number becomes reachable where before there was none.
+method: demonstration
 demonstrates:
-  - "sty-know-whether-a-machine-change-helped"
+  - sty-know-whether-a-machine-change-helped
 verifies: "none — demonstrates: carries the edge; the requirements behind this story are verify_method: test and are carried by the test-method specs beside it"
 files:
-  - "none — a demonstration performed against this repository's own archive; what it observes is a run, not a file"
+  - none — a demonstration performed against this repository's own archive; what it observes is a run, not a file
 ---
 
 ## Scope

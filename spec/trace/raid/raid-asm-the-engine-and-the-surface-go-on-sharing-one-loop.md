@@ -3,13 +3,13 @@ minted_in: i60-the-walk-gets-fast-and-it-is-measurable-
 id: raid-asm-the-engine-and-the-surface-go-on-sharing-one-loop
 type: "[[raid]]"
 kind: assumption
-statement: "The engine that answers a walker and the server that answers a surface go on being served from one loop, so work done for one is time taken from the other."
+statement: The engine that answers a walker and the server that answers a surface go on being served from one loop, so work done for one is time taken from the other.
 owner: the driving agent
 trigger: any change that moves either half onto its own process or thread, including one made by a sibling round
 status: probed
-probe: "HOLDS, 2026-08-24, at three times baseline after a confound was removed at the gate. FIRST PASS, WRONG - it counted 89 of 453 overlaps as 19.6 per cent against a 4.4 per cent baseline, and offered two near-identical durations as its sharpest evidence. A reviewer showed those pairs are the surface reporting the very call it was CARRYING, which proves nothing about contention. CORRECTED - excluding pairs whose durations agree within 200 ms leaves 69 genuinely different requests, and widening the baseline by the mean surface report of 7,966 ms gives 5.0 per cent. 15.2 against 5.0 is threefold. THE EVIDENCE IS NOW THE RIGHT SHAPE - a 2,415 ms surface request caught inside a 20,010 ms engine call, and a 46,161 ms one inside a 104,421 ms call. WHAT IS NOT SETTLED - four fifths of surface slow reports coincide with nothing, so the surface is also slow on its own account."
+probe: HOLDS, 2026-08-24, at three times baseline after a confound was removed at the gate. FIRST PASS, WRONG - it counted 89 of 453 overlaps as 19.6 per cent against a 4.4 per cent baseline, and offered two near-identical durations as its sharpest evidence. A reviewer showed those pairs are the surface reporting the very call it was CARRYING, which proves nothing about contention. CORRECTED - excluding pairs whose durations agree within 200 ms leaves 69 genuinely different requests, and widening the baseline by the mean surface report of 7,966 ms gives 5.0 per cent. 15.2 against 5.0 is threefold. THE EVIDENCE IS NOW THE RIGHT SHAPE - a 2,415 ms surface request caught inside a 20,010 ms engine call, and a 46,161 ms one inside a 104,421 ms call. WHAT IS NOT SETTLED - four fifths of surface slow reports coincide with nothing, so the surface is also slow on its own account.
 probed: 2026-08-24
-impact: "A requirement was written to stop a slow act freezing the surface. If the two stop sharing a loop, that row is satisfied by something nobody built and the round would have spent design effort on a coupling that had already gone."
+impact: A requirement was written to stop a slow act freezing the surface. If the two stop sharing a loop, that row is satisfied by something nobody built and the round would have spent design effort on a coupling that had already gone.
 breaks_how_badly: abrasive
 how_likely: plausible
 source_refs:

@@ -5,7 +5,7 @@ reopened: "2026-08-20T23:57:13.034Z — the machinery-ascends repair landed belo
 by: agent
 signed_off: 2026-08-20T23:57:15.806Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / gate-validation

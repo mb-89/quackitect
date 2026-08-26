@@ -1,10 +1,10 @@
 ---
 form: draw-context
-reopened: "2026-08-19T09:45:06.387Z — Gate motivation was re-signed after restoring the fixed ISO quality hierarchy; boundary remains unchanged."
+reopened: 2026-08-19T09:45:06.387Z — Gate motivation was re-signed after restoring the fixed ISO quality hierarchy; boundary remains unchanged.
 by: agent
 signed_off: 2026-08-19T09:45:28.589Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / draw-context

@@ -8,7 +8,7 @@ owner: the driving agent
 trigger: any vendor release note dated after 2026-08-18 touching a cited limit or behaviour
 status: open
 probe: "No cheap check exists this session: it needs each cited source re-fetched and its publish or last-updated date compared against 2026-08-18. draw-context's follow_up already schedules that scan; stays unprobed until it runs."
-probed: "unprobed 2026-08-19"
+probed: unprobed 2026-08-19
 breaks_how_badly: abrasive
 how_likely: plausible
 source_refs:

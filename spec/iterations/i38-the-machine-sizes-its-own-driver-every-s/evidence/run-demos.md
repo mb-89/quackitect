@@ -1,10 +1,10 @@
 ---
 form: run-demos
-reopened: "2026-08-20T23:32:00.747Z — gate-implementation was re-signed above it; the demonstration itself did not change."
+reopened: 2026-08-20T23:32:00.747Z — gate-implementation was re-signed above it; the demonstration itself did not change.
 by: agent
 signed_off: 2026-08-20T23:56:27.025Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / run-demos

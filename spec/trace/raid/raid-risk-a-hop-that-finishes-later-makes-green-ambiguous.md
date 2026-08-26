@@ -3,11 +3,11 @@ minted_in: i51-work-running-out-of-sight-reports-itself
 id: raid-risk-a-hop-that-finishes-later-makes-green-ambiguous
 type: "[[raid]]"
 kind: risk
-statement: "A state that may be left with its leaving verdict still owed breaks the one rule that makes green cheap to compute, and every gate below it inherits the ambiguity."
+statement: A state that may be left with its leaving verdict still owed breaks the one rule that makes green cheap to compute, and every gate below it inherits the ambiguity.
 owner: the driving agent
 trigger: the first walk that leaves a state with a pending verdict and then reads green anywhere downstream
 status: open
-impact: "Green is what a gate reads to decide passage. A third answer between green and not-green means every reader of green either learns the third answer or gets it wrong silently."
+impact: Green is what a gate reads to decide passage. A third answer between green and not-green means every reader of green either learns the third answer or gets it wrong silently.
 breaks_how_badly: crippling
 how_likely: expected
 source_refs:

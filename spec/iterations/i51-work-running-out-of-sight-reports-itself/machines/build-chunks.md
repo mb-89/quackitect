@@ -1,45 +1,45 @@
 ---
 steps:
   - id: the-table-holds-every-kind
-    statement: "One operation table replaces the two job tables, and an entry carries its kind, its identity, when it started, the state it belongs to, where its progress is written and the total that progress divides into"
+    statement: One operation table replaces the two job tables, and an entry carries its kind, its identity, when it started, the state it belongs to, where its progress is written and the total that progress divides into
     depends_on: []
     realization: code
   - id: a-diff-nothing-answers-for-runs-nothing
-    statement: "A change that maps to no test starts no test file and names every unanswered part, while a red suite, an unreadable tree, a direct request and the piecemeal threshold all keep running everything"
+    statement: A change that maps to no test starts no test file and names every unanswered part, while a red suite, an unreadable tree, a direct request and the piecemeal threshold all keep running everything
     depends_on: []
     realization: code
   - id: the-account-answers-in-one-call
-    statement: "One call returns every operation, running and finished alike, so a caller that missed the moment still learns what happened"
+    statement: One call returns every operation, running and finished alike, so a caller that missed the moment still learns what happened
     depends_on:
       - the-table-holds-every-kind
     realization: code
   - id: the-leaving-judgment-stops-holding-the-call
-    statement: "The serving path starts a step's leaving judgment and answers without awaiting it, registering the judgment as an operation against the step it belongs to"
+    statement: The serving path starts a step's leaving judgment and answers without awaiting it, registering the judgment as an operation against the step it belongs to
     depends_on:
       - the-table-holds-every-kind
     realization: code
   - id: the-figure-carries-its-basis
-    statement: "A duration is computed from the operation's own progress count and returned with what it rests on, and an operation with no measurement carries no figure and says so"
+    statement: A duration is computed from the operation's own progress count and returned with what it rests on, and an operation with no measurement carries no figure and says so
     depends_on:
       - the-account-answers-in-one-call
     realization: code
   - id: a-step-stands-in-one-of-three-words
-    statement: "A step's standing is one word from a closed set of passed, not passed and still deciding, and every reader of green takes the third word distinctly rather than flattened"
+    statement: A step's standing is one word from a closed set of passed, not passed and still deciding, and every reader of green takes the third word distinctly rather than flattened
     depends_on:
       - the-leaving-judgment-stops-holding-the-call
     realization: code
   - id: the-account-rides-every-answer
-    statement: "The account is attached where the lane composes its reply, beside the answer the caller asked for and never replacing it, and an empty account is an empty list rather than an absent field"
+    statement: The account is attached where the lane composes its reply, beside the answer the caller asked for and never replacing it, and an empty account is an empty list rather than an absent field
     depends_on:
       - the-figure-carries-its-basis
     realization: code
   - id: the-verdict-lands-against-its-step
-    statement: "A settled judgment writes its verdict where the step's other standings already live, and a judgment whose process is gone settles as failed rather than deciding for ever"
+    statement: A settled judgment writes its verdict where the step's other standings already live, and a judgment whose process is gone settles as failed rather than deciding for ever
     depends_on:
       - a-step-stands-in-one-of-three-words
     realization: code
   - id: a-fresh-session-knows-a-deciding-step
-    statement: "A session that finds a step still deciding with no live judgment behind it re-runs the judgment rather than trusting a word the repository cannot settle"
+    statement: A session that finds a step still deciding with no live judgment behind it re-runs the judgment rather than trusting a word the repository cannot settle
     depends_on:
       - the-verdict-lands-against-its-step
     realization: code

@@ -1,10 +1,10 @@
 ---
 form: observe-red
-reopened: "2026-08-21T12:45:00.666Z — Reload left the red-observation form filled but not standing. Reopen it to re-submit the unchanged derived no-spec result."
+reopened: 2026-08-21T12:45:00.666Z — Reload left the red-observation form filled but not standing. Reopen it to re-submit the unchanged derived no-spec result.
 by: agent
 signed_off: 2026-08-21T12:45:19.221Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / observe-red

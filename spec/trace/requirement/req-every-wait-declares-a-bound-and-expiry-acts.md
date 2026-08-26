@@ -6,7 +6,7 @@ statement: When the product begins waiting for anything whose end it does not co
 kind: functional
 verify_method: test
 measure: "wait sites in the product declaring no bound: zero. Waits that pass their bound without producing an outcome: zero."
-breaks_if_removed: "A wait with no bound is indistinguishable from a hang, and on a machine nobody watches there is no one to tell them apart, so the run is spent either way."
+breaks_if_removed: A wait with no bound is indistinguishable from a hang, and on a machine nobody watches there is no one to tell them apart, so the run is spent either way.
 breaks_how_badly: crippling
 priority: must
 refines:

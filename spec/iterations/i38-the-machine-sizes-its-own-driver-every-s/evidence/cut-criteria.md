@@ -4,7 +4,7 @@ by: agent
 signed_off: 2026-08-20T19:22:22.654Z
 reopened: "2026-08-20T19:22:19.624Z — a cold scoring pass re-judged both account axes against the corrected acting party. Nothing moves, and two things about this form do. Its cuts list still calls req-comparison-carries-both-sides the row the winner fails structurally, sixteen lines above the paragraph withdrawing exactly that sentence. And the residue of that reason is now false inside our own tree: the party that resolves a published rung is the walking agent, which picks the hand and therefore knows what it spawned."
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / cut-criteria

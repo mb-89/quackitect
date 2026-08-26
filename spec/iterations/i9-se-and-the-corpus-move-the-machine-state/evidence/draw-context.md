@@ -3,7 +3,7 @@ form: draw-context
 by: agent
 signed_off: 2026-08-19T12:20:18.189Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / draw-context

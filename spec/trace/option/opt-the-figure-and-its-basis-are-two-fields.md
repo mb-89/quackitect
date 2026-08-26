@@ -5,7 +5,7 @@ type: "[[option]]"
 statement: the duration and the thing it was computed from are two separate fields on the entry, so a caller that wants a number gets one and a caller that wants to judge it gets the working
 cluster: cluster-the-estimate
 found_by: contradiction
-source: "TRIZ separation IN SPACE, via meth-triz — improving 28 Measurement accuracy degrades 24 Loss of information, and both were assumed to apply to one sentence"
+source: TRIZ separation IN SPACE, via meth-triz — improving 28 Measurement accuracy degrades 24 Loss of information, and both were assumed to apply to one sentence
 ---
 
 ## Mechanism

@@ -3,7 +3,7 @@ form: an-empty-source-says-so
 by: agent
 signed_off: 2026-08-19T12:05:03.451Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / an-empty-source-says-so

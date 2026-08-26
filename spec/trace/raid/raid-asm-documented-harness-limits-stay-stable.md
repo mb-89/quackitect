@@ -8,7 +8,7 @@ owner: the driving agent
 trigger: any vendor changelog or observed behaviour change touching a documented limit; the quarterly harness re-scan this iteration's follow_up owes
 status: open
 probe: "No cheap check exists this session: verifying this needs re-fetching each vendor's current documentation and comparing it to the cited figures. draw-context's follow_up already schedules that fresh primary-source scan before design settles; this stays unprobed until that scan runs."
-probed: "unprobed 2026-08-19 — see draw-context follow_up"
+probed: unprobed 2026-08-19 — see draw-context follow_up
 breaks_how_badly: corrosive
 how_likely: plausible
 source_refs:

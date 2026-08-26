@@ -3,12 +3,12 @@ minted_in: i36
 id: tsp-research-across-harnesses
 type: "[[test-spec]]"
 statement: An engineer asking for current harness research receives a primary-source comparison whose queries and sources are logged, whose gaps are named, and whose figures say where each came from.
-method: "demonstration"
+method: demonstration
 demonstrates:
-  - "sty-run-deep-research-across-harnesses"
+  - sty-run-deep-research-across-harnesses
 verifies: "none — demonstrates: carries the edge; the harness-contract requirements behind this story are verify_method: test and are carried by tsp-supported-harness-serves-one-lane-contract"
 files:
-  - "none — a demonstration judged on the reference document and register entries a real run left behind"
+  - none — a demonstration judged on the reference document and register entries a real run left behind
 ---
 
 ## Scope

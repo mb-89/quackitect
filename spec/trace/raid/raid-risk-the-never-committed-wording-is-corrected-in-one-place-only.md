@@ -3,16 +3,16 @@ minted_in: i9
 id: raid-risk-the-never-committed-wording-is-corrected-in-one-place-only
 type: "[[raid]]"
 kind: risk
-statement: "The rule that machine-local state is never committed is written in at least two places, and correcting one of them leaves the other telling newcomers something the repository contradicts."
+statement: The rule that machine-local state is never committed is written in at least two places, and correcting one of them leaves the other telling newcomers something the repository contradicts.
 owner: the driving agent
-trigger: "the first newcomer who reads the front door after the marker lands"
+trigger: the first newcomer who reads the front door after the marker lands
 status: open
-impact: "A stranger reads that nothing in that folder reaches version control, then sees a file from it in the repository. The front door is exactly where a contradiction costs most, because it is the one document read by somebody with no way to check it."
+impact: A stranger reads that nothing in that folder reaches version control, then sees a file from it in the repository. The front door is exactly where a contradiction costs most, because it is the one document read by somebody with no way to check it.
 breaks_how_badly: abrasive
 how_likely: expected
 source_refs:
-  - "the ignore file's first line, and the README's own tree listing, both stating the rule"
-  - "this iteration's goal system, which rules that exactly one file is committed and carries no state"
+  - the ignore file's first line, and the README's own tree listing, both stating the rule
+  - this iteration's goal system, which rules that exactly one file is committed and carries no state
 ---
 
 ## What the risk is
