@@ -424,6 +424,29 @@ its to give, sends `form: {"bless": true}`, and the host denies it. The agent
 reads the denial as the engine's and reports the gate as the owner's. It was
 not; nobody had refused it.
 
+### You cannot see what your spawned hand is doing
+
+A RUNNING SUBAGENT'S PARTIAL OUTPUT IS UNREADABLE FROM HERE, until it finishes.
+Measured 2026-08-26 at an i54 verification state.
+
+THE HARNESS WRITES IT OUTSIDE THE PROJECT ROOT, under its own tasks folder, and
+all three ways in are shut at once.
+
+- `se_run {job}` is refused by the state gate, which allowed three read verbs.
+- A declared root would reach the host path, and declaring one is a WRITE to
+  `.se/roots.json` that the state did not allow either.
+- The host's own read tool is blocked by the cage, which is correct.
+
+SO PLAN FOR A SILENT HAND. On an unattended box the difference between working
+and stuck is exactly this, and there is no way to tell them apart from outside.
+Brief the subagent to report in stages rather than once at the end, and treat a
+long silence as normal rather than as a fault.
+
+THE FIX IS AN ENGINE CHANGE and is NOT BUILT YET. When it is built, reading a
+job by handle will be exempt from the state gate the way a served answer
+already is, because reading a job is not running one and the lane handed the
+handle out itself. Until then, brief for stages as above.
+
 ### Another machine may be walking the same record
 
 NOTHING STOPS IT, AND NOTHING IS MEANT TO. There is no claim, no lock and no

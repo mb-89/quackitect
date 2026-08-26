@@ -5,7 +5,7 @@ type: "[[raid]]"
 kind: debt
 statement: The consistency sweep was rewired to run after the demonstrations rather than beside them, because the walker cannot resume a fan leg once the leg it took was a submachine, so the method lost a parallel branch to get past an engine defect.
 owner: the owner
-looked: 2026-08-25
+looked: 2026-08-26
 status: open
 breaks_how_badly: corrosive
 how_likely: expected
@@ -128,4 +128,16 @@ sweep did not confuse the two, and the method still carries the serialised
 shape.
 
 RE-AFFIRMED AS STANDING. Trigger unchanged.
+
+## Swept 2026-08-26, at i54's closing retro: RE-ACCEPTED, and the trigger fired
+
+THIS IS THE FIRST LOOK WITH THE FAN ACTUALLY RUN. i54 spawned three hands beside the one holding the session, and they collided twice.
+
+WHAT THE COLLISION LOOKED LIKE. A spawned hand filled a position that had already been signed by the other hand, and its composed answer landed one position downstream. One authored step was discarded and a checkpoint took three fields nobody meant to write there.
+
+SO THE SERIALISATION THIS ENTRY DESCRIBES IS NOT MERELY A COST. Running the fan unserialised produced real damage, twice, in one record.
+
+TWO WORK TOKENS NOW CARRY THE REPAIRS, both minted at this retro. One asks a spawned hand to read the last signed position before its first write. One asks the stop guard to accept a registered second hand as a reason for the holding hand to rest.
+
+RE-ACCEPTED rather than repaid: the repairs are scoped and parked, and neither is this retro's to build.
 

@@ -5,7 +5,7 @@ type: "[[raid]]"
 kind: debt
 statement: The four demonstrations this iteration authored are drawn and none of them has been performed, so the iteration ships with every claim that needs a person watching standing on a drawing rather than on an observation.
 owner: the owner
-looked: 2026-08-25
+looked: 2026-08-26
 status: open
 breaks_how_badly: crippling
 how_likely: expected
@@ -102,4 +102,10 @@ is about, so nothing here moved.
 
 THE LOOK IS THE POINT. A debt nobody re-reads is a lie in the ledger, and this
 line is the evidence that somebody read it on this date.
+
+## Swept 2026-08-26, at i54's closing retro: RE-ACCEPTED
+
+NOT ADVANCED THIS WINDOW. i54 performed its own three demonstrations and left this record's untouched.
+
+RE-ACCEPTED consciously, trigger unchanged.
 

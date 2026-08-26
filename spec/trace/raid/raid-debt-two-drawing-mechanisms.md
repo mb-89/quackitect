@@ -7,7 +7,7 @@ statement: A seeded machine's steps are frontmatter rows in one drawing file, wh
 owner: the maintainer
 trigger: the picture-in-picture to-do machine design discussion, or the next change to the seeded-machine compiler
 status: open
-looked: 2026-08-25
+looked: 2026-08-26
 impact: Every feature the drawn machines gain must be built twice or the seeded ones fall behind; the owner has ruled the split wrong.
 breaks_how_badly: corrosive
 how_likely: expected
@@ -80,4 +80,10 @@ is about, so nothing here moved.
 
 THE LOOK IS THE POINT. A debt nobody re-reads is a lie in the ledger, and this
 line is the evidence that somebody read it on this date.
+
+## Swept 2026-08-26, at i54's closing retro: RE-ACCEPTED
+
+NOT TOUCHED THIS WINDOW. Neither drawing mechanism was opened.
+
+RE-ACCEPTED consciously, trigger unchanged.
 

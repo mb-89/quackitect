@@ -51,3 +51,13 @@ Three things, in order, and the first two are cheap.
 - WRITE THE TWO CASES THAT NEED TWO DOORS. One proves the already-reaches escape is evaluated per door, by giving a file an undeclared reach to door A and a NEW reach to door B and demanding a refusal. One proves the reasonless-departure guard checks every door whose list a path is, not the first.
 
 IT IS REPAID WHEN THE SWEEP REPORTS A SECOND DOOR WITH A NON-ZERO GOVERNED COUNT and those two cases are green. Not before, and no part of it is repaid by reading the code again.
+
+## Swept 2026-08-26, at i54's closing retro: RE-ACCEPTED
+
+FIRST DATED LOOK. This entry was minted by the record that is now closing, so no earlier sweep could have read it.
+
+THE TRIGGER HAS NOT FIRED. Its trigger is the record that registers a second conversation, and none has been opened.
+
+THE FIRST REPAYMENT STEP IS CHEAP AND STILL NOT TAKEN. Giving the door type a field naming the folders it governs would remove the hardcoded walk, and it does not need a second door to exist. It is deliberately left with the record that adds one, so the type change and its first real user land together.
+
+RE-ACCEPTED consciously, trigger unchanged.

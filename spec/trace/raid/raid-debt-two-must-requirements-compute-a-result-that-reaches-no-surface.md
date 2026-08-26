@@ -3,7 +3,7 @@ minted_in: i36
 id: raid-debt-two-must-requirements-compute-a-result-that-reaches-no-surface
 type: "[[raid]]"
 kind: debt
-looked: 2026-08-25
+looked: 2026-08-26
 statement: The stopping-layer diagnosis and the recurring-failure-shape detector are built and tested, but no production path calls either, so neither requirement's promised report actually reaches anyone.
 owner: the driving agent
 trigger: the next iteration that opens the lane's reporting surfaces
@@ -98,4 +98,16 @@ is about, so nothing here moved.
 
 THE LOOK IS THE POINT. A debt nobody re-reads is a lie in the ledger, and this
 line is the evidence that somebody read it on this date.
+
+## Swept 2026-08-26, at i54's closing retro: RE-ACCEPTED
+
+THE NEAREST THING TO A REPAYMENT RAN THIS WINDOW AND MISSED THIS ENTRY.
+
+i54 built a sweep for a different class: modules that open the disk without a declared exception. That is not the class here. This entry is about working code that computes a result no surface ever asks for.
+
+THE HALF THAT WOULD CATCH IT IS STILL A SHORT HAND-WRITTEN LIST. The reachability check walks a fixed pair of entry points rather than every export, which was confirmed by reading it this window. So neither of the two requirements here could have been flagged.
+
+WIDENING THAT CHECK IS ALREADY PARKED as a standing item in the pool. Until it lands, this entry cannot be found mechanically and stays where it is.
+
+RE-ACCEPTED consciously, trigger unchanged.
 

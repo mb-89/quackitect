@@ -2,7 +2,6 @@
 id: i54-everything-exported-has-a-door-a-sweep-o
 status: shipped
 closed: 2026-08-26T16:03:59.941Z
-retro_owed: 2026-08-26T16:03:59.941Z
 carried_count: 3
 carried:
   - Every new behavior carries its check, and the battery is green at rest — raid-debt-the-door-regime-is-built-for-four-doors-and-proved-with-one (gate-implementation.md)

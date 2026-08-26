@@ -5,7 +5,7 @@ type: "[[raid]]"
 kind: debt
 statement: The one demonstration this round owes watches a person browse the panel, and it was not performed, so the round ships with the claim about its own subject standing on a drawing rather than on an observation.
 owner: the owner
-looked: 2026-08-25
+looked: 2026-08-26
 status: open
 breaks_how_badly: crippling
 how_likely: expected
@@ -68,3 +68,9 @@ NO RECORD HAS OBSERVED THIS PROCEDURE SINCE i16. That is wider than this round
 and it already stands as its own entry,
 raid-debt-ten-checks-wait-on-a-person-or-a-second-machine. It is named here so
 the next sweep meets it rather than rediscovering it.
+
+## Swept 2026-08-26, at i54's closing retro: RE-ACCEPTED
+
+NOT TOUCHED THIS WINDOW. The window holds one record, and that record's subject was the disk regime rather than any panel.
+
+RE-ACCEPTED consciously, trigger unchanged.

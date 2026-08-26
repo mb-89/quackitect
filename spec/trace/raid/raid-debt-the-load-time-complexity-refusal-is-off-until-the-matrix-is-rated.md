@@ -3,7 +3,7 @@ minted_in: i38-the-machine-sizes-its-own-driver-every-s
 id: raid-debt-the-load-time-complexity-refusal-is-off-until-the-matrix-is-rated
 type: "[[raid]]"
 kind: debt
-looked: 2026-08-25
+looked: 2026-08-26
 statement: The engine refuses a missing complexity at the point of use rather than when the matrix is loaded, because turning the load-time refusal on before the 154 active cells are rated would make the product unloadable.
 owner: the owner
 trigger: the matrix owner rating the cells, and any reader who takes req-every-matrix-row-declares-its-complexity at its word
@@ -96,3 +96,9 @@ row that stands in for work happening elsewhere.
 WHAT MUST NOT CLOSE IT is deleting the point-of-use refusal on the grounds that
 the load-time one exists. Both are the same demand at two moments, and the later
 one is what stops a walk proceeding on a guess.
+
+## Swept 2026-08-26, at i54's closing retro: RE-ACCEPTED
+
+NOT TOUCHED THIS WINDOW. No rating pass ran and the matrix is unchanged.
+
+RE-ACCEPTED consciously, trigger unchanged.

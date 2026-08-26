@@ -97,7 +97,15 @@ export function mirrorText(m: MirrorState, intent: Intent = {}): string {
     ),
   );
 
-  const history = Array.isArray(v.history) ? v.history.map(String) : [];
+  // A HOP IS AN OBJECT, so `String` on it renders `[object Object]` ten times over.
+  // The last hops are the one part of this surface that says what just happened.
+  const history = Array.isArray(v.history)
+    ? v.history.map((h) =>
+        h !== null && typeof h === "object"
+          ? `${String((h as { state?: unknown }).state)} — ${String((h as { outcome?: unknown }).outcome)}`
+          : String(h),
+      )
+    : [];
   out.push(...bullets("Last hops", history.slice(-10)));
 
   if (v.comment.trim() !== "") out.push("## The drawing's own note", "", v.comment.trim(), "");
