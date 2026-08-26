@@ -185,6 +185,26 @@ The trigger is a NOTE carrying "needs retro":
      makes a folder available as `@name`, read-only by default. DECLARE IT
      YOURSELF and carry on. Stopping here to ask reports the drain unreachable
      and moves on, which is the step saying nothing.
+   - A FRESH CONTAINER HAS NOTHING TO DRAIN, and that is a real answer rather
+     than an unreachable step. A cloud box is cloned fresh and reclaimed when
+     it goes idle, so no memory from a previous session persisted into it.
+     Say "nothing persisted here" and move on.
+
+     SAY WHICH OF THE TWO IT WAS. "The folder was empty" and "no folder could
+     ever have carried anything into this box" are different findings, and
+     only the second one closes the step honestly on a disposable host.
+   - THE HOST MAY REFUSE THE DECLARATION, and then declaring one yourself is
+     not available. Observed 2026-08-26 on a Claude Code cloud container: a
+     glob of `@sessions` refused SE-C-127, its remedy said to write
+     `.se/roots.json` through the lane, and the harness's own permission layer
+     blocked that write before the lane saw it.
+
+     A HOST DENIAL IS NOT A LANE REFUSAL. It carries no clause and no remedy,
+     so there is nothing to follow and re-sending reaches the same layer.
+     `guidance/method/cloud-runner.md` carries how to tell them apart.
+
+     DO NOT REACH AROUND IT WITH THE SHELL. Record which call was denied and
+     by what, then answer the step with what you could reach.
    - WHAT IS NOT ALLOWED is ticking this step because nothing was surfaced.
      Say what you could reach and what you could not.
 

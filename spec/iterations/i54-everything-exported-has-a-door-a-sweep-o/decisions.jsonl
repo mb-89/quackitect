@@ -1,0 +1,48 @@
+{"ts":"2026-08-26T10:41:29.518Z","op":"done","visit":"start@0","node":"d2","brief":"the one-door ruling is written into the record"}
+{"ts":"2026-08-26T10:41:43.347Z","op":"plan","visit":"iterations/i54/spawn-the-hands@0","parent":null,"nodes":[{"id":"d6","brief":"read the spawn-hands roster card"},{"id":"d7","brief":"fill and submit spawn-the-hands"},{"id":"d8","brief":"carry the one-door ruling into the kickoff"}]}
+{"ts":"2026-08-26T10:42:22.767Z","op":"done","visit":"iterations/i54/spawn-the-hands@0","node":"d6","brief":"the roster card is read"}
+{"ts":"2026-08-26T10:42:56.186Z","op":"done","visit":"iterations/i54/spawn-the-hands@0","node":"d7","brief":"spawn-the-hands filled and submitted"}
+{"ts":"2026-08-26T10:43:46.763Z","op":"plan","visit":"iterations/i54/spawn-the-hands@0","parent":null,"nodes":[{"id":"d9","brief":"read what the walk owes"},{"id":"d10","brief":"walk the onboarding retro"},{"id":"d11","brief":"fill the kickoff against the widened scope"},{"id":"d12","brief":"fill the kickoff gate and stop"}]}
+{"ts":"2026-08-26T10:43:53.675Z","op":"update","visit":"iterations/i54/spawn-the-hands@0","node":"d13","brief":"searching for the one-door principle's names in the literature"}
+{"ts":"2026-08-26T10:44:11.039Z","op":"update","visit":"iterations/i54/spawn-the-hands@0","node":"d14","brief":"web search is gated here, so measuring the repo side first"}
+{"ts":"2026-08-26T10:44:34.340Z","op":"update","visit":"iterations/i54/spawn-the-hands@0","node":"d15","brief":"counting direct disk and network call sites across the engine"}
+{"ts":"2026-08-26T10:44:38.585Z","op":"fork","visit":"iterations/i54/spawn-the-hands@0","parent":"d3","node":"d16","brief":"spawn check refuses: ceiling 0 comes from a gate that has not run yet","nodes":[]}
+{"ts":"2026-08-26T10:44:47.841Z","op":"done","visit":"iterations/i54/spawn-the-hands@0","node":"d16","brief":"stood the M0 hand down so the ceiling check passes; defect noted"}
+{"ts":"2026-08-26T10:44:55.099Z","op":"update","visit":"iterations/i54/onboard-retro@0","node":"d17","brief":"checking whether a file door and a warm cache already exist"}
+{"ts":"2026-08-26T10:45:08.716Z","op":"update","visit":"iterations/i54/onboard-retro@0","node":"d18","brief":"surveying and mining the log to establish the retro window"}
+{"ts":"2026-08-26T10:45:10.116Z","op":"update","visit":"iterations/i54/onboard-retro@0","node":"d19","brief":"reading the three existing doors to check what they actually are"}
+{"ts":"2026-08-26T10:45:34.763Z","op":"update","visit":"iterations/i54/onboard-retro@0","node":"d20","brief":"looking for an exception-declaring precedent already in the repo"}
+{"ts":"2026-08-26T10:45:55.276Z","op":"update","visit":"iterations/i54/onboard-retro@0","node":"d21","brief":"both pending notes drained to the pool as work tokens"}
+{"ts":"2026-08-26T10:46:00.654Z","op":"done","visit":"iterations/i54/spawn-the-hands@0","node":"d9","brief":"retro card read and the walk's owed reading is clear"}
+{"ts":"2026-08-26T10:46:12.169Z","op":"done","visit":"start@0","node":"d3","brief":"the repo-side measurement is recorded"}
+{"ts":"2026-08-26T10:46:33.441Z","op":"plan","visit":"iterations/i54/onboard-retro@0","parent":null,"nodes":[{"id":"d22","brief":"classify the 398 disk sites into buckets"},{"id":"d23","brief":"report the measurement to the owner"}]}
+{"ts":"2026-08-26T10:46:49.419Z","op":"done","visit":"iterations/i54/onboard-retro@0","node":"d22","brief":"the disk sites are classified into three buckets"}
+{"ts":"2026-08-26T10:47:26.734Z","op":"update","visit":"iterations/i54/onboard-retro@0","node":"d24","brief":"taking the onboard-retro fill the tooth says is owed"}
+{"ts":"2026-08-26T10:47:45.141Z","op":"plan","visit":"iterations/i54/onboard-retro@0","parent":null,"nodes":[{"id":"d25","brief":"mine the call log for this window"},{"id":"d26","brief":"drain the pending notes"},{"id":"d27","brief":"fill the retro and ask field feedback"}]}
+{"ts":"2026-08-26T10:47:57.436Z","op":"update","visit":"iterations/i54/onboard-retro@0","node":"d28","brief":"checking the whole log against the last_retro window"}
+{"ts":"2026-08-26T10:48:09.699Z","op":"update","visit":"iterations/i54/onboard-retro@0","node":"d29","brief":"ranking the refusal clauses across the true window"}
+{"ts":"2026-08-26T10:48:39.543Z","op":"done","visit":"iterations/i54/onboard-retro@0","node":"d25","brief":"12 refusals ranked across the true 116-record window"}
+{"ts":"2026-08-26T10:48:53.820Z","op":"update","visit":"iterations/i54/onboard-retro@0","node":"d30","brief":"inbox empty; composing the retro evidence"}
+{"ts":"2026-08-26T10:49:08.586Z","op":"update","visit":"iterations/i54/onboard-retro@0","node":"d31","brief":"carrying the memory-drain note into the retro card"}
+{"ts":"2026-08-26T10:49:19.138Z","op":"done","visit":"iterations/i54/onboard-retro@0","node":"d26","brief":"the one pending note is carried into the retro card"}
+{"ts":"2026-08-26T10:49:44.823Z","op":"done","visit":"iterations/i54/spawn-the-hands@0","node":"d8","brief":"the ruling and its measurement are on the record"}
+{"ts":"2026-08-26T10:50:02.787Z","op":"done","visit":"iterations/i54/spawn-the-hands@0","node":"d10","brief":"onboard-retro signed; three notes minted as work tokens"}
+{"ts":"2026-08-26T10:50:39.296Z","op":"done","visit":"iterations/i54/onboard-retro@0","node":"d27","brief":"the retro is filled except the field-feedback question"}
+{"ts":"2026-08-26T10:50:58.049Z","op":"update","visit":"iterations/i54/gate-kickoff@0","node":"d32","brief":"my retro fill landed on the kickoff gate, checking what stands"}
+{"ts":"2026-08-26T10:51:06.956Z","op":"update","visit":"iterations/i54/gate-kickoff@0","node":"d33","brief":"reading the retro evidence to see whose fill stands"}
+{"ts":"2026-08-26T10:51:31.362Z","op":"update","visit":"iterations/i54/gate-kickoff@0","node":"d34","brief":"sizing the kickoff against the widened scope and the measured counts"}
+{"ts":"2026-08-26T10:52:00.495Z","op":"update","visit":"iterations/i54/gate-kickoff@0","node":"d35","brief":"finding the raid node shape so the gate can name its assumption"}
+{"ts":"2026-08-26T10:52:06.676Z","op":"update","visit":"iterations/i54/gate-kickoff@0","node":"d36","brief":"reading a raid assumption node for its schema"}
+{"ts":"2026-08-26T10:52:35.947Z","op":"done","visit":"iterations/i54/onboard-retro@0","node":"d23","brief":"the measurement was reported to the owner"}
+{"ts":"2026-08-26T10:52:48.396Z","op":"update","visit":"iterations/i54/gate-kickoff@0","node":"d37","brief":"two assumptions minted into the register for the kickoff to cite"}
+{"ts":"2026-08-26T10:52:57.957Z","op":"update","visit":"iterations/i54/gate-kickoff@0","node":"d38","brief":"capturing the owner's finding on the cloud-box retro"}
+{"ts":"2026-08-26T10:54:44.968Z","op":"done","visit":"iterations/i54/spawn-the-hands@0","node":"d11","brief":"the kickoff gate is filled against the widened scope"}
+{"ts":"2026-08-26T10:55:25.942Z","op":"update","visit":"iterations/i54/gate-kickoff@0","node":"d39","brief":"reading the walker's two assumption nodes to add their probes"}
+{"ts":"2026-08-26T10:55:43.393Z","op":"update","visit":"iterations/i54/gate-kickoff@0","node":"d40","brief":"the probe check rejects nodes that have a probe, finding the checker"}
+{"ts":"2026-08-26T10:55:58.389Z","op":"update","visit":"iterations/i54/gate-kickoff@0","node":"d41","brief":"reading the section checker to find why a leading Probe is invisible"}
+{"ts":"2026-08-26T10:56:00.512Z","op":"done","visit":"iterations/i54/spawn-the-hands@0","node":"d12","brief":"kickoff gate signed and standing unblessed"}
+{"ts":"2026-08-26T10:56:20.079Z","op":"update","visit":"iterations/i54/gate-kickoff@0","node":"d42","brief":"testing the section check directly against the three nodes"}
+{"ts":"2026-08-26T10:56:53.722Z","op":"plan","visit":"iterations/i54/gate-kickoff@0","parent":null,"nodes":[{"id":"d43","brief":"record the require_section defect"},{"id":"d44","brief":"sign the kickoff gate"},{"id":"d45","brief":"write the field report"}]}
+{"ts":"2026-08-26T10:57:03.996Z","op":"done","visit":"iterations/i54/gate-kickoff@0","node":"d43","brief":"the require_section defect is recorded with its evidence"}
+{"ts":"2026-08-26T10:57:34.194Z","op":"update","visit":"iterations/i54/gate-kickoff@0","node":"d46","brief":"correcting two contradicted sentences before blessing"}
+{"ts":"2026-08-26T10:57:49.680Z","op":"done","visit":"iterations/i54/gate-kickoff@0","node":"d44","brief":"the kickoff gate is blessed"}
