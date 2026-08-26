@@ -1,6 +1,13 @@
 ---
 id: i54-everything-exported-has-a-door-a-sweep-o
-status: open
+status: shipped
+closed: 2026-08-26T16:03:59.941Z
+retro_owed: 2026-08-26T16:03:59.941Z
+carried_count: 3
+carried:
+  - Every new behavior carries its check, and the battery is green at rest — raid-debt-the-door-regime-is-built-for-four-doors-and-proved-with-one (gate-implementation.md)
+  - Walker (deliverable/machines/methods/meth-spawn-hands.md) — raid-iss-the-spawn-check-refuses-the-answer-its-own-guidance-calls-legitimate (spawn-for-requirements.md)
+  - command and tool docs — raid-iss-no-write-verb-announces-the-door-refusals-before-firing-them (sweep-consistency.md)
 started: 2026-08-26T10:40:37.828Z
 opened: 2026-08-20T19:35:31.935Z
 goal: "Everything exported has a door: a sweep over every entry point replaces the hand-written list of two, and the working code nobody can reach gets a surface."
