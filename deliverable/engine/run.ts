@@ -1794,6 +1794,42 @@ export async function runToCompletion(root: string, command: string, opts: { cwd
  *  an unrelated process, or the process may be long gone; either way the record
  *  is the thing that must stop lying, and killTree already ignores a pid it
  *  cannot reach. */
+/** EVERY TEST RUN THE LAST ENGINE LEFT OPEN, CLOSED AT STARTUP.
+ *
+ *  A run's record says `started` and gains `ended` only when the engine that
+ *  owns it writes the closing line. An engine that was killed — a reload, a
+ *  crash — never wrote one, so the record says the run is still going, and the
+ *  stop hook believes it.
+ *
+ *  IT LIVES HERE RATHER THAN BESIDE THE TEST VERB, and the reason is the
+ *  produced vehicle. `se-mcp.ts --version` must answer from the vehicle's own
+ *  files with nothing installed. Importing the test module for this one
+ *  function dragged a package dependency onto that path and broke it.
+ *
+ *  IT MIRRORS reapAbandonedJobs below. The folders are separate because the
+ *  records are different shapes.
+ *  see dsp-the-work-account.md#a-killed-run-is-closed-at-startup */
+export function reapAbandonedTestJobs(root: string): string[] {
+  const dir = join(root, ".se", "test-jobs");
+  if (!existsSync(dir)) return [];
+  const reaped: string[] = [];
+  for (const name of readdirSync(dir)) {
+    if (!name.endsWith(".jsonl")) continue;
+    try {
+      const lines = readFileSync(join(dir, name), "utf8").trim().split("\n").filter(Boolean);
+      if (lines.length === 0) continue;
+      const last = JSON.parse(lines[lines.length - 1]) as { started?: number; ended?: number };
+      if (typeof last.started !== "number" || last.ended !== undefined) continue;
+      appendFileSync(join(dir, name), `${JSON.stringify({ ...last, ended: Date.now(), reaped: true })}\n`, "utf8");
+      reaped.push(name.slice(0, -".jsonl".length));
+    } catch {
+      // An unreadable record is left exactly as it is. Bookkeeping never
+      // becomes the reason a startup fails.
+    }
+  }
+  return reaped;
+}
+
 export function reapAbandonedJobs(root: string): string[] {
   const dir = jobDir(root);
   if (!existsSync(dir)) return [];

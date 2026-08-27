@@ -9,7 +9,7 @@ M5's evaluate-architecture, on the decomposed winner. The decisions are
 recorded, the structure stands, and the question is one sentence: does
 this structure survive its quality demands?
 
-## What ATAM is
+## What ATAM is #work
 
 The Architecture Tradeoff Analysis Method, from the Software Engineering
 Institute at Carnegie Mellon. A workshop method: walk concrete quality
@@ -49,7 +49,7 @@ Its four outputs, and where each lands:
   decision is named only where a recorded choice is why it holds. Not
   every quality needs a decision.
 
-## What ATAM lacks, and this state adds
+## What ATAM lacks, and this state adds #work
 
 The corpus splits design review into two halves: quantitative (computed,
 automatable) and qualitative (scenario judgment). ATAM is the qualitative
@@ -62,7 +62,7 @@ half only. This state runs both:
   Where that measure could run as an automated check, mark it - it is a
   fitness function candidate for M7.
 
-## Procedure
+## Procedure #work
 
 - Open the walk field. The deck deals the quality scenarios, worst grade
   first.
@@ -82,7 +82,7 @@ half only. This state runs both:
   Write it in the trace - a ripple to M3. The deck grows on the next
   look. No scenario pool exists beside the spec.
 
-## The levels, kept apart
+## The levels, kept apart #work
 
 - Qualities constrain the architecture.
 - Decisions address them.

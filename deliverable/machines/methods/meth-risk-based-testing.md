@@ -6,7 +6,7 @@ statement: "Risk-based testing: exposure = probability x consequence ranks what 
 ## Situation
 Guidance for M6 (ranking unknowns for spikes) and M7 (allocating test depth). Whenever check effort must be divided across more candidates than the budget covers.
 
-## Procedure
+## Procedure #work
 - Score each unknown or requirement: probability of being wrong x consequence if wrong.
 - Rank by exposure. The top gets the spike, the deep test, the earliest slot.
 - Low exposure earns light checks. Saying WHY something gets little testing is part of the method, never an omission.

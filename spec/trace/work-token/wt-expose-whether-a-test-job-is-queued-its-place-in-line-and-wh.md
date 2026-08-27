@@ -1,6 +1,6 @@
 ---
 id: wt-expose-whether-a-test-job-is-queued-its-place-in-line-and-wh
-type: "[[work-token]]"
+type: "[[work]]"
 statement: "Expose whether a test job is queued, its place in line, and why no cases have begun."
 ready_when: "ready when durable test-job scheduling or reporting is changed"
 source: "note-b1d1317dde98"

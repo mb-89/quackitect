@@ -19,6 +19,7 @@ import { gitLane } from "./gitlane.ts";
 import { capMiddle } from "./jsonio.ts";
 import type { ToolDef } from "./mcp.ts";
 import { mirrorText } from "./mirrortext.ts";
+import { noteWrite } from "./notes.ts";
 import { resolveInRoot, seDir } from "./paths.ts";
 import { type MirrorState, renderMirror } from "./render.ts";
 import { readRigorMatrix } from "./rigor-matrix.ts";
@@ -560,6 +561,10 @@ export function runTools(
           args.no_tool_reason === undefined ? undefined : String(args.no_tool_reason),
         );
         const cwd = args.cwd !== undefined ? { cwd: String(args.cwd) } : {};
+        // A SHELL MAY TOUCH ANYTHING, and the lane cannot see what it touched.
+        // So it counts as a write to everything, which keeps any verdict that
+        // judged the tree from standing over an edit made this way.
+        noteWrite();
         const res =
           args.background === true
             ? runBackground(root, String(args.command), { ...cwd, steps: stepsAsked(args, "background") })

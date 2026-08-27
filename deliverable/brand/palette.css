@@ -63,6 +63,11 @@
   --se-feed-kind-update: #7cc4e8;
   --se-feed-kind-note: #c58fe8;
   --se-feed-kind-aq: #f0879a;
+  /* WORK WEARS THE NOTE'S COLOUR (owner). Notes are on their way out as the
+   * everyday capture and a work token replaces them, so the colour a reader
+   * already reads as "somebody put something into the system" carries over.
+   * It was the agent's own teal, which said nothing the src column had not. */
+  --se-feed-kind-work: #c58fe8;
 }
 
 /* RENDERED DATA. JSON values in the details pane, and links. */
@@ -86,6 +91,20 @@
   --se-reg-dependency: #a8c88f;
   --se-reg-decision: #c58fe8;
   --se-reg-pick: #dde3e8;
+}
+
+/* THE BUCKETS. One colour per bucket, none shared with another role.
+ *
+ * NONE OF THEM IS A VERDICT COLOUR. A bucket says WHERE a piece of work sits,
+ * never whether it is good, so green, red and yellow are all out. Done is the
+ * one that tempts hardest and is teal for exactly that reason.
+ *
+ * PENDING IS THE QUIET ONE, and grey says so: it does not block anything. */
+:root {
+  --se-bucket-in: #7cc4e8;
+  --se-bucket-pending: #8a97a3;
+  --se-bucket-out: #c58fe8;
+  --se-bucket-done: #6fb3a8;
 }
 
 /* THE STOP. A stronger red than a failure, and it is meant to be: this is

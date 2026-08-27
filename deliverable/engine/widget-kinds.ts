@@ -8,7 +8,7 @@
 //
 // IT IMPORTS NOTHING, so every layer can reach it without a cycle.
 
-export const WIDGET_KINDS = ["machine", "details", "log", "terminal", "table", "trace"] as const;
+export const WIDGET_KINDS = ["machine", "details", "log", "terminal", "table", "trace", "work"] as const;
 
 export type WidgetKind = (typeof WIDGET_KINDS)[number];
 

@@ -27,7 +27,7 @@ const BLOCK_TAGS = ["div", "section", "main", "aside", "table", "ul", "ol", "for
 // payload writes things like {"<section>": "<text>"}, and the angle brackets
 // there stand for a name the reader supplies. Measured: that one
 // shape was the only false positive left after the reachability rule landed.
-const BLOCK = new RegExp("`[^`]*(?<![\"'])<(?:" + BLOCK_TAGS.join("|") + ")\\b");
+const BLOCK = new RegExp(`\`[^\`]*(?<!["'])<(?:${BLOCK_TAGS.join("|")})\\b`);
 const CLASSED = /`[^`]*(?<!["'])<[a-z]+\s+class=/;
 
 /** Does this source emit widget markup? One question, asked of content. */

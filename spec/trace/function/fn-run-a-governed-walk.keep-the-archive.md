@@ -6,6 +6,7 @@ cluster: the-record-life
 statement: keep every closed record readable exactly as it stood, and unchangeable
 satisfies:
   - req-a-closed-records-folder-stays-on-trunk
+  - req-a-storage-shape-chosen-for-the-archive-can-be-changed-later
   - req-archive-lists-every-closed-record
   - req-archive-shows-it-as-it-closed
   - req-archive-read-only

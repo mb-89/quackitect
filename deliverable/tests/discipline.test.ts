@@ -331,7 +331,7 @@ test("the classifier names the lane tool for each harvested shell shape", () => 
   assert.equal(classifyCommand("$x -replace 'a','b' | Set-Content out.md")?.tool, "se_file_patch");
   assert.equal(classifyCommand("npm test")?.tool, "se_test");
   assert.equal(classifyCommand("git status --porcelain")?.tool, "se_git");
-  assert.equal(classifyCommand("node engine/bin/render-decisions.ts"), undefined, "a plain node run is se_run's own job");
+  assert.equal(classifyCommand("node engine/bin/brand.ts"), undefined, "a plain node run is se_run's own job");
   assert.equal(classifyCommand("npm install --no-audit"), undefined);
 });
 
@@ -377,7 +377,7 @@ test("no_tool_reason runs a blocked category once and files the reason as eviden
 
 test("a clean command passes without a mark", () => {
   const se = fresh();
-  assert.equal(laneVerdict(se, "node engine/bin/render-decisions.ts --root ."), undefined);
+  assert.equal(laneVerdict(se, "node engine/bin/brand.ts --root ."), undefined);
   rmSync(se, { recursive: true, force: true });
 });
 

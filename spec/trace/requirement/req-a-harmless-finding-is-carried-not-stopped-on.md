@@ -52,3 +52,19 @@ hands is the work, and it gets fixed rather than carried.
 No model wanted. One invariant, checked with a state whose checklist carries an
 owed item: the state signs, the walk moves on, and the item is still standing
 when the close is attempted.
+
+## Addition — work tokens
+
+THE OWED ITEM ALSO BECOMES WORK, AND THE TWO ARE ONE ACT. This row already
+demands the state sign with the defect recorded and the walk move on. What is
+added is where the defect goes: onto the state that will fix it, rather than
+onto a list somebody routes afterwards.
+
+NEITHER HALF REPLACES THE OTHER. The owed item still names an open register
+entry with an owner, because that is what makes the disposition somebody
+agreed to. The placement is what makes the fix owed somewhere rather than
+remembered.
+
+SO A FINDING CARRIES TWO EDGES after this round: the register entry it names,
+and the state it now sits on. req-placing-work-makes-the-destination-owe-it
+carries the second.

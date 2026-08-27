@@ -44,7 +44,7 @@ describe("walk mechanics", { concurrency: true }, () => {
     const deskRoot = freshRoot();
     const desk = new Session(deskRoot);
     const deskServer = buildServer(deskRoot, desk);
-    await pullBoot(deskServer);
+    await pullBoot(deskServer, desk);
     assert.equal(desk.active()[0], "front_desk");
     desk.setTarget("expeditions");
     await readEverything(desk);

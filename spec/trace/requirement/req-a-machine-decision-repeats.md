@@ -27,6 +27,20 @@ weighs_against:
 weighs_with: none
 ---
 
+## Scenario
+
+- source: anybody re-running a decision the engine already made — an auditor, a
+  second machine, the same machine a week later
+- stimulus: the decision is asked for again while every input it reads is
+  unchanged
+- artifact: the deciding path, and the record it writes
+- environment: any supported host, any model, with the record committed and the
+  inputs untouched between the two asks
+- response: the same decision comes back, and the record names what was read to
+  reach it
+- response measure: decisions differing across repetitions with unchanged
+  inputs = 0; decisions recorded without their inputs = 0
+
 ## Why this axis did not exist and why it is needed now
 
 FOURTEEN CRITERION AXES STOOD BEFORE THIS ONE and not one of them measures

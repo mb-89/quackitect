@@ -19,6 +19,7 @@
 import { strict as assert } from "node:assert";
 import { describe, test } from "node:test";
 import { Session } from "../engine/session.ts";
+import { privateHome, readWork } from "../engine/workstore.ts";
 import { freshRoot, refusalAsync, sessionAtIdle } from "./helpers.ts";
 
 const root = (): string => freshRoot();
@@ -33,6 +34,33 @@ describe("the multi-agent seam stays open", { concurrency: true }, () => {
     const r = (await s.pull({ form: { choice: ["iterations", "retro", "overhaul"] } })) as Record<string, unknown>;
     assert.deepEqual(r.not_walked, ["retro", "overhaul"], "the rest come back rather than vanishing");
     assert.match(String(r.note), /only the first/, "and the answer says so plainly");
+  });
+
+  // HANDED BACK IN ONE ANSWER IS NOT THE SAME AS WRITTEN DOWN. The sentence
+  // above lives on a single pull result, and the call log caps every response
+  // except a shell run — so the list was not recoverable even from the log.
+  test("each leg nobody took is marked at that leg's own state", async () => {
+    const r0 = root();
+    const s = await sessionAtIdle(r0);
+    s.setAutonomy(1);
+    await s.pull({ form: { choice: ["iterations", "retro", "overhaul"] } });
+
+    const marks = readWork(privateHome(r0)).filter((i) => i.statement === "Offered, not taken");
+    assert.deepEqual(marks.map((m) => m.place).sort(), ["overhaul", "retro"], "the mark sits where the work is, not where the walk went");
+    for (const m of marks) assert.equal(m.status, "open", "nobody has done it, so it stands open");
+  });
+
+  // TWO PULLS OFFERING THE SAME LEG ARE ONE ROW. A mark per pull would bury the
+  // board under the same fact restated.
+  test("offering a leg twice marks it once", async () => {
+    const r0 = root();
+    const s = await sessionAtIdle(r0);
+    s.setAutonomy(1);
+    await s.pull({ form: { choice: ["iterations", "retro"] } });
+    await s.pull({ form: { choice: ["iterations", "retro"] } }).catch(() => undefined);
+
+    const marks = readWork(privateHome(r0)).filter((i) => i.statement === "Offered, not taken" && i.place === "retro");
+    assert.equal(marks.length, 1, "the mint matches on the leg, so the second offer adds nothing");
   });
 
   test("a single choice is the same form with one door, and reports no leftovers", async () => {

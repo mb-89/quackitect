@@ -1,48 +1,29 @@
-// The toll — the narration floor. see dsp-narration.md#the-toll
+// The work in hand, and the question the engine asks about it.
+// see dsp-narration.md#the-toll
 //
-import { CLAUSES, Rejection } from "./errors.ts";
+// NOTHING IS DEMANDED HERE ANY MORE. A token taken and a token settled ARE the
+// narration and both log themselves, so a floor has nothing left to enforce.
+// What is left is a QUESTION about the piece of work in hand, and a question
+// can be ignored.
 
 /** see dsp-narration.md#the-cadence-is-the-readers-control */
 export const NARRATION_DEFAULT_MINUTES = 5;
 export const NARRATION_DEFAULT_CALLS = 20;
 
 export class Toll {
-  private readonly fixedWindowMs?: number;
   private readonly now: () => number;
-  private readonly cadence: () => { minutes: number; calls: number };
-  /** The open decision-graph nodes, so the refusal can name one. Empty when
-   *  nothing is open, which is a legal state and takes a bare update. */
-  private readonly openNodes: () => string[];
   private armed = false;
-  private lastTs = 0;
-  private calls = 0;
-  private warned = false;
   private pending?: string;
+  /** The piece of work last reported in hand, and when it took the hand. */
+  private inHand = "";
+  private inHandSince = 0;
 
-  constructor(
-    opts: {
-      windowMs?: number;
-      now?: () => number;
-      cadence?: () => { minutes: number; calls: number };
-      openNodes?: () => string[];
-    } = {},
-  ) {
-    if (opts.windowMs !== undefined) this.fixedWindowMs = opts.windowMs;
+  constructor(opts: { now?: () => number } = {}) {
     this.now = opts.now ?? Date.now;
-    this.cadence = opts.cadence ?? (() => ({ minutes: NARRATION_DEFAULT_MINUTES, calls: NARRATION_DEFAULT_CALLS }));
-    this.openNodes = opts.openNodes ?? (() => []);
   }
 
   private minutes(ms: number): number {
     return Math.round(ms / 60000);
-  }
-
-  /** What is owed right now. An explicit windowMs (the tests) pins the time
-   *  and drops the call limit, so a fixed-window test stays about time. */
-  private budget(): { ms: number; calls: number } {
-    if (this.fixedWindowMs !== undefined) return { ms: this.fixedWindowMs, calls: 0 };
-    const c = this.cadence();
-    return { ms: c.minutes * 60_000, calls: c.calls };
   }
 
   /** A hop the machine forced, which pays no call.
@@ -51,7 +32,7 @@ export class Toll {
    *  judgment happened on it, and a toll falling due there could only ever be
    *  paid with filler.
    *
-   *  see dsp-narration.md#the-reading-loop-pays-nothing */
+   *  see dsp-narration.md#the-reading-loop-is-not-a-judgment */
   private static isReadingHop(tool: string, args: Record<string, unknown>): boolean {
     // WAITING ON A JOB YOU ALREADY STARTED IS THE SAME SHAPE AS THE READING
     // LOOP. The battery runs asynchronously and hands back a handle, so the
@@ -79,84 +60,88 @@ export class Toll {
     return Object.keys(form).length === 1;
   }
 
+  /** A NARRATION ACT, which cannot be charged for narrating.
+   *
+   *  THE TOLL IS A DISPATCH GUARD AND RUNS BEFORE THE HANDLER. Charging this
+   *  one would mean the refusal's own remedy names a call the lane then
+   *  refuses, which is a closed loop with no way out of it.
+   *
+   *  IT IS THE OPPOSITE ARGUMENT TO THE READING LOOP. A reading hop is exempt
+   *  because no judgment happened on it. A work act is exempt because it IS
+   *  the judgment the toll asks for, and every act demands a comment the store
+   *  refuses to leave empty.
+   *
+   *  THE EXEMPTION IS NOT THE PAYMENT. Only a SUCCEEDING act calls paid(), on
+   *  the way out, so a refused one slips the charge for a single call and
+   *  clears nothing.
+   *
+   *  see dsp-narration.md#the-toll */
+  private static isWorkAct(tool: string): boolean {
+    return tool === "se_work";
+  }
+
   /** The dispatch guard. Arms itself on the first call after boot. */
   check(booted: boolean, tool: string, args: Record<string, unknown>): void {
     if (!this.armed) {
-      if (booted) {
-        this.armed = true;
-        this.lastTs = this.now();
-        this.calls = 0;
-      }
+      if (booted) this.armed = true;
       return;
     }
     if (Toll.isReadingHop(tool, args)) return;
-    // THE COUNT IS NOT COMMITTED UNTIL THE CALL IS SERVED. Raising it before
-    // the throw made every retry of one refused call worse than the last — the
-    // log showed 22, 23, 24, 25 for a single call being resent. A refused call
-    // did not happen. see dsp-narration.md#the-toll
-    const next = this.calls + 1;
-    const budget = this.budget();
-    if (budget.ms === 0) {
-      this.calls = next;
-      return; // the control is off — nothing is ever owed
-    }
-    const silent = this.now() - this.lastTs;
-    const overTime = silent > budget.ms;
-    const overCalls = budget.calls > 0 && next > budget.calls;
-    if (!overTime && !overCalls) {
-      this.calls = next;
-      return;
-    }
-    const since = overTime ? `${this.minutes(silent)} min since the last` : `${next} calls since the last`;
-    if (!this.warned) {
-      this.calls = next;
-      // Grace: the first lapsed call proceeds, carrying the warning on its
-      // result — only ignoring it earns the refusal (v2 field ruling: a
-      // smooth rhythm is never interrupted by a cold toll).
-      this.warned = true;
-      this.pending = `update overdue (${since}) — the NEXT call without an update field is refused; add update: {op, brief, ...} (any decision-graph op) to any call`;
-      return;
-    }
-    const open = this.openNodes();
-    throw new Rejection({
-      clause: CLAUSES.TOLL_DUE,
-      expected:
-        budget.calls > 0
-          ? `an update within ${this.minutes(budget.ms)} min or ${budget.calls} calls of the last`
-          : `an update within ${this.minutes(budget.ms)} min of the last`,
-      got: `${since}, warning ignored`,
-      remedy: {
-        tool,
-        args: {
-          ...args,
-          // THE NODE IS A REAL ID, not a placeholder. While a checklist stands
-          // an update without one is refused, so a remedy naming no id costs a
-          // second call to go and find one.
-          update: {
-            op: "update",
-            ...(open.length > 0 ? { node: open[open.length - 1] } : {}),
-            brief: "<one line: what you are doing right now>",
-          },
-        },
-        note:
-          open.length > 0
-            ? `pay by resending THIS call with the update field — the node above is open right now. Open: ${open.join(", ")}. The ops: plan {items}, fork {brief}, done|obsolete|revert {node, brief}, update {node, brief}. A volunteered update is never stopped.`
-            : "pay by resending THIS call with the update field — nothing is open, so a bare update {brief} is right. The ops: plan {items}, fork {brief}, update {brief}. A volunteered update is never stopped.",
-      },
-      source: "engine/toll.ts check",
-    });
+    if (Toll.isWorkAct(tool)) return;
+    // NOTHING IS DEMANDED. A token taken and a token settled ARE the narration,
+    // and both log themselves, so there is nothing left to ask for and nothing
+    // a refusal could honestly be about.
+    //
+    // WHAT STANDS INSTEAD IS A QUESTION. `sameWork` asks at most once a minute
+    // whether the piece of work in hand is still the one in hand. A question
+    // can be ignored; that is the whole difference from a toll.
   }
 
-  /** A valid update landed — the window, the call count and the warning reset. */
+  /** HOW LONG ONE PIECE OF WORK MAY HOLD THE HAND before the walk is asked
+   *  about it. A minute is short enough to catch a stray and long enough that
+   *  ordinary work is never interrupted. */
+  private static readonly SAME_WORK_MS = 60_000;
+
+  /** THE NUDGE, AND IT NEVER REFUSES.
+   *
+   *  A PIECE OF WORK THAT HOLDS THE HAND FOR A LONG TIME IS TWO THINGS AT ONCE,
+   *  and only the walker knows which. Either it is genuinely one long piece of
+   *  work, or the walker strayed onto something else and owes a token for it.
+   *
+   *  SO THE ENGINE ASKS RATHER THAN DEMANDS. Nothing is refused, nothing is
+   *  counted, and an answer is never owed. The question is the whole mechanism.
+   *
+   *  IT ASKS AT MOST ONCE A MINUTE. Asking on every call would be a toll wearing
+   *  a question's clothes.
+   *
+   *  A CHANGE OF WORK ANSWERS IT. Settling one and opening the next resets the
+   *  clock by itself, because the id in hand moved. */
+  sameWork(id: string, said: string): void {
+    if (id === "") {
+      this.inHand = "";
+      this.inHandSince = 0;
+      return;
+    }
+    if (id !== this.inHand) {
+      this.inHand = id;
+      this.inHandSince = this.now();
+      return;
+    }
+    const held = this.now() - this.inHandSince;
+    if (held < Toll.SAME_WORK_MS) return;
+    this.inHandSince = this.now();
+    this.pending = `still on "${said}" after ${this.minutes(held)} min — if that is right, carry on. Strayed onto something else? Open a token for it: se_work {act: "open", id: "", comment: "<what you are actually doing>"}. A big piece of work wants sub-tokens rather than one that never closes.`;
+  }
+
+  /** A WORK ACT ANSWERS THE QUESTION, so a nudge waiting to be read is dropped.
+   *  Showing it after the walker already moved would be asking about work that
+   *  is no longer in hand. */
   paid(): void {
-    this.lastTs = this.now();
-    this.calls = 0;
-    this.warned = false;
     this.pending = undefined;
   }
 
-  /** The grace warning, if one is due — reading it clears it; the result
-   *  decorator attaches it to the next successful response. */
+  /** The nudge, if one is due — reading it clears it; the result decorator
+   *  attaches it to the next successful response. */
   takeWarning(): string | undefined {
     const w = this.pending;
     this.pending = undefined;

@@ -12,6 +12,8 @@ realizes:
   - "if-record-store-to-mirror"
   - "if-walk-engine-to-mirror"
 files:
+  - "deliverable/engine/mirrortext.ts"
+  - "deliverable/engine/widget-kinds.ts"
   - "deliverable/engine/render.ts"
   - "deliverable/engine/renderclient.ts"
   - "deliverable/engine/renderclient-detail.ts"
@@ -27,7 +29,6 @@ files:
   - "deliverable/engine/card-parts.ts"
   - "deliverable/engine/cards.ts"
   - "deliverable/engine/traceui.ts"
-  - "deliverable/engine/gitgraph.ts"
   - "deliverable/engine/shoot.ts"
   - "deliverable/engine/bin/brand.ts"
   - "deliverable/engine/bin/mermaid-check.ts"
@@ -494,6 +495,113 @@ DONE IS GREEN where a RECORD stands behind it (owner ruling 2026-08-04,
      gate, blessed — stored claim paints its state. States without records
      never enter the done set, so they stay uncoloured as before.
 
+## The pills are pushed
+
+A PILL APPEARS, MOVES OR EMPTIES THE MOMENT THE WORK STORE DOES. No navigation,
+no leaving the machine and coming back.
+
+THE PAGE WAS ALREADY PUSHED and the payload was one field short. The watched
+shape carried the position, the dials and a growth signal for the feed. Work
+was not in it, so a minted token changed nothing the page could see and the
+drawing sat still until the reader navigated.
+
+### One number, stamped rather than read
+
+THE SIGNAL IS THE SUM OF EACH ITEM'S SIZE AND MODIFICATION TIME. Hashing the
+contents would mean reading every item on a two-second loop, which is the cost
+being avoided.
+
+THE FOLDER'S OWN MODIFICATION TIME IS NOT ENOUGH. It moves when a file is added
+or removed and stands still when one is rewritten in place — which is exactly a
+take and a settle, the two changes the reader most wants to see.
+
+### The page redraws on it, like every other watched fact
+
+A CHANGED SIGNAL REDRAWS THE MACHINE, by the same path a moved walk or a
+re-aimed target already takes. Nothing new was invented for it.
+
+THE FIRST ANSWER ADOPTS THE VALUE rather than acting on it, so a page load never
+redraws itself for work that was already on the page when it was served.
+
+## Done hangs off the opposite corner
+
+THE THREE OWED BUCKETS RUN LEFT TO RIGHT ALONG THE TOP EDGE. DONE SITS AT THE
+RIGHT-HAND END OF THE BOTTOM EDGE.
+
+IT WAS BOTTOM-LEFT, directly under the input bucket, and the two groups read as
+one row that happened to wrap. Opposite corners cannot be read that way.
+
+### The anchor says which edge the coordinate is
+
+A PILL IS PLACED BY ONE EDGE OR THE OTHER. The owed pills give their LEFT edge
+and grow rightward; the done pill gives its RIGHT edge and grows leftward.
+
+WITHOUT THAT, A LONGER COUNT GROWS OFF THE BOX. `18 + 4` is wider than `1`, and
+a right-hand pill placed by its left edge moves as its number grows.
+
+## Green is refused over owed work
+
+A STATE CANNOT BE GREEN WHILE WORK IS OWED AT IT. Owner ruling, 2026-08-26,
+repeated: "A state cannot be green if not everything that's assigned to it is
+done. The engine must refuse this."
+
+Green says the state was PASSED. Work still owed at it says it was not. Both
+facts cannot stand, so the green goes.
+
+### Downstream loses its green too
+
+THE STATES AFTER IT ALSO STOP BEING GREEN. The owner's second sentence: "If
+there's still a token open in trace design, then the states below it cannot be
+green."
+
+The reason is the graph. The only way to reach a state after trace-design is
+THROUGH trace-design. A green further on therefore rests on a passage that did
+not happen.
+
+THE MARK PROPAGATES FORWARD ALONG THE EDGES, from every owing state, and the
+walk is cycle-safe. A machine with a loop in it would otherwise never finish.
+
+### Pending is the one exception
+
+PENDING NEVER TAKES A GREEN AWAY. Owner: "if there's something pending in the
+state, it can be green because pending doesn't block."
+
+So the count that decides is INPUT plus OUTPUT, at the state and beneath it.
+The pending bucket is left out of the sum entirely.
+
+### The mark is not a verdict colour
+
+A REFUSED GREEN WEARS THE OUTPUT BUCKET'S STROKE, dashed. Nothing failed here.
+The passage simply has not happened yet, so red would be a lie in the other
+direction.
+
+IT IS THE ONLY MARK A DOWNSTREAM STATE GETS. The owing state itself carries a
+pill saying how much it owes. A state three hops later carries no pill of its
+own, and without a stroke it would look merely unvisited.
+
+### The signature settles what it can, and this catches the rest
+
+TWO MECHANISMS, AND BOTH ARE NEEDED. Signing a state's claim settles the work
+placed at it, so ordinary work can never survive a signature.
+
+WHAT SURVIVES IS WHAT THE SIGNATURE SKIPS: a reading token, which closes from
+the reading credit instead, and anything held beneath the state in a submachine.
+This rule is what stops those painting a green.
+
+## The surface prints a hop rather than its shape
+
+A HOP IS AN OBJECT: the state, how it was left, an optional reason, and when.
+The text surface handed each one to `String()`, which prints `[object Object]`.
+
+THE HEADING MADE IT WORSE. Ten identical lines under "Last hops" read as a
+walk with no history, rather than as a printer that could not read one.
+
+### The clock, not the stamp
+
+A HOP CARRIES AN ISO TIMESTAMP and the line shows only the time of day. A
+reader scanning the last ten hops wants to know how long ago, and eleven
+characters of date on every line buries the state name.
+
 ## Suspect has no rule of its own
 
 SUSPECT HAS NO RULE OF ITS OWN, and that is the ruling (owner,
@@ -760,3 +868,165 @@ reader looks, not a boundary the program can see.
 WHAT THIS MEANS FOR A GUARD. Anything reading the client's source must read
 all of the parts. mirrorSource() names them, which is why a guard survives a
 further split instead of quietly checking a fraction of the script.
+
+## A state wears two pills, and each carries one number
+
+Owner ruling. A state that holds work says so on its own face, so a person
+reading the machine sees what is outstanding without opening anything.
+
+TWO PILLS, NEVER ONE FRACTION.
+
+- The pill on the TOP edge is what is OWED.
+- The pill on the BOTTOM edge is what is DONE.
+- Each carries ONE number.
+
+THE OWED PILL HAS A SECOND JOB, and that is why it cannot share. It reads
+`18 + 4` where four more pieces sit inside this state's submachine. The plus
+already carries meaning, so a fraction in the same pill would collide with it.
+
+NOTHING OWED MEANS NO PILL AT ALL. Absence is the signal. A pill reading zero
+asks the reader to notice a number rather than a shape, and the same holds for
+a state that has finished nothing.
+
+EACH PILL STRADDLES ITS EDGE, centre line on the border. That is what keeps it
+clear of the state's own name and subtitle, which are drawn at the middle.
+
+THEY TAKE NONE OF THE RESERVED COLOURS. Green, red and yellow mean passed,
+failed and attention. A count of work is not a verdict, so both pills are blue
+like the route line. They are told apart by WHICH EDGE they sit on, with the
+done pill dashed as a second signal.
+
+### Green already means the work is done, so a green state mints nothing
+
+THIS IS THE HALF THAT WAS WRONG. Green is painted from the signed form, and
+work was minted afterwards without consulting it. A finished state drew green
+and showed eighteen pieces owed at the same time.
+
+ONE THING CANNOT HAVE TWO SOURCES. Green now means every piece of work at that
+state is done and submitted, which makes minting fresh open work into a green
+state a contradiction rather than an oversight.
+
+SO THE MINT ASKS FIRST. A position already painted returns before deriving
+anything, and the drawing can no longer disagree with itself.
+
+WHAT IS NOT BUILT YET: the paint is still computed from the form rather than
+from the work. Until it is, the two agree because the mint defers to the paint,
+not because they are one source. Deriving the paint from the work is the
+remaining half.
+
+## A state wears its buckets
+
+A state shows what it owes without being opened. It wears up to four pills.
+
+Three sit on the TOP edge and hold what is still owed. One sits on the BOTTOM
+edge and holds what is done.
+
+### Position carries the meaning
+
+Left to right across the top: input, pending, output. Each holds its own lane
+whether or not its neighbours are drawn, so the output bucket is always on the
+right and never slides left when the input bucket empties.
+
+The pill's vertical centre sits ON the state's border. That keeps it clear of
+the state's own label.
+
+A BUCKET HOLDING NOTHING IS NOT DRAWN. Zero and absent look identical on a
+drawing, so the honest thing is to draw neither.
+
+### The count is its own plus what is beneath it
+
+A pill reads `18 + 4`. The first number is this state's own work. The second is
+everything inside its submachine.
+
+NOTHING REACHES THE SECOND HALF FROM THE PILL, and nothing should. The number
+is a summary; the way in is opening the machine.
+
+Every ancestor counts what its descendants hold, not only the immediate parent.
+A machine two levels up still owes what its grandchildren carry.
+
+### One colour per bucket, and none of them is a verdict
+
+Each bucket has its own colour in the palette. Nothing is dashed.
+
+Green, red and yellow stay reserved for verdicts. A bucket says WHERE work sits,
+never whether it is good, so none of the four may wear one.
+
+The editor's columns wear the same four colours. A reader moving between the
+drawing and the editor is looking at the same thing.
+
+### A green state mints nothing, so it owes nothing
+
+Green means every BLOCKING token is done and submitted. A green state showing
+owed input or output is a contradiction on its face.
+
+So the mint skips a state the record already paints green, and the pills on one
+are empty by construction rather than by filtering.
+
+### The signature IS the settle
+
+Signing a state's form is the claim that the state's work is done. So the stamp
+settles that work, in the same act.
+
+BEFORE THIS, TWO FACTS DESCRIBED ONE STATE. The paint read the signed form and
+the pill read the work store, and nothing reconciled them. trace-design read
+green while wearing an owed output bucket, which is the contradiction on the
+state's own face.
+
+MAKING THEM ONE FACT IS THE FIX. Not filtering the count, and not painting
+around it: the signature closes the tokens, so a green state owes nothing
+because nothing is left, rather than because something hid it.
+
+READING TOKENS ARE LEFT ALONE. The read credit closes those. Closing one here
+would claim a document was read because a form was signed, which is a different
+and false statement.
+
+The settle carries its reason like every other close: `the state's claim was
+signed`.
+
+### PENDING IS THE EXCEPTION, because pending does not block
+
+A green state may hold pending work. Pending is what nobody has placed, it holds
+nothing up, and a position finishes whether or not the backlog is empty.
+
+So the illegal combination is green over INPUT or OUTPUT. Green over PENDING is
+ordinary.
+
+### NOT BUILT YET: the engine must refuse it rather than draw it
+
+Today a state that went green while already owing input or output keeps those
+tokens, and the pill draws them. Seen on `trace-design`.
+
+When the machinery is finished the engine will REFUSE to call such a state
+green, rather than painting around it or filtering the count.
+
+That makes the paint and the work ONE fact instead of two that agree by
+convention, so they can never disagree again.
+
+### The pill is the way into the editor
+
+Each pill is clickable and its detail names the state and the bucket, in that
+order. A bucket kind alone cannot open anything, because the editor lists one
+block per position.
+
+Clicking scrolls the editor to that position's matching column and outlines it.
+The editor is already beside the machine in the same document, so opening it is
+scrolling rather than raising a panel over the drawing.
+
+The state under the pill does not also answer the press. Two answers to one
+press would open the details panel while the editor scrolled.
+
+### A pill that is all roll-up takes no click
+
+A container's own count is zero and only its `+ n` half is real. That count
+belongs to states INSIDE the machine, and the editor has no block for the
+container itself.
+
+So a click there would land on nothing. Such a pill lets the press THROUGH to
+the state under it, and that handler opens the machine.
+
+Which is the right answer anyway: nothing reaches the second half from the
+pill, and the way in is opening the machine.
+
+IT WAS FOUND BY MEASURING THE SERVED PAGE, not by reading the source. The pill
+class was right, the detail attribute was right, and the handler was right — the
+wire between them was broken, and only the output showed it.

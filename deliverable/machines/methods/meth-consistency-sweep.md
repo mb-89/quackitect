@@ -12,7 +12,7 @@ M8, before the validation gate.
 The describing surfaces are wherever the changed behaviour is taught. The
 Surfaces section below is the checklist the sweep state serves.
 
-## Procedure
+## Procedure #work
 
 - List what the iteration changed. The evidence trail has it.
 - For each change, find every surface that describes the old behaviour.
@@ -27,7 +27,7 @@ Surfaces section below is the checklist the sweep state serves.
 - Name the residue: a surface known stale and left is listed with its
   reason, never silently skipped.
 
-## Surfaces
+## Surfaces #work
 
 - command and tool docs
 - engine-served strings

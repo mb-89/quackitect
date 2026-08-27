@@ -152,9 +152,13 @@ describe("parameter panels", { concurrency: true }, () => {
   // renderer either generalises or is revealed as the first one in disguise.
   test("the note entry is a panel too, and its separator is declared not baked", () => {
     const params = loadPanel(REPO_ROOT, "note-entry");
+    // TWO CAPTURES SHARE THIS PANEL. A note and a piece of work are both things
+    // a person adds from the controls without leaving what they are doing, so
+    // the work line sits under the note line rather than on a surface of its
+    // own. see dsp-the-bucket-editor.md#the-editor-is-the-database
     assert.deepEqual(
       params.map((p) => p.type),
-      ["text", "choice", "action"],
+      ["text", "choice", "action", "text", "action"],
     );
     const html = renderPanel(params, VALUES);
     // The sketch splits title from body on a forward slash and refuses a value
@@ -165,6 +169,8 @@ describe("parameter panels", { concurrency: true }, () => {
     assert.match(html, /<option value="could" selected>/, "the first option is the default");
     assert.match(html, /<option value="must">/);
     assert.match(html, /data-post="\/note"/);
+    assert.match(html, /id="work-statement"[^>]*type="text"/, "the work line is a field of its own");
+    assert.match(html, /data-post="\/work\/mint"/, "and its button mints rather than noting");
   });
 
   test("a choice renders every option the spec names, and only those", () => {

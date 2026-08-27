@@ -1,8 +1,10 @@
 ---
 form: gate-kickoff
+amended: "2026-08-25T18:41:58.031Z by agent — this gate's red team withdrew the batch attack on a premise the pressure test later corrected"
 bless: blessed by agent
 by: agent
-signed_off: 2026-08-25T16:48:07.066Z
+signed_off: 2026-08-25T16:59:49.247Z
+reopened: "2026-08-25T16:57:36.309Z — the owner stated the vision after this gate stamped, and it adds a goal: the architecture analysis must sweep every place work is done so nothing the token system touches is missed"
 checked: Read refusals, Read template-free-form, Read template-per-item, Read template-list, Read template-choice-with-rationale, Read template-findings, Read template-refs
 authors: agent, human
 files:
@@ -18,13 +20,17 @@ THE SCOPE CHANGED DURING THIS GATE, and that is what the gate is for. The owner 
 
 EVIDENCE QUALITY, and it improved twice. Five researchers ran while the outward verbs were refused by the position gate, so none of them opened a page body. That is fixed and the verbs are legal everywhere now. Twenty primary sources were then read in full, which changed four conclusions and added two mechanisms.
 
-THE OWNER HAS RELEASED THIS GATE. An earlier pass left it unstamped, waiting for the editor drawing. The owner has since said the subject is discussed enough and that this gate may be filled and blessed from here, with every step after it waiting for their word. That is why it stamps now.
+THE OWNER HAS RELEASED THIS GATE. An earlier pass left it unstamped, waiting for the editor drawing. The owner has since said the subject is discussed enough and that this gate may be filled and blessed from here, with every step after it waiting for their word.
+
+THE VISION IS STATED AND IT IS SHORT. Implement the work token system. It touches a great many parts of this product. The two largest are the state machines and the token editor, and everywhere else that work is done is touched as well. Establishing that nothing is missed is the job of the architecture analysis later in this iteration, and a goal line now says so.
+
+THIS GATE WAS REOPENED TO CARRY THAT. It had already stamped, and a new goal changes what every gate below must answer, so a correction would have slipped past them.
 
 NOTE ON THIS FIELD ITSELF: the owner has ruled that the current-situation and follow-up sections are dropped. They are filled here because this form still asks for them, and removing them is this record's own work.
 
 ## retro_drained
 
-- inbox: empty, and the drawing confirms it. The onboarding retro walked fifteen notes across two passes. Two were folded into homes that already carry them. Thirteen were authored into work tokens now standing in the pool. Seven of the fifteen came from the owner driving the walk by hand, which is what the session was for.
+- inbox: empty, and the drawing confirms it. The onboarding retro walked seventeen notes across three passes. Two were folded into homes that already carry them. Fifteen were authored into work tokens now standing in the pool. Nine of the seventeen came from the owner driving the walk by hand and ruling as they went, which is what the session was for.
 
 ## goals
 
@@ -39,6 +45,7 @@ NOTE ON THIS FIELD ITSELF: the owner has ruled that the current-situation and fo
 - The pull returns open tokens rather than instructions.
 - The four ladders become two. Complexity is a ROUTING key that decides which hand a token is given to. Autonomy is unchanged.
 - Every position shows a count per slot, and clicking one opens the token editor.
+- THE ARCHITECTURE ANALYSIS LATER IN THIS ITERATION SWEEPS EVERY PLACE WORK IS DONE, so nothing the work token system touches is missed. The state machines and the token editor are the two largest surfaces, and they are not the whole list.
 
 ## pulled_in
 
@@ -46,8 +53,9 @@ NOTE ON THIS FIELD ITSELF: the owner has ruled that the current-situation and fo
 - THE EDITOR'S SPECIFICATION at design/worktokens.excalidraw.svg. It is a DRAWING and it is deliberately not transcribed. Owner ruling: a drawing of a surface is the specification, and if the drawing changes then the specification changed. It is an Excalidraw SVG, so the same file renders and reopens for editing.
 - THE PRIOR ART at research/prior-art-by-sketch-element.md. Twenty primary sources read in full, arranged by which part of the sketch each one judges.
 - WHERE THOSE DISAGREE, THE OWNER'S FILE WINS. Prior art is evidence; the rulings are decisions.
-- A DRAWN FIELD MUST DECLARE WHETHER IT IS A SNAPSHOT OR A LIVE READING, carried in from a note drained in the onboarding retro. A field drawn from a live source re-opens every time anything is captured, so a long milestone that keeps noticing things can never stamp. This gate's own drain re-opened exactly that way while it was being walked, and so did the retro before it. It is the sharpest evidence for the settled-token design: a token asked once is answered once and then settles.
-- Thirteen work tokens minted by this milestone's retro, and the 139 already in the pool. Candidates for scope rather than commitments.
+- THE VISION AS THE OWNER STATED IT: implement the work token system. It touches a great many parts of this product, the two largest being the state machines and the token editor, and everywhere else work is done is touched too. Proving nothing is missed is the architecture analysis's job later in this iteration.
+- A DRAWN FIELD MUST DECLARE WHETHER IT IS A SNAPSHOT OR A LIVE READING, carried in from a note drained in the onboarding retro. A field drawn from a live source re-opens every time anything is captured, so a long milestone that keeps noticing things can never stamp. This gate's own drain re-opened exactly that way twice while it was being walked, and so did the retro before it. It is the sharpest evidence for the settled-token design: a token asked once is answered once and then settles.
+- Fifteen work tokens minted by this milestone's retro, and the 139 already in the pool. Candidates for scope rather than commitments.
 - The engine change that landed mid-milestone: the outward verbs are legal in every position.
 - i59's ruling arrives as a constraint. A position carries only what its reader must act on, and this round gives the provenance somewhere else to go.
 
@@ -60,6 +68,8 @@ NOTE ON THIS FIELD ITSELF: the owner has ruled that the current-situation and fo
 - Whether the seven surfaces that filter share one mechanism or seven copies. Worth knowing before an eighth is added.
 - The archive living only in version history. A note, and possibly already seeded.
 - Walking the holding counters downward, and the duplicate-code-path sweep. Both placed in a later round by the owner.
+- REMOVING THE SPAWN STATES. The owner ruled they go, and that i64 is where they go, because that iteration already reworks how a fresh worker is started per segment. Until then they are walked as they stand.
+- A NOTE BLOCK ABOVE AN ITERATION'S START NODE carrying what the iteration is about, matching what the main machine already does. An owner request, explicitly not for now.
 
 ## walkers
 
@@ -92,7 +102,7 @@ major — proposed, and the owner decides. The walkthrough made this MORE clearl
 
 - STEELMAN => A token a person can open and edit beats mechanical mergeability here, because the readers are the committers and one engine walks one record. The exit rule is a COMPLETENESS mechanism and completeness is what a governed process sells. GitLab's convergence on one unit at every level is production evidence for the core idea, and Backlog.md is the same shape dogfooded by agents.
 - THE KILL-CRITERION, DEFUSED => The wrong call if a position froze on one unfinishable token. It cannot: the token can be cancelled, skipped, rejected, or MOVED. Three of those four are new since the seed and each releases the position.
-- THE BATCH ATTACK, WITHDRAWN => It assumed a position recurs. Positions are never reused, so there is no later batch to delay.
+- THE BATCH ATTACK, WITHDRAWN => It assumed a position recurs, so that holding this batch delays the next one queueing behind it. No second batch ever queues behind the first here. A re-entry, whether by escape or by reopen, resumes the same batch rather than queueing another. An earlier wording said positions are never reused, which was corrected at the pressure test because escaping and returning is a re-entry.
 - CROSS-PANEL DRAG IS THE LARGEST UNKNOWN => The owner wants a drag that begins in the editor panel and ends on the state machine panel, and that reveals hidden buckets on the receiving panel while it is in flight. None of that was researched, by instruction. Nothing in the tree drags between containers at all: three editors carry pointer machinery and all of it resizes or picks within one grid. A spike answers it and should run first.
 - THE TOKEN COUNT IS UNMEASURED => This gate alone became fourteen tokens. A record has many positions with several fields each and nobody has counted. A bubble showing three digits is a different surface from one showing one.
 - THE STORAGE, STILL STANDING => Five systems converged on a log with derived state. Two mature projects rejected or abandoned files-in-tree and published why. The closest agent-built analogue moved to a database. Not a majority to outvote lightly, and unruled.

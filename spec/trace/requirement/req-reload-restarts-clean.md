@@ -32,3 +32,20 @@ One restart, and everything it guarantees:
 - When a reload is requested, the engine shall record the pre-reload state of every governed tree before it restarts.
 - When a state reopens after a reload, the engine shall keep every filled entry that still satisfies the corrected guidance standing unchanged.
 - If a filled entry no longer satisfies the corrected guidance, then the engine shall mark it with what moved and shall delete nothing.
+
+## Addition — work tokens
+
+NO WORK WHOSE RESULT STANDS IS OFFERED AGAIN. Recomputing the position from
+recorded evidence extends to the work tokens a state carries: a work token
+whose result already stands is not re-offered after a restart.
+
+TWO CLEARING RULES POINT OPPOSITE WAYS ON PURPOSE. A restart deletes every
+work token outside a record. An escape and a re-entry do not, so coming back
+finds the same work waiting.
+
+WHAT IS STILL OPEN, named rather than glossed: whether the fact that
+something was STARTED and half done survives a restart. Three answers are
+written at
+raid-risk-an-ephemeral-token-dies-on-restart-and-work-underway-has-no-home,
+and the cheapest may well be right so long as it is chosen rather than
+defaulted into.

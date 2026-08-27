@@ -4,6 +4,7 @@ id: flow-existence-answer
 type: "[[flow]]"
 statement: whether a piece of work the session started is still there, asked of the work itself rather than inferred from what it last said
 kind: signal
+crosses: in
 source_refs:
   - req-the-engine-holds-what-it-launched-and-asks-whether-it-exists
   - fn-run-a-governed-walk.keep-the-account-true
@@ -28,3 +29,12 @@ nothing for an hour produces the same answer as one that is there and busy.
 
 It is not an outcome either. `flow-settled-entry` is what this answer can cause
 to be written, and only when the answer is that the work is gone.
+
+## Why it crosses in
+
+NO FUNCTION OF OURS PRODUCES THIS. The statement says it: the answer is asked
+OF THE WORK, and the work is a process outside the system.
+
+THE CONTROL ON THE CONSUMING FUNCTION SAYS THE SAME THING. Keeping the account
+true is controlled by whether the work can be asked about itself at all on this
+platform, which is a property of the platform rather than of us.

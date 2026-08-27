@@ -10,12 +10,13 @@
 // State is in-memory: a server restart mid-session drops back to start, and
 // the next refused call's remedy re-boots the agent in one turn.
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { basename, dirname, join } from "node:path";
 import { benchmarkNoteHops } from "./benchmark.ts";
 import { hostCapIsUnmeasured } from "./bound.ts";
 import { takeCompacted } from "./compaction.ts";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { contentHash } from "./hash.ts";
+import { recordLifecycle } from "./lifecycle.ts";
 import {
   activeStates,
   branchToReturnTo,
@@ -38,6 +39,33 @@ import {
 } from "./machines/compile.ts";
 import { computeRoute, type RouteNode, type RouteResult, type RouteStep, routeWraps } from "./route.ts";
 import { isRegistrationCall } from "./run.ts";
+import { demandsForState } from "./workmint.ts";
+import { leavingHeldBy } from "./workoffer.ts";
+import { drawnEndsWith, isDrawn, penWork } from "./workpen.ts";
+// ALIASED, because `completeState` already names something unrelated in this
+// file: the walk's own idea of a finished state, out of machine.ts. Two imports
+// of one word is a reader's trap rather than a compiler's.
+import {
+  BACKLOG,
+  homeFor,
+  homeOf,
+  isSettled,
+  type MintDemand,
+  mint,
+  mintBothSources,
+  privateHome,
+  readAllWork,
+  readWorkReporting,
+  refuseLongTitle,
+  completeState as removeEphemeralWorkAt,
+  restate,
+  settle,
+  splitWorkLine,
+  take,
+  type WorkItem,
+  type WorkStatus,
+  workHomes,
+} from "./workstore.ts";
 
 /** HOW LONG A CALL WAITS FOR A STEP'S LEAVING JUDGMENT before answering. It is
  *  the bound a lane call is promised, so a judgment that settles fast is still
@@ -67,7 +95,6 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import { CallLog, UNREPORTED } from "./calllog.ts";
 import type { CanvasData } from "./canvas.ts";
 import { conditionNotePath } from "./conditions.ts";
-import { Decisions } from "./decisions.ts";
 import type { GeneratedMachine } from "./expmachine.ts";
 import {
   confirmPrefill,
@@ -105,7 +132,7 @@ import { openInHost } from "./panel.ts";
 import { pathKind, resolveInRoot, seDir } from "./paths.ts";
 import { type PulledDoc, pulledFor, type SessionMode, scanGuidance } from "./pull.ts";
 import { probesMissed, readingProbes } from "./readproof.ts";
-import { type Expedition, expClose, expFind, expList, expNew, itCloseShipped, readRecord } from "./records.ts";
+import { type Expedition, expClose, expFind, expList, expNew, itCloseShipped, readRecord, recordStarted } from "./records.ts";
 import { CHANGE_COLUMNS } from "./rigor-matrix.ts";
 import { defaultAutonomy, loadLevels, loadStopAt, notchName, tierOf, valueFor, weightName } from "./scale.ts";
 import { requiredDependsOn } from "./seed.ts";
@@ -148,6 +175,11 @@ const ALWAYS_LEGAL: ReadonlySet<string> = new Set([
   "se_amend",
   "se_why",
   "se_reload",
+  // A HAND REPORTS ON ITS OWN WORK WHEREVER IT IS DOING THAT WORK. Naming the
+  // states that may take or settle a piece of work would mean naming every
+  // state that can hold one, which is every state.
+  // see dsp-the-work-store.md#the-door-is-one-verb-with-three-acts
+  "se_work",
   // READING THE SURFACE IS NEVER AN ACT. It prints what the person is already
   // looking at and changes nothing, so gating it by state would only push the
   // agent back towards asking for a screenshot — which needs a person's word
@@ -326,9 +358,6 @@ export class Session {
   onClosed?: () => void;
   /** When this session started — the mirror's log feed is scoped to it. */
   readonly startedTs = new Date().toISOString();
-  /** The decision graph — the lane writes it (ops ride the update field),
-   *  the mirror reads it (the details pane renders the tree). */
-  readonly decisions: Decisions;
   /** see dsp-walk-machine.md#the-read-proof */
   /** see dsp-boot-and-power.md#what-survives-a-reload-and-what-does-not */
   /** see dsp-walk-machine.md#a-static-sub-machine-is-a-drawing */
@@ -373,7 +402,13 @@ export class Session {
     return this.claims.amendClaim(name, fillsIn, reason, by, machineId, ops, chain);
   }
 
+  /** THE ONE BLESS DOOR. Three callers reach a gate's thumb — the pull's fill,
+   *  the surface's evidence post and the mirror's own route — and the rule that
+   *  a record's open work refuses the bless has to bind all three.
+   *
+   *  A GUARD ON TWO OF THREE IS THE THIRD ONE LETTING THE WALK THROUGH. */
   formBless(name: string, ok: boolean, by: string, machineId?: string): Record<string, unknown> {
+    this.refuseBlessOverOpenWork(name);
     return this.claims.formBless(name, ok, by, machineId);
   }
 
@@ -455,11 +490,25 @@ export class Session {
   private readonly live = new Liveness({
     persist: () => this.persistSettings(),
     describe: () => this.describe(),
+    // THE LIFECYCLE LOG IS THE CHANNEL, because it exists for exactly this:
+    // what happened when there was no call to record.
+    say: (line: string) => recordLifecycle(this.machineRoot(), "shutdown", line),
   });
 
   /** The liveness surface the outside reaches for. */
-  get power(): { block_sleep: boolean; shutdown_at_idle: boolean } {
+  get power(): { block_sleep: boolean; shutdown_at_front_desk: boolean } {
     return this.live.power;
+  }
+
+  /** Whole minutes nothing has happened, or nothing while something is. */
+  get inactiveMinutes(): number | undefined {
+    return this.live.inactiveMinutes;
+  }
+
+  /** EVERY LANE CALL SAYS THE AGENT IS WORKING. The dispatch guard rings this,
+   *  so a countdown never runs under a busy session. */
+  touchActivity(): void {
+    this.live.touch();
   }
 
   get ping(): { target: string; note?: string; seq: number } | undefined {
@@ -562,24 +611,6 @@ export class Session {
     // an ungated lane.
     this._machine = compileMachine(root, mainMachinePath(root));
     this.instance = newInstance(this._machine);
-    this.decisions = new Decisions(seDir(root));
-    // A DEFER NAMES A STATE, and only the session knows which are drawn. Every
-    // reachable machine counts, because a point deferred from inside a record
-    // legitimately names one of that record's own states.
-    //
-    // A RECORD COUNTS TOO, and that is the shape the owner asked for: a point
-    // that waits for an iteration is delivered when that iteration starts. The
-    // address of its first state carries the record id as a segment, so
-    // parkMatches finds it without anything else being wired up.
-    this.decisions.stateExists = (id: string): boolean => {
-      try {
-        const leaf = id.slice(id.lastIndexOf("/") + 1);
-        if (this.views.reachableMachines().some((m) => m.states.some((s) => s.id === id || s.id === leaf))) return true;
-        return itList(this.machineRoot()).some((x) => x.id === leaf || itShortId(x.id) === leaf);
-      } catch {
-        return true; // nothing compiled yet — say nothing rather than say something false
-      }
-    };
     // THE DIAL STARTS AT A NAMED RUNG, looked up in machines/scale.md like
     // any other rung. It is set here rather than at the field because the
     // scale is read from the root, and there is no root at initialiser time.
@@ -607,6 +638,11 @@ export class Session {
         autonomy?: number;
         emergency?: boolean;
         block_sleep?: boolean;
+        shutdown_at_front_desk?: boolean;
+        /** THE NAME THIS FIELD USED TO HAVE. A settings file written before the
+         *  rename carries it, and reading only the new name silently drops a
+         *  toggle the person had turned ON — which reads from outside as the
+         *  toggle never having worked at all. */
         shutdown_at_idle?: boolean;
         narration_minutes?: number;
         narration_calls?: number;
@@ -630,7 +666,7 @@ export class Session {
         this.restoreDial(s.hands);
         // Emergency rides its rung: restored only beside a top-rung autonomy.
         if (s.emergency === true && this._autonomy >= 1) this._emergency = true;
-        this.live.restore(s.block_sleep, s.shutdown_at_idle);
+        this.live.restore(s.block_sleep, s.shutdown_at_front_desk ?? s.shutdown_at_idle);
         if (typeof s.narration_minutes === "number" && Number.isInteger(s.narration_minutes) && s.narration_minutes >= 0)
           this._narrationMinutes = s.narration_minutes;
         if (typeof s.narration_calls === "number" && Number.isInteger(s.narration_calls) && s.narration_calls >= 0)
@@ -1189,7 +1225,6 @@ export class Session {
     const it = itFind(this.machineRoot(), id);
     this.bound = it;
     markStarted(this.machineRoot(), it);
-    this.decisions.setExtraSink(join(this.machineRoot(), "spec", "iterations", it.id, "decisions.jsonl"));
     return { bound: it.id, note: "the walk now stands in this iteration" };
   }
 
@@ -1311,9 +1346,6 @@ export class Session {
 
   expeditionOpen(id: string): Record<string, unknown> {
     this.bound = expFind(this.machineRoot(), id);
-    // While bound, decision ops ALSO land in the record: the reasoning is
-    // part of the persistent walk, parts per visit.
-    this.decisions.setExtraSink(join(this.bound.path, "spec", "expeditions", this.bound.id, "decisions.jsonl"));
     return { bound: this.bound.id, note: "the lane now works inside this expedition's folder" };
   }
 
@@ -1327,26 +1359,10 @@ export class Session {
         source: "engine/session.ts expedition",
       });
     }
-    // THE GRAPH IS EVIDENCE at the close itself too — the leave gate can
-    // be bypassed (close is legal in the work state), the close cannot.
-    const open = this.claims.openRecordPoints();
-    if (open.length > 0) {
-      throw new Rejection({
-        clause: CLAUSES.DECISION_UNRESOLVED,
-        expected: "no open decision point on this record — the graph is evidence",
-        got:
-          open
-            .slice(0, 8)
-            .map((n) => `${n.id}: ${n.brief}`)
-            .join(" · ") + (open.length > 8 ? ` · …and ${open.length - 8} more` : ""),
-        remedy: {
-          tool: "se_pull",
-          args: { update: { op: "done", node: open[0].id, brief: "<how it resolved>" } },
-          note: "resolve every point (done | obsolete | revert | defer), then close",
-        },
-        source: "engine/session.ts close",
-      });
-    }
+    // WHAT A RECORD STILL OWES USED TO BE CHECKED HERE, against its decision
+    // graph, because the leave gate can be bypassed (close is legal in the work
+    // state) and the close cannot. The graph is gone; the leaving guard over
+    // the record's own work tokens is what answers that question now.
     const result = expClose(this.machineRoot(), this.bound, merge, override);
     this.unbind();
     // THE CLOSE DELETES THE STATE THE WALK STANDS ON. Archiving the record
@@ -1392,7 +1408,6 @@ export class Session {
 
   private unbind(): void {
     this.bound = undefined;
-    this.decisions.setExtraSink(undefined);
   }
 
   /** see dsp-lane-door.md#escape-is-one-hatch */
@@ -1534,8 +1549,63 @@ export class Session {
       current: inst.current,
       status: inst.status,
     };
-    completeState(m, inst, stateId, outcome, now, only, () => new Set(this.claims.recordDone(m)));
-    if (activeStates(inst).length > 0 || inst.status !== "open") return;
+    // A STATE IS NOT LEFT WHILE IT HOLDS OPEN WORK. The hold used to sit on the
+    // form submit alone, so a state with no form — and every submachine's end —
+    // was left by this transition without the work store ever being asked.
+    //
+    // AND NOTHING SETTLES ON THE WAY OUT ANY MORE. Leaving used to mark every
+    // open item `done` with "the state was left", which is the rule inverted: a
+    // step nobody did became a step finished by walking past it. Settle each one
+    // with what happened, or move it where it will be done.
+    // see dsp-walk-machine.md#a-state-is-not-left-while-it-holds-open-work
+    // THE POSITION IS TAKEN WHILE THE STATE IS STILL ACTIVE. `positionFor`
+    // reads the ACTIVE list, and completing the state takes it off that list —
+    // so asking afterwards gets the bare name back, and a bare name has no
+    // container. The machine guard below then scoped to nothing and passed.
+    const box = this.containerOf(stateId);
+    const held = this.leavingHeld(this.positionFor(stateId));
+    if (held.held) {
+      throw new Rejection({
+        clause: CLAUSES.CONDITION_UNMET,
+        expected: `every piece of work at ${stateId}, and beneath it, settled or moved on before the state is left`,
+        got: held.why,
+        remedy: this.heldRemedy(held.open),
+        source: "engine/session.ts leaving-guard",
+      });
+    }
+    completeState(m, inst, stateId, outcome, now, only, () => this.greenNow(m));
+    // A SUBMACHINE FINISHES WHEN ITS `end` ACTIVATES, never by completing `end`.
+    // So the hold above never ran for the CONTAINER, and a machine closed over a
+    // sibling nobody walked while that sibling's token stood wide open.
+    //
+    // MEASURED ON i63. `build-steps` ran start → merge-the-surfaces →
+    // the-bucket-editor → end. `mark-the-corpus` was never entered, its `Fill
+    // built` stood open, and the walk went past to verification twice — once
+    // with the hold on the transition, and again with it widened at `end`,
+    // because neither door is the one a finishing machine goes through.
+    //
+    // THE INSTANCE CLOSING IS THE SIGNAL. Nothing else says a machine is done.
+    // see dsp-walk-machine.md#a-finishing-machine-is-a-third-door-and-it-is-the-one-that-was-missed
+    if (inst.status !== "open") {
+      const inside = this.leavingHeld(box);
+      if (inside.held) {
+        inst.active = snap.active;
+        inst.fired = snap.fired;
+        inst.current = snap.current;
+        inst.status = snap.status;
+        throw new Rejection({
+          clause: CLAUSES.CONDITION_UNMET,
+          expected: `every piece of work inside ${box} settled or moved on before the machine finishes`,
+          got: inside.why,
+          remedy: this.heldRemedy(inside.open),
+          source: "engine/session.ts machine-guard",
+        });
+      }
+    }
+    if (activeStates(inst).length > 0 || inst.status !== "open") {
+      this.clearWorkAt(stateId);
+      return;
+    }
     const starving = [...new Set((inst.fired ?? []).map((k) => k.split("->")[1]))];
     inst.active = snap.active;
     inst.fired = snap.fired;
@@ -2204,6 +2274,17 @@ export class Session {
     return paths;
   }
 
+  /** WHETHER THE PULL STILL HANDS DOCUMENTS OVER AND BLOCKS ON PROBES.
+   *
+   *  OFF BY THE OWNER'S RULING, and kept as one named switch rather than a
+   *  deletion so the machinery underneath — the gathering, the credit, the
+   *  version keying — stays reachable while the reading tokens carry the ask.
+   *
+   *  A DELETION WOULD HAVE TAKEN THE CREDIT WITH IT. The credit is what settles
+   *  a reading token, so removing the whole path would have left the tokens
+   *  with no way to close. */
+  private readonly readingGates = true;
+
   /** Credit what the served window actually showed. A part counts only when
    *  the window covered ALL of it — half a document is not a read — and only
    *  when it still hashes as it did when gathered. */
@@ -2383,6 +2464,14 @@ export class Session {
         } finally {
           this.walkingOver = wasWalkingOver;
         }
+        // EVERY STATE THE WALK REACHES MINTS WHAT IT OWES, as it reaches it.
+        // Minting only at the top of the call minted for the state the walk had
+        // just LEFT, so a person watching the machine saw each state's count
+        // appear one pull after they arrived there.
+        //
+        // ONCE PER POSITION, never once per call: the guard holds the last
+        // position minted, so a sweep mints each state it passes exactly once.
+        this.mintWhatThisPositionOwes();
         if (typeof one.banner === "string") banners.push(one.banner);
       } catch (e) {
         if (!(e instanceof Rejection)) throw e;
@@ -2599,8 +2688,73 @@ export class Session {
     }
   }
 
+  /** The position this walk has already minted for, so a pull that has not
+   *  moved does not re-derive. Minting is idempotent anyway; this keeps the
+   *  common pull free rather than merely correct. */
+  private _mintedAt = "";
+
+  /** MINT WHAT THIS POSITION OWES. see workmint.ts, which realizes
+   *  if-work-store-to-walk-engine.
+   *
+   *  THE PULL IS THE HOOK because it is the one verb that knows where the walk
+   *  stands, and no walk makes progress around it.
+   *
+   *  RE-ENTRY MATCHES RATHER THAN DUPLICATES, so calling this again is safe by
+   *  construction and a restart loses nothing.
+   *
+   *  A CARD THAT WILL NOT PARSE REFUSES ENTRY, and the throw travels. A partial
+   *  set reads exactly like a complete one. */
+  private mintWhatThisPositionOwes(): void {
+    // WORK IS MINTED EVERYWHERE, not only inside a record. Boot owes its
+    // reading, the desk owes its steps, and a position with no record to land in
+    // still owes what it owes. The old system where only a record counted goes
+    // away.
+    //
+    // THE HOME IS NOT PICKED HERE. Each demand lands in the source its lifetime
+    // names, and `mintBothSources` is the one place that decides.
+    // NOTHING IS EXCLUDED BY NAME. The front desk was, with no comment and no
+    // requirement behind it, while the paragraph above said in as many words
+    // that the desk owes its steps. It also skipped the desk's reconciliation,
+    // so an orphan was never reported there.
+    const at = this.active()[0];
+    if (at === undefined || at === this._mintedAt) return;
+    const { machine } = this.leaves();
+    const decl = machine.states.find((s) => s.id === at.slice(at.lastIndexOf("/") + 1));
+    if (decl === undefined) return;
+    // A GREEN STATE MINTS NOTHING. Green means every piece of work at that
+    // state is done and submitted, so minting fresh OPEN work into one makes
+    // the drawing contradict itself.
+    // see dsp-mirror-render.md#green-already-means-the-work-is-done-so-a-green-state-mints-nothing
+    if (this.recordPaint(machine).includes(decl.id)) return;
+    // THE STAMP MUST NOT COST THE READER THEIR CREDIT. Minting writes identity
+    // marks into the card it derives work from, and the credit keys to content,
+    // so a reader who had read the card was asked to read it again — for an
+    // edit no person made and no sentence changed.
+    //
+    // ONLY A CREDIT THAT ALREADY STOOD IS CARRIED. A card nobody had read is
+    // still owed, which is the whole point of the gate.
+    const reading = decl.entry?.read ?? [];
+    const held = reading.filter((p) => (this.reads.readBuffer.get(p) ?? "") !== "");
+    // TWO SOURCES, AND THE LIFETIME PICKS BETWEEN THEM. Ephemeral work is
+    // private by definition — it is deleted when the state completes, so
+    // committing it writes a file whose whole purpose is to be thrown away.
+    // THE PULLED LIST IS WHERE THE MARKS LIVE. A state reaches its method card
+    // by TAG far more often than by `entry.read`, and reading marks only from
+    // the latter left 305 marked parts producing no work at all.
+    const cards = this.pulled(machine, decl).map((d) => d.path);
+    mintBothSources(
+      this.machineRoot(),
+      at,
+      demandsForState(this.machineRoot(), decl, this.boundRecordHome(), cards),
+      new Date().toISOString(),
+    );
+    for (const p of held) this.reads.credit(p, this.reads.diskHash(p));
+    this._mintedAt = at;
+  }
+
   private async pullHeld(payload: { form?: Record<string, unknown>; escape?: string }, channel: Channel): Promise<Record<string, unknown>> {
     this.claims.driftReopen();
+    this.mintWhatThisPositionOwes();
     // see dsp-walk-machine.md#the-aim-is-read-after-the-payload-lands
     const choiceHere = (): boolean => {
       const here = this.active()[0];
@@ -2650,6 +2804,10 @@ export class Session {
     const readProof = this.takeReadProof(payload.form);
     const { saved, fanOut } =
       payload.form !== undefined && readProof === null ? this.pullSaveOrChoose(payload.form) : { saved: undefined, fanOut: [] };
+    // A LEG OFFERED AND NOT TAKEN LEAVES A MARK, here rather than in `extra`
+    // below: that helper is called on several return paths and would mint twice
+    // for one pull.
+    if (fanOut.length > 0) this.markUnwalked(fanOut);
 
     const extra = (): Record<string, unknown> => ({
       // THE ECHO IS THE AGENT'S COPY TOO. Every `forms:` path already stripped
@@ -2803,8 +2961,28 @@ export class Session {
       };
     }
 
+    // READING IS ASKED FOR BY A WORK TOKEN AND BY NOTHING ELSE.
+    //
+    // SO THE PULL NO LONGER GATES ON IT. A state mints one reading token per
+    // document it demands, the agent reads the document through the lane, and
+    // `creditReading` settles the token from the window that was actually
+    // served. The credit is version-keyed and durable, so nothing about the
+    // evidence changes — only who asks.
+    //
+    // MEASURED, WHICH IS WHY IT WAS RULED ON: fifteen documents held one walk at
+    // `start` before any state work began, one pull per document and one more
+    // per wrong probe.
+    //
+    // THE PROBES ARE GONE WITH IT, and that loses something real: they were the
+    // only thing telling a document READ from a document FETCHED. Whether that
+    // distinction comes back in another shape is the owner's to say, and it is
+    // named here rather than left as a silent subtraction.
+    // THE GATHERING STILL RUNS AND ONLY THE GATE IS GONE. serveReading is what
+    // fills `.se/reading.md`, what a person opens, and what the credit is
+    // checked against — skipping it entirely would take the evidence away with
+    // the ask, and the reading tokens would have nothing to settle from.
     const served = channel === "agent" ? this.serveReading() : null;
-    if (served !== null) {
+    if (served !== null && this.readingGates) {
       return {
         pull: "read",
         ...head(),
@@ -2876,6 +3054,43 @@ export class Session {
    *  only where the machine offered one (the road split, no target).
    *  Evidence wins when both could read — deterministic, and documented
    *  on the tool. */
+  /** A LEG THAT WAS OFFERED AND NOT TAKEN LEAVES A MARK AT THAT LEG.
+   *
+   *  Where a join is stuck, one feeder is walked and the rest are reported in a
+   *  sentence on ONE pull answer. Nothing wrote that down, and the call log caps
+   *  every response except a shell run — so the list was not recoverable even
+   *  from the log. Work explicitly offered and explicitly not taken left no trace
+   *  anywhere.
+   *
+   *  EVERY ONE OF THEM IS OWED. These are a join's feeders, so the bar waits on
+   *  all of them; none is an alternative made moot by the leg that was walked.
+   *  A token here holds that state when the walk reaches it, which is the point.
+   *
+   *  IT IS IDEMPOTENT. The mint matches on the source reference, so the same leg
+   *  offered on two pulls is one row.
+   *
+   *  IT NEVER FAILS THE PULL. A mark about the work is worth less than the walk. */
+  private markUnwalked(legs: string[]): void {
+    const now = new Date().toISOString();
+    for (const leg of legs) {
+      const at = this.qualHere(leg);
+      const demand: MintDemand = {
+        source: "hand",
+        source_ref: `not-walked/${at}`,
+        step: "",
+        statement: "Offered, not taken",
+        body: "The road split and one hand was walking, so this leg was offered and left. Nobody has done it.",
+        lifetime: "state",
+      };
+      try {
+        mint(privateHome(this.machineRoot()), at, [demand], now);
+      } catch {
+        // A mark about the work is worth less than the walk.
+      }
+    }
+    this.notifyChange();
+  }
+
   private pullSaveOrChoose(form: Record<string, unknown>): { saved?: Record<string, unknown>; fanOut: string[] } {
     // see dsp-walk-machine.md#a-stuck-join-is-the-one-place-a-choice
     if (form.choice !== undefined && Object.keys(form).length === 1) {
@@ -2906,7 +3121,7 @@ export class Session {
       }
       let saved = this.formSave(owed[0], fills as Record<string, string>);
       if (submit === true || submit === "true" || submit === "yes") saved = this.formDone(owed[0], "agent");
-      if (bless !== undefined) saved = this.claims.formBless(owed[0], bless === true || bless === "true" || bless === "yes", "agent");
+      if (bless !== undefined) saved = this.formBless(owed[0], bless === true || bless === "true" || bless === "yes", "agent");
       return { saved, fanOut: [] };
     }
     if (this._target === "" && form.choice !== undefined) {
@@ -3024,8 +3239,14 @@ export class Session {
     const ref = swept.refusal as { clause?: string } | undefined;
     if (ref?.clause !== CLAUSES.CONDITION_UNMET) return undefined;
 
+    // THE SECOND DOOR, and the one that hid. Gating the first read branch alone
+    // left this one answering `read` from the sweep's own unmet condition, so
+    // the walk was still held while the code above said it was not.
+    //
+    // THE GATHERING STILL RUNS HERE TOO, for the same reason as above: it fills
+    // the reading list and keeps the credit reachable.
     const servedNow = this.serveReading();
-    if (servedNow !== null) {
+    if (servedNow !== null && this.readingGates) {
       return {
         pull: "read",
         ...head(),
@@ -3122,6 +3343,8 @@ export class Session {
       arrived: swept.arrived === true,
       ...(branchOpts.length > 1 || (stuck && branchOpts.length > 0) ? { options: branchOpts } : {}),
       here: this.pullHere(),
+      // THE PULL HANDS THE WORK. Nothing is looked up, and there is no list.
+      ...(this.workToStart() ?? {}),
       ...(swept.banners !== undefined ? { banners: swept.banners } : {}),
       ...(swept.refusal !== undefined ? { stopped_at: swept.stopped_at, refusal: swept.refusal } : {}),
       do: this.doAdvice(swept.refusal !== undefined, stuck, branchOpts.length > 0),
@@ -3171,6 +3394,45 @@ export class Session {
    *  THE WALK IS ASKED, NEVER A PATH. It has always known the answer. */
   boundRecordId(): string | undefined {
     return this.bound?.id;
+  }
+
+  /** The open record's OWN FOLDER, where its work lives while it is open, or
+   *  nothing when no record is bound.
+   *
+   *  see dsp-the-work-store.md#behavior-and-constraints — a piece of work is a
+   *  file under this folder for as long as the record stands. */
+  boundRecordHome(): string | undefined {
+    const b = this.bound;
+    if (b === undefined) return undefined;
+    // THE RECORD'S OWN FOLDER, NEVER THE PROJECT ROOT. `bound.path` is the root
+    // the lane works in, which is what every other caller joins onto. Handing it
+    // back here put every minted item in a `work/` folder beside `spec/`, where
+    // nothing reads it and nothing said so.
+    //
+    // THE KIND IS ASKED OF THE DISK rather than carried on the record, because
+    // one type serves an iteration and an expedition alike, and only the folder
+    // that exists says which one was opened.
+    const root = this.machineRoot();
+    for (const kind of ["iterations", "expeditions"]) {
+      const dir = join(root, "spec", kind, b.id);
+      if (existsSync(dir)) return dir;
+    }
+    return undefined;
+  }
+
+  /** WHERE WORK LIVES, and the ONE answer every reader and every writer takes.
+   *
+   *  A bound record holds its own work. With nothing bound the home is `.se/`,
+   *  which is local and outside version control — the right place for work that
+   *  must not be published, and the only place available at the front desk.
+   *
+   *  WHY IT IS A METHOD AND NOT AN EXPRESSION. The two writers carried the
+   *  `.se/` half and the seven readers did not, so the engine wrote work the
+   *  card could not see. The editor read `work-empty` while eleven pieces of
+   *  work sat on disk, and the reader was told no record was open.
+   *  see dsp-the-work-store.md#one-home-for-reading-and-writing */
+  workHome(): string {
+    return this.boundRecordHome() ?? join(this.machineRoot(), ".se");
   }
 
   /** Where the walk is, machine-wise: ["main"] or ["main", "boot", …]. */
@@ -3291,6 +3553,558 @@ export class Session {
    *  presented on a passing tick — so the mirror's pill turns green from
    *  the machine too. The GATE stays per-tick; a stored proof never
    *  spares a re-read. */
+  /** THE SIGNATURE IS THE SETTLE, and that is what makes green mean something.
+   *
+   *  A state was painted green by its SIGNED FORM while the work minted at it
+   *  stayed open. Two facts about one state, agreeing only by convention, and
+   *  they disagreed: trace-design read green and wore an owed bucket.
+   *
+   *  SIGNING IS THE CLAIM THAT THE STATE'S WORK IS DONE. So the stamp settles
+   *  it, rather than a second mechanism deciding the paint should hide it.
+   *
+   *  READING TOKENS ARE LEFT ALONE. The read credit closes those, and closing
+   *  one here would claim a document was read because a form was signed.
+   *  see dsp-mirror-render.md#a-green-state-mints-nothing-so-it-owes-nothing */
+  private settleEvidenceAt(stateId: string): void {
+    const home = this.workHome();
+    // THE MATCH IS ON THE TAIL, the same join the drawing's counts make. A work
+    // item records its full position and a form is submitted by bare name.
+    const bare = stateId.slice(stateId.lastIndexOf("/") + 1);
+    const now = new Date().toISOString();
+    for (const i of readWorkReporting(home).items) {
+      if (isSettled(i) || i.source !== "evidence") continue;
+      if (i.place.split("/").pop() !== bare) continue;
+      settle(home, i.id, "done", { reason: `the ${i.source_ref} field is filled`, now });
+    }
+  }
+
+  /** THE FULL POSITION BEHIND A BARE FORM NAME. A form is submitted by the
+   *  state's own name and a work item records where it stands in full, so the
+   *  two are joined on the tail the way the drawing's counts are. */
+  /** OPEN A PIECE OF WORK WHERE IT WILL BE DONE.
+   *
+   *  THE PLACE DEFAULTS TO WHERE THE WALK STANDS, because that is where work
+   *  handed over in conversation is nearly always going to be done. Naming a
+   *  position puts it somewhere else, and the backlog is a legal answer for
+   *  work with no home yet.
+   *
+   *  IT IS A HAND'S WORK, so it lands in the output bucket and holds the state
+   *  until it is settled. That is the whole point: the person can see the work
+   *  arrive, and the state cannot be left with it standing open.
+   *
+   *  IT IS ALWAYS EPHEMERAL. An ad-hoc piece is how a hand SAYS what it is
+   *  doing, and a record's committed account is not the place for that. It
+   *  lives while its state lives and goes when the state is left.
+   *
+   *  ONLY OPEN ONE THE STATE DID NOT ALREADY MINT. A marked step arrives with
+   *  its own token, and a second for the same work counts one thing twice. */
+  /** A PLACE NOTHING ANSWERS TO IS REFUSED, never stored.
+   *
+   *  WHAT WENT WRONG WITHOUT IT. `at` was written to the token verbatim and
+   *  never compared to anything. Passing a position by its record's FOLDER name
+   *  rather than its id — `iterations/i63-work-tokens-become-.../fix-findings`
+   *  instead of `iterations/i63/fix-findings` — was accepted, the id came back,
+   *  and the result echoed the long name as though it had landed. The token
+   *  then sat where no state looks.
+   *
+   *  MEASURED: five tokens went missing that way in one afternoon, including
+   *  one the owner had just dictated. The state's pull listed four while five
+   *  more stood unseen in the store.
+   *
+   *  IT REFUSES ONLY WHAT IT CAN PROVE WRONG. A place inside a record has to
+   *  spell that record the way the walk spells it, and the walk's own standing
+   *  position is the spelling. A bare state name, the backlog, and anything
+   *  while the walk stands nowhere are all left alone — a guard that refuses
+   *  what it cannot check would block work for no reason.
+   *
+   *  THE REFUSAL HANDS BACK THE CORRECTED CALL, because the repair is
+   *  mechanical: the leaf is right and only the record segment is wrong. */
+  private refuseUnreachablePlace(place: string): void {
+    if (place === BACKLOG || !place.includes("/")) return;
+    const here = this.active()[0] ?? "";
+    if (!here.includes("/")) return;
+    const prefix = here.slice(0, here.lastIndexOf("/") + 1);
+    if (place.startsWith(prefix)) return;
+    const leaf = place.slice(place.lastIndexOf("/") + 1);
+    throw new Rejection({
+      clause: CLAUSES.REQUIRED_ARGS,
+      expected: `a position the walk answers to — inside this record they begin ${prefix}`,
+      got: `${place}, which no state here is named`,
+      remedy: {
+        tool: "se_work",
+        args: { act: "open", id: "", at: `${prefix}${leaf}`, comment: "<four words> / <the detail>" },
+        note: "the leaf is right and the record segment is not. A record is addressed by its id, never by its folder name, and work filed under the folder name is invisible to the state that would do it.",
+      },
+      source: "engine/session.ts work",
+    });
+  }
+
+  workOpen(statement: string, at?: string, details?: string): Record<string, unknown> {
+    const said = statement.trim();
+    if (said === "") {
+      throw new Rejection({
+        clause: CLAUSES.REQUIRED_ARGS,
+        expected: "comment: four words naming the work, a forward slash, then the detail",
+        got: "no statement",
+        remedy: {
+          tool: "se_work",
+          args: { act: "open", id: "", comment: "<four words> / <what was actually asked for>" },
+          note: "the four words name it and go on the bar. Everything after the slash lands in the token's body, which is what the next hand reads.",
+        },
+        source: "engine/session.ts work",
+      });
+    }
+    // FOUR WORDS NAME IT AND THE SLASH CARRIES THE REST. A token holding only
+    // its name tells the next hand nothing about what was actually asked for.
+    // see dsp-the-work-store.md#the-title-is-four-words
+    const cut = splitWorkLine(said);
+    const name = cut.statement;
+    // A SEPARATE ARGUMENT SAYS THE SAME THING, for a detail that carries slashes
+    // of its own. The two never disagree, because the slash wins only where the
+    // argument is absent.
+    const body = (details ?? "").trim() === "" ? cut.body : (details as string).trim();
+    refuseLongTitle(name, "open");
+    const place = (at ?? "").trim() === "" ? (this.active()[0] ?? BACKLOG) : (at as string);
+    this.refuseUnreachablePlace(place);
+
+    const demand: MintDemand = {
+      source: "hand",
+      source_ref: `hand/${name}`,
+      step: "",
+      statement: name,
+      body,
+      lifetime: "state",
+    };
+    const report = mint(privateHome(this.machineRoot()), place, [demand], new Date().toISOString());
+    const made = report.minted[0] ?? report.matched[0];
+    // THE SURFACE REDRAWS, and every surface rather than the one that asked. A
+    // write nobody announced leaves the reader looking at the state before
+    // their own act. see ux.md#nothing-a-person-does-needs-a-reload
+    this.notifyChange();
+    return { opened: made?.id ?? "", place, statement: name, ...(body === "" ? {} : { details: body }), lifetime: "state" };
+  }
+
+  /** WHETHER A POSITION IS THE ONE THIS WALK IS LEAVING.
+   *
+   *  A STATE NAME REPEATS IN EVERY RECORD. `verification` names a state in i62
+   *  and in i63, so matching on the tail alone reached into every other open
+   *  record and settled work nobody there had done — in their committed files,
+   *  with a reason saying the state was left.
+   *
+   *  SO A QUALIFIED POSITION HAS TO RESOLVE TO THE RECORD THIS WALK IS BOUND
+   *  TO. An unqualified one belongs to no record and is ours by construction:
+   *  boot, the desk, the overhaul and the retro all live outside every record
+   *  and there is only ever one walk in them. */
+  private isOurPosition(place: string, bare: string): boolean {
+    const seg = place.split("/").filter((s) => s !== "");
+    if (seg[seg.length - 1] !== bare) return false;
+    const home = homeFor(this.machineRoot(), place, "record");
+    return home === privateHome(this.machineRoot()) || home === this.boundRecordHome();
+  }
+
+  private positionFor(name: string): string {
+    return this.active().find((p) => p.slice(p.lastIndexOf("/") + 1) === name) ?? name;
+  }
+
+  /** THE MACHINE A STATE SITS IN, as a position.
+   *
+   *  A FINISHING MACHINE IS LEFT AS A WHOLE, so what holds it shut is anything
+   *  owed ANYWHERE inside it — including a branch the route never entered. */
+  private containerOf(name: string): string {
+    const at = this.positionFor(name);
+    const cut = at.lastIndexOf("/");
+    return cut <= 0 ? at : at.slice(0, cut);
+  }
+
+  /** LEAVING A STATE CLEARS IT. A state mints what it owes on entry, and when it
+   *  is left every one of those items is done, so none of them shows any more.
+   *
+   *  BOOT HAS TO BE CLEAR. An item still standing at a boot state is spam: the
+   *  walk is long past it and nothing will ever close it by hand.
+   *
+   *  IT READS BOTH HOMES. Ephemeral work lives in the private folder and a
+   *  record's work lives in the record, so a clearer that knew only one of them
+   *  left the other standing — which is the same split that once let a state be
+   *  signed with its own steps wide open.
+   *
+   *  THE EPHEMERAL ONES LEAVE NO FILE. Everything outside a record is ephemeral,
+   *  so boot's items, the desk's and the overhaul's go rather than pile up. The
+   *  EVIDENCE stays; only the item goes.
+   *
+   *  UNFINISHED HAND WORK IS NOT AMONG THEM. The store carries it to the backlog
+   *  instead, and every carry announces itself here. A move nobody announced is
+   *  the same silence as the delete it replaced.
+   *  see dsp-the-work-store.md#one-home-for-reading-and-writing */
+  private clearWorkAt(stateId: string): void {
+    const root = this.machineRoot();
+    const bare = stateId.slice(stateId.lastIndexOf("/") + 1);
+    const places = new Set<string>();
+    for (const i of readAllWork(root).items) if (this.isOurPosition(i.place, bare)) places.add(i.place);
+    for (const home of workHomes(root)) for (const at of places) removeEphemeralWorkAt(home, at);
+  }
+
+  /** WHAT HOLDS A POSITION SHUT, counting everything BENEATH it as well.
+   *
+   *  A SUBMACHINE IS HELD BY ITS INSIDES. `build-steps` holds no work of its
+   *  own; the open token sat at `build-steps/mark-the-corpus`. A check reading
+   *  only the position it was handed found nothing and let the walk out, so the
+   *  surface showed a state with an open piece of work that had been left.
+   *
+   *  IT ASKS THE SAME RULE THE FORM ASKS. Pending does not hold, a reading token
+   *  closes from the read credit, and emergency lifts the lot — one rule, so the
+   *  transition and the signature can never disagree about what is owed. */
+  /** EVERY POSITION THAT OWES WORK, computed once.
+   *
+   *  ASKING PER STATE WOULD READ THE WHOLE STORE PER STATE. Only the places
+   *  actually holding work can owe anything, and there are few of them.
+   *  see software.md#the-test */
+  private owedPlaces(): Set<string> {
+    const root = this.machineRoot();
+    const read = (p: string): boolean => this.documentRead(p);
+    const places = new Set<string>();
+    for (const i of readAllWork(root).items) if (!isSettled(i)) places.add(i.place);
+    const owed = new Set<string>();
+    for (const home of workHomes(root)) {
+      for (const p of places) if (leavingHeldBy(home, p, this._emergency, read).held) owed.add(p);
+    }
+    return owed;
+  }
+
+  /** THE GREEN THE JOIN READS, with owed work taken off it.
+   *
+   *  A CLAIM AND A WORK STORE CAN DISAGREE. A state signed before a token
+   *  existed reads green by its claim and owes one by its store, and the join
+   *  read the CLAIM — so a branch nobody walked counted as delivered, and the
+   *  submachine's `end` activated straight over it.
+   *
+   *  MEASURED ON i63. `mark-the-corpus` carried an open `Fill built` while the
+   *  walk ran start → merge-the-surfaces → the-bucket-editor → end, and the
+   *  reader saw a state wearing a count the walk had gone past.
+   *
+   *  ONE ANSWER FOR BOTH SURFACES. The drawing already takes the green off a
+   *  state that owes; this is that same rule reaching the walk, so what a
+   *  person sees and what the machine does can no longer disagree.
+   *
+   *  A BUSBAR STILL WAITS ONLY ON WHAT IS OWED. A branch that is genuinely
+   *  green keeps counting as delivered, which is the rule this leaves alone. */
+  private greenNow(m: MachineDecl): Set<string> {
+    const done = new Set(this.claims.recordDone(m));
+    const owed = this.owedPlaces();
+    if (owed.size === 0) return done;
+    for (const id of [...done]) {
+      const at = this.positionFor(id);
+      for (const p of owed) {
+        if (p === at || p.startsWith(`${at}/`)) {
+          done.delete(id);
+          break;
+        }
+      }
+    }
+    return done;
+  }
+
+  /** THE REMEDY FOR WORK THAT HOLDS A POSITION, and it differs by who may settle it.
+   *
+   *  AN AGENT CANNOT SETTLE A PERSON-ONLY ITEM. Offering it `se_work {act:
+   *  "settle"}` names a call the store refuses on sight, so the walk is handed a
+   *  remedy it cannot follow and has no way forward at all.
+   *
+   *  A REMEDY THAT CANNOT BE FOLLOWED IS A DIAGNOSIS. The test is whether
+   *  somebody could act on it without asking a second question.
+   *
+   *  SO THE REFUSAL NAMES THE PERSON where only a person may act. Waiting on
+   *  their word is a sanctioned stop, and saying so is what lets the walk end
+   *  the turn honestly instead of looping. */
+  private heldRemedy(open: WorkItem[]): { tool: string; args: Record<string, unknown>; note: string } {
+    const mine = open.find((i) => !i.person_only && !isDrawn(i.id));
+    if (mine !== undefined) {
+      return {
+        tool: "se_work",
+        args: { act: "settle", id: mine.id, comment: "what happened" },
+        note: "settle each one with what happened, or move it somewhere it will be done. The walk has not moved.",
+      };
+    }
+    // A DRAWN PIECE ENDS BY ITS SOURCE ENDING, never by a settle. Offering the
+    // settle here would name a call the store refuses on sight, which is a
+    // diagnosis wearing a remedy's clothes.
+    const derived = open.find((i) => isDrawn(i.id));
+    if (derived !== undefined) {
+      return {
+        tool: drawnEndsWith(derived.id),
+        args: { ref: derived.id, disposition: "done | obsolete | carried | backlog" },
+        note: `"${derived.statement}" is drawn from a live source and has no file to settle. It ends by that source ending — drain it, and the count falls by itself.`,
+      };
+    }
+    const theirs = open[0];
+    return {
+      tool: "se_surface",
+      args: {},
+      note: `"${theirs?.statement ?? "this piece of work"}" is a person's to settle and no agent may. Say plainly that the walk waits on them, and stop — their word resumes it where it stands.`,
+    };
+  }
+
+  /** THE WORK THIS POSITION CAN START NOW, handed over rather than looked up.
+   *
+   *  THE AGENT PULLS AND IS GIVEN. It never asks what is available, and there
+   *  is no list anywhere to read — what a token is doing is deduced from where
+   *  it stands and what status it carries.
+   *
+   *  TWO BEATS IN ONE STATE. The INPUT comes first: reading, and whatever has
+   *  to be in hand before anything can be produced. Once that is settled, the
+   *  OUTPUT tokens are what can be started.
+   *
+   *  THE NUDGE RIDES THE SECOND BEAT AND NOWHERE ELSE. With the input in hand
+   *  the agent can see what the state's own work does not cover, so that is the
+   *  moment to say it may open tokens of its own. Before the input is read,
+   *  opening one is a guess.
+   *
+   *  PENDING IS NOT OFFERED. It does not block and it is not owed here.
+   *
+   *  DRAWN WORK IS NOT OFFERED EITHER. A note or a pool token has no file and
+   *  ends by its own verb rather than by being worked here. */
+  private workToStart(): Record<string, unknown> | undefined {
+    const here = new Set(this.active());
+    if (here.size === 0) return undefined;
+    const mine = readAllWork(this.machineRoot()).items.filter(
+      (i) => here.has(i.place) && !isSettled(i) && !isDrawn(i.id) && i.slot !== "pending",
+    );
+    if (mine.length === 0) return undefined;
+    const say = (i: WorkItem): Record<string, unknown> => ({
+      id: i.id,
+      statement: i.statement,
+      ...(i.taken_by === "" ? {} : { taken_by: i.taken_by }),
+    });
+    const input = mine.filter((i) => i.source === "reading");
+    if (input.length > 0) return { input: input.map(say) };
+    return {
+      to_start: mine.map(say),
+      also: 'the input is in hand, so what these do not cover is visible now — open your own with se_work {act: "open", id: "", comment: "<four words>"}',
+    };
+  }
+
+  private leavingHeld(at: string, lift = true): { held: boolean; why: string; open: WorkItem[] } {
+    const root = this.machineRoot();
+    const read = (p: string): boolean => this.documentRead(p);
+    // A SUBMACHINE IS LEFT THROUGH ITS `end`, AND THAT POSITION COVERS NONE OF
+    // ITS SIBLINGS. The container itself never completes as a state of its own,
+    // so holding on the end alone let a whole submachine be left with an
+    // UNWALKED branch's token standing wide open.
+    //
+    // MEASURED ON i63. `build-steps` ran start → merge-the-surfaces →
+    // the-bucket-editor → end. `mark-the-corpus` was never walked, its `Fill
+    // built` token stood open, and the walk went straight past to verification.
+    //
+    // SO LEAVING THE END HOLDS ON THE MACHINE. Everything beneath the container
+    // is in scope, walked or not, which is what the reader sees on the drawing.
+    const scope = at.endsWith("/end") ? at.slice(0, -"/end".length) : at;
+    const under = new Set<string>([at, scope]);
+    for (const i of readAllWork(root).items) if (i.place.startsWith(`${scope}/`)) under.add(i.place);
+    const lifted = lift && this._emergency;
+    const each = workHomes(root).flatMap((h) => [...under].map((p) => leavingHeldBy(h, p, lifted, read)));
+    // A DRAWN PIECE HOLDS TOO, and it has no home for the scan above to find.
+    // A pending note is the RETRO's output, and a retro cannot be left until its
+    // inbox is drained (owner) — so the hold has to read the pen beside the
+    // stores. Only a BLOCKING drawn piece counts: a standing pool token draws
+    // pending, and pending has never held anything.
+    const pen = lifted ? [] : penWork(root).filter((i) => under.has(i.place) && i.slot !== "pending" && !isSettled(i));
+    const why = each
+      .filter((h) => h.held)
+      .map((h) => h.why)
+      .join(" · ");
+    const drawnWhy =
+      pen.length === 0
+        ? ""
+        : `${String(pen.length)} note(s) pend at ${[...new Set(pen.map((i) => i.place))].join(", ")}: ${pen
+            .slice(0, 3)
+            .map((i) => i.statement)
+            .join(", ")}`;
+    return {
+      held: each.some((h) => h.held) || pen.length > 0,
+      why: [why, drawnWhy].filter((s) => s !== "").join(" · "),
+      open: [...each.flatMap((h) => h.open), ...pen],
+    };
+  }
+
+  /** A GATE IS NOT BLESSED WHILE ANYTHING INSIDE THE RECORD IS STILL OPEN.
+   *
+   *  THE LEAVING GUARD IS PER STATE, and that is the hole. A state's own open
+   *  work holds that state, so nothing asked whether an EARLIER state was still
+   *  holding something when the gate came round. fix-findings could stand open
+   *  while the gate above it passed.
+   *
+   *  EMERGENCY DOES NOT LIFT THIS ONE, and it lifts every other work hold. That
+   *  was the second half of the hole: with emergency armed the walk reached the
+   *  gate over ten open tokens, and nothing inside the engine objected.
+   *
+   *  THE SCOPE IS THE BOUND RECORD, so it can never widen past it and never
+   *  narrows to one state. The backlog and the retro sit outside it, and
+   *  pending never holds anything — so the two piles that would make this
+   *  unpassable are out by construction rather than by a list. */
+  private gateHeld(name: string): { held: boolean; why: string; open: WorkItem[] } {
+    return this.leavingHeld(this.recordScope(name), false);
+  }
+
+  /** THE BOUND RECORD, AS A POSITION PREFIX.
+   *
+   *  THE WALK IS ASKED, NEVER A PATH GUESSED. A record's positions read
+   *  `<kind>/<id>/<state>`, and the kind is whichever folder the record
+   *  actually has — which the home already resolved off the disk.
+   *
+   *  NO RECORD BOUND MEANS NO RECORD RULE. Boot, the desk and the retro live
+   *  outside every record, so the gate falls back to its own container and the
+   *  hold is the per-state one it has always been. */
+  private recordScope(name: string): string {
+    const id = this.boundRecordId();
+    const home = this.boundRecordHome();
+    if (id === undefined || home === undefined) return this.containerOf(name);
+    return `${basename(dirname(home))}/${id}`;
+  }
+
+  /** The refusal a blessed gate earns while its record still owes work. */
+  private refuseBlessOverOpenWork(name: string): void {
+    const held = this.gateHeld(name);
+    if (!held.held) return;
+    throw new Rejection({
+      clause: CLAUSES.CONDITION_UNMET,
+      expected: `every piece of work inside ${this.recordScope(name)} settled or moved on before ${name} is blessed`,
+      got: held.why,
+      remedy: this.heldRemedy(held.open),
+      source: "engine/session.ts gate-bless",
+    });
+  }
+
+  /** THE WORK DECIDES WHETHER THE CLAIM MAY STAND, and only then is it stamped.
+   *
+   *  IT USED TO RUN THE OTHER WAY ROUND. Signing settled every open item at the
+   *  state, writing the signature itself onto each one as the reason it was
+   *  finished. That is the rule inverted: a step nobody did became a step marked
+   *  done by the act of claiming the state. The whole point of the model is that
+   *  a skipped step is an open item and an open item HOLDS the state.
+   *
+   *  PENDING DOES NOT HOLD IT and reading closes from the read credit, so what
+   *  is left is the state's own marked steps and whatever a hand placed here.
+   *
+   *  AND A COMPLETED STATE TAKES ITS EPHEMERAL WORK WITH IT. Everything outside
+   *  a record is ephemeral, so boot's items, the desk's and the overhaul's all
+   *  go here. The EVIDENCE stays; only the item goes.
+   *  see dsp-the-work-offer.md#emergency-lifts-the-work-gate */
+  private holdOrSign(name: string, instanceAbs: string, by: Channel): void {
+    // BOTH HOMES, because work lives in two. Asking only the record's folder
+    // let a state be signed with its own marked steps standing open in the
+    // private one — the gate was there and looking in one place.
+    const held = this.leavingHeld(this.positionFor(name));
+    if (held.held) {
+      throw new Rejection({
+        clause: CLAUSES.CONDITION_UNMET,
+        expected: `every piece of work at ${name} settled or moved on before its claim is stamped`,
+        got: held.why,
+        remedy: this.heldRemedy(held.open),
+        source: "engine/session.ts stateform",
+      });
+    }
+    // THE SIGNATURE IS ALL THIS DOES. Clearing belongs to LEAVING the state,
+    // which is one place for every state rather than one for the states that
+    // happen to carry a form.
+    writeFileSync(instanceAbs, withBy(withSignedOff(readFileSync(instanceAbs, "utf8"), new Date().toISOString()), by), "utf8");
+  }
+
+  /** THE ACTS A HAND PERFORMS ON A PIECE OF WORK.
+   *
+   *  THE LANE OFFERS WHAT THE SURFACE OFFERS. A hand at the keyboard could
+   *  rename a token and a hand on the walk could not, which made the spec's act
+   *  list true of one door and false of the other.
+   *
+   *  OPEN IS HOW WORK A PERSON HANDS OVER BECOMES VISIBLE. The surface already
+   *  had it; the walk did not, so an instruction given in conversation left no
+   *  mark anywhere and the person could not see it had been received.
+   *
+   *  TAKE AND SETTLE DEMAND A COMMENT and the store refuses an empty one.
+   *  RESTATE DEMANDS NONE: it changes what the work says it is, which is
+   *  neither of the two ends the log records.
+   *  see dsp-the-work-store.md#three-acts-and-no-more */
+  workAct(act: string, id: string, comment: string, status?: string, at?: string, details?: string): Record<string, unknown> {
+    if (act === "open") return this.workOpen(comment, at, details);
+    const root = this.machineRoot();
+    // A DRAWN PIECE OF WORK HAS NO FILE, so no act that writes one can touch
+    // it. The refusal names the act that DOES end it, because saying only that
+    // the item does not exist is false — the drawing just showed it.
+    if (isDrawn(id)) {
+      throw new Rejection({
+        clause: CLAUSES.REQUIRED_ARGS,
+        expected: "a piece of work the store holds",
+        got: `${id} is drawn from a live source and has no file to write`,
+        remedy: {
+          tool: drawnEndsWith(id),
+          args: {},
+          note: "this work is derived on every look, so it ends by its source ending rather than by being settled here",
+        },
+        source: "engine/session.ts work",
+      });
+    }
+    // THE HOME THE MINT ACTUALLY WROTE TO, found by looking. Ephemeral work
+    // lands in the private source even inside a record, so a single home was
+    // wrong for exactly the items a gate's own refusal points at.
+    const home = homeOf(root, id) ?? this.workHome();
+    if (act === "take") {
+      const item = take(home, id, "the walker", comment);
+      this.notifyChange();
+      // THE STATEMENT RIDES THE ANSWER. The feed reads the record and the
+      // caller only ever sent an id, so without this the log line could say a
+      // token was picked up and never which one.
+      return { took: item.id, statement: item.statement, comment };
+    }
+    if (act === "settle") {
+      const item = settle(home, id, (status ?? "done") as WorkStatus, { reason: comment, now: new Date().toISOString() });
+      this.notifyChange();
+      return { settled: item.id, statement: item.statement, status: item.status, comment: item.reason };
+    }
+    // THE COMMENT CARRIES THE NEW STATEMENT. A fourth argument for one act
+    // would leave every other call carrying an empty field.
+    if (act === "restate") {
+      const item = restate(home, id, comment);
+      this.notifyChange();
+      return { restated: item.id, statement: comment.trim() };
+    }
+    throw new Rejection({
+      clause: CLAUSES.REQUIRED_ARGS,
+      expected: "act: take, settle or restate",
+      got: act === "" ? "nothing" : act,
+      remedy: {
+        tool: "se_work",
+        args: { act: "take", id, comment },
+        note: "take picks it up, settle ends it, restate renames what it is",
+      },
+      source: "engine/session.ts workAct",
+    });
+  }
+
+  /** A TOKEN STARTING AND A TOKEN ENDING EACH WRITE THEIR OWN LINE.
+   *
+   *  THE READER WANTS TWO THINGS AND THE LINE CARRIES BOTH: what the work IS,
+   *  which is the token's own statement, and what the hand SAID about it, which
+   *  is the comment the act demanded.
+   *
+   *  THE LOG IS WHERE WORK BECOMES VISIBLE. A token file changing is a fact on
+   *  disk; a line in the feed is a person seeing it happen.
+   *
+   *  IT NEVER LEAVES A NODE OPEN. Both ends are recorded as they happen rather
+   *  than opened at the take and resolved at the settle — a token that is never
+   *  settled would otherwise leave a checklist item nothing can close.
+   *
+   *  A COMMENT IS TRIMMED RATHER THAN DROPPED. The brief is one line, and half
+   *  a sentence beats none.
+   *
+   *  IT NEVER FAILS THE ACT. The work landed; a line about it is worth less
+   *  than the act, so a graph that refuses the line does not undo the work. */
+  /** WHETHER ONE DOCUMENT STANDS READ, on any of the three ledgers.
+   *
+   *  It was written out twice here and wanted a third time by the work store,
+   *  so it is one method. A reading work token settles from exactly this.
+   *  see dsp-the-work-store.md#a-reading-token-settles-from-the-reading */
+  documentRead(path: string): boolean {
+    return this.reads.readProven("human", path, {}) || this.reads.agentProven(path) || this.reads.bufferedCurrent(path);
+  }
+
   conditionKeyMet(m: MachineDecl, s: StateDecl, key: string, which: "enter" | "leave"): boolean {
     if (key === "read") {
       const docs = (which === "leave" ? s.exit : s.entry)?.read ?? [];
@@ -3299,23 +4113,37 @@ export class Session {
       // in pull-world the reading is earned before any step is taken, and
       // a pill that stayed gray until the walk moved would show the agent
       // as unread while it was reading.
-      return docs.every((p) => this.reads.readProven("human", p, {}) || this.reads.agentProven(p) || this.reads.bufferedCurrent(p));
+      return docs.every((p) => this.documentRead(p));
     }
     if (key === "read_consume") {
-      return this.reads
-        .consumeDemand(s)
-        .every((p) => this.reads.readProven("human", p, {}) || this.reads.agentProven(p) || this.reads.bufferedCurrent(p));
+      return this.reads.consumeDemand(s).every((p) => this.documentRead(p));
     }
     if (key === "evidence_form") {
       const names = (which === "leave" ? s.exit : s.entry)?.evidence_form ?? [];
       return this.formsMet(names);
     }
     if (key === "no_pending_note") {
+      // THE FIRST ENTRY IS THE ONLY ONE IT BINDS (owner). A record already
+      // started has been through this gate; a note captured since does not
+      // send it back. Re-entry is the ordinary case rather than the odd one,
+      // because a reload restarts the walk at the beginning and every route
+      // back crosses the kickoff again.
+      if (which === "enter" && this.bound !== undefined && recordStarted(this.workRoot(), this.bound.id)) return true;
       const markers = (which === "leave" ? s.exit : s.entry)?.no_pending_note ?? [];
       return this.claims.blockingNotes(markers).length === 0;
     }
-    const ev = this.evidence.get(evidenceKey(m, s.id));
-    if (key === "script") return (ev?.script_result as { ok?: boolean } | undefined)?.ok === true;
+    // ONE DECIDER FOR WHERE A CHECK STANDS. This read the in-memory evidence
+    // itself, which made it a THIRD reader of a fact two others already
+    // answered — and the only one that had not been taught the verdict can
+    // stand on the form.
+    //
+    // WHAT THAT COST. After a restart the launcher declined to re-run a check
+    // whose verdict was on disk, and this said not-passed about the same check.
+    // Every state with a passing exit script became unleavable on any route
+    // longer than one hop, and crossing a record cost about ten calls of
+    // one-step aims to work around it.
+    // see dsp-the-walk-knows-what-its-own-hops-cost.md#a-green-state-walked-over-keeps-its-verdict
+    if (key === "script") return this.scripts.scriptStanding(m, s) === "passed";
     return false;
   }
 
@@ -3653,7 +4481,10 @@ export class Session {
           source: "engine/session.ts stateform",
         });
       }
-      writeFileSync(sh.instanceAbs, withBy(withSignedOff(readFileSync(sh.instanceAbs, "utf8"), new Date().toISOString()), by), "utf8");
+      // FILLING A FIELD IS WHAT CLOSES ITS EVIDENCE. The form stands complete by
+      // the check above, so every evidence item this state owed is answered.
+      this.settleEvidenceAt(name);
+      this.holdOrSign(name, sh.instanceAbs, by);
       this.notifyChange();
       return this.claims.stateFormGet(name, fm);
     }
@@ -3881,7 +4712,7 @@ export class Session {
       const strings = Object.fromEntries(Object.entries(fills).map(([k, v]) => [k, typeof v === "string" ? v : JSON.stringify(v)]));
       this.claims.stateFormSave(s.id, strings, "agent");
       if (submit === true || submit === "true" || submit === "yes") this.formDone(s.id, "agent");
-      if (bless !== undefined) this.claims.formBless(s.id, bless === true || bless === "true" || bless === "yes", "agent");
+      if (bless !== undefined) this.formBless(s.id, bless === true || bless === "true" || bless === "yes", "agent");
     }
     this.notifyChange();
     return { state: `${machine.id}/${s.id}`, evidence: record };
@@ -4136,50 +4967,64 @@ export class Session {
     // it, so it opens a fresh epoch too (see machines/compile.ts).
     bumpDrawingEpoch();
     const { machine, ids } = this.leaves();
-    const states = ids.map((id) => {
-      const s = this.state(machine, id);
-      return {
-        id: this.inSub() ? `${machine.id}/${s.id}` : s.id,
-        kind: s.kind,
-        statement: s.statement,
-        guidance: s.guidance,
-        priority: s.priority,
-        legal_tools: s.kind === "start" || s.kind === "end" || s.kind === "join" ? [...MACHINERY] : (s.legal_tools ?? []),
-        ...(s.entry !== undefined ? { entry: this.conditionStatus(machine, s, "enter") } : {}),
-        ...(s.exit !== undefined ? { exit: this.conditionStatus(machine, s, "leave") } : {}),
-        exit_met: this.conditionMet(machine, s, "leave"),
-        standing: this.stepStanding(machine, s),
-        // WHAT THIS STEP WILL ASK FOR. Without it an agent walked a step
-        // never having been told what evidence it wanted, and found out only
-        // when a gate refused. Seventy of the hundred and twenty-two fields
-        // reached nobody at all, because only gate rows were ever checked.
-        //
-        // A DERIVED FIELD IS NOT IN THE FORM. The engine computes those and
-        // speaks only if they fail, so asking for one would be asking for an
-        // answer that is not the agent's to give.
-        ...(s.evidence_form.length > 0 ? { evidence_form: s.evidence_form.filter((f) => f.type !== "derived") } : {}),
-        // The agent's packet names the pulled docs but NEVER their hashes —
-        // the hash is the proof-of-read, obtainable only via se_file_read.
-        pulled: this.pulled(machine, s).map((p) => ({ path: p.path, sources: p.sources })),
-        // Pre-read map from where you stand: every immediate neighbor's
-        // entry requirements, so the head can read once before moving.
-        lookahead_read: this.reads.lookaheadRequirements(machine, s),
-        // Enough to CHOOSE among several ways forward: what the target is,
-        // not just its name (the agent has no other way to peek).
-        next: s.edges.map((e) => {
-          const t = machine.states.find((st) => st.id === e.to);
-          return {
-            to: e.to,
-            role: e.role,
-            ...(e.guard !== undefined ? { guard: e.guard } : {}),
-            ...(t !== undefined ? { kind: t.kind, ...(t.statement !== "" ? { statement: t.statement } : {}), priority: t.priority } : {}),
-            ...(t?.entry !== undefined ? { entry: this.conditionStatus(machine, t, "enter") } : {}),
-            ...(t !== undefined ? { entry_read: this.reads.unreadEntryRequirements(machine, t) } : {}),
-            enter_met: t === undefined ? true : this.conditionMet(machine, t, "enter"),
-          };
-        }),
-      };
-    });
+    // ONE PASS OVER DISK FOR THE WHOLE STATES ARRAY (software.md, count the
+    // asks). Every state here asks for the trace corpus, and a bound record has
+    // sixty-four of them: 1,461 ms of asking for the same unchanged corpus,
+    // measured, against 22 ms for the identical loop inside a pass. That is the
+    // whole of the per-hop second, and the mechanism that fixes it was already
+    // built and simply never reached this loop.
+    //
+    // THE LOOP ONLY, NEVER THE WHOLE PACKET. clearTargetIfArrived below WRITES,
+    // and a pass covers reading and never writing.
+    //
+    // SYNCHRONOUS ON PURPOSE, like the route's pass: nothing can interleave
+    // inside one, so no other operation is handed this one's held text.
+    const states = withPass(() =>
+      ids.map((id) => {
+        const s = this.state(machine, id);
+        return {
+          id: this.inSub() ? `${machine.id}/${s.id}` : s.id,
+          kind: s.kind,
+          statement: s.statement,
+          guidance: s.guidance,
+          priority: s.priority,
+          legal_tools: s.kind === "start" || s.kind === "end" || s.kind === "join" ? [...MACHINERY] : (s.legal_tools ?? []),
+          ...(s.entry !== undefined ? { entry: this.conditionStatus(machine, s, "enter") } : {}),
+          ...(s.exit !== undefined ? { exit: this.conditionStatus(machine, s, "leave") } : {}),
+          exit_met: this.conditionMet(machine, s, "leave"),
+          standing: this.stepStanding(machine, s),
+          // WHAT THIS STEP WILL ASK FOR. Without it an agent walked a step
+          // never having been told what evidence it wanted, and found out only
+          // when a gate refused. Seventy of the hundred and twenty-two fields
+          // reached nobody at all, because only gate rows were ever checked.
+          //
+          // A DERIVED FIELD IS NOT IN THE FORM. The engine computes those and
+          // speaks only if they fail, so asking for one would be asking for an
+          // answer that is not the agent's to give.
+          ...(s.evidence_form.length > 0 ? { evidence_form: s.evidence_form.filter((f) => f.type !== "derived") } : {}),
+          // The agent's packet names the pulled docs but NEVER their hashes —
+          // the hash is the proof-of-read, obtainable only via se_file_read.
+          pulled: this.pulled(machine, s).map((p) => ({ path: p.path, sources: p.sources })),
+          // Pre-read map from where you stand: every immediate neighbor's
+          // entry requirements, so the head can read once before moving.
+          lookahead_read: this.reads.lookaheadRequirements(machine, s),
+          // Enough to CHOOSE among several ways forward: what the target is,
+          // not just its name (the agent has no other way to peek).
+          next: s.edges.map((e) => {
+            const t = machine.states.find((st) => st.id === e.to);
+            return {
+              to: e.to,
+              role: e.role,
+              ...(e.guard !== undefined ? { guard: e.guard } : {}),
+              ...(t !== undefined ? { kind: t.kind, ...(t.statement !== "" ? { statement: t.statement } : {}), priority: t.priority } : {}),
+              ...(t?.entry !== undefined ? { entry: this.conditionStatus(machine, t, "enter") } : {}),
+              ...(t !== undefined ? { entry_read: this.reads.unreadEntryRequirements(machine, t) } : {}),
+              enter_met: t === undefined ? true : this.conditionMet(machine, t, "enter"),
+            };
+          }),
+        };
+      }),
+    );
     this.clearTargetIfArrived();
     const { all, tools } = this.legal();
     // AFTER the arrival check, never before: reaching the target clears it,

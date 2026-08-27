@@ -16,6 +16,8 @@ cards:
     shows: details
   - card: database
     shows: table
+  - card: work
+    shows: work
 ---
 
 # Cards
@@ -59,3 +61,15 @@ muscle memory, and an agent connecting mid-session must never shift them
 under your hand.
 
 So a card with nothing to show keeps its slot and says so.
+
+## Why the work card sits at the end
+
+ADDING A CARD ANYWHERE ELSE RENUMBERS EVERY CARD AFTER IT, and the numbers are
+muscle memory. The work editor arrived last, so it took the last number.
+
+IT SHARES THIS DOCUMENT WITH THE MACHINE ON PURPOSE. A row is dragged from the
+work editor onto a state, and no drop crosses two webviews. Being cards in one
+page is what makes that drag ordinary rather than impossible.
+
+SHARING THE DOCUMENT IS PLUMBING AND NOT A LOOK. Each card keeps its own
+viewport: zooming the machine leaves the work list exactly where it was.

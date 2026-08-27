@@ -4,6 +4,7 @@ id: flow-workspace-hold
 type: "[[flow]]"
 statement: the exclusive claim one instance has on a workspace, held only while that instance is alive
 kind: signal
+crosses: in
 source_refs:
   - req-one-instance-holds-a-folder-and-its-port
   - fn-run-a-governed-walk.hold-a-workspace-alone
@@ -12,6 +13,15 @@ source_refs:
 ## What it holds
 
 Whether this workspace is being served, and by what.
+
+## Why it crosses in
+
+THE HOLD IS CARRIED BY SOMETHING OUTSIDE US — a port, a file, an operating‑system
+primitive. We read it and act on it; we do not make it.
+
+THE CONTROL ON THE CONSUMING FUNCTION IS THE PROOF. Holding a workspace alone
+turns on whether the thing that carries the hold releases itself when its
+holder dies, and that is a property of the carrier rather than of our design.
 
 ## It cannot outlive its holder
 

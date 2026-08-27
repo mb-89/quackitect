@@ -20,7 +20,7 @@ function edgesOf(root: string): Map<string, { to: string; role: string }[]> {
 // Every door off the FRONT DESK is drawn as ONE arrow now. Out is normal, back
 // is the alternative — the same shape the two-arrow drawing used to compile to.
 //
-// THE DESK IS THE HUB since 2026-08-23, when the idle state was removed. It is
+// THE DESK IS THE HUB since the idle state was removed. It is
 // not in this list because a hub is not a door off itself.
 const DOORS = ["ideation", "expeditions", "expedition_archive", "iterations", "iteration_archive", "retro"];
 

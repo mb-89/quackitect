@@ -88,12 +88,10 @@ test("the gate weighs the TARGET: a 0.4 state waits at 0.2, the archives wait at
   // instead, at the same autonomy, and watch it succeed.
   const deskSession = new Session(r);
   deskSession.setAutonomy(0.2);
-  let desk = (await deskSession.pull()) as { pull?: string; document?: { content?: string } };
-  for (let i = 0; i < 40 && desk.pull === "read"; i++) {
-    const doc = desk.document;
-    if (doc?.content === undefined) throw new Error(`the pull answered read with no document: ${JSON.stringify(desk)}`);
-    desk = (await deskSession.pull({ form: { read: proofFor(doc.content) } })) as typeof desk;
-  }
+  // readEverything answers the reading AND does what each step it lands on
+  // owes, which is what a walker does — boot's own marked step holds
+  // prepare_desk shut until it is settled.
+  const desk = await readEverything(deskSession);
   assert.equal(desk.pull, "do", JSON.stringify(desk));
   assert.deepEqual(deskSession.active(), ["front_desk"]);
   // Prove the documents on the human's hand — this session booted on the
@@ -243,13 +241,18 @@ test("the mirror over HTTP: slider served, POST /autonomy moves the gate, /api/a
     assert.deepEqual(session.active(), ["start"], "the retired route moved nothing");
     // PARITY: the human's note lands hand-stamped in the feed; a tool
     // click faces the SAME state gate the agent does, answered as JSON.
+    //
+    // THE NOTE ANSWERS IN PLACE. It redirected once, which left a refusal with
+    // nowhere to go and every client clearing the box on a note that never
+    // landed.
     const noted = await fetch(`${base}/note`, {
       method: "POST",
       redirect: "manual",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ text: "a human stray" }),
     });
-    assert.equal(noted.status, 303);
+    assert.equal(noted.status, 200);
+    assert.equal(((await noted.json()) as { ok?: boolean }).ok, true, "and it says the note landed");
     const feed = (await (await fetch(`${base}/api/log`)).json()) as { rows: { type: string; src: string; brief: string }[] };
     assert.ok(feed.rows.some((x) => x.type === "note" && x.src === "human" && x.brief.includes("a human stray")));
     const tool = (await (

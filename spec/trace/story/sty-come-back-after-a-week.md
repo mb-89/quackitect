@@ -35,9 +35,9 @@ Standing examples: the signed forms under spec/iterations/i1-prove-a-bases-equiv
 
 ---
 
-The decision graph beside it shows the last checklist: what was planned, what was ticked, and the one item that was deferred to a state further down.
+The work editor beside it shows what the position still owes: every piece of work standing open, what was settled and what somebody moved somewhere else.
 |||
-The graph lives in the record's decisions.jsonl and renders via engine/bin/render-decisions.ts; every op rode a lane call.
+The work tokens, drawn in the editor from the store's files and the live sources beside them. A state cannot be left while any of them stands open.
 
 ---
 

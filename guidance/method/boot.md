@@ -8,7 +8,7 @@ statement: How to run boot reliably across hosts and avoid avoidable refusals.
 
 Boot exists to reach the front desk fast and clean.
 
-## Startup order
+## Startup order #work/startup-order
 
 - First call is `se_pull` with no payload.
 - Immediately make the file and search lane callable. How depends on the host — AGENTS.md says which way per host.

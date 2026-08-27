@@ -9,14 +9,14 @@ M9 package. The step is AUTOMATED: a script assembles the artifact, and
 assembling by hand is the defect. The human-shaped work is the check
 that the package works.
 
-## What a package holds
+## What a package holds #work
 
 - a README - an entry document in plain language, no method jargon
 - the one-time installer script - the single command a fresh machine runs
 - the editor extension - the panel a person works in
 - the versioned engine and method underneath them
 
-## Procedure
+## Procedure #work
 
 - Bump the version and assemble by script. The script is part of the
   product; improving it is packaging work.
@@ -26,7 +26,7 @@ that the package works.
   nothing ships one. The commit history is the record of what changed.
 - A gap the check cannot close is named plainly, never papered over.
 
-## Waiting outside the matrix
+## Waiting outside the matrix #work
 
 finalize-docs (the emitted book) and ship-review (dependency rulings)
 left the matrix until their mechanisms exist. When the

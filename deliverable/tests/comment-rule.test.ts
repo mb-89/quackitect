@@ -54,7 +54,7 @@ const ATTRIBUTION = /\bowner (ruling|law|design|report|correction|verdict|discus
  *  standard forbids, and they are the two the sweep removes. */
 const CEILINGS: Record<string, number> = {
   "deliverable/engine": 0,
-  "deliverable/tests": 204,
+  "deliverable/tests": 203,
 };
 
 function tsFilesUnder(dir: string): string[] {

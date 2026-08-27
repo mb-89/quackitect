@@ -45,10 +45,8 @@ describe("records", { concurrency: true }, () => {
     assert.ok(existsSync(join(s.workRoot(), "scratch.md")));
     // ONE TREE, so a write made while bound lands where every reader looks.
 
-    // While bound, decision ops land in the RECORD too (parts per visit).
-    s.decisions.apply("continue_expedition/work@0", { op: "update", brief: "working in the record" });
-    const recDir = join(s.workRoot(), "spec", "expeditions", minted.created);
-    assert.ok(readFileSync(join(recDir, "decisions.jsonl"), "utf8").includes("working in the record"));
+    // A record's own account used to be a decision log written beside it. It is
+    // the work tokens now, and they live in the record's own work folder.
 
     // Closing without a REPORT is refused — an expedition ends with one.
     assert.throws(

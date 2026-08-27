@@ -16,7 +16,7 @@ record was built from.
 Owner ruling 2026-08-13. Without the emit, every record relearns what the
 last one already knew.
 
-## What travels by itself, and what does not
+## What travels by itself, and what does not #work
 
 THE PULL SIDE ALREADY WORKS. A record's machine is compiled at the kickoff
 bless from the matrix as it stands that minute, then pinned. So an
@@ -30,7 +30,7 @@ had it to the matrix that needs it.
 fires at the NEXT record's opening. The knowledge has to survive the seam in
 somebody's head or in a note.
 
-## The record may write the method, and the emit is still owed
+## The record may write the method, and the emit is still owed #work
 
 These paths are SHARED:
 
@@ -56,7 +56,7 @@ list and nothing else.
 
 Make the change where you stand. Name it here as well.
 
-## How to emit
+## How to emit #work
 
 At `package`, fill `emit_back`. One line per improvement, naming the target
 and the change.
@@ -80,7 +80,7 @@ WHAT COUNTS AS AN IMPROVEMENT TO EMIT:
 WHAT DOES NOT: anything about this record's own subject. That is the
 record's output, not the method's.
 
-## Where it lands
+## Where it lands #work
 
 The list is a HANDOFF. Two things consume it:
 
@@ -92,7 +92,7 @@ The second is faster and is preferred when the change is small and settled.
 It is one call now. The escape, the edit at the desk and the aim back were
 the old refusal's cost, and that refusal is retired.
 
-## Later
+## Later #work
 
 When the rendering system lands, this becomes mechanical: the emit produces
 a diff against the template rather than a line of prose, and the promotion

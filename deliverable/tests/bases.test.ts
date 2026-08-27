@@ -13,12 +13,15 @@ import { describe, test } from "node:test";
 import { parse } from "yaml";
 import {
   addView,
+  compileTree,
   createBase,
   duplicateView,
   type FilterRow,
+  filterGroups,
   fromExpression,
   hideAll,
   OPERATORS,
+  type PostedTree,
   removeView,
   renameView,
   setDisplayName,
@@ -290,6 +293,71 @@ describe("filters land in the file", () => {
     const tree = { or: ['file.hasTag("tag")', { and: ['file.hasTag("book")', 'file.hasLink("Textbook")'] }] };
     setViewFilters(v.root, v.rel, "The matrix", tree);
     assert.deepEqual(view(v.doc()).filters, tree);
+  });
+});
+
+// THE FILTER CONTROL IS AN AND OF ORS, and that is the shape the evaluator in
+// tables.ts already reads. These cases pin both directions: what the control
+// posts, and what a file already on disk draws as.
+describe("the funnel's groups — ANDed outside, ORed inside", () => {
+  const cond = (property: string, operator: string, value: string): { r: FilterRow } => ({ r: { property, operator, value } });
+
+  test("two groups compile to an and of ors", () => {
+    const posted: PostedTree = { and: [{ or: [cond("status", "is", "open"), cond("status", "is", "wip")] }, cond("price", "gt", "5")] };
+    assert.deepEqual(compileTree(posted), { and: [{ or: ['status == "open"', 'status == "wip"'] }, "price > 5"] });
+  });
+
+  test("the stored shape reads back into the same rows", () => {
+    const groups = filterGroups({ and: [{ or: ['status == "open"', 'status == "wip"'] }, "price > 5"] });
+    assert.equal(groups.length, 2);
+    assert.deepEqual(groups[0].rows, [
+      { property: "status", operator: "is", value: "open" },
+      { property: "status", operator: "is", value: "wip" },
+    ]);
+    assert.deepEqual(groups[1].rows, [{ property: "price", operator: "gt", value: "5" }]);
+    for (const g of groups) assert.equal(g.raw, undefined, "nothing was left unread");
+  });
+
+  test("a compiled tree reads back into the rows it was built from", () => {
+    const rows: FilterRow[] = [
+      { property: "status", operator: "is", value: "open" },
+      { property: "tags", operator: "contains", value: "book" },
+    ];
+    const groups = filterGroups(compileTree({ and: [{ or: rows.map((r) => ({ r })) }] }));
+    assert.equal(groups.length, 1);
+    assert.deepEqual(groups[0].rows, rows);
+  });
+
+  test("a leaf the builder cannot read is kept raw rather than mangled", () => {
+    assert.equal(fromExpression("price * 2 > age"), null, "null is the designed answer here, not a failure");
+    assert.deepEqual(filterGroups({ and: ["price * 2 > age"] }), [{ rows: [], raw: "price * 2 > age" }]);
+  });
+
+  test("one unreadable row makes its whole group raw", () => {
+    const or = { or: ['status == "open"', "price * 2 > age"] };
+    assert.deepEqual(filterGroups({ and: [or] }), [{ rows: [], raw: or }]);
+  });
+
+  test("a shape deeper than an and of ors is carried whole", () => {
+    const inner = { or: ['a == "1"', { and: ['b == "2"'] }] };
+    assert.deepEqual(filterGroups({ and: [inner] }), [{ rows: [], raw: inner }]);
+    assert.deepEqual(filterGroups({ not: 'kind == "draft"' }), [{ rows: [], raw: { not: 'kind == "draft"' } }]);
+  });
+
+  test("a bare array is an and, the way the evaluator reads one", () => {
+    assert.equal(filterGroups(['status == "open"', "price > 5"]).length, 2);
+  });
+
+  test("no filter at all is one empty group, so the control has somewhere to type", () => {
+    assert.deepEqual(filterGroups(undefined), [{ rows: [] }]);
+    assert.deepEqual(filterGroups({ and: [] }), [{ rows: [] }]);
+  });
+
+  test("what the control posts lands in the file as an and of ors", () => {
+    const v = root();
+    const posted: PostedTree = { and: [{ or: [cond("kind", "is", "a"), cond("kind", "is", "b")] }, cond("patch", "isNotEmpty", "")] };
+    setViewFilters(v.root, v.rel, "The matrix", compileTree(posted));
+    assert.deepEqual(view(v.doc()).filters, { and: [{ or: ['kind == "a"', 'kind == "b"'] }, "!patch.isEmpty()"] });
   });
 });
 

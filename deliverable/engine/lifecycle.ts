@@ -26,6 +26,10 @@ export type LifecycleEvent =
   | "stop-block"
   | "stop-pass"
   | "stop-error"
+  // THE SHUTDOWN COUNTDOWN. It happens with no call in flight, which is what
+  // this log is for, and a silent five minutes reads exactly like a toggle
+  // that never worked.
+  | "shutdown"
   | "reaped";
 
 /** Append one lifecycle line. Never throws: a postmortem that cannot be

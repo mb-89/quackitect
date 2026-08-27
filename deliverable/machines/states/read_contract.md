@@ -2,7 +2,6 @@
 state: read_contract
 state_kind: work
 priority: mechanical
-tags: boot
 legal_tools: se_file_read, se_note
 guidance: |
   BOOT IS SHORT NOW. Four documents are already in your PROMPT LAYER, present

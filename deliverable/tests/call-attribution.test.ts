@@ -391,29 +391,13 @@ test("a refused call carrying a relay still reaches the log", async () => {
   assert.equal((JSON.parse(lines[0]) as { ok: boolean }).ok, false);
 });
 
-test("an se_update record carries the CALL's coordinates, not the update payload's", async () => {
-  const { buildServer } = await import("../engine/tools.ts");
-  const root = freshRoot();
-  const server = buildServer(root);
-  await server.handle({
-    jsonrpc: "2.0",
-    id: 1,
-    method: "tools/call",
-    params: {
-      name: "se_pull",
-      arguments: { as: "guide", answered_by: "a-strong-model", update: { op: "plan", items: ["one", "two"] } },
-    },
-  });
-  const recs = readFileSync(join(seDir(root), "calls.jsonl"), "utf8")
-    .trim()
-    .split("\n")
-    .filter(Boolean)
-    .map((l) => JSON.parse(l) as Record<string, unknown>);
-  const upd = recs.find((r) => r.tool === "se_update");
-  assert.ok(upd !== undefined, "the update is its own record");
-  assert.equal(upd.part, "guide", "it read the {op, items} object, where a part never appears, and said walker");
-  assert.equal(upd.answered_by, "a-strong-model");
-});
+// AN se_update RECORD USED TO BE ITS OWN LINE, and this case pinned that it
+// carried the CALL's coordinates rather than the update payload's — a red team
+// found `as: "guide"` on the call and `walker` on the record.
+//
+// THE UPDATE IS GONE with the decision graph, so there is no second record to
+// mis-attribute. Every act on a work token is an ordinary lane call, and the
+// cases above already pin what a lane call records.
 
 test("a coordinate hidden inside the update object does not reach the record", async () => {
   const { buildServer } = await import("../engine/tools.ts");

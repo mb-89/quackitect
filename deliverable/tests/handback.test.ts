@@ -100,8 +100,15 @@ test("a verdict that changed replaces the one on the file", () => {
 });
 
 /** A walk with nothing running and nothing recorded — what a session that has
- *  just opened the project actually holds. */
-function freshScripts(): { scripts: Scripts; machine: MachineDecl; state: StateDecl } {
+ *  just opened the project actually holds.
+ *
+ *  `onDisk` is the verdict standing on the step's own form, which is what
+ *  survives the process that reached it. Left out, the form carries none.
+ *
+ *  THE FIXTURE'S SCRIPT DOES NOT EXIST, and the stamp for a missing script is
+ *  `<path>@gone`. That is what a caller passes to say the scripts have not
+ *  moved since the verdict was reached. */
+function freshScripts(onDisk?: { verdict: string; stamp: string }): { scripts: Scripts; machine: MachineDecl; state: StateDecl } {
   const state = { id: "verification", exit: { script: ["check.ts"] } } as unknown as StateDecl;
   const machine = { id: "i51", states: [state] } as unknown as MachineDecl;
   const host: ScriptHost = {
@@ -112,11 +119,51 @@ function freshScripts(): { scripts: Scripts; machine: MachineDecl; state: StateD
     state: () => state,
     notifyChange: () => {},
     recordVerdict: () => {},
-    standingJudgment: () => undefined,
+    standingJudgment: () => onDisk,
     evidence: new Map<string, Record<string, unknown>>(),
   };
   return { scripts: new Scripts(host), machine, state };
 }
+
+// THE LAUNCHER AND THE CHECKER READ ONE VERDICT, NEVER TWO. The launcher
+// declines to re-run a judgment whose verdict stands on the form. A checker
+// reading only its own memory called that same step not-passed, so the walk was
+// refused for a hop nothing was ever going to run again.
+//
+// WHAT IT COST: after a reload, no record could be re-entered past the first
+// state whose exit script had already passed. There is no fallback edge there
+// and no write verb, so the walk had nowhere to go.
+test("a verdict standing on the form is read by the checker, not only by the launcher", () => {
+  const { scripts, machine, state } = freshScripts({ verdict: "passed", stamp: "check.ts@gone" });
+  assert.equal(scripts.scriptStart(state.id, true), undefined, "the launcher skips a judgment whose verdict already stands on the form");
+  assert.equal(
+    scripts.scriptStanding(machine, state),
+    "passed",
+    "so the checker reads that same verdict rather than answering from an empty memory",
+  );
+});
+
+// The other direction of the same rule. A verdict reached against different
+// scripts answers a different question, so it carries nothing forward.
+//
+// NOTHING IS STARTED HERE, on purpose. A launched run makes the standing read
+// `deciding`, which is a true answer about a different moment and would hide
+// the one this case is about.
+test("a form verdict reached with different scripts does not stand", () => {
+  const { scripts, machine, state } = freshScripts({ verdict: "passed", stamp: "check.ts@something-else" });
+  assert.equal(
+    scripts.scriptStanding(machine, state),
+    "not passed",
+    "the checker refuses a verdict reached against scripts that have since moved",
+  );
+});
+
+// And a verdict the form carries as FAILED never reads as passed, whatever the
+// stamp says. Only `passed` carries.
+test("a failed verdict on the form is not read as passed", () => {
+  const { scripts, machine, state } = freshScripts({ verdict: "not passed", stamp: "check.ts@gone" });
+  assert.equal(scripts.scriptStanding(machine, state), "not passed", "a red on the form stays red");
+});
 
 // THE FATAL RISK, CLOSED BY CONSTRUCTION. raid-ar-walk-resumes-from-repo says a
 // step left deciding when a session ends has a word the repository cannot

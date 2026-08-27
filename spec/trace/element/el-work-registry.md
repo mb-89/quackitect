@@ -53,6 +53,8 @@ list, not the tail of it.
   itself.
 - [[if-work-registry-to-walk-engine]] — the account goes back out through the
   door the caller already knocked on.
+- [[if-work-store-to-work-registry]] — a piece of work that settled reports its
+  outcome, so one call still answers for everything running out of sight.
 
 ## Realization
 

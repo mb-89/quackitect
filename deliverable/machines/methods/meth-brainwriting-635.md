@@ -13,11 +13,15 @@ round REQUIRED to build on or mutate the previous round's sheet.
 wave, where the interesting ones live.
 
 **Steps.**
-1. Round one: three ideas on the frame, fast, no judging.
-2. Round two: read the sheet as if a colleague wrote it; three ideas
+1. Round one: three ideas on the frame, fast, no judging. #work
+2. Round two: #work
+
+   read the sheet as if a colleague wrote it; three ideas
    that extend, combine, or subvert what stands.
-3. Round three: same again, aiming deliberately AWAY from the favorite.
-4. Mark which round produced each keeper — round three earns its keep
+3. Round three: same again, aiming deliberately AWAY from the favorite. #work
+4. Mark which round produced each keeper #work
+
+   round three earns its keep
    surprisingly often.
 
 **Output.** Nine idea stubs with their lineage.

@@ -34,7 +34,7 @@ import { appendFileSync, existsSync, mkdirSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { createInterface } from "node:readline";
 import { fileURLToPath } from "node:url";
-import { takeWorkspace } from "../run.ts";
+import { reapAbandonedJobs, reapAbandonedTestJobs, takeWorkspace } from "../run.ts";
 import { SE_VERSION } from "../version.ts";
 
 const argv = [
@@ -360,6 +360,17 @@ if (argv.includes("--child") || process.env.SE_HOT_DISABLE === "1") {
     process.stderr.write(`se-mcp: ${hold.by} — this server is stopping rather than sharing the folder\n`);
     process.exit(1);
   }
+  // THE LAST ENGINE'S GHOSTS DIE HERE, WHATEVER ELSE STARTS.
+  //
+  // IT DOES NOT DEPEND ON THE MIRROR, for the same reason the hold above does
+  // not. A server started with the mirror disabled inherits the same abandoned
+  // records, and the stop hook reads them either way.
+  //
+  // REAPING TWICE IS HARMLESS. Both reapers skip a record that is already
+  // closed, so the mirror's own call on the way up finds nothing left.
+  // see dsp-the-work-account.md#a-killed-run-is-closed-at-startup
+  reapAbandonedJobs(root);
+  reapAbandonedTestJobs(root);
   const mcpServer = buildServer(root, session);
   if (mirrorPort > 0) {
     const log = new CallLog(seDir(root));

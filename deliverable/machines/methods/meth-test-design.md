@@ -18,7 +18,7 @@ space of trillions of combinations came down to 62 high-quality cases.
 
 Automating bad test cases is waste.
 
-## THE THREE LAYERS
+## THE THREE LAYERS #work
 
 One card, three altitudes — each answers a different question:
 
@@ -27,7 +27,7 @@ One card, three altitudes — each answers a different question:
   the environment, testability designed in.
 - DESIGN — how each case is derived. The method decides the cases.
 
-## STRATEGY — what, and how much
+## STRATEGY — what, and how much #work
 
 The strategy answers five drivers, before any case exists:
 
@@ -48,7 +48,7 @@ TESTING GIVES INFORMATION, NEVER QUALITY. The result is evidence for a
 decision; the improvement is upstream. More and better testing buys more
 and better information — that is all it buys, and it is enough.
 
-## DESIGN — deriving the cases
+## DESIGN — deriving the cases #work
 
 - Anatomy first. Every case carries:
   - an id
@@ -77,7 +77,7 @@ and better information — that is all it buys, and it is enough.
   - acceptance
   - A case belongs to the LOWEST level that can catch its defect.
 
-## THE SET — what makes a suite good
+## THE SET — what makes a suite good #work
 
 A suite is designed, never accumulated. Five properties:
 
@@ -98,7 +98,7 @@ A suite is designed, never accumulated. Five properties:
   the fix is upstream. A green suite proves the claims it encodes,
   nothing more.
 
-## THE SINGLE TEST — what makes one good
+## THE SINGLE TEST — what makes one good #work
 
 - ONE QUESTION, one reason to fail. A test asserting five things answers
   none when it goes red.
@@ -116,7 +116,7 @@ A suite is designed, never accumulated. Five properties:
   invisible to a test that only reads output — the house lesson, in
   guidance/craft/software.md.
 
-## TACTICS — how the campaign is organized, in and beyond software
+## TACTICS — how the campaign is organized, in and beyond software #work
 
 The method generalizes past code, and the corpus carries it:
 

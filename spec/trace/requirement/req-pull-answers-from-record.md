@@ -23,3 +23,23 @@ priority: must
 What the one answer carries:
 
 - When the walk stands on a state whose work is open, the engine shall answer the pull with one packet carrying the state's guidance, the legal tool set, and the owed evidence form.
+
+## Addition — work tokens
+
+WHAT THE INSTRUCTION CARRIES CHANGES, and this is the largest single change
+of the work-token round. The answer becomes the pieces of work that stand
+open where the walk is and that are ready to be taken, rather than an
+instruction the hand has to read a state's whole guidance to act on.
+
+READY IS COMPUTED, NEVER ASKED FOR. Work whose predecessor has not reached
+the outcome its edge names is withheld, and the hand is not told to check.
+
+THE ANSWER STILL NAMES THE NEXT ACT. A hand that infers nothing has to be
+told which call to make and what to put in it, and handing over work rather
+than instructions does not lift that.
+
+WHAT DOES NOT CHANGE. Where the walk may go, how it routes, and what a gate
+is. The round changes what a state hands out, not the machine.
+
+THE KICKOFF GATE CALLED THIS THE ONE ARGUMENT FOR GRADING THE ROUND ABOVE
+MAJOR, because the pull is the system's one verb.

@@ -15,6 +15,9 @@ import { anyJobRunning } from "./run.ts";
 export interface LivenessHost {
   persist(): void;
   describe(): Record<string, unknown>;
+  /** SAY SOMETHING WITH NO CALL IN FLIGHT. The idle clock runs in the
+   *  background, so it has no result to ride and needs a channel of its own. */
+  say(line: string): void;
 }
 
 export class Liveness {
@@ -25,9 +28,9 @@ export class Liveness {
   }
 
   /** The two flags, as the settings file carries them. */
-  restore(blockSleep: unknown, shutdownAtIdle: unknown): void {
+  restore(blockSleep: unknown, shutdownAtFrontDesk: unknown): void {
     if (typeof blockSleep === "boolean") this._blockSleep = blockSleep;
-    if (typeof shutdownAtIdle === "boolean") this._shutdownAtIdle = shutdownAtIdle;
+    if (typeof shutdownAtFrontDesk === "boolean") this._shutdownAtFrontDesk = shutdownAtFrontDesk;
   }
 
   /** The session reached end: the keep-awake dies with it. */
@@ -68,7 +71,7 @@ export class Liveness {
    */
   private _blockSleep = false;
 
-  private _shutdownAtIdle = false;
+  private _shutdownAtFrontDesk = false;
 
   private keepAwake?: ReturnType<typeof spawn>;
 
@@ -76,6 +79,22 @@ export class Liveness {
 
   /** Any act at all, by any hand. The idle clock measures from here. */
   private lastActivity = Date.now();
+
+  /** THE AGENT WORKING IS ACTIVITY, and the clock had no way to hear it.
+   *
+   *  `notifyChange` only fires when the WALK moves. An agent reading, searching
+   *  and writing at the front desk moves nothing, so a countdown ran underneath
+   *  a session that was plainly busy.
+   *
+   *  EVERY LANE CALL TOUCHES THIS. It is the cheapest true signal there is: the
+   *  agent cannot work without making one.
+   *
+   *  IT ONLY RECORDS THE TIME. Saying anything here would speak once per call,
+   *  which is hundreds of lines an hour. The WATCHDOG decides and the watchdog
+   *  speaks — one decider, once a minute. */
+  touch(at = Date.now()): void {
+    this.lastActivity = at;
+  }
 
   /** How long nothing may happen before an armed idle shutdown fires. */
   static IDLE_MINUTES = 5;
@@ -92,19 +111,19 @@ export class Liveness {
    *  that is actually working. */
   static JOB_MAX_AGE_MS = 60 * 60_000;
 
-  get power(): { block_sleep: boolean; shutdown_at_idle: boolean } {
-    return { block_sleep: this._blockSleep, shutdown_at_idle: this._shutdownAtIdle };
+  get power(): { block_sleep: boolean; shutdown_at_front_desk: boolean } {
+    return { block_sleep: this._blockSleep, shutdown_at_front_desk: this._shutdownAtFrontDesk };
   }
 
   setPower(key: string, on: boolean): Record<string, unknown> {
     if (key === "block-auto-sleep") this._blockSleep = on;
     // THE OLD KEY IS STILL ACCEPTED. The control was renamed and
     // a panel served before the rename still posts the old one.
-    else if (key === "shutdown-at-front-desk" || key === "shutdown-at-idle") this._shutdownAtIdle = on;
+    else if (key === "shutdown-at-front-desk" || key === "shutdown-at-idle") this._shutdownAtFrontDesk = on;
     else {
       throw new Rejection({
         clause: CLAUSES.REQUIRED_ARGS,
-        expected: "a power toggle: block-auto-sleep or shutdown-at-idle",
+        expected: "a power toggle: block-auto-sleep or shutdown-at-front-desk",
         got: key,
         remedy: {
           tool: "se_file_read",
@@ -129,12 +148,39 @@ export class Liveness {
    */
   private static readonly RESTING = new Set(["front_desk"]);
 
-  /** All three must hold: parked, quiet, and nothing of ours still running. */
-  idleFor(ms: number): boolean {
-    if (Date.now() - this.lastActivity < ms) return false;
+  /** PARKED AND QUIET, with nothing of ours still running. The clock's two
+   *  non-time conditions, split out so the countdown can ask them without
+   *  asking how long it has been. */
+  resting(): boolean {
     if (anyJobRunning(Liveness.JOB_MAX_AGE_MS)) return false;
     const active = this.host.describe().active as string[];
     return active.length > 0 && active.every((a) => Liveness.RESTING.has(a.split("/").pop()!));
+  }
+
+  /** All three must hold: parked, quiet, and nothing of ours still running. */
+  idleFor(ms: number): boolean {
+    if (Date.now() - this.lastActivity < ms) return false;
+    return this.resting();
+  }
+
+  /** WHOLE MINUTES NOTHING HAS HAPPENED, or nothing while something is.
+   *  It rides the live payload, so a surface can show it climb. */
+  private _inactiveMinutes?: number;
+
+  get inactiveMinutes(): number | undefined {
+    return this._inactiveMinutes;
+  }
+
+  /** STOP COUNTING, IN SILENCE.
+   *
+   *  THREE THINGS STOP IT: releasing the toggle, the walk moving, or anything
+   *  at all reaching the log. None of them is announced — something happening
+   *  is the ordinary case, and a line every time would be the noise this
+   *  counter exists to avoid. */
+  private standDown(): void {
+    if (this._inactiveMinutes === undefined) return;
+    this._inactiveMinutes = undefined;
+    this.wake();
   }
 
   /**
@@ -142,26 +188,63 @@ export class Liveness {
    * clock running at all and cannot power anything off by accident.
    */
   private armIdleTimer(): void {
-    if (this._shutdownAtIdle && this.idleTimer === undefined) {
-      this.idleTimer = setInterval(() => this.checkIdle(), 30_000);
+    if (this._shutdownAtFrontDesk && this.idleTimer === undefined) {
+      // ONCE A MINUTE, because the figure it reports is in whole minutes. A
+      // faster tick reports the same number again and again.
+      this.idleTimer = setInterval(() => this.checkIdle(), 60_000);
       this.idleTimer.unref?.();
-    } else if (!this._shutdownAtIdle && this.idleTimer !== undefined) {
+    } else if (!this._shutdownAtFrontDesk && this.idleTimer !== undefined) {
       clearInterval(this.idleTimer);
       this.idleTimer = undefined;
     }
   }
 
+  /** THE WATCHDOG. It runs once a minute and it is the ONLY thing that decides.
+   *
+   *  IT ASKS ONE QUESTION: how long since anything reached the log.
+   *
+   *  - Under a minute — something is happening. Nothing counted, nothing said.
+   *  - One to four — say how long it has been quiet, once per minute.
+   *  - Five — shut the machine down.
+   *
+   *  A SILENT WAIT AND THEN A DARK MACHINE is indistinguishable from a toggle
+   *  that never worked, and that is what the reader reported.
+   *
+   *  IT REPORTS THE FACT, NEVER THE RULE. "Inactive for 3 of 5 minutes" is
+   *  something a reader can check against what they just did. The mechanism
+   *  behind it is not their problem.
+   *
+   *  IT CANNOT FEED ITSELF. What it says goes to the lifecycle log under its
+   *  own `shutdown` event; what it listens to is the CALL log. Two files, two
+   *  origins, so its own voice is never mistaken for activity.
+   *  see dsp-boot-and-power.md#what-survives-a-reload-and-what-does-not */
   private checkIdle(): void {
-    if (!this._shutdownAtIdle) return;
-    if (!this.idleFor(Liveness.IDLE_MINUTES * 60_000)) {
-      // Something is still happening, so hold the computer awake for it.
-      this.syncKeepAwake();
+    if (!this._shutdownAtFrontDesk) {
+      this.standDown();
       return;
     }
+    if (!this.resting()) {
+      // Something is still happening, so hold the computer awake for it.
+      this.syncKeepAwake();
+      this.standDown();
+      return;
+    }
+    const minutes = Math.floor((Date.now() - this.lastActivity) / 60_000);
+    // SOMETHING IS HAPPENING. Nothing counted, nothing said.
+    if (minutes < 1) {
+      this.standDown();
+      return;
+    }
+    if (minutes !== this._inactiveMinutes) {
+      this._inactiveMinutes = minutes;
+      this.host.say(`inactive for ${String(minutes)} of ${String(Liveness.IDLE_MINUTES)} minutes`);
+      this.wake();
+    }
+    if (minutes < Liveness.IDLE_MINUTES) return;
     if (process.platform !== "win32" || process.env.SE_POWEROFF_DISABLE === "1") return;
     // Disarm before firing, so a shutdown that the person cancels at the
     // warning does not immediately arm another one behind them.
-    this._shutdownAtIdle = false;
+    this._shutdownAtFrontDesk = false;
     this.armIdleTimer();
     spawn("shutdown.exe", ["/s", "/t", "60", "/c", "se: idle for five minutes"], {
       stdio: "ignore",
@@ -200,7 +283,8 @@ export class Liveness {
   private syncKeepAwake(): void {
     // Either flag wants the computer awake. Shutdown-at-idle wants it awake
     // while work is happening; once it is not, powering off is the point.
-    const want = (this._blockSleep || this._shutdownAtIdle) && process.platform === "win32" && process.env.SE_KEEPAWAKE_DISABLE !== "1";
+    const want =
+      (this._blockSleep || this._shutdownAtFrontDesk) && process.platform === "win32" && process.env.SE_KEEPAWAKE_DISABLE !== "1";
     if (want && this.keepAwake === undefined) {
       const src =
         "Add-Type -TypeDefinition 'using System.Runtime.InteropServices; public class KA { [DllImport(\"kernel32.dll\")] public static extern uint SetThreadExecutionState(uint f); }'; while ($true) { [KA]::SetThreadExecutionState(2147483651) | Out-Null; Start-Sleep -Seconds 30 }";
@@ -239,7 +323,17 @@ export class Liveness {
     // EVERY HAND RESETS THE IDLE CLOCK. A tick, a mirror click, a note, an
     // evidence write — they all pass through here, so the clock measures
     // silence rather than only the agent's silence.
+    //
+    // THE WATCHDOG USES `wake` INSTEAD, and must. Announcing through here
+    // stamped the clock the announcement had just read, so the counter reset
+    // itself every time it spoke and could never reach the fifth minute.
     this.lastActivity = Date.now();
+    this.wake();
+  }
+
+  /** Wake every held wait WITHOUT saying anything happened. For a watcher that
+   *  reports on the clock rather than moving it. */
+  private wake(): void {
     const held = this.waiters;
     this.waiters = [];
     for (const wake of held) wake();

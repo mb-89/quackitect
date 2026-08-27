@@ -2,19 +2,9 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join, relative } from "node:path";
 
-/** THE UPWARD KEY EACH NODE TYPE OWES, from the trace schema's own direction:
- *  the newer artifact points at what it derives from. A node type absent here
- *  is a root and owes nothing upward. */
-const UPWARD: Record<string, string[]> = {
-  story: ["refines"],
-  "use-case": ["refines"],
-  requirement: ["refines"],
-  function: ["satisfies"],
-  element: ["implements"],
-  interface: ["carries"],
-  "design-spec": ["realizes"],
-  "test-spec": ["verifies", "demonstrates"],
-};
+// THE EDGE MAP LIVES IN ONE PLACE. The reading demand walks the same graph this
+// check reads, and two copies of a graph's shape diverge silently.
+import { UPWARD } from "../traceup.ts";
 
 function argValue(flag: string): string | undefined {
   const i = process.argv.indexOf(flag);

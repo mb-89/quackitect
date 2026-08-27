@@ -1,6 +1,6 @@
 {
   "change_size": "major",
-  "rigor_matrix_hash": "500756d393e3",
+  "rigor_matrix_hash": "cc1799828187",
   "pinned_at": "2026-08-25T16:48:07.495Z",
   "demands": {
     "spawn-the-hands": {
@@ -270,7 +270,7 @@
     },
     "gate-implementation": {
       "applies": "full",
-      "evidence": "[[\"quality_ok\",true,\"\",[],\"checklist\",\"\",[],[\"$iq_checklist\"],[]],[\"debt_taken\",true,\"\",[],\"refs\",\"raid\",[],[],[]],[\"risks_acceptable\",true,\"\",[],\"choice-with-rationale\",\"\",[\"acceptable\",\"not-acceptable\"],[],[]]]",
+      "evidence": "[[\"quality_ok\",true,\"\",[],\"checklist\",\"\",[],[\"$iq_checklist\"],[]],[\"debt_taken\",true,\"\",[],\"refs\",\"raid\",[],[],[]],[\"risks_acceptable\",true,\"\",[],\"choice-with-rationale\",\"\",[\"acceptable\",\"not-acceptable\"],[],[]],[\"design_holds\",true,\"\",[],\"choice-with-rationale\",\"\",[\"holds\",\"drifted\"],[],[]]]",
       "shape": "[[\"verification\"],true,\"\",\"\"]"
     },
     "spawn-for-validation": {

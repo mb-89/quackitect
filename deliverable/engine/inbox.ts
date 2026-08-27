@@ -7,7 +7,7 @@
 import { randomBytes } from "node:crypto";
 import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
-import { CLAUSES, Rejection } from "./errors.ts";
+import { CLAUSES, Rejection, refuseProseWall } from "./errors.ts";
 import { stripBom } from "./jsonio.ts";
 import { mintToken } from "./pool.ts";
 import { clearRetroOwed } from "./records.ts";
@@ -72,6 +72,8 @@ export function byPriority(a: StrayNote, b: StrayNote): number {
   return RANK[priorityOf(a)] - RANK[priorityOf(b)];
 }
 
+/** THE WALL GUARD SITS ON THE WRITER, not on one caller. It lived on the lane
+ *  verb alone, so a note written from the panel reached the file unchecked. */
 export function appendNote(
   seDirPath: string,
   text: string,
@@ -79,6 +81,7 @@ export function appendNote(
   title?: string,
   priority?: Priority,
 ): { captured: string; inbox: number } {
+  refuseProseWall(by === "human" ? "the note box" : "se_note", "the note", text);
   const p = notesPath(seDirPath);
   const note: StrayNote = {
     ref: `note-${randomBytes(6).toString("hex")}`,

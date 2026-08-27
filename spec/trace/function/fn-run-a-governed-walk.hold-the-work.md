@@ -5,6 +5,9 @@ type: "[[function]]"
 cluster: the-record-life
 statement: hold work in progress so the walk can be left and picked up again
 satisfies:
+  - req-two-hands-writing-work-at-once-do-not-collide
+  - req-work-outlives-its-state-or-goes-with-it-and-says-which
+  - req-work-outside-a-record-goes-when-its-state-completes
   - req-unshipped-dependency-refused
   - req-landing-needs-no-close
   - req-boot-ends-at-front-desk
@@ -66,3 +69,17 @@ ruling of 2026-08-14. Both halves it carried are still here.
 
 The rationale above already said it: the worktree exists because unfinished
 work needs somewhere to be. That sentence outlived the row.
+
+## Addition — work tokens
+
+WHAT IS HELD, AND WHAT IS NOT. Work tokens inside a record are held with it.
+Work tokens outside one are not: when their position completes they go, and
+what survives is the evidence they produced.
+
+THAT IS THE SAME SENTENCE THIS FUNCTION ALREADY RESTS ON, read from the other
+end. The worktree exists because unfinished work needs somewhere to be. Work
+outside a record has nowhere it needs to be after its position closes.
+
+THE GUARANTEE IS NARROWER THERE, and it is stated rather than discovered.
+What survives outside a record is that a position cannot be LEFT with work
+open. The trail of which work tokens existed does not.

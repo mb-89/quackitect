@@ -1,7 +1,8 @@
 ---
 form: onboard-retro
 by: agent
-signed_off: 2026-08-25T16:47:30.921Z
+signed_off: 2026-08-25T16:59:31.342Z
+reopened: "2026-08-25T16:58:35.633Z — two owner rulings were captured after this retro signed, and the drain is the only place they can be judged — the gate below refuses while they pend"
 checked: Read refusals, Read retro, Read template-free-form, Read template-per-item, Read template-list, Do the survey, Establish the interval
 authors: agent, human
 files:
@@ -45,7 +46,7 @@ All of it is drained. Nothing from this step is left pending.
 
 ## notes_drained
 
-- inbox: empty. Fifteen notes were walked in this state across two passes. Two were folded into homes that already carry them, and thirteen were authored into work tokens now standing in the pool. Seven of the fifteen came from the owner driving the walk by hand on 2026-08-25, which is what this session was for.
+- inbox: empty. Seventeen notes were walked in this state across three passes. Two were folded into homes that already carry them, and fifteen were authored into work tokens now standing in the pool. Nine of the seventeen came from the owner driving the walk by hand and ruling as they went, which is what the session was for.
 
 ## call_log_mined
 
@@ -86,17 +87,21 @@ A SECOND STALENESS, smaller. Nothing bounds a wait. Every surveyed engine puts a
 
 ## follow_up
 
-THIRTEEN WORK TOKENS MINTED IN THIS PASS, all standing in the pool with their re-entry conditions. Eleven were minted in the earlier pass, so twenty-four in total carry out of this state.
+FIFTEEN WORK TOKENS MINTED IN THIS PASS, all standing in the pool with their re-entry conditions. Eleven were minted in the earlier pass, so twenty-six in total carry out of this state.
 
-SEVEN OF THE THIRTEEN ARE ROUTED TO THE UI SITTING, on the owner's word that findings go to the record they belong to. They are the served surface still depending on a local web server, a block that shows the person no reason, ticks that do not survive, a reading demand no person can meet, an unrendered list of recent movement, a verb opening a deleted address, and two rules that disagree about seizing a held network address.
+EIGHT OF THE FIFTEEN ARE ROUTED TO THE UI SITTING, on the owner's word that findings go to the record they belong to. They are the served surface still depending on a local web server, a block that shows the person no reason, ticks that do not survive, a reading demand no person can meet, an unrendered list of recent movement, a verb opening a deleted address, two rules that disagree about seizing a held network address, and a description panel over an iteration's own machine.
 
 ONE IS ROUTED TO THE DETAILS-PANEL RECORD: driving the machine by hand needs a view of its own before the pane it lives in is deleted.
+
+ONE IS ROUTED TO THE DIAMOND RECORD: the positions that start a hand are removed there, on the owner's ruling.
 
 ONE GOES TO THE ARCHIVE RECORD, one to the narration record, one to the binding-rules file, one to whichever record next orders outward investigation, and one to the sitting where surfaces get sketched.
 
 TWO NOTES WERE CARRIED RATHER THAN MINTED. The measured mechanism behind the reading demand folded into that demand's own token. The drawn-field finding is carried into this record's kickoff as design input, because it is evidence for the work-token design and this state's own drain re-opened the same way while it was being walked.
 
-WHAT COMES NEXT IN THIS RECORD. The kickoff gate, filled with the research as design input. The owner has said the kickoff may be filled and blessed from here, and that every step after it waits for their word.
+THIS STATE WAS REOPENED TWICE, and both times for the same reason: notes captured after it signed re-opened the drain. It is the treadmill the design input names, observed on the machine that is being redesigned to end it.
+
+WHAT COMES NEXT IN THIS RECORD. The kickoff gate carries the owner's vision, and the walk goes on to draft the vision proper.
 
 ## anything_else
 
@@ -110,6 +115,6 @@ THE STORAGE CHOICE RUNS AGAINST FIVE INDEPENDENT CONVERGENCES. Five systems, ove
 
 THAT IS A TRADEOFF AND NOT A DEFEAT. Readability and direct editability against mechanical mergeability. The weight of the field is on the other side, so the argument has to be made out loud rather than assumed.
 
-THE LADDER COLLAPSE IS SUPPORTED, with one precise warning. Every mature rigor ladder folds many inputs into exactly one level and derives everything downstream from it. None carries two levels forward. But folding means DERIVING, not deleting: the strongest example does not remove verification depth, it derives it and writes the derivation down as seventy-one obligations against twenty-six. Removing a ladder without that written mapping deletes a control and leaves nothing behind.
+THE LADDER COLLAPSE IS SUPPORTED, with one precise warning. Every mature rigor ladder folds many inputs into exactly one level and derives everything downstream from it. None carries two levels forward. But folding means DERIVING, not deleting: the strongest example does not remove verification depth, it derives it and writes the derivation down as seventy-one work tokens against twenty-six. Removing a ladder without that written mapping deletes a control and leaves nothing behind.
 
 AND THE SURVIVING AXIS MAY BE MISNAMED. Every input to every mature ladder is about harm, never about how hard the work is. A hard step with no consequences needs no rigor; an easy step that can destroy something needs all of it.

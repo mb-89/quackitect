@@ -6,7 +6,7 @@ statement: FRAME names five tactic groups for finding options. Each group is a d
 ## Situation
 No single architecture method is general enough; FRAME names the five tactic groups and where each bites in the machine.
 
-## The groups
+## The groups #work
 - F Feasibility: early convergence checks, economically reasonable - [[meth-feasibility-checks]]. Feeds candidate composition.
 - R References: proven knowledge - heuristics, patterns, catalogs, standards, benchmarking, reference architectures, TRIZ. Feeds enumeration.
 - A Alternatives: always compare - the 8-step decision model ([[meth-eight-step-decision]]) spanning criteria to selection; morphological analysis + design-space exploration at EVERY design level.

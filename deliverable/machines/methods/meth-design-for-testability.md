@@ -13,7 +13,7 @@ than developing.
 
 Testability is designed in, never bolted on.
 
-## Procedure
+## Procedure #work
 
 - OBSERVE. What you see is what you test.
   - Give every element observation points: outputs, states, internals,

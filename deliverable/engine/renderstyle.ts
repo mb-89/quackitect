@@ -11,6 +11,131 @@ export const STYLE = `
   main { flex: 1; min-width: 0; display: flex; flex-direction: column; padding: 14px 18px; }
   .divider { width: 6px; cursor: col-resize; background: var(--se-border); flex: none; }
   .divider.horiz { width: auto; height: 6px; cursor: row-resize; }
+
+  /* THE WORK CARD. Cosmetics only — the two columns are laid out on the
+     element itself, because a stylesheet that does not reach the fragment
+     would leave them stacked. see ux.md "Layout that must hold". */
+  .work-place { border-bottom: 1px solid var(--se-border); padding: 8px 10px; }
+  .work-place:last-child { border-bottom: 0; }
+  .work-place-head { font-size: 11px; color: var(--se-muted); padding-bottom: 6px; }
+  .work-col { display: flex; flex-direction: column; }
+  .work-col-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: 11px; color: var(--se-muted); padding-bottom: 4px; cursor: pointer; }
+  /* THE CARD WEARS THE DRAWING'S COLOURS. One bucket, one colour, on both
+     surfaces — a reader moving between them is looking at the same thing. */
+  .work-col-in .work-col-head { color: var(--se-bucket-in); }
+  .work-col-pending .work-col-head { color: var(--se-bucket-pending); }
+  .work-col-out .work-col-head { color: var(--se-bucket-out); }
+  .work-col-done .work-col-head { color: var(--se-bucket-done); }
+  .work-col.folded .work-col-body, .work-col.folded .work-new { display: none; }
+  .work-col.folded .work-col-head { opacity: 0.7; }
+  .work-plus { border: 0; background: transparent; color: var(--se-muted); cursor: pointer; padding: 0 4px; line-height: 1; }
+  .work-plus:hover { color: var(--se-fg); }
+  .work-new { padding: 0 0 4px; }
+  .work-new input { width: 100%; background: transparent; border: 1px solid var(--se-border); color: inherit; font: inherit; padding: 3px 5px; }
+
+  /* A DESTINATION HOLDING NOTHING IS REVEALED WHILE A ROW IS IN THE AIR.
+     Hidden the rest of the time, so an empty bucket does not clutter the card;
+     shown during a drag, because otherwise the one place the row most wants to
+     go is the one place it cannot see. */
+  .work-col-empty { display: none; }
+  /* AND ONLY A BUCKET THAT COULD TAKE WHAT IS CARRIED. Revealing every empty
+     bucket offers the reader places the row cannot go. */
+  body.work-carrying-in .work-col-empty[data-slot="in"],
+  body.work-carrying-pending .work-col-empty[data-slot="pending"],
+  body.work-carrying-out .work-col-empty[data-slot="out"],
+  body.work-carrying-done .work-col-empty[data-slot="done"] { display: flex; outline: 1px dashed var(--se-walk); outline-offset: 2px; }
+  /* THE DONE BUCKET SITS UNDER THE OTHER THREE, and its own rule is what puts
+     it there. Everything above it is owed; it alone is finished. */
+  .work-cols-done { margin-top: 8px; border-top: 1px solid var(--se-border); padding-top: 6px; }
+  /* A STRIP HOLDING NOTHING SHOWS NOTHING — not its rule, not its spacing, not
+     the columns inside it. It stays in the document so a row in the air still
+     has somewhere to land, and the drag reveals it along with its buckets. */
+  /** TWO DATABASE PANES, SIDE BY SIDE. Equal halves, each scrolling on its own,
+   *  because a row is dragged from one to the other.
+   *  see dsp-the-bucket-editor.md#the-editor-is-the-database */
+  /** THE DOCK SITS LEFT OF THE DRAWING, and it is folded until somebody asks
+   *  for it. A reader who opened the machine page asked for the machine.
+   *  THE WIDTH IS THE READER'S. The grip on its right edge sets it, and the
+   *  client writes the chosen width back onto this element. */
+  /** THE EDITOR IS LEFT OF THE DRAWING, and it is folded until somebody asks
+   *  for it. A reader who opened the machine page asked for the machine. */
+  #work-dock { display: none; flex: 0 0 auto; width: 46vw; min-width: 280px; max-width: 90vw; min-height: 0; }
+  #work-dock:not([hidden]) { display: flex; }
+  .work-widget { flex: 1 1 0; min-width: 0; min-height: 0; display: flex; flex-direction: column; border-bottom: 0; }
+  .machine-lane { flex: 1 1 0; min-width: 0; min-height: 0; display: flex; flex-direction: column; gap: 10px; }
+  /** EVERY SEAM HERE IS UPRIGHT, because everything it splits is side by side.
+   *  The editor is LEFT of the drawing; the first column is left of the second.
+   *  A seam runs top to bottom and drags left and right.
+   *
+   *  A SEAM WITH NOTHING ON ONE SIDE SEPARATES NOTHING, which is what a bar
+   *  drawn under the editor was. */
+  .work-seam { background: transparent; position: relative; flex: 0 0 9px; align-self: stretch; cursor: col-resize; }
+  .work-seam::after { content: ""; position: absolute; inset: 6px 3px; border-radius: 2px; background: var(--se-border); }
+  .work-seam:hover::after, .work-seam.work-gripping::after { background: var(--se-accent); inset: 0 2px; }
+  /* THE EDITOR SHUT TAKES ITS SEAM WITH IT. */
+  #work-dock[hidden] + .work-seam { display: none; }
+  .work-panes { display: flex; align-items: stretch; min-height: 0; flex: 1 1 0; min-width: 0; padding: 0; }
+  .work-pane { flex: 1 1 0; min-width: 0; min-height: 0; display: flex; flex-direction: column; overflow: auto; }
+  .work-pane[hidden] { display: none; }
+  .work-pane .bs-block { flex: 1; min-height: 0; }
+  /** THE DROP TARGET SAYS SO. A row snapping back with nothing lit reads as a
+   *  drag that was never accepted. */
+  .work-pane.work-drop-target { outline: 1px solid var(--se-accent); outline-offset: -1px; }
+  /** THE HEADER'S OWN CONTROLS. They act on the work, never on the table, which
+   *  is why they are up here and not in the database's chrome. */
+  .work-tools { display: flex; gap: 6px; align-items: center; margin-left: auto; }
+  .work-picked { color: var(--se-muted); font-size: 11px; white-space: nowrap; }
+  .work-tools button[disabled] { opacity: 0.4; cursor: not-allowed; }
+  /** THE RENAME FIELD IS IN THE HEADER, not in a dialog. A webview refuses a
+   *  browser prompt outright, so a control that asked for one did nothing at
+   *  all when pressed — which is exactly how it was reported. */
+  .work-rename-field { background: none; border: 1px solid var(--se-border-strong); color: inherit; font: inherit; border-radius: 5px; padding: 2px 7px; min-width: 160px; }
+  .work-rename-field[hidden] { display: none; }
+  /** A TICKED ROW. Selection is a click on the row, so nothing had to be added
+   *  to every table in the product to make it possible. */
+  .work-pane tr.work-ticked > td { background: color-mix(in srgb, var(--se-accent) 22%, transparent); }
+  .tbl-opens { cursor: pointer; }
+  .work-cols { display: flex; gap: 10px; align-items: stretch; }
+  .work-cols-done { justify-content: flex-end; }
+  .work-cols-hollow { display: none; }
+  body.work-dragging .work-cols-hollow { display: flex; }
+  .work-said { font-style: italic; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+  .work-row.work-lifted { opacity: 0.5; }
+  .work-row[hidden] { display: none; }
+  .work-pick { flex: none; margin: 0; }
+  .work-status { flex: none; }
+  .work-status[data-status="in_work"] { color: var(--se-walk); }
+  .work-narrow { display: flex; gap: 8px; align-items: baseline; padding: 8px 10px; border-bottom: 1px solid var(--se-border); }
+  .work-find { flex: 1 1 auto; min-width: 0; background: transparent; border: 1px solid var(--se-border); color: inherit; font: inherit; padding: 3px 6px; }
+  g.work-drop-target rect, g.work-drop-target .state { stroke: var(--se-walk); stroke-width: 3; }
+  .work-count { font-variant-numeric: tabular-nums; color: var(--se-fg); }
+  .work-absent { color: var(--se-muted); cursor: help; }
+  .work-row { display: flex; align-items: baseline; gap: 8px; padding: 4px 6px; border: 1px solid var(--se-border); border-radius: 3px; margin-bottom: 4px; cursor: grab; }
+  .work-row:active { cursor: grabbing; }
+  /* THE TOKEN'S EDITOR. Folded until the row is pressed, and indented so it
+     reads as belonging to the row above it rather than as the next row.
+     see dsp-the-work-store.md#a-token-opens-an-editor */
+  .work-editor { margin: -2px 0 6px 18px; padding: 8px 10px; border: 1px solid var(--se-border); border-radius: 3px; }
+  .work-editor[hidden] { display: none; }
+  .work-field { display: flex; gap: 8px; align-items: baseline; }
+  .work-restate { flex: 1 1 auto; min-width: 0; background: transparent; border: 1px solid var(--se-border); color: inherit; font: inherit; padding: 3px 6px; }
+  .work-acts { display: flex; gap: 6px; align-items: baseline; margin-top: 6px; }
+  .work-comment { flex: 1 1 auto; min-width: 0; background: transparent; border: 1px solid var(--se-border); color: inherit; font: inherit; padding: 3px 6px; }
+  .work-do { flex: none; cursor: pointer; background: var(--se-raised); border: 1px solid var(--se-border-strong); color: inherit; font: inherit; padding: 3px 8px; border-radius: 3px; }
+  .work-do:hover { border-color: var(--se-fg); }
+  /* WHAT THE TOKEN IS, read rather than edited. Two columns, so a long value
+     wraps under itself instead of pushing its own label off the line. */
+  .work-facts { display: grid; grid-template-columns: max-content 1fr; gap: 2px 10px; margin: 8px 0 0; }
+  .work-facts dt { color: var(--se-muted); }
+  .work-facts dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+  .work-what { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  /* TWO MARKS THAT BOTH WANT ATTENTION, SEPARATED BY SHAPE RATHER THAN SHADE.
+     Two yellows would ask the reader to compare hues from memory, which the eye
+     does not do reliably. And neither takes a reserved verdict colour: an item
+     nobody sized has not failed anything. */
+  .work-unsized { color: var(--se-muted); font-style: italic; }
+  .work-empty { padding: 4px 6px; }
+  .work-unreadable { color: var(--se-warn); border-left: 3px solid var(--se-warn); padding: 8px 10px; border-bottom: 1px solid var(--se-border); }
   /* 465px is the width the owner settled the sidebar at by dragging it, and
      a default nobody re-drags is the only evidence a default is right. */
   aside { width: 465px; min-width: 320px; max-width: 80vw; display: flex; flex-direction: column; background: var(--se-bg-side); }
@@ -124,12 +249,49 @@ export const STYLE = `
   @keyframes se-current { 0%, 100% { stroke-opacity: 1; } 50% { stroke-opacity: 0.35; } }
   @media (prefers-reduced-motion: reduce) { .state.active { animation: none; } }
   /** see dsp-mirror-render.md#suspect-has-no-rule-of-its-own */
+  /* A STATE OWING WORK IS DRAWN LIKE ANY OTHER STATE (owner). It is not
+     dashed and its stroke is not recoloured: the refusal is that it does not
+     go GREEN, and withholding the green is the whole mark.
+
+     THE PILLS ALREADY SAY WHAT IS OWED, in numbers, on the state itself. A
+     second signal in a colour the drawing does not otherwise use taught a
+     vocabulary nobody asked for.
+     see dsp-mirror-render.md#green-is-refused-over-owed-work */
   .state.inner { fill: none; }
   .clickable { cursor: pointer; }
   .clickable:hover .state, .clickable:hover .comment { stroke: var(--se-fg); }
   .label { fill: var(--se-fg); font-size: 26px; text-anchor: middle; font-family: inherit; pointer-events: none; }
   .sublabel { fill: var(--se-muted); font-size: 17px; text-anchor: middle; font-family: inherit; pointer-events: none; }
   .bless-mark { font-size: 18px; text-anchor: end; pointer-events: none; }
+  /* WHAT A STATE OWES, AND WHAT IT HAS FINISHED. Two pills, one number each:
+     OWED straddles the top edge, DONE straddles the bottom. Blue like the
+     route and for the same reason — green, red and yellow are reserved for
+     verdicts, and a count of work is not a verdict. The two are told apart by
+     WHICH EDGE they sit on, and the done pill is dashed as a second signal. */
+  .work-pill-hit { cursor: pointer; }
+  /** THE DROP ZONES ARE INVISIBLE UNTIL A ROW IS IN THE AIR. A state is a
+   *  drawing to read most of the time, and three permanent targets on every one
+   *  of them would be three permanent distractions. */
+  .work-drop-zone { fill: transparent; stroke: none; pointer-events: none; opacity: 0; }
+  body.work-dragging .work-drop-zone { pointer-events: all; opacity: 1; fill: var(--se-bg); stroke-width: 2; stroke-dasharray: 4 3; }
+  body.work-dragging .work-drop-zone.in { stroke: var(--se-bucket-in); }
+  body.work-dragging .work-drop-zone.pending { stroke: var(--se-bucket-pending); }
+  body.work-dragging .work-drop-zone.out { stroke: var(--se-bucket-out); }
+  /** THE ZONE UNDER THE POINTER IS FILLED IN. A dashed outline says a target is
+   *  available; a solid one says this is the target you are about to hit. */
+  .work-drop-zone.work-drop-target { stroke-dasharray: none; fill: var(--se-accent-bg); }
+  /* A ROLL-UP PILL LETS THE PRESS THROUGH to the state under it, which opens
+     the machine. Its count lives inside that machine and nowhere else. */
+  .work-pill-rollup { pointer-events: none; }
+/* THE BUCKET A PILL OPENED. Blue is the walk's colour and the buckets', which
+   is why it is not green: this marks WHERE THE READER IS, never a verdict. */
+.work-lit { outline: 2px solid var(--se-walk); outline-offset: 2px; }
+  .work-pill { fill: var(--se-bg); stroke-width: 2.5; }
+  .work-pill.in { stroke: var(--se-bucket-in); }
+  .work-pill.pending { stroke: var(--se-bucket-pending); }
+  .work-pill.out { stroke: var(--se-bucket-out); }
+  .work-pill.done { stroke: var(--se-bucket-done); }
+  .work-pill-text { fill: var(--se-fg); font-size: 16px; text-anchor: middle; font-family: inherit; pointer-events: none; }
   .edge { stroke: var(--se-dim); stroke-width: 2.5; }
   .arrowhead { fill: var(--se-dim); }
   button.ghost:disabled { opacity: .45; cursor: default; }
@@ -193,7 +355,20 @@ export const STYLE = `
   .docview code { background: var(--se-raised); padding: 1px 5px; border-radius: 4px; }
   .docview pre { background: var(--se-bg); border: 1px solid var(--se-border); border-radius: 8px; padding: 10px; overflow: auto; }
   .docview a { color: var(--se-link); }
-  button.ghost { background: var(--se-raised); color: var(--se-fg); border: 1px solid var(--se-border-strong); border-radius: 8px; padding: 6px 12px; font: inherit; cursor: pointer; }
+  /* THE WORK IN HAND IS A LINK, and it draws like the position button beside
+     it. A reference is a link and never text, so the chip that opens a token
+     cannot be a button — and it must not read as a different kind of control
+     for that.
+
+     ONE RULE FOR BOTH, so they cannot come out at different sizes. Two rules
+     saying the same thing is two rules that drift, and the first thing that
+     drifted was the type size. */
+  button.ghost, a.ghost { background: var(--se-raised); color: var(--se-fg); border: 1px solid var(--se-border-strong); border-radius: 8px; padding: 6px 12px; font: inherit; font-size: inherit; line-height: inherit; cursor: pointer; }
+  a.ghost { display: inline-flex; align-items: center; text-decoration: none; white-space: nowrap; }
+  /* THE STATEMENT IS SHOWN AS IT WAS WRITTEN. The widget head uppercases what
+     sits in it, which is right for a label and wrong for a sentence somebody
+     authored — the crumbs reset it for the same reason. */
+  .in-hand { text-transform: none; letter-spacing: 0; }
   #w-details { flex: 1; border-radius: 0; border: 0; }
   .docheck { accent-color: var(--se-accent); cursor: pointer; }
   .docline { display: flex; align-items: center; gap: 6px; padding: 3px 0; }
@@ -237,6 +412,10 @@ export const STYLE = `
   .logrow .lkind.k-call { color: var(--se-feed-kind-call); }
   .logrow .lkind.k-update { font-weight: 700; color: var(--se-feed-kind-update); }
   .logrow .lkind.k-note { font-style: italic; color: var(--se-feed-kind-note); }
+  /* A TOKEN SPEAKING POPS. It shares the note's hue and takes the weight rather
+     than the lean, so work reads as an act and a stray reads as an aside. */
+  .logrow .lkind.k-work { font-weight: 700; color: var(--se-feed-kind-work); }
+  .logrow.work .lbrief { color: var(--se-feed-kind-work); }
   .logrow .lkind.k-aq { font-weight: 700; color: var(--se-feed-kind-aq); }
   .aq-q { font-weight: 700; color: var(--se-feed-kind-aq); padding: 6px 0; white-space: pre-wrap; }
   #loadbar { position: fixed; top: 0; left: 0; right: 0; height: 3px; background: var(--se-raised); z-index: 99; }

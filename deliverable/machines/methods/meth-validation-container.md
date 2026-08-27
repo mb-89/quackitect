@@ -7,7 +7,7 @@ statement: "Validation fills the story. Every slide's evidence half is filled, f
 
 M8. Validation attaches to stories and value props, never to requirements (verification's job, done at M7). The pass lines written at M1 on the needs are what "meets the need" means.
 
-## Procedure
+## Procedure #work
 
 - Walk every story - this iteration's and every earlier one's: shipping new work must not silently break an old need.
 - Fill each slide's evidence half from the shipped system: a run record, a report, a measurement. A slide that cannot be filled is a finding.
@@ -17,7 +17,7 @@ M8. Validation attaches to stories and value props, never to requirements (verif
 - The gate answers per value prop and per must story; its bless IS the sign-off - hash-bound, channel-recorded.
 - Market iterations only: the real-world tier per [[meth-market-tier]] is mandatory here; everyday iterations run the cheap tier only.
 
-## The report
+## The report #work
 
 One demonstration run, recorded. Seed from this fence:
 

@@ -7,8 +7,9 @@ statement: give every wait an end it will reach on its own, and produce an outco
 satisfies:
   - req-every-wait-declares-a-bound-and-expiry-acts
 inputs:
-  - flow-wait-bound
+  - flow-work-under-way
 outputs:
+  - flow-wait-bound
   - flow-settled-entry
 controls:
   - whether any measurement of comparable work exists to set the bound from

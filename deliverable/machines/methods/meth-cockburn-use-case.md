@@ -8,7 +8,7 @@ statement: A use case has one actor and one goal. Its main path runs 3 to 9 step
 M2: use cases GENERALIZE the stories. Where a story is one concrete pass, the
 use case is every pass.
 
-## A STORY IS ONE PASS, A USE CASE IS EVERY PASS
+## A STORY IS ONE PASS, A USE CASE IS EVERY PASS #work
 
 This is the whole distinction, and getting it backwards produces two piles of
 the same artifact.
@@ -24,7 +24,7 @@ requirements can be derived from it.
 THE TEST FOR EACH. A story with no order is not a story. A use case with a
 particular person's afternoon in it is not a use case.
 
-## THE TWO ARE WIRED, BOTH WAYS
+## THE TWO ARE WIRED, BOTH WAYS #work
 
 EVERY USE CASE REFINES AT LEAST ONE STORY. The story is what proves the general
 form is real. A use case with no story under it is a capability nobody has
@@ -38,7 +38,7 @@ THE ENGINE CHECKS BOTH DIRECTIONS. The evidence field declares `covers: story`,
 so the state refuses to close while either side has an orphan. Neither is a
 judgment call and neither waits for a reviewer.
 
-## REVERSE-ENGINEERING FINDS MISSING STORIES
+## REVERSE-ENGINEERING FINDS MISSING STORIES #work
 
 Walking a system that already exists turns up goals nobody told a story about.
 That is a result, not a failure.
@@ -47,7 +47,7 @@ When it happens, WRITE THE STORY FIRST, then the use case over it. The order
 matters: the example is what makes the general form checkable, and a use case
 written without one is a guess about how the product behaves.
 
-## Form
+## Form #work
 
 - Header: actor; trigger; precondition; guarantee. What starts it, what must
   hold, what is true when it succeeds.
@@ -57,7 +57,7 @@ written without one is a guess about how the product behaves.
 - Verb plus object names. NO user-interface mechanics: the use case survives a
   rewrite of every screen it touches.
 
-## Procedure
+## Procedure #work
 
 - One actor, one goal. A second goal is a second use case.
 - Every story maps into a scenario path. Where a new story fits an existing use

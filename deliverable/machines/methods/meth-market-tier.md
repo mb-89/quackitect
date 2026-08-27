@@ -7,7 +7,7 @@ statement: "The market tier is the expensive real-world check: real people, real
 
 M8 gate-validation's market_tier field. Everyday iterations skip it. An iteration DECLARED TO MARKET runs it before the gate, after the demonstrations.
 
-## Procedure
+## Procedure #work
 
 Three checks, each ending in a named result:
 

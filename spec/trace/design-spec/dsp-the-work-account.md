@@ -225,6 +225,39 @@ THAT MEASUREMENT WOULD SETTLE IT PROPERLY. Counting `se_run {job}` calls
 against the age of what they ask for is cheap, and the call log already holds
 every one.
 
+## A killed run is closed at startup
+
+A TEST RUN'S RECORD GAINS ITS CLOSING LINE FROM THE ENGINE THAT OWNS IT. An
+engine that was killed never wrote one, so the record says `started` and never
+says `ended`.
+
+THE RECORD THEN LIES. Nothing is running, and the file says something is.
+
+### What the ghost costs
+
+THE STOP HOOK READS THESE RECORDS to decide whether a turn may end. A record
+with no `ended` inside its window blocks every stop until the window passes.
+
+MEASURED: six turns blocked on a run that neither the job table nor the process
+list contained. Three reloads in one session each left one behind.
+
+### The engine closes them before it listens
+
+EVERY OPEN RECORD IS STAMPED `ended` AT STARTUP, beside the same reap that
+closes abandoned shell jobs. It runs before the port opens, so the first caller
+cannot race it.
+
+TWO FOLDERS AND TWO REAPERS, because the records are different shapes. A shell
+job carries a process id and a command; a test run carries a pace and a verdict.
+
+### The close carries no verdict
+
+NOTHING IS INVENTED ABOUT HOW THE RUN WENT. It was killed, so there is no
+outcome, and writing one here would be a fabricated result.
+
+The stamp says only that the wait is over. What the run would have found is
+unknown, and the next run is what answers it.
+
 ## Rationale
 
 ### Why one table and not one per kind

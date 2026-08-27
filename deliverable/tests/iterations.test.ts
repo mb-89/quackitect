@@ -100,8 +100,7 @@ test("the graph is evidence: an open decision point blocks the leave form", () =
   const s = new Session(root);
   const minted = s.expeditionNew("spike", "graph evidence") as { created: string };
   s.expeditionOpen(minted.created);
-  const sid = minted.created.match(/^(e\d+)-/)?.[1];
-  // A filled, done form — but the graph still holds an open point.
+  // A filled, done form.
   // ONE TREE SINCE i34: an expedition's record stands under the root.
   const rel = join(root, "spec", "expeditions", minted.created, "report.md");
   const filled = [
@@ -132,13 +131,10 @@ test("the graph is evidence: an open decision point blocks the leave form", () =
     "",
   ].join("\n");
   writeFileSync(rel, filled, "utf8");
-  s.decisions.apply(`${sid}@0`, { op: "plan", items: ["one open point"] });
-  let lint = s.formGet("expedition-leave") as { met: boolean; problems: string[] };
-  assert.equal(lint.met, false, "open point → the evidence does not stand");
-  assert.match(lint.problems.join(" | "), /open point/);
-  const node = s.decisions.graph(`${sid}@0`).nodes.find((n) => n.status === "open")!;
-  s.decisions.apply(`${sid}@0`, { op: "done", node: node.id, brief: "resolved" });
-  lint = s.formGet("expedition-leave") as { met: boolean; problems: string[] };
+  // A FILLED FORM STANDS. This used to open a decision point first and assert
+  // it blocked; the graph is gone, and what holds a state shut over unfinished
+  // work is the leaving guard over its work tokens.
+  const lint = s.formGet("expedition-leave") as { met: boolean; problems: string[] };
   assert.equal(lint.met, true, JSON.stringify(lint.problems));
 });
 

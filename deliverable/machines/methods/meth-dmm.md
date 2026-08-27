@@ -12,7 +12,7 @@ mapping itself.
 
 A [DSM](meth-dsm) is one domain. A DMM is exactly two, directly elicited.
 
-## Effect
+## Effect #work
 
 Not necessarily square. Row and column headings name different element sets.
 
@@ -29,7 +29,7 @@ from another. Two examples:
 That combined-but-uncomputed use stays a set of DSMs and DMMs. It is not yet
 an [MDM](meth-mdm).
 
-## Procedure
+## Procedure #work
 
 List domain A's elements as rows, and domain B's as columns.
 
@@ -41,7 +41,7 @@ Mark a cell where an A element maps to a B element. Mapping means one of:
 
 Keep one mapping meaning per DMM, by the same rule as a DSM.
 
-## Tools
+## Tools #work
 
 Trace edges are DMM cells already. A requirement-to-design-region edge is one,
 and so is a model-kind-to-element edge.

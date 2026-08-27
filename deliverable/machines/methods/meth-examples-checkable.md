@@ -10,7 +10,7 @@ One example thread runs the whole machine.
 The stages before scripting live INSIDE stories and use cases. An example node
 mints only when it is scripted (M6) or wrapped (M7).
 
-## The lifecycle
+## The lifecycle #work
 
 - intent (M1). The to-be world and the validation signals, as germs, with
   nothing minted.
@@ -41,7 +41,7 @@ mints only when it is scripted (M6) or wrapped (M7).
 - catalogued (M9). The example browser is a projection, never a
   hand-maintained gallery.
 
-## Rules
+## Rules #work
 
 - Stories are never executable. The example node is the runnable derivative,
   linked both ways.

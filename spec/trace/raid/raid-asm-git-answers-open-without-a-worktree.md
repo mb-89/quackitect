@@ -92,10 +92,25 @@ an iteration is open: `existsSync` at 12.6 ms, a batched `git cat-file` at
 58.7 ms, and one `git show` per iteration at 1004.2 ms. It concluded the
 assumption holds AND THE READER BATCHES.
 
-GIT IS NOT ASKED ANY MORE. A record is a folder on trunk, so its status is a
-file in the working tree and reading it is the `existsSync` path's cost, not
-the batched one's. The batched `git cat-file` this entry recommended is
-deleted.
+GIT WAS NOT ASKED ANY MORE, UNDER i34. A record was a folder on trunk, so its
+status was a file in the working tree and reading it cost the `existsSync`
+path. The batched `git cat-file` this entry recommended was deleted.
+
+i63 ASKS GIT AGAIN, FOR CLOSED RECORDS ONLY. A closed record folds into one file
+and its folder leaves the working tree, so its status is read from the folded
+file on trunk, and the pre-fold folder is reachable only at a recorded commit.
+
+WHICH COST APPLIES NOW DEPENDS ON WHICH QUESTION IS ASKED. Open records are
+still a working-tree read. Anybody wanting a closed record's original folder
+pays a history read, and the measured figures above are the ones to size that
+with.
+
+SO THE BATCHING THIS ENTRY RECOMMENDED MAY BE WANTED AGAIN. It was deleted on
+a reason i63 reverses, and the 33 call sites being routed through one element
+are exactly where a batched read would sit.
+
+THE MEASUREMENT STILL STANDS. Nothing here re-measures; the figures above were
+taken once and are not this record's to move.
 
 SO THE CONDITION IT NAMED IS MOOT rather than met. Recording that distinction
 matters: nobody implemented the batching this entry asked for, and nobody

@@ -14,7 +14,7 @@ from external quality (does it do the right thing).
 Neglect does not show up today. It shows up as TECHNICAL DEBT: rising
 cost of change, unplanned interruptions, expensive stabilization.
 
-## Checklist
+## Checklist #work
 
 The gate's quality_ok field serves these as checkboxes. Checking one is
 a claim; leave it unchecked and the form says what is still owed.
@@ -27,7 +27,7 @@ a claim; leave it unchecked and the form says what is still owed.
 - What changed is findable — cards, guidance and specs moved with the code
 - Every quick-and-dirty taken stands as a visible raid debt entry
 
-## Managing the debt
+## Managing the debt #work
 
 - DEBT IS VISIBLE OR IT IS LYING. Every conscious trade of quality for
   speed becomes a raid entry of kind `debt`, graded like every other

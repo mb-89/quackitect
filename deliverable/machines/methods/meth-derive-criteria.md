@@ -20,7 +20,7 @@ The step runs after gate-requirements and before any candidate exists. That
 order is deliberate. Weights fixed before the options are known cannot be
 tuned to make a favourite win.
 
-## THE CRITERIA ARE NEVER TYPED
+## THE CRITERIA ARE NEVER TYPED #work
 
 Nobody writes a criteria list. Nobody invents a weight.
 
@@ -36,7 +36,7 @@ shows in the form. There is no second copy to drift.
 A criterion that exists only in the evidence document is a defect. So is a
 weight nobody can recompute.
 
-## THE TWO SOURCES
+## THE TWO SOURCES #work
 
 The pool comes from two places, and only two.
 
@@ -48,7 +48,7 @@ already ([[meth-stakeholder-tensions]]). v1 modelled tensions as their own
 node kind and minted zero across 27 iterations. Do not go looking for a
 tensions table.
 
-## A REGISTER ENTRY IS NOT A CRITERION
+## A REGISTER ENTRY IS NOT A CRITERION #work
 
 The pool is requirements. The register feeds it by POINTING, never by
 standing in it.
@@ -68,7 +68,7 @@ A CLOSED ENTRY PULLS NOTHING. A concern somebody ruled away cannot make a
 requirement matter more, and offering it again wastes the one thing this
 method is trying to save.
 
-## THE THREE-WAY SPLIT, FROM MoSCoW ALONE
+## THE THREE-WAY SPLIT, FROM MoSCoW ALONE #work
 
 The demand-versus-wish split is already on every requirement. It needs no new
 field.
@@ -91,7 +91,7 @@ as a soft axis lets a candidate buy its way past a hard demand.
 Two frontmatter keys carry everything the table needs. Both live on the pool
 node, whether that node is a requirement or a register entry.
 
-### `weighs_with`
+### `weighs_with` #work
 
 The id this shares an axis with, and why, on one line.
 
@@ -109,7 +109,7 @@ register of forty wishes reaches the vital few.
 The reason rides in the same line on purpose. A merge nobody justified is a
 merge nobody can argue with.
 
-### `weighs_against`
+### `weighs_against` #work
 
 The pairwise judgments. One entry per pair, each an id and an operator.
 
@@ -126,7 +126,7 @@ claim `>` over the other, the engine names the contradiction.
 SILENCE IS NOT EQUALITY. An unjudged pair is unanswered, and the state does
 not stand while one is open. Equality is a claim and it is written.
 
-## `=` AND `weighs_with` ARE NOT THE SAME THING
+## `=` AND `weighs_with` ARE NOT THE SAME THING #work
 
 They are easy to confuse, and the difference decides how many columns the
 score table has.
@@ -137,7 +137,7 @@ score table has.
 Equal weight is a judgment about importance. Compounding is a judgment about
 what is being measured. A pair can be either, both, or neither.
 
-## THIS STATE PRODUCES THE POOL, NOT THE ORDER
+## THIS STATE PRODUCES THE POOL, NOT THE ORDER #work
 
 Owner ruling 2026-08-09, and it moves a job.
 
@@ -189,9 +189,9 @@ engineering rather than hoping for.
 
 THE WALK IS THREE RULES, and together they reach n-1 on a good hint.
 
-1. SORT THE POOL BY THE HINT, most important first.
-2. PROBE EACH NEW ITEM AGAINST THE CURRENT BOTTOM OF THE CHAIN.
-3. ON A MISS, BINARY-SEARCH the chain for its slot.
+1. SORT THE POOL BY THE HINT, most important first. #work
+2. PROBE EACH NEW ITEM AGAINST THE CURRENT BOTTOM OF THE CHAIN. #work
+3. ON A MISS, BINARY-SEARCH the chain for its slot. #work
 
 WHY THE BOTTOM AND NOT THE MIDDLE. A chain grows at its ends. If the next item
 really is the least important so far, one comparison against the bottom says
@@ -208,7 +208,7 @@ is exactly the question most likely to be confirmed, every time.
 A HINT NEED NOT BE RIGHT. A wrong one costs one question, never a wrong
 answer. The person still decides every comparison.
 
-## THE PROBE PAYS FOR ITSELF, OR THE ENGINE DROPS IT
+## THE PROBE PAYS FOR ITSELF, OR THE ENGINE DROPS IT #work
 
 A probe that misses is a question spent learning almost nothing, so the walk
 measures its own hint rather than trusting it.
@@ -233,7 +233,7 @@ dozen share `could` and no inbound reference. Ordering those among themselves
 is a small blind sort, and whether it is cheaper first or last is not argued
 out yet.
 
-## THE REMAINING COUNT IS AN ESTIMATE, AND IT MAY RISE
+## THE REMAINING COUNT IS AN ESTIMATE, AND IT MAY RISE #work
 
 It is the items left times the cost per item observed so far. A run of misses
 raises the observed cost, so the number goes up.
@@ -241,7 +241,7 @@ raises the observed cost, so the number goes up.
 SHOW IT RISING RATHER THAN HIDE IT. A counter that only falls would be lying
 about a walk whose cost depends on answers nobody has given yet.
 
-## THE STEADY STATE IS INCREMENTAL, AND THAT IS WHAT MAKES THIS VIABLE
+## THE STEADY STATE IS INCREMENTAL, AND THAT IS WHAT MAKES THIS VIABLE #work
 
 A later iteration re-ranks nothing. It inserts its new rows into the standing
 order, and every old pair stays settled.
@@ -256,7 +256,7 @@ THE ORDER IS A STANDING ARTIFACT for exactly this reason. It outlives the
 iteration that built it, and a later record extends it instead of replacing
 it.
 
-## THE ORDER IS COMPUTED, THE WEIGHT COMES FROM THE BAND
+## THE ORDER IS COMPUTED, THE WEIGHT COMES FROM THE BAND #work
 
 Two steps, carrying two different kinds of judgment.
 
@@ -288,7 +288,7 @@ that row's neighbours along. Three levels usually suffice.
 A BAND PARTITIONS AND NEVER REORDERS. Ordering belongs to the comparison
 pass, and two mechanisms touching one order would fight.
 
-## A NUDGE IS A COMPARISON
+## A NUDGE IS A COMPARISON #work
 
 Moving a row up the ranking is not its own kind of edit. It is written as a
 comparison, and the engine re-sorts.
@@ -301,7 +301,7 @@ asked, so a contradiction cannot surface there. A nudge that disagrees with an
 earlier answer surfaces it, and the engine names which answer it disagrees
 with.
 
-## THE BAND IS DRAWN ONCE, AT cut-criteria
+## THE BAND IS DRAWN ONCE, AT cut-criteria #work
 
 The boundary is drawn there, with the candidates in hand and the
 non-differentiators already struck.
@@ -319,7 +319,7 @@ out of rank order does jump the blind ordering, and it is the one edit that
 can be aimed at a favourite. It carries its reason, and the gate reads it
 apart from a boundary move.
 
-## THE BAND WRITES BACK, TO ITS OWN FIELD
+## THE BAND WRITES BACK, TO ITS OWN FIELD #work
 
 `criterion_band` on the node, written by the engine when the boundary lands.
 
@@ -342,7 +342,7 @@ than an error.
 - AN UNJUDGED PAIR — named, one line each.
   - The state stays grey until somebody answers it.
 
-## THE THREE CUTS, AND WHERE EACH ONE CAN RUN
+## THE THREE CUTS, AND WHERE EACH ONE CAN RUN #work
 
 Two run here. The third runs elsewhere, and NOTHING WALKS BACK.
 
@@ -369,7 +369,7 @@ identically BY CONSTRUCTION can go. An axis they merely look similar on
 cannot, because the resemblance is a guess and cutting on it can move the
 ranking.
 
-## WHAT THE ENGINE DECIDES, AND HOW TO CHANGE ITS MIND
+## WHAT THE ENGINE DECIDES, AND HOW TO CHANGE ITS MIND #work
 
 This step drops things. A dropped criterion is a criterion nothing gets scored
 on, so every drop is a decision, and none of them may be invisible.
@@ -397,7 +397,7 @@ never asked, so a contradiction in your judgments cannot surface there. Re-ask
 a sample of implied pairs and compare. A mismatch means an earlier answer was
 wrong, and it names which.
 
-## WHAT THE STATE STANDS ON
+## WHAT THE STATE STANDS ON #work
 
 The state is green exactly while all of these hold.
 
@@ -411,7 +411,7 @@ A NEW REQUIREMENT TURNS THE STATE GREY. That is correct, and it is what a
 standing artifact means. The pool grew, so a pair went unjudged, so the claim
 the state made stopped being true.
 
-## WHAT CANNOT BE DERIVED
+## WHAT CANNOT BE DERIVED #work
 
 Three things, and saying so plainly is part of the method.
 
@@ -436,7 +436,7 @@ flipping several named pairs, and every flip is a recorded claim somebody can
 argue with. The sensitivity run gets the same benefit: perturbing one
 judgment is a real question, where perturbing an invented number is not.
 
-## PRIOR ART, AND WHAT WAS TAKEN FROM IT
+## PRIOR ART, AND WHAT WAS TAKEN FROM IT #work
 
 The walk-the-pairs editor is not new. Every serious implementation solves the
 same problem the same way, and the scaling objection is the standard one in

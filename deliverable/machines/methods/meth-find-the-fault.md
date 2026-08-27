@@ -8,7 +8,7 @@ statement: Find the fault by shrinking the world around it. The method narrows t
 Guidance for M7 fix-findings. A finding says WHAT failed. This card is
 how to find WHY, without whack-a-mole.
 
-## The loop
+## The loop #work
 
 Debugging is the scientific method run fast:
 
@@ -21,7 +21,7 @@ Keep the audit trail — which hypotheses died and how. Rerunning on a
 guess without recording it is the anti-method: the same guess returns
 an hour later looking fresh.
 
-## Corner it
+## Corner it #work
 
 - MAKE IT FAIL FIRST. A fault that cannot be reproduced on demand is
   not understood. The reproduction is the instrument every later step
@@ -43,7 +43,7 @@ an hour later looking fresh.
 - GET A FRESH VIEW when stuck. Explaining the fault to someone — or
   filing the note that explains it — regularly finds it.
 
-## Real systems
+## Real systems #work
 
 - Reproduce in SIMULATION first where the system is physical or
   expensive. Fix it in the simulation, then confirm on the real thing.
@@ -53,7 +53,7 @@ an hour later looking fresh.
   between two parts: the side that shows the wrong value first holds
   the fault, and the other side is excluded whole.
 
-## The fix half
+## The fix half #work
 
 - IF YOU DID NOT FIX IT, IT IS NOT FIXED. The reproduction must turn
   green BECAUSE of the fix, and the understanding names why. A red

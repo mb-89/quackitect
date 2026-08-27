@@ -24,7 +24,7 @@ import { activeStates, completeState, type MachineDecl, type MachineInstance, ty
 import { parseStateNote } from "../engine/notes.ts";
 import { CHANGE_COLUMNS, compileColumn, readRigorMatrix } from "../engine/rigor-matrix.ts";
 import { Session } from "../engine/session.ts";
-import { checkDocs, freshRoot, gitInit, readEverything } from "./helpers.ts";
+import { checkDocs, doTheWork, freshRoot, gitInit, readEverything } from "./helpers.ts";
 
 /** The repository root — three levels above this file (tests/ → deliverable/ → project/ → root). */
 const REPO_ROOT = fileURLToPath(new URL("../..", import.meta.url));
@@ -352,6 +352,10 @@ test("the benchmark walk: one session, walked once, asserting at each stop it pa
       if (at() === state) return filled;
       if (r.pull === "do") last = `do at ${at()} :: ${JSON.stringify((r as { refusal?: unknown }).refusal ?? "no refusal").slice(0, 300)}`;
       if (r.pull === "fill" && r.forms?.[0] !== undefined) {
+        // THE STEPS BEFORE THE SIGNATURE. A state's marked steps hold its
+        // claim, so a fixture that only fills the form is refused by the gate
+        // that exists to catch exactly that.
+        doTheWork(root, at());
         const answer = (await session.pull({ form: fillFor(r.forms[0]) })) as {
           refused?: { problems?: string[] };
           forms?: { problems?: string[] }[];

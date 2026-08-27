@@ -8,7 +8,7 @@ statement: "Set-based design with a Pareto front: keep the non-dominated set ali
 M4's evaluate-set and its gate: the candidates gate blesses the FRONT, never a
 winner. Convergence to one happens at M5 — controlled, not premature.
 
-## Procedure
+## Procedure #work
 
 - Score every composed candidate on the weighted criteria AND the structure
   metrics from its matrices — multi-objective, no early collapsing into one
@@ -21,7 +21,7 @@ winner. Convergence to one happens at M5 — controlled, not premature.
 - All-options-equal is a signal with two readings: the decision does not
   matter, or a discriminating criterion is missing. Ask which, out loud.
 
-## NOBODY WORKS OUT THE FRONT BY HAND
+## NOBODY WORKS OUT THE FRONT BY HAND #work
 
 Domination is the one-line rule above, so the front and every elimination are
 a FUNCTION of the score table. The person scores; the arithmetic does the
@@ -47,7 +47,7 @@ in. Neither is a candidate; both are drawn.
   all candidates: taking it over the whole set makes it the worst of the
   losers, which says nothing about the decision.
 
-### What they are for
+### What they are for #work
 
 - DISTANCE TO UTOPIA RANKS THE FRONT WITHOUT PICKING FROM IT. The front is
   unordered by construction, and that is correct — but "which survivors are
@@ -60,7 +60,7 @@ in. Neither is a candidate; both are drawn.
   the survivors barely differ, which is the all-options-equal signal arriving
   as a number instead of an impression.
 
-### The one thing they must not become
+### The one thing they must not become #work
 
 A DISTANCE IS NOT A WINNER. Collapsing the front to whichever point sits
 nearest utopia is exactly the early collapse into one number this method

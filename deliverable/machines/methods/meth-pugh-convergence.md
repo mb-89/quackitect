@@ -6,7 +6,7 @@ statement: "Pugh controlled convergence with reversed sensitivity: datum = stron
 ## Situation
 M5's converge-pugh and reverse-sensitivity, operating on M4's Pareto front with M4's weighted criteria.
 
-## Procedure
+## Procedure #work
 - The datum is the STRONGEST viable rival - or the current design when redesigning. A status-quo datum is legal only as a second run, to establish worth-doing-at-all; record both runs.
 - Score each candidate against the datum per criterion (+/S/-). Iterate with the winner as the new datum: that iteration IS the controlled convergence.
 - STRENGTHEN, DO NOT ONLY SCORE. Pugh's loop alternates converging with DIVERGING: strong concepts are improved by attacking their negatives, which usually means taking what a rival does better.
@@ -16,7 +16,7 @@ M5's converge-pugh and reverse-sensitivity, operating on M4's Pareto front with 
 - A credible flip becomes a recorded tripwire - a RAID watch-item with its fallback - never a silent dismissal.
 - Named hazard: decision theater (weights invented post-hoc to justify a predecided option). The sensitivity check is the mitigation; the recorded runs are the audit.
 
-## THE HALF THIS CARD USED TO LEAVE OUT
+## THE HALF THIS CARD USED TO LEAVE OUT #work
 
 IT SAID THE ITERATION *IS* THE CONTROLLED CONVERGENCE, and that is only the
 converging half. Pugh's method also generates HYBRIDS between alternatives,

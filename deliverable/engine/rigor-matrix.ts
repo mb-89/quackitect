@@ -441,7 +441,7 @@ function parseMatrixRow(
     // A ROW MAY DEMAND ITS OWN METHOD. A state note has always been able to;
     // a row could only inherit one through same_as, so a step whose method is
     // not common knowledge had no way to make it a condition of entry.
-    entry: fm.entry_read === undefined ? undefined : { read: asList(fm.entry_read) },
+    entry: entryOf(fm),
     // see dsp-method-compilation.md#a-row-may-demand-a-machine-observed-check-on-the
     exit: fm.exit_script === undefined ? undefined : { script: asList(fm.exit_script) },
   };
@@ -449,6 +449,21 @@ function parseMatrixRow(
   mergeSameAs(dir, row, fm);
   mergeSharedGuidance(dir, row, fm);
   return { row, fm };
+}
+
+/** THE ENTRY CONDITIONS A ROW DECLARES, from its own flat keys.
+ *
+ *  FLAT, ONE KEY PER TYPE, because a nested dictionary renders as a JSON blob
+ *  in Obsidian Properties and a person edits these by hand.
+ *
+ *  AN EMPTY LIST IS A REAL DECLARATION. `entry_no_pending_note: []` says every
+ *  pending note blocks, which is what the kickoff wants — not that the check is
+ *  absent. Only a MISSING key means absent. */
+function entryOf(fm: Record<string, unknown>): Record<string, string[]> | undefined {
+  const out: Record<string, string[]> = {};
+  if (fm.entry_read !== undefined) out.read = asList(fm.entry_read);
+  if (fm.entry_no_pending_note !== undefined) out.no_pending_note = asList(fm.entry_no_pending_note);
+  return Object.keys(out).length === 0 ? undefined : out;
 }
 
 /** see dsp-method-compilation.md#a-mirror-is-a-reference-never-a-copy */
@@ -460,7 +475,11 @@ function mergeSameAs(dir: string, row: RigorMatrixRow, fm: Record<string, unknow
   row.same_as = fm.same_as;
   if (nfm.legal_tools !== undefined) row.legal_tools = asList(nfm.legal_tools);
   if (typeof nfm.guidance === "string" && nfm.guidance !== "") row.guidance = [nfm.guidance, row.guidance].filter(Boolean).join("\n\n");
-  if (nfm.entry_read !== undefined) row.entry = { read: asList(nfm.entry_read) };
+  // THE MIRROR ADDS TO THE ROW'S OWN CONDITIONS, never replaces them. It used
+  // to assign, so a row declaring a check of its own lost it the moment the
+  // mirrored state declared a reading.
+  const inherited = entryOf(nfm);
+  if (inherited !== undefined) row.entry = { ...inherited, ...(row.entry ?? {}) };
   if (typeof nfm.motivation === "string" && nfm.motivation !== "") row.motivation = nfm.motivation;
   if (typeof nfm.follow_up_label === "string" && nfm.follow_up_label !== "") row.follow_up_label = nfm.follow_up_label;
   const di = parseDoInputs(nfm.inputs);

@@ -53,19 +53,91 @@ A step weighing more than the dial is theirs. Present it, then STOP, saying
 plainly which step waits and that a message (continue is enough) resumes you.
 The dial alone cannot wake you, and it can move mid-session.
 
-## 4. Strays are notes
+## 4. A token is the default and a note is the exception
 
-A stray is:
+EVERYTHING YOU DO GETS A WORK TOKEN. That is where a thought goes now. Not
+your head, and not a note.
 
-- an idea
-- a bug
-- a better way
+    se_work {act: "open", id: "", comment: "<four words> / <the whole detail>"}
 
-Capture it with `se_note` and keep walking. You do not leave the state in your
-hand to chase one.
+A NOTE IS FOR ONE THING ONLY: what belongs in the next RETRO. Something to
+discuss, a doubt about the process, a lead nobody can act on yet.
 
-A DEFECT IN THE WORK YOU ARE BUILDING IS NOT A STRAY. A stray is elsewhere. A
-hole in the thing under your hands is the work.
+THE TEST IS ONE QUESTION. Can you name the state where this gets done?
+
+- YES — open a token. `at` names the position when it is not this one.
+- NO, AND IT WANTS DISCUSSING AT THE RETRO — `se_note`, and keep walking.
+
+WORK ASSIGNABLE TO A STATE THE WALK IS GOING INTO ANYWAY IS A TOKEN, never a
+note. A note routed at a state it could have been opened at is a finding
+nobody sees for a fortnight.
+
+YOU DO NOT LEAVE THE STATE IN YOUR HAND to chase either of them.
+
+A DEFECT IN THE WORK YOU ARE BUILDING IS NEITHER. A hole in the thing under
+your hands is the work, and rule 5 says finish it.
+
+OPEN IT THE MOMENT THEY SAY IT, before you start on it. That is how they see
+it was received. An instruction that lives only in the chat is invisible to
+every surface, so the person watching the board cannot tell a thing you are
+about to do from a thing you missed.
+
+AND THIS IS THE GENERAL RULE, NOT ONLY FOR WORK THEY HANDED YOU. Everything
+you do gets a token, so the board says what you are doing and why. Opening one
+is how you talk to the person about the work.
+
+ONLY WHERE THE STATE DID NOT ALREADY MINT ONE. A marked step arrives with its
+own token, and opening a second for the same work counts one thing twice.
+
+SWITCHING WORK IS TWO ACTS. Settle the piece in your hand, then open the next
+one. A switch nobody settled leaves the board naming work you stopped doing.
+
+THAT IS THE WHOLE TEST FOR A NEW TOKEN. Same piece of work, no token. Different
+piece of work, a token.
+
+IT LANDS WHERE THE WALK STANDS unless `at` names somewhere else, and it HOLDS
+THAT STATE until it is settled. So the state cannot be left with their work
+standing open, which is the whole point of opening it rather than remembering
+it.
+
+AN OPENED TOKEN IS EPHEMERAL. It lives while its state lives and goes when the
+state is left. It is a hand saying what it is doing, and a record's committed
+account is not the place for that.
+
+THE WORKING PATTERN, AND IT IS THE WHOLE OF HOW YOU WORK.
+
+- They say something. You OPEN A TOKEN for it, in that same breath.
+- You finish what is in your hand.
+- You work theirs BEFORE YOU LEAVE THE STATE.
+
+NOTHING ABOUT THAT IS OPTIONAL, and the third step is not a promise you keep by
+intending to. The state holds shut until every token at it is settled, so the
+walk cannot carry their work past the place it was given.
+
+THE TITLE IS FOUR WORDS AND THE STORE REFUSES A FIFTH. A token NAMES its work;
+it does not describe it. The bar draws the piece of work in hand beside the
+position, and a sentence there is unreadable at a glance.
+
+THE DETAIL RIDES THE SAME LINE, AFTER A FORWARD SLASH. Four words name it, the
+slash splits it, and everything after lands in the token's body. Write the
+whole instruction there, in the words it was given in.
+
+A TOKEN HOLDING ONLY FOUR WORDS TELLS THE NEXT HAND NOTHING. Another agent —
+or the person, a week later — cannot act on a name. From "Work coloured in
+log" alone, nothing says which colour or why.
+
+THE COMMENT ON THE TAKE AND THE SETTLE carries what happened, which is a
+different thing from what was asked for. Both are owed.
+
+TAKE IT WHEN YOU START AND SETTLE IT WHEN YOU STOP. Each act writes its own
+line carrying the statement and your comment, so the log shows work beginning
+and work ending without anybody narrating it separately.
+
+THE TOKENS ARE THE LOG. There is no second thing to keep up to date, and a
+sentence about the work that is not on a token is a sentence nobody will find.
+
+SETTLE IT WHEN IT IS DONE, with what happened. They watch it arrive, and they
+watch it go.
 
 ## 5. Finish it before you judge it
 

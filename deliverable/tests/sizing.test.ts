@@ -100,7 +100,10 @@ test("an archive record is sized by the goal it displays", () => {
 test("the drawing and the size read the same shortened subtitle", () => {
   const src = readFileSync(new URL("../engine/render.ts", import.meta.url), "utf8");
   assert.ok(src.includes("subLabel("), "the render shortens through the shared helper");
-  assert.ok(!/slice\(0, *4[0-9]\)/.test(src), "and keeps no truncation of its own to drift");
+  // THE GUARD IS ABOUT THE SUBTITLE. It used to read as "no cut in the forties
+  // anywhere in this file", and the mirror shortens other things — a work
+  // token's statement is one — so a bare length caught the wrong shortening.
+  assert.ok(!/subtitle[^\n]*\.slice\(/.test(src), "and keeps no truncation of its own to drift");
   assert.equal(subLabel("x".repeat(4000))?.length, SUB_MAX, "the shortened label is exactly the cut length");
   assert.equal(subLabel("short"), "short", "a short subtitle passes through untouched");
   assert.equal(subLabel(""), undefined, "an empty subtitle is no subtitle");

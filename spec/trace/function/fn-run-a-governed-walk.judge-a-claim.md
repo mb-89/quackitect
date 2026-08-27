@@ -5,6 +5,8 @@ type: "[[function]]"
 cluster: the-walk
 statement: build the form a step owes, check what comes back, and carry a person's verdict on it
 satisfies:
+  - req-a-gate-judges-on-the-work-minted-and-finished-before-it
+  - req-moving-work-releases-the-state-it-left
   - req-a-breached-bound-is-put-in-front-of-a-reviewer
   - req-a-harmless-finding-is-carried-not-stopped-on
   - req-a-harmless-finding-names-an-open-entry
@@ -24,6 +26,7 @@ satisfies:
   - req-a-ripple-names-its-root
   - req-an-amend-leaves-the-tree-standing
 inputs:
+  - flow-settled-work
   - flow-compiled-machine
   - flow-filled-claim
 outputs:
@@ -51,3 +54,18 @@ judgment.
 
 It names no surface. A gate is presented, not drawn, and how it is drawn is
 the showing function's.
+
+## Addition — work tokens
+
+WHAT IS JUDGED BECOMES THE POSITION'S OBLIGATIONS. The form this function
+builds is the set of things the position owes, and the check is whether each
+one has been answered.
+
+MOVING RELEASES AS SURELY AS SETTLING. A position stops owing a work token
+for two different reasons, and this judgment reads both. That is why the
+moved case sits here rather than on the function that does the moving: the
+judgment is what has to accept it.
+
+WITHOUT IT THE KICKOFF DEADLOCKS. A record opens holding scope that belongs
+on later positions, so a first position unable to release by moving could
+never be left.

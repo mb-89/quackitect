@@ -1,6 +1,6 @@
 ---
 id: wt-a-signature-must-not-outlive-what-it-stands-for-one-stalled-
-type: "[[work-token]]"
+type: "[[work]]"
 statement: "A signature must not outlive what it stands for. One stalled round holds a signed build form naming seven engine files; three are absent from the tree, and five distinctive symbols it describes match nothing anywhere. Either the work sits on a branch nobody merged, or it was undone and no check objected. Trust in this product is carried by signatures, so one that outlasts its subject weakens every other."
 ready_when: "ready when iteration nine is walked, where the git verb is legal and the history of those paths can be read"
 source: "note-a490c26dfbde"

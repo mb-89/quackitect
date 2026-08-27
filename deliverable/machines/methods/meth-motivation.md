@@ -11,24 +11,38 @@ downstream matters.
 
 ## The order
 
-1. Open with the PAIN, as scenes. Two to four short situations the
+1. Open with the PAIN, as scenes #work
+
+   Two to four short situations the
    reader recognizes themselves in. Concrete, second person, no
    abstractions.
-2. The as-is, in two parts. Say what is hard today, and what JUST
+2. The as-is, in two parts #work
+
+   Say what is hard today, and what JUST
    changed in the world to make a solution possible now.
-3. The delta — what nobody offers, in one paragraph. Name the existing
+3. The delta #work
+
+   what nobody offers, in one paragraph. Name the existing
    alternatives, and the essential thing each one gives up.
-4. The to-be world — a working day after the product exists. Write it
+4. The to-be world #work
+
+   a working day after the product exists. Write it
    in present tense as a scene the reader can picture, with people
    named by role.
-5. The goal, as an OUTCOME. What a person ends up WITH — never a
+5. The goal, as an OUTCOME #work
+
+   What a person ends up WITH — never a
    feature list.
-6. The goal system. Goals listed, conflicts named openly, priority
+6. The goal system #work
+
+   Goals listed, conflicts named openly, priority
    ruled. The method: [[meth-goal-system]].
-7. The pitch, last. Moore's five slots in verbatim shape, by the method
+7. The pitch, last #work
+
+   Moore's five slots in verbatim shape, by the method
    [[meth-moore-pitch]].
 
-## The rules
+## The rules #work
 
 - Write for the user. They do not care which attempt this is.
 - Keep the packet free of history and lineage. No method words either.

@@ -240,6 +240,25 @@ async function api(pathname, init) {
   }
 }
 var post = (pathname, body) => api(pathname, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
+async function handleDials(m) {
+  if (m.se === "autonomy") await post("/autonomy", { value: m.value });
+  else if (m.se === "stop-at") await post("/stop-at", { value: m.value });
+  else if (m.se === "emergency") {
+    await post("/autonomy", { value: 1 });
+    await post("/emergency", { on: true });
+  } else if (m.se === "power") await post("/power", { key: m.key, on: m.on });
+  else if (m.se === "narration") await post("/narration", { minutes: m.minutes, calls: m.calls });
+  else return false;
+  return true;
+}
+function entryAnswered(view, key, answer) {
+  const ok = answer !== null && answer !== void 0 && answer.ok === true;
+  if (!ok) {
+    const why = answer === null || answer === void 0 ? "the engine did not answer" : String(answer.expected ?? answer.error ?? "it was refused");
+    void vscode.window.showWarningMessage(`$PRODUCT$: ${why}`);
+  }
+  if (view !== null && view !== void 0) void view.webview.postMessage({ se: "entry", key, ok });
+}
 async function produceTree(kind, name, dest, abbr) {
   const answer = await vscode.window.withProgress(
     { location: vscode.ProgressLocation.Notification, title: `Making ${name}\u2026`, cancellable: false },
@@ -437,7 +456,9 @@ async function pollWalk() {
   if (levels === null) levels = await api("/api/levels");
   const p = await api("/api/packet");
   if (p === null) return;
-  const walkNow = `${JSON.stringify(p.active ?? null)}|${String(p.status)}|${String(p.target ?? "")}`;
+  const live = await api("/api/alive");
+  const workNow = live === null ? "" : String(live.work ?? "");
+  const walkNow = `${JSON.stringify(p.active ?? null)}|${String(p.status)}|${String(p.target ?? "")}|${workNow}`;
   const moved = walkNow !== lastWalk;
   lastWalk = walkNow;
   packet = p;
@@ -1173,6 +1194,11 @@ var Controls = class {
       // THE NOTE'S BUTTON CARRIES THE LINE. Every other action posts an empty
       // body; this one would drop a blank note without the field beside it.
       if (act.dataset.post === "/note") { captureNote(); return; }
+      // SO DOES THE WORK BUTTON, and it used to post an empty body like all the
+      // rest \u2014 which reached the engine as work with no statement and came back
+      // refused. The reader pressed a button and got an error for a line they
+      // had filled in.
+      if (act.dataset.post === "/work/mint") { captureWork(); return; }
       vsapi.postMessage({ se: "post", path: act.dataset.post });
       return;
     }
@@ -1199,18 +1225,36 @@ var Controls = class {
   });
   // THE NOTE CARRIES ITS MoSCoW. The choice sits on the same row, so the
   // weight is picked where the stray is written rather than at a retro.
+  //
+  // THE FIELD IS NOT CLEARED HERE. The engine can refuse this line, and the
+  // webview posts one way, so clearing on the press throws away text the reader
+  // then gets an error about. The host clears it when the engine says yes.
   function captureNote() {
     const field = $("bar").querySelector('.param-text[data-key="note_body"]');
     if (field === null || field.value.trim() === "") return;
     const pri = $("bar").querySelector('.param-choice[data-key="note_priority"]');
     vsapi.postMessage({ se: "note", text: field.value, priority: pri === null ? "could" : pri.value });
-    field.value = "";
+  }
+  // A PIECE OF WORK GOES IN THE SAME WAY A NOTE DOES. One line, one button, and
+  // it lands in the backlog until somebody places it.
+  //
+  // THE BODY TRAVELS WITH THE POST, so a future control carrying a field needs
+  // no third branch here and no edit on the host side at all.
+  //
+  // THE KEY RIDES THE POST so the answer can find this field again. Four words
+  // is a refusal the reader has to be able to edit, and they cannot edit what
+  // the box no longer holds.
+  function captureWork() {
+    const field = $("bar").querySelector('.param-text[data-key="work_statement"]');
+    if (field === null || field.value.trim() === "") return;
+    vsapi.postMessage({ se: "post", path: "/work/mint", key: "work_statement", body: { place: "backlog", slot: "pending", statement: field.value.trim() } });
   }
   $("bar").addEventListener("keydown", (ev) => {
     const t = ev.target;
-    if (!t || !t.closest || t.closest('.param-text[data-key="note_body"]') === null) return;
+    if (!t || !t.closest) return;
     if (ev.key !== "Enter") return;
-    captureNote();
+    if (t.closest('.param-text[data-key="note_body"]') !== null) { captureNote(); return; }
+    if (t.closest('.param-text[data-key="work_statement"]') !== null) captureWork();
   });
 
   // THE CADENCE GOES OVER AS A PAIR, because POST /narration reads
@@ -1224,6 +1268,14 @@ var Controls = class {
 
   window.addEventListener("message", (ev) => {
     const d = ev.data;
+    // AN ENTRY'S ANSWER COMES BACK HERE. Accepted clears the box; refused leaves
+    // it exactly as typed, and the host has already said why.
+    if (d && d.se === "entry") {
+      if (d.ok !== true) return;
+      const f = $("bar").querySelector('.param-text[data-key="' + d.key + '"]');
+      if (f !== null) f.value = "";
+      return;
+    }
     if (!d || d.se !== "state") return;
     applyBar(d.bar);
   });
@@ -1247,19 +1299,15 @@ var Controls = class {
         return;
       }
       if (m.se === "note") {
-        await post("/note", { text: m.text, priority: m.priority });
+        entryAnswered(view, "note_body", await post("/note", { text: m.text, priority: m.priority }));
         await pollLog();
         return;
       }
       if (await handleBarHelp(m)) return;
-      if (m.se === "autonomy") await post("/autonomy", { value: m.value });
-      else if (m.se === "stop-at") await post("/stop-at", { value: m.value });
-      else if (m.se === "emergency") {
-        await post("/autonomy", { value: 1 });
-        await post("/emergency", { on: true });
-      } else if (m.se === "power") await post("/power", { key: m.key, on: m.on });
-      else if (m.se === "narration") await post("/narration", { minutes: m.minutes, calls: m.calls });
-      else if (m.se === "post" && typeof m.path === "string" && m.path.startsWith("/")) await post(m.path, {});
+      if (!await handleDials(m) && m.se === "post" && typeof m.path === "string" && m.path.startsWith("/")) {
+        const answered = await post(m.path, m.body ?? {});
+        if (typeof m.key === "string") entryAnswered(view, m.key, answered);
+      }
       await pollWalk();
     });
     this.render();
@@ -1277,7 +1325,7 @@ var LINK = "[\u{1F517}]";
 var PLAIN = (s) => s.replace(/\[[0-9;]*m/g, "").trimEnd();
 var logRefs = /* @__PURE__ */ new Map();
 var DIM = (s) => `\x1B[2m${s}\x1B[0m`;
-var KIND_COLOUR = { call: "34", update: "35", note: "33", aq: "36" };
+var KIND_COLOUR = { call: "34", update: "35", work: "35", note: "33", aq: "36" };
 var paint = (code, s) => code === void 0 ? s : `\x1B[${code}m${s}\x1B[0m`;
 function logRow(r) {
   const ts = String(r.ts ?? "");

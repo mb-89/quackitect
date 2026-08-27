@@ -15,6 +15,8 @@ import type { MirrorState, StateMeta } from "./render.ts";
 import { loadLevels } from "./scale.ts";
 import { mainMachinePath } from "./session.ts";
 import type { WidgetKind } from "./widget-kinds.ts";
+import { bucketOf } from "./workoffer.ts";
+import { BACKLOG, BACKLOG_IS_DRAWN_AT, isSettled, type ReadCredit, readAllWork } from "./workstore.ts";
 
 /** What the surface is being asked for. */
 export interface Intent {
@@ -164,6 +166,15 @@ export function statePaint(
   if (activeIds.has(sid)) return { cls: "state active", marks: [] };
   if (m?.suspect === true) return { cls: "state suspect", marks: [] };
   if (!doneIds.has(sid)) return { cls: "state", marks: [] };
+  // A GREEN OVER OWED WORK IS ILLEGAL. Green says the state was passed. Work
+  // still owed at it says it was not, so the drawing must not claim it — and
+  // neither may anything downstream, which could only have been reached
+  // THROUGH it.
+  //
+  // PENDING IS THE EXCEPTION, and it is the only one. A pending piece does not
+  // block, so it never takes a green away.
+  // see dsp-mirror-render.md#green-is-refused-over-owed-work
+  if (m?.work_owed === true) return { cls: "state owed", marks: [] };
   // A LAW-PROVEN GREEN SIGNED NOTHING. It rides the same green — a pass is a
   // pass — and carries its own word, so the two are told apart at a glance.
   const cls = m?.law_proven === true ? "state done proven" : "state done";
@@ -230,6 +241,141 @@ export function stateDetails(m: MirrorState, decl: MachineDecl, done: Set<string
  *, and the whole rest of the render was under 27 ms. A single
  *  total says which call to look at and nothing about where inside it the time
  *  goes, so the parts are named and timed the same way the render's are. */
+/** A state's buckets, counted. `below` carries the same set summed over
+ *  everything inside this state's submachine.
+ *
+ *  THERE IS NO DONE BUBBLE ON THE DRAWING (owner). A finished piece of work is
+ *  not actionable, and a count of it on every state is noise on the one surface
+ *  whose whole job is showing what is owed. The editor's own filter is where
+ *  dones are read, and `bucketOf` still answers `done` for it there. */
+interface Buckets {
+  in: number;
+  pending: number;
+  out: number;
+  below: { in: number; pending: number; out: number };
+}
+
+function noBuckets(): Buckets {
+  return { in: 0, pending: 0, out: 0, below: { in: 0, pending: 0, out: 0 } };
+}
+
+/** WHICH BUCKET ONE PIECE OF WORK FALLS INTO.
+ *
+ *  DONE IS A FILTER OVER STATUS, NEVER A PLACE. A finished piece stays in the
+ *  bucket it was worked in and leaves that bucket's count by being filtered
+ *  here, not by moving. */
+// see workoffer.ts bucketOf — one decider, so the drawing and the editor can
+// never disagree about which bucket a piece of work sits in.
+
+/** What one state carries, with an absent state carrying nothing. */
+function countAt(byState: Map<string, Buckets>, id: string): Buckets {
+  return byState.get(id) ?? noBuckets();
+}
+
+/** EVERY STATE A GREEN WOULD BE A LIE ON.
+ *
+ *  A state that still owes work was not passed, so it cannot be green. Neither
+ *  can anything after it: the only way to reach a downstream state is through
+ *  this one, so its green rests on a passage that did not happen.
+ *
+ *  PENDING IS NOT COUNTED. A pending piece does not block, so it never takes a
+ *  green away — the owner's one exception.
+ *
+ *  THE CLOSURE IS FORWARD AND CYCLE-SAFE. A machine with a loop in it would
+ *  otherwise never finish this walk.
+ *  see dsp-mirror-render.md#green-is-refused-over-owed-work */
+function greenRefused(decl: MachineDecl, owedHere: Map<string, Buckets>): Set<string> {
+  const owing = new Set<string>();
+  for (const s of decl.states) {
+    const b = countAt(owedHere, s.id);
+    if (owesBlocking(b)) owing.add(s.id);
+  }
+  return withDownstream(decl, owing);
+}
+
+/** DOES THIS STATE HOLD WORK THAT BLOCKS?
+ *
+ *  PENDING IS THE ONE EXCEPTION AND IT IS NAMED HERE rather than left as an
+ *  omission from a sum. It is not an argument to this function, so it cannot
+ *  reach the decision at all.
+ *  see dsp-mirror-render.md#pending-is-the-one-exception */
+export function owesBlocking(b: { in: number; out: number; below: { in: number; out: number } }): boolean {
+  return b.in + b.out + b.below.in + b.below.out > 0;
+}
+
+/** THE SEEDS AND EVERYTHING REACHABLE FROM THEM, following the edges forward.
+ *
+ *  THE SEEDS ARE IN THE ANSWER. A state that owes work is itself the first
+ *  thing that cannot be green, so the closure includes where it started.
+ *
+ *  CYCLE-SAFE. A state already in the answer is never queued again, so a
+ *  machine with a loop in it finishes. */
+export function withDownstream(decl: MachineDecl, seeds: Set<string>): Set<string> {
+  const out = new Set(seeds);
+  const queue = [...seeds];
+  const byId = new Map(decl.states.map((s) => [s.id, s]));
+  while (queue.length > 0) {
+    const here = byId.get(queue.pop() ?? "");
+    if (here === undefined) continue;
+    for (const e of here.edges) {
+      if (out.has(e.to)) continue;
+      out.add(e.to);
+      queue.push(e.to);
+    }
+  }
+  return out;
+}
+
+/** WHAT EACH STATE OWES, counted once for the whole drawing.
+ *
+ *  ONE READ, NEVER ONE PER BOX. A per-state read would sweep the record's work
+ *  folder once for every state on the canvas.
+ *
+ *  THE MATCH IS ON THE TAIL OF THE POSITION. A work item records the full
+ *  position it was minted at, and the drawing knows a state by its bare id, so
+ *  the two are joined on the last segment rather than on a prefix either side
+ *  would have to guess at.
+ *
+ *  IT READS EVERY HOME, not the record the walk happens to stand in. Two
+ *  iterations with open work both draw their counts, and the desk draws the
+ *  backlog's. */
+function workByState(root: string, isRead: ReadCredit): Map<string, Buckets> {
+  const out = new Map<string, Buckets>();
+  for (const item of readAllWork(root, isRead).items) {
+    // A FINISHED PIECE NEVER REACHES THE DRAWING. Skipping it here rather than
+    // at the render is what makes the absence structural: no later surface can
+    // draw a bubble for a count that was never taken.
+    if (isSettled(item)) continue;
+    const segments = item.place.split("/").filter((s) => s !== "");
+    // THE BACKLOG IS THE FRONT DESK'S PENDING BUCKET (owner). It is not a
+    // position, so it has no state of its own — and filing it under its own
+    // name put the count against a state nothing draws.
+    const tail = segments[segments.length - 1] ?? "";
+    const own = item.place === BACKLOG ? BACKLOG_IS_DRAWN_AT : tail;
+    if (own === "") continue;
+    // `bucketOf` still answers `done` — the editor's filter needs it. The
+    // narrow is what keeps that answer out of the drawing's own type.
+    const where = bucketOf(item);
+    if (where === "done") continue;
+    const at = out.get(own) ?? noBuckets();
+    at[where] += 1;
+    out.set(own, at);
+    // A MACHINE COUNTS WHAT IS BENEATH IT TOO, and shows it as the second half
+    // of `18 + 4`. A piece of work inside a submachine is invisible from above
+    // without this, which is the whole reason the pill has a plus in it.
+    //
+    // EVERY ANCESTOR SEGMENT, not only the immediate parent: a machine two
+    // levels up still owes what its grandchildren hold.
+    // see dsp-mirror-render.md#a-state-wears-its-buckets
+    for (const ancestor of segments.slice(0, -1)) {
+      const up = out.get(ancestor) ?? noBuckets();
+      up.below[where] += 1;
+      out.set(ancestor, up);
+    }
+  }
+  return out;
+}
+
 export function drawingSets(
   m: MirrorState,
   decl: MachineDecl,
@@ -280,9 +426,27 @@ export function drawingSets(
     for (const s of decl.states) if (s.kind === "end") paint.add(s.id);
   }
   phase("sets.complete");
+  // THE READING CREDIT RIDES ALONG, so a token wanting a document already read
+  // counts as done rather than owed. Nobody submits anything to close one.
+  const owedHere = workByState(m.root, (p) => m.session.documentRead(p));
+  const noGreen = greenRefused(decl, owedHere);
+  phase("sets.work");
   const meta: Record<string, StateMeta> = {};
   for (const s of decl.states) {
     meta[s.id] = {
+      // ALWAYS SET, NEVER CONDITIONAL. A zero is what says the bucket holds
+      // nothing, and the drawing skips a bucket on zero — one decider, not two.
+      //
+      // PENDING IS ALWAYS ZERO TODAY, and that is honest rather than an
+      // oversight: a pending bucket belongs to the backlog, and nothing yet
+      // places work into one on a state.
+      work_in: countAt(owedHere, s.id).in,
+      work_pending: countAt(owedHere, s.id).pending,
+      work_out: countAt(owedHere, s.id).out,
+      work_below_in: countAt(owedHere, s.id).below.in,
+      work_below_pending: countAt(owedHere, s.id).below.pending,
+      work_below_out: countAt(owedHere, s.id).below.out,
+      work_owed: noGreen.has(s.id),
       suspect: suspect.has(s.id),
       ...(blessed.has(s.id) ? { blessed: true } : {}),
       ...(proven.has(s.id) ? { law_proven: true } : {}),

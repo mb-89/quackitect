@@ -366,6 +366,62 @@ function matchBinaryRow(node: Node & { k: "binary" }): FilterRow | null {
 }
 
 /**
+ * ONE GROUP OF THE FILTER CONTROL: rows ORed with each other.
+ *
+ * `raw` is set instead where the stored shape is not something the builder can
+ * draw. The subtree rides along verbatim, so the surface can show it and post
+ * it back untouched. That is the only honest thing to do with an expression
+ * nobody here can read: an approximation would quietly change what the query
+ * asks for.
+ */
+export interface FilterGroup {
+  rows: FilterRow[];
+  raw?: unknown;
+}
+
+const isBag = (n: unknown, key: "and" | "or"): n is Record<string, unknown[]> =>
+  typeof n === "object" && n !== null && Array.isArray((n as Record<string, unknown>)[key]);
+
+/**
+ * Read a stored filter into the control's AND of ORs.
+ *
+ * The outer level is the AND, so each of its children is one group. A child
+ * that is an OR holds that group's rows, and any other child is one row on its
+ * own. An empty filter answers one empty group, because the control always has
+ * somewhere to type.
+ */
+export function filterGroups(filters: unknown): FilterGroup[] {
+  const out = readGroups(filters);
+  return out.length === 0 ? [{ rows: [] }] : out;
+}
+
+function readGroups(filters: unknown): FilterGroup[] {
+  if (filters === undefined || filters === null) return [];
+  if (Array.isArray(filters)) return filters.map(groupOf);
+  if (isBag(filters, "and")) return filters.and.map(groupOf);
+  return [groupOf(filters)];
+}
+
+function groupOf(node: unknown): FilterGroup {
+  if (typeof node === "string") {
+    const row = fromExpression(node);
+    return row === null ? { rows: [], raw: node } : { rows: [row] };
+  }
+  if (isBag(node, "or")) {
+    const rows: FilterRow[] = [];
+    for (const kid of node.or) {
+      const row = typeof kid === "string" ? fromExpression(kid) : null;
+      // ONE UNREADABLE ROW MAKES THE WHOLE GROUP RAW. Drawing the rest as a
+      // form would lose the one it could not draw on the next write.
+      if (row === null) return { rows: [], raw: node };
+      rows.push(row);
+    }
+    return { rows };
+  }
+  return { rows: [], raw: node };
+}
+
+/**
  * What the surface posts: the same tree shape, but a leaf may still be a
  * BUILDER ROW rather than an expression.
  *

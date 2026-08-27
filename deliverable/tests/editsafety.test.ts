@@ -119,8 +119,12 @@ test("a plain reverse edge compiles as a return, and a duplicate collapses", () 
 test("the owner's redraw no longer strands the walk: boot completes into the desk", async () => {
   const root = freshRoot();
   redrawLikeObsidian(root);
-  const server = buildServer(root);
-  await pullBoot(server); // throws if the walk strands short of the front desk
+  // THE SESSION IS HANDED OVER so the fixture can do boot's own marked step.
+  // A state is not left while it holds open work, and the root the work lives
+  // under is reachable only through the session.
+  const session = new Session(root);
+  const server = buildServer(root, session);
+  await pullBoot(server, session); // throws if the walk strands short of the front desk
 });
 
 test("a drawn JOIN synchronizes: a starving join refuses the tick, the walk stands", async () => {
@@ -467,5 +471,11 @@ test("a broken sub-canvas refuses typed at entry; fixing it heals on the next ti
   writeFileSync(p, original);
   const healed = await call(server, "se_pull", {});
   assert.equal(healed.isError, false, JSON.stringify(healed.body));
-  assert.deepEqual(session.active(), ["ideation"], "the healed entry is the pull's one step");
+  // THE WALK GETS FURTHER IN ONE PULL than it used to, because reading no
+  // longer holds it at each door. What this case is about is that the healed
+  // drawing is entered at all, so it pins the entry rather than a depth.
+  assert.ok(
+    session.active().every((s) => s.startsWith("ideation")),
+    `the healed entry is the pull's one step: ${JSON.stringify(session.active())}`,
+  );
 });

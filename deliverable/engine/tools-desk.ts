@@ -6,7 +6,7 @@
 // see dsp-lane-door.md#the-verbs-are-grouped-by-what-they-touch
 import { readFileSync } from "node:fs";
 import { CallLog } from "./calllog.ts";
-import { CLAUSES, Rejection } from "./errors.ts";
+import { CLAUSES, Rejection, refuseProseWall } from "./errors.ts";
 import { appendNote, drainNote, type Priority, readNotes } from "./inbox.ts";
 import { LINT_CONFIG, lintProse } from "./lint.ts";
 import type { ToolDef } from "./mcp.ts";
@@ -18,22 +18,6 @@ import { survey } from "./survey.ts";
 import type { ReadingHook } from "./tools-file.ts";
 import { loadTrace, type TraceNode, uncoveredOf } from "./trace.ts";
 import { webFetch, webSearch } from "./web.ts";
-
-/** see dsp-lane-door.md#build-the-server */
-function refuseProseWall(tool: string, field: string, text: string): void {
-  if (text.length <= 300 || text.includes("\n")) return;
-  throw new Rejection({
-    clause: CLAUSES.PROSE_WALL,
-    expected: `${field} broken into lines — paragraphs and list lines survive every render`,
-    got: `${text.length} chars without a single line break — renders as a wall`,
-    remedy: {
-      tool,
-      args: { [field]: "<the same text with real line breaks>" },
-      note: "shape it like prose: short paragraphs, one list item per line",
-    },
-    source: "engine/tools.ts prose-wall",
-  });
-}
 
 export function deskTools(
   rootOf: (rel?: string) => string,
@@ -78,7 +62,7 @@ export function deskTools(
       name: "se_note",
       title: "se.note",
       description:
-        "Capture a stray — an idea, a bug, a better way — without leaving the state (contract rule 4). Machine-local (.se/notes.jsonl), never committed; joins the mirror's log feed; drained at a retro, later. CAPTURING IS MEANT TO BE CHEAP: give it a title, judge the priority yourself, and keep walking. Never ask the person what a stray is worth.",
+        'Capture something for the NEXT RETRO — a doubt about the process, a lead nobody can act on yet, a better way that belongs to a later discussion. Machine-local (.se/notes.jsonl), never committed; joins the mirror\'s log feed; drained at a retro, later.\n\nA WORK TOKEN IS THE DEFAULT AND THIS IS THE EXCEPTION (contract rule 4). Can you name the state where the thing gets done? Then it is se_work {act: "open"}, not a note. Work assignable to a state the walk is going into anyway is a token, and a note routed at such a state is a finding nobody sees for a fortnight.\n\nCAPTURING IS MEANT TO BE CHEAP: give it a title, judge the priority yourself, and keep walking. Never ask the person what a stray is worth.',
       inputSchema: {
         type: "object",
         properties: {
@@ -107,7 +91,6 @@ export function deskTools(
             source: "engine/tools.ts se_note",
           });
         }
-        refuseProseWall("se_note", "text", text);
         return appendNote(seDir(projectRoot), text, "agent", title, args.priority as Priority | undefined);
       },
     },

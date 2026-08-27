@@ -14,6 +14,7 @@
 // One source, two projections: the packet JSON shown here IS what the
 // agent receives.
 import { readFileSync } from "node:fs";
+import { join, relative, sep } from "node:path";
 import { BASES_SCRIPT, BASES_STYLE, BASES_TABLE_STYLE } from "./basesclient.ts";
 import { basesCard } from "./baseui.ts";
 import { LOOK_FILES, lookPath, palettePath } from "./brand.ts";
@@ -31,6 +32,9 @@ import { TRACE_SCRIPT, TRACE_STYLE, traceCard } from "./traceui.ts";
 import type { RouteMarks } from "./viewmodel.ts";
 import { view as resolveView, routeOverlay, statePaint } from "./viewmodel.ts";
 import type { WidgetKind } from "./widget-kinds.ts";
+import { workCard } from "./work-card.ts";
+import { WORK_SCRIPT } from "./workclient.ts";
+import { inHandAt, readAllWork } from "./workstore.ts";
 
 export type { RouteMarks };
 // ONE PLACE DECIDES WHAT A GREEN MEANS, and it is the resolver. Re-exported
@@ -153,6 +157,28 @@ export interface StateMeta {
   entry_met: boolean;
   /** The state's authored second line — drawn small under the name. */
   subtitle?: string;
+  /** THE STATE'S BUCKETS, counted. All of them hold what is still OWED, and
+   *  they sit on the top edge.
+   *
+   *  THERE IS NO DONE BUBBLE (owner). A finished piece of work is not
+   *  actionable, so the drawing never counts one — the editor's filter is where
+   *  dones are read. `bucketOf` still answers `done` for that filter.
+   *  see dsp-mirror-render.md#a-state-wears-its-buckets */
+  work_in?: number;
+  work_pending?: number;
+  work_out?: number;
+  /** THE SAME FOUR, SUMMED OVER EVERYTHING INSIDE THIS STATE'S SUBMACHINE.
+   *
+   *  The bucket reads `18 + 4`: its own, then what is beneath it. Without the
+   *  second half a machine hides every piece of work its children hold. */
+  /** TRUE WHERE A GREEN WOULD BE A LIE. Set on a state that still owes work,
+   *  and on every state downstream of one — those could only have been reached
+   *  through it. Pending never sets it.
+   *  see dsp-mirror-render.md#green-is-refused-over-owed-work */
+  work_owed?: boolean;
+  work_below_in?: number;
+  work_below_pending?: number;
+  work_below_out?: number;
 }
 
 /** A Catmull-Rom spline through every stop, emitted as cubic Beziers — the
@@ -263,7 +289,129 @@ function svgStateNode(
   if (statePaint(sid, activeIds, doneIds, meta).marks.includes("bless")) {
     parts.push(`<text x="${n.x + n.width - 14}" y="${n.y + 26}" class="bless-mark">👍</text>`);
   }
+  parts.push(...svgWorkPill(n, sid, meta[sid]));
   parts.push("</g>");
+  return parts;
+}
+
+/** ONE PILL, drawn straddling an edge of the state box.
+ *
+ *  IT IS CLICKABLE, and the click carries WHICH STATE and WHICH BUCKET. The
+ *  page routes every click through `clickable` and `data-detail`, so the pill
+ *  joins that path rather than opening a second one.
+ *
+ *  BOTH HALVES TRAVEL. A bucket kind alone cannot open anything: the editor
+ *  lists one block per position, so the click has to say which position.
+ *
+ *  A PILL THAT IS ALL ROLL-UP TAKES NO CLICK. Its count belongs to states
+ *  INSIDE the machine, and the editor has no block for the container itself, so
+ *  a click there would land on nothing. Letting the press through reaches the
+ *  state's own handler, which opens the machine — and opening the machine is
+ *  the way in, exactly as the design says.
+ *  see dsp-mirror-render.md#a-state-wears-its-buckets */
+function pill(
+  x: number,
+  centreY: number,
+  text: string,
+  cls: string,
+  bucket: string | undefined,
+  anchor: "left" | "right" = "left",
+): string[] {
+  // SIZED TO THE CANVAS, which draws its state names at 26px. A pill sized for
+  // a web page is invisible here.
+  const w = 22 + text.length * 10;
+  // see dsp-mirror-render.md#the-anchor-says-which-edge-the-coordinate-is
+  const left = anchor === "left" ? x : x - w;
+  const y = centreY - 15;
+  const open =
+    bucket === undefined ? `<g class="work-pill-rollup">` : `<g class="clickable work-pill-hit" data-detail="bucket:${esc(bucket)}">`;
+  return [
+    open,
+    `<rect x="${left}" y="${y}" width="${w}" height="30" rx="15" class="${cls}"/>`,
+    `<text x="${left + w / 2}" y="${y + 21}" class="work-pill-text">${esc(text)}</text>`,
+    "</g>",
+  ];
+}
+
+/** THE STATE'S BUCKETS, drawn on the state itself.
+ *
+ *  FOUR BUCKETS, AND POSITION CARRIES THE MEANING. Three sit on the TOP edge
+ *  and hold what is still owed; DONE sits on the BOTTOM edge.
+ *
+ *  - INPUT, furthest LEFT. What must be taken in. It blocks.
+ *  - PENDING, between them. Work the state deals with eventually. It does not
+ *    block, and it is really the backlog's bucket.
+ *  - OUTPUT, furthest RIGHT. What must be produced. It blocks.
+ *  - DONE, underneath. What is finished.
+ *
+ *  SO A STATE WITH NO TOP-ROW BUCKETS IS A FINISHED STATE, readable at a glance
+ *  with nothing to interpret.
+ *
+ *  A BUCKET HOLDING NOTHING IS NOT DRAWN AT ALL. Absence is the signal, and a
+ *  bucket reading zero would ask the reader to notice a number instead.
+ *
+ *  DONE IS A FILTER RATHER THAN A PLACE, so nothing moves between these when a
+ *  piece of work finishes: it stays where it was worked and changes which count
+ *  it falls into.
+ *
+ *  THEY TAKE NONE OF THE RESERVED COLOURS. Green, red and yellow mean passed,
+ *  failed and attention, and a count of work is not a verdict.
+ *  see dsp-mirror-render.md#a-state-wears-its-buckets */
+/** THE COUNT ONE BUCKET SHOWS: its own, and what its children hold.
+ *
+ *  IT READS `18 + 4`, and the plus is the whole point. The first number is
+ *  this state's own; the second is everything inside its submachine.
+ *
+ *  NOTHING REACHES THE SECOND HALF FROM HERE, and nothing should. The number
+ *  is a summary; the way in is opening the machine.
+ *  see dsp-mirror-render.md#a-state-wears-its-buckets */
+function bucketText(own: number, below: number): string | undefined {
+  if (own + below === 0) return undefined;
+  return below === 0 ? String(own) : `${String(own)} + ${String(below)}`;
+}
+
+/** THREE DROP ZONES ON EVERY STATE, one per bucket (owner).
+ *
+ *  DROPPING ON A STATE IS NOT ENOUGH. It said WHERE the work is done and said
+ *  nothing about WHICH bucket, so everything landed in the derived one — which
+ *  reads as the drop choosing for you.
+ *
+ *  THEY SHOW WHILE A ROW IS IN THE AIR and are invisible otherwise. A state is a
+ *  drawing to read most of the time, and three permanent targets on every state
+ *  would be three permanent distractions.
+ *
+ *  THEY SIT WHERE THE PILLS SIT, so the zone a reader aims at is under the count
+ *  it will change. Left is in, middle is pending, right is out.
+ *
+ *  THE STATE'S BODY IS STILL A TARGET, and it means here with the bucket left to
+ *  derive. That is how a said slot is taken back off. */
+function svgDropZones(n: CNode, sid: string): string[] {
+  const lane = (n.width - 48) / 3;
+  const top = n.y - 15;
+  return ["in", "pending", "out"].map(
+    (kind, i) =>
+      `<rect x="${n.x + 12 + lane * i}" y="${top}" width="${lane}" height="30" rx="15" class="work-drop-zone ${kind}" data-drop="${esc(sid)}:${kind}"><title>drop here to put this work in ${kind}</title></rect>`,
+  );
+}
+
+function svgWorkPill(n: CNode, sid: string, m: StateMeta | undefined): string[] {
+  const owed: [number, number, string][] = [
+    [m?.work_in ?? 0, m?.work_below_in ?? 0, "in"],
+    [m?.work_pending ?? 0, m?.work_below_pending ?? 0, "pending"],
+    [m?.work_out ?? 0, m?.work_below_out ?? 0, "out"],
+  ];
+  // THE ZONES GO DOWN FIRST, so a pill drawn over one still reads. They take a
+  // pointer only while a row is in the air.
+  const parts: string[] = svgDropZones(n, sid);
+  // LEFT TO RIGHT ACROSS THE TOP EDGE, each holding its own place whether or
+  // not its neighbours are drawn, so a state's output bucket is always on the
+  // right and never slides left when the input bucket empties.
+  const lane = (n.width - 48) / 3;
+  owed.forEach(([own, below, kind], i) => {
+    const text = bucketText(own, below);
+    if (text !== undefined)
+      parts.push(...pill(n.x + 24 + lane * i, n.y, text, `work-pill ${kind}`, own === 0 ? undefined : `${sid}:${kind}`));
+  });
   return parts;
 }
 
@@ -461,6 +609,8 @@ const BRIEFS: Record<string, (a: Record<string, unknown>) => string> = {
     const items = Array.isArray(a.items) ? ` (+${a.items.length})` : "";
     return `${a.op}${a.node !== undefined ? ` ${a.node}` : ""}${a.brief !== undefined ? `: ${a.brief}` : ""}${items}`;
   },
+  mirror_work_mint: (a) => `opened “${String(a.statement ?? "")}”`,
+  mirror_work_move: (a) => `moved ${Array.isArray(a.work) ? a.work.length : 1} → ${String(a.to ?? "")}`,
   se_note: (a) => String(a.text ?? ""),
   mirror_note: (a) => String(a.text ?? ""),
   se_answer: (a) => String(a.question ?? ""),
@@ -488,10 +638,53 @@ const BRIEFS: Record<string, (a: Record<string, unknown>) => string> = {
   se_exp_list: () => "expeditions",
 };
 
+/** A TOKEN SPEAKS WHEN IT IS PUT IN WORK AND WHEN IT COMES OUT (owner).
+ *
+ *  WHAT THE READER WANTS TO SEE is the STATEMENT and the COMMENT the hand
+ *  chose. Neither is in the arguments: a take or a settle sends only an id, and
+ *  the statement lives on the item. So the answer carries it back and this
+ *  reads the whole record rather than the arguments alone.
+ *
+ *  WITHOUT IT the feed printed the bare word `se_work` — a token moved, and
+ *  nothing about which one or why. */
+function briefWork(rec: CallRecord): string {
+  const a = rec.args as { act?: unknown; comment?: unknown };
+  const back = rec.response as { statement?: unknown; status?: unknown } | undefined;
+  const act = String(a.act ?? "");
+  const said = String(back?.statement ?? "");
+  const status = String(back?.status ?? "");
+  const mark =
+    act === "open"
+      ? "opened"
+      : act === "take"
+        ? "started"
+        : act === "restate"
+          ? "renamed"
+          : status === "done" || status === ""
+            ? "finished"
+            : status;
+  // AN OPEN CARRIES ITS DETAIL AFTER A SLASH, and the four words are the name.
+  // The rest is the token's body, which the feed does not repeat.
+  const line = String(a.comment ?? "");
+  const name = said !== "" ? said : line.split("/")[0].trim();
+  const why = act === "open" ? line.slice(line.indexOf("/") + 1).trim() : line.trim();
+  return why === "" || why === name ? `${mark} “${name}”` : `${mark} “${name}” — ${why}`;
+}
+
 /** One feed line's brief — the unified feed's middle column (
  *  v2 i9 notes: time | src | brief | result; the full record is one click
- *  away, so the brief only has to say WHAT, never everything). */
+ *  away, so the brief only has to say WHAT, never everything).
+ *
+ *  MOST TOOLS ARE READ FROM THEIR ARGUMENTS ALONE, which is why `BRIEFS` takes
+ *  them. A few need what came BACK, and those are named here. */
+const FULL_BRIEFS: Record<string, (rec: CallRecord) => string> = {
+  se_work: briefWork,
+  mirror_work_act: briefWork,
+};
+
 function briefFor(rec: CallRecord): string {
+  const whole = FULL_BRIEFS[rec.tool];
+  if (whole !== undefined) return whole(rec);
   const f = BRIEFS[rec.tool];
   return f !== undefined ? f(rec.args as Record<string, unknown>) : rec.tool;
 }
@@ -553,7 +746,12 @@ export function feedRows(
           ? "note"
           : rec.tool === "se_answer"
             ? "aq"
-            : "call",
+            : // THE SURFACE'S OWN ACTS ARE WORK TOO. A person pressing take on a
+              // token and an agent calling the verb are the same event, and the
+              // feed drew one of them as an ordinary call.
+              rec.tool === "se_work" || rec.tool === "mirror_work_act" || rec.tool === "mirror_work_mint"
+              ? "work"
+              : "call",
     brief: oneLine(briefFor(rec)),
     ok: rec.ok,
     ...(rec.ok ? {} : { clause: (rec.response as { clause?: string } | undefined)?.clause }),
@@ -642,6 +840,11 @@ const NATIVE = `
   body.solo .widget { border: 0; }
   body.solo .widget-head { display: none; }
   body.solo #w-machine .widget-head { display: flex; }
+  /* THE WORK EDITOR'S HEADER CARRIES CONTROLS, NOT A TITLE, so hiding it hides
+     the acts rather than a redundant caption. Measured: the header was drawn
+     correctly and this rule above it made it invisible, through two window
+     reloads and a rebuild. */
+  body.solo .work-widget > .widget-head { display: flex; }
   body.solo #w-machine .head-sliders { display: none !important; }
   body.solo #w-machine .expand { display: none; }
   body.solo aside, body.solo main { background: transparent; }
@@ -693,6 +896,37 @@ function aimChipFor(aim: { path: string; machine: string; leaf: string } | undef
   // thing a reader wants as jumping to where it STANDS, so it is the same
   // control wearing a different arrow.
   return `<button class="ghost cur-state aim" data-machine="${esc(aim.machine)}" data-state="${esc(aim.leaf)}" title="the walk is aimed at ${esc(aim.path)} — click: jump the view to it">→ ${esc(aim.leaf)}</button>`;
+}
+
+/** THE PIECE OF WORK IN HAND, for the chip LEFT of where the walk stands.
+ *
+ *  THE POSITION ALONE DOES NOT SAY WHAT IS HAPPENING. It names the state; this
+ *  names the piece of work inside it, so a reader watching the bar sees the
+ *  work FLIP rather than a state name that holds still for an hour.
+ *
+ *  TAKEN BEATS MERELY OPEN. A hand marks work before it acts, so an item
+ *  carrying a holder is the one being worked. With nothing taken, the oldest
+ *  open item at the position is what the walk owes next.
+ *
+ *  DRAWN WORK IS NOT IN HAND. A note or a pool token is reported from a live
+ *  source and nobody is holding it.
+ *
+ *  IT IS A LINK AND NEVER TEXT. Clicking opens the token's own markdown, which
+ *  is the shape ux.md asks of every reference a surface shows.
+ *
+ *  NOTHING IN HAND SHOWS AS NOTHING. An empty bar is a real state of the walk,
+ *  the same way an unrouted target draws no arrow. */
+function handChipFor(root: string, active: string[]): string {
+  const pick = inHandAt(root, active);
+  if (pick === undefined) return "";
+  const home = readAllWork(root).homeById.get(pick.id);
+  if (home === undefined) return "";
+  const path = relative(root, join(home, "work", `${pick.id}.md`))
+    .split(sep)
+    .join("/");
+  const said = pick.statement.length > 44 ? `${pick.statement.slice(0, 43)}…` : pick.statement;
+  const holder = pick.taken_by === "" ? "owed here" : `in hand: ${pick.taken_by}`;
+  return `<a class="ghost cur-state doclink in-hand" data-path="${esc(path)}" title="${esc(holder)} — ${esc(pick.statement)} — click: open the token">◐ ${esc(said)}</a>`;
 }
 
 export function renderMirror(
@@ -787,6 +1021,10 @@ export function renderMirror(
   // the row under the reader's hand. Not applicable is DISABLED, not absent.
   const canEscape = crumbTrail.length > 1 && crumbTrail[1] !== "boot";
   const escapeBtn = `<button class="ghost" id="escape-btn"${canEscape ? "" : " disabled"} title="${canEscape ? "escape to idle — the machine is left standing, the reason is recorded" : "nothing to escape — the walk is not inside a sub-machine"}">⤴ escape</button>`;
+  // THE WAY INTO THE EDITOR, BESIDE ESCAPE (owner). A bucket on a state opens
+  // it too, but a reader should never have to find a pill on a drawing first.
+  // see dsp-the-bucket-editor.md#a-pill-opens-the-editor
+  const workBtn = `<button class="ghost" id="work-btn" title="open the work token editor, below the drawing — every token there is, wherever it lives">▤ work</button>`;
   // see dsp-mirror-render.md#the-way-home-when-the-view-holds-still-elsewhere
   const curBtn = info.active
     .map((qualified) => qualified.split("/").pop() ?? "")
@@ -809,7 +1047,10 @@ export function renderMirror(
   // it is a thing a reader wants; the target is a fact, and nothing happens if
   // you press a fact.
   const aimChip = aimChipFor(model.aim);
-  const machineWidget = `<div class="widget" id="w-machine"><div class="widget-head"><span class="crumbs">${crumbs}</span><span class="head-controls" style="display:flex;align-items:center;gap:10px">${curBtn}${aimChip}<span class="head-sliders" style="display:flex;align-items:center;gap:10px">${slider}${nrBar}</span>${escapeBtn}<button class="expand" data-widget="w-machine" data-url="/widget/machine?view=${encodeURIComponent(decl.id)}" title="expand · ctrl-click: new tab · shift-click: new window — both open frozen on what this card is showing">⛶</button></span></div><div class="widget-body">${svg}</div></div>`;
+  // LEFT OF THE POSITION, because the work is the finer-grained fact and the
+  // reader scans left to right from what changes most often.
+  const handChip = handChipFor(m.root, info.active);
+  const machineWidget = `<div class="widget" id="w-machine"><div class="widget-head"><span class="crumbs">${crumbs}</span><span class="head-controls" style="display:flex;align-items:center;gap:10px">${handChip}${curBtn}${aimChip}<span class="head-sliders" style="display:flex;align-items:center;gap:10px">${slider}${nrBar}</span>${escapeBtn}${workBtn}<button class="expand" data-widget="w-machine" data-url="/widget/machine?view=${encodeURIComponent(decl.id)}" title="expand · ctrl-click: new tab · shift-click: new window — both open frozen on what this card is showing">⛶</button></span></div><div class="widget-body">${svg}</div></div>`;
   const detailsWidget = `<div class="widget" id="w-details">${widgetHead("details", "w-details", "/widget/details")}
     ${info.status === "closed" ? '<div class="meta" style="color:var(--se-fail)">machine closed</div>' : ""}
     <div class="meta" id="details-title" data-morph-ignore>—</div>
@@ -838,6 +1079,14 @@ export function renderMirror(
   // all 169 notes off disk. Measured at 60ms, against a 96ms render — so
   // computing it eagerly would have put a 60% tax on the machine page, the
   // log page and the details page, none of which ever show a table.
+  // THE WORK EDITOR, in the same document as the machine so a row can be
+  // dragged from one onto the other. A function for the same reason the table
+  // is: it reads the open record's work off disk, and no other card wants it.
+  const workWidget = (): string =>
+    workCard(
+      m.root,
+      `<button class="expand" data-widget="w-work" data-url="/widget/work" title="expand · ctrl-click: new tab · shift-click: new window">⌘</button>`,
+    );
   const tblWidget = (): string =>
     basesCard(
       m.root,
@@ -883,6 +1132,14 @@ export function renderMirror(
 <body${bodyClass}><div class="cols"><aside id="sidebar" style="width:100vw;max-width:100vw">${traceWidget()}</aside></div>${MODAL}${data}<script>${SCRIPT}</script><script>${TRACE_SCRIPT}</script></body></html>`;
   }
 
+  // THE EXPAND BUTTON NEEDS SOMEWHERE TO LAND. A card whose button points at a
+  // route nobody serves opens a blank page, which reads as the card being
+  // broken rather than the route being missing.
+  if (widget === "work") {
+    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · work</title><style>${pal}${STYLE}${TABLE_STYLE}${BASES_STYLE}${BASES_TABLE_STYLE} #work-dock{width:100vw;max-width:100vw} #work-grip{display:none} body.solo #sidebar{display:flex;flex-direction:column;height:100vh}${skin}</style>${ELEMENTS}</head>
+<body${bodyClass}><div class="cols"><aside id="sidebar" style="width:100vw;max-width:100vw">${workWidget()}</aside></div>${MODAL}${data}<script>${SCRIPT}</script><script>${TABLE_SCRIPT}</script><script>${BASES_SCRIPT}</script><script>${WORK_SCRIPT}</script></body></html>`;
+  }
+
   if (widget === "table") {
     return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · table</title><style>${pal}${STYLE}${TABLE_STYLE}${BASES_STYLE}${BASES_TABLE_STYLE} #w-table{flex:1;border-bottom:0;min-height:0} body.solo #sidebar{display:flex;flex-direction:column;height:100vh} .tbl-body{flex:1;min-height:0}${skin}</style>${ELEMENTS}</head>
 <body${bodyClass}><div class="cols"><aside id="sidebar" style="width:100vw;max-width:100vw">${tblWidget()}</aside></div>${MODAL}${data}<script>${SCRIPT}</script><script>${TABLE_SCRIPT}</script><script>${BASES_SCRIPT}</script></body></html>`;
@@ -899,9 +1156,31 @@ export function renderMirror(
 <body${bodyClass}><div class="cols"><aside id="sidebar" style="width:100vw;max-width:100vw">${logWidget}</aside></div>${MODAL}${data}<script>${SCRIPT}</script></body></html>`;
   }
 
+  // THE MACHINE PAGE CARRIES THE EDITOR, in the same document, under the
+  // drawing.
+  //
+  // IT IS NOT A LAYOUT PREFERENCE. A row is dragged FROM the editor ONTO a
+  // state, and no drop crosses two documents. An editor on its own page cannot
+  // receive that gesture at all, so the two must arrive together.
+  //
+  // MEASURED BEFORE THIS: /widget/machine drew every bucket and held no w-work,
+  // so pressing a bucket looked one up, found null and did nothing.
+  // see dsp-the-bucket-editor.md#it-never-moves-the-machine
+  // THE DATABASE'S OWN STYLESHEET AND SCRIPT RIDE THIS PAGE. The work editor IS
+  // two database cards, and without these the rows draw at the wrong height and
+  // the sort and properties buttons open nothing. Measured: the machine page
+  // carried neither, and the editor looked like a different component.
+  //
+  // THE EDITOR IS LEFT, THE DRAWING IS RIGHT, and the seam stands BETWEEN them
+  // (owner). The seam is UPRIGHT — it runs top to bottom, and dragging it moves
+  // the boundary left and right.
+  //
+  // THE SEAM IS A SIBLING OF BOTH, which is why it is written here rather than
+  // inside the editor. As the editor's last child it drew underneath it, and a
+  // bar under the editor separates the editor from nothing.
   if (widget === "machine") {
-    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · machine</title><style>${pal}${STYLE} main{padding:10px}${skin}</style>${ELEMENTS}</head>
-<body${bodyClass}><div class="cols"><main>${machineWidget}</main></div>${MODAL}${data}<script>${SCRIPT}</script></body></html>`;
+    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · machine</title><style>${pal}${STYLE}${TABLE_STYLE}${BASES_STYLE}${BASES_TABLE_STYLE} main{padding:10px;display:flex;flex-direction:row;align-items:stretch;gap:0;min-height:0}${skin}</style>${ELEMENTS}</head>
+<body${bodyClass}><div class="cols"><main>${workWidget()}<div class="work-seam" data-seam="dock" title="drag to give the editor more or less of the window"></div><div class="machine-lane">${machineWidget}</div></main></div>${MODAL}${data}<script>${SCRIPT}</script><script>${TABLE_SCRIPT}</script><script>${BASES_SCRIPT}</script><script>${WORK_SCRIPT}</script></body></html>`;
   }
   if (widget === "details") {
     return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · details</title><style>${pal}${STYLE}${skin}</style>${ELEMENTS}</head>
@@ -912,7 +1191,15 @@ export function renderMirror(
     card,
     embed,
     { bodyClass, skin, pal, data },
-    { terminal: terminalWidget, machine: machineWidget, log: logWidget, details: detailsWidget, table: tblWidget, trace: traceWidget },
+    {
+      terminal: terminalWidget,
+      machine: machineWidget,
+      log: logWidget,
+      details: detailsWidget,
+      table: tblWidget,
+      trace: traceWidget,
+      work: workWidget,
+    },
   );
 }
 
@@ -922,7 +1209,15 @@ function cardMatrixPage(
   card: string | undefined,
   embed: boolean | undefined,
   frame: { bodyClass: string; skin: string; pal: string; data: string },
-  widgets: { terminal: string; machine: string; log: string; details: string; table: () => string; trace: () => string },
+  widgets: {
+    terminal: string;
+    machine: string;
+    log: string;
+    details: string;
+    table: () => string;
+    trace: () => string;
+    work: () => string;
+  },
 ): string {
   const allCards = loadCards(m.root);
   const cardList = embed === true ? allCards.filter((c) => c.widget !== "terminal") : allCards;
@@ -935,6 +1230,7 @@ function cardMatrixPage(
     // card never pays for one.
     ...(cardList.some((c) => c.widget === "table") ? { table: widgets.table() } : {}),
     ...(cardList.some((c) => c.widget === "trace") ? { trace: widgets.trace() } : {}),
+    ...(cardList.some((c) => c.widget === "work") ? { work: widgets.work() } : {}),
   };
   const filled = (c: { widget?: string }): boolean => c.widget !== undefined && (byWidget[c.widget] ?? "") !== "";
   // THE DEFAULT MAIN CARD IS THE FIRST AVAILABLE ONE — one rule instead of a
@@ -982,7 +1278,7 @@ function cardMatrixPage(
   ${legendHtml}
   <div class="divider" id="div-cards"></div>
 </div>
-${MODAL}${frame.data}${cardData}<script>${SCRIPT}</script><script>${TABLE_SCRIPT}</script><script>${BASES_SCRIPT}</script><script>${TRACE_SCRIPT}</script>
+${MODAL}${frame.data}${cardData}<script>${SCRIPT}</script><script>${TABLE_SCRIPT}</script><script>${BASES_SCRIPT}</script><script>${TRACE_SCRIPT}</script><script>${WORK_SCRIPT}</script>
 </body></html>`;
 }
 

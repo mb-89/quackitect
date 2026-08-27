@@ -613,19 +613,29 @@ test("green reads the corpus once, and is computed against two hundred nodes", (
     1,
     `recordDone asked for the corpus ${asks} time(s) over ${claimful} claimful states. It collects its input ONCE and hands it down; ${claimful} asks would mean every state fetching its own, which is the defect this guards and which no cache hides.`,
   );
-  // MEASURED: 245 accesses over 200 fillers and 25 claimful
-  // states. That is ONE sweep — the corpus, plus the root's own nodes, plus
-  // each state instance and its templates on top. A per-state sweep at 25
-  // states would be about five thousand.
+  // RE-MEASURED, AND THE SHAPE MATTERS MORE THAN THE NUMBER. The cost is
+  // linear in the corpus: 298 + 3 per node, exact at 0, 50, 100, 200 and 400
+  // fillers. A ceiling with no constant term cannot bound a cost that has one,
+  // and the old `FILLERS * 4` sat UNDER the honest cost below 298 fillers.
   //
-  // SO THE CEILING SITS BETWEEN THEM, with the margin written down rather than
-  // guessed: 3.3x above the honest cost, 6x below the regression. Neither
-  // number moves with machine load, which is the whole reason this replaced a
-  // clock.
-  const ceiling = FILLERS * 4;
+  // WHY THE OLD BASELINE OF 245 IS NOT THE HONEST COST ANY MORE. It was taken
+  // while an automatic read-pass was open. That pass was REMOVED by a product
+  // law — a state note edited on disk binds the next call, with no reload — and
+  // without one every access asks. Running this same measurement inside a pass
+  // gives 452 rather than 898, so the removal accounts for about two thirds of
+  // the gap. The remaining third is unexplained and is recorded rather than
+  // hidden.
+  //
+  // WHAT THE GUARD IS STILL FOR is unchanged: a per-state sweep. At 35 claimful
+  // states that would be some seven thousand accesses, so the ceiling sits
+  // twice above the honest cost and four times below the defect.
+  //
+  // THE ASK COUNT ABOVE IS THE LAW. This second assertion is a budget, and it
+  // never names a defect it has not observed.
+  const ceiling = 600 + FILLERS * 6;
   assert.ok(
     accesses < ceiling,
-    `recordDone made ${accesses} door accesses over ${FILLERS} filler nodes and ${claimful} claimful states. The ceiling is ${ceiling}, against a measured 245. Above it, the corpus is being swept more than once — most likely once per state, which is the defect this guards.`,
+    `recordDone made ${accesses} door accesses over ${FILLERS} filler nodes and ${claimful} claimful states, against a ceiling of ${ceiling}. The cost is linear in the corpus at about 3 accesses per node; well above this means something started asking per state, and the ask count above says whether the corpus itself was loaded more than once.`,
   );
   // AND IT MUST ACTUALLY HAVE READ THE CORPUS. Without this line the guard
   // passes triumphantly on a green that was computed over nothing at all.

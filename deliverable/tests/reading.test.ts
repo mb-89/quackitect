@@ -19,7 +19,7 @@ import { strict as assert } from "node:assert";
 import { test } from "node:test";
 import { Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
-import { call, freshRoot, proofFor } from "./helpers.ts";
+import { call, freshRoot, proofFor, pullThrough } from "./helpers.ts";
 
 interface Reading {
   path: string;
@@ -62,9 +62,10 @@ test("one read of the reading carries the whole walk, with nothing handed in", a
     assert.ok(content.includes(`## ${p}`), `${p} is headed by its own path, so a reader can tell the parts apart`);
   }
 
-  // THE POINT: nothing handed in. The engine credited what it served,
-  // and a bare pull walks the default target (the desk).
-  const walked = await call(server, "se_pull");
+  // THE POINT: nothing handed in. The engine credited what it served, and the
+  // pulls walk the default target (the desk) with only boot's own marked step
+  // to do on the way.
+  const walked = await pullThrough(server, session);
   assert.equal(walked.body.pull, "do", JSON.stringify(walked.body));
   assert.equal(walked.body.arrived, true, "every read gate on the way was already satisfied");
 });
@@ -110,9 +111,11 @@ test("the reading PULLS: one document a pull, until it stops asking", async () =
   assert.equal(new Set(seen).size, seen.length, "what is read is never served twice");
   for (const p of wants) assert.ok(seen.includes(p), `${p} was handed over by the loop`);
 
-  // THE POINT: the proofs credited what was served, so the walk goes on.
-  assert.equal(r.body.pull, "do", JSON.stringify(r.body));
-  assert.equal(r.body.arrived, true);
+  // THE POINT: the proofs credited what was served, so the walk goes on once
+  // boot's own marked step is done.
+  const walked = await pullThrough(server, session);
+  assert.equal(walked.body.pull, "do", JSON.stringify(walked.body));
+  assert.equal(walked.body.arrived, true);
 });
 
 test("a wrong answer credits nothing, and the same document comes again", async () => {
@@ -152,7 +155,7 @@ test("a multi-read is remembered too, so nothing ever has to be carried", async 
   assert.equal(got.isError, false, JSON.stringify(got.body));
   // The buffer filled itself from the set, as it always did for a single
   // path. Only the multi shape was ever forgotten.
-  const walked = await call(server, "se_pull");
+  const walked = await pullThrough(server, session);
   assert.equal(walked.body.pull, "do", JSON.stringify(walked.body));
   assert.equal(walked.body.arrived, true, "a set read in one call proves as much as one read at a time");
 });

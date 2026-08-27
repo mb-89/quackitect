@@ -26,6 +26,7 @@ import { contentHash } from "../engine/hash.ts";
 import { proofFor } from "../engine/readproof.ts";
 import { Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
+import { isSettled, readAllWork, settle } from "../engine/workstore.ts";
 
 const REPO_ROOT = fileURLToPath(new URL("../..", import.meta.url));
 
@@ -85,6 +86,11 @@ const BORROWED = [join("deliverable", "engine")];
 // configured by, and preflight now demands both.
 const COPIED = [
   join("deliverable", "machines"),
+  // THE VIEWS ARE PART OF THE PRODUCT TOO. The card list lives here, and so do
+  // the `.base` files the database and the work editor draw. A root without
+  // them renders a database with no views and a work editor with no panes,
+  // which is a different product from the one being tested.
+  join("deliverable", "views"),
   "guidance".replace("/", sep),
   join("deliverable", "brand", "brand.json"),
   join("deliverable", "brand", "palette.css"),
@@ -591,15 +597,55 @@ export async function readOne(server: Server): Promise<{ path: string; content: 
  *  test reads its own success as a failure.
  *
  *  This cost six cases across four files, and every one of them looked like a
- *  broken walk rather than a helper discarding its result. */
+ *  broken walk rather than a helper discarding its result.
+ *
+ *  IT DOES THE STEP TOO, because a state is not left while it holds open work.
+ *  Boot's own `Startup order` is such a step, so a fixture that answered every
+ *  question and did none of the work stops inside boot — which is a walker
+ *  that read everything and walked nowhere. */
 export async function readEverything(s: Session): Promise<Record<string, unknown>> {
   let r = await s.pull();
-  for (let i = 0; i < 40 && r.pull === "read"; i++) {
-    const doc = r.document as { content?: string } | undefined;
-    if (doc?.content === undefined) throw new Error(`the pull answered read with no document: ${JSON.stringify(r)}`);
-    r = await s.pull({ form: { read: proofFor(doc.content) } });
+  for (let i = 0; i < 40; i++) {
+    if (r.pull === "read") {
+      const doc = r.document as { content?: string } | undefined;
+      if (doc?.content === undefined) throw new Error(`the pull answered read with no document: ${JSON.stringify(r)}`);
+      r = await s.pull({ form: { read: proofFor(doc.content) } });
+      continue;
+    }
+    // ARRIVING IS THE END OF THE WALK, and nothing is settled there — a fixture
+    // that meant to stand on its target must still be standing on it.
+    if (r.pull !== "do" || r.arrived === true) break;
+    // A `do` THAT STOPPED SHORT SAYS WHY, and only a stop is worth working at.
+    // Resting somewhere with nothing routed carries no refusal, and settling
+    // the work there would walk a fixture off the place it meant to stand.
+    if (r.refusal === undefined) break;
+    // DOING THE STEP IS WHAT MOVES IT. Settling nothing means something else is
+    // in the way, and the caller gets that answer.
+    if (workHere(s) === 0) break;
+    r = await s.pull();
   }
   if (r.pull === "read") throw new Error("the reading never drained");
+  return r;
+}
+
+/** THE SAME LOOP DRIVEN THROUGH THE SERVER, for a case that holds one.
+ *
+ *  It hands back the answer that stopped it, so the walk that carried it there
+ *  can still be read off the result. */
+export async function pullThrough(server: Server, session: Session): Promise<{ isError: boolean; body: Record<string, unknown> }> {
+  let r = await call(server, "se_pull");
+  for (let i = 0; i < 40; i++) {
+    if (r.body.pull === "read") {
+      const doc = r.body.document as { content?: string } | undefined;
+      if (doc?.content === undefined) throw new Error(`the pull answered read with no document: ${JSON.stringify(r.body)}`);
+      r = await call(server, "se_pull", { form: { read: proofFor(doc.content) } });
+      continue;
+    }
+    if (r.body.pull !== "do" || r.body.arrived === true) break;
+    if (r.body.refusal === undefined) break;
+    if (workHere(session) === 0) break;
+    r = await call(server, "se_pull");
+  }
   return r;
 }
 
@@ -658,6 +704,7 @@ export async function sessionAtIdle(root: string): Promise<Session> {
     }
     moves++;
     if (s.active()[0] === "front_desk") return s;
+    workHere(s);
   }
   throw new Error(`the pull did not reach the front desk: ${JSON.stringify(s.active())}`);
 }
@@ -671,7 +718,19 @@ export async function pullBoot(server: Server, session?: Session): Promise<void>
   if (session !== undefined) session.setTarget("front_desk");
   let moves = 0;
   let waits = 0;
-  while (moves < 12 && waits < 300) {
+  // A REAL AGENT DOES THE STEP BEFORE IT PULLS AGAIN, and a state is no longer
+  // left while it holds an open token. Boot's own `Startup order` step held
+  // `prepare_desk` shut and the fixture pulled at it until it ran out of moves.
+  //
+  // LEAVING USED TO SETTLE IT for us, which is the rule inverted — so the walker
+  // has to do here what a walker does.
+  //
+  // A SERVER WITH NO SESSION CANNOT DO IT. The root lives on the session, so a
+  // caller that wants the walk carried through boot hands one over.
+  //
+  // THE BUDGET COUNTS READS AS MOVES, and doing the step costs one more pull on
+  // top of them, so the ceiling leaves room for it.
+  while (moves < 16 && waits < 300) {
     const r = await call(server, "se_pull");
     // EITHER SHAPE IS A WAIT, NEVER A MOVE: the refusal can arrive as the whole
     // answer, or ride inside a good one as the stopped step's own reason.
@@ -691,6 +750,7 @@ export async function pullBoot(server: Server, session?: Session): Promise<void>
     }
     const where = r.body.where as string[];
     if (where.includes("front_desk")) return;
+    if (session !== undefined) workHere(session);
   }
   throw new Error("the pull did not reach a resting place");
 }
@@ -783,4 +843,40 @@ export function laneSource(): string {
   return laneSources()
     .map((s) => s.text)
     .join("\n");
+}
+
+/** DO WHAT THE POSITION OWES, the way a walker does before it signs.
+ *
+ *  A STATE'S MARKED STEPS HOLD ITS CLAIM, which is exactly what they are for.
+ *  So a walk fixture that only fills forms is a walker that answered every
+ *  question and did none of the work, and the gate refuses it — correctly.
+ *
+ *  WORK ONLY A PERSON MAY SETTLE IS LEFT ALONE. An agent settling one is
+ *  refused, and a fixture is an agent.
+ *
+ *  IT RETURNS HOW MANY IT CLOSED, so a fixture that suddenly owes twenty steps
+ *  where it owed two is visible rather than silently slower. */
+export function doTheWork(root: string, at: string, now = "2026-01-01T00:00:00.000Z"): number {
+  let did = 0;
+  const { items, homeById } = readAllWork(root);
+  for (const i of items) {
+    if (i.place.split("/").pop() !== at) continue;
+    if (isSettled(i) || i.person_only) continue;
+    const home = homeById.get(i.id);
+    if (home === undefined) continue;
+    settle(home, i.id, "done", { reason: "the fixture walked this step", now });
+    did++;
+  }
+  return did;
+}
+
+/** THE SAME, WHEREVER THE WALK HAPPENS TO STAND — every active state at once.
+ *
+ *  A pull can land on several states, and a fixture has no business knowing
+ *  which. It returns how many it closed, so a driving loop can tell progress
+ *  from a stall. */
+export function workHere(s: Session): number {
+  let did = 0;
+  for (const at of s.active()) did += doTheWork(s.machineRoot(), at.slice(at.lastIndexOf("/") + 1));
+  return did;
 }

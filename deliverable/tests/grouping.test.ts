@@ -42,11 +42,17 @@ function names(html: string): string[] {
     .map((r) => (r.match(/<td[^>]*>([^<]*)</) ?? ["", ""])[1]);
 }
 
-/** The group headers, as `property value` at their nesting depth. */
+/** The group headers, as `property value` at their nesting depth.
+ *
+ *  THE OPENING TAG IS MATCHED LOOSELY ON PURPOSE. A heading carries a `shut`
+ *  class when its group ships folded and a `data-group` naming itself, and both
+ *  arrived after this helper was written. A pattern pinned to the exact tag
+ *  matched nothing and reported every group as missing, which reads as the
+ *  grouping being broken rather than the reader being stale. */
 function groups(html: string): { depth: number; label: string; count: string }[] {
   return [
     ...html.matchAll(
-      /<tr class="tbl-group" data-depth="(\d+)">[\s\S]*?<span class="grp-prop">([^<]*)<\/span> <span class="grp-val">([^<]*)<\/span> <span class="grp-count">(\d+)<\/span>/g,
+      /<tr class="tbl-group[^"]*" data-depth="(\d+)"[^>]*>[\s\S]*?<span class="grp-prop">([^<]*)<\/span> <span class="grp-val">([^<]*)<\/span> <span class="grp-count">(\d+)<\/span>/g,
     ),
   ].map((m) => ({ depth: Number(m[1]), label: `${m[2]} ${m[3]}`, count: m[4] }));
 }

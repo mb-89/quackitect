@@ -6,7 +6,7 @@ statement: "Working-backwards PR-FAQ: pressure-test a drafted vision by writing 
 ## Situation
 AFTER the vision packet is drafted (never before - it tests, not generates). M1's pressure-test state.
 
-## Procedure
+## Procedure #work
 - Write the one-page press release from the to-be world's ship day: headline, what shipped, who benefits how, a customer quote.
 - Write the FAQ a skeptic would ask: why now, why us, what breaks, what it costs, what was given up.
 - Every question the FAQ cannot answer cleanly is a finding: fold it back into the vision or the risk log before the gate.

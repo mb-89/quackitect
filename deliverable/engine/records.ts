@@ -363,6 +363,28 @@ export function retroOwed(root: string): string[] {
   return owed.sort();
 }
 
+/** WHETHER A RECORD HAS ALREADY BEEN ENTERED, from its own stamp.
+ *
+ *  THE KICKOFF'S NOTE CHECK BINDS THE FIRST ENTRY ONLY (owner). A record that
+ *  has started has been through that gate, and a note captured afterwards must
+ *  not shut it again.
+ *
+ *  WITHOUT THIS THE WALK CANNOT GET BACK IN AT ALL. A reload restarts the walk
+ *  at the beginning, so every route back into a running iteration re-enters its
+ *  kickoff — and an inbox nobody has drained since holds it closed. Measured on
+ *  i63: 96 pending notes, the kickoff standing green, and no way forward.
+ *
+ *  THE STAMP IS ON THE RECORD rather than in the session, so it survives the
+ *  restart that causes the problem. */
+export function recordStarted(root: string, id: string): boolean {
+  for (const kind of ["iterations", "expeditions"]) {
+    const p = join(root, "spec", kind, id, "record.md");
+    if (!existsSync(p)) continue;
+    return /^started: \S/m.test(readNode(p));
+  }
+  return false;
+}
+
 /** THE RETRO'S OWN CLEAR. A judgment drain is the retro's signature — nothing
  *  else may make one — so the stamps come off there rather than by a step
  *  somebody has to remember. Returns what it cleared, so the answer can say. */

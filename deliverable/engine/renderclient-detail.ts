@@ -115,7 +115,7 @@ function showDetails(title, html) {
     document.getElementById("details-title").textContent = title;
     el.innerHTML = html;
   });
-  queueMicrotask(() => { void loadRecDecisions(); void loadStateTodos(); });
+  queueMicrotask(() => { void loadStateTodos(); });
 }
 // THE MODAL — one surface over the grayed page (forms, tool calls,
 // escape). Click outside or ✕ returns to the layout untouched.

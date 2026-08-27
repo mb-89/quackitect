@@ -17,7 +17,7 @@
 //
 // THE SOURCE KEEPS ITS $PRODUCT$ PLACEHOLDERS, which is what makes producing a
 // vehicle a rename rather than a find-and-replace.
-import { cpSync, existsSync, rmSync } from "node:fs";
+import { cpSync, existsSync, mkdirSync, readdirSync, rmSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { build } from "esbuild";
@@ -33,13 +33,32 @@ if (process.argv[1] !== undefined && fileURLToPath(import.meta.url) === resolve(
   await runBuild();
 }
 
+/** REBUILT FROM EMPTY. A file deleted from the source has to leave the install
+ *  too, and only starting from nothing guarantees that.
+ *
+ *  WHAT IS HELD IS SKIPPED. The editor links this folder and has the key
+ *  sender's native module loaded out of it, so removing node_modules fails on
+ *  Windows — after every other child is already gone. The build then leaves no
+ *  extension.js at all, which reads as the feature never having been built.
+ *
+ *  Emptying the rest keeps the guarantee for everything the build actually
+ *  produces, and survives the held handle. */
+function emptyFolder(dir, keep) {
+  if (!existsSync(dir)) {
+    mkdirSync(dir, { recursive: true });
+    return;
+  }
+  for (const name of readdirSync(dir)) {
+    if (keep.includes(name)) continue;
+    rmSync(join(dir, name), { recursive: true, force: true });
+  }
+}
+
 async function runBuild() {
   await build({ ...VSCODE_BUILD, logLevel: "info" });
 
   const dist = join(here, "vscode-dist");
-  // REBUILT FROM EMPTY. A file deleted from the source has to leave the install
-  // too, and only starting from nothing guarantees that.
-  rmSync(dist, { recursive: true, force: true });
+  emptyFolder(dist, ["node_modules"]);
   cpSync(join(here, "vscode"), dist, {
     recursive: true,
     filter: (src) => !src.includes("node_modules"),
@@ -58,7 +77,12 @@ async function runBuild() {
 // this folder, and the button stopped sending from that moment. The copy had
 // node_modules; the render filtered it out.
   const modules = join(here, "vscode", "node_modules");
-  if (existsSync(modules)) {
+  // A COPY OVER A LOADED NATIVE MODULE FAILS THE SAME WAY the remove does, so
+  // one already in place is left alone. It comes from an install rather than
+  // from this build, so it does not go stale between runs.
+  if (existsSync(join(dist, "node_modules"))) {
+    console.log("  kept vscode-dist/node_modules — run npm install in deliverable/vscode to refresh it");
+  } else if (existsSync(modules)) {
     cpSync(modules, join(dist, "node_modules"), { recursive: true });
   } else {
     console.warn("  WARNING: vscode/node_modules is missing — the key sender will not load.");

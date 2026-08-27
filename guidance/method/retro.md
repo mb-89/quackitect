@@ -25,7 +25,9 @@ The trigger is a NOTE carrying "needs retro":
 
 ## The steps
 
-1. MARK THE BOUNDARY, before anything else. Run se_log_query with
+1. MARK THE BOUNDARY #work/mark-the-boundary
+
+   Before anything else. Run se_log_query with
    filter {since: "last_retro"} and take the timestamp of its OLDEST
    record. That is where the window opens, just after the previous
    retro's drain. Write it down; every later query uses THAT timestamp.
@@ -82,7 +84,9 @@ The trigger is a NOTE carrying "needs retro":
 
    Take the timestamp and use it. Checking it by hand is not work this step
    owes.
-2. Field feedback. Ask the owner what came back from the
+2. FIELD FEEDBACK #work/field-feedback
+
+   Ask the owner what came back from the
    field since the last look. Capture every answer as a note.
 
    THIS IS A SANCTIONED STOP, AND THE ONLY ONE THE RETRO HAS. Ask the
@@ -98,7 +102,9 @@ The trigger is a NOTE carrying "needs retro":
 
    WHAT DOES NOT WAIT. The drain, the log mining, the debt sweep and the
    memory drain need no answer. Do them, and stop on the question.
-3. Drain the notes inbox, walking EVERY pending note once. Disposition each
+3. DRAIN THE NOTES INBOX #work/drain-the-notes-inbox
+
+   Walk EVERY pending note once. Disposition each
    with se_note_drain, routing it to exactly ONE home.
 
    CHECK BEFORE YOU JUDGE, and check CHEAPLY. Most of what pends is often
@@ -138,17 +144,23 @@ The trigger is a NOTE carrying "needs retro":
      - The two are different objects with different lifetimes.
      - The token is the truth from the mint onward.
    Nothing stays pending after a retro.
-4. Walk the backlog (migration). Every standing WORK TOKEN in the pool
+4. WALK THE BACKLOG #work/walk-the-backlog
+
+   The migration. Every standing WORK TOKEN in the pool
    (spec/trace/work-token/, on trunk, readable from any clone):
    keep it (condition still unmet), pull it
    (re-drain as carried, into this round's scope), or drop it (re-drain
    as obsolete, reason recorded). Re-draining IS the migration mechanism.
-5. Sweep the register for DEBTS. List every
+5. SWEEP THE REGISTER FOR DEBTS #work/sweep-the-register-for-debts
+
+   List every
    raid entry of kind `debt`. Each one is repaid now, rescheduled with
    its trigger re-affirmed, or consciously re-accepted - and the look is
    recorded on the entry, dated. A debt nobody re-reads is a lie in the
    ledger.
-6. Drain the assistant's persistent memory. The agent may write memory freely
+6. DRAIN THE ASSISTANT'S MEMORY #work/drain-the-assistant-s-memory
+
+   The agent may write memory freely
    between retros; the retro is where it drains. Read every memory entry:
    whatever holds project rules, project state, or working guidance moves
    INTO the repo (guidance, machines, prompts) and leaves the memory.
@@ -199,9 +211,13 @@ The trigger is a NOTE carrying "needs retro":
    SO GLOB WIDER THAN ONE SLUG. `@sessions/**/memory/*.md` finds every project's
    memory folder, and a project renamed or moved leaves its memories behind
    under the old name. Write the paths you found into the evidence.
-7. Hunt wasted effort. Rework, reversals, avoidable refactors,
+7. HUNT WASTED EFFORT #work/hunt-wasted-effort
+
+   Rework, reversals, avoidable refactors,
    reinventing instead of reusing. Each one is a lead.
-8. Mine the record, using the timestamp step 1 stored — never the whole
+8. MINE THE RECORD #work/mine-the-record
+
+   Use the timestamp step 1 stored — never the whole
    log, and never "last_retro" again by this point.
 
    Rank five things:
@@ -305,7 +321,9 @@ The trigger is a NOTE carrying "needs retro":
      SPLIT before anything clever is attempted inside it.
    COMPARE ACROSS RUNS, not within one. The record appends, so a test that
    has been getting slower for a fortnight is visible here and nowhere else.
-9. WALK THE MILESTONES, one iteration at a time. Every iteration that closed
+9. WALK THE MILESTONES #work/walk-the-milestones
+
+   One iteration at a time. Every iteration that closed
    in this window gets its milestone steps walked in order, and the walk lands
    as a TABLE the owner reads.
 
@@ -354,14 +372,20 @@ The trigger is a NOTE carrying "needs retro":
    that is the whole value. Which step cost the most is a question prose
    cannot answer at a glance.
 
-10. Tally the previous retro's improvements, and promote the wins. Dismiss
+10. TALLY THE PREVIOUS RETRO'S IMPROVEMENTS #work/tally-the-previous-retro-s-improvements
+
+   Promote the wins. Dismiss
    the duds WITH the reason recorded, so a dud is never re-proposed.
-11. Check the contract. Walk the contract rule by rule against the
+11. CHECK THE CONTRACT #work/check-the-contract
+
+   Walk the contract rule by rule against the
    period's recorded trail — the call log, the decision graph, the
    notes. A violation is a lead: propose how the rule gets teeth (a
    refusal, a lint, guidance) so it cannot recur. The check reads what
    the lane recorded — private thinking is not in the store.
-12. Aim every improvement at a durable home: guidance, a machine, a
+12. AIM EVERY IMPROVEMENT AT A DURABLE HOME #work/aim-every-improvement-at-a-durable-home
+
+   Guidance, a machine, a
    condition note, a form template, an engine refusal. Emit only the few
    highest-leverage notes. Each one specific and checkable — a concrete
    change, never "improve X".
@@ -421,3 +445,52 @@ method (`deliverable/machines/methods/meth-state-of-the-art.md`).
   scripts: a program over the corpus or the tree is the right instrument and
   the lane card says so.
   since: "last_retro" scopes it to the current retro period.
+
+## EVERY FAILED GATE REVIEW IS READ, ONE AT A TIME
+
+Owner ruling 2026-08-26, after a record where no milestone passed its first
+review and the fifth failure repeated the first.
+
+THE STEP: list every gate in the interval whose review found anything, and read
+each one on its own. Not the findings — the SHAPE of the mistake. Then say what
+rule would have caught it.
+
+THE RULE GOES SOMEWHERE DURABLE, never into the record that produced it. A
+method card, a condition, a check. A lesson written into an iteration's own
+evidence dies with that iteration.
+
+### Why one at a time rather than in a batch
+
+BECAUSE THE SHAPES REPEAT AND THE BATCH HIDES IT. Read separately, five
+failures in one record turned out to be one shape wearing five costumes: a
+cheap proxy passing for the real thing. A label for a statement. A summary for
+the steps. A note for a fix. A signature for current evidence. A promise for an
+act.
+
+NONE OF THEM LOOKS LIKE A MISTAKE WHILE IT HAPPENS. Each reads as diligence.
+That is the property that makes them repeat, and it is only visible across
+several of them at once.
+
+### What the gate now hands you
+
+EVERY GATE THAT FAILS ITS REVIEW WRITES A NOTE, by the same ruling. So the
+retro's input is not an archaeology exercise: the learnings are already in the
+inbox, written by the hand that had the context.
+
+WHERE THAT NOTE COMES FROM is `meth-gate-review.md`, section "A failed review
+produces a note, every time".
+
+DRAIN THEM LAST, after the ordinary notes. A learning read beside four other
+learnings is worth more than the same learning read alone, and the pattern is
+the thing the retro is for.
+
+### The check that would have caught four of five
+
+AN ENTRY WITH A TRIGGER IS A MESSAGE ADDRESSED TO A MOMENT, and nothing
+delivers it. Four of that record's five failures were already named in open
+register entries. One entry's trigger read "the next cut-criteria run". That run
+happened and nobody read the entry.
+
+SO THE RETRO ALSO ASKS: which open entries had their trigger fire in this
+interval, and did anybody act? An entry whose trigger fired and was ignored is
+a finding about the delivery mechanism rather than about the entry.

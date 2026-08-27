@@ -176,6 +176,34 @@ bug somewhere else.
 - Only content that is GENUINELY GONE may clear. If what they had open no longer exists, say so in its place.
   - Never silently swap in something else, and never quietly close it.
 
+## Nothing a person does needs a reload
+
+EVERY ACT SHOWS ITS RESULT AT ONCE, on every surface the result touches. A
+reader who has to reload to see what they just did has been told the act
+failed, and been told it wrongly.
+
+THIS IS ABSOLUTE. It is not a target and there is no act small enough to be
+excepted. Filing, renaming, moving, adding, finishing — all of them.
+
+THE WHOLE WIRE IS OWED, and a break anywhere in it looks identical from the
+outside. Four links, and each has failed in this product:
+
+- THE WRITE lands on disk.
+- THE INDEX HEARS IT. A surface reading a cached model still shows the state
+  before the act, and the write is invisible.
+- THE SURFACE REDRAWS. Every surface, not the one that was pressed.
+- THE REDRAW KEEPS THE READER'S PLACE. A repaint that resets what they had
+  open is the reload again, wearing a repaint's clothes.
+
+WHOEVER WRITES TELLS THE INDEX, at the one writer rather than in each caller.
+A caller that has to remember is a caller that will forget, and the next writer
+will never know it was owed.
+
+MEASURED, TWICE IN ONE SESSION. Filing work into a bucket wrote the file and
+told nothing, so the editor drew from a stale index and the reader saw no
+change. Renaming a bucket did the same. Both were reported as the feature not
+working at all.
+
 ## Every element answers for itself
 
 - Every widget gets a maximize control. It opens the widget full-screen as a modal over the grayed page.

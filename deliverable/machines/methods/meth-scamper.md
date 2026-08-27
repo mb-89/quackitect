@@ -14,7 +14,7 @@ catalogues, same move, different vocabulary.
 on green fields, strong on redesign — and most work is adaptation or variant
 design rather than new design (Pahl/Beitz Sect. 6.1.1).
 
-## SCAMPER — Osborn's checklist, compressed
+## SCAMPER — Osborn's checklist, compressed #work
 
 - **S**ubstitute — swap a part, a material, a mechanism.
 - **C**ombine — merge with another feature, tool, or step.
@@ -24,7 +24,7 @@ design rather than new design (Pahl/Beitz Sect. 6.1.1).
 - **E**liminate — remove the part; does the need disappear too?
 - **R**everse — invert the order, the roles, the direction.
 
-## SIT — Systematic Inventive Thinking
+## SIT — Systematic Inventive Thinking #work
 
 "Function follows form": transform first, find who wants the result after.
 
@@ -34,7 +34,7 @@ design rather than new design (Pahl/Beitz Sect. 6.1.1).
 - **Division** — split a component and rearrange the parts.
 - **Attribute Dependency** — make two attributes vary together that did not.
 
-## Osborn's own longer sequence
+## Osborn's own longer sequence #work
 
 Background, not a catalogue the form offers. The SyA corpus gives it in full,
 and the seven letters above compress it.
@@ -50,7 +50,7 @@ and the seven letters above compress it.
 - combine
 - transform
 
-## RUN BOTH WHOLE — THE PART THAT CHANGED
+## RUN BOTH WHOLE — THE PART THAT CHANGED #work
 
 This card used to say "one honest minute each". That was an attention budget
 written for a person, and it is the only thing about the method that has
@@ -64,7 +64,7 @@ WRITE THE MISSES. An operator that produces nothing is a row saying
 `nothing`. A blank row and a question nobody asked look identical afterwards,
 and only one of them is honest.
 
-## THE OVERLAP WITH TRIMMING IS DELIBERATE
+## THE OVERLAP WITH TRIMMING IS DELIBERATE #work
 
 SCAMPER's Eliminate, SIT's Subtraction and TRIZ's Trimming are one move.
 [[meth-trimming]] runs it exhaustively over every cluster and this runs it
@@ -73,7 +73,7 @@ once per subject.
 Reaching the null option twice is not waste. It has the highest value and
 the lowest proposal rate of any option there is.
 
-## Output
+## Output #work
 
 One [[option]] node per transformation that produced something, each naming
 its operator and the subject it was applied to. An idea with no lineage is

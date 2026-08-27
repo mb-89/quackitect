@@ -9,7 +9,7 @@ import { fileURLToPath } from "node:url";
 import { compileMachine } from "../engine/machines/compile.ts";
 import { mainMachinePath, Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
-import { anyGuidanceDoc, bootedServer, call, checkDocs, freshRoot, proofFor, pullBoot } from "./helpers.ts";
+import { anyGuidanceDoc, bootedServer, call, checkDocs, freshRoot, proofFor, pullBoot, workHere } from "./helpers.ts";
 
 const REPO_ROOT = fileURLToPath(new URL("../..", import.meta.url));
 
@@ -71,7 +71,8 @@ describe("boot", { concurrency: true }, () => {
 
   test("the agent's pulls walk boot: the reading gates, the machine walks, the banner survives the sweep", async () => {
     const root = freshRoot();
-    const server = buildServer(root);
+    const session = new Session(root);
+    const server = buildServer(root, session);
     // The pull says read. Pulling AGAIN without reading hands back the same
     // instruction — the gate bites by SAYING, never by throwing.
     const first = await call(server, "se_pull");
@@ -83,26 +84,39 @@ describe("boot", { concurrency: true }, () => {
     assert.equal(shut.body.clause, "SE-C-110");
     // Drain the reading the honest way — one document per pull, tail proven.
     //
-    // THE ANSWER IS THREADED, never re-pulled. The call that stops answering
-    // `read` is the one that WALKS, and pulling again to look at it throws that
-    // walk away: the target clears itself on arrival, so the extra pull
-    // correctly offers doors and the test reads a success as a failure. With
-    // the contract promoted there may be nothing owed at all, which makes the
-    // very first answer the whole walk.
+    // THE ANSWER IS THREADED, never re-pulled to look at. The call that stops
+    // answering `read` is the one that WALKS, and an idle pull after it throws
+    // that walk away: the target clears itself on arrival, so the extra pull
+    // correctly offers doors and the test reads a success as a failure.
+    //
+    // A MARKED STEP IS A BRANCHING POINT TOO: a state is not left while it
+    // holds open work, so the batch stops at boot's `Startup order` and runs on
+    // once the step is done. What the hops PROVE is unchanged — the way is
+    // walked in a handful of calls, not one call per hop.
     let r = await call(server, "se_pull");
+    const hops: string[] = [];
+    const banners: string[] = [];
     for (let j = 0; j < 40; j++) {
+      hops.push(...((r.body.walked ?? []) as string[]));
+      banners.push(...((r.body.banners ?? []) as string[]));
       const doc = r.body.document as { content?: string } | undefined;
-      if (doc?.content === undefined) break;
-      r = await call(server, "se_pull", { form: { read: proofFor(doc.content) } });
+      if (doc?.content !== undefined) {
+        r = await call(server, "se_pull", { form: { read: proofFor(doc.content) } });
+        continue;
+      }
+      if (r.body.pull !== "do" || r.body.arrived === true) break;
+      if (r.body.refusal === undefined) break;
+      if (workHere(session) === 0) break;
+      r = await call(server, "se_pull");
     }
     // That answer WALKED: boot ran its scripts, idle was crossed, and the
-    // session's default target (the front desk) was reached in ONE call.
+    // session's default target (the front desk) was reached.
     const walked = r;
     assert.equal(walked.body.pull, "do", JSON.stringify(walked.body));
     assert.equal(walked.body.arrived, true);
-    assert.ok((walked.body.walked as string[]).length > 3, "the whole branchless way in one pull");
+    assert.ok(hops.length > 3, `the whole branchless way in a handful of pulls: ${JSON.stringify(hops)}`);
+    assert.ok((walked.body.walked as string[]).length > 1, "and the last of them still carried a batch of hops");
     // THE BANNER EARNED MID-SWEEP SURVIVES — the harness rule says show it.
-    const banners = (walked.body.banners ?? []) as string[];
     assert.ok(
       banners.some((b) => b.includes("Main machine is live")),
       `boot's banner rides the answer: ${JSON.stringify(walked.body)}`,
@@ -149,9 +163,10 @@ describe("boot", { concurrency: true }, () => {
 
   test("the gate is logged like everything else — a refused pre-boot call lands in the log", async () => {
     const root = freshRoot();
-    const server = buildServer(root);
+    const session = new Session(root);
+    const server = buildServer(root, session);
     await call(server, "se_run", { command: "echo nope" }); // refused at start
-    await pullBoot(server);
+    await pullBoot(server, session);
     const q = await call(server, "se_log_query", { filter: { ok: false } });
     const recs = q.body.records as { tool: string; outcome: string }[];
     assert.equal(recs.length, 1);

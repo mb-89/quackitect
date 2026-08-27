@@ -8,6 +8,7 @@ realizes:
   - if-method-compiler-to-walk-engine
   - if-record-store-to-walk-engine
 files:
+  - "deliverable/engine/visit.ts"
   - deliverable/engine/session.ts
   - deliverable/engine/sessionclaims.ts
   - deliverable/engine/machine.ts
@@ -2214,3 +2215,106 @@ about. Three states are excluded and each for its own reason.
 
 An entry in any of the three is real and recorded; it just is not a call on
 anybody today, and plotting it buries the ones that are.
+
+## The pull hands the work that can be started
+
+THE AGENT PULLS. That is all it does, and the pull is the whole surface.
+
+THERE IS NO LIST TO READ. What a token is doing is deduced from where it stands
+and what status it carries, so nothing needs enumerating anywhere. The agent
+never asks what is available; it is given.
+
+### Two beats in one state
+
+THE INPUT COMES FIRST. Reading, and whatever has to be in hand before anything
+can be produced. While any of it is owed, nothing else is offered.
+
+THEN THE OUTPUT. Once the input is settled, the next pull hands the tokens that
+can be started now.
+
+### The nudge rides the second beat and nowhere else
+
+IT SAYS THE AGENT MAY OPEN TOKENS OF ITS OWN. With the input in hand, what the
+state's own work does not cover is visible, so that is the moment to say it.
+
+BEFORE THE INPUT IS READ, OPENING ONE IS A GUESS. A nudge there would teach the
+agent to invent work rather than to see what is missing.
+
+A NUDGE IS NEVER A REFUSAL. It arrives on a good answer and can be ignored, the
+same way the question about the work in hand can.
+
+### What is never offered
+
+PENDING WORK. It does not block and it is not owed here.
+
+DRAWN WORK. A note or a pool token has no file and ends by its own verb rather
+than by being worked at a position.
+
+### What this replaces
+
+A SECOND STRUCTURE HOLDING PLANS AND RESOLUTIONS beside the tokens. The pull
+already knows everything that structure recorded, and two structures holding
+one set of facts is the defect the craft rules already name.
+
+## A state is not left while it holds open work
+
+A STEP NOBODY DID IS NOT DONE BECAUSE THE WALK WENT PAST IT. Open work at a
+position holds that position shut until each piece is settled with what
+happened, or moved somewhere it will be done.
+
+### The hold sits on the transition, not on a form
+
+IT USED TO SIT ON THE FORM SUBMIT ALONE. A state with no form was left by the
+walk's own transition without the work store ever being asked, and so was every
+submachine.
+
+THE SIGNATURE ASKS THE SAME RULE, so the two can never disagree about what is
+owed. One function answers both.
+
+### A finishing machine is a third door, and it is the one that was missed
+
+A SUBMACHINE IS DONE WHEN ITS `end` ACTIVATES, never by completing `end`. So
+the transition guard never runs for the container at all.
+
+THE SIGNAL IS THE INSTANCE CLOSING. Nothing else says a machine is finished,
+and the scope is then the whole container rather than the state that happened
+to complete last.
+
+THE POSITION IS TAKEN BEFORE THE COMPLETION. Completing a state takes it off
+the active list, and the position lookup reads that list — so asking afterwards
+returns a bare name, which has no container and scopes to nothing.
+
+AN UNWALKED BRANCH IS STILL INSIDE. A route that never entered a sibling does
+not make that sibling's work go away, and the reader sees the count on the
+drawing whether the route went there or not.
+
+### Leaving settles nothing
+
+THE CLEARING USED TO MARK EVERY OPEN ITEM DONE with the reason "the state was
+left". That is the rule inverted, and it was the escape hatch that made the
+hold pointless: whatever the guard refused, the clearing then finished by
+walking past it.
+
+WHAT LEAVING STILL DOES is remove the ephemeral items, which are settled by
+then because the hold would not have opened otherwise.
+
+### The green the join reads has owed work taken off it
+
+A CLAIM AND A WORK STORE CAN DISAGREE. A state signed before a token existed
+reads green by its claim and owes one by its store.
+
+THE JOIN READ THE CLAIM, so an owed branch counted as delivered. The drawing
+already took the green off a state that owes; this is that same rule reaching
+the walk, so what a person sees and what the machine does agree.
+
+A BUSBAR STILL WAITS ONLY ON WHAT IS OWED. A branch that is genuinely green
+keeps counting as delivered, which is the rule this leaves alone.
+
+### Work only a person may settle holds it too
+
+THAT IS WHAT THE MARK IS FOR. An agent may not settle one, so the walk waits.
+
+THE REFUSAL NAMES THE PERSON RATHER THAN A CALL THE AGENT IS REFUSED. Offering
+the settle there would hand back a call the store rejects on sight, and a
+remedy nobody can follow is a diagnosis. Waiting on somebody's word is a
+sanctioned stop, and the refusal says which item and whose it is.

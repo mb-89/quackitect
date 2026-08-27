@@ -13,6 +13,17 @@ refines:
 priority: must
 ---
 
+## Scenario
+
+- source: a person at a surface, or an agent on the lane
+- stimulus: any request the system serves
+- artifact: the serving engine and every surface it draws
+- environment: the reference machine described below, under normal operation
+- response: the answer arrives inside the budget named for that kind of work,
+  or the system says it is working before the budget passes
+- response measure: requests exceeding their budget with no feedback = 0,
+  counted per budget row in the table below
+
 ## The reference machine
 
 EVERY BUDGET HERE IS MEASURED ON ONE MACHINE. It is a MID-LEVEL LAPTOP OF

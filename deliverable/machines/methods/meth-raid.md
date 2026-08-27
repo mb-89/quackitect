@@ -8,7 +8,7 @@ statement: One register holds the risks, assumptions, issues and dependencies â€
 The register opens at M1 log-risks and is added to for the life of the
 product. Assumptions get two states of their own at M3: identify, then probe.
 
-## THE REGISTER IS NODES, AND THE TABLE IS A VIEW
+## THE REGISTER IS NODES, AND THE TABLE IS A VIEW #work
 
 Every entry is a node shaped by [[raid]], living in
 `spec/trace/raid/`, landing on trunk exactly as a requirement does.
@@ -23,7 +23,7 @@ register a person reads is a VIEW over the folder, filtered by kind â€” so one
 source serves the project chapter and the design-input chapter without either
 restating the other.
 
-## Writing one
+## Writing one #work
 
 - ONE ENTRY, ONE CONCERN. Two things that would be mitigated differently are
   two entries.
@@ -39,7 +39,7 @@ restating the other.
   because a probability nobody measured reads exactly like one somebody
   did.
 
-## Telling the kinds apart
+## Telling the kinds apart #work
 
 | kind | what it is | the tell |
 | --- | --- | --- |
@@ -59,7 +59,7 @@ of its own ([[meth-stakeholder-analysis]]).
 A CREDIBLE DECISION FLIP IS A RISK with its fallback recorded
 ([[meth-pugh-convergence]]).
 
-## Where entries come from
+## Where entries come from #work
 
 - M1 log-risks opens the register from the vision and the actual.
 - M3 identify-assumptions adds the assumptions the requirements lean on.
@@ -71,7 +71,7 @@ A CREDIBLE DECISION FLIP IS A RISK with its fallback recorded
 - Any state may add one the moment it is noticed. Waiting for the right state
   is how an entry is lost.
 
-## What the gates read
+## What the gates read #work
 
 A gate does not count the register. It asks whether what stands there is
 believable, and whether anything obvious is missing. The counting is the

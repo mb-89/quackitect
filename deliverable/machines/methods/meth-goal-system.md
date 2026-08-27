@@ -6,7 +6,7 @@ statement: Goals form a system, not a list. Their conflicts and their priorities
 ## Situation
 Inside the vision draft (M1). A vision without a goal system hides its trade-offs; hiding them poisons every later decision.
 
-## Procedure
+## Procedure #work
 - List the goals the to-be world drives toward. Three is a good number.
 - Order them: which wins when they collide.
 - Name each conflict openly as a pair (trust against speed; durability against freedom) with the accepted price.

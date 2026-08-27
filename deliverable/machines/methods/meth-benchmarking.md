@@ -38,7 +38,7 @@ costs nobody paid. Benchmarking fails by being opaque — behaviour you can see
 and a mechanism you are guessing at. Each one's blind spot is the other's
 evidence.
 
-## THREE SOURCES, AND THE THIRD IS THE ONE PEOPLE SKIP
+## THREE SOURCES, AND THE THIRD IS THE ONE PEOPLE SKIP #work
 
 - COMPETITORS. What does the nearest product do for this function?
 - OUR OWN PREDECESSOR. What did the last version do, and why was it changed?
@@ -53,14 +53,18 @@ problem, its failures are recorded, and nobody has to guess at the context.
 
 ## THE PROCEDURE
 
-1. Name the function cluster being served. Not the product, the cluster.
-2. For each source, find what fills that cluster and describe the MECHANISM
-   rather than the marketing.
-3. Say what it cost them. A feature list without its price is half a finding.
-4. Say what our context breaks. An option that works because they have
+1. Name the function cluster being served. Not the product, the cluster. #work
+2. Describe each source's MECHANISM #work
+
+   Find what fills that cluster, and describe how it works rather than how it
+   is marketed.
+3. Say what it cost them. A feature list without its price is half a finding. #work
+4. Say what our context breaks #work
+
+   An option that works because they have
    something we do not is not an option here.
 
-## WHAT A FEATURE LIST IS EVIDENCE OF
+## WHAT A FEATURE LIST IS EVIDENCE OF #work
 
 That a feature is CLAIMED. Never that it is good, and never that it beats
 ours.
@@ -69,7 +73,7 @@ A COMPARATIVE CLAIM NEEDS EVIDENCE ON BOTH SIDES. "They do X better" needs
 what they do AND what we do. Where our side does not exist yet, the
 comparison is not weak — it is impossible, and writing it is fabrication.
 
-## THE FAILURE MODE
+## THE FAILURE MODE #work
 
 Copying the SURFACE. A competitor's screen is the output of constraints you
 cannot see, and adopting it imports decisions nobody here made.

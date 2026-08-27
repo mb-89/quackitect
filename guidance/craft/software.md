@@ -33,6 +33,28 @@ that one when you touch what it covers.
   - A million-line file is not editable.
   - Generated surfaces derive from the markdown, never the reverse.
   - Log files are the one exception.
+
+### Obsidian compatibility binds the FORMAT, never the FUNCTION
+
+A file we write opens in Obsidian and reads correctly there. That is the whole
+of the promise.
+
+IT DOES NOT SAY OUR FEATURES MAP ONTO OBSIDIAN'S. We do things it does not:
+grouping several levels deep, a work editor over two views at once, a walk that
+refuses. None of that is a compatibility question.
+
+AND IT NEVER MAKES OBSIDIAN'S INDEX THE LIMIT OF WHAT WE MAY READ. Our own
+readers decide what they read. A folder the vault excludes is excluded from the
+VAULT, and a surface that needs it reads it directly.
+
+THE WAY THIS GOES WRONG, measured. The work editor was built on the vault, the
+vault excludes the private folder by design, and the conclusion drawn was that
+private work could not be shown. The real answer was to read the second source
+beside the first, which costs one function and breaks no compatibility with
+anything.
+
+SO THE TEST IS: would a person opening this file in Obsidian see something
+broken? If not, compatibility has nothing to say about the design.
 - Machines are drawn. A state machine's truth is its Obsidian canvas, and a person edits it in Obsidian, in the real world.
   - The engine accepts what a person naturally draws.
   - A mechanism that depends on metadata Obsidian does not surface to its editor is a defect. Rework the mechanism, never the person.

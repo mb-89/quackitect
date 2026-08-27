@@ -6,7 +6,7 @@ statement: "Morphological analysis: partitioned functions as rows, solution opti
 ## Situation
 M4's enumerate-space. Requires the functional partitioning (the chart's rows) and option knowledge (references). With an agent enumerating, far more combinations are affordable than in the hand-drawn era - the method's revival.
 
-## Procedure
+## Procedure #work
 - Rows: the partitioned functions or function clusters. Cells: solution options per row - from engineering catalogs, patterns, reference architectures, TRIZ principles, benchmarking, legacy.
 - Combinations: one cell per row composes a variant. Prune the infeasible loudly (incompatible cells named).
 - Shortlist the viable combinations - each seeds one candidate state, elaborated in parallel.

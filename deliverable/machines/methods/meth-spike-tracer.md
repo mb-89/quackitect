@@ -14,7 +14,7 @@ they share this card and an improvement to either improves both.
 - M6's seeded spikes build to DERISK. rank-unknowns picks the targets: RAID
   entries, the M5 tripwires, and any doubtful verify_method.
 
-## Procedure
+## Procedure #work
 
 - Timebox every run. The box is the budget; running out IS a result.
 - Pick the cheapest form that yields the evidence.
@@ -32,7 +32,7 @@ they share this card and an improvement to either improves both.
   downstream of the whole process. A free expedition idea that bypassed the
   process enters at the top instead.
 
-## PROBING AS A FINDER — WHAT COULD NOT BE DONE BEFORE
+## PROBING AS A FINDER — WHAT COULD NOT BE DONE BEFORE #work
 
 This is the one genuinely NEW generator of the AI era, and it is new for a
 boring reason: cost.
@@ -53,7 +53,7 @@ THROWAWAY MEANS THROWAWAY. A probe's code is not a head start on the build,
 and treating it as one is how a prototype ships by accident. What survives is
 the finding.
 
-## WHAT MAKES A PROBE HONEST
+## WHAT MAKES A PROBE HONEST #work
 
 - IT HAS ONE QUESTION, written before it starts. A probe that discovers its
   question afterwards discovered a rationalisation.
@@ -64,7 +64,7 @@ the finding.
   before the run — a fallback invented after a red is a rationalisation
   with a plan attached.
 
-## HOW M6 RUNS THEM
+## HOW M6 RUNS THEM #work
 
 - The spike drawing deals one state per picked unknown, ALL PARALLEL. No
   spike waits on another, and the join waits for every one — the same

@@ -13,7 +13,7 @@ Requirements come first, then functions. That order is the method's, not a
 preference: task clarification before concepting (Pahl & Beitz, VDI 2221),
 and logical decomposition after the requirements baseline (NASA, INCOSE).
 
-## WHAT THIS STEP PRODUCES
+## WHAT THIS STEP PRODUCES #work
 
 A tree of function nodes, and nothing else.
 
@@ -32,17 +32,21 @@ winner.
 Work top-down and bottom-up, then reconcile. Neither direction finds
 everything.
 
-1. State the overall function. Abstract until the statement holds for every
-   design you would consider.
-2. Break it into sub-functions, verb plus noun. Stop when a child would name
-   a solution.
-3. Walk the requirement register. Assign each requirement to the function
-   that serves it.
-4. Walk the use-case steps. Every step must land on a function.
-5. Write the flows. What each function consumes and produces.
-6. Reconcile. Fix what the two walks disagree about.
+1. State the overall function #work
 
-## THE FOUR HOLES, AND WHERE EACH ONE SHOWS
+   Abstract until the statement holds for every design you would consider.
+2. Break it into sub-functions #work
+
+   Verb plus noun. Stop when a child would name a solution.
+3. Walk the requirement register #work
+
+   Assign each requirement to the function
+   that serves it.
+4. Walk the use-case steps. Every step must land on a function. #work
+5. Write the flows. What each function consumes and produces. #work
+6. Reconcile. Fix what the two walks disagree about. #work
+
+## THE FOUR HOLES, AND WHERE EACH ONE SHOWS #work
 
 Each has its own tell, and each is found by a different walk.
 
@@ -55,7 +59,7 @@ Each has its own tell, and each is found by a different walk.
 - AN OUTPUT NOBODY CONSUMES — found only by writing the flows. It means
   either a missing function, or a function doing work nobody needs.
 
-## SOLUTION-NEUTRAL IS THE HARD PART
+## SOLUTION-NEUTRAL IS THE HARD PART #work
 
 The test is one question. Could two honestly different designs both do this?
 
@@ -72,7 +76,7 @@ Where the solution is genuinely forced, it is a CONSTRAINT and belongs in the
 requirement register with the norm or decision that binds it. It is not a
 function.
 
-## HOW DEEP TO GO
+## HOW DEEP TO GO #work
 
 Stop when the next split would name a solution, or when the child would be
 allocated to the same element as its parent.
@@ -83,7 +87,7 @@ arrived early, and partitioning is M4's.
 Depth is not rigor. A tree with forty leaves and no flows is worth less than
 one with twelve leaves that say what crosses each boundary.
 
-## THE STRUCTURE WILL MOVE, AND THAT IS NORMAL
+## THE STRUCTURE WILL MOVE, AND THAT IS NORMAL #work
 
 Deriving functions exposes requirements that were vague, missing or wrong.
 Go back and fix them. The two peaks are worked together, not in one pass

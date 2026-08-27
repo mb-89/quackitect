@@ -58,3 +58,15 @@ accepted.
 THIS ROW CAME FROM THE CHECKLIST (owner design 2026-08-07). Compatibility had
 no answer, and asking the question found a rule that had been enforced
 without ever being stated.
+
+## Addition — work tokens
+
+A PIECE OF WORK IS ONE OF THOSE ARTIFACTS. Every work token a state carries
+is text a person opens and changes in a plain editor while nothing of this
+system is running, and a change made that way stands when the engine starts
+again.
+
+WHAT IS PAID FOR IT is mechanical merging. Five surveyed systems converged
+on an append-only log with derived state, and that dissent is recorded at
+raid-risk-the-storage-shape-is-the-one-five-systems-moved-away-from rather
+than settled.

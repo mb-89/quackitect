@@ -221,7 +221,25 @@ test("no new file read bypasses the door — the count may fall, never rise", ()
   // WHAT A COLD READER COSTS BESIDES TIME: it cannot be invalidated, so it
   // disagrees with the warm copy the moment a file changes under it, and
   // nothing reports the disagreement.
-  const CEILING = 116;
+  //
+  // 117: tools-run.ts reapAbandonedTestJobs reads each test run's own JSONL
+  // record to find the ones an engine was killed in the middle of, and stamps
+  // them ended. Three things put it outside the door.
+  //
+  // IT IS NOT A NODE. The door shares one read and one parse between readers of
+  // NODES. A machine-local job record has one writer and one reader, so there is
+  // nobody to share with — the same argument the run-projection reads above make.
+  //
+  // IT RUNS BEFORE THE DOOR EXISTS. The reap fires at startup, ahead of listen,
+  // so no pass is open and nothing could be shared even in principle.
+  //
+  // IT IS BOUNDED BY THE RECORDS ON DISK, and it opens each of them once per
+  // caller. Two callers run on the ordinary path — the lane's own startup and
+  // the mirror's — so a record is read twice per engine life and never again.
+  // Both reapers skip a record already carrying `ended`, so the second finds
+  // nothing to write.
+  // see dsp-the-work-account.md#a-killed-run-is-closed-at-startup
+  const CEILING = 117;
   let found = 0;
   const offenders: string[] = [];
   const walk = (dir: URL, rel: string): void => {
@@ -636,6 +654,26 @@ test("glob matches ** and excludes junk dirs", () => {
   assert.deepEqual(g.files, ["deep/nested/x.test.ts", "top.test.ts"]);
   assert.ok(globToRegExp("*.md").test("a.md"));
   assert.ok(!globToRegExp("*.md").test("d/a.md"));
+});
+
+test("the work store lists and globs, though it lives under an excluded folder", () => {
+  const root = fresh();
+  mkdirSync(join(root, ".se", "work"), { recursive: true });
+  writeFileSync(join(root, ".se", "calls.jsonl"), "{}\n");
+  writeFileSync(join(root, ".se", "work", "wk-1.md"), "---\nid: wk-1\n---\n");
+  // THE LANE'S OWN REMEDY NAMES THIS FOLDER. A refused work id is answered
+  // with "list the store, then name one of those ids", so a store that lists
+  // empty hands the caller a remedy that answers nothing. Ephemeral work has
+  // to live under `.se` because it must never be committed.
+  assert.deepEqual(
+    fileList(root, ".se/work").entries.map((e) => e.name),
+    ["wk-1.md"],
+  );
+  assert.deepEqual(fileGlob(root, ".se/work/*.md").files, [".se/work/wk-1.md"]);
+  // THE REST OF `.se` STAYS OUT. The call log, the snapshots and the reading
+  // are not the lane's to browse, and the root listing still shows no `.se`.
+  assert.ok(!fileList(root, ".").entries.some((e) => e.name === ".se"));
+  assert.deepEqual(fileGlob(root, "**/*.jsonl").files, []);
 });
 
 test("search finds matches with locations (ripgrep — hard dependency, no fallback)", () => {

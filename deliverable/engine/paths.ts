@@ -8,6 +8,14 @@ import { CLAUSES, Rejection } from "./errors.ts";
 /** Directories the lane never serves or lists. */
 export const EXCLUDED_DIRS = new Set([".git", "node_modules", ".se", ".venv", "__pycache__"]);
 
+/** Paths under an excluded directory that the lane DOES serve.
+ *
+ *  AN EXCLUSION IS A DEFAULT, NOT A CEILING. Ephemeral work lives under `.se`
+ *  because it must never be committed, and the lane's own refusals name that
+ *  folder as the place to look. A store nothing can list hands out a remedy
+ *  that answers nothing. */
+export const LANE_INCLUDES = [".se/work"];
+
 /** True for a path addressing a declared root, e.g. "@desktop/sketch.png". */
 export const isRootRef = (p: string): boolean => p.startsWith("@");
 
@@ -264,7 +272,17 @@ export function resolveInActBound(bound: string, p: string, source: string): str
 }
 
 export function isExcluded(rootRelative: string): boolean {
-  return rootRelative.split(sep).some((part) => EXCLUDED_DIRS.has(part));
+  const path = rootRelative.split(sep).join("/");
+  if (LANE_INCLUDES.some((i) => path === i || path.startsWith(`${i}/`))) return false;
+  return path.split("/").some((part) => EXCLUDED_DIRS.has(part));
+}
+
+/** Whether an EXCLUDED directory must still be descended, because an included
+ *  path lies under it. `.se` is skipped and `.se/work` is not, so a walk that
+ *  stops at the first excluded name never reaches the work store. */
+export function descendExcluded(rootRelative: string): boolean {
+  const path = rootRelative.split(sep).join("/");
+  return LANE_INCLUDES.some((i) => i.startsWith(`${path}/`));
 }
 
 export function seDir(root: string): string {

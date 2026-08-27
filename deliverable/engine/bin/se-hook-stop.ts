@@ -48,6 +48,7 @@ import { closeSync, existsSync, fstatSync, openSync, readdirSync, readFileSync, 
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { recordLifecycle } from "../lifecycle.ts";
+import { isSettled, readAllWork } from "../workstore.ts";
 
 // bin -> engine -> deliverable -> the project root. THREE hops, not four.
 //
@@ -230,6 +231,44 @@ function blockedByRunningWork(): boolean {
     // like the one in pass(), so a throw here cannot relabel a block an error.
   }
   return true;
+}
+
+/** WORK STANDING WHERE THE WALK STANDS, or nothing.
+ *
+ *  A STATE HOLDING OPEN WORK IS NOT FINISHED, whatever the dial says. The
+ *  notches answer how far the walk may GO before handing back; not one of them
+ *  answers whether the work in hand is done. A stop over open work hands back a
+ *  state the engine will refuse to leave anyway, so the turn ends having
+ *  achieved nothing and the person is called back for no reason.
+ *
+ *  A PERSON'S OWN ITEM IS NOT COUNTED. No agent may settle one, so blocking on
+ *  it would refuse a turn the agent has no way to release except by forcing.
+ *  Waiting on a person is what that item MEANS.
+ *
+ *  IT READS THE STORE, NOT THE ENGINE. The hook runs in its own process with no
+ *  session, so it asks the files the same way the leaving guard does.
+ *
+ *  THE TARGET COUNTS AS A PLACE, and that is not a widening for its own sake.
+ *  An aim MOVES THE WALK AND WRITES NO PULL, so the position on the newest pull
+ *  is stale by a whole record after one. `aimedSinceLastPull` exists for the
+ *  target for exactly that reason; the POSITION never got the same treatment.
+ *
+ *  MEASURED: the walk stood at fix-findings with six pieces of work open, the
+ *  newest pull still said boot/end, and the stop passed this check looking at a
+ *  state the walk had left. Work standing where the walk is HEADED is work left
+ *  whether or not it has arrived. */
+function openWorkHere(at: string[]): { count: number; first: string } | undefined {
+  if (at.length === 0) return undefined;
+  try {
+    const here = new Set(at);
+    const open = readAllWork(hookRoot()).items.filter((i) => here.has(i.place) && !isSettled(i) && !i.person_only);
+    if (open.length === 0) return undefined;
+    return { count: open.length, first: open[0].statement };
+  } catch {
+    // A STORE THAT CANNOT BE READ REFUSES NOTHING. The hook must never break
+    // the turn, and it must never block on its own failure to look.
+    return undefined;
+  }
 }
 
 /** EVERY DOOR THAT AIMS, and there are two.
@@ -483,15 +522,37 @@ export function decide(payload: string): Verdict {
     // A FORCED STOP GOES THROUGH, and forcing is a lane call rather than a
     // retry. see dsp-boot-and-power.md#the-only-stops-that-are-sanctioned
     if (bypassesStop(payload)) return pass("forced", forcedSinceLastPull() ?? "");
-    const at = Array.isArray(last.where) ? (last.where as unknown[]).map(String).join(", ") : String(last.where ?? "");
-    const sanctioned = notchSanction(notch, last, at);
-    if (sanctioned !== undefined) return pass(sanctioned[0], sanctioned[1]);
+    const places = Array.isArray(last.where) ? (last.where as unknown[]).map(String) : [String(last.where ?? "")];
+    const at = places.join(", ");
+    // OPEN WORK OUTRANKS EVERY NOTCH (owner). The dials say how far the walk may
+    // go; none of them says the work in hand is done. A force still releases it,
+    // which is why this sits after the bypass and before the notch.
     // A TARGET IS A STANDING INSTRUCTION FROM THE PERSON. While one is set,
     // the walk has somewhere to be, and "nothing to route" is false whatever
     // the desk answered.
     // AN AIM SINCE THE LAST PULL WINS. It is the newer statement of where the
-    // walk is meant to be going.
+    // walk is meant to be going, and it is also the only fresh news about WHERE
+    // the walk stands, because aiming writes no pull.
     const target = aimedSinceLastPull() ?? (typeof last.target === "string" ? last.target.trim() : "");
+    const held = openWorkHere([...places, target].filter((p) => p !== ""));
+    if (held !== undefined) {
+      try {
+        recordLifecycle(hookRoot(), "stop-block", `${String(held.count)} piece(s) of work stand at ${at}`);
+      } catch {
+        // a hook must never break the turn
+      }
+      return {
+        block: true,
+        reason:
+          `[se] ${String(held.count)} piece(s) of work stand open at ${at}, starting with “${held.first}”. ` +
+          "THERE IS STILL WORK HERE — carry on with what you are doing. " +
+          "The engine will refuse to leave this state while any of them stands, so stopping now hands back a walk that cannot move. " +
+          'Finish each one and close it with se_work {act: "settle", id, comment}, or move it where it will be done. ' +
+          `${SANCTIONED}`,
+      };
+    }
+    const sanctioned = notchSanction(notch, last, at);
+    if (sanctioned !== undefined) return pass(sanctioned[0], sanctioned[1]);
     if (nothingRouted(notch, target, pull, at)) {
       return pass("nothing routed", `no target, and the pull answered "${pull}"${at === "" ? "" : ` at ${at}`}`);
     }

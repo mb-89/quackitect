@@ -10,7 +10,7 @@ import { spawn } from "node:child_process";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { contentHash } from "./hash.ts";
 import type { MachineDecl, StateDecl } from "./machine.ts";
-import { readNode } from "./notes.ts";
+import { readNode, writeEpoch } from "./notes.ts";
 import { resolveInRoot, seDir } from "./paths.ts";
 import { openOperation, settleOperation } from "./run.ts";
 import { evidenceKey } from "./sessionforms.ts";
@@ -35,6 +35,11 @@ export interface ScriptHost {
 
 export class Scripts {
   private readonly host: ScriptHost;
+
+  /** THE LAST VERDICT EACH STEP ACTUALLY REACHED, with the write count it was
+   *  reached at. A verdict is worth nothing if the next attempt cannot see it,
+   *  and that is what left a state the walk stands on judging itself forever. */
+  private readonly freshVerdict = new Map<string, { ok: boolean; stamp: string; writes: number }>();
 
   constructor(host: ScriptHost) {
     this.host = host;
@@ -233,6 +238,12 @@ export class Scripts {
       // memory; a step left deciding when the session ends needs the verdict on
       // disk or the repository cannot settle the word.
       this.host.recordVerdict(machine, s, ok, result.stamp);
+      // WHAT THE TREE LOOKED LIKE ONCE THIS VERDICT HAD LANDED, and the order
+      // is the whole of it. Recording the verdict WRITES the form, and that
+      // write moves the count — so a count taken a line earlier is stale by
+      // exactly one and can never match again. Measured: a battery passed with
+      // nothing written afterwards, and the next attempt still ran it again.
+      this.freshVerdict.set(key, { ok, stamp: result.stamp, writes: writeEpoch() });
       this.host.notifyChange();
       return { state: `${machine.id}/${s.id}`, script_result: result };
     })().finally(() => {
@@ -309,6 +320,32 @@ export class Scripts {
     // - THE SCRIPTS HAVE NOT MOVED. A verdict reached with a different script is
     //   a verdict about a different question.
     // see dsp-the-walk-knows-what-its-own-hops-cost.md#a-green-state-walked-over-keeps-its-verdict
+    // A VERDICT THE WALK IS STANDING ON IS STILL A VERDICT, while nothing has
+    // been written since it landed.
+    //
+    // WITHOUT THIS A STATE THE WALK LANDS ON CANNOT BE LEFT AT ALL. Each pull
+    // starts a judgment, answers before it finishes, and the next pull throws
+    // that answer away and starts another. The verdict lands every time and is
+    // consumed never, so the step reports `deciding` forever.
+    //
+    // MEASURED: five pulls at a verification whose battery is 128 s and whose
+    // recorded verdict already said passed. The walk never moved.
+    //
+    // THE GUARD IS THE WRITE COUNT, and it is what makes this safe. Re-judging
+    // a state the walk WORKS exists because the walk may have edited something.
+    // Where nothing has been written, there is nothing new to judge — and the
+    // moment anything is, the count moves and the next attempt runs for real.
+    // A shell command counts as a write to everything, so an edit the lane
+    // cannot see moves it too.
+    const landedFresh = this.freshVerdict.get(evidenceKey(machine, s.id));
+    if (
+      !passingThrough &&
+      landedFresh?.ok === true &&
+      landedFresh.writes === writeEpoch() &&
+      landedFresh.stamp === this.scriptStamp(scripts)
+    ) {
+      return undefined;
+    }
     if (passingThrough) {
       const stamp = this.scriptStamp(scripts);
       const held = this.host.evidence.get(evidenceKey(machine, s.id))?.script_result as { ok?: boolean; stamp?: string } | undefined;
@@ -342,9 +379,36 @@ export class Scripts {
   scriptStanding(m: MachineDecl, s: StateDecl): "passed" | "not passed" | "deciding" {
     const key = evidenceKey(m, s.id);
     this.dropIfGhost(key);
+    // THE SKIP TRUSTS THE DISK, SO THE CHECK MUST TOO. scriptStart above
+    // declines to re-run a judgment whose verdict stands on the form. A checker
+    // reading only memory then calls that same step not-passed, and the walk is
+    // refused for a hop nothing is ever going to run again.
+    //
+    // IT ONLY BITES ON A LONG ROUTE, which is what hid it: the sweep marks a hop
+    // walked-over when the route is more than one step, and only a walked-over
+    // hop takes the skip. A one-step aim ran the same judgment and passed.
+    // see dsp-the-walk-knows-what-its-own-hops-cost.md#a-green-state-walked-over-keeps-its-verdict
+    const onDisk = this.host.standingJudgment(m, s);
+    const stands =
+      onDisk !== undefined &&
+      onDisk.verdict === "passed" &&
+      onDisk.stamp !== "" &&
+      onDisk.stamp === this.scriptStamp([...(s.exit?.script ?? []), ...(s.entry?.script ?? [])]);
+    // A RUN IN FLIGHT OUTRANKS A STANDING PASS, and it has to.
+    //
+    // THE STAMP IS OVER THE SCRIPT LIST, NEVER THE TREE. So a pass recorded
+    // once matches that stamp forever, whatever the code does afterwards.
+    // Letting it answer while a run is deciding walks the machine straight
+    // past a check that is failing right now — measured: a battery recorded
+    // green at 17:23 carried the walk through a run that exited 1.
+    //
+    // THE SKIP BELOW IS NOT THE SAME BET. It answers only when NOTHING is
+    // running, so there is no fresher verdict to prefer. Here there is one
+    // being computed, and the honest answer is that it is not in yet.
     if (this.scriptRuns.has(key)) return "deciding";
     const r = this.host.evidence.get(key)?.script_result as { ok?: boolean } | undefined;
-    return r?.ok === true ? "passed" : "not passed";
+    if (r !== undefined) return r.ok === true ? "passed" : "not passed";
+    return stands ? "passed" : "not passed";
   }
 
   /** Any condition script currently running — the mirror's follow signal. */

@@ -6,7 +6,7 @@ statement: Draw what is inside the system and what is outside it. Everything cro
 ## Situation
 M2's opening move. Most specs forget to say what the system is FOR - and what it is NOT for.
 
-## Procedure
+## Procedure #work
 - Draw the boundary: what is inside, every neighbour outside, each interface named (informational or physical).
 - Intended use: one honest paragraph - who drives it, for what.
 - Excluded from intended use: the does-NOT-do list, one line each. This list is load-bearing: every later scope argument is settled by it.

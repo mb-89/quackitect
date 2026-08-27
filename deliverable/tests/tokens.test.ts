@@ -261,8 +261,17 @@ describe("the token set", { concurrency: true }, () => {
     const source = readFileSync(fileURLToPath(new URL("../engine/session.ts", import.meta.url)), "utf8");
     assert.match(
       source,
-      /completeState\(m,\s*inst,\s*stateId,\s*outcome,\s*now,\s*only,\s*\(\)\s*=>\s*new Set\(this\.claims\.recordDone\(m\)\)\)/,
-      "the guard must pass recordDone as a thunk — without it a bar only sees this instance's history",
+      /completeState\(m,\s*inst,\s*stateId,\s*outcome,\s*now,\s*only,\s*\(\)\s*=>\s*this\.greenNow\(m\)\)/,
+      "the guard must pass the green as a thunk — without it a bar only sees this instance's history",
+    );
+    // THE THUNK STILL ASKS THE CLAIMS, and it also takes off what is owed. A
+    // state signed before a token existed reads green by its claim and owes one
+    // by its store, and a bar reading the claim alone counted an unwalked
+    // branch as delivered.
+    assert.match(
+      source,
+      /private greenNow\([\s\S]{0,400}this\.claims\.recordDone\(m\)/,
+      "the green is still the claims, with owed work subtracted",
     );
     const kernel = readFileSync(fileURLToPath(new URL("../engine/machine.ts", import.meta.url)), "utf8");
     assert.match(kernel, /standsGreen\(k\.split\("->"\)\[0\]\)/, "the busbar test must ask standsGreen, not the history set alone");

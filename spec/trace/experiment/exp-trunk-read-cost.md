@@ -12,7 +12,7 @@ fallback: worktree copies of the method tree, the fan-out class returning
 verdict: holds
 measured: 2026-08-10 — spawn-per-read 47 to 54 ms per file; one long-lived batch reader 2.0 ms per file (20 files, 41 ms total); plain disk 0.5 ms
 folds_to: raid-dec-thin-tree carries the dated measurement — the bet holds in the batch-reader shape only, and no requirement moves
-promote: "none — WITHDRAWN 2026-08-16 by i11. It promoted a long-lived batch reader as the trunk-read shape, because a spawn per read cost 47 to 54 ms a file. i34 removed the reason: a closed record's folder stays on disk, so nothing is read out of git and there is no trunk read to shape. The 2.0 ms measurement stands for whoever needs a batch reader again."
+promote: "none — WITHDRAWN 2026-08-16 by i11. It promoted a long-lived batch reader as the trunk-read shape, because a spawn per read cost 47 to 54 ms a file. i34 removed the reason: a closed record's folder stayed on disk, so nothing was read out of git and there was no trunk read to shape. i63 PUTS A TRUNK READ BACK for records closed from now on — a folded file rather than a folder — so the reason i34 gave no longer holds. The 2.0 ms measurement stands, and the 33 call sites being routed through one element are where a batch reader would sit if one is wanted again. Nothing is un-withdrawn here; the withdrawal's stated reason is corrected."
 chunk: none — delta-compose belonged to a drawing that shipped, and the reads it would have shaped no longer happen
 source_refs:
   - rank-unknowns, the seeded pick

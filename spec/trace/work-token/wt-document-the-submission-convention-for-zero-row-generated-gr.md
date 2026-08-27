@@ -1,6 +1,6 @@
 ---
 id: wt-document-the-submission-convention-for-zero-row-generated-gr
-type: "[[work-token]]"
+type: "[[work]]"
 statement: "Document the submission convention for zero-row generated grids, including the required saved representation."
 ready_when: "ready when node-table forms or their documentation are changed"
 source: "note-6de480ea7fdb"

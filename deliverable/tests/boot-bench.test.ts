@@ -7,7 +7,7 @@ import { strict as assert } from "node:assert";
 import { test } from "node:test";
 import { itSeed } from "../engine/iterations.ts";
 import { Session } from "../engine/session.ts";
-import { freshRoot, gitInit, proofFor } from "./helpers.ts";
+import { freshRoot, gitInit, proofFor, workHere } from "./helpers.ts";
 
 test("with an open record standing, boot ends at the desk inside the bound, on boot's own reading", async () => {
   const root = freshRoot();
@@ -19,10 +19,20 @@ test("with an open record standing, boot ends at the desk inside the bound, on b
   s.setTarget("front_desk");
   const reads: string[] = [];
   let r = await s.pull();
-  for (let i = 0; i < 40 && r.pull === "read"; i++) {
-    const doc = r.document as { path?: string; content?: string };
-    reads.push(String(doc.path ?? ""));
-    r = await s.pull({ form: { read: proofFor(String(doc.content ?? "")) } });
+  for (let i = 0; i < 40; i++) {
+    if (r.pull === "read") {
+      const doc = r.document as { path?: string; content?: string };
+      reads.push(String(doc.path ?? ""));
+      r = await s.pull({ form: { read: proofFor(String(doc.content ?? "")) } });
+      continue;
+    }
+    // A REAL WALKER DOES THE STEP BEFORE IT PULLS AGAIN. Boot's own marked step
+    // holds prepare_desk shut until it is settled, so answering the reading
+    // alone never reaches the desk.
+    if (r.pull !== "do" || r.arrived === true) break;
+    if (r.refusal === undefined) break;
+    if (workHere(s) === 0) break;
+    r = await s.pull();
   }
   const elapsed = performance.now() - started;
   assert.deepEqual(

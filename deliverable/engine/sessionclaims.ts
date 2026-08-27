@@ -16,6 +16,7 @@ import { CLAUSES, Rejection } from "./errors.ts";
 import { contentHash } from "./hash.ts";
 import { claimFeeders, downstreamCone, fallenChain, type MachineDecl, reopenStates, type StateDecl } from "./machine.ts";
 import { compileMachineCached, resolveRef } from "./machines/compile.ts";
+import { type MintDemand, mint, privateHome } from "./workstore.ts";
 
 /** WHICH STATE OWES THE FORM THE PULL SERVES, from where the walk stands.
  *
@@ -40,8 +41,6 @@ import { visitState } from "./visit.ts";
 
 export { visitState };
 
-import { replayFile } from "./decisions.ts";
-import { shortId } from "./expmachine.ts";
 import {
   formTemplatePath,
   lintForm,
@@ -153,22 +152,32 @@ export class Claims {
     this.host = host;
   }
 
-  /** Open points of the BOUND record's decision graph — the jsonl is the
-   *  source, so the check survives engine reloads. Scoped to the work's
-   *  own states. */
+  /** WHAT A RECORD STILL OWES, and the answer is now always nothing here.
+   *
+   *  This used to replay the record's decision graph for open points. The graph
+   *  is gone — the work tokens say what is outstanding, and the leaving guard
+   *  is what holds a state shut over them.
+   *
+   *  IT STAYS AS A SEAM rather than being deleted at every caller: a record's
+   *  outstanding work is a real question, and the answer comes from the work
+   *  store now. */
   openRecordPoints(): { id: string; visit: string; brief: string }[] {
-    const sid = shortId(this.host.bound!.id);
-    const recorded = replayFile(join(this.host.bound!.path, "spec", "expeditions", this.host.bound!.id, "decisions.jsonl"));
-    // see dsp-walk-machine.md#a-visit-is-recorded-qualified
-    return recorded.open.filter((n) => visitState(n.visit) === sid || visitState(n.visit) === `${sid}-leave`);
+    return [];
   }
 
-  /** Pending notes whose text carries one of the markers — what a
-   *  no_pending_note condition holds against ("needs retro" gates
-   *  start_iteration; the retro's drain clears them). */
+  /** Pending notes a `no_pending_note` condition holds against.
+   *
+   *  MARKERS NARROW IT. A named marker blocks only on a note carrying it, which
+   *  is how one phrase can gate one state.
+   *
+   *  NO MARKERS MEANS EVERY PENDING NOTE. That is the kickoff's check (owner):
+   *  an iteration does not start while a retro owes a drain, and the retro owes
+   *  one for any note at all rather than for a phrase somebody remembered to
+   *  type. An empty list used to match nothing, so the condition read as
+   *  satisfied over a full inbox. */
   blockingNotes(markers: string[]): { ref: string; text: string }[] {
     return pendingNotes(seDir(this.host.machineRoot()))
-      .filter((n) => markers.some((m) => n.text.toLowerCase().includes(m.toLowerCase())))
+      .filter((n) => markers.length === 0 || markers.some((m) => n.text.toLowerCase().includes(m.toLowerCase())))
       .map((n) => ({ ref: n.ref, text: n.text }));
   }
 
@@ -934,8 +943,46 @@ export class Claims {
     const run = this.host.top();
     if (run?.decl.states.some((s) => s.id === name)) {
       reopenStates(run.decl, run.instance, [name], reason, new Date().toISOString());
+      this.routeTheFinding(name, reason);
     }
     return { reopened: name, why: reason.trim(), by, still_green: this.recordDone(m) };
+  }
+
+  /** A REOPEN'S REASON IS A FINDING, AND A FINDING NEEDS A PLACE.
+   *
+   *  A gate's verdict of reopen names states and reasons, and the reason used to
+   *  live in one form field. Nothing routed it to the state that would fix it,
+   *  and nothing said afterwards whether it was fixed — which is the failure
+   *  contract rule 5 names: the defect recorded accurately, and the work
+   *  continuing past it as though naming were fixing.
+   *
+   *  SO THE REASON MINTS A TOKEN AT THE REOPENED STATE. It holds that state shut
+   *  until somebody settles it, and the settle comment is what says what was
+   *  done about the finding.
+   *
+   *  IT IS STAMPED, SO A SECOND REOPEN IS A SECOND FINDING. Two reopens of one
+   *  state are two things somebody objected to, and matching them onto one token
+   *  would lose the later reason.
+   *
+   *  IT NEVER FAILS THE REOPEN. The claim has already fallen; a token about it
+   *  is worth less than the act, so a store that refuses does not undo the walk. */
+  private routeTheFinding(name: string, reason: string): void {
+    const now = new Date().toISOString();
+    const at = this.host.active().find((p) => p.slice(p.lastIndexOf("/") + 1) === name) ?? name;
+    const demand: MintDemand = {
+      source: "hand",
+      source_ref: `reopen/${name}/${now}`,
+      step: "",
+      statement: "Answer the reopening",
+      body: reason.trim(),
+      lifetime: "state",
+    };
+    try {
+      mint(privateHome(this.host.machineRoot()), at, [demand], now);
+      this.host.notifyChange();
+    } catch {
+      // A LINE ABOUT THE WORK IS WORTH LESS THAN THE WORK.
+    }
   }
 
   /** WHAT A REOPEN OF THIS STATE WOULD TAKE WITH IT.

@@ -12,13 +12,13 @@ costs ([[meth-damage-scale]]), and `how_likely` — this scale — says how
 probable the paying is. Both are ordinal words with tests, so a grade can be
 argued with, and neither wears a number nobody measured.
 
-## THE THREE LEVELS
+## THE THREE LEVELS #work
 
 - **expected** — it happens on the current course; only the timing is open.
 - **plausible** — one ordinary, nameable event produces it.
 - **conceivable** — it takes an unusual combination of independent things.
 
-## The test for each
+## The test for each #work
 
 - EXPECTED. Name the standing condition that produces it.
   - If that condition already holds today, the grade is expected.
@@ -27,7 +27,7 @@ argued with, and neither wears a number nobody measured.
 - CONCEIVABLE. The story needs two or more independent things to go wrong
   at once.
 
-## What the grade means per kind
+## What the grade means per kind #work
 
 - risk — how likely it comes true.
 - assumption — how likely it is false.
@@ -35,7 +35,7 @@ argued with, and neither wears a number nobody measured.
 - dependency — how likely it fails to arrive as promised.
 - decision — how likely it proves wrong.
 
-## NEVER A NUMBER
+## NEVER A NUMBER #work
 
 A percentage nobody measured reads exactly like one somebody did — the
 register's standing rule, kept. The corpus works the same way: FMEA rates

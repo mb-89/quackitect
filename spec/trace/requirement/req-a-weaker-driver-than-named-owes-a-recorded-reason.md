@@ -48,3 +48,20 @@ third named conflict both rest on.
 NOTHING MECHANICAL WOULD HAVE CAUGHT IT EITHER: the engine's coverage check
 operates at use-case granularity, not step granularity, so a use case with one
 requirement passes while six of its extensions go unread.
+
+## Addition — work tokens
+
+THE GRAIN BECOMES THE TOKEN. Each piece of work carries its own difficulty
+mark, so the comparison between what was named and what answered is made per
+work token rather than per milestone.
+
+THE RAISE IS THE SAME ACT SEEN FROM THE OTHER SIDE. A hand meeting work
+harder than its mark records the raise together with the hand that made it,
+and leaves the work open for a stronger one.
+
+THREE THINGS THE RECORD FORBIDS: attempting the work anyway, dropping it
+without saying so, and closing it as skipped without naming the strength it
+needs.
+
+THE HAND LEAST ABLE TO NOTICE IS THE ONE ASKED TO NOTICE, which is why the
+act is recorded rather than trusted.

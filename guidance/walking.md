@@ -88,6 +88,16 @@ still on the file.
 The happy path was walked for you, every hop to the next branching point.
 `here` is where you landed. Do the work, pull again.
 
+ENTERING A STATE, DO FOUR THINGS IN ORDER.
+
+1. Do the input work the state's guidance asks for.
+2. CHECK ALL THE WORK STANDING AT THAT STATE. Read every token there.
+3. Seed your own tokens for whatever else you mean to do here.
+4. Start work.
+
+THE CHECK COMES BEFORE THE SEEDING. A state can arrive with work already on it,
+and a token opened for something already standing counts one thing twice.
+
 OPTIONS RIDE A `do`. There is no separate `choose` instruction. Where the road
 splits, the options ride along with weight and openness. Answer
 `form: {"choice": "<to>"}` only when a routed goal needs that door. A LIST is
@@ -221,70 +231,68 @@ SIX ARGUMENTS RIDE EVERY LANE TOOL, the way `update` does.
 NOTHING CHECKS ANY OF IT, and the record marks `as` and `answered_by` as
 claims. `guidance/method/lane.md` carries why.
 
-## Narration — the update rides the call the ENGINE asks for
+## Narration — the work tokens ARE the log
 
-`update: {...}` on ANY lane call carries a decision-graph op.
+`se_work` is how you say what you are doing. Every act carries a COMMENT, and
+the store refuses an empty one.
 
-NARRATE WHEN THE ENGINE ASKS. It asks by warning that the toll is due, by
-refusing a call without one, or by nudging that the checklist has not moved.
-The rest of the time it is not asking, and you do not answer.
+- `se_work {act: "open", id: "", comment: "<what you are doing>"}` starts a
+  piece of work where the walk stands. The id comes back.
+- `se_work {act: "take", id, comment}` picks up work that already exists.
+- `se_work {act: "settle", id, comment}` ends it and records what happened.
 
-THE BAND IS ONE A MINUTE TO ONE EVERY FIVE. Above it you are filling the log;
-below it the log has gaps. Most calls therefore carry nothing.
+THE TOKENS LOG THEMSELVES. A token moving to taken says what began. A token
+settled says what happened. Those two sentences are the narration. Nothing else
+has to be written for the board to read.
 
-RIDING ONE ON EVERY CALL IS THE HABIT THIS RULE EXISTS TO STOP. Measured over
-one window: 1445 ops against 124 pulls, twelve per step of walking, none of
-them demanded.
+OPEN ONE PER PIECE OF WORK. Settle it when it lands. The hand that did the work
+is the only one who can write those two comments.
 
-YOUR FIRST ONE IS A PLAN, and it rides the pull that starts the work:
+SWITCHING WORK IS A SETTLE AND AN OPEN. Contract rule 4 carries that rule.
 
-    se_pull  update: {op: "plan", items: ["read the record", "fill the gate", "submit"]}
+THE TOKEN IS EPHEMERAL. It lives while its state lives and goes when the state
+is left. Opening one costs the record nothing.
 
-NOBODY WILL ASK YOU FOR IT. The toll only bites after minutes or calls have run
-out, so a short state can be walked start to finish with the log holding
-nothing but pulls. That is a silent walk, and on an unattended machine the log
-is the only witness there is.
+### A nudge asks whether the work in hand is still the work
 
-EVERY OP CARRIES `op`, and the shorthand below is not the payload. `{node,
-brief}` alone is refused with SE-C-120 saying `op: undefined`.
+Once a minute, a nudge rides the result and asks one question. Is the work in
+your hand still the work you are doing?
 
-- `{op: "plan", items}` starts the checklist, BEFORE the first edit of any
-  multi-step work. Check items off with `done` AS each lands.
-  - SIZE AN ITEM SO IT CAN CLOSE WHERE YOU STAND. The stall guard counts
-    updates since anything closed, so an item that cannot close makes every
-    later update look like a stall.
-  - AN ITEM NAMING A WHOLE MILESTONE IS NOT AN ITEM. It is the state you are
-    in. Plan the steps inside it, and plan again at the next one.
-- `{op: "fork", brief, items?}` opens a BLOCKING detour: the current item cannot
-  continue until it is fixed. Scope growth is another `plan`, not a fork.
-- `{op: "done" | "obsolete" | "revert", node, brief}` resolves a node.
-  Everything started gets resolved; abandoning silently is illegal.
-- `{op: "defer", node, to}` parks a point for the state that can do it.
-- `{op: "update", node, brief}` says what you are doing ON an item. The node is
-  required while a checklist stands. With nothing open, a bare update is right.
+- Still the same? Nothing is owed.
+- Strayed onto something else? Settle what is in your hand, then open the next
+  piece.
 
-THE BRIEF IS ONE LINE, 90 characters. A brief that chains three or more
-separator-joined parts is corrected rather than refused, and the result names
-the correction.
+IT NEVER REFUSES. A nudge rides a result that already succeeded. It costs the
+call nothing, and no answer is owed.
 
-- An `update` chain becomes the PLAN it wanted to be.
-- A `fork` chain STAYS a fork and its parts become that detour's items, named
-  by the first. A fork blocks the current item and a plan does not, so
-  rewriting the op would change what the call means.
-- A RESOLUTION's chained brief still refuses (SE-C-120): which part resolved
-  the node is not the engine's to guess.
+IT ASKS AT MOST ONCE A MINUTE. Asking on every call would be a toll wearing a
+question's clothes.
 
-THE STALL WARNS AT FIVE AND REFUSES AT TWELVE (SE-C-133), and the gap is the
-grace. The counter measures updates since anything CLOSED.
+A CHANGE OF WORK ANSWERS IT. Settling one piece and opening the next moves the
+id in hand, so the clock starts again there.
 
-HOW OFTEN IS THE PERSON'S CONTROL, on the mirror's bar. Five notches, both
-clocks running — minutes and calls, whichever falls due first. A low notch is
-them asking to see the work, not a tax to pay with filler.
+### The update field is gone, and the tokens are the whole log
 
-THE READING LOOP PAYS NOTHING. A pull carrying only a read proof does not spend
-a call: the machine forced the hop and no judgment happened on it. The minutes
-clock still runs, and a pull carrying evidence beside the proof pays like any
-other work.
+THERE IS NO `update` FIELD. It carried an op on a second graph that said what
+the hand was doing, beside the tokens already saying it. A reader watching the
+board had to read both to know either.
+
+SO A CHECKLIST IS SUB-TOKENS NOW. A piece of work broken into parts is parts,
+on the surface the person already reads, settled the way anything else is.
+
+OWNER RULING: the graph was only a display for a person, it was never as good
+as the editor is now, and it comes out.
+
+WHAT WENT WITH IT: the ops `plan`, `fork`, `done`, `obsolete`, `revert`,
+`defer` and `update`; the clauses SE-C-120, SE-C-121, SE-C-122 and SE-C-133;
+and the details pane that drew the tree.
+
+WHAT DID NOT: every act on a token still logs itself, because every act on a
+token is a lane call and the feed reads the call log.
+
+A CHECKLIST YOU STARTED IS EXPECTED TO CLOSE. Twelve updates with nothing
+closed is refused (SE-C-133), and a nudge warns at five. That is about the
+checklist you chose to run. It is never about how often you narrate.
 
 ## Stopping, and looking at the surface
 
@@ -303,7 +311,14 @@ THREE VERBS ARE LEGAL WHEREVER THE WALK STANDS, because none of them is a move.
 
 ## Notes
 
-- `se_note {text}` captures a stray anywhere; keep walking.
+A WORK TOKEN IS THE DEFAULT AND A NOTE IS THE EXCEPTION (contract rule 4). A
+note is for the next RETRO — a doubt about the process, a lead nobody can act
+on yet, something to discuss.
+
+THE TEST IS ONE QUESTION. Can you name the state where the thing gets done?
+Then it is `se_work {act: "open"}`, and `at` names that state.
+
+- `se_note {text}` captures a retro-bound stray anywhere; keep walking.
 - A NOTE IS PROSE AND THE WALL GUARD BINDS IT. One paragraph of six hundred
   characters is refused with SE-C-125. Break it into paragraphs as you write.
 - `se_note_drain {ref, disposition}` takes one back out.

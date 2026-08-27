@@ -10,7 +10,7 @@ import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, test } from "node:test";
-import { setSource, toggleProperty } from "../engine/bases.ts";
+import { setSource, setViewFilters, toggleProperty } from "../engine/bases.ts";
 import { basesCard, HELP_TOPICS, helpFor, propertyInventory } from "../engine/baseui.ts";
 import { GLOBALS } from "../engine/expr.ts";
 import { type Row, Vault } from "../engine/vault.ts";
@@ -59,9 +59,9 @@ describe("the property inventory", () => {
 });
 
 describe("the toolbar carries only what works", () => {
-  test("Sort and Properties are there", () => {
+  test("Filter, Sort and Properties are there", () => {
     const html = card(vault());
-    for (const label of ["Sort", "Properties"]) assert.ok(html.includes(`${label}</button>`), label);
+    for (const label of ["Filter", "Sort", "Properties"]) assert.ok(html.includes(`${label}</button>`), label);
   });
 
   test("the view name and the count sit on one line, once", () => {
@@ -73,7 +73,6 @@ describe("the toolbar carries only what works", () => {
   });
 
   const absent: [string, string][] = [
-    ["Filter", "Filter"],
     ["Search", "Search"],
     ["the New button", "bs-new"],
     ["the view switcher", "bs-view-btn"],
@@ -173,6 +172,117 @@ describe("help is a detail, and the function list is generated", () => {
 
   test("an unknown topic answers rather than throwing", () => {
     assert.match(helpFor("nothing-like-this").html, /No help is written/);
+  });
+});
+
+// THE FUNNEL IS THE FILTER, AND IT IS IN EVERY BASE VIEW because it is drawn by
+// the one block builder every card goes through. Its own rule: what it cannot
+// read, it shows raw rather than approximating — a redrawn filter that quietly
+// asks something else is the failure this whole card is built to avoid.
+describe("the funnel — filter by", () => {
+  /** The popover's own markup, stopping before the blank templates at its end. */
+  const filterBox = (html: string): string =>
+    html.slice(html.indexOf('<div class="bs-pop" data-pop="filter"'), html.indexOf('<template class="bs-cond-tpl">'));
+
+  const unesc = (s: string): string =>
+    s
+      .replace(/&quot;/g, '"')
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">")
+      .replace(/&amp;/g, "&");
+
+  const TWO_GROUPS = { and: ["price > 5", { or: ['status == "open"', 'status == "closed"'] }] };
+
+  const filtered = (tree: unknown): { root: string; rows: Row[] } => {
+    const v = vault();
+    setViewFilters(v.root, "v.base", "Everything", tree as never);
+    return v;
+  };
+
+  test("the funnel is on the toolbar and opens its own popover", () => {
+    const html = card(vault());
+    assert.match(html, /<button type="button" class="bs-tool" data-pop="filter" data-help="filter">/);
+    assert.match(html, /<svg[^>]*><path fill="currentColor" d="M2 2h12/, "the icon is a funnel");
+    assert.match(html, /<div class="bs-pop" data-pop="filter"[^>]*hidden>/);
+    assert.match(html, /class="bs-pop-title bs-helpable" data-help="filter">Filter by</);
+  });
+
+  test("a view with no filter draws one group holding one blank condition", () => {
+    const box = filterBox(card(vault()));
+    assert.equal((box.match(/class="bs-group"/g) ?? []).length, 1);
+    assert.equal((box.match(/class="bs-row bs-cond"/g) ?? []).length, 1);
+    assert.match(box, /<option value="" selected>Property<\/option>/);
+  });
+
+  test("a stored two-group filter draws both, and the second holds two conditions", () => {
+    const box = filterBox(card(filtered(TWO_GROUPS)));
+    assert.equal((box.match(/class="bs-group"/g) ?? []).length, 2);
+    assert.equal((box.match(/class="bs-row bs-cond"/g) ?? []).length, 3);
+    assert.match(box, /<option value="price" selected>/);
+    assert.match(box, /<input class="bs-val" type="text" placeholder="value" value="open">/);
+  });
+
+  test("and joins the groups, or joins the rows, and both words are in the markup", () => {
+    const box = filterBox(card(filtered(TWO_GROUPS)));
+    assert.equal((box.match(/class="bs-join">and</g) ?? []).length, 2, "one and per group");
+    assert.equal((box.match(/class="bs-join">or</g) ?? []).length, 3, "one or per condition");
+  });
+
+  test("a leaf the builder cannot read draws raw, and says where to edit it", () => {
+    const box = filterBox(card(filtered({ and: ["price * 2 > age"] })));
+    assert.match(box, /class="bs-group bs-group-raw"/);
+    assert.match(box, /price \* 2 &gt; age/, "the expression is shown as written");
+    assert.match(box, /query panel/);
+    assert.ok(!box.includes('class="bs-prop"'), "no builder row pretends to hold it");
+    assert.match(box, /data-raw="&quot;price \* 2 &gt; age&quot;"/, "and it is posted back verbatim");
+  });
+
+  test("the operator list is the property's type, and only that", () => {
+    const box = filterBox(card(filtered({ and: ["price > 5"] })));
+    assert.match(box, /<option value="gt" selected>/, "a number offers greater than");
+    assert.ok(!box.includes('value="startsWith"'), "and never the string-only operators");
+  });
+
+  test("the value box is gone where the operator takes none", () => {
+    const box = filterBox(card(filtered({ and: ["status.isEmpty()"] })));
+    assert.match(box, /<option value="isEmpty" selected>/);
+    assert.match(box, /class="bs-val"[^>]*hidden>/);
+  });
+
+  test("an operator the file carries is kept even where the type would not offer it", () => {
+    const box = filterBox(card(filtered({ and: ['price.startsWith("1")'] })));
+    assert.match(box, /<option value="startsWith" selected>/, "the stored operator is never dropped behind the reader");
+  });
+
+  test("the operator offer rides the popover, per type, rather than being redeclared", () => {
+    const m = /data-ops="([^"]*)"/.exec(card(vault()));
+    assert.ok(m !== null, "the client reads the vocabulary off the markup");
+    const ops = JSON.parse(unesc(m[1])) as Record<string, { id: string }[]>;
+    assert.ok(ops.number.some((o) => o.id === "gt"));
+    assert.ok(!ops.number.some((o) => o.id === "startsWith"));
+    assert.ok(ops[""].some((o) => o.id === "is"));
+    assert.ok(!ops[""].some((o) => o.id === "gt"), "no property picked offers only the type-free operators");
+  });
+
+  test("Add condition and Add group have a template to clone from", () => {
+    const html = card(vault());
+    assert.ok(html.includes("+ Add condition"));
+    assert.ok(html.includes("+ Add group"));
+    assert.match(html, /<template class="bs-cond-tpl">/, "so Add works with no row on screen to copy");
+    assert.match(html, /<template class="bs-group-tpl">/);
+  });
+
+  test("a two-group filter narrows the rows the card actually draws", () => {
+    const v = filtered({ and: [{ or: ['status == "open"', 'status == "closed"'] }, "price > 5"] });
+    assert.match(card(v), /class="bs-count">1 result</, "both notes pass the first group, one passes the second");
+  });
+
+  test("the filter help says what and and or mean here", () => {
+    const html = helpFor("filter").html;
+    assert.match(html, /ORed/);
+    assert.match(html, /ANDed/);
+    assert.match(html, /EXPRESSION/);
+    assert.match(html, /RAW/);
   });
 });
 

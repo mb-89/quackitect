@@ -8,6 +8,45 @@ statement: The owner's design input for work tokens, captured as given, state by
 
 Captured as the owner gave it. This file grows as the walkthrough continues.
 
+## A BUILDING STATE READS ITS DESIGN INPUT, AND THE MACHINE MAKES IT
+
+Owner ruling, given after a surface was built three times from memory of a
+conversation while the file specifying it sat unread in the same record.
+
+THE RULE: when the engine mints a build step, that step carries the design
+input, and the design input is READ. It arrives as work in the input bucket,
+which blocks, so building cannot start before it.
+
+IT IS MECHANICAL, NEVER A SENTENCE IN A CARD. The rule was already knowable and
+was broken anyway, which is the standing argument for a mechanism.
+
+WHAT COUNTS AS A BUILDING STATE: one that can write. A state holding a write
+verb is a state whose work rests on the design input, and that is derivable
+from the state itself rather than from a list somebody maintains.
+
+### AND THE READING RUNS THE WHOLE TRACE, BOTTOM TO TOP
+
+Owner ruling, in the same breath. The reading owed is not the design input
+alone. It is everything the thing being built traces to, upward, to the root.
+
+THE CHAIN IS ALREADY MAPPED, in `deliverable/engine/bin/record-inspect.ts`:
+a test spec verifies a requirement, a design spec realizes one, a requirement
+refines a use case, a use case refines a story. That map is the one source and
+is not to be written a second time.
+
+WHAT IT COSTS, measured on this record rather than guessed: 36 requirements
+were minted here, and the design specs, use cases and stories above them bring
+the chain to roughly sixty documents. Every building state would owe all of
+them as input work.
+
+THAT NUMBER IS THE OPEN QUESTION, and it is the owner's. Sixty blocking input
+items per building state may be exactly the intent, since a state nobody can
+work without reading its whole justification is the point. It may equally want
+narrowing to the chain above what THAT state builds, which needs each building
+state to name its own anchor in the trace.
+
+NEITHER IS BUILT. The design-input half is built and the chain half is not.
+
 ## Rulings on the sketch itself
 
 ### The unit stands
@@ -138,9 +177,12 @@ Every state has TWO SLOTS.
 A state may have tokens in one slot and none in the other. The front desk has
 incoming tokens only, and nothing in its outgoing slot.
 
-## READ EVIDENCE IS GLOBAL, AND THE TOKEN IS NOT
+## READ EVIDENCE IS TO BE GLOBAL, AND THE TOKEN IS NOT
 
-Reading a document produces evidence, and that evidence is stored GLOBALLY.
+Reading a document produces evidence, and that evidence is to be stored
+GLOBALLY. THAT IS A TARGET OF THIS DESIGN RATHER THAN A PROPERTY IT INHERITS,
+and an earlier wording here read as a statement about today. The engine keys
+read evidence per reading hand and does not carry it across a restart.
 
 ENTERING A STATE TWICE DOES NOT MEAN READING TWICE. Arriving at the front desk
 a second time asks for nothing that was already proven.
@@ -150,7 +192,7 @@ a state it works out which reading that state requires, checks what is already
 proven, and builds tokens for the remainder and nothing else.
 
 THIS IS WHY DELETING AN EPHEMERAL TOKEN LOSES NOTHING. The token is per-entry
-and disposable. The evidence is global and durable. The two have different
+and disposable. The evidence is to be global and durable. The two have different
 lifetimes on purpose.
 
 ## A CONSTRAINT ON WHAT A STATE CARRIES
@@ -185,12 +227,24 @@ tokens. That is what pulling means.
 The reading request stops being a special shape of answer and becomes an
 ordinary incoming-slot token like any other.
 
-## READ EVIDENCE IS ALREADY VERSION-KEYED
+## READ EVIDENCE IS ALREADY VERSION-KEYED, AND IT IS NOT YET GLOBAL
 
 The engine already keys read evidence to the version of the file, and a changed
-file brings the requirement back.
+file brings the requirement back. That half is built and needs nothing.
 
-NOTHING NEW IS OWED HERE. This design does not have to solve it.
+THE GLOBAL HALF IS NOT BUILT, and an earlier wording here said nothing new was
+owed. That was wrong, and an independent reviewer found it by reading the code.
+
+WHAT THE CODE ACTUALLY DOES. A reading proof belongs to the HEAD that read,
+never to the record. The ledgers do not survive a restart, except the default
+reader's. The person's own checks live in memory. Every one of those is
+deliberate: a freshly spawned hand must re-owe what it has not read, and a hand
+does not survive a restart either, so its reading cannot.
+
+SO THE DESIGN DOES HAVE TO SOLVE SOMETHING. An input token minted only where
+the evidence is absent needs an evidence store that outlives the session, or
+the token is durable while the proof behind it is not. Which of the two moves
+is a design question and it is owed rather than answered.
 
 ## A METHOD'S STEPS BECOME OUTGOING TOKENS
 
@@ -446,9 +500,14 @@ kickoff is where scope is received and where it is routed.
 Looking at the iterations, each one carries a count. Fifty tokens here, sixty
 there, twenty on the third.
 
-THAT IS A SIZE NOBODY ESTIMATED. It is counted from what the record actually
-owes, and it answers the sizing question that was parked earlier without needing
-a t-shirt at all.
+THAT IS A NUMBER NOBODY ESTIMATED. It is counted from what the record actually
+owes.
+
+IT IS A GOOD INDICATION AND NOT A PRECISE SIZE. A count of tokens also tracks
+how finely a card's author cut their headings, so it is read as an indication
+rather than as a figure for comparing two records. An earlier wording here said
+it answered the sizing question outright without needing a scale at all; that
+stronger claim was withdrawn at the pressure test.
 
 IT ALSO MAKES THE POOL LEGIBLE. A token in the pool is unrouted scope. A token
 on an iteration is scope with a home. The difference between those two numbers is
@@ -825,7 +884,7 @@ now impossible by construction, which is the better kind of answer.
   where it is and leaves the owed count by being filtered out.
 - A PLACE CHANGE. Moved to another state. The token leaves the bucket.
 
-Both empty the bucket's obligation. Only one of them moves anything, and the
+Both empty the bucket's work token. Only one of them moves anything, and the
 engine has to hold that difference even though the surface shows the same number
 falling by one.
 

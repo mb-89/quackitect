@@ -69,6 +69,45 @@ document.addEventListener("click", async (ev) => {
     return;
   }
 });
+// A PLACE IS A STATE, so a heading in the work editor that names one is a door
+// to it. A bucket is a name somebody typed, and the server draws that as text.
+//
+// IT IS NOT A DOCLINK. A doclink carries a PATH and opens a document; this
+// carries a state id and moves the drawing, so it takes its own attribute and
+// its own handler rather than borrowing a name that already means something
+// else.
+//
+// THE READER KEEPS THEIR PLACE. Where the drawing on screen already holds the
+// state, the press is handed to that state and nothing else on the page moves —
+// the editor keeps its scroll, its ticked rows and its split.
+//
+// FOCUS IS NOT AN AIM. This selects a state the way a press on the state does.
+// It never targets one, and it never moves the walk.
+function stateOnScreen(id) {
+  const drawn = document.querySelectorAll("#machine-svg g.clickable[data-detail]");
+  for (const g of drawn) if (g.dataset.detail === "state:" + id) return g;
+  return null;
+}
+document.addEventListener("click", (ev) => {
+  const link = ev.target.closest ? ev.target.closest(".state-link") : null;
+  if (!link) return;
+  ev.preventDefault();
+  const id = link.dataset.state || "";
+  if (id === "") return;
+  const here = stateOnScreen(id);
+  if (here) {
+    here.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    return;
+  }
+  // ANOTHER MACHINE HOLDS IT, and a drawing cannot show a state it does not
+  // have. The view changes, and the editor's own place rides the URL so it
+  // comes back open at the same heading.
+  const machine = link.dataset.machine || "";
+  navigateTo(
+    "/?view=" + encodeURIComponent(machine) + "&detail=" + encodeURIComponent("state:" + id),
+    "loading " + (machine || id),
+  );
+});
 let CURRENT_DETAIL = null;
 // The last RELAYED card (help from another surface) — kept so a refresh
 // re-shows it instead of clobbering the reader's place.

@@ -6,6 +6,7 @@ statement: A plain-words keyword search over the lane's tools and guidance, with
 realizes:
   - el-walk-engine
 files:
+  - "deliverable/engine/bm25.ts"
   - deliverable/engine/help.ts
   - deliverable/engine/tools.ts
 ---

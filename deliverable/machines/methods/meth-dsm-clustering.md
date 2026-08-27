@@ -11,7 +11,7 @@ elements form a cohesive module.
 
 That is the M3 and M4 grouping call, which is otherwise pure judgment.
 
-## Effect
+## Effect #work
 
 Turns a judgment into a computed answer. The judgment is "this element sits
 here because it is tightly coupled to these".
@@ -34,7 +34,7 @@ The worked example is Pimmler and Eppinger 1994. A 16-element automotive
 climate-control-system DSM, clustered into both product modules and the
 matching team structure.
 
-## Procedure
+## Procedure #work
 
 Run a stochastic hill-climb over cluster assignments, in the cost and bid
 style of Thebeau 2001.

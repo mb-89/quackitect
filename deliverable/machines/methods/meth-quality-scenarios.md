@@ -6,7 +6,7 @@ statement: A quality demand becomes measurable when it is written as a six-part 
 ## Situation
 M3: qualities are requirements of kind quality, each carried by a scenario. The ISO 25010 tree is the elicitation aid - walk it to find the qualities that matter; write scenarios only for those.
 
-## The nine characteristics, walked as a checklist
+## The nine characteristics, walked as a checklist #work
 
 ISO/IEC 25010:2023 names nine. Each stands as a node in spec/trace/use-case/, carrying its own sub-characteristics.
 
@@ -30,10 +30,10 @@ closed-list rule in deliverable/machines/items/use-case.md. A quality requiremen
 `refines` one of the nine; it never gets a new use case or value prop of its
 own.
 
-## Form
+## Form #work
 - source (who/what initiates) | stimulus (the event) | artifact (what is hit) | environment (under which conditions) | response (what the system does) | response measure (the pass line, with tolerance).
 
-## Procedure
+## Procedure #work
 - The response measure is the requirement's pass line. No measure, no
   requirement.
 - A quality scenario is also a formulated example.

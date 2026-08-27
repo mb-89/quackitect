@@ -25,7 +25,7 @@ pointed at a RAID entry outright.
 So the content is real. Its home was wrong, and a second home for one kind of
 risk breaks the single-source rule.
 
-## What this means in practice
+## What this means in practice #work
 
 - map-stakeholders carries no tensions field. Its guidance is
   [[meth-stakeholder-analysis]].

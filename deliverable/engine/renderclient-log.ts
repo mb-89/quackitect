@@ -111,11 +111,7 @@ async function openLogDetail(ref) {
   }
   showDetails("log · " + (rec.tool || ref), jsonTable({ at: rec.ts, request: { tool: rec.tool, args: rec.args }, response: rec.response === undefined ? null : rec.response, duration_ms: rec.duration_ms }));
 }
-async function showDecisions(visit, sel) {
-  const r = await fetch("/api/decisions?visit=" + encodeURIComponent(visit));
-  DECISION_GRAPH = await r.json();
-  renderDecisions(sel);
-}
+
 function decisionsHtml(sel) {
   const g = DECISION_GRAPH;
   if (!g) return "";
@@ -167,13 +163,6 @@ async function showUpdateDetail(rec) {
   if (refused) rows.why = (res.expected ? String(res.expected) : "") + (res.got ? " — got " + String(res.got) : "") || "the narration was refused; the call it rode on still landed";
   rows.at_time = rec.ts;
   let html = '<div class="dinfo">' + jsonTable(rows) + "</div>";
-  if (a.visit) {
-    try {
-      const r = await fetch("/api/decisions?visit=" + encodeURIComponent(a.visit));
-      DECISION_GRAPH = await r.json();
-      html += decisionsHtml(a.node || res.active || null);
-    } catch (e) { html += '<div class="meta">the checklist could not be read: ' + escText(String((e && e.message) || e)) + "</div>"; }
-  }
   showDetails("update · " + rows.op + (a.node ? " " + a.node : ""), html);
 }
 // see dsp-mirror-render.md#the-loading-bar-owns-its-lifetime

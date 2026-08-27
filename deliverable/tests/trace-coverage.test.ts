@@ -145,7 +145,11 @@ describe("the live offer against the trace", () => {
     // overhaul sweep — the enumerator saw all three, se_couplings was already
     // traced, and the other two were reported as untraced until
     // uc-open-an-iteration and uc-take-a-step named them. The check working.
-    assert.equal(registeredVerbs().length, 44, "the lane's verb count moved — confirm the enumerator still sees every one");
+    // 45 WITH se_work, the door onto a work token. It was reported as untraced
+    // until uc-work-a-states-work-tokens-to-completion named it, which is the
+    // check working: the verb existed, and no use case said what anybody does
+    // with it.
+    assert.equal(registeredVerbs().length, 45, "the lane's verb count moved — confirm the enumerator still sees every one");
     assert.ok(traceText().length > 10000, "the trace read as good as empty — the path or the walk is wrong");
     assert.ok(traceText("use-case").length > 10000, "the use-case layer read as good as empty");
   });

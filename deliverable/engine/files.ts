@@ -17,7 +17,7 @@ import { guardParses } from "./guard.ts";
 import { contentHash } from "./hash.ts";
 import { lintFix } from "./lintfix.ts";
 import { forgetPath, parseStateNote, readNodeBytes, writeNode } from "./notes.ts";
-import { isExcluded, isRootRef, resolveDeclaredRoot, resolveForRead, resolveInRoot } from "./paths.ts";
+import { descendExcluded, isExcluded, isRootRef, resolveDeclaredRoot, resolveForRead, resolveInRoot } from "./paths.ts";
 import { guardNoSecondDoor } from "./pool.ts";
 import { search } from "./search.ts";
 import { guardNoUnregisteredEmitter } from "./widgets.ts";
@@ -851,7 +851,14 @@ export function fileGlob(
     for (const e of readdirSync(dir, { withFileTypes: true })) {
       const abs = join(dir, e.name);
       const rel = relative(base, abs).split(sep).join("/");
-      if (isExcluded(rootRef ? e.name : relative(root, abs))) continue;
+      const named = rootRef ? e.name : relative(root, abs);
+      if (isExcluded(named)) {
+        // AN EXCLUDED FOLDER IS STILL DESCENDED where an included path lies
+        // under it. Stopping at the first excluded name put the work store out
+        // of reach of every glob.
+        if (e.isDirectory() && descendExcluded(named)) walk(abs);
+        continue;
+      }
       if (e.isDirectory()) walk(abs);
       else if (rx.test(rel)) out.push(prefix + rel);
     }

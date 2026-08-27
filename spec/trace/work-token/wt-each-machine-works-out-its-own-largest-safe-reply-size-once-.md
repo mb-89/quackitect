@@ -1,6 +1,6 @@
 ---
 id: wt-each-machine-works-out-its-own-largest-safe-reply-size-once-
-type: "[[work-token]]"
+type: "[[work]]"
 statement: "Each machine works out its own largest safe reply size once, at start-up, and remembers it under a key that identifies that machine. Finding no entry, the opening sequence climbs a short ladder itself: double until a reply stops arriving whole, halve the step, keep the biggest that survived. Finding one, it reads the number and moves on. A guess is announced rather than applied quietly. On a cloud box the measured figure was more than six times the cautious default, and on this Windows machine no figure has ever been taken, so every reply of a whole session was chopped and handed back in slices."
 ready_when: "ready now — the owner asked for it on 2026-08-24 and it is the largest single cost measured on both machines"
 source: "note-551b05e18a77"

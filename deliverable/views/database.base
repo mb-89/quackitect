@@ -6,3 +6,6 @@ views:
       - description
     columnSize:
       file.path: 362
+    groupBy:
+      property: document
+      direction: ASC

@@ -16,6 +16,7 @@ import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { itFind, pinIteration } from "../engine/iterations.ts";
 import { Session } from "../engine/session.ts";
+import { privateHome, readWork } from "../engine/workstore.ts";
 import { checkDocs, freshRoot, gitInit } from "./helpers.ts";
 
 /** One session, positioned inside an iteration, with one claimful step
@@ -127,6 +128,41 @@ function signEveryClaim(root: string, id: string, decl: ReturnType<Session["curr
     writeFileSync(ev, `---\nsigned_off: ${at}\nby: agent\nauthors: human\n---\n\nthe claim, in full\n`, "utf8");
   }
 }
+
+// A REOPEN'S REASON IS A FINDING, AND A FINDING NEEDS A PLACE.
+//
+// A gate's verdict of reopen names states and reasons. The reason used to live
+// in one form field: nothing routed it to the state that would fix it, and
+// nothing said afterwards whether it was fixed. That is the failure contract
+// rule 5 names — the defect recorded accurately, and the work continuing past
+// it as though naming were fixing.
+test("a reopen leaves a work token at the reopened state, carrying the reason", async () => {
+  const { session, step, root } = await standingClaim();
+  const why = "the design no longer answers the requirement it was derived from";
+
+  session.reopenClaim(step, why, "agent");
+
+  const found = readWork(privateHome(root)).filter((i) => i.statement === "Answer the reopening");
+  assert.equal(found.length, 1, "the reason became one piece of work, not a sentence in a form");
+  assert.equal(found[0].body.trim(), why, "and it carries what the reopener actually objected to");
+  assert.equal(found[0].status, "open", "open, so it holds that state until somebody settles it");
+  assert.match(found[0].place, new RegExp(`(^|/)${step}$`), "placed at the state that has to answer it");
+});
+
+// TWO REOPENS ARE TWO OBJECTIONS. Matching them onto one token would keep the
+// first reason and lose the second, which is the same silence in a smaller box.
+test("a second reopen of one state is a second finding", async () => {
+  const { session, step, root } = await standingClaim();
+
+  session.reopenClaim(step, "the first objection", "agent");
+  session.reopenClaim(step, "a different objection entirely", "agent");
+
+  const bodies = readWork(privateHome(root))
+    .filter((i) => i.statement === "Answer the reopening")
+    .map((i) => i.body.trim())
+    .sort();
+  assert.deepEqual(bodies, ["a different objection entirely", "the first objection"]);
+});
 
 test("an amend rewrites a field and the signature does not move", async () => {
   const { session, decl, step, field, ev, signedAt } = await standingClaim();

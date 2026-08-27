@@ -46,3 +46,8 @@ actually says what it means.
 THE READING IS THE SAME BAR EITHER WAY. A model that cannot follow the
 mechanics is not a model that should be trusted with the judgment states, so
 nothing here argues for lowering what a state demands.
+
+<!-- Added by i63. -->
+
+- 2c. THE OBLIGATION IS HARDER THAN THE HAND HOLDING IT. Work carries how hard it is, and a weaker hand is given only what it can carry. Meeting one beyond it, the hand raises that mark and leaves it for a stronger hand, which is a recorded act rather than a silent skip.
+- 2d. THE FILTER, NOT THE STOP, IS WHAT THE GUARANTEE USES FIRST. Work the hand cannot carry is never offered, so the ordinary case is that judgment beyond the model is not reached at all. The guarantee's stop is the second line, and it fires where a mark was wrong and the hand met the work anyway.

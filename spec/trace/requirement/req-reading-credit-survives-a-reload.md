@@ -41,3 +41,20 @@ THE PARTICIPANT TEST. Three participants appear: the reader, the document and
 the store that holds the credit. The store is brought into being by the first
 credit written, and it survives the engine process. Nothing else appears from
 nowhere.
+
+## Addition — work tokens
+
+THE CREDIT IS SHARED ACROSS HANDS ON THE MACHINE, not only across a reload.
+A reading work token is minted only where the credit is absent, so a credit
+held by one hand and invisible to the next re-owes reading that was already
+done.
+
+TODAY IT IS NEITHER. deliverable/engine/sessionreads.ts line 88 says a proof
+belongs to the head that read, never to the record, and line 98 says the
+ledgers do not survive a restart except the default reader's.
+
+VERSION-KEYING ALREADY HOLDS. deliverable/engine/mirror.ts line 174 pins the
+check to the document's current hash, so an edited document asks again.
+
+THE KICKOFF GOAL ASSUMED BOTH HALVES. This addition is what makes the
+assumption true rather than a defect report.

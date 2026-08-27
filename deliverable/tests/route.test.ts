@@ -5,7 +5,7 @@ import { strict as assert } from "node:assert";
 import { test } from "node:test";
 import { computeRoute, type RouteNode } from "../engine/route.ts";
 import { Session } from "../engine/session.ts";
-import { craftDocs, freshRoot, GUIDANCE, readEverything } from "./helpers.ts";
+import { craftDocs, freshRoot, GUIDANCE, readEverything, workHere } from "./helpers.ts";
 
 /** A hand-drawn graph, so the search is tested without booting a machine. */
 function graph(edges: Record<string, string[]>, priority: Record<string, number> = {}) {
@@ -111,6 +111,13 @@ test("the sweep walks the whole way in one call, and every guard still fires", a
   const root = freshRoot();
   const s = new Session(root);
   s.setAutonomy(1);
+  // BOOT'S OWN MARKED STEP STOPS IT FIRST, because a state is not left while
+  // it holds open work. Do the step, the way a walker does, and sweep again —
+  // then the read proof is the thing standing in the way.
+  const held = await s.sweep("front_desk", "agent");
+  assert.equal(held.arrived, false, "an open step holds its state shut");
+  assert.deepEqual(s.active(), ["boot/prepare_desk"]);
+  assert.ok(workHere(s) > 0, "and the step is the fixture's to do");
   // WITHOUT the reading it stops, typed, exactly where the guard is.
   const short = await s.sweep("front_desk", "agent");
   assert.equal(short.arrived, false, "the read proof is not waived by sweeping");

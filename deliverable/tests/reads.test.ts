@@ -10,7 +10,7 @@ import { pulledFor, scanGuidance } from "../engine/pull.ts";
 import { renderMirror } from "../engine/render.ts";
 import { Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
-import { bootedServer, call, checkDocs, craftDocs, freshRoot, GUIDANCE, readOne } from "./helpers.ts";
+import { bootedServer, call, checkDocs, craftDocs, freshRoot, GUIDANCE, pullThrough, readOne } from "./helpers.ts";
 
 // THREE HOMES, NOT ONE. voice.md is about HOW YOU
 // TALK. It had accumulated rules about writing SOFTWARE and building
@@ -188,7 +188,9 @@ test("se_file_read credits too: reading the docs by hand carries the walk unaide
     const rr = await call(server, "se_file_read", { path, offset: 1, limit: 1 });
     assert.equal(rr.isError, false, JSON.stringify(rr.body));
   }
-  const walked = await call(server, "se_pull");
+  // BOOT'S OWN MARKED STEP IS STILL THE WALKER'S TO DO. Credits open the read
+  // gates; they do not settle work, and a state is not left while it holds any.
+  const walked = await pullThrough(server, session);
   assert.equal(walked.body.pull, "do", JSON.stringify(walked.body));
   assert.ok((walked.body.where as string[]).includes("front_desk"), "buffered credits carried the boot walk to idle");
 });
@@ -207,7 +209,7 @@ test("the reading buffer is per session: a second session earns it afresh", asyn
   // First entry: one read of the reading file carries the whole boot walk
   // to the session's default target, the desk.
   await call(server, "se_file_read", { path: ".se/reading.md" });
-  const first = await call(server, "se_pull");
+  const first = await pullThrough(server, session);
   assert.equal(first.body.pull, "do", JSON.stringify(first.body));
   assert.deepEqual(session.active(), ["front_desk"]);
 

@@ -14,10 +14,12 @@ where readers differ in how much they need. The voice's pyramid rule is
 this method applied to writing.
 
 **Steps, for a text.**
-1. TLDR or abstract at the top — the whole point in a few sentences.
-2. The high-level view next — the parts and how they relate.
-3. Deepening detail below, one level at a time.
-4. The fully detailed discussion last — the reader who arrives there
+1. TLDR or abstract at the top — the whole point in a few sentences. #work
+2. The high-level view next — the parts and how they relate. #work
+3. Deepening detail below, one level at a time. #work
+4. The fully detailed discussion last #work
+
+   the reader who arrives there
    wanted it.
 
 **The two criteria (Nielsen).** Get the SPLIT right — everything most

@@ -9,7 +9,7 @@ trigger: run the two-call probe below — it settles the direction now, and wait
 status: open
 impact: "A stale scoring table left standing is the worst outcome: it looks solid, it quotes its sources, and every quote answers a question nobody asks any more."
 breaks_how_badly: corrosive
-how_likely: possible
+how_likely: plausible
 source_refs:
   - wt-re-signing-an-answer-that-others-rest-on-knocks-those-others
 ---

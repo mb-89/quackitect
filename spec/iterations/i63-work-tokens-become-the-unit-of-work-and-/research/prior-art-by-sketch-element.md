@@ -284,7 +284,8 @@ status, a default closed status and a default duplicated status.
 
 The lean argument is that holding a stage until everything in it finishes sets
 the transfer batch to the whole stage. That argument assumes a stage RECURS. A
-milestone is walked once and its positions are never reused, so there is no next
+milestone is walked once and no second batch ever queues behind a
+position, so there is no next
 batch to delay.
 
 ## A STALL NEEDS A CLOCK

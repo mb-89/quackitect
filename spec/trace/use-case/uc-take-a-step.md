@@ -59,3 +59,7 @@ log rather than the message.
 - 5a. A required field is empty. The submit names which, and nothing is stamped.
 - 6a. The next state's entry conditions do not hold. The walk stops here and names what is missing.
 - 6b. The turn has to end while the walk still has legal work. Ending is refused until one of the sanctioned stops is named on the record, and one naming releases one stop.
+
+<!-- Added by i63. -->
+
+- 3b. THE STEP TURNS UP A DEFECT THAT BLOCKS NOTHING. The finding becomes work in its own right and is placed on the state that will fix it, rather than on a list somebody has to route afterwards. The walk continues, and the finding is owed where it will be done. It is 4c seen from the other end: the owed item still names an open register entry, and what changes is that it also sits where the fix happens.

@@ -11,7 +11,7 @@ documentation as a DOCUMENT.
 The war story to avoid is complete docs nobody understood. They diverged from
 reality, and the system was re-engineered.
 
-## Procedure
+## Procedure #work
 
 - Judge against the seven documentation qualities.
   - HELPFUL. Effort with it is less than effort without it.

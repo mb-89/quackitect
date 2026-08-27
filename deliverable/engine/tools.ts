@@ -14,8 +14,7 @@ import { join } from "node:path";
 import { benchmarkBind, benchmarkEnd } from "./benchmark.ts";
 import { setAnswerSpill } from "./bound.ts";
 import { CallLog, type CallPart, UNREPORTED } from "./calllog.ts";
-import { parseUpdate } from "./decisions.ts";
-import { CLAUSES, Rejection, type RejectionPayload } from "./errors.ts";
+import { CLAUSES, Rejection } from "./errors.ts";
 import { contentHash } from "./hash.ts";
 import { rankDemand, searchHelp } from "./help.ts";
 import { capJson } from "./jsonio.ts";
@@ -36,6 +35,7 @@ import { fileTools } from "./tools-file.ts";
 import { queryTools } from "./tools-query.ts";
 import { runTools } from "./tools-run.ts";
 import { laneAge, SE_VERSION } from "./version.ts";
+import { inHandAt } from "./workstore.ts";
 
 /** THE TICK — the machinery's one tool, legal in every state. */
 export function sessionTools(session: Session): ToolDef[] {
@@ -303,6 +303,48 @@ export function sessionTools(session: Session): ToolDef[] {
           args.machine === undefined ? undefined : String(args.machine),
           (args.ops ?? []) as AmendOp[],
           args.chain === true,
+        ),
+    },
+    {
+      name: "se_work",
+      title: "se.work",
+      description:
+        "OPEN a piece of work, PICK one up, END one, or RENAME what it is. Every act carries a COMMENT, and it cannot be empty.\n\nact: open MINTS A NEW PIECE OF WORK where it will be done. `at` names the position; leave it out and it lands where the walk stands.\n\nTHE COMMENT IS FOUR WORDS, A FORWARD SLASH, THEN THE DETAIL. The four words NAME the work and go on the bar beside the position. Everything after the slash lands in the token's body.\n\nWRITE THE DETAIL EVERY TIME. Four words cannot carry what was actually asked for, so a token holding only its name tells the next hand — a person, or another agent — nothing about what to do. Put the whole instruction there, in the words it was given in.\n\nOPEN IS HOW WORK A PERSON HANDS YOU BECOMES VISIBLE. An instruction given in conversation leaves no mark anywhere until it is opened, so the person cannot see that it arrived. Opened, it shows on the state, it holds that state until it is settled, and the person watches it go.\n\nact: take marks the item in_work and records what you are about to do. act: settle ends it and records what happened. A settle takes an optional status — done is the default; dropped or superseded say the work stopped rather than finished. act: restate carries the new statement in the comment.\n\nThe comment lands ON THE ITEM, never only in a log. The item is what somebody reads six months later.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          act: { type: "string", description: "open | take | settle | restate" },
+          details: {
+            type: "string",
+            description:
+              "OPEN only, and optional: the detail, where you would rather not put it after a slash in the comment. Same destination — the token's body.",
+          },
+          id: {
+            type: "string",
+            description: "the piece of work, by its id. OPEN takes none — send an empty string, and the id comes back.",
+          },
+          comment: {
+            type: "string",
+            description:
+              "open: what the work IS, in one line. take and settle: what you are about to do, or what happened. restate: the new statement. Never empty.",
+          },
+          status: { type: "string", description: "settle only: done (default) | dropped | superseded" },
+          at: {
+            type: "string",
+            description:
+              "open only: the position the work lands on. Omit it and the work lands where the walk stands, which is nearly always right. `backlog` is legal for work with no home yet.",
+          },
+        },
+        required: ["act", "id", "comment"],
+      },
+      handler: (args) =>
+        session.workAct(
+          String(args.act ?? ""),
+          String(args.id),
+          String(args.comment),
+          args.status === undefined ? undefined : String(args.status),
+          args.at === undefined ? undefined : String(args.at),
+          args.details === undefined ? undefined : String(args.details),
         ),
     },
   ];
@@ -588,11 +630,7 @@ function kickTypecheck(root: string): void {
 }
 const EDIT_TOOLS = new Set(["se_file_write", "se_file_patch", "se_file_replace", "se_file_move"]);
 
-export function buildServer(
-  root: string,
-  session = new Session(root),
-  tollOpts: { windowMs?: number; now?: () => number } = {},
-): McpServer {
+export function buildServer(root: string, session = new Session(root), tollOpts: { now?: () => number } = {}): McpServer {
   // WHERE AN OVERSIZED ANSWER SPILLS, so the bound can page rather than only
   // point. Machine-local and never committed.
   setAnswerSpill(seDir(root));
@@ -681,22 +719,7 @@ export function buildServer(
       return searchHelp(root, args.query, tools);
     },
   });
-  // THE UPDATE FIELD — every lane tool accepts it: a decision-graph op
-  // riding the call. Declared on every schema so harnesses send it as an
-  // object (an undeclared property arrives as a JSON string — v2 lesson).
-  const UPDATE_FULL = {
-    type: "object",
-    description:
-      'NARRATE AS YOU WORK — a decision-graph op riding this call. Every lane tool takes it.\n\nWHAT TO SEND, and each op is one line:\n  - plan {items} — start the state\'s checklist. Send this BEFORE your first edit of any multi-step work.\n  - update {node, brief} — say what you are doing ON an item. The node is REQUIRED while any item stands open; with nothing open, a bare update is right.\n  - done | obsolete | revert {node, brief} — resolve a node. Everything started gets resolved. Abandoning one silently is illegal.\n  - fork {brief, items?} — an unplanned branch opens where you stand, and the current item cannot continue until it is done. Scope that merely GREW is another plan, not a fork.\n  - defer {node, to} — park a point for the state that can do it. It arrives there as an open to-do.\n\nTHE FIRST ONE IS ALWAYS A PLAN. Example: update: {op: "plan", items: ["read the record", "fill the gate", "submit"]}.\n\nTHE BRIEF IS ONE LINE, 90 characters, one thing.\n\nEvery call answers with `update_result`, carrying the open node map and any nudge. A volunteered update resets the toll; when the toll lapses, the next call must carry one.',
-  };
-  // THE PROSE RIDES ONCE, ON se_pull. Stamping it on every tool made the same
-  // 1,206 characters half of the entire tool surface. What the v2 lesson above
-  // needs is the DECLARATION on every schema, never the prose, so every other
-  // tool carries a pointer instead and the typing is untouched.
-  const UPDATE_REF = {
-    type: "object",
-    description: "Narration op riding this call: {op, brief?, items?, node?}. Ops and rules: see se_pull.",
-  };
+
   // WHICH HAND IS CALLING — req-every-call-records-the-part-its-caller-played.
   // It rides every lane tool for the same reason `update` does: the answer is
   // about the CALL rather than about any one verb, and a coordinate a caller
@@ -735,7 +758,6 @@ export function buildServer(
   };
   for (const t of tools) {
     const props = t.inputSchema.properties as Record<string, unknown>;
-    props.update = t.name === "se_pull" ? UPDATE_FULL : UPDATE_REF;
     props.as = AS_PROP;
     props.relayed_by = RELAYED_BY_PROP;
     props.answered_by = ANSWERED_BY_PROP;
@@ -750,11 +772,7 @@ export function buildServer(
   );
   server.setAnswerSpillDir(seDir(root));
   const log = new CallLog(seDir(root));
-  const toll = new Toll({
-    ...tollOpts,
-    cadence: () => ({ minutes: session.narrationMinutes, calls: session.narrationCalls }),
-    openNodes: () => session.decisions.openNodeIds(),
-  });
+  const toll = new Toll(tollOpts);
 
   // Session read buffer: live se_file_read results feed later tick proofs.
   // Reads at a git ref are intentionally excluded.
@@ -786,94 +804,49 @@ export function buildServer(
   });
   // see dsp-lane-door.md#method-cannot-be-changed-from-inside-a-record
 
-  let updateComplaint: RejectionPayload | undefined;
-  let updateRejection: Rejection | undefined;
-  let updateResult: Record<string, unknown> | undefined;
-  server.addGuard((tool, args) => {
+  server.addGuard(() => {
     // see dsp-lane-door.md#every-external-call-is-a-new-drawing-epoch
     bumpDrawingEpoch();
-    updateComplaint = undefined;
-    updateRejection = undefined;
-    updateResult = undefined;
-    if (args.update === undefined) return;
-    const raw = args.update;
-    delete args.update;
-    try {
-      const { corrected, ...op } = parseUpdate(raw);
-      const visit = session.currentVisit();
-      const result = session.decisions.apply(visit, op);
-      // BOTH HALVES CAN CORRECT AT ONCE — the parser (a chained brief) and
-      // the apply (a closed node). Spreading would drop one silently.
-      const notes = [(result as Record<string, unknown>).corrected, corrected].filter((c): c is string => typeof c === "string");
-      updateResult = { ...(result as unknown as Record<string, unknown>), ...(notes.length > 0 ? { corrected: notes.join(" · ") } : {}) };
-      log.append({
-        tool: "se_update",
-        args: { via: tool, visit, ...op },
-        actor: "agent",
-        // THE CALL'S OWN COORDINATES, NOT THE UPDATE PAYLOAD'S. This read
-        // `raw` — the {op, node, brief} object — so an `se_update` record took
-        // its part and its answering model out of a place they never appear.
-        // Every one of them said `walker` and `unreported` however the caller
-        // declared itself, and a coordinate placed INSIDE the update object
-        // reached the record while bypassing the vocabulary guard entirely.
-        // `se_update` is the second most common tool in the log.
-        //
-        // FOUND BY A RED TEAM AT i38's implementation gate, by probing rather
-        // than reading: `as: "guide"` on the call, `walker` on the record.
-        ...whichHand(session, args),
-        ok: true,
-        outcome: "result",
-        duration_ms: 0,
-        response: result,
-      });
-      toll.paid();
-      // A DELEGATED HAND'S CHECKLIST IS ITS PROGRESS BAR. A `plan` says how many
-      // steps there are; a resolution says one landed. That is the only
-      // countable thing a spawned hand ever emits, and the work table's
-      // estimate is built from it.
-      //
-      // THE GUIDE'S OWN UPDATES ARE EXCLUDED ON PURPOSE. This session is not a
-      // background job, so counting its narration would advance whichever hand
-      // happened to be newest and report its manager's pace as its own.
-      const counted = whichHand(session, args).part;
-      if (counted === "walker" || counted === "reviewer" || counted === "researcher") {
-        const items = (op as { items?: unknown }).items;
-        const said = (op as { brief?: unknown }).brief;
-        noteAlive(
-          (op as { op?: string }).op,
-          Array.isArray(items) ? items.length : undefined,
-          counted,
-          typeof said === "string" ? said : undefined,
-        );
-      }
-    } catch (e) {
-      if (!(e instanceof Rejection)) throw e;
-      updateRejection = e;
-      updateComplaint = e.toJSON();
-      log.append({
-        tool: "se_update",
-        args: { via: tool, refused: true },
-        actor: "agent",
-        ...whichHand(session, args),
-        ok: false,
-        outcome: "rejected",
-        duration_ms: 0,
-        response: updateComplaint,
-      });
-    }
   });
 
-  // THE TOLL — armed after boot; one grace warning, then the refusal.
-  // THE PAYMENT'S OWN REFUSAL OUTRANKS THE TOLL (note-c883db8c6e12): a call
-  // that carried an update which failed to apply must hear what was wrong
-  // with the payment — the bare toll clause sent five identical resends
-  // into the same wall, live,.
+  // NOTHING IS DEMANDED AT DISPATCH. The toll arms itself after boot and asks
+  // for nothing, because a token taken and a token settled ARE the narration
+  // and both log themselves.
   server.addGuard((tool, args) => {
+    toll.check(session.isBooted(), tool, args);
+  });
+
+  // A PIECE OF WORK OPENED, TAKEN OR SETTLED IS THE PAYMENT. Every act carries
+  // a comment the store refuses to leave empty, which is the sentence the toll
+  // was ever asking for. see dsp-narration.md#the-toll
+  //
+  // IT PAYS ON THE WAY OUT, so only a SUCCEEDING act clears the debt. A refused
+  // one narrated nothing.
+  //
+  // AND IT RUNS BEFORE THE WARNING DECORATOR, so the call that pays is not also
+  // nagged for not having paid.
+  server.addDecorator((tool, result) => {
+    if (tool === "se_work") toll.paid();
+    return result;
+  });
+
+  // THE QUESTION ABOUT THE WORK IN HAND, asked at most once a minute.
+  //
+  // A PIECE OF WORK THAT HOLDS THE HAND FOR A LONG TIME IS TWO THINGS AT ONCE.
+  // Either it is genuinely one long piece of work, or the walker strayed onto
+  // something else and owes a token for it. Only the walker knows which, so
+  // the engine asks rather than guessing.
+  //
+  // IT RIDES A RESULT AND NEVER REFUSES. see dsp-narration.md#the-toll
+  server.addDecorator((_tool, result) => {
     try {
-      toll.check(session.isBooted(), tool, args);
-    } catch (tollErr) {
-      throw updateRejection ?? tollErr;
+      const hand = inHandAt(root, session.active());
+      toll.sameWork(hand?.id ?? "", hand?.statement ?? "");
+    } catch {
+      // A STORE THAT CANNOT BE READ ASKS NOTHING. A question is never worth
+      // failing a call the walker already got an answer to.
     }
+    return result;
   });
 
   // The grace warning rides the NEXT successful result (never a refusal).
@@ -978,28 +951,6 @@ export function buildServer(
     { onRefusal: true },
   );
 
-  // see dsp-write-guard.md#and-so-does-the-accepted-one
-  server.addDecorator((_tool, result) => {
-    const u = updateResult;
-    updateResult = undefined;
-    if (u === undefined || typeof result !== "object" || result === null || Array.isArray(result)) return result;
-    return { ...(result as Record<string, unknown>), update_result: u };
-  });
-
-  // The refused update rides home on the call it could not stop.
-  server.addDecorator((_tool, result) => {
-    const c = updateComplaint;
-    updateComplaint = undefined;
-    if (c === undefined || typeof result !== "object" || result === null || Array.isArray(result)) return result;
-    return {
-      ...(result as Record<string, unknown>),
-      update_refused: {
-        ...c,
-        note: "THE CALL WENT THROUGH — this update did not. Carry a corrected one on your next call; the toll is unpaid until you do.",
-      },
-    };
-  });
-
   // THE REPAIRED ARGUMENT NAME rides home on the call it saved.
   server.addDecorator((_tool, result) => {
     const r = argRepairs;
@@ -1038,6 +989,15 @@ export function buildServer(
   // FOUND BY A FRESH-EYES TESTER AT i38's verification, by probing the lane
   // rather than by reading the check — the case that was supposed to hold this
   // asserted on `append` directly, and the property is false one layer up.
+  // THE AGENT WORKING IS ACTIVITY, and the idle clock could not hear it.
+  //
+  // The clock only heard `notifyChange`, which fires when the WALK moves. An
+  // agent reading, searching and writing at the front desk moves nothing, so a
+  // shutdown counted down underneath a session that was plainly busy.
+  //
+  // EVERY LANE CALL RINGS IT, and this guard is the one place they all pass.
+  // see dsp-boot-and-power.md#what-survives-a-reload-and-what-does-not
+  server.addGuard(() => session.touchActivity());
   server.addGuard((tool, args) => {
     for (const key of ["as", "relayed_by"] as const) {
       const v = args[key];
@@ -1239,15 +1199,17 @@ export function buildServer(
       // very file they are already reading.
       response: rec.tool === "se_run" ? rec.response : capJson(rec.response, 500),
     });
-    // A DELEGATED HAND'S NARRATION IS ITS PROGRESS REPORT. A call that
-    // carried an update just proved a walking hand is still walking, so it
-    // refreshes the newest running agent job — the only cure for `statusOf`
-    // reading a busy hand's silence as idle.
-    // A GUIDE, THE OWNER OR THE SURFACE NEVER REFRESH ANYTHING: narrating
-    // ABOUT a walker is not the walker itself narrating.
-    if ((updateResult !== undefined || updateComplaint !== undefined) && (hand.part === "walker" || hand.part === "reviewer")) {
-      noteAlive();
-    }
+    // A DELEGATED HAND'S OWN CALL IS ITS PROGRESS REPORT. Any call it makes
+    // proves a walking hand is still walking, so it refreshes the newest
+    // running agent job — the only cure for `statusOf` reading a busy hand's
+    // silence as idle.
+    //
+    // IT USED TO KEY ON A NARRATION OP, and those are gone: a token opened,
+    // taken or settled IS the narration now, and it is one of these calls.
+    //
+    // A GUIDE, THE OWNER OR THE SURFACE NEVER REFRESH ANYTHING: acting ABOUT a
+    // walker is not the walker itself working.
+    if (hand.part === "walker" || hand.part === "reviewer") noteAlive();
     if (rec.ok && EDIT_TOOLS.has(rec.tool) && JSON.stringify(rec.args ?? {}).includes(".ts")) kickTypecheck(root);
   });
 

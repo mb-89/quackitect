@@ -1,8 +1,9 @@
-// The mirror's data contracts — what the page's client script consumes
-// keeps its shape: the decisions panel (checklist nodes, branches, and the
-// narration timeline), the feed's click keys, and the served page carrying
-// the renderers. Pinned after the blank-panel regression (owner order
-// 2026-07-27): a narrated visit must NEVER render empty.
+// The mirror's data contracts — what the page's client script consumes keeps
+// its shape: the feed's click keys, and the served page carrying the
+// renderers. Pinned after the blank-panel regression (owner order 2026-07-27).
+//
+// THE DECISIONS PANEL IS GONE, and its contract tests went with it. The work
+// tokens are what say outstanding work now, and the editor draws them.
 import { strict as assert } from "node:assert";
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -12,74 +13,6 @@ import { seDir } from "../engine/paths.ts";
 import { feedRows, renderMirror } from "../engine/render.ts";
 import { Session } from "../engine/session.ts";
 import { freshRoot } from "./helpers.ts";
-
-test("the checklist lives: plan opens nodes, done checks them off, fork branches", () => {
-  const s = new Session(freshRoot());
-  s.decisions.apply("idle@0", { op: "plan", items: ["first item", "second item"] });
-  let g = s.decisions.graph("idle@0");
-  assert.equal(g.nodes.length, 2);
-  assert.ok(g.nodes.every((n) => n.status === "open"));
-  const first = g.nodes[0];
-  s.decisions.apply("idle@0", { op: "fork", brief: "a surprise under the first item" });
-  g = s.decisions.graph("idle@0");
-  assert.equal(g.nodes.length, 3, "the fork branched the tree");
-  const forkNode = g.nodes.find((n) => n.brief.includes("surprise"))!;
-  s.decisions.apply("idle@0", { op: "done", node: forkNode.id, brief: "handled" });
-  s.decisions.apply("idle@0", { op: "done", node: first.id, brief: "shipped" });
-  g = s.decisions.graph("idle@0");
-  assert.equal(g.nodes.filter((n) => n.status === "done").length, 2, "checked off");
-  assert.equal(g.nodes.filter((n) => n.status === "open").length, 1, "one still open");
-});
-
-test("EVERY update changes the render: a bare update lands as a checked point (owner ruling)", () => {
-  const s = new Session(freshRoot());
-  s.decisions.apply("idle@0", { op: "update", brief: "hunting the bug" });
-  s.decisions.apply("idle@0", { op: "update", brief: "found it" });
-  const g = s.decisions.graph("idle@0");
-  assert.equal(g.nodes.length, 2, "each update is a visible point");
-  assert.ok(
-    g.nodes.every((n) => n.status === "done"),
-    "checked on arrival",
-  );
-  assert.deepEqual(
-    g.nodes.map((n) => n.brief),
-    ["hunting the bug", "found it"],
-  );
-  // An update aimed at an open plan item nests under it.
-  s.decisions.apply("idle@0", { op: "plan", items: ["one item"] });
-  const item = s.decisions.graph("idle@0").nodes.find((n) => n.status === "open")!;
-  s.decisions.apply("idle@0", { op: "update", node: item.id, brief: "working the item" });
-  const nested = s.decisions.graph("idle@0").nodes.find((n) => n.brief === "working the item")!;
-  assert.equal(nested.parent, item.id, "the point hangs under the item it narrates");
-});
-
-test("/api/decisions serves the panel's whole contract over HTTP", async () => {
-  const { startMirror } = await import("../engine/mirror.ts");
-  const root = freshRoot();
-  const session = new Session(root);
-  const planned = session.decisions.apply("idle@0", { op: "plan", items: ["item one"] }) as Record<string, unknown>;
-  const only = (planned.open_nodes as { id: string }[])[0].id;
-  session.decisions.apply("idle@0", { op: "update", node: only, brief: "narrating" });
-  const server = startMirror({ session, root, port: 0, log: new CallLog(seDir(root)), mode: "agent" });
-  await new Promise((r) => server.on("listening", r));
-  const port = (server.address() as { port: number }).port;
-  try {
-    const g = (await (await fetch(`http://127.0.0.1:${port}/api/decisions?visit=${encodeURIComponent("idle@0")}`)).json()) as {
-      visit: string;
-      nodes: { brief: string }[];
-      visits: string[];
-    };
-    assert.equal(g.visit, "idle@0");
-    assert.ok(g.nodes.length >= 2, "the checklist rides the wire");
-    assert.ok(
-      g.nodes.some((n) => n.brief === "narrating"),
-      "the update rides the wire as a checked point",
-    );
-    assert.ok(Array.isArray(g.visits));
-  } finally {
-    server.close();
-  }
-});
 
 test("feed rows carry the click keys the panel needs", () => {
   const root = freshRoot();
@@ -194,7 +127,10 @@ test("every card carries its number and the legend takes the empty slot", () => 
   const root = freshRoot();
   const html = renderMirror({ session: new Session(root), root, lastPacket: undefined, mode: "manual" });
   assert.match(html, /id="card-legend"/, "the legend is a card of its own");
-  assert.match(html, /grid-template-rows:repeat\(3,1fr\)/, "six cards make a two-by-three grid");
+  // THE ROW COUNT IS HALF THE CARDS, ROUNDED UP, and the literal is deliberate:
+  // declaring a card should make somebody look at this line rather than watch a
+  // derived assertion agree with whatever the code just did.
+  assert.match(html, /grid-template-rows:repeat\(4,1fr\)/, "eight cards make a two-by-four grid");
   assert.match(html, /<span class="cardnum"[^>]*>2<\/span>/, "cards carry the number that promotes them");
   // The default main card is the first AVAILABLE one — one rule, no exception
   // list. With no agent connected, the state machine leads.
@@ -443,120 +379,7 @@ test("the survey is offered as a legal tool, not as a button of its own", () => 
 // THE MAP RIDES EVERY UPDATE (note-792c32b5425e item 5). Resolving a node
 // needs its id, and the id used to be printed only by a REFUSAL - so the
 // way to see your own checklist was to name a node that does not exist.
-test("an update answers with the open nodes, so an id is never guessed", () => {
-  const s = new Session(freshRoot());
-  const planned = s.decisions.apply("idle@0", { op: "plan", items: ["first", "second"] }) as Record<string, unknown>;
-  const map = planned.open_nodes as { id: string; brief: string }[];
-  assert.equal(map.length, 2, "the plan answers with what it opened");
-  assert.deepEqual(
-    map.map((n) => n.brief),
-    ["first", "second"],
-  );
-  assert.ok(
-    map.every((n) => /^d\d+$/.test(n.id)),
-    "each carries the id a resolution needs",
-  );
-  // Closing one takes it off the map, so the map is never stale.
-  const after = s.decisions.apply("idle@0", { op: "done", node: map[0].id, brief: "landed" }) as Record<string, unknown>;
-  const left = after.open_nodes as { id: string; brief: string }[];
-  assert.deepEqual(
-    left.map((n) => n.brief),
-    ["second"],
-  );
-  assert.equal(after.open, 1, "and the count still agrees with the map");
-});
 
-// AN UPDATE THAT MOVES NOTHING ON THE CHECKLIST IS NARRATION WEARING
-// progress's clothes (owner, 2026-07-29, watching a board of yellow items
-// collect checked leaves underneath). This is only affordable because the
-// open node map now rides home on every call.
-test("an update names its item while a checklist stands, and is free when none does", () => {
-  const s = new Session(freshRoot());
-  // Nothing open - there is nothing to attach to, so a bare update is right.
-  const bare = s.decisions.apply("idle@0", { op: "update", brief: "before any plan" }) as Record<string, unknown>;
-  assert.equal(bare.update, "update");
-  const planned = s.decisions.apply("idle@0", { op: "plan", items: ["the item"] }) as Record<string, unknown>;
-  const only = (planned.open_nodes as { id: string }[])[0].id;
-  assert.throws(
-    () => s.decisions.apply("idle@0", { op: "update", brief: "floating free" }),
-    (err: unknown) => {
-      const r = err as { clause?: string; expected?: string };
-      assert.equal(r.clause, "SE-C-121");
-      assert.match(String(r.expected), /which item is this about/);
-      assert.match(String(r.expected), /the item/, "and the refusal names what is open");
-      return true;
-    },
-  );
-  // Named, it lands under the item it narrates.
-  s.decisions.apply("idle@0", { op: "update", node: only, brief: "on it" });
-  const nested = s.decisions.graph("idle@0").nodes.find((n) => n.brief === "on it")!;
-  assert.equal(nested.parent, only);
-  // ANOTHER STATE'S checklist is not this state's business.
-  const elsewhere = s.decisions.apply("front_desk@0", { op: "update", brief: "a different visit" }) as Record<string, unknown>;
-  assert.equal(elsewhere.update, "update", "an open list in another visit never blocks this one");
-});
-
-test("the checklist warns once when narration outruns it, then refuses", () => {
-  const s = new Session(freshRoot());
-  s.decisions.apply("idle@0", { op: "plan", items: ["first", "second"] });
-  // Each update NAMES its item - narration that moves nothing on the
-  // checklist is refused outright. This is about the item never CLOSING,
-  // which is a different failure.
-  const items = (s.decisions.apply("idle@0", { op: "update", node: "d1", brief: "starting" }) as Record<string, unknown>).open_nodes as {
-    id: string;
-  }[];
-  let last: Record<string, unknown> = {};
-  for (let i = 0; i < 4; i++)
-    last = s.decisions.apply("idle@0", { op: "update", node: items[0].id, brief: `working ${i}` }) as Record<string, unknown>;
-  assert.ok(typeof last.nudge === "string", "five updates with nothing closed earns the warning");
-  assert.match(String(last.nudge), /PROGRESS view/);
-  assert.equal(last.update, "update", "the warned call itself still lands - the warning is free");
-  // THE GRACE IS THE GAP BETWEEN THE TWO (i11, narration-grace). Both
-  // thresholds used to be five, so the warning and the refusal arrived one
-  // call apart - which is a two-stage refusal wearing a warning's clothes.
-  // Real work runs past six updates while reading its way to a root cause.
-  for (let i = 5; i < 12; i++) {
-    last = s.decisions.apply("idle@0", { op: "update", node: items[0].id, brief: `still working ${i}` }) as Record<string, unknown>;
-    assert.equal(last.update, "update", `update ${i + 1} is inside the grace and must land`);
-  }
-  // IGNORE IT LONG ENOUGH AND IT REFUSES. It took
-  // the toll's shape because advice lost: in one 15-hour window the nudge
-  // fired five times and was ignored five times.
-  assert.throws(
-    () => s.decisions.apply("idle@0", { op: "update", node: items[0].id, brief: "ignoring the warning" }),
-    (e: Error & { clause?: string }) => e.clause === "SE-C-133",
-    "the update after the grace runs out is refused",
-  );
-  // THE REMEDY IS NEVER REFUSED, or the refusal would be a trap with no way
-  // out. Closing something is always legal, and it clears the count.
-  const open = s.decisions.graph("idle@0").nodes.filter((n) => n.status === "open");
-  const closed = s.decisions.apply("idle@0", { op: "done", node: open[0].id, brief: "landed" }) as Record<string, unknown>;
-  assert.equal(closed.nudge, undefined, "closing something clears it");
-  const after = s.decisions.apply("idle@0", { op: "update", node: open[1].id, brief: "on to the next" }) as Record<string, unknown>;
-  assert.equal(after.nudge, undefined, "and the count starts again from there");
-});
-
-// DEFERRED MUST NEVER LOOK KILLED (owner design). A parked point is still
-// owed; it is simply owed in another state. The badge and the origin line
-// were already built, so this pins the one thing that was not: the style.
-test("a deferred point reads as owed elsewhere, never as struck out", () => {
-  const root = freshRoot();
-  const html = renderMirror({ session: new Session(root), root, lastPacket: undefined, mode: "manual" });
-  const rule = /\.dnode\.s-deferred \{([^}]*)\}/.exec(html);
-  assert.ok(rule, "deferred has a style of its own, not the default nothing");
-  assert.ok(!/line-through/.test(rule[1]), "a strike is what says a point died");
-  // The VARIABLE, not a literal: colour is configuration now, and a test
-  // pinning a hex would refuse the palette file the right to change it.
-  assert.match(rule[1], /var\(--se-accent\)/, "it keeps the open colour, because it is still owed");
-  assert.match(rule[1], /italic/, "and leans, because it is owed somewhere else");
-  // The arrow, distinct from the strike obsolete carries.
-  assert.match(html, /deferred: "→"/, "the badge is an arrow");
-});
-
-// A POPPED-OUT CARD IS A SNAPSHOT. The pop-out
-// opened a URL baked in at draw time, so it showed the server's default
-// while the live card showed whatever the reader had clicked — a state
-// against an answered question. Fifth time the reader's place was lost.
 test("a popped-out card opens on what it was showing, and then holds still", () => {
   const root = freshRoot();
   const html = renderMirror({ session: new Session(root), root, lastPacket: undefined, mode: "manual" });

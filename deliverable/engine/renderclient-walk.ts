@@ -184,9 +184,6 @@ function stateDetail(id) {
         + ((e.ruling || e.report) ? '<tr><td class="k">ruling</td><td class="v">' + escText(e.ruling || e.report) + "</td></tr>" : "")
         + '<tr><td class="k">report</td><td class="v"><a class="replink" data-exp="' + escText(e.id) + '" data-path="spec/expeditions/' + escText(e.id) + '/report.md" data-title="report · ' + escText(e.id) + '" title="click: modal · ctrl-click: new tab · shift-click: new window">report.md</a></td></tr>'
         + "</table>";
-      // The decision history, one expandable section per visit — the same
-      // tree the log click renders, collapsed by default.
-      html += '<div class="recdecisions" data-exp="' + escText(e.id) + '"><div class="meta">loading decisions…</div></div>';
     }
   }
   html += '<div class="statetodos" data-state="' + id + '"></div>';
@@ -257,6 +254,10 @@ const PLACE = [
   // up, so the flag spreads nowhere it does not belong.
   ["frozen", () => (FROZEN ? "1" : null)],
   ["embed", () => (EMBED_Q ? "1" : null)],
+  // THE EDITOR IS A PLACE TOO. Following a place heading out of the editor
+  // changes the machine on screen, and a reload that dropped the editor would
+  // reset one pane for an act performed in another.
+  ["work", () => (typeof window.seWorkAt === "function" ? window.seWorkAt() : null)],
 ];
 /** Carry the place onto a URL the reader is NAVIGATING to. */
 function withPlace(url) {

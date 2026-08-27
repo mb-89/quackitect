@@ -378,22 +378,40 @@ it costs to leave it, and stop.
 
 ## The steps
 
-1. Overhaul the method itself. Research, change or record the rejection, and
-   say what you compared against.
-2. Inventory. List what is active, because you cannot weed what you have not
-   listed.
-3. Run the machines. Every lint and the whole suite, collecting what fails.
-4. Scope the sweep. The rules that changed since the last overhaul, or
-   everything where none stands.
-5. Mark every candidate with its SORTED letter, and run the pattern checklist
-   beside it.
-6. Sort every finding into refactor, new function, defect or ruling.
-7. EXECUTE THE REFACTORS. All of them, in this run.
-8. Mechanise what a machine could have caught.
-9. SEED THE ITERATION for the new functions, one where one will do.
-10. Bring the rulings to the owner. Deletion is theirs.
-11. Write the report INTO THE COMMIT MESSAGE, under a subject beginning
-    `overhaul:`. That one act stamps the boundary and records the run.
+1. OVERHAUL THE METHOD ITSELF #work/method
+
+   Change it, or record the rejection. Say what you compared against.
+
+2. INVENTORY WHAT IS ACTIVE #work/inventory
+
+3. RUN THE MACHINES #work/machines
+
+   Every lint and the whole suite, collecting what fails.
+
+4. SCOPE THE SWEEP #work/scope
+
+   The rules that changed, or everything where none stands.
+
+5. MARK EVERY CANDIDATE #work/mark
+
+   Its SORTED letter, and the pattern checklist beside it.
+
+6. SORT EVERY FINDING #work/sort
+
+   Refactor, new function, defect or ruling. No fifth place.
+
+7. EXECUTE EVERY REFACTOR, IN THIS RUN #work/refactors
+
+8. MECHANISE WHAT A MACHINE COULD HAVE CAUGHT #work/mechanise
+
+9. SEED ONE ITERATION FOR THE NEW FUNCTIONS #work/seed
+
+10. BRING THE RULINGS TO THE OWNER, DELETION INCLUDED #work/rulings
+
+11. WRITE THE REPORT INTO THE COMMIT MESSAGE #work/report
+
+    Under a subject beginning `overhaul:`. That stamps the boundary.
+
 
 ## What the report has to carry
 

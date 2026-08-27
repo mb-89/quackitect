@@ -8,6 +8,7 @@ statement: Session guidance delivery is filtered by the active session mode befo
 realizes:
   - el-walk-engine
 files:
+  - "deliverable/engine/compaction.ts"
   - deliverable/engine/session.ts
   - deliverable/tests/pull-offer.test.ts
 ---

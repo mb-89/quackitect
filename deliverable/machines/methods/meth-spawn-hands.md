@@ -111,13 +111,18 @@ will - req-the-machine-names-a-driver-and-starts-nothing is a must graded
 fatal, and it groups that power with pushing and opening records unasked. The
 harness performs the spawn; the guide asks it to.
 
-SO THIS STATE IS TWO ACTS. Spawn the walker through the harness. Then declare
-it to the record with `se_run {agent: "<what it is for>", steps: <n>}`, which
-registers it in the job table. A reviewer or a researcher spawned later, at
-its own state, is declared the same way, there.
+SO THIS STATE IS THREE ACTS, and each one is a piece of work.
 
-THEN HAND THE WALKER ITS JOB ID, and tell it to narrate. A hand reports through
-the update system, which rides every lane call it already makes.
+1. Spawn the walker through the harness #work/spawn-the-walker
+2. Declare it to the record #work/declare-the-hand
+
+   `se_run {agent: "<what it is for>", steps: <n>}` registers it in the job
+   table. A reviewer or a researcher spawned later, at its own state, is
+   declared the same way, there.
+3. Hand the walker its job id, and tell it to narrate #work/hand-over-the-job
+
+   A hand reports through the update system, which rides every lane call it
+   already makes.
 
 ITS FIRST UPDATE IS A PLAN, and the number of items in that plan sets the
 length of the job. Each item resolved after that advances the bar by one.

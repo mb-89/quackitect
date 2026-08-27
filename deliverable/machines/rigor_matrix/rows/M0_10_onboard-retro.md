@@ -7,6 +7,7 @@ filled_by: agent
 same_as: retro
 depends_on:
   - spawn-the-hands
+entry_no_pending_note: []
 evidence:
   - name: field_feedback
     description: what came back from the field, or an explicit "nothing yet"
@@ -60,10 +61,29 @@ specification_note: |
 
 The seam this row adds: onboarding OPENS with the retro - the field-feedback question first - and the kickoff refuses while the inbox pends. Everything else about the retro is the referenced state's truth (same_as: retro), never restated here.
 
-AN EMPTY INBOX SKIPS THIS ROW. Survey first. If nothing pends, do not run it - pull onward.
+THE CHECK IS MECHANICAL NOW, and it is the whole of what this row adds to the
+walk (owner). Entering refuses while ANY note pends, because a pending note is
+a retro's undone work. No survey, no judgment, no phrase to remember.
 
-THE DOUBLE-FIRE IS WHY. A retro at the desk, then an iteration opened straight after, ran the whole retro twice within minutes with nothing left to drain the second time. The owner's words: "if the onboarding retro doesn't fire, then you just skip it. If we have just done a retro, we don't need another one."
+IT BINDS THE FIRST ENTRY AND ONLY THAT ONE. An entry condition is read on the
+way IN. Once the state has gone through green the walk does not re-enter it, so
+a note arriving later does not take the green away and does not reopen
+anything. Every later visit is a no-op.
 
-THE FIELD-FEEDBACK QUESTION IS NOT SKIPPED BY THIS. It was asked by the retro that emptied the inbox. What is skipped is asking it again in the same sitting.
+AN EMPTY INBOX SKIPS THIS ROW, and that is now what the condition PASSING means
+rather than something a hand decided. Nothing pends, the entry is met, the walk
+goes on.
+
+THE DOUBLE-FIRE IS WHY. A retro at the desk, then an iteration opened straight
+after, ran the whole retro twice within minutes with nothing left to drain the
+second time. The owner's words: "if the onboarding retro doesn't fire, then you
+just skip it. If we have just done a retro, we don't need another one."
+
+THE DRAIN HAPPENS AT THE DESK'S OWN RETRO. That is where the notes are read and
+dispositioned; this row only refuses to start on top of an inbox nobody has
+looked at.
+
+THE FIELD-FEEDBACK QUESTION IS NOT SKIPPED BY THIS. It was asked by the retro
+that emptied the inbox. What is skipped is asking it again in the same sitting.
 
 THIS IS THE CATCHING END OF THE EMIT. The previous record's `package` state filled `emit_back` with what it learned about the shared method. `promotions` is where that list is looked at and either landed or explicitly dropped. [[meth-emit-back]] holds both ends.

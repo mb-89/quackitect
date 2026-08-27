@@ -5,11 +5,15 @@ type: "[[function]]"
 cluster: the-record-life
 statement: state what work the session has under way that the caller cannot see, how far each piece has left to go, and what that estimate rests on
 satisfies:
+  - req-the-progress-account-is-derived-from-the-work-itself
   - req-one-call-reports-every-piece-of-work-out-of-sight
   - req-a-time-remaining-names-its-basis
   - req-responsiveness
 inputs:
+  - flow-settled-work
+  - flow-settled-entry
   - flow-work-under-way
+  - flow-wait-bound
   - flow-test-timings
 outputs:
   - flow-work-account
@@ -45,3 +49,17 @@ would have chosen the winner here.
 THE CONTROL IS THE HONEST PART. Whether any measurement exists is outside this
 function's gift, and it is the condition that decides whether a duration can be
 given at all.
+
+## Addition — work tokens
+
+THE ACCOUNT IS DERIVED FROM THE WORK, NOT NARRATED INTO A SECOND STRUCTURE.
+The work tokens already record when they opened and when they closed, so the
+progress they describe is computable rather than typed.
+
+THAT REMOVES A WHOLE MACHINERY. Measured over one window, 199 of 1233 calls
+were narration and none of it was work. On the worst measured walk the stall
+guard refused 59 times consecutively, every time on items that could not
+close from where the walk stood.
+
+A GUARD READING REAL WORK REFUSES FOR REAL REASONS OR NOT AT ALL. That is the
+difference between this account and the one it replaces.

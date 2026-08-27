@@ -453,6 +453,22 @@ export function corpusAsks(): number {
   return CORPUS_ASKS;
 }
 
+/** HOW MANY TIMES THE ASK ACTUALLY COST SOMETHING, which is a different
+ *  question from how many times it was asked.
+ *
+ *  An ask served from the pass is a map lookup. An ask that reaches the sweep
+ *  below stats every file in the corpus to decide whether to rebuild, and that
+ *  is the 22 ms a warm ask pays. Sixty-four of those is the per-hop second.
+ *
+ *  SO THE COUNT WORTH GUARDING IS THIS ONE. `corpusAsks` cannot tell a cheap
+ *  ask from an expensive one, so a loop that asks sixty-four times looks the
+ *  same before and after it is fixed. */
+let CORPUS_SWEEPS = 0;
+
+export function corpusSweeps(): number {
+  return CORPUS_SWEEPS;
+}
+
 /** ONE FILE, READ ONCE UNTIL IT MOVES — the same rule as the corpus, one
  *  level down.
  *
@@ -524,6 +540,7 @@ export function loadTrace(root: string): TraceNode[] {
   // lane write bumps the epoch, so a corpus built before it is never reused.
   const era = passEpoch();
   if (hit !== undefined && era !== 0 && hit.epoch === era) return hit.nodes.slice();
+  CORPUS_SWEEPS += 1;
   const files = traceFiles(traceDir(root));
   const stamp = corpusStamp(files);
   if (hit !== undefined && hit.stamp === stamp) {

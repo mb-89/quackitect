@@ -373,6 +373,26 @@ ten signed states that never heard about it. A changed question is a reopen.
 
 The rule is req-an-amend-leaves-the-tree-standing.
 
+#### A GATE IS NOT BLESSED WHILE THE RECORD STILL HOLDS OPEN WORK
+
+The leaving guard is PER STATE: a state's own open work holds that state. A
+gate asks a wider question, and it asks it under this clause.
+
+EVERY STATE INSIDE THE BOUND RECORD IS IN SCOPE. So a gate cannot be blessed
+while fix-findings, or any other state behind it, still holds something open.
+The refusal names the record and the work.
+
+EMERGENCY DOES NOT LIFT THIS ONE, and it lifts every other work hold. That is
+deliberate: with emergency armed a walk once reached a gate over ten open
+tokens, and nobody inside the engine objected.
+
+TWO PILES ARE OUT BY CONSTRUCTION rather than by a list. The BACKLOG sits
+outside every record's prefix, so it can never hold a gate. PENDING has never
+held anything, so a standing pool token does not either.
+
+THE WAY THROUGH IS TO SETTLE THE WORK OR MOVE IT. There is no override
+argument, and the refusal hands back the call that clears the first item.
+
 #### A LIST FIELD SENT AS A JSON ARRAY IS ACCEPTED AND LOSES EVERY ANSWER
 
 A per-item or list field takes ONE STRING with a line per item. Sending an
@@ -432,30 +452,43 @@ The walk stands where it is. Fix the drawing; the walk resumes.
 
 ## Narration
 
-### SE-C-040 — the toll is due
-Narration rides the work: an update on every call that changes something.
-When the toll lapses, the next call must carry one — resend the same call
-with the update field.
+### SE-C-040 — the toll, retired
+RETIRED. It refused the next call whenever narration lapsed. Nothing raises it
+now, and the number is not reused.
 
-### SE-C-120 — the update is malformed
-A brief is ONE line carrying ONE thought. A brief chaining three or more
-parts is an unrendered list, and the engine already computes the split.
+WHAT IT WAS FOR. A silent walk left the log with nothing in it. A floor on
+narration bought a sentence every few calls, so the record said what the hand
+was doing.
 
-WHAT IS CORRECTED, never refused:
+WHY IT IS GONE. Work tokens replaced the update. A token opened, taken or
+settled logs itself, and every act carries a comment the store refuses to leave
+empty. The narration is already in the record, so a floor has nothing left to
+enforce.
 
-- An `update` chain becomes the PLAN it wanted to be. The parts are the items.
-- A `fork` chain stays a FORK and the parts become its items, named by the
-  first. A fork blocks the current item and a plan does not, so rewriting the
-  op would change what the call means.
+WHAT STANDS IN ITS PLACE IS A QUESTION. When one piece of work has held the
+hand for a minute, the engine asks whether it is still the work in hand.
 
-WHAT STILL REFUSES: a RESOLUTION's chained brief. Which part resolved the
-node is not the engine's to guess.
+IT RIDES A GOOD ANSWER AND NEVER REFUSES. Nothing is counted, and no answer is
+owed. Strayed onto something else? Open a token for it. Genuinely one long
+piece of work? Carry on.
 
-### SE-C-121 — the node is unknown or resolved
-Updates name an OPEN node. Check the node map that rides every result.
+### Three retired clauses — the decision graph, once SE-C-120, SE-C-121 and SE-C-122
+RETIRED. None of the three numbers is reused, and nothing here claims them.
 
-### SE-C-122 — done over open children
-Everything started gets resolved. Resolve or re-home the children first.
+WHAT THEY WERE FOR. SE-C-120 refused a malformed update. SE-C-121 refused an
+update naming a node that was unknown or already resolved. SE-C-122 refused
+closing a node over open children.
+
+WHY THEY ARE GONE. The graph they guarded is gone. It was a second system
+saying what the hand was doing, beside the tokens already saying it, so a reader
+watching the board had to read both to know either.
+
+WHAT REPLACED IT: sub-tokens. A piece of work broken into parts is parts, on the
+surface the person already reads, and each settles the way anything else does.
+
+OWNER RULING: the graph was only a display for a person, it was never as good as
+the editor is now, and it comes out.
+
 
 ### The stop tooth refused your turn
 It is not a typed refusal — it arrives as hook feedback, not as a clause.
@@ -501,46 +534,27 @@ A WELL-SHAPED NAME NOTHING ANSWERS TO IS STILL ONLY MARKED. A park written
 inside a record names that record's own states, and those are drawn only while
 it is bound.
 
-### SE-C-133 — the checklist stopped moving
-Narration that never closes anything records intent, not progress.
+### A retired clause — the checklist stall, once SE-C-133
+RETIRED. The number is not reused, and no section here claims it.
 
-TWO THRESHOLDS, AND THE GAP BETWEEN THEM IS THE GRACE.
+WHAT IT WAS FOR. Narration that never closed anything recorded intent rather
+than progress, so a checklist standing open past twelve updates refused the
+next one.
 
-- FIVE updates with nothing resolved: a warning rides the result as a `nudge`.
-- TWELVE: the next non-resolving update refuses.
+WHY IT IS GONE. It guarded the decision graph's checklist, and the graph is
+gone. What holds a state shut over unfinished work is the leaving guard over
+its work tokens — and that one cannot be satisfied by narrating.
 
-THE GAP IS THE POINT. A warning one call ahead of the refusal is not a warning,
-it is a two-stage refusal — and the counter measures updates since anything
-CLOSED, which real work legitimately runs past while reading its way to a root
-cause.
+WHAT IT TAUGHT, kept because the shape outlives the mechanism. Measured on the
+i15 walk: 59 refusals, every one this clause, every one carrying the same two
+items — one that ended hours earlier and one that could not close until the
+iteration did. The work was real and the narration was honest. The ITEM was the
+wrong shape, and naming what was open sent the reader hunting for work to finish
+that did not exist.
 
-The way out is always open. A resolving op is never refused, because it is the
-remedy:
+SO SIZE A TOKEN SO IT CAN CLOSE WHERE YOU STAND. That rule survives the clause,
+and it now binds work tokens.
 
-- `done` — the item landed.
-- `obsolete` — it stopped mattering.
-- `revert` — it was undone.
-- `defer` — it belongs to a later state.
-
-The open node map rides every refusal, so the id you need is already in your
-hand. Nothing genuinely finished? Say what is actually blocking the item with
-`defer`, or close it `obsolete`. A checklist standing open for hours is the
-thing this stops.
-
-AN ITEM THAT SURVIVES TWO REFUSALS IS THE WRONG SHAPE, and the answer now says
-so by name. Surviving one refusal makes an item suspect; surviving two makes it
-wrong.
-
-THE FIX IS NOT ANOTHER RESOLVING OP. Such an item cannot close from where you
-stand, so there is no work to finish and no `done` to send. Drop it with
-`obsolete`, then send a FRESH PLAN whose items will close in THIS state.
-
-MEASURED ON THE i15 WALK: 59 refusals, every one SE-C-133, every one carrying
-the same two items — "walk boot reading loop", still open hours after boot
-ended, and "work milestones as served", which cannot close until the iteration
-does. The work was real and the narration was honest. The checklist was the
-wrong shape, and naming what was open sent the reader hunting for work to
-finish that did not exist.
 
 ### SE-C-135 — the write did not land as asked
 
@@ -588,6 +602,89 @@ A KIND FILTERS WHICH FIELDS EXIST. `id`, `type` and `statement` are always
 legal; everything else comes from that kind's own frontmatter, so two
 kinds rarely carry the same field list. Asking a raid entry for a
 requirement's `verify_method` is this clause, not a bug in the corpus.
+
+## Work
+
+### SE-C-149 — the close is not `done` and carries no reason
+A piece of work reaching `done` needs no reason. Every other terminal status
+does, and the reason lands ON THE ITEM rather than in a log.
+
+WHY THE ITEM AND NOT A LOG. The item is what a person reads six months later.
+A reason in a log is a reason nobody finds.
+
+THE REFUSAL NAMES THE STATUS IT REFUSED and hands back the same call with a
+`reason` on it. Nothing is written, so the item is exactly as it was.
+
+WHAT COUNTS AS A REASON is any non-empty text. The engine does not grade it,
+because a grader would be refusing on style and there is no honest bar.
+
+### SE-C-150 — a person must settle this one
+An item can be marked person-only. An agent settling one is refused, and the
+refusal names the rule rather than the field.
+
+THE LIMIT IS VISIBLE BEFORE ANYTHING IS ATTEMPTED. It stands on the item's own
+face, so a hand reads it rather than discovering it at a refusal. This clause
+is the backstop, not the notice.
+
+THE REMEDY IS NOT A FLAG. There is no override argument, on purpose. Ask the
+person, or move the item on.
+
+### A retired clause — the two models, once SE-C-151
+RETIRED. The number is not reused, and nothing here claims it: this is history,
+not a rule you can trip.
+
+WHAT IT WAS FOR. A tree carrying work in the current shape AND in an older one
+was refused, and the refusal named both shapes with a path to each. Two models
+means two counts, and two counts means every question about what is owed has
+two answers with nothing to choose between them.
+
+WHY IT IS GONE. Its only raiser was `checkOneModel`, one of eight work verbs
+that had no caller anywhere in the engine. The owner ruled them out on
+2026-08-27: "Remove them. We don't need that code. If we ever find that we
+needed them, we can read them."
+
+SO NOTHING CHECKS FOR A SECOND SHAPE NOW. That is a real gap and not a
+resolution, said plainly here rather than left to be discovered. The migration
+it would have caught is a migration nobody is watching for.
+
+THE RULE ITSELF STILL STANDS: work lives in one shape. What is gone is the
+mechanism that enforced it.
+
+### SE-C-153 — the title is more than four words
+A token NAMES its work. It does not describe it, and four words is the whole
+name.
+
+WHY IT IS MECHANICAL. The bar draws the piece of work in hand beside the
+position, and a sentence there is unreadable at a glance — which is the one
+thing the chip exists for.
+
+EVERY SEPARATOR COUNTS AS A SPACE. An underscore, a dash, a slash and a colon
+all break a word, so joining words together does not fit more in. That is the
+workaround the count exists to close rather than to catch.
+
+THE DETAIL ALREADY HAS A HOME. Whatever the four words cannot hold goes in the
+comment on the take or the settle, which is what a reader opens the token for.
+
+ONLY A HAND IS HELD TO IT. A title derived from a card's heading is the card
+author's sentence. Refusing that here would refuse the engine's own minting and
+teach nobody anything.
+
+THE REFUSAL HANDS BACK THE FIRST FOUR WORDS, ready to send. Nothing is written,
+so the store is exactly as it was.
+
+### SE-C-152 — a hand is already on this one
+Taking a piece of work marks it before that hand acts, and the mark is what the
+progress account is derived from. A second take is refused.
+
+WHY REFUSED RATHER THAN IGNORED. Two hands on one item is the thing the mark
+exists to make visible. Letting the second take succeed quietly would make the
+account say one hand where two are working.
+
+THE REFUSAL NAMES THE HAND THAT HOLDS IT, so the second hand knows who to ask
+rather than only that it may not proceed.
+
+THE WAY THROUGH IS A MOVE OR A SETTLE, never a retry. The first hand settles it,
+or the item is placed somewhere else.
 
 ## Notes and prose
 

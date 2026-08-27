@@ -33,3 +33,19 @@ keep them equal; it only stops either from being destroyed.
 
 Metric: mints after which the note file changed, vanished, or stayed pending.
 Target: zero.
+
+## Addition — work tokens
+
+TWO THINGS THIS ROW ALREADY DEMANDS NOW BIND EVERY PIECE OF WORK, not only a
+note at its mint.
+
+PRIVATE STAYS OFF TRUNK. Anything marked private is refused a write into
+version control, whatever kind of item it is. Private and committed are
+incompatible, so two homes is what privacy costs rather than an
+implementation choice.
+
+PLACE AND STATUS DO NOT MOVE TOGETHER. Marking a note drained leaves it
+where it is; the same separation binds a work token. Moving one leaves its
+status untouched, and settling one leaves its place untouched. Routing work
+out of scope therefore returns it to having no home rather than marking it
+finished.

@@ -162,7 +162,7 @@ test("the suggested spill page keeps a read's own answer inside the bound", asyn
   const { SPILL_PAGE_CHARS } = await import("../engine/bound.ts");
   const { fileRead } = await import("../engine/files.ts");
 
-  // THE PAGE IS SIZED ON THE MEASURED COST, NOT THE WORST CASE (2026-08-23).
+  // THE PAGE IS SIZED ON THE MEASURED COST, NOT THE WORST CASE.
   // Sizing on 2 made the page less than half of what fits, so every reading
   // loop paid about twice the calls it needed — boot's four documents cost
   // about 29 page reads instead of about 14.

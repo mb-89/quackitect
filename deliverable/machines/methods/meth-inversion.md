@@ -14,7 +14,7 @@ THAT AGREEMENT IS THE SIGNAL. A constraint nobody challenges gets re-confirmed
 by every check, because each check starts from it. The evidence is all there
 and the wrong question is being asked of it.
 
-## Form
+## Form #work
 
 Turn the question inside out. Three shapes, and the first is the cheapest.
 
@@ -27,16 +27,21 @@ Turn the question inside out. Three shapes, and the first is the cheapest.
 
 ## Procedure
 
-1. NAME THE CONSTRAINT IN ONE SENTENCE. If it takes a paragraph, it is two
-   constraints and they should be separated first.
-2. FIND WHERE IT IS WRITTEN DOWN. A standing demand, a design decision, a line
-   of code, or nowhere at all. Nowhere is the most common answer and the most
-   informative one.
-3. ASK WHETHER THE WRITTEN THING SAYS WHAT PEOPLE THINK IT SAYS. Quote it.
+1. NAME THE CONSTRAINT IN ONE SENTENCE #work
+
+   If it takes a paragraph, it is two constraints and they should be separated
+   first.
+2. FIND WHERE IT IS WRITTEN DOWN #work
+
+   A standing demand, a design decision, a line of code, or nowhere at all.
+   Nowhere is the most common answer and the most informative one.
+3. ASK WHETHER THE WRITTEN THING SAYS WHAT PEOPLE THINK IT SAYS. Quote it. #work
    - A remembered constraint drifts stricter than the recorded one every time.
-4. INVERT. Take one of the three shapes above and answer it honestly.
-5. RULE ON WHAT COMES BACK. Either the constraint survives with its reason
-   restated, or it was an implementation detail and the block is gone.
+4. INVERT. Take one of the three shapes above and answer it honestly. #work
+5. RULE ON WHAT COMES BACK #work
+
+   Either the constraint survives with its reason restated, or it was an
+   implementation detail and the block is gone.
 
 ## Why this is a card rather than advice
 

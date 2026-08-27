@@ -32,7 +32,8 @@ The reader-keeps-their-place law in guidance/craft/ux.md, held by a registry wit
 
 ---
 
-The trail reads like a story afterwards: each point's updates branch off
-it, the briefs readable, the colors carrying meaning from one palette.
+The trail reads like a story afterwards: each piece of work says what it
+was, who picked it up and what happened, the colours carrying meaning
+from one palette.
 |||
-The decision graph in the record's decisions.jsonl, rendered by engine/bin/render-decisions.ts; colour is configuration, one palette file.
+The work tokens, read from the call log the feed already draws — a token opened, taken or settled is a lane call, so nothing is kept beside it. Colour is configuration, one palette file.

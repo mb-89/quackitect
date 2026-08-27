@@ -8,11 +8,9 @@ delete process.env.SE_SCRIPT_SKIP;
 // more", state to-do lists, and the se_test tool.
 import { strict as assert } from "node:assert";
 import { spawnSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
-import { Decisions, parseUpdate } from "../engine/decisions.ts";
 import { type ArchiveEntry, buildArchive } from "../engine/expmachine.ts";
 import { compileMachine } from "../engine/machines/compile.ts";
 import { renderMirror } from "../engine/render.ts";
@@ -43,58 +41,6 @@ test("buildArchive: ten or fewer stay flat, more grows decade sub-machines", () 
   const n2 = dec.canvas.nodes!.find((n) => n.id === "n-e11-e13")!;
   assert.equal(n1.x, n2.x, "decades share one column");
   assert.ok(n2.y! > n1.y!, "a new decade lands at the bottom");
-});
-
-test("the open map says …and N more past eight open points", () => {
-  const d = new Decisions(mkdtempSync(join(tmpdir(), "se-dec-")));
-  d.apply("s@0", parseUpdate({ op: "plan", items: Array.from({ length: 9 }, (_, i) => `point ${i}`) }));
-  assert.throws(
-    () => d.apply("s@0", parseUpdate({ op: "done", node: "d99" })),
-    (e) => String((e as { expected?: string }).expected).includes("…and 1 more"),
-  );
-});
-
-// CORRECT WHAT IS MECHANICAL, ANNOUNCE IT, REFUSE ONLY THE AMBIGUOUS. An
-// update on the item just resolved was the biggest refusal class in the log.
-test("an update on a CLOSED node is corrected and announced, never refused", () => {
-  const d = new Decisions(mkdtempSync(join(tmpdir(), "se-dec-")));
-  d.apply("s@0", parseUpdate({ op: "plan", items: ["parent"] }));
-  d.apply("s@0", parseUpdate({ op: "plan", node: "d1", items: ["child"] }));
-  d.apply("s@0", parseUpdate({ op: "done", node: "d2", brief: "the child landed" }));
-  // The child is closed; its parent is not, so the update goes to the parent.
-  const onChild = d.apply("s@0", parseUpdate({ op: "update", node: "d2", brief: "still tidying it" }));
-  assert.equal(onChild.active, "d1", "it landed on the open parent");
-  assert.match(String(onChild.corrected), /d2 is already done/);
-  d.apply("s@0", parseUpdate({ op: "done", node: "d1", brief: "the parent landed" }));
-  // Nothing above it is open now, so the same update lands bare.
-  const bare = d.apply("s@0", parseUpdate({ op: "update", node: "d1", brief: "one last word" }));
-  assert.equal(bare.active, null, "with nothing open it lands bare");
-  assert.match(String(bare.corrected), /landed bare/);
-  // A RESOLUTION is a different matter — re-resolving is a real disagreement.
-  assert.throws(() => d.apply("s@0", parseUpdate({ op: "done", node: "d99", brief: "no such thing" })));
-});
-
-test("stateTodos: origins ride the nodes and parked defers show without materializing", () => {
-  const d = new Decisions(mkdtempSync(join(tmpdir(), "se-dec-")));
-  d.apply("a@0", parseUpdate({ op: "plan", items: ["one", "two"] }));
-  d.apply("a@0", parseUpdate({ op: "defer", node: "d1", to: "b" }));
-  const before = d.stateTodos("b");
-  assert.equal(before.parked.length, 1);
-  assert.equal(before.parked[0].brief, "one");
-  assert.equal(d.stateTodos("b").parked.length, 1, "looking never materializes");
-  const a = d.stateTodos("a");
-  assert.equal(a.visits.length, 1);
-  assert.equal(a.visits[0].nodes.find((n) => n.id === "d2")?.origin, "planned");
-  // Entering b materializes the parked defer as an open to-do, so the
-  // update names it. An update floating free of the checklist it should be
-  // moving is exactly what the node requirement exists to stop.
-  d.apply("b@0", parseUpdate({ op: "update", node: "d3", brief: "arrived" }));
-  const after = d.stateTodos("b");
-  assert.equal(after.parked.length, 0);
-  assert.ok(
-    after.visits.some((v) => v.nodes.some((n) => n.origin === "deferred")),
-    "the arrived point knows it was deferred",
-  );
 });
 
 function gitSeed(root: string): void {

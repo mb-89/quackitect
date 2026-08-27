@@ -208,7 +208,7 @@ export function mintToken(
     "---",
     ...(what.mintedIn !== undefined && what.mintedIn !== "" ? [`minted_in: ${JSON.stringify(what.mintedIn)}`] : []),
     `id: ${id}`,
-    'type: "[[work-token]]"',
+    'type: "[[work]]"',
     `statement: ${JSON.stringify(statement)}`,
     `ready_when: ${JSON.stringify(readyWhen)}`,
     `source: ${JSON.stringify(what.source)}`,

@@ -27,6 +27,16 @@ Each is a real thing that is genuinely not verified, and none of them blocks any
 
 ---
 
+The finding becomes a piece of work in its own right, and it is put ON THE
+STATE THAT WILL FIX IT rather than on a list somebody has to route later.
+|||
+Added by i63, on the owner's ruling. Findings scatter today across register
+entries, pressure-test findings and gate findings, each with a different home
+and no common answer to what happens next. As a piece of work with a place,
+the routing question dissolves rather than being answered.
+
+---
+
 The engineer records it as an owed item on the checklist rather than a ticked box, pointing it at a register entry that names an owner.
 |||
 NINE LINES WERE WRITTEN AS `- [owed] <spec> — <entry>`, against two entries: raid-issue-must-demos-owed for the four that need a person or a fresh machine, and raid-iss-whole-product-claims-reverified-by-every-record for the five the delta did not touch.

@@ -11,7 +11,7 @@ M4 enumerate-space, as one of the parallel finders.
 Every other finder adds options. This one removes, and the removal IS the
 option.
 
-## THE QUESTION
+## THE QUESTION #work
 
 For each function cluster: what if it does not exist?
 
@@ -30,7 +30,7 @@ things to BUILD, because that is what an option sounds like.
 The null option arrives only when something asks for it by name, and it is
 regularly the best one on the chart.
 
-## THE FOUR OUTCOMES
+## THE FOUR OUTCOMES #work
 
 - IT GOES, and nothing takes over. The cluster served a requirement nobody
   holds any more. That is a finding for the register, not just a cheaper
@@ -41,7 +41,7 @@ regularly the best one on the chart.
 - IT STAYS, and now you can say why. A cluster that survived the question is
   better justified than one nobody asked about.
 
-## THE ADJACENT MOVE: SUBTRACTION
+## THE ADJACENT MOVE: SUBTRACTION #work
 
 SIT's pattern, and it is a step short of trimming. Remove a component, then
 ask what the remainder is now good for.
@@ -50,7 +50,7 @@ The difference matters. Trimming asks who takes over the job. Subtraction
 asks what the mutilated thing has become, and sometimes the answer is a
 different product.
 
-## THE FAILURE MODE
+## THE FAILURE MODE #work
 
 Trimming what is cheap instead of what is expensive.
 

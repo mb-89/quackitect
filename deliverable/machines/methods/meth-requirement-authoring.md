@@ -12,7 +12,7 @@ card does not restate them. It says everything AROUND the statement: what
 makes one row good, and what the field, the corpus and two prior products
 learned the hard way.
 
-## ONE CONCERN PER NODE — AND THE DETAIL RIDES IN TABLES
+## ONE CONCERN PER NODE — AND THE DETAIL RIDES IN TABLES #work
 
 requirements
 written by and for agents need DETAIL, and a thousand atomic rows for the
@@ -58,7 +58,7 @@ cannot state what exists BEFORE the first trigger fires.
 Seven rows about claiming never showed that nothing created the ledger. Each
 was true. The set had a hole no row could describe.
 
-### When a model earns its place
+### When a model earns its place #work
 
 Three shapes are candidates.
 
@@ -82,7 +82,7 @@ BINDS exactly as `## Detail` binds.
 Where it does not, SAY SO IN ONE LINE and move on. A named absence is worth
 more than a diagram nobody needed, and it stops the next reader asking.
 
-### Write it as text for now
+### Write it as text for now #work
 
 PlantUML support is coming. Text converts to it without loss, so write the
 SHAPE and never a picture.
@@ -101,7 +101,7 @@ A state model, one line per transition:
     claimed    -> released:  a person forces, recording who and why
     released   -> claimed:   another machine enters
 
-### The first line is the one that pays
+### The first line is the one that pays #work
 
 `(nothing) -> ...` forces the question "what brings this into being". That is
 the question the claim lane never asked, and it cost a machine's whole
@@ -114,7 +114,7 @@ nowhere IS the gap.
 The test takes seconds and reads at a glance. Seven prose rows never showed
 it at all.
 
-### It is not mechanical, and it should not become so
+### It is not mechanical, and it should not become so #work
 
 No check counts these, and none should. A count would push the author toward
 writing models to satisfy it, which is the slop the owner named.
@@ -123,7 +123,7 @@ The set question `behaviour_modelled` on [[M3_10_write-requirements]] forces
 the LOOK, not the model. Naming the rows where a model would have been noise
 is a complete answer, and "none here wanted one" is a complete answer too.
 
-## EVERY VALUE CARRIES ITS UNIT AND TOLERANCE
+## EVERY VALUE CARRIES ITS UNIT AND TOLERANCE #work
 
 A bare number is unverifiable. A naked target ("fast", "reliable") is a
 mood. Write the unit and the bound: `in no more than 2 mm`, `within 200 ms
@@ -136,7 +136,7 @@ Why it binds: verification is done by people without the author's domain
 knowledge. The number is the only thing they can check. (INCOSE R33; the
 corpus's field practice.)
 
-## THE STATEMENT LEADS — FREE PROSE IS A DEFECT
+## THE STATEMENT LEADS — FREE PROSE IS A DEFECT #work
 
 Structured detail binds; loose paragraphs do not belong in a row.
 
@@ -151,7 +151,7 @@ Structured detail binds; loose paragraphs do not belong in a row.
 (The corpus's costliest review lesson, one organisation, noted as
 single-source — and it held across every review round they ran.)
 
-## THE KINDS, AND WHERE THE COMMON CASES LAND
+## THE KINDS, AND WHERE THE COMMON CASES LAND #work
 
 - functional — what the system does. A functional WITH a measure stays
   functional: performance is not a fifth kind.
@@ -173,7 +173,7 @@ single-source — and it held across every review round they ran.)
   owns each; an interface row only one side knows about is a future
   integration failure.
 
-## VERIFY_METHOD, NAMED NOW
+## VERIFY_METHOD, NAMED NOW #work
 
 Naming it is the verifiability check. Pick the cheapest method that would
 actually catch the row failing:
@@ -186,7 +186,7 @@ actually catch the row failing:
 
 Unnameable means the row is not a requirement yet: rewrite or drop.
 
-## BREAKS_IF_REMOVED — THE REMOVAL TEST
+## BREAKS_IF_REMOVED — THE REMOVAL TEST #work
 
 One line: what concretely fails without this row. Six ways to find it: what
 agent failure it prevents; what person mistake it catches; what trace gap
@@ -198,7 +198,7 @@ Unfillable means deletion candidate — never a keeper with a TODO.
 Editing this line later is patch-class: it rewords the why, not the demand.
 (An in-house rule; its nearest kin in the standards is 29148's "necessary".)
 
-## PRIORITY — MOSCOW, THE HOUSE SCALE
+## PRIORITY — MOSCOW, THE HOUSE SCALE #work
 
 `must | should | could`, defaulting to could — the same scale everything
 else here uses. The consumer is M4: the must rows GATE every candidate
@@ -206,7 +206,7 @@ pass/fail, and the should and could rows become the scored criteria. A
 won't-have is a non-goal, never a register row. Priority inflation defeats
 the consumer: if most rows are must, no candidate can differ.
 
-## TRACE — REFINES AND SOURCE_REFS ARE DIFFERENT EDGES
+## TRACE — REFINES AND SOURCE_REFS ARE DIFFERENT EDGES #work
 
 - `refines` names the uc- ids whose steps demand this row. The engine
   checks both directions against the use-case corpus.
@@ -216,14 +216,14 @@ the consumer: if most rows are must, no candidate can differ.
 - `source_refs` carries everything else: stk- ids, norm clauses, recorded
   decisions, field evidence. It is the rationale's home, as links.
 
-## NO TBD SURVIVES — AND THE CHECK IS A COUNT
+## NO TBD SURVIVES — AND THE CHECK IS A COUNT #work
 
 Detail now: requirements are design input, never build-time afterthoughts.
 The register is swept for the literal markers TBD | TBC | TBR | `???`, and
 the gate refuses on a nonzero count. A prohibition nobody counts is a wish
 (v1 counted; v2 prohibited without counting; both are needed).
 
-## WRITING WITH A MODEL IN THE LOOP
+## WRITING WITH A MODEL IN THE LOOP #work
 
 The 2024-2026 failure modes, all seen in the field literature:
 
@@ -236,7 +236,7 @@ The rule: every number, unit and domain fact traces to a named source
 before the row is accepted. A value with no source is a guess wearing a
 tolerance's clothes.
 
-## EVERY RULE HERE IS BACKED BY A CHECK
+## EVERY RULE HERE IS BACKED BY A CHECK #work
 
 A rule that lives in prose and not in a check will not be followed. These
 rules are backed by the register's refs coverage, the per-item criteria form
