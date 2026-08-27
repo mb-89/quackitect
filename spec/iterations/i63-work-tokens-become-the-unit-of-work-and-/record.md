@@ -1,6 +1,12 @@
 ---
 id: i63-work-tokens-become-the-unit-of-work-and-
-status: open
+status: shipped
+closed: 2026-08-27T21:15:05.412Z
+retro_owed: 2026-08-27T21:15:05.412Z
+carried_count: 2
+carried:
+  - tsp-a-person-steers-the-work-by-looking-and-dragging — raid-risk-a-state-must-mint-its-own-tokens-and-that-machinery-is-undesigned (verification.md)
+  - tsp-the-corpus-models-work-the-way-it-says-it-does — raid-risk-a-state-must-mint-its-own-tokens-and-that-machinery-is-undesigned (verification.md)
 started: 2026-08-25T13:07:39.976Z
 opened: 2026-08-24T14:43:49.793Z
 goal: "Work tokens become the unit of work, and the four difficulty ladders collapse to two. Every piece of work the agent does is a work token: a markdown file with open frontmatter, carrying its own guidance to read, its own evidence to produce, a complexity and a priority. A state cannot be left until its tokens are done, and each state shows a count of what it owes. Tokens live in buckets or on states, and either hand can move them. Reading (R0-R4) and the five-name rung (derive, transcribe, apply, author, frame) are removed entirely. Judgement (C0-C4) is renamed to complexity. What survives is complexity and autonomy, and nothing else."
