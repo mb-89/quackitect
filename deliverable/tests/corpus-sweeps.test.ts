@@ -4,7 +4,14 @@ import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
-import { deadLaneVerbs, duplicateHeadings, staleCitations, unreferencedTokens } from "../engine/corpus-sweeps.ts";
+import {
+  deadLaneVerbs,
+  duplicateHeadings,
+  POINTING_KEYS,
+  staleCitations,
+  uncheckedCitations,
+  unreferencedTokens,
+} from "../engine/corpus-sweeps.ts";
 import { danglingReferences, REFERENCE_KEYS } from "../engine/guard.ts";
 
 function fresh(): string {
@@ -173,4 +180,35 @@ test("with no tools file to read, the dead-verb check answers nothing", () => {
   const root = fresh();
   node(root, "deliverable/engine/session.ts", "// se_pull is mentioned but nothing declares it\n");
   assert.deepEqual(deadLaneVerbs(root, "the agent calls se_anything\n"), []);
+});
+
+test("the pointing keys the token join reads are the keys the guard sweeps", () => {
+  for (const key of REFERENCE_KEYS) {
+    assert.ok(POINTING_KEYS.includes(key), `${key} is swept for references and the token join does not read it`);
+  }
+});
+
+test("a token named in prose is not referenced; a token a key names is", () => {
+  const root = fresh();
+  node(root, "spec/trace/work-token/wt-alone.md", '---\ntype: "[[work-token]]"\n---\n');
+  node(root, "spec/trace/work-token/wt-pointed-at.md", '---\ntype: "[[work-token]]"\n---\n');
+  node(root, "spec/iterations/i1/evidence/some-form.md", "the retro minted wt-alone and parked it\n");
+  node(root, "spec/trace/raid/raid-dec-x.md", '---\ntype: "[[raid]]"\nsource_refs:\n  - wt-pointed-at\n---\n');
+  assert.deepEqual(unreferencedTokens(root), ["wt-alone"]);
+});
+
+test("a markdown anchor is checked as a heading slug", () => {
+  const root = fresh();
+  node(root, "spec/trace/design-spec/dsp-x.md", "# Title\n\n## A reopened placeholder is walked to, not through\n\ntext\n");
+  assert.deepEqual(staleCitations(root, "see `dsp-x.md#a-reopened-placeholder-is-walked-to-not-through`\n"), []);
+  assert.deepEqual(staleCitations(root, "see `dsp-x.md#a-heading-this-file-does-not-carry`"), [
+    "dsp-x.md#a-heading-this-file-does-not-carry",
+  ]);
+});
+
+test("a citation the sweep cannot parse is unchecked, and a directory is not a citation", () => {
+  const found = uncheckedCitations("the glob `rows/*.md` and the folder `.se/` and the file `.se/calls.jsonl`\n");
+  assert.ok(found.includes("rows/*.md"), `glob missing from ${JSON.stringify(found)}`);
+  assert.ok(found.includes(".se/calls.jsonl"), `machine-local path missing from ${JSON.stringify(found)}`);
+  assert.ok(!found.includes(".se/"), "a bare directory is not a citation");
 });

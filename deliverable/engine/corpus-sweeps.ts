@@ -22,6 +22,25 @@ const PATH_SHAPED = /`([^`\s]*\.[A-Za-z][A-Za-z0-9]{0,4})(?:#[^`\s]+)?(?::\d+)?`
 /** A lane verb as it is written in prose. */
 const LANE_VERB = /\bse_[a-z][a-z0-9_]*\b/g;
 
+/** THE FRONTMATTER KEYS A NODE POINTS WITH. It mirrors REFERENCE_KEYS in
+ *  guard.ts; the two are kept apart so this module stays text-only, and one
+ *  case asserts they agree. */
+export const POINTING_KEYS = [
+  "refines",
+  "satisfies",
+  "implements",
+  "realizes",
+  "verifies",
+  "depends_on",
+  "source_refs",
+  "weighs_with",
+  "weighs_against",
+  "demonstrates",
+  "probes",
+  "picks",
+  "cluster",
+];
+
 /** THE THREE SHAPES IN WHICH THE TOOL SURFACE DECLARES A VERB. Each captures
  *  the verb name in group 1. Anything else in those files — a comment, a
  *  string in a message, a call — is a mention and proves nothing. */
@@ -333,9 +352,30 @@ export function unreferencedTokens(root: string): string[] {
   markdownUnder(join(root, "spec"), files);
   const elsewhere = files.filter((abs) => !abs.startsWith(pool));
   const cited = new Set<string>();
+  // A REFERENCE IS A KEY, NOT A MENTION. The requirement joins the pool against
+  // every reference key in the corpus, and asking whether the id appears
+  // anywhere in the text counted a token merely named in an evidence document
+  // as referenced.
   for (const abs of elsewhere) {
-    const text = readFileSync(abs, "utf8");
-    for (const id of ids) if (text.includes(id)) cited.add(id);
+    for (const id of referenceValues(readFileSync(abs, "utf8"))) {
+      if (ids.includes(id)) cited.add(id);
+    }
   }
-  return ids.filter((id) => !cited.has(id)).sort();
+  return ids.filter((id) => !cited.has(id));
+}
+
+/** EVERY ID THIS NODE POINTS WITH, read off its reference keys.
+ *
+ *  The keys are read from the frontmatter block by name rather than parsed as
+ *  yaml, because this module takes text and nothing else. */
+function referenceValues(content: string): string[] {
+  const head = /^---\n([\s\S]*?)\n---/.exec(content);
+  if (head === null) return [];
+  const out: string[] = [];
+  for (const key of POINTING_KEYS) {
+    const inline = new RegExp(`^${key}:[ \\t]+(\\S.*)$`, "m").exec(head[1]);
+    if (inline !== null) out.push(inline[1].trim().replace(/^["']|["']$/g, ""));
+    for (const item of markedList(content, key)) out.push(item);
+  }
+  return out;
 }
