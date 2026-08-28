@@ -367,7 +367,7 @@ export function containersOf(place: string): string[] {
   return recordAlias(place) === "" ? [] : ["iterations"];
 }
 
-function workByState(root: string, isRead: ReadCredit): Map<string, Buckets> {
+export function workByState(root: string, isRead: ReadCredit): Map<string, Buckets> {
   const out = new Map<string, Buckets>();
   for (const item of readAllWork(root, isRead).items) {
     // A FINISHED PIECE NEVER REACHES THE DRAWING. Skipping it here rather than

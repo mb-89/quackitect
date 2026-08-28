@@ -54,7 +54,7 @@ statement: |-
 
   ## M3_10_write-requirements — set_criteria, no_tbd
 
-  - what a hand does today: runs a text search for TBD, TBC, TBR and ??? across the requirement nodes and writes an argument saying it found zero.
+  - what a hand does today: runs a text search for the four placeholder markers the sweep's own MARKERS list holds, across the requirement nodes, and writes an argument saying it found zero. The markers are not spelled out here, because writing one is what the marker check looks for.
   - what a script would do instead: run the existing marker sweep scoped to the requirement nodes as an exit script, and refuse the state on any hit, naming file and line.
   - what it needs to read: the frontmatter of every requirement node. The scanner already exists and reads fields rather than prose.
   - confidence: certain

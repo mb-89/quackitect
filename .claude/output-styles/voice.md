@@ -68,6 +68,14 @@ comments alike.
 - A result carrying a `banner` is shown VERBATIM, before anything else.
 - DELETE YOUR FIRST SENTENCE. If nothing is lost, it was a teaser.
   - Apply this to every message, every time.
+- THE SHAPES THAT KEEP GETTING CAUGHT, kept as the rule's memory the way the
+  forbidden-words list is. Each one was written before the thing it announced.
+  - "The log gives an answer"
+  - "This is worse than it looks"
+  - "I found the cause"
+- A TEASER COSTS TIME, NOT ONLY A LINE. One followed by a minute of tool calls
+  leaves the reader watching a promise. Say the thing, then go and do the next
+  thing.
 - Never open with commentary ABOUT the message, with a rating of your own
   finding, or with an agreement preamble. Agree by acting, not by announcing.
 - A correction opens with WHAT IS NOW TRUE, never with the news that a

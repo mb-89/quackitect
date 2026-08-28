@@ -13,7 +13,7 @@ import { fileURLToPath } from "node:url";
 import { appendNote, drainNote } from "../engine/inbox.ts";
 import { generateIterations } from "../engine/iterations-draw.ts";
 import { seDir } from "../engine/paths.ts";
-import { containersOf, recordAlias } from "../engine/viewmodel.ts";
+import { containersOf, recordAlias, workByState } from "../engine/viewmodel.ts";
 import { bucketOf } from "../engine/workoffer.ts";
 import { NOTES_ARE_DRAWN_AT, penSignal, penWork } from "../engine/workpen.ts";
 import { BACKLOG, BACKLOG_IS_DRAWN_AT, readAllWork } from "../engine/workstore.ts";
@@ -50,6 +50,28 @@ describe("a record's count reaches the box that draws it", () => {
     // THE BACKLOG IS DRAWN AT THE DESK RATHER THAN INSIDE IT, so counting it as
     // a child would put the same items on that box twice.
     assert.deepEqual(containersOf(BACKLOG), [], "the backlog is the desk's own count, never a roll-up");
+  });
+
+  // END TO END, over the repository as it stands. The unit above proves the
+  // rule; this proves the rule is actually WIRED to the box the surface draws.
+  // The owner asked twice for a pill on the iterations container, and both
+  // times the count existed and reached nothing.
+  test("the iterations container wears the count of everything standing on a record", () => {
+    const seen = workByState(REPO, () => true);
+    // The boxes drawn by a record NUMBER, which is what the container holds.
+    // A record's own items sit in `out`; a container wears them under `below`,
+    // which is the second half of the pill's `18 + 4`.
+    const onRecords = [...seen.entries()].filter(([id]) => /^i\d+$/.test(id));
+    const standing = onRecords.reduce((n, [, b]) => n + b.out, 0);
+    assert.ok(standing > 0, "no record carries work, so this proves nothing — check the repository");
+
+    const container = seen.get("iterations");
+    assert.notEqual(container, undefined, "the iterations container has no count at all");
+    assert.equal(
+      container?.below.out,
+      standing,
+      `${String(onRecords.length)} records carry ${String(standing)} between them, and the container shows ${String(container?.below.out)}`,
+    );
   });
 
   test("every box the container draws is reachable from some record's folder name", () => {
