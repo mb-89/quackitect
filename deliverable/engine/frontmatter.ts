@@ -32,7 +32,7 @@ export interface NoteSplit {
  *  refused and nothing reported: the node loaded with its long field silently
  *  cut, and a reprint would have written that cut back to disk.
  *
- *  MEASURED 2026-08-28. A work token carrying a horizontal rule in its statement
+ *  MEASURED. A work token carrying a horizontal rule in its statement
  *  read back at 794 characters where the file held 13,000. The write-time guard
  *  (SE-C-138) cannot see it, because a truncated block is valid YAML.
  *

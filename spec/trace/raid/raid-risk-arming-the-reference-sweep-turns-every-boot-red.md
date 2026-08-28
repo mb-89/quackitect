@@ -3,11 +3,11 @@ minted_in: i44-the-corpus-resolves-duplicate-headings-a
 id: raid-risk-arming-the-reference-sweep-turns-every-boot-red
 type: "[[raid]]"
 kind: risk
-statement: "The corpus-wide dangling-reference sweep fails the boot on the very references it was armed to find, so no session can start until every one of them is repaired."
+statement: The corpus-wide dangling-reference sweep fails the boot on the very references it was armed to find, so no session can start until every one of them is repaired.
 owner: the maintainer of the machine
 trigger: the first boot after the sweep is armed
 status: open
-impact: "Boot's exit check already refuses on a single unparseable node. A sweep with a wider reach inherits that power over the whole corpus, and a session that cannot boot cannot fix what is blocking it."
+impact: Boot's exit check already refuses on a single unparseable node. A sweep with a wider reach inherits that power over the whole corpus, and a session that cannot boot cannot fix what is blocking it.
 breaks_how_badly: crippling
 how_likely: plausible
 source_refs:

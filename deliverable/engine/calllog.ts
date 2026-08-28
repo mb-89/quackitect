@@ -501,13 +501,13 @@ export class CallLog {
      *  A COUNT CANNOT SEE A FIXED TOLL. Grouping this log by tool says the
      *  cheap verbs are the common ones, which is true and useless. What sizes
      *  a speed round is that the cheap verbs never finish under a second:
-     *  measured 2026-08-28 over four days, 68.5% of 3,677 lane calls landed
+     *  measured over four days, 68.5% of 3,677 lane calls landed
      *  between 1.0 and 2.0 seconds whatever they did, and `se_file_delete`
      *  never once beat 1,342 ms.
      *
      *  THAT WAS FOUND WITH A THROWAWAY SCRIPT and would have died with the
      *  session. It is a subfunction of the verb that already reads this log
-     *  rather than a verb of its own (owner ruling 2026-08-28: not everything
+     *  rather than a verb of its own (ruled: not everything
      *  needs to become a verb). */
     timings?: boolean;
     limit?: number;

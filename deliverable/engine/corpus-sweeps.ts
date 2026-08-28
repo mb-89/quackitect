@@ -256,17 +256,22 @@ const verbCache = new Map<string, Set<string> | undefined>();
 
 /** EVERY VERB THE TOOL SURFACE DECLARES.
  *
- *  THE SURFACE IS THE `tools*.ts` FILES AND NOTHING ELSE, and a DECLARATION is
- *  one of the three shapes those files use. A mention is not a declaration: a
- *  comment saying a verb was retired names it, and reading the whole engine
- *  for any occurrence marked every such name alive.
+ *  THE AUTHORITY IS A DECLARATION SITE, wherever in the engine it stands. A
+ *  verb is declared in one of three shapes, and a MENTION is not one of them:
+ *  a comment saying a verb was retired names it, and counting any occurrence
+ *  marked every such name alive.
+ *
+ *  IT IS NOT THE `tools*.ts` FILES ALONE. A verb served from a dispatcher, as
+ *  `case "se_x":`, is as alive as one listed on the surface, and reading only
+ *  the surface reported it dead.
  *
  *  THAT WAS MEASURED. Reading `tools.ts` alone in one shape reported 292 live
  *  verbs as dead; reading every engine file for any occurrence reported none,
- *  because 67 comment lines across 30 files name a verb. Reading the surface
- *  in all three of its shapes is the answer between them.
+ *  because 67 comment lines across 30 files name a verb. Reading every engine
+ *  file in the three declaring shapes is the answer between them.
  *
- *  With no surface to read, it answers undefined rather than guessing. */
+ *  With nothing declaring a verb anywhere, it answers undefined rather than
+ *  calling the whole corpus dead. */
 function servedVerbs(root: string): Set<string> | undefined {
   if (verbCache.has(root)) return verbCache.get(root);
   const dir = join(root, ...ENGINE);
@@ -276,17 +281,16 @@ function servedVerbs(root: string): Set<string> | undefined {
   }
   const files: string[] = [];
   sourceFilesUnder(dir, files);
-  const surface = files.filter((f) => /\/tools[a-z-]*\.ts$/.test(f));
-  if (surface.length === 0) {
-    verbCache.set(root, undefined);
-    return undefined;
-  }
   const alive = new Set<string>();
-  for (const abs of surface) {
+  for (const abs of files) {
     const text = readFileSync(abs, "utf8");
     for (const shape of DECLARED_VERB) {
       for (const m of text.matchAll(shape)) alive.add(m[1]);
     }
+  }
+  if (alive.size === 0) {
+    verbCache.set(root, undefined);
+    return undefined;
   }
   verbCache.set(root, alive);
   return alive;

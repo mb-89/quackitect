@@ -5,7 +5,7 @@ type: "[[raid]]"
 kind: issue
 statement: A row's difficulty varies with change size while the design gives each row ONE complexity value. The SPREAD is established; the NON-MONOTONICITY this entry first claimed was manufactured by quoting half a note and is withdrawn.
 owner: the owner
-trigger: "none — the rating pass ran on 2026-08-28 and answered the test this entry set"
+trigger: none — the rating pass ran on 2026-08-28 and answered the test this entry set
 status: closed
 looked: 2026-08-20
 impact: "A rating judged against the column it was written for is wrong at every other column, in the expensive direction at the small end: a patch walk pays a major walk's driver for a state the matrix itself has already tailored down."

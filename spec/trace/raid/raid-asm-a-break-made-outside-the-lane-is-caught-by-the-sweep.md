@@ -8,7 +8,7 @@ owner: the owner
 trigger: the first corpus break a person made by hand, and any change to how often the sweep runs
 status: probed
 probe: Introduce a malformed node by hand, outside the lane. Measure how many calls and how much wall-clock pass before anything names it. Compare against the four calls the same break cost inside the lane on 2026-08-16.
-probed: "2026-08-28, and it HOLDS. A hand break was named by the boot sweep at the very next boot, with the file, the line and the cause, before any work was done."
+probed: 2026-08-28, and it HOLDS. A hand break was named by the boot sweep at the very next boot, with the file, the line and the cause, before any work was done.
 impact: If a hand break survives long, the corpus is only as sound as the last person to open it in an editor, and every write-time refusal is guarding a door beside an open window.
 breaks_how_badly: crippling
 how_likely: expected

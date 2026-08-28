@@ -5373,7 +5373,7 @@ export class Session {
 
   private closedFired = false;
 
-  // THE LAST-SESSION BLOCK IS GONE FROM THE BANNER (owner ruling 2026-08-28).
+  // THE LAST-SESSION BLOCK IS GONE FROM THE BANNER, BY RULING.
   // It derived four figures from the call log and printed them under the
   // greeting: the call count, a refusal tally, notes captured and answers
   // recorded.

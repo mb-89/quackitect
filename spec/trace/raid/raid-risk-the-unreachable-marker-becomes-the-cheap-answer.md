@@ -3,11 +3,11 @@ minted_in: i44-the-corpus-resolves-duplicate-headings-a
 id: raid-risk-the-unreachable-marker-becomes-the-cheap-answer
 type: "[[raid]]"
 kind: risk
-statement: "Marking a reference unreachable becomes the default answer instead of repairing it, so the sweep goes green while the ledger stays as unfollowable as before."
+statement: Marking a reference unreachable becomes the default answer instead of repairing it, so the sweep goes green while the ledger stays as unfollowable as before.
 owner: the maintainer of the corpus
 trigger: the first count of markers against repairs, at this iteration's validation gate
 status: open
-impact: "A green lint over a marked corpus reads as hygiene achieved. The reader who follows a reference still finds nothing, and the marker makes the failure look deliberate."
+impact: A green lint over a marked corpus reads as hygiene achieved. The reader who follows a reference still finds nothing, and the marker makes the failure look deliberate.
 breaks_how_badly: corrosive
 how_likely: plausible
 source_refs:

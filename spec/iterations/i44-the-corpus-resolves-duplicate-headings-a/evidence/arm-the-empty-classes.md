@@ -1,10 +1,10 @@
 ---
 form: arm-the-empty-classes
-reopened: "2026-08-28T11:13:43.766Z — its claim was dropped when verbs-repaired had no standing claim, and the form is now neither served nor accepted"
+reopened: 2026-08-28T11:13:43.766Z — its claim was dropped when verbs-repaired had no standing claim, and the form is now neither served nor accepted
 by: agent
 signed_off: 2026-08-28T11:14:07.857Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / arm-the-empty-classes

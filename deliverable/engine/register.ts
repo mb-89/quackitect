@@ -38,7 +38,7 @@ export interface RegisterEntry {
    *  its file moves it there, exactly as a backlog item moves — one field,
    *  no verb.
    *
-   *  HYGIENE WORK KEEPS NO PLACE ON PURPOSE (owner ruling). Work any round
+   *  HYGIENE WORK KEEPS NO PLACE ON PURPOSE, BY RULING. Work any round
    *  could do is pulled by whichever round has room, so naming an owner in
    *  advance makes it wait for that owner instead. */
   place?: string;

@@ -3,9 +3,9 @@ minted_in: retro
 id: raid-iss-the-pool-has-no-exit-door-so-no-token-can-be-routed-to-its-owner
 type: "[[raid]]"
 kind: issue
-statement: "Every one of the 172 work tokens in the pool now has a named owner, and not one of them can be moved to it. pool.ts exports a mint and a read and nothing else, so no verb assigns a token, and guardNoSecondDoor refuses every other write into the pool."
+statement: Every one of the 172 work tokens in the pool now has a named owner, and not one of them can be moved to it. pool.ts exports a mint and a read and nothing else, so no verb assigns a token, and guardNoSecondDoor refuses every other write into the pool.
 owner: the adjudicator
-trigger: "none — closed, and the door it asked for was built and used"
+trigger: none — closed, and the door it asked for was built and used
 status: closed
 impact: "None now. It was real while it stood: the backlog was the thing the owner asked to shorten, and shortening it was the one act the lane could not perform."
 breaks_how_badly: crippling

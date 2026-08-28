@@ -16,7 +16,7 @@ export interface WorkToken {
    *  field rather than a verb: the token is a file and anybody who may edit a
    *  file may move it.
    *
-   *  OWNER RULING: the backlog is a pending bucket, so work is moved out of it
+   *  THE RULING: the backlog is a pending bucket, so work is moved out of it
    *  to whatever owns it — an iteration, the overhaul, a state. Deciding the
    *  owner is the retro's last step. */
   place?: string;

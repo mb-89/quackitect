@@ -31,7 +31,7 @@ export interface Survey {
    *  when that record opens. Nothing wakes it, so it waits until somebody
    *  happens to read the backlog at the right hour, and usually nobody does.
    *
-   *  MEASURED 2026-08-28: sixteen items named the walk-speed record. It
+   *  MEASURED: sixteen items named the walk-speed record. It
    *  shipped four days earlier and collected none of them. Twenty-four in
    *  total named a record that was shipped or abandoned, one of them naming a
    *  record abandoned outright, so its moment can never arrive at all.
@@ -116,8 +116,8 @@ export function survey(projectRoot: string, opts: SurveyOptions = {}): Survey {
   // see dsp-the-options-pool.md#the-pool-is-read-from-the-repository
   //
   // AN ITEM WITH A PLACE IS NOT IN THE BACKLOG ANY MORE, and the desk has to
-  // read that. Writing a place moved 300 of 352 items onto a record or a state
-  // on 2026-08-28, and the desk went on listing all 352 — because this line
+  // read that. Writing a place moved 300 of 352 items onto a record or a state,
+  // and the desk went on listing all 352 — because this line
   // took every standing token and never asked where any of them stood.
   //
   // THE PLACE WAS ALREADY BEING READ ELSEWHERE. `workpen.ts` draws an item at
@@ -132,7 +132,7 @@ export function survey(projectRoot: string, opts: SurveyOptions = {}): Survey {
   // and the board's pill counts what the pen draws. This list read the pool
   // alone, so the pill said 42 while the list showed 23. The 19 that never
   // appeared were open issues and debts, which are the oldest work there is.
-  // Measured 2026-08-28.
+  // Measured.
   //
   // THE PEN IS THE AUTHORITY ON WHERE WORK STANDS. This reads the same two
   // sources, filtered the same way, so the count and the list are one set

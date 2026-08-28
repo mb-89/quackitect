@@ -156,7 +156,7 @@ document.addEventListener("click", (ev) => {
     }
     // NO BACKTICK MAY APPEAR IN THIS FILE'S COMMENTS. The whole client is one
     // template literal, so a backtick closes it and the surface stops
-    // compiling. Cost four typecheck errors on 2026-08-28.
+    // compiling. Cost four typecheck errors.
     //
     // A BUCKET PILL SELECTS ITS STATE TOO. Without this the selection stayed
     // where it was, so the previously chosen bucket went on being highlighted

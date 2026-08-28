@@ -5,11 +5,11 @@ minted_in: i44-the-corpus-resolves-duplicate-headings-a
 id: raid-iss-a-signed-vision-cites-a-value-prop-that-does-not-stand
 type: "[[raid]]"
 kind: issue
-statement: "A signed vision evidence form names vp-vendoring among the resident goals, and no node of that name stands in the value-prop folder."
+statement: A signed vision evidence form names vp-vendoring among the resident goals, and no node of that name stands in the value-prop folder.
 owner: the maintainer of the corpus
 trigger: the next sweep that reaches references written in evidence prose
 status: open
-impact: "An iteration that inherits the goal system by pointer inherits a pointer that cannot be opened. The sweep this iteration arms reads frontmatter reference keys, and this citation sits in prose, so arming it does not catch the class."
+impact: An iteration that inherits the goal system by pointer inherits a pointer that cannot be opened. The sweep this iteration arms reads frontmatter reference keys, and this citation sits in prose, so arming it does not catch the class.
 breaks_how_badly: abrasive
 how_likely: plausible
 source_refs:

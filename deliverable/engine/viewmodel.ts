@@ -388,7 +388,7 @@ export function workByState(root: string, isRead: ReadCredit): Map<string, Bucke
     // because that is the folder. The two never met, so every count on a
     // seeded record was computed and nothing drew it.
     //
-    // MEASURED 2026-08-28, and the owner found it rather than a test: 299
+    // MEASURED, and a person found it rather than a test: 299
     // items were routed onto 34 records, all of them seeded, and the
     // container showed none of it.
     //
@@ -420,7 +420,7 @@ export function workByState(root: string, isRead: ReadCredit): Map<string, Bucke
     // The loop below finds ancestors by splitting the place on a slash. A
     // record place is ONE segment with no slash, so it has no ancestors by that
     // rule, and nothing ever reached the container that draws it. Measured
-    // 2026-08-28: about 300 items sat on records and the iterations box wore no
+    // Measured: about 300 items sat on records and the iterations box wore no
     // pill at all.
     //
     // THE RULE IS THE OWNER'S AND IT IS WIDER THAN THIS CASE: the roll-up goes

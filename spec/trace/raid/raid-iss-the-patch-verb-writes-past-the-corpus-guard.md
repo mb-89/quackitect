@@ -3,11 +3,11 @@ minted_in: i44-the-corpus-resolves-duplicate-headings-a
 id: raid-iss-the-patch-verb-writes-past-the-corpus-guard
 type: "[[raid]]"
 kind: issue
-statement: "The guard that refuses a write leaving a corpus node unparseable runs on one write verb only, so a patch or a replace lands the same break without a word."
+statement: The guard that refuses a write leaving a corpus node unparseable runs on one write verb only, so a patch or a replace lands the same break without a word.
 owner: the maintainer of the machine
 trigger: it has already happened; the next look is whichever iteration takes the engine
 status: open
-impact: "The product's own promise is that a corpus break is heard at the write with the line named. Two of the three writing verbs do not keep it, and the break then surfaces calls later at a reader that cannot name the file."
+impact: The product's own promise is that a corpus break is heard at the write with the line named. Two of the three writing verbs do not keep it, and the break then surfaces calls later at a reader that cannot name the file.
 breaks_how_badly: crippling
 how_likely: expected
 source_refs:
