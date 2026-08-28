@@ -1,4 +1,6 @@
 ---
+unreachable_citations:
+  - deliverable/machines/disk-exemptions.md
 minted_in: i54-everything-exported-has-a-door-a-sweep-o
 id: sty-read-why-the-code-departs-from-its-own-design
 type: "[[story]]"

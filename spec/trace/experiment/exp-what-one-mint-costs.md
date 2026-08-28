@@ -1,4 +1,6 @@
 ---
+unreachable_citations:
+  - scratchpad/measure-a-mint.ts
 minted_in: i63-work-tokens-become-the-unit-of-work-and-
 id: exp-what-one-mint-costs
 type: "[[experiment]]"

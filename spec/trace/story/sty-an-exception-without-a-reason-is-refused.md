@@ -1,4 +1,6 @@
 ---
+unreachable_citations:
+  - deliverable/machines/disk-exemptions.md
 minted_in: i54-everything-exported-has-a-door-a-sweep-o
 id: sty-an-exception-without-a-reason-is-refused
 type: "[[story]]"

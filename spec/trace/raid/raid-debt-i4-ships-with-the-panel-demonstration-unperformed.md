@@ -1,4 +1,6 @@
 ---
+unreachable_citations:
+  - reports/rpt-tsp-panel-walkthrough.md
 minted_in: i4-the-panel-round-the-archived-iteration-b
 id: raid-debt-i4-ships-with-the-panel-demonstration-unperformed
 type: "[[raid]]"

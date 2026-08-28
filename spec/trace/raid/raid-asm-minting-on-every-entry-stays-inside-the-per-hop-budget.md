@@ -1,4 +1,7 @@
 ---
+unreachable_citations:
+  - scratchpad/measure-a-mint.ts
+  - scratchpad/spike-mint-cost-and-volume.mjs
 minted_in: i63-work-tokens-become-the-unit-of-work-and-
 id: raid-asm-minting-on-every-entry-stays-inside-the-per-hop-budget
 type: "[[raid]]"

@@ -1,4 +1,6 @@
 ---
+unreachable_citations:
+  - scratchpad/shell-reach.mjs
 minted_in: i54-everything-exported-has-a-door-a-sweep-o
 id: raid-asm-every-write-that-adds-a-departure-passes-through-the-lane
 type: "[[raid]]"

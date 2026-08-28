@@ -1,4 +1,8 @@
 ---
+unreachable_citations:
+  - scratchpad/probe-many-files.mjs
+  - scratchpad/probe-why-smaller.mjs
+  - scratchpad/spike-mint-cost-and-volume.mjs
 minted_in: i63-work-tokens-become-the-unit-of-work-and-
 id: raid-asm-one-file-per-work-token-stays-workable-in-the-vault-and-the-repository
 type: "[[raid]]"

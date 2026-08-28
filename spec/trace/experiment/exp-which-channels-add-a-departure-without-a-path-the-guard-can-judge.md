@@ -1,4 +1,6 @@
 ---
+unreachable_citations:
+  - scratchpad/shell-reach.mjs
 minted_in: i54-everything-exported-has-a-door-a-sweep-o
 id: exp-which-channels-add-a-departure-without-a-path-the-guard-can-judge
 type: "[[experiment]]"

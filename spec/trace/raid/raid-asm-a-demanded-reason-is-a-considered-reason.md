@@ -1,4 +1,7 @@
 ---
+unreachable_citations:
+  - scratchpad/reasons.mjs
+  - scratchpad/spikes2.mjs
 minted_in: i54-everything-exported-has-a-door-a-sweep-o
 id: raid-asm-a-demanded-reason-is-a-considered-reason
 type: "[[raid]]"
@@ -68,7 +71,7 @@ field.
   line or a register entry cannot be copied down a column without becoming
   wrong.
 
-## Probe result, 2026-08-26
+## Probe result, 2026-08-26 — the first reading
 
 NOT PROBEABLE IN THIS TREE, and that is the finding rather than a failure to
 look.
@@ -95,7 +98,7 @@ WHAT WOULD MAKE IT PROBEABLE is exactly the graft this record adopted: the
 entry cannot be written without a reason, and the remedy stops pre-filling the
 slot. Once that ships, this assumption has a population to be measured against.
 
-## Probe result, 2026-08-26
+## Probe result, 2026-08-26 — the corrected reading
 
 HOLDS. 104 OF 113 COLLECTED REASONS ARE CONSIDERED.
 

@@ -163,3 +163,10 @@
 {"ts":"2026-08-28T12:18:20.771Z","op":"update","visit":"iterations/i44/fix-findings@0","node":"d204","brief":"read the two conflicted assumption nodes"}
 {"ts":"2026-08-28T12:18:32.579Z","op":"update","visit":"iterations/i44/fix-findings@0","node":"d205","brief":"read the second conflicted assumption node"}
 {"ts":"2026-08-28T12:18:40.045Z","op":"update","visit":"iterations/i44/fix-findings@0","node":"d206","brief":"read the affordability conflict region"}
+{"ts":"2026-08-28T12:21:05.625Z","op":"done","visit":"iterations/i44/fix-findings@0","node":"d185","brief":"trunk is merged in, seven conflicts resolved by hand"}
+{"ts":"2026-08-28T12:21:31.606Z","op":"plan","visit":"iterations/i44/fix-findings@0","parent":null,"nodes":[{"id":"d207","brief":"repair the 32 findings the merge surfaced"},{"id":"d208","brief":"correct the three wrong numbers in signed evidence"},{"id":"d209","brief":"derive the key-to-type map and arm it"},{"id":"d210","brief":"check qualified state references"},{"id":"d211","brief":"the confirm run"}]}
+{"ts":"2026-08-28T12:24:54.798Z","op":"update","visit":"iterations/i44/onboard-retro@1","node":"d212","brief":"re-check the 32 merge findings against the tree as it now stands"}
+{"ts":"2026-08-28T12:25:52.448Z","op":"update","visit":"iterations/i44/onboard-retro@1","node":"d213","brief":"reading credited; now re-check the merge findings before the retro steps"}
+{"ts":"2026-08-28T12:26:05.137Z","op":"update","visit":"iterations/i44/onboard-retro@1","node":"d214","brief":"retry the one missed probe, then re-check the merge findings"}
+{"ts":"2026-08-28T12:26:23.670Z","op":"update","visit":"iterations/i44/onboard-retro@1","node":"d215","brief":"running lane is 7.0.0 and cannot serve the merged machine files; reload onto disk"}
+{"ts":"2026-08-28T12:26:40.325Z","op":"update","visit":"iterations/i44/onboard-retro@1","node":"d216","brief":"escape to the desk so the stale lane can be reloaded onto the merged sources"}

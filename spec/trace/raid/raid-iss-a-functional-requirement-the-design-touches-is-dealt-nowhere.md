@@ -1,4 +1,6 @@
 ---
+unreachable_citations:
+  - scratchpad/sweep-functional-rows-the-fold-touches.mjs
 minted_in: i63-work-tokens-become-the-unit-of-work-and-
 id: raid-iss-a-functional-requirement-the-design-touches-is-dealt-nowhere
 type: "[[raid]]"

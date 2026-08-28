@@ -1,4 +1,6 @@
 ---
+unreachable_citations:
+  - scratchpad/reasons.mjs
 minted_in: i54-everything-exported-has-a-door-a-sweep-o
 id: exp-do-the-lists-that-demand-a-reason-collect-considered-ones
 type: "[[experiment]]"

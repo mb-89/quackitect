@@ -1,4 +1,6 @@
 ---
+unreachable_citations:
+  - scratchpad/spikes.mjs
 minted_in: i6-conformance-goes-mechanical-checks-bind-
 id: raid-asm-a-bound-check-runs-inside-the-write-budget
 type: "[[raid]]"

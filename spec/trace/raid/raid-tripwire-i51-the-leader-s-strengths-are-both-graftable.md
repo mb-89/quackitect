@@ -1,4 +1,7 @@
 ---
+unreachable_refs:
+  - cand-the-account-that-follows-you
+  - cand-the-measured-answer
 minted_in: i51-work-running-out-of-sight-reports-itself
 id: raid-tripwire-i51-the-leader-s-strengths-are-both-graftable
 type: "[[raid]]"

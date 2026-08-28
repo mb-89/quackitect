@@ -1,4 +1,7 @@
 ---
+unreachable_citations:
+  - scratchpad/probe-fold-at-real-size.mjs
+  - scratchpad/probe-many-files.mjs
 minted_in: i63-work-tokens-become-the-unit-of-work-and-
 id: raid-asm-the-folds-measured-benefit-arrives-at-a-scale-this-repository-has-not-reached
 type: "[[raid]]"

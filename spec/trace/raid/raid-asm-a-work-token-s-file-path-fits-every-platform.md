@@ -1,4 +1,6 @@
 ---
+unreachable_citations:
+  - scratchpad/spike-paths-and-counts.mjs
 minted_in: i63-work-tokens-become-the-unit-of-work-and-
 id: raid-asm-a-work-token-s-file-path-fits-every-platform
 type: "[[raid]]"

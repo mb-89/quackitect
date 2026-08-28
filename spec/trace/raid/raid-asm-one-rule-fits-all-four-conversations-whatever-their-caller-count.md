@@ -1,4 +1,6 @@
 ---
+unreachable_citations:
+  - scratchpad/spikes.mjs
 minted_in: i54-everything-exported-has-a-door-a-sweep-o
 id: raid-asm-one-rule-fits-all-four-conversations-whatever-their-caller-count
 type: "[[raid]]"

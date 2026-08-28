@@ -1,4 +1,6 @@
 ---
+unreachable_citations:
+  - decisions.ts
 minted_in: i54-everything-exported-has-a-door-a-sweep-o
 id: exp-do-the-engine-s-write-shapes-cluster-by-purpose
 type: "[[experiment]]"

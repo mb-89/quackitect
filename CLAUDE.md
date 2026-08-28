@@ -1,5 +1,5 @@
 <!-- GENERATED at agent start. Do not edit — the next start overwrites it.
-     from guidance/contract.md 3a4b6f73adf4
+     from guidance/contract.md 04ee028dafae
      from guidance/walking.md bf30b933fe16
      from guidance/method/lane.md 0f7559c796b0
      from guidance/voice.md a85b1d5c8486
@@ -52,92 +52,51 @@ A step weighing more than the dial is theirs. Present it, then STOP, saying
 plainly which step waits and that a message (continue is enough) resumes you.
 The dial alone cannot wake you, and it can move mid-session.
 
-## 4. A token is the default and a note is the exception
+## 4. Strays are notes
 
-EVERYTHING YOU DO GETS A WORK TOKEN. That is where a thought goes now. Not
-your head, and not a note.
+A stray is:
 
-    se_work {act: "open", id: "", comment: "<four words> / <the whole detail>"}
+- an idea
+- a bug
+- a better way
 
-A NOTE IS FOR ONE THING ONLY: what belongs in the next RETRO. Something to
-discuss, a doubt about the process, a lead nobody can act on yet.
+Capture it with `se_note` and keep walking. You do not leave the state in your
+hand to chase one.
 
-WRITING ONE IS NOT WORK AND NEVER GETS A TOKEN OF ITS OWN. A note is cheap on
-purpose, and a token to carry one costs four calls to capture a thought.
+A DEFECT IN THE WORK YOU ARE BUILDING IS NOT A STRAY. A stray is elsewhere. A
+hole in the thing under your hands is the work.
 
-THE TEST IS ONE QUESTION. Can you name the state where this gets done?
+A BUG YOU CAN SEE AND KNOW HOW TO FIX IS NOT A STRAY EITHER (owner ruling
+2026-08-28). Being outside your diff does not make it somebody else's.
 
-- YES — open a token. `at` names the position when it is not this one.
-- NO, AND IT WANTS DISCUSSING AT THE RETRO — `se_note`, and keep walking.
+His words: "I've seen you a few times now, not fixing a bug because it's
+outside of your fixed... of your diff. What are you doing? If you see a bug and
+you know the fix, especially if it's not a big thing, fix it. Just write
+yourself a work topic for it, and then do it when you're done with your current
+work."
 
-WORK ASSIGNABLE TO A STATE THE WALK IS GOING INTO ANYWAY IS A TOKEN, never a
-note. A note routed at a state it could have been opened at is a finding
-nobody sees for a fortnight.
+SO THE ORDER IS: note it, finish the step in your hand, then fix it. The note
+is what stops the fix being forgotten, never what stands in for it.
 
-YOU DO NOT LEAVE THE STATE IN YOUR HAND to chase either of them.
+WHAT STILL WAITS. A fix you do not know how to make, and a fix that is really a
+redesign. Those stay notes and become work tokens at the retro.
 
-A DEFECT IN THE WORK YOU ARE BUILDING IS NEITHER. A hole in the thing under
-your hands is the work, and rule 5 says finish it.
+YOU NEVER WRITE THE BACKLOG YOURSELF (owner ruling 2026-08-28). Capturing is
+yours. Minting is not.
 
-OPEN IT THE MOMENT THEY SAY IT, before you start on it. That is how they see
-it was received. An instruction that lives only in the chat is invisible to
-every surface, so the person watching the board cannot tell a thing you are
-about to do from a thing you missed.
+- A finding becomes a NOTE, wherever you are, however sure you are.
+- The RETRO drains that note and mints the work token.
+- Nothing else puts anything in the pool.
 
-AND THIS IS THE GENERAL RULE, NOT ONLY FOR WORK THEY HANDED YOU. Everything
-you do gets a token, so the board says what you are doing and why. Opening one
-is how you talk to the person about the work.
+THE OWNER'S WORDS: "another agent just wrote stuff directly in the backlog. I
+don't want that. Write notes, the retro writes the backlog."
 
-ONLY WHERE THE STATE DID NOT ALREADY MINT ONE. A marked step arrives with its
-own token, and opening a second for the same work counts one thing twice.
+WHY THE SPLIT EXISTS. The mint is where a raw note becomes an authored
+statement, and that rewrite is the privacy boundary. A token written straight
+into the pool has gone round it.
 
-SWITCHING WORK IS TWO ACTS. Settle the piece in your hand, then open the next
-one. A switch nobody settled leaves the board naming work you stopped doing.
-That is the whole test: same work, no token; different work, a token.
-
-IT LANDS WHERE THE WALK STANDS unless `at` names somewhere else, and it HOLDS
-THAT STATE until it is settled. So the state cannot be left with their work
-standing open, which is the whole point of opening it rather than remembering
-it.
-
-AN OPENED TOKEN IS EPHEMERAL. It lives while its state lives and goes when the
-state is left. It is a hand saying what it is doing, and a record's committed
-account is not the place for that.
-
-THE WORKING PATTERN, AND IT IS THE WHOLE OF HOW YOU WORK.
-
-- They say something. You OPEN A TOKEN for it, in that same breath.
-- You finish what is in your hand.
-- You work theirs BEFORE YOU LEAVE THE STATE.
-
-NOTHING ABOUT THAT IS OPTIONAL, and the third step is not a promise you keep by
-intending to. The state holds shut until every token at it is settled, so the
-walk cannot carry their work past the place it was given.
-
-THE TITLE IS FOUR WORDS AND THE STORE REFUSES A FIFTH. A token NAMES its work;
-it does not describe it. The bar draws the piece of work in hand beside the
-position, and a sentence there is unreadable at a glance.
-
-THE DETAIL RIDES THE SAME LINE, AFTER A FORWARD SLASH. Four words name it, the
-slash splits it, and everything after lands in the token's body. Write the
-whole instruction there, in the words it was given in.
-
-A TOKEN HOLDING ONLY FOUR WORDS TELLS THE NEXT HAND NOTHING. Another agent —
-or the person, a week later — cannot act on a name. From "Work coloured in
-log" alone, nothing says which colour or why.
-
-THE COMMENT ON THE TAKE AND THE SETTLE carries what happened, which is a
-different thing from what was asked for. Both are owed.
-
-TAKE IT WHEN YOU START AND SETTLE IT WHEN YOU STOP. Each act writes its own
-line carrying the statement and your comment, so the log shows work beginning
-and work ending without anybody narrating it separately.
-
-THE TOKENS ARE THE LOG. There is no second thing to keep up to date, and a
-sentence about the work that is not on a token is a sentence nobody will find.
-
-SETTLE IT WHEN IT IS DONE, with what happened. They watch it arrive, and they
-watch it go.
+WRITING A TOKEN FILE BY HAND IS THE SHAPE TO WATCH FOR. It looks like helpful
+tidiness and it is the second door.
 
 ## 5. Finish it before you judge it
 
@@ -202,7 +161,7 @@ the report and keep going in the same turn. Size is not a reason to hand back;
 large work is done by doing it.
 
 THE ONLY SANCTIONED STOP IS THE MACHINE'S OWN: a threshold above the dial, a
-gate, or the front desk. A question anywhere else is an unsanctioned stop, and the engine
+gate, or idle. A question anywhere else is an unsanctioned stop, and the engine
 cannot see it — it happens in chat, where nothing counts it.
 
 TWO QUESTIONS ARE THE EXCEPTION.
@@ -212,22 +171,6 @@ TWO QUESTIONS ARE THE EXCEPTION.
   amount of draining, mining or sweeping stands in for it. The rest of the
   retro needs no answer, so do that while the answer is owed.
 - A PLAN IS A SANCTIONED STOP, BEFORE IT IS ACTED ON. See rule 9.
-
-CLAIMING A STOP IS A CALL. `se_stop {because}` names which of them applies and
-why, and it is what actually releases the turn.
-
-SAYING IT IN CHAT PROVES NOTHING. The tooth that refuses a stop reads the call
-log and cannot read your message, so a sentence naming a sanctioned stop was
-only ever addressed to the person.
-
-THE ORDER IS: BE REFUSED, THEN FORCE. A force before the refusal does nothing,
-which is what stops it becoming the ordinary way to end a turn.
-
-ONE FORCE RELEASES ONE STOP, and the next pull spends it.
-
-A FLAG IS NOT A CLAIM. The harness sets one when it retries a blocked stop, and
-a valve that reads it as a claim releases every second attempt with nothing
-named. Measured: four blocks, four immediate releases in one session.
 
 RULES 6 AND 7 MEET AT THE START OF WORK. Confirm an ambiguous intent before you
 begin; once begun, carry on.
@@ -250,59 +193,45 @@ where the machine reads it:
 
 NOTHING IS WRITTEN FOR THE NEXT AGENT TO READ. The old handover file was read
 by the session that followed, it only ever got written on a tidy exit, and
-sessions get killed instead.
-
-AND NOTHING REPLACED IT ON THE BANNER EITHER. Boot printed four figures from
-the call log under the greeting, and the owner cut them: nobody read them.
-
-THE LOG STILL HOLDS IT ALL, and `se_log_query` reads it back.
+sessions get killed instead. What replaced it is derived: boot describes the
+last session from the call log and puts it on the banner.
 
 SO WHAT THE NEXT SESSION MUST KNOW GOES IN THE FOUR HOMES ABOVE, written when
 the thought occurs. A note, a parked to-do, or guidance — never saved for an
 exit that may never come.
 
-A FIELD REPORT IS OWED ON AN UNATTENDED RUN, and it is a different object from
-the handover. No handover file is written; a field report is.
+THE FIELD REPORT IS RETIRED (owner ruling 2026-08-28). No run owes one, and
+nothing is written to `.se/field-report.md`.
 
-BESIDE A PERSON, THE CHAT IS THE CHANNEL AND NO FILE IS WRITTEN. Only an
-unattended run owes one, and an attended session that writes one has written a
-report nobody wanted.
+A HANDOVER FILE WAS RETIRED BEFORE IT, for a different reason. That one was for
+the next AGENT, and boot's derived summary replaced it. The field report was for
+the PERSON, and the work token replaces it.
 
-THE REASON THE RULE GIVES IS ITS OWN SCOPE. Notes die with the container, so
-the report is the only channel that reaches a person. Where the person is
-reading the chat, that channel is already open.
+WHY IT EXISTED. Notes are machine-local and die with the container, so a report
+printed in chat was the only way a finding could leave the box.
 
-THE TWO ARE NOT THE SAME THING, which is why both halves stand.
+WHAT REPLACED IT. A work token lands on trunk, where every clone reads it. So a
+finding now travels in git rather than in a closing message.
 
-- The handover file was for the next AGENT, and the call log replaced it.
-- The field report is for the PERSON, and nothing replaces it.
+THE CHECK THAT GUARDED THE OLD RULE STILL STANDS and now has nothing to catch.
+`record-inspect` goes red on a field report found anywhere in version control.
+Under the old rule that stopped a private report leaking into the corpus; under
+this one it stops the retired object coming back.
 
-WHAT GOES IN IT: everything that cannot be mapped onto the repository.
+THE ROUTE, END TO END:
 
-- Improvements you found.
-- What fought you.
-- What you struggled with.
-- Anything you could not give a home in git.
+- Note everything noteworthy while you walk.
+- Run the retro when the record closes.
+- Drain every note, and mint a work token for whatever still needs doing.
+- Push.
 
-WHY IT CANNOT BE SKIPPED: notes are machine-local and die with the container.
-The report is the channel that reaches a person, so an unwritten one throws
-that away.
+THE OWNER'S WORDS, 2026-08-28: "you now can seed work tokens. So walk the
+iteration, make notes on everything noteworthy. After the iteration, you do a
+retro, and then you seed work tokens for everything that needs to be done and
+put them in the backlog, and then you can push."
 
-WHERE IT GOES: `.se/field-report.md`, which is gitignored. NOWHERE ELSE. Not
-`spec/`, not the record's own folder, not beside the evidence.
-
-HOW IT IS DELIVERED, and it is BOTH: handed over as a DOWNLOADABLE FILE, and
-printed in full as the closing message. The person keeps the file and passes it
-on; the message is what they read now.
-
-IT IS PRIVATE DATA, and that is the reason rather than a preference. It is
-written for one person and it is not a corpus document.
-
-A CHECK ENFORCES THIS. `record-inspect` goes red on a field report found
-anywhere in version control, and names the folder it belongs in. In prose
-alone the rule was broken twice, for 3,584 lines nothing ever cited.
-
-`guidance/method/cloud-runner.md` carries the detail.
+AND A CARD THAT STILL DEMANDS A REPORT IS OUT OF DATE. Fix it rather than obey
+it. The owner said that in the same breath.
 
 ## 9. Never open a record unasked
 

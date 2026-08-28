@@ -323,7 +323,7 @@ WHY IT IS HERE RATHER THAN IN A SCRATCHPAD. A scratchpad does not travel and is 
 
 WHAT IT IS NOT. It is not a plan and not a scope. Every entry names the id it came from, so a reader checks rather than trusts.
 
-# Speed-up candidates
+# The candidates as swept
 
 Swept: 231 work tokens in `spec/trace/work-token/`, 476 register entries in
 `spec/trace/raid/` (239 of them open issue / debt / risk / dependency), 287
