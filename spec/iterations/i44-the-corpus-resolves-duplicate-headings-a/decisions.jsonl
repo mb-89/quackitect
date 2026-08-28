@@ -151,3 +151,10 @@
 {"ts":"2026-08-28T12:11:17.464Z","op":"update","visit":"iterations/i44/fix-findings@0","node":"d193","brief":"read what the cloud card promises about pushing"}
 {"ts":"2026-08-28T12:11:34.269Z","op":"update","visit":"iterations/i44/fix-findings@0","node":"d194","brief":"the cloud card no longer promises a push the engine refuses"}
 {"ts":"2026-08-28T12:11:44.958Z","op":"done","visit":"iterations/i44/fix-findings@0","node":"d184","brief":"the cloud card's push promise is marked unbuilt with its alternative"}
+{"ts":"2026-08-28T12:16:19.813Z","op":"update","visit":"iterations/i44/fix-findings@0","node":"d195","brief":"measure what node type each reference key actually points at today"}
+{"ts":"2026-08-28T12:16:29.622Z","op":"update","visit":"iterations/i44/fix-findings@0","node":"d196","brief":"find how the corpus names a state in prose"}
+{"ts":"2026-08-28T12:16:37.405Z","op":"update","visit":"iterations/i44/fix-findings@0","node":"d197","brief":"quote real lines naming a state in prose"}
+{"ts":"2026-08-28T12:16:52.648Z","op":"update","visit":"iterations/i44/fix-findings@0","node":"d198","brief":"list the iteration machine's states to report the position exactly"}
+{"ts":"2026-08-28T12:17:40.035Z","op":"update","visit":"iterations/i44/fix-findings@0","node":"d199","brief":"see what is uncommitted before merging trunk in"}
+{"ts":"2026-08-28T12:17:46.851Z","op":"update","visit":"iterations/i44/fix-findings@0","node":"d200","brief":"fetch trunk before merging it in"}
+{"ts":"2026-08-28T12:17:54.201Z","op":"update","visit":"iterations/i44/fix-findings@0","node":"d201","brief":"clean the tree before the merge"}
