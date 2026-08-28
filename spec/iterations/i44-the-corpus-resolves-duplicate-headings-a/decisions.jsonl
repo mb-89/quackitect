@@ -1,0 +1,7 @@
+{"ts":"2026-08-28T10:23:10.678Z","op":"done","visit":"boot/prepare_idle@0","node":"d3","brief":"front desk done: recital printed and the iterations door taken"}
+{"ts":"2026-08-28T10:23:19.175Z","op":"update","visit":"iterations/i44/onboard-retro@0","node":"d7","brief":"inbox stands at zero notes, so onboard-retro is skipped by its own rule"}
+{"ts":"2026-08-28T10:23:39.548Z","op":"plan","visit":"iterations/i44/onboard-retro@0","parent":"d5","nodes":[{"id":"d8","brief":"mine the call log for the retro window"},{"id":"d9","brief":"fill the onboard-retro form"},{"id":"d10","brief":"submit it"}]}
+{"ts":"2026-08-28T10:25:22.551Z","op":"update","visit":"iterations/i44/gate-kickoff@0","node":"d11","brief":"capturing the two strays the retro named before the kickoff"}
+{"ts":"2026-08-28T10:25:30.795Z","op":"done","visit":"iterations/i44/onboard-retro@0","node":"d8","brief":"log mined and written into the retro form"}
+{"ts":"2026-08-28T10:25:35.174Z","op":"done","visit":"iterations/i44/onboard-retro@0","node":"d9","brief":"onboard-retro form filled from the survey and the log"}
+{"ts":"2026-08-28T10:26:13.140Z","op":"plan","visit":"iterations/i44/gate-kickoff@0","parent":"d5","nodes":[{"id":"d12","brief":"read the gate's method"},{"id":"d13","brief":"fill the kickoff brief with a proposed change size"},{"id":"d14","brief":"submit and bless it"}]}
