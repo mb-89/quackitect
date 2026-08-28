@@ -22,7 +22,7 @@ source_refs:
 
 ## Setup
 
-Run through the lane at 2026-08-21, from `iterations/i51/run-spikes/does-a-standing-hold-still`.
+Run through the lane at 2026-08-21, from [does-a-standing-hold-still](iterations/i51/run-spikes/does-a-standing-hold-still).
 
 THE THIRD STANDING IS NOT BUILT, so this uses the one deferred verdict the
 product already has: `se_test` hands off and reports later. That is the same

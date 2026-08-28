@@ -422,7 +422,7 @@ The record's OWN experiments, where its fold-back says so. An experiment
 ## The record the walk is in
 
 THE RECORD THE WALK IS IN, as its directory name. The state id carries the
- short id — `iterations/i12/specify-build` — and the directory is the one it
+ short id — [specify-build](iterations/i12/specify-build) — and the directory is the one it
  prefixes.
 
  WHY IT IS NOT A SCAN. Both lookups above used to read whichever record

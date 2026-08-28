@@ -1,6 +1,8 @@
 // see dsp-the-corpus-sweeps.md#the-shape
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join, sep } from "node:path";
+import { noteOf } from "./notes.ts";
+import { fileForId } from "./vocabulary.ts";
 
 /** A CITATION: a path, then an optional `#symbol`, then an optional `:line`.
  *
@@ -382,4 +384,148 @@ function referenceValues(content: string): string[] {
     for (const item of markedList(content, key)) out.push(item);
   }
   return out;
+}
+
+/** WHERE THE POINTING MAP LIVES. Beside the item templates, because a node
+ *  type is declared one per file in that folder and how the types connect had
+ *  no home until this one. */
+const POINTING_RULES_REL = join("deliverable", "machines", "items", "pointing-keys.md");
+
+/** ONE RULE PER LINE, under the marker: the key, a colon, the allowed types
+ *  separated by commas, an em dash and the evidence.
+ *
+ *  `any` IS PARSED AS NO RULE. The word documents for a reader that the key is
+ *  deliberately general, and the engine treats it exactly like a key with no
+ *  row at all. Both mean unchecked, and pretending otherwise would be a
+ *  distinction the check cannot act on. */
+const POINTING_RULE = /^-\s+([a-z_]+):\s+([a-z][a-z,\s-]*?)\s+—/gm;
+
+/** WHAT EACH POINTING KEY IS ALLOWED TO NAME, read from the map.
+ *
+ *  IT READS THROUGH THE NOTE DOOR rather than off the disk. The map carries
+ *  frontmatter and prose, which makes it a note like any other, and a second
+ *  direct read would be one more file the door does not hold.
+ *
+ *  WITH NO MAP TO READ IT ANSWERS UNDEFINED rather than an empty map. A tree
+ *  without the file has not declared that everything is allowed; it has said
+ *  nothing, and a check that cannot read its own rules reports nothing rather
+ *  than passing everything. */
+export function pointingRules(root: string): Map<string, Set<string>> | undefined {
+  const note = noteOf(join(root, POINTING_RULES_REL));
+  if (note === undefined) return undefined;
+  const out = new Map<string, Set<string>>();
+  for (const m of note.body.matchAll(POINTING_RULE)) {
+    const types = m[2]
+      .split(",")
+      .map((t) => t.trim())
+      .filter((t) => t !== "");
+    if (types.length === 1 && types[0] === "any") continue;
+    out.set(m[1], new Set(types));
+  }
+  return out;
+}
+
+/** THE NODE TYPE AN ID BELONGS TO, from the folder its template declares.
+ *
+ *  IT READS THE SAME REGISTRY THE RESOLVER READS. `fileForId` already maps an
+ *  id to `<folder>/<id>.md` through the longest matching prefix, and the last
+ *  folder segment is the type name. A second registry here could disagree with
+ *  the one the corpus is actually filed under. */
+function typeForId(root: string, id: string): string | undefined {
+  const rel = fileForId(root, id);
+  if (rel === undefined) return undefined;
+  const parts = rel.split("/");
+  return parts.length < 2 ? undefined : parts[parts.length - 2];
+}
+
+/** THE ID AT THE FRONT OF A REFERENCE VALUE, or the empty string where the
+ *  value does not open with one.
+ *
+ *  A VALUE CARRIES MORE THAN ITS ID, and three shapes stand in the corpus. A
+ *  wiki reference wraps it in double brackets. A `weighs_with` entry follows
+ *  it with an exclamation mark, an em dash and the reason. A `source_refs`
+ *  entry follows it with a step or an extension number.
+ *
+ *  SO THE ID IS THE LEADING TOKEN and everything after the first space is the
+ *  author talking. Reading the whole value as an id put two extra slashes in
+ *  the resolved path, and the type then came back as a sentence fragment. */
+function leadingId(value: string): string {
+  const bare = value.trim().replace(/^\[\[/, "").replace(/\]\]$/, "").split("|")[0];
+  const first = bare.trim().split(/\s/)[0];
+  return /^[a-z][a-z0-9-]*$/.test(first) ? first : "";
+}
+
+/** A POINTING KEY NAMING A NODE OF A TYPE ITS RULE FORBIDS.
+ *
+ *  AN ID THAT CANNOT BE PLACED IS SKIPPED, and that is deliberate rather than
+ *  lenient. A value no template prefix claims is either free text or a
+ *  reference to something that does not exist, and both already have their own
+ *  finding. Reporting it here as well would say one fault twice.
+ *
+ *  THE CLUSTER KEY FALLS OUT OF THE CHECK BY ITSELF for the same reason: its
+ *  value is a slug rather than an id, no prefix claims it, and it is skipped
+ *  without a special case to maintain. */
+export function mistypedReferences(root: string, frontmatter: Record<string, unknown>): string[] {
+  const rules = pointingRules(root);
+  if (rules === undefined) return [];
+  const out: string[] = [];
+  for (const [key, allowed] of rules) {
+    const raw = frontmatter[key];
+    const values = Array.isArray(raw) ? raw : raw === undefined || raw === null ? [] : [raw];
+    for (const v of values) {
+      if (typeof v !== "string") continue;
+      const id = leadingId(v);
+      if (id === "") continue;
+      const type = typeForId(root, id);
+      if (type === undefined) continue;
+      if (allowed.has(type)) continue;
+      out.push(`${key}: ${id} is a ${type}, and ${key} names ${[...allowed].join(" or ")}`);
+    }
+  }
+  return unique(out);
+}
+
+/** A QUALIFIED STATE REFERENCE WRITTEN IN BACKTICKS, which is the form this
+ *  check exists to replace.
+ *
+ *  QUALIFIED MEANS IT NAMES ITS RECORD. `iterations/i37/run-spikes/end`
+ *  resolves to exactly one state. A bare `observe-red` exists in many
+ *  iterations and names none of them, so it is not matched here and not
+ *  checked anywhere: a check that cannot tell which one is meant would be
+ *  guessing. */
+const BACKTICKED_STATE = /`(iterations\/[a-z0-9][a-z0-9-]*\/[a-z][a-z0-9-]*(?:\/[a-z][a-z0-9-]*)*)`/g;
+
+/** A FENCED CODE BLOCK'S OPENING OR CLOSING LINE. */
+const FENCE = /^\s*```/;
+
+/** A QUALIFIED STATE REFERENCE THAT IS NOT WRITTEN AS A LINK, each with the
+ *  link to write instead.
+ *
+ *  THE LINK CARRIES THE QUALIFIED NAME AND SHOWS THE LAST PART. That is the
+ *  owner's ruling and it buys both halves: the reader sees `end` rather than a
+ *  path, and the reference still says which iteration it means.
+ *
+ *  THE TARGET IS ROOT-RELATIVE, with no leading dot and no leading slash,
+ *  because that is what every link already in this corpus does. The state id
+ *  is already written that way, so the target is the id unchanged.
+ *
+ *  CODE IS SKIPPED. A fenced block and an indented block are showing the
+ *  reader a literal, and rewriting one would change what it shows. */
+export function unlinkedStateRefs(content: string): string[] {
+  const out: string[] = [];
+  let fenced = false;
+  for (const line of content.split("\n")) {
+    if (FENCE.test(line)) {
+      fenced = !fenced;
+      continue;
+    }
+    if (fenced) continue;
+    if (/^ {4,}\S/.test(line)) continue;
+    for (const m of line.matchAll(BACKTICKED_STATE)) {
+      const id = m[1];
+      const last = id.split("/").pop() ?? id;
+      out.push(`${id} is written as code — write it as [${last}](${id})`);
+    }
+  }
+  return unique(out);
 }

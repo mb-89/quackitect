@@ -53,7 +53,7 @@ item is now owed by that state, and the state cannot be left until it is
 settled or moved on.
 |||
 OBSERVED, and it is the heart of the story. Three tokens standing at the
-backlog were moved onto `iterations/i63/fix-findings` mid-round. From that
+backlog were moved onto [fix-findings](iterations/i63/fix-findings) mid-round. From that
 moment the state carried them, and the walk could not leave until two were
 settled as fixed and one was settled `carried` with its finding attached.
 

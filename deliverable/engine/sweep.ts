@@ -19,8 +19,10 @@ import {
   citationMarkers,
   deadLaneVerbs,
   duplicateHeadings,
+  mistypedReferences,
   staleCitations,
   uncheckedCitations,
+  unlinkedStateRefs,
   unreferencedTokens,
 } from "./corpus-sweeps.ts";
 import { danglingReferences } from "./guard.ts";
@@ -39,7 +41,9 @@ export interface Finding {
     | "duplicate-heading"
     | "dead-verb"
     | "stale-citation"
-    | "dangling-reference";
+    | "dangling-reference"
+    | "mistyped-reference"
+    | "unlinked-state";
   path: string;
   says: string;
 }
@@ -153,6 +157,12 @@ function textFindings(root: string, rel: string, raw: string, fm: Record<string,
   }
   for (const says of danglingReferences(root, fm)) {
     out.push({ kind: "dangling-reference", path: rel, says });
+  }
+  for (const says of mistypedReferences(root, fm)) {
+    out.push({ kind: "mistyped-reference", path: rel, says });
+  }
+  for (const says of unlinkedStateRefs(raw)) {
+    out.push({ kind: "unlinked-state", path: rel, says });
   }
   if (!teaches(rel)) return out;
   for (const verb of deadLaneVerbs(root, raw)) {

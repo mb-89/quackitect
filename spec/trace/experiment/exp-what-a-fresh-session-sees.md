@@ -22,7 +22,7 @@ source_refs:
 
 ## Setup
 
-Run through the lane at 2026-08-21, from `iterations/i51/run-spikes/what-a-fresh-session-sees`.
+Run through the lane at 2026-08-21, from [what-a-fresh-session-sees](iterations/i51/run-spikes/what-a-fresh-session-sees).
 
 THE THIRD STANDING IS NOT BUILT, so it cannot be left running and looked at.
 What CAN be measured is the machinery a third standing would have to live in, and

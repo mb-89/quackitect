@@ -29,7 +29,7 @@ chain beneath it was re-signed state by state: `record-adrs`,
 
 `run-spikes` IS NEXT AND CANNOT BE RE-SIGNED.
 
-The walk pins at `iterations/i37/run-spikes/end` and every pull answers the
+The walk pins at [end](iterations/i37/run-spikes/end) and every pull answers the
 same refusal:
 
     SE-C-112 — run-spikes's claim to stand before it completes — it declares 0
@@ -144,7 +144,7 @@ defect it found is real and still open.
 
 BUT THE WALK STAYED PINNED AFTER THE REOPEN. Reopening `run-spikes` moved the
 claim into the owed shape and the walk still could not complete it, answering
-at `iterations/i37/run-spikes/end` with an `unsubmitted` blocker and no verb
+at [end](iterations/i37/run-spikes/end) with an `unsubmitted` blocker and no verb
 that could serve the form.
 
 THREE MECHANISMS DISAGREED ABOUT WHETHER A PLACEHOLDER WAS GREEN.

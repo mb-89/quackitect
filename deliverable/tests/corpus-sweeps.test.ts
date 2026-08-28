@@ -7,9 +7,12 @@ import { test } from "node:test";
 import {
   deadLaneVerbs,
   duplicateHeadings,
+  mistypedReferences,
   POINTING_KEYS,
+  pointingRules,
   staleCitations,
   uncheckedCitations,
+  unlinkedStateRefs,
   unreferencedTokens,
 } from "../engine/corpus-sweeps.ts";
 import { danglingReferences, REFERENCE_KEYS } from "../engine/guard.ts";
@@ -211,4 +214,92 @@ test("a citation the sweep cannot parse is unchecked, and a directory is not a c
   assert.ok(found.includes("rows/*.md"), `glob missing from ${JSON.stringify(found)}`);
   assert.ok(found.includes(".se/calls.jsonl"), `machine-local path missing from ${JSON.stringify(found)}`);
   assert.ok(!found.includes(".se/"), "a bare directory is not a citation");
+});
+
+/** A root carrying two item templates and a pointing map over them. The
+ *  templates are what turn an id prefix into a type, so a case without them
+ *  would prove nothing about the map. */
+function rootWithPointingMap(rules: string): string {
+  const root = fresh();
+  node(root, "deliverable/machines/items/requirement.md", "---\nid_prefix: req-\nfolder: spec/trace/requirement\n---\n");
+  node(root, "deliverable/machines/items/story.md", "---\nid_prefix: sty-\nfolder: spec/trace/story\n---\n");
+  node(root, "deliverable/machines/items/pointing-keys.md", `---\nid: pointing-keys\n---\n\n<!-- rules below this line -->\n${rules}`);
+  return root;
+}
+
+test("a key naming the type its rule allows is not reported", () => {
+  const root = rootWithPointingMap("- satisfies: requirement — measured\n");
+  assert.deepEqual(mistypedReferences(root, { satisfies: ["req-a-thing"] }), []);
+});
+
+test("a key naming a type its rule forbids is reported with both types", () => {
+  const root = rootWithPointingMap("- satisfies: requirement — measured\n");
+  const found = mistypedReferences(root, { satisfies: ["sty-a-thing"] });
+  assert.equal(found.length, 1);
+  assert.match(found[0], /sty-a-thing is a story/);
+  assert.match(found[0], /satisfies names requirement/);
+});
+
+test("a key the map calls any is not checked", () => {
+  const root = rootWithPointingMap("- source_refs: any — the general provenance key\n");
+  assert.deepEqual(mistypedReferences(root, { source_refs: ["sty-a-thing"] }), []);
+});
+
+test("a value carrying a reason after its id is still placed by the id", () => {
+  const root = rootWithPointingMap("- weighs_with: requirement — measured\n");
+  const value = "req-a-thing ! — one is listing/entering work, the other is not";
+  assert.deepEqual(mistypedReferences(root, { weighs_with: [value] }), []);
+});
+
+test("a wiki reference is placed by the id inside the brackets", () => {
+  const root = rootWithPointingMap("- satisfies: requirement — measured\n");
+  assert.deepEqual(mistypedReferences(root, { satisfies: ["[[req-a-thing]]"] }), []);
+});
+
+test("a value no template prefix claims is left to the dangling check", () => {
+  const root = rootWithPointingMap("- satisfies: requirement — measured\n");
+  assert.deepEqual(mistypedReferences(root, { satisfies: ["https://example.invalid/a-page"] }), []);
+});
+
+test("with no map to read, the check answers nothing rather than passing everything", () => {
+  const root = fresh();
+  assert.equal(pointingRules(root), undefined);
+  assert.deepEqual(mistypedReferences(root, { satisfies: ["sty-a-thing"] }), []);
+});
+
+test("the live map rules only over keys the corpus points with", () => {
+  const rules = pointingRules("..");
+  assert.ok(rules !== undefined, "the map beside the item templates is readable");
+  for (const key of rules.keys()) {
+    assert.ok(POINTING_KEYS.includes(key), `${key} is ruled over and is not a pointing key`);
+  }
+});
+
+test("a qualified state reference written as code is reported with the link to write", () => {
+  const found = unlinkedStateRefs("the walk stops at `iterations/i37/run-spikes/end` and waits\n");
+  assert.equal(found.length, 1);
+  assert.match(found[0], /\[end\]\(iterations\/i37\/run-spikes\/end\)/);
+});
+
+test("a qualified state reference already written as a link is not reported", () => {
+  const found = unlinkedStateRefs("the walk stops at [end](iterations/i37/run-spikes/end) and waits\n");
+  assert.deepEqual(found, []);
+});
+
+test("a bare state name is not resolvable and is left alone", () => {
+  assert.deepEqual(unlinkedStateRefs("the walk reaches `observe-red` and stops\n"), []);
+});
+
+test("a state reference inside a fenced block is showing a literal and is left alone", () => {
+  const text = "before\n\n```\nse_aim {to: `iterations/i37/run-spikes/end`}\n```\n\nafter\n";
+  assert.deepEqual(unlinkedStateRefs(text), []);
+});
+
+test("a state reference in an indented block is left alone too", () => {
+  assert.deepEqual(unlinkedStateRefs("before\n\n    `iterations/i37/run-spikes/end`\n\nafter\n"), []);
+});
+
+test("the same reference twice is reported once", () => {
+  const text = "`iterations/i1/onboard-retro` and again `iterations/i1/onboard-retro`\n";
+  assert.equal(unlinkedStateRefs(text).length, 1);
 });

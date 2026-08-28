@@ -105,7 +105,7 @@ re-sizes the record down to the sweep that was seeded. Anything else confirms
 it.
 
 WHO RAN IT: the walker of the milestone that opened the design work, at
-`iterations/i54/draft-vision`.
+[draft-vision](iterations/i54/draft-vision).
 
 HOW IT WAS RUN, so it can be repeated. One search for the write verbs over
 `deliverable/engine`, filtered to the seven filenames, returned exactly 64

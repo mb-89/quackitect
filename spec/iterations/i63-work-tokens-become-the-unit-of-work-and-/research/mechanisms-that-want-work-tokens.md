@@ -26,7 +26,7 @@ Every claim below cites the file it was read from.
 ALL FIVE MOVERS ARE THIS ITERATION'S WORK, on the owner's ruling: a finding
 needed for the system to be complete is worked here rather than parked.
 
-They stand as open tokens at `iterations/i63/fix-findings`.
+They stand as open tokens at [fix-findings](iterations/i63/fix-findings).
 
 ## What already moved, so the baseline is clear
 

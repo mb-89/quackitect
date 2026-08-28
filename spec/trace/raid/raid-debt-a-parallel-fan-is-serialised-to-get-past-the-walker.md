@@ -23,7 +23,7 @@ THE OWNER AUTHORISED THE CLOSE, 2026-08-18, leaving for the night: "end this
 iteration completely by yourself... Everything that isn't clear, make a
 decision and put it as technical debt."
 
-THE WALK WAS STUCK AT `iterations/i16/run-demos/end` with no legal move. The
+THE WALK WAS STUCK AT [end](iterations/i16/run-demos/end) with no legal move. The
 choice was between changing the drawing and rebuilding the walker's sub-stack
 handling mid-record. The drawing was changed, because SE-C-123's own remedy
 says to fix the drawing and because contract rule 2 forbids the unnamed
