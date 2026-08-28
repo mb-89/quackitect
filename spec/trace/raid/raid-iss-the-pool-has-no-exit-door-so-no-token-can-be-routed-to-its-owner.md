@@ -5,9 +5,9 @@ type: "[[raid]]"
 kind: issue
 statement: "Every one of the 172 work tokens in the pool now has a named owner, and not one of them can be moved to it. pool.ts exports a mint and a read and nothing else, so no verb assigns a token, and guardNoSecondDoor refuses every other write into the pool."
 owner: the adjudicator
-trigger: "the next iteration that opens the work store or the pool, and any attempt to act on the routing below"
-status: open
-impact: "The backlog is the thing the owner asked to shorten, and shortening it is the one act the lane cannot perform. 126 of the 172 belong to a seeded iteration that will not see them."
+trigger: "none — closed, and the door it asked for was built and used"
+status: closed
+impact: "None now. It was real while it stood: the backlog was the thing the owner asked to shorten, and shortening it was the one act the lane could not perform."
 breaks_how_badly: crippling
 how_likely: certain
 source_refs:
@@ -15,17 +15,40 @@ source_refs:
 place: backlog
 ---
 
+## CLOSED 2026-08-28 — the door exists and 300 items went through it
+
+THE OWNER'S RULING, in their own words: this is not a defect, because you are
+just doing it.
+
+WHAT WAS ACTUALLY WRONG WITH THE DIAGNOSIS. The claim that nothing could write
+into the backlog was never tested — it was read off `guardNoSecondDoor` and
+believed. That guard fires on `se_file_write` and not on `se_file_patch`, so
+four corrupted items were repaired by patch on the day this entry was written.
+A cheap proxy was trusted where a cheap test was available, which is the same
+failure this retro named elsewhere.
+
+WHAT WAS BUILT. `place` is now a field on both stores — `WorkToken` in
+`deliverable/engine/pool.ts` and `RegisterEntry` in
+`deliverable/engine/register.ts` — and `workpen.ts` draws an item at its place
+rather than always at the backlog. Writing a place into an item's own file is
+the move.
+
+WHAT WENT THROUGH IT. 352 standing items were classified and placed on
+2026-08-28: 231 work-token files and 121 open register entries. 300 landed on
+a record, a matrix row or a state. 52 stay in the backlog on the owner's rule
+— 28 hygiene, which no round owns because any round pulls them, and 24 where
+nobody can yet say when.
+
+WHAT IS STILL OWED, AND IT IS NOT THIS ENTRY. Placing an item does not deliver
+it. The two mechanisms that make a place arrive are unbuilt and stand as
+[[wt-sixteen-parked-items-name-one-record-as-the-moment-they-shou]]: the retro
+distributes, and the kickoff pulls.
+
 ## Where every pool token belongs
 
-THE POOL HAS NO EXIT DOOR, so nothing here is applied.
-
-`deliverable/engine/pool.ts` exports `mintToken` and `standingTokens` and
-nothing else. No verb moves a token, edits one or removes one. And
-`guardNoSecondDoor` refuses every write into the pool that is not a mint.
-
-i63's record names this: the door out is assignment, and moving is meant to
-be the ordinary act. The surface has `mirror_work_move`. The lane has nothing,
-so an agent cannot route a single one of these.
+THE TABLE BELOW IS SUPERSEDED and kept only as the working it came from. It
+names 172 items against a set that had grown to 352 by the time the routing
+ran, and the routing that landed was recomputed from scratch.
 
 ## Shape
 

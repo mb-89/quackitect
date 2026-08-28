@@ -550,6 +550,37 @@ The trigger is a NOTE carrying "needs retro":
    "the pool" is the code's word for the same folder. Carrying the internal
    word into a report makes the reader translate.
 
+   MOVE EVERYTHING THAT CAN MOVE. The owner's rule, 2026-08-28: everything you
+   can move onto an iteration, move onto an iteration. Two things stay, and
+   only two.
+
+   - HYGIENE, which any round can do at any time. It keeps NO owner on
+     purpose, because assigning it would stop a passing round pulling it. Give
+     it the re-entry condition `ready when a building milestone pulls hygiene
+     work` and leave it.
+   - WORK NOBODY CAN TIME. Where it is genuinely unclear when this gets done,
+     say so and leave it. Sparingly.
+
+   CHECK EVERY DESTINATION BEFORE WRITING ONE. A place naming a record that
+   shipped is worse than no place at all, because it reads as routed. Measured
+   2026-08-28: 24 items stood parked against a record already shipped or
+   abandoned, and one named a record abandoned outright, so its moment could
+   never arrive.
+
+   `se_survey` NOW REPORTS THOSE. Its `passed_moments` block names every
+   backlog item whose condition points at a record that has closed. Read it
+   here; each one needs a fresh judgment.
+
+   THIS STEP IS HALF A MECHANISM, AND THE OTHER HALF IS THE KICKOFF'S. Writing
+   a place is not delivering the item. The kickoff pulls what is assigned to
+   its record once that record's substeps exist. Without that, a place is a
+   word waiting for somebody to read it at the right hour.
+
+   NOT AT SEEDING, AND THE DISTINCTION MATTERS. Seeding creates M0 and nothing
+   more, so nothing can wait on it — nobody knows in advance whether an
+   iteration will ever be seeded. The KICKOFF is where the substeps are seeded,
+   which is the first moment a record has anywhere to put work.
+
 ## The standing questions
 
 Two questions run EVERY retro, whatever the period held.

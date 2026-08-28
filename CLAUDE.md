@@ -1,5 +1,5 @@
 <!-- GENERATED at agent start. Do not edit — the next start overwrites it.
-     from guidance/contract.md 94fc93260d94
+     from guidance/contract.md 3a4b6f73adf4
      from guidance/walking.md bf30b933fe16
      from guidance/method/lane.md 0f7559c796b0
      from guidance/voice.md a85b1d5c8486
@@ -93,9 +93,7 @@ own token, and opening a second for the same work counts one thing twice.
 
 SWITCHING WORK IS TWO ACTS. Settle the piece in your hand, then open the next
 one. A switch nobody settled leaves the board naming work you stopped doing.
-
-THAT IS THE WHOLE TEST FOR A NEW TOKEN. Same piece of work, no token. Different
-piece of work, a token.
+That is the whole test: same work, no token; different work, a token.
 
 IT LANDS WHERE THE WALK STANDS unless `at` names somewhere else, and it HOLDS
 THAT STATE until it is settled. So the state cannot be left with their work

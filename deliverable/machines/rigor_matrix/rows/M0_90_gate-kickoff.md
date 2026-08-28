@@ -165,6 +165,29 @@ THE BLESS SEEDS THE ITERATION. The engine compiles the blessed column into the
 iteration's state machine and pins it to the record, and that seeded machine
 is part of this gate's output.
 
+## The kickoff pulls the work assigned to this record
+
+NOT BUILT YET. Do it by hand here until it is: read `se_survey`, take every
+backlog item whose `place` names this record, and list each one under
+`pulled_in`.
+
+WHEN IT IS BUILT, the bless will pull them. This is the first moment a record
+has substeps to put work into, so it is the moment the assignment can land.
+
+NOT AT SEEDING, and the distinction is the whole reason this sits here. Seeding
+creates M0 and nothing else. Nothing can wait on it, because nobody knows in
+advance whether an iteration will ever be seeded at all.
+
+THIS IS THE SECOND HALF OF A PAIR. The retro writes a `place` onto each backlog
+item (`guidance/method/retro.md`, step 15). Without the pull, that place is a
+word sitting in a file until somebody happens to read the backlog at the right
+hour — which is how sixteen items named a record that then shipped without
+collecting one of them (measured 2026-08-28).
+
+HYGIENE IS NOT PULLED HERE. It keeps no owner on purpose, and the building
+milestone collects it (`M7_20_specify-build`). Pulling it at the kickoff would
+give it the owner the rule exists to withhold.
+
 ## The goals
 
 THE GOALS ARE A TABLE, four columns wide, and they bind the whole walk.

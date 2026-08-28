@@ -23,6 +23,20 @@ SO 26 OF THE 44 CLASSIFIED FAILURES CAME FROM THE PROGRESS BOOKKEEPING rather th
 
 AND THE VOLUME IS THE LARGER HALF. The bookkeeping verb accounts for 686 of the 1,897 calls, 36 percent of everything, against 282 of the walking verb. That is 2.4 bookkeeping entries per step of walking, over a stretch of about five and a half hours, which is above the pace the contract asks for.
 
+## The owner ruled on this, 2026-08-28
+
+REMOVE IT RATHER THAN MAKE IT LEANER. The tokens talk now: a token taken says
+what began and a token settled says what happened, so the bookkeeping the toll
+was built to force is already written.
+
+WHAT SURVIVES IS ONE NUDGE, at about five minutes, asking whether the token in
+hand is still the work. Its shape is in
+[[wt-the-once-a-minute-question-asks-about-duration-when-it-shoul]].
+
+THE MEASURED PRIZE IS ON THIS ITEM ALREADY: 41 of 102 typed refusals in one
+window came from the progress-reporting mechanism rather than from the work.
+Removing it removes those refusals outright.
+
 ## When it comes back
 
 ready when the narration system is next opened, and the owner has already asked for it to become leaner

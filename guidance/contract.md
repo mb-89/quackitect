@@ -94,9 +94,7 @@ own token, and opening a second for the same work counts one thing twice.
 
 SWITCHING WORK IS TWO ACTS. Settle the piece in your hand, then open the next
 one. A switch nobody settled leaves the board naming work you stopped doing.
-
-THAT IS THE WHOLE TEST FOR A NEW TOKEN. Same piece of work, no token. Different
-piece of work, a token.
+That is the whole test: same work, no token; different work, a token.
 
 IT LANDS WHERE THE WALK STANDS unless `at` names somewhere else, and it HOLDS
 THAT STATE until it is settled. So the state cannot be left with their work
