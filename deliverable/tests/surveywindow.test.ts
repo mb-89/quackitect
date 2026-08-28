@@ -204,6 +204,54 @@ test("an item placed at a state leaves the desk's backlog", async () => {
   assert.equal(s.counts.backlog, s.backlog.length, "the count matches the list it counts");
 });
 
+// THE PILL AND THE LIST COUNTED DIFFERENT SETS.
+//
+// workpen draws BOTH pool tokens and open register entries at the backlog, and
+// the board's pill counts what the pen draws. The desk's own list read the pool
+// alone, so the pill said 42 while the list showed 23. The 19 that never
+// appeared were open issues and debts — the oldest work there is.
+//
+// Measured 2026-08-28, on the same surface and in the same week as the defect
+// above. Same shape too: the field was right, one reader ignored it.
+test("an open register entry stands in the desk's backlog beside a pool token", async () => {
+  const root = freshRoot();
+  gitInit(root);
+  const server = await bootedServer(root);
+
+  const entry = (slug: string, place: string | undefined): void => {
+    const dir = join(root, "spec", "trace", "raid");
+    mkdirSync(dir, { recursive: true });
+    const lines = [
+      "---",
+      `id: ${slug}`,
+      'type: "[[raid]]"',
+      "kind: issue",
+      "status: open",
+      "statement: a fixture issue nobody has placed",
+      "trigger: ready when somebody picks it up",
+      ...(place === undefined ? [] : [`place: ${place}`]),
+      "---",
+      "",
+    ];
+    writeFileSync(join(dir, `${slug}.md`), lines.join("\n"), "utf8");
+  };
+  entry("raid-iss-a-fixture-nobody-placed", undefined);
+  entry("raid-iss-a-fixture-routed-to-a-record", "i99-somewhere-else");
+
+  const s = (await call(server, "se_survey", {})).body as unknown as {
+    counts: { backlog: number };
+    backlog: { ref: string; ready_when: string }[];
+  };
+  const refs = s.backlog.map((b) => b.ref);
+  assert.ok(refs.includes("raid-iss-a-fixture-nobody-placed"), "an unplaced open issue stands in the backlog");
+  assert.ok(!refs.includes("raid-iss-a-fixture-routed-to-a-record"), "and a placed one has left it, exactly as a token does");
+  // THE TRIGGER IS THE READY-WHEN. Both answer what has to happen before
+  // somebody looks again, so the list carries one column rather than two.
+  const row = s.backlog.find((b) => b.ref === "raid-iss-a-fixture-nobody-placed");
+  assert.equal(row?.ready_when, "ready when somebody picks it up");
+  assert.equal(s.counts.backlog, s.backlog.length, "the count matches the list it counts");
+});
+
 // A PARKED ITEM WAITING ON A RECORD IS WAITING FOR AN EVENT NOBODY FIRES.
 //
 // "ready when i60 is seeded" reads like a promise that the item wakes when

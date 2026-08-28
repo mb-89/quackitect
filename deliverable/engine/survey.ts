@@ -4,6 +4,7 @@ import { itList, readItRecord } from "./iterations.ts";
 import { seDir } from "./paths.ts";
 import { standingTokens } from "./pool.ts";
 import { expList, readRecord, retroOwed } from "./records.ts";
+import { openRegisterWork } from "./register.ts";
 import { BACKLOG } from "./workstore.ts";
 
 export interface Survey {
@@ -125,15 +126,36 @@ export function survey(projectRoot: string, opts: SurveyOptions = {}): Survey {
   //
   // WHERE THE OTHERS WENT is the state's own pending work, which is what
   // holding a place means.
-  const allBacklog = standingTokens(projectRoot)
-    .filter((o) => o.place === undefined || o.place === "" || o.place === BACKLOG)
-    .map((o) => ({
-      ref: o.id,
-      ready_when: o.ready_when,
-      title: headline(o.statement, GOAL_CAP),
-      priority: DEFAULT_PRIORITY,
-      ...(withText ? { text: o.statement } : {}),
-    }));
+  // TWO SOURCES SIT IN THE BACKLOG AND THE DESK LISTED ONE.
+  //
+  // workpen.ts draws BOTH pool tokens and open register entries at the backlog,
+  // and the board's pill counts what the pen draws. This list read the pool
+  // alone, so the pill said 42 while the list showed 23. The 19 that never
+  // appeared were open issues and debts, which are the oldest work there is.
+  // Measured 2026-08-28.
+  //
+  // THE PEN IS THE AUTHORITY ON WHERE WORK STANDS. This reads the same two
+  // sources, filtered the same way, so the count and the list are one set
+  // rather than two answers a reader has to reconcile.
+  //
+  // A REGISTER ENTRY'S TRIGGER IS ITS READY-WHEN. Both answer the same question,
+  // which is what has to happen before somebody looks again, so the list
+  // carries one column rather than two named after where a row came from.
+  const atBacklog = (place: string | undefined): boolean => place === undefined || place === "" || place === BACKLOG;
+  const allBacklog = [
+    ...standingTokens(projectRoot)
+      .filter((o) => atBacklog(o.place))
+      .map((o) => ({ ref: o.id, ready_when: o.ready_when, statement: o.statement })),
+    ...openRegisterWork(projectRoot)
+      .filter((e) => atBacklog(e.place))
+      .map((e) => ({ ref: e.id, ready_when: e.trigger, statement: e.statement })),
+  ].map((o) => ({
+    ref: o.ref,
+    ready_when: o.ready_when,
+    title: headline(o.statement, GOAL_CAP),
+    priority: DEFAULT_PRIORITY,
+    ...(withText ? { text: o.statement } : {}),
+  }));
   const backlog = windowed ? allBacklog.slice(offset, offset + (opts.limit ?? allBacklog.length)) : allBacklog;
   const passed = passedMoments(itList(projectRoot), allBacklog);
   // READ FROM THE REPOSITORY, never from the local note store. Shipping used to
