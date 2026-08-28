@@ -325,13 +325,29 @@ THE WORKING SHAPE IS TWO SESSIONS. One prepares the repository; the next starts
 with the lane attached and the cage on. On a cloud runner the preparation is
 committed rather than performed at startup, which is ruling 1 again.
 
-### 5. Push is yours here, and only here
+### 5. Push is NOT BUILT YET, and the engine refuses it here like anywhere else
 
-THE LANE KEEPS PUSH WITH THE PERSON EVERYWHERE ELSE. On a cloud run there is no
-person, so the run pushes what it produced.
+WHAT TO DO INSTEAD: commit locally, say in chat how many commits are waiting
+and on which branch, and leave the push to the owner. That is the refusal's own
+remedy.
 
-CHECK WHAT THE GIT VERB ACTUALLY ALLOWS before relying on this. If it refuses,
-that is a finding for the field report, not a reason to reach around it.
+MEASURED ON i44. `se_git push -u origin v3` was refused with SE-C-003, "no push
+on the agent lane — pushing is the owner's act", from
+`deliverable/engine/gitlane.ts`. The clause carries no cloud exception.
+
+WHAT THIS SECTION USED TO PROMISE, so a reader who remembers it is not
+confused: that the lane keeps push with the person everywhere else, and that a
+cloud run pushes what it produced because no person is there. The second half
+was never built.
+
+THE ARGUMENT FOR IT STILL STANDS AND IS WRITTEN DOWN: an ephemeral box loses
+everything that is not pushed, and on an unattended run nobody is there to
+push. Whether the engine should grow the exception is the owner's ruling, not
+the agent's.
+
+IF IT REFUSES, THAT IS A NOTE AND A WORK TOKEN AT THE RETRO, never a reason to
+reach around it. Running the push through the shell would be working around a
+refusal with another lane, which the contract forbids.
 
 ## When something fails, look here first
 

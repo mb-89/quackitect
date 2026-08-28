@@ -148,3 +148,6 @@
 {"ts":"2026-08-28T12:09:51.622Z","op":"update","visit":"iterations/i44/fix-findings@0","node":"d190","brief":"drop the superseded join and add four cases for the new behaviour"}
 {"ts":"2026-08-28T12:10:04.789Z","op":"update","visit":"iterations/i44/fix-findings@0","node":"d191","brief":"verify the token join, the anchor check and the unchecked class"}
 {"ts":"2026-08-28T12:10:26.789Z","op":"update","visit":"iterations/i44/fix-findings@0","node":"d192","brief":"commit the honest token join and its four cases"}
+{"ts":"2026-08-28T12:11:17.464Z","op":"update","visit":"iterations/i44/fix-findings@0","node":"d193","brief":"read what the cloud card promises about pushing"}
+{"ts":"2026-08-28T12:11:34.269Z","op":"update","visit":"iterations/i44/fix-findings@0","node":"d194","brief":"the cloud card no longer promises a push the engine refuses"}
+{"ts":"2026-08-28T12:11:44.958Z","op":"done","visit":"iterations/i44/fix-findings@0","node":"d184","brief":"the cloud card's push promise is marked unbuilt with its alternative"}
