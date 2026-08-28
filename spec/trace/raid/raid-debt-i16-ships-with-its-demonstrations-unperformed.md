@@ -1,4 +1,9 @@
 ---
+unreachable_citations:
+  - reports/rpt-press-create-vehicle-and-land-in-it.md
+  - reports/rpt-drive-somebody-elses-product.md
+  - reports/rpt-nothing-i-do-reaches-what-it-came-from.md
+  - reports/rpt-vendor-it-into-my-product.md
 minted_in: i16-the-vehicle-overlay-a-vehicle-vendors-th
 id: raid-debt-i16-ships-with-its-demonstrations-unperformed
 type: "[[raid]]"

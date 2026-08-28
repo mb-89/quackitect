@@ -1,4 +1,6 @@
 ---
+unreachable_citations:
+  - bin/supply-gaps.ts
 minted_in: i1
 id: dsp-method-compilation
 type: "[[design-spec]]"

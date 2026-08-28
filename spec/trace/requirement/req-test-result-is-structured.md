@@ -16,8 +16,6 @@ priority: must
 
 ## Detail
 
-## Detail
-
 | field | carries |
 | --- | --- |
 | totals | pass, fail, and skip counts for the scope |

@@ -160,7 +160,11 @@ test("no new file read bypasses the door — the count may fall, never rise", ()
   // AND 121: run.ts timeRemaining reads the running work's own progress file to
   // project how much longer it needs. Same shape and same reason — machine-local
   // JSONL, no door, no parse of a trace node.
-  const CEILING = 121;
+  // AND 123 AT i44: corpus-sweeps.ts reads SOURCE, never a corpus node. One read
+  // asks whether the engine still names a lane verb, the other whether the tree
+  // holds a cited file. Neither wants frontmatter, so the node door has nothing
+  // to give them, and both are one-shot behind a module-level cache.
+  const CEILING = 123;
   let found = 0;
   const offenders: string[] = [];
   const walk = (dir: URL, rel: string): void => {

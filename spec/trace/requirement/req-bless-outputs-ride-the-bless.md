@@ -18,7 +18,5 @@ weighs_against:
 
 ## Detail
 
-## Detail
-
 - Examples of seeded outputs: a compiled machine, a pinned column.
 - The output is part of the gate record, never a follow-up task.

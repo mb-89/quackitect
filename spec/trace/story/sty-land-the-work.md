@@ -49,7 +49,7 @@ The bless is hash-bound and channel-recorded per meth-gate-review; the gate's fo
 
 The work lands on trunk in one piece. The worktree goes. The expedition that held the day stays open, still collecting.
 |||
-The landing door: se_git_land behind M9's gate-release - i1 reaches it this milestone; the mid-iteration syncs (baf5ec1d) already keep record and trunk in step.
+The landing is a commit on trunk behind M9's gate-release. Since i34 a record is a folder on trunk, so there is no branch to merge and no sync to keep in step.
 
 ---
 

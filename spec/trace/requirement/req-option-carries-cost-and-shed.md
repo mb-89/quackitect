@@ -20,8 +20,6 @@ weighs_against:
 
 ## Detail
 
-## Detail
-
 - Cost: what taking the option pays.
 - Shed: what taking the option gives up.
 - An absent entry and an empty entry close the step the same way.

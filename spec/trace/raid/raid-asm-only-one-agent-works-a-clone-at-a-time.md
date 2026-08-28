@@ -1,4 +1,7 @@
 ---
+unreachable_citations:
+  - satellite.ts
+  - supervisor.ts
 minted_in: i34-one-tree-iterations-and-archives-live-on
 id: raid-asm-only-one-agent-works-a-clone-at-a-time
 type: "[[raid]]"

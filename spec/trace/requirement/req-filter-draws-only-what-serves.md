@@ -20,8 +20,6 @@ weighs_against:
 
 ## Detail
 
-## Detail
-
 | rule | outcome |
 | --- | --- |
 | node serves the filter | drawn |

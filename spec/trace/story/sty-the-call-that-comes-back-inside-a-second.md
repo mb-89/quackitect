@@ -1,4 +1,6 @@
 ---
+unreachable_citations:
+  - tests/session.test.ts
 minted_in: i33-every-interface-a-person-or-an-agent-tou
 id: sty-the-call-that-comes-back-inside-a-second
 type: "[[story]]"

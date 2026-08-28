@@ -1,4 +1,6 @@
 ---
+unreachable_refs:
+  - cand-whoever-holds-the-hands-decides
 minted_in: i38-the-machine-sizes-its-own-driver-every-s
 id: raid-dec-difficulty-is-two-figures-and-is-named-per-state
 type: "[[raid]]"

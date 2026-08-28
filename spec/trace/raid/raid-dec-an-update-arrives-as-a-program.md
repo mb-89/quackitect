@@ -1,4 +1,6 @@
 ---
+unreachable_refs:
+  - cand-the-program-route
 minted_in: i16-the-vehicle-overlay-a-vehicle-vendors-th
 id: raid-dec-an-update-arrives-as-a-program
 type: "[[raid]]"

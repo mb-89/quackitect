@@ -1,4 +1,6 @@
 ---
+unreachable_refs:
+  - el-satellite-supervisor
 id: raid-ar-crash-lands-safe
 type: "[[raid]]"
 kind: risk

@@ -1,4 +1,6 @@
 ---
+unreachable_refs:
+  - uc-claim-an-iteration
 minted_in: i34-one-tree-iterations-and-archives-live-on
 id: raid-dec-the-machine-locking-specification-is-retired-whole
 type: "[[raid]]"

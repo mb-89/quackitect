@@ -21,7 +21,6 @@
 //   entry arrived passes while every other extension is gone.
 
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
-import { basename } from "node:path";
 
 export type Identifier = { id: string; uuid?: string };
 
@@ -147,12 +146,30 @@ export function problemsIn(text: string, mustContain: string[]): string[] {
 
 /** The entry for an extension folder, in the shape VS Code writes for itself.
  *  `dir` is the folder inside the extensions directory, linked or copied. */
+/** THE FOLDER NAME AT THE END OF A PATH, whatever separator wrote it.
+ *
+ *  THE REGISTRY IS WRITTEN ON ONE PLATFORM AND READ ON ANOTHER, so a backslash
+ *  is a separator here even where the running platform calls it an ordinary
+ *  character. `basename` asks the platform, and off its home ground it answers
+ *  with the whole string.
+ *
+ *  MEASURED ON POSIX: a Windows-shaped location returned the whole string
+ *  where the folder name was wanted. The line above already normalises the
+ *  same value for `location.path`; this one did not. */
+function lastSegment(dir: string): string {
+  const parts = dir
+    .replace(/\\/g, "/")
+    .split("/")
+    .filter((part) => part !== "");
+  return parts[parts.length - 1] ?? "";
+}
+
 export function entryFor(dir: string, pkg: { name: string; publisher: string; version: string }, installedAt: number): ExtensionEntry {
   return {
     identifier: { id: `${pkg.publisher}.${pkg.name}` },
     version: pkg.version,
     location: { $mid: 1, path: `/${dir.replace(/\\/g, "/")}`, scheme: "file" },
-    relativeLocation: basename(dir),
+    relativeLocation: lastSegment(dir),
     metadata: { installedTimestamp: installedAt, source: "vsix" },
   };
 }

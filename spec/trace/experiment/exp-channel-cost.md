@@ -1,4 +1,7 @@
 ---
+unreachable_refs:
+  - el-core
+  - if-core-satellite
 minted_in: i27
 id: exp-channel-cost
 type: "[[experiment]]"

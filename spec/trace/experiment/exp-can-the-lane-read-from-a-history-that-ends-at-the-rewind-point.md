@@ -1,4 +1,7 @@
 ---
+unreachable_refs:
+  - cand-the-guarded-run
+  - cand-the-refusing-run-with-recorded-conditions
 minted_in: i37-training-iterations-a-disposable-iterati
 id: exp-can-the-lane-read-from-a-history-that-ends-at-the-rewind-point
 type: "[[experiment]]"

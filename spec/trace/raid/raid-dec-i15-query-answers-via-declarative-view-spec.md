@@ -1,4 +1,6 @@
 ---
+unreachable_refs:
+  - cand-explicit-and-safe
 minted_in: i15-the-database-our-own-reader-over-obsidia
 id: raid-dec-i15-query-answers-via-declarative-view-spec
 type: "[[raid]]"

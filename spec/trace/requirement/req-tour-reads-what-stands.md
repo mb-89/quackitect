@@ -19,7 +19,5 @@ weighs_against:
 
 ## Detail
 
-## Detail
-
 - A part shipped since the last tour appears on the next tour with zero authored changes.
 - The stop list derives at tour time; zero stored tour scripts exist.

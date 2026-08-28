@@ -1,4 +1,6 @@
 ---
+unreachable_citations:
+  - scratchpad/demo-benchmark.mjs
 minted_in: i37-training-iterations-a-disposable-iterati
 id: tsp-a-machine-change-becomes-a-paired-number
 type: "[[test-spec]]"

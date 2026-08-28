@@ -1,4 +1,6 @@
 ---
+unreachable_citations:
+  - tests/latency.test.ts
 minted_in: i16-the-vehicle-overlay-a-vehicle-vendors-th
 id: raid-un-surface-answers-in-one-second
 type: "[[raid]]"

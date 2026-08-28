@@ -1,4 +1,7 @@
 ---
+unreachable_refs:
+  - cand-explicit-and-safe
+  - cand-fast-path-plus-blocking
 minted_in: i15-the-database-our-own-reader-over-obsidia
 id: raid-tripwire-i15-blocked-candidate-escape-hatch
 type: "[[raid]]"

@@ -1,4 +1,7 @@
 ---
+unreachable_citations:
+  - engine/statedecl.ts
+  - statedecl.ts
 minted_in: i9-se-and-the-corpus-move-the-machine-state
 id: dsp-the-state-declaration
 type: "[[design-spec]]"

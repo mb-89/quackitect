@@ -16,6 +16,4 @@ priority: must
 
 ## Detail
 
-## Detail
-
 The person's controls — the setting, the target, the checkboxes — AIM the walk. None of them moves it a state forward or back. A raised setting while the agent is stopped changes only how far the next pull is allowed to go.

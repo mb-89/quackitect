@@ -1,4 +1,7 @@
 ---
+unreachable_refs:
+  - cand-living-form
+  - cand-thin-worktree
 minted_in: i1
 id: raid-flip-living-form-on-resume-needs-no-person
 type: "[[raid]]"

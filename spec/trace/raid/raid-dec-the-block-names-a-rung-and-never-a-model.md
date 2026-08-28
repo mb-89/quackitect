@@ -1,4 +1,6 @@
 ---
+unreachable_refs:
+  - cand-whoever-holds-the-hands-decides
 minted_in: i38-the-machine-sizes-its-own-driver-every-s
 id: raid-dec-the-block-names-a-rung-and-never-a-model
 type: "[[raid]]"

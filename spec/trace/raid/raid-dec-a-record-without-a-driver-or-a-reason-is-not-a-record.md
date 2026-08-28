@@ -1,4 +1,6 @@
 ---
+unreachable_refs:
+  - cand-whoever-holds-the-hands-decides
 minted_in: i38-the-machine-sizes-its-own-driver-every-s
 id: raid-dec-a-record-without-a-driver-or-a-reason-is-not-a-record
 type: "[[raid]]"

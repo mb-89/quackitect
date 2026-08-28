@@ -1,4 +1,7 @@
 ---
+unreachable_citations:
+  - fn-bring-forth-a-vehicle.md
+  - node.md
 minted_in: i16-the-vehicle-overlay-a-vehicle-vendors-th
 id: exp-a-structural-rename-across-a-vehicle
 type: "[[experiment]]"

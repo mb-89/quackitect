@@ -18,8 +18,6 @@ weighs_against:
 
 ## Detail
 
-## Detail
-
 The two sides of the boundary:
 
 - Naming side, owned by the engine: the tour names one part per stop.

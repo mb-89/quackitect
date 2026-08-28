@@ -1,4 +1,6 @@
 ---
+unreachable_refs:
+  - el-satellite-supervisor
 id: raid-ar-every-call-logged
 type: "[[raid]]"
 kind: risk

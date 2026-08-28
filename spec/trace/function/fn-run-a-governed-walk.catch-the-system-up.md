@@ -15,6 +15,10 @@ satisfies:
   - req-sweep-covers-every-drift-class
   - req-finding-names-its-home
   - req-clean-sweep-is-dated
+  - req-a-reference-key-resolves-or-is-marked
+  - req-a-heading-appears-once-in-a-node
+  - req-a-code-citation-names-something-that-exists
+  - req-the-dead-vocabulary-sweep-reaches-the-trace
 inputs:
   - flow-method-sources
   - flow-repository

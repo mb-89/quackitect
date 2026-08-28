@@ -18,8 +18,6 @@ weighs_against:
 
 ## Detail
 
-## Detail
-
 | drift class | checked against |
 | --- | --- |
 | guidance | its own rules |

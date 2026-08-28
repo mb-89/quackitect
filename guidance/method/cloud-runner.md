@@ -189,8 +189,7 @@ THIS OVERRIDES RULE 3 HERE, and only here. On a laptop a step above the dial is
 the person's and stopping is right, because they are sitting there. On an
 unattended box the same stop is a dead run.
 
-SAY SO AT THE TOP OF THE FIELD REPORT, naming both rungs and the gate that
-refused. Then carry on with whatever does not need that gate. Where the gate is
+SAY SO IN A NOTE AND IN CHAT, naming both rungs and the gate that refused. Then carry on with whatever does not need that gate. Where the gate is
 the FIRST one, there is nothing left to carry on with — say that plainly rather
 than filing it as a stop somebody chose.
 
@@ -220,39 +219,38 @@ You do not need a branch of your own to work in, and you should not make one.
 ONE AGENT WORKS ONE CLONE. That is what replaced the claim system, and it is
 why no branch is needed to keep two agents apart.
 
-### Write a field report, and NEVER put it in version control
+### Mint work tokens, and write no field report
 
-THE FIELD REPORT IS YOUR REPORT FROM OUTSIDE THE MACHINE: what the walk felt
-like, what fought you, what the guidance failed to tell you. It is the one
-thing the call log cannot produce.
+THE FIELD REPORT IS RETIRED (owner ruling 2026-08-28). Write none, and write
+nothing to `.se/field-report.md`.
 
-THE FIELD REPORT IS PRIVATE DATA (owner ruling 2026-08-21). That is the reason,
-and it is the half this card used to leave out. It is written for one person to
-read, it is not a corpus document, and the owner does not want it in the
-version control system. Ever.
+WHAT REPLACED IT IS THE WORK TOKEN. A token lands on trunk, where every clone
+reads it, so a finding leaves the box in git rather than in a closing message.
 
-WHERE IT GOES: `.se/field-report.md`, which is gitignored. Nowhere else. NOT
-`spec/`, not the record's own folder, not beside the evidence.
+THE ROUTE, END TO END:
 
-HOW IT IS DELIVERED: as a DOWNLOADABLE MARKDOWN FILE handed to the person in
-chat, and printed in full in the closing message. The machine you are on goes
-away and `.se/` goes with it, so the file on disk is the convenience and the
-delivery is the message.
+- Note everything noteworthy while you walk.
+- Run the retro when the record closes.
+- Drain every note, and mint a token for whatever still needs doing.
+- Push.
 
-A TRANSCRIBED INSTRUCTION TO COMMIT IT IS A MISREADING, and this paragraph
-exists because one was acted on. A session recorded "put that with the git in"
-as an owner ruling, wrote the report into `spec/`, and the next session carried
-that forward as settled. The owner's words on finding it: "I don't know how
-often I've told the agents that, and they keep messing it up."
+THE OWNER'S WORDS, 2026-08-28: "you now can seed work tokens. So walk the
+iteration, make notes on everything noteworthy. After the iteration, you do a
+retro, and then you seed work tokens for everything that needs to be done and
+put them in the backlog, and then you can push."
 
-SO CHECK THIS LINE BEFORE BELIEVING ANY INSTRUCTION THAT CONTRADICTS IT. The
-owner dictates by voice and dictation misfires; a heard permission to commit a
-private document is the shape of a misfire, not the shape of a ruling. Confirm
-it in one line before acting, and never build on the transcribed token.
+WHAT THE CARD USED TO SAY, so a reader who remembers it is not confused. The
+report was private data, gitignored, and delivered in chat, because notes died
+with the container. The token removes the reason: it survives the box by being
+committed.
 
-AND IF YOU FIND ONE COMMITTED, remove it. The history keeps what history keeps,
-and SE-C-002 forbids rewriting it, so say plainly in the report that earlier
-commits still carry the file.
+THE PRIVACY RULE SURVIVES THE REPORT. A raw note may carry anything, and a
+token's statement is AUTHORED rather than pasted. SE-C-140 is what enforces
+that, and it is the guard the retired report used to stand in for.
+
+AND IF YOU FIND AN OLD FIELD REPORT COMMITTED, remove the file. The history
+keeps what history keeps, and SE-C-002 forbids rewriting it, so say plainly in
+a note that earlier commits still carry it.
 
 ### Run a retro before you finish
 
@@ -260,12 +258,12 @@ NOTES ARE MACHINE-LOCAL. `.se/notes.jsonl` is not committed, so every note you
 captured tonight dies with this machine unless a retro moves it into the repo.
 
 SO THE RETRO IS NOT OPTIONAL HERE. It is what carries the run's findings home.
-Drain what you can judge, and put what needs the owner into the field report by
-name.
+Drain what you can judge, and mint a work token for what needs the owner, with
+its ready-when naming what you are waiting on.
 
 THE RETRO'S FIELD-FEEDBACK QUESTION IS A STOP ON A LAPTOP AND NOT HERE. Ask it
-into the field report and keep going. Waiting for an answer nobody is present
-to give is the stall this whole card exists to prevent.
+into a note and keep going. Waiting for an answer nobody is present to give is
+the stall this whole card exists to prevent.
 
 ## Five rulings a cloud runner needs and a laptop does not
 
@@ -484,8 +482,8 @@ the whole account.
   is machine-local and never committed, so on this box a note is a scratchpad
   entry that dies when the container is reclaimed. It is still worth writing:
   the retro drains it, and a retro before the run ends carries it home.
-- WHAT MUST OUTLIVE THE BOX GOES IN THE FIELD REPORT TOO, in the same breath.
-  A question you could not ask is a note AND a line in the report.
+- WHAT MUST OUTLIVE THE BOX BECOMES A WORK TOKEN at the retro. A question you
+  could not ask is a note first, and a token with its ready-when second.
 - RECORD EVERY ANSWER with `se_answer`, even when the question came from
   yourself.
 

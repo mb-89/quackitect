@@ -20,7 +20,5 @@ weighs_against:
 
 ## Detail
 
-## Detail
-
 - One line suffices: the round or artifact that failed, named.
 - A round that asserts rather than shows is a legal reason on its own.

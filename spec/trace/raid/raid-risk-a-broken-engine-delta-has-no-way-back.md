@@ -1,4 +1,7 @@
 ---
+unreachable_refs:
+  - el-satellite-supervisor
+  - if-engine-delta-to-satellite
 minted_in: i27
 id: raid-risk-a-broken-engine-delta-has-no-way-back
 type: "[[raid]]"

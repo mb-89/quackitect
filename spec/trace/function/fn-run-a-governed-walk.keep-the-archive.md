@@ -1,4 +1,6 @@
 ---
+unreachable_refs:
+  - uc-answer-why-a-year-later
 minted_in: i1
 id: fn-run-a-governed-walk.keep-the-archive
 type: "[[function]]"

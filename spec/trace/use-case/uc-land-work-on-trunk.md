@@ -23,8 +23,8 @@ priority: should
 
 ## Lane doors
 
-- `se_git_sync` keeps the record and trunk in step mid-iteration, long before anything lands.
-- `se_git_land` is the landing itself, behind the release gate.
+- THERE IS NOTHING TO KEEP IN STEP. i34 made a record a folder ON trunk, so the work is already where it lands and no mid-iteration sync exists.
+- THE LANDING IS A COMMIT, made by the machine behind the release gate. No verb of its own carries it.
 - `se_git` runs the allowlisted git verbs. The push stays with the person.
 
 ## Extensions

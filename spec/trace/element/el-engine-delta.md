@@ -1,4 +1,7 @@
 ---
+unreachable_refs:
+  - cand-core-satellite
+  - cand-live-engine
 minted_in: i27
 id: el-engine-delta
 type: "[[element]]"

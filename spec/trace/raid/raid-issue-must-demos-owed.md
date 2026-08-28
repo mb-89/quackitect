@@ -1,4 +1,8 @@
 ---
+unreachable_citations:
+  - reports/rpt-ramp-up.md
+  - reports/rpt-start-a-new-product.md
+  - reports/rpt-walk-it-by-hand.md
 minted_in: i1
 id: raid-issue-must-demos-owed
 type: "[[raid]]"

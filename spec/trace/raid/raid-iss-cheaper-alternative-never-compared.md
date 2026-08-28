@@ -1,4 +1,6 @@
 ---
+unreachable_refs:
+  - cand-thin-worktree
 minted_in: i27
 id: raid-iss-cheaper-alternative-never-compared
 type: "[[raid]]"

@@ -1,4 +1,6 @@
 ---
+unreachable_citations:
+  - spec/trace/neighbour/nbr-something.md
 minted_in: i1
 id: dsp-evidence-forms
 type: "[[design-spec]]"

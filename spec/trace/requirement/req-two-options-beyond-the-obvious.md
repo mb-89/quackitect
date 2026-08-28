@@ -17,7 +17,5 @@ priority: must
 
 ## Detail
 
-## Detail
-
 - The trigger's obvious answer is recorded as the incumbent. It counts as at most one of the standing options.
 - A restatement of the incumbent is not a second option.

@@ -18,6 +18,13 @@ const took = Date.now() - began;
 // without anybody deciding it should.
 process.stdout.write(`sweep: ${String(r.scanned)} node(s) under ${rel} in ${String(took)} ms\n`);
 
+// REPORTS PRINT ON EVERY RUN, green or red, and change nothing. They name what
+// the sweep noticed and does not treat as a defect.
+if (r.reports.length > 0) {
+  process.stdout.write(`sweep notes ${String(r.reports.length)}:\n`);
+  for (const line of r.reports) process.stdout.write(`- ${line}\n`);
+}
+
 if (r.findings.length === 0) {
   process.stdout.write("sweep green\n");
   process.exit(0);

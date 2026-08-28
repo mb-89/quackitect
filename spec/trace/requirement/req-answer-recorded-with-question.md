@@ -17,8 +17,6 @@ priority: must
 
 ## Detail
 
-## Detail
-
 - The question and the answer are separate fields of one entry.
 - The chat prints the same recorded text verbatim. No second version is composed.
 - Source links ride the recorded copy.

@@ -8,6 +8,7 @@ satisfies:
   - req-open-work-is-answered-from-the-repository-not-a-local-store
   - req-a-windowed-pool-answer-says-that-it-was-windowed
   - req-the-pool-answers-a-person-and-an-agent-from-one-source
+  - req-a-work-token-nothing-references-is-reported
 inputs:
   - flow-standing-option
   - flow-repository

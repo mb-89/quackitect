@@ -1,4 +1,7 @@
 ---
+unreachable_refs:
+  - cand-everything-declared
+  - cand-the-program-route
 minted_in: i16-the-vehicle-overlay-a-vehicle-vendors-th
 id: raid-tripwire-i16-a-structural-migration-cannot-be-written
 type: "[[raid]]"

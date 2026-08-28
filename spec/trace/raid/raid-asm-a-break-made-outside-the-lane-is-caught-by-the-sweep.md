@@ -6,9 +6,9 @@ kind: assumption
 statement: A person editing the corpus in their own editor introduces breaks rarely enough, and the sweep finds them soon enough, that no write-time check is owed to that path.
 owner: the owner
 trigger: the first corpus break a person made by hand, and any change to how often the sweep runs
-status: open
+status: probed
 probe: Introduce a malformed node by hand, outside the lane. Measure how many calls and how much wall-clock pass before anything names it. Compare against the four calls the same break cost inside the lane on 2026-08-16.
-probed: not yet. The sweep this assumption relies on does not exist — raid-iss-se-lint-has-no-whole-repo-sweep.
+probed: "2026-08-28, and it HOLDS. A hand break was named by the boot sweep at the very next boot, with the file, the line and the cause, before any work was done."
 impact: If a hand break survives long, the corpus is only as sound as the last person to open it in an editor, and every write-time refusal is guarding a door beside an open window.
 breaks_how_badly: crippling
 how_likely: expected
@@ -94,3 +94,29 @@ THE PROBE CANNOT RUN YET, and that is stated rather than skipped. It
 measures against a sweep that does not exist —
 `raid-iss-se-lint-has-no-whole-repo-sweep`. It becomes runnable the day
 the sweep lands, which is inside this iteration's own scope.
+
+## PROBED 2026-08-28 — IT HOLDS, AND THE SWEEP NOW EXISTS
+
+THE TRIGGER FIRED ON ITS OWN. i44's session opened on a corpus carrying a hand
+break: one raid entry held the frontmatter key `probed` twice, which YAML
+refuses.
+
+THE BREAK WAS NOT MADE THROUGH THE LANE. A lane write of that shape is refused
+by SE-C-138 before anything lands, so the doubled key reached the file by
+another path.
+
+WHAT NAMED IT, AND HOW FAST. Boot's own exit check, at the first boot after the
+break. Two of its five scripts reported it independently: preflight exited 1
+naming the file and the line, and the conformance sweep reported the same file
+as unparseable inside a 2,549-node pass taking 892 to 1,178 milliseconds.
+
+ZERO CALLS WERE SPENT HUNTING IT. The comparison the probe asked for is against
+four calls inside the lane on 2026-08-16. The walk had not started, and the
+refusal carried the path.
+
+THE REASON THIS SAID "not yet" IS STALE. The whole-repo sweep exists:
+`deliverable/engine/bin/sweep.ts`, fired by boot's own exit condition.
+
+WHAT IS STILL UNMEASURED is the other half of the statement, whether hand
+breaks are RARE. One occurrence measures speed, not frequency. The trigger
+stays live for that half.

@@ -17,8 +17,6 @@ priority: must
 
 ## Detail
 
-## Detail
-
 - Accepting the proposal compiles the proposed column.
 - Naming a different size compiles the named column. No re-argument step exists.
 - No separate confirmation follows the choice. The choice is the recorded bless.

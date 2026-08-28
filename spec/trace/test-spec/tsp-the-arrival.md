@@ -57,7 +57,7 @@ that something is SAID: the hook announcing a failed arrival, and the opt-out
 announcing a skip. Both would pass trivially if the code simply did nothing, and
 both are written to fail in exactly that case.
 
-## Steps
+## Steps — the load-bearing ones
 
 EVERY CASE IN THE REFERENCED FILE IS ONE STEP. The load-bearing ones, and why
 each earns its place rather than the whole list restated.

@@ -19,6 +19,4 @@ weighs_against:
 
 ## Detail
 
-## Detail
-
 - A chosen option that needs a vehicle is routed to the front desk. Ideation seeds zero records itself.

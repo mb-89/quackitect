@@ -1,4 +1,6 @@
 ---
+unreachable_refs:
+  - cand-the-host-is-declared
 minted_in: i28-the-cloud-runs-from-its-seed-alone-a-fre
 id: el-entrypoint
 type: "[[element]]"

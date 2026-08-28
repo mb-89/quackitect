@@ -1,4 +1,6 @@
 ---
+unreachable_citations:
+  - deliverable/vendor/upstream/upstream.json
 minted_in: i16-the-vehicle-overlay-a-vehicle-vendors-th
 id: dsp-the-producing-acts
 type: "[[design-spec]]"

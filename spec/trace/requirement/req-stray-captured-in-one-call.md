@@ -18,8 +18,6 @@ priority: must
 
 ## Detail
 
-## Detail
-
 - The call is the same for a person at the box and an agent mid-walk, with the same result.
 - The note text is stored verbatim: zero rewording at capture.
 - Capture is legal from any state, with or without an open record.

@@ -1,4 +1,10 @@
 ---
+unreachable_refs:
+  - if-core-satellite
+  - dsp-core-and-satellite
+unreachable_citations:
+  - transports.ts
+  - boundaries.test.ts
 minted_in: i27
 id: raid-asm-the-three-transports-behave-identically
 type: "[[raid]]"

@@ -19,8 +19,6 @@ priority: must
 
 ## Detail
 
-## Detail
-
 - No known-broken marker exists to park a red under.
 - A resolution is one of two: the code fixed, or the test corrected where it asserted a rule that no longer holds.
 - The resolution record names which of the two happened.

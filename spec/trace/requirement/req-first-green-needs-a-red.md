@@ -19,6 +19,4 @@ weighs_against:
 
 ## Detail
 
-## Detail
-
 - A test whose red was never observable records its exemption citing a decision, not a red observation.

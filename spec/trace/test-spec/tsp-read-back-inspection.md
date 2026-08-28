@@ -1,4 +1,6 @@
 ---
+unreachable_citations:
+  - tests/bound-engine.test.ts
 minted_in: i27
 id: tsp-read-back-inspection
 type: "[[test-spec]]"

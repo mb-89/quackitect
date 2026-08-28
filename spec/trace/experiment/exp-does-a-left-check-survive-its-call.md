@@ -1,4 +1,6 @@
 ---
+unreachable_citations:
+  - scratchpad/spike-left-check.mjs
 minted_in: i51-work-running-out-of-sight-reports-itself
 id: exp-does-a-left-check-survive-its-call
 type: "[[experiment]]"

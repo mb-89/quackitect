@@ -67,6 +67,38 @@ hand to chase one.
 A DEFECT IN THE WORK YOU ARE BUILDING IS NOT A STRAY. A stray is elsewhere. A
 hole in the thing under your hands is the work.
 
+A BUG YOU CAN SEE AND KNOW HOW TO FIX IS NOT A STRAY EITHER (owner ruling
+2026-08-28). Being outside your diff does not make it somebody else's.
+
+His words: "I've seen you a few times now, not fixing a bug because it's
+outside of your fixed... of your diff. What are you doing? If you see a bug and
+you know the fix, especially if it's not a big thing, fix it. Just write
+yourself a work topic for it, and then do it when you're done with your current
+work."
+
+SO THE ORDER IS: note it, finish the step in your hand, then fix it. The note
+is what stops the fix being forgotten, never what stands in for it.
+
+WHAT STILL WAITS. A fix you do not know how to make, and a fix that is really a
+redesign. Those stay notes and become work tokens at the retro.
+
+YOU NEVER WRITE THE BACKLOG YOURSELF (owner ruling 2026-08-28). Capturing is
+yours. Minting is not.
+
+- A finding becomes a NOTE, wherever you are, however sure you are.
+- The RETRO drains that note and mints the work token.
+- Nothing else puts anything in the pool.
+
+THE OWNER'S WORDS: "another agent just wrote stuff directly in the backlog. I
+don't want that. Write notes, the retro writes the backlog."
+
+WHY THE SPLIT EXISTS. The mint is where a raw note becomes an authored
+statement, and that rewrite is the privacy boundary. A token written straight
+into the pool has gone round it.
+
+WRITING A TOKEN FILE BY HAND IS THE SHAPE TO WATCH FOR. It looks like helpful
+tidiness and it is the second door.
+
 ## 5. Finish it before you judge it
 
 RUNNING INTO A GAP OR A CONTRADICTION WHILE BUILDING SOMETHING, YOU SOLVE IT.
@@ -169,27 +201,33 @@ SO WHAT THE NEXT SESSION MUST KNOW GOES IN THE FOUR HOMES ABOVE, written when
 the thought occurs. A note, a parked to-do, or guidance — never saved for an
 exit that may never come.
 
-A FIELD REPORT IS OWED AT THE END OF EVERY RUN, and it is a different object
-(owner ruling 2026-08-20). This paragraph used to say no handover file is
-written at all, and the owner struck that: "I don't agree with this. This is an
-error in the guidance."
+THE FIELD REPORT IS RETIRED (owner ruling 2026-08-28). No run owes one, and
+nothing is written to `.se/field-report.md`.
 
-THE TWO ARE NOT THE SAME THING, which is why both halves stand.
+A HANDOVER FILE WAS RETIRED BEFORE IT, for a different reason. That one was for
+the next AGENT, and boot's derived summary replaced it. The field report was for
+the PERSON, and the work token replaces it.
 
-- The handover file was for the next AGENT, and the call log replaced it.
-- The field report is for the PERSON, and nothing replaces it.
+WHY IT EXISTED. Notes are machine-local and die with the container, so a report
+printed in chat was the only way a finding could leave the box.
 
-WHAT GOES IN IT: everything that cannot be mapped onto the repository.
-Improvements you found, what fought you, what you struggled with, and anything
-you could not give a home in git.
+WHAT REPLACED IT. A work token lands on trunk, where every clone reads it. So a
+finding now travels in git rather than in a closing message.
 
-WHY IT CANNOT BE SKIPPED: notes are machine-local and die with the container.
-The report is the channel that reaches a person, so an unwritten one throws
-that away.
+THE ROUTE, END TO END:
 
-WHERE IT GOES: `.se/field-report.md`, which is not committed, and PRINTED IN
-FULL as the closing message. The file is the convenience; the message is the
-delivery. `guidance/method/cloud-runner.md` carries the detail.
+- Note everything noteworthy while you walk.
+- Run the retro when the record closes.
+- Drain every note, and mint a work token for whatever still needs doing.
+- Push.
+
+THE OWNER'S WORDS, 2026-08-28: "you now can seed work tokens. So walk the
+iteration, make notes on everything noteworthy. After the iteration, you do a
+retro, and then you seed work tokens for everything that needs to be done and
+put them in the backlog, and then you can push."
+
+AND A CARD THAT STILL DEMANDS A REPORT IS OUT OF DATE. Fix it rather than obey
+it. The owner said that in the same breath.
 
 ## 9. Never open a record unasked
 

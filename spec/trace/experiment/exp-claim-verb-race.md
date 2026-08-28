@@ -1,4 +1,6 @@
 ---
+unreachable_refs:
+  - raid-asm-remote-serializes-claims
 minted_in: i2
 id: exp-claim-verb-race
 type: "[[experiment]]"

@@ -20,8 +20,6 @@ weighs_against:
 
 ## Detail
 
-## Detail
-
 Each round shows:
 
 - the round's content as it was filled.

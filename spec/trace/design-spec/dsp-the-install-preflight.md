@@ -1,4 +1,7 @@
 ---
+unreachable_citations:
+  - engine/bin/install-preflight.ts
+  - bin/install-preflight.ts
 minted_in: i9-se-and-the-corpus-move-the-machine-state
 id: dsp-the-install-preflight
 type: "[[design-spec]]"

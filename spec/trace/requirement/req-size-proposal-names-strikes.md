@@ -17,8 +17,6 @@ priority: must
 
 ## Detail
 
-## Detail
-
 | case | proposal |
 | --- | --- |
 | a standing baseline exists | the size the reasoning supports, with the struck cells of each smaller column listed |

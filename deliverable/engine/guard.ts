@@ -16,7 +16,7 @@ const SRC = "engine/guard.ts";
  *  — a URL, a quoted ruling, a page reference. Anything that does not look
  *  like an id is skipped rather than reported, so the loose half costs
  *  nothing and the id half is checked. */
-const REFERENCE_KEYS = [
+export const REFERENCE_KEYS = [
   "refines",
   "satisfies",
   "implements",
@@ -26,12 +26,61 @@ const REFERENCE_KEYS = [
   "source_refs",
   "weighs_with",
   "weighs_against",
+  // THREE KEYS POINT AT NODES AND WERE NOT SWEPT. A test-spec demonstrates a
+  // story, a chart probes an option, and a convergence picks one. Each is an
+  // id the corpus is expected to hold, and none was checked.
+  "demonstrates",
+  "probes",
+  "picks",
   // A CLUSTER IS A REFERENCE LIKE ANY OTHER, and it was the one nobody checked.
   // A function could name a group nobody had declared and nothing said so — the
   // offer a placement picks from is a list of real clusters, and the stored
   // value never had to come from it.
   "cluster",
 ];
+
+/** THE REFERENCES A NODE DECLARES AS DELIBERATELY GONE.
+ *
+ *  A node pointing at something the corpus retired lists that id under
+ *  `unreachable_refs`. A retired specification, a design the product no longer
+ *  has, a use case struck out with its mechanism — all real history, none of
+ *  them restorable.
+ *
+ *  IT IS A DECLARATION AND NOT A SILENCER. One entry per id, in the node that
+ *  points, so markers can be counted against repairs. That count is what
+ *  raid-risk-the-unreachable-marker-becomes-the-cheap-answer asks for. */
+function markedUnreachableRefs(frontmatter: Record<string, unknown>): Set<string> {
+  const raw = frontmatter.unreachable_refs;
+  const values = Array.isArray(raw) ? raw : raw === undefined || raw === null ? [] : [raw];
+  return new Set(
+    values.map((v) =>
+      String(v)
+        .trim()
+        .replace(/^\[\[|\]\]$/g, ""),
+    ),
+  );
+}
+
+/** THE ID ONE REFERENCE VALUE NAMES, or "" where the value is not a reference.
+ *
+ *  A CLUSTER IS STORED BARE — `cluster: the-arrival` — and the node it names
+ *  carries the prefix, so the value is resolved before it is looked up. Every
+ *  other key already holds a full id.
+ *
+ *  ONLY WHAT LOOKS LIKE AN ID IS CHECKED. A source_refs line carrying a
+ *  sentence, a URL or a quoted ruling is not a reference, and reporting it
+ *  would drown the real findings. */
+function referencedId(key: string, value: unknown): string {
+  const id =
+    key === "cluster"
+      ? clusterId(String(value))
+      : String(value)
+          .trim()
+          .replace(/^\[\[|\]\]$/g, "");
+  if (id === "") return "";
+  if (!/^[a-z]+-[a-z0-9-]+$/.test(id)) return "";
+  return id;
+}
 
 /** A REFERENCE THE CORPUS DOES NOT HOLD. It REPORTS and never refuses.
  *
@@ -44,24 +93,14 @@ const REFERENCE_KEYS = [
  *  req-a-standing-break-reports-and-lands */
 export function danglingReferences(root: string, frontmatter: Record<string, unknown>): string[] {
   const out: string[] = [];
+  const marked = markedUnreachableRefs(frontmatter);
   for (const key of REFERENCE_KEYS) {
     const raw = frontmatter[key];
     const values = Array.isArray(raw) ? raw : raw === undefined || raw === null ? [] : [raw];
     for (const v of values) {
-      // A CLUSTER IS STORED BARE — `cluster: the-arrival` — and the node it
-      // names carries the prefix, so the value is resolved before it is looked
-      // up. Every other key already holds a full id.
-      const id =
-        key === "cluster"
-          ? clusterId(String(v))
-          : String(v)
-              .trim()
-              .replace(/^\[\[|\]\]$/g, "");
+      const id = referencedId(key, v);
       if (id === "") continue;
-      // ONLY WHAT LOOKS LIKE AN ID IS CHECKED. A source_refs line carrying a
-      // sentence, a URL or a quoted ruling is not a reference and reporting it
-      // would drown the real findings.
-      if (!/^[a-z]+-[a-z0-9-]+$/.test(id)) continue;
+      if (marked.has(id)) continue;
       const rel = fileForId(root, id);
       if (rel === undefined) continue;
       if (existsSync(join(root, rel))) continue;

@@ -17,8 +17,6 @@ priority: must
 
 ## Detail
 
-## Detail
-
 - Direction one: every node of the declaring type names a live target.
 - Direction two: every target of the covered type is named by at least one node.
 - Coverage counts authored links only; a query-derived reference never counts.

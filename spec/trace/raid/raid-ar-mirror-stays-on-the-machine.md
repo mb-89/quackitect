@@ -1,4 +1,6 @@
 ---
+unreachable_refs:
+  - el-core
 id: raid-ar-mirror-stays-on-the-machine
 type: "[[raid]]"
 kind: risk

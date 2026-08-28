@@ -1,4 +1,7 @@
 ---
+unreachable_citations:
+  - mine.md
+  - company-guidance.md
 minted_in: i16-the-vehicle-overlay-a-vehicle-vendors-th
 id: raid-asm-the-overlay-layer-has-a-home-that-survives-an-update
 type: "[[raid]]"

@@ -15,6 +15,8 @@
 import { existsSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { parse as parseYaml } from "yaml";
+import { deadLaneVerbs, duplicateHeadings, staleCitations, unreferencedTokens } from "./corpus-sweeps.ts";
+import { danglingReferences } from "./guard.ts";
 import { readNode } from "./notes.ts";
 import { rulesOf } from "./rules.ts";
 import { fileForId, outsideVocabulary } from "./vocabulary.ts";
@@ -22,13 +24,24 @@ import { fileForId, outsideVocabulary } from "./vocabulary.ts";
 /** One thing the sweep found. It names the DIFFERENCE, never the category —
  *  "the register lists raid-x; the folder does not hold it" beats "drift". */
 export interface Finding {
-  kind: "unparseable" | "outside-vocabulary" | "unbound-rule" | "unfinished-rule";
+  kind:
+    | "unparseable"
+    | "outside-vocabulary"
+    | "unbound-rule"
+    | "unfinished-rule"
+    | "duplicate-heading"
+    | "dead-verb"
+    | "stale-citation"
+    | "dangling-reference";
   path: string;
   says: string;
 }
 
 export interface SweepResult {
   scanned: number;
+  /** What the sweep NOTICED without failing on it. A report is printed and
+   *  never changes the exit code. */
+  reports: string[];
   findings: Finding[];
 }
 
@@ -105,6 +118,42 @@ function ruleFindings(root: string, rel: string, fm: Record<string, unknown>): F
 
 /** SWEEP A TREE. `rel` is root-relative, so `spec/trace` sweeps the
  *  whole trace corpus and `spec` sweeps everything under it. */
+/** THE NODES THAT TEACH A READER WHAT TO DO. A retired verb named in one of
+ *  these misroutes somebody; the same name in a raid entry is history, and in
+ *  a requirement it may be the example the row is about. */
+function teaches(rel: string): boolean {
+  return rel.includes("/use-case/") || rel.includes("/story/");
+}
+
+/** A NODE DECLARES ITS TYPE. An evidence form carries `form:` and a working
+ *  document carries no frontmatter of the corpus kind at all, and neither is
+ *  a node the corpus owns.
+ *
+ *  The requirement says node, and reading it as file turned the sweep red on
+ *  one closed record's evidence and one prep document. */
+function isNode(fm: Record<string, unknown>): boolean {
+  return typeof fm.type === "string" && fm.type.length > 0;
+}
+
+function textFindings(root: string, rel: string, raw: string, fm: Record<string, unknown>): Finding[] {
+  const out: Finding[] = [];
+  if (!isNode(fm)) return out;
+  for (const heading of duplicateHeadings(raw)) {
+    out.push({ kind: "duplicate-heading", path: rel, says: `${heading} appears more than once` });
+  }
+  for (const cited of staleCitations(root, raw)) {
+    out.push({ kind: "stale-citation", path: rel, says: `${cited} is cited here and the tree does not hold it` });
+  }
+  for (const says of danglingReferences(root, fm)) {
+    out.push({ kind: "dangling-reference", path: rel, says });
+  }
+  if (!teaches(rel)) return out;
+  for (const verb of deadLaneVerbs(root, raw)) {
+    out.push({ kind: "dead-verb", path: rel, says: `${verb} is named here and the engine does not serve it` });
+  }
+  return out;
+}
+
 export function sweepCorpus(root: string, rel: string): SweepResult {
   const files: { abs: string; rel: string }[] = [];
   markdownUnder(join(root, rel), rel, files);
@@ -139,7 +188,15 @@ export function sweepCorpus(root: string, rel: string): SweepResult {
         says: `${wrong.field}: "${wrong.got}" — one of ${wrong.allowed.join(" | ")}`,
       });
     }
+    findings.push(...textFindings(root, f.rel, raw, fm));
     findings.push(...ruleFindings(root, f.rel, fm));
   }
-  return { scanned: files.length, findings };
+  // A TOKEN NOTHING POINTS AT IS NOT A DEFECT, so it rides `reports` and never
+  // `findings`. req-a-work-token-nothing-references-is-reported says the check
+  // reports and does not refuse, and i44 measured why: eleven of eleven such
+  // tokens were healthy and waiting. A backlog token is unreferenced by
+  // construction, so arming this as a failure would redden the sweep on the
+  // day any mint lands.
+  const reports = unreferencedTokens(root).map((id) => `${id} — a standing work token no node references`);
+  return { scanned: files.length, findings, reports };
 }

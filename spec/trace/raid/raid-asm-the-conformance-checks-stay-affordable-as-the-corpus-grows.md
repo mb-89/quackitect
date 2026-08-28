@@ -6,9 +6,9 @@ kind: assumption
 statement: The conformance checks stay inside their budgets as the corpus grows, so the write guard keeps refusing at the write and the sweep keeps running at the moments the engine chose.
 owner: the driving agent
 trigger: any write that feels slow, any sweep past two seconds, or a corpus above three thousand nodes
-probe: unprobed by i35, and the empty date is filled rather than the verdict invented. The corpus grew this run by 20 nodes — 5 requirements, 7 functions, 6 flows, 1 story, 1 use case — and the sweep stayed green at 1150 nodes in 410 ms. That is a data point on cost, not a probe of the assumption, which is about growth this iteration did not test.
+probe: "unprobed by i35, and the empty date is filled rather than the verdict invented. The corpus grew this run by 20 nodes — 5 requirements, 7 functions, 6 flows, 1 story, 1 use case — and the sweep stayed green at 1150 nodes in 410 ms. That is a data point on cost, not a probe of the assumption, which is about growth this iteration did not test. SECOND DATA POINT, i44 on 2026-08-28: the sweep read 2,549 nodes in 892 to 1,178 milliseconds, inside boot's exit check. Against i35's 1,150 nodes in 410 milliseconds that is roughly linear, and both numbers sit inside the two-second trigger. The corpus is now within 500 nodes of the three-thousand-node trigger, so the next growth spurt fires this entry rather than confirming it."
 status: open
-probed: 2026-08-17
+probed: 2026-08-28
 impact: the guard grows too slow for the write and moves to the sweep, which is a demotion the whole iteration was built to avoid.
 breaks_how_badly: abrasive
 how_likely: plausible

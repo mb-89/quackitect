@@ -1,4 +1,7 @@
 ---
+unreachable_refs:
+  - raid-dec-a-claim-ends-only-when-a-person-releases-it
+  - cand-the-lifecycle-is-the-claim
 minted_in: i28-the-cloud-runs-from-its-seed-alone-a-fre
 id: raid-dec-the-worktree-hangs-off-the-claim
 type: "[[raid]]"

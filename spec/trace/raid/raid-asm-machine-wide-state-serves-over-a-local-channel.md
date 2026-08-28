@@ -1,4 +1,8 @@
 ---
+unreachable_refs:
+  - el-core
+  - if-core-satellite
+  - cand-core-satellite
 minted_in: i27
 id: raid-asm-machine-wide-state-serves-over-a-local-channel
 type: "[[raid]]"

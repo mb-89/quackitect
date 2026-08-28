@@ -51,7 +51,7 @@ Storage speed, caching and RAM disks are IO fixes. They address a bottleneck
 this machine has not been shown to have, and on a machine whose named problem
 is clock speed they may buy nothing at all.
 
-## Probe
+## Probe — the comparison that would settle it
 
 RUN THE SAME SCOPED CALL ON BOTH MACHINES and compare wall clock: the
 throttled laptop, and a normal desktop. The laptop's figure is the one the
@@ -74,7 +74,7 @@ core count is beside the point and the fix is elsewhere.
 THE PROFILE IS CHEAP AND NOBODY HAS RUN IT. That is the gap this assumption
 sits in, and it is why the status is `held` rather than `closed`.
 
-## Probe
+## Probe — why it cannot run from here
 
 THIS SECTION WAS MISSING UNTIL 2026-08-19, and its absence was found by a sweep
 over the whole register. It was the only assumption of sixty-eight without one,

@@ -20,8 +20,6 @@ weighs_against:
 
 ## Detail
 
-## Detail
-
 - A capture raises the inbox count by one.
 - A drain lowers it by one.
 - The count and the feed agree at every read.

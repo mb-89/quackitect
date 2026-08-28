@@ -18,8 +18,6 @@ priority: must
 
 ## Detail
 
-## Detail
-
 | source class | the tree it compiles from |
 | --- | --- |
 | rigor-matrix rows and engine sources | the trunk |

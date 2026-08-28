@@ -1,4 +1,6 @@
 ---
+unreachable_refs:
+  - raid-asm-remote-serializes-claims
 minted_in: i12
 id: raid-risk-git-fake-drifts-from-git
 type: "[[raid]]"

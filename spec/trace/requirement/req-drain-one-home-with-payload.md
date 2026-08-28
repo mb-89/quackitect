@@ -25,8 +25,6 @@ priority: must
 
 ## Detail
 
-## Detail
-
 Each home binds its payload and its context. A drain breaking a row of this table is refused with the broken part named.
 
 | home | payload the drain must carry | legal context |

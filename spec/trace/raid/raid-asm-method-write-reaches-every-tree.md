@@ -1,4 +1,6 @@
 ---
+unreachable_citations:
+  - tests/worktree.test.ts
 minted_in: i12
 id: raid-asm-method-write-reaches-every-tree
 type: "[[raid]]"

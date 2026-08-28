@@ -1,4 +1,6 @@
 ---
+unreachable_refs:
+  - cand-thin-worktree
 minted_in: i1
 id: el-record-store
 type: "[[element]]"

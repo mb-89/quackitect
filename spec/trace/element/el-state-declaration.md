@@ -1,4 +1,6 @@
 ---
+unreachable_refs:
+  - cand-nothing-can-be-forgotten
 minted_in: i9
 id: el-state-declaration
 type: "[[element]]"

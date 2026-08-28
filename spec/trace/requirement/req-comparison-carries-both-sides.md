@@ -20,8 +20,6 @@ weighs_against:
 
 ## Detail
 
-## Detail
-
 | situation | the honest record |
 | --- | --- |
 | evidence exists on both sides | the comparison, each side citing its evidence |

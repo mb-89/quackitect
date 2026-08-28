@@ -1,4 +1,6 @@
 ---
+unreachable_refs:
+  - el-satellite-supervisor
 minted_in: i27
 id: exp-watchdog
 type: "[[experiment]]"

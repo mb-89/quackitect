@@ -14,7 +14,7 @@ source_refs:
   - "measured on the i15 walk: a gate stood signed with every section full, and the answer said `fill every required section` — the only thing owed was the bless, and nothing said so"
   - "measured on the i15 walk: a `wait` at draft-vision carried the very door it said it could not route to, and no field told the reader what to do with it"
   - "measured on the i35 cloud run: a `do` that could not move answered `the stopped step says what it wants` while no step had said anything, five times"
-  - req-a-refusal-carries-its-remedy
+  - req-refusal-carries-remedy
 priority: must
 ---
 

@@ -20,8 +20,6 @@ priority: must
 
 ## Detail
 
-## Detail
-
 - The recorded form is a role from the stamp vocabulary (owner, agent).
 - The sweep covers every stored record class: grants, stamps, log entries, evidence files.
 - Prose surfaces name the role too, never a person.

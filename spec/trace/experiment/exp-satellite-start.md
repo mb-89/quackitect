@@ -1,4 +1,7 @@
 ---
+unreachable_refs:
+  - el-satellite
+  - el-satellite-supervisor
 minted_in: i27
 id: exp-satellite-start
 type: "[[experiment]]"

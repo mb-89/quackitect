@@ -1,4 +1,6 @@
 ---
+unreachable_citations:
+  - scratchpad/demo-doors.mjs
 minted_in: i37-training-iterations-a-disposable-iterati
 id: tsp-every-door-to-the-future-closes-while-a-run-is-bound
 type: "[[test-spec]]"

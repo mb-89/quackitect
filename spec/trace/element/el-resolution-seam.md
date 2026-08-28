@@ -1,4 +1,6 @@
 ---
+unreachable_refs:
+  - cand-core-satellite
 minted_in: i27
 id: el-resolution-seam
 type: "[[element]]"
