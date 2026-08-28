@@ -339,6 +339,19 @@ export function withDownstream(decl: MachineDecl, seeds: Set<string>): Set<strin
  *  IT READS EVERY HOME, not the record the walk happens to stand in. Two
  *  iterations with open work both draw their counts, and the desk draws the
  *  backlog's. */
+/** THE NUMBER A RECORD IS DRAWN BY, given the folder it is placed by.
+ *
+ *  `i23-judgment-the-ui-sitting-cut-the-html-mir` is drawn as `i23`. Empty for
+ *  anything that is not a record folder, so a state name passes through
+ *  untouched.
+ *
+ *  IT IS EXPORTED SO A TEST CAN HOLD THE TWO VOCABULARIES TOGETHER. The defect
+ *  this closes was not a wrong rule — it was two correct names that never met,
+ *  and only a test naming both can catch that coming back. */
+export function recordAlias(place: string): string {
+  return /^(i\d+)-/.exec(place)?.[1] ?? "";
+}
+
 function workByState(root: string, isRead: ReadCredit): Map<string, Buckets> {
   const out = new Map<string, Buckets>();
   for (const item of readAllWork(root, isRead).items) {
@@ -353,6 +366,21 @@ function workByState(root: string, isRead: ReadCredit): Map<string, Buckets> {
     const tail = segments[segments.length - 1] ?? "";
     const own = item.place === BACKLOG ? BACKLOG_IS_DRAWN_AT : tail;
     if (own === "") continue;
+    // A RECORD IS DRAWN BY ITS NUMBER AND PLACED BY ITS WHOLE NAME.
+    //
+    // The iterations container names its boxes `i23`. A work item placed on
+    // that record carries `i23-judgment-the-ui-sitting-cut-the-html-mir`,
+    // because that is the folder. The two never met, so every count on a
+    // seeded record was computed and nothing drew it.
+    //
+    // MEASURED 2026-08-28, and the owner found it rather than a test: 299
+    // items were routed onto 34 records, all of them seeded, and the
+    // container showed none of it.
+    //
+    // THE ALIAS IS FILED BESIDE THE FULL NAME, never instead of it. The work
+    // editor groups by the whole place and the drawing knows the number, so
+    // both readers get the name they already use.
+    const short = recordAlias(own);
     // `bucketOf` still answers `done` — the editor's filter needs it. The
     // narrow is what keeps that answer out of the drawing's own type.
     const where = bucketOf(item);
@@ -360,6 +388,11 @@ function workByState(root: string, isRead: ReadCredit): Map<string, Buckets> {
     const at = out.get(own) ?? noBuckets();
     at[where] += 1;
     out.set(own, at);
+    if (short !== "") {
+      const alias = out.get(short) ?? noBuckets();
+      alias[where] += 1;
+      out.set(short, alias);
+    }
     // A MACHINE COUNTS WHAT IS BENEATH IT TOO, and shows it as the second half
     // of `18 + 4`. A piece of work inside a submachine is invisible from above
     // without this, which is the whole reason the pill has a plus in it.

@@ -11,10 +11,49 @@ import { join } from "node:path";
 import { describe, test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { appendNote, drainNote } from "../engine/inbox.ts";
+import { generateIterations } from "../engine/iterations-draw.ts";
 import { seDir } from "../engine/paths.ts";
+import { recordAlias } from "../engine/viewmodel.ts";
 import { bucketOf } from "../engine/workoffer.ts";
 import { NOTES_ARE_DRAWN_AT, penSignal, penWork } from "../engine/workpen.ts";
 import { BACKLOG, BACKLOG_IS_DRAWN_AT, readAllWork } from "../engine/workstore.ts";
+
+const REPO = fileURLToPath(new URL("../..", import.meta.url));
+
+// TWO CORRECT NAMES THAT NEVER MET.
+//
+// A record is PLACED by its folder — i23-judgment-the-ui-sitting-cut-the-html-mir
+// — and DRAWN by its number, i23. Every count on a seeded record was therefore
+// computed and filed under a key no box carried, so nothing showed.
+//
+// MEASURED 2026-08-28, and the owner found it rather than a test: 299 items
+// were routed onto 34 seeded records and the container showed none of it.
+//
+// THIS CASE HOLDS THE TWO VOCABULARIES TOGETHER, which is the only shape that
+// catches it coming back. Neither half is wrong alone.
+describe("a record's count reaches the box that draws it", () => {
+  test("the alias turns a placement name into a drawing name, and leaves others alone", () => {
+    assert.equal(recordAlias("i23-judgment-the-ui-sitting-cut-the-html-mir"), "i23");
+    assert.equal(recordAlias("i7-the-trace-sharpens-finer-grain-than-file"), "i7");
+    assert.equal(recordAlias("retro"), "", "a main-machine state is not a record");
+    assert.equal(recordAlias(BACKLOG), "", "the backlog is not a record");
+    assert.equal(recordAlias("i23"), "", "a name already short needs no alias");
+  });
+
+  test("every box the container draws is reachable from some record's folder name", () => {
+    // THE GENERATOR ANSWERS {decl: {states}}, and reading `.states` off the
+    // outer object gives an empty list that looks like an empty container.
+    const made = generateIterations(REPO) as { decl?: { states?: { id: string }[] }; states?: { id: string }[] };
+    const boxes = made.decl?.states ?? made.states ?? [];
+    const records = boxes.map((s) => s.id).filter((id) => /^i\d+$/.test(id));
+    assert.ok(records.length > 10, `the container draws its records — got ${records.length}`);
+    // The alias is the ONLY bridge, so every drawn record must be one it can
+    // produce. A box named any other way would be unreachable from a placement.
+    for (const id of records) {
+      assert.equal(recordAlias(`${id}-some-folder-name`), id, `${id} is reachable from a folder name`);
+    }
+  });
+});
 
 const fresh = (): string => mkdtempSync(join(tmpdir(), "se-pen-"));
 

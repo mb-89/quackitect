@@ -19,7 +19,7 @@ views:
       - property: if(bucket, bucket, place)
         direction: ASC
     columnSize:
-      statement: 439
+      statement: 745
       status: 106
     collapsed:
       - backlog

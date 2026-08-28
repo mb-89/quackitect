@@ -13,7 +13,8 @@ source_refs:
   - "evidence/evaluate-set.md: the drawn front is [cand-the-narrow-guard] alone, and utopia equals nadir on all six axes"
   - "evidence/cut-criteria.md: 6 criteria survived from 123, and two of the six are close paraphrases of what the incumbent rule already does"
   - "deliverable/machines/forms/templates/pareto-plot.md: lines that never cross mean the ranking was never really multi-objective"
-place: M4_20_enumerate-space
+place: backlog
+ready_when: ready when a building milestone pulls hygiene work
 ---
 
 ## What was observed

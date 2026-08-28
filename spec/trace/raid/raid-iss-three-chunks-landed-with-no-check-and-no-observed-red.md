@@ -12,7 +12,8 @@ breaks_how_badly: abrasive
 how_likely: expected
 source_refs:
   - raid-iss-nothing-shipped-this-round-makes-the-walk-faster
-place: M7_30_observe-red
+place: backlog
+ready_when: ready when a building milestone pulls hygiene work
 ---
 
 ## Which three

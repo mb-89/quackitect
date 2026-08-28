@@ -2,8 +2,8 @@
 id: wt-disqualify-an-option-that-fails-a-hard-requirement-before-an
 type: "[[work]]"
 statement: Disqualify an option that fails a hard requirement, before anything is scored. Scoring ranks candidates against each other; a hard requirement instead removes a candidate from the running. No step performs that removal today, so silence on a requirement and compliance with it look the same on the chart.
-place: M4_20_enumerate-space
-ready_when: ready when the compose form gains the field the finding proposes
+place: backlog
+ready_when: ready when a building milestone pulls hygiene work
 source: note-60d3c21a7c48
 ---
 

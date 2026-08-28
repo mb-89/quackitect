@@ -9,8 +9,8 @@ statement: |-
   WHY THE OBVIOUS DETOUR IS WRONG. The message also offers the underlying script, and running it would mean getting past a refusal through a different route. Our contract forbids that in as many words. The escape hatch for a missing tool does not help either: the tool exists, and only this ground withholds it.
 
   TWO HONEST ENDINGS. Grant the verb where the repairs happen. Or stop the check naming a cure the reader cannot administer.
-place: M7_60_fix-findings
-ready_when: ready when the position tool grants are next opened
+place: backlog
+ready_when: ready when a building milestone pulls hygiene work
 source: note-bad426c8c8f1
 ---
 

@@ -25,8 +25,18 @@ files:
 ANSWER ONE QUESTION: what does the surface show right now. Every fact about
 the walk that reaches a person is computed here, once, and handed over whole.
 
-WHAT IT DELIBERATELY DOES NOT DO. It does not render. It emits no markup, no
-class names and no colour. The shape it hands over is data.
+WHAT IT DELIBERATELY DOES NOT DO. It does not render. It emits no markup and
+no colour. The shape it hands over is data.
+
+IT DOES NAME A CLASS, AND THIS SENTENCE USED TO DENY IT. `paint` returns class
+strings, and that is correct: a class is a NAME for a state's standing, which
+is a fact about the walk, and the stylesheet decides what the name looks like.
+What the view must not do is choose a colour.
+
+CORRECTED 2026-08-28, from a field report written 2026-08-23 by a tester with
+fresh eyes. The author had already judged the code right and the sentence
+wrong, and the sentence stood for five days because a field report is read by
+nobody unless somebody goes looking.
 
 WHAT IT DOES NOT OWN EITHER. Focus, scroll position and an unsubmitted edit
 are the browser's own state. They are named here because the build has to
