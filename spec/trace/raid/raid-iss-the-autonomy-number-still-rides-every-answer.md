@@ -10,6 +10,7 @@ status: open
 breaks_how_badly: abrasive
 how_likely: expected
 impact: A test-spec that cannot be observed green blocks verification for every iteration that inherits it, and the box gets ticked anyway or marked owed forever. Neither is the answer the spec asked for.
+place: i14-the-ladder-engine-half-comparison-moves-
 ---
 
 ## What was observed

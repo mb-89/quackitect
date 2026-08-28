@@ -15,6 +15,7 @@ source_refs:
   - "[[exp-which-channels-add-a-departure-without-a-path-the-guard-can-judge]]"
 weighs_with: none
 weighs_against: none
+place: backlog
 ---
 
 ## What was wrong

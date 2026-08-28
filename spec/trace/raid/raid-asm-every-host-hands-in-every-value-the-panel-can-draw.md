@@ -16,6 +16,7 @@ source_refs:
   - req-a-surface-shows-the-state-an-act-produced
   - req-a-refused-act-says-why-and-what-next
   - uc-act-on-a-control-and-know-what-it-did
+place: i23-judgment-the-ui-sitting-cut-the-html-mir
 ---
 
 ## The assumption

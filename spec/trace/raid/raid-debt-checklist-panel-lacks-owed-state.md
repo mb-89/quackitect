@@ -16,6 +16,7 @@ source_refs:
   - deliverable/machines/forms/templates/checklist.md
 last_looked: 2026-08-23
 look_verdict: rescheduled
+place: i23-judgment-the-ui-sitting-cut-the-html-mir
 ---
 
 Found during i8's M8 sweep-consistency pass, surface class "panels and

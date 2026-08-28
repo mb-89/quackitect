@@ -16,6 +16,7 @@ source_refs:
   - i38-the-machine-sizes-its-own-driver-every-s
 weighs_with: raid-asm-the-answering-model-can-be-recorded-when-only-the-agent-knows-it
 weighs_against: none
+place: i31-the-process-becomes-measurable-a-walk-re
 ---
 
 ## Attribution needs two coordinates and the record carries neither

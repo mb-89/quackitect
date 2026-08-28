@@ -16,6 +16,7 @@ source_refs:
   - fn-govern-a-conversation-under-a-stated-rule
 weighs_with: none
 weighs_against: none
+place: backlog
 ---
 
 ## It was written as an assumption and the check falsified it

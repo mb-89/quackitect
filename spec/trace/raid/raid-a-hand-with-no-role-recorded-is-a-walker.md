@@ -16,6 +16,7 @@ source_refs:
   - deliverable/engine/bin/hands-spawned.ts, the running-and-walker filter
   - deliverable/engine/tools-run.ts, roleAsked
   - "owner ruling 2026-08-23: only walkers count towards the number"
+place: i64-the-diamond-and-the-orchestrator-handove
 ---
 
 NOT ESTABLISHED. The default exists so that hands registered before the role

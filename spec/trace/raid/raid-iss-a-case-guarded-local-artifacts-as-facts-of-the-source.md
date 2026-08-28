@@ -14,6 +14,8 @@ source_refs:
   - i5-engine-hygiene-one-version-source-every-
 weighs_with: none
 weighs_against: none
+place: backlog
+ready_when: ready when a building milestone pulls hygiene work
 ---
 
 ## What was found

@@ -9,6 +9,7 @@ statement: |-
   Two repairs look sound. Carry the commentary across a restart, as the aimed destination already survives one. Or make the refusal say a restart cleared the list, ending the hunt in a single line.
 
   Seen on the very first call after a restart.
+place: i55-narration-gets-lean-the-decision-graph-s
 ready_when: ready when i55-narration-gets-lean-the-decision-graph-s is walked, since it already opens the running commentary machinery
 source: note-ad7dbeff84ef
 ---

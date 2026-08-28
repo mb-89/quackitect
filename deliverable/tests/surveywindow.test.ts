@@ -156,3 +156,54 @@ test("a shipped iteration leaves the open list, whatever stands on disk", async 
   assert.ok(!after.iterations.some((i) => i.id === id), `a shipped record is not open: ${JSON.stringify(after.iterations)}`);
   assert.equal(after.counts.iterations, after.iterations.length, "the count matches the list it counts");
 });
+
+// A PARKED ITEM WAITING ON A RECORD IS WAITING FOR AN EVENT NOBODY FIRES.
+//
+// "ready when i60 is seeded" reads like a promise that the item wakes when
+// that record opens. Nothing wakes it. It waits until somebody happens to read
+// the backlog at the right hour, and usually nobody does.
+//
+// MEASURED 2026-08-28: sixteen items named the walk-speed record. It shipped
+// four days earlier and collected none of them. Twenty-four in total named a
+// record already shipped or abandoned.
+test("a backlog item waiting on a record that already closed says so", async () => {
+  const root = freshRoot();
+  gitInit(root);
+  const server = await bootedServer(root);
+
+  const record = (id: string, status: string): void => {
+    const dir = join(root, "spec", "iterations", id);
+    mkdirSync(dir, { recursive: true });
+    writeFileSync(join(dir, "record.md"), ["---", `id: ${id}`, `status: ${status}`, "goal: a fixture", "---", ""].join("\n"), "utf8");
+  };
+  record("i60-the-one-that-shipped", "shipped");
+  record("i61-the-one-still-open", "seeded");
+
+  const token = (slug: string, readyWhen: string): void => {
+    const dir = join(root, "spec", "trace", "work-token");
+    mkdirSync(dir, { recursive: true });
+    const text = [
+      "---",
+      `id: ${slug}`,
+      'type: "[[work-token]]"',
+      "statement: a fixture item parked against a moment",
+      `ready_when: ${readyWhen}`,
+      "source: a fixture",
+      "---",
+      "",
+    ].join("\n");
+    writeFileSync(join(dir, `${slug}.md`), text, "utf8");
+  };
+  token("wt-waits-on-a-record-that-shipped", "ready when i60 is seeded");
+  token("wt-waits-on-a-record-still-open", "ready when i61 reaches its build");
+  token("wt-waits-on-nothing-in-particular", "ready when somebody looks at it again");
+
+  const s = (await call(server, "se_survey", {})).body as unknown as {
+    passed_moments?: { ref: string; names: string; status: string }[];
+  };
+  const flagged = s.passed_moments ?? [];
+  assert.equal(flagged.length, 1, `only the one whose record closed is flagged: ${JSON.stringify(flagged)}`);
+  assert.equal(flagged[0].ref, "wt-waits-on-a-record-that-shipped");
+  assert.equal(flagged[0].names, "i60-the-one-that-shipped", "the answer names the record, not just the number");
+  assert.equal(flagged[0].status, "shipped", "and says what that record actually is now");
+});

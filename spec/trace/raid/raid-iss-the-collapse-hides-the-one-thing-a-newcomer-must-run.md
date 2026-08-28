@@ -13,6 +13,7 @@ how_likely: expected
 source_refs:
   - sty-ramp-up, whose second slide says the script sits in the root and is the loudest thing in the folder
   - the entry document's own layout section, which labels the inner folder as the one you open
+place: i23-judgment-the-ui-sitting-cut-the-html-mir
 ---
 
 ## How it was found

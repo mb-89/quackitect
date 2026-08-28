@@ -14,6 +14,7 @@ source_refs:
   - note-ec92cfa43897
 last_looked: 2026-08-23
 look_verdict: rescheduled
+place: i52-the-route-can-go-back-a-walk-can-reach-a
 ---
 
 ## What was taken, and by whom

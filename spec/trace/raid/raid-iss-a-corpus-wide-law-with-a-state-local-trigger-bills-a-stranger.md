@@ -17,6 +17,7 @@ source_refs:
   - raid-iss-a-placeholder-that-runs-a-sub-machine-can-never-be-re-signed
 weighs_with: none
 weighs_against: none
+place: i53-a-step-sees-its-own-record-s-slice-forms
 ---
 
 ## What happens

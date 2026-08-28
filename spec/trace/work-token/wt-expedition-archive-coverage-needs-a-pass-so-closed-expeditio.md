@@ -2,6 +2,7 @@
 id: wt-expedition-archive-coverage-needs-a-pass-so-closed-expeditio
 type: "[[work]]"
 statement: Expedition archive coverage needs a pass so closed expeditions are discoverable from the archive surface and from git-backed project state.
+place: i49-the-archive-slice-settled-option-candida
 ready_when: ready when archive work is selected or an archive iteration opens
 source: note-88fac5292848
 ---

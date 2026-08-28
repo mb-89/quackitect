@@ -17,6 +17,7 @@ source_refs:
   - spec/trace/raid/raid-mcp-stop-is-not-diagnosable.md
 last_looked: 2026-08-23
 look_verdict: rescheduled
+place: i39-the-lane-tells-the-truth-about-itself-de
 ---
 
 ## Repayment

@@ -2,6 +2,7 @@
 id: wt-an-ordering-of-decision-criteria-is-computed-from-a-damage-g
 type: "[[work]]"
 statement: An ordering of decision criteria is computed from a damage grade and then trusted without a look. A person can override it, and nothing obliges them to. So the ranking that settles which design wins may be decided by arithmetic nobody read. Wanted is a required confirmation of the leading entries, taken before any winner is picked.
+place: M4_28_cut-criteria
 ready_when: ready when the criteria-cutting step is next opened for change
 source: note-beac84587cd9
 ---

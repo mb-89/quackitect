@@ -15,6 +15,7 @@ statement: |-
   This widens an existing law. State machines are drawn and edited as drawings, and a surface now works the same way.
 
   WHAT IS OWED: a named home inside a record for these files, so a reader can find them. One is currently parked on a guess.
+place: i23-judgment-the-ui-sitting-cut-the-html-mir
 ready_when: ready when i23-judgment-the-ui-sitting-cut-the-html-mir is walked, because that is where surfaces get sketched and the sketches need a home
 source: note-ba995f63c7db
 ---

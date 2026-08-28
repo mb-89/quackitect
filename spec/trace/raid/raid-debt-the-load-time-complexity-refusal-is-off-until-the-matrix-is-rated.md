@@ -21,6 +21,7 @@ weighs_with: none
 weighs_against: none
 last_looked: 2026-08-23
 look_verdict: rescheduled
+place: i14-the-ladder-engine-half-comparison-moves-
 ---
 
 ## The shape of it

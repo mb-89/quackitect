@@ -16,6 +16,8 @@ source_refs:
   - "i11 record.md: THE REST OF THE BUNDLE, seeded 2026-08-12"
   - "i11 record.md: ADDED 2026-08-13, FROM THE NOTE POOL"
   - "build-chunks.md: anything live but outside this surface is RECORDED, not fixed"
+place: backlog
+ready_when: ready when a building milestone pulls hygiene work
 ---
 
 ## Why this is recorded rather than fixed

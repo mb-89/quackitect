@@ -16,6 +16,7 @@ source_refs:
   - note-360a599a263a
 weighs_with: none
 weighs_against: none
+place: i67-a-failure-the-caller-can-cause-arrives-t
 ---
 
 ## What happened, three times

@@ -16,6 +16,7 @@ source_refs:
   - tsp — trace-design's own guidance names the grain and its cost
 last_looked: 2026-08-23
 look_verdict: rescheduled
+place: i7-the-trace-sharpens-finer-grain-than-file
 ---
 
 Quality traded for speed, consciously: v1 went finer with `// design:`

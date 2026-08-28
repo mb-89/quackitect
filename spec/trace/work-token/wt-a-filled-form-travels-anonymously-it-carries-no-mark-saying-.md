@@ -11,6 +11,7 @@ statement: |-
   WHERE IT HURTS MOST. A checkpoint is precisely the document two hands must never both write. This is a route by which a second hand writes to one without intending to.
 
   THE SHAPE OF THE REPAIR. Let a payload name its intended document, and refuse where that name and the current position disagree. Which document was offered is already stated in the answer that offered it, so nothing new has to be tracked.
+place: i29-frontmatter-is-typed-and-the-engine-writ
 ready_when: ready when form submission is next opened
 source: note-e7d330a9731f
 ---

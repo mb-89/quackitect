@@ -2,6 +2,7 @@
 id: wt-make-build-guidance-and-forms-expose-the-supported-chunk-aut
 type: "[[work]]"
 statement: Make build guidance and forms expose the supported chunk authoring action and the required seeded drawing schema.
+place: i13-the-machine-format-state-machines-become
 ready_when: ready when iteration build-step authoring or submachine seeding is changed
 source: note-353161371a44
 ---

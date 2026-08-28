@@ -13,6 +13,7 @@ impact: Every breach report on this edge mixes lane overhead with runtimes the c
 source_refs:
   - spec/trace/interface/if-agent-harness-to-entrypoint.md
   - spec/iterations/i36-the-harness-is-not-claude-measure-what-e/evidence/gate-implementation.md
+place: i31-the-process-becomes-measurable-a-walk-re
 ---
 
 ## Graded off the scale, corrected 2026-08-20

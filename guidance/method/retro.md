@@ -168,7 +168,7 @@ The trigger is a NOTE carrying "needs retro":
      carry anything private.
 
      - A statement carrying the note's own words refuses SE-C-140.
-     - Cannot state it cleanly yet? Say so, and the pool carries it as an
+     - Cannot state it cleanly yet? Say so, and the backlog carries it as an
        open question.
      - What is refused is silence and paste, never honesty.
 
@@ -180,7 +180,7 @@ The trigger is a NOTE carrying "needs retro":
    Nothing stays pending after a retro.
 4. WALK THE BACKLOG #work/walk-the-backlog
 
-   The migration. Every standing WORK TOKEN in the pool
+   The migration. Every standing WORK TOKEN in the backlog
    (spec/trace/work-token/, on trunk, readable from any clone):
    keep it (condition still unmet), pull it
    (re-drain as carried, into this round's scope), or drop it (re-drain
@@ -444,10 +444,14 @@ The trigger is a NOTE carrying "needs retro":
    highest-leverage notes. Each one specific and checkable — a concrete
    change, never "improve X".
 
-13. CLEAR THE WORKBENCH #work/clear-the-workbench
+13. EMPTY THE SCRATCHPAD #work/empty-the-scratchpad
 
    OWNER INSTRUCTION: every retro does this, and the scratchpad is not allowed
    to grow without bound.
+
+   THE SCRATCHPAD IS NOT PERMANENT AND DOES NOT TRAVEL WITH VERSION CONTROL.
+   Anything useful sitting there is one machine away from being lost, so
+   "useful" is a reason to BAKE IT IN rather than a reason to keep it.
 
    Walk what is in `scratchpad/` and decide each file's fate. There are only
    three answers, and "leave it" is not one of them.
@@ -456,24 +460,35 @@ The trigger is a NOTE carrying "needs retro":
    - PROMOTE IT. See the scripts, below.
    - DELETE IT. It answered its question and the answer is recorded.
 
+   EMPTY MEANS EMPTY. A file kept because it might be handy next time is a
+   file that will not be there next time.
+
    READ THE FIELD REPORTS FIRST. A field report is the one channel that reaches
    a person from an unattended run, and nothing else carries what is in it.
    Anything in one that maps onto the repository moves there NOW — a guidance
    edit, a register entry, a work token. What cannot be mapped is why the
    report exists, and the retro is the only reader it will ever get.
 
-   THEN ASK OF EVERY SCRIPT WHETHER IT SHOULD BE A TOOL. A script written
+   THEN ASK OF EVERY SCRIPT WHERE IT BELONGS IN THE SYSTEM. A script written
    once is a program and costs nothing. A script REWRITTEN every session is a
-   missing verb naming itself, and the retro is where it gets named.
+   capability naming itself, and the retro is where it gets a home.
 
    - Group the scripts by what they ANSWER, not by their filenames.
-   - A shape that recurs across sessions is a candidate for a lane verb or a
-     check that runs on its own.
-   - Say which you promoted and which you did not, with the reason.
+   - A shape that recurs across sessions gets baked in.
+
+   A NEW VERB IS THE LAST RESORT, NOT THE FIRST (owner ruling). There are
+   already many, and each one is another thing to learn, maintain and get
+   wrong. Reach for these in order:
+
+   - A CHECK THE ENGINE RUNS ITSELF, on a write or at a leaving condition.
+     Nobody has to remember it and nobody has to call it.
+   - A SUBFUNCTION OF A VERB THAT EXISTS. An argument on a verb already in the
+     hand beats a whole new one nobody will find.
+   - A NEW VERB, only where neither fits, and say why neither fitted.
 
    THE COUNT GOES IN THE REPORT. How many files stood, how many were
-   incorporated, promoted or deleted. A workbench nobody counts is one nobody
-   clears.
+   incorporated, promoted or deleted. A scratchpad nobody counts is one nobody
+   empties.
 
 14. REPORT TO THE OWNER, FOR DISCUSSION #work/report-to-the-owner
 
@@ -522,12 +537,18 @@ The trigger is a NOTE carrying "needs retro":
 
    THAT IS WHY THIS SITS BELOW THE REPORT rather than beside the drain.
 
-   AND IT IS BLOCKED TODAY, said plainly rather than left to be discovered.
-   `deliverable/engine/pool.ts` exports a mint and a read and nothing else. No
-   verb moves an item out of the backlog, and the write guard refuses every
-   other write into it. The editing surface can move one; the lane cannot. So
-   this step can decide every owner and apply none of them, and it says so in
-   its report until the verb exists.
+   A MOVE IS ONE FIELD, NOT A VERB. Every backlog item is a file carrying a
+   `place`, and writing a position into that field moves the item there.
+   Anybody who may edit a file may move one, so nothing has to be built first.
+
+   AN ITEM SAYING NOTHING STANDS IN THE BACKLOG, which is the default a mint
+   gives it. Stamp the place explicitly anyway: a move is then a CHANGE to a
+   line rather than the absence of one, and the difference is visible to a
+   reader and to version control.
+
+   SAY BACKLOG. It is called the backlog on every surface a person reads, and
+   "the pool" is the code's word for the same folder. Carrying the internal
+   word into a report makes the reader translate.
 
 ## The standing questions
 
@@ -570,7 +591,7 @@ method (`deliverable/machines/methods/meth-state-of-the-art.md`).
   whenever" is one pull away, inside the machine's discipline.
 - a drained note's LOCAL half stays on file (.se/notes.jsonl, disposition
   backlog) so the two ends of a crossing can be found from each other. It
-  is not the pool. THE POOL IS spec/trace/work-token/, on trunk,
+  is not the backlog. THE BACKLOG IS spec/trace/work-token/, on trunk,
   and the migration step re-drains a token when its "ready when" comes
   true.
 - A SECOND DRAIN OF ONE NOTE TO THE POOL IS REFUSED. The token already

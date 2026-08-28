@@ -14,6 +14,7 @@ source_refs:
   - deliverable/machines/methods/meth-gate-review.md, "THREE HANDS READ A GATE, AND NONE OF THEM GRADES ITS OWN WORK"
   - spec/iterations/i4-the-panel-round-the-archived-iteration-b/evidence/map-stakeholders.md, stk-reviewing-agent
   - the unspecified-capability walk at iterations/i4/gate-inputs
+place: i44-the-corpus-resolves-duplicate-headings-a
 ---
 
 FOUND DURING THE UNSPECIFIED-CAPABILITY WALK at this gate, comparing the

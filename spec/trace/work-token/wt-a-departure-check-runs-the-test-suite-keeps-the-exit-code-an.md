@@ -10,8 +10,8 @@ statement: |-
 
   ALREADY FORBIDDEN, BY NAME. Our refusals page bans blanket errors: a wrapper carries out whatever its failing child said, rather than replacing it with a summary.
 
-  NOTHING NEW HAS TO BE BUILT. Shell results are retained in full and fetched later by handle. This path just never adopted that.</statement>
-  <parameter name="update">{"op": "done", "node": "d9", "brief": "the pin was diagnosed and then fixed properly"}
+  NOTHING NEW HAS TO BE BUILT. Shell results are retained in full and fetched later by handle. This path just never adopted that.
+place: i66-the-overhaul-gets-its-mechanisms-a-check
 ready_when: ready when the leaving-check runner is next opened
 source: note-a71bef4acbff
 ---
@@ -26,8 +26,7 @@ THE PRICE, SEEN ONCE. The suite had to be asked all over again, costing somethin
 
 ALREADY FORBIDDEN, BY NAME. Our refusals page bans blanket errors: a wrapper carries out whatever its failing child said, rather than replacing it with a summary.
 
-NOTHING NEW HAS TO BE BUILT. Shell results are retained in full and fetched later by handle. This path just never adopted that.</statement>
-<parameter name="update">{"op": "done", "node": "d9", "brief": "the pin was diagnosed and then fixed properly"}
+NOTHING NEW HAS TO BE BUILT. Shell results are retained in full and fetched later by handle. This path just never adopted that.
 
 ## When it comes back
 

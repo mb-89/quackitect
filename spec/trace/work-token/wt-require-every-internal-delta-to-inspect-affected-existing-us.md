@@ -2,6 +2,7 @@
 id: wt-require-every-internal-delta-to-inspect-affected-existing-us
 type: "[[work]]"
 statement: Require every internal delta to inspect affected existing use cases before accepting an empty use-case result.
+place: M2_20_generalize-use-cases
 ready_when: ready when iteration design-input guidance or use-case derivation is changed
 source: note-f0e1b99c5d91
 ---

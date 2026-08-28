@@ -18,6 +18,7 @@ source_refs:
   - dsp-the-sizing-block
 weighs_with: none
 weighs_against: req-call-answers-in-one-second
+place: i41-green-is-computed-once-and-right-the-dia
 ---
 
 ## The shape of it

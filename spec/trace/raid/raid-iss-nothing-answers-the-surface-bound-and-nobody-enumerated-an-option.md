@@ -14,6 +14,7 @@ source_refs:
   - req-surface-answers-in-one-second
   - evaluate-architecture at i9, 2026-08-19 — the only card ruled unaddressed
   - evaluate-set at i9 — the only axis where the utopia point falls below solid baseline
+place: i23-judgment-the-ui-sitting-cut-the-html-mir
 ---
 
 ## Two independent findings landed on the same square

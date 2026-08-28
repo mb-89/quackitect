@@ -24,6 +24,7 @@ source_refs:
   - i35-the-cloud-run-s-findings-land-the-fix-fi
 last_looked: 2026-08-23
 look_verdict: re-accepted
+place: i53-a-step-sees-its-own-record-s-slice-forms
 ---
 
 ## Why this is not [[raid-debt-human-observed-demonstrations]]

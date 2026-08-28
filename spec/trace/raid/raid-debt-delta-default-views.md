@@ -16,6 +16,7 @@ source_refs:
   - note-db7c72bd519c
 last_looked: 2026-08-23
 look_verdict: rescheduled
+place: i53-a-step-sees-its-own-record-s-slice-forms
 ---
 
 Taken knowingly at the b10 signing: the stamp at mint and the corpus

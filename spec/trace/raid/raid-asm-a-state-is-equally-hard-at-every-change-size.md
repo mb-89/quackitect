@@ -18,6 +18,7 @@ source_refs:
   - req-every-matrix-row-declares-its-complexity
 weighs_with: raid-risk-a-hand-declared-rung-drifts-upward-and-nothing-ever-says-so
 weighs_against: none
+place: i14-the-ladder-engine-half-comparison-moves-
 ---
 
 ## WHAT THIS ENTRY FIRST CLAIMED, AND WHY HALF OF IT IS WITHDRAWN

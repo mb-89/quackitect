@@ -16,6 +16,7 @@ source_refs:
   - 570cdc66 — the levelling commit that brought all twelve files into this tree
 last_looked: 2026-08-23
 look_verdict: rescheduled
+place: i48-wire-the-built-failure-shapes-feeds-the-
 ---
 
 Eight files carry the core and satellite design. Six test files

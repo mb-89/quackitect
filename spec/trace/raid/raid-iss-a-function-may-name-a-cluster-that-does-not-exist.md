@@ -16,6 +16,7 @@ source_refs:
   - i38-the-machine-sizes-its-own-driver-every-s
 weighs_with: none
 weighs_against: none
+place: i44-the-corpus-resolves-duplicate-headings-a
 ---
 
 ## Graded off the scale, corrected 2026-08-20

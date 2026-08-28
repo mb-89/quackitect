@@ -16,6 +16,7 @@ source_refs:
   - i38-the-machine-sizes-its-own-driver-every-s
 weighs_with: none
 weighs_against: none
+place: overhaul
 ---
 
 ## The three figures

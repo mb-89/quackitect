@@ -12,6 +12,7 @@ breaks_how_badly: corrosive
 how_likely: plausible
 source_refs:
   - wt-re-signing-an-answer-that-others-rest-on-knocks-those-others
+place: i65-deferred-revalidation-a-change-that-ripp
 ---
 
 ## What is established

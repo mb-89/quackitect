@@ -15,6 +15,7 @@ source_refs:
   - tsp-prose-inspection
   - tsp-record-inspection
   - tsp-derivation-analysis
+place: i25-judgment-the-voice-and-its-linter-integr
 ---
 
 Three of the nine specs a verification must answer want the whole corpus

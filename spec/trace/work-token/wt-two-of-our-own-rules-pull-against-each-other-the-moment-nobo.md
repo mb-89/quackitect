@@ -18,6 +18,7 @@ statement: |-
 
   - The stop guard learns that a registered second hand is a legitimate reason for the custodian to rest.
   - A refusal states which position a form was written for. A displaced hand then reads its own displacement in the reply, instead of guessing at an absent field.
+place: i64-the-diamond-and-the-orchestrator-handove
 ready_when: ready when the stop guard or the spawning method is next opened
 source: note-043d1941693a
 ---

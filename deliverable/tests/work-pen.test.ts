@@ -5,7 +5,7 @@
 //
 // see dsp-the-work-store.md#work-drawn-from-a-live-source
 import { strict as assert } from "node:assert";
-import { mkdtempSync, readFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, test } from "node:test";
@@ -72,6 +72,30 @@ describe("the pen draws work from its two live sources", { concurrency: true }, 
     assert.notEqual(BACKLOG, BACKLOG_IS_DRAWN_AT, "the place and the state it draws at are different things");
     assert.equal(bucketOf(pooled[0]), "pending", "the backlog is the desk's pending bucket and nothing else");
     assert.match(pooled[0].statement, /duplicated greeting/, "the drawn work does not carry the authored statement");
+  });
+
+  // A TOKEN LEAVES THE BACKLOG BY SAYING WHERE IT BELONGS, in its own file.
+  //
+  // The backlog is a PENDING bucket, so work is moved out of it to whatever
+  // owns it — an iteration, the overhaul, a state. Nothing new is needed for
+  // that: the token is a file, anybody who may edit a file may move it, and
+  // the default when it says nothing is the backlog it was minted into.
+  test("a place written into a token's own file moves it out of the backlog", () => {
+    const root = fresh();
+    const { captured } = appendNote(seDir(root), NOTE);
+    drainNote(seDir(root), captured, "backlog", READY, true, STATEMENT, root);
+
+    const id = penWork(root).filter((i) => i.id.startsWith("wt-"))[0].id;
+    const file = join(root, "spec", "trace", "work-token", `${id}.md`);
+    const before = readFileSync(file, "utf8");
+    assert.ok(!before.includes("\nplace:"), "a minted token already names a place, so the default cannot be observed");
+
+    writeFileSync(file, before.replace(/^ready_when:/m, "place: iterations/i23\nready_when:"));
+
+    const moved = penWork(root).filter((i) => i.id === id);
+    assert.equal(moved.length, 1, "the moved token stopped being drawn at all");
+    assert.equal(moved[0].place, "iterations/i23", "a place in the file did not move the token");
+    assert.notEqual(moved[0].place, BACKLOG, "the token is still standing in the backlog it was moved out of");
   });
 
   test("the whole-project read carries the drawn work and names no home for it", () => {

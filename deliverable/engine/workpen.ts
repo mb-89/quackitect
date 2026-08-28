@@ -103,17 +103,38 @@ export function penWork(root: string): WorkItem[] {
   for (const n of pendingNotes(seDir(root))) {
     out.push(drawn({ id: n.ref, statement: titleOf(n), place: NOTES_ARE_DRAWN_AT, sourceRef: n.ref, slot: "out", body: "" }));
   }
+  // A TOKEN GOES WHERE ITS FILE SAYS, and the backlog is only the default.
+  // Writing a position into a token's own file is how it leaves the backlog,
+  // so a move is an edit rather than a verb somebody has to build first.
   for (const t of standingTokens(root)) {
     out.push(
-      drawn({ id: t.id, statement: t.statement, place: BACKLOG, sourceRef: `${POOL_PREFIX}/${t.id}.md`, slot: "", body: t.ready_when }),
+      drawn({
+        id: t.id,
+        statement: t.statement,
+        place: t.place ?? BACKLOG,
+        sourceRef: `${POOL_PREFIX}/${t.id}.md`,
+        slot: "",
+        body: t.ready_when,
+      }),
     );
   }
-  // AN OPEN ISSUE OR DEBT IS WORK NOBODY HAS PLACED, so it draws where work
-  // nobody has placed belongs. Its TRIGGER is its re-entry condition, which is
-  // the same field a pool token calls ready_when.
+  // AN OPEN ISSUE OR DEBT IS WORK NOBODY HAS PLACED YET, so the backlog is
+  // where it starts. Its TRIGGER is its re-entry condition, which is the same
+  // field a backlog item calls ready_when.
+  //
+  // AND IT MOVES THE SAME WAY: a position written into the entry's own file
+  // takes it out of the backlog, so an issue that belongs to one round sits
+  // there rather than in a pile everybody has to re-read.
   for (const e of openRegisterWork(root)) {
     out.push(
-      drawn({ id: e.id, statement: e.statement, place: BACKLOG, sourceRef: `${RAID_PREFIX}/${e.id}.md`, slot: "", body: e.trigger }),
+      drawn({
+        id: e.id,
+        statement: e.statement,
+        place: e.place ?? BACKLOG,
+        sourceRef: `${RAID_PREFIX}/${e.id}.md`,
+        slot: "",
+        body: e.trigger,
+      }),
     );
   }
   return out;

@@ -17,6 +17,7 @@ source_refs:
   - req-the-system-runs-in-a-tree-that-is-not-its-own
 last_looked: 2026-08-23
 look_verdict: rescheduled
+place: backlog
 ---
 
 ## What was taken, and by whom

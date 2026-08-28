@@ -10,9 +10,9 @@ statement: |-
 
   WHY IT IS WORSE THAN A FALSE ALARM. It points the author at the wrong half. The only way to satisfy the check is to move a heading that was already where it belongs.
 
-  NOBODY HAS TRIED IT FROM A COLD ENGINE, and that is the first experiment.</statement>
-  <parameter name="update">{"op": "done", "node": "d9", "brief": "the pin was diagnosed and then fixed properly"}
-ready_when: ready when the node parser or its in-memory store is next opened
+  NOBODY HAS TRIED IT FROM A COLD ENGINE, and that is the first experiment.
+place: backlog
+ready_when: ready when a building milestone pulls hygiene work
 source: note-43ab71b58eb8
 ---
 
@@ -26,8 +26,7 @@ Two causes are worth testing, in this order. The frontmatter split may eat the f
 
 WHY IT IS WORSE THAN A FALSE ALARM. It points the author at the wrong half. The only way to satisfy the check is to move a heading that was already where it belongs.
 
-NOBODY HAS TRIED IT FROM A COLD ENGINE, and that is the first experiment.</statement>
-<parameter name="update">{"op": "done", "node": "d9", "brief": "the pin was diagnosed and then fixed properly"}
+NOBODY HAS TRIED IT FROM A COLD ENGINE, and that is the first experiment.
 
 ## When it comes back
 

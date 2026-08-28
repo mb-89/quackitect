@@ -10,6 +10,7 @@ status: open
 breaks_how_badly: corrosive
 how_likely: expected
 impact: An honest verifier marks most claims owed and the owed list stops meaning anything. A hurried one ticks them, and the checklist becomes a formality. Both outcomes destroy the signal the state exists to produce.
+place: i53-a-step-sees-its-own-record-s-slice-forms
 ---
 
 ## What was observed

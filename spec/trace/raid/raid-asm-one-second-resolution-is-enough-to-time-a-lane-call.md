@@ -16,6 +16,7 @@ source_refs:
   - i37-training-iterations-a-disposable-iterati
 weighs_with: none
 weighs_against: none
+place: i32-the-agent-s-thinking-is-measured-capture
 ---
 
 ## Where it comes from

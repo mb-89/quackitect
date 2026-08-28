@@ -17,8 +17,8 @@ statement: |-
 
   TWO HONEST ENDINGS, and either closes this. Widen what the rule watches. Or write the boundary into the rule's own account of what it governs, so a reader stops assuming the ground is covered.
 
-  The four defects this was found alongside are all fixed; only the boundary stands.</statement>
-  <parameter name="update">{"op": "done", "node": "d9", "brief": "the pin was diagnosed and then fixed properly"}
+  The four defects this was found alongside are all fixed; only the boundary stands.
+place: i40-every-write-path-is-guarded-the-pool-s-b
 ready_when: ready when the door regime is widened past the engine folder
 source: note-8dcb600f6426
 ---
@@ -40,8 +40,7 @@ WHAT THE RULE DOES ADMIT. Its own description names exactly one gap, where code 
 
 TWO HONEST ENDINGS, and either closes this. Widen what the rule watches. Or write the boundary into the rule's own account of what it governs, so a reader stops assuming the ground is covered.
 
-The four defects this was found alongside are all fixed; only the boundary stands.</statement>
-<parameter name="update">{"op": "done", "node": "d9", "brief": "the pin was diagnosed and then fixed properly"}
+The four defects this was found alongside are all fixed; only the boundary stands.
 
 ## When it comes back
 

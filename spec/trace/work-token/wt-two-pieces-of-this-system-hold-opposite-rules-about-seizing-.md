@@ -11,6 +11,7 @@ statement: |-
   Only an accident of ordering prevents harm. The folder claim happens first, so a duplicate exits before reaching the killing code. A crash frees the folder claim while leaving the address occupied, and then the kill fires at whatever is listening.
 
   Both rules cannot stand. Choose one and delete the other.
+place: i23-judgment-the-ui-sitting-cut-the-html-mir
 ready_when: ready when i23-judgment-the-ui-sitting-cut-the-html-mir is walked, since removing the served surface removes one side of the disagreement
 source: note-18cacec12771
 ---

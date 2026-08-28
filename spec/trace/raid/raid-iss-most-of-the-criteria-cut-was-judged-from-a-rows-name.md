@@ -15,6 +15,7 @@ probed: 2026-08-19
 source_refs:
   - cut-criteria at i9, 2026-08-19, amended at the candidates gate the same day
   - req-setup-stops-before-partial and req-close-leaves-trunk-clean, both restored
+place: i56-build-the-help-dictionary-and-the-previe
 ---
 
 ## What was measured

@@ -19,6 +19,7 @@ source_refs:
   - meth-verification-discipline
 last_looked: 2026-08-23
 look_verdict: rescheduled
+place: backlog
 ---
 
 ## What is actually owed

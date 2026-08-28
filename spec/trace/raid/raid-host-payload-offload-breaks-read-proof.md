@@ -13,6 +13,7 @@ impact: The agent may have to read host chat-session files to recover proof prom
 source_refs:
   - spec/iterations/i36-the-harness-is-not-claude-measure-what-e/evidence/onboard-retro.md
   - spec/iterations/i36-the-harness-is-not-claude-measure-what-e/evidence/define-actual.md
+place: i39-the-lane-tells-the-truth-about-itself-de
 ---
 
 ## Finding

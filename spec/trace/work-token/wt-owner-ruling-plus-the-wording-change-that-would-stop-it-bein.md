@@ -13,6 +13,7 @@ statement: |-
   The repair is the opening sentence itself, which should name the act it bans. Wording built around taking rather than viewing carries identical weight and closes the misreading.
 
   The misreading is easy because the paragraph beneath argues entirely about what a display might hold that nobody chose to reveal, and the heading generalises past that argument.
+place: overhaul
 ready_when: ready when the binding rules file is next edited, since this is a one-line correction to a heading
 source: note-e1bd8a68c4fb
 ---

@@ -14,6 +14,8 @@ source_refs:
   - "[[req-the-reachability-guard-enumerates-exports-from-the-source]]"
 weighs_with: none
 weighs_against: none
+place: backlog
+ready_when: ready when a building milestone pulls hygiene work
 ---
 
 ## How they were found

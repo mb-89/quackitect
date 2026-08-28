@@ -15,6 +15,7 @@ source_refs:
   - raid-dec-the-engine-runs-the-red-and-owns-its-own-promotions
   - req-a-ripple-names-its-root
   - deliverable/engine/session.ts
+place: i52-the-route-can-go-back-a-walk-can-reach-a
 ---
 
 ## What happened

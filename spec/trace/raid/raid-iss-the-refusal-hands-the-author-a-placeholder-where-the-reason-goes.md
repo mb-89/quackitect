@@ -13,6 +13,7 @@ source_refs:
   - "deliverable/engine/widgets.ts line 166: the remedy's new_string writes the reason slot as the literal placeholder text"
   - "deliverable/machines/widget-exemptions.md line 30: a bullet with no reason is ignored, by design"
   - "measured 2026-08-26: the whole tree carries one declared widget exemption"
+place: i40-every-write-path-is-guarded-the-pool-s-b
 ---
 
 ## What was found

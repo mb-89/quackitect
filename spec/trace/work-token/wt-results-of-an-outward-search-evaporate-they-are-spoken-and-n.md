@@ -9,6 +9,7 @@ statement: |-
   Several rules for that method were already paid for in hard currency. Verify the outward verbs are open where the walk stands before beginning. Require backing per assertion. Flag whatever rests on a digest rather than a fetched page. Make each result state what it disproves. Refuse a progress line where results belong.
 
   Two documents already in this repository covered the topic and went unread.
+place: find_prior_art
 ready_when: ready when any record next orders outward investigation, because the loss happens on the first such pass and cannot be recovered afterwards
 source: note-734f68e3ef9f
 ---

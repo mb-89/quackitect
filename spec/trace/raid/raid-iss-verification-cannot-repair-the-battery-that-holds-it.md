@@ -15,6 +15,7 @@ source_refs:
   - i62-background-work-reports-its-own-end-the-
 weighs_with: none
 weighs_against: none
+place: i52-the-route-can-go-back-a-walk-can-reach-a
 ---
 
 ## The shape

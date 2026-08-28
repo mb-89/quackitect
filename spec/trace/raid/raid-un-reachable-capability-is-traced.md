@@ -12,6 +12,7 @@ how_likely: expected
 source_refs:
   - evaluate-architecture, the scenario walk's verdict
   - req-reachable-capability-is-traced
+place: i7-the-trace-sharpens-finer-grain-than-file
 ---
 
 Found unaddressed at evaluate-architecture by agent. Either the

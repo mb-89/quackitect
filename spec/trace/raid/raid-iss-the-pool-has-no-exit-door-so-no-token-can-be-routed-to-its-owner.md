@@ -12,6 +12,7 @@ breaks_how_badly: crippling
 how_likely: certain
 source_refs:
   - i63-work-tokens-become-the-unit-of-work-and-
+place: backlog
 ---
 
 ## Where every pool token belongs

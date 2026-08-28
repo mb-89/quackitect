@@ -18,6 +18,7 @@ source_refs:
   - spec/trace/test-spec/tsp-repeated-failure-shape-becomes-durable-work.md
 last_looked: 2026-08-23
 look_verdict: rescheduled
+place: i48-wire-the-built-failure-shapes-feeds-the-
 ---
 
 ## Graded off the scale, corrected 2026-08-20

@@ -16,6 +16,7 @@ source_refs:
   - raid-iss-an-exit-script-may-not-read-unpinned-host-state
 weighs_with: none
 weighs_against: none
+place: i42-the-served-word-matches-the-machine-guid
 ---
 
 ## The shape of it

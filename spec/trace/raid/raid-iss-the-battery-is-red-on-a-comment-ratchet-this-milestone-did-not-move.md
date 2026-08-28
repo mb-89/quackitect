@@ -13,6 +13,8 @@ how_likely: expected
 source_refs:
   - "measured 2026-08-26 at i63/gate-requirements: 1861 tests, 1859 pass, 2 fail, both in deliverable/tests/comment-rule.test.ts"
   - req-red-is-never-carried
+place: backlog
+ready_when: ready when a building milestone pulls hygiene work
 ---
 
 ## What the run actually said

@@ -15,6 +15,7 @@ source_refs:
   - req-nothing-a-copy-does-reaches-its-source
   - raid-dec-an-import-is-read-only-and-a-vendored-copy-is-yours
   - sty-nothing-i-do-reaches-what-it-came-from
+place: i40-every-write-path-is-guarded-the-pool-s-b
 ---
 
 ## What it said before, and why the kind changed

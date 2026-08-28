@@ -2,6 +2,7 @@
 id: wt-after-reaching-a-target-retain-a-forward-route-for-later-unp
 type: "[[work]]"
 statement: After reaching a target, retain a forward route for later unprompted pulls.
+place: i52-the-route-can-go-back-a-walk-can-reach-a
 ready_when: ready when target selection and pull routing are revised
 source: note-c6dee0d2b659
 ---

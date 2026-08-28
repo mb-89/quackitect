@@ -17,6 +17,7 @@ source_refs:
   - raid-debt-cloud-validation-needs-a-machine-this-one-cannot-make
 weighs_with: none
 weighs_against: none
+place: i14-the-ladder-engine-half-comparison-moves-
 ---
 
 ## BOTH COMPARISONS ARE RIGHT AND THE SENTENCE BETWEEN THEM WAS WRONG

@@ -16,6 +16,8 @@ source_refs:
   - i17-the-options-pool-triage-a-raw-note-into-
 weighs_with: none
 weighs_against: none
+place: backlog
+ready_when: ready when a building milestone pulls hygiene work
 ---
 
 ## What is actually wrong

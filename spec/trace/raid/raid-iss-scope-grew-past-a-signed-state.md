@@ -16,6 +16,7 @@ source_refs:
   - spec/iterations/i3-the-walk-s-feedback-loop-the-reading-cre/evidence/write-requirements.md — three rows at first signing, seven after the reopen
   - engine/session.ts driftReopen, which reopens on a MOVED DEMAND and nothing else
   - engine/iterations.ts movedDemands, which compares the matrix, not the scope
+place: i65-deferred-revalidation-a-change-that-ripp
 ---
 
 ## What happened

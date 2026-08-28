@@ -14,6 +14,7 @@ source_refs:
   - note-d7a26094f592
   - spec/references/
   - i6 record vision — "Prior art already researched"
+place: i10-the-big-sweep-one-pass-over-one-key-a-mo
 ---
 
 ## What is claimed, and where

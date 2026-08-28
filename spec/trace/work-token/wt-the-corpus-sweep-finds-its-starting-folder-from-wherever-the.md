@@ -11,6 +11,7 @@ statement: |-
   BOTH BREAK THE SWEEP'S OWN HARDEST LINE, which says a category it cannot examine must report itself unexamined rather than quietly passing. Finding nothing is exactly that case wearing a pass.
 
   THE REPAIR HAS TWO HALVES. Derive the starting folder from the project itself. And treat a count of nothing as a refusal instead of a success.
+place: i66-the-overhaul-gets-its-mechanisms-a-check
 ready_when: ready when the corpus sweep is next opened
 source: note-c545c46b8e56
 ---

@@ -11,6 +11,7 @@ breaks_how_badly: abrasive
 how_likely: expected
 source_refs:
   - the record was seeded 2026-08-12; the file it cites was restructured by two iterations that shipped after
+place: i44-the-corpus-resolves-duplicate-headings-a
 ---
 
 ## What the record cites, and what stands there now

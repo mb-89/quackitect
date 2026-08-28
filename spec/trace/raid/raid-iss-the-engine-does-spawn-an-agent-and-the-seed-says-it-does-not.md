@@ -16,6 +16,7 @@ source_refs:
   - i38-the-machine-sizes-its-own-driver-every-s
 weighs_with: none
 weighs_against: none
+place: i64-the-diamond-and-the-orchestrator-handove
 ---
 
 ## What is actually true

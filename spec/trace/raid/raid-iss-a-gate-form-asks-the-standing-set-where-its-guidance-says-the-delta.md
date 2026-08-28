@@ -14,6 +14,7 @@ source_refs:
   - i5-engine-hygiene-one-version-source-every-
 weighs_with: none
 weighs_against: none
+place: i53-a-step-sees-its-own-record-s-slice-forms
 ---
 ## What was observed
 

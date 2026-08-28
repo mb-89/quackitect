@@ -13,6 +13,7 @@ impact: The agent can burn calls repeating a remedy that does not change the rou
 source_refs:
   - spec/iterations/i36-the-harness-is-not-claude-measure-what-e/evidence/gate-kickoff.md
   - spec/iterations/i36-the-harness-is-not-claude-measure-what-e/evidence/define-actual.md
+place: i67-a-failure-the-caller-can-cause-arrives-t
 ---
 
 ## Finding

@@ -8,8 +8,8 @@ statement: |-
 
   THE BRIEF AND THE REPOSITORY CONTRADICTED EACH OTHER, invisibly from both ends. The spawned hand had been told the position belonged to it. By the time it arrived, a ruling recorded inside the signed form had given the position to somebody else.
 
-  THE CHEAP GUARD IS A READ RATHER THAN A LOCK. Before its first write, a spawned hand reads the last signed position. Finding somebody's signature on the position it was sent to, it halts and reports. No ledger of who holds what is needed for that.</statement>
-  <parameter name="update">{"op": "done", "node": "d9", "brief": "the pin was diagnosed and then fixed properly"}
+  THE CHEAP GUARD IS A READ RATHER THAN A LOCK. Before its first write, a spawned hand reads the last signed position. Finding somebody's signature on the position it was sent to, it halts and reports. No ledger of who holds what is needed for that.
+place: i64-the-diamond-and-the-orchestrator-handove
 ready_when: ready when the spawning method or the form refusals are next opened
 source: note-ac588762e62c
 ---
@@ -22,8 +22,7 @@ WHAT IT COST, measured once. One whole authored step was thrown away. Three fiel
 
 THE BRIEF AND THE REPOSITORY CONTRADICTED EACH OTHER, invisibly from both ends. The spawned hand had been told the position belonged to it. By the time it arrived, a ruling recorded inside the signed form had given the position to somebody else.
 
-THE CHEAP GUARD IS A READ RATHER THAN A LOCK. Before its first write, a spawned hand reads the last signed position. Finding somebody's signature on the position it was sent to, it halts and reports. No ledger of who holds what is needed for that.</statement>
-<parameter name="update">{"op": "done", "node": "d9", "brief": "the pin was diagnosed and then fixed properly"}
+THE CHEAP GUARD IS A READ RATHER THAN A LOCK. Before its first write, a spawned hand reads the last signed position. Finding somebody's signature on the position it was sent to, it halts and reports. No ledger of who holds what is needed for that.
 
 ## When it comes back
 

@@ -15,6 +15,7 @@ statement: |-
   THE REPAIR IS A REMOVAL, not a reconciliation. Choose one field, strip the other from every entry, and add a check that turns away any entry carrying both.
 
   WHICH SURVIVES IS STILL OPEN. One held the later date everywhere, hinting that it is the living one. Nobody followed it back to whatever writes it.
+place: i43-the-register-is-true-the-thirty-four-ble
 ready_when: ready when the register's frontmatter schema is next opened
 source: note-2226ae993d97
 ---

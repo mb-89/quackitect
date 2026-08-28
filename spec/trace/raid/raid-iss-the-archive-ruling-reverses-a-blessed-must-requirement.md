@@ -20,6 +20,7 @@ source_refs:
   - "measured 2026-08-26: git grep over HEAD objects 114 ms against 161 ms over the worktree, at 20,000 files"
   - "i34 goal line: worktrees and record branches are gone — the archive ruling there was permissive"
   - "counted 2026-08-26: 56 paths naming an iteration folder from outside, across 49 files, 12 source and 37 prose"
+place: i49-the-archive-slice-settled-option-candida
 ---
 
 ## The two statements, side by side

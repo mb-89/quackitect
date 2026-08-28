@@ -12,6 +12,7 @@ statement: |-
   - Or the summary stops printing a call that the current ground will reject.
 
   THE FIRST LOOKS RIGHT. Asking after a job is not starting one, and the handle was issued by the same machinery that then refuses to honour it.
+place: i64-the-diamond-and-the-orchestrator-handove
 ready_when: ready when the position gate's exemptions are next opened
 source: note-86838fa04ab0
 ---

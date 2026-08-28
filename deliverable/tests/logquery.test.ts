@@ -232,3 +232,56 @@ test("a clause carried in a capped response string is still counted", () => {
   assert.equal(g["SE-C-110"], 2, "a clause inside a capped response STRING is counted too");
   assert.equal(g["(none)"], undefined, "no refusal carrying a clause lands under (none)");
 });
+
+// A COUNT CANNOT SEE A FIXED TOLL, and that is the whole reason this exists.
+//
+// Grouping the log by tool says the cheap verbs are the common ones. True, and
+// useless. What sizes a speed round is that the cheap verbs never finish under
+// a second: measured 2026-08-28 over four days, 68.5% of 3,677 lane calls
+// landed between 1.0 and 2.0 seconds whatever they did, and se_file_delete
+// never once beat 1,342 ms.
+//
+// THE MINIMUM IS THE FIGURE THAT CATCHES IT. A verb whose FASTEST call is over
+// a second is not doing a second of work, and no median or total says so.
+test("grouping can report what each group cost, and the minimum is reported", () => {
+  const dir = mkdtempSync(join(tmpdir(), "se-timings-"));
+  const log = new CallLog(dir);
+  const coords = { answered_by: "test", state: "front_desk", part: "walker" };
+
+  // one verb that does nothing and still never finishes under 1.2 seconds
+  for (const ms of [1400, 1200, 1600, 9000]) {
+    log.append({ ...coords, tool: "se_file_list", args: {}, ok: true, outcome: "result", duration_ms: ms } as never);
+  }
+  // one verb that genuinely does work
+  log.append({ ...coords, tool: "se_test", args: {}, ok: true, outcome: "result", duration_ms: 51000 } as never);
+
+  const bare = log.query({ group_by: "tool" });
+  assert.equal(bare.timings, undefined, "timings are absent unless asked for");
+
+  const t = log.query({ group_by: "tool", timings: true }).timings ?? {};
+  const list = t["se_file_list"];
+  assert.ok(list !== undefined, "the group that was counted is also costed");
+  assert.equal(list.n, 4);
+  assert.equal(list.min, 1200, "the FASTEST call is reported — this is the toll");
+  assert.equal(list.median, 1600);
+  assert.equal(list.max, 9000);
+  assert.equal(list.total_ms, 13200);
+  assert.equal(t["se_test"]?.min, 51000, "a verb that really works is not confused with the toll");
+});
+
+// A RECORD WITH NO DURATION MUST NOT BECOME A ZERO. Averaging a missing figure
+// in as zero is how a slow verb reads as fast, so `n` counts only the records
+// that carried one and can be smaller than the group's own count.
+test("a record carrying no duration is left out of the costing rather than counted as zero", () => {
+  const dir = mkdtempSync(join(tmpdir(), "se-timings-gap-"));
+  const log = new CallLog(dir);
+  const coords = { answered_by: "test", state: "front_desk", part: "walker" };
+
+  log.append({ ...coords, tool: "se_note", args: {}, ok: true, outcome: "result", duration_ms: 2000 } as never);
+  log.append({ ...coords, tool: "se_note", args: {}, ok: true, outcome: "result" } as never);
+
+  const r = log.query({ group_by: "tool", timings: true });
+  assert.equal(r.groups?.["se_note"], 2, "both records are counted");
+  assert.equal(r.timings?.["se_note"]?.n, 1, "only the one carrying a duration is costed");
+  assert.equal(r.timings?.["se_note"]?.min, 2000, "the missing one did not drag the minimum to zero");
+});

@@ -17,6 +17,7 @@ source_refs:
   - raid-asm-a-cloud-clone-can-reach-the-remote-it-came-from
 weighs_with: none
 weighs_against: none
+place: retro
 ---
 
 ## What changed the kind

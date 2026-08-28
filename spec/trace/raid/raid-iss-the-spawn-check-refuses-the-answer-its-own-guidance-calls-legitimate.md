@@ -12,6 +12,7 @@ breaks_how_badly: corrosive
 how_likely: expected
 source_refs:
   - raid-iss-the-record-names-its-doors-after-technologies-rather-than-purposes
+place: i42-the-served-word-matches-the-machine-guid
 ---
 
 ## What happened

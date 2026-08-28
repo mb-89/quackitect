@@ -9,6 +9,17 @@ export interface WorkToken {
   statement: string;
   ready_when: string;
   source: string;
+  /** WHERE THIS TOKEN BELONGS, and the whole of how one leaves the backlog.
+   *
+   *  A token with no place stands in the backlog, which is where a mint puts
+   *  it. Writing a position into its file moves it there, and the move is one
+   *  field rather than a verb: the token is a file and anybody who may edit a
+   *  file may move it.
+   *
+   *  OWNER RULING: the backlog is a pending bucket, so work is moved out of it
+   *  to whatever owns it — an iteration, the overhaul, a state. Deciding the
+   *  owner is the retro's last step. */
+  place?: string;
 }
 
 /** Where the pool lives: a corpus node like any other, so the sweep walks it
@@ -268,11 +279,13 @@ export function standingTokens(root: string): WorkToken[] {
       // direct would share its parse with nobody and walk around the one
       // mechanism that makes a whole-corpus pass affordable.
       const fm = parseStateNote(readNode(abs)).frontmatter;
+      const place = typeof fm.place === "string" && fm.place !== "" ? fm.place : undefined;
       out.push({
         id: String(fm.id ?? name.replace(/\.md$/, "")),
         statement: String(fm.statement ?? ""),
         ready_when: String(fm.ready_when ?? ""),
         source: String(fm.source ?? ""),
+        ...(place === undefined ? {} : { place }),
       });
     } catch {
       // A token nobody can read is not a token, and it is not the rest of the

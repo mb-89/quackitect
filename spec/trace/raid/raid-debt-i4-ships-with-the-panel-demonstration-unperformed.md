@@ -13,6 +13,7 @@ impact: The panel is what this round is about. Every other claim it makes is che
 source_refs:
   - tsp-panel-walkthrough
   - raid-debt-ten-checks-wait-on-a-person-or-a-second-machine
+place: i23-judgment-the-ui-sitting-cut-the-html-mir
 ---
 
 ## What was taken, and by whom

@@ -12,6 +12,7 @@ how_likely: expected
 impact: "An author spends a round learning a rule that could have been fed forward. Measured on this record: the departure refusal was met by its own builder as a surprise."
 weighs_with: none
 weighs_against: none
+place: i40-every-write-path-is-guarded-the-pool-s-b
 ---
 
 ## What is wrong

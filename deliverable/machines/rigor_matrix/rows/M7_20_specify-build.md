@@ -116,3 +116,26 @@ durable.
 The strategies inform the order, several at once
 ([[meth-build-strategies]]). Nothing enforces a pick; the plan records
 which lenses shaped it.
+
+## ONE CHUNK COLLECTS THE HYGIENE WORK #work
+
+OWNER RULING. When the chunks are drawn, one of them is for hygiene: the work
+that is not this record's subject and could be done by anybody, at any time.
+
+WHERE IT COMES FROM, and it is three places rather than one.
+
+- THE BACKLOG. Items standing unassigned, which is where hygiene belongs.
+- THE LOG. A refusal that keeps firing, a command that keeps failing, a shape
+  the last look-back named.
+- THE NOTES. Anything captured mid-walk that this round could close cheaply.
+
+HYGIENE WORK IS NEVER ASSIGNED TO A RECORD IN ADVANCE. Assigning it pretends
+it belongs to that record, and it then waits for that record rather than being
+done by the first walk with room. It stays unassigned and is PULLED here.
+
+SIZE THE CHUNK, then stop. It is a budget rather than an invitation to empty
+the backlog, and a round that spends its whole build on hygiene has stopped
+building what it opened for.
+
+SAY WHAT YOU PULLED AND WHAT YOU LEFT. A collection nobody records reads as an
+empty backlog next time.

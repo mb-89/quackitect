@@ -2,7 +2,8 @@
 id: wt-the-suite-s-standing-failures-are-counted-and-driven-to-noth
 type: "[[work]]"
 statement: The suite's standing failures are counted and driven to nothing. They stood at 27 across seventeen files at the close of the last round, and a scoped run four hours later found 2 across the twenty-one files it covered. The full battery has not run since, so the remainder is unconfirmed rather than cleared.
-ready_when: ready when the walk-speed iteration is seeded
+place: backlog
+ready_when: ready when a building milestone pulls hygiene work
 source: note-d0d9d16e9324
 ---
 

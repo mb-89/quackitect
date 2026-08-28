@@ -277,7 +277,7 @@ export function deskTools(
       name: "se_survey",
       title: "se.survey",
       description:
-        "WHAT STANDS OPEN — one mechanical call: open expeditions, open iterations, pending notes, and the standing WORK TOKENS in the options pool with their ready-when, read from the REPOSITORY so any clone sees the same answer. Everything that can be up is here, so there is only ever ONE inbox to understand. Notes and backlog list as title plus MoSCoW priority, highest first; read any one in full with se_log_query {ref}. The front desk and the retro open with it. The person asks the same question in the mirror, from the machine's header.",
+        "WHAT STANDS OPEN — one mechanical call: open expeditions, open iterations, pending notes, and the standing WORK TOKENS in the options pool with their ready-when, read from the REPOSITORY so any clone sees the same answer. Everything that can be up is here, so there is only ever ONE inbox to understand. Notes and backlog list as title plus MoSCoW priority, highest first; read any one in full with se_log_query {ref}. A `passed_moments` block rides along when a backlog item is waiting on a record that has already shipped or been abandoned — that item's moment came and went, so it wants rerouting rather than more waiting. The front desk and the retro open with it. The person asks the same question in the mirror, from the machine's header.",
       inputSchema: {
         type: "object",
         properties: {
@@ -318,6 +318,11 @@ export function deskTools(
               "{tool?, ok?, since?, text?, min_ms?} — since: an ISO timestamp, or 'last_retro' (everything after the previous retro, which is the newest carried/backlog drain — the desk cannot make those). text: a case-insensitive substring over the whole record, for finding a TOPIC without reading every hit. min_ms: only records at least this slow — the slowness mine over every door, one-second rule and all",
           },
           group_by: { type: "string", description: "e.g. 'tool' or 'outcome'" },
+          timings: {
+            type: "boolean",
+            description:
+              "with group_by: what each group COST as well as how many there were — n, total_ms, min, median, p90, max. THE MINIMUM IS THE ONE THAT CATCHES A FIXED TOLL: a verb whose fastest call in four days is 1,342 ms is not doing 1,342 ms of work. A count alone cannot see that",
+          },
           limit: { type: "number", default: 20 },
           offset: { type: "number", description: "how many records back from the newest to start — 0 is the newest window" },
         },
@@ -348,6 +353,7 @@ export function deskTools(
         return log.query({
           ...(args.filter !== undefined ? { filter: args.filter as { tool?: string; ok?: boolean; since?: string } } : {}),
           ...(args.group_by !== undefined ? { group_by: String(args.group_by) } : {}),
+          ...(args.timings !== undefined ? { timings: args.timings === true } : {}),
           ...(args.limit !== undefined ? { limit: Number(args.limit) } : {}),
           ...(args.offset !== undefined ? { offset: Number(args.offset) } : {}),
         });

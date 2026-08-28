@@ -14,6 +14,7 @@ source_refs:
   - req-a-target-that-cannot-be-reached-is-refused-quickly
   - tsp-a-failed-route-answers-no-slower-than-a-drawn-one
   - raid-iss-the-surface-row-has-no-harness-that-could-fail-it
+place: i41-green-is-computed-once-and-right-the-dia
 ---
 
 ## What is implemented and what is not

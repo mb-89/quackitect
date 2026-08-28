@@ -12,6 +12,7 @@ how_likely: expected
 impact: Recovery begins without knowing which layer failed. The same interruption can therefore repeat without a targeted fix.
 source_refs:
   - spec/iterations/i36-the-harness-is-not-claude-measure-what-e/evidence/scope-non-goals.md
+place: i48-wire-the-built-failure-shapes-feeds-the-
 ---
 
 ## Finding

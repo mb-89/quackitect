@@ -16,6 +16,7 @@ source_refs:
   - note-ed999c4b64b1
 last_looked: 2026-08-23
 look_verdict: rescheduled
+place: i13-the-machine-format-state-machines-become
 ---
 
 The owner's ruling stands on record: seeding is essentially just drawing

@@ -17,6 +17,7 @@ source_refs:
   - stk-reviewing-agent
 weighs_with: raid-asm-one-model-list-serves-every-host-the-engine-supports
 weighs_against: none
+place: i44-the-corpus-resolves-duplicate-headings-a
 ---
 
 ## Widened 2026-08-20, at the inputs gate

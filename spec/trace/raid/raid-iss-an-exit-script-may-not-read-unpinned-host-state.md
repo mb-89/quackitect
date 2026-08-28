@@ -17,6 +17,7 @@ source_refs:
   - raid-iss-boot-grants-no-tools-while-promising-repair
 weighs_with: none
 weighs_against: none
+place: i66-the-overhaul-gets-its-mechanisms-a-check
 ---
 
 ## The shape of it

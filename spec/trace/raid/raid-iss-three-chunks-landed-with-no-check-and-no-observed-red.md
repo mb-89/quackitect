@@ -12,6 +12,7 @@ breaks_how_badly: abrasive
 how_likely: expected
 source_refs:
   - raid-iss-nothing-shipped-this-round-makes-the-walk-faster
+place: M7_30_observe-red
 ---
 
 ## Which three

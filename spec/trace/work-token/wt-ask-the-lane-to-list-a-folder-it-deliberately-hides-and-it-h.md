@@ -15,6 +15,7 @@ statement: |-
   AND THE VERBS DISAGREE WITH EACH OTHER. Reading a file inside that folder works fine, and the machinery hands out such paths on its own. So one verb serves the folder while two deny it exists.
 
   THE REPAIR. Say it out loud, either as a marker on the reply or as a typed refusal naming the hidden segment.
+place: i39-the-lane-tells-the-truth-about-itself-de
 ready_when: ready when the file lane's listing verbs are next opened
 source: note-d694a6ffc870
 ---

@@ -11,7 +11,8 @@ statement: |-
   A TOOL THAT ERASES COMMENTS ERASES REASONS. Find which one does it before it runs again.
 
   The blocks were restored by hand. Nothing stops the next run removing them.
-ready_when: ready when the formatter or lint configuration is next touched
+place: backlog
+ready_when: ready when a building milestone pulls hygiene work
 source: note-83a96c800f20
 ---
 

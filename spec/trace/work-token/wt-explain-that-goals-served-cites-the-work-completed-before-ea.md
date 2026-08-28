@@ -2,6 +2,7 @@
 id: wt-explain-that-goals-served-cites-the-work-completed-before-ea
 type: "[[work]]"
 statement: Explain that goals_served cites the work completed before each gate, including planning evidence before build begins.
+place: i42-the-served-word-matches-the-machine-guid
 ready_when: ready when gate review fields or gate guidance are changed
 source: note-078075dd3543
 ---

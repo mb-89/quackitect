@@ -12,6 +12,7 @@ how_likely: conceivable
 impact: A drawing is a file a person edits in Obsidian, so the path comes from outside the lane. Nothing in the resolver stops it leaving the project.
 weighs_with: none
 weighs_against: none
+place: i40-every-write-path-is-guarded-the-pool-s-b
 ---
 
 ## What is wrong

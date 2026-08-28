@@ -16,6 +16,7 @@ source_refs:
   - raid-risk-i15-ships-without-a-live-prior-art-scan
 weighs_with: none
 weighs_against: none
+place: i42-the-served-word-matches-the-machine-guid
 ---
 
 ## The shape of it
