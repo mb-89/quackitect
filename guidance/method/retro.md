@@ -116,6 +116,23 @@ The trigger is a NOTE carrying "needs retro":
    for draining outside a retro. A refused record is skipped, so no judged
    mark existed at all.
 
+   A SECOND SHAPE PRODUCES THE SAME SILENCE, and it has nothing to do with
+   drains. THE LOG ROTATES. When it does, the older records move to a
+   `calls-<timestamp>.jsonl` beside the live file, and the live file
+   restarts at zero.
+
+   SO ONE WINDOW CAN SPAN SEVERAL FILES. A count taken from the live file
+   alone answers for whatever happened since the last rollover, and says
+   nothing at all about the rest.
+
+   IT CAN ROTATE MID-RETRO. Observed on a run where the boundary was taken
+   before the rollover and the mining after it: the live file held 103
+   records where 1413 stood, and a per-step table came back with one row
+   instead of thirty-three.
+
+   READ EVERY ROLLOVER BESIDE THE LIVE FILE, oldest first. Nothing about a
+   short answer says that it is short.
+
    Take the timestamp and use it. Checking it by hand is not work this step
    owes.
 2. FIELD FEEDBACK #work/field-feedback
