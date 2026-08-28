@@ -2,7 +2,7 @@
 id: wt-every-gate-points-at-the-card-governing-its-own-review-throu
 type: "[[work]]"
 statement: Every gate points at the card governing its own review through prose alone, so nothing ever makes a walker prove it read the one card all ten gates lean on.
-place: backlog
+place: i69-the-method-checks-what-it-claims-to-chec
 ready_when: ready when a building milestone pulls hygiene work
 source: note-e74738a2d036
 ---

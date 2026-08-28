@@ -36,8 +36,9 @@ Lowering one is a real judgement somebody still has to make.
 ## The by-product is bigger than the rating
 
 THE SAME PASS WAS ASKED TO HUNT FOR MECHANICAL WORK, and found 62 candidates
-with 35 marked certain. `spec/mechanical-steps.md` holds them, each with a file
-and a line.
+with 35 marked certain. They are work tokens on the speed-up round now, one per
+milestone band, each finding carrying its own file and line. The owner's ruling
+is why: a finding that lives in a document lives nowhere.
 
 FOUR OF THEM CARRY A RECORDED INCIDENT ALREADY. A scoring floor no code
 applies, against 22 of 44 cells that broke it. An editor that never seeds a

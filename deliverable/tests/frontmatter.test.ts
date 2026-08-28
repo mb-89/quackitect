@@ -36,6 +36,41 @@ describe("splitting a note", { concurrency: true }, () => {
   test("an unterminated fence is not frontmatter", () => {
     assert.equal(splitNote("---\nid: one\n\n# heading\n").fenced, false);
   });
+
+  // A HORIZONTAL RULE INSIDE A BLOCK SCALAR IS CONTENT, NOT A FENCE.
+  //
+  // Both splitters compared TRIMMED lines, so an indented `---` closed the
+  // frontmatter. What made it dangerous is that the shortened block is still
+  // valid YAML: nothing refused, nothing reported, and the node loaded with its
+  // long field cut. Measured on a work token that read back at 794 characters
+  // where the file held 13,000.
+  const RULED = [
+    "---",
+    "id: one",
+    "statement: |-",
+    "  first",
+    "",
+    "  ---",
+    "",
+    "  last",
+    "place: somewhere",
+    "---",
+    "",
+    "# A note",
+    "",
+  ].join("\n");
+
+  test("an indented rule inside a value does not end the frontmatter", () => {
+    assert.equal(splitNote(RULED).fenced, true);
+    assert.match(splitNote(RULED).head, /place: somewhere/);
+    const fm = parseStateNote(RULED).frontmatter;
+    assert.equal(fm.place, "somewhere", "the key after the rule was lost");
+    assert.match(String(fm.statement), /last/, "the value was cut at the rule");
+  });
+
+  test("a fence may carry trailing whitespace and still close", () => {
+    assert.equal(splitNote("---\nid: one\n---  \n\n# h\n").fenced, true);
+  });
 });
 
 describe("writing a key", { concurrency: true }, () => {

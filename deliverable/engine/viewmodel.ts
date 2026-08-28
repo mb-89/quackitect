@@ -352,6 +352,21 @@ export function recordAlias(place: string): string {
   return /^(i\d+)-/.exec(place)?.[1] ?? "";
 }
 
+/** THE CONTAINERS A PLACE SITS INSIDE, where the nesting is not written as a
+ *  path.
+ *
+ *  A RECORD SITS IN THE ITERATIONS CONTAINER. Its place is the folder name and
+ *  carries no slash, so no path-splitting rule can find the container above it.
+ *  Naming it here is what makes a roll-up work for a slot the drawing nests and
+ *  the store does not.
+ *
+ *  THE BACKLOG IS NOT LISTED, on purpose. It is drawn AT the front desk rather
+ *  than inside it, so its count is already the desk's OWN. Adding it here would
+ *  count the same items twice on one box. */
+export function containersOf(place: string): string[] {
+  return recordAlias(place) === "" ? [] : ["iterations"];
+}
+
 function workByState(root: string, isRead: ReadCredit): Map<string, Buckets> {
   const out = new Map<string, Buckets>();
   for (const item of readAllWork(root, isRead).items) {
@@ -400,7 +415,17 @@ function workByState(root: string, isRead: ReadCredit): Map<string, Buckets> {
     // EVERY ANCESTOR SEGMENT, not only the immediate parent: a machine two
     // levels up still owes what its grandchildren hold.
     // see dsp-mirror-render.md#a-state-wears-its-buckets
-    for (const ancestor of segments.slice(0, -1)) {
+    // A CONTAINER IS AN ANCESTOR TOO, and a path is not the only way to be one.
+    //
+    // The loop below finds ancestors by splitting the place on a slash. A
+    // record place is ONE segment with no slash, so it has no ancestors by that
+    // rule, and nothing ever reached the container that draws it. Measured
+    // 2026-08-28: about 300 items sat on records and the iterations box wore no
+    // pill at all.
+    //
+    // THE RULE IS THE OWNER'S AND IT IS WIDER THAN THIS CASE: the roll-up goes
+    // for EVERY slot, not only for the ones a path happens to nest.
+    for (const ancestor of [...segments.slice(0, -1), ...containersOf(item.place)]) {
       const up = out.get(ancestor) ?? noBuckets();
       up.below[where] += 1;
       out.set(ancestor, up);

@@ -13,7 +13,7 @@ import { fileURLToPath } from "node:url";
 import { appendNote, drainNote } from "../engine/inbox.ts";
 import { generateIterations } from "../engine/iterations-draw.ts";
 import { seDir } from "../engine/paths.ts";
-import { recordAlias } from "../engine/viewmodel.ts";
+import { containersOf, recordAlias } from "../engine/viewmodel.ts";
 import { bucketOf } from "../engine/workoffer.ts";
 import { NOTES_ARE_DRAWN_AT, penSignal, penWork } from "../engine/workpen.ts";
 import { BACKLOG, BACKLOG_IS_DRAWN_AT, readAllWork } from "../engine/workstore.ts";
@@ -38,6 +38,18 @@ describe("a record's count reaches the box that draws it", () => {
     assert.equal(recordAlias("retro"), "", "a main-machine state is not a record");
     assert.equal(recordAlias(BACKLOG), "", "the backlog is not a record");
     assert.equal(recordAlias("i23"), "", "a name already short needs no alias");
+  });
+
+  // A CONTAINER WEARS WHAT ITS CHILDREN HOLD, and a record's nesting is drawn
+  // rather than written as a path. The roll-up loop finds ancestors by
+  // splitting on a slash, so a record place — one segment, no slash — had none,
+  // and the iterations box showed nothing while 300 items sat inside it.
+  test("a record rolls up to the container that draws it, and a state does not", () => {
+    assert.deepEqual(containersOf("i23-judgment-the-ui-sitting-cut-the-html-mir"), ["iterations"]);
+    assert.deepEqual(containersOf("retro"), [], "a main-machine state sits in no container");
+    // THE BACKLOG IS DRAWN AT THE DESK RATHER THAN INSIDE IT, so counting it as
+    // a child would put the same items on that box twice.
+    assert.deepEqual(containersOf(BACKLOG), [], "the backlog is the desk's own count, never a roll-up");
   });
 
   test("every box the container draws is reachable from some record's folder name", () => {

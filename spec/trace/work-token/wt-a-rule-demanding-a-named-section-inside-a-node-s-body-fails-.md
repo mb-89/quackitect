@@ -11,7 +11,7 @@ statement: |-
   WHY IT IS WORSE THAN A FALSE ALARM. It points the author at the wrong half. The only way to satisfy the check is to move a heading that was already where it belongs.
 
   NOBODY HAS TRIED IT FROM A COLD ENGINE, and that is the first experiment.
-place: backlog
+place: i69-the-method-checks-what-it-claims-to-chec
 ready_when: ready when a building milestone pulls hygiene work
 source: note-43ab71b58eb8
 ---

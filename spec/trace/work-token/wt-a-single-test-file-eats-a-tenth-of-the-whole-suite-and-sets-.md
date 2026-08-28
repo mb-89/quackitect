@@ -15,7 +15,7 @@ statement: |-
   THE RUNNER IS ALREADY WORKING IN PARALLEL, since the effort is nearly three times the elapsed time. One heavy file therefore bounds the whole run.
 
   STILL UNKNOWN: what those twenty-three cases build, and whether some shared setup is being rebuilt for each one.
-place: backlog
+place: i68-the-walk-gets-fast-the-fixed-per-call-to
 ready_when: ready when a building milestone pulls hygiene work
 source: note-30585716d23d
 ---

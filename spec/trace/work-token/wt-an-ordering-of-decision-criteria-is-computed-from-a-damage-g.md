@@ -2,7 +2,7 @@
 id: wt-an-ordering-of-decision-criteria-is-computed-from-a-damage-g
 type: "[[work]]"
 statement: An ordering of decision criteria is computed from a damage grade and then trusted without a look. A person can override it, and nothing obliges them to. So the ranking that settles which design wins may be decided by arithmetic nobody read. Wanted is a required confirmation of the leading entries, taken before any winner is picked.
-place: backlog
+place: i69-the-method-checks-what-it-claims-to-chec
 ready_when: ready when a building milestone pulls hygiene work
 source: note-beac84587cd9
 ---

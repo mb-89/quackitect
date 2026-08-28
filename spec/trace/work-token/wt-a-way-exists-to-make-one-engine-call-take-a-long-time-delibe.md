@@ -2,7 +2,7 @@
 id: wt-a-way-exists-to-make-one-engine-call-take-a-long-time-delibe
 type: "[[work]]"
 statement: "A way exists to make one engine call take a long time deliberately, for use by checks. Two planned rows need it and neither can proceed: one wants to time how the surface answers while a call is held, and the other wants to watch what happens to a route while something is stuck."
-place: backlog
+place: i69-the-method-checks-what-it-claims-to-chec
 ready_when: ready when a building milestone pulls hygiene work
 source: note-17217553d704
 ---

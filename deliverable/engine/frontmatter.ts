@@ -25,12 +25,33 @@ export interface NoteSplit {
   fenced: boolean;
 }
 
+/** A FRONTMATTER FENCE, AND IT SITS AT COLUMN ZERO.
+ *
+ *  BOTH SPLITTERS COMPARED TRIMMED LINES, so a `---` INSIDE a block scalar
+ *  closed the frontmatter. The shortened block still parsed as YAML, so nothing
+ *  refused and nothing reported: the node loaded with its long field silently
+ *  cut, and a reprint would have written that cut back to disk.
+ *
+ *  MEASURED 2026-08-28. A work token carrying a horizontal rule in its statement
+ *  read back at 794 characters where the file held 13,000. The write-time guard
+ *  (SE-C-138) cannot see it, because a truncated block is valid YAML.
+ *
+ *  SWEPT BEFORE THE CHANGE: of 3,849 nodes carrying frontmatter, none closes on
+ *  an indented fence, so tightening this breaks nothing that stands.
+ *
+ *  ONE HOME, TWO CALLERS. notes.ts reads this rule from here rather than
+ *  keeping its own copy, which is how the two came to disagree in the first
+ *  place. */
+export function isFence(line: string): boolean {
+  return /^---[ \t]*$/.test(line);
+}
+
 export function splitNote(raw: string): NoteSplit {
   const text = stripBom(raw);
   const eol = text.includes("\r\n") ? "\r\n" : "\n";
   const lines = text.split(/\r?\n/);
-  if (lines[0]?.trim() !== "---") return { head: "", body: text, eol, fenced: false };
-  const end = lines.findIndex((l, i) => i > 0 && l.trim() === "---");
+  if (lines[0] === undefined || !isFence(lines[0])) return { head: "", body: text, eol, fenced: false };
+  const end = lines.findIndex((l, i) => i > 0 && isFence(l));
   if (end === -1) return { head: "", body: text, eol, fenced: false };
   const rest = lines.slice(end + 1);
   return {

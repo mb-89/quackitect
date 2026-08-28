@@ -2,6 +2,7 @@
 import { readFileSync, statSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { parse as parseYaml } from "yaml";
+import { isFence } from "./frontmatter.ts";
 import { stripBom } from "./jsonio.ts";
 
 export type FrontmatterValue = unknown;
@@ -17,8 +18,9 @@ export function parseStateNote(raw: string): StateNote {
   const lines = text.split(/\r?\n/);
   let frontmatter: Record<string, unknown> = {};
   let bodyStart = 0;
-  if (lines[0]?.trim() === "---") {
-    const end = lines.findIndex((l, i) => i > 0 && l.trim() === "---");
+  // THE FENCE SITS AT COLUMN ZERO, and isFence is where that rule lives.
+  if (lines[0] !== undefined && isFence(lines[0])) {
+    const end = lines.findIndex((l, i) => i > 0 && isFence(l));
     if (end > 0) {
       const block = lines.slice(1, end).join("\n");
       // A person edits these files in the real world, and two engine
