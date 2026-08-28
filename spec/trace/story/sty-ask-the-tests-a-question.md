@@ -1,4 +1,6 @@
 ---
+unreachable_verbs:
+  - se_test_verdict
 minted_in: i1
 id: sty-ask-the-tests-a-question
 type: "[[story]]"

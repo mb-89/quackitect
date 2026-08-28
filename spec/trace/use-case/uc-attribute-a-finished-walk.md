@@ -1,4 +1,6 @@
 ---
+unreachable_verbs:
+  - se_version
 minted_in: i38-the-machine-sizes-its-own-driver-every-s
 id: uc-attribute-a-finished-walk
 type: "[[use-case]]"

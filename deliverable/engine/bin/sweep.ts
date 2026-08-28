@@ -7,10 +7,26 @@ function argValue(flag: string): string | undefined {
 }
 
 const root = argValue("--root") ?? process.cwd();
-const rel = argValue("--under") ?? "spec";
+
+// THE THREE FOLDERS THE REQUIREMENT NAMES. A use case teaching a retired verb
+// costs the next reader a refused call, and until this line the sweep only
+// looked under `spec`, so guidance and the machines were never visited.
+//
+// req-the-dead-vocabulary-sweep-reaches-the-trace
+const DEFAULT_AREAS = ["spec", "guidance", "deliverable/machines"];
+const under = argValue("--under");
+const areas = under === undefined ? DEFAULT_AREAS : [under];
 
 const began = Date.now();
-const r = sweepCorpus(root, rel);
+const swept = areas.map((area) => sweepCorpus(root, area));
+const r = {
+  scanned: swept.reduce((n, one) => n + one.scanned, 0),
+  findings: swept.flatMap((one) => one.findings),
+  // THE TOKEN REPORT IS WHOLE-POOL and every area answers with the same list,
+  // so the areas after the first would repeat it.
+  reports: [...new Set(swept.flatMap((one) => one.reports))],
+};
+const rel = areas.join(", ");
 const took = Date.now() - began;
 
 // THE COST IS PRINTED EVERY RUN, not measured once and written into a comment.

@@ -15,7 +15,14 @@
 import { existsSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { parse as parseYaml } from "yaml";
-import { deadLaneVerbs, duplicateHeadings, staleCitations, unreferencedTokens } from "./corpus-sweeps.ts";
+import {
+  citationMarkers,
+  deadLaneVerbs,
+  duplicateHeadings,
+  staleCitations,
+  uncheckedCitations,
+  unreferencedTokens,
+} from "./corpus-sweeps.ts";
 import { danglingReferences } from "./guard.ts";
 import { readNode } from "./notes.ts";
 import { rulesOf } from "./rules.ts";
@@ -154,10 +161,37 @@ function textFindings(root: string, rel: string, raw: string, fm: Record<string,
   return out;
 }
 
+/** WHAT ONE NODE MAKES THE SWEEP NOTICE WITHOUT FAILING ON IT.
+ *
+ *  AN UNPARSEABLE CITATION IS REPORTED, NOT FAILED. The requirement says it
+ *  reports as unchecked rather than passing, and unchecked is not wrong: a
+ *  glob, a placeholder and a Windows-shaped path are all legitimate prose the
+ *  checker cannot follow.
+ *
+ *  A MARKER IS COUNTED SO THE COUNT CAN BE RE-DERIVED. Markers beside repairs
+ *  is what raid-risk-the-unreachable-marker-becomes-the-cheap-answer asks for,
+ *  and a count only a form carries is a number rather than a fact. */
+function textReports(root: string, rel: string, raw: string, fm: Record<string, unknown>): string[] {
+  const out: string[] = [];
+  if (!isNode(fm)) return out;
+  for (const cited of uncheckedCitations(raw)) {
+    out.push(`${rel} — ${cited} is cited here and the sweep cannot parse it, so it is unchecked`);
+  }
+  const marks = citationMarkers(root, raw);
+  for (const cited of marks.declared) {
+    out.push(`${rel} — ${cited} is marked unreachable`);
+  }
+  for (const cited of marks.stale) {
+    out.push(`${rel} — ${cited} is marked unreachable and the tree holds it after all`);
+  }
+  return out;
+}
+
 export function sweepCorpus(root: string, rel: string): SweepResult {
   const files: { abs: string; rel: string }[] = [];
   markdownUnder(join(root, rel), rel, files);
   const findings: Finding[] = [];
+  const reports: string[] = [];
   for (const f of files) {
     const raw = readNode(f.abs);
     if (raw === "") continue;
@@ -190,6 +224,7 @@ export function sweepCorpus(root: string, rel: string): SweepResult {
     }
     findings.push(...textFindings(root, f.rel, raw, fm));
     findings.push(...ruleFindings(root, f.rel, fm));
+    reports.push(...textReports(root, f.rel, raw, fm));
   }
   // A TOKEN NOTHING POINTS AT IS NOT A DEFECT, so it rides `reports` and never
   // `findings`. req-a-work-token-nothing-references-is-reported says the check
@@ -197,6 +232,6 @@ export function sweepCorpus(root: string, rel: string): SweepResult {
   // tokens were healthy and waiting. A backlog token is unreferenced by
   // construction, so arming this as a failure would redden the sweep on the
   // day any mint lands.
-  const reports = unreferencedTokens(root).map((id) => `${id} — a standing work token no node references`);
+  reports.push(...unreferencedTokens(root).map((id) => `${id} — a standing work token no node references`));
   return { scanned: files.length, findings, reports };
 }

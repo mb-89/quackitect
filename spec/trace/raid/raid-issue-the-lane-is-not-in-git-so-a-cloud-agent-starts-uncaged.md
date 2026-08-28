@@ -29,7 +29,7 @@ extension into the OPENED folder from _cage/ — never committed".
 - `.claude/settings.json`
 - `.claude/output-styles/`
 - `.copilot/`
-- `.github/copilot-instructions.md`
+- `.github/instructions/protocol.instructions.md`
 
 CHECKED ON A LIVE TREE rather than read off the file. All four candidate paths
 answer false: `.mcp.json`, `.claude/settings.json`, `.mcp.json` and

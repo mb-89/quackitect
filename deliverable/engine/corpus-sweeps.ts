@@ -2,8 +2,22 @@
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join, sep } from "node:path";
 
-/** A path a citation may name, with an optional line number that is not checked. */
-const CITATION = /`([A-Za-z0-9_][A-Za-z0-9_./-]*\.(?:ts|js|mjs|cjs|json|md))(?::\d+)?`/g;
+/** A CITATION: a path, then an optional `#symbol`, then an optional `:line`.
+ *
+ *  Group 1 is the path and group 2 is the symbol where one is given. The line
+ *  number is read off and thrown away — it moves on every edit above it, and a
+ *  check on it would keep the sweep red for no gain. */
+const CITATION = /`([A-Za-z0-9_.][A-Za-z0-9_./-]*\.(?:ts|js|mjs|cjs|json|md))(?:#([A-Za-z0-9_.$-]+))?(?::\d+)?`/g;
+
+/** A BACKTICKED SPAN THAT NAMES A FILE: it ends in a dot and a short
+ *  extension. What this matches and `CITATION` does not is a citation the
+ *  sweep cannot parse, which the requirement says reports as unchecked rather
+ *  than passing.
+ *
+ *  A BARE DIRECTORY IS NOT A CITATION. Requiring the extension is what keeps
+ *  `.se/` and `spec/trace` out of the class; without it 248 spans reported
+ *  unchecked and almost none of them named a file. */
+const PATH_SHAPED = /`([^`\s]*\.[A-Za-z][A-Za-z0-9]{0,4})(?:#[^`\s]+)?(?::\d+)?`/g;
 
 /** A lane verb as it is written in prose. */
 const LANE_VERB = /\bse_[a-z][a-z0-9_]*\b/g;
@@ -70,17 +84,6 @@ function treeOf(root: string): string[] {
   return found;
 }
 
-/** A CITATION NAMES A FILE WHEN SOME FILE IN THE TREE ENDS WITH IT.
- *
- *  Citations are written at the depth a reader needs — `guard.ts`,
- *  `engine/guard.ts` and `deliverable/engine/guard.ts` all name the same file.
- *  Resolving against a fixed set of prefixes reported 169 live files as gone,
- *  measured over the trace corpus on 2026-08-28. */
-function citationResolves(root: string, cited: string): boolean {
-  const tail = `/${cited}`;
-  return treeOf(root).some((abs) => abs.endsWith(tail) || abs === cited);
-}
-
 /** THE PATHS A NODE DECLARES AS DELIBERATELY GONE.
  *
  *  A node that names a file the tree no longer holds lists it under
@@ -94,11 +97,11 @@ function citationResolves(root: string, cited: string): boolean {
  *
  *  The list is read with a regex rather than a yaml parser, because this
  *  module takes text and nothing else. */
-function markedUnreachable(content: string): Set<string> {
+function markedList(content: string, key: string): Set<string> {
   const out = new Set<string>();
   const head = /^---\n([\s\S]*?)\n---/.exec(content);
   if (head === null) return out;
-  const block = /^unreachable_citations:[ \t]*\n((?:[ \t]*-[ \t]+.*\n?)+)/m.exec(`${head[1]}\n`);
+  const block = new RegExp(`^${key}:[ \\t]*\\n((?:[ \\t]*-[ \\t]+.*\\n?)+)`, "m").exec(`${head[1]}\n`);
   if (block === null) return out;
   for (const line of block[1].split("\n")) {
     const item = /^[ \t]*-[ \t]+(.+?)[ \t]*$/.exec(line);
@@ -107,12 +110,35 @@ function markedUnreachable(content: string): Set<string> {
   return out;
 }
 
-/** THE CITED PATHS THE TREE DOES NOT HOLD.
+/** THE PATHS THIS NODE DECLARES AS DELIBERATELY GONE. */
+function markedUnreachable(content: string): Set<string> {
+  return markedList(content, "unreachable_citations");
+}
+
+/** THE FILE A CITATION NAMES, or undefined where the tree holds none.
  *
- *  The line number is read off and thrown away. It moves on every edit above
- *  it, so checking it would keep the sweep red for no gain.
+ *  A CITATION NAMES A FILE WHEN SOME FILE IN THE TREE ENDS WITH IT. Citations
+ *  are written at the depth a reader needs — `guard.ts`, `engine/guard.ts` and
+ *  `deliverable/engine/guard.ts` all name the same file. Resolving against a
+ *  fixed set of prefixes reported 169 live files as gone. */
+function citedFile(root: string, cited: string): string | undefined {
+  // THE TREE WALK SKIPS DOT-DIRECTORIES, which is right for `.git` and wrong
+  // for `.se/reading.md`. A citation naming one is answered by looking, and 32
+  // such citations reported stale before this line existed.
+  const literal = join(root, cited);
+  if (existsSync(literal)) return literal;
+  const tail = `/${cited}`;
+  return treeOf(root).find((abs) => abs.endsWith(tail) || abs === cited);
+}
+
+/** THE CITED PATHS THE TREE DOES NOT HOLD, and the symbols the named file does
+ *  not carry.
  *
  *  A path the node lists under `unreachable_citations` is left alone.
+ *
+ *  THE SYMBOL IS CHECKED BY APPEARANCE, not by parsing the language. A symbol
+ *  the file never spells is not there; one it spells in a comment is close
+ *  enough for a citation to be followable, which is what the requirement asks.
  *
  *  req-a-code-citation-names-something-that-exists */
 export function staleCitations(root: string, content: string): string[] {
@@ -120,10 +146,91 @@ export function staleCitations(root: string, content: string): string[] {
   const found: string[] = [];
   for (const m of content.matchAll(CITATION)) {
     const cited = m[1];
+    const symbol = m[2];
     if (marked.has(cited)) continue;
-    if (!citationResolves(root, cited)) found.push(cited);
+    if (machineLocal(cited)) continue;
+    const abs = citedFile(root, cited);
+    if (abs === undefined) {
+      found.push(cited);
+      continue;
+    }
+    if (symbol === undefined) continue;
+    if (!symbolIsThere(abs, cited, symbol)) found.push(`${cited}#${symbol}`);
   }
   return unique(found);
+}
+
+/** THE SLUG A MARKDOWN HEADING ANSWERS TO, in the shape an anchor is written.
+ *  Lowercased, punctuation dropped, spaces hyphenated. */
+function headingSlug(heading: string): string {
+  return heading
+    .toLowerCase()
+    .replace(/[^a-z0-9 -]/g, "")
+    .trim()
+    .replace(/\s+/g, "-");
+}
+
+/** WHETHER THE CITED FILE CARRIES WHAT COMES AFTER THE HASH.
+ *
+ *  A MARKDOWN ANCHOR IS A HEADING SLUG, not a word in the text. Comparing it
+ *  literally reported a live anchor as stale, because the file carries
+ *  "A reopened placeholder is walked to, not through" and the anchor carries
+ *  its slug.
+ *
+ *  IN SOURCE THE SYMBOL IS THE WORD, so appearing anywhere in the file is
+ *  enough. This does not parse the language, and it is not meant to: a citation
+ *  is followable when the reader can find the name. */
+function symbolIsThere(abs: string, cited: string, symbol: string): boolean {
+  const text = readFileSync(abs, "utf8");
+  if (cited.endsWith(".md")) {
+    for (const m of text.matchAll(/^#{1,6}\s+(\S.*?)\s*$/gm)) {
+      if (headingSlug(m[1]) === symbol.toLowerCase()) return true;
+    }
+    return false;
+  }
+  return new RegExp(`\\b${symbol.replace(/[.$]/g, "\\$&")}\\b`).test(text);
+}
+
+/** A PATH THE TREE DOES NOT OWN. `.se/` is machine-local and never committed,
+ *  so a clone holds whichever of its files that machine happens to have made.
+ *
+ *  THE TREE CANNOT ANSWER EITHER WAY, and that is what unchecked is for. Twelve
+ *  citations into `.se/` reported stale on a fresh box, and the ones that are
+ *  genuinely retired — the handover file among them — look exactly like the
+ *  ones that are simply not made yet. */
+function machineLocal(cited: string): boolean {
+  return cited.startsWith(".se/");
+}
+
+/** THE CITATIONS THE SWEEP COULD NOT PARSE, and the ones it may not answer.
+ *
+ *  A backticked span shaped like a path that `CITATION` does not match is
+ *  neither checked nor passed — it is reported as unchecked, so the class list
+ *  stays auditable rather than quietly shrinking.
+ *
+ *  req-a-code-citation-names-something-that-exists */
+export function uncheckedCitations(content: string): string[] {
+  const parsed = new Set([...content.matchAll(CITATION)].map((m) => m[0]));
+  const out: string[] = [];
+  for (const m of content.matchAll(PATH_SHAPED)) {
+    if (parsed.has(m[0])) continue;
+    out.push(m[1]);
+  }
+  for (const m of content.matchAll(CITATION)) {
+    if (machineLocal(m[1])) out.push(m[1]);
+  }
+  return unique(out);
+}
+
+/** THE CITATION MARKERS A NODE DECLARES, and which of them no longer answer
+ *  anything because the tree holds the path after all.
+ *
+ *  THE COUNT IS THE POINT. raid-risk-the-unreachable-marker-becomes-the-cheap-answer
+ *  asks for markers counted beside repairs, and a count nobody can re-derive is
+ *  a number in a form rather than a fact about the corpus. */
+export function citationMarkers(root: string, content: string): { declared: string[]; stale: string[] } {
+  const declared = [...markedUnreachable(content)];
+  return { declared, stale: declared.filter((cited) => citedFile(root, cited) !== undefined) };
 }
 
 const verbCache = new Map<string, Set<string> | undefined>();
@@ -177,8 +284,22 @@ function servedVerbs(root: string): Set<string> | undefined {
 export function deadLaneVerbs(root: string, content: string): string[] {
   const alive = servedVerbs(root);
   if (alive === undefined) return [];
+  const declared = markedList(content, "unreachable_verbs");
   const named = unique([...content.matchAll(LANE_VERB)].map((m) => m[0]));
-  return named.filter((verb) => !alive.has(verb));
+  return named.filter((verb) => !alive.has(verb) && !declared.has(verb));
+}
+
+/** THE VERB-SHAPED NAMES A NODE DECLARES AS SOMETHING ELSE.
+ *
+ *  NOT EVERY `se_` NAME IS A VERB. `se_version` is a field in the call log and
+ *  `se_test_verdict` is an entry the log writes for itself. A node describing
+ *  either names something the tool surface will never declare, and the prefix
+ *  cannot tell the two apart.
+ *
+ *  IT IS COUNTED LIKE THE OTHER MARKERS, one entry per name, so a node cannot
+ *  quietly opt out of the whole check. */
+export function verbMarkers(content: string): string[] {
+  return [...markedList(content, "unreachable_verbs")];
 }
 
 function markdownUnder(dir: string, out: string[]): void {
