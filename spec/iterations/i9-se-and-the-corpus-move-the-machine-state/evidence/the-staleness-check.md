@@ -3,7 +3,7 @@ form: the-staleness-check
 by: agent
 signed_off: 2026-08-20T07:52:20.045Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / the-staleness-check

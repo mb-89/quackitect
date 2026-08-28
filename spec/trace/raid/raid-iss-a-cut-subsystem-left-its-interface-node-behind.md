@@ -3,11 +3,11 @@ minted_in: i5-engine-hygiene-one-version-source-every-
 id: raid-iss-a-cut-subsystem-left-its-interface-node-behind
 type: "[[raid]]"
 kind: issue
-statement: "The core-and-satellite subsystem was removed from this branch and one of its interface nodes was left standing, naming an element that no longer exists."
+statement: The core-and-satellite subsystem was removed from this branch and one of its interface nodes was left standing, naming an element that no longer exists.
 owner: the owner
 trigger: any state that reads the element matrix, which is every decompose-structure from now on
 status: open
-impact: "Every element matrix refuses. The state cannot close, and the message names a dangling id rather than the removal that caused it, so the reader looks for a missing element instead of for a finished cut."
+impact: Every element matrix refuses. The state cannot close, and the message names a dangling id rather than the removal that caused it, so the reader looks for a missing element instead of for a finished cut.
 breaks_how_badly: corrosive
 how_likely: expected
 source_refs:

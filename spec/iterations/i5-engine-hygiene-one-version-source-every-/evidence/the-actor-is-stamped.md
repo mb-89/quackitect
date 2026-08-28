@@ -3,7 +3,7 @@ form: the-actor-is-stamped
 by: agent
 signed_off: 2026-08-19T12:06:43.298Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / the-actor-is-stamped

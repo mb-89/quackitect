@@ -3,12 +3,12 @@ minted_in: i62-background-work-reports-its-own-end-the-
 id: raid-risk-the-heartbeat-ends-a-process-that-is-alive-but-quiet
 type: "[[raid]]"
 kind: risk
-statement: "A heartbeat that ends what does not answer will eventually end a process that is working and simply has nothing to say."
+statement: A heartbeat that ends what does not answer will eventually end a process that is working and simply has nothing to say.
 owner: the maintainer
-trigger: "the first report of work that stopped without finishing, and every change to what the ping asks or how long it waits"
+trigger: the first report of work that stopped without finishing, and every change to what the ping asks or how long it waits
 status: open
 looked: 2026-08-24
-impact: "Losing a long run mid-flight costs the whole run, and it costs it silently. The account would report the entry closed, which is exactly the shape of a successful close, so the loss looks like the fix working."
+impact: Losing a long run mid-flight costs the whole run, and it costs it silently. The account would report the entry closed, which is exactly the shape of a successful close, so the loss looks like the fix working.
 breaks_how_badly: crippling
 how_likely: plausible
 source_refs:

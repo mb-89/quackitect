@@ -3,11 +3,11 @@ minted_in: i38-the-machine-sizes-its-own-driver-every-s
 id: raid-risk-a-hand-declared-rung-drifts-upward-and-nothing-ever-says-so
 type: "[[raid]]"
 kind: risk
-statement: "A complexity rung is authored once and never contradicted by anything, so a state rated too high spends the difference on every walk forever while raising no signal at all."
+statement: A complexity rung is authored once and never contradicted by anything, so a state rated too high spends the difference on every walk forever while raising no signal at all.
 owner: the owner
-trigger: "the moment the first rating lands, and again the first time anyone asks what a rung has cost"
+trigger: the moment the first rating lands, and again the first time anyone asks what a rung has cost
 status: open
-impact: "The spend is silent and permanent. A state rated two rungs above its work costs the difference on every future walk of every future record, and no call, no gate and no retro has anything to compare the rating against."
+impact: The spend is silent and permanent. A state rated two rungs above its work costs the difference on every future walk of every future record, and no call, no gate and no retro has anything to compare the rating against.
 breaks_how_badly: corrosive
 how_likely: expected
 looked: 2026-08-20

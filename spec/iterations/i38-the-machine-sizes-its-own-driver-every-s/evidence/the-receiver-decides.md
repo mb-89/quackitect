@@ -3,7 +3,7 @@ form: the-receiver-decides
 by: agent
 signed_off: 2026-08-20T12:50:55.076Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / the-receiver-decides

@@ -1,6 +1,6 @@
 ---
 form: generalize-use-cases
-reopened: "2026-08-19T17:22:37.196Z — same claims-registration gap, cascading fix through M2"
+reopened: 2026-08-19T17:22:37.196Z — same claims-registration gap, cascading fix through M2
 by: agent
 signed_off: 2026-08-19T17:22:37.600Z
 authors: agent

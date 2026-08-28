@@ -3,13 +3,13 @@ minted_in: i51-work-running-out-of-sight-reports-itself
 id: raid-dec-the-duration-and-its-basis-are-one-return-value
 type: "[[raid]]"
 kind: decision
-statement: "A reported duration and what it was computed from are produced by one computation returning both, so an entry with no basis cannot carry a figure and a basis cannot go stale while the number updates."
+statement: A reported duration and what it was computed from are produced by one computation returning both, so an entry with no basis cannot carry a figure and a basis cannot go stale while the number updates.
 owner: the driving agent
 trigger: the first entry seen carrying a duration whose basis names a measurement older than the duration
 status: decided
 how_likely: plausible
 breaks_how_badly: crippling
-impact: "A basis that goes stale while the number updates is worse than no basis at all, because a reader checks it once and then stops checking. The whole honesty rule rests on the pair being inseparable."
+impact: A basis that goes stale while the number updates is worse than no basis at all, because a reader checks it once and then stops checking. The whole honesty rule rests on the pair being inseparable.
 source_refs:
   - req-a-time-remaining-names-its-basis
   - raid-risk-a-time-remaining-is-believed-more-than-it-deserves

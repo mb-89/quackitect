@@ -3,7 +3,7 @@ form: derive-functions
 by: agent
 signed_off: 2026-08-24T16:08:48.912Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / derive-functions

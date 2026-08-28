@@ -2,17 +2,17 @@
 minted_in: i38-the-machine-sizes-its-own-driver-every-s
 id: req-every-call-records-the-state-it-was-made-in
 type: "[[requirement]]"
-statement: "When the lane records a call, the record shall carry the state the walk stood in as a field of its own rather than inside an argument, so the log can be grouped by it."
+statement: When the lane records a call, the record shall carry the state the walk stood in as a field of its own rather than inside an argument, so the log can be grouped by it.
 kind: functional
 verify_method: test
-breaks_if_removed: "Attribution needs two coordinates. Knowing which model answered two hundred calls says nothing about which of fifty-three states it walked, so the model stamp alone answers no question anybody asked."
+breaks_if_removed: Attribution needs two coordinates. Knowing which model answered two hundred calls says nothing about which of fifty-three states it walked, so the model stamp alone answers no question anybody asked.
 breaks_how_badly: crippling
 refines:
   - uc-attribute-a-finished-walk
 source_refs:
-  - "uc-attribute-a-finished-walk step 2"
-  - "uc-attribute-a-finished-walk ext 2a"
-  - "raid-iss-a-call-cannot-be-attributed-to-the-state-it-was-made-in"
+  - uc-attribute-a-finished-walk step 2
+  - uc-attribute-a-finished-walk ext 2a
+  - raid-iss-a-call-cannot-be-attributed-to-the-state-it-was-made-in
 priority: must
 ---
 

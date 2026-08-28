@@ -63,7 +63,11 @@ export function protocolTargets(opened: string): { path: string; frontmatter?: s
         "---",
         "name: protocol",
         "description: Generated from guidance/. Edit those files, never this one.",
-        "applyTo: '**'",
+        // DOUBLE QUOTES BECAUSE THE FORMATTER NORMALISES TO THEM. Written with
+        // single quotes the file is rewritten the moment it lands, so the next
+        // projection sees a difference and warns about a lost hand edit that
+        // never happened. Measured: two placements seconds apart, both warning.
+        'applyTo: "**"',
         "---",
         "",
       ].join("\n"),

@@ -2,11 +2,11 @@
 minted_in: i37-training-iterations-a-disposable-iterati
 id: req-a-ceiling-that-cannot-prove-ancestry-refuses
 type: "[[requirement]]"
-statement: "Where the lane cannot establish that a requested commit is an ancestor of the bound run's rewind point, it shall refuse rather than serve."
+statement: Where the lane cannot establish that a requested commit is an ancestor of the bound run's rewind point, it shall refuse rather than serve.
 kind: quality
 verify_method: test
 fitness_candidate: false
-breaks_if_removed: "A ceiling that goes quiet looks exactly like a ceiling that passed, so the failure is silent and the report is confidently wrong."
+breaks_if_removed: A ceiling that goes quiet looks exactly like a ceiling that passed, so the failure is silent and the report is confidently wrong.
 breaks_how_badly: fatal
 refines:
   - uc-walk-an-iteration-from-a-tree-that-cannot-see-its-future

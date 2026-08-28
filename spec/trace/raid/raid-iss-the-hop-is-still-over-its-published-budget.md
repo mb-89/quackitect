@@ -3,7 +3,7 @@ minted_in: i60-the-walk-gets-fast-and-it-is-measurable-
 id: raid-iss-the-hop-is-still-over-its-published-budget
 type: "[[raid]]"
 kind: issue
-statement: "This entry claimed the walk misses its own per-hop budget by more than three times, and it measured the wrong thing; the flip the budget actually binds is 20 milliseconds against 250."
+statement: This entry claimed the walk misses its own per-hop budget by more than three times, and it measured the wrong thing; the flip the budget actually binds is 20 milliseconds against 250.
 owner: the driving agent
 trigger: it was raised, then refuted by the measurement it should have rested on
 status: closed

@@ -5,7 +5,7 @@ reopened: "2026-08-20T23:56:12.843Z — verification was re-signed below it: the
 by: agent
 signed_off: 2026-08-20T23:56:15.554Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / gate-implementation

@@ -3,7 +3,7 @@ minted_in: i60-the-walk-gets-fast-and-it-is-measurable-
 id: raid-iss-the-knock-down-has-no-reproduction-of-the-case-that-fails
 type: "[[raid]]"
 kind: issue
-statement: "Re-signing an answer knocks down what rests on it in the case observed today, and a work token records a case where it did not; nobody has a reproduction of the failing case, so no fix can be aimed at it."
+statement: Re-signing an answer knocks down what rests on it in the case observed today, and a work token records a case where it did not; nobody has a reproduction of the failing case, so no fix can be aimed at it.
 owner: the driving agent
 trigger: run the two-call probe below — it settles the direction now, and waiting for the bug to recur is a weaker trigger than this entry deserves
 status: open

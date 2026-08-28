@@ -5,7 +5,7 @@ type: "[[option]]"
 statement: a thing with work still running on it stays in every listing and carries a word saying it is not usable yet, rather than being hidden or shown as ready
 cluster: cluster-the-standing
 found_by: prior-art
-source: "Google AIP-151, Standard methods section, read at https://google.aip.dev/151 on 2026-08-21"
+source: Google AIP-151, Standard methods section, read at https://google.aip.dev/151 on 2026-08-21
 ---
 
 ## Mechanism

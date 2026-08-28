@@ -8,10 +8,10 @@ probes:
 timebox: 1 hour
 form: calculation
 chunk: none — the host's own source and its whole published type surface were read, and no editor was opened
-faked: "the running editor. Nothing was observed at runtime. The answer is read from the host's source at its default branch and from its published types, which is a stronger source than a blog and a weaker one than a session."
-fallback: "NOT WRITTEN IN ADVANCE. The seeding carried the question and the timebox and no fallback, which is the same seeding defect the criteria spike records. What to do if the assumption fell was decided after it fell."
+faked: the running editor. Nothing was observed at runtime. The answer is read from the host's source at its default branch and from its published types, which is a stronger source than a blog and a weaker one than a session.
+fallback: NOT WRITTEN IN ADVANCE. The seeding carried the question and the timebox and no fallback, which is the same seeding defect the criteria spike records. What to do if the assumption fell was decided after it fell.
 verdict: falls
-measured: "2026-08-19. The host's activation check walks the open folders, finds the first containing the named file, activates, and discards the folder identity. The activation result carries one field, the event string. With a wildcard pattern the folder is never computed at all. The extension receives the whole workspace and no activation reason. The activation event appears in no published type and in no proposed one."
+measured: 2026-08-19. The host's activation check walks the open folders, finds the first containing the named file, activates, and discards the folder identity. The activation result carries one field, the event string. With a wildcard pattern the folder is never computed at all. The extension receives the whole workspace and no activation reason. The activation event appears in no published type and in no proposed one.
 folds_to: opt-ownership-transfers-by-explicit-handover loses the editor from its list of things that can state a root, and raid-dec-ownership-is-stated-by-the-host-and-acknowledged-back is rewritten one-sided. The guarantee is unchanged and the mechanism becomes a self-check that refuses on any carrier count but one.
 promote: none — the check is four lines against the host's own file API and belongs in the build rather than in a script kept from here.
 source_refs:

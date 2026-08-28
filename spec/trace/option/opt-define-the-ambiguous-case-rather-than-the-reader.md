@@ -6,7 +6,7 @@ statement: Make callers agree by writing down what a malformed node IS and what 
 cluster: the-query
 question: how callers come to agree about the corpus
 found_by: analogy
-source: "epidemiology — the case definition, which makes many independent observers count one outbreak the same way by defining the confirmed, probable and suspected cases in advance"
+source: epidemiology — the case definition, which makes many independent observers count one outbreak the same way by defining the confirmed, probable and suspected cases in advance
 ---
 
 ## Mechanism

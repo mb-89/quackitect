@@ -3,7 +3,7 @@ form: trace-design
 by: agent
 signed_off: 2026-08-24T16:31:01.098Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / trace-design

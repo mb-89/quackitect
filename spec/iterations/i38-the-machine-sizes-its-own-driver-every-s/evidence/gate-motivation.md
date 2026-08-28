@@ -5,7 +5,7 @@ reopened: "2026-08-20T19:05:07.006Z — frame-delta was re-signed: its value pro
 by: agent
 signed_off: 2026-08-20T19:05:10.482Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / gate-motivation

@@ -1,10 +1,10 @@
 ---
 form: build_chart
-amended: "2026-08-20T14:11:01.536Z by agent — five false or unsupported figures caught by a hostile pass, and two visits the redraw added to the candidate nodes that the table did not carry"
+amended: 2026-08-20T14:11:01.536Z by agent — five false or unsupported figures caught by a hostile pass, and two visits the redraw added to the candidate nodes that the table did not carry
 by: agent
 signed_off: 2026-08-20T12:40:36.583Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / build_chart

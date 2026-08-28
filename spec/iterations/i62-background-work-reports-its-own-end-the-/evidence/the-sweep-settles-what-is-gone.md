@@ -3,7 +3,7 @@ form: the-sweep-settles-what-is-gone
 by: agent
 signed_off: 2026-08-24T16:30:16.081Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / the-sweep-settles-what-is-gone

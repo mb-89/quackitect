@@ -3,7 +3,7 @@ form: decompose-structure
 by: agent
 signed_off: 2026-08-12T21:31:04.715Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / decompose-structure

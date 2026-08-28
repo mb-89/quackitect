@@ -3,12 +3,12 @@ minted_in: i36
 id: tsp-a-failed-call-becomes-work
 type: "[[test-spec]]"
 statement: An agent recovers from a refused lane call in one turn, and a failure shape that keeps recurring ends the iteration as a fix or as a register entry with an owner and a trigger.
-method: "demonstration"
+method: demonstration
 demonstrates:
-  - "sty-turn-a-failed-call-into-improvement-work"
+  - sty-turn-a-failed-call-into-improvement-work
 verifies: "none — demonstrates: carries the edge; req-repeated-failure-shape-becomes-durable-work is verify_method: test and is carried by tsp-repeated-failure-shape-becomes-durable-work"
 files:
-  - "none — a demonstration over a live walk; the trail is the call log, the register and the iteration evidence, and no file carries it"
+  - none — a demonstration over a live walk; the trail is the call log, the register and the iteration evidence, and no file carries it
 ---
 
 ## Scope

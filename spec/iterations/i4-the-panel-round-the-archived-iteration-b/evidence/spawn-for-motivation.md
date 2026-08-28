@@ -1,11 +1,11 @@
 ---
 form: spawn-for-motivation
-reopened: "2026-08-23T15:08:32.633Z — gate-kickoff was re-signed after spawn-for-motivation, so spawn-for-motivation answered older ground"
+reopened: 2026-08-23T15:08:32.633Z — gate-kickoff was re-signed after spawn-for-motivation, so spawn-for-motivation answered older ground
 by: agent
 signed_off: 2026-08-23T15:08:35.564Z
 judgment: passed at 2026-08-23T15:17:26.131Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / spawn-for-motivation

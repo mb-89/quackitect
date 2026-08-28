@@ -6,7 +6,7 @@ statement: Keep no machine-state folder at all, deriving the walk's position, it
 cluster: the-walk
 question: how everything agrees where the machine state is
 found_by: transform
-source: "SCAMPER Eliminate, applied to the incumbent"
+source: SCAMPER Eliminate, applied to the incumbent
 ---
 
 ## Mechanism

@@ -5,8 +5,8 @@ type: "[[option]]"
 cluster: cluster-the-benchmark-run
 question: how a run decides which iteration to walk
 found_by: without
-statement: "The decision of what to work on is left to whoever asked for the work, so the system carries no selection logic at all."
-source: "TRIMMING \u2014 asked whether the choosing function can go, and the owner's ruling that a person triggers every run makes the answer nearly yes"
+statement: The decision of what to work on is left to whoever asked for the work, so the system carries no selection logic at all.
+source: TRIMMING — asked whether the choosing function can go, and the owner's ruling that a person triggers every run makes the answer nearly yes
 ---
 
 ## What goes

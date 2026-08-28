@@ -3,11 +3,11 @@ minted_in: i37-training-iterations-a-disposable-iterati
 id: raid-dec-an-archived-iteration-is-the-benchmark-and-nothing-is-authored
 type: "[[raid]]"
 kind: decision
-statement: "A benchmark re-walks an archived iteration from the commit before it started, and no scenario, subject or sandbox is authored for it."
+statement: A benchmark re-walks an archived iteration from the commit before it started, and no scenario, subject or sandbox is authored for it.
 owner: the owner
 trigger: a benchmark need at a change size the archive holds no instance of
 status: decided
-impact: "It removes the authoring cost that killed an earlier attempt at this, and it binds the design to whatever the archive happens to contain."
+impact: It removes the authoring cost that killed an earlier attempt at this, and it binds the design to whatever the archive happens to contain.
 breaks_how_badly: crippling
 how_likely: conceivable
 source_refs:

@@ -1,10 +1,10 @@
 ---
 form: evaluate-set
-amended: "2026-08-19T19:08:15.577Z by agent — a spike restored a thirteenth axis above the line, and a second spike changed the mechanism behind the fatal-axis score"
+amended: 2026-08-19T19:08:15.577Z by agent — a spike restored a thirteenth axis above the line, and a second spike changed the mechanism behind the fatal-axis score
 by: agent
 signed_off: 2026-08-19T16:08:59.552Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / evaluate-set

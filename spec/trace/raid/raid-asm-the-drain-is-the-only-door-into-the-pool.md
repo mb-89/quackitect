@@ -11,7 +11,7 @@ defer_until: a second writer of the option kind is proposed, or the first conven
 impact: "Five of the eight new requirements are demands on the mint. All five are satisfied by guarding one act, and every one of them is bypassed by a second writer - including the FATAL privacy row. The failure is silent: a bypassed option looks exactly like a minted one."
 breaks_how_badly: fatal
 how_likely: plausible
-probe: "HOLDS, AND BY CONSTRUCTION RATHER THAN BY CONVENTION. The inspection was run at i9's prototype gate. The pool prefix is named in exactly one module. It has one minter, reached only from the drain. It has one reader. And every other write is refused by a guard that sits on the lane's write path at the last point before anything lands, naming the drain as its remedy. WHAT THE GUARD CANNOT SEE is a write that never enters the lane, which is a different assumption with a different owner."
+probe: HOLDS, AND BY CONSTRUCTION RATHER THAN BY CONVENTION. The inspection was run at i9's prototype gate. The pool prefix is named in exactly one module. It has one minter, reached only from the drain. It has one reader. And every other write is refused by a guard that sits on the lane's write path at the last point before anything lands, naming the drain as its remedy. WHAT THE GUARD CANNOT SEE is a write that never enters the lane, which is a different assumption with a different owner.
 probed: 2026-08-19
 source_refs:
   - req-the-crossing-is-the-same-act-for-a-person-and-an-agent

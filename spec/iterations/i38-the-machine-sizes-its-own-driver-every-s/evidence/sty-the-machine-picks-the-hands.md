@@ -3,7 +3,7 @@ form: sty-the-machine-picks-the-hands
 by: agent
 signed_off: 2026-08-20T21:59:47.631Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / sty-the-machine-picks-the-hands

@@ -3,7 +3,7 @@ form: a-fresh-session-knows-a-deciding-step
 by: agent
 signed_off: 2026-08-21T11:37:12.361Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / a-fresh-session-knows-a-deciding-step

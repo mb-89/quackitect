@@ -2,9 +2,9 @@
 form: cut-criteria
 by: agent
 signed_off: 2026-08-23T17:46:13.712Z
-reopened: "2026-08-23T17:45:48.780Z — the rank order inverted fatal under corrosive, one axis was cut that discriminates, and one kept that does not reach the candidates"
+reopened: 2026-08-23T17:45:48.780Z — the rank order inverted fatal under corrosive, one axis was cut that discriminates, and one kept that does not reach the candidates
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / cut-criteria

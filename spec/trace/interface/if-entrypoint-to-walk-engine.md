@@ -2,7 +2,7 @@
 minted_in: i37-training-iterations-a-disposable-iterati
 id: if-entrypoint-to-walk-engine
 type: "[[interface]]"
-statement: "The entrypoint measures the host it started under and hands the walk engine that profile with the live lane, so the engine serves steps sized for the harness it is actually talking to."
+statement: The entrypoint measures the host it started under and hands the walk engine that profile with the live lane, so the engine serves steps sized for the harness it is actually talking to.
 source: el-entrypoint
 destination: el-walk-engine
 carries:

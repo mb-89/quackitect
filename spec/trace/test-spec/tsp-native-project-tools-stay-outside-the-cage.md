@@ -3,9 +3,9 @@ minted_in: i36
 id: tsp-native-project-tools-stay-outside-the-cage
 type: "[[test-spec]]"
 statement: A caged session exposes the se lane and the permitted web-search exception, and exposes zero native tools that can read, change, search or execute against the project.
-method: "test"
+method: test
 verifies:
-  - "req-native-project-tools-stay-outside-the-cage"
+  - req-native-project-tools-stay-outside-the-cage
 files:
   - tests/cage.test.ts
 ---

@@ -6,7 +6,7 @@ statement: Make what is withheld depend on which act is producing the copy, decl
 cluster: the-bootstrap
 question: how a produced copy withholds the machine state
 found_by: transform
-source: "SIT Attribute Dependency, applied to opt-exclude-at-the-packaging-boundary-and-prove-it"
+source: SIT Attribute Dependency, applied to opt-exclude-at-the-packaging-boundary-and-prove-it
 ---
 
 ## Mechanism

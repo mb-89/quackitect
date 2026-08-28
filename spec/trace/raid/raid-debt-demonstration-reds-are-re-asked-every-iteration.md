@@ -7,7 +7,7 @@ statement: observe-red asks every non-test spec in the corpus for a red observat
 owner: the owner
 trigger: the next iteration that reaches observe-red, which is every iteration
 status: open
-looked: 2026-08-25
+looked: 2026-08-26
 breaks_how_badly: abrasive
 how_likely: expected
 impact: observe-red refuses while any box stands open. i35 minted 2 demonstration specs and met a checklist of 15, so 13 belonged to other records and none of them had a red for THIS delta to observe. The alternative is ticking boxes on reds nobody watched, which is worse — so the walk stops until each one is either fabricated or owed.
@@ -98,4 +98,10 @@ THE COST THIS ROW NAMES IS UNCHANGED. Scoping the two halves together does not
 shrink the corpus either half is asked about.
 
 RESCHEDULED, TRIGGER RE-AFFIRMED: the next iteration reaching observe-red.
+
+## Swept 2026-08-26, at i54's closing retro: RE-ACCEPTED, and the trigger fired again
+
+i54 reached its demonstration positions and performed three, each with its own report under the record's reports folder. The wide checklist was answered again for a delta this record did not widen.
+
+RESCHEDULED, TRIGGER RE-AFFIRMED, unchanged: the next iteration reaching the same position.
 

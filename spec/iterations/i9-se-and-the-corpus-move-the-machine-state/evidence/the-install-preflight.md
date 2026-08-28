@@ -2,9 +2,9 @@
 form: the-install-preflight
 by: agent
 signed_off: 2026-08-20T10:03:52.046Z
-reopened: "2026-08-20T09:51:50.345Z — fresh eyes found the verify never runs on the default path, and the runtime pin cannot execute on the runtimes it exists to catch"
+reopened: 2026-08-20T09:51:50.345Z — fresh eyes found the verify never runs on the default path, and the runtime pin cannot execute on the runtimes it exists to catch
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / the-install-preflight

@@ -3,14 +3,14 @@ minted_in: i37-training-iterations-a-disposable-iterati
 id: raid-asm-the-call-log-attributes-every-call-to-the-state-it-was-made-in
 type: "[[raid]]"
 kind: assumption
-statement: "The call log can be partitioned by walk state, so cost per state is derivable from what is already recorded."
+statement: The call log can be partitioned by walk state, so cost per state is derivable from what is already recorded.
 owner: the maintainer of the machine
 trigger: the first attempt to derive cost per state from a run's log
 status: open
-impact: "Only a total is derivable. The ranked per-state view that makes a benchmark actionable is lost, and the whole thing degrades to one number per run."
+impact: Only a total is derivable. The ranked per-state view that makes a benchmark actionable is lost, and the whole thing degrades to one number per run.
 breaks_how_badly: corrosive
 how_likely: plausible
-probe: "unprobed \u2014 engine/calllog.ts records ref, ts, tool, args, ok, outcome, duration_ms, actor and se_version. No state field was seen in the CallRecord shape."
+probe: unprobed — engine/calllog.ts records ref, ts, tool, args, ok, outcome, duration_ms, actor and se_version. No state field was seen in the CallRecord shape.
 probed: 2026-08-19
 source_refs:
   - fn-the-benchmark-run.derive-what-the-walk-cost

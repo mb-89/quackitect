@@ -2,13 +2,13 @@
 minted_in: i37-training-iterations-a-disposable-iterati
 id: tsp-a-bound-run-cannot-reach-past-its-rewind-point
 type: "[[test-spec]]"
-statement: "A benchmark run resolves nothing newer than its rewind point, and where ancestry cannot be established the lane refuses rather than serves."
-method: "test"
+statement: A benchmark run resolves nothing newer than its rewind point, and where ancestry cannot be established the lane refuses rather than serves.
+method: test
 verifies:
   - req-a-bound-run-resolves-no-commit-newer-than-its-rewind-point
   - req-a-ceiling-that-cannot-prove-ancestry-refuses
 files:
-  - "tests/benchmark-run.test.ts"
+  - tests/benchmark-run.test.ts
 ---
 
 ## Scope

@@ -3,7 +3,7 @@ form: find_analogy
 by: agent
 signed_off: 2026-08-19T17:47:29.516Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / find_analogy

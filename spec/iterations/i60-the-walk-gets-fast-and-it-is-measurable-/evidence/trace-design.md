@@ -4,7 +4,7 @@ by: agent
 signed_off: 2026-08-24T18:01:48.222Z
 reopened: "2026-08-24T18:01:14.178Z — observe-red was re-signed after this state, so it answered older ground. What changed above it: eight chunks now stand where four did, the four added ones touched three more engine files, and one new file was added — the extension's build options, which moved into a module of their own so the staleness guard runs the same build rather than a copy of it."
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / trace-design

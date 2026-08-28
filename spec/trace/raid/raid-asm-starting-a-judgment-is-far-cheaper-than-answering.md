@@ -7,9 +7,9 @@ statement: Starting a leaving judgment and recording that one is owed costs far 
 owner: the driving agent
 trigger: the first answering call that exceeds a second without the judgment itself having been waited for
 status: probed
-probed: "2026-08-21, and it HOLDS with two orders of magnitude of margin. A handoff call that started a long run and did not wait for it was recorded at 7 ms against a 1000 ms measure."
-probe: "Time the answering call on the slowest machine available, with the leaving judgment started and not awaited. Compare against the one-second measure with the machine's own load recorded beside it."
-impact: "The measure on the answering call is absolute rather than a share. If starting the judgment is itself slow on a loaded or small machine, the product breaches its own measure while doing exactly what the design says."
+probed: 2026-08-21, and it HOLDS with two orders of magnitude of margin. A handoff call that started a long run and did not wait for it was recorded at 7 ms against a 1000 ms measure.
+probe: Time the answering call on the slowest machine available, with the leaving judgment started and not awaited. Compare against the one-second measure with the machine's own load recorded beside it.
+impact: The measure on the answering call is absolute rather than a share. If starting the judgment is itself slow on a loaded or small machine, the product breaches its own measure while doing exactly what the design says.
 breaks_how_badly: abrasive
 how_likely: plausible
 source_refs:

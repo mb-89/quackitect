@@ -3,7 +3,7 @@ form: cand-nothing-can-be-forgotten
 by: agent
 signed_off: 2026-08-19T15:46:45.422Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / cand-nothing-can-be-forgotten

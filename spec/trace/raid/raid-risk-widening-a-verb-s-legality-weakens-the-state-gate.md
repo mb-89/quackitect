@@ -3,12 +3,12 @@ minted_in: i62-background-work-reports-its-own-end-the-
 id: raid-risk-widening-a-verb-s-legality-weakens-the-state-gate
 type: "[[raid]]"
 kind: risk
-statement: "Making the helper registration legal everywhere widens a verb that carries other powers, and those powers travel with it into states that deliberately withhold them."
+statement: Making the helper registration legal everywhere widens a verb that carries other powers, and those powers travel with it into states that deliberately withhold them.
 owner: the maintainer
-trigger: "any later argument added to the widened verb, and the first refusal a walk works around by reaching for it"
+trigger: any later argument added to the widened verb, and the first refusal a walk works around by reaching for it
 status: open
 looked: 2026-08-24
-impact: "The state gate's whole value is that a tool being illegal where you stand means the machine holds that job elsewhere. A verb that is legal everywhere teaches the walk to reach for it, and every power it carries becomes ambient."
+impact: The state gate's whole value is that a tool being illegal where you stand means the machine holds that job elsewhere. A verb that is legal everywhere teaches the walk to reach for it, and every power it carries becomes ambient.
 breaks_how_badly: corrosive
 how_likely: plausible
 source_refs:

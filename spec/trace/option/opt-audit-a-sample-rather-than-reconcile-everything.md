@@ -4,9 +4,9 @@ id: opt-audit-a-sample-rather-than-reconcile-everything
 type: "[[option]]"
 cluster: the-sizing
 question: how over-driving is measured
-statement: "a small random sample of walked states is audited against what the work actually needed, and the sample alone is what moves the mapping, so the cost of checking does not scale with the amount of work"
+statement: a small random sample of walked states is audited against what the work actually needed, and the sample alone is what moves the mapping, so the cost of checking does not scale with the amount of work
 found_by: analogy
-source: "freight and postal class declaration, where a shipper declares a size-and-weight class and carriers spot-check a fraction at the depot, re-rating and surcharging the mis-declared ones rather than measuring every parcel"
+source: freight and postal class declaration, where a shipper declares a size-and-weight class and carriers spot-check a fraction at the depot, re-rating and surcharging the mis-declared ones rather than measuring every parcel
 ---
 
 ## Mechanism

@@ -1,10 +1,10 @@
 ---
 form: pointing-keeps-the-reachability-answer
-amended: "2026-08-24T20:00:47.180Z by agent — the open work this form named as unmeasured has since been measured and repaired"
+amended: 2026-08-24T20:00:47.180Z by agent — the open work this form named as unmeasured has since been measured and repaired
 by: agent
 signed_off: 2026-08-24T16:33:03.026Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / pointing-keeps-the-reachability-answer

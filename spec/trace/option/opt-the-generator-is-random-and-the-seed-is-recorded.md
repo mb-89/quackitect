@@ -5,8 +5,8 @@ type: "[[option]]"
 cluster: cluster-the-benchmark-run
 question: how a run decides which iteration to walk
 found_by: prior-art
-statement: "Work is drawn at random and the draw is written down, so the same run can be reproduced exactly without a second mechanism for fixed cases."
-source: "ref-agent-benchmark-harnesses-2026 \u2014 property-based testing and fuzzer corpora; RECALLED rather than fetched"
+statement: Work is drawn at random and the draw is written down, so the same run can be reproduced exactly without a second mechanism for fixed cases.
+source: ref-agent-benchmark-harnesses-2026 — property-based testing and fuzzer corpora; RECALLED rather than fetched
 ---
 
 ## What it buys

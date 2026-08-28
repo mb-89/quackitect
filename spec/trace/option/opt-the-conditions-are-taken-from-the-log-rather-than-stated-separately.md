@@ -5,8 +5,8 @@ type: "[[option]]"
 cluster: cluster-the-benchmark-run
 question: how a result carries the conditions it was taken under
 found_by: without
-statement: "Everything a result needs to be reproducible is read from the record the system already keeps, so nothing has to be gathered and written a second time."
-source: "TRIMMING \u2014 asked whether stating the conditions can be absorbed into deriving the cost, since both end up on the same report"
+statement: Everything a result needs to be reproducible is read from the record the system already keeps, so nothing has to be gathered and written a second time.
+source: TRIMMING — asked whether stating the conditions can be absorbed into deriving the cost, since both end up on the same report
 ---
 
 ## What goes

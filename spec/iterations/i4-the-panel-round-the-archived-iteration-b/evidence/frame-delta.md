@@ -1,10 +1,10 @@
 ---
 form: frame-delta
-reopened: "2026-08-23T15:21:55.708Z — define-actual was re-signed after it, so frame-delta answered older ground"
+reopened: 2026-08-23T15:21:55.708Z — define-actual was re-signed after it, so frame-delta answered older ground
 by: agent
 signed_off: 2026-08-23T15:22:03.419Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / frame-delta

@@ -3,7 +3,7 @@ form: the-verdict-lands-against-its-step
 by: agent
 signed_off: 2026-08-21T11:33:38.688Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / the-verdict-lands-against-its-step

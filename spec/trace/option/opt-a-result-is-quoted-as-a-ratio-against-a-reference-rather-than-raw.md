@@ -5,8 +5,8 @@ type: "[[option]]"
 cluster: cluster-the-benchmark-run
 question: how two results are made comparable
 found_by: prior-art
-statement: "Numbers are published relative to a named reference run rather than in absolute units, so results survive being taken on different machines."
-source: "ref-agent-benchmark-harnesses-2026 \u2014 SPEC CPU reference machine and ratios; RECALLED rather than fetched"
+statement: Numbers are published relative to a named reference run rather than in absolute units, so results survive being taken on different machines.
+source: ref-agent-benchmark-harnesses-2026 — SPEC CPU reference machine and ratios; RECALLED rather than fetched
 ---
 
 ## What it buys

@@ -6,7 +6,7 @@ statement: Build the packaged artefact from an explicit list of what belongs in 
 cluster: the-bootstrap
 question: how a produced copy withholds the machine state
 found_by: heuristic
-source: "Make the illegal unrepresentable, not merely checked."
+source: Make the illegal unrepresentable, not merely checked.
 ---
 
 ## Mechanism

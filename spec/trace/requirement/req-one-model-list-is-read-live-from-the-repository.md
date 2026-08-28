@@ -2,16 +2,16 @@
 minted_in: i38-the-machine-sizes-its-own-driver-every-s
 id: req-one-model-list-is-read-live-from-the-repository
 type: "[[requirement]]"
-statement: "The engine shall publish the same statement of how strong a hand a step needs on every supported host for the same inputs, discovering nothing about it at run time."
+statement: The engine shall publish the same statement of how strong a hand a step needs on every supported host for the same inputs, discovering nothing about it at run time.
 kind: constraint
 verify_method: inspection
-breaks_if_removed: "A system that answers differently on one machine than another cannot be replayed, and a walk that cannot be replayed is worth less here than one that is occasionally over-driven."
+breaks_if_removed: A system that answers differently on one machine than another cannot be replayed, and a walk that cannot be replayed is worth less here than one that is occasionally over-driven.
 breaks_how_badly: corrosive
 refines:
   - uc-let-the-machine-name-the-driver
 source_refs:
-  - "uc-let-the-machine-name-the-driver step 4"
-  - "raid-asm-one-model-list-serves-every-host-the-engine-supports"
+  - uc-let-the-machine-name-the-driver step 4
+  - raid-asm-one-model-list-serves-every-host-the-engine-supports
 priority: must
 ---
 

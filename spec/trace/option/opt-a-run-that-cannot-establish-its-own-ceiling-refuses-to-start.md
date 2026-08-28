@@ -5,8 +5,8 @@ type: "[[option]]"
 cluster: cluster-the-benchmark-run
 question: how the walked iteration's future is put out of reach
 found_by: heuristic
-statement: "The safe outcome is the default at every point where the guard cannot answer, including before the run begins rather than only during it."
-source: "HEURISTIC \u2014 the default should be the safe thing"
+statement: The safe outcome is the default at every point where the guard cannot answer, including before the run begins rather than only during it.
+source: HEURISTIC — the default should be the safe thing
 ---
 
 ## What it adds to what is already ruled

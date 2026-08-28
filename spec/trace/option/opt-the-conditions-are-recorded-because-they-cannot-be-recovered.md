@@ -5,8 +5,8 @@ type: "[[option]]"
 cluster: cluster-the-benchmark-run
 question: how a result carries the conditions it was taken under
 found_by: heuristic
-statement: "Anything about a run that cannot be re-derived later is written down at the moment it is true, and anything derivable is left to be derived."
-source: "HEURISTIC \u2014 if it must be remembered, it must be recorded"
+statement: Anything about a run that cannot be re-derived later is written down at the moment it is true, and anything derivable is left to be derived.
+source: HEURISTIC — if it must be remembered, it must be recorded
 ---
 
 ## What it sorts

@@ -3,9 +3,9 @@ form: gate-motivation
 bless: blessed by agent
 by: agent
 signed_off: 2026-08-23T15:43:18.933Z
-reopened: "2026-08-23T15:42:59.776Z — a cold reviewer found that eight of the twelve scope pieces carry no pass line, so success_measurable covers a third of the record and not the whole of it"
+reopened: 2026-08-23T15:42:59.776Z — a cold reviewer found that eight of the twelve scope pieces carry no pass line, so success_measurable covers a third of the record and not the whole of it
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / gate-motivation

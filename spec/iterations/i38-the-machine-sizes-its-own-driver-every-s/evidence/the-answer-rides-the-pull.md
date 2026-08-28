@@ -3,7 +3,7 @@ form: the-answer-rides-the-pull
 by: agent
 signed_off: 2026-08-20T20:42:58.303Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / the-answer-rides-the-pull

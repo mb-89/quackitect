@@ -1,11 +1,11 @@
 ---
 form: sweep-consistency
-amended: "2026-08-24T19:47:38.039Z by agent — the walking.md addition pushed a guidance page over the payload line and was reverted, so the form must not claim it"
+amended: 2026-08-24T19:47:38.039Z by agent — the walking.md addition pushed a guidance page over the payload line and was reverted, so the form must not claim it
 judgment: passed at 2026-08-24T19:39:07.581Z
 by: agent
 signed_off: 2026-08-24T19:39:05.121Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / sweep-consistency

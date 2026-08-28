@@ -2,9 +2,9 @@
 form: probe-assumptions
 by: agent
 signed_off: 2026-08-23T16:57:01.332Z
-reopened: "2026-08-23T16:56:36.432Z — identify-assumptions was re-signed after it, adding two assumptions it had not seen"
+reopened: 2026-08-23T16:56:36.432Z — identify-assumptions was re-signed after it, adding two assumptions it had not seen
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / probe-assumptions

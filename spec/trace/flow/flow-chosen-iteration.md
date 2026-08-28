@@ -2,7 +2,7 @@
 minted_in: i37-training-iterations-a-disposable-iterati
 id: flow-chosen-iteration
 type: "[[flow]]"
-statement: "the archived iteration a run will re-walk, with the seed of the draw where one was made"
+statement: the archived iteration a run will re-walk, with the seed of the draw where one was made
 kind: signal
 source_refs:
   - uc-measure-a-machine-change-against-a-finished-iteration ext 1a

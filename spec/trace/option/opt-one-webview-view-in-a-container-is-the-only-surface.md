@@ -6,7 +6,7 @@ statement: the walk is shown on exactly one surface, a webview view living in an
 cluster: the-account
 question: how the walk is shown to a person
 found_by: prior-art
-source: "VS Code Extension API, UX Guidelines / Webviews, https://code.visualstudio.com/api/ux-guidelines/webviews, page dated 8/19/2026"
+source: VS Code Extension API, UX Guidelines / Webviews, https://code.visualstudio.com/api/ux-guidelines/webviews, page dated 8/19/2026
 ---
 
 ## Mechanism

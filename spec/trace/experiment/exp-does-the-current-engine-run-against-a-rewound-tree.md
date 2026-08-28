@@ -2,16 +2,16 @@
 minted_in: i37-training-iterations-a-disposable-iterati
 id: exp-does-the-current-engine-run-against-a-rewound-tree
 type: "[[experiment]]"
-statement: "Does the current engine boot and answer against a tree rewound to the commit before an archived iteration started?"
+statement: Does the current engine boot and answer against a tree rewound to the commit before an archived iteration started?
 probes:
   - raid-asm-a-throwaway-tree-at-an-old-commit-can-run-the-engine
   - raid-asm-a-rewound-tree-carries-none-of-the-answers-the-walk-must-derive
-timebox: "minutes — boot it and call se_pull once"
+timebox: minutes — boot it and call se_pull once
 form: skeleton
-faked: "no walk was driven. The lane was booted and asked for one pull; nothing was filled and no state was signed."
+faked: no walk was driven. The lane was booted and asked for one pull; nothing was filled and no state was signed.
 fallback: "pre-agreed before the run: if the engine cannot run against a rewound tree, the whole rewind mechanism needs a different shape and M4 reopens."
-folds_to: "raid-dec-a-benchmark-rewinds-content-and-never-the-machine and el-benchmark-binding — the rewind is a three-way split"
-promote: "rewound spec, today's machines and guidance, history bounded"
+folds_to: raid-dec-a-benchmark-rewinds-content-and-never-the-machine and el-benchmark-binding — the rewind is a three-way split
+promote: rewound spec, today's machines and guidance, history bounded
 verdict: holds
 source_refs:
   - el-benchmark-binding

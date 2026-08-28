@@ -8,7 +8,7 @@ class: review
 killer: false
 kind: architecture
 provenance:
-  class: "schema-default (review)"
-  killer: "schema-default (false)"
-  kind: "agent-proposal - architecture, shapes query_tool and query_evaluator"
+  class: schema-default (review)
+  killer: schema-default (false)
+  kind: agent-proposal - architecture, shapes query_tool and query_evaluator
 ---

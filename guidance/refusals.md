@@ -840,3 +840,73 @@ refusal in this lane is not.
 
 MEASURED ON THE i15 WALK: three searches within a few minutes, all the same
 mistake, each one a thing the reader plainly meant literally.
+
+### SE-C-154 — the write would add a reach nobody declared
+
+MINTED AS SE-C-149 AND RENUMBERED AT THE MERGE. i63 shipped its own SE-C-149
+first, and a number in a shipped log is never reused. SE-C-143 was renumbered
+for the same reason, so this is the second time that rule has been applied.
+
+WHAT IT MEANS. The write would leave an engine module holding a governed conversation while no departure records it.
+
+THE RULE, in one sentence: every reach out of the engine goes through a named door, or is recorded with its reason.
+
+#### It refuses the ADDITION, never the edit
+
+A MODULE THAT ALREADY REACHES STAYS EDITABLE. The check asks whether THIS write turned a quiet module into one that reaches, so a module already on the list is untouched by it.
+
+THAT IS DELIBERATE. Most of the engine reaches the disk conversation today, and moving them is the work. A guard that froze them would block the fix as well as the fault.
+
+HOW MANY IS THE SWEEP'S ANSWER, NOT THIS PAGE'S. A number typed here is right on the day it is typed and wrong on the next import somebody adds. A hand-written count standing beside a computed one is the defect the door rule exists to stop, in prose instead of code.
+
+#### The three ways past it
+
+- ROUTE THE REACH THROUGH THE DOOR. That is the answer where the module has no business talking to the capability directly.
+- DECLARE IT, with its reason, in [deliverable/machines/doors.md](deliverable/machines/doors.md). The refusal hands back the exact patch.
+- CHANGE NOTHING AND WRITE SOMETHING ELSE. A module that does not reach is never asked.
+
+#### What it cannot see
+
+A REACH THROUGH A SPAWNED PROCESS. A command is a string carrying no path the guard can resolve into a target, and 38 of 178 engine modules hold that channel.
+
+Each door's own rule states this limit rather than implying completeness. The sweep carries the coverage the guard cannot, which is why it is the complete check rather than a second opinion.
+
+### SE-C-155 — the departure states no reason
+
+MINTED AS SE-C-150 AND RENUMBERED AT THE MERGE, for the same reason as its
+sibling above.
+
+WHAT IT MEANS. TWO SHAPES fire this clause, and both are a bullet below the marker that grants nothing.
+
+- A line carrying a path and nothing after the dash.
+- A line the parser cannot read as a departure at all: no `.ts`, no root-relative path, or a bullet that is prose.
+
+THE REASON IS THE ENTRY, NOT METADATA ON IT. A bare path is not a line.
+
+AND A LINE NOBODY CAN PARSE IS WORSE THAN A BARE PATH. The author is told nothing, believes an exemption stands, and the sweep goes on reporting the module forever. That was the fourth of the four line-shapes the test spec named, and it was silent until it was refused.
+
+#### Why it refuses rather than ignores
+
+IGNORING ONE LEAVES THE LIST UNREADABLE. A reader who finds a bare path cannot tell a rejected line from one nobody wrote, and the module it names goes on being reported with no explanation.
+
+The widget list ignores a reasonless bullet. This one refuses it, and that is the correction.
+
+#### What counts as a reason
+
+ANY NON-EMPTY TEXT AFTER THE DASH, once trimmed. Whitespace alone is refused.
+
+IT DEMANDS A REASON, NEVER A GOOD ONE. Judging quality is a reviewer's job, and the list is what they read. Measured across 113 reasons a refusing verb has actually collected here: 104 are considered, and the 9 that are not sit in a single record where the honest answer genuinely was the same nine times.
+
+#### The refusal names three things
+
+- the file
+- the line, counted in the file
+- the offending path, quoted back
+
+EVERY BARE LINE IS NAMED, not the first. Reporting one at a time cost an author one refused write per missing reason.
+
+The remedy it hands over is the exact patch that adds a reason to that line, ANCHORED TO THE WHOLE LINE. A bare `- <path>` is a strict prefix of the same path already declared with its reason, so an unanchored match found two occurrences and the patch refused as ambiguous — for the commonest case there is.
+
+#### Any dash separates the path from the reason
+
+Demanding an em dash means a person typing a hyphen gets nothing and no error to explain it.

@@ -19,6 +19,25 @@ export const LANE_INCLUDES = [".se/work"];
 /** True for a path addressing a declared root, e.g. "@desktop/sketch.png". */
 export const isRootRef = (p: string): boolean => p.startsWith("@");
 
+/**
+ * IS THIS PATH INSIDE THIS DIRECTORY? The containment rule, in one place.
+ *
+ * THE SEPARATOR IS THE WHOLE RULE. A bare prefix test puts `/x/vaultevil`
+ * inside `/x/vault`, and a copy guarding a write did exactly that.
+ *
+ * `self` SAYS WHETHER THE DIRECTORY COUNTS AS INSIDE ITSELF, because the copies
+ * disagreed about that too and the disagreement is real. A jail admits its own
+ * root; a somewhere-under-here test does not.
+ *
+ * IT TAKES AN ABSOLUTE OR A RELATIVE TARGET. resolve settles which, so a caller
+ * never has to branch on it and then forget the branch.
+ */
+export function isInside(dir: string, target: string, self = true): boolean {
+  const base = resolve(dir);
+  const abs = resolve(base, target);
+  return abs === base ? self : abs.startsWith(base + sep);
+}
+
 /** A declared root: where it is, and whether a WRITE lane may reach it.
  *
  *  TWO SHAPES ARE LEGAL IN .se/roots.json and the short one is unchanged. A
@@ -150,7 +169,7 @@ export function resolveDeclaredRoot(root: string, p: string, source: string): st
   }
   const base = resolve(declared.path);
   const abs = resolve(base, rest.join("/"));
-  if (abs !== base && !abs.startsWith(base + sep)) {
+  if (!isInside(base, abs)) {
     throw new Rejection({
       clause: CLAUSES.PATH_ESCAPE,
       expected: `a path inside the declared root @${name}`,

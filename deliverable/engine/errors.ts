@@ -125,6 +125,21 @@ export const CLAUSES = {
   WORK_PERSON_ONLY: "SE-C-150", // an agent settling an item whose face says a person must
   WORK_ALREADY_TAKEN: "SE-C-152", // a second hand taking work the first is already on
   WORK_TITLE_TOO_LONG: "SE-C-153", // a hand-written token title past four words
+  // THE DOOR REGIME'S TWO CLAUSES, MINTED AS SE-C-149 AND SE-C-150 ON THE
+  // system-exploration BRANCH AND RENUMBERED AT THE MERGE. i63 shipped the two
+  // work clauses above under those numbers first, and a number in a shipped log
+  // is never reused. SE-C-143 was renumbered for the same reason, and this is
+  // that precedent applied a second time.
+  //
+  // A WRITE THAT ADDS A REACH NOBODY DECLARED. A module that holds a governed
+  // conversation while no departure records it. It refuses the ADDITION and
+  // never the edit, so the modules that already reach stay fixable.
+  UNDECLARED_REACH: "SE-C-154",
+  // A DEPARTURE THAT STATES NO REASON. The reason is the entry rather than
+  // metadata on it, so a bare path is not a line. Every compared system lets
+  // somebody bypass a boundary; this is the one that makes the bypass explain
+  // itself.
+  DEPARTURE_WITHOUT_REASON: "SE-C-155",
 } as const;
 
 /** A WALL OF PROSE IS REFUSED. Paragraphs are the author's job, and no renderer

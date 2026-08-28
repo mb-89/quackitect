@@ -1,10 +1,10 @@
 ---
 form: identify-assumptions
-reopened: "2026-08-20T07:23:40.853Z — a feeder re-signed above it after the v3 merge moved the rigor matrix and the M6 spikes moved the winner"
+reopened: 2026-08-20T07:23:40.853Z — a feeder re-signed above it after the v3 merge moved the rigor matrix and the M6 spikes moved the winner
 by: agent
 signed_off: 2026-08-20T07:23:42.517Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / identify-assumptions

@@ -4,7 +4,7 @@ bless: blessed by agent
 by: agent
 signed_off: 2026-08-24T12:50:36.666Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / gate-implementation

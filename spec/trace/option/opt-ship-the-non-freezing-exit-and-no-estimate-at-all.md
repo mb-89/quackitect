@@ -5,7 +5,7 @@ type: "[[option]]"
 statement: build only the deferred leaving verdict and the one-call listing, and report no time remaining at all, because the estimate is the second-order want and the freeze is the first
 cluster: cluster-the-estimate
 found_by: without
-source: "trimming, via meth-trimming — asking of the estimate what if it does not exist, and who does its job instead"
+source: trimming, via meth-trimming — asking of the estimate what if it does not exist, and who does its job instead
 ---
 
 ## Mechanism

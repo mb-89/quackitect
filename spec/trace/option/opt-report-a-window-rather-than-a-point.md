@@ -5,7 +5,7 @@ type: "[[option]]"
 statement: the entry reports a range with a lower edge a caller can safely wait, rather than a single number that is precise and wrong
 cluster: cluster-the-estimate
 found_by: analogy
-source: "parcel logistics and appointment scheduling, where a delivery window replaces a point estimate and its width carries the uncertainty"
+source: parcel logistics and appointment scheduling, where a delivery window replaces a point estimate and its width carries the uncertainty
 ---
 
 ## Mechanism

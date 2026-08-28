@@ -7,7 +7,7 @@
 // see dsp-file-lane.md#a-patch-names-where-it-goes
 import { readFileSync } from "node:fs";
 import { CLAUSES, Rejection } from "./errors.ts";
-import { guardMachineNote, guardRawNul, lintAfterWrite, mustExist, type PatchOp, type PatchResult, SRC } from "./files.ts";
+import { guardRawNul, guardWriteContent, lintAfterWrite, mustExist, type PatchOp, type PatchResult, SRC } from "./files.ts";
 import { contentHash } from "./hash.ts";
 import { writeNode } from "./notes.ts";
 import { resolveInRoot } from "./paths.ts";
@@ -274,7 +274,7 @@ function writeStaged(
     byFile.set(s.abs, { path: s.path, next: s.next, replacements: (prev?.replacements ?? 0) + s.replacements });
   }
   for (const f of byFile.values()) {
-    guardMachineNote(f.path, f.next);
+    guardWriteContent(root, f.path, f.next);
     const nul = guardRawNul(f.path, f.next);
     f.next = nul.content;
     if (nul.corrected !== undefined) corrected.push(nul.corrected);

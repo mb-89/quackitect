@@ -4,11 +4,11 @@ id: dsp-the-widget-guard
 type: "[[design-spec]]"
 statement: one predicate over the source tree, compared against what the VS Code panel actually reaches, so a file the person never sees cannot emit markup
 realizes:
-  - "el-widget-guard"
-  - "if-walk-engine-to-widget-guard"
-  - "if-widget-guard-to-account"
+  - el-widget-guard
+  - if-walk-engine-to-widget-guard
+  - if-widget-guard-to-account
 files:
-  - "deliverable/engine/widgets.ts"
+  - deliverable/engine/widgets.ts
 ---
 
 ## Responsibility

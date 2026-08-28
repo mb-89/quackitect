@@ -3,11 +3,11 @@ minted_in: i5-engine-hygiene-one-version-source-every-
 id: raid-risk-splitting-the-heaviest-test-file-buys-no-wall-clock
 type: "[[raid]]"
 kind: risk
-statement: "Splitting refs.test.ts shortens nothing, because a different file sets the battery's critical path."
+statement: Splitting refs.test.ts shortens nothing, because a different file sets the battery's critical path.
 owner: the maintainer
 trigger: decompose-structure, before the split is designed
 status: open
-impact: "A file is divided, the diff is real, the review costs what a review costs, and the wait a person actually experiences is unchanged."
+impact: A file is divided, the diff is real, the review costs what a review costs, and the wait a person actually experiences is unchanged.
 breaks_how_badly: abrasive
 how_likely: plausible
 source_refs:

@@ -4,9 +4,9 @@ id: opt-the-driver-reads-the-difficulty-and-decides-whether-to-take-it
 type: "[[option]]"
 cluster: the-sizing
 question: who resolves a rung to a worker
-statement: "the block states the difficulty and the driver decides whether to accept the work or hand it back, so the match is made by the side that knows its own capability"
+statement: the block states the difficulty and the driver decides whether to accept the work or hand it back, so the match is made by the side that knows its own capability
 found_by: transform
-source: "SCAMPER Reverse applied to cluster-the-sizing — invert which side of the handover decides"
+source: SCAMPER Reverse applied to cluster-the-sizing — invert which side of the handover decides
 ---
 
 ## Mechanism

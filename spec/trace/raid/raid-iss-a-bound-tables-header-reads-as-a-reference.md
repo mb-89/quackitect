@@ -3,11 +3,11 @@ minted_in: i5-engine-hygiene-one-version-source-every-
 id: raid-iss-a-bound-tables-header-reads-as-a-reference
 type: "[[raid]]"
 kind: issue
-statement: "A bound table's header row is read as a list of node references, so a table whose row type carries a dash reports its own header as a reference resolving to nothing."
+statement: A bound table's header row is read as a list of node references, so a table whose row type carries a dash reports its own header as a reference resolving to nothing.
 owner: the maintainer
 trigger: any evidence field bound to a node type whose name carries a dash
 status: open
-impact: "The state cannot close. The refusal names the type as a dangling id, so the reader looks for a missing node instead of at the header the engine wrote itself."
+impact: The state cannot close. The refusal names the type as a dangling id, so the reader looks for a missing node instead of at the header the engine wrote itself.
 breaks_how_badly: corrosive
 how_likely: expected
 source_refs:

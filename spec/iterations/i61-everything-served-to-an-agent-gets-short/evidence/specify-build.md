@@ -1,10 +1,10 @@
 ---
 form: specify-build
-reopened: "2026-08-24T15:55:40.940Z — The existing signed form did not contain a seedable chunk drawing, leaving the declared build submachine unseeded."
+reopened: 2026-08-24T15:55:40.940Z — The existing signed form did not contain a seedable chunk drawing, leaving the declared build submachine unseeded.
 by: agent
 signed_off: 2026-08-24T16:14:13.243Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / specify-build

@@ -4,7 +4,7 @@ judgment: passed at 2026-08-23T17:51:28.957Z
 by: agent
 signed_off: 2026-08-23T17:51:26.860Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / spawn-for-architecture

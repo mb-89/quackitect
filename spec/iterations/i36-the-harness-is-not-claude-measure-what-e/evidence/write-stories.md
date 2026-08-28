@@ -2,9 +2,9 @@
 form: write-stories
 by: agent
 signed_off: 2026-08-19T09:48:24.980Z
-reopened: "2026-08-19T09:47:43.078Z — Four quality-specific stories were removed; i36 story evidence now contains only genuine user journeys."
+reopened: 2026-08-19T09:47:43.078Z — Four quality-specific stories were removed; i36 story evidence now contains only genuine user journeys.
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / write-stories

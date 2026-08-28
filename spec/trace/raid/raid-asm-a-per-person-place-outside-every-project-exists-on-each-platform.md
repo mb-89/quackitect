@@ -3,13 +3,13 @@ minted_in: i9
 type: "[[raid]]"
 id: raid-asm-a-per-person-place-outside-every-project-exists-on-each-platform
 kind: assumption
-statement: "Every platform this system runs on is assumed to give one writable place that belongs to the person rather than to any project, which survives between sessions and which no checkout can reach into."
+statement: Every platform this system runs on is assumed to give one writable place that belongs to the person rather than to any project, which survives between sessions and which no checkout can reach into.
 owner: the driving agent
-trigger: "the first time this system runs on a platform nobody has tried. Its first trigger, before the consent record is designed, fell away with that record on 2026-08-19."
+trigger: the first time this system runs on a platform nobody has tried. Its first trigger, before the consent record is designed, fell away with that record on 2026-08-19.
 status: closed
 probe: "holds on Windows, unprobed elsewhere. The probe this entry asked for was run in its own words - a directory was created outside every project, written, read back byte-identical, and removed. Three of the four properties hold here: it exists, it is writable without ceremony, and no checkout reaches it by path. Survival across a product update was not exercised. POSIX is unprobed for the plain reason that this machine is Windows, which says nothing at all about a POSIX host. The ephemeral host is untouched and is the sharp corner - a machine created for one run and destroyed has nothing that survives between sessions, by construction."
 probed: 2026-08-19
-impact: "NOTHING RESTS ON THIS ANY MORE. It was minted because the consent row demanded a record kept outside the folder it is about, and the owner struck that record on 2026-08-19. The probe result is kept because it cost real work and answers a question this system will ask again, not because anything standing needs it."
+impact: NOTHING RESTS ON THIS ANY MORE. It was minted because the consent row demanded a record kept outside the folder it is about, and the owner struck that record on 2026-08-19. The probe result is kept because it cost real work and answers a question this system will ask again, not because anything standing needs it.
 breaks_how_badly: corrosive
 how_likely: plausible
 source_refs:

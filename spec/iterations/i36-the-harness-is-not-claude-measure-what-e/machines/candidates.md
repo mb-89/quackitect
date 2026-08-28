@@ -1,11 +1,11 @@
 ---
 steps:
   - id: the-adopted-baseline-refined
-    statement: "compose cand-a-the-adopted-baseline-refined - the seams, the rough costs, and what it leans on"
+    statement: compose cand-a-the-adopted-baseline-refined - the seams, the rough costs, and what it leans on
     depends_on: []
     realization: document
   - id: the-trimmed-spread
-    statement: "compose cand-b-the-trimmed-spread - the seams, the rough costs, and what it leans on"
+    statement: compose cand-b-the-trimmed-spread - the seams, the rough costs, and what it leans on
     depends_on: []
     realization: document
 ---

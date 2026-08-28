@@ -3,19 +3,19 @@ minted_in: i9
 type: "[[raid]]"
 id: raid-asm-first-time-readers-can-be-found-and-are-the-people-the-row-means
 kind: assumption
-statement: "People who have never seen this product are assumed to be findable in enough number to measure against, and to behave like the newcomer the discoverability row is written about."
+statement: People who have never seen this product are assumed to be findable in enough number to measure against, and to behave like the newcomer the discoverability row is written about.
 owner: the driving agent
-trigger: "before the discoverability row is verified, and again whenever its numbers are quoted as though they had been observed"
+trigger: before the discoverability row is verified, and again whenever its numbers are quoted as though they had been observed
 status: open
 probed: 2026-08-19
-probe: "asked and answered on 2026-08-19, and the answer goes against the assumption rather than for it. About four people have seen this product, and the owner is keeping it near that number deliberately - wider word of it would cost them time with people who would discuss it rather than use it. Two things follow. The population is roughly four, which cannot carry a two-in-three measure. And every one of those four has ALREADY SEEN IT, which is precisely what disqualifies a first-time reader, so the usable population is nearer zero than four. The row's measure is therefore not verifiable as written, and that is a standing choice rather than an oversight. Its numbers stay marked as a chosen bar everywhere they appear."
-impact: "One requirement's pass line cannot be read at all without them. Quoting its numbers without having watched anybody would turn a chosen bar into a fabricated measurement, which is the exact failure the authoring method names."
+probe: asked and answered on 2026-08-19, and the answer goes against the assumption rather than for it. About four people have seen this product, and the owner is keeping it near that number deliberately - wider word of it would cost them time with people who would discuss it rather than use it. Two things follow. The population is roughly four, which cannot carry a two-in-three measure. And every one of those four has ALREADY SEEN IT, which is precisely what disqualifies a first-time reader, so the usable population is nearer zero than four. The row's measure is therefore not verifiable as written, and that is a standing choice rather than an oversight. Its numbers stay marked as a chosen bar everywhere they appear.
+impact: One requirement's pass line cannot be read at all without them. Quoting its numbers without having watched anybody would turn a chosen bar into a fabricated measurement, which is the exact failure the authoring method names.
 breaks_how_badly: abrasive
 how_likely: expected
 source_refs:
   - req-the-folder-shows-what-to-run
-  - "reports/rpt-ramp-up.md, whose population claims have stood at zero observations since i1"
-  - "meth-requirement-authoring, on population measures for a hard-to-measure quality"
+  - reports/rpt-ramp-up.md, whose population claims have stood at zero observations since i1
+  - meth-requirement-authoring, on population measures for a hard-to-measure quality
 ---
 
 ## What is being assumed

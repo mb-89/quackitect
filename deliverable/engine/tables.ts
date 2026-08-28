@@ -18,12 +18,13 @@
 // and no export. Obsidian cannot open a pivot view, which is fine — dropping
 // Obsidian is why this file exists.
 import { readdirSync, readFileSync, writeFileSync } from "node:fs";
-import { basename, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
+import { basename, dirname, join, relative, resolve, sep } from "node:path";
 import { parse } from "yaml";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { compare, evalExpr, passes } from "./expr.ts";
 import { coerce, kindOf, readKeys, setKeys } from "./frontmatter.ts";
 import { parseStateNote } from "./notes.ts";
+import { isInside } from "./paths.ts";
 
 const SRC = "engine/tables.ts";
 
@@ -772,8 +773,9 @@ export interface CellWritten {
 function notePath(root: string, rel: string): string {
   const dir = vaultDir(root);
   const abs = resolve(dir, rel);
-  const back = relative(dir, abs);
-  if (!rel.endsWith(".md") || back.startsWith("..") || isAbsolute(back)) {
+  // INSIDE THE VAULT, the vault itself included, which is where this differs
+  // from the bench guard. Both ask the path jail's own predicate now.
+  if (!rel.endsWith(".md") || !isInside(dir, abs)) {
     throw new Rejection({
       clause: CLAUSES.REQUIRED_ARGS,
       expected: "a markdown note inside the vault",

@@ -1,10 +1,10 @@
 ---
 form: build-steps
-reopened: "2026-08-24T16:44:50.874Z — Parent drawing completion is blocked by the machine claim guard."
+reopened: 2026-08-24T16:44:50.874Z — Parent drawing completion is blocked by the machine claim guard.
 by: agent
 signed_off: 2026-08-24T17:55:38.569Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / build-steps

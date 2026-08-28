@@ -18,6 +18,9 @@ source_refs:
   - "measured 2026-08-24: 36 of 48 aims ran past five seconds and 28 ran past fifteen, against a proposed budget of a twentieth of a second per hop"
 weighs_with:
   - req-a-clear-jump-is-one-call ! — this one bounds a BARE aim, that one bounds an aim that also asks to go; the two forms are separate acts and each keeps its own bound
+  - req-call-answers-in-one-second ! — that puts a wall-clock bound on every admitted call; this says the aim's cost must not GROW WITH DISTANCE, which is a shape claim and not a bound
+  - req-responsiveness ! — same ground against the budget table; a fixed duration cannot express that a cost is independent of how far away the target is
+  - req-surface-answers-in-one-second ! — one is the walk's aim inside the engine, the other a person's render at the mirror; different boundaries
 ---
 
 ## Scenario

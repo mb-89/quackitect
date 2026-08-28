@@ -2,7 +2,7 @@
 minted_in: i37-training-iterations-a-disposable-iterati
 id: uc-walk-an-iteration-from-a-tree-that-cannot-see-its-future
 type: "[[use-case]]"
-statement: "Walk an iteration from a tree that cannot see its own future."
+statement: Walk an iteration from a tree that cannot see its own future.
 actor: stk-agent
 trigger: the agent is bound to a benchmark run
 precondition: a throwaway tree stands at the commit before the walked iteration started

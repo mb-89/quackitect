@@ -1,7 +1,7 @@
 ---
 kind: matrix-row
 name: graft-onto-the-winner
-statement: "Take what each loser does better, try it on the winner one at a time, and re-score whatever moved."
+statement: Take what each loser does better, try it on the winner one at a time, and re-score whatever moved.
 state_kind: work
 filled_by: agent
 depends_on:

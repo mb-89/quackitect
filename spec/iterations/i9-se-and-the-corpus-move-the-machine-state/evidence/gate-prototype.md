@@ -1,11 +1,11 @@
 ---
 form: gate-prototype
-amended: "2026-08-19T19:26:49.960Z by agent — three unprobed assumptions were probed and the survivors were read, so both of this gate's dissents have answers"
+amended: 2026-08-19T19:26:49.960Z by agent — three unprobed assumptions were probed and the survivors were read, so both of this gate's dissents have answers
 bless: blessed by human
 by: agent
 signed_off: 2026-08-19T19:11:44.107Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / gate-prototype

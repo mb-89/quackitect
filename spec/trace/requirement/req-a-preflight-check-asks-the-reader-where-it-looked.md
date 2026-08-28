@@ -17,6 +17,8 @@ source_refs:
   - "engine/bin/preflight.ts: the palette and brand checks join their own path from root"
   - "note-13b3b5ae5a93: the comment above the fallback claims preflight guards it"
 priority: should
+weighs_with:
+  - req-what-the-corpus-is-has-one-answer ! — one counts how many places hold a configuration PATH, the other asks whether two readers agree about a node's CONTENT; a single path read by two disagreeing readers satisfies one and fails the other
 ---
 
 ## Scenario

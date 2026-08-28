@@ -3,7 +3,7 @@ form: the-registration-takes-the-live-end
 by: agent
 signed_off: 2026-08-24T16:29:40.170Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / the-registration-takes-the-live-end

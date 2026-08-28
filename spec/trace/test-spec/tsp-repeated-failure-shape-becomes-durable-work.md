@@ -3,9 +3,9 @@ minted_in: i36
 id: tsp-repeated-failure-shape-becomes-durable-work
 type: "[[test-spec]]"
 statement: A non-misuse failure shape that recurs across lane calls inside an open iteration window lands as iteration evidence or as a RAID entry carrying an owner and a trigger, rather than being absorbed call by call.
-method: "test"
+method: test
 verifies:
-  - "req-repeated-failure-shape-becomes-durable-work"
+  - req-repeated-failure-shape-becomes-durable-work
 files:
   - tests/bucket.test.ts
   - tests/pool-mint.test.ts

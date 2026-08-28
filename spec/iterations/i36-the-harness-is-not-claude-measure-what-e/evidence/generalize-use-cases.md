@@ -2,9 +2,9 @@
 form: generalize-use-cases
 by: agent
 signed_off: 2026-08-19T09:49:48.292Z
-reopened: "2026-08-19T09:49:32.918Z — Two freely authored quality use cases were removed; i36 use-case evidence now contains only genuine journey generalizations."
+reopened: 2026-08-19T09:49:32.918Z — Two freely authored quality use cases were removed; i36 use-case evidence now contains only genuine journey generalizations.
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / generalize-use-cases

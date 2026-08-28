@@ -6,7 +6,7 @@ statement: Delete the second corpus reader instead of making it agree, having th
 cluster: the-query
 question: how callers come to agree about the corpus
 found_by: probe
-source: "probe P4 at M4, 2026-08-19 — one loadTrace definition, twenty callers through it, and one live function that walks the corpus itself"
+source: probe P4 at M4, 2026-08-19 — one loadTrace definition, twenty callers through it, and one live function that walks the corpus itself
 ---
 
 ## What the probe measured

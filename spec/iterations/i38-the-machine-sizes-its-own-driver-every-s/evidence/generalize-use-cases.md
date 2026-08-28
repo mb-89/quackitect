@@ -4,7 +4,7 @@ by: agent
 signed_off: 2026-08-20T19:36:34.056Z
 reopened: "2026-08-20T19:36:32.296Z — this form's follow-up still records the second wrong version of extension 6a as the current one. It has since been corrected a third time: the reader acts by delegating, and the pass now carries a step and an extension for it."
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / generalize-use-cases

@@ -333,3 +333,65 @@ test("a judgment started outside the walk still enters the account", async () =>
     rmSync(lab, { recursive: true, force: true });
   }
 });
+
+/** A scripts surface whose host carries the standing judgment this case wants.
+ *  The fixture above hardcodes none, and none is one of the three answers. */
+function scriptsStanding(judgment: { verdict: string; stamp: string } | undefined): {
+  scripts: Scripts;
+  machine: MachineDecl;
+  state: StateDecl;
+} {
+  const state = { id: "verification", exit: { script: ["check.ts"] } } as unknown as StateDecl;
+  const machine = { id: "i54", states: [state] } as unknown as MachineDecl;
+  const host = {
+    workRoot: () => ".",
+    machineRoot: () => ".",
+    assertStanding: () => {},
+    leaves: () => ({ machine, ids: [state.id] }),
+    state: () => state,
+    notifyChange: () => {},
+    recordVerdict: () => {},
+    standingJudgment: () => judgment,
+    evidence: new Map<string, Record<string, unknown>>(),
+  } as unknown as ScriptHost;
+  return { scripts: new Scripts(host), machine, state };
+}
+
+// TWO READERS OF ONE TRUTH, AND THEY HAVE TO READ THE SAME STORE.
+//
+// The runner skips a re-run when the standing judgment ON DISK passed against
+// these same scripts. The checker asked only the IN-MEMORY evidence, which a
+// reload empties. So a re-entered record could not leave ANY state whose exit
+// carries a script: the runner said nothing needed running and the checker said
+// nothing had run, forever.
+//
+// MEASURED on the walk that found it: fourteen script-carrying hops, each
+// refused with `not run yet` while the script exited 0 when run by hand, and
+// `se_why` reported the state standing with no blockers.
+test("a passed judgment on disk answers the checker, not only the runner", () => {
+  const { scripts, machine, state } = scriptsStanding({ verdict: "passed", stamp: "check.ts@gone" });
+  assert.equal(
+    scripts.scriptPassedOnDisk(machine, state),
+    true,
+    "a verdict that outlived the process still covers the hop, or a reloaded session can never leave this state",
+  );
+});
+
+// AND IT CANNOT GREEN A STALE ONE. The stamp is the whole guard: a verdict
+// reached against different scripts is a verdict about a different question.
+test("a judgment reached against different scripts does not answer for these", () => {
+  const { scripts, machine, state } = scriptsStanding({ verdict: "passed", stamp: "check.ts@0000" });
+  assert.equal(scripts.scriptPassedOnDisk(machine, state), false, "a different stamp is a different question and re-runs");
+  const none = scriptsStanding(undefined);
+  assert.equal(none.scripts.scriptPassedOnDisk(none.machine, none.state), false, "and no judgment at all leans on nothing");
+});
+
+// THE CHECKER MUST ACTUALLY ASK. Deleting the one line restores the pin with
+// both cases above still passing, which is the regression this catches.
+test("the condition checker asks the runner's own question", () => {
+  assert.match(
+    source("session.ts"),
+    /key === "script"[\s\S]{0,240}scriptPassedOnDisk/,
+    "conditionKeyMet reads the in-memory evidence alone again, so a reloaded session cannot leave a script-carrying state",
+  );
+});

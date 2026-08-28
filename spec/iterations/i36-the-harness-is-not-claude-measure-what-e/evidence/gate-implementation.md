@@ -1,11 +1,11 @@
 ---
 form: gate-implementation
-amended: "2026-08-19T18:25:52.035Z by agent — Two must requirements compute a result that reaches no surface, so a clean pass overstates what shipped; the gap is now carried as owner-accepted debt."
+amended: 2026-08-19T18:25:52.035Z by agent — Two must requirements compute a result that reaches no surface, so a clean pass overstates what shipped; the gap is now carried as owner-accepted debt.
 bless: blessed by human
 by: agent
 signed_off: 2026-08-19T18:08:20.749Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / gate-implementation

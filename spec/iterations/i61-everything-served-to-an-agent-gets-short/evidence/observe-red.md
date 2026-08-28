@@ -1,11 +1,11 @@
 ---
 form: observe-red
-reopened: "2026-08-24T15:52:32.024Z — The re-signed build specification invalidated this earlier checkpoint, so it must re-earn its red observation."
+reopened: 2026-08-24T15:52:32.024Z — The re-signed build specification invalidated this earlier checkpoint, so it must re-earn its red observation.
 judgment: passed at 2026-08-24T15:48:52.830Z
 by: agent
 signed_off: 2026-08-24T16:14:25.554Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / observe-red

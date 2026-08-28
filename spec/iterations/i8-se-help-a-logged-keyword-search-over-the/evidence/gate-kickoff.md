@@ -3,9 +3,9 @@ form: gate-kickoff
 bless: blessed by agent
 by: agent
 signed_off: 2026-08-12T20:43:18.685Z
-reopened: "2026-08-12T20:42:45.065Z — Pinned change_size=patch despite the form choosing minor, due to a substring-order bug in kickoffSizeFromForm (engine/session.ts:4851-4852, see note-ee44c2873e55).…"
+reopened: 2026-08-12T20:42:45.065Z — Pinned change_size=patch despite the form choosing minor, due to a substring-order bug in kickoffSizeFromForm (engine/session.ts:4851-4852, see note-ee44c2873e55).…
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / gate-kickoff

@@ -4,6 +4,7 @@ id: flow-wait-bound
 type: "[[flow]]"
 statement: how long a wait will wait before it stops waiting, and whether that figure was measured or defaulted
 kind: signal
+crosses: in
 source_refs:
   - req-every-wait-declares-a-bound-and-expiry-acts
   - fn-run-a-governed-walk.bound-a-wait

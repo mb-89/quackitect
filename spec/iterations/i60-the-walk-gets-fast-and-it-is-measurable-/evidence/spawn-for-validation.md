@@ -1,11 +1,11 @@
 ---
 form: spawn-for-validation
-amended: "2026-08-24T19:54:47.101Z by agent — the shortfall this form told the phase to carry was measured against the wrong half of the hop and has been refuted"
+amended: 2026-08-24T19:54:47.101Z by agent — the shortfall this form told the phase to carry was measured against the wrong half of the hop and has been refuted
 judgment: passed at 2026-08-24T19:31:57.964Z
 by: agent
 signed_off: 2026-08-24T19:30:44.673Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / spawn-for-validation

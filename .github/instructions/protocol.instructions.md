@@ -1,7 +1,7 @@
 ---
 name: protocol
 description: Generated from guidance/. Edit those files, never this one.
-applyTo: '**'
+applyTo: "**"
 ---
 
 <!-- GENERATED at agent start. Do not edit — the next start overwrites it.

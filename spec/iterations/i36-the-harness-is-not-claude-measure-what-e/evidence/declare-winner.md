@@ -3,7 +3,7 @@ form: declare-winner
 by: agent
 signed_off: 2026-08-19T12:51:50.532Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / declare-winner

@@ -4,6 +4,7 @@ id: flow-settled-entry
 type: "[[flow]]"
 statement: a piece of work marked finished, carrying its outcome and which of the two ways of noticing settled it
 kind: material
+crosses: out
 source_refs:
   - req-a-run-closes-its-own-entry-when-its-process-exits
   - req-settling-an-entry-is-idempotent-and-the-first-outcome-stands

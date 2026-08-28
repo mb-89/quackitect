@@ -6,7 +6,7 @@ statement: An agent leaving a state whose leaving check runs a long program gets
 method: demonstration
 demonstrates:
   - sty-the-step-that-hands-the-walk-back
-verifies: "none — demonstrates carries the edge; req-a-leaving-check-does-not-hold-the-call is verify method test and is carried by the test-method specs beside it"
+verifies: none — demonstrates carries the edge; req-a-leaving-check-does-not-hold-the-call is verify method test and is carried by the test-method specs beside it
 files:
   - none — the procedure below is the definition, because the pass is what the agent's only verb does while a program runs
 ---

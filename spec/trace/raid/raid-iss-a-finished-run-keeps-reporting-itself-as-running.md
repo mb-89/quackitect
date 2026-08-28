@@ -3,12 +3,12 @@ minted_in: i62-background-work-reports-its-own-end-the-
 id: raid-iss-a-finished-run-keeps-reporting-itself-as-running
 type: "[[raid]]"
 kind: issue
-statement: "A background run whose process has exited keeps its entry marked running, so the work account reports processes that no longer exist."
+statement: A background run whose process has exited keeps its entry marked running, so the work account reports processes that no longer exist.
 owner: the maintainer
-trigger: "any walk held at a leaving judgment, and any account listing an entry running longer than the work it describes could take"
+trigger: any walk held at a leaving judgment, and any account listing an entry running longer than the work it describes could take
 status: closed
 looked: 2026-08-24
-impact: "A leaving judgment reads as still deciding while such an entry stands, so the walk stops at the step that owns it. The walk cannot be resumed by anything the agent does, because nothing it can call changes the entry."
+impact: A leaving judgment reads as still deciding while such an entry stands, so the walk stops at the step that owns it. The walk cannot be resumed by anything the agent does, because nothing it can call changes the entry.
 breaks_how_badly: crippling
 how_likely: expected
 source_refs:

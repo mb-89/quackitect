@@ -4,9 +4,9 @@ id: opt-the-mapping-is-checked-for-totality-when-the-machine-compiles
 type: "[[option]]"
 cluster: the-sizing
 question: what happens when no rung matches
-statement: "every difficulty the matrix can produce is checked against the mapping when the machine compiles, so a record whose mapping has a hole refuses to start rather than reaching the hole halfway through a walk"
+statement: every difficulty the matrix can produce is checked against the mapping when the machine compiles, so a record whose mapping has a hole refuses to start rather than reaching the hole halfway through a walk
 found_by: prior-art
-source: "compile-time totality checking, the standard treatment of a partial function in typed languages, and Nix's build-time feature resolution which fails the evaluation rather than the build — commissioned deep scan, 2026-08-20"
+source: compile-time totality checking, the standard treatment of a partial function in typed languages, and Nix's build-time feature resolution which fails the evaluation rather than the build — commissioned deep scan, 2026-08-20
 ---
 
 ## Mechanism

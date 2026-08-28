@@ -1,6 +1,6 @@
 ---
 id: retro-2026-08-25-milestones
-statement: "The milestone walk for the three iterations that closed in this window, with per-step cost and what would remove it."
+statement: The milestone walk for the three iterations that closed in this window, with per-step cost and what would remove it.
 ---
 
 # Milestone table — the window opening 2026-08-24T14:23:57Z

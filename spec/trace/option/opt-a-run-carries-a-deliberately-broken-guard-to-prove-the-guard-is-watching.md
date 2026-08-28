@@ -5,8 +5,8 @@ type: "[[option]]"
 cluster: cluster-the-benchmark-run
 question: how a run proves its own guard held
 found_by: transform
-statement: "One request that must be refused is issued on purpose during every run, and a run whose forbidden request succeeded is discarded rather than reported."
-source: "SCAMPER \u2014 Reverse, applied to the ceiling: instead of asking whether the guard held, make the run prove it by trying something that must fail"
+statement: One request that must be refused is issued on purpose during every run, and a run whose forbidden request succeeded is discarded rather than reported.
+source: "SCAMPER — Reverse, applied to the ceiling: instead of asking whether the guard held, make the run prove it by trying something that must fail"
 ---
 
 ## What it answers

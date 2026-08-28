@@ -1,11 +1,11 @@
 ---
 form: spawn-for-prototype
-reopened: "2026-08-23T18:39:14.930Z — gate-architecture was re-signed after it, so it answered older ground"
+reopened: 2026-08-23T18:39:14.930Z — gate-architecture was re-signed after it, so it answered older ground
 judgment: passed at 2026-08-23T18:24:23.518Z
 by: agent
 signed_off: 2026-08-23T18:39:22.817Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / spawn-for-prototype

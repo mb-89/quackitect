@@ -3,17 +3,17 @@ minted_in: i9
 type: "[[raid]]"
 id: raid-iss-the-consent-line-reads-a-clone-as-though-the-opener-had-consented
 kind: issue
-statement: "This iteration ruled that seeding a folder IS the person's consent, and that inside a seeded folder setup happens without asking again. A folder that arrived by clone was seeded by somebody else, so the rule treats one person's decision as another person's consent."
+statement: This iteration ruled that seeding a folder IS the person's consent, and that inside a seeded folder setup happens without asking again. A folder that arrived by clone was seeded by somebody else, so the rule treats one person's decision as another person's consent.
 owner: the driving agent
-trigger: "the first time anyone opens a checkout they did not create, which includes every second machine this project already runs on"
+trigger: the first time anyone opens a checkout they did not create, which includes every second machine this project already runs on
 status: superseded
-impact: "The rule as written would let a tree decide how it is treated, on the strength of an act performed by whoever built the tree. The cage list is a committed file, so it travels in the clone."
+impact: The rule as written would let a tree decide how it is treated, on the strength of an act performed by whoever built the tree. The cage list is a committed file, so it travels in the clone.
 breaks_how_badly: corrosive
 how_likely: expected
 source_refs:
   - "i9 draft-vision, the ruling in its own words: convenience inside a project, consent at its edge, and a folder that IS a project was seeded deliberately, and that act is the consent"
   - "direnv man page: the allow mechanism exists so that any git repo you pull, or tar archive you unpack, cannot act on you when you enter it — and the allow record is kept in the user's data directory, not in the tree"
-  - "VS Code workspace trust documentation, naming committed task definitions as the vector and answering with Restricted Mode rather than with a file in the tree"
+  - VS Code workspace trust documentation, naming committed task definitions as the vector and answering with Restricted Mode rather than with a file in the tree
   - "git safe.directory: by default git refuses to parse the config of a repository owned by someone else, let alone run its hooks"
   - "uc-arrive-on-an-unattended-machine step 1: the host reads the COMMITTED root settings before the agent reads anything"
 ---

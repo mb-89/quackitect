@@ -1,6 +1,6 @@
 ---
 form: draft-vision
-reopened: "2026-08-19T17:14:03.340Z — forcing this session's claims tracking to register draft-vision as done - route() treats it as an unmet upstream feeder of define-actual/log-risks despite the file being signed, blocking all forward progress"
+reopened: 2026-08-19T17:14:03.340Z — forcing this session's claims tracking to register draft-vision as done - route() treats it as an unmet upstream feeder of define-actual/log-risks despite the file being signed, blocking all forward progress
 amended: 2026-08-16T16:31:22.497Z by agent — ref "main" resolves — verified 2026-08-16; one of the two carried-forward raid entries is now closed
 by: agent
 signed_off: 2026-08-19T17:14:18.612Z

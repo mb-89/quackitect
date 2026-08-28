@@ -5,8 +5,8 @@ type: "[[option]]"
 cluster: cluster-the-benchmark-run
 question: how the walked iteration's future is put out of reach
 found_by: contradiction
-statement: "History is bounded by one ancestry test at the moment a run binds, so no verb needs its own rule and nothing has to enumerate what to hide."
-source: "separation in TIME \u2014 the contradiction between hiding history and letting an agent read history dissolves once the boundary is a moment rather than a set"
+statement: History is bounded by one ancestry test at the moment a run binds, so no verb needs its own rule and nothing has to enumerate what to hide.
+source: separation in TIME — the contradiction between hiding history and letting an agent read history dissolves once the boundary is a moment rather than a set
 ---
 
 ## The contradiction it breaks

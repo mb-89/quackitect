@@ -3,7 +3,7 @@ form: the-view-model
 by: agent
 signed_off: 2026-08-23T19:09:20.403Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / the-view-model

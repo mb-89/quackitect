@@ -2,9 +2,9 @@
 form: declare-winner
 by: agent
 signed_off: 2026-08-20T08:26:09.124Z
-reopened: "2026-08-20T08:26:05.978Z — a feeder re-signed above it"
+reopened: 2026-08-20T08:26:05.978Z — a feeder re-signed above it
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / declare-winner

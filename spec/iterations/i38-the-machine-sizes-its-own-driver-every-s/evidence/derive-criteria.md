@@ -2,9 +2,9 @@
 form: derive-criteria
 by: agent
 signed_off: 2026-08-20T19:38:44.367Z
-reopened: "2026-08-20T19:38:32.781Z — generalize-use-cases was re-signed with the third correction to the acting party. Re-read against that."
+reopened: 2026-08-20T19:38:32.781Z — generalize-use-cases was re-signed with the third correction to the acting party. Re-read against that.
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / derive-criteria

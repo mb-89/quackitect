@@ -3,11 +3,11 @@ minted_in: i60-the-walk-gets-fast-and-it-is-measurable-
 id: raid-iss-the-surface-row-has-no-harness-that-could-fail-it
 type: "[[raid]]"
 kind: issue
-statement: "A requirement demanding that a surface answers no worse while the engine is busy has no check that could ever fail it, because nothing can hold an engine call while timing surface requests beside it."
+statement: A requirement demanding that a surface answers no worse while the engine is busy has no check that could ever fail it, because nothing can hold an engine call while timing surface requests beside it.
 owner: the driving agent
 trigger: it has happened, and it was found at the state that observes reds
 status: open
-impact: "The row reads as verified because a spec names it, and no case exists that could go red. That is worse than an unverified row, because the trace looks complete."
+impact: The row reads as verified because a spec names it, and no case exists that could go red. That is worse than an unverified row, because the trace looks complete.
 breaks_how_badly: corrosive
 how_likely: expected
 source_refs:

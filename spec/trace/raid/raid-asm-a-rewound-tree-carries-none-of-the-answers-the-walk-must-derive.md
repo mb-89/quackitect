@@ -3,14 +3,14 @@ minted_in: i37-training-iterations-a-disposable-iterati
 id: raid-asm-a-rewound-tree-carries-none-of-the-answers-the-walk-must-derive
 type: "[[raid]]"
 kind: assumption
-statement: "At the commit before an iteration started, none of the requirements, decisions or experiments that iteration went on to produce exist in the tree, so a re-walk cannot read its own answers."
+statement: At the commit before an iteration started, none of the requirements, decisions or experiments that iteration went on to produce exist in the tree, so a re-walk cannot read its own answers.
 owner: the maintainer of the machine
 trigger: the first benchmark run whose report shows a state finishing far faster than every other state
 status: open
-impact: "If the assumption is false, the rewind is not a mask and the whole design rests on a filter that was struck. Every number taken before the discovery is contaminated and cannot be re-derived."
+impact: If the assumption is false, the rewind is not a mask and the whole design rests on a filter that was struck. Every number taken before the discovery is contaminated and cannot be re-derived.
 breaks_how_badly: fatal
 how_likely: conceivable
-probe: "HOLDS, both halves probed 2026-08-19. THE INPUT HALF — the i33 record at 5f85977f^ stands with status seeded, carrying goal, vision and inputs and no pin. THE OUTPUT HALF — a search of spec/trace at that same ref for i33 returns 0 files, against 60 today. CONTROL — the same search for i15 at the same ref returns 123 matches across 10 files, so the zero is a real zero rather than a search that did not run."
+probe: HOLDS, both halves probed 2026-08-19. THE INPUT HALF — the i33 record at 5f85977f^ stands with status seeded, carrying goal, vision and inputs and no pin. THE OUTPUT HALF — a search of spec/trace at that same ref for i33 returns 0 files, against 60 today. CONTROL — the same search for i15 at the same ref returns 123 matches across 10 files, so the zero is a real zero rather than a search that did not run.
 probed: 2026-08-19
 source_refs:
   - training-iterations

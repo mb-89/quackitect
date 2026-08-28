@@ -1,11 +1,11 @@
 ---
 form: rank-unknowns
-reopened: "2026-08-23T18:40:17.341Z — spawn-for-prototype was re-signed after it"
+reopened: 2026-08-23T18:40:17.341Z — spawn-for-prototype was re-signed after it
 judgment: passed at 2026-08-23T18:27:31.611Z
 by: agent
 signed_off: 2026-08-23T18:40:27.218Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / rank-unknowns

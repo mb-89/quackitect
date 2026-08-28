@@ -5,8 +5,8 @@ type: "[[requirement]]"
 statement: When a walk attempt starts a state's leaving check, the product shall answer that attempt without waiting for the check to finish.
 kind: functional
 verify_method: test
-measure: "the answering call returns in under 1 second, on every leaving check, whatever the check's own duration"
-breaks_if_removed: "The walker's only verb is held for the check's whole duration, and where that outlives the caller's own limit the caller is told the work failed while it was still moving."
+measure: the answering call returns in under 1 second, on every leaving check, whatever the check's own duration
+breaks_if_removed: The walker's only verb is held for the check's whole duration, and where that outlives the caller's own limit the caller is told the work failed while it was still moving.
 breaks_how_badly: crippling
 priority: must
 refines:

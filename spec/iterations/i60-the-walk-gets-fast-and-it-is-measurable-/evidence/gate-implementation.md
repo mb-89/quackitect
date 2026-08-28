@@ -3,9 +3,9 @@ form: gate-implementation
 bless: blessed by agent
 by: agent
 signed_off: 2026-08-24T19:28:39.131Z
-amended: "2026-08-24T19:54:31.680Z by agent — this verdict compared the whole hop against a budget that binds only the flip, and the flip has since been measured at 20 ms"
+amended: 2026-08-24T19:54:31.680Z by agent — this verdict compared the whole hop against a budget that binds only the flip, and the flip has since been measured at 20 ms
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / gate-implementation

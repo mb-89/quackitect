@@ -2,11 +2,12 @@
 //
 import { createHash } from "node:crypto";
 import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
-import { isAbsolute, join, relative, resolve } from "node:path";
+import { join } from "node:path";
 import { controlFilesPresent } from "./benchmark-guard.ts";
 import { CONDITIONS, conditionsStampDirs, reportProblems } from "./benchmark-report.ts";
 import { git } from "./gitlane.ts";
 import { noteOf } from "./notes.ts";
+import { isInside } from "./paths.ts";
 import { SE_VERSION } from "./version.ts";
 
 export interface BenchmarkRun {
@@ -193,9 +194,10 @@ function olderNeighbour(root: string, iteration: string): string | undefined {
 /** A path this run made, under `<root>/.se/bench`. Anything else is not ours
  *  to delete, however the binding on disk describes it. */
 function ownTree(root: string, tree: string): boolean {
-  const home = resolve(join(root, ".se", "bench"));
-  const rel = relative(home, resolve(tree));
-  return rel !== "" && !rel.startsWith("..") && !isAbsolute(rel);
+  // STRICTLY UNDER, never the home itself. This guards a recursive delete, and
+  // the home holds every bench rather than one. The predicate is the path
+  // jail's; only the self argument differs, and it differs on purpose.
+  return isInside(join(root, ".se", "bench"), tree, false);
 }
 
 /** Every iteration the archive marks shipped — the pool a run draws from. */

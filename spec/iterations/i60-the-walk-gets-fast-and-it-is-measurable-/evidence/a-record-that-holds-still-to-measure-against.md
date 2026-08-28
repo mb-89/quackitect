@@ -1,10 +1,10 @@
 ---
 form: a-record-that-holds-still-to-measure-against
-amended: "2026-08-24T20:00:24.227Z by agent — the cold figures this form measured on its first use have since fallen by a factor of five, and the yardstick is what proved it"
+amended: 2026-08-24T20:00:24.227Z by agent — the cold figures this form measured on its first use have since fallen by a factor of five, and the yardstick is what proved it
 by: agent
 signed_off: 2026-08-24T17:57:37.229Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / a-record-that-holds-still-to-measure-against

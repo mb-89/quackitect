@@ -6,7 +6,7 @@ statement: When the product is started against a folder whose network port is al
 kind: functional
 verify_method: test
 measure: "instances serving one folder at a time: at most one. Starts refused after the previous instance died: zero."
-breaks_if_removed: "Two instances write one call log and one machine-state folder, so neither log is the whole trail and a reader of either cannot tell that it is partial. It also breaks the reasoning that lets an instance settle a previous one's entries."
+breaks_if_removed: Two instances write one call log and one machine-state folder, so neither log is the whole trail and a reader of either cannot tell that it is partial. It also breaks the reasoning that lets an instance settle a previous one's entries.
 breaks_how_badly: corrosive
 priority: should
 refines:

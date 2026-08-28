@@ -3,15 +3,15 @@ minted_in: i9
 id: raid-iss-the-marker-cannot-be-committed-as-the-vision-describes-it
 type: "[[raid]]"
 kind: issue
-statement: "The iteration's marker plan cannot work as written, because git tracks files and never directories, so a folder whose every file is ignored appears in no clone."
+statement: The iteration's marker plan cannot work as written, because git tracks files and never directories, so a folder whose every file is ignored appears in no clone.
 owner: the driving agent
 status: superseded
-impact: "The headline outcome fails silently. A fresh clone finds no marker, and nothing says so, because the folder exists locally for whoever made it."
+impact: The headline outcome fails silently. A fresh clone finds no marker, and nothing says so, because the folder exists locally for whoever made it.
 breaks_how_badly: crippling
 how_likely: certain
 source_refs:
   - "the vision's own words: change .gitignore so the folder itself is tracked and its contents are ignored"
-  - "git FAQ, recommending a .gitignore inside the directory over a .gitkeep placeholder"
+  - git FAQ, recommending a .gitignore inside the directory over a .gitkeep placeholder
 ---
 
 ## What the vision asks for

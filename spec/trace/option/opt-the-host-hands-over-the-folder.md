@@ -6,7 +6,7 @@ statement: Take the product's root from whatever opened the system rather than s
 cluster: the-walk
 question: how the product's root is decided
 found_by: prior-art
-source: "VS Code docs/editing/workspaces/workspaces.md — a folder becomes a workspace by being opened and nothing else, and the product documents having no concept of a project at all"
+source: VS Code docs/editing/workspaces/workspaces.md — a folder becomes a workspace by being opened and nothing else, and the product documents having no concept of a project at all
 ---
 
 ## Mechanism

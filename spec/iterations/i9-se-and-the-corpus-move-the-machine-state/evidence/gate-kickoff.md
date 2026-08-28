@@ -3,9 +3,9 @@ form: gate-kickoff
 bless: blessed by agent
 by: agent
 signed_off: 2026-08-19T11:54:50.977Z
-reopened: "2026-08-19T11:53:12.890Z — The owner ruled the size up to major, and added a cleanup step after the move that stops for them."
+reopened: 2026-08-19T11:53:12.890Z — The owner ruled the size up to major, and added a cleanup step after the move that stops for them.
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / gate-kickoff

@@ -3,7 +3,7 @@ minted_in: i36
 id: raid-debt-harness-fallback-and-bounds-need-implementation-proof
 type: "[[raid]]"
 kind: debt
-looked: 2026-08-25
+looked: 2026-08-26
 statement: The research fallback and answer-bound changes are started but not yet proven on the live harness path.
 owner: the driving agent
 trigger: implementation begins after the motivation gate
@@ -58,3 +58,13 @@ with is a guess nobody is told about.
 
 That half now stands as its own work token, and the owner ruled on 2026-08-25
 that any host which does not know its limit measures it at start-up.
+
+## Swept 2026-08-26, at i54's closing retro: PARTLY EVIDENCED, still open
+
+THE BOUND HALF NOW HAS ONE REAL RUN BEHIND IT. A survey answer of 150,406 bytes was cut at 50,000, spilled to disk, and served back through the cursor the result carried. The reader followed it and reassembled the whole answer without loss.
+
+SO THE BOUND PATH IS NO LONGER UNEXERCISED. That is one run on one host, not a proof, and it is worth writing down because this entry previously had none.
+
+THE FALLBACK HALF IS UNTOUCHED. Nothing this window measured a host limit or took a fallback.
+
+RE-ACCEPTED, trigger unchanged.

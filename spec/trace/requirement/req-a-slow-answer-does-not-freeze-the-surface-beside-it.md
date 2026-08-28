@@ -18,6 +18,13 @@ source_refs:
   - raid-asm-the-slow-tail-and-the-undrawn-route-share-one-cause
 weighs_with:
   - req-surface-answers-in-one-second ! — that bounds a surface answering its OWN work, this bounds a surface answering while something ELSE is slow; a surface can satisfy that one alone and fail this one under load
+  - req-call-answers-in-one-second ! — that bounds one lane call's own time, this bounds a NEIGHBOUR still answering while a different request runs long; isolation is not latency
+  - req-responsiveness ! — that row is the budget table, a duration per kind of work; no duration states whether two requests interfere, which is all this row measures
+  - req-a-hop-of-the-walk-carries-its-own-time-budget ! — one bounds a transition inside the engine, this bounds what a second surface sees while that transition runs long
+  - req-a-target-that-cannot-be-reached-is-refused-quickly ! — one is about when an answer arrives, this is about whether anything else keeps answering meanwhile
+  - req-aiming-returns-before-the-walking-starts ! — one bounds an aim's own time, this bounds interference; a design can make aiming instant and still block every surface beside it
+weighs_against:
+  - req-tour-outlives-a-missing-highlight < — crippling outranks corrosive on the damage scale, which is the sort key this register declares; a tour that dies on one part teaches nothing further, while a frozen neighbour surface is a wait rather than a loss
 ---
 
 ## Scenario

@@ -3,7 +3,7 @@ form: re-signing-an-answer-knocks-down-what-rests-on-it
 by: agent
 signed_off: 2026-08-24T17:58:26.963Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / re-signing-an-answer-knocks-down-what-rests-on-it

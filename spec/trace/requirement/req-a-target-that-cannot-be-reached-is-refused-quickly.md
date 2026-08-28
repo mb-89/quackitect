@@ -16,6 +16,12 @@ source_refs:
   - raid-asm-the-slow-tail-and-the-undrawn-route-share-one-cause
   - raid-debt-the-route-drawer-reads-a-standing-as-a-boolean
   - "measured 2026-08-24: 42 of 418 pulls answered that nothing routed toward the target, and 15 of the 23 pulls past thirty seconds were among them"
+weighs_with:
+  - req-aiming-returns-before-the-walking-starts ! — that bounds the aim that SUCCEEDS, this bounds the answer that nothing routes at all; two outcomes of one call, and a design can be fast at one and slow at the other
+  - req-a-hop-of-the-walk-carries-its-own-time-budget ! — a hop is a transition that happens, this is a search that finds no transition to make; there is no hop here to bound
+  - req-call-answers-in-one-second ! — that is a wall-clock bound on any admitted call, this is a claim about the SHAPE of one search, that it expands each state at most once
+  - req-responsiveness ! — that row states durations, this row states that the search never revisits a state; a shape claim and a duration claim measure different things
+  - req-a-slow-answer-does-not-freeze-the-surface-beside-it ! — one is about when this answer arrives, the other about whether a neighbouring surface keeps answering meanwhile
 ---
 
 ## Scenario

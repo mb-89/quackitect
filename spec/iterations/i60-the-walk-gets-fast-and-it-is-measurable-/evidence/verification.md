@@ -1,12 +1,12 @@
 ---
 form: verification
-amended: "2026-08-24T20:01:20.031Z by agent — the suite count this form recorded is superseded, and the pugh case it called pre-existing has since been joined by the one that was owed"
+amended: 2026-08-24T20:01:20.031Z by agent — the suite count this form recorded is superseded, and the pugh case it called pre-existing has since been joined by the one that was owed
 by: agent
 signed_off: 2026-08-24T18:11:13.731Z
-reopened: "2026-08-24T18:03:14.375Z — Its claims list was signed against four chunks and eight now stand. The four added ones repaid the route-drawer debt, gave the pinned run its per-hop timings, and stopped the datum pick charging a candidate for axes nobody scored; a fourth is deliberately unbuilt. Three of them landed with no observed red, and a claims table that does not say so would read as verified work that nothing watched fail."
+reopened: 2026-08-24T18:03:14.375Z — Its claims list was signed against four chunks and eight now stand. The four added ones repaid the route-drawer debt, gave the pinned run its per-hop timings, and stopped the datum pick charging a candidate for axes nobody scored; a fourth is deliberately unbuilt. Three of them landed with no observed red, and a claims table that does not say so would read as verified work that nothing watched fail.
 judgment: passed at 2026-08-24T17:09:30.063Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / verification

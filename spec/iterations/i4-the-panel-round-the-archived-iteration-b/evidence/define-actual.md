@@ -1,10 +1,10 @@
 ---
 form: define-actual
-reopened: "2026-08-23T15:21:34.178Z — log-risks was re-signed after it, so define-actual answered older ground"
+reopened: 2026-08-23T15:21:34.178Z — log-risks was re-signed after it, so define-actual answered older ground
 by: agent
 signed_off: 2026-08-23T15:21:41.974Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / define-actual

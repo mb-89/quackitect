@@ -3,11 +3,11 @@ minted_in: i38-the-machine-sizes-its-own-driver-every-s
 id: raid-risk-a-relayed-judgment-is-filed-under-the-hand-that-relayed-it
 type: "[[raid]]"
 kind: risk
-statement: "A walker that carries a guide's answer back into a form files it under its own name, so the record shows the weak hand deciding what the strong hand decided."
+statement: A walker that carries a guide's answer back into a form files it under its own name, so the record shows the weak hand deciding what the strong hand decided.
 owner: the owner
-trigger: "the first walk where a step is delegated and the answer is typed into a form by the walker rather than filed by the guide"
+trigger: the first walk where a step is delegated and the answer is typed into a form by the walker rather than filed by the guide
 status: open
-impact: "The attribution coordinate reads as complete and is wrong in the direction that flatters the arrangement. A walk that leaned on a strong hand for every hard call looks like a walk a weak hand did alone, which is exactly the claim the whole split is meant to let somebody check."
+impact: The attribution coordinate reads as complete and is wrong in the direction that flatters the arrangement. A walk that leaned on a strong hand for every hard call looks like a walk a weak hand did alone, which is exactly the claim the whole split is meant to let somebody check.
 breaks_how_badly: crippling
 how_likely: expected
 probe: "READ THE SERVING PATH, 2026-08-20. engine/tools.ts stamps actor: \"agent\" on every lane call it serves, and engine/calllog.ts:22 declares the vocabulary as human | agent | ui. Nothing distinguishes two agents, and nothing carries an origin for work the caller did not author. A guide filing directly would at least produce a call to mislabel; a relayed answer produces no call of the guide's at all."
@@ -16,7 +16,7 @@ source_refs:
   - nbr-the-driver-that-performs-the-spawn
   - req-every-call-records-the-part-its-caller-played
   - uc-attribute-a-finished-walk ext 4c
-  - "deliverable/engine/calllog.ts:22"
+  - deliverable/engine/calllog.ts:22
 weighs_with: req-every-call-records-the-part-its-caller-played
 weighs_against: none
 ---

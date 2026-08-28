@@ -2,9 +2,9 @@
 form: spike-the-engine-on-an-exported-tree
 by: agent
 signed_off: 2026-08-19T20:19:54.678Z
-reopened: "2026-08-19T20:19:54.434Z — rank-unknowns re-signed above the sub-machine, so every spike claim is re-stamped against the same ground"
+reopened: 2026-08-19T20:19:54.434Z — rank-unknowns re-signed above the sub-machine, so every spike claim is re-stamped against the same ground
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / spike-the-engine-on-an-exported-tree

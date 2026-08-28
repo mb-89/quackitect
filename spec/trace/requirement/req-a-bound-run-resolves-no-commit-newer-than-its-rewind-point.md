@@ -2,11 +2,11 @@
 minted_in: i37-training-iterations-a-disposable-iterati
 id: req-a-bound-run-resolves-no-commit-newer-than-its-rewind-point
 type: "[[requirement]]"
-statement: "While a benchmark run is bound, the lane shall resolve zero commits that are not ancestors of the run's rewind point, at every verb that reaches history."
+statement: While a benchmark run is bound, the lane shall resolve zero commits that are not ancestors of the run's rewind point, at every verb that reaches history.
 kind: quality
 verify_method: test
 fitness_candidate: true
-breaks_if_removed: "The run reads what the original iteration concluded, and every number taken under it is wrong in the flattering direction while the report still looks valid."
+breaks_if_removed: The run reads what the original iteration concluded, and every number taken under it is wrong in the flattering direction while the report still looks valid.
 breaks_how_badly: fatal
 refines:
   - uc-walk-an-iteration-from-a-tree-that-cannot-see-its-future

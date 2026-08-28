@@ -5,8 +5,8 @@ type: "[[option]]"
 cluster: cluster-the-benchmark-run
 question: how earlier results are kept from anchoring a run
 found_by: contradiction
-statement: "Previous results are unreachable exactly while a measurement is being taken and freely readable at every other moment, so concealment costs nothing outside the run."
-source: "separation in TIME again \u2014 the same lens applied to the second concealment, found by asking whether the two hidings share a shape"
+statement: Previous results are unreachable exactly while a measurement is being taken and freely readable at every other moment, so concealment costs nothing outside the run.
+source: separation in TIME again — the same lens applied to the second concealment, found by asking whether the two hidings share a shape
 ---
 
 ## The contradiction it breaks

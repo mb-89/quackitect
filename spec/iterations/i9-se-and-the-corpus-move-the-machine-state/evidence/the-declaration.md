@@ -3,7 +3,7 @@ form: the-declaration
 by: agent
 signed_off: 2026-08-20T07:46:57.043Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / the-declaration

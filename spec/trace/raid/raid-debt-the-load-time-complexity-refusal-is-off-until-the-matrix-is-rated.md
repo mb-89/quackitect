@@ -3,12 +3,12 @@ minted_in: i38-the-machine-sizes-its-own-driver-every-s
 id: raid-debt-the-load-time-complexity-refusal-is-off-until-the-matrix-is-rated
 type: "[[raid]]"
 kind: debt
-looked: 2026-08-25
-statement: "The engine refuses a missing complexity at the point of use rather than when the matrix is loaded, because turning the load-time refusal on before the 154 active cells are rated would make the product unloadable."
+looked: 2026-08-26
+statement: The engine refuses a missing complexity at the point of use rather than when the matrix is loaded, because turning the load-time refusal on before the 154 active cells are rated would make the product unloadable.
 owner: the owner
-trigger: "the matrix owner rating the cells, and any reader who takes req-every-matrix-row-declares-its-complexity at its word"
+trigger: the matrix owner rating the cells, and any reader who takes req-every-matrix-row-declares-its-complexity at its word
 status: open
-impact: "The requirement asks for a refusal WHEN THE MATRIX IS LOADED. What ships refuses when a step is SIZED. Nothing ever proceeds without a complexity either way, so the demand's purpose is met — but a reader comparing the requirement against the code finds them saying different things, and the narrower reading is the one that ships."
+impact: The requirement asks for a refusal WHEN THE MATRIX IS LOADED. What ships refuses when a step is SIZED. Nothing ever proceeds without a complexity either way, so the demand's purpose is met — but a reader comparing the requirement against the code finds them saying different things, and the narrower reading is the one that ships.
 breaks_how_badly: abrasive
 how_likely: expected
 probe: "READ engine/rigor-matrix.ts difficultyFor, 2026-08-20. A missing complexity on an applied change-size cell returns {} while complexityRequiredIn(dir) is false, and throws naming the row and the column once it is true. The flag is one line in deliverable/machines/rigor_matrix/README.md, and the line is not there: no cell in the shipped matrix carries a rating."
@@ -16,7 +16,7 @@ probed: 2026-08-20
 source_refs:
   - req-every-matrix-row-declares-its-complexity
   - dsp-the-sizing-block
-  - "deliverable/engine/rigor-matrix.ts"
+  - deliverable/engine/rigor-matrix.ts
 weighs_with: none
 weighs_against: none
 last_looked: 2026-08-23
@@ -96,3 +96,9 @@ row that stands in for work happening elsewhere.
 WHAT MUST NOT CLOSE IT is deleting the point-of-use refusal on the grounds that
 the load-time one exists. Both are the same demand at two moments, and the later
 one is what stops a walk proceeding on a guess.
+
+## Swept 2026-08-26, at i54's closing retro: RE-ACCEPTED
+
+NOT TOUCHED THIS WINDOW. No rating pass ran and the matrix is unchanged.
+
+RE-ACCEPTED consciously, trigger unchanged.

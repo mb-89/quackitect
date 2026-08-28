@@ -7,9 +7,9 @@ statement: The caller gives up on a call after longer than one second, so answer
 owner: the driving agent
 trigger: the first call answered inside a second that the caller still reports as failed
 status: probed
-probed: "2026-08-21, and it HOLDS on this harness. A call answered at 2275 ms was received. Only one harness was measured, so the entry stays open for the others."
-probe: "Answer a call deliberately at just under a second on each supported harness and check the caller receives it. Where a harness reports a failure anyway, its limit is shorter than assumed and the measure needs rewriting."
-impact: "The whole design of the deferred verdict rests on one second being a safe answer. If any caller's limit is shorter, the product satisfies its own measure and still loses the answer, which is the failure it was built to end."
+probed: 2026-08-21, and it HOLDS on this harness. A call answered at 2275 ms was received. Only one harness was measured, so the entry stays open for the others.
+probe: Answer a call deliberately at just under a second on each supported harness and check the caller receives it. Where a harness reports a failure anyway, its limit is shorter than assumed and the measure needs rewriting.
+impact: The whole design of the deferred verdict rests on one second being a safe answer. If any caller's limit is shorter, the product satisfies its own measure and still loses the answer, which is the failure it was built to end.
 breaks_how_badly: crippling
 how_likely: conceivable
 source_refs:

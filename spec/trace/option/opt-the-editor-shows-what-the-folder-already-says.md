@@ -6,7 +6,7 @@ statement: Stop drawing the parts of the machine's state that are now plain file
 cluster: the-account
 question: what the drawn surface still draws
 found_by: without
-source: "trimming the showing half of the account cluster, once this delta puts the machine-state folder inside the folder the editor has open"
+source: trimming the showing half of the account cluster, once this delta puts the machine-state folder inside the folder the editor has open
 ---
 
 ## Mechanism

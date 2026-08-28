@@ -1,10 +1,10 @@
 ---
 form: evaluate-set
-reopened: "2026-08-20T08:24:13.246Z — a feeder re-signed above it"
+reopened: 2026-08-20T08:24:13.246Z — a feeder re-signed above it
 by: agent
 signed_off: 2026-08-20T08:25:09.135Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / evaluate-set

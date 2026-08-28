@@ -19,11 +19,6 @@ legal_tools:
   - se_log_query
   - se_answer
   - se_lint
-  # THE SWEEP EDITS GUIDANCE BY DESIGN, and guidance/ is the SOURCE of
-  # the prompt layer. Editing it makes AGENTS.md, CLAUDE.md and the Copilot
-  # instructions stale, and preflight fails on exactly that. Found in i17: the
-  # sweep re-taught the drain contract in walking.md, and the next state's
-  # battery went red on a projection neither state could re-place.
   - se_prompt_place
 evidence:
   - name: swept

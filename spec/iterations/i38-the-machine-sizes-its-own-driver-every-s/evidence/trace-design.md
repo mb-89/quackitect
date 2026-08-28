@@ -4,7 +4,7 @@ by: agent
 signed_off: 2026-08-20T23:53:36.694Z
 reopened: "2026-08-20T23:49:47.754Z — the walk standing inside a sub is standing in the state that RUNS it, and the submit guard did not know that: the form was served at run-demos/end and its own submit refused."
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / trace-design

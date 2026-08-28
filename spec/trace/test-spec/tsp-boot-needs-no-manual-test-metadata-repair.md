@@ -3,9 +3,9 @@ minted_in: i36
 id: tsp-boot-needs-no-manual-test-metadata-repair
 type: "[[test-spec]]"
 statement: Boot reaches the front desk over a stale or malformed historical test record, without an agent minting a replacement record by hand, and with every boot check still running.
-method: "test"
+method: test
 verifies:
-  - "req-boot-needs-no-manual-test-metadata-repair"
+  - req-boot-needs-no-manual-test-metadata-repair
 files:
   - tests/record-inspect.test.ts
 ---

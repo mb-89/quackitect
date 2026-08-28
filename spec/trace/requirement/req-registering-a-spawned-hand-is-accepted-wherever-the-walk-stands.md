@@ -6,7 +6,7 @@ statement: When a driving agent records that it has started a hand, the product 
 kind: functional
 verify_method: test
 measure: "states where the registration is refused: zero. Other arguments of the same verb that become legal in a state that did not already allow them: zero."
-breaks_if_removed: "The registration is refused exactly where a hand was just spawned, which is the only place it is ever needed, so the account is wrong about a hand that genuinely exists."
+breaks_if_removed: The registration is refused exactly where a hand was just spawned, which is the only place it is ever needed, so the account is wrong about a hand that genuinely exists.
 breaks_how_badly: corrosive
 priority: should
 refines:

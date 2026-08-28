@@ -2,9 +2,9 @@
 form: author-tests
 by: agent
 signed_off: 2026-08-20T22:05:46.071Z
-reopened: "2026-08-20T22:05:44.196Z — gate-validation's law wants a demonstration-method spec carrying the must story under demonstrates:, and the two inspection specs do not. A seventh spec is minted, tsp-a-walk-opens-each-step-by-naming-the-hand-it-needs, and this state is where the register lives."
+reopened: 2026-08-20T22:05:44.196Z — gate-validation's law wants a demonstration-method spec carrying the must story under demonstrates:, and the two inspection specs do not. A seventh spec is minted, tsp-a-walk-opens-each-step-by-naming-the-hand-it-needs, and this state is where the register lives.
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / author-tests

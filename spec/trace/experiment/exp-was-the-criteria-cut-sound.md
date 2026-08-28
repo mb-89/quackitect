@@ -8,10 +8,10 @@ probes:
 timebox: 1 hour
 form: calculation
 chunk: none — the corpus was read and the answer landed on the cut and the register entry
-faked: "nothing. The real cut, the real requirement statements and the real candidate documents were read. The one reduction is that a clean context judged 'do two designs commit to different behaviour here', which is a judgment rather than a measurement, and it says so per row."
-fallback: "NOT WRITTEN IN ADVANCE, and that is a defect in the seeding rather than in the run. The seeding carried the question and the timebox and no fallback. What to do with a wrong strike was decided after the result, which is the wrong order."
+faked: nothing. The real cut, the real requirement statements and the real candidate documents were read. The one reduction is that a clean context judged 'do two designs commit to different behaviour here', which is a judgment rather than a measurement, and it says so per row.
+fallback: NOT WRITTEN IN ADVANCE, and that is a defect in the seeding rather than in the run. The seeding carried the question and the timebox and no fallback. What to do with a wrong strike was decided after the result, which is the wrong order.
 verdict: falls
-measured: "2026-08-19. Coverage 99 of 99 struck statements. Five more wrongly struck, on top of the two the gate found by sampling ten. One of the five sits above the cutoff line. Four more returned unsure, each naming what would settle it."
+measured: 2026-08-19. Coverage 99 of 99 struck statements. Five more wrongly struck, on top of the two the gate found by sampling ten. One of the five sits above the cutoff line. Four more returned unsure, each naming what would settle it.
 folds_to: cut-criteria loses five strikes, with each rank recorded and the one above the line named. req-scaffold-from-template becomes a thirteenth axis and is scored by a second hand. The other four are out by position rather than on merit.
 promote: none — the finding is the product. What is worth carrying is the guard, not the script - a cut whose reason does not quote the row's own statement is unverified by construction and can be marked so with no judgment at all.
 source_refs:

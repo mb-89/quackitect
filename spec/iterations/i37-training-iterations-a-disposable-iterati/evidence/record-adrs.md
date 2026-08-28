@@ -2,9 +2,9 @@
 form: record-adrs
 by: agent
 signed_off: 2026-08-20T08:26:23.771Z
-reopened: "2026-08-20T08:26:21.201Z — a feeder re-signed above it"
+reopened: 2026-08-20T08:26:21.201Z — a feeder re-signed above it
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / record-adrs

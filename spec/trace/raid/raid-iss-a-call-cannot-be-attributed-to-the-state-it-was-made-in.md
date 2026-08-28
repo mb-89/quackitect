@@ -3,11 +3,11 @@ minted_in: i38-the-machine-sizes-its-own-driver-every-s
 id: raid-iss-a-call-cannot-be-attributed-to-the-state-it-was-made-in
 type: "[[raid]]"
 kind: issue
-statement: "Stamping the answering model onto every call buys attribution only if the call can also be tied to a state, and it cannot — the call log has no state coordinate and every record falls into one bucket."
+statement: Stamping the answering model onto every call buys attribution only if the call can also be tied to a state, and it cannot — the call log has no state coordinate and every record falls into one bucket.
 owner: the walking agent
-trigger: "the design state that specifies what the model stamp is FOR, and the first attempt to answer which state a walk overspent on"
+trigger: the design state that specifies what the model stamp is FOR, and the first attempt to answer which state a walk overspent on
 status: open
-impact: "The stated value of the model stamp — a walk can be attributed after the fact — is half delivered. Knowing that a model answered 200 calls says nothing about which of 53 states it walked, so the reconciliation the whole ladder would need cannot be computed even once the stamp lands."
+impact: The stated value of the model stamp — a walk can be attributed after the fact — is half delivered. Knowing that a model answered 200 calls says nothing about which of 53 states it walked, so the reconciliation the whole ladder would need cannot be computed even once the stamp lands.
 breaks_how_badly: crippling
 how_likely: expected
 probe: "ESTABLISHED BY READING THE RECORD SHAPE, which is the only evidence that settles it. engine/calllog.ts:11-24 declares CallRecord and its fields end at actor and se_version — there is no state, no visit, no step. THE FIRST PROBE WRITTEN HERE WAS INVALID AND IS KEPT AS A WARNING: it cited se_log_query {group_by: 'visit'} and {group_by: 'state'} both returning a single (none) bucket. calllog.ts:289-292 digs an arbitrary dotted path and falls back to (none) for ANY key it cannot reach, so {group_by: 'banana'} returns exactly the same shape — measured, 285 records in one bucket. That result cannot distinguish an absent field from an unreachable one, and the same run had already written up this behaviour as an engine defect when the key was 'clause'. The retro method carries the finding independently from 2026-08-17: per-step cost is not computable, because the state rides inside a narration record's arguments."

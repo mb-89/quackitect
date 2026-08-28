@@ -1,10 +1,10 @@
 ---
 form: write-requirements
-amended: "2026-08-19T15:13:03.813Z by agent — the security answer and the design hand-off both describe a consent prompt the owner struck on 2026-08-19"
+amended: 2026-08-19T15:13:03.813Z by agent — the security answer and the design hand-off both describe a consent prompt the owner struck on 2026-08-19
 by: agent
 signed_off: 2026-08-19T13:00:04.330Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / write-requirements

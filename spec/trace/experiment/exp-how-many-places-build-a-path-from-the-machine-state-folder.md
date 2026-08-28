@@ -8,10 +8,10 @@ probes:
 timebox: 30 minutes
 form: calculation
 chunk: the-move — the eleven recorded queries enter there as the check that nothing was missed, re-run after the move with the old name expected to return nothing
-faked: "nothing was faked, and three trees were unreachable. Version control ignores the build output, the machine-state folder itself and the workbench, and the search honours that. The folder's own contents matter most of the three, because a generated client script is written into it carrying its own path."
-fallback: "NOT WRITTEN IN ADVANCE, the third seeding to carry a question and a timebox with no fallback. The count was never going to falsify anything; it was going to size the work, and a fallback for a sizing probe should have said what number would change the plan."
+faked: nothing was faked, and three trees were unreachable. Version control ignores the build output, the machine-state folder itself and the workbench, and the search honours that. The folder's own contents matter most of the three, because a generated client script is written into it carrying its own path.
+fallback: NOT WRITTEN IN ADVANCE, the third seeding to carry a question and a timebox with no fallback. The count was never going to falsify anything; it was going to size the work, and a fallback for a sizing probe should have said what number would change the plan.
 verdict: falls
-measured: "2026-08-19. Forty-seven code sites in the engine. Four resolvers, three of them scripts re-implementing the one real one. Seventeen consumers that ask. Twenty-six hard-codes that never ask. Four more hard-codes outside the engine, one of them the ignore file. Twenty-four test files and about twenty documentation files name it directly. Nine served strings quote it to the agent at runtime."
+measured: 2026-08-19. Forty-seven code sites in the engine. Four resolvers, three of them scripts re-implementing the one real one. Seventeen consumers that ask. Twenty-six hard-codes that never ask. Four more hard-codes outside the engine, one of them the ignore file. Twenty-four test files and about twenty documentation files name it directly. Nine served strings quote it to the agent at runtime.
 folds_to: the move is sized from forty-seven rather than three, and the twenty-six hard-codes are the work because no rename reaches them. Every query is recorded on the register entry so the count can be repeated after the move.
 promote: the queries themselves. Re-running them after the move is the check that nothing was missed, and it costs one call.
 source_refs:

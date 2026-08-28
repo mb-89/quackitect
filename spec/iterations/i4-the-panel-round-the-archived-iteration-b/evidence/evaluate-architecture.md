@@ -2,9 +2,9 @@
 form: evaluate-architecture
 by: agent
 signed_off: 2026-08-23T18:35:59.231Z
-reopened: "2026-08-23T18:35:10.309Z — three cards are at risk on a latency hinge the spike measured out of existence"
+reopened: 2026-08-23T18:35:10.309Z — three cards are at risk on a latency hinge the spike measured out of existence
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / evaluate-architecture

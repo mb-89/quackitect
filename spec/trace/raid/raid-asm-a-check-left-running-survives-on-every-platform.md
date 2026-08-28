@@ -7,9 +7,9 @@ statement: A leaving judgment left running after its call has answered keeps run
 owner: the driving agent
 trigger: the first verdict that never arrives after its call answered, on any platform
 status: open
-probed: "2026-08-21, PARTLY. Handed-off work survived its call on Linux for ninety seconds and its verdict was readable. The leaving-check path itself was not exercised, and no other platform was."
-probe: "Start a leaving check, let its call answer, then read the verdict on each supported platform. A verdict that never lands names the platform where leaving work running does not survive."
-impact: "The deferred verdict is the iteration's load-bearing goal. On a platform where the work does not survive its call, the walk answers fast and then waits forever for a verdict that will never come, which is worse than the freeze it replaced."
+probed: 2026-08-21, PARTLY. Handed-off work survived its call on Linux for ninety seconds and its verdict was readable. The leaving-check path itself was not exercised, and no other platform was.
+probe: Start a leaving check, let its call answer, then read the verdict on each supported platform. A verdict that never lands names the platform where leaving work running does not survive.
+impact: The deferred verdict is the iteration's load-bearing goal. On a platform where the work does not survive its call, the walk answers fast and then waits forever for a verdict that will never come, which is worse than the freeze it replaced.
 breaks_how_badly: crippling
 how_likely: plausible
 source_refs:

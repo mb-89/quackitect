@@ -2,7 +2,7 @@
 minted_in: i37-training-iterations-a-disposable-iterati
 id: sty-walk-a-past-tree-without-reaching-its-future
 type: "[[story]]"
-statement: "When I am handed a rewound tree and asked to walk an iteration that has already been finished once, without being able to look up what it concluded, I want every door to the future closed by the lane itself, so my walk measures the machine rather than my ability to find the answer."
+statement: When I am handed a rewound tree and asked to walk an iteration that has already been finished once, without being able to look up what it concluded, I want every door to the future closed by the lane itself, so my walk measures the machine rather than my ability to find the answer.
 actor: stk-agent
 refines:
   - vp-rigor-without-toil

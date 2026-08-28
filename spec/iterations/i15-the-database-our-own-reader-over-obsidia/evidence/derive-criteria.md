@@ -1,6 +1,6 @@
 ---
 form: derive-criteria
-reopened: "2026-08-19T17:31:10.839Z — same claims-registration gap, cascading fix through M4"
+reopened: 2026-08-19T17:31:10.839Z — same claims-registration gap, cascading fix through M4
 by: agent
 signed_off: 2026-08-19T17:31:11.507Z
 authors: agent

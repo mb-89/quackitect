@@ -5,8 +5,8 @@ type: "[[option]]"
 cluster: cluster-the-benchmark-run
 question: how the measuring apparatus relates to an ordinary walk
 found_by: transform
-statement: "Any walk can be told it is being measured, and the measuring apparatus is the same for a benchmark and for real work, so nothing is a special mode."
-source: "SIT \u2014 Unification, applied to the whole cluster: give the existing walk the new job rather than building a second kind of walk"
+statement: Any walk can be told it is being measured, and the measuring apparatus is the same for a benchmark and for real work, so nothing is a special mode.
+source: "SIT — Unification, applied to the whole cluster: give the existing walk the new job rather than building a second kind of walk"
 ---
 
 ## What it collapses

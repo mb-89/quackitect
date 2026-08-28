@@ -1,10 +1,10 @@
 ---
 form: pressure-test
-reopened: "2026-08-23T15:22:55.326Z — frame-delta was re-signed after it, so pressure-test answered older ground"
+reopened: 2026-08-23T15:22:55.326Z — frame-delta was re-signed after it, so pressure-test answered older ground
 by: agent
 signed_off: 2026-08-23T15:23:01.827Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / pressure-test

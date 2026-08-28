@@ -3,11 +3,11 @@ minted_in: i60-the-walk-gets-fast-and-it-is-measurable-
 id: raid-iss-three-chunks-landed-with-no-check-and-no-observed-red
 type: "[[raid]]"
 kind: issue
-statement: "Three chunks of this round were built before any check could be written for them, so none had its red observed, and the checks they now carry are green from their first moment."
+statement: Three chunks of this round were built before any check could be written for them, so none had its red observed, and the checks they now carry are green from their first moment.
 owner: the driving agent
 trigger: it has happened, and the round's own verification refused to claim them
 status: open
-impact: "A check that was never watched failing has not been shown to fail on the thing it guards. It may be asserting something that was already true, and nothing here can tell the difference."
+impact: A check that was never watched failing has not been shown to fail on the thing it guards. It may be asserting something that was already true, and nothing here can tell the difference.
 breaks_how_badly: abrasive
 how_likely: expected
 source_refs:

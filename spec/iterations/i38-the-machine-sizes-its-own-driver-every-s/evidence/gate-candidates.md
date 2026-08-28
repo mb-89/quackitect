@@ -3,9 +3,9 @@ form: gate-candidates
 bless: blessed by agent
 by: agent
 signed_off: 2026-08-20T19:25:36.231Z
-reopened: "2026-08-20T19:23:58.743Z — evaluate-set was re-signed after a fourth scoring pass. A new must was minted after this gate ran its must-check, and this gate is where the check lives."
+reopened: 2026-08-20T19:23:58.743Z — evaluate-set was re-signed after a fourth scoring pass. A new must was minted after this gate ran its must-check, and this gate is where the check lives.
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / gate-candidates

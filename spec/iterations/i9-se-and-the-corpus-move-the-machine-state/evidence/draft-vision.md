@@ -1,11 +1,11 @@
 ---
 form: draft-vision
-amended: "2026-08-19T14:01:51.387Z by agent — the owner struck the clone prompt on 2026-08-19 and the consent ruling returns to its original shape"
+amended: 2026-08-19T14:01:51.387Z by agent — the owner struck the clone prompt on 2026-08-19 and the consent ruling returns to its original shape
 by: agent
 signed_off: 2026-08-19T12:00:36.068Z
-reopened: "2026-08-19T11:59:08.344Z — The major column asks three fields this form never had — the big idea, the to-be world and the pitch — and the walk cannot serve them while the state stands behind it."
+reopened: 2026-08-19T11:59:08.344Z — The major column asks three fields this form never had — the big idea, the to-be world and the pitch — and the walk cannot serve them while the state stands behind it.
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / draft-vision

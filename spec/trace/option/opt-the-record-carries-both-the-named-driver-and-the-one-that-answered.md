@@ -4,9 +4,9 @@ id: opt-the-record-carries-both-the-named-driver-and-the-one-that-answered
 type: "[[option]]"
 cluster: the-account
 question: what the call record holds
-statement: "every call record carries the driver the machine named alongside the driver that actually answered, so the gap between recommendation and practice is readable without reconstructing either side"
+statement: every call record carries the driver the machine named alongside the driver that actually answered, so the gap between recommendation and practice is readable without reconstructing either side
 found_by: heuristic
-source: "the heuristic if it must be remembered it must be recorded, held against the account cluster"
+source: the heuristic if it must be remembered it must be recorded, held against the account cluster
 ---
 
 ## Mechanism

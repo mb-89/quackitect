@@ -3,11 +3,11 @@ minted_in: i5-engine-hygiene-one-version-source-every-
 id: raid-iss-a-case-guarded-local-artifacts-as-facts-of-the-source
 type: "[[raid]]"
 kind: issue
-statement: "A produce case demanded that four generated or local folders exist in the source before checking they do not travel, so it failed on any clone that had not built or opened an editor."
+statement: A produce case demanded that four generated or local folders exist in the source before checking they do not travel, so it failed on any clone that had not built or opened an editor.
 owner: the maintainer
 trigger: any battery run on a machine that has not produced a release or opened the editor
 status: open
-impact: "The battery is red for a reason that has nothing to do with the code under test, and the message names a missing folder rather than a wrong guard. On a cloud clone it fails every run."
+impact: The battery is red for a reason that has nothing to do with the code under test, and the message names a missing folder rather than a wrong guard. On a cloud clone it fails every run.
 breaks_how_badly: abrasive
 how_likely: expected
 source_refs:

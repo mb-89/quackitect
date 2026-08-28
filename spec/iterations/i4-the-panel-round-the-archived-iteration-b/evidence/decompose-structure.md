@@ -2,10 +2,10 @@
 form: decompose-structure
 by: agent
 signed_off: 2026-08-23T18:17:53.095Z
-reopened: "2026-08-23T18:14:01.707Z — no interface carries the view model out of the resolver, and the guard element implements a function it does not perform"
-amended: "2026-08-23T18:02:37.120Z by agent — the follow-up said one interface was owed; the element matrix computed seven"
+reopened: 2026-08-23T18:14:01.707Z — no interface carries the view model out of the resolver, and the guard element implements a function it does not perform
+amended: 2026-08-23T18:02:37.120Z by agent — the follow-up said one interface was owed; the element matrix computed seven
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / decompose-structure

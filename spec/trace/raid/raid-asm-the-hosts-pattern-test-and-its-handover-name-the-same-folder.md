@@ -3,18 +3,18 @@ minted_in: i9
 id: raid-asm-the-hosts-pattern-test-and-its-handover-name-the-same-folder
 type: "[[raid]]"
 kind: assumption
-statement: "The host feature that decides whether to start the product and the host feature that says which folder it opened are assumed to name the same folder, on every host and in every workspace shape."
+statement: The host feature that decides whether to start the product and the host feature that says which folder it opened are assumed to name the same folder, on every host and in every workspace shape.
 owner: the driving agent
-trigger: "before any candidate taking both host features is built, and again the first time a workspace holding several folders is opened"
+trigger: before any candidate taking both host features is built, and again the first time a workspace holding several folders is opened
 status: open
-impact: "If they disagree, the lane comes up rooted in a folder nobody chose, and nothing says so. The candidate that takes both calls this its worst failure mode and leaves it unprobed."
+impact: If they disagree, the lane comes up rooted in a folder nobody chose, and nothing says so. The candidate that takes both calls this its worst failure mode and leaves it unprobed.
 breaks_how_badly: crippling
 how_likely: plausible
 probe: "FALSE, AND FOR A REASON THE ENTRY DID NOT ANTICIPATE. There is no handover to disagree with. The editor never names a folder to the extension: it computes which folder matched, then discards that identity before the extension host is told, and hands over the whole workspace instead. Read from the editor's own source and its published API surface, not from a blog."
 probed: 2026-08-19
 source_refs:
-  - "cand-the-folder-answers-for-itself, which takes both features and names the seam"
-  - "the composition of that candidate at run-candidates, 2026-08-19"
+  - cand-the-folder-answers-for-itself, which takes both features and names the seam
+  - the composition of that candidate at run-candidates, 2026-08-19
 ---
 
 ## Probe

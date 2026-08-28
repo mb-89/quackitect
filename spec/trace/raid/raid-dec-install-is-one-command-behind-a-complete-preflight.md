@@ -3,9 +3,9 @@ minted_in: i9
 id: raid-dec-install-is-one-command-behind-a-complete-preflight
 type: "[[raid]]"
 kind: decision
-statement: "The product installs with one command and no wizard, behind a preflight that runs every check, names each missing tool with where to get it, and changes nothing on disk until all of them pass."
+statement: The product installs with one command and no wizard, behind a preflight that runs every check, names each missing tool with where to get it, and changes nothing on disk until all of them pass.
 owner: the driving agent
-trigger: "before the installer is built, and at the first report of a half-installed machine"
+trigger: before the installer is built, and at the first report of a half-installed machine
 status: decided
 breaks_how_badly: crippling
 how_likely: expected
@@ -14,7 +14,7 @@ source_refs:
   - req-setup-floor-editor-shell
   - req-setup-stops-before-partial
   - req-fresh-machine-runs
-  - "the graft at i9 M5, 2026-08-19 — this cell was taken from the runner-up and broke the tie"
+  - the graft at i9 M5, 2026-08-19 — this cell was taken from the runner-up and broke the tie
 ---
 
 ## How this one arrived

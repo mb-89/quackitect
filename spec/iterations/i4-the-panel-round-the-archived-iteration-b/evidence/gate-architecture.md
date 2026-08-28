@@ -3,9 +3,9 @@ form: gate-architecture
 bless: blessed by agent
 by: agent
 signed_off: 2026-08-23T18:37:40.089Z
-reopened: "2026-08-23T18:37:20.286Z — evaluate-architecture was re-signed after it, moving three cards from at risk to addressed"
+reopened: 2026-08-23T18:37:20.286Z — evaluate-architecture was re-signed after it, moving three cards from at risk to addressed
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / gate-architecture

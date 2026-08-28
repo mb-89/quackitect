@@ -3,13 +3,13 @@ minted_in: i51-work-running-out-of-sight-reports-itself
 id: raid-dec-a-long-step-acknowledges-first-and-reports-on-a-clock
 type: "[[raid]]"
 kind: decision
-statement: "A step whose leaving check will outrun the caller's bound emits an acknowledgement inside the first second and then reports its progress on a clock, rather than deferring a verdict and being asked about it."
+statement: A step whose leaving check will outrun the caller's bound emits an acknowledgement inside the first second and then reports its progress on a clock, rather than deferring a verdict and being asked about it.
 owner: the driving agent
 trigger: the first leaving check whose acknowledgement does not reach the caller inside a second, or the first run where the clock reports nothing new for two consecutive intervals
 status: decided
 how_likely: plausible
 breaks_how_badly: crippling
-impact: "This is the load-bearing behaviour of the iteration. If the acknowledgement does not arrive inside the caller's bound, the walk freezes exactly as it does today and nothing else in the design matters."
+impact: This is the load-bearing behaviour of the iteration. If the acknowledgement does not arrive inside the caller's bound, the walk freezes exactly as it does today and nothing else in the design matters.
 source_refs:
   - req-a-leaving-check-does-not-hold-the-call
   - opt-acknowledge-inside-a-second-then-report-every-minute

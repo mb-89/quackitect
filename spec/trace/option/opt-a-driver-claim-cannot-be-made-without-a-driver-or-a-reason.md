@@ -4,9 +4,9 @@ id: opt-a-driver-claim-cannot-be-made-without-a-driver-or-a-reason
 type: "[[option]]"
 cluster: the-sizing
 question: what a record with no named driver means
-statement: "the published name is returned by the receiver with either that driver or a stated reason for a different one, so a walk driven weaker with nothing said is a shape the record cannot hold rather than a rule nobody enforced"
+statement: the published name is returned by the receiver with either that driver or a stated reason for a different one, so a walk driven weaker with nothing said is a shape the record cannot hold rather than a rule nobody enforced
 found_by: heuristic
-source: "the heuristic make the illegal unrepresentable rather than merely checked, held against the sizing cluster and against the design's one safety rule"
+source: the heuristic make the illegal unrepresentable rather than merely checked, held against the sizing cluster and against the design's one safety rule
 ---
 
 ## Mechanism

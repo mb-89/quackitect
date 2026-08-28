@@ -1,10 +1,10 @@
 ---
 form: derive-functions
-amended: "2026-08-19T15:12:38.816Z by agent — the consent prompt this field hands to the design milestone was struck by the owner on 2026-08-19"
+amended: 2026-08-19T15:12:38.816Z by agent — the consent prompt this field hands to the design milestone was struck by the owner on 2026-08-19
 by: agent
 signed_off: 2026-08-19T13:35:11.252Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / derive-functions

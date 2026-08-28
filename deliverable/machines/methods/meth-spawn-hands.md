@@ -3,7 +3,7 @@ kind: method
 card: spawn-hands
 catalog: spawn_hands
 catalog_sections: Roster
-statement: "Spawn the hand a state is actually built to start. A spawn state starts the walker, and only the walker; the reviewer starts at its own gate and the researcher starts wherever the work asks for one."
+statement: Spawn the hand a state is actually built to start. A spawn state starts the walker, and only the walker; the reviewer starts at its own gate and the researcher starts wherever the work asks for one.
 ---
 
 ## Roster

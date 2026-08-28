@@ -1,6 +1,6 @@
 ---
 form: partition-functions
-reopened: "2026-08-19T17:31:24.205Z — same claims-registration gap, cascading fix through M4"
+reopened: 2026-08-19T17:31:24.205Z — same claims-registration gap, cascading fix through M4
 by: agent
 signed_off: 2026-08-19T17:31:24.636Z
 authors: agent

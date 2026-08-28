@@ -8,7 +8,7 @@ demonstrates:
   - sty-answer-what-does-this-touch
   - sty-dispose-a-candidate-coupling
 verifies:
-  - "none — this spec demonstrates a story end to end, so the demonstrates edge above carries its trace; no requirement in the corpus mentions either story; the claim is about what a person can trust rather than about a return value"
+  - none — this spec demonstrates a story end to end, so the demonstrates edge above carries its trace; no requirement in the corpus mentions either story; the claim is about what a person can trust rather than about a return value
 files:
   - none — the procedure below is the definition; the observed run is the evidence
 ---

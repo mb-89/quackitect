@@ -3,7 +3,7 @@ form: spike-count-the-machine-state-path-builders
 by: agent
 signed_off: 2026-08-19T19:06:49.424Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / spike-count-the-machine-state-path-builders

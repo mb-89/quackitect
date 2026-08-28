@@ -582,7 +582,7 @@ test("a collection bar's prerequisites include every input, not just the nearest
 // defect. Any bound clear of that noise is also above 3683, so no setting of
 // this number both stays quiet and catches that regression.
 //
-// THE ACCESS CEILING BELOW CATCHES IT INSTEAD, at 800 against a per-state
+// THE ACCESS CEILING BELOW CATCHES IT INSTEAD. It stands well under a per-state
 // sweep of about five thousand, and it does not move with load. What is left
 // for the clock is work that got slow WITHOUT reading more, such as a loop
 // that turned quadratic in memory.

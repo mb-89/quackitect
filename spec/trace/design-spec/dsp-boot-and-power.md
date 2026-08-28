@@ -6,21 +6,22 @@ statement: the engine standing up and lying down, carried by the host bridge, th
 realizes:
   - el-bootstrap
 files:
-  - "deliverable/engine/lifecycle.ts"
-  - "deliverable/engine/stopping-layer.ts"
-  - "deliverable/engine/cage-inventory.ts"
-  - "deliverable/engine/bin/se-pty.ts"
-  - "deliverable/engine/bin/se-hook-stop.ts"
-  - "deliverable/engine/bin/se-hook-start.ts"
-  - "deliverable/engine/bin/register-extension.ts"
-  - "deliverable/engine/vscoderegistry.ts"
-  - "deliverable/esbuild.mjs"
-  - "deliverable/engine/vscodebuild.ts"
-  - "deliverable/tests/built-surface.test.ts"
-  - "deliverable/engine/pullnotice.ts"
-  - "deliverable/engine/bin/package.ts"
-  - "deliverable/engine/version.ts"
-  - "deliverable/engine/sessionlive.ts"
+  - deliverable/engine/lifecycle.ts
+  - deliverable/engine/compaction.ts
+  - deliverable/engine/stopping-layer.ts
+  - deliverable/engine/cage-inventory.ts
+  - deliverable/engine/bin/se-pty.ts
+  - deliverable/engine/bin/se-hook-stop.ts
+  - deliverable/engine/bin/se-hook-start.ts
+  - deliverable/engine/bin/register-extension.ts
+  - deliverable/engine/vscoderegistry.ts
+  - deliverable/esbuild.mjs
+  - deliverable/engine/vscodebuild.ts
+  - deliverable/tests/built-surface.test.ts
+  - deliverable/engine/pullnotice.ts
+  - deliverable/engine/bin/package.ts
+  - deliverable/engine/version.ts
+  - deliverable/engine/sessionlive.ts
 ---
 
 ## Responsibility

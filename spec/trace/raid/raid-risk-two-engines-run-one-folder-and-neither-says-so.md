@@ -3,12 +3,12 @@ minted_in: i62-background-work-reports-its-own-end-the-
 id: raid-risk-two-engines-run-one-folder-and-neither-says-so
 type: "[[raid]]"
 kind: risk
-statement: "Two engines can be started on one folder and one network port, and neither of them says that the other is there."
+statement: Two engines can be started on one folder and one network port, and neither of them says that the other is there.
 owner: the maintainer
-trigger: "any process listing showing more than one engine against one folder, and any report of a session dying without being stopped"
+trigger: any process listing showing more than one engine against one folder, and any report of a session dying without being stopped
 status: open
 looked: 2026-08-24
-impact: "Two engines writing one call log and one machine-state folder means neither log is the whole trail. The walk one of them serves is invisible to the other, so a person reading either sees a partial account and cannot tell that it is partial."
+impact: Two engines writing one call log and one machine-state folder means neither log is the whole trail. The walk one of them serves is invisible to the other, so a person reading either sees a partial account and cannot tell that it is partial.
 breaks_how_badly: corrosive
 how_likely: plausible
 source_refs:

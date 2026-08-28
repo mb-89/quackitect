@@ -5,7 +5,7 @@ type: "[[option]]"
 statement: the entry says when it is worth asking again, so the interval between asks is decided by the thing that knows how the work is going rather than guessed by the caller
 cluster: cluster-the-telling
 found_by: transform
-source: "SIT Attribute Dependency, via meth-scamper — make the ask interval vary with the reported progress, where the two were independent"
+source: SIT Attribute Dependency, via meth-scamper — make the ask interval vary with the reported progress, where the two were independent
 ---
 
 ## Mechanism

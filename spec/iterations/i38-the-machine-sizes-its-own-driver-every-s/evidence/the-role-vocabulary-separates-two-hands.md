@@ -3,7 +3,7 @@ form: the-role-vocabulary-separates-two-hands
 by: agent
 signed_off: 2026-08-20T20:15:34.192Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / the-role-vocabulary-separates-two-hands

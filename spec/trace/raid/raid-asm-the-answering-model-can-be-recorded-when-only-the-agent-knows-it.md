@@ -3,11 +3,11 @@ minted_in: i38-the-machine-sizes-its-own-driver-every-s
 id: raid-asm-the-answering-model-can-be-recorded-when-only-the-agent-knows-it
 type: "[[raid]]"
 kind: assumption
-statement: "Stamping the answering model onto every call is treated as achievable, while the only party that knows which model answered is the agent being measured, and the lane's handshake carries no model at all."
+statement: Stamping the answering model onto every call is treated as achievable, while the only party that knows which model answered is the agent being measured, and the lane's handshake carries no model at all.
 owner: the walking agent
-trigger: "the design state that decides where the model value comes from, and the first call whose stamped model cannot be corroborated"
+trigger: the design state that decides where the model value comes from, and the first call whose stamped model cannot be corroborated
 status: open
-impact: "Attribution after the fact rests on self-report. The design's one safety rule — a stronger model needs no argument, a weaker one needs a recorded reason — then asks the cheap model to declare that it is the cheap model, which is the exact actor the rule exists to catch."
+impact: Attribution after the fact rests on self-report. The design's one safety rule — a stronger model needs no argument, a weaker one needs a recorded reason — then asks the cheap model to declare that it is the cheap model, which is the exact actor the rule exists to catch.
 breaks_how_badly: crippling
 how_likely: plausible
 probe: "READ THE HANDSHAKE AT THE i38 KICKOFF GATE, 2026-08-20. engine/mcp.ts:58 and :68 declare clientInfo as {name, version?} and nothing else — a client name, no model. Nothing else in the transport carries one. So the value can only arrive as something the caller puts on the call. AND THE CALLER CAN BE HONESTLY WRONG, established the same day from the harness vendor's own documentation: this harness performs AUTOMATIC MODEL FALLBACK, re-running a flagged request on a different model and continuing the session on it, and the notice is suppressed under JSON output formats — the served model has to be read from a result field rather than from the warning. So even a truthful agent reporting the model it was started with can be reporting the wrong one."

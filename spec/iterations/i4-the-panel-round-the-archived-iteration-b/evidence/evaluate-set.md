@@ -2,9 +2,9 @@
 form: evaluate-set
 by: agent
 signed_off: 2026-08-23T17:50:08.553Z
-reopened: "2026-08-23T17:48:05.725Z — the score table scores four axes and the cut now stands at six, one of them struck"
+reopened: 2026-08-23T17:48:05.725Z — the score table scores four axes and the cut now stands at six, one of them struck
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / evaluate-set

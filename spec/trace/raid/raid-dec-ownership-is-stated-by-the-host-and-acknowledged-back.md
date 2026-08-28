@@ -3,9 +3,9 @@ minted_in: i9
 id: raid-dec-ownership-is-stated-by-the-host-and-acknowledged-back
 type: "[[raid]]"
 kind: decision
-statement: "The system binds to exactly one tree or refuses. Where whatever starts it can STATE which tree it is handing over, it does, and the system acknowledges that exact tree back. Where it cannot, and the editor cannot, the system runs the same test itself and refuses on any count of candidates but one."
+statement: The system binds to exactly one tree or refuses. Where whatever starts it can STATE which tree it is handing over, it does, and the system acknowledges that exact tree back. Where it cannot, and the editor cannot, the system runs the same test itself and refuses on any count of candidates but one.
 owner: the driving agent
-trigger: "any change to how the root is determined, and the first time a workspace holding several folders is opened"
+trigger: any change to how the root is determined, and the first time a workspace holding several folders is opened
 status: decided
 breaks_how_badly: fatal
 how_likely: plausible
@@ -13,8 +13,8 @@ source_refs:
   - req-a-wrong-act-never-passes-silently
   - req-walk-survives-host-swap
   - raid-asm-the-hosts-pattern-test-and-its-handover-name-the-same-folder
-  - "cand-nothing-can-be-forgotten, and the reverse graft that showed this cell decides the seat"
-  - "the i9 spike of 2026-08-19, which read the editor's own source and found the stating half impossible there"
+  - cand-nothing-can-be-forgotten, and the reverse graft that showed this cell decides the seat
+  - the i9 spike of 2026-08-19, which read the editor's own source and found the stating half impossible there
 ---
 
 ## Rejected options

@@ -4,7 +4,7 @@ by: agent
 signed_off: 2026-08-20T10:57:14.459Z
 reopened: "2026-08-20T10:57:05.099Z — it answered older ground: the move and the corpus reader were both re-signed after it"
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / the-branch-pin

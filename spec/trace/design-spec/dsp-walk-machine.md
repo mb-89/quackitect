@@ -10,6 +10,7 @@ realizes:
 files:
   - "deliverable/engine/visit.ts"
   - deliverable/engine/session.ts
+  - deliverable/engine/visit.ts
   - deliverable/engine/sessionclaims.ts
   - deliverable/engine/machine.ts
   - deliverable/engine/pull.ts

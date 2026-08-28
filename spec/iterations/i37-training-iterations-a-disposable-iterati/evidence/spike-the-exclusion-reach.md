@@ -2,9 +2,9 @@
 form: spike-the-exclusion-reach
 by: agent
 signed_off: 2026-08-19T20:17:25.653Z
-reopened: "2026-08-19T20:17:04.960Z — rank-unknowns re-signed above the sub-machine, so its completion has to be re-stamped"
+reopened: 2026-08-19T20:17:04.960Z — rank-unknowns re-signed above the sub-machine, so its completion has to be re-stamped
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / spike-the-exclusion-reach

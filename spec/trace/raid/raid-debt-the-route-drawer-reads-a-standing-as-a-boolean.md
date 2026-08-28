@@ -4,11 +4,11 @@ id: raid-debt-the-route-drawer-reads-a-standing-as-a-boolean
 type: "[[raid]]"
 kind: debt
 looked: 2026-08-25
-statement: "The route drawer asks whether a hop passes and receives a boolean, so a step whose leaving judgment is still being reached reads to it as failed rather than as deciding."
+statement: The route drawer asks whether a hop passes and receives a boolean, so a step whose leaving judgment is still being reached reads to it as failed rather than as deciding.
 owner: the driving agent
 trigger: a walk that redraws its route repeatedly while one long judgment is in flight
 status: closed
-impact: "A route is redrawn that did not need redrawing, and the redraw is paid on the request path while a person waits. It is never a false green, because the flattening errs toward refusing a hop rather than allowing one."
+impact: A route is redrawn that did not need redrawing, and the redraw is paid on the request path while a person waits. It is never a false green, because the flattening errs toward refusing a hop rather than allowing one.
 breaks_how_badly: corrosive
 how_likely: expected
 source_refs:

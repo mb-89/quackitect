@@ -6,7 +6,7 @@ statement: An agent answers what a decision touches with one structured query ov
 method: demonstration
 demonstrates:
   - sty-answer-what-does-this-touch
-verifies: "none — demonstrates carries the edge; the evaluator's mechanics are test-verified by tsp-query-answers"
+verifies: none — demonstrates carries the edge; the evaluator's mechanics are test-verified by tsp-query-answers
 files:
   - none — the procedure below is the definition, because the pass is what the agent can reach rather than what a function returns
 ---

@@ -8,6 +8,7 @@ realizes:
 files:
   - "deliverable/engine/bm25.ts"
   - deliverable/engine/help.ts
+  - deliverable/engine/bm25.ts
   - deliverable/engine/tools.ts
 ---
 
