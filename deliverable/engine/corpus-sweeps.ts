@@ -8,8 +8,10 @@ const CITATION = /`([A-Za-z0-9_][A-Za-z0-9_./-]*\.(?:ts|js|mjs|cjs|json|md))(?::
 /** A lane verb as it is written in prose. */
 const LANE_VERB = /\bse_[a-z][a-z0-9_]*\b/g;
 
-/** A verb name as it appears anywhere in the engine that serves it. */
-const SERVED_VERB = /\bse_[a-z][a-z0-9_]*\b/g;
+/** THE THREE SHAPES IN WHICH THE TOOL SURFACE DECLARES A VERB. Each captures
+ *  the verb name in group 1. Anything else in those files — a comment, a
+ *  string in a message, a call — is a mention and proves nothing. */
+const DECLARED_VERB = [/\bname:\s*"(se_[a-z][a-z0-9_]*)"/g, /^\s*"(se_[a-z][a-z0-9_]*)"\s*:/gm, /\bcase\s+"(se_[a-z][a-z0-9_]*)"/g];
 
 /** The engine's own files, which are the authority on what a verb is. */
 const ENGINE = ["deliverable", "engine"];
@@ -26,12 +28,18 @@ function unique(found: string[]): string[] {
  *  req-a-heading-appears-once-in-a-node */
 export function duplicateHeadings(content: string): string[] {
   const seen = new Map<string, number>();
-  let fenced = false;
+  // A FENCE OPENS WITH A MARKER AND CLOSES WITH THE SAME ONE. Toggling on any
+  // marker let a stray tilde close a backtick fence, and an odd count ran to
+  // the end of the file with every heading below it silenced.
+  let fence = "";
   for (const line of content.split("\n")) {
-    if (line.startsWith("```")) {
-      fenced = !fenced;
+    const marker = /^(```+|~~~+)/.exec(line);
+    if (marker !== null) {
+      if (fence === "") fence = marker[1][0];
+      else if (marker[1][0] === fence) fence = "";
       continue;
     }
+    const fenced = fence !== "";
     if (fenced) continue;
     const m = /^(#{1,6})\s+(\S.*?)\s*$/.exec(line);
     if (m === null) continue;
@@ -120,12 +128,19 @@ export function staleCitations(root: string, content: string): string[] {
 
 const verbCache = new Map<string, Set<string> | undefined>();
 
-/** EVERY VERB NAME THE ENGINE MENTIONS. A verb the engine never names is
- *  retired; anything else is alive, whichever file happens to declare it.
+/** EVERY VERB THE TOOL SURFACE DECLARES.
  *
- *  Reading one file as the surface reported 292 live verbs as dead, measured
- *  over the trace corpus on 2026-08-28. Only 16 of them are declared in
- *  tools.ts in the shape that check expected. */
+ *  THE SURFACE IS THE `tools*.ts` FILES AND NOTHING ELSE, and a DECLARATION is
+ *  one of the three shapes those files use. A mention is not a declaration: a
+ *  comment saying a verb was retired names it, and reading the whole engine
+ *  for any occurrence marked every such name alive.
+ *
+ *  THAT WAS MEASURED. Reading `tools.ts` alone in one shape reported 292 live
+ *  verbs as dead; reading every engine file for any occurrence reported none,
+ *  because 67 comment lines across 30 files name a verb. Reading the surface
+ *  in all three of its shapes is the answer between them.
+ *
+ *  With no surface to read, it answers undefined rather than guessing. */
 function servedVerbs(root: string): Set<string> | undefined {
   if (verbCache.has(root)) return verbCache.get(root);
   const dir = join(root, ...ENGINE);
@@ -135,9 +150,17 @@ function servedVerbs(root: string): Set<string> | undefined {
   }
   const files: string[] = [];
   sourceFilesUnder(dir, files);
+  const surface = files.filter((f) => /\/tools[a-z-]*\.ts$/.test(f));
+  if (surface.length === 0) {
+    verbCache.set(root, undefined);
+    return undefined;
+  }
   const alive = new Set<string>();
-  for (const abs of files.filter((f) => f.endsWith(".ts"))) {
-    for (const m of readFileSync(abs, "utf8").matchAll(SERVED_VERB)) alive.add(m[0]);
+  for (const abs of surface) {
+    const text = readFileSync(abs, "utf8");
+    for (const shape of DECLARED_VERB) {
+      for (const m of text.matchAll(shape)) alive.add(m[1]);
+    }
   }
   verbCache.set(root, alive);
   return alive;

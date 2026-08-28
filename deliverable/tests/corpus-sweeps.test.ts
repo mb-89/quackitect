@@ -120,25 +120,57 @@ test("the marker silences only the paths it names", () => {
   assert.deepEqual(staleCitations(root, text), ["engine/gone.ts"]);
 });
 
-// AN ID RESOLVES TO A PATH ONLY WHERE THE TEMPLATES DECLARING ITS PREFIX STAND,
-// so these two run against the real project root. A fresh temp root has no
-// templates, every id resolves to nothing, and the check would pass by finding
-// nothing at all.
-const PROJECT = join(import.meta.dirname, "..", "..");
+// AN ID RESOLVES TO A PATH ONLY WHERE THE TEMPLATE DECLARING ITS PREFIX STANDS.
+// A bare temp root has no templates, every id resolves to nothing, and a case
+// built on one would pass by finding nothing at all.
+//
+// SO THE ROOT CARRIES THE TEMPLATE. The test-spec says no case reads the live
+// corpus, and this is what it takes to keep that true.
+function rootWithUseCaseTemplate(): string {
+  const root = fresh();
+  node(root, "deliverable/machines/items/use-case.md", "---\nid_prefix: uc-\nfolder: spec/trace/use-case\n---\n");
+  return root;
+}
+
 const ABSENT = ["uc-a-node-this-corpus-does-not-hold", "uc-another-node-this-corpus-does-not-hold"];
 
 test("a reference the node marks unreachable is not reported", () => {
+  const root = rootWithUseCaseTemplate();
   const bare = { source_refs: [ABSENT[0]] };
-  assert.equal(danglingReferences(PROJECT, bare).length, 1, "it dangles before the marker");
+  assert.equal(danglingReferences(root, bare).length, 1, "it dangles before the marker");
   const marked = { ...bare, unreachable_refs: [ABSENT[0]] };
-  assert.deepEqual(danglingReferences(PROJECT, marked), []);
+  assert.deepEqual(danglingReferences(root, marked), []);
 });
 
 test("the reference marker silences only the ids it names", () => {
+  const root = rootWithUseCaseTemplate();
   const bare = { source_refs: ABSENT };
-  assert.equal(danglingReferences(PROJECT, bare).length, 2, "both dangle before the marker");
+  assert.equal(danglingReferences(root, bare).length, 2, "both dangle before the marker");
   const marked = { ...bare, unreachable_refs: [ABSENT[0]] };
-  const found = danglingReferences(PROJECT, marked);
+  const found = danglingReferences(root, marked);
   assert.equal(found.length, 1);
   assert.ok(found[0].includes(ABSENT[1]), found[0]);
+});
+
+test("a verb named only in an engine comment is not alive", () => {
+  const root = fresh();
+  node(root, "deliverable/engine/tools.ts", '  { name: "se_pull" },\n  // se_git_sync was retired at i34\n');
+  node(root, "deliverable/engine/session.ts", "// the walk once called se_version here\n");
+  const found = deadLaneVerbs(root, "the agent calls se_version, se_git_sync and se_pull\n");
+  assert.deepEqual(found.sort(), ["se_git_sync", "se_version"]);
+});
+
+test("a verb declared in any tools file is alive, whichever shape declares it", () => {
+  const root = fresh();
+  node(root, "deliverable/engine/tools.ts", '  { name: "se_pull" },\n');
+  node(root, "deliverable/engine/tools-file.ts", '    "se_file_read": handler,\n');
+  node(root, "deliverable/engine/tools-desk.ts", '      case "se_survey":\n');
+  const found = deadLaneVerbs(root, "se_pull, se_file_read and se_survey all stand\n");
+  assert.deepEqual(found, []);
+});
+
+test("with no tools file to read, the dead-verb check answers nothing", () => {
+  const root = fresh();
+  node(root, "deliverable/engine/session.ts", "// se_pull is mentioned but nothing declares it\n");
+  assert.deepEqual(deadLaneVerbs(root, "the agent calls se_anything\n"), []);
 });
