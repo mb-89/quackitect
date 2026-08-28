@@ -7,14 +7,14 @@ statement: A seeded machine's steps are frontmatter rows in one drawing file, wh
 owner: the maintainer
 trigger: the picture-in-picture to-do machine design discussion, or the next change to the seeded-machine compiler
 status: open
-looked: 2026-08-26
+looked: 2026-08-28
 impact: Every feature the drawn machines gain must be built twice or the seeded ones fall behind; the owner has ruled the split wrong.
 breaks_how_badly: corrosive
 how_likely: expected
 source_refs:
   - note-142563382cf5
   - note-ed999c4b64b1
-last_looked: 2026-08-23
+last_looked: 2026-08-26
 look_verdict: rescheduled
 place: i13-the-machine-format-state-machines-become
 ---

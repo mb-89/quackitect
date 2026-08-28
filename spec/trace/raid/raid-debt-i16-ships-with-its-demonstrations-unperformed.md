@@ -10,7 +10,7 @@ type: "[[raid]]"
 kind: debt
 statement: The four demonstrations this iteration authored are drawn and none of them has been performed, so the iteration ships with every claim that needs a person watching standing on a drawing rather than on an observation.
 owner: the owner
-looked: 2026-08-26
+looked: 2026-08-28
 status: open
 breaks_how_badly: crippling
 how_likely: expected
@@ -20,8 +20,9 @@ source_refs:
   - tsp-a-vehicle-is-made-and-then-drives-something-else
   - req-one-command-produces-a-complete-copy
   - req-the-system-runs-in-a-tree-that-is-not-its-own
-last_looked: 2026-08-23
+last_looked: 2026-08-26
 look_verdict: rescheduled
+trigger: a second machine exists that can run the four demonstrations, since none of them can be performed inside this repository
 place: backlog
 ---
 

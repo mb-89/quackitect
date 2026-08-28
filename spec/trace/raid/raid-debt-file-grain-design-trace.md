@@ -7,14 +7,14 @@ statement: The design-to-code sweep runs at file grain, so dead code inside a cl
 owner: the driving agent
 trigger: when the file-grain sweep stops finding anything new, or when a region-marker mechanism lands
 status: open
-looked: 2026-08-26
+looked: 2026-08-28
 impact: A dead function inside a live file never surfaces as an unclaimed finding, and only a reachability probe or a reader catches it.
 breaks_how_badly: corrosive
 how_likely: plausible
 source_refs:
   - note-0c5b06e4d056
   - tsp — trace-design's own guidance names the grain and its cost
-last_looked: 2026-08-23
+last_looked: 2026-08-26
 look_verdict: rescheduled
 place: i7-the-trace-sharpens-finer-grain-than-file
 ---

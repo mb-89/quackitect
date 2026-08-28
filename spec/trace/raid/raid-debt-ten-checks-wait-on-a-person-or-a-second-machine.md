@@ -5,16 +5,16 @@ type: "[[raid]]"
 kind: debt
 statement: Ten verification checks and two boundary timings cannot be answered by an agent on this machine, and they are listed here with what each one actually needs so the work-token system can route them.
 owner: the owner
-trigger: when the work-token system can carry a task to a person; or at the first verification after 2026-10-01, whichever comes first
+trigger: when a work token that says it needs a person SURVIVES being minted into the pool; or at the first verification after 2026-10-01, whichever comes first. The old wording fired already and collected nothing: session tokens all carry the person-only field and none of the 263 pool tokens does, so the mark is dropped at the mint
 status: open
-looked: 2026-08-26
+looked: 2026-08-28
 impact: A check nobody can run is marked owed every iteration and eventually stops being read, which is how four factual errors sat in the README while its own inspection was marked owed.
 breaks_how_badly: abrasive
 how_likely: expected
 source_refs:
   - raid-issue-the-corpus-wide-inspections-have-no-runner
   - i33 verification, tester rounds one to four
-last_looked: 2026-08-23
+last_looked: 2026-08-26
 look_verdict: rescheduled
 place: backlog
 ---

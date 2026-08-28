@@ -7,7 +7,10 @@ type: "[[raid]]"
 kind: debt
 statement: The one demonstration this round owes watches a person browse the panel, and it was not performed, so the round ships with the claim about its own subject standing on a drawing rather than on an observation.
 owner: the owner
-looked: 2026-08-26
+looked: 2026-08-28
+last_looked: 2026-08-26
+look_verdict: re-accepted
+trigger: a person watches the panel walkthrough, which is the only thing that can answer it — the entry carried no trigger at all until 2026-08-28, so it could never be rescheduled and was re-accepted by default rather than by choice
 status: open
 breaks_how_badly: crippling
 how_likely: expected

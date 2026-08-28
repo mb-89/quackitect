@@ -7,14 +7,14 @@ statement: The core and satellite cluster is built and tested, and nothing the r
 owner: the driving agent
 trigger: when the run mode is first flipped away from inline, or at the code-review iteration
 status: open
-looked: 2026-08-26
+looked: 2026-08-28
 impact: A whole subsystem drifts from the engine it is meant to carry, and its green tests read as proof it works.
 breaks_how_badly: corrosive
 how_likely: expected
 source_refs:
   - note-fe9e091bfa4c
   - 570cdc66 — the levelling commit that brought all twelve files into this tree
-last_looked: 2026-08-23
+last_looked: 2026-08-26
 look_verdict: rescheduled
 place: i48-wire-the-built-failure-shapes-feeds-the-
 ---

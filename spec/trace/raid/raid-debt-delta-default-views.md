@@ -5,17 +5,17 @@ type: "[[raid]]"
 kind: debt
 statement: The reference views still list the whole corpus - the minted_in stamps stand, but the resolvers do not yet default to the bound record's delta with the corpus opt-in.
 owner: the driving agent
-trigger: the next form opened in a record whose table lists another record's nodes, or the owner's next reiteration of the delta demand
+trigger: a record opens whose scope names the reference resolvers themselves — the old wording fired on the next form opened, which is every form of every round, and forty-two rounds have passed without it collecting anything
 status: open
-looked: 2026-08-26
+looked: 2026-08-28
 breaks_how_badly: abrasive
 how_likely: expected
 impact: Every reference table in a record lists the standing corpus beside the delta - 38 test-specs where 7 are the iteration's own - and the reader wades through history, exactly what the owner has flagged three times.
 source_refs:
   - req-nodes-scoped-to-iteration
   - note-db7c72bd519c
-last_looked: 2026-08-23
-look_verdict: rescheduled
+last_looked: 2026-08-26
+look_verdict: re-accepted
 place: i53-a-step-sees-its-own-record-s-slice-forms
 ---
 

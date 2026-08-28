@@ -7,7 +7,7 @@ statement: Four demonstration specs went unobserved at i3's verification - each 
 owner: the owner
 trigger: the consolidation pass that collects everything needing a person, or any iteration whose delta actually touches one of the four specs
 status: open
-looked: 2026-08-26
+looked: 2026-08-28
 breaks_how_badly: abrasive
 how_likely: expected
 impact: Verification refuses while any claim box stands open, so four specs nobody at a terminal can observe stop every iteration from closing. The alternative is checking boxes on unobserved claims, which is worse.
@@ -17,7 +17,7 @@ source_refs:
   - tsp-tour-run
   - tsp-desk-and-gates
   - meth-verification-discipline
-last_looked: 2026-08-23
+last_looked: 2026-08-26
 look_verdict: rescheduled
 place: backlog
 ---

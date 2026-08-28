@@ -5,15 +5,16 @@ type: "[[raid]]"
 kind: debt
 statement: The consistency sweep was rewired to run after the demonstrations rather than beside them, because the walker cannot resume a fan leg once the leg it took was a submachine, so the method lost a parallel branch to get past an engine defect.
 owner: the owner
-looked: 2026-08-26
+looked: 2026-08-28
 status: open
 breaks_how_badly: corrosive
 how_likely: expected
 impact: "Any drawing that fans into a submachine is unwalkable by one agent. The walk reaches the join with the other leg never taken, and every legal move is closed: the pull refuses SE-C-123, a choice refuses SE-C-110, the router draws a route the whole way round the record and moves zero hops, and se_reopen would take the walked leg down with it. The only ways out are editing the drawing or editing the engine."
 source_refs:
   - note-ec92cfa43897
-last_looked: 2026-08-23
+last_looked: 2026-08-26
 look_verdict: rescheduled
+trigger: the record that teaches the router to resume a fan leg, which is where this entry is placed
 place: i52-the-route-can-go-back-a-walk-can-reach-a
 ---
 

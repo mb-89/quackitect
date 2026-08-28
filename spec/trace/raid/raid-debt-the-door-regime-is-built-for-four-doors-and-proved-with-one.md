@@ -6,6 +6,8 @@ kind: debt
 statement: The rule table takes any number of conversations and three of its parts assume there is exactly one, so a second door would be silently mis-served rather than refused.
 owner: the maintainer
 status: open
+looked: 2026-08-28
+look_verdict: rescheduled
 trigger: the record that registers a second door, before it registers it
 impact: A second door would count zero governed files on a full tree and report itself UNCHECKED forever, and two behaviours that were fixed this iteration cannot be tested at all until it exists.
 breaks_how_badly: abrasive

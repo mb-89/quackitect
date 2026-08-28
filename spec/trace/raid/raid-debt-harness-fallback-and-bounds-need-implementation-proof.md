@@ -3,7 +3,7 @@ minted_in: i36
 id: raid-debt-harness-fallback-and-bounds-need-implementation-proof
 type: "[[raid]]"
 kind: debt
-looked: 2026-08-26
+looked: 2026-08-28
 statement: The research fallback and answer-bound changes are started but not yet proven on the live harness path.
 owner: the driving agent
 trigger: implementation begins after the motivation gate
@@ -15,7 +15,7 @@ source_refs:
   - spec/references/ref-agent-harness-portability-2026-08-19.md
   - spec/trace/raid/raid-host-payload-offload-breaks-read-proof.md
   - spec/trace/raid/raid-mcp-stop-is-not-diagnosable.md
-last_looked: 2026-08-23
+last_looked: 2026-08-26
 look_verdict: rescheduled
 place: i39-the-lane-tells-the-truth-about-itself-de
 ---

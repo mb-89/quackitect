@@ -3,7 +3,7 @@ minted_in: i36
 id: raid-debt-two-must-requirements-compute-a-result-that-reaches-no-surface
 type: "[[raid]]"
 kind: debt
-looked: 2026-08-26
+looked: 2026-08-28
 statement: The stopping-layer diagnosis and the recurring-failure-shape detector are built and tested, but no production path calls either, so neither requirement's promised report actually reaches anyone.
 owner: the driving agent
 trigger: the next iteration that opens the lane's reporting surfaces
@@ -16,7 +16,7 @@ source_refs:
   - spec/trace/requirement/req-repeated-failure-shape-becomes-durable-work.md
   - spec/trace/test-spec/tsp-interrupted-call-names-the-stopping-layer.md
   - spec/trace/test-spec/tsp-repeated-failure-shape-becomes-durable-work.md
-last_looked: 2026-08-23
+last_looked: 2026-08-26
 look_verdict: rescheduled
 place: i48-wire-the-built-failure-shapes-feeds-the-
 ---

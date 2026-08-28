@@ -5,8 +5,10 @@ type: "[[raid]]"
 kind: debt
 statement: A hop inside a large record costs about a second more than a hop outside one, the size of the gap is measured, and nothing has been shown to cause it.
 owner: the adjudicator
-trigger: the next complaint that the walk is slow, and any change to the pull path
+trigger: FIRED. i68 is open and its whole goal is the walk's fixed per-call cost, so this entry's home is that record and its next look belongs there rather than at another retro
 status: open
+looked: 2026-08-28
+look_verdict: rescheduled
 impact: Every hop of every record pays it, so it is the single most-felt cost in the system. Leaving it unattributed means the next attempt starts from the same three disproved hypotheses.
 breaks_how_badly: annoying
 how_likely: certain
