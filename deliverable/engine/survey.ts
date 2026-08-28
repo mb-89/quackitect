@@ -4,6 +4,7 @@ import { itList, readItRecord } from "./iterations.ts";
 import { seDir } from "./paths.ts";
 import { standingTokens } from "./pool.ts";
 import { expList, readRecord, retroOwed } from "./records.ts";
+import { BACKLOG } from "./workstore.ts";
 
 export interface Survey {
   counts: { expeditions: number; iterations: number; notes: number; backlog: number };
@@ -112,13 +113,27 @@ export function survey(projectRoot: string, opts: SurveyOptions = {}): Survey {
   const windowed = opts.limit !== undefined || offset > 0;
   const notes = windowed ? allNotes.slice(offset, offset + (opts.limit ?? allNotes.length)) : allNotes;
   // see dsp-the-options-pool.md#the-pool-is-read-from-the-repository
-  const allBacklog = standingTokens(projectRoot).map((o) => ({
-    ref: o.id,
-    ready_when: o.ready_when,
-    title: headline(o.statement, GOAL_CAP),
-    priority: DEFAULT_PRIORITY,
-    ...(withText ? { text: o.statement } : {}),
-  }));
+  //
+  // AN ITEM WITH A PLACE IS NOT IN THE BACKLOG ANY MORE, and the desk has to
+  // read that. Writing a place moved 300 of 352 items onto a record or a state
+  // on 2026-08-28, and the desk went on listing all 352 — because this line
+  // took every standing token and never asked where any of them stood.
+  //
+  // THE PLACE WAS ALREADY BEING READ ELSEWHERE. `workpen.ts` draws an item at
+  // its place. So the field was right, the store was right, and the one
+  // surface a person actually reads was the one that ignored it.
+  //
+  // WHERE THE OTHERS WENT is the state's own pending work, which is what
+  // holding a place means.
+  const allBacklog = standingTokens(projectRoot)
+    .filter((o) => o.place === undefined || o.place === "" || o.place === BACKLOG)
+    .map((o) => ({
+      ref: o.id,
+      ready_when: o.ready_when,
+      title: headline(o.statement, GOAL_CAP),
+      priority: DEFAULT_PRIORITY,
+      ...(withText ? { text: o.statement } : {}),
+    }));
   const backlog = windowed ? allBacklog.slice(offset, offset + (opts.limit ?? allBacklog.length)) : allBacklog;
   const passed = passedMoments(itList(projectRoot), allBacklog);
   // READ FROM THE REPOSITORY, never from the local note store. Shipping used to

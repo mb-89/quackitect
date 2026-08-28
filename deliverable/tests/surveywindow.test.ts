@@ -157,6 +157,53 @@ test("a shipped iteration leaves the open list, whatever stands on disk", async 
   assert.equal(after.counts.iterations, after.iterations.length, "the count matches the list it counts");
 });
 
+// AN ITEM WITH A PLACE IS NOT IN THE BACKLOG, and the desk has to read that.
+//
+// MEASURED 2026-08-28, and the owner found it rather than a test: 352 items
+// were given a place, 300 of them onto a record or a state, and the desk went
+// on listing all 352. The place was written into every file, `workpen` was
+// already drawing each item at its place, and the ONE SURFACE A PERSON READS
+// was the one that ignored the field.
+//
+// A COUNT IS EXACTLY THE KIND OF THING THAT READS RIGHT WHILE BEING WRONG.
+test("an item placed at a state leaves the desk's backlog", async () => {
+  const root = freshRoot();
+  gitInit(root);
+  const server = await bootedServer(root);
+
+  const token = (slug: string, place: string | undefined): void => {
+    const dir = join(root, "spec", "trace", "work-token");
+    mkdirSync(dir, { recursive: true });
+    const lines = [
+      "---",
+      `id: ${slug}`,
+      'type: "[[work-token]]"',
+      "statement: a fixture item",
+      "ready_when: ready now",
+      "source: a fixture",
+      ...(place === undefined ? [] : [`place: ${place}`]),
+      "---",
+      "",
+    ];
+    writeFileSync(join(dir, `${slug}.md`), lines.join("\n"), "utf8");
+  };
+  token("wt-carries-no-place-at-all", undefined);
+  token("wt-says-backlog-explicitly", "backlog");
+  token("wt-was-routed-to-a-record", "i99-somewhere-else");
+  token("wt-was-routed-to-a-state", "retro");
+
+  const s = (await call(server, "se_survey", {})).body as unknown as {
+    counts: { backlog: number };
+    backlog: { ref: string }[];
+  };
+  const refs = s.backlog.map((b) => b.ref);
+  assert.ok(refs.includes("wt-carries-no-place-at-all"), "no place means the backlog, which is what a mint gives");
+  assert.ok(refs.includes("wt-says-backlog-explicitly"), "saying backlog is the same as saying nothing");
+  assert.ok(!refs.includes("wt-was-routed-to-a-record"), "an item routed to a record has left the backlog");
+  assert.ok(!refs.includes("wt-was-routed-to-a-state"), "and so has one routed to a state");
+  assert.equal(s.counts.backlog, s.backlog.length, "the count matches the list it counts");
+});
+
 // A PARKED ITEM WAITING ON A RECORD IS WAITING FOR AN EVENT NOBODY FIRES.
 //
 // "ready when i60 is seeded" reads like a promise that the item wakes when
