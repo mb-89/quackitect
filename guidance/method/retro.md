@@ -13,6 +13,40 @@ The retro EMITS; it adopts almost nothing. A lead becomes a note. The
 note drains into exactly one home. Planning consumes what survived.
 (v1's retro/triage separation, ported.)
 
+## Fix what produced it, never only what it produced
+
+THE OPENING RULE HAS A SECOND HALF. "Fix the system, never a person" says who
+is not to blame. This says what to repair.
+
+A BAD OUTPUT IS EVIDENCE ABOUT ITS GENERATOR. The wrong answer is the symptom.
+What produced it is the thing to change, and it is one of these:
+
+- the prompt
+- the guidance card
+- the form
+- the refusal
+- the tool
+
+SO EVERY LEAD ANSWERS ONE QUESTION: what would have stopped this from being
+produced at all? An improvement that repairs one artifact and leaves the
+generator alone has bought one artifact.
+
+REPAIRING THE ARTIFACT TOO IS FINE, and usually necessary. It is simply not
+the finding.
+
+MID-WALK IT IS ALREADY HAPPENING. An agent that notices something and writes a
+note usually applies the finding to its own work in the same breath. The retro
+is where that becomes durable instead of personal.
+
+THE LINTER LAW IS THIS RULE WITH TEETH. A guidance sentence nobody heeds is
+not a fix. Measure whether findings lead to edits, then promote the ignored
+ones to refusals or delete them (guidance/method/engineering.md).
+
+WHERE IT COMES FROM. Bun's Zig-to-Rust port ran the same rule live. Agents
+read "get the crates to compile" as "stub out the failing functions", and the
+repair was one edit to the loop's prompt rather than a sweep over the stubs.
+The account is [[ref-bun-zig-to-rust-port]].
+
 ## When it fires
 
 The trigger is a NOTE carrying "needs retro":

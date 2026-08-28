@@ -49,6 +49,41 @@ subagent until the owner asked why. Almost none of the fixes were mechanical,
 so handing them over would have saved little — but the READING behind them was
 most of the session's cost, and every page of it stayed in context.
 
+## The reviewer never implements, and the implementer never reviews
+
+OWNER RULING 2026-08-26. Where a subagent reviews work, it reports what it
+found and stops. A different hand applies the findings.
+
+WHY THE SEPARATION IS THE POINT. The hand that wrote something wants it
+accepted. That is not a model defect. It is what having authored something
+does, to a person as much as to an agent, and a reviewer allowed to fix
+inherits the author's stake in the fix.
+
+THREE ROLES, AND NONE OF THEM DOUBLES UP.
+
+- The IMPLEMENTER writes, and never reviews its own work.
+- The REVIEWER hunts for reasons the work is wrong, and writes nothing.
+- The FIXER applies what the reviewer found.
+
+THE REVIEWER'S BRIEF SAYS WHAT IT IS HUNTING. "Review this" invites a summary.
+"Find every reason this does not work, and say which of them are real" invites
+a finding. Write the second one.
+
+MORE THAN ONE REVIEWER IS LEGAL AND OFTEN RIGHT. Where the work can fail in
+more than one way, give each reviewer a different lens rather than asking two
+agents the same question.
+
+THE WALKER IS A HAND LIKE ANY OTHER. Reading a subagent's findings and
+applying them is the fixer's job, and the walker may hold it. What the walker
+may not do is review its own work and call that a review.
+
+WHERE IT COMES FROM. Bun's Zig-to-Rust port ran one implementer, two or more
+adversarial reviewers and one fixer over every ported file, and named the
+author's bias as the reason. The account is [[ref-bun-zig-to-rust-port]].
+
+NOBODY HAS SEEN THE FAILURE HERE YET, and the owner said so when ordering the
+rule. It is written down before it costs something rather than after.
+
 ## Pass the lane rule to every subagent
 
 A subagent has your tools and none of your context. Give it the cage.
