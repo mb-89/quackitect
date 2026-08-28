@@ -140,8 +140,12 @@ reads as idle, whatever it is actually doing, because silence is the only
 signal the table has. A working hand that looks idle is worse than no column
 at all.
 
-THE EXIT CHECKS THAT YOU DID. hands-spawned.ts reads the registry and refuses
-while no hand stands against this record. It proves a hand was registered and
+THE STATE IS A PASS-THROUGH AT A CEILING OF ZERO. Where the kickoff asks for no
+hands, walk on and spawn nothing.
+
+THE EXIT CHECKS THE CEILING, NOT THE SPAWN. hands-spawned.ts reads the registry
+and refuses while MORE hands stand against this record than the kickoff allows.
+It used to ask whether you had spawned, and that was the wrong question. It proves a hand was registered and
 nothing more.
 
 WHAT IT DELIBERATELY DOES NOT PROVE is that the hand did the work. A guide

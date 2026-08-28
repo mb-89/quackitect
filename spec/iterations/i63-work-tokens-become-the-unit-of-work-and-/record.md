@@ -2,7 +2,6 @@
 id: i63-work-tokens-become-the-unit-of-work-and-
 status: shipped
 closed: 2026-08-27T21:15:05.412Z
-retro_owed: 2026-08-27T21:15:05.412Z
 carried_count: 2
 carried:
   - tsp-a-person-steers-the-work-by-looking-and-dragging — raid-risk-a-state-must-mint-its-own-tokens-and-that-machinery-is-undesigned (verification.md)

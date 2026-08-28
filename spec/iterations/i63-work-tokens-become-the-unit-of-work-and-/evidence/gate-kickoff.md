@@ -1,13 +1,13 @@
 ---
 form: gate-kickoff
-amended: "2026-08-25T18:41:58.031Z by agent — this gate's red team withdrew the batch attack on a premise the pressure test later corrected"
+amended: 2026-08-25T18:41:58.031Z by agent — this gate's red team withdrew the batch attack on a premise the pressure test later corrected
 bless: blessed by agent
 by: agent
 signed_off: 2026-08-25T16:59:49.247Z
 reopened: "2026-08-25T16:57:36.309Z — the owner stated the vision after this gate stamped, and it adds a goal: the architecture analysis must sweep every place work is done so nothing the token system touches is missed"
 checked: Read refusals, Read template-free-form, Read template-per-item, Read template-list, Read template-choice-with-rationale, Read template-findings, Read template-refs
 authors: agent, human
-files:
+files: null
 ---
 
 # Evidence form / gate-kickoff

@@ -3,11 +3,11 @@ minted_in: i63-work-tokens-become-the-unit-of-work-and-
 id: raid-risk-parallel-by-default-removes-the-sequence-that-made-a-skip-visible
 type: "[[raid]]"
 kind: risk
-statement: "Numbered steps in existing method cards become unordered tokens at conversion, so every recorded statement that order mattered is silently dropped unless somebody rewrites it as an edge."
+statement: Numbered steps in existing method cards become unordered tokens at conversion, so every recorded statement that order mattered is silently dropped unless somebody rewrites it as an edge.
 owner: the driving agent
-trigger: "the conversion of the first numbered method card, and any card whose steps run out of order afterwards"
+trigger: the conversion of the first numbered method card, and any card whose steps run out of order afterwards
 status: mitigated
-impact: "Numbering is the only place a card author has ever recorded that order mattered. Dropping it loses information the corpus already carries, and nothing refuses when it goes."
+impact: Numbering is the only place a card author has ever recorded that order mattered. Dropping it loses information the corpus already carries, and nothing refuses when it goes.
 breaks_how_badly: abrasive
 how_likely: plausible
 source_refs:

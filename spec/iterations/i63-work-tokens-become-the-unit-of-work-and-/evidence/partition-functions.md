@@ -2,9 +2,9 @@
 form: partition-functions
 by: agent
 signed_off: 2026-08-26T12:26:19.146Z
-reopened: "2026-08-26T12:26:13.626Z — derive-criteria was re-signed after it, and the three new rows land on functions that already have their cluster"
+reopened: 2026-08-26T12:26:13.626Z — derive-criteria was re-signed after it, and the three new rows land on functions that already have their cluster
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / partition-functions

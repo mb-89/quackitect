@@ -1,11 +1,11 @@
 ---
 form: spawn-for-motivation
-amended: "2026-08-25T18:34:54.697Z by agent — this state argued that author-is-reviewer is stronger separation than a spawned hand, which is the reasoning that produced a single-hand phase"
+amended: 2026-08-25T18:34:54.697Z by agent — this state argued that author-is-reviewer is stronger separation than a spawned hand, which is the reasoning that produced a single-hand phase
 judgment: passed at 2026-08-25T17:00:11.620Z with deliverable/engine/bin/hands-spawned.ts@8be27987d4e0
 by: agent
 signed_off: 2026-08-25T17:00:10.873Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / spawn-for-motivation

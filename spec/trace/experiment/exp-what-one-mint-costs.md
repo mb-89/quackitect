@@ -7,12 +7,12 @@ probes:
   - raid-asm-minting-on-every-entry-stays-inside-the-per-hop-budget
 timebox: half a day
 form: script
-faked: "NOTHING IS FAKED ANY MORE. The first pass read one source of three and called it a mint. The store now exists, so the act is timed end to end — read, stamp, write, and the re-entry match"
-fallback: "none needed — but a large position is within a factor of two of a bound that does not bind it, so the signal is what matters rather than the margin"
+faked: NOTHING IS FAKED ANY MORE. The first pass read one source of three and called it a mint. The store now exists, so the act is timed end to end — read, stamp, write, and the re-entry match
+fallback: none needed — but a large position is within a factor of two of a bound that does not bind it, so the signal is what matters rather than the margin
 verdict: holds
-measured: "2026-08-26, second pass, against the built store. A real 5-part card costs 18.52 ms whole. Re-entry costs 7.58 ms and writes nothing. A 40-item position costs 117.78 ms. The read half alone is 8.45 ms, stamp included"
+measured: 2026-08-26, second pass, against the built store. A real 5-part card costs 18.52 ms whole. Re-entry costs 7.58 ms and writes nothing. A 40-item position costs 117.78 ms. The read half alone is 8.45 ms, stamp included
 folds_to: raid-dec-work-is-a-file-while-open-and-one-folded-file-once-closed — the design's hot path is affordable
-promote: "none — nothing needs building to make this true; it already is"
+promote: none — nothing needs building to make this true; it already is
 chunk: the-work-store — which is where the write half was finally measured
 source_refs:
   - rank-unknowns, the seeded pick

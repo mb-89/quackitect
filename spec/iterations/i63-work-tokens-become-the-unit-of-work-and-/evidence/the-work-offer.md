@@ -3,7 +3,7 @@ form: the-work-offer
 by: agent
 signed_off: 2026-08-26T15:37:58.406Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / the-work-offer

@@ -61,3 +61,16 @@ THE TRIGGER HAS NOT FIRED. Its trigger is the record that registers a second con
 THE FIRST REPAYMENT STEP IS CHEAP AND STILL NOT TAKEN. Giving the door type a field naming the folders it governs would remove the hardcoded walk, and it does not need a second door to exist. It is deliberately left with the record that adds one, so the type change and its first real user land together.
 
 RE-ACCEPTED consciously, trigger unchanged.
+
+SWEPT 2026-08-28, at i63's closing retro: RE-ACCEPTED, and the trigger holds.
+
+The trigger is the record that registers a second door, before it registers it.
+No second door was registered in this window.
+
+WHAT DID HAPPEN is that the door regime merged into v3 from the
+system-exploration branch, and its two clauses renumbered to SE-C-154 and
+SE-C-155 because i63 had already shipped the original numbers. The regime is
+now on trunk and still proved with one door.
+
+SO THE DEBT IS UNCHANGED IN SUBSTANCE and larger in reach, since the guard now
+binds every write on trunk rather than one branch.

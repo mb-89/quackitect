@@ -4,12 +4,12 @@ id: dsp-marking-a-card
 type: "[[design-spec]]"
 statement: a card says which of its parts are work, and the compiler reads the mark instead of inferring from shape
 realizes:
-  - "el-method-compiler"
-  - "if-engine-delta-to-work-store"
-  - "if-method-compiler-to-work-store"
+  - el-method-compiler
+  - if-engine-delta-to-work-store
+  - if-method-compiler-to-work-store
 files:
-  - "deliverable/machines/methods"
-  - "deliverable/engine/cardwork.ts"
+  - deliverable/machines/methods
+  - deliverable/engine/cardwork.ts
 ---
 
 ## Responsibility

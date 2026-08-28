@@ -5,15 +5,15 @@ type: "[[raid]]"
 kind: assumption
 statement: The fold is justified by figures measured at 20,000 files, and this repository holds 1,312.
 owner: the driving agent
-trigger: "at the build step that writes the fold, and again at any point where the archive is measured"
+trigger: at the build step that writes the fold, and again at any point where the archive is measured
 status: closed
-impact: "If the scale never arrives, the fold is a format nobody needed. The archive half of the decision would still stand on its own, so what is at stake is the fold rather than the choice."
+impact: If the scale never arrives, the fold is a format nobody needed. The archive half of the decision would still stand on its own, so what is at stake is the fold rather than the choice.
 breaks_how_badly: corrosive
 how_likely: possible
 source_refs:
-  - "gate-architecture round_2_red_team, 2026-08-26"
-  - "scratchpad/probe-many-files.mjs — git add 26,073 ms at 20,000 files against 97 ms folded"
-  - "scratchpad/measure-archive-cost.mjs — 68 folders, 1,312 files, 9.7 MB of content"
+  - gate-architecture round_2_red_team, 2026-08-26
+  - scratchpad/probe-many-files.mjs — git add 26,073 ms at 20,000 files against 97 ms folded
+  - scratchpad/measure-archive-cost.mjs — 68 folders, 1,312 files, 9.7 MB of content
   - raid-dec-work-is-a-file-while-open-and-one-folded-file-once-closed
 ---
 

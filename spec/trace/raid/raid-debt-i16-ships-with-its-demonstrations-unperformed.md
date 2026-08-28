@@ -109,3 +109,13 @@ NOT ADVANCED THIS WINDOW. i54 performed its own three demonstrations and left th
 
 RE-ACCEPTED consciously, trigger unchanged.
 
+
+SWEPT 2026-08-28, at i63's closing retro: RE-ACCEPTED, AND IT CARRIES NO
+TRIGGER.
+
+Nothing brings it due. It is one of three open debts in that state.
+
+THE TRIGGER IT SHOULD CARRY: the consolidation pass that collects everything
+needing a person, which is the same moment
+raid-debt-human-observed-demonstrations already names. Two entries waiting on
+one moment should share its wording, so a single act closes both.

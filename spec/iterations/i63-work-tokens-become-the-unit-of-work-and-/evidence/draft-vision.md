@@ -1,11 +1,11 @@
 ---
 form: draft-vision
-amended: "2026-08-25T18:32:44.921Z by agent — an independent reviewer found the withdrawn positions-never-reused wording still standing here, and the read-evidence claim resting on a comment rather than on the code"
+amended: 2026-08-25T18:32:44.921Z by agent — an independent reviewer found the withdrawn positions-never-reused wording still standing here, and the read-evidence claim resting on a comment rather than on the code
 by: agent
 signed_off: 2026-08-25T17:10:14.753Z
-reopened: "2026-08-25T17:09:44.825Z — the goal list led with a quality instead of the goal — the owner ruled the goal is that every piece of work is modelled as a token that the engine, the agent and the person all understand"
+reopened: 2026-08-25T17:09:44.825Z — the goal list led with a quality instead of the goal — the owner ruled the goal is that every piece of work is modelled as a token that the engine, the agent and the person all understand
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / draft-vision

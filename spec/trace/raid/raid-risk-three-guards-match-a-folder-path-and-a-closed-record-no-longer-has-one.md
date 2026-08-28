@@ -11,7 +11,7 @@ against:
   - req-a-records-own-status-decides-whether-it-is-open
   - req-a-shipped-record-is-never-reclaimed
 source_refs:
-  - "gate-architecture, the program sweep of all 267 functional requirements"
+  - gate-architecture, the program sweep of all 267 functional requirements
   - scratchpad/sweep-functional-rows-the-fold-touches.mjs
   - raid-iss-a-functional-requirement-the-design-touches-is-dealt-nowhere
   - raid-dec-work-is-a-file-while-open-and-one-folded-file-once-closed

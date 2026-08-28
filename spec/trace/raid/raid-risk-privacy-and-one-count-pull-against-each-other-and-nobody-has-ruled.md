@@ -3,11 +3,11 @@ minted_in: i63-work-tokens-become-the-unit-of-work-and-
 id: raid-risk-privacy-and-one-count-pull-against-each-other-and-nobody-has-ruled
 type: "[[raid]]"
 kind: risk
-statement: "A note is private and a token is not, so making them one object would give the retro a single count and would also put private text where it can never be taken back."
+statement: A note is private and a token is not, so making them one object would give the retro a single count and would also put private text where it can never be taken back.
 owner: the owner role
-trigger: "the design step that specifies where a note lives, and any proposal to show notes and tokens in one number"
+trigger: the design step that specifies where a note lives, and any proposal to show notes and tokens in one number
 status: open
-impact: "Ruling it wrong in the permissive direction is unrecoverable. Anything landing on trunk stays in history, and a note may carry a path, a name or a customer."
+impact: Ruling it wrong in the permissive direction is unrecoverable. Anything landing on trunk stays in history, and a note may carry a path, a name or a customer.
 breaks_how_badly: corrosive
 how_likely: expected
 source_refs:

@@ -41,6 +41,18 @@ restating the other.
 
 ## Telling the kinds apart #work
 
+FIRST ASK WHETHER IT IS AN ENTRY AT ALL. A thing you could just DO is WORK, and
+it belongs on a work token rather than in the register.
+
+THE REGISTER IS FOR LONG-LIVING THINGS — something that might happen, something
+you are relying on, something you decided, something you owe. A design hole
+with a known fix is none of those. It is a fix nobody has made yet.
+
+WHY THE TEST EARNS ITS PLACE. The register reached 475 entries, 315 of them
+open, and a sweep found nine that had to be closed as work rather than kept as
+findings. Every one of them passed the kind table below, because the table asks
+which kind a thing is and never asks whether it is one.
+
 | kind | what it is | the tell |
 | --- | --- | --- |
 | risk | might happen, would hurt | it has not happened |

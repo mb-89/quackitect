@@ -2,9 +2,9 @@
 form: evaluate-set
 by: agent
 signed_off: 2026-08-26T12:47:30.300Z
-reopened: "2026-08-26T12:46:21.684Z — cut-criteria was re-signed with fifteen axes after a cold review moved four rows, and every cell has now come back from the spawned scorer"
+reopened: 2026-08-26T12:46:21.684Z — cut-criteria was re-signed with fifteen axes after a cold review moved four rows, and every cell has now come back from the spawned scorer
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / evaluate-set

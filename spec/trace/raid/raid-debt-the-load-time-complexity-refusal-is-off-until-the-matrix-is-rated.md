@@ -102,3 +102,14 @@ one is what stops a walk proceeding on a guess.
 NOT TOUCHED THIS WINDOW. No rating pass ran and the matrix is unchanged.
 
 RE-ACCEPTED consciously, trigger unchanged.
+
+SWEPT 2026-08-28, at i63's closing retro: TRIGGER PARTLY FIRED, RE-ACCEPTED.
+
+The trigger has two halves. The matrix owner rating the cells has not happened.
+The second half — a reader taking req-every-matrix-row-declares-its-complexity
+at its word — fired: a note in this window records that every work item carries
+an empty difficulty because no matrix cell is rated.
+
+SO THE ROW IS STILL WRITING A CHEQUE THE MATRIX CANNOT CASH, and a reader met
+it. 42 rigor-matrix files changed in this window and none of them added a
+rating.

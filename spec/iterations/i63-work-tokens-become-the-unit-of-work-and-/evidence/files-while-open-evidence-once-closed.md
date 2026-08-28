@@ -3,7 +3,7 @@ form: files-while-open-evidence-once-closed
 by: agent
 signed_off: 2026-08-26T10:42:53.556Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / files-while-open-evidence-once-closed

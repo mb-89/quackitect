@@ -57,6 +57,12 @@ the finding.
 
 - IT HAS ONE QUESTION, written before it starts. A probe that discovers its
   question afterwards discovered a rationalisation.
+- IT READS THE STORIES, NEVER THE GOALS LIST. A goals list is a summary, and a
+  probe aimed at a summary can answer a question nobody asked.
+- A SPIKE ON A NAMED REGISTER ENTRY OWES A PROBE OR A REFUSAL, never a scope
+  argument. Closing one by arguing the thing is out of scope leaves the entry
+  answered on paper and unprobed in fact. One such closure nearly shipped a
+  buildable verdict on a gesture the platform does not support.
 - IT HAS A TIMEBOX, and running out is a verdict rather than a failure.
 - IT NAMES WHAT IT FAKED. Every probe stubs something, and an unnamed stub is
   where a false positive lives.

@@ -185,3 +185,50 @@ test("min_ms filters the log to what was at least that slow", () => {
     "both doors, one ask",
   );
 });
+
+// GROUPING BY CLAUSE READS THE TEXT WHEN THE RESPONSE IS A STRING.
+//
+// A refusal's clause sits at `response.clause` while the response is an object,
+// and a long log caps most responses to a string. Digging then reaches nothing
+// and the record lands under `(none)`, which reads exactly like a period with
+// few refusals rather than a period whose refusals could not be counted.
+//
+// MEASURED ON A REAL LOG of 390 failures: 74 were attributed by the dig alone
+// and 293 once the text is read. The retro's own step asks for refusal clauses
+// by frequency and names this verb for it, so a four-fold undercount is the
+// verb answering the wrong question confidently.
+test("a clause carried in a capped response string is still counted", () => {
+  const dir = mkdtempSync(join(tmpdir(), "se-clause-"));
+  const log = new CallLog(dir);
+
+  // EVERY COORDINATE OR NONE, so each record carries all three.
+  const coords = { answered_by: "test", state: "front_desk", part: "walker" };
+
+  // one refusal whose response is an OBJECT — the dig finds this one
+  log.append({
+    ...coords,
+    tool: "se_file_patch",
+    args: {},
+    ok: false,
+    outcome: "rejected",
+    response: { clause: "SE-C-105" },
+  } as never);
+
+  // two whose response was capped to a STRING on the way in — the dig cannot
+  // reach these, and they are the majority shape in any long log
+  for (const clause of ["SE-C-110", "SE-C-110"]) {
+    log.append({
+      ...coords,
+      tool: "se_run",
+      args: {},
+      ok: false,
+      outcome: "rejected",
+      response: `{"kind":"rejected","clause":"${clause}","expected":"…cut…"}`,
+    } as never);
+  }
+
+  const g = log.query({ filter: { ok: false }, group_by: "clause" }).groups ?? {};
+  assert.equal(g["SE-C-105"], 1, "a clause on an object response is counted");
+  assert.equal(g["SE-C-110"], 2, "a clause inside a capped response STRING is counted too");
+  assert.equal(g["(none)"], undefined, "no refusal carrying a clause lands under (none)");
+});

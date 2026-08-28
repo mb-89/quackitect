@@ -4,20 +4,20 @@ id: dsp-the-work-store
 type: "[[design-spec]]"
 statement: every write to a piece of work, in one place — minted on entry, matched by identity on re-entry, placed, taken and settled
 realizes:
-  - "el-work-store"
-  - "if-work-store-to-work-offer"
-  - "if-work-offer-to-work-store"
-  - "if-work-store-to-walk-engine"
-  - "if-work-store-to-record-store"
-  - "if-record-store-to-work-store"
-  - "if-holding-pen-to-work-store"
-  - "if-work-store-to-work-registry"
+  - el-work-store
+  - if-work-store-to-work-offer
+  - if-work-offer-to-work-store
+  - if-work-store-to-walk-engine
+  - if-work-store-to-record-store
+  - if-record-store-to-work-store
+  - if-holding-pen-to-work-store
+  - if-work-store-to-work-registry
 files:
-  - "deliverable/engine/workstore.ts"
-  - "deliverable/engine/workmint.ts"
-  - "deliverable/engine/workpen.ts"
-  - "deliverable/engine/register.ts"
-  - "deliverable/engine/traceup.ts"
+  - deliverable/engine/workstore.ts
+  - deliverable/engine/workmint.ts
+  - deliverable/engine/workpen.ts
+  - deliverable/engine/register.ts
+  - deliverable/engine/traceup.ts
 ---
 
 ## The pen's third live source: the register

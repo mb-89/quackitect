@@ -3,11 +3,11 @@ minted_in: i63-work-tokens-become-the-unit-of-work-and-
 id: raid-risk-a-drag-that-crosses-two-panels-may-not-be-buildable-here
 type: "[[raid]]"
 kind: risk
-statement: "The design wants a token dragged out of the editor panel and dropped on the state machine panel, and nobody has established that a drag can cross two panels in this host."
+statement: The design wants a token dragged out of the editor panel and dropped on the state machine panel, and nobody has established that a drag can cross two panels in this host.
 owner: the maintainer
-trigger: "the spike's result, and any design work that assumes the gesture before that spike has run"
+trigger: the spike's result, and any design work that assumes the gesture before that spike has run
 status: open
-impact: "The gesture is how work reaches a state at all in the drawn surface. Without it the editor and the machine stop being two halves of one tool, and the whole surface has to be redesigned after the design is otherwise finished."
+impact: The gesture is how work reaches a state at all in the drawn surface. Without it the editor and the machine stop being two halves of one tool, and the whole surface has to be redesigned after the design is otherwise finished.
 breaks_how_badly: crippling
 how_likely: plausible
 source_refs:

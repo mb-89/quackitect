@@ -10,9 +10,9 @@ form: calculation
 faked: THE FIRST PASS COUNTED THE WORKING TREE, where eight of the gate review card's fifteen headings had been written by this same session hours earlier. Re-taken at HEAD, which is the honest corpus
 fallback: none needed — the first two cards checked both fail, in opposite directions
 verdict: falls
-measured: "2026-08-26, RE-TAKEN AGAINST COMMITTED TEXT after a cold review found the first pass counted this session's own edits — at HEAD the gate review card carries 7 headings of which about 2 are steps, and the retro card carries 4 headings and 12 steps as a numbered list under one of them"
+measured: 2026-08-26, RE-TAKEN AGAINST COMMITTED TEXT after a cold review found the first pass counted this session's own edits — at HEAD the gate review card carries 7 headings of which about 2 are steps, and the retro card carries 4 headings and 12 steps as a numbered list under one of them
 folds_to: req-a-card-says-which-of-its-parts-are-work, and the mechanism is raid-dec-a-reserved-tag-on-a-heading-line-marks-a-piece-of-work
-promote: "the requirement and the decision both stand — a card must say which of its parts are work, and a reserved tag on a heading line is how"
+promote: the requirement and the decision both stand — a card must say which of its parts are work, and a reserved tag on a heading line is how
 chunk: one pass over 137 cards to mark them, and the compiler reading the mark
 source_refs:
   - rank-unknowns, the seeded pick

@@ -2,15 +2,15 @@
 minted_in: i63-work-tokens-become-the-unit-of-work-and-
 id: req-a-close-that-is-not-done-carries-its-reason
 type: "[[requirement]]"
-statement: "When a piece of work is closed at a terminal status other than done, the system shall refuse the close until a stated reason stands on that work."
+statement: When a piece of work is closed at a terminal status other than done, the system shall refuse the close until a stated reason stands on that work.
 kind: functional
 verify_method: test
-breaks_if_removed: "Skipping and doing become indistinguishable on the record, so the guarantee that nothing is walked past in silence holds for the surface and not for the archive."
+breaks_if_removed: Skipping and doing become indistinguishable on the record, so the guarantee that nothing is walked past in silence holds for the surface and not for the archive.
 breaks_how_badly: corrosive
 refines:
   - uc-work-a-states-work-tokens-to-completion
 source_refs:
-  - "uc-work-a-states-work-tokens-to-completion extensions 7a and 7b"
+  - uc-work-a-states-work-tokens-to-completion extensions 7a and 7b
   - raid-dec-completeness-beats-flow-at-a-position-boundary
 priority: must
 weighs_with:

@@ -1,10 +1,10 @@
 ---
 form: one-file-per-token-volume
-amended: "2026-08-26T14:26:14.056Z by agent — the owner ruled the vault is a compatibility target rather than the interface, so the half this form called unmeasured was never a question"
+amended: 2026-08-26T14:26:14.056Z by agent — the owner ruled the vault is a compatibility target rather than the interface, so the half this form called unmeasured was never a question
 by: agent
 signed_off: 2026-08-26T14:21:27.542Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / one-file-per-token-volume

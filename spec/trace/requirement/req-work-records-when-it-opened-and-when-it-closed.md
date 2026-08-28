@@ -2,15 +2,15 @@
 minted_in: i63-work-tokens-become-the-unit-of-work-and-
 id: req-work-records-when-it-opened-and-when-it-closed
 type: "[[requirement]]"
-statement: "The system shall record on every piece of work the time it opened and the time it reached a terminal status."
+statement: The system shall record on every piece of work the time it opened and the time it reached a terminal status.
 kind: functional
 verify_method: inspection
-breaks_if_removed: "Nothing can say how long a state took or which piece of work dominated it, and a design whose exit rule makes a state as slow as its slowest piece cannot be measured at all."
+breaks_if_removed: Nothing can say how long a state took or which piece of work dominated it, and a design whose exit rule makes a state as slow as its slowest piece cannot be measured at all.
 breaks_how_badly: corrosive
 refines:
   - uc-read-what-the-system-owes-and-what-it-is-doing
 source_refs:
-  - "uc-read-what-the-system-owes-and-what-it-is-doing step 8"
+  - uc-read-what-the-system-owes-and-what-it-is-doing step 8
   - raid-dec-completeness-beats-flow-at-a-position-boundary
 priority: should
 weighs_with:

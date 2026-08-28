@@ -87,3 +87,8 @@ NOT TOUCHED THIS WINDOW. Neither drawing mechanism was opened.
 
 RE-ACCEPTED consciously, trigger unchanged.
 
+
+SWEPT 2026-08-28, at i63's closing retro: RE-ACCEPTED, and the trigger holds.
+
+It fires at the picture-in-picture to-do machine design discussion, or at the
+next change to the seeded-machine compiler. Neither happened in this window.

@@ -2,8 +2,8 @@
 minted_in: i63-work-tokens-become-the-unit-of-work-and-
 id: cand-the-work-holds-the-position
 type: "[[candidate]]"
-name: "Inverted"
-statement: "the work names the positions it holds open, points at its guidance, declares whether it blocks, and is offered unless it waits on something"
+name: Inverted
+statement: the work names the positions it holds open, points at its guidance, declares whether it blocks, and is offered unless it waits on something
 picks:
   - "[[opt-the-work-names-what-it-blocks-rather-than-a-position-listing-its-work]]"
 ---

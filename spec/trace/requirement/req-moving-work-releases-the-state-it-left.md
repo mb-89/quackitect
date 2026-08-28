@@ -2,10 +2,10 @@
 minted_in: i63-work-tokens-become-the-unit-of-work-and-
 id: req-moving-work-releases-the-state-it-left
 type: "[[requirement]]"
-statement: "When a piece of work is moved to another place, the system shall treat the state it left as released of it."
+statement: When a piece of work is moved to another place, the system shall treat the state it left as released of it.
 kind: functional
 verify_method: test
-breaks_if_removed: "A state can freeze on one piece of work nobody standing there can finish, and the first state of every record deadlocks on the scope it was handed."
+breaks_if_removed: A state can freeze on one piece of work nobody standing there can finish, and the first state of every record deadlocks on the scope it was handed.
 breaks_how_badly: crippling
 refines:
   - uc-work-a-states-work-tokens-to-completion
@@ -13,7 +13,7 @@ refines:
 source_refs:
   - raid-dec-completeness-beats-flow-at-a-position-boundary
   - "kickoff gate override one: a position is left when every token reaches a terminal status OR moves"
-  - "uc-work-a-states-work-tokens-to-completion extension 8a"
+  - uc-work-a-states-work-tokens-to-completion extension 8a
 priority: must
 weighs_with:
   - none

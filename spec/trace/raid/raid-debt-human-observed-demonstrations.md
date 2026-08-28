@@ -151,3 +151,16 @@ WHAT IT DOES NOT SETTLE. A demonstration whose subject is what somebody SEES sti
 
 RE-ACCEPTED consciously, trigger unchanged.
 
+
+SWEPT 2026-08-28, at i63's closing retro: RE-ACCEPTED, and half the trigger
+fired.
+
+It fires at the consolidation pass that collects everything needing a person,
+or at any iteration whose delta touches one of the four specs. No consolidation
+pass ran in this window.
+
+THIS ENTRY'S MOMENT IS THE ONE TWO SIBLING DEBTS ALSO WANT.
+raid-debt-i16-ships-with-its-demonstrations-unperformed and
+raid-debt-i4-ships-with-the-panel-demonstration-unperformed both carry no
+trigger at all and both wait on this same pass. Three debts, one moment, and
+only this one can be woken.

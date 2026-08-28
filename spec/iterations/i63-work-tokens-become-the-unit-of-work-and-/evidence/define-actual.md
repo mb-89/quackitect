@@ -1,10 +1,10 @@
 ---
 form: define-actual
-amended: "2026-08-25T18:41:19.171Z by agent — the earlier fix left a trailing clause contradicting the delta, and the overview qualification never landed here at all"
+amended: 2026-08-25T18:41:19.171Z by agent — the earlier fix left a trailing clause contradicting the delta, and the overview qualification never landed here at all
 by: agent
 signed_off: 2026-08-25T17:28:14.077Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / define-actual

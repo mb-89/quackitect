@@ -28,8 +28,8 @@ evidence:
     items:
       - $inbox
   - name: goals
-    description: the iteration's goals, one line each - every gate below measures what it produced against these
-    template: list
+    description: "one row per goal, four columns: the goal, why it exists now, what breaks or stays broken without it, and how anybody will know it was served - every gate below measures what it produced against these"
+    template: table
   - name: pulled_in
     description: what this iteration absorbs, each item with its origin
     template: list
@@ -167,13 +167,30 @@ is part of this gate's output.
 
 ## The goals
 
-THE GOALS ARE A LIST. One line each, and they bind the whole walk.
+THE GOALS ARE A TABLE, four columns wide, and they bind the whole walk.
+
+- THE GOAL, in one line.
+- WHY IT EXISTS NOW. Not why it is good — why this round rather than a later
+  one.
+- WHAT BREAKS OR STAYS BROKEN WITHOUT IT. A goal that answers this with
+  nothing is a wish, and it comes out of the list.
+- HOW ANYBODY WILL KNOW IT WAS SERVED. Named before the walk starts, so no
+  gate below has to invent the measure afterwards.
+
+WHY A TABLE RATHER THAN A LIST. A one-line goal reads as complete and carries
+no argument, so every gate below inherits a demand nobody justified. The three
+extra columns are the argument, written once at the top rather than
+reconstructed at each gate.
+
+CHANGING THIS FIELD'S SHAPE IS A TEMPLATE CHANGE, NEVER AN AMEND. Every gate
+below reads this list, so a shape change re-owes evidence on every record
+carrying the old one. Do it between records.
 
 Every gate below carries a `goals_served` field. It lists these goals back and
 asks what that milestone produced for each one. A milestone with nothing for a
 goal, and nothing coming, is a walk that has drifted off its own kickoff.
 
-Three rules on the list itself:
+Three rules on the table itself:
 
 - ENGINE IMPROVEMENTS is a standing goal, always available. It is where the
   iteration pulls in the machine's own repairs. It needs no argument.

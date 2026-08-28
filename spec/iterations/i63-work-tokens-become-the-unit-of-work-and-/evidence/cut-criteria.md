@@ -2,10 +2,10 @@
 form: cut-criteria
 by: agent
 signed_off: 2026-08-26T12:40:39.656Z
-amended: "2026-08-26T12:09:46.639Z by agent — the struck non-freezing-surface row moves the cut count from 117 to 118"
-reopened: "2026-08-26T12:40:16.231Z — a cold reviewer found two surviving rows scored against their titles rather than their statements, one strike contradicted by the candidate it was about, and one flat row kept while another was struck on the same evidence"
+amended: 2026-08-26T12:09:46.639Z by agent — the struck non-freezing-surface row moves the cut count from 117 to 118
+reopened: 2026-08-26T12:40:16.231Z — a cold reviewer found two surviving rows scored against their titles rather than their statements, one strike contradicted by the candidate it was about, and one flat row kept while another was struck on the same evidence
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / cut-criteria

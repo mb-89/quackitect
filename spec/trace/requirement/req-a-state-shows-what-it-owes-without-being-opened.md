@@ -2,16 +2,16 @@
 minted_in: i63-work-tokens-become-the-unit-of-work-and-
 id: req-a-state-shows-what-it-owes-without-being-opened
 type: "[[requirement]]"
-statement: "The system shall show on every state how much that state must still take in and how much it must still produce, without that state being opened."
+statement: The system shall show on every state how much that state must still take in and how much it must still produce, without that state being opened.
 kind: functional
 verify_method: demonstration
-breaks_if_removed: "What is outstanding stays spread across three stores with no surface holding them together, which is the reason the owner gave first for wanting this round."
+breaks_if_removed: What is outstanding stays spread across three stores with no surface holding them together, which is the reason the owner gave first for wanting this round.
 breaks_how_badly: corrosive
 refines:
   - uc-read-what-the-system-owes-and-what-it-is-doing
 source_refs:
   - "kickoff goal: every position shows a count per slot, and clicking one opens the token editor"
-  - "uc-read-what-the-system-owes-and-what-it-is-doing steps 2 to 7 and extensions 2a, 4a and 7a"
+  - uc-read-what-the-system-owes-and-what-it-is-doing steps 2 to 7 and extensions 2a, 4a and 7a
 priority: must
 weighs_with:
   - none

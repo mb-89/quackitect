@@ -1,19 +1,19 @@
 ---
 steps:
   - id: the-round-as-written
-    statement: "compose cand-the-round-as-written - the seams, the rough costs, and what it leans on"
+    statement: compose cand-the-round-as-written - the seams, the rough costs, and what it leans on
     depends_on: []
     realization: document
   - id: files-while-open-evidence-once-closed
-    statement: "compose cand-files-while-open-evidence-once-closed - the seams, the rough costs, and what it leans on"
+    statement: compose cand-files-while-open-evidence-once-closed - the seams, the rough costs, and what it leans on
     depends_on: []
     realization: document
   - id: nothing-new-the-form-keeps-doing-it
-    statement: "compose cand-nothing-new-the-form-keeps-doing-it - the seams, the rough costs, and what it leans on"
+    statement: compose cand-nothing-new-the-form-keeps-doing-it - the seams, the rough costs, and what it leans on
     depends_on: []
     realization: document
   - id: the-work-holds-the-position
-    statement: "compose cand-the-work-holds-the-position - the seams, the rough costs, and what it leans on"
+    statement: compose cand-the-work-holds-the-position - the seams, the rough costs, and what it leans on
     depends_on: []
     realization: document
 ---

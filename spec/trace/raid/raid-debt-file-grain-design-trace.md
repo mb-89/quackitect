@@ -76,3 +76,14 @@ NOT TOUCHED THIS WINDOW. No grain change ran.
 
 RE-ACCEPTED consciously, trigger unchanged.
 
+
+SWEPT 2026-08-28, at i63's closing retro: RE-ACCEPTED, AND ITS TRIGGER CANNOT
+BE OBSERVED.
+
+Half the trigger is deliverable — a region-marker mechanism landing is a
+nameable moment. The other half, "when the file-grain sweep stops finding
+anything new", names a never-event: nothing counts what the sweep finds per
+run, so nothing could ever report that it stopped.
+
+IT IS ONE OF SIXTEEN OPEN ENTRIES IN THAT CLASS, and the class is this retro's
+finding rather than this entry's.

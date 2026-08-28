@@ -5,7 +5,7 @@ type: "[[option]]"
 statement: hold each piece of work as its own text file in the working tree, its frontmatter carrying place, status, difficulty and dependency
 cluster: the-work
 found_by: prior-art
-source: "the vault-and-plugin pattern, where a folder of markdown files with frontmatter is queried as a table; and req-every-artifact-is-readable-text, which already demands text a person can open"
+source: the vault-and-plugin pattern, where a folder of markdown files with frontmatter is queried as a table; and req-every-artifact-is-readable-text, which already demands text a person can open
 ---
 
 ## Mechanism

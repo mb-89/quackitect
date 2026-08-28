@@ -200,6 +200,13 @@ Editing this line later is patch-class: it rewords the why, not the demand.
 
 ## PRIORITY — MOSCOW, THE HOUSE SCALE #work
 
+WHAT MAKES A ROW A MUST IS FATALITY, NOT IMPORTANCE. A broken must PURGES the
+iteration — nothing ships while it stands broken. A broken should SHIPS, as
+recorded debt with a trigger.
+
+SO THE QUESTION IS NOT HOW BADLY YOU WANT IT. It is what happens on the day it
+is found broken. Anything you would ship around is a should.
+
 `must | should | could`, defaulting to could — the same scale everything
 else here uses. The consumer is M4: the must rows GATE every candidate
 pass/fail, and the should and could rows become the scored criteria. A
@@ -256,3 +263,18 @@ where they stand.
 - The 2024-2026 LLM-in-RE literature — directional, preprint-grade.
 - The full research digest with per-claim attribution:
   .se/research-m3-requirements.md.
+
+## EXTENDING A STANDING ROW BEATS MINTING A NEW ONE #work
+
+BEFORE WRITING ANY ROW, PASS OVER THE ROWS THAT ALREADY STAND and ask whether
+one of them already carries this demand. Where it does, extend it. Minting
+beside it makes two rows nobody can tell apart, and every later reader has to
+decide which one is the real one.
+
+THIS IS NOT THE FAN-OUT RULE. That one folds sibling rows written in the same
+round. This one folds a new row into a row that was written before the round
+began, which nothing in this card asked for until now.
+
+MEASURED ON ONE ROUND: 36 rows were written and 25 kept. Eleven duplicated
+demands the corpus already carried, and they were found by a second walk rather
+than by the first.

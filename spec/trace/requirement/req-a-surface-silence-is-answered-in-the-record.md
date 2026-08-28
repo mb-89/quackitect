@@ -2,10 +2,10 @@
 minted_in: i63-work-tokens-become-the-unit-of-work-and-
 id: req-a-surface-silence-is-answered-in-the-record
 type: "[[requirement]]"
-statement: "While a register entry stands open recording a question the owner's drawing does not answer, the system shall carry that entry as outstanding work on every state whose evidence rests on the surface the question is about."
+statement: While a register entry stands open recording a question the owner's drawing does not answer, the system shall carry that entry as outstanding work on every state whose evidence rests on the surface the question is about.
 kind: functional
 verify_method: test
-breaks_if_removed: "An unanswered question about a drawing sits in the register where nobody working the affected state can see it, the design guesses, and a second source ages on its own — which is the divergent-copy failure this system already hunts."
+breaks_if_removed: An unanswered question about a drawing sits in the register where nobody working the affected state can see it, the design guesses, and a second source ages on its own — which is the divergent-copy failure this system already hunts.
 breaks_how_badly: crippling
 refines:
   - uc-work-a-states-work-tokens-to-completion

@@ -2,8 +2,8 @@
 minted_in: i63-work-tokens-become-the-unit-of-work-and-
 id: cand-the-round-as-written
 type: "[[candidate]]"
-name: "As proposed"
-statement: "every work token is its own file for the life of the repository, minted whole on entry, listed by its position, and all of them block"
+name: As proposed
+statement: every work token is its own file for the life of the repository, minted whole on entry, listed by its position, and all of them block
 picks:
   - "[[opt-work-is-a-file-in-the-working-tree]]"
 ---

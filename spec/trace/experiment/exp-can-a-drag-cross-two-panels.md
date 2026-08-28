@@ -10,9 +10,9 @@ form: tracer
 faked: none — the extension's own registration code was read rather than a stand-in
 fallback: none needed — the question resolved before a prototype was worth building
 verdict: falls
-measured: "2026-08-26 — the extension registers tools, controls and details as three separate view providers and seForm and snapshot as their own panels, so the bucket editor's own drag crosses none of them; and basesclient.ts lines 301 to 336 already carry a complete HTML5 drag cycle inside a webview, payload and hover feedback included"
+measured: 2026-08-26 — the extension registers tools, controls and details as three separate view providers and seForm and snapshot as their own panels, so the bucket editor's own drag crosses none of them; and basesclient.ts lines 301 to 336 already carry a complete HTML5 drag cycle inside a webview, payload and hover feedback included
 folds_to: raid-dec-the-machine-and-the-work-editor-share-one-webview — forced by this result, and predicted by raid-dec-one-editor-is-widened-rather-than-a-second-written at its own line 62
-promote: "the state machine and the work editor must share one webview. The owner requires the drag between them, and the platform does not deliver a drop from one webview to another"
+promote: the state machine and the work editor must share one webview. The owner requires the drag between them, and the platform does not deliver a drop from one webview to another
 chunk: merge the two surfaces into one webview — an architecture change rather than build work
 source_refs:
   - rank-unknowns, the seeded pick

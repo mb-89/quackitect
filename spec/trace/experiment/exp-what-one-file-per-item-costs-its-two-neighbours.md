@@ -10,9 +10,9 @@ form: script
 faked: the throwaway repository was built rather than measured on the real archive, and every item carries VARIED prose because identical bodies deduplicate in git
 fallback: none needed for the repository half; the vault half has no fallback and was not run
 verdict: holds
-measured: "2026-08-26 — 424 items if every card were walked, median 2 per position, largest 23; the heaviest record on disc holds 95 files; at 1,292 files git add takes 1,535 ms and git commit 151 ms"
+measured: 2026-08-26 — 424 items if every card were walked, median 2 per position, largest 23; the heaviest record on disc holds 95 files; at 1,292 files git add takes 1,535 ms and git commit 151 ms
 folds_to: raid-dec-work-is-a-file-while-open-and-one-folded-file-once-closed — the repository half is affordable and the fold answers the growth case
-promote: "nothing for the repository. The vault half needs one run with the files present, and it needs the vault rather than a script"
+promote: nothing for the repository. The vault half needs one run with the files present, and it needs the vault rather than a script
 chunk: none — no build step follows from this, and the missing half is a measurement rather than work
 source_refs:
   - rank-unknowns, the seeded pick

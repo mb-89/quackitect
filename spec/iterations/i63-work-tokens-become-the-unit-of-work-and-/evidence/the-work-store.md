@@ -3,7 +3,7 @@ form: the-work-store
 by: agent
 signed_off: 2026-08-26T15:30:10.817Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / the-work-store

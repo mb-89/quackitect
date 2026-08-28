@@ -4,7 +4,7 @@ amended: "2026-08-26T13:46:47.878Z by agent — the work-editor ruling was stret
 by: agent
 signed_off: 2026-08-26T13:12:57.464Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / evaluate-architecture

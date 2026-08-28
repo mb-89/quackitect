@@ -2,8 +2,8 @@
 minted_in: i63-work-tokens-become-the-unit-of-work-and-
 id: cand-files-while-open-evidence-once-closed
 type: "[[candidate]]"
-name: "Fold at close"
-statement: "files while the record is open and evidence once it closes, derived when asked, counted from an index, blocked by an authorisation"
+name: Fold at close
+statement: files while the record is open and evidence once it closes, derived when asked, counted from an index, blocked by an authorisation
 picks:
   - "[[opt-work-tokens-are-folded-into-the-evidence-when-a-record-closes]]"
 ---

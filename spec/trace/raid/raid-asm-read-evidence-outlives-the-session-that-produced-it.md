@@ -4,12 +4,12 @@ id: raid-asm-read-evidence-outlives-the-session-that-produced-it
 type: "[[raid]]"
 status: closed
 kind: issue
-statement: "The design mints an input token only where reading evidence is absent, which assumes that evidence outlives the session that produced it. It does not."
+statement: The design mints an input token only where reading evidence is absent, which assumes that evidence outlives the session that produced it. It does not.
 owner: the driving agent
-trigger: "the design step that says where a reading token's proof lives, and the first restart during a record that has already proven its reading"
+trigger: the design step that says where a reading token's proof lives, and the first restart during a record that has already proven its reading
 probe: "false. The check ran at the real channel on 2026-08-26 and the assumption did not survive. deliverable/engine/sessionreads.ts line 101 holds the ledgers as an in-memory Map, line 88 states that a proof belongs to the head that read rather than to the record, and line 98 says the ledgers do not survive a restart except the default reader's. The kind is changed to issue: it has already happened."
 probed: 2026-08-26
-impact: "An input token is a durable file. Its proof is not. So a record re-entered after a restart either re-owes reading it has already done, or the token reports itself satisfied by a store that no longer holds anything."
+impact: An input token is a durable file. Its proof is not. So a record re-entered after a restart either re-owes reading it has already done, or the token reports itself satisfied by a store that no longer holds anything.
 breaks_how_badly: corrosive
 how_likely: expected
 source_refs:

@@ -4,12 +4,12 @@ id: raid-asm-a-work-token-s-file-path-fits-every-platform
 type: "[[raid]]"
 status: closed
 kind: assumption
-statement: "One file per work token names that file after the thing it is, and the design assumes every such name fits the path limits of both platforms this system runs on."
+statement: One file per work token names that file after the thing it is, and the design assumes every such name fits the path limits of both platforms this system runs on.
 owner: the maintainer
-trigger: "the first work token minted from a long method heading, and any report of a write failing on one machine that worked on another"
+trigger: the first work token minted from a long method heading, and any report of a write failing on one machine that worked on another
 probe: "holds on Windows for a TRUNCATED name, and the probe assumed a design nobody has chosen. The 60-character slug it measured is what the present pool store applies, not something any requirement demands, and an untruncated 73-character heading was not measured. Otherwise: Measured 2026-08-26: the longest heading standing in the method corpus is 73 characters, and the corpus already truncates a work-token slug to 60. Worst path on this machine, with a 60-character slug under the deepest record folder, is about 170 characters against the 260-character limit. The margin is real and it belongs to this clone's location rather than to the design, so a deeper checkout eats it. The Linux half was not run: no cloud box was available this session."
 probed: 2026-08-26
-impact: "A write that fails on one platform and works on the other splits the product in two. The failure lands mid-walk, on a machine that was working yesterday, and it looks like corruption rather than like a name being too long."
+impact: A write that fails on one platform and works on the other splits the product in two. The failure lands mid-walk, on a machine that was working yesterday, and it looks like corruption rather than like a name being too long.
 breaks_how_badly: crippling
 how_likely: plausible
 source_refs:

@@ -2,16 +2,16 @@
 minted_in: i63-work-tokens-become-the-unit-of-work-and-
 id: req-a-destination-holding-nothing-is-revealed-while-work-is-placed
 type: "[[requirement]]"
-statement: "While a person is placing a piece of work, the system shall show every destination that accepts it, including destinations hidden because they hold nothing."
+statement: While a person is placing a piece of work, the system shall show every destination that accepts it, including destinations hidden because they hold nothing.
 kind: functional
 verify_method: demonstration
-breaks_if_removed: "The gesture is impossible for exactly the case it is most needed in, because an empty destination is not drawn and there is nothing on screen to aim at."
+breaks_if_removed: The gesture is impossible for exactly the case it is most needed in, because an empty destination is not drawn and there is nothing on screen to aim at.
 breaks_how_badly: crippling
 refines:
   - uc-route-outstanding-work-to-where-it-is-done
 source_refs:
   - raid-risk-a-drag-that-crosses-two-panels-may-not-be-buildable-here
-  - "uc-route-outstanding-work-to-where-it-is-done step 5"
+  - uc-route-outstanding-work-to-where-it-is-done step 5
 priority: should
 weighs_with:
   - none

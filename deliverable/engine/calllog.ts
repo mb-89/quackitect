@@ -480,8 +480,19 @@ export class CallLog {
     if (groupBy !== undefined) {
       const groups: Record<string, number> = {};
       let reached = 0;
+      // A CAPPED RESPONSE IS A STRING, so digging into it reaches nothing even
+      // though the clause is sitting in the text. Most refusals in a long log
+      // are stored that way, so the dig alone reports a small fraction of them
+      // and buries the rest under `(none)` — which reads exactly like a period
+      // with few refusals.
+      //
+      // SO THE CLAUSE KEY FALLS BACK TO THE TEXT. It is the one key whose
+      // values have a fixed shape, which is what makes the fallback safe here
+      // and wrong as a general rule.
+      const clauseInText = (r: CallRecord): string | undefined => /\bSE-C-\d{3}\b/.exec(JSON.stringify(r))?.[0];
       for (const r of records) {
-        const raw = dig(r, groupBy);
+        let raw = dig(r, groupBy);
+        if ((raw === undefined || raw === null) && q.group_by === "clause") raw = clauseInText(r);
         if (raw !== undefined && raw !== null) reached++;
         const key = String(raw ?? "(none)");
         groups[key] = (groups[key] ?? 0) + 1;

@@ -3,11 +3,11 @@ minted_in: i63-work-tokens-become-the-unit-of-work-and-
 id: raid-risk-a-place-the-token-change-touches-is-missed-and-breaks-a-later-round
 type: "[[raid]]"
 kind: risk
-statement: "Work is integral to every part of this system, so a place the token change touches can be missed, and the break surfaces rounds later as something that used to work and no longer does."
+statement: Work is integral to every part of this system, so a place the token change touches can be missed, and the break surfaces rounds later as something that used to work and no longer does.
 owner: the driving agent
-trigger: "the architecture analysis's own sweep, and any later round reporting that something which used to work has stopped working"
+trigger: the architecture analysis's own sweep, and any later round reporting that something which used to work has stopped working
 status: open
-impact: "The cost is not this round failing. It is the next several rounds paying for a place nobody listed, each time as a puzzling regression whose cause is a change that shipped and was signed off weeks earlier."
+impact: The cost is not this round failing. It is the next several rounds paying for a place nobody listed, each time as a puzzling regression whose cause is a change that shipped and was signed off weeks earlier.
 breaks_how_badly: corrosive
 how_likely: expected
 source_refs:

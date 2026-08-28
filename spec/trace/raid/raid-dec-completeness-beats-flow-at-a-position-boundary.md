@@ -3,11 +3,11 @@ minted_in: i63-work-tokens-become-the-unit-of-work-and-
 id: raid-dec-completeness-beats-flow-at-a-position-boundary
 type: "[[raid]]"
 kind: decision
-statement: "A state may only be left when every token in its input and output buckets has reached a terminal status or moved elsewhere, and that batching rule is accepted deliberately over letting each token flow on alone."
+statement: A state may only be left when every token in its input and output buckets has reached a terminal status or moved elsewhere, and that batching rule is accepted deliberately over letting each token flow on alone.
 owner: the owner role
-trigger: "the first state that stalls on a token nobody can finish, and any measurement showing a state's time dominated by its slowest single token"
+trigger: the first state that stalls on a token nobody can finish, and any measurement showing a state's time dominated by its slowest single token
 status: open
-impact: "This is the rule the whole design rests on. If it proves wrong, the guarantee that nothing is skipped in silence goes with it, and what is left is a filing system."
+impact: This is the rule the whole design rests on. If it proves wrong, the guarantee that nothing is skipped in silence goes with it, and what is left is a filing system.
 breaks_how_badly: crippling
 how_likely: conceivable
 source_refs:

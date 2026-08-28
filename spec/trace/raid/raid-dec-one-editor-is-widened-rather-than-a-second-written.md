@@ -3,11 +3,11 @@ minted_in: i63-work-tokens-become-the-unit-of-work-and-
 id: raid-dec-one-editor-is-widened-rather-than-a-second-written
 type: "[[raid]]"
 kind: decision
-statement: "The token editor is built by widening the existing table editor rather than writing a new one, so that understanding one editor means understanding all of them."
+statement: The token editor is built by widening the existing table editor rather than writing a new one, so that understanding one editor means understanding all of them.
 owner: the owner role
-trigger: "the first change to the widened editor that nobody wants to make, and any proposal for a second editor doing a job the first already does"
+trigger: the first change to the widened editor that nobody wants to make, and any proposal for a second editor doing a job the first already does
 status: open
-impact: "Going the other way splits the cell machinery in two, and the divergence shows up later as two surfaces that disagree while both keep working."
+impact: Going the other way splits the cell machinery in two, and the divergence shows up later as two surfaces that disagree while both keep working.
 breaks_how_badly: corrosive
 how_likely: conceivable
 source_refs:

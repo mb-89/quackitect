@@ -1,10 +1,10 @@
 ---
 form: pressure-test
-amended: "2026-08-25T18:41:46.354Z by agent — Q11 was defeated with a false premise, so its answer is gone and the attack is open again"
+amended: 2026-08-25T18:41:46.354Z by agent — Q11 was defeated with a false premise, so its answer is gone and the attack is open again
 by: agent
 signed_off: 2026-08-25T17:59:41.977Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / pressure-test

@@ -2,18 +2,18 @@
 minted_in: i63-work-tokens-become-the-unit-of-work-and-
 id: req-work-outside-a-record-goes-when-its-state-completes
 type: "[[requirement]]"
-statement: "When a state outside a record completes, the system shall remove the work that state carried and shall keep the evidence that work produced."
+statement: When a state outside a record completes, the system shall remove the work that state carried and shall keep the evidence that work produced.
 kind: functional
 verify_method: test
-breaks_if_removed: "Boot and the front desk accumulate finished work tokens forever, so a count of what is owed is dominated by work nobody is waiting for."
+breaks_if_removed: Boot and the front desk accumulate finished work tokens forever, so a count of what is owed is dominated by work nobody is waiting for.
 breaks_how_badly: corrosive
 refines:
   - uc-work-a-states-work-tokens-to-completion
   - uc-read-what-the-system-owes-and-what-it-is-doing
 source_refs:
   - "kickoff goal: outside a record everything is ephemeral"
-  - "uc-work-a-states-work-tokens-to-completion extension 9a"
-  - "uc-read-what-the-system-owes-and-what-it-is-doing extension 8a"
+  - uc-work-a-states-work-tokens-to-completion extension 9a
+  - uc-read-what-the-system-owes-and-what-it-is-doing extension 8a
 priority: must
 weighs_with:
   - none

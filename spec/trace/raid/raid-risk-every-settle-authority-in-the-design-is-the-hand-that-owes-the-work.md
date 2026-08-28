@@ -3,11 +3,11 @@ minted_in: i63-work-tokens-become-the-unit-of-work-and-
 id: raid-risk-every-settle-authority-in-the-design-is-the-hand-that-owes-the-work
 type: "[[raid]]"
 kind: risk
-statement: "Three separate answers each hand a judgment to the same hand that owes the work, so the design's guarantees rest on a party grading itself."
+statement: Three separate answers each hand a judgment to the same hand that owes the work, so the design's guarantees rest on a party grading itself.
 owner: the driving agent
-trigger: "the design step that specifies who may settle a judged token, raise a complexity label, or flag work as needing a person"
+trigger: the design step that specifies who may settle a judged token, raise a complexity label, or flag work as needing a person
 status: open
-impact: "The motivating incident is a weak hand skipping its own steps. If that hand also settles, escalates and stops on its own word, the round installs a better vocabulary for the same failure."
+impact: The motivating incident is a weak hand skipping its own steps. If that hand also settles, escalates and stops on its own word, the round installs a better vocabulary for the same failure.
 breaks_how_badly: crippling
 how_likely: plausible
 source_refs:

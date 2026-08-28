@@ -1,10 +1,10 @@
 ---
 form: log-risks
-amended: "2026-08-25T18:34:38.116Z by agent — the count said twelve where thirteen are listed, and the read-evidence check was struck on a comment rather than on the code"
+amended: 2026-08-25T18:34:38.116Z by agent — the count said twelve where thirteen are listed, and the read-evidence check was struck on a comment rather than on the code
 by: agent
 signed_off: 2026-08-25T17:22:34.463Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / log-risks

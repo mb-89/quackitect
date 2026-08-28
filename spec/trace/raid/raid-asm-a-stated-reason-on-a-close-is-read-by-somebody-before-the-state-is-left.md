@@ -3,13 +3,13 @@ minted_in: i63-work-tokens-become-the-unit-of-work-and-
 id: raid-asm-a-stated-reason-on-a-close-is-read-by-somebody-before-the-state-is-left
 type: "[[raid]]"
 kind: assumption
-statement: "Two guarantees rest on a short written reason carried by every close, and the design assumes somebody reads it before the state is left."
+statement: Two guarantees rest on a short written reason carried by every close, and the design assumes somebody reads it before the state is left.
 owner: the driving agent
-trigger: "the first observed case of a hand writing a close reason that says nothing, which is the owner's own trigger for tightening the field"
+trigger: the first observed case of a hand writing a close reason that says nothing, which is the owner's own trigger for tightening the field
 status: open
-probe: "scheduled. The probe walks a position where an work token is closed as skipped and names every reader of that reason before the position is left. Nothing closes an work token yet, so there is no walk to observe. It is a cheap check the moment settling exists."
+probe: scheduled. The probe walks a position where an work token is closed as skipped and names every reader of that reason before the position is left. Nothing closes an work token yet, so there is no walk to observe. It is a cheap check the moment settling exists.
 probed: 2026-08-26
-impact: "The claim that nothing is skipped in silence, and the claim that a withdrawn token is legible to a later reader, both rest on this. If nothing reads the reason in time, both degrade to an audit trail somebody may consult afterwards."
+impact: The claim that nothing is skipped in silence, and the claim that a withdrawn token is legible to a later reader, both rest on this. If nothing reads the reason in time, both degrade to an audit trail somebody may consult afterwards.
 breaks_how_badly: corrosive
 how_likely: plausible
 source_refs:

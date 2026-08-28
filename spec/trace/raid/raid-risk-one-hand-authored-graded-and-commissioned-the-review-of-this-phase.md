@@ -3,11 +3,11 @@ minted_in: i63-work-tokens-become-the-unit-of-work-and-
 id: raid-risk-one-hand-authored-graded-and-commissioned-the-review-of-this-phase
 type: "[[raid]]"
 kind: risk
-statement: "Two adversarial hands ran and both read a summary the author wrote rather than the artifacts, were scoped by that author, and had their findings graded by that author, so the reviews were independent in their reasoning and dependent in their inputs and their verdict."
+statement: Two adversarial hands ran and both read a summary the author wrote rather than the artifacts, were scoped by that author, and had their findings graded by that author, so the reviews were independent in their reasoning and dependent in their inputs and their verdict.
 owner: the owner role
-trigger: "the next phase whose evidence is authored and graded by the same hand, and any gate whose reviewer was briefed by its author"
+trigger: the next phase whose evidence is authored and graded by the same hand, and any gate whose reviewer was briefed by its author
 status: open
-impact: "Grading is where a register's judgment concentrates. Four entries are graded expected, and three of those would hold the gate if graded any other way. A second reader has never seen any of them."
+impact: Grading is where a register's judgment concentrates. Four entries are graded expected, and three of those would hold the gate if graded any other way. A second reader has never seen any of them.
 breaks_how_badly: corrosive
 how_likely: expected
 source_refs:

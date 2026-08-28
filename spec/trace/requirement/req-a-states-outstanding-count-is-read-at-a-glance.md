@@ -2,12 +2,12 @@
 minted_in: i63-work-tokens-become-the-unit-of-work-and-
 id: req-a-states-outstanding-count-is-read-at-a-glance
 type: "[[requirement]]"
-statement: "The system shall show a state's outstanding count in a form a person reads without opening that state."
+statement: The system shall show a state's outstanding count in a form a person reads without opening that state.
 kind: quality
 characteristic: interaction-capability
 verify_method: demonstration
 measure: "Over the per-state counts a real record produces, a reader names a state's outstanding total within 2 seconds without opening the state. Measured 2026-08-26 over 21 signed positions: 4 to 15 work tokens each, median 5."
-breaks_if_removed: "The surface is laid out against a number nobody measured, and a count nobody scans is a count nobody reads."
+breaks_if_removed: The surface is laid out against a number nobody measured, and a count nobody scans is a count nobody reads.
 breaks_how_badly: corrosive
 refines:
   - uc-read-what-the-system-owes-and-what-it-is-doing

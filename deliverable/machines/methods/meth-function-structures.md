@@ -81,6 +81,14 @@ function.
 Stop when the next split would name a solution, or when the child would be
 allocated to the same element as its parent.
 
+AND STOP WHERE THE CHILD SERVES NOBODY. Name the person or the hand this
+function is for, and say what they hold once it has run. A function whose only
+beneficiary is the function above it is an internal act, not a function.
+
+THAT TEST IS WHAT THE OTHER TWO MISS. Both of them ask about the SHAPE of the
+split. This one asks who it is for, and it is the one that catches a tree
+drifting into the steps a mechanism takes internally.
+
 Three levels is usually enough. A deeper tree is normally a partition that
 arrived early, and partitioning is M4's.
 

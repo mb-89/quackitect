@@ -2,10 +2,10 @@
 minted_in: i63-work-tokens-become-the-unit-of-work-and-
 id: req-work-outlives-its-state-or-goes-with-it-and-says-which
 type: "[[requirement]]"
-statement: "The system shall carry on every piece of work which of two lifetimes it has, keeping finished work that belongs to the record with the state that finished it and removing temporary work when its state completes."
+statement: The system shall carry on every piece of work which of two lifetimes it has, keeping finished work that belongs to the record with the state that finished it and removing temporary work when its state completes.
 kind: functional
 verify_method: test
-breaks_if_removed: "Nothing says whether a finished work token is part of the record or a scaffold, so either the archive fills with scaffolding or the record loses the evidence its own states produced."
+breaks_if_removed: Nothing says whether a finished work token is part of the record or a scaffold, so either the archive fills with scaffolding or the record loses the evidence its own states produced.
 breaks_how_badly: crippling
 refines:
   - uc-work-a-states-work-tokens-to-completion

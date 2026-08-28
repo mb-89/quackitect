@@ -4,12 +4,12 @@ id: raid-asm-one-file-per-work-token-stays-workable-in-the-vault-and-the-reposit
 type: "[[raid]]"
 status: closed
 kind: assumption
-statement: "Every work token becomes its own file on trunk, and the design assumes the two neighbours that hold those files stay workable at the volume that produces."
+statement: Every work token becomes its own file on trunk, and the design assumes the two neighbours that hold those files stay workable at the volume that produces.
 owner: the maintainer
-trigger: "the first record walked end to end under work tokens, and any report that opening the vault or listing the tree got slow"
+trigger: the first record walked end to end under work tokens, and any report that opening the vault or listing the tree got slow
 probe: "PROBED 2026-08-26 for version control, still unprobed for the vault. At 20,000 work-token files every read stays under 200 ms and reading out of git objects is FASTER than reading the worktree, 114 ms against 161 ms. Writing is where it hurts: git add 26,073 ms and git commit 6,646 ms. Disc allocates 7.5x the content at 4K clusters. Folding the same bytes into one JSONL beats the files on every axis measured, including at 400 files, and packs 2.0x smaller in git once the content is realistically varied, corrected down from a 12x figure that came from identical test bodies. The vault half was NOT run. Earlier note, still true: the first half now has a number. Counted 2026-08-26: 136 evidence fields across 21 positions of one real record, four milestones in. A full major carries roughly twice that many positions, so a record is in the low hundreds of files before reading work tokens and method steps are added. The second half was NOT run: nobody opened a folder of that many files in the vault or in version control, and that is the half this entry is actually about."
 probed: 2026-08-26
-impact: "The cost does not land on this system. It lands on the two tools a person actually uses to read the work, and a vault that takes seconds to open is a vault nobody opens."
+impact: The cost does not land on this system. It lands on the two tools a person actually uses to read the work, and a vault that takes seconds to open is a vault nobody opens.
 breaks_how_badly: corrosive
 how_likely: plausible
 source_refs:

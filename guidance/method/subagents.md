@@ -98,41 +98,45 @@ A SUBAGENT THAT DOES NOT KNOW ABOUT THE CAGE WILL REACH FOR ITS NATIVE TOOLS.
 It will then report that it could not read anything, and you will have paid
 for a turn that found nothing.
 
-### THE CHILD IS NOT IN THE CAGE, measured 2026-08-20
+### THE CHILD IS IN THE CAGE ON THIS HARNESS, and it was not on i37
 
-The `se` MCP server is NOT in a subagent's tool set. The child cannot call a
-lane verb at all, whatever you tell it.
+A SUBAGENT CAN CALL LANE VERBS HERE. Tell it to, and tell it how.
 
-What happened on i37's verification. The tester was handed the lane rule in
-full: the verbs, the argument names, the root-relative path rule, the
-read-only limit. It answered `No matching deferred tools found` for every
-`se_` verb. Its native Bash and Read were not blocked, and it used them.
+WHAT IT HAS TO BE TOLD, because the verbs are DEFERRED and it holds only their
+names until it asks for their schemas.
 
-So the warning above prepares for the wrong failure. The real case is a child
-that knows about a cage it is not in.
+- Call `ToolSearch` FIRST, with `select:mcp__se__se_file_read,mcp__se__se_file_search`
+  and whatever else it needs. Without that step the verbs are not callable and
+  the child reports it could read nothing.
+- The verbs are named `mcp__se__se_*`, not `se_*`.
+- Paths are root-relative to the project root.
+- Say whether it may write. Most readers may not.
 
-WHAT TO TELL A SUBAGENT INSTEAD, until the lane reaches children:
+MEASURED 2026-08-28. Nine hands were spawned in one retro and told the above.
+The call log took 152 lane calls in ten minutes, peaking at 36 in a single
+minute while the parent was making about three. `se_file_search`, `se_run`,
+`se_file_read`, `se_file_write` and `se_file_glob` all served children.
 
-- Say the paths are root-relative to the project root, and that it reads with
-  its NATIVE tools.
-- Say it may not write, unless you meant it to.
-- Say the lane exists and that it cannot drive it. A child that has been told
-  to use `se_` verbs wastes its first calls discovering they are absent.
+WHAT THE LOG PROVES AND WHAT IT DOES NOT. It proves the volume, and no single
+hand makes it. It does not stamp which hand made which call, because the lane
+cannot tell two hands apart on its own.
 
-WHY IT MATTERS BEYOND CONVENIENCE. Fresh eyes see a DIFFERENT PROJECT than the
-walk does. Four things are missing from theirs.
+THE EARLIER MEASUREMENT WAS REAL AND IT WAS ABOUT A DIFFERENT HARNESS. On i37,
+2026-08-20, a tester handed the same rule answered `No matching deferred tools
+found` for every verb and fell back to native Bash and Read.
 
-- no state gate
-- no narration toll
-- no typed refusals
-- no call log
+SO CHECK RATHER THAN ASSUME, both ways. A child that reports it cannot find
+the verbs is on a harness that does not carry them, and it reads natively. A
+child that finds them is in the cage and is logged like any other hand.
 
-Every finding a subagent makes about LANE BEHAVIOUR is second-hand by
-construction.
+WHY IT MATTERS BEYOND CONVENIENCE. A child reading through the lane is a child
+whose reads are LOGGED, so its findings can be checked afterwards rather than
+taken on trust. That is the whole difference between a reviewer you can audit
+and one you cannot.
 
-So weigh a subagent's lane findings accordingly, and re-check the ones that
-matter by driving the verb yourself. On i37 the tester's findings were good
-and two of them rested on reading `deliverable/engine/tools-file.ts` rather than on calling it.
+WHAT IS STILL SECOND-HAND is a finding about how a verb BEHAVES under the walk.
+A child sees no state gate and no walk position, so a claim about what a state
+refuses is still worth re-checking by driving the verb yourself.
 
 ## Two hands, and the log has to be able to count them apart
 

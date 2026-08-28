@@ -2,16 +2,16 @@
 minted_in: i63-work-tokens-become-the-unit-of-work-and-
 id: req-placing-work-makes-the-destination-owe-it
 type: "[[requirement]]"
-statement: "When a person places a piece of work on a destination, the system shall make that destination owe it, so the destination cannot be left until the work is settled or moved on again."
+statement: When a person places a piece of work on a destination, the system shall make that destination owe it, so the destination cannot be left until the work is settled or moved on again.
 kind: functional
 verify_method: test
-breaks_if_removed: "Routing becomes a suggestion. Work lands somewhere and nothing holds that place to it, which is what a note already does and why a note is not enough."
+breaks_if_removed: Routing becomes a suggestion. Work lands somewhere and nothing holds that place to it, which is what a note already does and why a note is not enough.
 breaks_how_badly: crippling
 refines:
   - uc-route-outstanding-work-to-where-it-is-done
   - uc-take-a-step
 source_refs:
-  - "uc-route-outstanding-work-to-where-it-is-done steps 4, 6 and 7 and extensions 4a, 4b and 4c"
+  - uc-route-outstanding-work-to-where-it-is-done steps 4, 6 and 7 and extensions 4a, 4b and 4c
   - "frame-delta: every build milestone gets a debt-reduction step with a small budget, seeded from the pool"
 priority: must
 weighs_with:

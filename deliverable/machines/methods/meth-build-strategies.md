@@ -73,3 +73,17 @@ reviewer can judge the order and not only the pieces.
   lot, parallelize). The owner recalls the course taught it on an
   airport build; the slide itself is in SyA_Business.pdf, not
   text-searchable — primary not seen.
+
+## RE-READ THE RECORD'S OWN DESIGN INPUT BEFORE THE FIRST EDIT
+
+EVERY BUILDING STEP, not only the first one. The design input is what the round
+decided; anything you are holding from an earlier step is a memory of it.
+
+WHAT IT COSTS TO SKIP, measured on one round: a surface was built three times
+from memory, and each version was wrong in a different way.
+
+THE MECHANISM IS HALF THERE. A position can already demand a document on entry
+and prove it was read, so no new machinery is needed — what is not settled is
+how a position names a document that belongs to whichever record is open, since
+the path is different every time. Until that is answered, this is a rule the
+builder follows rather than one the engine holds.

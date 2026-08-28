@@ -5,8 +5,8 @@ type: "[[test-spec]]"
 statement: A person opens the machine and learns what every state owes and what waits with no home, without a call, a folder, or asking the agent.
 method: demonstration
 demonstrates:
-  - "sty-see-every-open-thing-at-one-glance"
-verifies: "none — demonstrates carries the edge; that the served payload carries the counts is verified by test in deliverable/tests/work-served.test.ts"
+  - sty-see-every-open-thing-at-one-glance
+verifies: none — demonstrates carries the edge; that the served payload carries the counts is verified by test in deliverable/tests/work-served.test.ts
 files:
   - none — a demonstration is observed rather than instrumented, and the Procedure below is the whole definition
 ---

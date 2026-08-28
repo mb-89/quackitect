@@ -2,8 +2,8 @@
 minted_in: i63-work-tokens-become-the-unit-of-work-and-
 id: cand-files-while-open-one-file-in-version-control-once-closed
 type: "[[candidate]]"
-name: "Archive in git"
-statement: "editable files while the iteration is open, then the whole iteration folded into one file and taken off trunk, read back out of version control"
+name: Archive in git
+statement: editable files while the iteration is open, then the whole iteration folded into one file and taken off trunk, read back out of version control
 picks:
   - "[[opt-a-closed-iteration-leaves-trunk-as-one-file-read-back-from-version-control]]"
 ---

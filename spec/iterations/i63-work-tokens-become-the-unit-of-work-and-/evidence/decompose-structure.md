@@ -1,10 +1,10 @@
 ---
 form: decompose-structure
-amended: "2026-08-26T13:29:01.708Z by agent — the standing element count was one short, and the cut was stated as write-against-read when the store serves two reads and the fold belongs to the record store"
+amended: 2026-08-26T13:29:01.708Z by agent — the standing element count was one short, and the cut was stated as write-against-read when the store serves two reads and the fold belongs to the record store
 by: agent
 signed_off: 2026-08-26T13:04:10.885Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / decompose-structure

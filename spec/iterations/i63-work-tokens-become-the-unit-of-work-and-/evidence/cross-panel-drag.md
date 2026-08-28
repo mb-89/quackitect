@@ -3,7 +3,7 @@ form: cross-panel-drag
 by: agent
 signed_off: 2026-08-26T14:16:58.958Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / cross-panel-drag

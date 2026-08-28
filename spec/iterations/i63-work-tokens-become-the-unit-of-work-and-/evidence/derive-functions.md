@@ -1,12 +1,12 @@
 ---
 form: derive-functions
-reopened: "2026-08-26T12:23:24.469Z — write-requirements was re-signed after it with three more rows, and the functions that serve them are named"
+reopened: 2026-08-26T12:23:24.469Z — write-requirements was re-signed after it with three more rows, and the functions that serve them are named
 judgment: passed at 2026-08-26T10:02:24.052Z with deliverable/engine/bin/flow-closure.ts@5a1c579000d0
-amended: "2026-08-26T11:10:35.413Z by agent — the invented word obligation becomes work token, the name the owner uses"
+amended: 2026-08-26T11:10:35.413Z by agent — the invented word obligation becomes work token, the name the owner uses
 by: agent
 signed_off: 2026-08-26T12:23:28.760Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / derive-functions

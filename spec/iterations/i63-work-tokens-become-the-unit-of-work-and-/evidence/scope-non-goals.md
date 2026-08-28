@@ -1,10 +1,10 @@
 ---
 form: scope-non-goals
-amended: "2026-08-25T18:53:09.907Z by agent — the non-goal said removing narration belongs to i55, and the record's own vision says this round does it"
+amended: 2026-08-25T18:53:09.907Z by agent — the non-goal said removing narration belongs to i55, and the record's own vision says this round does it
 by: agent
 signed_off: 2026-08-25T17:39:18.274Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / scope-non-goals

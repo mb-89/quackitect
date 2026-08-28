@@ -2,10 +2,10 @@
 minted_in: i63-work-tokens-become-the-unit-of-work-and-
 id: req-work-says-when-a-hand-is-on-it
 type: "[[requirement]]"
-statement: "When a hand starts on a piece of work, the system shall record on that work that the hand is on it, before the hand acts, and shall keep that record until the work settles or moves elsewhere."
+statement: When a hand starts on a piece of work, the system shall record on that work that the hand is on it, before the hand acts, and shall keep that record until the work settles or moves elsewhere.
 kind: functional
 verify_method: test
-breaks_if_removed: "Nothing distinguishes an work token nobody has touched from one a hand is working, so the narration machinery is removed and the account it produced is replaced by silence."
+breaks_if_removed: Nothing distinguishes an work token nobody has touched from one a hand is working, so the narration machinery is removed and the account it produced is replaced by silence.
 breaks_how_badly: crippling
 refines:
   - uc-work-a-states-work-tokens-to-completion

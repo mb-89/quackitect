@@ -9,7 +9,7 @@ grade: crippling
 against:
   - req-record-status-comes-from-the-record
 source_refs:
-  - "gate-architecture, 2026-08-26, and the owner's question about what the call sites have to do with the elements"
+  - gate-architecture, 2026-08-26, and the owner's question about what the call sites have to do with the elements
   - el-record-store
   - raid-dec-work-is-a-file-while-open-and-one-folded-file-once-closed
 ---

@@ -1,12 +1,12 @@
 ---
 id: req-responsiveness
 type: "[[requirement]]"
-statement: "The system shall answer a person or an agent within the budget named for that kind of work, and where it cannot, it shall say that it is working."
+statement: The system shall answer a person or an agent within the budget named for that kind of work, and where it cannot, it shall say that it is working.
 kind: quality
 characteristic: performance-efficiency
 verify_method: test
 measure: every budget in the table below is met on the reference machine
-breaks_if_removed: "Each timing demand is then argued case by case and the numbers drift apart, so nothing can be called too slow."
+breaks_if_removed: Each timing demand is then argued case by case and the numbers drift apart, so nothing can be called too slow.
 breaks_how_badly: corrosive
 refines:
   - uc-quality-performance-efficiency

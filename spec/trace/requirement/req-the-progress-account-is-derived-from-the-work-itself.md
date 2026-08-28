@@ -2,10 +2,10 @@
 minted_in: i63-work-tokens-become-the-unit-of-work-and-
 id: req-the-progress-account-is-derived-from-the-work-itself
 type: "[[requirement]]"
-statement: "The system shall build its account of what a hand is doing from the pieces of work themselves, and shall demand no separate narration from that hand."
+statement: The system shall build its account of what a hand is doing from the pieces of work themselves, and shall demand no separate narration from that hand.
 kind: functional
 verify_method: test
-breaks_if_removed: "The agent keeps driving a second structure by hand beside the one it walks, and the guards over that structure keep refusing for reasons that have nothing to do with the work."
+breaks_if_removed: The agent keeps driving a second structure by hand beside the one it walks, and the guards over that structure keep refusing for reasons that have nothing to do with the work.
 breaks_how_badly: corrosive
 refines:
   - uc-work-a-states-work-tokens-to-completion

@@ -5,7 +5,7 @@ type: "[[option]]"
 statement: derive each work token at the moment something asks for it rather than deriving the whole set the instant a position is entered
 cluster: the-work
 found_by: contradiction
-source: "TRIZ separation IN TIME, on the contradiction that minting the exact set on entry puts the whole derivation on the hot path of every hop"
+source: TRIZ separation IN TIME, on the contradiction that minting the exact set on entry puts the whole derivation on the hot path of every hop
 ---
 
 ## Mechanism

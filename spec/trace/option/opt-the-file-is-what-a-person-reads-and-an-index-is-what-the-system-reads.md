@@ -5,7 +5,7 @@ type: "[[option]]"
 statement: keep the readable file for a person and answer every machine question from an index rebuilt from those files, so neither side pays the other's cost
 cluster: the-work
 found_by: contradiction
-source: "TRIZ separation IN SPACE, on the contradiction that a readable file per work token makes every count a folder walk"
+source: TRIZ separation IN SPACE, on the contradiction that a readable file per work token makes every count a folder walk
 ---
 
 ## Mechanism

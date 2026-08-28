@@ -1,10 +1,10 @@
 ---
 form: run-candidates
-amended: "2026-08-26T12:31:20.069Z by agent — a fifth candidate was composed after this state signed, so its count of four is stale"
+amended: 2026-08-26T12:31:20.069Z by agent — a fifth candidate was composed after this state signed, so its count of four is stale
 by: agent
 signed_off: 2026-08-26T10:41:37.650Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / run-candidates

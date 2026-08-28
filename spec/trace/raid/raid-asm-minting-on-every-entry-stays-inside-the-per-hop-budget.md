@@ -3,13 +3,13 @@ minted_in: i63-work-tokens-become-the-unit-of-work-and-
 id: raid-asm-minting-on-every-entry-stays-inside-the-per-hop-budget
 type: "[[raid]]"
 kind: assumption
-statement: "Deriving what a position owes runs on every entry into every position, and the design assumes that work fits inside the per-hop budget the walk already publishes."
+statement: Deriving what a position owes runs on every entry into every position, and the design assumes that work fits inside the per-hop budget the walk already publishes.
 owner: the driving agent
-trigger: "the first measured hop after minting is built, and any report that the walk got slower without anybody adding a state"
+trigger: the first measured hop after minting is built, and any report that the walk got slower without anybody adding a state
 status: closed
-probe: "RUN, 2026-08-26, against the built store. A real five-part card costs 18.52 ms whole and a re-entry costs 7.58 ms writing nothing. Forty items at once cost 117.78 ms. The 250 ms per-hop bound does not bind an entry duty, so what applies is the signal rather than the margin, and at these figures there is nothing to signal about."
+probe: RUN, 2026-08-26, against the built store. A real five-part card costs 18.52 ms whole and a re-entry costs 7.58 ms writing nothing. Forty items at once cost 117.78 ms. The 250 ms per-hop bound does not bind an entry duty, so what applies is the signal rather than the margin, and at these figures there is nothing to signal about.
 probed: 2026-08-26
-impact: "Minting is not one feature among many. It sits on the path of every entry, so a cost here is paid by every hop of every walk, and a walk that got slower everywhere reads as the machine being slow rather than as one act being expensive."
+impact: Minting is not one feature among many. It sits on the path of every entry, so a cost here is paid by every hop of every walk, and a walk that got slower everywhere reads as the machine being slow rather than as one act being expensive.
 breaks_how_badly: crippling
 how_likely: plausible
 source_refs:

@@ -1,12 +1,12 @@
 ---
 form: gate-requirements
 bless: blessed by agent
-reopened: "2026-08-26T12:24:58.678Z — three should rows joined the register after this gate blessed, and probe-assumptions re-signed with the volume outcome"
-amended: "2026-08-26T11:10:46.200Z by agent — the invented word obligation becomes work token, the name the owner uses"
+reopened: 2026-08-26T12:24:58.678Z — three should rows joined the register after this gate blessed, and probe-assumptions re-signed with the volume outcome
+amended: 2026-08-26T11:10:46.200Z by agent — the invented word obligation becomes work token, the name the owner uses
 by: agent
 signed_off: 2026-08-26T12:25:03.145Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / gate-requirements

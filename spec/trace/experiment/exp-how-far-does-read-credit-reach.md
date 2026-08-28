@@ -10,14 +10,14 @@ form: tracer
 faked: none — the engine's own reading ledger was read
 fallback: none needed — the code states its own scope and its reasoning
 verdict: holds
-measured: "2026-08-26 — credit is per reader, written to the session settings, keyed per version, and lost with the hand; sessionreads.ts lines 88 to 100"
+measured: 2026-08-26 — credit is per reader, written to the session settings, keyed per version, and lost with the hand; sessionreads.ts lines 88 to 100
 folds_to: raid-dec-read-credit-is-global-across-positions-and-never-across-sessions
-promote: "none — nothing in the engine changes, because it already does what the ruling asks"
+promote: none — nothing in the engine changes, because it already does what the ruling asks
 chunk: none — the wording of the kickoff goal is what moves, and it could not be amended without a reopen
 source_refs:
   - rank-unknowns, the seeded pick
   - deliverable/engine/sessionreads.ts
-  - "owner ruling, 2026-08-26"
+  - owner ruling, 2026-08-26
 ---
 
 ## What the code says, quoted

@@ -3,7 +3,7 @@ form: carry-a-finding-without-stopping
 by: agent
 signed_off: 2026-08-27T20:58:29.758Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / carry-a-finding-without-stopping

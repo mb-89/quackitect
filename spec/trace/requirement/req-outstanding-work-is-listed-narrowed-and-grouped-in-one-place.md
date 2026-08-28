@@ -2,15 +2,15 @@
 minted_in: i63-work-tokens-become-the-unit-of-work-and-
 id: req-outstanding-work-is-listed-narrowed-and-grouped-in-one-place
 type: "[[requirement]]"
-statement: "The system shall narrow the list of outstanding work by any field that work carries, and shall gather chosen rows into a group that carries them to a destination."
+statement: The system shall narrow the list of outstanding work by any field that work carries, and shall gather chosen rows into a group that carries them to a destination.
 kind: functional
 verify_method: demonstration
-breaks_if_removed: "Deciding what happens next means reading three stores by hand, so browsing the backlog ends in a survey rather than in a decision."
+breaks_if_removed: Deciding what happens next means reading three stores by hand, so browsing the backlog ends in a survey rather than in a decision.
 breaks_how_badly: crippling
 refines:
   - uc-route-outstanding-work-to-where-it-is-done
 source_refs:
-  - "uc-route-outstanding-work-to-where-it-is-done steps 1 to 3 and extensions 1a and 2a"
+  - uc-route-outstanding-work-to-where-it-is-done steps 1 to 3 and extensions 1a and 2a
 priority: should
 weighs_with:
   - none

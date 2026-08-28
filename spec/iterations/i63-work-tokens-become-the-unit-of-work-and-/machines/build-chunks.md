@@ -1,32 +1,38 @@
 ---
 steps:
   - id: mark-a-card
-    statement: "the compiler reads a mark rather than inferring from shape - any line that opens a part, at any level, heading or top-level list item"
+    statement: the compiler reads a mark rather than inferring from shape - any line that opens a part, at any level, heading or top-level list item
     depends_on: []
     realization: code
   - id: prove-the-format
-    statement: "mark the two cards that disagree and check the compiler holds on both - one whose steps are headings, and the retro whose steps are a numbered list"
-    depends_on: [mark-a-card]
+    statement: mark the two cards that disagree and check the compiler holds on both - one whose steps are headings, and the retro whose steps are a numbered list
+    depends_on:
+      - mark-a-card
     realization: code
   - id: the-work-store
-    statement: "every write to a piece of work in one module - mint on entry, match by identity on re-entry, place, take, settle"
-    depends_on: [mark-a-card]
+    statement: every write to a piece of work in one module - mint on entry, match by identity on re-entry, place, take, settle
+    depends_on:
+      - mark-a-card
     realization: code
   - id: the-work-offer
-    statement: "the two hot-path reads - what a hand may take now, and what a position owes per slot"
-    depends_on: [the-work-store]
+    statement: the two hot-path reads - what a hand may take now, and what a position owes per slot
+    depends_on:
+      - the-work-store
     realization: code
   - id: merge-the-surfaces
-    statement: "the machine and the work editor render in one webview and keep independent viewports - zooming one leaves the other untouched"
+    statement: the machine and the work editor render in one webview and keep independent viewports - zooming one leaves the other untouched
     depends_on: []
     realization: code
   - id: the-bucket-editor
-    statement: "buckets, folding, two panes, the drag onto a state, and the plus that mints from a template"
-    depends_on: [the-work-offer, merge-the-surfaces]
+    statement: buckets, folding, two panes, the drag onto a state, and the plus that mints from a template
+    depends_on:
+      - the-work-offer
+      - merge-the-surfaces
     realization: code
   - id: mark-the-corpus
-    statement: "mark the remaining cards, once the format has been proven on the awkward cases"
-    depends_on: [prove-the-format]
+    statement: mark the remaining cards, once the format has been proven on the awkward cases
+    depends_on:
+      - prove-the-format
     realization: document
 ---
 

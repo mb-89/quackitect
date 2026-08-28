@@ -95,4 +95,12 @@ slides at most: past that the story is two stories. -->
 its own words. -->
 |||
 <!-- Empty until M8. -->
+
+---
+
+<!-- THE USE CASES THIS STORY RESTS ON, one reference per line. LAST SLIDE, on
+purpose: the story has to read as a story first, and a reader who wants the
+formal route finds it at the end rather than meeting it in the middle. -->
+|||
+<!-- Empty until M8. -->
 ```

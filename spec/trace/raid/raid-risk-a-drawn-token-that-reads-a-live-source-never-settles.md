@@ -3,11 +3,11 @@ minted_in: i63-work-tokens-become-the-unit-of-work-and-
 id: raid-risk-a-drawn-token-that-reads-a-live-source-never-settles
 type: "[[raid]]"
 kind: risk
-statement: "A mechanical token whose script reads a source that keeps moving re-opens every time anything changes, so a long state can never close and the treadmill survives the redesign meant to end it."
+statement: A mechanical token whose script reads a source that keeps moving re-opens every time anything changes, so a long state can never close and the treadmill survives the redesign meant to end it.
 owner: the driving agent
-trigger: "the first mechanical token built, and any position that refuses to close over a value the engine drew"
+trigger: the first mechanical token built, and any position that refuses to close over a value the engine drew
 status: open
-impact: "The only way to close such a state is to stop noticing things, which is the opposite of what the walk should encourage. It converts a completeness mechanism into a reason to work with your eyes shut."
+impact: The only way to close such a state is to stop noticing things, which is the opposite of what the walk should encourage. It converts a completeness mechanism into a reason to work with your eyes shut.
 breaks_how_badly: corrosive
 how_likely: plausible
 source_refs:

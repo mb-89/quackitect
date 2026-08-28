@@ -1,9 +1,9 @@
 ---
 id: wt-a-large-record-is-built-once-committed-and-kept-solely-as-a-
 type: "[[work]]"
-statement: "A large record is built once, committed, and kept solely as a yardstick for timing. It never appears on a surface and never enters a tally. Anything still being worked on shifts under the measurement, which makes a slowdown indistinguishable from the thing simply growing. Without something that holds still, no time budget is enforceable."
-ready_when: "ready when the walk-speed iteration is seeded"
-source: "note-194e6b3d3e32"
+statement: A large record is built once, committed, and kept solely as a yardstick for timing. It never appears on a surface and never enters a tally. Anything still being worked on shifts under the measurement, which makes a slowdown indistinguishable from the thing simply growing. Without something that holds still, no time budget is enforceable.
+ready_when: ready when the walk-speed iteration is seeded
+source: note-194e6b3d3e32
 ---
 
 ## Why it stands

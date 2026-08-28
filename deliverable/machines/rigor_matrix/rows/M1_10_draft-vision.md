@@ -32,13 +32,6 @@ evidence:
       Describe a working day AFTER the product exists. Name people by role.
       Present tense, a scene, not a feature list. The reader should be able
       to picture the screen and the hands on it.
-  - name: goal_system
-    description: goals, conflicts named openly, priority order ruled
-    guidance: |
-      List the goals the product serves, most important first. Where two
-      goals pull against each other, say so openly and rule which one wins.
-      A goal list without a named conflict is usually hiding one.
-      The method: [[meth-goal-system]].
   - name: moore_pitch
     description: all five slots filled
     omit:
@@ -48,6 +41,16 @@ evidence:
       (need), THE (product name) IS A (category) THAT (key benefit).
       UNLIKE (main alternative), OUR PRODUCT (key differentiator).
       One phrase per slot, no slot skipped. The method: [[meth-moore-pitch]].
+
+      IT COMES BEFORE THE GOALS ON PURPOSE. The pitch carries the whole
+      picture in five slots, and the goals are read against it.
+  - name: goal_system
+    description: goals, conflicts named openly, priority order ruled
+    guidance: |
+      List the goals the product serves, most important first. Where two
+      goals pull against each other, say so openly and rule which one wins.
+      A goal list without a named conflict is usually hiding one.
+      The method: [[meth-goal-system]].
 major: tailored
 minor: inherit
 patch: none
@@ -97,8 +100,11 @@ The method, start to pitch, is [[meth-motivation]].
 
 - The big idea in one breath.
 - The to-be world alive, not abstract.
-- The goal system, with conflicts named openly ([[meth-goal-system]]).
-- The pitch last ([[meth-moore-pitch]]).
+- The pitch, all five slots ([[meth-moore-pitch]]).
+- The goal system last, with conflicts named openly ([[meth-goal-system]]).
+
+THE PITCH COMES BEFORE THE GOALS. It carries the whole picture in five slots,
+so a reader meets the shape of the thing before the list of what it serves.
 
 The vision is axiomatic. Nothing derives it, and the gate adjudicates whether
 it is worth having.

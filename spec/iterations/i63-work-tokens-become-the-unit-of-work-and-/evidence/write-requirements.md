@@ -2,10 +2,10 @@
 form: write-requirements
 by: agent
 signed_off: 2026-08-26T12:21:26.494Z
-reopened: "2026-08-26T12:19:45.685Z — three should rows were minted after the gate, for dimensions the scoring found the candidates differ on and no criterion measured"
-amended: "2026-08-26T09:56:13.601Z by agent — The step-walk claim named five use cases where 52 counts only the three new ones; the two standing ones were then walked too, and the row counts were wrong by one and one."
+reopened: 2026-08-26T12:19:45.685Z — three should rows were minted after the gate, for dimensions the scoring found the candidates differ on and no criterion measured
+amended: 2026-08-26T09:56:13.601Z by agent — The step-walk claim named five use cases where 52 counts only the three new ones; the two standing ones were then walked too, and the row counts were wrong by one and one.
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / write-requirements

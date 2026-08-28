@@ -5,7 +5,7 @@ type: "[[option]]"
 statement: give each work token an identity of its own at the moment it first exists, and carry the method's marked step as a pointer rather than as the thing that names it
 cluster: the-work
 found_by: contradiction
-source: "TRIZ separation IN LEVEL, on the contradiction that keeping work tokens so they can be moved makes a reworded method card orphan or duplicate them"
+source: TRIZ separation IN LEVEL, on the contradiction that keeping work tokens so they can be moved makes a reworded method card orphan or duplicate them
 ---
 
 ## Mechanism

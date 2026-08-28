@@ -21,7 +21,7 @@ evidence:
   - name: roles
     template: refs
     of: stakeholder
-    description: every role as a node reference, one per line — the node carries the placement, this field never restates it
+    description: what THIS round changes about the role set — added, removed or re-placed, one node each; `none` where the set did not move. The node carries the placement and this field never restates it
   - name: coverage
     description: every value prop's audience resolves to a role here, and every always-on class is present or ruled out with its reason
 major: tailored

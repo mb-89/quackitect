@@ -102,3 +102,16 @@ NOT TOUCHED THIS WINDOW. The window holds one record and it was about the disk r
 
 RE-ACCEPTED consciously, trigger unchanged.
 
+
+SWEPT 2026-08-28, at i63's closing retro: RE-ACCEPTED, AND ITS TRIGGER CANNOT
+BE DELIVERED.
+
+The trigger waits on the owner reviewing the panel's checklist rendering and
+deciding two things. Nothing schedules that, nothing watches for it, and no
+state arrives at it. This entry is one of sixteen open ones whose trigger names
+no moment anything could deliver.
+
+THE RETRO IS NOT REWRITING IT HERE, because a trigger that hands the owner's
+own decision to a state would be the retro deciding for them. What the retro
+does instead is name the class: an entry waiting on an unscheduled person act
+is waiting forever, and sixteen of them stand.

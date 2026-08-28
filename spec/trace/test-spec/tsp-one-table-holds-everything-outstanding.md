@@ -5,8 +5,8 @@ type: "[[test-spec]]"
 statement: A person browsing everything outstanding finds it in one table, narrows it to what they could finish today, groups what belongs together and starts a record from it, without leaving the table.
 method: demonstration
 demonstrates:
-  - "sty-browse-the-backlog-and-decide-what-happens-next"
-verifies: "none — demonstrates carries the edge; that the served editor lists the work in two database panes and that the entry control mints into the backlog are verified by test in deliverable/tests/work-served.test.ts"
+  - sty-browse-the-backlog-and-decide-what-happens-next
+verifies: none — demonstrates carries the edge; that the served editor lists the work in two database panes and that the entry control mints into the backlog are verified by test in deliverable/tests/work-served.test.ts
 files:
   - none — a demonstration is observed rather than instrumented, and the Procedure below is the whole definition
 ---

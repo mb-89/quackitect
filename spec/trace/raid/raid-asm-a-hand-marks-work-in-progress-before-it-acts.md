@@ -3,19 +3,19 @@ minted_in: i63-work-tokens-become-the-unit-of-work-and-
 id: raid-asm-a-hand-marks-work-in-progress-before-it-acts
 type: "[[raid]]"
 kind: assumption
-statement: "Removing the narration machinery rests on every hand marking a piece of work in progress before it acts, and nothing checks that the mark went on."
+statement: Removing the narration machinery rests on every hand marking a piece of work in progress before it acts, and nothing checks that the mark went on.
 owner: the driving agent
-trigger: "the first walk under work tokens, and any account of what a hand was doing that skips from nothing to finished"
+trigger: the first walk under work tokens, and any account of what a hand was doing that skips from nothing to finished
 status: open
-probe: "scheduled. The probe compares in-work marks against the call log over one walk, and neither the marks nor the walk exists yet. It is a before-and-after check and it is the one to run first once work tokens are built, because the answer decides whether the mark needs policing at all."
+probe: scheduled. The probe compares in-work marks against the call log over one walk, and neither the marks nor the walk exists yet. It is a before-and-after check and it is the one to run first once work tokens are built, because the answer decides whether the mark needs policing at all.
 probed: 2026-08-26
-impact: "The progress account replaces a machinery that was policed by five refusal clauses. Its replacement is policed by nothing, so a hand that simply does not mark produces an account that is silent rather than wrong, and silence reads as an idle hand."
+impact: The progress account replaces a machinery that was policed by five refusal clauses. Its replacement is policed by nothing, so a hand that simply does not mark produces an account that is silent rather than wrong, and silence reads as an idle hand.
 breaks_how_badly: crippling
 how_likely: plausible
 source_refs:
   - req-work-says-when-a-hand-is-on-it
   - req-the-progress-account-is-derived-from-the-work-itself
-  - "record.md lines 82 to 86, where the in-work state is what replaces the checklist"
+  - record.md lines 82 to 86, where the in-work state is what replaces the checklist
 ---
 
 ## Probe

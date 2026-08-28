@@ -5,7 +5,7 @@ signed_off: 2026-08-27T10:34:52.860Z
 reopened: "2026-08-27T10:34:15.692Z — its central finding is no longer true: the walk now calls the store, the mint is wired and the submit consults the offer, so the inspection has to be re-taken against what stands"
 judgment: passed at 2026-08-27T20:42:25.780Z with deliverable/engine/bin/battery.ts@dcc3f61899f0
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / verification

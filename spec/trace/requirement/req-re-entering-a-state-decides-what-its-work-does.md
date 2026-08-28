@@ -2,10 +2,10 @@
 minted_in: i63-work-tokens-become-the-unit-of-work-and-
 id: req-re-entering-a-state-decides-what-its-work-does
 type: "[[requirement]]"
-statement: "When the walk reaches a state it has stood in before, the system shall decide what happens to that state's work from how the state stands, and shall accept work dropped onto a running state rather than refusing it."
+statement: When the walk reaches a state it has stood in before, the system shall decide what happens to that state's work from how the state stands, and shall accept work dropped onto a running state rather than refusing it.
 kind: functional
 verify_method: test
-breaks_if_removed: "Re-entry is the ordinary case rather than the exception, and with nothing ruling it a second entry either loses finished work or asks for it twice."
+breaks_if_removed: Re-entry is the ordinary case rather than the exception, and with nothing ruling it a second entry either loses finished work or asks for it twice.
 breaks_how_badly: crippling
 refines:
   - uc-work-a-states-work-tokens-to-completion

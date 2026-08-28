@@ -3,11 +3,11 @@ minted_in: i63-work-tokens-become-the-unit-of-work-and-
 id: raid-risk-an-ephemeral-token-dies-on-restart-and-work-underway-has-no-home
 type: "[[raid]]"
 kind: risk
-statement: "A restart deletes every ephemeral token, so anything marked in work outside a record loses the only record that it was underway."
+statement: A restart deletes every ephemeral token, so anything marked in work outside a record loses the only record that it was underway.
 owner: the driving agent
-trigger: "the first restart during a state holding tokens marked in work, and any report of a walk repeating work it had already begun"
+trigger: the first restart during a state holding tokens marked in work, and any report of a walk repeating work it had already begun
 status: open
-impact: "The proof of a finished thing survives, because read evidence is global and version-keyed. What does not survive is the fact that something was started and half done, so the walk repeats it with nothing saying it should not."
+impact: The proof of a finished thing survives, because read evidence is global and version-keyed. What does not survive is the fact that something was started and half done, so the walk repeats it with nothing saying it should not.
 breaks_how_badly: corrosive
 how_likely: expected
 source_refs:

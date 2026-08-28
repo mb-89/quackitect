@@ -3,11 +3,11 @@ minted_in: i63-work-tokens-become-the-unit-of-work-and-
 id: raid-dec-work-is-a-file-while-open-and-one-folded-file-once-closed
 type: "[[raid]]"
 kind: decision
-statement: "A piece of work is an editable markdown file while its iteration is open. At close the whole iteration folds into one file, leaves the working tree, and is read back out of version control at a commit the fold records."
+statement: A piece of work is an editable markdown file while its iteration is open. At close the whole iteration folds into one file, leaves the working tree, and is read back out of version control at a commit the fold records.
 owner: the owner
-trigger: "the first iteration closed under this rule, and any report that reading an archived iteration is slower or harder than reading the tree was"
+trigger: the first iteration closed under this rule, and any report that reading an archived iteration is slower or harder than reading the tree was
 status: decided
-impact: "It settles what a person edits, what version control holds, and where the tree stops growing. Every later milestone builds on it, and the engine's fourteen readers of the iteration folder change with it."
+impact: It settles what a person edits, what version control holds, and where the tree stops growing. Every later milestone builds on it, and the engine's fourteen readers of the iteration folder change with it.
 breaks_how_badly: crippling
 how_likely: expected
 weighs_with: none

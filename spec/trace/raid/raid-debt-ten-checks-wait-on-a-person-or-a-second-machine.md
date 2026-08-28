@@ -166,3 +166,16 @@ WHAT IS STILL TRUE. None of them can carry a task to a person. A parked item sta
 
 RE-ACCEPTED consciously, trigger unchanged.
 
+
+SWEPT 2026-08-28, at i63's closing retro: RE-ACCEPTED, and the first half of
+the trigger is now closer than it was.
+
+The trigger fires when the work-token system can carry a task to a person, or
+at the first verification after 2026-10-01, whichever comes first.
+
+i63 SHIPPED THE WORK-TOKEN SYSTEM in this window, and SE-C-150 already refuses
+an agent settling an item marked person-only. So the carrying mechanism exists.
+What is not yet shown is a check actually routed to a person through it.
+
+RESCHEDULED, with the trigger sharpened: it fires at the first person-only
+token minted from one of these ten checks.

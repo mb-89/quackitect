@@ -74,3 +74,11 @@ the next sweep meets it rather than rediscovering it.
 NOT TOUCHED THIS WINDOW. The window holds one record, and that record's subject was the disk regime rather than any panel.
 
 RE-ACCEPTED consciously, trigger unchanged.
+
+SWEPT 2026-08-28, at i63's closing retro: RE-ACCEPTED, AND IT CARRIES NO
+TRIGGER.
+
+Nothing brings it due, and it is the third of three open debts in that state.
+
+THE TRIGGER IT SHOULD CARRY is the same one its two siblings want: the
+consolidation pass that collects everything needing a person.

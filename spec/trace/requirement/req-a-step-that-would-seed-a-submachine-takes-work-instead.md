@@ -2,10 +2,10 @@
 minted_in: i63-work-tokens-become-the-unit-of-work-and-
 id: req-a-step-that-would-seed-a-submachine-takes-work-instead
 type: "[[requirement]]"
-statement: "Where a step today seeds a machine beneath itself, the system shall give that step its own pieces of work instead, and shall carry work onward by moving it rather than by seeding."
+statement: Where a step today seeds a machine beneath itself, the system shall give that step its own pieces of work instead, and shall carry work onward by moving it rather than by seeding.
 kind: functional
 verify_method: test
-breaks_if_removed: "A whole level of machine survives beside the thing that replaces it, so the same work is modelled twice and a count on a state is blind to whatever hangs below it."
+breaks_if_removed: A whole level of machine survives beside the thing that replaces it, so the same work is modelled twice and a count on a state is blind to whatever hangs below it.
 breaks_how_badly: crippling
 refines:
   - uc-work-a-states-work-tokens-to-completion

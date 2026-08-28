@@ -5,7 +5,7 @@ type: "[[option]]"
 statement: give every status a place of its own, so moving a piece of work is the only way its status ever changes and the board can be read across a room
 cluster: the-work
 found_by: analogy
-source: "air traffic control's flight progress strips, where one strip per aircraft lives in a bay and moving it between bays IS the state change"
+source: air traffic control's flight progress strips, where one strip per aircraft lives in a bay and moving it between bays IS the state change
 ---
 
 ## Mechanism

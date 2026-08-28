@@ -4,11 +4,11 @@ id: dsp-the-work-offer
 type: "[[design-spec]]"
 statement: the hot-path reads — what a hand may take now, and how much a position still owes per slot
 realizes:
-  - "el-work-offer"
-  - "if-sizing-to-work-offer"
-  - "if-work-offer-to-mirror"
+  - el-work-offer
+  - if-sizing-to-work-offer
+  - if-work-offer-to-mirror
 files:
-  - "deliverable/engine/workoffer.ts"
+  - deliverable/engine/workoffer.ts
 ---
 
 ## Responsibility

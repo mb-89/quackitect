@@ -3,11 +3,11 @@ minted_in: i63-work-tokens-become-the-unit-of-work-and-
 id: raid-risk-work-only-a-person-may-settle-now-holds-the-walk-shut
 type: "[[raid]]"
 kind: risk
-statement: "A state is no longer left while it holds open work, and a person-only item is open work no agent may settle, so one such item parks the walk until somebody who is not the agent acts."
+statement: A state is no longer left while it holds open work, and a person-only item is open work no agent may settle, so one such item parks the walk until somebody who is not the agent acts.
 owner: the owner
-trigger: "the first person-only item placed at a state an unattended run has to walk through"
+trigger: the first person-only item placed at a state an unattended run has to walk through
 status: open
-impact: "An unattended run has nobody to ask. It waits at a state it cannot leave, and the only signal is a refusal nobody is reading."
+impact: An unattended run has nobody to ask. It waits at a state it cannot leave, and the only signal is a refusal nobody is reading.
 breaks_how_badly: corrosive
 how_likely: plausible
 source_refs:

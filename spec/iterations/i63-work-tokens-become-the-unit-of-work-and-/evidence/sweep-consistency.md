@@ -4,7 +4,7 @@ judgment: passed at 2026-08-27T21:01:04.542Z with deliverable/engine/bin/sweep.t
 by: agent
 signed_off: 2026-08-27T21:00:48.730Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / sweep-consistency

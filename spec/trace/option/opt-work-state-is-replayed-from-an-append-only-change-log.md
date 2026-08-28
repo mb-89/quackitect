@@ -5,7 +5,7 @@ type: "[[option]]"
 statement: store no state on a piece of work at all, and derive what it is now by replaying every recorded change against its identity in time order
 cluster: the-work
 found_by: prior-art
-source: "Fossil's ticket design, at fossil-scm.org/home/doc/trunk/www/bugtheory.wiki, which replays change artifacts in timestamp order to find a ticket's current state"
+source: Fossil's ticket design, at fossil-scm.org/home/doc/trunk/www/bugtheory.wiki, which replays change artifacts in timestamp order to find a ticket's current state
 ---
 
 ## Mechanism

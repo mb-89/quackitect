@@ -3,11 +3,11 @@ minted_in: i63-work-tokens-become-the-unit-of-work-and-
 id: raid-iss-the-battery-is-red-on-a-comment-ratchet-this-milestone-did-not-move
 type: "[[raid]]"
 kind: issue
-statement: "The full battery is red at the requirements gate. Comment lines carrying a date or an owner attribution stand at 207 in the test tree against a ceiling of 204, and this milestone wrote no file there."
+statement: The full battery is red at the requirements gate. Comment lines carrying a date or an owner attribution stand at 207 in the test tree against a ceiling of 204, and this milestone wrote no file there.
 owner: the maintainer
-trigger: "the next gate that runs the battery, and any attempt to land work while the ratchet stands above its ceiling"
+trigger: the next gate that runs the battery, and any attempt to land work while the ratchet stands above its ceiling
 status: open
-impact: "A gate cannot tell a red it caused from a red it inherited, so every later gate either carries this one forward or spends the time re-deciding that it is not theirs. Left standing it also disarms the ratchet in practice, because a check that is always red stops being read."
+impact: A gate cannot tell a red it caused from a red it inherited, so every later gate either carries this one forward or spends the time re-deciding that it is not theirs. Left standing it also disarms the ratchet in practice, because a check that is always red stops being read.
 breaks_how_badly: corrosive
 how_likely: expected
 source_refs:

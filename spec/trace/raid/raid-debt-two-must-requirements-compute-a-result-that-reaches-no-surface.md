@@ -111,3 +111,13 @@ WIDENING THAT CHECK IS ALREADY PARKED as a standing item in the pool. Until it l
 
 RE-ACCEPTED consciously, trigger unchanged.
 
+
+SWEPT 2026-08-28, at i63's closing retro: RE-ACCEPTED, and the trigger holds.
+
+It fires at the next iteration that opens the lane's reporting surfaces. i63
+touched the work surfaces rather than the reporting ones, so the moment has not
+arrived.
+
+ONE SEEDED STUB ALREADY NAMES IT: i48 wires failure-shapes into the retro and
+the boot summary, and gives the vehicle change reporter its door. That is this
+debt's home when it opens.

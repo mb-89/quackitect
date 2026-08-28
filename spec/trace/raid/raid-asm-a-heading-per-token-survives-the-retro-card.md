@@ -4,12 +4,12 @@ id: raid-asm-a-heading-per-token-survives-the-retro-card
 type: "[[raid]]"
 status: closed
 kind: assumption
-statement: "The design assumes a method's marked headings can become its tokens, and the retro card is the case that decides whether that is true."
+statement: The design assumes a method's marked headings can become its tokens, and the retro card is the case that decides whether that is true.
 owner: the driving agent
-trigger: "the rewrite of the retro card, which is the first place the format is tested against real prose"
+trigger: the rewrite of the retro card, which is the first place the format is tested against real prose
 probe: "scheduled. Splitting the retro card is authoring rather than measuring, and two things it depends on are deliberately unsettled: how a heading declares itself a step, and what the subheadings beneath one are called. Running the split before those are ruled would test a format nobody has defined."
 probed: 2026-08-26
-impact: "Method steps becoming tokens is the fix for a measured failure, where an overhaul agent skipped some of its own steps and nothing objected. If the format cannot carry the hardest card, that fix loses its proof and the guidance stays advice."
+impact: Method steps becoming tokens is the fix for a measured failure, where an overhaul agent skipped some of its own steps and nothing objected. If the format cannot carry the hardest card, that fix loses its proof and the guidance stays advice.
 breaks_how_badly: crippling
 how_likely: plausible
 source_refs:

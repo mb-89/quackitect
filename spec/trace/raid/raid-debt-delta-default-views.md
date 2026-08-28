@@ -129,3 +129,18 @@ SAYING THAT IS THE POINT. An unmeasured window is not a quiet one, and recording
 
 RE-ACCEPTED consciously, trigger unchanged.
 
+
+SWEPT 2026-08-28, at i63's closing retro: TRIGGER FIRED, AND STILL NOT
+MEASURED.
+
+It fires on the next form opened in a record whose table lists another record's
+nodes. i63 walked ten gates and about ninety forms in this window, so the
+moment arrived many times over.
+
+WHAT THIS ENTRY SAID OF ITSELF ON 2026-08-26 was that the window went
+unmeasured, and that an unmeasured window is not a quiet one. That is true
+again here, and saying it twice is the finding rather than the excuse.
+
+RESCHEDULED, and it now needs a measurement rather than another look. Somebody
+has to open one gate form and count how many of its rows belong to another
+record.

@@ -9,7 +9,7 @@ grade: fatal
 against:
   - req-structure-verdicts-are-mechanical
 source_refs:
-  - "gate-architecture cold review, 2026-08-26"
+  - gate-architecture cold review, 2026-08-26
   - deliverable/machines/forms/templates/scenario-deck.md
   - req-archive-shows-it-as-it-closed
 ---

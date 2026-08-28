@@ -1,6 +1,6 @@
 ---
 kind: report
-statement: "Demonstration of sty-steer-a-running-iteration-by-moving-work. The steering was performed through the lane rather than by dragging a row, and the report says so."
+statement: Demonstration of sty-steer-a-running-iteration-by-moving-work. The steering was performed through the lane rather than by dragging a row, and the report says so.
 demonstrates: sty-steer-a-running-iteration-by-moving-work
 performed: 2026-08-27
 performed_by: walker

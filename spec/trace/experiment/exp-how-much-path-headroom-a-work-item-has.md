@@ -10,9 +10,9 @@ form: calculation
 faked: none — the longest record folder and the longest marked heading were both taken from the real tree
 fallback: none needed — the answer is arithmetic on real names
 verdict: holds
-measured: "2026-08-26 — longest record folder 44 characters, longest item path 163 relative and 203 absolute on this machine, against the 260 classic Windows limit, leaving 57"
+measured: 2026-08-26 — longest record folder 44 characters, longest item path 163 relative and 203 absolute on this machine, against the 260 classic Windows limit, leaving 57
 folds_to: raid-dec-work-is-a-file-while-open-and-one-folded-file-once-closed
-promote: "none as a blocker. The headroom figure is what the build inherits, and a cap on the record folder name is the cheapest way to keep it"
+promote: none as a blocker. The headroom figure is what the build inherits, and a cap on the record folder name is the cheapest way to keep it
 chunk: none — nothing must be built, and the margin is a thing to watch rather than fix
 source_refs:
   - rank-unknowns, the seeded pick

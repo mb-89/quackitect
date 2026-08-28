@@ -1,11 +1,11 @@
 ---
 form: gate-architecture
 bless: blessed by agent
-amended: "2026-08-26T14:00:50.513Z by agent — the owner ruled on the format, the old folders, the presence requirement and the spike, and blessed the gate on those rulings"
+amended: 2026-08-26T14:00:50.513Z by agent — the owner ruled on the format, the old folders, the presence requirement and the spike, and blessed the gate on those rulings
 by: agent
 signed_off: 2026-08-26T13:23:08.110Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / gate-architecture

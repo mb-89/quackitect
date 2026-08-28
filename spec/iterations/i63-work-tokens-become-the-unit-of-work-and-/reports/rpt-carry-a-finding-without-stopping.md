@@ -1,6 +1,6 @@
 ---
 kind: report
-statement: "Demonstration of sty-carry-a-finding-without-stopping, performed against the shipped system on the walk of i63 itself."
+statement: Demonstration of sty-carry-a-finding-without-stopping, performed against the shipped system on the walk of i63 itself.
 demonstrates: sty-carry-a-finding-without-stopping
 performed: 2026-08-27
 performed_by: walker

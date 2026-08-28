@@ -2,16 +2,16 @@
 minted_in: i63-work-tokens-become-the-unit-of-work-and-
 id: req-a-state-mints-its-work-tokens-on-entry
 type: "[[requirement]]"
-statement: "When the walk enters a state, the system shall derive the work that state owes from the reading it demands, from the marked steps of its method, and from the evidence it must produce."
+statement: When the walk enters a state, the system shall derive the work that state owes from the reading it demands, from the marked steps of its method, and from the evidence it must produce.
 kind: functional
 verify_method: test
-breaks_if_removed: "A state's work tokens go back to being authored by hand in two places that nothing reconciles, which is the gap that let an overhaul agent skip its own steps."
+breaks_if_removed: A state's work tokens go back to being authored by hand in two places that nothing reconciles, which is the gap that let an overhaul agent skip its own steps.
 breaks_how_badly: crippling
 refines:
   - uc-work-a-states-work-tokens-to-completion
 source_refs:
   - raid-risk-a-state-must-mint-its-own-tokens-and-that-machinery-is-undesigned
-  - "uc-work-a-states-work-tokens-to-completion steps 1 to 4"
+  - uc-work-a-states-work-tokens-to-completion steps 1 to 4
   - "kickoff goals: reading requirements become incoming tokens; a method's steps become outgoing tokens"
 priority: must
 weighs_with:

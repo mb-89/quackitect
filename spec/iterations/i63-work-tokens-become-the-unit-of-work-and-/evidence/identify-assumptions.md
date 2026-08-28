@@ -1,11 +1,11 @@
 ---
 form: identify-assumptions
-reopened: "2026-08-26T12:23:50.935Z — derive-functions was re-signed after it, and the three new rows were swept against the six sources without producing a new assumption"
-amended: "2026-08-26T09:57:34.127Z by agent — Seven requirements arrived after this sweep ran, not eight, and the register now stands at thirty-two rows with twelve additions."
+reopened: 2026-08-26T12:23:50.935Z — derive-functions was re-signed after it, and the three new rows were swept against the six sources without producing a new assumption
+amended: 2026-08-26T09:57:34.127Z by agent — Seven requirements arrived after this sweep ran, not eight, and the register now stands at thirty-two rows with twelve additions.
 by: agent
 signed_off: 2026-08-26T12:23:55.245Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / identify-assumptions

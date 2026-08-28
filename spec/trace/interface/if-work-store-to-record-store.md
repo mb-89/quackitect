@@ -10,7 +10,7 @@ carries:
 form: one call at close, carrying every piece of work the record holds
 bound: inherited — the close's own bound, and the fold is the long part of it
 source_refs:
-  - "gate-architecture cold review, second round, 2026-08-26"
+  - gate-architecture cold review, second round, 2026-08-26
   - raid-dec-work-is-a-file-while-open-and-one-folded-file-once-closed
   - el-work-store
   - el-record-store

@@ -3,7 +3,7 @@ form: a-smaller-model-walks-a-record
 by: agent
 signed_off: 2026-08-27T20:59:06.855Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / a-smaller-model-walks-a-record

@@ -2,9 +2,9 @@
 form: derive-criteria
 by: agent
 signed_off: 2026-08-26T12:26:01.714Z
-reopened: "2026-08-26T12:25:39.608Z — three should rows joined the criterion pool and owe their place in the order"
+reopened: 2026-08-26T12:25:39.608Z — three should rows joined the criterion pool and owe their place in the order
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / derive-criteria

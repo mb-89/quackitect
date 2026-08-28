@@ -3,7 +3,7 @@ form: mint-cost-per-entry
 by: agent
 signed_off: 2026-08-26T14:20:03.172Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / mint-cost-per-entry

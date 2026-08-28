@@ -2,8 +2,8 @@
 minted_in: i63-work-tokens-become-the-unit-of-work-and-
 id: cand-nothing-new-the-form-keeps-doing-it
 type: "[[candidate]]"
-name: "The null"
-statement: "build none of it and let the evidence form go on being the derived list a position cannot be left without finishing"
+name: The null
+statement: build none of it and let the evidence form go on being the derived list a position cannot be left without finishing
 picks:
   - "[[opt-there-is-no-work-cluster-and-the-evidence-form-keeps-doing-the-job]]"
 ---

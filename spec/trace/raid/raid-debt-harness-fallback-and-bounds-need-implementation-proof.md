@@ -68,3 +68,14 @@ SO THE BOUND PATH IS NO LONGER UNEXERCISED. That is one run on one host, not a p
 THE FALLBACK HALF IS UNTOUCHED. Nothing this window measured a host limit or took a fallback.
 
 RE-ACCEPTED, trigger unchanged.
+
+SWEPT 2026-08-28, at i63's closing retro: RE-ACCEPTED, still partly evidenced.
+
+The trigger fired when implementation began after the motivation gate, and i63
+walked that whole milestone. The bounds half stays proven and the fallback half
+stays the finding, unchanged from the 2026-08-25 look.
+
+ONE NUMBER FROM THIS WINDOW BEARS ON IT. Every job handle in the session still
+reports `bound_basis: default`, so no bound in the product is measured. That is
+registered separately as raid-risk-one-blanket-bound-is-given-to-work-nobody-measured,
+and the two entries are neighbours rather than duplicates.

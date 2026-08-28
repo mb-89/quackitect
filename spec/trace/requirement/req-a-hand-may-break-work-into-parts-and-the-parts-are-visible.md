@@ -2,10 +2,10 @@
 minted_in: i63-work-tokens-become-the-unit-of-work-and-
 id: req-a-hand-may-break-work-into-parts-and-the-parts-are-visible
 type: "[[requirement]]"
-statement: "When a hand finds a piece of work larger than its mark says, the system shall let that hand create parts beneath it, and shall show those parts under the work they came from."
+statement: When a hand finds a piece of work larger than its mark says, the system shall let that hand create parts beneath it, and shall show those parts under the work they came from.
 kind: functional
 verify_method: test
-breaks_if_removed: "A hand meeting work too large has only two moves, doing all of it in one go or raising the mark and leaving it, and the person watching sees a single work token sit open with no account of what is happening inside it."
+breaks_if_removed: A hand meeting work too large has only two moves, doing all of it in one go or raising the mark and leaving it, and the person watching sees a single work token sit open with no account of what is happening inside it.
 breaks_how_badly: crippling
 refines:
   - uc-work-a-states-work-tokens-to-completion

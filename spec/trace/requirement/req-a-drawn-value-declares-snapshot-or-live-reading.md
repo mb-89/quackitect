@@ -2,10 +2,10 @@
 minted_in: i63-work-tokens-become-the-unit-of-work-and-
 id: req-a-drawn-value-declares-snapshot-or-live-reading
 type: "[[requirement]]"
-statement: "If a piece of work carries a value the system drew from somewhere else, then the system shall refuse it until that work declares whether the value is a snapshot or a live reading."
+statement: If a piece of work carries a value the system drew from somewhere else, then the system shall refuse it until that work declares whether the value is a snapshot or a live reading.
 kind: functional
 verify_method: test
-breaks_if_removed: "A state that keeps noticing things can never close, so the only way to finish is to stop looking, and the completeness mechanism becomes a reason to work with your eyes shut."
+breaks_if_removed: A state that keeps noticing things can never close, so the only way to finish is to stop looking, and the completeness mechanism becomes a reason to work with your eyes shut.
 breaks_how_badly: corrosive
 refines:
   - uc-work-a-states-work-tokens-to-completion

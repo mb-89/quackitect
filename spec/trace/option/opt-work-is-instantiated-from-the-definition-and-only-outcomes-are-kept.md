@@ -5,7 +5,7 @@ type: "[[option]]"
 statement: keep no record of an open piece of work at all, computing the set from the method on every entry and storing only what each one produced
 cluster: the-work
 found_by: prior-art
-source: "workflow engines, where a task instance is derived from the workflow definition on each run and only its result is persisted"
+source: workflow engines, where a task instance is derived from the workflow definition on each run and only its result is persisted
 ---
 
 ## Mechanism

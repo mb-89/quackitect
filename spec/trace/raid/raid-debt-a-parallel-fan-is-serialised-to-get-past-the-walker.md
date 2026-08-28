@@ -141,3 +141,18 @@ TWO WORK TOKENS NOW CARRY THE REPAIRS, both minted at this retro. One asks a spa
 
 RE-ACCEPTED rather than repaid: the repairs are scoped and parked, and neither is this retro's to build.
 
+
+SWEPT 2026-08-28, at i63's closing retro: RE-ACCEPTED, AND IT CARRIES NO
+TRIGGER, WHICH IS ITS OWN DEFECT.
+
+Nothing can bring this entry due. It is one of three open debts with no trigger
+field at all, so it waits on somebody happening to read it.
+
+THE TRIGGER IT SHOULD CARRY: the next record whose method fans work out across
+several hands at one state. That is a nameable moment, and this window had one
+— i63 walked spawn-the-hands, spawn-for-motivation, spawn-for-inputs,
+spawn-for-requirements, spawn-for-candidates, spawn-for-architecture,
+spawn-for-prototype, spawn-for-implementation, spawn-for-validation and
+spawn-for-release.
+
+TEN FAN-OUT STATES WALKED, and this entry could not tell anybody.

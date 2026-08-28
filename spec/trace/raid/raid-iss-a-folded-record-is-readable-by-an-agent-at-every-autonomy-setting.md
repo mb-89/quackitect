@@ -9,8 +9,8 @@ grade: corrosive
 against:
   - req-archive-opens-to-a-person-only
 source_refs:
-  - "graft-onto-the-winner, the install cell's own reasoning"
-  - "gate-architecture cold review, 2026-08-26"
+  - graft-onto-the-winner, the install cell's own reasoning
+  - gate-architecture cold review, 2026-08-26
   - raid-dec-work-is-a-file-while-open-and-one-folded-file-once-closed
 ---
 

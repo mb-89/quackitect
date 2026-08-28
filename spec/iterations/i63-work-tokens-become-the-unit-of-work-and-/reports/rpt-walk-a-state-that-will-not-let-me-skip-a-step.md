@@ -1,6 +1,6 @@
 ---
 kind: report
-statement: "Demonstration of sty-walk-a-state-that-will-not-let-me-skip-a-step, performed against the shipped system on this record's own walk."
+statement: Demonstration of sty-walk-a-state-that-will-not-let-me-skip-a-step, performed against the shipped system on this record's own walk.
 demonstrates: sty-walk-a-state-that-will-not-let-me-skip-a-step
 performed: 2026-08-27
 performed_by: walker

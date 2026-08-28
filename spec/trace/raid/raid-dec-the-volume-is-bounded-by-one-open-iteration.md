@@ -3,11 +3,11 @@ minted_in: i63-work-tokens-become-the-unit-of-work-and-
 id: raid-dec-the-volume-is-bounded-by-one-open-iteration
 type: "[[raid]]"
 kind: decision
-statement: "Trunk carries the work tokens of one open iteration and no more. A finished work token is deleted, an archived iteration leaves the working tree, and its evidence is folded into one file per iteration read back out of version control."
+statement: Trunk carries the work tokens of one open iteration and no more. A finished work token is deleted, an archived iteration leaves the working tree, and its evidence is folded into one file per iteration read back out of version control.
 owner: the owner
-trigger: "the first iteration archived under this rule, and any report that the vault or the tree got slow while one iteration was open"
+trigger: the first iteration archived under this rule, and any report that the vault or the tree got slow while one iteration was open
 status: decided
-impact: "It moves the volume ceiling from the whole corpus to one iteration. The measured 22,080 to 27,738 files across 69 records becomes 320 to 402, and the file-per-work-token shape stops being falsified on volume."
+impact: It moves the volume ceiling from the whole corpus to one iteration. The measured 22,080 to 27,738 files across 69 records becomes 320 to 402, and the file-per-work-token shape stops being falsified on volume.
 breaks_how_badly: corrosive
 how_likely: expected
 weighs_with: none

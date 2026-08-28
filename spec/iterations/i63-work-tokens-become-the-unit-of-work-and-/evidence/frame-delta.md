@@ -1,10 +1,10 @@
 ---
 form: frame-delta
-amended: "2026-08-25T18:53:25.797Z by agent — the case deferred a saving to a later round, and the record's vision puts the removal in this one"
+amended: 2026-08-25T18:53:25.797Z by agent — the case deferred a saving to a later round, and the record's vision puts the removal in this one
 by: agent
 signed_off: 2026-08-25T17:38:27.436Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / frame-delta

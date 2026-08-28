@@ -3,7 +3,7 @@ form: read-evidence-scope
 by: agent
 signed_off: 2026-08-26T14:19:28.909Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / read-evidence-scope

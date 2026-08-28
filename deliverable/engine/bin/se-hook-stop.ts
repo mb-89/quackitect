@@ -432,7 +432,7 @@ function notchSanction(notch: string, last: LastPull, at: string): [string, stri
 
 // see dsp-boot-and-power.md#the-only-stops-that-are-sanctioned
 const SANCTIONED =
-  "FOUR STOPS ARE SANCTIONED AND NOTHING ELSE IS. " +
+  "FIVE STOPS ARE SANCTIONED AND NOTHING ELSE IS. " +
   "(1) A GATE THE PERSON OWNS — gate-implementation is theirs to bless; the rest are yours at this dial. " +
   "(2) A DECISION ONLY THEY CAN MAKE — no answer you could pick would let the walk continue honestly. " +
   "(3) SOMETHING BROKE and no remedy gets you past it. " +

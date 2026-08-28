@@ -3,11 +3,11 @@ minted_in: i63-work-tokens-become-the-unit-of-work-and-
 id: raid-risk-the-exit-rule-can-be-satisfied-by-moving-work-rather-than-doing-it
 type: "[[raid]]"
 kind: risk
-statement: "The exit rule accepts a token that moved elsewhere, and two documented destinations do not block, so a state can be left by dragging its work tokens away rather than by settling them."
+statement: The exit rule accepts a token that moved elsewhere, and two documented destinations do not block, so a state can be left by dragging its work tokens away rather than by settling them.
 owner: the owner role
-trigger: "the design step that implements a recorded open point, and the first gate blessed while an open point stands unaccepted"
+trigger: the design step that implements a recorded open point, and the first gate blessed while an open point stands unaccepted
 status: mitigated
-impact: "The exit rule is the only mechanical refusal in the design. Every other guarantee defers to it. If it can be satisfied by moving work, the round makes axiomatic a guarantee it does not have."
+impact: The exit rule is the only mechanical refusal in the design. Every other guarantee defers to it. If it can be satisfied by moving work, the round makes axiomatic a guarantee it does not have.
 breaks_how_badly: fatal
 how_likely: plausible
 source_refs:

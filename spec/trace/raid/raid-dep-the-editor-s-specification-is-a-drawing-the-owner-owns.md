@@ -3,11 +3,11 @@ minted_in: i63-work-tokens-become-the-unit-of-work-and-
 id: raid-dep-the-editor-s-specification-is-a-drawing-the-owner-owns
 type: "[[raid]]"
 kind: dependency
-statement: "The token editor is specified by a drawing the owner authors, nobody transcribes it, and design cannot go past what it says."
+statement: The token editor is specified by a drawing the owner authors, nobody transcribes it, and design cannot go past what it says.
 owner: the owner role
-trigger: "any design step that needs an answer the drawing does not give, and any change to the drawing itself"
+trigger: any design step that needs an answer the drawing does not give, and any change to the drawing itself
 status: open
-impact: "Where the drawing is silent, the design has to wait or guess. Guessing produces a second source that ages on its own, which is the divergent-copy failure this system already hunts."
+impact: Where the drawing is silent, the design has to wait or guess. Guessing produces a second source that ages on its own, which is the divergent-copy failure this system already hunts.
 breaks_how_badly: crippling
 how_likely: plausible
 source_refs:

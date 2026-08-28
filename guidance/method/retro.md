@@ -444,6 +444,91 @@ The trigger is a NOTE carrying "needs retro":
    highest-leverage notes. Each one specific and checkable — a concrete
    change, never "improve X".
 
+13. CLEAR THE WORKBENCH #work/clear-the-workbench
+
+   OWNER INSTRUCTION: every retro does this, and the scratchpad is not allowed
+   to grow without bound.
+
+   Walk what is in `scratchpad/` and decide each file's fate. There are only
+   three answers, and "leave it" is not one of them.
+
+   - INCORPORATE IT. The thing has a durable home and belongs there.
+   - PROMOTE IT. See the scripts, below.
+   - DELETE IT. It answered its question and the answer is recorded.
+
+   READ THE FIELD REPORTS FIRST. A field report is the one channel that reaches
+   a person from an unattended run, and nothing else carries what is in it.
+   Anything in one that maps onto the repository moves there NOW — a guidance
+   edit, a register entry, a work token. What cannot be mapped is why the
+   report exists, and the retro is the only reader it will ever get.
+
+   THEN ASK OF EVERY SCRIPT WHETHER IT SHOULD BE A TOOL. A script written
+   once is a program and costs nothing. A script REWRITTEN every session is a
+   missing verb naming itself, and the retro is where it gets named.
+
+   - Group the scripts by what they ANSWER, not by their filenames.
+   - A shape that recurs across sessions is a candidate for a lane verb or a
+     check that runs on its own.
+   - Say which you promoted and which you did not, with the reason.
+
+   THE COUNT GOES IN THE REPORT. How many files stood, how many were
+   incorporated, promoted or deleted. A workbench nobody counts is one nobody
+   clears.
+
+14. REPORT TO THE OWNER, FOR DISCUSSION #work/report-to-the-owner
+
+   OWNER INSTRUCTION. A retro that files its findings and says nothing has
+   done half the job. Two things are owed, at two different moments.
+
+   A SHORT OVERVIEW THE MOMENT THE DRAIN CLOSES. Where the retro stands, what
+   is done, what is left. The owner should never have to ask.
+
+   THEN THE EXTENSIVE REPORT, at the end, AND IT CARRIES THE THEMES RATHER
+   THAN THE LIST. A hundred notes dispositioned one at a time is a list nobody
+   can discuss. The themes running through them are the thing a person can
+   actually rule on.
+
+   WHAT THE REPORT HAS TO CARRY.
+
+   - THE THEMES, named, with how many findings fell under each.
+   - THE NUMBERS. How many were already built, how many were duplicates, how
+     many were adopted, how many were routed.
+   - WHAT WAS ADOPTED IN THE RETRO ITSELF, so the owner sees what changed
+     under them rather than discovering it later.
+   - THE OPEN DECISIONS, separated out. Anything waiting on the owner is
+     listed as a question, not buried in a finding.
+   - WHAT THE RETRO COULD NOT DO, and why. A blocked step named plainly beats
+     a gap the reader has to notice.
+
+   PRESENT IT. Do not merely write it somewhere.
+
+15. DISTRIBUTE THE BACKLOG TO ITS OWNERS #work/distribute-the-backlog
+
+   OWNER INSTRUCTION, and it is the LAST step on purpose.
+
+   Everything is in the backlog by now. Walk it and ask of each item whether
+   an owner can take it.
+
+   - AN ITERATION owns it. Move it to that record's opening step.
+   - THE OVERHAUL owns it — anything about catching the system up to a standard
+     that has already moved.
+   - A STATE owns it, and redistributes it when the walk arrives.
+   - NOTHING owns it yet. It stays, and that is now the exception.
+
+   THE ORDER IS THE POINT, and the owner settled it: dump everything into the
+   backlog FIRST, discuss it, and distribute AFTERWARDS. Routing before the
+   discussion routes on the retro's own guess. Routing after it routes on a
+   decision.
+
+   THAT IS WHY THIS SITS BELOW THE REPORT rather than beside the drain.
+
+   AND IT IS BLOCKED TODAY, said plainly rather than left to be discovered.
+   `deliverable/engine/pool.ts` exports a mint and a read and nothing else. No
+   verb moves an item out of the backlog, and the write guard refuses every
+   other write into it. The editing surface can move one; the lane cannot. So
+   this step can decide every owner and apply none of them, and it says so in
+   its report until the verb exists.
+
 ## The standing questions
 
 Two questions run EVERY retro, whatever the period held.

@@ -5,7 +5,7 @@ type: "[[option]]"
 statement: treat each piece of work as the permission to act rather than as a record of something to do, so no hand may work on anything it does not hold
 cluster: the-work
 found_by: analogy
-source: "manufacturing kanban, where the card is an authorisation to produce and no card means no work, rather than a description of the job"
+source: manufacturing kanban, where the card is an authorisation to produce and no card means no work, rather than a description of the job
 ---
 
 ## Mechanism

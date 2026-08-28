@@ -7,10 +7,10 @@ breaks_how_badly: corrosive
 how_likely: plausible
 statement: The work offer and the work store exchange in both directions, and that cycle is contained in the tightest pair rather than removed.
 source_refs:
-  - "decompose-structure, the two-way pairs metric"
+  - decompose-structure, the two-way pairs metric
   - if-work-store-to-work-offer
   - if-work-offer-to-work-store
-  - "gate-architecture cold review, 2026-08-26"
+  - gate-architecture cold review, 2026-08-26
 ---
 
 ## What was decided

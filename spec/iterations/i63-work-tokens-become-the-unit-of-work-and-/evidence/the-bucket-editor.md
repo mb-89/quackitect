@@ -3,7 +3,7 @@ form: the-bucket-editor
 by: agent
 signed_off: 2026-08-26T15:59:12.543Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / the-bucket-editor

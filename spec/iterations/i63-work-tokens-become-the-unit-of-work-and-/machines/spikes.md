@@ -1,31 +1,31 @@
 ---
 steps:
   - id: cross-panel-drag
-    statement: "settle raid-risk-a-drag-that-crosses-two-panels-may-not-be-buildable-here - timebox one day, because a negative answer reopens a signed comparison"
+    statement: settle raid-risk-a-drag-that-crosses-two-panels-may-not-be-buildable-here - timebox one day, because a negative answer reopens a signed comparison
     depends_on: []
     realization: document
   - id: read-evidence-scope
-    statement: "settle raid-asm-read-evidence-outlives-the-session-that-produced-it - timebox one day, because the incoming slot is noise if the answer is no"
+    statement: settle raid-asm-read-evidence-outlives-the-session-that-produced-it - timebox one day, because the incoming slot is noise if the answer is no
     depends_on: []
     realization: document
   - id: mint-cost-per-entry
-    statement: "settle raid-asm-minting-on-every-entry-stays-inside-the-per-hop-budget - timebox half a day, measured against the published per-hop bound"
+    statement: settle raid-asm-minting-on-every-entry-stays-inside-the-per-hop-budget - timebox half a day, measured against the published per-hop bound
     depends_on: []
     realization: document
   - id: heading-per-token
-    statement: "settle raid-asm-a-heading-per-token-survives-the-retro-card - timebox half a day, against the card the register named as deciding it"
+    statement: settle raid-asm-a-heading-per-token-survives-the-retro-card - timebox half a day, against the card the register named as deciding it
     depends_on: []
     realization: document
   - id: one-file-per-token-volume
-    statement: "settle raid-asm-one-file-per-work-token-stays-workable-in-the-vault-and-the-repository - timebox half a day, both neighbours"
+    statement: settle raid-asm-one-file-per-work-token-stays-workable-in-the-vault-and-the-repository - timebox half a day, both neighbours
     depends_on: []
     realization: document
   - id: token-path-length
-    statement: "settle raid-asm-a-work-token-s-file-path-fits-every-platform - timebox one hour, because it fails silently"
+    statement: settle raid-asm-a-work-token-s-file-path-fits-every-platform - timebox one hour, because it fails silently
     depends_on: []
     realization: document
   - id: position-token-count
-    statement: "settle raid-asm-a-record-s-token-count-stays-legible-on-a-surface - timebox half a day, counted over the real cards"
+    statement: settle raid-asm-a-record-s-token-count-stays-legible-on-a-surface - timebox half a day, counted over the real cards
     depends_on: []
     realization: document
 ---

@@ -3,11 +3,11 @@ minted_in: i63-work-tokens-become-the-unit-of-work-and-
 id: raid-debt-the-per-hop-second-is-measured-and-unattributed
 type: "[[raid]]"
 kind: debt
-statement: "A hop inside a large record costs about a second more than a hop outside one, the size of the gap is measured, and nothing has been shown to cause it."
+statement: A hop inside a large record costs about a second more than a hop outside one, the size of the gap is measured, and nothing has been shown to cause it.
 owner: the adjudicator
-trigger: "the next complaint that the walk is slow, and any change to the pull path"
+trigger: the next complaint that the walk is slow, and any change to the pull path
 status: open
-impact: "Every hop of every record pays it, so it is the single most-felt cost in the system. Leaving it unattributed means the next attempt starts from the same three disproved hypotheses."
+impact: Every hop of every record pays it, so it is the single most-felt cost in the system. Leaving it unattributed means the next attempt starts from the same three disproved hypotheses.
 breaks_how_badly: annoying
 how_likely: certain
 source_refs:
@@ -61,3 +61,20 @@ the state count, and a five-state fixture cannot answer it.
 
 THEN THE COUNTER IS POINTED AT A REAL HOP inside a sixty-four-state record, and
 whatever it names is the cause.
+
+SWEPT 2026-08-28, at i63's closing retro: TRIGGER FIRED, AND THE MEASUREMENT IS
+NOW ON THE RECORD.
+
+This entry had never been looked at since it was minted. Its trigger names two
+moments: a complaint that the walk is slow, and any change to the pull path.
+
+THE RETRO'S OWN MINING IS THE COMPLAINT. Over 14,882 records from
+2026-08-25T16:59:33.814Z, se_pull ran 918 times for 3,947 seconds. That is 66
+minutes of pulling, at a median of 2.06 seconds and a mean of 4.30.
+
+THE ATTRIBUTION IS STILL MISSING, which is exactly what this entry says. The
+figure is a whole-call total. Nothing says which part of the hop spent it.
+
+RESCHEDULED, with the trigger re-affirmed and the number attached. The next
+hand to open the pull path inherits a measured baseline rather than an
+impression.

@@ -3,14 +3,14 @@ minted_in: i63-work-tokens-become-the-unit-of-work-and-
 id: raid-asm-one-complexity-axis-carries-what-two-ladders-carried
 type: "[[raid]]"
 kind: assumption
-statement: "Four difficulty ladders collapse to two, and the design assumes one complexity axis carries everything the reading ladder and the five-name rung controlled between them."
+statement: Four difficulty ladders collapse to two, and the design assumes one complexity axis carries everything the reading ladder and the five-name rung controlled between them.
 owner: the owner role
-trigger: "the first step whose old reading rung and new complexity mark disagree, and any routing decision nobody can express once the two ladders are gone"
+trigger: the first step whose old reading rung and new complexity mark disagree, and any routing decision nobody can express once the two ladders are gone
 status: closed
 probe: "RUN 2026-08-26, and it was cheap. Search every matrix row for a `<column>_complexity` rating and count them. The earlier note here said the probe would be authoring rather than checking, which was true of the mapping and false of the question: nothing had to be authored to find out how many ratings exist."
 probed: 2026-08-26
 probe_result: "ZERO rows of 63 carry a complexity rating. The two ladders are a schema nobody populated, so collapsing them destroys no information that exists. The record's own file says the same: NOT ONE MATRIX CELL IS RATED."
-impact: "The removal is not reversible in practice. The old values are deleted from the matrix, so a case the single axis cannot express has nowhere to be recorded and the routing quietly loses a distinction nobody wrote down."
+impact: The removal is not reversible in practice. The old values are deleted from the matrix, so a case the single axis cannot express has nowhere to be recorded and the routing quietly loses a distinction nobody wrote down.
 breaks_how_badly: crippling
 how_likely: plausible
 source_refs:

@@ -2,10 +2,10 @@
 form: onboard-retro
 by: agent
 signed_off: 2026-08-25T16:59:31.342Z
-reopened: "2026-08-25T16:58:35.633Z — two owner rulings were captured after this retro signed, and the drain is the only place they can be judged — the gate below refuses while they pend"
+reopened: 2026-08-25T16:58:35.633Z — two owner rulings were captured after this retro signed, and the drain is the only place they can be judged — the gate below refuses while they pend
 checked: Read refusals, Read retro, Read template-free-form, Read template-per-item, Read template-list, Do the survey, Establish the interval
 authors: agent, human
-files:
+files: null
 ---
 
 # Evidence form / onboard-retro

@@ -1,6 +1,6 @@
 ---
 kind: report
-statement: "Demonstration of sty-a-smaller-model-walks-a-record. The routing half was observed; the cloud half was not, and this report says which is which."
+statement: Demonstration of sty-a-smaller-model-walks-a-record. The routing half was observed; the cloud half was not, and this report says which is which.
 demonstrates: sty-a-smaller-model-walks-a-record
 performed: 2026-08-27
 performed_by: walker

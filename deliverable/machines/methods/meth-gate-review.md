@@ -319,3 +319,48 @@ NOT BUILT YET. Nothing serves these entries automatically, so the search is by
 hand: `se_file_search` over `spec/trace/raid` for the state's name and for the
 act it performs. When it is built, the pull will carry them and this paragraph
 becomes a description of what already happens.
+
+## A reviewer is told what THIS checkpoint decides
+
+WITHOUT IT THE REVIEWER AIMS AT THE WRONG THING. Told only to read cold and
+pick its own targets, it reads the whole record and reports whatever it finds.
+Some of that belongs to a checkpoint that has not run yet.
+
+MEASURED: three of five objections raised at one motivation checkpoint were
+aimed at questions later checkpoints own. They were not wrong. They were
+unanswerable there.
+
+SO THE BRIEF NAMES THE QUESTION THIS CHECKPOINT ANSWERS, and says that
+anything outside it is a finding for later rather than a reason to fail now.
+
+AN OBJECTION IS ONLY BLOCKING IF THIS CHECKPOINT COULD HAVE RESOLVED IT.
+Everything else is recorded and carried.
+
+## A withdrawn phrase is wrapped in backticks
+
+THE SWEEP ALREADY EXISTS and this is the cheap half that stops it crying wolf.
+
+When a ruling withdraws a claim, the correction quotes the withdrawn wording
+inside backticks. A search for that wording then tells an ASSERTION apart from
+a QUOTATION of an assertion.
+
+WITHOUT THE CONVENTION the sweep finds its own corrections and reports them as
+survivals of the thing they corrected. The author then re-reads text that is
+already right, every time.
+
+## A COMPLETE CHECK OVER ITS OWN SCOPE SAYS NOTHING ABOUT WHAT IS OUTSIDE IT
+
+This is the sixth shape, and it is the hardest to see because the check passes
+honestly.
+
+A deck that filters by kind and then rules every row it holds reports total
+coverage of ITSELF. It says nothing at all about the rows it filtered out, and
+every signal it gives reads like completeness.
+
+MEASURED: one quality deck dealt 57 of 57 and refused to let the position
+leave until it had. A demand graded fatal, of a different kind, was dealt
+nowhere. Completeness of the deck stood in for coverage of the corpus.
+
+SO FOR EVERY MECHANICAL CHECK A POSITION RAN, ASK WHAT IT DOES NOT LOOK AT,
+and name that scope in the checkpoint's own form. A check that cannot state its
+own denominator has not been read.

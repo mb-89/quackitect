@@ -3,7 +3,7 @@ form: heading-per-token
 by: agent
 signed_off: 2026-08-26T14:20:54.557Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / heading-per-token

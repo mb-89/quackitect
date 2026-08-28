@@ -2,15 +2,15 @@
 minted_in: i63-work-tokens-become-the-unit-of-work-and-
 id: req-a-work-token-survives-its-methods-rewording
 type: "[[requirement]]"
-statement: "When a state is entered again after its method card was edited, the system shall match each standing piece of work to its step by that step's own identity, creating no duplicate and orphaning none."
+statement: When a state is entered again after its method card was edited, the system shall match each standing piece of work to its step by that step's own identity, creating no duplicate and orphaning none.
 kind: functional
 verify_method: test
-breaks_if_removed: "Rewording a heading orphans the work already done under it and mints a fresh copy, so editing a method card silently reopens finished work."
+breaks_if_removed: Rewording a heading orphans the work already done under it and mints a fresh copy, so editing a method card silently reopens finished work.
 breaks_how_badly: corrosive
 refines:
   - uc-work-a-states-work-tokens-to-completion
 source_refs:
-  - "uc-work-a-states-work-tokens-to-completion extension 3a"
+  - uc-work-a-states-work-tokens-to-completion extension 3a
   - raid-risk-a-state-must-mint-its-own-tokens-and-that-machinery-is-undesigned
 priority: must
 weighs_with:

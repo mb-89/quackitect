@@ -9,7 +9,7 @@ grade: crippling
 against:
   - req-a-resolution-is-proven-by-read-back
 source_refs:
-  - "gate-architecture cold review, 2026-08-26"
+  - gate-architecture cold review, 2026-08-26
   - raid-dec-work-is-a-file-while-open-and-one-folded-file-once-closed
 ---
 

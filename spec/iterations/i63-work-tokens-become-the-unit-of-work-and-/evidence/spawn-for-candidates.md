@@ -2,11 +2,11 @@
 form: spawn-for-candidates
 by: agent
 signed_off: 2026-08-26T12:25:19.030Z
-reopened: "2026-08-26T12:25:14.635Z — gate-requirements was re-blessed after it with three more rows, and the roster is unchanged by them"
-amended: "2026-08-26T10:17:49.142Z by agent — The kickoff agreed to zero walkers for this record, so no hand is started here and the guide walks the phase."
+reopened: 2026-08-26T12:25:14.635Z — gate-requirements was re-blessed after it with three more rows, and the roster is unchanged by them
+amended: 2026-08-26T10:17:49.142Z by agent — The kickoff agreed to zero walkers for this record, so no hand is started here and the guide walks the phase.
 judgment: passed at 2026-08-26T10:17:54.643Z with deliverable/engine/bin/hands-spawned.ts@8be27987d4e0
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / spawn-for-candidates

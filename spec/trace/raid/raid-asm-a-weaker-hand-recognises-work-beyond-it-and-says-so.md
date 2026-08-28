@@ -3,13 +3,13 @@ minted_in: i63-work-tokens-become-the-unit-of-work-and-
 id: raid-asm-a-weaker-hand-recognises-work-beyond-it-and-says-so
 type: "[[raid]]"
 kind: assumption
-statement: "Routing work by difficulty leans on a weaker hand noticing that an work token is beyond it and raising the mark, and the hand least able to notice is the one being asked."
+statement: Routing work by difficulty leans on a weaker hand noticing that an work token is beyond it and raising the mark, and the hand least able to notice is the one being asked.
 owner: the driving agent
-trigger: "the first walk on a cheaper hand under work tokens, and any work token closed as done whose evidence a stronger hand then rejects"
+trigger: the first walk on a cheaper hand under work tokens, and any work token closed as done whose evidence a stronger hand then rejects
 status: open
-probe: "scheduled. The probe hands a cheaper hand two deliberately under-marked work tokens and counts what it does with them, and neither the work tokens nor the routing exists yet. It needs a real run on a real weaker model, which is a spike rather than a check."
+probe: scheduled. The probe hands a cheaper hand two deliberately under-marked work tokens and counts what it does with them, and neither the work tokens nor the routing exists yet. It needs a real run on a real weaker model, which is a spike rather than a check.
 probed: 2026-08-26
-impact: "The routing sells adherence from weaker hands. If the hand answers instead of raising, the system has handed judgment to something that cannot supply it and recorded the result as done, which is worse than not routing at all."
+impact: The routing sells adherence from weaker hands. If the hand answers instead of raising, the system has handed judgment to something that cannot supply it and recorded the result as done, which is worse than not routing at all.
 breaks_how_badly: crippling
 how_likely: plausible
 source_refs:

@@ -4,12 +4,12 @@ id: dsp-the-bucket-editor
 type: "[[design-spec]]"
 statement: the machine and the work editor render in one webview and behave as two — independent viewports, with a row dragged from one onto the other
 realizes:
-  - "el-mirror"
-  - "if-mirror-to-work-store"
+  - el-mirror
+  - if-mirror-to-work-store
 files:
-  - "deliverable/engine/work-card.ts"
-  - "deliverable/engine/workclient.ts"
-  - "deliverable/views/cards.md"
+  - deliverable/engine/work-card.ts
+  - deliverable/engine/workclient.ts
+  - deliverable/views/cards.md
 ---
 
 ## The file list changed at the build, and the reason is worth keeping

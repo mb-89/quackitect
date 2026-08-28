@@ -1,10 +1,10 @@
 ---
 form: probe-assumptions
-reopened: "2026-08-26T12:24:13.916Z — the volume assumption's version-control half was probed on 2026-08-26 and its outcome has to be written back here"
+reopened: 2026-08-26T12:24:13.916Z — the volume assumption's version-control half was probed on 2026-08-26 and its outcome has to be written back here
 by: agent
 signed_off: 2026-08-26T12:24:48.841Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / probe-assumptions

@@ -2,15 +2,15 @@
 minted_in: i63-work-tokens-become-the-unit-of-work-and-
 id: req-a-carrier-grouping-ends-when-it-empties
 type: "[[requirement]]"
-statement: "When a grouping that exists only to carry work becomes empty, the system shall remove it."
+statement: When a grouping that exists only to carry work becomes empty, the system shall remove it.
 kind: functional
 verify_method: test
-breaks_if_removed: "Empty groupings accumulate on the surface and a person has to tidy up after every routing decision."
+breaks_if_removed: Empty groupings accumulate on the surface and a person has to tidy up after every routing decision.
 breaks_how_badly: abrasive
 refines:
   - uc-route-outstanding-work-to-where-it-is-done
 source_refs:
-  - "uc-route-outstanding-work-to-where-it-is-done step 8"
+  - uc-route-outstanding-work-to-where-it-is-done step 8
   - raid-dep-the-editor-s-specification-is-a-drawing-the-owner-owns
 priority: should
 weighs_with:

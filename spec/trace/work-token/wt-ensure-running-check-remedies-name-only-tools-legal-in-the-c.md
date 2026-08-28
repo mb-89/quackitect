@@ -1,9 +1,9 @@
 ---
 id: wt-ensure-running-check-remedies-name-only-tools-legal-in-the-c
 type: "[[work]]"
-statement: "Ensure running-check remedies name only tools legal in the current state."
-ready_when: "ready when verification-state tool permissions are revised"
-source: "note-e86fb3c659c1"
+statement: Ensure running-check remedies name only tools legal in the current state.
+ready_when: ready when verification-state tool permissions are revised
+source: note-e86fb3c659c1
 ---
 
 ## Why it stands

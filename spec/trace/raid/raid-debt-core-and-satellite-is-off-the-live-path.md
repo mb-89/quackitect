@@ -160,3 +160,8 @@ NEITHER TRIGGER FIRED. The run mode is unchanged and no code-review round opened
 
 RE-ACCEPTED consciously, trigger unchanged.
 
+
+SWEPT 2026-08-28, at i63's closing retro: RE-ACCEPTED, and the trigger holds.
+
+It fires when the run mode is first flipped away from inline, or at the
+code-review iteration. Neither happened in this window.

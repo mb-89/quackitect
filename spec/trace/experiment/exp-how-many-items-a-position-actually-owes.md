@@ -10,9 +10,9 @@ form: calculation
 faked: THE FIRST PASS CALLED 137 FILES "method cards". 63 of them are rigor-matrix rows, and most carry one heading that is not a step, so the median it reported was an artifact of mixing two populations
 fallback: none needed — the count is arithmetic over files that exist
 verdict: holds
-measured: "2026-08-26, RE-TAKEN AT HEAD after a cold review — 74 method cards carry 338 headings at a median of 4, largest 23; 63 rigor rows carry 78, and 52 of those 63 have exactly one heading called Guidance, which is not a step. The first pass folded the two sets together and reported a median of 2"
+measured: 2026-08-26, RE-TAKEN AT HEAD after a cold review — 74 method cards carry 338 headings at a median of 4, largest 23; 63 rigor rows carry 78, and 52 of those 63 have exactly one heading called Guidance, which is not a step. The first pass folded the two sets together and reported a median of 2
 folds_to: if-work-offer-to-mirror — the surface consumes a figure rather than deriving one
-promote: "the design question changes shape. Not whether the number is small, but whether the rare large one degrades gracefully"
+promote: the design question changes shape. Not whether the number is small, but whether the rare large one degrades gracefully
 chunk: none — the surface work is the mirror's and this only tells it what to expect
 source_refs:
   - rank-unknowns, the seeded pick

@@ -2,10 +2,10 @@
 minted_in: i63-work-tokens-become-the-unit-of-work-and-
 id: req-every-piece-of-work-is-one-addressable-item
 type: "[[requirement]]"
-statement: "The system shall carry every piece of work as an item with its own identity, its own place, its own status and its own evidence."
+statement: The system shall carry every piece of work as an item with its own identity, its own place, its own status and its own evidence.
 kind: functional
 verify_method: inspection
-breaks_if_removed: "Work stays a field inside a form, so nothing can point at it, move it or count it, and no surface can say which piece is open and which was skipped."
+breaks_if_removed: Work stays a field inside a form, so nothing can point at it, move it or count it, and no surface can say which piece is open and which was skipped.
 breaks_how_badly: crippling
 refines:
   - uc-work-a-states-work-tokens-to-completion

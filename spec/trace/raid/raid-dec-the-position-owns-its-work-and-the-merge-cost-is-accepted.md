@@ -3,11 +3,11 @@ minted_in: i63-work-tokens-become-the-unit-of-work-and-
 id: raid-dec-the-position-owns-its-work-and-the-merge-cost-is-accepted
 type: "[[raid]]"
 kind: decision
-statement: "A position holds the work it owes, rather than a piece of work naming the positions it serves. The merge cost that direction carries is accepted rather than designed away."
+statement: A position holds the work it owes, rather than a piece of work naming the positions it serves. The merge cost that direction carries is accepted rather than designed away.
 owner: the owner
-trigger: "the first time two hands work one record from separate clones, and any report that a merge needed a person to resolve work content"
+trigger: the first time two hands work one record from separate clones, and any report that a merge needed a person to resolve work content
 status: decided
-impact: "It settles which end of the relation is authoritative, so every reader of what a position owes is written once. It also accepts a cost nothing has measured, on the only axis where a rejected candidate reached prior-art par."
+impact: It settles which end of the relation is authoritative, so every reader of what a position owes is written once. It also accepts a cost nothing has measured, on the only axis where a rejected candidate reached prior-art par.
 breaks_how_badly: corrosive
 how_likely: plausible
 weighs_with: none

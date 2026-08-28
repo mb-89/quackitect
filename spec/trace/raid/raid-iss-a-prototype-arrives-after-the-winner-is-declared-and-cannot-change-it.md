@@ -10,7 +10,7 @@ against:
   - req-structure-verdicts-are-mechanical
 source_refs:
   - "owner, 2026-08-26: the prototypes come too late, we need them before we declare a winner"
-  - "gate-candidates, the cross-panel drag spike"
+  - gate-candidates, the cross-panel drag spike
 ---
 
 ## CLOSED — IT WAS NEVER A REGISTER ENTRY, 2026-08-26

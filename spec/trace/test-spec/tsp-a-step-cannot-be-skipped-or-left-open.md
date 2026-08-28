@@ -5,8 +5,8 @@ type: "[[test-spec]]"
 statement: A state whose method has many steps hands each one over as work that refuses to be skipped, and the state cannot be left while any of them stands open.
 method: demonstration
 demonstrates:
-  - "sty-walk-a-state-that-will-not-let-me-skip-a-step"
-verifies: "none — demonstrates carries the edge; the holding mechanism itself is verified by test and is carried by deliverable/tests/gate-holds-over-record.test.ts"
+  - sty-walk-a-state-that-will-not-let-me-skip-a-step
+verifies: none — demonstrates carries the edge; the holding mechanism itself is verified by test and is carried by deliverable/tests/gate-holds-over-record.test.ts
 files:
   - none — a demonstration is observed rather than instrumented, and the Procedure below is the whole definition
 ---

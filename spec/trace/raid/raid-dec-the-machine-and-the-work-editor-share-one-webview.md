@@ -10,8 +10,8 @@ source_refs:
   - exp-can-a-drag-cross-two-panels
   - sty-steer-a-running-iteration-by-moving-work
   - raid-dec-one-editor-is-widened-rather-than-a-second-written
-  - "microsoft/vscode issue 111092 — drag events on WebviewViewProvider and Webview, requested and not built"
-  - "owner, 2026-08-26"
+  - microsoft/vscode issue 111092 — drag events on WebviewViewProvider and Webview, requested and not built
+  - owner, 2026-08-26
 ---
 
 ## What forces it

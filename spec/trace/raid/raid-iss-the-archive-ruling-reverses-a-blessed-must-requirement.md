@@ -3,11 +3,11 @@ minted_in: i63-work-tokens-become-the-unit-of-work-and-
 id: raid-iss-the-archive-ruling-reverses-a-blessed-must-requirement
 type: "[[raid]]"
 kind: issue
-statement: "A standing must requirement says a closed record's folder stays on trunk. The owner's archive ruling says the opposite. One of the two has to be withdrawn, and only the owner can withdraw the requirement."
+statement: A standing must requirement says a closed record's folder stays on trunk. The owner's archive ruling says the opposite. One of the two has to be withdrawn, and only the owner can withdraw the requirement.
 owner: the owner
-trigger: "the design milestone reaching the storage choice, or any attempt to build the fold"
+trigger: the design milestone reaching the storage choice, or any attempt to build the fold
 status: open
-impact: "The volume ceiling this iteration now rests on cannot be built while the requirement stands. Building it anyway would break a blessed must, which purges the iteration that broke it."
+impact: The volume ceiling this iteration now rests on cannot be built while the requirement stands. Building it anyway would break a blessed must, which purges the iteration that broke it.
 breaks_how_badly: crippling
 how_likely: expected
 weighs_with: none

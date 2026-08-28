@@ -2,10 +2,10 @@
 minted_in: i63-work-tokens-become-the-unit-of-work-and-
 id: req-a-gate-judges-on-the-work-minted-and-finished-before-it
 type: "[[requirement]]"
-statement: "When a gate is reached, the system shall put in front of it the pieces of work minted and finished before it, as the basis it judges on."
+statement: When a gate is reached, the system shall put in front of it the pieces of work minted and finished before it, as the basis it judges on.
 kind: functional
 verify_method: test
-breaks_if_removed: "A gate goes on reading forms while the work itself carries the evidence, so the two describe the same phase and only their disagreement is visible."
+breaks_if_removed: A gate goes on reading forms while the work itself carries the evidence, so the two describe the same phase and only their disagreement is visible.
 breaks_how_badly: crippling
 refines:
   - uc-work-a-states-work-tokens-to-completion

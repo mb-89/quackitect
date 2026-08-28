@@ -5,8 +5,8 @@ type: "[[test-spec]]"
 statement: A person watching an agent work learns which piece it holds and how it broke the job down, from the work and its log rather than from a transcript or a question.
 method: demonstration
 demonstrates:
-  - "sty-watch-the-machine-think"
-verifies: "none — demonstrates carries the edge; that a token act writes its own feed line carrying the statement and the comment is verified by test in deliverable/tests/tokens-speak.test.ts"
+  - sty-watch-the-machine-think
+verifies: none — demonstrates carries the edge; that a token act writes its own feed line carrying the statement and the comment is verified by test in deliverable/tests/tokens-speak.test.ts
 files:
   - none — a demonstration is observed rather than instrumented, and the Procedure below is the whole definition
 ---

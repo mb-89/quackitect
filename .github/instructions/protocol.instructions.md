@@ -5,10 +5,10 @@ applyTo: "**"
 ---
 
 <!-- GENERATED at agent start. Do not edit — the next start overwrites it.
-     from guidance/contract.md f70cc92101a6
-     from guidance/walking.md 68d864981386
+     from guidance/contract.md 94fc93260d94
+     from guidance/walking.md bf30b933fe16
      from guidance/method/lane.md 0f7559c796b0
-     from guidance/voice.md 2bbb7751a28c
+     from guidance/voice.md a85b1d5c8486
 -->
 
 # contract — the binding rules of the session
@@ -67,6 +67,9 @@ your head, and not a note.
 
 A NOTE IS FOR ONE THING ONLY: what belongs in the next RETRO. Something to
 discuss, a doubt about the process, a lead nobody can act on yet.
+
+WRITING ONE IS NOT WORK AND NEVER GETS A TOKEN OF ITS OWN. A note is cheap on
+purpose, and a token to carry one costs four calls to capture a thought.
 
 THE TEST IS ONE QUESTION. Can you name the state where this gets done?
 
@@ -257,13 +260,10 @@ NOTHING IS WRITTEN FOR THE NEXT AGENT TO READ. The old handover file was read
 by the session that followed, it only ever got written on a tidy exit, and
 sessions get killed instead.
 
-AND NOTHING REPLACED IT ON THE BANNER EITHER (owner ruling 2026-08-28). Boot
-used to derive four figures from the call log and print them under the
-greeting. The owner cut them: nobody read them, and four numbers about the
-previous session are not a handover.
+AND NOTHING REPLACED IT ON THE BANNER EITHER. Boot printed four figures from
+the call log under the greeting, and the owner cut them: nobody read them.
 
-THE CALL LOG IS STILL THERE, and `se_log_query` is how a session's own account
-is read. What went is the printing, not the record.
+THE LOG STILL HOLDS IT ALL, and `se_log_query` reads it back.
 
 SO WHAT THE NEXT SESSION MUST KNOW GOES IN THE FOUR HOMES ABOVE, written when
 the thought occurs. A note, a parked to-do, or guidance — never saved for an
@@ -490,12 +490,26 @@ The happy path was walked for you, every hop to the next branching point.
 ENTERING A STATE, DO FOUR THINGS IN ORDER.
 
 1. Do the input work the state's guidance asks for.
-2. CHECK ALL THE WORK STANDING AT THAT STATE. Read every token there.
+2. READ EVERY WORK TOKEN STANDING AT THAT STATE, ALL OF THEM, BEFORE STARTING
+   ANY OF THEM.
 3. Seed your own tokens for whatever else you mean to do here.
 4. Start work.
 
-THE CHECK COMES BEFORE THE SEEDING. A state can arrive with work already on it,
-and a token opened for something already standing counts one thing twice.
+STEP 2 IS ONE PASS OVER THE WHOLE SET, and it is not a glance at the list. Open
+each token and understand what it asks for. Only then pick one up.
+
+WHY IT IS THE WHOLE SET AND NOT THE FIRST ONE. THE TOKENS AT A STATE OFTEN
+DEPEND ON EACH OTHER. One names a decision another rests on; one is the reason
+a third exists; two are the same work seen twice. Starting the first before
+reading the rest works it against a picture with pieces missing, and the pieces
+were all lying there.
+
+IT IS CHEAPER THAN IT SOUNDS AND IT IS PAID ONCE. Reading five tokens costs one
+pass. Discovering at the fifth that the first was done wrong costs the first
+again.
+
+THE READ COMES BEFORE THE SEEDING TOO. A state can arrive with work already on
+it, and a token opened for something already standing counts one thing twice.
 
 OPTIONS RIDE A `do`. There is no separate `choose` instruction. Where the road
 splits, the options ride along with weight and openness. Answer
@@ -713,6 +727,12 @@ THREE VERBS ARE LEGAL WHEREVER THE WALK STANDS, because none of them is a move.
 A WORK TOKEN IS THE DEFAULT AND A NOTE IS THE EXCEPTION (contract rule 4). A
 note is for the next RETRO — a doubt about the process, a lead nobody can act
 on yet, something to discuss.
+
+CAPTURING ONE IS NOT A PIECE OF WORK. Never open a token to write a note. The
+whole point of a note is that it costs nothing and interrupts nothing.
+
+THE OTHER HALF STILL STANDS, and the two are opposite mistakes. A token whose
+statement asks for a thing DONE cannot be settled by recording it somewhere.
 
 THE TEST IS ONE QUESTION. Can you name the state where the thing gets done?
 Then it is `se_work {act: "open"}`, and `at` names that state.
@@ -1098,6 +1118,14 @@ comments alike.
 - A result carrying a `banner` is shown VERBATIM, before anything else.
 - DELETE YOUR FIRST SENTENCE. If nothing is lost, it was a teaser.
   - Apply this to every message, every time.
+- THE SHAPES THAT KEEP GETTING CAUGHT, kept as the rule's memory the way the
+  forbidden-words list is. Each one was written before the thing it announced.
+  - "The log gives an answer"
+  - "This is worse than it looks"
+  - "I found the cause"
+- A TEASER COSTS TIME, NOT ONLY A LINE. One followed by a minute of tool calls
+  leaves the reader watching a promise. Say the thing, then go and do the next
+  thing.
 - Never open with commentary ABOUT the message, with a rating of your own
   finding, or with an agreement preamble. Agree by acting, not by announcing.
 - A correction opens with WHAT IS NOW TRUE, never with the news that a

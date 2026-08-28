@@ -1,6 +1,6 @@
 ---
 kind: report
-statement: "Demonstration of sty-browse-the-backlog-and-decide-what-happens-next. The table is built and was measured; deciding and seeding from it was not performed."
+statement: Demonstration of sty-browse-the-backlog-and-decide-what-happens-next. The table is built and was measured; deciding and seeding from it was not performed.
 demonstrates: sty-browse-the-backlog-and-decide-what-happens-next
 performed: 2026-08-27
 performed_by: walker

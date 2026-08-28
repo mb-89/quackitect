@@ -3,11 +3,11 @@ minted_in: i63-work-tokens-become-the-unit-of-work-and-
 id: raid-iss-the-offer-withholds-every-piece-of-work-because-nothing-rates-it
 type: "[[raid]]"
 kind: issue
-statement: "The offer withholds work whose difficulty is unpublished, no state publishes one, and so every token measured is withheld and the offer hands nothing to anybody."
+statement: The offer withholds work whose difficulty is unpublished, no state publishes one, and so every token measured is withheld and the offer hands nothing to anybody.
 owner: the adjudicator
-trigger: "any state that asks the offer for work, and the rigor matrix's next review"
+trigger: any state that asks the offer for work, and the rigor matrix's next review
 status: open
-impact: "Routing work to a hand strong enough for it is the design's most novel claim. With nothing rated, the mechanism runs and offers nothing, so the claim is untested rather than false — and a reader watching an empty offer cannot tell which."
+impact: Routing work to a hand strong enough for it is the design's most novel claim. With nothing rated, the mechanism runs and offers nothing, so the claim is untested rather than false — and a reader watching an empty offer cannot tell which.
 breaks_how_badly: crippling
 how_likely: certain
 source_refs:

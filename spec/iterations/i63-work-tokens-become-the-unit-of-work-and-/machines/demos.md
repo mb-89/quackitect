@@ -1,11 +1,11 @@
 ---
 steps:
   - id: carry-a-finding-without-stopping
-    statement: "demonstrate sty-carry-a-finding-without-stopping against the shipped system - a real defect that breaks nothing is recorded and the walk carries on"
+    statement: demonstrate sty-carry-a-finding-without-stopping against the shipped system - a real defect that breaks nothing is recorded and the walk carries on
     depends_on: []
     realization: document
   - id: a-smaller-model-walks-a-record
-    statement: "demonstrate sty-a-smaller-model-walks-a-record against the shipped system - a night's work on a cheap hand comes back as signed states"
+    statement: demonstrate sty-a-smaller-model-walks-a-record against the shipped system - a night's work on a cheap hand comes back as signed states
     depends_on: []
     realization: document
 ---

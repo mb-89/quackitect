@@ -1,6 +1,6 @@
 ---
 kind: report
-statement: "Demonstration of sty-watch-the-machine-think. The trail the watcher reads was built and exercised tonight; the watching was done by the owner rather than by me."
+statement: Demonstration of sty-watch-the-machine-think. The trail the watcher reads was built and exercised tonight; the watching was done by the owner rather than by me.
 demonstrates: sty-watch-the-machine-think
 performed: 2026-08-27
 performed_by: walker

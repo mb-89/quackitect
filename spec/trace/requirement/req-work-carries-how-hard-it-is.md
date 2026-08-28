@@ -2,17 +2,17 @@
 minted_in: i63-work-tokens-become-the-unit-of-work-and-
 id: req-work-carries-how-hard-it-is
 type: "[[requirement]]"
-statement: "When a hand asks for work, the system shall offer it only the work whose difficulty mark that hand's own strength covers."
+statement: When a hand asks for work, the system shall offer it only the work whose difficulty mark that hand's own strength covers.
 kind: functional
 verify_method: test
-breaks_if_removed: "A cheaper hand is handed judgment it cannot supply, and it answers anyway, which is the failure the smaller-model journey is written against."
+breaks_if_removed: A cheaper hand is handed judgment it cannot supply, and it answers anyway, which is the failure the smaller-model journey is written against.
 breaks_how_badly: corrosive
 refines:
   - uc-walk-a-record-on-a-smaller-model
   - uc-work-a-states-work-tokens-to-completion
 source_refs:
   - "kickoff goal: the four ladders become two, and complexity is a ROUTING key deciding which hand a token is given to"
-  - "uc-walk-a-record-on-a-smaller-model extension 2c"
+  - uc-walk-a-record-on-a-smaller-model extension 2c
 priority: must
 weighs_with:
   - none

@@ -9,8 +9,8 @@ how_likely: conceivable
 source_refs:
   - req-a-card-says-which-of-its-parts-are-work
   - "owner, 2026-08-26: requirements are solution-free, so figure something out"
-  - "Pandoc heading attributes, pandoc.org/demo/example33/8.3-headings.html"
-  - "kramdown header IDs, kramdown.gettalong.org/syntax.html"
+  - Pandoc heading attributes, pandoc.org/demo/example33/8.3-headings.html
+  - kramdown header IDs, kramdown.gettalong.org/syntax.html
 ---
 
 ## What was decided

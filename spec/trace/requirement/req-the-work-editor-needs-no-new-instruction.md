@@ -2,12 +2,12 @@
 minted_in: i63-work-tokens-become-the-unit-of-work-and-
 id: req-the-work-editor-needs-no-new-instruction
 type: "[[requirement]]"
-statement: "The system shall let a person who has operated one of its table editors operate the work editor with no instruction beyond what the first editor taught."
+statement: The system shall let a person who has operated one of its table editors operate the work editor with no instruction beyond what the first editor taught.
 kind: quality
 characteristic: interaction-capability
 verify_method: demonstration
-measure: "One watched attempt. A person who has used one of the system's existing table editors is given the work editor and asked to narrow the list, fold a group and move a row. They complete all three with no instruction, no reference and no prompting, and every place they hesitate is written down."
-breaks_if_removed: "The cell machinery splits in two, and the divergence shows up later as two surfaces that disagree while both keep working."
+measure: One watched attempt. A person who has used one of the system's existing table editors is given the work editor and asked to narrow the list, fold a group and move a row. They complete all three with no instruction, no reference and no prompting, and every place they hesitate is written down.
+breaks_if_removed: The cell machinery splits in two, and the divergence shows up later as two surfaces that disagree while both keep working.
 breaks_how_badly: corrosive
 refines:
   - uc-route-outstanding-work-to-where-it-is-done

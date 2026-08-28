@@ -21,7 +21,7 @@ evidence:
   - name: neighbours
     template: refs
     of: neighbour
-    description: every neighbour that touches the box — one node each, whichever way the arrow points
+    description: what THIS round changes about the neighbour set — added, removed or redrawn, one node each; `none` where the set did not move
   - name: intended_use
     description: one honest paragraph
   - name: excluded_use

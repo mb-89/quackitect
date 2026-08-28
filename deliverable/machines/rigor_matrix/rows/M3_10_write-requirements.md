@@ -50,6 +50,7 @@ legal_tools:
   - se_file_search
   - se_file_glob
   - se_file_list
+  - se_file_delete
   - se_log_query
   - se_answer
 evidence:

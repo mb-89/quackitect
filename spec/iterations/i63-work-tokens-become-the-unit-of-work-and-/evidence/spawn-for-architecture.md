@@ -4,7 +4,7 @@ judgment: passed at 2026-08-26T12:52:18.206Z with deliverable/engine/bin/hands-s
 by: agent
 signed_off: 2026-08-26T12:52:17.369Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / spawn-for-architecture

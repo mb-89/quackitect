@@ -7,9 +7,9 @@ statement: Read credit is global across positions within one hand's session, and
 breaks_how_badly: corrosive
 how_likely: plausible
 source_refs:
-  - "owner ruling, 2026-08-26"
+  - owner ruling, 2026-08-26
   - req-reading-credit-survives-a-reload
-  - "deliverable/engine/sessionreads.ts lines 88 to 100"
+  - deliverable/engine/sessionreads.ts lines 88 to 100
   - raid-asm-read-evidence-outlives-the-session-that-produced-it
 ---
 

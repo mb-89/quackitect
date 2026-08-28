@@ -3,11 +3,11 @@ minted_in: i63-work-tokens-become-the-unit-of-work-and-
 id: raid-risk-a-state-must-mint-its-own-tokens-and-that-machinery-is-undesigned
 type: "[[raid]]"
 kind: risk
-statement: "Every state must now mint the tokens it owes when it is entered, and that machinery is new, barely discussed, and sits on the path of every single walk."
+statement: Every state must now mint the tokens it owes when it is entered, and that machinery is new, barely discussed, and sits on the path of every single walk.
 owner: the driving agent
-trigger: "the design step that specifies what happens on entering a state, and the first state whose minting is written"
+trigger: the design step that specifies what happens on entering a state, and the first state whose minting is written
 status: open
-impact: "Minting is on the hot path of every entry into every state. Getting it wrong does not break one feature; it breaks walking. Getting it slow taxes every hop."
+impact: Minting is on the hot path of every entry into every state. Getting it wrong does not break one feature; it breaks walking. Getting it slow taxes every hop.
 breaks_how_badly: crippling
 how_likely: plausible
 source_refs:

@@ -3,11 +3,11 @@ minted_in: i63-work-tokens-become-the-unit-of-work-and-
 id: raid-risk-a-half-migrated-tree-runs-two-systems-at-once
 type: "[[raid]]"
 kind: risk
-statement: "Every evidence form and every method card has to become tokens, and while only some have, two systems run side by side and a count is no longer a count."
+statement: Every evidence form and every method card has to become tokens, and while only some have, two systems run side by side and a count is no longer a count.
 owner: the maintainer
-trigger: "the first walk where one state hands out tokens and the next hands out a form, and any surface showing a count that does not cover every state"
+trigger: the first walk where one state hands out tokens and the next hands out a form, and any surface showing a count that does not cover every state
 status: open
-impact: "The counted size of a record is the main thing the design buys. A partial migration makes every count a partial count, and a partial count read as a whole one is worse than no count at all."
+impact: The counted size of a record is the main thing the design buys. A partial migration makes every count a partial count, and a partial count read as a whole one is worse than no count at all.
 breaks_how_badly: corrosive
 how_likely: plausible
 source_refs:

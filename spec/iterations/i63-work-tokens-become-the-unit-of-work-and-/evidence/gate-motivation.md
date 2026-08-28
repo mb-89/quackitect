@@ -1,11 +1,11 @@
 ---
 form: gate-motivation
 bless: blessed by human
-amended: "2026-08-26T11:10:40.727Z by agent — the invented word obligation becomes work token, the name the owner uses"
+amended: 2026-08-26T11:10:40.727Z by agent — the invented word obligation becomes work token, the name the owner uses
 by: agent
 signed_off: 2026-08-25T18:12:19.339Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / gate-motivation

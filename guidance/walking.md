@@ -91,12 +91,26 @@ The happy path was walked for you, every hop to the next branching point.
 ENTERING A STATE, DO FOUR THINGS IN ORDER.
 
 1. Do the input work the state's guidance asks for.
-2. CHECK ALL THE WORK STANDING AT THAT STATE. Read every token there.
+2. READ EVERY WORK TOKEN STANDING AT THAT STATE, ALL OF THEM, BEFORE STARTING
+   ANY OF THEM.
 3. Seed your own tokens for whatever else you mean to do here.
 4. Start work.
 
-THE CHECK COMES BEFORE THE SEEDING. A state can arrive with work already on it,
-and a token opened for something already standing counts one thing twice.
+STEP 2 IS ONE PASS OVER THE WHOLE SET, and it is not a glance at the list. Open
+each token and understand what it asks for. Only then pick one up.
+
+WHY IT IS THE WHOLE SET AND NOT THE FIRST ONE. THE TOKENS AT A STATE OFTEN
+DEPEND ON EACH OTHER. One names a decision another rests on; one is the reason
+a third exists; two are the same work seen twice. Starting the first before
+reading the rest works it against a picture with pieces missing, and the pieces
+were all lying there.
+
+IT IS CHEAPER THAN IT SOUNDS AND IT IS PAID ONCE. Reading five tokens costs one
+pass. Discovering at the fifth that the first was done wrong costs the first
+again.
+
+THE READ COMES BEFORE THE SEEDING TOO. A state can arrive with work already on
+it, and a token opened for something already standing counts one thing twice.
 
 OPTIONS RIDE A `do`. There is no separate `choose` instruction. Where the road
 splits, the options ride along with weight and openness. Answer
@@ -314,6 +328,12 @@ THREE VERBS ARE LEGAL WHEREVER THE WALK STANDS, because none of them is a move.
 A WORK TOKEN IS THE DEFAULT AND A NOTE IS THE EXCEPTION (contract rule 4). A
 note is for the next RETRO — a doubt about the process, a lead nobody can act
 on yet, something to discuss.
+
+CAPTURING ONE IS NOT A PIECE OF WORK. Never open a token to write a note. The
+whole point of a note is that it costs nothing and interrupts nothing.
+
+THE OTHER HALF STILL STANDS, and the two are opposite mistakes. A token whose
+statement asks for a thing DONE cannot be settled by recording it somewhere.
 
 THE TEST IS ONE QUESTION. Can you name the state where the thing gets done?
 Then it is `se_work {act: "open"}`, and `at` names that state.

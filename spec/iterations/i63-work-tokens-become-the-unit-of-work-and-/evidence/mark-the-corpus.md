@@ -2,9 +2,9 @@
 form: mark-the-corpus
 by: agent
 signed_off: 2026-08-27T10:24:43.553Z
-reopened: "2026-08-27T09:57:54.947Z — the marking swept deliverable/machines/methods only; guidance/method holds 13 more cards and 12 carry no mark, so boot, the desk and the overhaul mint no step work"
+reopened: 2026-08-27T09:57:54.947Z — the marking swept deliverable/machines/methods only; guidance/method holds 13 more cards and 12 carry no mark, so boot, the desk and the overhaul mint no step work
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / mark-the-corpus

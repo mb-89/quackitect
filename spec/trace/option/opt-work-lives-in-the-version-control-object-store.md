@@ -5,7 +5,7 @@ type: "[[option]]"
 statement: hold each piece of work as a versioned object under its own reference rather than as a file the working tree shows
 cluster: the-work
 found_by: prior-art
-source: "git-bug's README, which says in as many words that it embeds issues as objects in a git repository, not files"
+source: git-bug's README, which says in as many words that it embeds issues as objects in a git repository, not files
 ---
 
 ## Mechanism

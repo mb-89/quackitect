@@ -4,12 +4,12 @@ id: raid-asm-a-record-s-token-count-stays-legible-on-a-surface
 type: "[[raid]]"
 status: closed
 kind: assumption
-statement: "The bubble surface assumes a state's token count is a small number a person reads at a glance, and nobody has counted what a real record actually owes."
+statement: The bubble surface assumes a state's token count is a small number a person reads at a glance, and nobody has counted what a real record actually owes.
 owner: the maintainer
-trigger: "the count from an archived record, and any surface work that lays out a bubble before that count exists"
+trigger: the count from an archived record, and any surface work that lays out a bubble before that count exists
 probe: "holds on the half that was measured. Counted 2026-08-26 over this record's own 21 signed positions: 136 evidence fields, between 4 and 15 per position, median 5. A count of one or two digits is what a bubble was drawn for, so the surface assumption survives at the position grain. What is NOT measured is the whole-record total, because this record is mid-walk and its build and verification positions do not exist yet."
 probed: 2026-08-26
-impact: "A bubble showing one digit and a bubble showing three digits are different designs. Laying out the surface against the wrong one means redoing it after everything else is settled."
+impact: A bubble showing one digit and a bubble showing three digits are different designs. Laying out the surface against the wrong one means redoing it after everything else is settled.
 breaks_how_badly: corrosive
 how_likely: plausible
 source_refs:

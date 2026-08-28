@@ -1,6 +1,6 @@
 ---
 kind: report
-statement: "Demonstration of sty-see-every-open-thing-at-one-glance. The whole picture was read from the machine repeatedly; the graphical counts were not looked at."
+statement: Demonstration of sty-see-every-open-thing-at-one-glance. The whole picture was read from the machine repeatedly; the graphical counts were not looked at.
 demonstrates: sty-see-every-open-thing-at-one-glance
 performed: 2026-08-27
 performed_by: walker

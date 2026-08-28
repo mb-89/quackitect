@@ -2,10 +2,10 @@
 minted_in: i63-work-tokens-become-the-unit-of-work-and-
 id: req-every-place-work-is-modelled-is-named-in-one-list
 type: "[[requirement]]"
-statement: "The system shall carry one written list naming every place work is modelled, and a later reader shall be able to ask of any place whether it stood on that list."
+statement: The system shall carry one written list naming every place work is modelled, and a later reader shall be able to ask of any place whether it stood on that list.
 kind: functional
 verify_method: inspection
-breaks_if_removed: "A place nobody listed is missed, and the break surfaces rounds later as something that used to work and no longer does, with nothing to check the cause against."
+breaks_if_removed: A place nobody listed is missed, and the break surfaces rounds later as something that used to work and no longer does, with nothing to check the cause against.
 breaks_how_badly: corrosive
 refines:
   - uc-work-a-states-work-tokens-to-completion

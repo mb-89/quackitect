@@ -3,10 +3,10 @@ form: gate-candidates
 bless: blessed by human
 by: agent
 signed_off: 2026-08-26T12:50:30.473Z
-reopened: "2026-08-26T12:49:18.378Z — a cold reviewer refused to bless and found four things nobody did; the demand check it named has now been run and it eliminates a candidate the arithmetic did not"
-amended: "2026-08-26T12:10:03.823Z by agent — the owner ruled the non-freezing-surface row an implementation detail, so it was struck and the gate's counts and its reading of that row both change"
+reopened: 2026-08-26T12:49:18.378Z — a cold reviewer refused to bless and found four things nobody did; the demand check it named has now been run and it eliminates a candidate the arithmetic did not
+amended: 2026-08-26T12:10:03.823Z by agent — the owner ruled the non-freezing-surface row an implementation detail, so it was struck and the gate's counts and its reading of that row both change
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / gate-candidates

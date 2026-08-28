@@ -105,3 +105,14 @@ i54 reached its demonstration positions and performed three, each with its own r
 
 RESCHEDULED, TRIGGER RE-AFFIRMED, unchanged: the next iteration reaching the same position.
 
+
+SWEPT 2026-08-28, at i63's closing retro: TRIGGER FIRED AGAIN, RE-ACCEPTED.
+
+It fires at the next iteration reaching observe-red, which is every iteration.
+i63 walked observe-red on 2026-08-26 for 16 calls and 87 seconds, and
+`evidence/observe-red.md` stands signed.
+
+THAT IS THE SECOND RECORDED FIRE IN THREE DAYS, and the entry is unchanged
+both times. A trigger that fires every iteration is not a trigger; it is a
+standing cost with a trigger's wording. It belongs in the method as a known
+price, or it belongs fixed.

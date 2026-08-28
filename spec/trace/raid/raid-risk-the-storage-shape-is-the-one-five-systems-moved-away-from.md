@@ -3,11 +3,11 @@ minted_in: i63-work-tokens-become-the-unit-of-work-and-
 id: raid-risk-the-storage-shape-is-the-one-five-systems-moved-away-from
 type: "[[raid]]"
 kind: risk
-statement: "One editable file per token is chosen for readability, and it is the shape five surveyed systems converged away from in favour of an append-only log with derived state."
+statement: One editable file per token is chosen for readability, and it is the shape five surveyed systems converged away from in favour of an append-only log with derived state.
 owner: the owner role
-trigger: "the first merge conflict across two clones' token files, and any decision round that opens the pool's storage"
+trigger: the first merge conflict across two clones' token files, and any decision round that opens the pool's storage
 status: open
-impact: "If the choice proves wrong it is not a local fix. Every token, every count and every surface reads the store, so changing it later reaches everything this round builds."
+impact: If the choice proves wrong it is not a local fix. Every token, every count and every surface reads the store, so changing it later reaches everything this round builds.
 breaks_how_badly: corrosive
 how_likely: plausible
 source_refs:
