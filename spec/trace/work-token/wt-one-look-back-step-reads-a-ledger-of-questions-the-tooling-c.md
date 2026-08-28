@@ -16,7 +16,7 @@ statement: |-
 
   - Show how many times the verb was invoked, right beside its ledger.
   - Put the verb where somebody would meet it. Nothing this walk read named it, and an unknown tool goes unused.
-place: retro
+place: i69-the-method-checks-what-it-claims-to-chec
 ready_when: ready when the look-back method card or the lane's discoverability is next opened
 source: note-3e8b4036e7d8
 ---

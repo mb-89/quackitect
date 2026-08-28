@@ -13,7 +13,7 @@ statement: |-
   THE FIRST THING TO CHECK. The cloud method card already declares a session kind in its header. Whether anything reads that when drawing a route is unknown, and settling it may be most of the work.
 
   THE LOOK-BACK IS STILL WANTED AT THE END OF A CLOUD RUN, where it carries findings home before the box is reclaimed. It is only the opening one that has nothing to work on.
-place: retro
+place: i69-the-method-checks-what-it-claims-to-chec
 ready_when: ready when routing conditions are next opened, and the owner asked for it on 2026-08-26
 source: note-01c7b1b503e1
 ---
