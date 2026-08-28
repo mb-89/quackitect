@@ -24,9 +24,13 @@ evidence:
     description: (market) real-world validation green - blocks the ship only for to-market iterations
     required: false
 major: full
+major_complexity: C3/R3
 minor: full
+minor_complexity: C3/R3
 patch: tailored
+patch_complexity: C3/R3
 product: full
+product_complexity: C3/R3
 specification: tailored
 major_note: |
   FLOOR - applies in full: packaged and checked working. The bless ships

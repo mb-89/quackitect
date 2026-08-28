@@ -24,9 +24,11 @@ evidence:
     of: raid
     description: the chosen unknowns picked over the exposure chart. Take the biggest blockers for the coming build that a timeboxed probe can settle. One register ref per line, and each becomes one parallel spike state.
 major: full
+major_complexity: C2/R3
 minor: none
 patch: none
 product: full
+product_complexity: C2/R3
 specification: tailored
 major_note: |
   Applies in full: RAID, tripwires and doubtful verify methods feed the

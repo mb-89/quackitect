@@ -24,9 +24,12 @@ evidence:
     covers: value-prop
     description: the stories THIS delta touched, one node reference per line — the corpus answers which exist, and only you know which this record moved
 major: full
+major_complexity: C3/R3
 minor: tailored
+minor_complexity: C3/R3
 patch: none
 product: full
+product_complexity: C3/R3
 specification: full
 major_note: |
   Applies for the change: every need it introduces gets its story,

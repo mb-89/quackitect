@@ -25,9 +25,11 @@ evidence:
   - name: coverage
     description: every value prop's audience resolves to a role here, and every always-on class is present or ruled out with its reason
 major: tailored
+major_complexity: C3/R3
 minor: none
 patch: none
 product: full
+product_complexity: C3/R3
 specification: full
 major_note: |
   Inherit the map; re-check it against the change. An architectural move

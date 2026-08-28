@@ -27,9 +27,13 @@ evidence:
     page_size: 25
     description: the spec register against the elements and interfaces — coverage is checked, never claimed. The laws add file existence and the unclaimed sweep.
 major: full
+major_complexity: C2/R3
 minor: full
+minor_complexity: C2/R3
 patch: full
+patch_complexity: C2/R3
 product: full
+product_complexity: C2/R3
 specification: tailored
 major_note: |
   Applies in full: the built code and the design specs agree, both ways,

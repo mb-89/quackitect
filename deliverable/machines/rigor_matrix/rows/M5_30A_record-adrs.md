@@ -21,9 +21,11 @@ evidence:
     of: raid
     description: the decision entries in the register - one raid id of kind decision per line, each traced
 major: full
+major_complexity: C3/R3
 minor: none
 patch: none
 product: full
+product_complexity: C3/R3
 specification: full
 major_note: |
   Applies in full: every deciding ADR traced to the requirement or

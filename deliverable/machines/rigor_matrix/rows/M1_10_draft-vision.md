@@ -52,9 +52,12 @@ evidence:
       A goal list without a named conflict is usually hiding one.
       The method: [[meth-goal-system]].
 major: tailored
+major_complexity: C3/R3
 minor: inherit
+minor_complexity: C3/R2
 patch: none
 product: full
+product_complexity: C4/R3
 specification: full
 major_note: |
   INHERIT-WITH-JUDGMENT: point to the resident vision and argue in one

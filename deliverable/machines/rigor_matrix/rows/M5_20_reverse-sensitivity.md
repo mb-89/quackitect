@@ -43,9 +43,11 @@ evidence:
       `none` IS A COMMON AND HONEST ANSWER. A strength no rival can take
       is exactly what a robust choice looks like.
 major: full
+major_complexity: C3/R3
 minor: none
 patch: none
 product: full
+product_complexity: C3/R3
 specification: tailored
 major_note: |
   Applies in full: perturb the weights, hunt the losing world, credible

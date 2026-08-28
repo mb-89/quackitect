@@ -27,9 +27,13 @@ evidence:
       - $spawn_hands
 floor: true
 major: full
+major_complexity: C2/R2
 minor: full
+minor_complexity: C2/R2
 patch: full
+patch_complexity: C2/R2
 product: full
+product_complexity: C2/R2
 specification: tailored
 major_note: |
   FLOOR - applies in full. A major ships a changed shape, so the walker needs

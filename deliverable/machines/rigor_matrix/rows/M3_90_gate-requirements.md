@@ -20,9 +20,12 @@ legal_tools:
   - se_run
 evidence: []
 major: full
+major_complexity: C3/R4
 minor: full
+minor_complexity: C3/R4
 patch: none
 product: full
+product_complexity: C3/R4
 specification: tailored
 major_note: |
   Applies in full. End of design input; everything after is solution

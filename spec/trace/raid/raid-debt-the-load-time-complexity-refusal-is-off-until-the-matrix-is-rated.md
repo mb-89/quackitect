@@ -6,8 +6,8 @@ kind: debt
 looked: 2026-08-26
 statement: The engine refuses a missing complexity at the point of use rather than when the matrix is loaded, because turning the load-time refusal on before the 154 active cells are rated would make the product unloadable.
 owner: the owner
-trigger: the matrix owner rating the cells, and any reader who takes req-every-matrix-row-declares-its-complexity at its word
-status: open
+trigger: "none — paid 2026-08-28: the cells are rated, the re-pin was watched, and the line is written"
+status: closed
 impact: The requirement asks for a refusal WHEN THE MATRIX IS LOADED. What ships refuses when a step is SIZED. Nothing ever proceeds without a complexity either way, so the demand's purpose is met — but a reader comparing the requirement against the code finds them saying different things, and the narrower reading is the one that ships.
 breaks_how_badly: abrasive
 how_likely: expected
@@ -114,3 +114,53 @@ an empty difficulty because no matrix cell is rated.
 SO THE ROW IS STILL WRITING A CHEQUE THE MATRIX CANNOT CASH, and a reader met
 it. 42 rigor-matrix files changed in this window and none of them added a
 rating.
+
+## PAID 2026-08-28. All three acts, in the order this entry set them.
+
+### One: the cells are rated
+
+182 ratings stand, one on every active change-size cell. Four hands rated the
+63 rows against their full shape, each with a written reason; two rows were
+rated per column by hand. What is judged and what is derived is written down in
+the matrix README rather than left for a reader to work out.
+
+THE COUNT IS 182 AND NOT THE 154 THIS ENTRY PREDICTED, because the prediction
+pre-dates rows added since. Two of the engine's own refusals corrected the
+first attempt: `specification` is not a change-size column and owes nothing,
+and five rows that RUN a sub-machine are placeholders that owe nothing.
+
+### Two: the re-pin was watched, and it did not happen
+
+THE PREDICTION WAS THAT EVERY STANDING PIN GOES STALE AT ONCE. It did not,
+and the reason is better than the prediction.
+
+ASKED THROUGH THE ENGINE'S OWN FUNCTIONS — `pinIsUnset`, `pinIsStale` and
+`iterationDrift` — over all 39 open records: 39 carry NO PIN AT ALL, 0 went
+stale, and 0 had a demand move. Every open record sits before its kickoff
+bless, which is exactly where `pinIsUnset` says a record has no stored column.
+
+SO THE MASS RE-PIN COULD NOT HAVE HAPPENED, and the claim it was meant to test
+— that a complexity reaches no demand digest — is untested by this pass rather
+than confirmed by it. It will be tested the first time a record with a pin sees
+a matrix edit.
+
+A FIRST ATTEMPT AT THIS CHECK READ `record.md` FOR A PIN FIELD and found none,
+which looked like the same answer and was the script looking in the wrong
+place. The pin is a JSON file under the record. Recorded because the wrong
+method gave the right number, which is the shape that gets believed.
+
+### Three: the line is written
+
+`EVERY ACTIVE CELL CARRIES A COMPLEXITY.` stands in
+`deliverable/machines/rigor_matrix/README.md`. The loader reads that file, so
+saying it and making it binding were one act.
+
+VERIFIED BY LOADING: all four change-size columns compile with the refusal
+armed. patch 28 states carrying a complexity, minor 38, major 58, product 58.
+The only states without one are `start`, which the compiler synthesises, and
+the five sub-machine placeholders the engine itself excludes.
+
+### What was NOT done
+
+THE POINT-OF-USE REFUSAL STANDS UNTOUCHED, which is what this entry said
+repayment must not do.

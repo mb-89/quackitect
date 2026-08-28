@@ -21,9 +21,11 @@ evidence:
   - name: findings_folded
     description: what the test changed upstream, or none-with-reason
 major: tailored
+major_complexity: C3/R4
 minor: none
 patch: none
 product: full
+product_complexity: C3/R4
 specification: tailored
 major_note: |
   The PR-FAQ walks for the CHANGE: press release for the to-be world with

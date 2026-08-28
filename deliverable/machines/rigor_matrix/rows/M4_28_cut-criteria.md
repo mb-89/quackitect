@@ -56,9 +56,11 @@ evidence:
 
       The method is [[meth-derive-criteria]].
 major: full
+major_complexity: C3/R4
 minor: none
 patch: none
 product: full
+product_complexity: C3/R4
 specification: tailored
 major_note: |
   Applies in full: every criterion checked against the composed set, the

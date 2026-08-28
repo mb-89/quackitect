@@ -27,9 +27,11 @@ evidence:
   - name: excluded_use
     description: the does-NOT-do list
 major: full
+major_complexity: C3/R3
 minor: none
 patch: none
 product: full
+product_complexity: C3/R3
 specification: full
 major_note: |
   Applies in full: boundary, neighbours, intended and excluded use,

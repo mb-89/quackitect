@@ -37,9 +37,11 @@ evidence:
 
       See [[meth-gate-review]].
 major: full
+major_complexity: C3/R4
 minor: none
 patch: none
 product: full
+product_complexity: C3/R4
 specification: tailored
 major_note: |
   Applies in full: at least two viable candidates or the no-alternatives

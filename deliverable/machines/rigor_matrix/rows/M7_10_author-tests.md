@@ -31,9 +31,13 @@ evidence:
     page_size: 25
     description: the test-spec register — one row per spec; the files live on the spec node, and the law checks coverage both ways and the method match
 major: full
+major_complexity: C3/R3
 minor: full
+minor_complexity: C3/R3
 patch: tailored
+patch_complexity: C3/R3
 product: full
+product_complexity: C3/R3
 specification: full
 major_note: |
   Applies in full: every requirement in scope gets its check; the M5

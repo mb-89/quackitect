@@ -5,9 +5,13 @@ statement: "Write the requirements in full: EARS, four kinds, detail included - 
 state_kind: work
 filled_by: agent
 patch: tailored
+patch_complexity: C2/R1
 minor: full
+minor_complexity: C3/R3
 major: full
+major_complexity: C3/R4
 product: full
+product_complexity: C3/R4
 specification: full
 patch_note: |-
   CLARIFICATION ONLY, the same law as frame-delta at this size: an unclear

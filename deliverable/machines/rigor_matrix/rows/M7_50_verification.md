@@ -20,9 +20,13 @@ evidence:
       - $claim-specs
     description: one checkbox per non-test spec — observed green by fresh eyes. The battery is the engine's and needs no field.
 major: full
+major_complexity: C2/R2
 minor: full
+minor_complexity: C2/R2
 patch: full
+patch_complexity: C2/R2
 product: full
+product_complexity: C2/R2
 specification: tailored
 major_note: |
   FLOOR - the full battery, engine-filled. Identical at every size.

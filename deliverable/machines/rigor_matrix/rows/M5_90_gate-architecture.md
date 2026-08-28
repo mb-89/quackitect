@@ -18,9 +18,11 @@ legal_tools:
   - se_run
 evidence: []
 major: full
+major_complexity: C3/R4
 minor: none
 patch: none
 product: full
+product_complexity: C3/R4
 specification: tailored
 major_note: |
   Applies in full - the gate a major exists to pass. The matrix review is

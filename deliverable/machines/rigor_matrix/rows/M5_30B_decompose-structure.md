@@ -26,9 +26,12 @@ evidence:
     of: element
     description: the element matrix — every function's implementers, and every boundary-crossing cell named by its interface
 major: full
+major_complexity: C4/R4
 minor: tailored
+minor_complexity: C4/R4
 patch: none
 product: full
+product_complexity: C4/R4
 specification: full
 major_note: |
   Applies in full: the element tree from the winner's picks, the standing

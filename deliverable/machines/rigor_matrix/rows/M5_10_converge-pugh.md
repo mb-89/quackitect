@@ -21,9 +21,11 @@ evidence:
     reads: evaluate-set#scores
     description: the convergence runs, computed — datum the strongest rival, then the leader takes the seat
 major: full
+major_complexity: C2/R3
 minor: none
 patch: none
 product: full
+product_complexity: C2/R3
 specification: full
 major_note: |
   Applies in full: controlled convergence over the front, datum the

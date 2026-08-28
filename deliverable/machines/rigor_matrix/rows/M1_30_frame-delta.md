@@ -32,9 +32,13 @@ evidence:
     description: what the effort buys, in whose currency - skip with a recorded reason where no acquirer exists
     required: false
 major: full
+major_complexity: C4/R4
 minor: tailored
+minor_complexity: C4/R4
 patch: tailored
+patch_complexity: C4/R4
 product: full
+product_complexity: C4/R4
 specification: full
 major_note: |
   Applies in full for the change: the gap claim for what the major

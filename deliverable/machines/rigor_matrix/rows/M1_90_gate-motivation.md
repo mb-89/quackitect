@@ -31,9 +31,12 @@ evidence:
   - name: risks_logged
     description: the register is open with owners and triggers
 major: full
+major_complexity: C4/R4
 minor: tailored
+minor_complexity: C4/R4
 patch: none
 product: full
+product_complexity: C4/R4
 specification: tailored
 major_note: |
   Applies in full. A major re-argues its worth: the delta is real, the

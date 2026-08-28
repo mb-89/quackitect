@@ -26,9 +26,13 @@ evidence:
       Write each entry as a node shaped by [[raid]], then name it here.
       The node carries its kind and its owner. It carries the trigger, the impact and the statement too.
 major: full
+major_complexity: C3/R3
 minor: tailored
+minor_complexity: C3/R3
 patch: tailored
+patch_complexity: C3/R3
 product: full
+product_complexity: C3/R3
 specification: full
 major_note: |
   Applies in full for the change: an architectural move carries real

@@ -27,9 +27,13 @@ evidence:
       - $spawn_hands
 floor: true
 major: full
+major_complexity: C2/R1
 minor: full
+minor_complexity: C2/R1
 patch: full
+patch_complexity: C2/R1
 product: full
+product_complexity: C2/R1
 specification: tailored
 major_note: |
   FLOOR - applies in full. A major opens the space wide, so the walker needs

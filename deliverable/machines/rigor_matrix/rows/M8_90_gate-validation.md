@@ -35,9 +35,12 @@ evidence:
     description: (market) the real-world checks green per meth-market-tier - required only when the iteration is declared to market
     required: false
 major: full
+major_complexity: C3/R4
 minor: tailored
+minor_complexity: C3/R4
 patch: none
 product: full
+product_complexity: C3/R4
 specification: tailored
 major_note: |
   Applies in full: every value prop answered, every must story

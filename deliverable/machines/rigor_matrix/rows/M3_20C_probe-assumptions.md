@@ -49,9 +49,13 @@ evidence:
       A cell still holding its comment counts as empty.
       The submit refuses it by name.
 major: full
+major_complexity: C2/R3
 minor: tailored
+minor_complexity: C2/R3
 patch: tailored
+patch_complexity: C2/R3
 product: full
+product_complexity: C2/R3
 specification: tailored
 major_note: |
   Applies in full: every standing assumption probed, including the ones

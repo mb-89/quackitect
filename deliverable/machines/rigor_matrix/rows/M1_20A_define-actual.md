@@ -19,9 +19,11 @@ evidence:
   - name: as_is
     description: where we stand, good and bad, witnesses named
 major: tailored
+major_complexity: C3/R3
 minor: none
 patch: none
 product: full
+product_complexity: C3/R3
 specification: full
 major_note: |
   The as-is EXTENDS: the pains the change answers are stated fresh, with

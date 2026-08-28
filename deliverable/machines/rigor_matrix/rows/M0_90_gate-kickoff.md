@@ -53,9 +53,13 @@ evidence:
       - major
       - product
 major: full
+major_complexity: C4/R4
 minor: full
+minor_complexity: C4/R4
 patch: tailored
+patch_complexity: C4/R4
 product: full
+product_complexity: C4/R4
 specification: tailored
 major_note: |
   FLOOR - applies in full. The column argument for major names the

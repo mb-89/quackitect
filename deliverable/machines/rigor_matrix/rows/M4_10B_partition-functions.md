@@ -41,9 +41,11 @@ evidence:
 
       The method is [[meth-function-dsm]].
 major: full
+major_complexity: C3/R3
 minor: none
 patch: none
 product: full
+product_complexity: C3/R3
 specification: full
 major_note: |
   Applies in full for the change's cone: the DSM re-clusters where the

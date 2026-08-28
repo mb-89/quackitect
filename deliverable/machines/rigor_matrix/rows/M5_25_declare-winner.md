@@ -21,9 +21,11 @@ evidence:
   - name: comments
     description: anything the declaration should carry — free text, short is fine
 major: full
+major_complexity: C1/R2
 minor: none
 patch: none
 product: full
+product_complexity: C1/R2
 specification: full
 major_note: |
   Applies in full: the computed winner declared on the record with the

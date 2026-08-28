@@ -40,9 +40,12 @@ evidence:
       - chunk
     description: "every promoted spike, assigned: chunk names the step of the seeded drawing it enters as — the law refuses an unassigned promotion"
 major: full
+major_complexity: C3/R4
 minor: full
+minor_complexity: C3/R4
 patch: none
 product: full
+product_complexity: C3/R4
 specification: tailored
 major_note: |
   Applies in full: design specs authored for every element, the chunk
@@ -122,12 +125,25 @@ which lenses shaped it.
 OWNER RULING. When the chunks are drawn, one of them is for hygiene: the work
 that is not this record's subject and could be done by anybody, at any time.
 
-WHERE IT COMES FROM, and it is three places rather than one.
+WHERE IT COMES FROM, and it is four places rather than one.
 
 - THE BACKLOG. Items standing unassigned, which is where hygiene belongs.
+- THE REGISTER'S DEBT. Entries of kind `debt` still open. These are the
+  borrowed time this system took knowingly, and nothing else in the walk pays
+  any of it back.
 - THE LOG. A refusal that keeps firing, a command that keeps failing, a shape
   the last look-back named.
 - THE NOTES. Anything captured mid-walk that this round could close cheaply.
+
+AT LEAST ONE DEBT ENTRY IS PAID PER BUILDING ROUND (owner ruling 2026-08-28).
+One is a floor and not a target. A round that pays none says so and says why.
+
+WHY THE FLOOR EXISTS. Measured 2026-08-28: sixteen `debt` entries stood open,
+and three of them carried no trigger at all — nothing anywhere said when they
+would be looked at again. Debt nobody is billed for is not paid.
+
+PAY IT OR RETIRE IT. Some debt stops being debt when what it was borrowed
+against is gone. Closing such an entry with the reason written is paying it.
 
 HYGIENE WORK IS NEVER ASSIGNED TO A RECORD IN ADVANCE. Assigning it pretends
 it belongs to that record, and it then waits for that record rather than being

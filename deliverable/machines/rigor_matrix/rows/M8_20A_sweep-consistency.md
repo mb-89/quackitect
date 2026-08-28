@@ -27,9 +27,13 @@ evidence:
       - $sweep_surfaces
     description: the surface classes walked - the meth-consistency-sweep card holds the classes, and checking a box claims its documents teach the current behavior
 major: full
+major_complexity: C3/R4
 minor: full
+minor_complexity: C3/R4
 patch: full
+patch_complexity: C3/R4
 product: full
+product_complexity: C3/R4
 specification: tailored
 major_note: |
   FLOOR - never struck. An architecture move touches many teaching

@@ -25,9 +25,13 @@ evidence:
       - $claim-specs
     description: one checkbox per non-test spec — the reds no run can show. The engine observes the test reds itself.
 major: full
+major_complexity: C2/R2
 minor: full
+minor_complexity: C2/R2
 patch: full
+patch_complexity: C2/R2
 product: full
+product_complexity: C2/R2
 specification: tailored
 major_note: |
   Applies in full. Every new check fails before the build.

@@ -116,9 +116,11 @@ evidence:
       NO ROWS IS A LEGAL ANSWER. Every graft rejected or incompatible means
       nothing moved, and the table says `none`.
 major: full
+major_complexity: C3/R3
 minor: none
 patch: none
 product: full
+product_complexity: C3/R3
 specification: full
 major_note: |
   Applies in full: every axis a loser won gets asked, and every adopted

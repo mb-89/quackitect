@@ -41,9 +41,13 @@ evidence:
       - drifted
     description: "the design OUTPUT against the design INPUT that asked for it: does what was built still answer the requirements and use cases it was derived from? Quote the requirement and the design section that answers it. A design that drifted is a finding here, never a note for later — either the design comes back to the input, or the input was wrong and is amended through its own gate."
 major: full
+major_complexity: C3/R4
 minor: full
+minor_complexity: C3/R4
 patch: tailored
+patch_complexity: C3/R4
 product: full
+product_complexity: C3/R4
 specification: tailored
 major_note: |
   Applies in full: the machine already proved the mechanics upstream.

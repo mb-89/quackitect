@@ -56,9 +56,11 @@ evidence:
 
       The weight is arithmetic over these judgments. Never type a weight.
 major: full
+major_complexity: C2/R3
 minor: none
 patch: none
 product: full
+product_complexity: C2/R3
 specification: full
 major_note: |
   Applies in full - this is major's own territory. The vital few, weighted,

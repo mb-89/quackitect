@@ -35,9 +35,13 @@ evidence:
     description: what this record learned about the SHARED method, one line each, naming the target and the change. State none-found plainly where there is nothing, and see the guidance below for the kinds worth naming.
     template: list
 major: full
+major_complexity: C3/R3
 minor: full
+minor_complexity: C3/R3
 patch: tailored
+patch_complexity: C3/R3
 product: full
+product_complexity: C3/R3
 specification: full
 major_note: |
   Applies in full: major version bump, the package assembles by script,

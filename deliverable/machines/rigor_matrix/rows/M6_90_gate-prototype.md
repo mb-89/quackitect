@@ -25,9 +25,11 @@ evidence:
       - no
     description: the one judgment this gate asks — is the design buildable as evidenced, and why
 major: full
+major_complexity: C3/R4
 minor: none
 patch: none
 product: full
+product_complexity: C3/R4
 specification: tailored
 major_note: |
   Applies in full: the riskiest assumptions validated by evidence, the

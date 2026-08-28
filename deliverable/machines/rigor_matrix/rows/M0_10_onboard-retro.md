@@ -29,9 +29,13 @@ evidence:
   - name: process_stale
     description: the standing state-of-the-art check on the process itself
 major: full
+major_complexity: C3/R4
 minor: full
+minor_complexity: C3/R4
 patch: tailored
+patch_complexity: C3/R4
 product: full
+product_complexity: C3/R4
 specification: tailored
 major_note: |
   Applies in full: field feedback, inbox drained, call history mined. A

@@ -26,9 +26,11 @@ evidence:
       - promote
     description: per experiment — what it changed upstream, and what promotes into the build or none; the answers live on the experiment nodes
 major: full
+major_complexity: C3/R3
 minor: none
 patch: none
 product: full
+product_complexity: C3/R3
 specification: tailored
 major_note: |
   Applies in full: evidence updates requirements and architecture through

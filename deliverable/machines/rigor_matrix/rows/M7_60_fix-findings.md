@@ -26,9 +26,13 @@ legal_tools:
   - se_lint
   - se_git
 major: full
+major_complexity: C3/R3
 minor: full
+minor_complexity: C3/R3
 patch: full
+patch_complexity: C3/R3
 product: full
+product_complexity: C3/R3
 specification: tailored
 major_note: |
   Applies as drawn. Collect them all, fix in one pass, confirm in one run. The

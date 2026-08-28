@@ -90,9 +90,11 @@ evidence:
 
       The method is [[meth-set-based-pareto]].
 major: full
+major_complexity: C3/R4
 minor: none
 patch: none
 product: full
+product_complexity: C3/R4
 specification: full
 major_note: |
   Applies in full: scores on the weighted criteria and matrix metrics,

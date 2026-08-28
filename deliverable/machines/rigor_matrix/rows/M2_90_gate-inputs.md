@@ -27,9 +27,11 @@ evidence:
   - name: passes_concrete
     description: is every pass written concretely enough to script at M6 — the formulated stage of the example system, which at M2 IS the story slides
 major: full
+major_complexity: C3/R4
 minor: none
 patch: none
 product: full
+product_complexity: C3/R4
 specification: tailored
 major_note: |
   Applies in full, scoped to the change and everything it invalidated:
