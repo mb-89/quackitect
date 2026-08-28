@@ -17,7 +17,8 @@ source_refs:
   - raid-asm-a-cloud-clone-can-reach-the-remote-it-came-from
 weighs_with: none
 weighs_against: none
-place: retro
+probed_2026_08_28: "RE-PROBED AND WORSE THAN RECORDED. The 2026-08-19 probe said the empty-inbox skip still produced the right ACT for the wrong reason. On this container it produced the WRONG act. The opening look-back read an inbox of zero, signed a form saying there was nothing to drain, and skipped. The closing one on the same container then produced nine findings and sixteen items. The count could not tell an absent inbox from a drained one, and the caveat that it happened to be harmless no longer holds."
+place: i39-the-lane-tells-the-truth-about-itself-de
 ---
 
 ## What changed the kind
@@ -60,3 +61,20 @@ is cheaper and is the one worth proposing first.
 WHY IT IS RECORDED RATHER THAN FIXED HERE. The fix is a change to the survey
 or to where the inbox lives, and neither is inside this iteration's goal. The
 skip rule itself is sound; what is unproven is the signal it reads.
+
+## Re-probed, and the harmless case is gone
+
+THE EARLIER PROBE SAID THE SKIP STILL PRODUCED THE RIGHT ACT, for the wrong
+reason. That caveat no longer holds.
+
+WHAT HAPPENED ON THIS CONTAINER. The opening look-back read an inbox of zero,
+signed a form recording that there was nothing to drain, and skipped. The
+closing look-back on the same container, over the same window, produced nine
+findings and sixteen items.
+
+SO THE SIGNAL WAS NOT MERELY UNPROVEN. It was wrong, and the act it produced
+was wrong with it.
+
+WHAT STILL DOES NOT FOLLOW. The skip rule is not withdrawn. A genuinely
+drained inbox is still a good reason to walk past. What must change is that a
+count stops standing in for a question the file's existence answers.
