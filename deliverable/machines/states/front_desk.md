@@ -62,10 +62,10 @@ guidance: |
   SMALL FIXES THE OWNER ORDERS IN CHAT run directly from here, with no
   expedition, while the project stays pre-ledger.
 
-  THERE IS NO HANDOVER. The briefing on the last
-  session is DERIVED from the call log and rides the boot banner, so nothing is
-  written on the way out and nothing is read at boot. What must outlive a
-  session belongs in guidance, in a note or in a record.
+  THERE IS NO HANDOVER, and since 2026-08-28 there is no last-session block on
+  the banner either. Nothing is written on the way out and nothing is read at
+  boot. What must outlive a session belongs in guidance, in a note or in a
+  record. The call log still holds what happened, and se_log_query reads it.
 ---
 
 # Front desk

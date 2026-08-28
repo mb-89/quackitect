@@ -12,11 +12,11 @@ guidance: |
 
   NOTHING IS OWED HERE AT ALL. There is no handover to read any more.
 
-  The briefing on the last session is DERIVED from the call log. It rides the
-  boot banner, so it needs no document, no reading proof and no extra hop.
-  Just pull onward.
+  The boot banner carries the greeting and nothing else. Its last-session block
+  was cut on 2026-08-28 because nobody read it. So there is no document here,
+  no reading proof and no extra hop. Just pull onward.
 
-  Does something in that briefing matter beyond this session? Put it where it
+  Does something from the last session matter beyond this one? Put it where it
   belongs while you are thinking of it.
 
   - A note. se_note is legal here for exactly this.

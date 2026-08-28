@@ -8,7 +8,7 @@ realizes:
   - if-method-compiler-to-walk-engine
   - if-record-store-to-walk-engine
 files:
-  - "deliverable/engine/visit.ts"
+  - deliverable/engine/visit.ts
   - deliverable/engine/session.ts
   - deliverable/engine/visit.ts
   - deliverable/engine/sessionclaims.ts
@@ -2044,9 +2044,15 @@ THE WRITTEN HANDOVER IS GONE (owner ruling 2026-08-07).
  fired and there was never a handover. A duty that only discharges on the
  tidy path is not a duty, it is a wish.
 
- The log already records what happened, so boot DERIVES the briefing
- instead of asking anyone to write it. See lastSessionBriefing below and
- CallLog.lastSession. Nothing to forget, nothing to go stale.
+ The log already records what happened, so nobody is asked to write it down
+ a second time. See CallLog.lastSession, and se_log_query, which is how it is
+ read. Nothing to forget, nothing to go stale.
+
+ BOOT USED TO PRINT A DERIVED BRIEFING ON THE BANNER, and the owner cut it on
+ 2026-08-28. It carried four figures from the log: the call count, a refusal
+ tally, notes captured and answers recorded. Nobody read them, and the greeting
+ is the one place a newcomer must not meet a report. `lastSessionBriefing` went
+ with it; `CallLog.lastSession` stands and is still tested.
 
 ## One reading list
 

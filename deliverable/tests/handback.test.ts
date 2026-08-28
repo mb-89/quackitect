@@ -388,10 +388,24 @@ test("a judgment reached against different scripts does not answer for these", (
 
 // THE CHECKER MUST ACTUALLY ASK. Deleting the one line restores the pin with
 // both cases above still passing, which is the regression this catches.
+//
+// THE CALL IT PINS MOVED, AND THE DEMAND DID NOT. This first pinned
+// `scriptPassedOnDisk`, which the checker called directly beside its own read of
+// the in-memory evidence. i63 replaced that pair with ONE decider: three readers
+// answered the same question from different stores, and only two of them had
+// been taught that a verdict can stand on the form.
+//
+// `scriptStanding` IS A SUPERSET OF WHAT THIS ASKED FOR. It consults the same
+// standing judgment with the same stamp comparison, and adds one answer the old
+// pair could not give — `deciding`, while a run is in flight, so a stamp
+// recorded green cannot carry the walk past a check that is failing right now.
+//
+// SO THE PIN NAMES THE NEW CALL AND THE OLD ONE STAYS TESTED, by the two cases
+// above, which call `scriptPassedOnDisk` themselves.
 test("the condition checker asks the runner's own question", () => {
   assert.match(
     source("session.ts"),
-    /key === "script"[\s\S]{0,240}scriptPassedOnDisk/,
+    /key === "script"[\s\S]{0,240}scriptStanding/,
     "conditionKeyMet reads the in-memory evidence alone again, so a reloaded session cannot leave a script-carrying state",
   );
 });

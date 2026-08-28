@@ -92,7 +92,7 @@ export { visitState } from "./visit.ts";
 
 import { spawnSync } from "node:child_process";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { CallLog, UNREPORTED } from "./calllog.ts";
+import { UNREPORTED } from "./calllog.ts";
 import type { CanvasData } from "./canvas.ts";
 import { conditionNotePath } from "./conditions.ts";
 import type { GeneratedMachine } from "./expmachine.ts";
@@ -5373,22 +5373,18 @@ export class Session {
 
   private closedFired = false;
 
-  /** see dsp-walk-machine.md#the-ticks-result */
-  private lastSessionBriefing(): string | undefined {
-    try {
-      const last = new CallLog(seDir(this.machineRoot())).lastSession();
-      if (last === undefined) return undefined;
-      const when = `${last.from.slice(0, 10)} ${last.from.slice(11, 16)}–${last.to.slice(11, 16)}`;
-      const lines = [`Last session (${when}): ${last.calls} calls.`];
-      if (last.ended_at !== undefined) lines.push(`It stopped at ${last.ended_at}.`);
-      const refused = Object.entries(last.refusals ?? {});
-      if (refused.length > 0) lines.push(`Refused: ${refused.map(([c, n]) => `${c} ×${n}`).join(", ")}.`);
-      if (last.notes !== undefined) lines.push(`Notes captured: ${last.notes.length}. Answers recorded: ${(last.answers ?? []).length}.`);
-      return lines.join("\n");
-    } catch {
-      return undefined;
-    }
-  }
+  // THE LAST-SESSION BLOCK IS GONE FROM THE BANNER (owner ruling 2026-08-28).
+  // It derived four figures from the call log and printed them under the
+  // greeting: the call count, a refusal tally, notes captured and answers
+  // recorded.
+  //
+  // THE OWNER'S REASON WAS THAT NOBODY READ IT. Four numbers about the previous
+  // session tell the person nothing they can act on, and the greeting is the
+  // one place a newcomer must not meet a report.
+  //
+  // NOTHING IS LOST. `CallLog.lastSession` still stands and is still tested;
+  // only this caller went. The log is where a session's own account lives, and
+  // se_log_query is how it is read.
 
   private landing(): Record<string, unknown> {
     const lit = HOP_TRACE ? performance.now() : 0;
@@ -5417,13 +5413,11 @@ export class Session {
     const info = this.packet();
     if (!this.bannerShown && !this.inSub() && activeStates(this.instance).includes("front_desk")) {
       this.bannerShown = true;
-      const brief = this.lastSessionBriefing();
       return {
         ...info,
         booted: true,
         banner:
-          "🦆 SE v3 booted. Main machine is live. All work runs through the se lane; every call is logged. se_pull says what to do next." +
-          (brief === undefined ? "" : `\n\n${brief}`),
+          "🦆 SE v3 booted. Main machine is live. All work runs through the se lane; every call is logged. se_pull says what to do next.",
         display: "Show the banner above to the user VERBATIM as your first output, then proceed with their request.",
       };
     }

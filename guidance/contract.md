@@ -250,8 +250,15 @@ where the machine reads it:
 
 NOTHING IS WRITTEN FOR THE NEXT AGENT TO READ. The old handover file was read
 by the session that followed, it only ever got written on a tidy exit, and
-sessions get killed instead. What replaced it is derived: boot describes the
-last session from the call log and puts it on the banner.
+sessions get killed instead.
+
+AND NOTHING REPLACED IT ON THE BANNER EITHER (owner ruling 2026-08-28). Boot
+used to derive four figures from the call log and print them under the
+greeting. The owner cut them: nobody read them, and four numbers about the
+previous session are not a handover.
+
+THE CALL LOG IS STILL THERE, and `se_log_query` is how a session's own account
+is read. What went is the printing, not the record.
 
 SO WHAT THE NEXT SESSION MUST KNOW GOES IN THE FOUR HOMES ABOVE, written when
 the thought occurs. A note, a parked to-do, or guidance — never saved for an
