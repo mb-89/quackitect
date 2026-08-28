@@ -16,6 +16,7 @@ import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { itFind, pinIteration } from "../engine/iterations.ts";
 import { Session } from "../engine/session.ts";
+import { privateHome, readWork } from "../engine/workstore.ts";
 import { checkDocs, freshRoot, gitInit } from "./helpers.ts";
 
 /** One session, positioned inside an iteration, with one claimful step
@@ -47,9 +48,38 @@ async function standingClaim(): Promise<{
 
   pinIteration(root, itFind(root, id), "patch");
   const decl = session.currentMachine();
-  const state = decl.states.find((s) => s.evidence_form.length > 0 && s.kind !== "gate");
-  assert.ok(state !== undefined, "the column must ask for evidence somewhere");
-  const field = state.evidence_form[0].name;
+  // THE STATE THIS FIXTURE SIGNS MUST BE ONE A FORGED FILE CAN MAKE GREEN, and
+  // that is a narrow thing. At `patch` rigor this column has exactly TWO
+  // claimful states, and only one of them qualifies.
+  //
+  // IT USED TO TAKE THE FIRST STATE CARRYING AN EVIDENCE FORM, which held only
+  // while the first such state happened to be an ordinary one. BROKE
+  // 2026-08-23, when the rigor matrix grew a `spawn-the-hands` row at position
+  // 05 of every milestone. It is work rather than a gate, so it became the
+  // first claimful state — and its only field is a CHECKLIST, which refuses the
+  // sentence this fixture writes. Twenty-four tests went red on that one line.
+  //
+  // THREE RULES DECIDE THIS, each measured on 2026-08-24 rather than reasoned:
+  //
+  //   - A CLAIM IS GREEN ONLY IF ITS FEEDERS ARE. Signing one state in the
+  //     middle of the column can never make it stand, so this fixture signs
+  //     every other claim first — see the call below.
+  //   - A BARE SIGNED NOTE IS A WHOLE CLAIM. A note carrying no sections at all
+  //     stands; that is what every other state gets.
+  //   - A SECTION IS CHECKED AGAINST ITS FIELD'S TEMPLATE. A checklist wants a
+  //     ticked line and a per-item field wants its declared items, so a
+  //     sentence fails both. ONLY A FIELD WITH NO TEMPLATE accepts one.
+  //
+  // SO THE CANDIDATE NEEDS A PROSE FIELD, and it is that field the amend test
+  // rewrites. The predicate names that requirement instead of describing
+  // whichever state used to come first.
+  const proseField = (s: (typeof decl.states)[number]) => s.evidence_form.find((f) => f.template === undefined);
+  const state = decl.states.find((s) => s.evidence_form.length > 0 && s.kind !== "gate" && proseField(s) !== undefined);
+  assert.ok(
+    state !== undefined,
+    `no state in this column can hold a forged claim: the fixture needs one that asks for evidence, is not a gate, and has at least one field with no template. Checked ${String(decl.states.length)} states.`,
+  );
+  const field = (proseField(state) as { name: string }).name;
 
   // AN ISO STAMP, because the reopen mark is compared against it as a string.
   // A claim stamped by a much older engine carries prose here, and prose does
@@ -59,9 +89,22 @@ async function standingClaim(): Promise<{
   // ONE TREE SINCE i34: a record's evidence stands under the root.
   const ev = join(root, "spec", "iterations", id, "evidence", `${state.id}.md`);
   mkdirSync(dirname(ev), { recursive: true });
+  // EVERY OTHER CLAIM STANDS FIRST, because a claim whose feeders are not
+  // green is dropped from the green set. The chosen state cannot stand alone,
+  // however its own file is written.
+  signEveryClaim(root, id, decl, signedAt, state.id);
+  // ITS OWN FILE IS A BARE CLAIM PLUS ONE PROSE SECTION.
+  //
+  // THE BARE BODY IS WHAT MAKES IT STAND. A signed note carrying no sections is
+  // a whole claim. A note carrying SOME sections is a half-filled form, and a
+  // half-filled form counts as nothing at all — measured 2026-08-24 as
+  // `done = []` against a state wanting five fields, not four of five.
+  //
+  // THE ONE SECTION IS WHAT THE AMEND ACTS ON, and it names a field with no
+  // template, because a checklist or a per-item field refuses a sentence.
   writeFileSync(
     ev,
-    `---\nsigned_off: ${signedAt}\nby: agent\nauthors: human\n---\n\n## ${field}\n\nwhat was claimed the first time\n`,
+    `---\nsigned_off: ${signedAt}\nby: agent\nauthors: human\n---\n\nthe claim, in full\n\n## ${field}\n\nwhat was claimed the first time\n`,
     "utf8",
   );
   assert.ok(session.recordDone(decl).includes(state.id), "green from the record before anything touches it");
@@ -85,6 +128,41 @@ function signEveryClaim(root: string, id: string, decl: ReturnType<Session["curr
     writeFileSync(ev, `---\nsigned_off: ${at}\nby: agent\nauthors: human\n---\n\nthe claim, in full\n`, "utf8");
   }
 }
+
+// A REOPEN'S REASON IS A FINDING, AND A FINDING NEEDS A PLACE.
+//
+// A gate's verdict of reopen names states and reasons. The reason used to live
+// in one form field: nothing routed it to the state that would fix it, and
+// nothing said afterwards whether it was fixed. That is the failure contract
+// rule 5 names — the defect recorded accurately, and the work continuing past
+// it as though naming were fixing.
+test("a reopen leaves a work token at the reopened state, carrying the reason", async () => {
+  const { session, step, root } = await standingClaim();
+  const why = "the design no longer answers the requirement it was derived from";
+
+  session.reopenClaim(step, why, "agent");
+
+  const found = readWork(privateHome(root)).filter((i) => i.statement === "Answer the reopening");
+  assert.equal(found.length, 1, "the reason became one piece of work, not a sentence in a form");
+  assert.equal(found[0].body.trim(), why, "and it carries what the reopener actually objected to");
+  assert.equal(found[0].status, "open", "open, so it holds that state until somebody settles it");
+  assert.match(found[0].place, new RegExp(`(^|/)${step}$`), "placed at the state that has to answer it");
+});
+
+// TWO REOPENS ARE TWO OBJECTIONS. Matching them onto one token would keep the
+// first reason and lose the second, which is the same silence in a smaller box.
+test("a second reopen of one state is a second finding", async () => {
+  const { session, step, root } = await standingClaim();
+
+  session.reopenClaim(step, "the first objection", "agent");
+  session.reopenClaim(step, "a different objection entirely", "agent");
+
+  const bodies = readWork(privateHome(root))
+    .filter((i) => i.statement === "Answer the reopening")
+    .map((i) => i.body.trim())
+    .sort();
+  assert.deepEqual(bodies, ["a different objection entirely", "the first objection"]);
+});
 
 test("an amend rewrites a field and the signature does not move", async () => {
   const { session, decl, step, field, ev, signedAt } = await standingClaim();

@@ -5,7 +5,7 @@ statement: Draft the vision packet. It holds the big idea and the world it makes
 state_kind: work
 filled_by: agent
 depends_on:
-  - gate-kickoff
+  - spawn-for-motivation
 legal_tools:
   - se_file_read
   - se_file_write
@@ -15,8 +15,6 @@ legal_tools:
   - se_file_list
   - se_log_query
   - se_answer
-  - se_web_search
-  - se_web_fetch
 evidence:
   - name: big_idea
     description: one breath, standalone-readable
@@ -34,13 +32,6 @@ evidence:
       Describe a working day AFTER the product exists. Name people by role.
       Present tense, a scene, not a feature list. The reader should be able
       to picture the screen and the hands on it.
-  - name: goal_system
-    description: goals, conflicts named openly, priority order ruled
-    guidance: |
-      List the goals the product serves, most important first. Where two
-      goals pull against each other, say so openly and rule which one wins.
-      A goal list without a named conflict is usually hiding one.
-      The method: [[meth-goal-system]].
   - name: moore_pitch
     description: all five slots filled
     omit:
@@ -50,10 +41,23 @@ evidence:
       (need), THE (product name) IS A (category) THAT (key benefit).
       UNLIKE (main alternative), OUR PRODUCT (key differentiator).
       One phrase per slot, no slot skipped. The method: [[meth-moore-pitch]].
+
+      IT COMES BEFORE THE GOALS ON PURPOSE. The pitch carries the whole
+      picture in five slots, and the goals are read against it.
+  - name: goal_system
+    description: goals, conflicts named openly, priority order ruled
+    guidance: |
+      List the goals the product serves, most important first. Where two
+      goals pull against each other, say so openly and rule which one wins.
+      A goal list without a named conflict is usually hiding one.
+      The method: [[meth-goal-system]].
 major: tailored
+major_complexity: C3/R3
 minor: inherit
+minor_complexity: C3/R2
 patch: none
 product: full
+product_complexity: C4/R3
 specification: full
 major_note: |
   INHERIT-WITH-JUDGMENT: point to the resident vision and argue in one
@@ -64,8 +68,7 @@ minor_note: |
   ONE QUESTION SURVIVES AT THIS SIZE: the goal system. A minor cannot move
   the big idea, the to-be world or the pitch - a product whose identity
   changed is not a minor - so the form drops those three mechanically
-  (owner ruling 2026-08-13) rather than asking anyone to answer them
-  briefly.
+  rather than asking anyone to answer them briefly.
 
   WHAT IS STILL WORTH ASKING: a delta can pull an existing goal against
   another one. Naming that conflict, and ruling which wins, is cheap here
@@ -100,8 +103,11 @@ The method, start to pitch, is [[meth-motivation]].
 
 - The big idea in one breath.
 - The to-be world alive, not abstract.
-- The goal system, with conflicts named openly ([[meth-goal-system]]).
-- The pitch last ([[meth-moore-pitch]]).
+- The pitch, all five slots ([[meth-moore-pitch]]).
+- The goal system last, with conflicts named openly ([[meth-goal-system]]).
+
+THE PITCH COMES BEFORE THE GOALS. It carries the whole picture in five slots,
+so a reader meets the shape of the thing before the list of what it serves.
 
 The vision is axiomatic. Nothing derives it, and the gate adjudicates whether
 it is worth having.

@@ -7,13 +7,16 @@ statement: The design-to-code sweep runs at file grain, so dead code inside a cl
 owner: the driving agent
 trigger: when the file-grain sweep stops finding anything new, or when a region-marker mechanism lands
 status: open
-looked: 2026-08-20
+looked: 2026-08-26
 impact: A dead function inside a live file never surfaces as an unclaimed finding, and only a reachability probe or a reader catches it.
 breaks_how_badly: corrosive
 how_likely: plausible
 source_refs:
   - note-0c5b06e4d056
   - tsp — trace-design's own guidance names the grain and its cost
+last_looked: 2026-08-23
+look_verdict: rescheduled
+place: i7-the-trace-sharpens-finer-grain-than-file
 ---
 
 Quality traded for speed, consciously: v1 went finer with `// design:`
@@ -68,3 +71,20 @@ is about, so nothing here moved.
 THE LOOK IS THE POINT. A debt nobody re-reads is a lie in the ledger, and this
 line is the evidence that somebody read it on this date.
 
+## Swept 2026-08-26, at i54's closing retro: RE-ACCEPTED
+
+NOT TOUCHED THIS WINDOW. No grain change ran.
+
+RE-ACCEPTED consciously, trigger unchanged.
+
+
+SWEPT 2026-08-28, at i63's closing retro: RE-ACCEPTED, AND ITS TRIGGER CANNOT
+BE OBSERVED.
+
+Half the trigger is deliverable — a region-marker mechanism landing is a
+nameable moment. The other half, "when the file-grain sweep stops finding
+anything new", names a never-event: nothing counts what the sweep finds per
+run, so nothing could ever report that it stopped.
+
+IT IS ONE OF SIXTEEN OPEN ENTRIES IN THAT CLASS, and the class is this retro's
+finding rather than this entry's.

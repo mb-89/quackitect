@@ -33,10 +33,32 @@ that one when you touch what it covers.
   - A million-line file is not editable.
   - Generated surfaces derive from the markdown, never the reverse.
   - Log files are the one exception.
-- Machines are drawn. A state machine's truth is its Obsidian canvas, and a person edits it in Obsidian, in the real world (owner law, 2026-07-28).
+
+### Obsidian compatibility binds the FORMAT, never the FUNCTION
+
+A file we write opens in Obsidian and reads correctly there. That is the whole
+of the promise.
+
+IT DOES NOT SAY OUR FEATURES MAP ONTO OBSIDIAN'S. We do things it does not:
+grouping several levels deep, a work editor over two views at once, a walk that
+refuses. None of that is a compatibility question.
+
+AND IT NEVER MAKES OBSIDIAN'S INDEX THE LIMIT OF WHAT WE MAY READ. Our own
+readers decide what they read. A folder the vault excludes is excluded from the
+VAULT, and a surface that needs it reads it directly.
+
+THE WAY THIS GOES WRONG, measured. The work editor was built on the vault, the
+vault excludes the private folder by design, and the conclusion drawn was that
+private work could not be shown. The real answer was to read the second source
+beside the first, which costs one function and breaks no compatibility with
+anything.
+
+SO THE TEST IS: would a person opening this file in Obsidian see something
+broken? If not, compatibility has nothing to say about the design.
+- Machines are drawn. A state machine's truth is its Obsidian canvas, and a person edits it in Obsidian, in the real world.
   - The engine accepts what a person naturally draws.
   - A mechanism that depends on metadata Obsidian does not surface to its editor is a defect. Rework the mechanism, never the person.
-- The truth is read LIVE (owner ruling, 2026-07-29). A running system holding a stale copy of a file it calls the single truth is enforcing a lie.
+- The truth is read LIVE. A running system holding a stale copy of a file it calls the single truth is enforcing a lie.
   - Where re-reading is too expensive, cache it against the CONTENT of the files it was built from. Never against size and modification time, which a same-length edit walks straight past.
 - Do not repeat prose, data, or code.
   - Not across files.
@@ -49,7 +71,7 @@ that one when you touch what it covers.
 
 ## Dependencies: pull assets, never lean on servers
 
-The rule, owner-ruled twice (2026-08-01, restated harder 2026-08-09):
+The rule, and it has been restated harder once already:
 
 - PULLING an asset is free. A one-time download from a CDN or registry is
   fine — you had to be online to clone the repo anyway.
@@ -69,8 +91,8 @@ forever as generated.
 
 ## A stored copy never beats a derived one
 
-The 2026-08-09 retro drained five defects with one shape. A value the
-system can COMPUTE was also WRITTEN somewhere, and the written copy won.
+Five defects have been drained with one shape. A value the system can COMPUTE
+was also WRITTEN somewhere, and the written copy won.
 
 - The chart's picks beat the option nodes.
 - A stored criteria order beat the computed one. A corrosive row sat first
@@ -89,7 +111,7 @@ The rule:
   every reorder a silent edit.
 
 The precedent is the green light: calculated from the live files on every
-look, never written (owner ruling 2026-08-07, v1's adr-verdict-cache).
+look, never written.
 
 ## Derive on every look, but never re-derive what has not changed
 
@@ -97,10 +119,10 @@ The sibling of the rule above, and it must be read WITH it. "Derive on
 every look" is about where truth lives. It is not an instruction to read
 the same unchanged files forty times in one call.
 
-Owner ruling 2026-08-09, after a single `se_pull` took 274,270 ms entering
-an iteration. The server answers NOTHING while that runs, because the
-lane's endpoint shares one event loop with the mirror, so the transport
-gave up and the extension had to be restarted.
+A single `se_pull` once took 274,270 ms entering an iteration. The server
+answers NOTHING while that runs, because the lane's endpoint shares one event
+loop with the mirror, so the transport gives up and the extension has to be
+restarted.
 
 ### The rule
 
@@ -152,10 +174,15 @@ spelling hides it.
 
 ### Input, process, output — and the cache is the consolation prize
 
-Owner ruling 2026-08-09, and it OUTRANKS the section above.
+This OUTRANKS the section above.
 
-COLLECT THE INPUT ONCE. PROCESS IT. OUTPUT IT. Where it matters, check ONCE at
-the end whether the input moved while you worked, and redo or refuse if it did.
+Four acts, in order.
+
+- COLLECT THE INPUT ONCE.
+- PROCESS IT.
+- OUTPUT IT.
+- CHECK AT THE END, where it matters, whether the input moved while you
+  worked. Redo or refuse if it did.
 
 WHAT YOU DO NOT DO is ask an outside system the same question sixty-six times.
 
@@ -312,12 +339,26 @@ turn it into a check.
 A DELIBERATE CHOICE THAT MUST SURVIVE FUTURE EDITS GETS A TEST OR A LINT,
 never a comment. A comment is the weakest guard there is.
 
+### The rule has a ratchet, and it names the tree it watches
+
+`deliverable/tests/comment-rule.test.ts` counts every comment line carrying a
+date or an owner attribution, per tree, and refuses a rise. The count may fall
+freely and may never grow.
+
+A CEILING PER TREE, never one number for all of them. The engine stands at
+zero, and a shared ceiling would let test debt spend that.
+
+AIM IT AT EVERY TREE THE RULE BINDS. It watched the engine alone for months,
+so the engine reached zero while the tests reached 521 under a guard that
+looked like it covered them. A ratchet over half a tree measures the half that
+was already clean.
+
 ## Guards that teach
 
 A guard exists to move the work on, never to prove a rule. These four came
 out of one day of measuring what the lane actually cost its callers.
 
-- THE CORRECTION RULE (owner ruling 2026-08-02). Correct what is mechanical,
+- THE CORRECTION RULE. Correct what is mechanical,
   announce what you corrected, and refuse only the ambiguous.
   - A refusal over a difference nobody can see on screen spends a round and
     teaches nothing.
@@ -360,9 +401,9 @@ gone, which is the exact state it was meant to catch.
 
 ### The break that set this
 
-Measured 2026-08-21. VS Code listed no extensions at all and printed `Invalid
-extensions content` at its own registry file. Seven extensions sat on disk,
-correctly built, and none loaded.
+VS Code listed no extensions at all and printed `Invalid extensions content` at
+its own registry file. Seven extensions sat on disk, correctly built, and none
+loaded.
 
 The installer had rewritten `extensions.json` through a PowerShell JSON round
 trip. Three defects, in one block of forty lines.
@@ -502,9 +543,9 @@ And the suite is not one thing. BOOT runs a SMOKE test — seconds, proving
 the engine loads and answers. The full battery proves behaviour, and that
 question belongs to validation, at the end of a piece of work.
 
-THE BATTERY IS THE EXCEPTION, NOT THE HABIT (owner ruling 2026-08-02).
-Measured: about sixty full runs in one two-hour session, each piped to a temp
-file and grepped for a single failure.
+THE BATTERY IS THE EXCEPTION, NOT THE HABIT. Measured: about sixty full runs in
+one two-hour session, each piped to a temp file and grepped for a single
+failure.
 
 - SCOPED IS THE DEFAULT. Name the files the change touches, and the result
   carries the counts plus only the failures' detail.
@@ -517,7 +558,7 @@ file and grepped for a single failure.
 - TEST TO ANSWER A QUESTION, NOT TO REASSURE YOURSELF. In most cases the
   change broke nothing, and a green run you already expected bought you
   nothing but the wall clock.
-- THE BATTERY IS FIRE AND FORGET (owner ruling 2026-08-03). Call it only
+- THE BATTERY IS FIRE AND FORGET. Call it only
   when the scoped runs make you expect green, then DO OTHER WORK while it
   runs — never sit polling it. Its verdict logs itself when the run ends
   (an se_test_verdict record), and the retro reads the failure rate — and now
@@ -555,11 +596,11 @@ level that shows twenty things has stopped helping them choose.
   - An expedition opened to put the system into VS Code ended up holding a handover law, a rigor column, log paging and a palette file. Nobody looking for those would look there.
   - Amend the goal when the bundle grows past it, or the archive keeps the work and loses the thread.
 - Commits stay fine-grained, and records do not. The two answer different questions.
-- WORK IS PATCHED INTO A SEEDED RECORD ONLY, never into a started one (owner ruling 2026-08-14).
+- WORK IS PATCHED INTO A SEEDED RECORD ONLY, never into a started one.
   - A seed is a proposal. Editing it is still composing the record.
   - A started record's scope is signed. Work arriving by a later edit to its seed was never in what anybody blessed.
   - Late work goes to the options pool instead. It reaches a record by the normal route, at the next seeding.
-- EVERY WORK ITEM HAS EXACTLY ONE HOLDER, at every moment (owner ruling 2026-08-14). The holder is the pool, a retro, an iteration, or the archive.
+- EVERY WORK ITEM HAS EXACTLY ONE HOLDER, at every moment. The holder is the pool, a retro, an iteration, or the archive.
   - An item held by nothing is the failure this rule exists to stop.
-  - It happened on 2026-08-13. Eight notes were drained to a record, the record's scope disowned them, and for ten minutes they were nowhere.
-  - The machinery landed in i17. Draining a note to `backlog` mints a WORK TOKEN under `spec/trace/work-token/`, which is the pool holding it until a seeding pulls it in.
+  - It has happened. Eight notes were drained to a record, the record's scope disowned them, and they were held by nothing at all.
+  - Draining a note to `backlog` mints a WORK TOKEN under `spec/trace/work-token/`, which is the pool holding it until a seeding pulls it in.

@@ -3,14 +3,14 @@ minted_in: i37-training-iterations-a-disposable-iterati
 id: raid-asm-an-agent-told-its-work-is-discarded-still-walks-the-machine-the-same-way
 type: "[[raid]]"
 kind: assumption
-statement: "An agent told it is walking a benchmark spends the same effort on the machine's mechanics as one walking real work, so the measured process overhead transfers to real iterations."
+statement: An agent told it is walking a benchmark spends the same effort on the machine's mechanics as one walking real work, so the measured process overhead transfers to real iterations.
 owner: the owner
 trigger: the first time a benchmark number and a real iteration's own call log can be compared at the same size and model
 status: open
-impact: "If it is false, every benchmark number understates what a real iteration costs, and a machine change judged good on benchmarks might be neutral or worse in production."
+impact: If it is false, every benchmark number understates what a real iteration costs, and a machine change judged good on benchmarks might be neutral or worse in production.
 breaks_how_badly: corrosive
 how_likely: plausible
-probe: "unprobed — it cannot be probed until a real iteration and a benchmark run exist at the same size and model."
+probe: unprobed — it cannot be probed until a real iteration and a benchmark run exist at the same size and model.
 probed: 2026-08-19
 source_refs:
   - training-iterations

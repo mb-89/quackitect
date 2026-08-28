@@ -5,8 +5,8 @@ type: "[[option]]"
 cluster: cluster-the-benchmark-run
 question: how the past state is made to stand up
 found_by: analogy
-statement: "The old state is rebuilt on demand from an append-only history rather than kept as a copy, so any point in the past is reachable at the cost of replay instead of storage."
-source: "ANALOGY \u2014 event sourcing and point-in-time recovery in database systems, where a backup plus a write-ahead log reconstructs any instant"
+statement: The old state is rebuilt on demand from an append-only history rather than kept as a copy, so any point in the past is reachable at the cost of replay instead of storage.
+source: ANALOGY — event sourcing and point-in-time recovery in database systems, where a backup plus a write-ahead log reconstructs any instant
 ---
 
 ## The abstract problem it answers

@@ -15,6 +15,7 @@ source_refs:
   - req-a-slowness-signal-never-shortens-the-wait
   - el-mirror
   - raid-risk-an-accurate-progress-signal-can-drive-abandonment
+place: backlog
 ---
 
 ## The design spec refuses the decision this measure depends on

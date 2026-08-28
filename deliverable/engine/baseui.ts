@@ -17,10 +17,22 @@
 // THE FUNCTION HELP IS GENERATED FROM THE LIVE REGISTRY, so it can never
 // describe a function the evaluator would refuse.
 import { join } from "node:path";
-import { baseSource, LAYOUTS } from "./bases.ts";
+import { baseSource, type FilterGroup, type FilterRow, filterGroups, LAYOUTS, OPERATORS } from "./bases.ts";
 import { GLOBALS, METHODS } from "./expr.ts";
 import { type TypeName, typeOf } from "./expr-value.ts";
-import { type BaseSpec, type BaseView, listBases, loadBase, type Row, renderView, selectRows, unreadableRows, vaultDir } from "./tables.ts";
+import {
+  type BaseSpec,
+  type BaseView,
+  type GroupLink,
+  type GroupShut,
+  listBases,
+  loadBase,
+  type Row,
+  renderView,
+  selectRows,
+  unreadableRows,
+  vaultDir,
+} from "./tables.ts";
 import { warmRows, warmVault } from "./vault.ts";
 
 const esc = (s: string): string => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -141,6 +153,21 @@ const TOPICS: Record<string, () => Help> = {
       ) +
       P("Sorting applies inside the groups, so the two work together rather than against each other."),
   }),
+  filter: () => ({
+    title: "filter by",
+    html:
+      P("A condition is a row: a property, an operator, and a value.") +
+      P("Rows inside one GROUP are ORed. One row matching is enough for that group to pass.") +
+      P("Groups are ANDed with each other. Every group has to pass before a note shows.") +
+      P("So the whole control is an AND of ORs. That is the shape the query stores, and the shape it is read back from.") +
+      P(
+        "A row compiles to an EXPRESSION, in the same language formulas use. The query panel shows what a row wrote, and writing there is the same act.",
+      ) +
+      P("A row with an empty value box is unfinished. It writes nothing, so a half-typed condition never hides your rows.") +
+      P(
+        "A condition the builder cannot read back as a row is shown RAW and left alone. That is deliberate: an approximation would change what the query asks for. Edit that one in the query panel.",
+      ),
+  }),
   expression: () => ({
     title: "the expression language",
     html:
@@ -249,6 +276,108 @@ function propsPop(d: Declared, props: PropertyInfo[]): string {
   </div>`;
 }
 
+// ---------------------------------------------------------------------------
+// FILTER — the funnel, and the AND of ORs behind it
+//
+// GROUPS ARE ANDED, ROWS INSIDE A GROUP ARE ORED. The join word is drawn on
+// every group and every row, and CSS hides the first one of each. A join
+// written per row cannot drift out of step with the rows the way a separately
+// placed one can.
+//
+// THE OPERATOR VOCABULARY IS SERIALISED, NEVER REDECLARED. `data-ops` carries
+// the offer per type and `data-noval` the operators that take no value, both
+// built from OPERATORS. A client with its own copy would drift the first time
+// an operator was added.
+// ---------------------------------------------------------------------------
+
+const BLANK_ROW: FilterRow = { property: "", operator: "", value: "" };
+
+/** Which operators a property of this type is offered. "" means none picked yet. */
+function operatorsFor(type: string) {
+  return OPERATORS.filter((o) => o.types.length === 0 || (type !== "" && o.types.includes(type)));
+}
+
+/**
+ * The operator list for one row.
+ *
+ * AN OPERATOR ALREADY IN THE FILE IS SHOWN EVEN WHERE THE TYPE DOES NOT OFFER
+ * IT. The type is inferred from the data, so it can be wrong; dropping the
+ * stored operator would rewrite the filter the next time an unrelated row moved.
+ */
+function opOptions(type: string, selected: string): string {
+  const offered = operatorsFor(type);
+  const known = offered.some((o) => o.id === selected) || selected === "";
+  const shown = known ? offered : [...offered, ...OPERATORS.filter((o) => o.id === selected)];
+  return shown.map((o) => `<option value="${esc(o.id)}"${o.id === selected ? " selected" : ""}>${esc(o.label)}</option>`).join("");
+}
+
+function condRow(row: FilterRow, props: PropertyInfo[], types: Map<string, string>): string {
+  const type = types.get(row.property) ?? "";
+  const op = OPERATORS.find((o) => o.id === row.operator);
+  const takes = op === undefined || op.takesValue;
+  return `<div class="bs-row bs-cond">
+    <span class="bs-join">or</span>
+    <select class="bs-prop">${propOptions(props, row.property)}</select>
+    <select class="bs-op">${opOptions(type, row.operator)}</select>
+    <input class="bs-val" type="text" placeholder="value" value="${esc(row.value ?? "")}"${takes ? "" : " hidden"}>
+    <button type="button" class="bs-icon bs-drop-cond" title="remove this condition">✕</button>
+  </div>`;
+}
+
+function filterGroupHtml(g: FilterGroup, props: PropertyInfo[], types: Map<string, string>): string {
+  if (g.raw !== undefined) {
+    const text = typeof g.raw === "string" ? g.raw : JSON.stringify(g.raw);
+    return `<div class="bs-group bs-group-raw" data-raw="${attr(g.raw)}">
+      <span class="bs-join">and</span>
+      <div class="bs-group-body">
+        <div class="bs-raw"><code>${esc(text)}</code></div>
+        <div class="bs-raw-note">Not a condition this builder can draw, so it is left exactly as written. The query panel is where it is edited.</div>
+      </div>
+    </div>`;
+  }
+  const rows = g.rows.length > 0 ? g.rows : [BLANK_ROW];
+  return `<div class="bs-group">
+    <span class="bs-join">and</span>
+    <div class="bs-group-body">
+      <div class="bs-conds">${rows.map((r) => condRow(r, props, types)).join("")}</div>
+      <button type="button" class="bs-add bs-add-cond">+ Add condition</button>
+    </div>
+  </div>`;
+}
+
+/**
+ * THE FUNNEL'S POPOVER.
+ *
+ * The two templates at the end are what "+ Add condition" and "+ Add group"
+ * clone. A template's content is not in the document tree, so it is never
+ * collected as a real row — and it is always there, which a control that cloned
+ * a drawn row would not be when every stored group is raw.
+ */
+function filterPop(d: Declared, props: PropertyInfo[]): string {
+  const types = new Map(props.map((p) => [p.name, String(p.type)]));
+  const catalog: Record<string, { id: string; label: string }[]> = {};
+  for (const t of ["", ...new Set(props.map((p) => String(p.type)))]) {
+    catalog[t] = operatorsFor(t).map((o) => ({ id: o.id, label: o.label }));
+  }
+  const typeMap: Record<string, string> = {};
+  for (const p of props) typeMap[p.name] = String(p.type);
+  const noValue = OPERATORS.filter((o) => !o.takesValue)
+    .map((o) => o.id)
+    .join(" ");
+  const groups = filterGroups(d.view.filters).map((g) => filterGroupHtml(g, props, types));
+  return `<div class="bs-pop" data-pop="filter" data-ops="${attr(catalog)}" data-types="${attr(typeMap)}" data-noval="${esc(noValue)}" hidden>
+    <div class="bs-pop-title bs-helpable" data-help="filter">Filter by</div>
+    <div class="bs-groups">${groups.join("")}</div>
+    <button type="button" class="bs-add bs-add-group">+ Add group</button>
+    <template class="bs-cond-tpl">${condRow(BLANK_ROW, props, types)}</template>
+    <template class="bs-group-tpl">${filterGroupHtml({ rows: [] }, props, types)}</template>
+  </div>`;
+}
+
+// A funnel: wide at the top, narrowing to a stem. The icon the reader already
+// associates with narrowing a list.
+const FUNNEL_ICON = `<svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path fill="currentColor" d="M2 2h12l-4.6 5.6v5.1l-2.8 1.4V7.6L2 2Z"/></svg>`;
+
 // The markdown-preview icon VS Code puts in an editor's title bar: a page with
 // one half turned over. It means the same thing here — the other rendering of
 // what is already open.
@@ -260,6 +389,7 @@ function toolbar(d: Declared, count: number): string {
     <span class="bs-view-name">${esc(d.view.name)}</span>
     <span class="bs-count">${count} result${count === 1 ? "" : "s"}</span>
     <span class="bs-gap"></span>
+    <button type="button" class="bs-tool" data-pop="filter" data-help="filter">${FUNNEL_ICON} Filter</button>
     <button type="button" class="bs-tool" data-pop="sort" data-help="sort">⇅ Sort</button>
     <button type="button" class="bs-tool" data-pop="props" data-help="properties">≡ Properties</button>
     <button type="button" class="bs-tool bs-code-toggle" title="show the query">${CODE_ICON}</button>
@@ -271,23 +401,128 @@ function toolbar(d: Declared, count: number): string {
  *
  * It replaces the table rather than sitting beside it, because the two are the
  * same thing rendered twice and nobody needs both at once.
+ *
+ * AN EDIT IS UNDOABLE (owner). A hand-edited query only applies on save, so
+ * until then Reset puts the box back to what is saved. The served text is the
+ * textarea's own default value, so nothing has to be stored twice to offer it.
  */
 function codePanel(root: string, rel: string): string {
   return `<div class="bs-pane bs-pane-code" hidden>
     <div class="bs-code-head">
       <span class="bs-code-path bs-helpable" data-help="expression">${esc(rel)}</span>
+      <button type="button" class="bs-tool bs-code-reset" title="put the query back the way it was saved">Reset</button>
       <button type="button" class="bs-add bs-code-save">Save the query</button>
     </div>
     <textarea class="bs-code-text" spellcheck="false">${esc(baseSource(root, rel))}</textarea>
   </div>`;
 }
 
-export function basesCard(root: string, head: string, selected?: string, rowsIn?: Row[]): string {
+/** ONE DATABASE BLOCK — its chrome, its table and its code panel.
+ *
+ *  EXPORTED BECAUSE THE WORK EDITOR IS TWO OF THESE, side by side. Everything
+ *  it needs already lives here: the count, the sort control, the properties
+ *  control, grouping and filtering. A second surface would reinvent each one.
+ *  see dsp-the-bucket-editor.md#the-editor-is-the-database */
+export function basesBlock(
+  root: string,
+  d: Declared,
+  props: PropertyInfo[],
+  rowsIn?: Row[],
+  groupLink?: GroupLink,
+  groupShut?: GroupShut,
+): string {
+  // THE CALLER'S ROWS WIN. `basesCard` is handed a row set on some pages, and a
+  // block that reached for the warm vault instead drew zero rows over rows the
+  // caller was holding.
+  const rows = rowsIn ?? rowsOf(root);
+  let body: string;
+  let count = 0;
+  try {
+    count = selectRows(d.spec, d.view, rows).length;
+    body = renderView(d.spec, d.view, rows, groupLink, groupShut).html;
+  } catch (err) {
+    body = `<div class="tbl-refused">this view cannot be drawn — ${esc(String((err as Error).message).split("\n")[0])}</div>`;
+  }
+  return `<div class="bs-block" data-view="${esc(d.id)}">
+    <div class="bs-chrome">${toolbar(d, count)}${filterPop(d, props)}${sortPop(d, props)}${propsPop(d, props)}</div>
+    <div class="bs-pane bs-pane-table"><div class="bs-data">${body}</div></div>
+    ${pager()}
+    ${codePanel(root, d.file)}
+  </div>`;
+}
+
+/** THE PAGER — previous, where you are, next, and how big a page is.
+ *
+ *  THE SIZE IS TYPED RATHER THAN PICKED (owner). Every other pager in this
+ *  product offers a fixed set of options; the right page for a table of 249 is
+ *  not on anybody's list of four.
+ *
+ *  IT SHIPS HIDDEN AND THE CLIENT DECIDES. Whether a pager is worth drawing
+ *  depends on how many rows a CLOSED group is currently swallowing, and only
+ *  the page knows that. A pager over one page says nothing the count does not.
+ *
+ *  EVERY ROW STAYS IN THE MARKUP. Paging hides; it never prunes. A page change
+ *  costs no fetch, and the reader's place survives it. */
+function pager(): string {
+  return `<div class="bs-pager" hidden>
+    <button type="button" class="bs-prev" title="previous page">‹</button>
+    <span class="bs-where"></span>
+    <button type="button" class="bs-next" title="next page">›</button>
+    <input type="number" class="bs-per" min="0" step="1" value="50" title="rows a page — type any number, or 0 for all" />
+    <span class="bs-per-label">a page</span>
+  </div>`;
+}
+
+/** Whether the vault is warm enough to draw. A COLD VAULT IS NOT AN EMPTY ONE,
+ *  and a block that drew "no rows match this view's filter" over a vault that
+ *  had not been read yet would be saying something false. */
+export function vaultWarm(root: string): boolean {
+  if (warmRows(root) !== undefined) return true;
+  void warmVault(root);
+  return false;
+}
+
+/** The warm rows, or none. Callers check `vaultWarm` first. */
+function rowsOf(root: string): Row[] {
+  return warmRows(root) ?? [];
+}
+
+/** Every view declared in the vault, with the file and spec it came from. */
+export function declaredViews(root: string): Declared[] {
+  const out: Declared[] = [];
+  for (const rel of listBases(root)) {
+    const spec = loadBase(join(vaultDir(root), rel));
+    for (const view of spec.views) out.push({ id: `${rel}#${view.name}`, file: rel, spec, view });
+  }
+  return out;
+}
+
+/** The property inventory the sort and properties controls draw from. */
+export function viewProperties(root: string): PropertyInfo[] {
+  return propertyInventory(rowsOf(root));
+}
+
+/** WHO THIS CARD IS, when it is not the database card.
+ *
+ *  THE WORK EDITOR IS THIS CARD, TWICE. It needs its own element id and its own
+ *  title, and nothing else — the count, the sort, the properties, the grouping
+ *  and the filtering are the same code serving a different `.base` file. */
+export interface CardIdentity {
+  id?: string;
+  title?: string;
+  /** Drawn folded, opened by whatever control the page gives it. */
+  hidden?: boolean;
+}
+
+export function basesCard(root: string, head: string, selected?: string, rowsIn?: Row[], who: CardIdentity = {}): string {
+  const id = who.id ?? "w-table";
+  const title = who.title ?? "database";
+  const fold = who.hidden === true ? " hidden" : "";
   // see dsp-live-register.md#the-index-is-warm-and-a-render-never-builds-it
   const rows = rowsIn ?? warmRows(root);
   if (rows === undefined) {
     void warmVault(root);
-    return `<div class="widget" id="w-table"><div class="widget-head"><span>database</span>${head}</div>
+    return `<div class="widget" id="${id}"${fold}><div class="widget-head"><span>${esc(title)}</span>${head}</div>
       <div class="widget-body bs-body"><div class="bs-empty">The vault is warming. This card fills itself on the next refresh.</div></div></div>`;
   }
   const damaged = unreadableRows(rows);
@@ -298,37 +533,38 @@ export function basesCard(root: string, head: string, selected?: string, rowsIn?
     for (const view of spec.views) declared.push({ id: `${rel}#${view.name}`, file: rel, spec, view });
   }
   if (declared.length === 0) {
-    return `<div class="widget" id="w-table"><div class="widget-head"><span>database</span>${head}</div>
+    return `<div class="widget" id="${id}"${fold}><div class="widget-head"><span>${esc(title)}</span>${head}</div>
       <div class="widget-body bs-body"><div class="bs-empty">No <code>.base</code> file in the vault yet.
       <button type="button" class="bs-add bs-create">Create one</button></div></div></div>`;
   }
-  const want = declared.find((x) => x.id === selected)?.id ?? declared[0].id;
+  // A VIEW IS NAMED BY ITS FILE AND ITS VIEW, and the file part is a PATH. A
+  // caller naming `work.base#left` means the one under any folder, so the match
+  // accepts a suffix.
+  //
+  // AND AN UNMATCHED SELECTION SAYS SO RATHER THAN DRAWING SOMETHING ELSE.
+  // Falling back to the first declared view put a general note listing inside
+  // the work editor, which reads as the editor showing the wrong work rather
+  // than as a name nothing answers.
+  const hit = selected === undefined ? undefined : declared.find((x) => x.id === selected || x.id.endsWith(`/${selected}`));
+  if (selected !== undefined && hit === undefined) {
+    return `<div class="widget" id="${id}"${fold}><div class="widget-head"><span>${esc(title)}</span>${head}</div>
+      <div class="widget-body bs-body"><div class="bs-empty">No view named <code>${esc(selected)}</code> is declared in the vault.</div></div></div>`;
+  }
+  const want = hit?.id ?? declared[0].id;
 
+  // ONE BLOCK BUILDER, TWO CALLERS. This used to hold its own copy of
+  // `basesBlock`, character for character, and a fix to either one left the
+  // other behind.
   const blocks = declared
-    .map((d) => {
-      const shown = d.id === want;
-      if (!shown) return "";
-      let body: string;
-      let count = 0;
-      try {
-        count = selectRows(d.spec, d.view, rows).length;
-        body = renderView(d.spec, d.view, rows).html;
-      } catch (err) {
-        body = `<div class="tbl-refused">this view cannot be drawn — ${esc(String((err as Error).message).split("\n")[0])}</div>`;
-      }
-      return `<div class="bs-block" data-view="${esc(d.id)}">
-        <div class="bs-chrome">${toolbar(d, count)}${sortPop(d, props)}${propsPop(d, props)}</div>
-        <div class="bs-pane bs-pane-table"><div class="bs-data">${body}</div></div>
-        ${codePanel(root, d.file)}
-      </div>`;
-    })
+    .filter((d) => d.id === want)
+    .map((d) => basesBlock(root, d, props, rows))
     .join("");
 
   const damage =
     damaged.length === 0
       ? ""
       : `<div class="tbl-damage">${damaged.length} note${damaged.length === 1 ? "" : "s"} in the vault do not parse — ${esc(damaged[0])}</div>`;
-  return `<div class="widget" id="w-table"><div class="widget-head"><span>database</span>${head}</div>
+  return `<div class="widget" id="${id}"${fold}><div class="widget-head"><span>${esc(title)}</span>${head}</div>
     <div class="widget-body bs-body">${damage}${blocks}</div></div>`;
 }
 

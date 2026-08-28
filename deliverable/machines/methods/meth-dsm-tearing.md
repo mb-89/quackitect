@@ -12,7 +12,7 @@ cycles remain.
 Some of those cycles need prioritising for redesign. The others need explicit,
 recorded acceptance, rather than staying silent unresolved loops.
 
-## Effect
+## Effect #work
 
 Ranks backward dependencies by reach-back distance. That distance is the
 rework length a cycle costs.
@@ -23,7 +23,7 @@ Tearing only prioritises WHICH edges are structurally most disruptive to keep.
 Whether removing or redesigning one is feasible stays a domain-expert judgment
 call, never an automatic edit.
 
-## Procedure
+## Procedure #work
 
 Tearing is derivative of partitioning. Its candidate list depends entirely on
 which valid ordering was computed.

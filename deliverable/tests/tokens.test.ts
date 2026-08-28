@@ -134,7 +134,7 @@ describe("the token set", { concurrency: true }, () => {
     assert.deepEqual(start?.edges.map((e) => e.to).sort(), [...legs].sort(), "start fans into all seven — a chain would list one");
 
     // THE BAR STANDS OVER THE WORK THAT JOINS THE LEGS, never over the pill
-    // that closes the machine (owner ruling 2026-08-08).
+    // that closes the machine.
     const bar = m.states.find((s) => s.id === "build_chart");
     assert.equal(bar?.busbar, true, "the chart waits for every finder, and the walk may return for a leg it has not taken");
     assert.equal(m.states.find((s) => s.id === "end")?.busbar, undefined, "the end joins nothing, so it carries no bar");
@@ -160,7 +160,7 @@ describe("the token set", { concurrency: true }, () => {
     assert.deepEqual(inst.active, ["build_chart"], "the last submit releases the bar");
   });
 
-  // A GREEN BRANCH SATISFIES ITS EDGE (owner ruling 2026-08-09).
+  // A GREEN BRANCH SATISFIES ITS EDGE.
   //
   // Measured in iteration one that day. The motivation gate collects three
   // branches. All three were walked and the bar stayed shut, because one
@@ -261,8 +261,17 @@ describe("the token set", { concurrency: true }, () => {
     const source = readFileSync(fileURLToPath(new URL("../engine/session.ts", import.meta.url)), "utf8");
     assert.match(
       source,
-      /completeState\(m,\s*inst,\s*stateId,\s*outcome,\s*now,\s*only,\s*\(\)\s*=>\s*new Set\(this\.claims\.recordDone\(m\)\)\)/,
-      "the guard must pass recordDone as a thunk — without it a bar only sees this instance's history",
+      /completeState\(m,\s*inst,\s*stateId,\s*outcome,\s*now,\s*only,\s*\(\)\s*=>\s*this\.greenNow\(m\)\)/,
+      "the guard must pass the green as a thunk — without it a bar only sees this instance's history",
+    );
+    // THE THUNK STILL ASKS THE CLAIMS, and it also takes off what is owed. A
+    // state signed before a token existed reads green by its claim and owes one
+    // by its store, and a bar reading the claim alone counted an unwalked
+    // branch as delivered.
+    assert.match(
+      source,
+      /private greenNow\([\s\S]{0,400}this\.claims\.recordDone\(m\)/,
+      "the green is still the claims, with owed work subtracted",
     );
     const kernel = readFileSync(fileURLToPath(new URL("../engine/machine.ts", import.meta.url)), "utf8");
     assert.match(kernel, /standsGreen\(k\.split\("->"\)\[0\]\)/, "the busbar test must ask standsGreen, not the history set alone");
@@ -277,7 +286,7 @@ describe("the token set", { concurrency: true }, () => {
   });
 });
 
-// THE POSITION A REOPEN LEAVES BEHIND (owner, 2026-08-13).
+// THE POSITION A REOPEN LEAVES BEHIND.
 //
 // Re-pinning i3 from patch to minor moved the demands of eight standing steps,
 // and the reopen put a token on all eight. The owner opened the mirror and saw

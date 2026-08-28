@@ -12,7 +12,7 @@ import { join } from "node:path";
 import { test } from "node:test";
 import { Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
-import { call, freshRoot } from "./helpers.ts";
+import { call, freshRoot, pullThrough } from "./helpers.ts";
 
 test("the first packet names every document the way to the target demands", () => {
   const root = freshRoot();
@@ -50,9 +50,10 @@ test("one multi-read of the listed set carries the whole walk to the target", as
   const got = await call(server, "se_file_read", { paths: reads });
   assert.equal(got.isError, false, JSON.stringify(got.body));
 
-  // ONE pull walks the whole way on those credits: no read instruction,
-  // straight to `do`, arrived at the default target.
-  const walked = await call(server, "se_pull");
+  // THE PULLS WALK THE WHOLE WAY on those credits: no read instruction, and
+  // the only thing left to do on the way is boot's own marked step, which a
+  // walker does before it pulls again.
+  const walked = await pullThrough(server, session);
   assert.equal(walked.body.pull, "do", JSON.stringify(walked.body));
   assert.equal(walked.body.arrived, true, "the way was walked on the reading the packet named");
   assert.deepEqual(session.active(), ["front_desk"]);
@@ -64,7 +65,7 @@ test("the list goes away once the target is reached", async () => {
   const server = buildServer(root, session);
   const reads = (session.packet() as { route_reads: string[] }).route_reads;
   await call(server, "se_file_read", { paths: reads });
-  const walked = await call(server, "se_pull");
+  const walked = await pullThrough(server, session);
   assert.equal(walked.body.arrived, true, JSON.stringify(walked.body));
   const after = session.packet() as { target: string; route_reads?: string[] };
   assert.equal(after.target, "", "arriving clears the target");

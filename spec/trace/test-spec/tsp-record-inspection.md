@@ -32,9 +32,9 @@ teeth; until then the inspection carries it.
 Inspection per record at its gate, and per corpus sweep at the retro.
 One checklist item per claim, each with its pass criterion.
 
-## TWO ITEMS NOW HAVE A RUNNER (i33, 2026-08-17)
+## THREE ITEMS NOW HAVE A RUNNER (i33 2026-08-17, item 13 added 2026-08-24)
 
-`engine/bin/record-inspect.ts` answers items 11 and 12, and it runs at the
+`engine/bin/record-inspect.ts` answers items 11, 12 and 13, and it runs at the
 boot's exit beside the sweep.
 
 - ITEM 11 PASSES CLEAN across the whole corpus: every story, use case,
@@ -55,6 +55,27 @@ HOW THE TWO WERE FOUND. i33's verification tester ran ONE of the twelve by
 hand and took the no-runner argument as the verdict for the other eleven,
 then said so itself: "I did not run them because the runner argument gave me a
 defensible verdict without the work." Two of the eleven turned out mechanical.
+
+### ITEM 13 — NO FIELD REPORT IS IN VERSION CONTROL
+
+THE FIELD REPORT IS PRIVATE DATA (owner ruling 2026-08-21). It is written for
+one person, it is not a corpus document, and it is delivered as a file that
+person downloads.
+
+WHERE IT MAY LIVE is `.se/`, which is gitignored. Anywhere else is a finding.
+
+WHY IT BECAME A CHECK. The rule stands in the contract and twice in the
+cloud-runner card, and two reports were committed anyway — 3,584 lines across
+two records, which no guidance, machine or register entry ever cited. The owner
+named the pattern directly: "I want field reports, but I want them as
+downloadable files and not in Git, and some agents mess that up."
+
+THE FINDING NAMES THE RIGHT HOME, not only the fault. An agent that put the
+file in the wrong place needs to be told where it goes.
+
+OBSERVED FAILING BEFORE IT FIRST PASSED, 2026-08-24: green on the clean tree,
+RED with exit 1 on a report planted in a record's folder, green again once it
+was removed.
 
 ## Checklist
 

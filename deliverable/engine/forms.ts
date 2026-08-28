@@ -249,12 +249,31 @@ export function withSignedOff(instanceRaw: string, when: string): string {
  *  Returns the raw unchanged where the verdict already reads the same, so a
  *  judgment that keeps agreeing with itself never rewrites the file.
  *  see dsp-the-work-account.md#interface */
-export function withJudgment(instanceRaw: string, verdict: string, when: string): string {
-  const line = `judgment: ${verdict} at ${when}`;
-  const standing = /^judgment: (.+?) at /m.exec(instanceRaw)?.[1];
-  if (standing === verdict) return instanceRaw;
+export function withJudgment(instanceRaw: string, verdict: string, when: string, stamp = ""): string {
+  // THE STAMP RIDES THE LINE so a later session can tell whether the verdict is
+  // still about the same question. Without it the verdict on disk says what was
+  // decided and not what it was decided ABOUT, so nobody can reuse it and every
+  // session re-runs every judgment.
+  // see dsp-the-walk-knows-what-its-own-hops-cost.md#a-green-state-walked-over-keeps-its-verdict
+  const line = `judgment: ${verdict} at ${when}${stamp === "" ? "" : ` with ${stamp}`}`;
+  const held = judgmentOf(instanceRaw);
+  // A JUDGMENT THAT AGREES WITH ITSELF NEVER REWRITES, and that now means BOTH
+  // halves agreeing. A verdict reached against different scripts is news even
+  // when the word is the same.
+  if (held?.verdict === verdict && held.stamp === stamp) return instanceRaw;
   if (/^judgment:/m.test(instanceRaw)) return instanceRaw.replace(/^judgment:.*$/m, line);
   return afterAnchor(instanceRaw, line);
+}
+
+/** The verdict standing on a form, and what it was reached with.
+ *
+ *  THE STAMP IS EMPTY on a line written before stamps existed, which reads as
+ *  "cannot be reused" rather than as "matches nothing" — an older verdict is
+ *  still true, it just cannot be checked against today's scripts. */
+export function judgmentOf(instanceRaw: string): { verdict: string; stamp: string } | undefined {
+  const m = /^judgment: (.+?) at (\S+)(?: with (.*))?$/m.exec(instanceRaw);
+  if (m === null) return undefined;
+  return { verdict: m[1], stamp: (m[3] ?? "").trim() };
 }
 
 /** see dsp-evidence-forms.md#nothing-writes-a-suspect-mark-any-more */

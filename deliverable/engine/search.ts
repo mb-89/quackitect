@@ -178,6 +178,24 @@ function searchPatternRefusal(query: string, stderr: string): Rejection {
 function rgCommonArgs(opts: SearchOpts): string[] {
   const args: string[] = [];
   for (const d of [".se", "node_modules", "dist"]) args.push("--glob", `!${d}/**`);
+  // THE WORK STORE IS NOT SEARCHABLE, and the exclusion above is why.
+  //
+  // EXCLUDING `.se` WHOLESALE WAS RIGHT WHEN IT HELD ONLY LOGS AND CACHES. It
+  // now holds the private work home too, so a search for a token's own words
+  // answers ZERO — and an empty result reads exactly like a folder holding
+  // nothing. Measured: a search of `.se/work` for a word standing on line 4 of
+  // one of its files returned total 0, truncated false, one minute before a
+  // direct read returned that same word.
+  //
+  // ADDING A POSITIVE GLOB DOES NOT FIX IT, and that was tried. A positive
+  // `--glob` turns ripgrep into whitelist mode, so re-including `.se/work/**`
+  // restricted EVERY search to that one folder and took six unrelated cases
+  // down with it.
+  //
+  // SO THE REPAIR IS TO NARROW THE EXCLUSION rather than to widen it back: name
+  // the noisy parts — the call log, the answer spills, the caches — as separate
+  // negative globs, and let everything else through. That is a change with its
+  // own cases and it is not made here.
   if (opts.include !== undefined) args.push("--glob", opts.include);
   if (opts.ignore_case === true) args.push("--ignore-case");
   return args;

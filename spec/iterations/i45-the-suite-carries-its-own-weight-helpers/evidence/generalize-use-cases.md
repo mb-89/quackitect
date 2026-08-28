@@ -2,9 +2,9 @@
 form: generalize-use-cases
 by: agent
 signed_off: 2026-08-21T12:21:53.875Z
-reopened: "2026-08-21T12:21:26.433Z — No story delta does not establish that no existing use case changes. The signed nil claim must be re-evaluated against the shared-helper and test-run workflows."
+reopened: 2026-08-21T12:21:26.433Z — No story delta does not establish that no existing use case changes. The signed nil claim must be re-evaluated against the shared-helper and test-run workflows.
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / generalize-use-cases

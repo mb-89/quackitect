@@ -13,7 +13,7 @@ refines:
 source_refs:
   - uc-install-quackitect step 2
   - raid-iss-the-collapse-hides-the-one-thing-a-newcomer-must-run
-  - "sty-ramp-up slide 2, and reports/rpt-ramp-up.md, which has owed a fresh-machine run with a real first-timer since i1"
+  - sty-ramp-up slide 2, and reports/rpt-ramp-up.md, which has owed a fresh-machine run with a real first-timer since i1
   - "prior art, GitHub's own documentation: a readme at the repository root is surfaced automatically to visitors — on the website, not in an editor"
   - "prior art, the setup-script convention: its own readme says it works because contributors already know the pattern"
 priority: must

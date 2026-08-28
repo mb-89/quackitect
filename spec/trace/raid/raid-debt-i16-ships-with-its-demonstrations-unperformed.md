@@ -10,16 +10,19 @@ type: "[[raid]]"
 kind: debt
 statement: The four demonstrations this iteration authored are drawn and none of them has been performed, so the iteration ships with every claim that needs a person watching standing on a drawing rather than on an observation.
 owner: the owner
-looked: 2026-08-20
+looked: 2026-08-26
 status: open
 breaks_how_badly: crippling
 how_likely: expected
-impact: "Both headline capabilities are proved only inside this repository. The pass line of the two must requirements is a machine holding nothing of the source, and nothing has ever been run on one. A vehicle that works here and fails there looks identical from here."
+impact: Both headline capabilities are proved only inside this repository. The pass line of the two must requirements is a machine holding nothing of the source, and nothing has ever been run on one. A vehicle that works here and fails there looks identical from here.
 source_refs:
   - raid-iss-the-vehicle-demonstration-has-never-been-performed
   - tsp-a-vehicle-is-made-and-then-drives-something-else
   - req-one-command-produces-a-complete-copy
   - req-the-system-runs-in-a-tree-that-is-not-its-own
+last_looked: 2026-08-23
+look_verdict: rescheduled
+place: backlog
 ---
 
 ## What was taken, and by whom
@@ -106,3 +109,19 @@ is about, so nothing here moved.
 THE LOOK IS THE POINT. A debt nobody re-reads is a lie in the ledger, and this
 line is the evidence that somebody read it on this date.
 
+## Swept 2026-08-26, at i54's closing retro: RE-ACCEPTED
+
+NOT ADVANCED THIS WINDOW. i54 performed its own three demonstrations and left this record's untouched.
+
+RE-ACCEPTED consciously, trigger unchanged.
+
+
+SWEPT 2026-08-28, at i63's closing retro: RE-ACCEPTED, AND IT CARRIES NO
+TRIGGER.
+
+Nothing brings it due. It is one of three open debts in that state.
+
+THE TRIGGER IT SHOULD CARRY: the consolidation pass that collects everything
+needing a person, which is the same moment
+raid-debt-human-observed-demonstrations already names. Two entries waiting on
+one moment should share its wording, so a single act closes both.

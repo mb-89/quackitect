@@ -1,0 +1,46 @@
+properties:
+  statement:
+    displayName: statement
+    opensNote: true
+filters:
+  and:
+    - type == "[[work]]"
+    - status != "done"
+    - status != "dropped"
+    - status != "superseded"
+views:
+  - type: table
+    name: left
+    order:
+      - statement
+      - status
+      - file.ctime
+    groupBy:
+      - property: if(bucket, bucket, place)
+        direction: ASC
+    columnSize:
+      statement: 745
+      status: 106
+    collapsed:
+      - backlog
+      - retro
+    sort:
+      - property: status
+        direction: ASC
+    filters:
+      and:
+        - type == "[[work]]"
+        - status != "dropped"
+        - status != "superseded"
+        - status != "done"
+  - type: table
+    name: right
+    order:
+      - statement
+      - status
+    groupBy:
+      - property: if(bucket, bucket, place)
+        direction: ASC
+    collapsed:
+      - backlog
+      - retro

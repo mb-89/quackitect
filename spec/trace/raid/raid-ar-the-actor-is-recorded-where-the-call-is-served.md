@@ -10,7 +10,7 @@ status: open
 looked: 2026-08-20
 impact: The declared architecture names a rung and never a model, so nothing in this tree learns which model a rung resolved to. The record carries both the named driver and the answering one, the second self-reported, and nothing independent can check the self-report. What the scenario asks a reader to take from the record is there and unverifiable.
 breaks_how_badly: corrosive
-amended: "2026-08-20 — the impact said the answering driver can never be recorded. It can, self-reported, as it is on every line; what is lost is the cross-check. The over-statement came from the candidate node and reached five artifacts before a cold pass read the requirement instead of the citation."
+amended: 2026-08-20 — the impact said the answering driver can never be recorded. It can, self-reported, as it is on every line; what is lost is the cross-check. The over-statement came from the candidate node and reached five artifacts before a cold pass read the requirement instead of the citation.
 how_likely: expected
 source_refs:
   - evaluate-architecture, the scenario walk's verdict

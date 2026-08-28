@@ -2,12 +2,12 @@
 minted_in: i38-the-machine-sizes-its-own-driver-every-s
 id: req-a-machine-decision-repeats
 type: "[[requirement]]"
-statement: "While the inputs a decision reads are unchanged, the engine shall return the same decision on every machine and at every repetition, and shall record what it read."
+statement: While the inputs a decision reads are unchanged, the engine shall return the same decision on every machine and at every repetition, and shall record what it read.
 kind: quality
 fitness_candidate: true
 characteristic: reliability
 verify_method: test
-breaks_if_removed: "A walk stops being replayable. Two machines given the same record reach different answers with nothing to say why, and a finished record can no longer be audited — only re-run and hoped over."
+breaks_if_removed: A walk stops being replayable. Two machines given the same record reach different answers with nothing to say why, and a finished record can no longer be audited — only re-run and hoped over.
 breaks_how_badly: crippling
 refines:
   - uc-quality-reliability
@@ -26,6 +26,22 @@ weighs_against:
   - req-the-answer-never-exceeds-its-bound >
 weighs_with: none
 ---
+
+## Scenario
+
+- source: anybody re-running a decision the engine already made — an auditor, a
+  second machine, the same machine a week later
+- stimulus: the decision is asked for again while every input it reads is
+  unchanged
+- artifact: the deciding path, and the record it writes
+- environment: any supported host, any model, with the record committed and the
+  inputs untouched between the two asks. No process from the first answer
+  survives, so nothing in memory can carry the answer across
+- response: the same decision comes back, and the record names what was read to
+  reach it
+- response measure: decisions differing across repetitions with unchanged
+  inputs = 0, across repetitions and across machines; decisions recorded
+  without their inputs = 0
 
 ## Why this axis did not exist and why it is needed now
 

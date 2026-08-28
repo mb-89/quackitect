@@ -2,9 +2,9 @@
 form: build-steps
 by: agent
 signed_off: 2026-08-20T10:47:33.448Z
-reopened: "2026-08-20T10:47:14.039Z — two of its chunks are grey again, so its summary cannot stand"
+reopened: 2026-08-20T10:47:14.039Z — two of its chunks are grey again, so its summary cannot stand
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / build-steps

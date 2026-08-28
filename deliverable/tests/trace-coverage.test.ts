@@ -1,5 +1,4 @@
-// THE TRACE IS CHECKED BOTH WAYS, AT EVERY LAYER, OVER THE WHOLE TRACE
-// (owner ruling 2026-08-06).
+// THE TRACE IS CHECKED BOTH WAYS, AT EVERY LAYER, OVER THE WHOLE TRACE.
 //
 // A REGISTER BELONGS TO ONE ITERATION. A node written in an earlier iteration
 // is not in this iteration's register and never will be. So register
@@ -139,7 +138,18 @@ describe("the live offer against the trace", () => {
     // seeing the other — so taking either wholesale would have left the ratchet
     // one short, and the next verb to arrive would have "confirmed" a number
     // that was already stale. Confirmed here: the enumerator sees both.
-    assert.equal(registeredVerbs().length, 40, "the lane's verb count moved — confirm the enumerator still sees every one");
+    // 41 WITH se_probe_cap, the ladder that measures what a host will actually
+    // take. Confirmed: the enumerator saw it and reported it as untraced until
+    // uc-quality-performance-efficiency named it, which is the check working.
+    // 44 WITH THREE MORE: se_couplings, se_park and se_stop. Confirmed by an
+    // overhaul sweep — the enumerator saw all three, se_couplings was already
+    // traced, and the other two were reported as untraced until
+    // uc-open-an-iteration and uc-take-a-step named them. The check working.
+    // 45 WITH se_work, the door onto a work token. It was reported as untraced
+    // until uc-work-a-states-work-tokens-to-completion named it, which is the
+    // check working: the verb existed, and no use case said what anybody does
+    // with it.
+    assert.equal(registeredVerbs().length, 45, "the lane's verb count moved — confirm the enumerator still sees every one");
     assert.ok(traceText().length > 10000, "the trace read as good as empty — the path or the walk is wrong");
     assert.ok(traceText("use-case").length > 10000, "the use-case layer read as good as empty");
   });

@@ -4,7 +4,7 @@ by: agent
 signed_off: 2026-08-20T20:44:28.778Z
 reopened: "2026-08-20T20:44:27.168Z — the sizing half this chunk was missing now exists: the-answer-rides-the-pull is built, so the named driver a walker sends back is a value the walk already published rather than a string with nothing behind it."
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / a-weaker-walk-carries-its-reason

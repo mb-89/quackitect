@@ -6,7 +6,7 @@
 // see dsp-lane-door.md#the-verbs-are-grouped-by-what-they-touch
 import { readFileSync } from "node:fs";
 import { CallLog } from "./calllog.ts";
-import { CLAUSES, Rejection } from "./errors.ts";
+import { CLAUSES, Rejection, refuseProseWall } from "./errors.ts";
 import { appendNote, drainNote, type Priority, readNotes } from "./inbox.ts";
 import { LINT_CONFIG, lintProse } from "./lint.ts";
 import type { ToolDef } from "./mcp.ts";
@@ -18,22 +18,6 @@ import { survey } from "./survey.ts";
 import type { ReadingHook } from "./tools-file.ts";
 import { loadTrace, type TraceNode, uncoveredOf } from "./trace.ts";
 import { webFetch, webSearch } from "./web.ts";
-
-/** see dsp-lane-door.md#build-the-server */
-function refuseProseWall(tool: string, field: string, text: string): void {
-  if (text.length <= 300 || text.includes("\n")) return;
-  throw new Rejection({
-    clause: CLAUSES.PROSE_WALL,
-    expected: `${field} broken into lines — paragraphs and list lines survive every render`,
-    got: `${text.length} chars without a single line break — renders as a wall`,
-    remedy: {
-      tool,
-      args: { [field]: "<the same text with real line breaks>" },
-      note: "shape it like prose: short paragraphs, one list item per line",
-    },
-    source: "engine/tools.ts prose-wall",
-  });
-}
 
 export function deskTools(
   rootOf: (rel?: string) => string,
@@ -78,7 +62,7 @@ export function deskTools(
       name: "se_note",
       title: "se.note",
       description:
-        "Capture a stray — an idea, a bug, a better way — without leaving the state (contract rule 4). Machine-local (.se/notes.jsonl), never committed; joins the mirror's log feed; drained at a retro, later. CAPTURING IS MEANT TO BE CHEAP: give it a title, judge the priority yourself, and keep walking. Never ask the person what a stray is worth.",
+        'Capture something for the NEXT RETRO — a doubt about the process, a lead nobody can act on yet, a better way that belongs to a later discussion. Machine-local (.se/notes.jsonl), never committed; joins the mirror\'s log feed; drained at a retro, later.\n\nA WORK TOKEN IS THE DEFAULT AND THIS IS THE EXCEPTION (contract rule 4). Can you name the state where the thing gets done? Then it is se_work {act: "open"}, not a note. Work assignable to a state the walk is going into anyway is a token, and a note routed at such a state is a finding nobody sees for a fortnight.\n\nCAPTURING IS MEANT TO BE CHEAP: give it a title, judge the priority yourself, and keep walking. Never ask the person what a stray is worth.',
       inputSchema: {
         type: "object",
         properties: {
@@ -107,7 +91,6 @@ export function deskTools(
             source: "engine/tools.ts se_note",
           });
         }
-        refuseProseWall("se_note", "text", text);
         return appendNote(seDir(projectRoot), text, "agent", title, args.priority as Priority | undefined);
       },
     },
@@ -294,7 +277,7 @@ export function deskTools(
       name: "se_survey",
       title: "se.survey",
       description:
-        "WHAT STANDS OPEN — one mechanical call: open expeditions, open iterations, pending notes, and the standing WORK TOKENS in the options pool with their ready-when, read from the REPOSITORY so any clone sees the same answer. Everything that can be up is here, so there is only ever ONE inbox to understand. Notes and backlog list as title plus MoSCoW priority, highest first; read any one in full with se_log_query {ref}. The front desk and the retro open with it. The person asks the same question in the mirror, from the machine's header.",
+        "WHAT STANDS OPEN — one mechanical call: open expeditions, open iterations, pending notes, and the standing WORK TOKENS in the options pool with their ready-when, read from the REPOSITORY so any clone sees the same answer. Everything that can be up is here, so there is only ever ONE inbox to understand. Notes and backlog list as title plus MoSCoW priority, highest first; read any one in full with se_log_query {ref}. A `passed_moments` block rides along when a backlog item is waiting on a record that has already shipped or been abandoned — that item's moment came and went, so it wants rerouting rather than more waiting. The front desk and the retro open with it. The person asks the same question in the mirror, from the machine's header.",
       inputSchema: {
         type: "object",
         properties: {
@@ -335,6 +318,11 @@ export function deskTools(
               "{tool?, ok?, since?, text?, min_ms?} — since: an ISO timestamp, or 'last_retro' (everything after the previous retro, which is the newest carried/backlog drain — the desk cannot make those). text: a case-insensitive substring over the whole record, for finding a TOPIC without reading every hit. min_ms: only records at least this slow — the slowness mine over every door, one-second rule and all",
           },
           group_by: { type: "string", description: "e.g. 'tool' or 'outcome'" },
+          timings: {
+            type: "boolean",
+            description:
+              "with group_by: what each group COST as well as how many there were — n, total_ms, min, median, p90, max. THE MINIMUM IS THE ONE THAT CATCHES A FIXED TOLL: a verb whose fastest call in four days is 1,342 ms is not doing 1,342 ms of work. A count alone cannot see that",
+          },
           limit: { type: "number", default: 20 },
           offset: { type: "number", description: "how many records back from the newest to start — 0 is the newest window" },
         },
@@ -365,6 +353,7 @@ export function deskTools(
         return log.query({
           ...(args.filter !== undefined ? { filter: args.filter as { tool?: string; ok?: boolean; since?: string } } : {}),
           ...(args.group_by !== undefined ? { group_by: String(args.group_by) } : {}),
+          ...(args.timings !== undefined ? { timings: args.timings === true } : {}),
           ...(args.limit !== undefined ? { limit: Number(args.limit) } : {}),
           ...(args.offset !== undefined ? { offset: Number(args.offset) } : {}),
         });

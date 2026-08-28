@@ -4,7 +4,7 @@ unreachable_refs:
 minted_in: i37-training-iterations-a-disposable-iterati
 id: if-benchmark-binding-to-report
 type: "[[interface]]"
-statement: "The binding hands the report the three conditions no log holds and the window the run occupied, and the report reads nothing else from it."
+statement: The binding hands the report the three conditions no log holds and the window the run occupied, and the report reads nothing else from it.
 source: el-benchmark-binding
 destination: el-benchmark-report
 carries:

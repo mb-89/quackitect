@@ -21,16 +21,18 @@ evidence:
     of: raid
     description: the decision entries in the register - one raid id of kind decision per line, each traced
 major: full
+major_complexity: C3/R3
 minor: none
 patch: none
 product: full
+product_complexity: C3/R3
 specification: full
 major_note: |
   Applies in full: every deciding ADR traced to the requirement or
   quality that forced it, rejected options as history. The why lives
   once, here.
 minor_note: |
-  Does not apply (owner ruling 2026-08-13). A minor makes no architecture
+  Does not apply. A minor makes no architecture
   decisions, so there is no decision to record.
 
   ESCALATE: a choice worth an ADR is the architecture moving. Promote the
@@ -56,7 +58,7 @@ specification_note: |
 
 The why lives once, here.
 
-A DECISION IS A REGISTER ENTRY (owner ruling 2026-08-10): a raid node with
+A DECISION IS A REGISTER ENTRY: a raid node with
 `kind: decision`, in the same folder as the risks it sits beside. An ADR is
 nothing extra — it is a decision whose `breaks_how_badly` grades crippling
 or worse. The decisions chapter derives from the register, filtered.
@@ -87,7 +89,7 @@ decade of real use taught it.
 ## The prior-art back-check
 
 A CHOSEN DESIGN THAT RE-DERIVES EXISTING PRIOR ART OWES A STUDY OF THE
-ORIGINAL (owner ruling 2026-08-18). It runs here, and it is the back end of
+ORIGINAL. It runs here, and it is the back end of
 [[meth-prior-art]], which is the front end.
 
 WHY HERE AND NOT AT THE SEARCH. At the search there is no winner yet, so there

@@ -76,7 +76,7 @@ function standingAt(id) { return WALK_HERE && CURRENTS.indexOf(id) >= 0; }
 let WALK_HERE = D.viewingWalk;
 function nextTable(id, s) {
   const here = standingAt(id);
-  // THE NEW WAY (owner ruling 2026-07-30): the host's own elements, the same
+  // THE NEW WAY: the host's own elements, the same
   // ones the facts and the pull already use. A bordered table nested inside
   // another bordered table was the last of the old rendering left in here.
   const field = (k, v) => (v === undefined || v === null || v === "") ? ""
@@ -116,7 +116,7 @@ function pulledView(pulled) {
   const bySource = {};
   for (const p of pulled) for (const src of p.sources) (bySource[src] ??= []).push(p);
   // The engine calls the always-on set "root". The reader sees a PULL, and
-  // that is the word the fold wears (owner ruling 2026-07-30).
+  // that is the word the fold wears.
   const SRC_LABEL = { root: "pull" };
   return Object.entries(bySource).map(([srcName, docs]) => {
     const done = docs.filter(docChecked).length;
@@ -173,7 +173,7 @@ function stateDetail(id) {
   }
   if (s.archive_record !== undefined) {
     const e = s.archive_record;
-    // ONE rendering, in the table (owner ruling 2026-07-27): the ruling is
+    // ONE rendering, in the table: the ruling is
     // its own key; report is a LINK opening the big modal (ctrl: tab,
     // shift: window). No duplicate prose below.
     if (!e) html += '<div class="vnull">no record found</div>';
@@ -184,9 +184,6 @@ function stateDetail(id) {
         + ((e.ruling || e.report) ? '<tr><td class="k">ruling</td><td class="v">' + escText(e.ruling || e.report) + "</td></tr>" : "")
         + '<tr><td class="k">report</td><td class="v"><a class="replink" data-exp="' + escText(e.id) + '" data-path="spec/expeditions/' + escText(e.id) + '/report.md" data-title="report · ' + escText(e.id) + '" title="click: modal · ctrl-click: new tab · shift-click: new window">report.md</a></td></tr>'
         + "</table>";
-      // The decision history, one expandable section per visit — the same
-      // tree the log click renders, collapsed by default (owner ruling).
-      html += '<div class="recdecisions" data-exp="' + escText(e.id) + '"><div class="meta">loading decisions…</div></div>';
     }
   }
   html += '<div class="statetodos" data-state="' + id + '"></div>';
@@ -215,7 +212,7 @@ function morph(from, to) {
   for (const a of to.attributes) if (!(keepsStyle && a.name === "style") && from.getAttribute(a.name) !== a.value) from.setAttribute(a.name, a.value);
   for (const a of [...from.attributes]) if (!to.hasAttribute(a.name) && !(keepsStyle && a.name === "style")) from.removeAttribute(a.name);
   // A control under the reader's hand stays theirs until they leave it.
-  if (from.tagName === "INPUT" && from !== document.activeElement && to.hasAttribute("value")) from.value = to.getAttribute("value");
+  if (from.tagName === "INPUT" && !sePlaceIsEdited(from) && to.hasAttribute("value")) from.value = to.getAttribute("value");
   const byId = new Map();
   for (const c of from.children) if (c.id !== "") byId.set(c.id, c);
   let cur = from.firstChild;
@@ -243,7 +240,7 @@ function rebind() {
   if (CURRENT_DETAIL) { const dp = detailFor(CURRENT_DETAIL); showDetails(dp[0], dp[1]); }
 }
 let refreshInFlight = false;
-// ONE ACTION, ONE LOAD (owner 2026-07-28). A tick both navigates this page
+// ONE ACTION, ONE LOAD (owner ). A tick both navigates this page
 // and wakes /events, so the outgoing page used to fetch itself again on its
 // way out — the archive visibly loaded twice. Once we are leaving, we leave.
 let navigatingAway = false;
@@ -257,6 +254,10 @@ const PLACE = [
   // up, so the flag spreads nowhere it does not belong.
   ["frozen", () => (FROZEN ? "1" : null)],
   ["embed", () => (EMBED_Q ? "1" : null)],
+  // THE EDITOR IS A PLACE TOO. Following a place heading out of the editor
+  // changes the machine on screen, and a reload that dropped the editor would
+  // reset one pane for an act performed in another.
+  ["work", () => (typeof window.seWorkAt === "function" ? window.seWorkAt() : null)],
 ];
 /** Carry the place onto a URL the reader is NAVIGATING to. */
 function withPlace(url) {
@@ -318,7 +319,7 @@ async function refresh(detail) {
   if (navigatingAway) return;
   if (detail !== undefined) CURRENT_DETAIL = detail;
   const q = new URLSearchParams(location.search);
-  // THE VIEW HOLDS STILL (owner ruling 2026-07-28): finishing a state is
+  // THE VIEW HOLDS STILL: finishing a state is
   // data change, and data change never jumps the reader — every refresh
   // pins the machine being looked at explicitly.
   q.set("view", D.viewed.id);
@@ -431,7 +432,7 @@ document.addEventListener("click", async (ev) => {
     return;
   }
   // A FILE LINK OPENS THE FILE, in the editor the host already has (owner
-  // ruling 2026-08-06). The pane render is the FALLBACK, for the standalone
+  // ruling ). The pane render is the FALLBACK, for the standalone
   // browser where there is no editor to open into.
   const dl = ev.target.closest ? ev.target.closest(".doclink") : null;
   if (dl) {

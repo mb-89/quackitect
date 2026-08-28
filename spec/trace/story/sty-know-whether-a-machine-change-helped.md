@@ -2,7 +2,7 @@
 minted_in: i37-training-iterations-a-disposable-iterati
 id: sty-know-whether-a-machine-change-helped
 type: "[[story]]"
-statement: "When I change the process machine and want to know whether it helped, without waiting for the next real iteration to form an impression, I want the same finished iteration re-walked on both machine versions, so I get a paired number instead of a feeling."
+statement: When I change the process machine and want to know whether it helped, without waiting for the next real iteration to form an impression, I want the same finished iteration re-walked on both machine versions, so I get a paired number instead of a feeling.
 actor: stk-engineer-driving-agents
 refines:
   - vp-rigor-without-toil

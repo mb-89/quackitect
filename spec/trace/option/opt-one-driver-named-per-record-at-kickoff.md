@@ -4,9 +4,9 @@ id: opt-one-driver-named-per-record-at-kickoff
 type: "[[option]]"
 cluster: the-sizing
 question: what unit gets a driver named
-statement: "the machine names one driver for the whole record at kickoff and never revisits it, so a walk runs on one hand from onboard-retro to shipped"
+statement: the machine names one driver for the whole record at kickoff and never revisits it, so a walk runs on one hand from onboard-retro to shipped
 found_by: transform
-source: "SCAMPER Substitute applied to cluster-the-sizing — swap the unit the decision is made over"
+source: SCAMPER Substitute applied to cluster-the-sizing — swap the unit the decision is made over
 ---
 
 ## Mechanism

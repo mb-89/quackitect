@@ -21,7 +21,7 @@
 //
 //   node engine/bin/battery.ts --root <project root>
 import { spawnSync } from "node:child_process";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { failureSummary } from "../testreporters.ts";
 
@@ -31,6 +31,27 @@ function argValue(flag: string): string | undefined {
 }
 
 const root = argValue("--root") ?? process.cwd();
+
+/** THE VERDICT IS WRITTEN DOWN, not only printed.
+ *
+ *  THIS SCRIPT IS RUN AS A STATE'S LEAVING JUDGMENT, and a judgment's stdout is
+ *  not always kept where a reader can reach it. When it is not, the repair
+ *  state is told its confirm run failed and shown nothing — which is the one
+ *  thing that state cannot work with, because the findings ARE its input.
+ *
+ *  MEASURED: a confirm run reported `not passed` with an empty output field,
+ *  and the failures were unreachable from the walk that had to fix them.
+ *
+ *  A WRAPPER NEVER SWALLOWS WHAT IT WRAPS — guidance/refusals.md says so about
+ *  every check, and this is that rule applied to the check's own transport. */
+function record(text: string): void {
+  try {
+    mkdirSync(join(root, ".se"), { recursive: true });
+    writeFileSync(join(root, ".se", "battery-last.txt"), text, "utf8");
+  } catch {
+    // A verdict that cannot be filed must not become the reason there is none.
+  }
+}
 const row = join(root, "deliverable", "machines", "rigor_matrix", "rows", "M7_50_verification.md");
 
 if (!existsSync(row)) {
@@ -70,7 +91,9 @@ if (!existsSync(row)) {
     process.stdout.write("##progress 1 1 done\n");
     const out = `${r.stdout ?? ""}${r.stderr ?? ""}`;
     if (r.status === 0) {
-      process.stdout.write(`battery green — ${command}\n`);
+      const green = `battery green — ${command}\n`;
+      record(green);
+      process.stdout.write(green);
     } else {
       // EVERY FAILURE IS NAMED, GROUPED BY FILE, BEFORE THE TAIL.
       //
@@ -79,7 +102,11 @@ if (!existsSync(row)) {
       // of them, and a run with fifty red lost the rest. What a reader needs
       // first is which files are red and how many in each, and that is the
       // part a tail drops.
-      process.stdout.write(`battery RED — ${command} exited ${String(r.status)}\n\n${failureSummary(out)}\n${out.slice(-6000)}\n`);
+      const red = `battery RED — ${command} exited ${String(r.status)}\n\n${failureSummary(out)}\n`;
+      // THE FILED COPY CARRIES THE WHOLE RUN, not the tail. The tail is what a
+      // reader can be shown inline; the file is what the repair state reads.
+      record(`${red}\n${out}`);
+      process.stdout.write(`${red}${out.slice(-6000)}\n`);
       process.exitCode = 1;
     }
   }

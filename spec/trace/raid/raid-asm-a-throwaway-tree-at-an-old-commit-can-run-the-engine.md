@@ -3,14 +3,14 @@ minted_in: i37-training-iterations-a-disposable-iterati
 id: raid-asm-a-throwaway-tree-at-an-old-commit-can-run-the-engine
 type: "[[raid]]"
 kind: assumption
-statement: "A tree standing at an old commit can run the engine that was current then, so a benchmark walk gets past boot at all."
+statement: A tree standing at an old commit can run the engine that was current then, so a benchmark walk gets past boot at all.
 owner: the maintainer of the machine
 trigger: the first benchmark run that reaches its first pull
 status: open
-impact: "The run cannot start, and the failure looks like a broken benchmark rather than an incompatible checkout."
+impact: The run cannot start, and the failure looks like a broken benchmark rather than an incompatible checkout.
 breaks_how_badly: fatal
 how_likely: plausible
-probe: "HOLDS BY OWNER RULING 2026-08-19 — the CURRENT engine runs over a rewound tree. The owner: \"The engine that works of a rewound tree is the current engine. I think it is clear.\" So the rewind is CONTENT only, and the deliverable is never checked out at an old commit."
+probe: 'HOLDS BY OWNER RULING 2026-08-19 — the CURRENT engine runs over a rewound tree. The owner: "The engine that works of a rewound tree is the current engine. I think it is clear." So the rewind is CONTENT only, and the deliverable is never checked out at an old commit.'
 probed: 2026-08-19
 source_refs:
   - fn-the-benchmark-run.stand-a-throwaway-tree-and-bind-the-run

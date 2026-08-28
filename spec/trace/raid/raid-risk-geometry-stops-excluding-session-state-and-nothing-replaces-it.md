@@ -3,11 +3,11 @@ minted_in: i9
 type: "[[raid]]"
 id: raid-risk-geometry-stops-excluding-session-state-and-nothing-replaces-it
 kind: risk
-statement: "Session state is kept out of everything the product ships by sitting outside the packaged folder. The collapse moves it inside, so the exclusion has to become a written rule at the same moment, or it silently stops happening."
+statement: Session state is kept out of everything the product ships by sitting outside the packaged folder. The collapse moves it inside, so the exclusion has to become a written rule at the same moment, or it silently stops happening.
 owner: the driving agent
-trigger: "the first packaging or vendoring run after the machine-state folder moves"
+trigger: the first packaging or vendoring run after the machine-state folder moves
 status: open
-impact: "A packaged or vendored copy carries the raw call log and the raw note file. Both are documented as able to hold anything, and the note file is under a standing rule that it never enters version control. The product would be shipping them to whoever received the copy."
+impact: A packaged or vendored copy carries the raw call log and the raw note file. Both are documented as able to hold anything, and the note file is under a standing rule that it never enters version control. The product would be shipping them to whoever received the copy.
 breaks_how_badly: corrosive
 how_likely: expected
 source_refs:

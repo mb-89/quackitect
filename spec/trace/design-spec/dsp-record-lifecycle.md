@@ -2,24 +2,32 @@
 minted_in: i1
 id: dsp-record-lifecycle
 type: "[[design-spec]]"
-statement: records seeded, bound, landed and archived as folders on trunk, with generated container machines
+statement: records seeded, bound and landed as folders on trunk, folded to one file at close, with generated container machines
 realizes:
-  - "el-record-store"
-  - "if-front-desk-to-record-store"
+  - el-record-store
+  - if-front-desk-to-record-store
 files:
-  - "deliverable/engine/iterations.ts"
-  - "deliverable/engine/iterations-draw.ts"
-  - "deliverable/engine/records.ts"
-  - "deliverable/engine/seed.ts"
+  - deliverable/engine/iterations.ts
+  - deliverable/engine/iterations-draw.ts
+  - deliverable/engine/records.ts
+  - deliverable/engine/seed.ts
 ---
 
 ## Responsibility
 
 A record opens on the person's word, minted from templates as a FOLDER
 ON TRUNK. Entering binds; the pinned column compiles the walk live;
-closing refuses loose ends; the archive lists every closed record as it
-closed, and the folder stays where it is. The container machines —
-iterations, expeditions, archives — generate from what stands on disk.
+closing refuses loose ends, then FOLDS the record into one file and takes the
+folder off the working tree; the archive lists every closed record as it closed,
+from those folded files. The container machines — iterations, expeditions,
+archives — generate from what stands on disk.
+
+A FOLDER MEANS OPEN AND A FOLDED FILE MEANS CLOSED. That is what lets the
+archive list every closed record and zero live ones without asking anything
+else.
+
+THIS PARAGRAPH SAID THE FOLDER STAYS UNTIL i63. That was i34's ruling and it is
+reversed. The reversal is [[raid-dec-work-is-a-file-while-open-and-one-folded-file-once-closed]].
 
 ## Behavior and constraints
 
@@ -54,8 +62,15 @@ a read of the branch. Which one answered depended on what happened to exist.
 
 THE BRANCH READ IS GONE. A closed expedition's record used to live on its
 branch, so the reader fell back to reading that branch and cached the result
-because a closed branch never moves. The archive lives on disk now, so the
-folder is still there and there is nothing to retrieve.
+because a closed branch never moves.
+
+A CLOSED RECORD IS READ FROM ITS FOLDED FILE (i63), which stands on trunk like
+any other file. That is one read of one path, not a fallback chain, and it is
+not a branch read either.
+
+THE PRE-FOLD FOLDER IS STILL REACHABLE, at the commit the fold recorded. That is
+for anybody who wants the original shape file by file, and it is the only path
+that touches history.
 
 ## A disposition is agreed, never asserted
 
@@ -218,6 +233,31 @@ THE STATUSES A RECORD CANNOT BE WALKED FROM. One definition, because two
  readers disagreeing about what "open" means is the defect this replaces:
  the survey read the status and the container read the filesystem, so i28
  stood in one list and not the other on 2026-08-16.
+
+THERE ARE THREE, AND `abandoned` IS THE THIRD (owner ruling 2026-08-24).
+
+- `shipped` — the walk reached the end and the work is delivered.
+- `closed` — the same for a record that does not ship.
+- `abandoned` — THE RECORD IS PUT DOWN. It will not be walked, and nobody
+  is waiting for it.
+
+WHAT `abandoned` IS FOR. A record whose work is no longer wanted, or whose
+outcome arrived by another road while its own walk stood unfinished. Neither
+of the other two words can say that: `shipped` claims gates that never
+happened, and returning it to `seeded` claims work that was never begun.
+
+THE GAP IT CLOSES, measured 2026-08-24. One record stood open for four days
+with every one of its goals satisfied in the tree and three of its ten gates
+never walked. No word in the vocabulary fitted it, so it could not leave the
+open set at all.
+
+AN ABANDONED RECORD KEEPS EVERYTHING. Its folder, its evidence and its
+decisions stay exactly where they are. The standing is a statement about the
+future, never an erasure of the past.
+
+IT SAYS WHY, IN THE RECORD. A standing that does not carry its reason leaves
+the next reader to guess whether the work was wrong, overtaken, or merely
+dropped.
 
 ## The container is a dag
 
@@ -397,8 +437,11 @@ the 2026-07-28 ruling that closed records live in git and the tree carries
 only live work.
 
 THERE IS NOTHING TO MERGE, because a record's work is written on trunk from
-the first keystroke, and NOTHING TO RETIRE, because the archive reads the
-folder from disk.
+the first keystroke.
+
+THERE IS SOMETHING TO RETIRE AGAIN, AND IT IS NOT A MERGE (i63). Closing folds
+the record into one file and removes the folder. What went with `mergeAndRetire`
+was the BRANCH work; the removal comes back without it.
 
 WHAT WENT WITH THEM: the conflict handling, the abort, and the typed refusal
 that named the conflicting files. A merge that cannot happen cannot conflict.

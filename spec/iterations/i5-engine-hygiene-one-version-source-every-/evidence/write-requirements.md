@@ -2,9 +2,9 @@
 form: write-requirements
 by: agent
 signed_off: 2026-08-19T11:16:06.800Z
-reopened: "2026-08-19T11:15:42.876Z — a row I wrote in this state duplicated a standing one; splitting it into the reader half changed its kind to quality, and the six-part scenario was owed"
+reopened: 2026-08-19T11:15:42.876Z — a row I wrote in this state duplicated a standing one; splitting it into the reader half changed its kind to quality, and the six-part scenario was owed
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / write-requirements

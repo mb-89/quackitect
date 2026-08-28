@@ -13,11 +13,11 @@
 // because the cage's .mcp.json is fixed template text and cannot carry
 // per-launch arguments.
 //
-// ORDERED RELOADS ONLY (owner ruling 2026-07-27, after automatic swaps
+// ORDERED RELOADS ONLY (after automatic swaps
 // churned the walk): the shim holds the harness connection and forwards
 // JSON-RPC lines; the CHILD runs the engine, the session, and the mirror.
 // The shim NEVER watches sources and never swaps on its own. se_reload —
-// canary-guarded, idle-only, either hand — makes the child exit with code
+// canary-guarded, legal wherever the walk stands, either hand — makes the child exit with code
 // 42; the shim reads that as "respawn me on the new sources". The walk
 // reboots; boot re-proves the new engine green. SE_HOT_DISABLE=1 runs the
 // engine in-process instead (tests, debugging) — then a reload needs a
@@ -34,6 +34,7 @@ import { appendFileSync, existsSync, mkdirSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { createInterface } from "node:readline";
 import { fileURLToPath } from "node:url";
+import { reapAbandonedJobs, reapAbandonedTestJobs, takeWorkspace } from "../run.ts";
 import { SE_VERSION } from "../version.ts";
 
 const argv = [
@@ -164,6 +165,8 @@ ENGINE — read by the server (this file is where they are defined).
                  set it where there is no mirror to press — an unattended
                  box, whose settings store never restores a stored notch
                  because it recognises no session token.
+  --session-mode which guidance applies: attended (the default), unattended,
+                 or cloud. Env: SE_SESSION_MODE.
   --mirror-port  the embedded mirror's HTTP port (the human's hand on the
                  same walk). Default 7333. 0 disables. Env: SE_MIRROR_PORT.
   --headless     no stdio lane — agents attach over HTTP instead, at /mcp
@@ -235,7 +238,7 @@ if (argv.includes("--child") || process.env.SE_HOT_DISABLE === "1") {
   // VS Code only calls deactivate on an orderly close, so a killed or crashed
   // window never says anything. The survivor keeps the port AND its in-memory
   // session, so the next morning reopened yesterday's autonomy and yesterday's
-  // checked documents (found live 2026-07-30). Watch the parent instead.
+  // checked documents (found live ). Watch the parent instead.
   //
   // Only a host that CLAIMS a parent gets this. The classic launcher detaches
   // its terminal host on purpose and must go on outliving its window.
@@ -290,6 +293,10 @@ if (argv.includes("--child") || process.env.SE_HOT_DISABLE === "1") {
   // on a box with no mirror to press, nobody could move it: not the agent, who
   // may not, and not the person, who has no surface.
   const stopAtRaw = argValue("--stop-at") ?? process.env.SE_STOP_AT;
+  const sessionMode = argValue("--session-mode") ?? process.env.SE_SESSION_MODE ?? "attended";
+  if (sessionMode !== "attended" && sessionMode !== "unattended" && sessionMode !== "cloud") {
+    throw new Error(`se-mcp: --session-mode must be attended, unattended, or cloud; got ${sessionMode}`);
+  }
 
   // WHERE SATELLITES RUN, for THIS run only. One architecture, three
   // transports — process, thread, inline — and the argument wins over the
@@ -298,6 +305,7 @@ if (argv.includes("--child") || process.env.SE_HOT_DISABLE === "1") {
   //
   // A BAD VALUE STOPS THE LAUNCH, and that is deliberate: an unreadable stored
   const session = new Session(root); // fails fast on a misdrawn machine
+  session.setSessionMode(sessionMode);
   if (autonomyRaw !== undefined) session.setAutonomy(autonomyRaw); // a rung by name or a bare value; refuses either out of range
   if (stopAtRaw !== undefined) session.setStopAt(stopAtRaw); // a notch by name or a bare value; refuses either out of range
   // SESSION OVER — reaching end stops everything. The grace period lets the
@@ -326,6 +334,43 @@ if (argv.includes("--child") || process.env.SE_HOT_DISABLE === "1") {
     process.stderr.write("se-mcp: --headless serves the lane at /mcp on the mirror port — it cannot run with the mirror disabled\n");
     process.exit(1);
   }
+  // ONE INSTANCE SERVES ONE FOLDER. The workspace hold is a port derived from
+  // the folder itself, and it is NOT the mirror port below: the mirror is one
+  // shared window that a second agent may evict, while the workspace is this
+  // folder's own and a second server on it must stop.
+  //
+  // TWO SERVERS ON ONE FOLDER WRITE ONE CALL LOG AND ONE STATE FOLDER, so
+  // neither log is the whole trail. Settling entries a previous instance left
+  // behind is also only safe because one instance serves the folder.
+  //
+  // NOTHING IS WRITTEN DOWN TO CARRY THE HOLD. A record of it would outlive the
+  // process that made it, and a crash would leave a folder nobody can start in.
+  // see dsp-one-instance-holds-the-workspace.md
+  // THE HOLD IS DECIDED BEFORE ANYTHING TOUCHES THE FOLDER, and the await is
+  // the whole point. Booting first and asking afterwards let a refused second
+  // instance reap the FIRST instance's live jobs on its way out: the mirror's
+  // start reaps abandoned work synchronously, and a take that resolves from a
+  // socket callback cannot answer until a turn later.
+  //
+  // IT DOES NOT DEPEND ON THE MIRROR. The workspace port is derived from the
+  // folder alone, so a server started with the mirror disabled shares the
+  // folder just as dangerously and has to be stopped just the same.
+  const hold = await takeWorkspace(root);
+  if (!hold.held) {
+    process.stderr.write(`se-mcp: ${hold.by} — this server is stopping rather than sharing the folder\n`);
+    process.exit(1);
+  }
+  // THE LAST ENGINE'S GHOSTS DIE HERE, WHATEVER ELSE STARTS.
+  //
+  // IT DOES NOT DEPEND ON THE MIRROR, for the same reason the hold above does
+  // not. A server started with the mirror disabled inherits the same abandoned
+  // records, and the stop hook reads them either way.
+  //
+  // REAPING TWICE IS HARMLESS. Both reapers skip a record that is already
+  // closed, so the mirror's own call on the way up finds nothing left.
+  // see dsp-the-work-account.md#a-killed-run-is-closed-at-startup
+  reapAbandonedJobs(root);
+  reapAbandonedTestJobs(root);
   const mcpServer = buildServer(root, session);
   if (mirrorPort > 0) {
     const log = new CallLog(seDir(root));
@@ -475,24 +520,39 @@ if (argv.includes("--child") || process.env.SE_HOT_DISABLE === "1") {
     process.stderr.write(
       `se-mcp shim: a server already walks this root — attaching to ${target}/mcp as a proxy, not raising a second engine\n`,
     );
+    // EVERY LINE IN GETS A LINE BACK, or the caller waits on an answer that is
+    // never coming. A client cannot tell silence from slowness, so silence is
+    // the one thing the proxy may never do.
+    const answerError = (line: string, message: string): void => {
+      let id: number | string | null = null;
+      try {
+        id = (JSON.parse(line) as { id?: number | string | null }).id ?? null;
+      } catch {
+        // unparseable — the server would have answered the parse error; gone, nobody can
+      }
+      if (id !== null) process.stdout.write(`${JSON.stringify({ jsonrpc: "2.0", id, error: { code: -32000, message } })}\n`);
+    };
     const rl = createInterface({ input: process.stdin, terminal: false });
     rl.on("line", (line) => {
       if (line.trim() === "") return;
       void (async () => {
         try {
-          const r = await fetch(`${target}/mcp`, { method: "POST", headers: { "content-type": "application/json" }, body: line });
+          // THE PROXY CALL IS BOUNDED, like the aliveness check above it. It
+          // used to carry no timeout at all, so an engine that was listening
+          // but not answering held every client request open for good.
+          const r = await fetch(`${target}/mcp`, {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: line,
+            signal: AbortSignal.timeout(120_000),
+          });
+          // A NON-200 IS STILL AN ANSWER OWED. fetch resolves rather than
+          // throwing on one, so the catch below never saw it and the reply was
+          // simply dropped.
           if (r.status === 200) process.stdout.write(`${await r.text()}\n`);
+          else answerError(line, `the attached se server answered ${r.status} on ${target}/mcp`);
         } catch (e) {
-          let id: number | string | null = null;
-          try {
-            id = (JSON.parse(line) as { id?: number | string | null }).id ?? null;
-          } catch {
-            // unparseable — the server would have answered the parse error; gone, nobody can
-          }
-          if (id !== null)
-            process.stdout.write(
-              `${JSON.stringify({ jsonrpc: "2.0", id, error: { code: -32000, message: `the attached se server went away: ${String(e)}` } })}\n`,
-            );
+          answerError(line, `the attached se server went away: ${String(e)}`);
         }
       })();
     });

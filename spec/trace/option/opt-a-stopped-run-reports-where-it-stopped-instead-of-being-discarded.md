@@ -5,8 +5,8 @@ type: "[[option]]"
 cluster: cluster-the-benchmark-run
 question: how an incomplete run is treated
 found_by: contradiction
-statement: "An incomplete measurement is kept and labelled with the point it reached, rather than thrown away for being incomplete."
-source: "separation on CONDITION \u2014 the contradiction between wanting complete runs and wanting cheap ones dissolves once completeness is a field rather than a gate"
+statement: An incomplete measurement is kept and labelled with the point it reached, rather than thrown away for being incomplete.
+source: separation on CONDITION — the contradiction between wanting complete runs and wanting cheap ones dissolves once completeness is a field rather than a gate
 ---
 
 ## The contradiction it breaks

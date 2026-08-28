@@ -5,7 +5,7 @@ type: "[[option]]"
 statement: a step's standing is one value from a closed set of three, so a reader cannot express passed-and-also-deciding and cannot forget the third case, rather than a boolean with a flag beside it
 cluster: cluster-the-standing
 found_by: heuristic
-source: "the heuristics \"make the illegal unrepresentable, not merely checked\" and \"the default should be the safe thing\", from meth-heuristics-catalog"
+source: the heuristics "make the illegal unrepresentable, not merely checked" and "the default should be the safe thing", from meth-heuristics-catalog
 ---
 
 ## Mechanism

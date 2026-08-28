@@ -8,7 +8,7 @@ owner: the driving agent
 trigger: onboarding a harness or a runtime pin change that spawns scripts differently
 status: open
 probe: "Cheapest real check ran this session: node -v reported v24.18.0, and node scratchpad/probe-ts-exec.ts executed a real .ts file unflagged and printed its result. HOLDS on this Windows host; the other supported hosts (Copilot CLI, Codex, Cursor, cloud POSIX) are unprobed this session."
-probed: "2026-08-19"
+probed: 2026-08-19
 breaks_how_badly: crippling
 how_likely: conceivable
 source_refs:

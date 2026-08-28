@@ -15,7 +15,7 @@ needs, requirements or architecture.
 
 Its keeper feeds design INPUT, and walks the milestones like any other claim.
 
-## Procedure
+## Procedure #work
 
 - Explore in isolation. The record stays untouched by anything not promoted.
 - On return, name what the expedition actually established.

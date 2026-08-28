@@ -7,10 +7,10 @@
 
 import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { CLAUSES, Rejection } from "./errors.ts";
 import type { EvidenceField } from "./machine.ts";
-import { noteOf } from "./notes.ts";
+import { noteOf, passEpoch } from "./notes.ts";
 import { slug } from "./records.ts";
 import { CHANGE_COLUMNS, type ChangeColumn, compileColumn, readRigorMatrix, rigorMatrixContentHash } from "./rigor-matrix.ts";
 import { dependsOnLines } from "./seed.ts";
@@ -26,10 +26,19 @@ export const SRC = "engine/iterations.ts";
 function git(root: string, args: string[], what: string): string {
   const r = spawnSync("git", args, { cwd: root, encoding: "utf8", maxBuffer: 8 * 1024 * 1024 });
   if (r.status !== 0) {
+    // THE STATUS LEADS, and the output follows it.
+    //
+    // IT USED TO SHOW STDERR ALONE, cut at 500 characters. A call that failed
+    // while printing hundreds of harmless warnings then reported nothing but
+    // warnings, and read as though a warning had caused the failure. A killed
+    // process, which reports a null status and no message at all, read the
+    // same way.
+    const how = r.signal !== null && r.signal !== undefined ? `killed by ${r.signal}` : `exit ${String(r.status)}`;
+    const said = (r.stderr ?? "").trim().slice(0, 500);
     throw new Rejection({
       clause: CLAUSES.NOT_CONFIGURED,
       expected: `git ${what} to succeed`,
-      got: (r.stderr ?? "").trim().slice(0, 500) || `exit ${r.status}`,
+      got: said === "" ? how : `${how} — ${said}`,
       remedy: { tool: "se_git", args: { args: ["status"] }, note: "inspect the repository state" },
       source: SRC,
     });
@@ -42,6 +51,10 @@ export interface Iteration {
   branch: string;
   path: string;
   open: boolean;
+  /** The record's own status word, carried rather than re-read. The listing
+   *  already reads it to work out `open`, and a caller asking a second time
+   *  would open the same file again for a value it was just handed. */
+  status: string;
   /** Whether the seed's stub push reached the remote in the seeding act. */
   announced?: boolean;
 }
@@ -58,7 +71,7 @@ export function readItRecord(root: string, it: Iteration): Record<string, unknow
 }
 
 /** see dsp-record-lifecycle.md#the-statuses-a-record-cannot-be-walked-from */
-export const RECORD_FINISHED: ReadonlySet<string> = new Set(["shipped", "closed"]);
+export const RECORD_FINISHED: ReadonlySet<string> = new Set(["shipped", "closed", "abandoned"]);
 
 /** EVERY RECORD IS A FOLDER, and OPEN comes from its own status.
  *
@@ -69,6 +82,26 @@ export const RECORD_FINISHED: ReadonlySet<string> = new Set(["shipped", "closed"
  *  still name it and nothing yet reads it as a place to fetch from. It goes
  *  when the branches do. */
 export function itList(root: string): Iteration[] {
+  // DERIVED FROM MANY FILES, so it keys on the pass that built it. This is the
+  // pattern software.md names for exactly this shape, and this function is the
+  // reason it was needed.
+  //
+  // WHAT IT COST WITHOUT IT: two `existsSync` calls, a read and a YAML parse per
+  // iteration EVER CREATED, every time the route drawing expanded the iterations
+  // container — which is once per node, per hop. The archived records were read
+  // in full only to be discarded for being archived.
+  //
+  // MEASURED on one hop that does no work: 3,454 ms of `existsSync` and 1,403 ms
+  // of `readFileUtf8`, 55 per cent of the hop.
+  //
+  // OUTSIDE A PASS `passEpoch()` is 0 and nothing is held, which is what a test
+  // gets and what is right.
+  const pass = passEpoch();
+  const key = resolve(root);
+  if (pass !== 0) {
+    const hit = IT_LIST.get(key);
+    if (hit !== undefined && hit.pass === pass) return hit.list;
+  }
   const dir = join(root, "spec", "iterations");
   if (!existsSync(dir)) return [];
   const out: Iteration[] = [];
@@ -81,10 +114,15 @@ export function itList(root: string): Iteration[] {
     const abs = join(dir, id, "record.md");
     if (!existsSync(abs)) continue;
     const status = String(noteOf(abs)?.frontmatter.status ?? "");
-    out.push({ id, branch: `it/${id}`, path: root, open: !RECORD_FINISHED.has(status) });
+    out.push({ id, branch: `it/${id}`, path: root, open: !RECORD_FINISHED.has(status), status });
   }
-  return out.sort((a, b) => Number(a.id.match(/^i(\d+)/)?.[1] ?? 0) - Number(b.id.match(/^i(\d+)/)?.[1] ?? 0));
+  out.sort((a, b) => Number(a.id.match(/^i(\d+)/)?.[1] ?? 0) - Number(b.id.match(/^i(\d+)/)?.[1] ?? 0));
+  if (pass !== 0) IT_LIST.set(key, { pass, list: out });
+  return out;
 }
+
+/** The iteration list, held for the pass that built it. see itList. */
+const IT_LIST = new Map<string, { pass: number; list: Iteration[] }>();
 
 // NOTHING IS MISSING ON A CLONE. A record is a folder, so a clone has every
 // record by construction, and there is no half
@@ -157,7 +195,7 @@ export function itSeed(root: string, goal: string, vision: string, inputs: strin
   );
   git(root, ["add", "--", itRecordRel(id)], "add");
   git(root, ["commit", "-q", "-m", `iteration ${id}: seed`, "--", itRecordRel(id)], "commit");
-  return { id, branch: `it/${id}`, path: root, open: true };
+  return { id, branch: `it/${id}`, path: root, open: true, status: "seeded" };
 }
 
 export function itFind(root: string, id: string): Iteration {
@@ -181,16 +219,79 @@ export function itFind(root: string, id: string): Iteration {
   return it;
 }
 
+/** THE RECORD THIS ENGINE IS HOLDING, if any.
+ *
+ *  ONE ENGINE WALKS ONE RECORD. Wanting two at once means a second checkout,
+ *  and that is the owner's ruling rather than a limitation. A record that has
+ *  been set aside is not held, which is what makes the refusal below survivable
+ *  without finishing or abandoning anything. */
+export function heldRecord(root: string): Iteration | undefined {
+  return itList(root).find((x) => x.status === "open");
+}
+
 /** First entry stamps `started:` — from then on the needs-retro gate no
- *  longer holds this iteration (re-entering running work is never blocked). */
+ *  longer holds this iteration (re-entering running work is never blocked).
+ *
+ *  IT ALSO REFUSES A SECOND OPEN RECORD, and resumes one that was set aside. */
 export function markStarted(_root: string, it: Iteration): void {
   const recAbs = join(it.path, itRecordRel(it.id));
   if (!existsSync(recAbs)) return;
+  const held = heldRecord(it.path);
+  if (held !== undefined && held.id !== it.id) {
+    throw new Rejection({
+      clause: CLAUSES.SECOND_RECORD_OPEN,
+      expected: `no other record open — ${held.id} is held`,
+      got: it.id,
+      remedy: {
+        tool: "se_park",
+        args: { id: held.id, why: "<why it is being set aside>" },
+        note: "set the held record aside first, then enter this one. Two at once means a second checkout of the repository.",
+      },
+      source: SRC,
+    });
+  }
   const raw = readFileSync(recAbs, "utf8");
+  // RESUMING ONE THAT WAS SET ASIDE. It already carries `started:`, so the
+  // early return below would leave it parked while the walk stood inside it.
+  if (/^status: parked$/m.test(raw)) {
+    writeFileSync(recAbs, raw.replace(/^status: parked$/m, "status: open"), "utf8");
+    git(it.path, ["add", "-A"], "add");
+    git(it.path, ["commit", "-q", "-m", `iteration ${it.id}: resumed`], "commit");
+    return;
+  }
   if (/^started: /m.test(raw)) return;
   writeFileSync(recAbs, raw.replace(/^status: seeded$/m, `status: open\nstarted: ${new Date().toISOString()}`), "utf8");
   git(it.path, ["add", "-A"], "add");
   git(it.path, ["commit", "-q", "-m", `iteration ${it.id}: started`], "commit");
+}
+
+/** SET A RECORD ASIDE without finishing or abandoning it.
+ *
+ *  THE REFUSAL ABOVE NEEDS AN EXIT THAT IS NOT A VERDICT. Shipping claims
+ *  gates that never happened and abandoning says the work is no longer wanted;
+ *  parking says neither, and the record comes back exactly as it was. */
+export function parkRecord(root: string, id: string, why: string): Record<string, unknown> {
+  const it = itFind(root, id);
+  const recAbs = join(it.path, itRecordRel(it.id));
+  const raw = readFileSync(recAbs, "utf8");
+  if (!/^status: open$/m.test(raw)) {
+    throw new Rejection({
+      clause: CLAUSES.SECOND_RECORD_OPEN,
+      expected: "a record that is open — only an open one can be set aside",
+      got: `${id} is ${it.status || "unreadable"}`,
+      remedy: { tool: "se_survey", args: {}, note: "the survey lists what stands open" },
+      source: SRC,
+    });
+  }
+  const parked = raw.replace(/^status: open$/m, "status: parked").replace(/^---$/m, "---");
+  writeFileSync(
+    recAbs,
+    parked.includes("parked_why:") ? parked : parked.replace(/^status: parked$/m, `status: parked\nparked_why: ${JSON.stringify(why)}`),
+    "utf8",
+  );
+  git(it.path, ["add", "-A"], "add");
+  git(it.path, ["commit", "-q", "-m", `iteration ${it.id}: parked`], "commit");
+  return { parked: it.id, why, note: "another record may be entered now; entering this one again resumes it exactly as it was" };
 }
 
 export function itPinRel(id: string): string {
@@ -437,7 +538,7 @@ export function pinIsStale(root: string, it: Iteration): boolean {
   return pin.rigor_matrix_hash !== rigorMatrixContentHash(root);
 }
 
-/** tailored is always tailored DOWN (owner ruling 2026-07-30); inherit
+/** tailored is always tailored DOWN; inherit
  *  defers to the fuller content, so it ranks with full. */
 const APPLIES_RANK: Record<string, number> = { none: 0, tailored: 1, inherit: 2, full: 2 };
 

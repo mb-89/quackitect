@@ -3,9 +3,9 @@ minted_in: i36
 id: tsp-supported-harness-serves-one-lane-contract
 type: "[[test-spec]]"
 statement: A session starting in a supported harness identifies that harness by name and serves the same lane contract inside every limit measured for it, before the first work state is reached.
-method: "test"
+method: test
 verifies:
-  - "req-supported-harness-serves-one-lane-contract"
+  - req-supported-harness-serves-one-lane-contract
 files:
   - tests/cage.test.ts
   - tests/skills.test.ts

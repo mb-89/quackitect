@@ -41,6 +41,15 @@ priority: must
   WHY IT IS LOAD-BEARING RATHER THAN A CONVENIENCE. This product goes open source while company-specific method stays inside the company. Without a copy that is genuinely its owner's, those two facts cannot both hold.
   THE RULE IS THE DIRECTION OF WRITES, never a folder. A vendored copy is yours to change entirely; what may never be reached is the source it came from. The argument stands at raid-dec-an-import-is-read-only-and-a-vendored-copy-is-yours.
 
+- A REACH REFUSES A BYPASS. That is a sixth consequence the drawing attaches, beside a state refusing tools, a gate refusing passage, a write refusing a break and the machine naming its driver.
+  Metric: places reaching a capability that has a door, without going through it and without a registry entry. Target: none.
+  Metric: registry entries carrying no written reason. Target: zero.
+  Metric: engine code changed to put a door in front of a new capability. Target: none, on the same reasoning as the first criterion above. A door binds to a declared capability the way a machine compiles from a drawing.
+  Added by i54.
+  THE REASON IS THE PRODUCT, and that is what separates this from the field. Six systems were read at their own documentation for this iteration, and exactly one can force a reason on an exception. The comparison stands at `spec/iterations/i54-everything-exported-has-a-door-a-sweep-o/evidence/prior-art-one-door.md`.
+  NOT BUILT YET FOR ANY CAPABILITY BUT WIDGETS. The pattern exists once, at `deliverable/machines/widget-exemptions.md` with the SE-C-146 section of `guidance/refusals.md`. Generalising it is what i54 is for, and until that lands the first two measures are taken on widgets alone.
+  THE THIRD MEASURE IS THE HARD ONE and it is stated as a target rather than a claim. Nothing today lets a door be declared without engine code, and whether that is reachable is the open question of this iteration.
+
 BOTH MEASURES USED TO COUNT CLAIMS, and i34 retired the claim system whole.
 The first read "double-claimed iterations" and the second "acts from clone to
 first claimed iteration". Neither counts anything now.

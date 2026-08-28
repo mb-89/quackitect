@@ -4,9 +4,9 @@ id: opt-publish-the-difficulty-and-let-consumers-choose-their-own-hand
 type: "[[option]]"
 cluster: the-sizing
 question: what the block publishes
-statement: "the block publishes the difficulty as a property of the work and stops there, so choosing a driver is one consumer of that number rather than the block's purpose"
+statement: the block publishes the difficulty as a property of the work and stops there, so choosing a driver is one consumer of that number rather than the block's purpose
 found_by: transform
-source: "SCAMPER Put to other use applied to cluster-the-sizing — ask who else wants this number as-is"
+source: SCAMPER Put to other use applied to cluster-the-sizing — ask who else wants this number as-is
 ---
 
 ## Mechanism

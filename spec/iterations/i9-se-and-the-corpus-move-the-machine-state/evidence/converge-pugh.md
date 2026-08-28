@@ -1,10 +1,10 @@
 ---
 form: converge-pugh
-amended: "2026-08-19T17:42:07.451Z by agent — the one-point-away list named an axis the reference line actually wins, and counted a cell that a later rescore put two points away"
+amended: 2026-08-19T17:42:07.451Z by agent — the one-point-away list named an axis the reference line actually wins, and counted a cell that a later rescore put two points away
 by: agent
 signed_off: 2026-08-19T16:54:27.416Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / converge-pugh

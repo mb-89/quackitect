@@ -5,7 +5,7 @@ statement: Rank the unknowns and timebox the spikes - seeded from RAID, tripwire
 state_kind: work
 filled_by: agent
 depends_on:
-  - gate-architecture
+  - spawn-for-prototype
 seeds: spikes
 exit_script:
   - deliverable/engine/bin/grades-complete.ts
@@ -18,17 +18,17 @@ legal_tools:
   - se_file_list
   - se_log_query
   - se_answer
-  - se_web_search
-  - se_web_fetch
 evidence:
   - name: seeded
     template: exposure-pick
     of: raid
-    description: the chosen unknowns picked over the exposure chart — the biggest blockers for the coming build that a timeboxed probe can settle; one register ref per line, each becoming one parallel spike state
+    description: the chosen unknowns picked over the exposure chart. Take the biggest blockers for the coming build that a timeboxed probe can settle. One register ref per line, and each becomes one parallel spike state.
 major: full
+major_complexity: C2/R3
 minor: none
 patch: none
 product: full
+product_complexity: C2/R3
 specification: tailored
 major_note: |
   Applies in full: RAID, tripwires and doubtful verify methods feed the
@@ -36,7 +36,7 @@ major_note: |
   unknown. A major with zero spikes is legal but rare - record the "none"
   argument carefully.
 minor_note: |
-  Does not apply (owner ruling 2026-08-13). M6 is struck whole at this
+  Does not apply. M6 is struck whole at this
   size, so there is nothing to rank unknowns for.
 
   ESCALATE: an unknown big enough to need a timeboxed probe is bigger than
@@ -56,7 +56,7 @@ specification_note: |
 
 ## Guidance
 
-THE RANKING IS A COMPUTATION, never typed (owner ruling 2026-08-10).
+THE RANKING IS A COMPUTATION, never typed.
 Exposure is damage times likelihood — `breaks_how_badly` and `how_likely`
 off every open register entry, worst first. The what-if-wrong is the
 entry's own `impact` field, on the node where it lives. The register view

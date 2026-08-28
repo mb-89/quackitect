@@ -1,6 +1,6 @@
 // expedition records, escape and pause — the git-heavy cases
 //
-// SMALL FILES ON PURPOSE (owner ruling, 2026-07-30). A test file is the
+// SMALL FILES ON PURPOSE. A test file is the
 // only unit that reaches a second core, so themes get their own file and
 // the suite uses the machine it runs on. See guidance/software.md.
 import { strict as assert } from "node:assert";
@@ -45,10 +45,8 @@ describe("records", { concurrency: true }, () => {
     assert.ok(existsSync(join(s.workRoot(), "scratch.md")));
     // ONE TREE, so a write made while bound lands where every reader looks.
 
-    // While bound, decision ops land in the RECORD too (parts per visit).
-    s.decisions.apply("continue_expedition/work@0", { op: "update", brief: "working in the record" });
-    const recDir = join(s.workRoot(), "spec", "expeditions", minted.created);
-    assert.ok(readFileSync(join(recDir, "decisions.jsonl"), "utf8").includes("working in the record"));
+    // A record's own account used to be a decision log written beside it. It is
+    // the work tokens now, and they live in the record's own work folder.
 
     // Closing without a REPORT is refused — an expedition ends with one.
     assert.throws(
@@ -84,7 +82,7 @@ describe("records", { concurrency: true }, () => {
     assert.equal(readFileSync(join(root, "scratch.md"), "utf8"), "expedition work");
     // CLOSED RECORDS LIVE ON DISK (owner ruling 2026-08-16, reversing the one
     // of 2026-07-28). The folder stays, stamped closed + applied — the close
-    // IS the ruling (owner 2026-07-27).
+    // IS the ruling.
     assert.equal(existsSync(join(root, "spec", "expeditions", minted.created)), true, "the record's folder stands");
     // READ FROM THE TREE, not out of git. This used to be
     // `git show exp/<id>:<rel>`, because the close removed the folder and the
@@ -99,7 +97,7 @@ describe("records", { concurrency: true }, () => {
     assert.equal(arch[0].ruling, "applied");
   });
 
-  // ONE HATCH (owner ruling 2026-08-02): every kind of stepping out is an
+  // ONE HATCH: every kind of stepping out is an
   // escape, told apart only by its reason — the person said stop, the road
   // is blocked, earlier work no longer stands. It lands at the FRONT DESK,
   // where the person routes. pause retired with the ruling; the reason

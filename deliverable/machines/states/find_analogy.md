@@ -7,7 +7,7 @@ entry_read:
   - deliverable/machines/methods/meth-analogy-transfer.md
 exit_script:
   - deliverable/engine/bin/outward-search.ts
-legal_tools: se_file_read, se_file_write, se_file_patch, se_file_search, se_file_glob, se_file_list, se_log_query, se_answer, se_web_search, se_web_fetch
+legal_tools: se_file_read, se_file_write, se_file_patch, se_file_search, se_file_glob, se_file_list, se_log_query, se_answer
 evidence:
   - name: applies
     template: choice-with-rationale

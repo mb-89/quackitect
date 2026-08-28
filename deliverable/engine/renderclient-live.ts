@@ -114,16 +114,44 @@ document.addEventListener("click", (ev) => {
   if (act) {
     // THE NOTE'S BUTTON CARRIES THE LINE BESIDE IT. Every other action posts
     // an empty body; this one would drop a blank note without the field.
+    //
+    // A REFUSED LINE STAYS IN THE FIELD, exactly as the work line does. The
+    // wall guard refuses a breakless note, and clearing the box would throw
+    // away what the reader typed and say nothing.
     if (act.dataset.post === "/note") {
       const f = document.getElementById("note-body");
       if (f && f.value.trim() !== "") {
         const pr = document.querySelector('.param-choice[data-key="note_priority"]');
-        void fetch("/note", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ text: f.value, priority: pr === null ? "could" : pr.value }) }).then(() => { f.value = ""; refreshLog(); });
+        void fetch("/note", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ text: f.value, priority: pr === null ? "could" : pr.value }) }).then(async (r) => {
+          let d = null;
+          try { d = await r.json(); } catch (e) { d = null; }
+          if (d && d.ok === true) { f.value = ""; refreshLog(); return; }
+          toast(d && (d.expected || d.error) ? (d.expected || d.error) : "the note was refused");
+        });
+      }
+      return;
+    }
+    // THE WORK BUTTON CARRIES ITS LINE THE SAME WAY, separator and all: four
+    // words name the work, then a slash, then the detail. The server splits it,
+    // so the line travels whole. The backlog is where work with no place yet
+    // belongs.
+    //
+    // A REFUSED LINE STAYS IN THE FIELD. The four-word rule refuses here, and
+    // clearing the box would throw away what the reader typed and say nothing.
+    if (act.dataset.post === "/work/mint") {
+      const w = document.getElementById("work-statement");
+      if (w && w.value.trim() !== "") {
+        void fetch("/work/mint", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ place: "backlog", slot: "pending", statement: w.value.trim() }) }).then(async (r) => {
+          let d = null;
+          try { d = await r.json(); } catch (e) { d = null; }
+          if (d && d.ok === true) { w.value = ""; refreshLog(); return; }
+          toast(d && (d.expected || d.error) ? (d.expected || d.error) : "the work was refused");
+        });
       }
       return;
     }
     // A JSON-answering control reports its refusal IN PLACE — the target
-    // button used to swallow it (owner report 2026-08-09). A redirecting
+    // button used to swallow it. A redirecting
     // control answers HTML, and reading it as JSON just stays quiet.
     void fetch(act.dataset.post, { method: "POST", headers: { "content-type": "application/json" }, body: "{}" }).then(async (r) => {
       try {
@@ -267,6 +295,10 @@ let deathTimer = null;
 // The newest person-pull already landed; null until the first alive adopts
 // the standing value, so a page load never replays an old pull.
 let lastPullSeq = null;
+// The work store's signal at the last render. Null until the first alive
+// adopts it, so a page load never redraws itself for work that was already
+// on the page when it was served.
+let lastWork = null;
 // ONE alive-driven pass, shared by the event stream and the host's wake —
 // an embedded page has no stream, and this is everything it would miss.
 function applyAlive(a) {
@@ -283,7 +315,7 @@ function applyAlive(a) {
     if (armed) b.textContent = "E";
     else if (b.textContent === "E") b.textContent = "I";
   }
-  if (thr && document.activeElement !== thr && Number(thr.value) !== a.autonomy) {
+  if (thr && !sePlaceIsEdited(thr) && Number(thr.value) !== a.autonomy) {
     thr.value = a.autonomy;
     const lbl = document.getElementById("thr-val");
     if (lbl) lbl.textContent = Number(a.autonomy).toFixed(2);
@@ -304,7 +336,7 @@ function applyAlive(a) {
   else if (litTarget !== null && !document.querySelector(".se-ping, .se-ping-svg")) applyPing();
   if (a.trace_trail && window.seTraceTrail) window.seTraceTrail(a.trace_trail);
   if (logPanel && a.acts !== lastActs) { lastActs = a.acts; refreshLog(); }
-  // THE PERSON PULLED (owner design 2026-08-04): the answer lands in the
+  // THE PERSON PULLED: the answer lands in the
   // details, and a form the walk owes gets a panel of its own — the inline
   // details pane is ephemeral on purpose.
   if (lastPullSeq === null) lastPullSeq = a.last_pull ? a.last_pull.seq : 0;
@@ -319,6 +351,21 @@ function applyAlive(a) {
       if (window.parent !== window) window.parent.postMessage({ se: "open-form", name: first.form }, "*");
       else if (!EMBED) window.open("/widget/details?detail=" + encodeURIComponent("form:" + first.form), "_blank", "popup,width=760,height=900");
     }).catch(() => {});
+  }
+  // THE WORK MOVED. A token minted, taken, settled or placed changes the
+  // signal, and the drawing redraws under the reader — no navigation, no
+  // leaving the machine and coming back.
+  //
+  // TWO SURFACES, ONE SIGNAL, AND EACH REPAINTS ITSELF. The drawing morphs; the
+  // work editor is morph-ignored and redraws through its own client. A single
+  // repaint could not serve both, because the morph carries the editor's
+  // server-side defaults and would shut it under the reader.
+  if (lastWork === null) lastWork = a.work;
+  else if (a.work !== lastWork) {
+    lastWork = a.work;
+    if (typeof window.seRedrawWork === "function") window.seRedrawWork();
+    refresh();
+    return;
   }
   if (JSON.stringify(a.active || []) !== ACTIVE_AT_RENDER) { refresh(); return; }
   // A re-aimed walk redraws the route under the reader.

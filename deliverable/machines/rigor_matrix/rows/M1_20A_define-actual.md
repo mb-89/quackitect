@@ -15,22 +15,22 @@ legal_tools:
   - se_file_list
   - se_log_query
   - se_answer
-  - se_web_search
-  - se_web_fetch
 evidence:
   - name: as_is
     description: where we stand, good and bad, witnesses named
 major: tailored
+major_complexity: C3/R3
 minor: none
 patch: none
 product: full
+product_complexity: C3/R3
 specification: full
 major_note: |
   The as-is EXTENDS: the pains the change answers are stated fresh, with
   witnesses - a major usually exists because the recorded as-is no longer
   tells the whole story. The untouched baseline inherits by pointer.
 minor_note: |
-  Does not apply (owner ruling 2026-08-13). The as-is baseline stands: a
+  Does not apply. The as-is baseline stands: a
   minor changes what the system DOES, not the record of the pains it was
   built to answer.
 

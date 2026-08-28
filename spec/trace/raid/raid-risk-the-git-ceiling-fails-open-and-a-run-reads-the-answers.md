@@ -3,11 +3,11 @@ minted_in: i37-training-iterations-a-disposable-iterati
 id: raid-risk-the-git-ceiling-fails-open-and-a-run-reads-the-answers
 type: "[[raid]]"
 kind: risk
-statement: "The ceiling that stops a benchmark run resolving commits newer than its rewind point fails open, so the run reads the answers the original iteration produced and every number taken under it is worthless."
+statement: The ceiling that stops a benchmark run resolving commits newer than its rewind point fails open, so the run reads the answers the original iteration produced and every number taken under it is worthless.
 owner: the maintainer of the machine
 trigger: the first benchmark run, and every change to the git lane allowlist or to the ref-reading path afterwards
 status: open
-impact: "A run that can reach the future measures search-and-paste speed rather than the machine. The failure is silent — the report looks exactly like a valid one, and the number is wrong in the flattering direction."
+impact: A run that can reach the future measures search-and-paste speed rather than the machine. The failure is silent — the report looks exactly like a valid one, and the number is wrong in the flattering direction.
 breaks_how_badly: fatal
 how_likely: plausible
 source_refs:

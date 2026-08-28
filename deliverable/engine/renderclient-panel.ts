@@ -39,13 +39,40 @@ function detailFor(key) {
     const txt = (D.comment || "").replace(/&/g,"&amp;").replace(/</g,"&lt;");
     return ["machine: " + D.viewed.id, '<div class="comment-detail">' + txt + "</div>" + jsonTable(D.viewed)];
   }
+  // A BUCKET PILL IS A DOOR TO ITS STATE, and it was a door to nothing.
+  //
+  // WHAT WENT WRONG. The pill carries bucket:<state>:<kind>, and this
+  // function had no branch for it. The key fell through to the empty table at
+  // the bottom, so pressing "55 pending" showed a blank panel. Worse, the
+  // handler below posts /selected only for a state: key, so the engine's
+  // mirrored selection never moved and the PREVIOUSLY selected bucket stayed
+  // lit — which reads as the wrong bucket being chosen rather than as nothing
+  // happening. Reported by the owner, three times over.
+  //
+  // A STATE ID CAN CARRY A COLON, so the kind is taken from the LAST one
+  // rather than by splitting the whole key.
+  //
+  // IT RESOLVES TO THE STATE, deliberately. One state wears several buckets and
+  // each is a grouping OF that state, so the door behind all of them is the
+  // same door. Naming which bucket was pressed is what the pill adds.
+  if (key.startsWith("bucket:")) {
+    const raw = key.slice(7);
+    const cut = raw.lastIndexOf(":");
+    const id = cut < 0 ? raw : raw.slice(0, cut);
+    const kind = cut < 0 ? "" : raw.slice(cut + 1);
+    if (id === "") return [key, jsonTable({})];
+    const known = D.states[id];
+    const head = '<div class="meta">' + (kind === "" ? "a bucket" : kind) + " at " + id + "</div>";
+    if (known && known.has_form) { void showForm(id, "details", viewedMachine()); return ["", head + '<div class="meta">loading…</div>']; }
+    return [kind === "" ? "state: " + id : kind + ": " + id, head + stateDetail(id)];
+  }
   if (key.startsWith("state:")) {
     // see dsp-mirror-render.md#the-machine-rides-inside-the-key
     const at = key.slice(6).split("@");
     const id = at[0];
     const mac = at[1] || "";
     const known = D.states[id];
-    // ONE TRUTH, TWO RENDERS (owner ruling 2026-08-04): a state with an
+    // ONE TRUTH, TWO RENDERS: a state with an
     // evidence form shows THE FORM as its details — the old detail view
     // stays only for form-less states. A state this page's view does not
     // know still resolves through its carried machine.
@@ -69,10 +96,49 @@ document.addEventListener("click", async (ev) => {
     return;
   }
 });
+// A PLACE IS A STATE, so a heading in the work editor that names one is a door
+// to it. A bucket is a name somebody typed, and the server draws that as text.
+//
+// IT IS NOT A DOCLINK. A doclink carries a PATH and opens a document; this
+// carries a state id and moves the drawing, so it takes its own attribute and
+// its own handler rather than borrowing a name that already means something
+// else.
+//
+// THE READER KEEPS THEIR PLACE. Where the drawing on screen already holds the
+// state, the press is handed to that state and nothing else on the page moves —
+// the editor keeps its scroll, its ticked rows and its split.
+//
+// FOCUS IS NOT AN AIM. This selects a state the way a press on the state does.
+// It never targets one, and it never moves the walk.
+function stateOnScreen(id) {
+  const drawn = document.querySelectorAll("#machine-svg g.clickable[data-detail]");
+  for (const g of drawn) if (g.dataset.detail === "state:" + id) return g;
+  return null;
+}
+document.addEventListener("click", (ev) => {
+  const link = ev.target.closest ? ev.target.closest(".state-link") : null;
+  if (!link) return;
+  ev.preventDefault();
+  const id = link.dataset.state || "";
+  if (id === "") return;
+  const here = stateOnScreen(id);
+  if (here) {
+    here.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    return;
+  }
+  // ANOTHER MACHINE HOLDS IT, and a drawing cannot show a state it does not
+  // have. The view changes, and the editor's own place rides the URL so it
+  // comes back open at the same heading.
+  const machine = link.dataset.machine || "";
+  navigateTo(
+    "/?view=" + encodeURIComponent(machine) + "&detail=" + encodeURIComponent("state:" + id),
+    "loading " + (machine || id),
+  );
+});
 let CURRENT_DETAIL = null;
 // The last RELAYED card (help from another surface) — kept so a refresh
 // re-shows it instead of clobbering the reader's place.
-let LAST_RELAY = null;
+const LAST_RELAY = null;
 document.addEventListener("click", (ev) => {
   const arrow = ev.target.closest ? ev.target.closest(".crumb-arrow") : null;
   document.querySelectorAll(".crumb-arrow.open").forEach((a) => { if (a !== arrow) a.classList.remove("open"); });
@@ -88,10 +154,23 @@ document.addEventListener("click", (ev) => {
       CURRENT_DETAIL = g.dataset.detail + "@" + viewedMachine();
       void fetch("/selected", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ state: g.dataset.detail.slice(6), machine: viewedMachine() }) });
     }
+    // NO BACKTICK MAY APPEAR IN THIS FILE'S COMMENTS. The whole client is one
+    // template literal, so a backtick closes it and the surface stops
+    // compiling. Cost four typecheck errors on 2026-08-28.
+    //
+    // A BUCKET PILL SELECTS ITS STATE TOO. Without this the selection stayed
+    // where it was, so the previously chosen bucket went on being highlighted
+    // while the reader had pressed a different one entirely.
+    if (g.dataset.detail.startsWith("bucket:")) {
+      const raw = g.dataset.detail.slice(7);
+      const cut = raw.lastIndexOf(":");
+      const st = cut < 0 ? raw : raw.slice(0, cut);
+      if (st !== "") void fetch("/selected", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ state: st, machine: viewedMachine() }) });
+    }
     const [t, h] = detailFor(CURRENT_DETAIL); showDetails(t, h);
   }
 });
-// A GRID CELL OPENS ITS DETAIL (owner, 2026-08-09): the score grid shows
+// A GRID CELL OPENS ITS DETAIL (owner): the score grid shows
 // the value; the anchor and the prior-art name sit behind the click, in
 // the details pane like every other detail.
 document.addEventListener("click", (ev) => {
@@ -145,7 +224,7 @@ function restoreViewBox() {
 }
 const svg = document.getElementById("machine-svg");
 if (svg) {
-  let vb = svg.viewBox.baseVal;
+  const vb = svg.viewBox.baseVal;
   const VB_KEY = "se-vb-" + D.viewed.id;
   restoreViewBox();
   const saveVb = () => { try { sessionStorage.setItem(VB_KEY, JSON.stringify({ x: vb.x, y: vb.y, w: vb.width, h: vb.height })); } catch (e) { /* storage full — the view just re-fits */ } };
@@ -228,7 +307,7 @@ const CARDS = CARDBLOB === null ? { list: [], now: "" } : JSON.parse(CARDBLOB.te
 let CARD_NOW = new URLSearchParams(location.search).get("card") || CARDS.now;
 let CARD_PREV = null;
 // Chat is promoted once, the first time a host answers. Not on every poll.
-let CHAT_LED = false;
+const CHAT_LED = false;
 function cardCell(id) {
   const i = CARDS.list.findIndex((c) => c.id === id);
   const at = i < 0 ? 0 : i;
@@ -265,7 +344,7 @@ function promoteCard(id) {
   q.set("card", id);
   history.replaceState(null, "", location.pathname + "?" + q.toString());
 }
-// NUMBER KEYS, NOT FUNCTION KEYS (owner 2026-07-29). F1, F5, F6, F11 and F12
+// NUMBER KEYS, NOT FUNCTION KEYS (owner ). F1, F5, F6, F11 and F12
 // belong to the browser, and a laptop needs an Fn chord for them. A key never
 // fires while the reader is typing — chat is a card you type in.
 addEventListener("keydown", (ev) => {
@@ -294,7 +373,7 @@ addEventListener("keydown", (ev) => {
   ev.preventDefault();
   promoteCard(card.id);
 });
-// THE NUMBER IS A CONTROL, NOT A LABEL (owner 2026-07-29). Whatever the key
+// THE NUMBER IS A CONTROL, NOT A LABEL (owner ). Whatever the key
 // does, clicking the badge does — including the press-again toggle back.
 addEventListener("click", (ev) => {
   const badge = ev.target !== null && ev.target.closest !== undefined ? ev.target.closest(".cardnum") : null;
@@ -305,7 +384,7 @@ addEventListener("click", (ev) => {
   ev.stopPropagation();
   promoteCard(card.id.replace(/^card-/, ""));
 });
-// 58/42 to start (owner 2026-07-29), then wherever the reader drags it,
+// 58/42 to start (owner ), then wherever the reader drags it,
 // remembered exactly the way every other pane already is.
 const CARDS_KEY = PANE_KEY + "cards-main";
 const cardsEl = document.querySelector(".cards");

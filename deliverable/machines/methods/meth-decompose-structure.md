@@ -1,6 +1,6 @@
 ---
 kind: method
-statement: "Structural decomposition: the winner's picks become elements, every function lands on one, every boundary crossing gets its contract, and every requirement lands on the structure."
+statement: "Structural decomposition: the winner's picks become elements. Every function, boundary crossing and requirement then lands on that structure."
 ---
 
 ## Situation
@@ -17,15 +17,15 @@ crossings change interfaces, a support need adds a function. One state
 holds all three on purpose. The corpus draws the same loop: static
 partitioning may send you back to functional partitioning.
 
-### Elements
+### Elements #work
 
 Three sources, in order of how much they decide for you:
 
 - THE WINNER'S PICKS. Each pick names a mechanism; each mechanism becomes
   one or more elements. Mostly derivation — the decisions were made at
   compose time.
-- THE STANDING SYSTEM. Brownfield joins as it is. Integrate useful legacy
-  rather than redrawing it.
+- THE STANDING SYSTEM. Brownfield joins as it is.
+  - Integrate useful legacy rather than redrawing it.
 - THE GROUPING JUDGMENT. Substrate several picks lean on becomes its own
   element. Cohesion up, coupling down; volatility separated from
   stability; an element not overloaded; separation of concerns.
@@ -35,23 +35,26 @@ its boundary, make/reuse/buy ([[element]]). The `group` key on the node
 holds the grouping — the same node-borne mechanism `cluster` uses on
 functions, written by the same editor.
 
-### Allocation
+### Allocation #work
 
 Every element names the functions it realizes in `implements` — the
 node-borne DMM, pointing the same way `refines` points on a requirement:
-the newer artifact names what it derives from. THE MATCH IS NOT ONE TO
-ONE: several elements or interfaces may implement one function. Software
-tends to one-to-one; systems spread a function across sensor, converter
-and filter, and the spread is exactly what the DSM shows. Checked: every
-function implemented at least once, and nothing implementing nothing —
-the four-holes logic, review-class now, engine-computed later. Elements
-and interfaces both stand in the trace graph's design half, one radius
-past the functions.
+the newer artifact names what it derives from.
+
+THE MATCH IS NOT ONE TO ONE: several elements or interfaces may implement
+one function. Software tends to one-to-one; systems spread a function across
+sensor, converter and filter, and the spread is exactly what the DSM shows.
+
+CHECKED: every function implemented at least once, and nothing implementing
+nothing — the four-holes logic, review-class now, engine-computed later.
+
+Elements and interfaces both stand in the trace graph's design half, one
+radius past the functions.
 
 An element that turns out to need a support function sends you back one
 act, and that is the loop working, not a failure.
 
-### Interfaces
+### Interfaces #work
 
 The owed cells are COMPUTED: every flow whose producing and consuming
 functions sit in different elements crosses a boundary, and each crossing
@@ -61,9 +64,9 @@ element pair owes one interface. Each owed cell is answered by an
 Two coverage directions, both checked: a crossing no interface carries is
 a hole; an interface no crossing demands is a question the other way.
 
-## The trace is complete, on two paths
+## The trace is complete, on two paths #work
 
-NO RESIDUE (owner ruling 2026-08-10): a trace with holes cannot show the
+NO RESIDUE: a trace with holes cannot show the
 changes, and change visibility is what the graph is FOR.
 
 - THE TRANSITIVE PATH carries most requirements: a requirement is served
@@ -86,7 +89,7 @@ SysML's names hold on both paths: behavior ALLOCATED to structure
 (implements), structure SATISFIES requirements directly where the shape
 is the answer.
 
-## The closing act
+## The closing act #work
 
 What stood before is SUPERSEDED, explicitly — the CM law: a baseline is
 immutable, change means a new one. The losers stay on record and stop

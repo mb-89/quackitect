@@ -16,7 +16,37 @@ applies_to:
 These rules bind every surface a person looks at. How you WRITE the words
 on it is voice.md. How you write the CODE behind it is software.md.
 
-## THE BROWSER IS OUT (owner ruling 2026-08-07)
+## A REFERENCE IS A LINK, NEVER TEXT
+
+Four things render as something the reader can follow, wherever a surface
+shows one.
+
+- a path
+- a node id
+- a ref
+- a URL
+
+THREE THINGS FOLLOW FROM THAT.
+
+- A PATH PRINTED AS PLAIN TEXT asks the reader to go and find the file by
+  hand. The page already knew where it was.
+- THIS BINDS EVERY SURFACE, not only prose. Form fields, checklists, tables,
+  job rows, refusal messages, guidance blocks.
+- voice.md ALREADY SAYS IT FOR WORDS: "Link the referent." This is the same
+  rule, binding the RENDER.
+
+The panel's link is `<a class="doclink" data-path="...">`. Use that shape and
+nothing else, so one click handler serves every link on the page.
+
+TWO TRAPS, BOTH MEASURED.
+
+- A LINK INSIDE A `<label>` TOGGLES THE CONTROL. Following a reference then
+  silently ticks the checkbox it was explaining. Put the link outside.
+- THE STORED VALUE KEEPS THE WHOLE ORIGINAL LINE. Only the DISPLAY splits the
+  label from the reference. A collector that writes back what it rendered
+  corrupts the value it was showing.
+
+## THE BROWSER IS OUT
 
 The surface is the editor panel. That is the only place a person looks, and
 the only place a change is proven.
@@ -52,7 +82,7 @@ server actually returns: the radii, the coordinates, the emitted classes. It
 is one call, and it is the difference between reporting a fact and reporting
 a hope.
 
-WHY THIS IS A RULE. Every drawing change on 2026-08-07 took two tries. Each
+WHY THIS IS A RULE. Every drawing change took two tries. Each
 time the source was right, the claim was made from the source, and the owner
 found the gap on the screen. That is work handed back for no reason.
 
@@ -73,7 +103,7 @@ classes aligns only while its stylesheet arrives.
 
 Cosmetics may live in a stylesheet. Structure may not.
 
-This was learned twice on 2026-08-07, on the same table, in one afternoon.
+This was learned twice, on the same table, in one afternoon.
 
 ## Nothing ever hangs
 
@@ -100,7 +130,7 @@ bug somewhere else.
 - STAY VERY CLOSE TO THE DRAWING. This is not a style preference, it is a known weakness.
   - The assistant's visual judgment under this harness is not good enough to improvise with, and every departure from the sketch has been a step backwards.
   - When the drawing and your taste disagree, the drawing wins.
-- NO SLIDERS UNLESS THE SKETCH DRAWS ONE (owner, 2026-08-01). A slider implies a continuum and a total order.
+- NO SLIDERS UNLESS THE SKETCH DRAWS ONE. A slider implies a continuum and a total order.
   - Most of what has been built with one was really a set of named CATEGORIES, and it wanted buttons and line edits instead.
   - The autonomy, shutdown and narration controls were all this mistake.
 - A prefill is a suggestion, never content. Anything the AI prefills for a person stays inert (commented out) until that person confirms it — one confirmation per prefill, never in bulk.
@@ -124,7 +154,7 @@ bug somewhere else.
 - ONE DECIDER PER PAINT.
   - Every rule deciding how one thing is drawn lives in ONE function, and every surface drawing that thing calls it.
   - A second caller deciding a mark for itself is how one surface starts disagreeing with the next about what is proven.
-- COLOUR IS CONFIGURATION, NEVER CODE (owner ruling 2026-07-30).
+- COLOUR IS CONFIGURATION, NEVER CODE.
   - One palette file holds every colour the product chooses.
   - A person edits that file. Changing a colour never means changing code.
   - The surfaces read it LIVE. An edit shows without reloading the machinery.
@@ -145,6 +175,34 @@ bug somewhere else.
   - It says so on itself, quietly. A snapshot that looks live is a trap.
 - Only content that is GENUINELY GONE may clear. If what they had open no longer exists, say so in its place.
   - Never silently swap in something else, and never quietly close it.
+
+## Nothing a person does needs a reload
+
+EVERY ACT SHOWS ITS RESULT AT ONCE, on every surface the result touches. A
+reader who has to reload to see what they just did has been told the act
+failed, and been told it wrongly.
+
+THIS IS ABSOLUTE. It is not a target and there is no act small enough to be
+excepted. Filing, renaming, moving, adding, finishing — all of them.
+
+THE WHOLE WIRE IS OWED, and a break anywhere in it looks identical from the
+outside. Four links, and each has failed in this product:
+
+- THE WRITE lands on disk.
+- THE INDEX HEARS IT. A surface reading a cached model still shows the state
+  before the act, and the write is invisible.
+- THE SURFACE REDRAWS. Every surface, not the one that was pressed.
+- THE REDRAW KEEPS THE READER'S PLACE. A repaint that resets what they had
+  open is the reload again, wearing a repaint's clothes.
+
+WHOEVER WRITES TELLS THE INDEX, at the one writer rather than in each caller.
+A caller that has to remember is a caller that will forget, and the next writer
+will never know it was owed.
+
+MEASURED, TWICE IN ONE SESSION. Filing work into a bucket wrote the file and
+told nothing, so the editor drew from a stale index and the reader saw no
+change. Renaming a bucket did the same. Both were reported as the feature not
+working at all.
 
 ## Every element answers for itself
 
@@ -171,7 +229,7 @@ A surface behavior is never one change. It spans four things:
 
 Fixing one leg and shipping is the failure this project repeats most.
 
-Four times in one day (2026-08-04) a change landed with one leg missing:
+Four times in one day a change landed with one leg missing:
 
 - Colours: the data was right. The CSS rule never existed.
 - The route line: the route was right. The projection matched the wrong prefix.
@@ -200,7 +258,7 @@ A second surface for a job one surface already does is the most expensive
 mistake on this page. Both halves keep working, and only their disagreement
 is visible.
 
-Three came out of one afternoon on the trace graph (2026-08-05):
+Three came out of one afternoon on the trace graph:
 
 - A second details panel was built beside the real one. The page already routes every click through `clickable` and `data-detail`.
 - The nodes were styled from scratch and came out black on black. The machine view's `state` and `label` classes already carry the host's palette.

@@ -14,22 +14,33 @@
 // One source, two projections: the packet JSON shown here IS what the
 // agent receives.
 import { readFileSync } from "node:fs";
+import { join, relative, sep } from "node:path";
 import { BASES_SCRIPT, BASES_STYLE, BASES_TABLE_STYLE } from "./basesclient.ts";
 import { basesCard } from "./baseui.ts";
 import { LOOK_FILES, lookPath, palettePath } from "./brand.ts";
 import type { CallLog, CallRecord } from "./calllog.ts";
-import { type CanvasData, type CanvasElement, loadCanvas, subLabel } from "./canvas.ts";
+import { type CanvasData, type CanvasElement, subLabel } from "./canvas.ts";
 import { bindings, loadCards } from "./cards.ts";
 import type { StrayNote } from "./inbox.ts";
 import type { MachineDecl } from "./machine.ts";
-import { compileMachineCached, resolveRef } from "./machines/compile.ts";
-import { loadPanel, renderPanel } from "./params.ts";
+import { renderSidebar } from "./params.ts";
 import { SCRIPT } from "./renderclient.ts";
 import { STYLE } from "./renderstyle.ts";
-import { loadLevels } from "./scale.ts";
-import { mainMachinePath, type Session } from "./session.ts";
+import type { Session } from "./session.ts";
 import { TABLE_SCRIPT, TABLE_STYLE } from "./tables.ts";
 import { TRACE_SCRIPT, TRACE_STYLE, traceCard } from "./traceui.ts";
+import type { RouteMarks } from "./viewmodel.ts";
+import { view as resolveView, routeOverlay, statePaint } from "./viewmodel.ts";
+import type { WidgetKind } from "./widget-kinds.ts";
+import { workCard } from "./work-card.ts";
+import { WORK_SCRIPT } from "./workclient.ts";
+import { inHandAt, readAllWork } from "./workstore.ts";
+
+export type { RouteMarks };
+// ONE PLACE DECIDES WHAT A GREEN MEANS, and it is the resolver. Re-exported
+// here because callers older than the move ask this module for them, and a
+// caller should not have to learn where a function went.
+export { routeOverlay, statePaint };
 
 function esc(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -65,7 +76,7 @@ function sidePoint(el: CanvasElement, side: string | undefined, other: CanvasEle
   }
 }
 
-/** THE ROUTED LAW (owner ruling 2026-08-04, opt-in): arrows run centre
+/** THE ROUTED LAW: arrows run centre
  *  to centre and clip at the borders — the tip always lands ON the
  *  target's edge, pointing at its heart. */
 function borderPoint(el: CanvasElement, toward: [number, number]): [number, number] {
@@ -133,8 +144,8 @@ export function reservedColours(root: string): string[] {
 export interface StateMeta {
   /** Passed against a demand that has since moved — no longer green. */
   suspect?: boolean;
-  /** A blessed gate — the thumbs-up rides the green (owner ruling
-   *  2026-08-11: green means submitted; green plus thumb means blessed). */
+  /** A blessed gate — the thumbs-up rides the green (
+   *: green means submitted; green plus thumb means blessed). */
   blessed?: boolean;
   /** Green because a LAW passed, with no form signed. The third kind, and the
    *  one that used to look exactly like the first — see
@@ -146,49 +157,28 @@ export interface StateMeta {
   entry_met: boolean;
   /** The state's authored second line — drawn small under the name. */
   subtitle?: string;
-}
-
-/** see dsp-mirror-render.md#the-drawing-is-the-truth */
-export function routeOverlay(
-  steps: { from: string; to: string }[],
-  /** The view's QUALIFIED chain below main ("" is main). A nested machine
-   *  is "iterations/i1", never its bare leaf id — hops speak full chains. */
-  prefix: string,
-): { waypoints: Set<string>; path: string[] } {
-  const local = (q: string): string | undefined => {
-    if (prefix === "") return q.split("/")[0];
-    if (!q.startsWith(`${prefix}/`)) return undefined;
-    return q.slice(prefix.length + 1).split("/")[0];
-  };
-  const waypoints = new Set<string>();
-  const path: string[] = [];
-  const visit = (id: string): void => {
-    if (path[path.length - 1] !== id) path.push(id);
-  };
-  for (const s of steps) {
-    const a = local(s.from);
-    const b = local(s.to);
-    if (a === undefined || b === undefined) continue;
-    visit(a);
-    if (a === b) waypoints.add(a);
-    else visit(b);
-  }
-  return { waypoints, path };
-}
-
-interface RouteMarks {
-  waypoints: Set<string>;
-  /** The stops in order. The spline runs through their anchors. */
-  path: string[];
-  /** A bar's owed legs the path does not run through — each drawn as its
-   *  own line into the bar, so the fan shows whole. */
-  fan?: { from: string; to: string }[];
-  /** The destination, if it is in this drawing. */
-  target?: string;
-  /** The walk STANDS in this drawing — the one view that draws the here-arrow. */
-  here?: boolean;
-  /** The hop the walk cannot pass, and why. Drawn as a road closure. */
-  blocked?: { at: string; why: string };
+  /** THE STATE'S BUCKETS, counted. All of them hold what is still OWED, and
+   *  they sit on the top edge.
+   *
+   *  THERE IS NO DONE BUBBLE (owner). A finished piece of work is not
+   *  actionable, so the drawing never counts one — the editor's filter is where
+   *  dones are read. `bucketOf` still answers `done` for that filter.
+   *  see dsp-mirror-render.md#a-state-wears-its-buckets */
+  work_in?: number;
+  work_pending?: number;
+  work_out?: number;
+  /** THE SAME FOUR, SUMMED OVER EVERYTHING INSIDE THIS STATE'S SUBMACHINE.
+   *
+   *  The bucket reads `18 + 4`: its own, then what is beneath it. Without the
+   *  second half a machine hides every piece of work its children hold. */
+  /** TRUE WHERE A GREEN WOULD BE A LIE. Set on a state that still owes work,
+   *  and on every state downstream of one — those could only have been reached
+   *  through it. Pending never sets it.
+   *  see dsp-mirror-render.md#green-is-refused-over-owed-work */
+  work_owed?: boolean;
+  work_below_in?: number;
+  work_below_pending?: number;
+  work_below_out?: number;
 }
 
 /** A Catmull-Rom spline through every stop, emitted as cubic Beziers — the
@@ -254,34 +244,6 @@ function svgEdges(canvas: CanvasData, byId: Map<string, CNode>, skip: Set<string
   return parts;
 }
 
-/** SUSPECT BEATS DONE. The claim was filed and it still stands on disk. What
- *  it answered has moved, so the state is not green — it is a lapsed pass,
- *  and the drawing has to say so before anybody trusts the colour.
- *
- *  ONE WORD FOR ONE IDEA. The trace graph marks a node standing on moved
- *  ground with the same word and the same style. A reader who learns the mark
- *  once reads it everywhere. */
-/** ONE PLACE DECIDES WHAT A GREEN MEANS. Three rules said it and three test
- *  files enforced parts of them, so nobody could say which parts were covered.
- *  see dsp-mirror-render.md#one-decider-says-which-kind-of-green-it-is */
-export function statePaint(
-  sid: string,
-  activeIds: Set<string>,
-  doneIds: Set<string>,
-  meta: Record<string, StateMeta>,
-): { cls: string; marks: string[] } {
-  const m = meta[sid];
-  // SUSPECT BEATS EVERY GREEN. A colour standing on moved ground is no longer
-  // earned, and the drawing says so before anybody trusts it.
-  if (activeIds.has(sid)) return { cls: "state active", marks: [] };
-  if (m?.suspect === true) return { cls: "state suspect", marks: [] };
-  if (!doneIds.has(sid)) return { cls: "state", marks: [] };
-  // A LAW-PROVEN GREEN SIGNED NOTHING. It rides the same green — a pass is a
-  // pass — and carries its own word, so the two are told apart at a glance.
-  const cls = m?.law_proven === true ? "state done proven" : "state done";
-  return { cls, marks: m?.blessed === true ? ["bless"] : [] };
-}
-
 function stateClass(sid: string, activeIds: Set<string>, doneIds: Set<string>, meta: Record<string, StateMeta>): string {
   return statePaint(sid, activeIds, doneIds, meta).cls;
 }
@@ -327,7 +289,129 @@ function svgStateNode(
   if (statePaint(sid, activeIds, doneIds, meta).marks.includes("bless")) {
     parts.push(`<text x="${n.x + n.width - 14}" y="${n.y + 26}" class="bless-mark">👍</text>`);
   }
+  parts.push(...svgWorkPill(n, sid, meta[sid]));
   parts.push("</g>");
+  return parts;
+}
+
+/** ONE PILL, drawn straddling an edge of the state box.
+ *
+ *  IT IS CLICKABLE, and the click carries WHICH STATE and WHICH BUCKET. The
+ *  page routes every click through `clickable` and `data-detail`, so the pill
+ *  joins that path rather than opening a second one.
+ *
+ *  BOTH HALVES TRAVEL. A bucket kind alone cannot open anything: the editor
+ *  lists one block per position, so the click has to say which position.
+ *
+ *  A PILL THAT IS ALL ROLL-UP TAKES NO CLICK. Its count belongs to states
+ *  INSIDE the machine, and the editor has no block for the container itself, so
+ *  a click there would land on nothing. Letting the press through reaches the
+ *  state's own handler, which opens the machine — and opening the machine is
+ *  the way in, exactly as the design says.
+ *  see dsp-mirror-render.md#a-state-wears-its-buckets */
+function pill(
+  x: number,
+  centreY: number,
+  text: string,
+  cls: string,
+  bucket: string | undefined,
+  anchor: "left" | "right" = "left",
+): string[] {
+  // SIZED TO THE CANVAS, which draws its state names at 26px. A pill sized for
+  // a web page is invisible here.
+  const w = 22 + text.length * 10;
+  // see dsp-mirror-render.md#the-anchor-says-which-edge-the-coordinate-is
+  const left = anchor === "left" ? x : x - w;
+  const y = centreY - 15;
+  const open =
+    bucket === undefined ? `<g class="work-pill-rollup">` : `<g class="clickable work-pill-hit" data-detail="bucket:${esc(bucket)}">`;
+  return [
+    open,
+    `<rect x="${left}" y="${y}" width="${w}" height="30" rx="15" class="${cls}"/>`,
+    `<text x="${left + w / 2}" y="${y + 21}" class="work-pill-text">${esc(text)}</text>`,
+    "</g>",
+  ];
+}
+
+/** THE STATE'S BUCKETS, drawn on the state itself.
+ *
+ *  FOUR BUCKETS, AND POSITION CARRIES THE MEANING. Three sit on the TOP edge
+ *  and hold what is still owed; DONE sits on the BOTTOM edge.
+ *
+ *  - INPUT, furthest LEFT. What must be taken in. It blocks.
+ *  - PENDING, between them. Work the state deals with eventually. It does not
+ *    block, and it is really the backlog's bucket.
+ *  - OUTPUT, furthest RIGHT. What must be produced. It blocks.
+ *  - DONE, underneath. What is finished.
+ *
+ *  SO A STATE WITH NO TOP-ROW BUCKETS IS A FINISHED STATE, readable at a glance
+ *  with nothing to interpret.
+ *
+ *  A BUCKET HOLDING NOTHING IS NOT DRAWN AT ALL. Absence is the signal, and a
+ *  bucket reading zero would ask the reader to notice a number instead.
+ *
+ *  DONE IS A FILTER RATHER THAN A PLACE, so nothing moves between these when a
+ *  piece of work finishes: it stays where it was worked and changes which count
+ *  it falls into.
+ *
+ *  THEY TAKE NONE OF THE RESERVED COLOURS. Green, red and yellow mean passed,
+ *  failed and attention, and a count of work is not a verdict.
+ *  see dsp-mirror-render.md#a-state-wears-its-buckets */
+/** THE COUNT ONE BUCKET SHOWS: its own, and what its children hold.
+ *
+ *  IT READS `18 + 4`, and the plus is the whole point. The first number is
+ *  this state's own; the second is everything inside its submachine.
+ *
+ *  NOTHING REACHES THE SECOND HALF FROM HERE, and nothing should. The number
+ *  is a summary; the way in is opening the machine.
+ *  see dsp-mirror-render.md#a-state-wears-its-buckets */
+function bucketText(own: number, below: number): string | undefined {
+  if (own + below === 0) return undefined;
+  return below === 0 ? String(own) : `${String(own)} + ${String(below)}`;
+}
+
+/** THREE DROP ZONES ON EVERY STATE, one per bucket (owner).
+ *
+ *  DROPPING ON A STATE IS NOT ENOUGH. It said WHERE the work is done and said
+ *  nothing about WHICH bucket, so everything landed in the derived one — which
+ *  reads as the drop choosing for you.
+ *
+ *  THEY SHOW WHILE A ROW IS IN THE AIR and are invisible otherwise. A state is a
+ *  drawing to read most of the time, and three permanent targets on every state
+ *  would be three permanent distractions.
+ *
+ *  THEY SIT WHERE THE PILLS SIT, so the zone a reader aims at is under the count
+ *  it will change. Left is in, middle is pending, right is out.
+ *
+ *  THE STATE'S BODY IS STILL A TARGET, and it means here with the bucket left to
+ *  derive. That is how a said slot is taken back off. */
+function svgDropZones(n: CNode, sid: string): string[] {
+  const lane = (n.width - 48) / 3;
+  const top = n.y - 15;
+  return ["in", "pending", "out"].map(
+    (kind, i) =>
+      `<rect x="${n.x + 12 + lane * i}" y="${top}" width="${lane}" height="30" rx="15" class="work-drop-zone ${kind}" data-drop="${esc(sid)}:${kind}"><title>drop here to put this work in ${kind}</title></rect>`,
+  );
+}
+
+function svgWorkPill(n: CNode, sid: string, m: StateMeta | undefined): string[] {
+  const owed: [number, number, string][] = [
+    [m?.work_in ?? 0, m?.work_below_in ?? 0, "in"],
+    [m?.work_pending ?? 0, m?.work_below_pending ?? 0, "pending"],
+    [m?.work_out ?? 0, m?.work_below_out ?? 0, "out"],
+  ];
+  // THE ZONES GO DOWN FIRST, so a pill drawn over one still reads. They take a
+  // pointer only while a row is in the air.
+  const parts: string[] = svgDropZones(n, sid);
+  // LEFT TO RIGHT ACROSS THE TOP EDGE, each holding its own place whether or
+  // not its neighbours are drawn, so a state's output bucket is always on the
+  // right and never slides left when the input bucket empties.
+  const lane = (n.width - 48) / 3;
+  owed.forEach(([own, below, kind], i) => {
+    const text = bucketText(own, below);
+    if (text !== undefined)
+      parts.push(...pill(n.x + 24 + lane * i, n.y, text, `work-pill ${kind}`, own === 0 ? undefined : `${sid}:${kind}`));
+  });
   return parts;
 }
 
@@ -337,7 +421,7 @@ function svgStateNode(
  *  every alive answer; a mismatch reloads the page. */
 export const ENGINE_LIFE = Date.now().toString(36);
 
-// THE FAN IS DRAWN WHOLE (owner, 2026-08-09): every leg a bar still owes
+// THE FAN IS DRAWN WHOLE (owner): every leg a bar still owes
 // gets its own dashed line into it and its own dot, so the one drawn path
 // cannot hide the others.
 function svgFanLegs(route: RouteMarks | undefined, nodeOfState: Map<string, CNode>): string[] {
@@ -525,6 +609,8 @@ const BRIEFS: Record<string, (a: Record<string, unknown>) => string> = {
     const items = Array.isArray(a.items) ? ` (+${a.items.length})` : "";
     return `${a.op}${a.node !== undefined ? ` ${a.node}` : ""}${a.brief !== undefined ? `: ${a.brief}` : ""}${items}`;
   },
+  mirror_work_mint: (a) => `opened “${String(a.statement ?? "")}”`,
+  mirror_work_move: (a) => `moved ${Array.isArray(a.work) ? a.work.length : 1} → ${String(a.to ?? "")}`,
   se_note: (a) => String(a.text ?? ""),
   mirror_note: (a) => String(a.text ?? ""),
   se_answer: (a) => String(a.question ?? ""),
@@ -552,10 +638,53 @@ const BRIEFS: Record<string, (a: Record<string, unknown>) => string> = {
   se_exp_list: () => "expeditions",
 };
 
-/** One feed line's brief — the unified feed's middle column (owner ruling,
+/** A TOKEN SPEAKS WHEN IT IS PUT IN WORK AND WHEN IT COMES OUT (owner).
+ *
+ *  WHAT THE READER WANTS TO SEE is the STATEMENT and the COMMENT the hand
+ *  chose. Neither is in the arguments: a take or a settle sends only an id, and
+ *  the statement lives on the item. So the answer carries it back and this
+ *  reads the whole record rather than the arguments alone.
+ *
+ *  WITHOUT IT the feed printed the bare word `se_work` — a token moved, and
+ *  nothing about which one or why. */
+function briefWork(rec: CallRecord): string {
+  const a = rec.args as { act?: unknown; comment?: unknown };
+  const back = rec.response as { statement?: unknown; status?: unknown } | undefined;
+  const act = String(a.act ?? "");
+  const said = String(back?.statement ?? "");
+  const status = String(back?.status ?? "");
+  const mark =
+    act === "open"
+      ? "opened"
+      : act === "take"
+        ? "started"
+        : act === "restate"
+          ? "renamed"
+          : status === "done" || status === ""
+            ? "finished"
+            : status;
+  // AN OPEN CARRIES ITS DETAIL AFTER A SLASH, and the four words are the name.
+  // The rest is the token's body, which the feed does not repeat.
+  const line = String(a.comment ?? "");
+  const name = said !== "" ? said : line.split("/")[0].trim();
+  const why = act === "open" ? line.slice(line.indexOf("/") + 1).trim() : line.trim();
+  return why === "" || why === name ? `${mark} “${name}”` : `${mark} “${name}” — ${why}`;
+}
+
+/** One feed line's brief — the unified feed's middle column (
  *  v2 i9 notes: time | src | brief | result; the full record is one click
- *  away, so the brief only has to say WHAT, never everything). */
+ *  away, so the brief only has to say WHAT, never everything).
+ *
+ *  MOST TOOLS ARE READ FROM THEIR ARGUMENTS ALONE, which is why `BRIEFS` takes
+ *  them. A few need what came BACK, and those are named here. */
+const FULL_BRIEFS: Record<string, (rec: CallRecord) => string> = {
+  se_work: briefWork,
+  mirror_work_act: briefWork,
+};
+
 function briefFor(rec: CallRecord): string {
+  const whole = FULL_BRIEFS[rec.tool];
+  if (whole !== undefined) return whole(rec);
   const f = BRIEFS[rec.tool];
   return f !== undefined ? f(rec.args as Record<string, unknown>) : rec.tool;
 }
@@ -571,7 +700,20 @@ function oneLine(s: string): string {
 /** see dsp-mirror-render.md#the-server-acting-on-its-own-behalf */
 const SELF_SERVED = new Set(["mirror_slow", "mirror_narration_now", "mirror_profile"]);
 
-function srcOf(tool: string, actor?: string): string {
+/** THE HAND BEATS THE ACTOR WHERE THERE IS ONE.
+ *
+ *  Every agent call already records the PART it played — guide, walker,
+ *  reviewer — and the feed printed "agent" for every one of them, which tells
+ *  a reader nothing they had not already assumed.
+ *
+ *  A LOG THAT CANNOT TELL THE GUIDE FROM THE WALKER cannot answer whether
+ *  delegating was worth its tokens, and that is the question the roster exists
+ *  to settle. The coordinate was being recorded and never shown.
+ *
+ *  `human` AND `ui` ARE UNTOUCHED. A person is a person however the record
+ *  labels the hand, and the surface acting on its own behalf is not a hand. */
+function srcOf(tool: string, actor?: string, part?: string): string {
+  if (actor === "agent" && (part === "guide" || part === "walker" || part === "reviewer")) return part;
   // THE RECORD WINS. A stamp is what the handler that served the call KNEW;
   // the rule below is a guess from a string, kept only for records written
   // before the stamp existed, because history cannot be restamped.
@@ -587,14 +729,14 @@ export function feedRows(
 ): { capped: boolean; rows: Array<Record<string, unknown>> } {
   const q = log.query({ filter: { since }, limit: 501 });
   // The reader's selection is view state — logged, never shown as a feed row.
-  // Self-served polls and timings never show either (owner ruling 2026-08-12:
+  // Self-served polls and timings never show either (
   // a poll is not an act) — the log keeps them for the slowness mine.
   const records = (q.records ?? []).filter((r) => r.tool !== "mirror_select" && !SELF_SERVED.has(r.tool));
   const capped = records.length > 500;
   const rows = records.slice(-500).map((rec) => ({
     ref: rec.ref,
     ts: rec.ts,
-    src: srcOf(rec.tool, rec.actor),
+    src: srcOf(rec.tool, rec.actor, rec.part),
     // Updates are NARRATION (bold), whatever their op — only se_note
     // strays are retro notes (italic). Two kinds, never conflated.
     type:
@@ -604,7 +746,12 @@ export function feedRows(
           ? "note"
           : rec.tool === "se_answer"
             ? "aq"
-            : "call",
+            : // THE SURFACE'S OWN ACTS ARE WORK TOO. A person pressing take on a
+              // token and an agent calling the verb are the same event, and the
+              // feed drew one of them as an ordinary call.
+              rec.tool === "se_work" || rec.tool === "mirror_work_act" || rec.tool === "mirror_work_mint"
+              ? "work"
+              : "call",
     brief: oneLine(briefFor(rec)),
     ok: rec.ok,
     ...(rec.ok ? {} : { clause: (rec.response as { clause?: string } | undefined)?.clause }),
@@ -624,30 +771,6 @@ export function feedRows(
   return { capped, rows: [...noteRows, ...rows] };
 }
 
-/** Resolve a viewable machine by id: main itself, or one of its subs. */
-function viewedMachine(m: MirrorState, view: string | undefined): { decl: MachineDecl; canvas: CanvasData } {
-  const mainPath = mainMachinePath(m.root);
-  if (view === undefined || view === m.session.machine.id) {
-    return { decl: m.session.machine, canvas: loadCanvas(mainPath) };
-  }
-  const subState = m.session.machine.states.find((s) => s.submachine !== undefined && s.id === view);
-  if (subState === undefined) {
-    // Nested generated machines (archive decades) are viewable too.
-    const nested = m.session.viewFor(view);
-    return nested ?? { decl: m.session.machine, canvas: loadCanvas(mainPath) };
-  }
-  // Generated machines serve their own drawing (continue_expedition).
-  const generated = m.session.generatedView(subState.id);
-  if (generated !== undefined) return generated;
-  const path = resolveRef(m.root, mainPath, subState.submachine!);
-  // CACHED, and live all the same. compileMachineCached memoises against the
-  // CONTENT of every file the compile read, so an edited canvas or state note
-  // recompiles on the next render and an untouched one does not. The mirror
-  // re-renders on every poll, and recompiling the machine each time cost a
-  // full second per render — paid by the VS Code panel, not just the tests.
-  return { decl: compileMachineCached(m.root, path), canvas: loadCanvas(path) };
-}
-
 // THE COMPONENT LIBRARY, on every page the mirror serves. The engine serves
 // the bundle itself (mirror.ts, /vendor), so this is an ordinary script tag
 // rather than a webview asset URI — no bundler and no build step.
@@ -655,6 +778,21 @@ const ELEMENTS = '<script type="module" src="/vendor/vscode-elements.js"></scrip
 
 // see dsp-mirror-render.md#the-palette-is-configuration
 const PALETTE_FALLBACK = ":root{--se-bg:#14171a;--se-fg:#d8dde2}";
+
+/** TURN `[[refs]]` IN RENDERED PROSE INTO LINKS THE READER CAN FOLLOW.
+ *
+ *  IT LIVES HERE BECAUSE MARKUP LIVES HERE (i4). The server used to
+ *  build this anchor itself, which made the server a place markup came from.
+ *  Every reference the panel shows now comes out of the one surface.
+ *
+ *  see dsp-legible-controls.md#a-reference-in-prose-is-a-link-not-dead */
+export function linkDocRefs(html: string, links: Record<string, string>): string {
+  const attr = (s: string): string => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
+  return html.replace(/\[\[([^\]\n]+)\]\]/g, (whole: string, id: string) => {
+    const path = links[id.trim()];
+    return path === undefined ? whole : `<a class="doclink" data-path="${attr(path)}">${attr(id.trim())}</a>`;
+  });
+}
 
 export function palette(root: string): string {
   try {
@@ -702,195 +840,34 @@ const NATIVE = `
   body.solo .widget { border: 0; }
   body.solo .widget-head { display: none; }
   body.solo #w-machine .widget-head { display: flex; }
+  /* THE WORK EDITOR'S HEADER CARRIES CONTROLS, NOT A TITLE, so hiding it hides
+     the acts rather than a redundant caption. Measured: the header was drawn
+     correctly and this rule above it made it invisible, through two window
+     reloads and a rebuild. */
+  body.solo .work-widget > .widget-head { display: flex; }
   body.solo #w-machine .head-sliders { display: none !important; }
   body.solo #w-machine .expand { display: none; }
   body.solo aside, body.solo main { background: transparent; }
 `;
 
-/** The per-state detail objects the page's data island carries. */
-function stateDetails(m: MirrorState, decl: MachineDecl, done: Set<string>, archived: { id: string }[]): Record<string, unknown> {
-  const states: Record<string, unknown> = {};
-  for (const s of decl.states) {
-    states[s.id] = {
-      id: s.id,
-      kind: s.kind,
-      statement: s.statement,
-      guidance: s.guidance,
-      priority: s.priority,
-      // A state with evidence fields IS its form — the details render it.
-      has_form: s.evidence_form.length > 0,
-      legal_tools: s.legal_tools ?? [],
-      ...(s.submachine !== undefined ? { submachine: s.submachine } : {}),
-      ...(s.entry !== undefined ? { entry: m.session.conditionStatus(decl, s, "enter") } : {}),
-      ...(s.exit !== undefined ? { exit: m.session.conditionStatus(decl, s, "leave") } : {}),
-      exit_met: m.session.conditionMet(decl, s, "leave"),
-      was_filled: done.has(s.id),
-      // An archive-record state carries ITS closed record for the detail.
-      ...(s.tags?.includes("archive-record")
-        ? { archive_record: archived.find((e) => e.id === s.id || e.id.startsWith(`${s.id}-`)) ?? null }
-        : {}),
-      ...(s.exit?.script !== undefined || s.entry?.script !== undefined ? { script: m.session.scriptStatus(decl, s) } : {}),
-      pulled: m.session.pulled(decl, s),
-      next: s.edges.map((e) => stateEdgeDetail(m, decl, e)),
-    };
-  }
-  return states;
-}
-
-function stateEdgeDetail(m: MirrorState, decl: MachineDecl, e: MachineDecl["states"][number]["edges"][number]): Record<string, unknown> {
-  const t = decl.states.find((st) => st.id === e.to);
-  const ready = t === undefined ? true : m.session.entryReadyHuman(decl, t);
-  return {
-    to: e.to,
-    role: e.role,
-    ...(e.guard !== undefined ? { guard: e.guard } : {}),
-    ...(t !== undefined ? { kind: t.kind, statement: t.statement, priority: t.priority } : {}),
-    // The human's ▶ lock: explicit entry conditions AND the pull —
-    // every doc entering demands, checked at its current version. A
-    // locked edge carries WHAT is missing (the tooltip names it).
-    // ASKED ONCE. This ran entryReadyHuman twice per edge, and each
-    // call walks the target's whole reading list.
-    enter_met: ready,
-    ...(t !== undefined && !ready ? { missing: m.session.entryMissingHuman(decl, t) } : {}),
-  };
-}
-
-/** RECORD-COMPLETE, derived: every claimful state stands green, and every
- *  drawn sub-machine is record-complete in turn. A machine with nothing
- *  claimful anywhere proves nothing and stays incomplete, as does an
- *  unwalked branch's machine — a false grey, never a false green. Memoised
- *  per drawing; the memo doubles as the cycle guard. */
-function recordComplete(m: MirrorState, d: MachineDecl, rc: Map<string, boolean>, green?: Set<string>): boolean {
-  const known = rc.get(d.id);
-  if (known !== undefined) return known;
-  rc.set(d.id, false); // a cycle proves nothing
-  const g = green ?? new Set(m.session.recordPaint(d));
-  let provable = false;
-  for (const s of d.states) {
-    const claimful = s.evidence_form.length > 0;
-    if (claimful || s.submachine !== undefined) provable = true;
-    if (claimful && !g.has(s.id)) return false;
-    if (s.submachine !== undefined && !subComplete(m, s.id, rc)) return false;
-  }
-  rc.set(d.id, provable);
-  return provable;
-}
-
-/** A container's derived green: its drawing resolves AND that machine is
- *  record-complete. A seeded sub-machine with no drawing yet proves nothing. */
-function subComplete(m: MirrorState, id: string, rc: Map<string, boolean>): boolean {
-  const sub = m.session.viewFor(id);
-  return sub !== undefined && recordComplete(m, sub.decl, rc);
-}
-
-/** Highlights follow the WALK; the view may be elsewhere. */
-function drawingSets(
-  m: MirrorState,
-  decl: MachineDecl,
-  info: { active: string[] },
-  viewingWalk: boolean,
-): {
-  leafActive: Set<string>;
-  done: Set<string>;
-  paint: Set<string>;
-  subIds: Set<string>;
-  openIds: Set<string>;
-  meta: Record<string, StateMeta>;
-} {
-  const leafActive = viewingWalk ? new Set(info.active.map((a) => a.split("/").pop()!)) : new Set<string>();
-  if (!viewingWalk && decl.id === m.session.machine.id) {
-    // Viewing main while the walk is inside a sub: the sub state is the live one.
-    leafActive.add(m.session.breadcrumb()[1]);
-  }
-  // RE-ENTRY RESETS (owner ruling 2026-07-27): the drawing shows the LIVE
-  // run only — a machine entered again starts gray; past passes live in
-  // the record, not on the drawing.
-  const run = m.session.viewRun(decl.id);
-  const done = new Set(run.done.map((s) => s.split("/").pop()!));
-  // An end state is never "filled" — it turns green when its machine completed.
-  if (run.completed) for (const s of decl.states) if (s.kind === "end") done.add(s.id);
-  // see dsp-mirror-render.md#only-record-backed-states-paint
-  const paint = new Set(m.session.recordPaint(decl));
-  const blessed = new Set(m.session.blessedGates(decl, paint));
-  const proven = new Set(m.session.lawProvenStates(decl));
-  // see dsp-mirror-render.md#drift-is-computed-on-the-way-to-the-screen
-  const suspect = new Set(m.session.suspectStates(decl));
-  const subIds = new Set(decl.states.filter((s) => s.submachine !== undefined).map((s) => s.id));
-  // WHICH OF THEM CAN ACTUALLY BE OPENED. A seeded sub-machine has no drawing
-  // until its authoring state has run, and asking the resolver is the only way
-  // to know — the declaration alone says nothing about whether it exists.
-  const openIds = new Set([...subIds].filter((id) => m.session.viewFor(id) !== undefined));
-  // see dsp-mirror-render.md#a-walked-sub-machine-must-not-look-unstarted
-  const rc = new Map<string, boolean>();
-  if (decl.states.some((s) => s.kind === "end") && recordComplete(m, decl, rc, paint)) {
-    for (const s of decl.states) if (s.kind === "end") paint.add(s.id);
-  }
-  const meta: Record<string, StateMeta> = {};
-  for (const s of decl.states) {
-    meta[s.id] = {
-      suspect: suspect.has(s.id),
-      ...(blessed.has(s.id) ? { blessed: true } : {}),
-      ...(proven.has(s.id) ? { law_proven: true } : {}),
-      has_exit: s.exit !== undefined,
-      exit_met: m.session.conditionMet(decl, s, "leave"),
-      has_entry: s.entry !== undefined,
-      entry_met: m.session.conditionMet(decl, s, "enter"),
-      // The STATEMENT is the subtitle (owner ruling 2026-07-28): authored
-      // meaning renders small under the name; empty renders nothing.
-      ...(s.statement !== "" && s.statement !== s.id ? { subtitle: s.statement } : {}),
-    };
-  }
-  return { leafActive, done, paint, subIds, openIds, meta };
-}
-
-// THE ROUTE, PROJECTED ONTO THIS DRAWING. A broken or unreachable target
-// must never take the picture down with it, so the marks simply go
-// missing and the machine still renders.
-function routeMarksFor(m: MirrorState, decl: MachineDecl): RouteMarks | undefined {
-  try {
-    const r = m.session.route(m.session.target);
-    const prefix = decl.id === m.session.machine.id ? "" : m.session.viewChain(decl.id).slice(1).join("/");
-    const { waypoints, path: hops } = routeOverlay(r.steps, prefix);
-    const localOf = (q: string): string | undefined => {
-      if (prefix === "") return q.split("/")[0];
-      return q.startsWith(`${prefix}/`) ? q.slice(prefix.length + 1).split("/")[0] : undefined;
-    };
-    // The fan's legs, projected onto this drawing like every other mark.
-    const fan: { from: string; to: string }[] = [];
-    for (const f of r.fan ?? []) {
-      const to = localOf(f.at);
-      if (to === undefined) continue;
-      for (const l of f.legs) {
-        const from = localOf(l);
-        if (from !== undefined && from !== to) fan.push({ from, to });
-      }
-    }
-    const shutAt = r.stops_at === undefined ? undefined : localOf(r.stops_at.at);
-    const rest = prefix === "" ? r.from : r.from.startsWith(`${prefix}/`) ? r.from.slice(prefix.length + 1) : undefined;
-    return {
-      waypoints,
-      path: hops,
-      ...(fan.length > 0 ? { fan } : {}),
-      here: rest !== undefined && !rest.includes("/"),
-      ...(r.found && localOf(r.target) !== undefined ? { target: localOf(r.target) } : {}),
-      ...(shutAt !== undefined && r.stops_at !== undefined ? { blocked: { at: shutAt, why: r.stops_at.why } } : {}),
-    };
-  } catch {
-    /* no route, no marks - the drawing stands either way */
-    return undefined;
-  }
-}
-
 // Breadcrumbs describe the VIEW: main [›subs] [ › sub [›its subs] ].
 // The crumbs walk the PARENT CHAIN — a nested machine shows under its
-// real parent, never directly under main (owner ruling 2026-07-28).
-function crumbsFor(m: MirrorState, decl: MachineDecl): string {
+// real parent, never directly under main.
+function crumbsFor(m: MirrorState, decl: MachineDecl, address = decl.id): string {
   const mainSubs = m.session.machine.states.filter((s) => s.submachine !== undefined).map((s) => s.id);
   const crumbArrow = (subs: string[]): string =>
     subs.length === 0
       ? ""
       : `<span class="crumb-arrow">›<span class="crumb-menu">${subs.map((s) => `<a href="/?view=${encodeURIComponent(s)}">${esc(s)}</a>`).join("")}</span></span>`;
-  const chain = m.session.viewChain(decl.id);
+  // THE CRUMBS SAY THE PATH ONCE.
+  //
+  // THEY USED TO PRINT THE POSITION AGAIN beside themselves, as a full
+  // qualified path. It carried nothing the crumbs did not already show, and
+  // the leaf it added is on the position button two elements to the right.
+  //
+  // WHERE THE WALK IS AIMED IS THE AIM CHIP'S, beside that button. Nothing was
+  // lost by removing the repeat.
+  const chain = m.session.viewChain(address);
   return chain
     .map((id, i) => {
       const label = i === chain.length - 1 ? `<b class="here">${esc(id)}</b>` : `<a href="/?view=${encodeURIComponent(id)}">${esc(id)}</a>`;
@@ -905,9 +882,56 @@ function crumbsFor(m: MirrorState, decl: MachineDecl): string {
     .join("");
 }
 
+/** WHERE THE WALK IS AIMED, for the chip beside where it stands.
+ *
+ *  IT IS ITS OWN FUNCTION because renderMirror sits at the complexity ceiling
+ *  and one more branch inside it crosses.
+ *
+ *  NOTHING ROUTED SHOWS AS NOTHING, never as a dash. An empty target is a real
+ *  state of the walk, and the absence of the arrow says it. */
+function aimChipFor(aim: { path: string; machine: string; leaf: string } | undefined): string {
+  if (aim === undefined) return "";
+  // IT IS A BUTTON NOW, drawn like the position
+  // button beside it. Jumping the view to where the walk is AIMED is the same
+  // thing a reader wants as jumping to where it STANDS, so it is the same
+  // control wearing a different arrow.
+  return `<button class="ghost cur-state aim" data-machine="${esc(aim.machine)}" data-state="${esc(aim.leaf)}" title="the walk is aimed at ${esc(aim.path)} — click: jump the view to it">→ ${esc(aim.leaf)}</button>`;
+}
+
+/** THE PIECE OF WORK IN HAND, for the chip LEFT of where the walk stands.
+ *
+ *  THE POSITION ALONE DOES NOT SAY WHAT IS HAPPENING. It names the state; this
+ *  names the piece of work inside it, so a reader watching the bar sees the
+ *  work FLIP rather than a state name that holds still for an hour.
+ *
+ *  TAKEN BEATS MERELY OPEN. A hand marks work before it acts, so an item
+ *  carrying a holder is the one being worked. With nothing taken, the oldest
+ *  open item at the position is what the walk owes next.
+ *
+ *  DRAWN WORK IS NOT IN HAND. A note or a pool token is reported from a live
+ *  source and nobody is holding it.
+ *
+ *  IT IS A LINK AND NEVER TEXT. Clicking opens the token's own markdown, which
+ *  is the shape ux.md asks of every reference a surface shows.
+ *
+ *  NOTHING IN HAND SHOWS AS NOTHING. An empty bar is a real state of the walk,
+ *  the same way an unrouted target draws no arrow. */
+function handChipFor(root: string, active: string[]): string {
+  const pick = inHandAt(root, active);
+  if (pick === undefined) return "";
+  const home = readAllWork(root).homeById.get(pick.id);
+  if (home === undefined) return "";
+  const path = relative(root, join(home, "work", `${pick.id}.md`))
+    .split(sep)
+    .join("/");
+  const said = pick.statement.length > 44 ? `${pick.statement.slice(0, 43)}…` : pick.statement;
+  const holder = pick.taken_by === "" ? "owed here" : `in hand: ${pick.taken_by}`;
+  return `<a class="ghost cur-state doclink in-hand" data-path="${esc(path)}" title="${esc(holder)} — ${esc(pick.statement)} — click: open the token">◐ ${esc(said)}</a>`;
+}
+
 export function renderMirror(
   m: MirrorState,
-  widget?: "machine" | "details" | "log" | "terminal" | "table" | "trace",
+  widget?: WidgetKind,
   view?: string,
   card?: string,
   embed?: boolean,
@@ -928,64 +952,43 @@ export function renderMirror(
   };
   const skin = embed === true ? NATIVE : "";
   const bodyClass = embed === true ? ` class="embed${widget === undefined ? "" : " solo"}"` : "";
-  const info = m.session.describe() as { active: string[]; status: string };
-  // The scale is READ from machines/scale.md — the Obsidian-editable
-  // truth; an owner edit shows on the next reload.
-  const levels = loadLevels(m.root);
-  const walkMachine = m.session.currentMachine();
-  const { decl, canvas } = viewedMachine(m, view ?? walkMachine.id);
-  const viewingWalk = decl.id === walkMachine.id;
-  phase("session");
-  const history = m.session.instance.history ?? [];
+  // THE SURFACE ASKS FOR THE VIEW. Everything below this line DRAWS what came
+  // back; nothing below it works out an answer of its own.
+  //
+  // THE PHASE NAMES AND THE WORK THEY MEASURE ARE UNCHANGED. The resolver
+  // reports the ones it now owns, so a reader comparing timings across the
+  // move is measuring the same thing. Their ORDER changed: machine.states now
+  // comes before machine.svg, because the model is built before it is drawn.
+  const machineStarted = performance.now();
+  const model = resolveView(m, { widget, view, onPhase: phase });
+  const { canvas, decl, viewingWalk } = model;
+  const info = model.describe;
+  const levels = model.levels;
+  const packet = model.packet;
+  const checkedDocs = model.checkedDocs;
+  const states = model.states;
+  const comment = model.comment;
   let svg = "";
   let crumbs = "";
-  let states: ReturnType<typeof stateDetails> = {};
-  let comment = "";
-  // THE MACHINE PHASE IS REPORTED WHOLE AND IN PARTS. The parts are new; the
-  // total keeps its old name and its old span, so a reader comparing across
-  // runs is not silently handed a different measurement.
-  const machineStarted = performance.now();
-  if (widget !== "trace") {
-    const { leafActive, done, paint, subIds, openIds, meta } = drawingSets(m, decl, info, viewingWalk);
-    const marks = routeMarksFor(m, decl);
-    phase("machine.sets");
-    const INPUT_ROLES = new Set(["normal", "approval"]);
-    const busbars = decl.states
-      .filter((gate) => gate.busbar === true)
-      .map((gate) => ({
-        into: gate.id,
-        feeders: decl.states
-          .filter((parent) => parent.edges.some((edge) => edge.to === gate.id && INPUT_ROLES.has(edge.role ?? "normal")))
-          .map((parent) => parent.id),
-      }))
-      .filter((bar) => bar.feeders.length >= 2);
-    svg = machineSvg(canvas, leafActive, paint, subIds, openIds, meta, busbars, marks);
+  if (model.drawing !== undefined) {
+    const d = model.drawing;
+    svg = machineSvg(canvas, d.leafActive, d.paint, d.subIds, d.openIds, d.meta, d.busbars, d.marks);
     phase("machine.svg");
-    crumbs = crumbsFor(m, decl);
-    const archived = decl.states.some((state) => state.tags?.includes("archive-record"))
-      ? (m.session.expeditionList() as { archive: { id: string }[] }).archive
-      : [];
-    states = stateDetails(m, decl, done, archived);
-    phase("machine.states");
-    comment = (canvas.nodes ?? []).find((node) => node.type === "text")?.text ?? "";
+    crumbs = crumbsFor(m, decl, view);
   }
   phase("machine.rest");
   onPhase?.("machine", performance.now() - machineStarted);
-  const packet = widget === "trace" ? { legal_tools: [] } : m.session.packet();
-  phase("packet");
-  const checkedDocs = m.session.humanCheckedPaths();
-  phase("checked_docs");
   const data = `<script type="application/json" id="se-data">${JSON.stringify({
     build: ENGINE_LIFE,
-    target: m.session.target,
+    target: model.target,
     describe: info,
     packet,
-    lastPacket: m.lastPacket ?? null,
+    lastPacket: model.lastPacket,
     states,
     comment,
     viewingWalk,
-    viewed: { id: decl.id, reentry: decl.reentry, initial: decl.initial, states: decl.states.map((s) => s.id) },
-    history: history.slice(-20),
+    viewed: model.viewed,
+    history: model.history,
     levels,
     // Every doc the reader has checked AT ITS CURRENT VERSION. A condition
     // names docs that are not always in the state's own pulled list, so the
@@ -1002,42 +1005,58 @@ export function renderMirror(
   // Nothing here decides how a control looks; the spec names the parameters
   // and params.ts draws the types it knows. A type it does not know refuses,
   // so a control cannot appear that the drawing never asked for.
-  const thr = m.session.autonomy;
-  const panelValues = {
-    rungs: levels,
-    autonomy: thr,
-    ints: { narration_minutes: m.session.narrationMinutes, narration_calls: m.session.narrationCalls },
-  };
-  // THE NOTE ROW IS ITS OWN PANEL, drawn right after the controls. Both
-  // surfaces read the same two specs, so neither can drift from the other.
-  const slider = renderPanel(loadPanel(m.root, "controls"), panelValues) + renderPanel(loadPanel(m.root, "note-entry"), panelValues);
+  const panelValues = model.panel;
+  // ONE FUNCTION STACKS THE PANELS, and both surfaces call it. Concatenating
+  // the specs by hand here is what let the background table go missing from
+  // this surface while the other one carried it.
+  const slider = renderSidebar(m.root, panelValues);
   // see dsp-mirror-render.md#the-shutdown-control-is-gone
 
   const nrBar = "";
   // Escape has a hand-side affordance too (parity law): only while a
   // sub-machine other than boot is being walked.
   const crumbTrail = m.session.breadcrumb();
-  // ESCAPE STANDS BESIDE THE POSITION, ALWAYS (owner ruling 2026-07-30). It
+  // ESCAPE STANDS BESIDE THE POSITION, ALWAYS. It
   // used to appear and vanish with the walk, which moved everything else in
   // the row under the reader's hand. Not applicable is DISABLED, not absent.
   const canEscape = crumbTrail.length > 1 && crumbTrail[1] !== "boot";
   const escapeBtn = `<button class="ghost" id="escape-btn"${canEscape ? "" : " disabled"} title="${canEscape ? "escape to idle — the machine is left standing, the reason is recorded" : "nothing to escape — the walk is not inside a sub-machine"}">⤴ escape</button>`;
+  // THE WAY INTO THE EDITOR, BESIDE ESCAPE (owner). A bucket on a state opens
+  // it too, but a reader should never have to find a pill on a drawing first.
+  // see dsp-the-bucket-editor.md#a-pill-opens-the-editor
+  const workBtn = `<button class="ghost" id="work-btn" title="open the work token editor, below the drawing — every token there is, wherever it lives">▤ work</button>`;
   // see dsp-mirror-render.md#the-way-home-when-the-view-holds-still-elsewhere
   const curBtn = info.active
     .map((qualified) => qualified.split("/").pop() ?? "")
     .filter((leaf) => leaf !== "")
     .map(
       (leaf) =>
-        `<button class="ghost cur-state" data-machine="${esc(walkMachine.id)}" data-state="${esc(leaf)}" title="the walk stands here — click: jump the view to it">☉ ${esc(leaf)}</button>`,
+        `<button class="ghost cur-state" data-machine="${esc(model.walkMachineId)}" data-state="${esc(leaf)}" title="the walk stands here — click: jump the view to it">☉ ${esc(leaf)}</button>`,
     )
     .join("");
-  const machineWidget = `<div class="widget" id="w-machine"><div class="widget-head"><span class="crumbs">${crumbs}</span><span class="head-controls" style="display:flex;align-items:center;gap:10px">${curBtn}<span class="head-sliders" style="display:flex;align-items:center;gap:10px">${slider}${nrBar}</span>${escapeBtn}<button class="expand" data-widget="w-machine" data-url="/widget/machine?view=${encodeURIComponent(decl.id)}" title="expand · ctrl-click: new tab · shift-click: new window — both open frozen on what this card is showing">⛶</button></span></div><div class="widget-body">${svg}</div></div>`;
+  // WHERE THE WALK IS AIMED, beside where it stands.
+  //
+  // THE ROUTE LINE WAS NOT ENOUGH. It draws only where the target sits in the
+  // SAME drawing, and an iteration aimed at its ship state routes across
+  // machines — so the blue line went missing exactly when a target existed.
+  //
+  // NOTHING ROUTED SHOWS AS NOTHING, never as a dash. An empty target is a real
+  // state of the walk, and the absence of the arrow says it.
+  //
+  // IT IS NOT A BUTTON. The position is clickable because jumping the view to
+  // it is a thing a reader wants; the target is a fact, and nothing happens if
+  // you press a fact.
+  const aimChip = aimChipFor(model.aim);
+  // LEFT OF THE POSITION, because the work is the finer-grained fact and the
+  // reader scans left to right from what changes most often.
+  const handChip = handChipFor(m.root, info.active);
+  const machineWidget = `<div class="widget" id="w-machine"><div class="widget-head"><span class="crumbs">${crumbs}</span><span class="head-controls" style="display:flex;align-items:center;gap:10px">${handChip}${curBtn}${aimChip}<span class="head-sliders" style="display:flex;align-items:center;gap:10px">${slider}${nrBar}</span>${escapeBtn}${workBtn}<button class="expand" data-widget="w-machine" data-url="/widget/machine?view=${encodeURIComponent(decl.id)}" title="expand · ctrl-click: new tab · shift-click: new window — both open frozen on what this card is showing">⛶</button></span></div><div class="widget-body">${svg}</div></div>`;
   const detailsWidget = `<div class="widget" id="w-details">${widgetHead("details", "w-details", "/widget/details")}
     ${info.status === "closed" ? '<div class="meta" style="color:var(--se-fail)">machine closed</div>' : ""}
     <div class="meta" id="details-title" data-morph-ignore>—</div>
     <div class="panel" id="details" data-morph-ignore></div>
   </div>`;
-  // The unified feed sits ABOVE details (owner ruling 2026-07-26) — rows
+  // The unified feed sits ABOVE details — rows
   // load and refresh client-side off /api/log; only present with a log.
   const logWidget =
     m.log === undefined
@@ -1053,13 +1072,21 @@ export function renderMirror(
   </div>`;
   // see dsp-mirror-render.md#the-chat-card-keeps-its-slot
   const terminalWidget = termWidget(true);
-  // THE TABLE (owner ask 2026-08-01) — every view every .base in the vault
+  // THE TABLE (owner ask ) — every view every.base in the vault
   // declares, drawn here so Obsidian is not the only thing that can read
   // them. The vault is re-read per render for the same reason the palette is.
   // A FUNCTION, NOT A VALUE, and that is the whole point: building it reads
   // all 169 notes off disk. Measured at 60ms, against a 96ms render — so
   // computing it eagerly would have put a 60% tax on the machine page, the
   // log page and the details page, none of which ever show a table.
+  // THE WORK EDITOR, in the same document as the machine so a row can be
+  // dragged from one onto the other. A function for the same reason the table
+  // is: it reads the open record's work off disk, and no other card wants it.
+  const workWidget = (): string =>
+    workCard(
+      m.root,
+      `<button class="expand" data-widget="w-work" data-url="/widget/work" title="expand · ctrl-click: new tab · shift-click: new window">⌘</button>`,
+    );
   const tblWidget = (): string =>
     basesCard(
       m.root,
@@ -1105,6 +1132,14 @@ export function renderMirror(
 <body${bodyClass}><div class="cols"><aside id="sidebar" style="width:100vw;max-width:100vw">${traceWidget()}</aside></div>${MODAL}${data}<script>${SCRIPT}</script><script>${TRACE_SCRIPT}</script></body></html>`;
   }
 
+  // THE EXPAND BUTTON NEEDS SOMEWHERE TO LAND. A card whose button points at a
+  // route nobody serves opens a blank page, which reads as the card being
+  // broken rather than the route being missing.
+  if (widget === "work") {
+    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · work</title><style>${pal}${STYLE}${TABLE_STYLE}${BASES_STYLE}${BASES_TABLE_STYLE} #work-dock{width:100vw;max-width:100vw} #work-grip{display:none} body.solo #sidebar{display:flex;flex-direction:column;height:100vh}${skin}</style>${ELEMENTS}</head>
+<body${bodyClass}><div class="cols"><aside id="sidebar" style="width:100vw;max-width:100vw">${workWidget()}</aside></div>${MODAL}${data}<script>${SCRIPT}</script><script>${TABLE_SCRIPT}</script><script>${BASES_SCRIPT}</script><script>${WORK_SCRIPT}</script></body></html>`;
+  }
+
   if (widget === "table") {
     return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · table</title><style>${pal}${STYLE}${TABLE_STYLE}${BASES_STYLE}${BASES_TABLE_STYLE} #w-table{flex:1;border-bottom:0;min-height:0} body.solo #sidebar{display:flex;flex-direction:column;height:100vh} .tbl-body{flex:1;min-height:0}${skin}</style>${ELEMENTS}</head>
 <body${bodyClass}><div class="cols"><aside id="sidebar" style="width:100vw;max-width:100vw">${tblWidget()}</aside></div>${MODAL}${data}<script>${SCRIPT}</script><script>${TABLE_SCRIPT}</script><script>${BASES_SCRIPT}</script></body></html>`;
@@ -1121,9 +1156,31 @@ export function renderMirror(
 <body${bodyClass}><div class="cols"><aside id="sidebar" style="width:100vw;max-width:100vw">${logWidget}</aside></div>${MODAL}${data}<script>${SCRIPT}</script></body></html>`;
   }
 
+  // THE MACHINE PAGE CARRIES THE EDITOR, in the same document, under the
+  // drawing.
+  //
+  // IT IS NOT A LAYOUT PREFERENCE. A row is dragged FROM the editor ONTO a
+  // state, and no drop crosses two documents. An editor on its own page cannot
+  // receive that gesture at all, so the two must arrive together.
+  //
+  // MEASURED BEFORE THIS: /widget/machine drew every bucket and held no w-work,
+  // so pressing a bucket looked one up, found null and did nothing.
+  // see dsp-the-bucket-editor.md#it-never-moves-the-machine
+  // THE DATABASE'S OWN STYLESHEET AND SCRIPT RIDE THIS PAGE. The work editor IS
+  // two database cards, and without these the rows draw at the wrong height and
+  // the sort and properties buttons open nothing. Measured: the machine page
+  // carried neither, and the editor looked like a different component.
+  //
+  // THE EDITOR IS LEFT, THE DRAWING IS RIGHT, and the seam stands BETWEEN them
+  // (owner). The seam is UPRIGHT — it runs top to bottom, and dragging it moves
+  // the boundary left and right.
+  //
+  // THE SEAM IS A SIBLING OF BOTH, which is why it is written here rather than
+  // inside the editor. As the editor's last child it drew underneath it, and a
+  // bar under the editor separates the editor from nothing.
   if (widget === "machine") {
-    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · machine</title><style>${pal}${STYLE} main{padding:10px}${skin}</style>${ELEMENTS}</head>
-<body${bodyClass}><div class="cols"><main>${machineWidget}</main></div>${MODAL}${data}<script>${SCRIPT}</script></body></html>`;
+    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · machine</title><style>${pal}${STYLE}${TABLE_STYLE}${BASES_STYLE}${BASES_TABLE_STYLE} main{padding:10px;display:flex;flex-direction:row;align-items:stretch;gap:0;min-height:0}${skin}</style>${ELEMENTS}</head>
+<body${bodyClass}><div class="cols"><main>${workWidget()}<div class="work-seam" data-seam="dock" title="drag to give the editor more or less of the window"></div><div class="machine-lane">${machineWidget}</div></main></div>${MODAL}${data}<script>${SCRIPT}</script><script>${TABLE_SCRIPT}</script><script>${BASES_SCRIPT}</script><script>${WORK_SCRIPT}</script></body></html>`;
   }
   if (widget === "details") {
     return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · details</title><style>${pal}${STYLE}${skin}</style>${ELEMENTS}</head>
@@ -1134,7 +1191,15 @@ export function renderMirror(
     card,
     embed,
     { bodyClass, skin, pal, data },
-    { terminal: terminalWidget, machine: machineWidget, log: logWidget, details: detailsWidget, table: tblWidget, trace: traceWidget },
+    {
+      terminal: terminalWidget,
+      machine: machineWidget,
+      log: logWidget,
+      details: detailsWidget,
+      table: tblWidget,
+      trace: traceWidget,
+      work: workWidget,
+    },
   );
 }
 
@@ -1144,7 +1209,15 @@ function cardMatrixPage(
   card: string | undefined,
   embed: boolean | undefined,
   frame: { bodyClass: string; skin: string; pal: string; data: string },
-  widgets: { terminal: string; machine: string; log: string; details: string; table: () => string; trace: () => string },
+  widgets: {
+    terminal: string;
+    machine: string;
+    log: string;
+    details: string;
+    table: () => string;
+    trace: () => string;
+    work: () => string;
+  },
 ): string {
   const allCards = loadCards(m.root);
   const cardList = embed === true ? allCards.filter((c) => c.widget !== "terminal") : allCards;
@@ -1157,6 +1230,7 @@ function cardMatrixPage(
     // card never pays for one.
     ...(cardList.some((c) => c.widget === "table") ? { table: widgets.table() } : {}),
     ...(cardList.some((c) => c.widget === "trace") ? { trace: widgets.trace() } : {}),
+    ...(cardList.some((c) => c.widget === "work") ? { work: widgets.work() } : {}),
   };
   const filled = (c: { widget?: string }): boolean => c.widget !== undefined && (byWidget[c.widget] ?? "") !== "";
   // THE DEFAULT MAIN CARD IS THE FIRST AVAILABLE ONE — one rule instead of a
@@ -1204,7 +1278,7 @@ function cardMatrixPage(
   ${legendHtml}
   <div class="divider" id="div-cards"></div>
 </div>
-${MODAL}${frame.data}${cardData}<script>${SCRIPT}</script><script>${TABLE_SCRIPT}</script><script>${BASES_SCRIPT}</script><script>${TRACE_SCRIPT}</script>
+${MODAL}${frame.data}${cardData}<script>${SCRIPT}</script><script>${TABLE_SCRIPT}</script><script>${BASES_SCRIPT}</script><script>${TRACE_SCRIPT}</script><script>${WORK_SCRIPT}</script>
 </body></html>`;
 }
 

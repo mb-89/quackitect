@@ -1,6 +1,6 @@
 ---
 form: cut-criteria
-reopened: "2026-08-19T17:36:47.517Z — same claims-registration gap, cascading fix through M4"
+reopened: 2026-08-19T17:36:47.517Z — same claims-registration gap, cascading fix through M4
 by: agent
 signed_off: 2026-08-19T17:37:25.424Z
 authors: agent

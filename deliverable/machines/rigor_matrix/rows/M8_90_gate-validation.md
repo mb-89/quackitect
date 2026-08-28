@@ -17,12 +17,8 @@ legal_tools:
   - se_file_list
   - se_log_query
   - se_answer
-  - se_web_search
-  - se_web_fetch
+  - se_run
   - se_test
-  # THE GATE RUNS THE BATTERY, so it owns the one failure the battery can
-  # raise that no code change fixes: a stale prompt layer. Without this the
-  # gate can SEE the red and has no verb to clear it (i17).
   - se_prompt_place
 evidence:
   - name: meets_need
@@ -39,9 +35,12 @@ evidence:
     description: (market) the real-world checks green per meth-market-tier - required only when the iteration is declared to market
     required: false
 major: full
+major_complexity: C3/R4
 minor: tailored
+minor_complexity: C3/R4
 patch: none
 product: full
+product_complexity: C3/R4
 specification: tailored
 major_note: |
   Applies in full: every value prop answered, every must story

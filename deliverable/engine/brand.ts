@@ -53,7 +53,7 @@ export function brandPath(root: string): string {
   return join(root, ...BRAND_PARTS);
 }
 
-/** Read live (owner ruling 2026-07-29): a running system holding a stale copy
+/** Read live: a running system holding a stale copy
  *  of the file it calls the single truth is enforcing a lie. */
 export function loadBrand(root: string): Brand {
   let raw: string;

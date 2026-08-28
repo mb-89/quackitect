@@ -43,9 +43,11 @@ evidence:
       `none` IS A COMMON AND HONEST ANSWER. A strength no rival can take
       is exactly what a robust choice looks like.
 major: full
+major_complexity: C3/R3
 minor: none
 patch: none
 product: full
+product_complexity: C3/R3
 specification: tailored
 major_note: |
   Applies in full: perturb the weights, hunt the losing world, credible
@@ -91,7 +93,7 @@ could take the leader's strength without giving up its own is a real world. One
 that could take it only by abandoning what put it on the front is not, and the
 line says which.
 
-THE RULING IS A CLICK (owner ruling 2026-08-10). Marking a cell credible and
+THE RULING IS A CLICK. Marking a cell credible and
 saving mints its RAID tripwire ([[meth-raid]]) with the fallback in its body;
 the ruling line keeps the minted ref. An unmarked cell stands visibly
 unruled on a card that redraws from the scores — nothing is dismissed in

@@ -3,11 +3,11 @@ minted_in: i5-engine-hygiene-one-version-source-every-
 id: raid-iss-a-cloud-run-must-push-and-the-lane-refuses-it
 type: "[[raid]]"
 kind: issue
-statement: "The guidance now requires a cloud run to push before it finishes, and SE-C-003 refuses every push without exception. The one act that decides whether the work survives is the one act outside the lane."
+statement: The guidance now requires a cloud run to push before it finishes, and SE-C-003 refuses every push without exception. The one act that decides whether the work survives is the one act outside the lane.
 owner: the owner
 trigger: every cloud run, from the next one on
 status: open
-impact: "A cloud run's push is unlogged, unrefusable and unguarded. Nothing checks the branch and nothing stops a force. The call log is what the method calls the only witness on an unattended box, and it holds no record of the act that delivered the work."
+impact: A cloud run's push is unlogged, unrefusable and unguarded. Nothing checks the branch and nothing stops a force. The call log is what the method calls the only witness on an unattended box, and it holds no record of the act that delivered the work.
 breaks_how_badly: crippling
 how_likely: expected
 source_refs:
@@ -19,6 +19,7 @@ source_refs:
   - i5-engine-hygiene-one-version-source-every-
 weighs_with: none
 weighs_against: none
+place: i42-the-served-word-matches-the-machine-guid
 ---
 
 ## What was observed

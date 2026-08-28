@@ -39,7 +39,11 @@ function headings(): Map<string, Set<string>> {
   for (const rel of pointable()) {
     const set = new Set<string>();
     for (const l of readFileSync(join(REPO_ROOT, rel), "utf8").split("\n")) {
-      if (l.startsWith("## ")) set.add(slug(l.slice(3)));
+      // EVERY HEADING LEVEL IS A SECTION. This collected `## ` only, so a
+      // pointer naming a real `### ` section was reported as a citation to
+      // nowhere — the pointer was right and the reader was not looking.
+      const h = /^(#{2,6}) /.exec(l);
+      if (h !== null) set.add(slug(l.slice(h[1].length + 1)));
     }
     out.set(rel.split(/[/\\]/).pop() as string, set);
   }

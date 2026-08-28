@@ -2,7 +2,7 @@
 minted_in: i37-training-iterations-a-disposable-iterati
 id: flow-benchmark-request
 type: "[[flow]]"
-statement: "a request to measure the machine against a finished iteration"
+statement: a request to measure the machine against a finished iteration
 kind: signal
 crosses: in
 source_refs:

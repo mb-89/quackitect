@@ -3,7 +3,7 @@ form: the-decision-repeats-and-shows-its-input
 by: agent
 signed_off: 2026-08-20T20:37:02.061Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / the-decision-repeats-and-shows-its-input

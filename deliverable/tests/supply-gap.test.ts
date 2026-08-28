@@ -5,7 +5,7 @@
 // tools were the file verbs and se_run. It could not call the test verb, so the
 // agent reached for the shell.
 //
-// MEASURED 2026-08-16, first run of this check over the live matrix: 29
+// MEASURED, first run of this check over the live matrix: 29
 // state/field pairs across four columns, every one a gate asked to name the
 // register entries its own review added, with no verb that can mint one.
 //

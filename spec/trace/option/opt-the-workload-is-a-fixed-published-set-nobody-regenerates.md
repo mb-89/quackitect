@@ -5,8 +5,8 @@ type: "[[option]]"
 cluster: cluster-the-benchmark-run
 question: how a run decides which iteration to walk
 found_by: prior-art
-statement: "The set of things a benchmark may run is written down, versioned, and never regenerated, so two results are comparable because the work did not move between them."
-source: "ref-agent-benchmark-harnesses-2026 \u2014 SWE-bench, 2,294 problems across 12 repositories, fetched 2026-08-19"
+statement: The set of things a benchmark may run is written down, versioned, and never regenerated, so two results are comparable because the work did not move between them.
+source: ref-agent-benchmark-harnesses-2026 — SWE-bench, 2,294 problems across 12 repositories, fetched 2026-08-19
 ---
 
 ## What it buys

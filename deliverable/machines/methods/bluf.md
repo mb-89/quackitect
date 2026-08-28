@@ -13,12 +13,18 @@ Progressive disclosure (deliverable/machines/methods/progressive-disclosure.md) 
 idea for whole documents and interfaces.
 
 **Steps.**
-1. Write the bottom line as one or two sentences: what happened, what
+1. Write the bottom line as one or two sentences: #work
+
+   what happened, what
    is needed, or what was decided.
-2. Put it FIRST — before context, before narrative, before caveats.
-3. Order the rest by falling importance, not by the order you did the
+2. Put it FIRST — before context, before narrative, before caveats. #work
+3. Order the rest by falling importance #work
+
+   Not by the order you did the
    work or thought the thoughts.
-4. Cut test: delete the last paragraph. If the text is still complete,
+4. Cut test: #work
+
+   delete the last paragraph. If the text is still complete,
    the order is right, so repeat.
 
 **Output.** A text whose first sentence could stand alone — and whose

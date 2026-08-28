@@ -16,7 +16,7 @@ satisfies:
 source_refs:
   - cand-nothing-can-be-forgotten
   - raid-dec-one-corpus-reader-and-the-second-is-deleted
-  - "probe P4 at i9 M4, 2026-08-19"
+  - probe P4 at i9 M4, 2026-08-19
 ---
 
 It exists because two readers already disagreed and nothing noticed. One drops a

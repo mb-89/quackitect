@@ -1,6 +1,6 @@
 ---
 form: identify-assumptions
-reopened: "2026-08-19T17:29:24.689Z — same claims-registration gap, cascading fix through M3"
+reopened: 2026-08-19T17:29:24.689Z — same claims-registration gap, cascading fix through M3
 by: agent
 signed_off: 2026-08-19T17:29:25.153Z
 authors: agent

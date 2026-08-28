@@ -3,20 +3,21 @@ minted_in: i37-training-iterations-a-disposable-iterati
 id: raid-iss-a-corpus-wide-law-with-a-state-local-trigger-bills-a-stranger
 type: "[[raid]]"
 kind: issue
-statement: "A law that reads the whole corpus but fires only at one state accumulates debt nobody is billed for, and then bills whichever iteration next stands there. Twice now that iteration has been i37."
+statement: A law that reads the whole corpus but fires only at one state accumulates debt nobody is billed for, and then bills whichever iteration next stands there. Twice now that iteration has been i37.
 owner: the maintainer of the machine
 trigger: any new corpus-wide law added as a state check, or any existing one whose backlog has never been swept
 status: open
-impact: "An iteration is stopped by a wall of ids it did not mint. The work is real and belongs to somebody else, so it is done badly or filed to look covered - and a link filed to look covered is worse than the gap it hides."
+impact: An iteration is stopped by a wall of ids it did not mint. The work is real and belongs to somebody else, so it is done badly or filed to look covered - and a link filed to look covered is worse than the gap it hides.
 breaks_how_badly: corrosive
 how_likely: expected
-probe: "MEASURED 2026-08-20 on i37, twice over. Fourteen uncovered crossings named at specify-build, nine of them minted in i9. Seventeen register entries graded at rank-unknowns, none of them i37's."
+probe: MEASURED 2026-08-20 on i37, twice over. Fourteen uncovered crossings named at specify-build, nine of them minted in i9. Seventeen register entries graded at rank-unknowns, none of them i37's.
 probed: 2026-08-20
 source_refs:
   - i37-training-iterations-a-disposable-iterati
   - raid-iss-a-placeholder-that-runs-a-sub-machine-can-never-be-re-signed
 weighs_with: none
 weighs_against: none
+place: i53-a-step-sees-its-own-record-s-slice-forms
 ---
 
 ## What happens

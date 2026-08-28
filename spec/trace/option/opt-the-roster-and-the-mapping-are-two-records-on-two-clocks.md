@@ -4,9 +4,9 @@ id: opt-the-roster-and-the-mapping-are-two-records-on-two-clocks
 type: "[[option]]"
 cluster: the-sizing
 question: what the mapping from difficulty to driver holds
-statement: "the difficulty-to-rung mapping and the roster of models filling each rung live in two separate records, because they move on different clocks and for different reasons"
+statement: the difficulty-to-rung mapping and the roster of models filling each rung live in two separate records, because they move on different clocks and for different reasons
 found_by: heuristic
-source: "the heuristic group what changes together and separate what changes apart, held against the sizing cluster"
+source: the heuristic group what changes together and separate what changes apart, held against the sizing cluster
 ---
 
 ## Mechanism

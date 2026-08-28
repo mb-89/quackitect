@@ -3,7 +3,7 @@ form: the-account-rides-every-answer
 by: agent
 signed_off: 2026-08-21T11:19:13.181Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / the-account-rides-every-answer

@@ -15,7 +15,7 @@ Three roles bind at seed:
 
 The engine gates outputs. It never runs a role.
 
-## Procedure
+## Procedure #work
 
 - Author an executable check for every requirement in scope.
 - Push toward mechanical wherever the verify_method allows.

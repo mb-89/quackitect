@@ -1,10 +1,10 @@
 ---
 form: specify-build
-reopened: "2026-08-21T12:34:57.192Z — The signed Seed 7 implementation scope requires build chunks, but specify-build left the chunk machine at its placeholder because no design-spec node was added."
+reopened: 2026-08-21T12:34:57.192Z — The signed Seed 7 implementation scope requires build chunks, but specify-build left the chunk machine at its placeholder because no design-spec node was added.
 by: agent
 signed_off: 2026-08-21T12:35:37.996Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / specify-build

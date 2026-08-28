@@ -7,9 +7,9 @@ statement: A piece of work that is still running has already recorded something 
 owner: the driving agent
 trigger: the first report whose duration does not change between two asks made a minute apart
 status: probed
-probed: "2026-08-21, and it HOLDS more strongly than the assumption claimed. A run appends to .se/test-progress.jsonl line by line while it is going, and its first line carries the denominator."
-probe: "Start a long run, wait, and read what has been written to the timing record while it is still going. If the file is empty or unchanged until the run ends, nothing is readable mid-run and the estimate has no input."
-impact: "Every duration in the report is computed from what a piece of work has already done. If nothing is recorded until the work finishes, there is nothing to compute from and the honest answer is always that no estimate can be given."
+probed: 2026-08-21, and it HOLDS more strongly than the assumption claimed. A run appends to .se/test-progress.jsonl line by line while it is going, and its first line carries the denominator.
+probe: Start a long run, wait, and read what has been written to the timing record while it is still going. If the file is empty or unchanged until the run ends, nothing is readable mid-run and the estimate has no input.
+impact: Every duration in the report is computed from what a piece of work has already done. If nothing is recorded until the work finishes, there is nothing to compute from and the honest answer is always that no estimate can be given.
 breaks_how_badly: corrosive
 how_likely: plausible
 source_refs:

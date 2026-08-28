@@ -1,11 +1,11 @@
 ---
 steps:
   - id: sty-answer-what-does-this-touch
-    statement: "An agent asks the query verb what a decision touches, gets filtered rows back, then gets refused by name when it asks for a field the view does not carry."
+    statement: An agent asks the query verb what a decision touches, gets filtered rows back, then gets refused by name when it asks for a field the view does not carry.
     depends_on: []
     realization: demonstration
   - id: sty-dispose-a-candidate-coupling
-    statement: "An agent describes a real change, asks the BM25 sibling for candidate couplings, and gets one disposition row per candidate with nothing left silently pending."
+    statement: An agent describes a real change, asks the BM25 sibling for candidate couplings, and gets one disposition row per candidate with nothing left silently pending.
     depends_on: []
     realization: demonstration
 ---

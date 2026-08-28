@@ -9,45 +9,49 @@ delete process.env.SE_SCRIPT_SKIP;
 // hand, exactly as the mirror drives it. The agent's verb is the pull,
 // tested in the pull*.test.ts files.
 //
-// SMALL FILES ON PURPOSE (owner ruling, 2026-07-30). A test file is the
+// SMALL FILES ON PURPOSE. A test file is the
 // only unit that reaches a second core, so themes get their own file and
 // the suite uses the machine it runs on. See guidance/software.md.
 import { strict as assert } from "node:assert";
 import { describe, test } from "node:test";
 import { Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
-import { call, checkDocs, freshRoot, pullBoot, sessionAtIdle } from "./helpers.ts";
+import { call, checkDocs, freshRoot, pullBoot, readEverything, sessionAtIdle } from "./helpers.ts";
 
 // Concurrent: every case builds its own root and touches no global.
 describe("walk mechanics", { concurrency: true }, () => {
-  test("se_reload: refused off-idle, dry-runs its canary at idle, free under emergency", async () => {
+  test("se_reload: legal wherever the walk stands, and dry-runs its canary", async () => {
     const server = buildServer(freshRoot());
     const early = await call(server, "se_reload", {});
-    assert.equal(early.isError, true);
-    assert.equal(early.body.clause, "SE-C-110", "not legal before idle");
+    assert.equal(early.isError, false, JSON.stringify(early.body));
+    assert.equal(early.body.reload, "dry", "legal before the desk is ever reached");
 
     const idleRoot = freshRoot();
     const idle = await sessionAtIdle(idleRoot);
-    assert.deepEqual(idle.active(), ["idle"]);
+    assert.deepEqual(idle.active(), ["front_desk"]);
     const r = await call(buildServer(idleRoot, idle), "se_reload", {});
     assert.equal(r.isError, false, JSON.stringify(r.body));
     assert.equal(r.body.reload, "dry");
 
-    // The boot walks THROUGH idle and rests at the front desk, so the
-    // resting place is off-idle and the gate still holds there. Emergency
-    // is the one key: repair cannot afford to walk home first.
+    // A RELOAD NO LONGER DEMANDS THE FRONT DESK. An agent that has just fixed
+    // the engine puts the fix into effect where it stands, instead of walking
+    // out of its record and back in to do it. Nothing mid-record is lost: the
+    // forms are on disk and the pull recomputes the position from the
+    // repository, which is what makes a killed session survivable too.
+    //
+    // THE CANARY IS STILL THE GUARD. A tree whose module graph will not load
+    // never kills a running engine, wherever the reload is asked for.
     const deskRoot = freshRoot();
     const desk = new Session(deskRoot);
     const deskServer = buildServer(deskRoot, desk);
-    // NO SESSION ARGUMENT, ON PURPOSE. Passing one aims the walk at idle, and
-    // the three lines below need it OFF idle, resting at the desk. The call
-    // used to pass `desk` and still land at the desk by timing alone; once the
-    // boot helper stopped racing a deciding judgment it landed at idle instead
-    // and the assertion below caught it.
-    await pullBoot(deskServer);
+    await pullBoot(deskServer, desk);
     assert.equal(desk.active()[0], "front_desk");
-    const refused = await call(deskServer, "se_reload", {});
-    assert.equal(refused.body.clause, "SE-C-110", "the desk is not idle");
+    desk.setTarget("expeditions");
+    await readEverything(desk);
+    assert.notEqual(desk.active()[0], "front_desk", "walked off home, where a reload used to be refused");
+    const offHome = await call(deskServer, "se_reload", {});
+    assert.equal(offHome.isError, false, JSON.stringify(offHome.body));
+    assert.equal(offHome.body.reload, "dry", "off home is no longer a refusal");
     desk.setAutonomy(1);
     desk.setEmergency(true);
     const armed = await call(deskServer, "se_reload", {});
@@ -63,12 +67,12 @@ describe("walk mechanics", { concurrency: true }, () => {
     await session.advance();
     checkDocs(session);
     await session.advance();
-    assert.deepEqual(session.active(), ["boot/prepare_idle"]);
+    assert.deepEqual(session.active(), ["boot/prepare_desk"]);
     // Green or not-yet-run: the file lane stays shut.
     const shut = await call(server, "se_file_write", { path: "x.md", content: "hi", base_hash: null });
     assert.equal(shut.body.clause, "SE-C-110");
     // The suite fails — the engine records it; the repair tools open up.
-    session.submitEvidence("prepare_idle", { script_result: { ok: false, output: "1 failing test" } });
+    session.submitEvidence("prepare_desk", { script_result: { ok: false, output: "1 failing test" } });
     const fix = await call(server, "se_file_write", { path: "x.md", content: "hi", base_hash: null });
     assert.equal(fix.isError, false, JSON.stringify(fix.body));
   });
@@ -78,7 +82,7 @@ describe("walk mechanics", { concurrency: true }, () => {
     const s = new Session(freshRoot());
     // the condition script never pre-runs, and running it from outside is refused
     await assert.rejects(
-      () => s.scriptRun("prepare_idle"),
+      () => s.scriptRun("prepare_desk"),
       (e) => (e as { clause?: string }).clause === "SE-C-112",
     );
     // evidence for a state you are not standing in is refused

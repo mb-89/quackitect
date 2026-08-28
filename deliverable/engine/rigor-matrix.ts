@@ -13,7 +13,7 @@ import {
   validateMachine,
 } from "./machine.ts";
 import { assertCanSupply } from "./machines/supply.ts";
-import { parseStateNote, passEpoch, section } from "./notes.ts";
+import { noteOf, passEpoch, section } from "./notes.ts";
 
 const SRC = "engine/rigor-matrix.ts";
 
@@ -278,7 +278,7 @@ function optionalKeys(file: string, f: Record<string, unknown>): Partial<Evidenc
     ...list("items"),
     ...list("passing"),
     ...list("columns"),
-    // WHICH CHOICES OWE A REASON (owner ruling 2026-08-08). Absent means
+    // WHICH CHOICES OWE A REASON. Absent means
     // ALL of them, which is what a gate verdict wants. A finder's `applies`
     // names only the skip: saying yes needs no essay, saying no does.
     ...list("rationale_for"),
@@ -320,8 +320,8 @@ export function matrixDir(root: string): string {
 }
 
 /** The matrix CONTENT hash — a pin records it, so drift between a pinned
- *  machine and the live matrix stays detectable (and silent until asked —
- *  owner verdict 2026-07-30). Data only; the Bases view is presentation. */
+ *  machine and the live matrix stays detectable, and silent until asked.
+ *  Data only; the Bases view is presentation. */
 const HASH_CACHE = new Map<string, { stamp: string; hash: string; epoch: number }>();
 
 /** THE HASH IS THE HONEST KEY, AND THE STAMP IS THE HONEST KEY FOR THE HASH.
@@ -407,7 +407,11 @@ function parseMatrixRow(
   file: string,
   byName: Map<string, RigorMatrixRow>,
 ): { row: RigorMatrixRow; fm: Record<string, unknown> } {
-  const note = parseStateNote(readFileSync(join(dir, "rows", file), "utf8"));
+  // THROUGH THE DOOR. A matrix row is a NOTE, and the door parses each one
+  // once and shares it with every other reader in the pass. Read cold, the
+  // matrix re-parsed 63 rows for every caller that asked about any of them.
+  const note = noteOf(join(dir, "rows", file));
+  if (note === undefined) throw new Error(`matrix row ${file} cannot be read`);
   const fm = note.frontmatter;
   const name = typeof fm.name === "string" ? fm.name : "";
   if (!name) throw new Error(`matrix row ${file} declares no name`);
@@ -437,28 +441,81 @@ function parseMatrixRow(
     // A ROW MAY DEMAND ITS OWN METHOD. A state note has always been able to;
     // a row could only inherit one through same_as, so a step whose method is
     // not common knowledge had no way to make it a condition of entry.
-    entry: fm.entry_read === undefined ? undefined : { read: asList(fm.entry_read) },
+    entry: entryOf(fm),
     // see dsp-method-compilation.md#a-row-may-demand-a-machine-observed-check-on-the
     exit: fm.exit_script === undefined ? undefined : { script: asList(fm.exit_script) },
   };
   refuseBadRow(row);
   mergeSameAs(dir, row, fm);
+  mergeSharedGuidance(dir, row, fm);
   return { row, fm };
+}
+
+/** THE ENTRY CONDITIONS A ROW DECLARES, from its own flat keys.
+ *
+ *  FLAT, ONE KEY PER TYPE, because a nested dictionary renders as a JSON blob
+ *  in Obsidian Properties and a person edits these by hand.
+ *
+ *  AN EMPTY LIST IS A REAL DECLARATION. `entry_no_pending_note: []` says every
+ *  pending note blocks, which is what the kickoff wants — not that the check is
+ *  absent. Only a MISSING key means absent. */
+function entryOf(fm: Record<string, unknown>): Record<string, string[]> | undefined {
+  const out: Record<string, string[]> = {};
+  if (fm.entry_read !== undefined) out.read = asList(fm.entry_read);
+  if (fm.entry_no_pending_note !== undefined) out.no_pending_note = asList(fm.entry_no_pending_note);
+  return Object.keys(out).length === 0 ? undefined : out;
 }
 
 /** see dsp-method-compilation.md#a-mirror-is-a-reference-never-a-copy */
 function mergeSameAs(dir: string, row: RigorMatrixRow, fm: Record<string, unknown>): void {
   if (typeof fm.same_as !== "string" || fm.same_as === "") return;
-  const note = parseStateNote(readFileSync(join(dir, "..", "states", `${fm.same_as}.md`), "utf8"));
+  const note = noteOf(join(dir, "..", "states", `${fm.same_as}.md`));
+  if (note === undefined) throw new Error(`matrix row ${row.name} mirrors state ${fm.same_as}, and that state cannot be read`);
   const nfm = note.frontmatter;
   row.same_as = fm.same_as;
   if (nfm.legal_tools !== undefined) row.legal_tools = asList(nfm.legal_tools);
   if (typeof nfm.guidance === "string" && nfm.guidance !== "") row.guidance = [nfm.guidance, row.guidance].filter(Boolean).join("\n\n");
-  if (nfm.entry_read !== undefined) row.entry = { read: asList(nfm.entry_read) };
+  // THE MIRROR ADDS TO THE ROW'S OWN CONDITIONS, never replaces them. It used
+  // to assign, so a row declaring a check of its own lost it the moment the
+  // mirrored state declared a reading.
+  const inherited = entryOf(nfm);
+  if (inherited !== undefined) row.entry = { ...inherited, ...(row.entry ?? {}) };
   if (typeof nfm.motivation === "string" && nfm.motivation !== "") row.motivation = nfm.motivation;
   if (typeof nfm.follow_up_label === "string" && nfm.follow_up_label !== "") row.follow_up_label = nfm.follow_up_label;
   const di = parseDoInputs(nfm.inputs);
   if (di !== undefined) row.inputs = di;
+}
+
+// A ROW MAY NAME A SHARED CARD instead of writing its own paragraph twice.
+// Ten spawn rows once carried the identical guidance body, copy-pasted, and
+// editing it meant editing ten files. `shared_guidance` names a method card
+// by its `card:` key; the card's own "## Guidance" section is read and
+// PREPENDED — the same ordering `mergeSameAs` already uses for a referenced
+// state's guidance, so the shared doctrine leads and the row's own
+// phase-specific text follows it.
+//
+// A row that names no card is untouched: this returns before `row.guidance`
+// is read or written, so every other row in the matrix behaves exactly as it
+// did before this existed.
+//
+// A NAMED CARD THAT DOES NOT EXIST REFUSES LOUDLY rather than splicing in an
+// empty string. A silent empty splice would read as "this row has nothing to
+// say", which is never true — a row naming a card always means to say
+// something through it, and a typo'd name deserves a build error, not a
+// state that quietly lost half its guidance.
+function mergeSharedGuidance(dir: string, row: RigorMatrixRow, fm: Record<string, unknown>): void {
+  if (typeof fm.shared_guidance !== "string" || fm.shared_guidance === "") return;
+  const name = fm.shared_guidance;
+  const methods = join(dir, "..", "methods");
+  const files = readdirSync(methods).filter((f) => f.endsWith(".md"));
+  const hit = files.find((f) => noteOf(join(methods, f))?.frontmatter.card === name);
+  if (hit === undefined) {
+    throw new Error(
+      `matrix row ${row.name} names shared_guidance "${name}", and no method card under deliverable/machines/methods declares card: ${name}`,
+    );
+  }
+  const shared = section(noteOf(join(methods, hit))?.body ?? "", "Guidance");
+  row.guidance = [shared, row.guidance].filter(Boolean).join("\n\n");
 }
 
 // A CELL IS FRONTMATTER ON ITS ROW. It used to be a file of its own, and

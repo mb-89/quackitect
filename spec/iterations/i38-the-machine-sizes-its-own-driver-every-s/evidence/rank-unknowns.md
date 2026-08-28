@@ -2,9 +2,9 @@
 form: rank-unknowns
 by: agent
 signed_off: 2026-08-20T19:30:59.837Z
-reopened: "2026-08-20T19:30:53.686Z — gate-architecture was re-signed. This state seeded a spike on the sentence 'the receiver reads and cannot act', and that sentence is false. The spike ran, searched the reachable tree, and confirmed the falsehood. The pick was right and its stated reason was inherited from a wrong node."
+reopened: 2026-08-20T19:30:53.686Z — gate-architecture was re-signed. This state seeded a spike on the sentence 'the receiver reads and cannot act', and that sentence is false. The spike ran, searched the reachable tree, and confirmed the falsehood. The pick was right and its stated reason was inherited from a wrong node.
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / rank-unknowns

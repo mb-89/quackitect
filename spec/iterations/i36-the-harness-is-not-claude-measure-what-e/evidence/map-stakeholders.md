@@ -2,9 +2,9 @@
 form: map-stakeholders
 by: agent
 signed_off: 2026-08-19T09:47:02.502Z
-reopened: "2026-08-19T09:46:50.413Z — Gate motivation was re-signed after restoring ISO quality hierarchy; stakeholder roles remain unchanged."
+reopened: 2026-08-19T09:46:50.413Z — Gate motivation was re-signed after restoring ISO quality hierarchy; stakeholder roles remain unchanged.
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / map-stakeholders

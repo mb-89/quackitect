@@ -3,17 +3,18 @@ minted_in: i5-engine-hygiene-one-version-source-every-
 id: raid-iss-a-gate-form-asks-the-standing-set-where-its-guidance-says-the-delta
 type: "[[raid]]"
 kind: issue
-statement: "A scoped gate's guidance says to argue the delta, and its fields serve every standing item, so most of the answers are the words not exercised."
+statement: A scoped gate's guidance says to argue the delta, and its fields serve every standing item, so most of the answers are the words not exercised.
 owner: the maintainer
 trigger: every gate whose fields draw from a live source, in every minor record
 status: open
-impact: "i5's validation gate served 24 must stories and 9 value props for a delta of 5 requirements. Nineteen answers say the delta did not touch them. The signal a reader wants is buried in a form that is mostly filler, and filler is what teaches a reader to skim."
+impact: i5's validation gate served 24 must stories and 9 value props for a delta of 5 requirements. Nineteen answers say the delta did not touch them. The signal a reader wants is buried in a form that is mostly filler, and filler is what teaches a reader to skim.
 breaks_how_badly: corrosive
 how_likely: expected
 source_refs:
   - i5-engine-hygiene-one-version-source-every-
 weighs_with: none
 weighs_against: none
+place: i53-a-step-sees-its-own-record-s-slice-forms
 ---
 ## What was observed
 

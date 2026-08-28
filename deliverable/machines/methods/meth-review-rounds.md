@@ -20,7 +20,7 @@ review.
 
 ## The rounds
 
-### 1. VERIFY — built it right
+### 1. VERIFY — built it right #work
 
 Did each input state deliver? Read the evidence or the referent.
 
@@ -29,7 +29,7 @@ Confirm the work EXISTS and MATCHES ITS CLAIM. A bless is not proof.
 Open what the evidence points at, rather than trusting its description of
 itself.
 
-### 2. VALIDATE — built the right thing
+### 2. VALIDATE — built the right thing #work
 
 Does this meet the original intent, and not merely its own plan? The intent is
 the frame, the vision and the REQUIREMENT REGISTER.
@@ -39,7 +39,7 @@ List what is missing, wrong or out of scope.
 WATCH FOR ASKS THAT NO CHECK COVERED. A requirement no acceptance item happens
 to test is exactly where a design drifts from its register.
 
-### 3. GOALS — does this milestone serve the kickoff
+### 3. GOALS — does this milestone serve the kickoff #work
 
 The kickoff blessed a LIST of goals. This round lists them back, one row each,
 and asks what THIS milestone produced for each one.
@@ -52,8 +52,8 @@ Three answers are legal, and only two of them pass:
 - NAMED ARTIFACTS. The goal is served, and the row says by what.
 - `nothing yet`, naming the milestone that owns it. A goal need not be served
   everywhere.
-- `nothing, and nothing will`. This FAILS the gate. The walk has drifted off
-  its own kickoff.
+- `nothing, and nothing will`. This FAILS the gate.
+  - The walk has drifted off its own kickoff.
 
 DO NOT ANSWER FROM THE SCOPE. The scope is what was promised. This round asks
 what was BUILT.
@@ -64,14 +64,18 @@ Iteration 33 answered it "the scope answers both halves of the owner's
 framing" - true of the scope, and never a check on the register.
 
 EVERY OTHER COVERAGE CHECK IN THIS SYSTEM COMPARES A NODE TO ITS NEIGHBOUR.
-Story to value prop. Requirement to use case. Chunk to design spec. A chain
-that is perfectly linked and serves a quarter of the kickoff passes all of
-them, because not one of them looks UP.
+
+- story to value prop
+- requirement to use case
+- chunk to design spec
+
+A chain that is perfectly linked and serves a quarter of the kickoff passes
+all of them, because not one of them looks UP.
 
 This is the only round that looks up, and it is per-item so it cannot be
 answered in general.
 
-### 4. RED-TEAM — argue the opposing case before you endorse
+### 4. RED-TEAM — argue the opposing case before you endorse #work
 
 Cite a rubric, not vibes. The rubric is the criteria, the register or the goal
 system.
@@ -84,7 +88,7 @@ Frame open questions so they can be FALSIFIED rather than agreed with.
 An OVERRIDE blesses past an unmet criterion. It is legal, and it is logged
 WITH ITS DISSENT, never as a clean pass.
 
-## Rules
+## Rules #work
 
 - RISK-WEIGHTED. Deepest scrutiny goes first to the riskiest, most central
   items.

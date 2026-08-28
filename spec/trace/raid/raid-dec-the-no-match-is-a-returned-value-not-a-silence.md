@@ -7,9 +7,9 @@ type: "[[raid]]"
 kind: decision
 statement: When no rung matches, the block returns an explicit no-match value carrying the difficulty that found none, rather than publishing nothing.
 owner: the owner
-trigger: "the first difficulty the mapping does not cover, and the first receiver that has to tell a silence from a crash"
+trigger: the first difficulty the mapping does not cover, and the first receiver that has to tell a silence from a crash
 status: decided
-impact: "An absence on the wire is indistinguishable from a crash and from never having run. A receiver that cannot tell those apart either treats every silence as a failure or treats every failure as a silence, and both are wrong in the expensive direction."
+impact: An absence on the wire is indistinguishable from a crash and from never having run. A receiver that cannot tell those apart either treats every silence as a failure or treats every failure as a silence, and both are wrong in the expensive direction.
 breaks_how_badly: crippling
 how_likely: expected
 source_refs:

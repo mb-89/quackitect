@@ -3,11 +3,11 @@ minted_in: i9-se-and-the-corpus-move-the-machine-state
 id: raid-iss-a-requirement-lost-its-only-verifier-when-its-demonstration-was-dropped
 type: "[[raid]]"
 kind: issue
-statement: "Dropping a demonstration left the requirement it verified with no verifier at all, and nothing reported the gap because the coverage check reads live specs only."
+statement: Dropping a demonstration left the requirement it verified with no verifier at all, and nothing reported the gap because the coverage check reads live specs only.
 owner: the maintainer
 trigger: every observe-red and every trace-design, until the row has a verifier again
 status: open
-impact: "req-a-surface-resolves-to-what-it-shows is carried at every gate on a claim nothing checks. tsp-bound-surface was its only verifier and reads status dropped, so the row now passes coverage by not being looked at rather than by being verified."
+impact: req-a-surface-resolves-to-what-it-shows is carried at every gate on a claim nothing checks. tsp-bound-surface was its only verifier and reads status dropped, so the row now passes coverage by not being looked at rather than by being verified.
 breaks_how_badly: corrosive
 how_likely: expected
 source_refs:
@@ -16,6 +16,7 @@ source_refs:
   - raid-debt-the-bound-surface-demo-leans-on-two-open-records
 weighs_with: none
 weighs_against: none
+place: i44-the-corpus-resolves-duplicate-headings-a
 ---
 
 ## What was observed

@@ -31,17 +31,31 @@ const DATE = /\b\d{4}-\d{2}-\d{2}\b/;
 /** Who ruled it. The ruling belongs in the design document it settled. */
 const ATTRIBUTION = /\bowner (ruling|law|design|report|correction|verdict|discussion|sketch)\b/i;
 
-/** TODAY'S COUNT, and the only direction it may move is down.
+/** TODAY'S COUNT PER TREE, and the only direction either may move is down.
  *
- *  Lowering this number is the point. Raising it means a comment carrying a
+ *  Lowering these numbers is the point. Raising one means a comment carrying a
  *  date or an attribution was added, and the fix is to move the reasoning
  *  into the design document and leave a `see <doc>.md#<section>` pointer.
  *
- *  160 SINCE THE i5 AND i36 MERGES, 2026-08-20. Two branches each added dated
- *  comments to the engine while under their own ceiling, and merging them sums
- *  both. Nothing was authored here — the number is what the merged tree holds,
- *  and the ratchet starts falling again from it. */
-const CEILING = 160;
+ *  THE ENGINE STANDS AT ZERO. Every date and every owner attribution came out
+ *  of its comments in one pass; the reasoning stayed exactly where it was and
+ *  only the stamp went. The ground is banked here so it cannot be given back.
+ *
+ *  THE TESTS WERE NEVER WATCHED, and that is why they held 521 while the engine
+ *  held none. The rule reads "every artifact" and the check read one folder, so
+ *  the tests accumulated freely under a guard that looked like it covered them.
+ *  A ratchet aimed at half the tree measures the half that was already clean.
+ *
+ *  A SEPARATE CEILING PER TREE, so the engine's zero cannot be spent on test
+ *  debt. One shared number would let 204 test offenders hide a new engine one.
+ *
+ *  A DATE MEANS NOTHING TO A READER OF CODE, and an attribution is a claim about
+ *  a person standing at an application site. Those are the two things the
+ *  standard forbids, and they are the two the sweep removes. */
+const CEILINGS: Record<string, number> = {
+  "deliverable/engine": 0,
+  "deliverable/tests": 203,
+};
 
 function tsFilesUnder(dir: string): string[] {
   const out: string[] = [];
@@ -77,10 +91,10 @@ function commentLines(src: string): { line: number; text: string }[] {
   return out;
 }
 
-function offenders(): string[] {
-  const engine = join(REPO_ROOT, "deliverable", "engine");
+function offenders(tree: string): string[] {
+  const root = join(REPO_ROOT, ...tree.split("/"));
   const hits: string[] = [];
-  for (const f of tsFilesUnder(engine)) {
+  for (const f of tsFilesUnder(root)) {
     const rel = f.slice(REPO_ROOT.length + 1);
     for (const { line, text } of commentLines(readFileSync(f, "utf8"))) {
       if (DATE.test(text) || ATTRIBUTION.test(text)) hits.push(`${rel}:${line}`);
@@ -90,24 +104,26 @@ function offenders(): string[] {
 }
 
 describe("the comment rule holds mechanically", { concurrency: true }, () => {
-  test("no comment in the engine gains a date or an owner attribution", () => {
-    const hits = offenders();
-    assert.ok(
-      hits.length <= CEILING,
-      `comment lines carrying a date or an owner attribution rose to ${hits.length}, above the ceiling of ${CEILING}.\n` +
-        "The standard forbids both at application sites. Move the reasoning into the design document and leave a pointer:\n" +
-        "  // see dsp-<name>.md#<section>\n" +
-        `New or moved offenders are among:\n${hits.slice(0, 20).join("\n")}`,
-    );
-  });
+  for (const [tree, ceiling] of Object.entries(CEILINGS)) {
+    test(`no comment in ${tree} gains a date or an owner attribution`, () => {
+      const hits = offenders(tree);
+      assert.ok(
+        hits.length <= ceiling,
+        `comment lines carrying a date or an owner attribution rose to ${hits.length} in ${tree}, above the ceiling of ${ceiling}.\n` +
+          "The standard forbids both at application sites. Move the reasoning into the design document and leave a pointer:\n" +
+          "  // see dsp-<name>.md#<section>\n" +
+          `New or moved offenders are among:\n${hits.slice(0, 20).join("\n")}`,
+      );
+    });
 
-  // A CEILING NOBODY LOWERS IS A CEILING NOBODY NOTICES. When the count falls
-  // well below the constant, the constant is stale and hides the next rise.
-  test("the ceiling still tracks the tree, so a fall gets banked", () => {
-    const n = offenders().length;
-    assert.ok(
-      n > CEILING - 50,
-      `the count fell to ${n}, ${CEILING - n} below the ceiling of ${CEILING}. Lower CEILING to ${n} so the ground that was won is held.`,
-    );
-  });
+    // A CEILING NOBODY LOWERS IS A CEILING NOBODY NOTICES. When the count falls
+    // well below the constant, the constant is stale and hides the next rise.
+    test(`the ${tree} ceiling still tracks the tree, so a fall gets banked`, () => {
+      const n = offenders(tree).length;
+      assert.ok(
+        n > ceiling - 50,
+        `the count fell to ${n} in ${tree}, ${ceiling - n} below its ceiling of ${ceiling}. Lower it to ${n} so the ground that was won is held.`,
+      );
+    });
+  }
 });

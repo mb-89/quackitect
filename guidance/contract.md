@@ -214,6 +214,11 @@ printed in chat was the only way a finding could leave the box.
 WHAT REPLACED IT. A work token lands on trunk, where every clone reads it. So a
 finding now travels in git rather than in a closing message.
 
+THE CHECK THAT GUARDED THE OLD RULE STILL STANDS and now has nothing to catch.
+`record-inspect` goes red on a field report found anywhere in version control.
+Under the old rule that stopped a private report leaking into the corpus; under
+this one it stops the retired object coming back.
+
 THE ROUTE, END TO END:
 
 - Note everything noteworthy while you walk.

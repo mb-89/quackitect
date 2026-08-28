@@ -18,8 +18,7 @@ legal_tools:
   - se_file_list
   - se_log_query
   - se_answer
-  - se_web_search
-  - se_web_fetch
+  - se_run
 evidence:
   - name: vision_scope_stated
     description: the packet is complete, every part of it
@@ -32,9 +31,12 @@ evidence:
   - name: risks_logged
     description: the register is open with owners and triggers
 major: full
+major_complexity: C4/R4
 minor: tailored
+minor_complexity: C4/R4
 patch: none
 product: full
+product_complexity: C4/R4
 specification: tailored
 major_note: |
   Applies in full. A major re-argues its worth: the delta is real, the

@@ -7,14 +7,14 @@
 //
 // see dsp-record-lifecycle.md#a-generated-machine-is-drawn-from-the-record
 
-import { existsSync, readFileSync } from "node:fs";
-import { join } from "node:path";
+import { existsSync } from "node:fs";
+import { join, resolve } from "node:path";
 import { type CanvasData, type CanvasEdge, type CanvasElement, nodeSize } from "./canvas.ts";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { buildArchive, type GeneratedMachine } from "./expmachine.ts";
 import { type Iteration, itList, itPinRel, itSeededRel, itShortId, readItRecord, SCAFFOLD_NONE, SRC } from "./iterations.ts";
 import { type MachineDecl, type StateDecl, validateMachine } from "./machine.ts";
-import { parseStateNote, readNode } from "./notes.ts";
+import { noteOf, passEpoch, readNode } from "./notes.ts";
 import { CHANGE_COLUMNS, type ChangeColumn, compileColumn, compileM0, readRigorMatrix } from "./rigor-matrix.ts";
 
 /** see dsp-record-lifecycle.md#the-seeded-machine */
@@ -41,7 +41,7 @@ export function generateSeeded(_root: string, it: Iteration, machineId: string, 
       source: SRC,
     });
   }
-  const fm = parseStateNote(readFileSync(abs, "utf8")).frontmatter;
+  const fm: Record<string, unknown> = noteOf(abs)?.frontmatter ?? {};
   const raw = Array.isArray(fm.steps) ? fm.steps : Array.isArray(fm.chunks) ? fm.chunks : [];
   interface Chunk {
     id: string;
@@ -150,7 +150,7 @@ export function generateSeeded(_root: string, it: Iteration, machineId: string, 
       statement: c.statement,
       guidance: `A build chunk — realization: ${c.realization}. The tag pulls the discipline's guidance.`,
       // A SPIKE'S EVIDENCE IS ITS EXPERIMENT REF, never free text (owner
-      // ruling 2026-08-10) — the result lives on the exp- node, and the
+      // ruling ) — the result lives on the exp- node, and the
       // form links it.
       evidence_form:
         kind === "spikes"
@@ -205,8 +205,34 @@ export function generateSeeded(_root: string, it: Iteration, machineId: string, 
   return { decl, canvas: pinnedCanvas(decl), expByState: {} };
 }
 
+/** The container, held for the pass that built it. see generateIterations. */
+const CONTAINER = new Map<string, { pass: number; made: GeneratedMachine }>();
+
 /** see dsp-record-lifecycle.md#the-iterations-container */
 export function generateIterations(root: string): GeneratedMachine {
+  // DERIVED FROM MANY FILES, so it keys on the pass that built it, the same way
+  // `itList` does. It is called once per node the route drawing expands, and a
+  // route is drawn on every hop.
+  //
+  // MEASURED with a profiler: 1,767 ms of one three-hop walk's syscall time,
+  // second only to the template read that was fixed beside it. Rebuilding the
+  // same container from the same unchanged records, over and over, inside one
+  // call.
+  //
+  // OUTSIDE A PASS nothing is held and every call rebuilds, which is what a test
+  // gets and what is right.
+  const pass = passEpoch();
+  const key = resolve(root);
+  if (pass !== 0) {
+    const hit = CONTAINER.get(key);
+    if (hit !== undefined && hit.pass === pass) return hit.made;
+  }
+  const made = generateIterationsNow(root);
+  if (pass !== 0) CONTAINER.set(key, { pass, made });
+  return made;
+}
+
+function generateIterationsNow(root: string): GeneratedMachine {
   let open: Iteration[] = [];
   try {
     open = itList(root).filter((it) => it.open);
@@ -607,7 +633,7 @@ export function pinnedCanvas(m: MachineDecl): CanvasData {
 }
 
 /** THE ITERATION ARCHIVE, generated like the expedition archive — the
- *  same decade shape (owner ruling: both archives). */
+ *  same decade shape. */
 export function generateIterationArchive(root: string): GeneratedMachine {
   let closed: Iteration[] = [];
   try {

@@ -5,7 +5,7 @@ statement: "Fill the stories: every slide's evidence side, all stories, all iter
 state_kind: work
 filled_by: agent
 depends_on:
-  - gate-implementation
+  - spawn-for-validation
 seeds: demos
 legal_tools:
   - se_file_read
@@ -17,9 +17,13 @@ legal_tools:
   - se_log_query
   - se_answer
 major: full
+major_complexity: C2/R3
 minor: tailored
+minor_complexity: C2/R3
 patch: tailored
+patch_complexity: C2/R3
 product: full
+product_complexity: C2/R3
 specification: full
 major_note: |
   Applies in full: every story the change created or touched fills its
@@ -53,4 +57,6 @@ THE CHECK IS COMPUTED, so this state carries no form. The law reads every story 
 
 THE MUST STORIES ARE THE EXCEPTION here: their evidence is the demonstration report, and run-demos mints those next. The law skips them at this state and catches them at the gate.
 
-AUTHOR THE DEMO DRAWING before leaving: `<record>/machines/demos.md`, in the record’s own folder, one step per must story, the step id being the story id. run-demos runs it.
+AUTHOR THE DEMO DRAWING before leaving. It is `<record>/machines/demos.md`,
+in the record’s own folder. One step per must story, and the step id is the
+story id. run-demos runs it.

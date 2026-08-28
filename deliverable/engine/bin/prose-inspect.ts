@@ -69,7 +69,14 @@ function entryDocsAreePlain(): void {
     lines.forEach((line, i) => {
       // A LINK ON THE LINE IS THE PASS. Markdown link, or a bare URL.
       if (/\[[^\]]+\]\([^)]+\)/.test(line) || /https?:\/\//.test(line)) return;
-      const hits = METHOD_TERMS.filter((t) => line.toLowerCase().includes(t.toLowerCase()));
+      // A HYPHEN USED TO HIDE A TERM. The list holds `rigor matrix` with a
+      // space, the test was a plain substring, and a README line reading
+      // `rigor-matrix` broke the law in substance while the checker saw
+      // nothing. Comparing the flattened forms as well closes that.
+      const flatLine = line.toLowerCase().replace(/-/g, " ");
+      const hits = METHOD_TERMS.filter(
+        (t) => line.toLowerCase().includes(t.toLowerCase()) || flatLine.includes(t.toLowerCase().replace(/-/g, " ")),
+      );
       if (CLAUSE.test(line)) hits.push(CLAUSE.exec(line)?.[0] ?? "a refusal code");
       for (const h of hits) findings.push(`item 1 · ${rel}:${String(i + 1)} — bare method term "${h}", with no definition one click away`);
     });

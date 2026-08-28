@@ -17,17 +17,20 @@ legal_tools:
   - se_file_list
   - se_log_query
   - se_answer
-  - se_web_search
-  - se_web_fetch
+  - se_run
   - se_git
 evidence:
   - name: market_block
     description: (market) real-world validation green - blocks the ship only for to-market iterations
     required: false
 major: full
+major_complexity: C3/R3
 minor: full
+minor_complexity: C3/R3
 patch: tailored
+patch_complexity: C3/R3
 product: full
+product_complexity: C3/R3
 specification: tailored
 major_note: |
   FLOOR - applies in full: packaged and checked working. The bless ships
@@ -50,6 +53,6 @@ specification_note: |
 
 Review per [[meth-gate-review]]. The retro waits beyond the terminal - its field-feedback question opens the next start. Market iterations: no ship without the real-world checks green.
 
-TWO ROWS WAIT OUTSIDE THE MATRIX (owner ruling 2026-08-11): finalize-docs returns when the emitted book exists, and ship-review returns when the vendoring and dependency-ruling system does. Their gate fields (docs_match, dependencies_ruled) left with them, and handover_accepted folded into the bless itself.
+TWO ROWS WAIT OUTSIDE THE MATRIX: finalize-docs returns when the emitted book exists, and ship-review returns when the vendoring and dependency-ruling system does. Their gate fields (docs_match, dependencies_ruled) left with them, and handover_accepted folded into the bless itself.
 
-NO packaged FIELD EITHER (owner ruling 2026-08-11): the package state cannot be left until its own claim stands - the ZIP on disk, the works check yes - and this gate depends on that state. Restating it here would be a second copy of a signed claim.
+NO packaged FIELD EITHER. The package state cannot be left until its own claim stands: the ZIP on disk, and the works check answered yes. This gate depends on that state, so restating it here would be a second copy of a signed claim.

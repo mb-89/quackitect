@@ -8,7 +8,7 @@
 // it should instruct is the whole bug class coming back, and it would come
 // back silently, because a rejection looks like working code.
 //
-// SMALL FILE ON PURPOSE (owner ruling 2026-07-30). Every case here builds a
+// SMALL FILE ON PURPOSE. Every case here builds a
 // session at idle and that costs a full boot walk, so the pull cases are
 // split across three files by theme — one file carrying all of them was the
 // slowest thing in the suite. See guidance/software.md.
@@ -37,7 +37,7 @@ describe("the pull instructs where a refusal would have thrown", { concurrency: 
     assert.equal(r.pull, "wait", "THE LAW: a threshold is an instruction, never a throw");
     assert.equal(r.waiting_for, "the person");
     assert.equal(r.at, "overhaul", "the agent must be able to say WHICH step waits");
-    // The word, never the number (owner ruling 2026-08-14).
+    // The word, never the number.
     assert.equal(r.autonomy, undefined, "no answer carries a bare number");
     assert.match(String(r.why), /above this session's \w+/);
     // The served wait says DIAL, matching contract rule 3's own wording.
@@ -66,4 +66,34 @@ describe("the pull instructs where a refusal would have thrown", { concurrency: 
     assert.equal(r.pull, "do");
     assert.deepEqual(s.active(), ["front_desk"]);
   });
+});
+
+test("a successful sweep returns the entered state's required form", () => {
+  const session = {
+    pullFormsOwed: () => ["entered-state"],
+    formsMet: () => false,
+    refusedBlock: () => ({}),
+    formForAgent: (name: string) => ({ form: name }),
+    fillAdvice: () => "fill the entered state",
+    conditionUnmetResponse: () => undefined,
+    pullOptions: () => [],
+    pullHere: () => [],
+    doAdvice: () => "continue",
+  };
+  const result = (
+    Session.prototype as unknown as {
+      pullAfterSweep: (
+        swept: Record<string, unknown>,
+        head: () => Record<string, unknown>,
+        extra: () => Record<string, unknown>,
+      ) => Record<string, unknown>;
+    }
+  ).pullAfterSweep.call(
+    session,
+    { swept: ["entered-state"], arrived: true },
+    () => ({}),
+    () => ({}),
+  );
+  assert.equal(result.pull, "fill");
+  assert.deepEqual(result.forms, [{ form: "entered-state" }]);
 });

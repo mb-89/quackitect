@@ -15,6 +15,7 @@ source_refs:
   - el-resolution-seam
   - exp-one-seam
   - req-a-wrong-act-never-passes-silently
+place: i40-every-write-path-is-guarded-the-pool-s-b
 ---
 
 Found by an adversarial audit of i27's build, 2026-08-14, and confirmed at the

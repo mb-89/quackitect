@@ -26,16 +26,18 @@ evidence:
     of: requirement
     description: the measurable scenarios that could automate at M7 — filed by the deck's fitness button, or typed as references
 major: full
+major_complexity: C3/R4
 minor: none
 patch: none
 product: full
+product_complexity: C3/R4
 specification: full
 major_note: |
   Applies in full: every quality scenario dealt and ruled, and the
   fitness candidates flagged for M7. The structure numbers render as
   information beside the walk.
 minor_note: |
-  Does not apply (owner ruling 2026-08-13). The architecture is not under
+  Does not apply. The architecture is not under
   review at this size. It is assumed to hold, and decompose-structure is
   where that assumption breaks if it is going to.
 

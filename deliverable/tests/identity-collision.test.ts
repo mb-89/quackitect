@@ -1,4 +1,4 @@
-// THE IDENTITY CHECK MUST NOT MISTAKE THE VOCABULARY FOR A LEAK — i17, 2026-08-18.
+// THE IDENTITY CHECK MUST NOT MISTAKE THE VOCABULARY FOR A LEAK — i17.
 //
 // prose-inspect item 3 hunts a username, an email, a home directory or a
 // machine name that got written into a stored record. The needles are read from
@@ -7,7 +7,7 @@
 // records discuss that agent by name on nearly every page.
 //
 // WHAT THAT COST. 64 findings, every one of them false, on the first run of a
-// fresh cloud clone. prose-inspect is an EXIT SCRIPT of boot/prepare_idle, so
+// fresh cloud clone. prose-inspect is an EXIT SCRIPT of boot/prepare_desk, so
 // boot could not finish — and that state grants no tools, so the check could not
 // be repaired from inside the lane either.
 //

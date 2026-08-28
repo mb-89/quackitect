@@ -7,9 +7,13 @@ filled_by: agent
 depends_on:
   - gate-release
 major: full
+major_complexity: C0/R0
 minor: full
+minor_complexity: C0/R0
 patch: full
+patch_complexity: C0/R0
 product: full
+product_complexity: C0/R0
 specification: tailored
 major_note: |
   Terminal, at every size. The retro is the seam into the next start.

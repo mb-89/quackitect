@@ -3,16 +3,16 @@ minted_in: i9
 id: raid-dec-a-produced-copy-is-built-from-an-include-list
 type: "[[raid]]"
 kind: decision
-statement: "Every act that produces a copy assembles it from an explicit list of what belongs in it, so a file nobody named cannot ship, instead of listing what must stay out and checking that the list is right."
+statement: Every act that produces a copy assembles it from an explicit list of what belongs in it, so a file nobody named cannot ship, instead of listing what must stay out and checking that the list is right.
 owner: the driving agent
-trigger: "any new producing act, and any change to what the packaged artefact contains"
+trigger: any new producing act, and any change to what the packaged artefact contains
 status: decided
 breaks_how_badly: crippling
 how_likely: plausible
 source_refs:
   - req-fresh-product-starts-empty
   - req-only-a-file-with-its-own-door-is-withheld
-  - "probe P3 at i9 M4, 2026-08-19 — both producing acts already run one shared filter function"
+  - probe P3 at i9 M4, 2026-08-19 — both producing acts already run one shared filter function
 ---
 
 ## Rejected options

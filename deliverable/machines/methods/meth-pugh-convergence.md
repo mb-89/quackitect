@@ -6,16 +6,17 @@ statement: "Pugh controlled convergence with reversed sensitivity: datum = stron
 ## Situation
 M5's converge-pugh and reverse-sensitivity, operating on M4's Pareto front with M4's weighted criteria.
 
-## Procedure
+## Procedure #work
 - The datum is the STRONGEST viable rival - or the current design when redesigning. A status-quo datum is legal only as a second run, to establish worth-doing-at-all; record both runs.
 - Score each candidate against the datum per criterion (+/S/-). Iterate with the winner as the new datum: that iteration IS the controlled convergence.
-- STRENGTHEN, DO NOT ONLY SCORE. Pugh's loop alternates converging with DIVERGING: strong concepts are improved by attacking their negatives, which usually means taking what a rival does better. Our machine runs that at [[graft-onto-the-winner]], after the winner is declared, and re-scores whatever moves.
+- STRENGTHEN, DO NOT ONLY SCORE. Pugh's loop alternates converging with DIVERGING: strong concepts are improved by attacking their negatives, which usually means taking what a rival does better.
+  - Our machine runs that at [[graft-onto-the-winner]], after the winner is declared, and re-scores whatever moves.
 - Engine-computed sensitivity: perturb the weights - does the winner flip? "Winner robust" vs "weight-sensitive - the adjudicator's checkmark matters".
 - REVERSE it: find the FIRST plausible combination of weight changes and rival variants under which the winner LOSES, within reason. Judge that world's credibility out loud.
 - A credible flip becomes a recorded tripwire - a RAID watch-item with its fallback - never a silent dismissal.
 - Named hazard: decision theater (weights invented post-hoc to justify a predecided option). The sensitivity check is the mitigation; the recorded runs are the audit.
 
-## THE HALF THIS CARD USED TO LEAVE OUT
+## THE HALF THIS CARD USED TO LEAVE OUT #work
 
 IT SAID THE ITERATION *IS* THE CONTROLLED CONVERGENCE, and that is only the
 converging half. Pugh's method also generates HYBRIDS between alternatives,
@@ -42,5 +43,4 @@ the winner loses.
 - The hybridising half: Frey and others' model-based evaluation of the method,
   which records that hybrids are formed between alternatives, added to the set
   and scored, and that the matrix's ideation improves the alternative set as
-  much as it aids convergence. https://web.mit.edu/2.009/www/resources/PughFrey.pdf
-  and https://link.springer.com/article/10.1007/s00163-008-0056-z
+  much as it aids convergence ([[ref-pugh-frey]]).

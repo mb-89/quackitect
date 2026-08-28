@@ -3,17 +3,17 @@ minted_in: i9
 id: raid-iss-the-chart-has-no-cell-for-standing-the-product-up
 type: "[[raid]]"
 kind: issue
-statement: "Four of the twelve criterion axes have no candidate reaching solid baseline, and three of the four are about standing the product up, because the morphological chart carries no row about it at all."
+statement: Four of the twelve criterion axes have no candidate reaching solid baseline, and three of the four are about standing the product up, because the morphological chart carries no row about it at all.
 owner: the driving agent
-trigger: "before M5 converges on one candidate, and again if enumerate-space is ever reopened in this iteration"
+trigger: before M5 converges on one candidate, and again if enumerate-space is ever reopened in this iteration
 status: closed
-impact: "A candidate cannot be chosen on an axis nothing addresses. Whichever line wins at M5 will carry three unanswered install-and-setup demands into the build, and nobody will have compared alternatives for any of them."
+impact: A candidate cannot be chosen on an axis nothing addresses. Whichever line wins at M5 will carry three unanswered install-and-setup demands into the build, and nobody will have compared alternatives for any of them.
 breaks_how_badly: crippling
 how_likely: certain
 source_refs:
-  - "evaluate-set at i9, 2026-08-19 — the utopia point falls below 3 on four axes"
-  - "req-fresh-machine-runs, req-setup-floor-editor-shell, req-setup-stops-before-partial"
-  - "both independent scorers said unprompted that no candidate addresses the setup floor"
+  - evaluate-set at i9, 2026-08-19 — the utopia point falls below 3 on four axes
+  - req-fresh-machine-runs, req-setup-floor-editor-shell, req-setup-stops-before-partial
+  - both independent scorers said unprompted that no candidate addresses the setup floor
 ---
 
 ## Closed the same day it was raised, 2026-08-19

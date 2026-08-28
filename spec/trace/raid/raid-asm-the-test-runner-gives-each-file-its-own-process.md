@@ -3,15 +3,15 @@ minted_in: i5-engine-hygiene-one-version-source-every-
 id: raid-asm-the-test-runner-gives-each-file-its-own-process
 type: "[[raid]]"
 kind: assumption
-statement: "The test runner gives each test file its own process, so splitting one file into several reaches more cores."
+statement: The test runner gives each test file its own process, so splitting one file into several reaches more cores.
 owner: the maintainer
 trigger: any decision to split a test file for speed
 status: open
-impact: "A file is divided for parallelism the runner does not provide, the wall clock does not move, and the split looks like a failed optimisation rather than a wrong premise."
+impact: A file is divided for parallelism the runner does not provide, the wall clock does not move, and the split looks like a failed optimisation rather than a wrong premise.
 breaks_how_badly: abrasive
 how_likely: conceivable
 probed: 2026-08-19
-probe: "scheduled, 2026-08-19. The only real check is a battery run compared against the summed cost of its files, and no state before verification may fire one. The container carries no previous run to read either. So the measurement lands at verification, and the split item is written to allow measure-and-strike as an outcome rather than assuming the premise."
+probe: scheduled, 2026-08-19. The only real check is a battery run compared against the summed cost of its files, and no state before verification may fire one. The container carries no previous run to read either. So the measurement lands at verification, and the split item is written to allow measure-and-strike as an outcome rather than assuming the premise.
 source_refs:
   - raid-risk-splitting-the-heaviest-test-file-buys-no-wall-clock
   - raid-iss-a-fresh-container-has-no-battery-timings-to-design-against

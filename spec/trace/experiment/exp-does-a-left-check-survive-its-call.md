@@ -9,12 +9,12 @@ probes:
   - raid-asm-a-check-left-running-survives-on-every-platform
 timebox: 60 minutes
 form: script
-promote: "none"
+promote: none
 folds_to: "the spawn shape needs no change: the build stops awaiting and alters nothing else about how a condition script is started"
 faked: The judgment itself. The run spawns a sleeping stand-in rather than a real exit script, because no exit script in the tree takes long enough to observe the window. The SPAWN is the real one, copied from deliverable/engine/sessionscript.ts line 50 — same binary, same undetached mode, same piped stdio, same drain handlers.
 fallback: If a left-running judgment does not survive, the handback is unbuildable as designed and the fallback is to keep the await and make the judgment itself cheap — cap what an exit script may do rather than when it may finish.
 verdict: holds
-measured: "2026-08-21 on linux, node v22.22.2. The call answered in 4 ms while the judgment ran 3003 ms. The verdict was readable at 5007 ms with exit code 0 and stdout fully drained. An orphaned judgment whose starter exited at 5052 ms still completed and wrote its verdict at 10058 ms. A killed judgment reported code=null signal=SIGTERM and left no verdict file at all (ENOENT)."
+measured: 2026-08-21 on linux, node v22.22.2. The call answered in 4 ms while the judgment ran 3003 ms. The verdict was readable at 5007 ms with exit code 0 and stdout fully drained. An orphaned judgment whose starter exited at 5052 ms still completed and wrote its verdict at 10058 ms. A killed judgment reported code=null signal=SIGTERM and left no verdict file at all (ENOENT).
 source_refs:
   - rank-unknowns, the seeded pick
   - req-a-leaving-check-does-not-hold-the-call

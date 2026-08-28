@@ -1,6 +1,6 @@
 // THE READING PROOF ASKS FOR WORDS, SO IT MUST ASK FOR WORDS.
 //
-// MEASURED AT BOOT, 2026-08-18. Four round trips on
+// MEASURED AT BOOT. Four round trips on
 // guidance/method/cloud-runner.md, where the probe's expected answer was
 // `remedy; follow it. -` — three words a reader sees, plus the list marker of
 // the NEXT bullet. Every answer a person would give was refused.
@@ -15,8 +15,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { probesMissed, proofFor, readingProbes, readingWords } from "../engine/readproof.ts";
-import { Session } from "../engine/session.ts";
-import { freshRoot, gitInit } from "./helpers.ts";
 
 // THE EXACT SHAPE THAT COST FOUR ROUND TRIPS, reproduced from
 // guidance/method/cloud-runner.md's closing list.
@@ -68,20 +66,16 @@ test("a wrong answer names exactly the probes it missed", () => {
   assert.deepEqual(probesMissed(expect, expect[0]), expect.slice(1), "the miss list does not name exactly the probes that failed");
 });
 
-// THE MISS RIDES THE ANSWER, so a reader is never left guessing which of three
-// probes failed. The field report names that guess as a round trip each time.
-test("the pull hands back which probes were missed, not only that one was", async () => {
-  const root = freshRoot();
-  gitInit(root);
-  const s = new Session(root);
-  const first = await s.pull();
-  assert.equal(first.pull, "read", "boot serves a document to prove");
-  const wrong = await s.pull({ form: { read: "nothing like the document" } });
-  assert.equal(wrong.pull, "read", "a wrong proof serves the same document again");
-  assert.ok(Array.isArray(wrong.missed), "the answer does not say WHICH probes were missed");
-  assert.ok((wrong.missed as string[]).length > 0, "the miss list is empty on a wrong answer");
-  assert.match(String(wrong.note), /probe\(s\) were not answered/, "the note does not count the misses");
-});
+// TWO CASES THAT WENT THROUGH THE PULL ARE GONE (owner ruling). Reading is
+// asked for by a work token now; the pull hands over no documents and blocks on
+// no probes, so a case driving that path drives nothing.
+//
+// WHAT THEY PROVED IS NOT LOST. The miss list and the banking are properties of
+// `probesMissed`, and the case above asserts the first directly. What went is
+// the round trip through a walk that no longer takes one.
+//
+// THE MATHS BELOW IS UNTOUCHED, because the read CREDIT still uses it: se_file_read
+// earns credit, and credit is what settles a reading token.
 
 // THE ANSWER IS COUNTED THE WAY THE PROBE WAS CUT (i17 boot, 2026-08-18).
 //
@@ -127,6 +121,26 @@ test("punctuation the probe never counted cannot fail an answer", () => {
   const { expect } = readingProbes(DASHED);
   const peppered = expect.map((e) => e.split(" ").join(" \u2014 ")).join("\n\n");
   assert.deepEqual(probesMissed(expect, peppered), [], "standalone punctuation between the right words was read as a wrong answer");
+});
+
+// PUNCTUATION ATTACHED TO A WORD IS THE HALF THE HINT PROMISED AND THE CHECK
+// DID NOT KEEP. The tokeniser keeps it attached, so `stands,` and `stands`
+// were different words while the hint said punctuation does not count. Two
+// probes in one boot were answered correctly and refused.
+test("punctuation attached to a word cannot fail an answer", () => {
+  const { expect } = readingProbes(DASHED);
+  const commaed = expect.map((e) => `${e.split(" ").join(", ")}.`).join("\n\n");
+  assert.deepEqual(probesMissed(expect, commaed), [], "a comma attached to the right words was read as a wrong answer");
+});
+
+test("the expected run's own punctuation does not have to be reproduced", () => {
+  // The source side carries the punctuation and the answer side does not.
+  // Both go through the one normaliser, so neither has to match the other's
+  // commas — which is the whole promise the hint makes to a reader.
+  const withCommas = "alpha beta, gamma delta, epsilon zeta eta theta iota kappa lambda mu nu xi omicron pi rho sigma tau upsilon";
+  const { expect } = readingProbes(withCommas);
+  const bare = expect.map((e) => e.replace(/[^\p{L}\p{N} ]/gu, "")).join(" ");
+  assert.deepEqual(probesMissed(expect, bare), [], "an answer that dropped the source's commas was refused");
 });
 
 test("a genuinely wrong answer is still refused after the filter loosens", () => {
@@ -211,31 +225,7 @@ the reader cannot tell which half was the ruling.
   }
 });
 
-// A PROBE ANSWERED ONCE STAYS ANSWERED.
-//
-// The answer names WHICH probes missed, so a reader sends those. Judging that
-// reply against all three failed it for the ones it had already got right, and
-// the only way out was to notice the rule and resend everything every time.
-// The i15 walk worked that out the expensive way and wrote it into its field
-// report as a thing nothing had told it.
-test("answering only the probes that missed is enough, because the rest are banked", async () => {
-  const root = freshRoot();
-  gitInit(root);
-  const s = new Session(root);
-  const first = (await s.pull()) as { pull?: string; document?: { content: string; path: string } };
-  if (first.pull !== "read" || first.document === undefined) return;
-  const [a, b, c] = readingProbes(first.document.content).expect;
-
-  // One right, two wrong — the ordinary partial answer.
-  const partial = (await s.pull({ form: { read: a } })) as { pull?: string; missed?: string[] };
-  assert.equal(partial.pull, "read", "a partial answer credited the whole document");
-  assert.deepEqual(partial.missed, [b, c], `the answer does not name exactly what is still owed: ${JSON.stringify(partial.missed)}`);
-
-  // Now send ONLY what was named as missing. The first probe is not resent.
-  const rest = (await s.pull({ form: { read: `${b} ... ${c}` } })) as { pull?: string; document?: { path: string } };
-  assert.notEqual(
-    rest.document?.path,
-    first.document.path,
-    "answering the named probes served the same document again — the earlier probe was not banked",
-  );
-});
+// A PROBE ANSWERED ONCE STAYS ANSWERED, and that is now a property of
+// `probesMissed` alone rather than of a walk. The case that drove it through
+// the pull is gone with the gate; the maths it rested on is asserted directly
+// at the top of this file.

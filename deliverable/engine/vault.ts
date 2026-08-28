@@ -30,6 +30,8 @@ export type Row = Record<string, unknown>;
 interface VaultWatchConfig {
   extensions: string[];
   excludeDirectories: string[];
+  /** Root-relative folders admitted DESPITE an excluded name on the way in. */
+  includePaths: string[];
 }
 
 const DEFAULT_WATCH_CONFIG: VaultWatchConfig = {
@@ -37,7 +39,23 @@ const DEFAULT_WATCH_CONFIG: VaultWatchConfig = {
   // `dist` IS BUILD OUTPUT and only came into range when the folder
   // levels collapsed — it used to sit beside the vault rather than inside it.
   excludeDirectories: ["node_modules", ".git", ".obsidian", ".se", ".worktrees", "dist", "tests"],
+  // THE PRIVATE WORK SOURCE IS INDEXED, and it is the one thing inside `.se`
+  // that is. Ephemeral work lives there because it must not be committed, and
+  // the editor has to show it beside the work that is.
+  //
+  // AN EXCLUDED NAME IS A DEFAULT, NOT A CEILING. `.se` stays out because most
+  // of what it holds is a log, a snapshot or a reading, and none of that is a
+  // note. One folder inside it is notes, so one folder inside it is admitted.
+  includePaths: [".se/work"],
 };
+
+/** WHETHER A ROOT-RELATIVE PATH BELONGS TO THE VAULT. One predicate, because
+ *  four places used to decide it and an override added to three of them would
+ *  index files the watcher then refused to follow. */
+function inVault(rel: string, config: VaultWatchConfig): boolean {
+  if (config.includePaths.some((p) => rel === p || rel.startsWith(`${p}/`))) return true;
+  return !rel.split("/").some((part) => config.excludeDirectories.includes(part));
+}
 
 function loadWatchConfig(root: string): VaultWatchConfig {
   try {
@@ -47,6 +65,7 @@ function loadWatchConfig(root: string): VaultWatchConfig {
       excludeDirectories: Array.isArray(raw.excludeDirectories)
         ? raw.excludeDirectories.map(String)
         : DEFAULT_WATCH_CONFIG.excludeDirectories,
+      includePaths: Array.isArray(raw.includePaths) ? raw.includePaths.map(String) : DEFAULT_WATCH_CONFIG.includePaths,
     };
   } catch {
     return { ...DEFAULT_WATCH_CONFIG };
@@ -74,7 +93,7 @@ export interface VaultStats {
   bytes: number;
 }
 
-function walk(dir: string, out: string[], config: VaultWatchConfig): void {
+function walk(root: string, dir: string, out: string[], config: VaultWatchConfig): void {
   let entries: import("node:fs").Dirent[];
   try {
     entries = readdirSync(dir, { withFileTypes: true });
@@ -82,11 +101,16 @@ function walk(dir: string, out: string[], config: VaultWatchConfig): void {
     return;
   }
   for (const e of entries) {
+    const abs = join(dir, e.name);
+    const rel = relative(root, abs).split(sep).join("/");
     if (e.isDirectory()) {
-      if (config.excludeDirectories.includes(e.name)) continue;
-      walk(join(dir, e.name), out, config);
+      // AN EXCLUDED FOLDER IS STILL DESCENDED where an included path lies under
+      // it. `.se` is skipped and `.se/work` is not, so the skip cannot be a
+      // name test alone.
+      if (!inVault(rel, config) && !config.includePaths.some((p) => p.startsWith(`${rel}/`))) continue;
+      walk(root, abs, out, config);
     } else if (e.isFile() && config.extensions.some((extension) => e.name.endsWith(extension))) {
-      out.push(join(dir, e.name));
+      if (inVault(rel, config)) out.push(abs);
     }
   }
 }
@@ -104,6 +128,9 @@ export class Vault {
   private byPath = new Map<string, number>();
   private stats: VaultStats = { notes: 0, unreadable: 0, buildMs: 0, bytes: 0 };
   private watcher: parcelWatcher.AsyncSubscription | null = null;
+  /** One per included path that lies under an excluded folder.
+   *  see dsp-the-work-store.md#one-home-for-reading-and-writing */
+  private included: parcelWatcher.AsyncSubscription[] = [];
   private watcherStarting: Promise<void> | null = null;
   private snapshotWrite: Promise<void> = Promise.resolve();
   private stopped = false;
@@ -183,7 +210,7 @@ export class Vault {
 
   private files(): string[] {
     const files: string[] = [];
-    walk(this.dir, files, this.watchConfig);
+    walk(this.dir, this.dir, files, this.watchConfig);
     files.sort();
     return files;
   }
@@ -360,8 +387,52 @@ export class Vault {
     return changed;
   }
 
+  // AN EXCLUDED FOLDER STAYS EXCLUDED AT THE WATCHER, whatever lies inside it.
+  // Dropping `**/.se/**` so one folder under it could be followed made the
+  // watcher watch the snapshot it writes itself: every save fired an event, the
+  // event saved the snapshot, and every turn of that loop also announced an
+  // external change to every open surface. The call log is written on every lane
+  // call and sits in the same folder, so the loop had a second engine.
+  //
+  // AN INCLUDED PATH GETS ITS OWN SUBSCRIPTION instead, rooted at the folder
+  // itself. see startIncluded
   private watcherOptions(): parcelWatcher.Options {
     return { ignore: this.watchConfig.excludeDirectories.map((directory) => `**/${directory}/**`) };
+  }
+
+  /** Which included paths need a subscription of their own: the ones the main
+   *  watcher's ignore list would swallow. A path under no excluded folder is
+   *  already covered and gets nothing. */
+  private ownWatchNeeded(): string[] {
+    return this.watchConfig.includePaths.filter((p) => p.split("/").some((part) => this.watchConfig.excludeDirectories.includes(part)));
+  }
+
+  /** WATCH EACH INCLUDED FOLDER DIRECTLY. No snapshot is written for these: the
+   *  snapshot lives in the parent the main watcher ignores, so writing one here
+   *  would rebuild the loop this exists to avoid. `reconcile` at startup is what
+   *  catches up anything missed while the process was down. */
+  private async startIncluded(): Promise<void> {
+    for (const rel of this.ownWatchNeeded()) {
+      const dir = join(this.root, ...rel.split("/"));
+      if (!existsSync(dir)) continue;
+      try {
+        const sub = await parcelWatcher.subscribe(dir, (error, events) => {
+          if (error !== null) return;
+          this.applyWatcherEvents(events);
+          if (this.externalLive && events.length > 0) {
+            emitModelMutations({
+              root: this.root,
+              origin: "external",
+              changes: events.map((e) => ({ kind: "refresh", path: e.path })),
+            });
+          }
+        });
+        if (this.stopped) await sub.unsubscribe();
+        else this.included.push(sub);
+      } catch {
+        // A folder the backend will not watch stays on reconcile, not on nothing.
+      }
+    }
   }
 
   private snapshotPath(): string {
@@ -374,7 +445,7 @@ export class Vault {
       const path = relative(this.dir, event.path).split(sep).join("/");
       if (path === "" || path === ".." || path.startsWith("../")) continue;
       if (!this.watchConfig.extensions.some((extension) => path.endsWith(extension))) continue;
-      if (path.split("/").some((part) => this.watchConfig.excludeDirectories.includes(part))) continue;
+      if (!inVault(path, this.watchConfig)) continue;
       if (event.type === "delete") {
         this.forget(path);
       } else {
@@ -436,6 +507,7 @@ export class Vault {
     }
     this.reconcile();
     await this.saveWatcherSnapshot();
+    await this.startIncluded();
     this.externalLive = true;
   }
 
@@ -466,6 +538,9 @@ export class Vault {
     const watcher = this.watcher;
     this.watcher = null;
     if (watcher !== null) await watcher.unsubscribe();
+    const included = this.included;
+    this.included = [];
+    for (const sub of included) await sub.unsubscribe();
   }
 
   private indexPath(): string {
@@ -654,7 +729,9 @@ function wikilinks(raw: string): string[] {
 // `rebuild()` exists and the cache carries the hash needed to check.
 // ---------------------------------------------------------------------------
 
-const INDEX_VERSION = 2;
+// 3 — the private work folder joined the index, so every cache written before
+// it is missing files it should hold. A stale cache reads as an empty editor.
+const INDEX_VERSION = 3;
 
 interface CacheEntry {
   path: string;
@@ -689,8 +766,36 @@ function vaultPath(vault: Vault, path: string): string | undefined {
   const rel = path.split(sep).join("/");
   const config = loadWatchConfig(vault.root);
   if (!config.extensions.some((extension) => rel.endsWith(extension))) return undefined;
-  if (rel.split("/").some((part) => config.excludeDirectories.includes(part))) return undefined;
+  if (!inVault(rel, config)) return undefined;
   return rel;
+}
+
+/** TELL EVERY WARM INDEX THAT ONE FILE MOVED, BY ITS ABSOLUTE PATH.
+ *
+ *  THE LANE'S FILE VERBS ALREADY PUBLISH. What did not was every write the
+ *  ENGINE makes itself — the work store above all, which writes a token and
+ *  told nobody.
+ *
+ *  MEASURED: filing work into a bucket wrote the file, the editor re-rendered
+ *  from an index that had not heard, and the reader saw no change until they
+ *  reloaded the whole surface. Renaming a bucket did the same.
+ *
+ *  IT TAKES AN ABSOLUTE PATH because a caller deep in the store knows the file
+ *  it just wrote and not which root owns it. Asking every warm index is cheap:
+ *  there is one.
+ *
+ *  see ux.md#nothing-a-person-does-needs-a-reload */
+export function noteFileChanged(abs: string, gone = false): void {
+  for (const [root, vault] of WARM) {
+    const rel = relative(root, abs);
+    // A path outside this root relativises to something climbing out of it.
+    if (rel === "" || rel.startsWith("..") || rel === abs) continue;
+    const at = vaultPath(vault, rel);
+    if (at === undefined) continue;
+    if (gone) vault.forget(at);
+    else vault.refresh(at);
+    vault.notify();
+  }
 }
 
 /** Apply deterministic MCP mutations without creating an otherwise-unused model. */

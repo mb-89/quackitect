@@ -6,7 +6,7 @@ statement: Wake in every window on the host's own after-everything-else event, t
 cluster: the-bootstrap
 question: what happens when a folder is opened
 found_by: probe
-source: "the M3 probe of the extension manifest, 2026-08-19 — the only declared activation event is the editor's onStartupFinished"
+source: the M3 probe of the extension manifest, 2026-08-19 — the only declared activation event is the editor's onStartupFinished
 ---
 
 ## Mechanism

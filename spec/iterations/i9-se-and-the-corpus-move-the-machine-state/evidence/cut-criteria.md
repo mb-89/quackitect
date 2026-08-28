@@ -1,10 +1,10 @@
 ---
 form: cut-criteria
-amended: "2026-08-19T19:26:16.068Z by agent — the surviving rows were read too, which is the question nobody had asked, and it changes the diagnosis"
+amended: 2026-08-19T19:26:16.068Z by agent — the surviving rows were read too, which is the question nobody had asked, and it changes the diagnosis
 by: agent
 signed_off: 2026-08-19T15:53:02.045Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / cut-criteria

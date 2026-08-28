@@ -2,16 +2,16 @@
 minted_in: i37-training-iterations-a-disposable-iterati
 id: exp-how-far-does-each-of-the-lanes-exclusion-lists-actually-reach
 type: "[[experiment]]"
-statement: "Which lane verbs honour which exclusion list, so the conditional concealment a benchmark run needs has one rule to attach to rather than three?"
+statement: Which lane verbs honour which exclusion list, so the conditional concealment a benchmark run needs has one rule to attach to rather than three?
 probes:
   - raid-iss-the-reading-verb-consults-no-exclusion-list-at-all
   - raid-ar-the-benchmark-history-is-unreadable-while-a-run-is-bound
-timebox: "minutes — one probe per verb per list"
+timebox: minutes — one probe per verb per list
 form: script
-faked: "nothing. Every row is a real lane call against this tree."
+faked: nothing. Every row is a real lane call against this tree.
 fallback: "pre-agreed before the run: if one list already binds every verb, the concealment attaches to it and the standing work token is not this iteration's dependency."
-folds_to: "req-the-benchmark-history-is-unreadable-while-a-run-is-bound — it waits on a work token this iteration does not own"
-promote: "none — a blocker rather than a mechanism"
+folds_to: req-the-benchmark-history-is-unreadable-while-a-run-is-bound — it waits on a work token this iteration does not own
+promote: none — a blocker rather than a mechanism
 verdict: falls
 source_refs:
   - el-benchmark-guard

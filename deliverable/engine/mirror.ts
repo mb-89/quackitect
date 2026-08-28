@@ -12,7 +12,6 @@ import { applyBaseOp, type BaseOp } from "./bases.ts";
 import { helpFor } from "./baseui.ts";
 import { type CallLog, slowMs, UNREPORTED } from "./calllog.ts";
 import { loadCards } from "./cards.ts";
-import { replayVisitsText } from "./decisions.ts";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { appendNote, pendingNotes, readNotes } from "./inbox.ts";
 import { recordClientFailures, recordLifecycle } from "./lifecycle.ts";
@@ -20,17 +19,41 @@ import { bumpDrawingEpoch } from "./machines/compile.ts";
 import { handleHttp, type McpServer } from "./mcp.ts";
 import { subscribeModelMutations } from "./model-fs.ts";
 import { beginPass, endPass } from "./notes.ts";
-import { loadPanel, renderPanel } from "./params.ts";
+import { renderSidebar, tasksTable } from "./params.ts";
 import { resolveInRoot, seDir } from "./paths.ts";
 import { produce } from "./produce.ts";
-import { ENGINE_LIFE, feedRows, type MirrorState, renderMirror } from "./render.ts";
-import { runningJob } from "./run.ts";
+import { ENGINE_LIFE, feedRows, linkDocRefs, type MirrorState, renderMirror } from "./render.ts";
+import { reapAbandonedJobs, reapAbandonedTestJobs, runningWork } from "./run.ts";
 import { loadLevels, loadStopAt } from "./scale.ts";
 import type { Session } from "./session.ts";
 import { survey } from "./survey.ts";
 import { editCell } from "./tables.ts";
 import { recordTraceWrites, traceWriteTrail } from "./trace.ts";
 import { warmVault } from "./vault.ts";
+import { WIDGET_KINDS, type WidgetKind } from "./widget-kinds.ts";
+import {
+  allWorkSignal,
+  BACKLOG,
+  boundToItsState,
+  freshBucket,
+  groupIsPlace,
+  homeForPlace,
+  homeOf,
+  type MintDemand,
+  mint,
+  place,
+  readAllWork,
+  readOne,
+  rebucket,
+  refuseLongTitle,
+  renameBucket,
+  restate,
+  settle,
+  splitWorkLine,
+  take,
+  type WorkStatus,
+  workHomes,
+} from "./workstore.ts";
 
 export interface MirrorOptions {
   session: Session;
@@ -40,6 +63,135 @@ export interface MirrorOptions {
   mode: "manual" | "agent";
   /** When given, /mcp serves the agent lane over HTTP — same dispatch as stdio. */
   mcp?: McpServer;
+}
+
+/** ONE PIECE OF WORK, EDITED FROM THE SURFACE.
+ *
+ *  THREE ACTS AND NO MORE. Rename what it says, take it, or close it. Anything
+ *  else about a work item belongs to the machine rather than to a hand.
+ *
+ *  THE STORE HOLDS EVERY RULE. This function routes and nothing else — the
+ *  empty-comment refusal, the already-taken refusal and the person-only
+ *  refusal all live in the one writer, so the surface cannot get a different
+ *  answer from the lane.
+ *  see dsp-the-work-store.md#a-token-opens-an-editor */
+function workAct(
+  state: MirrorState,
+  said: { id: string; act: string; comment: string; statement: string; status: string },
+): { log: Record<string, unknown>; answer: Record<string, unknown> } {
+  if (said.id === "") throw new Error("the edit named no work");
+  // THE ID IS THE WHOLE ADDRESS. The editor lists work from every record at
+  // once, so the reader pressing a row never knew which one it came from.
+  const home = homeOf(state.root, said.id);
+  if (home === undefined) throw new Error(`no piece of work has the id ${said.id}`);
+  if (said.act === "restate") {
+    const item = restate(home, said.id, said.statement);
+    return { log: { restated: item.id }, answer: { ok: true, statement: item.statement } };
+  }
+  // THE PERSON IS THE HAND HERE. A press on the surface is theirs, and
+  // recording it as the walker's would erase who actually did it.
+  if (said.act === "take") {
+    const item = take(home, said.id, "the person", said.comment);
+    // THE STATEMENT RIDES THE ANSWER, because the feed reads the record and the
+    // press only ever sent an id.
+    return { log: { took: item.id }, answer: { ok: true, took: item.id, statement: item.statement } };
+  }
+  if (said.act === "settle") {
+    const now = new Date().toISOString();
+    const item = settle(home, said.id, said.status as WorkStatus, { reason: said.comment, by: "person", now });
+    return {
+      log: { settled: item.id, status: item.status },
+      answer: { ok: true, settled: item.id, statement: item.statement, status: item.status },
+    };
+  }
+  throw new Error(`no such act: ${said.act} — it is restate, take or settle`);
+}
+
+/** THE LAST SEGMENT OF A POSITION, which is what the drawing calls a state. */
+function tailOf(position: string): string {
+  return position.slice(position.lastIndexOf("/") + 1);
+}
+
+/** EVERY POSITION THIS SURFACE CAN NAME — the walk's own, and every place work
+ *  already stands at. */
+function knownPositions(state: MirrorState): string[] {
+  return [...state.session.active(), ...readAllWork(state.root).items.map((i) => i.place)];
+}
+
+/** THE POSITION A NAME MEANS, or nothing where no position answers to it.
+ *
+ *  THE DRAWING NAMES A STATE BY ITS LAST SEGMENT AND THE STORE RECORDS THE
+ *  WHOLE POSITION. A drop carrying `fix-findings` therefore matched no place,
+ *  and the name became a BUCKET called `fix-findings` sitting beside the state's
+ *  own heading — the same state drawn twice, which reads as the drop landing
+ *  somewhere else entirely.
+ *
+ *  IT NEVER INVENTS ONE. A name nothing answers to is a bucket, and that is the
+ *  whole difference this decides. */
+export function knownPosition(state: MirrorState, name: string): string | undefined {
+  const want = name.trim();
+  if (want === "" || want === BACKLOG) return undefined;
+  const known = knownPositions(state);
+  return known.find((p) => p === want) ?? known.find((p) => tailOf(p) === want);
+}
+
+/** WHERE A DROP ONTO THE DRAWING LANDED.
+ *
+ *  A STATE ON THE DRAWING IS ALWAYS A POSITION, so this one DOES supply the
+ *  prefix a bare name is missing. A state nobody has worked yet answers to no
+ *  known position, and it is still a state.
+ *
+ *  THE PREFIX COMES FROM THE WALK — the container of wherever it stands, which
+ *  is the machine being drawn. */
+export function landingPlace(state: MirrorState, name: string): string {
+  const want = name.trim();
+  const found = knownPosition(state, want);
+  if (found !== undefined) return found;
+  if (want === "" || want.includes("/")) return want;
+  const at = state.session.active()[0] ?? "";
+  const cut = at.lastIndexOf("/");
+  return cut <= 0 ? want : `${at.slice(0, cut)}/${want}`;
+}
+
+/** A DROP INSIDE THE EDITOR, applied to every row it named.
+ *
+ *  A PLACE IS WHERE THE WORK IS DONE, so landing on one MOVES it and clears any
+ *  bucket. A bucket is only a grouping, so landing on one FILES it and leaves
+ *  the place exactly as it was.
+ *
+ *  IT LIVES OUTSIDE THE ROUTE so the route stays one thought. Returns whether
+ *  the group turned out to be a place, which is what the log records. */
+function regroup(state: MirrorState, ids: string[], group: string, slot: string): boolean {
+  const at = knownPosition(state, group) ?? (groupIsPlace(state.root, group) ? group : undefined);
+  for (const id of ids) {
+    const home = homeOf(state.root, id);
+    if (home === undefined) throw new Error(`no piece of work has the id ${id}`);
+    if (at !== undefined) byHand(home, id, at, slot);
+    else rebucket(home, id, group);
+  }
+  return at !== undefined;
+}
+
+/** A MOVE THE PERSON MADE, which is not the same as one the engine makes.
+ *
+ *  WORK A STATE MINTED STAYS AT THAT STATE (owner). Its card demands it, and
+ *  re-entering the state mints it again — so dragging it away duplicates it
+ *  rather than moving it.
+ *
+ *  THE ENGINE'S OWN PLACEMENT IS UNTOUCHED. It genuinely moves work between
+ *  positions, which is req-moving-work-releases-the-state-it-left, so the rule
+ *  binds this door rather than the mover.
+ *
+ *  DROPPING IT BACK ON ITS OWN STATE IS ALWAYS ALLOWED, and it is how a filed
+ *  piece comes out of its bucket. */
+function byHand(home: string, id: string, to: string, slot = ""): void {
+  const item = readOne(home, id);
+  if (item !== null && item !== undefined && item.place !== to && boundToItsState(item)) {
+    throw new Error(
+      `"${item.statement}" belongs to ${item.origin} — its card demands it, so it cannot be dragged out. File it under a bucket instead, or finish it where it stands.`,
+    );
+  }
+  place(home, id, to, slot);
 }
 
 export function startMirror(o: MirrorOptions): Server {
@@ -53,11 +205,20 @@ export function startMirror(o: MirrorOptions): Server {
 
   // A SLOT ON THE MODEL'S MUTATION SIGNAL. The model fires once per batch and
   // does not wait; this only stamps ids, and the graph animates from there.
+  //
+  // AND IT WAKES EVERY HELD PAGE. A write lands, the index hears it, and the
+  // surfaces were left waiting for the next poll to notice — which reads as a
+  // token that did not appear until the reader reloaded.
+  //
+  // IT IS HERE AND NOT IN EACH ROUTE, so no future writer can forget. Six work
+  // routes each had to remember, and none of them did.
+  // see ux.md#nothing-a-person-does-needs-a-reload
   subscribeModelMutations(o.root, (batch) => {
     recordTraceWrites(
       o.root,
       batch.changes.map((c) => (c.kind === "rename" ? c.to : c.path)),
     );
+    o.session.notifyChange();
   });
 
   // THE READER'S SELECTION, mirrored server-side: the machine page reports
@@ -92,6 +253,14 @@ export function startMirror(o: MirrorOptions): Server {
     ...(state.session.progress() === undefined ? {} : { progress: state.session.progress() }),
     // A monotone change signal for the feed — the log file only grows.
     acts: existsSync(o.log.path) ? statSync(o.log.path).size : 0,
+    // WHAT THE STATES OWE, as one number. A pill appears, moves or empties the
+    // moment the work store does, with no navigation and no re-entry.
+    // see dsp-mirror-render.md#the-pills-are-pushed
+    work: allWorkSignal(state.root),
+    // HOW LONG IT HAS BEEN QUIET, for a surface that wants to show it. A silent
+    // wait and then a dark machine reads exactly like a toggle that never
+    // worked.
+    ...(state.session.inactiveMinutes === undefined ? {} : { inactive_minutes: state.session.inactiveMinutes }),
     // The agent's pointing finger — the page pulses the target on a new seq.
     ...(state.session.ping === undefined ? {} : { ping: state.session.ping }),
     // Which trace nodes the agent just wrote — the graph blinks then fades them.
@@ -310,22 +479,6 @@ export function startMirror(o: MirrorOptions): Server {
         result: state.session.formBless(String(body.name ?? ""), body.ok === true, "human", String(body.machine ?? "")),
       }),
     ],
-    // THE PRIORITY RIDES THE NOTE (owner, 2026-08-01). The note row draws
-    // a MoSCoW choice, and a capture that dropped it made every stray a
-    // "could" whatever the reader picked.
-    "/note": [
-      "mirror_note",
-      (body) => ({
-        args: { text: body.text, priority: body.priority },
-        result: appendNote(
-          seDir(o.root),
-          String(body.text ?? ""),
-          "human",
-          undefined,
-          body.priority === "must" || body.priority === "should" ? body.priority : "could",
-        ),
-      }),
-    ],
     "/escape": [
       "mirror_escape",
       (body) => ({ args: { reason: body.reason }, result: state.session.escape(String(body.reason ?? ""), "human") }),
@@ -450,7 +603,7 @@ export function startMirror(o: MirrorOptions): Server {
         }),
         (e) => (e instanceof Rejection ? e.toJSON() : { error: whyOf(e) }),
       ),
-    // SET TARGET, the bar's button (owner design 2026-08-04): aims at the
+    // SET TARGET, the bar's button: aims at the
     // SELECTED state — the one whose details the machine page reported.
     "/target/selected": (req, res) =>
       jsonPost(
@@ -575,6 +728,247 @@ export function startMirror(o: MirrorOptions): Server {
     // A CONTROL IS A WRITE, so it joins the feed like every other one. It
     // answers JSON and the card redraws itself from disk afterwards, which
     // is what makes the file rather than the surface the state.
+    // A MOVE IS A REQUEST, NEVER A WRITE BY THE SURFACE. The drop NAMES the
+    // move; the work store is the only module that writes a piece of work.
+    // see dsp-the-bucket-editor.md#behavior-and-constraints
+    //
+    // A REFUSAL RIDES BACK WITH ITS REASON, because a row snapping into place
+    // with nothing said is the failure the design names.
+    "/work/move": (req, res) =>
+      jsonPost(
+        req,
+        res,
+        "mirror_work_move",
+        (body) => {
+          // A ROW NAMES ITSELF BY ITS FILE. The editor is the database now, and
+          // a database row's identity is the note it came from — so the drop
+          // sends a path and the id is read off the end of it.
+          //
+          // A GROUP TRAVELS TOGETHER. One row and a picked set are the same act,
+          // so the payload is a list and a single one is a list of one.
+          const named = body.path !== undefined ? body.path : body.work;
+          const ids = (Array.isArray(named) ? (named as unknown[]) : [named])
+            .map((w) => String(w ?? ""))
+            .map((w) => (w.endsWith(".md") ? (w.split(/[\\/]/).pop() ?? "").replace(/\.md$/, "") : w))
+            .filter((w) => w !== "");
+          const to = landingPlace(state, String(body.to ?? ""));
+          // WHICH BUCKET, WHERE THE DROP SAID SO. A state carries three drop
+          // zones; landing on one names the bucket, and landing on the state's
+          // body names none and leaves it to derive.
+          const slot = String(body.slot ?? "");
+          return {
+            args: { work: ids, to, slot },
+            run: () => {
+              if (ids.length === 0) throw new Error("the move named no work");
+              if (slot === "done") throw new Error("work reaches done by being finished, so it cannot be dropped there");
+              const moved = ids.map((id) => {
+                const home = homeOf(state.root, id);
+                if (home === undefined) throw new Error(`no piece of work has the id ${id}`);
+                byHand(home, id, to, slot);
+                return { from: to, to };
+              });
+              return { log: { moved: moved.length, to, slot }, answer: { ok: true, moved: moved.length, to, slot } };
+            },
+          };
+        },
+        (e) => ({ ok: false, error: whyOf(e) }),
+      ),
+    // FILE WORK UNDER A NAME OF THE PERSON'S OWN.
+    //
+    // IT MOVES NOTHING. The place stays exactly as it was and only the grouping
+    // changes, which is the whole difference between a bucket and a place.
+    "/work/bucket": (req, res) =>
+      jsonPost(
+        req,
+        res,
+        "mirror_work_bucket",
+        (body) => {
+          const named = body.paths !== undefined ? body.paths : body.path;
+          const ids = (Array.isArray(named) ? (named as unknown[]) : [named])
+            .map((w) => String(w ?? ""))
+            .map((w) => (w.endsWith(".md") ? (w.split(/[\\/]/).pop() ?? "").replace(/\.md$/, "") : w))
+            .filter((w) => w !== "");
+          // AN EMPTY NAME ASKS FOR A FRESH ONE (owner). The bucket is made
+          // first and named afterwards, so nothing has to be typed before the
+          // reader can see what landed in it.
+          const asked = String(body.bucket ?? "").trim();
+          return {
+            args: { work: ids, bucket: asked },
+            run: () => {
+              if (ids.length === 0) throw new Error("nothing was selected, so there is nothing to file");
+              const bucket = asked === "" ? freshBucket(state.root) : asked;
+              for (const id of ids) {
+                const home = homeOf(state.root, id);
+                if (home === undefined) throw new Error(`no piece of work has the id ${id}`);
+                rebucket(home, id, bucket);
+              }
+              return { log: { filed: ids.length, bucket }, answer: { ok: true, filed: ids.length, bucket } };
+            },
+          };
+        },
+        (e) => ({ ok: false, error: whyOf(e) }),
+      ),
+    // A DROP INSIDE THE EDITOR, onto a group heading or onto a row in one.
+    //
+    // THE GROUP IS A BUCKET OR A PLACE and its name alone does not say which,
+    // so the store is asked. Landing on a place MOVES the work; landing on a
+    // bucket FILES it and moves nothing.
+    "/work/regroup": (req, res) =>
+      jsonPost(
+        req,
+        res,
+        "mirror_work_regroup",
+        (body) => {
+          const named = body.paths !== undefined ? body.paths : body.path;
+          const ids = (Array.isArray(named) ? (named as unknown[]) : [named])
+            .map((w) => String(w ?? ""))
+            .map((w) => (w.endsWith(".md") ? (w.split(/[\\/]/).pop() ?? "").replace(/\.md$/, "") : w))
+            .filter((w) => w !== "");
+          const group = String(body.group ?? "").trim();
+          // THE SECOND LEVEL OF GROUPING IS A BUCKET, so a drop on it names the
+          // place above it AND which of that place's buckets it landed in.
+          const slot = String(body.slot ?? "").trim();
+          return {
+            args: { work: ids, group, slot },
+            run: () => {
+              if (ids.length === 0) throw new Error("the drop named no work");
+              if (group === "") throw new Error("the drop landed on no group at all");
+              const isPlace = regroup(state, ids, group, slot);
+              return {
+                log: { moved: ids.length, group, slot, as: isPlace ? "place" : "bucket" },
+                answer: { ok: true, moved: ids.length, group },
+              };
+            },
+          };
+        },
+        (e) => ({ ok: false, error: whyOf(e) }),
+      ),
+    // RENAME A BUCKET, everywhere it stands. A PLACE CANNOT BE RENAMED HERE:
+    // a place is the drawing's name for a state, and the drawing owns it.
+    "/work/bucket/rename": (req, res) =>
+      jsonPost(
+        req,
+        res,
+        "mirror_work_bucket_rename",
+        (body) => {
+          const from = String(body.from ?? "").trim();
+          const to = String(body.to ?? "").trim();
+          return {
+            args: { from, to },
+            run: () => {
+              if (from === "") throw new Error("no bucket was named, so nothing could be renamed");
+              if (to === "") throw new Error("a bucket needs a name; drop the rows onto a place to unfile them instead");
+              // EVERY SOURCE IS VISITED. A bucket can hold work from the record
+              // and from the private source at once, and renaming one half
+              // would split the group in two.
+              const moved = workHomes(state.root).flatMap((home) => renameBucket(home, from, to));
+              if (moved.length === 0) throw new Error(`no work is filed under "${from}"`);
+              return { log: { renamed: moved.length, from, to }, answer: { ok: true, renamed: moved.length, from, to } };
+            },
+          };
+        },
+        (e) => ({ ok: false, error: whyOf(e) }),
+      ),
+    // THE PRIORITY RIDES THE NOTE (owner). The note row draws a MoSCoW choice,
+    // and a capture that dropped it made every stray a "could" whatever the
+    // reader picked.
+    //
+    // IT ANSWERS JSON RATHER THAN REDIRECTING. The wall guard refuses a
+    // breakless note, and a redirect leaves no refusal for any client to read —
+    // so all three cleared the field and showed nothing.
+    "/note": (req, res) =>
+      jsonPost(
+        req,
+        res,
+        "mirror_note",
+        (body) => ({
+          args: { text: body.text, priority: body.priority },
+          run: () => {
+            const r = appendNote(
+              seDir(o.root),
+              String(body.text ?? ""),
+              "human",
+              undefined,
+              body.priority === "must" || body.priority === "should" ? (body.priority as "must" | "should") : "could",
+            );
+            return { log: r, answer: { ok: true, note: r } };
+          },
+        }),
+        (e) => (e instanceof Rejection ? e.toJSON() : { error: whyOf(e) }),
+      ),
+    // THE PLUS. A piece of work added by a hand rather than derived from a
+    // card, and it goes through the same one writer as everything else.
+    "/work/mint": (req, res) =>
+      jsonPost(
+        req,
+        res,
+        "mirror_work_mint",
+        (body) => {
+          const at = String(body.place ?? "");
+          const slot = String(body.slot ?? "out");
+          const statement = String(body.statement ?? "").trim();
+          return {
+            args: { place: at, slot, statement },
+            run: () => {
+              if (statement === "") throw new Error("a piece of work says what it is; an unnamed one cannot be judged later");
+              // NOTHING IS ADDED STRAIGHT INTO DONE. The done bucket is a
+              // filter over status, so work can only arrive there by finishing.
+              if (slot === "done") throw new Error("work reaches done by being finished, so it cannot be added there");
+              // THE SLOT IS DERIVED FROM THE SOURCE, never stored beside it, so
+              // the column a hand adds into decides which source it carries.
+              //
+              // FOUR WORDS NAME IT AND THE SLASH CARRIES THE REST, exactly as
+              // the note entry beside it does and exactly as the lane verb
+              // does. see dsp-the-work-store.md#the-title-is-four-words
+              const said = splitWorkLine(statement);
+              refuseLongTitle(said.statement, "open");
+              const demand: MintDemand = {
+                source: slot === "in" ? "reading" : "hand",
+                source_ref: `hand/${said.statement}`,
+                step: "",
+                statement: said.statement,
+                body: said.body,
+              };
+              // PENDING IS THE BACKLOG'S. Adding there places the work nowhere
+              // in particular, which is exactly what pending means.
+              // WHERE IT LANDS FOLLOWS FROM WHERE IT IS GOING, never from which
+              // record the walk stands in.
+              const to = slot === "pending" ? BACKLOG : at;
+              const report = mint(homeForPlace(state.root, to), to, [demand], new Date().toISOString());
+              return { log: { minted: report.minted.length }, answer: { ok: true, minted: report.minted.length } };
+            },
+          };
+        },
+        (e) => ({ ok: false, error: whyOf(e) }),
+      ),
+    // THE TOKEN'S OWN EDITOR. Pressing a row opens it, and these are the three
+    // things a hand can do to one piece of work from the surface.
+    //
+    // TAKE AND SETTLE BOTH DEMAND A COMMENT, and the STORE is what refuses an
+    // empty one, never this route. One rule, one place.
+    // see dsp-the-work-store.md#a-token-opens-an-editor
+    "/work/act": (req, res) =>
+      jsonPost(
+        req,
+        res,
+        "mirror_work_act",
+        (body) => {
+          const id = String(body.work ?? "");
+          const act = String(body.act ?? "");
+          const comment = String(body.comment ?? "").trim();
+          const statement = String(body.statement ?? "").trim();
+          const status = String(body.status ?? "done");
+          return {
+            // THE COMMENT RIDES THE RECORD. It is the sentence the hand wrote
+            // about this piece of work, and the log line is where the person
+            // reads it back. Logging only the id said a token moved and never
+            // which one or why.
+            args: { work: id, act, status, comment },
+            run: () => workAct(state, { id, act, comment, statement, status }),
+          };
+        },
+        (e) => ({ ok: false, error: whyOf(e) }),
+      ),
     "/base/edit": (req, res) =>
       jsonPost(
         req,
@@ -619,28 +1013,6 @@ export function startMirror(o: MirrorOptions): Server {
       res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
       res.end(body);
     },
-    // One state visit's decision tree — the details pane renders it.
-    "/api/decisions": (url, _req, res) => {
-      const visit = url.searchParams.get("visit") ?? state.session.currentVisit();
-      json(res, { ...state.session.decisions.graph(visit), visits: state.session.decisions.visits() });
-    },
-    // A state's per-visit to-do lists plus points parked for it —
-    // rendered below the state's details, one fold per visit.
-    "/api/statetodos": (url, _req, res) => {
-      json(res, state.session.decisions.stateTodos(url.searchParams.get("state") ?? ""));
-    },
-    // A record's decision history, per visit. THE FOLDER IS THE ONLY PLACE IT
-    // LIVES (i6): this fell back to `git show exp/<id>:<rel>` for a dismissed
-    // expedition whose file was only on its branch. i34 keeps the folder where
-    // it is through the close, dismissal included, so the branch held nothing
-    // the tree does not.
-    "/api/recdecisions": (url, _req, res) => {
-      const expId = url.searchParams.get("exp") ?? "";
-      const rel = `spec/expeditions/${expId}/decisions.jsonl`;
-      const abs = resolveInRoot(o.root, rel, "mirror /api/recdecisions");
-      const raw = existsSync(abs) ? readFileSync(abs, "utf8") : "";
-      json(res, { exp: expId, visits: replayVisitsText(raw) });
-    },
     // Serve a guidance document, rendered — links in the details pane.
     "/doc": (url, _req, res) => {
       const p = url.searchParams.get("path") ?? "";
@@ -657,15 +1029,8 @@ export function startMirror(o: MirrorOptions): Server {
       }
       raw = raw.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n/, ""); // frontmatter is machine-facing
       let html = p.endsWith(".md") ? (marked.parse(raw) as string) : `<pre>${raw.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</pre>`;
-      // see dsp-legible-controls.md#a-reference-in-prose-is-a-link-not-dead
-      if (p.endsWith(".md")) {
-        const links = state.session.docRefPaths(p);
-        const escAttr = (s: string): string => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
-        html = html.replace(/\[\[([^\]\n]+)\]\]/g, (whole: string, id: string) => {
-          const path = links[id.trim()];
-          return path === undefined ? whole : `<a class="doclink" data-path="${escAttr(path)}">${escAttr(id.trim())}</a>`;
-        });
-      }
+      // THE SURFACE MAKES THE LINK, not the server. see linkDocRefs.
+      if (p.endsWith(".md")) html = linkDocRefs(html, state.session.docRefPaths(p));
       if (url.searchParams.get("page") === "1") {
         // A standalone page — ctrl/shift-click targets (new tab, new window).
         res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
@@ -770,7 +1135,7 @@ export function startMirror(o: MirrorOptions): Server {
       res.writeHead(200, { "content-type": "application/json; charset=utf-8", "access-control-allow-origin": "*" });
       res.end(JSON.stringify({ cards: loadCards(o.root) }));
     },
-    // BOTH HANDS ASK IT (owner ruling 2026-07-28): the agent through
+    // BOTH HANDS ASK IT: the agent through
     // se_survey, the person through the machine header's button.
     "/api/survey": (_url, _req, res) => {
       json(res, survey(o.root));
@@ -833,24 +1198,37 @@ export function startMirror(o: MirrorOptions): Server {
         // buttons, which is the hole the comment above this block records.
         stopat: loadStopAt(state.root),
         stop_at: state.session.stopAtValue,
-        // WORK STILL RUNNING, so a person watching a still surface can tell a
-        // slow operation from a hung one. Absent when nothing is running, which
-        // is the ordinary case and draws nothing.
-        running: runningJob(),
+        // EVERY PIECE OF WORK STILL RUNNING, so a person watching a still
+        // surface can tell a slow operation from a hung one and can see how
+        // many things are going. Empty is the ordinary case and draws nothing.
+        tables: { running: tasksTable(runningWork()) },
         emergency: state.session.emergency,
         ints: { narration_minutes: state.session.narrationMinutes, narration_calls: state.session.narrationCalls },
-        toggles: { "block-auto-sleep": power.block_sleep, "shutdown-at-idle": power.shutdown_at_idle },
+        toggles: { "block-auto-sleep": power.block_sleep, "shutdown-at-front-desk": power.shutdown_at_front_desk },
       };
-      // THE NOTE ROW RIDES ALONG. It is its own panel with its own spec
-      // (note-entry.md), and serving it here means the sidebar needs one
-      // fetch rather than two, with neither surface writing markup.
-      const bar = renderPanel(loadPanel(state.root, "controls"), values) + renderPanel(loadPanel(state.root, "note-entry"), values);
+      // EVERY PANEL RIDES ALONG, in the one order there is. renderSidebar
+      // decides it, so the sidebar needs one fetch and neither surface writes
+      // markup or picks an order of its own.
+      const bar = renderSidebar(state.root, values);
       res.writeHead(200, { "content-type": "text/html; charset=utf-8", "access-control-allow-origin": "*" });
       res.end(bar);
     },
   };
 
-  const WIDGETS = new Set(["machine", "details", "log", "terminal", "table", "trace"]);
+  // THE WIDGETS STAY, AND THE WHOLE PAGE DOES NOT.
+  //
+  // A WIDGET IS THE SIDEBAR. The editor's panes are these routes, framed. Take
+  // them away and the surface people actually use goes with them.
+  //
+  // THE PAGE WAS A SECOND INTERFACE NOBODY USED, and its cost was never the
+  // code. An agent would fix a pane, open the standalone page, see the fix, and
+  // report the interface repaired — while the sidebar still showed the fault.
+  // THE GATE TAKES ITS VOCABULARY FROM THE RENDERER, so it cannot admit a kind
+  // the renderer has no branch for. It admitted `controls` while the cast one
+  // line below had no such member, and `/widget/controls` has its own route
+  // above — so the entry did nothing but keep a way through to the whole page
+  // this file says is no longer served.
+  const WIDGETS: ReadonlySet<string> = new Set<string>(WIDGET_KINDS);
 
   // RENDER FIRST, THEN WRITE THE HEAD. See the note at the dispatcher's catch.
   const serveWidget = (widget: string, url: URL, res: Res): void => {
@@ -858,7 +1236,7 @@ export function startMirror(o: MirrorOptions): Server {
     const started = performance.now();
     const html = renderMirror(
       state,
-      widget as "machine" | "details" | "log" | "terminal" | "table" | "trace",
+      widget as WidgetKind,
       url.searchParams.get("view") ?? undefined,
       undefined,
       url.searchParams.get("embed") === "1",
@@ -885,27 +1263,6 @@ export function startMirror(o: MirrorOptions): Server {
     }
     res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
     res.end(html);
-  };
-
-  // GET / — tick without arguments: information about where we are.
-  // ?view=<machine> browses a machine without moving the walk.
-  const servePage = (url: URL, res: Res): void => {
-    state.lastPacket = state.session.packet();
-    const page = renderMirror(
-      state,
-      undefined,
-      url.searchParams.get("view") ?? undefined,
-      url.searchParams.get("card") ?? undefined,
-      url.searchParams.get("embed") === "1",
-      undefined,
-      url.searchParams.get("tp") ?? undefined,
-      url.searchParams.get("tt") ?? undefined,
-      url.searchParams.get("tq") ?? undefined,
-      url.searchParams.get("tc") ?? undefined,
-      url.searchParams.get("to") ?? undefined,
-    );
-    res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
-    res.end(page);
   };
 
   /** True when a POST table answered the request. */
@@ -980,15 +1337,16 @@ export function startMirror(o: MirrorOptions): Server {
         serveWidget(widget, url, res);
         return;
       }
-      // AN UNKNOWN POST ANSWERS 404, NEVER THE PAGE. The fallthrough used to
-      // serve the page to every method, so a retired route kept returning a
-      // 200 full of HTML and its caller kept believing in it.
-      if (req.method !== "GET" && req.method !== "HEAD") {
-        res.writeHead(404, { "content-type": "text/plain; charset=utf-8" });
-        res.end(`no such route: ${req.method} ${url.pathname}`);
-        return;
-      }
-      servePage(url, res);
+      // NO WHOLE PAGE IS SERVED HERE ANY MORE. `/` used to answer with the
+      // entire mirror, and every unknown GET fell through to it.
+      //
+      // WHAT REMAINS: `/mcp`, `/widget/*` — which IS the editor's sidebar — and
+      // the API those panes read and post their controls to.
+      //
+      // AND `se_shoot` STILL DRAWS THE SURFACE, without HTTP in the path at
+      // all, while `se_surface` prints the same facts as text.
+      res.writeHead(404, { "content-type": "text/plain; charset=utf-8" });
+      res.end(`no such route: ${req.method ?? "GET"} ${url.pathname}`);
     } catch (e) {
       // A BLACK WINDOW IS THE WORST WAY TO REPORT A FAULT, and it is what this
       // used to do. The 200 head went out BEFORE the render ran, so a throw
@@ -1023,6 +1381,22 @@ export function startMirror(o: MirrorOptions): Server {
   // A reset is the CLIENT's socket dying, and it now leaves a line. Before
   // this, telling it from a server exit meant checking a PID by hand.
   recordClientFailures(o.root, server);
+  // THE LAST ENGINE'S GHOSTS DIE HERE, BEFORE ANYBODY CAN READ THEM.
+  //
+  // A job records itself as running and only the engine that owns it writes
+  // the closing record. An engine that was killed never did, so without this
+  // the next one inherits jobs that report progress and never finish.
+  //
+  // IT RUNS BEFORE listen ON PURPOSE. The first lane answer already carries
+  // the work account, so a reap after the port opens is a reap the first
+  // caller can race.
+  const reaped = reapAbandonedJobs(o.root);
+  if (reaped.length > 0) recordLifecycle(o.root, "reaped", `jobs=${String(reaped.length)} ${reaped.join(" ")}`);
+  // AND THE TEST RUNS, which live in their own folder and their own shape. A
+  // record left open blocks the stop hook until its window passes, so a killed
+  // run reads as a running one for half an hour.
+  const reapedTests = reapAbandonedTestJobs(o.root);
+  if (reapedTests.length > 0) recordLifecycle(o.root, "reaped", `tests=${String(reapedTests.length)} ${reapedTests.join(" ")}`);
   server.listen(o.port, "127.0.0.1", () => recordLifecycle(o.root, "listening", `port=${String(o.port)}`));
   return server;
 }

@@ -1,7 +1,7 @@
 ---
 form: verification
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / verification

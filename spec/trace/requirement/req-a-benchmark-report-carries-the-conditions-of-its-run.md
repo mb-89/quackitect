@@ -6,7 +6,7 @@ statement: "The engine shall refuse to record a benchmark report that omits any 
 kind: quality
 verify_method: test
 fitness_candidate: true
-breaks_if_removed: "A number without its conditions cannot be re-tested or paired, so the whole ledger becomes anecdote."
+breaks_if_removed: A number without its conditions cannot be re-tested or paired, so the whole ledger becomes anecdote.
 breaks_how_badly: crippling
 refines:
   - uc-measure-a-machine-change-against-a-finished-iteration

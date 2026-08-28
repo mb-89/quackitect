@@ -25,9 +25,13 @@ evidence:
       - $claim-specs
     description: one checkbox per non-test spec — the reds no run can show. The engine observes the test reds itself.
 major: full
+major_complexity: C2/R2
 minor: full
+minor_complexity: C2/R2
 patch: full
+patch_complexity: C2/R2
 product: full
+product_complexity: C2/R2
 specification: tailored
 major_note: |
   Applies in full. Every new check fails before the build.
@@ -50,7 +54,7 @@ specification_note: |
 
 Last before the build, before any code lands ([[meth-test-first]]). A check green with no realized design is suspect.
 
-ONLY WHAT A PERSON MUST DO IS LISTED (owner ruling 2026-08-11). The
+ONLY WHAT A PERSON MUST DO IS LISTED. The
 checklist holds the NON-TEST specs — demonstration, inspection,
 analysis — where no run can show the red. One deliberate check per
 spec. Checking claims one of two things:
@@ -64,7 +68,7 @@ fires [[red-observed]]: it reads every test-spec minted in the open
 record whose method is `test`, runs the files they name, and refuses
 unless at least one case FAILS. The agent never runs them.
 
-WHY A REFUSAL AND NOT A WARNING (owner ruling 2026-08-16). This state
+WHY A REFUSAL AND NOT A WARNING. This state
 had no test verb to begin with, so the agent reached for the shell, and
 a truncating pipe ate the output it reached for. The owner rejected
 granting the verb in the same breath as proposing this: it keeps the

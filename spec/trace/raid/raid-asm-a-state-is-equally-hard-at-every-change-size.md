@@ -3,10 +3,10 @@ minted_in: i38-the-machine-sizes-its-own-driver-every-s
 id: raid-asm-a-state-is-equally-hard-at-every-change-size
 type: "[[raid]]"
 kind: issue
-statement: "A row's difficulty varies with change size while the design gives each row ONE complexity value. The SPREAD is established; the NON-MONOTONICITY this entry first claimed was manufactured by quoting half a note and is withdrawn."
+statement: A row's difficulty varies with change size while the design gives each row ONE complexity value. The SPREAD is established; the NON-MONOTONICITY this entry first claimed was manufactured by quoting half a note and is withdrawn.
 owner: the owner
-trigger: "the first rating pass over the matrix, and the first walk at a change size other than the one the ratings were judged against"
-status: open
+trigger: "none — the rating pass ran on 2026-08-28 and answered the test this entry set"
+status: closed
 looked: 2026-08-20
 impact: "A rating judged against the column it was written for is wrong at every other column, in the expensive direction at the small end: a patch walk pays a major walk's driver for a state the matrix itself has already tailored down."
 breaks_how_badly: corrosive
@@ -18,6 +18,7 @@ source_refs:
   - req-every-matrix-row-declares-its-complexity
 weighs_with: raid-risk-a-hand-declared-rung-drifts-upward-and-nothing-ever-says-so
 weighs_against: none
+place: i14-the-ladder-engine-half-comparison-moves-
 ---
 
 ## WHAT THIS ENTRY FIRST CLAIMED, AND WHY HALF OF IT IS WITHDRAWN
@@ -99,3 +100,43 @@ and this entry closes.
 AND IT SHOULD RATE `draft-vision` AT MINOR AND MAJOR TOO, now that the omit
 lists are known: one field against four is the sharpest available test of
 whether volume and difficulty come apart.
+
+## THE PASS RAN, 2026-08-28. Both tests differ, so per-column stands.
+
+THE TEST THIS ENTRY SET was run on the two rows it named.
+
+`write-requirements`, patch against major:
+
+- PATCH is `C2/R1`. Clarification only. The rule decides for you and the diff
+  is the tell — a reworded line is a patch, a new or deleted line is not. One
+  requirement and the output that went wrong is everything there is to read.
+- MAJOR is `C3/R4`. Every new requirement authored with its kind, its verify
+  method and its breaks-if-removed, eight set-level criteria each answered with
+  an argument, and every standing row the architectural move touches re-read
+  for continued truth.
+- TWO RUNGS APART on both figures. The entry's surviving claim holds.
+
+`draft-vision`, minor against major against product, and this is the sharper
+result:
+
+- MINOR is `C3/R2`. One field survives, `goal_system`. Ruling which of two
+  goals wins is a real call whatever its volume.
+- MAJOR is `C3/R3`. The same call, plus judging whether the vision bends at
+  all, over the whole resident packet.
+- PRODUCT is `C4/R3`. The packet is authored from nothing, which is framing
+  rather than authoring.
+
+WHAT THAT SHOWS, and it is what the two-figure design was built for: JUDGEMENT
+HELD STILL AT C3 WHILE READING MOVED FROM R2 TO R3. One field against four
+changed how much had to be held and did not change how hard the call was.
+Volume and difficulty came apart exactly where this entry predicted.
+
+## The design was already per-column, and that is the other half
+
+THIS ENTRY'S PREMISE ABOUT THE DESIGN IS WRONG. It says "the design gives each
+row ONE complexity value". The loader reads `<column>_complexity` —
+`difficultyFor` in `deliverable/engine/rigor-matrix.ts` looks up
+`fm[`${col}_complexity`]`, one value per cell.
+
+SO NOTHING NEEDS CHANGING. The pass confirms per-column is needed and the
+store already holds per-column. The entry closes on its own stated test.

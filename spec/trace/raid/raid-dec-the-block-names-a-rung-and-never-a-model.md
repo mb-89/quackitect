@@ -7,7 +7,7 @@ type: "[[raid]]"
 kind: decision
 statement: The sizing block publishes a rung name and holds no roster, so resolving that rung to a concrete model is entirely the receiver's business and no model name ever appears in our tree.
 owner: the owner
-trigger: "the first host that runs a model this project has never heard of, and the first vendor retirement"
+trigger: the first host that runs a model this project has never heard of, and the first vendor retirement
 status: decided
 impact: "This is the defining choice of the winning architecture and everything else in it follows. It buys host portability by construction and pays for it with a check we can never run: nothing of ours learns which model a rung resolved to, so the record carries what we named and a self-reported account of what ran, with nothing independent to compare them against."
 breaks_how_badly: crippling

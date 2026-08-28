@@ -1,19 +1,19 @@
 ---
 steps:
   - id: the-quiet-handback
-    statement: "compose cand-the-quiet-handback - the seams, the rough costs, and what it leans on"
+    statement: compose cand-the-quiet-handback - the seams, the rough costs, and what it leans on
     depends_on: []
     realization: document
   - id: the-measured-answer
-    statement: "compose cand-the-measured-answer - the seams, the rough costs, and what it leans on"
+    statement: compose cand-the-measured-answer - the seams, the rough costs, and what it leans on
     depends_on: []
     realization: document
   - id: the-guided-caller
-    statement: "compose cand-the-guided-caller - the seams, the rough costs, and what it leans on"
+    statement: compose cand-the-guided-caller - the seams, the rough costs, and what it leans on
     depends_on: []
     realization: document
   - id: the-account-that-follows-you
-    statement: "compose cand-the-account-that-follows-you - the seams, the rough costs, and what it leans on"
+    statement: compose cand-the-account-that-follows-you - the seams, the rough costs, and what it leans on
     depends_on: []
     realization: document
 ---

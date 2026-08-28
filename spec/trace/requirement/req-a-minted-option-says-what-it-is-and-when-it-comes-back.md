@@ -40,3 +40,16 @@ re-entry condition IS, and that is out of scope.
 Metric: minted options carrying an empty statement or an empty condition.
 Target: zero. And a mint offering the unstatable form is ACCEPTED — a test that
 only proves refusals would let an over-strict check pass.
+
+## Addition — work tokens
+
+THE SAME DEMAND BINDS EVERY PIECE OF WORK THAT BELONGS TO NO STATE, not only
+one minted from a note. It carries a written condition saying when it comes
+back, and the surface shows that condition beside the work.
+
+THE CONDITION IS WHAT MAKES BROWSING END IN A DECISION. A person narrowing
+the list reads whether each row's moment has arrived, and the narrowing works
+because the condition is a field rather than prose.
+
+MEASURED: 154 such pieces of work stand in the pool after this round's own
+drain, each carrying one.

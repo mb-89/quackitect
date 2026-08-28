@@ -5,13 +5,16 @@ type: "[[raid]]"
 kind: debt
 statement: The consistency sweep was rewired to run after the demonstrations rather than beside them, because the walker cannot resume a fan leg once the leg it took was a submachine, so the method lost a parallel branch to get past an engine defect.
 owner: the owner
-looked: 2026-08-20
+looked: 2026-08-26
 status: open
 breaks_how_badly: corrosive
 how_likely: expected
 impact: "Any drawing that fans into a submachine is unwalkable by one agent. The walk reaches the join with the other leg never taken, and every legal move is closed: the pull refuses SE-C-123, a choice refuses SE-C-110, the router draws a route the whole way round the record and moves zero hops, and se_reopen would take the walked leg down with it. The only ways out are editing the drawing or editing the engine."
 source_refs:
   - note-ec92cfa43897
+last_looked: 2026-08-23
+look_verdict: rescheduled
+place: i52-the-route-can-go-back-a-walk-can-reach-a
 ---
 
 ## What was taken, and by whom
@@ -127,3 +130,30 @@ shape.
 
 RE-AFFIRMED AS STANDING. Trigger unchanged.
 
+## Swept 2026-08-26, at i54's closing retro: RE-ACCEPTED, and the trigger fired
+
+THIS IS THE FIRST LOOK WITH THE FAN ACTUALLY RUN. i54 spawned three hands beside the one holding the session, and they collided twice.
+
+WHAT THE COLLISION LOOKED LIKE. A spawned hand filled a position that had already been signed by the other hand, and its composed answer landed one position downstream. One authored step was discarded and a checkpoint took three fields nobody meant to write there.
+
+SO THE SERIALISATION THIS ENTRY DESCRIBES IS NOT MERELY A COST. Running the fan unserialised produced real damage, twice, in one record.
+
+TWO WORK TOKENS NOW CARRY THE REPAIRS, both minted at this retro. One asks a spawned hand to read the last signed position before its first write. One asks the stop guard to accept a registered second hand as a reason for the holding hand to rest.
+
+RE-ACCEPTED rather than repaid: the repairs are scoped and parked, and neither is this retro's to build.
+
+
+SWEPT 2026-08-28, at i63's closing retro: RE-ACCEPTED, AND IT CARRIES NO
+TRIGGER, WHICH IS ITS OWN DEFECT.
+
+Nothing can bring this entry due. It is one of three open debts with no trigger
+field at all, so it waits on somebody happening to read it.
+
+THE TRIGGER IT SHOULD CARRY: the next record whose method fans work out across
+several hands at one state. That is a nameable moment, and this window had one
+— i63 walked spawn-the-hands, spawn-for-motivation, spawn-for-inputs,
+spawn-for-requirements, spawn-for-candidates, spawn-for-architecture,
+spawn-for-prototype, spawn-for-implementation, spawn-for-validation and
+spawn-for-release.
+
+TEN FAN-OUT STATES WALKED, and this entry could not tell anybody.

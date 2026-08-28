@@ -15,4 +15,5 @@ source_refs:
 priority: should
 weighs_against:
   - req-filter-draws-only-what-serves >
+  - req-surface-answers-in-one-second > showing the machine at all is crippling to lose; showing it a second slower is corrosive
 ---

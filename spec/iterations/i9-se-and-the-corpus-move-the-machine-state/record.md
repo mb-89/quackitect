@@ -1,6 +1,7 @@
 ---
 id: i9-se-and-the-corpus-move-the-machine-state
-status: open
+status: abandoned
+closed: 2026-08-24T14:12:08.336Z
 started: 2026-08-19T10:38:56.618Z
 opened: 2026-08-12T19:39:42.160Z
 goal: ".se and the corpus: move the machine-state folder into the product, make it a committed marker, split the lane's exclusion by file instead of by directory, and give the engine one corpus reader."
@@ -125,3 +126,54 @@ These stood in the options pool referenced by no iteration at all. Assigned
 here in a pass over the pool.
 
 - wt-enginesearchts-never-reaches-the-one-path-visibility-seam-in
+
+## Abandoned 2026-08-24, and why
+
+EVERY GOAL THIS RECORD SET IS SATISFIED IN THE TREE. Its walk is not. Neither
+of the two older standings could say that, which is why a third was built for
+it.
+
+### The goals, each checked against the code rather than remembered
+
+| goal | where it stands |
+| --- | --- |
+| the machine-state folder sits inside the product | met — it is at the product root, with no wrapper folder above it |
+| it is a committed marker | met — one named file inside it is tracked while everything around it is ignored |
+| the lane excludes by file rather than by folder | met — that same tracked exception IS a per-file exclusion |
+| the engine has one corpus reader | met — the reader is defined once and twelve modules go through it |
+
+THE FOURTH WAS MISREAD TWICE BEFORE IT WAS CHECKED PROPERLY. Two modules were
+called a second reader on the evidence that both touch the filesystem. One of
+them imports the reader; the other is the warm index and says so in its own
+opening lines.
+
+### What was never finished
+
+THREE GATES NEVER HAPPENED: implementation, validation and release. Two forms
+stand unsigned, and one of them is verification, so the suite never ran against
+this record at all.
+
+SEVEN GATES ARE BLESSED, up to the prototype gate. The last act recorded here
+is reading fourteen neighbour nodes on 2026-08-20, and then the session ended.
+
+### Why abandoned rather than shipped or seeded
+
+SHIPPED WOULD BE A LIE. It would assert gates that were never walked and a
+verification that never ran.
+
+SEEDED WOULD BE A DIFFERENT LIE. It would present finished work as work never
+begun, and invite somebody to walk the whole thing again for nothing.
+
+ABANDONED IS THE HONEST WORD. The outcomes arrived by another road while this
+record's own walk stood still. Nobody is waiting for it, and it will not be
+walked.
+
+NOTHING WAS REMOVED. The evidence, the decisions and the folder all stand
+exactly as the walk left them.
+
+### The one thing that outlived it
+
+A BUILD FORM HERE NAMES SEVEN SOURCE FILES, AND THREE OF THOSE NAMES DO NOT
+RESOLVE. The work they describe is present by its effects, so the names are the
+part that went stale. That makes a build form's file list decorative rather
+than checkable, and it is carried as its own item in the pool.

@@ -33,9 +33,13 @@ evidence:
       - people
     description: each source swept, and what it turned up — none is a legal answer, with its reason
 major: full
+major_complexity: C3/R3
 minor: tailored
+minor_complexity: C3/R3
 patch: tailored
+patch_complexity: C3/R3
 product: full
+product_complexity: C3/R3
 specification: tailored
 major_note: |
   Applies in full: every source swept, every assumption the change's

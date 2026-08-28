@@ -5,47 +5,47 @@ steps:
     depends_on: []
     realization: code
   - id: the-cell-declares-a-difficulty
-    statement: "A matrix cell carries a two-part difficulty beside its applies value, per change-size column, and the loader refuses a missing one where the row applies and a present one on a row that seeds a sub-machine"
+    statement: A matrix cell carries a two-part difficulty beside its applies value, per change-size column, and the loader refuses a missing one where the row applies and a present one on a row that seeds a sub-machine
     depends_on:
       - complexity-stays-out-of-the-ledger
     realization: code
   - id: the-compile-carries-it-onto-the-step
-    statement: "The compiled machine carries each cell's difficulty onto the state it compiles, so the sizing block reads a step and never joins against the matrix"
+    statement: The compiled machine carries each cell's difficulty onto the state it compiles, so the sizing block reads a step and never joins against the matrix
     depends_on:
       - the-cell-declares-a-difficulty
     realization: code
   - id: the-sizing-block-answers
-    statement: "PROMOTED from exp-two-hands-rating-the-same-six-cells - a step in, a pair and a rung out, a unit no weaker than its hardest step with the spread alongside, and an unmatched rung returned as a value naming itself"
+    statement: PROMOTED from exp-two-hands-rating-the-same-six-cells - a step in, a pair and a rung out, a unit no weaker than its hardest step with the spread alongside, and an unmatched rung returned as a value naming itself
     depends_on:
       - the-compile-carries-it-onto-the-step
     realization: code
   - id: the-answer-rides-the-pull
-    statement: "The published pair and rung sit on the pull beside the state and the tier, and nothing in the lane starts a process on account of them"
+    statement: The published pair and rung sit on the pull beside the state and the tier, and nothing in the lane starts a process on account of them
     depends_on:
       - the-sizing-block-answers
     realization: code
   - id: the-call-record-grows-three-fields
-    statement: "PROMOTED from exp-can-anything-act-on-a-published-driver - the call record carries the answering model, the state the walk stood in and the part its caller played, all three in one edit, the two claimed ones marked"
+    statement: PROMOTED from exp-can-anything-act-on-a-published-driver - the call record carries the answering model, the state the walk stood in and the part its caller played, all three in one edit, the two claimed ones marked
     depends_on: []
     realization: code
   - id: the-role-vocabulary-separates-two-hands
-    statement: "The closed role vocabulary can express the hand holding the walk and a hand it delegated to as different parts, refuses a value outside itself, and takes the part from the work's author rather than from the caller"
+    statement: The closed role vocabulary can express the hand holding the walk and a hand it delegated to as different parts, refuses a value outside itself, and takes the part from the work's author rather than from the caller
     depends_on:
       - the-call-record-grows-three-fields
     realization: code
   - id: the-log-answers-by-any-coordinate
-    statement: "The log query groups by model, by state and by part, and a grouping key nothing carries is distinguishable from a grouping that found one bucket"
+    statement: The log query groups by model, by state and by part, and a grouping key nothing carries is distinguishable from a grouping that found one bucket
     depends_on:
       - the-role-vocabulary-separates-two-hands
     realization: code
   - id: a-weaker-walk-carries-its-reason
-    statement: "A step walked below its named strength carries the stated reason, and where none was given it carries the mark saying so rather than being refused"
+    statement: A step walked below its named strength carries the stated reason, and where none was given it carries the mark saying so rather than being refused
     depends_on:
       - the-log-answers-by-any-coordinate
       - the-answer-rides-the-pull
     realization: code
   - id: the-decision-repeats-and-shows-its-input
-    statement: "The same inputs give the same rung in one process, across processes and in any order, and the published pair re-derives the published rung"
+    statement: The same inputs give the same rung in one process, across processes and in any order, and the published pair re-derives the published rung
     depends_on:
       - the-sizing-block-answers
     realization: code

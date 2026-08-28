@@ -4,7 +4,7 @@ reopened: "2026-08-20T23:57:06.617Z — the machinery-ascends repair landed belo
 by: agent
 signed_off: 2026-08-20T23:57:08.235Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / sweep-consistency

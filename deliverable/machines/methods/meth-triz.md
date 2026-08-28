@@ -17,7 +17,7 @@ Reach for it at M4 enumerate-space, on a function cluster where two
 requirements genuinely conflict. It is the finder that turns up options
 nobody proposed because they looked impossible.
 
-## THE CLAIM UNDERNEATH IT
+## THE CLAIM UNDERNEATH IT #work
 
 Somebody already solved your problem, or one shaped like it, in a field you
 have never read.
@@ -32,17 +32,19 @@ So this is not creativity. It is a lookup, and that is its whole appeal.
 
 Four steps, and the second is the one people skip.
 
-1. STATE THE CONTRADICTION IN ONE LINE — improving X degrades Y.
+1. STATE THE CONTRADICTION IN ONE LINE — improving X degrades Y. #work
    - Root Conflict Analysis where the real conflict hides under a symptom.
-2. RESTATE IT IN THE STANDARD PARAMETERS.
+2. RESTATE IT IN THE STANDARD PARAMETERS. #work
    - Not "faster but less safe". Speed against reliability.
    - The matrix is indexed by those words and no others, so a conflict left
      in your own vocabulary cannot be looked up at all.
-3. TRY THE FOUR SEPARATIONS FIRST. They are cheaper than the matrix and they
-   dissolve more conflicts than it does.
-4. LOOK UP THE PRINCIPLES, then reformulate so BOTH sides win.
+3. TRY THE FOUR SEPARATIONS FIRST #work
 
-## THE FOUR SEPARATIONS
+   They are cheaper than the matrix and they dissolve more conflicts than it
+   does.
+4. LOOK UP THE PRINCIPLES, then reformulate so BOTH sides win. #work
+
+## THE FOUR SEPARATIONS #work
 
 The foundational idea, and the one to reach for before anything else.
 
@@ -104,7 +106,7 @@ The reference, so nobody looks it up again.
 39. Inert environment
 40. Composite materials
 
-## WHICH ONES ACTUALLY BITE ON SOFTWARE
+## WHICH ONES ACTUALLY BITE ON SOFTWARE #work
 
 Most of the list is physical, and pretending otherwise wastes the pass. These
 are the ones that transfer, with what they look like here.
@@ -127,7 +129,7 @@ are the ones that transfer, with what they look like here.
 - CHEAP SHORT-LIVED OBJECT. Many disposable instead of one durable.
 - REJECTING AND REGENERATING. Throw the part away and rebuild it.
 
-## THE CONTRADICTION MATRIX
+## THE CONTRADICTION MATRIX #work
 
 Rows are the parameter that DEGRADES, columns the one that IMPROVES. The cell
 holds the principle numbers that historically resolved that pair.
@@ -150,7 +152,7 @@ THE SEPARATIONS STILL COME FIRST. They resolve more conflicts than the matrix
 does and they need no lookup at all. The grid is the fallback, not the entry
 point.
 
-## WHAT TRIZ IS ALSO FOR
+## WHAT TRIZ IS ALSO FOR #work
 
 Beyond contradictions, three uses the corpus names.
 
@@ -192,7 +194,7 @@ THE ROW THAT RECORDS THIS:
 The option node that came out of it names the separation as its source. An
 idea with no lineage is not a TRIZ finding.
 
-## THE FAILURE MODE
+## THE FAILURE MODE #work
 
 Reaching for the principles before stating the contradiction properly.
 

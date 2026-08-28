@@ -7,18 +7,12 @@
 // see dsp-evidence-forms.md#the-form-is-bound-to-the-corpus
 import { existsSync, mkdirSync, readdirSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
 import { dirname, join, relative, sep } from "node:path";
-import type { MachineDecl, StateDecl } from "./machine.ts";
-import { chartPlan } from "./morphbox.ts";
-
-/** see dsp-walk-machine.md#the-state-a-recorded-visit-names */
-export function visitState(visit: string): string {
-  return visit.split("@")[0].split("/").pop() ?? "";
-}
-
 import { mintScenarioLines } from "./atamwalk.ts";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { type FormTemplate, fieldContent, stripComments, withFrontmatter, withFrontmatterList } from "./forms.ts";
 import type { Iteration } from "./iterations.ts";
+import type { MachineDecl, StateDecl } from "./machine.ts";
+import { chartPlan } from "./morphbox.ts";
 import { parseStateNote, section, writeNode } from "./notes.ts";
 import { mintFlipLines } from "./pugh.ts";
 import { CHANGE_COLUMNS } from "./rigor-matrix.ts";
@@ -441,7 +435,8 @@ export function stateFormScaffold(name: string, t: FormTemplate): string {
 /** The blessed size may live in the kickoff's own stored form. */
 export function kickoffSizeFromForm(it: Iteration): string | undefined {
   const abs = join(it.path, `spec/iterations/${it.id}/evidence/gate-kickoff.md`);
-  if (!existsSync(abs)) return undefined;
-  const txt = stripComments(section(parseStateNote(readFileSync(abs, "utf8")).body, "change_size")).toLowerCase();
+  const note = noteOf(abs);
+  if (note === undefined) return undefined;
+  const txt = stripComments(section(note.body, "change_size")).toLowerCase();
   return chosenOption(txt, CHANGE_COLUMNS);
 }

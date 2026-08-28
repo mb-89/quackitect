@@ -5,7 +5,7 @@ statement: "Partition the functions: the shared function DSM before any enumerat
 state_kind: work
 filled_by: agent
 depends_on:
-  - gate-requirements
+  - spawn-for-candidates
 legal_tools:
   - se_file_read
   - se_file_write
@@ -41,9 +41,11 @@ evidence:
 
       The method is [[meth-function-dsm]].
 major: full
+major_complexity: C3/R3
 minor: none
 patch: none
 product: full
+product_complexity: C3/R3
 specification: full
 major_note: |
   Applies in full for the change's cone: the DSM re-clusters where the
@@ -76,7 +78,7 @@ TWO ACTS, AND THE ENGINE DOES EVERYTHING BETWEEN THEM.
 - PLACE each function in a cluster. The engine proposes; you confirm or move.
 - NAME each cluster and class its coupling. The engine cannot do this part.
 
-THERE IS NO MATCHING STEP HERE ANY MORE (owner ruling 2026-08-08). A [[flow]] is a node, picked at derive-functions, so two functions naming one flow are connected by construction. The matrix is built before you arrive.
+THERE IS NO MATCHING STEP HERE ANY MORE. A [[flow]] is a node, picked at derive-functions, so two functions naming one flow are connected by construction. The matrix is built before you arrive.
 
 THE MATRIX IS DERIVED AND NEVER DRAWN. It projects over the function notes' flow edges, clusters by [[meth-dsm-clustering]], and there is no second copy to drift.
 

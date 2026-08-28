@@ -1,6 +1,6 @@
 // se-hook-stop — THE UNSANCTIONED STOP IS REFUSED MECHANICALLY.
 //
-// The contract has said it in prose since 2026-08-07: a turn ends when the
+// The contract has said it in prose since: a turn ends when the
 // work does, a report is not a checkpoint, size is not a reason. Prose
 // failed four recorded times in two days. This hook is the tooth.
 //
@@ -21,7 +21,7 @@
 //   stop: idle, the desk with nothing routed, or a step above the slider;
 //
 //   THE TARGET HALF WAS MISSING AND AN ESCAPE WALKED STRAIGHT THROUGH THE
-//   GAP (owner instruction 2026-08-14). The escape hatch lands at the front
+//   GAP (owner instruction ). The escape hatch lands at the front
 //   desk, and the desk answers "wait". So the sequence was: escape for a
 //   real reason, land at the desk, stop — and the tooth had nothing to
 //   bite, because the last pull said "wait".
@@ -44,14 +44,31 @@
 // A hook must never break the turn, so every failure is swallowed and the
 // exit is always clean.
 
-import { closeSync, fstatSync, openSync, readSync } from "node:fs";
+import { closeSync, existsSync, fstatSync, openSync, readdirSync, readFileSync, readSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { recordLifecycle } from "../lifecycle.ts";
+import { isSettled, readAllWork } from "../workstore.ts";
 
-// bin -> engine -> deliverable -> product -> the project root. The env
-// override is the test seam — the suite points the hook at a crafted log.
-const root = process.env.SE_HOOK_ROOT ?? resolve(dirname(fileURLToPath(import.meta.url)), "..", "..", "..", "..");
+// bin -> engine -> deliverable -> the project root. THREE hops, not four.
+//
+// IT CLIMBED FOUR AND LANDED OUTSIDE THE REPOSITORY. The layout once carried a
+// `product/` folder between the root and `deliverable/`, and the extra hop
+// survived its removal. The root then resolved to the repository's PARENT,
+// where no call log exists.
+//
+// THE FAILURE WAS SILENT AND TOTAL. No log means no pull on record, which is
+// one of the three sanctioned stops, so the hook allowed every stop it was
+// built to refuse. A tooth aimed at an empty folder bites nothing, and the
+// swallow-everything exit made a broken check look like a permitted stop.
+//
+// The env override is the test seam — the suite points the hook at a crafted log.
+// READ PER CALL, NOT AT LOAD. A check asks the decision about several crafted
+// roots inside one process, and a constant captured at import time would pin
+// every one of them to whichever root happened to be set first.
+function hookRoot(): string {
+  return process.env.SE_HOOK_ROOT ?? resolve(dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
+}
 
 // The newest pull can carry a whole document, so the tail window is wide.
 const TAIL_BYTES = 4 * 1024 * 1024;
@@ -69,6 +86,246 @@ function tailOf(path: string): string {
   }
 }
 
+/** The log tail, read once. Two readers walk it and the window is megabytes. */
+let cachedLines: string[] | undefined;
+
+function logLines(): string[] {
+  cachedLines ??= tailOf(join(hookRoot(), ".se", "calls.jsonl")).split("\n");
+  return cachedLines;
+}
+
+/** A BACKGROUND RUN STILL GOING, named for the refusal. Undefined when none is.
+ *
+ *  THE HOOK CANNOT ASK THE SERVER — calling the session's own mirror over HTTP
+ *  deadlocks it. So it reads what a run WRITES: the job records under
+ *  .se/test-jobs, one file per run, whose last line gains an `ended` stamp when
+ *  the verdict lands.
+ *
+ *  STALE RECORDS ARE NOT NEWS. A run older than the window belongs to a session
+ *  that is gone, and blocking on it would wedge every later turn. */
+const RUNNING_WINDOW_MS = 30 * 60 * 1000;
+
+function runningWork(): string | undefined {
+  const dir = join(hookRoot(), ".se", "test-jobs");
+  if (!existsSync(dir)) return undefined;
+  for (const name of readdirSync(dir)) {
+    if (!name.endsWith(".jsonl")) continue;
+    try {
+      const lines = readFileSync(join(dir, name), "utf8").trimEnd().split("\n");
+      const last = JSON.parse(lines[lines.length - 1]) as { started?: number; ended?: number };
+      if (typeof last.started !== "number" || last.ended !== undefined) continue;
+      if (Date.now() - last.started > RUNNING_WINDOW_MS) continue;
+      const secs = Math.round((Date.now() - last.started) / 1000);
+      return `a test run has been going ${secs}s and its verdict is not in yet`;
+    } catch {
+      // A torn or half-written record is not evidence that anything is running.
+    }
+  }
+  return undefined;
+}
+
+/** Has this stop already been blocked once? Both hosts spell the flag their
+ *  own way, and either spelling means the same thing. */
+function bitesOnce(payload: string): boolean {
+  const p = JSON.parse(payload || "{}") as { stop_hook_active?: boolean; stopHookActive?: boolean };
+  return p.stop_hook_active === true || p.stopHookActive === true;
+}
+
+/** EVERY DECISION LEAVES A LINE, not only the refusals.
+ *
+ *  A BLOCK WAS RECORDED AND A PASS WAS NOT, so a hook that permitted a stop and
+ *  a hook that broke on the way to deciding looked identical from outside. That
+ *  is not a worry, it is this file's own history: the root once climbed one
+ *  directory too far, found no call log, and permitted every stop it exists to
+ *  refuse. Nothing was written either way, so nobody could see it.
+ *
+ *  The record is the answer to "why did the hook not bite", asked afterwards. */
+function pass(why: string, detail = ""): Verdict {
+  try {
+    recordLifecycle(hookRoot(), "stop-pass", detail === "" ? why : `${why} — ${detail}`);
+  } catch {
+    // a hook must never break the turn
+  }
+  return { block: false };
+}
+
+/** WHAT THE HOOK DECIDED. Blocking carries the reason the agent will read.
+ *
+ *  IT IS A VALUE, NOT AN EXIT. The decision used to call `process.exit` from
+ *  wherever it landed, so the ONLY way to ask what the hook thinks was to spawn
+ *  it and read its exit code.
+ *
+ *  WHAT THAT COST. Twenty cases, twenty node processes, each type-stripping
+ *  this file again — and under the parallel battery one of them occasionally
+ *  exited 1 having written nothing at all, which no amount of reading the hook
+ *  could explain. A red that vanishes on a re-run teaches people to re-run. */
+export interface Verdict {
+  block: boolean;
+  reason?: string;
+}
+
+// ATTENDANCE IS NO LONGER ASKED. The valve used to turn on whether a person
+// was there to read a claim, which meant reading .se/settings.json on every
+// stop. The notch answers the question that actually matters, so the read and
+// the branch both went.
+
+/** WAS THE STOP FORCED, deliberately, since the walk last moved?
+ *
+ *  `stop_hook_active` IS NOT A CLAIM, and treating it as one was the defect.
+ *  The HARNESS sets that flag when it retries a blocked stop — the agent never
+ *  chose anything. So the valve released automatically, and the log reads
+ *  `stop-block` then `stop-pass bites once per stop`, over and over. From
+ *  outside that is indistinguishable from a hook that does not work.
+ *
+ *  A FORCE IS A LANE CALL, so it is an act and it is on the record. The agent
+ *  says which sanctioned stop applies and why; the claim lands in the call log
+ *  like everything else, and this reads it back.
+ *
+ *  IT IS SPENT BY THE NEXT PULL. The scan stops at the newest successful pull,
+ *  exactly as the aim reader above does, so one force releases one stop and
+ *  never the one after it. */
+function forcedSinceLastPull(): string | undefined {
+  const lines = logLines();
+  for (let i = lines.length - 1; i >= 0; i--) {
+    const line = lines[i].trim();
+    if (line === "") continue;
+    let rec: { tool?: string; ok?: boolean; args?: unknown };
+    try {
+      rec = JSON.parse(line) as { tool?: string; ok?: boolean; args?: unknown };
+    } catch {
+      continue;
+    }
+    if (rec.tool === "se_pull" && rec.ok === true) return undefined;
+    if (rec.tool !== "se_stop" || rec.ok !== true) continue;
+    const why = (rec.args as { because?: unknown } | undefined)?.because;
+    return typeof why === "string" && why.trim() !== "" ? why.trim() : "no reason given";
+  }
+  return undefined;
+}
+
+/** THE VALVE: BLOCKED ONCE, AND FORCED ON PURPOSE.
+ *
+ *  BOTH HALVES ARE REQUIRED. The harness flag proves this stop was already
+ *  refused, so a force cannot pre-empt the tooth. The lane call proves a hand
+ *  decided to stop anyway, which the flag alone never proved.
+ *
+ *  THE REFUSAL'S INVITATION IS NOW TRUE. It ends by asking the agent to name
+ *  which sanctioned stop applies — and naming it is what opens the valve. */
+function bypassesStop(payload: string): boolean {
+  return bitesOnce(payload) && forcedSinceLastPull() !== undefined;
+}
+
+/** Refuse the stop while a run is going, and say what to do instead. True when
+ *  it wrote the refusal, so the caller exits without deciding anything else. */
+function blockedByRunningWork(): boolean {
+  const busy = runningWork();
+  if (busy === undefined) return false;
+  const reason =
+    `[se] ${busy}. Do not end the turn on it. The run reports itself on the \`work\` account of your next lane call — ` +
+    "how far along, how many failed, and the first failures by name. Read it there, act on the verdict, then stop.";
+  process.stdout.write(`${JSON.stringify({ decision: "block", reason })}\n`);
+  try {
+    recordLifecycle(hookRoot(), "stop-block", `a test run is still going: ${busy}`);
+  } catch {
+    // The block is already written, so the decision stands either way. Guarded
+    // like the one in pass(), so a throw here cannot relabel a block an error.
+  }
+  return true;
+}
+
+/** WORK STANDING WHERE THE WALK STANDS, or nothing.
+ *
+ *  A STATE HOLDING OPEN WORK IS NOT FINISHED, whatever the dial says. The
+ *  notches answer how far the walk may GO before handing back; not one of them
+ *  answers whether the work in hand is done. A stop over open work hands back a
+ *  state the engine will refuse to leave anyway, so the turn ends having
+ *  achieved nothing and the person is called back for no reason.
+ *
+ *  A PERSON'S OWN ITEM IS NOT COUNTED. No agent may settle one, so blocking on
+ *  it would refuse a turn the agent has no way to release except by forcing.
+ *  Waiting on a person is what that item MEANS.
+ *
+ *  IT READS THE STORE, NOT THE ENGINE. The hook runs in its own process with no
+ *  session, so it asks the files the same way the leaving guard does.
+ *
+ *  THE TARGET COUNTS AS A PLACE, and that is not a widening for its own sake.
+ *  An aim MOVES THE WALK AND WRITES NO PULL, so the position on the newest pull
+ *  is stale by a whole record after one. `aimedSinceLastPull` exists for the
+ *  target for exactly that reason; the POSITION never got the same treatment.
+ *
+ *  MEASURED: the walk stood at fix-findings with six pieces of work open, the
+ *  newest pull still said boot/end, and the stop passed this check looking at a
+ *  state the walk had left. Work standing where the walk is HEADED is work left
+ *  whether or not it has arrived. */
+function openWorkHere(at: string[]): { count: number; first: string } | undefined {
+  if (at.length === 0) return undefined;
+  try {
+    const here = new Set(at);
+    const open = readAllWork(hookRoot()).items.filter((i) => here.has(i.place) && !isSettled(i) && !i.person_only);
+    if (open.length === 0) return undefined;
+    return { count: open.length, first: open[0].statement };
+  } catch {
+    // A STORE THAT CANNOT BE READ REFUSES NOTHING. The hook must never break
+    // the turn, and it must never block on its own failure to look.
+    return undefined;
+  }
+}
+
+/** EVERY DOOR THAT AIMS, and there are two.
+ *
+ *  `se_aim` is the AGENT's. `mirror_target` and `mirror_target/selected` are the
+ *  PERSON's, and the person is the hand the contract says does the aiming. A
+ *  first fix taught the hook only the agent's door, which left the more
+ *  important one open and made the blindness asymmetric instead of removing it. */
+const AIMING_TOOLS = (tool: string): boolean => tool === "se_aim" || tool.startsWith("mirror_target");
+
+/** A TARGET SET BY AIMING SINCE THE NEWEST PULL. Undefined when nobody aimed;
+ *  the EMPTY STRING when the newest aim CLEARED the target.
+ *
+ *  THE HOOK READS PULLS AND AIMING WRITES NONE. Aiming with `go: false` records
+ *  a target and walks nothing, and the mirror's route does not walk at all. The
+ *  hook then read a stale pull, saw no target on it, and permitted the stop
+ *  while a routed goal stood.
+ *
+ *  IT IS THE SAME HOLE THE ESCAPE HATCH OPENED, which this file's header already
+ *  describes: a newer act moved the walk and the tooth was still reading the
+ *  older record.
+ *
+ *  THE SCAN STOPS AT THE FIRST SUCCESSFUL PULL, because a pull carries its own
+ *  target and is then the newer news. A REFUSED pull does not stop it: a refusal
+ *  did not move the walk, so an aim before it still stands. `lastPull()` anchors
+ *  on the same record, so the two cannot disagree about which pull is the
+ *  reference.
+ *
+ *  AN EMPTY TARGET IS RETURNED RATHER THAN SKIPPED. Clearing the target is an
+ *  act, and skipping it would let an older aim outlive the clear that cancelled
+ *  it. */
+function aimedSinceLastPull(): string | undefined {
+  const lines = logLines();
+  for (let i = lines.length - 1; i >= 0; i--) {
+    const line = lines[i].trim();
+    if (line === "") continue;
+    let rec: { tool?: string; ok?: boolean; response?: unknown };
+    try {
+      rec = JSON.parse(line) as { tool?: string; ok?: boolean; response?: unknown };
+    } catch {
+      continue;
+    }
+    if (rec.tool === "se_pull" && rec.ok === true) return undefined;
+    if (rec.tool === undefined || !AIMING_TOOLS(rec.tool) || rec.ok !== true) continue;
+    const body = typeof rec.response === "string" ? rec.response : JSON.stringify(rec.response ?? {});
+    // READ BY PATTERN, NOT BY PARSING, and it is not a shortcut. Every aiming
+    // answer in the log is stored CUT — 44 of 44 measured, none parseable —
+    // because an aim carries its whole drawn route and the log caps a response.
+    //
+    // THE FIELD SURVIVES THE CUT because it sits first in the answer, which is
+    // the same reason the truncated-pull reader below works.
+    // see dsp-boot-and-power.md#a-long-response-is-stored-truncated
+    return /"target"\s*:\s*"([^"]*)"/.exec(body)?.[1]?.trim() ?? "";
+  }
+  return undefined;
+}
+
 interface LastPull {
   pull?: string;
   where?: unknown;
@@ -81,7 +338,7 @@ interface LastPull {
 
 /** The newest se_pull's answer, read from the log tail. */
 function lastPull(): LastPull | undefined {
-  const lines = tailOf(join(root, ".se", "calls.jsonl")).split("\n");
+  const lines = logLines();
   let refused = false;
   for (let i = lines.length - 1; i >= 0; i--) {
     const line = lines[i].trim();
@@ -120,87 +377,223 @@ function lastPull(): LastPull | undefined {
   return undefined;
 }
 
-let raw = "";
-process.stdin.setEncoding("utf8");
-process.stdin.on("data", (c: string) => {
-  raw += c;
-});
-process.stdin.on("end", () => {
-  try {
-    const p = JSON.parse(raw || "{}") as { stop_hook_active?: boolean; stopHookActive?: boolean };
-    // The bites-once valve: a stop already blocked once passes, so a
-    // genuinely blocking question can be asked and the turn ended.
-    if (p.stop_hook_active === true || p.stopHookActive === true) {
-      process.exit(0);
-    }
+/** WHAT THE NOTCH ITSELF SANCTIONS, as [why, detail], or undefined when this
+ *  notch has nothing to say about this stop.
+ *
+ *  SPLIT OUT OF THE HANDLER so the decision reads as three named cases rather
+ *  than three more branches in an already long function. */
+/** IS THIS THE MACHINE'S OWN IDLE STOP?
+ *
+ *  THE DESK WITH NOTHING ROUTED IS SANCTIONED in the ordinary case. There is
+ *  genuinely nowhere to walk, and the desk's own guidance says to stay there.
+ *  see dsp-boot-and-power.md#the-desk-with-nothing-routed-is-the-machines-own
+ *
+ *  THE DESK IS A STOP AT EVERY NOTCH, and after a boot the walk stops there
+ *  rather than picking up whatever work is lying around. Standing there with
+ *  nothing routed passes, and no notch overrides it.
+ *  see dsp-blockers-only-stop-behavior.md#the-front-desk-outranks-every-notch
+ *
+ *  A TARGET STILL OUTRANKS THE DESK. A routed goal is the person's standing
+ *  instruction, and the desk is not a hiding place from one.
+ *
+ *  `blockers only` OUTRANKS AN IDLE WAIT ANYWHERE ELSE. That notch means one
+ *  thing: come back when the walk CANNOT GO ON. A wait mid-machine is not a
+ *  blocker, it is the absence of one.
+ *
+ *  MEASURED ON A LIVE SESSION'S OWN LOG: four stops in a row passed as "nothing
+ *  routed" while the notch stood at `blockers only` and the agent had work in
+ *  hand. The notch was read correctly and then never consulted, because this
+ *  rule sat below it and passed unconditionally.
+ *
+ *  THE FIRST FIX OVERSHOT. Letting the notch outrank everything made the desk
+ *  bite too, so a session that had genuinely finished was pushed back in with
+ *  nowhere to go. */
+function nothingRouted(notch: string, target: string, pull: string, at: string): boolean {
+  if (target !== "") return false;
+  if (at.split(",").some((w) => w.trim() === "front_desk")) return true;
+  if (notch === "blockers only") return false;
+  return pull === "wait";
+}
+
+function notchSanction(notch: string, last: LastPull, at: string): [string, string] | undefined {
+  // STATE END: the ENGINE holds every transition and refuses to move. The
+  // agent stopping is then not a failure of nerve, it is the machine's own
+  // stop — exactly what this hook exists to let through.
+  if (notch === "state end") return ["notch: state end", "the engine holds every transition"];
+  // BLOCKERS ONLY: nothing brings the person back until the walk cannot go on.
+  // The newest pull being REFUSED is that, and it is the only thing that is —
+  // an unattended run is what this notch is for.
+  if (notch === "blockers only" && last.ok === false) return ["notch: blockers only", "the newest pull was refused"];
+  // BLESS: run to where a thumb is owed anyway, and stop there. A gate is the
+  // only place that is true, and the walk's own position names it.
+  if (notch === "bless" && /(^|\/)gate[-_]/.test(at)) return ["notch: bless", `a gate is owed at ${at}`];
+  return undefined;
+}
+
+// see dsp-boot-and-power.md#the-only-stops-that-are-sanctioned
+const SANCTIONED =
+  "FIVE STOPS ARE SANCTIONED AND NOTHING ELSE IS. " +
+  "(1) A GATE THE PERSON OWNS — gate-implementation is theirs to bless; the rest are yours at this dial. " +
+  "(2) A DECISION ONLY THEY CAN MAKE — no answer you could pick would let the walk continue honestly. " +
+  "(3) SOMETHING BROKE and no remedy gets you past it. " +
+  "(4) THE RETRO'S FIELD-FEEDBACK QUESTION — ask it, then STOP and wait. It is the owner's own report from outside the machine, " +
+  "nothing else in the retro can stand in for it, and walking on past it has quietly skipped it for several retros running. " +
+  "(5) A PLAN, BEFORE IT IS ACTED ON. PLANNING WAITS FOR THE OWNER'S GO; EXECUTION DOES NOT (owner ruling 2026-08-14). " +
+  "Seeding a record, splitting or merging one, deciding which iteration a finding belongs to, choosing scope — all planning. Present the list and WAIT. " +
+  "Once the plan has the go, execute the whole of it without asking again. " +
+  "Being unsure is not one. Having a lot left is not one. Having just finished a piece is not one. " +
+  'STOPPING FOR ONE OF THOSE? SAY SO ON THE RECORD: se_stop {because: "<which one, and why>"}, then stop again. ' +
+  "Saying it in chat is not enough and never was — the tooth cannot read your message, only the call log. " +
+  "ONE FORCE RELEASES ONE STOP. The next pull spends it, so this is a decision rather than a switch. " +
+  "NO se_stop IN YOUR TOOL LIST? The running engine is older than this hook. se_reload is legal everywhere — reload, and the verb is there.";
+
+/** WHAT THE REFUSAL SAYS, given the four things that shape the wording.
+ *
+ *  SEPARATE FROM THE DECISION BECAUSE THEY ARE SEPARATE JOBS. `decide` answers
+ *  whether to block; this answers how to say so. Holding both in one function
+ *  put it over the linter's complexity ceiling the moment a third wording was
+ *  needed, which is the linter reporting a seam rather than a nuisance.
+ *
+ *  THREE WORDINGS, and the difference is what the reader can actually do.
+ *
+ *  - A WAIT WITH A TARGET is a routing failure. There is a door toward it.
+ *  - A WAIT WITH NO TARGET is an idle desk. There is no such door, so saying
+ *    "take the door toward the target" would be advice nobody can act on.
+ *  - ANYTHING ELSE is mid-work, and the answer is to pull again.
+ *
+ *  THE MIDDLE ONE USED TO PRINT AS THE FIRST, rendering an empty target as
+ *  `A target is set ()`, which sent the reader looking for a target that was
+ *  not there.
+ *  see dsp-blockers-only-stop-behavior.md#an-empty-target-is-never-printed-as-a-set-one */
+function blockReason(notch: string, pull: string, target: string, where: string): string {
+  // WHAT THE NOTCH IS ASKING FOR, said in the refusal rather than left for the
+  // reader to infer from a setting they may not have looked at.
+  const NOTCHED: Record<string, string> = {
+    bless: "[se] stop @ bless: you run until a BLESS is owed, and no gate is owed here. ",
+    "blockers only": "[se] stop @ blockers only: you stop only when the walk CANNOT go on, and the last pull was not refused. ",
+  };
+  const prefix = NOTCHED[notch] ?? "";
+  if (pull === "wait" && target !== "") {
+    return (
+      `${prefix}[se] A target is set (${target}) and the walk is not on it` +
+      (where === "" ? "" : `, standing at ${where}`) +
+      '. The pull answered "wait" because nothing routed FROM HERE, which is not the same as nothing to do. ' +
+      `Take the door that leads toward the target and keep walking. ${SANCTIONED}`
+    );
+  }
+  if (pull === "wait") {
+    return (
+      `${prefix}[se] Nothing is routed — the target is empty` +
+      (where === "" ? "" : `, and the walk stands at ${where}`) +
+      '. The pull answered "wait", and this notch does not read an idle desk as work finished. ' +
+      "Two things end this honestly. The person routes a door, or the stop is one of the sanctioned ones below and you claim it on the record. " +
+      SANCTIONED
+    );
+  }
+  return (
+    `${prefix}[se] The walk stands mid-work: the last pull answered "${pull}"` +
+    (where === "" ? "" : ` at ${where}`) +
+    `. A report is not a checkpoint and size is not a reason — call se_pull and keep walking. ${SANCTIONED}`
+  );
+}
+
+/** THE WHOLE DECISION, from the payload and whatever the root holds.
+ *
+ *  EXPORTED SO A CHECK CAN ASK IT DIRECTLY, in this process, with no spawn in
+ *  the way. Point `SE_HOOK_ROOT` at a crafted log and call it. */
+export function decide(payload: string): Verdict {
+  // THE CALL LOG IS READ ONCE PER DECISION, not once per process. A second ask
+  // about a second root must not be served the first root's log.
+  cachedLines = undefined;
+  {
+    // A BACKGROUND RUN STILL GOING OUTRANKS EVERY SANCTIONED STOP BELOW. Its
+    // verdict is seconds away and nobody reads a job nobody asked about, so a
+    // turn that ends first throws the answer away.
+    //
+    // A RUN THAT NEVER FINISHES COSTS ONE WINDOW, NOT THE SESSION. Only a run
+    // started inside the window counts as going, so a hung one stops blocking
+    // by itself.
+    if (blockedByRunningWork()) return { block: false };
     const last = lastPull() ?? {};
     const pull = last.pull;
-    if (pull === undefined) process.exit(0);
+    if (pull === undefined) return pass("no pull on record", "the engine never ran here");
     // see dsp-boot-and-power.md#the-notch-decides
     const notch = typeof last.stop_at === "string" ? last.stop_at.trim().toLowerCase() : "";
-    // STATE END: the ENGINE holds every transition and refuses to move. The
-    // agent stopping is then not a failure of nerve, it is the machine's own
-    // stop — exactly what this hook exists to let through.
-    if (notch === "state end") process.exit(0);
-    // BLOCKERS ONLY: nothing brings the person back until the walk cannot go
-    // on. The newest pull being REFUSED is that, and it is the only thing that
-    // is — an unattended run is what this notch is for.
-    if (notch === "blockers only" && last.ok === false) process.exit(0);
-    // BLESS: run to where a thumb is owed anyway, and stop there. A gate is
-    // the only place that is true, and the walk's own position names it.
-    const at = Array.isArray(last.where) ? (last.where as unknown[]).map(String).join(", ") : String(last.where ?? "");
-    if (notch === "bless" && /(^|\/)gate[-_]/.test(at)) process.exit(0);
+    // A FORCED STOP GOES THROUGH, and forcing is a lane call rather than a
+    // retry. see dsp-boot-and-power.md#the-only-stops-that-are-sanctioned
+    if (bypassesStop(payload)) return pass("forced", forcedSinceLastPull() ?? "");
+    const places = Array.isArray(last.where) ? (last.where as unknown[]).map(String) : [String(last.where ?? "")];
+    const at = places.join(", ");
+    // OPEN WORK OUTRANKS EVERY NOTCH (owner). The dials say how far the walk may
+    // go; none of them says the work in hand is done. A force still releases it,
+    // which is why this sits after the bypass and before the notch.
     // A TARGET IS A STANDING INSTRUCTION FROM THE PERSON. While one is set,
     // the walk has somewhere to be, and "nothing to route" is false whatever
     // the desk answered.
-    const target = typeof last.target === "string" ? last.target.trim() : "";
-    // see dsp-boot-and-power.md#the-desk-with-nothing-routed-is-the-machines-own
-    const atDesk = at.split(",").some((w) => w.trim() === "front_desk");
-    if (target === "" && (pull === "wait" || atDesk)) process.exit(0);
-    const where = at;
-    const aimed = pull === "wait";
-    // WHAT THE NOTCH IS ASKING FOR, said in the refusal rather than left for
-    // the reader to infer from a setting they may not have looked at.
-    const NOTCHED: Record<string, string> = {
-      bless: "[se] stop @ bless: you run until a BLESS is owed, and no gate is owed here. ",
-      "blockers only": "[se] stop @ blockers only: you stop only when the walk CANNOT go on, and the last pull was not refused. ",
-    };
-    const prefix = NOTCHED[notch] ?? "";
-    // see dsp-boot-and-power.md#the-only-stops-that-are-sanctioned
-    const SANCTIONED =
-      "FOUR STOPS ARE SANCTIONED AND NOTHING ELSE IS. " +
-      "(1) A GATE THE PERSON OWNS — gate-implementation is theirs to bless; the rest are yours at this dial. " +
-      "(2) A DECISION ONLY THEY CAN MAKE — no answer you could pick would let the walk continue honestly. " +
-      "(3) SOMETHING BROKE and no remedy gets you past it. " +
-      "(4) THE RETRO'S FIELD-FEEDBACK QUESTION — ask it, then STOP and wait. It is the owner's own report from outside the machine, " +
-      "nothing else in the retro can stand in for it, and walking on past it has quietly skipped it for several retros running. " +
-      "(5) A PLAN, BEFORE IT IS ACTED ON. PLANNING WAITS FOR THE OWNER'S GO; EXECUTION DOES NOT (owner ruling 2026-08-14). " +
-      "Seeding a record, splitting or merging one, deciding which iteration a finding belongs to, choosing scope — all planning. Present the list and WAIT. " +
-      "Once the plan has the go, execute the whole of it without asking again. " +
-      "Being unsure is not one. Having a lot left is not one. Having just finished a piece is not one. " +
-      "Stopping for one of the four? Say which, in one line, and stop again — this tooth bites once per stop.";
-    process.stdout.write(
-      JSON.stringify({
-        decision: "block",
+    // AN AIM SINCE THE LAST PULL WINS. It is the newer statement of where the
+    // walk is meant to be going, and it is also the only fresh news about WHERE
+    // the walk stands, because aiming writes no pull.
+    const target = aimedSinceLastPull() ?? (typeof last.target === "string" ? last.target.trim() : "");
+    const held = openWorkHere([...places, target].filter((p) => p !== ""));
+    if (held !== undefined) {
+      try {
+        recordLifecycle(hookRoot(), "stop-block", `${String(held.count)} piece(s) of work stand at ${at}`);
+      } catch {
+        // a hook must never break the turn
+      }
+      return {
+        block: true,
         reason:
-          prefix +
-          (aimed
-            ? `[se] A target is set (${target}) and the walk is not on it` +
-              (where !== "" ? `, standing at ${where}` : "") +
-              '. The pull answered "wait" because nothing routed FROM HERE, which is not the same as nothing to do. ' +
-              "Take the door that leads toward the target and keep walking. " +
-              SANCTIONED
-            : `[se] The walk stands mid-work: the last pull answered "${pull}"` +
-              (where !== "" ? ` at ${where}` : "") +
-              ". A report is not a checkpoint and size is not a reason — call se_pull and keep walking. " +
-              SANCTIONED),
-      }),
-    );
+          `[se] ${String(held.count)} piece(s) of work stand open at ${at}, starting with “${held.first}”. ` +
+          "THERE IS STILL WORK HERE — carry on with what you are doing. " +
+          "The engine will refuse to leave this state while any of them stands, so stopping now hands back a walk that cannot move. " +
+          'Finish each one and close it with se_work {act: "settle", id, comment}, or move it where it will be done. ' +
+          `${SANCTIONED}`,
+      };
+    }
+    const sanctioned = notchSanction(notch, last, at);
+    if (sanctioned !== undefined) return pass(sanctioned[0], sanctioned[1]);
+    if (nothingRouted(notch, target, pull, at)) {
+      return pass("nothing routed", `no target, and the pull answered "${pull}"${at === "" ? "" : ` at ${at}`}`);
+    }
+    const where = at;
     // The veto is now observable after the fact. Without a line here, a turn
     // the hook ended looks exactly like one the transport ended.
-    recordLifecycle(root, "stop-block", where === "" ? pull : `${pull} at ${where}`);
-  } catch {
-    /* a hook must never break the turn */
+    try {
+      recordLifecycle(hookRoot(), "stop-block", where === "" ? pull : `${pull} at ${where}`);
+    } catch {
+      // a hook must never break the turn
+    }
+    return { block: true, reason: blockReason(notch, pull, target, where) };
   }
-  process.exit(0);
-});
+}
+
+// THE ENTRYPOINT, and the only place that touches a stream or an exit code.
+// Everything above is a question with an answer.
+//
+// ONLY WHEN RUN AS THE PROGRAM. A check imports this file to ask `decide`, and
+// wiring stdin there would leave a listener holding the runner's own input
+// open — a test process that finishes its cases and never exits.
+if (process.argv[1] !== undefined && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  let raw = "";
+  process.stdin.setEncoding("utf8");
+  process.stdin.on("data", (c: string) => {
+    raw += c;
+  });
+  process.stdin.on("end", () => {
+    try {
+      const verdict = decide(raw);
+      if (verdict.block) process.stdout.write(JSON.stringify({ decision: "block", reason: verdict.reason ?? "" }));
+    } catch (err) {
+      // A HOOK MUST NEVER BREAK THE TURN, so the failure is swallowed — but it
+      // is no longer silent. A swallowed throw permits the stop, which is the
+      // exact shape of the root-path defect this file carries a scar from.
+      try {
+        recordLifecycle(hookRoot(), "stop-error", String(err).slice(0, 300));
+      } catch {
+        // nothing left to try
+      }
+    }
+    process.exit(0);
+  });
+}

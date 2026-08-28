@@ -5,6 +5,7 @@ type: "[[function]]"
 cluster: the-account
 statement: carry engineering work through a recorded method, one governed step at a time
 satisfies:
+  - req-one-word-names-one-thing-and-the-walks-marker-is-not-a-token
   - req-product-is-a-folder
   - req-a-wrong-act-never-passes-silently
 inputs:
@@ -38,3 +39,16 @@ they sit with the holding rather than floating at the root.
 
 A root that collects whatever fits nowhere is a bin. One requirement is the
 honest count.
+
+## Addition — one word names one thing
+
+THE ROOT KEEPS A SECOND REQUIREMENT NOW, and it is here for the same reason
+the first one is: it binds every part at once and belongs to no part.
+
+THE WORD TOKEN MEANS A PIECE OF WORK AND NOTHING ELSE. The walk's own marker
+is the position. That is a naming rule over the engine, the machines, the
+guidance and the refusal clauses together, so no single sub-function can
+carry it.
+
+TWO REQUIREMENTS IS STILL AN HONEST COUNT for a root. A root that collects
+whatever fits nowhere is a bin, and both of these genuinely bind everything.

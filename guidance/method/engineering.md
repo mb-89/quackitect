@@ -5,7 +5,7 @@ statement: General software rules the project builds by - referenced, never pull
 
 # Engineering rules
 
-## The TypeScript toolchain (owner ruling 2026-08-03)
+## The TypeScript toolchain
 
 The universal law is software.md's "The toolchain is mechanical". These are
 the concrete tools, chosen for speed and for installing with plain
@@ -25,8 +25,8 @@ the concrete tools, chosen for speed and for installing with plain
 - THE LANE'S FIXER (`deliverable/engine/lintfix.ts`) runs Biome's SAFE fixes after
   every lane write to a covered file and announces what changed. Its
   coverage is read live from biome.json — never mirrored.
-- `--write --unsafe` IS BANNED. The unsafe tier rewrote ~70 non-null
-  assertions into optional chains and broke the strict build (2026-08-03).
+- `--write --unsafe` IS BANNED. The unsafe tier once rewrote about seventy
+  non-null assertions into optional chains and broke the strict build.
   Safe fixes only, everywhere, including by hand.
 - THE SHELL BUNDLES: `deliverable/vscode/src/extension.ts` → esbuild →
   `vscode/extension.js` (generated — edit the source, then
@@ -35,7 +35,7 @@ the concrete tools, chosen for speed and for installing with plain
   scoped `se_test` → commit. The battery only where the test economics
   flip (software.md).
 
-## Commit what is on disk (owner ruling 2026-07-29)
+## Commit what is on disk
 
 A dirty tree left behind is not caution. It is unfinished work.
 
@@ -54,7 +54,7 @@ The close already works this way — it commits trunk's strays before it
 merges, and names every file it took. The principle is the same one:
 a walk's work never silently vanishes, and neither does anyone else's.
 
-## Data is not code (owner ruling 2026-07-28)
+## Data is not code
 
 Configuration lives in DATA the running system reads — never in
 constants that demand a recompile. When a behavior will be tuned, give
@@ -63,7 +63,7 @@ thresholds live in `deliverable/machines/lint/voice-lint.md`; edit the file and 
 next `se_lint` call uses it, with no rebuild and no reload. The rules'
 LOGIC stays code — only their parameters are data.
 
-## Every switch appears in help (owner ruling 2026-07-28)
+## Every switch appears in help
 
 Every command-line switch a program parses is listed by that program's
 `--help`. No exceptions, including internal ones — mark those as internal
@@ -73,7 +73,7 @@ A switch nobody can discover is a switch nobody has. `--one-screen` sat
 in the launcher for weeks, undocumented, because the launcher's help only
 forwarded to the server's help and the server had never heard of it.
 
-ONE HELP, NOT TWO (owner ruling 2026-07-28). A program that forwards
+ONE HELP, NOT TWO. A program that forwards
 arguments to another does NOT print a list of its own. It declares its
 flags in the same registry as the program it forwards to, and renders that
 one text. Two half-lists leave the reader stitching them together.
@@ -116,7 +116,7 @@ warnings do. An advisory nobody heeds is noise — measure whether lint
 findings lead to edits, then promote the ignored ones to refusals or
 delete them.
 
-## Churn is acceptable (owner ruling 2026-07-04)
+## Churn is acceptable
 
 Backward churn — ripple, migrations, rewriting what already stands — is
 acceptable. Churn-aversion is a human-team instinct. It must not decide
@@ -142,7 +142,7 @@ keeps getting worked on.
 It is a tiebreaker, never a trump. It cannot excuse a real cost or
 correctness gap.
 
-## Method tooling lives in the lane (owner ruling 2026-07-07, scoped 2026-07-10)
+## Method tooling lives in the lane
 
 Any migration, converter or fix the PROCESS depends on becomes a real
 tool in the lane, with a test and a registration. Never a sidecar script
@@ -159,7 +159,7 @@ in the repo.
 The tell that the rule is being broken: a shell command doing what a
 lane tool should do. Treat it as a missing tool, not a solved problem.
 
-## Library capabilities are read, not guessed (owner correction 2026-07-31)
+## Library capabilities are read, not guessed
 
 A claim about what a library can do comes from its documentation or its
 source. Never from recall.
@@ -170,7 +170,7 @@ design before anyone checks it.
 
 Cite where the capability is documented when a decision rests on it.
 
-## Adding a control to the bar (owner ruling 2026-08-04)
+## Adding a control to the bar
 
 The bar's one truth is `deliverable/machines/panels/controls.md`.
 The renderer is `deliverable/engine/params.ts`. Every surface fetches the rendered bar
@@ -178,9 +178,9 @@ from the engine (`/widget/controls`) — the VS Code sidebar included.
 
 - ONE ROW PER CONTROL. The row starts with its label; the controls follow.
   The Types section in controls.md lists what a row may declare.
-- NEVER write bar markup in a surface. A surface that drew its own copy
-  drifted silently, and it cost the owner corrections. The spec is the
-  only place a control is born.
+- NEVER write bar markup in a surface. A surface that draws its own copy
+  drifts silently, and the drift is caught by a person rather than a check.
+  The spec is the only place a control is born.
 - A BUTTON POSTS A ROUTE. Give it `data-post` (the `action` and `actions`
   types do); the sidebar forwards any such press with no extension edit.
 - THE LABEL EXPLAINS ITSELF ON CLICK. The renderer puts the row's help
@@ -194,10 +194,10 @@ from the engine (`/widget/controls`) — the VS Code sidebar included.
 - Adding a control therefore means: a row in controls.md, at most a new
   type in params.ts — and NO extension edit in the normal case.
 
-## A UI change is not done until the engine restarts on it (owner ruling 2026-08-06)
+## A UI change is not done until the engine restarts on it
 
 THE OWNER MUST SEE A UI CHANGE ON THE NEXT LOOK. Anything less costs them a
-round of "I still do not see it", and it cost several in one morning.
+round of "I still do not see it", and those rounds come in runs.
 
 The failure has a TELL, and it is worth knowing by sight. The surface shows
 NEW DATA drawn by OLD CODE — a template's raw `{token}` on screen, a
@@ -219,10 +219,9 @@ always the part that made a change visible.
 
 ## The engine checks a written file, and the agent never asks
 
-OWNER RULING 2026-08-15. "We are going to have a register of checking tools
-in the engine. The engine says: I am editing a TypeScript file, I am applying
-all the checks for TypeScript on it, and then I continue. Auto-formatting,
-like ruff for Python — the engine would just do that. It would not even ask.
+THE ENGINE HOLDS A REGISTER OF CHECKING TOOLS. Editing a TypeScript file, it
+applies every check for TypeScript and continues. Formatting is the same: the
+engine does it and does not ask.
 But if it detects a problem it cannot auto-format, it will reject with a
 decent remedy."
 
@@ -234,10 +233,11 @@ with ruff is another. Markdown is another.
 THREE OUTCOMES ON A WRITE, and only the third reaches the agent.
 
 - CLEAN. The write lands and nothing is said.
-- FIXABLE. The engine applies the fix and says so on the result. It does not
-  ask. The linter already behaves this way on se_file_patch, which is the
-  proof the shape works: "the linter's safe fixes ran on <path> — the
-  returned hashes are the fixed content".
+- FIXABLE. The engine applies the fix and says so on the result.
+  - It does not ask.
+  - The linter already behaves this way on se_file_patch, which is the proof
+    the shape works: "the linter's safe fixes ran on <path> — the returned
+    hashes are the fixed content".
 - NOT FIXABLE. The write is REFUSED, with the tool's own message and an
   executable remedy, like every other refusal in the lane.
 
@@ -256,19 +256,15 @@ THERE IS NO `se_package` VERB TODAY. Do not call one. Until it exists, the M9
 package state builds its archive by running `deliverable/engine/bin/package.ts` through
 `se_run`, like any other script.
 
-OWNER RULING 2026-08-15, agreed at i12's retro. The M9 package state requires
-a versioned archive and the lane has no verb that builds one, so the agent
-reaches for the shell. It happened twice in i12, once refused for a bad
-argument.
+WHY THE HOLE IS NAMED RATHER THAN LEFT. The M9 package state requires a
+versioned archive and the lane has no verb that builds one, so an agent reaches
+for the shell and sometimes gets the arguments wrong.
 
 WHEN IT IS BUILT the verb wraps `deliverable/engine/bin/package.ts`, answers with the
 artifact path, and the package state's file-ref field resolves it against disk
 as it already does.
 
 ## A merge into trunk re-checks every open iteration
-
-OWNER RULING 2026-08-15, at i12's retro: "rechecking every open iteration, I
-think makes sense. We can do that."
 
 WHEN AN ITERATION'S BRANCH MERGES INTO TRUNK, the files it changed are files
 other open iterations have already signed claims against. Nothing re-checks
@@ -296,23 +292,27 @@ the comparison is set operations over the realizes and files edges. The one
 constraint that matters: the graph must be built from TRUNK, never from the
 merging iteration's own tree.
 
-## A failed gate returns the walk to idle
+## A failed gate returns the walk to the front desk
 
 OWNER RULING 2026-08-15: "A fail of a gate, in my opinion, lands you back at
 idle, and then you need to decide how you go about it. Sometimes you can go
 back maybe only one gate, sometimes we need to go back two gates. A dismissed
 gate goes back to idle."
 
+THE POSITION THE RULING NAMES IS NOW THE FRONT DESK. The idle state was
+removed and the desk took its place as home. The ruling stands
+unchanged; only the name of the place it lands did.
+
 TODAY A FAILED GATE HAS NOWHERE TO GO. gate-implementation's only successor
 is the next state, so a verdict of `fail` stamps nothing and moves nothing.
 When the owner failed i12's implementation gate the walk did not move, and
 the agent had to route around it by hand.
 
-WHY IDLE AND NOT A NAMED PREDECESSOR. How far back a fail should send the
+WHY HOME AND NOT A NAMED PREDECESSOR. How far back a fail should send the
 walk is a judgment that depends on what failed, and the machine cannot know
-it. Idle is the one position from which every route can be drawn, so it is
-the honest destination.
+it. The desk is the one position from which every route can be drawn, so it
+is the honest destination.
 
 THE VERDICT STILL STANDS ON THE FORM. The fail is recorded with its
 rationale; only the POSITION moves. Nothing about the ruling is lost by
-returning to idle.
+returning to the desk.

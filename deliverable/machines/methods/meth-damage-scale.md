@@ -19,7 +19,7 @@ M3, when the requirement is written, because that is when somebody actually
 knows. M4 reads it: the criteria ordering starts from damage rather than from
 nothing.
 
-## THE FIVE LEVELS
+## THE FIVE LEVELS #work
 
 - **fatal** — the product stops being the thing it claims to be.
 - **crippling** — one named use case can no longer complete.
@@ -27,7 +27,7 @@ nothing.
 - **abrasive** — noticed and complained about; nobody changes what they do.
 - **cosmetic** — nobody would notice.
 
-## The test for each
+## The test for each #work
 
 One question per level, answered against the register rather than against a
 feeling. Take the highest level whose test passes.
@@ -44,7 +44,7 @@ feeling. Take the highest level whose test passes.
 - ABRASIVE. They would mention it and carry on.
 - COSMETIC. Nobody would notice at all.
 
-## COSMETIC IS A DELETION CANDIDATE, NOT A LEVEL
+## COSMETIC IS A DELETION CANDIDATE, NOT A LEVEL #work
 
 A row nobody would notice missing is a row nobody needs. It joins the register
 as a non-goal or it leaves.
@@ -52,7 +52,7 @@ as a non-goal or it leaves.
 The level exists so the honest answer can be given. It is not a place to park
 rows that nobody wants to argue about.
 
-## HOW BADLY IS NOT HOW MUCH
+## HOW BADLY IS NOT HOW MUCH #work
 
 The commonest way to fill this in wrong is to read it as importance, and then
 everything anybody cares about becomes fatal.
@@ -65,7 +65,7 @@ fatal.
 THE ANCHOR IS THE STRIKE TEST. If two people disagree, they are disagreeing
 about what actually happens, which is a question with an answer.
 
-## It does not replace MoSCoW
+## It does not replace MoSCoW #work
 
 They ask different things and both are kept.
 
@@ -76,9 +76,9 @@ They ask different things and both are kept.
 A must can be abrasive — scoped in because it is cheap and asked for. A could
 can be fatal — genuinely load-bearing and genuinely not scheduled yet.
 
-## WHAT M4 DOES WITH IT
+## WHAT M4 DOES WITH IT #work
 
-IT IS THE SORT KEY AT cut-criteria, worst first (owner ruling 2026-08-09). Not
+IT IS THE SORT KEY AT cut-criteria, worst first. Not
 a hint for something else to improve on — the order itself.
 
 THE SORT IS THEREFORE MECHANICAL, and that is the property worth protecting.
@@ -91,7 +91,7 @@ because the KEY is authored at M3 on the requirement itself. A person who
 wanted a favourite axis to rise would have to re-grade what breaks without it,
 in the register, against the strike test, where anybody can check it.
 
-THE SORT IS TWO STEPS, AND THIS IS THE FIRST (owner ruling 2026-08-09). The
+THE SORT IS TWO STEPS, AND THIS IS THE FIRST. The
 grade roughs the order out. Then somebody CHECKS it and pushes rows up or down
 where it came out wrong.
 
@@ -105,7 +105,7 @@ with its neighbours.
 
 WHY IT WAS SPECIFIED THIS WAY. Ordered from nothing, a response-time
 requirement came out above the foundations of the system (owner report
-2026-08-08). It was still there on 2026-08-09, ranked first of seventy-two
+2026-08-08). It was still there, ranked first of seventy-two
 while graded corrosive — third of five — because a stored order from an
 earlier pass overrode the computed one. Two lessons, and both are load-bearing.
 

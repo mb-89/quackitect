@@ -14,7 +14,7 @@ source_refs:
   - req-the-editor-is-the-only-entry-point
   - raid-asm-the-editor-fires-something-when-a-folder-is-opened
   - "the probe of 2026-08-19: the extension declares onStartupFinished, which is the activation event defined as running after everything else"
-  - "the owner's report of 2026-08-19, that a control taking over a second is unusable and produces a second press"
+  - the owner's report of 2026-08-19, that a control taking over a second is unusable and produces a second press
 priority: should
 weighs_against:
   - req-surface-answers-in-one-second >

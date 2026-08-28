@@ -74,12 +74,12 @@ describe("parameter panels", { concurrency: true }, () => {
       ...VALUES,
       autonomy: 1,
       emergency: true,
-      toggles: { "block-auto-sleep": true, "shutdown-at-idle": false },
+      toggles: { "block-auto-sleep": true, "shutdown-at-front-desk": false },
     });
     assert.match(armed, />E</, "the armed top rung says so on itself");
     assert.match(armed, /class="rung on danger emergency"/);
     assert.match(armed, /data-toggle="block-auto-sleep"[^>]*aria-pressed="true"/);
-    assert.match(armed, /data-toggle="shutdown-at-idle"[^>]*aria-pressed="false"/);
+    assert.match(armed, /data-toggle="shutdown-at-front-desk"[^>]*aria-pressed="false"/);
   });
 
   test("the shipped control bar is read from its spec, not from code", () => {
@@ -94,7 +94,7 @@ describe("parameter panels", { concurrency: true }, () => {
     assert.match(html, /id="narration-minutes"[^>]*value="5"/);
     assert.match(html, /id="narration-calls"[^>]*value="20"/);
     assert.match(html, /class="rung param-action" data-post="\/narration-now"/);
-    // The walk row (owner design 2026-08-04): one row, label first, two
+    // The walk row: one row, label first, two
     // one-shot buttons — aim at the selected state, and the person's pull.
     assert.match(html, /class="rung param-action" data-post="\/target\/selected"/);
     assert.match(html, /class="rung param-action" data-post="\/pull"/);
@@ -116,7 +116,7 @@ describe("parameter panels", { concurrency: true }, () => {
     // The shutdown row: two buttons that do not exclude each other, which is
     // why it is `toggles` and not `choice`.
     assert.match(html, /data-toggle="block-auto-sleep"/);
-    assert.match(html, /data-toggle="shutdown-at-idle"/);
+    assert.match(html, /data-toggle="shutdown-at-front-desk"/);
   });
 
   // THE LOAD-BEARING GUARANTEE. Skipping an unknown type quietly would let a
@@ -152,9 +152,13 @@ describe("parameter panels", { concurrency: true }, () => {
   // renderer either generalises or is revealed as the first one in disguise.
   test("the note entry is a panel too, and its separator is declared not baked", () => {
     const params = loadPanel(REPO_ROOT, "note-entry");
+    // TWO CAPTURES SHARE THIS PANEL. A note and a piece of work are both things
+    // a person adds from the controls without leaving what they are doing, so
+    // the work line sits under the note line rather than on a surface of its
+    // own. see dsp-the-bucket-editor.md#the-editor-is-the-database
     assert.deepEqual(
       params.map((p) => p.type),
-      ["text", "choice", "action"],
+      ["text", "choice", "action", "text", "action"],
     );
     const html = renderPanel(params, VALUES);
     // The sketch splits title from body on a forward slash and refuses a value
@@ -165,6 +169,8 @@ describe("parameter panels", { concurrency: true }, () => {
     assert.match(html, /<option value="could" selected>/, "the first option is the default");
     assert.match(html, /<option value="must">/);
     assert.match(html, /data-post="\/note"/);
+    assert.match(html, /id="work-statement"[^>]*type="text"/, "the work line is a field of its own");
+    assert.match(html, /data-post="\/work\/mint"/, "and its button mints rather than noting");
   });
 
   test("a choice renders every option the spec names, and only those", () => {

@@ -16,7 +16,7 @@ Several [DSMs](meth-dsm) and [DMMs](meth-dmm) set side by side are only a
 "combined" case. Nothing new is derived, so it is not yet an MDM. The term is
 due to Maurer and Lindemann, 2007.
 
-## Effect
+## Effect #work
 
 Derives one DSM or DMM subset from others, by composing directed paths.
 
@@ -41,9 +41,9 @@ inside one subset breaks the structural interpretation.
 
 To derive a target subset, walk three steps.
 
-1. Follow a row in the A-to-B DMM to a filled cell.
-2. Follow that column into B's own DSM.
-3. Check the intersection for a further dependency.
+1. Follow a row in the A-to-B DMM to a filled cell. #work
+2. Follow that column into B's own DSM. #work
+3. Check the intersection for a further dependency. #work
 
 Direction survives the composition. Six documented Boolean-composition cases
 cover directed relations.

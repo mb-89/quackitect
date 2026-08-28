@@ -3,6 +3,7 @@ minted_in: i36
 id: raid-debt-harness-fallback-and-bounds-need-implementation-proof
 type: "[[raid]]"
 kind: debt
+looked: 2026-08-26
 statement: The research fallback and answer-bound changes are started but not yet proven on the live harness path.
 owner: the driving agent
 trigger: implementation begins after the motivation gate
@@ -14,6 +15,9 @@ source_refs:
   - spec/references/ref-agent-harness-portability-2026-08-19.md
   - spec/trace/raid/raid-host-payload-offload-breaks-read-proof.md
   - spec/trace/raid/raid-mcp-stop-is-not-diagnosable.md
+last_looked: 2026-08-23
+look_verdict: rescheduled
+place: i39-the-lane-tells-the-truth-about-itself-de
 ---
 
 ## Repayment
@@ -38,3 +42,41 @@ is about, so nothing here moved.
 THE LOOK IS THE POINT. A debt nobody re-reads is a lie in the ledger, and this
 line is the evidence that somebody read it on this date.
 
+
+## Looked 2026-08-25 — the bounds half is proven, the fallback half is the finding
+
+FIRST DATED LOOK. This entry had never been re-read.
+
+THE BOUND PATH IS PROVEN ON A LIVE HARNESS. Every answer over the limit spilled
+to disk, carried its first page inline and handed back a cursor, and paging the
+cursor rebuilt the answer. That happened dozens of times in one session on
+Windows, and nothing was lost.
+
+THE FALLBACK HALF IS WHERE THE COST IS. The limit in force was the cautious
+default, because this machine had never measured its own. A cloud box measured
+more than six times that figure. So the mechanism works and the number it works
+with is a guess nobody is told about.
+
+That half now stands as its own work token, and the owner ruled on 2026-08-25
+that any host which does not know its limit measures it at start-up.
+
+## Swept 2026-08-26, at i54's closing retro: PARTLY EVIDENCED, still open
+
+THE BOUND HALF NOW HAS ONE REAL RUN BEHIND IT. A survey answer of 150,406 bytes was cut at 50,000, spilled to disk, and served back through the cursor the result carried. The reader followed it and reassembled the whole answer without loss.
+
+SO THE BOUND PATH IS NO LONGER UNEXERCISED. That is one run on one host, not a proof, and it is worth writing down because this entry previously had none.
+
+THE FALLBACK HALF IS UNTOUCHED. Nothing this window measured a host limit or took a fallback.
+
+RE-ACCEPTED, trigger unchanged.
+
+SWEPT 2026-08-28, at i63's closing retro: RE-ACCEPTED, still partly evidenced.
+
+The trigger fired when implementation began after the motivation gate, and i63
+walked that whole milestone. The bounds half stays proven and the fallback half
+stays the finding, unchanged from the 2026-08-25 look.
+
+ONE NUMBER FROM THIS WINDOW BEARS ON IT. Every job handle in the session still
+reports `bound_basis: default`, so no bound in the product is measured. That is
+registered separately as raid-risk-one-blanket-bound-is-given-to-work-nobody-measured,
+and the two entries are neighbours rather than duplicates.

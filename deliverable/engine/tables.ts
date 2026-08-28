@@ -11,19 +11,20 @@
 // wrong, which is worse than no table.
 //
 // THE PIVOT IS OURS, and it is the one place we go past Obsidian (owner ask
-// 2026-08-01). `type: pivot` crosses a row property with a column property
+// ). `type: pivot` crosses a row property with a column property
 // and puts an aggregate in the cell. A LIST-VALUED property spreads across
 // its elements, which is the whole point: pivoting the notes by name against
 // their own depends_on IS the dependency matrix, with no second data model
 // and no export. Obsidian cannot open a pivot view, which is fine — dropping
 // Obsidian is why this file exists.
 import { readdirSync, readFileSync, writeFileSync } from "node:fs";
-import { basename, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
+import { basename, dirname, join, relative, resolve, sep } from "node:path";
 import { parse } from "yaml";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { compare, evalExpr, passes } from "./expr.ts";
 import { coerce, kindOf, readKeys, setKeys } from "./frontmatter.ts";
 import { parseStateNote } from "./notes.ts";
+import { isInside } from "./paths.ts";
 
 const SRC = "engine/tables.ts";
 
@@ -42,6 +43,20 @@ export interface BaseView {
   groupBy: { property: string; direction: string }[];
   /** Column widths in pixels, by property. A dragged edge lands here. */
   columnSize: Record<string, number>;
+  /** WHICH GROUPS SHIP FOLDED. Names, matched against the group heading.
+   *
+   *  IT IS A DECLARATION RATHER THAN A NAME IN CODE (owner). The card used to
+   *  hardcode the backlog, so every further group somebody wanted folded meant
+   *  another line in a renderer — and the person who wanted it could not write
+   *  it themselves.
+   *
+   *  A GROUP THAT BURIES THE PAGE IS NOT A GROUP. The backlog holds 154 pool
+   *  tokens and the retro holds every pending note; a reader who came for the
+   *  four rows at their own state finds neither.
+   *
+   *  ABSENT MEANS NONE, which is why it is optional: a view that says nothing
+   *  about folding ships every group open, as it always did. */
+  collapsed?: string[];
   filters?: unknown;
   /** pivot only: the property whose values become rows. */
   rows?: string;
@@ -103,6 +118,9 @@ export function parseBase(text: string): BaseSpec {
       sort: Array.isArray(v.sort) ? v.sort.filter((s) => String(s?.property ?? "") !== "") : [],
       groupBy: groupLevels((v as { groupBy?: unknown }).groupBy),
       columnSize: ((v as { columnSize?: Record<string, number> }).columnSize ?? {}) as Record<string, number>,
+      collapsed: (Array.isArray((v as { collapsed?: unknown }).collapsed) ? ((v as { collapsed: unknown[] }).collapsed as unknown[]) : [])
+        .map((s) => String(s).trim())
+        .filter((s) => s !== ""),
       ...(v.filters !== undefined ? { filters: v.filters } : doc.filters !== undefined ? { filters: doc.filters } : {}),
       ...(v.rows !== undefined ? { rows: String(v.rows) } : {}),
       ...(v.columns !== undefined ? { columns: String(v.columns) } : {}),
@@ -124,7 +142,7 @@ export function loadBase(path: string): BaseSpec {
 // opens with `kind == "matrix-row"`. So we hand the renderer the same thing:
 // every note, as a row of its own frontmatter.
 //
-// 169 notes and 442 KB, measured 2026-08-01. Reading all of them costs less
+// 169 notes and 442 KB, measured. Reading all of them costs less
 // than one render, so nothing is cached — an edit shows on the next load,
 // the same rule the palette follows.
 // ---------------------------------------------------------------------------
@@ -135,7 +153,12 @@ export function loadBase(path: string): BaseSpec {
 // `dist` holds extracted release trees. It sat beside the vault until the
 // folder levels collapsed; inside it, its 479 notes are counted as vault
 // content and every table reports three times the rows it has.
-const SKIP_DIRS = new Set(["node_modules", ".git", ".obsidian", ".se", ".worktrees", "dist", "tests"]);
+// `scratchpad` is the workbench and is never committed. THE SAME FAULT AS
+// `dist`, found again: a full copy of the project sat under it, so every rigor
+// row was counted twice and the matrix reported 126 rows where 63 stand. The
+// suite's own file walker already skipped it and this one did not, so two
+// walkers disagreed about what the repository contains.
+const SKIP_DIRS = new Set(["node_modules", ".git", ".obsidian", ".se", ".worktrees", "dist", "scratchpad", "tests"]);
 
 export function vaultDir(root: string): string {
   return root;
@@ -286,9 +309,14 @@ const EDIT_HINT = "double-click, or Enter — Enter commits, Escape discards";
  * LOCKED with the reason in its tooltip — a cell that silently ignores a
  * double-click reads as a broken table.
  */
-function cellAttrs(r: Row, col: string): string {
+function cellAttrs(spec: BaseSpec, r: Row, col: string): string {
   const path = (r.file as { path?: string } | undefined)?.path;
   if (typeof path !== "string") return "";
+  // A PROPERTY MAY DECLARE ITSELF A DOOR RATHER THAN A FIELD. `opensNote` says
+  // the cell opens the note it came from, and a door is not an edit box.
+  // THE BASE DECIDES, NOT THIS FILE. Hard-coding one field name here would make
+  // the rule invisible to whoever writes the view.
+  if (opensNote(spec, col)) return ` class="tbl-locked tbl-opens" title="opens this note"`;
   // `file.name` is the FILENAME. Editing it is a rename, which moves a file and
   // rewrites every reference to it — se_file_move's job, never a cell's.
   if (col.startsWith("file.")) return ` class="tbl-locked" title="this comes from the filename — renaming is a move, not an edit"`;
@@ -312,7 +340,33 @@ export interface TableResult {
   html: string;
 }
 
-export function renderView(spec: BaseSpec, view: BaseView, rows: Row[]): TableResult {
+/** WHERE A GROUP HEADING GOES, when the caller can say.
+ *
+ *  A HEADING IS A BARE STRING TO THIS FILE. Only the caller knows whether the
+ *  name is somewhere the reader can go: the work editor's headings are places
+ *  and buckets mixed together, and the text alone does not say which.
+ *
+ *  THE ANCESTORS RIDE ALONG. A nested heading may name something only its
+ *  PARENT can resolve — the work editor's second level is `in`, `pending` or
+ *  `out`, which is a bucket of the place named one level up. Without the trail
+ *  those headings were plain text while their parents were doors.
+ *
+ *  ANSWERING `null` LEAVES THE HEADING AS PLAIN TEXT, which is the default and
+ *  what every other card gets. */
+export type GroupLink = (name: string, trail: string[]) => { state: string; machine: string } | null;
+
+/** WHICH GROUPS SHIP CLOSED, when the caller can say.
+ *
+ *  A GROUP THAT HOLDS HUNDREDS OF ROWS IS NOT A GROUP, IT IS THE PAGE. The
+ *  backlog draws every standing pool token — 154 of them measured — and it would
+ *  bury the four rows a reader actually came for.
+ *
+ *  THE SERVER DECIDES, NOT THE CLIENT. Drawing them and hiding them afterwards
+ *  flashes the whole list on every repaint, which is the reader's place being
+ *  reset in front of them. */
+export type GroupShut = (name: string, trail: string[]) => boolean;
+
+export function renderView(spec: BaseSpec, view: BaseView, rows: Row[], groupLink?: GroupLink, groupShut?: GroupShut): TableResult {
   if (view.type === "pivot") return renderPivot(spec, view, rows);
   if (view.type !== "table") {
     throw new Rejection({
@@ -329,16 +383,37 @@ export function renderView(spec: BaseSpec, view: BaseView, rows: Row[]): TableRe
   }
   const kept = selectRows(spec, view, rows);
   const cols = view.order.length > 0 ? view.order : [...new Set(kept.flatMap((r) => Object.keys(r)))];
+  // WHICH WAY THIS COLUMN IS SORTED, or nothing where it is not the sort key.
+  //
+  // ONE KEY AT A TIME, because a header click REPLACES the sort rather than
+  // adding to it (owner). A column carrying the second of three levels would
+  // draw an arrow that does not describe what the reader is looking at.
+  //
+  // GROUPING IS UNTOUCHED and always comes first. This orders rows INSIDE each
+  // group, which is what a table header has always meant.
+  const sorted = (view.sort ?? []).length === 1 ? view.sort[0] : undefined;
   const head = cols
     .map((c, i) => {
       // The LAST column takes whatever is left, so the table always fills its
       // pane. Giving it a width too would leave a dead strip on the right.
       const w = i === cols.length - 1 ? "" : ` style="width:${Math.max(40, Math.round(view.columnSize?.[c] ?? 160))}px"`;
-      return `<th data-col="${esc(c)}" draggable="true"${w}><span class="th-label">${esc(heading(spec, c))}</span><span class="th-grip" title="drag to resize"></span></th>`;
+      const way = sorted?.property === c ? (sorted.direction.toUpperCase() === "DESC" ? "desc" : "asc") : "";
+      const mark = way === "" ? "" : `<span class="th-sort">${way === "desc" ? "▾" : "▴"}</span>`;
+      const say = way === "" ? "click to sort by this column" : `sorted ${way === "desc" ? "descending" : "ascending"} — click to reverse`;
+      return `<th data-col="${esc(c)}"${way === "" ? "" : ` data-sort="${way}"`} draggable="true" title="${esc(say)}"${w}><span class="th-label">${esc(heading(spec, c))}</span>${mark}<span class="th-grip" title="drag to resize"></span></th>`;
     })
     .join("");
-  const cell = (r: Row, c: string): string => `<td${cellAttrs(r, c)}>${cellHtml(r, c)}</td>`;
-  const line = (r: Row): string => `<tr>${cols.map((c) => cell(r, c)).join("")}</tr>`;
+  const cell = (r: Row, c: string): string => `<td${cellAttrs(spec, r, c)}>${cellHtml(spec, r, c)}</td>`;
+  // A ROW CARRIES ITS OWN NOTE. The cells already did, for the cell editor; the
+  // row needs it too, because what a reader drags is the ROW.
+  // see dsp-the-bucket-editor.md#a-pill-opens-the-editor
+  const rowPath = (r: Row): string => {
+    const p = (r.file as { path?: string } | undefined)?.path;
+    return typeof p === "string" ? ` data-path="${esc(p)}" draggable="true"` : "";
+  };
+  // A ROW UNDER A CLOSED GROUP IS DRAWN AND HIDDEN. It stays in the markup so
+  // opening the group costs nothing and needs no second fetch.
+  const line = (r: Row, shut = false): string => `<tr${shut ? " hidden" : ""}${rowPath(r)}>${cols.map((c) => cell(r, c)).join("")}</tr>`;
 
   // AN EMPTY TABLE SAYS SO. A heading row over nothing reads as a rendering
   // fault; naming the filter that emptied it reads as an answer.
@@ -346,9 +421,9 @@ export function renderView(spec: BaseSpec, view: BaseView, rows: Row[]): TableRe
   if (kept.length === 0) {
     body = `<tr><td class="tbl-empty" colspan="${cols.length}">no rows match this view's filter</td></tr>`;
   } else if ((view.groupBy ?? []).length === 0) {
-    body = kept.map(line).join("");
+    body = kept.map((r) => line(r)).join("");
   } else {
-    body = groupRows(spec, view, kept, cols, line, 0);
+    body = groupRows(spec, view, kept, cols, line, 0, groupLink, [], groupShut, false);
   }
   return {
     name: view.name,
@@ -362,12 +437,23 @@ export function renderView(spec: BaseSpec, view: BaseView, rows: Row[]): TableRe
  * A cell's HTML. Everything is plain text except the two file references,
  * which are the way to open the note a row stands for.
  */
-function cellHtml(r: Row, c: string): string {
+function cellHtml(spec: BaseSpec, r: Row, c: string): string {
   const text = cellText(field(r, c));
-  if (c !== "file.path" && c !== "file.name") return esc(text);
+  if (c !== "file.path" && c !== "file.name" && !opensNote(spec, c)) return esc(text);
   const path = String((r.file as Row | undefined)?.path ?? "");
   if (path === "") return esc(text);
   return `<a class="doclink tbl-link" data-path="${esc(path)}">${esc(text)}</a>`;
+}
+
+/** Whether this column is a door to its note rather than a field to edit.
+ *
+ *  DECLARED IN THE BASE as `opensNote: true` under `properties`. The work
+ *  editor's statement is one: it names the piece of work, and pressing it opens
+ *  the markdown behind it. Renaming work is its own act with its own route, so
+ *  a cell editor there would be a second way to do it that nothing else knows
+ *  about. */
+function opensNote(spec: BaseSpec, col: string): boolean {
+  return (spec.properties[col] as { opensNote?: unknown } | undefined)?.opensNote === true;
 }
 
 /**
@@ -377,12 +463,23 @@ function cellHtml(r: Row, c: string): string {
  * levels give three nested headers over one set of rows. That is the whole
  * difference from Obsidian, which groups by one property only.
  */
-function groupRows(spec: BaseSpec, view: BaseView, rows: Row[], cols: string[], line: (r: Row) => string, depth: number): string {
+function groupRows(
+  spec: BaseSpec,
+  view: BaseView,
+  rows: Row[],
+  cols: string[],
+  line: (r: Row, shut?: boolean) => string,
+  depth: number,
+  groupLink: GroupLink | undefined,
+  trail: string[],
+  groupShut: GroupShut | undefined,
+  shut: boolean,
+): string {
   const level = (view.groupBy ?? [])[depth];
-  if (level === undefined) return rows.map(line).join("");
+  if (level === undefined) return rows.map((r) => line(r, shut)).join("");
   const buckets = new Map<string, Row[]>();
   for (const r of rows) {
-    const key = cellText(field(r, level.property)).trim() || EMPTY_KEY;
+    const key = cellText(groupValue(r, level.property)).trim() || EMPTY_KEY;
     const at = buckets.get(key);
     if (at === undefined) buckets.set(key, [r]);
     else at.push(r);
@@ -398,10 +495,49 @@ function groupRows(spec: BaseSpec, view: BaseView, rows: Row[], cols: string[], 
   return keys
     .map((k) => {
       const kids = buckets.get(k)!;
-      const header = `<tr class="tbl-group" data-depth="${depth}"><td colspan="${cols.length}"><span class="grp-pad" style="width:${depth * 14}px"></span><span class="grp-prop">${esc(heading(spec, level.property))}</span> <span class="grp-val">${esc(k)}</span> <span class="grp-count">${kids.length}</span></td></tr>`;
-      return header + groupRows(spec, view, kids, cols, line, depth + 1);
+      // A CLOSED PARENT CLOSES EVERYTHING UNDER IT, however deep.
+      const closed = shut || groupShut?.(k, trail) === true;
+      const header = `<tr class="tbl-group${closed ? " shut" : ""}"${shut ? " hidden" : ""} data-depth="${depth}" data-group="${esc(k)}"><td colspan="${cols.length}"><span class="grp-pad" style="width:${depth * 14}px"></span><span class="grp-fold">${closed ? "▸" : "▾"}</span><span class="grp-prop">${esc(heading(spec, level.property))}</span> <span class="grp-val">${groupName(k, trail, groupLink)}</span> <span class="grp-count">${kids.length}</span></td></tr>`;
+      return header + groupRows(spec, view, kids, cols, line, depth + 1, groupLink, [...trail, k], groupShut, closed);
     })
     .join("");
+}
+
+/** A GROUP'S NAME, as text or as a door.
+ *
+ *  IT IS NOT A DOCLINK, and that is deliberate. A doclink carries a PATH and
+ *  opens a document; this carries a STATE and moves the drawing, so it takes
+ *  its own attributes and its own handler rather than borrowing a name that
+ *  already means something else.
+ *
+ *  IT STAYS INSIDE `.grp-val`. A drop onto the heading, the rename control and
+ *  the pill's own highlight all read that span's text, and every one of them
+ *  keeps reading it because an anchor contributes its text like anything else. */
+function groupName(name: string, trail: string[], groupLink?: GroupLink): string {
+  const to = groupLink === undefined ? null : groupLink(name, trail);
+  if (to === null) return esc(name);
+  return `<a class="state-link" data-state="${esc(to.state)}" data-machine="${esc(to.machine)}" title="go to this state on the drawing">${esc(name)}</a>`;
+}
+
+/** WHAT A ROW GROUPS UNDER. A property name, or an EXPRESSION.
+ *
+ *  A GROUP LEVEL MAY BE COMPUTED, and that is what lets one field fall back to
+ *  another. The work editor groups by `if(bucket, bucket, place)`: a token
+ *  carrying a bucket groups under it, and one without groups under its place.
+ *
+ *  THE PLAIN LOOKUP IS THE FALLBACK, not the other way round. A property whose
+ *  name is not a legal expression — anything with a space or a dash in it —
+ *  would otherwise stop grouping the day this changed. Filters and formulas use
+ *  the same evaluator, so nothing new is being invented here.
+ *
+ *  A BARE NAME GOES THROUGH BOTH PATHS AND AGREES. `place` evaluates to the
+ *  row's place, which is exactly what the lookup returned. */
+function groupValue(r: Row, property: string): unknown {
+  try {
+    return evalExpr(property, { row: r });
+  } catch {
+    return field(r, property);
+  }
 }
 
 // A dimension value that is absent gets its own bucket rather than dropping
@@ -637,8 +773,9 @@ export interface CellWritten {
 function notePath(root: string, rel: string): string {
   const dir = vaultDir(root);
   const abs = resolve(dir, rel);
-  const back = relative(dir, abs);
-  if (!rel.endsWith(".md") || back.startsWith("..") || isAbsolute(back)) {
+  // INSIDE THE VAULT, the vault itself included, which is where this differs
+  // from the bench guard. Both ask the path jail's own predicate now.
+  if (!rel.endsWith(".md") || !isInside(dir, abs)) {
     throw new Rejection({
       clause: CLAUSES.REQUIRED_ARGS,
       expected: "a markdown note inside the vault",

@@ -3,16 +3,17 @@ minted_in: i9
 id: raid-iss-the-collapse-hides-the-one-thing-a-newcomer-must-run
 type: "[[raid]]"
 kind: issue
-statement: "After the collapse a fresh clone shows one folder and nothing else, and the launcher a newcomer must run once sits inside it rather than in front of them."
+statement: After the collapse a fresh clone shows one folder and nothing else, and the launcher a newcomer must run once sits inside it rather than in front of them.
 owner: the driving agent
-trigger: "writing the ramp-up story against the collapsed shape, and again at the first fresh-machine run"
+trigger: writing the ramp-up story against the collapsed shape, and again at the first fresh-machine run
 status: open
-impact: "The first story in the set opens on somebody with nothing installed. Today the launcher is the loudest thing in the folder they land in. After the collapse it is one level down, and nothing at the top says to go there."
+impact: The first story in the set opens on somebody with nothing installed. Today the launcher is the loudest thing in the folder they land in. After the collapse it is one level down, and nothing at the top says to go there.
 breaks_how_badly: abrasive
 how_likely: expected
 source_refs:
-  - "sty-ramp-up, whose second slide says the script sits in the root and is the loudest thing in the folder"
-  - "the entry document's own layout section, which labels the inner folder as the one you open"
+  - sty-ramp-up, whose second slide says the script sits in the root and is the loudest thing in the folder
+  - the entry document's own layout section, which labels the inner folder as the one you open
+place: i23-judgment-the-ui-sitting-cut-the-html-mir
 ---
 
 ## How it was found

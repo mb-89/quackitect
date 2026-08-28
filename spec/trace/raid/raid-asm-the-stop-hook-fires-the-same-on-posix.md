@@ -8,10 +8,9 @@ owner: the driving agent
 trigger: the first unattended POSIX run that exercises a stop event, and any change to how the hook is registered per host
 status: open
 probe: "No cheap check exists this session: it needs a POSIX host with a stop event forced mid-walk. raid-lane-works-on-posix proved the lane itself survives on a Linux container (i35, 2026-08-18), but that probed lane survival, not this stop hook's own behaviour. Stays unprobed until that host is available."
-probed: "unprobed 2026-08-19"
+probed: unprobed 2026-08-19
 breaks_how_badly: crippling
 how_likely: plausible
-  - raid-lane-works-on-posix
 weighs_with: none
 weighs_against: none
 ---

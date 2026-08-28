@@ -13,7 +13,7 @@ surfaces structure-dependent qualities.
 SyA notes the same feedback. Functions and qualities that depend on chosen
 elements appear only after the first partitioning iteration.
 
-## Procedure
+## Procedure #work
 - Work in short alternations, never a waterfall pass per peak.
 - A finding on the other peak is folded back immediately: a new requirement enters the register; a changed function re-ripples.
 - The gates still bind: what a gate blessed reopens through the reopen mechanics, never silently.

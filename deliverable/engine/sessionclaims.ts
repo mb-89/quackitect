@@ -16,6 +16,7 @@ import { CLAUSES, Rejection } from "./errors.ts";
 import { contentHash } from "./hash.ts";
 import { claimFeeders, downstreamCone, fallenChain, type MachineDecl, reopenStates, type StateDecl } from "./machine.ts";
 import { compileMachineCached, resolveRef } from "./machines/compile.ts";
+import { type MintDemand, mint, privateHome } from "./workstore.ts";
 
 /** WHICH STATE OWES THE FORM THE PULL SERVES, from where the walk stands.
  *
@@ -36,13 +37,10 @@ export function formBearer(leaf: StateDecl | undefined, parent: StateDecl | unde
   return parentReopened && signs(parent) ? parent : undefined;
 }
 
-/** see dsp-walk-machine.md#the-state-a-recorded-visit-names */
-export function visitState(visit: string): string {
-  return visit.split("@")[0].split("/").pop() ?? "";
-}
+import { visitState } from "./visit.ts";
 
-import { replayFile } from "./decisions.ts";
-import { shortId } from "./expmachine.ts";
+export { visitState };
+
 import {
   formTemplatePath,
   lintForm,
@@ -60,7 +58,7 @@ import {
 } from "./forms.ts";
 import { pendingNotes } from "./inbox.ts";
 import { type Iteration, iterationDrift, itList, itShortId, pinIsStale, pinIsUnset, repinColumn } from "./iterations.ts";
-import { parseStateNote, readNode, section, writeNode } from "./notes.ts";
+import { noteOf as heldNote, parseStateNote, passEpoch, readNode, readNodeIfPresent, section, writeNode } from "./notes.ts";
 import { seDir } from "./paths.ts";
 import { scanGuidance } from "./pull.ts";
 import { levelName, loadLevels } from "./scale.ts";
@@ -84,6 +82,17 @@ import { corpusVersion, loadTrace, noteOf, traceDir } from "./trace.ts";
 /** What the claims need of the walk: where things live, where it stands, and
  *  the one call that tells a held mirror something moved. Session satisfies
  *  it structurally. */
+
+/** IS THIS FRONTMATTER SIGNED. One expression, because two callers ask it: the
+ *  whole state form, and the cheap signature read the route's input check uses.
+ *
+ *  A PRESENT-BUT-EMPTY `signed_off` IS UNSIGNED. Reading the key's mere presence
+ *  as a stamp is the same defect as withSignedOff's, mirrored. */
+function isSignedOff(fm: Record<string, unknown>): boolean {
+  const s = fm.signed_off;
+  return typeof s === "string" && s.trim() !== "";
+}
+
 export type ClaimsHost = Pick<
   Session,
   | "machineRoot"
@@ -143,22 +152,32 @@ export class Claims {
     this.host = host;
   }
 
-  /** Open points of the BOUND record's decision graph — the jsonl is the
-   *  source, so the check survives engine reloads. Scoped to the work's
-   *  own states. */
+  /** WHAT A RECORD STILL OWES, and the answer is now always nothing here.
+   *
+   *  This used to replay the record's decision graph for open points. The graph
+   *  is gone — the work tokens say what is outstanding, and the leaving guard
+   *  is what holds a state shut over them.
+   *
+   *  IT STAYS AS A SEAM rather than being deleted at every caller: a record's
+   *  outstanding work is a real question, and the answer comes from the work
+   *  store now. */
   openRecordPoints(): { id: string; visit: string; brief: string }[] {
-    const sid = shortId(this.host.bound!.id);
-    const recorded = replayFile(join(this.host.bound!.path, "spec", "expeditions", this.host.bound!.id, "decisions.jsonl"));
-    // see dsp-walk-machine.md#a-visit-is-recorded-qualified
-    return recorded.open.filter((n) => visitState(n.visit) === sid || visitState(n.visit) === `${sid}-leave`);
+    return [];
   }
 
-  /** Pending notes whose text carries one of the markers — what a
-   *  no_pending_note condition holds against ("needs retro" gates
-   *  start_iteration; the retro's drain clears them). */
+  /** Pending notes a `no_pending_note` condition holds against.
+   *
+   *  MARKERS NARROW IT. A named marker blocks only on a note carrying it, which
+   *  is how one phrase can gate one state.
+   *
+   *  NO MARKERS MEANS EVERY PENDING NOTE. That is the kickoff's check (owner):
+   *  an iteration does not start while a retro owes a drain, and the retro owes
+   *  one for any note at all rather than for a phrase somebody remembered to
+   *  type. An empty list used to match nothing, so the condition read as
+   *  satisfied over a full inbox. */
   blockingNotes(markers: string[]): { ref: string; text: string }[] {
     return pendingNotes(seDir(this.host.machineRoot()))
-      .filter((n) => markers.some((m) => n.text.toLowerCase().includes(m.toLowerCase())))
+      .filter((n) => markers.length === 0 || markers.some((m) => n.text.toLowerCase().includes(m.toLowerCase())))
       .map((n) => ({ ref: n.ref, text: n.text }));
   }
 
@@ -251,7 +270,7 @@ export class Claims {
     };
   }
 
-  /** ANY state's form is always fetchable (owner ruling 2026-08-04) —
+  /** ANY state's form is always fetchable —
    *  for export to a colleague wherever the walk stands. The machine on
    *  display resolves the name; the walk's machine is the default. */
   /** THE MACHINE THAT DECLARES THIS STATE FORM.
@@ -339,7 +358,7 @@ export class Claims {
 
   stateFormHeader(name: string, raw: string | undefined, m: MachineDecl = this.machineHolding(name)): Record<string, string> {
     const fm = raw === undefined ? ({} as Record<string, unknown>) : parseStateNote(raw).frontmatter;
-    // The priority wears its RUNG NAME (owner ruling 2026-08-04) — the
+    // The priority wears its RUNG NAME — the
     // numerical scale stays internal.
     const s = m.states.find((st) => st.id === name);
     return {
@@ -368,10 +387,67 @@ export class Claims {
     }
   }
 
+  /** ONE STATE FORM, BUILT ONCE PER PASS. The answer is a pure function of the
+   *  instance text, the template, the guidance and the trace corpus, and a pass
+   *  is synchronous, so none of the four can move inside one.
+   *
+   *  WHY IT IS WORTH A CACHE. Drawing a route asks `feedersUnsigned` for every
+   *  state on the way and every state feeding one, and the leaving check asks
+   *  again. Measured on a three-hop sweep: 1,034 ms of 6,113 ms was this method,
+   *  answering the same question about the same file hundreds of times.
+   *
+   *  THE KEY IS THE TEXT, not just the pass. A pass writes generated containers
+   *  while it walks, so a form written mid-pass must not be served from before
+   *  the write. The door forgets a file it wrote, so the text comes back changed
+   *  and the entry misses by itself.
+   *  see dsp-the-walk-knows-what-its-own-hops-cost.md#a-state-form-is-built-once-per-pass */
+  private static readonly FORMS = new Map<string, { pass: number; raw: string | undefined; value: Record<string, unknown> }>();
+
+  /** IS THIS STATE'S FORM SIGNED, and nothing else. The same answer
+   *  `stateFormGet` puts on its `signed` key, reached without building the rest
+   *  of the form.
+   *
+   *  WHY IT IS SEPARATE. Drawing a route asks this about every state on the way
+   *  and every state feeding one, and the whole form is a template, a lint, a
+   *  bound view, a problems list and an owed list. Measured on a three-hop
+   *  sweep: 914 ms of 5,772 ms went to building forms nobody read a second
+   *  field of.
+   *
+   *  THE DOOR PARSES THE NOTE ONCE and holds it, so a repeat ask inside a pass
+   *  costs a map lookup.
+   *  see dsp-the-walk-knows-what-its-own-hops-cost.md#a-signature-is-read-without-building-the-form */
+  stateSigned(name: string, m: MachineDecl): boolean {
+    let abs: string;
+    try {
+      abs = this.stateFormHome(name, m).instanceAbs;
+    } catch {
+      return false;
+    }
+    return isSignedOff(heldNote(abs)?.frontmatter ?? {});
+  }
+
   stateFormGet(name: string, m: MachineDecl = this.machineHolding(name)): Record<string, unknown> {
     const s = this.stateFormState(name, m);
     const h = this.stateFormHome(name, m);
-    const raw = existsSync(h.instanceAbs) ? readFileSync(h.instanceAbs, "utf8") : undefined;
+    const raw = readNodeIfPresent(h.instanceAbs);
+    const pass = passEpoch();
+    const memoKey = `${m.id}::${name}::${h.instanceAbs}`;
+    if (pass !== 0) {
+      const hit = Claims.FORMS.get(memoKey);
+      if (hit !== undefined && hit.pass === pass && hit.raw === raw) return hit.value;
+    }
+    const value = this.stateFormBuild(name, m, s, h, raw);
+    if (pass !== 0) Claims.FORMS.set(memoKey, { pass, raw, value });
+    return value;
+  }
+
+  private stateFormBuild(
+    name: string,
+    m: MachineDecl,
+    s: StateDecl,
+    h: { instanceAbs: string; instanceRel: string },
+    raw: string | undefined,
+  ): Record<string, unknown> {
     const model = stateFormModel(
       this.host.machineRoot(),
       scanGuidance(this.host.machineRoot()),
@@ -432,9 +508,10 @@ export class Claims {
       checked: stateFormChecked(raw),
       active: this.stateFormActive(name, m),
       gate: s.kind === "gate",
-      // A present-but-EMPTY signed_off is unsigned. Reading the key's mere
-      // presence as a stamp is the same defect as withSignedOff's, mirrored.
-      signed: typeof fmData.signed_off === "string" && fmData.signed_off.trim() !== "",
+      // ONE EXPRESSION, TWO CALLERS. `stateSigned` answers the same question
+      // without building the rest of this form, and two copies of the rule
+      // would drift the day either is edited.
+      signed: isSignedOff(fmData),
       // THE SIGNATURE SURVIVES A REOPEN, so the two are reported apart. The
       // page still shows who signed and when; `reopened_after` is what makes
       // the form owed again and the state grey.
@@ -463,7 +540,7 @@ export class Claims {
       met: lint.met && tp.length === 0,
       // NAMED, NOT JUST COUNTED. A debt visible only as a number invites a
       // reader to skim past it; the ref is what lets the next person go
-      // look (owner ruling 2026-08-13).
+      // look.
       owed_count: owed.length,
       owed,
     };
@@ -506,20 +583,23 @@ export class Claims {
     for (const s of decl.states) {
       if (!claimful.has(s.id)) continue;
       const abs = this.evidenceAbs(it, s.id);
-      if (!existsSync(abs)) continue;
+      // NO existsSync AHEAD OF THE DOOR. The door answers undefined for a file
+      // that is not there, so asking the filesystem first pays a syscall for an
+      // answer the very next line gets for free. This ran per claimful state per
+      // machine per hop.
       try {
         const note = noteOf(abs);
         if (note === undefined) continue;
         const fm = note.frontmatter;
         if (typeof fm.signed_off !== "string") continue;
-        // see dsp-walk-machine.md#the-signature-time-comes-out-of-this-read
-        pass.times ??= new Map();
-        pass.times.set(s.id, claimTime(fm));
         // A REOPEN IS THE FOURTH WAY A CLAIM STOPS STANDING. The other three
         // are the claim's own doing; this one is somebody deciding it must be
         // re-earned. The downstream ripple is free — the fixed point below
         // drops everything fed by a state that just left this set.
         if (reopenedAfterSigning(fm)) continue;
+        // see dsp-walk-machine.md#the-signature-time-comes-out-of-this-read
+        pass.times ??= new Map();
+        pass.times.set(s.id, claimTime(fm));
         const key = [traceRoot, s.id, version, contentHash(note.body), contentHash(JSON.stringify(s.evidence_form))].join("\0");
         let failed = Claims.VERDICTS.get(key);
         if (failed === undefined) {
@@ -656,8 +736,8 @@ export class Claims {
     return done;
   }
 
-  /** The panel's colour truth: green means SUBMITTED (owner ruling
-   *  2026-08-11) — a signed gate paints before its bless, and the bless
+  /** The panel's colour truth: green means SUBMITTED (
+   *  ) — a signed gate paints before its bless, and the bless
    *  rides as the thumbs-up. The route never reads this. */
   recordPaint(decl: MachineDecl): string[] {
     return this.recordDone(decl, new Set(), Claims.newPass(), true);
@@ -698,7 +778,7 @@ export class Claims {
     return out;
   }
 
-  /** THE DRIFT (owner ruling 2026-08-05): which states were passed against a
+  /** THE DRIFT: which states were passed against a
    *  demand that has since moved, plus everything downstream of them.
    *
    *  GREEN MUST MEAN STILL GREEN NOW. The demand diff used to run only when a
@@ -863,8 +943,46 @@ export class Claims {
     const run = this.host.top();
     if (run?.decl.states.some((s) => s.id === name)) {
       reopenStates(run.decl, run.instance, [name], reason, new Date().toISOString());
+      this.routeTheFinding(name, reason);
     }
     return { reopened: name, why: reason.trim(), by, still_green: this.recordDone(m) };
+  }
+
+  /** A REOPEN'S REASON IS A FINDING, AND A FINDING NEEDS A PLACE.
+   *
+   *  A gate's verdict of reopen names states and reasons, and the reason used to
+   *  live in one form field. Nothing routed it to the state that would fix it,
+   *  and nothing said afterwards whether it was fixed — which is the failure
+   *  contract rule 5 names: the defect recorded accurately, and the work
+   *  continuing past it as though naming were fixing.
+   *
+   *  SO THE REASON MINTS A TOKEN AT THE REOPENED STATE. It holds that state shut
+   *  until somebody settles it, and the settle comment is what says what was
+   *  done about the finding.
+   *
+   *  IT IS STAMPED, SO A SECOND REOPEN IS A SECOND FINDING. Two reopens of one
+   *  state are two things somebody objected to, and matching them onto one token
+   *  would lose the later reason.
+   *
+   *  IT NEVER FAILS THE REOPEN. The claim has already fallen; a token about it
+   *  is worth less than the act, so a store that refuses does not undo the walk. */
+  private routeTheFinding(name: string, reason: string): void {
+    const now = new Date().toISOString();
+    const at = this.host.active().find((p) => p.slice(p.lastIndexOf("/") + 1) === name) ?? name;
+    const demand: MintDemand = {
+      source: "hand",
+      source_ref: `reopen/${name}/${now}`,
+      step: "",
+      statement: "Answer the reopening",
+      body: reason.trim(),
+      lifetime: "state",
+    };
+    try {
+      mint(privateHome(this.host.machineRoot()), at, [demand], now);
+      this.host.notifyChange();
+    } catch {
+      // A LINE ABOUT THE WORK IS WORTH LESS THAN THE WORK.
+    }
   }
 
   /** WHAT A REOPEN OF THIS STATE WOULD TAKE WITH IT.
@@ -1024,7 +1142,7 @@ export class Claims {
     };
   }
 
-  /** THE BLESS (owner design 2026-08-04, v1's thumbs reborn): a gate's
+  /** THE BLESS: a gate's
    *  submitted form needs a hand ABOVE it — the human always, or an agent
    *  whose autonomy stands strictly above the gate's own weight. */
   formBless(name: string, ok: boolean, by: string, machineId?: string): Record<string, unknown> {
@@ -1071,7 +1189,7 @@ export class Claims {
     const s = this.stateFormState(name, m);
     // A CHART WRITES NOTES, and it is the only field that CREATES and DELETES
     // them. Drawing a line mints a candidate; deleting the row throws the note
-    // away (owner ruling 2026-08-08).
+    // away.
     const charted: string[] = [];
     for (const f of s.evidence_form.filter((x) => x.template === "morph-box" && fields[x.name] !== undefined)) {
       charted.push(...bindChart(this.host, String(fields[f.name]), m));
@@ -1161,8 +1279,8 @@ export class Claims {
     return this.stateFormGet(name, m);
   }
 
-  /** ONE CLICK, ONE TRIPWIRE (owner ruling 2026-08-10). The flip deck posts
-   *  a ruling as it is made; the line lands in the sensitivity section and
+  /** ONE CLICK, ONE TRIPWIRE. The flip deck posts
+   *  A ruling as it is made: the line lands in the sensitivity section and
    *  the save mints its node before the page redraws. Idempotent: a cell
    *  already ruled answers with the standing form. The field name is the
    *  method's own — the deck lives on the sensitivity reading. */
@@ -1178,7 +1296,7 @@ export class Claims {
     return this.stateFormSave(name, { sensitivity: current === "" ? line : `${current}\n${line}` }, by, m);
   }
 
-  /** ONE CLICK, ONE VERDICT (owner ruling 2026-08-10). The scenario deck
+  /** ONE CLICK, ONE VERDICT. The scenario deck
    *  posts a verdict as it is made; the line lands in the walk section and
    *  the save mints the register entry for at-risk and unaddressed before
    *  the page redraws. A fitness click files the requirement in
@@ -1197,7 +1315,7 @@ export class Claims {
     const raw = readNode(h.instanceAbs);
     const field = kind === "fitness" ? "fitness_candidates" : "walk";
     const current = raw === "" ? "" : section(parseStateNote(raw).body, field).trim();
-    // THE FLAG LIVES ON THE REQUIREMENT NODE (owner ruling 2026-08-10):
+    // THE FLAG LIVES ON THE REQUIREMENT NODE:
     // fitness_candidate: true in its frontmatter, so the mark outlives the
     // form. The list line below shows the same fact where the reader is.
     if (kind === "fitness") {
@@ -1487,11 +1605,7 @@ export class Claims {
         done ??= new Set(this.recordDone(fm));
         return done.has(p.id);
       }
-      try {
-        return (this.stateFormGet(p.id, fm) as { signed?: boolean }).signed === true;
-      } catch {
-        return false;
-      }
+      return this.stateSigned(p.id, fm);
     };
     const unsigned = feeders.filter((p) => !finished(p));
     // THE BAR IS THE AND: every input signed, or the state does not stamp.
@@ -1607,7 +1721,7 @@ export class Claims {
       ];
     }
     // AND WHEN NOTHING UPSTREAM FELL, SAY WHAT IS WRONG WITH THIS ONE (owner
-    // instruction 2026-08-13). The content check knows which field failed and
+    // instruction ). The content check knows which field failed and
     // what it wanted; a check reports in the words of the question IT asked.
     const own = this.ownClaimProblems(stateId, m);
     if (own.length > 0) {

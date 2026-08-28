@@ -100,8 +100,15 @@ test("a verdict that changed replaces the one on the file", () => {
 });
 
 /** A walk with nothing running and nothing recorded — what a session that has
- *  just opened the project actually holds. */
-function freshScripts(): { scripts: Scripts; machine: MachineDecl; state: StateDecl } {
+ *  just opened the project actually holds.
+ *
+ *  `onDisk` is the verdict standing on the step's own form, which is what
+ *  survives the process that reached it. Left out, the form carries none.
+ *
+ *  THE FIXTURE'S SCRIPT DOES NOT EXIST, and the stamp for a missing script is
+ *  `<path>@gone`. That is what a caller passes to say the scripts have not
+ *  moved since the verdict was reached. */
+function freshScripts(onDisk?: { verdict: string; stamp: string }): { scripts: Scripts; machine: MachineDecl; state: StateDecl } {
   const state = { id: "verification", exit: { script: ["check.ts"] } } as unknown as StateDecl;
   const machine = { id: "i51", states: [state] } as unknown as MachineDecl;
   const host: ScriptHost = {
@@ -112,10 +119,51 @@ function freshScripts(): { scripts: Scripts; machine: MachineDecl; state: StateD
     state: () => state,
     notifyChange: () => {},
     recordVerdict: () => {},
+    standingJudgment: () => onDisk,
     evidence: new Map<string, Record<string, unknown>>(),
   };
   return { scripts: new Scripts(host), machine, state };
 }
+
+// THE LAUNCHER AND THE CHECKER READ ONE VERDICT, NEVER TWO. The launcher
+// declines to re-run a judgment whose verdict stands on the form. A checker
+// reading only its own memory called that same step not-passed, so the walk was
+// refused for a hop nothing was ever going to run again.
+//
+// WHAT IT COST: after a reload, no record could be re-entered past the first
+// state whose exit script had already passed. There is no fallback edge there
+// and no write verb, so the walk had nowhere to go.
+test("a verdict standing on the form is read by the checker, not only by the launcher", () => {
+  const { scripts, machine, state } = freshScripts({ verdict: "passed", stamp: "check.ts@gone" });
+  assert.equal(scripts.scriptStart(state.id, true), undefined, "the launcher skips a judgment whose verdict already stands on the form");
+  assert.equal(
+    scripts.scriptStanding(machine, state),
+    "passed",
+    "so the checker reads that same verdict rather than answering from an empty memory",
+  );
+});
+
+// The other direction of the same rule. A verdict reached against different
+// scripts answers a different question, so it carries nothing forward.
+//
+// NOTHING IS STARTED HERE, on purpose. A launched run makes the standing read
+// `deciding`, which is a true answer about a different moment and would hide
+// the one this case is about.
+test("a form verdict reached with different scripts does not stand", () => {
+  const { scripts, machine, state } = freshScripts({ verdict: "passed", stamp: "check.ts@something-else" });
+  assert.equal(
+    scripts.scriptStanding(machine, state),
+    "not passed",
+    "the checker refuses a verdict reached against scripts that have since moved",
+  );
+});
+
+// And a verdict the form carries as FAILED never reads as passed, whatever the
+// stamp says. Only `passed` carries.
+test("a failed verdict on the form is not read as passed", () => {
+  const { scripts, machine, state } = freshScripts({ verdict: "not passed", stamp: "check.ts@gone" });
+  assert.equal(scripts.scriptStanding(machine, state), "not passed", "a red on the form stays red");
+});
 
 // THE FATAL RISK, CLOSED BY CONSTRUCTION. raid-ar-walk-resumes-from-repo says a
 // step left deciding when a session ends has a word the repository cannot
@@ -169,6 +217,7 @@ test("the call answers in under a second while a long judgment is still running"
     state: () => slow,
     notifyChange: () => {},
     recordVerdict: () => {},
+    standingJudgment: () => undefined,
     evidence: new Map<string, Record<string, unknown>>(),
   };
   const scripts = new Scripts(host);
@@ -197,7 +246,20 @@ test("the call answers in under a second while a long judgment is still running"
   } finally {
     if (skip === undefined) delete process.env.SE_SCRIPT_SKIP;
     else process.env.SE_SCRIPT_SKIP = skip;
-    rmSync(lab, { recursive: true, force: true });
+    // The 2000ms script is still running past the 1000ms bound this case
+    // means to prove, so on Windows the directory can still be held open
+    // when teardown runs. Retry briefly rather than failing on a race the
+    // test itself set up on purpose.
+    for (let i = 0; i < 20; i++) {
+      try {
+        rmSync(lab, { recursive: true, force: true });
+        break;
+      } catch {
+        // A throw from inside finally would bury whatever the try block
+        // above actually decided, so this gives up quietly after ~3s.
+        await new Promise((r) => setTimeout(r, 150));
+      }
+    }
   }
 });
 
@@ -250,6 +312,7 @@ test("a judgment started outside the walk still enters the account", async () =>
     state: () => slow,
     notifyChange: () => {},
     recordVerdict: () => {},
+    standingJudgment: () => undefined,
     evidence: new Map<string, Record<string, unknown>>(),
   };
   const scripts = new Scripts(host);
@@ -269,4 +332,80 @@ test("a judgment started outside the walk still enters the account", async () =>
     else process.env.SE_SCRIPT_SKIP = skip;
     rmSync(lab, { recursive: true, force: true });
   }
+});
+
+/** A scripts surface whose host carries the standing judgment this case wants.
+ *  The fixture above hardcodes none, and none is one of the three answers. */
+function scriptsStanding(judgment: { verdict: string; stamp: string } | undefined): {
+  scripts: Scripts;
+  machine: MachineDecl;
+  state: StateDecl;
+} {
+  const state = { id: "verification", exit: { script: ["check.ts"] } } as unknown as StateDecl;
+  const machine = { id: "i54", states: [state] } as unknown as MachineDecl;
+  const host = {
+    workRoot: () => ".",
+    machineRoot: () => ".",
+    assertStanding: () => {},
+    leaves: () => ({ machine, ids: [state.id] }),
+    state: () => state,
+    notifyChange: () => {},
+    recordVerdict: () => {},
+    standingJudgment: () => judgment,
+    evidence: new Map<string, Record<string, unknown>>(),
+  } as unknown as ScriptHost;
+  return { scripts: new Scripts(host), machine, state };
+}
+
+// TWO READERS OF ONE TRUTH, AND THEY HAVE TO READ THE SAME STORE.
+//
+// The runner skips a re-run when the standing judgment ON DISK passed against
+// these same scripts. The checker asked only the IN-MEMORY evidence, which a
+// reload empties. So a re-entered record could not leave ANY state whose exit
+// carries a script: the runner said nothing needed running and the checker said
+// nothing had run, forever.
+//
+// MEASURED on the walk that found it: fourteen script-carrying hops, each
+// refused with `not run yet` while the script exited 0 when run by hand, and
+// `se_why` reported the state standing with no blockers.
+test("a passed judgment on disk answers the checker, not only the runner", () => {
+  const { scripts, machine, state } = scriptsStanding({ verdict: "passed", stamp: "check.ts@gone" });
+  assert.equal(
+    scripts.scriptPassedOnDisk(machine, state),
+    true,
+    "a verdict that outlived the process still covers the hop, or a reloaded session can never leave this state",
+  );
+});
+
+// AND IT CANNOT GREEN A STALE ONE. The stamp is the whole guard: a verdict
+// reached against different scripts is a verdict about a different question.
+test("a judgment reached against different scripts does not answer for these", () => {
+  const { scripts, machine, state } = scriptsStanding({ verdict: "passed", stamp: "check.ts@0000" });
+  assert.equal(scripts.scriptPassedOnDisk(machine, state), false, "a different stamp is a different question and re-runs");
+  const none = scriptsStanding(undefined);
+  assert.equal(none.scripts.scriptPassedOnDisk(none.machine, none.state), false, "and no judgment at all leans on nothing");
+});
+
+// THE CHECKER MUST ACTUALLY ASK. Deleting the one line restores the pin with
+// both cases above still passing, which is the regression this catches.
+//
+// THE CALL IT PINS MOVED, AND THE DEMAND DID NOT. This first pinned
+// `scriptPassedOnDisk`, which the checker called directly beside its own read of
+// the in-memory evidence. i63 replaced that pair with ONE decider: three readers
+// answered the same question from different stores, and only two of them had
+// been taught that a verdict can stand on the form.
+//
+// `scriptStanding` IS A SUPERSET OF WHAT THIS ASKED FOR. It consults the same
+// standing judgment with the same stamp comparison, and adds one answer the old
+// pair could not give — `deciding`, while a run is in flight, so a stamp
+// recorded green cannot carry the walk past a check that is failing right now.
+//
+// SO THE PIN NAMES THE NEW CALL AND THE OLD ONE STAYS TESTED, by the two cases
+// above, which call `scriptPassedOnDisk` themselves.
+test("the condition checker asks the runner's own question", () => {
+  assert.match(
+    source("session.ts"),
+    /key === "script"[\s\S]{0,240}scriptStanding/,
+    "conditionKeyMet reads the in-memory evidence alone again, so a reloaded session cannot leave a script-carrying state",
+  );
 });

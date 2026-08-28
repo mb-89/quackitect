@@ -26,9 +26,13 @@ evidence:
       Write each entry as a node shaped by [[raid]], then name it here.
       The node carries its kind and its owner. It carries the trigger, the impact and the statement too.
 major: full
+major_complexity: C3/R3
 minor: tailored
+minor_complexity: C3/R3
 patch: tailored
+patch_complexity: C3/R3
 product: full
+product_complexity: C3/R3
 specification: full
 major_note: |
   Applies in full for the change: an architectural move carries real
@@ -61,7 +65,7 @@ state opens.
 The goal system's named conflicts are the first entries. Add the top risks the
 vision and delta expose, with an owner and a revisit trigger on each.
 
-EACH ENTRY IS A NODE, not a table row (owner ruling 2026-08-06). A table row
+EACH ENTRY IS A NODE, not a table row. A table row
 is per-iteration, carries no id, and freezes at sign-off.
 
 So an entry recorded here could never be pointed at. An assumption recorded

@@ -3,9 +3,9 @@ form: gate-inputs
 bless: blessed by agent
 by: agent
 signed_off: 2026-08-20T19:36:53.463Z
-reopened: "2026-08-20T19:36:49.992Z — generalize-use-cases was re-signed with the third correction to the acting party. Re-read against that."
+reopened: 2026-08-20T19:36:49.992Z — generalize-use-cases was re-signed with the third correction to the acting party. Re-read against that.
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / gate-inputs

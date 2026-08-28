@@ -1,4 +1,4 @@
-// THE LEGAL EDGES, checked (owner ruling 2026-08-07).
+// THE LEGAL EDGES, checked.
 //
 // The trace spine runs value-prop, story, use-case, requirement, function.
 // A function satisfies a REQUIREMENT. It never points at a use case, and a
@@ -105,7 +105,7 @@ test("an edge to a node outside the corpus is left to the dangling check", () =>
   assert.deepEqual(edgeProblems(fn, new Map(), root), []);
 });
 
-// A DOTTED ID IS AN ID (owner ruling 2026-08-07). The function tree carries
+// A DOTTED ID IS AN ID. The function tree carries
 // its shape in the id: fn-a.b sits under fn-a.
 //
 // looksLikeId had no dot in its class, so refsIn DROPPED every dotted ref

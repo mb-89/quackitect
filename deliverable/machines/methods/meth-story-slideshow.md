@@ -7,7 +7,7 @@ statement: "The user story as a deck: one actor, one concrete pass, a claim on e
 
 Guidance for M2 write-stories. This is the one card the step draws from.
 
-## What a story is for
+## What a story is for #work
 
 A value prop says what the product PROMISES. It is a claim, and a claim is
 easy to agree with and impossible to check.
@@ -44,7 +44,7 @@ work nobody asked for. A proposition no story refines is a promise nothing
 shows. The step refuses to close while either stands, so neither waits for a
 reviewer to spot it.
 
-## A story is a journey
+## A story is a journey #work
 
 
 
@@ -72,7 +72,7 @@ and the person has to reach the first screen. Installing, booting and every
 click on the way belong in that one story. Every other story starts where the
 ramp-up ends.
 
-## The story is a deck
+## The story is a deck #work
 
 The body is markdown slides, the shape Obsidian uses. One slide per `---`.
 
@@ -94,18 +94,24 @@ req-ifu-split-slide and shipped it.
 A fixed shape, so a reader knows where they are. v1 settled it as
 req-ifu-user-stories and the prior art holds it up.
 
-1. THE PROBLEM. What the actor cannot do today.
-2. THE STARTING STATE — where they stand before they begin. Name what is
+1. THE PROBLEM. What the actor cannot do today. #work
+2. THE STARTING STATE #work
+
+   where they stand before they begin. Name what is
    already open, and what does not exist yet.
-3. THE STEPS — what they do, and what the product does back. Six at most,
+3. THE STEPS #work
+
+   what they do, and what the product does back. Six at most,
    because past that it is two stories.
-4. THE RESULT. How it was solved, answering the problem slide in its own
+4. THE RESULT #work
+
+   How it was solved, answering the problem slide in its own
    words.
 
 That is Before-After-Bridge, which is how a demo is told: the problem is the
 before, the result is the after, the steps are the bridge.
 
-## Writing one
+## Writing one #work
 
 - A JOB STORY, not a role story. "When <situation>, I want <motivation>, so I
   can <outcome>." It leads with the situation, which is what a concrete pass
@@ -122,7 +128,7 @@ before, the result is the after, the steps are the bridge.
 - `refines` NAMES THE VALUE PROP, and that is the edge the trace graph draws.
   A story with none hangs off nothing and never appears under a proposition.
 
-## Finding the ones that are missing
+## Finding the ones that are missing #work
 
 Story mapping: lay the passes side by side in the order a user meets them,
 and the gaps show up as columns with nothing in them.

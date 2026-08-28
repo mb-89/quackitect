@@ -39,7 +39,7 @@ describe("the standard review rounds", () => {
   test("the four rounds are the ones the doctrine names", () => {
     // raid_additions sits between the last round and the verdict: a review is
     // when a risk or assumption is most visible and least likely to be
-    // recorded (owner ruling 2026-08-06).
+    // recorded.
     assert.deepEqual(ROUND_NAMES, [
       "round_0_verify",
       "round_1_validate",
@@ -84,7 +84,7 @@ describe("the standard review rounds", () => {
         // rounds once overwrote a gate's own fields instead of joining them,
         // and this is what caught it.
         //
-        // AN EMPTY GATE IS LEGAL NOW (owner ruling 2026-08-07). A gate whose
+        // AN EMPTY GATE IS LEGAL NOW. A gate whose
         // fields all reduced to mechanical checks SHOULD carry none, because
         // re-asking a check that can only pass is what teaches a reader to
         // skim. gate-requirements is the first to get there.

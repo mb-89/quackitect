@@ -3,16 +3,16 @@ minted_in: i9
 id: raid-risk-the-entry-point-goal-is-a-silent-bootstrap-by-another-name
 type: "[[raid]]"
 kind: risk
-statement: "Opening a folder and having it silently set itself up is the same shape as a known abuse pattern, and nothing in the goal says where the line between convenience and surprise sits."
+statement: Opening a folder and having it silently set itself up is the same shape as a known abuse pattern, and nothing in the goal says where the line between convenience and surprise sits.
 owner: the driving agent
-trigger: "the design milestone, when the launcher's steps are split into one-time and every-time"
+trigger: the design milestone, when the launcher's steps are split into one-time and every-time
 status: open
-impact: "A person opens a folder expecting to read it and something installs, starts a server, or writes into their tree. The act carries no intent to set anything up, so whatever happens is a surprise rather than a choice."
+impact: A person opens a folder expecting to read it and something installs, starts a server, or writes into their tree. The act carries no intent to set anything up, so whatever happens is a surprise rather than a choice.
 breaks_how_badly: abrasive
 how_likely: plausible
 source_refs:
-  - "a published security writeup demonstrating the editor's own silent extension bootstrap being used to load extensions without prompting"
-  - "the owner's own retraction of auto-seeding on 2026-08-19, which is this instinct arriving by a different route"
+  - a published security writeup demonstrating the editor's own silent extension bootstrap being used to load extensions without prompting
+  - the owner's own retraction of auto-seeding on 2026-08-19, which is this instinct arriving by a different route
 ---
 
 ## What the risk is

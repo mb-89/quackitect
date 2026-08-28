@@ -35,7 +35,13 @@ async function atTheIterationsOffer(): Promise<{ s: Session; door: string }> {
   const s = new Session(root);
   await readEverything(s);
   s.setTarget("iterations");
-  const first = (await s.pull()) as { options?: { to: string }[] };
+  // Boot lands directly on front_desk now (idle was removed from the state
+  // machine), so entering "iterations" owes a reading proof it did not owe
+  // before. Drain it and pull forward until the offer actually appears.
+  let first = (await readEverything(s)) as { options?: { to: string }[] };
+  for (let i = 0; i < 40 && (first.options ?? []).length === 0; i++) {
+    first = (await readEverything(s)) as { options?: { to: string }[] };
+  }
   const door = (first.options ?? []).map((o) => o.to).find((to) => !to.endsWith("/end")) ?? "";
   assert.notEqual(door, "", "the fixture did not offer the seeded iteration as a door");
   return { s, door };

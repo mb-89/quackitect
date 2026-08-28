@@ -2,11 +2,12 @@
 //
 import { createHash } from "node:crypto";
 import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
-import { isAbsolute, join, relative, resolve } from "node:path";
+import { join } from "node:path";
 import { controlFilesPresent } from "./benchmark-guard.ts";
 import { CONDITIONS, conditionsStampDirs, reportProblems } from "./benchmark-report.ts";
 import { git } from "./gitlane.ts";
 import { noteOf } from "./notes.ts";
+import { isInside } from "./paths.ts";
 import { SE_VERSION } from "./version.ts";
 
 export interface BenchmarkRun {
@@ -20,6 +21,17 @@ export interface BenchmarkRun {
   stop_at: string;
   ended_at: string;
   conditions: Record<string, string>;
+  /** WHAT EACH HOP OF THIS RUN COST TO WALK, in order.
+   *
+   *  THIS IS WHAT MAKES THE RUN A YARDSTICK. The subject's `spec` is rewound to a
+   *  fixed commit, so the record does not grow between runs. Two walks of the
+   *  same pinned record are therefore comparable, and a walk that got slower can
+   *  be told apart from a record that got bigger.
+   *
+   *  WITHOUT IT the binding pins a record nobody measures against, which is the
+   *  half that was missing.
+   *  see req-a-hop-of-the-walk-carries-its-own-time-budget */
+  hops?: { to: string; ms: number }[];
 }
 
 export interface BindRefusal {
@@ -182,9 +194,10 @@ function olderNeighbour(root: string, iteration: string): string | undefined {
 /** A path this run made, under `<root>/.se/bench`. Anything else is not ours
  *  to delete, however the binding on disk describes it. */
 function ownTree(root: string, tree: string): boolean {
-  const home = resolve(join(root, ".se", "bench"));
-  const rel = relative(home, resolve(tree));
-  return rel !== "" && !rel.startsWith("..") && !isAbsolute(rel);
+  // STRICTLY UNDER, never the home itself. This guards a recursive delete, and
+  // the home holds every bench rather than one. The predicate is the path
+  // jail's; only the self argument differs, and it differs on purpose.
+  return isInside(join(root, ".se", "bench"), tree, false);
 }
 
 /** Every iteration the archive marks shipped — the pool a run draws from. */
@@ -338,7 +351,7 @@ export function benchmarkBind(root: string, opts: { iteration?: string; stop_at?
     rewind,
     tree,
     controlled,
-    // THE WHOLE WALK IS THE DEFAULT, by owner ruling. A stop point is a
+    // THE WHOLE WALK IS THE DEFAULT, and it is ruled so. A stop point is a
     // narrowing somebody asked for, never the normal case.
     stop_at: opts.stop_at ?? "shipped",
     ended_at: "",
@@ -383,6 +396,51 @@ export function benchmarkStop(root: string, run: BenchmarkRun, endedAt: string):
   return done;
 }
 
+/** ADD WHAT A SWEEP JUST COST to the bound run, if one is bound.
+ *
+ *  IT IS A NO-OP WHEN NOTHING IS BOUND, on purpose. Every ordinary walk calls
+ *  this, and an ordinary walk is not a benchmark. Refusing here would make the
+ *  caller ask first, and asking first is a second reader of the same file.
+ *
+ *  A TORN OR MISSING BINDING IS NOT AN ERROR EITHER. Losing a timing is a
+ *  measurement gap; throwing here would lose the walk.
+ *
+ *  IT READS AND WRITES THE BINDING DIRECTLY, like the rest of this file. The
+ *  door shares one read and one parse between readers of NODES; this is a JSON
+ *  binding with one reader and one writer, and routing it through the node door
+ *  would gain nothing and cost a parse it does not need. */
+export function benchmarkNoteHops(root: string, hops: readonly { to: string; ms: number }[]): void {
+  if (hops.length === 0) return;
+  const bound = join(root, ".se", "benchmark.json");
+  if (!existsSync(bound)) return;
+  try {
+    const run = JSON.parse(readFileSync(bound, "utf8")) as BenchmarkRun;
+    run.hops = [...(run.hops ?? []), ...hops];
+    writeFileSync(bound, `${JSON.stringify(run, null, 2)}\n`, "utf8");
+  } catch {
+    // a binding nobody can read is a lost measurement, never a lost walk
+  }
+}
+
+/** The run's hop timings, summarised the way a reader compares two runs.
+ *
+ *  THE MEDIAN AND NOT THE MEAN. One slow hop — a cold cache, a machine that
+ *  swapped — moves a mean and does not move a median, and the question this
+ *  answers is whether the WALK got slower rather than whether one hop did. */
+function hopsSummary(run: BenchmarkRun): Record<string, unknown> {
+  const hops = run.hops ?? [];
+  if (hops.length === 0) return { hops: 0, note: "no hop was timed during this run" };
+  const ms = hops.map((h) => h.ms).sort((a, b) => a - b);
+  const mid = Math.floor(ms.length / 2);
+  return {
+    hops: ms.length,
+    total_ms: Math.round(ms.reduce((a, b) => a + b, 0)),
+    median_ms: Math.round(ms.length % 2 === 1 ? ms[mid] : (ms[mid - 1] + ms[mid]) / 2),
+    slowest_ms: Math.round(ms[ms.length - 1]),
+    slowest_hop: hops.reduce((worst, h) => (h.ms > worst.ms ? h : worst), hops[0]).to,
+  };
+}
+
 /** END THE OPEN RUN, from the lane, without the caller holding the run object.
  *
  *  A RUN THAT DIED STILL LEAVES A RESULT, so this reads the bound run off disk
@@ -410,6 +468,9 @@ export function benchmarkEnd(root: string, endedAt: string): Record<string, unkn
     // when one of them is simply absent.
     reached_the_end: done.ended_at === done.stop_at,
     conditions: conditionsFor(done),
+    // THE YARDSTICK'S OWN NUMBER. The subject was pinned, so this is comparable
+    // against the same pinned subject walked another day.
+    walk: hopsSummary(done),
   };
 }
 

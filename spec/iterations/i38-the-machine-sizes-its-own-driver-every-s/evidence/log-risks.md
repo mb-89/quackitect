@@ -2,9 +2,9 @@
 form: log-risks
 by: agent
 signed_off: 2026-08-20T10:02:37.400Z
-reopened: "2026-08-20T10:01:24.156Z — it claimed a re-read of the standing register that it never performed; the skipped sweep turns up two open entries directly on this iterations payoff, one crippling and expected"
+reopened: 2026-08-20T10:01:24.156Z — it claimed a re-read of the standing register that it never performed; the skipped sweep turns up two open entries directly on this iterations payoff, one crippling and expected
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / log-risks

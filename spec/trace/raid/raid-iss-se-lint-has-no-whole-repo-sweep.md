@@ -14,6 +14,7 @@ source_refs:
   - note-d7a26094f592
   - raid-dec-a-check-refuses-a-wrong-write-and-reports-a-wrong-corpus
   - i6 scope-non-goals — third, the four checks the pool already named
+place: i66-the-overhaul-gets-its-mechanisms-a-check
 ---
 
 ## What the note said, and when

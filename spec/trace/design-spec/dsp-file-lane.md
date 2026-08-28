@@ -4,23 +4,23 @@ id: dsp-file-lane
 type: "[[design-spec]]"
 statement: reading, writing, searching and running inside the root, carried by compare-and-swap writes and root-relative paths
 realizes:
-  - "el-walk-engine"
+  - el-walk-engine
 files:
-  - "deliverable/engine/files.ts"
-  - "deliverable/engine/files-patch.ts"
-  - "deliverable/engine/signals.ts"
-  - "deliverable/engine/paths.ts"
-  - "deliverable/engine/resolve.ts"
-  - "deliverable/engine/search.ts"
-  - "deliverable/engine/move.ts"
-  - "deliverable/engine/run.ts"
-  - "deliverable/engine/web.ts"
-  - "deliverable/engine/gitlane.ts"
-  - "deliverable/engine/jsonio.ts"
-  - "deliverable/engine/hash.ts"
-  - "deliverable/engine/model-fs.ts"
-  - "deliverable/engine/bin/outward-search.ts"
-  - "deliverable/engine/bin/se-hook-websearch.ts"
+  - deliverable/engine/files.ts
+  - deliverable/engine/files-patch.ts
+  - deliverable/engine/signals.ts
+  - deliverable/engine/paths.ts
+  - deliverable/engine/resolve.ts
+  - deliverable/engine/search.ts
+  - deliverable/engine/move.ts
+  - deliverable/engine/run.ts
+  - deliverable/engine/web.ts
+  - deliverable/engine/gitlane.ts
+  - deliverable/engine/jsonio.ts
+  - deliverable/engine/hash.ts
+  - deliverable/engine/model-fs.ts
+  - deliverable/engine/bin/outward-search.ts
+  - deliverable/engine/bin/se-hook-websearch.ts
 ---
 
 ## A wide replace is read before it is run

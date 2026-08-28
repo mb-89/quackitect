@@ -13,6 +13,7 @@ source_refs:
   - req-one-command-starts-an-unattended-machine
   - nbr-cloud-host
   - sty-work-on-two-machines
+place: i39-the-lane-tells-the-truth-about-itself-de
 ---
 
 The owner's actual cloud shape is not the one i28 built for. A session starts

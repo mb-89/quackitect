@@ -5,7 +5,7 @@ statement: "Draw the context: boundary, neighbours, intended use - and the bindi
 state_kind: work
 filled_by: agent
 depends_on:
-  - gate-motivation
+  - spawn-for-inputs
 legal_tools:
   - se_file_read
   - se_file_write
@@ -21,22 +21,24 @@ evidence:
   - name: neighbours
     template: refs
     of: neighbour
-    description: every neighbour that touches the box — one node each, whichever way the arrow points
+    description: what THIS round changes about the neighbour set — added, removed or redrawn, one node each; `none` where the set did not move
   - name: intended_use
     description: one honest paragraph
   - name: excluded_use
     description: the does-NOT-do list
 major: full
+major_complexity: C3/R3
 minor: none
 patch: none
 product: full
+product_complexity: C3/R3
 specification: full
 major_note: |
   Applies in full: boundary, neighbours, intended and excluded use,
   redrawn for the change. Architecture moves ripple to the boundary more
   often than predicted - this is the cheap place to catch it.
 minor_note: |
-  Does not apply (owner ruling 2026-08-13). Boundary and neighbours do not
+  Does not apply. Boundary and neighbours do not
   move at this size, so the state could only ever answer "unchanged" - and
   a step whose only honest answer is nothing is a step that teaches skimming.
 

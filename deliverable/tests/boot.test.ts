@@ -1,6 +1,6 @@
 // the gate and the walk: what is legal before boot, and boot pulled end to end
 //
-// SMALL FILES ON PURPOSE (owner ruling, 2026-07-30). A test file is the
+// SMALL FILES ON PURPOSE. A test file is the
 // only unit that reaches a second core, so themes get their own file and
 // the suite uses the machine it runs on. See guidance/software.md.
 import { strict as assert } from "node:assert";
@@ -9,7 +9,7 @@ import { fileURLToPath } from "node:url";
 import { compileMachine } from "../engine/machines/compile.ts";
 import { mainMachinePath, Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
-import { anyGuidanceDoc, bootedServer, call, checkDocs, freshRoot, proofFor, pullBoot } from "./helpers.ts";
+import { anyGuidanceDoc, bootedServer, call, checkDocs, freshRoot, proofFor, pullBoot, workHere } from "./helpers.ts";
 
 const REPO_ROOT = fileURLToPath(new URL("../..", import.meta.url));
 
@@ -23,7 +23,7 @@ describe("boot", { concurrency: true }, () => {
     assert.equal(m.states.find((s) => s.id === "end")?.kind, "end");
     const boot = m.states.find((s) => s.id === "boot")!;
     assert.ok(boot.submachine?.endsWith("boot.canvas"), "boot is a sub-machine state");
-    assert.deepEqual(m.states.find((s) => s.id === "idle")?.legal_tools, ["all"]);
+    assert.deepEqual(m.states.find((s) => s.id === "front_desk")?.legal_tools, ["all", "se_note_drain"]);
   });
 
   test("the boot sub-machine compiles with its own mechanical start/end", () => {
@@ -37,7 +37,7 @@ describe("boot", { concurrency: true }, () => {
     // placed is not the projection of the guidance root, so the promotion is
     // guarded mechanically rather than by trust.
     //
-    // AND NOW IT READS NOTHING ON THE WAY OUT (owner ruling 2026-08-07). The
+    // AND NOW IT READS NOTHING ON THE WAY OUT. The
     // handover used to be consumed here. It is gone: boot DERIVES the last
     // session from the call log and puts it on the banner, so there is no
     // document to read, no proof to earn and no file anyone must remember to
@@ -71,7 +71,8 @@ describe("boot", { concurrency: true }, () => {
 
   test("the agent's pulls walk boot: the reading gates, the machine walks, the banner survives the sweep", async () => {
     const root = freshRoot();
-    const server = buildServer(root);
+    const session = new Session(root);
+    const server = buildServer(root, session);
     // The pull says read. Pulling AGAIN without reading hands back the same
     // instruction — the gate bites by SAYING, never by throwing.
     const first = await call(server, "se_pull");
@@ -83,26 +84,39 @@ describe("boot", { concurrency: true }, () => {
     assert.equal(shut.body.clause, "SE-C-110");
     // Drain the reading the honest way — one document per pull, tail proven.
     //
-    // THE ANSWER IS THREADED, never re-pulled. The call that stops answering
-    // `read` is the one that WALKS, and pulling again to look at it throws that
-    // walk away: the target clears itself on arrival, so the extra pull
-    // correctly offers doors and the test reads a success as a failure. With
-    // the contract promoted there may be nothing owed at all, which makes the
-    // very first answer the whole walk.
+    // THE ANSWER IS THREADED, never re-pulled to look at. The call that stops
+    // answering `read` is the one that WALKS, and an idle pull after it throws
+    // that walk away: the target clears itself on arrival, so the extra pull
+    // correctly offers doors and the test reads a success as a failure.
+    //
+    // A MARKED STEP IS A BRANCHING POINT TOO: a state is not left while it
+    // holds open work, so the batch stops at boot's `Startup order` and runs on
+    // once the step is done. What the hops PROVE is unchanged — the way is
+    // walked in a handful of calls, not one call per hop.
     let r = await call(server, "se_pull");
+    const hops: string[] = [];
+    const banners: string[] = [];
     for (let j = 0; j < 40; j++) {
+      hops.push(...((r.body.walked ?? []) as string[]));
+      banners.push(...((r.body.banners ?? []) as string[]));
       const doc = r.body.document as { content?: string } | undefined;
-      if (doc?.content === undefined) break;
-      r = await call(server, "se_pull", { form: { read: proofFor(doc.content) } });
+      if (doc?.content !== undefined) {
+        r = await call(server, "se_pull", { form: { read: proofFor(doc.content) } });
+        continue;
+      }
+      if (r.body.pull !== "do" || r.body.arrived === true) break;
+      if (r.body.refusal === undefined) break;
+      if (workHere(session) === 0) break;
+      r = await call(server, "se_pull");
     }
     // That answer WALKED: boot ran its scripts, idle was crossed, and the
-    // session's default target (the front desk) was reached in ONE call.
+    // session's default target (the front desk) was reached.
     const walked = r;
     assert.equal(walked.body.pull, "do", JSON.stringify(walked.body));
     assert.equal(walked.body.arrived, true);
-    assert.ok((walked.body.walked as string[]).length > 3, "the whole branchless way in one pull");
+    assert.ok(hops.length > 3, `the whole branchless way in a handful of pulls: ${JSON.stringify(hops)}`);
+    assert.ok((walked.body.walked as string[]).length > 1, "and the last of them still carried a batch of hops");
     // THE BANNER EARNED MID-SWEEP SURVIVES — the harness rule says show it.
-    const banners = (walked.body.banners ?? []) as string[];
     assert.ok(
       banners.some((b) => b.includes("Main machine is live")),
       `boot's banner rides the answer: ${JSON.stringify(walked.body)}`,
@@ -112,21 +126,36 @@ describe("boot", { concurrency: true }, () => {
     assert.equal(later.body.banners, undefined);
   });
 
-  test("idle opens the whole lane; pulling to end closes it; after the close the pull still answers", async () => {
+  // PULL UNTIL THE WALK SETTLES, answering any reading it owes on the way.
+  // A route can owe one, and a test that treats that as a failure is testing
+  // the route rather than the thing it names.
+  async function settle(server: Parameters<typeof call>[0]): Promise<Record<string, unknown>> {
+    for (let i = 0; i < 12; i++) {
+      const r = await call(server, "se_pull");
+      if (r.body.pull === "read") {
+        const doc = r.body.document as { content?: string } | undefined;
+        if (doc?.content === undefined) return r.body;
+        await call(server, "se_pull", { form: { read: proofFor(doc.content) } });
+        continue;
+      }
+      if (r.body.pull !== "do") return r.body;
+    }
+    throw new Error("the walk never settled");
+  }
+
+  test("the desk opens the whole lane; pulling to end closes it; after the close the pull still answers", async () => {
     const root = freshRoot();
     const server = await bootedServer(root);
     const w = await call(server, "se_file_write", { path: "x.md", content: "hi", base_hash: null });
     assert.equal(w.isError, false);
-    // With no target, idle comes home to the desk first. The desk then waits
-    // with the live doors as options, and end is answered as a form.
-    const first = await call(server, "se_pull");
-    const offer = first.body.pull === "do" ? await call(server, "se_pull") : first;
-    assert.equal(offer.body.pull, "wait", JSON.stringify(offer.body));
+    // Boot lands ON the desk now. With no target it waits there, with the live
+    // doors as options, and end is answered as a form.
+    const offer = await settle(server);
+    assert.equal(offer.pull, "wait", JSON.stringify(offer));
     const exit = await call(server, "se_pull", { form: { choice: "end" } });
     assert.equal(exit.isError, false, JSON.stringify(exit.body));
-    const rest0 = await call(server, "se_pull");
-    const rest = rest0.body.pull === "do" ? await call(server, "se_pull") : rest0;
-    assert.equal(rest.body.pull, "wait", JSON.stringify(rest.body));
+    const rest = await settle(server);
+    assert.equal(rest.pull, "wait", JSON.stringify(rest));
     const after = await call(server, "se_file_read", { path: "x.md" });
     assert.equal(after.isError, true);
     assert.equal(after.body.clause, "SE-C-110");
@@ -134,9 +163,10 @@ describe("boot", { concurrency: true }, () => {
 
   test("the gate is logged like everything else — a refused pre-boot call lands in the log", async () => {
     const root = freshRoot();
-    const server = buildServer(root);
+    const session = new Session(root);
+    const server = buildServer(root, session);
     await call(server, "se_run", { command: "echo nope" }); // refused at start
-    await pullBoot(server);
+    await pullBoot(server, session);
     const q = await call(server, "se_log_query", { filter: { ok: false } });
     const recs = q.body.records as { tool: string; outcome: string }[];
     assert.equal(recs.length, 1);
@@ -161,11 +191,11 @@ describe("boot", { concurrency: true }, () => {
     // simply has nothing to check.
     checkDocs(s);
     await s.advance();
-    assert.deepEqual(s.active(), ["boot/prepare_idle"]);
-    await s.advance(); // prepare_idle -> boot's visible end position
+    assert.deepEqual(s.active(), ["boot/prepare_desk"]);
+    await s.advance(); // prepare_desk -> boot's visible end position
     assert.deepEqual(s.active(), ["boot/end"]);
     await s.advance(); // pop back to main: boot filled, idle
-    assert.deepEqual(s.active(), ["idle"]);
+    assert.deepEqual(s.active(), ["front_desk"]);
     // idle is a hub now: an unnamed advance is refused, the step must choose
     await assert.rejects(
       () => s.advance(),
@@ -177,7 +207,7 @@ describe("boot", { concurrency: true }, () => {
     await s.advance(); // nothing open: start runs to end
     assert.deepEqual(s.active(), ["expeditions/end"]);
     await s.advance(); // pop: filled, back at idle
-    assert.deepEqual(s.active(), ["idle"]);
+    assert.deepEqual(s.active(), ["front_desk"]);
     await s.advance("end");
     assert.equal((s.describe() as { status: string }).status, "closed");
   });
@@ -202,7 +232,7 @@ describe("boot", { concurrency: true }, () => {
     ).states[0];
     // BOOT OWES NOTHING ON THE WAY OUT. The contract, the walk, the lane and
     // the voice went to the prompt layer, and the handover was retired
-    // outright (owner ruling 2026-08-07) — the last session is derived from
+    // outright — the last session is derived from
     // the call log now and rides the banner. An absent dictionary is the shape
     // of a boot that owes nothing, which is the whole point.
     assert.deepEqual(Object.keys(state.exit ?? {}), [], "nothing is demanded on the way out any more");
@@ -218,7 +248,7 @@ describe("boot", { concurrency: true }, () => {
     );
     assert.ok(Array.isArray(state.lookahead_read), "packet carries preread hint field");
     assert.ok(
-      (state.next ?? []).some((n) => n.to === "prepare_idle" && Array.isArray(n.entry_read)),
+      (state.next ?? []).some((n) => n.to === "prepare_desk" && Array.isArray(n.entry_read)),
       "each next edge carries its own read requirement list",
     );
   });

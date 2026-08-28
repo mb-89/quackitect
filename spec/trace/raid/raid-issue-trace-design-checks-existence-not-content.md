@@ -13,6 +13,7 @@ how_likely: plausible
 source_refs:
   - dsp-help-search.md
   - spec/iterations/i8-se-help-a-logged-keyword-search-over-the/gate-implementation (this iteration's own round_2_red_team)
+place: i7-the-trace-sharpens-finer-grain-than-file
 ---
 
 Found while fixing i8's own gate-implementation: dsp-help-search.md names

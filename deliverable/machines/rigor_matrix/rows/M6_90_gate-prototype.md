@@ -16,8 +16,7 @@ legal_tools:
   - se_file_list
   - se_log_query
   - se_answer
-  - se_web_search
-  - se_web_fetch
+  - se_run
 evidence:
   - name: buildable
     template: choice-with-rationale
@@ -26,15 +25,17 @@ evidence:
       - no
     description: the one judgment this gate asks — is the design buildable as evidenced, and why
 major: full
+major_complexity: C3/R4
 minor: none
 patch: none
 product: full
+product_complexity: C3/R4
 specification: tailored
 major_note: |
   Applies in full: the riskiest assumptions validated by evidence, the
   design buildable, every spike's evidence pinned.
 minor_note: |
-  Does not apply (owner ruling 2026-08-13). M6 is struck whole at this
+  Does not apply. M6 is struck whole at this
   size, so this gate would guard an empty milestone.
 patch_note: |
   Does not apply. Nothing was proved because nothing needed proving.
@@ -52,11 +53,11 @@ specification_note: |
 
 BUILDABLE is the gate's judgment — yes or no with the why.
 
-RESULTS RECORDED is struck as mechanical (owner ruling 2026-08-10):
+RESULTS RECORDED is struck as mechanical:
 every seeded spike leaves an experiment node, and fold-back's submit
 refuses while any node's fold keys stand unanswered.
 
-ASSUMPTIONS VALIDATED is UNDER DISCUSSION with the owner (2026-08-10) —
+ASSUMPTIONS VALIDATED is UNDER DISCUSSION with the owner —
 its shape here is not settled. Until it is, the bless reads the
 register's assumptions and their probe results as data.
 

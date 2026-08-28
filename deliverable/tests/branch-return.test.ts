@@ -14,6 +14,9 @@ const step = (from: string, to: string): RouteStep => ({
   tick: { from, to: to.split("/").pop() ?? to },
   priority: 0.2,
   demands: {},
+  // The wrap detector reads only from and to, so the drawing cost is
+  // irrelevant here and is fixed rather than measured.
+  ms: 0,
 });
 
 describe("the wrap detector", { concurrency: true }, () => {
@@ -22,8 +25,8 @@ describe("the wrap detector", { concurrency: true }, () => {
       step("it/i2/build/b2", "it/i2/build/end"),
       step("it/i2/build/end", "it/i2/trace"),
       step("it/i2/shipped", "it/end"),
-      step("it/end", "idle"),
-      step("idle", "it/start"),
+      step("it/end", "front_desk"),
+      step("front_desk", "it/start"),
       step("it/start", "it/i2/build/b1"),
       step("it/i2/build/b1", "it/i2/build/b3"),
     ];
@@ -35,8 +38,8 @@ describe("the wrap detector", { concurrency: true }, () => {
     assert.equal(routeWraps("it/i2/gate", "it/i2/specify", steps), false);
   });
 
-  test("a cross-machine route through idle is not a wrap — there is no shared machine to stay inside", () => {
-    const steps = [step("front_desk", "idle"), step("idle", "it/start")];
+  test("a cross-machine route through the desk is not a wrap — there is no shared machine to stay inside", () => {
+    const steps = [step("front_desk", "it/start")];
     assert.equal(routeWraps("front_desk", "it/start/x", steps), false);
   });
 });

@@ -3,11 +3,11 @@ minted_in: i38-the-machine-sizes-its-own-driver-every-s
 id: raid-iss-a-function-may-name-a-cluster-that-does-not-exist
 type: "[[raid]]"
 kind: issue
-statement: "A function's cluster field can name a group no cluster node declares, and nothing anywhere reports it — the field holds a bare name, every offer list and every lookup speaks node ids, and the dangling-reference guard does not read the field at all."
+statement: A function's cluster field can name a group no cluster node declares, and nothing anywhere reports it — the field holds a bare name, every offer list and every lookup speaks node ids, and the dangling-reference guard does not read the field at all.
 owner: the walking agent
-trigger: "M4 partition-functions naming a new cluster, and any later form whose picks are drawn from the declared clusters"
+trigger: M4 partition-functions naming a new cluster, and any later form whose picks are drawn from the declared clusters
 status: open
-impact: "This iteration declared the-sizing at partition-functions and signed the state. No cluster node was written. Every downstream form that offers the declared clusters offered eight and could not name the one the iteration was about, and the morphological chart's cluster lookup misses for every option that names a cluster rather than a design question — CORRECTED at gate-candidates, where a hostile pass caught this field claiming forty-nine FUNCTIONS. stateform.ts:333 filters to option nodes and function nodes never reach the lookup at :347, which the node's own body already said three paragraphs further down. The impact was inflated and the body was right."
+impact: This iteration declared the-sizing at partition-functions and signed the state. No cluster node was written. Every downstream form that offers the declared clusters offered eight and could not name the one the iteration was about, and the morphological chart's cluster lookup misses for every option that names a cluster rather than a design question — CORRECTED at gate-candidates, where a hostile pass caught this field claiming forty-nine FUNCTIONS. stateform.ts:333 filters to option nodes and function nodes never reach the lookup at :347, which the node's own body already said three paragraphs further down. The impact was inflated and the body was right.
 breaks_how_badly: abrasive
 how_likely: expected
 probe: "THREE REPRESENTATIONS OF ONE FACT, each verified by reading. (1) The stored form is bare: every function node carries `cluster: the-walk`, measured across spec/trace/function — nine distinct values, none prefixed. (2) The offered form is a node id: stateform.ts:560 resolves $clusters to clusterItems, which is typedItems(traceRoot, 'cluster') and returns cluster-the-walk. Before cluster-the-sizing was written the offer list held eight entries and the corpus held nine cluster values on functions; after writing it, nine and nine. (3) The guard never looks: engine/guard.ts:18 lists nine REFERENCE_KEYS and cluster is not among them, and adding it would not help, because fileForId at vocabulary.ts:129 resolves by declared id prefix and returns undefined for the-sizing, which guard.ts:54 then skips silently. The same mismatch is visible in stateform.ts:347, where an option's cluster is looked up in a map keyed by node id."
@@ -16,6 +16,7 @@ source_refs:
   - i38-the-machine-sizes-its-own-driver-every-s
 weighs_with: none
 weighs_against: none
+place: i44-the-corpus-resolves-duplicate-headings-a
 ---
 
 ## Graded off the scale, corrected 2026-08-20

@@ -5,7 +5,7 @@ type: "[[option]]"
 statement: work that will run long emits an acknowledgement inside the first second and then reports its progress at least once a minute, so the caller is never left guessing and never has to ask
 cluster: cluster-the-handback
 found_by: prior-art
-source: "v1 at ref main, product/quackitect/project_types/default/guides/responsiveness.md lines 4 and 11 to 13 — the predecessor, read as the prior-art card's step 0 demands"
+source: v1 at ref main, product/quackitect/project_types/default/guides/responsiveness.md lines 4 and 11 to 13 — the predecessor, read as the prior-art card's step 0 demands
 ---
 
 ## Mechanism

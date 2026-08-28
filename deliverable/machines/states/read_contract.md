@@ -2,7 +2,6 @@
 state: read_contract
 state_kind: work
 priority: mechanical
-tags: boot
 legal_tools: se_file_read, se_note
 guidance: |
   BOOT IS SHORT NOW. Four documents are already in your PROMPT LAYER, present
@@ -13,11 +12,11 @@ guidance: |
 
   NOTHING IS OWED HERE AT ALL. There is no handover to read any more.
 
-  The briefing on the last session is DERIVED from the call log. It rides the
-  boot banner, so it needs no document, no reading proof and no extra hop.
-  Just pull onward.
+  The boot banner carries the greeting and nothing else. Its last-session block
+  was cut on 2026-08-28 because nobody read it. So there is no document here,
+  no reading proof and no extra hop. Just pull onward.
 
-  Does something in that briefing matter beyond this session? Put it where it
+  Does something from the last session matter beyond this one? Put it where it
   belongs while you are thinking of it.
 
   - A note. se_note is legal here for exactly this.
@@ -47,7 +46,7 @@ before.
 ## The handover, which nobody writes any more
 
 There used to be a `.se/HANDOVER.md`, read here and destroyed on the way out.
-It is gone (owner ruling 2026-08-07).
+It is gone.
 
 WHY IT WENT. The duty to write one was enforced at the `end` state. Sessions
 do not end there. They get killed — the host closes, the person walks away,

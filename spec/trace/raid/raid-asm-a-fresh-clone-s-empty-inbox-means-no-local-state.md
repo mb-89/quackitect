@@ -3,20 +3,21 @@ minted_in: i5-engine-hygiene-one-version-source-every-
 id: raid-asm-a-fresh-clone-s-empty-inbox-means-no-local-state
 type: "[[raid]]"
 kind: issue
-statement: "An empty notes inbox means the retro is already done, and that reading holds on a fresh cloud clone as well as on a laptop."
+statement: An empty notes inbox means the retro is already done, and that reading holds on a fresh cloud clone as well as on a laptop.
 owner: the owner
 trigger: the first onboard-retro or desk retro that runs on a container created after the last one ended
 status: open
-impact: "The onboard-retro skips on a signal that carries no information. Notes written on another machine are never seen, and the mining steps read one session instead of a period."
+impact: The onboard-retro skips on a signal that carries no information. Notes written on another machine are never seen, and the mining steps read one session instead of a period.
 breaks_how_badly: corrosive
 how_likely: expected
-probe: "FALSE ON A CLOUD CLONE, probed 2026-08-19 on this container. The inbox and the call log both live outside git — .se/notes.jsonl does not exist here at all, and .se/calls.jsonl opened at this session's first record, 10:40:44Z. So the inbox read zero because the container is new, not because a retro emptied it. The empty-inbox skip rule still produced the right ACT here, since there was genuinely nothing to drain on this clone, but it produced it for the wrong reason. On a laptop the assumption holds, because the same .se folder survives between sessions."
+probe: FALSE ON A CLOUD CLONE, probed 2026-08-19 on this container. The inbox and the call log both live outside git — .se/notes.jsonl does not exist here at all, and .se/calls.jsonl opened at this session's first record, 10:40:44Z. So the inbox read zero because the container is new, not because a retro emptied it. The empty-inbox skip rule still produced the right ACT here, since there was genuinely nothing to drain on this clone, but it produced it for the wrong reason. On a laptop the assumption holds, because the same .se folder survives between sessions.
 probed: 2026-08-19
 source_refs:
   - i5-engine-hygiene-one-version-source-every-
   - raid-asm-a-cloud-clone-can-reach-the-remote-it-came-from
 weighs_with: none
 weighs_against: none
+place: retro
 ---
 
 ## What changed the kind

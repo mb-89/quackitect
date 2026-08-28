@@ -4,9 +4,9 @@ id: opt-the-decision-is-fixed-within-a-run-and-revised-between-them
 type: "[[option]]"
 cluster: the-sizing
 question: when the decision may change
-statement: "the mapping is frozen for the whole of a record's walk and revised only between walks, so a finished record replays exactly while the table still learns from what the finished records showed"
+statement: the mapping is frozen for the whole of a record's walk and revised only between walks, so a finished record replays exactly while the table still learns from what the finished records showed
 found_by: contradiction
-source: "TRIZ principle 13, the other way round, from the reliability-against-adaptability cell of the contradiction matrix vendored at deliverable/vendor/triz/triz-matrix.json — instead of making the decision adapt, make the thing being adapted sit still while the walk runs"
+source: TRIZ principle 13, the other way round, from the reliability-against-adaptability cell of the contradiction matrix vendored at deliverable/vendor/triz/triz-matrix.json — instead of making the decision adapt, make the thing being adapted sit still while the walk runs
 ---
 
 ## Mechanism

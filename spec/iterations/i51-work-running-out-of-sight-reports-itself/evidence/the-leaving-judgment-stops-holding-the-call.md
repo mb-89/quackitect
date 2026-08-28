@@ -3,7 +3,7 @@ form: the-leaving-judgment-stops-holding-the-call
 by: agent
 signed_off: 2026-08-21T11:24:19.598Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / the-leaving-judgment-stops-holding-the-call

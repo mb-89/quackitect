@@ -3,9 +3,9 @@ minted_in: i9
 id: raid-dec-the-machine-state-sits-inside-the-opened-folder-and-one-declaration-names-it
 type: "[[raid]]"
 kind: decision
-statement: "The machine-state folder sits inside the folder a person opens, and exactly one declaration says what it is, from which path resolution, the lane's read exclusion, the producing acts' exclusion and the editor's hide rule are all generated."
+statement: The machine-state folder sits inside the folder a person opens, and exactly one declaration says what it is, from which path resolution, the lane's read exclusion, the producing acts' exclusion and the editor's hide rule are all generated.
 owner: the driving agent
-trigger: "any change to what the machine-state folder is called or which of its files are withheld"
+trigger: any change to what the machine-state folder is called or which of its files are withheld
 status: decided
 breaks_how_badly: crippling
 how_likely: plausible
@@ -13,7 +13,7 @@ source_refs:
   - req-the-machine-state-sits-in-the-folder-that-is-open
   - req-only-a-file-with-its-own-door-is-withheld
   - req-product-is-a-folder
-  - "cand-nothing-can-be-forgotten, the declared winner"
+  - cand-nothing-can-be-forgotten, the declared winner
 ---
 
 ## Rejected options

@@ -1,7 +1,7 @@
 ---
 steps:
   - id: copilot-stop-contract
-    statement: "probe raid-asm-an-engineer-can-tell-stop-hook-from-cancellation-today - observe a Copilot stop request during active work and distinguish hook veto, client reset, transport loss and server exit"
+    statement: probe raid-asm-an-engineer-can-tell-stop-hook-from-cancellation-today - observe a Copilot stop request during active work and distinguish hook veto, client reset, transport loss and server exit
     depends_on: []
     realization: probe
 ---

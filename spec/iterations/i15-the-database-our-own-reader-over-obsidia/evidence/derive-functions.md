@@ -1,6 +1,6 @@
 ---
 form: derive-functions
-reopened: "2026-08-19T17:27:07.758Z — same claims-registration gap, cascading fix through M3"
+reopened: 2026-08-19T17:27:07.758Z — same claims-registration gap, cascading fix through M3
 by: agent
 signed_off: 2026-08-19T17:29:15.048Z
 authors: agent

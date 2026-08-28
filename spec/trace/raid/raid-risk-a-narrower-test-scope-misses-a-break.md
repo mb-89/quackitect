@@ -3,11 +3,11 @@ minted_in: i51-work-running-out-of-sight-reports-itself
 id: raid-risk-a-narrower-test-scope-misses-a-break
 type: "[[raid]]"
 kind: risk
-statement: "Teaching the engine to run fewer tests for a change lets a real break through, because the mapping from a changed file to the tests that answer for it is a guess."
+statement: Teaching the engine to run fewer tests for a change lets a real break through, because the mapping from a changed file to the tests that answer for it is a guess.
 owner: the driving agent
 trigger: the first verification battery that fails on something a scoped run for the same diff had passed
 status: open
-impact: "A scoped run that passes is read as evidence the change is sound. Where the mapping missed the test that would have caught it, the walk carries a false green as far as verification."
+impact: A scoped run that passes is read as evidence the change is sound. Where the mapping missed the test that would have caught it, the walk carries a false green as far as verification.
 breaks_how_badly: corrosive
 how_likely: plausible
 source_refs:

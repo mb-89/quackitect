@@ -389,7 +389,7 @@ Write-Host "  .copilot\mcp-config.json in place"
 
 # The FAST gate only (sub-second): canvases compile, hard deps answer, the
 # log location is writable. The FULL test suite is not run here - it runs
-# INSIDE boot (prepare_idle's selftest exit script), engine-observed, so
+# INSIDE boot (prepare_desk's selftest exit script), engine-observed, so
 # launching stays instant and the walk still proves the engine green.
 Write-Host "$P - preflight (full selftests run in boot)" -ForegroundColor Cyan
 Push-Location (Join-Path $root "deliverable")

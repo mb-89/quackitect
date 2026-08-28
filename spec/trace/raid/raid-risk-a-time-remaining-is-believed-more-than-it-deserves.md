@@ -3,11 +3,11 @@ minted_in: i51-work-running-out-of-sight-reports-itself
 id: raid-risk-a-time-remaining-is-believed-more-than-it-deserves
 type: "[[raid]]"
 kind: risk
-statement: "A figure for how much longer a job needs is acted on as though it were measured, when the timings behind it are known to be wrong."
+statement: A figure for how much longer a job needs is acted on as though it were measured, when the timings behind it are known to be wrong.
 owner: the driving agent
 trigger: the first time a caller waits the reported time and the job is still running when it comes back
 status: open
-impact: "A caller that reads forty seconds waits forty seconds. Where the figure is wrong by an order of magnitude the caller either wastes the wait or resumes polling, which is the behaviour the goal exists to stop."
+impact: A caller that reads forty seconds waits forty seconds. Where the figure is wrong by an order of magnitude the caller either wastes the wait or resumes polling, which is the behaviour the goal exists to stop.
 breaks_how_badly: corrosive
 how_likely: expected
 source_refs:

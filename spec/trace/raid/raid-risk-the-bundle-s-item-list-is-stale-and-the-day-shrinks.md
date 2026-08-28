@@ -3,11 +3,11 @@ minted_in: i5-engine-hygiene-one-version-source-every-
 id: raid-risk-the-bundle-s-item-list-is-stale-and-the-day-shrinks
 type: "[[raid]]"
 kind: risk
-statement: "Most of i5's thirteen items are already fixed or retired, so the iteration turns out to be a bookkeeping pass rather than a day of work."
+statement: Most of i5's thirteen items are already fixed or retired, so the iteration turns out to be a bookkeeping pass rather than a day of work.
 owner: the owner
 trigger: frame-delta, where every remaining item is opened against the tree
 status: open
-impact: "The record spends a full 29-state walk on a scope that no longer exists. The ceremony costs what an iteration costs, and the output is a list of strikes."
+impact: The record spends a full 29-state walk on a scope that no longer exists. The ceremony costs what an iteration costs, and the output is a list of strikes.
 breaks_how_badly: abrasive
 how_likely: plausible
 source_refs:

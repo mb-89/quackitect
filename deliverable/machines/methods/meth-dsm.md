@@ -12,7 +12,7 @@ far only been eyeballed off a diagram.
 Reach for a DSM whenever a grouping or tearing decision needs data instead of
 intuition.
 
-## Effect
+## Effect #work
 
 Turns coupling into a data structure every downstream operation reads:
 
@@ -32,7 +32,7 @@ Browning's classification splits the kinds in two.
 - Component, architecture and parameter DSMs. Analysed by clustering.
 - Activity and schedule DSMs. Analysed by sequencing.
 
-## Procedure
+## Procedure #work
 
 List the domain's elements once, in the same order on rows and columns.
 

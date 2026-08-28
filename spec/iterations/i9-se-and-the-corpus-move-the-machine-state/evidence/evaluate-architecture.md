@@ -1,10 +1,10 @@
 ---
 form: evaluate-architecture
-amended: "2026-08-19T17:19:36.425Z by agent — the verdict lines named each requirement bare, and the deck's check reads them only as links"
+amended: 2026-08-19T17:19:36.425Z by agent — the verdict lines named each requirement bare, and the deck's check reads them only as links
 by: agent
 signed_off: 2026-08-19T17:17:20.193Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / evaluate-architecture

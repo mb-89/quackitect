@@ -7,7 +7,7 @@ Lives in `guidance/authoring/`. The three layers are:
 - the engine — code
 
 The authoring rules for drawn machines. Written after the first canvas
-shipped with paths Obsidian could not resolve (owner fix 2026-07-26) — so
+shipped with paths Obsidian could not resolve — so
 the mistakes stay fixed. Follow this EVERY time a canvas is created or
 edited; the compiler enforces most of it and refuses loudly, but layout and
 paths it can only partially check.
@@ -18,8 +18,8 @@ paths it can only partially check.
 a canvas is VAULT-RELATIVE, and since the folder levels collapsed that is the
 same spelling as root-relative — one form, right in both places:
 
-- right: `"file": "deliverable/machines/states/idle.md"`
-- wrong: `"file": "states/idle.md"` (canvas-relative — Obsidian shows a
+- right: `"file": "deliverable/machines/states/front_desk.md"`
+- wrong: `"file": "states/front_desk.md"` (canvas-relative — Obsidian shows a
   broken node)
 
 THIS USED TO BE THREE FORMS. The vault root was a folder one level down, so a
@@ -58,8 +58,9 @@ name, not "done".
   **label is the guard** (`<counter> <op> <int>`) — nothing else goes in a
   label. Always set `fromSide`/`toSide` so the drawing stays readable.
 - **Hub rule**: a state's inbound NORMAL edges form an AND-join — it waits
-  for all of them. RETURN edges to a hub (idle) must be `alternative`, or
-  the hub becomes unreachable. Found twice: v2's gate_inputs, v3's idle.
+  for all of them. RETURN edges to a hub (the front desk) must be
+  `alternative`, or the hub becomes unreachable. Found twice: v2's
+  gate_inputs, v3's idle before it was removed.
 - **Text nodes are comments** — annotate freely, the compiler skips them.
 - **Groups are geometric**: a state whose center sits inside a group
   rectangle carries its label. Presentation only.
@@ -74,7 +75,7 @@ Agent-facing lives in FRONTMATTER; the body is prose for humans. First
 
 ```
 ---
-state: idle                  # the state's id (required)
+state: front_desk            # the state's id (required)
 state_kind: work             # work | gate | terminal | start | end (required)
 legal_tools: all             # THE STATE GATE: tools legal here (`all` opens the lane;
                              # se_pull is ALWAYS legal — it is the machinery)
@@ -116,7 +117,7 @@ Two types exist today:
 - `script` — args are scripts the engine runs, and exit 0 is the evidence.
   The STATE names what runs, as boot does with its preflight and selftest.
 
-THE PULL GATES ENTRY (owner ruling 2026-07-26): outside boot, entering a
+THE PULL GATES ENTRY: outside boot, entering a
 state also demands its pulled guidance proven read, the same way — hashes
 from the agent, checks from the human. Boot is exempt (it is where the
 first reads happen); a state's own `exit_read` list is excluded from its
@@ -135,8 +136,11 @@ THE RUNGS ARE WORDS, and the words are the truth (owner cut-over ruling
 and the numbers beside the rungs are transitional anchors for the
 weighing. Author `priority:` as a rung word:
 
-- **mechanical** — what mainly the engine does, carried out as decided:
-  start/end pills, boot's steps, idle, the route.
+- **mechanical** — what mainly the engine does, carried out as decided.
+  - start and end pills
+  - boot's steps
+  - the front desk
+  - the route
 - **operational** — single steps and submitting: the work and find
   states, frame, diverge, converge.
 - **tactical** — running iterations and expeditions, seeding and
@@ -178,7 +182,7 @@ visibility — only conditions gate. Never author `pulled`.
 - A NEW NODE IS BORN THE SIZE OF ITS LABEL. Make it just big enough for the
   title and the subtitle. Nothing more.
 - The old rule sized a node to display its whole NOTE, around 620 × 640. It
-  is struck (owner ruling 2026-07-28). A note-reading box is far too big for
+  is struck. A note-reading box is far too big for
   what a machine drawing shows.
 - THE SIZE YOU DRAW IS THE SIZE THAT RENDERS. The render takes the geometry
   verbatim now. Adjust a node in Obsidian and the mirror agrees on reload.

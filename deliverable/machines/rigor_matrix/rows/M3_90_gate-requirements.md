@@ -17,13 +17,15 @@ legal_tools:
   - se_file_list
   - se_log_query
   - se_answer
-  - se_web_search
-  - se_web_fetch
+  - se_run
 evidence: []
 major: full
+major_complexity: C3/R4
 minor: full
+minor_complexity: C3/R4
 patch: none
 product: full
+product_complexity: C3/R4
 specification: tailored
 major_note: |
   Applies in full. End of design input; everything after is solution
@@ -56,7 +58,7 @@ specification_note: |
 
 Design input ends here. The requirements and the function structure stand blessed. Everything after is solution space.
 
-THIS GATE CARRIES NO FIELDS OF ITS OWN, and that is deliberate (owner ruling 2026-08-07). Six stood here. Each was already settled elsewhere:
+THIS GATE CARRIES NO FIELDS OF ITS OWN, and that is deliberate. Six stood here. Each was already settled elsewhere:
 
 - verifiable: the requirement template demands a `verify_method` from a fixed set.
 - traced: the register declares `covers: use-case`, checked both ways.
@@ -67,7 +69,7 @@ THIS GATE CARRIES NO FIELDS OF ITS OWN, and that is deliberate (owner ruling 202
 
 A GATE THAT RE-ASKS A MECHANICAL CHECK TEACHES PEOPLE TO SKIM. A field that can only say yes trains the reader to stop reading. The fields that could have said no get skimmed with the rest.
 
-ONE THING THIS GATE DOES ASK, and it is an adjudication rather than a re-check (owner instruction 2026-08-19). Read `quality_groups_swept` from write-requirements. It carries one line per ISO/IEC 25010:2023 characteristic, nine in all.
+ONE THING THIS GATE DOES ASK, and it is an adjudication rather than a re-check. Read `quality_groups_swept` from write-requirements. It carries one line per ISO/IEC 25010:2023 characteristic, nine in all.
 
 Rule on every gap it names. Each one stays open with a stated reason, or a row is owed before this gate blesses.
 

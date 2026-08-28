@@ -3,9 +3,9 @@ form: gate-inputs
 bless: blessed by agent
 by: agent
 signed_off: 2026-08-19T09:50:44.732Z
-reopened: "2026-08-19T09:50:19.008Z — Quality stories and invented quality use cases were removed; six ISO quality requirements now carry that behavior."
+reopened: 2026-08-19T09:50:19.008Z — Quality stories and invented quality use cases were removed; six ISO quality requirements now carry that behavior.
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / gate-inputs

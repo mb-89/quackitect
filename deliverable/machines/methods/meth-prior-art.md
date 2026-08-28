@@ -13,7 +13,7 @@ been solved and why. Reuse beats rediscovery.
 Caching, undo, scheduling and review flows all have decades of art behind
 them.
 
-## THE EVIDENCE IS A DESCRIPTION, AND THAT IS THE WHOLE DISTINCTION
+## THE EVIDENCE IS A DESCRIPTION, AND THAT IS THE WHOLE DISTINCTION #work
 
 This card and [[meth-benchmarking]] are told apart by WHAT YOU ARE HOLDING,
 never by what the thing is.
@@ -35,11 +35,11 @@ description, or did you LOOK at the artifact? Reading is here. Looking is
 benchmarking.
 
 THIS CARD USED TO SAY "somebody shipped this already" AND TO SWEEP "products
-that do it" (owner ruling 2026-08-08). That was benchmarking's territory
+that do it". That was benchmarking's territory
 written into prior art's card, and it left the two finders with no rule that
 could separate them.
 
-## THE TWO FAILURE MODES ARE OPPOSITE
+## THE TWO FAILURE MODES ARE OPPOSITE #work
 
 - PRIOR ART FAILS BY BEING ASPIRATIONAL. A paper describes a design nobody
   ever ran, and its costs were never paid by anybody.
@@ -50,8 +50,10 @@ That is why both run. Each one's blind spot is the other's evidence.
 
 ## Steps
 
-0. READ THE PREDECESSOR FIRST. This project has earlier versions and they are
-   one argument away on every read verb. `se_file_read`, `se_file_search` and
+0. READ THE PREDECESSOR FIRST #work
+
+   This project has earlier versions and they are one argument away on every
+   read verb. `se_file_read`, `se_file_search` and
    `se_file_glob` all take `ref`. `main` reaches v1, `v2` reaches v2.
 
    IT IS THE ONLY CODEBASE THAT EVER SOLVED THESE PROBLEMS FOR THIS METHOD. A
@@ -62,18 +64,26 @@ That is why both run. Each one's blind spot is the other's evidence.
    MINE IT FOR FEATURES, NEVER FOR AUTHORITY. A decision recorded in an earlier
    version is evidence that version tried it, and nothing more.
 
-1. Name the problem in the field's vocabulary. Finding the right TERM is half
-   the search, and `se_web_search` earns its keep here.
-2. Sweep three angles, all of them written: patterns that describe it,
+1. Name the problem in the field's vocabulary #work
+
+   Finding the right TERM is half the search, and `se_web_search` earns its
+   keep here.
+2. Sweep three angles, all of them written: #work
+
+   patterns that describe it,
    standards that govern it, failures written up about it.
-3. For each find, ask what adopting it would look like HERE, and what our
+3. For each find, ask what adopting it would look like HERE #work
+
+   And what our
    context breaks.
-4. Cite everything. An idea with a source is checkable; one without is a
+4. Cite everything #work
+
+   An idea with a source is checkable; one without is a
    rumour.
 
-## STORING A BIG SWEEP
+## STORING A BIG SWEEP #work
 
-EXTENSIVE RESEARCH IS NEVER THROWN AWAY (owner instruction 2026-08-18).
+EXTENSIVE RESEARCH IS NEVER THROWN AWAY.
 
 - IT IS STORED LOCALLY, under `scratchpad/research/`, and never
   committed. The scratchpad is the workbench.
@@ -89,18 +99,18 @@ reading, none of them the question it was commissioned for.
 WHAT A MINED FINDING THEN BECOMES IS STILL OPEN. It stands as a work token in
 the pool, because a finding with no reader is landfill.
 
-## THE BACK-CHECK, AND IT IS NOT HERE
+## THE BACK-CHECK, AND IT IS NOT HERE #work
 
 This card is the FRONT end: research before invention.
 
-THERE IS A BACK END TOO (owner ruling 2026-08-18). A chosen design that
+THERE IS A BACK END TOO. A chosen design that
 re-derives existing prior art owes a study of the original. What does the
 original do better than ours? What cost did it pay that we have not paid yet?
 
 IT RUNS AT record-adrs IN M5, not here. By then a winner exists, so the
 question has something concrete to compare against.
 
-## Output
+## Output #work
 
 One [[option]] node per idea, each naming its cluster and its source. Plus
 the dry wells: a cluster nobody has published about is a finding, not a gap

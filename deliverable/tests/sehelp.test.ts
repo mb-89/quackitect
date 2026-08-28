@@ -47,6 +47,41 @@ test("a query matching a guidance page's own statement surfaces it", async () =>
   );
 });
 
+test("a question about one refusal clause lands on that clause's own section", async () => {
+  // THE PAGE IS NOT THE ANSWER. Every clause the lane can throw lives on one
+  // page under one heading each. Before sections, this query answered
+  // "guidance/refusals.md" and left the reader to find the clause.
+  const root = freshRoot();
+  gitInit(root);
+  const server = await bootedServer(root);
+  const found = (await call(server, "se_help", { query: "my point is parked for nowhere" })).body as unknown as HelpResult;
+  assert.equal(found.miss, false);
+  assert.match(found.matches[0].name, /refusals\.md § SE-C-148/, `got ${JSON.stringify(found.matches.slice(0, 3))}`);
+});
+
+test("a question a method card answers finds the card's section", async () => {
+  const root = freshRoot();
+  gitInit(root);
+  const server = await bootedServer(root);
+  const found = (await call(server, "se_help", { query: "measure the answer limit on this host" })).body as unknown as HelpResult;
+  assert.equal(found.miss, false);
+  assert.ok(
+    found.matches.some((m) => m.kind === "guidance" && /boot\.md §/.test(m.name)),
+    `expected a section of the boot card, got ${JSON.stringify(found.matches.slice(0, 3))}`,
+  );
+});
+
+test("a query whose words are all common misses — coincidence is not a match", async () => {
+  // COVERAGE ALONE IS FOOLED. "different" and "query" turn up across a corpus
+  // this size, so a query built from them alone covers and means nothing. An
+  // answer must also share one UNCOMMON word.
+  const root = freshRoot();
+  gitInit(root);
+  const server = await bootedServer(root);
+  const found = (await call(server, "se_help", { query: "totally different unmatched gibberish query" })).body as unknown as HelpResult;
+  assert.equal(found.miss, true, `expected a miss, got ${JSON.stringify(found.matches.slice(0, 3))}`);
+});
+
 test("a nonsense query misses, is logged, and demands rank by shape", async () => {
   const root = freshRoot();
   gitInit(root);

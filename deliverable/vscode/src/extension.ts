@@ -286,6 +286,48 @@ async function api(pathname, init) {
 const post = (pathname, body) =>
   api(pathname, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
 
+/** THE ENTRY'S ANSWER GOES BACK TO THE FIELD IT CAME FROM.
+ *
+ *  The webview posts one way and cannot read the engine's reply. A field
+ *  cleared on the press therefore throws away a line the engine then refused,
+ *  and shows an error about text the reader can no longer see.
+ *
+ *  So the host holds the answer, and the host is what tells the field whether
+ *  to clear. The refusal goes through the editor's own notice, which is the
+ *  channel it already uses for everything else that fails here. */
+/** THE BAR'S DIALS, EACH ON ITS OWN ROUTE. Answers whether it took the message.
+ *
+ *  THE SECOND BANK HAS A ROUTE OF ITS OWN. While every stop-at press landed on
+ *  /autonomy the stop-at value never moved, so blockers only stayed locked
+ *  however often bless was pressed.
+ *
+ *  THE DRUMROLL CLIMBS FIRST. The engine refuses emergency below the top rung,
+ *  and the presses may have started anywhere.
+ *
+ *  THE CADENCE GOES OVER AS A PAIR. POST /narration reads {minutes, calls}, and
+ *  a missing half arrives as NaN. */
+async function handleDials(m) {
+  if (m.se === "autonomy") await post("/autonomy", { value: m.value });
+  else if (m.se === "stop-at") await post("/stop-at", { value: m.value });
+  else if (m.se === "emergency") {
+    await post("/autonomy", { value: 1 });
+    await post("/emergency", { on: true });
+  } else if (m.se === "power") await post("/power", { key: m.key, on: m.on });
+  else if (m.se === "narration") await post("/narration", { minutes: m.minutes, calls: m.calls });
+  else return false;
+  return true;
+}
+
+function entryAnswered(view, key, answer) {
+  const ok = answer !== null && answer !== undefined && answer.ok === true;
+  if (!ok) {
+    const why =
+      answer === null || answer === undefined ? "the engine did not answer" : String(answer.expected ?? answer.error ?? "it was refused");
+    void vscode.window.showWarningMessage(`$PRODUCT$: ${why}`);
+  }
+  if (view !== null && view !== undefined) void view.webview.postMessage({ se: "entry", key, ok });
+}
+
 /**
  * THE TWO PRODUCING ACTS, AS BUTTONS.
  *
@@ -554,7 +596,24 @@ async function pollWalk() {
   if (levels === null) levels = await api("/api/levels");
   const p = await api("/api/packet");
   if (p === null) return;
-  const walkNow = `${JSON.stringify(p.active ?? null)}|${String(p.status)}|${String(p.target ?? "")}`;
+  // THE WORK SIGNAL IS PART OF WHAT MOVED, and leaving it out is why the work
+  // editor never redrew. A token opened, taken, settled or placed changes the
+  // work signal and nothing else, so a comparison over position, status and
+  // target alone read as "nothing happened" and no card was woken.
+  //
+  // MEASURED: the owner reported the editor not refreshing four times in one
+  // day. Every other leg of this wire was built and proven — the write lands,
+  // the index hears it, the alive payload carries the signal, and the page
+  // redraws on it. This comparison was the one place the change was dropped.
+  //
+  // IT COMES FROM THE ALIVE PAYLOAD, which is where the signal demonstrably
+  // lives (mirror.ts, `work: allWorkSignal`) and is the same value the page
+  // itself compares. Reading it from the packet instead would be a guess about
+  // a field name, and a wrong guess here fails silently — exactly the shape
+  // this fix exists to remove.
+  const live = await api("/api/alive");
+  const workNow = live === null ? "" : String(live.work ?? "");
+  const walkNow = `${JSON.stringify(p.active ?? null)}|${String(p.status)}|${String(p.target ?? "")}|${workNow}`;
   const moved = walkNow !== lastWalk;
   lastWalk = walkNow;
   packet = p;
@@ -1190,6 +1249,18 @@ class Controls {
   .param-row { display: flex; align-items: center; gap: 6px; }
   .param-label { flex: 0 0 6.2em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--vscode-descriptionForeground); text-transform: uppercase; letter-spacing: .07em; font-size: .8em; cursor: pointer; }
   .param-label:hover { color: var(--vscode-foreground); }
+  /* A TABLE PARAMETER: an ordinary labelled row whose right side is a table.
+     ONE LINE PER ROW. table-layout is fixed so the columns do not jump when a
+     job with a long command arrives, and the last column takes what is left
+     and truncates. The whole cell is on its own tooltip. */
+  .param-table { flex: 1 1 auto; min-width: 0; font-size: .85em; }
+  .param-table.empty { color: var(--vscode-descriptionForeground); }
+  .param-table table { width: 100%; table-layout: fixed; border-collapse: collapse; }
+  .param-table th { text-align: left; font-weight: normal; color: var(--vscode-descriptionForeground); padding: 0 6px 1px 0; }
+  .param-table td { padding: 0 6px 0 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .param-table .col0 { width: 9em; }
+  .param-table .col1 { width: 5em; color: var(--vscode-descriptionForeground); font-variant-numeric: tabular-nums; }
+  .param-table .col2 { width: 6em; color: var(--vscode-descriptionForeground); font-variant-numeric: tabular-nums; }
   .rungs { display: flex; gap: 4px; flex: 1 1 auto; }
   .rung { flex: 1 1 auto; padding: 3px 4px; font: inherit; font-size: .85em; cursor: pointer; background: var(--vscode-button-secondaryBackground); color: var(--vscode-button-secondaryForeground); border: 1px solid var(--vscode-panel-border); border-radius: 4px; }
   .rung:hover { background: var(--vscode-button-secondaryHoverBackground); }
@@ -1364,7 +1435,19 @@ class Controls {
           return;
         }
       }
-      if (rung.classList.contains("locked")) return;
+      // A LOCKED RUNG SAYS WHY IT DECLINED. This returned in silence, and a
+      // control that declines without a word cannot be told from a broken one.
+      // It has been reported as a broken button three times: the emergency
+      // rung, the shutdown row, and the stop-at notches.
+      //
+      // THE RUNG ALREADY KNOWS THE REASON. rungWhy() puts it on the title,
+      // covering both cases: unlock the one below first, or the control was
+      // never told where it stands. Opening that help is the smallest honest
+      // answer to a press, and it uses a channel that already exists.
+      if (rung.classList.contains("locked")) {
+        vsapi.postMessage({ se: "scale-help", which: bank, level: Number(rung.dataset.rung) });
+        return;
+      }
       const level = Number(rung.dataset.level);
       pending[bank] = level;
       paintRungs(bank, level);
@@ -1395,6 +1478,11 @@ class Controls {
       // THE NOTE'S BUTTON CARRIES THE LINE. Every other action posts an empty
       // body; this one would drop a blank note without the field beside it.
       if (act.dataset.post === "/note") { captureNote(); return; }
+      // SO DOES THE WORK BUTTON, and it used to post an empty body like all the
+      // rest — which reached the engine as work with no statement and came back
+      // refused. The reader pressed a button and got an error for a line they
+      // had filled in.
+      if (act.dataset.post === "/work/mint") { captureWork(); return; }
       vsapi.postMessage({ se: "post", path: act.dataset.post });
       return;
     }
@@ -1421,18 +1509,36 @@ class Controls {
   });
   // THE NOTE CARRIES ITS MoSCoW. The choice sits on the same row, so the
   // weight is picked where the stray is written rather than at a retro.
+  //
+  // THE FIELD IS NOT CLEARED HERE. The engine can refuse this line, and the
+  // webview posts one way, so clearing on the press throws away text the reader
+  // then gets an error about. The host clears it when the engine says yes.
   function captureNote() {
     const field = $("bar").querySelector('.param-text[data-key="note_body"]');
     if (field === null || field.value.trim() === "") return;
     const pri = $("bar").querySelector('.param-choice[data-key="note_priority"]');
     vsapi.postMessage({ se: "note", text: field.value, priority: pri === null ? "could" : pri.value });
-    field.value = "";
+  }
+  // A PIECE OF WORK GOES IN THE SAME WAY A NOTE DOES. One line, one button, and
+  // it lands in the backlog until somebody places it.
+  //
+  // THE BODY TRAVELS WITH THE POST, so a future control carrying a field needs
+  // no third branch here and no edit on the host side at all.
+  //
+  // THE KEY RIDES THE POST so the answer can find this field again. Four words
+  // is a refusal the reader has to be able to edit, and they cannot edit what
+  // the box no longer holds.
+  function captureWork() {
+    const field = $("bar").querySelector('.param-text[data-key="work_statement"]');
+    if (field === null || field.value.trim() === "") return;
+    vsapi.postMessage({ se: "post", path: "/work/mint", key: "work_statement", body: { place: "backlog", slot: "pending", statement: field.value.trim() } });
   }
   $("bar").addEventListener("keydown", (ev) => {
     const t = ev.target;
-    if (!t || !t.closest || t.closest('.param-text[data-key="note_body"]') === null) return;
+    if (!t || !t.closest) return;
     if (ev.key !== "Enter") return;
-    captureNote();
+    if (t.closest('.param-text[data-key="note_body"]') !== null) { captureNote(); return; }
+    if (t.closest('.param-text[data-key="work_statement"]') !== null) captureWork();
   });
 
   // THE CADENCE GOES OVER AS A PAIR, because POST /narration reads
@@ -1446,6 +1552,14 @@ class Controls {
 
   window.addEventListener("message", (ev) => {
     const d = ev.data;
+    // AN ENTRY'S ANSWER COMES BACK HERE. Accepted clears the box; refused leaves
+    // it exactly as typed, and the host has already said why.
+    if (d && d.se === "entry") {
+      if (d.ok !== true) return;
+      const f = $("bar").querySelector('.param-text[data-key="' + d.key + '"]');
+      if (f !== null) f.value = "";
+      return;
+    }
     if (!d || d.se !== "state") return;
     applyBar(d.bar);
   });
@@ -1469,29 +1583,24 @@ class Controls {
         return;
       }
       if (m.se === "note") {
-        await post("/note", { text: m.text, priority: m.priority });
+        entryAnswered(view, "note_body", await post("/note", { text: m.text, priority: m.priority }));
         await pollLog();
         return;
       }
       if (await handleBarHelp(m)) return;
-      if (m.se === "autonomy") await post("/autonomy", { value: m.value });
-      // THE SECOND BANK'S OWN ROUTE. Until this branch existed, every
-      // stop-at press landed on /autonomy and the stop-at value never moved
-      // — which is why blockers only stayed locked however often bless was
-      // pressed.
-      else if (m.se === "stop-at") await post("/stop-at", { value: m.value });
-      // THE DRUMROLL ARMED. Climb to the top rung first: the engine refuses
-      // emergency below it, and the presses may have started anywhere.
-      else if (m.se === "emergency") {
-        await post("/autonomy", { value: 1 });
-        await post("/emergency", { on: true });
-      } else if (m.se === "power") await post("/power", { key: m.key, on: m.on });
-      // THE CADENCE IS A PAIR. POST /narration reads {minutes, calls}, so the
-      // old single value left both halves NaN.
-      else if (m.se === "narration") await post("/narration", { minutes: m.minutes, calls: m.calls });
       // AN ACTION CARRIES ITS OWN ROUTE, declared in the panel spec. A new
       // action button works with no edit here.
-      else if (m.se === "post" && typeof m.path === "string" && m.path.startsWith("/")) await post(m.path, {});
+      //
+      // A BODY MAY RIDE ALONG. Without one every action posted `{}`, so a
+      // control carrying a field could not work at all — measured on the work
+      // entry, which came back refused for having no statement.
+      //
+      // A CONTROL CARRYING A FIELD NAMES IT, so the answer reaches the box the
+      // line was typed in. One without a field names none.
+      if (!(await handleDials(m)) && m.se === "post" && typeof m.path === "string" && m.path.startsWith("/")) {
+        const answered = await post(m.path, m.body ?? {});
+        if (typeof m.key === "string") entryAnswered(view, m.key, answered);
+      }
       await pollWalk();
     });
     this.render();
@@ -1531,7 +1640,10 @@ const DIM = (s) => `[2m${s}[0m`;
 // THE TERMINAL'S OWN PALETTE. These are the theme's ansi slots, so the log
 // follows whatever the reader picked, exactly like the rest of the shell.
 // Green and red are spent on pass and fail, so a kind never takes one.
-const KIND_COLOUR = { call: "34", update: "35", note: "33", aq: "36" };
+// WORK WEARS THE NARRATION'S COLOUR. A token opened, taken or settled IS the
+// narration, so the two read as one kind of row. A kind missing from this table
+// prints grey, and built-colours-match.test.ts is what refuses that.
+const KIND_COLOUR = { call: "34", update: "35", work: "35", note: "33", aq: "36" };
 const paint = (code, s) => (code === undefined ? s : `[${code}m${s}[0m`);
 
 function logRow(r) {

@@ -1,10 +1,10 @@
 ---
 form: derive-criteria
-amended: "2026-08-19T14:41:42.510Z by agent — the two cards were answered none while the walk still reports 25 of 108 placed, and the record must say so"
+amended: 2026-08-19T14:41:42.510Z by agent — the two cards were answered none while the walk still reports 25 of 108 placed, and the record must say so
 by: agent
 signed_off: 2026-08-19T14:41:06.264Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / derive-criteria

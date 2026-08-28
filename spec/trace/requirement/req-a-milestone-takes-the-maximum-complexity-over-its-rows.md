@@ -2,17 +2,17 @@
 minted_in: i38-the-machine-sizes-its-own-driver-every-s
 id: req-a-milestone-takes-the-maximum-complexity-over-its-rows
 type: "[[requirement]]"
-statement: "The engine shall name, for every unit of work it sizes, a difficulty no weaker than that of the hardest step the unit contains, making visible in the record how far each step in that unit sits below it."
+statement: The engine shall name, for every unit of work it sizes, a difficulty no weaker than that of the hardest step the unit contains, making visible in the record how far each step in that unit sits below it.
 kind: functional
 verify_method: test
-breaks_if_removed: "A milestone driven below its hardest row produces a plausible wrong answer at exactly the step where a checker cannot see it. Reporting only the maximum hides how much of the milestone was overpaid for."
+breaks_if_removed: A milestone driven below its hardest row produces a plausible wrong answer at exactly the step where a checker cannot see it. Reporting only the maximum hides how much of the milestone was overpaid for.
 breaks_how_badly: crippling
 refines:
   - uc-let-the-machine-name-the-driver
 source_refs:
-  - "uc-let-the-machine-name-the-driver step 3"
-  - "uc-let-the-machine-name-the-driver ext 3a"
-  - "raid-risk-a-submachine-maximum-drags-easy-items-onto-an-expensive-walker"
+  - uc-let-the-machine-name-the-driver step 3
+  - uc-let-the-machine-name-the-driver ext 3a
+  - raid-risk-a-submachine-maximum-drags-easy-items-onto-an-expensive-walker
 priority: must
 ---
 

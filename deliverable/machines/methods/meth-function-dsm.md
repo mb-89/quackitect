@@ -9,7 +9,7 @@ M4's partition-functions. Cluster the function structure BEFORE enumerating cand
 
 The matrix is a projection over the function notes. Nothing is stored separately.
 
-## THE RELATION IS FIXED HERE, AND THAT IS A DEPARTURE
+## THE RELATION IS FIXED HERE, AND THAT IS A DEPARTURE #work
 
 Lindemann's method says pick one relation meaning per matrix, from many, and never mix two. The general rule stands and this system settles it once.
 
@@ -26,7 +26,7 @@ Other meanings would each need their own edge data, which this system does not c
 
 Adding one means adding its edges first.
 
-## Procedure
+## Procedure #work
 
 - Cluster ([[meth-dsm-clustering]]). Strongly-coupled functions group; inter-cluster coupling is minimised.
 - Confirm each proposed placement, or move the function and say why.
@@ -34,7 +34,7 @@ Adding one means adding its edges first.
 
 Sequence with [[meth-dsm-partitioning]] where ordering matters. Band with [[meth-dsm-banding]] for parallelism. Neither is this state's duty.
 
-## A CLUSTER IS NOT AN ELEMENT
+## A CLUSTER IS NOT AN ELEMENT #work
 
 The clusters are groups of FUNCTIONS. The static cut into elements is per candidate and comes later.
 

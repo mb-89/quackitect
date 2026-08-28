@@ -7,13 +7,16 @@ statement: The checklist editor's panel UI (engine/editors/checklist.ts) has no 
 owner: the owner
 trigger: the owner reviews the panel's checklist rendering and decides the visual state and the ref-entry affordance
 status: open
-looked: 2026-08-20
+looked: 2026-08-26
 impact: A returning person reading a checklist field in the panel cannot tell an owed item from an unchecked one by looking - the distinction only shows in the raw markdown. The mechanism (engine/stateform.ts checklistItemStatus, the "- [owed] <item> - <ref>" line form) is fully functional for an agent writing it directly through a form fill; only the panel's own render/collect JS was not extended.
 breaks_how_badly: abrasive
 how_likely: expected
 source_refs:
   - deliverable/engine/editors/checklist.ts
   - deliverable/machines/forms/templates/checklist.md
+last_looked: 2026-08-23
+look_verdict: rescheduled
+place: i23-judgment-the-ui-sitting-cut-the-html-mir
 ---
 
 Found during i8's M8 sweep-consistency pass, surface class "panels and
@@ -94,3 +97,22 @@ is about, so nothing here moved.
 THE LOOK IS THE POINT. A debt nobody re-reads is a lie in the ledger, and this
 line is the evidence that somebody read it on this date.
 
+## Swept 2026-08-26, at i54's closing retro: RE-ACCEPTED
+
+NOT TOUCHED THIS WINDOW. The window holds one record and it was about the disk regime. No panel work ran, and the trigger is the owner's own review, which has not happened.
+
+RE-ACCEPTED consciously, trigger unchanged.
+
+
+SWEPT 2026-08-28, at i63's closing retro: RE-ACCEPTED, AND ITS TRIGGER CANNOT
+BE DELIVERED.
+
+The trigger waits on the owner reviewing the panel's checklist rendering and
+deciding two things. Nothing schedules that, nothing watches for it, and no
+state arrives at it. This entry is one of sixteen open ones whose trigger names
+no moment anything could deliver.
+
+THE RETRO IS NOT REWRITING IT HERE, because a trigger that hands the owner's
+own decision to a state would be the retro deciding for them. What the retro
+does instead is name the class: an entry waiting on an unscheduled person act
+is waiting forever, and sixteen of them stand.

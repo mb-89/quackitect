@@ -14,7 +14,7 @@ import { anyGuidanceDoc, checkDocs, freshRoot, readEverything } from "./helpers.
 async function bootHuman(s: Session): Promise<void> {
   checkDocs(s);
   for (let i = 0; i < 10; i++) {
-    if (s.active()[0] === "idle") return;
+    if (s.active()[0] === "front_desk") return;
     await s.advance();
   }
   throw new Error("boot did not reach idle");
@@ -236,7 +236,7 @@ test("seeded container: expeditions are the states, entering BINDS, one ending c
   assert.equal(closed.moved_to, "expeditions/end", "the close says where it put the walk");
   assert.deepEqual(s.active(), ["expeditions/end"]);
   await s.advance();
-  assert.deepEqual(s.active(), ["idle"], "one expedition coming home completes the container");
+  assert.deepEqual(s.active(), ["front_desk"], "one expedition coming home completes the container");
 
   // Re-entry REGENERATES: only A remains, the drawing starts gray.
   await s.advance("expeditions");

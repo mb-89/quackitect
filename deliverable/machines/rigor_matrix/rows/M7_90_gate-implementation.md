@@ -16,8 +16,7 @@ legal_tools:
   - se_file_list
   - se_log_query
   - se_answer
-  - se_web_search
-  - se_web_fetch
+  - se_run
   - se_test
 evidence:
   - name: quality_ok
@@ -35,10 +34,20 @@ evidence:
       - acceptable
       - not-acceptable
     description: the implementation risks added or regraded this iteration, judged — name the raid ids in the rationale, or say none moved
+  - name: design_holds
+    template: choice-with-rationale
+    options:
+      - holds
+      - drifted
+    description: "the design OUTPUT against the design INPUT that asked for it: does what was built still answer the requirements and use cases it was derived from? Quote the requirement and the design section that answers it. A design that drifted is a finding here, never a note for later — either the design comes back to the input, or the input was wrong and is amended through its own gate."
 major: full
+major_complexity: C3/R4
 minor: full
+minor_complexity: C3/R4
 patch: tailored
+patch_complexity: C3/R4
 product: full
+product_complexity: C3/R4
 specification: tailored
 major_note: |
   Applies in full: the machine already proved the mechanics upstream.
@@ -66,7 +75,7 @@ specification_note: |
 ## Guidance
 
 Review per [[meth-gate-review]]. FIVE CHECKS LEFT THIS FORM because the
-machine proves them upstream (owner ruling 2026-08-11):
+machine proves them upstream:
 
 - build planned — the seeded drawing refuses build-steps when absent
 - red observed — observe-red's law, per spec, at its birth
@@ -79,6 +88,25 @@ items, and an unchecked box refuses the submit. The DEBT is the
 register's: every quick-and-dirty taken this iteration stands as a raid
 entry of kind `debt`, and debt_taken references them. Risks the same:
 what the build added or regraded, judged with its reason.
+
+THE DRIFT CHECK RUNS IN THE OTHER DIRECTION FROM THE SWEEP (owner). The
+trace's sweep asks whether the CODE realizes the DESIGN. This asks whether
+the DESIGN still answers the INPUT — the requirements and use cases it was
+derived from, several milestones back.
+
+NOTHING ELSE ASKS IT. Every check between M3 and here reads downward:
+requirement to function, function to candidate, design to code. A design
+that quietly stopped answering its own requirement passes all of them,
+because each hop only compares itself to the hop above.
+
+QUOTE BOTH SIDES. The requirement in its own words, and the design section
+that answers it. A verdict with no quote is `not answered` (contract rule
+5), and this is exactly the kind of claim that reads as diligence while
+saying nothing.
+
+DRIFT IS A FINDING, NOT A DISCLOSURE. Naming it does not close it. Either
+the design comes back to the input, or the input was wrong and is amended
+through the gate that owns it.
 
 A genuinely-needed new element goes back through the architecture gate,
 as always.

@@ -3,7 +3,7 @@
 // only reads its output (software.md).
 delete process.env.SE_SCRIPT_SKIP;
 
-// THE SESSION CLEANS UP AFTER ITSELF (owner, 2026-07-30): when the machine
+// THE SESSION CLEANS UP AFTER ITSELF: when the machine
 // reaches end, the server posts /pty/end and the terminal host ends its
 // agent — politely first (/exit after the output settles), then by force.
 // The host exits with the agent, so end leaves no strays holding ports.

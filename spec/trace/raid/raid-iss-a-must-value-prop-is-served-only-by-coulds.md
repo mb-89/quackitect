@@ -17,6 +17,7 @@ source_refs:
   - req-nothing-a-copy-does-reaches-its-source
   - req-setup-serves-shipped-method
   - req-second-product-reuses-install
+place: i14-the-ladder-engine-half-comparison-moves-
 ---
 
 ## The grades, read this session

@@ -7,13 +7,16 @@ statement: The core and satellite cluster is built and tested, and nothing the r
 owner: the driving agent
 trigger: when the run mode is first flipped away from inline, or at the code-review iteration
 status: open
-looked: 2026-08-20
+looked: 2026-08-26
 impact: A whole subsystem drifts from the engine it is meant to carry, and its green tests read as proof it works.
 breaks_how_badly: corrosive
 how_likely: expected
 source_refs:
   - note-fe9e091bfa4c
   - 570cdc66 — the levelling commit that brought all twelve files into this tree
+last_looked: 2026-08-23
+look_verdict: rescheduled
+place: i48-wire-the-built-failure-shapes-feeds-the-
 ---
 
 Eight files carry the core and satellite design. Six test files
@@ -152,3 +155,14 @@ is about, so nothing here moved.
 THE LOOK IS THE POINT. A debt nobody re-reads is a lie in the ledger, and this
 line is the evidence that somebody read it on this date.
 
+## Swept 2026-08-26, at i54's closing retro: RE-ACCEPTED
+
+NEITHER TRIGGER FIRED. The run mode is unchanged and no code-review round opened.
+
+RE-ACCEPTED consciously, trigger unchanged.
+
+
+SWEPT 2026-08-28, at i63's closing retro: RE-ACCEPTED, and the trigger holds.
+
+It fires when the run mode is first flipped away from inline, or at the
+code-review iteration. Neither happened in this window.

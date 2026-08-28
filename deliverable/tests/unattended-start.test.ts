@@ -78,7 +78,7 @@ test("the declared runtime floor is one the engine can actually run on", () => {
   // does: unflagged TypeScript execution landed in Node 22 at 22.18, so the
   // floor is INSIDE a major and 22.6 must still be refused.
   //
-  // WHY 22 AND NOT 24 (owner ruling 2026-08-18): a cloud box gets 22 by
+  // WHY 22 AND NOT 24: a cloud box gets 22 by
   // default, so pinning above it means installing a runtime on every arrival.
   // Measured on the i35 run — nothing in the engine needs 24, and the only
   // failures under 22 were these floor assertions failing BECAUSE the runtime

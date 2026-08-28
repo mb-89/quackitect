@@ -13,6 +13,7 @@ breaks_how_badly: crippling
 how_likely: expected
 source_refs:
   - i37-training-iterations-a-disposable-iterati
+place: i31-the-process-becomes-measurable-a-walk-re
 ---
 
 ## Where it comes from

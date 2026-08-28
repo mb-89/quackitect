@@ -13,12 +13,18 @@ premortem's cousin — v1 field precedent.
 agrees too quickly. Also the standard second pass on any favorite.
 
 **Steps.**
-1. State the idea as its strongest claim.
-2. Write the prosecution: three concrete failure scenarios, each with
+1. State the idea as its strongest claim. #work
+2. Write the prosecution: #work
+
+   three concrete failure scenarios, each with
    the input and the broken outcome — no vague "might not scale".
-3. Write the case for doing NOTHING — what the current state quietly
+3. Write the case for doing NOTHING #work
+
+   what the current state quietly
    does well.
-4. Verdict: the idea survives amended, survives with a named risk, or
+4. Verdict: #work
+
+   the idea survives amended, survives with a named risk, or
    dies. Record which argument moved the needle.
 
 **Output.** A hardened idea with named risks — or an honest grave.

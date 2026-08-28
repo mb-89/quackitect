@@ -14,6 +14,7 @@ source_refs:
   - engine/mcp.ts handleHttp
   - engine/bin/se-mcp.ts notifyToolListChanged
   - note-dc358a9c2c59
+place: i39-the-lane-tells-the-truth-about-itself-de
 ---
 
 AN ISSUE, NOT AN ASSUMPTION, and the distinction is the point. It has already

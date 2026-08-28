@@ -10,6 +10,7 @@ status: open
 breaks_how_badly: corrosive
 how_likely: expected
 impact: A design chosen after the search is built without ever being compared to how anybody else solved it. The gap is invisible, because the record can point at a real prior-art state that really ran.
+place: i22-judgment-the-frozen-window-pull-dependen
 ---
 
 ## What was observed

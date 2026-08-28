@@ -6,18 +6,22 @@ statement: the engine standing up and lying down, carried by the host bridge, th
 realizes:
   - el-bootstrap
 files:
-  - "deliverable/engine/lifecycle.ts"
-  - "deliverable/engine/stopping-layer.ts"
-  - "deliverable/engine/cage-inventory.ts"
-  - "deliverable/engine/bin/se-pty.ts"
-  - "deliverable/engine/bin/se-hook-stop.ts"
-  - "deliverable/engine/bin/se-hook-start.ts"
-  - "deliverable/engine/bin/register-extension.ts"
-  - "deliverable/engine/vscoderegistry.ts"
-  - "deliverable/engine/pullnotice.ts"
-  - "deliverable/engine/bin/package.ts"
-  - "deliverable/engine/version.ts"
-  - "deliverable/engine/sessionlive.ts"
+  - deliverable/engine/lifecycle.ts
+  - deliverable/engine/compaction.ts
+  - deliverable/engine/stopping-layer.ts
+  - deliverable/engine/cage-inventory.ts
+  - deliverable/engine/bin/se-pty.ts
+  - deliverable/engine/bin/se-hook-stop.ts
+  - deliverable/engine/bin/se-hook-start.ts
+  - deliverable/engine/bin/register-extension.ts
+  - deliverable/engine/vscoderegistry.ts
+  - deliverable/esbuild.mjs
+  - deliverable/engine/vscodebuild.ts
+  - deliverable/tests/built-surface.test.ts
+  - deliverable/engine/pullnotice.ts
+  - deliverable/engine/bin/package.ts
+  - deliverable/engine/version.ts
+  - deliverable/engine/sessionlive.ts
 ---
 
 ## Responsibility
@@ -93,6 +97,45 @@ theirs. machines/stopat.md holds what each one means.
 AN UNREADABLE OR ABSENT NOTCH IS `agent judgement`, the default, which
 is the behaviour every line below this already described.
 
+### The fail-safe hid a total disconnection
+
+THE NOTCH HAS TO RIDE THE PULL, and for four days it did not.
+
+The engine stamped it onto the mirror's packet. The hook reads pulls. Measured
+across the live call log: 338 of 338 pulls carried no notch at all.
+
+SO THREE OF THE FOUR NOTCHES WERE UNREACHABLE BRANCHES. `state end`, `bless`
+and `blockers only` could not fire, and setting the control changed nothing
+about when the agent handed back.
+
+THE DEFAULT CLAUSE ABOVE IS WHAT MADE IT INVISIBLE. Degrading an absent notch
+to `agent judgement` is right for a torn record and wrong as the only signal a
+reader gets, because a notch that never arrives looks exactly like a person who
+never set one.
+
+WHERE IT LIVES NOW: `head()` in the pull, the helper every pull shape spreads.
+The mirror keeps its own copy for rendering, and that copy is not this one.
+
+WHAT THE SUITE COULD NOT SEE. Every hook case fed the hook a pull response
+written by hand, so both halves passed while disconnected. The case that joins
+them stands up a real session and feeds the hook its real pull.
+
+## The hook records what it decided
+
+IT RECORDED ONLY ITS REFUSALS, so a stop it permitted and a stop it failed to
+judge left the same trace: none.
+
+THAT IS NOT A HYPOTHETICAL. This file's own root once climbed one directory too
+far, found no call log, and permitted every stop it exists to refuse. No log is
+itself a sanctioned stop, so the broken check looked exactly like a working one.
+
+THREE OUTCOMES, THREE RECORDS. `stop-pass` carries which sanction applied,
+`stop-block` carries what it refused, and `stop-error` carries the swallowed
+throw.
+
+THE SWALLOW STAYS. A hook must never break the turn. What changed is that the
+swallow is no longer silent.
+
 ## The desk with nothing routed is the machines own
 
 THE DESK WITH NOTHING ROUTED IS THE MACHINE'S OWN STOP, whatever the
@@ -131,6 +174,32 @@ It fits (2) on its face and was never read that way, because the agent
 could always find more retro to do and kept walking past the question.
 Only the FIRST retro step that needs a person gets named here; the rest
 of the retro proceeds while the answer is owed.
+
+### Claiming one is a call, not a sentence
+
+A STOP IS RELEASED BY `se_stop {because}`, and by nothing else. The agent says
+which sanctioned stop applies and why, the claim lands in the call log, and the
+tooth reads it there.
+
+RETRYING IS NOT CLAIMING, and the valve used to treat it as though it were.
+`stop_hook_active` is set by the HARNESS when a blocked stop is retried, so the
+agent chose nothing. The refusal invited a claim and then released the stop
+whether or not one came.
+
+MEASURED ON A LIVE SESSION: four times in a row the lifecycle log reads
+`stop-block do at front_desk` and then `stop-pass bites once per stop`. The
+tooth bit and the valve immediately undid it, which from outside is
+indistinguishable from a hook that does not run at all.
+
+BOTH HALVES ARE STILL REQUIRED. The harness flag proves the stop was already
+refused, so a force cannot pre-empt the tooth. The lane call proves a hand
+decided to stop anyway.
+
+ONE FORCE RELEASES ONE STOP. The next pull spends it, exactly as a pull spends
+an aim, so this is a decision rather than a switch left on.
+
+THE HOOK CANNOT READ A MESSAGE. It reads the call log, which is why saying
+which stop applies in chat never proved anything to it.
 
 ## The session cleans up after itself
 

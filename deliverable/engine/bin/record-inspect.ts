@@ -2,19 +2,9 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join, relative } from "node:path";
 
-/** THE UPWARD KEY EACH NODE TYPE OWES, from the trace schema's own direction:
- *  the newer artifact points at what it derives from. A node type absent here
- *  is a root and owes nothing upward. */
-const UPWARD: Record<string, string[]> = {
-  story: ["refines"],
-  "use-case": ["refines"],
-  requirement: ["refines"],
-  function: ["satisfies"],
-  element: ["implements"],
-  interface: ["carries"],
-  "design-spec": ["realizes"],
-  "test-spec": ["verifies", "demonstrates"],
-};
+// THE EDGE MAP LIVES IN ONE PLACE. The reading demand walks the same graph this
+// check reads, and two copies of a graph's shape diverge silently.
+import { UPWARD } from "../traceup.ts";
 
 function argValue(flag: string): string | undefined {
   const i = process.argv.indexOf(flag);
@@ -95,6 +85,44 @@ function testRunsCarryTheirQuestion(): void {
   );
 }
 
+/** WHERE A FIELD REPORT IS ALLOWED TO LIVE, and it is one folder. */
+const REPORT_HOME = ".se";
+
+/** Folders a tree walk never needs to enter. */
+const SKIP = new Set([".git", ".worktrees", "node_modules", "dist", "scratchpad", REPORT_HOME]);
+
+/** ITEM 13 — no field report is in version control.
+ *
+ *  THE FIELD REPORT IS PRIVATE DATA. It is written for one person, it is not a
+ *  corpus document, and it is delivered as a file the person downloads rather
+ *  than as something the repository keeps.
+ *
+ *  WHY IT IS A CHECK AND NOT A SENTENCE. The rule is stated in the contract
+ *  and twice in the cloud-runner card, and two reports were committed anyway —
+ *  3,584 lines across two records, which nothing ever cited. A prose rule
+ *  broken more than once wants a guard.
+ *
+ *  IT NAMES THE HOME RATHER THAN ONLY THE FAULT. An agent that put the file in
+ *  the wrong place needs to be told the right one. */
+function noFieldReportIsInVersionControl(): void {
+  const walk = (dir: string): void => {
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      if (entry.isDirectory()) {
+        if (!SKIP.has(entry.name)) walk(join(dir, entry.name));
+        continue;
+      }
+      // THE SPELLING ON DISK, not the one in the author's head: a pattern
+      // demanding the hyphen misses every file that omits it.
+      if (!/^field[-_ ]?report.*\.md$/i.test(entry.name)) continue;
+      const where = relative(root, join(dir, entry.name));
+      findings.push(
+        `item 13 · ${where} — a field report is private data and never goes in version control. Move it to ${REPORT_HOME}/field-report.md, which is gitignored, and hand it to the person as a downloadable file.`,
+      );
+    }
+  };
+  walk(root);
+}
+
 function frontmatter(text: string): string | undefined {
   if (!text.startsWith("---")) return undefined;
   const end = text.indexOf("\n---", 3);
@@ -103,14 +131,15 @@ function frontmatter(text: string): string | undefined {
 
 upwardLinksLiveInTheFile();
 testRunsCarryTheirQuestion();
+noFieldReportIsInVersionControl();
 
-process.stdout.write("record-inspect: items 11 and 12 of tsp-record-inspection\n");
-process.stdout.write("                the other ten need acts nobody has performed recently\n");
+process.stdout.write("record-inspect: items 11, 12 and 13 of tsp-record-inspection\n");
+process.stdout.write("                the other nine need acts nobody has performed recently\n");
 for (const c of caveats) process.stdout.write(`                NOTE: ${c}\n`);
 process.stdout.write("\n");
 
 if (findings.length === 0) {
-  process.stdout.write("record-inspect green on the two mechanical items\n");
+  process.stdout.write("record-inspect green on the three mechanical items\n");
   process.exit(0);
 }
 

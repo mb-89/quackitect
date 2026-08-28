@@ -5,6 +5,8 @@ type: "[[function]]"
 cluster: the-record-life
 statement: put every standing option in front of whoever is deciding what to do next, wherever it was parked
 satisfies:
+  - req-outstanding-work-is-listed-narrowed-and-grouped-in-one-place
+  - req-the-work-editor-needs-no-new-instruction
   - req-open-work-is-answered-from-the-repository-not-a-local-store
   - req-a-windowed-pool-answer-says-that-it-was-windowed
   - req-the-pool-answers-a-person-and-an-agent-from-one-source
@@ -46,3 +48,20 @@ An UNDRAINED capture. It is deliberately not an input: an undrained note has
 not been judged, and this function offers options rather than everything
 anybody typed. The pending count stays a separate signal, served by
 show-where-it-stands, and the two must not merge.
+
+## Addition — work tokens
+
+PUTTING THE OPTIONS IN FRONT OF SOMEBODY IS NOT ENOUGH TO DECIDE WITH. Two
+acts turn a list into a decision, and neither stood before.
+
+NARROWING WORKS ON ANY FIELD the work carries, rather than on a set somebody
+chose in advance. A narrowing that matches nothing is widened rather than
+reported as no work existing.
+
+GATHERING ROWS INTO A GROUP is what carries several pieces of work to one
+destination together.
+
+AND THE SURFACE THAT DOES IT TEACHES NOTHING NEW. A person who has operated
+one of the system's table editors operates this one with no further
+instruction, which is why the editor is widened rather than a second one
+written.

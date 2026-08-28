@@ -4,7 +4,7 @@ unreachable_refs:
 minted_in: i37-training-iterations-a-disposable-iterati
 id: if-benchmark-report-to-binding
 type: "[[interface]]"
-statement: "The reports folder tells the binding which iteration was benchmarked least recently, and it is the only state a cycling run reads."
+statement: The reports folder tells the binding which iteration was benchmarked least recently, and it is the only state a cycling run reads.
 source: el-benchmark-report
 destination: el-benchmark-binding
 carries:

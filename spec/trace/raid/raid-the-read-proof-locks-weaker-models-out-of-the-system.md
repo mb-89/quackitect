@@ -14,6 +14,7 @@ source_refs:
   - i28-the-cloud-runs-from-its-seed-alone-a-fre
   - note-8de9bfec67b6
   - note-4671c830fca7
+place: i64-the-diamond-and-the-orchestrator-handove
 ---
 
 ## What happened, from the field

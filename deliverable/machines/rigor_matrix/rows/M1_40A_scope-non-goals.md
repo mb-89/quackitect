@@ -21,9 +21,12 @@ evidence:
   - name: non_goals
     description: what it deliberately leaves, one line each
 major: full
+major_complexity: C3/R3
 minor: tailored
+minor_complexity: C3/R3
 patch: none
 product: full
+product_complexity: C3/R3
 specification: full
 major_note: |
   Applies: the change's scope and non-goals in full - an architectural

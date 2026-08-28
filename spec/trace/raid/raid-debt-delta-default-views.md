@@ -7,13 +7,16 @@ statement: The reference views still list the whole corpus - the minted_in stamp
 owner: the driving agent
 trigger: the next form opened in a record whose table lists another record's nodes, or the owner's next reiteration of the delta demand
 status: open
-looked: 2026-08-20
+looked: 2026-08-26
 breaks_how_badly: abrasive
 how_likely: expected
 impact: Every reference table in a record lists the standing corpus beside the delta - 38 test-specs where 7 are the iteration's own - and the reader wades through history, exactly what the owner has flagged three times.
 source_refs:
   - req-nodes-scoped-to-iteration
   - note-db7c72bd519c
+last_looked: 2026-08-23
+look_verdict: rescheduled
+place: i53-a-step-sees-its-own-record-s-slice-forms
 ---
 
 Taken knowingly at the b10 signing: the stamp at mint and the corpus
@@ -119,3 +122,26 @@ is about, so nothing here moved.
 THE LOOK IS THE POINT. A debt nobody re-reads is a lie in the ledger, and this
 line is the evidence that somebody read it on this date.
 
+## Swept 2026-08-26, at i54's closing retro: RE-ACCEPTED
+
+NOT MEASURED THIS WINDOW. i54's gates were filled and blessed, and no count of what each form served was taken, so this look cannot say whether the trigger fired.
+
+SAYING THAT IS THE POINT. An unmeasured window is not a quiet one, and recording it as quiet would be the lie this whole sweep exists to prevent.
+
+RE-ACCEPTED consciously, trigger unchanged.
+
+
+SWEPT 2026-08-28, at i63's closing retro: TRIGGER FIRED, AND STILL NOT
+MEASURED.
+
+It fires on the next form opened in a record whose table lists another record's
+nodes. i63 walked ten gates and about ninety forms in this window, so the
+moment arrived many times over.
+
+WHAT THIS ENTRY SAID OF ITSELF ON 2026-08-26 was that the window went
+unmeasured, and that an unmeasured window is not a quiet one. That is true
+again here, and saying it twice is the finding rather than the excuse.
+
+RESCHEDULED, and it now needs a measurement rather than another look. Somebody
+has to open one gate form and count how many of its rows belong to another
+record.

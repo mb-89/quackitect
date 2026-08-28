@@ -1,6 +1,6 @@
 // what the mirror shows and how the agent points at it
 //
-// SMALL FILES ON PURPOSE (owner ruling, 2026-07-30). A test file is the
+// SMALL FILES ON PURPOSE. A test file is the
 // only unit that reaches a second core, so themes get their own file and
 // the suite uses the machine it runs on. See guidance/software.md.
 import { strict as assert } from "node:assert";
@@ -43,13 +43,15 @@ describe("panel", { concurrency: true }, () => {
     const s = new Session(root);
     // At main/start: the main canvas only.
     let html = renderMirror({ session: s, root, lastPacket: undefined, mode: "manual" });
-    assert.ok(html.includes(`>idle</text>`));
+    // THE MAIN CANVAS DRAWS THE DESK. It used to draw a hub called `idle`
+    // beside it, and that state was removed.
+    assert.ok(html.includes(`>front_desk</text>`));
     assert.ok(!html.includes(`>read_contract</text>`), "sub-machine states are NOT drawn while in main");
     // Step into boot: the boot canvas only, breadcrumb main › boot.
     await s.advance();
     html = renderMirror({ session: s, root, lastPacket: undefined, mode: "manual" });
     assert.ok(html.includes(`>read_contract</text>`));
-    assert.ok(!html.includes(`>idle</text>`), "main states are NOT drawn while in the sub");
+    assert.ok(!html.includes(`>front_desk</text>`), "main states are NOT drawn while in the sub");
     assert.ok(html.includes('class="here">boot'), "breadcrumb marks the machine the walk is in");
     assert.ok(html.includes('data-detail="state:read_contract"'), "states are clickable for details");
     assert.ok(html.includes('class="expand"'), "widgets carry expand buttons");

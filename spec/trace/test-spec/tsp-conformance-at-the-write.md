@@ -7,7 +7,7 @@ method: demonstration
 demonstrates:
   - sty-a-check-binds-without-engine-code
   - sty-the-write-refuses-the-break
-verifies: "none — demonstrates carries the edge; both requirements are verify method test and are carried by tsp-bound-rules and tsp-write-guard"
+verifies: none — demonstrates carries the edge; both requirements are verify method test and are carried by tsp-bound-rules and tsp-write-guard
 files:
   - none — the procedure below is the definition, and the observed session is the evidence
 ---

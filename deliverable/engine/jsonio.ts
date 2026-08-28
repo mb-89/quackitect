@@ -19,7 +19,8 @@ export function capMiddle(s: string, max: number, note = "the whole lives in the
   let tailStart = s.length - tailBudget;
   const tws = s.indexOf(" ", tailStart);
   if (tws !== -1 && tws < tailStart + 80) tailStart = tws + 1;
-  return `${s.slice(0, headEnd)}\n…[${tailStart - headEnd} chars cut — ${note}]…\n${s.slice(tailStart)}`;
+  const why = note === undefined || note === "" ? "" : ` — ${note}`;
+  return `${s.slice(0, headEnd)}\n…[${tailStart - headEnd} chars cut${why}]…\n${s.slice(tailStart)}`;
 }
 
 /** Cap a value's JSON form for logging — raw payloads live with their tool.

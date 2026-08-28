@@ -2,9 +2,9 @@
 form: log-risks
 by: agent
 signed_off: 2026-08-19T12:06:51.002Z
-reopened: "2026-08-19T12:06:32.515Z — Its inputs re-signed beneath it and the register gained an entry the prior-art scan produced, so the list is re-earned rather than assumed."
+reopened: 2026-08-19T12:06:32.515Z — Its inputs re-signed beneath it and the register gained an entry the prior-art scan produced, so the list is re-earned rather than assumed.
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / log-risks

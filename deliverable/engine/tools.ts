@@ -14,8 +14,7 @@ import { join } from "node:path";
 import { benchmarkBind, benchmarkEnd } from "./benchmark.ts";
 import { setAnswerSpill } from "./bound.ts";
 import { CallLog, type CallPart, UNREPORTED } from "./calllog.ts";
-import { parseUpdate } from "./decisions.ts";
-import { CLAUSES, Rejection, type RejectionPayload } from "./errors.ts";
+import { CLAUSES, Rejection } from "./errors.ts";
 import { contentHash } from "./hash.ts";
 import { rankDemand, searchHelp } from "./help.ts";
 import { capJson } from "./jsonio.ts";
@@ -26,7 +25,7 @@ import { openPanel } from "./panel.ts";
 import { seDir } from "./paths.ts";
 import { produceProject, produceVehicle } from "./produce.ts";
 import type { MirrorState } from "./render.ts";
-import { runToCompletion, workAccount } from "./run.ts";
+import { noteAlive, runToCompletion, workAccount } from "./run.ts";
 import { requiredDependsOn } from "./seed.ts";
 import { type AmendOp, Session } from "./session.ts";
 import { Toll } from "./toll.ts";
@@ -36,6 +35,7 @@ import { fileTools } from "./tools-file.ts";
 import { queryTools } from "./tools-query.ts";
 import { runTools } from "./tools-run.ts";
 import { laneAge, SE_VERSION } from "./version.ts";
+import { inHandAt } from "./workstore.ts";
 
 /** THE TICK — the machinery's one tool, legal in every state. */
 export function sessionTools(session: Session): ToolDef[] {
@@ -110,7 +110,7 @@ export function sessionTools(session: Session): ToolDef[] {
       name: "se_reload",
       title: "se.reload",
       description:
-        "Reload the engine onto the current sources — legal only with the walk at idle. Canary-guarded: a tree that does not load is refused and the running engine survives. The reload reboots the walk (boot re-proves the engine green). Swaps NEVER fire on their own — this call, from either hand, is the only trigger.",
+        "Reload the engine onto the current sources — legal WHEREVER THE WALK STANDS. Canary-guarded: a tree that does not load is refused and the running engine survives. The reload reboots the walk (boot re-proves the engine green). Swaps NEVER fire on their own — this call, from either hand, is the only trigger.",
       inputSchema: { type: "object", properties: {} },
       handler: () => session.requestReload(),
     },
@@ -187,7 +187,7 @@ export function sessionTools(session: Session): ToolDef[] {
       name: "se_aim",
       title: "se.aim",
       description:
-        "AIM THE WALK at a state AND BE CARRIED THERE, in this one call. The machine draws the route and walks every hop whose conditions already pass, stopping only where something is genuinely owed — so a state that is already green is walked THROUGH, never landed on, and re-entering a long record costs ONE call rather than a pull per state. Name any state in the machine you stand in, or a fully qualified one like iterations/i1/write-requirements. GOING IS THE DEFAULT (owner ruling 2026-08-20): re-aiming one state at a time relitigates hops the machine would have walked through, and going is as safe as pulling — the sweep still refuses whatever the conditions and the dial refuse. The answer says whether it ARRIVED; stopped short, it stands whole on the state that owes something, never between two.",
+        "AIM THE WALK at a state AND BE CARRIED THERE, in this one call. The machine draws the route and walks every hop whose conditions already pass, stopping only where something is genuinely owed — so a state that is already green is walked THROUGH, never landed on, and re-entering a long record costs ONE call rather than a pull per state. Name any state in the machine you stand in, or a fully qualified one like iterations/i1/write-requirements. GOING IS THE DEFAULT (owner ruling 2026-08-20): re-aiming one state at a time relitigates hops the machine would have walked through, and going is as safe as pulling — the sweep still refuses whatever the conditions and the dial refuse. The answer says whether it ARRIVED; stopped short, it stands whole on the state that owes something, never between two. IT ALSO SAYS WHAT IT COST: `swept_ms` names each hop and its milliseconds, and `visited` says how many states the search looked at. Read those rather than timing the call yourself.",
       inputSchema: {
         type: "object",
         properties: {
@@ -201,6 +201,9 @@ export function sessionTools(session: Session): ToolDef[] {
         required: ["to"],
       },
       handler: async (args) => {
+        // A BARE AIM DRAWS AND DOES NOT WALK. The drawing answers whether the
+        // target is reachable; the sweep is what pointing must not pay for.
+        // see req-aiming-returns-before-the-walking-starts
         const aimed = session.setTarget(String(args.to));
         if (args.go === false) return aimed;
         // req-a-clear-jump-is-one-call: the caller named the target, and going
@@ -302,6 +305,48 @@ export function sessionTools(session: Session): ToolDef[] {
           args.chain === true,
         ),
     },
+    {
+      name: "se_work",
+      title: "se.work",
+      description:
+        "OPEN a piece of work, PICK one up, END one, or RENAME what it is. Every act carries a COMMENT, and it cannot be empty.\n\nact: open MINTS A NEW PIECE OF WORK where it will be done. `at` names the position; leave it out and it lands where the walk stands.\n\nTHE COMMENT IS FOUR WORDS, A FORWARD SLASH, THEN THE DETAIL. The four words NAME the work and go on the bar beside the position. Everything after the slash lands in the token's body.\n\nWRITE THE DETAIL EVERY TIME. Four words cannot carry what was actually asked for, so a token holding only its name tells the next hand — a person, or another agent — nothing about what to do. Put the whole instruction there, in the words it was given in.\n\nOPEN IS HOW WORK A PERSON HANDS YOU BECOMES VISIBLE. An instruction given in conversation leaves no mark anywhere until it is opened, so the person cannot see that it arrived. Opened, it shows on the state, it holds that state until it is settled, and the person watches it go.\n\nact: take marks the item in_work and records what you are about to do. act: settle ends it and records what happened. A settle takes an optional status — done is the default; dropped or superseded say the work stopped rather than finished. act: restate carries the new statement in the comment.\n\nThe comment lands ON THE ITEM, never only in a log. The item is what somebody reads six months later.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          act: { type: "string", description: "open | take | settle | restate" },
+          details: {
+            type: "string",
+            description:
+              "OPEN only, and optional: the detail, where you would rather not put it after a slash in the comment. Same destination — the token's body.",
+          },
+          id: {
+            type: "string",
+            description: "the piece of work, by its id. OPEN takes none — send an empty string, and the id comes back.",
+          },
+          comment: {
+            type: "string",
+            description:
+              "open: what the work IS, in one line. take and settle: what you are about to do, or what happened. restate: the new statement. Never empty.",
+          },
+          status: { type: "string", description: "settle only: done (default) | dropped | superseded" },
+          at: {
+            type: "string",
+            description:
+              "open only: the position the work lands on. Omit it and the work lands where the walk stands, which is nearly always right. `backlog` is legal for work with no home yet.",
+          },
+        },
+        required: ["act", "id", "comment"],
+      },
+      handler: (args) =>
+        session.workAct(
+          String(args.act ?? ""),
+          String(args.id),
+          String(args.comment),
+          args.status === undefined ? undefined : String(args.status),
+          args.at === undefined ? undefined : String(args.at),
+          args.details === undefined ? undefined : String(args.details),
+        ),
+    },
   ];
 }
 
@@ -368,6 +413,21 @@ export function expeditionTools(session: Session): ToolDef[] {
           Array.isArray(args.inputs) ? args.inputs.map(String) : [],
           requiredDependsOn("se_seed_iteration", args.depends_on, { goal: args.goal, vision: args.vision }),
         ),
+    },
+    {
+      name: "se_park",
+      title: "se.park",
+      description:
+        "SET THE OPEN RECORD ASIDE, so another can be entered. One engine walks one record; wanting two at once means a second checkout.\n\nIT IS NOT A VERDICT. Shipping would claim gates that never happened and abandoning would say the work is no longer wanted. Parking says neither: entering the record again resumes it exactly as it was, with every signature standing.\n\nTHE REASON IS RECORDED on the record itself, so the archive shows why it was set down.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          id: { type: "string", description: "the record to set aside; omit to park whichever one is held" },
+          why: { type: "string", description: "why it is being set down, in one line" },
+        },
+        required: ["why"],
+      },
+      handler: (args) => session.recordPark(args.id === undefined ? undefined : String(args.id), String(args.why)),
     },
     {
       name: "se_exp_close",
@@ -477,6 +537,10 @@ export function coreTools(
    *  a path. Defaults to nothing, which stamps nothing, exactly as writing
    *  outside a record always did. */
   boundRecord: () => string | undefined = () => undefined,
+  /** WHERE THE WALK STANDS, threaded to runTools so a spawned job can be
+   *  stamped with its milestone at registration without the caller declaring
+   *  one. */
+  positionOf: () => string = () => "",
   // `whereNow` IS DELETED (i6). It existed for one caller: the battery refusal
   // that asked WHERE the walk stood before deciding whether an agent-initiated
   // battery was legal. The owner's ruling moved that decision into the engine
@@ -522,7 +586,7 @@ export function coreTools(
     },
 
     ...fileTools(rootOf, model, reading),
-    ...runTools(rootOf, projectRoot, reading, mirror),
+    ...runTools(rootOf, projectRoot, reading, mirror, positionOf),
     ...deskTools(rootOf, projectRoot, model, judgmentDrainAllowed, reading, doors, mirror),
     ...queryTools(rootOf),
   ];
@@ -566,11 +630,7 @@ function kickTypecheck(root: string): void {
 }
 const EDIT_TOOLS = new Set(["se_file_write", "se_file_patch", "se_file_replace", "se_file_move"]);
 
-export function buildServer(
-  root: string,
-  session = new Session(root),
-  tollOpts: { windowMs?: number; now?: () => number } = {},
-): McpServer {
+export function buildServer(root: string, session = new Session(root), tollOpts: { now?: () => number } = {}): McpServer {
   // WHERE AN OVERSIZED ANSWER SPILLS, so the bound can page rather than only
   // point. Machine-local and never committed.
   setAnswerSpill(seDir(root));
@@ -590,8 +650,42 @@ export function buildServer(
       () => session.doors(),
       () => ({ session, root, lastPacket: undefined, mode: "manual" }),
       () => session.boundRecordId(),
+      () => session.currentState(),
     ),
   ];
+  tools.push({
+    name: "se_stop",
+    title: "se.stop",
+    description:
+      "FORCE A STOP THE TOOTH REFUSED, on the record.\n\nWHEN TO REACH FOR IT. The stop hook blocked your turn and you judge that one of the sanctioned stops genuinely applies. Say which one, and why, and stop again.\n\nWHY IT IS A CALL AND NOT A SENTENCE. The hook cannot read your message — it reads the call log. Saying which stop applies in chat proved nothing to it, and the retry flag the harness sets proved nothing either, because you did not choose it.\n\nONE FORCE RELEASES ONE STOP. The next se_pull spends it, so this is a decision rather than a switch you leave on.\n\nIT DOES NOT MOVE THE WALK. The walk stands exactly where it stood; only the turn ends.\n\nNOT AN ESCAPE. se_pull {escape} lands the walk at the front desk because you are mechanically stuck. This ends a turn and changes nothing.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        because: { type: "string", description: "which sanctioned stop applies, and why — one line" },
+      },
+      required: ["because"],
+    },
+    handler: (args) => {
+      const because = typeof args.because === "string" ? args.because.trim() : "";
+      if (because === "") {
+        throw new Rejection({
+          clause: CLAUSES.REQUIRED_ARGS,
+          expected: "se_stop requires: because — which sanctioned stop applies, and why",
+          got: `received: ${Object.keys(args).join(", ") || "nothing"}`,
+          remedy: {
+            tool: "se_stop",
+            args: { because: "<which sanctioned stop, and why>" },
+            note: "an unreasoned force is the thing this replaces — the reason is the whole point",
+          },
+          source: "engine/tools.ts se_stop",
+        });
+      }
+      return {
+        forced: because,
+        note: "the next stop is released once. A pull spends this, so force again if you pull first.",
+      };
+    },
+  });
   // WIRED HERE, NOT INSIDE coreTools. searchHelp needs the FULL assembled
   // catalog (session + expedition + core tools), which exists only once
   // the array above is built (dsp-help-search.md's own interface note).
@@ -599,7 +693,7 @@ export function buildServer(
     name: "se_help",
     title: "se.help",
     description:
-      "Search the lane's tools and guidance by plain words — ranked word-overlap over each tool's name/title/description and each guidance page's path/statement. A miss (zero matches) is appended to a durable ranked demand log; se_help {demands: true} reads that log back, grouped by shape, most-demanded first. Does not do synonym or stem matching, does not replace reading a tool's full schema, and does not search the codebase or the web — se_file_search and se_web_search do that.",
+      "Search the lane's tools and guidance by plain words.\n\nWHAT IS SEARCHED. Every tool's name, title and full description. Every guidance page, INCLUDING METHOD CARDS AND THE REFUSALS PAGE, split at its own headings — so an answer names the section, not just the file. Asking about one refusal clause lands on that clause.\n\nHOW IT RANKS. BM25, the same ranker the coupling proposer uses. A word appearing everywhere counts for almost nothing; a rare one counts for a lot. A name match outranks the same word buried in prose.\n\nWHEN IT SAYS NOTHING. An answer must cover most of your words AND share at least one uncommon word with you. Coincidence on common words is a miss, not a match.\n\nA MISS IS RECORDED. It lands in a durable demand log; se_help {demands: true} reads that back, grouped by shape, most-demanded first.\n\nWHAT IT IS NOT. No synonyms and no stemming. Not a substitute for a tool's full schema. Not a code or web search — se_file_search and se_web_search do that.",
     inputSchema: {
       type: "object",
       properties: {
@@ -625,22 +719,7 @@ export function buildServer(
       return searchHelp(root, args.query, tools);
     },
   });
-  // THE UPDATE FIELD — every lane tool accepts it: a decision-graph op
-  // riding the call. Declared on every schema so harnesses send it as an
-  // object (an undeclared property arrives as a JSON string — v2 lesson).
-  const UPDATE_FULL = {
-    type: "object",
-    description:
-      'NARRATE AS YOU WORK — a decision-graph op riding this call. Every lane tool takes it.\n\nWHAT TO SEND, and each op is one line:\n  - plan {items} — start the state\'s checklist. Send this BEFORE your first edit of any multi-step work.\n  - update {node, brief} — say what you are doing ON an item. The node is REQUIRED while any item stands open; with nothing open, a bare update is right.\n  - done | obsolete | revert {node, brief} — resolve a node. Everything started gets resolved. Abandoning one silently is illegal.\n  - fork {brief, items?} — an unplanned branch opens where you stand, and the current item cannot continue until it is done. Scope that merely GREW is another plan, not a fork.\n  - defer {node, to} — park a point for the state that can do it. It arrives there as an open to-do.\n\nTHE FIRST ONE IS ALWAYS A PLAN. Example: update: {op: "plan", items: ["read the record", "fill the gate", "submit"]}.\n\nTHE BRIEF IS ONE LINE, 90 characters, one thing.\n\nEvery call answers with `update_result`, carrying the open node map and any nudge. A volunteered update resets the toll; when the toll lapses, the next call must carry one.',
-  };
-  // THE PROSE RIDES ONCE, ON se_pull. Stamping it on every tool made the same
-  // 1,206 characters half of the entire tool surface. What the v2 lesson above
-  // needs is the DECLARATION on every schema, never the prose, so every other
-  // tool carries a pointer instead and the typing is untouched.
-  const UPDATE_REF = {
-    type: "object",
-    description: "Narration op riding this call: {op, brief?, items?, node?}. Ops and rules: see se_pull.",
-  };
+
   // WHICH HAND IS CALLING — req-every-call-records-the-part-its-caller-played.
   // It rides every lane tool for the same reason `update` does: the answer is
   // about the CALL rather than about any one verb, and a coordinate a caller
@@ -679,7 +758,6 @@ export function buildServer(
   };
   for (const t of tools) {
     const props = t.inputSchema.properties as Record<string, unknown>;
-    props.update = t.name === "se_pull" ? UPDATE_FULL : UPDATE_REF;
     props.as = AS_PROP;
     props.relayed_by = RELAYED_BY_PROP;
     props.answered_by = ANSWERED_BY_PROP;
@@ -694,11 +772,7 @@ export function buildServer(
   );
   server.setAnswerSpillDir(seDir(root));
   const log = new CallLog(seDir(root));
-  const toll = new Toll({
-    ...tollOpts,
-    cadence: () => ({ minutes: session.narrationMinutes, calls: session.narrationCalls }),
-    openNodes: () => session.decisions.openNodeIds(),
-  });
+  const toll = new Toll(tollOpts);
 
   // Session read buffer: live se_file_read results feed later tick proofs.
   // Reads at a git ref are intentionally excluded.
@@ -730,75 +804,49 @@ export function buildServer(
   });
   // see dsp-lane-door.md#method-cannot-be-changed-from-inside-a-record
 
-  let updateComplaint: RejectionPayload | undefined;
-  let updateRejection: Rejection | undefined;
-  let updateResult: Record<string, unknown> | undefined;
-  server.addGuard((tool, args) => {
+  server.addGuard(() => {
     // see dsp-lane-door.md#every-external-call-is-a-new-drawing-epoch
     bumpDrawingEpoch();
-    updateComplaint = undefined;
-    updateRejection = undefined;
-    updateResult = undefined;
-    if (args.update === undefined) return;
-    const raw = args.update;
-    delete args.update;
-    try {
-      const { corrected, ...op } = parseUpdate(raw);
-      const visit = session.currentVisit();
-      const result = session.decisions.apply(visit, op);
-      // BOTH HALVES CAN CORRECT AT ONCE — the parser (a chained brief) and
-      // the apply (a closed node). Spreading would drop one silently.
-      const notes = [(result as Record<string, unknown>).corrected, corrected].filter((c): c is string => typeof c === "string");
-      updateResult = { ...(result as unknown as Record<string, unknown>), ...(notes.length > 0 ? { corrected: notes.join(" · ") } : {}) };
-      log.append({
-        tool: "se_update",
-        args: { via: tool, visit, ...op },
-        actor: "agent",
-        // THE CALL'S OWN COORDINATES, NOT THE UPDATE PAYLOAD'S. This read
-        // `raw` — the {op, node, brief} object — so an `se_update` record took
-        // its part and its answering model out of a place they never appear.
-        // Every one of them said `walker` and `unreported` however the caller
-        // declared itself, and a coordinate placed INSIDE the update object
-        // reached the record while bypassing the vocabulary guard entirely.
-        // `se_update` is the second most common tool in the log.
-        //
-        // FOUND BY A RED TEAM AT i38's implementation gate, by probing rather
-        // than reading: `as: "guide"` on the call, `walker` on the record.
-        ...whichHand(session, args),
-        ok: true,
-        outcome: "result",
-        duration_ms: 0,
-        response: result,
-      });
-      toll.paid();
-    } catch (e) {
-      if (!(e instanceof Rejection)) throw e;
-      updateRejection = e;
-      updateComplaint = e.toJSON();
-      log.append({
-        tool: "se_update",
-        args: { via: tool, refused: true },
-        actor: "agent",
-        ...whichHand(session, args),
-        ok: false,
-        outcome: "rejected",
-        duration_ms: 0,
-        response: updateComplaint,
-      });
-    }
   });
 
-  // THE TOLL — armed after boot; one grace warning, then the refusal.
-  // THE PAYMENT'S OWN REFUSAL OUTRANKS THE TOLL (note-c883db8c6e12): a call
-  // that carried an update which failed to apply must hear what was wrong
-  // with the payment — the bare toll clause sent five identical resends
-  // into the same wall, live, on 2026-08-03.
+  // NOTHING IS DEMANDED AT DISPATCH. The toll arms itself after boot and asks
+  // for nothing, because a token taken and a token settled ARE the narration
+  // and both log themselves.
   server.addGuard((tool, args) => {
+    toll.check(session.isBooted(), tool, args);
+  });
+
+  // A PIECE OF WORK OPENED, TAKEN OR SETTLED IS THE PAYMENT. Every act carries
+  // a comment the store refuses to leave empty, which is the sentence the toll
+  // was ever asking for. see dsp-narration.md#the-toll
+  //
+  // IT PAYS ON THE WAY OUT, so only a SUCCEEDING act clears the debt. A refused
+  // one narrated nothing.
+  //
+  // AND IT RUNS BEFORE THE WARNING DECORATOR, so the call that pays is not also
+  // nagged for not having paid.
+  server.addDecorator((tool, result) => {
+    if (tool === "se_work") toll.paid();
+    return result;
+  });
+
+  // THE QUESTION ABOUT THE WORK IN HAND, asked at most once a minute.
+  //
+  // A PIECE OF WORK THAT HOLDS THE HAND FOR A LONG TIME IS TWO THINGS AT ONCE.
+  // Either it is genuinely one long piece of work, or the walker strayed onto
+  // something else and owes a token for it. Only the walker knows which, so
+  // the engine asks rather than guessing.
+  //
+  // IT RIDES A RESULT AND NEVER REFUSES. see dsp-narration.md#the-toll
+  server.addDecorator((_tool, result) => {
     try {
-      toll.check(session.isBooted(), tool, args);
-    } catch (tollErr) {
-      throw updateRejection ?? tollErr;
+      const hand = inHandAt(root, session.active());
+      toll.sameWork(hand?.id ?? "", hand?.statement ?? "");
+    } catch {
+      // A STORE THAT CANNOT BE READ ASKS NOTHING. A question is never worth
+      // failing a call the walker already got an answer to.
     }
+    return result;
   });
 
   // The grace warning rides the NEXT successful result (never a refusal).
@@ -869,7 +917,7 @@ export function buildServer(
         `THE RUNNING LANE IS OLDER THAN THE CODE ON DISK. It serves ${age.served}; the tree is at ${age.on_disk}. Engine changes since then are invisible here, including any this walk made. Run se_reload at idle to restart it onto these sources.`,
       );
     }
-    // THE STALE-SETTINGS BANNER IS STRUCK (owner, 2026-08-20). It explained an
+    // THE STALE-SETTINGS BANNER IS STRUCK (owner). It explained an
     // earlier lane, a settings store and a design decision, to a person who
     // had just opened the system and wanted to work. A banner is for something
     // the reader must ACT on, and there was nothing to act on.
@@ -902,28 +950,6 @@ export function buildServer(
     },
     { onRefusal: true },
   );
-
-  // see dsp-write-guard.md#and-so-does-the-accepted-one
-  server.addDecorator((_tool, result) => {
-    const u = updateResult;
-    updateResult = undefined;
-    if (u === undefined || typeof result !== "object" || result === null || Array.isArray(result)) return result;
-    return { ...(result as Record<string, unknown>), update_result: u };
-  });
-
-  // The refused update rides home on the call it could not stop.
-  server.addDecorator((_tool, result) => {
-    const c = updateComplaint;
-    updateComplaint = undefined;
-    if (c === undefined || typeof result !== "object" || result === null || Array.isArray(result)) return result;
-    return {
-      ...(result as Record<string, unknown>),
-      update_refused: {
-        ...c,
-        note: "THE CALL WENT THROUGH — this update did not. Carry a corrected one on your next call; the toll is unpaid until you do.",
-      },
-    };
-  });
 
   // THE REPAIRED ARGUMENT NAME rides home on the call it saved.
   server.addDecorator((_tool, result) => {
@@ -963,6 +989,15 @@ export function buildServer(
   // FOUND BY A FRESH-EYES TESTER AT i38's verification, by probing the lane
   // rather than by reading the check — the case that was supposed to hold this
   // asserted on `append` directly, and the property is false one layer up.
+  // THE AGENT WORKING IS ACTIVITY, and the idle clock could not hear it.
+  //
+  // The clock only heard `notifyChange`, which fires when the WALK moves. An
+  // agent reading, searching and writing at the front desk moves nothing, so a
+  // shutdown counted down underneath a session that was plainly busy.
+  //
+  // EVERY LANE CALL RINGS IT, and this guard is the one place they all pass.
+  // see dsp-boot-and-power.md#what-survives-a-reload-and-what-does-not
+  server.addGuard(() => session.touchActivity());
   server.addGuard((tool, args) => {
     for (const key of ["as", "relayed_by"] as const) {
       const v = args[key];
@@ -1141,6 +1176,7 @@ export function buildServer(
 
   // §9 — the single call path logs everything. se_run keeps its full output.
   server.addObserver((rec) => {
+    const hand = whichHand(session, rec.args);
     log.append({
       tool: rec.tool,
       args: rec.args,
@@ -1152,7 +1188,8 @@ export function buildServer(
       // before any move, because the guards throw ahead of the handler.
       // see dsp-call-log.md#the-walk-position-is-stamped-not-inferred
       where: session.active(),
-      ...whichHand(session, rec.args),
+      hands: session.hands(),
+      ...hand,
       ok: rec.ok,
       outcome: rec.outcome,
       duration_ms: rec.duration_ms,
@@ -1160,15 +1197,19 @@ export function buildServer(
       // because that is the one a caller comes back for. Everything else is
       // capped here — so the cut says so, rather than sending a reader to the
       // very file they are already reading.
-      response:
-        rec.tool === "se_run"
-          ? rec.response
-          : capJson(
-              rec.response,
-              500,
-              "cut from the LOG's copy — the caller received this answer whole, and only se_run's output is kept in full",
-            ),
+      response: rec.tool === "se_run" ? rec.response : capJson(rec.response, 500),
     });
+    // A DELEGATED HAND'S OWN CALL IS ITS PROGRESS REPORT. Any call it makes
+    // proves a walking hand is still walking, so it refreshes the newest
+    // running agent job — the only cure for `statusOf` reading a busy hand's
+    // silence as idle.
+    //
+    // IT USED TO KEY ON A NARRATION OP, and those are gone: a token opened,
+    // taken or settled IS the narration now, and it is one of these calls.
+    //
+    // A GUIDE, THE OWNER OR THE SURFACE NEVER REFRESH ANYTHING: acting ABOUT a
+    // walker is not the walker itself working.
+    if (hand.part === "walker" || hand.part === "reviewer") noteAlive();
     if (rec.ok && EDIT_TOOLS.has(rec.tool) && JSON.stringify(rec.args ?? {}).includes(".ts")) kickTypecheck(root);
   });
 

@@ -3,21 +3,31 @@ state: retro
 state_kind: work
 priority: strategic
 statement: Turn what happened into rules.
-legal_tools: se_note_drain, se_survey, se_log_query, se_answer, se_help, se_test, se_run, se_file_read, se_file_search, se_file_glob, se_file_list, se_file_patch, se_file_write, se_prompt_place, se_seed_expedition, se_seed_iteration, se_web_search, se_web_fetch
+legal_tools: se_note_drain, se_survey, se_log_query, se_answer, se_help, se_test, se_run, se_file_read, se_file_search, se_file_glob, se_file_list, se_file_patch, se_file_write, se_file_delete, se_prompt_place, se_seed_expedition, se_seed_iteration, se_git
 entry_read: guidance/method/retro.md
 motivation: Lessons expire. A stray nobody judges rots into noise, and a mistake nobody names repeats. The retro turns what happened into rules while it is cheap, and it empties the inbox so the next decision starts clean.
 inputs:
-  - "Do the survey | Run se_survey. One call lists everything open: expeditions, iterations, pending notes, the options pool."
+  - "Do the survey | Run se_survey. One call lists everything open: expeditions, iterations, pending notes, the backlog."
   - "Establish the interval | Name the span this retro judges: from the last retro (se_log_query shows it) to now. Write it into the report."
 follow_up_label: steps minted
 guidance: |
   THE RETRO, applied. Follow `guidance/method/retro.md` step by step.
 
   - Open with se_survey. One call lists everything that stands open, down to
-    the work tokens standing in the options pool.
+    the work tokens standing in the backlog.
+  - HISTORY IS READABLE HERE (owner ruling). Tallying what the previous retro
+    emitted needs the commit history, and refusing it made that step
+    impossible from inside the one state that owes it. Reading is legal.
   - Drain every pending note with se_note_drain, including the needs-retro
     triggers. This state is the ONE place draining is legal.
+  - THE LAST STEP IS THE BACKLOG. Everything is in it by now, so walk it and
+    give each item its owner — an iteration, the overhaul, a state. A move is
+    one field in the item's own file, not a verb somebody has to build.
   - Aim improvements at durable homes.
+  - DRAINING THE ASSISTANT MEMORY MEANS EMPTYING IT. Whatever holds project
+    rules, project state or working guidance moves into the repository, and the
+    memory file is then DELETED. A drain that only reads leaves the next retro
+    the same pile to judge again.
   - Re-project the prompt layer with se_prompt_place after editing guidance.
     Editing guidance/ makes AGENTS.md, CLAUDE.md and the Copilot
     instructions stale, and preflight goes red at the next verdict.
@@ -40,7 +50,7 @@ The retro is one state (the one-state rule) - its legality zone rides
 legal_tools, its method rides the entry read. Leaving it should leave
 the inbox empty.
 
-## An empty inbox skips the retro (owner ruling 2026-08-16)
+## An empty inbox skips the retro
 
 THE CADENCE DOUBLE-FIRES AND THE OWNER NAMED IT. Run a retro at the desk, then
 open an iteration, and the iteration's own onboard-retro runs a second one
@@ -94,7 +104,7 @@ stale projections, and the verb that fixes it refused under SE-C-110. The
 repair went through the shell with its reason logged, which is a refusal doing
 its job and a grant that was wrong.
 
-## The outward doors are legal here (owner ruling 2026-08-15)
+## The outward doors are legal here
 
 `se_web_search` and `se_web_fetch` were missing from this state's tools, and
 the gap surfaced the moment the retro tried to do its own job.

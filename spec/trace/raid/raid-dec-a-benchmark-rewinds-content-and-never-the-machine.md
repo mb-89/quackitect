@@ -3,11 +3,11 @@ minted_in: i37-training-iterations-a-disposable-iterati
 id: raid-dec-a-benchmark-rewinds-content-and-never-the-machine
 type: "[[raid]]"
 kind: decision
-statement: "A benchmark run exports the content subtree at the rewind commit. The deliverable is never checked out at an old commit, so the engine measured is always the current one."
+statement: A benchmark run exports the content subtree at the rewind commit. The deliverable is never checked out at an old commit, so the engine measured is always the current one.
 owner: the owner
-trigger: "any change to what counts as content, or the first time a benchmark needs a past engine to reproduce a result"
+trigger: any change to what counts as content, or the first time a benchmark needs a past engine to reproduce a result
 status: decided
-impact: "The whole experiment is whether a weaker model on an improved machine matches a stronger model on the old one. Rewinding the machine with the content would measure the machine as it was, which is the opposite of the question."
+impact: The whole experiment is whether a weaker model on an improved machine matches a stronger model on the old one. Rewinding the machine with the content would measure the machine as it was, which is the opposite of the question.
 breaks_how_badly: fatal
 how_likely: expected
 weighs_with: none
@@ -16,7 +16,7 @@ source_refs:
   - raid-asm-a-throwaway-tree-at-an-old-commit-can-run-the-engine
   - "owner ruling 2026-08-19: the engine that works of a rewound tree is the current engine"
   - "probe 2026-08-19: git archive of spec at 5f85977f^ produced 1149 files, 0 mentioning i33"
-  - "raid-asm-a-throwaway-tree-at-an-old-commit-can-run-the-engine"
+  - raid-asm-a-throwaway-tree-at-an-old-commit-can-run-the-engine
 ---
 
 ## What it settles

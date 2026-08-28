@@ -17,6 +17,7 @@ source_refs:
   - raid-asm-battery-timings-measure-work
   - raid-iss-record-entry-levels-method-not-spec
   - i12
+place: i41-green-is-computed-once-and-right-the-dia
 ---
 
 ## What was observed

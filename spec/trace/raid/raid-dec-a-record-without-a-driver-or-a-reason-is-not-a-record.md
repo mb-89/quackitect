@@ -7,9 +7,9 @@ type: "[[raid]]"
 kind: decision
 statement: A call record carrying neither the driver the machine named nor a stated reason for departing from it is not a valid record, and the named driver is written at the moment of the call rather than reconstructed.
 owner: the owner
-trigger: "the first walk that runs on a weaker hand than the one named, and the first attempt to measure how often that happens"
+trigger: the first walk that runs on a weaker hand than the one named, and the first attempt to measure how often that happens
 status: decided
-impact: "Without it the design's only safety rule is a convention. req-a-weaker-driver-than-named-owes-a-recorded-reason obliges a reason for a departure that nothing records and nothing checks, so the obligation falls on a participant with no incentive to meet it and no mechanism that notices when they do not."
+impact: Without it the design's only safety rule is a convention. req-a-weaker-driver-than-named-owes-a-recorded-reason obliges a reason for a departure that nothing records and nothing checks, so the obligation falls on a participant with no incentive to meet it and no mechanism that notices when they do not.
 breaks_how_badly: crippling
 how_likely: expected
 source_refs:

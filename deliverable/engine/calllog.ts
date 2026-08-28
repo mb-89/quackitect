@@ -12,9 +12,9 @@ import { stripBom } from "./jsonio.ts";
 /** THE PART A HAND PLAYED. Closed on purpose: an open vocabulary makes every
  *  count a guess about what the words meant that day. Two was never the
  *  property — req-acts-carry-role-and-channel's Detail fixed it at two until
- *  2026-08-20, which is why no design about which of two agents walks a step
+ *, which is why no design about which of two agents walks a step
  *  could ever score on it. */
-export type CallPart = "owner" | "walker" | "guide" | "reviewer" | "surface";
+export type CallPart = "owner" | "walker" | "guide" | "reviewer" | "researcher" | "surface";
 
 export interface CallRecord {
   ref: string;
@@ -45,12 +45,9 @@ export interface CallRecord {
    *  that tells the hand holding the walk apart from a hand it delegated to.
    *  `actor` cannot: a walker and a guide are both `agent`.
    *
-   *  NOT ENFORCED YET. The field is declared so the checks at
-   *  tests/call-attribution.test.ts compile and run red. Requiring it,
-   *  refusing a value outside the vocabulary, and taking it from the work's
-   *  AUTHOR rather than the caller are the chunks
-   *  the-call-record-grows-three-fields and
-   *  the-role-vocabulary-separates-two-hands. */
+   *  ENFORCED BY `assertCoordinates` in this file: a record reaching `append`
+   *  without it throws. The type stays optional because a caller composes the
+   *  record before the door checks it. */
   part?: CallPart;
   /** WHO FILED IT, where that is not who authored it. A guide may work the
    *  lane itself, and then this is absent. Where the walker carries a guide's
@@ -63,6 +60,12 @@ export interface CallRecord {
    *  argument, so the log can be grouped by it —
    *  req-every-call-records-the-state-it-was-made-in. */
   state?: string;
+  /** SOLO OR SPAWNED, at the moment this call was served. `.se/settings.json`
+   *  is session-global and gets rewritten, so a retro reading it later learns
+   *  which arm the LAST session ran — not which arm THIS record ran. The
+   *  call log is the archive; this stamp is what makes the two arms
+   *  comparable per record rather than per session. */
+  hands?: "solo" | "spawned";
   /** WHICH OF THE FIELDS ABOVE ARE SELF-REPORTED. The state is known where the
    *  call is served; the model and the part are known only to the caller. A
    *  field that reads like an observation and is a claim is worse than an
@@ -132,7 +135,12 @@ const STAT_EVERY = 50;
  *  time. A vocabulary that holds for our own code and for nothing arriving
  *  through a lane call is not closed — see
  *  req-every-call-records-the-part-its-caller-played. */
-const PARTS: ReadonlySet<string> = new Set<CallPart>(["owner", "walker", "guide", "reviewer", "surface"]);
+// `researcher` JOINED ON. It was left out on the reasoning that a
+// researcher need not report to the log — true of the log, false of liveness.
+// A hand whose part is not in this set cannot have its narration attributed to
+// it, so the work table marked a working researcher idle and could not be told
+// otherwise.
+const PARTS: ReadonlySet<string> = new Set<CallPart>(["owner", "walker", "guide", "reviewer", "researcher", "surface"]);
 
 /** THE TWO COORDINATES ONLY THE CALLER KNOWS. The state is written by the
  *  handler that served the call; these two are claims and are marked. */
@@ -163,6 +171,72 @@ function assertCoordinates(entry: { answered_by?: string; state?: string; part?:
   if (entry.relayed_by !== undefined && entry.relayed_by === entry.part) {
     throw new Error("relayed_by names who FILED work somebody else authored — it cannot be the author's own part");
   }
+}
+
+/** Follow a dotted path into a record, giving up quietly at the first gap. */
+function dig(obj: unknown, path: string): unknown {
+  return path.split(".").reduce<unknown>((v, k) => (v && typeof v === "object" ? (v as Record<string, unknown>)[k] : undefined), obj);
+}
+
+/** Bucket records by one key, and collect each bucket's durations when asked.
+ *
+ *  A CAPPED RESPONSE IS A STRING, so digging into it reaches nothing even
+ *  though the clause is sitting in the text. Most refusals in a long log are
+ *  stored that way, so the dig alone reports a small fraction of them and
+ *  buries the rest under `(none)` — which reads exactly like a period with few
+ *  refusals.
+ *
+ *  SO THE CLAUSE KEY FALLS BACK TO THE TEXT. It is the one key whose values
+ *  have a fixed shape, which is what makes the fallback safe here and wrong as
+ *  a general rule. */
+function groupRecords(
+  records: CallRecord[],
+  groupBy: string,
+  clauseKey: boolean,
+  wantTimings: boolean,
+): { groups: Record<string, number>; reached: number; durations: Record<string, number[]> } {
+  const groups: Record<string, number> = {};
+  const durations: Record<string, number[]> = {};
+  let reached = 0;
+  const clauseInText = (r: CallRecord): string | undefined => /\bSE-C-\d{3}\b/.exec(JSON.stringify(r))?.[0];
+  for (const r of records) {
+    let raw = dig(r, groupBy);
+    if ((raw === undefined || raw === null) && clauseKey) raw = clauseInText(r);
+    if (raw !== undefined && raw !== null) reached++;
+    const key = String(raw ?? "(none)");
+    groups[key] = (groups[key] ?? 0) + 1;
+    if (wantTimings && typeof r.duration_ms === "number") {
+      const bucket = durations[key] ?? [];
+      bucket.push(r.duration_ms);
+      durations[key] = bucket;
+    }
+  }
+  return { groups, reached, durations };
+}
+
+/** What each bucket cost: the count, the total, and four points of the spread.
+ *
+ *  THE MEDIAN IS THE ONE THAT MATTERS HERE, and the minimum is the one that
+ *  catches a fixed toll. A verb whose fastest call in four days is 1,342 ms is
+ *  not doing 1,342 ms of work. */
+function summariseDurations(
+  durations: Record<string, number[]>,
+): Record<string, { n: number; total_ms: number; min: number; median: number; p90: number; max: number }> {
+  const out: Record<string, { n: number; total_ms: number; min: number; median: number; p90: number; max: number }> = {};
+  for (const [key, raw] of Object.entries(durations)) {
+    if (raw.length === 0) continue;
+    const ds = [...raw].sort((a, b) => a - b);
+    const at = (p: number): number => ds[Math.min(ds.length - 1, Math.floor(ds.length * p))];
+    out[key] = {
+      n: ds.length,
+      total_ms: ds.reduce((a, b) => a + b, 0),
+      min: ds[0],
+      median: at(0.5),
+      p90: at(0.9),
+      max: ds[ds.length - 1],
+    };
+  }
+  return out;
 }
 
 export class CallLog {
@@ -231,7 +305,7 @@ export class CallLog {
     return total;
   }
 
-  /** ONE PARSE, NOT FOUR THOUSAND (owner, 2026-07-29: clicking a log line
+  /** ONE PARSE, NOT FOUR THOUSAND (owner: clicking a log line
    *  took seconds). This walked records(), which JSON.parses EVERY line of
    *  the whole log into an object, to return exactly one of them. At five
    *  megabytes that is thousands of parses per click, synchronously, on the
@@ -305,7 +379,7 @@ export class CallLog {
    *  refused, so the newest of those marks a retro.
    *
    *  THE FALLBACK IS THE LIVE FILE'S START, NEVER ANOTHER DRAIN (owner
-   *  instruction 2026-08-18). A `done` or `obsolete` drain is a check anyone
+   *  instruction ). A `done` or `obsolete` drain is a check anyone
    *  can run and every walk makes them, so taking the newest drain of ANY
    *  disposition puts the mark wherever the last walk happened to tidy up.
    *
@@ -320,7 +394,7 @@ export class CallLog {
    *  truncated mining window reports almost nothing and reads as finished,
    *  and retro.md step 1 already promised the behaviour this now has.
    *
-   *  THE SCAN CROSSES ROTATIONS, corrected 2026-08-20. It used to read the
+   *  THE SCAN CROSSES ROTATIONS, corrected. It used to read the
    *  LIVE FILE ALONE and call the live file's start "the honest answer" for a
    *  drain older than it. That reasoning assumed a rotation lands between
    *  retros. It does not: this log rotates every 12 MB, which this project
@@ -357,7 +431,7 @@ export class CallLog {
     for (const line of lines) {
       // The first parseable record dates the live file. Only this one line is
       // parsed speculatively — the whole-log parse is what killed the server
-      // in 2026-08-09, and the substring guard below still holds for the rest.
+      // in, and the substring guard below still holds for the rest.
       if (first === undefined) {
         try {
           first = (JSON.parse(line) as CallRecord).ts;
@@ -422,11 +496,29 @@ export class CallLog {
   query(q: {
     filter?: { tool?: string; ok?: boolean; since?: string; text?: string; min_ms?: number };
     group_by?: string;
+    /** ASK EACH GROUP WHAT IT COST, not only how many there were.
+     *
+     *  A COUNT CANNOT SEE A FIXED TOLL. Grouping this log by tool says the
+     *  cheap verbs are the common ones, which is true and useless. What sizes
+     *  a speed round is that the cheap verbs never finish under a second:
+     *  measured 2026-08-28 over four days, 68.5% of 3,677 lane calls landed
+     *  between 1.0 and 2.0 seconds whatever they did, and `se_file_delete`
+     *  never once beat 1,342 ms.
+     *
+     *  THAT WAS FOUND WITH A THROWAWAY SCRIPT and would have died with the
+     *  session. It is a subfunction of the verb that already reads this log
+     *  rather than a verb of its own (owner ruling 2026-08-28: not everything
+     *  needs to become a verb). */
+    timings?: boolean;
     limit?: number;
     offset?: number;
   }): {
     total: number;
     groups?: Record<string, number>;
+    /** PER GROUP, WHAT IT COST. Only present when `timings` was asked for.
+     *  `n` counts the records in the group that carried a duration at all,
+     *  which can be fewer than the group's count. */
+    timings?: Record<string, { n: number; total_ms: number; min: number; median: number; p90: number; max: number }>;
     /** SET WHEN NO RECORD CARRIED THE KEY AT ALL. The groups then say
      *  `(none)` and mean "asked for something nobody has", which is a
      *  different answer from "everybody has the same value". */
@@ -435,8 +527,6 @@ export class CallLog {
     offset?: number;
     older?: number;
   } {
-    const dig = (obj: unknown, path: string): unknown =>
-      path.split(".").reduce<unknown>((v, k) => (v && typeof v === "object" ? (v as Record<string, unknown>)[k] : undefined), obj);
     const f = q.filter ?? {};
     // AN UNKNOWN KEY INSIDE `filter` ANSWERED INSTEAD OF REFUSING, and a wrong
     // filter reads exactly like a real one. SE-C-101 refuses an unknown
@@ -465,19 +555,13 @@ export class CallLog {
     // under `(none)`.
     const groupBy = q.group_by === "clause" ? "response.clause" : q.group_by;
     // since: "last_retro" — the newest judgment drain marks the previous
-    // retro; the retro mines only its own period (the raw log is kept,
-    // owner ruling: forever-until-1GB).
+    // retro; the retro mines only its own period. The raw log itself is kept
+    // for good, or until it reaches a gigabyte.
     const since = f.since === "last_retro" ? this.lastRetroMark() : f.since;
     const records = this.filtered({ tool: f.tool, ok: f.ok, text: f.text, since, min_ms: f.min_ms });
     if (groupBy !== undefined) {
-      const groups: Record<string, number> = {};
-      let reached = 0;
-      for (const r of records) {
-        const raw = dig(r, groupBy);
-        if (raw !== undefined && raw !== null) reached++;
-        const key = String(raw ?? "(none)");
-        groups[key] = (groups[key] ?? 0) + 1;
-      }
+      const { groups, reached, durations } = groupRecords(records, groupBy, q.group_by === "clause", q.timings === true);
+      const timings = q.timings === true ? summariseDurations(durations) : undefined;
       // A KEY NOTHING CARRIES AND A KEY EVERYTHING SHARES LOOK IDENTICAL from
       // the groups alone: both are one bucket. This iteration read one as
       // evidence of the other, so the answer now says which it is rather than
@@ -485,6 +569,7 @@ export class CallLog {
       return {
         total: records.length,
         groups,
+        ...(timings === undefined ? {} : { timings }),
         ...(records.length > 0 && reached === 0 ? { group_by_reached_nothing: groupBy } : {}),
       };
     }
@@ -581,7 +666,7 @@ export class CallLog {
     };
   }
 
-  /** ~1 GB: surface a cleanup decision, never auto-delete (owner ruling, v2). */
+  /** ~1 GB: surface a cleanup decision, never auto-delete. */
   cleanupDue(): boolean {
     return existsSync(this.path) && statSync(this.path).size >= GB;
   }

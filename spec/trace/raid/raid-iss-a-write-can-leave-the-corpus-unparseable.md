@@ -14,6 +14,7 @@ source_refs:
   - observed live 2026-08-16, at i6/log-risks
   - i6 record vision — conformance moves to the WRITE path
   - raid-dec-a-check-refuses-a-wrong-write-and-reports-a-wrong-corpus
+place: i29-frontmatter-is-typed-and-the-engine-writ
 ---
 
 ## What happened, in full

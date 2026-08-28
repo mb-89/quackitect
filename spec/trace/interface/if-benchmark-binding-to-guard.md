@@ -4,13 +4,13 @@ unreachable_refs:
 minted_in: i37-training-iterations-a-disposable-iterati
 id: if-benchmark-binding-to-guard
 type: "[[interface]]"
-statement: "The binding hands the guard the rewind commit and the fact that a run is open, and the guard answers every later resolution against them."
+statement: The binding hands the guard the rewind commit and the fact that a run is open, and the guard answers every later resolution against them.
 source: el-benchmark-binding
 destination: el-benchmark-guard
 carries:
   - flow-bound-run
 form: in-process call
-bound: "inherited from req-call-answers-in-one-second, divided by the resolutions a lane call makes. THAT COUNT IS UNMEASURED, so the crossing has no number yet and this says so rather than inventing one."
+bound: inherited from req-call-answers-in-one-second, divided by the resolutions a lane call makes. THAT COUNT IS UNMEASURED, so the crossing has no number yet and this says so rather than inventing one.
 source_refs:
   - i37-training-iterations-a-disposable-iterati
   - cand-the-refusing-run-with-recorded-conditions

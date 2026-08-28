@@ -1,11 +1,11 @@
 ---
 form: gate-requirements
 bless: blessed by human
-amended: "2026-08-19T15:12:54.193Z by agent — one of the five design choices this gate hands forward was struck by the owner on 2026-08-19"
+amended: 2026-08-19T15:12:54.193Z by agent — one of the five design choices this gate hands forward was struck by the owner on 2026-08-19
 by: agent
 signed_off: 2026-08-19T13:51:33.975Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / gate-requirements

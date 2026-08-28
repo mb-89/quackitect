@@ -3,14 +3,15 @@ minted_in: i9
 id: raid-iss-this-records-cited-line-numbers-moved-under-it
 type: "[[raid]]"
 kind: issue
-statement: "Three of the four code anchors this record cites have moved, because two later iterations restructured the file after this record was seeded."
+statement: Three of the four code anchors this record cites have moved, because two later iterations restructured the file after this record was seeded.
 owner: the driving agent
 status: open
-impact: "A builder following the record lands on unrelated code, and the sizing argument rests on a claim about how small the change is that nobody can now check from the citation."
+impact: A builder following the record lands on unrelated code, and the sizing argument rests on a claim about how small the change is that nobody can now check from the citation.
 breaks_how_badly: abrasive
 how_likely: expected
 source_refs:
-  - "the record was seeded 2026-08-12; the file it cites was restructured by two iterations that shipped after"
+  - the record was seeded 2026-08-12; the file it cites was restructured by two iterations that shipped after
+place: i44-the-corpus-resolves-duplicate-headings-a
 ---
 
 ## What the record cites, and what stands there now

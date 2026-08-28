@@ -68,3 +68,16 @@ cycle, and the compiler said so.
 
 The defect is in how the walk ENFORCES this precedence, not in whether the
 precedence is declared.
+
+## THE HYGIENE CHUNK IS A CHUNK LIKE ANY OTHER
+
+One of the drawn chunks carries work that is not this record's subject — items
+pulled from the backlog, the log and the notes at specify-build.
+
+IT WALKS THE SAME WAY. Same fills, same actor, same record. Nothing about it is
+an exception, and that is the point: hygiene done outside the walk is hygiene
+nobody can see afterwards.
+
+WHAT IT IS FOR. The backlog only ever grows while every item waits for a round
+that names it. Pulling the unassigned ones into whichever round has room is how
+the pile falls.

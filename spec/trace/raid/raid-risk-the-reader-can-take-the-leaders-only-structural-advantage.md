@@ -3,20 +3,20 @@ minted_in: i38-the-machine-sizes-its-own-driver-every-s
 id: raid-risk-the-reader-can-take-the-leaders-only-structural-advantage
 type: "[[raid]]"
 kind: risk
-statement: "The Pugh leader leads on two axes, ties or trails on three, and the rival already level with it can take one of the two without giving up anything of its own — after which it leads outright."
+statement: The Pugh leader leads on two axes, ties or trails on three, and the rival already level with it can take one of the two without giving up anything of its own — after which it leads outright.
 owner: the walking agent
-trigger: "declare-winner, and graft-onto-the-winner where the graft this entry describes is the machine's own next act"
+trigger: declare-winner, and graft-onto-the-winner where the graft this entry describes is the machine's own next act
 status: closed
 looked: 2026-08-20
 closed: 2026-08-20
-impact: "A winner declared at cand-whoever-holds-the-hands-decides is declared one point ahead on one axis, over a rival that can erase the point by adopting a mechanism it is not prevented from adopting. Two independent perturbations - the graft and a weighting by the damage grades the axes already carry - both hand the lead to cand-the-reader-beside-the-walk."
+impact: A winner declared at cand-whoever-holds-the-hands-decides is declared one point ahead on one axis, over a rival that can erase the point by adopting a mechanism it is not prevented from adopting. Two independent perturbations - the graft and a weighting by the damage grades the axes already carry - both hand the lead to cand-the-reader-beside-the-walk.
 breaks_how_badly: crippling
 how_likely: expected
 probe: "COMPUTED OVER THE RE-EARNED SCORE TABLE, 2026-08-20, every graft the leader's strengths admit. Baseline sums are reader 12, receiver 11, seed 9, derived 9, the datum is the receiver and the totals against it are reader ZERO, seed minus one, derived minus one. THE LEADER HOLDS TWO STRENGTHS. On req-a-wrong-act-never-passes-silently it scores 4 and the reader already ties by a different mechanism, so there is nothing to take; granted free to either eliminated candidate, neither passes the reader. On req-walk-survives-host-swap it scores 4 against the reader's 3, and the reader taking opt-the-block-names-a-rung-and-never-a-model reaches 13 against 11 and LEADS OUTRIGHT. THE SECOND ROUTE NEEDS NO GRAFT AT ALL: weighting fatal 4, crippling 3, corrosive 2 gives reader 35, receiver 34. THE LEADER CANNOT ANSWER IN KIND — it scores 0 on req-the-actor-is-recorded-where-the-call-is-served and is worst of four there, and its own note says why: nothing of ours ever knew which model the rung resolved to."
 probed: 2026-08-20
 source_refs:
   - i38-the-machine-sizes-its-own-driver-every-s
-  - "reverse-sensitivity reverse_graft, 2026-08-20"
+  - reverse-sensitivity reverse_graft, 2026-08-20
 weighs_with: none
 weighs_against: none
 ---

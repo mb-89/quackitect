@@ -2,16 +2,16 @@
 minted_in: i38-the-machine-sizes-its-own-driver-every-s
 id: req-the-complexity-value-is-read-live-and-never-pinned
 type: "[[requirement]]"
-statement: "The engine shall keep a step's complexity out of every record's demand ledger, so that a complexity changing reopens no standing claim."
+statement: The engine shall keep a step's complexity out of every record's demand ledger, so that a complexity changing reopens no standing claim.
 kind: constraint
 verify_method: test
-breaks_if_removed: "If complexity enters the demands, every demand in every standing record moves at once and every claim behind them reopens. Three records are open and pinned today and two of them carry more than fifty demands each."
+breaks_if_removed: If complexity enters the demands, every demand in every standing record moves at once and every claim behind them reopens. Three records are open and pinned today and two of them carry more than fifty demands each.
 breaks_how_badly: fatal
 refines:
   - uc-let-the-machine-name-the-driver
 source_refs:
-  - "uc-let-the-machine-name-the-driver step 2"
-  - "raid-risk-naming-a-driver-per-milestone-moves-the-step-shapes-and-reopens-standing-claims"
+  - uc-let-the-machine-name-the-driver step 2
+  - raid-risk-naming-a-driver-per-milestone-moves-the-step-shapes-and-reopens-standing-claims
 priority: must
 ---
 

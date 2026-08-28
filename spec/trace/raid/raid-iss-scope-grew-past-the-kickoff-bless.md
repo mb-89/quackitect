@@ -13,6 +13,7 @@ how_likely: expected
 source_refs:
   - spec/iterations/i27/evidence/gate-kickoff.md
   - raid-iss-scope-grew-past-a-signed-state
+place: i65-deferred-revalidation-a-change-that-ripp
 ---
 
 FOUR LANDED BEFORE THE GATE PRICED THEM, built on trunk the same day

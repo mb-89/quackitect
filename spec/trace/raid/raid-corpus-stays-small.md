@@ -17,6 +17,7 @@ source_refs:
   - "i34 2026-08-16: methodFilesIn is deleted, so the whole-folder method scan this entry named is gone; the whole-corpus green recomputation it also names still stands"
   - engine/paths.ts methodFilesIn
   - req-call-answers-in-one-second
+place: i41-green-is-computed-once-and-right-the-dia
 ---
 
 The whole computed-green design rests on reading being cheap. recordDone opens

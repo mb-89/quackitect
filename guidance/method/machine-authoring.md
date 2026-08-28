@@ -5,7 +5,7 @@ statement: The rules for drawing machines - consulted when authoring, pulled now
 
 # Machine authoring — the rules
 
-## The one-state rule (owner ruling 2026-07-28)
+## The one-state rule
 
 A machine with only one working state is a STATE, not a sub-machine.
 Draw the state note directly on the parent canvas; give it its guidance,
@@ -21,7 +21,7 @@ that are seeded dynamically (the containers). Retro and the front desk
 were converted under this rule; the boot keeps its machine because it
 has several states.
 
-## Statements are subtitles (owner ruling 2026-07-28)
+## Statements are subtitles
 
 ONE field: `statement:`. Authored in a state note's frontmatter (or a
 sub-canvas frontmatter for its door), rendered small under the drawn
@@ -34,7 +34,7 @@ anti-noise law:
   statement that restates the name. Empty is better than an echo.
 - The owner decides what deserves one, by filling or emptying the field.
 
-## Records are not confetti (owner ruling 2026-07-28)
+## Records are not confetti
 
 Expeditions and iterations stay OPEN and collect related work until they
 are fat enough to be worth an archive entry. Do not close a record the

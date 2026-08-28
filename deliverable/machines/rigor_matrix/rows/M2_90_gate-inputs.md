@@ -18,8 +18,7 @@ legal_tools:
   - se_file_list
   - se_log_query
   - se_answer
-  - se_web_search
-  - se_web_fetch
+  - se_run
 evidence:
   - name: picture_judged
     description: the judgment the counts cannot make — are these the right journeys, and is any one of them wrong?
@@ -28,9 +27,11 @@ evidence:
   - name: passes_concrete
     description: is every pass written concretely enough to script at M6 — the formulated stage of the example system, which at M2 IS the story slides
 major: full
+major_complexity: C3/R4
 minor: none
 patch: none
 product: full
+product_complexity: C3/R4
 specification: tailored
 major_note: |
   Applies in full, scoped to the change and everything it invalidated:
@@ -38,7 +39,7 @@ major_note: |
   current. The gate's reason is strongest exactly here - system-level
   writing on a wrong user picture is what a major cannot afford.
 minor_note: |
-  FOLDED INTO THE REQUIREMENTS GATE (owner ruling 2026-08-13). With context
+  FOLDED INTO THE REQUIREMENTS GATE. With context
   and stakeholders struck at this size, this gate would guard stories and
   use cases alone - and both feed gate-requirements, which reviews them in
   the same breath.
@@ -61,7 +62,7 @@ specification_note: |
 
 The user-level picture stops here for judgment before any system-level writing starts - requirements written on unblessed stories propagate garbage. Review per [[meth-gate-review]].
 
-THE COUNTS ARE NOT EVIDENCE HERE (owner ruling 2026-08-06). Every proposition realized by a story, and every story inside a use case, are COMPUTED - `covers: value-prop` at write-stories and `covers: story` at generalize-use-cases. This gate used to ask for all three in prose, and got a paragraph that agreed with the engine until the day it did not. They are struck. If a coverage rule is red, the feeder state never signed and this gate cannot stamp; there is nothing left for a person to attest.
+THE COUNTS ARE NOT EVIDENCE HERE. Every proposition realized by a story, and every story inside a use case, are COMPUTED - `covers: value-prop` at write-stories and `covers: story` at generalize-use-cases. This gate used to ask for all three in prose, and got a paragraph that agreed with the engine until the day it did not. They are struck. If a coverage rule is red, the feeder state never signed and this gate cannot stamp; there is nothing left for a person to attest.
 
 SO THIS GATE ASKS ONLY WHAT A PERSON CAN SEE AND THE ENGINE CANNOT.
 

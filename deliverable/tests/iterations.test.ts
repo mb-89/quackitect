@@ -32,7 +32,7 @@ test("a seed stands in the container at once — its machine is M0", () => {
   const walk = gen.subGen!.i1();
   assert.deepEqual(
     walk.decl.states.map((s) => s.id),
-    ["start", "onboard-retro", "gate-kickoff", "end"],
+    ["start", "spawn-the-hands", "onboard-retro", "gate-kickoff", "end"],
     "the seed machine is M0 alone",
   );
   const kick = walk.decl.states.find((s) => s.id === "gate-kickoff")!;
@@ -76,7 +76,7 @@ test("any state's form is fetchable by its machine — the walk elsewhere", () =
   assert.ok(existsSync(inst), "the instance lives in the record's folder");
   assert.match(readFileSync(inst, "utf8"), /seen from the desk/);
   // A browse-save is never stamped and a browse-submit refuses — questions
-  // are answered in order, in the state (owner ruling 2026-08-04).
+  // are answered in order, in the state.
   assert.ok(!/^signed_off:/m.test(readFileSync(inst, "utf8")), "a save never stamps; submit does, and only in the state");
   assert.throws(
     () => s.formDone("onboard-retro", "human", "i1"),
@@ -100,8 +100,7 @@ test("the graph is evidence: an open decision point blocks the leave form", () =
   const s = new Session(root);
   const minted = s.expeditionNew("spike", "graph evidence") as { created: string };
   s.expeditionOpen(minted.created);
-  const sid = minted.created.match(/^(e\d+)-/)?.[1];
-  // A filled, done form — but the graph still holds an open point.
+  // A filled, done form.
   // ONE TREE SINCE i34: an expedition's record stands under the root.
   const rel = join(root, "spec", "expeditions", minted.created, "report.md");
   const filled = [
@@ -132,13 +131,10 @@ test("the graph is evidence: an open decision point blocks the leave form", () =
     "",
   ].join("\n");
   writeFileSync(rel, filled, "utf8");
-  s.decisions.apply(`${sid}@0`, { op: "plan", items: ["one open point"] });
-  let lint = s.formGet("expedition-leave") as { met: boolean; problems: string[] };
-  assert.equal(lint.met, false, "open point → the evidence does not stand");
-  assert.match(lint.problems.join(" | "), /open point/);
-  const node = s.decisions.graph(`${sid}@0`).nodes.find((n) => n.status === "open")!;
-  s.decisions.apply(`${sid}@0`, { op: "done", node: node.id, brief: "resolved" });
-  lint = s.formGet("expedition-leave") as { met: boolean; problems: string[] };
+  // A FILLED FORM STANDS. This used to open a decision point first and assert
+  // it blocked; the graph is gone, and what holds a state shut over unfinished
+  // work is the leaving guard over its work tokens.
+  const lint = s.formGet("expedition-leave") as { met: boolean; problems: string[] };
   assert.equal(lint.met, true, JSON.stringify(lint.problems));
 });
 
@@ -292,11 +288,31 @@ test("the bless pins the machine and it grows in place — no wrapper, fills car
   await session.advance(sid);
   // Entering the node descends into the iteration's OWN machine — M0.
   assert.deepEqual(session.breadcrumb(), ["main", "iterations", sid]);
-  // The METHOD guards the door (owner 2026-08-04) — the person proves by
+  // The METHOD guards the door — the person proves by
   // checkbox, and only then does the retro open.
   session.humanCheck(GUIDANCE.retroMethod);
-  await session.advance(); // start → onboard-retro
-  // THE EXIT IS THE HARD GATE (owner 2026-08-04): the retro's stored form
+  // start → spawn-the-hands: the roster row stands at position 05 of every
+  // milestone, so M0 opens on it.
+  await session.advance();
+  // ITS ONE FIELD IS OPTIONAL AND THIS FIXTURE RUNS NO WALKERS, which is the
+  // row's own default. The form is still filled rather than skipped, because
+  // the walk asks for it and an unfilled form holds the state.
+  session.formSave(
+    "spawn-the-hands",
+    {
+      current_situation: "a fresh root, with no hands spawned yet",
+      follow_up: "- none",
+      // THE TICKED LINE CARRIES THE CATALOG'S OWN LABEL, source and all. A
+      // shortened label is a different item and reads as unchecked.
+      hands: "- [x] Walker (deliverable/machines/methods/meth-spawn-hands.md)",
+    },
+    "human",
+  );
+  // THE SUBMIT IS THE STAMPING ACT. Complete and unsubmitted still holds the
+  // state, which is the same law this case asserts for the retro below.
+  session.formDone("spawn-the-hands", "human");
+  await session.advance(); // spawn-the-hands → onboard-retro
+  // THE EXIT IS THE HARD GATE: the retro's stored form
   // must stand complete before the walk moves.
   await assert.rejects(
     () => session.advance(),
@@ -353,6 +369,9 @@ test("the bless pins the machine and it grows in place — no wrapper, fills car
     pulled_in: "- none",
     left_out: "- everything else",
     change_size: "patch — the smallest walk proves the seam",
+    // THE ROSTER'S QUESTION AT THE GATE: how many walkers this record runs.
+    // It is a choice and it carries its reason on the same line.
+    walkers: "1 — the norm, and it matches the one hand this fixture rosters",
     round_0_verify: "- evidence vs claims: read\n- types: green\n- lint: green\n- tests: green",
     round_1_validate:
       "- exercised against the goal: walked\n- missing: none\n- wrong: none\n- out of scope: none\n- prior art: none in this seam",
@@ -374,32 +393,37 @@ test("the bless pins the machine and it grows in place — no wrapper, fills car
   );
   session.formBless("gate-kickoff", true, "human");
   // The advance is the bless — the pin fires from the form and the machine
-  // GROWS IN PLACE during that very call. Several ways forward stand in
-  // the grown machine, so the UNNAMED advance refuses typed — and the
-  // growth has already happened when it does.
+  // GROWS IN PLACE during that very call.
+  //
+  // THE KICKOFF'S EXIT IS UNAMBIGUOUS NOW, and it did not use to be. An
+  // unnamed advance refused here while several ways forward stood in the
+  // grown machine, because choosing between them was never the engine's job.
+  //
+  // ONE STATE DEPENDS ON THE GATE TODAY: the one that spawns the motivation
+  // phase's hand. Nothing is left to choose, so the unnamed advance takes it.
+  //
+  // THE CARD IS READ BEFORE THE WALK LEAVES. A state entered without meth-raid
+  // writes the table the register stopped being.
   const rec = join(root, "spec", "iterations", id, "record.md");
-  await assert.rejects(
-    () => session.advance(),
-    (e) => /named way forward/.test(JSON.stringify(e)),
-  );
+  session.humanCheck("deliverable/machines/methods/meth-raid.md");
+  await session.advance();
   assert.ok(existsSync(join(root, itPinRel(id))), "the pin exists");
   assert.deepEqual(session.breadcrumb(), ["main", "iterations", sid], "the walk stands in the SAME machine");
   const grown = session.currentMachine();
   assert.equal(grown.id, sid, "the machine id is stable across the pin");
+  assert.equal(
+    grown.states.find((s) => s.id === "gate-kickoff")!.edges.length,
+    1,
+    "one way forward stands from the blessed kickoff, so an unnamed advance has nothing to choose",
+  );
   const pin = JSON.parse(readFileSync(join(root, itPinRel(id)), "utf8")) as { change_size: ChangeColumn };
   assert.equal(
     grown.states.length,
     compileColumn(readRigorMatrix(root), pin.change_size).states.length,
     "the machine is the pinned column, compiled live from it",
   );
-  // Leaving the blessed kickoff by a NAMED edge completes it — and the
-  // M0 fills carried across the swap.
-  //
-  // log-risks demands meth-raid first: the register became NODES on
-  // 2026-08-06 and a state entered without that card writes the table it
-  // used to write.
-  session.humanCheck("deliverable/machines/methods/meth-raid.md");
-  await session.advance(grown.states.find((s) => s.id === "gate-kickoff")!.edges[0].to);
+  // Leaving the blessed kickoff completed it, and the M0 fills carried across
+  // the swap. The history is where that shows.
   const hist = (session.describe() as { history: { state: string; outcome: string }[] }).history.map((h) => h.state);
   assert.ok(hist.includes(`iterations/${sid}/onboard-retro`), "the retro's fill survived the swap");
   assert.ok(hist.includes(`iterations/${sid}/gate-kickoff`), "the kickoff's fill survived the swap");
@@ -484,9 +508,12 @@ test("no gate holds the first start — entering binds, stamps started, and M0 s
   // And a BROWSE resolves the iteration's machine with the walk elsewhere —
   // the reader's click, which used to fall back to the main drawing.
   assert.ok(new Session(root).viewFor(sid!) !== undefined, "browsing resolves the iteration's machine without a walk");
-  await session.advance(); // start → onboard-retro: the retro stands FIRST
+  // start → spawn-the-hands: the roster stands FIRST, and the retro follows it.
+  // The roster row sits at position 05 of every milestone, so M0 opens on it
+  // rather than on the retro.
+  await session.advance();
   const active = (session.describe() as { submachine?: { active: string[] } }).submachine?.active;
-  assert.deepEqual(active, ["onboard-retro"]);
+  assert.deepEqual(active, ["spawn-the-hands"]);
   // Entering stamped `started:` on the record, which stands in the one tree.
   const rec = readFileSync(join(root, "spec", "iterations", String(seeded.seeded), "record.md"), "utf8");
   assert.match(rec, /^started: /m);
@@ -528,7 +555,7 @@ test("a choice while a form is owed refuses and names the reopen", async () => {
   assert.equal(out.remedy?.tool, "se_reopen", "and the remedy names the way back");
 });
 
-// A CLAIMFUL STATE COMPLETES ON ITS CLAIM (owner rule 2026-08-09). The walk
+// A CLAIMFUL STATE COMPLETES ON ITS CLAIM. The walk
 // once passed build_chart unsigned and reached the candidates gate — a
 // sub-machine skipped whole. The route-side fix stopped the observed case;
 // this guard closes the class at the one gate every completion passes.
@@ -582,7 +609,7 @@ test("completing a claimful state without its claim refuses, and the walk stands
 
 // The recovery edge made the fallback pair a cycle; the cycle guard cut the
 // walk mid-way and the half-computed layer was memoized, so fix-findings drew
-// rows above the verification it serves (owner report 2026-08-11).
+// rows above the verification it serves.
 test("a fallback state rides beside the state it recovers", () => {
   const work = (id: string, edges: StateDecl["edges"]): StateDecl => ({
     id,

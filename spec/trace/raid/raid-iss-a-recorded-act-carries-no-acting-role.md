@@ -3,11 +3,11 @@ minted_in: i5-engine-hygiene-one-version-source-every-
 id: raid-iss-a-recorded-act-carries-no-acting-role
 type: "[[raid]]"
 kind: issue
-statement: "A recorded call carries no acting role, so every reader that needs one derives it from the call's tool name."
+statement: A recorded call carries no acting role, so every reader that needs one derives it from the call's tool name.
 owner: the maintainer
 trigger: any surface that shows who acted, and any new server-side tool added to the lane
 status: open
-impact: "The accountability trail a standing requirement demands is reconstructed by a string test at render time. A new server-side tool reads as a person until somebody edits a hand-kept list, and nothing on the surface says the column is inferred."
+impact: The accountability trail a standing requirement demands is reconstructed by a string test at render time. A new server-side tool reads as a person until somebody edits a hand-kept list, and nothing on the surface says the column is inferred.
 breaks_how_badly: crippling
 how_likely: expected
 source_refs:
@@ -16,6 +16,7 @@ source_refs:
   - i5-engine-hygiene-one-version-source-every-
 weighs_with: none
 weighs_against: none
+place: i31-the-process-becomes-measurable-a-walk-re
 ---
 
 ## What was observed

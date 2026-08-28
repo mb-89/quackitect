@@ -4,22 +4,22 @@ id: dsp-the-outside-boundaries-and-their-bounds
 type: "[[design-spec]]"
 statement: every crossing where the product meets something it does not own is a node carrying its own argued bound, and the matrix knows a neighbour is a legal end
 realizes:
-  - "el-walk-engine"
-  - "if-agent-harness-to-entrypoint"
-  - "if-engineer-to-mirror"
-  - "if-vscode-to-mirror"
-  - "if-test-runner-to-toolchain"
-  - "if-bootstrap-to-toolchain"
-  - "if-account-to-git"
-  - "if-record-store-to-git"
-  - "if-record-store-to-origin-remote"
-  - "if-account-to-obsidian"
-  - "if-walk-engine-to-web"
-  - "if-mirror-to-output-tools"
+  - el-walk-engine
+  - if-agent-harness-to-entrypoint
+  - if-engineer-to-mirror
+  - if-vscode-to-mirror
+  - if-test-runner-to-toolchain
+  - if-bootstrap-to-toolchain
+  - if-account-to-git
+  - if-record-store-to-git
+  - if-record-store-to-origin-remote
+  - if-account-to-obsidian
+  - if-walk-engine-to-web
+  - if-mirror-to-output-tools
 files:
-  - "deliverable/machines/items/interface.md"
-  - "deliverable/engine/trace.ts"
-  - "deliverable/engine/elematrix.ts"
+  - deliverable/machines/items/interface.md
+  - deliverable/engine/trace.ts
+  - deliverable/engine/elematrix.ts
 ---
 
 ## The element this design lands in

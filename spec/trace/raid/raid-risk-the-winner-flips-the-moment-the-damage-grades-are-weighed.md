@@ -3,9 +3,9 @@ minted_in: i38-the-machine-sizes-its-own-driver-every-s
 id: raid-risk-the-winner-flips-the-moment-the-damage-grades-are-weighed
 type: "[[raid]]"
 kind: risk
-statement: "The leader wins on an unweighted count of signs while every axis already carries a damage grade, and under any ordering that respects those grades the leader loses."
+statement: The leader wins on an unweighted count of signs while every axis already carries a damage grade, and under any ordering that respects those grades the leader loses.
 owner: the owner
-trigger: "the first time anyone asks why the grades are drawn on the matrix if nothing reads them, and any future record that types a band value"
+trigger: the first time anyone asks why the grades are drawn on the matrix if nothing reads them, and any future record that types a band value
 status: closed
 superseded: "2026-08-20 — this entry describes cand-the-seed-made-total as the Pugh leader. It no longer is: the candidate set was redrawn, a second clean-context scorer re-scored it, and that candidate is dominated and off the front. The finding was acted on rather than outlived — it is why the set was redrawn — and it stands as history. The live entry against the current leader is raid-risk-the-reader-can-take-the-leaders-only-structural-advantage."
 looked: 2026-08-20
@@ -17,7 +17,7 @@ probe: "COMPUTED OVER THE SIGNED SCORE TABLE, 2026-08-20. Unweighted, the totals
 probed: 2026-08-20
 source_refs:
   - i38-the-machine-sizes-its-own-driver-every-s
-  - "reverse-sensitivity, 2026-08-20"
+  - reverse-sensitivity, 2026-08-20
 weighs_with: raid-risk-the-leaders-whole-margin-is-one-cell-two-rivals-can-take
 weighs_against: none
 ---

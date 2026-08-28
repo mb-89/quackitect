@@ -3,11 +3,11 @@ minted_in: i37-training-iterations-a-disposable-iterati
 id: raid-asm-carry-forward-attribution-covers-every-call-between-two-pulls
 type: "[[raid]]"
 kind: issue
-statement: "Every lane call between two se_pull answers belongs to the state the earlier pull named, so carrying that state forward attributes the whole log."
+statement: Every lane call between two se_pull answers belongs to the state the earlier pull named, so carrying that state forward attributes the whole log.
 owner: the maintainer of the machine
 trigger: the first benchmark run that derives cost per state
 status: mitigated
-impact: "Cost lands on the wrong state wherever a call happened somewhere else. The ranked per-state view stops being trustworthy in exactly the places that are most expensive, which is where subagents and long tool runs live."
+impact: Cost lands on the wrong state wherever a call happened somewhere else. The ranked per-state view stops being trustworthy in exactly the places that are most expensive, which is where subagents and long tool runs live.
 breaks_how_badly: corrosive
 how_likely: plausible
 probe: "FALSE, measured 2026-08-20 by a fresh-eyes verification. The premise is wrong: the pull RESPONSE carries where, not the record, and 2,233 of 2,298 pull responses in this project own log are capped to invalid JSON. 31 are recoverable. The boundaries were not recoverable by inference at all."

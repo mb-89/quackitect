@@ -2,7 +2,7 @@
 form: evaluate-architecture
 by: agent
 signed_off: 2026-08-19T17:39:23.414Z
-reopened: "2026-08-19T17:39:23.000Z — same claims-registration gap, cascading fix through M5"
+reopened: 2026-08-19T17:39:23.000Z — same claims-registration gap, cascading fix through M5
 authors: agent
 files: null
 ---

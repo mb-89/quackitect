@@ -38,9 +38,18 @@ shipped already, and it says so on a branch nobody fetches by default. THE
 LEDGER IS THE ONE FILE EVERY MACHINE READS BEFORE IT ENTERS ANYTHING."
 
 THE PREMISE WAS THE BRANCH. A record lived on a branch nobody fetched, so its
-status could not reach a peer and a separate ledger had to. A record is a
-folder on trunk now, so a clone that has trunk has the status, and the reason
-for the second file is gone with the first problem.
+status could not reach a peer and a separate ledger had to. A record stands on
+trunk now, so a clone that has trunk has the status, and the reason for the
+second file is gone with the first problem.
+
+i63 CHANGES THE SHAPE AND NOT THE ANSWER. From i63 onward a record closed is
+folded into one file, so a shipped record is a file on trunk rather than a
+folder on trunk. It is still on trunk, so a clone still has the status.
+
+READ THE STATUS, NEVER THE SHAPE. This row's own detail names the sites that
+must stop asking the filesystem, and the fold is one more reason they must:
+[[req-a-records-own-status-decides-whether-it-is-open]] forbids deciding from
+presence, and after the fold there are two shapes a record can be present in.
 
 WHAT WAS LOST WITH THE LEDGER, stated rather than glossed: a release and a
 completion were different acts, and only the ledger could tell a peer which had

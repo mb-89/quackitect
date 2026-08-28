@@ -50,7 +50,7 @@ build-chart AUTHORS the candidate drawing (`<record>/machines/candidates.md`, in
 
 An unseeded drawing refuses mechanically. Until build-chart has run there is nothing to enter, and the drawing cannot be double-clicked into.
 
-IT WRITES BACK INTO THE CANDIDATE NOTES, and mints nothing (owner ruling 2026-08-08). Each compose state fills three sections of the [[candidate]] note its line already created:
+IT WRITES BACK INTO THE CANDIDATE NOTES, and mints nothing. Each compose state fills three sections of the [[candidate]] note its line already created:
 
 - How it works - the whole architecture, and especially the seams between the chosen options.
 - What it costs - the rough feasibility checks, proportional and no more ([[meth-feasibility-checks]]).

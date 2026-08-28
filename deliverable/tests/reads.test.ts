@@ -10,9 +10,9 @@ import { pulledFor, scanGuidance } from "../engine/pull.ts";
 import { renderMirror } from "../engine/render.ts";
 import { Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
-import { bootedServer, call, checkDocs, craftDocs, freshRoot, GUIDANCE, readOne } from "./helpers.ts";
+import { bootedServer, call, checkDocs, craftDocs, freshRoot, GUIDANCE, pullThrough, readOne } from "./helpers.ts";
 
-// THREE HOMES, NOT ONE (owner ruling 2026-07-29). voice.md is about HOW YOU
+// THREE HOMES, NOT ONE. voice.md is about HOW YOU
 // TALK. It had accumulated rules about writing SOFTWARE and building
 // INTERFACES, and a reader looking for one had to sift the other two.
 //
@@ -21,9 +21,22 @@ import { bootedServer, call, checkDocs, craftDocs, freshRoot, GUIDANCE, readOne 
 // so the pull serves them THERE and nowhere else. voice is PROMOTED: the
 // prompt layer carries it on every turn, so the pull skips it.
 //
-// THEY LEFT THE GUIDANCE ROOT (owner ruling 2026-08-06). A root doc is pulled
+// THEY LEFT THE GUIDANCE ROOT. A root doc is pulled
 // into every packet, and neither of these binds a design-input step. The step
 // that maps stakeholders was reading how to write code.
+test("session-restricted guidance reaches only its declared session mode", () => {
+  const machine = { id: "test" } as Parameters<typeof pulledFor>[2];
+  const state = { id: "work", kind: "work", tags: [] } as unknown as Parameters<typeof pulledFor>[3];
+  const docs = [
+    { path: "guidance/method/every.md", hash: "", applies: "always", applies_to: [], tags: [], sessions: [] },
+    { path: "guidance/method/attended.md", hash: "", applies: "always", applies_to: [], tags: [], sessions: ["attended"] },
+    { path: "guidance/method/cloud.md", hash: "", applies: "always", applies_to: [], tags: [], sessions: ["cloud"] },
+  ] as Parameters<typeof pulledFor>[1];
+  const paths = (mode: "attended" | "cloud"): string[] => pulledFor("", docs, machine, state, mode).map((doc) => doc.path);
+  assert.deepEqual(paths("attended"), ["guidance/method/every.md", "guidance/method/attended.md"]);
+  assert.deepEqual(paths("cloud"), ["guidance/method/cloud.md", "guidance/method/every.md"]);
+});
+
 test("the guidance splits three ways, and every home reaches the reader", () => {
   const root = freshRoot();
   const s = new Session(root);
@@ -33,7 +46,7 @@ test("the guidance splits three ways, and every home reaches the reader", () => 
   const docs = scanGuidance(root);
   const at = (id: string): string[] =>
     pulledFor(root, docs, s.machine, { id, kind: "work", tags: [] } as unknown as Parameters<typeof pulledFor>[3]).map((p) => p.path);
-  const idle = at("idle");
+  const idle = at("front_desk");
   const work = at("build-steps");
   const craft = craftDocs();
   for (const home of craft) {
@@ -70,29 +83,34 @@ test("a check pins the VERSION: editing the doc unchecks it and the gate asks ag
   await s.advance();
   await s.advance();
   await s.advance();
-  assert.deepEqual(s.active(), ["idle"]);
-  // THE DOOR IS ONE THAT PULLS SOMETHING. Since software and ux left the
-  // guidance root, a door that pulls nothing has nothing that can go stale,
-  // so the doc under test is READ OFF the door rather than named here.
-  const door = s.machine.states.find((x) => x.id === "front_desk")!;
-  const doc = s.pulled(s.machine, door).map((p) => p.path)[0];
-  assert.ok(doc !== undefined, "the door pulls guidance, or there is nothing to pin");
-  s.humanCheck(doc);
+  assert.deepEqual(s.active(), ["front_desk"]);
+  // THE DOOR DEMANDS A PERSON'S READING. Since software and ux left the
+  // guidance root, a door that demands nothing is vacuously ready and can
+  // never go stale, so it would prove nothing here.
+  //
+  // IT USED TO BE THE DESK, reached from the removed hub. The walk stands ON
+  // the desk now, so the door has to be one ahead of it. Measured on the live
+  // machine: `retro` and `overhaul` are the two that demand one.
+  const door = s.machine.states.find((x) => x.id === "retro")!;
+  const docs = s.pulled(s.machine, door).map((p) => p.path);
+  assert.ok(docs.length > 0, "the door pulls guidance, or there is nothing to pin");
+  for (const d of docs) s.humanCheck(d);
+  const doc = docs[0];
   assert.equal(s.entryReadyHuman(s.machine, door), true, "all pulled docs checked — entry ready");
   // The owner edits it mid-session: the pinned hash no longer matches.
   appendFileSync(join(root, ...doc.split("/")), "\nEdited mid-session.\n");
   assert.equal(s.entryReadyHuman(s.machine, door), false, "the edited doc unchecked itself");
   await assert.rejects(
-    () => s.advance("front_desk"),
+    () => s.advance("retro"),
     (e) => (e as { clause?: string }).clause === "SE-C-112",
   );
   // One fresh check of the NEW version and the walk flows again.
   s.humanCheck(doc);
-  await s.advance("front_desk");
-  assert.deepEqual(s.active(), ["front_desk"]);
+  await s.advance("retro");
+  assert.deepEqual(s.active(), ["retro"]);
 });
 
-// THE WRITTEN HANDOVER IS GONE (owner ruling 2026-08-07). It was demanded at
+// THE WRITTEN HANDOVER IS GONE. It was demanded at
 // the `end` state, and sessions do not end there — they get killed, so the
 // gate almost never fired. The owner put it plainly: they kill the session, so
 // there was never a handover. Boot DERIVES the briefing from the call log now
@@ -117,11 +135,18 @@ test("a left-behind handover file is neither read nor destroyed — it is simply
 
 test("end opens with no handover written, because nobody writes one now", async () => {
   const server = await bootedServer(freshRoot());
-  // end is one of idle's offered doors, so the choice form answers it.
+  // end is one of the desk's offered doors, so the choice form answers it.
   const out = await call(server, "se_pull", { form: { choice: "end" } });
   assert.equal(out.isError, false, JSON.stringify(out.body));
   assert.equal(out.body.refusal, undefined, "the way out is no longer gated on a file");
-  assert.deepEqual(out.body.where, ["end"]);
+  // TAKING THE DOOR AIMS THE WALK; the reading owed on the way is answered
+  // before it arrives. The desk absorbed the removed hub's guidance, so it
+  // carries a document of its own and that comes first.
+  for (let j = 0; j < 40; j++) {
+    if ((await readOne(server)) === null) break;
+  }
+  const landed = await call(server, "se_pull");
+  assert.deepEqual(landed.body.where, ["end"]);
 });
 
 test("an edited doc drops the agent's credit: the pull asks for the reading again", async () => {
@@ -153,7 +178,7 @@ test("se_file_read credits too: reading the docs by hand carries the walk unaide
   const root = freshRoot();
   const session = new Session(root);
   const server = buildServer(root, session);
-  session.setTarget("idle"); // the person's aim
+  session.setTarget("front_desk"); // the person's aim
   assert.equal((await call(server, "se_pull")).body.pull, "read");
   // Earn the credits through plain lane reads of the engine's OWN list —
   // a windowed read still carries the whole file's CAS hash, so one line
@@ -163,9 +188,11 @@ test("se_file_read credits too: reading the docs by hand carries the walk unaide
     const rr = await call(server, "se_file_read", { path, offset: 1, limit: 1 });
     assert.equal(rr.isError, false, JSON.stringify(rr.body));
   }
-  const walked = await call(server, "se_pull");
+  // BOOT'S OWN MARKED STEP IS STILL THE WALKER'S TO DO. Credits open the read
+  // gates; they do not settle work, and a state is not left while it holds any.
+  const walked = await pullThrough(server, session);
   assert.equal(walked.body.pull, "do", JSON.stringify(walked.body));
-  assert.ok((walked.body.where as string[]).includes("idle"), "buffered credits carried the boot walk to idle");
+  assert.ok((walked.body.where as string[]).includes("front_desk"), "buffered credits carried the boot walk to idle");
 });
 
 // BOOT IS THE READING ROOM, AND IT CLEARS THE BUFFER ON THE WAY BACK IN.
@@ -182,7 +209,7 @@ test("the reading buffer is per session: a second session earns it afresh", asyn
   // First entry: one read of the reading file carries the whole boot walk
   // to the session's default target, the desk.
   await call(server, "se_file_read", { path: ".se/reading.md" });
-  const first = await call(server, "se_pull");
+  const first = await pullThrough(server, session);
   assert.equal(first.body.pull, "do", JSON.stringify(first.body));
   assert.deepEqual(session.active(), ["front_desk"]);
 
@@ -197,7 +224,7 @@ test("the reading buffer is per session: a second session earns it afresh", asyn
   // case to guard again.
   const second = new Session(root);
   const secondServer = buildServer(root, second);
-  second.setTarget("idle");
+  second.setTarget("front_desk");
   const owed = await call(secondServer, "se_pull");
   assert.equal(owed.body.pull, "read", "a fresh session proves the reading itself, inheriting nothing");
 });
@@ -223,7 +250,7 @@ test("the pill turns green from the machine: the agent's reading records its pro
   const root = freshRoot();
   // WHAT read_contract OWES IS ITS TAG-PULLED GUIDANCE. The contract, the
   // walk, the lane and the voice went to the prompt layer, and the handover
-  // was retired outright (owner ruling 2026-08-07) — what remains is the boot
+  // was retired outright — what remains is the boot
   // method reading, demanded by tag rather than named on the state.
   const session = new Session(root);
   const server = buildServer(root, session);
@@ -260,14 +287,14 @@ test("THE HANDOVER RULE: the human walks boot on checkboxes, raises the slider �
   await session.advance();
   checkDocs(session);
   await session.advance();
-  assert.deepEqual(session.active(), ["boot/prepare_idle"]);
+  assert.deepEqual(session.active(), ["boot/prepare_desk"]);
   // The packet tells the agent what the session has checked.
   const info = session.packet() as { human_checked: string[] };
   assert.ok(info.human_checked.includes(GUIDANCE.bootMethod));
   // The slider rises; the agent pulls — but its head holds none of it, so
   // the machine demands the same reading before it walks anywhere.
   session.setAutonomy(0.6);
-  session.setTarget("idle"); // the person's aim
+  session.setTarget("front_desk"); // the person's aim
   const owed = await call(server, "se_pull");
   assert.equal(owed.body.pull, "read", "their checkmark is not the agent's reading");
   const served: string[] = [];
@@ -276,7 +303,13 @@ test("THE HANDOVER RULE: the human walks boot on checkboxes, raises the slider �
     if (doc === null) break;
     served.push(doc.path);
   }
-  assert.ok(served.includes(craftDocs().find((p) => p.endsWith("software.md")) ?? ""), `the same list is owed: ${served.join(", ")}`);
+  // THE PROOF IS THE DOC THE PERSON CHECKED. It comes back to the agent, which
+  // is the whole rule: a checkmark is theirs and never the agent's reading.
+  //
+  // IT USED TO NAME A CRAFT DOC. Those are demanded at a craft door, and the
+  // route to the desk no longer passes one — the hub that did is gone. Naming a
+  // doc this route never owes would have asserted the wrong thing.
+  assert.ok(served.includes(GUIDANCE.bootMethod), `the same list is owed: ${served.join(", ")}`);
   // Proving the last document already moves the walk, so what matters here
   // is that the reading gate is discharged — not which door comes next.
   const landed = await call(server, "se_pull");

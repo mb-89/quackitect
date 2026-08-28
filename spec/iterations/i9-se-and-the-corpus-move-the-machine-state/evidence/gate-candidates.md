@@ -1,11 +1,11 @@
 ---
 form: gate-candidates
 bless: blessed by agent
-amended: "2026-08-19T16:42:07.997Z by agent — the owner overruled the missing-install-row reasoning, the row was added and judged, and one of three dissents is now resolved"
+amended: 2026-08-19T16:42:07.997Z by agent — the owner overruled the missing-install-row reasoning, the row was added and judged, and one of three dissents is now resolved
 by: agent
 signed_off: 2026-08-19T16:20:13.950Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / gate-candidates

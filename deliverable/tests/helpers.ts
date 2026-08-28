@@ -26,6 +26,7 @@ import { contentHash } from "../engine/hash.ts";
 import { proofFor } from "../engine/readproof.ts";
 import { Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
+import { isSettled, readAllWork, settle } from "../engine/workstore.ts";
 
 const REPO_ROOT = fileURLToPath(new URL("../..", import.meta.url));
 
@@ -39,7 +40,7 @@ try {
   // no npm install — rgPath() falls back to PATH rg and fails loudly if absent
 }
 
-// Walks in tests hit prepare_idle's exit scripts, and one of those IS the
+// Walks in tests hit prepare_desk's exit scripts, and one of those IS the
 // suite (engine/bin/selftest.ts) — without this guard every booted walk
 // would spawn the whole suite again, recursively.
 process.env.SE_SELFTEST_SKIP = "1";
@@ -85,6 +86,11 @@ const BORROWED = [join("deliverable", "engine")];
 // configured by, and preflight now demands both.
 const COPIED = [
   join("deliverable", "machines"),
+  // THE VIEWS ARE PART OF THE PRODUCT TOO. The card list lives here, and so do
+  // the `.base` files the database and the work editor draw. A root without
+  // them renders a database with no views and a work editor with no panes,
+  // which is a different product from the one being tested.
+  join("deliverable", "views"),
   "guidance".replace("/", sep),
   join("deliverable", "brand", "brand.json"),
   join("deliverable", "brand", "palette.css"),
@@ -93,7 +99,7 @@ const COPIED = [
   // point: engine, tests and the vscode sources — never the copied machines
   // and guidance a test root also carries.
   //
-  // MEASURED 2026-08-17, in a root that had biome but not its config: 133 files
+  // MEASURED, in a root that had biome but not its config: 133 files
   // checked instead of the product's set, 47 warnings, and --error-on-warnings
   // turned that into a non-zero exit. se_test's battery returns early on a
   // failed format step, so tests/nesting.test.ts saw 1 result where it expects 4.
@@ -113,7 +119,7 @@ const YAML_REL = join("deliverable", "node_modules", "yaml");
 // the link to its real path — so it looks inside this template and finds a
 // node_modules holding exactly one package.
 //
-// MEASURED 2026-08-17: tests/nesting.test.ts read 1 !== 4 for that reason, on
+// MEASURED: tests/nesting.test.ts read 1 !== 4 for that reason, on
 // both platforms, since the link resolves the same way on each.
 const BIOME_REL = join("deliverable", "node_modules", "@biomejs");
 
@@ -149,7 +155,7 @@ function freeze(dir: string): void {
 
 let templateDir: string | undefined;
 
-// THE TEMPLATE LIVES IN .se, NOT IN TEMP (owner ruling, 2026-07-30). It
+// THE TEMPLATE LIVES IN .se, NOT IN TEMP. It
 // is machine-local, already ignored by git, and about 1.2 MB — the engine
 // plus the yaml package. It is never deleted: if the fingerprint matches
 // it is reused, and if it does not, a new one is built beside it. Keeping
@@ -273,14 +279,17 @@ async function readBoundedAnswer(server: Server, bounded: Record<string, unknown
   }
 }
 
+/** WAIT FOR A RUN BY READING THE ACCOUNT, which is how a walker learns it too.
+ *  There is no status verb: a run reports itself on the `work` block of every
+ *  lane answer, so any call will do and se_pull is the cheapest. */
 export async function waitForTestJob(server: Server, job: string): Promise<Record<string, unknown>> {
   for (;;) {
-    const response = await call(server, "se_test", {
-      job,
-      update: { op: "update", brief: "Read durable test verdict" },
+    const response = await call(server, "se_pull", {
+      update: { op: "update", brief: "Read the run off the account" },
     });
-    if (response.isError) throw new Error(JSON.stringify(response.body));
-    if (response.body.running === false) return response.body;
+    const account = (response.body.work ?? []) as { job?: string; running?: boolean }[];
+    const entry = account.find((e) => e.job === job);
+    if (entry !== undefined && entry.running === false) return entry as Record<string, unknown>;
     await new Promise<void>((resolve) => setImmediate(resolve));
   }
 }
@@ -354,7 +363,12 @@ export async function creditReading(
 ): Promise<void> {
   let previous = -1;
   for (let round = 0; round < 60; round++) {
-    const r = await call(server as never, "se_file_read", { path: ".se/reading.md", offset: 1, limit: 400 });
+    // A WIDE PAGE, because the cost here is the number of ROUNDS and not the
+    // size of one. The surface shrinks as it is credited, so a narrow page is
+    // re-read from the top many times over. MEASURED 2026-08-25: this setup is
+    // paid once per case and clear-jump.test.ts spent 85 seconds on 8 cases,
+    // a fifth of the whole battery's floor.
+    const r = await call(server as never, "se_file_read", { path: ".se/reading.md", offset: 1, limit: 5000 });
     const body = r.body as { content?: string; total_lines?: number };
     if (typeof body.content !== "string") break;
     const lines = body.total_lines ?? 0;
@@ -380,6 +394,71 @@ export async function creditReading(
   for (const p of guidanceDocs()) {
     await call(server as never, "se_file_read", { path: p, update: paying });
   }
+}
+
+/** A BOOTED SESSION, BUILT ONCE FOR A WHOLE FILE.
+ *
+ *  WHY THIS EXISTS. Standing a session at the front desk with both read proofs
+ *  in hand costs about 900 ms of pure I/O: 400 to lay down the product tree,
+ *  330 to read the guidance corpus, the rest to compile and walk. Under the
+ *  parallel battery that same work takes seven seconds, because forty-two files
+ *  are doing it at once. A file paying it per case pays it eight times.
+ *
+ *  MEASURED: clear-jump.test.ts spent 65 of the battery's 361 seconds, and
+ *  every one of its eight cases opened with the identical boot.
+ *
+ *  IT CANNOT BE COPIED, and that was tried first. The walk's position and BOTH
+ *  read proofs live on the Session, not on disk — a fresh session opened on a
+ *  copy of a booted root lands back at `start` owing three reads. So the thing
+ *  that is shared is the session itself.
+ *
+ *  SO THE CASES SHARE ONE, AND EACH RESETS IT. `reset()` walks back to the
+ *  front desk in about 100 ms, against 900 for a fresh boot.
+ *
+ *  A FILE USING THIS RUNS ITS CASES SERIALLY. One session cannot be in two
+ *  places, so `describe` must not carry `concurrency: true`. */
+export interface SharedDesk {
+  s: SessionLike;
+  server: unknown;
+  /** Walk back to the front desk, so the next case starts where the last began. */
+  reset: () => Promise<void>;
+}
+
+type SessionLike = {
+  active: () => string[];
+  advance: () => Promise<unknown>;
+  humanCheck: (p: string) => unknown;
+  packet: () => unknown;
+};
+
+let deskPromise: Promise<SharedDesk> | undefined;
+
+export function sharedDesk(
+  makeSession: (root: string) => SessionLike,
+  makeServer: (root: string, s: SessionLike) => unknown,
+  call: (s: never, name: string, args: Record<string, unknown>) => Promise<{ body: Record<string, unknown> }>,
+): Promise<SharedDesk> {
+  deskPromise ??= (async (): Promise<SharedDesk> => {
+    const root = freshRoot();
+    const s = makeSession(root);
+    checkDocs(s);
+    for (let i = 0; i < 10; i++) {
+      if (s.active()[0] === "front_desk") break;
+      await s.advance();
+    }
+    if (s.active()[0] !== "front_desk") throw new Error(`boot did not reach the front desk, it reached ${s.active()[0]}`);
+    const server = makeServer(root, s);
+    await creditReading(server, call);
+    const reset = async (): Promise<void> => {
+      if (s.active()[0] === "front_desk") return;
+      await call(server as never, "se_aim", { to: "front_desk", go: true });
+      if (s.active()[0] !== "front_desk") {
+        throw new Error(`the shared desk could not be reset — it stands at ${s.active().join(", ")}`);
+      }
+    };
+    return { s, server, reset };
+  })();
+  return deskPromise;
 }
 
 /** The guidance root documents, derived from the folder rather than named. A
@@ -431,16 +510,30 @@ export function gitInit(root: string, commit = false): void {
     g(t, "init");
     g(t, "config", "user.email", "se@test.local");
     g(t, "config", "user.name", "se test");
+    // GIT DOES NOT REWRITE LINE ENDINGS IN A TEST REPOSITORY.
+    //
+    // ON WINDOWS THE GLOBAL DEFAULT TURNS EVERY LF INTO CRLF on checkout, and
+    // `git add` then prints a warning per file about the round trip. A fixture
+    // repository holds a copy of the product tree, so that is hundreds of
+    // warning lines on one call, for a conversion no case is about.
+    //
+    // MEASURED: a pin inside sizing-on-the-pull failed with `git add` reporting
+    // nothing but LF-will-be-replaced warnings. Whatever made the status
+    // non-zero, the noise is what made the failure unreadable.
+    g(t, "config", "core.autocrlf", "false");
+    g(t, "config", "core.safecrlf", "false");
     gitTemplate = t;
   }
   cpSync(join(gitTemplate, ".git"), join(root, ".git"), { recursive: true });
   if (commit) {
-    g(root, "add", "-A");
+    const seedPaths = ["deliverable/machines", "deliverable/brand", "deliverable/biome.json", "guidance", "AGENTS.md"];
+    if (existsSync(join(root, "spec"))) seedPaths.push("spec");
+    g(root, "add", ...seedPaths);
     g(root, "commit", "-q", "-m", "seed");
   }
 }
 
-// proofFor IS RE-EXPORTED, NEVER MIRRORED (owner, 2026-08-18). It used to be a
+// proofFor IS RE-EXPORTED, NEVER MIRRORED. It used to be a
 // hand-kept copy of the engine's probe maths with a comment saying so, and the
 // comment did not stop it going stale. engine/readproof.ts is the one source.
 // It is imported at the top of this file and re-exported here, because callers
@@ -504,15 +597,55 @@ export async function readOne(server: Server): Promise<{ path: string; content: 
  *  test reads its own success as a failure.
  *
  *  This cost six cases across four files, and every one of them looked like a
- *  broken walk rather than a helper discarding its result. */
+ *  broken walk rather than a helper discarding its result.
+ *
+ *  IT DOES THE STEP TOO, because a state is not left while it holds open work.
+ *  Boot's own `Startup order` is such a step, so a fixture that answered every
+ *  question and did none of the work stops inside boot — which is a walker
+ *  that read everything and walked nowhere. */
 export async function readEverything(s: Session): Promise<Record<string, unknown>> {
   let r = await s.pull();
-  for (let i = 0; i < 40 && r.pull === "read"; i++) {
-    const doc = r.document as { content?: string } | undefined;
-    if (doc?.content === undefined) throw new Error(`the pull answered read with no document: ${JSON.stringify(r)}`);
-    r = await s.pull({ form: { read: proofFor(doc.content) } });
+  for (let i = 0; i < 40; i++) {
+    if (r.pull === "read") {
+      const doc = r.document as { content?: string } | undefined;
+      if (doc?.content === undefined) throw new Error(`the pull answered read with no document: ${JSON.stringify(r)}`);
+      r = await s.pull({ form: { read: proofFor(doc.content) } });
+      continue;
+    }
+    // ARRIVING IS THE END OF THE WALK, and nothing is settled there — a fixture
+    // that meant to stand on its target must still be standing on it.
+    if (r.pull !== "do" || r.arrived === true) break;
+    // A `do` THAT STOPPED SHORT SAYS WHY, and only a stop is worth working at.
+    // Resting somewhere with nothing routed carries no refusal, and settling
+    // the work there would walk a fixture off the place it meant to stand.
+    if (r.refusal === undefined) break;
+    // DOING THE STEP IS WHAT MOVES IT. Settling nothing means something else is
+    // in the way, and the caller gets that answer.
+    if (workHere(s) === 0) break;
+    r = await s.pull();
   }
   if (r.pull === "read") throw new Error("the reading never drained");
+  return r;
+}
+
+/** THE SAME LOOP DRIVEN THROUGH THE SERVER, for a case that holds one.
+ *
+ *  It hands back the answer that stopped it, so the walk that carried it there
+ *  can still be read off the result. */
+export async function pullThrough(server: Server, session: Session): Promise<{ isError: boolean; body: Record<string, unknown> }> {
+  let r = await call(server, "se_pull");
+  for (let i = 0; i < 40; i++) {
+    if (r.body.pull === "read") {
+      const doc = r.body.document as { content?: string } | undefined;
+      if (doc?.content === undefined) throw new Error(`the pull answered read with no document: ${JSON.stringify(r.body)}`);
+      r = await call(server, "se_pull", { form: { read: proofFor(doc.content) } });
+      continue;
+    }
+    if (r.body.pull !== "do" || r.body.arrived === true) break;
+    if (r.body.refusal === undefined) break;
+    if (workHere(session) === 0) break;
+    r = await call(server, "se_pull");
+  }
   return r;
 }
 
@@ -523,7 +656,7 @@ export async function readEverything(s: Session): Promise<Record<string, unknown
  *  refusal is an instruction to try again, never a failure.
  *
  *  A BOOT HELPER THAT TREATS IT AS A FAILURE DIES WHENEVER THE MACHINE IS BUSY.
- *  Measured in the full suite: prepare_idle runs five scripts, and against 153
+ *  Measured in the full suite: prepare_desk runs five scripts, and against 153
  *  other suites they outlast the handback bound, so a case that passed alone
  *  failed in the battery. */
 export function judgmentStillRunning(x: unknown): boolean {
@@ -543,7 +676,7 @@ export function judgmentStillRunning(x: unknown): boolean {
 export async function sessionAtIdle(root: string): Promise<Session> {
   const s = new Session(root);
   s.setAutonomy(1);
-  s.setTarget("idle");
+  s.setTarget("front_desk");
   // A PULL THAT ANSWERS "still running" HAS NOT MOVED, so it must not spend one
   // of the bounded attempts. The two counters keep the move budget honest while
   // letting the walk wait for a judgment that is still being reached.
@@ -551,7 +684,7 @@ export async function sessionAtIdle(root: string): Promise<Session> {
   let waits = 0;
   while (moves < 8 && waits < 300) {
     await readEverything(s);
-    if (s.active()[0] === "idle") return s;
+    if (s.active()[0] === "front_desk") return s;
     let packet: unknown;
     try {
       packet = await s.pull();
@@ -570,9 +703,10 @@ export async function sessionAtIdle(root: string): Promise<Session> {
       continue;
     }
     moves++;
-    if (s.active()[0] === "idle") return s;
+    if (s.active()[0] === "front_desk") return s;
+    workHere(s);
   }
-  throw new Error(`the pull did not reach idle: ${JSON.stringify(s.active())}`);
+  throw new Error(`the pull did not reach the front desk: ${JSON.stringify(s.active())}`);
 }
 
 /** Boot an EXISTING server by pulling, exactly as a real agent does: do
@@ -581,10 +715,22 @@ export async function sessionAtIdle(root: string): Promise<Session> {
  *  offered); WITHOUT one, the walk follows the session's default target
  *  and rests at the front desk. */
 export async function pullBoot(server: Server, session?: Session): Promise<void> {
-  if (session !== undefined) session.setTarget("idle");
+  if (session !== undefined) session.setTarget("front_desk");
   let moves = 0;
   let waits = 0;
-  while (moves < 12 && waits < 300) {
+  // A REAL AGENT DOES THE STEP BEFORE IT PULLS AGAIN, and a state is no longer
+  // left while it holds an open token. Boot's own `Startup order` step held
+  // `prepare_desk` shut and the fixture pulled at it until it ran out of moves.
+  //
+  // LEAVING USED TO SETTLE IT for us, which is the rule inverted — so the walker
+  // has to do here what a walker does.
+  //
+  // A SERVER WITH NO SESSION CANNOT DO IT. The root lives on the session, so a
+  // caller that wants the walk carried through boot hands one over.
+  //
+  // THE BUDGET COUNTS READS AS MOVES, and doing the step costs one more pull on
+  // top of them, so the ceiling leaves room for it.
+  while (moves < 16 && waits < 300) {
     const r = await call(server, "se_pull");
     // EITHER SHAPE IS A WAIT, NEVER A MOVE: the refusal can arrive as the whole
     // answer, or ride inside a good one as the stopped step's own reason.
@@ -603,7 +749,8 @@ export async function pullBoot(server: Server, session?: Session): Promise<void>
       continue;
     }
     const where = r.body.where as string[];
-    if (where.includes("idle") || where.includes("front_desk")) return;
+    if (where.includes("front_desk")) return;
+    if (session !== undefined) workHere(session);
   }
   throw new Error("the pull did not reach a resting place");
 }
@@ -654,6 +801,13 @@ export async function pullTo(session: Session, state: string): Promise<void> {
 export function mirrorSources(): { rel: string; text: string }[] {
   return [
     "render.ts",
+    // THE SURFACE IS SEVERAL FILES NOW. The resolver moved the whole view
+    // computation out of the renderer, and the reader's place moved out with
+    // it. A guard that reads only render.ts is reading a fraction of the
+    // surface, and it reports the code it cannot see as missing rather than as
+    // moved — which is exactly what four of these cases did.
+    "viewmodel.ts",
+    "renderclient-place.ts",
     "renderclient.ts",
     "renderclient-detail.ts",
     "renderclient-walk.ts",
@@ -689,4 +843,40 @@ export function laneSource(): string {
   return laneSources()
     .map((s) => s.text)
     .join("\n");
+}
+
+/** DO WHAT THE POSITION OWES, the way a walker does before it signs.
+ *
+ *  A STATE'S MARKED STEPS HOLD ITS CLAIM, which is exactly what they are for.
+ *  So a walk fixture that only fills forms is a walker that answered every
+ *  question and did none of the work, and the gate refuses it — correctly.
+ *
+ *  WORK ONLY A PERSON MAY SETTLE IS LEFT ALONE. An agent settling one is
+ *  refused, and a fixture is an agent.
+ *
+ *  IT RETURNS HOW MANY IT CLOSED, so a fixture that suddenly owes twenty steps
+ *  where it owed two is visible rather than silently slower. */
+export function doTheWork(root: string, at: string, now = "2026-01-01T00:00:00.000Z"): number {
+  let did = 0;
+  const { items, homeById } = readAllWork(root);
+  for (const i of items) {
+    if (i.place.split("/").pop() !== at) continue;
+    if (isSettled(i) || i.person_only) continue;
+    const home = homeById.get(i.id);
+    if (home === undefined) continue;
+    settle(home, i.id, "done", { reason: "the fixture walked this step", now });
+    did++;
+  }
+  return did;
+}
+
+/** THE SAME, WHEREVER THE WALK HAPPENS TO STAND — every active state at once.
+ *
+ *  A pull can land on several states, and a fixture has no business knowing
+ *  which. It returns how many it closed, so a driving loop can tell progress
+ *  from a stall. */
+export function workHere(s: Session): number {
+  let did = 0;
+  for (const at of s.active()) did += doTheWork(s.machineRoot(), at.slice(at.lastIndexOf("/") + 1));
+  return did;
 }

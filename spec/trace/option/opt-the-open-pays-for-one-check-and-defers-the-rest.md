@@ -6,7 +6,7 @@ statement: Make opening a folder cost one existence check and nothing else, defe
 cluster: the-bootstrap
 question: what happens when a folder is opened
 found_by: heuristic
-source: "Make the common case cheap; make the rare case possible."
+source: Make the common case cheap; make the rare case possible.
 ---
 
 ## Mechanism

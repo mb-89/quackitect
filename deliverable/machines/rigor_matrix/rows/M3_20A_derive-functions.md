@@ -72,9 +72,12 @@ evidence:
 
       Say `none` where every function passed on the first pass.
 major: full
+major_complexity: C3/R3
 minor: tailored
+minor_complexity: C3/R3
 patch: none
 product: full
+product_complexity: C3/R3
 specification: full
 major_note: |
   Applies in full for the change's cone: new functions derived

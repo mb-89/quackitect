@@ -12,6 +12,78 @@ happens to one when the session is interrupted.
 BOTH RULES LIVED IN THE ASSISTANT MEMORY until 2026-08-19. The repo is the
 memory, so they moved here at that retro.
 
+## Spawn one to save context or to raise quality, never to go faster
+
+TWO REASONS ARE GOOD AND ONE IS NOT.
+
+- SAVING CONTEXT is a reason. A subagent has its own window, so what it reads
+  never enters yours and only its answer does.
+- RAISING QUALITY is a reason. Fresh eyes that never saw your reasoning catch
+  what you cannot, which is why verification asks for them by name.
+- GOING FASTER IS NOT A REASON ON ITS OWN. A subagent on YOUR model doing work
+  you would have done costs the whole job twice: its window and yours. Parallel
+  wall-clock is not a saving when nobody is waiting on the clock.
+
+SO THE TEST IS: would this work have entered my context anyway? If the answer
+is yes and the model is the same, do it yourself.
+
+THE SAVING IS CONTEXT, NEVER KEYSTROKES. The work worth handing over is the
+work whose READING is long and whose ANSWER is short.
+
+DELEGATE A QUESTION LIKE THESE:
+
+- Which use case names the lane verbs, and what shape does an entry take?
+- Where is this rendered, and who calls it?
+- What do three existing nodes of this kind look like?
+
+DO NOT DELEGATE A JUDGMENT. What a changed contract should now mean, whether
+an assertion still proves its point, which of two readings the owner meant —
+these are yours, and a weaker hand returns a confident wrong answer.
+
+DO NOT DELEGATE A SWEEP THE LANE HAS A VERB FOR. `se_file_replace` renames
+across a tree in one call with a preview. A subagent doing the same is slower
+and less checkable.
+
+MEASURED. A session fixed about forty test failures and spawned no
+subagent until the owner asked why. Almost none of the fixes were mechanical,
+so handing them over would have saved little — but the READING behind them was
+most of the session's cost, and every page of it stayed in context.
+
+## The reviewer never implements, and the implementer never reviews
+
+OWNER RULING 2026-08-26. Where a subagent reviews work, it reports what it
+found and stops. A different hand applies the findings.
+
+WHY THE SEPARATION IS THE POINT. The hand that wrote something wants it
+accepted. That is not a model defect. It is what having authored something
+does, to a person as much as to an agent, and a reviewer allowed to fix
+inherits the author's stake in the fix.
+
+THREE ROLES, AND NONE OF THEM DOUBLES UP.
+
+- The IMPLEMENTER writes, and never reviews its own work.
+- The REVIEWER hunts for reasons the work is wrong, and writes nothing.
+- The FIXER applies what the reviewer found.
+
+THE REVIEWER'S BRIEF SAYS WHAT IT IS HUNTING. "Review this" invites a summary.
+"Find every reason this does not work, and say which of them are real" invites
+a finding. Write the second one.
+
+MORE THAN ONE REVIEWER IS LEGAL AND OFTEN RIGHT. Where the work can fail in
+more than one way, give each reviewer a different lens rather than asking two
+agents the same question.
+
+THE WALKER IS A HAND LIKE ANY OTHER. Reading a subagent's findings and
+applying them is the fixer's job, and the walker may hold it. What the walker
+may not do is review its own work and call that a review.
+
+WHERE IT COMES FROM. Bun's Zig-to-Rust port ran one implementer, two or more
+adversarial reviewers and one fixer over every ported file, and named the
+author's bias as the reason. The account is [[ref-bun-zig-to-rust-port]].
+
+NOBODY HAS SEEN THE FAILURE HERE YET, and the owner said so when ordering the
+rule. It is written down before it costs something rather than after.
+
 ## Pass the lane rule to every subagent
 
 A subagent has your tools and none of your context. Give it the cage.
@@ -26,35 +98,45 @@ A SUBAGENT THAT DOES NOT KNOW ABOUT THE CAGE WILL REACH FOR ITS NATIVE TOOLS.
 It will then report that it could not read anything, and you will have paid
 for a turn that found nothing.
 
-### THE CHILD IS NOT IN THE CAGE, measured 2026-08-20
+### THE CHILD IS IN THE CAGE ON THIS HARNESS, and it was not on i37
 
-The `se` MCP server is NOT in a subagent's tool set. The child cannot call a
-lane verb at all, whatever you tell it.
+A SUBAGENT CAN CALL LANE VERBS HERE. Tell it to, and tell it how.
 
-What happened on i37's verification. The tester was handed the lane rule in
-full: the verbs, the argument names, the root-relative path rule, the
-read-only limit. It answered `No matching deferred tools found` for every
-`se_` verb. Its native Bash and Read were not blocked, and it used them.
+WHAT IT HAS TO BE TOLD, because the verbs are DEFERRED and it holds only their
+names until it asks for their schemas.
 
-So the warning above prepares for the wrong failure. The real case is a child
-that knows about a cage it is not in.
+- Call `ToolSearch` FIRST, with `select:mcp__se__se_file_read,mcp__se__se_file_search`
+  and whatever else it needs. Without that step the verbs are not callable and
+  the child reports it could read nothing.
+- The verbs are named `mcp__se__se_*`, not `se_*`.
+- Paths are root-relative to the project root.
+- Say whether it may write. Most readers may not.
 
-WHAT TO TELL A SUBAGENT INSTEAD, until the lane reaches children:
+MEASURED 2026-08-28. Nine hands were spawned in one retro and told the above.
+The call log took 152 lane calls in ten minutes, peaking at 36 in a single
+minute while the parent was making about three. `se_file_search`, `se_run`,
+`se_file_read`, `se_file_write` and `se_file_glob` all served children.
 
-- Say the paths are root-relative to the project root, and that it reads with
-  its NATIVE tools.
-- Say it may not write, unless you meant it to.
-- Say the lane exists and that it cannot drive it. A child that has been told
-  to use `se_` verbs wastes its first calls discovering they are absent.
+WHAT THE LOG PROVES AND WHAT IT DOES NOT. It proves the volume, and no single
+hand makes it. It does not stamp which hand made which call, because the lane
+cannot tell two hands apart on its own.
 
-WHY IT MATTERS BEYOND CONVENIENCE. Fresh eyes see a DIFFERENT PROJECT than
-the walk does: no state gate, no narration toll, no typed refusals, no call
-log. Every finding a subagent makes about LANE BEHAVIOUR is second-hand by
-construction.
+THE EARLIER MEASUREMENT WAS REAL AND IT WAS ABOUT A DIFFERENT HARNESS. On i37,
+2026-08-20, a tester handed the same rule answered `No matching deferred tools
+found` for every verb and fell back to native Bash and Read.
 
-So weigh a subagent's lane findings accordingly, and re-check the ones that
-matter by driving the verb yourself. On i37 the tester's findings were good
-and two of them rested on reading `deliverable/engine/tools-file.ts` rather than on calling it.
+SO CHECK RATHER THAN ASSUME, both ways. A child that reports it cannot find
+the verbs is on a harness that does not carry them, and it reads natively. A
+child that finds them is in the cage and is logged like any other hand.
+
+WHY IT MATTERS BEYOND CONVENIENCE. A child reading through the lane is a child
+whose reads are LOGGED, so its findings can be checked afterwards rather than
+taken on trust. That is the whole difference between a reviewer you can audit
+and one you cannot.
+
+WHAT IS STILL SECOND-HAND is a finding about how a verb BEHAVES under the walk.
+A child sees no state gate and no walk position, so a claim about what a state
+refuses is still worth re-checking by driving the verb yourself.
 
 ## Two hands, and the log has to be able to count them apart
 
@@ -87,7 +169,7 @@ claims.
 
 ## Which model
 
-JUDGE IT PER SUBAGENT (owner grant 2026-07-11). There is no fixed mapping and
+JUDGE IT PER SUBAGENT. There is no fixed mapping and
 none should be invented.
 
 - MECHANICAL WORK rides a lower tier. Counting, collecting, listing, reading

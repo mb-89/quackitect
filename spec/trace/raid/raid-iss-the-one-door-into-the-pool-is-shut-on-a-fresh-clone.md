@@ -3,11 +3,11 @@ minted_in: i5-engine-hygiene-one-version-source-every-
 id: raid-iss-the-one-door-into-the-pool-is-shut-on-a-fresh-clone
 type: "[[raid]]"
 kind: issue
-statement: "A work token is minted only by draining a note to backlog. A fresh clone has no notes, so the pool can never be filled from a cloud run."
+statement: A work token is minted only by draining a note to backlog. A fresh clone has no notes, so the pool can never be filled from a cloud run.
 owner: the maintainer
 trigger: every cloud run that wants to park work for later
 status: open
-impact: "The pool stands at zero tokens today. Work a cloud session defers has nowhere mechanical to go, so it becomes prose in an evidence form that nothing queries."
+impact: The pool stands at zero tokens today. Work a cloud session defers has nowhere mechanical to go, so it becomes prose in an evidence form that nothing queries.
 breaks_how_badly: crippling
 how_likely: expected
 source_refs:
@@ -17,6 +17,7 @@ source_refs:
   - i5-engine-hygiene-one-version-source-every-
 weighs_with: none
 weighs_against: none
+place: backlog
 ---
 
 ## What was observed

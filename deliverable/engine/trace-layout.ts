@@ -256,7 +256,7 @@ export function layoutTrace(
   const rootsShown = (id: string): string[] => (roots.get(id) ?? []).filter((r) => shown.includes(r));
   const onSome = (t: string): boolean => asked.some((r) => r.includes(t));
   const inScope = all2.filter((n) => rootsShown(n.id).length > 0 && kept.has(n.id) && onSome(n.type));
-  // AN EMPTY RING IS NOISE (owner, 2026-08-06). A level nothing has reached
+  // AN EMPTY RING IS NOISE (owner). A level nothing has reached
   // yet draws a circle around nothing and pushes everything else inward. It
   // comes back by itself the moment the level has a node.
   const levels = asked.filter((r) => r.some((t) => inScope.some((n) => n.type === t)));
@@ -386,7 +386,7 @@ export function layoutTrace(
   // cards rather than the circles.
   const reach = placed.reduce((m, p) => Math.max(m, Math.hypot(p.x, p.y)), rings[rings.length - 1] ?? RING_GAP);
   // THE BANDS — what a reader sees when the cards are too small to read
-  // (owner design 2026-08-07). One arc per section, and one per slice inside
+  //. One arc per section, and one per slice inside
   // it. They ride OUTSIDE the outermost ring so they never collide with a
   // card, and the client fades them against the cards as the zoom changes.
   const divided = levels.some((r) => r.some((t) => sliceOf(t) >= 0));

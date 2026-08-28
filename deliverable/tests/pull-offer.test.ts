@@ -3,7 +3,7 @@
 // Two properties, and they pull against each other on purpose.
 //
 // THE BATCH: a pull does not hand over one step. It hands over every step
-// on the happy path up to the next branching point (owner, 2026-08-01).
+// on the happy path up to the next branching point.
 // Start to front desk has no branch in it, so it must not cost a round trip
 // per hop.
 //
@@ -17,7 +17,7 @@
 import { strict as assert } from "node:assert";
 import { describe, test } from "node:test";
 import { Session } from "../engine/session.ts";
-import { freshRoot, readEverything, sessionAtIdle } from "./helpers.ts";
+import { checkDocs, freshRoot, readEverything, sessionAtIdle } from "./helpers.ts";
 
 const root = (): string => freshRoot();
 
@@ -34,7 +34,11 @@ describe("the batch", { concurrency: true }, () => {
   });
 
   test("`here` carries the guidance but not the pulled documents", async () => {
-    const s = await sessionAtIdle(root());
+    // sessionAtIdle now rests AT front_desk itself (idle was renamed into
+    // it), so it would already have spent the one hop this case wants to
+    // watch. Start from a fresh, un-arrived session instead.
+    const s = new Session(root());
+    checkDocs(s);
     s.setAutonomy(1);
     s.setTarget("front_desk");
     // The answer that STOPS the reading is the one that walks.
@@ -48,7 +52,11 @@ describe("the batch", { concurrency: true }, () => {
 
 describe("the offer", { concurrency: true }, () => {
   test("with no target away from the desk, the walk comes home first; at the desk it waits with options", async () => {
-    const s = await sessionAtIdle(root());
+    // Same reason as above: sessionAtIdle already rests at front_desk, so it
+    // cannot show the walk COMING home. Start away from it instead.
+    const s = new Session(root());
+    checkDocs(s);
+    s.setAutonomy(1);
     s.setTarget("");
     const routed = await readEverything(s);
     assert.equal(routed.pull, "do");
@@ -57,23 +65,37 @@ describe("the offer", { concurrency: true }, () => {
     assert.equal(r.pull, "wait");
     const options = r.options as Record<string, unknown>[];
     assert.ok(options.length > 1, "the desk should still surface the live doors");
-    const desk = options.find((o) => o.to === "front_desk");
-    assert.ok(desk !== undefined, "the front desk is one of them");
+    // THE DOOR CHECKED HERE USED TO BE THE DESK ITSELF, offered from the hub
+    // that stood in front of it. The desk IS the hub now, and a state has no
+    // edge to itself, so the mechanical door checked is `end`.
+    const way = options.find((o) => o.to === "end");
+    assert.ok(way !== undefined, "end is one of them");
     // THE WEIGHT IS A WORD (req-autonomy-is-categorical; owner 2026-08-16).
     // Every door of every pull used to carry `priority: 0.2`, so the number
     // the answer had stopped saying at the top was said a dozen times below it.
-    assert.equal(desk.priority, undefined, "no served surface carries a bare autonomy number");
-    assert.equal(desk.weight, "mechanical", "the weight rides along as the rung's own word");
+    assert.equal(way.priority, undefined, "no served surface carries a bare autonomy number");
+    assert.equal(way.weight, "mechanical", "the weight rides along as the rung's own word");
   });
 
-  test("idle itself is among the desk's doors — the hub is a destination, not only a thoroughfare", async () => {
+  // THIS CASE TURNED OVER WHEN THE HUB WAS REMOVED. It used to demand that a
+  // state called `idle` offer the desk as one of its doors, because the hub
+  // was a thoroughfare and the desk was a destination beyond it.
+  //
+  // THE DESK IS THE HUB NOW, so that door would be a state offering itself.
+  // The case guards the new shape instead: nobody re-adds a self-edge, and the
+  // doors the desk really has are still offered.
+  test("the desk offers no door to itself — it IS the hub, so parking there is standing still", async () => {
     const s = await sessionAtIdle(root());
     s.setTarget("");
     await readEverything(s);
     const r = (await s.pull()) as Record<string, unknown>;
-    const idle = (r.options as Record<string, unknown>[]).find((o) => o.to === "idle");
-    assert.ok(idle !== undefined, "idle is offered at the desk");
-    assert.equal(idle.open, true, "nothing blocks parking at the hub");
+    const options = r.options as Record<string, unknown>[];
+    assert.equal(
+      options.find((o) => o.to === "front_desk"),
+      undefined,
+      "a state has no edge to itself, and a door to where you stand goes nowhere",
+    );
+    assert.ok(options.length > 1, "the doors it does have are still offered");
   });
 
   test("an option above the slider is offered as NOT open, and says who it needs", async () => {

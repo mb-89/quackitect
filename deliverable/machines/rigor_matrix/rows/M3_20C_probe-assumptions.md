@@ -19,8 +19,6 @@ legal_tools:
   - se_test
   - se_log_query
   - se_answer
-  - se_web_search
-  - se_web_fetch
 evidence:
   - name: probes
     template: node-table
@@ -51,9 +49,13 @@ evidence:
       A cell still holding its comment counts as empty.
       The submit refuses it by name.
 major: full
+major_complexity: C2/R3
 minor: tailored
+minor_complexity: C2/R3
 patch: tailored
+patch_complexity: C2/R3
 product: full
+product_complexity: C2/R3
 specification: tailored
 major_note: |
   Applies in full: every standing assumption probed, including the ones
@@ -80,7 +82,7 @@ specification_note: |
 THIS STATE'S INPUT IS THE RAID FOLDER, not the state above it. Every standing
 assumption is probed, whenever it was recorded.
 
-That is why identifying and probing are two states (owner ruling, 2026-08-06).
+That is why identifying and probing are two states.
 With one state doing both, "probe assumptions" naturally reads as "probe the
 ones I just wrote". An assumption recorded in i1 is then never looked at
 again, which is exactly when it has most likely gone stale.

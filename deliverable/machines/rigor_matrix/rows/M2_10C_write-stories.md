@@ -5,7 +5,7 @@ statement: Write the user stories as decks - one actor, one concrete pass, a cla
 state_kind: work
 filled_by: agent
 depends_on:
-  - gate-motivation
+  - spawn-for-inputs
 entry_read:
   - deliverable/machines/methods/meth-story-slideshow.md
 legal_tools:
@@ -24,9 +24,12 @@ evidence:
     covers: value-prop
     description: the stories THIS delta touched, one node reference per line — the corpus answers which exist, and only you know which this record moved
 major: full
+major_complexity: C3/R3
 minor: tailored
+minor_complexity: C3/R3
 patch: none
 product: full
+product_complexity: C3/R3
 specification: full
 major_note: |
   Applies for the change: every need it introduces gets its story,
@@ -70,6 +73,6 @@ SEVERAL STORIES MAY SERVE ONE VALUE PROP, and most do. `refines` names the prop,
 
 COVERAGE IS CHECKED, NEVER WRITTEN DOWN. The field declares `covers: value-prop`, so the engine refuses this state while any story refines no proposition, and while any proposition is refined by no story.
 
-THERE IS NO COVERAGE FIELD, deliberately (owner ruling 2026-08-06). A form field asking whoever fills it to restate a computed result gets a paragraph that agrees with the engine until the day it does not. What is NOT computed - which stories are MUSTS, and why each earns its demonstration - is judgment, and it goes under `anything_else`.
+THERE IS NO COVERAGE FIELD, deliberately. A form field asking whoever fills it to restate a computed result gets a paragraph that agrees with the engine until the day it does not. What is NOT computed - which stories are MUSTS, and why each earns its demonstration - is judgment, and it goes under `anything_else`.
 
 THE SET IS NEVER COMPLETE, and does not have to be. Coverage is not the same as completeness: every proposition having a story does not mean every pass is told. A missing story surfaces later the same way a missing value prop does - something gets built that no story covers. Add it then, rather than stalling here for exhaustiveness.

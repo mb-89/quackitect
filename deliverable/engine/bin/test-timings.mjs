@@ -48,6 +48,21 @@ export default async function* timings(source) {
       // bookkeeping never fails the suite
     }
   };
+  // THE FOLDER IS MADE BEFORE THE FIRST BEAT, not after the last one.
+  //
+  // MEASURED 2026-08-25: two runs were abandoned after seven and twenty-three
+  // minutes having written no beat at all, because the only mkdir stood at the
+  // END of the stream. A run that never reaches its end therefore leaves
+  // nothing, which is the exact case this file exists to serve.
+  try {
+    mkdirSync(SE, { recursive: true });
+  } catch {
+    // bookkeeping never fails the suite
+  }
+  // A HEADER OPENS EVERY RUN'S BEATS, so a reader can tell this run's lines
+  // from the last one's. The battery used to write it and the scoped path did
+  // not, so a scoped run's progress was indistinguishable from stale lines.
+  beat({ run, started: run, pid: process.pid });
   for await (const event of source) {
     if (event.type !== "test:pass" && event.type !== "test:fail") continue;
     const d = event.data;
@@ -63,10 +78,15 @@ export default async function* timings(source) {
     };
     rows.push(row);
     // A dying test streams its WHY the moment it dies.
+    // EVERY BEAT NAMES ITS RUN. Without it a reader cannot tell this run's
+    // lines from the last one's, and a stale tail reads exactly like a live
+    // one — which is how two abandoned runs looked like runs that never
+    // started at all.
     beat(
       row.ok
-        ? { file: row.file, ms: row.ms, t: Date.now() - t0 }
+        ? { run, file: row.file, ms: row.ms, t: Date.now() - t0 }
         : {
+            run,
             file: row.file,
             ms: row.ms,
             t: Date.now() - t0,

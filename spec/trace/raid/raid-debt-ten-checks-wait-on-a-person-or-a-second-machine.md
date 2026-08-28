@@ -7,13 +7,16 @@ statement: Ten verification checks and two boundary timings cannot be answered b
 owner: the owner
 trigger: when the work-token system can carry a task to a person; or at the first verification after 2026-10-01, whichever comes first
 status: open
-looked: 2026-08-20
+looked: 2026-08-26
 impact: A check nobody can run is marked owed every iteration and eventually stops being read, which is how four factual errors sat in the README while its own inspection was marked owed.
 breaks_how_badly: abrasive
 how_likely: expected
 source_refs:
   - raid-issue-the-corpus-wide-inspections-have-no-runner
   - i33 verification, tester rounds one to four
+last_looked: 2026-08-23
+look_verdict: rescheduled
+place: backlog
 ---
 
 TAKEN DELIBERATELY AT i33 (owner ruling 2026-08-17: "note all the others as
@@ -156,3 +159,24 @@ is about, so nothing here moved.
 THE LOOK IS THE POINT. A debt nobody re-reads is a lie in the ledger, and this
 line is the evidence that somebody read it on this date.
 
+## Swept 2026-08-26, at i54's closing retro: RE-ACCEPTED
+
+THE POOL IS NO LONGER EMPTY, and that changes nothing here. It holds well over a hundred parked items and this retro added eleven more.
+
+WHAT IS STILL TRUE. None of them can carry a task to a person. A parked item states a condition and waits to be re-read; nobody is notified when its moment arrives. That is the half this entry is about, and it is unbuilt.
+
+RE-ACCEPTED consciously, trigger unchanged.
+
+
+SWEPT 2026-08-28, at i63's closing retro: RE-ACCEPTED, and the first half of
+the trigger is now closer than it was.
+
+The trigger fires when the work-token system can carry a task to a person, or
+at the first verification after 2026-10-01, whichever comes first.
+
+i63 SHIPPED THE WORK-TOKEN SYSTEM in this window, and SE-C-150 already refuses
+an agent settling an item marked person-only. So the carrying mechanism exists.
+What is not yet shown is a check actually routed to a person through it.
+
+RESCHEDULED, with the trigger sharpened: it fires at the first person-only
+token minted from one of these ten checks.

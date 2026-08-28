@@ -130,7 +130,7 @@ describe("the catalogues", { concurrency: true }, () => {
 // THE MIDDLE LAYER, which had no test and was where the silence lived.
 //
 // Every cluster column was declared right and every one of them read as free
-// text (owner, 2026-08-08). Both ends were fine: the note declared its picks,
+// text. Both ends were fine: the note declared its picks,
 // and the editor drew what it was given. Nothing checked what came out between.
 describe("the offers a finder actually makes", { concurrency: true }, () => {
   const tableField = (state: string, field: string): EvidenceField => {
@@ -144,8 +144,8 @@ describe("the offers a finder actually makes", { concurrency: true }, () => {
 
   test("a literal rides beside a live source, so the offer is complete before the live one fills", () => {
     const args = argsOf("find_without", "trims");
-    // The trace had no clusters when this was reported (2026-08-08); i1's
-    // five landed on trunk 2026-08-09 and the live half now fills. The
+    // The trace had no clusters when this was reported; i1's
+    // five landed on trunk and the live half now fills. The
     // CLAIM is about the literal half: it rides whatever the live one holds.
     for (const lit of ["the environment", "the user", "nobody"]) {
       assert.ok(args.picks.who_takes_over.includes(lit), `${lit} is offered beside the live source`);

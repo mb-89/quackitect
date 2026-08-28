@@ -19,6 +19,7 @@ source_refs:
   - tsp-panel-walkthrough
   - tsp-desk-and-gates
   - tsp-tour-run
+place: backlog
 ---
 
 The three runs need what the agent cannot honestly supply: a fresh

@@ -3,11 +3,11 @@ minted_in: i5-engine-hygiene-one-version-source-every-
 id: raid-iss-a-fresh-container-has-no-battery-timings-to-design-against
 type: "[[raid]]"
 kind: issue
-statement: "The test-timing records do not survive a container, so a record that starts on a fresh clone cannot design a performance change against its own battery."
+statement: The test-timing records do not survive a container, so a record that starts on a fresh clone cannot design a performance change against its own battery.
 owner: the maintainer
 trigger: any state that must reason about test cost before verification runs
 status: open
-impact: "A performance item has to be designed from an older record's numbers, measured on another machine, or deferred until after the build. All three are worse than reading the last run."
+impact: A performance item has to be designed from an older record's numbers, measured on another machine, or deferred until after the build. All three are worse than reading the last run.
 breaks_how_badly: corrosive
 how_likely: expected
 source_refs:
@@ -15,6 +15,7 @@ source_refs:
   - raid-risk-splitting-the-heaviest-test-file-buys-no-wall-clock
 weighs_with: none
 weighs_against: none
+place: i50-the-unattended-deadline-a-wait-or-an-owe
 ---
 
 ## What was observed

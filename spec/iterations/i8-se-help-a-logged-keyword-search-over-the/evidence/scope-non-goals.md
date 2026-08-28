@@ -3,7 +3,7 @@ form: scope-non-goals
 by: agent
 signed_off: 2026-08-12T20:58:10.722Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / scope-non-goals

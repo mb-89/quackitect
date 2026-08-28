@@ -27,7 +27,7 @@ Hold each against every cluster.
 - If it must be remembered, it must be recorded.
 - The default should be the safe thing.
 
-## RUN IT WHOLE, AND WRITE THE MISSES
+## RUN IT WHOLE, AND WRITE THE MISSES #work
 
 Eight rules times however many clusters is a small number, and the pass is
 mechanical. A partial sweep is a choice nobody made on purpose.
@@ -54,13 +54,13 @@ The SyA corpus opens its "using available knowledge" list with heuristics,
 quoting one: "group strongly-related elements, separate unrelated". That rule
 alone changes a partition, which is what M4 is deciding.
 
-## THE CATALOG IS SHORT ON PURPOSE, AND IT GROWS BY EVIDENCE
+## THE CATALOG IS SHORT ON PURPOSE, AND IT GROWS BY EVIDENCE #work
 
 A rule joins this list when it has bitten on a real decision here, not
 because it is famous. A catalogue nobody can run whole in minutes stops being
 run at all.
 
-## Output
+## Output #work
 
 One [[option]] node per heuristic that bit, its `source` being the rule
 itself — so an option from this finder traces to one line above.

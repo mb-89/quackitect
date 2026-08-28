@@ -895,7 +895,7 @@ The raid register holds 311 entries: 216 open, 42 decided, 19 closed, 10 probed,
   lint: A check that every open register entry carries a looked date newer than N days, or is flagged in the survey.
 - **[E]** open issues, fixed — spec/trace/raid/raid-iss-boot-grants-no-tools-while-promising-repair.md:9
   claim: raid-iss-boot-grants-no-tools-while-promising-repair is fixed: prepare_idle now grants exactly the repair tools the entry demanded.
-  evidence: deliverable/machines/states/prepare_idle.md line 12: 'repair_tools: se_file_read, se_file_search, se_file_glob, se_file_list, se_file_patch, se_file_write, se_run' beside the guidance sentence the entry quoted as contradicted.
+  evidence: deliverable/machines/states/prepare_desk.md line 12: 'repair_tools: se_file_read, se_file_search, se_file_glob, se_file_list, se_file_patch, se_file_write, se_run' beside the guidance sentence the entry quoted as contradicted.
   proposal: Close it, citing prepare_idle.md.
 - **[E]** open issues, fixed — spec/trace/raid/raid-iss-a-write-can-leave-the-corpus-unparseable.md
   claim: raid-iss-a-write-can-leave-the-corpus-unparseable is fixed: the write path now refuses frontmatter that does not parse, exactly the colon-in-scalar case that spawned the entry.
@@ -915,7 +915,7 @@ The raid register holds 311 entries: 216 open, 42 decided, 19 closed, 10 probed,
   proposal: Close it; the machinery-note (facet 3) residue is covered by raid-asm-a-machinery-note-still-has-a-home, which stays open.
 - **[E]** open issues, fixed — spec/trace/raid/raid-iss-se-lint-has-no-whole-repo-sweep.md
   claim: raid-iss-se-lint-has-no-whole-repo-sweep is superseded: a whole-corpus sweep exists (bin/sweep.ts), runs at every boot, and the owner ruled deliberately that it is not a verb.
-  evidence: deliverable/machines/states/prepare_idle.md exit_script includes deliverable/engine/bin/sweep.ts; its body: 'THE SWEEP RUNS HERE BECAUSE THERE IS NO VERB FOR IT (owner ruling 2026-08-16)... 1015 nodes in 388 ms, and six standing breaks'.
+  evidence: deliverable/machines/states/prepare_desk.md exit_script includes deliverable/engine/bin/sweep.ts; its body: 'THE SWEEP RUNS HERE BECAUSE THERE IS NO VERB FOR IT (owner ruling 2026-08-16)... 1015 nodes in 388 ms, and six standing breaks'.
   proposal: Close it citing the ruling; the corpus-wide checks it worried about now have a runner.
 - **[E]** open issues, fixed — spec/trace/raid/raid-iss-a-recorded-act-carries-no-acting-role.md
   claim: raid-iss-a-recorded-act-carries-no-acting-role is fixed: the call log stamps the actor where the call is served.

@@ -5,7 +5,7 @@ statement: Author an executable check for every requirement in scope; examples t
 state_kind: work
 filled_by: agent
 depends_on:
-  - gate-prototype
+  - spawn-for-implementation
 entry_read:
   - deliverable/machines/methods/meth-test-design.md
 legal_tools:
@@ -31,9 +31,13 @@ evidence:
     page_size: 25
     description: the test-spec register — one row per spec; the files live on the spec node, and the law checks coverage both ways and the method match
 major: full
+major_complexity: C3/R3
 minor: full
+minor_complexity: C3/R3
 patch: tailored
+patch_complexity: C3/R3
 product: full
+product_complexity: C3/R3
 specification: full
 major_note: |
   Applies in full: every requirement in scope gets its check; the M5
@@ -61,7 +65,7 @@ specification_note: |
 
 ## Guidance
 
-THE SPEC IS THE ARTIFACT (owner ruling 2026-08-11). This state authors
+THE SPEC IS THE ARTIFACT. This state authors
 TEST-SPEC nodes ([[test-spec]]): one per verification collection, minted
 from the item template's skeleton into spec/trace/test-spec/.
 The spec carries the trace edge — `verifies:` names the requirement ids —

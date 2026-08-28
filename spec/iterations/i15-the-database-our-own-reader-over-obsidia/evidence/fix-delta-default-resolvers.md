@@ -3,7 +3,7 @@ form: fix-delta-default-resolvers
 by: agent
 signed_off: 2026-08-19T19:41:02.501Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / fix-delta-default-resolvers

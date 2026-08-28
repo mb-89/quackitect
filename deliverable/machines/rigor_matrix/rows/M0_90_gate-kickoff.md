@@ -20,8 +20,7 @@ legal_tools:
   - se_file_list
   - se_log_query
   - se_answer
-  - se_web_search
-  - se_web_fetch
+  - se_run
 evidence:
   - name: retro_drained
     description: what happened to each pending note, in one word and a reason
@@ -29,14 +28,22 @@ evidence:
     items:
       - $inbox
   - name: goals
-    description: the iteration's goals, one line each - every gate below measures what it produced against these
-    template: list
+    description: "one row per goal, four columns: the goal, why it exists now, what breaks or stays broken without it, and how anybody will know it was served - every gate below measures what it produced against these"
+    template: table
   - name: pulled_in
     description: what this iteration absorbs, each item with its origin
     template: list
   - name: left_out
     description: what explicitly stays out, and where it went
     template: list
+  - name: walkers
+    description: how many walkers this record runs with, and why - 0 is the DEFAULT and is the guide alone; a record asks for more deliberately
+    template: choice-with-rationale
+    options:
+      - "0"
+      - "1"
+      - "2"
+      - "3"
   - name: change_size
     description: the proposed column and its rationale; strikes named
     template: choice-with-rationale
@@ -46,9 +53,13 @@ evidence:
       - major
       - product
 major: full
+major_complexity: C4/R4
 minor: full
+minor_complexity: C4/R4
 patch: tailored
+patch_complexity: C4/R4
 product: full
+product_complexity: C4/R4
 specification: tailored
 major_note: |
   FLOOR - applies in full. The column argument for major names the
@@ -94,6 +105,37 @@ The kickoff handover is ONE brief carrying everything:
 The change size is the `change_size` field. It is one of patch, minor, major
 or product. Strikes are named where a cell reduces the walk.
 
+THE MOST WALKERS THIS RECORD MAY RUN WITH IS DECIDED HERE (owner ruling
+2026-08-23). The `walkers` field is a CEILING, never a quota, and ZERO is the
+default.
+
+- ZERO MEANS THE GUIDE WALKS THE RECORD ALONE, and it is where a record starts
+  unless somebody argues otherwise.
+- ASKING FOR ONE IS A DELIBERATE CHOICE, argued in the rationale, for a record
+  whose states genuinely earn a separate head.
+- IT IS STILL A MAXIMUM. Even at one, the guide decides at each spawn state
+  whether that phase earns a hand, and none is always allowed.
+- MORE THAN ONE is rarer still, for work that genuinely fans out.
+
+WHY ZERO. Delegated WRITING was measured over a full day and lost: three hands
+each spent about fifteen minutes rebuilding context the guide already held, for
+edits the guide had already located by file and line. The prior art agrees —
+reads parallelise and writes do not.
+
+WHAT IS UNAFFECTED. A REVIEWER at a gate and a RESEARCHER where the research
+happens do not count here and are not discouraged. Both earned their cost the
+same day.
+
+IT IS SET HERE AND LEFT ALONE. Changing it mid-record makes the comparison
+meaningless, and comparison is the only reason the dial exists.
+
+SAY WHY IN THE RATIONALE, because that is the half a later reader needs.
+Spawning buys separation — a hand that authors cannot also bless — and costs
+tokens and wall-clock. Measured, three hands each spent roughly
+fifteen minutes re-reading files the guide already held, for edits the guide
+had already located by line number. Whether that trade is worth making is what
+the A/B is for, and the call log now carries which arm each record ran.
+
 THE FIRST ITERATION OF A PRODUCT IS `product`. It authors the vision packet,
 the stakeholders and the actual state.
 
@@ -127,23 +169,65 @@ THE BLESS SEEDS THE ITERATION. The engine compiles the blessed column into the
 iteration's state machine and pins it to the record, and that seeded machine
 is part of this gate's output.
 
+## The kickoff pulls the work assigned to this record
+
+NOT BUILT YET. Do it by hand here until it is: read `se_survey`, take every
+backlog item whose `place` names this record, and list each one under
+`pulled_in`.
+
+WHEN IT IS BUILT, the bless will pull them. This is the first moment a record
+has substeps to put work into, so it is the moment the assignment can land.
+
+NOT AT SEEDING, and the distinction is the whole reason this sits here. Seeding
+creates M0 and nothing else. Nothing can wait on it, because nobody knows in
+advance whether an iteration will ever be seeded at all.
+
+THIS IS THE SECOND HALF OF A PAIR. The retro writes a `place` onto each backlog
+item (`guidance/method/retro.md`, step 15). Without the pull, that place is a
+word sitting in a file until somebody happens to read the backlog at the right
+hour — which is how sixteen items named a record that then shipped without
+collecting one of them (measured 2026-08-28).
+
+HYGIENE IS NOT PULLED HERE. It keeps no owner on purpose, and the building
+milestone collects it (`M7_20_specify-build`). Pulling it at the kickoff would
+give it the owner the rule exists to withhold.
+
 ## The goals
 
-THE GOALS ARE A LIST. One line each, and they bind the whole walk.
+THE GOALS ARE A TABLE, four columns wide, and they bind the whole walk.
+
+- THE GOAL, in one line.
+- WHY IT EXISTS NOW. Not why it is good — why this round rather than a later
+  one.
+- WHAT BREAKS OR STAYS BROKEN WITHOUT IT. A goal that answers this with
+  nothing is a wish, and it comes out of the list.
+- HOW ANYBODY WILL KNOW IT WAS SERVED. Named before the walk starts, so no
+  gate below has to invent the measure afterwards.
+
+WHY A TABLE RATHER THAN A LIST. A one-line goal reads as complete and carries
+no argument, so every gate below inherits a demand nobody justified. The three
+extra columns are the argument, written once at the top rather than
+reconstructed at each gate.
+
+CHANGING THIS FIELD'S SHAPE IS A TEMPLATE CHANGE, NEVER AN AMEND. Every gate
+below reads this list, so a shape change re-owes evidence on every record
+carrying the old one. Do it between records.
 
 Every gate below carries a `goals_served` field. It lists these goals back and
 asks what that milestone produced for each one. A milestone with nothing for a
 goal, and nothing coming, is a walk that has drifted off its own kickoff.
 
-Three rules on the list itself:
+Three rules on the table itself:
 
 - ENGINE IMPROVEMENTS is a standing goal, always available. It is where the
   iteration pulls in the machine's own repairs. It needs no argument.
 - MORE THAN HALF A DOZEN GOALS IS TOO BIG. Split the iteration.
-- THE COUNT INFORMS THE COLUMN. One goal has a patch's shape. Two or three
-  have a minor's. More than that argues for major.
+- THE COUNT INFORMS THE COLUMN.
+  - One goal has a patch's shape.
+  - Two or three have a minor's.
+  - More than that argues for major.
 
-WHY THE GOALS LIVE HERE AND NOT IN THE TRACE (owner ruling 2026-08-17): a goal
+WHY THE GOALS LIVE HERE AND NOT IN THE TRACE: a goal
 is not an artifact that anything refines. It is what every artifact is measured
 against. It travels with the iteration, like the change size and a probed
 assumption, and it never enters the trace graph.

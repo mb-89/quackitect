@@ -9,7 +9,7 @@ export interface RejectionPayload {
   /** Executable: the exact call to make instead. */
   remedy: { tool: string; args: Record<string, unknown>; note?: string };
   source: string;
-  /** FEED-FORWARD (owner ruling 2026-08-06): where the rule is stated ahead
+  /** FEED-FORWARD: where the rule is stated ahead
    *  of the refusal. Computed from the clause, never passed by a caller.
    *  refusals.test.ts enforces that the section exists. */
   guidance: string;
@@ -70,11 +70,14 @@ export const CLAUSES = {
   GIT_REWRITE: "SE-C-002", // carried from v2 — no rebase; superseded content lives in history
   GIT_PUSH: "SE-C-003", // carried from v2 — the agent never pushes; the owner does
   GIT_NOT_ALLOWLISTED: "SE-C-004", // carried from v2 — git beyond the allowlist stays engine-internal
-  TOLL_DUE: "SE-C-040", // carried from v2 — update overdue; pay by resending the same call with the update field
+  // RETIRED and never raised. The number stays in the registry because the
+  // refusals page pairs a section to every clause here, and the section for
+  // this one says why it is gone. see guidance/refusals.md
+  TOLL_DUE: "SE-C-040",
   NOTE_UNKNOWN: "SE-C-073", // carried from v2 — draining an unknown note ref is refused
-  UPDATE_MALFORMED: "SE-C-120", // the update field failed to parse as a decision-graph op
-  DECISION_NODE: "SE-C-121", // update names an unknown or already-resolved node
-  DECISION_UNRESOLVED: "SE-C-122", // done over open children — everything started gets resolved
+  // SE-C-120, SE-C-121 and SE-C-122 are RETIRED with the decision graph they
+  // guarded, and none of the three numbers is reused. guidance/refusals.md says
+  // what each was for and what replaced it.
   DEAD_END: "SE-C-123", // completing the state would leave the machine open with nothing active — a starved join in the drawing
   CANVAS_BROKEN: "SE-C-124", // a canvas fails to compile mid-walk — the walk stands; fix the drawing
   PROSE_WALL: "SE-C-125", // long prose without a line break renders as a wall — break it into lines
@@ -83,7 +86,9 @@ export const CLAUSES = {
   JOB_UNKNOWN: "SE-C-128", // a background job ref this session never started
   RUN_LANE_JOB: "SE-C-129", // se_run asked to do a lane tool's job — the lane covers it; the ladder blocks after one warned run
   // see dsp-lane-door.md#se-c-130-and-se-c-131-are-retired
-  NARRATION_STALLED: "SE-C-133", // updates keep coming while the checklist never moves — warned once, then refused
+  // SE-C-133 is RETIRED with the checklist it counted. The leaving guard over a
+  // state's work tokens is what holds a state shut now, and it cannot be
+  // satisfied by narrating.
   RAW_NUL: "SE-C-132", // a raw NUL byte in text — it makes the whole file unsearchable; in code it is corrected to the escape, elsewhere the intent is not knowable
   WRITE_TRANSFORMED: "SE-C-135", // the applied text does not contain the payload — something transformed it on the way in; refused rather than silently corrupted
   TEST_NO_QUESTION: "SE-C-136", // a scoped run with no question — the scope says which tests ran, only the question says why
@@ -102,4 +107,58 @@ export const CLAUSES = {
   // an unclosed group in it. It came back as raw rg stderr with no clause and
   // no remedy, which is the one thing every other refusal in this lane is not.
   SEARCH_PATTERN: "SE-C-145", // the search pattern does not parse as a regex — the escaped literal rides the refusal // a structured query names a field the matched kind does not carry — refused by name, listing the fields that ARE legal, rather than silently returning an empty column
+  // A WRITE THAT ADDS A SECOND SURFACE. An engine module that emits widget
+  // markup while the editor registry does not name it and the exemption list
+  // does not declare it. A second surface accreted once over months and
+  // nothing objected, because nothing could.
+  UNREGISTERED_EMITTER: "SE-C-146",
+  // A SECOND RECORD OPENED WHILE ONE IS ALREADY HELD. One engine walks one
+  // record; wanting two at once means a second checkout. The refusal names
+  // what is held and the verb that sets it aside, so it has an exit that is
+  // neither finishing nor abandoning the work.
+  PARK_NOWHERE: "SE-C-148", // a point parked for a name the walk never reaches — nothing could ever deliver it
+  SECOND_RECORD_OPEN: "SE-C-147",
+  // THE END OF A PIECE OF WORK, and the three ways it goes wrong. Each is a
+  // different fault with a different remedy, which is why they are three
+  // clauses rather than one about work.
+  WORK_REASON_OWED: "SE-C-149", // a close at anything other than done, with no reason on the item
+  WORK_PERSON_ONLY: "SE-C-150", // an agent settling an item whose face says a person must
+  WORK_ALREADY_TAKEN: "SE-C-152", // a second hand taking work the first is already on
+  WORK_TITLE_TOO_LONG: "SE-C-153", // a hand-written token title past four words
+  // THE DOOR REGIME'S TWO CLAUSES, MINTED AS SE-C-149 AND SE-C-150 ON THE
+  // system-exploration BRANCH AND RENUMBERED AT THE MERGE. i63 shipped the two
+  // work clauses above under those numbers first, and a number in a shipped log
+  // is never reused. SE-C-143 was renumbered for the same reason, and this is
+  // that precedent applied a second time.
+  //
+  // A WRITE THAT ADDS A REACH NOBODY DECLARED. A module that holds a governed
+  // conversation while no departure records it. It refuses the ADDITION and
+  // never the edit, so the modules that already reach stay fixable.
+  UNDECLARED_REACH: "SE-C-154",
+  // A DEPARTURE THAT STATES NO REASON. The reason is the entry rather than
+  // metadata on it, so a bare path is not a line. Every compared system lets
+  // somebody bypass a boundary; this is the one that makes the bypass explain
+  // itself.
+  DEPARTURE_WITHOUT_REASON: "SE-C-155",
 } as const;
+
+/** A WALL OF PROSE IS REFUSED. Paragraphs are the author's job, and no renderer
+ *  can invent them.
+ *
+ *  IT LIVES HERE BECAUSE TWO DOORS NEED IT. A guard held by one caller is a
+ *  guard the other door walks past: the same text was refused from the lane and
+ *  accepted from the panel. */
+export function refuseProseWall(tool: string, field: string, text: string): void {
+  if (text.length <= 300 || text.includes("\n")) return;
+  throw new Rejection({
+    clause: CLAUSES.PROSE_WALL,
+    expected: `${field} broken into lines — paragraphs and list lines survive every render`,
+    got: `${text.length} chars without a single line break — renders as a wall`,
+    remedy: {
+      tool,
+      args: { [field]: "<the same text with real line breaks>" },
+      note: "shape it like prose: short paragraphs, one list item per line",
+    },
+    source: "engine/errors.ts prose-wall",
+  });
+}

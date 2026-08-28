@@ -14,11 +14,13 @@ being missed — the coverage card, where brainstorming clusters around
 the obvious.
 
 **Steps.**
-1. Center: the frame in one phrase.
-2. Eight petals: aspects, stakeholders, constraints, adjacent problems.
-3. Promote the two or three richest petals to centers; eight sub-ideas
+1. Center: the frame in one phrase. #work
+2. Eight petals: aspects, stakeholders, constraints, adjacent problems. #work
+3. Promote the two or three richest petals to centers #work
+
+   eight sub-ideas
    each.
-4. Harvest: every leaf is an idea stub or a question worth a note.
+4. Harvest: every leaf is an idea stub or a question worth a note. #work
 
 **Output.** A breadth map plus the harvested stubs — the map itself
 shows what was deliberately NOT explored.

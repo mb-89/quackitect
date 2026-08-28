@@ -5,9 +5,12 @@ type: "[[function]]"
 cluster: the-account
 statement: put the whole standing position in front of a person, without them asking anybody
 satisfies:
+  - req-a-states-outstanding-count-is-read-at-a-glance
+  - req-a-hand-may-break-work-into-parts-and-the-parts-are-visible
   - req-the-panel-s-paint-says-which-kind-of-green-it-is
   - req-the-actor-is-recorded-where-the-call-is-served
   - req-surface-answers-in-one-second
+  - req-a-slow-answer-does-not-freeze-the-surface-beside-it
   - req-survey-counts-only-open-records
   - req-panel-shows-the-machine
   - req-selected-node-shows-its-claim
@@ -29,6 +32,8 @@ satisfies:
   - req-work-past-its-bound-says-it-is-working
   - req-a-slowness-signal-never-shortens-the-wait
 inputs:
+  - flow-owed-count
+  - flow-view-model
   - flow-position
   - flow-trace-graph
   - flow-filter
@@ -91,3 +96,36 @@ IT IS NOT [[fn-run-a-governed-walk.resolve-a-path]]. That function resolves a
 path for a caller and proves it by read-back. This one is answerable for what
 a person SEES, which fails differently — a correct resolution drawn under the
 wrong record's name is still a person reading the wrong thing.
+
+## Addition — work tokens
+
+THE COUNT ARRIVES DERIVED AND THIS FUNCTION DRAWS IT. Producing the figure is
+[[fn-run-a-governed-walk.count-what-is-owed]]; putting it where a person
+reads it without opening the position is this one.
+
+LEGIBILITY IS A DRAWING PROPERTY, so it sits here. A count nobody scans is a
+count nobody reads, and a surface laid out against the wrong magnitude has to
+be redrawn after everything else is settled.
+
+THE POPULATION IS NOT MEASURED YET. One script over an archived record
+answers it, and the register carries that as an open assumption with its
+probe.
+
+## Addition — the parts of a piece of work are drawn under it
+
+A HAND MAY BREAK ONE PIECE OF WORK INTO PARTS, and this function is where a
+person SEES them. Making the parts is
+[[fn-run-a-governed-walk.mint-what-a-state-owes]]; drawing them under the work
+they came from is this one.
+
+THE DEMAND IS HIERARCHY, not a list. A part shown beside its parent says
+nothing about which job it belongs to, and the whole purchase is that a person
+reads how the hand broke the job down without asking it.
+
+IT FAILS DIFFERENTLY FROM MAKING THEM. Parts created correctly and drawn flat
+leave the reader with more rows and no more understanding, which is worse than
+the single row they replaced.
+
+THE COUNT IS THE SEAM TO WATCH. Whatever the design rules about a parent while
+its parts are open, what this function draws as outstanding may not count one
+piece of work as several, or several as one, without saying which it did.

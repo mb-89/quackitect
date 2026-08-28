@@ -11,7 +11,7 @@ built or decided before what.
 
 The answer is a topological order, or the closest achievable thing to one.
 
-## Effect
+## Effect #work
 
 A fully triangularizable DSM has no feedback loops. A DAG has a valid
 topological order.
@@ -29,7 +29,7 @@ overlap. The source names three:
 - Kusiak 1999.
 - Gebala and Eppinger 1991.
 
-## Procedure
+## Procedure #work
 
 Reorder rows and columns with a deterministic reachability-based algorithm.
 

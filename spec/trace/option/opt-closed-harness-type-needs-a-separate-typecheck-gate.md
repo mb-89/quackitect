@@ -5,7 +5,7 @@ type: "[[option]]"
 statement: A closed harness type only makes a missing case illegal if something runs the type checker separately from execution; on this runtime, a missing switch case falls through silently at run time.
 cluster: cluster-the-arrival
 found_by: probe
-source: "Probed 2026-08-19: scratchpad/probe-harness-type-exhaustiveness.ts, a discriminated union with one case (\"cursor\") deliberately left unhandled, run with `node <file>.ts` (no flag). Exit 0, stdout \"fell through\" \u2014 the missing case did not error. deliverable/package.json carries no tsc or typecheck script, confirmed by search."
+source: 'Probed 2026-08-19: scratchpad/probe-harness-type-exhaustiveness.ts, a discriminated union with one case ("cursor") deliberately left unhandled, run with `node <file>.ts` (no flag). Exit 0, stdout "fell through" — the missing case did not error. deliverable/package.json carries no tsc or typecheck script, confirmed by search.'
 ---
 
 ## Mechanism

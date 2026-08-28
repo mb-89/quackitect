@@ -13,9 +13,9 @@ warm-up card — run it before the heavier machinery.
 it. Also to dump a full head before a structured card.
 
 **Steps.**
-1. Frame in the center.
-2. Branch freely — aspects, fears, wishes, names, adjacent anything.
-3. Two levels deep at most; speed over neatness.
-4. Circle the three branches with pull; they seed the next card's focus.
+1. Frame in the center. #work
+2. Branch freely — aspects, fears, wishes, names, adjacent anything. #work
+3. Two levels deep at most; speed over neatness. #work
+4. Circle the three branches with pull; they seed the next card's focus. #work
 
 **Output.** A rough map, three circled leads, and an emptied head.

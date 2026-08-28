@@ -41,6 +41,7 @@ Its sub-characteristics, so nobody has to open the standard to use this:
 ## Extensions
 
 - 2a. The answer exceeds the bound: the excess is the defect, and it is measured rather than felt.
+- 2d. The bound itself is a guess: `se_probe_cap` measures what THIS host will actually take, climbing until the answer is cut, and records the largest that arrived whole. Only the agent can see the cut, because it happens between the host and the model, so the engine hands the ladder over rather than guessing a number.
 - 2b. The answer will exceed the bound and cannot be handed off: it says so WHILE it works, without taking the surface over, so the person is never left deciding whether the machine is alive. Added by i33, and it is the half this use case's guarantee already promised — a call that cannot answer in time says so rather than hanging — with nothing in the main scenario carrying it.
 - 2c. The signal itself misleads: a faithful completion reading that carries discouraging news drives a person out of a wait worth finishing, so what is shown is whether it is working rather than a percentage. raid-risk-an-accurate-progress-signal-can-drive-abandonment holds this, and it is the owner's.
 - 6a. The surface exceeds the bound: the excess is recorded where somebody reads it, rather than being paid silently on every look.

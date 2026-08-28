@@ -3,7 +3,7 @@ form: harness-registry
 by: agent
 signed_off: 2026-08-19T16:25:36.032Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / harness-registry

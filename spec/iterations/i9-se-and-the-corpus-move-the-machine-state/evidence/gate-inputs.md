@@ -1,11 +1,11 @@
 ---
 form: gate-inputs
-amended: "2026-08-19T15:12:47.615Z by agent — a coverage claim cites a use-case extension the owner struck, and the inherited-work list still names a record that is not kept"
+amended: 2026-08-19T15:12:47.615Z by agent — a coverage claim cites a use-case extension the owner struck, and the inherited-work list still names a record that is not kept
 bless: blessed by human
 by: agent
 signed_off: 2026-08-19T12:47:14.866Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / gate-inputs

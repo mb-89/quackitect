@@ -15,13 +15,14 @@ legal_tools:
   - se_file_list
   - se_log_query
   - se_answer
-  - se_web_search
-  - se_web_fetch
+  - se_run
 evidence: []
 major: full
+major_complexity: C3/R4
 minor: none
 patch: none
 product: full
+product_complexity: C3/R4
 specification: tailored
 major_note: |
   Applies in full - the gate a major exists to pass. The matrix review is
@@ -29,7 +30,7 @@ major_note: |
   as data. M7 builds inside this baseline; a new element found mid-build
   returns HERE.
 minor_note: |
-  Does not apply (owner ruling 2026-08-13). Only decompose-structure
+  Does not apply. Only decompose-structure
   survives M5 at this size, and it allocates new functions into standing
   structure. A gate over one allocation reviews nothing M3's gate did not.
 
@@ -53,7 +54,7 @@ specification_note: |
 
 ## Guidance
 
-THE GATE ASKS NOTHING OF ITS OWN (owner ruling 2026-08-10). Everything it
+THE GATE ASKS NOTHING OF ITS OWN. Everything it
 once asked is produced mechanically upstream:
 
 - the choice trace — the Pugh card computes both runs from the signed

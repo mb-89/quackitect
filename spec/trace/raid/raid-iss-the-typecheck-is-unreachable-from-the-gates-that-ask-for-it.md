@@ -3,17 +3,18 @@ minted_in: i5-engine-hygiene-one-version-source-every-
 id: raid-iss-the-typecheck-is-unreachable-from-the-gates-that-ask-for-it
 type: "[[raid]]"
 kind: issue
-statement: "Two gates ask round zero for the typecheck, and neither grants a tool that can run one, so the number is always carried rather than taken."
+statement: Two gates ask round zero for the typecheck, and neither grants a tool that can run one, so the number is always carried rather than taken.
 owner: the maintainer
 trigger: every gate-validation and gate-release, in every record
 status: open
-impact: "A gate that asks for a measurement it cannot take teaches the honest answer to look like the dishonest one. Restating a stale number reads identically to re-taking it, and only the writer knows which happened."
+impact: A gate that asks for a measurement it cannot take teaches the honest answer to look like the dishonest one. Restating a stale number reads identically to re-taking it, and only the writer knows which happened.
 breaks_how_badly: corrosive
 how_likely: expected
 source_refs:
   - i5-engine-hygiene-one-version-source-every-
 weighs_with: none
 weighs_against: none
+place: i39-the-lane-tells-the-truth-about-itself-de
 ---
 ## What was observed
 

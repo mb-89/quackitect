@@ -4,7 +4,7 @@ by: agent
 signed_off: 2026-08-20T19:07:07.387Z
 reopened: "2026-08-20T19:07:00.710Z — draw-context was re-signed: the owner ruled that either hand may work the lane, and that a guide's work relayed by the walker is recorded as the guide's. Re-read against that."
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / map-stakeholders

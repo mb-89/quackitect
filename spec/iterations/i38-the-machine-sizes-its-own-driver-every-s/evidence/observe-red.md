@@ -4,7 +4,7 @@ reopened: "2026-08-20T22:06:41.442Z — author-tests was re-signed: a seventh sp
 by: agent
 signed_off: 2026-08-20T22:06:43.016Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / observe-red

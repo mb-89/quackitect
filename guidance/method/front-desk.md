@@ -29,7 +29,7 @@ the same:
 >
 > New here? I can give you a tour of the whole system. Just say "tour".
 
-NOTHING FOLLOWS IT (owner ruling 2026-08-18). A generated list of doors
+NOTHING FOLLOWS IT. A generated list of doors
 and a closing line about the autonomy dial used to print underneath.
 Both are gone. The recital and those two lines are the whole first
 visit.
@@ -53,7 +53,7 @@ nothing arrives to end it, and the run is spent.
 
 Read the LIVE machinery, in this order. Never answer from memory.
 
-- The doors: `se_survey` carries them as `doors` — idle's live offer,
+- The doors: `se_survey` carries them as `doors` — this state's own live offer,
   statement and weight each. That list is the current vocabulary, and it
   arrives with the same call that lists the work.
 - The open work: the survey's expeditions and iterations — what stands,
@@ -117,6 +117,16 @@ applies to advice).
 
 LANDING WORK DOES NOT NEED A CLOSE. Work reaches trunk while its
 expedition stays open, so a day's bundle keeps collecting.
+
+A RECORD CAN BE PUT DOWN. Set its status to `abandoned` and say why in the
+record. Use it when the work is no longer wanted, or when its outcome arrived
+by another road while its own walk stood unfinished.
+
+- `shipped` would claim gates that never happened.
+- `seeded` would present finished work as work never begun.
+- Nothing is deleted. The folder and its evidence stay.
+
+The standing is the owner's call, never the desk's.
 
 ## 3. Execute — the desk carries the paperwork
 

@@ -10,7 +10,7 @@ steps:
       - stand-the-rewound-tree
     realization: software
   - id: derive-what-the-walk-cost
-    statement: "Walk the call log and carry each se_pull's where until the next, producing calls, wall clock, forms filled, forms refilled after a refusal, refusals by clause, and states visited and re-entered, per state. One M6 spike enters here pre-verified."
+    statement: Walk the call log and carry each se_pull's where until the next, producing calls, wall clock, forms filled, forms refilled after a refusal, refusals by clause, and states visited and re-entered, per state. One M6 spike enters here pre-verified.
     depends_on: []
     realization: software
   - id: write-the-benchmark-report
@@ -20,7 +20,7 @@ steps:
       - derive-what-the-walk-cost
     realization: software
   - id: conceal-the-reports-while-a-run-is-bound
-    statement: "The visibility rule at four measured call sites across three files - paths.ts, search.ts and fileRead in files.ts - written against the sites and never against one of the four disagreeing exclusion lists. Blocked on a work token this iteration does not own."
+    statement: The visibility rule at four measured call sites across three files - paths.ts, search.ts and fileRead in files.ts - written against the sites and never against one of the four disagreeing exclusion lists. Blocked on a work token this iteration does not own.
     depends_on:
       - bind-a-run-and-write-its-conditions
     realization: software

@@ -9,6 +9,7 @@
 // path as every other lane tool, so it is logged without any code here).
 import { appendFileSync, existsSync, mkdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
+import { bm25, docFrequency, tokenize } from "./bm25.ts";
 import { headline } from "./inbox.ts";
 import { stripBom } from "./jsonio.ts";
 import type { ToolDef } from "./mcp.ts";
@@ -17,7 +18,9 @@ import { scanGuidance } from "./pull.ts";
 
 export interface HelpMatch {
   kind: "tool" | "guidance";
-  /** The tool's wire name, or the guidance doc's root-relative path. */
+  /** The tool's wire name, or the guidance doc's root-relative path. A page
+   *  answering under one of its own headings carries that heading too, as
+   *  `path § heading`. */
   name: string;
   score: number;
   snippet: string;
@@ -32,112 +35,96 @@ export interface HelpResult {
 const SNIPPET_CAP = 160;
 const MAX_MATCHES = 10;
 
-// Function words carry no search intent and are common enough to coincide
-// with unrelated prose across a corpus this size — left in, "nothing" alone
-// would false-match any nonsense query against se_file_read's own
-// description ("nothing is ever silently truncated").
-const STOPWORDS = new Set([
-  "a",
-  "an",
-  "the",
-  "is",
-  "are",
-  "was",
-  "were",
-  "be",
-  "been",
-  "being",
-  "to",
-  "of",
-  "in",
-  "on",
-  "at",
-  "by",
-  "for",
-  "with",
-  "from",
-  "as",
-  "and",
-  "or",
-  "but",
-  "nor",
-  "so",
-  "if",
-  "then",
-  "than",
-  "this",
-  "that",
-  "these",
-  "those",
-  "it",
-  "its",
-  "not",
-  "no",
-  "do",
-  "does",
-  "did",
-  "have",
-  "has",
-  "had",
-  "what",
-  "which",
-  "who",
-  "whom",
-  "when",
-  "where",
-  "why",
-  "how",
-]);
-
-function words(s: string): string[] {
-  return (s.toLowerCase().match(/[a-z0-9]+/g) ?? []).filter((w) => !STOPWORDS.has(w));
-}
-
-/** How many of the query's words appear in the haystack — the whole scoring
- *  rule. Simple on purpose: record.md's own vision says the search half is
- *  the weaker half, so it earns no more machinery than the miss log needs
- *  to have something to log against. */
-function overlapScore(queryWords: string[], haystack: string): number {
-  const hay = new Set(words(haystack));
-  let score = 0;
-  for (const w of queryWords) if (hay.has(w)) score += 1;
-  return score;
-}
-
-// A word living in the tool's OWN NAME/title, or the guidance doc's OWN
-// PATH, is a far stronger relevance signal than the same word turning up
-// somewhere in the body prose — weighted so "drain a stray note" ranks
-// se_note_drain (drain+note in its own name) over se_note (note only,
-// drain absent, tied by body prose alone) on merit, not an alphabetical
-// coin-flip.
+// A WORD IN THE TOOL'S OWN NAME, or in the page's own path and heading, is a
+// far stronger signal than the same word somewhere in the prose.
+//
+// TWO FIELDS, RANKED SEPARATELY, THEN ADDED. Putting the identity words into
+// the body several times was the first attempt and it does not work: the
+// ranker measures a document against the average LENGTH, so a name match
+// inside a long description is diluted by the description.
+//
+// MEASURED ON "drain a stray note". Folded together, se_note_drain — whose own
+// name carries two of the three query words — came THIRD, behind se_note and a
+// guidance section. Scored apart, its identity is three tokens long and two of
+// them match, which is exactly the signal that should win.
 const IDENTITY_WEIGHT = 3;
 
-// A word or two shared with a huge corpus by accident is noise, not a
-// match — require most of the query's distinct words to turn up (identity
-// or body, either counts once), scaled to the query's own length rather
-// than a flat count. A flat floor of 2 let se_help's own description (it
-// talks about "matches" and a miss scoring "nothing") false-hit a
-// five-word nonsense query on two coincidental words; 60% asks for three
-// of five there while still asking for only two of three on a short,
-// real query ("drain a stray note" only ever lands two of its three
-// content words on any single candidate).
-function minMatches(queryWords: string[]): number {
-  return Math.max(1, Math.ceil(queryWords.length * 0.6));
+// HOW MUCH OF THE QUERY AN ANSWER MUST ACTUALLY COVER. Ranking says which
+// answer is best; it never says whether the best one is any good. A nonsense
+// query still ranks something, because a couple of its words coincide with a
+// corpus this size somewhere.
+const MIN_COVERAGE = 0.6;
+
+// AND ONE OF THE COVERED WORDS MUST BE UNCOMMON. Coverage alone is fooled by
+// a query built from words that are everywhere: "totally different unmatched
+// gibberish query" covers on "different" and "query" and means nothing. A term
+// living in more than a quarter of the corpus is not evidence of anything.
+const COMMON_TERM_SHARE = 0.25;
+
+/** A page split at its own headings, so an answer can point at a section.
+ *
+ *  WHY SECTIONS AND NOT PAGES. The refusals page carries every clause the lane
+ *  can throw, under one heading each. Unsectioned, a question about one clause
+ *  answers "guidance/refusals.md" and leaves the reader to find it. */
+function sections(path: string, body: string): { id: string; title: string; text: string }[] {
+  const lines = body.split(/\r?\n/);
+  const out: { id: string; title: string; text: string }[] = [];
+  let title = "";
+  let buf: string[] = [];
+  const flush = (): void => {
+    const text = buf.join("\n").trim();
+    if (text === "" && title === "") return;
+    out.push({ id: title === "" ? path : `${path} § ${title}`, title, text });
+  };
+  for (const line of lines) {
+    const h = /^#{2,4}\s+(.*\S)\s*$/.exec(line);
+    if (h === null) {
+      buf.push(line);
+      continue;
+    }
+    flush();
+    title = h[1];
+    buf = [];
+  }
+  flush();
+  return out;
 }
 
-function distinctMatches(queryWords: string[], identity: string, body: string): number {
-  const idHay = new Set(words(identity));
-  const bodyHay = new Set(words(body));
-  let n = 0;
-  for (const w of queryWords) if (idHay.has(w) || bodyHay.has(w)) n += 1;
-  return n;
-}
-
-function guidanceStatement(root: string, path: string): string {
+/** THE PAGE, THROUGH THE DOOR EVERY OTHER READER USES. Its own `statement:`
+ *  wins over the derived one, and the body comes back from the same parse — a
+ *  second readFileSync here would pay for a file the pass is already holding. */
+function guidancePage(root: string, path: string): { statement: string; body: string } {
   const note = noteOf(join(root, path));
-  if (note === undefined) return "";
-  const fmStatement = note.frontmatter.statement;
-  return typeof fmStatement === "string" && fmStatement.trim() !== "" ? fmStatement : note.statement;
+  if (note === undefined) return { statement: "", body: "" };
+  const fm = note.frontmatter.statement;
+  const statement = typeof fm === "string" && fm.trim() !== "" ? fm : note.statement;
+  return { statement, body: note.body };
+}
+
+interface Candidate {
+  kind: "tool" | "guidance";
+  name: string;
+  identity: string;
+  body: string;
+  snippet: string;
+}
+
+function guidanceCandidates(root: string): Candidate[] {
+  const out: Candidate[] = [];
+  for (const d of scanGuidance(root)) {
+    const { statement, body } = guidancePage(root, d.path);
+    for (const s of sections(d.path, body)) {
+      if (s.text === "") continue;
+      out.push({
+        kind: "guidance",
+        name: s.id,
+        identity: `${d.path} ${s.title}`,
+        body: `${statement} ${s.text}`,
+        snippet: headline(s.text, SNIPPET_CAP),
+      });
+    }
+  }
+  return out;
 }
 
 /** Search tools and guidance for `query`. `tools` is the LIVE registered
@@ -145,26 +132,45 @@ function guidanceStatement(root: string, path: string): string {
  *  tools, expedition tools, core tools) only exists once buildServer has
  *  assembled it. A miss is recorded before this returns. */
 export function searchHelp(root: string, query: string, tools: ToolDef[]): HelpResult {
-  const qWords = words(query);
-  const floor = minMatches(qWords);
+  const q = tokenize(query);
+  const candidates: Candidate[] = [
+    ...tools.map((t) => ({
+      kind: "tool" as const,
+      name: t.name,
+      identity: `${t.name} ${t.title}`,
+      body: t.description,
+      snippet: headline(t.description, SNIPPET_CAP),
+    })),
+    ...guidanceCandidates(root),
+  ];
+  const idDocs = candidates.map((c) => ({ id: c.name, terms: tokenize(c.identity) }));
+  const bodyDocs = candidates.map((c) => ({ id: c.name, terms: tokenize(c.body) }));
+
+  const total = new Map<string, number>();
+  for (const r of bm25(q, idDocs, 0)) total.set(r.id, r.score * IDENTITY_WEIGHT);
+  for (const r of bm25(q, bodyDocs, 0)) total.set(r.id, (total.get(r.id) ?? 0) + r.score);
+
+  const distinct = [...new Set(q)];
+  const df = docFrequency(distinct, bodyDocs);
+  const common = Math.max(1, Math.floor(candidates.length * COMMON_TERM_SHARE));
+  const needed = Math.max(1, Math.ceil(distinct.length * MIN_COVERAGE));
+  const seen = new Map(candidates.map((c, i) => [c.name, new Set([...idDocs[i].terms, ...bodyDocs[i].terms])]));
+
   const matches: HelpMatch[] = [];
-  for (const t of tools) {
-    const identity = `${t.name} ${t.title}`;
-    if (distinctMatches(qWords, identity, t.description) < floor) continue;
-    const score = overlapScore(qWords, identity) * IDENTITY_WEIGHT + overlapScore(qWords, t.description);
-    matches.push({ kind: "tool", name: t.name, score, snippet: headline(t.description, SNIPPET_CAP) });
+  for (const c of [...candidates].sort((a, b) => (total.get(b.name) ?? 0) - (total.get(a.name) ?? 0))) {
+    const score = total.get(c.name) ?? 0;
+    if (score <= 0) break;
+    const has = seen.get(c.name);
+    if (has === undefined) continue;
+    const covered = distinct.filter((w) => has.has(w));
+    if (covered.length < needed) continue;
+    if (!covered.some((w) => (df.get(w) ?? 0) <= common)) continue;
+    matches.push({ kind: c.kind, name: c.name, score, snippet: c.snippet });
+    if (matches.length >= MAX_MATCHES) break;
   }
-  for (const d of scanGuidance(root)) {
-    const statement = guidanceStatement(root, d.path);
-    if (distinctMatches(qWords, d.path, statement) < floor) continue;
-    const score = overlapScore(qWords, d.path) * IDENTITY_WEIGHT + overlapScore(qWords, statement);
-    matches.push({ kind: "guidance", name: d.path, score, snippet: headline(statement, SNIPPET_CAP) });
-  }
-  matches.sort((a, b) => b.score - a.score || a.name.localeCompare(b.name));
-  const top = matches.slice(0, MAX_MATCHES);
-  const miss = top.length === 0;
+  const miss = matches.length === 0;
   if (miss) recordMiss(root, query);
-  return { query, matches: top, miss };
+  return { query, matches, miss };
 }
 
 function demandPath(root: string): string {
@@ -186,7 +192,7 @@ function recordMiss(root: string, query: string): void {
  *  shape is the query's own words, lowercased and sorted — cheap, and good
  *  enough that "log risks" and "risks log" rank together. */
 function demandShape(query: string): string {
-  return words(query).sort().join(" ");
+  return tokenize(query).sort().join(" ");
 }
 
 function readDemand(root: string): DemandRecord[] {

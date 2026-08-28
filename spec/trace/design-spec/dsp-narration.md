@@ -2,46 +2,75 @@
 minted_in: i1
 id: dsp-narration
 type: "[[design-spec]]"
-statement: the decision graph riding every changing call, carried by typed ops with a toll that keeps the story gapless
+statement: the work tokens ARE the narration, with a question rather than a toll and a cadence the reader sets
 realizes:
   - el-walk-engine
 files:
-  - deliverable/engine/decisions.ts
   - deliverable/engine/toll.ts
-  - deliverable/engine/bin/render-decisions.ts
 ---
 
 ## Responsibility
 
-Narration is data: plan, fork, update, done, obsolete, revert and defer
-land as nodes and resolutions in the decision graph. The toll enforces
-the floor — a changing call without an update, past the person's
-notch, refuses. Malformed briefs are corrected into plans where the
-correction is mechanical.
+Narration is data, and the data is the work tokens. A piece of work opened,
+taken or settled carries its comment on the item itself, and each of those acts
+is a lane call, so the feed reads it from the call log.
+
+Nothing is demanded. The acts log themselves.
 
 ## Rationale
 
-The graph replaces prose status: a reader sees what was opened, what
-closed and what stalled, without trusting anybody's summary.
+A reader sees what was opened, what closed and what stalled without trusting
+anybody's summary.
+
+THE DECISION GRAPH USED TO CARRY THIS BESIDE THE TOKENS, and that was the
+problem: two systems saying what the hand was doing, so a reader watching the
+board had to read both to know either.
+
+OWNER RULING: it was only a display for a person, it was never as good as the
+editor is now, and it came out. What replaces a checklist is SUB-TOKENS — a
+piece of work broken into parts is parts, on the surface the person already
+reads, and each settles the way anything else does.
 
 ## The toll
 
-WORK IS TOOL CALLS, so an agent physically cannot keep working un-narrated.
-The server timestamps the last update. When the window lapses the next call
-carries one grace warning on its result, and the call after an ignored warning
-is refused with the exact resend inline.
+THE FLOOR IS GONE AND NOTHING REPLACES IT AS A DEMAND. A token opened, taken
+or settled IS the narration, and every act carries a comment the store refuses
+to leave empty. The record already holds the sentence, so a floor has nothing
+left to enforce.
 
-PAYMENT IS ANY DECISION-GRAPH OP riding the `update` field of any call. A
-volunteered update is never stopped, and always resets the window.
+WHY A FLOOR EXISTED AT ALL. Work is tool calls, and an agent could once work at
+length with the log holding nothing but pulls. The answer then was to charge
+for silence.
 
-THE TOLL IS ARMED ONLY AFTER BOOT. The reading room pays nothing.
+WHY CHARGING STOPPED BEING THE ANSWER. The thing being charged for now happens
+by itself. A hand that opens a token, takes it and settles it has narrated
+three times without being asked once, and a refusal on top of that only ever
+bought filler.
 
-## Two clocks, because a call is not a minute
+## The question about the work in hand
 
-A minute of a fast harness is fifteen calls. A minute of a slow one is two.
+ONE PIECE OF WORK HOLDING THE HAND FOR A LONG TIME IS TWO THINGS AT ONCE, and
+only the walker knows which. Either it is genuinely one long piece of work, or
+the walker strayed onto something else and owes a token for it.
 
-So the cadence runs both clocks and whichever falls due first is what is owed.
-The reader gets the same rhythm whatever host the agent is on.
+SO THE ENGINE ASKS RATHER THAN GUESSING. Once a minute at most, riding a
+successful result, quoting the statement back.
+
+IT NEVER REFUSES. Nothing is counted and no answer is owed. A question can be
+ignored, and that is the whole difference from a toll.
+
+A CHANGE OF WORK ANSWERS IT BY ITSELF. Settling one and opening the next moves
+the id in hand, which resets the clock without anybody replying.
+
+THE STATEMENT IS QUOTED, NEVER THE ID. An id does not travel, and the mismatch
+between what the token says and what the walker just did is the thing the
+question exists to make visible.
+
+WHAT THE CLOCK DOES NOT CATCH, said here rather than left to be discovered: it
+asks about DURATION and not about MATCH. Work can move seconds after a token
+opens, and the question then arrives a minute later about the wrong thing.
+Firing it on a WRITE rather than on the clock is the improvement this leaves
+open.
 
 ## The cadence is the reader's control
 
@@ -49,29 +78,31 @@ HOW OFTEN IS THEIRS, not the engine's. They watch from a different surface on
 every host, so the cadence sits on the same bar as the autonomy dial and the
 shutdown level.
 
-Two numbers: an update every n minutes at least, or every n calls at least,
-whichever falls due first. Zero stops that clock, and both zero owes nothing.
+Two numbers: an update every n minutes at least, or every n calls at least.
+Zero stops that clock.
 
-TURNED OFF, NOTHING IS EVER OWED and a volunteered update still lands.
+IT SETS A RHYTHM RATHER THAN A DEBT. Nothing is refused at any notch, and
+turning it off refuses nothing either.
 
-## The reading loop pays nothing
+## The reading loop is not a judgment
 
 THE READING LOOP IS MECHANICAL. The pull answers `read`, hands over one
 document, and the only legal next move is to read it and pull back with the
 proof. No judgment happens on that hop, so there is nothing honest to narrate.
 
-WHAT IT COST BEFORE: crediting the reading was about fifteen calls in a row
-against a budget of twenty, so the toll fell due inside the loop and could only
-be paid with filler. The test helpers had grown a workaround — a dummy update
-attached to every read call, with a comment explaining why.
+WHAT IT COST WHEN A FLOOR EXISTED: crediting the reading was about fifteen
+calls in a row against a budget of twenty, so the demand fell due inside the
+loop and could only be met with filler. The test helpers had grown a workaround
+— a dummy update attached to every read call, with a comment explaining why.
 
-THE CLOCK STILL RUNS. Only the call counter is spared, because that is what a
-burst of forced hops inflates. An agent genuinely silent for the whole window
-still owes, whatever it was reading.
+THE EXEMPTION OUTLIVED THE DEMAND, on purpose. Nothing charges for these hops
+any more, so nothing needs sparing — but the rule they were an exception to is
+the one worth keeping written down: a forced hop is not a decision, and asking
+the walker about one would only ever produce filler.
 
-IT CANNOT BE GAMED. A read proof is only accepted while the engine is holding a
-document it chose to serve, so the agent cannot manufacture these hops. A pull
-carrying evidence beside the proof pays like any other work.
+IT CANNOT BE GAMED EITHER WAY. A read proof is only accepted while the engine
+is holding a document it chose to serve, so the agent cannot manufacture these
+hops.
 
 ## Why there is no ETA field
 
@@ -79,83 +110,28 @@ HAND-TYPED CLOCK TIMES MEASURED UNCALIBRATABLE — a median ratio of 0.01 betwee
 what was promised and what was spent. Durations come from the engine's own
 timestamps instead, where nobody can guess.
 
-## The nudge grew teeth
+## What the graph taught, kept because the shapes outlive it
 
-IT STAYED ADVICE FOR A GOOD REASON: refusing work over its commentary is a
-mistake this mechanism already made once. Advice lost anyway. In one
-fifteen-hour window the nudge fired five times and was ignored five times, once
-at nineteen updates with nothing closed.
+Each of these was measured against the mechanism that is now gone. The shape is
+what survives, and every one of them binds work tokens.
 
-SO IT TAKES THE TOLL'S OWN SHAPE, which is already trusted: one warning, then
-the next offending call refuses. The counter clears on any resolve, so a walk
-with a moving checklist never sees it.
+SIZE A PIECE OF WORK SO IT CAN CLOSE WHERE YOU STAND. Measured on the i15 walk:
+59 refusals, every one carrying the same two items — one that had ended hours
+earlier and one that could not close until the iteration did. The work was real
+and the narration was honest. The ITEM was the wrong shape, and naming what was
+open sent the reader hunting for work to finish that did not exist.
 
-WHAT KEEPS IT FROM BEING THE OLD MISTAKE: a resolving op is never refused. The
-remedy is always reachable in one call, and the open node map rides the
-refusal, so the id needed to obey it is already in hand.
+CORRECT WHAT IS MECHANICAL, ANNOUNCE IT, REFUSE ONLY THE AMBIGUOUS. A chained
+brief was the lane's most-hit refusal — 174 of one window's 505 failures — and
+the refusal already computed the split it then threw away. Narrating on the
+item just resolved was the largest single class in another window, 43 of 128.
 
-## An update names the item it is about
+NARRATION THAT MOVES NOTHING IS PROGRESS'S CLOTHES. The shape that produced
+that rule was a board of thirteen open items collecting a pile of checked
+leaves underneath. What holds a state shut now is the leaving guard over its
+work tokens, and that one cannot be satisfied by narrating.
 
-AN UPDATE THAT MOVES NOTHING ON THE CHECKLIST IS NARRATION WEARING PROGRESS'S
-CLOTHES. The shape that produced this rule was a board of thirteen yellow items
-collecting a pile of checked leaves underneath.
-
-SO WHEN A CHECKLIST STANDS, an update says which item it is about. With none
-open there is nothing to attach to and a bare update is exactly right. It is
-only affordable because the open node map rides home on every call, so naming
-one costs a glance.
-
-IT IS SCOPED TO THIS VISIT. Another state's open checklist is not this state's
-business, and a walk that had moved on would be refused over items it can no
-longer reach.
-
-## The decision graph
-
-The decision graph — the agent's thought process as a per-state tree
-(owner design, first captured 2026-07-25 in v2's i9 notes; built here).
-Every task started is a NODE. Every node started gets RESOLVED: done,
-obsolete, or reverted — abandoning is legal, abandoning silently is not.
-Depth of forking IS the measure of drift; the retro reads the file.
-
-Ops arrive as the `update` field riding any lane call. The live graph is
-in-memory (session-scoped, like the walk); every op also appends to
-.se/decisions.jsonl — replayable, and the retro's raw material.
-
-## The chain is corrected
-
-THE CHAIN IS CORRECTED, NOT REFUSED (owner ruling 2026-08-02: correct
-the mechanical, announce it, refuse only the ambiguous). This was the
-lane's most-hit refusal — 174 of one window's 505 failures — and the
-refusal already computed the split it then threw away. Narration that
-chains is APPLIED as the plan it wanted to be; a chained item becomes
-the items it listed. A RESOLUTION's brief still refuses: which part
-resolved the node is not the engine's to guess.
-
-## Updates landed since anything last closed
-
-Updates landed since anything last CLOSED. The checklist is a progress
- view, so a run of narration over a checklist that never moves is the
- thing worth saying out loud (owner 2026-07-29). Prose said this
- already and prose lost, which is the case for a mechanical nudge.
- High enough that ordinary narration passes untouched.
-
-## A node from an earlier sessions visit
-
-A NODE FROM AN EARLIER SESSION'S VISIT. The live graph replays
-only this session's trail, but the RECORD keeps every visit — and
-the leave gate counts the record. A resolution must reach what the
-gate counts, or a record whose walk spanned sessions can never
-close (found live 2026-08-02, closing e31).
-
-## The node an update attaches to
-
-THE NODE AN UPDATE ATTACHES TO. A node that is CLOSED or unknown is
- not an AMBIGUOUS one (software.md: correct what is mechanical,
- announce it, refuse only the ambiguous). Narrating on the item just
- resolved is the commonest slip there is — the largest single refusal
- class in the 2026-08-02 to 08-05 window, 43 of 128 failures.
-
- So it lands on the closed item's still-open ancestor, or bare when
- nothing above it is open, and the result says which happened. Only
- `update` is corrected. A RESOLUTION naming a closed node still
- refuses, because re-resolving is a real disagreement.
+A RECORD OUTLIVES A SESSION. The live view held only this session's trail while
+the gate counted the record, so a record whose walk spanned sessions could
+never close. Work tokens are files, which is the same lesson built in rather
+than remembered.

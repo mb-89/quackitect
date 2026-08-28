@@ -5,9 +5,9 @@ minted_in: i37-training-iterations-a-disposable-iterati
 id: raid-dec-the-ceiling-is-an-ancestry-test-not-a-path-mask
 type: "[[raid]]"
 kind: decision
-statement: "While a run is bound, a commit or ref that is not an ancestor of the rewind point does not resolve. Nothing is hidden by path."
+statement: While a run is bound, a commit or ref that is not an ancestor of the rewind point does not resolve. Nothing is hidden by path.
 owner: the owner
-trigger: "any new verb that resolves a commit or a ref, or the first benchmark whose report cannot show its guard was exercised"
+trigger: any new verb that resolves a commit or a ref, or the first benchmark whose report cannot show its guard was exercised
 status: decided
 impact: "A path mask hides a folder and leaves the answers everywhere else. Measured: 282 files under spec/trace mention i15 or i34, and an iteration writes its requirements and experiments outside its own folder. At the rewind commit those files are unwritten, so the boundary removes rather than conceals."
 breaks_how_badly: fatal

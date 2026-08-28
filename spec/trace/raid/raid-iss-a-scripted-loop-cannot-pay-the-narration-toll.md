@@ -3,7 +3,7 @@ minted_in: i5-engine-hygiene-one-version-source-every-
 id: raid-iss-a-scripted-loop-cannot-pay-the-narration-toll
 type: "[[raid]]"
 kind: issue
-statement: "The narration toll is owed per call, so a script that makes many lane calls is refused partway through with no honest line to narrate."
+statement: The narration toll is owed per call, so a script that makes many lane calls is refused partway through with no honest line to narrate.
 owner: the maintainer
 trigger: any state whose work is a query loop — the retro's log mining most of all
 status: open
@@ -15,6 +15,7 @@ source_refs:
   - i5-engine-hygiene-one-version-source-every-
 weighs_with: none
 weighs_against: none
+place: i55-narration-gets-lean-the-decision-graph-s
 ---
 ## What was observed
 

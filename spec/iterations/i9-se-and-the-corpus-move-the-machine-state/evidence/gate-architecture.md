@@ -1,11 +1,11 @@
 ---
 form: gate-architecture
 bless: blessed by human
-amended: "2026-08-19T18:02:06.503Z by agent — the recount closed the credible flip, so the dissent about a one-cell seat is replaced by what the recount actually found"
+amended: 2026-08-19T18:02:06.503Z by agent — the recount closed the credible flip, so the dissent about a one-cell seat is replaced by what the recount actually found
 by: agent
 signed_off: 2026-08-19T17:22:03.468Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / gate-architecture

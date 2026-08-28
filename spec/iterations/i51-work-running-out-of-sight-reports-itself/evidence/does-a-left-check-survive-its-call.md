@@ -3,7 +3,7 @@ form: does-a-left-check-survive-its-call
 by: agent
 signed_off: 2026-08-21T10:34:47.040Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / does-a-left-check-survive-its-call

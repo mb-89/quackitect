@@ -2,9 +2,9 @@
 form: write-requirements
 by: agent
 signed_off: 2026-08-20T19:37:11.517Z
-reopened: "2026-08-20T19:37:09.117Z — generalize-use-cases was re-signed with the third correction to the acting party. Re-read against that."
+reopened: 2026-08-20T19:37:09.117Z — generalize-use-cases was re-signed with the third correction to the acting party. Re-read against that.
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / write-requirements

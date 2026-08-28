@@ -4,10 +4,10 @@ id: dsp-radial-layout
 type: "[[design-spec]]"
 statement: the trace drawn as deterministic geometry — a wedge per value prop, a ring per level, and one named rule where a layout library would have been
 realizes:
-  - "el-mirror"
+  - el-mirror
 files:
-  - "deliverable/engine/trace.ts"
-  - "deliverable/engine/trace-layout.ts"
+  - deliverable/engine/trace.ts
+  - deliverable/engine/trace-layout.ts
 ---
 
 ## A table's header names columns, never nodes

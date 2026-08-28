@@ -6,6 +6,7 @@ statement: Work still running past the bound named for it says so on the surface
 method: test
 verifies:
   - req-work-past-its-bound-says-it-is-working
+  - req-responsiveness
 files:
   - deliverable/tests/slow-work-signals.test.ts
 ---

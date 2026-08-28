@@ -3,7 +3,7 @@ form: what-a-fresh-session-sees
 by: agent
 signed_off: 2026-08-21T10:40:17.330Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / what-a-fresh-session-sees

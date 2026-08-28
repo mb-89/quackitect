@@ -515,3 +515,32 @@
 {"ts":"2026-08-21T14:20:04.508Z","op":"done","visit":"iterations/i51/fix-findings@0","node":"d84","brief":"record committed at 3f4cb458"}
 {"ts":"2026-08-21T14:20:39.624Z","op":"update","visit":"iterations/i51/fix-findings@1","node":"d94","brief":"checking what is still uncommitted"}
 {"ts":"2026-08-21T14:20:47.622Z","op":"update","visit":"iterations/i51/fix-findings@1","node":"d95","brief":"committing the narration log"}
+{"ts":"2026-08-23T11:15:40.176Z","op":"obsolete","visit":"front_desk@0","node":"d2","brief":"the retro is closed; its checklist cannot close inside i51"}
+{"ts":"2026-08-23T11:16:06.527Z","op":"obsolete","visit":"front_desk@0","node":"d3","brief":"the retro's findings were presented; this item is spent"}
+{"ts":"2026-08-23T11:16:29.800Z","op":"obsolete","visit":"retro@0","node":"d14","brief":"the token walk finished in the retro"}
+{"ts":"2026-08-23T11:21:25.672Z","op":"update","visit":"iterations/i51/draw-context@0","node":"d158","brief":"restored draw-context, submitting the original author's own form"}
+{"ts":"2026-08-23T11:22:18.274Z","op":"fork","visit":"iterations/i51/draw-context@0","parent":null,"node":"d159","brief":"the ship is blocked by a checker demanding an optional neighbour field","nodes":[]}
+{"ts":"2026-08-23T11:23:04.094Z","op":"update","visit":"iterations/i51/draw-context@0","node":"d160","brief":"the checker treats every template field as required; teaching it optional"}
+{"ts":"2026-08-23T11:25:21.844Z","op":"update","visit":"iterations/i51/draw-context@0","node":"d161","brief":"teaching the checker that a template may declare a field optional"}
+{"ts":"2026-08-23T11:28:48.231Z","op":"plan","visit":"iterations/i51/draw-context@0","parent":null,"nodes":[{"id":"d162","brief":"reload legal everywhere"},{"id":"d163","brief":"status column with idle"},{"id":"d164","brief":"restart the engine"},{"id":"d165","brief":"ship i51"},{"id":"d166","brief":"present i4"}]}
+{"ts":"2026-08-23T11:30:59.124Z","op":"done","visit":"boot/prepare_desk@0","node":"d1","brief":"boot green, prompt layer placed"}
+{"ts":"2026-08-23T11:36:53.032Z","op":"update","visit":"iterations/i51/derive-functions@0","node":"d6","brief":"walking i51 state by state; four cleared so far"}
+{"ts":"2026-08-23T11:42:38.816Z","op":"update","visit":"iterations/i51/cut-criteria@0","node":"d7","brief":"i51 walked past M4 candidates; at cut-criteria"}
+{"ts":"2026-08-23T11:47:59.965Z","op":"update","visit":"iterations/i51/author-tests@0","node":"d8","brief":"i51 walked through M6; at author-tests"}
+{"ts":"2026-08-23T11:48:07.028Z","op":"update","visit":"iterations/i51/author-tests@0","node":"d9","brief":"author-tests already stands; walking on"}
+{"ts":"2026-08-23T11:48:45.011Z","op":"update","visit":"iterations/i51/author-tests@0","node":"d10","brief":"linking the responsiveness requirement to the spec that already tests it"}
+{"ts":"2026-08-23T11:50:36.939Z","op":"update","visit":"iterations/i51/verification@0","node":"d11","brief":"at verification, submitting to fire the battery"}
+{"ts":"2026-08-23T11:50:44.915Z","op":"update","visit":"iterations/i51/verification@0","node":"d12","brief":"verification stands; taking the gate door"}
+{"ts":"2026-08-23T11:52:19.441Z","op":"update","visit":"iterations/i51/run-candidates/start@2","node":"d13","brief":"aiming at the implementation gate to close i51"}
+{"ts":"2026-08-23T11:53:37.014Z","op":"update","visit":"iterations/i51/gate-architecture@1","node":"d14","brief":"gate-architecture already blessed; walking on"}
+{"ts":"2026-08-23T11:55:09.545Z","op":"done","visit":"boot/prepare_desk@0","node":"d3","brief":"read i4 whole; briefing below"}
+{"ts":"2026-08-23T11:55:45.509Z","op":"update","visit":"iterations/i51/verification@0","node":"d15","brief":"waiting on the battery verdict at verification"}
+{"ts":"2026-08-23T11:56:41.905Z","op":"fork","visit":"iterations/i51/verification@0","parent":"d2","node":"d16","brief":"battery red on six cases; the tests encode behaviour the owner changed","nodes":[]}
+{"ts":"2026-08-23T11:58:05.113Z","op":"plan","visit":"iterations/i51/fix-findings@0","parent":null,"nodes":[{"id":"d17","brief":"place every finding"},{"id":"d18","brief":"fix the comment attributions"},{"id":"d19","brief":"fix the reload test"},{"id":"d20","brief":"fix the guidance size"},{"id":"d21","brief":"confirm run"}]}
+{"ts":"2026-08-23T11:58:42.961Z","op":"done","visit":"iterations/i51/fix-findings@0","node":"d17","brief":"all six findings placed to three real failures"}
+{"ts":"2026-08-23T12:00:57.077Z","op":"done","visit":"iterations/i51/fix-findings@0","node":"d18","brief":"the three fixes land in one pass"}
+{"ts":"2026-08-23T12:01:10.405Z","op":"done","visit":"iterations/i51/fix-findings@0","node":"d20","brief":"walking.md trimmed back under the payload line"}
+{"ts":"2026-08-23T12:01:35.202Z","op":"done","visit":"iterations/i51/fix-findings@0","node":"d19","brief":"the reload test now asserts the new behaviour"}
+{"ts":"2026-08-23T12:02:48.660Z","op":"update","visit":"iterations/i51/converge-pugh@2","node":"d22","brief":"walking forward; the confirm battery fires on leaving fix-findings"}
+{"ts":"2026-08-23T12:08:59.738Z","op":"update","visit":"iterations/i51/verification@1","node":"d23","brief":"confirm battery re-running with the three fixes in"}
+{"ts":"2026-08-23T12:09:13.927Z","op":"done","visit":"iterations/i51/fix-findings@0","node":"d21","brief":"confirm run green; the walk cleared verification"}

@@ -2,7 +2,7 @@
 form: specify-build
 by: agent
 signed_off: 2026-08-19T18:30:44.703Z
-reopened: "2026-08-19T18:20:24.130Z — seeding the five missing build chunks and interface entries named in gate-implementation's fail verdict follow_up, per coordinator instruction"
+reopened: 2026-08-19T18:20:24.130Z — seeding the five missing build chunks and interface entries named in gate-implementation's fail verdict follow_up, per coordinator instruction
 authors: agent
 files: null
 ---

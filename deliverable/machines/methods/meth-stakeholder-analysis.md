@@ -16,7 +16,7 @@ portfolio decisions.
 Three sources, in this order. The first is the cheapest and is usually
 skipped.
 
-### 1. The value propositions
+### 1. The value propositions #work
 
 Every value prop names an `audience`. That audience is a stakeholder, and the
 props are the reason the product exists, so they come first.
@@ -25,7 +25,7 @@ Sweep them and ask what each one is FOR. A prop whose audience resolves to no
 node is a hole. A node no prop serves is a role nobody is building for, which
 is worth noticing rather than hiding.
 
-### 2. The always-on classes
+### 2. The always-on classes #work
 
 Some roles are served by every project, whatever it builds. Walk the register
 and keep or strike each one deliberately.
@@ -52,7 +52,7 @@ A product with hardware or a service life adds more.
 - transport-logistics
 - end-of-life
 
-### 3. The project and the organisation
+### 3. The project and the organisation #work
 
 - Who funds it.
 - Who must approve it.
@@ -61,7 +61,7 @@ A product with hardware or a service life adds more.
 
 These never fall out of the value props, and they are the ones a walk misses.
 
-## Procedure
+## Procedure #work
 
 - ROLES, NEVER PERSONS. One person may hold several roles, and the role
   outlives the person. This is also the privacy law.
@@ -79,7 +79,7 @@ These never fall out of the value props, and they are the ones a walk misses.
 - CHECK CONTACT. Each role needs some intensity of contact — necessary,
   helpful, or on-demand. Compare it against the contact that actually exists.
 
-## Who needs what depth
+## Who needs what depth #work
 
 The Stakeholder/View matrix. Rows are stakeholders, columns are views, and
 each cell says what depth that role needs of that view.
@@ -89,7 +89,7 @@ derives from. A role that needs one view deeply and the rest not at all is
 the normal case, and writing everything for everyone is the failure it
 prevents.
 
-## Coverage is the check
+## Coverage is the check #work
 
 This is what the step actually proves, and what the M2 gate reads.
 
@@ -98,7 +98,7 @@ This is what the step actually proves, and what the M2 gate reads.
 - At M3 every requirement sources to a role that exists here. A goal without
   a traceable stakeholder is a wish.
 
-## Tensions are RAID entries
+## Tensions are RAID entries #work
 
 Where two roles pull against each other, that is a
 RISK. It goes in the RAID register with an owner and a trigger, like any

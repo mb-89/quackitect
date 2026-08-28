@@ -5,7 +5,7 @@ type: "[[option]]"
 statement: the time remaining is computed at the moment somebody asks for it, from what the work has done by then, rather than being decided when the work started and carried along unchanged
 cluster: cluster-the-estimate
 found_by: heuristic
-source: "the heuristic \"push decisions to the last responsible moment\", from meth-heuristics-catalog"
+source: the heuristic "push decisions to the last responsible moment", from meth-heuristics-catalog
 ---
 
 ## Mechanism

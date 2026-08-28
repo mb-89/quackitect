@@ -6,7 +6,7 @@ statement: A copy brought up on a machine that never held the parent is edited i
 method: demonstration
 demonstrates:
   - sty-vendor-it-into-my-product
-verifies: "none — demonstrates carries the edge; the producing half is verify method test and is carried by tsp-a-vehicle-is-made-and-then-drives-something-else"
+verifies: none — demonstrates carries the edge; the producing half is verify method test and is carried by tsp-a-vehicle-is-made-and-then-drives-something-else
 files:
   - none — a demonstration is observed rather than instrumented, and the Procedure below is the whole definition
 ---

@@ -74,6 +74,45 @@ be told apart from a build that never emitted one.
 
 ## Behavior and constraints
 
+### The estimate grades itself
+
+EVERY PREDICTION IS SCORED AGAINST WHAT ACTUALLY HAPPENED (owner ruling
+2026-08-23). An estimate nobody grades never gets better, and the first version
+of this estimator was exactly that: it extrapolated from the pace so far and
+stopped there.
+
+THE FIRST GUESS IS THE ONE KEPT. A prediction made seconds before a job ends is
+right by construction and teaches nothing, so the entry remembers what the
+engine said the FIRST time it said anything, and when it said it.
+
+THE RATIO IS MEASURED FROM THAT MOMENT, never from the start of the job. The
+engine said "this much longer" at a point in time. What it is graded against is
+how much longer it actually took FROM THAT POINT. Comparing against the whole
+duration would grade a sentence it never said.
+
+THE GRADES LIVE IN `.se/estimates.jsonl`, one line per finished job, machine
+local and never committed. Each line carries the job, its kind, the MODEL that
+answered for it, what was predicted, what happened, and the ratio between them.
+
+THE MODEL IS ON EVERY LINE BECAUSE THE BIAS IS PER MODEL. A hand that
+consistently overruns and one that consistently finishes early need opposite
+corrections, and averaging them together produces a number that is wrong for
+both.
+
+THE CORRECTION IS THE MEDIAN RATIO, not the mean. One job that hung for an hour
+would otherwise set the correction for every job after it.
+
+THREE GRADED RUNS ARE NEEDED BEFORE A CORRECTION IS APPLIED. Below that the
+figure is reported raw and the basis SAYS SO, naming how many runs are still
+wanted. Two samples of a model is superstition rather than calibration.
+
+A STALLED FIGURE IS NOT GRADED. The engine has already said the number is not
+advancing. Scoring it would teach the calibration that the model is slow, when
+what happened was a stall.
+
+THE BASIS ALWAYS SAYS WHICH IT IS. A reader can tell a corrected estimate from
+a raw one without opening anything.
+
 ### The three standings of an entry
 
 - `running` — registered and not yet finished.
@@ -119,6 +158,25 @@ never absent. The entry lists and its basis says no measurement was found.
 A JUDGMENT THAT DIES WITHOUT SETTLING is settled as failed. The table reads the
 process, finds it gone, and never leaves an entry deciding for ever.
 
+THAT CLAIM WAS NOT HONOURED ON ONE PATH, and the path is named here because it
+looks identical from outside. A run whose child is killed can fail to close its
+output pipes, so the promise behind the step never settles at all. There was
+nothing left to read: the process was gone, no record stood behind the step, and
+the step reported `deciding` for the life of the engine.
+
+TWO GUARDS CLOSE IT.
+
+- THE RUN ENDS ITSELF. Killing the child arms a second clock, and the run
+  reports what it has when that clock fires, whatever the pipes are doing.
+- A RUN PAST ITS CEILING IS DROPPED. The in-flight table records when each run
+  started, and one older than the kill ceiling plus its grace is forgotten, so
+  the next attempt starts a real run rather than joining a promise that will
+  never resolve.
+
+MEASURED: a walk sat at its repair step reporting a battery still running,
+nineteen minutes after that battery's last case finished, with no battery
+process alive anywhere on the machine.
+
 THE SIGNAL IS UNAMBIGUOUS AND WAS MEASURED. In
 [[exp-does-a-left-check-survive-its-call]] a killed judgment closed with
 `code=null signal=SIGTERM` and left no verdict file at all, so absence plus a dead
@@ -126,6 +184,79 @@ process cannot be mistaken for a judgment still thinking.
 
 A TREE THAT CANNOT BE RESOLVED refuses the handback rather than starting a
 judgment with nowhere to run. The caller sees that refusal inside its second.
+
+## How long a settled entry's files are kept
+
+SEVEN DAYS AFTER THE ENTRY SETTLES. That is the ruling this record owes, and
+no code acts on it yet — the sweep that clears the pile is a named non-goal.
+
+NOT BUILT YET. Until the sweep exists the pile keeps growing, and whoever
+builds it uses this number rather than picking a new one.
+
+### Why seven and not seven hundred
+
+A SETTLED ENTRY'S FILE ANSWERS ONE QUESTION: `se_run {job}` asked by id. Nobody
+asks that about work they have forgotten, and a working week is the span over
+which somebody still says "that run on Monday".
+
+THE OUTPUT IS NOT WHAT IS AT STAKE. A run's output stays under its call-log ref
+for good, so clearing the job file loses the entry's metadata and nothing else.
+
+THE PILE IS REAL. It stood at 598 one morning and 1,245 that afternoon, which
+is roughly 650 files in half a day. At that rate a year of keeping everything
+is hundreds of thousands of files in one folder.
+
+### What is never cleared
+
+AN ENTRY WHOSE LAST RECORD SAYS RUNNING. The next engine reads exactly those to
+close what its predecessor left behind, so clearing one turns a recoverable
+ghost into an invisible one.
+
+AGE IS MEASURED FROM THE SETTLING, never from the start. A run that took two
+days is not two days closer to being cleared than one that took a minute.
+
+### Who owns this number
+
+THE DRIVING AGENT CHOSE IT, alone, because the record's scope committed to a
+ruling and none had been written. It rests on the reasoning above and on no
+measurement of how often an old entry is actually asked for.
+
+THAT MEASUREMENT WOULD SETTLE IT PROPERLY. Counting `se_run {job}` calls
+against the age of what they ask for is cheap, and the call log already holds
+every one.
+
+## A killed run is closed at startup
+
+A TEST RUN'S RECORD GAINS ITS CLOSING LINE FROM THE ENGINE THAT OWNS IT. An
+engine that was killed never wrote one, so the record says `started` and never
+says `ended`.
+
+THE RECORD THEN LIES. Nothing is running, and the file says something is.
+
+### What the ghost costs
+
+THE STOP HOOK READS THESE RECORDS to decide whether a turn may end. A record
+with no `ended` inside its window blocks every stop until the window passes.
+
+MEASURED: six turns blocked on a run that neither the job table nor the process
+list contained. Three reloads in one session each left one behind.
+
+### The engine closes them before it listens
+
+EVERY OPEN RECORD IS STAMPED `ended` AT STARTUP, beside the same reap that
+closes abandoned shell jobs. It runs before the port opens, so the first caller
+cannot race it.
+
+TWO FOLDERS AND TWO REAPERS, because the records are different shapes. A shell
+job carries a process id and a command; a test run carries a pace and a verdict.
+
+### The close carries no verdict
+
+NOTHING IS INVENTED ABOUT HOW THE RUN WENT. It was killed, so there is no
+outcome, and writing one here would be a fabricated result.
+
+The stamp says only that the wait is over. What the run would have found is
+unknown, and the next run is what answers it.
 
 ## Rationale
 

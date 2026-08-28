@@ -1,11 +1,11 @@
 ---
 form: find_prior_art
-amended: "2026-08-20T14:10:08.386Z by agent — three false figures and one fact this record had already corrected elsewhere and left standing here"
+amended: 2026-08-20T14:10:08.386Z by agent — three false figures and one fact this record had already corrected elsewhere and left standing here
 by: agent
 signed_off: 2026-08-20T12:22:53.447Z
 reopened: "2026-08-20T12:21:02.589Z — the deep search it commissioned returned after it was signed, and named prior art it does not carry: XACML NotApplicable as a returned no-match value, compile-time totality checking over the mapping, and four shipped recommend-only reconcilers. The form claims a completed search over the sizing cluster and the search was still running."
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / find_prior_art

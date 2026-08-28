@@ -1,9 +1,10 @@
 ---
 id: wt-an-ordering-of-decision-criteria-is-computed-from-a-damage-g
-type: "[[work-token]]"
-statement: "An ordering of decision criteria is computed from a damage grade and then trusted without a look. A person can override it, and nothing obliges them to. So the ranking that settles which design wins may be decided by arithmetic nobody read. Wanted is a required confirmation of the leading entries, taken before any winner is picked."
-ready_when: "ready when the criteria-cutting step is next opened for change"
-source: "note-beac84587cd9"
+type: "[[work]]"
+statement: An ordering of decision criteria is computed from a damage grade and then trusted without a look. A person can override it, and nothing obliges them to. So the ranking that settles which design wins may be decided by arithmetic nobody read. Wanted is a required confirmation of the leading entries, taken before any winner is picked.
+place: i69-the-method-checks-what-it-claims-to-chec
+ready_when: ready when a building milestone pulls hygiene work
+source: note-beac84587cd9
 ---
 
 ## Why it stands

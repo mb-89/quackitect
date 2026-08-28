@@ -29,7 +29,7 @@ function committed(root: string): void {
 //
 // FIVE RAN ON 2026-08-16 against a designed maximum of two, every one on the
 // agent's own judgment. A rule that only asks is what this row replaces.
-// THE REFUSAL IS GONE AND THE DEMAND IS NOT (owner ruling 2026-08-16). This
+// THE REFUSAL IS GONE AND THE DEMAND IS NOT. This
 // case asserted that an agent-initiated battery outside verification REFUSES.
 // That refusal and its sibling closed on each other — each remedy was the other
 // — and no test call was legal at all for four milestones.

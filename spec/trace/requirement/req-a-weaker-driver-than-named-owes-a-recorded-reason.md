@@ -2,10 +2,10 @@
 minted_in: i38-the-machine-sizes-its-own-driver-every-s
 id: req-a-weaker-driver-than-named-owes-a-recorded-reason
 type: "[[requirement]]"
-statement: "Where a milestone is walked by a driver weaker than the one it named, the record shall carry a stated reason, and shall mark the milestone as unreasoned where none was given."
+statement: Where a milestone is walked by a driver weaker than the one it named, the record shall carry a stated reason, and shall mark the milestone as unreasoned where none was given.
 kind: functional
 verify_method: test
-breaks_if_removed: "The design's only safety rule becomes a convention. A cheap driver can walk a state rated above it and leave a record indistinguishable from one that was driven correctly, which is the exact failure the asymmetry was written to stop."
+breaks_if_removed: The design's only safety rule becomes a convention. A cheap driver can walk a state rated above it and leave a record indistinguishable from one that was driven correctly, which is the exact failure the asymmetry was written to stop.
 breaks_how_badly: crippling
 refines:
   - uc-let-the-machine-name-the-driver
@@ -48,3 +48,20 @@ third named conflict both rest on.
 NOTHING MECHANICAL WOULD HAVE CAUGHT IT EITHER: the engine's coverage check
 operates at use-case granularity, not step granularity, so a use case with one
 requirement passes while six of its extensions go unread.
+
+## Addition — work tokens
+
+THE GRAIN BECOMES THE TOKEN. Each piece of work carries its own difficulty
+mark, so the comparison between what was named and what answered is made per
+work token rather than per milestone.
+
+THE RAISE IS THE SAME ACT SEEN FROM THE OTHER SIDE. A hand meeting work
+harder than its mark records the raise together with the hand that made it,
+and leaves the work open for a stronger one.
+
+THREE THINGS THE RECORD FORBIDS: attempting the work anyway, dropping it
+without saying so, and closing it as skipped without naming the strength it
+needs.
+
+THE HAND LEAST ABLE TO NOTICE IS THE ONE ASKED TO NOTICE, which is why the
+act is recorded rather than trusted.

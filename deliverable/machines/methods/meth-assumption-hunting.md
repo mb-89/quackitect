@@ -9,7 +9,7 @@ Guidance for M3 identify-assumptions. This is the one card the step draws
 from. What an assumption IS and how the node is shaped are [[raid]] and
 [[meth-raid]]; probing is [[meth-assumption-probing]].
 
-## THE RULE
+## THE RULE #work
 
 If an item is only true under some condition you have not established and do
 not control, that condition is an ASSUMPTION and it gets written down.
@@ -23,7 +23,7 @@ Two halves matter equally.
   - If somebody else owns it and you need it, it is a dependency.
   - If nobody owns it and it might change under you, it is an assumption.
 
-## THE SWEEP — WHERE TO LOOK
+## THE SWEEP — WHERE TO LOOK #work
 
 A nil answer is cheap when it is given once. It is expensive when it must be
 given per source, with a reason. So the form asks the sources one at a time,
@@ -42,7 +42,7 @@ WALK THE REQUIREMENTS, NOT YOUR MEMORY. The register is the input. A
 requirement with a number in it usually rests on something; a requirement
 about a boundary almost always does.
 
-## WRITE THE CLAIM, NOT THE SUBJECT (owner ruling 2026-08-07)
+## WRITE THE CLAIM, NOT THE SUBJECT #work
 
 This step COLLECTS ASSUMPTIONS. So each entry it opens says the thing being
 relied on, phrased so it could turn out false.
@@ -63,10 +63,10 @@ at, which is how a register fills up with entries nobody can close.
 AND CHECK THE KIND BEFORE THE TITLE. If the thing has already happened, it is
 an ISSUE, not an assumption — present tense, hurting now. Recording an
 observed failure as an assumption hides that it already bit. This was got
-wrong on 2026-08-07 with the reload's tool list, which had been seen to fail
+wrong with the reload's tool list, which had been seen to fail
 before it was written down as something merely believed.
 
-## THREE SMELLS THAT MEAN AN ASSUMPTION IS HIDING
+## THREE SMELLS THAT MEAN AN ASSUMPTION IS HIDING #work
 
 - A NUMBER WITH NO SOURCE. A tolerance nobody measured is a guess wearing a
   measurement's clothes, and the thing that would make it true is the
@@ -76,7 +76,7 @@ before it was written down as something merely believed.
 - A CAPABILITY NAMED WITHOUT A VERSION. "git", "Node", "the harness" — each
   one is a promise somebody else made and can withdraw.
 
-## WHAT IS NOT AN ASSUMPTION
+## WHAT IS NOT AN ASSUMPTION #work
 
 - A decision you made. That is a decision; record it as one.
 - Something you already checked. That is a fact; cite it.

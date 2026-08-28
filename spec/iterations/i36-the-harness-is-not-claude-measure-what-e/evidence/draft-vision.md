@@ -2,9 +2,9 @@
 form: draft-vision
 by: agent
 signed_off: 2026-08-19T09:06:11.403Z
-reopened: "2026-08-19T08:46:19.331Z — The owner requires a fresh thorough online scan; inherited 2026-08-18 research is not sufficient for current harness claims."
+reopened: 2026-08-19T08:46:19.331Z — The owner requires a fresh thorough online scan; inherited 2026-08-18 research is not sufficient for current harness claims.
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / draft-vision

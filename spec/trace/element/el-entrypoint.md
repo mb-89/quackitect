@@ -15,6 +15,7 @@ satisfies:
   - req-fresh-machine-runs
 implements:
   - fn-run-a-governed-walk.bring-the-product-up
+  - fn-run-a-governed-walk.hold-a-workspace-alone
   - fn-arrive-on-a-machine.resolve-the-cited-refs
   - fn-arrive-on-a-machine.judge-the-runtime
   - fn-arrive-on-a-machine.supply-the-dependencies

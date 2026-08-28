@@ -22,7 +22,14 @@ priority: should
 ## Lane doors
 
 - `se_panel` serves the live surface.
-- `se_shoot` renders it to a picture, so a pane is judged by seeing it rather than by reading its markup.
+- `se_surface` prints it as text, which is how the AGENT reads it every day. Same view model as the page, so the two cannot disagree. Legal in every state, and it needs nobody's permission.
+- `se_shoot` renders it to a picture, for a question about LAYOUT. It looks at a screen, so the person is asked each time (contract rule 10).
+
+THE PAGE SERVER STAYS FOR NOW, and the reason is worth writing down. The same
+port carries `/mcp`, which is how an editor harness and a terminal client attach
+to ONE walk. The sidebar renders its own markup but POSTs every control to those
+routes. What is genuinely droppable is the standalone browser page and the
+editor panel that frames it — a smaller change than dropping the server.
 
 ## Extensions
 

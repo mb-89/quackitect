@@ -57,7 +57,7 @@ function evidenceForm(machineId: string, noteName: string, fm: Record<string, un
 
 /** File refs are VAULT-RELATIVE (the Obsidian vault root is the repository
  *  root since the folder levels collapsed —
- *  owner fix 2026-07-26): "deliverable/machines/states/x.md". Canvas-dir-
+ *  owner fix ): "deliverable/machines/states/x.md". Canvas-dir-
  *  relative and root-relative are accepted as fallbacks. */
 export function resolveRef(root: string, canvasPath: string, ref: string): string {
   if (isAbsolute(ref)) return ref;
@@ -73,8 +73,54 @@ const CACHE = new Map<string, { decl: MachineDecl; sources: string[]; stamp: str
 
 // see dsp-method-compilation.md#one-validation-per-call
 let EPOCH = 1;
+
+/** How many holds are open. While one is, the drawing is not re-validated.
+ *
+ *  ONE VALIDATION PER CALL IS WHAT THIS ALWAYS MEANT, and it was being paid per
+ *  HOP. A pull that sweeps thirty hops bumped the epoch thirty times, and each
+ *  bump re-hashes every source of every cached machine.
+ *
+ *  MEASURED on one hop that does no work: 3,454 ms of `existsSync` and 1,403 ms
+ *  of `readFileUtf8`, which is 55 per cent of it. Thousands of reads to guard
+ *  against an edit nobody made.
+ *
+ *  THE RULING: take the hash, do the work from the warm model, and check the
+ *  hash afterwards. Do not throw the model away because something MIGHT change.
+ *  The only reason a mid-call edit was a real hazard is that the call took
+ *  twenty seconds, and it took twenty seconds because of the guarding.
+ *
+ *  THE GUARANTEE HOLDS. An edit between calls is seen, because the next call
+ *  bumps. An edit DURING one is caught by `drawingChangedUnderUs` at release. */
+let HELD = 0;
+
 export function bumpDrawingEpoch(): void {
+  if (HELD > 0) return;
   EPOCH++;
+}
+
+/** Hold the drawing for the length of one call. Nested holds are counted, so an
+ *  inner hold cannot release an outer one. */
+export function holdDrawing(): void {
+  HELD++;
+}
+
+export function releaseDrawing(): void {
+  if (HELD > 0) HELD--;
+}
+
+/** Did anything the call relied on move underneath it?
+ *
+ *  THIS IS THE AFTER-CHECK, and it is what makes holding safe. It re-stamps
+ *  every cached drawing and answers which ones no longer match. Empty means the
+ *  warm model the call worked from was valid the whole way through.
+ *
+ *  IT COSTS ONE PASS, not one per hop, which is the whole point. */
+export function drawingChangedUnderUs(): string[] {
+  const moved: string[] = [];
+  for (const [key, hit] of CACHE) {
+    if (stampOf(hit.sources) !== hit.stamp) moved.push(key);
+  }
+  return moved;
 }
 
 // STAMPED BY CONTENT, not by size and mtime. Those two are the usual cheap
@@ -431,7 +477,7 @@ function asList(v: unknown): string[] | undefined {
 const BLOCKED_PRIORITY = 1.5;
 
 function asPriority(v: unknown, root: string): number | undefined {
-  // A TIER WORD IS THE AUTHORED TRUTH (owner cut-over ruling 2026-08-12);
+  // A TIER WORD IS THE AUTHORED TRUTH (owner cut-over ruling );
   // its number is the transitional anchor from the drawn scale. Numeric
   // stays legal while the sweep runs.
   if (typeof v === "string" && v.trim() !== "" && Number.isNaN(Number(v))) {
@@ -451,7 +497,7 @@ function asPriority(v: unknown, root: string): number | undefined {
 
 /** Conditions are FLAT frontmatter keys — exit_read, exit_script,
  *  entry_<type> — because nested dictionaries render as JSON blobs in
- *  Obsidian Properties (owner ruling: Obsidian-editable). */
+ *  Obsidian Properties. */
 function conditionDict(
   machineId: string,
   ref: string,

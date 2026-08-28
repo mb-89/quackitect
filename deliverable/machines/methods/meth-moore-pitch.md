@@ -15,7 +15,7 @@ One blockquote forces the five hard choices:
 - the benefit
 - the displaced alternative
 
-## Procedure
+## Procedure #work
 
 - Fill every slot. An empty <unlike> means the alternative was not faced.
 - The <who> must match a value-prop audience.

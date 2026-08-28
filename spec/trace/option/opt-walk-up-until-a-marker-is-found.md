@@ -6,7 +6,7 @@ statement: Find the product's root by starting where the caller is and walking u
 cluster: the-walk
 question: how the product's root is decided
 found_by: prior-art
-source: "git setup.c (the die() text names .git and the parent search); npm docs/lib/content/configuring-npm/folders.md; Cargo src/util/important_paths.rs; Black docs/usage_and_configuration/the_basics.md; uv docs/concepts/configuration-files.md"
+source: git setup.c (the die() text names .git and the parent search); npm docs/lib/content/configuring-npm/folders.md; Cargo src/util/important_paths.rs; Black docs/usage_and_configuration/the_basics.md; uv docs/concepts/configuration-files.md
 ---
 
 ## Mechanism

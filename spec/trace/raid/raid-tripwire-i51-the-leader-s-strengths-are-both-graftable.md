@@ -3,11 +3,11 @@ minted_in: i51-work-running-out-of-sight-reports-itself
 id: raid-tripwire-i51-the-leader-s-strengths-are-both-graftable
 type: "[[raid]]"
 kind: risk
-statement: "Both strengths that won the convergence can be taken by the runner-up, and a runner-up that takes them dominates the leader on every axis."
+statement: Both strengths that won the convergence can be taken by the runner-up, and a runner-up that takes them dominates the leader on every axis.
 owner: the driving agent
 trigger: the graft state at M5, where a loser's best cell reaches the winner — and again at the architecture gate if the graft did not run
 status: open
-impact: "The declared winner would be the wrong seat. The runner-up with both strengths grafted scores at least as well on every axis and better on one, which is domination rather than a trade."
+impact: The declared winner would be the wrong seat. The runner-up with both strengths grafted scores at least as well on every axis and better on one, which is domination rather than a trade.
 breaks_how_badly: crippling
 how_likely: expected
 source_refs:

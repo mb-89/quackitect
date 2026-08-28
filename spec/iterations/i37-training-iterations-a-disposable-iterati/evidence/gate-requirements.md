@@ -1,11 +1,11 @@
 ---
 form: gate-requirements
 bless: blessed by agent
-reopened: "2026-08-20T07:23:55.401Z — a feeder re-signed above it after the v3 merge moved the rigor matrix and the M6 spikes moved the winner"
+reopened: 2026-08-20T07:23:55.401Z — a feeder re-signed above it after the v3 merge moved the rigor matrix and the M6 spikes moved the winner
 by: agent
 signed_off: 2026-08-20T07:23:58.122Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / gate-requirements

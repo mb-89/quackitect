@@ -3,16 +3,16 @@ minted_in: i9
 id: raid-risk-an-existing-checkout-keeps-its-state-where-the-move-left
 type: "[[raid]]"
 kind: risk
-statement: "Anybody who already has this repository checked out keeps their machine-state folder at the old location, because it is ignored by git and the move cannot reach it."
+statement: Anybody who already has this repository checked out keeps their machine-state folder at the old location, because it is ignored by git and the move cannot reach it.
 owner: the driving agent
-trigger: "the first time somebody pulls the commit that moves the folder into an existing checkout"
+trigger: the first time somebody pulls the commit that moves the folder into an existing checkout
 status: accepted
-impact: "The engine looks in the new place, finds nothing, and reads that as a tree nobody has ever driven. The call log, the notes and the session state are all still on disk one level up, and nothing says so."
+impact: The engine looks in the new place, finds nothing, and reads that as a tree nobody has ever driven. The call log, the notes and the session state are all still on disk one level up, and nothing says so.
 breaks_how_badly: corrosive
 how_likely: expected
 source_refs:
-  - "the ignore file excludes the folder, so no commit can carry it"
-  - "raid-risk-a-path-that-resolves-the-machine-state-folder-is-missed, which is the same silent failure from the code's side"
+  - the ignore file excludes the folder, so no commit can carry it
+  - raid-risk-a-path-that-resolves-the-machine-state-folder-is-missed, which is the same silent failure from the code's side
 ---
 
 ## What happens

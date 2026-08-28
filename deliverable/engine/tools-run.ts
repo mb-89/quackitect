@@ -7,22 +7,44 @@
 // see dsp-lane-door.md#the-verbs-are-grouped-by-what-they-touch
 
 import { spawn } from "node:child_process";
-import { appendFileSync, existsSync, mkdirSync, readFileSync } from "node:fs";
+import { appendFileSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { availableParallelism } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { hostCapState, recordHostCap } from "./bound.ts";
 import { CallLog, UNREPORTED } from "./calllog.ts";
 import { BATTERY_QUESTION, decideScope, laneSummary, laneVerdict, parseTap, streakNudge, testRecord } from "./discipline.ts";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { gitLane } from "./gitlane.ts";
 import { capMiddle } from "./jsonio.ts";
 import type { ToolDef } from "./mcp.ts";
+import { mirrorText } from "./mirrortext.ts";
+import { noteWrite } from "./notes.ts";
 import { resolveInRoot, seDir } from "./paths.ts";
 import { type MirrorState, renderMirror } from "./render.ts";
-import { jobDone, jobList, jobStatus, jobStop, noteStarted, runBackground, runToCompletion, startJob } from "./run.ts";
+import { readRigorMatrix } from "./rigor-matrix.ts";
+import {
+  jobAcknowledge,
+  jobAcknowledgeSettled,
+  jobDone,
+  jobRoster,
+  jobStatus,
+  jobStop,
+  noteModel,
+  noteProgress,
+  noteRole,
+  noteStarted,
+  openOperation,
+  retireOtherMilestones,
+  runBackground,
+  runToCompletion,
+  settleOperation,
+  startJob,
+} from "./run.ts";
 import { shoot } from "./shoot.ts";
 import { TIMINGS_DIR_ENV, testConcurrency, testReporterArgs, timedSince, timingReport } from "./testreporters.ts";
 import type { ReadingHook } from "./tools-file.ts";
+import { isWidgetKind, WIDGET_LIST } from "./widget-kinds.ts";
 
 const BIOME_BIN = fileURLToPath(new URL("../node_modules/@biomejs/biome/bin/biome", import.meta.url));
 
@@ -46,10 +68,167 @@ function batteryRecord(se: string): { pace: string; total?: number } {
     return { pace: " No earlier battery is on record to size the wait." };
   }
 }
+/** HOW MANY STEPS THE WORK HAS, and a refusal when nobody says.
+ *
+ *  THE INTERFACE FORCES THE COUNT because a task that will not say how big it
+ *  is cannot be projected, and a surface with nothing to show invites the
+ *  reader to stop looking. An estimate revised upward later is honest; silence
+ *  is not. */
+function stepsAsked(args: Record<string, unknown>, verb: string): number {
+  // A HOST MAY SEND THE COUNT AS TEXT. Some harnesses serialise a numeric
+  // argument as a string, and this check is the only place that reads one
+  // strictly, so the agent verb refused a count the shell verb accepted.
+  // A string that IS a number is an answer; anything else still refuses.
+  const raw = args.steps;
+  const n = typeof raw === "string" && raw.trim() !== "" ? Number(raw) : raw;
+  if (typeof n === "number" && Number.isFinite(n) && n > 0) return Math.round(n);
+  throw new Rejection({
+    clause: CLAUSES.REQUIRED_ARGS,
+    expected: "steps: how many steps this work has, as a whole number above zero",
+    got: n === undefined ? "no steps" : String(n),
+    remedy: {
+      tool: "se_run",
+      args: { [verb]: "<what it is>", steps: 5 },
+      note: "a guess is fine and it may rise later: report with se_run {job, did, steps?}",
+    },
+    source: "engine/tools-run.ts stepsAsked",
+  });
+}
+
+/** WHICH MODEL ANSWERS FOR THIS HAND, and a refusal when nobody says.
+ *
+ *  THE RETRO CANNOT WEIGH SPAWNING WITHOUT IT. The question it must answer is
+ *  whether putting work on a second hand paid for itself, and that is a
+ *  question about tokens, which is a question about which model ran.
+ *
+ *  A LABEL IS NOT A RECORD. Naming the model inside the description works only
+ *  while somebody remembers, and the first hand spawned under this roster was
+ *  registered without one. */
+function modelAsked(args: Record<string, unknown>): string {
+  const m = args.model;
+  if (typeof m === "string" && m.trim() !== "") return m.trim();
+  throw new Rejection({
+    clause: CLAUSES.REQUIRED_ARGS,
+    expected: "model: which model answers for this hand, so the retro can weigh what the spawn cost",
+    got: m === undefined ? "no model" : String(m),
+    remedy: {
+      tool: "se_run",
+      args: { agent: "<what it is for>", steps: 5, model: "sonnet" },
+      note: "a shell run needs none and records as script; only a spawned hand is asked",
+    },
+    source: "engine/tools-run.ts modelAsked",
+  });
+}
+
+/** WHERE A SPAWNED JOB SITS, so it can be stamped without the caller
+ *  declaring a state — a declared state is a claim that can be wrong. The
+ *  milestone follows from the rigor matrix row whose name matches the
+ *  state's last segment — the same join the matrix uses everywhere else. */
+function agentPosition(root: string, positionOf?: () => string): { state?: string; milestone?: string } {
+  const state = positionOf?.();
+  if (state === undefined) return {};
+  const milestone = readRigorMatrix(root).rows.find((r) => r.name === state.split("/").pop())?.milestone;
+  return { state, ...(milestone === undefined ? {} : { milestone }) };
+}
+
+/** WHICH HAND IS BEING REGISTERED — walker, reviewer or researcher.
+ *
+ *  ONLY A WALKER COUNTS AGAINST THE RECORD'S CEILING (
+ *  ). A reviewer buys separation and a researcher buys reading
+ *  nobody has done; neither competes for the walking slot, and neither should
+ *  be able to strand the next phase by filling it.
+ *
+ *  IT DEFAULTS TO `walker`, which is the conservative direction: an unnamed
+ *  hand counts, so a forgotten role can never quietly raise the ceiling. */
+function roleAsked(args: Record<string, unknown>): string {
+  const raw = args.role;
+  if (raw === "walker" || raw === "reviewer" || raw === "researcher") return raw;
+  return "walker";
+}
+
 /** The job side of se_run: list, stop, wait or status. Undefined when the
  *  call names no job — the command side handles it. */
-function jobArm(args: Record<string, unknown>, root: string): unknown {
-  if (args.jobs === true) return { jobs: jobList(root) };
+function jobArm(args: Record<string, unknown>, root: string, positionOf?: () => string): unknown {
+  if (args.jobs === true) return jobRoster(root);
+  // A SUBAGENT IS WORK OUT OF SIGHT, so it belongs on the same list. Nothing
+  // here can observe one, so the agent that spawned it registers it and closes
+  // it. An unclosed one shows as running, which is the honest answer.
+  if (typeof args.agent === "string" && args.agent !== "") {
+    const id = `agent-${Date.now().toString(36)}`;
+    const model = modelAsked(args);
+    const role = roleAsked(args);
+    const at = agentPosition(root, positionOf);
+    // ONE WALKER PER MILESTONE, AND THE HANDOVER IS VISIBLE. Registering a hand
+    // for a new milestone retires the hands of every other one, so the table
+    // shows the M1 walker going as the M2 walker arrives rather than both
+    // standing for ever.
+    //
+    // THIS IS THE ONE MOMENT THE ENGINE RELIABLY LEARNS the previous milestone
+    // is over. It cannot see a spawned hand die — the harness owns that process
+    // — so a row otherwise reads `running` long after the agent is gone.
+    const retired = at.milestone === undefined ? [] : retireOtherMilestones(at.milestone);
+    openOperation({
+      id,
+      kind: "agent",
+      command: args.agent,
+      root,
+      steps: stepsAsked(args, "agent"),
+      ...at,
+    });
+    noteModel(id, model, root);
+    noteRole(id, role, root);
+    noteStarted(id, root);
+    return {
+      agent: id,
+      ...(retired.length === 0 ? {} : { retired }),
+      // THIS USED TO POINT A SPAWNED HAND AT se_run TO REPORT PROGRESS, and
+      // se_run IS LEGAL ONLY IN THE SPAWN STATE — nowhere the hand itself
+      // ever stands. The instruction refused on the hand's first attempt,
+      // silently: it read like working guidance because nothing checked
+      // whether the tool it named was one the hand could actually call.
+      // The real channel is the update system, which rides every lane call
+      // a hand already makes; its opening plan sets the job's length.
+      note: 'report through update: {op: "plan", items: [...]} on your first lane call, then update: {op: "done", node, brief} as each item resolves — the plan\'s item count sets this job\'s length. Close with se_run {agent_done: "<id>"}',
+    };
+  }
+  // SAY HOW FAR ALONG, and revise the total where the work turned out bigger.
+  if (typeof args.job === "string" && typeof args.did === "number") {
+    const total = typeof args.steps === "number" ? args.steps : undefined;
+    if (!noteProgress(args.job, args.did, total, root)) {
+      throw new Rejection({
+        clause: CLAUSES.JOB_UNKNOWN,
+        expected: "a job this session started",
+        got: String(args.job),
+        remedy: { tool: "se_run", args: { jobs: true }, note: "the ids are here" },
+        source: "engine/run.ts noteProgress",
+      });
+    }
+    return { job: args.job, steps_done: args.did, ...(total === undefined ? {} : { steps_total: total }) };
+  }
+  if (typeof args.agent_done === "string" && args.agent_done !== "") {
+    settleOperation(String(args.agent_done), args.ok !== false, root);
+    return { closed: args.agent_done };
+  }
+  // ACKNOWLEDGING DROPS SETTLED WORK FROM THE RIDE. `ack: true` clears
+  // everything settled; a list clears exactly those. A running job is named
+  // back rather than hidden, because its outcome is not in yet.
+  // `true` MAY ARRIVE AS THE STRING "true". This argument takes several shapes,
+  // so its schema declares no type, and an untyped property is handed over as
+  // the transport found it. MEASURED: ack: true acknowledged a job
+  // named "true" and cleared nothing.
+  if (args.ack === true || args.ack === "true" || args.ack === "all") {
+    // A COUNT, NOT THE LIST. Clearing a long session acknowledged 200 jobs and
+    // named every one of them, which is the noise this whole verb exists to
+    // remove. An explicit list still gets its ids back, because the caller
+    // named them and is owed the answer.
+    const done = jobAcknowledgeSettled(root);
+    return {
+      acknowledged: done.length,
+      note: "settled work no longer rides answers; each record stays reachable by its id with se_run {job}",
+    };
+  }
+  if (Array.isArray(args.ack)) return jobAcknowledge(args.ack.map(String), root);
+  if (typeof args.ack === "string" && args.ack !== "") return jobAcknowledge([args.ack], root);
   if (args.job === undefined) return undefined;
   if (args.stop === true) return jobStop(String(args.job), root);
   return jobStatus(String(args.job), root);
@@ -76,7 +255,7 @@ function shapedRemedy(command: string): { tool: string; args: Record<string, unk
   if (/--test\b|\bnpm\b.*\btest\b|\bjest\b|\bvitest\b/i.test(command)) {
     return {
       tool: "se_test",
-      // NO SCOPE ARGUMENT, since the owner's ruling (2026-08-16). You say what
+      // NO SCOPE ARGUMENT, and that is ruled. You say what
       // you want to know; the engine reads what changed and decides whether
       // that is the battery, a named set, or nothing at all.
       args: { question: "<what this run answers>" },
@@ -130,6 +309,24 @@ function testJobPath(se: string, id: string): string {
   return join(se, "test-jobs", `${id}.jsonl`);
 }
 
+/** THE LAST RUN'S WHOLE RESULT, at one stable path.
+ *
+ *  THE ACCOUNT CARRIES A COUNT AND NOTHING ELSE, because it rides every answer
+ *  and the answer has a byte bound. The names behind that count have to be
+ *  somewhere a reader can follow, and one file that always holds the newest
+ *  run is the cheapest somewhere there is.
+ *
+ *  IT IS MACHINE-LOCAL and overwritten by the next run. The call log keeps
+ *  every verdict for good; this is the one wanted almost every time. */
+function storeLastResults(se: string, result: Record<string, unknown>): void {
+  try {
+    mkdirSync(se, { recursive: true });
+    writeFileSync(join(se, "test-last.json"), JSON.stringify(result, null, 1), "utf8");
+  } catch {
+    // Bookkeeping never kills a run.
+  }
+}
+
 function persistTestJob(se: string, id: string, entry: TestJobEntry): void {
   mkdirSync(join(se, "test-jobs"), { recursive: true });
   const record: PersistedTestJob = {
@@ -143,53 +340,9 @@ function persistTestJob(se: string, id: string, entry: TestJobEntry): void {
   appendFileSync(testJobPath(se, id), `${JSON.stringify(record)}\n`, "utf8");
 }
 
-function recoverTestJob(se: string, id: string): TestJobEntry | undefined {
-  const path = testJobPath(se, id);
-  if (!existsSync(path)) return undefined;
-  const lines = readFileSync(path, "utf8").trimEnd().split("\n");
-  for (let index = lines.length - 1; index >= 0; index--) {
-    try {
-      const record = JSON.parse(lines[index]) as PersistedTestJob;
-      return { done: Promise.resolve(), started: record.started, pace: record.pace, verdict: record.verdict };
-    } catch {
-      // An incomplete final append never hides the preceding valid state.
-    }
-  }
-  return undefined;
-}
-
-/** see dsp-lane-door.md#the-verdict-outlives-the-call */
-function testJobArm(args: Record<string, unknown>, se: string): Record<string, unknown> {
-  const id = String(args.job);
-  const t = testVerdicts.get(id) ?? recoverTestJob(se, id);
-  if (t === undefined) {
-    throw new Rejection({
-      clause: CLAUSES.JOB_UNKNOWN,
-      expected: "a test run started in this session",
-      got: `${id} (unknown)`,
-      remedy: { tool: "se_run", args: { jobs: true }, note: "list the session's jobs" },
-      source: "engine/tools.ts se_test",
-    });
-  }
-  if (t.verdict !== undefined) return t.verdict;
-  if (!testVerdicts.has(id)) {
-    return {
-      job: id,
-      running: false,
-      state: "owner_unavailable",
-      elapsed_ms: Date.now() - t.started,
-      note: "The server owning this unfinished test job is unavailable. Start a new test run.",
-    };
-  }
-  const progress = t.pace !== "" ? batteryProgress(se, t.started) : undefined;
-  return {
-    job: id,
-    running: true,
-    elapsed_ms: Date.now() - t.started,
-    ...(progress !== undefined ? { progress } : {}),
-    note: `still running. Call again with {job} to read current status.${t.pace}`,
-  };
-}
+// THE STATUS READER IS GONE, and nothing replaced it in this file. A running
+// battery reports itself through the work account on every lane call, which is
+// where every other background job already reported. See run.ts batteryFound.
 
 // see dsp-write-guard.md#scopedfiles-is-gone
 
@@ -212,65 +365,60 @@ function scopedQuestion(questionArg: unknown): string {
   });
 }
 
-/** Live progress of a running battery, read from the reporter's beat file.
- *  Absent when the stream is missing or belongs to an older run. */
-function batteryProgress(se: string, since: number): Record<string, unknown> | undefined {
-  try {
-    const lines = readFileSync(join(se, "test-progress.jsonl"), "utf8")
-      .split("\n")
-      .filter((l) => l.trim() !== "");
-    const head = JSON.parse(lines[0]) as { start?: string; files_total?: number; tests_last_run?: number };
-    if (typeof head.start !== "string" || Date.parse(head.start) < since) return undefined;
-    let cases = 0;
-    const files = new Set<string>();
-    const failures: string[] = [];
-    for (const line of lines.slice(1)) {
-      let rec: { file?: string; fail?: string; msg?: string };
-      try {
-        rec = JSON.parse(line);
-      } catch {
-        continue;
-      }
-      if (typeof rec.file !== "string") continue;
-      cases += 1;
-      files.add(rec.file);
-      if (typeof rec.fail === "string") failures.push(`${rec.fail}${typeof rec.msg === "string" && rec.msg !== "" ? `: ${rec.msg}` : ""}`);
-    }
-    return {
-      cases_done: cases,
-      ...(typeof head.tests_last_run === "number" ? { cases_last_run: head.tests_last_run } : {}),
-      files_touched: files.size,
-      files_total: head.files_total,
-      ...(failures.length > 0 ? { failures_so_far: failures } : {}),
-    };
-  } catch {
-    return undefined;
-  }
-}
+// THE BEAT FILE IS READ BY THE WORK ACCOUNT NOW, in run.ts batteryFound. It
+// was read here too, for a status verb that no longer exists.
 
 export function runTools(
   rootOf: (rel?: string) => string,
   projectRoot: string,
   _reading?: ReadingHook,
   mirror?: () => MirrorState,
+  /** WHERE THE WALK STANDS, for stamping a spawned job's milestone at
+   *  registration. The engine reads its own position; a caller-declared
+   *  state would be a claim that can be wrong. */
+  positionOf?: () => string,
 ): ToolDef[] {
   return [
     {
-      name: "se_shoot",
-      title: "se.shoot",
+      name: "se_surface",
+      title: "se.surface",
       description:
-        "LOOK AT THE MIRROR. Renders the surface to an image and hands back the PICTURE, so a change to a pane can be judged by seeing it rather than by reading its HTML. Shoot the whole page, or one widget with widget: 'machine' | 'details' | 'log' | 'terminal'. view: names a machine to draw instead of the one being walked. Nothing is served over HTTP and no browser window opens.",
+        "READ THE PERSON'S SURFACE, IN WORDS. Prints what the mirror is showing — where the walk stands, the dials, what is legal here, every state with its marks, and the last hops.\n\nTHIS IS THE EVERYDAY WAY TO SEE THE SURFACE. It costs nothing and needs nobody's permission.\n\nse_shoot IS FOR LAYOUT ONLY, and it looks at a screen, so it is asked for each time.\n\nview: names a machine to print instead of the one being walked.",
       inputSchema: {
         type: "object",
         properties: {
-          widget: { type: "string", description: "machine | details | log | terminal — omit for the whole page" },
+          view: { type: "string", description: "print this machine instead of the one the walk stands in" },
+        },
+      },
+      handler: (args) => {
+        if (mirror === undefined) {
+          throw new Rejection({
+            clause: CLAUSES.CONDITION_UNMET,
+            expected: "a server built with a mirror surface",
+            got: "no mirror on this build",
+            remedy: { tool: "se_pull", args: {}, note: "the full engine serves the mirror; this build has none to print" },
+            source: "engine/tools.ts se_surface",
+          });
+        }
+        return { text: mirrorText(mirror(), args.view === undefined ? {} : { view: String(args.view) }) };
+      },
+    },
+    {
+      name: "se_shoot",
+      title: "se.shoot",
+      description: `LOOK AT THE MIRROR, AS A PICTURE. Renders the surface to an image, so a question about LAYOUT can be judged by seeing it.\n\nASK THE PERSON FIRST, EVERY TIME. This looks at a screen, and contract rule 10 makes that theirs to grant. Delete the capture when you are done with it.\n\nFOR ANYTHING THAT IS NOT ABOUT LAYOUT, se_surface prints the same facts as text and needs no permission.\n\nShoot the whole page, or one widget with widget: ${WIDGET_LIST}. view: names a machine to draw instead of the one being walked. Nothing is served over HTTP and no browser window opens.`,
+      inputSchema: {
+        type: "object",
+        properties: {
+          widget: { type: "string", description: `${WIDGET_LIST} — omit for the whole page` },
           view: { type: "string", description: "draw this machine instead of the one the walk stands in" },
           width: { type: "number", description: "viewport width, default 1600" },
           height: { type: "number", description: "viewport height, default 1000" },
         },
       },
       handler: (args) => {
-        const w = args.widget === undefined ? undefined : (String(args.widget) as "machine" | "details" | "log" | "terminal" | "table");
+        const raw = args.widget === undefined ? undefined : String(args.widget);
+        const w = raw !== undefined && isWidgetKind(raw) ? raw : undefined;
         if (mirror === undefined) {
           throw new Rejection({
             clause: CLAUSES.CONDITION_UNMET,
@@ -295,6 +443,38 @@ export function runTools(
       },
     },
     {
+      name: "se_probe_cap",
+      title: "se.probe.cap",
+      description: `MEASURE THIS HOST'S OWN OUTPUT CAP, because only the agent can see where it bites.\n\nTHE CUT HAPPENS BETWEEN THE HOST AND THE MODEL. The engine hands over the whole answer and never learns what arrived, so a number written into the engine by hand is a guess. This verb is the ladder that replaces the guess.\n\nHOW TO RUN IT. Call {bytes: N} and look at the very end of what you got. An intact answer ends with the marker END-OF-PROBE-<N>. Missing marker means the host cut it. Climb until it cuts, halve the step, and settle on the largest N that still shows its marker.\n\nSTART AT 20000 AND DOUBLE while the marker keeps arriving. On the first cut, BISECT between the largest that survived and the smallest that did not, and stop once those two sit within 1000 of each other. Four or five calls settle it.\n\nNEVER STOP AT THE FIRST SIZE THAT WORKS. A figure that merely arrived is not the limit, and the whole point is knowing where the limit is.\n\nTHEN RECORD IT with {cap: N}. That number is written to .se/harness-cap.json and the answer bound moves to it, so every later call pages at the size this host can actually take.\n\nCALL IT WITH NOTHING to see what is recorded now.\n\nTHIS ANSWER IS NOT BOUNDED. It is the one verb that must not be, or it would measure our own ceiling instead of the host's.`,
+      inputSchema: {
+        type: "object",
+        properties: {
+          bytes: { type: "number", description: "send a payload of about this many characters, ending in its own marker" },
+          cap: { type: "number", description: "record the largest payload that arrived intact on this host" },
+        },
+      },
+      handler: async (args) => {
+        // THE CAP FILE LIVES IN `.se/`, NOT BESIDE IT. `recordHostCap` and
+        // `readHostCap` both take the MACHINE-STATE folder, and `setAnswerSpill`
+        // reads it from there. Passing the project root wrote the measurement to
+        // an untracked file at the top of the repository, where nothing reads it:
+        // the probe reported success, the bound never moved, and the next session
+        // inherited nothing.
+        const home = seDir(rootOf(".se"));
+        if (args.cap !== undefined) return recordHostCap(home, Number(args.cap));
+        if (args.bytes === undefined) return hostCapState(home);
+        const asked = Math.max(1, Math.min(4_000_000, Number(args.bytes)));
+        const marker = `END-OF-PROBE-${asked}`;
+        const filler = "x".repeat(Math.max(0, asked - marker.length - 200));
+        return {
+          probe: { asked },
+          how: "the answer is intact only if the LAST thing in it is the end field below, unchanged",
+          filler,
+          end: marker,
+        };
+      },
+    },
+    {
       name: "se_run",
       title: "se.run",
       description: `Run a shell command from the project root: bash on POSIX, PowerShell on Windows. For what ONLY a shell does, such as node, npm, builds and processes.\n\nWRITE A SCRIPT WHEN THE QUESTION IS ABOUT MANY THINGS. Put it in scratchpad/, run it here, change it, run it again. Counting, routing and measuring across a tree are programs, not readings. Have the script PRINT what you need, and nothing has to be piped.\n\nTHE LANE JOBS ARE REFUSED HERE: ${laneSummary()}. The refusal names the lane call as the remedy (SE-C-129). A first offence per category runs once with a warning. Pass no_tool_reason where the lane truly cannot do the job, and it is logged for the retro.\n\nOutput is captured and logged IN FULL under the call ref. Foreground waits. background returns a job at once: read it with {job}, cancel with {job, stop: true}, list with {jobs: true}.\n\nNever call this session own mirror over HTTP from here. The run blocks the server event loop, so the mirror cannot answer itself.`,
@@ -310,14 +490,50 @@ export function runTools(
           background: { type: "boolean", description: "start it detached and return a job handle IMMEDIATELY — for work you know is long" },
           job: { type: "string", description: "ask an existing job how it is doing: its output so far, whether it still runs" },
           stop: { type: "boolean", description: "with job: kill it and every process it spawned" },
-          jobs: { type: "boolean", description: "list every job this session started, newest first" },
+          jobs: {
+            type: "boolean",
+            description:
+              'list what is RUNNING right now, newest first, and NOTHING else. A finished job is served whole by se_run {job: "<id>"}; how many there are rides as `settled`.',
+          },
+          agent: {
+            type: "string",
+            description:
+              "REGISTER A SUBAGENT YOU JUST SPAWNED, saying in one line what it is doing, and NAME ITS MODEL with the model argument. It then rides the work account and the panel like every other background task. Nothing here can see a subagent for itself — the harness spawns it, so you are the one who knows. HAND IT THE RETURNED ID so it can report progress; a hand that never reports reads as idle whatever it is doing. THIS ONE CALL IS LEGAL WHEREVER THE WALK STANDS, even where se_run itself is not: a hand is spawned at whatever state the work asked for one, and a record the engine refuses to take is a hand that has to be stood down again.",
+          },
+          model: {
+            type: "string",
+            description:
+              "WHICH MODEL ANSWERS FOR THIS HAND. Required alongside agent, because the retro's question is whether spawning paid for itself, and that cannot be answered without knowing what ran. A shell run needs none and records as script.",
+          },
+          agent_done: { type: "string", description: "close a registered subagent by its id; pass ok: false where it failed" },
+          ok: { type: "boolean", description: "with agent_done: whether the subagent succeeded" },
+          ack: {
+            description:
+              "ACKNOWLEDGE SETTLED WORK so it stops riding every answer. true clears everything settled; a job id, or a list of them, clears exactly those. A running job is named back rather than hidden. The record stays reachable with se_run {job} afterwards.",
+          },
+          steps: {
+            type: "number",
+            description:
+              "HOW MANY STEPS THIS WORK HAS. Required to start anything in the background, because a task that will not say how big it is cannot be projected and the panel has nothing to show. A guess is fine, and it may rise later.",
+          },
+          did: {
+            type: "number",
+            description:
+              "with job: how many steps are behind you now. Pass steps alongside to revise the total where the work turned out bigger.",
+          },
           timeout_ms: { type: "number" },
+          role: {
+            type: "string",
+            enum: ["walker", "reviewer", "researcher"],
+            description:
+              "with agent: which hand this is. Only a walker counts against the record's ceiling — a reviewer and a researcher are a different purchase. Defaults to walker.",
+          },
           cwd: { type: "string", description: "root-relative working directory" },
         },
       },
       handler: async (args) => {
         const root = rootOf();
-        const job = jobArm(args, root);
+        const job = jobArm(args, root, positionOf);
         if (job !== undefined) return job;
         if (args.command === undefined) {
           throw new Rejection({
@@ -345,9 +561,13 @@ export function runTools(
           args.no_tool_reason === undefined ? undefined : String(args.no_tool_reason),
         );
         const cwd = args.cwd !== undefined ? { cwd: String(args.cwd) } : {};
+        // A SHELL MAY TOUCH ANYTHING, and the lane cannot see what it touched.
+        // So it counts as a write to everything, which keeps any verdict that
+        // judged the tree from standing over an edit made this way.
+        noteWrite();
         const res =
           args.background === true
-            ? runBackground(root, String(args.command), cwd)
+            ? runBackground(root, String(args.command), { ...cwd, steps: stepsAsked(args, "background") })
             : await runToCompletion(root, String(args.command), cwd);
         return annotateRun(res, laneWarning);
       },
@@ -356,7 +576,7 @@ export function runTools(
       name: "se_test",
       title: "se.test",
       description:
-        "ASK FOR A TEST; THE ENGINE DECIDES WHAT RUNS. You say what you want to know, and nothing else. The engine reads what changed, picks the scope, runs it, and `decided` says what it picked and why. No argument widens or narrows it.\n\nNOTHING IS A REAL ANSWER. An unchanged tree keeps its last verdict, and the result says so rather than refusing. `force` is a flake hunt, which is the whole suite by definition.\n\nWhere the diff is mostly DOCUMENTS the engine sweeps the corpus alongside the tests, and says so in `decided.sweep`.\n\nIt is a durable job. Starting returns a handle, and {job} reads its status or final verdict. Every run records its timings, so a silent instrument failure shows instead of passing as green.",
+        "ASK FOR A TEST; THE ENGINE DECIDES WHAT RUNS. You say what you want to know, and nothing else. The engine reads what changed, picks the scope, runs it, and `decided` says what it picked and why. No argument widens or narrows it.\n\nNOTHING IS A REAL ANSWER. An unchanged tree keeps its last verdict, and the result says so rather than refusing. `force` is a flake hunt, which is the whole suite by definition.\n\nWhere the diff is mostly DOCUMENTS the engine sweeps the corpus alongside the tests, and says so in `decided.sweep`.\n\nIt is a durable job. Starting returns a handle, and THE RUN THEN REPORTS ITSELF on the `work` account of every lane call you make — how far along it is, how many failed, the first failures by name, and how much longer it needs. THERE IS NO POLL and asking for one is refused. Carry on working; the news finds you. Every run records its timings, so a silent instrument failure shows instead of passing as green.",
       inputSchema: {
         type: "object",
         properties: {
@@ -366,17 +586,29 @@ export function runTools(
               "what you want to know, in one line. REQUIRED, and recorded with the verdict. The engine says which tests ran; only this says why you asked.",
           },
           force: { type: "boolean", description: "a flake hunt: run the whole suite whatever the diff says" },
-          job: {
-            type: "string",
-            description: "read a test job's current status or final verdict without waiting",
-          },
         },
       },
       handler: async (args) => {
         const root = rootOf();
         const se = seDir(projectRoot);
         const force = args.force === true;
-        if (args.job !== undefined) return testJobArm(args, se);
+        // THERE IS NO POLL HERE ANY MORE. A running battery
+        // rides the `work` account on every lane call, carrying its count,
+        // its estimate and the failures as they land. A verb for reading
+        // status invited a tight polling loop, and got one.
+        if (args.job !== undefined) {
+          throw new Rejection({
+            clause: CLAUSES.UNKNOWN_ARGS,
+            expected: "a question — se_test starts a run and the work account reports it",
+            got: `job: ${String(args.job)}`,
+            remedy: {
+              tool: "se_pull",
+              args: {},
+              note: "the running battery rides `work` on this and every other lane call, with cases_done, remaining_ms and failures_so_far. Keep working; do not poll. se_run {job} still serves the whole record afterwards.",
+            },
+            source: "engine/tools.ts se_test",
+          });
+        }
         // see dsp-lane-door.md#a-test-run-never-outlives-its-session
         const spawnNode = async (
           argv: string[],
@@ -514,7 +746,7 @@ export function runTools(
         // record on disk alone. Without this a run that settles between two
         // lane calls reads back as history and never reaches the caller.
         noteStarted(id, root);
-        // THE LAST RUN SIZES THE EXPECTATION (owner ruling 2026-08-03): a
+        // THE LAST RUN SIZES THE EXPECTATION: a
         // battery caller is told how long the previous one took — measured,
         // never guessed — or told plainly that no record exists.
         const battery = decision.scope === "battery";
@@ -536,6 +768,7 @@ export function runTools(
             entry.verdict = { job: id, running: false, ...value };
             entry.ended = Date.now();
             persistTestJob(se, id, entry);
+            storeLastResults(se, { job: id, question: args.question, ...value });
             try {
               // see dsp-lane-door.md#the-record-carries-the-question-it-answered
               new CallLog(seDir(projectRoot)).append({
@@ -591,7 +824,7 @@ export function runTools(
         return {
           handed_off: true,
           job: id,
-          note: `running in the background. Call se_test with {job: "${id}"} to read status. The final verdict records itself.${measured.pace}`,
+          note: `running in the background. DO NOT POLL: it rides the \`work\` account on every lane call, with its count, its estimate and the failures as they land. Carry on working and read it there. The final verdict records itself.${measured.pace}`,
         };
       },
     },

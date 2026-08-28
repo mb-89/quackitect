@@ -4,7 +4,7 @@ by: agent
 signed_off: 2026-08-20T19:28:20.022Z
 reopened: "2026-08-20T19:28:17.861Z — declare-winner was re-signed: the winner's adoption cost rested on a falsified sentence, and the question it handed M6 is answered — the walking agent acts on a published rung by delegating. Re-read against that."
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / graft-onto-the-winner

@@ -4,9 +4,9 @@ id: opt-a-row-s-difficulty-tracks-its-own-reopen-history
 type: "[[option]]"
 cluster: the-sizing
 question: how a step's difficulty is arrived at
-statement: "a state's difficulty rises when its own past walks were reopened and falls when they were not, so the number is corrected by the record instead of being fixed by a declaration"
+statement: a state's difficulty rises when its own past walks were reopened and falls when they were not, so the number is corrected by the record instead of being fixed by a declaration
 found_by: transform
-source: "SIT Attribute Dependency applied to cluster-the-sizing — make difficulty vary with a quantity it currently ignores"
+source: SIT Attribute Dependency applied to cluster-the-sizing — make difficulty vary with a quantity it currently ignores
 ---
 
 ## Mechanism

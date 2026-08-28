@@ -1,10 +1,10 @@
 ---
 form: reverse-sensitivity
-reopened: "2026-08-20T08:25:59.255Z — a feeder re-signed above it"
+reopened: 2026-08-20T08:25:59.255Z — a feeder re-signed above it
 by: agent
 signed_off: 2026-08-20T08:26:02.446Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / reverse-sensitivity

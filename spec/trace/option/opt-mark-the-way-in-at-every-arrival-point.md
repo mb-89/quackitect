@@ -6,7 +6,7 @@ statement: Mark the way in wherever somebody can arrive, in one form they alread
 cluster: the-bootstrap
 question: how a newcomer is shown the one thing to run
 found_by: analogy
-source: "emergency egress wayfinding — a standard marker, repeated at every decision point, readable by somebody who has never been in the building and is not reading carefully"
+source: emergency egress wayfinding — a standard marker, repeated at every decision point, readable by somebody who has never been in the building and is not reading carefully
 ---
 
 ## Mechanism

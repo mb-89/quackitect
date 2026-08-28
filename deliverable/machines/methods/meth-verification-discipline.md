@@ -9,7 +9,7 @@ Guidance for M7 verification, and for every fix-findings round behind
 it. Test DESIGN is [[meth-test-design]]; this card is how the
 verification is EXECUTED.
 
-## The discipline
+## The discipline #work/the-discipline
 
 - READ THE SPECS FIRST. The spec's pass line is the oracle.
   - A verdict from taste is not a verdict.
@@ -23,7 +23,7 @@ verification is EXECUTED.
 - THE BUILDER DOES NOT VERIFY THEIR OWN BUILD. Familiarity is exactly
   what hides the fault.
 
-## Fresh eyes (owner ruling 2026-08-11)
+## Fresh eyes #work/fresh-eyes
 
 - A PERSON verifying adheres to this card directly.
 - An AGENT verifying SPAWNS A TESTER SUBAGENT: fresh context, another
@@ -31,7 +31,7 @@ verification is EXECUTED.
   It does not inherit the builder's context, and that is the point —
   what the builder knows is what the tester must not assume.
 
-## The gatekeeper persists
+## The gatekeeper persists #work/the-gatekeeper-persists
 
 The tester is a GATEKEEPER for verification and its fix-findings loop,
 not a per-round hire:

@@ -6,7 +6,7 @@ statement: Declare what the machine-state folder is in exactly one place, and ha
 cluster: the-walk
 question: how everything agrees where the machine state is
 found_by: heuristic
-source: "One source of truth; everything else derives."
+source: One source of truth; everything else derives.
 ---
 
 ## Mechanism

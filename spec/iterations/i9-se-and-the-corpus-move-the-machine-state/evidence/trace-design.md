@@ -4,7 +4,7 @@ by: agent
 signed_off: 2026-08-20T10:58:51.579Z
 reopened: "2026-08-20T10:58:39.015Z — it answered older ground: every chunk was re-signed after it, and two more files joined the corpus reader"
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / trace-design

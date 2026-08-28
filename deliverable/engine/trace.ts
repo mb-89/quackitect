@@ -1,8 +1,8 @@
 // The trace graph, drawn radially. see dsp-radial-layout.md#no-layout-library
-import { readdirSync, readFileSync, statSync } from "node:fs";
+import { readdirSync, statSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
 import { contentHash } from "./hash.ts";
-import { nodeLines, noteOf, parseStateNote, passEpoch, readNode } from "./notes.ts";
+import { nodeLines, nodeStamp, noteOf, passEpoch, readNode } from "./notes.ts";
 
 /** THE SHARED SPINE, in ring order from the centre outward. Every wedge holds
  *  these whole, and nothing branches until the last of them.
@@ -130,7 +130,7 @@ function asList(v: unknown): string[] {
 }
 
 /** Every markdown file under the trace corpus, at any depth. ONE SUBFOLDER
- *  PER TYPE is the shape a person reads (owner, 2026-08-05); the loader does
+ *  PER TYPE is the shape a person reads (owner); the loader does
  *  not depend on it, so a flat file still loads and a new type needs no code. */
 function traceFiles(dir: string, depth = 0): string[] {
   if (depth > 4) return [];
@@ -210,6 +210,14 @@ export interface ItemTemplate {
   folder: string;
   /** see dsp-radial-layout.md#mechanical-checks-the-template-declares */
   checks: TemplateCheck[];
+  /** The fields a node MAY LEAVE OUT. This subtracts from the required list;
+   *  it never re-declares it. The skeleton still names every key and the mint
+   *  still offers them all.
+   *
+   *  A neighbour's `group` is the case that found it. That template says in as
+   *  many words that a person is never in a group, and the checker demanded
+   *  one from the engineer anyway. */
+  optional: string[];
 }
 
 /** One declared check. Exactly one of its rule keys is set.
@@ -299,12 +307,11 @@ export function itemTemplate(root: string, type: string): ItemTemplate | undefin
 }
 
 function buildItemTemplate(path: string, type: string): ItemTemplate | undefined {
-  let note: { frontmatter: Record<string, unknown>; body: string };
-  try {
-    note = parseStateNote(readFileSync(path, "utf8"));
-  } catch {
-    return undefined;
-  }
+  // THROUGH THE DOOR. A template is a note, and the door answers undefined for
+  // one that cannot be read — the same answer the try/catch was reaching for,
+  // without a second read of a file the pass is already holding.
+  const note = noteOf(path);
+  if (note === undefined) return undefined;
   const fence = /```skeleton\r?\n([\s\S]*?)```/.exec(note.body);
   const pairs = fence === null ? [] : [...(fence[1] ?? "").matchAll(/^([a-z_]+):[ \t]*(.*)$/gm)];
   return {
@@ -313,6 +320,7 @@ function buildItemTemplate(path: string, type: string): ItemTemplate | undefined
     fields: pairs.map((m) => m[1] ?? ""),
     defaults: Object.fromEntries(pairs.filter((m) => !(m[2] ?? "").includes("TODO")).map((m) => [m[1] ?? "", (m[2] ?? "").trim()])),
     sections: Array.isArray(note.frontmatter.sections) ? note.frontmatter.sections.map(String) : [],
+    optional: Array.isArray(note.frontmatter.optional) ? note.frontmatter.optional.map(String) : [],
     folder: typeof note.frontmatter.folder === "string" ? note.frontmatter.folder : "",
     checks: checkList(note.frontmatter.checks),
   };
@@ -403,6 +411,7 @@ export function conformance(root: string, node: TraceNode): string[] {
   const out: string[] = [];
   if (tpl.id_prefix !== "" && !node.id.startsWith(tpl.id_prefix)) out.push(`${node.id}: a ${tpl.type} id starts with ${tpl.id_prefix}`);
   const missing = tpl.fields.filter((k) => {
+    if (tpl.optional.includes(k)) return false;
     const s = fieldValue(tpl, note.frontmatter, k);
     return s.trim() === "" || s.includes("TODO");
   });
@@ -444,6 +453,22 @@ export function corpusAsks(): number {
   return CORPUS_ASKS;
 }
 
+/** HOW MANY TIMES THE ASK ACTUALLY COST SOMETHING, which is a different
+ *  question from how many times it was asked.
+ *
+ *  An ask served from the pass is a map lookup. An ask that reaches the sweep
+ *  below stats every file in the corpus to decide whether to rebuild, and that
+ *  is the 22 ms a warm ask pays. Sixty-four of those is the per-hop second.
+ *
+ *  SO THE COUNT WORTH GUARDING IS THIS ONE. `corpusAsks` cannot tell a cheap
+ *  ask from an expensive one, so a loop that asks sixty-four times looks the
+ *  same before and after it is fixed. */
+let CORPUS_SWEEPS = 0;
+
+export function corpusSweeps(): number {
+  return CORPUS_SWEEPS;
+}
+
 /** ONE FILE, READ ONCE UNTIL IT MOVES — the same rule as the corpus, one
  *  level down.
  *
@@ -463,15 +488,14 @@ export { nodeLines, noteOf, readNode };
 
 /** see dsp-trace-corpus.md#the-corpuss-version */
 function corpusStamp(files: string[]): string {
+  // THROUGH THE DOOR, which has already stat'd every one of these inside a pass.
+  // A raw stat per file paid that syscall a second time: 2,790 of them, every
+  // time a write moved the derived answers, four times a hop.
+  //
+  // THE CHECK IS UNCHANGED. The door's stamp is the same size-and-times string
+  // it compares before trusting a held file.
   const parts: string[] = [];
-  for (const f of files) {
-    try {
-      const s = statSync(f);
-      parts.push(`${f}:${s.size}:${s.mtimeMs}`);
-    } catch {
-      parts.push(`${f}:gone`);
-    }
-  }
+  for (const f of files) parts.push(`${f}:${nodeStamp(f)}`);
   return contentHash(parts.join("\n"));
 }
 
@@ -516,6 +540,7 @@ export function loadTrace(root: string): TraceNode[] {
   // lane write bumps the epoch, so a corpus built before it is never reused.
   const era = passEpoch();
   if (hit !== undefined && era !== 0 && hit.epoch === era) return hit.nodes.slice();
+  CORPUS_SWEEPS += 1;
   const files = traceFiles(traceDir(root));
   const stamp = corpusStamp(files);
   if (hit !== undefined && hit.stamp === stamp) {
@@ -574,11 +599,7 @@ export function visionText(root: string): string {
   };
   for (const r of roots) hunt(r, 0);
   if (found.length === 0) return "No vision is written down yet.";
-  try {
-    return parseStateNote(readFileSync(found[0], "utf8")).body.trim();
-  } catch {
-    return "No vision is written down yet.";
-  }
+  return noteOf(found[0])?.body.trim() ?? "No vision is written down yet.";
 }
 
 /** see dsp-radial-layout.md#no-layout-library */

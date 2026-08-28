@@ -41,11 +41,11 @@ specification_note: |
 
 ## Guidance
 
-THE BUSBAR SITS HERE, AND IT IS WHY (owner ruling 2026-08-08). This is an AND-join: the design space does not open until BOTH the partitioning and the criteria stand. Criteria written with the options already on the table can be chosen to suit a favourite. Options generated with no criteria fixed drift toward whatever is easy to score. The sources put weights at step 3 and variants at step 4 for the same reason ([[meth-eight-step-decision]]).
+THE BUSBAR SITS HERE, AND IT IS WHY. This is an AND-join: the design space does not open until BOTH the partitioning and the criteria stand. Criteria written with the options already on the table can be chosen to suit a favourite. Options generated with no criteria fixed drift toward whatever is easy to score. The sources put weights at step 3 and variants at step 4 for the same reason ([[meth-eight-step-decision]]).
 
 MORPHOLOGICAL ANALYSIS IS THE FRAME, NOT ONE METHOD AMONG THE OTHERS. The chart's rows are the function clusters and its cells are options, so every finder below is a way of FILLING CELLS ([[meth-morphological-analysis]]).
 
-THIS ROW IS A SUB-MACHINE STATE, AND CARRIES NO EVIDENCE OF ITS OWN (owner ruling 2026-08-08). A sub-machine IS a canvas. So the row names the drawing and takes its name from it. The work lives in the drawing's states, and each of those carries its own form.
+THIS ROW IS A SUB-MACHINE STATE, AND CARRIES NO EVIDENCE OF ITS OWN. A sub-machine IS a canvas. So the row names the drawing and takes its name from it. The work lives in the drawing's states, and each of those carries its own form.
 
 IT USED TO CARRY A CHART AND A SHORTLIST FIELD. Neither could ever be filled. The walk descends into the sub-machine on the way in, and completes this state on the way out. Its form is never served in either direction.
 

@@ -3,7 +3,7 @@ form: complexity-stays-out-of-the-ledger
 by: agent
 signed_off: 2026-08-20T20:25:19.322Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / complexity-stays-out-of-the-ledger

@@ -36,3 +36,55 @@ the accepted handover are never struck, at any size.
 A `comment` in a row's frontmatter is the owner's OPEN REVIEW CHANNEL. An agent may work a comment IN, and may not delete the field until
 the owner says the round is done. The first round's comments were consumed
 before this was written; git history holds them.
+
+## The ratings
+
+EVERY ACTIVE CELL CARRIES A COMPLEXITY. 182 of them, written 2026-08-28.
+
+THAT SENTENCE IS THE SWITCH. `rigor-matrix.ts` reads this file for it, and
+once it is here a cell that applies and declares no complexity refuses at
+load. Saying it and making it binding is one act rather than two that can
+disagree.
+
+### What is rated and what is not
+
+- A CHANGE-SIZE COLUMN owes a rating: `patch`, `minor`, `major`, `product`.
+- `specification` owes none. It says how the row is DOCUMENTED, not how hard
+  it is to walk.
+- A CELL THAT DOES NOT APPLY owes none. 58 cells read `none`.
+- A ROW THAT RUNS A SUB-MACHINE owes none, because the work happens in the
+  states below it. Five rows: `enumerate-space`, `run-candidates`,
+  `run-spikes`, `build-steps`, `run-demos`. A row that SEEDS one still owes a
+  rating, because seeding is real work.
+
+### How they were arrived at, and where the judgement is thin
+
+FOUR HANDS RATED EACH ROW ONCE, against its full shape, each with a written
+reason. That is 63 judgements.
+
+THE ROW'S PAIR THEN WENT ONTO EVERY COLUMN THAT APPLIES. The per-column spread
+was not judged cell by cell, so a `tailored` cell carries its `full` sibling's
+rating.
+
+THAT OVER-DRIVES THE TAILORED CELLS, ON PURPOSE. `sizing.ts` states the
+asymmetry the whole ladder rests on: under-driving produces a plausible wrong
+answer that passes, over-driving only costs money. A tailored cell carrying a
+rating that is too strong errs in the cheap direction. Any guess in the other
+direction would not.
+
+SO THESE ARE A FLOOR RATHER THAN AN ANSWER at the small end, and lowering one
+is a real judgement somebody still has to make.
+
+### Two rows were rated per column by hand
+
+They were rated because an open register entry named them as its own test:
+`raid-asm-a-state-is-equally-hard-at-every-change-size`.
+
+- `write-requirements` is `C2/R1` at patch against `C3/R4` at major. Patch is
+  clarification only, where the diff decides for you.
+- `draft-vision` is `C3/R2` at minor, `C3/R3` at major, `C4/R3` at product.
+
+THE SECOND ONE IS WHY THE PAIR IS A PAIR. Judgement held still at C3 while
+reading moved from R2 to R3. One field against four changed how much had to be
+held and did not change how hard the call was. A single collapsed figure could
+not have said that.

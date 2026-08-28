@@ -13,9 +13,11 @@ the mechanism, not the surface.
 smells like something with a famous solution elsewhere.
 
 **Steps.**
-1. Abstract the problem one level: not "archive rendering" but "showing
+1. Abstract the problem one level: #work
+
+   not "archive rendering" but "showing
    a large history without drowning the reader".
-2. Name EVERY domain that faces the abstract problem.
+2. Name EVERY domain that faces the abstract problem. #work
    - libraries
    - air traffic
    - forestry
@@ -23,11 +25,13 @@ smells like something with a famous solution elsewhere.
    - logistics
    - epidemiology
    - finance
-3. Describe each domain's mechanism in ITS terms, honestly.
-4. Transfer: what is the mechanism's equivalent here? What breaks in
+3. Describe each domain's mechanism in ITS terms, honestly. #work
+4. Transfer: #work
+
+   what is the mechanism's equivalent here? What breaks in
    translation?
 
-## NAME MANY DOMAINS, NOT THREE
+## NAME MANY DOMAINS, NOT THREE #work
 
 This card said "name three domains", and three was never the method. It was
 the number one person could speak to.
@@ -37,7 +41,7 @@ the thing that moved. Name the domains that genuinely face the abstract
 problem, then say which ones you could not describe honestly — an admitted
 gap beats a confident paragraph about a field nobody knows.
 
-## NATURE IS A DOMAIN, AND IT HAS ITS OWN NAME
+## NATURE IS A DOMAIN, AND IT HAS ITS OWN NAME #work
 
 BIOMIMETIC DESIGN IS THIS METHOD with biology as the source. It is named
 separately in the current literature — iDesignGPT (Nature Communications,

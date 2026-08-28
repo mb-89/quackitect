@@ -5,8 +5,8 @@ type: "[[option]]"
 cluster: cluster-the-benchmark-run
 question: how the walked iteration's future is put out of reach
 found_by: heuristic
-statement: "The past state is served from a source that has no future in it, so a request for a newer commit cannot be formed rather than being formed and refused."
-source: "HEURISTIC \u2014 make the illegal unrepresentable, not merely checked"
+statement: The past state is served from a source that has no future in it, so a request for a newer commit cannot be formed rather than being formed and refused.
+source: HEURISTIC — make the illegal unrepresentable, not merely checked
 ---
 
 ## What it changes

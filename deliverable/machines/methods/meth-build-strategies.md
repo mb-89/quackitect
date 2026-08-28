@@ -12,7 +12,7 @@ choices — a good plan usually shows two at once (owner ruling
 2026-08-11). Record in the plan which lenses shaped the order, so a
 reviewer can judge the order and not only the pieces.
 
-## Spine first (walking skeleton)
+## Spine first (walking skeleton) #work
 
 - The thinnest end-to-end slice that exercises every seam, then flesh
   in increments.
@@ -22,7 +22,7 @@ reviewer can judge the order and not only the pieces.
 - Misleads when one part carries the real risk: a skeleton around an
   infeasible core is scaffolding around nothing.
 
-## Risk first (breakthrough early — make it run, then make it right)
+## Risk first (breakthrough early — make it run, then make it right) #work
 
 - The riskiest or most-doubted piece first, while the budget to react
   still exists.
@@ -33,7 +33,7 @@ reviewer can judge the order and not only the pieces.
 - Misleads when risk is spread evenly: then the spine finds it
   cheaper.
 
-## Parallel flow (integrated flow management)
+## Parallel flow (integrated flow management) #work
 
 - Split the build into LOTS — strands of chunks that run in parallel.
 - Shape the dependencies so a later lot leans on ideally ONE earlier
@@ -51,7 +51,7 @@ reviewer can judge the order and not only the pieces.
 - Misleads when the work is one deep chain — forcing width onto a
   chain only adds seams.
 
-## The checklist against the order
+## The checklist against the order #work
 
 - Let the classic integration strategies check it: bottom-up,
   top-down, feature-driven, big-bang. Big-bang is almost always the
@@ -73,3 +73,17 @@ reviewer can judge the order and not only the pieces.
   lot, parallelize). The owner recalls the course taught it on an
   airport build; the slide itself is in SyA_Business.pdf, not
   text-searchable — primary not seen.
+
+## RE-READ THE RECORD'S OWN DESIGN INPUT BEFORE THE FIRST EDIT
+
+EVERY BUILDING STEP, not only the first one. The design input is what the round
+decided; anything you are holding from an earlier step is a memory of it.
+
+WHAT IT COSTS TO SKIP, measured on one round: a surface was built three times
+from memory, and each version was wrong in a different way.
+
+THE MECHANISM IS HALF THERE. A position can already demand a document on entry
+and prove it was read, so no new machinery is needed — what is not settled is
+how a position names a document that belongs to whichever record is open, since
+the path is different every time. Until that is answered, this is a rule the
+builder follows rather than one the engine holds.

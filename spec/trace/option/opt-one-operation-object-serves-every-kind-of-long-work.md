@@ -5,7 +5,7 @@ type: "[[option]]"
 statement: every method that may run long returns the same operation object, and one shared service answers about all of them, so no caller ever learns a second door
 cluster: cluster-the-telling
 found_by: prior-art
-source: "Google AIP-151, Long-running operations, state Approved, read at https://google.aip.dev/151 on 2026-08-21"
+source: Google AIP-151, Long-running operations, state Approved, read at https://google.aip.dev/151 on 2026-08-21
 ---
 
 ## Mechanism

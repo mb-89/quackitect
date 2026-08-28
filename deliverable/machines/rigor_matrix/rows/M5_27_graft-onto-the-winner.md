@@ -1,7 +1,7 @@
 ---
 kind: matrix-row
 name: graft-onto-the-winner
-statement: "Take what each loser does better, try it on the winner one at a time, and re-score whatever moved."
+statement: Take what each loser does better, try it on the winner one at a time, and re-score whatever moved.
 state_kind: work
 filled_by: agent
 depends_on:
@@ -51,7 +51,7 @@ evidence:
       scope are legal reasons; "the winner is fine" is not.
 
       A GRAFT CANNOT COST THE WINNER THE SEAT, and this state does not
-      pretend otherwise (owner ruling 2026-08-19). One that costs more
+      pretend otherwise. One that costs more
       than it buys is `incompatible` and never adopted, so the winner's
       scores only ever move up. The question of whether a RIVAL could
       overtake was already asked at [[reverse-sensitivity]], before the
@@ -93,7 +93,7 @@ evidence:
     guidance: |
       THE RE-SCORE IS NOT A GUARD ON THE OUTCOME. The winner cannot lose
       here, and saying the re-score protects against that would be a
-      justification that does not survive one question (owner, 2026-08-19).
+      justification that does not survive one question.
 
       IT IS A GUARD ON THE NUMBER. "We grafted it and now we score a 4"
       is a claim, made by the hand that did the grafting, and it travels
@@ -116,9 +116,11 @@ evidence:
       NO ROWS IS A LEGAL ANSWER. Every graft rejected or incompatible means
       nothing moved, and the table says `none`.
 major: full
+major_complexity: C3/R3
 minor: none
 patch: none
 product: full
+product_complexity: C3/R3
 specification: full
 major_note: |
   Applies in full: every axis a loser won gets asked, and every adopted
@@ -166,7 +168,7 @@ features onto it that make it better."
 IT IS NOT FOR PROTECTING THE OUTCOME. A graft only lands if it improves the
 winner, so the winner's scores only move up and the seat cannot change hands
 here. That was this state's first justification and it did not survive being
-asked about (owner, 2026-08-19).
+asked about.
 
 THE RIVAL QUESTION IS ASKED EARLIER. [[reverse-sensitivity]] now grafts the
 leader's strengths onto each rival and asks whether any overtakes, before the

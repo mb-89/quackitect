@@ -8,7 +8,7 @@ statement: "Probing an assumption: check the real channel, record what came back
 Guidance for M3 probe-assumptions. This is the one card the step draws from.
 Finding them is [[meth-assumption-hunting]]; the node is [[raid]].
 
-## PROBE ALL OF THEM, NOT THE ONES YOU JUST WROTE
+## PROBE ALL OF THEM, NOT THE ONES YOU JUST WROTE #work
 
 This state's input is the RAID FOLDER, not the form above it. Every standing
 assumption is probed, whenever it was recorded.
@@ -19,7 +19,7 @@ just identified", and an assumption written in i1 is never looked at again —
 which is exactly when it is most likely to have gone stale, because the world
 moved and nobody checked.
 
-## WHAT A PROBE IS
+## WHAT A PROBE IS #work
 
 ONE PROBE SETTLES WHAT A DATASHEET CLAIMS. Check the real channel: what the
 harness actually loads, what the API actually returns, what the command
@@ -32,7 +32,7 @@ actually exits with, what the platform actually does.
 - THE CHEAPEST REAL CHECK WINS. A probe is minutes, not a spike.
   - If it needs a spike, that is M6's work and the entry says so.
 
-## THE FOUR OUTCOMES
+## THE FOUR OUTCOMES #work
 
 | outcome | what it means | what happens to the entry |
 | --- | --- | --- |
@@ -45,7 +45,7 @@ NAMING A GAP DOES NOT CLOSE IT. "Unprobed" is a legal outcome and it needs its
 reason. What is not legal is listing an unprobed assumption and calling the
 state done without saying why no check exists.
 
-## WHEN ONE TURNS OUT FALSE
+## WHEN ONE TURNS OUT FALSE #work
 
 It becomes an ISSUE, not a risk. It has already happened. Keep the id, change
 the kind, and say in the body what broke and what now rests on nothing.
@@ -55,7 +55,7 @@ resting on something known false. Name those items in the state's follow-up.
 That is the whole payoff of the register being addressable — a table row could
 not be pointed at, so nothing could be traced back from it.
 
-## A PROBE RESULT DECAYS
+## A PROBE RESULT DECAYS #work
 
 An assumption probed green in i1 is not thereby green in i7. Stamp the
 `probed` date on every probe. Nothing enforces a re-probe interval today; the

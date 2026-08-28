@@ -3,11 +3,11 @@ minted_in: i38-the-machine-sizes-its-own-driver-every-s
 id: raid-iss-the-i38-seed-counts-a-matrix-that-has-since-moved
 type: "[[raid]]"
 kind: issue
-statement: "Every measured figure in the i38 seed was taken against the matrix as it stood before i9 added a row, so the state count, the evidence-field count, the drawn-field count and the front-half claim are all one sweep out of date."
+statement: Every measured figure in the i38 seed was taken against the matrix as it stood before i9 added a row, so the state count, the evidence-field count, the drawn-field count and the front-half claim are all one sweep out of date.
 owner: the walking agent
-trigger: "any state that rates, counts or sweeps the matrix, and the first reader who takes 52 or 86 as the denominator of a measurement"
+trigger: any state that rates, counts or sweeps the matrix, and the first reader who takes 52 or 86 as the denominator of a measurement
 status: open
-impact: "A rating pass driven by the seed's figures leaves one state unrated and reports coverage over a denominator three too small. The warning about the test going red is already spent, so a state may also spend effort answering a problem that does not exist."
+impact: A rating pass driven by the seed's figures leaves one state unrated and reports coverage over a denominator three too small. The warning about the test going red is already spent, so a state may also spend effort answering a problem that does not exist.
 breaks_how_badly: corrosive
 how_likely: expected
 probe: "MEASURED AT THE i38 KICKOFF GATE, 2026-08-20. deliverable/machines/rigor_matrix/rows/ holds 53 row files by an exhaustive, untruncated glob. tests/rigor-matrix.test.ts:68 asserts m.rows.length === 53, and the comment at :66 dates it — 53 since 2026-08-19, M5_27 graft-onto-the-winner, added by i9. Evidence-field declarations across the rows number 89, spread over 43 of the 53 rows. The drawn-field split was re-derived by a reviewer with no shared context and is 25 of 89, not 23 of 86 — the two extra drawn fields are graft-onto-the-winner's own, the same i9 row that moved the count. The seed's claim that M0 through M3 hold ONE drawn field between them is also wrong: there are three (onboard-retro notes_drained, gate-kickoff retro_drained, probe-assumptions probes). A third stale count stands outside the record, in guidance/method/tour.md:70, which says 50 rows."
@@ -16,6 +16,7 @@ source_refs:
   - i38-the-machine-sizes-its-own-driver-every-s
 weighs_with: none
 weighs_against: none
+place: overhaul
 ---
 
 ## The three figures

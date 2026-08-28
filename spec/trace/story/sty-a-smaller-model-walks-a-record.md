@@ -35,6 +35,26 @@ MEASURED, first run: the gate signed. Then every pull answered with the same for
 
 ---
 
+IT IS NOT HANDED EVERY PIECE OF WORK. Each work token carries how hard it is,
+and a cheap hand is given the ones it can carry. The harder ones wait for a
+stronger hand rather than being attempted badly.
+|||
+Added by i63. Difficulty stops being an estimate and becomes a routing key: it
+says which strength of hand takes the work, which is the one idea in this
+design that no surveyed system covers, because human teams never routed work
+to less capable people out loud.
+
+---
+
+It meets one that is beyond it. It does not guess. It raises the difficulty on
+that work token and leaves it for a stronger hand, and the raise is a recorded
+act rather than a silent skip.
+|||
+EMPTY UNTIL M8. The honest limit is in the register: the hand least able to
+notice it is out of its depth is the hand asked to notice.
+
+---
+
 It walks on into the milestone, and the states below sign one after another.
 |||
 THIS IS THE SLIDE THAT DOES NOT FILL YET. On the first run the walk ended at the gate. What the record shows is boot, a routing, and one gate.

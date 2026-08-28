@@ -2,9 +2,9 @@
 form: fold-back
 by: agent
 signed_off: 2026-08-20T19:35:01.369Z
-reopened: "2026-08-20T19:34:59.493Z — one paragraph in this form still says the iteration ships a machine that hands its driver to nobody, and the paragraph above it now says the opposite."
+reopened: 2026-08-20T19:34:59.493Z — one paragraph in this form still says the iteration ships a machine that hands its driver to nobody, and the paragraph above it now says the opposite.
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / fold-back

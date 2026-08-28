@@ -20,7 +20,7 @@ the autonomy rungs above the resting one. You do not jump to `blockers only`.
 ## Why it exists
 
 THE STOP HOOK READS THE WALK'S POSITION AND CANNOT SEE THE REASON. So a stop
-the contract REQUIRES looks exactly like an overcautious one, and on 2026-08-16
+the contract REQUIRES looks exactly like an overcautious one, and
 the hook overrode a rule-9 stop five times — the agent had correctly refused to
 open an iteration unasked, said so, and was pushed past it anyway.
 
@@ -58,8 +58,12 @@ where a person's thumb is owed anyway, so the stop costs nothing extra.
 
 `blockers only` IS FOR AN UNATTENDED RUN, and it is the dangerous one in the
 same way ideation is dangerous on the autonomy dial: nothing brings the person
-back until the machine cannot continue. It is the setting an overnight run
-wants and cannot have today.
+back until the machine cannot continue.
+
+IT WORKS NOW. This paragraph used to end "the setting an overnight run wants and
+cannot have today", and that was true for as long as the notch never reached the
+stop hook. It reaches it: the pull's answer carries `stop_at`, and the hook reads
+it off the last pull.
 
 ## The notch and the dial answer different questions
 
@@ -74,9 +78,25 @@ work this out has spent calls on a question the engine answers. Send the
 bless. Either it lands, or the refusal tells you it is the person's — and the
 refusal is the authority, not a reading of the contract.
 
-WHAT THE NOTCH BINDS instead is the agent's own discipline. Only `state end`
-is held by the engine; at `bless` and above nothing stops a pull, and the
-agent stopping where the notch says is the whole mechanism.
+## What holds each notch, and it is not one mechanism
+
+TWO DIFFERENT THINGS ENFORCE THIS SCALE, and confusing them is why the loose
+notches did nothing for a long time.
+
+- `state end` IS HELD BY THE ENGINE. It refuses the transition itself, and the
+  person's press stops it refusing.
+- `bless` AND `blockers only` ARE HELD BY THE STOP HOOK. Nothing stops a pull at
+  those notches. What is stopped is the agent ENDING ITS TURN: the hook reads
+  the notch off the last pull and blocks a stop the notch does not sanction.
+
+EACH LOOSE NOTCH SAYS WHAT IT WANTED, in the refusal itself. At `bless` the hook
+says no gate is owed here; at `blockers only` it says the last pull was not
+refused. The reader is never left to infer it from a setting they may not have
+looked at.
+
+THE NOTCH RIDES THE PULL'S ANSWER as `stop_at`. Before that it did not, and the
+hook fell back to one fixed rule whatever the person had set — measured at 338
+pulls in a row carrying no notch at all.
 
 ## The press grants permission and never advances
 

@@ -39,9 +39,16 @@ satisfies:
   - req-a-fallback-fires-when-its-condition-fails
   - req-refusal-carries-remedy
   - req-call-answers-in-one-second
+  - req-aiming-returns-before-the-walking-starts
+  - req-a-hop-of-the-walk-carries-its-own-time-budget
+  - req-a-target-that-cannot-be-reached-is-refused-quickly
   - req-one-operation-reads-its-input-once
   - req-a-served-instruction-names-the-next-act
   - req-oversized-results-remain-recoverable-through-the-lane
+  - req-session-serves-only-applicable-guidance
+  - req-zero-worker-ceiling-satisfies-spawn-state
+  - req-state-entry-delivers-its-required-form
+  - req-blockers-only-stops-only-at-a-blocker
 inputs:
   - flow-position
   - flow-compiled-machine
@@ -77,3 +84,17 @@ SO DOES THE RULE ABOUT HOW IT READS ITS INPUT. Serving a step reads the
 corpus, and it used to read it once per part rather than once per call. That
 is the same critical path and the same argument: a bound on the answer means
 nothing while the cost multiplies by how many times the work asks.
+
+AND SO DO THREE MORE, ADDED WITHOUT SPLITTING ANYTHING. Pointing the walk,
+walking one hop, and failing to find a route are all this function doing its
+one job, seen at three different grains.
+
+- THE BOUND ON A CALL was here already and measures the whole answer.
+- THE BOUND ON A HOP is finer, and a call may hold many hops, so the first
+  can hold while the second breaks.
+- THE BOUND ON A FAILED SEARCH is the same act reporting that it found
+  nothing, and it must not cost more than reporting that it found something.
+
+NONE OF THEM IS A NEW FUNCTION. Each is a property of this one, at a grain the
+older rows did not reach. A new function here would say the architecture had
+moved, and it has not.

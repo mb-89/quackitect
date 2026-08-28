@@ -17,10 +17,20 @@ const SE = mkdtempSync(join(tmpdir(), "se-bound-"));
 /** An answer far past the bound, shaped like the scenario deck that caused it. */
 const oversized = (): unknown => ({ rows: Array.from({ length: 20_000 }, (_, i) => `row ${i} of a scenario deck`) });
 
+// THE BOUND BELONGS TO THE MACHINE IT RUNS ON (owner ruling). A box that cuts
+// at twenty thousand should cut there, and one that carries fifty thousand
+// should carry fifty thousand. The figure below is the STARTING POINT for a
+// machine nobody has climbed a ladder on, not a ceiling for everybody.
+//
+// THE TRADEOFF, STATED RATHER THAN HIDDEN. This assertion used to demand 6,000
+// or less, because one host was seen offloading at 8 KB. An unmeasured host
+// that behaves that way will now offload until somebody measures it, and the
+// ladder in guidance/method/boot.md is the answer: a host writing an answer to
+// disk is the trigger to climb, once.
 test("the engine declares a bound for an answer", () => {
   assert.equal(typeof ANSWER_BOUND_BYTES, "number");
   assert.equal(ANSWER_BOUND_BYTES > 0, true, "a bound of zero would send nothing at all");
-  assert.equal(ANSWER_BOUND_BYTES <= 6_000, true, "the bound must beat the 8 KB host offload observed in i36");
+  assert.equal(ANSWER_BOUND_BYTES, 20_000, "the starting point for a machine nobody has measured");
 });
 
 test("an answer within the bound is returned whole", () => {
@@ -152,15 +162,17 @@ test("the suggested spill page keeps a read's own answer inside the bound", asyn
   const { SPILL_PAGE_CHARS } = await import("../engine/bound.ts");
   const { fileRead } = await import("../engine/files.ts");
 
-  // DERIVED, AND SIZED SO THE WORST CASE STILL FITS. A page of P costs at most
-  // 2P once escaped, because a spill file is JSON text and the densest thing
-  // left in it is backslash and quote. So 2P plus the envelope must clear the
-  // bound, and this asserts the derivation rather than a number.
+  // THE PAGE IS SIZED ON THE MEASURED COST, NOT THE WORST CASE.
+  // Sizing on 2 made the page less than half of what fits, so every reading
+  // loop paid about twice the calls it needed — boot's four documents cost
+  // about 29 page reads instead of about 14.
+  //
+  // WHAT MAKES THE OPTIMISM SAFE is not a bigger margin. characterRead
+  // serialises its own answer and shrinks the slice until it fits, reporting
+  // what actually came back in char_range.to. The cases below are the proof:
+  // they push the densest real shapes through fileRead and check the answer
+  // stayed inside the bound.
   assert.ok(SPILL_PAGE_CHARS < ANSWER_BOUND_BYTES, "the page cannot exceed the bound it is derived from");
-  assert.ok(
-    SPILL_PAGE_CHARS * 2 + 200 <= ANSWER_BOUND_BYTES,
-    `a page of ${SPILL_PAGE_CHARS} could serialise to ${SPILL_PAGE_CHARS * 2} in the worst case, which would spill again`,
-  );
 
   const root = mkdtempSync(join(tmpdir(), "spill-page-"));
   // Two shapes that really spill: quote-dense records, and long source lines.
@@ -188,4 +200,27 @@ test("the suggested spill page keeps a read's own answer inside the bound", asyn
     );
   }
   rmSync(root, { recursive: true, force: true });
+});
+
+test("the cap probe records into the machine-state folder, not beside it", () => {
+  // MEASURED. The handler passed `rootOf(".se")` — the PROJECT ROOT —
+  // to a pair of functions whose parameter is the `.se` folder itself. The probe
+  // answered `recorded: 38000`, the file landed untracked at the top of the
+  // repository, and the bound never moved.
+  //
+  // A MEASUREMENT THAT REPORTS SUCCESS AND CHANGES NOTHING is the worst shape a
+  // bug can take, because the agent stops looking. Nothing else in the engine
+  // would have caught it: both sides of the read/write pair agree with each
+  // other, so only the call site is wrong.
+  const src = readFileSync(new URL("../engine/tools-run.ts", import.meta.url), "utf8");
+  const start = src.indexOf('name: "se_probe_cap"');
+  assert.ok(start > 0, "se_probe_cap is still a tool");
+  const block = src.slice(start, src.indexOf('name: "se_run"', start));
+  const folder = /const (\w+) = seDir\(/.exec(block);
+  assert.ok(folder, "the probe derives the machine-state folder with seDir");
+  for (const verb of ["recordHostCap", "hostCapState"]) {
+    const call = new RegExp(`${verb}\\((\\w+)`).exec(block);
+    assert.ok(call, `se_probe_cap still calls ${verb}`);
+    assert.equal(call[1], folder[1], `${verb} must be handed the machine-state folder, and it got ${call[1]}`);
+  }
 });

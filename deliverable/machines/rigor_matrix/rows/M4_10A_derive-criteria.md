@@ -5,7 +5,7 @@ statement: "The criteria fall out of the register: pairwise judgments in, the we
 state_kind: work
 filled_by: agent
 depends_on:
-  - gate-requirements
+  - spawn-for-candidates
 entry_read:
   - deliverable/machines/methods/meth-derive-criteria.md
 legal_tools:
@@ -56,9 +56,11 @@ evidence:
 
       The weight is arithmetic over these judgments. Never type a weight.
 major: full
+major_complexity: C2/R3
 minor: none
 patch: none
 product: full
+product_complexity: C2/R3
 specification: full
 major_note: |
   Applies in full - this is major's own territory. The vital few, weighted,

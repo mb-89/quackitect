@@ -4,7 +4,7 @@ by: agent
 signed_off: 2026-08-20T19:06:31.056Z
 reopened: "2026-08-20T19:05:46.938Z — gate-motivation was re-signed on a widened value proposition, and the owner corrected this state's own account of the two parties. This form said the guide never touches the lane and every lane call is the walker's. That is not the arrangement the owner wants: either hand may work the lane, and where the walker relays a guide's work it is recorded as the guide's."
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / draw-context

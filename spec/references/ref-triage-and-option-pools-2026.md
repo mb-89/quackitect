@@ -1,7 +1,7 @@
 ---
 id: ref-triage-and-option-pools-2026
 kind: reference
-statement: How shipping products actually run a triage stage and an option pool - Linear Triage and GitHub Projects draft issues, scanned live because i17 fixes a shape against them.
+statement: How shipping products actually run a triage stage and an option pool. Linear Triage and GitHub Projects draft issues, scanned live because i17 fixes a shape against them.
 scanned: 2026-08-18
 scanned_at: i17/draft-vision
 ---
@@ -38,9 +38,9 @@ THREE THINGS THEY HAVE THAT WE DO NOT.
 - DUPLICATE MERGE. Two captures of one idea become one item, and the merge
   carries the attachments across. We have no way to say "this note is that
   note", so a second capture of the same thing is drained twice.
-- SNOOZE WAKES BY ITSELF. It returns at a chosen time or on new activity. Our
-  `where: ready when ...` is a sentence a human re-reads at a retro. Nothing
-  wakes it, and the migration step exists because nothing does.
+- SNOOZE WAKES BY ITSELF, returning at a chosen time or on new activity.
+  - Our `where: ready when ...` is a sentence somebody re-reads at a retro.
+  - Nothing wakes it, and the migration step exists because nothing does.
 - TRIAGE RULES AND TRIAGE RESPONSIBILITY. Rules act on an item as it arrives -
   routing, labelling, assigning - so a person does not touch every one.
   Responsibility puts a rotating named owner on the queue. Both are answers to

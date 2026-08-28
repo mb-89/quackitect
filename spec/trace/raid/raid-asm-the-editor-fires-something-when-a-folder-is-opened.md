@@ -3,19 +3,19 @@ minted_in: i9
 type: "[[raid]]"
 id: raid-asm-the-editor-fires-something-when-a-folder-is-opened
 kind: assumption
-statement: "The editor is assumed to run our code when a folder is opened, on its own, reliably, and early enough that the person never waits for a lane that has not been asked for yet."
+statement: The editor is assumed to run our code when a folder is opened, on its own, reliably, and early enough that the person never waits for a lane that has not been asked for yet.
 owner: the driving agent
-trigger: "before the entry-point row is designed, and again on any editor version that changes how extensions start"
+trigger: before the entry-point row is designed, and again on any editor version that changes how extensions start
 status: probed
 probe: "holds in part, and the failing half is the useful one. The extension manifest declares exactly one activation event, onStartupFinished, which is deferred by design and blind to which folder is open. So our code does wake with no act from the person, which is the half the entry-point goal rests on. But it wakes in every window on every folder, including folders that are not projects of this system, which the owner ruled on 2026-08-19 is FINE, provided a folder carrying no machine state is identified and then left completely alone. So the finding is smaller and sharper than first written. What is now unprobed is whether the extension performs that check today and writes nothing when it fails - the manifest settles what WAKES it and says nothing about what it does next. Still owed: opening a folder four ways and watching both when we wake and what we touch."
 probed: 2026-08-19
-impact: "The row that makes the launcher a one-time act rests entirely on this. If the editor will not start us without the person acting, then either the person runs something on every start, which is what this iteration exists to remove, or something outside the editor watches folders, which is a much larger design."
+impact: The row that makes the launcher a one-time act rests entirely on this. If the editor will not start us without the person acting, then either the person runs something on every start, which is what this iteration exists to remove, or something outside the editor watches folders, which is a much larger design.
 breaks_how_badly: crippling
 how_likely: plausible
 source_refs:
   - req-the-editor-is-the-only-entry-point
-  - "the editor's own documented activation events, which include a form that fires when an opened folder contains a file matching a pattern"
-  - "the same documentation on tasks that run on folder open, which is gated both by a setting and by workspace trust"
+  - the editor's own documented activation events, which include a form that fires when an opened folder contains a file matching a pattern
+  - the same documentation on tasks that run on folder open, which is gated both by a setting and by workspace trust
 ---
 
 ## What is being assumed

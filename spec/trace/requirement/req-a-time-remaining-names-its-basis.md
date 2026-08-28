@@ -6,7 +6,7 @@ statement: When the product reports how much longer a piece of work needs, it sh
 kind: functional
 verify_method: test
 measure: "reported durations carrying no named basis: zero. Entries reporting a figure on a machine with no prior measurement for that kind of work: zero."
-breaks_if_removed: "A figure with nothing behind it reads exactly like a measured one, so a caller waits on a number nobody computed and is worse off than with no answer at all."
+breaks_if_removed: A figure with nothing behind it reads exactly like a measured one, so a caller waits on a number nobody computed and is worse off than with no answer at all.
 breaks_how_badly: corrosive
 priority: must
 refines:

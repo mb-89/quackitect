@@ -32,9 +32,8 @@ function renderLog() {
   const fEl = document.getElementById("log-filter");
   const f = fEl ? fEl.value.toLowerCase() : "";
   const rows = LOG_ROWS.filter((r) => !f || (r.ts + " " + r.src + " " + r.type + " " + r.brief + " " + (r.clause || "")).toLowerCase().includes(f));
-  // NEWEST ON TOP (owner ruling): the feed reads downward into the past;
+  // NEWEST ON TOP: the feed reads downward into the past;
   // the scroll pins to the top while the reader is there.
-  const stick = logPanel.scrollTop < 40;
   const html = rows.slice().reverse().map((r) =>
     '<div class="logrow ' + r.type + (r.ok ? "" : " failed") + '" data-ref="' + r.ref + '">' +
       '<span class="lt">' + (r.pending ? r.ts.slice(5, 10) : r.ts.slice(11, 19)) + "</span>" +
@@ -49,10 +48,9 @@ function renderLog() {
   // as the details pane, on a surface that repaints far more often.
   if (html === LOG_HTML) return;
   LOG_HTML = html;
-  const top = logPanel.scrollTop;
-  logPanel.innerHTML = html;
-  // Sticking to the top is the reader's place TOO, when that is where they are.
-  logPanel.scrollTop = stick ? 0 : top;
+  // Sticking to the top is the reader's place TOO, when that is where they are,
+  // and sePlaceKeepScroll is the one decider for both cases.
+  sePlaceKeepScroll(logPanel, () => { logPanel.innerHTML = html; }, { stickWithin: 40 });
 }
 async function refreshLog() {
   if (!logPanel) return;
@@ -113,11 +111,7 @@ async function openLogDetail(ref) {
   }
   showDetails("log · " + (rec.tool || ref), jsonTable({ at: rec.ts, request: { tool: rec.tool, args: rec.args }, response: rec.response === undefined ? null : rec.response, duration_ms: rec.duration_ms }));
 }
-async function showDecisions(visit, sel) {
-  const r = await fetch("/api/decisions?visit=" + encodeURIComponent(visit));
-  DECISION_GRAPH = await r.json();
-  renderDecisions(sel);
-}
+
 function decisionsHtml(sel) {
   const g = DECISION_GRAPH;
   if (!g) return "";
@@ -169,13 +163,6 @@ async function showUpdateDetail(rec) {
   if (refused) rows.why = (res.expected ? String(res.expected) : "") + (res.got ? " — got " + String(res.got) : "") || "the narration was refused; the call it rode on still landed";
   rows.at_time = rec.ts;
   let html = '<div class="dinfo">' + jsonTable(rows) + "</div>";
-  if (a.visit) {
-    try {
-      const r = await fetch("/api/decisions?visit=" + encodeURIComponent(a.visit));
-      DECISION_GRAPH = await r.json();
-      html += decisionsHtml(a.node || res.active || null);
-    } catch (e) { html += '<div class="meta">the checklist could not be read: ' + escText(String((e && e.message) || e)) + "</div>"; }
-  }
   showDetails("update · " + rows.op + (a.node ? " " + a.node : ""), html);
 }
 // see dsp-mirror-render.md#the-loading-bar-owns-its-lifetime

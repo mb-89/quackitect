@@ -12,6 +12,8 @@ breaks_how_badly: crippling
 how_likely: plausible
 source_refs:
   - sty-work-on-two-machines
+place: backlog
+ready_when: ready when a building milestone pulls hygiene work
 ---
 
 Observed 2026-08-12 in the fresh-eyes claim-lane demonstration

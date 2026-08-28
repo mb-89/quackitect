@@ -5,6 +5,7 @@ type: "[[function]]"
 cluster: the-account
 statement: record every act and every claim so the reasoning can be reconstructed without asking anybody
 satisfies:
+  - req-work-records-when-it-opened-and-when-it-closed
   - req-a-records-own-status-decides-whether-it-is-open
   - req-every-call-logged
   - req-acts-carry-role-and-channel
@@ -28,6 +29,7 @@ satisfies:
   - req-vendor-page-claim-only
   - req-missing-provider-named
   - req-no-agent-act-destroys-work
+  - req-registering-a-spawned-hand-is-accepted-wherever-the-walk-stands
 inputs:
   - flow-resolved-target
   - flow-dispatched-call
@@ -77,3 +79,16 @@ sources came with it.
 
 Nothing here decides anything. It records, and it derives views over what it
 recorded. That is what keeps it allocatable on its own at M4.
+
+## Addition — work tokens
+
+TWO STAMPS PER OBLIGATION. When it opened and when it reached a terminal
+status. The exit rule makes a position as slow as its slowest work token, so
+anybody measuring position time has to read it that way, and without the
+stamps there is nothing to read.
+
+AND A SILENCE IN A DRAWING IS ANSWERED HERE. Where the design needs something
+the owner's drawing does not give, the answer is recorded beside the drawing
+before any design step rests on it. An answer given in conversation and
+written nowhere leaves the question open, which is the divergent-copy failure
+this system already hunts.

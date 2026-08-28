@@ -7,14 +7,15 @@ statement: A job asked how much longer it needs can answer from work already rec
 owner: the driving agent
 trigger: the first time a job is asked for a time remaining on a machine that has never run it
 status: open
-probed: "2026-08-21, and it is FALSE. Both timing records were absent on this fresh container and the product said so rather than guessing. The kind is now issue, because it has already happened."
-probe: "Start a battery on a container with no recorded timings and ask it how much longer it needs. Read what the answer says."
-impact: "The estimate is the whole point of the first goal. Where no history exists the arithmetic has no inputs, so the answer is either absent or invented, and an invented one is worse than none."
+probed: 2026-08-21, and it is FALSE. Both timing records were absent on this fresh container and the product said so rather than guessing. The kind is now issue, because it has already happened.
+probe: Start a battery on a container with no recorded timings and ask it how much longer it needs. Read what the answer says.
+impact: The estimate is the whole point of the first goal. Where no history exists the arithmetic has no inputs, so the answer is either absent or invented, and an invented one is worse than none.
 breaks_how_badly: corrosive
 how_likely: expected
 source_refs:
   - wt-one-lane-call-should-report-the-state-of-every-piece-of-work
   - i51
+place: i50-the-unattended-deadline-a-wait-or-an-owe
 ---
 
 ## Why it is open

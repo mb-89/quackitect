@@ -16,6 +16,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { CLAUSES, Rejection } from "./errors.ts";
+import type { RunningRow } from "./run.ts";
 
 const SRC = "engine/params.ts";
 
@@ -72,11 +73,29 @@ export interface PanelValues {
   choices?: Record<string, string>;
   /** Which independent toggles are on, by slug. */
   toggles?: Record<string, boolean>;
-  /** WORK STILL RUNNING PAST ITS BOUND, or absent when nothing is. A person
-   *  watching a still surface cannot tell a slow operation from a hung one,
-   *  and this is what the surface says instead of nothing. */
-  running?: { what: string; since_ms: number };
+  /** Whatever a `table` param's key asks for. */
+  tables?: Record<string, PanelTable>;
 }
+
+/** A TABLE A PANEL CAN DRAW. Columns name themselves; every row is that many
+ *  cells of plain text.
+ *
+ *  THE LAST COLUMN IS THE WIDE ONE and the surface truncates it to one line.
+ *  Put the short, scannable facts first and the long description last.
+ *
+ *  IT IS PLAIN TEXT ON PURPOSE. A panel is a list of parameters and never
+ *  markup (machines/panels/controls.md), so a cell carries no markup either. */
+export interface PanelTable {
+  columns: string[];
+  rows: PanelCell[][];
+  /** Shown in place of the table when there are no rows. */
+  empty?: string;
+}
+
+/** ONE CELL. Plain text, or text with a tooltip of its own where the tooltip
+ *  has to say something the cell does not — a dash explaining why there is no
+ *  figure, for instance. */
+export type PanelCell = string | { text: string; title: string };
 
 /** A toggle's key is its label, mechanically. The spec stays readable prose. */
 export const toggleKey = (label: string): string =>
@@ -272,11 +291,114 @@ function rowLabel(p: Param): string {
  * person no less willing to wait than silence would, and the wording is the
  * owner's to settle rather than this renderer's.
  */
-function renderRunning(v: PanelValues): string {
-  const r = v.running;
-  if (r === undefined) return "";
-  const secs = Math.round(r.since_ms / 1000);
-  return `<span class="running" title="${esc(r.what)} — still working, ${secs}s so far">${esc(r.what)} — working, ${secs}s</span>`;
+function clock(ms: number): string {
+  const s = Math.round(ms / 1000);
+  return s < 60 ? `${s}s` : `${Math.floor(s / 60)}m ${String(s % 60).padStart(2, "0")}s`;
+}
+
+/** ONE JOB, AS THREE CELLS: a short name, when it lands, and what it is.
+ *
+ *  THE REMAINING TIME IS THE JOB'S OWN, never this renderer's arithmetic. A
+ *  task that cannot project one shows a dash rather than a guess.
+ *
+ *  THE ELAPSED TIME RIDES THE ETA CELL when there is no estimate, because a
+ *  person watching wants to tell a slow task from a hung one either way. */
+function taskRow(r: RunningRow): PanelCell[] {
+  // THE TOOLTIP CARRIES WHAT IT IS DOING NOW. The
+  // LATEST narration beats the spawn line: the spawn line never changes and
+  // answers nothing after the first minute, while a person hovering wants to
+  // know the current step.
+  //
+  // THE SPAWN LINE STILL RIDES ALONG, after it, because a reader who has just
+  // opened the panel needs to know what this hand is FOR as well as what it is
+  // doing this second.
+  const doing = r.last_brief === undefined ? r.what : `${r.last_brief} — ${r.what}`;
+  const name = { text: r.name, title: doing };
+  const progress =
+    r.steps_total === undefined
+      ? { text: "—", title: "this task did not say how many steps it has" }
+      : { text: `${r.steps_done ?? 0}/${r.steps_total}`, title: doing };
+  const eta =
+    r.remaining_ms === undefined
+      ? { text: "—", title: r.basis ?? "not enough done yet to project" }
+      : { text: clock(r.remaining_ms), title: r.basis ?? "" };
+  // IDLE IS A STANDING HELPER, not a finished one. It keeps its row so a
+  // person can see there is a helper free to take the next piece of work.
+  const status =
+    r.status === "idle"
+      ? { text: "idle", title: "nothing reported for two minutes — this helper is free" }
+      : { text: "working", title: "reporting as it goes" };
+  // THE MODEL IS A COLUMN, NOT A LABEL. A shell run says `script`, so a reader
+  // never has to work out which rows are agents and which are not.
+  const model =
+    r.model === undefined
+      ? { text: "unreported", title: "registered before the model was asked for" }
+      : { text: r.model, title: r.model === "script" ? "not an agent — a shell run or a battery" : "the model that answered" };
+  // THE MILESTONE IS NOT A COLUMN. This table is
+  // GENERIC: a shell run and a battery belong in it too, and neither has a
+  // milestone. A column that is empty for whole classes of row teaches the
+  // reader to ignore it.
+  //
+  // IT RIDES THE NAME INSTEAD, where the caller already writes it — "walker M2:
+  // …". The engine still RECORDS the milestone on the job, because retiring
+  // the previous milestone's hands depends on knowing it.
+  //
+  // THE MODEL STAYS, and only because every row can answer it: a shell run
+  // reads `script`, so that column is never blank.
+  return [name, model, status, progress, eta];
+}
+
+/** THE SIDEBAR'S PANELS, IN THE ONE ORDER THERE IS.
+ *
+ *  BOTH SURFACES CALL THIS. They used to concatenate the specs themselves, and
+ *  a value wired into one of them was missing from the other — the background
+ *  table drew nothing in VS Code while the tests passed.
+ *  One function is what makes that impossible.
+ *
+ *  `tasks` IS LAST AND STAYS LAST. Its height follows how many jobs are
+ *  running, so anywhere else it moves the controls under it. A panel added
+ *  later goes in the middle of this list, never after. */
+export function renderSidebar(root: string, v: PanelValues): string {
+  return ["controls", "note-entry", "tasks"].map((id) => renderPanel(loadPanel(root, id), v)).join("");
+}
+
+/** THE JOB LIST AS A TABLE the panel can draw. The adapter sits here rather
+ *  than in the job registry: what a person reads is this file's business. */
+export function tasksTable(rows: RunningRow[]): PanelTable {
+  return {
+    columns: ["task", "model", "status", "progress", "eta"],
+    rows: rows.map(taskRow),
+    empty: "nothing running",
+  };
+}
+
+/** A TABLE, AS ONE ORDINARY ROW. Label on the left like every other control,
+ *  the table on the right.
+ *
+ *  IT IS A DECLARED PARAMETER AND NOT AN APPENDIX. An earlier version had
+ *  renderPanel append it after the rows, and the surface draws two panels from
+ *  the same values — the controls and the note row — so the appended row came
+ *  out twice. A declared row is drawn where the panel spec asks for it, once.
+ *
+ *  A TABLE THAT GROWS AND SHRINKS BELONGS AT THE BOTTOM of a panel, or every
+ *  control above it moves whenever a job starts. That is the panel spec's
+ *  ordering to get right, not this renderer's. */
+function renderTable(p: Param, v: PanelValues): string {
+  const key = p.fields[0] ?? p.name;
+  const t = v.tables?.[key];
+  if (t === undefined || t.rows.length === 0) {
+    return `<span class="param-table empty">${esc(t?.empty ?? "nothing")}</span>`;
+  }
+  // THE FULL TEXT RIDES THE TOOLTIP. A cell is one line and the surface cuts
+  // it, so the only place the rest can live is where hovering finds it.
+  const head = t.columns.map((c) => `<th>${esc(c)}</th>`).join("");
+  const cell = (c: PanelCell, i: number): string => {
+    const text = typeof c === "string" ? c : c.text;
+    const title = typeof c === "string" ? c : c.title;
+    return `<td class="col${i}" title="${esc(title)}">${esc(text)}</td>`;
+  };
+  const body = t.rows.map((r) => `<tr>${r.map(cell).join("")}</tr>`).join("");
+  return `<span class="param-table"><table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></span>`;
 }
 
 export function renderPanel(params: Param[], v: PanelValues): string {
@@ -296,10 +418,12 @@ export function renderPanel(params: Param[], v: PanelValues): string {
         return renderChoice(p, v);
       case "toggles":
         return renderToggles(p, v);
+      case "table":
+        return renderTable(p, v);
       default:
         throw new Rejection({
           clause: CLAUSES.REQUIRED_ARGS,
-          expected: "a parameter type the renderer knows: rungs, int, action, actions, text, choice, toggles",
+          expected: "a parameter type the renderer knows: rungs, int, action, actions, text, choice, toggles, table",
           got: `${p.type} (parameter "${p.name}")`,
           remedy: {
             tool: "se_file_read",
@@ -320,5 +444,5 @@ export function renderPanel(params: Param[], v: PanelValues): string {
     else rows[rows.length - 1].push(parts[i]);
   });
   const html = rows.map((r) => `<span class="param-row">${r.join("")}</span>`).join("");
-  return `<span class="threshold rungbar">${html}</span>${renderRunning(v)}`;
+  return `<span class="threshold rungbar">${html}</span>`;
 }

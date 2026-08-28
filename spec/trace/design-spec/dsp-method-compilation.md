@@ -6,14 +6,14 @@ id: dsp-method-compilation
 type: "[[design-spec]]"
 statement: authored method compiled into runnable machines, carried by the rigor matrix, drawn canvases and seeded drawings sharing one state shape
 realizes:
-  - "el-method-compiler"
+  - el-method-compiler
 files:
-  - "deliverable/engine/rigor-matrix.ts"
-  - "deliverable/engine/canvas.ts"
-  - "deliverable/engine/catalogs.ts"
-  - "deliverable/engine/machines/compile.ts"
-  - "deliverable/engine/expmachine.ts"
-  - "deliverable/engine/machines/supply.ts"
+  - deliverable/engine/rigor-matrix.ts
+  - deliverable/engine/canvas.ts
+  - deliverable/engine/catalogs.ts
+  - deliverable/engine/machines/compile.ts
+  - deliverable/engine/expmachine.ts
+  - deliverable/engine/machines/supply.ts
 ---
 
 ## Responsibility
@@ -206,12 +206,20 @@ THE ARCHIVE READS FOLDERS, AND THAT IS THE WHOLE READ (i6).
  — batched because a spawn per record made the archive take seconds to open,
  and cached because a closed branch never moves.
 
- i34 PUT THE ARCHIVE ON DISK. The folder stays where it is when a record
- closes, so a record that is not on disk is not anywhere. The fallback read
+ i34 PUT THE ARCHIVE ON DISK. The folder stayed where it was when a record
+ closed, so a record that was not on disk was not anywhere. The fallback read
  branches the seed no longer creates, and it went with them.
 
- A MISSING RECORD NOW READS AS MISSING, which is the honest answer and the
- one the callers already handle.
+ i63 FOLDS THE FOLDER AWAY AT CLOSE, and the archive stays on disk. What the
+ reader looks for changes shape: an open record is a folder, a closed one is a
+ single folded file, and both stand on trunk.
+
+ THE FALLBACK STAYS GONE. Neither shape is a branch read, so nothing comes back
+ from history on the ordinary path.
+
+ A MISSING RECORD STILL READS AS MISSING, which is the honest answer and the
+ one the callers already handle. What counts as present is now two shapes
+ rather than one.
 
 ## One archive shape for both record kinds
 

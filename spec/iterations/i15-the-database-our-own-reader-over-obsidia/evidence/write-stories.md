@@ -1,6 +1,6 @@
 ---
 form: write-stories
-reopened: "2026-08-19T17:22:20.464Z — same claims-registration gap, cascading fix through M2"
+reopened: 2026-08-19T17:22:20.464Z — same claims-registration gap, cascading fix through M2
 by: agent
 signed_off: 2026-08-19T17:22:20.864Z
 authors: agent

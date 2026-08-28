@@ -2,7 +2,7 @@
 // state earns it by naming it. The retro is a PLAIN STATE (the one-state
 // rule, owner 2026-07-28); entering it demands the method read.
 //
-// THE SPLIT (owner 2026-07-29): the front desk names the drain too, but only
+// THE SPLIT: the front desk names the drain too, but only
 // for the mechanical verdicts. The desk could add to the inbox and never
 // take anything out, while its own method opens by weighing that inbox.
 import { strict as assert } from "node:assert";
@@ -25,7 +25,7 @@ test("draining splits: done and obsolete anywhere, carried and backlog only in t
   await pullBoot(server, session);
   const minted = await call(server, "se_note", { text: "a stray to drain" });
   const ref = String(minted.body.captured);
-  // AN INBOX YOU MAY ONLY ADD TO IS NOT AN INBOX (owner ruling 2026-08-01).
+  // AN INBOX YOU MAY ONLY ADD TO IS NOT AN INBOX.
   // done and obsolete are checks anyone can run, so they drain anywhere the
   // walk happens to stand — here, at idle.
   const drained = await call(server, "se_note_drain", { ref, disposition: "done", where: "checked the code, it is there" });
@@ -236,6 +236,6 @@ test("the retro boundary is found in an archive when a rotation split the period
   assert.equal(oldest, "2026-08-19T10:00:00.000Z", "and it reaches back across the rotation to the drain itself");
 });
 
-// The needs-retro gate moved (owner design 2026-07-27): it holds the FIRST
+// The needs-retro gate moved: it holds the FIRST
 // start of a never-walked iteration inside the iterations container —
 // tests/iterations.test.ts walks it end to end.

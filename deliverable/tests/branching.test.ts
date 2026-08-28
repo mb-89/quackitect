@@ -1,4 +1,4 @@
-// BRANCHING POINTS, AND THE RETURN TO ONE (owner design 2026-08-07).
+// BRANCHING POINTS, AND THE RETURN TO ONE.
 //
 // A fan hands out ONE leg. Walk it to the end and the drawing offers nothing:
 // the other legs are behind you and the join above wants them all. The walk
@@ -152,8 +152,8 @@ test("a branch that cannot reach the objective is not offered", () => {
   assert.equal(branchToReturnTo(m, "left", "no-such-state"), undefined);
 });
 
-// THE FUNCTIONS ARE A RING (owner ruling 2026-08-07), AND THE TESTS JOINED
-// THEM (owner ruling 2026-08-10). The trace ran to the requirements and
+// THE FUNCTIONS ARE A RING, AND THE TESTS JOINED
+// THEM. The trace ran to the requirements and
 // stopped, so what answers a requirement — and what verifies it — was
 // invisible on the drawing. Function and test share the first ring past the
 // spine, one per slice.
@@ -166,7 +166,7 @@ test("the trace runs past the requirements, to functions and tests", async () =>
   assert.equal(TRACE_LEVELS.indexOf("function") - TRACE_LEVELS.indexOf("requirement"), 1);
 });
 
-// THE RING GAP IS THE VISION'S OWN GAP (owner ruling 2026-08-07).
+// THE RING GAP IS THE VISION'S OWN GAP.
 //
 // The vision to the value props is FIRST_RING, and that is the drawing's unit
 // of separation. Every later ring gets at least the same, measured EDGE TO

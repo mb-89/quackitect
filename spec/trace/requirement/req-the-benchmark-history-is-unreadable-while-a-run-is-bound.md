@@ -2,11 +2,11 @@
 minted_in: i37-training-iterations-a-disposable-iterati
 id: req-the-benchmark-history-is-unreadable-while-a-run-is-bound
 type: "[[requirement]]"
-statement: "While a benchmark run is bound, every lane verb shall return zero results from the benchmark reports folder, and outside a bound run it shall return them normally."
+statement: While a benchmark run is bound, every lane verb shall return zero results from the benchmark reports folder, and outside a bound run it shall return them normally.
 kind: quality
 verify_method: test
 fitness_candidate: true
-breaks_if_removed: "The agent reads the previous run's numbers and works toward them, so the instrument measures its own last reading."
+breaks_if_removed: The agent reads the previous run's numbers and works toward them, so the instrument measures its own last reading.
 breaks_how_badly: corrosive
 refines:
   - uc-walk-an-iteration-from-a-tree-that-cannot-see-its-future

@@ -1,10 +1,10 @@
 ---
 form: define-actual
-reopened: "2026-08-19T09:08:14.597Z — Draft vision was re-signed with fresh 2026-08-19 harness research; confirm the actual-state evidence still holds."
+reopened: 2026-08-19T09:08:14.597Z — Draft vision was re-signed with fresh 2026-08-19 harness research; confirm the actual-state evidence still holds.
 by: agent
 signed_off: 2026-08-19T09:08:27.488Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / define-actual

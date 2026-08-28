@@ -3,7 +3,7 @@ kind: method
 statement: Absolute 0-5 anchors for evaluation scoring; a spawned research agent scores against prior art, never the builder.
 ---
 
-## Anchors (absolute, 0-5)
+## Anchors (absolute, 0-5) #work
 
 - 0 - absent. The dimension is not addressed at all.
 - 1 - gesture. Addressed in prose only; nothing checkable.
@@ -17,7 +17,7 @@ Rules:
 - Scores 4 and 5 REQUIRE a named external comparison. No name, no score above 3.
 - The score never moves for effort or intent. Only for what the evidence shows.
 
-## The research-agent recipe
+## The research-agent recipe #work
 
 The builder never scores its own work. At a scoring step:
 

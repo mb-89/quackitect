@@ -13,6 +13,7 @@ how_likely: expected
 source_refs:
   - deliverable/machines/methods/meth-ship-package.md
   - raid-issue-must-demos-owed
+place: backlog
 ---
 
 Same underlying limit as raid-issue-must-demos-owed — an unattended

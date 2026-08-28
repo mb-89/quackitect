@@ -17,6 +17,7 @@ source_refs:
   - raid-iss-boot-grants-no-tools-while-promising-repair
 weighs_with: none
 weighs_against: none
+place: i52-the-route-can-go-back-a-walk-can-reach-a
 ---
 
 ## The shape of it

@@ -6,7 +6,7 @@ cluster: the-sizing
 question: how a step's difficulty is arrived at
 statement: "no one types a difficulty: each step declares what will judge its output, and the difficulty is computed from that, so a machine-checkable judge caps the rung and only a step judged by a reader alone can reach the top"
 found_by: prior-art
-source: "Kubernetes Quality of Service classes, kubernetes.io/docs/concepts/workloads/pods/pod-qos/ — there is no QoS field to set; the class is computed from requests and limits, so it is a consequence of measurable quantities rather than a label an author types"
+source: Kubernetes Quality of Service classes, kubernetes.io/docs/concepts/workloads/pods/pod-qos/ — there is no QoS field to set; the class is computed from requests and limits, so it is a consequence of measurable quantities rather than a label an author types
 ---
 
 ## Mechanism

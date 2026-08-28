@@ -7,7 +7,7 @@ statement: observe-red asks every non-test spec in the corpus for a red observat
 owner: the owner
 trigger: the next iteration that reaches observe-red, which is every iteration
 status: open
-looked: 2026-08-20
+looked: 2026-08-26
 breaks_how_badly: abrasive
 how_likely: expected
 impact: observe-red refuses while any box stands open. i35 minted 2 demonstration specs and met a checklist of 15, so 13 belonged to other records and none of them had a red for THIS delta to observe. The alternative is ticking boxes on reds nobody watched, which is worse — so the walk stops until each one is either fabricated or owed.
@@ -22,6 +22,9 @@ source_refs:
   - tsp-unattended-start
   - raid-debt-human-observed-demonstrations
   - i35-the-cloud-run-s-findings-land-the-fix-fi
+last_looked: 2026-08-23
+look_verdict: re-accepted
+place: i53-a-step-sees-its-own-record-s-slice-forms
 ---
 
 ## Why this is not [[raid-debt-human-observed-demonstrations]]
@@ -97,3 +100,20 @@ shrink the corpus either half is asked about.
 
 RESCHEDULED, TRIGGER RE-AFFIRMED: the next iteration reaching observe-red.
 
+## Swept 2026-08-26, at i54's closing retro: RE-ACCEPTED, and the trigger fired again
+
+i54 reached its demonstration positions and performed three, each with its own report under the record's reports folder. The wide checklist was answered again for a delta this record did not widen.
+
+RESCHEDULED, TRIGGER RE-AFFIRMED, unchanged: the next iteration reaching the same position.
+
+
+SWEPT 2026-08-28, at i63's closing retro: TRIGGER FIRED AGAIN, RE-ACCEPTED.
+
+It fires at the next iteration reaching observe-red, which is every iteration.
+i63 walked observe-red on 2026-08-26 for 16 calls and 87 seconds, and
+`evidence/observe-red.md` stands signed.
+
+THAT IS THE SECOND RECORDED FIRE IN THREE DAYS, and the entry is unchanged
+both times. A trigger that fires every iteration is not a trigger; it is a
+standing cost with a trigger's wording. It belongs in the method as a known
+price, or it belongs fixed.

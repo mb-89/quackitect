@@ -1,4 +1,4 @@
-// THE DRAWING IS THE TRUTH, SIZE INCLUDED (owner ruling 2026-07-28).
+// THE DRAWING IS THE TRUTH, SIZE INCLUDED.
 //
 // The render used to compute its own box sizes, on the reasoning that a label
 // needs less room than a note. The cost was that the mirror and Obsidian
@@ -70,7 +70,7 @@ test("a new node is born the size of its title and subtitle", () => {
   assert.ok(withSub.height < 640, "the 620x640 birth size is struck");
 });
 
-// A GENERATED BOX IS SIZED BY WHAT IT SHOWS (owner ruling 2026-07-28). An
+// A GENERATED BOX IS SIZED BY WHAT IT SHOWS. An
 // expedition's subtitle is its whole goal statement, and sizing from that made
 // e20's box 10793px wide to display 48 characters. Nobody could fix it in
 // Obsidian either, because the node is generated on every render.
@@ -100,7 +100,10 @@ test("an archive record is sized by the goal it displays", () => {
 test("the drawing and the size read the same shortened subtitle", () => {
   const src = readFileSync(new URL("../engine/render.ts", import.meta.url), "utf8");
   assert.ok(src.includes("subLabel("), "the render shortens through the shared helper");
-  assert.ok(!/slice\(0, *4[0-9]\)/.test(src), "and keeps no truncation of its own to drift");
+  // THE GUARD IS ABOUT THE SUBTITLE. It used to read as "no cut in the forties
+  // anywhere in this file", and the mirror shortens other things — a work
+  // token's statement is one — so a bare length caught the wrong shortening.
+  assert.ok(!/subtitle[^\n]*\.slice\(/.test(src), "and keeps no truncation of its own to drift");
   assert.equal(subLabel("x".repeat(4000))?.length, SUB_MAX, "the shortened label is exactly the cut length");
   assert.equal(subLabel("short"), "short", "a short subtitle passes through untouched");
   assert.equal(subLabel(""), undefined, "an empty subtitle is no subtitle");

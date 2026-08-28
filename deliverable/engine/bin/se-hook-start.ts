@@ -1,7 +1,7 @@
 // se-hook-start — THE CAGED SESSION'S SessionStart NOTICE. Not the prompt layer.
 //
 // KNOW THE DIFFERENCE, because getting it wrong puts a second copy of the
-// rules in the tree (owner correction 2026-08-18).
+// rules in the tree.
 //
 // THE PROMPT LAYER IS THE SESSION PROMPT. `engine/promptlayer.ts` assembles
 // guidance/contract.md, walking.md, method/lane.md and voice.md
@@ -30,6 +30,29 @@
 //
 // A hook must never break the turn, so this only ever writes to stdout and
 // exits clean.
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+import { markCompacted } from "../compaction.ts";
 import { COMPACTED, OPENING } from "../pullnotice.ts";
 
-process.stdout.write(`${process.argv.includes("--compacted") ? COMPACTED : OPENING}\n`);
+const compacted = process.argv.includes("--compacted");
+
+// THE MARKER IS WHAT MAKES THE NOTICE TRUE. It says the reading is gone and
+// that the next pull will ask for it again; without this line nothing on this
+// path can reach the engine's read gate, and the sentence is simply false.
+//
+// THE ROOT COMES FROM THIS FILE, never from the cwd. The hook is fired by the
+// client, which chooses its own working directory, and `.se/` sits three levels
+// above `deliverable/engine/bin`.
+//
+// A HOOK MUST NEVER BREAK THE TURN. A failed marker costs a re-read that did
+// not happen, which is bad and survivable; a throw here takes the session.
+if (compacted) {
+  try {
+    markCompacted(join(dirname(fileURLToPath(import.meta.url)), "..", "..", ".."));
+  } catch {
+    // the notice still prints, and the agent is still told to pull
+  }
+}
+
+process.stdout.write(`${compacted ? COMPACTED : OPENING}\n`);

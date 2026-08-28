@@ -5,7 +5,7 @@ type: "[[option]]"
 statement: Upgrade an old test-record's shape once, at the moment it is next written, instead of teaching every reader to tolerate every historical shape forever.
 cluster: cluster-the-record-life
 found_by: transform
-source: "SCAMPER Substitute, held against tolerate-old-test-records (meth-scamper.md)."
+source: SCAMPER Substitute, held against tolerate-old-test-records (meth-scamper.md).
 ---
 
 ## Mechanism

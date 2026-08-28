@@ -1,4 +1,4 @@
-// THE FLOOR LAW — four steps that no change size may tailor away.
+// THE FLOOR LAW — the steps that no change size may tailor away.
 //
 // The flag was authored on four rows, parsed into the row type, and read by
 // nothing. The only guard anywhere was four assertions against the PATCH
@@ -30,10 +30,34 @@ function matrix(): ReturnType<typeof readRigorMatrix> {
   } as ReturnType<typeof readRigorMatrix>;
 }
 
-const FLOOR = ["gate-kickoff", "verification", "sweep-consistency", "gate-release"];
+// FOUR GATES AND TEN ROSTER ROWS.
+//
+// THE FOUR GATES WERE THE ORIGINAL FLOOR: the kickoff, the verification, the
+// consistency sweep and the release gate.
+//
+// THE ROSTER ROWS JOINED IT ONE PER MILESTONE, M0 through M9. Their own note
+// says why they are never struck: the reason for the roster is that one hand
+// must not author and bless the same work, and that reason does not shrink
+// with the change size. A patch still gets a walker.
+const FLOOR = [
+  "gate-kickoff",
+  "verification",
+  "sweep-consistency",
+  "gate-release",
+  "spawn-the-hands",
+  "spawn-for-motivation",
+  "spawn-for-inputs",
+  "spawn-for-requirements",
+  "spawn-for-candidates",
+  "spawn-for-architecture",
+  "spawn-for-prototype",
+  "spawn-for-implementation",
+  "spawn-for-validation",
+  "spawn-for-release",
+];
 
 describe("what the floor is", () => {
-  test("exactly four rows declare it, and they are the ones the method names", () => {
+  test("exactly these rows declare it, and they are the ones the method names", () => {
     const flagged = matrix()
       .rows.filter((r) => r.floor)
       .map((r) => r.name)

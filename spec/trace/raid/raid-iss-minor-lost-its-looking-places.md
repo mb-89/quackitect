@@ -17,6 +17,7 @@ source_refs:
   - machines/rigor_matrix/rows/M5_90_gate-architecture.md, minor_note
   - tests/rigor-matrix.test.ts, the twelve struck rows named
   - the owner's ruling 2026-08-13, taken milestone by milestone
+place: i22-judgment-the-frozen-window-pull-dependen
 ---
 
 ## The claim

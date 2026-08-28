@@ -13,6 +13,7 @@ impact: a candidate could be eliminated from further consideration on a score th
 source_refs:
   - spec/iterations/i15-the-database-our-own-reader-over-obsidia/evidence/evaluate-set.md
   - opt-closed-regex-grammar-for-filter-expressions
+place: i49-the-archive-slice-settled-option-candida
 ---
 
 ## What would settle it

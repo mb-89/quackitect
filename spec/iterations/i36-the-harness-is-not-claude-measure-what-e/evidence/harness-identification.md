@@ -3,7 +3,7 @@ form: harness-identification
 by: agent
 signed_off: 2026-08-19T16:28:34.428Z
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / harness-identification

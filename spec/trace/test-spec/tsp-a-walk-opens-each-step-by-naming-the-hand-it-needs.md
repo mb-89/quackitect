@@ -6,7 +6,7 @@ statement: An engineer opens a record without choosing a model for it, and a ste
 method: demonstration
 demonstrates:
   - sty-the-machine-picks-the-hands
-verifies: "none — demonstrates carries the edge; the requirements behind this story are verify method test and inspection and are carried by the three sizing specs named in the Scope below"
+verifies: none — demonstrates carries the edge; the requirements behind this story are verify method test and inspection and are carried by the three sizing specs named in the Scope below
 files:
   - none — a demonstration is observed rather than instrumented, and the Procedure below is the whole definition
 ---

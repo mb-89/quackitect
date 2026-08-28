@@ -3,11 +3,11 @@ minted_in: i38-the-machine-sizes-its-own-driver-every-s
 id: raid-asm-one-model-list-serves-every-host-the-engine-supports
 type: "[[raid]]"
 kind: assumption
-statement: "One fixed list of model names in the repository is treated as usable identically on every host, while the engine registers three hosts and two of them are a different vendor whose model names are not ours."
+statement: One fixed list of model names in the repository is treated as usable identically on every host, while the engine registers three hosts and two of them are a different vendor whose model names are not ours.
 owner: the owner
-trigger: "the first time the list is read on a host that is not Claude Code, and the first time a name on it is not servable where it is read"
+trigger: the first time the list is read on a host that is not Claude Code, and the first time a name on it is not servable where it is read
 status: open
-impact: "On a host that cannot resolve a name, the machine's recommendation is unusable and the walk either ignores it or stops. The ruling that a weaker model needs a recorded reason then has nothing to measure against."
+impact: On a host that cannot resolve a name, the machine's recommendation is unusable and the walk either ignores it or stops. The ruling that a weaker model needs a recorded reason then has nothing to measure against.
 breaks_how_badly: corrosive
 how_likely: expected
 probe: "MEASURED AT THE i38 KICKOFF GATE, 2026-08-20. engine/harness.ts registers three supported hosts — claude-code, copilot-cli and vscode-copilot. Two of the three are GitHub Copilot and do not serve our vendor's model-name namespace. No list exists in the tree yet, so no per-host evidence has ever been taken. RAISED TO EXPECTED THE SAME DAY by a prior-art scan of the vendor's own documentation: a model ALIAS resolves to a different model per provider — the same short name reaches Sonnet 5 on the vendor API and Sonnet 4.5 on Bedrock and on Microsoft Foundry, and aliases are documented as pointing at the recommended version for your provider and updating over time. So a byte-identical table already produces different models on different hosts unless it pins full names."

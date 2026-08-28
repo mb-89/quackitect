@@ -32,6 +32,16 @@ edits it in the real world, and Obsidian reads it.
 - `actions` — a bank of one-shot buttons: caption then route, repeated.
   Each press posts its route and nothing else. Not an `action`: an action
   joins the row above, and a bank IS its own row, label first.
+- `table` — rows of plain text under named columns. Fields: key.
+  - The key names which table in the values gets drawn.
+  - It is READ-ONLY and nothing in it can be pressed.
+  - ONE LINE PER ROW. The last column is the wide one and the surface
+    truncates it, so short scannable facts go first and the long description
+    goes last.
+  - THE FULL TEXT OF EVERY CELL IS ON ITS TOOLTIP, which is where a truncated
+    line can still be read.
+  - The label stands whether or not there are rows, like every other row. An
+    empty table is the ordinary case and says so in words.
 
 A type this renderer does not know is a REFUSAL, not a guess. That is the
 whole point: the drawing decides, and an unlisted widget cannot appear by
@@ -60,11 +70,22 @@ screen twice, which is the same two-drawings fault the sliders had.
 - | int | narration_calls | calls | 0 | 1440 | an update every n calls at least — 0 stops this clock
 - NOW | action | /narration-now | force an update at the next possibility
 - log filter | text | log_filter | filter the logs | | narrow the feed to the lines that match
-- shutdown | toggles | block auto-sleep | shutdown at idle | what the machine does about power — neither pressed means it does nothing
+- shutdown | toggles | block auto-sleep | shutdown at front desk | what the machine does about power — neither pressed means it does nothing
 
 THE NOTE ROW IS ITS OWN PANEL (note-entry.md) and the sidebar draws it under
 this one. It is a separate control with a separate spec, so it is not
 restated here.
+
+## A panel whose height changes goes last
+
+THE BACKGROUND TABLE IS ITS OWN PANEL (tasks.md) and the sidebar draws it
+under everything, including the note row. Its height follows how many jobs are
+running, so anywhere else it would push the controls below it up and down
+while a person is reaching for one.
+
+A NEW CONTROL BELONGS IN THIS FILE, not after that one. `renderSidebar` in
+`deliverable/engine/params.ts` fixes the order, so adding a row here can never
+push the table off the bottom.
 
 ## The stop-at row
 
@@ -86,14 +107,19 @@ Two buttons, either or both.
 
 - BLOCK AUTO-SLEEP holds the machine awake, so it does not sleep under a
   running walk.
-- SHUTDOWN AT IDLE holds it awake while anything is happening, then shuts the
-  machine down once nothing is.
+- SHUTDOWN AT FRONT DESK holds it awake while anything is happening, then shuts
+  the machine down once nothing is.
 
 THE ENGINE IS THIS SERVER AND THE MACHINE IS THE COMPUTER. Both buttons act on
 the machine; the engine is only what watches.
 
 WHAT IT IS FOR: tell the agent to do its work and return to the front desk,
-flip shutdown at idle, and leave. Five quiet minutes later the machine is off.
+flip shutdown at front desk, and leave. Five quiet minutes later the machine is
+off.
+
+IT SAID "AT IDLE" UNTIL 2026-08-23, and there is no idle state any more. The
+control named a place the walk cannot stand in, which is the kind of label a
+reader trusts and should not.
 
 Neither pressed means nothing is done about power at all. That is the resting
 state and what a fresh session starts in.
@@ -101,8 +127,15 @@ state and what a fresh session starts in.
 THE ENGINE DOES THIS, NOT THE AGENT. It is a timer the engine owns. The
 language model neither decides it nor triggers it, which is the point: a
 shutdown that waited for an agent to notice would never fire, because an agent
-that has stopped is exactly what idle means.
+that has stopped is exactly what resting means.
 
-IDLE IS THREE CONDITIONS, all of them. The walk stands at a resting place —
-idle or the front desk. Nothing has reached the log for five minutes, by any
-hand. And nothing this session started is still running.
+RESTING IS THREE CONDITIONS, all of them.
+
+- The walk stands at the front desk, which is the only resting place there is.
+- Nothing has reached the log for five minutes, by any hand.
+- Nothing this session started in the last hour is still running.
+
+THE HOUR ON THE THIRD ONE IS NEW and it is why this never fired.
+A background job that hangs stays "running" for ever, and one of those held the
+machine awake indefinitely. A job silent for an hour is a leak rather than
+work, and a shutdown that any leak can veto is a shutdown that never happens.

@@ -11,14 +11,17 @@ import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync } from "node:fs";
 import { dirname, extname, join, relative, sep } from "node:path";
 import { concealedFromLane, isBound } from "./benchmark-guard.ts";
+import { ANSWER_BOUND_BYTES } from "./bound.ts";
+import { guardDepartureHasReason, guardNoUndeclaredReach } from "./doorguard.ts";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { guardParses } from "./guard.ts";
 import { contentHash } from "./hash.ts";
 import { lintFix } from "./lintfix.ts";
 import { forgetPath, parseStateNote, readNodeBytes, writeNode } from "./notes.ts";
-import { isExcluded, isRootRef, resolveDeclaredRoot, resolveForRead, resolveInRoot } from "./paths.ts";
+import { descendExcluded, isExcluded, isRootRef, resolveDeclaredRoot, resolveForRead, resolveInRoot } from "./paths.ts";
 import { guardNoSecondDoor } from "./pool.ts";
 import { search } from "./search.ts";
+import { guardNoUnregisteredEmitter } from "./widgets.ts";
 
 /** Whole-file read budget (chars). Beyond this, offset/limit is required. */
 export const READ_BUDGET = 50_000;
@@ -145,16 +148,45 @@ function characterRead(
 ): ReadResult {
   const charOffset = Math.max(0, opts.charOffset ?? 0);
   const charLimit = Math.max(1, opts.charLimit ?? 3_000);
-  const to = Math.min(raw.length, charOffset + charLimit);
-  return {
+  const want = Math.min(raw.length, charOffset + charLimit);
+  const build = (to: number): ReadResult => ({
     path,
     hash,
     bytes: raw.length,
     content: raw.slice(charOffset, to),
     char_range: { offset: charOffset, limit: charLimit, to, of: raw.length },
     ...(opts.ref !== undefined ? { ref: opts.ref } : {}),
-  };
+  });
+
+  // THE PAGE FITS ITSELF RATHER THAN BEING GUESSED AT.
+  //
+  // The old shape sized the caller's page on a worst-case escape cost of 2,
+  // which is less than half of what actually fits, so every reading loop paid
+  // roughly twice the calls it needed. MEASURED: boot's four
+  // documents are 61,439 bytes, which is about 29 page reads at the suggested
+  // page and about 14 at one sized honestly.
+  //
+  // ASKING FOR TOO MUCH IS NOW SAFE. The answer is serialised and shrunk until
+  // it is under the bound, and `char_range.to` reports what actually came
+  // back, so the caller's cursor stays correct either way. A caller may
+  // therefore ask optimistically and never spill a spill.
+  let to = want;
+  for (;;) {
+    const candidate = build(to);
+    if (JSON.stringify(candidate).length + ACCOUNT_ALLOWANCE <= ANSWER_BOUND_BYTES) return candidate;
+    if (to <= charOffset + MIN_CHARS) return build(Math.min(raw.length, charOffset + MIN_CHARS));
+    to = charOffset + Math.floor((to - charOffset) * 0.8);
+  }
 }
+
+/** Room kept for the work account and the envelope the transport adds after
+ *  this result is built. The account carries references now, not transcripts,
+ *  so it is small and bounded rather than open-ended. */
+const ACCOUNT_ALLOWANCE = 1_400;
+
+/** The smallest page worth returning. Below this the caller is better served
+ *  by an oversize refusal than by a page that says almost nothing. */
+const MIN_CHARS = 500;
 
 export function fileRead(
   root: string,
@@ -297,6 +329,44 @@ export function fileRead(
  *  So the guard sits at the WRITE, the last moment anything can still act.
  *  This happened for real and took the mirror black; the compiler caught it
  *  only once the walk was already trapped behind it. */
+/**
+ * EVERY WRITE PASSES THIS, whichever verb asked for it.
+ *
+ * ONE PLACE HOLDS THE CONTENT REFUSALS. Before it existed the whole-file write
+ * ran five and the patch, replace and move verbs ran one, one and none. A rule
+ * enforced on one verb of four is not enforced — and the contract tells every
+ * agent to edit source with the patch verb, which was the one running fewest.
+ *
+ * WORSE, BOTH DOOR REFUSALS HAND BACK A REMEDY WHOSE TOOL IS THE PATCH VERB.
+ * Following the remedy edited the departure list through the path that never
+ * checked whether the line stated a reason.
+ *
+ * IT REFUSES AND NEVER CORRECTS. The two guards that repair rather than refuse
+ * stay with their callers, because each one owns what it does with the
+ * repaired bytes and with the note naming the repair.
+ *
+ * THE POOL GUARD IS NOT IN HERE, and that is measured rather than preferred.
+ * It refuses every path under the pool with no escape at all, so at a
+ * chokepoint every verb passes through it breaks the corpus-wide rename
+ * se_file_replace exists for. See the note where it stands.
+ *
+ * NO CONDITION MAY STAND AROUND A CALL TO IT. A caller that wrapped it in its
+ * own test would have moved the off-switch rather than removed it, which
+ * req-no-setting-disables-every-rule-at-once forbids.
+ */
+export function guardWriteContent(root: string, path: string, content: string): void {
+  guardMachineNote(path, content);
+  // A SECOND SURFACE CANNOT BE WRITTEN, rather than being discouraged. The
+  // rule lives in widgets.ts and the sweep asks it the same question about the
+  // whole tree (see el-widget-guard).
+  guardNoUnregisteredEmitter(root, path, content, SRC);
+  // EVERY REACH OUT OF THE ENGINE GOES THROUGH A NAMED DOOR, OR IS RECORDED
+  // WITH ITS REASON. The rule lives in doors.ts and the sweep asks it the same
+  // questions about the whole tree (see dsp-the-door-refusals).
+  guardNoUndeclaredReach(root, path, content, SRC);
+  guardDepartureHasReason(root, path, content, SRC);
+}
+
 export function guardMachineNote(path: string, content: string): void {
   const p = path.replace(/\\/g, "/");
   if (!p.includes("deliverable/machines/") || !p.endsWith(".md")) return;
@@ -406,12 +476,19 @@ export function fileWrite(root: string, path: string, content: string, baseHash:
       });
     }
   }
-  guardMachineNote(path, content);
   // THE POOL HAS ONE DOOR, and this is what makes that true rather than said.
   // i17 verification landed a fabricated work token carrying a third party's
   // name through this very function, in one call, skipping every demand the
   // mint makes — which is the whole privacy boundary gone round.
+  //
+  // IT STAYS ON THIS VERB ALONE. pool.ts refuses every path under the pool with
+  // no escape, so moving it into the shared guard broke the corpus-wide rename:
+  // one work token citing the old id failed the whole batch, and the remedy
+  // handed back was a note drain, which cannot rename a citation. Widening it
+  // needs the already-exists escape the emitter guard has, and that is its own
+  // record.
   guardNoSecondDoor(path, SRC);
+  guardWriteContent(root, path, content);
   // THE WRITE GUARD STANDS HERE, with the other two, because this is the last
   // point before anything lands (req-a-write-that-breaks-the-corpus-refuses).
   // THE GUARD ANSWERS TWICE. It THROWS on a break this write made, and RETURNS
@@ -597,7 +674,7 @@ export function fileReplace(
     };
   }
   for (const s of staged) {
-    guardMachineNote(s.path, s.next);
+    guardWriteContent(root, s.path, s.next);
     const nul = guardRawNul(s.path, s.next);
     s.next = nul.content;
     if (nul.corrected !== undefined) corrected.push(nul.corrected);
@@ -816,7 +893,14 @@ export function fileGlob(
     for (const e of readdirSync(dir, { withFileTypes: true })) {
       const abs = join(dir, e.name);
       const rel = relative(base, abs).split(sep).join("/");
-      if (isExcluded(rootRef ? e.name : relative(root, abs))) continue;
+      const named = rootRef ? e.name : relative(root, abs);
+      if (isExcluded(named)) {
+        // AN EXCLUDED FOLDER IS STILL DESCENDED where an included path lies
+        // under it. Stopping at the first excluded name put the work store out
+        // of reach of every glob.
+        if (e.isDirectory() && descendExcluded(named)) walk(abs);
+        continue;
+      }
       if (e.isDirectory()) walk(abs);
       else if (rx.test(rel)) out.push(prefix + rel);
     }

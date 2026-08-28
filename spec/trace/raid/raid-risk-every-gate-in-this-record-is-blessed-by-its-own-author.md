@@ -3,11 +3,11 @@ minted_in: i5-engine-hygiene-one-version-source-every-
 id: raid-risk-every-gate-in-this-record-is-blessed-by-its-own-author
 type: "[[raid]]"
 kind: risk
-statement: "Every gate in this record is proposed and blessed by the same agent, so no gate carries an outside judgment."
+statement: Every gate in this record is proposed and blessed by the same agent, so no gate carries an outside judgment.
 owner: the owner
 trigger: the owner's next look at this record, and any gate whose verdict would change a scope
 status: open
-impact: "A wrong call at a gate is not caught by the mechanism built to catch it. The record still ships, and the error is found later, where it is more expensive."
+impact: A wrong call at a gate is not caught by the mechanism built to catch it. The record still ships, and the error is found later, where it is more expensive.
 breaks_how_badly: corrosive
 how_likely: expected
 source_refs:

@@ -1,11 +1,11 @@
-// THE ROUTE (owner design 2026-07-29) — a target state and the way there.
+// THE ROUTE — a target state and the way there.
 // It is SCHEDULING ONLY: it removes no guard and no autonomy rule, it
 // collapses round trips. The preview moves nothing at all.
 import { strict as assert } from "node:assert";
 import { test } from "node:test";
 import { computeRoute, type RouteNode } from "../engine/route.ts";
 import { Session } from "../engine/session.ts";
-import { craftDocs, freshRoot, GUIDANCE, readEverything } from "./helpers.ts";
+import { craftDocs, freshRoot, GUIDANCE, readEverything, workHere } from "./helpers.ts";
 
 /** A hand-drawn graph, so the search is tested without booting a machine. */
 function graph(edges: Record<string, string[]>, priority: Record<string, number> = {}) {
@@ -50,16 +50,20 @@ test("the blue line: from a cold start to the front desk, every hop named", () =
   // Two of these moves are drawn NOWHERE and are the reason the route needs
   // its own model: entering boot lands on the submachine's start, and
   // reaching its end pops back out to the parent's next state.
+  // idle used to sit between boot/end and front_desk. It is gone from the
+  // state machine, so boot lands on front_desk in one hop, not two, and the
+  // stop no longer repeats.
   assert.deepEqual(
     r.steps.map((h) => h.to),
-    ["boot/start", "boot/read_contract", "boot/prepare_idle", "boot/end", "idle", "front_desk"],
+    ["boot/start", "boot/read_contract", "boot/prepare_desk", "boot/end", "front_desk"],
   );
   assert.deepEqual(r.steps[0].tick, { from: "start", to: "boot" }, "each hop carries the exact tick that performs it");
   assert.deepEqual(r.steps[4].tick, { from: "boot/end", advance: true }, "popping out of a submachine is an advance");
-  assert.equal(r.steps[5].priority, 0.2, "and every hop carries the weight of ENTERING it");
+  // Five hops now, not six, so the last one sits at index 4.
+  assert.equal(r.steps[4].priority, 0.2, "and every hop carries the weight of ENTERING it");
 });
 
-// THE DESK STOPPED BEING A BLOCKABLE TARGET (owner tier cut-over 2026-08-12).
+// THE DESK STOPPED BEING A BLOCKABLE TARGET.
 // This case used to run at 0.1 and shut at the front desk, back when mechanical
 // was 0.01 and the desk 0.2. Both sit on the mechanical rung now, so no dial
 // opens the boot lane and shuts the desk.
@@ -107,6 +111,13 @@ test("the sweep walks the whole way in one call, and every guard still fires", a
   const root = freshRoot();
   const s = new Session(root);
   s.setAutonomy(1);
+  // BOOT'S OWN MARKED STEP STOPS IT FIRST, because a state is not left while
+  // it holds open work. Do the step, the way a walker does, and sweep again —
+  // then the read proof is the thing standing in the way.
+  const held = await s.sweep("front_desk", "agent");
+  assert.equal(held.arrived, false, "an open step holds its state shut");
+  assert.deepEqual(s.active(), ["boot/prepare_desk"]);
+  assert.ok(workHere(s) > 0, "and the step is the fixture's to do");
   // WITHOUT the reading it stops, typed, exactly where the guard is.
   const short = await s.sweep("front_desk", "agent");
   assert.equal(short.arrived, false, "the read proof is not waived by sweeping");
@@ -138,7 +149,7 @@ test("the sweep stops at the slider, and the target defaults to the front desk",
   await readEverything(s);
   const out = await s.sweep("expeditions", "agent");
   assert.equal(out.arrived, false, "a sweep never walks past the dial");
-  assert.deepEqual(s.active(), ["idle"], "it goes as far as it may and stops there");
+  assert.deepEqual(s.active(), ["front_desk"], "it goes as far as it may and stops there");
   assert.equal((out.refusal as { clause: string }).clause, "SE-C-113");
   // Aiming somewhere the drawing cannot reach is refused, not stored.
   assert.throws(() => s.setTarget("nowhere-at-all"));
@@ -152,7 +163,9 @@ test("the drawing carries the route: a spline OVER the nodes, its stops, an arro
   // The projection gives the ORDERED stops. Hops running around inside one
   // state make it a WAYPOINT, which is what a submachine entered and left is.
   const { waypoints, path } = routeOverlay(s.route("front_desk").steps, "");
-  assert.deepEqual(path, ["start", "boot", "idle", "front_desk"]);
+  // idle used to project to its own repeated front_desk stop. Gone now, so
+  // the projected path is one stop shorter.
+  assert.deepEqual(path, ["start", "boot", "front_desk"]);
   assert.deepEqual([...waypoints], ["boot"], "boot is passed through, so it is a waypoint");
   const html = renderMirror({ session: s, root, lastPacket: undefined, mode: "manual" });
 
@@ -178,7 +191,7 @@ test("the drawing carries the route: a spline OVER the nodes, its stops, an arro
   assert.match(html, /\.route-line \{ fill: none; stroke: var\(--se-walk\)/);
 });
 
-// THE ONE MOMENT THE MAP LIES (owner ruling 2026-07-29). An unbroken blue
+// THE ONE MOMENT THE MAP LIES. An unbroken blue
 // line to the destination says the whole way is open. When the slider blocks a
 // hop it is not, and the reader has no way to see that the walk will stop
 // short and wait for their hand.
@@ -259,4 +272,84 @@ test("the preview MOVES NOTHING", () => {
   s.route("front_desk");
   s.route("nowhere-at-all");
   assert.deepEqual(s.active(), before, "looking is not walking");
+});
+
+// TSP-EVERY-HOP-RECORDS-HOW-LONG-IT-TOOK. A call may carry many hops, so one
+// duration for the call cannot answer what a hop cost. The unit is the hop.
+test("every hop the search returns carries how long it took", () => {
+  const g = graph({ a: ["b"], b: ["c"], c: [] });
+  const began = performance.now();
+  const r = computeRoute("a", "c", g);
+  const whole = performance.now() - began;
+
+  assert.equal(r.found, true);
+  assert.equal(r.steps.length, 2, "two hops from a to c");
+
+  let sum = 0;
+  for (const s of r.steps) {
+    const ms = (s as { ms?: unknown }).ms;
+    // FINITE AND NOT NEGATIVE, never merely "a number". `typeof NaN` is
+    // "number", so the weaker check stays green on a duration that was never
+    // computed — which is the one failure this row exists to catch.
+    assert.ok(typeof ms === "number" && Number.isFinite(ms) && ms >= 0, `hop to ${s.to} records ${String(ms)} rather than a real duration`);
+    sum += ms;
+  }
+
+  // THE HOPS FIT INSIDE THE CALL. A per-hop figure that outgrew the call it
+  // came from would be measuring something other than the hop.
+  //
+  // THIS HOLDS BY CONSTRUCTION TODAY and a reviewer said so: `whole` times the
+  // same call whose hops produced `sum`, so each figure is a sub-interval of it.
+  // Keep it anyway — it bites the day somebody makes `ms` cumulative or sources
+  // it from somewhere other than the hop. Do not count it as a second
+  // independent guard.
+  //
+  // NOT ASSERTED ABOVE ZERO, deliberately. A hop times one expand, a warm
+  // expand costs about a tenth of a millisecond, and a memoized one rounds to
+  // zero. Demanding a positive number would make the test fail on the machine
+  // doing the least work.
+  assert.ok(sum <= whole, `the hops sum to ${sum} ms inside a call that took ${whole} ms`);
+});
+
+// TSP-A-FAILED-ROUTE-ANSWERS-NO-SLOWER-THAN-A-DRAWN-ONE. The id keeps an older
+// name and the row no longer means it: "no slower than a drawn one" was struck
+// as impossible, because saying there is no way means looking everywhere
+// reachable while finding one stops at the first.
+//
+// WHAT THE ROW DEMANDS NOW is that a failed search stays bounded by the graph —
+// each reachable state expanded once, never twice — which is what catches a
+// search that runs on. Timing in a unit test is flaky, so this asserts the COUNT
+// the timing is about.
+//
+// REPORTING THE COUNT IS NOT THE CLAIM, and an earlier version of this case
+// asserted only that both counts were numbers. A failed search could have
+// expanded four hundred thousand states and stayed green.
+test("a search that finds nothing costs no more than exhausting the graph", () => {
+  const REACHABLE = 41; // n0 through n40
+  const wide: Record<string, string[]> = {};
+  for (let i = 0; i < 40; i++) wide[`n${i}`] = [`n${i + 1}`];
+  wide.n40 = [];
+  const g = graph(wide);
+
+  const near = computeRoute("n0", "n1", g);
+  const none = computeRoute("n0", "nowhere", g);
+  assert.equal(near.found, true);
+  assert.equal(none.found, false);
+
+  // THE BOUND IS THE GRAPH. Each state is expanded at most once, so a search
+  // for something absent walks every reachable state and then stops. Expanding
+  // more than that means it revisited, which is the unbounded case.
+  assert.ok(
+    none.visited <= REACHABLE,
+    `a failed search expanded ${none.visited} of ${REACHABLE} reachable states — above that it is revisiting`,
+  );
+
+  // AND THE SUCCESSFUL SEARCH LEAVES EARLY. It stops at the first way it finds,
+  // so it expands strictly fewer states than one that has to exhaust the set.
+  //
+  // THIS IS NOT THE REQUIREMENT'S MEASURE, and an earlier version read as though
+  // it were — which had the case asserting the reverse of what the row demanded.
+  // The row demands the FAILED search stay bounded, and that is the assertion
+  // above. This one shows the early return.
+  assert.ok(near.visited < none.visited, `finding at one hop expanded ${near.visited} against ${none.visited} for finding nothing`);
 });

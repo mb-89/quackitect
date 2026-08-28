@@ -14,6 +14,7 @@ source_refs:
   - req-nothing-a-copy-does-reaches-its-source
   - req-the-source-keeps-no-record-of-a-copy
   - raid-dec-a-vehicle-is-a-copy-with-a-one-way-upstream-link
+place: i42-the-served-word-matches-the-machine-guid
 ---
 
 ## What is happening

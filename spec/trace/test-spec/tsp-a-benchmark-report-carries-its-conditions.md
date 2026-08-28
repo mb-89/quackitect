@@ -2,13 +2,13 @@
 minted_in: i37-training-iterations-a-disposable-iterati
 id: tsp-a-benchmark-report-carries-its-conditions
 type: "[[test-spec]]"
-statement: "A benchmark report is refused unless it carries every condition of its run, and it says both where the run was told to stop and where it actually ended."
-method: "test"
+statement: A benchmark report is refused unless it carries every condition of its run, and it says both where the run was told to stop and where it actually ended.
+method: test
 verifies:
   - req-a-benchmark-report-carries-the-conditions-of-its-run
   - req-a-run-that-stopped-early-says-where-it-stopped
 files:
-  - "tests/benchmark-run.test.ts"
+  - tests/benchmark-run.test.ts
 ---
 
 ## Scope

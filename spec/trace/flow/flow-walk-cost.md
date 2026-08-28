@@ -2,7 +2,7 @@
 minted_in: i37-training-iterations-a-disposable-iterati
 id: flow-walk-cost
 type: "[[flow]]"
-statement: "what the walk cost, per state, taken from the call log"
+statement: what the walk cost, per state, taken from the call log
 kind: signal
 source_refs:
   - req-a-benchmark-report-carries-the-conditions-of-its-run

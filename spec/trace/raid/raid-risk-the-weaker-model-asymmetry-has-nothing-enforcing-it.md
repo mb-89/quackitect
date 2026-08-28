@@ -3,11 +3,11 @@ minted_in: i38-the-machine-sizes-its-own-driver-every-s
 id: raid-risk-the-weaker-model-asymmetry-has-nothing-enforcing-it
 type: "[[raid]]"
 kind: risk
-statement: "The one safety rule in the driver design — a stronger model needs no argument, a weaker one needs a recorded reason — is a convention with no mechanism behind it, asked of exactly the actor it exists to catch."
+statement: The one safety rule in the driver design — a stronger model needs no argument, a weaker one needs a recorded reason — is a convention with no mechanism behind it, asked of exactly the actor it exists to catch.
 owner: the owner
-trigger: "the first walk that runs a state below its recommended rung, and the first time a form is submitted with no reason where one was owed"
+trigger: the first walk that runs a state below its recommended rung, and the first time a form is submitted with no reason where one was owed
 status: open
-impact: "The rule fails in the one case it was written for. A cheap model that talks itself into staying cheap produces a walk that looks compliant, and the field that should carry the dissent is simply empty."
+impact: The rule fails in the one case it was written for. A cheap model that talks itself into staying cheap produces a walk that looks compliant, and the field that should carry the dissent is simply empty.
 breaks_how_badly: crippling
 how_likely: plausible
 probe: "READ THE DESIGN AND THE ENGINE AT THE i38 KICKOFF GATE, 2026-08-20. The asymmetry is stated as a ruling and nothing in the engine holds it: there is no field declared for the reason, no refusal clause covering its absence, and no comparison between a recommended rung and what actually walked. IT ALSO DEPENDS ON A SECOND THING THAT IS NOT ESTABLISHED — knowing which model answered, which today is self-reported and which this register already carries as an open assumption. So the rule rests on a value the system cannot check, judged by the party being judged."

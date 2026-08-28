@@ -1,7 +1,7 @@
 // A repeating failure becomes durable work
 // (tsp-repeated-failure-shape-becomes-durable-work).
 //
-// SMALL FILES ON PURPOSE (owner ruling, 2026-07-30). See guidance/craft/software.md.
+// SMALL FILES ON PURPOSE. See guidance/craft/software.md.
 import { strict as assert } from "node:assert";
 import { describe, test } from "node:test";
 import { asWorkStatement, MISUSE_CLAUSES, recurringShapes, shapeOf } from "../engine/failure-shapes.ts";

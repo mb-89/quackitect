@@ -8,7 +8,9 @@
 // see dsp-walk-machine.md#the-suites-spawn-skip
 import { spawn } from "node:child_process";
 import { CLAUSES, Rejection } from "./errors.ts";
+import { contentHash } from "./hash.ts";
 import type { MachineDecl, StateDecl } from "./machine.ts";
+import { readNode, writeEpoch } from "./notes.ts";
 import { resolveInRoot, seDir } from "./paths.ts";
 import { openOperation, settleOperation } from "./run.ts";
 import { evidenceKey } from "./sessionforms.ts";
@@ -25,12 +27,19 @@ export interface ScriptHost {
   notifyChange(): void;
   /** WRITE A SETTLED JUDGMENT WHERE THE STEP'S OTHER STANDINGS LIVE. The
    *  evidence map below dies with the process; this does not. */
-  recordVerdict(m: MachineDecl, s: StateDecl, ok: boolean): void;
+  recordVerdict(m: MachineDecl, s: StateDecl, ok: boolean, stamp?: string): void;
+  /** The verdict standing on the step's form, which outlives this process. */
+  standingJudgment(m: MachineDecl, s: StateDecl): { verdict: string; stamp: string } | undefined;
   readonly evidence: Map<string, Record<string, unknown>>;
 }
 
 export class Scripts {
   private readonly host: ScriptHost;
+
+  /** THE LAST VERDICT EACH STEP ACTUALLY REACHED, with the write count it was
+   *  reached at. A verdict is worth nothing if the next attempt cannot see it,
+   *  and that is what left a state the walk stands on judging itself forever. */
+  private readonly freshVerdict = new Map<string, { ok: boolean; stamp: string; writes: number }>();
 
   constructor(host: ScriptHost) {
     this.host = host;
@@ -39,7 +48,7 @@ export class Scripts {
   /** One script, ASYNC — spawnSync would freeze the whole server (and the
    *  mirror with it) for the run's duration; found when the suite's eight
    *  seconds read as a crashed browser window. */
-  spawnScript(abs: string): Promise<{ status: number | null; out: string }> {
+  spawnScript(abs: string, machineId = ""): Promise<{ status: number | null; out: string }> {
     return new Promise((resolve) => {
       // A CONDITION JUDGES THE CORPUS THE LANE WRITES TO, never the repo
       // root. Judged against the wrong one, the agent is asked to satisfy a
@@ -53,7 +62,14 @@ export class Scripts {
       const where = this.host.workRoot();
       const child = spawn("node", [abs, "--root", where], {
         cwd: where,
-        env: { ...process.env, SE_HOME: seDir(this.host.machineRoot()) },
+        // WHICH RECORD IS BEING JUDGED. A check that reads something the record
+        // DECIDED — the kickoff's walker ceiling, say — has to know which record
+        // it stands in, and only the walk knows that.
+        //
+        // IT IS NOT COPIED INTO SESSION STATE. `.se/settings.json` is global to
+        // the session, so a per-record number kept there leaks across records
+        // and is a second place to disagree with the first.
+        env: { ...process.env, SE_HOME: seDir(this.host.machineRoot()), SE_MACHINE: machineId },
       });
       let out = "";
       let pending = "";
@@ -88,17 +104,45 @@ export class Scripts {
       // battery, which tools.ts already records as "long BY DESIGN now that
       // boot walks read real guidance — 150s killed it mid-run". A cap that
       // kills the battery reads as a red that never happened.
-      const timer = setTimeout(() => child.kill(), 600_000);
-      child.on("error", (e) => {
-        clearTimeout(timer);
+      //
+      // THE RUN ENDS ITSELF, WHICHEVER WAY IT ENDS. Three paths reach the
+      // verdict and each has to be able to fire alone, so they share one
+      // settle that only the first caller gets through.
+      let settled = false;
+      let timer: ReturnType<typeof setTimeout> | undefined;
+      let abandon: ReturnType<typeof setTimeout> | undefined;
+      const end = (status: number | null, text: string): void => {
+        if (settled) return;
+        settled = true;
+        if (timer !== undefined) clearTimeout(timer);
+        if (abandon !== undefined) clearTimeout(abandon);
         this.clearProgress();
-        resolve({ status: null, out: String(e) });
-      });
-      child.on("close", (code) => {
-        clearTimeout(timer);
-        this.clearProgress();
-        resolve({ status: code, out: out + pending });
-      });
+        resolve({ status, out: text });
+      };
+      // KILLING THE CHILD IS NOT THE END OF THE STORY. `kill` ends the child
+      // and leaves its grandchildren holding the output pipes, so `close` can
+      // fail to arrive and the promise never settles at all.
+      //
+      // A RUN STUCK THAT WAY OUTLIVES EVERYTHING THAT COULD CLEAR IT. The step
+      // reads `deciding` for the life of the process, no job record stands
+      // behind it, and every later attempt joins the ghost instead of starting
+      // a real run.
+      //
+      // IT WAS MEASURED, NOT IMAGINED. A walk sat at its repair step reporting
+      // a battery still running, nineteen minutes after that battery's last
+      // case finished, with no battery process alive anywhere on the machine.
+      //
+      // SO THE KILL ARMS A SECOND CLOCK. Half a minute later the run reports
+      // what it has, whatever the pipes are doing.
+      timer = setTimeout(() => {
+        child.kill();
+        abandon = setTimeout(
+          () => end(null, `${out}${pending}\nthe run passed its ceiling, was killed, and never closed its output`),
+          30_000,
+        );
+      }, 600_000);
+      child.on("error", (e) => end(null, String(e)));
+      child.on("close", (code) => end(code, out + pending));
     });
   }
 
@@ -107,6 +151,27 @@ export class Scripts {
    *  when repeated clicks on an unresponsive button queued whole extra
    *  suite runs behind the first. */
   readonly scriptRuns = new Map<string, Promise<Record<string, unknown>>>();
+
+  /** WHEN EACH IN-FLIGHT RUN STARTED. The map above cannot say how old its
+   *  entries are, and a run that never settles is indistinguishable from one
+   *  that started a second ago. */
+  private readonly runStartedAt = new Map<string, number>();
+
+  /** THE AGE PAST WHICH A RUN IS A GHOST. The child is killed at its ceiling
+   *  and given half a minute to close; anything older than both ended in a way
+   *  no clock inside the run can reach. */
+  private static readonly GHOST_MS = 700_000;
+
+  /** FORGET A RUN NOTHING CAN STILL FINISH. Dropping it is what lets the next
+   *  attempt start a real run rather than join a promise that will never
+   *  resolve — the difference between a slow step and a stuck one. */
+  private dropIfGhost(key: string): void {
+    const at = this.runStartedAt.get(key);
+    if (at === undefined) return;
+    if (Date.now() - at < Scripts.GHOST_MS) return;
+    this.scriptRuns.delete(key);
+    this.runStartedAt.delete(key);
+  }
 
   /** RUN a state's condition script — legal only while standing in it.
    *  The result is engine-observed evidence; nobody can claim it. */
@@ -125,6 +190,7 @@ export class Scripts {
       });
     }
     const key = evidenceKey(machine, s.id);
+    this.dropIfGhost(key);
     const inFlight = this.scriptRuns.get(key);
     if (inFlight !== undefined) return inFlight;
     const run = (async () => {
@@ -143,7 +209,7 @@ export class Scripts {
       let ok = true;
       for (const rel of scripts) {
         const abs = resolveInRoot(this.host.machineRoot(), rel, "engine/session.ts script");
-        const r = await this.spawnScript(abs);
+        const r = await this.spawnScript(abs, machine.id);
         // BOTH ENDS, BECAUSE EACH CARRIES HALF THE VERDICT.
         //
         // The TAIL carries the counts — exit codes, totals, units. A head slice
@@ -166,16 +232,26 @@ export class Scripts {
         outputs.push(`${rel} → exit ${r.status}${out === "" ? "" : `\n${out}`}`);
         if (r.status !== 0) ok = false;
       }
-      const result = { ok, output: outputs.join("\n"), at: new Date().toISOString() };
+      const result = { ok, output: outputs.join("\n"), at: new Date().toISOString(), stamp: this.scriptStamp(scripts) };
       this.host.evidence.set(key, { ...(this.host.evidence.get(key) ?? {}), script_result: result });
       // AND IT LANDS SOMEWHERE THAT OUTLIVES THE PROCESS. The map above is
       // memory; a step left deciding when the session ends needs the verdict on
       // disk or the repository cannot settle the word.
-      this.host.recordVerdict(machine, s, ok);
+      this.host.recordVerdict(machine, s, ok, result.stamp);
+      // WHAT THE TREE LOOKED LIKE ONCE THIS VERDICT HAD LANDED, and the order
+      // is the whole of it. Recording the verdict WRITES the form, and that
+      // write moves the count — so a count taken a line earlier is stale by
+      // exactly one and can never match again. Measured: a battery passed with
+      // nothing written afterwards, and the next attempt still ran it again.
+      this.freshVerdict.set(key, { ok, stamp: result.stamp, writes: writeEpoch() });
       this.host.notifyChange();
       return { state: `${machine.id}/${s.id}`, script_result: result };
-    })().finally(() => this.scriptRuns.delete(key));
+    })().finally(() => {
+      this.scriptRuns.delete(key);
+      this.runStartedAt.delete(key);
+    });
     this.scriptRuns.set(key, run);
+    this.runStartedAt.set(key, Date.now());
     // THE JUDGMENT ENTERS THE ONE TABLE, against the step it belongs to. It is
     // registered HERE, where the run is created, rather than in scriptStart.
     // The mirror's own /script endpoint calls this method directly, so a run
@@ -199,15 +275,87 @@ export class Scripts {
     return run;
   }
 
+  /** WHAT A VERDICT WAS REACHED WITH, so it can be told apart from a verdict
+   *  reached against different scripts. Content, not size and time, for the same
+   *  reason the drawing cache stamps that way: a same-size edit inside one
+   *  filesystem tick would go unseen.
+   *
+   *  THROUGH THE DOOR, so a pass reads each script once however many states cite
+   *  it. */
+  private scriptStamp(scripts: readonly string[]): string {
+    return scripts
+      .map((rel) => {
+        const abs = resolveInRoot(this.host.machineRoot(), rel, "engine/session.ts script");
+        const text = readNode(abs);
+        return text === "" ? `${rel}@gone` : `${rel}@${contentHash(text)}`;
+      })
+      .join("|");
+  }
+
   /** START a step's leaving judgment and hand the promise back UNAWAITED.
    *  Returns undefined where the state declares no judgment to start.
    *  The run registers itself in the account; this method only decides
    *  whether there is a judgment to start at all.
    *  see dsp-the-work-account.md#responsibility */
-  scriptStart(stateId: string): Promise<Record<string, unknown>> | undefined {
+  scriptStart(stateId: string, passingThrough = false): Promise<Record<string, unknown>> | undefined {
     const { machine } = this.host.leaves();
     const s = this.host.state(machine, stateId);
-    if ((s.exit?.script ?? []).length === 0 && (s.entry?.script ?? []).length === 0) return undefined;
+    const scripts = [...(s.exit?.script ?? []), ...(s.entry?.script ?? [])];
+    if (scripts.length === 0) return undefined;
+    // A GREEN STATE WALKED OVER KEEPS THE VERDICT IT ALREADY HAS.
+    //
+    // Walking over a state re-judged it, so a fast-forward through finished work
+    // paid for every judgment it already had on file. Measured: 2,455 ms of a
+    // 6,084 ms three-hop sweep was the call waiting on scripts whose states were
+    // already signed.
+    //
+    // THREE THINGS MUST ALL HOLD, and each closes a way this could turn a red
+    // hop green.
+    //
+    // - THE WALK IS PASSING THROUGH, not landing. A state the walk actually
+    //   works always re-judges, because that is where the judgment is about to
+    //   be relied on.
+    // - THE STANDING VERDICT SAYS PASSED. Anything else re-runs, so a red never
+    //   survives on a stale answer.
+    // - THE SCRIPTS HAVE NOT MOVED. A verdict reached with a different script is
+    //   a verdict about a different question.
+    // see dsp-the-walk-knows-what-its-own-hops-cost.md#a-green-state-walked-over-keeps-its-verdict
+    // A VERDICT THE WALK IS STANDING ON IS STILL A VERDICT, while nothing has
+    // been written since it landed.
+    //
+    // WITHOUT THIS A STATE THE WALK LANDS ON CANNOT BE LEFT AT ALL. Each pull
+    // starts a judgment, answers before it finishes, and the next pull throws
+    // that answer away and starts another. The verdict lands every time and is
+    // consumed never, so the step reports `deciding` forever.
+    //
+    // MEASURED: five pulls at a verification whose battery is 128 s and whose
+    // recorded verdict already said passed. The walk never moved.
+    //
+    // THE GUARD IS THE WRITE COUNT, and it is what makes this safe. Re-judging
+    // a state the walk WORKS exists because the walk may have edited something.
+    // Where nothing has been written, there is nothing new to judge — and the
+    // moment anything is, the count moves and the next attempt runs for real.
+    // A shell command counts as a write to everything, so an edit the lane
+    // cannot see moves it too.
+    const landedFresh = this.freshVerdict.get(evidenceKey(machine, s.id));
+    if (
+      !passingThrough &&
+      landedFresh?.ok === true &&
+      landedFresh.writes === writeEpoch() &&
+      landedFresh.stamp === this.scriptStamp(scripts)
+    ) {
+      return undefined;
+    }
+    if (passingThrough) {
+      const stamp = this.scriptStamp(scripts);
+      const held = this.host.evidence.get(evidenceKey(machine, s.id))?.script_result as { ok?: boolean; stamp?: string } | undefined;
+      if (held?.ok === true && held.stamp === stamp) return undefined;
+      // NOTHING IN MEMORY IS THE ORDINARY CASE for a session that re-entered a
+      // record. The verdict on the form is the same verdict, reached by the same
+      // script, and it outlived the process that reached it.
+      const onDisk = held === undefined ? this.host.standingJudgment(machine, s) : undefined;
+      if (onDisk?.verdict === "passed" && onDisk.stamp !== "" && onDisk.stamp === stamp) return undefined;
+    }
     return this.scriptRun(stateId);
   }
 
@@ -215,8 +363,8 @@ export class Scripts {
    *  for a verdict and hands back whatever it has; it is never held for as long
    *  as the judgment runs, which is the defect this record exists to end.
    *  see dsp-the-work-account.md#responsibility */
-  async scriptSettleWithin(stateId: string, ms: number): Promise<void> {
-    const run = this.scriptStart(stateId);
+  async scriptSettleWithin(stateId: string, ms: number, passingThrough = false): Promise<void> {
+    const run = this.scriptStart(stateId, passingThrough);
     if (run === undefined) return;
     let timer: ReturnType<typeof setTimeout> | undefined;
     const capped = new Promise<void>((res) => {
@@ -226,13 +374,60 @@ export class Scripts {
     if (timer !== undefined) clearTimeout(timer);
   }
 
+  /**
+   * A VERDICT REACHED AGAINST THESE SCRIPTS THAT OUTLIVED THE PROCESS.
+   *
+   * THE RUNNER ALREADY CONSULTS IT, in scriptStart, to decide there is nothing
+   * to run. A checker that asked only the in-memory evidence then refused
+   * forever: the runner said nothing needed running and the checker said nothing
+   * had run, so a re-entered record could not leave any state whose exit carries
+   * a script. One truth, two readers, and they read different stores.
+   *
+   * THE STAMP IS COMPARED THE SAME WAY, so a verdict reached against different
+   * scripts cannot green a hop.
+   */
+  scriptPassedOnDisk(m: MachineDecl, s: StateDecl): boolean {
+    const scripts = [...(s.exit?.script ?? []), ...(s.entry?.script ?? [])];
+    if (scripts.length === 0) return false;
+    const onDisk = this.host.standingJudgment(m, s);
+    return onDisk?.verdict === "passed" && onDisk.stamp !== "" && onDisk.stamp === this.scriptStamp(scripts);
+  }
+
   /** WHERE A STEP STANDS, one word from a closed set of three.
    *  see dsp-the-work-account.md#behavior-and-constraints */
   scriptStanding(m: MachineDecl, s: StateDecl): "passed" | "not passed" | "deciding" {
     const key = evidenceKey(m, s.id);
+    this.dropIfGhost(key);
+    // THE SKIP TRUSTS THE DISK, SO THE CHECK MUST TOO. scriptStart above
+    // declines to re-run a judgment whose verdict stands on the form. A checker
+    // reading only memory then calls that same step not-passed, and the walk is
+    // refused for a hop nothing is ever going to run again.
+    //
+    // IT ONLY BITES ON A LONG ROUTE, which is what hid it: the sweep marks a hop
+    // walked-over when the route is more than one step, and only a walked-over
+    // hop takes the skip. A one-step aim ran the same judgment and passed.
+    // see dsp-the-walk-knows-what-its-own-hops-cost.md#a-green-state-walked-over-keeps-its-verdict
+    const onDisk = this.host.standingJudgment(m, s);
+    const stands =
+      onDisk !== undefined &&
+      onDisk.verdict === "passed" &&
+      onDisk.stamp !== "" &&
+      onDisk.stamp === this.scriptStamp([...(s.exit?.script ?? []), ...(s.entry?.script ?? [])]);
+    // A RUN IN FLIGHT OUTRANKS A STANDING PASS, and it has to.
+    //
+    // THE STAMP IS OVER THE SCRIPT LIST, NEVER THE TREE. So a pass recorded
+    // once matches that stamp forever, whatever the code does afterwards.
+    // Letting it answer while a run is deciding walks the machine straight
+    // past a check that is failing right now — measured: a battery recorded
+    // green at 17:23 carried the walk through a run that exited 1.
+    //
+    // THE SKIP BELOW IS NOT THE SAME BET. It answers only when NOTHING is
+    // running, so there is no fresher verdict to prefer. Here there is one
+    // being computed, and the honest answer is that it is not in yet.
     if (this.scriptRuns.has(key)) return "deciding";
     const r = this.host.evidence.get(key)?.script_result as { ok?: boolean } | undefined;
-    return r?.ok === true ? "passed" : "not passed";
+    if (r !== undefined) return r.ok === true ? "passed" : "not passed";
+    return stands ? "passed" : "not passed";
   }
 
   /** Any condition script currently running — the mirror's follow signal. */
@@ -240,7 +435,7 @@ export class Scripts {
     return this.scriptRuns.size > 0;
   }
 
-  /** THE WAIT BAR MEASURES SOMETHING (owner ruling, 2026-07-30). A running
+  /** THE WAIT BAR MEASURES SOMETHING. A running
    *  script reports its own steps; indeterminate is the FALLBACK, for work
    *  that genuinely cannot count itself, never the default. */
   progressAt: { done: number; total: number; label: string } | undefined;

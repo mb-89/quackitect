@@ -1,7 +1,6 @@
 // see dsp-mirror-render.md#the-cards-the-mirror-shows
-import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { parseStateNote } from "./notes.ts";
+import { noteOf } from "./notes.ts";
 
 export interface Card {
   /** 1-based, and the key that promotes it. Row order, nothing else. */
@@ -55,8 +54,11 @@ export function cardsPath(root: string): string {
 export function loadCards(root: string): Card[] {
   const path = cardsPath(root);
   let rows: [string, string][] = FALLBACK;
-  if (existsSync(path)) {
-    const found = declared(parseStateNote(readFileSync(path, "utf8")).frontmatter);
+  // THROUGH THE DOOR, which answers undefined for a file that is not there —
+  // the same question existsSync was asking, without a second look at disk.
+  const note = noteOf(path);
+  if (note !== undefined) {
+    const found = declared(note.frontmatter);
     if (found.length > 0) rows = found;
   }
   return rows.map(([title, shows], i) => ({

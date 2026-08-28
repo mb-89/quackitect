@@ -2,11 +2,11 @@
 minted_in: i37-training-iterations-a-disposable-iterati
 id: req-a-run-that-stopped-early-says-where-it-stopped
 type: "[[requirement]]"
-statement: "The engine shall record on every benchmark report the stop point the run was given and the state the run actually ended in."
+statement: The engine shall record on every benchmark report the stop point the run was given and the state the run actually ended in.
 kind: quality
 verify_method: test
 fitness_candidate: false
-breaks_if_removed: "A shortened run is silently compared against a full one, and the delta measures the stop point rather than the machine."
+breaks_if_removed: A shortened run is silently compared against a full one, and the delta measures the stop point rather than the machine.
 breaks_how_badly: crippling
 refines:
   - uc-measure-a-machine-change-against-a-finished-iteration

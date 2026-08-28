@@ -156,3 +156,149 @@ test("a shipped iteration leaves the open list, whatever stands on disk", async 
   assert.ok(!after.iterations.some((i) => i.id === id), `a shipped record is not open: ${JSON.stringify(after.iterations)}`);
   assert.equal(after.counts.iterations, after.iterations.length, "the count matches the list it counts");
 });
+
+// AN ITEM WITH A PLACE IS NOT IN THE BACKLOG, and the desk has to read that.
+//
+// MEASURED 2026-08-28, and the owner found it rather than a test: 352 items
+// were given a place, 300 of them onto a record or a state, and the desk went
+// on listing all 352. The place was written into every file, `workpen` was
+// already drawing each item at its place, and the ONE SURFACE A PERSON READS
+// was the one that ignored the field.
+//
+// A COUNT IS EXACTLY THE KIND OF THING THAT READS RIGHT WHILE BEING WRONG.
+test("an item placed at a state leaves the desk's backlog", async () => {
+  const root = freshRoot();
+  gitInit(root);
+  const server = await bootedServer(root);
+
+  const token = (slug: string, place: string | undefined): void => {
+    const dir = join(root, "spec", "trace", "work-token");
+    mkdirSync(dir, { recursive: true });
+    const lines = [
+      "---",
+      `id: ${slug}`,
+      'type: "[[work-token]]"',
+      "statement: a fixture item",
+      "ready_when: ready now",
+      "source: a fixture",
+      ...(place === undefined ? [] : [`place: ${place}`]),
+      "---",
+      "",
+    ];
+    writeFileSync(join(dir, `${slug}.md`), lines.join("\n"), "utf8");
+  };
+  token("wt-carries-no-place-at-all", undefined);
+  token("wt-says-backlog-explicitly", "backlog");
+  token("wt-was-routed-to-a-record", "i99-somewhere-else");
+  token("wt-was-routed-to-a-state", "retro");
+
+  const s = (await call(server, "se_survey", {})).body as unknown as {
+    counts: { backlog: number };
+    backlog: { ref: string }[];
+  };
+  const refs = s.backlog.map((b) => b.ref);
+  assert.ok(refs.includes("wt-carries-no-place-at-all"), "no place means the backlog, which is what a mint gives");
+  assert.ok(refs.includes("wt-says-backlog-explicitly"), "saying backlog is the same as saying nothing");
+  assert.ok(!refs.includes("wt-was-routed-to-a-record"), "an item routed to a record has left the backlog");
+  assert.ok(!refs.includes("wt-was-routed-to-a-state"), "and so has one routed to a state");
+  assert.equal(s.counts.backlog, s.backlog.length, "the count matches the list it counts");
+});
+
+// THE PILL AND THE LIST COUNTED DIFFERENT SETS.
+//
+// workpen draws BOTH pool tokens and open register entries at the backlog, and
+// the board's pill counts what the pen draws. The desk's own list read the pool
+// alone, so the pill said 42 while the list showed 23. The 19 that never
+// appeared were open issues and debts — the oldest work there is.
+//
+// Measured 2026-08-28, on the same surface and in the same week as the defect
+// above. Same shape too: the field was right, one reader ignored it.
+test("an open register entry stands in the desk's backlog beside a pool token", async () => {
+  const root = freshRoot();
+  gitInit(root);
+  const server = await bootedServer(root);
+
+  const entry = (slug: string, place: string | undefined): void => {
+    const dir = join(root, "spec", "trace", "raid");
+    mkdirSync(dir, { recursive: true });
+    const lines = [
+      "---",
+      `id: ${slug}`,
+      'type: "[[raid]]"',
+      "kind: issue",
+      "status: open",
+      "statement: a fixture issue nobody has placed",
+      "trigger: ready when somebody picks it up",
+      ...(place === undefined ? [] : [`place: ${place}`]),
+      "---",
+      "",
+    ];
+    writeFileSync(join(dir, `${slug}.md`), lines.join("\n"), "utf8");
+  };
+  entry("raid-iss-a-fixture-nobody-placed", undefined);
+  entry("raid-iss-a-fixture-routed-to-a-record", "i99-somewhere-else");
+
+  const s = (await call(server, "se_survey", {})).body as unknown as {
+    counts: { backlog: number };
+    backlog: { ref: string; ready_when: string }[];
+  };
+  const refs = s.backlog.map((b) => b.ref);
+  assert.ok(refs.includes("raid-iss-a-fixture-nobody-placed"), "an unplaced open issue stands in the backlog");
+  assert.ok(!refs.includes("raid-iss-a-fixture-routed-to-a-record"), "and a placed one has left it, exactly as a token does");
+  // THE TRIGGER IS THE READY-WHEN. Both answer what has to happen before
+  // somebody looks again, so the list carries one column rather than two.
+  const row = s.backlog.find((b) => b.ref === "raid-iss-a-fixture-nobody-placed");
+  assert.equal(row?.ready_when, "ready when somebody picks it up");
+  assert.equal(s.counts.backlog, s.backlog.length, "the count matches the list it counts");
+});
+
+// A PARKED ITEM WAITING ON A RECORD IS WAITING FOR AN EVENT NOBODY FIRES.
+//
+// "ready when i60 is seeded" reads like a promise that the item wakes when
+// that record opens. Nothing wakes it. It waits until somebody happens to read
+// the backlog at the right hour, and usually nobody does.
+//
+// MEASURED 2026-08-28: sixteen items named the walk-speed record. It shipped
+// four days earlier and collected none of them. Twenty-four in total named a
+// record already shipped or abandoned.
+test("a backlog item waiting on a record that already closed says so", async () => {
+  const root = freshRoot();
+  gitInit(root);
+  const server = await bootedServer(root);
+
+  const record = (id: string, status: string): void => {
+    const dir = join(root, "spec", "iterations", id);
+    mkdirSync(dir, { recursive: true });
+    writeFileSync(join(dir, "record.md"), ["---", `id: ${id}`, `status: ${status}`, "goal: a fixture", "---", ""].join("\n"), "utf8");
+  };
+  record("i60-the-one-that-shipped", "shipped");
+  record("i61-the-one-still-open", "seeded");
+
+  const token = (slug: string, readyWhen: string): void => {
+    const dir = join(root, "spec", "trace", "work-token");
+    mkdirSync(dir, { recursive: true });
+    const text = [
+      "---",
+      `id: ${slug}`,
+      'type: "[[work-token]]"',
+      "statement: a fixture item parked against a moment",
+      `ready_when: ${readyWhen}`,
+      "source: a fixture",
+      "---",
+      "",
+    ].join("\n");
+    writeFileSync(join(dir, `${slug}.md`), text, "utf8");
+  };
+  token("wt-waits-on-a-record-that-shipped", "ready when i60 is seeded");
+  token("wt-waits-on-a-record-still-open", "ready when i61 reaches its build");
+  token("wt-waits-on-nothing-in-particular", "ready when somebody looks at it again");
+
+  const s = (await call(server, "se_survey", {})).body as unknown as {
+    passed_moments?: { ref: string; names: string; status: string }[];
+  };
+  const flagged = s.passed_moments ?? [];
+  assert.equal(flagged.length, 1, `only the one whose record closed is flagged: ${JSON.stringify(flagged)}`);
+  assert.equal(flagged[0].ref, "wt-waits-on-a-record-that-shipped");
+  assert.equal(flagged[0].names, "i60-the-one-that-shipped", "the answer names the record, not just the number");
+  assert.equal(flagged[0].status, "shipped", "and says what that record actually is now");
+});

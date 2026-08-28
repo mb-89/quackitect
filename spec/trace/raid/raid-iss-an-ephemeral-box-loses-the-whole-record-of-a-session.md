@@ -3,11 +3,11 @@ minted_in: i5-engine-hygiene-one-version-source-every-
 id: raid-iss-an-ephemeral-box-loses-the-whole-record-of-a-session
 type: "[[raid]]"
 kind: issue
-statement: "The call log, the notes and the handover all live in `.se/`, which git ignores. Nothing a session learns can reach the next clone by that route, and the design that retired the written handover assumed a machine that persists."
+statement: The call log, the notes and the handover all live in `.se/`, which git ignores. Nothing a session learns can reach the next clone by that route, and the design that retired the written handover assumed a machine that persists.
 owner: the maintainer
 trigger: every cloud run, and the first retro after one
 status: open
-impact: "A retro can only mine the container it runs in. The window for i5's retro opened at this container's first pull, so three earlier sessions of the same iteration are simply absent from it. A session that wrote a handover for its successor wrote it into a directory the successor never sees."
+impact: A retro can only mine the container it runs in. The window for i5's retro opened at this container's first pull, so three earlier sessions of the same iteration are simply absent from it. A session that wrote a handover for its successor wrote it into a directory the successor never sees.
 breaks_how_badly: crippling
 how_likely: expected
 source_refs:
@@ -18,6 +18,7 @@ source_refs:
   - i5-engine-hygiene-one-version-source-every-
 weighs_with: none
 weighs_against: none
+place: i31-the-process-becomes-measurable-a-walk-re
 ---
 ## What was observed
 

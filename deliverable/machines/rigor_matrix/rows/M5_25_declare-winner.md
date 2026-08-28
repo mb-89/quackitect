@@ -21,9 +21,11 @@ evidence:
   - name: comments
     description: anything the declaration should carry — free text, short is fine
 major: full
+major_complexity: C1/R2
 minor: none
 patch: none
 product: full
+product_complexity: C1/R2
 specification: full
 major_note: |
   Applies in full: the computed winner declared on the record with the
@@ -45,8 +47,7 @@ specification_note: |
 ## Guidance
 
 The selection is the decision model's own closing step - "select one" - and
-it is RECORDED here rather than implied by arithmetic two states back
-(owner ruling 2026-08-10).
+it is RECORDED here rather than implied by arithmetic two states back.
 
 The card draws the computed winner: the same decision-matrix reading
 converge-pugh shows, with the seat held. Nothing here recomputes or

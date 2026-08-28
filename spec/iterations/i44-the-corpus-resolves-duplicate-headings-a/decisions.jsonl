@@ -158,3 +158,8 @@
 {"ts":"2026-08-28T12:17:40.035Z","op":"update","visit":"iterations/i44/fix-findings@0","node":"d199","brief":"see what is uncommitted before merging trunk in"}
 {"ts":"2026-08-28T12:17:46.851Z","op":"update","visit":"iterations/i44/fix-findings@0","node":"d200","brief":"fetch trunk before merging it in"}
 {"ts":"2026-08-28T12:17:54.201Z","op":"update","visit":"iterations/i44/fix-findings@0","node":"d201","brief":"clean the tree before the merge"}
+{"ts":"2026-08-28T12:18:03.118Z","op":"update","visit":"iterations/i44/fix-findings@0","node":"d202","brief":"merge the 87 commits of trunk into i44"}
+{"ts":"2026-08-28T12:18:11.703Z","op":"update","visit":"iterations/i44/fix-findings@0","node":"d203","brief":"list every conflicted file"}
+{"ts":"2026-08-28T12:18:20.771Z","op":"update","visit":"iterations/i44/fix-findings@0","node":"d204","brief":"read the two conflicted assumption nodes"}
+{"ts":"2026-08-28T12:18:32.579Z","op":"update","visit":"iterations/i44/fix-findings@0","node":"d205","brief":"read the second conflicted assumption node"}
+{"ts":"2026-08-28T12:18:40.045Z","op":"update","visit":"iterations/i44/fix-findings@0","node":"d206","brief":"read the affordability conflict region"}

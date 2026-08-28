@@ -24,7 +24,7 @@ import { activeStates, completeState, type MachineDecl, type MachineInstance, ty
 import { parseStateNote } from "../engine/notes.ts";
 import { CHANGE_COLUMNS, compileColumn, readRigorMatrix } from "../engine/rigor-matrix.ts";
 import { Session } from "../engine/session.ts";
-import { checkDocs, freshRoot, gitInit, readEverything } from "./helpers.ts";
+import { checkDocs, doTheWork, freshRoot, gitInit, readEverything } from "./helpers.ts";
 
 /** The repository root — three levels above this file (tests/ → deliverable/ → project/ → root). */
 const REPO_ROOT = fileURLToPath(new URL("../..", import.meta.url));
@@ -179,7 +179,7 @@ test("the shipped matrix wires verification's fallback loop, and the loop walks 
 //
 // M7_60_fix-findings.md carries `guard: verification_attempts < 3` and its
 // prose promises "the machine escapes to a human when the guard exhausts".
-// MEASURED 2026-08-17: `counters` is initialised to {} in session.ts, carried
+// MEASURED: `counters` is initialised to {} in session.ts, carried
 // across a repin, read by evalGuard — and assigned nowhere. The name
 // `verification_attempts` does not occur in the engine at all.
 //
@@ -259,6 +259,16 @@ function fillFor(form: {
   const out: Record<string, unknown> = {};
   for (const f of form.fields ?? []) {
     if (f.required === false) continue;
+    // A CHOICE FIELD IS ANSWERED BY NAME, ahead of any template. The kickoff
+    // gate asks how many walkers the record runs and takes one of its own
+    // options; a sentence is refused whatever template the field carries.
+    if (f.name === "walkers") {
+      // THE CHOICE CARRIES ITS REASON ON THE SAME LINE. A bare option is
+      // refused: the form wants `<option> — <why>`, so that a reader of the
+      // record sees the judgement rather than only the number.
+      out[f.name] = "0 — a fixture root, walked by one hand and spawning none";
+      continue;
+    }
     const t = form.field_templates?.[f.name] ?? "free-form";
     const items = form.field_args?.[f.name]?.items ?? [];
     switch (t) {
@@ -284,7 +294,11 @@ function fillFor(form: {
             : "patch — the smallest column that still has a verification";
         break;
       default:
-        out[f.name] = "a fixture root, walked by the benchmark";
+        // A CHOICE FIELD TAKES ONE OF ITS OWN OPTIONS, never a sentence. The
+        // kickoff gate now asks how many walkers the record runs, and a
+        // fixture that runs none answers zero — which is the roster row's own
+        // default, and the honest answer for a walk with no hands spawned.
+        out[f.name] = f.name === "walkers" ? "0" : "a fixture root, walked by the benchmark";
     }
   }
   if (form.gate === true) out.bless = true;
@@ -338,6 +352,10 @@ test("the benchmark walk: one session, walked once, asserting at each stop it pa
       if (at() === state) return filled;
       if (r.pull === "do") last = `do at ${at()} :: ${JSON.stringify((r as { refusal?: unknown }).refusal ?? "no refusal").slice(0, 300)}`;
       if (r.pull === "fill" && r.forms?.[0] !== undefined) {
+        // THE STEPS BEFORE THE SIGNATURE. A state's marked steps hold its
+        // claim, so a fixture that only fills the form is refused by the gate
+        // that exists to catch exactly that.
+        doTheWork(root, at());
         const answer = (await session.pull({ form: fillFor(r.forms[0]) })) as {
           refused?: { problems?: string[] };
           forms?: { problems?: string[] }[];
@@ -354,7 +372,7 @@ test("the benchmark walk: one session, walked once, asserting at each stop it pa
   await walkTo("gate-kickoff");
   assert.deepEqual(
     session.currentMachine().states.map((s) => s.id),
-    ["start", "onboard-retro", "gate-kickoff", "end"],
+    ["start", "spawn-the-hands", "onboard-retro", "gate-kickoff", "end"],
     "before the bless the machine is M0 alone — the column is not pinned by seeding",
   );
   await walkTo("log-risks");

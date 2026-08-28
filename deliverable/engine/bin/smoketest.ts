@@ -14,7 +14,7 @@ function argValue(flag: string): string | undefined {
 // own, so the mode is chosen once and the work is nested under it.
 const help = process.argv.some((a) => a === "--help" || a === "-h" || a === "-?");
 // RECURSION GUARD, the same one selftest.ts carries. The suite walks boot
-// machines inside COPIED temp roots, and those walks reach prepare_idle's
+// machines inside COPIED temp roots, and those walks reach prepare_desk's
 // exit scripts. Two reasons to stand down there: the walk would spawn the
 // checks forever, and a copied root has no node_modules, so importing the
 // engine's modules would fail on a missing dependency rather than on

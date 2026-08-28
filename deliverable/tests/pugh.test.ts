@@ -30,6 +30,40 @@ const SCORES = [
   row("cand-z", "req-d", 2),
 ].join("\n");
 
+// A HOLE IN A SCORE TABLE IS SILENCE, NEVER A ZERO. An unscored pair means
+// nobody wrote the words down, and reading it as nought makes honest silence the
+// worst possible answer.
+//
+// THE FAILURE IT GUARDS IS SILENT. A real contender vanishes from the pick and
+// the table still looks complete, which is why this is worth a case even though
+// it was green from birth.
+//
+// `holed` BEATS `filled` ON THE AXES THEY SHARE, 8 to 6, and loses 8 to 9 the
+// moment its missing cell is counted as a zero.
+const HOLED = [
+  "| candidate | axis | score | anchor | prior_art |",
+  "| --- | --- | --- | --- | --- |",
+  row("cand-holed", "req-a", 4),
+  row("cand-holed", "req-c", 4),
+  row("cand-filled", "req-a", 3),
+  row("cand-filled", "req-c", 3),
+  row("cand-filled", "req-d", 3),
+].join("\n");
+
+test("a candidate with an unscored axis still leads a weaker rival that has none", () => {
+  const pv = pughView(HOLED, CUTS, grade);
+  // THE DATUM IS SECOND PLACE, not first — it is the strongest rival the leader
+  // has to beat. So leading on the shared axes means NOT holding the seat.
+  assert.equal(pv.runs[0].datum, "cand-filled", "the weaker one is the rival to beat");
+  assert.equal(pv.winner, "cand-holed", "the hole must not cost it the win");
+  // THE HOLE IS STILL REPORTED. Nothing here silences it; the arithmetic just
+  // stopped inventing a value the page does not carry.
+  assert.ok(
+    pv.problems.some((p) => p.includes("cand-holed")),
+    "the unscored pair is still named above the pick",
+  );
+});
+
 test("the axes come off the cuts: struck rows out, rows past the cutoff out, grades carried", () => {
   const { axes, problems } = axesFromCuts(CUTS, grade);
   assert.deepEqual(

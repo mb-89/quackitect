@@ -4,7 +4,7 @@ by: agent
 signed_off: 2026-08-20T10:03:07.364Z
 reopened: "2026-08-20T10:01:15.822Z — four claims do not hold: six autonomy rungs where scale.md rules five plus a control position, a complexity-sweep enumeration that is wrong, an unsupported assertion about who receives a driver name, and a group_by measurement that cannot distinguish an absent field from an unreachable one"
 authors: agent
-files:
+files: null
 ---
 
 # Evidence form / define-actual

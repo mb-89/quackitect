@@ -3,7 +3,7 @@ minted_in: i37-training-iterations-a-disposable-iterati
 id: raid-iss-a-placeholder-that-runs-a-sub-machine-can-never-be-re-signed
 type: "[[raid]]"
 kind: issue
-statement: "A reopened placeholder could not be re-signed — the walk popped past it and no verb could serve its form — and the refusal that showed it named the wrong remedy, pointing at se_pull instead of at se_reopen's machine argument. The walk defect is fixed; the remedy-naming one is not."
+statement: A reopened placeholder could not be re-signed — the walk popped past it and no verb could serve its form — and the refusal that showed it named the wrong remedy, pointing at se_pull instead of at se_reopen's machine argument. The walk defect is fixed; the remedy-naming one is not.
 owner: the owner
 trigger: any reopen upstream of run-spikes, build-steps, run-candidates, enumerate-space or run-demos
 status: mitigated

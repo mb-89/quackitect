@@ -50,3 +50,14 @@ than no mechanism.
 No model wanted. One invariant: a form carrying an owed item whose reference
 resolves to nothing, or to a closed entry, or to an entry with no owner, does
 not stamp — and the refusal names which.
+
+## Addition — work tokens
+
+THIS ROW IS UNCHANGED AND IT IS THE HALF THAT STAYS. An owed item names an
+open register entry carrying an owner, or the submit refuses it.
+
+WHAT THE ROUND ADDS IS A SECOND HOME, not a replacement. The finding also
+becomes work placed on the state that will fix it. A reader meeting only the
+newer row might take the placement as the whole disposition, and it is not:
+an item placed somewhere with no register entry behind it is still a
+disposition nobody agreed to.

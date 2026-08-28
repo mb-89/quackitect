@@ -9,7 +9,7 @@ source: ref-structural-complexity-management
 Reach for it once a [DSM partitioning](meth-dsm-partitioning) layering exists.
 The real question then is what can be worked on concurrently at this layer.
 
-## Effect
+## Effect #work
 
 Elements that can be processed independently of each other sit side-by-side
 after partitioning. They group into the same band, drawn as alternating light
@@ -26,7 +26,7 @@ adjacency in the already-partitioned order.
 Quality is bounded by the prior partitioning. A bad ordering yields bad bands,
 and the same caveat applies to [tearing](meth-dsm-tearing) run beforehand.
 
-## Procedure
+## Procedure #work
 
 Run banding only on an already-partitioned DSM, torn first where that is
 relevant.

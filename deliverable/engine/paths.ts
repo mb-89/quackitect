@@ -8,8 +8,35 @@ import { CLAUSES, Rejection } from "./errors.ts";
 /** Directories the lane never serves or lists. */
 export const EXCLUDED_DIRS = new Set([".git", "node_modules", ".se", ".venv", "__pycache__"]);
 
+/** Paths under an excluded directory that the lane DOES serve.
+ *
+ *  AN EXCLUSION IS A DEFAULT, NOT A CEILING. Ephemeral work lives under `.se`
+ *  because it must never be committed, and the lane's own refusals name that
+ *  folder as the place to look. A store nothing can list hands out a remedy
+ *  that answers nothing. */
+export const LANE_INCLUDES = [".se/work"];
+
 /** True for a path addressing a declared root, e.g. "@desktop/sketch.png". */
 export const isRootRef = (p: string): boolean => p.startsWith("@");
+
+/**
+ * IS THIS PATH INSIDE THIS DIRECTORY? The containment rule, in one place.
+ *
+ * THE SEPARATOR IS THE WHOLE RULE. A bare prefix test puts `/x/vaultevil`
+ * inside `/x/vault`, and a copy guarding a write did exactly that.
+ *
+ * `self` SAYS WHETHER THE DIRECTORY COUNTS AS INSIDE ITSELF, because the copies
+ * disagreed about that too and the disagreement is real. A jail admits its own
+ * root; a somewhere-under-here test does not.
+ *
+ * IT TAKES AN ABSOLUTE OR A RELATIVE TARGET. resolve settles which, so a caller
+ * never has to branch on it and then forget the branch.
+ */
+export function isInside(dir: string, target: string, self = true): boolean {
+  const base = resolve(dir);
+  const abs = resolve(base, target);
+  return abs === base ? self : abs.startsWith(base + sep);
+}
 
 /** A declared root: where it is, and whether a WRITE lane may reach it.
  *
@@ -36,7 +63,7 @@ const UPSTREAM_FILE = ["deliverable", "vendor", "upstream", "upstream.json"] as 
  *  is NOT.
  *
  *  A FILE THAT CANNOT BE READ MUST NEVER PASS FOR AN ABSENT ONE. That is the
- *  lesson `declaredRoots` learned the hard way on 2026-07-29, and it is worse
+ *  lesson `declaredRoots` learned the hard way, and it is worse
  *  here: a swallowed parse error would silently switch the source guard off,
  *  and the guard going quiet looks exactly like the guard passing. */
 function identityIn(dir: string, parts: readonly string[], source: string): string | undefined {
@@ -142,7 +169,7 @@ export function resolveDeclaredRoot(root: string, p: string, source: string): st
   }
   const base = resolve(declared.path);
   const abs = resolve(base, rest.join("/"));
-  if (abs !== base && !abs.startsWith(base + sep)) {
+  if (!isInside(base, abs)) {
     throw new Rejection({
       clause: CLAUSES.PATH_ESCAPE,
       expected: `a path inside the declared root @${name}`,
@@ -219,7 +246,7 @@ function containedIn(root: string, p: string, source: string): string {
     remedy: {
       tool: "se_file_list",
       args: { dir: "." },
-      note: "two doors lead outside, and neither is a path. PAST VERSIONS of this repo are read at a committed ref: se_file_read / se_file_search / se_file_glob all take ref (main reaches v1, v2 reaches v2). ANOTHER FOLDER entirely belongs in .se/roots.json as a declared root, reachable as @name/rest — read-only unless the declaration says writable. Ask the owner before declaring one.",
+      note: "two doors lead outside, and neither is a path. PAST VERSIONS of this repo are read at a committed ref: se_file_read / se_file_search / se_file_glob all take ref (main reaches v1, v2 reaches v2). ANOTHER FOLDER entirely belongs in .se/roots.json as a declared root, reachable as @name/rest — read-only unless the declaration says writable. DECLARE ONE YOURSELF when you need it: write .se/roots.json through the lane, where it is logged like every other call.",
     },
     source,
   });
@@ -264,7 +291,17 @@ export function resolveInActBound(bound: string, p: string, source: string): str
 }
 
 export function isExcluded(rootRelative: string): boolean {
-  return rootRelative.split(sep).some((part) => EXCLUDED_DIRS.has(part));
+  const path = rootRelative.split(sep).join("/");
+  if (LANE_INCLUDES.some((i) => path === i || path.startsWith(`${i}/`))) return false;
+  return path.split("/").some((part) => EXCLUDED_DIRS.has(part));
+}
+
+/** Whether an EXCLUDED directory must still be descended, because an included
+ *  path lies under it. `.se` is skipped and `.se/work` is not, so a walk that
+ *  stops at the first excluded name never reaches the work store. */
+export function descendExcluded(rootRelative: string): boolean {
+  const path = rootRelative.split(sep).join("/");
+  return LANE_INCLUDES.some((i) => i.startsWith(`${path}/`));
 }
 
 export function seDir(root: string): string {

@@ -2,17 +2,17 @@
 minted_in: i38-the-machine-sizes-its-own-driver-every-s
 id: req-the-machine-names-a-driver-and-starts-nothing
 type: "[[requirement]]"
-statement: "The lane shall publish the named driver on the pull and shall start no process on account of it, on any host and in any mode."
+statement: The lane shall publish the named driver on the pull and shall start no process on account of it, on any host and in any mode.
 kind: constraint
 verify_method: inspection
-breaks_if_removed: "A lane that starts agents is a lane that acts outside the record on its own judgment, which is the same class of act as pushing and opening records unasked. Once it holds that power every other boundary is a convention."
+breaks_if_removed: A lane that starts agents is a lane that acts outside the record on its own judgment, which is the same class of act as pushing and opening records unasked. Once it holds that power every other boundary is a convention.
 breaks_how_badly: fatal
 refines:
   - uc-let-the-machine-name-the-driver
 source_refs:
-  - "uc-let-the-machine-name-the-driver step 5"
-  - "nbr-the-driver-that-performs-the-spawn"
-  - "raid-iss-the-engine-does-spawn-an-agent-and-the-seed-says-it-does-not"
+  - uc-let-the-machine-name-the-driver step 5
+  - nbr-the-driver-that-performs-the-spawn
+  - raid-iss-the-engine-does-spawn-an-agent-and-the-seed-says-it-does-not
 priority: must
 ---
 

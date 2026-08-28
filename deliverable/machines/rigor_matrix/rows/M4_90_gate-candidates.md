@@ -16,8 +16,7 @@ legal_tools:
   - se_file_list
   - se_log_query
   - se_answer
-  - se_web_search
-  - se_web_fetch
+  - se_run
 evidence:
   - name: reasons_hold
     template: free-form
@@ -38,9 +37,11 @@ evidence:
 
       See [[meth-gate-review]].
 major: full
+major_complexity: C3/R4
 minor: none
 patch: none
 product: full
+product_complexity: C3/R4
 specification: tailored
 major_note: |
   Applies in full: at least two viable candidates or the no-alternatives
@@ -65,7 +66,7 @@ specification_note: |
 
 SET-BASED DISCIPLINE: convergence happens at M5, never here. The front is blessed, never a winner. Review per [[meth-gate-review]].
 
-THIS GATE ASKED FOR SEVEN THINGS AND SIX OF THEM WERE ALREADY TRUE (owner ruling 2026-08-08). Each was either computed by the engine or refused upstream before the walk could reach here.
+THIS GATE ASKED FOR SEVEN THINGS AND SIX OF THEM WERE ALREADY TRUE. Each was either computed by the engine or refused upstream before the walk could reach here.
 
 - viable_set. The front's size is counted.
 - complete_allocation. A candidate visits every cluster or the chart draws it unfinished.

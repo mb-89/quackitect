@@ -6,7 +6,7 @@ statement: Split the bootstrap cluster by whether the act reaches into a tree fr
 cluster: the-bootstrap
 question: how the bootstrap and the arrival are cut
 found_by: heuristic
-source: "Group what changes together; separate what changes apart."
+source: Group what changes together; separate what changes apart.
 ---
 
 ## Mechanism

@@ -5,16 +5,16 @@ unreachable_refs:
 minted_in: i37-training-iterations-a-disposable-iterati
 id: exp-can-the-lane-read-from-a-history-that-ends-at-the-rewind-point
 type: "[[experiment]]"
-statement: "Can a working tree be stood up whose git history ENDS at the rewind commit, so a request for a later commit cannot be formed rather than being refused?"
+statement: Can a working tree be stood up whose git history ENDS at the rewind commit, so a request for a later commit cannot be formed rather than being refused?
 probes:
   - raid-risk-the-git-ceiling-fails-open-and-a-run-reads-the-answers
   - raid-ar-a-bound-run-resolves-no-commit-newer-than-its-rewind-point
-timebox: "minutes — two git commands, abandon if it needs a server config change"
+timebox: minutes — two git commands, abandon if it needs a server config change
 form: script
-faked: "the lane itself. The tree was built and interrogated with git directly; no se_ verb was pointed at it, because reaching another tree needs a declared root and that is the owner's act."
+faked: the lane itself. The tree was built and interrogated with git directly; no se_ verb was pointed at it, because reaching another tree needs a declared root and that is the owner's act.
 fallback: "pre-agreed before the run: if a truncated history could not be built without changing server configuration, the checked ceiling stands and the declaration at declare-winner needs no revisiting."
-folds_to: "declare-winner — the structural ceiling is available on probed ground and the override falls"
-promote: "name the rewind commit as a ref, then fetch it at depth 1"
+folds_to: declare-winner — the structural ceiling is available on probed ground and the override falls
+promote: name the rewind commit as a ref, then fetch it at depth 1
 verdict: holds
 source_refs:
   - cand-the-guarded-run

@@ -3,11 +3,11 @@ minted_in: i5-engine-hygiene-one-version-source-every-
 id: raid-iss-a-state-that-signs-no-form-can-never-be-sent-back
 type: "[[raid]]"
 kind: issue
-statement: "A state with no evidence fields leaves no form on disk, so a reopen is refused and the work it owns cannot be re-earned."
+statement: A state with no evidence fields leaves no form on disk, so a reopen is refused and the work it owns cannot be re-earned.
 owner: the maintainer
 trigger: any state whose evidence list is empty, and any gate that refuses over one
 status: open
-impact: "The one state whose whole job is filling a story's evidence is the one state that cannot be sent back to do it. A must story reached the validation gate with seven empty evidence halves, and the repair had to be made at the gate instead of where it belongs."
+impact: The one state whose whole job is filling a story's evidence is the one state that cannot be sent back to do it. A must story reached the validation gate with seven empty evidence halves, and the repair had to be made at the gate instead of where it belongs.
 breaks_how_badly: corrosive
 how_likely: expected
 source_refs:
@@ -15,6 +15,7 @@ source_refs:
   - i5-engine-hygiene-one-version-source-every-
 weighs_with: none
 weighs_against: none
+place: i52-the-route-can-go-back-a-walk-can-reach-a
 ---
 ## What was observed
 

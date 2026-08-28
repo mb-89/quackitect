@@ -15,6 +15,7 @@ source_refs:
   - uc-drive-a-foreign-product
   - fn-run-a-governed-walk.resolve-a-path
   - deliverable/engine/paths.ts lines 1-12
+place: i30-reverse-engineering-point-the-system-at-
 ---
 
 ## What the code says, read this session

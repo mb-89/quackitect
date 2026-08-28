@@ -1,0 +1,228 @@
+{"ts":"2026-08-24T14:37:33.949Z","op":"done","visit":"front_desk@1","node":"d16","brief":"i60 now names only the hot path and its two siblings"}
+{"ts":"2026-08-24T14:38:04.236Z","op":"obsolete","visit":"front_desk@1","node":"d13","brief":"answered in chat; the narration system is being replaced anyway"}
+{"ts":"2026-08-24T14:38:45.551Z","op":"plan","visit":"iterations/i60/onboard-retro@0","parent":null,"nodes":[{"id":"d20","brief":"confirm the inbox is empty"},{"id":"d21","brief":"pull past the onboard retro"},{"id":"d22","brief":"propose the change size at the kickoff gate"}]}
+{"ts":"2026-08-24T14:38:49.911Z","op":"done","visit":"iterations/i60/onboard-retro@0","node":"d20","brief":"inbox confirmed empty, so the onboard retro is skipped by its own rule"}
+{"ts":"2026-08-24T14:40:12.658Z","op":"done","visit":"iterations/i60/onboard-retro@0","node":"d21","brief":"onboard-retro signed, recording the retro that already ran"}
+{"ts":"2026-08-24T14:42:05.109Z","op":"done","visit":"iterations/i60/onboard-retro@0","node":"d22","brief":"kickoff blessed at minor with zero walkers"}
+{"ts":"2026-08-24T14:42:18.255Z","op":"done","visit":"front_desk@1","node":"d17","brief":"the VS Code ruling stands in i23 marked as needing no judgment"}
+{"ts":"2026-08-24T14:42:49.115Z","op":"plan","visit":"iterations/i60/spawn-for-motivation@0","parent":null,"nodes":[{"id":"d23","brief":"fill the motivation spawn state with no hand"},{"id":"d24","brief":"prove the route-drawer suspect from the recorded trail"},{"id":"d25","brief":"carry that evidence into the actual state"}]}
+{"ts":"2026-08-24T14:44:07.177Z","op":"done","visit":"iterations/i60/spawn-for-motivation@0","node":"d23","brief":"motivation spawn signed with no hand and the reason recorded"}
+{"ts":"2026-08-24T14:44:19.092Z","op":"update","visit":"iterations/i60/log-risks@0","node":"d26","brief":"checking whether a judgment was live during the 126-second pull"}
+{"ts":"2026-08-24T14:44:38.129Z","op":"update","visit":"iterations/i60/log-risks@0","node":"d27","brief":"42 pulls answered nothing-routes; counting how many were slow"}
+{"ts":"2026-08-24T14:45:06.559Z","op":"done","visit":"iterations/i60/spawn-for-motivation@0","node":"d24","brief":"route-failing pulls are 18 times likelier to run past thirty seconds"}
+{"ts":"2026-08-24T14:46:06.847Z","op":"update","visit":"iterations/i60/log-risks@0","node":"d28","brief":"three register entries written for this round"}
+{"ts":"2026-08-24T14:46:25.982Z","op":"done","visit":"iterations/i60/spawn-for-motivation@0","node":"d25","brief":"the debt re-graded corrosive with the measurement on it"}
+{"ts":"2026-08-24T14:47:08.870Z","op":"plan","visit":"iterations/i60/frame-delta@0","parent":null,"nodes":[{"id":"d29","brief":"name the value prop this round extends"},{"id":"d30","brief":"scope and non-goals"},{"id":"d31","brief":"the motivation gate"}]}
+{"ts":"2026-08-24T14:47:36.657Z","op":"done","visit":"iterations/i60/frame-delta@0","node":"d29","brief":"the round extends rigor-without-toil rather than minting a prop"}
+{"ts":"2026-08-24T14:53:08.256Z","op":"plan","visit":"iterations/i60/gate-motivation@0","parent":null,"nodes":[{"id":"d32","brief":"register and close the reviewer"},{"id":"d33","brief":"fix the probe design it broke"},{"id":"d34","brief":"fix the published-versus-proposed claim"},{"id":"d35","brief":"record the query so the numbers re-run"},{"id":"d36","brief":"add the sibling-reach risk"},{"id":"d37","brief":"fill the gate with what survived"}]}
+{"ts":"2026-08-24T14:53:12.661Z","op":"done","visit":"iterations/i60/gate-motivation@0","node":"d32","brief":"reviewer registered and closed; it found eight things"}
+{"ts":"2026-08-24T14:53:35.659Z","op":"done","visit":"iterations/i60/gate-motivation@0","node":"d33","brief":"the cheap probe is struck; loop contention named as a third hypothesis"}
+{"ts":"2026-08-24T14:53:49.124Z","op":"done","visit":"iterations/i60/gate-motivation@0","node":"d34","brief":"the budget reads proposed, and the five-second band is now a metric"}
+{"ts":"2026-08-24T14:54:10.197Z","op":"done","visit":"iterations/i60/gate-motivation@0","node":"d36","brief":"the sibling-reach risk is minted; my red team had missed it"}
+{"ts":"2026-08-24T14:56:46.132Z","op":"plan","visit":"iterations/i60/write-stories@0","parent":null,"nodes":[{"id":"d38","brief":"read a resident story for its shape"},{"id":"d39","brief":"write the delta's story as a deck"},{"id":"d40","brief":"generalize it into a use case"}]}
+{"ts":"2026-08-24T14:56:54.304Z","op":"done","visit":"iterations/i60/gate-motivation@0","node":"d35","brief":"the four queries and the boundary now stand in the assumption"}
+{"ts":"2026-08-24T14:58:33.768Z","op":"plan","visit":"iterations/i60/generalize-use-cases@0","parent":null,"nodes":[{"id":"d41","brief":"record the broken stop-at control"},{"id":"d42","brief":"map the story into a use case"},{"id":"d43","brief":"carry the control fix into the round's scope"}]}
+{"ts":"2026-08-24T14:58:46.858Z","op":"done","visit":"iterations/i60/generalize-use-cases@0","node":"d41","brief":"the broken control is an issue entry and is in this round's scope"}
+{"ts":"2026-08-24T14:59:44.027Z","op":"update","visit":"iterations/i60/generalize-use-cases@0","node":"d44","brief":"trying to capture the owner's two findings from where the walk stands"}
+{"ts":"2026-08-24T15:00:18.070Z","op":"update","visit":"iterations/i60/generalize-use-cases@0","node":"d45","brief":"correcting a note I disproved a minute after writing it"}
+{"ts":"2026-08-24T15:02:02.125Z","op":"fork","visit":"iterations/i60/generalize-use-cases@0","parent":"d42","node":"d46","brief":"fix the stop-at control now, on the owner's emergency instruction","nodes":[]}
+{"ts":"2026-08-24T15:03:12.141Z","op":"update","visit":"iterations/i60/generalize-use-cases@0","node":"d47","brief":"checking whether the owner's press reached the engine at all"}
+{"ts":"2026-08-24T15:06:42.427Z","op":"done","visit":"iterations/i60/generalize-use-cases@0","node":"d46","brief":"a locked rung now says why instead of swallowing the press"}
+{"ts":"2026-08-24T15:07:13.090Z","op":"update","visit":"iterations/i60/generalize-use-cases@0","node":"d48","brief":"extending the resident use case rather than minting a second one"}
+{"ts":"2026-08-24T15:08:44.419Z","op":"plan","visit":"iterations/i60/write-requirements@0","parent":null,"nodes":[{"id":"d49","brief":"check whether the aim ruling contradicts a resident requirement"},{"id":"d50","brief":"write the delta's requirement rows"},{"id":"d51","brief":"answer the nine set questions"}]}
+{"ts":"2026-08-24T15:10:29.563Z","op":"done","visit":"iterations/i60/write-requirements@0","node":"d50","brief":"four requirement rows written for the delta"}
+{"ts":"2026-08-24T15:10:37.827Z","op":"done","visit":"iterations/i60/write-requirements@0","node":"d49","brief":"the contested resident row now points at the row contesting it"}
+{"ts":"2026-08-24T15:11:43.432Z","op":"update","visit":"iterations/i60/write-requirements@0","node":"d52","brief":"the two aim forms are separate acts, so neither ruling gives way"}
+{"ts":"2026-08-24T15:11:51.615Z","op":"update","visit":"iterations/i60/write-requirements@0","node":"d53","brief":"the resident row is not contested after all; the pointer says so"}
+{"ts":"2026-08-24T15:13:23.813Z","op":"update","visit":"iterations/i60/write-requirements@0","node":"d54","brief":"checking whether the stop hook is recorded as firing"}
+{"ts":"2026-08-24T15:14:09.595Z","op":"update","visit":"iterations/i60/derive-functions@0","node":"d55","brief":"mapping the four new rows onto the function that serves a step"}
+{"ts":"2026-08-24T15:14:34.307Z","op":"update","visit":"iterations/i60/derive-functions@0","node":"d56","brief":"four rows mapped onto two standing functions, none new"}
+{"ts":"2026-08-24T15:15:26.233Z","op":"done","visit":"iterations/i60/write-requirements@0","node":"d51","brief":"the nine characteristics were answered and write-requirements signed"}
+{"ts":"2026-08-24T15:16:23.585Z","op":"update","visit":"iterations/i60/identify-assumptions@0","node":"d57","brief":"two assumptions written, both with probes"}
+{"ts":"2026-08-24T15:16:51.662Z","op":"done","visit":"iterations/i60/generalize-use-cases@0","node":"d43","brief":"the six sources swept, two assumptions opened with probes"}
+{"ts":"2026-08-24T15:17:56.319Z","op":"plan","visit":"iterations/i60/probe-assumptions@0","parent":null,"nodes":[{"id":"d58","brief":"probe the shared loop from recorded data"},{"id":"d59","brief":"record the instrument probe as unprobed with its reason"},{"id":"d60","brief":"fill the probe form"}]}
+{"ts":"2026-08-24T15:18:39.329Z","op":"done","visit":"iterations/i60/probe-assumptions@0","node":"d58","brief":"the shared loop holds at four and a half times baseline"}
+{"ts":"2026-08-24T15:19:02.902Z","op":"done","visit":"iterations/i60/probe-assumptions@0","node":"d59","brief":"the instrument probe is unprobed with its reason and its channel named"}
+{"ts":"2026-08-24T15:20:07.888Z","op":"update","visit":"iterations/i60/probe-assumptions@0","node":"d61","brief":"the probe results belong in frontmatter, not in the form"}
+{"ts":"2026-08-24T15:20:15.162Z","op":"done","visit":"iterations/i60/probe-assumptions@0","node":"d60","brief":"three probe results stamped on their nodes"}
+{"ts":"2026-08-24T15:26:22.169Z","op":"plan","visit":"iterations/i60/gate-requirements@0","parent":null,"nodes":[{"id":"d62","brief":"re-run the overlap probe without self-pairs"},{"id":"d63","brief":"strike the contradicting probed stamps"},{"id":"d64","brief":"remove the invented 200ms"},{"id":"d65","brief":"fix the nine-characteristic sweep"},{"id":"d66","brief":"fix the freeze row's borrowed bound"},{"id":"d67","brief":"ask the owner for the outside-clock probe"}]}
+{"ts":"2026-08-24T15:27:09.757Z","op":"done","visit":"iterations/i60/gate-requirements@0","node":"d62","brief":"threefold after removing 20 self-pairs from the 89"}
+{"ts":"2026-08-24T15:27:28.636Z","op":"done","visit":"iterations/i60/gate-requirements@0","node":"d64","brief":"the invented 200ms is gone; the measure is a comparison"}
+{"ts":"2026-08-24T15:27:47.168Z","op":"done","visit":"iterations/i60/gate-requirements@0","node":"d66","brief":"the freeze row measures the surface against itself now"}
+{"ts":"2026-08-24T15:28:12.969Z","op":"done","visit":"iterations/i60/gate-requirements@0","node":"d63","brief":"what the probed stamp means is now on all three nodes"}
+{"ts":"2026-08-24T15:28:29.401Z","op":"done","visit":"iterations/i60/gate-requirements@0","node":"d67","brief":"the outside-clock probe is asked of the owner, not worked around"}
+{"ts":"2026-08-24T15:29:01.179Z","op":"update","visit":"iterations/i60/gate-requirements@0","node":"d68","brief":"registering the gate reviewer before ruling on what it found"}
+{"ts":"2026-08-24T15:29:06.338Z","op":"done","visit":"iterations/i60/gate-requirements@0","node":"d65","brief":"the sweep errors are ruled at the gate rather than edited silently"}
+{"ts":"2026-08-24T15:31:16.227Z","op":"plan","visit":"iterations/i60/spawn-for-candidates@0","parent":null,"nodes":[{"id":"d69","brief":"find the owner's timed call in the trail"},{"id":"d70","brief":"compare the outside clock against the stamp"},{"id":"d71","brief":"close the instrument assumption"}]}
+{"ts":"2026-08-24T15:31:27.147Z","op":"update","visit":"iterations/i60/spawn-for-candidates@0","node":"d72","brief":"widening the window to find the outside call"}
+{"ts":"2026-08-24T15:31:49.997Z","op":"done","visit":"iterations/i60/spawn-for-candidates@0","node":"d69","brief":"the outside call is not in the trail at all"}
+{"ts":"2026-08-24T15:32:05.800Z","op":"update","visit":"iterations/i60/spawn-for-candidates@0","node":"d73","brief":"searching the whole trail for the owner's timed call"}
+{"ts":"2026-08-24T15:32:48.428Z","op":"done","visit":"iterations/i60/spawn-for-candidates@0","node":"d70","brief":"the outside clock says the stamp captures the wait, not a fraction of it"}
+{"ts":"2026-08-24T15:33:22.738Z","op":"done","visit":"iterations/i60/spawn-for-candidates@0","node":"d71","brief":"the instrument assumption holds; the stamp is the caller's wait"}
+{"ts":"2026-08-24T15:33:46.757Z","op":"update","visit":"iterations/i60/spawn-for-candidates@0","node":"d74","brief":"the distribution is recorded; it is three problems rather than one"}
+{"ts":"2026-08-24T15:36:11.655Z","op":"update","visit":"iterations/i60/spawn-for-implementation@0","node":"d75","brief":"the probe was scheduled to a milestone this size does not compile"}
+{"ts":"2026-08-24T15:36:26.276Z","op":"done","visit":"iterations/i60/generalize-use-cases@0","node":"d42","brief":"the stranded-schedule shape is captured for a retro"}
+{"ts":"2026-08-24T15:41:50.353Z","op":"plan","visit":"iterations/i60/author-tests@0","parent":null,"nodes":[{"id":"d76","brief":"delete the register entry the owner struck"},{"id":"d77","brief":"author a test spec per new requirement"},{"id":"d78","brief":"map honestly against files that exist"}]}
+{"ts":"2026-08-24T15:42:49.630Z","op":"done","visit":"iterations/i60/author-tests@0","node":"d77","brief":"four test specs, one per new requirement"}
+{"ts":"2026-08-24T15:42:56.622Z","op":"update","visit":"iterations/i60/author-tests@0","node":"d79","brief":"checking the named test files exist before a spec claims them"}
+{"ts":"2026-08-24T15:43:14.969Z","op":"done","visit":"iterations/i60/author-tests@0","node":"d78","brief":"the aim spec points at the file that already tests that verb"}
+{"ts":"2026-08-24T15:44:04.236Z","op":"plan","visit":"iterations/i60/specify-build@0","parent":null,"nodes":[{"id":"d80","brief":"find the design specs realizing these elements"},{"id":"d81","brief":"specify the round's design"},{"id":"d82","brief":"seed the chunk plan"}]}
+{"ts":"2026-08-24T15:45:13.028Z","op":"plan","visit":"iterations/i60/observe-red@0","parent":null,"nodes":[{"id":"d83","brief":"read the route test's shape"},{"id":"d84","brief":"write the failing cases"},{"id":"d85","brief":"let the engine observe the red"}]}
+{"ts":"2026-08-24T15:45:43.612Z","op":"done","visit":"iterations/i60/observe-red@0","node":"d83","brief":"the route test uses a hand-drawn graph, so the reds are not flaky"}
+{"ts":"2026-08-24T15:46:16.317Z","op":"update","visit":"iterations/i60/observe-red@0","node":"d86","brief":"the bare aim still draws the route, which is the red"}
+{"ts":"2026-08-24T15:48:14.642Z","op":"plan","visit":"iterations/i60/build-steps@0","parent":null,"nodes":[{"id":"d87","brief":"read the route module"},{"id":"d88","brief":"record a duration and a visited count per search"},{"id":"d89","brief":"make a bare aim skip the drawing"},{"id":"d90","brief":"run the three reds green"}]}
+{"ts":"2026-08-24T15:48:47.987Z","op":"done","visit":"iterations/i60/build-steps@0","node":"d88","brief":"route.ts now times each hop and reports what every search visited"}
+{"ts":"2026-08-24T15:48:53.758Z","op":"done","visit":"iterations/i60/build-steps@0","node":"d87","brief":"the search is pure graph work, so the change is local"}
+{"ts":"2026-08-24T15:49:50.580Z","op":"update","visit":"iterations/i60/build-steps@0","node":"d91","brief":"fixing the two hand-built steps the typechecker named"}
+{"ts":"2026-08-24T15:50:03.042Z","op":"update","visit":"iterations/i60/build-steps@0","node":"d92","brief":"the hand-built step in the wrap test now carries the field"}
+{"ts":"2026-08-24T15:50:12.403Z","op":"done","visit":"iterations/i60/build-steps@0","node":"d90","brief":"both hand-built steps carry the field the typechecker demanded"}
+{"ts":"2026-08-24T15:50:19.991Z","op":"update","visit":"iterations/i60/build-steps@0","node":"d93","brief":"route work landed; the bare-aim split is the remaining red"}
+{"ts":"2026-08-24T15:51:31.141Z","op":"update","visit":"iterations/i60/build-steps@0","node":"d94","brief":"the aim test asserted a field that is absent by design"}
+{"ts":"2026-08-24T15:53:04.314Z","op":"done","visit":"iterations/i60/build-steps@0","node":"d89","brief":"a bare aim checks the state exists rather than searching for a path"}
+{"ts":"2026-08-24T15:53:11.512Z","op":"update","visit":"iterations/i60/build-steps@0","node":"d95","brief":"asking whether the third red went green"}
+{"ts":"2026-08-24T15:54:38.505Z","op":"update","visit":"iterations/i60/build-steps@0","node":"d96","brief":"the bare aim reuses the drawing's name resolution and stops there"}
+{"ts":"2026-08-24T15:55:06.928Z","op":"plan","visit":"iterations/i60/build-steps@0","parent":null,"nodes":[{"id":"d97","brief":"measure what one expand costs"},{"id":"d98","brief":"find what makes it expensive"},{"id":"d99","brief":"fix the drawing rather than avoid it"}]}
+{"ts":"2026-08-24T15:58:31.711Z","op":"done","visit":"iterations/i60/build-steps@0","node":"d97","brief":"one expand is 3.7ms and a route is 68ms, so the search is not the cost"}
+{"ts":"2026-08-24T16:07:10.776Z","op":"fork","visit":"iterations/i60/build-steps@0","parent":"d85","node":"d100","brief":"the stop hook stopped biting and the stop-at fix never reached the built file","nodes":[]}
+{"ts":"2026-08-24T16:07:56.481Z","op":"plan","visit":"iterations/i60/build-steps@0","parent":null,"nodes":[{"id":"d101","brief":"measure whether blockers-only plus a refused pull explains the quiet tooth"},{"id":"d102","brief":"give the hook a trail it writes"},{"id":"d103","brief":"build the vscode extension so a source fix reaches the built file"},{"id":"d104","brief":"fix the stop-at notches for real"}]}
+{"ts":"2026-08-24T16:08:45.537Z","op":"update","visit":"iterations/i60/build-steps@0","node":"d105","brief":"338 of 338 pulls carried no stop_at, so the notch logic never fired"}
+{"ts":"2026-08-24T16:11:13.932Z","op":"done","visit":"iterations/i60/build-steps@0","node":"d101","brief":"the notch rode packet() and the hook reads pulls, so it never once connected"}
+{"ts":"2026-08-24T16:13:16.885Z","op":"update","visit":"iterations/i60/build-steps@0","node":"d106","brief":"the suite hand-wrote the pull response, so both halves passed while disconnected"}
+{"ts":"2026-08-24T16:15:00.274Z","op":"update","visit":"iterations/i60/build-steps@0","node":"d107","brief":"esbuild already builds it and the generated file was hand-edited instead"}
+{"ts":"2026-08-24T16:21:32.378Z","op":"update","visit":"iterations/i60/spawn-the-hands@0","node":"d5","brief":"paying the re-owed reads to get back to build-steps"}
+{"ts":"2026-08-24T16:23:54.259Z","op":"done","visit":"front_desk@0","node":"d2","brief":"back inside i60 and standing at gate-requirements"}
+{"ts":"2026-08-24T16:26:29.050Z","op":"done","visit":"front_desk@0","node":"d3","brief":"the drawing stays because it answers reachability for almost no cost"}
+{"ts":"2026-08-24T16:28:37.088Z","op":"plan","visit":"iterations/i60/build-steps@0","parent":null,"nodes":[{"id":"d6","brief":"author the chunk drawing specify-build owes"},{"id":"d7","brief":"walk the chunks"},{"id":"d8","brief":"reach verification"}]}
+{"ts":"2026-08-24T16:30:12.829Z","op":"done","visit":"iterations/i60/build-steps@0","node":"d6","brief":"the chunk drawing is authored and the machine seeded from it"}
+{"ts":"2026-08-24T16:31:17.717Z","op":"update","visit":"iterations/i60/build-steps/a-hop-carries-its-own-time@0","node":"d9","brief":"the new aim case read the helper's wrapper instead of its answer"}
+{"ts":"2026-08-24T16:31:43.433Z","op":"done","visit":"front_desk@0","node":"d4","brief":"431 of 435 pass and the four failures are named"}
+{"ts":"2026-08-24T16:33:55.163Z","op":"update","visit":"iterations/i60/trace-design@0","node":"d10","brief":"claiming the changed hook and build files under boot-and-power"}
+{"ts":"2026-08-24T16:37:10.105Z","op":"update","visit":"iterations/i60/verification@0","node":"d11","brief":"tester: counting how many se_pull records in the call log carry stop_at"}
+{"ts":"2026-08-24T16:39:03.497Z","op":"update","visit":"iterations/i60/verification@0","node":"d12","brief":"tester: checking the stophook test that feeds a real pull to the hook"}
+{"ts":"2026-08-24T16:45:09.871Z","op":"update","visit":"iterations/i60/verification@0","node":"d13","brief":"tester: comparing the i60 tests against their own test-spec steps"}
+{"ts":"2026-08-24T16:47:17.542Z","op":"update","visit":"iterations/i60/verification@0","node":"d14","brief":"tester: confirming the vault walker picks up the stray scratchpad copy"}
+{"ts":"2026-08-24T16:50:57.065Z","op":"plan","visit":"iterations/i60/verification@0","parent":null,"nodes":[{"id":"d15","brief":"exclude the stray project copy from the vault reader"},{"id":"d16","brief":"strengthen the hop-timing and failed-route tests"},{"id":"d17","brief":"reconcile the two test specs the tests disagree with"},{"id":"d18","brief":"let the stop hook see a target set by aiming"},{"id":"d19","brief":"guard the unguarded lifecycle write"}]}
+{"ts":"2026-08-24T16:53:42.942Z","op":"done","visit":"iterations/i60/verification@0","node":"d18","brief":"an aim since the last pull now counts as the standing target"}
+{"ts":"2026-08-24T16:54:50.579Z","op":"update","visit":"iterations/i60/fix-findings@0","node":"d20","brief":"two specs amended to oracles the measurement supports"}
+{"ts":"2026-08-24T16:56:03.568Z","op":"done","visit":"iterations/i60/verification@0","node":"d17","brief":"three specs now match their tests and the unbuilt half is an open issue"}
+{"ts":"2026-08-24T16:57:49.824Z","op":"done","visit":"iterations/i60/verification@0","node":"d16","brief":"435 of 435 pass and the two standing reds are gone"}
+{"ts":"2026-08-24T16:58:23.175Z","op":"update","visit":"iterations/i60/fix-findings@0","node":"d21","brief":"tester: re-verifying the i60 fix pass, three questions from the coordinator"}
+{"ts":"2026-08-24T17:01:59.326Z","op":"fork","visit":"iterations/i60/fix-findings@0","parent":"d8","node":"d22","brief":"the person's own aiming door was still invisible to the hook","nodes":[]}
+{"ts":"2026-08-24T17:02:59.268Z","op":"done","visit":"iterations/i60/fix-findings@0","node":"d22","brief":"both aiming doors reach the hook and clearing a target now counts"}
+{"ts":"2026-08-24T17:04:03.148Z","op":"update","visit":"iterations/i60/fix-findings@0","node":"d23","brief":"waiting on the confirm battery, which has been running 75 seconds"}
+{"ts":"2026-08-24T17:05:06.307Z","op":"update","visit":"iterations/i60/fix-findings@0","node":"d24","brief":"the battery named one failure in the git lane, outside anything this round touched"}
+{"ts":"2026-08-24T17:06:24.624Z","op":"done","visit":"iterations/i60/build-steps@0","node":"d8","brief":"the confirm battery passed and the walk leaves fix-findings"}
+{"ts":"2026-08-24T17:09:47.854Z","op":"done","visit":"iterations/i60/build-steps@0","node":"d7","brief":"every chunk is signed and both batteries passed"}
+{"ts":"2026-08-24T17:14:35.661Z","op":"update","visit":"iterations/i60/gate-implementation@0","node":"d25","brief":"checking whether noting is already legal in every state"}
+{"ts":"2026-08-24T17:14:59.229Z","op":"plan","visit":"iterations/i60/gate-implementation@0","parent":null,"nodes":[{"id":"d26","brief":"read the four i60 requirements"},{"id":"d27","brief":"check whether a walked hop records its time"},{"id":"d28","brief":"read the two open raid issues"},{"id":"d29","brief":"compare clear-jump and stophook tests to their specs"},{"id":"d30","brief":"write the three review rounds"}]}
+{"ts":"2026-08-24T17:18:01.993Z","op":"done","visit":"iterations/i60/gate-implementation@0","node":"d27","brief":"no walked hop is timed — only the route drawing, at route.ts line 108"}
+{"ts":"2026-08-24T17:18:15.621Z","op":"done","visit":"iterations/i60/gate-implementation@0","node":"d28","brief":"both open issues read — each is honest about the row it leaves unverified"}
+{"ts":"2026-08-24T17:18:23.917Z","op":"done","visit":"iterations/i60/gate-implementation@0","node":"d29","brief":"tests compared to specs — two amended rows now assert less than their requirement demands"}
+{"ts":"2026-08-24T17:19:07.261Z","op":"update","visit":"iterations/i60/gate-implementation@0","node":"d31","brief":"measuring the sweep, which is where the twenty seconds must be"}
+{"ts":"2026-08-24T17:20:52.529Z","op":"fork","visit":"iterations/i60/gate-implementation@0","parent":"d15","node":"d32","brief":"the shipped instrument timed the drawing and the cost is in the walking","nodes":[]}
+{"ts":"2026-08-24T17:24:57.267Z","op":"done","visit":"iterations/i60/verification@0","node":"d19","brief":"the running-work lifecycle write sits inside a try now"}
+{"ts":"2026-08-24T17:26:12.873Z","op":"done","visit":"iterations/i60/gate-implementation@0","node":"d32","brief":"the sweep now records what each hop cost to walk"}
+{"ts":"2026-08-24T17:28:33.034Z","op":"done","visit":"iterations/i60/verification@0","node":"d15","brief":"scratchpad is excluded and the matrix reports the rows it has"}
+{"ts":"2026-08-24T17:33:24.812Z","op":"plan","visit":"iterations/i60/gate-implementation@0","parent":null,"nodes":[{"id":"d33","brief":"measure the mechanical flip apart from the state's work"},{"id":"d34","brief":"reopen author-tests and build-steps"},{"id":"d35","brief":"reconcile the requirements with their specs"},{"id":"d36","brief":"build the four owed items"}]}
+{"ts":"2026-08-24T17:35:28.561Z","op":"done","visit":"iterations/i60/gate-implementation@0","node":"d34","brief":"author-tests and build-steps are both reopened"}
+{"ts":"2026-08-24T17:36:49.863Z","op":"done","visit":"iterations/i60/gate-implementation@0","node":"d35","brief":"the failed-route row now demands a bound the search can actually meet"}
+{"ts":"2026-08-24T17:38:33.272Z","op":"update","visit":"iterations/i60/author-tests@2","node":"d37","brief":"all three requirements now match the specs and tests under them"}
+{"ts":"2026-08-24T17:40:14.036Z","op":"done","visit":"iterations/i60/gate-implementation@0","node":"d36","brief":"the four owed items are chunks now rather than an omission"}
+{"ts":"2026-08-24T17:40:44.159Z","op":"plan","visit":"iterations/i60/specify-build@2","parent":null,"nodes":[{"id":"d38","brief":"re-sign specify-build with the four added chunks"},{"id":"d39","brief":"build the route-drawer repayment"},{"id":"d40","brief":"build the yardstick"},{"id":"d41","brief":"build the knock-down and the score cell"}]}
+{"ts":"2026-08-24T17:42:35.612Z","op":"done","visit":"iterations/i60/specify-build@2","node":"d38","brief":"specify-build still stands and the drawing now carries eight chunks"}
+{"ts":"2026-08-24T17:44:57.558Z","op":"update","visit":"iterations/i60/observe-red@2","node":"d42","brief":"the drawer gets its own three-word question and the sweep says deciding"}
+{"ts":"2026-08-24T17:45:17.165Z","op":"done","visit":"iterations/i60/specify-build@2","node":"d39","brief":"the route-drawer debt is repaid and the sweep no longer calls deciding a refusal"}
+{"ts":"2026-08-24T17:47:38.082Z","op":"update","visit":"iterations/i60/observe-red@2","node":"d43","brief":"the pinned record now carries what each hop of the run cost"}
+{"ts":"2026-08-24T17:49:30.724Z","op":"update","visit":"iterations/i60/observe-red@2","node":"d44","brief":"walking over a hop no longer owes that hop's reading"}
+{"ts":"2026-08-24T17:50:16.077Z","op":"done","visit":"iterations/i60/specify-build@2","node":"d40","brief":"the pinned run records its hop timings and reports their median"}
+{"ts":"2026-08-24T17:51:59.377Z","op":"done","visit":"iterations/i60/specify-build@2","node":"d41","brief":"an unscored axis no longer costs a candidate the datum seat"}
+{"ts":"2026-08-24T17:53:59.229Z","op":"plan","visit":"iterations/i60/observe-red@2","parent":null,"nodes":[{"id":"d45","brief":"answer observe-red honestly about the four built without a red"},{"id":"d46","brief":"walk the eight chunk states"},{"id":"d47","brief":"reach verification"}]}
+{"ts":"2026-08-24T17:55:45.546Z","op":"done","visit":"iterations/i60/observe-red@2","node":"d45","brief":"observe-red carries the break in test-first order rather than a green box"}
+{"ts":"2026-08-24T17:59:37.249Z","op":"done","visit":"iterations/i60/observe-red@2","node":"d46","brief":"all eight chunk states are signed"}
+{"ts":"2026-08-24T18:00:35.965Z","op":"update","visit":"iterations/i60/trace-design@1","node":"d48","brief":"trace-design next, then verification"}
+{"ts":"2026-08-24T18:02:30.161Z","op":"update","visit":"iterations/i60/verification@2","node":"d49","brief":"tester: re-verifying the second i60 fix pass"}
+{"ts":"2026-08-24T18:04:18.917Z","op":"update","visit":"iterations/i60/verification@2","node":"d50","brief":"minting the entry the open claim boxes need"}
+{"ts":"2026-08-24T18:05:49.820Z","op":"fork","visit":"iterations/i60/fix-findings@1","parent":"d47","node":"d51","brief":"my score-cell fix rewarded silence instead of punishing it","nodes":[]}
+{"ts":"2026-08-24T18:08:28.947Z","op":"done","visit":"iterations/i60/fix-findings@1","node":"d51","brief":"the datum pick now runs on the axes every candidate scored"}
+{"ts":"2026-08-24T18:10:36.617Z","op":"done","visit":"iterations/i60/observe-red@2","node":"d47","brief":"442 of 442 pass and the gatekeeper's findings are answered"}
+{"ts":"2026-08-24T18:12:29.044Z","op":"update","visit":"iterations/i60/gate-implementation@0","node":"d52","brief":"re-judging the gate on the deltas the reopen produced"}
+{"ts":"2026-08-24T18:15:17.780Z","op":"fork","visit":"iterations/i60/gate-implementation@0","parent":"d30","node":"d53","brief":"the gate reviewer's two edits and three smaller ones","nodes":[]}
+{"ts":"2026-08-24T18:17:49.125Z","op":"done","visit":"iterations/i60/gate-implementation@0","node":"d53","brief":"all five of the gate reviewer's edits are made"}
+{"ts":"2026-08-24T18:20:41.695Z","op":"fork","visit":"iterations/i60/gate-implementation@0","parent":"d30","node":"d54","brief":"two entries sat behind a blocker that does not exist","nodes":[]}
+{"ts":"2026-08-24T18:25:23.670Z","op":"plan","visit":"iterations/i60/gate-implementation@0","parent":null,"nodes":[{"id":"d55","brief":"read what a multi-hop walk actually cost today"},{"id":"d56","brief":"time one live fast-forward with per-hop numbers"},{"id":"d57","brief":"find what a no-work hop spends"}]}
+{"ts":"2026-08-24T18:29:11.982Z","op":"update","visit":"iterations/i60/gate-implementation@0","node":"d58","brief":"the hop reports its own phases now rather than being guessed at"}
+{"ts":"2026-08-24T18:36:24.691Z","op":"update","visit":"iterations/i60/gate-implementation@0","node":"d59","brief":"checking whether listing iterations reads every record including archived ones"}
+{"ts":"2026-08-24T18:42:11.684Z","op":"update","visit":"iterations/i60/gate-implementation@0","node":"d60","brief":"holding the drawing for one call instead of per hop"}
+{"ts":"2026-08-24T18:44:22.415Z","op":"update","visit":"iterations/i60/gate-implementation@0","node":"d61","brief":"measuring the hop with the drawing held for the call"}
+{"ts":"2026-08-24T18:47:46.920Z","op":"update","visit":"iterations/i60/gate-implementation@0","node":"d62","brief":"profiling the sweep again after holding the iteration list"}
+{"ts":"2026-08-24T18:48:48.380Z","op":"done","visit":"iterations/i60/gate-implementation@0","node":"d55","brief":"the log's own durations say a hop costs three to six seconds"}
+{"ts":"2026-08-24T18:50:06.433Z","op":"done","visit":"iterations/i60/gate-implementation@0","node":"d57","brief":"resolvesOf in supply.ts is half the walk's syscall time"}
+{"ts":"2026-08-24T18:51:22.107Z","op":"update","visit":"iterations/i60/gate-implementation@0","node":"d63","brief":"measuring the sweep after fixing the template read"}
+{"ts":"2026-08-24T18:53:07.896Z","op":"update","visit":"iterations/i60/gate-implementation@0","node":"d64","brief":"the walk is two and a half times faster and disk is no longer the cost"}
+{"ts":"2026-08-24T18:54:47.662Z","op":"done","visit":"iterations/i60/gate-implementation@0","node":"d56","brief":"the walk is two and a half times faster with the suite still green"}
+{"ts":"2026-08-24T18:56:17.968Z","op":"update","visit":"iterations/i60/gate-implementation@0","node":"d65","brief":"checking whether a passed state re-runs its exit script"}
+{"ts":"2026-08-24T19:00:08.972Z","op":"fork","visit":"iterations/i60/gate-implementation@0","parent":"d54","node":"d66","brief":"a green state walked over keeps the verdict it already has","nodes":[]}
+{"ts":"2026-08-24T19:00:54.445Z","op":"update","visit":"iterations/i60/gate-implementation@0","node":"d67","brief":"measuring the sweep with green states keeping their verdicts"}
+{"ts":"2026-08-24T19:01:57.569Z","op":"update","visit":"iterations/i60/gate-implementation@0","node":"d68","brief":"the verdict is written to disk and never read back at session start"}
+{"ts":"2026-08-24T19:04:59.059Z","op":"update","visit":"iterations/i60/gate-implementation@0","node":"d69","brief":"the verdict now carries what it was reached with, on disk"}
+{"ts":"2026-08-24T19:10:16.493Z","op":"update","visit":"iterations/i60/gate-implementation@0","node":"d70","brief":"suite green but the sweep did not move — tracing where the hop time really goes"}
+{"ts":"2026-08-24T19:13:18.041Z","op":"update","visit":"iterations/i60/gate-implementation@0","node":"d71","brief":"the route fan and the leaving check both rebuild every state form; caching that"}
+{"ts":"2026-08-24T19:17:27.121Z","op":"update","visit":"iterations/i60/gate-implementation@0","node":"d72","brief":"three per-pass caches landed: 6113 ms to 2785 ms on the three-hop sweep"}
+{"ts":"2026-08-24T19:18:13.632Z","op":"update","visit":"iterations/i60/gate-implementation@0","node":"d73","brief":"suite 463 of 464 — the miss is three design-spec sections i owe"}
+{"ts":"2026-08-24T19:18:57.182Z","op":"update","visit":"iterations/i60/gate-implementation@0","node":"d74","brief":"wrote the three sections and corrected the refuted measurement in the design spec"}
+{"ts":"2026-08-24T19:21:00.277Z","op":"update","visit":"iterations/i60/gate-implementation@0","node":"d75","brief":"the shared green pass bought nothing — checking whether writes reset the pass mid-route"}
+{"ts":"2026-08-24T19:23:27.794Z","op":"update","visit":"iterations/i60/gate-implementation@0","node":"d76","brief":"reverted the green-pass share; kept the door stamp and the redundant syscall removal"}
+{"ts":"2026-08-24T19:24:37.153Z","op":"done","visit":"iterations/i60/gate-implementation@0","node":"d66","brief":"verdict reuse landed, and the sweep went 6113 ms to 2562 ms on four measured fixes"}
+{"ts":"2026-08-24T19:25:30.365Z","op":"plan","visit":"iterations/i60/gate-implementation@0","parent":null,"nodes":[{"id":"d77","brief":"pull and see what the engine knocked down"},{"id":"d78","brief":"re-earn what the engine changes dropped"},{"id":"d79","brief":"get back to the gate"}]}
+{"ts":"2026-08-24T19:26:33.075Z","op":"plan","visit":"iterations/i60/gate-implementation@0","parent":null,"nodes":[{"id":"d80","brief":"close the entry saying nothing got faster"},{"id":"d81","brief":"mint the entry for the budget still missed"},{"id":"d82","brief":"amend the gate verdict to match"},{"id":"d83","brief":"put the bless in front of the owner"}]}
+{"ts":"2026-08-24T19:27:11.175Z","op":"done","visit":"iterations/i60/gate-implementation@0","node":"d80","brief":"the entry is closed against the measurement, with what it got wrong recorded"}
+{"ts":"2026-08-24T19:27:24.057Z","op":"done","visit":"iterations/i60/gate-implementation@0","node":"d81","brief":"minted the entry carrying 854 ms against a 250 ms budget, with the structural candidates"}
+{"ts":"2026-08-24T19:28:19.344Z","op":"update","visit":"iterations/i60/gate-implementation@0","node":"d84","brief":"captured the owner's ruling that the retro empties the scratchpad"}
+{"ts":"2026-08-24T19:28:28.018Z","op":"update","visit":"iterations/i60/gate-implementation@0","node":"d85","brief":"sending the bless to read what the dial allows"}
+{"ts":"2026-08-24T19:28:38.485Z","op":"update","visit":"iterations/i60/gate-implementation@0","node":"d86","brief":"the verdict fill unstamped the form; stamping and blessing in one call"}
+{"ts":"2026-08-24T19:29:55.201Z","op":"plan","visit":"iterations/i60/spawn-for-validation@0","parent":null,"nodes":[{"id":"d87","brief":"pull and read what validation owes"},{"id":"d88","brief":"fill the story evidence"},{"id":"d89","brief":"run the demos and record results"},{"id":"d90","brief":"sweep for consistency"},{"id":"d91","brief":"submit the state evidence"}]}
+{"ts":"2026-08-24T19:29:56.426Z","op":"update","visit":"iterations/i60/spawn-for-validation@0","node":"d92","brief":"gate blessed and shipped; walker spawned for the validation phase"}
+{"ts":"2026-08-24T19:30:25.877Z","op":"update","visit":"iterations/i60/spawn-for-validation@0","node":"d93","brief":"reading the i60 record to ground the current situation"}
+{"ts":"2026-08-24T19:30:26.531Z","op":"done","visit":"iterations/i60/gate-implementation@0","node":"d83","brief":"gate blessed; walker agent-mt7mrlo0 registered and handed its job id"}
+{"ts":"2026-08-24T19:30:52.412Z","op":"done","visit":"iterations/i60/spawn-for-validation@0","node":"d87","brief":"spawn-for-validation filled and submitted; walker registered"}
+{"ts":"2026-08-24T19:31:55.103Z","op":"update","visit":"iterations/i60/spawn-for-validation@0","node":"d94","brief":"kickoff agreed zero walkers; standing the spawned hand down rather than raising it"}
+{"ts":"2026-08-24T19:32:13.457Z","op":"plan","visit":"iterations/i60/sweep-consistency@0","parent":null,"nodes":[{"id":"d95","brief":"read the sweep card for its surface classes"},{"id":"d96","brief":"list what i60 changed"},{"id":"d97","brief":"walk each class and fix what teaches the old way"},{"id":"d98","brief":"fill and submit the sweep form"}]}
+{"ts":"2026-08-24T19:33:14.046Z","op":"done","visit":"iterations/i60/sweep-consistency@0","node":"d95","brief":"nine surface classes from the card; the sweep runs as one script over all of them"}
+{"ts":"2026-08-24T19:34:30.986Z","op":"update","visit":"iterations/i60/sweep-consistency@0","node":"d99","brief":"stopat.md corrected: the notch is held by the hook, not only by the agent"}
+{"ts":"2026-08-24T19:35:30.913Z","op":"fork","visit":"iterations/i60/sweep-consistency@0","parent":"d97","node":"d100","brief":"the dashed state is a law-proven green; the owner wants the stroke gone","nodes":[]}
+{"ts":"2026-08-24T19:37:19.884Z","op":"done","visit":"iterations/i60/sweep-consistency@0","node":"d100","brief":"the stroke is gone and the spec says the third green is now unpainted"}
+{"ts":"2026-08-24T19:37:39.532Z","op":"update","visit":"iterations/i60/sweep-consistency@0","node":"d101","brief":"walking.md now teaches swept_ms and visited; guidance and machines swept"}
+{"ts":"2026-08-24T19:39:50.633Z","op":"plan","visit":"iterations/i60/gate-validation@0","parent":null,"nodes":[{"id":"d102","brief":"read the story evidence the gate judges"},{"id":"d103","brief":"spawn a reviewer with fresh eyes"},{"id":"d104","brief":"fill the gate from what it finds"}]}
+{"ts":"2026-08-24T19:40:40.419Z","op":"update","visit":"iterations/i60/gate-validation@0","node":"d105","brief":"reviewer spawned; a reviewer stands outside the walker ceiling"}
+{"ts":"2026-08-24T19:41:23.030Z","op":"done","visit":"iterations/i60/gate-validation@0","node":"d102","brief":"one story was stale: its owed measurement is taken and its suspect refuted"}
+{"ts":"2026-08-24T19:42:11.978Z","op":"update","visit":"iterations/i60/gate-validation@0","node":"d106","brief":"one story amended; testing the surface edits while the reviewer reads"}
+{"ts":"2026-08-24T19:43:34.357Z","op":"update","visit":"iterations/i60/gate-validation@0","node":"d107","brief":"reviewer reading observe-red to judge the three unreddened chunks"}
+{"ts":"2026-08-24T19:43:35.616Z","op":"update","visit":"iterations/i60/gate-validation@0","node":"d108","brief":"reading the i60 record tail for the profiler and four-fix sections"}
+{"ts":"2026-08-24T19:43:44.715Z","op":"update","visit":"iterations/i60/gate-validation@0","node":"d109","brief":"listing the i60 machines folder for the chunk and story list"}
+{"ts":"2026-08-24T19:44:40.547Z","op":"update","visit":"iterations/i60/gate-validation@0","node":"d110","brief":"quoting the implementation gate's record of the profiler pass"}
+{"ts":"2026-08-24T19:45:35.491Z","op":"update","visit":"iterations/i60/gate-validation@0","node":"d111","brief":"checking whether any RAID statement covers the stop-at notches"}
+{"ts":"2026-08-24T19:45:38.196Z","op":"update","visit":"iterations/i60/gate-validation@0","node":"d112","brief":"checking whether any RAID statement covers unchecked generated artifacts"}
+{"ts":"2026-08-24T19:45:39.011Z","op":"update","visit":"iterations/i60/gate-validation@0","node":"d113","brief":"checking whether the closed speed entry's body matches its post-fix statement"}
+{"ts":"2026-08-24T19:45:39.685Z","op":"update","visit":"iterations/i60/gate-validation@0","node":"d114","brief":"checking whether the pugh datum-pick fix has any recorded check"}
+{"ts":"2026-08-24T19:45:46.052Z","op":"update","visit":"iterations/i60/gate-validation@0","node":"d115","brief":"a fifth guidance page is over the line and its file has not moved"}
+{"ts":"2026-08-24T19:46:10.960Z","op":"update","visit":"iterations/i60/gate-validation@0","node":"d116","brief":"checking whether the 250ms budget binds the flip or the whole hop"}
+{"ts":"2026-08-24T19:46:35.144Z","op":"update","visit":"iterations/i60/gate-validation@0","node":"d117","brief":"the fifth page was walking.md and my own edit tipped it; reverted"}
+{"ts":"2026-08-24T19:48:27.825Z","op":"done","visit":"iterations/i60/gate-validation@0","node":"d103","brief":"cold reviewer spawned and reporting; findings land in the gate form"}
+{"ts":"2026-08-24T19:48:55.650Z","op":"update","visit":"iterations/i60/gate-validation@0","node":"d118","brief":"four gate fields landed; checking the bound before answering it"}
+{"ts":"2026-08-24T19:49:56.440Z","op":"update","visit":"iterations/i60/gate-validation@0","node":"d119","brief":"the must story and its value prop are resident, so the drawing carried neither"}
+{"ts":"2026-08-24T19:51:23.752Z","op":"update","visit":"iterations/i60/gate-validation@0","node":"d120","brief":"the reviewer is right — measuring the flip apart from the state's work now"}
+{"ts":"2026-08-24T19:53:46.067Z","op":"done","visit":"iterations/i60/gate-implementation@0","node":"d33","brief":"the flip is 20 ms warm against 250, and the 854 figure was a cold process"}
+{"ts":"2026-08-24T19:56:07.491Z","op":"plan","visit":"iterations/i60/gate-validation@0","parent":null,"nodes":[{"id":"d121","brief":"write the owed pugh check"},{"id":"d122","brief":"correct the score-cell story to what stands"},{"id":"d123","brief":"fix the end-to-end figure in the design spec"},{"id":"d124","brief":"bring record.md forward"},{"id":"d125","brief":"settle published against proposed"}]}
+{"ts":"2026-08-24T19:57:42.489Z","op":"update","visit":"iterations/i60/gate-validation@0","node":"d126","brief":"my assertion was inverted — the datum is second place, not the leader"}
+{"ts":"2026-08-24T19:59:10.035Z","op":"done","visit":"iterations/i60/gate-validation@0","node":"d121","brief":"the owed pugh check is written and it caught an inverted assertion of my own"}
+{"ts":"2026-08-24T20:01:19.899Z","op":"done","visit":"iterations/i60/gate-validation@0","node":"d122","brief":"the score-cell story now describes what stands, and its owed check exists"}
+{"ts":"2026-08-24T20:02:18.631Z","op":"done","visit":"iterations/i60/gate-validation@0","node":"d125","brief":"the budget is ratified by a signed requirement, and the value prop said it never was"}
+{"ts":"2026-08-24T20:03:40.497Z","op":"done","visit":"iterations/i60/gate-validation@0","node":"d104","brief":"gate-validation signed with every reviewer finding closed by work"}
+{"ts":"2026-08-24T20:03:43.934Z","op":"done","visit":"iterations/i60/gate-validation@0","node":"d123","brief":"both scopes of the speed figure now stated apart in the design spec"}
+{"ts":"2026-08-24T20:03:54.161Z","op":"done","visit":"iterations/i60/gate-validation@0","node":"d124","brief":"record.md now carries the ratified budget and what became of the twenty seconds"}
+{"ts":"2026-08-24T20:04:13.699Z","op":"update","visit":"iterations/i60/spawn-for-release@0","node":"d127","brief":"release phase opens with no walker, as the kickoff agreed"}
+{"ts":"2026-08-24T20:04:56.700Z","op":"plan","visit":"iterations/i60/package@0","parent":null,"nodes":[{"id":"d128","brief":"bump the minor and assemble by script"},{"id":"d129","brief":"check the package by using it"},{"id":"d130","brief":"check the shutdown-at-front-desk code and its countdown"},{"id":"d131","brief":"fill and submit the package form"}]}
+{"ts":"2026-08-24T20:06:29.386Z","op":"done","visit":"iterations/i60/package@0","node":"d129","brief":"the package carries every item the ship method names"}
+{"ts":"2026-08-24T20:06:57.533Z","op":"done","visit":"iterations/i60/package@0","node":"d130","brief":"the shutdown code is sound but nothing counts down and no agent can arm it"}
+{"ts":"2026-08-24T20:07:45.079Z","op":"done","visit":"iterations/i60/package@0","node":"d131","brief":"package signed at 8.1.0 with the live-install gap named"}
+{"ts":"2026-08-24T20:08:29.113Z","op":"update","visit":"iterations/i60/gate-release@0","node":"d132","brief":"shipping i60 at the release gate"}

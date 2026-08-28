@@ -133,7 +133,7 @@ describe("the box a person sees", { concurrency: true }, () => {
     assert.ok(!/class="sfmbdot"/.test(html), "the slots are the client's, so the count can follow the lines");
   });
 
-  // THE ROW IS A REFERENCE TO A NOTE (owner ruling 2026-08-08). Clicking it
+  // THE ROW IS A REFERENCE TO A NOTE. Clicking it
   // opens the candidate, where its prose lives.
   test("a line whose note exists opens it; one not written yet says so", () => {
     const linked = draw(BOX, { "cand-1-proxy": "spec/trace/candidate/cand-1-proxy.md" });

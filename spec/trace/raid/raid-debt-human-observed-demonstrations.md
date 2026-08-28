@@ -7,7 +7,7 @@ statement: Four demonstration specs went unobserved at i3's verification - each 
 owner: the owner
 trigger: the consolidation pass that collects everything needing a person, or any iteration whose delta actually touches one of the four specs
 status: open
-looked: 2026-08-20
+looked: 2026-08-26
 breaks_how_badly: abrasive
 how_likely: expected
 impact: Verification refuses while any claim box stands open, so four specs nobody at a terminal can observe stop every iteration from closing. The alternative is checking boxes on unobserved claims, which is worse.
@@ -17,6 +17,9 @@ source_refs:
   - tsp-tour-run
   - tsp-desk-and-gates
   - meth-verification-discipline
+last_looked: 2026-08-23
+look_verdict: rescheduled
+place: backlog
 ---
 
 ## What is actually owed
@@ -139,3 +142,26 @@ is about, so nothing here moved.
 THE LOOK IS THE POINT. A debt nobody re-reads is a lie in the ledger, and this
 line is the evidence that somebody read it on this date.
 
+## Swept 2026-08-26, at i54's closing retro: RE-ACCEPTED, with fresh evidence
+
+THREE DEMONSTRATIONS WERE PERFORMED THIS WINDOW WITH NOBODY WATCHING, and each left a written report under its record's reports folder.
+
+WHAT THAT ADDS. It is another data point that the class is not uniformly blocked on a person. A demonstration whose whole subject is a refusal, a report or a sweep can be performed and written up by the walking hand alone.
+
+WHAT IT DOES NOT SETTLE. A demonstration whose subject is what somebody SEES still needs eyes, and that is the half this entry is really about.
+
+RE-ACCEPTED consciously, trigger unchanged.
+
+
+SWEPT 2026-08-28, at i63's closing retro: RE-ACCEPTED, and half the trigger
+fired.
+
+It fires at the consolidation pass that collects everything needing a person,
+or at any iteration whose delta touches one of the four specs. No consolidation
+pass ran in this window.
+
+THIS ENTRY'S MOMENT IS THE ONE TWO SIBLING DEBTS ALSO WANT.
+raid-debt-i16-ships-with-its-demonstrations-unperformed and
+raid-debt-i4-ships-with-the-panel-demonstration-unperformed both carry no
+trigger at all and both wait on this same pass. Three debts, one moment, and
+only this one can be woken.

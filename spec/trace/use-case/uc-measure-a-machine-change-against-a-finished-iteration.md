@@ -2,7 +2,7 @@
 minted_in: i37-training-iterations-a-disposable-iterati
 id: uc-measure-a-machine-change-against-a-finished-iteration
 type: "[[use-case]]"
-statement: "Measure a machine change against a finished iteration."
+statement: Measure a machine change against a finished iteration.
 actor: stk-engineer-driving-agents
 trigger: a change to the process machine that the engineer wants to judge
 precondition: at least one iteration is shipped and carries a pinned change size
