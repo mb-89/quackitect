@@ -182,3 +182,48 @@ test("a sound write still lands and still returns its hash", async () => {
   assert.ok(existsSync(join(root, NODE)), "the file is on disk");
   assert.match(readFileSync(join(root, NODE), "utf8"), /status: open/, "the content is what was sent");
 });
+
+test("the patch verb refuses an unquoted colon too, and leaves the file as it was", async () => {
+  const root = freshRoot();
+  gitInit(root);
+  const server = await bootedServer(root);
+
+  const sound = frontmatter("statement: A fixture.\nstatus: open");
+  const first = await call(server, "se_file_write", { path: NODE, base_hash: null, content: sound });
+  assert.notEqual(first.body.kind, "rejected", `the fixture lands: ${JSON.stringify(first.body)}`);
+
+  // THE SAME BREAK, THROUGH THE VERB THE CONTRACT SENDS EVERY AGENT TO. The
+  // whole-file writer refused this shape from the day the guard was built. The
+  // patch verb accepted it, and the walk then died on a bare parser message
+  // carrying no clause and no remedy.
+  const r = await call(server, "se_file_patch", {
+    ops: [{ path: NODE, old_string: "status: open", new_string: "trigger: it fired already and collected nothing: the mark is dropped" }],
+  });
+
+  const said = JSON.stringify(r.body);
+  assert.equal(r.body.kind, "rejected", `the patch is refused, not accepted: ${said}`);
+  assert.match(said, /raid-probe-written-by-the-guard-test/, "the refusal names the file");
+  assert.match(said, /nothing: the mark/, "the refusal quotes the offending value back");
+  assert.ok((r.body as { remedy?: unknown }).remedy !== undefined, `the refusal carries an executable remedy: ${said}`);
+  assert.equal(readFileSync(join(root, NODE), "utf8"), sound, "the file on disk is exactly what it was");
+});
+
+test("the patch verb still lands an edit that keeps the frontmatter readable", async () => {
+  const root = freshRoot();
+  gitInit(root);
+  const server = await bootedServer(root);
+
+  const first = await call(server, "se_file_write", {
+    path: NODE,
+    base_hash: null,
+    content: frontmatter("statement: A fixture.\nstatus: open"),
+  });
+  assert.notEqual(first.body.kind, "rejected", `the fixture lands: ${JSON.stringify(first.body)}`);
+
+  const r = await call(server, "se_file_patch", {
+    ops: [{ path: NODE, old_string: "status: open", new_string: "status: closed" }],
+  });
+
+  assert.notEqual(r.body.kind, "rejected", `a sound patch is not refused: ${JSON.stringify(r.body)}`);
+  assert.match(readFileSync(join(root, NODE), "utf8"), /status: closed/, "the edit is on disk");
+});

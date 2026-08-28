@@ -8,6 +8,7 @@
 import { readFileSync } from "node:fs";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { guardRawNul, guardWriteContent, lintAfterWrite, mustExist, type PatchOp, type PatchResult, SRC } from "./files.ts";
+import { guardParses } from "./guard.ts";
 import { contentHash } from "./hash.ts";
 import { writeNode } from "./notes.ts";
 import { resolveInRoot } from "./paths.ts";
@@ -275,6 +276,16 @@ function writeStaged(
   }
   for (const f of byFile.values()) {
     guardWriteContent(root, f.path, f.next);
+    // A CORPUS NODE'S FRONTMATTER MUST STILL PARSE, and this verb is the one
+    // the contract sends every agent to for source edits
+    // (req-a-write-that-breaks-the-corpus-refuses).
+    //
+    // IT STANDS HERE RATHER THAN IN guardWriteContent, which the renaming
+    // verbs also pass through. Those rewrite an unbounded set of files that
+    // this write did not author, so one already-broken node would fail a whole
+    // corpus-wide rename. Widening it needs the seam that tells a fresh break
+    // from a standing one, and that is its own record.
+    guardParses(root, f.path, f.next);
     const nul = guardRawNul(f.path, f.next);
     f.next = nul.content;
     if (nul.corrected !== undefined) corrected.push(nul.corrected);
