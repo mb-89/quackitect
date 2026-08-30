@@ -1,4 +1,2 @@
-.bin/
-.se/
 node_modules/
 *.jsonl

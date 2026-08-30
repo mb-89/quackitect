@@ -2,36 +2,33 @@
 
 Level 0. Nothing above it exists yet.
 
-## Install
+## What is here
 
-    util\setup\install.ps1        Windows
-    util/setup/install.sh         Linux
-
-Not written yet. Until it is, see **Build** below.
+| Folder | What it holds |
+|---|---|
+| `docs/` | The design. Start with `user-stories.md`, then `level-0-design.md`. |
+| `viewer/` | The log window. A general program that reads log files. Go. |
+| `bin/` | Built viewers. `logview.exe` is Windows, `logview` is Linux. |
+| `engine/` | Empty. Next. |
+| `extension/` | Empty. Next. |
+| `setup/` | Empty. Next. |
 
 ## Look at the log window
 
-    .bin\logview.exe --demo       Windows
-    .bin/logview --demo           Linux
+Windows:
+
+    bin\logview.exe --demo
+
+Linux:
+
+    bin/logview --demo
 
 Demo mode writes a made-up log twice a second and views it. It exists so the
-window can be seen before there is an engine to fill it. To read a real file,
-give it the path instead of `--demo`.
+window can be seen before there is an engine to fill it.
 
-## What is here
+To read a real log file:
 
-Four things, and that is the limit. See the rule of five in
-`docs/cross-cutting/cross-cutting-design.md`.
-
-| Entry | What it holds |
-|---|---|
-| `docs/` | The design. Start with `user-stories.md`. |
-| `source/` | Everything that is written. `viewer`, `engine`, `extension`. |
-| `util/` | Everything that is run rather than shipped. `setup` for now. |
-| `.bin/` | Built programs. Rebuilt from source, and not in version control. |
-
-`.se/` holds private material. Dated reports and measured evidence live there
-and never travel.
+    bin\logview.exe <file>
 
 ## Keys
 
@@ -61,16 +58,16 @@ Terms narrow together. Columns are `time src kind actor msg session ok`, and
 any field inside a record's details can also be named.
 
 An unfinished pattern is not an error. The last filter that worked stays on
-screen, and the status line says which.
+screen and the status line says which.
 
 ## Build
 
 Go 1.24 or later.
 
-    cd source/viewer
+    cd viewer
     go test ./...
-    go build -o ../../.bin/logview .
+    go build -o ../bin/logview .
 
 Cross-compile for Windows from Linux:
 
-    GOOS=windows GOARCH=amd64 go build -o ../../.bin/logview.exe .
+    GOOS=windows GOARCH=amd64 go build -o ../bin/logview.exe .

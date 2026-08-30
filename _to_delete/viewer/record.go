@@ -22,9 +22,9 @@ type Record struct {
 	OK      *bool          `json:"ok"`
 	Data    map[string]any `json:"data"`
 
-	Raw     string // the line as it was on disk
-	Broken  bool   // the line did not parse
-	LineNo  int64  // position in the file, used when Seq is absent
+	Raw    string // the line as it was on disk
+	Broken bool   // the line did not parse
+	LineNo int64  // position in the file, used when Seq is absent
 }
 
 type wire struct {
@@ -151,11 +151,19 @@ func sortedKeys(m map[string]any) []string {
 // the question completely and never sends the reader to the file.
 func (r Record) Detail() string {
 	var b strings.Builder
+	// The label column is as wide as the widest label, so a long field name
+	// cannot push its value out of line.
+	kw := 8
+	for _, k := range sortedKeys(r.Data) {
+		if len(k) > kw {
+			kw = len(k)
+		}
+	}
 	add := func(k, v string) {
 		if v == "" {
 			return
 		}
-		fmt.Fprintf(&b, "%-10s %s\n", k, v)
+		fmt.Fprintf(&b, "%-*s %s\n", kw, k, v)
 	}
 	if r.Broken {
 		b.WriteString("this line did not parse\n\n")
@@ -178,10 +186,10 @@ func (r Record) Detail() string {
 		b.WriteString("\n")
 		for _, k := range sortedKeys(r.Data) {
 			v := r.Data[k]
-			if s, err := json.MarshalIndent(v, "           ", "  "); err == nil && looksNested(v) {
-				fmt.Fprintf(&b, "%-10s %s\n", k, string(s))
+			if s, err := json.MarshalIndent(v, strings.Repeat(" ", kw+1), "  "); err == nil && looksNested(v) {
+				fmt.Fprintf(&b, "%-*s %s\n", kw, k, string(s))
 			} else {
-				fmt.Fprintf(&b, "%-10s %v\n", k, v)
+				fmt.Fprintf(&b, "%-*s %v\n", kw, k, v)
 			}
 		}
 	}

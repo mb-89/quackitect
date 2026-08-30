@@ -41,11 +41,14 @@ type model struct {
 }
 
 var (
-	greyStyle  = lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "245", Dark: "241"})
-	selStyle   = lipgloss.NewStyle().Bold(true)
-	errStyle   = lipgloss.NewStyle().Foreground(lipgloss.Color("203"))
-	dimStyle   = lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "246", Dark: "243"})
-	focusStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("111")).Bold(true)
+	greyStyle   = lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "245", Dark: "241"})
+	selStyle    = lipgloss.NewStyle().Bold(true)
+	errStyle    = lipgloss.NewStyle().Foreground(lipgloss.Color("203"))
+	dimStyle    = lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "246", Dark: "243"})
+	focusStyle  = lipgloss.NewStyle().Foreground(lipgloss.Color("111")).Bold(true)
+	selBarStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("111")).Bold(true)
+	okStyle     = lipgloss.NewStyle().Foreground(lipgloss.Color("77"))
+	notOKStyle  = lipgloss.NewStyle().Foreground(lipgloss.Color("203")).Bold(true)
 )
 
 // Colour carries meaning here and nowhere else. Kind and source are the two
@@ -340,19 +343,41 @@ func (m model) renderList() string {
 }
 
 func (m model) renderRow(r Record, selected bool, w int) string {
-	stamp := greyStyle.Render(r.Day() + " " + r.Stamp())
-	src := srcColour(r.Src).Render(pad(r.Src, 7))
-	kind := kindColour(r.Kind).Render(pad(r.Kind, 9))
-	used := 14 + 1 + 7 + 1 + 9 + 1 + 2
+	// The selected line is marked three ways, because one subtle way is what
+	// it was before: a gutter bar, a bold underline across the whole row, and
+	// the row padded so the underline reaches the right edge.
+	mark := func(st lipgloss.Style) lipgloss.Style {
+		if selected {
+			return st.Underline(true).Bold(true)
+		}
+		return st
+	}
+	gutter := "  "
+	if selected {
+		gutter = selBarStyle.Render("▌") + " "
+	}
+	stamp := mark(greyStyle).Render(r.Day() + " " + r.Stamp())
+	src := mark(srcColour(r.Src)).Render(pad(r.Src, 7))
+	kind := mark(kindColour(r.Kind)).Render(pad(r.Kind, 9))
+
+	used := 2 + 14 + 1 + 7 + 1 + 9 + 1 + 1 + 1
 	msgW := w - used
 	if msgW < 10 {
 		msgW = 10
 	}
-	msg := oneLine(r.Msg, msgW)
-	if selected {
-		msg = selStyle.Render(msg)
+	msg := mark(lipgloss.NewStyle()).Render(pad(oneLine(r.Msg, msgW), msgW))
+	return fmt.Sprintf("%s%s %s %s %s %s", gutter, stamp, src, kind, msg, mark(markColour(r)).Render(r.Mark()))
+}
+
+// The mark is the fastest thing on the line to read, so it carries colour.
+func markColour(r Record) lipgloss.Style {
+	if r.OK == nil {
+		return dimStyle
 	}
-	return fmt.Sprintf("%s %s %s %s %s", stamp, src, kind, msg, dimStyle.Render(r.Mark()))
+	if *r.OK {
+		return okStyle
+	}
+	return notOKStyle
 }
 
 func (m model) renderStatus(w int) string {
@@ -386,10 +411,11 @@ func (m model) renderDetail() string {
 }
 
 func pad(s string, n int) string {
-	if len(s) >= n {
-		return s[:n]
+	rs := []rune(s)
+	if len(rs) >= n {
+		return string(rs[:n])
 	}
-	return s + strings.Repeat(" ", n-len(s))
+	return s + strings.Repeat(" ", n-len(rs))
 }
 
 func oneLine(s string, w int) string {
