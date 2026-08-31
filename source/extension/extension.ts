@@ -4,6 +4,7 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import * as os from "node:os";
 import { panelHtml, everyGroup, Node } from "./panel";
+import { editorHtml } from "./editor";
 import { whichHarness, kickoffText, openAgent } from "./agent";
 
 // The extension is idle when it loads. It does not act, it does not start
@@ -33,6 +34,10 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand("quackitect.startEngine", () => startEngine(context)),
     vscode.commands.registerCommand("quackitect.stopEngine", () => stopEngine()),
     vscode.commands.registerCommand("quackitect.showLog", () => showLog(context)),
+    vscode.commands.registerCommand("quackitect.showWork", () => toggleWork(context)),
+    vscode.commands.registerCommand("quackitect.mintWork", (arg?: { text: string; kind: string }) =>
+      mintWork(context, arg),
+    ),
     vscode.commands.registerCommand("quackitect.welcome", () =>
       vscode.commands.executeCommand("workbench.action.openWalkthrough", "quackitect.quackitect#quackitect.start", false),
     ),
@@ -706,6 +711,12 @@ class ControlPanel implements vscode.WebviewViewProvider {
         vscode.commands.executeCommand(msg.command);
         return;
       }
+      // A control that carries something runs its command with it. The panel
+      // holds no value of its own, so what it carries is spent here.
+      if (msg.type === "run") {
+        vscode.commands.executeCommand(msg.command, { text: msg.text, kind: msg.kind });
+        return;
+      }
       if (msg.type === "set") setValue(this.context, msg.key, msg.value);
       if (msg.type === "ready") {
         // The view can listen now. Anything sent before this is lost, which
@@ -721,5 +732,126 @@ class ControlPanel implements vscode.WebviewViewProvider {
 
 type PanelMessage =
   | { type: "command"; command: string }
+  | { type: "run"; command: string; text: string; kind: string }
   | { type: "set"; key: string; value: unknown }
   | { type: "ready" };
+
+// ---------------------------------------------------------------------------
+// THE WORK EDITOR
+// ---------------------------------------------------------------------------
+
+// One panel, and the button toggles it. A second press closes what the first
+// opened, because a button that only ever opens leaves the person hunting for
+// the tab it made.
+let workPanel: vscode.WebviewPanel | undefined;
+let workView = "work";
+
+function toggleWork(context: vscode.ExtensionContext) {
+  if (workPanel) {
+    workPanel.dispose();
+    return;
+  }
+  workPanel = vscode.window.createWebviewPanel("quackitect.work", "work", vscode.ViewColumn.One, {
+    enableScripts: true,
+    retainContextWhenHidden: true,
+  });
+  workPanel.onDidDispose(() => (workPanel = undefined));
+  workPanel.webview.onDidReceiveMessage((m: WorkMessage) => {
+    if (m.type === "view") {
+      workView = m.view;
+      void drawWork(context);
+      return;
+    }
+    if (m.type === "open") void openNote(context, m.id);
+    if (m.type === "file") void fileWork(context, m.id, m.sets, m.into);
+  });
+  void drawWork(context);
+
+  // THE LEDGER IS FILES, SO THE EDITOR WATCHES FILES. No server and no port:
+  // the engine writes notes and this notices, which is the arrangement the log
+  // window already uses.
+  const watcher = vscode.workspace.createFileSystemWatcher("**/{work,.se/work}/*.md");
+  const again = () => {
+    if (workPanel) void drawWork(context);
+  };
+  watcher.onDidCreate(again);
+  watcher.onDidChange(again);
+  watcher.onDidDelete(again);
+  context.subscriptions.push(watcher);
+}
+
+type WorkMessage =
+  | { type: "view"; view: string }
+  | { type: "open"; id: string }
+  | { type: "file"; id: string; sets: string; into: string };
+
+async function drawWork(context: vscode.ExtensionContext) {
+  if (!workPanel) return;
+  const table = await askEngine(context, ["query", "--view", workView]);
+  const listed = await askEngine(context, ["query", "--list"]);
+  const views: string[] = listed?.views ?? [];
+  workPanel.webview.html = editorHtml(table ?? { error: "the engine could not be asked" }, views, workView);
+}
+
+async function openNote(context: vscode.ExtensionContext, id: string) {
+  const work = workRoot();
+  if (!work) return;
+  for (const rel of [path.join("doc", "work", id + ".md"), path.join(".se", "work", id + ".md")]) {
+    const full = path.join(work, rel);
+    if (fs.existsSync(full)) {
+      await vscode.window.showTextDocument(vscode.Uri.file(full), { preview: true });
+      return;
+    }
+  }
+  vscode.window.showWarningMessage(`no note for ${id}`);
+}
+
+// Filing is the engine's act. The editor says which token and what to write,
+// and the engine decides whether that is allowed.
+async function fileWork(context: vscode.ExtensionContext, id: string, sets: string, into: string) {
+  await askEngine(context, ["work", "--set", id, "--" + sets, into]);
+  void drawWork(context);
+}
+
+async function mintWork(context: vscode.ExtensionContext, arg?: { text: string; kind: string }) {
+  const text = arg?.text?.trim();
+  if (!text) return;
+  const [scope, traced] = readKind(arg?.kind ?? "");
+  const cut = text.indexOf("/");
+  const form = (cut < 0 ? text : text.slice(0, cut)).trim();
+  const detail = cut < 0 ? "" : text.slice(cut + 1).trim();
+  const args = ["work", "--form", form, "--assignee", "human", "--scope", scope, "--traced=" + traced];
+  if (detail) args.push("--detail", detail);
+  const out = await askEngine(context, args);
+  if (out?.error) {
+    vscode.window.showErrorMessage(out.error);
+    return;
+  }
+  void drawWork(context);
+}
+
+// The picker carries one word for two decisions, so one place reads it apart.
+function readKind(kind: string): [string, string] {
+  const [left, right] = kind.split("·");
+  const scope = left === "MS" ? "multi-step" : left === "T" ? "token" : "single-step";
+  return [scope, right === "E" ? "false" : "true"];
+}
+
+function askEngine(context: vscode.ExtensionContext, args: string[]): Promise<any> {
+  return new Promise((resolve) => {
+    const work = workRoot();
+    const exe = binary(context, "se");
+    if (!work || !fs.existsSync(exe)) return resolve(undefined);
+    const done = spawn(exe, [...args, "--work", work], { cwd: work });
+    let out = "";
+    done.stdout?.on("data", (b: Buffer) => (out += b.toString()));
+    done.on("error", () => resolve(undefined));
+    done.on("exit", () => {
+      try {
+        resolve(JSON.parse(out));
+      } catch {
+        resolve(undefined);
+      }
+    });
+  });
+}

@@ -11,7 +11,8 @@
           "name": "shown",
           "type": "strlist",
           "default": [
-            "control"
+            "control",
+            "work"
           ],
           "help": "Which groups appear in the sidebar. The gear chooses them."
         }
@@ -64,6 +65,61 @@
           "label": "init",
           "command": "quackitect.init",
           "title": "make this folder a project, or a vehicle that carries the method"
+        }
+      ]
+    },
+    {
+      "name": "work",
+      "title": "work",
+      "type": "group",
+      "children": [
+        {
+          "name": "editor",
+          "type": "action",
+          "label": "work",
+          "command": "quackitect.showWork",
+          "title": "open the work editor. Press it again to close it"
+        },
+        {
+          "name": "mint",
+          "type": "text",
+          "span": 3,
+          "command": "quackitect.mintWork",
+          "placeholder": "four words / the whole instruction",
+          "title": "Four words name the work. After the slash goes everything the next hand needs. Enter mints it."
+        },
+        {
+          "name": "kind",
+          "type": "pick",
+          "span": 1,
+          "default": "SS·T",
+          "options": [
+            {
+              "value": "SS·T",
+              "says": "single step, traced"
+            },
+            {
+              "value": "SS·E",
+              "says": "single step, ephemeral"
+            },
+            {
+              "value": "MS·T",
+              "says": "multi step, traced"
+            },
+            {
+              "value": "MS·E",
+              "says": "multi step, ephemeral"
+            },
+            {
+              "value": "T·T",
+              "says": "in a token, traced"
+            },
+            {
+              "value": "T·E",
+              "says": "in a token, ephemeral"
+            }
+          ],
+          "title": "What the token is. Closed it shows the short form, open it says what each one means."
         }
       ]
     },

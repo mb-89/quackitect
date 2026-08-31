@@ -1,0 +1,67 @@
+# THE WORK EDITOR, which is the generic editor pointed at work.
+#
+# The format is Obsidian's and the engine renders it. Nothing here is a second
+# grammar, and nothing in the renderer knows what a token is.
+#
+# THE PINNED GROUPS ARE FILTERS, not values of the grouping property. That is
+# what lets them stay at the top when the grouping changes underneath them.
+# A row goes to the first pinned group that matches and is not repeated below,
+# so the top is a partition rather than a second copy of the same rows.
+#
+# state.current answers nothing at these levels, so `here` is empty until a
+# level above supplies a state. Empty is the honest answer: there is no current
+# state, so nothing is at it.
+
+properties:
+  form:
+    displayName: what
+    opensNote: true
+  status:
+    displayName: state
+  assignee:
+    displayName: who
+  bucket:
+    displayName: bucket
+
+filters:
+  and:
+    - type == "work"
+    - status != "closed"
+
+views:
+  - type: table
+    name: left
+    order:
+      - form
+      - status
+      - assignee
+    columnSize:
+      form: 620
+      status: 110
+      assignee: 110
+    pinned:
+      - name: yours
+        filter: assignee == "human" && (status == "open" || status == "in_work")
+      - name: here
+        filter: scope == state.current
+    groupBy:
+      - property: if(bucket, bucket, status)
+        sets: bucket
+        direction: ASC
+    collapsed:
+      - backlogged
+    sort:
+      - property: opened
+        direction: ASC
+
+  - type: table
+    name: right
+    order:
+      - form
+      - status
+    groupBy:
+      - property: if(bucket, bucket, status)
+        sets: bucket
+        direction: ASC
+    collapsed:
+      - backlogged

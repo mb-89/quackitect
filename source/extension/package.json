@@ -65,6 +65,14 @@
       {
         "command": "quackitect.chooseEngine",
         "title": "quackitect: choose which copy drives this folder"
+      },
+      {
+        "command": "quackitect.showWork",
+        "title": "Quackitect: work"
+      },
+      {
+        "command": "quackitect.mintWork",
+        "title": "Quackitect: mint a work token"
       }
     ],
     "walkthroughs": [

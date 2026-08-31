@@ -33,7 +33,8 @@ func runWork(args []string) {
 	}
 	work := fs.String("work", "", "the folder being worked on (default: this one)")
 	stdin := fs.Bool("stdin", false, "read the token as JSON on standard input")
-	form := fs.String("form", "", "what work is to be done")
+	form := fs.String("form", "", "what work is to be done, in one line")
+	detail := fs.String("detail", "", "the whole instruction, in the words it was asked in")
 	assignee := fs.String("assignee", "", "whose token it is")
 	guidance := fs.String("guidance", "", "the method, inline")
 	guidanceRef := fs.String("guidance-ref", "", "the method, by reference")
@@ -46,11 +47,40 @@ func runWork(args []string) {
 	backlog := fs.Bool("backlog", false, "mint it backlogged: visible, and not work anybody is doing")
 	note := fs.Bool("note", false, "a note: ephemeral and backlogged. What a person means by write a note on this")
 	activate := fs.String("open", "", "move a backlogged token into the queue, by id")
+	set := fs.String("set", "", "instead of minting: change one thing about a token, by id")
+	bucket := fs.String("bucket", "", "with set: file it under this grouping. Empty clears it")
 	_ = fs.Parse(args)
 
 	roots, err := FindRoots(*work)
 	if err != nil {
 		fail(err)
+	}
+
+	// FILING IS THE ENGINE'S ACT. A person drags a row onto a group and the
+	// editor says which token and what to write. What is allowed is decided
+	// here, because two places that decide disagree.
+	if *set != "" {
+		t, err := LoadToken(roots, *set)
+		if err != nil {
+			answerJSON(map[string]any{"error": err.Error()})
+			os.Exit(1)
+		}
+		// A DERIVED GROUP CLEARS THE BUCKET. Saying where the work belongs is
+		// a stronger statement than the grouping it was filed under, so the
+		// grouping goes rather than sitting on top of it.
+		if *bucket == Cleared || Status(*bucket).Known() {
+			t.Bucket = ""
+		} else {
+			t.Bucket = *bucket
+		}
+		if err := SaveToken(roots, t); err != nil {
+			answerJSON(map[string]any{"error": err.Error()})
+			os.Exit(1)
+		}
+		inSession(roots, "work", "person", "filed "+t.ID+" under "+or2(t.Bucket, "no bucket"), Yes(),
+			map[string]any{"id": t.ID, "bucket": t.Bucket})
+		answerJSON(t)
+		return
 	}
 
 	if *activate != "" {
@@ -73,7 +103,7 @@ func runWork(args []string) {
 			os.Exit(1)
 		}
 	} else {
-		t = Token{Form: *form, Assignee: *assignee, Guidance: *guidance, GuidanceRef: *guidanceRef,
+		t = Token{Form: *form, Detail: *detail, Assignee: *assignee, Guidance: *guidance, GuidanceRef: *guidanceRef,
 			Scope: Scope(*scope), Parent: *parent, Traced: *traced,
 			DependsOn: splitComma(*dependsOn)}
 		if *sections != "" {
@@ -98,6 +128,64 @@ func runWork(args []string) {
 	inSession(roots, "work", minted.MintedBy, "minted "+minted.ID+": "+minted.Form, Yes(),
 		map[string]any{"id": minted.ID, "assignee": minted.Assignee, "scope": minted.Scope})
 	answerJSON(minted)
+}
+
+// runQuery draws a view. It answers the rows grouped, and the renderer is
+// whatever asked: a webview, or a person at a terminal reading JSON.
+func runQuery(args []string) {
+	fs := flag.NewFlagSet("query", flag.ExitOnError)
+	fs.SetOutput(os.Stdout)
+	fs.Usage = func() {
+		fmt.Fprintln(os.Stdout, "se query - draw a view over the work. Prints the table as JSON.")
+		fmt.Fprintln(os.Stdout, "")
+		fmt.Fprintln(os.Stdout, "  se query --list          which views exist")
+		fmt.Fprintln(os.Stdout, "  se query --view work     draw the first view in work.base")
+		fmt.Fprintln(os.Stdout, "")
+		fs.PrintDefaults()
+	}
+	work := fs.String("work", "", "the folder being worked on (default: this one)")
+	name := fs.String("view", "work", "which view file, by name or path")
+	which := fs.String("pane", "", "which view inside the file (default: the first)")
+	list := fs.Bool("list", false, "print the views that exist and exit")
+	_ = fs.Parse(args)
+
+	roots, err := FindRoots(*work)
+	if err != nil {
+		fail(err)
+	}
+	if *list {
+		answerJSON(map[string]any{"views": Views(roots)})
+		return
+	}
+	path, ok := ViewPath(roots, *name)
+	if !ok {
+		answerJSON(map[string]any{"error": "no view called " + *name, "views": Views(roots)})
+		os.Exit(1)
+	}
+	base, err := LoadBase(path)
+	if err != nil {
+		answerJSON(map[string]any{"error": err.Error()})
+		os.Exit(1)
+	}
+	view := base.Views[0]
+	if *which != "" {
+		found := false
+		for _, v := range base.Views {
+			if v.Name == *which {
+				view, found = v, true
+			}
+		}
+		if !found {
+			answerJSON(map[string]any{"error": "no pane called " + *which})
+			os.Exit(1)
+		}
+	}
+	t, err := Render(base, view, TokenRows(roots))
+	if err != nil {
+		answerJSON(map[string]any{"error": err.Error()})
+		os.Exit(1)
+	}
+	answerJSON(t)
 }
 
 // runPull is the agent's one verb. It reads an optional payload and answers

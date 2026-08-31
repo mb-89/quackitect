@@ -48,7 +48,7 @@ func dirFor(r Roots, t Token) string {
 // then what it is attached to, then the times.
 var frontOrder = []string{
 	"id", "type", "form", "status", "assignee", "scope", "traced",
-	"disposition", "reason", "holder",
+	"disposition", "reason", "holder", "bucket",
 	"parent", "subs", "depends_on", "successors",
 	"evidence", "evidence_script", "rounds",
 	"minted_by", "opened", "taken_at", "sent_at", "closed_at",
@@ -60,6 +60,7 @@ func (t Token) front() Front {
 		"status": string(t.Status), "assignee": t.Assignee, "scope": string(t.Scope),
 		"traced":      strconv.FormatBool(t.Traced),
 		"disposition": string(t.Disposition), "reason": t.Reason, "holder": t.Holder,
+		"bucket": t.Bucket,
 		"parent": t.Parent, "subs": t.Subs, "depends_on": t.DependsOn,
 		"successors": t.Successors,
 		"evidence":   t.Evidence.Sections, "evidence_script": t.Evidence.Script,
@@ -78,7 +79,7 @@ func tokenFromFront(f Front) Token {
 		Status: Status(fs(f, "status")), Assignee: fs(f, "assignee"),
 		Scope: Scope(fs(f, "scope")), Traced: fb(f, "traced"),
 		Disposition: Disposition(fs(f, "disposition")), Reason: fs(f, "reason"),
-		Holder: fs(f, "holder"), Parent: fs(f, "parent"),
+		Holder: fs(f, "holder"), Bucket: fs(f, "bucket"), Parent: fs(f, "parent"),
 		Subs: fl(f, "subs"), DependsOn: fl(f, "depends_on"),
 		Successors: fl(f, "successors"),
 		Evidence:   EvidenceSpec{Sections: fl(f, "evidence"), Script: fs(f, "evidence_script")},

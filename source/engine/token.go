@@ -55,6 +55,20 @@ const (
 	InToken    Scope = "token"       // inside another token: a step of somebody's own breakdown
 )
 
+// The word a drop uses to say "no bucket". A person can type it, and a group
+// with no name answers to it.
+const Cleared = ""
+
+// A status is the engine's word, so a group named after one is a derived group
+// and a drop into it clears the bucket rather than setting one.
+func (s Status) Known() bool {
+	switch s {
+	case Backlogged, Open, InWork, Submitted, InReview, Closed:
+		return true
+	}
+	return false
+}
+
 func (s Scope) Known() bool {
 	return s == MultiStep || s == SingleStep || s == InToken
 }
@@ -117,6 +131,19 @@ type Token struct {
 	// Decided at minting, by the minter. Ephemeral is scratch work that the
 	// record has no use for. It is not a way out of review: see SelfClosing.
 	Traced bool `json:"traced"`
+
+	// A GROUPING A PERSON MADE, and the only thing here they name themselves.
+	//
+	// EMPTY MEANS THE DERIVED GROUP. A token carrying a bucket groups under it,
+	// and one without groups under what the view falls back to. That fallback
+	// lives in the view, as if(bucket, bucket, ...), so the note stays honest:
+	// an absent bucket is absent rather than a copy that drifts.
+	//
+	// THE DERIVED GROUP IS THE ENGINE'S AND A BUCKET IS THE PERSON'S. A bucket
+	// is a name somebody typed, so it can be renamed and it can be emptied.
+	// Dropping work onto a derived group clears it, because saying where the
+	// work belongs is stronger than the grouping it was filed under.
+	Bucket string `json:"bucket,omitempty"`
 
 	Parent string   `json:"parent,omitempty"`
 	Subs   []string `json:"subs,omitempty"`

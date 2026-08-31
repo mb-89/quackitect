@@ -16,13 +16,15 @@
 export type Node = {
   name: string;
   title?: string;
-  type: "group" | "bool" | "int" | "float" | "str" | "list" | "strlist" | "action" | "status" | "gap";
+  type: "group" | "bool" | "int" | "float" | "str" | "list" | "strlist" | "action" | "status" | "gap" | "text" | "pick";
   help?: string;
   default?: unknown;
   min?: number;
   max?: number;
   step?: number;
-  options?: string[];
+  options?: Array<string | { value: string; says: string }>;
+  placeholder?: string;
+  span?: number;
   narrow?: string;
   shown?: boolean;
   children?: Node[];
@@ -77,12 +79,14 @@ export function everyGroup(n: Node, path = ""): Array<{ key: string; title: stri
 
 function section(path: string, g: Node): string {
   const kids = g.children ?? [];
-  const drawn = kids.filter((k) => k.type === "action" || k.type === "status" || k.type === "gap");
-  const held = kids.filter(
-    (k) =>
-      k.type !== "action" && k.type !== "status" && k.type !== "gap" &&
-      k.type !== "group" && k.type !== "strlist",
-  );
+  // A row is drawn one control per column. text and pick join the row because
+  // they act rather than hold a stored value: what they carry is spent on the
+  // command they run, and nothing here keeps it afterwards.
+  const inRow = (k: Node) =>
+    k.type === "action" || k.type === "status" || k.type === "gap" ||
+    k.type === "text" || k.type === "pick";
+  const drawn = kids.filter(inRow);
+  const held = kids.filter((k) => !inRow(k) && k.type !== "group" && k.type !== "strlist");
   const rows: string[] = [];
   if (drawn.length) rows.push(buttonRow(drawn));
   for (const k of held) rows.push(field(key(path, k), k));
@@ -118,6 +122,27 @@ function button(n: Node): string {
   if (n.type === "gap") {
     return `<span></span>`;
   }
+  const wide = n.span && n.span > 1 ? ` style="grid-column: span ${n.span}"` : "";
+  if (n.type === "text") {
+    // Enter is what a person presses, so Enter is what mints. The value goes
+    // to the command and is not stored: nothing here holds a draft.
+    return `<input class="line" type="text"${wide} data-run="${esc(n.command ?? "")}"
+      placeholder="${esc(n.placeholder ?? "")}" title="${esc(n.title ?? n.name)}">`;
+  }
+  if (n.type === "pick") {
+    // CLOSED IT IS SHORT, OPEN IT SAYS WHAT IT MEANS. A select shows one text
+    // in both places, and one column is not wide enough for the long one.
+    const opts = (n.options ?? []).map((o) => {
+      const v = typeof o === "string" ? o : o.value;
+      const says = typeof o === "string" ? o : o.says;
+      return `<li data-value="${esc(v)}"><b>${esc(v)}</b><span>${esc(says)}</span></li>`;
+    });
+    const first = n.default !== undefined ? String(n.default) : "";
+    return `<div class="pick"${wide} data-name="${esc(n.name)}" title="${esc(n.title ?? n.name)}">
+      <button class="picked" data-value="${esc(first)}">${esc(first)}</button>
+      <ul class="options" hidden>${opts.join("")}</ul>
+    </div>`;
+  }
   if (n.type === "action") {
     return `<button data-command="${esc(n.command ?? "")}" title="${esc(n.title ?? n.label ?? n.name)}">${esc(
       n.label ?? n.name,
@@ -141,7 +166,10 @@ function field(k: string, n: Node): string {
   if (n.type === "bool") {
     control = `<input type="checkbox" ${common}>`;
   } else if (n.type === "list" || n.options) {
-    const opts = (n.options ?? []).map((v) => `<option value="${esc(v)}">${esc(v)}</option>`).join("");
+    const opts = (n.options ?? [])
+      .map((o) => (typeof o === "string" ? o : o.value))
+      .map((v) => `<option value="${esc(v)}">${esc(v)}</option>`)
+      .join("");
     control = `<select ${common}>${opts}</select>`;
   } else if (n.type === "int" || n.type === "float") {
     const bounds = [
@@ -173,6 +201,22 @@ function css(): string {
   .gear { width: 22px; height: 22px; padding: 0; background: transparent; border: none;
           color: var(--vscode-descriptionForeground); font-size: 14px; line-height: 1; cursor: pointer; }
   .gear:hover { color: var(--vscode-foreground); background: transparent; }
+  input.line { width: 100%; box-sizing: border-box; height: 24px; padding: 0 6px;
+               font: inherit; color: var(--vscode-input-foreground);
+               background: var(--vscode-input-background);
+               border: 1px solid var(--vscode-input-border, transparent); border-radius: 2px; }
+  input.line::placeholder { color: var(--vscode-input-placeholderForeground); }
+  .pick { position: relative; }
+  .pick .picked { width: 100%; height: 24px; padding: 0 4px; }
+  .pick .options { position: absolute; right: 0; top: 26px; z-index: 20; margin: 0; padding: 4px 0;
+                   list-style: none; min-width: 190px; border-radius: 2px;
+                   background: var(--vscode-dropdown-background, var(--vscode-editor-background));
+                   border: 1px solid var(--vscode-dropdown-border, var(--vscode-focusBorder));
+                   box-shadow: 0 2px 8px rgba(0,0,0,.35); }
+  .pick .options li { display: flex; gap: 8px; align-items: baseline; padding: 3px 10px; cursor: pointer; }
+  .pick .options li:hover { background: var(--vscode-list-hoverBackground); }
+  .pick .options b { font-weight: 600; min-width: 36px; }
+  .pick .options span { color: var(--vscode-descriptionForeground); white-space: nowrap; }
   details { margin-bottom: 10px; }
   summary { font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.06em;
             color: var(--vscode-descriptionForeground); font-weight: 600; cursor: pointer;
@@ -239,6 +283,36 @@ function script(): string {
       send({ type: 'command', command: b.dataset.state === 'good' && stop ? stop : b.dataset.command });
     };
   }
+
+  // A line edit spends what it holds on the command it runs, and keeps
+  // nothing. Enter is what a person presses, so Enter is what acts.
+  for (const line of document.querySelectorAll('input.line')) {
+    line.onkeydown = (ev) => {
+      if (ev.key !== 'Enter') return;
+      const text = line.value.trim();
+      if (!text) return;
+      const pick = document.querySelector('.pick .picked');
+      send({ type: 'run', command: line.dataset.run, text, kind: pick ? pick.dataset.value : '' });
+      line.value = '';
+    };
+  }
+
+  // CLOSED IT IS SHORT, OPEN IT SAYS WHAT IT MEANS.
+  for (const pick of document.querySelectorAll('.pick')) {
+    const button = pick.querySelector('.picked');
+    const list = pick.querySelector('.options');
+    button.onclick = (ev) => { ev.stopPropagation(); list.hidden = !list.hidden; };
+    for (const item of list.querySelectorAll('li')) {
+      item.onclick = () => {
+        button.dataset.value = item.dataset.value;
+        button.textContent = item.dataset.value;
+        list.hidden = true;
+      };
+    }
+  }
+  document.addEventListener('click', () => {
+    for (const l of document.querySelectorAll('.pick .options')) l.hidden = true;
+  });
 
   for (const c of document.querySelectorAll('[data-key]')) {
     c.onchange = () => {

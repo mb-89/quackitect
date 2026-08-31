@@ -35,6 +35,9 @@ func main() {
 		case "stop":
 			runStop(os.Args[2:])
 			return
+		case "query":
+			runQuery(os.Args[2:])
+			return
 		}
 	}
 	flag.Usage = func() {
@@ -47,6 +50,7 @@ func main() {
 		fmt.Fprintln(out, "  se work --help       mint a work token")
 		fmt.Fprintln(out, "  se pull --help       ask the engine what to do next")
 		fmt.Fprintln(out, "  se stop --help       name why you are stopping")
+		fmt.Fprintln(out, "  se query --help      draw a view over the work")
 		fmt.Fprintln(out, "")
 		flag.PrintDefaults()
 	}
