@@ -156,11 +156,17 @@ func installInto(copyRoot string) error {
 	if err != nil {
 		return err
 	}
-	dest := filepath.Join(copyRoot, ".bin", exeName("se"))
-	if err := os.MkdirAll(filepath.Dir(dest), 0o755); err != nil {
+	bin := filepath.Join(copyRoot, ".bin")
+	if err := os.MkdirAll(bin, 0o755); err != nil {
 		return err
 	}
-	return copyFile(self, dest, 0o755)
+	// Under both names, because installing writes both. The cage names the
+	// one with no suffix, so a copy that had only the other one would be
+	// caged by a file that is not there.
+	if err := copyFile(self, filepath.Join(bin, exeName("se")), 0o755); err != nil {
+		return err
+	}
+	return copyFile(self, filepath.Join(bin, "se"), 0o755)
 }
 
 func runEngine(copyRoot string, args ...string) (string, error) {

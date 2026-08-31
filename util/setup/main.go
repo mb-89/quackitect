@@ -261,7 +261,33 @@ func build(name, source string) error {
 	if err := cmd.Run(); err != nil {
 		return fmt.Errorf("building %s failed: %w", name, err)
 	}
-	return nil
+	return alsoWithoutTheSuffix(out, filepath.Join(*root, ".bin", name))
+}
+
+// ONE PROGRAM, AND THE NAME THE CAGE CALLS IT BY.
+//
+// The cage is in version control, so it names one path on every platform, and
+// a path that is the same everywhere carries no file extension. Windows runs
+// a program by path whatever it is called, because the loader reads the
+// header and not the name.
+//
+// THE SUFFIXED NAME STAYS, because a shell finds a command through PATHEXT
+// and RUNME on Windows is a shell. So the file has both names and there is
+// only one file: a hard link is the same bytes twice in the folder listing.
+// A copy is the fallback, for a filesystem that will not link.
+func alsoWithoutTheSuffix(built, plain string) error {
+	if built == plain {
+		return nil
+	}
+	_ = os.Remove(plain)
+	if err := os.Link(built, plain); err == nil {
+		return nil
+	}
+	in, err := os.ReadFile(built)
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(plain, in, 0o755)
 }
 
 func openEditor(root string) {

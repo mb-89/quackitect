@@ -103,10 +103,13 @@ func Project(roots Roots) ([]string, error) {
 // depend on how the engine was started, and a copy run from somewhere else
 // wrote a path that only that invocation could use.
 func variables(roots Roots) (map[string]string, error) {
+	// NO FILE EXTENSION, on either platform. The cage is in version control,
+	// so it says one thing everywhere, and se.exe is not one thing everywhere.
+	// The installer writes the program under both names for this.
 	bin := filepath.Join(roots.Method, ".bin")
 	return map[string]string{
-		"engine": within(roots.Work, filepath.Join(bin, exeName("se"))),
-		"mcp":    within(roots.Work, filepath.Join(bin, exeName("se-mcp"))),
+		"engine": within(roots.Work, filepath.Join(bin, "se")),
+		"mcp":    within(roots.Work, filepath.Join(bin, "se-mcp")),
 		"method": within(roots.Work, roots.Method),
 		"work":   within(roots.Work, roots.Work),
 	}, nil
