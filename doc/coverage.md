@@ -40,7 +40,7 @@ proves it.** A case with no test is named as such, with the reason.
 | UC-33 a session measured for voice | **not built.** The checker exists. Sampling a session does not |
 | UC-34 every call is in the log | `TestTheGuardAppendsToTheRunningSession`, `TestEveryWriteReachesTheFileAndNamesItsWriter` |
 | UC-35 Level 0 alone, with no authority | `TestStoppingIsRecordedAndOnlyRefusedWhenAsked`, and the guard tests |
-| A person with no panel puts everything down | `TestOnlyAWholeMessageIsAWord`, `TestTheWordPutsEverythingDownAndPicksItUpAgain` |
+| A person with no panel puts everything down | `TestOnlyAWholeMessageIsAWord`, `TestTheWordPutsEverythingDownAndPicksItUpAgain`, `TestTheWordActsWhateverPathTheMessageCameBy` |
 | UC-36 read a growing log while reading a detail | `TestArrivingLinesDoNotMoveAHeldSelection`, `TestArrivingLinesDoNotRedrawTheDetailPane` |
 | UC-37 filter down to one call | `TestFilterShapes`, `TestHalfTypedPatternKeepsTheLastGoodFilter` |
 

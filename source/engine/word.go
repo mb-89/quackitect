@@ -51,3 +51,25 @@ func TheWord(said string) Word {
 	}
 	return NoWord
 }
+
+// ActOnTheWord puts everything down, or lets it go on, when the whole message
+// was one of the words. Two callers reach it, because a person's message
+// arrives two ways and both are the same message.
+//
+// The note is empty when the message was prose, and nothing happened. When it
+// is not empty, ok says whether the hold was written.
+func ActOnTheWord(r Roots, said string) (note string, ok bool) {
+	switch TheWord(said) {
+	case PutItDown:
+		if _, err := SetHold(r, true, "the person"); err != nil {
+			return "the hold could not be written: " + err.Error(), false
+		}
+		return "everything is on hold: they said so", true
+	case PickItUp:
+		if _, err := SetHold(r, false, ""); err != nil {
+			return "the hold could not be lifted: " + err.Error(), false
+		}
+		return "the hold is lifted: they said so", true
+	}
+	return "", false
+}

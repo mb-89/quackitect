@@ -167,6 +167,16 @@ func main() {
 	// thing with a different word.
 	if *said != "" {
 		noteInLog(dir, "user", "prompt", *said, nil, nil)
+		// AND THE SAME MESSAGE, THE SAME WAY. A message written into a turn
+		// that is already running fires no event, so the guard never sees it
+		// and the agent is the only thing that can bring it here. The word
+		// then has to act, or a person is heard on one path and not the
+		// other, which is worse than being heard on neither.
+		if note, ok := ActOnTheWord(roots, *said); note != "" {
+			noteInLog(dir, "engine", "hold", note, &ok, map[string]any{"by": "the person"})
+			fmt.Println(note)
+			return
+		}
 		fmt.Println("recorded")
 		return
 	}

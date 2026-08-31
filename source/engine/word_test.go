@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"os/exec"
 	"strings"
 	"testing"
 )
@@ -98,5 +99,48 @@ func TestTheWordPutsEverythingDownAndPicksItUpAgain(t *testing.T) {
 	hookSays(t, exe, r.Method, "UserPromptSubmit", map[string]any{"cwd": r.Work, "prompt": "go"})
 	if LoadHold(r).On {
 		t.Fatal("the word did not lift the hold")
+	}
+}
+
+// THE SAME MESSAGE ARRIVES TWO WAYS. One starts a turn and fires an event.
+// One is written into a turn already running and fires nothing, so the agent
+// carries it here by hand. A person heard on one path and not the other is
+// worse off than one heard on neither, because they cannot tell which they got.
+func TestTheWordActsWhateverPathTheMessageCameBy(t *testing.T) {
+	exe := buildEngine(t)
+	r := guidanceTree(t)
+	Project(r)
+	l, _ := OpenLog(r.Private("log"))
+	l.Write("engine", "start", "engine", "engine started", Yes(), nil)
+	l.Close()
+
+	say := func(said string) string {
+		t.Helper()
+		out, err := exec.Command(exe, "--said", said, "--work", r.Work, "--method", r.Method).CombinedOutput()
+		if err != nil {
+			t.Fatalf("--said failed: %v: %s", err, out)
+		}
+		return strings.TrimSpace(string(out))
+	}
+
+	if out := say("stop the engine and tell me why"); out != "recorded" {
+		t.Fatalf("prose did something: %q", out)
+	}
+	if LoadHold(r).On {
+		t.Fatal("prose put everything down")
+	}
+
+	if out := say("stop"); !strings.Contains(out, "on hold") {
+		t.Fatalf("the word did not put everything down: %q", out)
+	}
+	if !LoadHold(r).On {
+		t.Fatal("the hold was not written")
+	}
+
+	if out := say("go"); !strings.Contains(out, "lifted") {
+		t.Fatalf("the word did not lift it: %q", out)
+	}
+	if LoadHold(r).On {
+		t.Fatal("the hold outlived the word that lifted it")
 	}
 }
