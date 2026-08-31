@@ -3,7 +3,7 @@ id: wk-c22f29af7b
 seq: "-10"
 type: work
 title: a reviewer names lessons
-status: imp_open
+status: imp_submitted
 assignee: main
 scope: single-step
 traced: true
@@ -39,6 +39,34 @@ verdict.
 
 THIS REPLACES wk-6684401070, which had the engine doing the minting. The owner
 overruled that, and this token carries the decision.
+
+## evidence: finding 1 · round 1 · one case per refusal, and both doors driven
+
+CLOSED, and the evidence was wrong in both readings of both halves.
+
+WHAT I CLAIMED AND WHAT WAS TRUE. I wrote that the check drives the refusal on both halves. It drove one door and, inside that door, it could not tell its two cases apart: the empty-id case matched on the word mint, which the neighbouring refusal also carries, so either case would have passed for the other and neither was guarded.
+
+EACH REFUSAL IS NOW ASSERTED ON WHAT ONLY IT CAN SAY. The empty-id case requires "names no token". The not-a-token case requires the refusal to name the id it was handed, wk-nothing, which the other cannot do because there is no id. That is the shape spec_test.go:149 already used for the no-lesson refusal, so it did not need inventing.
+
+AND THE SPEC DOOR IS DRIVEN. rejectionIsWhole guards two, src/engine/pull.go:367 for a draft and :463 for an implementation, and only the second was watched. TestASpecRejectionNamesTheLessonsTokenToo drives the first: both refusals by their own words, and then a whole rejection sending the draft back to spec_open with the lesson and its token on it.
+
+WATCHED RED, THREE DEFECTS PUT BACK ONE AT A TIME:
+
+  the learned check taken out of rejectionIsWhole      RED
+    lesson_test.go:42:  the refusal does not say the lesson names no token
+    lesson_test.go:116: the refusal does not say the lesson names no token
+  the not-a-token check taken out                      RED
+    lesson_test.go:50:  a rejection naming a token nobody minted was accepted: wait
+    lesson_test.go:122: a spec rejection naming a token nobody minted was accepted: wait
+  the spec door left unguarded                         RED
+    lesson_test.go:113: a spec rejection that minted nothing was accepted: wait
+  restored                                             GREEN
+
+THE FIRST INJECTION IS WHAT THE OLD ASSERTION COULD NOT SEE. With the empty-id refusal gone, the next one answers "learned names , which is not a token", which still contains the word mint in its satisfies line. The old check went green on that. The new one names the sentence that is missing.
+
+THE THIRD IS THE DOOR NOBODY WATCHED, and only the new test reds on it, which is the point of adding it.
+
+A rule enforced in one place and checked in the other is a rule that lasts until somebody edits the one nobody watches. The whole battery afterwards: all ok, fourteen lines.
 
 ## finding 1 · round 1 · detail: WHAT THE ENGINE DOES: it refuses. A rejection carries the id of the token the reviewer minted, the engine checks that the id is a token, and a rejection naming none is refused the way one with no finding is refused. That is the whole of the engine's part. / evidence: THREE CHECKS, ALL GREEN. TestARejectionNamesTheLessonsToken drives the refusal on both halves · by reviewer6
 

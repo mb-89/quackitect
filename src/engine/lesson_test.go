@@ -29,20 +29,28 @@ func TestARejectionNamesTheLessonsToken(t *testing.T) {
 		Satisfies: "one that was watched failing"}}
 
 	// NAMING NOTHING IS REFUSED.
+	//
+	// EACH REFUSAL IS ASSERTED ON WHAT ONLY IT CAN SAY. Both of these were once
+	// matched on the word mint, which the neighbouring refusal also carries, so
+	// either case would have passed for the other and neither was guarded.
 	a := Pull(r, "rev", RoleReviewer, Payload{ID: tok.ID, Verdict: "reject",
 		Findings: findings, Lesson: lesson})
 	if a.Pull != AnswerRefused {
 		t.Fatalf("a rejection that minted nothing was accepted: %s", a.Pull)
 	}
-	if len(a.Findings) == 0 || !strings.Contains(a.Findings[0].Wrong+a.Findings[0].Satisfies, "mint") {
-		t.Fatalf("the refusal does not say what to do: %+v", a.Findings)
+	if len(a.Findings) == 0 || !strings.Contains(a.Findings[0].Wrong, "names no token") {
+		t.Fatalf("the refusal does not say the lesson names no token: %+v", a.Findings)
 	}
 
-	// AND SO IS NAMING SOMETHING THAT IS NOT A TOKEN.
+	// AND SO IS NAMING SOMETHING THAT IS NOT A TOKEN. This one names the id it
+	// was handed, which the refusal above cannot do because there is no id.
 	a = Pull(r, "rev", RoleReviewer, Payload{ID: tok.ID, Verdict: "reject",
 		Findings: findings, Lesson: lesson, Learned: "wk-nothing"})
 	if a.Pull != AnswerRefused {
 		t.Fatalf("a rejection naming a token nobody minted was accepted: %s", a.Pull)
+	}
+	if len(a.Findings) == 0 || !strings.Contains(a.Findings[0].Wrong, "wk-nothing") {
+		t.Fatalf("the refusal does not name the id it was handed: %+v", a.Findings)
 	}
 
 	// A REJECTION THAT NAMES ONE IS ACCEPTED, and the id is on the lesson.
@@ -80,4 +88,59 @@ func learnedFrom(t *testing.T, r Roots, l Lesson) string {
 		t.Fatal(err)
 	}
 	return made.ID
+}
+
+// A DRAFT SENT BACK IS SENT BACK THE SAME WAY.
+//
+// rejectionIsWhole guards two doors, the spec's and the implementation's, and
+// only one of them was driven. A rule enforced in one place and checked in the
+// other is a rule that lasts until somebody edits the one nobody watches.
+func TestASpecRejectionNamesTheLessonsTokenToo(t *testing.T) {
+	r := guidanceTree(t)
+	tok := aSpec(t, r, "a thing to build")
+	Pull(r, "main", RoleWorker, Payload{})
+	Pull(r, "main", RoleWorker, Payload{ID: tok.ID})
+	Pull(r, "reviewer", RoleReviewer, Payload{})
+
+	const class = "a criterion whose command does not decide its sentence"
+	lesson := Lesson{Class: class, Avoid: "read the command and ask what file it names"}
+	findings := []Rejection{{Clause: "the criteria", Wrong: "the command is borrowed",
+		Satisfies: "one that decides the sentence above it"}}
+
+	a := Pull(r, "reviewer", RoleReviewer, Payload{ID: tok.ID, Verdict: "reject",
+		Findings: findings, Lesson: lesson})
+	if a.Pull != AnswerRefused {
+		t.Fatalf("a spec rejection that minted nothing was accepted: %s", a.Pull)
+	}
+	if len(a.Findings) == 0 || !strings.Contains(a.Findings[0].Wrong, "names no token") {
+		t.Fatalf("the refusal does not say the lesson names no token: %+v", a.Findings)
+	}
+
+	a = Pull(r, "reviewer", RoleReviewer, Payload{ID: tok.ID, Verdict: "reject",
+		Findings: findings, Lesson: lesson, Learned: "wk-nothing"})
+	if a.Pull != AnswerRefused {
+		t.Fatalf("a spec rejection naming a token nobody minted was accepted: %s", a.Pull)
+	}
+	if len(a.Findings) == 0 || !strings.Contains(a.Findings[0].Wrong, "wk-nothing") {
+		t.Fatalf("the refusal does not name the id it was handed: %+v", a.Findings)
+	}
+
+	// AND ONE THAT NAMES A TOKEN SENDS THE DRAFT BACK TO ITS DRAFTER.
+	learned := mint(t, r, Token{Title: "learned: a criterion", Status: Backlogged,
+		Detail: "THE CLASS: " + class})
+	a = Pull(r, "reviewer", RoleReviewer, Payload{ID: tok.ID, Verdict: "reject",
+		Findings: findings, Lesson: lesson, Learned: learned.ID})
+	if a.Pull == AnswerRefused {
+		t.Fatalf("a whole spec rejection was refused: %+v", a.Findings)
+	}
+	back, err := LoadToken(r, tok.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if back.Status != SpecOpen {
+		t.Fatalf("a rejected draft is %s", back.Status)
+	}
+	if n := len(back.Lessons); n != 1 || back.Lessons[0].Learned != learned.ID {
+		t.Fatalf("the lesson did not land with its token: %+v", back.Lessons)
+	}
 }
