@@ -93,3 +93,29 @@ func LoadRunning(r Roots) (Running, bool) {
 	}
 	return v, true
 }
+
+// ONE ENGINE PER PROJECT, AND THE ENGINE IS WHAT SAYS SO.
+//
+// A second engine rotates the first one's log away, and the record splits in
+// half. The editor already checks before it starts one, and a check that
+// lives only in a caller is a check the next caller does not have. A cloud
+// session has a caller the editor never knew about.
+//
+// AlreadyHere answers with the running engine's ready line, because what the
+// caller asked for is an engine to watch, and there is one. The line carries
+// the same fields a starting engine prints, so a reader needs no second shape.
+func AlreadyHere(r Roots) (string, bool) {
+	v, yes := LoadRunning(r)
+	if !yes {
+		return "", false
+	}
+	line, err := json.Marshal(map[string]any{
+		"ready": true, "log": v.Log, "session": v.Session,
+		"method_root": r.Method, "work_root": r.Work,
+		"attached": true, "pid": v.PID,
+	})
+	if err != nil {
+		return "", false
+	}
+	return string(line), true
+}
