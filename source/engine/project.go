@@ -158,7 +158,17 @@ func writeIfDifferent(path, content string) (bool, error) {
 	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
 		return false, err
 	}
-	return true, os.WriteFile(path, []byte(content), 0o644)
+	return true, os.WriteFile(path, []byte(content), modeFor(path))
+}
+
+// A SHELL SCRIPT IS RUN, so it is written with the bit that lets it run.
+// Seeding says the same thing about the same suffix, and one rule stated
+// twice the same way is the rule holding in two places.
+func modeFor(path string) os.FileMode {
+	if strings.HasSuffix(path, ".sh") {
+		return 0o755
+	}
+	return 0o644
 }
 
 // IsProjection says whether a path is one this engine writes, and where to

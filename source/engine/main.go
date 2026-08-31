@@ -372,6 +372,25 @@ func main() {
 		return
 	}
 
+	// ONE ENGINE, AND THE ENGINE IS WHAT SAYS SO.
+	//
+	// A second engine rotates the first one's log away and the record splits
+	// in half. The editor already checks before it starts one, and a check
+	// that lives only in a caller is a check the next caller does not have.
+	// So the refusal is here, where the fact about running engines is kept.
+	//
+	// The caller is answered with the running engine's ready line, because
+	// what it asked for is an engine to watch, and there is one.
+	if r, yes := LoadRunning(roots); yes {
+		out, _ := json.Marshal(map[string]any{
+			"ready": true, "log": r.Log, "session": r.Session,
+			"method_root": roots.Method, "work_root": roots.Work,
+			"attached": true, "pid": r.PID,
+		})
+		fmt.Println(string(out))
+		return
+	}
+
 	log, err := OpenLog(dir)
 	if err != nil {
 		fail(err)

@@ -53,6 +53,14 @@
         "util/cage/mcp.json"
       ],
       "wrap": "none"
+    },
+    {
+      "name": "the wake",
+      "target": ".claude/hooks/session-start.sh",
+      "sources": [
+        "util/cage/session-start.sh"
+      ],
+      "wrap": "none"
     }
   ]
 }
