@@ -382,3 +382,81 @@ func TestNoFilterNamesAStatusTheEngineDoesNotKnow(t *testing.T) {
 		t.Fatal("no filter compares a status, so this guards nothing")
 	}
 }
+
+// EVERY OLD NAME READS BACK, AND THE CHECK DOES NOT DEPEND ON A NOTE SURVIVING.
+//
+// WHY THIS IS SEPARATE FROM THE SWEEP ABOVE. The sweep reads the tokens on disk,
+// and every one of them is a note the engine rewrites under the new names the
+// first time anything touches it. So the sweep's ability to fail is spent by the
+// migration succeeding: the last note spelling in_work stopped spelling it the
+// moment that token was submitted, and the last one spelling submitted stopped
+// when a reviewer pulled it. Two aliases went unguarded inside one afternoon,
+// one of them to a review that changed no code at all.
+//
+// THE TELL, AND IT GENERALISES: ask what the tree would have to contain for the
+// check to go red, then ask whether the system removes that thing while working.
+// When the answer is yes, the check needs a fixture it owns.
+//
+// SO THE LIST IS HERE AND NOT READ FROM THE MAP. Walking wasCalled would take
+// its cases from the thing under test, so deleting an entry would delete the
+// case that guards it and the check would stay green. These are the names notes
+// in this tree were written under, which is a fact about what happened and does
+// not change.
+var everOnDisk = map[Status]Status{
+	"spec":           SpecOpen,
+	"open":           ImpOpen,
+	"in_work":        ImpInWork,
+	"submitted":      ImpSubmitted,
+	"in_review":      ImpInReview,
+	"closed":         ImpDone,
+	"spec_ready":     SpecSubmitted,
+	"spec_in_review": SpecInReview, // kept its name, and it still has to read back
+}
+
+func TestEveryOldNameReadsBackWhoeverIsLeftOnDisk(t *testing.T) {
+	if len(everOnDisk) == 0 {
+		t.Fatal("no old name is named here, so this guards nothing")
+	}
+	for old, now := range everOnDisk {
+		r := lane(t)
+		id := "wk-0000000001"
+		note := "---" + nl +
+			"id: " + id + nl +
+			"seq: \"1\"" + nl +
+			"type: work" + nl +
+			"title: one older note" + nl +
+			"status: " + string(old) + nl +
+			"assignee: main" + nl +
+			"scope: single-step" + nl +
+			"traced: \"true\"" + nl +
+			"---" + nl + nl + "## detail" + nl + nl + "what it was about" + nl
+		if err := os.MkdirAll(TracedDir(r), 0o755); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(filepath.Join(TracedDir(r), id+".md"), []byte(note), 0o644); err != nil {
+			t.Fatal(err)
+		}
+		back, err := LoadToken(r, id)
+		if err != nil {
+			t.Fatalf("a note saying status: %s cannot be read: %v", old, err)
+		}
+		if back.Status != now {
+			t.Errorf("a note saying status: %s reads back as %s rather than %s", old, back.Status, now)
+		}
+		if !back.Status.Known() {
+			t.Errorf("a note saying status: %s reads back as %q, which the engine does not know", old, back.Status)
+		}
+	}
+	// AND THE ENGINE RENAMES NOTHING THIS DOES NOT KNOW ABOUT. A rename added to
+	// the map and not to this list is a rename nobody wrote a case for, and the
+	// refusal says which one.
+	for old := range wasCalled {
+		if _, named := everOnDisk[old]; !named {
+			t.Errorf("the engine reads %q as an old name and nothing here says a note ever said it", old)
+		}
+	}
+	// A name nobody ever used is not invented a meaning for.
+	if got := ReadStatus("nonesuch"); got != Status("nonesuch") {
+		t.Fatalf("a name nobody used reads back as %q", got)
+	}
+}

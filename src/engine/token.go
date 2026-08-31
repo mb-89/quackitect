@@ -197,8 +197,26 @@ func (e EvidenceSpec) Empty() bool { return len(e.Sections) == 0 && e.Script == 
 type Criterion struct {
 	Says string `json:"says"`           // what has to be true, in one line
 	Runs string `json:"runs,omitempty"` // the command that decides it, if one can
-	Ran  string `json:"ran,omitempty"`  // what it answered when the worker ran it
-	Met  bool   `json:"met,omitempty"`  // whether it passed
+
+	// WHAT WAS TAKEN AWAY TO MAKE IT FAIL, AND WHAT IT SAID WHEN IT DID.
+	//
+	// A criterion nobody has watched fail is a criterion nobody has tested. The
+	// observation is two fields rather than a paragraph near them, because the
+	// note is re-rendered from the parsed token on every save and prose written
+	// beside a criterion is dropped the next time anybody writes the note.
+	Without string `json:"without,omitempty"` // what was absent when it went red
+	Red     string `json:"red,omitempty"`     // what it said when it went red
+
+	Ran string `json:"ran,omitempty"` // what it answered when the worker ran it
+	Met bool   `json:"met,omitempty"` // whether it passed
+}
+
+// Watched answers whether somebody has seen this criterion fail.
+//
+// A CRITERION WITH NO COMMAND IS NOT WATCHED AND IS NOT ASKED TO BE. It is
+// answered by name in the evidence and a reviewer judges the answer.
+func (c Criterion) Watched() bool {
+	return c.Runs == "" || (trimmed(c.Without) != "" && trimmed(c.Red) != "")
 }
 
 type Token struct {

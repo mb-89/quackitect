@@ -102,6 +102,11 @@ const (
 	headEvidence = "## evidence: "
 	headFinding  = "## finding "
 	headCriteria = "## done when"
+
+	// WHAT A WATCHED CRITERION SAYS ON THE PAGE. One lead each, so a reader
+	// sees what was absent and what it said without opening anything else.
+	leadWithout = "**red without** "
+	leadRed     = "**red said** "
 	headLesson   = "## lesson "
 )
 
@@ -127,6 +132,16 @@ func (t Token) body() string {
 			b.WriteString("- " + c.Says + "\n")
 			if c.Runs != "" {
 				b.WriteString("  `" + c.Runs + "`\n")
+			}
+			// WHAT WAS TAKEN AWAY TO MAKE IT FAIL, AND WHAT IT SAID. It sits
+			// beside the command because that is what it is about, and it is a
+			// field rather than prose because prose here is lost on the next
+			// save.
+			if c.Without != "" {
+				b.WriteString("  " + leadWithout + c.Without + "\n")
+			}
+			if c.Red != "" {
+				b.WriteString("  " + leadRed + c.Red + "\n")
 			}
 		}
 		b.WriteString("\n")
@@ -204,6 +219,10 @@ func readCriteria(text string) []Criterion {
 			out = append(out, Criterion{Says: strings.TrimSpace(l[2:])})
 		case strings.HasPrefix(l, "`") && strings.HasSuffix(l, "`") && len(out) > 0:
 			out[len(out)-1].Runs = strings.Trim(l, "`")
+		case strings.HasPrefix(l, leadWithout) && len(out) > 0:
+			out[len(out)-1].Without = strings.TrimPrefix(l, leadWithout)
+		case strings.HasPrefix(l, leadRed) && len(out) > 0:
+			out[len(out)-1].Red = strings.TrimPrefix(l, leadRed)
 		}
 	}
 	return out

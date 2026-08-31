@@ -9,7 +9,7 @@ func aSpec(t *testing.T, r Roots, title string) Token {
 	t.Helper()
 	tok, err := Mint(r, Token{Title: title, Assignee: "main", Scope: SingleStep,
 		Status: SpecOpen, Detail: "what the problem is", MintedBy: "person",
-		Criteria: []Criterion{{Says: "the suite passes", Runs: "exit 0"}}})
+		Criteria: []Criterion{{Says: "the suite passes", Runs: "exit 1"}}})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -115,6 +115,7 @@ func TestASubmissionThatMeetsNoCriterionIsRefused(t *testing.T) {
 	// Meeting them lets it through: the command passes and the other is
 	// answered by name in the evidence.
 	tok.Criteria[0].Runs = "exit 0"
+	tok.Criteria[0].Without, tok.Criteria[0].Red = "the suite", "it said no such suite"
 	if err := SaveToken(r, tok); err != nil {
 		t.Fatal(err)
 	}

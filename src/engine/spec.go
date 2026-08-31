@@ -39,6 +39,35 @@ func StartsAt(t Token) Status {
 	return ImpOpen
 }
 
+// CriteriaThatAlreadyPass answers the command criteria that exit zero before
+// anybody has done the work.
+//
+// A CRITERION THAT PASSES BEFORE THE WORK CANNOT REPORT ON THE WORK. The spec
+// is the cheapest place to catch one, because nothing is built yet to argue
+// about.
+//
+// RED BY ABSENCE IS WHAT THIS FINDS. go test -run on a name that does not exist
+// answers ok, no tests to run, and exits zero. A linter given a path it ignores
+// does the same. So does a search over a folder that is not there. Each one
+// reports success for a run in which it asserted nothing, and each one goes on
+// doing so after the work lands. One draft reached review with eight command
+// criteria and every one of them passed with nothing built.
+func CriteriaThatAlreadyPass(r Roots, t Token) []string {
+	var out []string
+	for i, c := range t.Criteria {
+		if c.Runs == "" {
+			continue
+		}
+		said, err := runEvidence(r, c.Runs)
+		if err != nil {
+			continue
+		}
+		out = append(out, fmt.Sprintf("%d. %s\n     %s\n     it exits zero with the work not done, "+
+			"so it cannot report on the work: %s", i+1, c.Says, c.Runs, firstLines(said, 2)))
+	}
+	return out
+}
+
 // DraftReady answers what stops a draft going to review, or nothing.
 func DraftReady(t Token) error {
 	if strings.TrimSpace(t.Detail) == "" {
@@ -64,6 +93,15 @@ func DraftReady(t Token) error {
 func UnmetCriteria(r Roots, t Token, p Payload) []string {
 	var out []string
 	for i, c := range t.Criteria {
+		// A CRITERION NOBODY HAS WATCHED FAIL IS A CRITERION NOBODY HAS TESTED.
+		// Running it once and seeing green says the command exits zero. It says
+		// nothing about whether the command could ever exit anything else.
+		if !c.Watched() {
+			out = append(out, fmt.Sprintf("%d. %s\n     %s\n     nobody has watched this fail. "+
+				"Take the work away, run it, and record what was absent and what it said",
+				i+1, c.Says, c.Runs))
+			continue
+		}
 		if c.Runs != "" {
 			said, err := runEvidence(r, c.Runs)
 			if err != nil {

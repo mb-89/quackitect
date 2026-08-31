@@ -321,6 +321,15 @@ func submitSpec(r Roots, actor string, t Token, p Payload) (Answer, bool) {
 		return refuse(&t, Rejection{Clause: "the spec", Wrong: err.Error(),
 			Satisfies: "a detail saying what the problem is, and criteria saying what done means"}), true
 	}
+	// WHERE IT BITES FIRST. A spec whose criteria already pass does not go to
+	// review. A criterion that passes before the work cannot report on the
+	// work, and nothing is built yet to argue about.
+	if green := CriteriaThatAlreadyPass(r, t); len(green) > 0 {
+		return refuse(&t, Rejection{Clause: "the criteria",
+			Wrong: fmt.Sprintf("%d of the %d criteria pass with the work not done:\n\n  %s",
+				len(green), len(t.Criteria), strings.Join(green, "\n  ")),
+			Satisfies: "a command that is red today and goes green when the work lands"}), true
+	}
 	// SUBMITTED IS WHERE A QUEUE IS COUNTED. A draft went from the drafter's
 	// hands straight into a reviewer's with no state in between, so nothing
 	// could say how much was waiting for a reviewer.
