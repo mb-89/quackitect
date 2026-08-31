@@ -163,3 +163,10 @@ export function initArgs(kind: string): string[] {
 export function startArgs(): string[] {
   return [];
 }
+
+// SETTING ONE THING ABOUT A TOKEN, from the panel or from a cell a person
+// edited. The key and the text are the person's and the method root is the
+// caller's, and the flags are this file's like every other call.
+export function setArgs(key: string, text: string, method: string): string[] {
+  return ["--set", key + "=" + text, "--method", method];
+}

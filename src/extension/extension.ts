@@ -11,6 +11,7 @@ import {
   viewArgs, paneArgs, panesArgs, viewsArgs, pinArgs, unpinArgs, widthArgs,
   orderArgs, levelArgs, dropLevelArgs, filterArgs,
   rotateArgs, projectArgs, copiesArgs, attachArgs, configArgs, initArgs, startArgs,
+  setArgs,
 } from "./engineargs";
 
 // The extension is idle when it loads. It does not act, it does not start
@@ -566,7 +567,7 @@ function setValue(context: vscode.ExtensionContext, key: string, value: unknown)
       );
       return resolve(false);
     }
-    const args = ["--set", `${key}=${asText(value)}`, "--work", work, "--method", methodRoot(context)];
+    const args = [...setArgs(key, asText(value), methodRoot(context)), "--work", work];
     const done = spawn(exe, args, { cwd: work });
     let err = "";
     let out = "";

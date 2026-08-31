@@ -42,6 +42,19 @@ func TestARejectionNamesTheLessonsToken(t *testing.T) {
 		t.Fatalf("the refusal does not say the lesson names no token: %+v", a.Findings)
 	}
 
+	// AND A REJECTION WITH NO FINDING AT ALL IS REFUSED, which nothing drove:
+	// deleting that refusal left the whole suite green. It is the first of the
+	// three and the one a worker meets most, because a reviewer with a class in
+	// mind and nothing concrete is exactly the round this queue exists to stop.
+	a = Pull(r, "rev", RoleReviewer, Payload{ID: tok.ID, Verdict: "reject",
+		Lesson: lesson, Learned: tok.ID})
+	if a.Pull != AnswerRefused {
+		t.Fatalf("a rejection with a lesson and no finding was accepted: %s", a.Pull)
+	}
+	if len(a.Findings) == 0 || !strings.Contains(a.Findings[0].Wrong, "no finding") {
+		t.Fatalf("the refusal does not say there is no finding: %+v", a.Findings)
+	}
+
 	// AND SO IS NAMING SOMETHING THAT IS NOT A TOKEN. This one names the id it
 	// was handed, which the refusal above cannot do because there is no id.
 	a = Pull(r, "rev", RoleReviewer, Payload{ID: tok.ID, Verdict: "reject",
@@ -123,6 +136,16 @@ func TestASpecRejectionNamesTheLessonsTokenToo(t *testing.T) {
 	}
 	if len(a.Findings) == 0 || !strings.Contains(a.Findings[0].Wrong, "wk-nothing") {
 		t.Fatalf("the refusal does not name the id it was handed: %+v", a.Findings)
+	}
+
+	// A DRAFT SENT BACK WITH NO FINDING IS REFUSED THE SAME WAY.
+	a = Pull(r, "reviewer", RoleReviewer, Payload{ID: tok.ID, Verdict: "reject",
+		Lesson: lesson, Learned: tok.ID})
+	if a.Pull != AnswerRefused {
+		t.Fatalf("a spec rejection with no finding was accepted: %s", a.Pull)
+	}
+	if len(a.Findings) == 0 || !strings.Contains(a.Findings[0].Wrong, "no finding") {
+		t.Fatalf("the refusal does not say there is no finding: %+v", a.Findings)
 	}
 
 	// AND ONE THAT NAMES A TOKEN SENDS THE DRAFT BACK TO ITS DRAFTER.
