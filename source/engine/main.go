@@ -63,6 +63,8 @@ func main() {
 		fmt.Fprintln(out, "  se view --help       change how a view looks")
 		fmt.Fprintln(out, "  se lint --help       name what breaks a rule")
 		fmt.Fprintln(out, "  se hold --help       stop the agent, or let it go on")
+		fmt.Fprintln(out, "  se --said \"...\"      put what the person said in the record, word for word")
+		fmt.Fprintln(out, "  se --answer \"...\"    put your answer to them in the record")
 		fmt.Fprintln(out, "")
 		flag.PrintDefaults()
 	}
@@ -81,8 +83,8 @@ func main() {
 	settings := flag.Bool("config", false, "print every parameter, its value, and where the value came from")
 	tree := flag.Bool("tree", false, "print the parameter tree as declared")
 	set := flag.String("set", "", "change one parameter: name=value")
-	note := flag.String("note", "", "put one line in the record and exit")
-	from := flag.String("from", "agent", "with note: who said it. agent, or user")
+	said := flag.String("said", "", "put what the person said in the record, word for word, and exit")
+	answer := flag.String("answer", "", "put your answer to them in the record, and exit")
 	version := flag.Bool("version", false, "print which build this is and exit")
 	selftest := flag.Bool("selftest", false, "produce a copy, drive a project with it, and check what came out")
 	keep := flag.Bool("keep", false, "with selftest: leave the temporary trees behind")
@@ -149,22 +151,39 @@ func main() {
 		return
 	}
 
-	// One line into the running session, from whoever asks. The engine owns
-	// the format, so nothing else writes the record.
-	// WHAT SOMEBODY SAID, PUT IN THE RECORD BY WHOEVER HEARD IT.
+	// WHAT THE PERSON SAID, WORD FOR WORD.
 	//
 	// The harness fires an event for a message that starts a turn and none for
-	// a message written into one that is already running. Nothing on disk
-	// holds those words: the transcript keeps a note that one was absorbed and
-	// not what it said.
+	// one written into a turn that is already running. Nothing on disk holds
+	// those words, so whatever heard them is the only thing that can record
+	// them.
 	//
-	// So the only thing that can put it in the record is whatever heard it.
-	if *note != "" {
-		src, kind := "agent", "note"
-		if *from == "user" {
-			src, kind = "user", "prompt"
-		}
-		noteInLog(dir, src, kind, *note, nil, nil)
+	// IT IS THEIR SENTENCE AND NOT A SUMMARY OF IT. A person reading the log
+	// for what they said and finding an agent's reading of it has been told
+	// what they meant by the thing they were checking.
+	//
+	// THERE IS NO SECOND KIND OF NOTE. A note is a work token in the backlog,
+	// and se work --note mints one. This records a prompt, which is a different
+	// thing with a different word.
+	if *said != "" {
+		noteInLog(dir, "user", "prompt", *said, nil, nil)
+		fmt.Println("recorded")
+		return
+	}
+
+	// YOUR ANSWER TO THEM, IN THE RECORD BESIDE THEIR PROMPT.
+	//
+	// One prompt, one answer, and the person reads it where they are already
+	// looking. Two things follow.
+	//
+	// A HARNESS SOMETIMES EATS AN ANSWER and a line in a file does not, so the
+	// answer arrives whether or not the turn delivered it.
+	//
+	// AND THE AGENT DOES NOT HAVE TO STOP TO BE HEARD. Answering was the one
+	// thing that needed the turn to end, so it was ending turns that had work
+	// left in them.
+	if *answer != "" {
+		noteInLog(dir, "agent", "answer", *answer, nil, nil)
 		fmt.Println("recorded")
 		return
 	}

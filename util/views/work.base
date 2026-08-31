@@ -48,9 +48,8 @@ views:
     collapsed:
       - backlogged
     sort:
-      - property: opened
+      - property: seq
         direction: ASC
-
   - type: table
     name: right
     order:

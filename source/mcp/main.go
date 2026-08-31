@@ -98,6 +98,10 @@ func reply(out *json.Encoder, id any, result any) {
 	_ = out.Encode(response{JSONRPC: "2.0", ID: id, Result: result})
 }
 
+// A blank line between paragraphs, written once so every description reads the
+// same and none of them carries the escape.
+const nl2 = "\n\n"
+
 func tools() []map[string]any {
 	// The lane's tools are declared where they are handled, so a tool and its
 	// description never drift apart.
@@ -108,14 +112,40 @@ func tools() []map[string]any {
 			"inputSchema": map[string]any{"type": "object", "properties": map[string]any{}},
 		},
 		{
-			"name":        "se_note",
-			"description": "Put one line in the record. Use it for a decision or a finding that the next reader needs.",
+			"name": "se_answer",
+			"description": "ANSWER THE PERSON, IN THE RECORD. One prompt, one answer, where they are " +
+				"already looking." + nl2 +
+				"Use it for every prompt they give you. Say what you would have said to them, in " +
+				"full, and then carry on with the work you hold." + nl2 +
+				"YOU DO NOT HAVE TO STOP TO BE HEARD. Answering was the one thing that needed the " +
+				"turn to end, so it was ending turns that still had work in them. A harness " +
+				"sometimes loses an answer, and a line in a file does not.",
 			"inputSchema": map[string]any{
 				"type": "object",
 				"properties": map[string]any{
-					"message": map[string]any{"type": "string", "description": "One line. Say the thing, not the story."},
+					"answer": map[string]any{"type": "string",
+						"description": "what you would have said to them. The whole answer, not a summary of it."},
 				},
-				"required": []string{"message"},
+				"required": []string{"answer"},
+			},
+		},
+		{
+			"name": "se_said",
+			"description": "PUT WHAT THE PERSON SAID IN THE RECORD, WORD FOR WORD.\n\n" +
+				"Use it the moment a message reaches you in the middle of a turn. The harness " +
+				"fires no event for one of those, so you are the only thing that can record it.\n\n" +
+				"THEIR SENTENCE, NOT A SUMMARY OF IT. Somebody reading the log for what they said, " +
+				"and finding your reading of it, has been told what they meant by the one thing " +
+				"they were checking. Copy the message. Do not shorten it, tidy it, or join two.\n\n" +
+				"A NOTE IS SOMETHING ELSE. A note is a work token in the backlog, and se_work with " +
+				"backlog set is what mints one.",
+			"inputSchema": map[string]any{
+				"type": "object",
+				"properties": map[string]any{
+					"said": map[string]any{"type": "string",
+						"description": "what they said, copied. Their words and nothing else."},
+				},
+				"required": []string{"said"},
 			},
 		},
 	}...)
@@ -131,13 +161,22 @@ func call(roots roots, params json.RawMessage) map[string]any {
 	switch p.Name {
 	case "se_status":
 		return text(status(roots))
-	case "se_note":
-		msg, _ := p.Arguments["message"].(string)
+	case "se_answer":
+		msg, _ := p.Arguments["answer"].(string)
 		if msg == "" {
-			return text("A note needs a message.")
+			return text("Say what you would have said to them.")
 		}
-		if err := note(roots, msg); err != nil {
-			return text("The note could not be recorded: " + err.Error())
+		if err := answered(roots, msg); err != nil {
+			return text("It could not be recorded: " + err.Error())
+		}
+		return text("recorded")
+	case "se_said":
+		msg, _ := p.Arguments["said"].(string)
+		if msg == "" {
+			return text("Say what they said.")
+		}
+		if err := said(roots, msg); err != nil {
+			return text("It could not be recorded: " + err.Error())
 		}
 		return text("recorded")
 	case "se_work":

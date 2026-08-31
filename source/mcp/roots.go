@@ -99,10 +99,16 @@ func or(s, fallback string) string {
 	return s
 }
 
-// note appends one line to the session that is running. The engine owns the
-// format, so the stub asks it rather than writing the record itself.
-func note(r roots, msg string) error {
-	_, err := ask(r, "--note", msg)
+// said puts what the person said in the record, word for word. The engine owns
+// the format, so the stub asks it rather than writing the record itself.
+func said(r roots, msg string) error {
+	_, err := ask(r, "--said", msg)
+	return err
+}
+
+// answered puts the agent's answer in the record beside the prompt it answers.
+func answered(r roots, msg string) error {
+	_, err := ask(r, "--answer", msg)
 	return err
 }
 

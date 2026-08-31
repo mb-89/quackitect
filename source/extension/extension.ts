@@ -872,6 +872,7 @@ function toggleWork(context: vscode.ExtensionContext) {
     if (m.type === "columns") void setColumns(context, m.side, m.only);
     if (m.type === "level") void setLevel(context, m.side, m.kind, m.property, m.direction);
     if (m.type === "width") void setWidth(context, m.side, m.property, m.px);
+    if (m.type === "filter") void setFilter(context, m.side, m.groups);
     if (m.type === "file") void fileWork(context, m.id, m.sets, m.into);
   });
   void drawWork(context);
@@ -895,6 +896,7 @@ type WorkMessage =
   | { type: "columns"; side: string; only: string[] }
   | { type: "level"; side: string; kind: string; property: string; direction: string }
   | { type: "width"; side: string; property: string; px: number }
+  | { type: "filter"; side: string; groups: unknown[] }
   | { type: "open"; id: string }
   | { type: "edit"; id: string; col: string; text: string }
   | { type: "file"; id: string; sets: string; into: string };
@@ -958,6 +960,12 @@ async function setLevel(context: vscode.ExtensionContext, side: string, kind: st
 
 async function setWidth(context: vscode.ExtensionContext, side: string, property: string, px: number) {
   await writeView(context, side, ["--width", property + "=" + String(px)]);
+}
+
+// THE ENGINE OWNS THE VOCABULARY. The panel sends the rows a person built and
+// nothing here decides what a condition means.
+async function setFilter(context: vscode.ExtensionContext, side: string, groups: unknown[]) {
+  await writeView(context, side, ["--filter", JSON.stringify(groups)]);
 }
 
 async function writeView(context: vscode.ExtensionContext, side: string, args: string[]) {

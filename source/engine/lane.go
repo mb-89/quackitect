@@ -212,6 +212,7 @@ func runView(args []string) {
 	sortBy := fs.String("sort", "", "sort by this column")
 	groupBy := fs.String("group", "", "group by this column")
 	direction := fs.String("direction", "ASC", "with sort or group: ASC or DESC")
+	filter := fs.String("filter", "", "the filter a person built, as JSON groups of rows")
 	_ = fs.Parse(args)
 
 	roots, err := FindRoots(*work)
@@ -248,6 +249,16 @@ func runView(args []string) {
 		wrote = SetSort(path, *pane, *sortBy, *direction)
 	case *groupBy != "":
 		wrote = SetGroup(path, *pane, *groupBy, *direction)
+	case *filter != "":
+		var groups []FilterGroup
+		if err := json.Unmarshal([]byte(*filter), &groups); err != nil {
+			wrote = fmt.Errorf("the filter will not read: %w", err)
+			break
+		}
+		var text string
+		if text, wrote = FilterExpression(groups); wrote == nil {
+			wrote = SetFilter(path, *pane, text)
+		}
 	default:
 		wrote = fmt.Errorf("say what to change: width, order, sort or group")
 	}

@@ -212,11 +212,22 @@ never content it has to author.
 
 Put what the person said into the record when a message reaches you mid-turn:
 
-    se --note "<what they said>" --from user
+    se --said "<their sentence, copied>"
 
-Do it first, before anything else you were going to do. The person is watching
-the log for what they said, and every call you make before that one is time
-they spend wondering whether it arrived.
+Copy it. Do not shorten it, tidy it, or join two of them. Somebody reading the
+log for what they said, and finding your reading of it, has been told what they
+meant by the one thing they were checking.
+
+Then answer it:
+
+    se --answer "<what you would have said to them>"
+
+IN THAT ORDER, and before anything else you were going to do. Their sentence,
+then your answer to it, then the work. Answering first puts your answer above
+their prompt in the log, which reads as an answer to something else.
+
+You do not have to stop the turn to be heard. Answering was the one thing that
+needed the turn to end, so it was ending turns that still had work in them.
 
 The harness fires an event for a message that starts a turn and none for one
 written into a turn that is already running. You are the only thing that hears

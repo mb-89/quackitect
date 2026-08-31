@@ -78,6 +78,27 @@ func SetGroup(path, view, col, direction string) error {
 	})
 }
 
+// SetFilter writes one statement as the view's filter. What a person built
+// compiles to one expression, and that expression is the only thing written.
+func SetFilter(path, view, text string) error {
+	return patchView(path, view, "filters", func(_ []string, indent string) []string {
+		if strings.TrimSpace(text) == "" {
+			// A FILTER NOBODY SET KEEPS EVERYTHING, which is what having none
+			// means. An empty line would read as a filter that matches nothing.
+			return nil
+		}
+		return []string{indent + "- " + quoteStatement(text)}
+	})
+}
+
+// A statement goes in quoted when leaving it bare would change what it means.
+func quoteStatement(s string) string {
+	if strings.ContainsAny(s, ":#") || strings.HasPrefix(s, "-") {
+		return strconv.Quote(s)
+	}
+	return s
+}
+
 var itemStart = regexp.MustCompile(`^(\s*)-\s`)
 var nameLine = regexp.MustCompile(`^\s*-?\s*name:\s*(\S+)\s*$`)
 

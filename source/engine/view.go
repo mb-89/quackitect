@@ -62,6 +62,9 @@ type Sort struct {
 }
 
 type View struct {
+	// What the file said the filter was, kept so the builder can draw it back.
+	RawFilter any
+
 	Name      string
 	Type      string
 	Order     []string // the columns, in order
@@ -146,6 +149,7 @@ func readView(m map[string]any) (View, error) {
 		v.Widths[name] = n
 	}
 	var err error
+	v.RawFilter = m["filters"]
 	if v.Filter, err = filterOf(m["filters"]); err != nil {
 		return v, err
 	}
@@ -366,6 +370,13 @@ type Table struct {
 	Sorted []LevelSaid    `json:"sorted,omitempty"`
 	File   string         `json:"file,omitempty"`
 	Source string         `json:"source,omitempty"`
+
+	// WHAT THE FILTER BUILDER DRAWS. The groups a person built, and the
+	// operator vocabulary they are offered. The vocabulary is serialised
+	// rather than declared in the panel a second time: a client with its own
+	// copy drifts the first time an operator is added.
+	Filters   []FilterGroup `json:"filters,omitempty"`
+	Operators []Operator    `json:"operators,omitempty"`
 }
 
 // A level, as the toolbar shows it. The expression is text there, because a
@@ -444,6 +455,8 @@ func Render(b Base, v View, rows []Row) (Table, error) {
 		t.Sorted = append(t.Sorted, LevelSaid{Property: sr.Property, Direction: dirOf(sr.Descending)})
 	}
 	t.Props = propertyInventory(kept, t.Columns)
+	t.Filters = FilterGroups(v.RawFilter)
+	t.Operators = Operators
 
 	t.Groups, err = group(rest, v, t.Columns, 0)
 	return t, err

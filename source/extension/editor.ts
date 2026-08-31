@@ -49,6 +49,8 @@ export type Table = {
   sorted?: LevelSaid[];
   file?: string;
   source?: string;
+  filters?: FilterGroup[];
+  operators?: Operator[];
   error?: string;
 };
 
@@ -59,6 +61,9 @@ const ICON: Record<string, string> = {
 };
 
 export type PropertyInfo = { name: string; type: string; on: boolean };
+export type Operator = { id: string; label: string; types?: string[]; takes: boolean };
+export type FilterRow = { property: string; operator: string; value?: string };
+export type FilterGroup = { rows: FilterRow[] | null; raw?: string };
 export type LevelSaid = { property: string; direction: string; sets?: string };
 export type Pane = { side: string; table: Table };
 export type Body = { pinned: string; scrolling: string; total: number; counts: Tally[] };
@@ -92,9 +97,10 @@ function paneHtml(p: Pane, hidden: boolean): string {
   const b = paneBody(p.table);
   const t = p.table;
   return `<div class="pane-wrap" data-side="${esc(p.side)}"${hidden ? " hidden" : ""}>
-  <div class="chrome">${toolbar(t)}${sortPop(t)}${propsPop(t)}</div>
+  <div class="chrome">${toolbar(t)}${filterPop(t)}${sortPop(t)}${propsPop(t)}</div>
   <div class="top">${b.pinned}</div>
   <div class="pane">${b.scrolling}</div>
+  ${pager()}
   ${codePanel(t)}
 </div>`;
 }
@@ -112,10 +118,89 @@ function toolbar(t: Table): string {
     <span class="bs-view-name">${esc(t.view)}</span>
     <span class="bs-count">${n} result${n === 1 ? "" : "s"}</span>
     <span class="bs-gap"></span>
+    <button type="button" class="bs-tool" data-pop="filter" data-help="filter">&#9660; Filter</button>
     <button type="button" class="bs-tool" data-pop="sort" data-help="sort">&#8645; Sort</button>
     <button type="button" class="bs-tool" data-pop="props" data-help="properties">&#8801; Properties</button>
     <button type="button" class="bs-tool bs-code-toggle" title="show the query">&#9781;</button>
   </div>`;
+}
+
+// THE FUNNEL'S POPOVER.
+//
+// GROUPS ARE ANDED, ROWS INSIDE A GROUP ARE ORED. The join word is drawn on
+// every group and every row, and the first one of each is hidden by CSS. A join
+// written per row cannot drift out of step with the rows.
+//
+// The two templates at the end are what Add condition and Add group clone. A
+// template's content is not in the document tree, so it is never collected as a
+// real row, and it is always there, which a control that cloned a drawn row
+// would not be when every stored group is raw.
+//
+// Ported from baseui.ts:314-375.
+function filterPop(t: Table): string {
+  const groups = (t.filters ?? []).length ? t.filters! : [{ rows: [] }];
+  const ops = JSON.stringify(t.operators ?? []);
+  const types: Record<string, string> = {};
+  for (const p of t.props ?? []) types[p.name] = p.type;
+  return `<div class="bs-pop" data-pop="filter" data-ops='${esc(ops)}'
+    data-types='${esc(JSON.stringify(types))}' hidden>
+    <div class="bs-pop-title" data-help="filter">Filter by</div>
+    <div class="bs-groups">${groups.map((g) => groupRow(g, t)).join("")}</div>
+    <button type="button" class="bs-add bs-add-group">+ Add group</button>
+    <template class="bs-cond-tpl">${condRow({ property: "", operator: "" }, t)}</template>
+    <template class="bs-group-tpl">${groupRow({ rows: [] }, t)}</template>
+  </div>`;
+}
+
+function groupRow(g: FilterGroup, t: Table): string {
+  if (g.raw) {
+    return `<div class="bs-group bs-group-raw">
+      <span class="bs-join">and</span>
+      <div class="bs-group-body">
+        <div class="bs-raw"><code>${esc(g.raw)}</code></div>
+        <div class="bs-raw-note">Not a condition this builder can draw, so it is left exactly as
+        written. The query is where it is edited.</div>
+      </div>
+    </div>`;
+  }
+  const rows = (g.rows ?? []).length ? g.rows! : [{ property: "", operator: "" }];
+  return `<div class="bs-group">
+    <span class="bs-join">and</span>
+    <div class="bs-group-body">
+      <div class="bs-conds">${rows.map((r) => condRow(r, t)).join("")}</div>
+      <button type="button" class="bs-add bs-add-cond">+ Add condition</button>
+    </div>
+  </div>`;
+}
+
+function condRow(row: FilterRow, t: Table): string {
+  const kind = (t.props ?? []).find((p) => p.name === row.property)?.type ?? "";
+  const op = (t.operators ?? []).find((o) => o.id === row.operator);
+  const takes = op === undefined || op.takes;
+  const props = (t.props ?? [])
+    .map((p) => `<option value="${esc(p.name)}"${p.name === row.property ? " selected" : ""}>${esc(p.name)}</option>`)
+    .join("");
+  return `<div class="bs-row bs-cond">
+    <span class="bs-join">or</span>
+    <select class="bs-prop"><option value=""></option>${props}</select>
+    <select class="bs-op">${opOptions(t, kind, row.operator)}</select>
+    <input class="bs-val" type="text" placeholder="value" value="${esc(row.value ?? "")}"${takes ? "" : " hidden"}>
+    <button type="button" class="bs-icon bs-drop-cond" title="remove this condition">&#10005;</button>
+  </div>`;
+}
+
+// AN OPERATOR ALREADY IN THE FILE IS SHOWN even where the type does not offer
+// it. The type is inferred from the data, so it can be wrong, and dropping the
+// stored operator would rewrite the filter the next time an unrelated row moved.
+function opOptions(t: Table, kind: string, selected: string): string {
+  const all = t.operators ?? [];
+  const offered = all.filter((o) => !o.types?.length || (kind !== "" && o.types.includes(kind)));
+  const shown = offered.some((o) => o.id === selected) || selected === ""
+    ? offered
+    : [...offered, ...all.filter((o) => o.id === selected)];
+  return shown
+    .map((o) => `<option value="${esc(o.id)}"${o.id === selected ? " selected" : ""}>${esc(o.label)}</option>`)
+    .join("");
 }
 
 // Sort and group by, both as LISTS.
@@ -161,6 +246,30 @@ function propsPop(t: Table): string {
     <input class="bs-find" type="text" placeholder="Find a property...">
     <div class="bs-prop-list">${items}</div>
     <div class="bs-pop-foot"><button type="button" class="bs-add bs-hide-all">Hide all</button></div>
+  </div>`;
+}
+
+// THE PAGER: previous, where you are, next, and how big a page is.
+//
+// THE SIZE IS TYPED RATHER THAN PICKED. The right page for a table of 249 is
+// not on anybody's list of four.
+//
+// IT SHIPS HIDDEN AND THE PAGE DECIDES. Whether a pager is worth drawing
+// depends on how many rows a closed group is swallowing, and only the page
+// knows that. A pager over one page says nothing the count does not.
+//
+// EVERY ROW STAYS IN THE MARKUP. Paging hides, it never prunes. A page change
+// costs no fetch and the reader's place survives it.
+//
+// Ported from baseui.ts:466-474.
+function pager(): string {
+  return `<div class="bs-pager" hidden>
+    <button type="button" class="bs-prev" title="previous page">&#8249;</button>
+    <span class="bs-where"></span>
+    <button type="button" class="bs-next" title="next page">&#8250;</button>
+    <input type="number" class="bs-per" min="0" step="1" value="50"
+      title="rows a page. Type any number, or 0 for all">
+    <span class="bs-per-label">a page</span>
   </div>`;
 }
 
@@ -339,6 +448,26 @@ function css(): string {
   .bs-prop-item .bs-type { color: var(--vscode-descriptionForeground); width: 14px; }
   .bs-pop-foot { margin-top: 6px; }
   /* The query replaces the table rather than sitting beside it. */
+  /* The join word is drawn on every row and the first of each is hidden, so it
+     cannot drift out of step with the rows. */
+  .bs-group { display: flex; gap: 6px; margin-bottom: 6px; }
+  .bs-group:first-child > .bs-join, .bs-cond:first-child > .bs-join { visibility: hidden; }
+  .bs-join { color: var(--vscode-descriptionForeground); font-size: .85em; width: 26px; }
+  .bs-group-body { flex: 1 1 auto; }
+  .bs-cond { display: flex; gap: 4px; align-items: center; margin-bottom: 4px; }
+  .bs-cond select, .bs-cond input { font: inherit; min-width: 0; }
+  .bs-prop, .bs-op { flex: 1 1 0; }
+  .bs-val { flex: 1 1 0; padding: 1px 4px; }
+  .bs-icon { padding: 0 5px; color: var(--vscode-descriptionForeground); }
+  .bs-raw code { font-family: var(--vscode-editor-font-family); }
+  .bs-raw-note { color: var(--vscode-descriptionForeground); font-size: .85em; margin-top: 2px; }
+  th { position: relative; }
+  .th-grip { position: absolute; right: 0; top: 0; width: 6px; height: 100%;
+             cursor: col-resize; }
+  .bs-pager { display: flex; align-items: center; gap: 6px; padding: 3px 8px; flex: 0 0 auto;
+              border-top: 1px solid var(--vscode-panel-border); }
+  .bs-where, .bs-per-label { color: var(--vscode-descriptionForeground); font-size: .9em; }
+  .bs-per { width: 60px; font: inherit; }
   .bs-pane-code { flex: 1 1 auto; overflow: auto; }
   .bs-code-head { padding: 4px 8px; border-bottom: 1px solid var(--vscode-panel-border); }
   .bs-code-text { margin: 0; padding: 8px; font-family: var(--vscode-editor-font-family);
@@ -406,6 +535,8 @@ function script(): string {
     wrap.querySelector('.bs-count').textContent = m.total + ' result' + (m.total === 1 ? '' : 's');
     restore(wrap);
     wire(wrap);
+    wireColumns(wrap);
+    showPage(wrap);
     pane.scrollTop = at;
   });
 
@@ -553,11 +684,174 @@ function script(): string {
     }
   }
 
+  // THE FILTER, COLLECTED FROM WHAT IS DRAWN. Nothing here decides what a
+  // condition means: the rows go to the engine, which owns the vocabulary.
+  //
+  // AN EMPTY VALUE BOX IS AN UNFINISHED ROW, never a test for the empty string.
+  // Writing it would empty the table, so the engine refuses it and the row
+  // stays where the reader can finish it.
+  function wireFilter(wrap) {
+    const pop = wrap.querySelector('.bs-pop[data-pop="filter"]');
+    if (!pop) return;
+    const ops = JSON.parse(pop.dataset.ops || '[]');
+    const types = JSON.parse(pop.dataset.types || '{}');
+
+    const collect = () => {
+      const groups = [];
+      for (const g of pop.querySelectorAll('.bs-group')) {
+        if (g.classList.contains('bs-group-raw')) {
+          groups.push({ raw: g.querySelector('code').textContent });
+          continue;
+        }
+        const rows = [];
+        for (const c of g.querySelectorAll('.bs-cond')) {
+          rows.push({ property: c.querySelector('.bs-prop').value,
+            operator: c.querySelector('.bs-op').value,
+            value: c.querySelector('.bs-val').value });
+        }
+        groups.push({ rows });
+      }
+      send({ type: 'filter', side: wrap.dataset.side, groups });
+    };
+
+    const wireCond = (c) => {
+      const prop = c.querySelector('.bs-prop');
+      const op = c.querySelector('.bs-op');
+      const val = c.querySelector('.bs-val');
+      const offer = () => {
+        const kind = types[prop.value] || '';
+        const keep = op.value;
+        const shown = ops.filter((o) => !o.types || !o.types.length || (kind && o.types.includes(kind)));
+        if (keep && !shown.some((o) => o.id === keep)) {
+          for (const o of ops) if (o.id === keep) shown.push(o);
+        }
+        op.innerHTML = shown.map((o) =>
+          '<option value="' + o.id + '"' + (o.id === keep ? ' selected' : '') + '>' + o.label + '</option>').join('');
+        const chosen = ops.find((o) => o.id === op.value);
+        val.hidden = chosen !== undefined && !chosen.takes;
+      };
+      prop.onchange = () => { offer(); collect(); };
+      op.onchange = () => { offer(); collect(); };
+      val.onchange = collect;
+      c.querySelector('.bs-drop-cond').onclick = () => { c.remove(); collect(); };
+    };
+
+    for (const c of pop.querySelectorAll('.bs-cond')) wireCond(c);
+    for (const add of pop.querySelectorAll('.bs-add-cond')) {
+      add.onclick = () => {
+        const tpl = pop.querySelector('.bs-cond-tpl');
+        const row = tpl.content.firstElementChild.cloneNode(true);
+        add.parentElement.querySelector('.bs-conds').appendChild(row);
+        wireCond(row);
+      };
+    }
+    const addGroup = pop.querySelector('.bs-add-group');
+    if (addGroup) {
+      addGroup.onclick = () => {
+        const tpl = pop.querySelector('.bs-group-tpl');
+        const g = tpl.content.firstElementChild.cloneNode(true);
+        pop.querySelector('.bs-groups').appendChild(g);
+        for (const c of g.querySelectorAll('.bs-cond')) wireCond(c);
+        g.querySelector('.bs-add-cond').onclick = () => {
+          const row = pop.querySelector('.bs-cond-tpl').content.firstElementChild.cloneNode(true);
+          g.querySelector('.bs-conds').appendChild(row);
+          wireCond(row);
+        };
+      };
+    }
+  }
+
+  // DRAGGING A COLUMN EDGE SETS ITS WIDTH, and the grip is not the header: a
+  // click on it must not sort.
+  function wireColumns(wrap) {
+    for (const th of wrap.querySelectorAll('th[data-col]')) {
+      const grip = document.createElement('span');
+      grip.className = 'th-grip';
+      th.appendChild(grip);
+      let from = null;
+      grip.onmousedown = (ev) => {
+        ev.preventDefault();
+        ev.stopPropagation();
+        from = { x: ev.clientX, w: th.offsetWidth };
+      };
+      const move = (ev) => {
+        if (!from) return;
+        th.style.width = Math.max(40, from.w + ev.clientX - from.x) + 'px';
+      };
+      const up = () => {
+        if (!from) return;
+        from = null;
+        send({ type: 'width', side: wrap.dataset.side, property: th.dataset.col, px: th.offsetWidth });
+      };
+      document.addEventListener('mousemove', move);
+      document.addEventListener('mouseup', up);
+      // CLICKING A HEADING SORTS BY IT, and it replaces every level rather than
+      // adding one: a header that added a level would make the two controls
+      // disagree about what is in force.
+      th.onclick = (ev) => {
+        if (ev.target.classList.contains('th-grip')) return;
+        send({ type: 'level', side: wrap.dataset.side, kind: 'sort',
+          property: th.dataset.col, direction: th.dataset.dir === 'ASC' ? 'DESC' : 'ASC' });
+      };
+    }
+  }
+
   document.addEventListener('click', () => {
     for (const p of document.querySelectorAll('.bs-pop')) p.hidden = true;
     for (const t of document.querySelectorAll('.bs-tool[data-pop]')) t.classList.remove('on');
   });
 
-  for (const wrap of document.querySelectorAll('.pane-wrap')) { wire(wrap); wireChrome(wrap); }
+  // TWO THINGS HIDE A ROW and they share one attribute: a closed group, and a
+  // page it is not on. Two handlers writing the hidden flag would fight, and
+  // the loser would be whichever ran second. SO BOTH ARE COMPUTED IN ONE PASS.
+  //
+  // Ported from basesclient.ts:479-520.
+  const page = new Map();
+
+  function candidates(wrap) {
+    // Every row a closed group is not swallowing, in the order they are drawn.
+    const out = [];
+    for (const g of wrap.querySelectorAll('.group')) {
+      if (g.classList.contains('shut')) continue;
+      if (g.closest('.group.shut') !== null) continue;
+      for (const row of g.querySelectorAll('tr[data-id]')) out.push(row);
+    }
+    return out;
+  }
+
+  function showPage(wrap) {
+    const bar = wrap.querySelector('.bs-pager');
+    if (!bar) return;
+    const per = Math.max(0, Number(bar.querySelector('.bs-per').value) || 0);
+    const rows = candidates(wrap);
+    const at = page.get(wrap.dataset.side) || 0;
+    const from = per === 0 ? 0 : at * per;
+    const to = per === 0 ? rows.length : from + per;
+    rows.forEach((row, i) => { row.hidden = i < from || i >= to; });
+    // A PAGER OVER ONE PAGE SAYS NOTHING THE COUNT DOES NOT.
+    bar.hidden = per === 0 || rows.length <= per;
+    bar.querySelector('.bs-where').textContent =
+      rows.length === 0 ? '' : (from + 1) + '-' + Math.min(to, rows.length) + ' of ' + rows.length;
+  }
+
+  function wirePager(wrap) {
+    const bar = wrap.querySelector('.bs-pager');
+    if (!bar) return;
+    const side = wrap.dataset.side;
+    bar.querySelector('.bs-prev').onclick = () => {
+      page.set(side, Math.max(0, (page.get(side) || 0) - 1));
+      showPage(wrap);
+    };
+    bar.querySelector('.bs-next').onclick = () => {
+      page.set(side, (page.get(side) || 0) + 1);
+      showPage(wrap);
+    };
+    bar.querySelector('.bs-per').onchange = () => { page.set(side, 0); showPage(wrap); };
+    showPage(wrap);
+  }
+
+  for (const wrap of document.querySelectorAll('.pane-wrap')) {
+    wire(wrap); wireChrome(wrap); wireFilter(wrap); wireColumns(wrap); wirePager(wrap);
+  }
   `;
 }

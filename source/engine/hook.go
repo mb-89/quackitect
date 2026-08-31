@@ -190,9 +190,13 @@ func runHook(args []string) {
 	case "Stop":
 		decideStop(roots, cfg, log, in, actor)
 	case "UserPromptSubmit":
-		// The prompt is private. It is in the log, and the log is private
-		// material, so this is not a second place it can leak from.
-		record(log, "user", "prompt", actor, firstLine(in.Prompt+in.UserPrompt), nil, nil)
+		// THE PROMPT IS WHAT THEY WROTE, WHOLE. firstLine took the first line
+		// and cut it at two hundred characters, so a person reading the log for
+		// what they said found the beginning of it.
+		//
+		// It is private. It is in the log, and the log is private material, so
+		// this is not a second place it can leak from.
+		record(log, "user", "prompt", actor, in.Prompt+in.UserPrompt, nil, nil)
 	case "SessionStart":
 		// A session that resumes after a compaction starts with nothing read.
 		if in.Source == "compact" || in.Source == "clear" {

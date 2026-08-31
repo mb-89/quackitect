@@ -3,7 +3,7 @@ id: wk-48b9cbd3cd
 seq: "12"
 type: work
 title: reattach on reload
-status: submitted
+status: closed
 assignee: main
 scope: single-step
 traced: true
