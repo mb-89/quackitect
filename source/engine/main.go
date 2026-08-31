@@ -419,6 +419,21 @@ func main() {
 	}
 	log.Write("engine", "start", "engine", "engine started", Yes(), startRecord)
 
+	// TWO NAMES, ONE FILE. Installing links them, so the cage and RUNME call
+	// the same program. A build run by hand replaces one name and leaves the
+	// other pointing at what was there before, and then the guards run one
+	// build while a person reads another.
+	//
+	// It cannot be fixed from here, because the fix is to install. Saying so
+	// in the record is what turns a silent difference into a visible one.
+	for _, name := range []string{"se", "se-mcp"} {
+		if a, b, split := twoNames(roots.Method, name); split {
+			log.Write("engine", "error", "engine",
+				name+" is two different files, so the cage and RUNME run different builds", No(),
+				map[string]any{"one": a, "other": b, "fix": "install again"})
+		}
+	}
+
 	// The extension needs to know where to point the viewer, and a person
 	// running this by hand needs the same fact. One line of JSON on standard
 	// output serves both.
