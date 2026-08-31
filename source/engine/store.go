@@ -116,9 +116,6 @@ func (t Token) body() string {
 		fmt.Fprintf(&b, "%s%d · round %d · %s · by %s\n\n", headFinding, i+1, f.Round, f.Clause, f.By)
 		b.WriteString("**wrong:** " + f.Wrong + "\n\n")
 		b.WriteString("**satisfies:** " + f.Satisfies + "\n\n")
-		if f.At != "" {
-			b.WriteString("**at:** " + f.At + "\n\n")
-		}
 	}
 	return b.String()
 }
@@ -203,8 +200,6 @@ func readFinding(head, text string) Rejection {
 			f.Wrong = strings.TrimPrefix(line, "**wrong:** ")
 		case strings.HasPrefix(line, "**satisfies:** "):
 			f.Satisfies = strings.TrimPrefix(line, "**satisfies:** ")
-		case strings.HasPrefix(line, "**at:** "):
-			f.At = strings.TrimPrefix(line, "**at:** ")
 		}
 	}
 	return f
@@ -257,7 +252,7 @@ func SaveToken(r Roots, t Token) error {
 func noteMove(r Roots, t, was Token, existed bool) {
 	switch {
 	case !existed:
-		inSession(r, "work", t.MintedBy, t.ID+" opened "+string(t.Status)+": "+t.Title, Yes(),
+		inSession(r, "work", t.MintedBy, t.ID+" minted "+string(t.Status)+": "+t.Title, Yes(),
 			map[string]any{"id": t.ID, "status": string(t.Status), "assignee": t.Assignee})
 	case was.Status != t.Status:
 		who := t.Holder

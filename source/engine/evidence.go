@@ -4,9 +4,11 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
 	"sort"
+	"strings"
 	"time"
 )
 
@@ -34,6 +36,11 @@ type Read struct {
 type Agent struct {
 	Kind  string    `json:"kind"`
 	First time.Time `json:"first_seen"`
+
+	// A SPEAKING NAME, because a hash in the actor column tells a reader
+	// nothing. It is the kind and a number, so two reviewers are two names and
+	// the reader can tell them apart.
+	Name string `json:"name,omitempty"`
 }
 
 func evidencePath(roots Roots) string { return roots.Private("evidence.json") }
@@ -122,9 +129,38 @@ func NoteAgent(roots Roots, id, kind string) {
 	}
 	e := LoadEvidence(roots)
 	if _, seen := e.Agents[id]; !seen {
-		e.Agents[id] = Agent{Kind: kind, First: time.Now().UTC()}
+		e.Agents[id] = Agent{Kind: kind, First: time.Now().UTC(), Name: nextName(e, kind)}
 		_ = SaveEvidence(roots, e)
 	}
+}
+
+// The next free name for this kind. Counting the ones already named means the
+// second reviewer is reviewer-2 rather than a second reviewer-1.
+func nextName(e Evidence, kind string) string {
+	if kind == "" {
+		kind = "agent"
+	}
+	kind = strings.ToLower(strings.ReplaceAll(kind, " ", "-"))
+	n := 0
+	for _, a := range e.Agents {
+		if a.Kind == kind || strings.HasPrefix(a.Name, kind+"-") {
+			n++
+		}
+	}
+	return fmt.Sprintf("%s-%d", kind, n+1)
+}
+
+// NameOf answers what to call an agent in the record. An identity nobody
+// started keeps its own name, because inventing one would hide that the
+// harness named it something this program never saw.
+func NameOf(roots Roots, id string) string {
+	if id == "" || id == "main" {
+		return "main"
+	}
+	if a, ok := LoadEvidence(roots).Agents[id]; ok && a.Name != "" {
+		return a.Name
+	}
+	return id
 }
 
 // KnownAgent says whether this identity was started in this session. An

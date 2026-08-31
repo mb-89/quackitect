@@ -33,8 +33,8 @@ Do not use a contraction.
 
 Do not use a Latin abbreviation. Write "for example", "that is", "and so on".
 
-Do not write "simply", "just", "obviously", "of course", or "clearly". They
-tell the reader how to feel about the sentence.
+Do not tell the reader how to feel about a sentence. The words that do it are
+in `util/voice-rules.json`, and a refusal names the one you wrote.
 
 ## Audience
 

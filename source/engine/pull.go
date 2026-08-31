@@ -217,7 +217,7 @@ func judge(r Roots, actor string, t Token, p Payload) (Answer, bool) {
 		}
 		t.Rounds++
 		for _, f := range p.Findings {
-			f.Round, f.By, f.At = t.Rounds, actor, now()
+			f.Round, f.By = t.Rounds, actor
 			t.Findings = append(t.Findings, f)
 		}
 		t.Status, t.Holder = Open, ""

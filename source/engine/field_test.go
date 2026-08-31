@@ -61,3 +61,25 @@ func TestATitleWrittenByHandKeepsTheFourWordRule(t *testing.T) {
 		t.Fatalf("a refused write changed the token to %q", tok.Title)
 	}
 }
+
+// A BUCKET IS A NAME A PERSON TYPED. An agent that invents one has made a
+// grouping nobody meant, and two agents inventing two names for one idea is
+// how a list stops being readable.
+func TestOnlyAPersonNamesABucket(t *testing.T) {
+	tok := Token{Title: "a title", Assignee: "main", Scope: SingleStep}
+	if err := WriteFieldBy(&tok, "bucket", "later", "main"); err == nil {
+		t.Fatal("an agent invented a bucket")
+	} else if !strings.Contains(err.Error(), "backlogged") {
+		t.Fatalf("the refusal does not say what the agent can do instead: %v", err)
+	}
+	if tok.Bucket != "" {
+		t.Fatalf("the refused write left %q on the token", tok.Bucket)
+	}
+	// A person names one, and an agent may still clear one.
+	if err := WriteFieldBy(&tok, "bucket", "this week", "person"); err != nil {
+		t.Fatalf("a person was refused: %v", err)
+	}
+	if err := WriteFieldBy(&tok, "bucket", "", "main"); err != nil {
+		t.Fatalf("an agent could not empty a bucket: %v", err)
+	}
+}

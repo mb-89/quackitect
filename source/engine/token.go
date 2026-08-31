@@ -93,7 +93,6 @@ type Rejection struct {
 	Clause    string `json:"clause"`    // what rule it fails
 	Wrong     string `json:"wrong"`     // what is wrong with it
 	Satisfies string `json:"satisfies"` // what would satisfy the clause
-	At        string `json:"at"`
 }
 
 // The evidence a token demands: a filled form, or a script that runs. Two

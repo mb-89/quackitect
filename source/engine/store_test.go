@@ -20,8 +20,8 @@ func TestATokenSurvivesBeingWrittenAndReadBack(t *testing.T) {
 	got := mint(t, r, want)
 	got.Submission = map[string]string{"what": "the row is there", "how": "a test names it"}
 	got.Findings = []Rejection{
-		{Round: 1, By: "rev", Clause: "voice", Wrong: "a semicolon", Satisfies: "two sentences", At: "2026-08-31T00:00:00Z"},
-		{Round: 2, By: "rev2", Clause: "evidence", Wrong: "no measurement", Satisfies: "a number", At: "2026-08-31T00:01:00Z"},
+		{Round: 1, By: "rev", Clause: "voice", Wrong: "a semicolon", Satisfies: "two sentences"},
+		{Round: 2, By: "rev2", Clause: "evidence", Wrong: "no measurement", Satisfies: "a number"},
 	}
 	got.Rounds = 2
 	if err := SaveToken(r, got); err != nil {

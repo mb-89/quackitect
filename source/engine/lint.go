@@ -4,6 +4,8 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"path/filepath"
+	"strings"
 )
 
 // THE LINT. Every rule a token has to keep, run over the tokens that exist.
@@ -25,6 +27,16 @@ func LintTokens(r Roots) []Finding3 {
 	for _, t := range Tokens(r) {
 		if err := checkTitle(t.Title); err != nil {
 			out = append(out, Finding3{ID: t.ID, Title: t.Title, Says: err.Error()})
+		}
+		for _, dir := range workDirs(r) {
+			b, err := os.ReadFile(filepath.Join(dir, t.ID+".md"))
+			if err != nil {
+				continue
+			}
+			for _, line := range timesIn(string(b)) {
+				out = append(out, Finding3{ID: t.ID, Title: t.Title,
+					Says: "a token carries no time, and this one carries " + line})
+			}
 		}
 	}
 	return out
@@ -52,4 +64,24 @@ func runLint(args []string) {
 	if len(found) > 0 {
 		os.Exit(1)
 	}
+}
+
+// A TOKEN CARRIES NO TIME. It travels, and a time on it says when somebody was
+// at their desk. The record holds every moment instead, and the record never
+// travels.
+//
+// A note is edited by hand and a rule added after the work was minted has to
+// reach the work, so this reads what is on disk rather than what this program
+// would have written.
+func timesIn(text string) []string {
+	var found []string
+	for _, line := range strings.Split(text, "\n") {
+		l := strings.TrimSpace(line)
+		for _, key := range []string{"opened:", "taken_at:", "sent_at:", "closed_at:", "**at:**", "at:"} {
+			if strings.HasPrefix(l, key) {
+				found = append(found, l)
+			}
+		}
+	}
+	return found
 }

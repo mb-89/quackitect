@@ -78,24 +78,46 @@ func TestTheGuardAppendsToTheRunningSession(t *testing.T) {
 	l.Write("engine", "start", "engine", "engine started", Yes(), nil)
 	l.Close()
 
-	hookSays(t, exe, r.Method, "PreToolUse", map[string]any{
-		"cwd": r.Work, "tool_name": "Read", "agent_id": "helper-1",
+	// ONE LINE PER CALL, and it is written when the call comes back. A call and
+	// an answer are one thing, so two lines say it twice.
+	call := map[string]any{
+		"cwd": r.Work, "tool_name": "Read", "agent_id": "helper-1", "tool_use_id": "t1",
 		"tool_input": map[string]any{"file_path": filepath.Join(r.Work, "notes.md")},
-	})
-
-	b, err := os.ReadFile(filepath.Join(r.Private("log"), Current))
-	if err != nil {
-		t.Fatal(err)
 	}
-	lines := strings.Split(strings.TrimSpace(string(b)), "\n")
+	hookSays(t, exe, r.Method, "PreToolUse", call)
+	if n := len(logLines(t, r)); n != 1 {
+		t.Fatalf("asking wrote %d records, and asking on its own writes none", n-1)
+	}
+	hookSays(t, exe, r.Method, "PostToolUse", call)
+
+	lines := logLines(t, r)
 	if len(lines) != 2 {
-		t.Fatalf("expected the guard to append one record, got %d", len(lines))
+		t.Fatalf("expected one record for the call, got %d", len(lines)-1)
 	}
 	var rec Record
 	json.Unmarshal([]byte(lines[1]), &rec)
 	if rec.Actor != "helper-1" {
 		t.Fatalf("the record does not name who acted: %+v", rec)
 	}
+	// THE SOURCE IS WHOEVER ASKED, and the line says what was asked.
+	if rec.Src != "agent" || rec.Kind != "call" {
+		t.Fatalf("the line is %s/%s, and the agent asked", rec.Src, rec.Kind)
+	}
+	if !strings.Contains(rec.Msg, "notes.md") {
+		t.Fatalf("the line does not say what was asked: %q", rec.Msg)
+	}
+	if rec.OK == nil || !*rec.OK {
+		t.Fatal("a call that came back is not marked as having come back")
+	}
+}
+
+func logLines(t *testing.T, r Roots) []string {
+	t.Helper()
+	b, err := os.ReadFile(filepath.Join(r.Private("log"), Current))
+	if err != nil {
+		t.Fatal(err)
+	}
+	return strings.Split(strings.TrimSpace(string(b)), "\n")
 }
 
 // Read evidence is kept, and a compaction throws it away: the agent no longer

@@ -23,7 +23,7 @@
     {
       "name": "do not tell the reader how to feel",
       "pattern": "(?i)\\b(simply|obviously|of course|clearly)\\b",
-      "says": "the word tells the reader how to feel about the sentence"
+      "says": "the word tells the reader how to feel about the sentence, and this file is the whole list"
     }
   ]
 }

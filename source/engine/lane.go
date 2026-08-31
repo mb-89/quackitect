@@ -69,7 +69,7 @@ func runWork(args []string) {
 			os.Exit(1)
 		}
 		if *field != "" {
-			if err := WriteField(&t, *field, *to); err != nil {
+			if err := WriteFieldBy(&t, *field, *to, or2(*by, "main")); err != nil {
 				answerJSON(map[string]any{"error": err.Error()})
 				os.Exit(1)
 			}
@@ -85,10 +85,13 @@ func runWork(args []string) {
 		// A DERIVED GROUP CLEARS THE BUCKET. Saying where the work belongs is
 		// a stronger statement than the grouping it was filed under, so the
 		// grouping goes rather than sitting on top of it.
-		if *bucket == Cleared || Status(*bucket).Known() {
-			t.Bucket = ""
-		} else {
-			t.Bucket = *bucket
+		want := *bucket
+		if Status(want).Known() {
+			want = ""
+		}
+		if err := WriteFieldBy(&t, "bucket", want, or2(*by, "main")); err != nil {
+			answerJSON(map[string]any{"error": err.Error()})
+			os.Exit(1)
 		}
 		if err := SaveToken(roots, t); err != nil {
 			answerJSON(map[string]any{"error": err.Error()})

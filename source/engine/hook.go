@@ -155,10 +155,15 @@ func runHook(args []string) {
 		defer log.Close()
 	}
 
-	actor := in.AgentID
-	if actor == "" {
-		actor = "main"
+	// A HASH IN THE ACTOR COLUMN TELLS A READER NOTHING. The harness names an
+	// agent with one, and Level 0 gives it a speaking name when it starts.
+	//
+	// The identity is still the harness's, and it is what everything is keyed
+	// by. The name is what the record shows.
+	if in.Event == "SubagentStart" {
+		NoteAgent(roots, in.AgentID, in.AgentType)
 	}
+	actor := NameOf(roots, in.AgentID)
 
 	cfg := LoadConfig(roots)
 	emergency := LoadEmergency(roots)
@@ -199,7 +204,6 @@ func runHook(args []string) {
 		record(log, "agent", "session", actor, "session ended", Yes(), nil)
 	case "SubagentStart":
 		// Every agent has an identity, and the record says which one acted.
-		NoteAgent(roots, in.AgentID, in.AgentType)
 		record(log, "agent", "helper", actor, "helper started: "+in.AgentType, Yes(),
 			map[string]any{"agent_type": in.AgentType})
 	case "SubagentStop":
@@ -215,14 +219,25 @@ func runHook(args []string) {
 		// A read is evidence. A write means what anyone read of that file is
 		// no longer what is there.
 		notePostTool(roots, in, actor)
-		record(log, "engine", "answer", actor, describe(in.ToolName, pathOf(in), ""), Yes(),
+		// THE SOURCE IS WHOEVER ASKED. The engine answered, and what the line
+		// is about is the agent's call.
+		said := takeCall(roots, in.ToolUseID)
+		if said == "" {
+			said = describe(in.ToolName, pathOf(in), "")
+		}
+		record(log, "agent", "call", actor, said, Yes(),
 			map[string]any{"tool": in.ToolName, "path": pathOf(in)})
 	case "ConfigChange":
 		// The files that changed were read under rules that no longer hold.
 		ForgetReads(roots, "configuration changed")
 		record(log, "engine", "config", actor, "configuration changed, read evidence reset", Yes(), nil)
 	case "PostToolUseFailure":
-		record(log, "engine", "error", actor, in.ToolName+" failed", No(),
+		// The same one line, and the ok column is what says it failed.
+		said := takeCall(roots, in.ToolUseID)
+		if said == "" {
+			said = describe(in.ToolName, pathOf(in), "")
+		}
+		record(log, "agent", "call", actor, said, No(),
 			map[string]any{"tool": in.ToolName})
 	case "Notification":
 		record(log, "engine", "note", actor, firstLine(string(raw)), nil, nil)
@@ -335,8 +350,60 @@ func decidePreToolUse(roots Roots, cfg Config, emergency Emergency, log *Log, in
 		}
 	}
 
-	record(log, "agent", "call", actor, describe(in.ToolName, path, ti.Command), nil,
-		map[string]any{"tool": in.ToolName, "path": path})
+	// ONE LINE PER CALL, and it is written when the call comes back.
+	//
+	// A call and an answer are one thing: the answer already carries what was
+	// asked, so two lines say the same thing twice and the reader scrolls past
+	// half a log to find one call. What is remembered here is what was asked,
+	// because the answer's event does not carry a shell command.
+	//
+	// A CALL THAT NEVER RETURNS LEAVES NOTHING. That is the cost, and the
+	// failure event covers the ordinary way a call ends badly.
+	rememberCall(roots, in.ToolUseID, describe(in.ToolName, path, ti.Command))
+}
+
+// WHAT WAS ASKED, HELD UNTIL THE ANSWER COMES. The guard is a fresh process per
+// event and holds nothing between them, so it is a file.
+func callPath(r Roots) string { return r.Private("calls.json") }
+
+func rememberCall(r Roots, id, said string) {
+	if id == "" || said == "" {
+		return
+	}
+	calls := loadCalls(r)
+	calls[id] = said
+	// A call that never came back would keep its line for ever. The newest few
+	// are what an answer can still be waiting for.
+	if len(calls) > 64 {
+		calls = map[string]string{id: said}
+	}
+	if b, err := json.Marshal(calls); err == nil {
+		_ = os.WriteFile(callPath(r), b, 0o644)
+	}
+}
+
+func takeCall(r Roots, id string) string {
+	if id == "" {
+		return ""
+	}
+	calls := loadCalls(r)
+	said := calls[id]
+	if said != "" {
+		delete(calls, id)
+		if b, err := json.Marshal(calls); err == nil {
+			_ = os.WriteFile(callPath(r), b, 0o644)
+		}
+	}
+	return said
+}
+
+func loadCalls(r Roots) map[string]string {
+	out := map[string]string{}
+	b, err := os.ReadFile(callPath(r))
+	if err != nil || json.Unmarshal(b, &out) != nil {
+		return map[string]string{}
+	}
+	return out
 }
 
 // underPrivate says whether a path is inside the folder that holds what does

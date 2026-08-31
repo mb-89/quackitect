@@ -10,7 +10,22 @@ import "fmt"
 // WHAT THE ENGINE DECIDES IS NOT A PERSON'S TO TYPE. A status is moved by a
 // pull, an id is minted, a list is a relation. Typing over one of those puts
 // the note and the engine's reading of it out of step, and nothing would say so.
+// A BUCKET IS A NAME A PERSON TYPED, and the agent does not invent one. What
+// an agent can say about where work sits is the backlog, which is a status and
+// shows as a group beside open. A name nobody asked for is a grouping nobody
+// meant, and it spreads: two agents inventing two names for one idea is how a
+// list stops being readable.
 func WriteField(t *Token, field, to string) error {
+	return writeField(t, field, to, "person")
+}
+
+// WriteFieldBy is the same with the caller named, so the rules that depend on
+// who is asking can be applied.
+func WriteFieldBy(t *Token, field, to, by string) error {
+	return writeField(t, field, to, by)
+}
+
+func writeField(t *Token, field, to, by string) error {
 	switch field {
 	case "title":
 		if err := checkTitle(to); err != nil {
@@ -27,6 +42,10 @@ func WriteField(t *Token, field, to string) error {
 		}
 		t.Assignee = to
 	case "bucket":
+		if by != "person" && to != "" {
+			return fmt.Errorf("a bucket is a name a person typed. " +
+				"What you can say is that it is backlogged, which is a status")
+		}
 		t.Bucket = to
 	case "reason":
 		t.Reason = to
