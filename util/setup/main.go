@@ -99,6 +99,13 @@ func main() {
 		// stopping for. Everything else already works.
 		warn("could not register this copy: %v", err)
 	}
+	// A TREE THAT CARRIES THE METHOD IS A VEHICLE, and the README says RUNME
+	// works here once this script has run. RUNME reads .se/runme.json, so
+	// this tree has to be seeded like any other vehicle. Seeding never
+	// overwrites, so a second run changes nothing.
+	if err := seedThroughEngine(*root); err != nil {
+		warn("could not seed this copy: %v", err)
+	}
 	if *profile == "desktop" {
 		if err := installExtension(*root, m.Product.ID); err != nil {
 			fail(err)
@@ -115,16 +122,47 @@ func registerThroughEngine(root string) error {
 		say("  register would be written by the engine")
 		return nil
 	}
+	out, err := engineSays(root, "--register")
+	if err != nil {
+		return err
+	}
+	say("  register %s", firstLine(out))
+	return nil
+}
+
+// The engine seeds, for the reason it registers: it is the one that reads
+// what a vehicle is made of.
+func seedThroughEngine(root string) error {
+	if *dry {
+		say("  seed would be written by the engine")
+		return nil
+	}
+	out, err := engineSays(root, "--init", "vehicle", "--work", root)
+	if err != nil {
+		return err
+	}
+	say("  seed     %s", firstLine(out))
+	return nil
+}
+
+func engineSays(root string, args ...string) (string, error) {
 	exe := filepath.Join(root, ".bin", "se")
 	if runtime.GOOS == "windows" {
 		exe += ".exe"
 	}
-	out, err := exec.Command(exe, "--register", "--method", root).CombinedOutput()
+	out, err := exec.Command(exe, append(args, "--method", root)...).CombinedOutput()
 	if err != nil {
-		return fmt.Errorf("%s: %w", strings.TrimSpace(string(out)), err)
+		return "", fmt.Errorf("%s: %w", strings.TrimSpace(string(out)), err)
 	}
-	say("  register %s", strings.TrimSpace(string(out)))
-	return nil
+	return string(out), nil
+}
+
+func firstLine(s string) string {
+	s = strings.TrimSpace(s)
+	if i := strings.IndexByte(s, '\n'); i >= 0 {
+		return s[:i]
+	}
+	return s
 }
 
 func readManifest(path string) (*Manifest, error) {
