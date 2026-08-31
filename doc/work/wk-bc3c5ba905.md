@@ -3,7 +3,7 @@ id: wk-bc3c5ba905
 seq: "-6"
 type: work
 title: a token carries done
-status: imp_in_work
+status: imp_open
 assignee: main
 scope: multi-step
 traced: true
