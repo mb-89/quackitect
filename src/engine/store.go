@@ -311,6 +311,14 @@ func readFinding(head, text string) Rejection {
 // are ordinary here: a command line and a lane are separate processes that talk
 // to no one, and only the rename decides which of them landed last.
 func SaveToken(r Roots, t Token) error {
+	// THE RECORD REFUSES TO HOLD WHAT IT CANNOT READ BACK. A criterion is one
+	// lead and one line, and the reader stops at the first newline, so a second
+	// line is lost on the save rather than on the write. Here is where the value
+	// stops being a value and becomes a line, and a refusal in a caller is a
+	// refusal the next caller does not have.
+	if err := linesThatFit(t); err != nil {
+		return err
+	}
 	// EVERY CHANGE OF STATE IS IN THE RECORD, and this is the one place that
 	// sees them all. The agent does not remember to write them and cannot
 	// forget to: whoever moves a token moves it through here.
@@ -481,4 +489,36 @@ func followChildren(r Roots, child Token) {
 		return
 	}
 	_ = SaveToken(r, p)
+}
+
+// linesThatFit refuses a criterion carrying a second line in a field the note
+// writes on one.
+//
+// WHY THIS IS A REFUSAL AND NOT A FOLD. A folded value invents a continuation
+// syntax. The note is a file a person opens and edits, and a syntax nobody
+// typed is a syntax somebody gets wrong. It would also need reading back, which
+// is a second place to be wrong about one thing.
+//
+// AND WITHOUT IT THE OBSERVATION GATE SWITCHES ITSELF OFF. A two-line command
+// reads back as no command, the criterion becomes prose, and prose is answered
+// by name in the evidence rather than by watching it fail. Writing a command on
+// two lines therefore turned the gate off, silently, at the moment of the save.
+func linesThatFit(t Token) error {
+	for i, c := range t.Criteria {
+		for _, one := range []struct{ field, value string }{
+			{"says", c.Says},
+			{"runs", c.Runs},
+			{"red without", c.Without},
+			{"red said", c.Red},
+		} {
+			if !strings.ContainsAny(one.value, "\r\n") {
+				continue
+			}
+			return fmt.Errorf("criterion %d, %q: its %s is written on more than one line, "+
+				"and the note holds one. The reader stops at the first newline, so the rest "+
+				"would be lost on this save. Write it on one line, or name a file and put "+
+				"the whole of it in the evidence", i+1, firstLines(c.Says, 1), one.field)
+		}
+	}
+	return nil
 }

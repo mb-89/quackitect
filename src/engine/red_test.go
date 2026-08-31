@@ -176,3 +176,86 @@ func whatIsWrong(fs []Rejection) string {
 	}
 	return b.String()
 }
+
+// A LINE HOLDS ONE LINE, AND THE RECORD REFUSES WHAT IT CANNOT READ BACK.
+//
+// THE GATE SWITCHES ITSELF OFF WITHOUT THIS, which is why it is here rather
+// than on the token about the parser. A criterion is written as one lead and
+// one line, and the reader stops at the first newline. So a two-line Runs is
+// read back as no command at all, the criterion becomes prose, and Watched
+// answers true for prose because prose is answered by name in the evidence.
+// Writing a command on two lines therefore turns the gate off silently.
+//
+// FOUR FIELDS, and they are the ones the note writes on one line. A block field
+// is a different shape and belongs to the token about the parser.
+func TestALineHoldsOneLine(t *testing.T) {
+	r := lane(t)
+	tried := 0
+	for _, one := range []struct {
+		field string
+		c     Criterion
+	}{
+		{"says", Criterion{Says: "it works" + nl + "and also this", Runs: "exit 0",
+			Without: "the fix", Red: "it said no"}},
+		{"runs", Criterion{Says: "it works", Runs: "cd src" + nl + "go test .",
+			Without: "the fix", Red: "it said no"}},
+		{"red without", Criterion{Says: "it works", Runs: "exit 0",
+			Without: "the fix" + nl + "and the test", Red: "it said no"}},
+		{"red said", Criterion{Says: "it works", Runs: "exit 0",
+			Without: "the fix", Red: "it said no" + nl + "twice"}},
+	} {
+		tried++
+		tok := mint(t, r, Token{Title: "one to write"})
+		tok.Criteria = []Criterion{one.c}
+		err := SaveToken(r, tok)
+		if err == nil {
+			t.Errorf("a criterion whose %s is two lines was written", one.field)
+			continue
+		}
+		if !strings.Contains(err.Error(), one.field) {
+			t.Errorf("the refusal does not name %s: %v", one.field, err)
+		}
+		if !strings.Contains(err.Error(), "it works") {
+			t.Errorf("the refusal does not say which criterion: %v", err)
+		}
+	}
+	if tried == 0 {
+		t.Fatal("no field was tried, so this guards nothing")
+	}
+	// AND ONE LINE IS WRITTEN, so the refusal is about the second line rather
+	// than about having a criterion at all.
+	tok := mint(t, r, Token{Title: "one that fits"})
+	tok.Criteria = []Criterion{{Says: "it works", Runs: "exit 0",
+		Without: "the fix", Red: "it said no"}}
+	if err := SaveToken(r, tok); err != nil {
+		t.Fatalf("a criterion that fits on its lines was refused: %v", err)
+	}
+}
+
+// A COMMAND WRITTEN ON TWO LINES CANNOT TURN THE GATE OFF.
+//
+// This is the consequence, driven end to end rather than reasoned about: the
+// submission gate asks Watched, Watched answers true for a criterion with no
+// command, and the parser turns a two-line command into no command.
+func TestATwoLineCommandCannotSwitchTheGateOff(t *testing.T) {
+	r := lane(t)
+	tok := mint(t, r, Token{Title: "do the thing", Status: ImpOpen})
+	// The shape a drafter would write, with the command on two lines and no
+	// observation at all.
+	tok.Criteria = []Criterion{{Says: "the thing is built", Runs: "cd src" + nl + "go test ."}}
+	if err := SaveToken(r, tok); err == nil {
+		t.Fatal("a two-line command was written, so the criterion reads back as prose " +
+			"and the gate stops asking for an observation")
+	}
+	// AND THE GATE IS STILL ASKING. Written on one line, the same criterion is
+	// refused at the submission for having no observation.
+	tok.Criteria = []Criterion{{Says: "the thing is built", Runs: "exit 0"}}
+	if err := SaveToken(r, tok); err != nil {
+		t.Fatal(err)
+	}
+	Pull(r, "main", RoleWorker, Payload{})
+	a := Pull(r, "main", RoleWorker, Payload{ID: tok.ID, Disposition: string(Done)})
+	if a.Pull != AnswerRefused {
+		t.Fatalf("the gate took a submission on an unwatched criterion: %q", a.Pull)
+	}
+}
