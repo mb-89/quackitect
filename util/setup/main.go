@@ -99,6 +99,13 @@ func main() {
 		// stopping for. Everything else already works.
 		warn("could not register this copy: %v", err)
 	}
+	// A TREE THAT CARRIES THE METHOD IS A VEHICLE, and the README says RUNME
+	// works here once this script has run. RUNME reads .se/runme.json, so
+	// this tree has to be seeded like any other vehicle. Seeding never
+	// overwrites, so a second run changes nothing.
+	if err := seedThroughEngine(*root); err != nil {
+		warn("could not seed this copy: %v", err)
+	}
 	if *profile == "desktop" {
 		if err := installExtension(*root, m.Product.ID); err != nil {
 			fail(err)
@@ -115,16 +122,50 @@ func registerThroughEngine(root string) error {
 		say("  register would be written by the engine")
 		return nil
 	}
+	out, err := engineSays(root, "--register")
+	if err != nil {
+		return err
+	}
+	say("  register %s", firstLine(out))
+	return nil
+}
+
+// The engine seeds, for the reason it registers: it is the one that reads
+// what a vehicle is made of.
+func seedThroughEngine(root string) error {
+	if *dry {
+		say("  seed would be written by the engine")
+		return nil
+	}
+	out, err := engineSays(root, "--init", "vehicle", "--work", root)
+	if err != nil {
+		return err
+	}
+	say("  seed     %s", firstLine(out))
+	return nil
+}
+
+func engineSays(root string, args ...string) (string, error) {
 	exe := filepath.Join(root, ".bin", "se")
 	if runtime.GOOS == "windows" {
 		exe += ".exe"
 	}
-	out, err := Quietly(exec.Command(exe, "--register", "--method", root)).CombinedOutput()
+	// THE CALLER SAYS WHICH QUESTION IT IS ASKING, and the window stays shut
+	// whichever it is. Installing asks two things now, to register and to seed,
+	// and a console flashing up on a desktop for either one is the same defect.
+	out, err := Quietly(exec.Command(exe, append(args, "--method", root)...)).CombinedOutput()
 	if err != nil {
-		return fmt.Errorf("%s: %w", strings.TrimSpace(string(out)), err)
+		return "", fmt.Errorf("%s: %w", strings.TrimSpace(string(out)), err)
 	}
-	say("  register %s", strings.TrimSpace(string(out)))
-	return nil
+	return string(out), nil
+}
+
+func firstLine(s string) string {
+	s = strings.TrimSpace(s)
+	if i := strings.IndexByte(s, '\n'); i >= 0 {
+		return s[:i]
+	}
+	return s
 }
 
 func readManifest(path string) (*Manifest, error) {
@@ -223,7 +264,40 @@ func build(name, source string) error {
 	if err := cmd.Run(); err != nil {
 		return fmt.Errorf("building %s failed: %w", name, err)
 	}
-	return nil
+	return alsoWithoutTheSuffix(out, filepath.Join(*root, ".bin", name))
+}
+
+// ONE PROGRAM, AND THE NAME THE CAGE CALLS IT BY.
+//
+// The cage is in version control, so it names one path on every platform, and
+// a path that is the same everywhere carries no file extension. Windows runs
+// a program by path whatever it is called, because the loader reads the
+// header and not the name.
+//
+// THE SUFFIXED NAME STAYS, because a shell finds a command through PATHEXT
+// and RUNME on Windows is a shell. So the file has both names and there is
+// only one file: a hard link is the same bytes twice in the folder listing.
+// A copy is the fallback, for a filesystem that will not link.
+func alsoWithoutTheSuffix(built, plain string) error {
+	if built == plain {
+		return nil
+	}
+	_ = os.Remove(plain)
+	if err := os.Link(built, plain); err == nil {
+		return nil
+	} else if runtime.GOOS == "windows" {
+		// A HARD LINK TO A FILE NEEDS NO PRIVILEGE, which is what makes it the
+		// right one here. A symbolic link is the one that needs a privilege an
+		// ordinary account does not hold, and a junction is for folders. It
+		// still wants one NTFS volume, and a network or removable drive is not
+		// that, so a failure is worth naming rather than hiding in a copy.
+		say("  build    could not link %s, so it is a copy: %v", filepath.Base(plain), err)
+	}
+	in, err := os.ReadFile(built)
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(plain, in, 0o755)
 }
 
 func openEditor(root string) {

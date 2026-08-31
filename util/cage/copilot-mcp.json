@@ -3,7 +3,7 @@
   "mcpServers": {
     "quackitect": {
       "type": "local",
-      "command": "{{method}}/.bin/se-mcp",
+      "command": "{{mcp}}",
       "args": ["--method", "{{method}}", "--work", "{{work}}"],
       "tools": ["*"]
     }

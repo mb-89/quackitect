@@ -562,7 +562,19 @@ func (m model) renderStatus(w int) string {
 	shown := len(m.view)
 	total := len(m.all)
 	if total == 0 {
-		return dimStyle.Render(truncate("waiting for "+m.path+" · nothing has been written to it yet", w)) // · is a separator, not an icon
+		// A PATH IS SHORTENED FROM ITS FRONT. Cutting the end takes the file
+		// name, which is the one part of a path a reader needs, and leaves the
+		// directories every file on the machine shares. On a narrow window this
+		// line named a temp directory and no file at all.
+		head, tail := "waiting for ", " · nothing has been written to it yet" // · is a separator, not an icon
+		room := w - len([]rune(head)) - len([]rune(tail))
+		// AND WHEN EVEN THAT DOES NOT FIT, THE SENTENCE GOES BEFORE THE NAME
+		// DOES. A reader who can see which file is waited for has been told the
+		// thing. One who can only see that something is being waited for has not.
+		if room < 24 {
+			tail, room = "", w-len([]rune(head))
+		}
+		return dimStyle.Render(truncate(head+shortPath(m.path, room)+tail, w))
 	}
 	follow := "held"
 	if m.follow {
@@ -602,6 +614,19 @@ func pad(s string, n int) string {
 func oneLine(s string, w int) string {
 	s = strings.ReplaceAll(strings.ReplaceAll(s, "\n", " "), "\t", " ")
 	return truncate(s, w)
+}
+
+// shortPath answers a path that fits, keeping the end rather than the start.
+//
+// THE NAME IS THE PART THAT MATTERS. A reader who cannot see which file is
+// meant has been told nothing, and the leading directories are the same for
+// every file on the machine.
+func shortPath(p string, w int) string {
+	rs := []rune(p)
+	if w <= 1 || len(rs) <= w {
+		return p
+	}
+	return "…" + string(rs[len(rs)-(w-1):]) // an ellipsis is punctuation, not an icon
 }
 
 func truncate(s string, w int) string {

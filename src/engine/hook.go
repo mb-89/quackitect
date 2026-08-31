@@ -592,7 +592,7 @@ func decideStop(roots Roots, cfg Config, log *Log, in hookIn, actor string) {
 		record(log, "agent", "stop", actor, "stopped", Yes(), nil)
 		return
 	}
-	if c, ok := TakeClaim(roots, actor); ok {
+	if c, ok := StandingClaim(roots, actor); ok {
 		record(log, "agent", "stop", actor, "stopped: "+c.Because+" — "+c.Why, Yes(),
 			map[string]any{"because": c.Because, "why": c.Why})
 		return

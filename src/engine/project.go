@@ -87,16 +87,46 @@ func Project(roots Roots) ([]string, error) {
 
 // A source may name the engine or the roots, because a cage has to say which
 // program the guards call. Nothing else is substituted.
+//
+// EVERY ONE OF THEM IS RELATIVE TO THE WORK ROOT WHEN IT CAN BE. A projection
+// is a file in the work root, and some of them are in version control, so an
+// absolute path in one is a path on one machine written into a file that
+// travels to every other. It was right on the machine that wrote it and dead
+// everywhere else.
+//
+// A path that leaves the work root stays absolute, because there is nothing
+// else it could be. That is the driven case, where the method lives somewhere
+// the project cannot name.
+// THE ENGINE IS THE METHOD'S, and not whichever binary happens to be running.
+// A cage names the program its guards call, and that program is the one the
+// method root carries. Reading it from the running process made the cage
+// depend on how the engine was started, and a copy run from somewhere else
+// wrote a path that only that invocation could use.
 func variables(roots Roots) (map[string]string, error) {
-	exe, err := os.Executable()
-	if err != nil {
-		return nil, err
-	}
+	// NO FILE EXTENSION, on either platform. The cage is in version control,
+	// so it says one thing everywhere, and se.exe is not one thing everywhere.
+	// The installer writes the program under both names for this.
+	bin := filepath.Join(roots.Method, ".bin")
 	return map[string]string{
-		"engine": filepath.ToSlash(exe),
-		"method": filepath.ToSlash(roots.Method),
-		"work":   filepath.ToSlash(roots.Work),
+		"engine": within(roots.Work, filepath.Join(bin, "se")),
+		"mcp":    within(roots.Work, filepath.Join(bin, "se-mcp")),
+		"method": within(roots.Work, roots.Method),
+		"work":   within(roots.Work, roots.Work),
 	}, nil
+}
+
+// within says where something is, from the work root, in the shortest form
+// that still finds it. The harness runs a hook and starts the tool lane with
+// the work root as the working folder, so a relative path resolves.
+func within(work, path string) string {
+	rel, err := filepath.Rel(work, path)
+	if err != nil || rel == ".." || strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
+		return filepath.ToSlash(path)
+	}
+	if rel == "." {
+		return "."
+	}
+	return "./" + filepath.ToSlash(rel)
 }
 
 func assemble(methodRoot string, sources []string, vars map[string]string) (string, error) {
@@ -158,7 +188,17 @@ func writeIfDifferent(path, content string) (bool, error) {
 	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
 		return false, err
 	}
-	return true, os.WriteFile(path, []byte(content), 0o644)
+	return true, os.WriteFile(path, []byte(content), modeFor(path))
+}
+
+// A SHELL SCRIPT IS RUN, so it is written with the bit that lets it run.
+// Seeding says the same thing about the same suffix, and one rule stated
+// twice the same way is the rule holding in two places.
+func modeFor(path string) os.FileMode {
+	if strings.HasSuffix(path, ".sh") {
+		return 0o755
+	}
+	return 0o644
 }
 
 // IsProjection says whether a path is one this engine writes, and where to

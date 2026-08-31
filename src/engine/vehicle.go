@@ -281,3 +281,48 @@ func RegisterCopy(methodRoot, version string) (string, error) {
 	}
 	return id, last
 }
+
+// twoNames says whether a program's two names have come apart. The installer
+// gives every built program a suffixed name and a plain one, as one file
+// under both, because a shell finds a command by extension and a cage cannot
+// name an extension that differs by platform.
+//
+// On a platform where the two names are the same string there is nothing to
+// come apart, and this says so.
+func twoNames(methodRoot, name string) (string, string, bool) {
+	bin := filepath.Join(methodRoot, ".bin")
+	return apart(filepath.Join(bin, name), filepath.Join(bin, exeName(name)))
+}
+
+// apart says whether two names have become two files. Two names that are the
+// same string are one file. So are two names linked to each other, which is
+// what the installer makes and what a build run by hand takes away.
+//
+// A name that is not there is not a difference. The engine is running, so at
+// least one of them is, and the other may belong to a platform that does not
+// use it.
+func apart(a, b string) (string, string, bool) {
+	if a == b {
+		return a, b, false
+	}
+	one, err := os.Stat(a)
+	if err != nil {
+		return a, b, false
+	}
+	other, err := os.Stat(b)
+	if err != nil {
+		return a, b, false
+	}
+	return a, b, !os.SameFile(one, other)
+}
+
+// rebuiltSince says whether the program was replaced after this process
+// started from it. Installing writes a new file over the old name, so the
+// name is younger than the process running the old bytes.
+func rebuiltSince(methodRoot string, started time.Time) bool {
+	info, err := os.Stat(filepath.Join(methodRoot, ".bin", "se"))
+	if err != nil {
+		return false
+	}
+	return info.ModTime().After(started)
+}

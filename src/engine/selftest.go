@@ -82,12 +82,16 @@ func SelfTest(roots Roots, keep bool) int {
 	say("the driver is found by identity, not by path", known && recorded && found == copyRoot, found)
 
 	// 6. The copy projects into the project, and not into itself.
+	//
+	// A copy carries an AGENTS.md, because the tree it was made from is a
+	// project as well as the method. So the file being there proves nothing.
+	// What is asked here is where this run WROTE, and Project says that.
 	written, err := Project(driven)
 	_, inProject := os.Stat(filepath.Join(project, "AGENTS.md"))
-	_, inCopy := os.Stat(filepath.Join(copyRoot, "AGENTS.md"))
 	say("the copy writes into the project", err == nil && len(written) > 0 && inProject == nil,
 		fmt.Sprintf("%d files", len(written)))
-	say("the copy does not write into itself", inCopy != nil, "no AGENTS.md in the copy")
+	apart, says := nothingUnder(written, copyRoot)
+	say("the copy does not write into itself", apart, says)
 
 	// 7. The record is written where the project keeps private material.
 	log, err := OpenLog(driven.Private("log"))
@@ -105,9 +109,8 @@ func SelfTest(roots Roots, keep bool) int {
 	say("the guard knows the project's projections", yes, instead)
 
 	// 9. And the two trees stay apart: nothing was written back here.
-	_, touched := os.Stat(filepath.Join(roots.Method, "AGENTS.md"))
-	say("nothing was written back into the tree that produced the copy", touched != nil,
-		roots.Method)
+	apart, says = nothingUnder(written, roots.Method)
+	say("nothing was written back into the tree that produced the copy", apart, says)
 
 	// 10. THE STORY, END TO END. The vehicle makes a project of its own, and
 	// that project answers the one command every project must answer. This is
@@ -153,11 +156,17 @@ func installInto(copyRoot string) error {
 	if err != nil {
 		return err
 	}
-	dest := filepath.Join(copyRoot, ".bin", exeName("se"))
-	if err := os.MkdirAll(filepath.Dir(dest), 0o755); err != nil {
+	bin := filepath.Join(copyRoot, ".bin")
+	if err := os.MkdirAll(bin, 0o755); err != nil {
 		return err
 	}
-	return copyFile(self, dest, 0o755)
+	// Under both names, because installing writes both. The cage names the
+	// one with no suffix, so a copy that had only the other one would be
+	// caged by a file that is not there.
+	if err := copyFile(self, filepath.Join(bin, exeName("se")), 0o755); err != nil {
+		return err
+	}
+	return copyFile(self, filepath.Join(bin, "se"), 0o755)
 }
 
 func runEngine(copyRoot string, args ...string) (string, error) {
@@ -178,6 +187,18 @@ func runRunme(dir string, args ...string) (string, error) {
 	cmd.Dir = dir
 	out, err := cmd.CombinedOutput()
 	return string(out), err
+}
+
+// nothingUnder answers whether a projection landed inside a tree it had no
+// business writing to, and names the first one that did.
+func nothingUnder(written []string, root string) (bool, string) {
+	for _, w := range written {
+		rel, err := filepath.Rel(root, w)
+		if err == nil && rel != ".." && !strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
+			return false, w
+		}
+	}
+	return true, "nothing was written under " + root
 }
 
 func firstLineOf(s string) string {

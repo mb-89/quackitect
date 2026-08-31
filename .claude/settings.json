@@ -8,7 +8,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"C:/Users/ichbi/Desktop/ai/quackitect-v4/.bin/se.exe\" hook --method \"C:/Users/ichbi/Desktop/ai/quackitect-v4\""
+            "command": "C:/Users/ichbi/Desktop/ai/quackitect-v4/.bin/se.exe hook --method C:/Users/ichbi/Desktop/ai/quackitect-v4"
           }
         ]
       }
@@ -19,7 +19,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"C:/Users/ichbi/Desktop/ai/quackitect-v4/.bin/se.exe\" hook --method \"C:/Users/ichbi/Desktop/ai/quackitect-v4\""
+            "command": "C:/Users/ichbi/Desktop/ai/quackitect-v4/.bin/se.exe hook --method C:/Users/ichbi/Desktop/ai/quackitect-v4"
           }
         ]
       }
@@ -30,7 +30,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"C:/Users/ichbi/Desktop/ai/quackitect-v4/.bin/se.exe\" hook --method \"C:/Users/ichbi/Desktop/ai/quackitect-v4\""
+            "command": "C:/Users/ichbi/Desktop/ai/quackitect-v4/.bin/se.exe hook --method C:/Users/ichbi/Desktop/ai/quackitect-v4"
           }
         ]
       }
@@ -41,7 +41,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"C:/Users/ichbi/Desktop/ai/quackitect-v4/.bin/se.exe\" hook --method \"C:/Users/ichbi/Desktop/ai/quackitect-v4\""
+            "command": "C:/Users/ichbi/Desktop/ai/quackitect-v4/.bin/se.exe hook --method C:/Users/ichbi/Desktop/ai/quackitect-v4"
           }
         ]
       }
@@ -52,7 +52,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"C:/Users/ichbi/Desktop/ai/quackitect-v4/.bin/se.exe\" hook --method \"C:/Users/ichbi/Desktop/ai/quackitect-v4\""
+            "command": "sh \"$CLAUDE_PROJECT_DIR/.claude/hooks/session-start.sh\""
+          },
+          {
+            "type": "command",
+            "command": "C:/Users/ichbi/Desktop/ai/quackitect-v4/.bin/se.exe hook --method C:/Users/ichbi/Desktop/ai/quackitect-v4"
           }
         ]
       }
@@ -63,7 +67,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"C:/Users/ichbi/Desktop/ai/quackitect-v4/.bin/se.exe\" hook --method \"C:/Users/ichbi/Desktop/ai/quackitect-v4\""
+            "command": "C:/Users/ichbi/Desktop/ai/quackitect-v4/.bin/se.exe hook --method C:/Users/ichbi/Desktop/ai/quackitect-v4"
           }
         ]
       }
@@ -74,7 +78,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"C:/Users/ichbi/Desktop/ai/quackitect-v4/.bin/se.exe\" hook --method \"C:/Users/ichbi/Desktop/ai/quackitect-v4\""
+            "command": "C:/Users/ichbi/Desktop/ai/quackitect-v4/.bin/se.exe hook --method C:/Users/ichbi/Desktop/ai/quackitect-v4"
           }
         ]
       }
@@ -85,7 +89,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"C:/Users/ichbi/Desktop/ai/quackitect-v4/.bin/se.exe\" hook --method \"C:/Users/ichbi/Desktop/ai/quackitect-v4\""
+            "command": "C:/Users/ichbi/Desktop/ai/quackitect-v4/.bin/se.exe hook --method C:/Users/ichbi/Desktop/ai/quackitect-v4"
           }
         ]
       }
@@ -96,7 +100,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"C:/Users/ichbi/Desktop/ai/quackitect-v4/.bin/se.exe\" hook --method \"C:/Users/ichbi/Desktop/ai/quackitect-v4\""
+            "command": "C:/Users/ichbi/Desktop/ai/quackitect-v4/.bin/se.exe hook --method C:/Users/ichbi/Desktop/ai/quackitect-v4"
           }
         ]
       }
@@ -107,7 +111,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"C:/Users/ichbi/Desktop/ai/quackitect-v4/.bin/se.exe\" hook --method \"C:/Users/ichbi/Desktop/ai/quackitect-v4\""
+            "command": "C:/Users/ichbi/Desktop/ai/quackitect-v4/.bin/se.exe hook --method C:/Users/ichbi/Desktop/ai/quackitect-v4"
           }
         ]
       }
@@ -118,7 +122,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"C:/Users/ichbi/Desktop/ai/quackitect-v4/.bin/se.exe\" hook --method \"C:/Users/ichbi/Desktop/ai/quackitect-v4\""
+            "command": "C:/Users/ichbi/Desktop/ai/quackitect-v4/.bin/se.exe hook --method C:/Users/ichbi/Desktop/ai/quackitect-v4"
           }
         ]
       }
@@ -129,7 +133,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"C:/Users/ichbi/Desktop/ai/quackitect-v4/.bin/se.exe\" hook --method \"C:/Users/ichbi/Desktop/ai/quackitect-v4\""
+            "command": "C:/Users/ichbi/Desktop/ai/quackitect-v4/.bin/se.exe hook --method C:/Users/ichbi/Desktop/ai/quackitect-v4"
           }
         ]
       }
@@ -140,7 +144,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"C:/Users/ichbi/Desktop/ai/quackitect-v4/.bin/se.exe\" hook --method \"C:/Users/ichbi/Desktop/ai/quackitect-v4\""
+            "command": "C:/Users/ichbi/Desktop/ai/quackitect-v4/.bin/se.exe hook --method C:/Users/ichbi/Desktop/ai/quackitect-v4"
           }
         ]
       }
@@ -151,7 +155,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"C:/Users/ichbi/Desktop/ai/quackitect-v4/.bin/se.exe\" hook --method \"C:/Users/ichbi/Desktop/ai/quackitect-v4\""
+            "command": "C:/Users/ichbi/Desktop/ai/quackitect-v4/.bin/se.exe hook --method C:/Users/ichbi/Desktop/ai/quackitect-v4"
           }
         ]
       }

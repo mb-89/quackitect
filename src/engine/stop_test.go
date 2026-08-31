@@ -111,7 +111,7 @@ func TestAnyActionSpendsTheClaim(t *testing.T) {
 		"cwd": r.Work, "tool_name": "Read",
 		"tool_input": map[string]any{"file_path": filepath.Join(r.Work, "notes.md")},
 	})
-	if _, ok := TakeClaim(r, "main"); ok {
+	if _, ok := StandingClaim(r, "main"); ok {
 		t.Fatal("the claim survived an action")
 	}
 
@@ -122,9 +122,24 @@ func TestAnyActionSpendsTheClaim(t *testing.T) {
 	if out := hookSays(t, exe, r.Method, "Stop", map[string]any{"cwd": r.Work}); out != "" {
 		t.Fatalf("a claimed stop was refused: %s", out)
 	}
-	// ONE CLAIM RELEASES ONE STOP.
+
+	// AND IT STANDS WHILE THE AGENT IS STOPPED. A harness sends turns nobody
+	// asked for, and every one of them ends in a stop. An agent that has
+	// stopped and done nothing since is still stopped, so the same claim is
+	// still true.
+	for i := 0; i < 3; i++ {
+		if out := hookSays(t, exe, r.Method, "Stop", map[string]any{"cwd": r.Work}); out != "" {
+			t.Fatalf("stop %d was refused while the claim still stood: %s", i+2, out)
+		}
+	}
+
+	// Acting ends it, and the stop after that is refused again.
+	hookSays(t, exe, r.Method, "PreToolUse", map[string]any{
+		"cwd": r.Work, "tool_name": "Read",
+		"tool_input": map[string]any{"file_path": filepath.Join(r.Work, "notes.md")},
+	})
 	if out := hookSays(t, exe, r.Method, "Stop", map[string]any{"cwd": r.Work}); out == "" {
-		t.Fatal("the same claim released a second stop")
+		t.Fatal("a stop was granted after the agent went back to work")
 	}
 }
 

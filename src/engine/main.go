@@ -373,6 +373,12 @@ func main() {
 		return
 	}
 
+	// ONE ENGINE, AND THE ENGINE IS WHAT SAYS SO.
+	if line, yes := AlreadyHere(roots); yes {
+		fmt.Println(line)
+		return
+	}
+
 	log, err := OpenLog(dir)
 	if err != nil {
 		fail(err)
@@ -414,6 +420,21 @@ func main() {
 	}
 	log.Write("engine", "start", "engine", "engine started", Yes(), startRecord)
 
+	// TWO NAMES, ONE FILE. Installing links them, so the cage and RUNME call
+	// the same program. A build run by hand replaces one name and leaves the
+	// other pointing at what was there before, and then the guards run one
+	// build while a person reads another.
+	//
+	// It cannot be fixed from here, because the fix is to install. Saying so
+	// in the record is what turns a silent difference into a visible one.
+	for _, name := range []string{"se", "se-mcp"} {
+		if a, b, split := twoNames(roots.Method, name); split {
+			log.Write("engine", "error", "engine",
+				name+" is two different files, so the cage and RUNME run different builds", No(),
+				map[string]any{"one": a, "other": b, "fix": "install again"})
+		}
+	}
+
 	// The extension needs to know where to point the viewer, and a person
 	// running this by hand needs the same fact. One line of JSON on standard
 	// output serves both.
@@ -448,6 +469,7 @@ func main() {
 	defer ticker.Stop()
 	started := time.Now()
 	var beats int
+	var saidStale bool
 	for {
 		select {
 		case <-reproject:
@@ -476,6 +498,22 @@ func main() {
 			beats++
 			here.Beat = time.Now().UTC().Format(time.RFC3339)
 			SayRunning(roots, here)
+
+			// AN ENGINE OUTLIVES THE BUILD IT CAME FROM. Installing replaces
+			// the program on disk and leaves this process running the code it
+			// started with, and this process is the one writing the
+			// projections. So a rule changed in the source goes on being
+			// written the old way, by an engine nobody thought to restart.
+			//
+			// It cannot restart itself, because whoever started it decides
+			// that. Saying it once is what turns it into something a person
+			// can see.
+			if !saidStale && rebuiltSince(roots.Method, started) {
+				saidStale = true
+				log.Write("engine", "error", "engine",
+					"this engine is older than the program on disk, so it writes what its own build knew", No(),
+					map[string]any{"build": Build, "fix": "stop it and start it again"})
+			}
 			beat, _ := json.Marshal(map[string]any{
 				"beat": beats, "uptime_s": int(time.Since(started).Seconds()),
 			})
