@@ -7,124 +7,93 @@ import (
 	"time"
 )
 
-// THE LANE, for Level 1. Two tools, and the stub decides nothing about
-// either. It shapes the arguments into a payload, hands them to the engine,
-// and returns what the engine said.
+// THE LANE, for Level 1. The stub decides nothing. It shapes the arguments,
+// hands them to the engine, and returns what the engine said.
 //
-// Whether a submission is good, which token comes next, and who may close it
-// are all the engine's rulings. Putting any of them here would be a second
-// place that decides, and two places that decide disagree.
+// A DESCRIPTION IS IN THE PROMPT ON EVERY TURN, so it says what to do and
+// stops. Explaining why costs the same tokens forever and changes nothing.
 
 func laneTools() []map[string]any {
 	return []map[string]any{
 		{
 			"name": "se_work",
 			"description": "MINT A WORK TOKEN. Work that is not a token is work nothing can see.\n\n" +
-				"Open one for anything you are about to do that is not already a token, and for " +
-				"anything a person asks you for in conversation. Until it is a token it has left " +
-				"no mark, and the person cannot watch it go.\n\n" +
-				"The form is what is to be done, in the words it was asked in. Write the whole " +
-				"instruction: a line naming the work tells the next hand nothing about it.\n\n" +
-				"The evidence names the sections that completion has to fill, or evidence_script " +
-				"names a command that has to exit zero. Asserting done is not evidence.\n\n" +
-				"A parent breaks a token you already hold into steps. A sub-token closes on your " +
-				"own submission, so use it for your own breakdown and nothing else.\n\n" +
-				"WHEN THE PERSON SAYS WRITE A NOTE ON SOMETHING, THEY MEAN THIS TOOL WITH " +
-				"backlog SET AND traced OFF. Not a file, not a line in a document, and not a " +
-				"sentence in your answer. An ephemeral backlogged token, every time.\n\n" +
-				"A note is work that exists and that nobody is doing: it stays out of the queue, " +
-				"and it holds nobody from stopping. Somebody drains the backlog later, by " +
-				"deciding to.\n\n" +
-				"AN INSTRUCTION THAT IS ACTIONABLE NOW is minted without backlog, and it goes " +
-				"straight into the queue. Backlogged or not is the whole difference between the " +
-				"two, and choosing wrongly either buries the work or interrupts with it.\n\n" +
+				"\"Write a note on this\" means backlog: true.\n" +
+				"An instruction to act on now means backlog left off.\n\n" +
+				"form is one line. detail is the whole instruction, in the words it was asked in.\n" +
 				"You cannot close what you mint. A reviewer settles it.",
 			"inputSchema": map[string]any{
 				"type": "object",
 				"properties": map[string]any{
-					"form": map[string]any{"type": "string",
-						"description": "what work is to be done. The whole instruction, not its name."},
-					"assignee": map[string]any{"type": "string",
-						"description": "whose token it is. Yours is the actor you pull as."},
-					"guidance": map[string]any{"type": "string",
-						"description": "the method that travels with this work, inline."},
+					"form":     map[string]any{"type": "string", "description": "what is to be done, in one line"},
+					"assignee": map[string]any{"type": "string", "description": "whose it is"},
+					"detail":   map[string]any{"type": "string", "description": "the whole instruction"},
+					"guidance": map[string]any{"type": "string", "description": "the method, inline"},
 					"guidance_ref": map[string]any{"type": "string",
-						"description": "the method by reference, where it is shared. A path."},
+						"description": "the method, by path"},
 					"evidence": map[string]any{"type": "array", "items": map[string]any{"type": "string"},
-						"description": "the sections completion must fill. Every one is checked before a reviewer is woken."},
+						"description": "sections completion must fill. Each is checked before a reviewer sees it"},
 					"evidence_script": map[string]any{"type": "string",
-						"description": "a command that must exit zero. Use it wherever completion can be measured rather than judged."},
-					"parent": map[string]any{"type": "string", "description": "the token this one breaks down."},
+						"description": "a command that must exit zero"},
+					"parent": map[string]any{"type": "string",
+						"description": "the token this breaks down. Yours to close, if it is ephemeral"},
 					"backlog": map[string]any{"type": "boolean",
-						"description": "mint it backlogged: visible, out of the queue, holding nobody. What a person means by write a note on this."},
+						"description": "out of the queue, holding nobody. What a note is"},
 					"open": map[string]any{"type": "string",
-						"description": "instead of minting: move a backlogged token into the queue, by id."},
+						"description": "instead of minting: move a backlogged token into the queue, by id"},
 				},
 				"required": []string{"form", "assignee"},
 			},
 		},
 		{
 			"name": "se_stop",
-			"description": "NAME WHY YOU ARE STOPPING. Use it when a stop was refused and one of the " +
-				"sanctioned reasons applies.\n\n" +
-				"The refusal carries the list. Say which entry applies and why, in one line. " +
-				"Saying it in chat is not enough, because nothing can read chat.\n\n" +
-				"One claim releases one stop. Do anything else first and it is gone.\n\n" +
-				"Call it with no arguments to read the list.",
+			"description": "NAME WHY YOU ARE STOPPING, when a stop was refused.\n\n" +
+				"The refusal carries the list. Say which entry applies and why.\n" +
+				"One claim releases one stop. Do anything else first and it is gone.\n" +
+				"No arguments reads the list.",
 			"inputSchema": map[string]any{
 				"type": "object",
 				"properties": map[string]any{
 					"because": map[string]any{"type": "string",
-						"description": "the id of the sanctioned stop that applies. Leave it out to read the list."},
-					"why": map[string]any{"type": "string",
-						"description": "why it applies here, in one line. A reason on its own is a category."},
-					"actor": map[string]any{"type": "string", "description": "who is stopping. Leave it out and you are main."},
+						"description": "the id of the sanctioned stop. Leave it out to read the list"},
+					"why":   map[string]any{"type": "string", "description": "why it applies, in one line"},
+					"actor": map[string]any{"type": "string", "description": "who is stopping. Default main"},
 				},
 			},
 		},
 		{
 			"name": "se_pull",
 			"description": "THE PULL, your one verb for work. Pull, do what comes back, pull again.\n\n" +
-				"The engine owns the queue. You never name a target and never choose what to work on.\n\n" +
-				"FOUR ANSWERS, and the pull field names which one you got.\n\n" +
-				"- work: a token rides in token. Do it. Findings from an earlier round ride in " +
-				"findings, and every one of them has to be answered.\n" +
-				"- review: you are the reviewer, and a submission rides in token. Judge it against " +
-				"the token's own rules and nothing else. Answer verdict accept, or verdict reject " +
-				"with findings.\n" +
-				"- refused: the engine checked what a program can check and your submission failed. " +
-				"The finding names the clause, what is wrong, and what would satisfy it. Fix it and " +
-				"pull again with the same id.\n" +
-				"- wait: no token is assigned to you. Say so plainly and stop.\n\n" +
-				"SUBMITTING IS A PULL. When the evidence is produced, pull with id, evidence and " +
-				"disposition. You get back either a refusal or your next piece of work. You cannot " +
-				"close a token: the engine checks it, then a reviewer settles it.",
+				"FOUR ANSWERS, and the pull field names which.\n" +
+				"- work: do the token. Findings from an earlier round have to be answered.\n" +
+				"- review: judge it against its own rules. Answer verdict accept, or reject with findings.\n" +
+				"- refused: a check failed. Fix what the finding names and pull again with the same id.\n" +
+				"- wait: nothing for you. Say so and stop.\n\n" +
+				"SUBMITTING IS A PULL: id, evidence and disposition. You cannot close a token.",
 			"inputSchema": map[string]any{
 				"type": "object",
 				"properties": map[string]any{
 					"id": map[string]any{"type": "string",
-						"description": "the token you are submitting or judging. Leave it out to ask for work."},
+						"description": "the token you are submitting or judging. Leave it out to ask for work"},
 					"evidence": map[string]any{"type": "object",
 						"additionalProperties": map[string]any{"type": "string"},
-						"description":          "one entry per section the token asked for. An empty section is refused."},
+						"description":          "one entry per section the token asked for. Empty is refused"},
 					"disposition": map[string]any{"type": "string",
-						"description": "done, became, or dropped. A token cannot close without one."},
+						"description": "done, became, or dropped"},
 					"successors": map[string]any{"type": "array", "items": map[string]any{"type": "string"},
-						"description": "became only: the tokens this turned into. They must exist."},
-					"reason": map[string]any{"type": "string",
-						"description": "dropped only: why the work stopped. Abandoning is a decision, and decisions are recorded."},
-					"verdict": map[string]any{"type": "string", "description": "reviewer only: accept or reject."},
+						"description": "became only: the tokens this turned into. They must exist"},
+					"reason": map[string]any{"type": "string", "description": "dropped only: why the work stopped"},
+					"verdict": map[string]any{"type": "string",
+						"description": "reviewer only: accept or reject"},
 					"findings": map[string]any{"type": "array",
-						"description": "reviewer only, with reject: each names the clause, what is wrong, and what would satisfy it.",
+						"description": "reviewer only, with reject: clause, wrong, satisfies",
 						"items": map[string]any{"type": "object", "properties": map[string]any{
 							"clause":    map[string]any{"type": "string"},
 							"wrong":     map[string]any{"type": "string"},
 							"satisfies": map[string]any{"type": "string"},
 						}}},
-					"as": map[string]any{"type": "string",
-						"description": "which queue: worker, or reviewer. Leave it out and you are a worker."},
-					"actor": map[string]any{"type": "string",
-						"description": "who is pulling. Leave it out and you are main."},
+					"as":    map[string]any{"type": "string", "description": "worker, or reviewer. Default worker"},
+					"actor": map[string]any{"type": "string", "description": "who is pulling. Default main"},
 				},
 			},
 		},
@@ -142,8 +111,8 @@ func mintWork(r roots, args map[string]any) string {
 	// A fixed order, because a map's is not one and a command line a person
 	// reads in the log should look the same every time.
 	for _, pair := range [][2]string{
-		{"--guidance", "guidance"}, {"--guidance-ref", "guidance_ref"},
-		{"--evidence-script", "evidence_script"}, {"--parent", "parent"}, {"--closer", "closer"},
+		{"--detail", "detail"}, {"--guidance", "guidance"}, {"--guidance-ref", "guidance_ref"},
+		{"--evidence-script", "evidence_script"}, {"--parent", "parent"},
 	} {
 		if v := str(args[pair[1]]); v != "" {
 			a = append(a, pair[0], v)

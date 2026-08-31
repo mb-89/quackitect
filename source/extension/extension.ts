@@ -17,6 +17,7 @@ let view: vscode.WebviewView | undefined;
 export function activate(context: vscode.ExtensionContext) {
   const provider = new ControlPanel(context);
   rotateLogOnStartup(context);
+  reattach(context);
   projectOnStartup(context);
   watchParameters(context);
   void chooseEngine(context);
@@ -47,9 +48,41 @@ export function activate(context: vscode.ExtensionContext) {
 // A window that opens shows this session, never the last one. The current log
 // is set aside under a stamped name before anything can read it. Nothing is
 // deleted, and the engine owns the rule: the editor only asks for it.
+// A RELOADED WINDOW REATTACHES, and does not start a second engine.
+//
+// The engine says on disk that it is here. If that is still true, the window
+// picks it up: the button is green, the log is the running session's, and
+// nothing is rotated. Rotating would take the log away from an engine that is
+// still writing to it.
+function reattach(context: vscode.ExtensionContext): boolean {
+  const running = whatIsRunning(context);
+  if (!running) return false;
+  engineLog = running.log;
+  setState("good", "");
+  armLivenessCheck();
+  return true;
+}
+
+type Running = { pid: number; log: string; session: string; beat?: string };
+
+function whatIsRunning(context: vscode.ExtensionContext): Running | undefined {
+  const work = workRoot();
+  if (!work) return undefined;
+  try {
+    const v = JSON.parse(fs.readFileSync(path.join(work, ".se", "engine.json"), "utf8")) as Running;
+    // A FILE IS NOT A PROCESS. One killed engine leaves its file behind.
+    process.kill(v.pid, 0);
+    return v;
+  } catch {
+    return undefined;
+  }
+}
+
 function rotateLogOnStartup(context: vscode.ExtensionContext) {
   const work = workRoot();
   if (!work) return;
+  // An engine that is still writing keeps its log.
+  if (whatIsRunning(context)) return;
   const exe = binary(context, "se");
   if (!fs.existsSync(exe)) return;
   const done = spawn(exe, ["--rotate", "--work", work], { cwd: work });
@@ -530,8 +563,18 @@ function startEngine(context: vscode.ExtensionContext) {
     return;
   }
 
+  // ALREADY RUNNING IS NOT A REASON TO START A SECOND. A second engine
+  // rotates the first one's log away and the record splits in half.
+  if (reattach(context)) {
+    vscode.window.showInformationMessage("The engine is already running. This window is watching it.");
+    return;
+  }
+
   setState("busy", "starting");
-  const child = spawn(exe, ["--work", work], { cwd: work });
+  // Detached, so it outlives a window reload. The window finds it again
+  // through what the engine says on disk.
+  const child = spawn(exe, ["--work", work], { cwd: work, detached: true });
+  child.unref();
   engine = child;
 
   // Not up within the budget is a fault. A light that stays yellow for ever

@@ -381,6 +381,14 @@ func main() {
 	})
 	fmt.Println(string(ready))
 
+	// AND IT SAYS SO ON DISK, for whoever did not start it. A window that
+	// reloads has no parent any more, and without this it cannot tell a live
+	// engine from none.
+	here := Running{PID: os.Getpid(), Log: log.Path(), Session: log.Session(),
+		Started: time.Now().UTC().Format(time.RFC3339), Build: Build}
+	SayRunning(roots, here)
+	defer StopSaying(roots)
+
 	if *once {
 		return
 	}
@@ -424,6 +432,8 @@ func main() {
 			// log full of nothing happened is a log nobody reads. It goes to
 			// standard output, where whoever started the engine is listening.
 			beats++
+			here.Beat = time.Now().UTC().Format(time.RFC3339)
+			SayRunning(roots, here)
 			beat, _ := json.Marshal(map[string]any{
 				"beat": beats, "uptime_s": int(time.Since(started).Seconds()),
 			})

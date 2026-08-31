@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"os"
 	"path/filepath"
 	"time"
@@ -41,4 +42,54 @@ func GuidanceDir(methodRoot string) string {
 func exists(p string) bool {
 	_, err := os.Stat(p)
 	return err == nil
+}
+
+// WHAT IS RUNNING, ON DISK.
+//
+// A heartbeat on standard output reaches whoever started the engine, and
+// nobody else. An editor window that reloads has no parent any more, so it
+// cannot tell a live engine from none and starts a second one. The second one
+// rotates the first one's log away, and the record splits in half.
+//
+// So the engine says on disk that it is here. The file carries what a reader
+// needs to attach: which process, which log, which session, and when it last
+// said anything.
+type Running struct {
+	PID     int    `json:"pid"`
+	Log     string `json:"log"`
+	Session string `json:"session"`
+	Started string `json:"started"`
+	Beat    string `json:"beat"`
+	Build   string `json:"build"`
+}
+
+func runningPath(r Roots) string { return r.Private("engine.json") }
+
+func SayRunning(r Roots, v Running) {
+	if err := os.MkdirAll(r.Private(), 0o755); err != nil {
+		return
+	}
+	b, err := json.MarshalIndent(v, "", "  ")
+	if err != nil {
+		return
+	}
+	_ = os.WriteFile(runningPath(r), append(b, '\n'), 0o644)
+}
+
+// StopSaying is called when the engine leaves on purpose. A file left behind
+// by a process that was killed is what LoadRunning has to survive.
+func StopSaying(r Roots) { _ = os.Remove(runningPath(r)) }
+
+// LoadRunning answers what is running, and whether it still is. A file naming
+// a process that is gone is not an engine, and saying so is the whole job.
+func LoadRunning(r Roots) (Running, bool) {
+	var v Running
+	b, err := os.ReadFile(runningPath(r))
+	if err != nil || json.Unmarshal(b, &v) != nil {
+		return v, false
+	}
+	if v.PID <= 0 || !alive(v.PID) {
+		return v, false
+	}
+	return v, true
 }

@@ -3,7 +3,7 @@
   "mcpServers": {
     "quackitect": {
       "command": "C:/Users/ichbi/Desktop/ai/quackitect-v4/.bin/se-mcp",
-      "args": ["--method", "C:/Users/ichbi/Desktop/ai/quackitect-v4", "--work", "c:/Users/ichbi/Desktop/ai/quackitect-v4"]
+      "args": ["--method", "C:/Users/ichbi/Desktop/ai/quackitect-v4", "--work", "C:/Users/ichbi/Desktop/ai/quackitect-v4"]
     }
   }
 }
