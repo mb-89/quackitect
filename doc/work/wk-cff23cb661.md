@@ -3,10 +3,11 @@ id: wk-cff23cb661
 seq: "50"
 type: work
 title: two generic editors
-status: open
+status: imp_in_work
 assignee: main
 scope: single-step
 traced: true
+holder: main
 parent: wk-66a28ca311
 minted_by: person
 ---
