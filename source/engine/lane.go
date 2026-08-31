@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
+	"strconv"
 	"strings"
 )
 
@@ -188,6 +190,76 @@ func runHold(args []string) {
 	answerJSON(h)
 }
 
+// runView writes a view file back. A person ticked a column, dragged an edge or
+// picked a level, and where that is stored is one place's business.
+func runView(args []string) {
+	fs := flag.NewFlagSet("view", flag.ExitOnError)
+	fs.SetOutput(os.Stdout)
+	fs.Usage = func() {
+		fmt.Fprintln(os.Stdout, "se view - change how a view looks. Prints what it now is.")
+		fmt.Fprintln(os.Stdout, "")
+		fmt.Fprintln(os.Stdout, "  se view --file work --pane left --width title=420")
+		fmt.Fprintln(os.Stdout, "  se view --file work --pane left --order title,status")
+		fmt.Fprintln(os.Stdout, "  se view --file work --pane left --sort status --direction DESC")
+		fmt.Fprintln(os.Stdout, "")
+		fs.PrintDefaults()
+	}
+	work := fs.String("work", "", "the folder being worked on (default: this one)")
+	file := fs.String("file", "work", "which view file, by name or path")
+	pane := fs.String("pane", "", "which view inside the file")
+	width := fs.String("width", "", "a column and its width: name=px")
+	order := fs.String("order", "", "the columns, in order, comma separated")
+	sortBy := fs.String("sort", "", "sort by this column")
+	groupBy := fs.String("group", "", "group by this column")
+	direction := fs.String("direction", "ASC", "with sort or group: ASC or DESC")
+	_ = fs.Parse(args)
+
+	roots, err := FindRoots(*work)
+	if err != nil {
+		fail(err)
+	}
+	path, ok := ViewPath(roots, *file)
+	if !ok {
+		answerJSON(map[string]any{"error": "no view called " + *file})
+		os.Exit(1)
+	}
+	if *pane == "" {
+		base, err := LoadBase(path)
+		if err != nil {
+			answerJSON(map[string]any{"error": err.Error()})
+			os.Exit(1)
+		}
+		*pane = base.Views[0].Name
+	}
+
+	var wrote error
+	switch {
+	case *width != "":
+		name, px, found := strings.Cut(*width, "=")
+		n, _ := strconv.Atoi(px)
+		if !found || n == 0 {
+			wrote = fmt.Errorf("a width is name=px")
+		} else {
+			wrote = SetWidth(path, *pane, name, n)
+		}
+	case *order != "":
+		wrote = SetOrder(path, *pane, splitComma(*order))
+	case *sortBy != "":
+		wrote = SetSort(path, *pane, *sortBy, *direction)
+	case *groupBy != "":
+		wrote = SetGroup(path, *pane, *groupBy, *direction)
+	default:
+		wrote = fmt.Errorf("say what to change: width, order, sort or group")
+	}
+	if wrote != nil {
+		answerJSON(map[string]any{"error": wrote.Error()})
+		os.Exit(1)
+	}
+	inSession(roots, "view", "person", *file+"/"+*pane+" changed", Yes(),
+		map[string]any{"file": *file, "pane": *pane})
+	answerJSON(map[string]any{"file": *file, "pane": *pane, "ok": true})
+}
+
 // runQuery draws a view. It answers the rows grouped, and the renderer is
 // whatever asked: a webview, or a person at a terminal reading JSON.
 func runQuery(args []string) {
@@ -253,6 +325,16 @@ func runQuery(args []string) {
 	if err != nil {
 		answerJSON(map[string]any{"error": err.Error()})
 		os.Exit(1)
+	}
+	// THE QUERY IS THE SAME THING RENDERED TWICE, and a person may want the
+	// other rendering. It rides along so the panel needs no second call.
+	if rel, err := filepath.Rel(roots.Method, path); err == nil {
+		t.File = filepath.ToSlash(rel)
+	} else {
+		t.File = filepath.Base(path)
+	}
+	if b, err := os.ReadFile(path); err == nil {
+		t.Source = string(b)
 	}
 	answerJSON(t)
 }

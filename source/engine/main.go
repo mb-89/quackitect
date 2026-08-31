@@ -38,6 +38,9 @@ func main() {
 		case "query":
 			runQuery(os.Args[2:])
 			return
+		case "view":
+			runView(os.Args[2:])
+			return
 		case "lint":
 			runLint(os.Args[2:])
 			return
@@ -57,6 +60,7 @@ func main() {
 		fmt.Fprintln(out, "  se pull --help       ask the engine what to do next")
 		fmt.Fprintln(out, "  se stop --help       name why you are stopping")
 		fmt.Fprintln(out, "  se query --help      draw a view over the work")
+		fmt.Fprintln(out, "  se view --help       change how a view looks")
 		fmt.Fprintln(out, "  se lint --help       name what breaks a rule")
 		fmt.Fprintln(out, "  se hold --help       stop the agent, or let it go on")
 		fmt.Fprintln(out, "")
@@ -466,10 +470,20 @@ func main() {
 
 // A one-line record from a command that is not the engine's own run. It
 // appends to the session that is going, and does nothing when none is.
+// THE RECORD DOES NOT DEPEND ON AN ENGINE RUNNING.
+//
+// MEASURED 2026-08-31: the window rotated the log on a reload with no engine
+// up, and every note written after that went nowhere. What the person said was
+// lost in the one situation where they were watching for it.
+//
+// So a note joins the session that is running, and starts one when there is
+// none. A line written into a fresh file is a line somebody can read.
 func noteInLog(dir, src, kind, msg string, ok *bool, data map[string]any) {
 	l, err := OpenExistingLog(dir)
 	if err != nil {
-		return
+		if l, err = OpenLog(dir); err != nil {
+			return
+		}
 	}
 	defer l.Close()
 	l.Write(src, kind, "owner", msg, ok, data)

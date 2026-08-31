@@ -294,6 +294,59 @@ type Tally struct {
 	N    int    `json:"n"`
 }
 
+// WHAT COLUMNS EXIST, AND WHAT TYPE EACH ONE IS.
+//
+// The type is READ FROM THE DATA rather than declared anywhere, because nothing
+// declares it. The first value that is not empty decides, which is wrong only
+// for a property holding two different types, and that is a defect in the notes
+// worth seeing rather than smoothing over.
+type PropertyInfo struct {
+	Name string `json:"name"`
+	Type string `json:"type"`
+	On   bool   `json:"on"`
+}
+
+func propertyInventory(rows []Row, order []string) []PropertyInfo {
+	seen := map[string]string{}
+	var names []string
+	for _, r := range rows {
+		for k, v := range r {
+			if _, had := seen[k]; !had {
+				names = append(names, k)
+				seen[k] = ""
+			}
+			if seen[k] == "" && v.Kind != 'x' {
+				seen[k] = kindName(v.Kind)
+			}
+		}
+	}
+	sort.Strings(names)
+	var out []PropertyInfo
+	for _, n := range names {
+		out = append(out, PropertyInfo{Name: n, Type: or3(seen[n], "string"), On: contains(order, n)})
+	}
+	return out
+}
+
+func kindName(k byte) string {
+	switch k {
+	case 'n':
+		return "number"
+	case 'b':
+		return "boolean"
+	case 'l':
+		return "list"
+	}
+	return "string"
+}
+
+func or3(s, fallback string) string {
+	if s == "" {
+		return fallback
+	}
+	return s
+}
+
 type Table struct {
 	View    string            `json:"view"`
 	Columns []string          `json:"columns"`
@@ -304,6 +357,23 @@ type Table struct {
 	Groups  []Group           `json:"groups"`
 	Counts  []Tally           `json:"counts,omitempty"`
 	Total   int               `json:"total"`
+
+	// WHAT THE TOOLBAR OPERATES ON. The properties a column list ticks, the
+	// levels a sort list shows, and the file itself, because the query is the
+	// same thing rendered twice and a person may want the other rendering.
+	Props  []PropertyInfo `json:"props,omitempty"`
+	Group  []LevelSaid    `json:"group,omitempty"`
+	Sorted []LevelSaid    `json:"sorted,omitempty"`
+	File   string         `json:"file,omitempty"`
+	Source string         `json:"source,omitempty"`
+}
+
+// A level, as the toolbar shows it. The expression is text there, because a
+// person types one.
+type LevelSaid struct {
+	Property  string `json:"property"`
+	Direction string `json:"direction"`
+	Sets      string `json:"sets,omitempty"`
 }
 
 // Render selects, pins, groups and sorts. Rows arrive as flat maps and nothing
@@ -367,8 +437,23 @@ func Render(b Base, v View, rows []Row) (Table, error) {
 			Count: len(mine), Lines: lines(mine, t.Columns)})
 	}
 
+	for _, l := range v.Group {
+		t.Group = append(t.Group, LevelSaid{Property: l.Text, Direction: dirOf(l.Descending), Sets: l.Sets})
+	}
+	for _, sr := range v.Sort {
+		t.Sorted = append(t.Sorted, LevelSaid{Property: sr.Property, Direction: dirOf(sr.Descending)})
+	}
+	t.Props = propertyInventory(kept, t.Columns)
+
 	t.Groups, err = group(rest, v, t.Columns, 0)
 	return t, err
+}
+
+func dirOf(desc bool) string {
+	if desc {
+		return "DESC"
+	}
+	return "ASC"
 }
 
 func keep(rows []Row, global, own *Expr) ([]Row, error) {

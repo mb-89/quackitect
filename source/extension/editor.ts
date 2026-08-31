@@ -44,14 +44,26 @@ export type Table = {
   groups?: Group[];
   counts?: Tally[];
   total: number;
+  props?: PropertyInfo[];
+  group?: LevelSaid[];
+  sorted?: LevelSaid[];
+  file?: string;
+  source?: string;
   error?: string;
 };
 
+// The type a column holds, said in one character. Ported from baseui.ts:53-65.
+const ICON: Record<string, string> = {
+  file: "ⓘ", date: "◷", list: "≡", string: "≡",
+  number: "#", boolean: "☑", link: "↗", object: "{}", null: "·",
+};
+
+export type PropertyInfo = { name: string; type: string; on: boolean };
+export type LevelSaid = { property: string; direction: string; sets?: string };
 export type Pane = { side: string; table: Table };
 export type Body = { pinned: string; scrolling: string; total: number; counts: Tally[] };
 
 export function editorHtml(panes: Pane[], views: string[], view: string): string {
-  const first = panes[0]?.table;
   const tabs = views
     .map((v) => `<button class="tab${v === view ? " on" : ""}" data-view="${esc(v)}">${esc(v)}</button>`)
     .join("");
@@ -66,8 +78,6 @@ export function editorHtml(panes: Pane[], views: string[], view: string): string
 <body>
 <div class="bar">${tabs}
   <button class="second" id="second" title="show a second column">&#9707;</button>
-  <span class="counts">${tallyHtml(first?.counts ?? [])}</span>
-  <span class="total">${first?.total ?? 0}</span>
 </div>
 <div class="panes">
 ${panes.map((p, i) => paneHtml(p, i > 0)).join(seam)}
@@ -80,10 +90,88 @@ ${panes.map((p, i) => paneHtml(p, i > 0)).join(seam)}
 // A pane is the pinned groups that do not scroll, and the part that does.
 function paneHtml(p: Pane, hidden: boolean): string {
   const b = paneBody(p.table);
+  const t = p.table;
   return `<div class="pane-wrap" data-side="${esc(p.side)}"${hidden ? " hidden" : ""}>
+  <div class="chrome">${toolbar(t)}${sortPop(t)}${propsPop(t)}</div>
   <div class="top">${b.pinned}</div>
   <div class="pane">${b.scrolling}</div>
+  ${codePanel(t)}
 </div>`;
+}
+
+// THE TOOLBAR IS NOT IN THE SCROLLING AREA. It sits above a pane that scrolls
+// on its own, so it stays put while rows go past.
+//
+// HELP IS A DETAIL, NEVER A BUTTON. There is no question mark anywhere here.
+// Clicking a control's label puts its help where a person is already looking.
+//
+// Ported from baseui.ts:383-395.
+function toolbar(t: Table): string {
+  const n = t.total ?? 0;
+  return `<div class="bs-bar">
+    <span class="bs-view-name">${esc(t.view)}</span>
+    <span class="bs-count">${n} result${n === 1 ? "" : "s"}</span>
+    <span class="bs-gap"></span>
+    <button type="button" class="bs-tool" data-pop="sort" data-help="sort">&#8645; Sort</button>
+    <button type="button" class="bs-tool" data-pop="props" data-help="properties">&#8801; Properties</button>
+    <button type="button" class="bs-tool bs-code-toggle" title="show the query">&#9781;</button>
+  </div>`;
+}
+
+// Sort and group by, both as LISTS.
+//
+// An empty list still draws one blank row. Without it there is nothing to clone
+// and Add does nothing at all, which is exactly what a control that lies looks
+// like. Ported from baseui.ts:240-258.
+function sortPop(t: Table): string {
+  const groups = (t.group ?? []).length ? t.group! : [{ property: "", direction: "ASC" }];
+  const sorts = (t.sorted ?? []).length ? t.sorted! : [{ property: "", direction: "ASC" }];
+  return `<div class="bs-pop" data-pop="sort" hidden>
+    <div class="bs-pop-title" data-help="sort">Group by</div>
+    <div class="bs-levels" data-kind="group">${groups.map((g) => level("group", g, t)).join("")}</div>
+    <div class="bs-pop-title" data-help="sort">Sort by</div>
+    <div class="bs-levels" data-kind="sort">${sorts.map((sr) => level("sort", sr, t)).join("")}</div>
+  </div>`;
+}
+
+function level(kind: string, l: LevelSaid, t: Table): string {
+  const opts = (t.props ?? [])
+    .map((p) => `<option value="${esc(p.name)}"${p.name === l.property ? " selected" : ""}>${esc(p.name)}</option>`)
+    .join("");
+  const asc = l.direction !== "DESC";
+  return `<div class="bs-level" data-kind="${esc(kind)}">
+    <select class="bs-level-prop"><option value=""></option>${opts}</select>
+    <button type="button" class="bs-dir" data-direction="${asc ? "ASC" : "DESC"}"
+      title="${asc ? "smallest first" : "largest first"}">${asc ? "&#9650;" : "&#9660;"}</button>
+  </div>`;
+}
+
+// The column list, with a find box. Ported from baseui.ts:260-276.
+function propsPop(t: Table): string {
+  const items = (t.props ?? [])
+    .map(
+      (p) => `<label class="bs-prop-item${p.on ? " on" : ""}">
+      <input type="checkbox" class="bs-tick" data-property="${esc(p.name)}"${p.on ? " checked" : ""}>
+      <span class="bs-type" title="${esc(p.type)}">${ICON[p.type] ?? "·"}</span>
+      <span class="bs-prop-name">${esc(p.name)}</span>
+    </label>`,
+    )
+    .join("");
+  return `<div class="bs-pop bs-pop-tall" data-pop="props" hidden>
+    <input class="bs-find" type="text" placeholder="Find a property...">
+    <div class="bs-prop-list">${items}</div>
+    <div class="bs-pop-foot"><button type="button" class="bs-add bs-hide-all">Hide all</button></div>
+  </div>`;
+}
+
+// THE QUERY, SHOWN. It replaces the table rather than sitting beside it,
+// because the two are the same thing rendered twice and nobody needs both at
+// once. Ported from baseui.ts:398-416.
+function codePanel(t: Table): string {
+  return `<div class="bs-pane-code" hidden>
+    <div class="bs-code-head"><span class="bs-code-path">${esc(t.file ?? "")}</span></div>
+    <pre class="bs-code-text">${esc(t.source ?? "")}</pre>
+  </div>`;
 }
 
 export function paneBody(t: Table): Body {
@@ -188,17 +276,13 @@ function css(): string {
          margin: 0; padding: 0; display: flex; flex-direction: column; height: 100vh; }
   .bar { display: flex; align-items: center; gap: 4px; padding: 4px 8px; flex: 0 0 auto;
          border-bottom: 1px solid var(--vscode-panel-border); }
-  .bar .counts { margin-left: auto; display: flex; gap: 12px; }
-  .bar .tally { color: var(--vscode-descriptionForeground); font-size: .9em; }
-  .bar .tally b { color: var(--vscode-foreground); font-weight: 600; margin-right: 4px; }
-  .bar .total { margin-left: 14px; padding-left: 14px; font-size: .9em;
-                color: var(--vscode-descriptionForeground);
-                border-left: 1px solid var(--vscode-panel-border); }
-  .tab, .second { font: inherit; padding: 2px 8px; border: 0; border-radius: 2px; cursor: pointer;
-                  color: var(--vscode-foreground); background: transparent; }
-  .tab.on, .second.on { background: var(--vscode-list-activeSelectionBackground);
-                        color: var(--vscode-list-activeSelectionForeground); }
-  .tab:hover, .second:hover { background: var(--vscode-list-hoverBackground); }
+  /* ONE LOOK FOR EVERY BUTTON. v3 drew its table's buttons differently from
+     every other button in the product, and the reader had to learn two. */
+  button { font: inherit; padding: 2px 8px; border: 0; border-radius: 2px; cursor: pointer;
+           color: var(--vscode-foreground); background: transparent; }
+  button:hover { background: var(--vscode-list-hoverBackground); }
+  button.on { background: var(--vscode-list-activeSelectionBackground);
+              color: var(--vscode-list-activeSelectionForeground); }
   /* Two panes, and the seam between them. The second ships hidden. */
   .panes { flex: 1 1 auto; display: flex; min-height: 0; }
   .pane-wrap { flex: 1 1 0; display: flex; flex-direction: column; min-width: 0; min-height: 0; }
@@ -230,6 +314,36 @@ function css(): string {
   .group.pinned h2 .name { color: var(--vscode-foreground); }
   .group.over { outline: 1px solid var(--vscode-focusBorder); outline-offset: -1px; }
   .bad { padding: 12px; color: var(--vscode-errorForeground); white-space: pre-wrap; }
+
+  /* The toolbar, ported from basesclient.ts:16-60. A control redraws the data
+     and not the card, so a popover the reader opened stays open. */
+  .chrome { position: relative; flex: 0 0 auto; }
+  .bs-bar { display: flex; align-items: center; gap: 6px; padding: 3px 8px;
+            border-bottom: 1px solid var(--vscode-panel-border); }
+  .bs-view-name { font-weight: 600; }
+  .bs-count, .bs-code-path { color: var(--vscode-descriptionForeground); font-size: .9em; }
+  .bs-gap { flex: 1 1 auto; }
+  .bs-pop { position: absolute; right: 8px; top: 26px; z-index: 30; padding: 8px;
+            min-width: 240px; border-radius: 3px;
+            background: var(--vscode-dropdown-background, var(--vscode-editor-background));
+            border: 1px solid var(--vscode-dropdown-border, var(--vscode-focusBorder));
+            box-shadow: 0 2px 10px rgba(0,0,0,.4); }
+  .bs-pop-tall { max-height: 60vh; display: flex; flex-direction: column; }
+  .bs-pop-title { font-size: .85em; text-transform: uppercase; letter-spacing: .06em;
+                  color: var(--vscode-descriptionForeground); margin: 4px 0; cursor: pointer; }
+  .bs-level { display: flex; gap: 6px; align-items: center; margin-bottom: 4px; }
+  .bs-level-prop { flex: 1 1 auto; font: inherit; }
+  .bs-find { width: 100%; box-sizing: border-box; font: inherit; padding: 2px 6px; margin-bottom: 6px; }
+  .bs-prop-list { overflow: auto; flex: 1 1 auto; }
+  .bs-prop-item { display: flex; gap: 6px; align-items: center; padding: 2px 0; cursor: pointer; }
+  .bs-prop-item .bs-type { color: var(--vscode-descriptionForeground); width: 14px; }
+  .bs-pop-foot { margin-top: 6px; }
+  /* The query replaces the table rather than sitting beside it. */
+  .bs-pane-code { flex: 1 1 auto; overflow: auto; }
+  .bs-code-head { padding: 4px 8px; border-bottom: 1px solid var(--vscode-panel-border); }
+  .bs-code-text { margin: 0; padding: 8px; font-family: var(--vscode-editor-font-family);
+                  white-space: pre; }
+  .pane-wrap.showing-code .pane, .pane-wrap.showing-code .top { display: none; }
   `;
 }
 
@@ -289,10 +403,7 @@ function script(): string {
     const at = pane.scrollTop;
     wrap.querySelector('.top').innerHTML = m.pinned;
     pane.innerHTML = m.scrolling;
-    if (m.first) {
-      document.querySelector('.counts').innerHTML = m.counts;
-      document.querySelector('.total').textContent = m.total;
-    }
+    wrap.querySelector('.bs-count').textContent = m.total + ' result' + (m.total === 1 ? '' : 's');
     restore(wrap);
     wire(wrap);
     pane.scrollTop = at;
@@ -381,6 +492,72 @@ function script(): string {
     }
   }
 
-  for (const wrap of document.querySelectorAll('.pane-wrap')) wire(wrap);
+  // A CONTROL REDRAWS THE DATA, NOT THE CARD. Replacing the whole pane closed
+  // whatever popover was open, so ticking three columns meant opening the same
+  // list three times. Ported from basesclient.ts:7-10.
+  function wireChrome(wrap) {
+    const pops = wrap.querySelectorAll('.bs-pop');
+    for (const tool of wrap.querySelectorAll('.bs-tool[data-pop]')) {
+      tool.onclick = (ev) => {
+        ev.stopPropagation();
+        const want = tool.dataset.pop;
+        for (const p of pops) {
+          const show = p.dataset.pop === want && p.hidden;
+          p.hidden = !show;
+        }
+        for (const t2 of wrap.querySelectorAll('.bs-tool[data-pop]')) {
+          const p = wrap.querySelector('.bs-pop[data-pop="' + t2.dataset.pop + '"]');
+          t2.classList.toggle('on', p && !p.hidden);
+        }
+      };
+    }
+    const code = wrap.querySelector('.bs-code-toggle');
+    if (code) {
+      code.onclick = () => {
+        const on = wrap.classList.toggle('showing-code');
+        wrap.querySelector('.bs-pane-code').hidden = !on;
+        code.classList.toggle('on', on);
+      };
+    }
+    // THE FIND BOX IS THIS BLOCK'S OWN. The editor draws two of these side by
+    // side, and filtering the wrong pane's list would be worse than no box.
+    const find = wrap.querySelector('.bs-find');
+    if (find) {
+      find.oninput = () => {
+        const want = find.value.toLowerCase();
+        for (const item of wrap.querySelectorAll('.bs-prop-item')) {
+          item.hidden = want !== '' && !item.textContent.toLowerCase().includes(want);
+        }
+      };
+    }
+    for (const tick of wrap.querySelectorAll('.bs-tick')) {
+      tick.onchange = () => send({ type: 'column', side: wrap.dataset.side,
+        property: tick.dataset.property, show: tick.checked });
+    }
+    const hideAll = wrap.querySelector('.bs-hide-all');
+    if (hideAll) {
+      hideAll.onclick = () => send({ type: 'columns', side: wrap.dataset.side, only: [] });
+    }
+    for (const lv of wrap.querySelectorAll('.bs-level')) {
+      const prop = lv.querySelector('.bs-level-prop');
+      const dir = lv.querySelector('.bs-dir');
+      const say = () => send({ type: 'level', side: wrap.dataset.side, kind: lv.dataset.kind,
+        property: prop.value, direction: dir.dataset.direction });
+      prop.onchange = say;
+      dir.onclick = () => {
+        const asc = dir.dataset.direction !== 'ASC';
+        dir.dataset.direction = asc ? 'ASC' : 'DESC';
+        dir.textContent = asc ? '▲' : '▼';
+        say();
+      };
+    }
+  }
+
+  document.addEventListener('click', () => {
+    for (const p of document.querySelectorAll('.bs-pop')) p.hidden = true;
+    for (const t of document.querySelectorAll('.bs-tool[data-pop]')) t.classList.remove('on');
+  });
+
+  for (const wrap of document.querySelectorAll('.pane-wrap')) { wire(wrap); wireChrome(wrap); }
   `;
 }

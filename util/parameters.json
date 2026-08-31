@@ -122,17 +122,9 @@
             {
               "value": "MS·E",
               "says": "multi step, ephemeral"
-            },
-            {
-              "value": "T·T",
-              "says": "in a token, traced"
-            },
-            {
-              "value": "T·E",
-              "says": "in a token, ephemeral"
             }
           ],
-          "title": "What the token is. Closed it shows the short form, open it says what each one means."
+          "title": "What the token is. Closed it shows the short form, open it says what each one means. A sub-token is not here, because this row has no way to name its parent."
         }
       ]
     },

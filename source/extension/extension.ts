@@ -4,7 +4,7 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import * as os from "node:os";
 import { panelHtml, everyGroup, Node } from "./panel";
-import { editorHtml, paneBody, tallyHtml, Table, Pane } from "./editor";
+import { editorHtml, paneBody, Table, Pane } from "./editor";
 import { whichHarness, kickoffText, openAgent } from "./agent";
 
 // The extension is idle when it loads. It does not act, it does not start
@@ -268,6 +268,20 @@ function setState(next: EngineState, why = "") {
 
 function beat() {
   view?.webview.postMessage({ type: "beat" });
+}
+
+// WHAT IS TRUE NOW, TOLD TO A PANEL THAT HAS JUST APPEARED. Every state here is
+// held somewhere that outlives the window: the engine in a file with its pid,
+// the hold in a file of its own. The panel asks and this answers, so nothing
+// depends on a message sent before anybody could hear it.
+function sayEverything(context: vscode.ExtensionContext) {
+  if (whatIsRunning(context)) {
+    if (engineState !== "good") setState("good", "");
+    else view?.webview.postMessage({ type: "state", id: "engine", state: "good", detail });
+  } else {
+    view?.webview.postMessage({ type: "state", id: "engine", state: engineState, detail });
+  }
+  void showHold(context);
 }
 
 function post() {
@@ -802,8 +816,14 @@ class ControlPanel implements vscode.WebviewViewProvider {
       if (msg.type === "ready") {
         // The view can listen now. Anything sent before this is lost, which
         // is how a panel comes up empty.
+        //
+        // EVERY LIGHT SAYS WHAT IS TRUE, AND IT SAYS IT AGAIN HERE. The window
+        // reattaches to a running engine while it is starting, before there is
+        // a panel to tell. Reloading the window then left the engine running
+        // and the button grey, and pressing start was the only way to agree.
         post();
         postValues(this.context);
+        sayEverything(this.context);
       }
     });
     webviewView.onDidDispose(() => (view = undefined));
@@ -848,6 +868,10 @@ function toggleWork(context: vscode.ExtensionContext) {
     }
     if (m.type === "open") void openNote(context, m.id);
     if (m.type === "edit") void editCell(context, m.id, m.col, m.text);
+    if (m.type === "column") void showColumn(context, m.side, m.property, m.show);
+    if (m.type === "columns") void setColumns(context, m.side, m.only);
+    if (m.type === "level") void setLevel(context, m.side, m.kind, m.property, m.direction);
+    if (m.type === "width") void setWidth(context, m.side, m.property, m.px);
     if (m.type === "file") void fileWork(context, m.id, m.sets, m.into);
   });
   void drawWork(context);
@@ -867,6 +891,10 @@ function toggleWork(context: vscode.ExtensionContext) {
 
 type WorkMessage =
   | { type: "view"; view: string }
+  | { type: "column"; side: string; property: string; show: boolean }
+  | { type: "columns"; side: string; only: string[] }
+  | { type: "level"; side: string; kind: string; property: string; direction: string }
+  | { type: "width"; side: string; property: string; px: number }
   | { type: "open"; id: string }
   | { type: "edit"; id: string; col: string; text: string }
   | { type: "file"; id: string; sets: string; into: string };
@@ -902,14 +930,43 @@ async function drawWork(context: vscode.ExtensionContext, rebuild = false) {
     workBuilt = workView;
     return;
   }
-  for (const [i, p] of panes.entries()) {
+  for (const p of panes) {
     const b = paneBody(p.table);
     void workPanel.webview.postMessage({
-      type: "body", side: p.side, first: i === 0,
-      pinned: b.pinned, scrolling: b.scrolling,
-      counts: tallyHtml(b.counts), total: b.total,
+      type: "body", side: p.side, pinned: b.pinned, scrolling: b.scrolling, total: b.total,
     });
   }
+}
+
+// THE VIEW FILE IS THE OWNER'S, AND THE ENGINE WRITES IT. Ticking a column and
+// dragging an edge are a person saying how they want to look at this, and where
+// that is stored is one place's business.
+async function showColumn(context: vscode.ExtensionContext, side: string, property: string, show: boolean) {
+  const table = await askEngine(context, ["query", "--view", workView, "--pane", side]);
+  const cols: string[] = table?.columns ?? [];
+  const next = show ? [...cols, property] : cols.filter((c: string) => c !== property);
+  await writeView(context, side, ["--order", next.join(",")]);
+}
+
+async function setColumns(context: vscode.ExtensionContext, side: string, only: string[]) {
+  await writeView(context, side, ["--order", only.join(",")]);
+}
+
+async function setLevel(context: vscode.ExtensionContext, side: string, kind: string, property: string, direction: string) {
+  await writeView(context, side, ["--" + kind, property, "--direction", direction]);
+}
+
+async function setWidth(context: vscode.ExtensionContext, side: string, property: string, px: number) {
+  await writeView(context, side, ["--width", property + "=" + String(px)]);
+}
+
+async function writeView(context: vscode.ExtensionContext, side: string, args: string[]) {
+  const out = await askEngine(context, ["view", "--file", workView, "--pane", side, ...args]);
+  if (out?.error) {
+    vscode.window.showErrorMessage(out.error);
+    return;
+  }
+  void drawWork(context, true);
 }
 
 // AN EDIT IS THE ENGINE'S ACT. The editor says which token, which field and

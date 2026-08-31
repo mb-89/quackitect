@@ -36,15 +36,6 @@ views:
       title: 300
       status: 110
       assignee: 110
-    counts:
-      - name: open
-        filter: status == "open"
-      - name: in work
-        filter: status == "in_work"
-      - name: in review
-        filter: status == "submitted" || status == "in_review"
-      - name: backlogged
-        filter: status == "backlogged"
     pinned:
       - name: yours
         filter: assignee == "human" && (status == "open" || status == "in_work")
