@@ -16,6 +16,9 @@ func main() {
 	demo := flag.Bool("demo", false, "write a made-up log twice a second and view it")
 	keys := flag.Bool("keys", false, "print every key this terminal sends, and nothing else")
 	version := flag.Bool("version", false, "print which build this is and exit")
+	frame := flag.Bool("frame", false, "draw the window once, print it, and exit")
+	size := flag.String("size", "120x40", "with --frame: how big the window is, WxH")
+	narrow := flag.String("filter", "", "with --frame: narrow it, in the language --help prints")
 	flag.Parse()
 	if *help {
 		fmt.Println(FilterHelp)
@@ -52,6 +55,24 @@ func main() {
 		os.Exit(2)
 	}
 	path := args[0]
+
+	// A READER WITH NO TERMINAL still gets the window. The frame is drawn by
+	// the same code that draws it on a screen, so the two never disagree.
+	if *frame {
+		w, h, err := ParseSize(*size)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(2)
+		}
+		out, err := Frame(path, w, h, *narrow)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+		fmt.Println(out)
+		return
+	}
+
 	// A file that is not there yet is not an error. The window can be opened
 	// before the engine writes anything, and it fills when it does.
 	run(path)
