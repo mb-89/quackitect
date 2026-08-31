@@ -315,3 +315,14 @@ func apart(a, b string) (string, string, bool) {
 	}
 	return a, b, !os.SameFile(one, other)
 }
+
+// rebuiltSince says whether the program was replaced after this process
+// started from it. Installing writes a new file over the old name, so the
+// name is younger than the process running the old bytes.
+func rebuiltSince(methodRoot string, started time.Time) bool {
+	info, err := os.Stat(filepath.Join(methodRoot, ".bin", "se"))
+	if err != nil {
+		return false
+	}
+	return info.ModTime().After(started)
+}

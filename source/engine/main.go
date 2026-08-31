@@ -468,6 +468,7 @@ func main() {
 	defer ticker.Stop()
 	started := time.Now()
 	var beats int
+	var saidStale bool
 	for {
 		select {
 		case <-reproject:
@@ -496,6 +497,22 @@ func main() {
 			beats++
 			here.Beat = time.Now().UTC().Format(time.RFC3339)
 			SayRunning(roots, here)
+
+			// AN ENGINE OUTLIVES THE BUILD IT CAME FROM. Installing replaces
+			// the program on disk and leaves this process running the code it
+			// started with, and this process is the one writing the
+			// projections. So a rule changed in the source goes on being
+			// written the old way, by an engine nobody thought to restart.
+			//
+			// It cannot restart itself, because whoever started it decides
+			// that. Saying it once is what turns it into something a person
+			// can see.
+			if !saidStale && rebuiltSince(roots.Method, started) {
+				saidStale = true
+				log.Write("engine", "error", "engine",
+					"this engine is older than the program on disk, so it writes what its own build knew", No(),
+					map[string]any{"build": Build, "fix": "stop it and start it again"})
+			}
 			beat, _ := json.Marshal(map[string]any{
 				"beat": beats, "uptime_s": int(time.Since(started).Seconds()),
 			})

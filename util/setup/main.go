@@ -282,6 +282,13 @@ func alsoWithoutTheSuffix(built, plain string) error {
 	_ = os.Remove(plain)
 	if err := os.Link(built, plain); err == nil {
 		return nil
+	} else if runtime.GOOS == "windows" {
+		// A HARD LINK TO A FILE NEEDS NO PRIVILEGE, which is what makes it the
+		// right one here. A symbolic link is the one that needs a privilege an
+		// ordinary account does not hold, and a junction is for folders. It
+		// still wants one NTFS volume, and a network or removable drive is not
+		// that, so a failure is worth naming rather than hiding in a copy.
+		say("  build    could not link %s, so it is a copy: %v", filepath.Base(plain), err)
 	}
 	in, err := os.ReadFile(built)
 	if err != nil {
