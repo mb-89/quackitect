@@ -3,13 +3,13 @@ id: wk-c22f29af7b
 seq: "-10"
 type: work
 title: a reviewer names lessons
-status: imp_in_review
+status: imp_open
 assignee: main
 scope: single-step
 traced: true
 disposition: done
-holder: reviewer6
 parent: wk-bc3c5ba905
+rounds: "1"
 minted_by: person
 ---
 
@@ -40,23 +40,17 @@ verdict.
 THIS REPLACES wk-6684401070, which had the engine doing the minting. The owner
 overruled that, and this token carries the decision.
 
-## evidence: what was built
+## finding 1 · round 1 · detail: WHAT THE ENGINE DOES: it refuses. A rejection carries the id of the token the reviewer minted, the engine checks that the id is a token, and a rejection naming none is refused the way one with no finding is refused. That is the whole of the engine's part. / evidence: THREE CHECKS, ALL GREEN. TestARejectionNamesTheLessonsToken drives the refusal on both halves · by reviewer6
 
-The engine refuses a rejection that does not name the token the reviewer minted for the lesson, and it does nothing else about lessons.
+**wrong:** THE HALF OF THE REFUSAL THIS TOKEN EXISTS FOR IS GUARDED BY NOTHING, AND THE EVIDENCE SAYS OTHERWISE. It says "TestARejectionNamesTheLessonsToken drives the refusal on both halves." It drives one.
 
-THE REFUSAL. rejectionIsWhole, src/engine/pull.go:395, is called on both rejection paths, the spec's at :367 and the implementation's at :463. It refuses a rejection naming no token, and it refuses one naming an id that is not a token, because a typed id that reaches nothing is the same hole as no id at all.
+**satisfies:** ASSERT ON THE WORDS, ONE CASE PER REFUSAL. Split the first half of TestARejectionNamesTheLessonsToken into two cases that cannot pass for each other. The empty-id case requires the refusal to carry its own distinguishing phrase -- "names no token", or "so it is a sentence on a note somebody has to remember to act on" -- and not a fragment like "mint" that the neighbouring refusal also contains. The not-a-token case requires the refusal to name the id it was handed, which the other cannot do because there is no id. spec_test.go:149 already does exactly this for the no-lesson refusal, so the shape is in the tree and does not need inventing.
 
-WHAT THE REVIEWER DOES. Mints the token with se work, backlogged or open as it judges, writes the class and what to do instead into it, and names the id in the verdict's learned field. The lesson lands on the token beside the round that taught it, and the note carries **minted as:** <id> so a reader of the note follows it without opening the engine.
+## lesson 1 · round 1 · by reviewer6
 
-WHY THE ENGINE DOES NOT MINT IT, which is the owner's ruling and the reason this token exists. A class is a judgment. The same token coming back twice would mint the same lesson twice, and only somebody who has read both rounds can tell a second instance of an old class from a new one. Matching on the words would be a word list fitted to the cases already seen, which is one of the four shapes the method already names. Whether the lesson goes to the backlog or straight into what is open is the same kind of judgment.
+**the class:** A GUARD STANDING IN FRONT OF ANOTHER GUARD, WITH A CHECK THAT ONLY ASKS WHETHER IT WAS REFUSED. Two refusals sit one after the other, and the second catches by accident everything the first was written for: the first refuses the empty case with a message saying what to do, the second refuses the malformed case, and an empty value is also malformed. The test asserts the call was refused; it is refused either way. Delete the first guard and the whole suite stays green, so nothing holds the message a person actually reads. And where the test does look at the text it looks for a fragment -- Contains(wrong+satisfies, "mint") -- which the fall-through refusal satisfies with the word "minted", so the one assertion aimed at telling them apart passes on the wrong one. On wk-c22f29af7b that is the refusal the token exists for: with it gone, the reviewer is handed "learned names , which is not a token: no such token: ", a sentence with a hole where the id should be and no instruction in it, and go test ./... says ok.
 
-THREE CHECKS, ALL GREEN. TestARejectionNamesTheLessonsToken drives the refusal on both halves. TestARejectionWithoutALessonIsRefused drives the older half, that a rejection with no class and no remedy is refused at all. TestCriteriaAndLessonsSurviveTheNote drives the round trip, because the note is re-rendered from the parsed token on every save and a lesson written as prose would be dropped.
+**instead:** When you add a guard, ask what the caller sees if you delete it, and run the suite with it deleted before you believe the check. A green suite means the guard is not guarded, and either the check has to assert on the thing that changed or the guard is not earning its lines. A refusal's value is its message, so a check on a refusal asserts on the message: the distinguishing phrase, never a fragment a neighbouring refusal also contains, and one case per refusal rather than one case any refusal satisfies. Ask it in one sentence before writing the assertion -- what would I have to break for this to go red, and is that the thing I just wrote.
 
-AND IT HAS BEEN IN USE ALL SESSION, WHICH IS BETTER EVIDENCE THAN THE TESTS. Every rejection this session carried a minted token id because the engine would not take one without: wk-644aae4ac6 symptom removed defect kept, wk-789ff2ba2e the check ran dry, and the four rounds before them. Two of those lessons are now in doc/guidance/behaviour.md and their tokens are aborted naming the section, which is the whole point of minting them rather than writing a paragraph nobody acts on.
-
-THE METHOD SAYS IT TOO, in doc/guidance/reviewing.md: every rejection carries a lesson, and you mint it.
-
-THIS REPLACES wk-6684401070, which had the engine doing the minting. The owner overruled that and this token carries the decision.
-
-WHAT IS NOT HERE. The engine does not check that the minted token says anything useful, and it cannot: that is the judgment it was told to stay out of. A reviewer minting an empty token to get past the gate is possible and is caught by a person reading the token, not by the engine.
+**minted as:** wk-84a8b68af9
 
