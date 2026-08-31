@@ -3,10 +3,13 @@ id: wk-644aae4ac6
 seq: "74"
 type: work
 title: symptom removed, defect kept
-status: imp_open
+status: aborted
 assignee: main
 scope: single-step
 traced: true
+disposition: dropped
+reason: "The lesson is written where an agent reads it: doc/guidance/behaviour.md, section 'A fix in the caller leaves the defect where it is'. The instance it was found on is fixed too: reCompare now takes one literal, src/engine/filterbuild.go, checked by feeding the reader input the writer would never emit. Obsolete as a token."
+aborted_from: imp_open
 minted_by: reviewer5
 ---
 

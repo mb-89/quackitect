@@ -3,8 +3,8 @@
   "mcpServers": {
     "quackitect": {
       "type": "local",
-      "command": "./.bin/se-mcp",
-      "args": ["--method", ".", "--work", "."],
+      "command": "{{mcp}}",
+      "args": ["--method", "C:/Users/ichbi/Desktop/ai/quackitect-v4", "--work", "c:/Users/ichbi/Desktop/ai/quackitect-v4"],
       "tools": ["*"]
     }
   }

@@ -3,10 +3,13 @@ id: wk-789ff2ba2e
 seq: "75"
 type: work
 title: the check ran dry
-status: imp_open
+status: aborted
 assignee: main
 scope: single-step
 traced: true
+disposition: dropped
+reason: "The lesson is written where an agent reads it: doc/guidance/behaviour.md, section 'A check whose red depends on data the system eats goes quiet', with the measurement it came from. The instance it was found on is fixed too: TestEveryOldNameReadsBackWhoeverIsLeftOnDisk writes its own note per old name and its list of cases is its own rather than read from wasCalled. Obsolete as a token."
+aborted_from: imp_open
 minted_by: reviewer5
 ---
 

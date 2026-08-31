@@ -226,6 +226,51 @@ THE CHECK GOES WHERE THE DEFECT IS, in the language the defect is written in.
 A CHECK THAT FINDS NOTHING TO CHECK REFUSES. One that passes because the code it
 guards has gone is a check that has quietly stopped working.
 
+### A check whose red depends on data the system eats goes quiet
+
+Ask what the tree would have to contain for the check to go red. Then ask
+whether the system removes that thing while it is working.
+
+A check written against whatever is lying in the repository is watched failing,
+the evidence is filed, and the evidence is true. Then ordinary use eats the data
+it stood on. The check goes on passing, reports nothing, and nobody is told it
+has stopped being able to fail. That is worse than never writing it, because the
+record says this one was proved.
+
+MEASURED, on a check over the notes on disk. The engine rewrites a note under
+the new state names the first time anything touches it. The last note spelling
+in_work stopped spelling it when its own token was submitted, and the last one
+spelling submitted stopped when a reviewer pulled another token. Two of five
+names went unguarded inside one afternoon, and the second went to a review that
+changed no code at all.
+
+WHEN THE ANSWER IS YES, THE CHECK NEEDS A FIXTURE IT OWNS. Write the case rather
+than finding it. One note per old name, in a lane of its own, read back through
+the same file layer a real note is read through.
+
+AND THE LIST OF CASES IS THE CHECK'S OWN, NOT THE THING UNDER TEST'S. Walking
+the map the check is about takes the cases from what is being tested, so
+deleting an entry deletes the case that guards it and the check stays green. I
+wrote that first and watched it stay green under every single deletion.
+
+### A fix in the caller leaves the defect where it is
+
+A consumer misreads a shape. The fix changes the producer so it stops emitting
+that shape. The symptom goes, every check goes green, and the defect sits
+exactly where it was.
+
+IT IS NOW REACHABLE ONLY BY THE OTHER PRODUCERS, and for anything read out of a
+file the other producer is a person with an editor. That is the worst place to
+leave it. The lenient reader was there to protect hand-written input, and a
+lenient reader does not fall back, it misreads.
+
+A ROUND TRIP TEST CANNOT SEE THIS. It feeds the reader what the writer produced,
+so it goes green the moment the writer stops producing the shape. It was green
+over a corruption that reproduced character for character by hand.
+
+SO FIX THE THING THAT HAS THE DEFECT, and check it by feeding the reader input
+the writer would never emit.
+
 ### Search with the tool the probe found
 
 The engine probes this machine on every boot and hands you the list on your
