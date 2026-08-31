@@ -1,4 +1,20 @@
 .bin/
 .se/
+_to_delete/
 node_modules/
 *.jsonl
+
+# built programs belong in .bin/, never next to their source
+source/engine/engine
+source/engine/engine.exe
+source/viewer/viewer
+source/viewer/viewer.exe
+util/setup/setup
+util/setup/setup.exe
+source/extension/out/
+*.tgz
+*.tar.gz
+
+# throwaway, and it never travels
+util/scratchpad/*
+!util/scratchpad/README.md

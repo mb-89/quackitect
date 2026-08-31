@@ -1,0 +1,29 @@
+{
+  "$comment": "THE RULES ARE DATA, AND THEY ARE MEANT TO BE SWAPPED. Replace this file and the checker changes. Nothing here is copied from a standard that restricts who may use it: the wording is our own, and a licensed word list can be dropped in as a rules file of its own.",
+  "source": "guidance/voice.md",
+  "limits": {
+    "sentence_words": 25
+  },
+  "rules": [
+    {
+      "name": "no semicolon",
+      "pattern": ";",
+      "says": "a semicolon joins two sentences that should be two"
+    },
+    {
+      "name": "no Latin abbreviation",
+      "pattern": "(?i)\\b(e\\.g\\.|i\\.e\\.|etc\\.|viz\\.|cf\\.)",
+      "says": "write it out"
+    },
+    {
+      "name": "no contraction",
+      "pattern": "(?i)\\b\\w+n't\\b|\\b(?:it|that|there|here|what|who|let)'s\\b|\\b\\w+'(?:ll|re|ve|d)\\b",
+      "says": "write both words"
+    },
+    {
+      "name": "do not tell the reader how to feel",
+      "pattern": "(?i)\\b(simply|obviously|of course|clearly)\\b",
+      "says": "the word tells the reader how to feel about the sentence"
+    }
+  ]
+}

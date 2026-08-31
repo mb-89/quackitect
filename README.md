@@ -7,70 +7,39 @@ Level 0. Nothing above it exists yet.
     util\setup\install.ps1        Windows
     util/setup/install.sh         Linux
 
-Not written yet. Until it is, see **Build** below.
+Run it once. After that, everything goes through RUNME:
 
-## Look at the log window
+    .\RUNME.ps1 --help            Windows
+    ./RUNME.sh --help             Linux
 
-    .bin\logview.exe --demo       Windows
-    .bin/logview --demo           Linux
-
-Demo mode writes a made-up log twice a second and views it. It exists so the
-window can be seen before there is an engine to fill it. To read a real file,
-give it the path instead of `--demo`.
+RUNME is the one command that always works. It installs what has to be
+installed and hands every argument to the command line interface. Ask it what
+it takes.
 
 ## What is here
 
-Four things, and that is the limit. See the rule of five in
-`docs/cross-cutting/cross-cutting-design.md`.
+See `doc/cross-cutting/cross-cutting-design.md`.
 
-| Entry | What it holds |
+| Entry | What it is for |
 |---|---|
-| `docs/` | The design. Start with `user-stories.md`. |
-| `source/` | Everything that is written. `viewer`, `engine`, `extension`. |
-| `util/` | Everything that is run rather than shipped. `setup` for now. |
+| `doc/` | The design, as it was collected, the guidance the agent is told, and the work. Start with `user-stories.md`. Not specification. |
+| `source/` | Everything that is written. `engine`, `viewer`, `extension`. |
+| `util/` | Everything that is run rather than shipped. `setup`, `cage`, and `scratchpad`, which is throwaway and not in version control. |
 | `.bin/` | Built programs. Rebuilt from source, and not in version control. |
 
 `.se/` holds private material. Dated reports and measured evidence live there
 and never travel.
 
-## Keys
+`doc/coverage.md` maps every story and every case to the test that proves it.
+`doc/open.md` names what no test proves yet, and why.
 
-    up down        move the selection, or scroll the pane that has focus
-    page up down   move a screen at a time
-    home end       first line, newest line
-    tab            move focus between the list and the details
-    ctrl+d         open the details, and close them again
-    esc            clear the filter
-    ctrl+c         quit
+## Which folder do I open
 
-There is no mouse. Mouse tracking takes selection and copy away from the
-terminal, and a log nobody can copy from has a hole in it.
+**To work on v4 itself:** open this folder. The method root and the work root
+are then the same tree, which is the ordinary self-hosting case.
 
-## Filter
+**To work on anything else:** open that folder. It does not have to contain
+anything. On the first start it gets a `.se/` folder, and inside it a
+`project.json` naming the copy that drives it.
 
-Type. There is no key to press first.
-
-    word              every column contains "word"
-    name:word         that column contains "word"
-    /pattern/         every column matches the regular expression
-    name:/pattern/    that column matches it
-    -word             lines that contain "word" are removed
-    "two words"       one term, not two
-
-Terms narrow together. Columns are `time src kind actor msg session ok`, and
-any field inside a record's details can also be named.
-
-An unfinished pattern is not an error. The last filter that worked stays on
-screen, and the status line says which.
-
-## Build
-
-Go 1.24 or later.
-
-    cd source/viewer
-    go test ./...
-    go build -o ../../.bin/logview .
-
-Cross-compile for Windows from Linux:
-
-    GOOS=windows GOARCH=amd64 go build -o ../../.bin/logview.exe .
+`.se/` is the marker that a folder is a project this system has worked on.

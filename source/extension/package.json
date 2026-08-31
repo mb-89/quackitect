@@ -1,0 +1,132 @@
+{
+  "name": "quackitect",
+  "displayName": "quackitect",
+  "description": "Systematic engineering, level 0.",
+  "version": "0.1.0",
+  "publisher": "quackitect",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "main": "./out/extension.js",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "quackitect",
+          "title": "quackitect",
+          "icon": "icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "quackitect": [
+        {
+          "id": "quackitect.control",
+          "name": "controls",
+          "type": "webview"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "quackitect.startAgent",
+        "title": "quackitect: start"
+      },
+      {
+        "command": "quackitect.chooseGroups",
+        "title": "quackitect: choose which groups are shown"
+      },
+      {
+        "command": "quackitect.stopEngine",
+        "title": "quackitect: stop"
+      },
+      {
+        "command": "quackitect.init",
+        "title": "quackitect: make this folder a project or a vehicle"
+      },
+      {
+        "command": "quackitect.startEngine",
+        "title": "quackitect: start the engine only"
+      },
+      {
+        "command": "quackitect.showLog",
+        "title": "quackitect: show the log"
+      },
+      {
+        "command": "quackitect.welcome",
+        "title": "quackitect: open the home page"
+      },
+      {
+        "command": "quackitect.chooseEngine",
+        "title": "quackitect: choose which copy drives this folder"
+      }
+    ],
+    "walkthroughs": [
+      {
+        "id": "quackitect.start",
+        "title": "quackitect",
+        "description": "Level 0. The cage, the record, and the window over it.",
+        "steps": [
+          {
+            "id": "panel",
+            "title": "Open the panel",
+            "description": "The icon in the activity bar opens the panel. What the panel shows is set by the parameter tree, and the gear chooses which parts of it appear.\n[Open the panel](command:quackitect.control.focus)",
+            "media": {
+              "markdown": "media/panel.md"
+            }
+          },
+          {
+            "id": "agent",
+            "title": "Start the agent",
+            "description": "One button does the whole thing: it starts the engine, opens the log window, and hands the agent its first instruction.\n[Start](command:quackitect.startAgent)",
+            "media": {
+              "markdown": "media/engine.md"
+            },
+            "completionEvents": [
+              "onCommand:quackitect.startAgent"
+            ]
+          },
+          {
+            "id": "log",
+            "title": "Read the log",
+            "description": "The window opens in a terminal. Type to filter. ctrl+d opens the details beside a line, and on the filter it shows the filter language.\n[Show the log](command:quackitect.showLog)",
+            "media": {
+              "markdown": "media/log.md"
+            },
+            "completionEvents": [
+              "onCommand:quackitect.showLog"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "scripts": {
+    "build": "node build.mjs",
+    "watch": "node build.mjs --watch"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.1",
+    "@types/vscode": "^1.90.0",
+    "esbuild": "^0.23.0",
+    "typescript": "^5.5.0"
+  },
+  "extensionKind": [
+    "workspace"
+  ],
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": "limited",
+      "description": "The panel and the log window work in a folder you have not trusted. Starting the engine runs a program from this folder, so it waits until the folder is trusted."
+    }
+  },
+  "dependencies": {
+    "koffi": "^2.9.0"
+  }
+}

@@ -1,0 +1,211 @@
+package main
+
+import (
+	"fmt"
+	"sort"
+	"strconv"
+	"strings"
+)
+
+// FRONTMATTER, AND THE SUBSET OF YAML WE WRITE.
+//
+// A token is a markdown note. Its data is the frontmatter and its prose is the
+// body, which is what makes it a thing a person reads six months later rather
+// than a record only a program can open.
+//
+// THE SUBSET IS NARROW AND IT REFUSES LOUDLY. Scalars, and lists of scalars in
+// the block form. That is what this program writes, and a parser that silently
+// ignores what it cannot read returns a note that looks complete and is wrong.
+//
+// It is our own rather than a library because the engine carries no
+// dependencies: the installer builds it on the reader's machine, and a machine
+// that cannot reach the network still has to get an engine.
+
+const noteFence = "---"
+
+// SplitNote separates the frontmatter from the body. A note with no noteFence has
+// no frontmatter and is all body, which is an ordinary markdown file and not
+// an error.
+func SplitNote(text string) (front, body string) {
+	text = strings.ReplaceAll(text, "\r\n", "\n")
+	if !strings.HasPrefix(text, noteFence+"\n") {
+		return "", text
+	}
+	rest := text[len(noteFence)+1:]
+	end := strings.Index(rest, "\n"+noteFence)
+	if end < 0 {
+		return "", text
+	}
+	// The blank line between the fence and the prose is formatting, so it is
+	// not part of what a person wrote.
+	after := rest[end+len(noteFence)+1:]
+	return rest[:end], strings.TrimLeft(after, "\n")
+}
+
+// A value is a string, or a list of strings. Nothing else is written, so
+// nothing else is read.
+type Front map[string]any
+
+func ParseFront(front string) (Front, error) {
+	out := Front{}
+	var key string
+	var list []string
+	flush := func() {
+		if key != "" && list != nil {
+			out[key] = list
+		}
+		list = nil
+	}
+	for n, raw := range strings.Split(front, "\n") {
+		line := strings.TrimRight(raw, " \t")
+		if strings.TrimSpace(line) == "" || strings.HasPrefix(strings.TrimSpace(line), "#") {
+			continue
+		}
+		// A list item continues the key above it.
+		if strings.HasPrefix(line, "  - ") || strings.HasPrefix(line, "- ") {
+			if key == "" {
+				return nil, fmt.Errorf("line %d: a list item with no key above it", n+1)
+			}
+			list = append(list, unquote(strings.TrimSpace(strings.TrimPrefix(strings.TrimSpace(line), "-"))))
+			continue
+		}
+		if strings.HasPrefix(line, " ") || strings.HasPrefix(line, "\t") {
+			return nil, fmt.Errorf("line %d: nested mappings are not read here: %q", n+1, line)
+		}
+		flush()
+		k, v, ok := strings.Cut(line, ":")
+		if !ok {
+			return nil, fmt.Errorf("line %d: no key: %q", n+1, line)
+		}
+		key = strings.TrimSpace(k)
+		v = strings.TrimSpace(v)
+		if v == "" {
+			// The value is the list that follows, or nothing.
+			out[key] = ""
+			list = []string{}
+			continue
+		}
+		out[key] = unquote(v)
+		key, list = "", nil
+	}
+	flush()
+	for k, v := range out {
+		if l, ok := v.([]string); ok && len(l) == 0 {
+			out[k] = ""
+		}
+	}
+	return out, nil
+}
+
+// WriteFront renders in a stable order, so a token that did not change reads
+// as a file that did not change, and a diff shows the field that moved.
+func WriteFront(f Front, order []string) string {
+	var b strings.Builder
+	b.WriteString(noteFence + "\n")
+	seen := map[string]bool{}
+	write := func(k string) {
+		v, ok := f[k]
+		if !ok || seen[k] {
+			return
+		}
+		seen[k] = true
+		switch val := v.(type) {
+		case []string:
+			if len(val) == 0 {
+				return
+			}
+			b.WriteString(k + ":\n")
+			for _, e := range val {
+				b.WriteString("  - " + quote(e) + "\n")
+			}
+		case string:
+			if val == "" {
+				return
+			}
+			b.WriteString(k + ": " + quote(val) + "\n")
+		}
+	}
+	for _, k := range order {
+		write(k)
+	}
+	var rest []string
+	for k := range f {
+		if !seen[k] {
+			rest = append(rest, k)
+		}
+	}
+	sort.Strings(rest)
+	for _, k := range rest {
+		write(k)
+	}
+	b.WriteString(noteFence + "\n")
+	return b.String()
+}
+
+// A value is quoted when leaving it bare would change what it means. Quoting
+// everything would be safe and would make the file unpleasant to read, and a
+// person reading it is the reason the file is markdown.
+func quote(s string) string {
+	if s == "" {
+		return `""`
+	}
+	if strings.ContainsAny(s, ":#\n\"'") || strings.TrimSpace(s) != s ||
+		strings.HasPrefix(s, "-") || strings.HasPrefix(s, "[") || strings.HasPrefix(s, "{") ||
+		isBareWord(s) {
+		return strconv.Quote(s)
+	}
+	return s
+}
+
+// Words YAML would read as something other than text.
+//
+// True and false are not among them. They are what a boolean field carries, a
+// person writing one writes it bare, and a quoted boolean reads as a mistake.
+// A value that is only the word true reads back as the string either way.
+func isBareWord(s string) bool {
+	switch strings.ToLower(s) {
+	case "yes", "no", "on", "off", "null", "~":
+		return true
+	}
+	if _, err := strconv.ParseFloat(s, 64); err == nil {
+		return true
+	}
+	return false
+}
+
+func unquote(s string) string {
+	if len(s) >= 2 && (s[0] == '"' || s[0] == '\'') && s[len(s)-1] == s[0] {
+		if s[0] == '"' {
+			if out, err := strconv.Unquote(s); err == nil {
+				return out
+			}
+		}
+		return s[1 : len(s)-1]
+	}
+	return s
+}
+
+func fs(f Front, k string) string {
+	s, _ := f[k].(string)
+	return s
+}
+
+func fl(f Front, k string) []string {
+	switch v := f[k].(type) {
+	case []string:
+		return v
+	case string:
+		if v == "" {
+			return nil
+		}
+		return []string{v}
+	}
+	return nil
+}
+
+func fb(f Front, k string) bool { return fs(f, k) == "true" }
+
+func fi(f Front, k string) int {
+	n, _ := strconv.Atoi(fs(f, k))
+	return n
+}

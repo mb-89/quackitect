@@ -1,0 +1,160 @@
+{
+  "$comment": "GENERATED from util/cage/claude-settings.json. Edit the source, not this file.",
+  "outputStyle": "quackitect",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"C:/Users/ichbi/Desktop/ai/quackitect-v4/.bin/se.exe\" hook --method \"C:/Users/ichbi/Desktop/ai/quackitect-v4\""
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"C:/Users/ichbi/Desktop/ai/quackitect-v4/.bin/se.exe\" hook --method \"C:/Users/ichbi/Desktop/ai/quackitect-v4\""
+          }
+        ]
+      }
+    ],
+    "PostToolUseFailure": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"C:/Users/ichbi/Desktop/ai/quackitect-v4/.bin/se.exe\" hook --method \"C:/Users/ichbi/Desktop/ai/quackitect-v4\""
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"C:/Users/ichbi/Desktop/ai/quackitect-v4/.bin/se.exe\" hook --method \"C:/Users/ichbi/Desktop/ai/quackitect-v4\""
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"C:/Users/ichbi/Desktop/ai/quackitect-v4/.bin/se.exe\" hook --method \"C:/Users/ichbi/Desktop/ai/quackitect-v4\""
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"C:/Users/ichbi/Desktop/ai/quackitect-v4/.bin/se.exe\" hook --method \"C:/Users/ichbi/Desktop/ai/quackitect-v4\""
+          }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"C:/Users/ichbi/Desktop/ai/quackitect-v4/.bin/se.exe\" hook --method \"C:/Users/ichbi/Desktop/ai/quackitect-v4\""
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"C:/Users/ichbi/Desktop/ai/quackitect-v4/.bin/se.exe\" hook --method \"C:/Users/ichbi/Desktop/ai/quackitect-v4\""
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"C:/Users/ichbi/Desktop/ai/quackitect-v4/.bin/se.exe\" hook --method \"C:/Users/ichbi/Desktop/ai/quackitect-v4\""
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"C:/Users/ichbi/Desktop/ai/quackitect-v4/.bin/se.exe\" hook --method \"C:/Users/ichbi/Desktop/ai/quackitect-v4\""
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"C:/Users/ichbi/Desktop/ai/quackitect-v4/.bin/se.exe\" hook --method \"C:/Users/ichbi/Desktop/ai/quackitect-v4\""
+          }
+        ]
+      }
+    ],
+    "PostCompact": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"C:/Users/ichbi/Desktop/ai/quackitect-v4/.bin/se.exe\" hook --method \"C:/Users/ichbi/Desktop/ai/quackitect-v4\""
+          }
+        ]
+      }
+    ],
+    "ConfigChange": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"C:/Users/ichbi/Desktop/ai/quackitect-v4/.bin/se.exe\" hook --method \"C:/Users/ichbi/Desktop/ai/quackitect-v4\""
+          }
+        ]
+      }
+    ],
+    "StopFailure": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"C:/Users/ichbi/Desktop/ai/quackitect-v4/.bin/se.exe\" hook --method \"C:/Users/ichbi/Desktop/ai/quackitect-v4\""
+          }
+        ]
+      }
+    ]
+  }
+}

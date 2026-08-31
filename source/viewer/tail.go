@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"os"
+	"path/filepath"
 	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -30,8 +31,11 @@ func newTailer(path string) *tailer {
 	t := &tailer{path: path, wake: make(chan struct{}, 1)}
 	// The watcher is the fast path. Failing to create one is not fatal: the
 	// poll below sees every change anyway, one interval later.
+	//
+	// The folder is watched rather than the file, because the file may not
+	// exist yet, and because rotation replaces it.
 	if w, err := fsnotify.NewWatcher(); err == nil {
-		if w.Add(path) == nil {
+		if w.Add(filepath.Dir(path)) == nil {
 			t.watch = w
 			go func() {
 				for range w.Events {
@@ -53,6 +57,9 @@ func newTailer(path string) *tailer {
 // written.
 func (t *tailer) read() ([]Record, error) {
 	f, err := os.Open(t.path)
+	if os.IsNotExist(err) {
+		return nil, nil // not written yet, or between rotations
+	}
 	if err != nil {
 		return nil, err
 	}

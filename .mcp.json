@@ -1,0 +1,9 @@
+{
+  "$comment": "GENERATED from util/cage/mcp.json. Edit the source, not this file.",
+  "mcpServers": {
+    "quackitect": {
+      "command": "C:/Users/ichbi/Desktop/ai/quackitect-v4/.bin/se-mcp",
+      "args": ["--method", "C:/Users/ichbi/Desktop/ai/quackitect-v4", "--work", "C:/Users/ichbi/Desktop/ai/quackitect-v4"]
+    }
+  }
+}

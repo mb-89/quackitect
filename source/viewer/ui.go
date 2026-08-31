@@ -24,12 +24,14 @@ type model struct {
 	all  []Record // every record read, in file order
 	view []int    // indexes into all, after the filter
 
-	selSeq  int64 // the selection is a record, never a row number
-	top     int   // first visible row of the list
-	follow  bool  // true while the selection sits on the newest line
-	focus   focus
-	details bool
+	selID    int64 // the selection is a record, by an identity this program owns
+	onFilter bool  // the selection is on the filter line, which is a row like any other
+	top      int   // first visible row of the list
+	follow   bool  // true while the selection sits on the newest line
+	focus    focus
+	details  bool
 
+	helping   bool // the pane is showing the filter language rather than a record
 	filter    Filter
 	filterBad string // the message under the list when the typed filter will not compile
 	input     textinput.Model
@@ -49,6 +51,9 @@ var (
 	selBarStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("111")).Bold(true)
 	okStyle     = lipgloss.NewStyle().Foreground(lipgloss.Color("77"))
 	notOKStyle  = lipgloss.NewStyle().Foreground(lipgloss.Color("203")).Bold(true)
+	headerStyle = lipgloss.NewStyle().
+			Foreground(lipgloss.AdaptiveColor{Light: "238", Dark: "252"}).
+			Bold(true)
 )
 
 // Colour carries meaning here and nowhere else. Kind and source are the two
@@ -86,6 +91,7 @@ func srcColour(s string) lipgloss.Style {
 func newModel(path string) model {
 	in := textinput.New()
 	in.Prompt = "filter "
+	in.PromptStyle = focusStyle
 	in.Placeholder = "type to narrow"
 	in.Focus()
 	return model{
@@ -107,14 +113,14 @@ func (m *model) rebuild() {
 		}
 	}
 	if m.follow && len(m.view) > 0 {
-		m.selSeq = m.all[m.view[len(m.view)-1]].Seq
+		m.selID = m.all[m.view[len(m.view)-1]].ID
 	}
 	m.clampTop()
 }
 
 func (m model) selIndex() int {
 	for i, ai := range m.view {
-		if m.all[ai].Seq == m.selSeq {
+		if m.all[ai].ID == m.selID {
 			return i
 		}
 	}
@@ -146,22 +152,79 @@ func (m *model) clampTop() {
 }
 
 func (m *model) moveSel(delta int) {
+	// The filter is a row. It sits after the last record, and selecting it
+	// shows what it can do, in the pane that shows what a record holds.
+	if m.onFilter {
+		if delta < 0 {
+			m.onFilter = false
+			m.loadDetail()
+		}
+		return
+	}
 	if len(m.view) == 0 {
+		if delta > 0 {
+			m.onFilter = true
+			m.loadDetail()
+		}
 		return
 	}
 	i := m.selIndex() + delta
+	if i > len(m.view)-1 {
+		// Past the last record is the filter, and only by one step. A page
+		// down from the middle stops at the last record.
+		if m.selIndex() == len(m.view)-1 {
+			m.onFilter = true
+			m.follow = false
+			m.loadDetail()
+			return
+		}
+		i = len(m.view) - 1
+	}
 	if i < 0 {
 		i = 0
 	}
-	if i > len(m.view)-1 {
-		i = len(m.view) - 1
-	}
-	m.selSeq = m.all[m.view[i]].Seq
+	m.selID = m.all[m.view[i]].ID
 	// Following the newest line is not a mode the user sets. It is where the
 	// selection is. Move up and the list holds still.
 	m.follow = i == len(m.view)-1
 	m.clampTop()
 	m.loadDetail()
+}
+
+// One key puts the window back the way it started. Clearing the filter alone
+// left the selection where it was, so a person who filtered, read, and cleared
+// was still held and watched nothing arrive.
+//
+// Following is where the selection is rather than a mode, so getting back to
+// it means moving to the newest line. That is the same move End makes, and it
+// is made here for the same reason.
+func (m *model) clearAndFollow() {
+	m.input.SetValue("")
+	m.filter, m.filterBad = Filter{}, ""
+	m.rebuild()
+	m.onFilter = false
+	if len(m.view) == 0 {
+		// Nothing to select, and the next line to arrive is the newest one.
+		m.follow = true
+		m.loadDetail()
+		return
+	}
+	m.moveSel(len(m.view))
+}
+
+// One key opens the details and the same key closes them. Enter is what a
+// person reaches for, and ctrl+d works where a terminal gives Enter to
+// something else.
+func (m *model) toggleDetails() {
+	m.details = !m.details
+	m.detail.Width = max(10, m.w-m.listWidth()-3)
+	m.detail.Height = max(3, m.h-4)
+	if m.details {
+		m.loadDetail()
+	} else {
+		m.focus = focusList
+	}
+	m.clampTop()
 }
 
 // loadDetail is called when the SELECTION changes and at no other time. New
@@ -170,17 +233,70 @@ func (m *model) loadDetail() {
 	if !m.details {
 		return
 	}
+	if m.onFilter {
+		m.detail.SetContent(FilterHelp)
+		m.detail.GotoTop()
+		m.helping = true
+		return
+	}
 	i := m.selIndex()
 	if i < 0 {
 		m.detail.SetContent(FilterHelp)
 		return
 	}
+	m.helping = false
 	m.detail.SetContent(m.all[m.view[i]].Detail())
 	m.detail.GotoTop()
 }
 
+// One description of the columns. The header and the rows are rendered from
+// it, so they cannot drift apart.
+type column struct {
+	title string
+	width int // 0 means: take what is left
+}
+
+var columns = []column{
+	{"time", 14},
+	{"src", 7},
+	{"kind", 9},
+	{"actor", 9},
+	{"message", 0},
+	{"ok", 2},
+}
+
+func (m model) msgWidth(w int) int {
+	used := 2 // the gutter
+	for _, c := range columns {
+		if c.width == 0 {
+			continue
+		}
+		used += c.width + 1
+	}
+	if n := w - used; n > 10 {
+		return n
+	}
+	return 10
+}
+
+func (m model) renderHeader(w int) string {
+	var b strings.Builder
+	b.WriteString("  ")
+	for i, c := range columns {
+		width := c.width
+		if width == 0 {
+			width = m.msgWidth(w)
+		}
+		b.WriteString(pad(c.title, width))
+		if i < len(columns)-1 {
+			b.WriteByte(' ')
+		}
+	}
+	return headerStyle.Width(w).Render(b.String())
+}
+
 func (m model) listRows() int {
-	// header, filter line, status line
+	// the column titles, the filter line, and the status line
 	r := m.h - 3
 	if r < 1 {
 		return 1
@@ -203,9 +319,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		m.w, m.h = msg.Width, msg.Height
-		m.input.Width = max(10, m.w-10)
+		m.input.Width = max(10, m.listWidth()-12)
 		m.detail.Width = max(10, m.w-m.listWidth()-3)
-		m.detail.Height = max(3, m.h-3)
+		m.detail.Height = max(3, m.h-4)
 		m.clampTop()
 		return m, nil
 
@@ -226,21 +342,18 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, m.tailer.cmd()
 
 	case tea.KeyMsg:
-		switch msg.String() {
-		case "ctrl+c":
+		// Keys are matched by TYPE as well as by name. A terminal that reports
+		// a key under a name this program did not expect would otherwise send
+		// it to the filter, where an arrow moves a text cursor and nothing
+		// visible happens.
+		switch msg.Type {
+		case tea.KeyCtrlC:
 			return m, tea.Quit
-		case "ctrl+d":
-			m.details = !m.details
-			m.detail.Width = max(10, m.w-m.listWidth()-3)
-			m.detail.Height = max(3, m.h-3)
-			if m.details {
-				m.loadDetail()
-			} else {
-				m.focus = focusList
-			}
-			m.clampTop()
+		case tea.KeyCtrlD, tea.KeyEnter:
+			m.toggleDetails()
 			return m, nil
-		case "tab":
+
+		case tea.KeyTab:
 			if m.details {
 				if m.focus == focusList {
 					m.focus = focusDetail
@@ -249,33 +362,62 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 			}
 			return m, nil
-		case "esc":
-			m.input.SetValue("")
-			m.filter, m.filterBad = Filter{}, ""
-			m.rebuild()
-			m.loadDetail()
+		case tea.KeyEsc:
+			m.clearAndFollow()
 			return m, nil
-		case "up", "down", "pgup", "pgdown", "home", "end":
+		case tea.KeyUp, tea.KeyDown, tea.KeyPgUp, tea.KeyPgDown, tea.KeyHome, tea.KeyEnd,
+			tea.KeyCtrlP, tea.KeyCtrlN:
 			if m.focus == focusDetail {
 				var cmd tea.Cmd
 				m.detail, cmd = m.detail.Update(msg)
 				return m, cmd
 			}
-			switch msg.String() {
-			case "up":
+			switch msg.Type {
+			case tea.KeyUp, tea.KeyCtrlP:
 				m.moveSel(-1)
-			case "down":
+			case tea.KeyDown, tea.KeyCtrlN:
 				m.moveSel(1)
-			case "pgup":
+			case tea.KeyPgUp:
 				m.moveSel(-m.listRows())
-			case "pgdown":
+			case tea.KeyPgDown:
 				m.moveSel(m.listRows())
-			case "home":
+			case tea.KeyHome:
 				m.moveSel(-len(m.view))
-			case "end":
+			case tea.KeyEnd:
+				m.onFilter = false
 				m.moveSel(len(m.view))
 			}
 			return m, nil
+		}
+		// The same keys, matched by name, for a terminal this build has not
+		// met. Nothing here is reached when the types above matched.
+		switch msg.String() {
+		case "up", "ctrl+p":
+			m.moveSel(-1)
+			return m, nil
+		case "down", "ctrl+n":
+			m.moveSel(1)
+			return m, nil
+		case "pgup":
+			m.moveSel(-m.listRows())
+			return m, nil
+		case "pgdown":
+			m.moveSel(m.listRows())
+			return m, nil
+		case "home":
+			m.moveSel(-len(m.view))
+			return m, nil
+		case "end":
+			m.onFilter = false
+			m.moveSel(len(m.view))
+			return m, nil
+		case "enter", "ctrl+d":
+			m.toggleDetails()
+			return m, nil
+		case "esc":
+			m.clearAndFollow()
+			return m, nil
+
 		}
 	}
 
@@ -324,6 +466,10 @@ func (m model) View() string {
 func (m model) renderList() string {
 	w := m.listWidth()
 	var b strings.Builder
+	// The titles never scroll away. A column nobody can name is a column
+	// nobody can filter on.
+	b.WriteString(m.renderHeader(w))
+	b.WriteString("\n")
 	rows := m.listRows()
 	sel := m.selIndex()
 	for i := 0; i < rows; i++ {
@@ -333,19 +479,30 @@ func (m model) renderList() string {
 			continue
 		}
 		r := m.all[m.view[idx]]
-		b.WriteString(m.renderRow(r, idx == sel, w))
+		b.WriteString(m.renderRow(r, !m.onFilter && idx == sel, w))
 		b.WriteString("\n")
 	}
-	b.WriteString(m.renderStatus(w))
+	// The filter sits under the list and above the status line, because it is
+	// the last row a person walks onto.
+	b.WriteString(m.renderFilter())
 	b.WriteString("\n")
-	b.WriteString(lipgloss.NewStyle().Width(w).Render(m.input.View()))
+	b.WriteString(m.renderStatus(w))
 	return lipgloss.NewStyle().Width(w).Render(b.String())
 }
 
+// The filter is drawn like a row and marked like one. The input renders
+// itself, colours and all, so it is neither wrapped in another style nor
+// truncated: wrapping makes lipgloss lay it out again, and truncating counts
+// runes in a string that is mostly invisible escape characters.
+func (m model) renderFilter() string {
+	gutter := "  "
+	if m.onFilter {
+		gutter = selBarStyle.Render("▌") + " "
+	}
+	return gutter + m.input.View()
+}
+
 func (m model) renderRow(r Record, selected bool, w int) string {
-	// The selected line is marked three ways, because one subtle way is what
-	// it was before: a gutter bar, a bold underline across the whole row, and
-	// the row padded so the underline reaches the right edge.
 	mark := func(st lipgloss.Style) lipgloss.Style {
 		if selected {
 			return st.Underline(true).Bold(true)
@@ -356,17 +513,16 @@ func (m model) renderRow(r Record, selected bool, w int) string {
 	if selected {
 		gutter = selBarStyle.Render("▌") + " "
 	}
-	stamp := mark(greyStyle).Render(r.Day() + " " + r.Stamp())
-	src := mark(srcColour(r.Src)).Render(pad(r.Src, 7))
-	kind := mark(kindColour(r.Kind)).Render(pad(r.Kind, 9))
-
-	used := 2 + 14 + 1 + 7 + 1 + 9 + 1 + 1 + 1
-	msgW := w - used
-	if msgW < 10 {
-		msgW = 10
+	msgW := m.msgWidth(w)
+	cells := []string{
+		mark(greyStyle).Render(pad(r.Day()+" "+r.Stamp(), columns[0].width)),
+		mark(srcColour(r.Src)).Render(pad(r.Src, columns[1].width)),
+		mark(kindColour(r.Kind)).Render(pad(r.Kind, columns[2].width)),
+		mark(dimStyle).Render(pad(r.Actor, columns[3].width)),
+		mark(lipgloss.NewStyle()).Render(pad(oneLine(r.Msg, msgW), msgW)),
+		mark(markColour(r)).Render(pad(r.Mark(), columns[5].width)),
 	}
-	msg := mark(lipgloss.NewStyle()).Render(pad(oneLine(r.Msg, msgW), msgW))
-	return fmt.Sprintf("%s%s %s %s %s %s", gutter, stamp, src, kind, msg, mark(markColour(r)).Render(r.Mark()))
+	return gutter + strings.Join(cells, " ")
 }
 
 // The mark is the fastest thing on the line to read, so it carries colour.
@@ -389,23 +545,26 @@ func (m model) renderStatus(w int) string {
 	}
 	shown := len(m.view)
 	total := len(m.all)
+	if total == 0 {
+		return dimStyle.Render(truncate("waiting for "+m.path+" · nothing has been written to it yet", w))
+	}
 	follow := "held"
 	if m.follow {
 		follow = "following"
 	}
-	where := focusStyle.Render("list")
+	focus := "list"
 	if m.focus == focusDetail {
-		where = focusStyle.Render("details")
+		focus = "details"
 	}
-	s := fmt.Sprintf("%d of %d  ·  %s  ·  focus %s  ·  ctrl+d details  ·  tab focus  ·  esc clear",
-		shown, total, follow, where)
+	s := fmt.Sprintf("%d of %d  ·  %s  ·  tab focus %s  ·  enter details  ·  esc clear and follow  ·  %s",
+		shown, total, follow, focusStyle.Render(focus), Build)
 	return dimStyle.Render(truncate(s, w))
 }
 
 func (m model) renderDetail() string {
 	head := dimStyle.Render("details")
-	if m.selIndex() < 0 {
-		head = dimStyle.Render("filter help")
+	if m.helping || m.selIndex() < 0 {
+		head = dimStyle.Render("the filter language")
 	}
 	return head + "\n" + m.detail.View()
 }

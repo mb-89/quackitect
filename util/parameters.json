@@ -1,0 +1,122 @@
+{
+  "$comment": "ONE TREE. Everything that changes how the system runs is declared here. A group marked shown becomes a section in the sidebar. Types are pyqtgraph's and JSON Schema's: group, bool, int, float, str, list, action, status.",
+  "name": "quackitect",
+  "type": "group",
+  "children": [
+    {
+      "name": "panel",
+      "type": "group",
+      "children": [
+        {
+          "name": "shown",
+          "type": "strlist",
+          "default": [
+            "control"
+          ],
+          "help": "Which groups appear in the sidebar. The gear chooses them."
+        }
+      ]
+    },
+    {
+      "name": "control",
+      "title": "agent and engine control",
+      "type": "group",
+      "children": [
+        {
+          "name": "engine",
+          "type": "status",
+          "command": "quackitect.startAgent",
+          "stopCommand": "quackitect.stopEngine",
+          "labels": {
+            "idle": "start",
+            "busy": "start",
+            "good": "stop",
+            "bad": "start"
+          },
+          "titles": {
+            "idle": "start",
+            "busy": "starting",
+            "good": "stop",
+            "bad": "start again"
+          }
+        },
+        {
+          "name": "log",
+          "type": "action",
+          "label": "show log",
+          "command": "quackitect.showLog",
+          "title": "open the log window in a terminal"
+        },
+        {
+          "name": "home",
+          "type": "action",
+          "label": "home",
+          "command": "quackitect.welcome",
+          "title": "the engine's own home page, not the project it drives"
+        },
+        {
+          "name": "spacer",
+          "type": "gap"
+        },
+        {
+          "name": "init",
+          "type": "action",
+          "label": "init",
+          "command": "quackitect.init",
+          "title": "make this folder a project, or a vehicle that carries the method"
+        }
+      ]
+    },
+    {
+      "name": "limits",
+      "title": "limits",
+      "type": "group",
+      "children": [
+        {
+          "name": "heartbeat_seconds",
+          "title": "heartbeat",
+          "type": "int",
+          "default": 5,
+          "min": 1,
+          "max": 60,
+          "narrow": "smaller",
+          "help": "Seconds between heartbeats. A smaller number is taken. A larger one is ignored."
+        },
+        {
+          "name": "ready_budget_ms",
+          "title": "ready in",
+          "type": "int",
+          "default": 15000,
+          "min": 1000,
+          "max": 15000,
+          "step": 500,
+          "narrow": "smaller",
+          "help": "Milliseconds allowed from the press to a ready agent. Missing it turns the light red."
+        }
+      ]
+    },
+    {
+      "name": "guards",
+      "title": "guards",
+      "type": "group",
+      "children": [
+        {
+          "name": "guard_projections",
+          "title": "projections",
+          "type": "bool",
+          "default": true,
+          "narrow": "on",
+          "help": "Refuse a write to a projection. It can be turned on and never off."
+        },
+        {
+          "name": "stop_needs_claim",
+          "title": "stop needs a claim",
+          "type": "bool",
+          "default": true,
+          "narrow": "on",
+          "help": "Refuse every stop the agent has not claimed a sanctioned reason for. The engine names which reasons those are."
+        }
+      ]
+    }
+  ]
+}

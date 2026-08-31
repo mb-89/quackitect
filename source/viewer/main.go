@@ -14,11 +14,28 @@ import (
 func main() {
 	help := flag.Bool("help", false, "print the keys and the filter language")
 	demo := flag.Bool("demo", false, "write a made-up log twice a second and view it")
+	keys := flag.Bool("keys", false, "print every key this terminal sends, and nothing else")
+	version := flag.Bool("version", false, "print which build this is and exit")
 	flag.Parse()
 	if *help {
 		fmt.Println(FilterHelp)
 		return
 	}
+	// What a terminal actually sends. Run it where a key does not work and
+	// the answer is on the screen rather than in a guess.
+	// A terminal keeps the process it started, so a window can outlive the
+	// build it was started from. The stamp is on screen and in --version, so
+	// nobody has to wonder which one is running.
+	if *version {
+		fmt.Println(Build)
+		return
+	}
+
+	if *keys {
+		showKeys()
+		return
+	}
+
 	if *demo {
 		path, err := runDemo()
 		if err != nil {
@@ -35,10 +52,8 @@ func main() {
 		os.Exit(2)
 	}
 	path := args[0]
-	if _, err := os.Stat(path); err != nil {
-		fmt.Fprintf(os.Stderr, "cannot read %s: %v\n", path, err)
-		os.Exit(1)
-	}
+	// A file that is not there yet is not an error. The window can be opened
+	// before the engine writes anything, and it fills when it does.
 	run(path)
 }
 

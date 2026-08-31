@@ -2,53 +2,373 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"regexp"
 	"strings"
 )
 
-// ErrIncomplete means the person is still typing, not that they typed
-// something wrong. A pattern is opened with a slash and closed with one, and
-// between those two keystrokes the expression is neither valid nor an error.
-// Treating it as a literal is what blanks the view on every keystroke.
+// The filter language is KQL, the query language Kibana uses, with one
+// borrowed addition. It was not invented here.
+//
+//   bare word            every column, and every detail
+//   name: value          that column
+//   name: "two words"    the phrase, in that column
+//   a and b   a or b     combine. The keywords are not case sensitive
+//   not a     -a         remove
+//   ( a or b ) and c     group
+//   name: val*           the wildcard KQL supports
+//   details: word        anything the details pane shows for that line
+//
+// The addition is /pattern/, which is Lucene's way of writing a regular
+// expression. KQL has no regular expressions, and a log window is where they
+// earn their keep.
+//
+//   /pat/                every column matches it
+//   name: /pat/          that column matches it
+//
+// Terms with nothing between them are combined with and, as in KQL.
+
 var ErrIncomplete = errors.New("still typing")
 
-// A Filter is a list of terms that must all match. Nothing here is clever. The
-// three shapes below are the whole language, and the help text in the detail
-// pane is generated from this file so the two cannot disagree.
 type Filter struct {
 	Source string
-	terms  []term
+	root   node
 }
 
-type term struct {
-	field  string         // empty means every column
-	needle string         // substring match, case folded
-	re     *regexp.Regexp // set instead of needle when the term was a pattern
-	negate bool
+type node interface{ match(Record) bool }
+
+type andNode struct{ l, r node }
+type orNode struct{ l, r node }
+type notNode struct{ n node }
+type clause struct {
+	field  string
+	needle string
+	re     *regexp.Regexp
+}
+
+func (n andNode) match(r Record) bool { return n.l.match(r) && n.r.match(r) }
+func (n orNode) match(r Record) bool  { return n.l.match(r) || n.r.match(r) }
+func (n notNode) match(r Record) bool { return !n.n.match(r) }
+
+func (c clause) match(r Record) bool {
+	switch strings.ToLower(c.field) {
+	case "":
+		return c.hit(r.Haystack())
+	case "details", "detail":
+		// Everything the details pane shows, not only the extra fields. A
+		// person filtering on details means what they can see there.
+		return c.hit(r.Detail())
+	}
+	v, found := r.Field(c.field)
+	if !found {
+		// A column nobody has heard of matches nothing. It is a typo, and a
+		// typo that matched everything would look like a working filter.
+		return false
+	}
+	return c.hit(v)
+}
+
+func (c clause) hit(s string) bool {
+	if c.re != nil {
+		return c.re.MatchString(s)
+	}
+	return strings.Contains(strings.ToLower(s), c.needle)
+}
+
+func (f Filter) Empty() bool         { return f.root == nil }
+func (f Filter) Match(r Record) bool { return f.root == nil || f.root.match(r) }
+
+// ---- reading the text ----
+
+type token struct {
+	kind string // word quoted regex ( ) and or not colon
+	text string
+}
+
+func lex(s string) ([]token, error) {
+	var out []token
+	rs := []rune(s)
+	for i := 0; i < len(rs); {
+		c := rs[i]
+		switch {
+		case c == ' ' || c == '\t':
+			i++
+		case c == '(' || c == ')':
+			out = append(out, token{string(c), string(c)})
+			i++
+		case c == ':':
+			out = append(out, token{"colon", ":"})
+			i++
+		case c == '"':
+			j := i + 1
+			for j < len(rs) && rs[j] != '"' {
+				j++
+			}
+			if j >= len(rs) {
+				return nil, ErrIncomplete // the closing quote has not been typed
+			}
+			out = append(out, token{"quoted", string(rs[i+1 : j])})
+			i = j + 1
+		case c == '/':
+			j := i + 1
+			for j < len(rs) && rs[j] != '/' {
+				if rs[j] == '\\' {
+					j++
+				}
+				j++
+			}
+			if j >= len(rs) {
+				return nil, ErrIncomplete // the closing slash has not been typed
+			}
+			out = append(out, token{"regex", string(rs[i+1 : j])})
+			i = j + 1
+		default:
+			j := i
+			for j < len(rs) && !strings.ContainsRune(" \t():\"", rs[j]) {
+				j++
+			}
+			w := string(rs[i:j])
+			switch strings.ToLower(w) {
+			case "and", "or", "not":
+				out = append(out, token{strings.ToLower(w), w})
+			default:
+				out = append(out, token{"word", w})
+			}
+			i = j
+		}
+	}
+	return out, nil
+}
+
+type parser struct {
+	t []token
+	i int
+}
+
+func ParseFilter(s string) (Filter, error) {
+	toks, err := lex(s)
+	if err != nil {
+		return Filter{}, err
+	}
+	if len(toks) == 0 {
+		return Filter{Source: s}, nil
+	}
+	// A pattern that will not compile is an error, not a filter that matches
+	// nothing. The view keeps the last one that worked and the line under the
+	// list says which.
+	if err := CompileError(s); err != nil {
+		return Filter{}, err
+	}
+	p := &parser{t: toks}
+	n, err := p.parseOr()
+	if err != nil {
+		return Filter{}, err
+	}
+	if p.i != len(p.t) {
+		return Filter{}, fmt.Errorf("cannot read %q", p.t[p.i].text)
+	}
+	return Filter{Source: s, root: n}, nil
+}
+
+func (p *parser) peek() string {
+	if p.i < len(p.t) {
+		return p.t[p.i].kind
+	}
+	return ""
+}
+
+func (p *parser) parseOr() (node, error) {
+	left, err := p.parseAnd()
+	if err != nil {
+		return nil, err
+	}
+	for p.peek() == "or" {
+		p.i++
+		right, err := p.parseAnd()
+		if err != nil {
+			return nil, err
+		}
+		left = orNode{left, right}
+	}
+	return left, nil
+}
+
+func (p *parser) parseAnd() (node, error) {
+	left, err := p.parseUnary()
+	if err != nil {
+		return nil, err
+	}
+	for {
+		if p.peek() == "and" {
+			p.i++
+		} else if k := p.peek(); k != "word" && k != "quoted" && k != "regex" && k != "(" && k != "not" {
+			// Terms with nothing between them are combined with and, so
+			// anything that can start a term continues the list.
+			return left, nil
+		}
+		right, err := p.parseUnary()
+		if err != nil {
+			return nil, err
+		}
+		left = andNode{left, right}
+	}
+}
+
+func (p *parser) parseUnary() (node, error) {
+	if p.peek() == "not" {
+		p.i++
+		n, err := p.parseUnary()
+		if err != nil {
+			return nil, err
+		}
+		return notNode{n}, nil
+	}
+	return p.parsePrimary()
+}
+
+func (p *parser) parsePrimary() (node, error) {
+	switch p.peek() {
+	case "(":
+		p.i++
+		n, err := p.parseOr()
+		if err != nil {
+			return nil, err
+		}
+		if p.peek() != ")" {
+			return nil, ErrIncomplete // the closing bracket has not been typed
+		}
+		p.i++
+		return n, nil
+	case "word", "quoted", "regex":
+		return p.parseClause()
+	case "":
+		// The text ends where a term was expected, which is what half a
+		// filter looks like.
+		return nil, ErrIncomplete
+	}
+	return nil, fmt.Errorf("cannot read %q", p.t[p.i].text)
+}
+
+func (p *parser) parseClause() (node, error) {
+	first := p.t[p.i]
+	p.i++
+	field := ""
+	// A word followed by a colon names a column. Anything else is a value.
+	if first.kind == "word" && p.peek() == "colon" {
+		field = strings.TrimPrefix(first.text, "-")
+		if strings.HasPrefix(first.text, "-") {
+			p.i++
+			v, err := p.value()
+			if err != nil {
+				return nil, err
+			}
+			return notNode{clauseFor(field, v)}, nil
+		}
+		p.i++
+		v, err := p.value()
+		if err != nil {
+			return nil, err
+		}
+		return clauseFor(field, v), nil
+	}
+	if first.kind == "word" && strings.HasPrefix(first.text, "-") && len(first.text) > 1 {
+		return notNode{clauseFor("", token{"word", first.text[1:]})}, nil
+	}
+	return clauseFor("", first), nil
+}
+
+func (p *parser) value() (token, error) {
+	switch p.peek() {
+	case "word", "quoted", "regex":
+		t := p.t[p.i]
+		p.i++
+		return t, nil
+	}
+	return token{}, ErrIncomplete // the value has not been typed yet
+}
+
+func clauseFor(field string, v token) node {
+	c := clause{field: field}
+	switch {
+	case v.kind == "regex":
+		re, err := regexp.Compile("(?i)" + v.text)
+		if err != nil {
+			// An expression that will not compile matches nothing, and the
+			// line under the list says so. It never removes the whole view
+			// by accident.
+			c.needle = "\x00"
+			return c
+		}
+		c.re = re
+	case strings.Contains(v.text, "*"):
+		// The one wildcard KQL has.
+		parts := strings.Split(v.text, "*")
+		for i, part := range parts {
+			parts[i] = regexp.QuoteMeta(part)
+		}
+		c.re = regexp.MustCompile("(?i)" + strings.Join(parts, ".*"))
+	default:
+		c.needle = strings.ToLower(v.text)
+	}
+	return c
+}
+
+// CompileError reports a pattern that will not compile, separately from a
+// filter that is merely unfinished. The two call for different reactions.
+func CompileError(s string) error {
+	toks, err := lex(s)
+	if err != nil {
+		return nil
+	}
+	for _, t := range toks {
+		if t.kind != "regex" {
+			continue
+		}
+		if _, err := regexp.Compile("(?i)" + t.text); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 const FilterHelp = `FILTER
 
-Type to filter. There is no key to press first.
+The language is KQL, the one Kibana uses. It was not invented here, so what
+you already know about it holds.
 
-  word              every column contains "word"
-  name:word         that column contains "word"
-  /pattern/         every column matches the regular expression
-  name:/pattern/    that column matches it
-  -word             lines that contain "word" are removed
+  word                 every column, and every detail
+  name: value          that column
+  name: "two words"    the phrase, in that column
+  details: word        anything the details pane shows for that line
 
-Several terms narrow together. Every term must match.
+COMBINING
+
+  a b                  both. Terms with nothing between them mean and
+  a and b              both
+  a or b               either
+  not a                remove. -a means the same
+  (a or b) and c       group with brackets
+
+The keywords are not case sensitive. not binds tightest, then and, then or.
+
+MATCHING
+
+  val*                 the wildcard KQL has
+  /pattern/            a regular expression, written as Lucene writes it
+  name: /pattern/      the same, in one column
+
+Matching ignores case everywhere.
 
 COLUMNS
 
-  time  src  kind  actor  msg  session  ok
+  time  src  kind  actor  msg  session  ok  details
 
 Any field inside a record's details can also be named.
 
 WHILE TYPING
 
-A filter that is not finished yet is not an error. The last filter that worked
-stays on screen, and the line below the list says the new one is not valid.
+A filter that is not finished is not an error. The last filter that worked
+stays on screen, and the line below the list says which of the two it is.
 
 KEYS
 
@@ -60,101 +380,5 @@ KEYS
   esc            clear the filter
   ctrl+c         quit
 
-The newest line is followed only while the selection is on it. Move up and the
-list holds still, however much arrives.`
-
-func ParseFilter(s string) (Filter, error) {
-	if strings.Count(s, `"`)%2 == 1 {
-		return Filter{}, ErrIncomplete
-	}
-	f := Filter{Source: s}
-	for _, raw := range splitTerms(s) {
-		if raw == "" {
-			continue
-		}
-		t := term{}
-		if strings.HasPrefix(raw, "-") && len(raw) > 1 {
-			t.negate = true
-			raw = raw[1:]
-		}
-		body := raw
-		if i := strings.Index(raw, ":"); i > 0 {
-			t.field = raw[:i]
-			body = raw[i+1:]
-		}
-		// A leading slash is ambiguous: it opens a pattern, and it also starts
-		// a path. One slash means a pattern that is not closed yet. Two means
-		// the person meant it, and whether it ends with a slash decides which
-		// of the two it is.
-		if strings.HasPrefix(body, "/") && strings.Count(body, "/") < 2 {
-			return Filter{}, ErrIncomplete
-		}
-		if strings.HasPrefix(body, "/") && strings.HasSuffix(body, "/") {
-			re, err := regexp.Compile("(?i)" + body[1:len(body)-1])
-			if err != nil {
-				return Filter{}, err
-			}
-			t.re = re
-		} else {
-			t.needle = strings.ToLower(body)
-		}
-		f.terms = append(f.terms, t)
-	}
-	return f, nil
-}
-
-// splitTerms keeps a quoted phrase together. A person who types a message
-// fragment with a space in it means one term, not two.
-func splitTerms(s string) []string {
-	var out []string
-	var cur strings.Builder
-	inQuote := false
-	for _, r := range s {
-		switch {
-		case r == '"':
-			inQuote = !inQuote
-		case r == ' ' && !inQuote:
-			out = append(out, cur.String())
-			cur.Reset()
-		default:
-			cur.WriteRune(r)
-		}
-	}
-	out = append(out, cur.String())
-	return out
-}
-
-func (f Filter) Empty() bool { return len(f.terms) == 0 }
-
-func (f Filter) Match(r Record) bool {
-	for _, t := range f.terms {
-		hit := t.match(r)
-		if t.negate {
-			hit = !hit
-		}
-		if !hit {
-			return false
-		}
-	}
-	return true
-}
-
-func (t term) match(r Record) bool {
-	if t.field == "" {
-		return t.hit(r.Haystack())
-	}
-	v, found := r.Field(t.field)
-	if !found {
-		// A column nobody has heard of matches nothing. It is a typo, and a
-		// typo that matched everything would look like a working filter.
-		return false
-	}
-	return t.hit(v)
-}
-
-func (t term) hit(s string) bool {
-	if t.re != nil {
-		return t.re.MatchString(s)
-	}
-	return strings.Contains(strings.ToLower(s), t.needle)
-}
+The newest line is followed only while the selection is on it. Move up and
+the list holds still, however much arrives.`

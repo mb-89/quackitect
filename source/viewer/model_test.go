@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 	"testing"
@@ -10,7 +11,10 @@ import (
 )
 
 func rec(seq int64, src, kind, msg string) Record {
-	return Record{Seq: seq, Src: src, Kind: kind, Msg: msg,
+	// ID is the viewer's own identity for a record. In the running program it
+	// is the line number. Here it is the sequence, which is unique in these
+	// fixtures.
+	return Record{Seq: seq, ID: seq, Src: src, Kind: kind, Msg: msg,
 		Time: time.Date(2026, 8, 30, 14, 0, int(seq), 0, time.UTC),
 		Data: map[string]any{"path": fmt.Sprintf("/f/%d.txt", seq)}}
 }
@@ -75,10 +79,10 @@ func TestArrivingLinesDoNotMoveAHeldSelection(t *testing.T) {
 	if m.follow {
 		t.Fatal("following should stop as soon as the selection leaves the newest line")
 	}
-	sel, top := m.selSeq, m.top
+	sel, top := m.selID, m.top
 	m = arrive(m, rec(51, "agent", "call", "new one"), rec(52, "agent", "call", "another"))
-	if m.selSeq != sel {
-		t.Fatalf("selection moved from %d to %d", sel, m.selSeq)
+	if m.selID != sel {
+		t.Fatalf("selection moved from %d to %d", sel, m.selID)
 	}
 	if m.top != top {
 		t.Fatalf("the list scrolled: top %d became %d", top, m.top)
@@ -119,8 +123,8 @@ func TestFollowingResumesAtTheNewestLine(t *testing.T) {
 		t.Fatal("should follow again at the newest line")
 	}
 	m = arrive(m, rec(11, "agent", "call", "newest"))
-	if m.selSeq != 11 {
-		t.Fatalf("following should move the selection to the newest line, got %d", m.selSeq)
+	if m.selID != 11 {
+		t.Fatalf("following should move the selection to the newest line, got %d", m.selID)
 	}
 }
 
@@ -164,8 +168,14 @@ func TestFilterShapes(t *testing.T) {
 		{"/wr.te/", []int64{2, 3}},
 		{"msg:/^read/", []int64{1}},
 		{"-src:agent", []int64{2}},
+		{"not src:agent", []int64{2}},
+		{"src:agent or kind:refusal", []int64{1, 2, 3}},
+		{"(src:agent or kind:refusal) and wr", []int64{2, 3}},
+		{`msg:"read the file"`, []int64{1}},
+		{"details:2.txt", []int64{2}},
+		{"kind:ref*", []int64{2}},
 		{"src:agent note", []int64{3}},
-		{"path:/f/2.txt", []int64{2}},
+		{`path:"/f/2.txt"`, []int64{2}},
 		{"nosuchcolumn:x", nil},
 	}
 	for _, c := range cases {
@@ -195,11 +205,17 @@ func TestHalfTypedPatternKeepsTheLastGoodFilter(t *testing.T) {
 	if kept == 0 {
 		t.Fatal("setup: expected some lines")
 	}
-	// An unterminated pattern is still a literal, so it is not an error. A
-	// closed pattern that will not compile is.
+	// An unfinished pattern is not an error: it is somebody typing. A closed
+	// one that will not compile is.
 	m = key(m, " ")
 	m = key(m, "/")
 	m = key(m, "[")
+	if m.filterBad != "still typing" {
+		t.Fatalf("an unfinished pattern should read as still typing, got %q", m.filterBad)
+	}
+	if len(m.view) != kept {
+		t.Fatalf("the view changed while the pattern was unfinished")
+	}
 	m = key(m, "/")
 	if m.filterBad == "" {
 		t.Fatal("an unfinished pattern should be reported")
@@ -221,17 +237,62 @@ func TestEscapeClearsTheFilter(t *testing.T) {
 	}
 }
 
+// The irritating walk, in one test. Hold the selection, filter, read, and
+// clear. Clearing the filter alone left the reader held, watching nothing.
+func TestEscapeAlsoReturnsToFollowing(t *testing.T) {
+	m := newTestModel(20)
+	m = key(m, "up")
+	m = key(m, "up")
+	if m.follow {
+		t.Fatal("two steps up should hold the selection")
+	}
+	m = key(m, "1")
+	m = key(m, "esc")
+
+	if !m.follow {
+		t.Fatal("escape should return to following")
+	}
+	if len(m.view) != 20 {
+		t.Fatalf("escape should restore every line, got %d", len(m.view))
+	}
+	if m.onFilter {
+		t.Fatal("escape should leave the filter box")
+	}
+	// Following means the newest line, and it means the next one too.
+	if m.selID != 20 {
+		t.Fatalf("the selection sits on %d, not the newest line", m.selID)
+	}
+	m = arrive(m, rec(21, "agent", "call", "newest"))
+	if m.selID != 21 {
+		t.Fatalf("it did not follow the arriving line, got %d", m.selID)
+	}
+}
+
+// Escape on an empty log has nothing to select, and the next line to arrive
+// is still the newest one.
+func TestEscapeFollowsEvenWithNothingToSelect(t *testing.T) {
+	m := newTestModel(0)
+	m = key(m, "esc")
+	if !m.follow {
+		t.Fatal("escape should follow an empty log")
+	}
+	m = arrive(m, rec(1, "agent", "call", "the first line"))
+	if m.selID != 1 {
+		t.Fatalf("it did not follow the first arriving line, got %d", m.selID)
+	}
+}
+
 // A record the filter removed must not take the selection with it silently.
 func TestSelectionSurvivesAFilterThatKeepsIt(t *testing.T) {
 	m := newTestModel(20)
 	m = key(m, "up")
 	m = key(m, "up")
-	want := m.selSeq
+	want := m.selID
 	for _, r := range "message" {
 		m = key(m, string(r))
 	}
-	if m.selSeq != want {
-		t.Fatalf("selection moved from %d to %d under a filter that kept it", want, m.selSeq)
+	if m.selID != want {
+		t.Fatalf("selection moved from %d to %d under a filter that kept it", want, m.selID)
 	}
 }
 
@@ -255,4 +316,41 @@ func TestRotationRestartsFromTheTop(t *testing.T) {
 	if tl.offset <= 0 {
 		t.Skip()
 	}
+}
+
+// A session is written by more than one process, and each carries its own
+// counter. Two records with the same seq must not make the selection stick.
+func TestTheSelectionSurvivesRepeatedSequenceNumbers(t *testing.T) {
+	m := newModel("/dev/null")
+	m.w, m.h = 120, 20
+	// What a real session looks like: the engine writes seq 1, then each
+	// guard is its own process and writes its own seq 1.
+	for i := 0; i < 3; i++ {
+		r := rec(1, "engine", "call", fmt.Sprintf("record %d", i+1))
+		m.all = append(m.all, ParseRecord(mustJSON(r), int64(i+1)))
+	}
+	m.rebuild()
+	if len(m.view) != 3 {
+		t.Fatalf("expected three records, got %d", len(m.view))
+	}
+	start := m.selIndex()
+	m = key(m, "up")
+	if m.selIndex() == start {
+		t.Fatalf("the selection did not move: still row %d of %d", m.selIndex()+1, len(m.view))
+	}
+	m = key(m, "down")
+	if m.selIndex() != start {
+		t.Fatalf("down did not return to row %d, it is on %d", start+1, m.selIndex()+1)
+	}
+}
+
+func mustJSON(r Record) string {
+	b, err := json.Marshal(map[string]any{
+		"t": r.Time.Format(time.RFC3339Nano), "seq": r.Seq, "src": r.Src,
+		"kind": r.Kind, "actor": r.Actor, "msg": r.Msg,
+	})
+	if err != nil {
+		panic(err)
+	}
+	return string(b)
 }

@@ -24,7 +24,17 @@ type Record struct {
 
 	Raw    string // the line as it was on disk
 	Broken bool   // the line did not parse
-	LineNo int64  // position in the file, used when Seq is absent
+	LineNo int64  // position in the file
+
+	// ID IS THIS PROGRAM'S OWN, and it is what the selection holds on to.
+	//
+	// The record's own seq cannot be used. A session is written by more than
+	// one process: the engine writes its own records, and every guard is a
+	// separate process started by the harness for one event. Each carries its
+	// own counter, so seq repeats across writers. Two records with the same
+	// seq make the selection stick, because moving to the next one lands on a
+	// number that still finds the first.
+	ID int64
 }
 
 type wire struct {
@@ -40,7 +50,7 @@ type wire struct {
 }
 
 func ParseRecord(line string, lineNo int64) Record {
-	r := Record{Raw: line, LineNo: lineNo}
+	r := Record{Raw: line, LineNo: lineNo, ID: lineNo}
 	var w wire
 	if err := json.Unmarshal([]byte(line), &w); err != nil {
 		r.Broken = true
@@ -134,6 +144,22 @@ func (r Record) Haystack() string {
 			b.WriteByte(' ')
 			fmt.Fprint(&b, r.Data[k])
 		}
+	}
+	return b.String()
+}
+
+// DetailValues is everything under details, names and values alike, as one
+// string. It is what details: searches.
+func (r Record) DetailValues() string {
+	if r.Data == nil {
+		return ""
+	}
+	var b strings.Builder
+	for _, k := range sortedKeys(r.Data) {
+		b.WriteString(k)
+		b.WriteByte(' ')
+		fmt.Fprint(&b, r.Data[k])
+		b.WriteByte(' ')
 	}
 	return b.String()
 }

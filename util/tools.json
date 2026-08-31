@@ -1,0 +1,21 @@
+{
+  "$comment": "WHAT THE MACHINE HAS. The engine runs each of these at boot and keeps the ones that answer. The argument differs per tool, which is why this is data: go says version with no dashes. Add a tool by adding a line. Nothing is compiled in.",
+  "tools": [
+    { "name": "python",     "args": ["--version"],  "for": "a helper script" },
+    { "name": "python3",    "args": ["--version"],  "for": "a helper script" },
+    { "name": "py",         "args": ["--version"],  "for": "a helper script, on Windows" },
+    { "name": "uv",         "args": ["--version"],  "for": "a helper script, with its own dependencies" },
+    { "name": "uvx",        "args": ["--version"],  "for": "running a published tool without installing it" },
+    { "name": "node",       "args": ["--version"],  "for": "a helper script" },
+    { "name": "npx",        "args": ["--version"],  "for": "running a published tool without installing it" },
+    { "name": "go",         "args": ["version"],    "for": "building a program" },
+    { "name": "bash",       "args": ["--version"],  "for": "a shell script" },
+    { "name": "pwsh",       "args": ["-NoProfile", "-Command", "$PSVersionTable.PSVersion.ToString()"], "for": "a shell script" },
+    { "name": "powershell", "args": ["-NoProfile", "-Command", "$PSVersionTable.PSVersion.ToString()"], "for": "a shell script" },
+    { "name": "git",        "args": ["--version"],  "for": "history and diffs" },
+    { "name": "rg",         "args": ["--version"],  "for": "searching file contents" },
+    { "name": "jq",         "args": ["--version"],  "for": "reading and shaping JSON" },
+    { "name": "curl",       "args": ["--version"],  "for": "fetching over the network" },
+    { "name": "gh",         "args": ["--version"],  "for": "GitHub, without a browser" }
+  ]
+}

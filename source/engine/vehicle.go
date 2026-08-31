@@ -1,0 +1,283 @@
+package main
+
+import (
+	"crypto/rand"
+	"encoding/hex"
+	"encoding/json"
+	"fmt"
+	"io"
+	"os"
+	"path/filepath"
+	"strings"
+	"time"
+)
+
+// A COPY, AND THE PROJECT IT DRIVES.
+//
+// The purpose of this system is to work on projects that are not itself. That
+// needs three things, and all three are this layer's:
+//
+//   1. A copy has an IDENTITY of its own, made when it is installed.
+//   2. A project records WHICH COPY drives it, by that identity.
+//   3. The register turns an identity into a place, so either tree can move.
+//
+// A path would do none of this. It goes stale the moment either end moves,
+// which is why v3 could record a driver and never resolve one.
+
+// CopyID is this installation's own identity. It lives in the method tree, so
+// a produced copy gets its own and a moved tree keeps its own.
+func CopyID(methodRoot string) (string, error) {
+	path := filepath.Join(methodRoot, ".se", "copy.json")
+	var got struct {
+		ID   string    `json:"id"`
+		Made time.Time `json:"made"`
+	}
+	if b, err := os.ReadFile(path); err == nil && json.Unmarshal(b, &got) == nil && got.ID != "" {
+		return got.ID, nil
+	}
+	buf := make([]byte, 8)
+	if _, err := rand.Read(buf); err != nil {
+		return "", err
+	}
+	got.ID = hex.EncodeToString(buf)
+	got.Made = time.Now().UTC()
+	b, err := json.MarshalIndent(got, "", "  ")
+	if err != nil {
+		return "", err
+	}
+	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+		return "", err
+	}
+	return got.ID, os.WriteFile(path, append(b, '\n'), 0o644)
+}
+
+// A project says which copy drives it. The file is the marker that a folder
+// is a project this system has worked on.
+type Driven struct {
+	Driver string    `json:"driver"`
+	Since  time.Time `json:"since"`
+}
+
+func projectPath(roots Roots) string { return roots.Private("project.json") }
+
+func LoadDriven(roots Roots) (Driven, bool) {
+	var p Driven
+	b, err := os.ReadFile(projectPath(roots))
+	if err != nil || json.Unmarshal(b, &p) != nil || p.Driver == "" {
+		return Driven{}, false
+	}
+	return p, true
+}
+
+// Attach records that this copy drives this folder. It is written on the
+// first start, so working on a new folder needs no ceremony.
+func Attach(roots Roots) (Driven, error) {
+	id, err := CopyID(roots.Method)
+	if err != nil {
+		return Driven{}, err
+	}
+	p := Driven{Driver: id, Since: time.Now().UTC()}
+	b, err := json.MarshalIndent(p, "", "  ")
+	if err != nil {
+		return p, err
+	}
+	if err := os.MkdirAll(filepath.Dir(projectPath(roots)), 0o755); err != nil {
+		return p, err
+	}
+	return p, os.WriteFile(projectPath(roots), append(b, '\n'), 0o644)
+}
+
+// Detach forgets which copy drives this folder, so the next start asks again.
+func Detach(roots Roots) error {
+	err := os.Remove(projectPath(roots))
+	if os.IsNotExist(err) {
+		return nil
+	}
+	return err
+}
+
+// TheOnlyCopy is what a folder with no recorded driver uses when there is no
+// choice to make. One copy is not a question.
+func TheOnlyCopy() (string, bool) {
+	var found []string
+	for _, dir := range registerDirs() {
+		for _, e := range readRegister(filepath.Join(dir, "registry.json")) {
+			found = append(found, e.MethodRoot)
+		}
+	}
+	if len(found) == 1 {
+		return found[0], true
+	}
+	return "", false
+}
+
+// FindDriver turns the recorded identity into a place, through the register.
+// An identity that is not on this machine is a fact, not an error: the copy
+// may simply be somewhere else.
+func FindDriver(roots Roots) (path string, known bool, recorded bool) {
+	p, ok := LoadDriven(roots)
+	if !ok {
+		return "", false, false
+	}
+	for _, dir := range registerDirs() {
+		for _, e := range readRegister(filepath.Join(dir, "registry.json")) {
+			if e.ID == p.Driver {
+				return e.MethodRoot, true, true
+			}
+		}
+	}
+	return "", false, true
+}
+
+// Produce makes a copy of the method somewhere else. The copy carries the
+// method and nothing else: no record of this tree's own work, no private
+// material, and no identity, so it makes its own on first use.
+func Produce(methodRoot, dest string) error {
+	if _, err := os.Stat(dest); err == nil {
+		return fmt.Errorf("%s is already there. A copy is made into a new place", dest)
+	}
+	return produce(methodRoot, dest)
+}
+
+// ProduceInto writes the method into a folder that already exists, which is
+// what making the folder you are standing in into a vehicle means.
+func ProduceInto(methodRoot, dest string) error {
+	if sameFile(methodRoot, dest) {
+		return fmt.Errorf("a copy cannot be made into the tree it is copied from")
+	}
+	return produce(methodRoot, dest)
+}
+
+func produce(methodRoot, dest string) error {
+	skip := map[string]bool{
+		".git":         true, // the tool's own development record does not travel
+		".se":          true, // private material, and the copy's identity
+		".bin":         true, // built programs, which the copy builds for itself
+		"node_modules": true,
+		"_to_delete":   true,
+	}
+	return filepath.Walk(methodRoot, func(p string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		rel, err := filepath.Rel(methodRoot, p)
+		if err != nil {
+			return err
+		}
+		if rel == "." {
+			return os.MkdirAll(dest, 0o755)
+		}
+		if skip[strings.Split(filepath.ToSlash(rel), "/")[0]] {
+			if info.IsDir() {
+				return filepath.SkipDir
+			}
+			return nil
+		}
+		out := filepath.Join(dest, rel)
+		if info.IsDir() {
+			return os.MkdirAll(out, info.Mode())
+		}
+		return copyFile(p, out, info.Mode())
+	})
+}
+
+func copyFile(from, to string, mode os.FileMode) error {
+	in, err := os.Open(from)
+	if err != nil {
+		return err
+	}
+	defer in.Close()
+	if err := os.MkdirAll(filepath.Dir(to), 0o755); err != nil {
+		return err
+	}
+	out, err := os.OpenFile(to, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, mode)
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+	_, err = io.Copy(out, in)
+	return err
+}
+
+// The register says which copies exist on this machine. The environment may
+// name where it lives, which is how a cloud box says so. An entry that no
+// longer resolves is skipped rather than treated as an error.
+type Registered struct {
+	ID         string `json:"id"`
+	Version    string `json:"version"`
+	MethodRoot string `json:"method_root"`
+	Registered string `json:"registered"`
+}
+
+func registerDirs() []string {
+	if s := os.Getenv("SE_REGISTRY"); s != "" {
+		return strings.Split(s, string(os.PathListSeparator))
+	}
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return nil
+	}
+	return []string{filepath.Join(home, ".se")}
+}
+
+func readRegister(path string) []Registered {
+	b, err := os.ReadFile(path)
+	if err != nil {
+		return nil
+	}
+	var all []Registered
+	if json.Unmarshal(b, &all) != nil {
+		return nil
+	}
+	out := all[:0:0]
+	for _, e := range all {
+		if e.MethodRoot == "" {
+			continue
+		}
+		if _, err := os.Stat(e.MethodRoot); err != nil {
+			continue
+		}
+		out = append(out, e)
+	}
+	return out
+}
+
+// RegisterCopy adds or replaces this copy in every register it can write.
+func RegisterCopy(methodRoot, version string) (string, error) {
+	id, err := CopyID(methodRoot)
+	if err != nil {
+		return "", err
+	}
+	var last error
+	wrote := false
+	for _, dir := range registerDirs() {
+		path := filepath.Join(dir, "registry.json")
+		entries := readRegister(path)
+		kept := entries[:0:0]
+		for _, e := range entries {
+			if e.ID != id && e.MethodRoot != methodRoot {
+				kept = append(kept, e)
+			}
+		}
+		kept = append(kept, Registered{ID: id, Version: version, MethodRoot: methodRoot,
+			Registered: time.Now().UTC().Format(time.RFC3339)})
+		b, err := json.MarshalIndent(kept, "", "  ")
+		if err != nil {
+			last = err
+			continue
+		}
+		if err := os.MkdirAll(dir, 0o755); err != nil {
+			last = err
+			continue
+		}
+		if err := os.WriteFile(path, append(b, '\n'), 0o644); err != nil {
+			last = err
+			continue
+		}
+		wrote = true
+	}
+	if wrote {
+		return id, nil
+	}
+	return id, last
+}

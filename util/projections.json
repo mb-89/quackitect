@@ -1,0 +1,58 @@
+{
+  "projections": [
+    {
+      "name": "agent protocol",
+      "target": "AGENTS.md",
+      "sources": [
+        "doc/guidance/voice.md",
+        "doc/guidance/behaviour.md"
+      ],
+      "wrap": "markdown"
+    },
+    {
+      "name": "copilot instructions",
+      "target": ".github/copilot-instructions.md",
+      "sources": [
+        "doc/guidance/voice.md",
+        "doc/guidance/behaviour.md"
+      ],
+      "wrap": "markdown"
+    },
+    {
+      "name": "claude output style",
+      "target": ".claude/output-styles/quackitect.md",
+      "sources": [
+        "doc/guidance/voice.md",
+        "doc/guidance/behaviour.md"
+      ],
+      "wrap": "frontmatter",
+      "frontmatter": {
+        "name": "quackitect"
+      }
+    },
+    {
+      "name": "claude cage",
+      "target": ".claude/settings.json",
+      "sources": [
+        "util/cage/claude-settings.json"
+      ],
+      "wrap": "none"
+    },
+    {
+      "name": "copilot cage",
+      "target": ".copilot/mcp-config.json",
+      "sources": [
+        "util/cage/copilot-mcp.json"
+      ],
+      "wrap": "none"
+    },
+    {
+      "name": "claude tool lane",
+      "target": ".mcp.json",
+      "sources": [
+        "util/cage/mcp.json"
+      ],
+      "wrap": "none"
+    }
+  ]
+}

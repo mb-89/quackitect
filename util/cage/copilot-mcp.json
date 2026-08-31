@@ -1,0 +1,11 @@
+{
+  "$comment": "GENERATED from util/cage/copilot-mcp.json. Edit the source, not this file.",
+  "mcpServers": {
+    "quackitect": {
+      "type": "local",
+      "command": "{{method}}/.bin/se-mcp",
+      "args": ["--method", "{{method}}", "--work", "{{work}}"],
+      "tools": ["*"]
+    }
+  }
+}

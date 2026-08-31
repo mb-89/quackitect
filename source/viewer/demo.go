@@ -26,9 +26,9 @@ type demoLine struct {
 
 var (
 	demoPaths = []string{
-		"docs/level-0-design.md", "engine/log.go", "setup/manifest.json",
+		"scratchpad/level-0-design.md", "engine/log.go", "setup/manifest.json",
 		"viewer/ui.go", ".se/notes/2026-08-30.md", "extension/package.json",
-		"guidance/method/front-desk.md", "docs/use-cases.md",
+		"guidance/method/front-desk.md", "scratchpad/use-cases.md",
 	}
 	demoTools  = []string{"read", "write", "search", "list", "run", "edit"}
 	demoActors = []string{"main", "helper-1", "helper-2"}

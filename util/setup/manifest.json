@@ -1,0 +1,71 @@
+{
+  "product": {
+    "id": "quackitect",
+    "name": "quackitect",
+    "version": "0.1.0"
+  },
+  "profiles": {
+    "desktop": [
+      "git",
+      "go",
+      "node",
+      "ripgrep",
+      "vscode"
+    ],
+    "headless": [
+      "git",
+      "go",
+      "node",
+      "ripgrep"
+    ]
+  },
+  "tools": {
+    "git": {
+      "probe": "git",
+      "winget": "Git.Git",
+      "apt": "git",
+      "why": "the archive is version history"
+    },
+    "go": {
+      "probe": "go",
+      "winget": "GoLang.Go",
+      "apt": "golang-go",
+      "why": "the engine and the log window are written in it"
+    },
+    "node": {
+      "probe": "node",
+      "winget": "OpenJS.NodeJS.LTS",
+      "apt": "nodejs",
+      "why": "the editor extension is built with it"
+    },
+    "ripgrep": {
+      "probe": "rg",
+      "winget": "BurntSushi.ripgrep.MSVC",
+      "apt": "ripgrep",
+      "why": "search"
+    },
+    "vscode": {
+      "probe": "code",
+      "winget": "Microsoft.VisualStudioCode",
+      "apt": "",
+      "why": "the intended user interface"
+    }
+  },
+  "builds": [
+    {
+      "name": "se",
+      "source": "source/engine",
+      "why": "the engine"
+    },
+    {
+      "name": "logview",
+      "source": "source/viewer",
+      "why": "the log window"
+    },
+    {
+      "name": "se-mcp",
+      "source": "source/mcp",
+      "why": "the tool lane between an agent and the engine"
+    }
+  ]
+}
