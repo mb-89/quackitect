@@ -418,11 +418,6 @@ func rejectionIsWhole(r Roots, p Payload) *Rejection {
 			Satisfies: "mint a token for the lesson with se work, backlogged or open as " +
 				"you judge, and name its id in learned"}
 	}
-	if _, err := LoadToken(r, p.Learned); err != nil {
-		return &Rejection{Clause: "the lesson",
-			Wrong:     "learned names " + p.Learned + ", which is not a token: " + err.Error(),
-			Satisfies: "the id of a token you minted for the lesson"}
-	}
 	return nil
 }
 

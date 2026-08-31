@@ -3,7 +3,7 @@ id: wk-cff23cb661
 seq: "-11"
 type: work
 title: two generic editors
-status: imp_submitted
+status: imp_done
 assignee: main
 scope: single-step
 traced: true

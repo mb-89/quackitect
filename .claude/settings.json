@@ -8,7 +8,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "C:/Users/ichbi/Desktop/ai/quackitect-v4/.bin/se.exe hook --method C:/Users/ichbi/Desktop/ai/quackitect-v4"
+            "command": "./.bin/se hook --method ."
           }
         ]
       }
@@ -19,7 +19,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "C:/Users/ichbi/Desktop/ai/quackitect-v4/.bin/se.exe hook --method C:/Users/ichbi/Desktop/ai/quackitect-v4"
+            "command": "./.bin/se hook --method ."
           }
         ]
       }
@@ -30,7 +30,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "C:/Users/ichbi/Desktop/ai/quackitect-v4/.bin/se.exe hook --method C:/Users/ichbi/Desktop/ai/quackitect-v4"
+            "command": "./.bin/se hook --method ."
           }
         ]
       }
@@ -41,7 +41,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "C:/Users/ichbi/Desktop/ai/quackitect-v4/.bin/se.exe hook --method C:/Users/ichbi/Desktop/ai/quackitect-v4"
+            "command": "./.bin/se hook --method ."
           }
         ]
       }
@@ -56,7 +56,7 @@
           },
           {
             "type": "command",
-            "command": "C:/Users/ichbi/Desktop/ai/quackitect-v4/.bin/se.exe hook --method C:/Users/ichbi/Desktop/ai/quackitect-v4"
+            "command": "./.bin/se hook --method ."
           }
         ]
       }
@@ -67,7 +67,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "C:/Users/ichbi/Desktop/ai/quackitect-v4/.bin/se.exe hook --method C:/Users/ichbi/Desktop/ai/quackitect-v4"
+            "command": "./.bin/se hook --method ."
           }
         ]
       }
@@ -78,7 +78,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "C:/Users/ichbi/Desktop/ai/quackitect-v4/.bin/se.exe hook --method C:/Users/ichbi/Desktop/ai/quackitect-v4"
+            "command": "./.bin/se hook --method ."
           }
         ]
       }
@@ -89,7 +89,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "C:/Users/ichbi/Desktop/ai/quackitect-v4/.bin/se.exe hook --method C:/Users/ichbi/Desktop/ai/quackitect-v4"
+            "command": "./.bin/se hook --method ."
           }
         ]
       }
@@ -100,7 +100,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "C:/Users/ichbi/Desktop/ai/quackitect-v4/.bin/se.exe hook --method C:/Users/ichbi/Desktop/ai/quackitect-v4"
+            "command": "./.bin/se hook --method ."
           }
         ]
       }
@@ -111,7 +111,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "C:/Users/ichbi/Desktop/ai/quackitect-v4/.bin/se.exe hook --method C:/Users/ichbi/Desktop/ai/quackitect-v4"
+            "command": "./.bin/se hook --method ."
           }
         ]
       }
@@ -122,7 +122,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "C:/Users/ichbi/Desktop/ai/quackitect-v4/.bin/se.exe hook --method C:/Users/ichbi/Desktop/ai/quackitect-v4"
+            "command": "./.bin/se hook --method ."
           }
         ]
       }
@@ -133,7 +133,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "C:/Users/ichbi/Desktop/ai/quackitect-v4/.bin/se.exe hook --method C:/Users/ichbi/Desktop/ai/quackitect-v4"
+            "command": "./.bin/se hook --method ."
           }
         ]
       }
@@ -144,7 +144,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "C:/Users/ichbi/Desktop/ai/quackitect-v4/.bin/se.exe hook --method C:/Users/ichbi/Desktop/ai/quackitect-v4"
+            "command": "./.bin/se hook --method ."
           }
         ]
       }
@@ -155,7 +155,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "C:/Users/ichbi/Desktop/ai/quackitect-v4/.bin/se.exe hook --method C:/Users/ichbi/Desktop/ai/quackitect-v4"
+            "command": "./.bin/se hook --method ."
           }
         ]
       }

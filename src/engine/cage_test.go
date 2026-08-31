@@ -53,9 +53,9 @@ func TestNoCagedFileNamesTheMachineItWasWrittenOn(t *testing.T) {
 			t.Fatalf("%s: %v", p.Name, err)
 		}
 		for i, line := range strings.Split(out, "\n") {
-			if strings.Contains(line, root) {
-				t.Errorf("%s (%s) line %d names this machine: %s",
-					p.Name, p.Target, i+1, strings.TrimSpace(line))
+			if said := namesTheMachine(line, root); said != "" {
+				t.Errorf("%s (%s) line %d names this machine as %s: %s",
+					p.Name, p.Target, i+1, said, strings.TrimSpace(line))
 			}
 		}
 	}
@@ -79,8 +79,30 @@ func TestNoCommittedProjectionNamesTheMachine(t *testing.T) {
 		if err != nil {
 			continue // not written yet, which the check above already covers
 		}
-		if strings.Contains(string(b), root) {
-			t.Errorf("%s names this machine. Run the engine to write it again", p.Target)
+		if said := namesTheMachine(string(b), root); said != "" {
+			t.Errorf("%s names this machine as %s. Run the engine to write it again",
+				p.Target, said)
 		}
 	}
+}
+
+// namesTheMachine answers the spelling of this machine's root that a text
+// carries, or nothing.
+//
+// A PATH HAS TWO SPELLINGS HERE AND ONLY ONE OF THEM WAS LOOKED FOR.
+// filepath.Abs answers this machine's root with backslashes, and every file the
+// cage writes uses forward slashes, because that is what JSON and a shell both
+// want. So the check compared the spelling nothing writes, and on this platform
+// it could not fail for the defect it exists to catch. On Linux the two are one
+// string, which is why it passed there.
+//
+// WATCHED: with util/cage/mcp.json holding this machine's path in full, written
+// with forward slashes exactly as a projection writes one, the check was green.
+func namesTheMachine(text, root string) string {
+	for _, spelling := range []string{root, filepath.ToSlash(root)} {
+		if strings.Contains(text, spelling) {
+			return spelling
+		}
+	}
+	return ""
 }
