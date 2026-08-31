@@ -364,13 +364,18 @@ func main() {
 		log.Write("engine", "tools", "engine", "no candidate tool answered", No(), nil)
 	}
 
-	log.Write("engine", "start", "engine", "engine started", Yes(), map[string]any{
+	startRecord := map[string]any{
 		"method_root": roots.Method,
 		"work_root":   roots.Work,
 		"log":         log.Path(),
 		"pid":         os.Getpid(),
-		"build":       Build,
-	})
+	}
+	// A build that was never stamped says nothing, so it is left out rather
+	// than written as the word a variable holds when nobody set it.
+	if Build != "unstamped" {
+		startRecord["build"] = Build
+	}
+	log.Write("engine", "start", "engine", "engine started", Yes(), startRecord)
 
 	// The extension needs to know where to point the viewer, and a person
 	// running this by hand needs the same fact. One line of JSON on standard

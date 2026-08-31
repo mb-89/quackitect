@@ -556,8 +556,14 @@ func (m model) renderStatus(w int) string {
 	if m.focus == focusDetail {
 		focus = "details"
 	}
-	s := fmt.Sprintf("%d of %d  ·  %s  ·  tab focus %s  ·  enter details  ·  esc clear and follow  ·  %s",
-		shown, total, follow, focusStyle.Render(focus), Build)
+	// A BUILD THAT WAS NEVER STAMPED SAYS NOTHING, so it is not shown. The
+	// word is what a variable holds when nobody set it, and putting it on the
+	// bar asks the reader to work that out.
+	s := fmt.Sprintf("%d of %d  ·  %s  ·  tab focus %s  ·  enter details  ·  esc clear and follow",
+		shown, total, follow, focusStyle.Render(focus))
+	if Build != "unstamped" {
+		s += "  ·  " + Build
+	}
 	return dimStyle.Render(truncate(s, w))
 }
 

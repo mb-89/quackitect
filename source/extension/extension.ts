@@ -33,7 +33,7 @@ export function activate(context: vscode.ExtensionContext) {
       postValues(context);
     }),
     vscode.commands.registerCommand("quackitect.startEngine", () => startEngine(context)),
-    vscode.commands.registerCommand("quackitect.stopEngine", () => stopEngine()),
+    vscode.commands.registerCommand("quackitect.stopEngine", () => stopEngine(context)),
     vscode.commands.registerCommand("quackitect.showLog", () => showLog(context)),
     vscode.commands.registerCommand("quackitect.showWork", () => toggleWork(context)),
     vscode.commands.registerCommand("quackitect.mintWork", (arg?: { text: string; kind: string }) =>
@@ -59,7 +59,7 @@ function reattach(context: vscode.ExtensionContext): boolean {
   if (!running) return false;
   engineLog = running.log;
   setState("good", "");
-  armLivenessCheck();
+  armLivenessCheck(context);
   return true;
 }
 
@@ -582,7 +582,7 @@ function startEngine(context: vscode.ExtensionContext) {
   watchdog = setTimeout(() => {
     if (engineState === "busy") {
       setState("bad", "the engine did not report ready in time");
-      stopEngine();
+      stopEngine(context);
     }
   }, READY_MS);
 
@@ -595,7 +595,7 @@ function startEngine(context: vscode.ExtensionContext) {
           engineLog = msg.log;
           clearTimeout(watchdog);
           setState("good", "");
-          armLivenessCheck();
+          armLivenessCheck(context);
         }
         if (msg.beat !== undefined) {
           // A real heartbeat, from the engine itself. It does not go in the
@@ -631,14 +631,23 @@ function startEngine(context: vscode.ExtensionContext) {
 
 // Liveness. The engine beats on its own output, so nothing has to be polled
 // and nothing has to be parsed out of the record.
-function armLivenessCheck() {
+// LIVENESS IS READ FROM DISK, whether this window started the engine or found
+// it. A heartbeat that arrives on a pipe reaches only whoever started it, so a
+// reattached window would watch a pipe that does not exist and call a healthy
+// engine dead within three beats.
+function armLivenessCheck(context: vscode.ExtensionContext) {
   stopWatching();
-  lastBeat = Date.now();
   beatTimer = setInterval(() => {
     if (engineState !== "good") return;
-    // Two missed beats and more. The engine is running and not answering,
-    // which is the failure a heartbeat exists to find.
-    if (Date.now() - lastBeat > HEARTBEAT_MS * 2.5) {
+    const running = whatIsRunning(context);
+    if (!running) {
+      setState("bad", "the engine is gone");
+      return;
+    }
+    // Two missed beats and more. The engine is there and not answering, which
+    // is the failure a heartbeat exists to find.
+    const beat = running.beat ? Date.parse(running.beat) : 0;
+    if (beat && Date.now() - beat > HEARTBEAT_MS * 2.5) {
       setState("bad", "the engine stopped answering");
     }
   }, 1000);
@@ -695,9 +704,22 @@ function waitForState(want: EngineState, ms: number): Promise<boolean> {
   });
 }
 
-function stopEngine() {
+// STOPPING WORKS ON AN ENGINE THIS WINDOW DID NOT START. After a reload there
+// is no child to kill, and the button would have done nothing at all.
+function stopEngine(context?: vscode.ExtensionContext) {
   stopWatching();
-  engine?.kill();
+  if (engine) {
+    engine.kill();
+  } else if (context) {
+    const running = whatIsRunning(context);
+    if (running) {
+      try {
+        process.kill(running.pid);
+      } catch {
+        // It went while we were looking at it, which is the outcome anyway.
+      }
+    }
+  }
   engine = undefined;
   engineLog = undefined;
   setState("idle", "");
