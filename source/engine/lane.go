@@ -50,6 +50,8 @@ func runWork(args []string) {
 	by := fs.String("by", "", "who is minting it. The caller knows, and nothing here can work it out")
 	set := fs.String("set", "", "instead of minting: change one thing about a token, by id")
 	bucket := fs.String("bucket", "", "with set: file it under this grouping. Empty clears it")
+	field := fs.String("field", "", "with set: which field to write")
+	to := fs.String("to", "", "with set: what to write in it")
 	_ = fs.Parse(args)
 
 	roots, err := FindRoots(*work)
@@ -65,6 +67,20 @@ func runWork(args []string) {
 		if err != nil {
 			answerJSON(map[string]any{"error": err.Error()})
 			os.Exit(1)
+		}
+		if *field != "" {
+			if err := WriteField(&t, *field, *to); err != nil {
+				answerJSON(map[string]any{"error": err.Error()})
+				os.Exit(1)
+			}
+			if err := SaveToken(roots, t); err != nil {
+				answerJSON(map[string]any{"error": err.Error()})
+				os.Exit(1)
+			}
+			inSession(roots, "work", or2(*by, "main"), t.ID+" "+*field+" is now "+or2(*to, "empty"), Yes(),
+				map[string]any{"id": t.ID, "field": *field})
+			answerJSON(t)
+			return
 		}
 		// A DERIVED GROUP CLEARS THE BUCKET. Saying where the work belongs is
 		// a stronger statement than the grouping it was filed under, so the
@@ -186,6 +202,7 @@ func runQuery(args []string) {
 	name := fs.String("view", "work", "which view file, by name or path")
 	which := fs.String("pane", "", "which view inside the file (default: the first)")
 	list := fs.Bool("list", false, "print the views that exist and exit")
+	panes := fs.Bool("panes", false, "print the views this file declares, in order, and exit")
 	_ = fs.Parse(args)
 
 	roots, err := FindRoots(*work)
@@ -205,6 +222,16 @@ func runQuery(args []string) {
 	if err != nil {
 		answerJSON(map[string]any{"error": err.Error()})
 		os.Exit(1)
+	}
+	// THE FILE DECLARES ITS PANES. Two views side by side is what the file
+	// says, not what this program decided.
+	if *panes {
+		var names []string
+		for _, v := range base.Views {
+			names = append(names, v.Name)
+		}
+		answerJSON(map[string]any{"panes": names})
+		return
 	}
 	view := base.Views[0]
 	if *which != "" {

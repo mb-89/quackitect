@@ -1,16 +1,20 @@
-// THE EDITOR IS GENERIC, AND THE WORK EDITOR IS ONE VIEW IN IT.
+// THE EDITOR IS GENERIC, AND THE WORK EDITOR IS ONE VIEW FILE IN IT.
 //
 // It draws whatever `se query` answers. It knows about columns, groups and
-// pinned groups, and it knows nothing about work: the view file decides what
-// is selected and what it is grouped by, and the engine decides what a row is.
-// A second source drawn here later is a second view name, not a change to this.
+// pinned groups, and it knows nothing about work: the view file decides what is
+// selected and what it is grouped by, and the engine decides what a row is. A
+// second source drawn here later is a second view name, not a change to this.
+//
+// TWO PANES, ONE HEADER. The view file declares two views and both are drawn
+// side by side. Two cards would each bring a header, and the reader would be
+// looking at three bars stacked over one list.
+//
+// THE PAGE IS BUILT ONCE AND THE DATA CHANGES INSIDE IT. Replacing the page
+// throws away what the reader was doing: which groups they folded and where
+// they had scrolled to. The data changed. What they were looking at did not.
 //
 // IT READS FILES AND RUNS THE ENGINE. There is no server and no port. The
 // engine is the only writer, so the editor asks it rather than touching a note.
-//
-// PINNED GROUPS DO NOT SCROLL. They sit above the pane that does, which is
-// what pinning means. The header row is sticky inside that pane for the same
-// reason: it stays put while rows go past.
 //
 // THE HOST OWNS THE LOOK. Fonts and colours are the editor's own, so the page
 // carries no palette of its own and adds no frame around a window VS Code has
@@ -43,19 +47,46 @@ export type Table = {
   error?: string;
 };
 
-export function editorHtml(t: Table, views: string[], view: string): string {
-  const b = editorBody(t);
-  return page(views, view, b.pinned, b.scrolling, b.total, b.counts);
-}
-
-// THE PAGE IS BUILT ONCE AND THE DATA CHANGES INSIDE IT.
-//
-// Replacing the whole page on every change throws away what the reader was
-// doing: which groups they folded, and where they had scrolled to. The data
-// changed. What they were looking at did not.
+export type Pane = { side: string; table: Table };
 export type Body = { pinned: string; scrolling: string; total: number; counts: Tally[] };
 
-export function editorBody(t: Table): Body {
+export function editorHtml(panes: Pane[], views: string[], view: string): string {
+  const first = panes[0]?.table;
+  const tabs = views
+    .map((v) => `<button class="tab${v === view ? " on" : ""}" data-view="${esc(v)}">${esc(v)}</button>`)
+    .join("");
+  const seam = `<div class="seam" hidden></div>`;
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline';">
+<style>${css()}</style>
+</head>
+<body>
+<div class="bar">${tabs}
+  <button class="second" id="second" title="show a second column">&#9707;</button>
+  <span class="counts">${tallyHtml(first?.counts ?? [])}</span>
+  <span class="total">${first?.total ?? 0}</span>
+</div>
+<div class="panes">
+${panes.map((p, i) => paneHtml(p, i > 0)).join(seam)}
+</div>
+<script>${script()}</script>
+</body>
+</html>`;
+}
+
+// A pane is the pinned groups that do not scroll, and the part that does.
+function paneHtml(p: Pane, hidden: boolean): string {
+  const b = paneBody(p.table);
+  return `<div class="pane-wrap" data-side="${esc(p.side)}"${hidden ? " hidden" : ""}>
+  <div class="top">${b.pinned}</div>
+  <div class="pane">${b.scrolling}</div>
+</div>`;
+}
+
+export function paneBody(t: Table): Body {
   if (t.error) {
     return { pinned: `<p class="bad">${esc(t.error)}</p>`, scrolling: "", total: 0, counts: [] };
   }
@@ -72,21 +103,21 @@ ${(t.groups ?? []).map((g) => groupHtml(g, cols, t)).join("")}`,
 }
 
 // THE LAST COLUMN TAKES WHATEVER IS LEFT, so the table always fills its pane.
-// Giving it a width too would leave a dead strip down the right.
+// Giving it a width too leaves a dead strip down the right.
 function head(c: string, t: Table, last: boolean): string {
   const w = last ? 0 : t.widths?.[c];
-  return `<th${w ? ` style="width:${w}px"` : ""}>${esc(t.heads?.[c] ?? c)}</th>`;
+  return `<th data-col="${esc(c)}"${w ? ` style="width:${w}px"` : ""}>${esc(t.heads?.[c] ?? c)}</th>`;
 }
 
 // A group is a heading and its rows. It carries what a drop into it would
-// write, so a renderer can offer the target without knowing what the level
-// was computed from.
+// write, so a renderer can offer the target without knowing what the level was
+// computed from.
 function groupHtml(g: Group, cols: string[], t: Table): string {
   const kids = (g.groups ?? []).map((k) => groupHtml(k, cols, t)).join("");
   const rows = (g.lines ?? []).map((l) => rowHtml(l, cols, t)).join("");
   const drop = g.sets ? ` data-sets="${esc(g.sets)}" data-into="${esc(g.name)}"` : "";
-  // The key a fold is remembered by. Its name and its depth, because two
-  // groups with the same name at different depths are two groups.
+  // The key a fold is remembered by. Its name and its depth, because two groups
+  // with the same name at different depths are two groups.
   const key = `${g.pinned ? "pin" : "g"}:${g.depth}:${g.name}`;
   return `<section class="group${g.pinned ? " pinned" : ""}${g.shut ? " shut" : ""}"
     data-key="${esc(key)}" style="--depth:${g.depth}"${drop}>
@@ -100,46 +131,46 @@ function groupHtml(g: Group, cols: string[], t: Table): string {
 </section>`;
 }
 
+// A CELL SAYS WHETHER IT CAN BE EDITED, and why not when it cannot. A cell that
+// silently ignores a double-click reads as a broken table.
 function rowHtml(l: Line, cols: string[], t: Table): string {
+  const last = cols[cols.length - 1];
   const cells = cols
     .map((c) => {
       const v = l.cells?.[c]?.value ?? "";
-      const opens = t.opens?.[c] ? " class=\"opens\"" : "";
-      const w = c === cols[cols.length - 1] ? 0 : t.widths?.[c];
-      return `<td${opens}${w ? ` style="width:${w}px"` : ""}>${esc(v)}</td>`;
+      const w = c === last ? 0 : t.widths?.[c];
+      const width = w ? ` style="width:${w}px"` : "";
+      if (t.opens?.[c]) {
+        return `<td class="opens" data-col="${esc(c)}"${width} title="click to open the note">${esc(v)}</td>`;
+      }
+      const why = locked(c);
+      if (why) {
+        return `<td class="locked" data-col="${esc(c)}"${width} title="${esc(why)}">${esc(v)}</td>`;
+      }
+      return `<td class="edits" data-col="${esc(c)}" data-was="${esc(v)}"${width} title="double-click to edit">${esc(v)}</td>`;
     })
     .join("");
   return `<tr draggable="true" data-id="${esc(l.id)}">${cells}</tr>`;
 }
 
-function page(
-  views: string[],
-  view: string,
-  pinned: string,
-  scrolling: string,
-  total = 0,
-  counts: Tally[] = [],
-): string {
-  const tabs = views
-    .map((v) => `<button class="tab${v === view ? " on" : ""}" data-view="${esc(v)}">${esc(v)}</button>`)
-    .join("");
-  // WHAT IS WORTH COUNTING IS THE VIEW'S TO SAY. This draws whatever came
-  // back, so counting something else is a line in the view file.
-  const tally = tallyHtml(counts);
-  return `<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline';">
-<style>${css()}</style>
-</head>
-<body>
-<div class="bar">${tabs}<span class="counts">${tally}</span><span class="total">${total}</span></div>
-<div class="top">${pinned}</div>
-<div class="pane">${scrolling}</div>
-<script>${script()}</script>
-</body>
-</html>`;
+// What the engine decides and a person may not type over. Editing one of these
+// would put the note and the engine's reading of it out of step.
+function locked(col: string): string {
+  if (col.startsWith("file.")) return "renaming is a move, not an edit";
+  switch (col) {
+    case "id":
+    case "seq":
+    case "type":
+      return "the engine decides this";
+    case "status":
+    case "holder":
+      return "a pull moves this, not a keystroke";
+    case "subs":
+    case "depends_on":
+    case "successors":
+      return "a list is edited in the note";
+  }
+  return "";
 }
 
 export function tallyHtml(counts: Tally[]): string {
@@ -163,11 +194,15 @@ function css(): string {
   .bar .total { margin-left: 14px; padding-left: 14px; font-size: .9em;
                 color: var(--vscode-descriptionForeground);
                 border-left: 1px solid var(--vscode-panel-border); }
-  .tab { font: inherit; padding: 2px 8px; border: 0; border-radius: 2px; cursor: pointer;
-         color: var(--vscode-foreground); background: transparent; }
-  .tab.on { background: var(--vscode-list-activeSelectionBackground);
-            color: var(--vscode-list-activeSelectionForeground); }
-  .tab:hover { background: var(--vscode-list-hoverBackground); }
+  .tab, .second { font: inherit; padding: 2px 8px; border: 0; border-radius: 2px; cursor: pointer;
+                  color: var(--vscode-foreground); background: transparent; }
+  .tab.on, .second.on { background: var(--vscode-list-activeSelectionBackground);
+                        color: var(--vscode-list-activeSelectionForeground); }
+  .tab:hover, .second:hover { background: var(--vscode-list-hoverBackground); }
+  /* Two panes, and the seam between them. The second ships hidden. */
+  .panes { flex: 1 1 auto; display: flex; min-height: 0; }
+  .pane-wrap { flex: 1 1 0; display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+  .seam { flex: 0 0 1px; background: var(--vscode-panel-border); }
   /* The pinned groups do not scroll. That is the whole of what pinning is. */
   .top { flex: 0 0 auto; border-bottom: 1px solid var(--vscode-panel-border); }
   .pane { flex: 1 1 auto; overflow: auto; }
@@ -180,6 +215,12 @@ function css(): string {
   tr:hover { background: var(--vscode-list-hoverBackground); }
   td.opens { cursor: pointer; }
   td.opens:hover { text-decoration: underline; }
+  td.edits { cursor: text; }
+  td.editing { padding: 0; }
+  td.editing input { width: 100%; box-sizing: border-box; font: inherit; padding: 2px 6px;
+                     color: var(--vscode-input-foreground); background: var(--vscode-input-background);
+                     border: 1px solid var(--vscode-focusBorder); }
+  td.bad { outline: 1px solid var(--vscode-errorForeground); outline-offset: -1px; }
   h2 { font-size: .85em; text-transform: uppercase; letter-spacing: .06em; font-weight: 600;
        color: var(--vscode-descriptionForeground); margin: 0; padding: 4px 8px;
        padding-left: calc(8px + var(--depth) * 14px);
@@ -197,34 +238,30 @@ function script(): string {
   const vscode = acquireVsCodeApi();
   const send = (m) => vscode.postMessage(m);
 
-  const topRegion = document.querySelector('.top');
-  const pane = document.querySelector('.pane');
-
-  // WHAT THE READER WAS DOING, KEPT ACROSS A CHANGE IN THE DATA.
-  //
-  // The data changed. What they were looking at did not. Folding a group and
-  // scrolling to a place are things a person did, and throwing them away
-  // because a file was written is the editor answering a question nobody asked.
+  // WHAT THE READER WAS DOING, KEPT ACROSS A CHANGE IN THE DATA. Folding a
+  // group and scrolling to a place are things a person did, and throwing them
+  // away because a file was written is the editor answering a question nobody
+  // asked.
   const folded = new Set();
 
   function remember() {
     for (const g of document.querySelectorAll('.group[data-key]')) {
-      if (g.classList.contains('shut')) folded.add(g.dataset.key);
-      else folded.delete(g.dataset.key);
+      const key = g.closest('.pane-wrap').dataset.side + '/' + g.dataset.key;
+      if (g.classList.contains('shut')) folded.add(key); else folded.delete(key);
     }
   }
 
-  function restore() {
-    for (const g of document.querySelectorAll('.group[data-key]')) {
-      const shut = folded.has(g.dataset.key);
+  function restore(where) {
+    for (const g of where.querySelectorAll('.group[data-key]')) {
+      const shut = folded.has(where.dataset.side + '/' + g.dataset.key);
       g.classList.toggle('shut', shut);
       const f = g.querySelector('.fold');
       if (f) f.textContent = shut ? '\\u25B8' : '\\u25BE';
     }
   }
 
-  function wire() {
-    for (const h of document.querySelectorAll('.group h2')) {
+  function wire(where) {
+    for (const h of where.querySelectorAll('.group h2')) {
       h.onclick = () => {
         const g = h.parentElement;
         g.classList.toggle('shut');
@@ -232,43 +269,108 @@ function script(): string {
         remember();
       };
     }
-    for (const cell of document.querySelectorAll('td.opens')) {
+    for (const cell of where.querySelectorAll('td.opens')) {
       cell.onclick = () => send({ type: 'open', id: cell.parentElement.dataset.id });
     }
-    wireDragging();
+    for (const cell of where.querySelectorAll('td.edits')) {
+      cell.ondblclick = () => begin(cell);
+    }
+    wireDragging(where);
   }
 
-  // NEW DATA LANDS INSIDE THE PAGE. The page is built once and never again,
-  // because rebuilding it takes the reader back to the top of a list they had
-  // scrolled through.
+  // NEW DATA LANDS INSIDE THE PAGE, one pane at a time.
   window.addEventListener('message', (ev) => {
     const m = ev.data;
     if (m.type !== 'body') return;
+    const wrap = document.querySelector('.pane-wrap[data-side="' + m.side + '"]');
+    if (!wrap) return;
     remember();
-    const where = pane.scrollTop;
-    topRegion.innerHTML = m.pinned;
+    const pane = wrap.querySelector('.pane');
+    const at = pane.scrollTop;
+    wrap.querySelector('.top').innerHTML = m.pinned;
     pane.innerHTML = m.scrolling;
-    document.querySelector('.counts').innerHTML = m.counts;
-    document.querySelector('.total').textContent = m.total;
-    restore();
-    wire();
-    pane.scrollTop = where;
+    if (m.first) {
+      document.querySelector('.counts').innerHTML = m.counts;
+      document.querySelector('.total').textContent = m.total;
+    }
+    restore(wrap);
+    wire(wrap);
+    pane.scrollTop = at;
   });
 
   for (const tab of document.querySelectorAll('.tab')) {
     tab.onclick = () => send({ type: 'view', view: tab.dataset.view });
   }
 
+  // THE SECOND COLUMN SHIPS HIDDEN. Most looking is done in one, and two
+  // half-width lists are worse than one full-width one until somebody wants
+  // the second.
+  const second = document.getElementById('second');
+  second.onclick = () => {
+    const wrap = document.querySelectorAll('.pane-wrap')[1];
+    const seam = document.querySelector('.seam');
+    if (!wrap) return;
+    const show = wrap.hidden;
+    wrap.hidden = !show;
+    if (seam) seam.hidden = !show;
+    second.classList.toggle('on', show);
+  };
+
+  // EDITING A CELL. Double-click begins, Enter commits, Escape discards.
+  //
+  // A REFUSAL LEAVES THE TYPED TEXT WHERE THE READER CAN SEE IT. Putting the
+  // old value back on a write that never happened is the one behaviour that
+  // would make somebody trust a lost edit.
+  let editing = null;
+
+  function begin(cell) {
+    if (editing) return;
+    editing = { cell, was: cell.innerHTML };
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.value = cell.dataset.was || '';
+    cell.classList.add('editing');
+    cell.classList.remove('bad');
+    cell.innerHTML = '';
+    cell.appendChild(input);
+    input.focus();
+    input.select();
+    input.onkeydown = (ev) => {
+      if (ev.key === 'Enter') { ev.preventDefault(); commit(input.value); }
+      if (ev.key === 'Escape') { ev.preventDefault(); discard(); }
+    };
+    input.onblur = () => discard();
+  }
+
+  function discard() {
+    if (!editing) return;
+    const e = editing;
+    editing = null;
+    e.cell.classList.remove('editing');
+    e.cell.innerHTML = e.was;
+  }
+
+  function commit(text) {
+    if (!editing) return;
+    const cell = editing.cell;
+    const row = cell.parentElement;
+    editing = null;
+    cell.classList.remove('editing');
+    cell.textContent = text;
+    cell.dataset.was = text;
+    send({ type: 'edit', id: row.dataset.id, col: cell.dataset.col, text });
+  }
+
   // DRAGGING A ROW ONTO A GROUP FILES IT THERE. The group says which property
-  // the drop writes, so nothing here has to know what the grouping was
-  // computed from. A group that says nothing takes no drop.
+  // the drop writes, so nothing here has to know what the grouping was computed
+  // from. A group that says nothing takes no drop.
   let dragging = null;
-  function wireDragging() {
-    for (const row of document.querySelectorAll('tr[data-id]')) {
+  function wireDragging(where) {
+    for (const row of where.querySelectorAll('tr[data-id]')) {
       row.ondragstart = () => { dragging = row.dataset.id; };
       row.ondragend = () => { dragging = null; };
     }
-    for (const g of document.querySelectorAll('.group[data-sets]')) {
+    for (const g of where.querySelectorAll('.group[data-sets]')) {
       g.ondragover = (ev) => { ev.preventDefault(); g.classList.add('over'); };
       g.ondragleave = () => g.classList.remove('over');
       g.ondrop = (ev) => {
@@ -278,6 +380,7 @@ function script(): string {
       };
     }
   }
-  wire();
+
+  for (const wrap of document.querySelectorAll('.pane-wrap')) wire(wrap);
   `;
 }

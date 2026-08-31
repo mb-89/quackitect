@@ -4,7 +4,7 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import * as os from "node:os";
 import { panelHtml, everyGroup, Node } from "./panel";
-import { editorHtml, editorBody, tallyHtml, Table } from "./editor";
+import { editorHtml, paneBody, tallyHtml, Table, Pane } from "./editor";
 import { whichHarness, kickoffText, openAgent } from "./agent";
 
 // The extension is idle when it loads. It does not act, it does not start
@@ -847,6 +847,7 @@ function toggleWork(context: vscode.ExtensionContext) {
       return;
     }
     if (m.type === "open") void openNote(context, m.id);
+    if (m.type === "edit") void editCell(context, m.id, m.col, m.text);
     if (m.type === "file") void fileWork(context, m.id, m.sets, m.into);
   });
   void drawWork(context);
@@ -867,6 +868,7 @@ function toggleWork(context: vscode.ExtensionContext) {
 type WorkMessage =
   | { type: "view"; view: string }
   | { type: "open"; id: string }
+  | { type: "edit"; id: string; col: string; text: string }
   | { type: "file"; id: string; sets: string; into: string };
 
 // THE PAGE IS BUILT ONCE. After that the data lands inside it.
@@ -876,22 +878,48 @@ type WorkMessage =
 // what they were looking at did not.
 let workBuilt = "";
 
+// THE VIEW FILE DECLARES THE PANES, and there are as many as it declares up to
+// two. A file with one view draws one, and the second column button has nothing
+// to show.
 async function drawWork(context: vscode.ExtensionContext, rebuild = false) {
   if (!workPanel) return;
-  const table: Table = (await askEngine(context, ["query", "--view", workView])) ?? {
-    view: workView, columns: [], heads: {}, total: 0, error: "the engine could not be asked",
-  };
+  const sides = await askEngine(context, ["query", "--view", workView, "--panes"]);
+  const names: string[] = sides?.panes ?? [];
+  const panes: Pane[] = [];
+  for (const side of names.slice(0, 2)) {
+    const table: Table = (await askEngine(context, ["query", "--view", workView, "--pane", side])) ?? {
+      view: workView, columns: [], heads: {}, total: 0, error: "the engine could not be asked",
+    };
+    panes.push({ side, table });
+  }
+  if (panes.length === 0) {
+    panes.push({ side: "left", table: { view: workView, columns: [], heads: {}, total: 0,
+      error: sides?.error ?? "the engine could not be asked" } });
+  }
   if (rebuild || workBuilt !== workView) {
     const listed = await askEngine(context, ["query", "--list"]);
-    workPanel.webview.html = editorHtml(table, listed?.views ?? [], workView);
+    workPanel.webview.html = editorHtml(panes, listed?.views ?? [], workView);
     workBuilt = workView;
     return;
   }
-  const b = editorBody(table);
-  void workPanel.webview.postMessage({
-    type: "body", pinned: b.pinned, scrolling: b.scrolling,
-    counts: tallyHtml(b.counts), total: b.total,
-  });
+  for (const [i, p] of panes.entries()) {
+    const b = paneBody(p.table);
+    void workPanel.webview.postMessage({
+      type: "body", side: p.side, first: i === 0,
+      pinned: b.pinned, scrolling: b.scrolling,
+      counts: tallyHtml(b.counts), total: b.total,
+    });
+  }
+}
+
+// AN EDIT IS THE ENGINE'S ACT. The editor says which token, which field and
+// what to write. Whether that is allowed is decided in one place.
+async function editCell(context: vscode.ExtensionContext, id: string, col: string, text: string) {
+  const out = await askEngine(context, ["work", "--set", id, "--field", col, "--to", text, "--by", "person"]);
+  if (out?.error) {
+    vscode.window.showErrorMessage(out.error);
+  }
+  void drawWork(context);
 }
 
 async function openNote(context: vscode.ExtensionContext, id: string) {
