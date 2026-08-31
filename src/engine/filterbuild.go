@@ -120,7 +120,17 @@ func FilterExpression(groups []FilterGroup) (string, error) {
 // ---------------------------------------------------------------------------
 
 var (
-	reCompare = regexp.MustCompile(`^\s*([A-Za-z_][\w.\-]*)\s*(==|!=|>=|<=|>|<)\s*(.+?)\s*$`)
+	// A VALUE IS ONE LITERAL: a quoted string, or a bare word with no space and
+	// no quote in it. It was written as anything up to the end of the line, and
+	// then `status == "open" && assignee == "main"` read back as one comparison
+	// whose value was `open" && assignee == "main`. The page redrew its builder
+	// from that, and one touch wrote the value back quoted and escaped, so the
+	// pane answered nothing.
+	//
+	// NARROWING THE READER IS THE WHOLE FIX. One unreadable row already makes
+	// the group raw, which is what a person who wrote a compound line by hand
+	// wants: it is left exactly as they typed it.
+	reCompare = regexp.MustCompile(`^\s*([A-Za-z_][\w.\-]*)\s*(==|!=|>=|<=|>|<)\s*("(?:[^"\\]|\\.)*"|[^\s"]+)\s*$`)
 	reMethod  = regexp.MustCompile(`^\s*(!?)\s*([A-Za-z_][\w.\-]*)\.(\w+)\((.*)\)\s*$`)
 )
 

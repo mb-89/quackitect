@@ -70,3 +70,51 @@ func sameGroups(a, b []FilterGroup) bool {
 	}
 	return true
 }
+
+// A VALUE IS ONE LITERAL, AND A ROW THE READER CANNOT READ IS SAID TO BE RAW.
+//
+// reCompare's value was written as anything up to the end of the line, so
+// `status == "open" && assignee == "main"` read back as ONE comparison whose
+// value was `open" && assignee == "main`. The page then redrew its builder from
+// that and one touch wrote the value back quoted and escaped:
+//
+//	- status == "open\" && assignee == \"main"
+//
+// and the pane answered zero rows. The builder no longer emits that shape, so
+// the way in is a person editing the file by hand, which is the population the
+// raw escape hatch exists for.
+//
+// ONE UNREADABLE ROW MAKES THE WHOLE GROUP RAW. That is already the rule here.
+// What was missing is the reader saying it cannot read one.
+func TestAValueThatIsNotOneLiteralIsNotReadAsAComparison(t *testing.T) {
+	cannot := []string{
+		`status == "open" && assignee == "main"`,
+		`status == "open" || status == "in_work"`,
+		`status == "open" && assignee == "main" && scope == "single-step"`,
+		`status == "open with a quote in it " and more"`,
+	}
+	for _, src := range cannot {
+		if row, ok := FromExpression(src); ok {
+			t.Errorf("%s read back as one comparison whose value is %q", src, row.Value)
+		}
+	}
+	// AND THE ONES THAT ARE ONE LITERAL STILL READ, so the reader is narrowed
+	// rather than broken.
+	can := []struct{ src, prop, value string }{
+		{`status == "open"`, "status", "open"},
+		{`assignee != "main"`, "assignee", "main"},
+		{`seq >= 12`, "seq", "12"},
+		{`title == "one with spaces in it"`, "title", "one with spaces in it"},
+		{`status == "a value with an escaped \" in it"`, "status", `a value with an escaped " in it`},
+	}
+	for _, one := range can {
+		row, ok := FromExpression(one.src)
+		if !ok {
+			t.Errorf("%s cannot be read, and it is one literal", one.src)
+			continue
+		}
+		if row.Property != one.prop || row.Value != one.value {
+			t.Errorf("%s read back as %s / %q", one.src, row.Property, row.Value)
+		}
+	}
+}

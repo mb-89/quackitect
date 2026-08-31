@@ -8,7 +8,7 @@ assignee: main
 scope: single-step
 traced: true
 disposition: dropped
-reason: "The remedy landed on the filter round trip: TestAFilterReadsBackAsWhatWasBuilt at src/engine/filterbuild_test.go:14 drives the round trip this token described. Obsolete."
+reason: THIS ABORT WAS WRONG, and it is left standing because an ending is not written over. It said the remedy landed because TestAFilterReadsBackAsWhatWasBuilt drives the round trip, and that test only ever feeds the reader what the writer produced, so it cannot fail for the defect this token was about. Two of the three remedies landed. The third, that reCompare refuses a value that is not a single literal, was never done, and a person editing a filter by hand still meets the corruption. It is carried by wk-5bec911840, which a reviewer sent back for exactly that. The lesson is wk-644aae4ac6.
 aborted_from: backlogged
 minted_by: reviewer4
 ---
