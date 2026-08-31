@@ -200,7 +200,7 @@ Run the check that would catch the mistake you are most likely to have made.
 ## Help
 
 You may write a helper script for anything you are about to do more than once.
-Put it in `util/scratchpad/`. Write it in something the engine told you this machine
+Put it in `.se/scratchpad/`. Write it in something the engine told you this machine
 has. We read the ones you write, and the ones that earn it become part of the
 method.
 

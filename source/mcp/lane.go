@@ -29,6 +29,11 @@ func laneTools() []map[string]any {
 				"names a command that has to exit zero. Asserting done is not evidence.\n\n" +
 				"A parent breaks a token you already hold into steps. A sub-token closes on your " +
 				"own submission, so use it for your own breakdown and nothing else.\n\n" +
+				"WRITE A NOTE ON SOMETHING is this tool with backlog set. A note is work that " +
+				"exists and that nobody is doing: it stays out of the queue, and it holds nobody " +
+				"from stopping. Somebody drains the backlog later, by deciding to.\n\n" +
+				"An instruction that is actionable now is minted without backlog, and it goes " +
+				"straight into the queue. That difference is the whole of what the two words mean.\n\n" +
 				"You cannot close what you mint. A reviewer settles it.",
 			"inputSchema": map[string]any{
 				"type": "object",
@@ -46,8 +51,10 @@ func laneTools() []map[string]any {
 					"evidence_script": map[string]any{"type": "string",
 						"description": "a command that must exit zero. Use it wherever completion can be measured rather than judged."},
 					"parent": map[string]any{"type": "string", "description": "the token this one breaks down."},
-					"closer": map[string]any{"type": "string",
-						"description": "who settles it. Leave it out and a reviewer does, which is the point."},
+					"backlog": map[string]any{"type": "boolean",
+						"description": "mint it backlogged: visible, out of the queue, holding nobody. What a person means by write a note on this."},
+					"open": map[string]any{"type": "string",
+						"description": "instead of minting: move a backlogged token into the queue, by id."},
 				},
 				"required": []string{"form", "assignee"},
 			},
@@ -58,7 +65,7 @@ func laneTools() []map[string]any {
 				"sanctioned reasons applies.\n\n" +
 				"The refusal carries the list. Say which entry applies and why, in one line. " +
 				"Saying it in chat is not enough, because nothing can read chat.\n\n" +
-				"One claim releases one stop, and your next pull spends it.\n\n" +
+				"One claim releases one stop. Do anything else first and it is gone.\n\n" +
 				"Call it with no arguments to read the list.",
 			"inputSchema": map[string]any{
 				"type": "object",
@@ -121,7 +128,13 @@ func laneTools() []map[string]any {
 }
 
 func mintWork(r roots, args map[string]any) string {
+	if id := str(args["open"]); id != "" {
+		return engineCall(r, []string{"work", "--open", id}, nil)
+	}
 	a := []string{"work", "--form", str(args["form"]), "--assignee", str(args["assignee"])}
+	if b, ok := args["backlog"].(bool); ok && b {
+		a = append(a, "--backlog")
+	}
 	// A fixed order, because a map's is not one and a command line a person
 	// reads in the log should look the same every time.
 	for _, pair := range [][2]string{

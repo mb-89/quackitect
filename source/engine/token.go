@@ -19,7 +19,13 @@ import (
 // ledger makes that a lock. It is also what a person reads six months later,
 // and a person reads a file better than a line in a stream.
 
-// THE FIVE STATES. A token is in exactly one of them.
+// THE SIX STATES. A token is in exactly one of them.
+//
+// BACKLOGGED IS NOT OPEN, and that is the whole point of it. A note somebody
+// asked for is work that exists, is visible, and is not being done. It never
+// reaches the queue and it never holds anybody from stopping. Draining the
+// backlog is a separate act, and it is somebody's decision rather than a
+// consequence of having written the note down.
 //
 // Submitted and in review are separate because a reviewer has to be able to
 // take one back. Without the split there is nothing to reclaim from a reviewer
@@ -27,11 +33,12 @@ import (
 type Status string
 
 const (
-	Open      Status = "open"      // minted and assigned. Nobody has picked it up
-	InWork    Status = "in_work"   // an actor holds it
-	Submitted Status = "submitted" // the evidence is in, and it waits for a reviewer
-	InReview  Status = "in_review" // a reviewer holds it
-	Closed    Status = "closed"    // settled, with a disposition
+	Backlogged Status = "backlogged" // minted, and not work anybody is asked to do yet
+	Open       Status = "open"       // minted and assigned. Nobody has picked it up
+	InWork     Status = "in_work"    // an actor holds it
+	Submitted  Status = "submitted"  // the evidence is in, and it waits for a reviewer
+	InReview   Status = "in_review"  // a reviewer holds it
+	Closed     Status = "closed"     // settled, with a disposition
 )
 
 // THE SCOPE. The barrier a token sits behind, and the one thing Level 1 reads
@@ -187,7 +194,9 @@ func Mint(r Roots, t Token) (Token, error) {
 		}
 	}
 	t.ID = newID()
-	t.Status = Open
+	if t.Status != Backlogged {
+		t.Status = Open
+	}
 	t.Opened = now()
 	// A sub-token is a token. The parent holds the list, because a parent
 	// cannot close while a child is open and that is the parent's rule.
@@ -230,6 +239,21 @@ func Blocked(r Roots, t Token) string {
 		return "it waits on " + strings.Join(waiting, ", ")
 	}
 	return ""
+}
+
+// Activate moves a backlogged token into the queue. Draining the backlog is a
+// decision somebody makes, and it is not a consequence of having written the
+// note down.
+func Activate(r Roots, id string) (Token, error) {
+	t, err := LoadToken(r, id)
+	if err != nil {
+		return t, err
+	}
+	if t.Status != Backlogged {
+		return t, fmt.Errorf("%s is %s, and only a backlogged token is opened this way", id, t.Status)
+	}
+	t.Status = Open
+	return t, SaveToken(r, t)
 }
 
 // OpenSubs names the children still holding a parent open. A parent that

@@ -24,11 +24,11 @@ See `doc/cross-cutting/cross-cutting-design.md`.
 |---|---|
 | `doc/` | The design, as it was collected, the guidance the agent is told, and the work. Start with `user-stories.md`. Not specification. |
 | `source/` | Everything that is written. `engine`, `viewer`, `extension`. |
-| `util/` | Everything that is run rather than shipped. `setup`, `cage`, and `scratchpad`, which is throwaway and not in version control. |
+| `util/` | Everything that is run rather than shipped. `setup` and `cage`. |
 | `.bin/` | Built programs. Rebuilt from source, and not in version control. |
 
-`.se/` holds private material. Dated reports and measured evidence live there
-and never travel.
+`.se/` holds private material, and it never travels. Dated reports, measured
+evidence, the record, ephemeral work, and `scratchpad/` for anything throwaway.
 
 `doc/coverage.md` maps every story and every case to the test that proves it.
 `doc/open.md` names what no test proves yet, and why.

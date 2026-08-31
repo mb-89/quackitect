@@ -43,11 +43,26 @@ func runWork(args []string) {
 	parent := fs.String("parent", "", "the token this one breaks down")
 	dependsOn := fs.String("depends-on", "", "ids that must close first, comma separated")
 	traced := fs.Bool("traced", true, "whether this token belongs in the record")
+	backlog := fs.Bool("backlog", false, "mint it backlogged: visible, and not work anybody is doing")
+	note := fs.Bool("note", false, "a note: ephemeral and backlogged. What a person means by write a note on this")
+	activate := fs.String("open", "", "move a backlogged token into the queue, by id")
 	_ = fs.Parse(args)
 
 	roots, err := FindRoots(*work)
 	if err != nil {
 		fail(err)
+	}
+
+	if *activate != "" {
+		t, err := Activate(roots, *activate)
+		if err != nil {
+			answerJSON(map[string]any{"error": err.Error()})
+			os.Exit(1)
+		}
+		inSession(roots, "work", "person", "opened "+t.ID+" from the backlog: "+t.Form, Yes(),
+			map[string]any{"id": t.ID})
+		answerJSON(t)
+		return
 	}
 
 	var t Token
@@ -65,6 +80,12 @@ func runWork(args []string) {
 			t.Evidence.Sections = splitComma(*sections)
 		}
 		t.Evidence.Script = *script
+	}
+	if *note {
+		t.Traced, t.Status = false, Backlogged
+	}
+	if *backlog {
+		t.Status = Backlogged
 	}
 	t.MintedBy = or2(t.MintedBy, "person")
 
@@ -180,7 +201,7 @@ func runStop(args []string) {
 	inSession(roots, "stop", *actor, "claimed a stop: "+*because+" — "+*why, Yes(),
 		map[string]any{"because": *because})
 	answerJSON(map[string]any{"claimed": *because,
-		"notice": "Recorded. Ask to stop again and it is granted. Your next pull spends this."})
+		"notice": "Recorded. Ask to stop again and it is granted. Do anything else first and this is gone."})
 }
 
 func answerJSON(v any) {

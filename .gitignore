@@ -14,7 +14,3 @@ util/setup/setup.exe
 source/extension/out/
 *.tgz
 *.tar.gz
-
-# throwaway, and it never travels
-util/scratchpad/*
-!util/scratchpad/README.md

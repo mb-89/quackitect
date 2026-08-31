@@ -451,6 +451,8 @@ func AskToStop(r Roots, actor string) Ruling {
 		if t.Assignee != actor {
 			continue
 		}
+		// Backlogged work is not work anybody was asked to do, so it holds
+		// nobody. That is what separates a note from a task.
 		if t.Status != Open && t.Status != InWork {
 			continue
 		}
