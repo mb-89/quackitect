@@ -877,7 +877,9 @@ async function mintWork(context: vscode.ExtensionContext, arg?: { text: string; 
   const cut = text.indexOf("/");
   const form = (cut < 0 ? text : text.slice(0, cut)).trim();
   const detail = cut < 0 ? "" : text.slice(cut + 1).trim();
-  const args = ["work", "--form", form, "--assignee", "human", "--scope", scope, "--traced=" + traced];
+  // A person typed it in the panel, so a person minted it.
+  const args = ["work", "--form", form, "--assignee", "human", "--by", "person",
+                "--scope", scope, "--traced=" + traced];
   if (detail) args.push("--detail", detail);
   const out = await askEngine(context, args);
   if (out?.error) {

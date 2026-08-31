@@ -47,6 +47,7 @@ func runWork(args []string) {
 	backlog := fs.Bool("backlog", false, "mint it backlogged: visible, and not work anybody is doing")
 	note := fs.Bool("note", false, "a note: ephemeral and backlogged. What a person means by write a note on this")
 	activate := fs.String("open", "", "move a backlogged token into the queue, by id")
+	by := fs.String("by", "", "who is minting it. The caller knows, and nothing here can work it out")
 	set := fs.String("set", "", "instead of minting: change one thing about a token, by id")
 	bucket := fs.String("bucket", "", "with set: file it under this grouping. Empty clears it")
 	_ = fs.Parse(args)
@@ -77,7 +78,7 @@ func runWork(args []string) {
 			answerJSON(map[string]any{"error": err.Error()})
 			os.Exit(1)
 		}
-		inSession(roots, "work", "person", "filed "+t.ID+" under "+or2(t.Bucket, "no bucket"), Yes(),
+		inSession(roots, "work", or2(*by, "main"), "filed "+t.ID+" under "+or2(t.Bucket, "no bucket"), Yes(),
 			map[string]any{"id": t.ID, "bucket": t.Bucket})
 		answerJSON(t)
 		return
@@ -89,7 +90,7 @@ func runWork(args []string) {
 			answerJSON(map[string]any{"error": err.Error()})
 			os.Exit(1)
 		}
-		inSession(roots, "work", "person", "opened "+t.ID+" from the backlog: "+t.Form, Yes(),
+		inSession(roots, "work", or2(*by, "main"), "opened "+t.ID+" from the backlog: "+t.Form, Yes(),
 			map[string]any{"id": t.ID})
 		answerJSON(t)
 		return
@@ -117,7 +118,10 @@ func runWork(args []string) {
 	if *backlog {
 		t.Status = Backlogged
 	}
-	t.MintedBy = or2(t.MintedBy, "person")
+	// WHO MINTED IT IS THE CALLER'S TO SAY. An agent minting through the lane
+	// is that agent. A person typing in the panel is the person. The engine
+	// sees the same process either way, so guessing here got it wrong.
+	t.MintedBy = or2(*by, or2(t.MintedBy, "main"))
 
 	minted, err := Mint(roots, t)
 	if err != nil {

@@ -765,3 +765,48 @@ back on. Design the script for Walk C and the other three follow.
 | Proves | The filter floor, and that help sits where the user is looking |
 | Fails if | The view blanks while typing, or the syntax lives only in documentation |
 | By hand | Apply the same expressions with a command-line tool and compare the results |
+
+---
+
+### UC-38 — The window reloads and the engine keeps running
+
+**Story.** US-7.
+
+1. The engine is running and writing the session.
+2. The user reloads the editor window.
+3. The engine is still running, because it was not started as a child of the window.
+4. The window reads what the engine says about itself, and checks that the process is there.
+5. The engine shows as running. The user presses nothing.
+6. The log window shows the session that is still being written, and nothing was set aside.
+
+| | |
+|---|---|
+| Proves | A reload costs nothing, and the record stays in one piece |
+| Fails if | The engine dies with the window, or the log is set aside while it is still being written |
+| By hand | Reload the window with an engine running, and read the log |
+
+---
+
+### UC-39 — Start is pressed while an engine is running
+
+**Story.** US-7.
+
+1. An engine is running.
+2. The user presses start, having forgotten, or on a second window.
+3. The window attaches to the engine that is there, and says so.
+4. No second engine starts.
+5. The log is untouched.
+
+Then the engine is killed rather than stopped, so its file is left behind.
+
+6. The user presses start.
+7. The file names a process that is gone, so it is not believed.
+8. A fresh engine starts.
+
+| | |
+|---|---|
+| Proves | A file is not a process, and two engines never write one log |
+| Fails if | A second engine starts and sets aside the log the first is writing |
+| By hand | `TestWhatIsRunningIsCheckedAndNotTrusted`, then press start twice |
+
+---

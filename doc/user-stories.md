@@ -172,6 +172,29 @@ from is worth less than the clicking is worth.
 
 ---
 
+## US-7 — Restarting the window continues the session
+
+**As** a user.
+**I want** a reloaded editor window to pick up whatever is already running.
+**So that** reloading costs me nothing and the record stays in one piece.
+
+**Done when**
+
+- The engine survives a window reload.
+- The window comes back with the engine shown as running, and I press nothing.
+- The log window shows the session that is still being written, not an empty one.
+- Pressing start while an engine runs attaches to it, and never starts a second.
+- What the engine says about itself is checked, so a file left by a killed engine
+  is not mistaken for one.
+
+**Why it is a story and not a detail.** A reload is the ordinary way a person
+picks up a change to the editor. If it costs a restart and a lost log, people
+stop reloading, and then they stop changing the editor.
+
+**Cases.** UC-38, UC-39.
+
+---
+
 ## Standing rules these stories set
 
 | Rule | Where it lands |

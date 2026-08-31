@@ -41,6 +41,8 @@ func laneTools() []map[string]any {
 						"description": "out of the queue, holding nobody. What a note is"},
 					"open": map[string]any{"type": "string",
 						"description": "instead of minting: move a backlogged token into the queue, by id"},
+					"actor": map[string]any{"type": "string",
+						"description": "who is minting. Default main"},
 				},
 				"required": []string{"form", "assignee"},
 			},
@@ -104,7 +106,13 @@ func mintWork(r roots, args map[string]any) string {
 	if id := str(args["open"]); id != "" {
 		return engineCall(r, []string{"work", "--open", id}, nil)
 	}
-	a := []string{"work", "--form", str(args["form"]), "--assignee", str(args["assignee"])}
+	// The agent minting is the actor it pulls as, so the engine is told rather
+	// than left to guess.
+	by := str(args["actor"])
+	if by == "" {
+		by = "main"
+	}
+	a := []string{"work", "--form", str(args["form"]), "--assignee", str(args["assignee"]), "--by", by}
 	if b, ok := args["backlog"].(bool); ok && b {
 		a = append(a, "--backlog")
 	}
