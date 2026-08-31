@@ -114,7 +114,12 @@ function buttonRow(items: Node[]): string {
   const drawn = items.map(button);
   // Short of five, the rest of the row is empty. Past five, the grid wraps and
   // the next row starts, which is what a grid does.
-  const rest = Array.from({ length: Math.max(0, COLUMNS - drawn.length) }).map(() => `<span></span>`);
+  //
+  // A CONTROL MAY TAKE MORE THAN ONE COLUMN, and the count is of columns
+  // rather than controls. Counting controls made a row of three that spanned
+  // five ask for seven, and the row wrapped.
+  const used = items.reduce((n, k) => n + (k.span ?? 1), 0);
+  const rest = Array.from({ length: Math.max(0, COLUMNS - used) }).map(() => `<span></span>`);
   return [...drawn, ...rest].join("\n");
 }
 
@@ -194,6 +199,10 @@ function json(v: unknown): string {
 
 function css(): string {
   return `
+  /* ONE HEIGHT FOR EVERY CONTROL IN A ROW. A control a few pixels taller than
+     the one beside it reads as a mistake, and it is one. The number is here
+     and nowhere else, so a new control cannot disagree with the old ones. */
+  :root { --row-h: 28px; }
   body { font-family: var(--vscode-font-family); font-size: var(--vscode-font-size);
          color: var(--vscode-foreground); background: transparent; padding: 8px 6px; margin: 0; }
   .grid { display: grid; grid-template-columns: repeat(${COLUMNS}, 1fr); gap: 6px; align-items: center; }
@@ -201,14 +210,19 @@ function css(): string {
   .gear { width: 22px; height: 22px; padding: 0; background: transparent; border: none;
           color: var(--vscode-descriptionForeground); font-size: 14px; line-height: 1; cursor: pointer; }
   .gear:hover { color: var(--vscode-foreground); background: transparent; }
-  input.line { width: 100%; box-sizing: border-box; height: 24px; padding: 0 6px;
+  input.line { width: 100%; box-sizing: border-box; height: var(--row-h); padding: 0 6px;
                font: inherit; color: var(--vscode-input-foreground);
                background: var(--vscode-input-background);
                border: 1px solid var(--vscode-input-border, transparent); border-radius: 2px; }
   input.line::placeholder { color: var(--vscode-input-placeholderForeground); }
   .pick { position: relative; }
-  .pick .picked { width: 100%; height: 24px; padding: 0 4px; }
-  .pick .options { position: absolute; right: 0; top: 26px; z-index: 20; margin: 0; padding: 4px 0;
+  /* A CARET, so it reads as a thing that opens. Without one it is a button
+     that says something odd. */
+  .pick .picked { width: 100%; height: var(--row-h); padding: 0 6px;
+                  display: flex; align-items: center; justify-content: space-between; gap: 4px; }
+  .pick .picked::after { content: "\\25BE"; font-size: .9em; opacity: .8; }
+  .pick.open .picked::after { content: "\\25B4"; }
+  .pick .options { position: absolute; right: 0; top: calc(var(--row-h) + 2px); z-index: 20; margin: 0; padding: 4px 0;
                    list-style: none; min-width: 190px; border-radius: 2px;
                    background: var(--vscode-dropdown-background, var(--vscode-editor-background));
                    border: 1px solid var(--vscode-dropdown-border, var(--vscode-focusBorder));
@@ -227,7 +241,7 @@ function css(): string {
   h3 { font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.06em;
        color: var(--vscode-descriptionForeground); margin: 0 0 6px 0; font-weight: 600; }
   h3 + .grid { margin-bottom: 12px; }
-  button { height: 28px; width: 100%; padding: 0 8px; border: 1px solid var(--vscode-button-border, transparent);
+  button { height: var(--row-h); width: 100%; padding: 0 8px; border: 1px solid var(--vscode-button-border, transparent);
            border-radius: 2px; background: var(--vscode-button-background); color: var(--vscode-button-foreground);
            font: inherit; cursor: pointer; overflow: hidden; white-space: nowrap; }
   button:hover:not(:disabled) { background: var(--vscode-button-hoverBackground); }
@@ -301,17 +315,25 @@ function script(): string {
   for (const pick of document.querySelectorAll('.pick')) {
     const button = pick.querySelector('.picked');
     const list = pick.querySelector('.options');
-    button.onclick = (ev) => { ev.stopPropagation(); list.hidden = !list.hidden; };
+    button.onclick = (ev) => {
+      ev.stopPropagation();
+      list.hidden = !list.hidden;
+      pick.classList.toggle('open', !list.hidden);
+    };
     for (const item of list.querySelectorAll('li')) {
       item.onclick = () => {
         button.dataset.value = item.dataset.value;
         button.textContent = item.dataset.value;
         list.hidden = true;
+        pick.classList.remove('open');
       };
     }
   }
   document.addEventListener('click', () => {
-    for (const l of document.querySelectorAll('.pick .options')) l.hidden = true;
+    for (const p of document.querySelectorAll('.pick')) {
+      p.querySelector('.options').hidden = true;
+      p.classList.remove('open');
+    }
   });
 
   for (const c of document.querySelectorAll('[data-key]')) {

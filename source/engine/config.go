@@ -62,18 +62,24 @@ func (o Option) MarshalJSON() ([]byte, error) {
 }
 
 type Node struct {
-	Name     string   `json:"name"`
-	Title    string   `json:"title,omitempty"`
-	Type     string   `json:"type"`
-	Help     string   `json:"help,omitempty"`
-	Default  any      `json:"default,omitempty"`
-	Min      *float64 `json:"min,omitempty"`
-	Max      *float64 `json:"max,omitempty"`
-	Step     *float64 `json:"step,omitempty"`
-	Options  []Option `json:"options,omitempty"`
-	Narrow   string   `json:"narrow,omitempty"` // smaller, larger, on, off, or empty for free
-	Shown    bool     `json:"shown,omitempty"`
-	Children []Node   `json:"children,omitempty"`
+	Name    string   `json:"name"`
+	Title   string   `json:"title,omitempty"`
+	Type    string   `json:"type"`
+	Help    string   `json:"help,omitempty"`
+	Default any      `json:"default,omitempty"`
+	Min     *float64 `json:"min,omitempty"`
+	Max     *float64 `json:"max,omitempty"`
+	Step    *float64 `json:"step,omitempty"`
+	Options []Option `json:"options,omitempty"`
+
+	// How the panel draws it. The engine does not read these, and it must not
+	// drop them: --tree prints the tree AS DECLARED, and a field this program
+	// happens not to use is still part of what somebody wrote.
+	Placeholder string `json:"placeholder,omitempty"`
+	Span        int    `json:"span,omitempty"`
+	Narrow      string `json:"narrow,omitempty"` // smaller, larger, on, off, or empty for free
+	Shown       bool   `json:"shown,omitempty"`
+	Children    []Node `json:"children,omitempty"`
 
 	// Drawn rather than held.
 	Label       string            `json:"label,omitempty"`

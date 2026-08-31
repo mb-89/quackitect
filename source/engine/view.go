@@ -48,6 +48,14 @@ type Level struct {
 	Sets string
 }
 
+// A COUNT IS A NAMED FILTER, and it is the generic machinery that lets a
+// specific view say what is worth counting. The work editor counts what is
+// open and what is backlogged. A view that counts nothing shows nothing.
+type Count struct {
+	Name   string
+	Filter *Expr
+}
+
 type Sort struct {
 	Property   string
 	Descending bool
@@ -62,6 +70,7 @@ type View struct {
 	Pinned    []Pin
 	Collapsed []string
 	Sort      []Sort
+	Counts    []Count
 	Filter    *Expr
 	Limit     int
 }
@@ -157,6 +166,14 @@ func readView(m map[string]any) (View, error) {
 		v.Sort = append(v.Sort, Sort{Property: ystr(s["property"]),
 			Descending: strings.EqualFold(ystr(s["direction"]), "DESC")})
 	}
+	for _, raw := range ylist(m["counts"]) {
+		c := ymap(raw)
+		e, err := Parse(ystr(c["filter"]))
+		if err != nil {
+			return v, fmt.Errorf("count %q: %w", ystr(c["name"]), err)
+		}
+		v.Counts = append(v.Counts, Count{Name: ystr(c["name"]), Filter: e})
+	}
 	for _, raw := range ylist(m["pinned"]) {
 		p := ymap(raw)
 		e, err := Parse(ystr(p["filter"]))
@@ -168,7 +185,7 @@ func readView(m map[string]any) (View, error) {
 	for key := range m {
 		switch key {
 		case "name", "type", "order", "collapsed", "limit", "columnSize",
-			"filters", "groupBy", "sort", "pinned":
+			"filters", "groupBy", "sort", "pinned", "counts":
 		default:
 			return v, fmt.Errorf("view %q: this program does not read %q", v.Name, key)
 		}
@@ -271,6 +288,12 @@ type Group struct {
 	Groups []Group `json:"groups,omitempty"`
 }
 
+// A count, answered. Name and number, because that is all a bar has room for.
+type Tally struct {
+	Name string `json:"name"`
+	N    int    `json:"n"`
+}
+
 type Table struct {
 	View    string            `json:"view"`
 	Columns []string          `json:"columns"`
@@ -279,6 +302,7 @@ type Table struct {
 	Opens   map[string]bool   `json:"opens,omitempty"`
 	Pinned  []Group           `json:"pinned,omitempty"`
 	Groups  []Group           `json:"groups"`
+	Counts  []Tally           `json:"counts,omitempty"`
 	Total   int               `json:"total"`
 }
 
@@ -302,6 +326,23 @@ func Render(b Base, v View, rows []Row) (Table, error) {
 		} else {
 			t.Heads[c] = c
 		}
+	}
+
+	// Counted over what the view selects, and not over the ledger. A number
+	// that answers a different question from the table under it is worse than
+	// no number.
+	for _, c := range v.Counts {
+		n := 0
+		for _, r := range kept {
+			ok, err := truthy(c.Filter, r)
+			if err != nil {
+				return t, err
+			}
+			if ok {
+				n++
+			}
+		}
+		t.Counts = append(t.Counts, Tally{Name: c.Name, N: n})
 	}
 
 	// The pinned groups take their rows out of what is left, in the order they

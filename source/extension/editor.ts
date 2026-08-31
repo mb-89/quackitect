@@ -29,6 +29,7 @@ export type Group = {
   lines?: Line[];
   groups?: Group[];
 };
+export type Tally = { name: string; n: number };
 export type Table = {
   view: string;
   columns: string[];
@@ -37,6 +38,7 @@ export type Table = {
   opens?: Record<string, boolean>;
   pinned?: Group[];
   groups?: Group[];
+  counts?: Tally[];
   total: number;
   error?: string;
 };
@@ -53,6 +55,7 @@ export function editorHtml(t: Table, views: string[], view: string): string {
 </table>
 ${(t.groups ?? []).map((g) => groupHtml(g, cols, t)).join("")}`,
     t.total,
+    t.counts ?? [],
   );
 }
 
@@ -92,9 +95,21 @@ function rowHtml(l: Line, cols: string[], t: Table): string {
   return `<tr draggable="true" data-id="${esc(l.id)}">${cells}</tr>`;
 }
 
-function page(views: string[], view: string, pinned: string, scrolling: string, total = 0): string {
+function page(
+  views: string[],
+  view: string,
+  pinned: string,
+  scrolling: string,
+  total = 0,
+  counts: Tally[] = [],
+): string {
   const tabs = views
     .map((v) => `<button class="tab${v === view ? " on" : ""}" data-view="${esc(v)}">${esc(v)}</button>`)
+    .join("");
+  // WHAT IS WORTH COUNTING IS THE VIEW'S TO SAY. This draws whatever came
+  // back, so counting something else is a line in the view file.
+  const tally = counts
+    .map((c) => `<span class="tally"><b>${c.n}</b>${esc(c.name)}</span>`)
     .join("");
   return `<!DOCTYPE html>
 <html lang="en">
@@ -104,7 +119,7 @@ function page(views: string[], view: string, pinned: string, scrolling: string, 
 <style>${css()}</style>
 </head>
 <body>
-<div class="bar">${tabs}<span class="total">${total}</span></div>
+<div class="bar">${tabs}<span class="counts">${tally}</span><span class="total">${total}</span></div>
 <div class="top">${pinned}</div>
 <div class="pane">${scrolling}</div>
 <script>${script()}</script>
@@ -123,7 +138,12 @@ function css(): string {
          margin: 0; padding: 0; display: flex; flex-direction: column; height: 100vh; }
   .bar { display: flex; align-items: center; gap: 4px; padding: 4px 8px; flex: 0 0 auto;
          border-bottom: 1px solid var(--vscode-panel-border); }
-  .bar .total { margin-left: auto; color: var(--vscode-descriptionForeground); font-size: .9em; }
+  .bar .counts { margin-left: auto; display: flex; gap: 12px; }
+  .bar .tally { color: var(--vscode-descriptionForeground); font-size: .9em; }
+  .bar .tally b { color: var(--vscode-foreground); font-weight: 600; margin-right: 4px; }
+  .bar .total { margin-left: 14px; padding-left: 14px; font-size: .9em;
+                color: var(--vscode-descriptionForeground);
+                border-left: 1px solid var(--vscode-panel-border); }
   .tab { font: inherit; padding: 2px 8px; border: 0; border-radius: 2px; cursor: pointer;
          color: var(--vscode-foreground); background: transparent; }
   .tab.on { background: var(--vscode-list-activeSelectionBackground);
