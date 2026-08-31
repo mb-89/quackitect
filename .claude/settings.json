@@ -8,7 +8,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"/home/user/quackitect/.bin/se\" hook --method \"/home/user/quackitect\""
+            "command": "/home/user/quackitect/.bin/se hook --method /home/user/quackitect"
           }
         ]
       }
@@ -19,7 +19,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"/home/user/quackitect/.bin/se\" hook --method \"/home/user/quackitect\""
+            "command": "/home/user/quackitect/.bin/se hook --method /home/user/quackitect"
           }
         ]
       }
@@ -30,7 +30,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"/home/user/quackitect/.bin/se\" hook --method \"/home/user/quackitect\""
+            "command": "/home/user/quackitect/.bin/se hook --method /home/user/quackitect"
           }
         ]
       }
@@ -41,7 +41,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"/home/user/quackitect/.bin/se\" hook --method \"/home/user/quackitect\""
+            "command": "/home/user/quackitect/.bin/se hook --method /home/user/quackitect"
           }
         ]
       }
@@ -56,7 +56,7 @@
           },
           {
             "type": "command",
-            "command": "\"/home/user/quackitect/.bin/se\" hook --method \"/home/user/quackitect\""
+            "command": "/home/user/quackitect/.bin/se hook --method /home/user/quackitect"
           }
         ]
       }
@@ -67,7 +67,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"/home/user/quackitect/.bin/se\" hook --method \"/home/user/quackitect\""
+            "command": "/home/user/quackitect/.bin/se hook --method /home/user/quackitect"
           }
         ]
       }
@@ -78,7 +78,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"/home/user/quackitect/.bin/se\" hook --method \"/home/user/quackitect\""
+            "command": "/home/user/quackitect/.bin/se hook --method /home/user/quackitect"
           }
         ]
       }
@@ -89,7 +89,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"/home/user/quackitect/.bin/se\" hook --method \"/home/user/quackitect\""
+            "command": "/home/user/quackitect/.bin/se hook --method /home/user/quackitect"
           }
         ]
       }
@@ -100,7 +100,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"/home/user/quackitect/.bin/se\" hook --method \"/home/user/quackitect\""
+            "command": "/home/user/quackitect/.bin/se hook --method /home/user/quackitect"
           }
         ]
       }
@@ -111,7 +111,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"/home/user/quackitect/.bin/se\" hook --method \"/home/user/quackitect\""
+            "command": "/home/user/quackitect/.bin/se hook --method /home/user/quackitect"
           }
         ]
       }
@@ -122,7 +122,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"/home/user/quackitect/.bin/se\" hook --method \"/home/user/quackitect\""
+            "command": "/home/user/quackitect/.bin/se hook --method /home/user/quackitect"
           }
         ]
       }
@@ -133,7 +133,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"/home/user/quackitect/.bin/se\" hook --method \"/home/user/quackitect\""
+            "command": "/home/user/quackitect/.bin/se hook --method /home/user/quackitect"
           }
         ]
       }
@@ -144,7 +144,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"/home/user/quackitect/.bin/se\" hook --method \"/home/user/quackitect\""
+            "command": "/home/user/quackitect/.bin/se hook --method /home/user/quackitect"
           }
         ]
       }
@@ -155,7 +155,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"/home/user/quackitect/.bin/se\" hook --method \"/home/user/quackitect\""
+            "command": "/home/user/quackitect/.bin/se hook --method /home/user/quackitect"
           }
         ]
       }

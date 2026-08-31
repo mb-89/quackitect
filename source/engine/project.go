@@ -87,16 +87,41 @@ func Project(roots Roots) ([]string, error) {
 
 // A source may name the engine or the roots, because a cage has to say which
 // program the guards call. Nothing else is substituted.
+//
+// EVERY ONE OF THEM IS RELATIVE TO THE WORK ROOT WHEN IT CAN BE. A projection
+// is a file in the work root, and some of them are in version control, so an
+// absolute path in one is a path on one machine written into a file that
+// travels to every other. It was right on the machine that wrote it and dead
+// everywhere else.
+//
+// A path that leaves the work root stays absolute, because there is nothing
+// else it could be. That is the driven case, where the method lives somewhere
+// the project cannot name.
 func variables(roots Roots) (map[string]string, error) {
 	exe, err := os.Executable()
 	if err != nil {
 		return nil, err
 	}
 	return map[string]string{
-		"engine": filepath.ToSlash(exe),
-		"method": filepath.ToSlash(roots.Method),
-		"work":   filepath.ToSlash(roots.Work),
+		"engine": within(roots.Work, exe),
+		"mcp":    within(roots.Work, filepath.Join(filepath.Dir(exe), exeName("se-mcp"))),
+		"method": within(roots.Work, roots.Method),
+		"work":   within(roots.Work, roots.Work),
 	}, nil
+}
+
+// within says where something is, from the work root, in the shortest form
+// that still finds it. The harness runs a hook and starts the tool lane with
+// the work root as the working folder, so a relative path resolves.
+func within(work, path string) string {
+	rel, err := filepath.Rel(work, path)
+	if err != nil || rel == ".." || strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
+		return filepath.ToSlash(path)
+	}
+	if rel == "." {
+		return "."
+	}
+	return "./" + filepath.ToSlash(rel)
 }
 
 func assemble(methodRoot string, sources []string, vars map[string]string) (string, error) {
