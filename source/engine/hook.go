@@ -196,15 +196,7 @@ func runHook(args []string) {
 		//
 		// It is private. It is in the log, and the log is private material, so
 		// this is not a second place it can leak from.
-		said := in.Prompt + in.UserPrompt
-		record(log, "user", "prompt", actor, said, nil, nil)
-
-		// AND A WHOLE MESSAGE THAT IS ONE WORD IS A BUTTON. A person in a
-		// cloud session has no panel to press, and the interrupt writes
-		// nothing that outlives the call it cancelled.
-		if note, ok := ActOnTheWord(roots, said); note != "" {
-			record(log, "engine", "hold", actor, note, &ok, map[string]any{"by": "the person"})
-		}
+		record(log, "user", "prompt", actor, in.Prompt+in.UserPrompt, nil, nil)
 	case "SessionStart":
 		// A session that resumes after a compaction starts with nothing read.
 		if in.Source == "compact" || in.Source == "clear" {

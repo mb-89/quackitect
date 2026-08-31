@@ -15,7 +15,7 @@ proves it.** A case with no test is named as such, with the reason.
 | US-1 install with one script | `--selftest` steps 1 to 3, and `--dry-run` in the installer |
 | US-2 start the caged agent from idle | **by hand.** It needs a harness and an editor |
 | US-4 the agent speaks the way the engine prescribes | `TestTheVoiceCheckSeesWhatAProgramCanSee`, `TestAWriteThatBreaksAVoiceRuleIsRefused` |
-| US-5 watch the cage hold | `TestTheGuardAppendsToTheRunningSession`, `TestTheGuardRefusesAProjectionAndNothingElse`, `TestTheWordPutsEverythingDownAndPicksItUpAgain` |
+| US-5 watch the cage hold | `TestTheGuardAppendsToTheRunningSession`, `TestTheGuardRefusesAProjectionAndNothingElse` |
 | US-6 read the log without a mouse | `TestArrivingLinesDoNotMoveAHeldSelection` and the rest in the viewer |
 
 ## The first-build cases
@@ -40,7 +40,6 @@ proves it.** A case with no test is named as such, with the reason.
 | UC-33 a session measured for voice | **not built.** The checker exists. Sampling a session does not |
 | UC-34 every call is in the log | `TestTheGuardAppendsToTheRunningSession`, `TestEveryWriteReachesTheFileAndNamesItsWriter` |
 | UC-35 Level 0 alone, with no authority | `TestStoppingIsRecordedAndOnlyRefusedWhenAsked`, and the guard tests |
-| A person with no panel puts everything down | `TestOnlyAWholeMessageIsAWord`, `TestTheWordPutsEverythingDownAndPicksItUpAgain`, `TestTheWordActsWhateverPathTheMessageCameBy` |
 | UC-36 read a growing log while reading a detail | `TestArrivingLinesDoNotMoveAHeldSelection`, `TestArrivingLinesDoNotRedrawTheDetailPane` |
 | UC-37 filter down to one call | `TestFilterShapes`, `TestHalfTypedPatternKeepsTheLastGoodFilter` |
 
