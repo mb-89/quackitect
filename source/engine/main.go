@@ -74,6 +74,7 @@ func main() {
 	tree := flag.Bool("tree", false, "print the parameter tree as declared")
 	set := flag.String("set", "", "change one parameter: name=value")
 	note := flag.String("note", "", "put one line in the record and exit")
+	from := flag.String("from", "agent", "with note: who said it. agent, or user")
 	version := flag.Bool("version", false, "print which build this is and exit")
 	selftest := flag.Bool("selftest", false, "produce a copy, drive a project with it, and check what came out")
 	keep := flag.Bool("keep", false, "with selftest: leave the temporary trees behind")
@@ -142,8 +143,20 @@ func main() {
 
 	// One line into the running session, from whoever asks. The engine owns
 	// the format, so nothing else writes the record.
+	// WHAT SOMEBODY SAID, PUT IN THE RECORD BY WHOEVER HEARD IT.
+	//
+	// The harness fires an event for a message that starts a turn and none for
+	// a message written into one that is already running. Nothing on disk
+	// holds those words: the transcript keeps a note that one was absorbed and
+	// not what it said.
+	//
+	// So the only thing that can put it in the record is whatever heard it.
 	if *note != "" {
-		noteInLog(dir, "agent", "note", *note, nil, nil)
+		src, kind := "agent", "note"
+		if *from == "user" {
+			src, kind = "user", "prompt"
+		}
+		noteInLog(dir, src, kind, *note, nil, nil)
 		fmt.Println("recorded")
 		return
 	}
@@ -355,18 +368,10 @@ func main() {
 			map[string]any{"files": written})
 	}
 
-	// What the machine has, asked once per boot. An agent that may write a
-	// helper script has to be told what it can write one in.
-	if p := ProbeTools(roots, log.Session()); len(p.Found) > 0 {
-		var names []string
-		for _, t := range p.Found {
-			names = append(names, t.Name)
-		}
-		log.Write("engine", "tools", "engine", "the machine has "+strings.Join(names, ", "), Yes(),
-			map[string]any{"found": len(p.Found)})
-	} else {
-		log.Write("engine", "tools", "engine", "no candidate tool answered", No(), nil)
-	}
+	// What the machine has, asked once per boot. It goes in a file the pull
+	// reads, and not in the record: a person watching the log did not ask what
+	// this machine has, and a line they did not ask for is a line in the way.
+	ProbeTools(roots, log.Session())
 
 	startRecord := map[string]any{
 		"method_root": roots.Method,

@@ -12,16 +12,13 @@
 # level above supplies a state. Empty is the honest answer: there is no current
 # state, so nothing is at it.
 
+# A COLUMN IS NAMED WHAT THE NOTE NAMES IT. displayName exists for a heading
+# the owner wants to read differently, and renaming status to state or assignee
+# to who is not that: it hides where the value came from and nobody can filter
+# on a word that is not in the file.
 properties:
   title:
-    displayName: title
     opensNote: true
-  status:
-    displayName: state
-  assignee:
-    displayName: who
-  bucket:
-    displayName: bucket
 
 filters:
   and:

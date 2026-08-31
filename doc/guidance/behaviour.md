@@ -28,6 +28,16 @@ sub-token and assign it to the scribe.
 A scribe transcribes and does not compose. Send it content you have specified,
 never content it has to author.
 
+## The record
+
+Put what the person said into the record when a message reaches you mid-turn:
+
+    se --note "<what they said>" --from user
+
+The harness fires an event for a message that starts a turn and none for one
+written into a turn that is already running. You are the only thing that hears
+those, so you are the only thing that can record them.
+
 ## Change
 
 Change one thing at a time.
