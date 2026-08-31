@@ -27,6 +27,8 @@ export type Group = {
   by?: string;
   sets?: string;
   pinned?: boolean;
+  pins?: string;
+  declared?: boolean;
   shut?: boolean;
   depth: number;
   count: number;
@@ -40,6 +42,7 @@ export type Table = {
   heads: Record<string, string>;
   widths?: Record<string, number>;
   opens?: Record<string, boolean>;
+  icons?: Record<string, { glyph: string }>;
   pinned?: Group[];
   groups?: Group[];
   counts?: Tally[];
@@ -54,11 +57,14 @@ export type Table = {
   error?: string;
 };
 
-// The type a column holds, said in one character. Ported from baseui.ts:53-65.
-const ICON: Record<string, string> = {
-  file: "ⓘ", date: "◷", list: "≡", string: "≡",
-  number: "#", boolean: "☑", link: "↗", object: "{}", null: "·",
-};
+// EVERY MARK THIS DRAWS COMES FROM THE ENGINE'S TABLE. Nothing here carries a
+// glyph, so the same mark is the same mark in the sidebar and here, and one
+// edit to util/icons.json changes both.
+//
+// A NAME THE TABLE DOES NOT HOLD DRAWS ITSELF. A blank leaves a button nobody
+// can see, and the name on the face says which entry is missing.
+let ICONS: Record<string, { glyph: string }> = {};
+const icon = (name: string) => ICONS[name]?.glyph ?? name;
 
 export type PropertyInfo = { name: string; type: string; on: boolean };
 export type Operator = { id: string; label: string; types?: string[]; takes: boolean };
@@ -66,9 +72,17 @@ export type FilterRow = { property: string; operator: string; value?: string };
 export type FilterGroup = { rows: FilterRow[] | null; raw?: string };
 export type LevelSaid = { property: string; direction: string; sets?: string };
 export type Pane = { side: string; table: Table };
-export type Body = { pinned: string; scrolling: string; total: number; counts: Tally[] };
+export type Body = { heads: string; pinned: string; scrolling: string; total: number; counts: Tally[] };
 
 export function editorHtml(panes: Pane[], views: string[], view: string): string {
+  // THE TABLE ARRIVES WITH THE DATA, and it is taken before a mark is drawn.
+  // Every pane carries the same one, so the first that has it decides.
+  for (const p of panes) {
+    if (p.table?.icons) {
+      ICONS = p.table.icons;
+      break;
+    }
+  }
   const tabs = views
     .map((v) => `<button class="tab${v === view ? " on" : ""}" data-view="${esc(v)}">${esc(v)}</button>`)
     .join("");
@@ -82,7 +96,7 @@ export function editorHtml(panes: Pane[], views: string[], view: string): string
 </head>
 <body>
 <div class="bar">${tabs}
-  <button class="second" id="second" title="show a second column">&#9707;</button>
+  <button class="second" id="second" title="show a second column">${icon("split")}</button>
 </div>
 <div class="panes">
 ${panes.map((p, i) => paneHtml(p, i > 0)).join(seam)}
@@ -98,6 +112,7 @@ function paneHtml(p: Pane, hidden: boolean): string {
   const t = p.table;
   return `<div class="pane-wrap" data-side="${esc(p.side)}"${hidden ? " hidden" : ""}>
   <div class="chrome">${toolbar(t)}${filterPop(t)}${sortPop(t)}${propsPop(t)}</div>
+  <div class="heads">${b.heads}</div>
   <div class="top">${b.pinned}</div>
   <div class="pane">${b.scrolling}</div>
   ${pager()}
@@ -111,17 +126,29 @@ function paneHtml(p: Pane, hidden: boolean): string {
 // HELP IS A DETAIL, NEVER A BUTTON. There is no question mark anywhere here.
 // Clicking a control's label puts its help where a person is already looking.
 //
+// THE TOTAL IS NOT UP HERE. Every group heading carries its own count, so a
+// number on the bar is the same fact in a second place, and the two disagree
+// the moment a filter moves. baseui.ts:390 had one. It is left out.
+//
 // Ported from baseui.ts:383-395.
 function toolbar(t: Table): string {
-  const n = t.total ?? 0;
+  // THE BUTTONS SAY WHAT THEY CAN DO. A count nobody can see turns a dead
+  // button into a mystery, so the bar carries the number as well as the state.
+  //
+  // THE NAME IS TYPED ON THE BAR. No dialog, because a webview refuses a
+  // browser prompt: v3's control that asked for a name did nothing at all when
+  // pressed. So the bucket is made first and named afterwards.
   return `<div class="bs-bar">
-    <span class="bs-view-name">${esc(t.view)}</span>
-    <span class="bs-count">${n} result${n === 1 ? "" : "s"}</span>
+    <button type="button" class="bs-tool bs-group" hidden
+      title="make a group of the ticked rows">${icon("plus")} Group</button>
+    <button type="button" class="bs-tool bs-rename" hidden
+      title="rename the group these rows are in">Rename</button>
+    <input class="bs-rename-field" type="text" hidden placeholder="a name for it">
     <span class="bs-gap"></span>
-    <button type="button" class="bs-tool" data-pop="filter" data-help="filter">&#9660; Filter</button>
-    <button type="button" class="bs-tool" data-pop="sort" data-help="sort">&#8645; Sort</button>
-    <button type="button" class="bs-tool" data-pop="props" data-help="properties">&#8801; Properties</button>
-    <button type="button" class="bs-tool bs-code-toggle" title="show the query">&#9781;</button>
+    <button type="button" class="bs-tool" data-pop="filter" data-help="filter">${icon("filter")} Filter</button>
+    <button type="button" class="bs-tool" data-pop="sort" data-help="sort">${icon("sort")} Sort</button>
+    <button type="button" class="bs-tool" data-pop="props" data-help="properties">${icon("columns")} Properties</button>
+    <button type="button" class="bs-tool bs-code-toggle" title="show the query">${icon("query")}</button>
   </div>`;
 }
 
@@ -185,7 +212,7 @@ function condRow(row: FilterRow, t: Table): string {
     <select class="bs-prop"><option value=""></option>${props}</select>
     <select class="bs-op">${opOptions(t, kind, row.operator)}</select>
     <input class="bs-val" type="text" placeholder="value" value="${esc(row.value ?? "")}"${takes ? "" : " hidden"}>
-    <button type="button" class="bs-icon bs-drop-cond" title="remove this condition">&#10005;</button>
+    <button type="button" class="bs-icon bs-drop-cond" title="remove this condition">${icon("remove")}</button>
   </div>`;
 }
 
@@ -227,7 +254,8 @@ function level(kind: string, l: LevelSaid, t: Table): string {
   return `<div class="bs-level" data-kind="${esc(kind)}">
     <select class="bs-level-prop"><option value=""></option>${opts}</select>
     <button type="button" class="bs-dir" data-direction="${asc ? "ASC" : "DESC"}"
-      title="${asc ? "smallest first" : "largest first"}">${asc ? "&#9650;" : "&#9660;"}</button>
+      data-up="${icon("up")}" data-down="${icon("down")}"
+      title="${asc ? "smallest first" : "largest first"}">${asc ? icon("up") : icon("down")}</button>
   </div>`;
 }
 
@@ -237,7 +265,7 @@ function propsPop(t: Table): string {
     .map(
       (p) => `<label class="bs-prop-item${p.on ? " on" : ""}">
       <input type="checkbox" class="bs-tick" data-property="${esc(p.name)}"${p.on ? " checked" : ""}>
-      <span class="bs-type" title="${esc(p.type)}">${ICON[p.type] ?? "·"}</span>
+      <span class="bs-type" title="${esc(p.type)}">${icon("type." + p.type)}</span>
       <span class="bs-prop-name">${esc(p.name)}</span>
     </label>`,
     )
@@ -264,9 +292,9 @@ function propsPop(t: Table): string {
 // Ported from baseui.ts:466-474.
 function pager(): string {
   return `<div class="bs-pager" hidden>
-    <button type="button" class="bs-prev" title="previous page">&#8249;</button>
+    <button type="button" class="bs-prev" title="previous page">${icon("previous")}</button>
     <span class="bs-where"></span>
-    <button type="button" class="bs-next" title="next page">&#8250;</button>
+    <button type="button" class="bs-next" title="next page">${icon("next")}</button>
     <input type="number" class="bs-per" min="0" step="1" value="50"
       title="rows a page. Type any number, or 0 for all">
     <span class="bs-per-label">a page</span>
@@ -285,15 +313,18 @@ function codePanel(t: Table): string {
 
 export function paneBody(t: Table): Body {
   if (t.error) {
-    return { pinned: `<p class="bad">${esc(t.error)}</p>`, scrolling: "", total: 0, counts: [] };
+    return { heads: "", pinned: `<p class="bad">${esc(t.error)}</p>`, scrolling: "", total: 0, counts: [] };
   }
   const cols = t.columns ?? [];
+  // THE COLUMN HEADER SITS ABOVE EVERYTHING, pinned groups included. It was
+  // below them, so a pinned group had no columns over it and read as a
+  // different kind of thing. A pinned group is a group.
   return {
-    pinned: (t.pinned ?? []).map((g) => groupHtml(g, cols, t)).join(""),
-    scrolling: `<table>
+    heads: `<table>
   <thead><tr>${cols.map((c, i) => head(c, t, i === cols.length - 1)).join("")}</tr></thead>
-</table>
-${(t.groups ?? []).map((g) => groupHtml(g, cols, t)).join("")}`,
+</table>`,
+    pinned: (t.pinned ?? []).map((g) => groupHtml(g, cols, t)).join(""),
+    scrolling: (t.groups ?? []).map((g) => groupHtml(g, cols, t)).join(""),
     total: t.total,
     counts: t.counts ?? [],
   };
@@ -316,11 +347,23 @@ function groupHtml(g: Group, cols: string[], t: Table): string {
   // The key a fold is remembered by. Its name and its depth, because two groups
   // with the same name at different depths are two groups.
   const key = `${g.pinned ? "pin" : "g"}:${g.depth}:${g.name}`;
+  // EVERY GROUP CARRIES A PIN. It is a span of its own, so clicking it pins
+  // rather than folding, the same way the column grip is its own span.
+  //
+  // A pinned group unpins by its name. Any other pins on the filter the engine
+  // says would keep it, because the engine owns the expression language.
+  const pin = g.pinned
+    ? `<span class="pin on" data-unpin="${esc(g.name)}" title="unpin">${icon("pin")}</span>`
+    : g.declared
+      ? `<span class="pin" data-pin="${esc(g.name)}" title="pin">${icon("pin")}</span>`
+      : g.pins
+        ? `<span class="pin" data-pin="${esc(g.name)}" data-matching="${esc(g.pins)}" title="pin">${icon("pin")}</span>`
+        : "";
   return `<section class="group${g.pinned ? " pinned" : ""}${g.shut ? " shut" : ""}"
     data-key="${esc(key)}" style="--depth:${g.depth}"${drop}>
-  <h2><span class="fold">${g.shut ? "▸" : "▾"}</span>
+  <h2><span class="fold">${g.shut ? icon("shut") : icon("open")}</span>
     <span class="name">${esc(g.name || "no group")}</span>
-    <span class="count">${g.count}</span></h2>
+    <span class="count">${g.count}</span>${pin}</h2>
   <div class="rows">
     <table>${rows}</table>
     ${kids}
@@ -338,7 +381,12 @@ function rowHtml(l: Line, cols: string[], t: Table): string {
       const w = c === last ? 0 : t.widths?.[c];
       const width = w ? ` style="width:${w}px"` : "";
       if (t.opens?.[c]) {
-        return `<td class="opens" data-col="${esc(c)}"${width} title="click to open the note">${esc(v)}</td>`;
+        // THE TEXT IS THE DOOR, AND ONLY THE TEXT. It underlines under the
+        // pointer, and that underline is the promise: press the underlined
+        // words and the note opens, press anywhere else on the row and the row
+        // ticks. A cell that was a door edge to edge left no way to tick a row.
+        return `<td class="opens" data-col="${esc(c)}"${width}><span class="door" ` +
+          `title="open the note">${esc(v)}</span></td>`;
       }
       const why = locked(c);
       if (why) {
@@ -396,6 +444,9 @@ function css(): string {
   .panes { flex: 1 1 auto; display: flex; min-height: 0; }
   .pane-wrap { flex: 1 1 0; display: flex; flex-direction: column; min-width: 0; min-height: 0; }
   .seam { flex: 0 0 1px; background: var(--vscode-panel-border); }
+  /* THE COLUMN HEADER IS ABOVE EVERYTHING, so a pinned group has columns over
+     it exactly like every other group. */
+  .heads { flex: 0 0 auto; }
   /* The pinned groups do not scroll. That is the whole of what pinning is. */
   .top { flex: 0 0 auto; border-bottom: 1px solid var(--vscode-panel-border); }
   .pane { flex: 1 1 auto; overflow: auto; }
@@ -406,8 +457,10 @@ function css(): string {
   table { width: 100%; border-collapse: collapse; table-layout: fixed; }
   td { padding: 2px 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   tr:hover { background: var(--vscode-list-hoverBackground); }
-  td.opens { cursor: pointer; }
-  td.opens:hover { text-decoration: underline; }
+  td.opens .door { cursor: pointer; }
+  td.opens .door:hover { text-decoration: underline; }
+  tr.ticked td { background: var(--vscode-list-activeSelectionBackground);
+                 color: var(--vscode-list-activeSelectionForeground); }
   td.edits { cursor: text; }
   td.editing { padding: 0; }
   td.editing input { width: 100%; box-sizing: border-box; font: inherit; padding: 2px 6px;
@@ -420,7 +473,11 @@ function css(): string {
        display: flex; align-items: center; gap: 6px; cursor: pointer; }
   h2 .count { color: var(--vscode-descriptionForeground); font-weight: 400; }
   .group.shut .rows { display: none; }
-  .group.pinned h2 .name { color: var(--vscode-foreground); }
+  /* A PINNED GROUP LOOKS LIKE EVERY OTHER GROUP. What says it is pinned is the
+     pin, which is lit rather than faint. */
+  .pin { margin-left: 6px; opacity: 0; cursor: pointer; font-size: .9em; }
+  h2:hover .pin, .pin.on { opacity: 1; }
+  .pin:not(.on) { filter: grayscale(1); }
   .group.over { outline: 1px solid var(--vscode-focusBorder); outline-offset: -1px; }
   .bad { padding: 12px; color: var(--vscode-errorForeground); white-space: pre-wrap; }
 
@@ -429,14 +486,22 @@ function css(): string {
   .chrome { position: relative; flex: 0 0 auto; }
   .bs-bar { display: flex; align-items: center; gap: 6px; padding: 3px 8px;
             border-bottom: 1px solid var(--vscode-panel-border); }
-  .bs-view-name { font-weight: 600; }
-  .bs-count, .bs-code-path { color: var(--vscode-descriptionForeground); font-size: .9em; }
+  .bs-code-path { color: var(--vscode-descriptionForeground); font-size: .9em; }
+  .bs-rename-field { font: inherit; padding: 1px 4px; min-width: 140px;
+                     color: var(--vscode-input-foreground);
+                     background: var(--vscode-input-background);
+                     border: 1px solid var(--vscode-input-border, transparent); }
   .bs-gap { flex: 1 1 auto; }
   .bs-pop { position: absolute; right: 8px; top: 26px; z-index: 30; padding: 8px;
             min-width: 240px; border-radius: 3px;
             background: var(--vscode-dropdown-background, var(--vscode-editor-background));
             border: 1px solid var(--vscode-dropdown-border, var(--vscode-focusBorder));
             box-shadow: 0 2px 10px rgba(0,0,0,.4); }
+  /* A CLASS BEATS THE BROWSER'S OWN [hidden] RULE, so a popover given a
+     display by one of these stayed on screen with hidden set on it. The
+     properties popover is the tall one, which is why that was the one always
+     open. This says it once, for every popover. */
+  .bs-pop[hidden] { display: none; }
   .bs-pop-tall { max-height: 60vh; display: flex; flex-direction: column; }
   .bs-pop-title { font-size: .85em; text-transform: uppercase; letter-spacing: .06em;
                   color: var(--vscode-descriptionForeground); margin: 4px 0; cursor: pointer; }
@@ -472,7 +537,12 @@ function css(): string {
   .bs-code-head { padding: 4px 8px; border-bottom: 1px solid var(--vscode-panel-border); }
   .bs-code-text { margin: 0; padding: 8px; font-family: var(--vscode-editor-font-family);
                   white-space: pre; }
-  .pane-wrap.showing-code .pane, .pane-wrap.showing-code .top { display: none; }
+  /* THE TABLE IS THREE PARTS AND THEY HIDE TOGETHER. The header moved out of
+     the scroller and this rule was not extended to it, so the raw query showed
+     with a stranded header row over it. */
+  .pane-wrap.showing-code .pane,
+  .pane-wrap.showing-code .top,
+  .pane-wrap.showing-code .heads { display: none; }
   `;
 }
 
@@ -503,17 +573,115 @@ function script(): string {
     }
   }
 
+  // TICKED ROWS MAKE A GROUP, and a group is a bucket: the person's own name
+  // for one. It does not move the work. The status stays exactly as it was and
+  // only the grouping changes.
+  function ticked() {
+    return [...document.querySelectorAll('.pane tr.ticked')];
+  }
+
+  // THE HEADING A ROW STANDS UNDER names the group it is in, which is the
+  // bucket where it has one and the status where it has none. The column is not
+  // always shown, so the heading answers instead.
+  function groupOf(row) {
+    const section = row.closest('section.group');
+    if (!section) return { name: '', declared: true };
+    return {
+      name: (section.querySelector('h2 .name')?.textContent ?? '').trim(),
+      declared: section.querySelector('h2 .pin')?.hasAttribute('data-matching') === false,
+    };
+  }
+
+  // THE BUTTONS SAY WHAT THEY CAN DO. A count nobody can see turns a dead
+  // button into a mystery.
+  //
+  // RENAMING NEEDS A BUCKET, not merely a selection. A row grouped by its
+  // status has no bucket to rename, and a status is the system's word.
+  function countTicked() {
+    const rows = ticked();
+    const first = rows[0] ? groupOf(rows[0]) : { name: '', declared: true };
+    for (const bar of document.querySelectorAll('.bs-bar')) {
+      const group = bar.querySelector('.bs-group');
+      const rename = bar.querySelector('.bs-rename');
+      group.hidden = rename.hidden = rows.length === 0;
+      rename.disabled = first.declared || first.name === '';
+      rename.title = rename.disabled
+        ? 'these rows are grouped by their status, and a status is not yours to rename'
+        : 'rename ' + first.name;
+    }
+    if (rows.length === 0) {
+      for (const box of document.querySelectorAll('.bs-rename-field')) box.hidden = true;
+    }
+  }
+
+  document.addEventListener('click', (ev) => {
+    const make = ev.target.closest?.('.bs-group');
+    if (!make) return;
+    const rows = ticked();
+    if (rows.length === 0) return;
+    // AN EMPTY NAME ASKS THE ENGINE FOR A FRESH ONE. It knows what is taken and
+    // the client would have to guess. The bucket is made first and named after.
+    send({ type: 'group', ids: rows.map((r) => r.dataset.id) });
+  });
+
+  document.addEventListener('click', (ev) => {
+    const press = ev.target.closest?.('.bs-rename');
+    if (!press || press.disabled) return;
+    const rows = ticked();
+    if (rows.length === 0) return;
+    const box = press.parentElement.querySelector('.bs-rename-field');
+    box.hidden = false;
+    box.value = groupOf(rows[0]).name;
+    box.dataset.from = box.value;
+    box.focus();
+    box.select();
+  });
+
+  document.addEventListener('keydown', (ev) => {
+    const box = ev.target.closest?.('.bs-rename-field');
+    if (!box) return;
+    if (ev.key === 'Escape') { box.hidden = true; return; }
+    if (ev.key !== 'Enter') return;
+    const from = box.dataset.from ?? '';
+    const to = box.value.trim();
+    box.hidden = true;
+    if (to === '' || to === from) return;
+    send({ type: 'rename', from, to });
+  });
+
   function wire(where) {
     for (const h of where.querySelectorAll('.group h2')) {
-      h.onclick = () => {
+      h.onclick = (e) => {
+        // THE PIN IS INSIDE THE HEADING, so a click on it must not also fold.
+        if (e.target.closest('.pin')) return;
         const g = h.parentElement;
         g.classList.toggle('shut');
         h.querySelector('.fold').textContent = g.classList.contains('shut') ? '\\u25B8' : '\\u25BE';
         remember();
       };
     }
-    for (const cell of where.querySelectorAll('td.opens')) {
-      cell.onclick = () => send({ type: 'open', id: cell.parentElement.dataset.id });
+    for (const p of where.querySelectorAll('.pin')) {
+      p.onclick = () => {
+        const side = where.dataset.side;
+        if (p.dataset.unpin) send({ type: 'unpin', side, name: p.dataset.unpin });
+        else send({ type: 'pin', side, name: p.dataset.pin, matching: p.dataset.matching });
+      };
+    }
+    for (const door of where.querySelectorAll('td.opens .door')) {
+      door.onclick = (ev) => {
+        // The door swallows the press, so ticking never happens behind it.
+        ev.stopPropagation();
+        send({ type: 'open', id: door.closest('tr').dataset.id });
+      };
+    }
+    // A PRESS ON A ROW TICKS IT. Every column ticks, the first one included:
+    // not being editable is not a reason not to be selectable, and somebody
+    // ticking four rows should not have to aim at the second column.
+    for (const row of where.querySelectorAll('tr[data-id]')) {
+      row.onclick = () => {
+        row.classList.toggle('ticked');
+        countTicked();
+      };
     }
     for (const cell of where.querySelectorAll('td.edits')) {
       cell.ondblclick = () => begin(cell);
@@ -530,9 +698,13 @@ function script(): string {
     remember();
     const pane = wrap.querySelector('.pane');
     const at = pane.scrollTop;
+    // THE HEADINGS GO WITH THE ROWS, and this line wrote the word undefined
+    // over them for months: the extension never sent m.heads, so every data
+    // change replaced the column names with that string. It sends them now,
+    // and this refuses to write nothing over something that is already right.
+    if (m.heads) wrap.querySelector('.heads').innerHTML = m.heads;
     wrap.querySelector('.top').innerHTML = m.pinned;
     pane.innerHTML = m.scrolling;
-    wrap.querySelector('.bs-count').textContent = m.total + ' result' + (m.total === 1 ? '' : 's');
     restore(wrap);
     wire(wrap);
     wireColumns(wrap);
@@ -678,7 +850,11 @@ function script(): string {
       dir.onclick = () => {
         const asc = dir.dataset.direction !== 'ASC';
         dir.dataset.direction = asc ? 'ASC' : 'DESC';
-        dir.textContent = asc ? '▲' : '▼';
+        // THE MARK COMES FROM THE TABLE HERE TOO. It was a literal, so the
+        // table decided the arrow until a person clicked, and after one click
+        // the source decided it. The button carries both marks, put there at
+        // render time by the same icon() call that drew the first one.
+        dir.textContent = asc ? dir.dataset.up : dir.dataset.down;
         say();
       };
     }
@@ -796,7 +972,13 @@ function script(): string {
     }
   }
 
-  document.addEventListener('click', () => {
+  // A PRESS OUTSIDE CLOSES A POPOVER, AND A PRESS INSIDE DOES NOT.
+  //
+  // This did not know inside from outside, so reaching for the first select in
+  // a popover closed it. That is what a person sees as a control that vanishes
+  // the moment it opens: the thing they reach for is the thing that shuts it.
+  document.addEventListener('click', (ev) => {
+    if (ev.target.closest?.('.bs-pop')) return;
     for (const p of document.querySelectorAll('.bs-pop')) p.hidden = true;
     for (const t of document.querySelectorAll('.bs-tool[data-pop]')) t.classList.remove('on');
   });

@@ -125,9 +125,11 @@ views:
       - status
     columnSize:
       title: 620
-    pinned:
+    groups:
       - name: yours
         filter: assignee == "human"
+    pinned:
+      - yours
     groupBy:
       - property: if(bucket, bucket, status)
         sets: bucket
@@ -195,11 +197,14 @@ views:
   - name: left
     order:
       - title
-    pinned:
+    groups:
       - name: yours
         filter: assignee == "human"
       - name: also-yours
         filter: assignee == "human"
+    pinned:
+      - yours
+      - also-yours
     groupBy:
       - property: if(bucket, bucket, status)
         sets: bucket
@@ -270,5 +275,357 @@ views:
 		if (g.Name == "backlogged") != g.Shut {
 			t.Fatalf("group %q ships shut=%v", g.Name, g.Shut)
 		}
+	}
+}
+
+// EVERY GROUP CARRIES A PIN, AND THE EMPTY ONE IS A GROUP.
+//
+// Rows that lack the grouping property fall into a group whose name is empty.
+// It is usually the biggest one on the page, and it was the one group a person
+// could not pin, because the pin was guarded on the name being non-empty.
+//
+// It is reachable from a shipped control: the Sort popover's group-by level
+// writes se view --group <column>, and any column some rows lack makes it.
+func TestTheGroupWithNoNameCarriesAPinLikeEveryOther(t *testing.T) {
+	p := writeBase(t, t.TempDir(), "z.base", `
+views:
+  - name: left
+    order:
+      - title
+    groupBy:
+      - property: holder
+`)
+	b, err := LoadBase(p)
+	if err != nil {
+		t.Fatal(err)
+	}
+	tab, err := Render(b, b.Views[0], []Row{
+		row("id", "1", "holder", "main", "title", "held"),
+		row("id", "2", "title", "nobody holds this"),
+		row("id", "3", "title", "nor this"),
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	var empty *Group
+	for i := range tab.Groups {
+		if tab.Groups[i].Name == "" {
+			empty = &tab.Groups[i]
+		}
+	}
+	if empty == nil {
+		t.Fatalf("no group with an empty name: %v", tab.Groups)
+	}
+	if empty.Count != 2 {
+		t.Fatalf("the empty group holds %d rows", empty.Count)
+	}
+	// THE PIN IS THE FILTER THAT WOULD KEEP THOSE ROWS, so it has to be the
+	// same expression the engine reads back.
+	want := `holder == ""`
+	if empty.Pins != want {
+		t.Fatalf("the empty group pins with %q rather than %q", empty.Pins, want)
+	}
+	// AND THE EXPRESSION HAS TO WORK. A pin nobody can evaluate is a pin that
+	// empties the pane the moment it is clicked.
+	e, err := Parse(empty.Pins)
+	if err != nil {
+		t.Fatalf("the engine cannot read its own pin %q: %v", empty.Pins, err)
+	}
+	kept := 0
+	for _, r := range []Row{
+		row("id", "1", "holder", "main"),
+		row("id", "2"),
+		row("id", "3"),
+	} {
+		ok, err := truthy(e, r)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if ok {
+			kept++
+		}
+	}
+	if kept != 2 {
+		t.Fatalf("the pin keeps %d rows rather than 2", kept)
+	}
+}
+
+// EVERY GROUP MEANS EVERY GROUP, so the count is asserted rather than read.
+func TestEveryGroupOnThePageCarriesAPin(t *testing.T) {
+	p := writeBase(t, t.TempDir(), "z.base", `
+views:
+  - name: left
+    order:
+      - title
+    groupBy:
+      - property: status
+`)
+	b, err := LoadBase(p)
+	if err != nil {
+		t.Fatal(err)
+	}
+	tab, err := Render(b, b.Views[0], []Row{
+		row("id", "1", "status", "open", "title", "a"),
+		row("id", "2", "status", "submitted", "title", "b"),
+		row("id", "3", "title", "c"),
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(tab.Groups) != 3 {
+		t.Fatalf("%d groups", len(tab.Groups))
+	}
+	for _, g := range tab.Groups {
+		if g.Pins == "" {
+			t.Fatalf("the group named %q carries no pin", g.Name)
+		}
+	}
+}
+
+// A PINNED FUNCTIONAL GROUP IS DRAWN WITH NOTHING IN IT, and an unpinned one
+// hides at zero and comes back when its filter returns a row.
+//
+// Pinning is the person saying they want to see it. One they did not pin is an
+// empty heading they did not ask for.
+func TestAPinnedFunctionalGroupIsDrawnEvenWithNoRows(t *testing.T) {
+	p := writeBase(t, t.TempDir(), "z.base", `
+views:
+  - name: left
+    order:
+      - title
+    groups:
+      - name: yours
+        filter: assignee == "human"
+      - name: mine
+        filter: assignee == "main"
+    pinned:
+      - yours
+    groupBy:
+      - property: bucket
+`)
+	b, err := LoadBase(p)
+	if err != nil {
+		t.Fatal(err)
+	}
+	tab, err := Render(b, b.Views[0], []Row{
+		row("id", "1", "assignee", "main", "title", "a"),
+		row("id", "2", "assignee", "main", "bucket", "later", "title", "b"),
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	// The pinned one is empty and it is still there.
+	if len(tab.Pinned) != 1 || tab.Pinned[0].Name != "yours" || tab.Pinned[0].Count != 0 {
+		t.Fatalf("the pinned groups are %v", tab.Pinned)
+	}
+	// The unpinned declared one has rows, so it draws, before anything the data
+	// made.
+	if len(tab.Groups) == 0 || tab.Groups[0].Name != "mine" {
+		t.Fatalf("the groups are %v", names(tab.Groups))
+	}
+	if !tab.Groups[0].Declared {
+		t.Fatal("a declared group does not say it is declared, so it draws no pin")
+	}
+	if tab.Groups[0].Count != 2 {
+		t.Fatalf("mine holds %d rows", tab.Groups[0].Count)
+	}
+	// AND THE DECLARED ONES TAKE THEIR ROWS FIRST, so nothing is left for the
+	// grouping to make a group out of.
+	if len(tab.Groups) != 1 {
+		t.Fatalf("a row appeared twice: %v", names(tab.Groups))
+	}
+}
+
+func names(gs []Group) []string {
+	var out []string
+	for _, g := range gs {
+		out = append(out, g.Name)
+	}
+	return out
+}
+
+// AN UNPINNED FUNCTIONAL GROUP HIDES AT ZERO AND COMES BACK. It has not been
+// asked for, so an empty heading is noise, and the declaration is what brings
+// it back the moment the filter returns a row.
+func TestAnUnpinnedFunctionalGroupHidesAtZeroAndComesBack(t *testing.T) {
+	p := writeBase(t, t.TempDir(), "z.base", `
+views:
+  - name: left
+    order:
+      - title
+    groups:
+      - name: yours
+        filter: assignee == "human"
+      - name: mine
+        filter: assignee == "main"
+    pinned:
+      - yours
+    groupBy:
+      - property: bucket
+`)
+	b, err := LoadBase(p)
+	if err != nil {
+		t.Fatal(err)
+	}
+	draw := func(rows ...Row) ([]string, []string) {
+		tab, err := Render(b, b.Views[0], rows)
+		if err != nil {
+			t.Fatal(err)
+		}
+		return names(tab.Pinned), names(tab.Groups)
+	}
+
+	// Nothing at all. The pinned one is there, the unpinned one is not.
+	pinned, groups := draw()
+	if len(pinned) != 1 || pinned[0] != "yours" {
+		t.Fatalf("the pinned groups are %v", pinned)
+	}
+	if len(groups) != 0 {
+		t.Fatalf("an unpinned functional group drew at zero: %v", groups)
+	}
+
+	// One row for it, and it is back.
+	pinned, groups = draw(row("id", "1", "assignee", "main", "title", "a"))
+	if len(groups) != 1 || groups[0] != "mine" {
+		t.Fatalf("it did not come back: %v", groups)
+	}
+	if len(pinned) != 1 || pinned[0] != "yours" {
+		t.Fatalf("the pinned groups are %v", pinned)
+	}
+}
+
+// A GROUP THE DATA MADE IS DRAWN WHILE IT HAS ROWS AND NOT AFTER, pinned or
+// not. Pinning one writes its filter into the pin and declares nothing, so an
+// invented group goes on disappearing when it empties.
+func TestPinningAnInventedGroupDoesNotMakeItPermanent(t *testing.T) {
+	dir := t.TempDir()
+	p := writeBase(t, dir, "z.base", `
+views:
+  - name: left
+    order:
+      - title
+    groupBy:
+      - property: bucket
+`)
+	if err := AddPin(p, "left", "later", `bucket == "later"`); err != nil {
+		t.Fatal(err)
+	}
+	// THE FILE DECLARES NOTHING ABOUT IT. A declaration would make it permanent.
+	text, _ := os.ReadFile(p)
+	if strings.Contains(string(text), "groups:") {
+		t.Fatalf("pinning an invented group declared it:\n%s", text)
+	}
+
+	b, err := LoadBase(p)
+	if err != nil {
+		t.Fatal(err)
+	}
+	tab, err := Render(b, b.Views[0], []Row{row("id", "1", "bucket", "later", "title", "a")})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(tab.Pinned) != 1 || tab.Pinned[0].Name != "later" || tab.Pinned[0].Count != 1 {
+		t.Fatalf("the pinned groups are %v", tab.Pinned)
+	}
+
+	// Empty it, and it is gone even though the pin is still in the file.
+	tab, err = Render(b, b.Views[0], []Row{row("id", "1", "title", "a")})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(tab.Pinned) != 0 {
+		t.Fatalf("an invented group survived emptying: %v", names(tab.Pinned))
+	}
+
+	// And unpinning takes the whole entry, because nothing else named it.
+	if err := DropPinNamed(p, "left", "later"); err != nil {
+		t.Fatal(err)
+	}
+	text, _ = os.ReadFile(p)
+	if strings.Contains(string(text), "later") {
+		t.Fatalf("unpinning left the invented group behind:\n%s", text)
+	}
+}
+
+// A PIN DOES NOT DECIDE WHO TAKES A ROW. The file's order does.
+//
+// yours is a subset of here. here is declared second, so if a pin moved here
+// to the front of the partition it took every row yours would have had, and
+// yours then had none. None is what hides an unpinned group, so unpinning
+// yours hid it forever and no row could bring it back.
+//
+// The owner's rule is that the moment its function produces more than zero it
+// shows again, and this is the case that broke it.
+func TestAPinDoesNotDecideWhoTakesARow(t *testing.T) {
+	write := func(pins string) Base {
+		p := writeBase(t, t.TempDir(), "z.base", `
+views:
+  - name: left
+    order:
+      - title
+    groups:
+      - name: yours
+        filter: assignee == "human"
+      - name: here
+        filter: status == "open"
+`+pins)
+		b, err := LoadBase(p)
+		if err != nil {
+			t.Fatal(err)
+		}
+		return b
+	}
+	// A row that both filters keep. yours is the narrower of the two.
+	rows := []Row{
+		row("id", "1", "assignee", "human", "status", "open", "title", "a"),
+		row("id", "2", "assignee", "main", "status", "open", "title", "b"),
+	}
+	find := func(tab Table, name string) *Group {
+		for i := range tab.Pinned {
+			if tab.Pinned[i].Name == name {
+				return &tab.Pinned[i]
+			}
+		}
+		for i := range tab.Groups {
+			if tab.Groups[i].Name == name {
+				return &tab.Groups[i]
+			}
+		}
+		return nil
+	}
+
+	// Both pinned: yours is declared first, so it takes the row it shares.
+	b := write("    pinned:\n      - yours\n      - here\n")
+	tab, err := Render(b, b.Views[0], rows)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if g := find(tab, "yours"); g == nil || g.Count != 1 {
+		t.Fatalf("yours is %v", g)
+	}
+	if g := find(tab, "here"); g == nil || g.Count != 1 {
+		t.Fatalf("here is %v", g)
+	}
+
+	// UNPIN YOURS AND IT KEEPS ITS ROW. The pin was an ordering, and the file
+	// still says yours comes first.
+	b = write("    pinned:\n      - here\n")
+	tab, err = Render(b, b.Views[0], rows)
+	if err != nil {
+		t.Fatal(err)
+	}
+	g := find(tab, "yours")
+	if g == nil {
+		t.Fatal("unpinning yours made it disappear while its filter still matched a row")
+	}
+	if g.Count != 1 {
+		t.Fatalf("yours holds %d rows after unpinning", g.Count)
+	}
+	if g.Pinned {
+		t.Fatal("it is still pinned")
+	}
+	// And it draws in line rather than at the top.
+	if len(tab.Pinned) != 1 || tab.Pinned[0].Name != "here" {
+		t.Fatalf("the pinned groups are %v", names(tab.Pinned))
 	}
 }

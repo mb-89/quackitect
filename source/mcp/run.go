@@ -15,7 +15,7 @@ func isWindows() bool { return runtime.GOOS == "windows" }
 func runWithTimeout(exe string, args []string, d time.Duration) (string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), d)
 	defer cancel()
-	cmd := exec.CommandContext(ctx, exe, args...)
+	cmd := Quietly(exec.CommandContext(ctx, exe, args...))
 	var out bytes.Buffer
 	cmd.Stdout, cmd.Stderr = &out, &out
 	err := cmd.Run()
@@ -27,7 +27,7 @@ func runWithTimeout(exe string, args []string, d time.Duration) (string, error) 
 func runWithInput(exe string, args []string, in []byte, d time.Duration) (string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), d)
 	defer cancel()
-	cmd := exec.CommandContext(ctx, exe, args...)
+	cmd := Quietly(exec.CommandContext(ctx, exe, args...))
 	if in != nil {
 		cmd.Stdin = bytes.NewReader(in)
 	}

@@ -1,0 +1,155 @@
+{
+  "$comment": "EVERY ICON THE SYSTEM DRAWS, in one table. Nothing else carries a glyph: a control, a heading or a button names an icon, and this file decides what that name looks like. So the same mark is the same mark in the sidebar, the editor and the log window, and changing one is one edit here. A name that resolves to a glyph today can resolve to a file tomorrow, and nothing that uses the name has to change. Prefer a character: it takes the colour of the text around it, scales with the font, and needs no file. `at` is the code point, written for a person to search for.",
+  "power": {
+    "glyph": "⏻",
+    "at": "U+23FB",
+    "for": "start the engine, and stop it"
+  },
+  "lines": {
+    "glyph": "≡",
+    "at": "U+2261",
+    "for": "the log, and a list"
+  },
+  "home": {
+    "glyph": "⌂",
+    "at": "U+2302",
+    "for": "the engine's own home page"
+  },
+  "plus": {
+    "glyph": "＋",
+    "at": "U+FF0B",
+    "for": "make something new. Full width, because a thin plus disappears at this size"
+  },
+  "hand": {
+    "glyph": "✋🤖",
+    "at": "U+270B U+1F916",
+    "for": "the hold. A raised hand and the robot it stops, so what has stopped is on the button"
+  },
+  "hammer": {
+    "glyph": "🔨",
+    "at": "U+1F528",
+    "for": "work. Not gears, which belong to configuration"
+  },
+  "pin": {
+    "glyph": "📌",
+    "at": "U+1F4CC",
+    "for": "pin a group to the top, and unpin it"
+  },
+  "open": {
+    "glyph": "▾",
+    "at": "U+25BE",
+    "for": "a group that is open"
+  },
+  "shut": {
+    "glyph": "▸",
+    "at": "U+25B8",
+    "for": "a group that is folded"
+  },
+  "filter": {
+    "glyph": "▼",
+    "at": "U+25BC",
+    "for": "the filter control"
+  },
+  "sort": {
+    "glyph": "⇅",
+    "at": "U+21C5",
+    "for": "the sort control"
+  },
+  "columns": {
+    "glyph": "≡",
+    "at": "U+2261",
+    "for": "the properties control"
+  },
+  "query": {
+    "glyph": "☵",
+    "at": "U+2635",
+    "for": "show the query behind a view"
+  },
+  "split": {
+    "glyph": "◫",
+    "at": "U+25EB",
+    "for": "show a second column"
+  },
+  "remove": {
+    "glyph": "✕",
+    "at": "U+2715",
+    "for": "take this row away"
+  },
+  "up": {
+    "glyph": "▲",
+    "at": "U+25B2",
+    "for": "smallest first"
+  },
+  "down": {
+    "glyph": "▼",
+    "at": "U+25BC",
+    "for": "largest first"
+  },
+  "previous": {
+    "glyph": "‹",
+    "at": "U+2039",
+    "for": "the page before"
+  },
+  "next": {
+    "glyph": "›",
+    "at": "U+203A",
+    "for": "the page after"
+  },
+  "$log": "What the log window puts beside a record. It reads this table too.",
+  "ok": {
+    "glyph": "✓",
+    "at": "U+2713",
+    "for": "a call that was allowed"
+  },
+  "refused": {
+    "glyph": "✗",
+    "at": "U+2717",
+    "for": "a call that was refused"
+  },
+  "$types": "What a column holds, said in one character. The editor draws one of these beside every property name.",
+  "type.file": {
+    "glyph": "ⓘ",
+    "at": "U+24D8",
+    "for": "a file"
+  },
+  "type.date": {
+    "glyph": "◷",
+    "at": "U+25F7",
+    "for": "a date"
+  },
+  "type.list": {
+    "glyph": "≡",
+    "at": "U+2261",
+    "for": "a list"
+  },
+  "type.string": {
+    "glyph": "≡",
+    "at": "U+2261",
+    "for": "text"
+  },
+  "type.number": {
+    "glyph": "#",
+    "at": "U+0023",
+    "for": "a number"
+  },
+  "type.boolean": {
+    "glyph": "☑",
+    "at": "U+2611",
+    "for": "true or false"
+  },
+  "type.link": {
+    "glyph": "↗",
+    "at": "U+2197",
+    "for": "a link"
+  },
+  "type.object": {
+    "glyph": "{}",
+    "at": "U+007B U+007D",
+    "for": "something with parts"
+  },
+  "type.null": {
+    "glyph": "·",
+    "at": "U+00B7",
+    "for": "nothing"
+  }
+}

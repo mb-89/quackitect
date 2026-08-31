@@ -21,7 +21,7 @@ type Operator struct {
 	ID    string   `json:"id"`
 	Label string   `json:"label"`
 	Types []string `json:"types,omitempty"` // empty means every type
-	Takes bool     `json:"takes"`          // whether it takes a value
+	Takes bool     `json:"takes"`           // whether it takes a value
 	build func(prop, value string) string
 }
 

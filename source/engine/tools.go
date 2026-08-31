@@ -106,7 +106,7 @@ func ask1(c Candidate) (Tool, bool) {
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), probeWait)
 	defer cancel()
-	out, err := exec.CommandContext(ctx, path, c.Args...).CombinedOutput()
+	out, err := Quietly(exec.CommandContext(ctx, path, c.Args...)).CombinedOutput()
 	if err != nil {
 		return Tool{}, false
 	}

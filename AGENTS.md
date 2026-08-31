@@ -35,6 +35,10 @@ Do not use a contraction.
 
 Do not use a Latin abbreviation. Write "for example", "that is", "and so on".
 
+Do not use "just" as a minimiser. The time word is fine: somebody who has just
+arrived. The minimiser is not: a newly reachable tree is just more filesystem.
+No checker can separate the two, so this one is yours to keep.
+
 Do not tell the reader how to feel about a sentence. The words that do it are
 in `util/voice-rules.json`, and a refusal names the one you wrote.
 
@@ -194,6 +198,34 @@ Do not report work as done without the evidence that it is.
 
 Run the check that would catch the mistake you are most likely to have made.
 
+### The check comes first
+
+Write the check before the work. Run it against the defect. Watch it go red.
+Then do the work.
+
+A CHECK BUILT AFTER THE WORK, FROM THE WORK, CANNOT GO RED. It asserts what the
+fix happens to produce, so it confirms what you have already done and can never
+contradict you. A check nobody has seen fail is a check nobody has tested.
+
+Four shapes it takes, and they are one mistake:
+
+A check that names something nothing writes. One tested for a class name that
+appears nowhere and passed with the defect on screen.
+
+A check in the wrong language. A rule enforced in Go and checked in JavaScript
+cannot see the thing it guards, and stayed green when the defect was put back.
+
+A word list built from the cases already found. It reports zero by construction
+and cannot go non-zero for anything phrased differently.
+
+A scope drawn around what you touched rather than around what the claim covers.
+Two files were enumerated and called all of them.
+
+THE CHECK GOES WHERE THE DEFECT IS, in the language the defect is written in.
+
+A CHECK THAT FINDS NOTHING TO CHECK REFUSES. One that passes because the code it
+guards has gone is a check that has quietly stopped working.
+
 ## Help
 
 You may write a helper script for anything you are about to do more than once.
@@ -210,28 +242,29 @@ never content it has to author.
 
 ## The record
 
-Put what the person said into the record when a message reaches you mid-turn:
-
-    se --said "<their sentence, copied>"
-
-Copy it. Do not shorten it, tidy it, or join two of them. Somebody reading the
-log for what they said, and finding your reading of it, has been told what they
-meant by the one thing they were checking.
-
-Then answer it:
+Answer the person before you do anything else:
 
     se --answer "<what you would have said to them>"
 
-IN THAT ORDER, and before anything else you were going to do. Their sentence,
-then your answer to it, then the work. Answering first puts your answer above
-their prompt in the log, which reads as an answer to something else.
+THE ENGINE PUTS THEIR WORDS IN THE RECORD, so you do not. It reads the
+harness transcript on every tool call and copies what they said, word for word,
+into the log. Then it refuses every call until an answer follows.
 
-You do not have to stop the turn to be heard. Answering was the one thing that
-needed the turn to end, so it was ending turns that still had work in them.
+That refusal is the whole rule. You cannot forget it and you cannot get ahead
+of it: their sentence is already above your answer, and nothing else runs until
+you give one.
 
-The harness fires an event for a message that starts a turn and none for one
-written into a turn that is already running. You are the only thing that hears
-those, so you are the only thing that can record them.
+You do not have to stop the turn to be heard. Answer, then carry on with the
+work you hold.
+
+    se --said "<their sentence, copied>"
+
+is the fallback, for a message the engine has not copied. Use it whenever you
+are unsure. The verb refuses a repeat, so recording one twice is not a thing
+you can do, and a rule with no condition on it is a rule you cannot apply
+wrongly.
+
+Copy their sentence. Do not shorten it, tidy it, or join two of them.
 
 ## Change
 

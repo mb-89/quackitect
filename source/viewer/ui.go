@@ -233,19 +233,22 @@ func (m *model) loadDetail() {
 	if !m.details {
 		return
 	}
+	// THE PANE WRAPS RATHER THAN CLIPS. A viewport cuts at its width, and the
+	// lines worth opening the pane for are the long ones.
+	show := func(text string) { m.detail.SetContent(Wrap(text, m.detail.Width)) }
 	if m.onFilter {
-		m.detail.SetContent(FilterHelp)
+		show(FilterHelp)
 		m.detail.GotoTop()
 		m.helping = true
 		return
 	}
 	i := m.selIndex()
 	if i < 0 {
-		m.detail.SetContent(FilterHelp)
+		show(FilterHelp)
 		return
 	}
 	m.helping = false
-	m.detail.SetContent(m.all[m.view[i]].Detail())
+	show(m.all[m.view[i]].Detail())
 	m.detail.GotoTop()
 }
 
@@ -322,6 +325,11 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.input.Width = max(10, m.listWidth()-12)
 		m.detail.Width = max(10, m.w-m.listWidth()-3)
 		m.detail.Height = max(3, m.h-4)
+		// A NARROWER PANE WRAPS DIFFERENTLY, so what is shown is built again at
+		// the new width. The selection has not moved, so the scroll is kept.
+		at := m.detail.YOffset
+		m.loadDetail()
+		m.detail.YOffset = at
 		m.clampTop()
 		return m, nil
 
@@ -549,12 +557,12 @@ func (m model) renderStatus(w int) string {
 		return errStyle.Render(truncate("cannot read the log: "+m.err.Error(), w))
 	}
 	if m.filterBad != "" {
-		return errStyle.Render(truncate("filter "+m.filterBad+" · showing the last one that worked", w))
+		return errStyle.Render(truncate("filter "+m.filterBad+" · showing the last one that worked", w)) // · is a separator, not an icon
 	}
 	shown := len(m.view)
 	total := len(m.all)
 	if total == 0 {
-		return dimStyle.Render(truncate("waiting for "+m.path+" · nothing has been written to it yet", w))
+		return dimStyle.Render(truncate("waiting for "+m.path+" · nothing has been written to it yet", w)) // · is a separator, not an icon
 	}
 	follow := "held"
 	if m.follow {
@@ -567,10 +575,10 @@ func (m model) renderStatus(w int) string {
 	// A BUILD THAT WAS NEVER STAMPED SAYS NOTHING, so it is not shown. The
 	// word is what a variable holds when nobody set it, and putting it on the
 	// bar asks the reader to work that out.
-	s := fmt.Sprintf("%d of %d  ·  %s  ·  tab focus %s  ·  enter details  ·  esc clear and follow",
+	s := fmt.Sprintf("%d of %d  ·  %s  ·  tab focus %s  ·  enter details  ·  esc clear and follow", // · is a separator, not an icon
 		shown, total, follow, focusStyle.Render(focus))
 	if Build != "unstamped" {
-		s += "  ·  " + Build
+		s += "  ·  " + Build // · is a separator, not an icon
 	}
 	return dimStyle.Render(truncate(s, w))
 }

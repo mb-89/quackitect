@@ -96,6 +96,8 @@ const (
 	headGuidance = "## guidance"
 	headEvidence = "## evidence: "
 	headFinding  = "## finding "
+	headCriteria = "## done when"
+	headLesson   = "## lesson "
 )
 
 func (t Token) body() string {
@@ -112,10 +114,29 @@ func (t Token) body() string {
 	for _, s := range sortedKeys(t.Submission) {
 		b.WriteString(headEvidence + s + "\n\n" + t.Submission[s] + "\n\n")
 	}
+	// WHAT DONE MEANS, in the note a person reads and edits. A criterion with a
+	// command carries it, so a reader runs the same thing the engine runs.
+	if len(t.Criteria) > 0 {
+		b.WriteString(headCriteria + "\n\n")
+		for _, c := range t.Criteria {
+			b.WriteString("- " + c.Says + "\n")
+			if c.Runs != "" {
+				b.WriteString("  `" + c.Runs + "`\n")
+			}
+		}
+		b.WriteString("\n")
+	}
 	for i, f := range t.Findings {
 		fmt.Fprintf(&b, "%s%d · round %d · %s · by %s\n\n", headFinding, i+1, f.Round, f.Clause, f.By)
 		b.WriteString("**wrong:** " + f.Wrong + "\n\n")
 		b.WriteString("**satisfies:** " + f.Satisfies + "\n\n")
+	}
+	// A LESSON SITS BESIDE THE ROUND THAT TAUGHT IT, so a reader finds what a
+	// round cost and what it was worth in the same place.
+	for i, l := range t.Lessons {
+		fmt.Fprintf(&b, "%s%d · round %d · by %s\n\n", headLesson, i+1, l.Round, l.By)
+		b.WriteString("**the class:** " + l.Class + "\n\n")
+		b.WriteString("**instead:** " + l.Avoid + "\n\n")
 	}
 	return b.String()
 }
@@ -148,10 +169,58 @@ func readBody(t *Token, body string) {
 				t.Submission = map[string]string{}
 			}
 			t.Submission[strings.TrimPrefix(head, headEvidence)] = text
+		case head == headCriteria:
+			t.Criteria = readCriteria(text)
 		case strings.HasPrefix(head, headFinding):
 			t.Findings = append(t.Findings, readFinding(head, text))
+		case strings.HasPrefix(head, headLesson):
+			t.Lessons = append(t.Lessons, readLesson(head, text))
 		}
 	}
+}
+
+// One newline, named, because writing it inline is where these files keep
+// breaking.
+const nl = "\n"
+
+// A CRITERION IS A LIST ITEM, and the command under it is fenced in backticks
+// so a person can copy it out and run the same thing the engine runs.
+func readCriteria(text string) []Criterion {
+	var out []Criterion
+	for _, line := range strings.Split(text, nl) {
+		l := strings.TrimSpace(line)
+		switch {
+		case strings.HasPrefix(l, "- "):
+			out = append(out, Criterion{Says: strings.TrimSpace(l[2:])})
+		case strings.HasPrefix(l, "`") && strings.HasSuffix(l, "`") && len(out) > 0:
+			out[len(out)-1].Runs = strings.Trim(l, "`")
+		}
+	}
+	return out
+}
+
+func readLesson(head, text string) Lesson {
+	// The heading carries the round and the author, the way a finding's does.
+	l := Lesson{}
+	for _, p := range strings.Split(strings.TrimPrefix(head, headLesson), "·") {
+		p = strings.TrimSpace(p)
+		switch {
+		case strings.HasPrefix(p, "round "):
+			l.Round, _ = strconv.Atoi(strings.TrimPrefix(p, "round "))
+		case strings.HasPrefix(p, "by "):
+			l.By = strings.TrimPrefix(p, "by ")
+		}
+	}
+	for _, part := range strings.Split(text, nl+nl) {
+		p := strings.TrimSpace(part)
+		switch {
+		case strings.HasPrefix(p, "**the class:** "):
+			l.Class = strings.TrimPrefix(p, "**the class:** ")
+		case strings.HasPrefix(p, "**instead:** "):
+			l.Avoid = strings.TrimPrefix(p, "**instead:** ")
+		}
+	}
+	return l
 }
 
 // sections cuts the body at every level-two heading. The heading is the whole
@@ -244,6 +313,9 @@ func SaveToken(r Roots, t Token) error {
 		return err
 	}
 	noteMove(r, t, was, existed == nil)
+	if existed == nil && was.Status != t.Status {
+		followChildren(r, t)
+	}
 	return nil
 }
 
@@ -332,4 +404,50 @@ func Tokens(r Roots) []Token {
 		return out[i].ID < out[j].ID
 	})
 	return out
+}
+
+// A PARENT FOLLOWS ITS CHILDREN INTO WORK, AND OUT OF IT AGAIN.
+//
+// A parent is in work while any child is in work, and it leaves in_work when
+// the last child does. That is how two tokens are in work at once without an
+// agent holding two: the agent holds the child, and the parent is in work
+// because the child is how the parent is being done.
+//
+// It also replaces a wrong reading. A parent looked blocked by its own
+// sub-token, which said the sub-token was in the way when it was the work.
+//
+// NOTHING PULLS A PARENT, so the rule can only live here. This is the one
+// place that sees a state change, and a parent is not a queue entry: the
+// holder stays empty, because nobody is holding it.
+func followChildren(r Roots, child Token) {
+	if child.Parent == "" {
+		return
+	}
+	p, err := LoadToken(r, child.Parent)
+	if err != nil {
+		return
+	}
+	// A parent already settled is left alone. Its children are history.
+	if p.Status == Closed || p.Status == Submitted || p.Status == InReview {
+		return
+	}
+	working := false
+	for _, id := range p.Subs {
+		if s, err := LoadToken(r, id); err == nil && s.Status == InWork {
+			working = true
+			break
+		}
+	}
+	// LOWER ONLY WHAT THIS RULE RAISED, and the empty holder is the mark. A
+	// parent an agent pulled has a holder, and putting that one back to open
+	// left the record saying a token was open and held at once.
+	switch {
+	case working && p.Status == Open && p.Holder == "":
+		p.Status = InWork
+	case !working && p.Status == InWork && p.Holder == "":
+		p.Status = Open
+	default:
+		return
+	}
+	_ = SaveToken(r, p)
 }

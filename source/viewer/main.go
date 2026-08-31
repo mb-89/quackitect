@@ -58,6 +58,9 @@ func main() {
 }
 
 func run(path string) {
+	// EVERY MARK COMES FROM util/icons.json, the same table the sidebar and the
+	// editor read. It is found by walking up from the log this window watches.
+	ReadIcons(path)
 	// The alternate screen keeps the log out of the shell's scrollback. No
 	// mouse option is requested anywhere: mouse tracking takes selection and
 	// copy away from the terminal, and a log nobody can copy from has a hole

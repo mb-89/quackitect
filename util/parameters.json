@@ -29,10 +29,10 @@
           "command": "quackitect.startAgent",
           "stopCommand": "quackitect.stopEngine",
           "labels": {
-            "idle": "start",
-            "busy": "start",
-            "good": "stop",
-            "bad": "start"
+            "idle": "power",
+            "busy": "power",
+            "good": "power",
+            "bad": "power"
           },
           "titles": {
             "idle": "start",
@@ -44,16 +44,16 @@
         {
           "name": "log",
           "type": "action",
-          "label": "show log",
+          "label": "lines",
           "command": "quackitect.showLog",
-          "title": "open the log window in a terminal"
+          "title": "show log / open the log window in a terminal"
         },
         {
           "name": "home",
           "type": "action",
           "label": "home",
           "command": "quackitect.welcome",
-          "title": "the engine's own home page, not the project it drives"
+          "title": "home / the engine's own home page, not the project it drives"
         },
         {
           "name": "spacer",
@@ -62,21 +62,21 @@
         {
           "name": "init",
           "type": "action",
-          "label": "init",
+          "label": "plus",
           "command": "quackitect.init",
-          "title": "make this folder a project, or a vehicle that carries the method"
+          "title": "init / make this folder a project, or a vehicle that carries the method"
         },
         {
           "name": "hold",
           "type": "toggle",
           "command": "quackitect.hold",
           "labels": {
-            "off": "hold 🤖",
-            "on": "held 🤖"
+            "off": "hand",
+            "on": "hand"
           },
           "titles": {
-            "off": "stop the agent. Nothing it asks for is allowed until this is pressed again",
-            "on": "everything is on hold. Press to let it go on"
+            "off": "hold / stop the agent. Nothing it asks for is allowed until this is pressed again",
+            "on": "held / everything is on hold. Press to let it go on"
           }
         }
       ]
@@ -89,9 +89,9 @@
         {
           "name": "editor",
           "type": "action",
-          "label": "work",
+          "label": "hammer",
           "command": "quackitect.showWork",
-          "title": "open the work editor. Press it again to close it"
+          "title": "work / open the work editor. Press it again to close it"
         },
         {
           "name": "mint",
@@ -139,7 +139,7 @@
           "type": "int",
           "default": 5,
           "min": 1,
-          "max": 60,
+          "max": 5,
           "narrow": "smaller",
           "help": "Seconds between heartbeats. A smaller number is taken. A larger one is ignored."
         },
@@ -153,6 +153,16 @@
           "step": 500,
           "narrow": "smaller",
           "help": "Milliseconds allowed from the press to a ready agent. Missing it turns the light red."
+        },
+        {
+          "name": "unreviewed_before_blocked",
+          "title": "unreviewed before blocked",
+          "type": "int",
+          "default": 3,
+          "min": 0,
+          "max": 3,
+          "narrow": "smaller",
+          "help": "How many tokens may wait for review with nothing in review before the pull refuses. Zero turns it off. It may be made smaller and never larger, so a person tightens the rule here and loosens it by changing the default."
         }
       ]
     },
@@ -161,6 +171,14 @@
       "title": "guards",
       "type": "group",
       "children": [
+        {
+          "name": "answer_first",
+          "title": "answer them first",
+          "type": "bool",
+          "default": true,
+          "narrow": "on",
+          "help": "Refuse every call while the person is waiting to be answered. The engine reads its own log to know."
+        },
         {
           "name": "guard_projections",
           "title": "projections",

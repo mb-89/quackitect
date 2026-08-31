@@ -1,5 +1,8 @@
 {
   "$comment": "THE RULES ARE DATA, AND THEY ARE MEANT TO BE SWAPPED. Replace this file and the checker changes. Nothing here is copied from a standard that restricts who may use it: the wording is our own, and a licensed word list can be dropped in as a rules file of its own.",
+  "$omitted": {
+    "just": "CONSIDERED AND LEFT OUT, and written into voice.md instead. It has two meanings, the minimiser and the time word, and a word-boundary pattern cannot tell them apart. MEASURED: adding it refuses 5 lines in this project's own documents, and 4 of them are the time word: 'somebody who has just arrived' twice, 'the thing that just happened', 'a settings file that just changed'. One is the minimiser: 'a newly reachable tree is just more filesystem'. A rule that is wrong four times out of five is a rule a writer turns off. So the rule lives in doc/guidance/voice.md, where a person applies it, and not here."
+  },
   "source": "guidance/voice.md",
   "limits": {
     "sentence_words": 25

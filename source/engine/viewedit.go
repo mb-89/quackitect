@@ -125,7 +125,17 @@ func patchView(path, view, key string, rewrite func(block []string, indent strin
 	block := rewrite(was, inner)
 
 	var out []string
-	if at < 0 {
+	switch {
+	case at >= 0 && len(block) == 0:
+		// A KEY WITH NOTHING UNDER IT IS NOT A KEY. Leaving the bare line
+		// behind gives the reader a name where a value was wanted, and it
+		// refuses the whole file. Unpinning the last pin did exactly that.
+		out = append(out, lines[:at]...)
+		out = append(out, lines[end:]...)
+	case at < 0 && len(block) == 0:
+		// A key that is not there and has nothing to say stays not there.
+		return nil
+	case at < 0:
 		// A KEY THAT IS NOT THERE YET GOES AFTER THE VIEW'S LAST LINE, and the
 		// last line is the last one that belongs to the view rather than the
 		// last one before the next. A blank line between two views belongs to
@@ -138,12 +148,19 @@ func patchView(path, view, key string, rewrite func(block []string, indent strin
 		out = append(out, keyIndent+key+":")
 		out = append(out, block...)
 		out = append(out, lines[last:]...)
-	} else {
+	default:
 		out = append(out, lines[:at+1]...)
 		out = append(out, block...)
 		out = append(out, lines[end:]...)
 	}
-	return os.WriteFile(path, []byte(strings.Join(out, "\n")), 0o644)
+	// THE FILE KEEPS ITS LAST NEWLINE. Removing a key at the end of a file
+	// took the empty line after it too, so a pin and an unpin left the file one
+	// byte shorter than it started.
+	text := strings.Join(out, "\n")
+	if strings.HasSuffix(string(b), "\n") && !strings.HasSuffix(text, "\n") {
+		text += "\n"
+	}
+	return os.WriteFile(path, []byte(text), 0o644)
 }
 
 // A VIEW STARTS AT ITS LIST ITEM, not at the line that names it. The name may
@@ -241,6 +258,122 @@ func upsertPair(block []string, indent, name, value string) []string {
 	}
 	if !found {
 		out = append(out, indent+name+": "+value)
+	}
+	return out
+}
+
+// PINNING IS THE OWNER'S, AND IT IS A FILTER.
+//
+// A pinned group is drawn like every other group. What pinning changes is
+// where it sits and that it survives a change of grouping, which is why the
+// pin carries a filter rather than a value of whatever the grouping is today.
+//
+// Pin adds one. Unpin removes the one with that name. Both write the view
+// file, because that is where the owner's arrangement lives.
+// AddPin puts a group on top.
+//
+// A GROUP THE FILE DECLARES IS PINNED BY NAME. The filter is already in the
+// file, so nothing is written twice and nothing can drift.
+//
+// A GROUP THE DATA MADE IS PINNED WITH ITS FILTER, inline, and the file goes on
+// declaring nothing about it. Declaring it would make it permanent, and a group
+// somebody invented has to go on disappearing when it empties.
+func AddPin(path, view, name, filter string) error {
+	if strings.TrimSpace(name) == "" {
+		return fmt.Errorf("a pin needs a name")
+	}
+	declared := declaresGroup(path, view, name)
+	if !declared && strings.TrimSpace(filter) == "" {
+		return fmt.Errorf("%q is not a declared group, so pinning it needs a filter", name)
+	}
+	return patchView(path, view, "pinned", func(was []string, indent string) []string {
+		out := dropPinned(was, name)
+		if declared {
+			return append(out, indent+"- "+name)
+		}
+		return append(out, indent+"- name: "+name,
+			indent+"  filter: "+quoteStatement(filter))
+	})
+}
+
+// DropPinNamed takes a group off the top.
+//
+// A DECLARED GROUP STAYS DECLARED, so it draws where the grouping puts it. An
+// invented one leaves with its pin, because the pin was the only thing in the
+// file that named it.
+func DropPinNamed(path, view, name string) error {
+	return patchView(path, view, "pinned", func(was []string, indent string) []string {
+		return dropPinned(was, name)
+	})
+}
+
+// dropPinned removes one entry from the pin list, whichever shape it is: a bare
+// name, or a name with its filter under it.
+func dropPinned(block []string, name string) []string {
+	return dropName(dropPin(block, name), name)
+}
+
+// declaresGroup answers whether the view already declares a group by this name.
+func declaresGroup(path, view, name string) bool {
+	b, err := os.ReadFile(path)
+	if err != nil {
+		return false
+	}
+	lines := strings.Split(strings.ReplaceAll(string(b), "\r\n", "\n"), "\n")
+	from, to, indent := findView(lines, view)
+	if from < 0 {
+		return false
+	}
+	at, end := findKey(lines, from, to, indent, "groups")
+	if at < 0 {
+		return false
+	}
+	for _, l := range lines[at+1 : end] {
+		if m := pinName.FindStringSubmatch(l); m != nil && strings.Trim(m[1], `"'`) == name {
+			return true
+		}
+	}
+	return false
+}
+
+var bareName = regexp.MustCompile(`^\s*-\s*(.+?)\s*$`)
+
+// dropName removes one name from a list of them.
+func dropName(block []string, name string) []string {
+	var out []string
+	for _, l := range block {
+		if m := bareName.FindStringSubmatch(l); m != nil && strings.Trim(m[1], `"'`) == name {
+			continue
+		}
+		if strings.TrimSpace(l) != "" {
+			out = append(out, l)
+		}
+	}
+	return out
+}
+
+var pinName = regexp.MustCompile(`^\s*-\s*name:\s*(.+?)\s*$`)
+
+// dropPin removes one pin's item from a pinned block, and its lines with it. A
+// pin is a list item, so it ends where the next list item begins.
+func dropPin(block []string, name string) []string {
+	var out []string
+	skipping := false
+	for _, l := range block {
+		if m := pinName.FindStringSubmatch(l); m != nil {
+			skipping = strings.Trim(m[1], `"'`) == name
+			if skipping {
+				continue
+			}
+		} else if skipping {
+			if !itemStart.MatchString(l) {
+				continue
+			}
+			skipping = false
+		}
+		if strings.TrimSpace(l) != "" {
+			out = append(out, l)
+		}
 	}
 	return out
 }

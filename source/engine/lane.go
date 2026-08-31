@@ -49,16 +49,51 @@ func runWork(args []string) {
 	backlog := fs.Bool("backlog", false, "mint it backlogged: visible, and not work anybody is doing")
 	note := fs.Bool("note", false, "a note: ephemeral and backlogged. What a person means by write a note on this")
 	activate := fs.String("open", "", "move a backlogged token into the queue, by id")
+	first := fs.String("first", "", "instead of minting: put a token at the front of the queue, by id")
 	by := fs.String("by", "", "who is minting it. The caller knows, and nothing here can work it out")
 	set := fs.String("set", "", "instead of minting: change one thing about a token, by id")
+	dup := fs.String("duplicate", "", "instead of minting: settle a token that says the same as another, by id")
+	of := fs.String("of", "", "with duplicate: the token it says the same as")
 	bucket := fs.String("bucket", "", "with set: file it under this grouping. Empty clears it")
+	file := fs.String("file", "", "instead of minting: file these ids in one bucket, comma separated")
+	named := fs.String("named", "", "with file: what to call it. Empty asks the engine for a free name")
+	rename := fs.String("rename", "", "instead of minting: rename a bucket, by the name it has")
 	field := fs.String("field", "", "with set: which field to write")
-	to := fs.String("to", "", "with set: what to write in it")
+	to := fs.String("to", "", "with set or rename: what to write in it")
 	_ = fs.Parse(args)
 
 	roots, err := FindRoots(*work)
 	if err != nil {
 		fail(err)
+	}
+
+	// A DUPLICATE IS SETTLED WITHOUT A REVIEW, because nothing was done to
+	// review. Two tokens saying one thing is a fault in the backlog rather
+	// than work, and the one that stays carries the successor so nothing
+	// vanishes: a reader who finds the closed one is sent to the live one.
+	if *dup != "" {
+		t, err := LoadToken(roots, *dup)
+		if err != nil {
+			answerJSON(map[string]any{"error": err.Error()})
+			os.Exit(1)
+		}
+		if _, err := LoadToken(roots, *of); err != nil {
+			answerJSON(map[string]any{"error": "it duplicates " + *of + ", which does not exist"})
+			os.Exit(1)
+		}
+		if t.Status == Closed {
+			answerJSON(map[string]any{"error": *dup + " is already closed"})
+			os.Exit(1)
+		}
+		t.Status, t.Disposition, t.Successors, t.Holder = Closed, Became, []string{*of}, ""
+		if err := SaveToken(roots, t); err != nil {
+			answerJSON(map[string]any{"error": err.Error()})
+			os.Exit(1)
+		}
+		inSession(roots, "work", or2(*by, "main"), t.ID+" says the same as "+*of, Yes(),
+			map[string]any{"id": t.ID, "became": *of})
+		answerJSON(t)
+		return
 	}
 
 	// FILING IS THE ENGINE'S ACT. A person drags a row onto a group and the
@@ -105,6 +140,53 @@ func runWork(args []string) {
 		return
 	}
 
+	// WHAT A PERSON OWNS IS THE ORDER, and this is how they say it. It writes
+	// seq and nothing else, so which state a token is in stays with the pull.
+	// A BUCKET IS THE PERSON'S OWN NAME FOR A GROUP, and filing rows into one is
+	// what a person means by making a group out of a selection.
+	if *file != "" {
+		ids := splitComma(*file)
+		name, err := FileInBucket(roots, ids, *named, or2(*by, "main"))
+		if err != nil {
+			answerJSON(map[string]any{"error": err.Error()})
+			os.Exit(1)
+		}
+		inSession(roots, "work", or2(*by, "main"),
+			fmt.Sprintf("%d token(s) filed in %s", len(ids), name), Yes(),
+			map[string]any{"bucket": name, "ids": ids})
+		answerJSON(map[string]any{"bucket": name, "filed": len(ids)})
+		return
+	}
+
+	if *rename != "" {
+		n, err := RenameBucket(roots, *rename, *to, or2(*by, "main"))
+		if err != nil {
+			answerJSON(map[string]any{"error": err.Error()})
+			os.Exit(1)
+		}
+		inSession(roots, "work", or2(*by, "main"),
+			fmt.Sprintf("%s renamed to %s, %d token(s)", *rename, *to, n), Yes(),
+			map[string]any{"from": *rename, "to": *to, "tokens": n})
+		answerJSON(map[string]any{"bucket": *to, "moved": n})
+		return
+	}
+
+	if *first != "" {
+		t, err := PutFirst(roots, *first)
+		if err != nil {
+			answerJSON(map[string]any{"error": err.Error()})
+			os.Exit(1)
+		}
+		// THE ORDER IS A DECISION AND EVERY DECISION IS IN THE RECORD. The
+		// queue hands out by seq, so a log that does not say who moved one
+		// cannot explain why the next pull answered what it did.
+		inSession(roots, "work", or2(*by, "main"),
+			fmt.Sprintf("%s put first at seq %d: %s", t.ID, t.Seq, t.Title), Yes(),
+			map[string]any{"id": t.ID, "seq": t.Seq})
+		answerJSON(t)
+		return
+	}
+
 	if *activate != "" {
 		t, err := Activate(roots, *activate)
 		if err != nil {
@@ -126,6 +208,9 @@ func runWork(args []string) {
 		t = Token{Title: *title, Detail: *detail, Assignee: *assignee, Guidance: *guidance, GuidanceRef: *guidanceRef,
 			Scope: Scope(*scope), Parent: *parent, Traced: *traced,
 			DependsOn: splitComma(*dependsOn)}
+		// A TOKEN DRAFTS BEFORE IT IS WORKED ON. Which ones is the verb's
+		// policy, and StartsAt is where that policy lives.
+		t.Status = StartsAt(t)
 		if *sections != "" {
 			t.Evidence.Sections = splitComma(*sections)
 		}
@@ -201,6 +286,7 @@ func runView(args []string) {
 		fmt.Fprintln(os.Stdout, "  se view --file work --pane left --width title=420")
 		fmt.Fprintln(os.Stdout, "  se view --file work --pane left --order title,status")
 		fmt.Fprintln(os.Stdout, "  se view --file work --pane left --sort status --direction DESC")
+		fmt.Fprintln(os.Stdout, "  se view --file work --pane left --pin open --matching 'status == \"open\"'")
 		fmt.Fprintln(os.Stdout, "")
 		fs.PrintDefaults()
 	}
@@ -213,6 +299,9 @@ func runView(args []string) {
 	groupBy := fs.String("group", "", "group by this column")
 	direction := fs.String("direction", "ASC", "with sort or group: ASC or DESC")
 	filter := fs.String("filter", "", "the filter a person built, as JSON groups of rows")
+	pin := fs.String("pin", "", "pin a group to the top, by name")
+	pinOn := fs.String("matching", "", "with pin: the filter the pinned group keeps")
+	unpin := fs.String("unpin", "", "unpin a group, by name")
 	_ = fs.Parse(args)
 
 	roots, err := FindRoots(*work)
@@ -259,8 +348,12 @@ func runView(args []string) {
 		if text, wrote = FilterExpression(groups); wrote == nil {
 			wrote = SetFilter(path, *pane, text)
 		}
+	case *pin != "":
+		wrote = AddPin(path, *pane, *pin, *pinOn)
+	case *unpin != "":
+		wrote = DropPinNamed(path, *pane, *unpin)
 	default:
-		wrote = fmt.Errorf("say what to change: width, order, sort or group")
+		wrote = fmt.Errorf("say what to change: width, order, sort, group, filter, pin or unpin")
 	}
 	if wrote != nil {
 		answerJSON(map[string]any{"error": wrote.Error()})
@@ -336,6 +429,11 @@ func runQuery(args []string) {
 	if err != nil {
 		answerJSON(map[string]any{"error": err.Error()})
 		os.Exit(1)
+	}
+	// EVERY ICON THE EDITOR DRAWS RIDES ALONG, so the client holds no copy of
+	// a mark and cannot drift from the table.
+	if icons, err := Icons(roots); err == nil {
+		t.Icons = icons
 	}
 	// THE QUERY IS THE SAME THING RENDERED TWICE, and a person may want the
 	// other rendering. It rides along so the panel needs no second call.
@@ -478,4 +576,40 @@ func or2(s, fallback string) string {
 		return fallback
 	}
 	return s
+}
+
+// runMove moves a file and repairs what refers to it. It answers what it
+// rewrote and what it could not, because the second is work the caller owes.
+func runMove(args []string) {
+	fs := flag.NewFlagSet("move", flag.ExitOnError)
+	fs.SetOutput(os.Stdout)
+	fs.Usage = func() {
+		fmt.Fprintln(os.Stdout, "se move - move a file and fix every reference to it. Prints what changed.")
+		fmt.Fprintln(os.Stdout, "")
+		fmt.Fprintln(os.Stdout, "  se move --from doc/old.md --to doc/new.md")
+		fmt.Fprintln(os.Stdout, "")
+		fs.PrintDefaults()
+	}
+	work := fs.String("work", "", "the folder being worked on (default: this one)")
+	from := fs.String("from", "", "the file to move")
+	to := fs.String("to", "", "where it goes")
+	_ = fs.Parse(args)
+
+	roots, err := FindRoots(*work)
+	if err != nil {
+		fail(err)
+	}
+	if *from == "" || *to == "" {
+		answerJSON(map[string]any{"error": "say both --from and --to"})
+		os.Exit(1)
+	}
+	out, err := MoveFile(roots, *from, *to)
+	if err != nil {
+		answerJSON(map[string]any{"error": err.Error()})
+		os.Exit(1)
+	}
+	inSession(roots, "move", "main", out.Moved.From+" moved to "+out.Moved.To, Yes(),
+		map[string]any{"from": out.Moved.From, "to": out.Moved.To,
+			"rewritten": len(out.Rewritten), "unrewritten": out.UnrewritN})
+	answerJSON(out)
 }

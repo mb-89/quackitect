@@ -119,7 +119,7 @@ func registerThroughEngine(root string) error {
 	if runtime.GOOS == "windows" {
 		exe += ".exe"
 	}
-	out, err := exec.Command(exe, "--register", "--method", root).CombinedOutput()
+	out, err := Quietly(exec.Command(exe, "--register", "--method", root)).CombinedOutput()
 	if err != nil {
 		return fmt.Errorf("%s: %w", strings.TrimSpace(string(out)), err)
 	}
@@ -217,7 +217,7 @@ func build(name, source string) error {
 	// The build is stamped, so a window that has been open a while can say
 	// which code it is running.
 	stamp := time.Now().UTC().Format("01-02-1504")
-	cmd := exec.Command("go", "build", "-ldflags", "-s -w -X main.Build="+stamp, "-o", out, ".")
+	cmd := Quietly(exec.Command("go", "build", "-ldflags", "-s -w -X main.Build="+stamp, "-o", out, "."))
 	cmd.Dir = source
 	cmd.Stdout, cmd.Stderr = os.Stdout, os.Stderr
 	if err := cmd.Run(); err != nil {
@@ -236,7 +236,7 @@ func openEditor(root string) {
 }
 
 func run(name string, args ...string) error {
-	cmd := exec.Command(name, args...)
+	cmd := Quietly(exec.Command(name, args...))
 	cmd.Stdout, cmd.Stderr = os.Stdout, os.Stderr
 	return cmd.Run()
 }

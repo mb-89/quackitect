@@ -117,10 +117,12 @@ func (r Record) Mark() string {
 	if r.OK == nil {
 		return " "
 	}
+	// THE FALLBACK IS WRITTEN HERE ON PURPOSE. A table that will not read must
+	// not empty this column: a blank in a terminal reads as a missing record.
 	if *r.OK {
-		return "✓"
+		return drawn("ok", "✓") // the tick is named ok, not an icon literal
 	}
-	return "✗"
+	return drawn("refused", "✗") // the cross is named refused, not an icon literal
 }
 
 // Haystack is what a bare term searches. Everything a person can see, plus the

@@ -162,7 +162,7 @@ func installInto(copyRoot string) error {
 
 func runEngine(copyRoot string, args ...string) (string, error) {
 	exe := filepath.Join(copyRoot, ".bin", exeName("se"))
-	out, err := exec.Command(exe, append(args, "--method", copyRoot)...).CombinedOutput()
+	out, err := Quietly(exec.Command(exe, append(args, "--method", copyRoot)...)).CombinedOutput()
 	return string(out), err
 }
 
@@ -171,9 +171,9 @@ func runRunme(dir string, args ...string) (string, error) {
 	script := filepath.Join(dir, runmeName())
 	var cmd *exec.Cmd
 	if runtime.GOOS == "windows" {
-		cmd = exec.Command("powershell", append([]string{"-NoProfile", "-File", script}, args...)...)
+		cmd = Quietly(exec.Command("powershell", append([]string{"-NoProfile", "-File", script}, args...)...))
 	} else {
-		cmd = exec.Command("sh", append([]string{script}, args...)...)
+		cmd = Quietly(exec.Command("sh", append([]string{script}, args...)...))
 	}
 	cmd.Dir = dir
 	out, err := cmd.CombinedOutput()

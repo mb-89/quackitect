@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { spawn, ChildProcess } from "node:child_process";
+import { spawn as spawnRaw, ChildProcess, SpawnOptions } from "node:child_process";
 import * as fs from "node:fs";
 import * as path from "node:path";
 import * as os from "node:os";
@@ -115,6 +115,18 @@ export function deactivate() {
 // The two roots. The method root is where this copy is installed. The work
 // root is the folder that is open. Neither is declared and neither is
 // registered: a write outside them is nobody's business.
+// NO WINDOW OPENS FOR A CHILD PROCESS.
+//
+// Windows gives a console to a process started from one that has none, and
+// every one of those is a window that appears on somebody's screen. Booting
+// starts several, so booting flashed several windows.
+//
+// EVERY START GOES THROUGH HERE. A start that skips it is a window, and one
+// door is the only way to keep that from coming back.
+function spawn(exe: string, args: string[], options: SpawnOptions = {}): ChildProcess {
+  return spawnRaw(exe, args, { ...options, windowsHide: true });
+}
+
 function methodRoot(context: vscode.ExtensionContext): string {
   // The extension is loaded through a junction, so extensionPath is the LINK
   // and not the tree it points at. Two levels up from the link lands in
@@ -378,10 +390,31 @@ function declaredShown(n: Node): string[] {
   return [];
 }
 
+// A CONTROL NAMES AN ICON AND NEVER CARRIES ONE. util/icons.json decides what
+// the name looks like, so the same mark is the same mark here and in the
+// editor, and changing one is one edit in one file.
+//
+// A NAME THE TABLE DOES NOT HOLD DRAWS ITSELF. A blank leaves a button nobody
+// can see, and the name on the face says which entry is missing.
+function drawIcons(n: Node, icons: Record<string, { glyph: string }>): void {
+  const drawn = (name: string) => icons[name]?.glyph ?? name;
+  if (n.label) n.label = drawn(n.label);
+  for (const k of Object.keys(n.labels ?? {})) n.labels![k] = drawn(n.labels![k]);
+  for (const c of n.children ?? []) drawIcons(c, icons);
+}
+
 function loadTree(context: vscode.ExtensionContext): Node {
   try {
-    const file = path.join(methodRoot(context), "util", "parameters.json");
-    return JSON.parse(fs.readFileSync(file, "utf8"));
+    const root = methodRoot(context);
+    const file = path.join(root, "util", "parameters.json");
+    const tree: Node = JSON.parse(fs.readFileSync(file, "utf8"));
+    try {
+      drawIcons(tree, JSON.parse(fs.readFileSync(path.join(root, "util", "icons.json"), "utf8")));
+    } catch {
+      // A table that will not read leaves the names on the buttons, which
+      // still say what each one is.
+    }
+    return tree;
   } catch {
     // A declaration that cannot be read leaves one button: the one that opens
     // the page explaining how to fix it.
@@ -874,6 +907,10 @@ function toggleWork(context: vscode.ExtensionContext) {
     if (m.type === "width") void setWidth(context, m.side, m.property, m.px);
     if (m.type === "filter") void setFilter(context, m.side, m.groups);
     if (m.type === "file") void fileWork(context, m.id, m.sets, m.into);
+    if (m.type === "pin") void writeView(context, m.side, ["--pin", m.name, "--matching", m.matching]);
+    if (m.type === "unpin") void writeView(context, m.side, ["--unpin", m.name]);
+    if (m.type === "group") void groupWork(context, m.ids);
+    if (m.type === "rename") void renameGroup(context, m.from, m.to);
   });
   void drawWork(context);
 
@@ -897,9 +934,13 @@ type WorkMessage =
   | { type: "level"; side: string; kind: string; property: string; direction: string }
   | { type: "width"; side: string; property: string; px: number }
   | { type: "filter"; side: string; groups: unknown[] }
+  | { type: "pin"; side: string; name: string; matching: string }
+  | { type: "unpin"; side: string; name: string }
   | { type: "open"; id: string }
   | { type: "edit"; id: string; col: string; text: string }
-  | { type: "file"; id: string; sets: string; into: string };
+  | { type: "file"; id: string; sets: string; into: string }
+  | { type: "group"; ids: string[] }
+  | { type: "rename"; from: string; to: string };
 
 // THE PAGE IS BUILT ONCE. After that the data lands inside it.
 //
@@ -934,8 +975,13 @@ async function drawWork(context: vscode.ExtensionContext, rebuild = false) {
   }
   for (const p of panes) {
     const b = paneBody(p.table);
+    // THE HEADINGS GO WITH THE ROWS. They were drawn once when the page was
+    // built and never again, so a first build that arrived before the engine
+    // answered left them empty for the life of the window. That is why they
+    // appeared only after a property was ticked: ticking rebuilds the page.
     void workPanel.webview.postMessage({
-      type: "body", side: p.side, pinned: b.pinned, scrolling: b.scrolling, total: b.total,
+      type: "body", side: p.side, heads: b.heads, pinned: b.pinned,
+      scrolling: b.scrolling, total: b.total,
     });
   }
 }
@@ -1004,6 +1050,22 @@ async function openNote(context: vscode.ExtensionContext, id: string) {
 // and the engine decides whether that is allowed.
 async function fileWork(context: vscode.ExtensionContext, id: string, sets: string, into: string) {
   await askEngine(context, ["work", "--set", id, "--" + sets, into]);
+  void drawWork(context);
+}
+
+// TICKED ROWS MAKE A GROUP. A person pressed the button, so a person made it,
+// and the engine refuses a group from anybody else.
+//
+// NO NAME IS SENT. The engine knows which names are taken and hands back a free
+// one, which is why the group is made first and named afterwards.
+async function groupWork(context: vscode.ExtensionContext, ids: string[]) {
+  if (ids.length === 0) return;
+  await askEngine(context, ["work", "--file", ids.join(","), "--by", "person"]);
+  void drawWork(context);
+}
+
+async function renameGroup(context: vscode.ExtensionContext, from: string, to: string) {
+  await askEngine(context, ["work", "--rename", from, "--to", to, "--by", "person"]);
   void drawWork(context);
 }
 

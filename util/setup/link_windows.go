@@ -5,7 +5,6 @@ import (
 	"os"
 	"os/exec"
 	"strings"
-	"syscall"
 )
 
 // A JUNCTION, never a symbolic link. A symbolic link on Windows needs a
@@ -50,9 +49,13 @@ func removeLink(dest string) error {
 	return nil
 }
 
+// THE COMMAND LINE IS WRITTEN INTO THE ATTRIBUTE THE DOOR MADE, and the
+// attribute is never replaced. Assigning a fresh one here would have thrown
+// away the two flags Quietly set, which is a window on somebody's screen and
+// is exactly the silent clobber this shape avoids.
 func runCmd(line string) (string, error) {
-	cmd := exec.Command("cmd")
-	cmd.SysProcAttr = &syscall.SysProcAttr{CmdLine: line}
+	cmd := Quietly(exec.Command("cmd"))
+	cmd.SysProcAttr.CmdLine = line
 	out, err := cmd.CombinedOutput()
 	return strings.TrimSpace(string(out)), err
 }

@@ -3,14 +3,25 @@
 # The format is Obsidian's and the engine renders it. Nothing here is a second
 # grammar, and nothing in the renderer knows what a token is.
 #
-# THE PINNED GROUPS ARE FILTERS, not values of the grouping property. That is
-# what lets them stay at the top when the grouping changes underneath them.
-# A row goes to the first pinned group that matches and is not repeated below,
-# so the top is a partition rather than a second copy of the same rows.
+# A DECLARED GROUP IS ALWAYS DRAWN, with nothing in it if nothing matches. What
+# it names goes on existing whether or not a token is in that state today, and a
+# heading that comes and goes is a heading nobody can aim at. A group nobody
+# declared comes from the data, and one of those is gone the moment it empties.
 #
-# state.current answers nothing at these levels, so `here` is empty until a
-# level above supplies a state. Empty is the honest answer: there is no current
-# state, so nothing is at it.
+# A PIN IS AN ORDERING AND NOT AN EXISTENCE. It names a declared group and puts
+# it on top, so unpinning leaves the group where the grouping puts it.
+#
+# A GROUP THE DATA MADE IS PINNED WITH ITS FILTER WRITTEN IN, and this file goes
+# on declaring nothing about it. So unpinning takes the whole entry away, and a
+# bucket somebody invented goes back to disappearing when it empties.
+#
+# The declared groups take their rows first, in order, so the page is a
+# partition and no row appears twice. What is left is grouped by the bucket,
+# which is the only kind of group a person invents.
+#
+# HERE IS EVERYTHING AT THE CURRENT STATE, and there are no states above the
+# token yet, so here is everything that is open or in work. It carries in_work
+# as well as open so a person sees what is being done and not only what waits.
 
 # A COLUMN IS NAMED WHAT THE NOTE NAMES IT. displayName exists for a heading
 # the owner wants to read differently, and renaming status to state or assignee
@@ -32,15 +43,25 @@ views:
       - title
       - status
       - assignee
+      - blocked
     columnSize:
       title: 300
       status: 110
-      assignee: 110
-    pinned:
+      assignee: 71
+    groups:
       - name: yours
         filter: assignee == "human" && (status == "open" || status == "in_work")
       - name: here
-        filter: scope == state.current
+        filter: status == "open" || status == "in_work"
+      - name: backlogged
+        filter: status == "backlogged"
+      - name: submitted
+        filter: status == "submitted"
+      - name: in_review
+        filter: status == "in_review"
+    pinned:
+      - yours
+      - here
     groupBy:
       - property: if(bucket, bucket, status)
         sets: bucket
@@ -48,8 +69,8 @@ views:
     collapsed:
       - backlogged
     sort:
-      - property: seq
-        direction: ASC
+      - property: assignee
+        direction: DESC
   - type: table
     name: right
     order:

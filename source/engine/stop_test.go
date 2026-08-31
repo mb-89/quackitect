@@ -155,7 +155,7 @@ func TestRejectedWorkIsWorkInHandAgain(t *testing.T) {
 	Pull(r, "main", RoleWorker, Payload{ID: tok.ID, Disposition: string(Done)})
 	Pull(r, "rev", RoleReviewer, Payload{})
 	Pull(r, "rev", RoleReviewer, Payload{ID: tok.ID, Verdict: "reject",
-		Findings: []Rejection{{Clause: "voice", Wrong: "a semicolon", Satisfies: "two sentences"}}})
+		Findings: []Rejection{{Clause: "voice", Wrong: "a semicolon", Satisfies: "two sentences"}}, Lesson: Lesson{Class: "a check built from the fix", Avoid: "write the check first and watch it go red"}})
 
 	if AskToStop(r, "main").Permitted {
 		t.Fatal("rejected work should be work in hand again")

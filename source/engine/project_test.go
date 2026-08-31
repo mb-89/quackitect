@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"os"
 	"path/filepath"
 	"strings"
@@ -21,6 +22,13 @@ func guidanceTree(t *testing.T) Roots {
 	  {"name":"copilot","target":".github/copilot-instructions.md","sources":["doc/guidance/voice.md","doc/guidance/behaviour.md"],"wrap":"markdown"},
 	  {"name":"style","target":".claude/output-styles/quackitect.md","sources":["doc/guidance/voice.md","doc/guidance/behaviour.md"],"wrap":"frontmatter","frontmatter":{"name":"quackitect"}}
 	]}`), 0o644)
+	// The icon table. The fixture declares its own for the same reason it
+	// declares its own tree: the mechanism is the thing under test.
+	os.WriteFile(filepath.Join(method, "util", "icons.json"), []byte(`{
+	  "$comment": "the fixture's own",
+	  "power": {"glyph": "⏻", "at": "U+23FB"},
+	  "hand": {"glyph": "✋", "at": "U+270B"}
+	}`), 0o644)
 	// One tree. The fixture declares its own, so the tests exercise the
 	// mechanism rather than the product's list.
 	os.WriteFile(filepath.Join(method, "util", "parameters.json"), []byte(`{
@@ -126,4 +134,69 @@ func TestTheDigestFollowsContentNotTime(t *testing.T) {
 	if other == first {
 		t.Fatal("changed content did not change the digest")
 	}
+}
+
+// A RULE THAT REACHES A WORKER REACHES EVERY FILE A WORKER READS.
+//
+// The evidence for this was a sentence: the section appears once in each of
+// the three projections, counted. The number was right and the scope was hand
+// drawn. Declare a fourth projection from the same source and the claim stays
+// true of its three while the fourth goes without the rule.
+//
+// So the scope comes from the data. Every projection that lists the guidance
+// as a source has to carry what the guidance says.
+func TestEveryProjectionOfAGuidanceCarriesIt(t *testing.T) {
+	r := guidanceTree(t)
+	source := filepath.Join("doc", "guidance", "behaviour.md")
+
+	// A rule the fixture's own guidance carries, so this tests the mechanism
+	// rather than the product's wording.
+	const rule = "Do what was asked."
+	os.WriteFile(filepath.Join(r.Method, source), []byte("# Behaviour\n\n"+rule+"\n"), 0o644)
+	if _, err := Project(r); err != nil {
+		t.Fatal(err)
+	}
+
+	targets := projectionsFrom(t, r, filepath.ToSlash(source))
+	// A CHECK THAT FINDS NOTHING TO CHECK REFUSES.
+	if len(targets) == 0 {
+		t.Fatalf("nothing is projected from %s, so this guards nothing", source)
+	}
+	for _, target := range targets {
+		b, err := os.ReadFile(filepath.Join(r.Work, target))
+		if err != nil {
+			t.Errorf("%s is projected from %s and cannot be read: %v", target, source, err)
+			continue
+		}
+		if !strings.Contains(string(b), rule) {
+			t.Errorf("%s is projected from %s and does not carry what it says", target, source)
+		}
+	}
+}
+
+// projectionsFrom answers every target whose sources include this file.
+func projectionsFrom(t *testing.T, r Roots, source string) []string {
+	t.Helper()
+	b, err := os.ReadFile(filepath.Join(r.Method, "util", "projections.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var declared struct {
+		Projections []struct {
+			Target  string   `json:"target"`
+			Sources []string `json:"sources"`
+		} `json:"projections"`
+	}
+	if err := json.Unmarshal(b, &declared); err != nil {
+		t.Fatal(err)
+	}
+	var out []string
+	for _, p := range declared.Projections {
+		for _, s := range p.Sources {
+			if s == source {
+				out = append(out, p.Target)
+			}
+		}
+	}
+	return out
 }

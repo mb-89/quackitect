@@ -17,7 +17,7 @@ func laneTools() []map[string]any {
 	return []map[string]any{
 		{
 			"name": "se_work",
-			"description": "MINT A WORK TOKEN. Work that is not a token is work nothing can see.\n\n" +
+			"description": "MINT A WORK TOKEN. Every piece of work is one.\n\n" +
 				"\"Write a note on this\" means backlog: true.\n" +
 				"An instruction to act on now means backlog left off.\n\n" +
 				"form is one line. detail is the whole instruction, in the words it was asked in.\n" +

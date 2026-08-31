@@ -41,6 +41,9 @@ func main() {
 		case "view":
 			runView(os.Args[2:])
 			return
+		case "move":
+			runMove(os.Args[2:])
+			return
 		case "lint":
 			runLint(os.Args[2:])
 			return
@@ -85,6 +88,9 @@ func main() {
 	set := flag.String("set", "", "change one parameter: name=value")
 	said := flag.String("said", "", "put what the person said in the record, word for word, and exit")
 	answer := flag.String("answer", "", "put your answer to them in the record, and exit")
+	// WHO IS SPEAKING. An obligation to answer belongs to one agent, because
+	// several run here at once and a message given to one is not owed by all.
+	actor := flag.String("actor", "main", "with said or answer: who is speaking")
 	version := flag.Bool("version", false, "print which build this is and exit")
 	selftest := flag.Bool("selftest", false, "produce a copy, drive a project with it, and check what came out")
 	keep := flag.Bool("keep", false, "with selftest: leave the temporary trees behind")
@@ -166,7 +172,19 @@ func main() {
 	// and se work --note mints one. This records a prompt, which is a different
 	// thing with a different word.
 	if *said != "" {
+		// ONE PROMPT, ONE RECORD. The engine copies the same messages off the
+		// transcript, so this refuses a repeat rather than asking the caller to
+		// check. Then always record is a rule with no condition on it.
+		if AlreadySaid(roots, *said) {
+			fmt.Println("already recorded")
+			return
+		}
 		noteInLog(dir, "user", "prompt", *said, nil, nil)
+		// A PROMPT GOING IN FLIPS THE FLAG. This is one of the two places a
+		// prompt reaches the engine, and the other is the harness event.
+		if err := TheyAsked(roots, *actor, *said); err != nil {
+			fail(err)
+		}
 		fmt.Println("recorded")
 		return
 	}
@@ -184,6 +202,9 @@ func main() {
 	// left in them.
 	if *answer != "" {
 		noteInLog(dir, "agent", "answer", *answer, nil, nil)
+		if err := TheyWereAnswered(roots, *actor); err != nil {
+			fail(err)
+		}
 		fmt.Println("recorded")
 		return
 	}

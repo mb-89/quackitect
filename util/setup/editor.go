@@ -194,7 +194,7 @@ func runIn(dir, name string, args ...string) error {
 	if _, err := exec.LookPath(name); err != nil {
 		return fmt.Errorf("%s is not on this machine", name)
 	}
-	cmd := exec.Command(name, args...)
+	cmd := Quietly(exec.Command(name, args...))
 	cmd.Dir = dir
 	cmd.Stdout, cmd.Stderr = os.Stdout, os.Stderr
 	return cmd.Run()

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"os/exec"
 	"path/filepath"
 	"runtime"
@@ -55,6 +56,13 @@ type Payload struct {
 	// A reviewer's answer.
 	Verdict  string      `json:"verdict,omitempty"` // accept or reject
 	Findings []Rejection `json:"findings,omitempty"`
+
+	// WHAT THE CLASS OF MISTAKE IS, and what to do instead. A rejection
+	// without one is refused.
+	Lesson Lesson `json:"lesson,omitempty"`
+
+	// A draft's criteria, when the payload is a spec.
+	Criteria []Criterion `json:"criteria,omitempty"`
 }
 
 type Answer struct {
@@ -68,6 +76,11 @@ type Answer struct {
 	// and a fact delivered is worth more than a fact an agent is told to
 	// go and look for.
 	Tools []Tool `json:"tools,omitempty"`
+
+	// THE METHOD FOR THIS ANSWER, DELIVERED RATHER THAN REMEMBERED. A reviewer
+	// told to go and read the method reviews from whatever it happens to think.
+	// It rides on the answer for the same reason the tool list does.
+	Guidance string `json:"guidance,omitempty"`
 }
 
 // Pull is the whole protocol. One function, because the order of its parts is
@@ -105,7 +118,52 @@ func answerFor(r Roots, actor, role string, p Payload) Answer {
 			return a
 		}
 	}
+	// THE WORK PILES UP AND NOBODY IS JUDGING IT. A submission is settled first,
+	// because settling one is progress and refusing it would lose the work.
+	// Asking for the next piece is what gets refused.
+	if a, blocked := reviewerMissing(r, role); blocked {
+		return a
+	}
 	return next(r, actor, role)
+}
+
+// reviewerMissing refuses a worker's pull when the review queue has grown and
+// nothing is reading it.
+//
+// NOTHING STARTS A REVIEWER. The engine said spawn one if you have not, in a
+// notice, and a notice is a suggestion. Seven tokens sat submitted with none in
+// review while the queue went on handing out work.
+//
+// A REFUSAL IS THE ONLY THING THAT WORKS. The hold refuses and the owed answer
+// refuses, and those two hold. So this one refuses too, and it names the one
+// thing that clears it.
+//
+// A REVIEWER IS NEVER REFUSED. It is the thing that clears this, and refusing
+// it would be a trap nobody could escape.
+func reviewerMissing(r Roots, role string) (Answer, bool) {
+	limit := LoadConfig(r).UnreviewedBeforeBlocked
+	if role == RoleReviewer || limit <= 0 {
+		return Answer{}, false
+	}
+	var waiting []string
+	for _, t := range Tokens(r) {
+		switch t.Status {
+		case InReview:
+			// One token in review is a reviewer reading, and that is enough.
+			return Answer{}, false
+		case Submitted:
+			waiting = append(waiting, t.ID+" "+t.Title)
+		}
+	}
+	if len(waiting) <= limit {
+		return Answer{}, false
+	}
+	return Answer{Pull: AnswerWait, Notice: fmt.Sprintf(
+		"NO REVIEWER IS RUNNING AND %d PIECES OF WORK ARE WAITING FOR ONE. "+
+			"Nothing new is handed out until one is.\n\n%s\n\n"+
+			"Spawn a reviewer. It pulls with --as reviewer, judges one token, "+
+			"answers, and pulls again. This clears the moment its first pull moves "+
+			"a token into review.", len(waiting), briefly(waiting))}, true
 }
 
 // The session is named in the first record of the current log. A pull that
@@ -124,7 +182,13 @@ func settle(r Roots, actor, role string, p Payload) (Answer, bool) {
 			Satisfies: "an id the engine minted"}), true
 	}
 	if role == RoleReviewer {
+		if t.Status == SpecInReview {
+			return judgeSpec(r, actor, t, p)
+		}
 		return judge(r, actor, t, p)
+	}
+	if t.Status == Spec {
+		return submitSpec(r, actor, t, p)
 	}
 	return submit(r, actor, t, p)
 }
@@ -155,6 +219,15 @@ func submit(r Roots, actor string, t Token, p Payload) (Answer, bool) {
 	if f := checkEvidence(r, t, p); f != nil {
 		return refuse(&t, *f), true
 	}
+	// THE WORKER RUNS THE CRITERIA BEFORE SUBMITTING. Asking the reviewer to
+	// find out is what this replaces, so the engine runs them here and a
+	// submission that does not meet them never reaches a reviewer.
+	if unmet := UnmetCriteria(r, t, p); len(unmet) > 0 {
+		return refuse(&t, Rejection{Clause: "the criteria",
+			Wrong: fmt.Sprintf("%d of the %d criteria this token agreed are not met:\n\n  %s",
+				len(unmet), len(t.Criteria), strings.Join(unmet, "\n  ")),
+			Satisfies: "every criterion met, or a reviewer agreeing a change to them"}), true
+	}
 
 	t.Submission = p.Evidence
 	t.Disposition = Disposition(p.Disposition)
@@ -177,6 +250,89 @@ func submit(r Roots, actor string, t Token, p Payload) (Answer, bool) {
 			Satisfies: "a writable .se/work"}), true
 	}
 	return Answer{}, false
+}
+
+// submitSpec sends a draft to a reviewer. The work does not start until one
+// agrees it, which is the whole point of the state.
+func submitSpec(r Roots, actor string, t Token, p Payload) (Answer, bool) {
+	if t.Assignee != actor {
+		return refuse(&t, Rejection{Clause: "assignee", Wrong: "this token is not yours",
+			Satisfies: "draft a token assigned to " + actor}), true
+	}
+	if err := DraftReady(t); err != nil {
+		return refuse(&t, Rejection{Clause: "the spec", Wrong: err.Error(),
+			Satisfies: "a detail saying what the problem is, and criteria saying what done means"}), true
+	}
+	t.Status, t.Holder = SpecInReview, ""
+	if err := SaveToken(r, t); err != nil {
+		return refuse(&t, Rejection{Clause: "the record", Wrong: err.Error(),
+			Satisfies: "a writable .se/work"}), true
+	}
+	return Answer{}, false
+}
+
+// judgeSpec applies a reviewer's verdict on a draft. Accepting it opens the
+// token, which is when the work starts.
+func judgeSpec(r Roots, actor string, t Token, p Payload) (Answer, bool) {
+	if t.Assignee == actor {
+		return refuse(&t, Rejection{Clause: "the reviewer",
+			Wrong:     "you drafted this spec, so you cannot agree it",
+			Satisfies: "a draft from somebody else"}), true
+	}
+	if t.Holder != actor {
+		return refuse(&t, Rejection{Clause: "the reviewer",
+			Wrong:     "this spec is not with you",
+			Satisfies: "pull for a review, and judge what comes back"}), true
+	}
+	switch p.Verdict {
+	case "accept":
+		t.Status, t.Holder = Open, ""
+		if err := SaveToken(r, t); err != nil {
+			return refuse(&t, Rejection{Clause: "the record", Wrong: err.Error(),
+				Satisfies: "a writable .se/work"}), true
+		}
+		noteVerdict(r, actor, t, "spec agreed", nil)
+		return Answer{}, false
+	case "reject":
+		if f := rejectionIsWhole(p); f != nil {
+			return refuse(&t, *f), true
+		}
+		t.Rounds++
+		for _, f := range p.Findings {
+			f.Round, f.By = t.Rounds, actor
+			t.Findings = append(t.Findings, f)
+		}
+		t.Status, t.Holder = Spec, ""
+		if err := SaveToken(r, t); err != nil {
+			return refuse(&t, Rejection{Clause: "the record", Wrong: err.Error(),
+				Satisfies: "a writable .se/work"}), true
+		}
+		if err := KeepLesson(r, t, actor, p.Lesson); err != nil {
+			return refuse(&t, Rejection{Clause: "the lesson", Wrong: err.Error(),
+				Satisfies: "a writable backlog"}), true
+		}
+		noteVerdict(r, actor, t, "spec rejected", p.Findings)
+		return Answer{}, false
+	}
+	return refuse(&t, Rejection{Clause: "the verdict", Wrong: "a verdict is accept or reject",
+		Satisfies: "verdict: accept, or verdict: reject with findings and a lesson"}), true
+}
+
+// EVERY REJECTION CARRIES A LESSON, NOT ONLY A FINDING. A finding teaches one
+// token. A lesson names the class and teaches everything after it.
+func rejectionIsWhole(p Payload) *Rejection {
+	if len(p.Findings) == 0 {
+		return &Rejection{Clause: "the rejection",
+			Wrong:     "a rejection with no finding tells the worker nothing",
+			Satisfies: "at least one finding, with clause, wrong and satisfies"}
+	}
+	if p.Lesson.Empty() {
+		return &Rejection{Clause: "the lesson",
+			Wrong: "a rejection with no lesson teaches this token and nothing after it. " +
+				"One token took five rounds because every round fixed the instance and left the class standing",
+			Satisfies: "a lesson naming the class of mistake and what to do instead"}
+	}
+	return nil
 }
 
 // judge applies a reviewer's verdict. A reviewer closes, and it is the only
@@ -208,12 +364,11 @@ func judge(r Roots, actor string, t Token, p Payload) (Answer, bool) {
 			return refuse(&t, Rejection{Clause: "the record", Wrong: err.Error(),
 				Satisfies: "a writable .se/work"}), true
 		}
+		noteVerdict(r, actor, t, "accepted", nil)
 		return Answer{}, false
 	case "reject":
-		if len(p.Findings) == 0 {
-			return refuse(&t, Rejection{Clause: "the rejection",
-				Wrong:     "a rejection with no finding tells the worker nothing",
-				Satisfies: "at least one finding, with clause, wrong and satisfies"}), true
+		if f := rejectionIsWhole(p); f != nil {
+			return refuse(&t, *f), true
 		}
 		t.Rounds++
 		for _, f := range p.Findings {
@@ -226,16 +381,45 @@ func judge(r Roots, actor string, t Token, p Payload) (Answer, bool) {
 			return refuse(&t, Rejection{Clause: "the record", Wrong: err.Error(),
 				Satisfies: "a writable .se/work"}), true
 		}
+		if err := KeepLesson(r, t, actor, p.Lesson); err != nil {
+			return refuse(&t, Rejection{Clause: "the lesson", Wrong: err.Error(),
+				Satisfies: "a writable backlog"}), true
+		}
+		noteVerdict(r, actor, t, "rejected", p.Findings)
 		return Answer{}, false
 	}
 	return refuse(&t, Rejection{Clause: "the verdict", Wrong: "a verdict is accept or reject",
 		Satisfies: "verdict: accept, or verdict: reject with findings"}), true
 }
 
+// EVERY VERDICT IS IN THE RECORD, WITH ITS REASONS.
+//
+// A move line says a token went from in_review to open, and that is the fact
+// without the reason. The person watching the log is the one who decides what
+// to do next, and they were being shown the state change with the finding kept
+// inside the token file.
+//
+// It is written here rather than beside the move, because the move loses who
+// judged: a verdict clears the holder, so by the time it is saved the only
+// name left on the token is the worker's.
+func noteVerdict(r Roots, actor string, t Token, verdict string, found []Rejection) {
+	data := map[string]any{"id": t.ID, "verdict": verdict, "round": t.Rounds}
+	msg := t.ID + " " + verdict + ": " + t.Title
+	if len(found) > 0 {
+		var b strings.Builder
+		b.WriteString(msg)
+		for _, f := range found {
+			fmt.Fprintf(&b, "\n\n%s: %s\nit passes with: %s", f.Clause, f.Wrong, f.Satisfies)
+		}
+		msg = b.String()
+		data["findings"] = len(found)
+	}
+	inSession(r, "review", actor, msg, Yes(), data)
+}
+
 func refuse(t *Token, f Rejection) Answer {
 	return Answer{Pull: AnswerRefused, Token: t, Findings: []Rejection{f},
-		Notice: "The submission was refused by the engine, before any reviewer saw it. " +
-			"Fix what the finding names and pull again with the same id."}
+		Notice: "Fix what the finding names and pull again with the same id."}
 }
 
 // A token cannot close without saying what became of it. Three values, and
@@ -299,7 +483,7 @@ func runEvidence(r Roots, script string) (string, error) {
 	if runtime.GOOS == "windows" {
 		name, args = "cmd", []string{"/c", script}
 	}
-	cmd := exec.Command(name, args...)
+	cmd := Quietly(exec.Command(name, args...))
 	cmd.Dir = r.Work
 	done := make(chan struct{})
 	var out []byte
@@ -316,6 +500,20 @@ func runEvidence(r Roots, script string) (string, error) {
 	}
 }
 
+// briefly lists a few of something and says how many more there are. A notice
+// that prints forty ids is a notice nobody reads to the end.
+func briefly(all []string) string {
+	shown := all
+	if len(shown) > 3 {
+		shown = shown[:3]
+	}
+	out := "  " + strings.Join(shown, "\n  ")
+	if len(all) > len(shown) {
+		out += fmt.Sprintf("\n  and %d more", len(all)-len(shown))
+	}
+	return out
+}
+
 func firstLines(s string, n int) string {
 	lines := strings.Split(s, "\n")
 	if len(lines) > n {
@@ -324,17 +522,64 @@ func firstLines(s string, n int) string {
 	return strings.Join(lines, "\n")
 }
 
+// aheadOf answers the index of an open token of this actor's that a person put
+// ahead of seq, or -1. Only a person writes an order, so anything ahead of
+// what the agent holds is a person saying which one is next.
+func aheadOf(r Roots, all []Token, actor string, seq int) int {
+	best := -1
+	for i := range all {
+		if all[i].Assignee != actor || all[i].Status != Open || all[i].Seq >= seq {
+			continue
+		}
+		if Blocked(r, all[i]) != "" {
+			continue
+		}
+		if best < 0 || all[i].Seq < all[best].Seq {
+			best = i
+		}
+	}
+	return best
+}
+
 // next reads the queue the role names. An agent is idle when no token is
 // assigned to it, and that is answered from the ledger rather than from the
 // harness, because the ledger is the thing that can be checked.
 func next(r Roots, actor, role string) Answer {
 	all := Tokens(r)
 	if role == RoleReviewer {
-		// A reviewer that already holds one gets it back rather than a second.
-		// Nobody judges two things at once.
+		// ONE TOKEN AT A TIME, AND ALWAYS A VERDICT FOR IT.
+		//
+		// A reviewer that already holds one gets that one back rather than a
+		// second. A reviewer reading three and ruling on them together makes
+		// the person wait for the third to hear about the first, and the first
+		// was something they could have acted on.
+		//
+		// A TOKEN IS DONE WHEN ITS STATE CHANGED. Nothing asks the reviewer
+		// whether it finished, because a verdict moves the token out of
+		// in_review and that is a fact the engine can see.
+		for i := range all {
+			if all[i].Status == SpecInReview && all[i].Holder == actor {
+				return Answer{Pull: AnswerReview, Token: &all[i], Notice: heldNotice(),
+					Guidance: ReviewMethod(r)}
+			}
+		}
 		for i := range all {
 			if all[i].Status == InReview && all[i].Holder == actor {
-				return Answer{Pull: AnswerReview, Token: &all[i], Notice: reviewNotice()}
+				return Answer{Pull: AnswerReview, Token: &all[i], Notice: heldNotice(),
+					Guidance: ReviewMethod(r)}
+			}
+		}
+		// A DRAFT IS JUDGED BEFORE THE WORK STARTS, and it comes first: a spec
+		// waiting is somebody blocked from starting, and a submission waiting
+		// is work already done.
+		for i := range all {
+			if all[i].Status == SpecInReview && all[i].Holder == "" && all[i].Assignee != actor {
+				all[i].Holder = actor
+				if err := SaveToken(r, all[i]); err != nil {
+					return Answer{Pull: AnswerWait, Notice: "the record will not take a write: " + err.Error()}
+				}
+				return Answer{Pull: AnswerReview, Token: &all[i], Notice: specNotice(),
+					Guidance: ReviewMethod(r)}
 			}
 		}
 		for i := range all {
@@ -343,7 +588,8 @@ func next(r Roots, actor, role string) Answer {
 				if err := SaveToken(r, all[i]); err != nil {
 					return Answer{Pull: AnswerWait, Notice: "the record will not take a write: " + err.Error()}
 				}
-				return Answer{Pull: AnswerReview, Token: &all[i], Notice: reviewNotice()}
+				return Answer{Pull: AnswerReview, Token: &all[i], Notice: reviewNotice(),
+					Guidance: ReviewMethod(r)}
 			}
 		}
 		return Answer{Pull: AnswerWait,
@@ -352,11 +598,35 @@ func next(r Roots, actor, role string) Answer {
 
 	// Work already picked up comes back first. An agent that pulled, was
 	// interrupted, and pulled again gets the same token, not a second one.
+	//
+	// THE PERSON'S ORDER WINS. Unless something open now sits ahead of what
+	// the agent holds, which only happens because a person put it there. Then
+	// the held token goes back to the queue untouched and the person's choice
+	// is handed out.
+	//
+	// It is decided here because the pull is the only thing that moves a token
+	// between states, and a person saying which is next has to be able to
+	// reach an agent that already picked up the wrong one.
 	for i := range all {
-		if all[i].Assignee == actor && all[i].Status == InWork {
+		// THE HOLDER IS WHAT SAYS THE AGENT PICKED IT UP. A parent is in work
+		// because a child is, with no holder, and nothing pulls a parent. Left
+		// out, the queue handed back the parent instead of the child.
+		if all[i].Assignee != actor || all[i].Status != InWork || all[i].Holder != actor {
+			continue
+		}
+		ahead := aheadOf(r, all, actor, all[i].Seq)
+		if ahead < 0 {
 			return Answer{Pull: AnswerWork, Token: &all[i], Findings: all[i].Findings,
 				Notice: workNotice(all[i])}
 		}
+		put := all[i]
+		put.Status, put.Holder = Open, ""
+		if err := SaveToken(r, put); err != nil {
+			return Answer{Pull: AnswerWait, Notice: "the record will not take a write: " + err.Error()}
+		}
+		inSession(r, "work", actor, put.ID+" put down: "+all[ahead].ID+" was put ahead of it", Yes(),
+			map[string]any{"id": put.ID, "for": all[ahead].ID})
+		break
 	}
 	// THE OLDEST THAT IS NOT BLOCKED. A token waiting on something else is
 	// not work anybody can do, so it is not offered.
@@ -379,10 +649,41 @@ func next(r Roots, actor, role string) Answer {
 	return Answer{Pull: AnswerWait, Notice: waitNotice(r, actor, held)}
 }
 
+// heldNotice goes to a reviewer that pulled while still holding one.
+func heldNotice() string {
+	return "THIS IS THE TOKEN YOU ALREADY HOLD, and you get nothing new until you " +
+		"rule on it. One token at a time, and a verdict for every one.\n\n" + reviewNotice()
+}
+
+// specNotice goes to a reviewer judging a draft rather than finished work.
+func specNotice() string {
+	return "THIS IS A DRAFT, NOT FINISHED WORK. Judge whether the problem is stated " +
+		"and whether the criteria say what done means.\n\n" +
+		"A criterion that can be a command has to be one, because a command fails and " +
+		"a sentence does not. A criterion nobody could check is not a criterion.\n\n" +
+		"Answer with verdict: accept to let the work start, or verdict: reject with " +
+		"findings and a lesson."
+}
+
 func reviewNotice() string {
 	return "Judge this submission against the token's own rules and nothing else. " +
 		"Answer with verdict: accept, or verdict: reject and findings, each naming " +
-		"the clause, what is wrong, and what would satisfy it."
+		"the clause, what is wrong, and what would satisfy it. " +
+		"The guidance field carries the method: four rounds, and every measurement reproduced."
+}
+
+// ReviewMethod is the method a reviewer works to. It is read from the method
+// root and sent with every review, because a reviewer told to go and find it
+// reviews from whatever it happens to think.
+//
+// A METHOD THAT WILL NOT READ IS SAID AND NEVER FATAL. The review is worth
+// less without it and worth nothing if the pull refuses.
+func ReviewMethod(r Roots) string {
+	b, err := os.ReadFile(filepath.Join(r.Method, "doc", "guidance", "reviewing.md"))
+	if err != nil {
+		return "doc/guidance/reviewing.md could not be read: " + err.Error()
+	}
+	return string(b)
 }
 
 func workNotice(t Token) string {
@@ -392,7 +693,7 @@ func workNotice(t Token) string {
 		fmt.Fprintf(&b, " It came back from review %d time(s): every finding below has to be answered.", t.Rounds)
 	}
 	if t.SelfClosing() {
-		b.WriteString(" This one closes on submission, because it is your own breakdown of work you hold.")
+		b.WriteString(" This one closes on submission.")
 	} else {
 		b.WriteString(" You cannot close it. A reviewer settles it after the engine's checks pass.")
 	}
@@ -419,8 +720,7 @@ func waitNotice(r Roots, actor string, held []string) string {
 		return fmt.Sprintf("No open tokens. %d of yours wait for review. "+
 			"Spawn a reviewer if you have not, then pull again in a minute to see whether it finished.", waiting)
 	}
-	return "No token is assigned to you, which is what idle means here. " +
-		"Tell the person plainly that there is no work, and stop."
+	return "No token is assigned to you. Tell the person plainly that there is no work, and stop."
 }
 
 // THE AUTHORITY, ON STOPPING.
@@ -462,17 +762,39 @@ func AskToStop(r Roots, actor string) Ruling {
 		mine = append(mine, t.ID+" "+t.Title)
 	}
 	if len(mine) == 0 {
-		return Ruling{Permitted: true}
-	}
-	n := len(mine)
-	if n > 3 {
-		mine = mine[:3]
-	}
-	lines := "  " + strings.Join(mine, "\n  ")
-	if n > 3 {
-		lines += fmt.Sprintf("\n  and %d more", n-3)
+		return reviewerAskingToStop(r, actor)
 	}
 	return Ruling{Reason: fmt.Sprintf(
 		"You hold %d piece(s) of work that nothing else will do:\n%s\n\n"+
-			"Pull to pick one up.", n, lines)}
+			"Pull to pick one up.", len(mine), briefly(mine))}
+}
+
+// A REVIEWER IS ASSIGNED NOTHING, so the check above never saw it.
+//
+// A worker holds work by being its assignee. A reviewer holds a token by being
+// its holder while the token is in review, and it is assigned nothing at all.
+// So the check found no work and let a reviewer walk away with a token in its
+// hands, and that token then sat in review with nobody behind the name.
+//
+// WHAT HOLDS IT IS WHAT IT IS HOLDING, and nothing else.
+//
+// A first version also held an actor while anything waited for a reviewer. That
+// held the WORKER too, because the engine does not know who is a reviewer: a
+// role is an argument to a pull rather than a property of an actor. The
+// queue-full case already has its own refusal, on the worker's pull, so this
+// covers the case that had no cover at all.
+func reviewerAskingToStop(r Roots, actor string) Ruling {
+	var holding []string
+	for _, t := range Tokens(r) {
+		if (t.Status == InReview || t.Status == SpecInReview) && t.Holder == actor {
+			holding = append(holding, t.ID+" "+t.Title)
+		}
+	}
+	if len(holding) == 0 {
+		return Ruling{Permitted: true}
+	}
+	return Ruling{Reason: fmt.Sprintf(
+		"YOU ARE STILL HOLDING %d PIECE(S) OF WORK TO JUDGE:\n%s\n\n"+
+			"Rule on it. Nobody else can, and it sits in review with your name on it "+
+			"until you do.", len(holding), briefly(holding))}
 }

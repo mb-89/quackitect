@@ -73,7 +73,7 @@ func ViewPath(r Roots, name string) (string, bool) {
 	if filepath.Ext(name) == "" {
 		name += ".base"
 	}
-	for _, dir := range []string{r.Private("views"), filepath.Join(r.Method, "util", "views")} {
+	for _, dir := range viewDirs(r) {
 		p := filepath.Join(dir, name)
 		if _, err := os.Stat(p); err == nil {
 			return p, true
@@ -82,12 +82,29 @@ func ViewPath(r Roots, name string) (string, bool) {
 	return "", false
 }
 
+// WHERE A VIEW IS LOOKED FOR, NEAREST FIRST.
+//
+// THE FOLDER BEING WORKED ON WINS. A command told to work on one folder wrote
+// into another: a reviewer isolating itself with --work still reached the live
+// util/views, because only the method root was searched for a shipped view.
+//
+// So the work folder's own util/views comes before the method's. A tree that
+// carries a copy of the method is worked on by itself, which is what --work
+// means, and the method stays the fallback for a project that ships none.
+func viewDirs(r Roots) []string {
+	dirs := []string{r.Private("views"), filepath.Join(r.Work, "util", "views")}
+	if r.Method != r.Work {
+		dirs = append(dirs, filepath.Join(r.Method, "util", "views"))
+	}
+	return dirs
+}
+
 // Views lists what can be asked for, so a person or a panel can offer them
 // rather than having to know their names.
 func Views(r Roots) []string {
 	seen := map[string]bool{}
 	var out []string
-	for _, dir := range []string{r.Private("views"), filepath.Join(r.Method, "util", "views")} {
+	for _, dir := range viewDirs(r) {
 		entries, err := os.ReadDir(dir)
 		if err != nil {
 			continue

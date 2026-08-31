@@ -117,9 +117,7 @@ func tools() []map[string]any {
 				"already looking." + nl2 +
 				"Use it for every prompt they give you. Say what you would have said to them, in " +
 				"full, and then carry on with the work you hold." + nl2 +
-				"YOU DO NOT HAVE TO STOP TO BE HEARD. Answering was the one thing that needed the " +
-				"turn to end, so it was ending turns that still had work in them. A harness " +
-				"sometimes loses an answer, and a line in a file does not.",
+				"YOU DO NOT HAVE TO STOP TO BE HEARD. Answer, then keep working.",
 			"inputSchema": map[string]any{
 				"type": "object",
 				"properties": map[string]any{
@@ -132,11 +130,11 @@ func tools() []map[string]any {
 		{
 			"name": "se_said",
 			"description": "PUT WHAT THE PERSON SAID IN THE RECORD, WORD FOR WORD.\n\n" +
-				"Use it the moment a message reaches you in the middle of a turn. The harness " +
-				"fires no event for one of those, so you are the only thing that can record it.\n\n" +
-				"THEIR SENTENCE, NOT A SUMMARY OF IT. Somebody reading the log for what they said, " +
-				"and finding your reading of it, has been told what they meant by the one thing " +
-				"they were checking. Copy the message. Do not shorten it, tidy it, or join two.\n\n" +
+				"THE ENGINE COPIES A MID-TURN MESSAGE ON YOUR NEXT TOOL CALL. This is the " +
+				"fallback, for one it did not copy. Look in the log first and use this only " +
+				"when their words are not already there.\n\n" +
+				"THEIR SENTENCE, NOT A SUMMARY OF IT. Copy the message. Do not shorten it, tidy " +
+				"it, or join two.\n\n" +
 				"A NOTE IS SOMETHING ELSE. A note is a work token in the backlog, and se_work with " +
 				"backlog set is what mints one.",
 			"inputSchema": map[string]any{

@@ -34,11 +34,24 @@ type Status string
 
 const (
 	Backlogged Status = "backlogged" // minted, and not work anybody is asked to do yet
-	Open       Status = "open"       // minted and assigned. Nobody has picked it up
-	InWork     Status = "in_work"    // an actor holds it
-	Submitted  Status = "submitted"  // the evidence is in, and it waits for a reviewer
-	InReview   Status = "in_review"  // a reviewer holds it
-	Closed     Status = "closed"     // settled, with a disposition
+
+	// A TOKEN CARRIES WHAT DONE MEANS BEFORE ANYBODY WORKS ON IT.
+	//
+	// The reviewer kept telling the worker it had not done the work, and that
+	// is a fault in the token rather than in the review. Nothing said what done
+	// meant, so nothing could be checked before the submission and the review
+	// became the first place anybody looked.
+	//
+	// So two states sit in front of open. The worker drafts the problem and the
+	// criteria, a reviewer agrees the draft, and only then does the work start.
+	Spec         Status = "spec"           // the problem and the criteria are being drafted
+	SpecInReview Status = "spec_in_review" // a reviewer is judging the draft
+
+	Open      Status = "open"      // minted and assigned. Nobody has picked it up
+	InWork    Status = "in_work"   // an actor holds it
+	Submitted Status = "submitted" // the evidence is in, and it waits for a reviewer
+	InReview  Status = "in_review" // a reviewer holds it
+	Closed    Status = "closed"    // settled, with a disposition
 )
 
 // THE SCOPE. The barrier a token sits behind, and the one thing Level 1 reads
@@ -63,7 +76,7 @@ const Cleared = ""
 // and a drop into it clears the bucket rather than setting one.
 func (s Status) Known() bool {
 	switch s {
-	case Backlogged, Open, InWork, Submitted, InReview, Closed:
+	case Backlogged, Spec, SpecInReview, Open, InWork, Submitted, InReview, Closed:
 		return true
 	}
 	return false
@@ -107,6 +120,22 @@ type EvidenceSpec struct {
 
 func (e EvidenceSpec) Empty() bool { return len(e.Sections) == 0 && e.Script == "" }
 
+// WHAT DONE MEANS, WRITTEN BEFORE THE WORK.
+//
+// One line saying what has to be true. Where that can be a command, it is one,
+// and it passes when it exits zero. Where it cannot, the worker answers it by
+// name in the evidence and a reviewer judges the answer.
+//
+// A CRITERION THAT CAN BE A COMMAND IS ONE. The difference between a criterion
+// a program runs and a sentence somebody reads is the difference between a
+// check that fails and a claim that does not.
+type Criterion struct {
+	Says string `json:"says"`           // what has to be true, in one line
+	Runs string `json:"runs,omitempty"` // the command that decides it, if one can
+	Ran  string `json:"ran,omitempty"`  // what it answered when the worker ran it
+	Met  bool   `json:"met,omitempty"`  // whether it passed
+}
+
 type Token struct {
 	ID string `json:"id"`
 
@@ -123,6 +152,15 @@ type Token struct {
 
 	// What completion has to demonstrate. Asserting done is not evidence.
 	Evidence EvidenceSpec `json:"evidence"`
+
+	// WHAT DONE MEANS, AGREED BEFORE THE WORK. A token with none cannot leave
+	// spec, and a submission runs every criterion that is a command.
+	Criteria []Criterion `json:"criteria,omitempty"`
+
+	// WHAT EACH ROUND TAUGHT. A finding says what is wrong with this token and
+	// a lesson says what class of mistake it is, so a reader finds both where
+	// the round happened.
+	Lessons []Lesson `json:"lessons,omitempty"`
 
 	Assignee string `json:"assignee"`
 	Scope    Scope  `json:"scope"`
@@ -265,7 +303,10 @@ func Mint(r Roots, t Token) (Token, error) {
 	}
 	t.ID = newID()
 	t.Seq = nextSeq(r)
-	if t.Status != Backlogged {
+	// THE MINTER SAYS WHERE IT STARTS, and with nothing said it is open. Which
+	// tokens draft first is the verb's policy rather than this function's: see
+	// StartsAt, which se work calls.
+	if !t.Status.Known() || t.Status == Closed {
 		t.Status = Open
 	}
 	// A sub-token is a token. The parent holds the list, because a parent
@@ -337,4 +378,35 @@ func OpenSubs(r Roots, t Token) []string {
 		}
 	}
 	return open
+}
+
+// PutFirst moves one token to the front of the queue.
+//
+// WHAT A PERSON OWNS IS THE ORDER. The queue hands out the oldest open token,
+// oldest means the lowest seq, and nothing could change that, so a person who
+// wanted a different thing done next had no way to say it. An agent holding
+// the wrong token could not put it down and a person could not pull another
+// forward.
+//
+// IT WRITES SEQ AND NOTHING ELSE. Which state a token is in stays with the
+// pull, which is why a status written by hand is refused.
+func PutFirst(r Roots, id string) (Token, error) {
+	t, err := LoadToken(r, id)
+	if err != nil {
+		return t, err
+	}
+	if t.Status == Closed {
+		return t, fmt.Errorf("%s is closed, and the queue does not hand out closed work", id)
+	}
+	low := t.Seq
+	for _, o := range Tokens(r) {
+		if o.Status != Closed && o.Seq < low {
+			low = o.Seq
+		}
+	}
+	if low == t.Seq {
+		return t, nil // already first, and a write that changes nothing is noise
+	}
+	t.Seq = low - 1
+	return t, SaveToken(r, t)
 }

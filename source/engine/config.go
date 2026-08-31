@@ -107,7 +107,27 @@ func LoadTree(methodRoot string) (Node, error) {
 	if err := json.Unmarshal(b, &root); err != nil {
 		return Node{}, fmt.Errorf("util/parameters.json is not readable: %w", err)
 	}
+	// A CONTROL NAMES AN ICON AND NEVER CARRIES ONE. The table decides what the
+	// name looks like, so the same mark is the same mark everywhere and one
+	// edit changes it. Resolving here is the one place a tree is read.
+	icons, err := Icons(Roots{Method: methodRoot})
+	if err != nil {
+		return root, err
+	}
+	drawIcons(&root, icons)
 	return root, nil
+}
+
+func drawIcons(n *Node, icons map[string]Icon) {
+	if n.Label != "" {
+		n.Label = DrawnAs(icons, n.Label)
+	}
+	for k, v := range n.Labels {
+		n.Labels[k] = DrawnAs(icons, v)
+	}
+	for i := range n.Children {
+		drawIcons(&n.Children[i], icons)
+	}
 }
 
 // Values are stored in one file, flat, keyed by the path through the tree.
@@ -323,17 +343,27 @@ func toNumber(v any) (float64, bool) {
 type Config struct {
 	GuardProjections bool
 	StopNeedsClaim   bool
+	AnswerFirst      bool
 	HeartbeatSeconds int
 	ReadyBudgetMs    int
-	From             map[string]string
+
+	// HOW MUCH UNREVIEWED WORK IS TOLERABLE before the pull refuses. Zero turns
+	// it off. It is a guess about a queue rather than a fact about the code, so
+	// it is a parameter a person moves.
+	UnreviewedBeforeBlocked int
+
+	From map[string]string
 }
 
 func TheFloor() Config {
 	// StopNeedsClaim is ON. An unclaimed stop is refused whatever is open,
 	// because the commonest bad stop is the agent that has nothing open and
 	// ends the turn to say what it did.
-	return Config{GuardProjections: true, StopNeedsClaim: true,
-		HeartbeatSeconds: 5, ReadyBudgetMs: 15000, From: map[string]string{}}
+	// AnswerFirst is ON. Somebody waiting to be answered while the agent works
+	// on is the failure this exists to stop.
+	return Config{GuardProjections: true, StopNeedsClaim: true, AnswerFirst: true,
+		HeartbeatSeconds: 5, ReadyBudgetMs: 15000, UnreviewedBeforeBlocked: 3,
+		From: map[string]string{}}
 }
 
 func LoadConfig(roots Roots) Config {
@@ -349,11 +379,19 @@ func LoadConfig(roots Roots) Config {
 	if b, ok := toBool(v.Value["guards.stop_needs_claim"]); ok {
 		c.StopNeedsClaim = b || c.StopNeedsClaim
 	}
+	if b, ok := toBool(v.Value["guards.answer_first"]); ok {
+		c.AnswerFirst = b || c.AnswerFirst
+	}
 	if n, ok := toNumber(v.Value["limits.heartbeat_seconds"]); ok && int(n) > 0 {
 		c.HeartbeatSeconds = int(n)
 	}
 	if n, ok := toNumber(v.Value["limits.ready_budget_ms"]); ok && int(n) > 0 {
 		c.ReadyBudgetMs = int(n)
+	}
+	// ZERO IS A VALUE HERE and not a missing one, because zero turns the
+	// refusal off and somebody has to be able to say that.
+	if n, ok := toNumber(v.Value["limits.unreviewed_before_blocked"]); ok && int(n) >= 0 {
+		c.UnreviewedBeforeBlocked = int(n)
 	}
 	return c
 }

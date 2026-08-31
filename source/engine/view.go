@@ -65,11 +65,32 @@ type View struct {
 	// What the file said the filter was, kept so the builder can draw it back.
 	RawFilter any
 
-	Name      string
-	Type      string
-	Order     []string // the columns, in order
-	Widths    map[string]int
-	Group     []Level
+	Name   string
+	Type   string
+	Order  []string // the columns, in order
+	Widths map[string]int
+	Group  []Level
+
+	// THE GROUPS THIS VIEW DECLARES. A declared group is always drawn, with
+	// nothing in it if nothing matches, because the thing it names goes on
+	// existing whether or not anything is in that state today.
+	//
+	// A group nobody declared comes from the data, and one of those is gone
+	// the moment it empties: nothing lists what those could be, so an empty
+	// one has no name to draw.
+	Groups []Pin
+
+	// WHICH GROUPS SIT AT THE TOP, in the order they are named.
+	//
+	// A PIN ON A DECLARED GROUP IS A NAME. The file already holds the filter,
+	// so unpinning removes the name and the group stays: a pin is an ordering
+	// and not an existence.
+	//
+	// A PIN ON A GROUP THE DATA MADE CARRIES ITS OWN FILTER, and nothing else
+	// in the file mentions it. Unpinning removes the whole entry, so a group
+	// somebody invented goes back to disappearing when it empties. Declaring
+	// it would have made it permanent, which is the one line this must not
+	// cross.
 	Pinned    []Pin
 	Collapsed []string
 	Sort      []Sort
@@ -178,7 +199,28 @@ func readView(m map[string]any) (View, error) {
 		}
 		v.Counts = append(v.Counts, Count{Name: ystr(c["name"]), Filter: e})
 	}
+	for _, raw := range ylist(m["groups"]) {
+		p := ymap(raw)
+		e, err := Parse(ystr(p["filter"]))
+		if err != nil {
+			return v, fmt.Errorf("group %q: %w", ystr(p["name"]), err)
+		}
+		v.Groups = append(v.Groups, Pin{Name: ystr(p["name"]), Filter: e})
+	}
 	for _, raw := range ylist(m["pinned"]) {
+		if name := ystr(raw); name != "" {
+			// A NAME PINS A DECLARED GROUP. Naming one that is not declared
+			// would pin something with no filter, which draws nothing forever.
+			found := false
+			for _, g := range v.Groups {
+				found = found || g.Name == name
+			}
+			if !found {
+				return v, fmt.Errorf("view %q pins %q, and no group of that name is declared", v.Name, name)
+			}
+			v.Pinned = append(v.Pinned, Pin{Name: name})
+			continue
+		}
 		p := ymap(raw)
 		e, err := Parse(ystr(p["filter"]))
 		if err != nil {
@@ -189,7 +231,7 @@ func readView(m map[string]any) (View, error) {
 	for key := range m {
 		switch key {
 		case "name", "type", "order", "collapsed", "limit", "columnSize",
-			"filters", "groupBy", "sort", "pinned", "counts":
+			"filters", "groupBy", "sort", "groups", "pinned", "counts":
 		default:
 			return v, fmt.Errorf("view %q: this program does not read %q", v.Name, key)
 		}
@@ -284,6 +326,17 @@ type Group struct {
 	// Empty means nothing may be dropped here.
 	Sets string `json:"sets,omitempty"`
 
+	// WHAT PINNING THIS GROUP WOULD WRITE. A pin is a filter, so a group made
+	// by a grouping level pins as a test on that level. The engine builds it
+	// because the engine owns the expression language.
+	//
+	// A group that is already pinned carries none: it unpins by its name.
+	Pins string `json:"pins,omitempty"`
+
+	// A GROUP THE FILE DECLARES CARRIES NO FILTER TO PIN BY, because the file
+	// already holds one. It pins by its name alone.
+	Declared bool `json:"declared,omitempty"`
+
 	Pinned bool    `json:"pinned,omitempty"`
 	Shut   bool    `json:"shut,omitempty"`
 	Depth  int     `json:"depth"`
@@ -371,6 +424,11 @@ type Table struct {
 	File   string         `json:"file,omitempty"`
 	Source string         `json:"source,omitempty"`
 
+	// EVERY ICON THE EDITOR DRAWS, from the one table. It rides on the answer
+	// for the same reason the operator vocabulary does: a client with its own
+	// copy drifts the first time a mark changes.
+	Icons map[string]Icon `json:"icons,omitempty"`
+
 	// WHAT THE FILTER BUILDER DRAWS. The groups a person built, and the
 	// operator vocabulary they are offered. The vocabulary is serialised
 	// rather than declared in the panel a second time: a client with its own
@@ -426,16 +484,28 @@ func Render(b Base, v View, rows []Row) (Table, error) {
 		t.Counts = append(t.Counts, Tally{Name: c.Name, N: n})
 	}
 
-	// The pinned groups take their rows out of what is left, in the order they
-	// were declared, so the top is a partition and no row appears twice.
+	// A GROUP TAKES ITS ROWS OUT OF WHAT IS LEFT, in order, so the page is a
+	// partition and no row appears twice. The pinned ones go first.
+	//
+	// A PINNED FUNCTIONAL GROUP IS DRAWN WITH NOTHING IN IT. Pinning it is the
+	// person saying they want to see it, and a heading they pinned that came
+	// and went is a heading they cannot aim at.
+	//
+	// AN UNPINNED ONE HIDES AT ZERO AND COMES BACK. It has not been asked for,
+	// so an empty heading is noise. The declaration is what brings it back the
+	// moment the filter returns a row.
+	//
+	// A GROUP THE DATA MADE IS DRAWN WHILE IT HAS ROWS AND NOT AFTER. Nothing
+	// lists what those could be, so an empty one has no name to draw. Pinning
+	// one does not change that: the pin carries the filter and the file never
+	// declares it.
 	rest := kept
-	for _, p := range v.Pinned {
-		var mine []Row
-		var others []Row
+	take := func(e *Expr) ([]Row, error) {
+		var mine, others []Row
 		for _, r := range rest {
-			ok, err := truthy(p.Filter, r)
+			ok, err := truthy(e, r)
 			if err != nil {
-				return t, err
+				return nil, err
 			}
 			if ok {
 				mine = append(mine, r)
@@ -444,8 +514,65 @@ func Render(b Base, v View, rows []Row) (Table, error) {
 			}
 		}
 		rest = others
-		t.Pinned = append(t.Pinned, Group{Name: p.Name, Pinned: true,
-			Count: len(mine), Lines: lines(mine, t.Columns)})
+		return mine, nil
+	}
+
+	// THE FILE'S ORDER DECIDES WHO TAKES A ROW, AND A PIN DOES NOT.
+	//
+	// A pin moves a group to the top of the drawing. It must not move it to the
+	// front of the partition, because the owner wrote the order and a person
+	// clicking a pin is not rewriting it.
+	//
+	// Getting this wrong hid a group forever. yours is a subset of here, and
+	// here is declared second, so unpinning yours let here take every row yours
+	// would have had. It then had none, and none is what hides it.
+	pinned := map[string]Group{}
+	var declared []Group
+	for _, p := range v.Groups {
+		mine, err := take(p.Filter)
+		if err != nil {
+			return t, err
+		}
+		g := Group{Name: p.Name, Declared: true, Count: len(mine), Lines: lines(mine, t.Columns)}
+		if pinnedByName(v.Pinned, p.Name) {
+			g.Pinned = true
+			pinned[p.Name] = g
+			continue
+		}
+		if len(mine) == 0 {
+			continue
+		}
+		declared = append(declared, g)
+	}
+
+	// A GROUP THE DATA MADE, PINNED WITH ITS OWN FILTER. It takes what the
+	// declared ones left, and it is drawn only while it holds a row.
+	for _, p := range v.Pinned {
+		if p.Filter == nil {
+			continue
+		}
+		mine, err := take(p.Filter)
+		if err != nil {
+			return t, err
+		}
+		if len(mine) == 0 {
+			continue
+		}
+		pinned[p.Name] = Group{Name: p.Name, Pinned: true,
+			Count: len(mine), Lines: lines(mine, t.Columns)}
+	}
+
+	// THE PINS DRAW IN THE ORDER THEY WERE PINNED, which is the person's, and
+	// a pin naming a group nothing declared and nothing matched draws nothing.
+	for _, p := range v.Pinned {
+		g, ok := pinned[p.Name]
+		if !ok {
+			if p.Filter == nil {
+				return t, fmt.Errorf("view %q pins %q with no filter", v.Name, p.Name)
+			}
+			continue
+		}
+		t.Pinned = append(t.Pinned, g)
 	}
 
 	for _, l := range v.Group {
@@ -459,7 +586,18 @@ func Render(b Base, v View, rows []Row) (Table, error) {
 	t.Operators = Operators
 
 	t.Groups, err = group(rest, v, t.Columns, 0)
+	// The declared groups come first, in the order the file declared them.
+	t.Groups = append(declared, t.Groups...)
 	return t, err
+}
+
+func pinnedByName(pins []Pin, name string) bool {
+	for _, p := range pins {
+		if p.Filter == nil && p.Name == name {
+			return true
+		}
+	}
+	return false
 }
 
 func dirOf(desc bool) string {
@@ -543,6 +681,10 @@ func group(rows []Row, v View, cols []string, depth int) ([]Group, error) {
 		}
 		g := Group{Name: key, By: level.Text, Sets: level.Sets, Depth: depth,
 			Count: len(byKey[key]), Shut: contains(v.Collapsed, key)}
+		// AN EMPTY KEY PINS LIKE ANY OTHER. It is usually the biggest group on
+		// the page, and it was the one group a person could not pin. The
+		// expression is the same one, and the engine reads holder == "" back.
+		g.Pins = level.Text + " == " + strconv.Quote(key)
 		if depth+1 >= len(v.Group) && len(kids) == 1 {
 			g.Lines = kids[0].Lines
 		} else {

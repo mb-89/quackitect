@@ -35,6 +35,7 @@ type hookIn struct {
 	AgentID        string          `json:"agent_id"`
 	AgentType      string          `json:"agent_type"`
 	StopHookActive bool            `json:"stop_hook_active"`
+	Transcript     string          `json:"transcript_path"`
 }
 
 type toolInput struct {
@@ -90,6 +91,58 @@ func askTheAuthority(roots Roots, actor string) Ruling {
 		}
 	}
 	return Ruling{Permitted: true}
+}
+
+// The one call that is allowed while an answer is owed is the one that gives
+// it. Anything else would be a refusal nobody could satisfy.
+//
+// IT MATCHES THE COMMAND AND NOT THE TEXT. A substring match opened the guard
+// for anything that mentioned the words, and a submission carrying the phrase
+// se_answer in its evidence would have walked straight through.
+func isAnswering(in hookIn) bool {
+	if in.ToolName == "se_answer" || in.ToolName == "mcp__quackitect__se_answer" {
+		return true
+	}
+	var ti toolInput
+	_ = json.Unmarshal(in.ToolInput, &ti)
+	return runsTheEngineWith(ti.Command, "--answer")
+}
+
+// runsTheEngineWith answers whether a shell command runs the engine and passes
+// this flag as an argument of its own.
+//
+// A FLAG IS AN ARGUMENT, NOT A SUBSTRING. It is looked for among the words
+// after the program, and the program has to be the engine, so a file named
+// --answer.md or a sentence containing the word does not count.
+func runsTheEngineWith(command, flag string) bool {
+	words := strings.Fields(command)
+	program := -1
+	for i, w := range words {
+		if isTheEngine(w) {
+			program = i
+			break
+		}
+	}
+	if program < 0 {
+		return false
+	}
+	for _, w := range words[program+1:] {
+		if w == flag || strings.HasPrefix(w, flag+"=") {
+			return true
+		}
+	}
+	return false
+}
+
+// isTheEngine answers whether this word names the engine, wherever it was
+// started from and however it is quoted.
+func isTheEngine(word string) bool {
+	w := strings.Trim(word, `"'`)
+	w = strings.ReplaceAll(w, `\`, "/")
+	if i := strings.LastIndex(w, "/"); i >= 0 {
+		w = w[i+1:]
+	}
+	return w == "se" || w == "se.exe"
 }
 
 // Block is the shape a Stop hook reads. The reason reaches the agent.
@@ -184,6 +237,32 @@ func runHook(args []string) {
 		}
 	}
 
+	// WHAT THE PERSON SAID MID-TURN, COPIED BY THE ENGINE.
+	//
+	// The harness fires no event for a message written into a running turn, and
+	// it writes one to its own transcript. The guard runs on every tool call,
+	// so a message is in the record by the agent's next call whatever the agent
+	// remembers to do.
+	if in.Event == "PreToolUse" || in.Event == "PostToolUse" || in.Event == "Stop" {
+		CopyWhatWasHeard(roots, in.Transcript, log, actor)
+	}
+
+	// AN ANSWER IS OWED, AND NOTHING ELSE HAPPENS UNTIL IT IS GIVEN.
+	//
+	// The person is waiting to be answered, and the agent going quiet into its
+	// work is the thing they see. The engine knows because it writes the log.
+	if in.Event == "PreToolUse" && cfg.AnswerFirst && !isAnswering(in) {
+		if owed, yes := AnswerOwed(roots, actor); yes {
+			record(log, "engine", "owed", actor, "refused: they are waiting for an answer", No(),
+				map[string]any{"tool": in.ToolName})
+			denyToolUse("THEY ARE WAITING FOR AN ANSWER, and nothing else happens until you " +
+				"give one.\n\nWhat they said:\n\n" + firstLines(owed, 12) +
+				"\n\nAnswer them, in full, with se_answer. Then carry on with the work you hold. " +
+				"You do not have to stop the turn to be heard.")
+			return
+		}
+	}
+
 	switch in.Event {
 	case "PreToolUse":
 		decidePreToolUse(roots, cfg, emergency, log, in, actor)
@@ -197,6 +276,12 @@ func runHook(args []string) {
 		// It is private. It is in the log, and the log is private material, so
 		// this is not a second place it can leak from.
 		record(log, "user", "prompt", actor, in.Prompt+in.UserPrompt, nil, nil)
+		// A PROMPT THAT STARTS A TURN IS RECORDED HERE, so the transcript pass
+		// must not record it again. Everything up to now is read.
+		StartWhereItIs(roots, in.Transcript)
+		// A PROMPT GOING IN FLIPS THE FLAG, here for a prompt that starts a
+		// turn and in the said verb for one written into a running turn.
+		_ = TheyAsked(roots, actor, in.Prompt+in.UserPrompt)
 	case "SessionStart":
 		// A session that resumes after a compaction starts with nothing read.
 		if in.Source == "compact" || in.Source == "clear" {
@@ -220,6 +305,19 @@ func runHook(args []string) {
 		record(log, "engine", "compact", actor, "context compacted, read evidence reset", Yes(),
 			map[string]any{"forgotten": n})
 	case "PostToolUse":
+		// THE GUARD CLEARS THE OBLIGATION, BECAUSE ONLY THE GUARD KNOWS WHO
+		// ANSWERED.
+		//
+		// The answer verb runs as a program with no idea which agent called it,
+		// so it cleared the default actor and left the caller still owing. A
+		// reviewer answered seven times, watched the engine say recorded seven
+		// times, and stayed refused until it gave up holding a token in review.
+		//
+		// The guard is the one place that knows the agent id, so it is the one
+		// place that can clear the right entry.
+		if isAnswering(in) {
+			_ = TheyWereAnswered(roots, actor)
+		}
 		// A read is evidence. A write means what anyone read of that file is
 		// no longer what is there.
 		notePostTool(roots, in, actor)

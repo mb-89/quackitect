@@ -33,6 +33,10 @@ Do not use a contraction.
 
 Do not use a Latin abbreviation. Write "for example", "that is", "and so on".
 
+Do not use "just" as a minimiser. The time word is fine: somebody who has just
+arrived. The minimiser is not: a newly reachable tree is just more filesystem.
+No checker can separate the two, so this one is yours to keep.
+
 Do not tell the reader how to feel about a sentence. The words that do it are
 in `util/voice-rules.json`, and a refusal names the one you wrote.
 

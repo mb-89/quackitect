@@ -125,3 +125,86 @@ func TestFrontmatterThatCannotBeReadIsRefused(t *testing.T) {
 		t.Fatal("a line with no key was accepted")
 	}
 }
+
+// A PARENT FOLLOWS ITS CHILDREN INTO WORK, AND OUT OF IT AGAIN. That is how
+// two tokens are in work at once without an agent holding two.
+func TestAParentFollowsItsChildrenIntoWork(t *testing.T) {
+	r := guidanceTree(t)
+	parent, err := Mint(r, Token{Title: "the whole thing", Assignee: "main", MintedBy: "person"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	one, err := Mint(r, Token{Title: "the first part", Assignee: "main",
+		Parent: parent.ID, MintedBy: "person"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	two, err := Mint(r, Token{Title: "the second part", Assignee: "main",
+		Parent: parent.ID, MintedBy: "person"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	at := func(id string) Status {
+		got, err := LoadToken(r, id)
+		if err != nil {
+			t.Fatal(err)
+		}
+		return got.Status
+	}
+	if at(parent.ID) != Open {
+		t.Fatalf("the parent starts %s", at(parent.ID))
+	}
+
+	one.Status, one.Holder = InWork, "main"
+	if err := SaveToken(r, one); err != nil {
+		t.Fatal(err)
+	}
+	if at(parent.ID) != InWork {
+		t.Fatalf("a child is in work and the parent is %s", at(parent.ID))
+	}
+	// NOBODY IS HOLDING THE PARENT. It is in work because its child is, and a
+	// holder would say an agent picked it up.
+	got, _ := LoadToken(r, parent.ID)
+	if got.Holder != "" {
+		t.Fatalf("the parent is held by %q", got.Holder)
+	}
+
+	// A second child arriving and leaving does not move the parent, because the
+	// first is still in work.
+	two.Status, two.Holder = InWork, "main"
+	SaveToken(r, two)
+	two.Status, two.Holder = Open, ""
+	SaveToken(r, two)
+	if at(parent.ID) != InWork {
+		t.Fatalf("one child left and the parent went to %s", at(parent.ID))
+	}
+
+	// The last one out takes the parent with it.
+	one.Status, one.Holder = Submitted, ""
+	SaveToken(r, one)
+	if at(parent.ID) != Open {
+		t.Fatalf("no child is in work and the parent is %s", at(parent.ID))
+	}
+}
+
+// A PARENT ALREADY SETTLED IS LEFT ALONE. Its children are history, and moving
+// a submitted parent back to in_work would take it off a reviewer's desk.
+func TestASettledParentIsNotDraggedBack(t *testing.T) {
+	r := guidanceTree(t)
+	parent, _ := Mint(r, Token{Title: "the whole thing", Assignee: "main", MintedBy: "person"})
+	child, _ := Mint(r, Token{Title: "one part", Assignee: "main",
+		Parent: parent.ID, MintedBy: "person"})
+
+	parent, _ = LoadToken(r, parent.ID)
+	parent.Status = Submitted
+	if err := SaveToken(r, parent); err != nil {
+		t.Fatal(err)
+	}
+	child.Status, child.Holder = InWork, "main"
+	SaveToken(r, child)
+
+	got, _ := LoadToken(r, parent.ID)
+	if got.Status != Submitted {
+		t.Fatalf("a submitted parent was dragged to %s", got.Status)
+	}
+}
