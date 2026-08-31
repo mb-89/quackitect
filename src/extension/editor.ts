@@ -662,9 +662,17 @@ function script(): string {
   // ticked rows and the person watched one of them silently left out.
   //
   // A PINNED GROUP IS A GROUP, which this file already says where it draws one.
-  function ticked() {
-    return [...document.querySelectorAll('.pane-wrap tr.ticked')];
+  //
+  // AND AN INSTANCE OWNS ITS OWN. This read tr.ticked out of the whole
+  // document, so a row ticked on the left lit the right instance's Group
+  // button and pressing it filed the left instance's row. The two panes are
+  // two instances of one editor and neither owns the other.
+  function ticked(where) {
+    return [...where.querySelectorAll('tr.ticked')];
   }
+
+  // The instance a control belongs to. Every toolbar sits inside its own.
+  const instance = (el) => el.closest('.pane-wrap');
 
   // THE HEADING A ROW STANDS UNDER names the group it is in, which is the
   // bucket where it has one and the status where it has none. The column is not
@@ -683,10 +691,15 @@ function script(): string {
   //
   // RENAMING NEEDS A BUCKET, not merely a selection. A row grouped by its
   // status has no bucket to rename, and a status is the system's word.
-  function countTicked() {
-    const rows = ticked();
-    const first = rows[0] ? groupOf(rows[0]) : { name: '', declared: true };
-    for (const bar of document.querySelectorAll('.bs-bar')) {
+  // EACH INSTANCE ANSWERS FOR ITSELF. One pass wrote the same state into every
+  // toolbar on the page, so the other instance offered to file rows it did not
+  // have.
+  function countTicked(where) {
+    for (const w of where ? [where] : document.querySelectorAll('.pane-wrap')) {
+      const bar = w.querySelector('.bs-bar');
+      if (!bar) continue;
+      const rows = ticked(w);
+      const first = rows[0] ? groupOf(rows[0]) : { name: '', declared: true };
       const group = bar.querySelector('.bs-make-bucket');
       const rename = bar.querySelector('.bs-rename');
       group.hidden = rename.hidden = rows.length === 0;
@@ -694,16 +707,16 @@ function script(): string {
       rename.title = rename.disabled
         ? 'these rows are grouped by their status, and a status is not yours to rename'
         : 'rename ' + first.name;
-    }
-    if (rows.length === 0) {
-      for (const box of document.querySelectorAll('.bs-rename-field')) box.hidden = true;
+      if (rows.length === 0) {
+        for (const box of w.querySelectorAll('.bs-rename-field')) box.hidden = true;
+      }
     }
   }
 
   document.addEventListener('click', (ev) => {
     const make = ev.target.closest?.('.bs-make-bucket');
     if (!make) return;
-    const rows = ticked();
+    const rows = ticked(instance(make));
     if (rows.length === 0) return;
     // AN EMPTY NAME ASKS THE ENGINE FOR A FRESH ONE. It knows what is taken and
     // the client would have to guess. The bucket is made first and named after.
@@ -713,7 +726,7 @@ function script(): string {
   document.addEventListener('click', (ev) => {
     const press = ev.target.closest?.('.bs-rename');
     if (!press || press.disabled) return;
-    const rows = ticked();
+    const rows = ticked(instance(press));
     if (rows.length === 0) return;
     const box = press.parentElement.querySelector('.bs-rename-field');
     box.hidden = false;
@@ -778,7 +791,7 @@ function script(): string {
     for (const row of where.querySelectorAll('tr[data-id]')) {
       row.onclick = () => {
         row.classList.toggle('ticked');
-        countTicked();
+        countTicked(where);
       };
     }
     for (const cell of where.querySelectorAll('td.edits')) {

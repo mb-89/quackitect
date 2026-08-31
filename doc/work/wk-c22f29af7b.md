@@ -3,11 +3,12 @@ id: wk-c22f29af7b
 seq: "-10"
 type: work
 title: a reviewer names lessons
-status: imp_submitted
+status: imp_in_review
 assignee: main
 scope: single-step
 traced: true
 disposition: done
+holder: reviewer6
 parent: wk-bc3c5ba905
 minted_by: person
 ---
