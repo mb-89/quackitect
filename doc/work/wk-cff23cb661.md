@@ -1,13 +1,13 @@
 ---
 id: wk-cff23cb661
-seq: "50"
+seq: "-11"
 type: work
 title: two generic editors
-status: imp_in_work
+status: imp_submitted
 assignee: main
 scope: single-step
 traced: true
-holder: main
+disposition: done
 parent: wk-66a28ca311
 minted_by: person
 ---
@@ -75,4 +75,42 @@ drive-editor.mjs asserts three things of it: every shell control is drawn and no
 instance carries one, every instance control is drawn and none is outside an
 instance, and each instance has its own of every one. Watched red both ways, by
 putting a second button inside a pane and by putting a toolbar on the bar.
+
+## evidence: what was built
+
+The two panes are two instances of one generic editor, and the shell is what knows there are two.
+
+THE LINE IS DRAWN AND IT IS ON THE TOKEN, under THE LINE, DRAWN. The shell owns the view tabs, the second-instance button, the seam, and the one thing that carries a row dragged between instances. An instance owns its toolbar, its three popovers, its heads, its pinned box, its scrolling box, its pager, its code panel, its ticked rows and its folds.
+
+TWO CALLS IN THAT LIST ARE JUDGMENTS AND I WANT THEM JUDGED. A bucket is the table's and not work's, because a bucket is a person's name for a group of rows and any table can have one. What makes it look like work's is the engine refusing to let an agent make one, and that is about who may name a grouping rather than about what a grouping is. And the mint row is not on this page at all: it lives in src/extension/panel.ts, a different webview. It was on the list this token wrote before anybody looked.
+
+WHAT ACTUALLY CHANGED IN THE CODE, and it is smaller than the token expected because the markup was already per-instance. paneHtml has always drawn a complete editor. The sharing was in the script: ticked() read tr.ticked out of the whole document and countTicked() wrote the same state into every toolbar. So a row ticked in the left instance lit the right instance's Group button, and pressing it filed the left instance's row. ticked takes the instance now, countTicked answers per instance, and the two toolbar handlers resolve theirs from the button that was pressed.
+
+THAT IS THE CLASS BEHIND EVERY EDITOR DEFECT REPORTED THIS WEEK: one pane's control reaching into the other's state through a shared page. An instance that owns its own state cannot have it.
+
+DRAG AND DROP BETWEEN THEM ALREADY WORKED AND NOW IT IS PROVED. What carries the dragged row sits above both instances, which is what the shell owning it means. Driven: a row out of the first instance, a drop on a group in the second, and the file message carries the first instance's row and the second's group.
+
+EVERY CHECK WAS WATCHED RED, in a DOM of its own so the presses above do not decide what it sees.
+
+  the instance owning its ticks, against the code as it stood:
+    FAIL and leaves the other instance's Group button hidden
+         the other instance offers to file a row it does not have
+    FAIL and pressing the other instance's Group sends nothing
+         it sent {"type":"group","ids":["wk-4e8eeb76aa"]}, filing a row from the other pane
+
+  the shell carrying the dragged row, with the carrier moved inside wireDragging:
+    FAIL a row dragged out of one instance and dropped in the other is filed there
+         it sent {"type":"group","ids":["wk-4b67d7126a"]} instead
+
+  the line, both ways, by putting a second button inside a pane and a toolbar on the bar:
+    FAIL and no instance carries one
+    FAIL and every one is inside an instance
+
+AND ONE THING THE DRAG CHECK FOUND. No group in this tree takes a drop at all. The view declares a group per status, a declared group takes its rows before the grouping level runs, so a bucket draws nowhere and there is no drop target on the page. A declared group correctly takes none, because dropping onto backlogged would write a status and a status is moved by a pull. That is wk-e4754bcd17, minted backlogged with the measurement and with where the line probably falls, because it wants agreeing before it is built.
+
+SO THE CHECK BUILDS ITS OWN TARGET rather than waiting for the tree to supply one. A check that waits for the tree to supply its case is a check that goes quiet, and this project has been bitten by that twice this week.
+
+The whole battery afterwards: all ok, fourteen lines.
+
+WHAT I HAVE NOT DONE, and it is worth your eye rather than mine. The instances share one page and therefore one script, so an instance is a scope by discipline rather than by construction: nothing stops the next handler from reaching across. Making it a class with its own elements would stop it by construction. That is a larger change to a file that draws a page, and every defect in it this week was found by somebody looking at it rather than by a check.
 
