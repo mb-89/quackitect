@@ -37,6 +37,26 @@ and cannot go non-zero for anything phrased differently.
 A scope drawn around what you touched rather than around what the claim covers.
 Two files were enumerated and called all of them.
 
+### When a claim says every, count from the side that produces them
+
+A universal claim was guarded by a check whose entry point was the module the
+work created. The check drove nineteen calls through seventeen builders against
+the real binary. That thoroughness is what hid the boundary: a reader watching
+it exercise everything it knows about has no way to see what it was never given.
+
+MEASURED. The claim was every argument list one program sends another. The check
+imported the one module the work refactored. Seven of the eight lists were
+written at their call sites, in a file the check never loads, so no defect in
+any of them could reach it however many cases it drove.
+
+SO ENUMERATE FIRST, FROM THE PRODUCING SIDE. One search for every place the
+extension starts the engine. The answer was eight, and the work had touched one.
+Do that count before choosing the check's entry point, because the entry point
+silently fixes the scope.
+
+AND IF THE COUNT COMES OUT LARGER THAN THE WORK, SAY SO AND NARROW THE CLAIM.
+That costs a sentence and keeps the sentence true.
+
 THE CHECK GOES WHERE THE DEFECT IS, in the language the defect is written in.
 
 A CHECK THAT FINDS NOTHING TO CHECK REFUSES. One that passes because the code it

@@ -113,3 +113,53 @@ export function dropLevelArgs(kind: string, at: number): string[] {
 export function filterArgs(groups: string): string[] {
   return ["--filter", groups];
 }
+
+// ---------------------------------------------------------------------------
+// THE LIFECYCLE CALLS, which are every other way the extension starts the
+// engine.
+//
+// WHY THEY ARE HERE AND NOT AT THE CALL SITE. The token this file exists for
+// says every argument list the extension sends the engine is built in one place
+// and driven against the real engine. Seven of the eight were still written as
+// literals in extension.ts, so the check bundling this module could not reach
+// one of them however many calls it drove. A check whose entry point is the
+// module the work created can only ever report on that module.
+//
+// THEY ARE THE SAME KIND OF THING THAT BROKE. --form against --title is the
+// same mistake as --attach or --copies drifting, and the only reason none of
+// these is wrong today is that nobody has renamed one yet.
+//
+// THE WORK FOLDER IS NOT HERE. Every one of these ends with --work <folder> and
+// the caller has it, so it is appended at the call site the way it always was.
+// What this file owns is which flags a call sends.
+
+export function rotateArgs(): string[] {
+  return ["--rotate"];
+}
+
+export function projectArgs(): string[] {
+  return ["--project"];
+}
+
+export function copiesArgs(method: string): string[] {
+  return ["--copies", "--method", method];
+}
+
+export function attachArgs(method: string): string[] {
+  return ["--attach", "--method", method];
+}
+
+export function configArgs(method: string): string[] {
+  return ["--config", "--method", method];
+}
+
+// The kind of vehicle is the person's, chosen from a list the engine answered.
+export function initArgs(kind: string): string[] {
+  return ["--init", kind];
+}
+
+// STARTING THE ENGINE SENDS NO FLAG AT ALL, and that is the whole call. It is
+// here so the check can say it looked at it rather than not knowing it exists.
+export function startArgs(): string[] {
+  return [];
+}

@@ -10,6 +10,7 @@ import {
   mintArgs, editCellArgs, fileArgs, groupArgs, renameGroupArgs, holdArgs,
   viewArgs, paneArgs, panesArgs, viewsArgs, pinArgs, unpinArgs, widthArgs,
   orderArgs, levelArgs, dropLevelArgs, filterArgs,
+  rotateArgs, projectArgs, copiesArgs, attachArgs, configArgs, initArgs, startArgs,
 } from "./engineargs";
 
 // The extension is idle when it loads. It does not act, it does not start
@@ -92,7 +93,7 @@ function rotateLogOnStartup(context: vscode.ExtensionContext) {
   if (whatIsRunning(context)) return;
   const exe = binary(context, "se");
   if (!fs.existsSync(exe)) return;
-  const done = spawn(exe, ["--rotate", "--work", work], { cwd: work });
+  const done = spawn(exe, [...rotateArgs(), "--work", work], { cwd: work });
   done.on("error", () => {
     /* nothing to recover: the window still works, it just shows more */
   });
@@ -106,7 +107,7 @@ function projectOnStartup(context: vscode.ExtensionContext) {
   if (!work) return;
   const exe = binary(context, "se");
   if (!fs.existsSync(exe)) return;
-  const done = spawn(exe, ["--project", "--work", work], { cwd: work });
+  const done = spawn(exe, [...projectArgs(), "--work", work], { cwd: work });
   done.on("error", () => {
     /* the engine writes them again when it starts */
   });
@@ -197,7 +198,7 @@ function readCopies(context: vscode.ExtensionContext): Promise<{ driver: string;
     const own = inCopy(methodRoot(context), "se");
     const empty = { driver: "", recorded: false, copies: [] as Copy[] };
     if (!work || !fs.existsSync(own)) return resolve(empty);
-    const done = spawn(own, ["--copies", "--work", work, "--method", methodRoot(context)], { cwd: work });
+    const done = spawn(own, [...copiesArgs(methodRoot(context)), "--work", work], { cwd: work });
     let out = "";
     done.stdout?.on("data", (b: Buffer) => (out += b.toString()));
     done.on("error", () => resolve(empty));
@@ -255,7 +256,7 @@ async function chooseEngine(context: vscode.ExtensionContext): Promise<void> {
   const exe = inCopy(chosenRoot, "se");
   const work = workRoot();
   if (work && fs.existsSync(exe)) {
-    spawn(exe, ["--attach", "--work", work, "--method", chosenRoot], { cwd: work });
+    spawn(exe, [...attachArgs(chosenRoot), "--work", work], { cwd: work });
   }
 }
 
@@ -472,7 +473,7 @@ function readValues(context: vscode.ExtensionContext): Promise<void> {
     // Reading is quiet. Nothing is wrong with a window that has no folder
     // open, and saying so on every refresh would be noise.
     if (!work || !fs.existsSync(exe)) return resolve();
-    const done = spawn(exe, ["--config", "--work", work, "--method", methodRoot(context)], { cwd: work });
+    const done = spawn(exe, [...configArgs(methodRoot(context)), "--work", work], { cwd: work });
     let out = "";
     done.stdout?.on("data", (b: Buffer) => (out += b.toString()));
     done.on("error", () => resolve());
@@ -512,7 +513,7 @@ async function initHere(context: vscode.ExtensionContext) {
   );
   if (!pick) return;
 
-  const done = spawn(exe, ["--init", pick.label, "--work", work], { cwd: work });
+  const done = spawn(exe, [...initArgs(pick.label), "--work", work], { cwd: work });
   let out = "";
   done.stdout?.on("data", (b: Buffer) => (out += b.toString()));
   done.stderr?.on("data", (b: Buffer) => (out += b.toString()));
@@ -637,7 +638,7 @@ function startEngine(context: vscode.ExtensionContext) {
   setState("busy", "starting");
   // Detached, so it outlives a window reload. The window finds it again
   // through what the engine says on disk.
-  const child = spawn(exe, ["--work", work], { cwd: work, detached: true });
+  const child = spawn(exe, [...startArgs(), "--work", work], { cwd: work, detached: true });
   child.unref();
   engine = child;
 
