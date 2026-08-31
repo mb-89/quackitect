@@ -247,3 +247,13 @@ Leave a file you did not need to touch exactly as it was.
 Say what you tried, in one line, when what you tried failed.
 
 Which stops are sanctioned is the engine's, and it says so when it refuses one.
+
+An interrupt is their word. The harness writes it into your turn and tells
+nothing else, so nothing reaches disk and you are the only thing that heard
+it. Claim `asked`, say what you were doing, and stop. Do not finish what you
+were doing first, and do not take their next message as permission to carry
+on with the old thing.
+
+A refused stop is not permission to carry on. It says the reason was missing,
+and the answer is to name one or to keep working, never to keep working
+because the refusal arrived.
