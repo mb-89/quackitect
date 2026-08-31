@@ -129,3 +129,41 @@ func TestTheEnginesOwnWordsAreNotReadBackAsProm(t *testing.T) {
 		t.Fatalf("it read %q", got)
 	}
 }
+
+// A HOLE IN THE RECORD IS WORTH RECORDING. The harness writes that it absorbed
+// a message and never writes what it said, so the record says somebody spoke
+// rather than reading as though nobody did.
+func TestAMessageThatWasAbsorbedIsMarkedEvenThoughItsWordsAreGone(t *testing.T) {
+	r := Roots{Method: t.TempDir(), Work: t.TempDir()}
+	dir := r.Private("log")
+	l, _ := OpenLog(dir)
+	l.Write("engine", "start", "engine", "engine started", Yes(), nil)
+	l.Close()
+
+	p := transcript(t,
+		`{"type":"user","message":{"role":"user","content":[{"type":"text","text":"one they typed at the start"}]}}`,
+		`{"type":"queue-operation","operation":"remove","reason":"absorbed_mid_turn","timestamp":"2026-08-31T10:31:22.076Z"}`,
+		`{"type":"queue-operation","operation":"enqueue","timestamp":"2026-08-31T10:31:23.000Z"}`,
+		`{"type":"queue-operation","operation":"remove","reason":"absorbed_mid_turn","timestamp":"2026-08-31T10:32:00.000Z"}`,
+	)
+	if n := BackfillPrompts(dir, p, "main"); n != 3 {
+		t.Fatalf("it wrote %d, and one prompt and two holes were there", n)
+	}
+
+	var lost, said int
+	b, _ := os.ReadFile(filepath.Join(dir, Current))
+	for _, line := range splitLines(string(b)) {
+		var rec Record
+		if json.Unmarshal([]byte(line), &rec) != nil || rec.Kind != "prompt" {
+			continue
+		}
+		if rec.Data["lost"] == true {
+			lost++
+		} else {
+			said++
+		}
+	}
+	if said != 1 || lost != 2 {
+		t.Fatalf("the record holds %d said and %d lost", said, lost)
+	}
+}

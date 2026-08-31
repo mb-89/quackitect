@@ -31,6 +31,25 @@ type transcriptLine struct {
 		Role    string          `json:"role"`
 		Content json.RawMessage `json:"content"`
 	} `json:"message"`
+
+	// A message sent into a turn that is already running. The harness writes
+	// that it absorbed one and never writes what it said.
+	Operation string `json:"operation"`
+	Reason    string `json:"reason"`
+	Timestamp string `json:"timestamp"`
+}
+
+// A HOLE IN THE RECORD IS WORTH RECORDING.
+//
+// MEASURED 2026-08-31: forty-four messages in one session were absorbed into a
+// running turn. The harness fires no event for them and writes the text
+// nowhere, so nothing can recover the words.
+//
+// What it does write is that it absorbed one. So the record says a person
+// spoke and what they said was not kept, which is worth more than a record
+// that reads as though nothing happened.
+type Lost struct {
+	At string
 }
 
 // HOW FAR THIS HAS READ. A transcript is only appended to, so everything
@@ -71,14 +90,25 @@ func PromptsIn(path string) []string {
 // promptsFrom reads from a byte offset and answers where it stopped, so the
 // next call reads only what has arrived since.
 func promptsFrom(path string, from int64) ([]string, int64) {
+	said, _, to := readTranscript(path, from)
+	return said, to
+}
+
+// LostIn names the moments a message was absorbed and its text was not kept.
+func LostIn(path string) []Lost {
+	_, lost, _ := readTranscript(path, 0)
+	return lost
+}
+
+func readTranscript(path string, from int64) ([]string, []Lost, int64) {
 	f, err := os.Open(path)
 	if err != nil {
-		return nil, from
+		return nil, nil, from
 	}
 	defer f.Close()
 	st, err := f.Stat()
 	if err != nil {
-		return nil, from
+		return nil, nil, from
 	}
 	// A file that shrank is a different file under the same name, so the mark
 	// means nothing and the whole of it is read again.
@@ -86,15 +116,23 @@ func promptsFrom(path string, from int64) ([]string, int64) {
 		from = 0
 	}
 	if _, err := f.Seek(from, 0); err != nil {
-		return nil, from
+		return nil, nil, from
 	}
 
 	var out []string
+	var lost []Lost
 	in := bufio.NewScanner(f)
 	in.Buffer(make([]byte, 0, 1<<20), 1<<24)
 	for in.Scan() {
 		var l transcriptLine
-		if json.Unmarshal(in.Bytes(), &l) != nil || l.Type != "user" || l.Message.Role != "user" {
+		if json.Unmarshal(in.Bytes(), &l) != nil {
+			continue
+		}
+		if l.Type == "queue-operation" && l.Reason == "absorbed_mid_turn" {
+			lost = append(lost, Lost{At: l.Timestamp})
+			continue
+		}
+		if l.Type != "user" || l.Message.Role != "user" {
 			continue
 		}
 		for _, t := range textIn(l.Message.Content) {
@@ -104,9 +142,9 @@ func promptsFrom(path string, from int64) ([]string, int64) {
 		}
 	}
 	if err := in.Err(); err != nil {
-		return out, from
+		return out, lost, from
 	}
-	return out, st.Size()
+	return out, lost, st.Size()
 }
 
 // A PROMPT IS WHAT THE PERSON WROTE. A harness puts other things in the same
@@ -166,8 +204,8 @@ func textIn(raw json.RawMessage) []string {
 // be right twice.
 func BackfillPrompts(dir, transcript, actor string) int {
 	from := readMark(dir, transcript)
-	said, to := promptsFrom(transcript, from)
-	if len(said) == 0 {
+	said, lost, to := readTranscript(transcript, from)
+	if len(said) == 0 && len(lost) == 0 {
 		writeMark(dir, transcript, to)
 		return 0
 	}
@@ -195,8 +233,15 @@ func BackfillPrompts(dir, transcript, actor string) int {
 		l.Write("user", "prompt", actor, firstLine(p), nil,
 			map[string]any{"backfilled": true})
 	}
+	// A HOLE, SAID OUT LOUD. The words are gone and nothing can bring them
+	// back, so the record says that somebody spoke here rather than reading as
+	// though nobody did.
+	for _, g := range lost {
+		l.Write("user", "prompt", actor, "a message arrived while the turn was running, and the harness kept no text for it",
+			No(), map[string]any{"lost": true, "at": g.At})
+	}
 	writeMark(dir, transcript, to)
-	return len(missing)
+	return len(missing) + len(lost)
 }
 
 func promptsHeld(dir string) map[string]bool {
