@@ -3,7 +3,7 @@ id: wk-24be1c06ae
 seq: "78"
 type: work
 title: a line holds one
-status: spec_open
+status: spec_submitted
 assignee: main
 scope: single-step
 traced: true
@@ -68,40 +68,70 @@ criterion with both lines. Against the tree as it stands that reads back three
 criteria and one line. Do the same for Says and for Runs.
 
 
-THE DECISION, AND IT IS REFUSE RATHER THAN FOLD.
+THREE SHAPES, AND THE FIELD SAYS WHICH ONE IT IS. Refuse was the right answer
+for the shape the lesson was found on and the wrong answer for the shape the
+record is actually losing. The boundary is the parser and not the Criterion
+struct, so the sweep is over every field the note writes and reads back.
 
-A folded value invents a continuation syntax. The note is a file a person opens
-and edits, and a syntax nobody typed is a syntax somebody gets wrong. It would
-also need reading back, which is a second place to be wrong about the same
-thing.
+ONE LINE BY DESIGN: Criterion.Says, Criterion.Runs, Criterion.Without,
+Criterion.Red. Each is one lead and one line on the page and a person types it
+there. A folded continuation syntax nobody typed is a syntax somebody gets
+wrong, and it would need reading back, which is a second place to be wrong about
+the same thing. So the record refuses to hold what it cannot read back, and the
+refusal names the field and which criterion.
 
-SO THE RECORD REFUSES TO HOLD WHAT IT CANNOT READ BACK. Saving a token whose
-criterion carries a newline in a one-line field is refused, and the refusal
-names the field, the criterion and the line that will not fit. That is the same
-shape as every other gate here: the queue refuses rather than reminds.
+A BLOCK BY DESIGN: Rejection.Wrong, Rejection.Satisfies, Lesson.Class,
+Lesson.Avoid. These are paragraphs by design and the writer already writes them
+whole: body() writes a finding's wrong as its lead followed by the value and a
+blank line, and nothing about that write stops it holding several paragraphs.
+Only the reader is line-based. So there is no format to invent: readFinding
+reads from its lead to the next lead or the next heading rather than to the next
+newline, which is what readLesson already does one degree better by splitting on
+a blank line. Refusing a newline here would make every review written in this
+queue this session illegal.
 
-WHERE IT GOES. SaveToken, because that is the moment the value stops being a
-value and becomes a line. A refusal in the caller is a refusal the next caller
-does not have, and there are several callers.
+A VALUE THAT GOES INTO A HEADING: Rejection.Clause. It is joined into a heading
+line with the round and the author, split on the middle dot, so it cannot hold
+that character or a newline whatever else is decided. That one really is a line,
+and it is refused with a message saying which character.
 
-WHICH FIELDS. Says, Runs, Without and Red. All four are one lead and one line,
-and all four are strings that hold anything. Every other field on a criterion is
-a bool or is not written to the note.
+WHAT IS BEING LOST RIGHT NOW, MEASURED ON THE RECORD RATHER THAN PREDICTED. Of
+the fourteen findings on the four tokens in this queue, the six written as one
+long paragraph survive whole, 939 to 2844 characters. Every one written in
+paragraphs is cut to its first. One finding is 85 characters in the record and
+was about 1900 when it was sent: the body, the measurements and the reproduction
+are gone, and the worker reads one sentence. Another is 196 of about 3900, and
+another 528 of about 5000.
 
-WHAT A WORKER DOES INSTEAD. Writes the observation on one line. Where several
-lines were seen, they are joined with a separator, which is what carry-red.py
-already does. Where that is not enough, the observation names a file and the
-evidence carries the whole of it, which is what the token's evidence section is
-for.
+SO THE ONE-PARAGRAPH HOUSE STYLE IS NOT A STYLE. It is the same silent
+workaround this token was minted about, and nobody using it has been told they
+are using it. A truncated observation costs a sentence. A truncated finding
+costs the round, because the worker answers the paragraph that survived and the
+reviewer re-runs a reproduction the worker never saw.
+
+WHERE EACH HALF GOES. The refusals go in SaveToken, because that is the moment
+the value becomes a line and a refusal in one caller is a refusal the next caller
+does not have. The block reading goes in readFinding and stays where readLesson
+already is, because nothing is being refused there and the writer is already
+right.
+
+AND THE NEXT FIELD IS TOLD WHICH SHAPE IT IS CHOOSING. The list above lives in
+the detail beside the sweep, so somebody adding a field to this note picks one of
+three rather than guessing.
 
 ## done when
 
-- A criterion carrying a newline in a field the note writes on one line is refused when the token is saved, and the refusal names the field and says which criterion
+- One check walks every field the note writes and reads back, names each one and the shape it is, and refuses if it finds none to walk, so it cannot pass by the list having gone
+  `rg -q func.TestEveryFieldTheNoteWritesIsRead src/engine && go test -C src/engine -count=1 -run TestEveryFieldTheNoteWritesIsRead$ .`
+- A field that is one line by design carrying a newline is refused when the token is saved, and the refusal names the field and which criterion it is on
   `rg -q func.TestALineHoldsOneLine src/engine && go test -C src/engine -count=1 -run TestALineHoldsOneLine$ .`
-- All four one-line fields are refused, not only the two the lesson was found on, and the check walks a list rather than naming one
-  `rg -q func.TestEveryOneLineFieldRefusesASecondLine src/engine && go test -C src/engine -count=1 -run TestEveryOneLineFieldRefusesASecondLine$ .`
-- The round trip is fed what the format does not obviously survive rather than what the writer normally produces: the lead itself, the list marker, a backtick, and an empty value, and each reads back as it was written
+- A field that is a block by design comes back byte-identical from two paragraphs, from a value carrying a blank line, and from one whose second paragraph begins with a lead this parser reads
+  `rg -q func.TestABlockComesBackWhole src/engine && go test -C src/engine -count=1 -run TestABlockComesBackWhole$ .`
+- A clause carrying the character its heading is split on, or a newline, is refused, and the refusal says which character
+  `rg -q func.TestAHeadingHoldsNoDelimiter src/engine && go test -C src/engine -count=1 -run TestAHeadingHoldsNoDelimiter$ .`
+- Every field is fed what the format does not obviously survive rather than what the writer normally produces: the lead itself, the list marker, a backtick, the heading delimiter, and an empty value
   `rg -q func.TestTheNoteSurvivesAwkwardValues src/engine && go test -C src/engine -count=1 -run TestTheNoteSurvivesAwkwardValues$ .`
+- The findings already on disk that were truncated are not rewritten, because a finding says what a reviewer sent on the day and the engine cannot invent what it dropped. The evidence says how many were counted and what a reader of one of them sees
 - Every test named above was watched failing on its own assertion, with the change absent, before it was watched passing. The evidence says what was seen and what was taken away each time.
 
 ## finding 1 · round 1 · done when: All four one-line fields are refused, not only the two the lesson was found on, and the check walks a list rather than naming one / detail: WHICH FIELDS. Says, Runs, Without and Red · by reviewer6
