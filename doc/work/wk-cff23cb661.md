@@ -42,3 +42,37 @@ the work: the mint row, the group buttons, the second-pane button, and whatever
 else turns out to be about work rather than about a table. Drawing the line is
 the first thing this token does, because it decides what the generic editor is.
 
+
+THE LINE, DRAWN. This is the first thing the token said it would do, and here it
+is, with what falls on each side.
+
+THE SHELL IS THE WORK EDITOR. It knows there are two instances, which view they
+are showing, and what a row dragged between them is. That is the view tabs, the
+second-instance button, the seam between the two, and the one thing that carries
+a dragged row, which has to sit above both because neither instance owns the
+other.
+
+AN INSTANCE IS A GENERIC EDITOR. It draws a table over one view and one pane and
+everything it does is about that table: its toolbar, which is Group, Rename,
+Filter, Sort, Properties and the query toggle, its three popovers, its column
+heads, its pinned box, its scrolling box, its pager, its code panel, its own
+ticked rows and its own folds.
+
+A BUCKET IS THE TABLE'S AND NOT WORK'S, which is the one call in this list worth
+arguing. A bucket is a person's own name for a group of rows, and any table can
+have one. What makes it look like work's is that the engine refuses to let an
+agent make one, and that refusal is about who may name a grouping rather than
+about what a grouping is.
+
+THE MINT ROW IS NOT ON THIS PAGE AT ALL. It lives in the panel webview,
+src/extension/panel.ts, which is a different surface. It was on the list this
+token wrote before anybody looked, and looking is what took it off.
+
+THE LINE IS A CHECK AND NOT A PARAGRAPH. Every editor defect the owner reported
+this week was a control on one side of it reaching to the other, and a line
+nothing enforces is a line that moves the next time somebody adds a button.
+drive-editor.mjs asserts three things of it: every shell control is drawn and no
+instance carries one, every instance control is drawn and none is outside an
+instance, and each instance has its own of every one. Watched red both ways, by
+putting a second button inside a pane and by putting a toolbar on the bar.
+
