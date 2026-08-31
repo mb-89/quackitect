@@ -47,7 +47,7 @@ func dirFor(r Roots, t Token) string {
 // The frontmatter's order on the page. Identity first, then where it stands,
 // then what it is attached to, then the times.
 var frontOrder = []string{
-	"id", "type", "form", "status", "assignee", "scope", "traced",
+	"id", "type", "title", "status", "assignee", "scope", "traced",
 	"disposition", "reason", "holder", "bucket",
 	"parent", "subs", "depends_on", "successors",
 	"evidence", "evidence_script", "rounds",
@@ -56,7 +56,7 @@ var frontOrder = []string{
 
 func (t Token) front() Front {
 	f := Front{
-		"id": t.ID, "type": TypeWork, "form": t.Form,
+		"id": t.ID, "type": TypeWork, "title": t.Title,
 		"status": string(t.Status), "assignee": t.Assignee, "scope": string(t.Scope),
 		"traced":      strconv.FormatBool(t.Traced),
 		"disposition": string(t.Disposition), "reason": t.Reason, "holder": t.Holder,
@@ -75,7 +75,7 @@ func (t Token) front() Front {
 
 func tokenFromFront(f Front) Token {
 	return Token{
-		ID: fs(f, "id"), Form: fs(f, "form"),
+		ID: fs(f, "id"), Title: fs(f, "title"),
 		Status: Status(fs(f, "status")), Assignee: fs(f, "assignee"),
 		Scope: Scope(fs(f, "scope")), Traced: fb(f, "traced"),
 		Disposition: Disposition(fs(f, "disposition")), Reason: fs(f, "reason"),
@@ -264,6 +264,13 @@ func readNote(path string) (Token, bool) {
 	}
 	t := tokenFromFront(f)
 	readBody(&t, body)
+	// A NOTE IS EDITED BY HAND, so the rule is checked where the note is read
+	// and not only where it was minted. A title that broke it is said out loud
+	// and the token is still returned: refusing to read work is worse than
+	// reading work with a bad title.
+	if err := checkTitle(t.Title); err != nil {
+		fmt.Fprintf(os.Stderr, "engine: %s: %v\n", path, err)
+	}
 	return t, true
 }
 

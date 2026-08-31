@@ -12,7 +12,7 @@ import (
 func TestATokenSurvivesBeingWrittenAndReadBack(t *testing.T) {
 	r := lane(t)
 	want := Token{
-		Form: "write the level-1 row", Detail: "The whole instruction, in the\nwords it was asked in.",
+		Title: "the level-1 row", Detail: "The whole instruction, in the\nwords it was asked in.",
 		Guidance: "Say what is. Leave out what is not.",
 		Evidence: EvidenceSpec{Sections: []string{"what", "how"}, Script: "go test ./..."},
 		Assignee: "main", Scope: MultiStep, Traced: true,
@@ -33,7 +33,7 @@ func TestATokenSurvivesBeingWrittenAndReadBack(t *testing.T) {
 		t.Fatal(err)
 	}
 	for _, c := range []struct{ name, want, got string }{
-		{"form", got.Form, back.Form},
+		{"title", got.Title, back.Title},
 		{"detail", got.Detail, back.Detail},
 		{"guidance", got.Guidance, back.Guidance},
 		{"assignee", got.Assignee, back.Assignee},
@@ -65,13 +65,13 @@ func TestATokenSurvivesBeingWrittenAndReadBack(t *testing.T) {
 // is not JSON.
 func TestTheNoteIsReadableMarkdown(t *testing.T) {
 	r := lane(t)
-	tok := mint(t, r, Token{Form: "write the thing", Detail: "and say why", Traced: true})
+	tok := mint(t, r, Token{Title: "write the thing", Detail: "and say why", Traced: true})
 	b, err := os.ReadFile(filepath.Join(r.Work, "doc", "work", tok.ID+".md"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	text := string(b)
-	for _, want := range []string{"---\n", "id: " + tok.ID, "type: work", "form: write the thing",
+	for _, want := range []string{"---\n", "id: " + tok.ID, "type: work", "title: write the thing",
 		"status: open", "## detail", "and say why"} {
 		if !strings.Contains(text, want) {
 			t.Errorf("the note does not carry %q\n%s", want, text)
@@ -82,7 +82,7 @@ func TestTheNoteIsReadableMarkdown(t *testing.T) {
 // A folder holds other notes too, so a note is a token only when it says so.
 func TestANoteThatIsNotATokenIsNotInTheLedger(t *testing.T) {
 	r := lane(t)
-	mint(t, r, Token{Form: "a real one", Traced: true})
+	mint(t, r, Token{Title: "a real one", Traced: true})
 	dir := filepath.Join(r.Work, "doc", "work")
 	os.WriteFile(filepath.Join(dir, "notes.md"),
 		[]byte("---\nid: not-a-token\ntype: reading\n---\n\nsome thinking.\n"), 0o644)
@@ -96,7 +96,7 @@ func TestANoteThatIsNotATokenIsNotInTheLedger(t *testing.T) {
 // A person edits these by hand, so what a person is likely to write has to
 // read back as what they meant.
 func TestTheFrontmatterReadsWhatAPersonWrites(t *testing.T) {
-	front, body := SplitNote("---\nid: wk-1\nform: \"a form: with a colon\"\nsubs:\n  - wk-2\n  - wk-3\ntraced: true\n---\n\nthe body.\n")
+	front, body := SplitNote("---\nid: wk-1\ntitle: \"a title: with a colon\"\nsubs:\n  - wk-2\n  - wk-3\ntraced: true\n---\n\nthe body.\n")
 	if body != "the body.\n" {
 		t.Fatalf("the body came back as %q", body)
 	}
@@ -104,8 +104,8 @@ func TestTheFrontmatterReadsWhatAPersonWrites(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if fs(f, "form") != "a form: with a colon" {
-		t.Errorf("a quoted colon read as %q", fs(f, "form"))
+	if fs(f, "title") != "a title: with a colon" {
+		t.Errorf("a quoted colon read as %q", fs(f, "title"))
 	}
 	if got := fl(f, "subs"); len(got) != 2 || got[1] != "wk-3" {
 		t.Errorf("the list read as %v", got)

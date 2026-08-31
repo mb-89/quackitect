@@ -26,14 +26,14 @@ func runWork(args []string) {
 	fs.Usage = func() {
 		fmt.Fprintln(os.Stdout, "se work - mint a work token. Prints the token as JSON.")
 		fmt.Fprintln(os.Stdout, "")
-		fmt.Fprintln(os.Stdout, "  se work --form \"...\" --assignee main")
+		fmt.Fprintln(os.Stdout, "  se work --title \"...\" --assignee main")
 		fmt.Fprintln(os.Stdout, "  se work --stdin        read the whole token as JSON")
 		fmt.Fprintln(os.Stdout, "")
 		fs.PrintDefaults()
 	}
 	work := fs.String("work", "", "the folder being worked on (default: this one)")
 	stdin := fs.Bool("stdin", false, "read the token as JSON on standard input")
-	form := fs.String("form", "", "what work is to be done, in one line")
+	title := fs.String("title", "", "what the work is, in four words at most")
 	detail := fs.String("detail", "", "the whole instruction, in the words it was asked in")
 	assignee := fs.String("assignee", "", "whose token it is")
 	guidance := fs.String("guidance", "", "the method, inline")
@@ -90,7 +90,7 @@ func runWork(args []string) {
 			answerJSON(map[string]any{"error": err.Error()})
 			os.Exit(1)
 		}
-		inSession(roots, "work", or2(*by, "main"), "opened "+t.ID+" from the backlog: "+t.Form, Yes(),
+		inSession(roots, "work", or2(*by, "main"), "opened "+t.ID+" from the backlog: "+t.Title, Yes(),
 			map[string]any{"id": t.ID})
 		answerJSON(t)
 		return
@@ -104,7 +104,7 @@ func runWork(args []string) {
 			os.Exit(1)
 		}
 	} else {
-		t = Token{Form: *form, Detail: *detail, Assignee: *assignee, Guidance: *guidance, GuidanceRef: *guidanceRef,
+		t = Token{Title: *title, Detail: *detail, Assignee: *assignee, Guidance: *guidance, GuidanceRef: *guidanceRef,
 			Scope: Scope(*scope), Parent: *parent, Traced: *traced,
 			DependsOn: splitComma(*dependsOn)}
 		if *sections != "" {
@@ -129,7 +129,7 @@ func runWork(args []string) {
 		os.Exit(1)
 	}
 	// A minting is an event, so it is in the record like every other one.
-	inSession(roots, "work", minted.MintedBy, "minted "+minted.ID+": "+minted.Form, Yes(),
+	inSession(roots, "work", minted.MintedBy, "minted "+minted.ID+": "+minted.Title, Yes(),
 		map[string]any{"id": minted.ID, "assignee": minted.Assignee, "scope": minted.Scope})
 	answerJSON(minted)
 }

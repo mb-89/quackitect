@@ -35,10 +35,6 @@ type hookIn struct {
 	AgentID        string          `json:"agent_id"`
 	AgentType      string          `json:"agent_type"`
 	StopHookActive bool            `json:"stop_hook_active"`
-
-	// What the harness wrote down. It is read only to recover prompts the
-	// harness never sent an event for.
-	TranscriptPath string `json:"transcript_path"`
 }
 
 type toolInput struct {
@@ -243,13 +239,6 @@ func notePostTool(roots Roots, in hookIn, actor string) {
 }
 
 func decidePreToolUse(roots Roots, cfg Config, emergency Emergency, log *Log, in hookIn, actor string) {
-	// A PROMPT SENT INTO A RUNNING TURN REACHES THE RECORD HERE. Waiting for
-	// the stop would mean a person watching the log sees what they said only
-	// after the turn ends, which is the one time they are not watching.
-	if in.TranscriptPath != "" {
-		BackfillPrompts(roots.Private("log"), in.TranscriptPath, actor)
-	}
-
 	// ANYTHING YOU DO AFTER CLAIMING A STOP ERASES THE CLAIM. A claim says the
 	// next thing is stopping. An agent that claims and then carries on has
 	// changed its mind, whether or not it noticed.
@@ -399,15 +388,6 @@ func isProse(path string) bool {
 // agent decided. v3 measured that: block, pass, block, pass, and the tooth
 // never bit.
 func decideStop(roots Roots, cfg Config, log *Log, in hookIn, actor string) {
-	// A PROMPT THE HARNESS NEVER SENT AN EVENT FOR IS STILL A PROMPT. This is
-	// the last moment the record can be made whole before the turn is over.
-	if in.TranscriptPath != "" {
-		if n := BackfillPrompts(roots.Private("log"), in.TranscriptPath, actor); n > 0 {
-			record(log, "engine", "record", actor, "recovered prompts the harness sent no event for", Yes(),
-				map[string]any{"prompts": n})
-		}
-	}
-
 	if !cfg.StopNeedsClaim {
 		record(log, "agent", "stop", actor, "stopped", Yes(), nil)
 		return

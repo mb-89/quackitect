@@ -25,7 +25,7 @@ func rowOf(r Roots, t Token) Row {
 		rel = path
 	}
 	row := Row{
-		"id": vs(t.ID), "type": vs(TypeWork), "form": vs(t.Form),
+		"id": vs(t.ID), "type": vs(TypeWork), "title": vs(t.Title),
 		"detail": vs(t.Detail), "guidance": vs(t.Guidance),
 		"status": vs(string(t.Status)), "assignee": vs(t.Assignee),
 		"scope": vs(string(t.Scope)), "traced": vb(t.Traced),

@@ -38,6 +38,9 @@ func main() {
 		case "query":
 			runQuery(os.Args[2:])
 			return
+		case "lint":
+			runLint(os.Args[2:])
+			return
 		}
 	}
 	flag.Usage = func() {
@@ -51,6 +54,7 @@ func main() {
 		fmt.Fprintln(out, "  se pull --help       ask the engine what to do next")
 		fmt.Fprintln(out, "  se stop --help       name why you are stopping")
 		fmt.Fprintln(out, "  se query --help      draw a view over the work")
+		fmt.Fprintln(out, "  se lint --help       name what breaks a rule")
 		fmt.Fprintln(out, "")
 		flag.PrintDefaults()
 	}

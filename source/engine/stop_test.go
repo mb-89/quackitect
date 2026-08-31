@@ -45,7 +45,7 @@ func TestARefusedStopNamesTheWorkTheActorHolds(t *testing.T) {
 	l, _ := OpenLog(r.Private("log"))
 	l.Close()
 
-	tok, err := Mint(r, Token{Form: "write the thing", Assignee: "main"})
+	tok, err := Mint(r, Token{Title: "write the thing", Assignee: "main"})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -63,7 +63,7 @@ func TestARefusalDoesNotNameAnotherActorsWork(t *testing.T) {
 	l, _ := OpenLog(r.Private("log"))
 	l.Close()
 
-	if _, err := Mint(r, Token{Form: "the scribe's own", Assignee: "scribe-1"}); err != nil {
+	if _, err := Mint(r, Token{Title: "the scribe's own", Assignee: "scribe-1"}); err != nil {
 		t.Fatal(err)
 	}
 	out := hookSays(t, exe, r.Method, "Stop", map[string]any{"cwd": r.Work})
@@ -132,7 +132,7 @@ func TestAnyActionSpendsTheClaim(t *testing.T) {
 // it and the refusal should not name it.
 func TestSubmittedWorkIsNotNamedAsWorkInHand(t *testing.T) {
 	r := guidanceTree(t)
-	tok, err := Mint(r, Token{Form: "write the thing", Assignee: "main"})
+	tok, err := Mint(r, Token{Title: "write the thing", Assignee: "main"})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -150,7 +150,7 @@ func TestSubmittedWorkIsNotNamedAsWorkInHand(t *testing.T) {
 // point of it coming back.
 func TestRejectedWorkIsWorkInHandAgain(t *testing.T) {
 	r := guidanceTree(t)
-	tok, _ := Mint(r, Token{Form: "write the thing", Assignee: "main"})
+	tok, _ := Mint(r, Token{Title: "write the thing", Assignee: "main"})
 	Pull(r, "main", RoleWorker, Payload{})
 	Pull(r, "main", RoleWorker, Payload{ID: tok.ID, Disposition: string(Done)})
 	Pull(r, "rev", RoleReviewer, Payload{})

@@ -25,7 +25,7 @@ func laneTools() []map[string]any {
 			"inputSchema": map[string]any{
 				"type": "object",
 				"properties": map[string]any{
-					"form":     map[string]any{"type": "string", "description": "what is to be done, in one line"},
+					"title":    map[string]any{"type": "string", "description": "what the work is, in four words at most"},
 					"assignee": map[string]any{"type": "string", "description": "whose it is"},
 					"detail":   map[string]any{"type": "string", "description": "the whole instruction"},
 					"guidance": map[string]any{"type": "string", "description": "the method, inline"},
@@ -44,7 +44,7 @@ func laneTools() []map[string]any {
 					"actor": map[string]any{"type": "string",
 						"description": "who is minting. Default main"},
 				},
-				"required": []string{"form", "assignee"},
+				"required": []string{"title", "assignee"},
 			},
 		},
 		{
@@ -112,7 +112,7 @@ func mintWork(r roots, args map[string]any) string {
 	if by == "" {
 		by = "main"
 	}
-	a := []string{"work", "--form", str(args["form"]), "--assignee", str(args["assignee"]), "--by", by}
+	a := []string{"work", "--title", str(args["title"]), "--assignee", str(args["assignee"]), "--by", by}
 	if b, ok := args["backlog"].(bool); ok && b {
 		a = append(a, "--backlog")
 	}

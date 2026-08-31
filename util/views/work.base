@@ -13,8 +13,8 @@
 # state, so nothing is at it.
 
 properties:
-  form:
-    displayName: what
+  title:
+    displayName: title
     opensNote: true
   status:
     displayName: state
@@ -32,11 +32,11 @@ views:
   - type: table
     name: left
     order:
-      - form
+      - title
       - status
       - assignee
     columnSize:
-      form: 620
+      title: 300
       status: 110
       assignee: 110
     counts:
@@ -66,7 +66,7 @@ views:
   - type: table
     name: right
     order:
-      - form
+      - title
       - status
     groupBy:
       - property: if(bucket, bucket, status)

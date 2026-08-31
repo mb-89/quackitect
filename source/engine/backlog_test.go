@@ -6,7 +6,7 @@ import "testing"
 // nothing back. That is what separates writing something down from taking it on.
 func TestABackloggedTokenIsNotHandedOutAndHoldsNobody(t *testing.T) {
 	r := lane(t)
-	note, err := Mint(r, Token{Form: "look at whether a move verb is worth having",
+	note, err := Mint(r, Token{Title: "a move verb",
 		Assignee: "main", Status: Backlogged})
 	if err != nil {
 		t.Fatal(err)
@@ -29,7 +29,7 @@ func TestABackloggedTokenIsNotHandedOutAndHoldsNobody(t *testing.T) {
 // having written the note down.
 func TestOpeningABackloggedTokenPutsItInTheQueue(t *testing.T) {
 	r := lane(t)
-	note, _ := Mint(r, Token{Form: "the note", Assignee: "main", Status: Backlogged})
+	note, _ := Mint(r, Token{Title: "the note", Assignee: "main", Status: Backlogged})
 
 	got, err := Activate(r, note.ID)
 	if err != nil {
@@ -52,7 +52,7 @@ func TestOpeningABackloggedTokenPutsItInTheQueue(t *testing.T) {
 // somewhere, and moving it there again would lose where it was.
 func TestOnlyABackloggedTokenIsOpenedFromTheBacklog(t *testing.T) {
 	r := lane(t)
-	tok := mint(t, r, Token{Form: "already open"})
+	tok := mint(t, r, Token{Title: "already open"})
 	if _, err := Activate(r, tok.ID); err == nil {
 		t.Fatal("an open token was opened from the backlog")
 	}

@@ -112,9 +112,9 @@ type Token struct {
 	ID string `json:"id"`
 
 	// What work is to be done. There is no work without one.
-	Form string `json:"form"`
+	Title string `json:"title"`
 
-	// The whole instruction, in the words it was asked in. Form is one line
+	// The whole instruction, in the words it was asked in. The title is one line
 	// and this is everything the next hand needs that the line cannot carry.
 	Detail string `json:"detail,omitempty"`
 
@@ -185,6 +185,33 @@ type Token struct {
 // parent, and the parent was never the agent's to settle.
 func (t Token) SelfClosing() bool { return t.Scope == InToken && !t.Traced }
 
+// THE TITLE IS FOUR WORDS AT MOST. It is what a person reads down a column,
+// and a column of sentences is a column nobody reads. Everything the four
+// words cannot carry goes in the detail, which is where the whole instruction
+// belongs anyway.
+//
+// PADDING IS NOT A WAY ROUND IT. Joining words with an underscore or a slash
+// makes one word of four and reads worse than the sentence it was hiding.
+const TitleWords = 4
+
+func checkTitle(title string) error {
+	title = strings.TrimSpace(title)
+	if title == "" {
+		return fmt.Errorf("a token needs a title: say what the work is, in %d words", TitleWords)
+	}
+	words := strings.Fields(title)
+	if len(words) > TitleWords {
+		return fmt.Errorf("a title is %d words at most, and this is %d. Put the rest in the detail: %q",
+			TitleWords, len(words), title)
+	}
+	for _, w := range words {
+		if strings.ContainsAny(w, "_/\\") && len(w) > 12 {
+			return fmt.Errorf("%q joins words to get under the limit. Put them in the detail instead", w)
+		}
+	}
+	return nil
+}
+
 func newID() string {
 	b := make([]byte, 5)
 	if _, err := rand.Read(b); err != nil {
@@ -201,8 +228,8 @@ func now() string { return time.Now().UTC().Format(time.RFC3339Nano) }
 // because the caller is the minter and the minter is who those decisions
 // belong to.
 func Mint(r Roots, t Token) (Token, error) {
-	if strings.TrimSpace(t.Form) == "" {
-		return t, fmt.Errorf("a token needs a form: say what work is to be done")
+	if err := checkTitle(t.Title); err != nil {
+		return t, err
 	}
 	if t.Assignee == "" {
 		return t, fmt.Errorf("a token needs an assignee: every token is somebody's")

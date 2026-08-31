@@ -15,8 +15,8 @@ func lane(t *testing.T) Roots {
 
 func mint(t *testing.T, r Roots, tok Token) Token {
 	t.Helper()
-	if tok.Form == "" {
-		tok.Form = "do the thing"
+	if tok.Title == "" {
+		tok.Title = "do the thing"
 	}
 	if tok.Assignee == "" {
 		tok.Assignee = "main"
@@ -31,8 +31,8 @@ func mint(t *testing.T, r Roots, tok Token) Token {
 // The whole point of pulling: the agent names nothing and receives work.
 func TestAPullWithNoPayloadHandsOutTheOldestOpenToken(t *testing.T) {
 	r := lane(t)
-	first := mint(t, r, Token{Form: "the first"})
-	mint(t, r, Token{Form: "the second"})
+	first := mint(t, r, Token{Title: "the first"})
+	mint(t, r, Token{Title: "the second"})
 
 	a := Pull(r, "main", RoleWorker, Payload{})
 	if a.Pull != AnswerWork {
@@ -51,7 +51,7 @@ func TestAPullWithNoPayloadHandsOutTheOldestOpenToken(t *testing.T) {
 // An agent that pulls twice is not working two things at once.
 func TestPullingAgainReturnsTheSameTokenUntilItIsSubmitted(t *testing.T) {
 	r := lane(t)
-	mint(t, r, Token{Form: "the only one"})
+	mint(t, r, Token{Title: "the only one"})
 	first := Pull(r, "main", RoleWorker, Payload{})
 	again := Pull(r, "main", RoleWorker, Payload{})
 	if again.Pull != AnswerWork || again.Token.ID != first.Token.ID {
@@ -72,7 +72,7 @@ func TestAnActorWithNoTokenIsToldToWait(t *testing.T) {
 // The rule the whole layer turns on. The worker submits and does not close.
 func TestSubmittingDoesNotCloseTheTokenItSendsItToReview(t *testing.T) {
 	r := lane(t)
-	tok := mint(t, r, Token{Form: "write the thing"})
+	tok := mint(t, r, Token{Title: "write the thing"})
 	Pull(r, "main", RoleWorker, Payload{})
 
 	a := Pull(r, "main", RoleWorker, Payload{ID: tok.ID, Disposition: string(Done)})
@@ -91,7 +91,7 @@ func TestSubmittingDoesNotCloseTheTokenItSendsItToReview(t *testing.T) {
 // The reviewer's queue is a different queue, and the worker's is empty of it.
 func TestTheReviewerPullsFromTheOtherQueue(t *testing.T) {
 	r := lane(t)
-	tok := mint(t, r, Token{Form: "write the thing"})
+	tok := mint(t, r, Token{Title: "write the thing"})
 	Pull(r, "main", RoleWorker, Payload{})
 	Pull(r, "main", RoleWorker, Payload{ID: tok.ID, Disposition: string(Done)})
 
@@ -114,7 +114,7 @@ func TestTheReviewerPullsFromTheOtherQueue(t *testing.T) {
 // A rejection is typed, it lands on the token, and the work comes back.
 func TestARejectionComesBackWithItsFindingsOnTheToken(t *testing.T) {
 	r := lane(t)
-	tok := mint(t, r, Token{Form: "write the thing"})
+	tok := mint(t, r, Token{Title: "write the thing"})
 	Pull(r, "main", RoleWorker, Payload{})
 	Pull(r, "main", RoleWorker, Payload{ID: tok.ID, Disposition: string(Done)})
 	// A reviewer judges what was handed to it, so it pulls before it answers.
@@ -162,10 +162,10 @@ func TestARejectionWithNoFindingIsItselfRefused(t *testing.T) {
 // ever woken. Each case names the clause it must fail on.
 func TestTheEngineRefusesWhatAProgramCanSee(t *testing.T) {
 	r := lane(t)
-	other := mint(t, r, Token{Form: "somebody else's", Assignee: "them"})
-	filled := mint(t, r, Token{Form: "a form", Evidence: EvidenceSpec{Sections: []string{"what", "how"}}})
-	parent := mint(t, r, Token{Form: "the parent"})
-	mint(t, r, Token{Form: "the child", Parent: parent.ID, Scope: InToken})
+	other := mint(t, r, Token{Title: "somebody else's", Assignee: "them"})
+	filled := mint(t, r, Token{Title: "a form", Evidence: EvidenceSpec{Sections: []string{"what", "how"}}})
+	parent := mint(t, r, Token{Title: "the parent"})
+	mint(t, r, Token{Title: "the child", Parent: parent.ID, Scope: InToken})
 
 	cases := []struct {
 		name   string
@@ -211,8 +211,8 @@ func TestTheEngineRefusesWhatAProgramCanSee(t *testing.T) {
 // A parent is held open by its children, and it is freed by closing them.
 func TestClosingEverySubTokenFreesTheParent(t *testing.T) {
 	r := lane(t)
-	parent := mint(t, r, Token{Form: "the parent"})
-	child := mint(t, r, Token{Form: "the child", Parent: parent.ID, Scope: InToken})
+	parent := mint(t, r, Token{Title: "the parent"})
+	child := mint(t, r, Token{Title: "the child", Parent: parent.ID, Scope: InToken})
 
 	// The child is the agent's own breakdown, so submitting closes it.
 	Pull(r, "main", RoleWorker, Payload{ID: child.ID, Disposition: string(Done)})
@@ -233,8 +233,8 @@ func TestAnEvidenceScriptThatFailsRefusesTheSubmission(t *testing.T) {
 	if runtime.GOOS == "windows" {
 		bad, good = "exit /b 3", "exit /b 0"
 	}
-	fails := mint(t, r, Token{Form: "run it", Evidence: EvidenceSpec{Script: bad}})
-	passes := mint(t, r, Token{Form: "run it", Evidence: EvidenceSpec{Script: good}})
+	fails := mint(t, r, Token{Title: "run it", Evidence: EvidenceSpec{Script: bad}})
+	passes := mint(t, r, Token{Title: "run it", Evidence: EvidenceSpec{Script: good}})
 
 	a := Pull(r, "main", RoleWorker, Payload{ID: fails.ID, Disposition: string(Done)})
 	if a.Pull != AnswerRefused || a.Findings[0].Clause != "evidence" {
@@ -250,7 +250,7 @@ func TestAnEvidenceScriptThatFailsRefusesTheSubmission(t *testing.T) {
 // reason is the evidence, and the reason is already required.
 func TestDroppedWorkNeedsAReasonAndNotAFilledForm(t *testing.T) {
 	r := lane(t)
-	tok := mint(t, r, Token{Form: "a form", Evidence: EvidenceSpec{Sections: []string{"what"}}})
+	tok := mint(t, r, Token{Title: "a form", Evidence: EvidenceSpec{Sections: []string{"what"}}})
 	a := Pull(r, "main", RoleWorker, Payload{ID: tok.ID, Disposition: string(Dropped),
 		Reason: "the requirement went away"})
 	if a.Pull == AnswerRefused {
@@ -265,12 +265,12 @@ func TestMintingRefusesATokenThatDescribesNothing(t *testing.T) {
 	if _, err := Mint(r, Token{Assignee: "main"}); err == nil {
 		t.Fatal("a token with no form was minted")
 	}
-	if _, err := Mint(r, Token{Form: "something"}); err == nil {
+	if _, err := Mint(r, Token{Title: "something"}); err == nil {
 		t.Fatal("a token with no assignee was minted")
 	}
 	// The default scope is a single step, so a reviewer closes it and four
 	// eyes hold without a policy.
-	tok, err := Mint(r, Token{Form: "something", Assignee: "main"})
+	tok, err := Mint(r, Token{Title: "something", Assignee: "main"})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -278,7 +278,7 @@ func TestMintingRefusesATokenThatDescribesNothing(t *testing.T) {
 		t.Fatalf("the default scope is %q and self-closing is %v", tok.Scope, tok.SelfClosing())
 	}
 	// A scope nobody declared is a scope nobody can act on.
-	if _, err := Mint(r, Token{Form: "x", Assignee: "main", Scope: "somewhere"}); err == nil {
+	if _, err := Mint(r, Token{Title: "x", Assignee: "main", Scope: "somewhere"}); err == nil {
 		t.Fatal("an unknown scope was minted")
 	}
 }
@@ -287,8 +287,8 @@ func TestMintingRefusesATokenThatDescribesNothing(t *testing.T) {
 // whether it is traced. The record travels. Scratch work does not.
 func TestATracedTokenTravelsAndAnEphemeralOneDoesNot(t *testing.T) {
 	r := lane(t)
-	kept := mint(t, r, Token{Form: "the record", Traced: true})
-	scratch := mint(t, r, Token{Form: "scratch", Scope: InToken})
+	kept := mint(t, r, Token{Title: "the record", Traced: true})
+	scratch := mint(t, r, Token{Title: "scratch", Scope: InToken})
 
 	if _, err := os.Stat(filepath.Join(r.Work, "doc", "work", kept.ID+".md")); err != nil {
 		t.Fatalf("a traced token is not in the travelling folder: %v", err)

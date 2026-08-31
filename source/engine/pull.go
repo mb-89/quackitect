@@ -459,7 +459,7 @@ func AskToStop(r Roots, actor string) Ruling {
 		if Blocked(r, t) != "" {
 			continue
 		}
-		mine = append(mine, t.ID+" "+t.Form)
+		mine = append(mine, t.ID+" "+t.Title)
 	}
 	if len(mine) == 0 {
 		return Ruling{Permitted: true}

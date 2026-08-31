@@ -17,7 +17,7 @@ func row(pairs ...string) Row {
 
 // The expression language, at the width the views actually use.
 func TestWhatAFilterCanSay(t *testing.T) {
-	r := row("status", "open", "assignee", "main", "bucket", "", "form", "write the thing")
+	r := row("status", "open", "assignee", "main", "bucket", "", "title", "write the thing")
 	r["rounds"] = vn(2)
 	r["subs"] = vl([]string{"wk-1", "wk-2"})
 
@@ -30,8 +30,8 @@ func TestWhatAFilterCanSay(t *testing.T) {
 		`assignee`,
 		`rounds > 1`,
 		`rounds >= 2`,
-		`form.contains("write")`,
-		`form.startsWith("write")`,
+		`title.contains("write")`,
+		`title.startsWith("write")`,
 		`bucket.isEmpty()`,
 		`subs.contains("wk-2")`,
 		`(status == "open" || status == "closed") && assignee == "main"`,
@@ -110,7 +110,7 @@ func writeBase(t *testing.T, dir, name, text string) string {
 func TestAViewFileReads(t *testing.T) {
 	p := writeBase(t, t.TempDir(), "x.base", `
 properties:
-  form:
+  title:
     displayName: what
     opensNote: true
 filters:
@@ -121,10 +121,10 @@ views:
   - type: table
     name: left
     order:
-      - form
+      - title
       - status
     columnSize:
-      form: 620
+      title: 620
     pinned:
       - name: yours
         filter: assignee == "human"
@@ -142,14 +142,14 @@ views:
 	if err != nil {
 		t.Fatal(err)
 	}
-	if b.Display["form"] != "what" || !b.Opens["form"] {
+	if b.Display["title"] != "what" || !b.Opens["title"] {
 		t.Fatalf("properties read as %v %v", b.Display, b.Opens)
 	}
 	if len(b.Views) != 1 {
 		t.Fatalf("%d views", len(b.Views))
 	}
 	v := b.Views[0]
-	if len(v.Order) != 2 || v.Order[0] != "form" || v.Widths["form"] != 620 {
+	if len(v.Order) != 2 || v.Order[0] != "title" || v.Widths["title"] != 620 {
 		t.Fatalf("order %v widths %v", v.Order, v.Widths)
 	}
 	if len(v.Pinned) != 1 || v.Pinned[0].Name != "yours" {
@@ -194,7 +194,7 @@ func TestPinnedGroupsTakeTheirRowsOutOfTheGrouping(t *testing.T) {
 views:
   - name: left
     order:
-      - form
+      - title
     pinned:
       - name: yours
         filter: assignee == "human"
@@ -209,9 +209,9 @@ views:
 		t.Fatal(err)
 	}
 	rows := []Row{
-		row("id", "1", "assignee", "human", "status", "open", "form", "theirs"),
-		row("id", "2", "assignee", "main", "status", "open", "form", "mine"),
-		row("id", "3", "assignee", "main", "status", "open", "bucket", "later", "form", "filed"),
+		row("id", "1", "assignee", "human", "status", "open", "title", "theirs"),
+		row("id", "2", "assignee", "main", "status", "open", "title", "mine"),
+		row("id", "3", "assignee", "main", "status", "open", "bucket", "later", "title", "filed"),
 	}
 	tab, err := Render(b, b.Views[0], rows)
 	if err != nil {
@@ -252,7 +252,7 @@ func TestACollapsedGroupIsDeclaredInTheFile(t *testing.T) {
 views:
   - name: left
     order:
-      - form
+      - title
     collapsed:
       - backlogged
     groupBy:
@@ -260,8 +260,8 @@ views:
 `)
 	b, _ := LoadBase(p)
 	tab, err := Render(b, b.Views[0], []Row{
-		row("id", "1", "status", "backlogged", "form", "a"),
-		row("id", "2", "status", "open", "form", "b"),
+		row("id", "1", "status", "backlogged", "title", "a"),
+		row("id", "2", "status", "open", "title", "b"),
 	})
 	if err != nil {
 		t.Fatal(err)
