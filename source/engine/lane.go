@@ -90,8 +90,6 @@ func runWork(args []string) {
 			answerJSON(map[string]any{"error": err.Error()})
 			os.Exit(1)
 		}
-		inSession(roots, "work", or2(*by, "main"), "opened "+t.ID+" from the backlog: "+t.Title, Yes(),
-			map[string]any{"id": t.ID})
 		answerJSON(t)
 		return
 	}
@@ -128,9 +126,6 @@ func runWork(args []string) {
 		answerJSON(map[string]any{"error": err.Error()})
 		os.Exit(1)
 	}
-	// A minting is an event, so it is in the record like every other one.
-	inSession(roots, "work", minted.MintedBy, "minted "+minted.ID+": "+minted.Title, Yes(),
-		map[string]any{"id": minted.ID, "assignee": minted.Assignee, "scope": minted.Scope})
 	answerJSON(minted)
 }
 

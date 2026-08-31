@@ -63,7 +63,7 @@ export function editorBody(t: Table): Body {
   return {
     pinned: (t.pinned ?? []).map((g) => groupHtml(g, cols, t)).join(""),
     scrolling: `<table>
-  <thead><tr>${cols.map((c) => head(c, t)).join("")}</tr></thead>
+  <thead><tr>${cols.map((c, i) => head(c, t, i === cols.length - 1)).join("")}</tr></thead>
 </table>
 ${(t.groups ?? []).map((g) => groupHtml(g, cols, t)).join("")}`,
     total: t.total,
@@ -71,8 +71,10 @@ ${(t.groups ?? []).map((g) => groupHtml(g, cols, t)).join("")}`,
   };
 }
 
-function head(c: string, t: Table): string {
-  const w = t.widths?.[c];
+// THE LAST COLUMN TAKES WHATEVER IS LEFT, so the table always fills its pane.
+// Giving it a width too would leave a dead strip down the right.
+function head(c: string, t: Table, last: boolean): string {
+  const w = last ? 0 : t.widths?.[c];
   return `<th${w ? ` style="width:${w}px"` : ""}>${esc(t.heads?.[c] ?? c)}</th>`;
 }
 
@@ -103,7 +105,7 @@ function rowHtml(l: Line, cols: string[], t: Table): string {
     .map((c) => {
       const v = l.cells?.[c]?.value ?? "";
       const opens = t.opens?.[c] ? " class=\"opens\"" : "";
-      const w = t.widths?.[c];
+      const w = c === cols[cols.length - 1] ? 0 : t.widths?.[c];
       return `<td${opens}${w ? ` style="width:${w}px"` : ""}>${esc(v)}</td>`;
     })
     .join("");

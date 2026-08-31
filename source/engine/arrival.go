@@ -103,7 +103,7 @@ func Reclaim(r Roots, actor, role string) []string {
 			if t.Status != InWork || (t.Assignee != actor && t.MintedBy != actor) {
 				continue
 			}
-			t.Status, t.Holder, t.TakenAt = Open, "", ""
+			t.Status, t.Holder = Open, ""
 		}
 		if SaveToken(r, t) == nil {
 			back = append(back, t.ID)

@@ -35,8 +35,7 @@ func rowOf(r Roots, t Token) Row {
 		"successors": vl(t.Successors),
 		"evidence":   vl(t.Evidence.Sections), "evidence_script": vs(t.Evidence.Script),
 		"rounds": vn(float64(t.Rounds)), "minted_by": vs(t.MintedBy),
-		"opened": vs(t.Opened), "taken_at": vs(t.TakenAt),
-		"sent_at": vs(t.SentAt), "closed_at": vs(t.ClosedAt),
+		"seq": vn(float64(t.Seq)),
 
 		"file.name":   vs(t.ID),
 		"file.path":   vs(filepath.ToSlash(rel)),

@@ -47,16 +47,16 @@ func dirFor(r Roots, t Token) string {
 // The frontmatter's order on the page. Identity first, then where it stands,
 // then what it is attached to, then the times.
 var frontOrder = []string{
-	"id", "type", "title", "status", "assignee", "scope", "traced",
+	"id", "seq", "type", "title", "status", "assignee", "scope", "traced",
 	"disposition", "reason", "holder", "bucket",
 	"parent", "subs", "depends_on", "successors",
 	"evidence", "evidence_script", "rounds",
-	"minted_by", "opened", "taken_at", "sent_at", "closed_at",
+	"minted_by",
 }
 
 func (t Token) front() Front {
 	f := Front{
-		"id": t.ID, "type": TypeWork, "title": t.Title,
+		"id": t.ID, "seq": strconv.Itoa(t.Seq), "type": TypeWork, "title": t.Title,
 		"status": string(t.Status), "assignee": t.Assignee, "scope": string(t.Scope),
 		"traced":      strconv.FormatBool(t.Traced),
 		"disposition": string(t.Disposition), "reason": t.Reason, "holder": t.Holder,
@@ -64,8 +64,7 @@ func (t Token) front() Front {
 		"parent": t.Parent, "subs": t.Subs, "depends_on": t.DependsOn,
 		"successors": t.Successors,
 		"evidence":   t.Evidence.Sections, "evidence_script": t.Evidence.Script,
-		"minted_by": t.MintedBy, "opened": t.Opened, "taken_at": t.TakenAt,
-		"sent_at": t.SentAt, "closed_at": t.ClosedAt,
+		"minted_by": t.MintedBy,
 	}
 	if t.Rounds > 0 {
 		f["rounds"] = strconv.Itoa(t.Rounds)
@@ -75,7 +74,7 @@ func (t Token) front() Front {
 
 func tokenFromFront(f Front) Token {
 	return Token{
-		ID: fs(f, "id"), Title: fs(f, "title"),
+		ID: fs(f, "id"), Seq: fi(f, "seq"), Title: fs(f, "title"),
 		Status: Status(fs(f, "status")), Assignee: fs(f, "assignee"),
 		Scope: Scope(fs(f, "scope")), Traced: fb(f, "traced"),
 		Disposition: Disposition(fs(f, "disposition")), Reason: fs(f, "reason"),
@@ -84,8 +83,6 @@ func tokenFromFront(f Front) Token {
 		Successors: fl(f, "successors"),
 		Evidence:   EvidenceSpec{Sections: fl(f, "evidence"), Script: fs(f, "evidence_script")},
 		Rounds:     fi(f, "rounds"), MintedBy: fs(f, "minted_by"),
-		Opened: fs(f, "opened"), TakenAt: fs(f, "taken_at"),
-		SentAt: fs(f, "sent_at"), ClosedAt: fs(f, "closed_at"),
 	}
 }
 
@@ -219,6 +216,13 @@ func readFinding(head, text string) Rejection {
 // are ordinary here: a command line and a lane are separate processes that talk
 // to no one, and only the rename decides which of them landed last.
 func SaveToken(r Roots, t Token) error {
+	// EVERY CHANGE OF STATE IS IN THE RECORD, and this is the one place that
+	// sees them all. The agent does not remember to write them and cannot
+	// forget to: whoever moves a token moves it through here.
+	//
+	// It is the record and not the token because a traced token travels, and a
+	// time on it says when somebody was at their desk.
+	was, existed := LoadToken(r, t.ID)
 	dir := dirFor(r, t)
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return err
@@ -240,7 +244,30 @@ func SaveToken(r Roots, t Token) error {
 		os.Remove(name)
 		return err
 	}
-	return os.Rename(name, final)
+	if err := os.Rename(name, final); err != nil {
+		os.Remove(name)
+		return err
+	}
+	noteMove(r, t, was, existed == nil)
+	return nil
+}
+
+// WHAT MOVED, IN THE RECORD. The agent does not remember to write these and
+// cannot forget to: whoever moves a token moves it through SaveToken.
+func noteMove(r Roots, t, was Token, existed bool) {
+	switch {
+	case !existed:
+		inSession(r, "work", t.MintedBy, t.ID+" opened "+string(t.Status)+": "+t.Title, Yes(),
+			map[string]any{"id": t.ID, "status": string(t.Status), "assignee": t.Assignee})
+	case was.Status != t.Status:
+		who := t.Holder
+		if who == "" {
+			who = t.Assignee
+		}
+		inSession(r, "work", who,
+			t.ID+" "+string(was.Status)+" to "+string(t.Status)+": "+t.Title, Yes(),
+			map[string]any{"id": t.ID, "from": string(was.Status), "to": string(t.Status)})
+	}
 }
 
 func readNote(path string) (Token, bool) {
@@ -301,6 +328,13 @@ func Tokens(r Roots) []Token {
 			}
 		}
 	}
-	sort.Slice(out, func(i, j int) bool { return out[i].Opened < out[j].Opened })
+	// OLDEST FIRST, by the number it was minted with. A time would have said
+	// the same thing and also said when somebody was at their desk.
+	sort.Slice(out, func(i, j int) bool {
+		if out[i].Seq != out[j].Seq {
+			return out[i].Seq < out[j].Seq
+		}
+		return out[i].ID < out[j].ID
+	})
 	return out
 }

@@ -164,14 +164,14 @@ func submit(r Roots, actor string, t Token, p Payload) (Answer, bool) {
 	// The agent settles its own breakdown and nothing else. Everything else
 	// goes to a reviewer, which is what the scope decides.
 	if t.SelfClosing() {
-		t.Status, t.Holder, t.ClosedAt = Closed, "", now()
+		t.Status, t.Holder = Closed, ""
 		if err := SaveToken(r, t); err != nil {
 			return refuse(&t, Rejection{Clause: "the record", Wrong: err.Error(),
 				Satisfies: "a writable .se/work"}), true
 		}
 		return Answer{}, false
 	}
-	t.Status, t.Holder, t.SentAt = Submitted, "", now()
+	t.Status, t.Holder = Submitted, ""
 	if err := SaveToken(r, t); err != nil {
 		return refuse(&t, Rejection{Clause: "the record", Wrong: err.Error(),
 			Satisfies: "a writable .se/work"}), true
@@ -200,7 +200,7 @@ func judge(r Roots, actor string, t Token, p Payload) (Answer, bool) {
 	}
 	switch p.Verdict {
 	case "accept":
-		t.Status, t.Holder, t.ClosedAt = Closed, "", now()
+		t.Status, t.Holder = Closed, ""
 		if t.Disposition == NoDisposition {
 			t.Disposition = Done
 		}
@@ -220,7 +220,7 @@ func judge(r Roots, actor string, t Token, p Payload) (Answer, bool) {
 			f.Round, f.By, f.At = t.Rounds, actor, now()
 			t.Findings = append(t.Findings, f)
 		}
-		t.Status, t.Holder, t.SentAt = Open, "", ""
+		t.Status, t.Holder = Open, ""
 		t.Submission = nil
 		if err := SaveToken(r, t); err != nil {
 			return refuse(&t, Rejection{Clause: "the record", Wrong: err.Error(),
@@ -369,7 +369,7 @@ func next(r Roots, actor, role string) Answer {
 			held = append(held, all[i].ID+": "+why)
 			continue
 		}
-		all[i].Status, all[i].Holder, all[i].TakenAt = InWork, actor, now()
+		all[i].Status, all[i].Holder = InWork, actor
 		if err := SaveToken(r, all[i]); err != nil {
 			return Answer{Pull: AnswerWait, Notice: "the record will not take a write: " + err.Error()}
 		}

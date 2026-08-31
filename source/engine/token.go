@@ -166,11 +166,15 @@ type Token struct {
 	// in review. It is what an arriving agent reclaims against.
 	Holder string `json:"holder,omitempty"`
 
+	// WHEN THINGS HAPPENED IS NOT ON THE TOKEN. A traced token travels, and a
+	// timestamp on it says when somebody was at their desk. The record holds
+	// every change, and the record never travels.
+	//
+	// WHAT ORDER THEY WERE MINTED IN IS NOT A TIME. The queue hands out the
+	// thing that waited longest, and a plain number answers that while saying
+	// nothing about when anybody was working.
+	Seq      int    `json:"seq"`
 	MintedBy string `json:"minted_by"`
-	Opened   string `json:"opened"`
-	TakenAt  string `json:"taken_at,omitempty"`
-	SentAt   string `json:"sent_at,omitempty"`
-	ClosedAt string `json:"closed_at,omitempty"`
 }
 
 // WHO MAY CLOSE, AND IT IS NOT A FIELD.
@@ -224,6 +228,19 @@ func newID() string {
 
 func now() string { return time.Now().UTC().Format(time.RFC3339Nano) }
 
+// The next number in the ledger. Two mints at the same instant can read the
+// same one, and the cost of that is a tie in the queue's order rather than a
+// token that is lost.
+func nextSeq(r Roots) int {
+	high := 0
+	for _, t := range Tokens(r) {
+		if t.Seq > high {
+			high = t.Seq
+		}
+	}
+	return high + 1
+}
+
 // Mint writes a new token. The caller decides everything the token carries,
 // because the caller is the minter and the minter is who those decisions
 // belong to.
@@ -248,10 +265,10 @@ func Mint(r Roots, t Token) (Token, error) {
 		}
 	}
 	t.ID = newID()
+	t.Seq = nextSeq(r)
 	if t.Status != Backlogged {
 		t.Status = Open
 	}
-	t.Opened = now()
 	// A sub-token is a token. The parent holds the list, because a parent
 	// cannot close while a child is open and that is the parent's rule.
 	if t.Parent != "" {

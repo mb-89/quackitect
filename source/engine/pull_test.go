@@ -83,7 +83,7 @@ func TestSubmittingDoesNotCloseTheTokenItSendsItToReview(t *testing.T) {
 	if back.Status != Submitted {
 		t.Fatalf("the worker left it %s, and only a reviewer may close", back.Status)
 	}
-	if back.ClosedAt != "" {
+	if back.Status == Closed {
 		t.Fatal("the worker closed its own work")
 	}
 }
