@@ -97,14 +97,16 @@ func Project(roots Roots) ([]string, error) {
 // A path that leaves the work root stays absolute, because there is nothing
 // else it could be. That is the driven case, where the method lives somewhere
 // the project cannot name.
+// THE ENGINE IS THE METHOD'S, and not whichever binary happens to be running.
+// A cage names the program its guards call, and that program is the one the
+// method root carries. Reading it from the running process made the cage
+// depend on how the engine was started, and a copy run from somewhere else
+// wrote a path that only that invocation could use.
 func variables(roots Roots) (map[string]string, error) {
-	exe, err := os.Executable()
-	if err != nil {
-		return nil, err
-	}
+	bin := filepath.Join(roots.Method, ".bin")
 	return map[string]string{
-		"engine": within(roots.Work, exe),
-		"mcp":    within(roots.Work, filepath.Join(filepath.Dir(exe), exeName("se-mcp"))),
+		"engine": within(roots.Work, filepath.Join(bin, exeName("se"))),
+		"mcp":    within(roots.Work, filepath.Join(bin, exeName("se-mcp"))),
 		"method": within(roots.Work, roots.Method),
 		"work":   within(roots.Work, roots.Work),
 	}, nil
