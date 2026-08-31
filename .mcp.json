@@ -2,8 +2,8 @@
   "$comment": "GENERATED from util/cage/mcp.json. Edit the source, not this file.",
   "mcpServers": {
     "quackitect": {
-      "command": "{{mcp}}",
-      "args": ["--method", "/home/user/quackitect", "--work", "/home/user/quackitect"]
+      "command": "./.bin/se-mcp",
+      "args": ["--method", ".", "--work", "."]
     }
   }
 }
