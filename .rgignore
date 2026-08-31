@@ -1,0 +1,16 @@
+# WHAT RIPGREP SEARCHES THAT GIT IGNORES.
+#
+# .gitignore hides .se from git, and it is right to: the record, the tokens and
+# the scratchpad are this machine's rather than the project's. rg reads
+# .gitignore too, so the one folder an agent most often needs to search was the
+# one folder it could not.
+#
+# TWO LINES AND NOT ONE, measured rather than assumed. The first un-ignores the
+# folder. The second un-ignores the record inside it, because .gitignore also
+# ignores every jsonl file and un-ignoring the folder does not lift that. With
+# only the first, rg lists the tokens and never the log.
+#
+# !.se/** ALONE REACHES NEITHER, because the directory itself stays excluded
+# and rg never descends into it.
+!.se/
+!.se/**/*.jsonl

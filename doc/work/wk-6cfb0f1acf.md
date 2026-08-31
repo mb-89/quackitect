@@ -3,7 +3,7 @@ id: wk-6cfb0f1acf
 seq: "22"
 type: work
 title: a person orders work
-status: submitted
+status: closed
 assignee: main
 scope: single-step
 traced: true
@@ -37,11 +37,11 @@ WHAT IT DOES NOT DO is move a token between states. That stays with the pull.
 
 ## evidence: checked, and proved red
 
-source/engine/token_test.go: TestPuttingATokenFirstIsRecorded builds the engine, mints two tokens, runs se work --first <id> --by person, and asserts the log carries the id, the phrase 'put first at seq', and actor person. I removed the inSession line and it failed with 'the record does not carry put first at seq', printing the log it read.
+src/engine/token_test.go: TestPuttingATokenFirstIsRecorded builds the engine, mints two tokens, runs se work --first <id> --by person, and asserts the log carries the id, the phrase 'put first at seq', and actor person. I removed the inSession line and it failed with 'the record does not carry put first at seq', printing the log it read.
 
 ## evidence: checks
 
-go test -count=1 ./... passes in source/engine (25.8s).
+go test -count=1 ./... passes in src/engine (25.8s).
 
 ## evidence: round 1 finding 1, a flag accepted and thrown away
 
@@ -49,7 +49,7 @@ The finding was right. The --first branch was four lines and read neither --by n
 
 ## evidence: round 1 finding 2, what is owed
 
-The finding was right and the answer is one sentence. THE ENGINE VERB IS BUILT AND THE EDITOR DOES NOT CALL IT. Nothing in source/extension calls --first, because dragging a row up needs a reorder gesture the editor does not have. The one drag handler there drops a row into a group and writes a field on the token, which is a different gesture with a different effect and predates this token.
+The finding was right and the answer is one sentence. THE ENGINE VERB IS BUILT AND THE EDITOR DOES NOT CALL IT. Nothing in src/extension calls --first, because dragging a row up needs a reorder gesture the editor does not have. The one drag handler there drops a row into a group and writes a field on the token, which is a different gesture with a different effect and predates this token.
 
 ## evidence: so the clause is not finished
 
@@ -57,7 +57,7 @@ The detail says the editor calls it when a person drags a row up. That half is n
 
 ## evidence: what is built
 
-se work --first <id> --by person writes seq and nothing else. PutFirst at source/engine/token.go refuses a closed token, does nothing when the token is already first, and otherwise takes one below the lowest live seq. TestAPersonPutsATokenFirst covers both, and pull_test.go pulls after PutFirst and gets the token that moved.
+se work --first <id> --by person writes seq and nothing else. PutFirst at src/engine/token.go refuses a closed token, does nothing when the token is already first, and otherwise takes one below the lowest live seq. TestAPersonPutsATokenFirst covers both, and pull_test.go pulls after PutFirst and gets the token that moved.
 
 ## evidence: why it has to be recorded
 
@@ -71,7 +71,7 @@ THE ORDER IS A DECISION AND EVERY DECISION IS IN THE RECORD. The queue hands out
 
 ## finding 2 · round 1 · It is the person's, the way opening a backlogged token is the person's, and the editor calls it when they drag a row up. · by reviewer
 
-**wrong:** THE EDITOR CLAUSE IS NOT BUILT AND NOT MENTIONED. The detail says "and the editor calls it when they drag a row up." Nothing in source/extension calls it: grepping the TypeScript for --first, 'first' and "first" returns no call site, only unrelated words like showWarningMessage("Open a folder first"). There is no drag-to-reorder at all. The one drag handler in editor.ts sends `{ type: 'file', id: dragging, sets: g.dataset.sets, into: g.dataset.into }`, which drops a row INTO A GROUP and writes a field on the token. That is a different gesture with a different effect, and it existed before this token.
+**wrong:** THE EDITOR CLAUSE IS NOT BUILT AND NOT MENTIONED. The detail says "and the editor calls it when they drag a row up." Nothing in src/extension calls it: grepping the TypeScript for --first, 'first' and "first" returns no call site, only unrelated words like showWarningMessage("Open a folder first"). There is no drag-to-reorder at all. The one drag handler in editor.ts sends `{ type: 'file', id: dragging, sets: g.dataset.sets, into: g.dataset.into }`, which drops a row INTO A GROUP and writes a field on the token. That is a different gesture with a different effect, and it existed before this token.
 
 **satisfies:** SAY WHAT IS OWED, IN THE SUBMISSION. One sentence is enough: the engine verb is built and the editor does not call it yet, because dragging a row up needs a reorder gesture the editor does not have. That is a passing answer -- work done, plus what still owes it -- and it is the difference between a token that is finished and one that only looks finished.
 

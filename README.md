@@ -23,7 +23,7 @@ See `doc/cross-cutting/cross-cutting-design.md`.
 | Entry | What it is for |
 |---|---|
 | `doc/` | The design, as it was collected, the guidance the agent is told, and the work. Start with `user-stories.md`. Not specification. |
-| `source/` | Everything that is written. `engine`, `viewer`, `extension`. |
+| `src/` | Everything that is written. `engine`, `viewer`, `extension`. |
 | `util/` | Everything that is run rather than shipped. `setup` and `cage`. |
 | `.bin/` | Built programs. Rebuilt from source, and not in version control. |
 

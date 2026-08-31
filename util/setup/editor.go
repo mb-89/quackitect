@@ -17,7 +17,7 @@ import (
 func extensionsDir() string { return filepath.Join(homeDir(), ".vscode", "extensions") }
 
 func installExtension(root, id string) error {
-	src := filepath.Join(root, "source", "extension")
+	src := filepath.Join(root, "src", "extension")
 	if *dry {
 		say("  editor   the extension would be built and linked from %s", src)
 		return nil

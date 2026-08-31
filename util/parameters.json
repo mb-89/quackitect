@@ -163,6 +163,16 @@
           "max": 3,
           "narrow": "smaller",
           "help": "How many tokens may wait for review with nothing in review before the pull refuses. Zero turns it off. It may be made smaller and never larger, so a person tightens the rule here and loosens it by changing the default."
+        },
+        {
+          "name": "pulls_before_hold_is_stale",
+          "title": "pulls before hold is stale",
+          "type": "int",
+          "default": 10,
+          "min": 1,
+          "max": 10,
+          "narrow": "smaller",
+          "help": "How many pulls may pass without the holder of a token in review pulling before that hold stops counting as somebody reading. The queue itself is the clock, so a reviewer that has stopped goes stale after a few pulls by anybody else. It may be made smaller and never larger."
         }
       ]
     },

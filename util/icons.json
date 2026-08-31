@@ -16,14 +16,19 @@
     "for": "the engine's own home page"
   },
   "plus": {
-    "glyph": "＋",
-    "at": "U+FF0B",
-    "for": "make something new. Full width, because a thin plus disappears at this size"
+    "glyph": "+",
+    "at": "U+002B",
+    "for": "make something new. A regular plus, on the owner's word: the full-width one read as a different character"
   },
   "hand": {
     "glyph": "✋🤖",
     "at": "U+270B U+1F916",
     "for": "the hold. A raised hand and the robot it stops, so what has stopped is on the button"
+  },
+  "gear": {
+    "glyph": "⚙",
+    "at": "U+2699",
+    "for": "configuration. What is shown, and what a thing is set to"
   },
   "hammer": {
     "glyph": "🔨",

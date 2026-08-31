@@ -106,6 +106,28 @@ it must be red before anything is fixed, and it catches the class rather than
 the instance. What v4 changes is who writes it: the worker writes the check,
 because the worker is the one the engine lets write to source.
 
+## Every rejection carries a lesson, and the engine mints it
+
+A finding teaches one token. A lesson names the CLASS of mistake and what to do
+instead, and it teaches everything after it.
+
+A rejection with no lesson is refused. So is one with no finding.
+
+YOU MINT THE LESSON'S TOKEN AND YOU NAME IT. Mint it with `se work`, write the
+class and what to do instead into it, and put its id in `learned` on the
+verdict. A rejection naming no token is refused, and so is one naming an id
+that is not a token.
+
+THE ENGINE CANNOT MINT IT FOR YOU, and that is why this is yours. Which class a
+finding belongs to is a judgment. Whether a second round is a new class or the
+one already written down is a judgment. And so is whether it goes to the
+backlog or straight into what is open, which is the next thing you decide:
+backlogged if somebody will pick it up later, open if it is small enough to do
+inside the work that taught it.
+
+A CLASS ALREADY WRITTEN DOWN IS NAMED AGAIN rather than minted twice. Look for
+it before you mint, and name the one that exists.
+
 ## Scale to the work
 
 Deepest scrutiny goes to the riskiest part first. Risk rises where many things

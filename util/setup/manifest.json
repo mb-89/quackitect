@@ -54,17 +54,17 @@
   "builds": [
     {
       "name": "se",
-      "source": "source/engine",
+      "source": "src/engine",
       "why": "the engine"
     },
     {
       "name": "logview",
-      "source": "source/viewer",
+      "source": "src/viewer",
       "why": "the log window"
     },
     {
       "name": "se-mcp",
-      "source": "source/mcp",
+      "source": "src/mcp",
       "why": "the tool lane between an agent and the engine"
     }
   ]

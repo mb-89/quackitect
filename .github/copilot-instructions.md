@@ -226,6 +226,31 @@ THE CHECK GOES WHERE THE DEFECT IS, in the language the defect is written in.
 A CHECK THAT FINDS NOTHING TO CHECK REFUSES. One that passes because the code it
 guards has gone is a check that has quietly stopped working.
 
+### Search with the tool the probe found
+
+The engine probes this machine on every boot and hands you the list on your
+first pull. Use what it found for searching file contents. It answers before
+the one your fingers already know, and a recursive search with the older tool
+is refused.
+
+A SEARCH ON ONE NAMED FILE IS LEFT ALONE. The refused thing is a recursive
+search over the tree.
+
+THE FOLDER THE RECORD LIVES IN IS SEARCHED. .gitignore hides it from git and
+the tree carries an .rgignore that un-ignores it, so an ordinary search reaches
+the log, the tokens and the scratchpad with no flag anybody has to remember.
+
+MEASURED, ON THE CASE THE RULE GOVERNS, warm, three runs each:
+
+    grep -rnI LoadConfig src     258ms, 277ms, 261ms
+    rg -n LoadConfig src          39ms,  42ms,  40ms
+
+About six times, and from the root over everything it is the same shape. An
+earlier measurement said the difference was nothing, and it was taken on one
+directory of sources with a non-recursive search, which is the case this rule
+leaves alone. A number taken on the permitted case cannot be the verdict on the
+refused one.
+
 ## Help
 
 You may write a helper script for anything you are about to do more than once.
