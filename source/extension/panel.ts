@@ -16,7 +16,7 @@
 export type Node = {
   name: string;
   title?: string;
-  type: "group" | "bool" | "int" | "float" | "str" | "list" | "strlist" | "action" | "status" | "gap" | "text" | "pick";
+  type: "group" | "bool" | "int" | "float" | "str" | "list" | "strlist" | "action" | "status" | "gap" | "text" | "pick" | "toggle";
   help?: string;
   default?: unknown;
   min?: number;
@@ -84,7 +84,7 @@ function section(path: string, g: Node): string {
   // command they run, and nothing here keeps it afterwards.
   const inRow = (k: Node) =>
     k.type === "action" || k.type === "status" || k.type === "gap" ||
-    k.type === "text" || k.type === "pick";
+    k.type === "text" || k.type === "pick" || k.type === "toggle";
   const drawn = kids.filter(inRow);
   const held = kids.filter((k) => !inRow(k) && k.type !== "group" && k.type !== "strlist");
   const rows: string[] = [];
@@ -147,6 +147,17 @@ function button(n: Node): string {
       <button class="picked" data-value="${esc(first)}">${esc(first)}</button>
       <ul class="options" hidden>${opts.join("")}</ul>
     </div>`;
+  }
+  if (n.type === "toggle") {
+    // A TOGGLE IS DOWN OR IT IS UP. There is nothing to report about it, so
+    // there is no light: a light says a thing is happening on its own, and
+    // this only ever says what the person last pressed.
+    const labels = n.labels ?? {};
+    const titles = n.titles ?? {};
+    return `<button class="toggle" id="${esc(n.name)}"${wide} data-state="off"
+      data-command="${esc(n.command ?? "")}"
+      data-labels='${json(labels)}' data-titles='${json(titles)}'
+      title="${esc(titles.off ?? n.name)}">${esc(labels.off ?? n.name)}</button>`;
   }
   if (n.type === "action") {
     return `<button data-command="${esc(n.command ?? "")}" title="${esc(n.title ?? n.label ?? n.name)}">${esc(
@@ -248,6 +259,10 @@ function css(): string {
   button:disabled { background: transparent; color: var(--vscode-disabledForeground);
                     border: 1px dashed var(--vscode-panel-border); cursor: default; }
   button.status { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+  button.toggle[data-state="on"] { background: var(--vscode-inputValidation-warningBackground,
+                                   var(--vscode-button-secondaryBackground));
+                                   color: var(--vscode-foreground);
+                                   border-color: var(--vscode-focusBorder); }
   button.status .label { overflow: hidden; text-overflow: ellipsis; }
   button.status .led { flex: 0 0 auto; width: 9px; height: 9px; border-radius: 50%;
                        background: var(--led, #8b8b8b); box-shadow: 0 0 0 1px rgba(0,0,0,0.35) inset; }
@@ -287,7 +302,11 @@ function script(): string {
   if (gear) gear.onclick = () => send({ type: 'command', command: 'quackitect.chooseGroups' });
 
   for (const b of document.querySelectorAll('button[data-command]')) {
-    if (b.classList.contains('status')) continue;
+    if (b.classList.contains('status') || b.classList.contains('toggle')) continue;
+    b.onclick = () => send({ type: 'command', command: b.dataset.command });
+  }
+
+  for (const b of document.querySelectorAll('button.toggle')) {
     b.onclick = () => send({ type: 'command', command: b.dataset.command });
   }
 
@@ -347,6 +366,18 @@ function script(): string {
 
   window.addEventListener('message', (e) => {
     const m = e.data;
+    if (m.type === 'state' && m.id) {
+      const t = document.getElementById(m.id);
+      if (t && t.classList.contains('toggle')) {
+        const on = m.state === 'good';
+        t.dataset.state = on ? 'on' : 'off';
+        const labels = JSON.parse(t.dataset.labels || '{}');
+        const titles = JSON.parse(t.dataset.titles || '{}');
+        t.textContent = labels[on ? 'on' : 'off'] || t.textContent;
+        t.title = titles[on ? 'on' : 'off'] || '';
+        return;
+      }
+    }
     if (m.type === 'beat') {
       const led = document.querySelector('button.status .led');
       if (!led) return;

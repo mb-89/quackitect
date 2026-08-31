@@ -41,6 +41,7 @@ func init() {
 		StopReason{"decision", "A decision only the person can make. No answer you could pick " +
 			"lets the work continue honestly."},
 		StopReason{"broken", "Something broke and no remedy gets you past it."},
+		StopReason{"asked", "The person told you to stop. Their word is the reason, and you need no other."},
 		StopReason{"plan", "A plan, before it is acted on. Present it and wait. Once it has the " +
 			"go, do the whole of it without asking again."},
 	)

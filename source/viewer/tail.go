@@ -16,6 +16,15 @@ import (
 type linesMsg struct {
 	recs []Record
 	eof  bool
+
+	// THE FILE STARTED AGAIN, so what was read before it is gone. A reader
+	// that appends the new reading to the old holds two lines under one
+	// identity, and the selection then finds whichever came first.
+	//
+	// MEASURED 2026-08-31: the file was rewritten shorter, the reading
+	// restarted, and paging down from 10:35 landed at 10:17. Two lines, one
+	// number, and the search stopped at the older one.
+	restarted bool
 }
 type tailErrMsg struct{ err error }
 
@@ -55,29 +64,31 @@ func newTailer(path string) *tailer {
 // read takes everything written since the last call. A partial last line is
 // left on disk and read again next time, so a record is never shown half
 // written.
-func (t *tailer) read() ([]Record, error) {
+func (t *tailer) read() ([]Record, bool, error) {
 	f, err := os.Open(t.path)
 	if os.IsNotExist(err) {
-		return nil, nil // not written yet, or between rotations
+		return nil, false, nil // not written yet, or between rotations
 	}
 	if err != nil {
-		return nil, err
+		return nil, false, err
 	}
 	defer f.Close()
 	st, err := f.Stat()
 	if err != nil {
-		return nil, err
+		return nil, false, err
 	}
 	// A file that shrank was rotated or replaced. Start again from the top
 	// rather than reading from an offset that now means something else.
+	restarted := false
 	if st.Size() < t.offset {
 		t.offset, t.lineNo = 0, 0
+		restarted = true
 	}
 	if st.Size() == t.offset {
-		return nil, nil
+		return nil, false, nil
 	}
 	if _, err := f.Seek(t.offset, 0); err != nil {
-		return nil, err
+		return nil, false, err
 	}
 	var out []Record
 	rd := bufio.NewReaderSize(f, 1<<16)
@@ -96,7 +107,7 @@ func (t *tailer) read() ([]Record, error) {
 		out = append(out, ParseRecord(trimmed, t.lineNo))
 	}
 	t.offset += consumed
-	return out, nil
+	return out, restarted, nil
 }
 
 func trimEOL(s string) string {
@@ -115,10 +126,10 @@ func (t *tailer) cmd() tea.Cmd {
 		case <-t.wake:
 		case <-time.After(300 * time.Millisecond):
 		}
-		recs, err := t.read()
+		recs, restarted, err := t.read()
 		if err != nil {
 			return tailErrMsg{err}
 		}
-		return linesMsg{recs: recs}
+		return linesMsg{recs: recs, restarted: restarted}
 	}
 }

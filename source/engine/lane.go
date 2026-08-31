@@ -134,6 +134,46 @@ func runWork(args []string) {
 	answerJSON(minted)
 }
 
+// runHold is the person putting everything down, and picking it up again.
+func runHold(args []string) {
+	fs := flag.NewFlagSet("hold", flag.ExitOnError)
+	fs.SetOutput(os.Stdout)
+	fs.Usage = func() {
+		fmt.Fprintln(os.Stdout, "se hold - stop the agent, or let it go on. Prints what it now is.")
+		fmt.Fprintln(os.Stdout, "")
+		fmt.Fprintln(os.Stdout, "  se hold            say whether it is on")
+		fmt.Fprintln(os.Stdout, "  se hold --on")
+		fmt.Fprintln(os.Stdout, "  se hold --off")
+		fmt.Fprintln(os.Stdout, "")
+		fs.PrintDefaults()
+	}
+	work := fs.String("work", "", "the folder being worked on (default: this one)")
+	on := fs.Bool("on", false, "put everything on hold")
+	off := fs.Bool("off", false, "let it go on")
+	by := fs.String("by", "person", "who did it")
+	_ = fs.Parse(args)
+
+	roots, err := FindRoots(*work)
+	if err != nil {
+		fail(err)
+	}
+	if !*on && !*off {
+		answerJSON(LoadHold(roots))
+		return
+	}
+	h, err := SetHold(roots, *on, *by)
+	if err != nil {
+		answerJSON(map[string]any{"error": err.Error()})
+		os.Exit(1)
+	}
+	what := "everything is on hold"
+	if !h.On {
+		what = "the hold is lifted"
+	}
+	inSession(roots, "hold", *by, what, Yes(), map[string]any{"on": h.On})
+	answerJSON(h)
+}
+
 // runQuery draws a view. It answers the rows grouped, and the renderer is
 // whatever asked: a webview, or a person at a terminal reading JSON.
 func runQuery(args []string) {

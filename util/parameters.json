@@ -65,6 +65,19 @@
           "label": "init",
           "command": "quackitect.init",
           "title": "make this folder a project, or a vehicle that carries the method"
+        },
+        {
+          "name": "hold",
+          "type": "toggle",
+          "command": "quackitect.hold",
+          "labels": {
+            "off": "hold 🤖",
+            "on": "held 🤖"
+          },
+          "titles": {
+            "off": "stop the agent. Nothing it asks for is allowed until this is pressed again",
+            "on": "everything is on hold. Press to let it go on"
+          }
         }
       ]
     },

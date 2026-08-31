@@ -163,6 +163,22 @@ func runHook(args []string) {
 	cfg := LoadConfig(roots)
 	emergency := LoadEmergency(roots)
 
+	// A PERSON PUT EVERYTHING DOWN. Nothing the agent asks for is allowed
+	// while it is on, and the only thing left to do is stop. No claim is
+	// wanted: the button is the grant.
+	if h := LoadHold(roots); h.On {
+		switch in.Event {
+		case "PreToolUse":
+			record(log, "engine", "hold", actor, "refused: everything is on hold", No(),
+				map[string]any{"tool": in.ToolName})
+			denyToolUse(h.Says)
+			return
+		case "Stop":
+			record(log, "agent", "stop", actor, "stopped: everything is on hold", Yes(), nil)
+			return
+		}
+	}
+
 	switch in.Event {
 	case "PreToolUse":
 		decidePreToolUse(roots, cfg, emergency, log, in, actor)

@@ -330,6 +330,14 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, m.tailer.cmd()
 
 	case linesMsg:
+		// The file started again, so what was read before it is gone. Keeping
+		// it would leave two lines under one identity.
+		if msg.restarted {
+			m.all = nil
+			m.top = 0
+			m.selID = 0
+			m.follow = true
+		}
 		if len(msg.recs) > 0 {
 			m.all = append(m.all, msg.recs...)
 			m.rebuild()

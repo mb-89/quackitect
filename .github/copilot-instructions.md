@@ -214,6 +214,10 @@ Put what the person said into the record when a message reaches you mid-turn:
 
     se --note "<what they said>" --from user
 
+Do it first, before anything else you were going to do. The person is watching
+the log for what they said, and every call you make before that one is time
+they spend wondering whether it arrived.
+
 The harness fires an event for a message that starts a turn and none for one
 written into a turn that is already running. You are the only thing that hears
 those, so you are the only thing that can record them.

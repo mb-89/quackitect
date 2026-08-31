@@ -4,7 +4,7 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import * as os from "node:os";
 import { panelHtml, everyGroup, Node } from "./panel";
-import { editorHtml } from "./editor";
+import { editorHtml, editorBody, tallyHtml, Table } from "./editor";
 import { whichHarness, kickoffText, openAgent } from "./agent";
 
 // The extension is idle when it loads. It does not act, it does not start
@@ -18,6 +18,7 @@ export function activate(context: vscode.ExtensionContext) {
   const provider = new ControlPanel(context);
   rotateLogOnStartup(context);
   reattach(context);
+  void showHold(context);
   projectOnStartup(context);
   watchParameters(context);
   void chooseEngine(context);
@@ -36,6 +37,7 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand("quackitect.stopEngine", () => stopEngine(context)),
     vscode.commands.registerCommand("quackitect.showLog", () => showLog(context)),
     vscode.commands.registerCommand("quackitect.showWork", () => toggleWork(context)),
+    vscode.commands.registerCommand("quackitect.hold", () => toggleHold(context)),
     vscode.commands.registerCommand("quackitect.mintWork", (arg?: { text: string; kind: string }) =>
       mintWork(context, arg),
     ),
@@ -834,11 +836,14 @@ function toggleWork(context: vscode.ExtensionContext) {
     enableScripts: true,
     retainContextWhenHidden: true,
   });
-  workPanel.onDidDispose(() => (workPanel = undefined));
+  workPanel.onDidDispose(() => {
+    workPanel = undefined;
+    workBuilt = "";
+  });
   workPanel.webview.onDidReceiveMessage((m: WorkMessage) => {
     if (m.type === "view") {
       workView = m.view;
-      void drawWork(context);
+      void drawWork(context, true);
       return;
     }
     if (m.type === "open") void openNote(context, m.id);
@@ -864,12 +869,29 @@ type WorkMessage =
   | { type: "open"; id: string }
   | { type: "file"; id: string; sets: string; into: string };
 
-async function drawWork(context: vscode.ExtensionContext) {
+// THE PAGE IS BUILT ONCE. After that the data lands inside it.
+//
+// Replacing the html takes the reader back to the top of a list they had
+// scrolled through and unfolds every group they folded. The data changed, and
+// what they were looking at did not.
+let workBuilt = "";
+
+async function drawWork(context: vscode.ExtensionContext, rebuild = false) {
   if (!workPanel) return;
-  const table = await askEngine(context, ["query", "--view", workView]);
-  const listed = await askEngine(context, ["query", "--list"]);
-  const views: string[] = listed?.views ?? [];
-  workPanel.webview.html = editorHtml(table ?? { error: "the engine could not be asked" }, views, workView);
+  const table: Table = (await askEngine(context, ["query", "--view", workView])) ?? {
+    view: workView, columns: [], heads: {}, total: 0, error: "the engine could not be asked",
+  };
+  if (rebuild || workBuilt !== workView) {
+    const listed = await askEngine(context, ["query", "--list"]);
+    workPanel.webview.html = editorHtml(table, listed?.views ?? [], workView);
+    workBuilt = workView;
+    return;
+  }
+  const b = editorBody(table);
+  void workPanel.webview.postMessage({
+    type: "body", pinned: b.pinned, scrolling: b.scrolling,
+    counts: tallyHtml(b.counts), total: b.total,
+  });
 }
 
 async function openNote(context: vscode.ExtensionContext, id: string) {
@@ -935,4 +957,32 @@ function askEngine(context: vscode.ExtensionContext, args: string[]): Promise<an
       }
     });
   });
+}
+
+// THE HOLD. A person puts everything down, and picks it up again.
+//
+// The engine keeps it in a file, so it survives this window and reaches the
+// guard, which is a fresh process per event and holds nothing between them.
+async function toggleHold(context: vscode.ExtensionContext) {
+  const now = await askEngine(context, ["hold"]);
+  const out = await askEngine(context, ["hold", now?.on ? "--off" : "--on", "--by", "person"]);
+  if (out?.error) {
+    vscode.window.showErrorMessage(out.error);
+    return;
+  }
+  setHoldState(out?.on === true);
+  vscode.window.showInformationMessage(
+    out?.on ? "Everything is on hold. The agent is refused until you press it again."
+            : "The hold is lifted.",
+  );
+}
+
+// The button says what is true, and it says it after a reload as well.
+async function showHold(context: vscode.ExtensionContext) {
+  const now = await askEngine(context, ["hold"]);
+  setHoldState(now?.on === true);
+}
+
+function setHoldState(on: boolean) {
+  view?.webview.postMessage({ type: "state", id: "hold", state: on ? "good" : "idle", detail: "" });
 }

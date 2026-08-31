@@ -44,19 +44,31 @@ export type Table = {
 };
 
 export function editorHtml(t: Table, views: string[], view: string): string {
-  if (t.error) return page(views, view, `<p class="bad">${esc(t.error)}</p>`, "");
+  const b = editorBody(t);
+  return page(views, view, b.pinned, b.scrolling, b.total, b.counts);
+}
+
+// THE PAGE IS BUILT ONCE AND THE DATA CHANGES INSIDE IT.
+//
+// Replacing the whole page on every change throws away what the reader was
+// doing: which groups they folded, and where they had scrolled to. The data
+// changed. What they were looking at did not.
+export type Body = { pinned: string; scrolling: string; total: number; counts: Tally[] };
+
+export function editorBody(t: Table): Body {
+  if (t.error) {
+    return { pinned: `<p class="bad">${esc(t.error)}</p>`, scrolling: "", total: 0, counts: [] };
+  }
   const cols = t.columns ?? [];
-  return page(
-    views,
-    view,
-    (t.pinned ?? []).map((g) => groupHtml(g, cols, t)).join(""),
-    `<table>
+  return {
+    pinned: (t.pinned ?? []).map((g) => groupHtml(g, cols, t)).join(""),
+    scrolling: `<table>
   <thead><tr>${cols.map((c) => head(c, t)).join("")}</tr></thead>
 </table>
 ${(t.groups ?? []).map((g) => groupHtml(g, cols, t)).join("")}`,
-    t.total,
-    t.counts ?? [],
-  );
+    total: t.total,
+    counts: t.counts ?? [],
+  };
 }
 
 function head(c: string, t: Table): string {
@@ -71,8 +83,11 @@ function groupHtml(g: Group, cols: string[], t: Table): string {
   const kids = (g.groups ?? []).map((k) => groupHtml(k, cols, t)).join("");
   const rows = (g.lines ?? []).map((l) => rowHtml(l, cols, t)).join("");
   const drop = g.sets ? ` data-sets="${esc(g.sets)}" data-into="${esc(g.name)}"` : "";
+  // The key a fold is remembered by. Its name and its depth, because two
+  // groups with the same name at different depths are two groups.
+  const key = `${g.pinned ? "pin" : "g"}:${g.depth}:${g.name}`;
   return `<section class="group${g.pinned ? " pinned" : ""}${g.shut ? " shut" : ""}"
-    style="--depth:${g.depth}"${drop}>
+    data-key="${esc(key)}" style="--depth:${g.depth}"${drop}>
   <h2><span class="fold">${g.shut ? "▸" : "▾"}</span>
     <span class="name">${esc(g.name || "no group")}</span>
     <span class="count">${g.count}</span></h2>
@@ -108,9 +123,7 @@ function page(
     .join("");
   // WHAT IS WORTH COUNTING IS THE VIEW'S TO SAY. This draws whatever came
   // back, so counting something else is a line in the view file.
-  const tally = counts
-    .map((c) => `<span class="tally"><b>${c.n}</b>${esc(c.name)}</span>`)
-    .join("");
+  const tally = tallyHtml(counts);
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -125,6 +138,10 @@ function page(
 <script>${script()}</script>
 </body>
 </html>`;
+}
+
+export function tallyHtml(counts: Tally[]): string {
+  return counts.map((c) => `<span class="tally"><b>${c.n}</b>${esc(c.name)}</span>`).join("");
 }
 
 function esc(s: string): string {
@@ -178,36 +195,87 @@ function script(): string {
   const vscode = acquireVsCodeApi();
   const send = (m) => vscode.postMessage(m);
 
+  const topRegion = document.querySelector('.top');
+  const pane = document.querySelector('.pane');
+
+  // WHAT THE READER WAS DOING, KEPT ACROSS A CHANGE IN THE DATA.
+  //
+  // The data changed. What they were looking at did not. Folding a group and
+  // scrolling to a place are things a person did, and throwing them away
+  // because a file was written is the editor answering a question nobody asked.
+  const folded = new Set();
+
+  function remember() {
+    for (const g of document.querySelectorAll('.group[data-key]')) {
+      if (g.classList.contains('shut')) folded.add(g.dataset.key);
+      else folded.delete(g.dataset.key);
+    }
+  }
+
+  function restore() {
+    for (const g of document.querySelectorAll('.group[data-key]')) {
+      const shut = folded.has(g.dataset.key);
+      g.classList.toggle('shut', shut);
+      const f = g.querySelector('.fold');
+      if (f) f.textContent = shut ? '\\u25B8' : '\\u25BE';
+    }
+  }
+
+  function wire() {
+    for (const h of document.querySelectorAll('.group h2')) {
+      h.onclick = () => {
+        const g = h.parentElement;
+        g.classList.toggle('shut');
+        h.querySelector('.fold').textContent = g.classList.contains('shut') ? '\\u25B8' : '\\u25BE';
+        remember();
+      };
+    }
+    for (const cell of document.querySelectorAll('td.opens')) {
+      cell.onclick = () => send({ type: 'open', id: cell.parentElement.dataset.id });
+    }
+    wireDragging();
+  }
+
+  // NEW DATA LANDS INSIDE THE PAGE. The page is built once and never again,
+  // because rebuilding it takes the reader back to the top of a list they had
+  // scrolled through.
+  window.addEventListener('message', (ev) => {
+    const m = ev.data;
+    if (m.type !== 'body') return;
+    remember();
+    const where = pane.scrollTop;
+    topRegion.innerHTML = m.pinned;
+    pane.innerHTML = m.scrolling;
+    document.querySelector('.counts').innerHTML = m.counts;
+    document.querySelector('.total').textContent = m.total;
+    restore();
+    wire();
+    pane.scrollTop = where;
+  });
+
   for (const tab of document.querySelectorAll('.tab')) {
     tab.onclick = () => send({ type: 'view', view: tab.dataset.view });
-  }
-  for (const h of document.querySelectorAll('.group h2')) {
-    h.onclick = () => {
-      const g = h.parentElement;
-      g.classList.toggle('shut');
-      h.querySelector('.fold').textContent = g.classList.contains('shut') ? '\\u25B8' : '\\u25BE';
-    };
-  }
-  for (const cell of document.querySelectorAll('td.opens')) {
-    cell.onclick = () => send({ type: 'open', id: cell.parentElement.dataset.id });
   }
 
   // DRAGGING A ROW ONTO A GROUP FILES IT THERE. The group says which property
   // the drop writes, so nothing here has to know what the grouping was
   // computed from. A group that says nothing takes no drop.
   let dragging = null;
-  for (const row of document.querySelectorAll('tr[data-id]')) {
-    row.ondragstart = () => { dragging = row.dataset.id; };
-    row.ondragend = () => { dragging = null; };
+  function wireDragging() {
+    for (const row of document.querySelectorAll('tr[data-id]')) {
+      row.ondragstart = () => { dragging = row.dataset.id; };
+      row.ondragend = () => { dragging = null; };
+    }
+    for (const g of document.querySelectorAll('.group[data-sets]')) {
+      g.ondragover = (ev) => { ev.preventDefault(); g.classList.add('over'); };
+      g.ondragleave = () => g.classList.remove('over');
+      g.ondrop = (ev) => {
+        ev.preventDefault();
+        g.classList.remove('over');
+        if (dragging) send({ type: 'file', id: dragging, sets: g.dataset.sets, into: g.dataset.into });
+      };
+    }
   }
-  for (const g of document.querySelectorAll('.group[data-sets]')) {
-    g.ondragover = (ev) => { ev.preventDefault(); g.classList.add('over'); };
-    g.ondragleave = () => g.classList.remove('over');
-    g.ondrop = (ev) => {
-      ev.preventDefault();
-      g.classList.remove('over');
-      if (dragging) send({ type: 'file', id: dragging, sets: g.dataset.sets, into: g.dataset.into });
-    };
-  }
+  wire();
   `;
 }
