@@ -178,6 +178,28 @@ Change one thing at a time.
 
 Leave a file you did not need to touch exactly as it was.
 
+### Commit what you changed, by name
+
+Stage the paths you edited. Never stage everything.
+
+SEVERAL AGENTS SHARE ONE WORKING TREE, and one of the things they do in it is
+put a defect back to watch a check go red. A commit that stages everything takes
+that half-applied experiment with it, and the message says nothing about the
+file, because the author never touched it.
+
+MEASURED. A commit about two cage checks deleted five lines from pull.go, and
+those five lines were a refusal. The tree went red on two assertions and stayed
+that way until the reviewer that had been mid-injection noticed and put it back.
+The commit message named neither the file nor the refusal.
+
+TWO RULES OUT OF ONE INCIDENT. Stage by path, so what you commit is what you
+wrote. And put a defect back in a worktree of your own rather than in the tree
+somebody else is committing, which is the other half of the same collision.
+
+A WORKTREE IS CHEAP AND THE COLLISION IS NOT. git worktree add gives an isolated
+checkout at the commit under test, the tests run in it, and nothing anybody else
+does can land in the middle of an injection.
+
 ## Stopping
 
 Say what you tried, in one line, when what you tried failed.
