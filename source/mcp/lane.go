@@ -29,11 +29,15 @@ func laneTools() []map[string]any {
 				"names a command that has to exit zero. Asserting done is not evidence.\n\n" +
 				"A parent breaks a token you already hold into steps. A sub-token closes on your " +
 				"own submission, so use it for your own breakdown and nothing else.\n\n" +
-				"WRITE A NOTE ON SOMETHING is this tool with backlog set. A note is work that " +
-				"exists and that nobody is doing: it stays out of the queue, and it holds nobody " +
-				"from stopping. Somebody drains the backlog later, by deciding to.\n\n" +
-				"An instruction that is actionable now is minted without backlog, and it goes " +
-				"straight into the queue. That difference is the whole of what the two words mean.\n\n" +
+				"WHEN THE PERSON SAYS WRITE A NOTE ON SOMETHING, THEY MEAN THIS TOOL WITH " +
+				"backlog SET AND traced OFF. Not a file, not a line in a document, and not a " +
+				"sentence in your answer. An ephemeral backlogged token, every time.\n\n" +
+				"A note is work that exists and that nobody is doing: it stays out of the queue, " +
+				"and it holds nobody from stopping. Somebody drains the backlog later, by " +
+				"deciding to.\n\n" +
+				"AN INSTRUCTION THAT IS ACTIONABLE NOW is minted without backlog, and it goes " +
+				"straight into the queue. Backlogged or not is the whole difference between the " +
+				"two, and choosing wrongly either buries the work or interrupts with it.\n\n" +
 				"You cannot close what you mint. A reviewer settles it.",
 			"inputSchema": map[string]any{
 				"type": "object",

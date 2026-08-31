@@ -303,16 +303,30 @@ function watchFile(file: string, onChange: () => void) {
 // chose. Both come from the same tree.
 function render(context: vscode.ExtensionContext) {
   if (!view) return;
-  const groups = shownGroups();
+  const groups = shownGroups(context);
   builtWith = groups.join(",");
   view.webview.html = panelHtml(loadTree(context), groups);
 }
 
-function shownGroups(): string[] {
+// WHICH GROUPS ARE SHOWN, and the default is not written here.
+//
+// util/parameters.json declares it, so this reads the declaration rather than
+// carrying a second copy. A default in two places is a default that disagrees
+// with itself the first time one of them is edited.
+function shownGroups(context?: vscode.ExtensionContext): string[] {
   const v = lastValues["panel.shown"];
   if (Array.isArray(v)) return v.map(String);
   if (typeof v === "string") return v.split(",").map((s) => s.trim()).filter(Boolean);
-  return ["control"];
+  return context ? declaredShown(loadTree(context)) : [];
+}
+
+function declaredShown(n: Node): string[] {
+  if (n.name === "shown" && Array.isArray(n.default)) return (n.default as unknown[]).map(String);
+  for (const c of n.children ?? []) {
+    const found = declaredShown(c);
+    if (found.length) return found;
+  }
+  return [];
 }
 
 function loadTree(context: vscode.ExtensionContext): Node {
@@ -344,7 +358,7 @@ function postValues(context: vscode.ExtensionContext) {
   void readValues(context).then(() => {
     // The panel is rebuilt when the groups it holds are not the groups it was
     // built with. One comparison, against what is on screen.
-    if (shownGroups().join(",") !== builtWith) {
+    if (shownGroups(context).join(",") !== builtWith) {
       render(context);
       return; // the new view asks for its values itself
     }
@@ -422,7 +436,7 @@ async function initHere(context: vscode.ExtensionContext) {
 // setting it. Nothing about the panel is stored anywhere else.
 async function chooseGroups(context: vscode.ExtensionContext) {
   const all = everyGroup(loadTree(context)).filter((g) => g.key !== "panel");
-  const now = shownGroups();
+  const now = shownGroups(context);
   const picked = await vscode.window.showQuickPick<vscode.QuickPickItem & { key: string }>(
     all.map((g) => ({ label: g.title, description: g.key, key: g.key, picked: now.includes(g.key) })),
     { canPickMany: true, title: "Which groups are shown in the panel" },

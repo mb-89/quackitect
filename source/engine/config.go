@@ -25,6 +25,42 @@ import (
 // float, str, list, and the two that draw rather than hold a value, action
 // and status.
 
+// AN OPTION IS A VALUE, AND IT MAY ALSO SAY WHAT IT MEANS.
+//
+// A short value is what a control shows when it is closed, and a long one is
+// what it says when it is open. Both shapes are written, because a list of
+// plain strings is what most controls want and spelling one out as an object
+// would be noise.
+type Option struct {
+	Value string `json:"value"`
+	Says  string `json:"says,omitempty"`
+}
+
+func (o *Option) UnmarshalJSON(b []byte) error {
+	var s string
+	if json.Unmarshal(b, &s) == nil {
+		o.Value, o.Says = s, ""
+		return nil
+	}
+	var full struct {
+		Value string `json:"value"`
+		Says  string `json:"says"`
+	}
+	if err := json.Unmarshal(b, &full); err != nil {
+		return fmt.Errorf("an option is a value, or a value and what it says: %s", b)
+	}
+	o.Value, o.Says = full.Value, full.Says
+	return nil
+}
+
+func (o Option) MarshalJSON() ([]byte, error) {
+	if o.Says == "" {
+		return json.Marshal(o.Value)
+	}
+	type plain Option
+	return json.Marshal(plain(o))
+}
+
 type Node struct {
 	Name     string   `json:"name"`
 	Title    string   `json:"title,omitempty"`
@@ -34,7 +70,7 @@ type Node struct {
 	Min      *float64 `json:"min,omitempty"`
 	Max      *float64 `json:"max,omitempty"`
 	Step     *float64 `json:"step,omitempty"`
-	Options  []string `json:"options,omitempty"`
+	Options  []Option `json:"options,omitempty"`
 	Narrow   string   `json:"narrow,omitempty"` // smaller, larger, on, off, or empty for free
 	Shown    bool     `json:"shown,omitempty"`
 	Children []Node   `json:"children,omitempty"`
@@ -181,12 +217,14 @@ func narrow(n Node, floor, want any) (any, string) {
 	case "str", "list":
 		w := fmt.Sprint(want)
 		if len(n.Options) > 0 {
+			var names []string
 			for _, o := range n.Options {
-				if o == w {
+				if o.Value == w {
 					return w, ""
 				}
+				names = append(names, o.Value)
 			}
-			return floor, "it is not one of " + strings.Join(n.Options, ", ")
+			return floor, "it is not one of " + strings.Join(names, ", ")
 		}
 		return w, ""
 	}
