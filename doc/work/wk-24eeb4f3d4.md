@@ -3,10 +3,13 @@ id: wk-24eeb4f3d4
 seq: "55"
 type: work
 title: one class one meaning
-status: backlogged
+status: aborted
 assignee: main
 scope: single-step
 traced: true
+disposition: dropped
+reason: "The remedy landed on the editor port: the toolbar button that files ticked rows is bs-make-bucket at src/extension/editor.ts:152, and bs-group now names the filter group and nothing else, so the handler cannot reach a filter control. Obsolete."
+aborted_from: backlogged
 minted_by: reviewer4
 ---
 

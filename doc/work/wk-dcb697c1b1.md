@@ -3,10 +3,13 @@ id: wk-dcb697c1b1
 seq: "65"
 type: work
 title: "learned: literals are derived"
-status: backlogged
+status: aborted
 assignee: main
 scope: single-step
 traced: true
+disposition: dropped
+reason: "The lesson is written where a drafter reads it: doc/guidance/specifying.md, section \"The command decides the sentence above it\". It is the shape called A LITERAL NOBODY DERIVED. Obsolete as a token."
+aborted_from: backlogged
 minted_by: reviewer5
 ---
 

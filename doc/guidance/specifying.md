@@ -33,6 +33,46 @@ Where no command decides it, the worker answers it by name in the evidence and
 a reviewer judges the answer. That is worse than a command and better than
 nothing.
 
+## The command decides the sentence above it
+
+A criterion is two things, and they have to be about one thing.
+
+The sentence says what has to be true. The command decides it. When the two
+drift apart the command still exits zero, so the gate opens on a sentence
+nobody checked, and the token closes carrying a claim that is false.
+
+Five shapes of the drift, each found on a real token here.
+
+BORROWED. The command was copied from a neighbouring token and still names that
+token's deliverable. It passes because the neighbour is finished. Read every
+command you copied and ask what file it names.
+
+A LITERAL NOBODY DERIVED. The command searches for a string that encodes a
+claim about the tree, and nothing ever ran the thing that would establish the
+claim. The search proves the string is present and says nothing about whether
+it is true. Derive the literal by running the command that decides it, then
+write what that command answered.
+
+A SET COVERED BY ONE MEMBER. The sentence is about all of them and the command
+names one. A deliverable naming three of thirteen passes. When a criterion is
+about a set, the command walks the set and fails on the first miss.
+
+A LIVE FACT DEMOTED TO PROSE. The engine runs a command criterion once, at the
+submission gate, so it reads the world at the moment of submission. That is
+exactly the instrument a live fact wants. Prose is for a fact no program can
+decide, and not for one that changes.
+
+A ONE-TIME ASSERTION WRITTEN AS A STANDING RULE. The opposite mistake, and it
+looks the same on the page. A criterion asserting something about the project's
+own data becomes a permanent rule the moment it is agreed, so it goes red the
+next time anybody adds an ordinary row. Pin a one-time assertion to what existed
+when the work started, by id or by a snapshot inside the token.
+
+THE TWO LAST ONES ARE ONE QUESTION. Ask whether the criterion is about the
+change or about the project, and then whether it is asserted once or forever.
+Say which in the sentence, so the reviewer judges the instrument and not only
+the words.
+
 ## What a criterion is not
 
 It is not a plan. How the work is done is the worker's, and a spec that

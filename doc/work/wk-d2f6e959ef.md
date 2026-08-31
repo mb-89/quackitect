@@ -3,10 +3,13 @@ id: wk-d2f6e959ef
 seq: "73"
 type: work
 title: written reads back
-status: backlogged
+status: aborted
 assignee: main
 scope: single-step
 traced: true
+disposition: dropped
+reason: "The remedy landed on the filter round trip: TestAFilterReadsBackAsWhatWasBuilt at src/engine/filterbuild_test.go:14 drives the round trip this token described. Obsolete."
+aborted_from: backlogged
 minted_by: reviewer4
 ---
 

@@ -3,10 +3,13 @@ id: wk-10d3cf13cd
 seq: "70"
 type: work
 title: the whole set checked
-status: backlogged
+status: aborted
 assignee: main
 scope: single-step
 traced: true
+disposition: dropped
+reason: "The lesson is written where a drafter reads it: doc/guidance/specifying.md, section \"The command decides the sentence above it\". It is the shape called A SET COVERED BY ONE MEMBER, and the instance it was found on is already fixed: wk-c6247665a3 now carries one command criterion per commit, thirteen of them. Obsolete as a token."
+aborted_from: backlogged
 minted_by: reviewer4
 ---
 

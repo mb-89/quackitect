@@ -3,10 +3,13 @@ id: wk-ccd563ec25
 seq: "68"
 type: work
 title: one pass hides rows
-status: backlogged
+status: aborted
 assignee: main
 scope: single-step
 traced: true
+disposition: dropped
+reason: "The remedy landed on the editor port: candidates() skips a row a folded parent took away at src/extension/editor.ts:1131, in the same pass as the other two. Obsolete."
+aborted_from: backlogged
 minted_by: reviewer4
 ---
 
