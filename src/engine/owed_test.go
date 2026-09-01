@@ -4,6 +4,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"sync"
 	"testing"
@@ -32,6 +33,17 @@ func TestNothingHappensWhileAnAnswerIsOwed(t *testing.T) {
 	// They said something.
 	hookSays(t, exe, r.Method, "UserPromptSubmit",
 		map[string]any{"cwd": r.Work, "prompt": "the editor is still not right"})
+
+	// THE GRACE IS SPENT FIRST, and it is warned rather than refused. A prompt
+	// lands while a call is already in flight, and killing that call kills work
+	// the agent began before it could have known.
+	for i := 0; i < GraceCalls; i++ {
+		if out := hookSays(t, exe, r.Method, "PreToolUse", read); strings.Contains(out, `"deny"`) {
+			t.Fatalf("call %d of the grace was refused: %s", i+1, out)
+		} else if !strings.Contains(out, "the editor is still not right") {
+			t.Fatalf("call %d of the grace says nothing about the prompt: %s", i+1, out)
+		}
+	}
 
 	out := hookSays(t, exe, r.Method, "PreToolUse", read)
 	if !strings.Contains(out, `"permissionDecision":"deny"`) {
@@ -205,8 +217,12 @@ func TestAnsweringClearsTheObligationOfWhoeverAnswered(t *testing.T) {
 		"cwd": r.Work, "tool_name": "Read", "tool_use_id": "t1", "agent_id": "agent-1",
 		"tool_input": map[string]any{"file_path": filepath.Join(r.Work, "notes.md")},
 	}
+	// The grace first, which is warned, and then the refusal.
+	for i := 0; i < GraceCalls; i++ {
+		hookSays(t, exe, r.Method, "PreToolUse", read)
+	}
 	if out := hookSays(t, exe, r.Method, "PreToolUse", read); !strings.Contains(out, `"deny"`) {
-		t.Fatalf("the subagent was not refused: %s", out)
+		t.Fatalf("the subagent was not refused after its grace: %s", out)
 	}
 
 	// It answers with the tool, which runs as a program that does not know it.
@@ -493,5 +509,119 @@ func TestTheTwoWritersMakeOneObligationInEitherOrder(t *testing.T) {
 				t.Fatalf("the walker owes %q, %v", got, yes)
 			}
 		})
+	}
+}
+
+// A BADLY TIMED FIRST CALL IS NOT KILLED, AND THE FOURTH ONE IS.
+//
+// THE OWNER'S RULE: the first three calls after a prompt arrives get a warning
+// saying there is a prompt waiting and how many are left. Only then does the
+// engine block.
+//
+// WHY A GRACE AT ALL. A prompt lands while a tool call is already in flight, so
+// the agent is refused for not answering something it has not been shown yet,
+// and the work it was doing dies with the refusal. The rule is about an agent
+// that goes quiet into its work, and a call that started before the message
+// arrived is not that.
+func TestAnAnswerIsAskedForThreeTimesBeforeItIsRefused(t *testing.T) {
+	r := lane(t)
+	if err := TheyAsked(r, "main", "what is going on with the icons"); err != nil {
+		t.Fatal(err)
+	}
+	for i := 1; i <= GraceCalls; i++ {
+		said, refuse := AnswerOwedNow(r, "main")
+		if refuse {
+			t.Fatalf("call %d of %d was refused, and the grace is %d", i, GraceCalls, GraceCalls)
+		}
+		if said == "" {
+			t.Fatalf("call %d says nothing about the prompt waiting", i)
+		}
+		if !strings.Contains(said, "what is going on with the icons") {
+			t.Fatalf("the warning does not carry what they said: %q", said)
+		}
+		// AND IT SAYS HOW MANY ARE LEFT, because a warning that does not is a
+		// warning an agent learns to read past.
+		if !strings.Contains(said, strconv.Itoa(GraceCalls-i)) {
+			t.Fatalf("warning %d does not say %d are left: %q", i, GraceCalls-i, said)
+		}
+	}
+	if _, refuse := AnswerOwedNow(r, "main"); !refuse {
+		t.Fatalf("the call after %d warnings was not refused", GraceCalls)
+	}
+	// AND IT KEEPS REFUSING. A grace that renewed itself would be no gate.
+	if _, refuse := AnswerOwedNow(r, "main"); !refuse {
+		t.Fatal("the refusal did not hold")
+	}
+	// ANSWERING CLEARS IT, and the next prompt gets its own grace.
+	if err := TheyWereAnswered(r, "main"); err != nil {
+		t.Fatal(err)
+	}
+	if _, refuse := AnswerOwedNow(r, "main"); refuse {
+		t.Fatal("an agent that answered is still refused")
+	}
+	if err := TheyAsked(r, "main", "and another thing"); err != nil {
+		t.Fatal(err)
+	}
+	if _, refuse := AnswerOwedNow(r, "main"); refuse {
+		t.Fatal("a fresh prompt was refused on its first call")
+	}
+}
+
+// THE GRACE IS ONE AGENT'S. Two agents overlapping is why this store is keyed
+// by actor at all, and a grace spent by one would refuse the other early.
+func TestTheGraceIsCountedPerAgent(t *testing.T) {
+	r := lane(t)
+	if err := TheyAsked(r, "main", "a question"); err != nil {
+		t.Fatal(err)
+	}
+	if err := TheyAsked(r, "reviewer1", "another question"); err != nil {
+		t.Fatal(err)
+	}
+	for i := 0; i <= GraceCalls; i++ {
+		AnswerOwedNow(r, "main")
+	}
+	if _, refuse := AnswerOwedNow(r, "main"); !refuse {
+		t.Fatal("main spent its grace and was not refused")
+	}
+	if _, refuse := AnswerOwedNow(r, "reviewer1"); refuse {
+		t.Fatal("reviewer1 was refused on a grace main spent")
+	}
+}
+
+// AN EDITOR SAYING WHERE SOMEBODY IS LOOKING IS NOT A QUESTION.
+//
+// The harness writes a notice into the turn when a person opens a file. It is
+// the editor telling the agent where the person is, and treating it as a prompt
+// made the engine demand an answer to a file being opened.
+//
+// IT IS NOT COUNTED RATHER THAN FORGIVEN. A notice that became an obligation
+// and then had its grace spent is still an obligation nobody can clear.
+func TestANoticeFromTheEditorIsNotAQuestion(t *testing.T) {
+	r := lane(t)
+	notices := []string{
+		"<ide_opened_file>The user opened the file c:/x/y.md in the IDE. " +
+			"This may or may not be related to the current task.</ide_opened_file>",
+		"  <ide_opened_file>a file</ide_opened_file>  ",
+	}
+	for _, one := range notices {
+		if err := TheyAsked(r, "main", one); err != nil {
+			t.Fatal(err)
+		}
+		if said, _ := AnswerOwedNow(r, "main"); said != "" {
+			t.Fatalf("an editor notice became something to answer: %q", said)
+		}
+	}
+	// AND A REAL QUESTION IN THE SAME MESSAGE IS STILL A QUESTION, because a
+	// person types after the notice and that is what they said.
+	both := "<ide_opened_file>a file</ide_opened_file>\nwhy is the light still red"
+	if err := TheyAsked(r, "main", both); err != nil {
+		t.Fatal(err)
+	}
+	said, _ := AnswerOwedNow(r, "main")
+	if !strings.Contains(said, "why is the light still red") {
+		t.Fatalf("a question written under a notice was dropped: %q", said)
+	}
+	if strings.Contains(said, "ide_opened_file") {
+		t.Fatalf("the notice was kept as part of what they said: %q", said)
 	}
 }

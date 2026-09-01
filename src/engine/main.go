@@ -57,6 +57,7 @@ func main() {
 	once := flag.Bool("once", false, "write a start record and exit")
 	where := flag.Bool("where", false, "print the log path and exit")
 	rotate := flag.Bool("rotate", false, "set the current log aside and exit, writing nothing")
+	link := flag.Bool("link", false, "give every built program both its names as one file, and exit")
 	project := flag.Bool("project", false, "write the projections from guidance and exit")
 	emergency := flag.String("emergency", "", "arm or disarm emergency mode: on, off, or status")
 	reason := flag.String("reason", "", "why emergency mode is being armed")
@@ -118,6 +119,17 @@ func main() {
 	// Setting the current log aside without starting. The editor calls this
 	// when a window opens, so a log window opened before any engine shows
 	// this session rather than the last one.
+	// ONE FILE UNDER BOTH NAMES, ASKED FOR BY THE BUILD. Installing does this
+	// too, and a build by hand is the thing that took it away.
+	if *link {
+		done, err := LinkBothNames(roots.Method, []string{"se", "se-mcp", "logview"})
+		if err != nil {
+			fail(err)
+		}
+		answerJSON(map[string]any{"linked": done})
+		return
+	}
+
 	if *rotate {
 		if err := RetireCurrent(dir); err != nil {
 			fail(err)

@@ -326,3 +326,52 @@ func rebuiltSince(methodRoot string, started time.Time) bool {
 	}
 	return info.ModTime().After(started)
 }
+
+// LinkBothNames gives a program its plain name as the same file as its
+// suffixed one, and answers what it did.
+//
+// ONE FILE UNDER BOTH NAMES. The cage names ./.bin/se, with no extension,
+// because it travels and an extension differs by platform. A shell finds a
+// command through PATHEXT and RUNME on Windows is a shell, so the suffixed name
+// stays. Installing makes the two one file, and a build by hand replaced one
+// and left the other.
+//
+// WHAT THAT COST. After a merge the plain name was a Linux binary from another
+// checkout while the suffixed one was this platform's build. sh takes
+// ./.bin/se literally, answers Exec format error, and every hook stops firing:
+// the guard, the answer-first refusal, the stop refusal and the log. Nothing
+// says so, because the thing that would say so is the hook.
+//
+// IT IS HERE RATHER THAN IN THE BUILD SCRIPT because a shell's ln is not one
+// behaviour. The one in this project's shell moved the file instead of linking
+// it, which left the tree with no engine at all.
+func LinkBothNames(methodRoot string, names []string) ([]string, error) {
+	var done []string
+	for _, name := range names {
+		bin := filepath.Join(methodRoot, ".bin")
+		plain, suffixed := filepath.Join(bin, name), filepath.Join(bin, exeName(name))
+		if plain == suffixed {
+			continue
+		}
+		if _, err := os.Stat(suffixed); err != nil {
+			continue // that program is not built here, which is not a fault
+		}
+		_ = os.Remove(plain)
+		if err := os.Link(suffixed, plain); err != nil {
+			// A HARD LINK TO A FILE NEEDS NO PRIVILEGE, which is what makes it
+			// the right one. It wants one volume, and a failure is worth naming
+			// rather than hiding in a copy that then drifts.
+			b, readErr := os.ReadFile(suffixed)
+			if readErr != nil {
+				return done, readErr
+			}
+			if err := os.WriteFile(plain, b, 0o755); err != nil {
+				return done, err
+			}
+			done = append(done, name+" (a copy, because the link failed: "+err.Error()+")")
+			continue
+		}
+		done = append(done, name)
+	}
+	return done, nil
+}

@@ -2,7 +2,9 @@ package main
 
 import (
 	"os"
+	"os/exec"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"testing"
 )
@@ -105,4 +107,71 @@ func namesTheMachine(text, root string) string {
 		}
 	}
 	return ""
+}
+
+// EVERY HOOK THE CAGE DECLARES RUNS HERE, DRIVEN THROUGH A SHELL.
+//
+// The cage carries relative paths so it travels, and a path that is the same
+// everywhere carries no file extension. On Windows the engine is se.exe, and
+// the plain name is the same file only because installing links them.
+//
+// WHAT HAPPENED WHEN IT WAS NOT. .bin/se was a Linux binary from an older
+// checkout while .bin/se.exe was this platform's build. Every hook then failed
+// to launch: the guard, the answer-first refusal, the stop refusal and the log
+// writing. Nothing said so, because the thing that would have said so is the
+// hook.
+//
+// THE GUARD THAT EXISTS SAYS IT ON ENGINE START, INTO THE LOG. That is no use
+// for this. An engine cannot report that its own name is unrunnable, and the
+// log it would write to is the one nothing was writing.
+//
+// IT GOES THROUGH A SHELL, AND THAT IS THE WHOLE POINT. A first version ran the
+// program by path and stayed green with the broken file in place, because Go's
+// exec adds an extension from PATHEXT when the name has none. cmd does the
+// same. sh does not: it takes ./.bin/se literally and answers Exec format
+// error, which is what the harness met. A check that papers over the difference
+// the defect lives in is a check in the wrong language.
+func TestEveryHookTheCageDeclaresRunsHere(t *testing.T) {
+	root, err := filepath.Abs(filepath.Join("..", ".."))
+	if err != nil {
+		t.Fatal(err)
+	}
+	b, err := os.ReadFile(filepath.Join(root, ".claude", "settings.json"))
+	if err != nil {
+		t.Skip("this reads the product's own cage, and it is not here")
+	}
+	// One command per hook, and the ones that matter name a path in this tree.
+	said := map[string]bool{}
+	for _, m := range regexp.MustCompile(`"command"\s*:\s*"([^"]+)"`).FindAllStringSubmatch(string(b), -1) {
+		cmd := strings.ReplaceAll(m[1], `\"`, `"`)
+		if strings.Contains(cmd, "./.bin/") || strings.Contains(cmd, ".bin\\") {
+			said[cmd] = true
+		}
+	}
+	if len(said) == 0 {
+		t.Fatal("the cage declares no hook that runs a program in this tree, so this guards nothing")
+	}
+	// A STOP WITH NO CLAIM IS THE CHEAPEST QUESTION THE ENGINE ANSWERS, and its
+	// answer is unmistakably its own.
+	const event = `{"hook_event_name":"Stop","session_id":"a check","transcript_path":""}`
+	for cmd := range said {
+		run := exec.Command("sh", "-c", cmd)
+		run.Dir = root
+		run.Stdin = strings.NewReader(event)
+		out, _ := run.CombinedOutput()
+		// ONE ASSERTION, AND IT IS THAT THE ENGINE ANSWERED. A list of the
+		// error words a shell might use is a list fitted to the failures
+		// already seen: the first version of this matched "not found" and the
+		// shell said "No such file or directory". What the engine says when it
+		// answers is one string, and everything else is a failure whatever it
+		// is spelled.
+		// READ WITHOUT ITS CASE, and matched on the one word the engine's stop
+		// answer always carries whichever refusal it gives. Which refusal that
+		// is depends on what is open, and a check that turned on that would be
+		// a check whose result follows the queue.
+		if !strings.Contains(strings.ToLower(string(out)), "sanctioned") {
+			t.Errorf("a shell running the hook %q did not get the engine's answer: %s",
+				cmd, firstLines(strings.TrimSpace(string(out)), 3))
+		}
+	}
 }

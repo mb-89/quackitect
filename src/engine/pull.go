@@ -110,8 +110,20 @@ func Pull(r Roots, actor, role string, p Payload) Answer {
 		reclaimed = Reclaim(r, actor, role)
 	}
 
+	// THE QUEUE IS COUNTED BEFORE THE HAND-OUT, because a pull that gives this
+	// agent a token makes it busy by definition, and the owner's condition is
+	// three open with nothing in work. Counted afterwards the nudge could only
+	// ever land on a wait.
+	said := Nudge(r, actor, role)
+
 	a := answerFor(r, actor, role, p)
 	a.Notice += reclaimNotice(reclaimed)
+	// A NUDGE RIDES ON THE ANSWER RATHER THAN BEING A THING TO GO AND LOOK FOR.
+	// It refuses nothing: it says the queue is long and nothing is in hand, and
+	// declining is a fine answer.
+	if said != "" {
+		a.Notice += nl + nl + said
+	}
 	if first {
 		if a.Tools = KnownTools(r, session); len(a.Tools) > 0 {
 			a.Notice += " This machine's tools ride in this answer, with what each one is for." +

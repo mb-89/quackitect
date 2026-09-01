@@ -261,15 +261,25 @@ func runHook(args []string) {
 	//
 	// The person is waiting to be answered, and the agent going quiet into its
 	// work is the thing they see. The engine knows because it writes the log.
+	// A CALL ALREADY IN FLIGHT IS NOT AN AGENT GOING QUIET. A prompt lands while
+	// a tool call is on its way, so refusing that call kills work the agent
+	// began before it could have known. The first few calls are warned and the
+	// rest are refused, and the warning says how many are left.
 	if in.Event == "PreToolUse" && cfg.AnswerFirst && !isAnswering(in) {
-		if owed, yes := AnswerOwed(roots, actor); yes {
-			record(log, "engine", "owed", actor, "refused: they are waiting for an answer", No(),
+		if said, refuse := AnswerOwedNow(roots, actor); said != "" {
+			if refuse {
+				record(log, "engine", "owed", actor, "refused: they are waiting for an answer", No(),
+					map[string]any{"tool": in.ToolName})
+				denyToolUse("THEY ARE WAITING FOR AN ANSWER, and nothing else happens until you " +
+					"give one.\n\nWhat they said:\n\n" + firstLines(said, 12) +
+					"\n\nAnswer them, in full, with se_answer. Then carry on with the work you hold. " +
+					"You do not have to stop the turn to be heard.")
+				return
+			}
+			record(log, "engine", "owed", actor, "warned: they are waiting for an answer", Yes(),
 				map[string]any{"tool": in.ToolName})
-			denyToolUse("THEY ARE WAITING FOR AN ANSWER, and nothing else happens until you " +
-				"give one.\n\nWhat they said:\n\n" + firstLines(owed, 12) +
-				"\n\nAnswer them, in full, with se_answer. Then carry on with the work you hold. " +
-				"You do not have to stop the turn to be heard.")
-			return
+			warnTheAgent(firstLines(said, 12) +
+				"\n\nAnswer them with se_answer. You do not have to stop the turn to be heard.")
 		}
 	}
 
@@ -630,4 +640,20 @@ func record(log *Log, src, kind, actor, msg string, ok *bool, data map[string]an
 		return
 	}
 	log.Write(src, kind, actor, msg, ok, data)
+}
+
+// warnTheAgent says something without refusing anything.
+//
+// A WARNING IS NOT A REFUSAL, and it needs its own shape. denyToolUse kills the
+// call, which is the thing the grace exists to stop for the first few. Claude
+// Code reads additionalContext on a PreToolUse that allows, so the call goes
+// through and the agent is told anyway.
+func warnTheAgent(said string) {
+	out, _ := json.Marshal(map[string]any{
+		"hookSpecificOutput": map[string]any{
+			"hookEventName":     "PreToolUse",
+			"additionalContext": said,
+		},
+	})
+	fmt.Println(string(out))
 }

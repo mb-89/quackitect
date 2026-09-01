@@ -167,10 +167,27 @@ func isBareWord(s string) bool {
 	case "yes", "no", "on", "off", "null", "~":
 		return true
 	}
+	// A WHOLE NUMBER IS WRITTEN AS A NUMBER. Every value that parsed as one was
+	// quoted, so the note said seq: "45" and rounds: "4", and a person reading
+	// it asks why a count is a string. Nothing is lost by leaving the quotes
+	// off: a whole number written bare reads back as the same characters.
+	//
+	// EVERYTHING ELSE THAT LOOKS NUMERIC KEEPS THEM, because that is where bare
+	// would change what it means. 007 loses its zeros, 1.5 and 1e3 come back
+	// spelled differently, and each of those is a value somebody typed.
+	if _, err := strconv.Atoi(s); err == nil {
+		return strconv.Itoa(mustAtoi(s)) != s
+	}
 	if _, err := strconv.ParseFloat(s, 64); err == nil {
 		return true
 	}
 	return false
+}
+
+// mustAtoi is Atoi where the caller has already asked whether it parses.
+func mustAtoi(s string) int {
+	n, _ := strconv.Atoi(s)
+	return n
 }
 
 func unquote(s string) string {

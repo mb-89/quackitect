@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"testing"
 )
@@ -206,5 +207,70 @@ func TestASettledParentIsNotDraggedBack(t *testing.T) {
 	got, _ := LoadToken(r, parent.ID)
 	if got.Status != ImpSubmitted {
 		t.Fatalf("a submitted parent was dragged to %s", got.Status)
+	}
+}
+
+// A NUMBER IS WRITTEN AS A NUMBER.
+//
+// Every value was quoted when it would read back as something other than text,
+// and a number was counted among those. So the note said seq: "45" and
+// rounds: "4", and a person reading it asks why a count is a string.
+//
+// NOTHING IS LOST BY LEAVING THE QUOTES OFF. The engine's own reader takes the
+// characters either way, and a whole number written bare reads back as the same
+// characters in every parser.
+//
+// A VALUE THAT IS NOT A WHOLE NUMBER KEEPS ITS QUOTES, because that is where
+// bare would change what it means: a leading zero, a fraction, and the words a
+// YAML reader turns into something else.
+func TestANumberIsWrittenAsANumber(t *testing.T) {
+	r := lane(t)
+	tok := mint(t, r, Token{Title: "one with a count", Status: ImpOpen, Traced: true})
+	tok.Rounds = 4
+	if err := SaveToken(r, tok); err != nil {
+		t.Fatal(err)
+	}
+	note, err := os.ReadFile(filepath.Join(TracedDir(r), tok.ID+".md"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	said := string(note)
+	for _, bare := range []string{"seq: " + strconv.Itoa(tok.Seq), "rounds: 4"} {
+		if !strings.Contains(said, bare+nl) {
+			t.Errorf("the note does not say %q:\n%s", bare, firstLines(said, 12))
+		}
+	}
+	for _, quoted := range []string{`seq: "`, `rounds: "`} {
+		if strings.Contains(said, quoted) {
+			t.Errorf("the note still quotes a number: %q", quoted)
+		}
+	}
+	// AND IT READS BACK AS THE NUMBER IT IS.
+	back, err := LoadToken(r, tok.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if back.Seq != tok.Seq || back.Rounds != 4 {
+		t.Fatalf("it reads back as seq %d, rounds %d", back.Seq, back.Rounds)
+	}
+
+	// WHAT STAYS QUOTED, and each one would read back as something else bare.
+	for _, one := range []string{"007", "1.5", "yes", "no", "null", "~", "on", "off"} {
+		if quote(one) == one {
+			t.Errorf("%q is written bare and a reader would take it for something else", one)
+		}
+	}
+	// A whole number is the one that changes.
+	for _, one := range []string{"0", "45", "1000000"} {
+		if quote(one) != one {
+			t.Errorf("%q is a whole number and it is written as %s", one, quote(one))
+		}
+	}
+	// A NEGATIVE ONE KEEPS ITS QUOTES, and that is the leading dash rather than
+	// the number. A value starting with a dash is quoted whatever follows it,
+	// because a line beginning with one is how a list item starts. The tree has
+	// negative sequences, from tokens minted before the ledger started.
+	if quote("-3") == "-3" {
+		t.Error("a value starting with a dash is written bare")
 	}
 }

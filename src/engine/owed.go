@@ -2,7 +2,9 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -52,7 +54,13 @@ func owedPath(r Roots) string { return r.Private("owed.json") }
 // two things, and a slot that held one erased the first. The refusal then
 // showed the newest question and the older one was handed to nobody.
 func TheyAsked(r Roots, actor, said string) error {
-	return changeOwed(r, func(o Owed) { o[actor] = append(o[actor], said) })
+	// THE EDITOR TALKING IS NOT A QUESTION, and it is dropped here rather than
+	// forgiven later, so it never becomes an obligation nobody can clear.
+	real := TheyReallyAsked(said)
+	if real == "" {
+		return nil
+	}
+	return changeOwed(r, func(o Owed) { o[actor] = append(o[actor], real) })
 }
 
 // TheyWereAnswered is called where an answer arrives, and nowhere else. It
@@ -237,4 +245,98 @@ func TheyWereAnsweredIfNamed(r Roots, actor string) error {
 		return nil
 	}
 	return TheyWereAnswered(r, actor)
+}
+
+// THE GRACE, AND WHY THERE IS ONE.
+//
+// A prompt lands while a tool call is already in flight. The agent is then
+// refused for not answering something it has not been shown, and the work it
+// was doing dies with the refusal. The rule is about an agent that goes quiet
+// into its work, and a call that started before the message arrived is not
+// that.
+//
+// SO THE FIRST FEW CALLS ARE WARNED AND THE REST ARE REFUSED. The warning says
+// what they said and how many calls are left, because a warning that does not
+// say how close the gate is is a warning an agent learns to read past.
+//
+// IT IS COUNTED PER AGENT, for the same reason the obligation is keyed by one.
+const GraceCalls = 3
+
+type graced struct {
+	Session string         `json:"session"`
+	Seen    map[string]int `json:"seen"`
+}
+
+func gracePath(r Roots) string { return r.Private("grace.json") }
+
+// AnswerOwedNow answers what to say about an owed answer, and whether to refuse.
+//
+// It counts the call, so a caller that asks twice has used two of the grace.
+func AnswerOwedNow(r Roots, actor string) (string, bool) {
+	said, owed := AnswerOwed(r, actor)
+	if !owed {
+		_ = forgetGrace(r, actor)
+		return "", false
+	}
+	n := countGrace(r, actor)
+	if n > GraceCalls {
+		return said, true
+	}
+	return fmt.Sprintf("THEY ARE WAITING FOR AN ANSWER, and %d more call(s) go through "+
+		"before nothing else does.\n\nWhat they said:\n\n%s", GraceCalls-n, said), false
+}
+
+// countGrace answers how many calls this agent has made since the prompt.
+//
+// A SESSION OF ITS OWN, the way arrivals has one. A count that outlived the run
+// it was made in would refuse a fresh agent on a prompt from hours ago.
+func countGrace(r Roots, actor string) int {
+	var g graced
+	if b, err := os.ReadFile(gracePath(r)); err == nil {
+		_ = json.Unmarshal(b, &g)
+	}
+	if g.Seen == nil || g.Session != currentSession(r) {
+		g = graced{Session: currentSession(r), Seen: map[string]int{}}
+	}
+	g.Seen[actor]++
+	n := g.Seen[actor]
+	if b, err := json.MarshalIndent(g, "", " "); err == nil {
+		_ = os.WriteFile(gracePath(r), b, 0o644)
+	}
+	return n
+}
+
+func forgetGrace(r Roots, actor string) error {
+	var g graced
+	b, err := os.ReadFile(gracePath(r))
+	if err != nil {
+		return nil
+	}
+	if json.Unmarshal(b, &g) != nil || g.Seen == nil {
+		return nil
+	}
+	delete(g.Seen, actor)
+	out, err := json.MarshalIndent(g, "", " ")
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(gracePath(r), out, 0o644)
+}
+
+// AN EDITOR SAYING WHERE SOMEBODY IS LOOKING IS NOT A QUESTION.
+//
+// The harness writes a notice into the turn when a person opens a file. It is
+// the editor telling the agent where the person is, not the person asking for
+// anything, and treating it as a prompt made the engine demand an answer to a
+// file being opened.
+//
+// IT IS TAKEN OUT RATHER THAN FORGIVEN. A notice that became an obligation and
+// then had its grace spent is still an obligation nobody can clear. What a
+// person typed under the notice is still theirs, so only the notice goes.
+var editorNotice = regexp.MustCompile(`(?s)<ide_[a-z_]+>.*?</ide_[a-z_]+>`)
+
+// TheyReallyAsked answers what a person actually said, or nothing when the
+// message was the editor talking.
+func TheyReallyAsked(said string) string {
+	return strings.TrimSpace(editorNotice.ReplaceAllString(said, ""))
 }

@@ -6,6 +6,7 @@ import * as os from "node:os";
 import { panelHtml, everyGroup, Node } from "./panel";
 import { editorHtml, paneBody, Table, Pane } from "./editor";
 import { whichHarness, kickoffText, openAgent } from "./agent";
+import { nextEngineState, whyNot, HEARTBEAT_MS } from "./liveness";
 import {
   mintArgs, editCellArgs, fileArgs, groupArgs, renameGroupArgs, holdArgs,
   viewArgs, paneArgs, panesArgs, viewsArgs, pinArgs, unpinArgs, widthArgs,
@@ -276,7 +277,6 @@ let watchdog: NodeJS.Timeout | undefined;
 let beatTimer: NodeJS.Timeout | undefined;
 let lastBeat = 0;
 
-const HEARTBEAT_MS = 5000;
 const READY_MS = 15000; // the budget, and missing it is a fault, not a wait
 
 function setState(next: EngineState, why = "") {
@@ -703,19 +703,19 @@ function startEngine(context: vscode.ExtensionContext) {
 // engine dead within three beats.
 function armLivenessCheck(context: vscode.ExtensionContext) {
   stopWatching();
+  // IT READS WHAT IS TRUE AND SAYS IT, IN BOTH DIRECTIONS. This began with a
+  // line that returned unless the state was already good, so the light could go
+  // from good to bad and never back. An engine started from a terminal, or one
+  // started after a stale pair was stopped, left the button red for the rest of
+  // the window's life with a fresh heartbeat on disk one directory away.
+  //
+  // THE DECISION IS IN liveness.ts, because a timer is not a thing a check can
+  // drive and the decision is.
   beatTimer = setInterval(() => {
-    if (engineState !== "good") return;
+    const was = engineState;
     const running = whatIsRunning(context);
-    if (!running) {
-      setState("bad", "the engine is gone");
-      return;
-    }
-    // Two missed beats and more. The engine is there and not answering, which
-    // is the failure a heartbeat exists to find.
-    const beat = running.beat ? Date.parse(running.beat) : 0;
-    if (beat && Date.now() - beat > HEARTBEAT_MS * 2.5) {
-      setState("bad", "the engine stopped answering");
-    }
+    const next = nextEngineState(was, running, Date.now());
+    if (next !== was) setState(next, whyNot(next, running));
   }, 1000);
 }
 
