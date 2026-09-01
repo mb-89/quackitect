@@ -332,10 +332,11 @@ func TestEveryCommandANoticeNamesIsAnswered(t *testing.T) {
 			if err == nil {
 				continue
 			}
-			if strings.Contains(string(out), "flag provided but not defined") ||
-				strings.Contains(string(out), "is moved by a pull") ||
-				strings.Contains(string(out), "which nothing read") {
-				t.Errorf("the notice built in %s says to run %q and the engine answers: %s",
+			// THE ENGINE SAYS WHICH KIND OF ANSWER THIS IS, and the check
+			// reads that rather than the wording. A refusal about the
+			// content is a real answer; not reading the call at all is not.
+			if err.(*exec.ExitError).ExitCode() == Unread {
+				t.Errorf("the notice built in %s says to run %q and the engine did not read it: %s",
 					where, strings.Join(cmd, " "), firstLines(strings.TrimSpace(string(out)), 2))
 			}
 		}
@@ -435,4 +436,42 @@ func namedCommands(said string) [][]string {
 		out = append(out, append([]string{"se"}, strings.Fields(m[1])...))
 	}
 	return out
+}
+
+// AN UNREAD CALL EXITS WITH A CODE OF ITS OWN.
+//
+// A RULE THE CHECK CAN APPLY, RATHER THAN A LIST OF MESSAGES. The notice check
+// asked whether the engine's refusal was worded one of three ways, so rewording
+// a refusal would have turned it green with the bad command still in the
+// notice. A message is a string somebody will reword. An exit code is the
+// engine saying which kind of answer this is.
+//
+// TWO AND NOT ONE. One is a refusal about the CONTENT, which is a real answer:
+// a token id that does not exist is the engine reading the call and disagreeing
+// with it. Two is the engine not reading the call at all.
+func TestAnUnreadCallExitsWithItsOwnCode(t *testing.T) {
+	exe := retroExe(t)
+	r := lane(t)
+	for _, one := range []struct {
+		args []string
+		want int
+		why  string
+	}{
+		{[]string{"work", "--set", "wk-nothing", "--field", "status", "--to", "x"}, 1,
+			"a refusal about the content is a real answer"},
+		{[]string{"work", "--set", "--field", "status"}, Unread,
+			"nothing read what it was handed"},
+		{[]string{"work", "--help"}, 0, "a call the engine answers"},
+	} {
+		out, err := exec.Command(exe, append(one.args, "--work", r.Work)...).CombinedOutput()
+		code := 0
+		if err != nil {
+			code = err.(*exec.ExitError).ExitCode()
+		}
+		if code != one.want {
+			t.Errorf("se %s exited %d and %s, so it should be %d:\n%s",
+				strings.Join(one.args, " "), code, one.why, one.want,
+				firstLines(strings.TrimSpace(string(out)), 2))
+		}
+	}
 }

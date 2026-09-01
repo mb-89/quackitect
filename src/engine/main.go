@@ -563,3 +563,10 @@ func fail(err error) {
 	fmt.Fprintln(os.Stderr, "engine:", err)
 	os.Exit(1)
 }
+
+// failUnread is how the engine says it did not read the call at all, which is a
+// different answer from disagreeing with what the call said.
+func failUnread(err error) {
+	fmt.Fprintln(os.Stderr, "engine:", err)
+	os.Exit(Unread)
+}

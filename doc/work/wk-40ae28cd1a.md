@@ -3,7 +3,7 @@ id: wk-40ae28cd1a
 seq: 1000020
 type: work
 title: a reclaim strands specs
-status: spec_open
+status: spec_submitted
 assignee: main
 scope: single-step
 traced: true
@@ -26,8 +26,12 @@ It reads the reclaim's table now, because the reclaim is what actually moves it.
   `rg -q func.TestAReclaimReachesEveryHeldState src/engine && go test -C src/engine -count=1 -run TestAReclaimReachesEveryHeldState$ .`
   **red without** the two spec states taken out of the table the reclaim walks
   **red said** TestAReclaimReachesEveryHeldState: a token left at spec_in_work came back as spec_in_work, and it should be spec_open, and the same for spec_in_review
-- Every command a notice names is a command this engine answers, over EVERY notice the engine builds rather than over one call. The set is taken from the source, every function whose name says it builds a notice and the one that answers an investigate, so a builder added next month is walked because it is a builder. The check takes each command out the way a reader does, everything after se up to the punctuation that ends the clause, and drives it through the built binary. THE ENGINE ANSWERS A COMMAND when it exits zero, or when it exits non-zero for a reason that is not the command being unread, which is a rule rather than a list of messages. AND THE ANTI-VACUITY GUARD IS ON THE SET: it refuses when the walk finds no builder at all, because refusing an empty notice catches that notice going empty and says nothing about the set being short, and short is the only way this claim goes wrong
+- Every command a notice names is a command this engine answers, over EVERY notice the engine builds rather than over one call. The set is taken from the source, every function whose name says it builds a notice and the one that answers an investigate, so a builder added next month is walked because it is a builder. The check takes each command out the way a reader does, everything after se up to the punctuation that ends the clause, and drives it through the built binary. THE ENGINE SAYS WHICH KIND OF ANSWER IT GAVE, WITH A CODE. Zero is an answer. One is a refusal about the CONTENT, which is also an answer: a token id that does not exist is the engine reading the call and disagreeing with it. Two is the engine not reading the call at all, and two is the only failure this check reports. THE CHECK READS THE CODE AND NOT THE WORDING, because a message is a string somebody will reword and rewording one would have turned this green over a command the engine never read. AND THE ANTI-VACUITY GUARD IS ON THE SET: it refuses when the walk finds no builder at all, because refusing an empty notice catches that notice going empty and says nothing about the set being short, and short is the only way this claim goes wrong
   `rg -q func.TestEveryCommandANoticeNamesIsAnswered src/engine && go test -C src/engine -count=1 -run TestEveryCommandANoticeNamesIsAnswered$ .`
+  **red without** a command the engine does not answer put into draftNotice, which is a different builder from the one the check used to read
+  **red said** TestEveryCommandANoticeNamesIsAnswered: the notice built in pull.go draftNotice says to run se work --set --field status and the engine did not read it
+- An unread call exits with a code of its own, so which kind of answer the engine gave is the engine's to say rather than the check's to guess: zero for an answer, one for a refusal about the content, two for a call nothing read
+  `rg -q func.TestAnUnreadCallExitsWithItsOwnCode src/engine && go test -C src/engine -count=1 -run TestAnUnreadCallExitsWithItsOwnCode$ .`
   **red without** a command the engine does not answer put into draftNotice, which is a different builder from the one the check used to read
   **red said** TestEveryCommandANoticeNamesIsAnswered: the notice built in pull.go draftNotice says to run se work --set --field status and the engine answers that nothing read it
 - The notice and the reclaim agree about where every held state goes back to, over the reclaim's own table rather than over a list typed beside it, and the check refuses when no state is held at all

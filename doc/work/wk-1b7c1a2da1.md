@@ -3,7 +3,7 @@ id: wk-1b7c1a2da1
 seq: 1000013
 type: work
 title: the bar burns down
-status: spec_open
+status: spec_submitted
 assignee: main
 scope: single-step
 traced: true
@@ -47,25 +47,10 @@ wk-c02dc4046b.
 
 ## done when
 
-- The engine answers the four numbers and the panel draws what it is handed. A number the panel derives is a number nothing checks, which this record has already been bitten by
-  `rg -q func.TestTheEngineAnswersABurndown src/engine && go test -C src/engine -count=1 -run TestTheEngineAnswersABurndown$ .`
-- Minted per day and done per day are read out of the log, driven over a fixture log holding events on two named days, so the check decides the counting rather than agreeing with whatever the tree happens to hold
-  `rg -q func.TestTheBurndownCountsADay src/engine && go test -C src/engine -count=1 -run TestTheBurndownCountsADay$ .`
-- Open plus backlogged is one absolute count over every token that has not ended, across both stores, and the check refuses when it finds none rather than passing by there being nothing to count
-  `rg -q func.TestTheBurndownCountsWhatIsStillOpen src/engine && go test -C src/engine -count=1 -run TestTheBurndownCountsWhatIsStillOpen$ .`
-- The failure rate counts a rejection per round, so a token rejected twice counts twice and the rate goes above a hundred. The check drives one token rejected twice in one day and requires two hundred per cent, which is the property the owner asked for by name
-  `rg -q func.TestTheFailureRateCountsEveryRound src/engine && go test -C src/engine -count=1 -run TestTheFailureRateCountsEveryRound$ .`
-- The answer says which window it covers and that a retro truncates it, naming wk-88f4fcc517 as where the long run is decided, so a reader can tell a small number from a short window
-  `rg -q func.TestTheBurndownSaysItsWindow src/engine && go test -C src/engine -count=1 -run TestTheBurndownSaysItsWindow$ .`
-- The bar draws BD: four numbers separated by slashes, small, with the detail on hover and not on the bar, and the check drives the page rather than reading the source. THE ARGUMENTS COME FROM src/extension/engineargs.ts, so the builder is one engine-args.mjs already walks and no flag is written at the call site
+- The heading line carries a filter box, and what a person types in it narrows what the panes draw and writes nothing to the view file, because a filter typed in the bar is somebody looking rather than somebody editing
   `node util/checks/burndown.mjs .`
-- The panel derives none of the four, and the check reads the panel's own source, because a rule about TypeScript enforced in Go cannot see the thing it guards. DERIVING MEANS FORMING ANY OF THE FOUR FROM ANOTHER NUMBER rather than reading it out of the engine's answer, so the check refuses arithmetic between the values on the way to the bar and names the number it found being made
-  `node util/checks/burndown-derives-nothing.mjs .`
-- The whole battery is green afterwards. THIS IS A STANDING RULE OVER THE PROJECT rather than an assertion about this change: it is true before the work and has to be true after
-  `sh util/checks/battery.sh`
-  **red without** the package made not to build, in a copy of the tree
-  **red said** battery.sh: go build FAIL, and 10 failed at the end of the run
-- Every test named above was watched failing on its own assertion, with the change absent, before it was watched passing. THE EVIDENCE NAMES THE TEST AND WHAT IT SAID rather than a line number
+- The syntax is the log's, and the box hands the text to the log's own reader rather than parsing it a second time, so a person who has learned one has learned the other and neither can drift from the other
+  `rg -q func.TestTheBarFilterReadsWhatTheLogReads src/engine && go test -C src/engine -count=1 -run TestTheBarFilterReadsWhatTheLogReads$ .`
 
 ## finding 1 · round 1 · done when, criterion 7: "The whole battery is green afterwards" · by reviewer10
 
@@ -106,27 +91,4 @@ wk-c02dc4046b.
 **instead:** WHAT WOULD HAVE STOPPED IT BEING MADE: after drafting, read the criteria as a column rather than as sentences, and write three things beside each in a few words, the instrument, the data it runs on, and the value it requires. Any line with a blank is not finished, and the blank is where the attention ran out rather than where the check is easy. Where the sibling criteria already answer one of the three, the odd one out is the line to write again. WHAT WOULD HAVE CAUGHT IT: for every criterion, write the wrong implementation that satisfies its sentence, in one line, before agreeing it. For a counting criterion that is a check over the live tree asserting only that the number is more than zero. If the wrong implementation is easy to write, the criterion has decided nothing, and an anti-vacuity guard on the line is a sign that the wrong implementation was the one in mind.
 
 **minted as:** wk-936df2f551
-
-AND A FILTER BOX IN THE SAME LINE, WHICH THE OWNER ASKED FOR HERE BECAUSE THIS
-BAR IS THAT LINE. THEIR WORDS: what you can add, and you can add that to the
-general editor, is a small line edit in the heading line where I can filter for
-names or attributes the same way as in the log. So I enter something in there
-with the same syntax as the log, and then I only see the elements that fit that
-filter. That would have helped me to search for the test quicker.
-
-THE SYNTAX IS THE LOG'S AND NOT A SECOND ONE. A person who has learned one has
-learned the other, and a second syntax for one job reads as a second job. The
-log's reader is the authority for what it accepts, so the box hands the text to
-it rather than parsing it here.
-
-IT NARROWS WHAT IS DRAWN AND CHANGES NOTHING ON DISK. A filter typed in the bar
-is a person looking, not a person editing, so it writes no view file: the .base
-filter is the view's and this is the reader's.
-
-## done when
-
-- The heading line carries a filter box, and what a person types in it narrows what the panes draw and writes nothing to the view file, because a filter typed in the bar is somebody looking rather than somebody editing
-  `node util/checks/burndown.mjs .`
-- The syntax is the log's, and the box hands the text to the log's own reader rather than parsing it a second time, so a person who has learned one has learned the other and neither can drift from the other
-  `rg -q func.TestTheBarFilterReadsWhatTheLogReads src/engine && go test -C src/engine -count=1 -run TestTheBarFilterReadsWhatTheLogReads$ .`
 

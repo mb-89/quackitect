@@ -46,6 +46,17 @@ func Verbs() []string {
 	return out
 }
 
+// WHAT THE ENGINE DID WITH A CALL, AS A CODE RATHER THAN AS A SENTENCE.
+//
+// A CHECK ASKED WHETHER A REFUSAL WAS WORDED ONE OF THREE WAYS, so rewording
+// one would have turned it green over a command the engine never read. A
+// message is a string somebody will reword and a code is the engine saying
+// which kind of answer this is.
+//
+// ONE IS A REFUSAL ABOUT THE CONTENT, which is a real answer: a token id that
+// does not exist is the engine reading the call and disagreeing with it.
+const Unread = 2
+
 // Stray answers what a verb was handed and will not read.
 func Stray(verb string, left []string) error {
 	if len(left) == 0 {
@@ -66,7 +77,7 @@ func Stray(verb string, left []string) error {
 func parse(fs *flag.FlagSet, verb string, args []string) {
 	_ = fs.Parse(args)
 	if err := Stray(verb, fs.Args()); err != nil {
-		fail(err)
+		failUnread(err)
 	}
 }
 
@@ -79,6 +90,6 @@ func parse(fs *flag.FlagSet, verb string, args []string) {
 func parseFlags() {
 	flag.Parse()
 	if err := Stray("", flag.Args()); err != nil {
-		fail(err)
+		failUnread(err)
 	}
 }

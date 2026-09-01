@@ -3,11 +3,10 @@ id: wk-24be1c06ae
 seq: "-28"
 type: work
 title: a line holds one
-status: spec_in_work
+status: spec_submitted
 assignee: main
 scope: single-step
 traced: true
-holder: main
 rounds: 8
 minted_by: reviewer6
 ---
@@ -149,10 +148,11 @@ reviewer holds the size of the derived set against the size of the declared one
 instead of reading the word every.
 
     one line by design   Criterion.Says, Criterion.Runs, Criterion.Without,
-                         Criterion.Red, Token.GuidanceRef
+                         Criterion.Red
     a block by design    Rejection.Wrong, Rejection.Satisfies, Lesson.Class,
                          Lesson.Avoid, Lesson.Prevents, Lesson.Learned,
-                         Token.Detail, Token.Guidance, and the VALUE of every
+                         Token.Detail, Token.Guidance, Token.GuidanceRef, and
+                         the VALUE of every
                          map of string the note writes as a body section, which
                          is Token.Submission and Token.Rewatched today
     a map's key          one line by design, and it is not a heading: a newline
