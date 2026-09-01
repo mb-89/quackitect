@@ -87,6 +87,10 @@ for (const name of readdirSync(here).filter((f) => f.endsWith(".ts"))) {
 say("the extension starts the engine somewhere", found.length > 0,
   "no spawn was found at all, so this check has nothing to judge and is not doing its job");
 
+// THE BUILDERS engineargs EXPORTS, read before the walk needs them.
+const argsSrc = readFileSync(join(here, "engineargs.ts"), "utf8");
+const exported = new Set([...argsSrc.matchAll(/export function ([A-Za-z_$][\w$]*)/g)].map((m) => m[1]));
+
 // EVERY ONE OF THEM TAKES ITS FLAGS FROM engineargs. A spread of a builder call
 // is what that looks like: [...rotateArgs(), "--work", work]. A bare literal
 // flag in the array is what it does not.
@@ -97,7 +101,7 @@ say("the extension starts the engine somewhere", found.length > 0,
 // quietly minting nothing. Everything else is the builder's.
 for (const one of found) {
   const spread = /\.\.\.\s*[A-Za-z_$][\w$]*/.test(one.args);
-  const wrote = whatItWrites(one.args, one.before);
+  const wrote = whatItWrites(one.args, one.before, exported, doors);
   say(one.where + " sends " + one.args, spread && wrote.length === 0,
     spread
       ? "it writes " + wrote.join(" and ") + " at the call site, and only --work belongs there"
@@ -105,62 +109,91 @@ for (const one of found) {
         + "the flags the engine has. Put them in src/extension/engineargs.ts and spread the builder");
 }
 
-// THE PERMITTED SET, NOT THE FORBIDDEN ONE.
+// THE PERMITTED SET, NOT THE FORBIDDEN ONE, AND AN UNREADABLE ELEMENT IS
+// REFUSED RATHER THAN PASSED.
 //
-// FOUR ROUNDS BOUGHT ONE SHAPE EACH. Seven call sites, then a spawn whose
-// arguments were a bare name, then the converse, then two quote characters, and
-// each widening was exactly what the last finding named. That is a deny list
-// over a set nobody can enumerate: the ways to get a string into an array are
-// unbounded, so a check that hunts them needs a round per shape and is behind
-// after every one.
+// FIVE ROUNDS BOUGHT ONE SHAPE EACH. Seven call sites, then a spawn whose
+// arguments were a bare name, then the converse, then two quote characters,
+// then a variable and a concatenation. Each widening was exactly what the last
+// finding named, because a deny list over a set nobody can enumerate needs a
+// round per shape.
 //
-// WHAT A CALL SITE MAY WRITE IS SHORT AND FINITE. After the spreads are taken
-// out, an element is one of two things: the literal --work, however it is
-// quoted, or a value the caller owns. A value the caller owns is an expression
-// carrying no flag literal, directly or through the name it was given.
+// AND THE ROUND AFTER THAT FOUND THREE MORE, because the check was still a
+// hunter with a longer reach: an element it could not read fell off the end as
+// fine. A spread of a name, a spread of an inline array and a property read all
+// carried a flag past it. AN ALLOW LIST IS A DEFAULT, NOT A MATCHER.
 //
-// SO A VARIABLE, A CONCATENATION, A TEMPLATE AND A QUOTE CHARACTER ARE ONE CASE
-// RATHER THAN FOUR, and a fifth shape nobody has thought of is refused before
-// anybody writes it.
+// SO THE DEFAULT IS REFUSE. An element passes when it MATCHES one of the four
+// shapes below and for no other reason, so a shape nobody has thought of is
+// refused before it is written, and the fix is to write it in a form this can
+// read.
 //
-// A LITERAL BEGINNING WITH A DASH IS A FLAG, WHOLE OR IN PIECES. Asking for
-// --name let "--" + "form" through, because neither half is a flag by itself
-// and the pair is. Anything a call site quotes that opens with a dash is
-// refused, and --work is the one exception. If a value ever has to begin with
-// a dash, name it here with the reason rather than widening this again.
-function whatItWrites(args, before) {
+//   ...builder(...)   a spread of a call to something engineargs exports
+//   ...name           a spread of somebody else's array, inside a door
+//   "--work"          the one flag a call site may write, however quoted
+//   name, a.b         a value carrying no quoted literal of its own
+function whatItWrites(args, before, exported, doors) {
+  // A DOOR MAY FORWARD SOMEBODY ELSE'S ARRAY AND NOTHING ELSE MAY. Which
+  // function the spawn sits in decides that, so it is read here rather than
+  // guessed from the name being spread.
+  const inADoor = Object.keys(doors).some((d) => enclosing(before) === d);
   const inside = args.replace(/^\s*\[/, "").replace(/\]\s*$/, "");
   const wrote = [];
   for (const el of split(inside)) {
     const one = el.trim();
-    if (one === "" || one.startsWith("...")) continue;
-    // THE ONE FLAG A CALL SITE MAY WRITE. Every call ends with the folder
-    // being worked on, the caller is the only thing that knows it, and it is
-    // not a flag that can drift: the engine would stop working entirely
-    // rather than quietly minting nothing.
-    if (/^["'`]--work["'`]$/.test(one)) continue;
-    const found = flagIn(one, before);
-    if (found) wrote.push(found);
+    if (one === "") continue;
+    const why = whyItIsNotAllowed(one, before, exported, inADoor);
+    if (why) wrote.push(why);
   }
   return wrote;
 }
 
-// flagIn answers the flag an element carries, following a bare name back to
-// the nearest assignment above the call, or nothing.
-function flagIn(one, before) {
-  const direct = one.match(/["'`](-[^"'`]*)["'`]/);
-  if (direct) return direct[1];
-  if (/^[A-Za-z_$][\w$]*$/.test(one)) {
-    const gives = new RegExp(
-      "\\b(?:const|let|var)\\s+" + one + "\\s*(?::[^=]*)?=\\s*([^;\\n]+)", "g");
-    const all = [...(before || "").matchAll(gives)];
-    if (all.length) {
-      const was = all[all.length - 1][1];
-      const held = was.match(/["'`](-[^"'`]*)["'`]/);
-      if (held && held[1] !== "--work") return held[1] + " (through " + one + ")";
-    }
+function whyItIsNotAllowed(one, before, exported, inADoor) {
+  // A SPREAD OF A BUILDER CALL, and the builder is one engineargs exports.
+  const call = one.match(/^\.\.\.\s*([A-Za-z_$][\w$]*)\s*\(/);
+  if (call) {
+    return exported.has(call[1]) ? ""
+      : call[1] + " is spread here and src/extension/engineargs.ts does not export it";
   }
-  return "";
+  // A SPREAD OF SOMEBODY ELSE'S ARRAY, which only a door may do. Anywhere
+  // else it is an array this check cannot read, and one of those carried a
+  // flag past every round of this.
+  const pass = one.match(/^\.\.\.\s*([A-Za-z_$][\w$]*)\s*$/);
+  if (pass) {
+    return inADoor ? ""
+      : "..." + pass[1] + " spreads an array this check cannot read, and only a door may forward one";
+  }
+  if (/^\.\.\./.test(one)) {
+    return "a spread of something this check cannot read: " + one;
+  }
+  // THE ONE FLAG A CALL SITE MAY WRITE. Every call ends with the folder being
+  // worked on, the caller is the only thing that knows it, and it cannot
+  // drift: the engine would stop working rather than quietly minting nothing.
+  if (/^["'`]--work["'`]$/.test(one)) return "";
+  // A VALUE THE CALLER OWNS: a name, a property read, or a call, carrying no
+  // quoted literal of its own and none through the name it was given.
+  if (/^[A-Za-z_$][\w$.?]*(\([^()]*\))?$/.test(one)) {
+    const held = throughTheName(one, before);
+    return held ? held + " reaches the call site through " + one : "";
+  }
+  return "this check cannot read " + one + ", so it is refused rather than passed";
+}
+
+// enclosing answers the name of the function the call sits in.
+function enclosing(before) {
+  const all = [...(before || "").matchAll(/(?:^|\n)(?:async )?function ([A-Za-z_$][\w$]*)\s*\(/g)];
+  return all.length ? all[all.length - 1][1] : "";
+}
+
+// throughTheName answers the quoted literal a bare name was given, if any.
+function throughTheName(one, before) {
+  if (!/^[A-Za-z_$][\w$]*$/.test(one)) return "";
+  const gives = new RegExp(
+    "\b(?:const|let|var)\s+" + one + "\s*(?::[^=]*)?=\s*([^;\n]+)", "g");
+  const all = [...(before || "").matchAll(gives)];
+  if (!all.length) return "";
+  const held = all[all.length - 1][1].match(/["'`](-[^"'`]*)["'`]/);
+  return held ? held[1] : "";
 }
 
 // split takes an array's elements apart at the commas that are not inside
@@ -189,8 +222,6 @@ function split(text) {
 
 
 // AND THE BUILDERS IT SPREADS ARE REAL ONES. A call site could spread anything.
-const argsSrc = readFileSync(join(here, "engineargs.ts"), "utf8");
-const exported = new Set([...argsSrc.matchAll(/export function ([A-Za-z_$][\w$]*)/g)].map((m) => m[1]));
 say("engineargs exports builders", exported.size > 5,
   "it exports " + exported.size + ", so this check could pass by the builders having gone");
 for (const one of found) {
