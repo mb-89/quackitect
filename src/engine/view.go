@@ -549,22 +549,36 @@ func Render(b Base, v View, rows []Row) (Table, error) {
 	// one does not change that: the pin carries the filter and the file never
 	// declares it.
 	rest := kept
-	take := func(e *Expr) ([]Row, error) {
-		var mine, others []Row
-		for _, r := range rest {
+
+	// A QUERY ASKS EVERY ROW AND TAKES NOTHING AWAY.
+	//
+	// THE OWNER'S RULING. A group declared by a filter is a query, and a query
+	// is a question asked of every row rather than a place a row lives, so it
+	// overlaps other queries and it overlaps the bucket a person put the row
+	// in. An item can be found by a query and be in a user defined group at
+	// the same time.
+	//
+	// WHAT THE PARTITION COST. here was declared as one state and claimed those
+	// rows first, so a group for that state below it could never draw anything:
+	// three rows under here, no group for the state, and no way to have both.
+	// The rows a query matches are still grouped below by their bucket.
+	ask := func(e *Expr) ([]Row, error) {
+		var mine []Row
+		for _, r := range kept {
 			ok, err := truthy(e, r)
 			if err != nil {
 				return nil, err
 			}
 			if ok {
 				mine = append(mine, r)
-			} else {
-				others = append(others, r)
 			}
 		}
-		rest = others
 		return mine, nil
 	}
+
+	// A GROUP THE DATA MADE, PINNED WITH ITS OWN FILTER, IS STILL A QUERY. It
+	// asks the same way, and the grouping below draws the row as well.
+	take := ask
 
 	// THE FILE'S ORDER DECIDES WHO TAKES A ROW, AND A PIN DOES NOT.
 	//

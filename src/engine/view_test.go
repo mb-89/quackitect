@@ -191,7 +191,7 @@ func TestAViewFileRefusesWhatItCannotDraw(t *testing.T) {
 
 // PINNED GROUPS ARE A PARTITION. A row goes to the first one that matches and
 // is not repeated below, so the top is not a second copy of the same rows.
-func TestPinnedGroupsTakeTheirRowsOutOfTheGrouping(t *testing.T) {
+func TestAQueryTakesNoRowOutOfTheGrouping(t *testing.T) {
 	p := writeBase(t, t.TempDir(), "z.base", `
 views:
   - name: left
@@ -225,17 +225,20 @@ views:
 	if len(tab.Pinned) != 2 || tab.Pinned[0].Count != 1 {
 		t.Fatalf("pinned %v", tab.Pinned)
 	}
-	// The second pin has the same filter and gets nothing, because the first
-	// one already took the row.
-	if tab.Pinned[1].Count != 0 {
-		t.Fatalf("a row landed in two pinned groups")
+	// THE SECOND QUERY ASKS THE SAME QUESTION AND GETS THE SAME ANSWER.
+	// Under the partition it got nothing, because the first had taken the
+	// row. A query takes nothing away, so two queries that agree agree.
+	if tab.Pinned[1].Count != 1 {
+		t.Fatalf("two queries with one filter answered %d and %d",
+			tab.Pinned[0].Count, tab.Pinned[1].Count)
 	}
-	// What is left groups by the computed level: one bucket, one status.
+	// AND THE GROUPING DRAWS EVERY ROW, not what the queries left. One
+	// bucket and one status, with all three rows between them.
 	names := map[string]int{}
 	for _, g := range tab.Groups {
 		names[g.Name] = g.Count
 	}
-	if names["later"] != 1 || names["open"] != 1 || len(names) != 2 {
+	if names["later"] != 1 || names["open"] != 2 || len(names) != 2 {
 		t.Fatalf("the grouping is %v", names)
 	}
 	// The level says what a drop would write, because a computed level cannot
@@ -429,10 +432,11 @@ views:
 	if tab.Groups[0].Count != 2 {
 		t.Fatalf("mine holds %d rows", tab.Groups[0].Count)
 	}
-	// AND THE DECLARED ONES TAKE THEIR ROWS FIRST, so nothing is left for the
-	// grouping to make a group out of.
-	if len(tab.Groups) != 1 {
-		t.Fatalf("a row appeared twice: %v", names(tab.Groups))
+	// AND THE GROUPING DRAWS THOSE ROWS TOO, because a query takes nothing
+	// away. Under the partition this asserted the opposite, that nothing was
+	// left for the grouping to make a group out of.
+	if len(tab.Groups) < 2 {
+		t.Fatalf("the query took the rows out of the grouping: %v", names(tab.Groups))
 	}
 }
 
@@ -484,9 +488,11 @@ views:
 		t.Fatalf("an unpinned functional group drew at zero: %v", groups)
 	}
 
-	// One row for it, and it is back.
+	// One row for it, and it is back. THE GROUPING DRAWS THAT ROW AS WELL,
+	// because a query takes nothing away, so this asks whether mine is among
+	// the groups rather than whether it is the only one.
 	pinned, groups = draw(row("id", "1", "assignee", "main", "title", "a"))
-	if len(groups) != 1 || groups[0] != "mine" {
+	if !contains(groups, "mine") {
 		t.Fatalf("it did not come back: %v", groups)
 	}
 	if len(pinned) != 1 || pinned[0] != "yours" {
@@ -556,7 +562,13 @@ views:
 //
 // The owner's rule is that the moment its function produces more than zero it
 // shows again, and this is the case that broke it.
-func TestAPinDoesNotDecideWhoTakesARow(t *testing.T) {
+// A PIN IS AN ORDERING AND A QUERY IS A QUESTION.
+//
+// Getting this wrong hid a group forever under the partition: yours is a subset
+// of here, and here was declared second, so unpinning yours let here take every
+// row yours would have had. It then had none, and none is what hides it. Under
+// queries neither takes anything, and the pin decides only where a group draws.
+func TestAPinDecidesOrderAndNotMembership(t *testing.T) {
 	write := func(pins string) Base {
 		p := writeBase(t, t.TempDir(), "z.base", `
 views:
@@ -603,7 +615,10 @@ views:
 	if g := find(tab, "yours"); g == nil || g.Count != 1 {
 		t.Fatalf("yours is %v", g)
 	}
-	if g := find(tab, "here"); g == nil || g.Count != 1 {
+	// BOTH PINNED, AND BOTH ANSWER. yours matches one row and here matches
+	// both. Under the partition here answered one, because yours was declared
+	// first and had taken the row they share.
+	if g := find(tab, "here"); g == nil || g.Count != 2 {
 		t.Fatalf("here is %v", g)
 	}
 
@@ -710,4 +725,79 @@ views:
 	if len(b.Views[1].Pinned) != 1 || b.Views[1].Pinned[0].Name != "mine" {
 		t.Fatalf("the declaring view's pins are %v", b.Views[1].Pinned)
 	}
+}
+
+// A QUERY IS A QUESTION ASKED OF EVERY ROW, NOT A PLACE A ROW LIVES.
+//
+// THE OWNER'S RULING: the groups that are not defined by a user defined bucket
+// are queries, and they can overlap with user defined groups, and the queries
+// can also overlap with themselves, and an item could be found by a query and
+// at the same time be in a user defined group.
+//
+// WHAT THE PARTITION COST. here was declared as one state and claimed those
+// rows first, so a group for that state below it could never draw anything.
+// The owner read three rows under here where the queue held nine, and saw no
+// group for the state at all. Under the partition there was no way to have both.
+func TestARowIsInEveryQueryThatMatchesIt(t *testing.T) {
+	p := writeBase(t, t.TempDir(), "z.base", `
+views:
+  - name: left
+    order:
+      - title
+    groupBy:
+      - property: bucket
+        sets: bucket
+    groups:
+      - name: yours
+        filter: assignee == "human"
+      - name: here
+        filter: status == "open"
+`)
+	b, err := LoadBase(p)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// ONE ROW THAT BOTH QUERIES MATCH, AND IT SITS IN A BUCKET.
+	rows := []Row{
+		row("id", "1", "assignee", "human", "status", "open", "bucket", "later", "title", "a"),
+	}
+	tab, err := Render(b, b.Views[0], rows)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, want := range []string{"yours", "here"} {
+		found := false
+		for _, g := range append(append([]Group{}, tab.Pinned...), tab.Groups...) {
+			if g.Name == want && g.Count == 1 {
+				found = true
+			}
+		}
+		if !found {
+			t.Errorf("the row matches the query %q and it is not drawn there", want)
+		}
+	}
+	// AND IT IS STILL IN ITS BUCKET, which is where it actually lives.
+	if !inABucketNamed(tab, "later") {
+		t.Errorf("the row is in the bucket later and the grouping drew it nowhere")
+	}
+}
+
+// inABucketNamed answers whether the grouping drew a row under that key.
+func inABucketNamed(tab Table, name string) bool {
+	var walk func([]Group) bool
+	walk = func(gs []Group) bool {
+		for _, g := range gs {
+			if g.Declared {
+				continue
+			}
+			if g.Name == name && (g.Count > 0 || len(g.Lines) > 0) {
+				return true
+			}
+			if walk(g.Groups) {
+				return true
+			}
+		}
+		return false
+	}
+	return walk(tab.Groups)
 }

@@ -243,7 +243,16 @@ if (tick) {
     const kids = [...wrap.querySelectorAll("tr[data-id]")]
       .filter((r) => Number(r.dataset.depth || 0) > 0);
     say("a child is drawn deeper than its parent", kids.length > 0);
-    say("and the child is drawn once", new Set(kids.map((r) => r.dataset.id)).size === kids.length);
+    // ONCE INSIDE ITS GROUP, AND NOT ONCE ON THE PAGE. A group declared by a
+    // filter is a query now, so a row is drawn under every query that matches
+    // it and under its bucket as well, and a page-wide count of ids was the
+    // partition rule asserted from the outside.
+    const twiceInOne = [...wrap.querySelectorAll("section.group")].some((sec) => {
+      const ids = [...sec.querySelectorAll(":scope > .rows > table tr[data-id]")]
+        .map((r) => r.dataset.id);
+      return new Set(ids).size !== ids.length;
+    });
+    say("and the child is drawn once inside its group", !twiceInOne);
 
     const fold = parent.querySelector(".kid-fold");
     say("the parent carries a fold", !!fold);

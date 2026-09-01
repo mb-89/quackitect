@@ -378,7 +378,7 @@ function groupHtml(g: Group, cols: string[], t: Table): string {
   return `<section class="group${g.pinned ? " pinned" : ""}${g.shut ? " shut" : ""}"
     data-key="${esc(key)}" style="--depth:${g.depth}"${drop}>
   <h2><span class="fold">${g.shut ? icon("shut") : icon("open")}</span>
-    <span class="name">${esc(g.name || "no group")}</span>
+    <span class="name">${g.declared ? "q/" : ""}${esc(g.name || "no group")}</span>
     <span class="count">${g.count}</span>${pin}</h2>
   <div class="rows">
     <table>${rows}</table>

@@ -146,11 +146,13 @@ const want = [
   }],
   ["the marks the table gives are on the page", (h) =>
     ["\u{1F4CC}", "▾", "⇅", "◫"].every((g) => h.includes(g))],
-  // A DECLARED GROUP IS DRAWN WITH NOTHING IN IT. yours filters on an assignee
-  // no token carries, so it is the empty one, and a heading that came and went
-  // is a heading nobody can aim at.
-  ["a declared group draws with no rows", (h) =>
-    /<span class="name">yours<\/span>\s*<span class="count">0<\/span>/.test(h)],
+  // A DECLARED GROUP DRAWN AT ZERO IS ASSERTED IN GO, in
+  // TestAPinnedFunctionalGroupIsDrawnEvenWithNoRows, where a fixture is
+  // free. It used to be asserted here, over the live tree, and it passed
+  // only while one particular group happened to be empty: a check whose
+  // red depends on the data it reads goes quiet as the data changes.
+  // What this page can decide is the mapping below, which holds for any
+  // count.
   // And it pins by its name alone, because the file already holds its filter.
   ["a declared group pins by its name", /class="pin" data-pin="backlogged" title=/],
 
@@ -198,6 +200,26 @@ const want = [
 
   ["a draggable row", /<tr draggable="true" data-id="wk-/],
   ["the pinned group named", /class="group pinned"/],
+  // A QUERY SAYS IT IS ONE, AND A BUCKET DOES NOT. A group declared by a
+  // filter is a question asked of every row; a bucket is where a row lives.
+  // The page says which without a legend, and both kinds are on it, so the
+  // second half of this cannot pass by there being no buckets to draw.
+  // A QUERY SAYS IT IS ONE AND A BUCKET DOES NOT, and the mapping is held
+  // against the table rather than against the page alone: every group the
+  // engine marks declared draws with q slash before its name, and every
+  // group the data made draws with its own name. The check refuses when
+  // the table holds no groups, so it cannot pass by there being none.
+  ["a query draws q slash and a bucket does not", (h) => {
+    const flat = [];
+    const walk = (gs) => (gs || []).forEach((g) => { flat.push(g); walk(g.groups); });
+    for (const p of panes) { walk(p.table.pinned); walk(p.table.groups); }
+    if (flat.length === 0) return false;
+    const drawn = [...h.matchAll(/<span class="name">([^<]*)<\/span>/g)].map((m) => m[1]);
+    return flat.every((g) => {
+      const want = (g.declared ? "q/" : "") + (g.name || "no group");
+      return drawn.includes(want);
+    });
+  }],
 ];
 const say2 = (what, ok, extra) => {
   if (!ok) bad++;
