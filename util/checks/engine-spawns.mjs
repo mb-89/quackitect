@@ -189,7 +189,7 @@ function enclosing(before) {
 function throughTheName(one, before) {
   if (!/^[A-Za-z_$][\w$]*$/.test(one)) return "";
   const gives = new RegExp(
-    "\b(?:const|let|var)\s+" + one + "\s*(?::[^=]*)?=\s*([^;\n]+)", "g");
+    "\\b(?:const|let|var)\\s+" + one + "\\s*(?::[^=]*)?=\\s*([^;\\n]+)", "g");
   const all = [...(before || "").matchAll(gives)];
   if (!all.length) return "";
   const held = all[all.length - 1][1].match(/["'`](-[^"'`]*)["'`]/);
