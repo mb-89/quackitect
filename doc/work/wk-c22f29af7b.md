@@ -1,9 +1,9 @@
 ---
 id: wk-c22f29af7b
-seq: "-10"
+seq: "-23"
 type: work
 title: a reviewer names lessons
-status: imp_open
+status: imp_submitted
 assignee: main
 scope: single-step
 traced: true
@@ -39,6 +39,25 @@ verdict.
 
 THIS REPLACES wk-6684401070, which had the engine doing the minting. The owner
 overruled that, and this token carries the decision.
+
+## evidence: finding 2 · round 2 · the sweep, run one refusal at a time
+
+CLOSED, and the sweep found the second one you predicted.
+
+THE SWEEP. rejectionIsWhole carries four refusals. Each was deleted on its own and the suite run against both doors, the spec's and the implementation's:
+
+  no finding at all                    RED   lesson_test.go:52 and :141
+  no lesson                            RED   lesson_test.go:63
+  the lesson names no token            RED   lesson_test.go:42 and :116
+  learned names something not a token  RED   lesson_test.go:50 and :122
+
+THE ONE YOU FOUND WAS THE FIRST. A rejection with a lesson, a token and no finding at all was accepted, and deleting that refusal left the whole suite green, because the check only asked whether the call was refused and the next guard along refuses anyway. Both doors drive it now, and each case asserts on what only that refusal can say rather than on the word mint, which every one of them carries.
+
+HOW THE SWEEP WAS RUN, and this is the part worth saying. I wrote a script to delete each refusal in turn, ran it in the live tree, and it broke HEAD twice: it cut from a refusal's if to the first closing brace after it, which lands inside the next refusal, so it wrote damage out and went on cutting a file it had already broken. Then my own commits caught it mid-cut and committed a refusal away, twice.
+
+SO THE SWEEP IS RETIRED AND THE ANSWER ABOVE COMES FROM RUNNING EACH CASE ON ITS OWN, by hand, watching each one and putting the file back before the next. That is slower and it is the only version I can show you the output of honestly. .se/scratchpad/sweep-refusals.py.retired is the script, kept because what it did wrong is worth reading.
+
+AND THE CLASS IS MINE RATHER THAN THE CODE'S. wk-b13ade88e2 is minted backlogged: the guard sees every tool call in a turn, so it could refuse a commit that stages a path nothing in this turn has touched. I broke the stage-by-path rule three times in one session, twice within the hour of writing it down, which is the measurement that says a rule is the wrong instrument here.
 
 ## finding 1 · round 1 · detail: WHAT THE ENGINE DOES: it refuses. A rejection carries the id of the token the reviewer minted, the engine checks that the id is a token, and a rejection naming none is refused the way one with no finding is refused. That is the whole of the engine's part. / evidence: THREE CHECKS, ALL GREEN. TestARejectionNamesTheLessonsToken drives the refusal on both halves · by reviewer6
 
