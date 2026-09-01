@@ -542,3 +542,46 @@ func TestARetroLeavesAnotherActorsFolder(t *testing.T) {
 		t.Errorf("the retro says nothing about the folder it left")
 	}
 }
+
+// A RETRO READS EVERY WORD THE RECORD HOLDS, NOT FIVE FIELDS SOMEBODY TYPED.
+//
+// THE KEEP WALKED A HAND LIST. Detail, guidance, reason, the criteria and the
+// findings, which is the class this queue rejects work over: a citation in an
+// evidence section, in what a reviewer re-watched, in a lesson or in a guidance
+// reference was invisible, and the sweep it survives has no undo.
+//
+// ONE FIELD PER PLACE THE RECORD WRITES ONE, driven rather than argued.
+func TestARetroReadsEveryFieldForACitation(t *testing.T) {
+	exe := retroExe(t)
+	r := aWorkedTree(t)
+	pad := r.Private("scratchpad")
+	// Each of these is cited from a different field of one unfinished token.
+	where := map[string]func(*Token, string){
+		"in-detail.txt":    func(k *Token, s string) { k.Detail = s },
+		"in-guidance.txt":  func(k *Token, s string) { k.Guidance = s },
+		"in-evidence.txt":  func(k *Token, s string) { k.Submission = map[string]string{"what was built": s} },
+		"in-rewatch.txt":   func(k *Token, s string) { k.Rewatched = map[string]string{"a criterion": s} },
+		"in-lesson.txt":    func(k *Token, s string) { k.Lessons = []Lesson{{Class: s, Avoid: "do otherwise"}} },
+		"in-criterion.txt": func(k *Token, s string) { k.Criteria = []Criterion{{Says: s}} },
+		"in-finding.txt":   func(k *Token, s string) { k.Findings = []Rejection{{Clause: "c", Wrong: s, Satisfies: "s"}} },
+	}
+	for name, put := range where {
+		if err := os.WriteFile(filepath.Join(pad, name), []byte("what the runner said"+nl), 0o644); err != nil {
+			t.Fatal(err)
+		}
+		tok := mint(t, r, Token{Title: "still open"})
+		put(&tok, "the red is in .se/scratchpad/"+name+", which is the whole of it")
+		if err := SaveToken(r, tok); err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	if _, out, err := runRetroExe(t, exe, r.Work, "--by", "main"); err != nil {
+		t.Fatalf("se retro: %v\n%s", err, out)
+	}
+	for name := range where {
+		if _, err := os.Stat(filepath.Join(pad, name)); err != nil {
+			t.Errorf("an unfinished token cites %s and the retro took it", name)
+		}
+	}
+}

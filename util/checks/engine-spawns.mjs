@@ -79,7 +79,8 @@ for (const name of readdirSync(here).filter((f) => f.endsWith(".ts"))) {
         ? assigned[assigned.length - 1][1]
         : "(named " + args + ", and nothing above it gives that name an array)";
     }
-    found.push({ where: name + ":" + line, args: args.replace(/\s+/g, " ") });
+    found.push({ where: name + ":" + line, args: args.replace(/\s+/g, " "),
+                 before: text.slice(0, m.index) });
   }
 }
 
@@ -96,20 +97,96 @@ say("the extension starts the engine somewhere", found.length > 0,
 // quietly minting nothing. Everything else is the builder's.
 for (const one of found) {
   const spread = /\.\.\.\s*[A-Za-z_$][\w$]*/.test(one.args);
-  const own = one.args.replace(/\.\.\.\s*[A-Za-z_$][\w$]*\s*(\([^)]*\))?/g, "");
-  // EVERY SPELLING THE LANGUAGE HAS FOR ONE LITERAL. This matched a double
-  // quote alone, so the owner's own defect passed when it was written with
-  // single quotes or in a template literal: the guard written to catch
-  // --form was green over --form, one quote character along. Nothing in the
-  // tree makes the double quote a rule, there is no linter config here, so
-  // the check was resting on a habit.
-  const literalFlag = [...own.matchAll(/["'`](--[a-z-]+)["'`]/g)].map((m) => m[1]).filter((f) => f !== "--work");
-  say(one.where + " sends " + one.args, spread && literalFlag.length === 0,
+  const wrote = whatItWrites(one.args, one.before);
+  say(one.where + " sends " + one.args, spread && wrote.length === 0,
     spread
-      ? "it writes " + literalFlag.join(" and ") + " at the call site, and only --work belongs there"
+      ? "it writes " + wrote.join(" and ") + " at the call site, and only --work belongs there"
       : "it writes the engine's flags at the call site, so nothing reads them against "
         + "the flags the engine has. Put them in src/extension/engineargs.ts and spread the builder");
 }
+
+// THE PERMITTED SET, NOT THE FORBIDDEN ONE.
+//
+// FOUR ROUNDS BOUGHT ONE SHAPE EACH. Seven call sites, then a spawn whose
+// arguments were a bare name, then the converse, then two quote characters, and
+// each widening was exactly what the last finding named. That is a deny list
+// over a set nobody can enumerate: the ways to get a string into an array are
+// unbounded, so a check that hunts them needs a round per shape and is behind
+// after every one.
+//
+// WHAT A CALL SITE MAY WRITE IS SHORT AND FINITE. After the spreads are taken
+// out, an element is one of two things: the literal --work, however it is
+// quoted, or a value the caller owns. A value the caller owns is an expression
+// carrying no flag literal, directly or through the name it was given.
+//
+// SO A VARIABLE, A CONCATENATION, A TEMPLATE AND A QUOTE CHARACTER ARE ONE CASE
+// RATHER THAN FOUR, and a fifth shape nobody has thought of is refused before
+// anybody writes it.
+//
+// A LITERAL BEGINNING WITH A DASH IS A FLAG, WHOLE OR IN PIECES. Asking for
+// --name let "--" + "form" through, because neither half is a flag by itself
+// and the pair is. Anything a call site quotes that opens with a dash is
+// refused, and --work is the one exception. If a value ever has to begin with
+// a dash, name it here with the reason rather than widening this again.
+function whatItWrites(args, before) {
+  const inside = args.replace(/^\s*\[/, "").replace(/\]\s*$/, "");
+  const wrote = [];
+  for (const el of split(inside)) {
+    const one = el.trim();
+    if (one === "" || one.startsWith("...")) continue;
+    // THE ONE FLAG A CALL SITE MAY WRITE. Every call ends with the folder
+    // being worked on, the caller is the only thing that knows it, and it is
+    // not a flag that can drift: the engine would stop working entirely
+    // rather than quietly minting nothing.
+    if (/^["'`]--work["'`]$/.test(one)) continue;
+    const found = flagIn(one, before);
+    if (found) wrote.push(found);
+  }
+  return wrote;
+}
+
+// flagIn answers the flag an element carries, following a bare name back to
+// the nearest assignment above the call, or nothing.
+function flagIn(one, before) {
+  const direct = one.match(/["'`](-[^"'`]*)["'`]/);
+  if (direct) return direct[1];
+  if (/^[A-Za-z_$][\w$]*$/.test(one)) {
+    const gives = new RegExp(
+      "\\b(?:const|let|var)\\s+" + one + "\\s*(?::[^=]*)?=\\s*([^;\\n]+)", "g");
+    const all = [...(before || "").matchAll(gives)];
+    if (all.length) {
+      const was = all[all.length - 1][1];
+      const held = was.match(/["'`](-[^"'`]*)["'`]/);
+      if (held && held[1] !== "--work") return held[1] + " (through " + one + ")";
+    }
+  }
+  return "";
+}
+
+// split takes an array's elements apart at the commas that are not inside
+// something else. A regular expression cannot do this and get nesting right.
+function split(text) {
+  const out = [];
+  let depth = 0, quote = "", at = 0;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (quote) {
+      if (c === "\\") i++;
+      else if (c === quote) quote = "";
+      continue;
+    }
+    if (c === '"' || c === "'" || c === "`") quote = c;
+    else if (c === "(" || c === "[" || c === "{") depth++;
+    else if (c === ")" || c === "]" || c === "}") depth--;
+    else if (c === "," && depth === 0) {
+      out.push(text.slice(at, i));
+      at = i + 1;
+    }
+  }
+  out.push(text.slice(at));
+  return out;
+}
+
 
 // AND THE BUILDERS IT SPREADS ARE REAL ONES. A call site could spread anything.
 const argsSrc = readFileSync(join(here, "engineargs.ts"), "utf8");

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"reflect"
 	"sort"
 	"strings"
 	"time"
@@ -137,8 +138,15 @@ func Retro(r Roots, actor string, transcripts map[string]string) (Collected, err
 			got.Kept = append(got.Kept, name+": an unfinished token names it by path")
 			return false
 		}
+		// A FOLDER, AND WHOEVER OWNS IT MAY BE WRITING TO IT.
+		//
+		// THE INDEX SAYS WHAT THE CODE KNOWS. This kept every directory and
+		// wrote that it was another actor's, which the condition never asks:
+		// the scratchpad holds a folder called pinrt and nothing says that is
+		// an actor. The keep is right and wider than an actor list, so the
+		// sentence is widened to match rather than the keep narrowed.
 		if isDir(filepath.Join(pad, name)) && name != actor {
-			got.Kept = append(got.Kept, name+": another actor's folder, and they may be writing to it")
+			got.Kept = append(got.Kept, name+": a folder, and whoever owns it may be writing to it")
 			return false
 		}
 		return true
@@ -184,20 +192,61 @@ func citedInOpenWork(r Roots) map[string]bool {
 		if t.Status.Ended() {
 			continue
 		}
-		said := []string{t.Detail, t.Guidance, t.Reason}
-		for _, c := range t.Criteria {
-			said = append(said, c.Says, c.Runs, c.Without, c.Red)
-		}
-		for _, f := range t.Findings {
-			said = append(said, f.Wrong, f.Satisfies)
-		}
-		for _, one := range said {
+		for _, one := range everyWordOn(reflect.ValueOf(t)) {
 			for _, name := range scratchpadNames(one) {
 				kept[name] = true
 			}
 		}
 	}
 	return kept
+}
+
+// everyWordOn answers every string the record writes for this value, asking
+// the type rather than reading a list.
+//
+// A HAND LIST OF FIELDS IS EXACTLY THE SIZE OF WHAT SOMEBODY HAPPENED TO THINK
+// OF. This read five: the detail, the guidance, the reason, the criteria and
+// the findings. A citation in an evidence section, in what a reviewer
+// re-watched, or in a lesson was invisible, and the sweep it survives has no
+// undo. The record grows a field every few days and the walk grew none.
+//
+// IT FOLLOWS WHAT THE NOTE WRITES: strings, structs, slices of structs and
+// maps of string, which is the same boundary wk-24be1c06ae draws over the
+// parser, so the two agree by construction rather than by anybody checking.
+func everyWordOn(v reflect.Value) []string {
+	var out []string
+	switch v.Kind() {
+	case reflect.String:
+		out = append(out, v.String())
+	case reflect.Struct:
+		for i := 0; i < v.NumField(); i++ {
+			if v.Type().Field(i).PkgPath != "" {
+				continue // unexported, so the note never writes it
+			}
+			out = append(out, everyWordOn(v.Field(i))...)
+		}
+	case reflect.Slice, reflect.Map:
+		for _, k := range keysOrIndexes(v) {
+			out = append(out, everyWordOn(k)...)
+		}
+	}
+	return out
+}
+
+// keysOrIndexes answers the values inside a slice or a map, and a map's keys
+// as well, because the note writes a key into a heading.
+func keysOrIndexes(v reflect.Value) []reflect.Value {
+	var out []reflect.Value
+	if v.Kind() == reflect.Map {
+		for _, k := range v.MapKeys() {
+			out = append(out, k, v.MapIndex(k))
+		}
+		return out
+	}
+	for i := 0; i < v.Len(); i++ {
+		out = append(out, v.Index(i))
+	}
+	return out
 }
 
 // WHERE A CITATION ENDS. A path in prose is followed by punctuation or by
