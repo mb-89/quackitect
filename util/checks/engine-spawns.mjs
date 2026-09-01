@@ -80,7 +80,7 @@ for (const name of readdirSync(here).filter((f) => f.endsWith(".ts"))) {
         : "(named " + args + ", and nothing above it gives that name an array)";
     }
     found.push({ where: name + ":" + line, args: args.replace(/\s+/g, " "),
-                 before: text.slice(0, m.index) });
+                 before: text.slice(0, m.index), whole: text });
   }
 }
 
@@ -101,7 +101,7 @@ const exported = new Set([...argsSrc.matchAll(/export function ([A-Za-z_$][\w$]*
 // quietly minting nothing. Everything else is the builder's.
 for (const one of found) {
   const spread = /\.\.\.\s*[A-Za-z_$][\w$]*/.test(one.args);
-  const wrote = whatItWrites(one.args, one.before, exported, doors);
+  const wrote = whatItWrites(one.args, one.before, one.whole, exported, doors);
   say(one.where + " sends " + one.args, spread && wrote.length === 0,
     spread
       ? "it writes " + wrote.join(" and ") + " at the call site, and only --work belongs there"
@@ -132,7 +132,7 @@ for (const one of found) {
 //   ...name           a spread of somebody else's array, inside a door
 //   "--work"          the one flag a call site may write, however quoted
 //   name, a.b         a value carrying no quoted literal of its own
-function whatItWrites(args, before, exported, doors) {
+function whatItWrites(args, before, whole, exported, doors) {
   // A DOOR MAY FORWARD SOMEBODY ELSE'S ARRAY AND NOTHING ELSE MAY. Which
   // function the spawn sits in decides that, so it is read here rather than
   // guessed from the name being spread.
@@ -142,13 +142,13 @@ function whatItWrites(args, before, exported, doors) {
   for (const el of split(inside)) {
     const one = el.trim();
     if (one === "") continue;
-    const why = whyItIsNotAllowed(one, before, exported, inADoor);
+    const why = whyItIsNotAllowed(one, before, whole, exported, inADoor);
     if (why) wrote.push(why);
   }
   return wrote;
 }
 
-function whyItIsNotAllowed(one, before, exported, inADoor) {
+function whyItIsNotAllowed(one, before, whole, exported, inADoor) {
   // A SPREAD OF A BUILDER CALL, and the builder is one engineargs exports.
   const call = one.match(/^\.\.\.\s*([A-Za-z_$][\w$]*)\s*\(/);
   if (call) {
@@ -181,36 +181,84 @@ function whyItIsNotAllowed(one, before, exported, inADoor) {
   // all through.
   //
   // IT ANSWERS ONE OF THREE THINGS NOW, and only the middle one passes.
-  const said = whatItResolvesTo(one, before, 0);
+  const said = whatItResolvesTo(one, before, whole, 0);
   if (said === "clean") return "";
   return said + ", so it cannot stand as a value the caller owns";
 }
 
 // whatItResolvesTo answers a flag, or clean, or why it could not tell.
 //
-// A NAME IS FOLLOWED TO WHAT IT WAS GIVEN, and so is the object of a property
-// read and the callee of a call, because a flag can be one hop away in any of
-// the three. A chain is followed to a small depth rather than forever.
-function whatItResolvesTo(one, before, depth) {
+// CLEAN IS EARNED, NOT ASSUMED. This once answered a flag when it found one,
+// followed a bare name, and returned clean for everything else, so nothing
+// found was read as no flag one level in: a call returning a flag, an object
+// property read through a name, and an array index all walked past it. The
+// element already had three answers and the resolver kept two.
+//
+// SO IT RETURNS CLEAN ONLY WHEN IT FOLLOWED THE ASSIGNMENT TO SOMETHING IT
+// COULD READ AND FOUND NO FLAG. Everything else says what it could not do, in
+// the same words a spread it cannot read gets, so a call site is told to write
+// the value in a form the check can read rather than left to guess.
+//
+// THE SHAPES IT CAN FOLLOW, which is a list rather than a default: a quoted
+// literal, a bare name followed onward, an object or an array literal read for
+// a dash literal, a property read or an index resolved through its object, and
+// a call whose function this file declares.
+function whatItResolvesTo(one, before, whole, depth) {
   if (depth > 5) return "this check will not follow " + one + " any further";
-  const name = one.match(/^([A-Za-z_$][\w$]*)\s*(?:\.[\w$]+|\([^()]*\))?$/);
+  const name = one.match(/^([A-Za-z_$][\w$]*)\s*(?:[.[][^\]]*\]?|\([^()]*\))?$/);
   if (!name) return "this check cannot read " + one;
   const gives = new RegExp(
     "\\b(?:const|let|var)\\s+" + name[1] + "\\s*(?::[^=]*)?=\\s*([^;\\n]+)", "g");
   const all = [...(before || "").matchAll(gives)];
   if (!all.length) {
-    // NOT FOUND IS NOT CLEAN. A name this check cannot follow is a name it
-    // cannot vouch for, and vouching for it is what let three forms past.
     return "nothing above the call gives " + name[1] + " a value this check can read";
   }
-  const was = all[all.length - 1][1];
+  return whatThisIs(all[all.length - 1][1].trim(), before, whole, depth);
+}
+
+// whatThisIs classifies what a name was given.
+function whatThisIs(was, before, whole, depth) {
+  // A QUOTED LITERAL OPENING WITH A DASH IS A FLAG, whole or in pieces.
   const held = was.match(/["'`](-[^"'`]*)["'`]/);
-  if (held) return held[1] + " reaches the call site through " + one;
-  // A NAME GIVEN ANOTHER NAME IS FOLLOWED, because the flag can be one more
-  // hop away. const a = "--form" and const b = a is two hops.
-  const onward = was.trim().match(/^[A-Za-z_$][\w$]*$/);
-  if (onward) return whatItResolvesTo(was.trim(), before, depth + 1);
-  return "clean";
+  if (held) return held[1] + " reaches the call site through it";
+  // AN OBJECT OR AN ARRAY LITERAL IS READ WHOLE, because a flag inside one is
+  // a flag however it is taken out again.
+  if (was.startsWith("{") || was.startsWith("[")) return "clean";
+  // A NAME IS FOLLOWED, and so is a property read or an index through its
+  // object, because the flag can be one more hop away in any of them.
+  const onward = was.match(/^([A-Za-z_$][\w$]*)\s*(?:[.[][^\]]*\]?)?$/);
+  if (onward) return whatItResolvesTo(onward[1], before, whole, depth + 1);
+  // A CALL IS FOLLOWED TO THE FUNCTION THIS FILE DECLARES, read over the
+  // WHOLE file rather than the text above the call, because the one that
+  // vouches for work is declared below the spawns that use it.
+  const call = was.match(/^([A-Za-z_$][\w$]*)\s*\(/);
+  if (call) {
+    const body = bodyOf(whole, call[1]);
+    if (body === null) {
+      return "nothing in this file declares " + call[1] + ", so this check cannot "
+        + "say what it answers";
+    }
+    const inside = body.match(/["'`](-[^"'`]*)["'`]/);
+    return inside ? inside[1] + " comes back from " + call[1] + "()" : "clean";
+  }
+  return "this check cannot read the value it was given, " + was;
+}
+
+// bodyOf answers a function's body, or nothing when the file declares none.
+function bodyOf(text, name) {
+  const at = text.search(new RegExp("(?:^|\\n)(?:async )?function " + name + "\\s*\\("));
+  if (at < 0) return null;
+  const open = text.indexOf("{", at);
+  if (open < 0) return null;
+  let depth = 0, i = open;
+  for (; i < text.length; i++) {
+    if (text[i] === "{") depth++;
+    else if (text[i] === "}") {
+      depth--;
+      if (depth === 0) break;
+    }
+  }
+  return text.slice(open, i);
 }
 
 // enclosing answers the name of the function the call sits in.
@@ -219,16 +267,6 @@ function enclosing(before) {
   return all.length ? all[all.length - 1][1] : "";
 }
 
-// throughTheName answers the quoted literal a bare name was given, if any.
-function throughTheName(one, before) {
-  if (!/^[A-Za-z_$][\w$]*$/.test(one)) return "";
-  const gives = new RegExp(
-    "\\b(?:const|let|var)\\s+" + one + "\\s*(?::[^=]*)?=\\s*([^;\\n]+)", "g");
-  const all = [...(before || "").matchAll(gives)];
-  if (!all.length) return "";
-  const held = all[all.length - 1][1].match(/["'`](-[^"'`]*)["'`]/);
-  return held ? held[1] : "";
-}
 
 // split takes an array's elements apart at the commas that are not inside
 // something else. A regular expression cannot do this and get nesting right.
