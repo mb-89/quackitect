@@ -3,7 +3,7 @@ id: wk-40ae28cd1a
 seq: 1000020
 type: work
 title: a reclaim strands specs
-status: spec_open
+status: spec_submitted
 assignee: main
 scope: single-step
 traced: true

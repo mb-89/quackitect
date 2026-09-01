@@ -3,7 +3,7 @@ id: wk-2fb5bf5bb1
 seq: 1000015
 type: work
 title: a lesson prevents
-status: spec_open
+status: spec_submitted
 assignee: main
 scope: single-step
 traced: true
