@@ -33,6 +33,7 @@ var run = map[string]func([]string){
 	"move":  runMove,
 	"lint":  runLint,
 	"hold":  runHold,
+	"retro": runRetro,
 }
 
 // Verbs answers every verb this program has, in order.

@@ -660,3 +660,33 @@ func runMove(args []string) {
 			"rewritten": len(out.Rewritten), "unrewritten": out.UnrewritN})
 	answerJSON(out)
 }
+
+// se retro - collect everything a retro needs into one folder, and drain it.
+func runRetro(args []string) {
+	fs := flag.NewFlagSet("retro", flag.ExitOnError)
+	fs.SetOutput(os.Stdout)
+	fs.Usage = func() {
+		fmt.Fprintln(os.Stdout, "se retro - collect the record and the scratchpad into one folder, and drain them.")
+		fmt.Fprintln(os.Stdout, "")
+		fmt.Fprintln(os.Stdout, "  se retro                 collect, and answer where it put them")
+		fmt.Fprintln(os.Stdout, "")
+		fmt.Fprintln(os.Stdout, "It rotates the log first, so the session that is running is in the retro.")
+		fmt.Fprintln(os.Stdout, "It refuses while anybody else holds work, because a sweep has no undo.")
+		fmt.Fprintln(os.Stdout, "")
+		fs.PrintDefaults()
+	}
+	work := fs.String("work", "", "the folder being worked on (default: this one)")
+	by := fs.String("by", "main", "who is running it. Their own held work does not stop them")
+	parse(fs, "retro", args)
+
+	roots, err := FindRoots(*work)
+	if err != nil {
+		fail(err)
+	}
+	got, err := Retro(roots, *by, Transcripts(roots))
+	if err != nil {
+		answerJSON(map[string]any{"error": err.Error()})
+		os.Exit(1)
+	}
+	answerJSON(got)
+}

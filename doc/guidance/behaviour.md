@@ -144,6 +144,11 @@ Put it in `.se/scratchpad/`. Write it in something the engine told you this mach
 has. We read the ones you write, and the ones that earn it become part of the
 method.
 
+THE STANDING CHECKS ARE NOT THERE. They live in `util/checks/`, which is in
+version control, so a worktree gets them and a retro that drains the scratchpad
+cannot take the thing that judges the next submission. A script that earns its
+place moves there, and one written for one afternoon stays in the scratchpad.
+
 You may spawn a scribe for reading and for writing that you have fully
 specified. A scribe exists to burn context so that you do not. Mint a
 sub-token and assign it to the scribe.
