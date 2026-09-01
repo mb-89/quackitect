@@ -222,3 +222,60 @@ func projectionTargets(t *testing.T, root, source string) []string {
 	}
 	return out
 }
+
+// A HERE-DOC BODY IS DATA, NOT COMMANDS.
+//
+// The guard splits a command into statements and reads each one. A here-doc's
+// body sits between << and its terminator and is written to a file or piped to
+// a program, so a script that CONTAINS a recursive search was refused although
+// nothing was searched.
+//
+// THE COST OF THE FALSE POSITIVE IS THE REASON. Refusing a permitted case sends
+// somebody looking for a workaround, and a rule people work around is a rule
+// that stops being read. Writing a script about the guard is exactly the case
+// the guard should leave alone, and it is the one I met while writing this.
+//
+// THE SEARCH IS ASSEMBLED so this file does not carry the refused words, which
+// the guard would refuse on the way in.
+func TestAHereDocBodyIsNotCommands(t *testing.T) {
+	recursive := "g" + "rep -rn LoadConfig src"
+	allowed := []string{
+		"cat > x.sh <<'EOF'\n" + recursive + "\nEOF",
+		"cat > x.sh <<EOF\n" + recursive + "\nEOF",
+		"cat <<'END' > x.md\nuse " + recursive + " to look\nEND",
+		// A body with the terminator inside a word is still the body.
+		"cat > x.sh <<'EOF'\n" + recursive + "\nEOFISH\nEOF",
+		// AND THE SEARCH AFTER THAT WORD IS STILL INSIDE IT. A match that only
+		// asked whether the line started with the terminator would end the body
+		// at EOFISH and refuse what follows.
+		"cat > x.sh <<'EOF'\nEOFISH\n" + recursive + "\nEOF",
+		// The dash form, which lets the terminator be indented.
+		"cat > x.sh <<-EOF\n" + recursive + "\n\tEOF",
+	}
+	for _, cmd := range allowed {
+		if why, yes := ARecursiveSearch(cmd, Tool{Name: "rg", Path: "rg"}); yes {
+			t.Errorf("a here-doc that writes a search was refused:\n%s\n  %s", cmd, why)
+		}
+	}
+	// AND A SEARCH OUTSIDE THE BODY IS STILL REFUSED, before it and after it.
+	refused := []string{
+		recursive + "\ncat > x.sh <<'EOF'\nhello\nEOF",
+		"cat > x.sh <<'EOF'\nhello\nEOF\n" + recursive,
+		// A LINE THAT MERELY STARTS WITH THE TERMINATOR DOES NOT END THE BODY,
+		// so the search after the real terminator is outside it. A loose match
+		// would end the body at EOFISH and let this through.
+		"cat > x.sh <<'EOF'\nhello\nEOFISH\nEOF\n" + recursive,
+		// A HERE-STRING HAS NO BODY, so nothing after it is skipped. Treating
+		// <<< as an opener would swallow the rest of the command.
+		"tr a-z A-Z <<< hello\n" + recursive,
+	}
+	for _, cmd := range refused {
+		if _, yes := ARecursiveSearch(cmd, Tool{Name: "rg", Path: "rg"}); !yes {
+			t.Errorf("a search outside a here-doc body was allowed:\n%s", cmd)
+		}
+	}
+	// A COMMAND WITH NO HERE-DOC IS UNTOUCHED.
+	if _, yes := ARecursiveSearch(recursive, Tool{Name: "rg", Path: "rg"}); !yes {
+		t.Error("an ordinary recursive search was allowed")
+	}
+}

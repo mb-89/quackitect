@@ -41,7 +41,7 @@ The sentence says what has to be true. The command decides it. When the two
 drift apart the command still exits zero, so the gate opens on a sentence
 nobody checked, and the token closes carrying a claim that is false.
 
-Five shapes of the drift, each found on a real token here.
+The shapes of the drift, each found on a real token here.
 
 BORROWED. The command was copied from a neighbouring token and still names that
 token's deliverable. It passes because the neighbour is finished. Read every
@@ -79,6 +79,20 @@ A LIVE FACT DEMOTED TO PROSE. The engine runs a command criterion once, at the
 submission gate, so it reads the world at the moment of submission. That is
 exactly the instrument a live fact wants. Prose is for a fact no program can
 decide, and not for one that changes.
+
+A SNAPSHOT TAKEN AFTER THE WORK HAS STARTED. Pinning a one-time assertion to
+what existed is right, and taking that pin late is how it goes wrong. The set is
+frozen after part of it has already been settled, so the token closes showing
+every verdict it owes and owing fewer than it did. Every criterion then agrees
+with itself.
+
+MEASURED. A backlog pass froze thirteen ids. Four more had been settled by the
+same token eight minutes earlier and were gone from the live list by the time it
+was written down. The set owed seventeen.
+
+TAKE THE PIN FROM THE COMMIT THE WORK STARTED AT, not from disk, because disk is
+now. Where part of the set is not in version control, read that part off disk
+and say in the token which part that is and why it will not show in a diff.
 
 A ONE-TIME ASSERTION WRITTEN AS A STANDING RULE. The opposite mistake, and it
 looks the same on the page. A criterion asserting something about the project's

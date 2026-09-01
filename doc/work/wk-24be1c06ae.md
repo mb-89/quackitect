@@ -1,13 +1,14 @@
 ---
 id: wk-24be1c06ae
-seq: "78"
+seq: 78
 type: work
 title: a line holds one
-status: spec_open
+status: spec_in_work
 assignee: main
 scope: single-step
 traced: true
-rounds: "2"
+holder: main
+rounds: 2
 minted_by: reviewer6
 ---
 

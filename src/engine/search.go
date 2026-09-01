@@ -116,7 +116,7 @@ func readsATree(args []string) bool {
 var separators = []string{"\r\n", "\n", "\r", "&&", "||", "|", ";", "&"}
 
 func pipeline(command string) []string {
-	parts := []string{command}
+	parts := []string{withoutHereDocs(command)}
 	for _, sep := range separators {
 		var next []string
 		for _, p := range parts {
@@ -125,4 +125,55 @@ func pipeline(command string) []string {
 		parts = next
 	}
 	return parts
+}
+
+// withoutHereDocs answers the command with every here-doc body taken out.
+//
+// A HERE-DOC BODY IS DATA AND NOT COMMANDS. It sits between << and its
+// terminator and is written to a file or piped to a program, so a script that
+// CONTAINS a recursive search was refused although nothing was searched.
+//
+// THE COST OF THE FALSE POSITIVE IS THE REASON. Refusing a permitted case sends
+// somebody looking for a workaround, and a rule people work around stops being
+// read. Writing a script about the guard is exactly the case the guard should
+// leave alone.
+//
+// THE TERMINATOR IS THE WHOLE LINE, trimmed. A body line reading EOFISH does
+// not end a body opened with EOF.
+func withoutHereDocs(command string) string {
+	lines := strings.Split(command, nl)
+	var out []string
+	end := ""
+	for _, line := range lines {
+		if end != "" {
+			if strings.TrimSpace(line) == end {
+				end = ""
+			}
+			continue
+		}
+		out = append(out, line)
+		if at := strings.Index(line, "<<"); at >= 0 {
+			end = hereDocEnd(line[at+2:])
+		}
+	}
+	return strings.Join(out, nl)
+}
+
+// hereDocEnd answers the terminator a here-doc opener names, or nothing.
+//
+// The word after << is the terminator, with a leading dash, quotes or a
+// backslash taken off, and anything after it on the line ignored.
+func hereDocEnd(after string) string {
+	after = strings.TrimSpace(after)
+	after = strings.TrimPrefix(after, "-")
+	after = strings.TrimSpace(after)
+	if after == "" || strings.HasPrefix(after, "<") {
+		return "" // << with nothing, or a <<< here-string, which has no body
+	}
+	word := strings.Fields(after)[0]
+	word = strings.Trim(word, "\"'\\")
+	if word == "" {
+		return ""
+	}
+	return word
 }

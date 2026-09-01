@@ -23,7 +23,7 @@ A CHECK BUILT AFTER THE WORK, FROM THE WORK, CANNOT GO RED. It asserts what the
 fix happens to produce, so it confirms what you have already done and can never
 contradict you. A check nobody has seen fail is a check nobody has tested.
 
-Four shapes it takes, and they are one mistake:
+The shapes it takes, and they are one mistake:
 
 A check that names something nothing writes. One tested for a class name that
 appears nowhere and passed with the defect on screen.

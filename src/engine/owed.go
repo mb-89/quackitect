@@ -333,7 +333,7 @@ func forgetGrace(r Roots, actor string) error {
 // IT IS TAKEN OUT RATHER THAN FORGIVEN. A notice that became an obligation and
 // then had its grace spent is still an obligation nobody can clear. What a
 // person typed under the notice is still theirs, so only the notice goes.
-var editorNotice = regexp.MustCompile(`(?s)<ide_[a-z_]+>.*?</ide_[a-z_]+>`)
+var editorNotice = regexp.MustCompile(`(?s)<(ide_[a-z_]+|task-notification|system-reminder)>.*?</(ide_[a-z_]+|task-notification|system-reminder)>`)
 
 // TheyReallyAsked answers what a person actually said, or nothing when the
 // message was the editor talking.
