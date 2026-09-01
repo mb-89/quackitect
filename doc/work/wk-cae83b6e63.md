@@ -3,7 +3,7 @@ id: wk-cae83b6e63
 seq: 1000017
 type: work
 title: a reviewer repairs trivia
-status: spec_open
+status: spec_submitted
 assignee: main
 scope: single-step
 traced: true
@@ -38,8 +38,13 @@ four are claims about the record rather than instructions to a worker.
 WHAT MAY NOT, AND THE ENGINE HOLDS THIS RATHER THAN THE REVIEWER REMEMBERING IT.
 A criterion, a command, a detail's claim, and any file under src or util. Those
 are the work, and a reviewer that edits the work stops being a second pair of
-eyes. A repair naming a path outside doc/work is refused, which is a rule a
-program can apply and a rule a tired reviewer cannot forget.
+eyes.
+
+FOUR MEMBERS AND FOUR REFUSALS, NOT ONE. A path outside doc/work is the cheapest
+to catch and it is the one a reviewer is least likely to trip: the repair a
+reviewer actually makes is inside a note, and rewriting a criterion there passes
+every path rule there is. So the engine reads what a repair touched inside the
+note as well as which file it named, and the refusal says which member it was.
 
 THE FIRST THING THE RULE WILL BE USED ON is already standing.
 TestEveryRedSaidResolves, written this session on wk-2b78b911b1, requires every
@@ -52,7 +57,7 @@ carries it.
 
 - A verdict carries repairs, each one saying what it changed, where, and why that changes nothing that runs, and the engine writes each to the note in its own section so a reader sees what the reviewer changed and not only what it refused
   `rg -q func.TestARepairIsRecordedOnTheToken src/engine && go test -C src/engine -count=1 -run TestARepairIsRecordedOnTheToken$ .`
-- A repair naming anything outside doc/work is refused, and the refusal names the path and says a reviewer repairs the record and not the work. THE ENGINE HOLDS THE LINE, because a rule a reviewer has to remember is a rule that lasts until the round somebody is tired
+- EVERY MEMBER OF THE FORBIDDEN SET IS REFUSED, AND THE SET IS THE ONE THE DETAIL NAMES: a path outside doc/work, a criterion, a command, and a claim in a detail. The check drives one repair per member and requires the refusal to name which member it was, rather than deciding one and agreeing three. A REPAIR UNDER doc/work THAT REWRITES A CRITERION IS THE CASE THE PATH RULE CANNOT SEE, and it is the one a reviewer is most likely to make
   `rg -q func.TestARepairOutsideTheRecordIsRefused src/engine && go test -C src/engine -count=1 -run TestARepairOutsideTheRecordIsRefused$ .`
 - That refusal is asserted on what only it can say, and it has a case of its own because it stands beside the refusals for a missing finding, a missing lesson and a lesson naming no token: the case deletes that one refusal with the other three left standing and requires the verdict to come back ACCEPTED rather than merely refused by something else
   `rg -q func.TestOnlyTheRepairRefusalCanSayIt src/engine && go test -C src/engine -count=1 -run TestOnlyTheRepairRefusalCanSayIt$ .`

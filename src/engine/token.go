@@ -75,6 +75,15 @@ func States() []Status {
 		ImpOpen, ImpInWork, ImpSubmitted, ImpInReview, ImpDone, Aborted}
 }
 
+// Drafting answers whether a token is in the spec half of the machine, which is
+// where a draft is being written or read rather than work being done.
+//
+// ONE PLACE, BECAUSE THE HALVES WERE TESTED BY NAMING THEIR MEMBERS. A test for
+// spec_open or spec_in_work is a hand list of two over a half that has four.
+func (s Status) Drafting() bool {
+	return s == SpecOpen || s == SpecInWork || s == SpecSubmitted || s == SpecInReview
+}
+
 // Ended answers whether a token has stopped, either way.
 func (s Status) Ended() bool { return s == ImpDone || s == Aborted }
 

@@ -3,7 +3,7 @@ id: wk-24be1c06ae
 seq: "-28"
 type: work
 title: a line holds one
-status: spec_submitted
+status: imp_open
 assignee: main
 scope: single-step
 traced: true
@@ -169,6 +169,29 @@ instead of reading the word every.
                          Token.Successors, Token.Evidence.Sections
     not on the page      Criterion.Ran, Lesson.Token
 
+WHAT WAS RUN TO PUT EACH ROW WHERE IT IS, recorded by reviewer12 at round 8 in a
+copy of src/engine outside this tree, with the linesThatFit refusal taken out of
+SaveToken so the format could answer for itself.
+
+    one line by design   a two-line value through all four: Says, Without and
+                         Red came back as their first line, and Runs came back
+                         empty, because the closing backtick is on a later line
+    Token.GuidanceRef    a two-line value came back byte-identical, and one
+                         carrying a line that opens a section came back as its
+                         first line with the tail landing in Token.Detail, which
+                         is the block signature and is why it moved
+    into a heading       the middle dot through all three: Rejection.By came
+                         back cut with its tail in the clause, Rejection.Clause
+                         came back as the half after the dot, and Lesson.By came
+                         back as the half before it
+    a map's key          the middle dot came back whole in a Submission key and
+                         in a Rewatched key, and a newline cut each key with its
+                         tail moved into the value
+    in the frontmatter   a Reason of two lines, one opening a section, one
+                         carrying a fence and one carrying a key all came back
+                         byte-identical, with Title, Assignee and Detail
+                         untouched
+
 A ROW FOR THE KIND AND NOT FOR THE MEMBER, where there is a kind. Every map of
 string the note writes as a body section is one row, because the last round
 answered the member a finding named and never asked what kind it was, and the
@@ -227,6 +250,10 @@ TWO CHARACTERS, NAMED SEPARATELY, because one word for both was ambiguous. THE
 SECTION OPENER is the two hashes and a space that begin a heading line, and it
 is what truncates a block. THE HEADING SEPARATOR is the middle dot that joins a
 clause to its round and its author, and it is what a clause cannot carry.
+
+## re-watched: A field that is one line by design carrying a newline is refused when the token is saved, and the refusal names the field and which criterion it is on. THE SET INCLUDES A MAP'S KEYS, because a newline in one is cut and its tail moves into the value, and the refusal names which map and which key
+
+without the linesThatFit refusal, and I copied src/engine into a scratch package outside this tree, took that refusal out of SaveToken, and drove a two-line value through every member of the row rather than through the one the last finding named. Criterion.Says came back as first line, Criterion.Without and Criterion.Red came back the same way, and Criterion.Runs came back empty, because the closing backtick sits on a later line. Then the map half, which is what this criterion added: a Submission key of key, newline, tail came back as the key key holding tail, a blank line, and then the value, and a Rewatched key behaved identically. Token.GuidanceRef came back byte-identical as first line, newline, second line, which is why it is no longer on this row, and I moved that reading into the detail beside the table.
 
 ## done when
 

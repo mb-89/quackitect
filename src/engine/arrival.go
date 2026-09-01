@@ -203,6 +203,47 @@ func Reclaim(r Roots, actor, role string) []string {
 	return back
 }
 
+// WHICH STATES A PULL HANDS OUT, AND WHICH ONE SOMEBODY IS ALREADY HOLDING.
+//
+// ONE ANSWER, BECAUSE IT WAS WRITTEN OUT THREE TIMES IN THREE SHAPES. pull.go
+// tested for spec_open or spec_in_work where it picks a draft, countQueue wrote
+// the whole set again for both roles, and a view file typed two of them into a
+// filter. Nothing said they were one set, so a twelfth state would have joined
+// some of them and not others.
+//
+// TWO HALVES, THE SAME FOUR VERBS. A worker is handed what is open and holds
+// what is in work. A reviewer is handed what is submitted and holds what is in
+// review.
+func HandedOut(role string) []Status {
+	if role == RoleReviewer {
+		return []Status{ImpSubmitted, SpecSubmitted}
+	}
+	return []Status{ImpOpen, SpecOpen}
+}
+
+// containsStatus answers whether a set holds a state.
+func containsStatus(all []Status, one Status) bool {
+	for _, s := range all {
+		if s == one {
+			return true
+		}
+	}
+	return false
+}
+
+// HeldBy answers the states this role is already working, which is the other
+// half of what an actor can be in on a queue.
+func HeldBy(role string) []Status {
+	var out []Status
+	for _, s := range States() {
+		if to, held := whereItGoesBack[s]; held && heldBy[s] == role {
+			_ = to
+			out = append(out, s)
+		}
+	}
+	return out
+}
+
 // THE FOUR STATES SOMEBODY HOLDS, AND WHERE EACH GOES BACK TO.
 //
 // TWO HALVES, THE SAME FOUR VERBS. This answered for one half, so a drafter or

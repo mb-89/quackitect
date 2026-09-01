@@ -3,10 +3,11 @@ id: wk-40ae28cd1a
 seq: 1000020
 type: work
 title: a reclaim strands specs
-status: spec_submitted
+status: spec_in_review
 assignee: main
 scope: single-step
 traced: true
+holder: reviewer12
 rounds: 2
 minted_by: main
 ---

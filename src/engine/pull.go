@@ -260,7 +260,7 @@ func settle(r Roots, actor, role string, p Payload) (Answer, bool) {
 		}
 		return judge(r, actor, t, p)
 	}
-	if t.Status == SpecOpen || t.Status == SpecInWork {
+	if t.Status.Drafting() {
 		return submitSpec(r, actor, t, p)
 	}
 	return submit(r, actor, t, p)

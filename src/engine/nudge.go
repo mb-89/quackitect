@@ -75,22 +75,16 @@ func Nudge(r Roots, actor, role string) string {
 func countQueue(r Roots, actor, role string) (int, bool, string) {
 	waiting, busy := 0, false
 	for _, t := range Tokens(r) {
-		if role == RoleReviewer {
-			if t.Status == ImpSubmitted || t.Status == SpecSubmitted {
-				waiting++
-			}
-			if (t.Status == ImpInReview || t.Status == SpecInReview) && t.Holder == actor {
-				busy = true
-			}
+		// WHICH STATES COUNT IS THE ENGINE'S ONE ANSWER. This wrote the
+		// whole set out again, for both roles, so a twelfth state would have
+		// joined the pull and not the count.
+		if role != RoleReviewer && t.Assignee != actor {
 			continue
 		}
-		if t.Assignee != actor {
-			continue
-		}
-		if t.Status == ImpOpen || t.Status == SpecOpen {
+		if containsStatus(HandedOut(role), t.Status) {
 			waiting++
 		}
-		if (t.Status == ImpInWork || t.Status == SpecInWork) && t.Holder == actor {
+		if containsStatus(HeldBy(role), t.Status) && t.Holder == actor {
 			busy = true
 		}
 	}
