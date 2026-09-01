@@ -409,14 +409,7 @@ func rejectionIsWhole(r Roots, p Payload) *Rejection {
 		return &Rejection{Clause: "the rejection",
 			Wrong:     "a rejection with no finding tells the worker nothing",
 			Satisfies: "at least one finding, with clause, wrong and satisfies"}
-	}
-	if p.Lesson.Empty() {
-		return &Rejection{Clause: "the lesson",
-			Wrong: "a rejection with no lesson teaches this token and nothing after it. " +
-				"One token took five rounds because every round fixed the instance and left the class standing",
-			Satisfies: "a lesson naming the class of mistake and what to do instead"}
-	}
-	// AND THE LESSON HAS A TOKEN, MINTED BY WHOEVER JUDGED IT.
+	}	// AND THE LESSON HAS A TOKEN, MINTED BY WHOEVER JUDGED IT.
 	//
 	// A lesson that is only a sentence on a note is a sentence somebody has to
 	// remember to act on. The reviewer mints it, because which class a finding
@@ -429,6 +422,11 @@ func rejectionIsWhole(r Roots, p Payload) *Rejection {
 				"has to remember to act on",
 			Satisfies: "mint a token for the lesson with se work, backlogged or open as " +
 				"you judge, and name its id in learned"}
+	}
+	if _, err := LoadToken(r, p.Learned); err != nil {
+		return &Rejection{Clause: "the lesson",
+			Wrong:     "learned names " + p.Learned + ", which is not a token: " + err.Error(),
+			Satisfies: "the id of a token you minted for the lesson"}
 	}
 	return nil
 }

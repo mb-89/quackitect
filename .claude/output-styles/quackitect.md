@@ -409,6 +409,22 @@ TWO RULES OUT OF ONE INCIDENT. Stage by path, so what you commit is what you
 wrote. And put a defect back in a worktree of your own rather than in the tree
 somebody else is committing, which is the other half of the same collision.
 
+IT HAPPENED AGAIN, TO ME, WITH THE SAME HAND. The second time there was no other
+agent: a sweep of my own was running in the background, putting a refusal back
+one at a time, and I ran `git add -A src/` between two of its cuts. A refusal was
+committed away, the tree went red, and the commit message named a different
+subject entirely.
+
+SO THE RULE IS NOT ABOUT OTHER AGENTS. Anything that edits and restores is
+another writer, including your own background job. Stage the paths you edited,
+by name, and check `git status` before you commit rather than after somebody
+finds the hole.
+
+AND A SCRIPT THAT EDITS SOURCE CHECKS ITS OWN RESTORE. Read the file back after
+putting it right, compare it with what you saved, and stop the run if they
+differ. The sweep that caused this cut into the middle of a refusal, wrote the
+damage out, and went on cutting a file it had already broken.
+
 A WORKTREE IS CHEAP AND THE COLLISION IS NOT. git worktree add gives an isolated
 checkout at the commit under test, the tests run in it, and nothing anybody else
 does can land in the middle of an injection.
