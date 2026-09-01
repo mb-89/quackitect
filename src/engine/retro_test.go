@@ -585,3 +585,46 @@ func TestARetroReadsEveryFieldForACitation(t *testing.T) {
 		}
 	}
 }
+
+// A CITATION IS RECOGNISED HOWEVER THE PATH WAS SPELLED.
+//
+// THE KEEP READ ONE SEPARATOR AND THE SWEEP IT GUARDS HAS NO UNDO. This machine
+// is Windows: a path pasted out of a shell, an error message or an editor is
+// written with backslashes, and a citation in that form was invisible, so the
+// file went out from under an open token.
+//
+// COUNTED BEFORE CLAIMING AN EXTENT: 140 citations in the record use the
+// forward slash and none uses the backslash, so nothing is at risk today. That
+// is what makes it worth doing now. The claim is true, the check is green, and
+// nothing marks the boundary, so the first note written the other way joins the
+// record with the keep silent over it.
+//
+// THE COST OF EVERY OTHER FINDING ON THIS TOKEN IS A ROUND. The cost of this
+// one is a file nobody can get back.
+func TestARetroReadsACitationHoweverItIsSpelled(t *testing.T) {
+	exe := retroExe(t)
+	r := aWorkedTree(t)
+	pad := r.Private("scratchpad")
+	for _, one := range []struct{ name, cited string }{
+		{"back-slashed.txt", ".se\\scratchpad\\back-slashed.txt"},
+		{"absolute.txt", "C:\\Users\\somebody\\work\\.se\\scratchpad\\absolute.txt"},
+		{"forward.txt", ".se/scratchpad/forward.txt"},
+	} {
+		if err := os.WriteFile(filepath.Join(pad, one.name), []byte("what it said"+nl), 0o644); err != nil {
+			t.Fatal(err)
+		}
+		tok := mint(t, r, Token{Title: "still open",
+			Detail: "the red is in " + one.cited + ", which is the whole of it"})
+		if err := SaveToken(r, tok); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if _, out, err := runRetroExe(t, exe, r.Work, "--by", "main"); err != nil {
+		t.Fatalf("se retro: %v\n%s", err, out)
+	}
+	for _, name := range []string{"back-slashed.txt", "absolute.txt", "forward.txt"} {
+		if _, err := os.Stat(filepath.Join(pad, name)); err != nil {
+			t.Errorf("an unfinished token cites %s and the retro took it", name)
+		}
+	}
+}

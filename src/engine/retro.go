@@ -255,6 +255,11 @@ var breaksACitation = " \t\n\r\"'`,;)]"
 
 // scratchpadNames answers the entry under .se/scratchpad each citation names.
 func scratchpadNames(said string) []string {
+	// A PATH IS A PATH HOWEVER IT WAS SPELLED. This machine writes a
+	// backslash, so a citation pasted out of a shell, an error message or an
+	// editor carries one, and reading a single spelling made those invisible
+	// to a sweep with no undo. An absolute path carries them too.
+	said = strings.ReplaceAll(said, string(rune(92)), "/")
 	var out []string
 	const lead = ".se/scratchpad/"
 	for at := 0; ; {

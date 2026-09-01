@@ -374,7 +374,7 @@ func judgeSpec(r Roots, actor string, t Token, p Payload) (Answer, bool) {
 		if f := somethingWasRewatched(t, p, "the draft"); f != nil {
 			return refuse(&t, *f), true
 		}
-		t.Rewatched = p.Rewatched
+		t.Rewatched = alsoWatched(t.Rewatched, p.Rewatched)
 		t.Status, t.Holder = ImpOpen, ""
 		if err := SaveToken(r, t); err != nil {
 			return refuse(&t, Rejection{Clause: "the record", Wrong: err.Error(),
@@ -423,6 +423,21 @@ func rejectionIsWhole(r Roots, p Payload) *Rejection {
 				"One token took five rounds because every round fixed the instance and left the class standing",
 			Satisfies: "a lesson naming the class of mistake and what to do instead"}
 	}
+	// AND IT SAYS WHAT WOULD HAVE STOPPED THE MISTAKE BEING MADE, which is a
+	// different sentence from what would have caught it.
+	//
+	// THE OWNER ASKED FOR IT BY NAME. What would have helped to just not make
+	// that mistake? A lesson that ships only the catching half teaches the
+	// more expensive of the two: detection is read by somebody already
+	// suspicious, and a prevention is read by somebody who has not started.
+	if trimmed(p.Lesson.Prevents) == "" {
+		return &Rejection{Clause: "the lesson",
+			Wrong: "this lesson says how the mistake would be caught and not what would have " +
+				"prevented it. Those are different sentences, and the second is the one a " +
+				"worker reads before they start",
+			Satisfies: "prevents, saying the practice that would have stopped it being made, " +
+				"which is what somebody does before the mistake rather than after it"}
+	}
 	// AND THE LESSON HAS A TOKEN, MINTED BY WHOEVER JUDGED IT.
 	//
 	// A lesson that is only a sentence on a note is a sentence somebody has to
@@ -469,7 +484,7 @@ func judge(r Roots, actor string, t Token, p Payload) (Answer, bool) {
 		if f := somethingWasRewatched(t, p, "this token"); f != nil {
 			return refuse(&t, *f), true
 		}
-		t.Rewatched = p.Rewatched
+		t.Rewatched = alsoWatched(t.Rewatched, p.Rewatched)
 		if t.Disposition == NoDisposition {
 			t.Disposition = Done
 		}
@@ -596,6 +611,36 @@ func somethingWasRewatched(t Token, p Payload, half string) *Rejection {
 			"none was re-watched. The worker's red proves the check can fail. Yours "+
 			"proves it is still the check that guards the behaviour", half, owed),
 		Satisfies: "rewatched, keyed by the criterion, saying what you took away and what it said"}
+}
+
+// alsoWatched adds what this reviewer watched to what an earlier one did.
+//
+// TWO ACCEPTANCES, TWO OBSERVATIONS, ONE FIELD. A draft is agreed by one
+// reviewer and the work by another, and an assignment made the second erase the
+// first, or erase it with nothing when the second sent none. The record then
+// lost the very thing the gate was built to keep, silently.
+//
+// A SECOND LOOK AT THE SAME CRITERION IS KEPT BESIDE THE FIRST, because they
+// were taken at different moments and each says something the other cannot: one
+// before the work and one after it.
+func alsoWatched(had, said map[string]string) map[string]string {
+	if len(said) == 0 {
+		return had
+	}
+	if had == nil {
+		had = map[string]string{}
+	}
+	for k, v := range said {
+		if trimmed(v) == "" {
+			continue
+		}
+		if was := trimmed(had[k]); was != "" && was != trimmed(v) {
+			had[k] = had[k] + nl + nl + v
+			continue
+		}
+		had[k] = v
+	}
+	return had
 }
 
 func refuse(t *Token, f Rejection) Answer {

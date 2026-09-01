@@ -536,3 +536,53 @@ var (
 	guardName  = regexp.MustCompile(`rg -q func.(\w+)`)
 	runnerName = regexp.MustCompile(`-run (\w+)\$`)
 )
+
+// A SECOND ACCEPTANCE ADDS TO WHAT THE FIRST WATCHED AND DOES NOT ERASE IT.
+//
+// TWO ACCEPTANCES AND ONE ASSIGNMENT. Both paths wrote t.Rewatched =
+// p.Rewatched, so the spec reviewer's observation was overwritten by whatever
+// the implementation reviewer sent, or by nothing at all when it sent none.
+//
+// THE RECORD LOSES THE THING THE GATE WAS BUILT TO KEEP, and it loses it
+// silently, which is the class this queue has a token open about.
+func TestAnAcceptanceKeepsWhatAnEarlierOneWatched(t *testing.T) {
+	r := guidanceTree(t)
+	watched := Criterion{Says: "the suite passes", Runs: "exit 0",
+		Without: "the fix", Red: "TestTheSuite: it said the suite is red"}
+	tok, err := Mint(r, Token{Title: "a thing to build", Assignee: "main",
+		Scope: SingleStep, Status: SpecOpen, Detail: "what the problem is",
+		MintedBy: "person", Criteria: []Criterion{watched}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	Pull(r, "main", RoleWorker, Payload{})
+	Pull(r, "main", RoleWorker, Payload{ID: tok.ID})
+	Pull(r, "specrev", RoleReviewer, Payload{})
+	a := Pull(r, "specrev", RoleReviewer, Payload{ID: tok.ID, Verdict: "accept",
+		Rewatched: map[string]string{watched.Says: "at the draft: TestTheSuite says that"}})
+	if a.Pull == AnswerRefused {
+		t.Fatalf("the draft was refused: %v", a.Findings)
+	}
+
+	// THE WORK LANDS AND A SECOND REVIEWER ACCEPTS IT.
+	Pull(r, "main", RoleWorker, Payload{})
+	Pull(r, "main", RoleWorker, Payload{ID: tok.ID, Disposition: string(Done)})
+	Pull(r, "imprev", RoleReviewer, Payload{})
+	a = Pull(r, "imprev", RoleReviewer, Payload{ID: tok.ID, Verdict: "accept",
+		Rewatched: map[string]string{watched.Says: "after the work: I put the fix back and it said it again"}})
+	if a.Pull == AnswerRefused {
+		t.Fatalf("the work was refused: %v", a.Findings)
+	}
+
+	now, err := LoadToken(r, tok.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	said := now.Rewatched[watched.Says]
+	if !strings.Contains(said, "at the draft") {
+		t.Errorf("the spec reviewer's observation is gone: %q", said)
+	}
+	if !strings.Contains(said, "after the work") {
+		t.Errorf("the second reviewer's observation is not there: %q", said)
+	}
+}
