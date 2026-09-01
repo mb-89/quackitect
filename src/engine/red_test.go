@@ -302,3 +302,82 @@ func TestADraftWhoseCriteriaCarryTheirRedIsAgreed(t *testing.T) {
 		t.Fatalf("the refusal does not name the criteria: %v", a.Findings)
 	}
 }
+
+// THE REVIEWER'S HALF OF THE OBSERVATION.
+//
+// TWO PLACES A CRITERION IS OBSERVED RED, AND THEY ARE DIFFERENT OBSERVATIONS.
+// The worker sees it before the work, with the fix absent, which proves the
+// check can fail. The reviewer sees it again after the work landed, which
+// proves the check is still the one that guards the behaviour.
+//
+// ONLY THE WORKER'S HALF WAS BUILT. The gate stopped running a criterion red
+// for itself and now takes the recorded string, so the whole weight of it sits
+// on words nobody re-reads. Two observations in one sitting of reviewing did
+// not survive being followed.
+func TestAnAcceptanceSaysWhatTheReviewerWatched(t *testing.T) {
+	r := guidanceTree(t)
+	// AN AGREED TOKEN, BUILT AND SUBMITTED, so it arrives at the reviewer
+	// carrying a command criterion that passes, which is the case the gate
+	// now waves through on the strength of a recorded string.
+	tok, err := Mint(r, Token{Title: "a thing to build", Assignee: "main",
+		Scope: SingleStep, Status: ImpOpen, Detail: "what the problem is",
+		MintedBy: "person", Criteria: []Criterion{{Says: "the suite passes",
+			Runs: "exit 0", Without: "the fix", Red: "it said the suite is red"}}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	Pull(r, "main", RoleWorker, Payload{})
+	Pull(r, "main", RoleWorker, Payload{ID: tok.ID, Disposition: string(Done)})
+	Pull(r, "rev2", RoleReviewer, Payload{})
+
+	// ACCEPTING WITHOUT LOOKING IS REFUSED, and the refusal says what is
+	// wanted rather than only that something is missing.
+	a := Pull(r, "rev2", RoleReviewer, Payload{ID: tok.ID, Verdict: "accept"})
+	if a.Pull != AnswerRefused {
+		t.Fatalf("a token with a command criterion was agreed with nothing re-watched: %s", a.Pull)
+	}
+	if len(a.Findings) == 0 || !strings.Contains(a.Findings[0].Wrong, "re-watched") {
+		t.Fatalf("the refusal does not say nothing was re-watched: %+v", a.Findings)
+	}
+
+	// AND SAYING WHAT WAS SEEN IS ACCEPTED, and it lands in the note rather
+	// than in a session that ends.
+	a = Pull(r, "rev2", RoleReviewer, Payload{ID: tok.ID, Verdict: "accept",
+		Rewatched: map[string]string{
+			"the suite passes": "without the fix put back, it said the suite is red",
+		}})
+	if a.Pull == AnswerRefused {
+		t.Fatalf("an acceptance saying what was watched was refused: %v", a.Findings)
+	}
+	now, err := LoadToken(r, tok.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(now.Rewatched) == 0 {
+		t.Fatalf("the note says nothing about what the reviewer watched: %+v", now.Rewatched)
+	}
+	if !strings.Contains(now.Rewatched["the suite passes"], "the suite is red") {
+		t.Fatalf("what the reviewer watched did not come back whole: %q",
+			now.Rewatched["the suite passes"])
+	}
+}
+
+// A TOKEN WITH NO COMMAND CRITERION ASKS FOR NOTHING, because there is nothing
+// to re-run. A refusal that fired on those would make every prose token
+// unagreeable, which is a gate with no way through.
+func TestATokenWithNoCommandAsksForNoRewatch(t *testing.T) {
+	r := guidanceTree(t)
+	tok, err := Mint(r, Token{Title: "a thing to build", Assignee: "main",
+		Scope: SingleStep, Status: ImpOpen, Detail: "what the problem is",
+		MintedBy: "person", Criteria: []Criterion{{Says: "it reads well"}}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	Pull(r, "main", RoleWorker, Payload{})
+	Pull(r, "main", RoleWorker, Payload{ID: tok.ID, Disposition: string(Done),
+		Evidence: map[string]string{"it reads well": "it does, and here is why"}})
+	Pull(r, "rev", RoleReviewer, Payload{})
+	if a := Pull(r, "rev", RoleReviewer, Payload{ID: tok.ID, Verdict: "accept"}); a.Pull == AnswerRefused {
+		t.Fatalf("a token with no command was refused for re-watching nothing: %v", a.Findings)
+	}
+}

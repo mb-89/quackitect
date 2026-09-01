@@ -128,6 +128,41 @@ inside the work that taught it.
 A CLASS ALREADY WRITTEN DOWN IS NAMED AGAIN rather than minted twice. Look for
 it before you mint, and name the one that exists.
 
+## An acceptance says what you watched go red
+
+A criterion carrying `**red without**` and `**red said**` is claiming somebody
+watched it fail. The gate takes that claim: a criterion that passes is agreed on
+the strength of the words recorded on it, and the engine no longer runs it red
+for itself.
+
+SO THE WHOLE WEIGHT OF THE GATE SITS ON A STRING, and you are the only reader of
+it.
+
+TWO OBSERVATIONS, AND THEY ARE DIFFERENT. The worker's is taken before the work,
+with the fix absent, and it proves the check can fail. Yours is taken after the
+work landed, by putting the defect back or by building the tree without the fix,
+and it proves the check is still the one that guards the behaviour.
+
+AT LEAST ONE, ON AN ACCEPTANCE. Accepting a token that carries a command
+criterion with nothing re-watched is refused. Not every criterion, because a
+cost nobody pays is a rule that gets turned off. One is the difference between
+having looked and not.
+
+    rewatched: {"<the criterion>": "without <what you took away>, it said <what it said>"}
+
+IT LANDS IN THE NOTE, beside the evidence, because a sentence in a session that
+ends is not a record.
+
+AND NAME WHAT IT SAID, NOT WHERE IT WAS. A line number is a claim about
+something nobody controls: it moves the moment anybody adds a function above it.
+Name the test and the message.
+
+MEASURED, WHICH IS WHY THIS EXISTS. In one sitting of reviewing, two recorded
+observations did not survive being followed: one cited a line that had never
+carried the assertion it quoted, and one cited a line guarded by a different
+test entirely. Both were caught because a person happened to re-run them, and
+nothing asked either reviewer to.
+
 ## Scale to the work
 
 Deepest scrutiny goes to the riskiest part first. Risk rises where many things

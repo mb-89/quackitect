@@ -79,19 +79,22 @@ func investigate(r Roots, t Token) Answer {
 			"Nothing has been moved. It is exactly where it was and it stays there "+
 			"until you rule on it, because a timeout guesses and a person looking "+
 			"does not.\n\n"+
-			"Find out whether %s is still working. If it is gone, take the token "+
-			"back with se work --set %s --field status --to %s, or judge it "+
-			"yourself. Then pull again.",
-		t.ID, t.Title, t.Status, t.Holder, howFar, t.Holder, t.ID, freeAgain(t))}
+			"Find out whether %s is still working. If it is gone, pull again "+
+			"with se pull, and the engine takes it back to %s for you. If it "+
+			"is working, leave it where it is and come back to se pull. This "+
+			"notice stands until they move.",
+		t.ID, t.Title, t.Status, t.Holder, howFar, t.Holder, freeAgain(t))}
 }
 
 // freeAgain answers where a held token goes when nobody is behind the hold.
+//
+// ONE TABLE, IN arrival.go, BECAUSE THE RECLAIM IS WHAT ACTUALLY MOVES IT. This
+// was a second switch saying the same thing and it disagreed with the first:
+// it sent a spec in review back to spec_open, where the reclaim sends it to
+// spec_submitted, so the notice named a state the engine would not have used.
 func freeAgain(t Token) Status {
-	switch t.Status {
-	case ImpInReview:
-		return ImpSubmitted
-	case SpecInReview:
-		return SpecOpen
+	if to, held := whereItGoesBack[t.Status]; held {
+		return to
 	}
 	return ImpOpen
 }

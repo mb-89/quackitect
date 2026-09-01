@@ -83,7 +83,7 @@ func tokenFromFront(f Front) Token {
 		Scope: Scope(fs(f, "scope")), Traced: fb(f, "traced"),
 		Disposition: Disposition(fs(f, "disposition")), Reason: fs(f, "reason"),
 		AbortedFrom: ReadStatus(fs(f, "aborted_from")),
-		Holder: fs(f, "holder"), Bucket: fs(f, "bucket"), Parent: fs(f, "parent"),
+		Holder:      fs(f, "holder"), Bucket: fs(f, "bucket"), Parent: fs(f, "parent"),
 		Subs: fl(f, "subs"), DependsOn: fl(f, "depends_on"),
 		Successors: fl(f, "successors"),
 		Evidence:   EvidenceSpec{Sections: fl(f, "evidence"), Script: fs(f, "evidence_script")},
@@ -97,17 +97,18 @@ func tokenFromFront(f Front) Token {
 // write anything else in the note and it is left alone, because nothing but
 // these headings is read back.
 const (
-	headDetail   = "## detail"
-	headGuidance = "## guidance"
-	headEvidence = "## evidence: "
-	headFinding  = "## finding "
-	headCriteria = "## done when"
+	headDetail    = "## detail"
+	headGuidance  = "## guidance"
+	headEvidence  = "## evidence: "
+	headRewatched = "## re-watched: "
+	headFinding   = "## finding "
+	headCriteria  = "## done when"
 
 	// WHAT A WATCHED CRITERION SAYS ON THE PAGE. One lead each, so a reader
 	// sees what was absent and what it said without opening anything else.
 	leadWithout = "**red without** "
 	leadRed     = "**red said** "
-	headLesson   = "## lesson "
+	headLesson  = "## lesson "
 )
 
 func (t Token) body() string {
@@ -123,6 +124,13 @@ func (t Token) body() string {
 	}
 	for _, s := range sortedKeys(t.Submission) {
 		b.WriteString(headEvidence + s + "\n\n" + t.Submission[s] + "\n\n")
+	}
+	// AND WHAT THE REVIEWER WATCHED, beside the evidence rather than in a
+	// session that ends. The gate takes the worker's recorded red on trust,
+	// so the second look is the only thing holding it and it has to be a
+	// record a later reader can follow.
+	for _, s := range sortedKeys(t.Rewatched) {
+		b.WriteString(headRewatched + s + nl + nl + t.Rewatched[s] + nl + nl)
 	}
 	// WHAT DONE MEANS, in the note a person reads and edits. A criterion with a
 	// command carries it, so a reader runs the same thing the engine runs.
@@ -189,6 +197,11 @@ func readBody(t *Token, body string) {
 			} else {
 				t.Guidance = text
 			}
+		case strings.HasPrefix(head, headRewatched):
+			if t.Rewatched == nil {
+				t.Rewatched = map[string]string{}
+			}
+			t.Rewatched[strings.TrimPrefix(head, headRewatched)] = text
 		case strings.HasPrefix(head, headEvidence):
 			if t.Submission == nil {
 				t.Submission = map[string]string{}

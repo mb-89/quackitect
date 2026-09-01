@@ -3,7 +3,9 @@ package main
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"testing"
 )
@@ -294,5 +296,83 @@ func TestNoNoteCarriesATime(t *testing.T) {
 		if strings.Contains(a.Notice, when) {
 			t.Fatalf("the investigation says how long in %q: %s", when, a.Notice)
 		}
+	}
+}
+
+// A NOTICE NAMES A COMMAND THIS ENGINE ANSWERS.
+//
+// THE INVESTIGATE NOTICE TOLD AN AGENT to take a stranded token back with
+// se work --set --field status, and se work --set refuses a status with the
+// words status is moved by a pull, not by a keystroke. So the engine named a
+// remedy it forbids, and the only other thing it offered was judging a token
+// the reader had drafted, which the four-eyes refusal also forbids.
+//
+// A MESSAGE THAT NAMES A COMMAND IS A CLAIM ABOUT THAT COMMAND, and nothing
+// checked it. This runs every one a notice names.
+func TestEveryCommandANoticeNamesIsAnswered(t *testing.T) {
+	exe := retroExe(t)
+	r := lane(t)
+	tok := mint(t, r, Token{Title: "held by somebody gone"})
+	tok.Status, tok.Holder = ImpInReview, "gone"
+	if err := SaveToken(r, tok); err != nil {
+		t.Fatal(err)
+	}
+	said := investigate(r, tok).Notice
+	found := namedCommands(said)
+	// A NOTICE THAT NAMES NOTHING LEAVES THE READER WITH NOTHING, and a check
+	// that passed on one would pass by there being nothing to check.
+	if len(found) == 0 {
+		t.Fatalf("the investigate notice names no command at all: %q", said)
+	}
+	for _, one := range found {
+		out, err := exec.Command(exe, append(one[1:], "--work", r.Work)...).CombinedOutput()
+		if err == nil {
+			continue
+		}
+		if strings.Contains(string(out), "flag provided but not defined") ||
+			strings.Contains(string(out), "is moved by a pull") ||
+			strings.Contains(string(out), "which nothing read") {
+			t.Errorf("the notice says to run %q and the engine answers: %s",
+				strings.Join(one, " "), firstLines(strings.TrimSpace(string(out)), 2))
+		}
+	}
+}
+
+// namedCommands answers every se invocation a notice names, as argument lists.
+// A COMMAND RUNS TO THE END OF THE CLAUSE, which is how a reader takes one out
+// of a sentence: everything after se up to the punctuation that ends it.
+var seCall = regexp.MustCompile(`\bse ([^,.;]+)`)
+
+func namedCommands(said string) [][]string {
+	var out [][]string
+	for _, m := range seCall.FindAllStringSubmatch(said, -1) {
+		out = append(out, append([]string{"se"}, strings.Fields(m[1])...))
+	}
+	return out
+}
+
+// THE NOTICE AND THE RECLAIM AGREE ABOUT WHERE A HELD TOKEN GOES.
+//
+// TWO TABLES SAID THE SAME THING AND DISAGREED. freeAgain answered spec_open
+// for a spec in review, where the reclaim sends it to spec_submitted, so the
+// notice named a place the engine would not have used.
+//
+// ONE OWNER PER FACT. The reclaim is what moves the token, so the reclaim
+// decides, and this is what says the notice has not grown a second opinion.
+func TestTheNoticeAndTheReclaimAgree(t *testing.T) {
+	held := 0
+	for _, s := range States() {
+		to, canBeHeld := whereItGoesBack[s]
+		if !canBeHeld {
+			continue
+		}
+		held++
+		if said := freeAgain(Token{Status: s}); said != to {
+			t.Errorf("the notice says a token at %s goes back to %s, and the reclaim sends it to %s",
+				s, said, to)
+		}
+	}
+	if held == 0 {
+		t.Fatal("no state is held by anybody, so this guards nothing")
 	}
 }

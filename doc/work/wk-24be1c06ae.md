@@ -3,10 +3,11 @@ id: wk-24be1c06ae
 seq: "-28"
 type: work
 title: a line holds one
-status: spec_submitted
+status: spec_in_review
 assignee: main
 scope: single-step
 traced: true
+holder: reviewer10
 rounds: 4
 minted_by: reviewer6
 ---

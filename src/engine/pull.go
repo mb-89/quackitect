@@ -49,7 +49,10 @@ type Payload struct {
 	ID string `json:"id,omitempty"`
 
 	// A worker's submission.
-	Evidence    map[string]string `json:"evidence,omitempty"`
+	Evidence map[string]string `json:"evidence,omitempty"`
+
+	// WHAT THE REVIEWER WATCHED GO RED, per criterion, after the work landed.
+	Rewatched   map[string]string `json:"rewatched,omitempty"`
 	Disposition string            `json:"disposition,omitempty"`
 	Successors  []string          `json:"successors,omitempty"`
 	Reason      string            `json:"reason,omitempty"`
@@ -459,6 +462,10 @@ func judge(r Roots, actor string, t Token, p Payload) (Answer, bool) {
 	}
 	switch p.Verdict {
 	case "accept":
+		if f := somethingWasRewatched(t, p); f != nil {
+			return refuse(&t, *f), true
+		}
+		t.Rewatched = p.Rewatched
 		if t.Disposition == NoDisposition {
 			t.Disposition = Done
 		}
@@ -521,6 +528,39 @@ func noteVerdict(r Roots, actor string, t Token, verdict string, found []Rejecti
 		data["findings"] = len(found)
 	}
 	inSession(r, "review", actor, msg, Yes(), data)
+}
+
+// A CRITERION THE ENGINE NO LONGER RUNS FOR ITSELF IS READ BY SOMEBODY OR BY
+// NOBODY. The spec gate takes a criterion that passes on the strength of its
+// recorded red, so the whole weight of it sits on a string, and the reviewer is
+// the only reader of that string.
+//
+// AT LEAST ONE, NOT ALL OF THEM. Re-watching every command criterion on every
+// acceptance is a cost nobody would pay, and a rule nobody pays is a rule that
+// gets turned off. One is the difference between having looked and not.
+//
+// A TOKEN WITH NO COMMAND ASKS FOR NOTHING, because there is nothing to re-run,
+// and a refusal that fired on those would be a gate with no way through.
+func somethingWasRewatched(t Token, p Payload) *Rejection {
+	commands := 0
+	for _, c := range t.Criteria {
+		if trimmed(c.Runs) != "" {
+			commands++
+		}
+	}
+	if commands == 0 {
+		return nil
+	}
+	for _, said := range p.Rewatched {
+		if trimmed(said) != "" {
+			return nil
+		}
+	}
+	return &Rejection{Clause: "the criteria",
+		Wrong: fmt.Sprintf("this token carries %d command criteria and none was re-watched. "+
+			"The worker's red proves the check can fail. Yours proves it is still the "+
+			"check that guards the behaviour, and the gate takes the worker's on trust", commands),
+		Satisfies: "rewatched, keyed by the criterion, saying what you took away and what it said"}
 }
 
 func refuse(t *Token, f Rejection) Answer {

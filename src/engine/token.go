@@ -285,8 +285,20 @@ type Token struct {
 	AbortedFrom Status `json:"aborted_from,omitempty"`
 
 	Submission map[string]string `json:"submission,omitempty"`
-	Findings   []Rejection       `json:"findings,omitempty"`
-	Rounds     int               `json:"rounds"`
+
+	// WHAT THE REVIEWER WATCHED, per criterion, after the work landed.
+	//
+	// TWO OBSERVATIONS AND THEY ARE DIFFERENT. The worker's proves the check
+	// can fail. The reviewer's proves the check is still the one that guards
+	// the behaviour, which is the half the recorded red cannot answer for.
+	//
+	// THE GATE RESTS ON A STRING NOW. A criterion that passes is agreed on
+	// the strength of what it records, so somebody has to read those words
+	// against the tree, and nothing asked anybody to.
+	Rewatched map[string]string `json:"rewatched,omitempty"`
+
+	Findings []Rejection `json:"findings,omitempty"`
+	Rounds   int         `json:"rounds"`
 
 	// Who holds it now. A worker while it is in work, a reviewer while it is
 	// in review. It is what an arriving agent reclaims against.

@@ -185,23 +185,44 @@ func saveArrivals(r Roots, a arrivals) {
 func Reclaim(r Roots, actor, role string) []string {
 	var back []string
 	for _, t := range Tokens(r) {
-		if role == RoleReviewer {
-			if t.Status != ImpInReview {
-				continue
-			}
-			t.Status, t.Holder = ImpSubmitted, ""
-		} else {
-			if t.Status != ImpInWork || (t.Assignee != actor && t.MintedBy != actor) {
-				continue
-			}
-			t.Status, t.Holder = ImpOpen, ""
+		to, held := whereItGoesBack[t.Status]
+		if !held || heldBy[t.Status] != role {
+			continue
 		}
+		// A WORKER TAKES BACK ITS OWN AND A REVIEWER TAKES BACK ANY. Work in
+		// hand belongs to whoever was asked for it. A review belongs to
+		// whichever reviewer is here now.
+		if role == RoleWorker && t.Assignee != actor && t.MintedBy != actor {
+			continue
+		}
+		t.Status, t.Holder = to, ""
 		if SaveToken(r, t) == nil {
 			back = append(back, t.ID)
 		}
 	}
 	return back
 }
+
+// THE FOUR STATES SOMEBODY HOLDS, AND WHERE EACH GOES BACK TO.
+//
+// TWO HALVES, THE SAME FOUR VERBS. This answered for one half, so a drafter or
+// a spec reviewer that died holding a token stranded it: nothing returned it
+// and se work --set refuses a status, so the note sat held by a name that was
+// gone. Measured on wk-2b78b911b1.
+var (
+	whereItGoesBack = map[Status]Status{
+		SpecInWork:   SpecOpen,
+		SpecInReview: SpecSubmitted,
+		ImpInWork:    ImpOpen,
+		ImpInReview:  ImpSubmitted,
+	}
+	heldBy = map[Status]string{
+		SpecInWork:   RoleWorker,
+		SpecInReview: RoleReviewer,
+		ImpInWork:    RoleWorker,
+		ImpInReview:  RoleReviewer,
+	}
+)
 
 func reclaimNotice(back []string) string {
 	if len(back) == 0 {
