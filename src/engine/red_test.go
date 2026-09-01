@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"path/filepath"
+	"regexp"
 	"strings"
 	"testing"
 )
@@ -489,3 +491,48 @@ func TestARewatchNamesACriterionOnTheToken(t *testing.T) {
 		t.Fatalf("the refusal does not say the key names no criterion: %+v", a.Findings)
 	}
 }
+
+// A TWO-PART COMMAND NAMES ONE SYMBOL IN BOTH HALVES.
+//
+// WHY THE PAIR EXISTS. go test -run on a name nothing defines answers ok and
+// exits zero, so a criterion puts a search for the definition in front of the
+// run, and the two together can report on the work.
+//
+// THEN THE NAME IS WRITTEN OUT TWICE AND ONE OF THEM DRIFTS. It does not fail
+// open, it fails SHUT: the worker writes exactly the test the criterion names,
+// the search finds nothing, and the criterion is red with the work done. The
+// only ways out are a decoy definition or editing the criterion, which a
+// worker may not do, so it is met at the keyboard by somebody with no
+// authority to fix it.
+//
+// AND NOTHING COULD SEE IT. The whole line is red while the work is unbuilt,
+// which is the honest red, so no gate can tell the two apart.
+func TestACriterionsGuardAndRunnerNameOneTest(t *testing.T) {
+	root := filepath.Join("..", "..")
+	r := Roots{Method: root, Work: root}
+	pairs := 0
+	for _, tok := range Tokens(r) {
+		for i, c := range tok.Criteria {
+			guard := guardName.FindStringSubmatch(c.Runs)
+			runner := runnerName.FindStringSubmatch(c.Runs)
+			if guard == nil || runner == nil {
+				continue
+			}
+			pairs++
+			if guard[1] != runner[1] {
+				t.Errorf("%s criterion %d searches for %q and runs %q, so the worker "+
+					"writes the test it names and the guard stays red",
+					tok.ID, i+1, guard[1], runner[1])
+			}
+		}
+	}
+	if pairs == 0 {
+		t.Fatal("no criterion pairs a search with a run, so this guards nothing")
+	}
+	t.Logf("%d criteria pair a search with a run", pairs)
+}
+
+var (
+	guardName  = regexp.MustCompile(`rg -q func.(\w+)`)
+	runnerName = regexp.MustCompile(`-run (\w+)\$`)
+)
