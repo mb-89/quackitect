@@ -3,12 +3,11 @@ id: wk-c22f29af7b
 seq: "-23"
 type: work
 title: a reviewer names lessons
-status: imp_in_work
+status: imp_submitted
 assignee: main
 scope: single-step
 traced: true
 disposition: done
-holder: main
 parent: wk-bc3c5ba905
 rounds: 3
 minted_by: person
@@ -40,6 +39,10 @@ verdict.
 
 THIS REPLACES wk-6684401070, which had the engine doing the minting. The owner
 overruled that, and this token carries the decision.
+
+## evidence: what was built
+
+THE SWEEP FINISHED, AND THE TABLE RE-RUN RATHER THAN TRANSCRIBED. FINDING 4, THE EXTENT STOPPED AT THE FUNCTION THE FINDING NAMED. Nine refusals stand on the reviewer's path. Four in rejectionIsWhole were watched and the five beside them in judge and judgeSpec were watched by nothing, which is the same silence round 1 rejected this token about, one function along. Each of the five now has a case that asserts on what only that refusal can say: a reviewer pulling to judge a token it submitted is told it cannot judge it, a verdict on a token in another status is told the token is not with you and the clause is status rather than the reviewer, a second reviewer on a held sphere is told a newer reviewer holds this sphere, a drafter agreeing its own spec is told it cannot agree it, and a spec held by somebody else is told it is not with you. Three of them stand in sequence in judge, so a case asking only whether the call was refused would pass with any one deleted, which is the class this token is about. THE SWEEP, RUN IN NINE ISOLATED COPIES AGAINST A BASELINE COPY so the copy-only failures cancel, and never in the tree. Each refusal deleted on its own: a rejection with no finding, lesson_test.go:52 and :145. A rejection with no lesson, spec_test.go:149, and nothing in lesson_test.go at all, which is why the old table's shape misled. The lesson names no token, lesson_test.go:42 and :129. Learned names something that is not a token, lesson_test.go:63 and :135. The submitter cannot judge it, lesson_test.go:195. This token is not with you, lesson_test.go:211. A newer reviewer holds this sphere, lesson_test.go:229. The drafter cannot agree it, lesson_test.go:250. This spec is not with you, lesson_test.go:266. Nine of nine watched. FINDING 3, THE FIVE WRONG CITATIONS. The four rows are what the runner printed in this sweep rather than what a previous table said, and the no-lesson refusal is guarded from a different file, spec_test.go, which the old table's columns implied it was not. THE BATTERY IS GREEN, fifteen lines, all ok.
 
 ## finding 1 · round 1 · detail: WHAT THE ENGINE DOES: it refuses. A rejection carries the id of the token the reviewer minted, the engine checks that the id is a token, and a rejection naming none is refused the way one with no finding is refused. That is the whole of the engine's part. / evidence: THREE CHECKS, ALL GREEN. TestARejectionNamesTheLessonsToken drives the refusal on both halves · by reviewer6
 

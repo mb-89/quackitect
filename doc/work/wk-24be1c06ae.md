@@ -3,7 +3,7 @@ id: wk-24be1c06ae
 seq: "-28"
 type: work
 title: a line holds one
-status: spec_open
+status: spec_submitted
 assignee: main
 scope: single-step
 traced: true
@@ -142,10 +142,32 @@ THE THREE SHAPES, AND WHICH FIELD IS WHICH.
     one line by design   Criterion.Says, Criterion.Runs, Criterion.Without,
                          Criterion.Red
     a block by design    Rejection.Wrong, Rejection.Satisfies, Lesson.Class,
-                         Lesson.Avoid, Token.Detail, Token.Guidance
-    into a heading       Rejection.Clause
+                         Lesson.Avoid, Token.Detail, Token.Guidance,
+                         Token.Submission
+    into a heading       Rejection.Clause, Rejection.By, Lesson.By
     not on the page      Criterion.Ran, Criterion.Met, Lesson.Token,
-                         Lesson.Learned, Lesson.By
+                         Lesson.Learned
+
+THE EVIDENCE IS A BLOCK AND THE WALK HAD TO REACH IT. Token.Submission is a map
+of string to string, store.go writes each key as a body section with the value
+under it, and readBody reads them back through the same sections call a detail
+goes through. It is the longest prose this record holds, written by a worker who
+quotes section names, and it truncates today.
+
+THREE VALUES GO INTO A HEADING, NOT ONE. A finding heading joins the lead, the
+index, the round, the clause and the author on the middle dot. A lesson heading
+joins the lead, the index, the round and the author on the same character. So
+Rejection.By and Lesson.By are in a delimited heading exactly as Clause is, and
+both lose data today. Lesson.By was in the table under not on the page, which
+was wrong.
+
+WHERE THE WALK STOPS, AND THE BOUNDARY IS CLOSED RATHER THAN LEFT TO GUESS. It
+follows exported string fields, exported struct fields, exported slice-of-struct
+fields and exported map-of-string values, because those are the four things
+store.go writes to the note. It does not follow unexported fields, integers,
+booleans or times, because none of those is written as prose a parser reads
+back. A reviewer who disagrees with that boundary can say so about a list rather
+than about an omission.
 
 TWO MORE BLOCKS, AND THEY ARE LOSING DATA TODAY. Token.Detail and Token.Guidance
 are body sections read by the same parser, headDetail and headGuidance in
@@ -184,22 +206,22 @@ clause to its round and its author, and it is what a clause cannot carry.
 
 ## done when
 
-- The walk starts from Token and follows the record: reflect over its exported string fields and recurse into its exported struct and slice-of-struct fields, so Criterion, Rejection and Lesson are reached because the record reaches them. Every string field the walk arrives at must appear in the shape table, and one the table does not answer for makes it red by name. A deliberate exclusion is written into the table with its answer, so a reader can tell one from an oversight
+- The walk starts from Token and follows what the record writes: exported string fields, and into exported struct fields, exported slice-of-struct fields and exported map-of-string values, so Criterion, Rejection, Lesson and Token.Submission are all reached because the record reaches them. Every string field the walk arrives at must appear in the shape table, and one the table does not answer for makes it red by name. A deliberate exclusion is written into the table with its answer, so a reader can tell one from an oversight
   `rg -q func.TestEveryFieldTheNoteWritesIsRead src/engine && go test -C src/engine -count=1 -run TestEveryFieldTheNoteWritesIsRead$ .`
 - A field that is one line by design carrying a newline is refused when the token is saved, and the refusal names the field and which criterion it is on
   `rg -q func.TestALineHoldsOneLine src/engine && go test -C src/engine -count=1 -run TestALineHoldsOneLine$ .`
   **red without** the linesThatFit refusal taken out of SaveToken, and separately runs left out of the fields it walks
-  **red said** red_test.go:212: a criterion whose says is two lines was written, and three more, one per field
+  **red said** TestALineHoldsOneLine: a criterion whose says is two lines was written, and three more, one per field
 - A field that is a block by design comes back byte-identical from two paragraphs, from a value carrying a blank line, and from one whose second paragraph begins with a lead this parser reads. Token.Detail and Token.Guidance are among the blocks the check feeds, because the same parser writes and reads them
   `rg -q func.TestABlockComesBackWhole src/engine && go test -C src/engine -count=1 -run TestABlockComesBackWhole$ .`
 - A block carrying a line that opens a section is refused when the token is saved, and the refusal names the field and says a block cannot carry a line that opens a section. It is refused on every block the table names, Token.Detail and Token.Guidance included, rather than on the two the finding was found on
   `rg -q func.TestABlockOpensNoSection src/engine && go test -C src/engine -count=1 -run TestABlockOpensNoSection$ .`
-- A clause carrying the heading separator, which is the middle dot that joins it to its round and its author, or a newline, is refused, and the refusal says which character
+- EVERY value the note joins into a heading is refused when it carries the heading separator, which is the middle dot, or a newline, and the refusal names the field and the character. The set is the one the table names under into a heading, and the check takes it from there rather than asserting it of the clause alone
   `rg -q func.TestAHeadingHoldsNoDelimiter src/engine && go test -C src/engine -count=1 -run TestAHeadingHoldsNoDelimiter$ .`
 - Every field is fed what the format does not obviously survive rather than what the writer normally produces: the lead itself, the list marker, a backtick, the section opener, the heading separator, and an empty value
   `rg -q func.TestTheNoteSurvivesAwkwardValues src/engine && go test -C src/engine -count=1 -run TestTheNoteSurvivesAwkwardValues$ .`
 - The findings already on disk that were truncated are not rewritten, because a finding says what a reviewer sent on the day and the engine cannot invent what it dropped. The evidence says how many were counted and what a reader of one of them sees
-- Every test named above was watched failing on its own assertion, with the change absent, before it was watched passing. For the walk the change taken away is a string field added to Token, or a fourth struct given a section, and the red names it. The evidence says what was seen and what was taken away each time
+- Every test named above was watched failing on its own assertion, with the change absent, before it was watched passing. For the walk the change taken away is Token.Submission's row taken out of the table, and the red names Token.Submission. For the heading refusal the red is taken once per member, a middle dot put into Rejection.Clause, Rejection.By and Lesson.By in turn, and each red names that field. The evidence says what was seen and what was taken away each time
 
 ## finding 1 · round 1 · done when: All four one-line fields are refused, not only the two the lesson was found on, and the check walks a list rather than naming one / detail: WHICH FIELDS. Says, Runs, Without and Red · by reviewer6
 
