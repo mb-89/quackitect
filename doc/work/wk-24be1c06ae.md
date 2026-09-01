@@ -3,12 +3,11 @@ id: wk-24be1c06ae
 seq: "-28"
 type: work
 title: a line holds one
-status: spec_in_review
+status: spec_submitted
 assignee: main
 scope: single-step
 traced: true
-holder: reviewer11
-rounds: 4
+rounds: 5
 minted_by: reviewer6
 ---
 
@@ -138,29 +137,43 @@ by nothing, so they are dead rather than lossy. That is the right answer for
 them, and a reader of a hand list cannot tell that answer from an oversight. In
 the table it is written down.
 
-THE THREE SHAPES, AND WHICH FIELD IS WHICH.
+THE FIVE SHAPES, AND WHICH FIELD IS WHICH. DERIVED BY RUNNING THE WALK AT
+96d9404e RATHER THAN BY ADDING THE NAMES THE LAST FINDINGS USED. Reflecting over
+Token and following exported string fields, exported struct fields, exported
+slice-of-struct fields and exported map-of-string values arrives at 32, and the
+table below answers for 32. The two numbers are a criterion, so the next
+reviewer holds the size of the derived set against the size of the declared one
+instead of reading the word every.
 
     one line by design   Criterion.Says, Criterion.Runs, Criterion.Without,
-                         Criterion.Red
+                         Criterion.Red, Token.GuidanceRef
     a block by design    Rejection.Wrong, Rejection.Satisfies, Lesson.Class,
-                         Lesson.Avoid, Token.Detail, Token.Guidance,
-                         Token.Submission
+                         Lesson.Avoid, Lesson.Learned, Token.Detail,
+                         Token.Guidance, and every map of string the note writes
+                         as a body section, which is Token.Submission and
+                         Token.Rewatched today
     into a heading       Rejection.Clause, Rejection.By, Lesson.By
-    not on the page      Criterion.Ran, Criterion.Met, Lesson.Token,
-                         Lesson.Learned
+    in the frontmatter   Token.ID, Token.Title, Token.Status, Token.Assignee,
+                         Token.Scope, Token.Disposition, Token.Reason,
+                         Token.AbortedFrom, Token.Holder, Token.Bucket,
+                         Token.Parent, Token.MintedBy, Token.Evidence.Script
+    not on the page      Criterion.Ran, Lesson.Token
 
-THE EVIDENCE IS A BLOCK AND THE WALK HAD TO REACH IT. Token.Submission is a map
-of string to string, store.go writes each key as a body section with the value
-under it, and readBody reads them back through the same sections call a detail
-goes through. It is the longest prose this record holds, written by a worker who
-quotes section names, and it truncates today.
+A ROW FOR THE KIND AND NOT FOR THE MEMBER, where there is a kind. Every map of
+string the note writes as a body section is one row, because the last round
+answered the member a finding named and never asked what kind it was, and the
+second member of that kind, Token.Rewatched, joined the record two hours later
+without joining the table. A third one is covered before it exists.
 
-THREE VALUES GO INTO A HEADING, NOT ONE. A finding heading joins the lead, the
-index, the round, the clause and the author on the middle dot. A lesson heading
-joins the lead, the index, the round and the author on the same character. So
-Rejection.By and Lesson.By are in a delimited heading exactly as Clause is, and
-both lose data today. Lesson.By was in the table under not on the page, which
-was wrong.
+THE FOURTH SHAPE IS THE FRONTMATTER, AND NOTHING IS REFUSED THERE. front() in
+store.go hands thirteen strings to the frontmatter writer, which holds a value
+whole and quotes what needs quoting, so a newline in one of them is written and
+read back rather than cut. They are named here because a table that answered for
+nineteen fields and left thirteen out would leave a reader unable to tell an
+answer from an omission, which is this token's whole subject.
+
+Criterion.Met is a bool on Criterion and the walk never reaches it, so it has no
+row. That is said here so a reader can tell it from an oversight.
 
 WHERE THE WALK STOPS, AND THE BOUNDARY IS CLOSED RATHER THAN LEFT TO GUESS. It
 follows exported string fields, exported struct fields, exported slice-of-struct
@@ -207,7 +220,7 @@ clause to its round and its author, and it is what a clause cannot carry.
 
 ## done when
 
-- The walk starts from Token and follows what the record writes: exported string fields, and into exported struct fields, exported slice-of-struct fields and exported map-of-string values, so Criterion, Rejection, Lesson and Token.Submission are all reached because the record reaches them. Every string field the walk arrives at must appear in the shape table, and one the table does not answer for makes it red by name. A deliberate exclusion is written into the table with its answer, so a reader can tell one from an oversight
+- The walk starts from Token and follows what the record writes: exported string fields, and into exported struct fields, exported slice-of-struct fields and exported map-of-string values, so Criterion, Rejection, Lesson, Token.Submission and Token.Rewatched are all reached because the record reaches them. Every string field the walk arrives at must appear in the shape table, and one the table does not answer for makes it red by name. A deliberate exclusion is written into the table with its answer, so a reader can tell one from an oversight
   `rg -q func.TestEveryFieldTheNoteWritesIsRead src/engine && go test -C src/engine -count=1 -run TestEveryFieldTheNoteWritesIsRead$ .`
 - A field that is one line by design carrying a newline is refused when the token is saved, and the refusal names the field and which criterion it is on
   `rg -q func.TestALineHoldsOneLine src/engine && go test -C src/engine -count=1 -run TestALineHoldsOneLine$ .`
@@ -215,14 +228,16 @@ clause to its round and its author, and it is what a clause cannot carry.
   **red said** TestALineHoldsOneLine: a criterion whose says is two lines was written, and three more, one per field
 - A field that is a block by design comes back byte-identical from two paragraphs, from a value carrying a blank line, and from one whose second paragraph begins with a lead this parser reads. Token.Detail and Token.Guidance are among the blocks the check feeds, because the same parser writes and reads them
   `rg -q func.TestABlockComesBackWhole src/engine && go test -C src/engine -count=1 -run TestABlockComesBackWhole$ .`
-- A block carrying a line that opens a section is refused when the token is saved, and the refusal names the field and says a block cannot carry a line that opens a section. It is refused on every block the table names, Token.Detail and Token.Guidance included, rather than on the two the finding was found on
-  `rg -q func.TestABlockOpensNoSection src/engine && go test -C src/engine -count=1 -run TestABlockOpensNoSection$ .`
 - EVERY value the note joins into a heading is refused when it carries the heading separator, which is the middle dot, or a newline, and the refusal names the field and the character. The set is the one the table names under into a heading, and the check takes it from there rather than asserting it of the clause alone
   `rg -q func.TestAHeadingHoldsNoDelimiter src/engine && go test -C src/engine -count=1 -run TestAHeadingHoldsNoDelimiter$ .`
 - Every field is fed what the format does not obviously survive rather than what the writer normally produces: the lead itself, the list marker, a backtick, the section opener, the heading separator, and an empty value
   `rg -q func.TestTheNoteSurvivesAwkwardValues src/engine && go test -C src/engine -count=1 -run TestTheNoteSurvivesAwkwardValues$ .`
 - The findings already on disk that were truncated are not rewritten, because a finding says what a reviewer sent on the day and the engine cannot invent what it dropped. The evidence says how many were counted and what a reader of one of them sees
-- Every test named above was watched failing on its own assertion, with the change absent, before it was watched passing. For the walk the change taken away is Token.Submission's row taken out of the table, and the red names Token.Submission. For the heading refusal the red is taken once per member, a middle dot put into Rejection.Clause, Rejection.By and Lesson.By in turn, and each red names that field. The evidence says what was seen and what was taken away each time
+- The number the walk arrives at and the number the table answers for are the same number, derived at check time rather than read off the detail, and the check refuses when the walk arrives at none. It is 32 at 96d9404e and the detail says so beside the table
+  `rg -q func.TestTheTableAnswersForEveryFieldTheWalkReaches src/engine && go test -C src/engine -count=1 -run TestTheTableAnswersForEveryFieldTheWalkReaches$ .`
+- A block carrying a line that opens a section is refused when the token is saved, and the refusal names the field and says a block cannot carry a line that opens a section. It is refused on every block the table names, and the check takes that set from the table rather than from the two the finding was found on, so Token.Rewatched and Lesson.Learned are covered by the same run
+  `rg -q func.TestABlockOpensNoSection src/engine && go test -C src/engine -count=1 -run TestABlockOpensNoSection$ .`
+- Every test named above was watched failing on its own assertion, with the change absent, before it was watched passing. For the walk the red is taken once per answer rather than once for the criterion: the Token.Rewatched row deleted and the walk naming Token.Rewatched, a Rewatched value whose second paragraph opens a section coming back as its first, a Lesson.Learned of two paragraphs coming back as one, and one exported string field added to Token with the table left alone. For the heading refusal the red is taken once per member, a middle dot put into Rejection.Clause, Rejection.By and Lesson.By in turn, and each red names that field. The evidence says what was seen and what was taken away each time
 
 ## finding 1 · round 1 · done when: All four one-line fields are refused, not only the two the lesson was found on, and the check walks a list rather than naming one / detail: WHICH FIELDS. Says, Runs, Without and Red · by reviewer6
 
@@ -272,6 +287,12 @@ clause to its round and its author, and it is what a clause cannot carry.
 
 **satisfies:** Write criterion 5 over the set rather than over the clause: every value the note joins into a heading is refused when it carries the heading separator or a newline, and the refusal names the field and the character. Name the three members in the detail's table, Rejection.Clause, Rejection.By and Lesson.By, or take them from the walk the way criterion 1 takes its fields. Then take one red per member rather than one red for the criterion: put a middle dot in each of the three in turn, watch the refusal name that field, and record which field each red was taken on.
 
+## finding 9 · round 5 · done when, criterion 1: "Every string field the walk arrives at must appear in the shape table, and one the table does not answer for makes it red by name" / detail: "SO THE TABLE ANSWERS FOR EVERY FIELD, INCLUDING THE ONES IT EXCLUDES" and the table under THE THREE SHAPES, AND WHICH FIELD IS WHICH · by reviewer11
+
+**wrong:** THE TABLE WAS EXTENDED BY THE TWO NAMES LAST ROUND'S FINDINGS USED AND NOTHING WAS RE-SWEPT, WHICH IS THE FINDING OF ROUND 4 REPEATED. Round 4 asked for the walk to be run and the table written from what it answered. The redraft added Token.Submission, which finding 7 named, and Rejection.By, which finding 8 named, and derived nothing. I ran the walk criterion 1 specifies rather than reasoning about it: I copied src/engine into a scratch package outside this tree and reflected over Token, following exported string fields, exported struct fields, exported slice-of-struct fields and exported map-of-string values. IT ARRIVES AT 32 FIELDS. The table names 18, and one of those, Criterion.Met, is a bool on Criterion in token.go that the walk never reaches, so the table answers for 17 and 15 have no row: Token.ID, Token.Title, Token.GuidanceRef, Token.Assignee, Token.Scope, Token.Bucket, Token.Parent, Token.Status, Token.Disposition, Token.Reason, Token.AbortedFrom, Token.Holder, Token.MintedBy, Token.Evidence.Script and Token.Rewatched. Criterion 1 is red by name for 15 fields on the day the check is written, and the worker closes that gap by inventing 15 answers this token never agreed, which is the outcome the token exists to forbid. THREE OF THEM ARE NOT BOOKKEEPING AND I MEASURED EACH ONE IN THE SCRATCH COPY. Token.Rewatched is a SECOND map-of-string body section: token.go declares it beside Token.Submission, body() in store.go writes each key under the re-watched lead, and readBody reads it back through the same sections call Token.Submission goes through, so a rewatched value of para one, a blank line, a line of two hashes and the words done when, a blank line, para two saves with no complaint and reads back as para one. The redraft answered the member the finding named and never asked what kind it was, so the second member of that kind, which the engine grew for the rewatched gate, joined the record without joining the table. Token.GuidanceRef is written into the body by body() as See plus the value and read back by readBody with a TrimPrefix, and a GuidanceRef whose second paragraph opens a section reads back as its first line, so it is on the page and it is in no row. Lesson.Learned is still under not on the page, and body() writes it as the minted as lead while readLesson reads it back on a blank-line split, so a Learned of wk-1234, a blank line and and more reads back as wk-1234. Round 4's finding said correct TWO wrong rows, Lesson.By and Lesson.Learned. Lesson.By is corrected and the detail names it as corrected. Lesson.Learned is untouched. THE OTHER 13 ARE HONEST AND I CHECKED THEM RATHER THAN ASSUMING: I saved a two-line Title, a two-line Holder, a two-line Reason, a Reason whose second paragraph opens a section, and an Evidence.Script of two lines, and every one came back byte-identical, because front() in store.go hands them to WriteFront, so the true row for them is a fourth shape, held whole by the frontmatter writer and nothing refused, exactly as round 4 measured. AND THE BOUNDARY PARAGRAPH IS NOT CLOSED IN BOTH DIRECTIONS. WHERE THE WALK STOPS names four kinds followed and says it does not follow unexported fields, integers, booleans or times. Exported slice-of-string is in neither list, and Token.Subs, Token.DependsOn, Token.Successors and Token.Evidence.Sections are all exported slices of string that front() writes to the note, so a reader cannot tell whether they were excluded or missed, which is the thing the table is being asked to fix.
+
+**satisfies:** RUN THE DERIVATION BEFORE WRITING THE TABLE AND PUT WHAT IT ANSWERED IN THE DETAIL. Paste the walk's command and its count beside the table, with the commit the count was taken at, so a reviewer holds the size of the derived set against the size of the declared one instead of reading the word every. Today those two numbers are 32 and 17. Then give every field the walk reaches a row. Name the fourth shape for the 13 frontmatter strings, held whole by the frontmatter writer and nothing refused, and say that front() is what holds them. Put Token.Rewatched beside Token.Submission under a block by design, and write the row for the KIND rather than for the member, every map-of-string the note writes as a body section, so the third one is covered before it exists. Move Lesson.Learned out of not on the page and give it its block answer beside Lesson.Class and Lesson.Avoid. Give Token.GuidanceRef its row, block or refused, since it is written into the body and read back by a prefix. Say beside Criterion.Met that it is a bool and the walk does not reach it, so a reader can tell that row from an oversight. And close the boundary in both directions by naming exported slice-of-string as followed or not followed, with the reason, since front() writes four of them. THE CHECK, RED TODAY, AND IT IS CRITERION 1'S OWN: write TestEveryFieldTheNoteWritesIsRead and run it against the table as the draft stands BEFORE agreeing the draft. It names 15 fields today, and a criterion that would be red by name for 15 members on the day it is agreed is a draft that is not finished. Then take one red per answer rather than one for the criterion: delete the Token.Rewatched row and watch the walk name Token.Rewatched; save a Rewatched value whose second paragraph is a line of two hashes and watch the round trip come back as its first paragraph; save a Lesson.Learned of two paragraphs and watch it come back as one; add one exported string field to Token, leave the table alone, and watch the walk name that field. Record each red by the test name and what it said rather than by a line.
+
 ## lesson 1 · round 1 · by reviewer6
 
 **the class:** AN EXTENT INHERITED FROM THE FINDING THAT REPORTED IT, RATHER THAN MEASURED AGAINST THE FILE. A reviewer's finding names the places it happened to look. The drafter reads the finding, writes those places into the criteria, and the criteria then say all of them about a set the reviewer drew and nobody re-swept. The sample becomes the extent silently, because the draft now carries the word every and a list, which reads exactly like a measurement. The tell is that the list stops at a struct boundary or a package boundary rather than at the boundary of the thing that has the defect: ask what draws the line, and if the answer is the finding rather than the parser, it is a quotation and not an extent. And the remedy inherits it too -- a rule chosen for the shape of the instance is applied to the whole set, and the set turns out to hold things of another shape for which the rule is wrong. On wk-24be1c06ae the draft names four one-line fields on a criterion; the parser those four live under also truncates a finding's wrong and satisfies at the first newline and splits a clause into a heading, and of fourteen findings in the record every one written in paragraphs is cut to its first, 85 characters of 1900 in one case.
@@ -301,6 +322,14 @@ clause to its round and its author, and it is what a clause cannot carry.
 **the class:** A CHECK THAT HOLDS A DERIVED SET AGAINST A DECLARED ONE, WHERE THE ROUND FIXED THE DERIVED SIDE AND LEFT THE DECLARED SIDE AS IT WAS. A reviewer says the members were typed into the check. The next draft takes them from the language, with reflect or a directory read, and that is the right fix. It is half of the check. The check has two sides: the set the language hands over, and the table of decisions that set is held against. The table is still a photograph, and the round extended it by exactly the names the finding used. What hides it is that the draft now reads as derived. The criterion says reflect, it says every, and it says fail by name. Nothing on the page says how big the derived set is, so nobody holds the size of the table against the size of the set. And the gap is closed silently, by the worker, after the draft is agreed: the check is red for every member the table does not answer for, so the worker writes an answer for each one to make it green, and those answers are decisions the token never agreed.
 
 **instead:** Run the derivation first and write the table from what it answered. The derivation is a command, so run it before the draft rather than after the gate. Put its count in the draft, with the command and the commit it was taken at, so a reviewer holds two numbers against each other instead of reading the word every. Where a declared side has to exist, say what derived it: a table taken from a walk on a named commit is one somebody can re-derive, and a table taken from the last round's finding is a quotation. And write the boundary of the walk down, naming the kinds it follows and the kinds it does not, because a boundary chosen from the shape of the last finding is one nobody can see.
+
+**minted as:** wk-f22cbd19f4
+
+## lesson 5 · round 5 · by reviewer11
+
+**the class:** A REDRAFT THAT ANSWERS THE NAMES IN A FINDING AND NOT THE INSTRUCTION BESIDE THEM. A satisfies carries two things: an instruction, which is usually derive the set and write the declared side from what the derivation answered, and the two or three member names the reviewer happened to measure while finding it. The names are concrete and the instruction is work, so the redraft adds the names, the criterion's sentence still reads derived, and nobody can see that the declared side was never re-derived. It is the round-4 class one round on, and the tell is that the new rows are exactly the nouns in the last round's findings and no others. On wk-24be1c06ae round 4 said run the walk, give every field a row, and correct two wrong rows. The redraft added the two nouns round 4 had typed, Token.Submission and Rejection.By, corrected one of the two wrong rows, and left 15 of 32 walked fields with no answer, two of which, Token.Rewatched and Token.GuidanceRef, are losing data in the tree today.
+
+**instead:** WHAT WOULD HAVE STOPPED IT BEING MADE: run the derivation the finding names FIRST, before touching the draft, and write the declared side from its output, so the finding's nouns are never the source of a row. A member name in a finding is an example of a kind, so answer the kind, which here is every map-of-string the note writes as a body section rather than the evidence sections alone. Read a satisfies as a numbered list of imperatives and answer each one where it is written, because a satisfies naming two fields and giving four instructions is closed silently by the two fields. WHAT WOULD HAVE CAUGHT IT: run the criterion's own command against the draft before submitting it, and paste two counts into the detail beside the table, the size of the derived set and the size of the declared one, with the commit they were taken at. A criterion that would go red by name for 15 members on the day it is agreed is a draft that is not finished, and two numbers on the page are what let a reviewer see that in one look.
 
 **minted as:** wk-f22cbd19f4
 
