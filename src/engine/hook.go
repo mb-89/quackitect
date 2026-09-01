@@ -134,6 +134,123 @@ func runsTheEngineWith(command, flag string) bool {
 	return false
 }
 
+// runsTheEngine answers whether this command runs the engine at all, whatever
+// it asks the engine to do.
+//
+// IT IS THE NAMED EXCEPTION TO THE WRITE GATE. Minting a token, saying which
+// one you are on, answering the person: an agent with nothing in hand does all
+// of those through the engine, so gating them would be a gate nobody could ever
+// pass. It is deliberately the whole program rather than a list of verbs: a
+// list of verbs is a set described rather than asked for, and it goes short the
+// day somebody adds one.
+// THE ENGINE HAS TO BE THE PROGRAM, AND THE ONLY ONE.
+//
+// This asked whether any word was the engine, so the write gate was skipped for
+// any command that merely mentioned it: echo se was in the exception, and so was
+// echo se && rm -rf src/engine. And a compound whose first half ran the engine
+// took its second half through with it, because the gate reads one string.
+//
+// SO IT ANCHORS THE WAY runsTheEngineWith ALREADY DOES. The engine is the first
+// word, and a separator introducing a second program takes the command back out
+// of the exception. A separator inside quotes is data and not a separator, which
+// is why the quoted spans come out first: an answer carrying a semicolon is an
+// answer, and refusing it would break the one call an agent with nothing in hand
+// has to be able to make.
+func runsTheEngine(command string) bool {
+	// THE PROGRAM IS READ WITH ITS QUOTES ON, because a path with a space in it
+	// is one word and this machine has several. The separators are read with the
+	// quotes off, because punctuation inside them is somebody's prose.
+	if !isTheEngine(firstWord(command)) {
+		return false
+	}
+	// A REDIRECTION IS A WRITE AND IT NEEDS NO SECOND PROGRAM. This list held the
+	// separators that introduce another program and not the ones that write a
+	// file, so `se --version > src/engine/gate.go` was inside the exception: an
+	// ungated write of the gate's own source. A reviewer found it on the shipped
+	// binary, with the redirection allowed and a plain search from the same actor
+	// refused.
+	// ONE WALK, AND EVERY QUESTION READ OFF IT. Where the quoted spans begin
+	// and end is one fact about the string, so a second pass with its own
+	// delimiters builds a second parse and at most one of them is bash's.
+	//
+	// THAT SECOND PARSE IS HOW THIS LEAKED A FOURTH TIME. The substitution
+	// scan demoted the double quote, so an apostrophe in ordinary English --
+	// it's, don't -- opened a span for it, and everything to the next
+	// apostrophe was invisible to the only scan hunting $( and a backtick.
+	// rev-25 drove `se work --detail "it's $(...)"` past the gate, and a bare
+	// substitution behind an earlier apostrophe with it.
+	separators, substitutions := theQuotings(command)
+	// A SEPARATOR IS LITERAL INSIDE EITHER KIND OF QUOTE, which is what keeps
+	// `se work --detail "a sentence; with punctuation"` working.
+	if strings.ContainsAny(separators, ";&|<>\n") {
+		return false
+	}
+	// A SUBSTITUTION IS LITERAL IN SINGLE QUOTES AND LIVE IN DOUBLE ONES.
+	return !strings.Contains(substitutions, "$(") && !strings.Contains(substitutions, "`")
+}
+
+// theQuotings walks a command once in bash's own state machine and answers both
+// readings of it: separators is everything unquoted, and substitutions is
+// everything except the single-quoted spans.
+//
+// SPLIT THE ANSWER, NEVER THE WALK. A single quote is literal inside a
+// double-quoted span and a double quote is literal inside a single-quoted one,
+// so where the spans lie is decided once, here, and each scan reads its own
+// string off that one decision.
+func theQuotings(command string) (separators, substitutions string) {
+	var sep, sub strings.Builder
+	quote := rune(0)
+	for _, r := range command {
+		switch {
+		case quote == '\'':
+			if r == '\'' {
+				quote = 0
+			}
+		case quote == '"':
+			if r == '"' {
+				quote = 0
+				continue
+			}
+			sub.WriteRune(r)
+		case r == '\'' || r == '"':
+			quote = r
+			sep.WriteRune(' ')
+			if r == '\'' {
+				sub.WriteRune(' ')
+			}
+		default:
+			sep.WriteRune(r)
+			sub.WriteRune(r)
+		}
+	}
+	return sep.String(), sub.String()
+}
+
+// The first word of a command, with a quoted span counting as part of one word.
+func firstWord(command string) string {
+	var out strings.Builder
+	quote := rune(0)
+	for _, r := range command {
+		switch {
+		case quote != 0:
+			if r == quote {
+				quote = 0
+				continue
+			}
+			out.WriteRune(r)
+		case r == '"' || r == '\'':
+			quote = r
+		case r == ' ' || r == '\t':
+			if out.Len() > 0 {
+				return out.String()
+			}
+		default:
+			out.WriteRune(r)
+		}
+	}
+	return out.String()
+}
+
 // isTheEngine answers whether this word names the engine, wherever it was
 // started from and however it is quoted.
 func isTheEngine(word string) bool {
@@ -477,6 +594,35 @@ func decidePreToolUse(roots Roots, cfg Config, emergency Emergency, log *Log, in
 		}
 	}
 
+	// NO TOKEN, NO WRITING.
+	//
+	// A write says which work it belongs to, and saying it is what puts that
+	// token in work. So the queue on the person's screen is the truth about what
+	// is being done, rather than a thing the agent has to remember to update.
+	//
+	// THE ENGINE'S OWN CALLS GO THROUGH. Minting a token, naming one, answering
+	// the person: all of those are how an agent with nothing in hand gets a
+	// token, so gating them would be a gate nobody could ever pass. This is the
+	// named exception the token asks for rather than a hole.
+	//
+	// IT IS ASKED LAST, AFTER THE GUARDS THAT READ THE WRITE ITSELF. A refusal
+	// naming the projection, the voice rule or the private original tells the
+	// agent something about this write. This one tells it something about the
+	// queue, and the specific answer is the more useful of the two.
+	// THE PULL GOING PAST IS WHERE THE TWO NAMES MEET. The harness calls this
+	// agent one thing and the command says what it pulls with, so the guard
+	// writes the link down here and the gate can ask about both.
+	NoteTheNameItPullsWith(roots, actor, ti.Command)
+
+	if !runsTheEngine(ti.Command) {
+		if why, refuse := WriteNeedsAToken(roots, actor, in.ToolName, pathOf(in)); refuse {
+			record(log, "engine", "gate", actor, "refused: no token in hand", No(),
+				map[string]any{"tool": in.ToolName})
+			denyToolUse(why)
+			return
+		}
+	}
+
 	// ONE LINE PER CALL, and it is written when the call comes back.
 	//
 	// A call and an answer are one thing: the answer already carries what was
@@ -617,11 +763,27 @@ func decideStop(roots Roots, cfg Config, log *Log, in hookIn, actor string) {
 func describe(tool, path, command string) string {
 	switch {
 	case command != "":
-		return tool + " " + firstLine(command)
+		// THE COMMAND IS SQUASHED, NOT CUT AT ITS FIRST LINE. Agents write
+		// multi-line commands whose whole first line is `python -c "`, so the
+		// record said that and nothing else, and the owner read it as the same
+		// call failing over and over. The newlines fold to spaces, the cap
+		// still holds, and the transcript keeps the whole thing.
+		return tool + " " + squashed(command)
 	case path != "":
 		return tool + " " + path
 	}
 	return tool
+}
+
+// squashed folds every run of whitespace to one space and keeps the cap
+// firstLine keeps, so a multi-line command reads as its content rather than
+// as its shortest line.
+func squashed(s string) string {
+	s = strings.Join(strings.Fields(s), " ")
+	if len(s) > 200 {
+		s = s[:200] + "…"
+	}
+	return s
 }
 
 func firstLine(s string) string {
