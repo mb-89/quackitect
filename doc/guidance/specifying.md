@@ -120,6 +120,32 @@ change or about the project, and then whether it is asserted once or forever.
 Say which in the sentence, so the reviewer judges the instrument and not only
 the words.
 
+
+HALF A MECHANISM SHIPS, AND THE HALF LEFT OUT IS THE ONE THAT AUDITS THE OTHER.
+
+A detail names two parts and says neither is enough alone. The part that
+PRODUCES gets built, checked and evidenced. The part that CHECKS the first does
+not, and nothing downstream looks wrong, because the producing half fills the
+field, writes the record and turns the gate green. The absence has no symptom
+until the producing half is wrong, which is the exact case the second half
+existed for.
+
+ASK WHICH HALF HAS NO OUTPUT. That is the one that will be missing. It cannot be
+demonstrated by showing a thing it made, its tests are about somebody else's
+mistake, and it always looks like it can follow later. So it is deferred, and
+being deferred it is not written down as deferred, because nothing was decided.
+
+PUT BOTH HALVES IN THE EVIDENCE, even when the second one's answer is nothing
+yet. Nothing yet, naming what still owes it, is an answer. Silence is not,
+because silence cannot be told from having judged it out of scope.
+
+MEASURED ON wk-7f0b46d99f, whose detail said a criterion is observed red in two
+places and neither alone is enough. The worker's half was built well and its
+evidence reproduced. The reviewer's half was built nowhere: no field, no
+refusal, nothing in the note, and no evidence section mentioning it. The gate
+had by then been loosened to take the worker's recorded red on trust, so the
+missing half was the only thing holding it.
+
 ## What a criterion is not
 
 It is not a plan. How the work is done is the worker's, and a spec that
