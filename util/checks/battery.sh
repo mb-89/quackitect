@@ -75,7 +75,7 @@ run "se lint" .bin/se.exe lint
 # holding five of the twelve and it answered all ok, exit 0, having said nothing
 # about the seven it did not run. Any sweep, or any accidental deletion, shrinks
 # the battery in silence while every submission goes on citing a green run.
-for c in render-check drive-editor engine-args engine-args-lifecycle engine-spawns liveness one-look panel-icons no-loose-glyphs no-loose-spawns no-lone-escape checks-live-in-the-method; do
+for c in render-check drive-editor engine-args engine-args-lifecycle engine-spawns liveness one-look panel-icons no-loose-glyphs no-loose-spawns no-lone-escape checks-live-in-the-method engine-spawns-catches; do
   if [ -f "util/checks/$c.mjs" ]; then
     run "$c" node "util/checks/$c.mjs" "$root"
   else

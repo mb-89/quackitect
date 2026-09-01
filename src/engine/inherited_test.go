@@ -3,7 +3,6 @@ package main
 import (
 	"os"
 	"path/filepath"
-	"strings"
 	"testing"
 )
 
@@ -100,7 +99,7 @@ func TestTheInheritedCheckRuleReachesEveryProjection(t *testing.T) {
 			t.Errorf("%s is projected from %s and cannot be read: %v", target, inheritedFile, err)
 			continue
 		}
-		if !strings.Contains(strings.ToLower(string(b)), rule) {
+		if !carriesLoosely(string(b), rule) {
 			t.Errorf("%s is projected from %s and does not carry the rule", target, inheritedFile)
 		}
 	}

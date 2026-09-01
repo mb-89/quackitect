@@ -302,6 +302,35 @@ THE CHECK GOES WHERE THE DEFECT IS, in the language the defect is written in.
 A CHECK THAT FINDS NOTHING TO CHECK REFUSES. One that passes because the code it
 guards has gone is a check that has quietly stopped working.
 
+
+A DESCRIPTION OF THE SET STANDING IN FOR THE SET.
+
+A check is written over every member of a set, and the members are not asked
+for. A HAND LIST TYPES THEM OUT. A PATTERN SAYS WHAT THEY LOOK LIKE. Both are
+complete on the day they are written and neither knows when it stops being.
+
+THE TELL IS THE SAME IN BOTH: the check DESCRIBES THE MEMBERS INSTEAD OF ASKING
+FOR THEM. Ask where the set is defined. If it is a struct, an enum, a directory,
+a JSON list or a switch, the language or the tree can hand you its members. If
+the answer is in the check, the check is the only place that knows.
+
+WHAT IT COSTS. The check stays green when a member is added, which is the only
+moment it was ever needed. Nothing goes red and nobody is told. An anti-vacuity
+guard does not help: refusing an empty list catches the list being deleted and
+says nothing about the list being short, and short is the only way this goes
+wrong.
+
+WHAT TO DO INSTEAD, AND IT DIFFERS BY SHAPE. WHERE THE LANGUAGE CAN ENUMERATE,
+ASK IT: reflect over the struct, read the map, walk the registered list. Where
+it cannot, because the set is a behaviour in somebody else's source, hold the
+count AGAINST SOMETHING THE CHECK DID NOT PRODUCE, and say so when the two
+disagree rather than reporting what you found.
+
+MEASURED, ON BOTH SHAPES. A search for a spawn whose arguments are an inline
+array read EIGHT OF NINE, and the ninth was the one that had KEPT ITS LITERALS
+at its call site. And a hand list of NINE STRUCT FIELDS WOULD HAVE MISSED THE
+TENTH, which is the moment the token about losing data exists for.
+
 ### A check whose red depends on data the system eats goes quiet
 
 Ask what the tree would have to contain for the check to go red. Then ask

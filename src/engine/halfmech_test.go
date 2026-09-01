@@ -68,14 +68,28 @@ func bothPlaces(t *testing.T) map[string]string {
 	}
 }
 
+// carriesLoosely answers whether a text says want, ignoring how it is wrapped.
+//
+// A PHRASE BROKEN BY A LINE WRAP IS STILL THE PHRASE. These files are wrapped
+// and a projection re-wraps them, so a raw search judges the wrapping rather
+// than the words. Three projection checks were written with one and every one
+// of them went red over a file that carries the rule.
+func carriesLoosely(text, want string) bool {
+	flat := strings.Join(strings.Fields(strings.ToLower(text)), " ")
+	return strings.Contains(flat, strings.Join(strings.Fields(strings.ToLower(want)), " "))
+}
+
 // saysAll fails naming the file that is short, and the phrase it is short of.
 //
 // NAMING THE FILE IS THE POINT. A check that confirmed one place and was silent
 // about the other is how a rule ends up in the file nobody's harness reads.
 func saysAll(t *testing.T, where string, said string, wants []string) {
 	t.Helper()
+	// A PHRASE BROKEN BY A LINE WRAP IS STILL THE PHRASE. These files are
+	// wrapped, so a phrase lands either side of a newline often enough that
+	// matching the raw text would be judging the wrapping.
 	for _, want := range wants {
-		if !strings.Contains(strings.ToLower(said), strings.ToLower(want)) {
+		if !carriesLoosely(said, want) {
 			t.Errorf("%s does not say %q", where, want)
 		}
 	}
@@ -145,7 +159,7 @@ func TestTheHalfMechanismRuleReachesEveryProjection(t *testing.T) {
 			t.Errorf("%s is projected from %s and cannot be read: %v", target, halfMechBehaviour, err)
 			continue
 		}
-		if !strings.Contains(strings.ToLower(string(b)), rule) {
+		if !carriesLoosely(string(b), rule) {
 			t.Errorf("%s is projected from %s and does not carry the rule", target, halfMechBehaviour)
 		}
 	}
