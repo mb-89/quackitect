@@ -3,11 +3,10 @@ id: wk-1b7c1a2da1
 seq: 1000013
 type: work
 title: the bar burns down
-status: spec_in_work
+status: spec_submitted
 assignee: main
 scope: single-step
 traced: true
-holder: main
 rounds: 1
 minted_by: person
 ---
@@ -22,6 +21,14 @@ two per-day numbers are read out of the log. The log holds what is needed: a
 work event carries the mint with its time, and a review event carries the
 verdict. The absolute count is taken over the notes, because that is a fact
 about now rather than about a day.
+
+THE PANEL DERIVING NOTHING IS ITS OWN CRITERION, IN THE LANGUAGE THE RULE IS
+ABOUT. The owner asked for it by name, obviously the engine should do these
+calculations, and a criterion carrying that sentence with a Go command cannot
+decide it: a test in src/engine cannot see src/extension at all, and the check
+that drives the page sees four numbers rendered and cannot tell one the engine
+handed over from one the panel worked out. util/checks already reads the
+extension's own source for rules of this shape, so this one does too.
 
 AND THE WINDOW IS NAMED IN THE ANSWER, because it is smaller than it looks. se
 retro drains the log, so the per-day numbers only reach back to the last retro,
@@ -52,6 +59,8 @@ wk-c02dc4046b.
   `rg -q func.TestTheBurndownSaysItsWindow src/engine && go test -C src/engine -count=1 -run TestTheBurndownSaysItsWindow$ .`
 - The bar draws BD: four numbers separated by slashes, small, with the detail on hover and not on the bar, and the check drives the page rather than reading the source. THE ARGUMENTS COME FROM src/extension/engineargs.ts, so the builder is one engine-args.mjs already walks and no flag is written at the call site
   `node util/checks/burndown.mjs .`
+- The panel derives none of the four, and the check reads the panel's own source, because a rule about TypeScript enforced in Go cannot see the thing it guards. DERIVING MEANS FORMING ANY OF THE FOUR FROM ANOTHER NUMBER rather than reading it out of the engine's answer, so the check refuses arithmetic between the values on the way to the bar and names the number it found being made
+  `node util/checks/burndown-derives-nothing.mjs .`
 - The whole battery is green afterwards. THIS IS A STANDING RULE OVER THE PROJECT rather than an assertion about this change: it is true before the work and has to be true after
   `sh util/checks/battery.sh`
   **red without** the package made not to build, in a copy of the tree

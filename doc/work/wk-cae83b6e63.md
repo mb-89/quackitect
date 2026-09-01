@@ -3,10 +3,11 @@ id: wk-cae83b6e63
 seq: 1000017
 type: work
 title: a reviewer repairs trivia
-status: spec_submitted
+status: spec_in_review
 assignee: main
 scope: single-step
 traced: true
+holder: reviewer11
 depends_on:
   - wk-24be1c06ae
 rounds: 2
@@ -45,8 +46,6 @@ recorded observation to name a line where an assertion stands, so an edit above
 that line turns it red with nothing wrong. Taking the line out of the check and
 making it find the assertion by its words is the repair, and wk-42adef4818
 carries it.
-
-THE RATE IS NOT WRITTEN HERE AND NOT REQUIRED INTO THE METHOD. It is alive: three drafts carried three different figures for it today and a count an hour later answered differently again, because reviews land while anybody is counting. A number nobody re-derives has no owner. It belongs on the burndown bar, wk-1b7c1a2da1, where the engine computes it on every draw and it is right at the moment somebody looks. WHAT DOES NOT MOVE IS THE CASE: wk-2b78b911b1 lost a whole round to a line number that had shifted, and it changed no behaviour and would have taken one edit.
 
 ## done when
 
