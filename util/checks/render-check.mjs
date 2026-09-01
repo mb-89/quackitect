@@ -223,6 +223,23 @@ const want = [
       return names.length > 0 && twice.length === 0;
     });
   }],
+  // A RULE BETWEEN THE TWO KINDS, once per pane, after the last query and
+  // before the first bucket. The two halves overlap by design, so the page
+  // says they are different kinds rather than leaving a reader to count the
+  // rows twice.
+  ["a rule divides the queries from the buckets", (h) => {
+    const panes = h.split('<div class="pane-wrap"').slice(1);
+    if (panes.length === 0) return false;
+    return panes.every((pane) => {
+      const scroll = pane.slice(pane.indexOf('<div class="pane">'));
+      const rule = scroll.indexOf('<div class="kinds">');
+      if (rule < 0) return false;
+      const after = scroll.slice(rule);
+      const before = scroll.slice(0, rule);
+      return before.includes('<span class="name">q/')
+        && !after.includes('<span class="name">q/');
+    });
+  }],
   ["a query draws q slash and a bucket does not", (h) => {
     const flat = [];
     const walk = (gs) => (gs || []).forEach((g) => { flat.push(g); walk(g.groups); });

@@ -340,10 +340,33 @@ export function paneBody(t: Table): Body {
   <thead><tr>${cols.map((c, i) => head(c, t, i === cols.length - 1)).join("")}</tr></thead>
 </table>`,
     pinned: (t.pinned ?? []).map((g) => groupHtml(g, cols, t)).join(""),
-    scrolling: (t.groups ?? []).map((g) => groupHtml(g, cols, t)).join(""),
+    scrolling: withARuleBetweenTheKinds(t.groups ?? [], cols, t),
     total: t.total,
     counts: t.counts ?? [],
   };
+}
+
+// A RULE BETWEEN THE QUERIES AND THE BUCKETS, the same one that divides the
+// pinned from the rest.
+//
+// THE TWO HALVES ARE DIFFERENT KINDS AND THE PAGE HAS TO SAY SO. A query is a
+// question asked of every row, so a row is drawn in every query that matches it
+// AND in its bucket: the rows below the rule are the rows above it again. A
+// reader who does not know that reads the page as a list and counts wrong.
+//
+// AND no group IS A BUCKET, not a query that came up empty, which is the other
+// thing the rule says without a legend.
+function withARuleBetweenTheKinds(groups: Group[], cols: string[], t: Table): string {
+  const out: string[] = [];
+  let ruled = false;
+  for (const g of groups) {
+    if (!ruled && !g.declared && out.length > 0) {
+      out.push(`<div class="kinds"></div>`);
+      ruled = true;
+    }
+    out.push(groupHtml(g, cols, t));
+  }
+  return out.join("");
 }
 
 // THE LAST COLUMN TAKES WHATEVER IS LEFT, so the table always fills its pane.
@@ -491,6 +514,7 @@ function css(): string {
   .heads { flex: 0 0 auto; }
   /* The pinned groups do not scroll. That is the whole of what pinning is. */
   .top { flex: 0 0 auto; border-bottom: 1px solid var(--vscode-panel-border); }
+  .kinds { border-top: 1px solid var(--vscode-panel-border); margin: 6px 0; }
   .pane { flex: 1 1 auto; overflow: auto; }
   thead th { position: sticky; top: 0; z-index: 2; text-align: left; font-weight: 600;
              padding: 4px 8px; background: var(--vscode-editor-background);
