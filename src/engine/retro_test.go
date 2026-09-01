@@ -55,14 +55,17 @@ func aWorkedTree(t *testing.T) Roots {
 	if err := os.WriteFile(filepath.Join(logs, Current), []byte(running), 0o644); err != nil {
 		t.Fatal(err)
 	}
+	// THE FOLDER BELONGS TO THE ACTOR THAT RUNS THE RETRO, so these fixtures
+	// are about a folder moving whole. Another actor's folder is left where
+	// it is now, and the test that decides that makes its own.
 	pad := r.Private("scratchpad")
-	if err := os.MkdirAll(filepath.Join(pad, "reviewer9"), 0o755); err != nil {
+	if err := os.MkdirAll(filepath.Join(pad, "main"), 0o755); err != nil {
 		t.Fatal(err)
 	}
 	if err := os.WriteFile(filepath.Join(pad, "one-off.py"), []byte("print(1)"+nl), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(filepath.Join(pad, "reviewer9", "probe.sh"), []byte("echo"+nl), 0o644); err != nil {
+	if err := os.WriteFile(filepath.Join(pad, "main", "probe.sh"), []byte("echo"+nl), 0o644); err != nil {
 		t.Fatal(err)
 	}
 	return r
@@ -456,4 +459,86 @@ func readDirOr(t *testing.T, dir string) []string {
 		out = append(out, e.Name())
 	}
 	return out
+}
+
+// A RETRO TAKES NOTHING AN UNFINISHED TOKEN NAMES BY PATH.
+//
+// THE SWEEP HAD NOTHING STANDING OVER IT FROM INSIDE. Two criteria said the
+// checks are left alone, and util/checks sits outside the swept folder, so both
+// were about the boundary and neither about what the sweep takes.
+//
+// WHAT IT TAKES IS OTHER TOKENS' EVIDENCE. A note that cites a scratchpad file
+// as the artefact behind an observation loses it, and the observation gate
+// rests on that artefact being followable.
+func TestARetroKeepsWhatAnOpenTokenCites(t *testing.T) {
+	exe := retroExe(t)
+	r := aWorkedTree(t)
+	pad := r.Private("scratchpad")
+	if err := os.WriteFile(filepath.Join(pad, "observed-red.txt"),
+		[]byte("what the runner printed"+nl), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	mint(t, r, Token{Title: "still open",
+		Detail: "the red is in .se/scratchpad/observed-red.txt, which is the whole of it"})
+	// AND ONE AN ENDED TOKEN CITES IS TAKEN, because the citation has done
+	// its work. Otherwise the folder never empties and the drain stops
+	// meaning anything.
+	if err := os.WriteFile(filepath.Join(pad, "spent.txt"), []byte("old"+nl), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	// MINTED AND THEN ENDED, because Mint opens a token whatever it is
+	// handed, so the ended state has to be written after.
+	spent := mint(t, r, Token{Title: "finished",
+		Detail: "it rested on .se/scratchpad/spent.txt and it is done"})
+	spent.Status = ImpDone
+	if err := SaveToken(r, spent); err != nil {
+		t.Fatal(err)
+	}
+
+	got, out, err := runRetroExe(t, exe, r.Work)
+	if err != nil {
+		t.Fatalf("se retro: %v\n%s", err, out)
+	}
+	if _, err := os.Stat(filepath.Join(pad, "observed-red.txt")); err != nil {
+		t.Errorf("an open token cites observed-red.txt and the retro took it: %v", err)
+	}
+	if _, err := os.Stat(filepath.Join(pad, "spent.txt")); err == nil {
+		t.Errorf("only a finished token cites spent.txt and the retro left it")
+	}
+	if got.Kept == nil {
+		t.Errorf("the retro says nothing about what it kept, so a reader cannot tell")
+	}
+}
+
+// AND IT LEAVES ANOTHER ACTOR'S FOLDER.
+//
+// THE GUARD ASKS WHO HOLDS A TOKEN AND THE FOLDER ASKS WHO HAS FILES. An agent
+// is holderless for ordinary reasons: a reviewer whose queue answered wait, a
+// worker between submitting and being reviewed, an agent reading before it
+// pulls. Each of those is told to keep its working files here.
+func TestARetroLeavesAnotherActorsFolder(t *testing.T) {
+	exe := retroExe(t)
+	r := aWorkedTree(t)
+	pad := r.Private("scratchpad")
+	if err := os.MkdirAll(filepath.Join(pad, "reviewer9"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(pad, "reviewer9", "probe.sh"),
+		[]byte("echo"+nl), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	got, out, err := runRetroExe(t, exe, r.Work, "--by", "main")
+	if err != nil {
+		t.Fatalf("se retro: %v\n%s", err, out)
+	}
+	if _, err := os.Stat(filepath.Join(pad, "reviewer9", "probe.sh")); err != nil {
+		t.Errorf("reviewer9 holds no token and the retro took its folder: %v", err)
+	}
+	if _, err := os.Stat(filepath.Join(pad, "one-off.py")); err == nil {
+		t.Errorf("a loose file nobody cites was left behind")
+	}
+	if len(got.Kept) == 0 {
+		t.Errorf("the retro says nothing about the folder it left")
+	}
 }

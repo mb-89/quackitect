@@ -50,9 +50,14 @@ func Nudge(r Roots, actor, role string) string {
 	if busy {
 		return ""
 	}
+	// A QUEUE THAT HAS FALLEN FORGETS THE STEPS IT FELL PAST, whatever it
+	// has fallen to. This stood inside the empty case, so it could only
+	// ever assign zero and the rule collapsed to forgetting everything when
+	// the queue emptied. A queue that fell from nine to four and climbed
+	// back said nothing for the rest of the session.
+	forgetAbove(r, role, waiting)
 	step := stepFor(waiting)
 	if step == 0 {
-		forgetAbove(r, role, waiting)
 		return ""
 	}
 	if !firstTimeAt(r, role, step) {

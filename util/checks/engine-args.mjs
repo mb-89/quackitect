@@ -17,7 +17,7 @@
 //
 //   node .se/scratchpad/engine-args.mjs <root>
 import { execFileSync, execFile } from "node:child_process";
-import { mkdtempSync, mkdirSync, writeFileSync, copyFileSync, existsSync } from "node:fs";
+import { mkdtempSync, mkdirSync, writeFileSync, copyFileSync, existsSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -214,11 +214,42 @@ for (const [what, groups] of [
     JSON.stringify(bare));
 }
 
-// A CHECK THAT FINDS NOTHING TO CHECK REFUSES. If the builders stop being
-// exported, every call above becomes a builder that answered nothing and this
-// would still have run.
+// EVERY BUILDER IS DRIVEN, OR IS EXCLUDED BY NAME WITH A REASON.
+//
+// A COUNT COMPARED WITH NOTHING SAYS NOTHING. This asked builders.length > 5,
+// which is true of twenty-six today and true of twenty-seven tomorrow, so a
+// builder added and never driven left it green. The number the module produces
+// is now held against a number this check did not produce: what the two runners
+// actually call, read out of their own source.
+//
+// AND AN EXCLUSION IS WRITTEN DOWN WITH ITS ANSWER, so a reader can tell one
+// from an oversight.
+const excluded = {
+  readKind: "not an argument builder: it reads a kind out of an answer",
+};
 const builders = Object.keys(A).filter((k) => typeof A[k] === "function");
 say("the extension exports its argument builders (" + builders.length + ")", builders.length > 5);
+
+const asked = new Set();
+for (const runner of ["engine-args.mjs", "engine-args-lifecycle.mjs"]) {
+  const src = readFileSync(join(root, "util", "checks", runner), "utf8");
+  for (const m of src.matchAll(/\bA\.(\w+)\s*\(/g)) asked.add(m[1]);
+}
+say("the runners were read for what they call (" + asked.size + ")", asked.size > 5,
+  "nothing was read out of the runners, so the comparison below is against nothing");
+for (const name of builders) {
+  if (asked.has(name) || name in excluded) continue;
+  say("engineargs." + name + " is driven against the engine", false,
+    "it is exported, no runner calls it, and it is in no exclusion");
+}
+for (const name of Object.keys(excluded)) {
+  say("the exclusion " + name + " is still a builder", builders.includes(name),
+    "it is excluded by name and the module no longer exports it");
+}
+say("every builder is driven or excluded, counted a second way ("
+  + builders.length + " exported, " + asked.size + " asked, "
+  + Object.keys(excluded).length + " excluded)",
+  builders.every((n) => asked.has(n) || n in excluded));
 
 // AND THE CHECK CAN SEE A BAD FLAG. A guard nobody has watched catch anything
 // is a guard nobody has tested, so one deliberate mistake goes through it.

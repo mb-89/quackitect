@@ -175,3 +175,56 @@ func TestTheNudgeRidesOnThePull(t *testing.T) {
 		t.Fatalf("the nudge changed the answer to %q", a.Pull)
 	}
 }
+
+// A QUEUE THAT FALLS AND CLIMBS BACK IS NUDGED AGAIN.
+//
+// THE FALL THE OLD CALL SITE COULD NOT SEE. forgetAbove ran only inside
+// `if step == 0`, so it could only ever assign zero and the rule collapsed to
+// forgetting everything when the queue emptied. A queue that fell from nine to
+// four and climbed back said nothing for the rest of the session.
+//
+// TWO FALLS, BECAUSE ONE OF THEM IS TO A LOWER STEP AND ONE IS BETWEEN STEPS.
+func TestAQueueThatFallsAndClimbsIsNudgedAgain(t *testing.T) {
+	r := lane(t)
+	for _, at := range []struct {
+		open int
+		want bool
+		why  string
+	}{
+		{6, true, "six open and nothing in hand"},
+		{4, false, "four is not a step"},
+		{6, true, "back to six after falling past it"},
+		{7, false, "seven is still the six step"},
+		{9, true, "nine is the step above"},
+		{7, false, "seven after nine is not a new step"},
+		{9, true, "back to nine after falling past it"},
+	} {
+		queueOf(t, r, at.open)
+		said := Nudge(r, "main", RoleWorker)
+		if (said != "") != at.want {
+			t.Fatalf("at %d open the engine said %q, and %s", at.open, said, at.why)
+		}
+	}
+}
+
+// queueOf leaves exactly n tokens open where main pulls, and nothing in hand.
+func queueOf(t *testing.T, r Roots, n int) {
+	t.Helper()
+	have := 0
+	for _, tok := range Tokens(r) {
+		if tok.Status != ImpOpen {
+			continue
+		}
+		have++
+		if have > n {
+			tok.Status = ImpDone
+			if err := SaveToken(r, tok); err != nil {
+				t.Fatal(err)
+			}
+			have--
+		}
+	}
+	for ; have < n; have++ {
+		mint(t, r, Token{Title: "one more", Status: ImpOpen})
+	}
+}

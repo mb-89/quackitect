@@ -22,6 +22,23 @@ import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
 const root = process.argv[2] ?? ".";
+
+// THE DOORS A BUILDER MAY REACH THE ENGINE THROUGH, other than a spawn that
+// spreads it. Each one is a function that takes an array and hands it on, and
+// each is checked below to be a function in this extension that ends at a
+// spawn this check read. Naming the doors is two names. Naming the builders
+// that use them would be eighteen, and eighteen is a photograph.
+// NOT AN ARGUMENT BUILDER, and named here with its reason so a reader can tell
+// an exclusion from an oversight.
+const notABuilder = {
+  readKind: "reads a kind out of a string. It builds no argument list and is "
+    + "called inside engineargs.ts by the one that does",
+};
+
+const doors = {
+  askEngine: "takes an array and spawns it with --work appended",
+  writeView: "takes an array, wraps it in viewArgs, and hands that to askEngine",
+};
 const here = join(root, "src", "extension");
 
 let bad = 0;
@@ -98,6 +115,69 @@ for (const one of found) {
     say(one.where + " spreads " + m[1] + ", which engineargs exports", exported.has(m[1]),
       m[1] + " is not exported by src/extension/engineargs.ts, so it is built somewhere else");
   }
+}
+
+// AND THE CONVERSE, WHICH IS THE SECOND NUMBER THIS CHECK DID NOT PRODUCE.
+//
+// The loop above asks whether every spread name is exported. It cannot see a
+// spawn written in a shape the pattern misses, because a spawn it never read
+// is a spawn it never judged. From the other end that spawn shows up as a
+// builder nobody spreads, and the builders are enumerated by the language.
+//
+// A BUILDER THAT REACHES THE ENGINE ANOTHER WAY IS NAMED HERE WITH ITS REASON,
+// so a reader can tell an exclusion from an oversight.
+const spreadSomewhere = new Set();
+for (const one of found) {
+  for (const m of one.args.matchAll(/\.{3}\s*([A-Za-z_$][\w$]*)\s*\(/g)) spreadSomewhere.add(m[1]);
+}
+
+// A BUILDER HANDED TO A DOOR REACHES THE ENGINE THROUGH IT. The statement is
+// the unit: a call to a door and the builder it is given sit in one.
+const extSrc = readFileSync(join(here, "extension.ts"), "utf8");
+const throughADoor = new Set();
+
+// A NAME IS FOLLOWED BACK TO THE BUILDER THAT GAVE IT, the same way a spawn's
+// arguments are. A call site that binds the array first and hands the name to
+// the door is the ordinary shape here, and reading only the statement would
+// report those builders as unreached.
+// THE NEAREST ASSIGNMENT ABOVE THE CALL IS THE ONE. Two call sites both bind a
+// local called args, so one map over the file would let the later one answer
+// for the earlier, and a builder would be reported as reaching the engine on
+// the strength of a different builder's assignment.
+function givenBy(name, before) {
+  const gives = new RegExp("\\b(?:const|let|var)\\s+NAME\\s*(?::[^=]*)?=\\s*([A-Za-z_$][\\w$]*)\\s*\\(".replace("NAME", name), "g");
+  const all = [...before.matchAll(gives)];
+  return all.length ? all[all.length - 1][1] : name;
+}
+for (const door of Object.keys(doors)) {
+  for (const m of extSrc.matchAll(new RegExp("NAME\\s*\\(([^;]*)".replace("NAME", door), "g"))) {
+    const before = extSrc.slice(0, m.index);
+    for (const w of m[1].matchAll(/\b([A-Za-z_$][\w$]*)/g)) {
+      const name = givenBy(w[1], before);
+      if (exported.has(name)) throughADoor.add(name);
+    }
+  }
+}
+for (const [door, why] of Object.entries(doors)) {
+  say("the door " + door + " is a function here that " + why,
+    new RegExp("function " + door + "\\s*\\(").test(extSrc),
+    "nothing in extension.ts declares it, so it is not a door and the builders "
+    + "excused through it are excused by nothing");
+}
+for (const name of exported) {
+  if (spreadSomewhere.has(name) || throughADoor.has(name) || name in notABuilder) continue;
+  say("engineargs." + name + " reaches the engine", false,
+    "no spawn this check read spreads it and no door is handed it. Either a "
+    + "spawn is written in a shape the pattern misses, or the builder is dead");
+}
+say("every builder is spread or excluded, counted from the module ("
+  + exported.size + " exported, " + spreadSomewhere.size + " spread, "
+  + throughADoor.size + " through a door, "
+  + Object.keys(notABuilder).length + " not a builder)",
+  [...exported].every((n) => spreadSomewhere.has(n) || throughADoor.has(n) || n in notABuilder));
+for (const name of Object.keys(notABuilder)) {
+  say("the exclusion " + name + " is still exported", exported.has(name),
+    "it is excluded by name and engineargs no longer exports it");
 }
 
 console.log("\n" + found.length + " spawn(s) read. " + bad + " failed.");

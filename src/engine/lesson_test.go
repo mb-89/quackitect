@@ -167,3 +167,105 @@ func TestASpecRejectionNamesTheLessonsTokenToo(t *testing.T) {
 		t.Fatalf("the lesson did not land with its token: %+v", back.Lessons)
 	}
 }
+
+// THE REST OF THE REFUSALS ON THE REVIEWER'S PATH.
+//
+// NINE REFUSALS STAND ON THAT PATH. rejectionIsWhole carries four and each of
+// those is watched. The five beside them, in judge and judgeSpec, were watched
+// by nothing: each could be deleted with the whole suite green.
+//
+// EACH CASE ASSERTS ON WHAT ONLY ITS REFUSAL CAN SAY. Three of the five stand
+// in sequence in judge, so a case that asked only whether the call was refused
+// would pass with any one of them deleted, which is the class this token is
+// about.
+func TestAReviewerMayNotJudgeWhatItSubmitted(t *testing.T) {
+	r := lane(t)
+	tok := mint(t, r, Token{Title: "write the thing"})
+	Pull(r, "main", RoleWorker, Payload{})
+	Pull(r, "main", RoleWorker, Payload{ID: tok.ID, Disposition: string(Done)})
+	Pull(r, "rev", RoleReviewer, Payload{})
+
+	// THE FOUR-EYES RULE, which reviewing.md states as its own section and
+	// nothing watched. main submitted it, so main may not judge it.
+	a := Pull(r, "main", RoleReviewer, Payload{ID: tok.ID, Verdict: "accept"})
+	if a.Pull != AnswerRefused {
+		t.Fatalf("the submitter judged its own token: %s", a.Pull)
+	}
+	if len(a.Findings) == 0 || !strings.Contains(a.Findings[0].Wrong, "cannot judge it") {
+		t.Fatalf("the refusal does not say the submitter cannot judge it: %+v", a.Findings)
+	}
+}
+
+func TestAVerdictOnATokenInAnotherStatusIsRefused(t *testing.T) {
+	r := lane(t)
+	tok := mint(t, r, Token{Title: "write the thing"})
+	Pull(r, "main", RoleWorker, Payload{})
+
+	// IT IS IN WORK AND NOT IN REVIEW, so there is nothing to judge. The
+	// refusal names the status and not the reviewer.
+	a := Pull(r, "rev", RoleReviewer, Payload{ID: tok.ID, Verdict: "accept"})
+	if a.Pull != AnswerRefused {
+		t.Fatalf("a token that is not in review was judged: %s", a.Pull)
+	}
+	if len(a.Findings) == 0 || !strings.Contains(a.Findings[0].Wrong, "not with you") {
+		t.Fatalf("the refusal does not say the token is not with you: %+v", a.Findings)
+	}
+	if a.Findings[0].Clause != "status" {
+		t.Fatalf("the refusal is not about the status: %q", a.Findings[0].Clause)
+	}
+}
+
+func TestASecondReviewerOnAHeldSphereIsRefused(t *testing.T) {
+	r := lane(t)
+	tok := mint(t, r, Token{Title: "write the thing"})
+	Pull(r, "main", RoleWorker, Payload{})
+	Pull(r, "main", RoleWorker, Payload{ID: tok.ID, Disposition: string(Done)})
+	Pull(r, "rev", RoleReviewer, Payload{})
+
+	// ONE SPHERE HAS ONE REVIEWER. rev holds it, so a second reviewer is
+	// told whose it is rather than merely refused.
+	a := Pull(r, "rev2", RoleReviewer, Payload{ID: tok.ID, Verdict: "accept"})
+	if a.Pull != AnswerRefused {
+		t.Fatalf("a second reviewer judged a held token: %s", a.Pull)
+	}
+	if len(a.Findings) == 0 || !strings.Contains(a.Findings[0].Wrong, "newer reviewer holds this sphere") {
+		t.Fatalf("the refusal does not say another reviewer holds it: %+v", a.Findings)
+	}
+}
+
+func TestADrafterMayNotAgreeItsOwnSpec(t *testing.T) {
+	r := guidanceTree(t)
+	tok := aSpec(t, r, "a thing to build")
+	Pull(r, "main", RoleWorker, Payload{})
+	Pull(r, "main", RoleWorker, Payload{ID: tok.ID})
+	Pull(r, "rev", RoleReviewer, Payload{})
+
+	// THE SAME RULE ON THE OTHER HALF. main drafted it, so main may not
+	// agree it, and the refusal says agree rather than judge.
+	a := Pull(r, "main", RoleReviewer, Payload{ID: tok.ID, Verdict: "accept"})
+	if a.Pull != AnswerRefused {
+		t.Fatalf("the drafter agreed its own spec: %s", a.Pull)
+	}
+	if len(a.Findings) == 0 || !strings.Contains(a.Findings[0].Wrong, "cannot agree it") {
+		t.Fatalf("the refusal does not say the drafter cannot agree it: %+v", a.Findings)
+	}
+}
+
+func TestASpecNotWithThisReviewerIsRefused(t *testing.T) {
+	r := guidanceTree(t)
+	tok := aSpec(t, r, "a thing to build")
+	Pull(r, "main", RoleWorker, Payload{})
+	Pull(r, "main", RoleWorker, Payload{ID: tok.ID})
+	Pull(r, "rev", RoleReviewer, Payload{})
+
+	// rev holds the draft, so rev2 is told it is not theirs. This refusal
+	// stands behind the drafter refusal, and rev2 is not the drafter, so it
+	// is the only one that can answer here.
+	a := Pull(r, "rev2", RoleReviewer, Payload{ID: tok.ID, Verdict: "accept"})
+	if a.Pull != AnswerRefused {
+		t.Fatalf("a spec held by another reviewer was judged: %s", a.Pull)
+	}
+	if len(a.Findings) == 0 || !strings.Contains(a.Findings[0].Wrong, "not with you") {
+		t.Fatalf("the refusal does not say the spec is not with you: %+v", a.Findings)
+	}
+}

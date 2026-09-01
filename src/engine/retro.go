@@ -45,6 +45,7 @@ type Collected struct {
 	Scripts    int      `json:"scripts"`
 	Transcript []string `json:"transcripts"`
 	Missing    []string `json:"looked_for_and_missing"`
+	Kept       []string `json:"kept_and_why"`
 }
 
 // AN ACTOR STILL HOLDING WORK STOPS A RETRO, AND THE REFUSAL NAMES THEM.
@@ -113,9 +114,35 @@ func Retro(r Roots, actor string, transcripts map[string]string) (Collected, err
 	}
 	got.Logs = n
 
-	// THE SCRATCHPAD MOVES WHOLE, folders and all, because a per-actor folder is
-	// exactly the working file a retro wants to read.
-	n, err = drain(r.Private("scratchpad"), filepath.Join(folder, "scratchpad"), nil)
+	// THE SCRATCHPAD MOVES EXCEPT FOR TWO THINGS, AND THE INDEX SAYS WHICH.
+	//
+	// A FILE AN UNFINISHED TOKEN NAMES BY PATH STAYS. A note that cites a
+	// scratchpad file as the artefact behind an observation loses it
+	// otherwise, and since the observation gate rests on a recorded red
+	// rather than on the engine seeing it, that artefact is what a reviewer
+	// re-runs. A finished token's citation has done its work and goes.
+	//
+	// ANOTHER ACTOR'S FOLDER STAYS. The refusal above asks who holds a
+	// token, and the folder asks who has files, which are different sets: an
+	// agent is holderless for ordinary reasons and is still told to keep its
+	// working files here.
+	//
+	// NARROWED RATHER THAN REFUSED, because a refusal covering everybody who
+	// has pulled would refuse nearly always, and a retro nobody can run is
+	// not a boundary.
+	cited := citedInOpenWork(r)
+	pad := r.Private("scratchpad")
+	n, err = drain(pad, filepath.Join(folder, "scratchpad"), func(name string) bool {
+		if cited[name] {
+			got.Kept = append(got.Kept, name+": an unfinished token names it by path")
+			return false
+		}
+		if isDir(filepath.Join(pad, name)) && name != actor {
+			got.Kept = append(got.Kept, name+": another actor's folder, and they may be writing to it")
+			return false
+		}
+		return true
+	})
 	if err != nil {
 		return got, err
 	}
@@ -144,6 +171,68 @@ func Retro(r Roots, actor string, transcripts map[string]string) (Collected, err
 	inSession(r, "retro", actor, "a retro collected "+folder, Yes(),
 		map[string]any{"folder": folder, "logs": got.Logs, "scripts": got.Scripts})
 	return got, nil
+}
+
+// citedInOpenWork answers every scratchpad entry a token that has not ended
+// names by path, keyed by the name directly under the scratchpad.
+//
+// THE ENTRY AND NOT THE FILE. A citation reaching into a folder keeps the
+// folder, because taking the folder takes the file.
+func citedInOpenWork(r Roots) map[string]bool {
+	kept := map[string]bool{}
+	for _, t := range Tokens(r) {
+		if t.Status.Ended() {
+			continue
+		}
+		said := []string{t.Detail, t.Guidance, t.Reason}
+		for _, c := range t.Criteria {
+			said = append(said, c.Says, c.Runs, c.Without, c.Red)
+		}
+		for _, f := range t.Findings {
+			said = append(said, f.Wrong, f.Satisfies)
+		}
+		for _, one := range said {
+			for _, name := range scratchpadNames(one) {
+				kept[name] = true
+			}
+		}
+	}
+	return kept
+}
+
+// WHERE A CITATION ENDS. A path in prose is followed by punctuation or by
+// nothing, and these are the characters this record's notes put after one.
+var breaksACitation = " \t\n\r\"'`,;)]"
+
+// scratchpadNames answers the entry under .se/scratchpad each citation names.
+func scratchpadNames(said string) []string {
+	var out []string
+	const lead = ".se/scratchpad/"
+	for at := 0; ; {
+		i := strings.Index(said[at:], lead)
+		if i < 0 {
+			return out
+		}
+		at += i + len(lead)
+		end := at
+		for end < len(said) && !strings.ContainsRune(breaksACitation, rune(said[end])) {
+			end++
+		}
+		name := said[at:end]
+		if cut := strings.IndexByte(name, '/'); cut >= 0 {
+			name = name[:cut]
+		}
+		if name != "" {
+			out = append(out, name)
+		}
+		at = end
+	}
+}
+
+// isDir answers whether the path is a directory.
+func isDir(path string) bool {
+	info, err := os.Stat(path)
+	return err == nil && info.IsDir()
 }
 
 // drain moves what matches into another folder and leaves the source empty of
