@@ -299,56 +299,104 @@ func TestNoNoteCarriesATime(t *testing.T) {
 	}
 }
 
-// A NOTICE NAMES A COMMAND THIS ENGINE ANSWERS.
+// EVERY NOTICE THE ENGINE BUILDS NAMES COMMANDS THIS ENGINE ANSWERS.
 //
-// THE INVESTIGATE NOTICE TOLD AN AGENT to take a stranded token back with
-// se work --set --field status, and se work --set refuses a status with the
-// words status is moved by a pull, not by a keystroke. So the engine named a
-// remedy it forbids, and the only other thing it offered was judging a token
-// the reader had drafted, which the four-eyes refusal also forbids.
+// COUNT FROM THE SIDE THAT PRODUCES THEM. This drove one notice, the
+// investigate, so seventeen of the eighteen places the engine builds a Notice
+// were never reached. The claim was true and the check was green and nothing
+// marked the boundary, so the first notice to gain a command would have joined
+// the record with the guard green over it.
 //
-// A MESSAGE THAT NAMES A COMMAND IS A CLAIM ABOUT THAT COMMAND, and nothing
-// checked it. This runs every one a notice names.
+// AND THE ANTI-VACUITY GUARD WAS ON THE MEMBER. Refusing a notice that names no
+// command guards THAT notice going empty and says nothing about the SET being
+// short, and short is the only way this claim ever goes wrong. It is on the set
+// now: no builder found at all is the failure that means this has stopped
+// working.
+//
+// WHAT ANSWERS MEANS, said as a rule rather than as a list of messages, because
+// a message is a string somebody will reword. The engine answers a command when
+// it exits zero, or when it exits non-zero for a reason that is not the command
+// being unread.
 func TestEveryCommandANoticeNamesIsAnswered(t *testing.T) {
 	exe := retroExe(t)
 	r := lane(t)
-	tok := mint(t, r, Token{Title: "held by somebody gone"})
-	tok.Status, tok.Holder = ImpInReview, "gone"
-	if err := SaveToken(r, tok); err != nil {
-		t.Fatal(err)
+	said := noticeSource(t, filepath.Join("..", ".."))
+	if len(said) == 0 {
+		t.Fatal("no notice builder was found in src/engine, so this guards nothing")
 	}
-	said := investigate(r, tok).Notice
-	found := namedCommands(said)
-	// A NOTICE THAT NAMES NOTHING LEAVES THE READER WITH NOTHING, and a check
-	// that passed on one would pass by there being nothing to check.
-	if len(found) == 0 {
-		t.Fatalf("the investigate notice names no command at all: %q", said)
-	}
-	for _, one := range found {
-		out, err := exec.Command(exe, append(one[1:], "--work", r.Work)...).CombinedOutput()
-		if err == nil {
-			continue
-		}
-		if strings.Contains(string(out), "flag provided but not defined") ||
-			strings.Contains(string(out), "is moved by a pull") ||
-			strings.Contains(string(out), "which nothing read") {
-			t.Errorf("the notice says to run %q and the engine answers: %s",
-				strings.Join(one, " "), firstLines(strings.TrimSpace(string(out)), 2))
+	ran := 0
+	for where, one := range said {
+		for _, cmd := range namedCommands(one) {
+			ran++
+			out, err := exec.Command(exe, append(cmd[1:], "--work", r.Work)...).CombinedOutput()
+			if err == nil {
+				continue
+			}
+			if strings.Contains(string(out), "flag provided but not defined") ||
+				strings.Contains(string(out), "is moved by a pull") ||
+				strings.Contains(string(out), "which nothing read") {
+				t.Errorf("the notice built in %s says to run %q and the engine answers: %s",
+					where, strings.Join(cmd, " "), firstLines(strings.TrimSpace(string(out)), 2))
+			}
 		}
 	}
+	if ran == 0 {
+		t.Fatalf("%d notice builders name no command at all, so this guards nothing", len(said))
+	}
+	t.Logf("%d notice builder(s), %d command(s) run", len(said), ran)
 }
 
-// namedCommands answers every se invocation a notice names, as argument lists.
-// A COMMAND RUNS TO THE END OF THE CLAUSE, which is how a reader takes one out
-// of a sentence: everything after se up to the punctuation that ends it.
-var seCall = regexp.MustCompile(`\bse ([^,.;]+)`)
-
-func namedCommands(said string) [][]string {
-	var out [][]string
-	for _, m := range seCall.FindAllStringSubmatch(said, -1) {
-		out = append(out, append([]string{"se"}, strings.Fields(m[1])...))
+// noticeSource answers the body of every function in src/engine that builds a
+// notice, keyed by where it is.
+//
+// THE SET IS TAKEN FROM THE SOURCE AND NOT FROM A LIST. A builder added next
+// month is walked because it is a builder, not because somebody remembered.
+func noticeSource(t *testing.T, root string) map[string]string {
+	t.Helper()
+	out := map[string]string{}
+	entries, err := os.ReadDir(filepath.Join(root, "src", "engine"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, e := range entries {
+		if e.IsDir() || !strings.HasSuffix(e.Name(), ".go") || strings.HasSuffix(e.Name(), "_test.go") {
+			continue
+		}
+		b, err := os.ReadFile(filepath.Join(root, "src", "engine", e.Name()))
+		if err != nil {
+			t.Fatal(err)
+		}
+		text := string(b)
+		for _, m := range buildsANotice.FindAllStringSubmatchIndex(text, -1) {
+			name := text[m[2]:m[3]]
+			out[e.Name()+" "+name] = bodyFrom(text, m[1])
+		}
 	}
 	return out
+}
+
+// A FUNCTION BUILDS A NOTICE WHEN ITS NAME SAYS SO, or when it is the one that
+// answers an investigate, which is a notice by another name.
+var buildsANotice = regexp.MustCompile(`(?m)^func (\w*[Nn]otice|investigate)\(`)
+
+// bodyFrom answers the function body that opens after at.
+func bodyFrom(text string, at int) string {
+	open := strings.IndexByte(text[at:], '{')
+	if open < 0 {
+		return ""
+	}
+	depth, i := 0, at+open
+	for ; i < len(text); i++ {
+		if text[i] == '{' {
+			depth++
+		} else if text[i] == '}' {
+			depth--
+			if depth == 0 {
+				break
+			}
+		}
+	}
+	return text[at+open : i]
 }
 
 // THE NOTICE AND THE RECLAIM AGREE ABOUT WHERE A HELD TOKEN GOES.
@@ -375,4 +423,16 @@ func TestTheNoticeAndTheReclaimAgree(t *testing.T) {
 	if held == 0 {
 		t.Fatal("no state is held by anybody, so this guards nothing")
 	}
+}
+
+// A COMMAND RUNS TO THE END OF THE CLAUSE, which is how a reader takes one out
+// of a sentence: everything after se up to the punctuation that ends it.
+var seCall = regexp.MustCompile(`\bse ([^,.;"\n]+)`)
+
+func namedCommands(said string) [][]string {
+	var out [][]string
+	for _, m := range seCall.FindAllStringSubmatch(said, -1) {
+		out = append(out, append([]string{"se"}, strings.Fields(m[1])...))
+	}
+	return out
 }

@@ -52,7 +52,10 @@ wk-c02dc4046b.
   `rg -q func.TestTheBurndownSaysItsWindow src/engine && go test -C src/engine -count=1 -run TestTheBurndownSaysItsWindow$ .`
 - The bar draws BD: four numbers separated by slashes, small, with the detail on hover and not on the bar, and the check drives the page rather than reading the source. THE ARGUMENTS COME FROM src/extension/engineargs.ts, so the builder is one engine-args.mjs already walks and no flag is written at the call site
   `node util/checks/burndown.mjs .`
-- The whole battery is green afterwards
+- The whole battery is green afterwards. THIS IS A STANDING RULE OVER THE PROJECT rather than an assertion about this change: it is true before the work and has to be true after
+  `sh util/checks/battery.sh`
+  **red without** the package made not to build, in a copy of the tree
+  **red said** battery.sh: go build FAIL, and 10 failed at the end of the run
 - Every test named above was watched failing on its own assertion, with the change absent, before it was watched passing. THE EVIDENCE NAMES THE TEST AND WHAT IT SAID rather than a line number
 
 ## finding 1 · round 1 · done when, criterion 7: "The whole battery is green afterwards" · by reviewer10
