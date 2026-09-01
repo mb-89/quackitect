@@ -801,3 +801,90 @@ func inABucketNamed(tab Table, name string) bool {
 	}
 	return walk(tab.Groups)
 }
+
+// A BUCKET GROUPS BY THE BUCKET, AND A STATE IS NOT A BUCKET.
+//
+// THE FALLBACK WAS INVISIBLE UNDER THE PARTITION. The grouping level read
+// if(bucket, bucket, status), so a token with no bucket grouped under its
+// state. The declared queries took those rows first, so the fallback never
+// drew. Once a query stopped taking rows, every state drew twice: once as the
+// query named after it and once as a group the grouping invented.
+//
+// A BUCKET IS WHERE A PERSON PUT A ROW. A state is the engine's word for where
+// the row is, and there is already a query for each one.
+func TestAStateIsNotABucket(t *testing.T) {
+	p := writeBase(t, t.TempDir(), "z.base", `
+views:
+  - name: left
+    order:
+      - title
+    groupBy:
+      - property: bucket
+        sets: bucket
+    groups:
+      - name: backlogged
+        filter: status == "backlogged"
+`)
+	b, err := LoadBase(p)
+	if err != nil {
+		t.Fatal(err)
+	}
+	rows := []Row{
+		row("id", "1", "status", "backlogged", "title", "a"),
+		row("id", "2", "status", "backlogged", "bucket", "later", "title", "b"),
+	}
+	tab, err := Render(b, b.Views[0], rows)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, g := range tab.Groups {
+		if g.Declared {
+			continue
+		}
+		if g.Name == "backlogged" {
+			t.Errorf("the grouping made a group called backlogged, and there is already a query of that name")
+		}
+	}
+	// AND THE ONE WITH A BUCKET IS UNDER IT, so this cannot pass by the
+	// grouping having stopped working.
+	if !inABucketNamed(tab, "later") {
+		t.Error("the row in the bucket later was drawn nowhere")
+	}
+}
+
+// AND THE COUNT AT THE FOOT IS TOKENS, NOT ROWS DRAWN.
+//
+// A row is drawn under every query that matches it and under its bucket, so
+// counting what was drawn answered 156 over a queue of about 60. The owner read
+// it off the page and said so.
+func TestTheTotalCountsTokensAndNotRowsDrawn(t *testing.T) {
+	p := writeBase(t, t.TempDir(), "z.base", `
+views:
+  - name: left
+    order:
+      - title
+    groupBy:
+      - property: bucket
+        sets: bucket
+    groups:
+      - name: yours
+        filter: assignee == "human"
+      - name: here
+        filter: status == "open"
+`)
+	b, err := LoadBase(p)
+	if err != nil {
+		t.Fatal(err)
+	}
+	rows := []Row{
+		row("id", "1", "assignee", "human", "status", "open", "title", "a"),
+		row("id", "2", "assignee", "main", "status", "open", "title", "b"),
+	}
+	tab, err := Render(b, b.Views[0], rows)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if tab.Total != len(rows) {
+		t.Errorf("two tokens are drawn %d times and the foot says %d", 0, tab.Total)
+	}
+}

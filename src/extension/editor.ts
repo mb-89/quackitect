@@ -1159,8 +1159,13 @@ function script(): string {
     rows.forEach((row, i) => { row.hidden = i < from || i >= to; });
     // A PAGER OVER ONE PAGE SAYS NOTHING THE COUNT DOES NOT.
     bar.hidden = per === 0 || rows.length <= per;
-    bar.querySelector('.bs-where').textContent =
-      rows.length === 0 ? '' : (from + 1) + '-' + Math.min(to, rows.length) + ' of ' + rows.length;
+    // A ROW IS DRAWN UNDER EVERY QUERY THAT MATCHES IT AND UNDER ITS BUCKET,
+    // so the number of rows on the page is not the number of tokens. Saying
+    // one and meaning the other read as 156 work tokens over a queue of 61.
+    const tokens = new Set([...rows].map((r) => r.dataset.id)).size;
+    bar.querySelector('.bs-where').textContent = rows.length === 0 ? ''
+      : (from + 1) + '-' + Math.min(to, rows.length) + ' of ' + rows.length
+        + ' rows, ' + tokens + (tokens === 1 ? ' token' : ' tokens');
   }
 
   function wirePager(wrap) {

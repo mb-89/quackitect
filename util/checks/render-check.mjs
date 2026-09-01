@@ -209,6 +209,20 @@ const want = [
   // engine marks declared draws with q slash before its name, and every
   // group the data made draws with its own name. The check refuses when
   // the table holds no groups, so it cannot pass by there being none.
+  // NO TWO GROUPS ON A PAGE SHARE A NAME. The grouping fell back to the
+  // state when a token had no bucket, so every state drew twice: once as the
+  // query named after it and once as a group the grouping invented. A person
+  // read it off the page and said backlogged is in there twice.
+  ["no group name is drawn twice in one pane", (h) => {
+    const panes = h.split('<div class="pane-wrap"').slice(1);
+    if (panes.length === 0) return false;
+    return panes.every((pane) => {
+      const names = [...pane.matchAll(/<span class="name">([^<]*)<\/span>/g)].map((m) => m[1]);
+      const seen = new Set();
+      const twice = names.filter((n) => (seen.has(n) ? true : (seen.add(n), false)));
+      return names.length > 0 && twice.length === 0;
+    });
+  }],
   ["a query draws q slash and a bucket does not", (h) => {
     const flat = [];
     const walk = (gs) => (gs || []).forEach((g) => { flat.push(g); walk(g.groups); });

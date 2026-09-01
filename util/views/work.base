@@ -22,6 +22,14 @@
 # HERE IS EVERYTHING AT THE CURRENT STATE, and there are no states above the
 # token yet, so here is everything that is open or in work. It carries in_work
 # as well as open so a person sees what is being done and not only what waits.
+#
+# THE GROUPING GROUPS BY THE BUCKET AND BY NOTHING ELSE. It read
+# if(bucket, bucket, status), so a token with no bucket grouped under its state
+# and drew a second group beside the query named after that state. The fallback
+# was invisible while a declared group took its rows first, and every state drew
+# twice the moment a query stopped taking them. A bucket is where a person put a
+# row. A state is the engine's word for where the row is, and there is a query
+# for each one already.
 
 # A COLUMN IS NAMED WHAT THE NOTE NAMES IT. displayName exists for a heading
 # the owner wants to read differently, and renaming status to state or assignee
@@ -38,8 +46,17 @@ filters:
     - status != "aborted"
 
 groups:
+  # YOURS IS EVERYTHING OF YOURS THAT NEEDS WORK FROM YOU. It mirrored
+  # here, so a token assigned to the person while it still carried a draft sat
+  # under spec_open and the group meant to hold their work was empty. A status
+  # is moved by a pull and never by a keystroke, rightly, so there was no way to
+  # put a token in front of the person it belongs to. The view is what was
+  # wrong. What is left out is what somebody else holds, which is the four
+  # waiting states, and the backlog, which is nobody's work yet. It is written
+  # as what is excluded rather than as what is included, so a state nobody
+  # anticipated shows up here rather than disappearing.
   - name: yours
-    filter: assignee == "human" && (status == "imp_open" || status == "imp_in_work")
+    filter: assignee == "human" && status != "backlogged" && status != "spec_submitted" && status != "spec_in_review" && status != "imp_submitted" && status != "imp_in_review"
   - name: here
     filter: status == "imp_open" || status == "imp_in_work"
   - name: backlogged
@@ -73,7 +90,7 @@ views:
       status: 110
       assignee: 71
     groupBy:
-      - property: if(bucket, bucket, status)
+      - property: bucket
         sets: bucket
         direction: ASC
     collapsed:
@@ -87,7 +104,7 @@ views:
       - title
       - status
     groupBy:
-      - property: if(bucket, bucket, status)
+      - property: bucket
         sets: bucket
         direction: ASC
     collapsed:
