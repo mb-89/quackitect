@@ -259,3 +259,46 @@ func TestATwoLineCommandCannotSwitchTheGateOff(t *testing.T) {
 		t.Fatalf("the gate took a submission on an unwatched criterion: %q", a.Pull)
 	}
 }
+
+// A CRITERION THAT ALREADY PASSES AND CARRIES ITS RED IS AGREED.
+//
+// THE HOLE THIS CLOSES. The spec gate refuses a command criterion that exits
+// zero, because one that passes before the work cannot report on the work. That
+// is right while the work is ahead of it. It is wrong for a draft that comes
+// back after a round of implementation: the work is done, the criteria are
+// green, and the redraft can never be submitted at all. A gate with no way
+// through is not a gate, it is a wall.
+//
+// THE OBSERVATION IS THE EVIDENCE, and the engine already asks for it at the
+// other gate. A criterion carrying what was taken away and what it said when it
+// failed has been watched red by somebody, which is the whole thing the spec
+// gate was trying to establish by seeing it red itself.
+//
+// SO THE TWO GATES ASK ONE QUESTION between them: has anybody watched this fail.
+// Red now answers it. A recorded observation answers it. Nothing else does.
+func TestADraftWhoseCriteriaCarryTheirRedIsAgreed(t *testing.T) {
+	r := guidanceTree(t)
+	// The shape a redraft has: the work is done, so the command passes.
+	tok := mint(t, r, Token{Title: "a thing rebuilt", Status: SpecOpen,
+		Detail: "what the problem is", MintedBy: "person",
+		Criteria: []Criterion{{Says: "the thing is built", Runs: "exit 0",
+			Without: "the whole of thing.go", Red: "it said thing: no such file"}}})
+	Pull(r, "main", RoleWorker, Payload{})
+	if a := Pull(r, "main", RoleWorker, Payload{ID: tok.ID}); a.Pull == AnswerRefused {
+		t.Fatalf("a redraft whose criteria carry their red was refused: %v", a.Findings)
+	}
+
+	// AND ONE THAT PASSES WITH NO OBSERVATION IS STILL REFUSED, because nothing
+	// says anybody has ever seen it fail.
+	other := mint(t, r, Token{Title: "a thing not watched", Status: SpecOpen,
+		Detail: "what the problem is", MintedBy: "person",
+		Criteria: []Criterion{{Says: "the thing is built", Runs: "exit 0"}}})
+	Pull(r, "main", RoleWorker, Payload{})
+	a := Pull(r, "main", RoleWorker, Payload{ID: other.ID})
+	if a.Pull != AnswerRefused {
+		t.Fatalf("a draft whose criterion passes unwatched went to review: %q", a.Pull)
+	}
+	if !hasClause(a.Findings, "the criteria") {
+		t.Fatalf("the refusal does not name the criteria: %v", a.Findings)
+	}
+}

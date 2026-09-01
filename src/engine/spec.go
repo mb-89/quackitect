@@ -58,12 +58,21 @@ func CriteriaThatAlreadyPass(r Roots, t Token) []string {
 		if c.Runs == "" {
 			continue
 		}
+		// A CRITERION CARRYING ITS RED HAS ALREADY BEEN WATCHED FAIL, which is
+		// the whole thing this gate establishes by seeing it red itself. A
+		// draft that comes back after a round of implementation has green
+		// criteria and nothing wrong with them, and without this it could never
+		// be submitted at all. A gate with no way through is a wall.
+		if c.Watched() {
+			continue
+		}
 		said, err := runEvidence(r, c.Runs)
 		if err != nil {
 			continue
 		}
-		out = append(out, fmt.Sprintf("%d. %s\n     %s\n     it exits zero with the work not done, "+
-			"so it cannot report on the work: %s", i+1, c.Says, c.Runs, firstLines(said, 2)))
+		out = append(out, fmt.Sprintf("%d. %s\n     %s\n     it exits zero and nothing says anybody "+
+			"has watched it fail, so it cannot report on the work: %s",
+			i+1, c.Says, c.Runs, firstLines(said, 2)))
 	}
 	return out
 }

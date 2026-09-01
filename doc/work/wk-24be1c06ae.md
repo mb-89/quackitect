@@ -1,13 +1,12 @@
 ---
 id: wk-24be1c06ae
-seq: 78
+seq: "-16"
 type: work
 title: a line holds one
-status: spec_in_work
+status: spec_submitted
 assignee: main
 scope: single-step
 traced: true
-holder: main
 rounds: 2
 minted_by: reviewer6
 ---
@@ -120,12 +119,42 @@ AND THE NEXT FIELD IS TOLD WHICH SHAPE IT IS CHOOSING. The list above lives in
 the detail beside the sweep, so somebody adding a field to this note picks one of
 three rather than guessing.
 
+
+THE WALK ASKS THE STRUCTS, WHICH IS ROUND TWO'S FINDING AND IT IS RIGHT. A hand
+list of nine is a photograph of the set. The anti-vacuity guard catches the list
+being emptied and says nothing about it being short, and short is the only way
+this list ever goes wrong.
+
+THE NEXT FIELD IS THE WHOLE POINT OF THIS TOKEN. It exists because somebody
+added two fields to a struct, gave them a line on the page, and nobody asked
+what a value that does not fit does. With a hand list, the tenth field is added,
+is not walked, is not fed an awkward value, and nothing goes red. The token
+would fail at its own purpose one field later.
+
+SO THE TABLE ANSWERS FOR EVERY FIELD, INCLUDING THE ONES IT EXCLUDES.
+Criterion.Ran and Criterion.Met are written to the note by nothing and read back
+by nothing, so they are dead rather than lossy. That is the right answer for
+them, and a reader of a hand list cannot tell that answer from an oversight. In
+the table it is written down.
+
+THE THREE SHAPES, AND WHICH FIELD IS WHICH.
+
+    one line by design   Criterion.Says, Criterion.Runs, Criterion.Without,
+                         Criterion.Red
+    a block by design    Rejection.Wrong, Rejection.Satisfies, Lesson.Class,
+                         Lesson.Avoid
+    into a heading       Rejection.Clause
+    not on the page      Criterion.Ran, Criterion.Met, Lesson.Token,
+                         Lesson.Learned, Lesson.By
+
 ## done when
 
-- One check walks every field the note writes and reads back, names each one and the shape it is, and refuses if it finds none to walk, so it cannot pass by the list having gone
+- The walk is taken from the structs rather than from a list: every exported string field of Criterion, Rejection and Lesson is read with reflect, each must appear in the shape table, and a field the table does not answer for makes it red by name. A deliberate exclusion is written into the table with its answer, so a reader can tell one from an oversight
   `rg -q func.TestEveryFieldTheNoteWritesIsRead src/engine && go test -C src/engine -count=1 -run TestEveryFieldTheNoteWritesIsRead$ .`
 - A field that is one line by design carrying a newline is refused when the token is saved, and the refusal names the field and which criterion it is on
   `rg -q func.TestALineHoldsOneLine src/engine && go test -C src/engine -count=1 -run TestALineHoldsOneLine$ .`
+  **red without** the linesThatFit refusal taken out of SaveToken, and separately runs left out of the fields it walks
+  **red said** red_test.go:212: a criterion whose says is two lines was written, and three more, one per field
 - A field that is a block by design comes back byte-identical from two paragraphs, from a value carrying a blank line, and from one whose second paragraph begins with a lead this parser reads
   `rg -q func.TestABlockComesBackWhole src/engine && go test -C src/engine -count=1 -run TestABlockComesBackWhole$ .`
 - A clause carrying the character its heading is split on, or a newline, is refused, and the refusal says which character

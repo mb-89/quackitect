@@ -3,7 +3,7 @@ id: wk-bc3c5ba905
 seq: "-6"
 type: work
 title: a token carries done
-status: imp_open
+status: imp_in_work
 assignee: main
 scope: multi-step
 traced: true
@@ -13,7 +13,7 @@ subs:
   - wk-7f0b46d99f
   - wk-6684401070
   - wk-c22f29af7b
-rounds: "3"
+rounds: 3
 minted_by: person
 ---
 

@@ -57,6 +57,21 @@ A SET COVERED BY ONE MEMBER. The sentence is about all of them and the command
 names one. A deliverable naming three of thirteen passes. When a criterion is
 about a set, the command walks the set and fails on the first miss.
 
+A DESCRIPTION OF THE SET STANDING IN FOR THE SET. Two shapes, and the tell is
+the same: the check describes the members instead of asking for them. A hand
+list types them out. A pattern says what they look like. Both are complete on
+the day they are written and neither knows when it stops being.
+
+MEASURED. A search for a spawn whose arguments are an inline array read eight of
+nine, and the ninth was the one that had kept its literals. A hand list of nine
+struct fields would miss the tenth, which is the moment its own token exists
+for.
+
+WHERE THE LANGUAGE CAN ENUMERATE, ASK IT: reflect over the struct, read the map,
+walk the registered list. Where it cannot, because the set lives in somebody
+else's source, compare the count with something the check did not produce, and
+say so when the two differ rather than reporting what was found.
+
 AND WALKING THE SET IS NOT WHAT MOST TOOLS DO WHEN HANDED ONE. `rg -q PATTERN
 a.md b.md c.md` exits zero when ANY of the three matches, so a command that
 names every member reads as the remedy and quietly ORs them. Anything with a
