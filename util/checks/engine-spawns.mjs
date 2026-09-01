@@ -97,7 +97,13 @@ say("the extension starts the engine somewhere", found.length > 0,
 for (const one of found) {
   const spread = /\.\.\.\s*[A-Za-z_$][\w$]*/.test(one.args);
   const own = one.args.replace(/\.\.\.\s*[A-Za-z_$][\w$]*\s*(\([^)]*\))?/g, "");
-  const literalFlag = [...own.matchAll(/"(--[a-z-]+)"/g)].map((m) => m[1]).filter((f) => f !== "--work");
+  // EVERY SPELLING THE LANGUAGE HAS FOR ONE LITERAL. This matched a double
+  // quote alone, so the owner's own defect passed when it was written with
+  // single quotes or in a template literal: the guard written to catch
+  // --form was green over --form, one quote character along. Nothing in the
+  // tree makes the double quote a rule, there is no linter config here, so
+  // the check was resting on a habit.
+  const literalFlag = [...own.matchAll(/["'`](--[a-z-]+)["'`]/g)].map((m) => m[1]).filter((f) => f !== "--work");
   say(one.where + " sends " + one.args, spread && literalFlag.length === 0,
     spread
       ? "it writes " + literalFlag.join(" and ") + " at the call site, and only --work belongs there"
