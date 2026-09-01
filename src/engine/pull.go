@@ -409,7 +409,14 @@ func rejectionIsWhole(r Roots, p Payload) *Rejection {
 		return &Rejection{Clause: "the rejection",
 			Wrong:     "a rejection with no finding tells the worker nothing",
 			Satisfies: "at least one finding, with clause, wrong and satisfies"}
-	}	// AND THE LESSON HAS A TOKEN, MINTED BY WHOEVER JUDGED IT.
+	}
+	if p.Lesson.Empty() {
+		return &Rejection{Clause: "the lesson",
+			Wrong: "a rejection with no lesson teaches this token and nothing after it. " +
+				"One token took five rounds because every round fixed the instance and left the class standing",
+			Satisfies: "a lesson naming the class of mistake and what to do instead"}
+	}
+	// AND THE LESSON HAS A TOKEN, MINTED BY WHOEVER JUDGED IT.
 	//
 	// A lesson that is only a sentence on a note is a sentence somebody has to
 	// remember to act on. The reviewer mints it, because which class a finding
