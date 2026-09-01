@@ -122,10 +122,27 @@ func TestACitationResolvesOrSaysWhy(t *testing.T) {
 		}
 	}
 	bad := map[string]string{
+		// THE DECOYS ROUND 2 NAMED, kept here so the branch they walked past
+		// cannot go back to being a substring search. A word that opens a
+		// sentence is not a heading, and a heading claimed of one file is not
+		// answered by another file carrying it.
+		`section "the"`:                    "no guidance carries that section",
+		`section "A SET"`:                  "no guidance carries that section",
 		"src/engine/nosuchfile.go":         "there is no such file",
 		"src/engine/drain_test.go:99999":   "that file has fewer lines than that",
 		"wk-0000000000":                    "there is no such token",
 		`section "a heading nobody wrote"`: "no guidance carries that section",
+	}
+	// A PAIR IS ASKED OF THE RESOLVER DIRECTLY, because citations reads a
+	// path out of the prose form first and the pair is the second citation
+	// it yields, so going through it would test the path branch again.
+	for one, want := range map[string]string{
+		"pair doc/guidance/voice.md|The command decides the sentence above it": "that heading is in doc/guidance/specifying.md and not there",
+		"pair doc/guidance/voice.md|A heading nobody ever wrote":               "no guidance carries that section",
+	} {
+		if why := resolves(r, root, one); why != want {
+			t.Errorf("%q answered %q rather than %q", one, why, want)
+		}
 	}
 	for one, want := range bad {
 		found := citations(one)
@@ -187,12 +204,26 @@ func citations(reason string) []string {
 	return out
 }
 
-// headingAt answers whether a line opens with want, ignoring the marks a
-// heading is written with. A substring anywhere else is not a heading.
+// headingAt answers whether a line IS a heading reading want, ignoring the
+// marks a heading is written with.
+//
+// A PREFIX OF A BODY LINE IS NOT A HEADING. Anchoring to the start of a line
+// stopped a substring in the middle of a paragraph and let section "the" through
+// on any sentence beginning with the word, which is a search for a word standing
+// in for a search for a heading.
+//
+// SO THE HEADING ENDS WHERE THE LINE OR THE SENTENCE DOES. What follows want is
+// nothing, or the punctuation that closes a heading. That admits both shapes
+// this guidance uses: a hash heading, which runs to the end of its line, and an
+// uppercase lead, which runs to its full stop or its colon.
 func headingAt(body, want string) bool {
 	for _, line := range strings.Split(body, nl) {
-		line = strings.TrimLeft(line, "#*- 	")
-		if strings.HasPrefix(line, want) {
+		line = strings.TrimRight(strings.TrimLeft(line, "#*- \t"), " \t\r")
+		rest, is := strings.CutPrefix(line, want)
+		if !is {
+			continue
+		}
+		if rest == "" || strings.HasPrefix(rest, ".") || strings.HasPrefix(rest, ":") {
 			return true
 		}
 	}
