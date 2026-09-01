@@ -371,6 +371,10 @@ func judgeSpec(r Roots, actor string, t Token, p Payload) (Answer, bool) {
 	}
 	switch p.Verdict {
 	case "accept":
+		if f := somethingWasRewatched(t, p, "the draft"); f != nil {
+			return refuse(&t, *f), true
+		}
+		t.Rewatched = p.Rewatched
 		t.Status, t.Holder = ImpOpen, ""
 		if err := SaveToken(r, t); err != nil {
 			return refuse(&t, Rejection{Clause: "the record", Wrong: err.Error(),
@@ -462,7 +466,7 @@ func judge(r Roots, actor string, t Token, p Payload) (Answer, bool) {
 	}
 	switch p.Verdict {
 	case "accept":
-		if f := somethingWasRewatched(t, p); f != nil {
+		if f := somethingWasRewatched(t, p, "this token"); f != nil {
 			return refuse(&t, *f), true
 		}
 		t.Rewatched = p.Rewatched
@@ -535,31 +539,62 @@ func noteVerdict(r Roots, actor string, t Token, verdict string, found []Rejecti
 // recorded red, so the whole weight of it sits on a string, and the reviewer is
 // the only reader of that string.
 //
-// AT LEAST ONE, NOT ALL OF THEM. Re-watching every command criterion on every
+// TWO VERDICTS AND BOTH ASK, because there are two acceptance paths and the
+// loosened gate runs on the one that was left out. Counted off the log: 41
+// acceptances, 33 through judge and 8 through judgeSpec, so about one in five
+// went through with nothing asked and nothing recorded.
+//
+// WHAT COUNTS DIFFERS BY PATH, AND IT IS THE SAME QUESTION EACH TIME. On an
+// implementation, a criterion with a command, because the work has landed and
+// the reviewer can run it. On a draft, a criterion carrying a recorded
+// observation, because that is exactly the set the gate waves through: a
+// criterion the engine ran red for itself needs no second reader.
+//
+// AT LEAST ONE, NOT ALL OF THEM. Re-watching every criterion on every
 // acceptance is a cost nobody would pay, and a rule nobody pays is a rule that
 // gets turned off. One is the difference between having looked and not.
 //
-// A TOKEN WITH NO COMMAND ASKS FOR NOTHING, because there is nothing to re-run,
-// and a refusal that fired on those would be a gate with no way through.
-func somethingWasRewatched(t Token, p Payload) *Rejection {
-	commands := 0
+// A TOKEN WITH NONE OF THEM ASKS FOR NOTHING, and a refusal that fired on those
+// would be a gate with no way through.
+func somethingWasRewatched(t Token, p Payload, half string) *Rejection {
+	says := map[string]bool{}
+	owed := 0
 	for _, c := range t.Criteria {
+		says[trimmed(c.Says)] = true
+		if half == "the draft" {
+			if c.Runs != "" && c.Watched() {
+				owed++
+			}
+			continue
+		}
 		if trimmed(c.Runs) != "" {
-			commands++
+			owed++
 		}
 	}
-	if commands == 0 {
+	// THE KEY NAMES A CRITERION ON THE TOKEN. This once took the first
+	// non-blank value under any key at all, so one word under a key naming
+	// nothing satisfied it. The map is keyed by the criterion, so the key is
+	// held against what the token carries.
+	said := 0
+	for key, what := range p.Rewatched {
+		if trimmed(what) == "" {
+			continue
+		}
+		if !says[trimmed(key)] {
+			return &Rejection{Clause: "the criteria",
+				Wrong: fmt.Sprintf("what you re-watched is filed under %q, and this "+
+					"token carries no criterion of that name", firstLines(key, 1)),
+				Satisfies: "rewatched, keyed by the criterion's own sentence"}
+		}
+		said++
+	}
+	if owed == 0 || said > 0 {
 		return nil
 	}
-	for _, said := range p.Rewatched {
-		if trimmed(said) != "" {
-			return nil
-		}
-	}
 	return &Rejection{Clause: "the criteria",
-		Wrong: fmt.Sprintf("this token carries %d command criteria and none was re-watched. "+
-			"The worker's red proves the check can fail. Yours proves it is still the "+
-			"check that guards the behaviour, and the gate takes the worker's on trust", commands),
+		Wrong: fmt.Sprintf("%s carries %d criteria the gate takes on a recorded red and "+
+			"none was re-watched. The worker's red proves the check can fail. Yours "+
+			"proves it is still the check that guards the behaviour", half, owed),
 		Satisfies: "rewatched, keyed by the criterion, saying what you took away and what it said"}
 }
 

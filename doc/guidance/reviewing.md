@@ -143,15 +143,30 @@ with the fix absent, and it proves the check can fail. Yours is taken after the
 work landed, by putting the defect back or by building the tree without the fix,
 and it proves the check is still the one that guards the behaviour.
 
-AT LEAST ONE, ON AN ACCEPTANCE. Accepting a token that carries a command
-criterion with nothing re-watched is refused. Not every criterion, because a
-cost nobody pays is a rule that gets turned off. One is the difference between
-having looked and not.
+AT LEAST ONE, ON EITHER ACCEPTANCE. Both verdicts ask, because there are two
+acceptance paths and the loosened gate runs on the draft. Not every criterion,
+because a cost nobody pays is a rule that gets turned off. One is the difference
+between having looked and not.
+
+WHAT COUNTS DIFFERS BY WHAT YOU ARE HOLDING, and it is the same question each
+time. On an implementation it is a criterion with a command, because the work
+has landed and you can run it. On a draft it is a criterion carrying a recorded
+observation, because that is exactly the set the gate waves through: one the
+engine ran red for itself needs no second reader, and a draft whose criteria are
+all red asks you for nothing.
 
     rewatched: {"<the criterion>": "without <what you took away>, it said <what it said>"}
 
 IT LANDS IN THE NOTE, beside the evidence, because a sentence in a session that
-ends is not a record.
+ends is not a record. It landed there from an implementation verdict and was
+taken and dropped from a draft verdict, which is worse than not asking, because
+a reviewer who did the work got no record that it was done.
+
+THE KEY IS THE CRITERION'S OWN SENTENCE, and a key naming no criterion on the
+token is refused. WHAT THIS RESTS ON, SAID RATHER THAN LEFT TO BE DISCOVERED:
+one non-blank value under one matching key satisfies it. The engine cannot
+judge whether you looked, only whether you said you did and said it about
+something the token carries.
 
 AND NAME WHAT IT SAID, NOT WHERE IT WAS. A line number is a claim about
 something nobody controls: it moves the moment anybody adds a function above it.

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 )
@@ -379,5 +380,112 @@ func TestATokenWithNoCommandAsksForNoRewatch(t *testing.T) {
 	Pull(r, "rev", RoleReviewer, Payload{})
 	if a := Pull(r, "rev", RoleReviewer, Payload{ID: tok.ID, Verdict: "accept"}); a.Pull == AnswerRefused {
 		t.Fatalf("a token with no command was refused for re-watching nothing: %v", a.Findings)
+	}
+}
+
+// A SPEC ACCEPTANCE ASKS FOR THE SAME LOOK, AND IT IS THE GATE THAT NEEDS IT.
+//
+// THE LOOSENED GATE IS THE SPEC GATE. A criterion that passes is agreed on the
+// strength of the red recorded on it, so the whole weight of that decision is a
+// string, and it is a spec reviewer who reads it. The refusal was built on the
+// implementation verdict, which is the path that gate does not run on.
+//
+// COUNTED OFF THE LOG: 41 acceptances, 33 through judge and 8 through
+// judgeSpec, so about one in five went through with nothing asked and nothing
+// recorded. A rewatch sent with one of those was taken and dropped.
+func TestASpecAcceptanceSaysWhatTheReviewerChecked(t *testing.T) {
+	r := guidanceTree(t)
+	// A DRAFT WHOSE CRITERION PASSES AND CARRIES ITS RECORDED RED, which is
+	// exactly the case the gate waves through.
+	watched := Criterion{Says: "the suite passes", Runs: "exit 0",
+		Without: "the fix", Red: "TestTheSuite: it said the suite is red"}
+	// A REVIEWER PER DRAFT, because one that was refused still holds the
+	// first, and the queue would hand it back rather than the next.
+	seen := 0
+	draft := func() (Token, string) {
+		t.Helper()
+		seen++
+		rev := fmt.Sprintf("rev%d", seen)
+		tok, err := Mint(r, Token{Title: "a thing to build", Assignee: "main",
+			Scope: SingleStep, Status: SpecOpen, Detail: "what the problem is",
+			MintedBy: "person", Criteria: []Criterion{watched}})
+		if err != nil {
+			t.Fatal(err)
+		}
+		Pull(r, "main", RoleWorker, Payload{})
+		Pull(r, "main", RoleWorker, Payload{ID: tok.ID})
+		Pull(r, rev, RoleReviewer, Payload{})
+		return tok, rev
+	}
+
+	one, revOne := draft()
+	a := Pull(r, revOne, RoleReviewer, Payload{ID: one.ID, Verdict: "accept"})
+	if a.Pull != AnswerRefused {
+		t.Fatalf("a draft resting on a recorded red was agreed with nothing checked: %s", a.Pull)
+	}
+	if len(a.Findings) == 0 || !strings.Contains(a.Findings[0].Wrong, "re-watched") {
+		t.Fatalf("the refusal does not say nothing was re-watched: %+v", a.Findings)
+	}
+
+	// AND WHAT THE REVIEWER CHECKED LANDS IN THE NOTE, rather than being
+	// taken from the payload and dropped without a word.
+	two, revTwo := draft()
+	a = Pull(r, revTwo, RoleReviewer, Payload{ID: two.ID, Verdict: "accept",
+		Rewatched: map[string]string{
+			watched.Says: "TestTheSuite says that, at the line it names",
+		}})
+	if a.Pull == AnswerRefused {
+		t.Fatalf("a draft agreed with a rewatch was refused: %v", a.Findings)
+	}
+	now, err := LoadToken(r, two.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(now.Rewatched[watched.Says], "TestTheSuite says that") {
+		t.Fatalf("the note kept %v", now.Rewatched)
+	}
+
+	// AND A DRAFT WHOSE CRITERIA THE ENGINE RAN RED FOR ITSELF ASKS FOR
+	// NOTHING, because there is no recorded red standing in for a run.
+	plain, err := Mint(r, Token{Title: "another thing", Assignee: "main",
+		Scope: SingleStep, Status: SpecOpen, Detail: "what the problem is",
+		MintedBy: "person", Criteria: []Criterion{{Says: "it is built", Runs: "exit 1"}}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	Pull(r, "main", RoleWorker, Payload{})
+	Pull(r, "main", RoleWorker, Payload{ID: plain.ID})
+	Pull(r, "rev9", RoleReviewer, Payload{})
+	if a := Pull(r, "rev9", RoleReviewer, Payload{ID: plain.ID, Verdict: "accept"}); a.Pull == AnswerRefused {
+		t.Fatalf("a draft the engine ran red for itself was refused: %v", a.Findings)
+	}
+}
+
+// AND THE KEY NAMES A CRITERION ON THE TOKEN.
+//
+// WHAT THE REFUSAL RESTS ON, SAID RATHER THAN DISCOVERED. It once took the
+// first non-blank value under any key at all, so one word under a key naming
+// nothing satisfied it. The map is keyed by the criterion, so the key is held
+// against the criteria the token carries.
+func TestARewatchNamesACriterionOnTheToken(t *testing.T) {
+	r := guidanceTree(t)
+	tok, err := Mint(r, Token{Title: "a thing to build", Assignee: "main",
+		Scope: SingleStep, Status: ImpOpen, Detail: "what the problem is",
+		MintedBy: "person", Criteria: []Criterion{{Says: "the suite passes",
+			Runs: "exit 0", Without: "the fix", Red: "it said the suite is red"}}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	Pull(r, "main", RoleWorker, Payload{})
+	Pull(r, "main", RoleWorker, Payload{ID: tok.ID, Disposition: string(Done)})
+	Pull(r, "rev2", RoleReviewer, Payload{})
+
+	a := Pull(r, "rev2", RoleReviewer, Payload{ID: tok.ID, Verdict: "accept",
+		Rewatched: map[string]string{"something else entirely": "yes"}})
+	if a.Pull != AnswerRefused {
+		t.Fatalf("a rewatch naming no criterion was accepted: %s", a.Pull)
+	}
+	if len(a.Findings) == 0 || !strings.Contains(a.Findings[0].Wrong, "carries no criterion of that name") {
+		t.Fatalf("the refusal does not say the key names no criterion: %+v", a.Findings)
 	}
 }
