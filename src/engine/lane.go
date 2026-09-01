@@ -55,6 +55,7 @@ func runWork(args []string) {
 	dup := fs.String("duplicate", "", "instead of minting: settle a token that says the same as another, by id")
 	of := fs.String("of", "", "with duplicate: the token it says the same as")
 	abort := fs.String("abort", "", "instead of minting: end a token from wherever it stands, by id")
+	putDown := fs.String("put-down", "", "instead of minting: set a token you are holding back where it was, by id")
 	why := fs.String("why", "", "with abort: why it is ending. An abort with no reason is refused")
 	bucket := fs.String("bucket", "", "with set: file it under this grouping. Empty clears it")
 	file := fs.String("file", "", "instead of minting: file these ids in one bucket, comma separated")
@@ -67,6 +68,20 @@ func runWork(args []string) {
 	roots, err := FindRoots(*work)
 	if err != nil {
 		fail(err)
+	}
+
+	// WORK PICKED UP BY MISTAKE IS SET DOWN. Nothing else released a held
+	// token, so an agent that pulled the wrong one with nothing else open was
+	// stuck holding it, and the queue showed it working on something it was
+	// not.
+	if *putDown != "" {
+		t, err := PutDown(roots, *putDown, or2(*by, "main"))
+		if err != nil {
+			answerJSON(map[string]any{"error": err.Error()})
+			os.Exit(1)
+		}
+		answerJSON(t)
+		return
 	}
 
 	// AN ABORT COMES OFF ANY STATE AND CARRIES WHY. It is the door onto the

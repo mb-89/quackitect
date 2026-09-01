@@ -948,3 +948,54 @@ func reviewerAskingToStop(r Roots, actor string) Ruling {
 			"Rule on it. Nobody else can, and it sits in review with your name on it "+
 			"until you do.", len(holding), briefly(holding))}
 }
+
+// PutDown sets a token back where it was, and answers what it looks like now.
+//
+// THE GAP THIS FILLS. Work already picked up comes back on every pull, which is
+// right: an agent that pulled, was interrupted and pulled again gets the same
+// token rather than a second one. The only thing that released one was a person
+// putting something else first, so an agent that picked up the wrong thing with
+// nothing else open could not set it down at all, and the queue showed it
+// working on something it was not.
+//
+// PUTTING DOWN IS NOT ABORTING. Nothing became of the work, it has no reason,
+// and it goes back exactly where it came from so the next puller finds it.
+//
+// EACH HALF GOES BACK TO ITS OWN OPEN. A draft in hand returns to a draft, not
+// to work, because the two halves stay apart.
+func PutDown(r Roots, id, actor string) (Token, error) {
+	t, err := LoadToken(r, id)
+	if err != nil {
+		return t, err
+	}
+	if t.Status.Ended() {
+		return t, fmt.Errorf("%s already ended as %s. Putting down is for work in "+
+			"somebody's hands, and an ending is not written over", t.ID, t.Status)
+	}
+	back, ok := whereItCameFrom[t.Status]
+	if !ok {
+		return t, fmt.Errorf("%s is %s, which is nobody's hands to let go of", t.ID, t.Status)
+	}
+	if t.Holder != actor {
+		if t.Holder == "" {
+			return t, fmt.Errorf("%s is not in anybody's hands", t.ID)
+		}
+		return t, fmt.Errorf("%s is in %s's hands rather than yours", t.ID, t.Holder)
+	}
+	t.Status, t.Holder = back, ""
+	if err := SaveToken(r, t); err != nil {
+		return t, err
+	}
+	inSession(r, "work", actor, t.ID+" put down", Yes(), map[string]any{"id": t.ID})
+	return t, nil
+}
+
+// WHERE A HELD TOKEN GOES BACK TO. In review returns to submitted, because a
+// reviewer letting go leaves work waiting for one rather than sending it back
+// to its author.
+var whereItCameFrom = map[Status]Status{
+	ImpInWork:    ImpOpen,
+	SpecInWork:   SpecOpen,
+	ImpInReview:  ImpSubmitted,
+	SpecInReview: SpecSubmitted,
+}

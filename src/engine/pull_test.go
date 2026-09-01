@@ -927,3 +927,126 @@ func TestAHoldCarriedAcrossARestartIsNotCalledStopped(t *testing.T) {
 		t.Fatalf("the refusal does not name the hold: %q", later.Notice)
 	}
 }
+
+// AN AGENT THAT PICKED UP THE WRONG THING CAN SET IT DOWN.
+//
+// THE GAP. A held token comes back on every pull, because work already picked up
+// comes back first. The only thing that releases one is something else open
+// sitting ahead of it, which is a person putting work first. When nothing else
+// is open the token cannot be released at all, and the queue shows an agent
+// working on something it is not.
+//
+// THAT IS WHAT HAPPENED. A helper pulled until the queue handed over the token
+// it wanted, picked up the shutdown token on the way, and then every pull
+// answered with the shutdown. The person read the queue and asked why the
+// machine shuts down was being implemented. Nothing was.
+//
+// PUTTING DOWN IS NOT ABORTING. The work is not ended, nothing became of it, and
+// it goes back exactly where it was so the next puller finds it.
+func TestWorkCanBePutDown(t *testing.T) {
+	r := lane(t)
+	tok := mint(t, r, Token{Title: "one picked wrongly", Status: ImpOpen})
+	if a := Pull(r, "main", RoleWorker, Payload{}); a.Pull != AnswerWork {
+		t.Fatalf("the work was not handed out: %q", a.Pull)
+	}
+	if now, _ := LoadToken(r, tok.ID); now.Status != ImpInWork || now.Holder != "main" {
+		t.Fatalf("it is %s held by %q", now.Status, now.Holder)
+	}
+	// AND IT COMES BACK ON EVERY PULL UNTIL IT IS PUT DOWN, which is the whole
+	// reason the verb exists.
+	if a := Pull(r, "main", RoleWorker, Payload{}); a.Token == nil || a.Token.ID != tok.ID {
+		t.Fatal("a held token did not come back")
+	}
+
+	put, err := PutDown(r, tok.ID, "main")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if put.Status != ImpOpen || put.Holder != "" {
+		t.Fatalf("a token put down is %s held by %q", put.Status, put.Holder)
+	}
+	// NOTHING BECAME OF IT. Putting down is not an ending.
+	if put.Disposition != NoDisposition || put.Reason != "" {
+		t.Fatalf("putting it down gave it a disposition %q and a reason %q",
+			put.Disposition, put.Reason)
+	}
+
+	// A DRAFT GOES BACK TO A DRAFT, not to open. The two halves stay apart.
+	draft := mint(t, r, Token{Title: "a draft picked up", Status: SpecInWork})
+	draft.Holder = "main"
+	if err := SaveToken(r, draft); err != nil {
+		t.Fatal(err)
+	}
+	back, err := PutDown(r, draft.ID, "main")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if back.Status != SpecOpen || back.Holder != "" {
+		t.Fatalf("a draft put down is %s held by %q", back.Status, back.Holder)
+	}
+}
+
+// ONLY THE HOLDER PUTS IT DOWN, and a token nobody is holding is not put down
+// twice.
+func TestOnlyTheHolderPutsItDown(t *testing.T) {
+	r := lane(t)
+	tok := mint(t, r, Token{Title: "one in hand", Status: ImpOpen})
+	Pull(r, "main", RoleWorker, Payload{})
+
+	// EACH REFUSAL IS ASSERTED ON WHAT ONLY IT CAN SAY. Three of these stand
+	// one behind another: an ended token has no entry in the table either, and
+	// a token nobody holds fails the holder check too. A test that only asked
+	// whether the call was refused would pass with any one of them deleted.
+	_, err := PutDown(r, tok.ID, "somebody else")
+	if err == nil {
+		t.Fatal("somebody who is not holding it put it down")
+	}
+	if !strings.Contains(err.Error(), "in main's hands rather than yours") {
+		t.Fatalf("the refusal does not say whose hands it is in: %v", err)
+	}
+	if now, _ := LoadToken(r, tok.ID); now.Status != ImpInWork {
+		t.Fatalf("the refused putdown moved it to %s", now.Status)
+	}
+	if _, err := PutDown(r, tok.ID, "main"); err != nil {
+		t.Fatal(err)
+	}
+	// AND A TOKEN THAT IS NOT IN ANYBODY'S HANDS IS REFUSED, rather than
+	// quietly answering that it did something.
+	// PUT DOWN TWICE, and the second time its state is nobody's hands at all.
+	_, err = PutDown(r, tok.ID, "main")
+	if err == nil {
+		t.Fatal("a token nobody holds was put down")
+	}
+	if !strings.Contains(err.Error(), "nobody's hands to let go of") {
+		t.Fatalf("the refusal does not name the state: %v", err)
+	}
+
+	// AND A TOKEN IN A HOLDING STATE THAT NOBODY HOLDS, which is the refusal
+	// the one above would otherwise cover. A restart leaves exactly this.
+	loose := mint(t, r, Token{Title: "one nobody holds", Status: ImpInWork})
+	if err := SaveToken(r, loose); err != nil {
+		t.Fatal(err)
+	}
+	_, err = PutDown(r, loose.ID, "main")
+	if err == nil {
+		t.Fatal("a token in nobody's hands was put down")
+	}
+	if !strings.Contains(err.Error(), "not in anybody's hands") {
+		t.Fatalf("the refusal does not say it is in nobody's hands: %v", err)
+	}
+	// A TOKEN THAT HAS ENDED IS NOT PUT DOWN EITHER.
+	done := mint(t, r, Token{Title: "one that ended", Status: ImpOpen})
+	done.Status, done.Disposition, done.Holder = ImpDone, Done, "main"
+	if err := SaveToken(r, done); err != nil {
+		t.Fatal(err)
+	}
+	_, err = PutDown(r, done.ID, "main")
+	if err == nil {
+		t.Fatal("a token that had ended was put back into the queue")
+	}
+	if !strings.Contains(err.Error(), "already ended") {
+		t.Fatalf("the refusal does not say it had ended: %v", err)
+	}
+
+
+}
