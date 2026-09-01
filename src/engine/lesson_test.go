@@ -1,6 +1,9 @@
 package main
 
 import (
+	"os"
+	"path/filepath"
+	"regexp"
 	"strings"
 	"testing"
 )
@@ -268,4 +271,115 @@ func TestASpecNotWithThisReviewerIsRefused(t *testing.T) {
 	if len(a.Findings) == 0 || !strings.Contains(a.Findings[0].Wrong, "not with you") {
 		t.Fatalf("the refusal does not say the spec is not with you: %+v", a.Findings)
 	}
+}
+
+// NOTHING IN THIS PACKAGE CLAIMS A BEHAVIOUR NOBODY CALLS.
+//
+// MintLessonToken read as the feature: its name and its doc said the engine
+// mints a lesson its own token, and nothing anywhere called it. A reviewer
+// looking for the behaviour found the function and stopped looking.
+//
+// THE METHOD SAYS THE OPPOSITE, AND THE METHOD IS RIGHT. reviewing.md: you mint
+// the lesson's token and you name it, the engine cannot mint it for you,
+// because which class a finding belongs to is a judgment. So the function was
+// not unfinished, it was contradicted, and it is gone.
+//
+// THE CHECK IS OVER THE PACKAGE AND NOT OVER THAT NAME. An exported function in
+// this package that nothing calls and no test drives is either dead or a claim,
+// and both want saying out loud.
+func TestNoExportedFunctionHereIsUncalled(t *testing.T) {
+	root := filepath.Join("..", "..")
+	// KNOWN AND SAID, so a reader can tell one from an oversight. Each is
+	// reached from outside this package or from a place a search cannot see.
+	reached := map[string]string{
+		"Retro":      "a verb of the program, reached through the dispatch table",
+		"Abort":      "a verb of the program, reached through the dispatch table",
+		"PutDown":    "a verb of the program, reached through the dispatch table",
+		"Nudge":      "called on every pull",
+		"Reclaim":    "called on every pull",
+		"KnownTools": "called on a first pull",
+		// NOTHING YET, AND WHAT OWES IT. The filter builder's per-type
+		// offer. The panel that would ask for it is wk-66a28ca311, the v3
+		// editor port, and until that lands nothing calls this. It is named
+		// here so a reader can tell it from an oversight, which is the
+		// answer the method allows and the one silence does not.
+		"OperatorsFor": "the filter builder's per-type offer, owed a caller by wk-66a28ca311",
+	}
+	declared := exportedFuncs(t, filepath.Join(root, "src", "engine"))
+	if len(declared) < 10 {
+		t.Fatalf("only %d exported functions were found, so this guards nothing", len(declared))
+	}
+	// AN EXCLUSION IS HELD AGAINST THE PACKAGE TOO. A name excused here that
+	// nothing declares any more is an exclusion nobody will notice has gone
+	// stale, which is the same silence this check exists to end.
+	for name := range reached {
+		if _, there := declared[name]; !there {
+			t.Errorf("%s is excused here and this package declares no such function", name)
+		}
+	}
+	for name, where := range declared {
+		if _, said := reached[name]; said {
+			continue
+		}
+		if calledSomewhere(t, root, name, where) {
+			continue
+		}
+		t.Errorf("%s in %s is exported, nothing calls it, and it is in no exclusion. "+
+			"Either it is dead or it is a claim about a behaviour that is not there",
+			name, filepath.Base(where))
+	}
+}
+
+// exportedFuncs answers every exported plain function this package declares,
+// keyed by name, with the file it is in. Methods are left out: a method is
+// reached through its type and a search for its name says little.
+func exportedFuncs(t *testing.T, dir string) map[string]string {
+	t.Helper()
+	out := map[string]string{}
+	entries, err := os.ReadDir(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, e := range entries {
+		if e.IsDir() || !strings.HasSuffix(e.Name(), ".go") || strings.HasSuffix(e.Name(), "_test.go") {
+			continue
+		}
+		p := filepath.Join(dir, e.Name())
+		b, err := os.ReadFile(p)
+		if err != nil {
+			t.Fatal(err)
+		}
+		for _, m := range plainFunc.FindAllStringSubmatch(string(b), -1) {
+			out[m[1]] = p
+		}
+	}
+	return out
+}
+
+var plainFunc = regexp.MustCompile(`(?m)^func ([A-Z]\w*)\(`)
+
+// calledSomewhere answers whether anything but the declaration names it.
+func calledSomewhere(t *testing.T, root, name, declaredIn string) bool {
+	t.Helper()
+	found := false
+	filepath.WalkDir(filepath.Join(root, "src"), func(p string, d os.DirEntry, err error) error {
+		if err != nil || d.IsDir() || found || !strings.HasSuffix(p, ".go") {
+			return nil
+		}
+		b, err := os.ReadFile(p)
+		if err != nil {
+			return nil
+		}
+		for _, line := range strings.Split(string(b), nl) {
+			if strings.HasPrefix(line, "func "+name+"(") || strings.HasPrefix(line, "//") {
+				continue
+			}
+			if strings.Contains(line, name+"(") {
+				found = true
+				return nil
+			}
+		}
+		return nil
+	})
+	return found
 }

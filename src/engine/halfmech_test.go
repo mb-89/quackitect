@@ -150,3 +150,35 @@ func TestTheHalfMechanismRuleReachesEveryProjection(t *testing.T) {
 		}
 	}
 }
+
+// THE PRIOR ART IS NAMED, WITH WHAT EACH ONE CONTRIBUTES.
+//
+// THE CLAUSE WAS UNANSWERED FOR A ROUND and nothing said so. A reviewer
+// searched the whole tree for the five sources and found them only in the
+// token's own detail asking for the work, which is the shape where a
+// requirement is its own only trace.
+//
+// EACH SOURCE IS ASKED FOR SEPARATELY, so the check names the one that is
+// missing rather than saying the section is short.
+func TestThePriorArtNamesEverySource(t *testing.T) {
+	said := sectionUnder(t, filepath.Join("..", ".."), halfMechSpecifying, "## Prior art")
+	for _, source := range []string{
+		"Fit.", "FitNesse", "Specification by example", "Adzic",
+		"three amigos", "Behaviour-driven development", "Dan North",
+	} {
+		if !strings.Contains(said, source) {
+			t.Errorf("the prior art does not name %q", source)
+		}
+	}
+	// AND WHAT EACH CONTRIBUTES, not only that it exists. The phrase this
+	// section uses to say it is what this looks for.
+	takes := strings.Count(strings.ToLower(said), "takes")
+	if takes < 4 {
+		t.Errorf("the prior art says what it takes from %d of them, and there are five", takes)
+	}
+	// AND AN ESTIMATE IS MARKED AS AN ESTIMATE, which the voice asks of any
+	// claim that is not a measurement.
+	if !strings.Contains(said, "ESTIMATE, MARKED AS ONE") {
+		t.Error("the prior art carries no estimate marked as an estimate")
+	}
+}

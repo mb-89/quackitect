@@ -1,9 +1,5 @@
 package main
 
-import (
-	"fmt"
-)
-
 // WHERE A LESSON GOES.
 //
 // A finding teaches one token. A lesson names the class of mistake and teaches
@@ -15,11 +11,15 @@ import (
 // and is applied while the mistake is fresh.
 //
 // BIGGER THAN THAT, IT IS ITS OWN TOKEN. A lesson that needs its own work is
-// work, and work that is not a token is work nothing can see. The reviewer says
-// which by naming a token or leaving the name off.
+// work, and work that is not a token is work nothing can see.
+//
+// THE REVIEWER MINTS THAT TOKEN AND THE ENGINE REFUSES WITHOUT IT. This once
+// carried MintLessonToken, which nothing called and whose name and comment read
+// as the feature, so a reader looking for the behaviour found the function and
+// stopped looking. It was not unfinished, it was contradicted: reviewing.md
+// says the engine cannot mint it, because which class a finding belongs to and
+// whether it goes to the backlog are judgments. It is gone.
 
-// KeepLesson records a lesson on the token being rejected, and mints one when
-// the reviewer asked for its own.
 // KeepLesson writes the lesson onto the token, with the id of the token the
 // reviewer minted for it.
 //
@@ -52,18 +52,4 @@ func appendLesson(r Roots, t Token, l Lesson) error {
 	}
 	live.Lessons = append(live.Lessons, l)
 	return SaveToken(r, live)
-}
-
-// MintLessonToken makes a lesson its own backlogged work, for one too big to
-// apply inside the token that taught it.
-func MintLessonToken(r Roots, l Lesson, title, by string) (Token, error) {
-	if l.Empty() {
-		return Token{}, fmt.Errorf("a lesson names a class of mistake and what to do instead")
-	}
-	detail := l.Class + "\n\n" + l.Avoid
-	if l.Token != "" {
-		detail += "\n\nLearned from " + l.Token + ", round " + fmt.Sprint(l.Round) + "."
-	}
-	return Mint(r, Token{Title: title, Detail: detail, Assignee: "main",
-		Scope: SingleStep, Status: Backlogged, MintedBy: by})
 }
