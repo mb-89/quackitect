@@ -42,6 +42,41 @@ what only that refusal can say.
 A scope drawn around what you touched rather than around what the claim covers.
 Two files were enumerated and called all of them.
 
+
+WORK ADOPTED ON THE STRENGTH OF ITS TESTS, WITH NONE OF THEM RUN AGAINST THE
+DEFECT IT NAMES.
+
+Somebody else's branch is read, the commit messages are good, each commit
+carries a test, and the verdict is taken. Each carries its own test is a claim
+about those tests, and it is made by reading them. A test that is read is a test
+that is green, and green is what a test that cannot fail looks like too.
+
+INHERITED WORK IS WHERE THIS RULE IS EASIEST TO FORGET, because the check
+ARRIVES ALREADY GREEN and there is no moment at which somebody had to make it go
+red.
+
+WHAT TO DO. Before a verdict rests on the reason that each commit carries its
+own test, run the ones the reason leans on against the defect they name: break
+what the check guards, watch it go red, put it back, watch it go green, and
+write the two lines into the report under the commit that brought it.
+
+NOT ALL OF THEM AND NOT FOR LONG. The ones the verdict's reason turns on. A rule
+nobody can afford is a rule nobody keeps, and a sweep over every test on a
+branch is one nobody will run twice.
+
+AND THE HALF THAT STOPS IT RATHER THAN CATCHING IT: a check comparing two
+spellings of the same thing, a path with either separator, a name in either
+case, a URL with or without its trailing slash, is written in the spelling the
+producer writes, or normalises both sides. Ask what the artefact contains, by
+opening it, rather than what your own language hands you.
+
+MEASURED ON THIRTEEN ADOPTED COMMITS. The check the work turned on compared
+every projected line against this machine's root as filepath.Abs spells it, and
+the projector writes every path through filepath.ToSlash. It looked for the one
+spelling nothing writes. The two are one string on the platform it passed review
+on, which is why it arrived here green, and it could not fail on this platform
+for the defect it exists to catch.
+
 ### When a claim says every, count from the side that produces them
 
 A universal claim was guarded by a check whose entry point was the module the
