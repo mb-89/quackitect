@@ -170,13 +170,47 @@ function whyItIsNotAllowed(one, before, exported, inADoor) {
   // worked on, the caller is the only thing that knows it, and it cannot
   // drift: the engine would stop working rather than quietly minting nothing.
   if (/^["'`]--work["'`]$/.test(one)) return "";
-  // A VALUE THE CALLER OWNS: a name, a property read, or a call, carrying no
-  // quoted literal of its own and none through the name it was given.
-  if (/^[A-Za-z_$][\w$.?]*(\([^()]*\))?$/.test(one)) {
-    const held = throughTheName(one, before);
-    return held ? held + " reaches the call site through " + one : "";
+  // A VALUE THE CALLER OWNS, AND THE CHECK HAS TO BE ABLE TO SAY SO.
+  //
+  // NOTHING FOUND IS NOT NO FLAG. This branch handed a name, a property read
+  // or a call to a reader that answered the empty string both when it had
+  // looked and found nothing dangerous and when it could not look at all, and
+  // the empty string was read as permitted. So the top-level default refused
+  // and the branch under it permitted, which let a property read whose value
+  // is a flag, a name pointing at another name, and a call returning a flag
+  // all through.
+  //
+  // IT ANSWERS ONE OF THREE THINGS NOW, and only the middle one passes.
+  const said = whatItResolvesTo(one, before, 0);
+  if (said === "clean") return "";
+  return said + ", so it cannot stand as a value the caller owns";
+}
+
+// whatItResolvesTo answers a flag, or clean, or why it could not tell.
+//
+// A NAME IS FOLLOWED TO WHAT IT WAS GIVEN, and so is the object of a property
+// read and the callee of a call, because a flag can be one hop away in any of
+// the three. A chain is followed to a small depth rather than forever.
+function whatItResolvesTo(one, before, depth) {
+  if (depth > 5) return "this check will not follow " + one + " any further";
+  const name = one.match(/^([A-Za-z_$][\w$]*)\s*(?:\.[\w$]+|\([^()]*\))?$/);
+  if (!name) return "this check cannot read " + one;
+  const gives = new RegExp(
+    "\\b(?:const|let|var)\\s+" + name[1] + "\\s*(?::[^=]*)?=\\s*([^;\\n]+)", "g");
+  const all = [...(before || "").matchAll(gives)];
+  if (!all.length) {
+    // NOT FOUND IS NOT CLEAN. A name this check cannot follow is a name it
+    // cannot vouch for, and vouching for it is what let three forms past.
+    return "nothing above the call gives " + name[1] + " a value this check can read";
   }
-  return "this check cannot read " + one + ", so it is refused rather than passed";
+  const was = all[all.length - 1][1];
+  const held = was.match(/["'`](-[^"'`]*)["'`]/);
+  if (held) return held[1] + " reaches the call site through " + one;
+  // A NAME GIVEN ANOTHER NAME IS FOLLOWED, because the flag can be one more
+  // hop away. const a = "--form" and const b = a is two hops.
+  const onward = was.trim().match(/^[A-Za-z_$][\w$]*$/);
+  if (onward) return whatItResolvesTo(was.trim(), before, depth + 1);
+  return "clean";
 }
 
 // enclosing answers the name of the function the call sits in.
