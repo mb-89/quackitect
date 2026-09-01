@@ -165,6 +165,22 @@ own conduct has changed subject, and the reader came for the subject.
 
 ## Claims
 
+Derive a count. Never retype one.
+
+A note that enumerates things grows a sentence at the top saying how many of
+each kind there are. It is written from memory while the body is being drafted,
+the body then moves, and nobody counts again. The summary is the first thing a
+reader reads and the last thing anybody checks, so it is where a wrong number
+survives longest.
+
+MEASURED, TWICE IN ONE AFTERNOON. A map paragraph said eleven aborted and ten
+backlogged while its own body and all twenty-two notes said ten and eleven. An
+evidence section said four tests failed beside a list of five, and twelve of
+thirteen beside thirteen.
+
+RUN THE COUNT AND PASTE WHAT IT ANSWERED, the command and its answer. That is
+what this method asks of a criterion, applied to a sentence.
+
 State a measurement with its unit and where it came from.
 
 Mark an estimate as an estimate.

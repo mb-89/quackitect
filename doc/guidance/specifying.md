@@ -57,6 +57,24 @@ A SET COVERED BY ONE MEMBER. The sentence is about all of them and the command
 names one. A deliverable naming three of thirteen passes. When a criterion is
 about a set, the command walks the set and fails on the first miss.
 
+AND WALKING THE SET IS NOT WHAT MOST TOOLS DO WHEN HANDED ONE. `rg -q PATTERN
+a.md b.md c.md` exits zero when ANY of the three matches, so a command that
+names every member reads as the remedy and quietly ORs them. Anything with a
+find-and-stop exit code does the same. Write the loop, and let it fail on the
+first miss:
+
+    for f in a.md b.md c.md; do rg -q PATTERN "$f" || exit 1; done
+
+THE TELL IS THE EXIT CODE'S SUBJECT. Ask whether the tool exits on any or on
+every, and where the answer is any, the command is one member's however many
+you list.
+
+AN EXTENT IS MEASURED, NOT INHERITED. A reviewer's finding names the places it
+happened to look. Writing those places into the criteria and calling them all of
+them turns a sample into a measurement silently, because the draft then carries
+the word every and a list, which reads exactly like one. Re-sweep the file
+yourself and say what the sweep answered.
+
 A LIVE FACT DEMOTED TO PROSE. The engine runs a command criterion once, at the
 submission gate, so it reads the world at the moment of submission. That is
 exactly the instrument a live fact wants. Prose is for a fact no program can

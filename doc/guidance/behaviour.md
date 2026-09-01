@@ -34,6 +34,11 @@ cannot see the thing it guards, and stayed green when the defect was put back.
 A word list built from the cases already found. It reports zero by construction
 and cannot go non-zero for anything phrased differently.
 
+A check that asks only whether the call was refused, with two refusals in a row.
+The first refuses the empty case and the second the malformed one, and an empty
+value is also malformed, so deleting the first leaves the suite green. Assert on
+what only that refusal can say.
+
 A scope drawn around what you touched rather than around what the claim covers.
 Two files were enumerated and called all of them.
 

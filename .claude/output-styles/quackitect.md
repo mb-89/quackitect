@@ -170,6 +170,22 @@ own conduct has changed subject, and the reader came for the subject.
 
 ## Claims
 
+Derive a count. Never retype one.
+
+A note that enumerates things grows a sentence at the top saying how many of
+each kind there are. It is written from memory while the body is being drafted,
+the body then moves, and nobody counts again. The summary is the first thing a
+reader reads and the last thing anybody checks, so it is where a wrong number
+survives longest.
+
+MEASURED, TWICE IN ONE AFTERNOON. A map paragraph said eleven aborted and ten
+backlogged while its own body and all twenty-two notes said ten and eleven. An
+evidence section said four tests failed beside a list of five, and twelve of
+thirteen beside thirteen.
+
+RUN THE COUNT AND PASTE WHAT IT ANSWERED, the command and its answer. That is
+what this method asks of a criterion, applied to a sentence.
+
 State a measurement with its unit and where it came from.
 
 Mark an estimate as an estimate.
@@ -220,6 +236,11 @@ cannot see the thing it guards, and stayed green when the defect was put back.
 
 A word list built from the cases already found. It reports zero by construction
 and cannot go non-zero for anything phrased differently.
+
+A check that asks only whether the call was refused, with two refusals in a row.
+The first refuses the empty case and the second the malformed one, and an empty
+value is also malformed, so deleting the first leaves the suite green. Assert on
+what only that refusal can say.
 
 A scope drawn around what you touched rather than around what the claim covers.
 Two files were enumerated and called all of them.
@@ -364,6 +385,28 @@ Copy their sentence. Do not shorten it, tidy it, or join two of them.
 Change one thing at a time.
 
 Leave a file you did not need to touch exactly as it was.
+
+### Commit what you changed, by name
+
+Stage the paths you edited. Never stage everything.
+
+SEVERAL AGENTS SHARE ONE WORKING TREE, and one of the things they do in it is
+put a defect back to watch a check go red. A commit that stages everything takes
+that half-applied experiment with it, and the message says nothing about the
+file, because the author never touched it.
+
+MEASURED. A commit about two cage checks deleted five lines from pull.go, and
+those five lines were a refusal. The tree went red on two assertions and stayed
+that way until the reviewer that had been mid-injection noticed and put it back.
+The commit message named neither the file nor the refusal.
+
+TWO RULES OUT OF ONE INCIDENT. Stage by path, so what you commit is what you
+wrote. And put a defect back in a worktree of your own rather than in the tree
+somebody else is committing, which is the other half of the same collision.
+
+A WORKTREE IS CHEAP AND THE COLLISION IS NOT. git worktree add gives an isolated
+checkout at the commit under test, the tests run in it, and nothing anybody else
+does can land in the middle of an injection.
 
 ## Stopping
 

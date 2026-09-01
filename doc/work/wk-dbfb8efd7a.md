@@ -1,12 +1,15 @@
 ---
 id: wk-dbfb8efd7a
-seq: "84"
+seq: 84
 type: work
 title: any is not every
-status: backlogged
+status: aborted
 assignee: main
 scope: single-step
 traced: true
+disposition: dropped
+reason: "The class is written where an agent reads it. doc/guidance/specifying.md, beside A SET COVERED BY ONE MEMBER: rg -q over several files exits zero when any of them matches, so a command naming every member reads as the remedy and the tool quietly ORs them. The tell is whether the exit code is about any or about every. The instance is on wk-8573243384 and I am fixing that criterion as part of its redraft. Obsolete as a token."
+aborted_from: backlogged
 minted_by: reviewer6
 ---
 
