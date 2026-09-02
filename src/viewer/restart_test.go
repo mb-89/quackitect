@@ -9,6 +9,7 @@ import "testing"
 // number, the selection found whichever came first, and paging down from 10:35
 // landed at 10:17.
 func TestAFileThatStartedAgainReplacesWhatWasRead(t *testing.T) {
+	t.Parallel()
 	m := newTestModel(20)
 	m = key(m, "end")
 	if len(m.all) != 20 || m.selID != 20 {
@@ -39,6 +40,7 @@ func TestAFileThatStartedAgainReplacesWhatWasRead(t *testing.T) {
 
 // Paging down never goes backwards, even after a restart.
 func TestPagingDownNeverGoesBackwardsAfterARestart(t *testing.T) {
+	t.Parallel()
 	m := newTestModel(40)
 	out, _ := m.Update(linesMsg{recs: []Record{
 		rec(1, "agent", "call", "message 1"),

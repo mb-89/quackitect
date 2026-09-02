@@ -1,0 +1,98 @@
+# The smallest process there is: an observation written down, and later decided.
+# The activities are SIPOC rows, so the drawing is derived rather than drawn.
+
+name: note
+description: an observation written down, and later decided
+
+# A note is never traced. It is unfiltered by definition, and voice rule 13
+# keeps unfiltered notes out of git. Promoting one restates it.
+traced: false
+
+# Which of the catalogue's sections a note carries. The catalogue is in
+# src/schemas/work-token.schema.yaml, and everything not named here is off.
+sections:
+  required:
+    - detail
+    - proposed action
+  optional:
+    # A note may carry what would make it answered, and most do not. It is
+    # optional because the smallest note is a sentence about something wrong,
+    # and demanding criteria of that turns a note into a work token.
+    - done when
+    - "evidence: "
+
+# Which of the catalogue's fields a note may carry, beyond the ones every
+# token has.
+#
+# Two ways to say a note is not ready, and they answer different questions.
+# depends_on names other tokens that have to close first, which the engine can
+# decide on its own. ready_when names anything else, in whatever words fit: a
+# date, or a condition only a person can judge. Triage passes over a note that
+# is not ready, so deciding not to decide needs no disposition and leaves no
+# history on the token.
+fields:
+  optional:
+    - bucket
+    - holder
+    - needs_human
+    - depends_on
+    - ready_when
+    - disposition
+    - reason
+    - successors
+
+states:
+  - name: noted
+    description: written, waiting to be decided. This is the backlog.
+  - name: closed
+    description: decided, and the disposition says how
+
+activities:
+  - name: write
+    supplier: anyone
+    input: a raw idea
+    does: write it down so a stranger understands it, and cut what nobody needs
+    output: a note
+    customer: the backlog
+    by: anyone
+    to: noted
+    # What has to be true before this activity is done. Every one is ticked.
+    # Where evidence is required, the tick is not enough and a sentence says
+    # what was seen. Raising the bar here raises it for every token after it.
+    criteria:
+      - says: the guidance this token names was read and applied
+      - says: the smallest case that still shows it
+        evidence: required
+      - says: why it is a problem, and not only what happened
+        evidence: required
+      - says: a stranger could act on this without asking you anything
+      - says: is this a symptom of something bigger, and not only its instance
+
+  - name: decide
+    supplier: the backlog
+    input: a note
+    does: decide what to do with it
+    output: a disposition, and a work token when it becomes one
+    customer: the backlog
+    by: the owner or an assigned agent
+    from: noted
+    to: closed
+    criteria:
+      - says: the note was read whole, and not only its title
+      - says: the disposition says what happened
+        evidence: required
+      - says: a became names its successor, and that token exists
+      - says: a dropped says why, in a sentence about this note
+      - says: not now is ready_when, and not a disposition
+
+# What a decision answers. All three end the note.
+# Deciding not to decide is not one of them: the activity is abandoned, no
+# transition happens, and the note stays noted. The call log holds who looked.
+dispositions:
+  - name: done
+    description: the answer was small enough to do, and it was done
+  - name: became
+    description: the answer is larger work, named in successors
+  - name: dropped
+    description: it is not a problem, or it is one we will never act on
+    reason: required

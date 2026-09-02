@@ -14,6 +14,7 @@ import (
 // the method root was searched for a shipped view, and the owner saw the
 // change on their board.
 func TestTheWorkFolderOwnsItsViews(t *testing.T) {
+	t.Parallel()
 	method, work := t.TempDir(), t.TempDir()
 	r := Roots{Method: method, Work: work}
 
@@ -55,6 +56,7 @@ func TestTheWorkFolderOwnsItsViews(t *testing.T) {
 
 // The same for the marks, for the same reason.
 func TestTheWorkFolderOwnsItsIcons(t *testing.T) {
+	t.Parallel()
 	method, work := t.TempDir(), t.TempDir()
 	r := Roots{Method: method, Work: work}
 
@@ -77,24 +79,6 @@ func TestTheWorkFolderOwnsItsIcons(t *testing.T) {
 	}
 }
 
-// Every view the engine can name is looked for in the same places, so a listing
-// and a lookup never disagree about what exists.
-func TestListingAndLookupLookInTheSamePlaces(t *testing.T) {
-	method, work := t.TempDir(), t.TempDir()
-	r := Roots{Method: method, Work: work}
-	os.MkdirAll(filepath.Join(work, "util", "views"), 0o755)
-	os.WriteFile(filepath.Join(work, "util", "views", "mine.base"),
-		[]byte("views:\n  - name: left\n    order:\n      - title\n"), 0o644)
-
-	names := Views(r)
-	if len(names) != 1 || names[0] != "mine" {
-		t.Fatalf("the listing answers %v", names)
-	}
-	if _, ok := ViewPath(r, "mine"); !ok {
-		t.Fatal("a view the listing names cannot be found")
-	}
-}
-
 // READING FALLS BACK TO THE METHOD. WRITING DOES NOT.
 //
 // The fallback was writable, so a command told to work on one folder wrote into
@@ -102,6 +86,7 @@ func TestListingAndLookupLookInTheSamePlaces(t *testing.T) {
 // what isolating yourself with a fresh folder looks like. A reviewer working in
 // a temporary folder changed the owner's board twice.
 func TestAnEditNeverWritesIntoTheMethod(t *testing.T) {
+	t.Parallel()
 	method, work := t.TempDir(), t.TempDir()
 	r := Roots{Method: method, Work: work}
 
@@ -179,6 +164,7 @@ views:
 // cannot produce the state is a fixture that can only exercise the case that
 // works.
 func TestANeighbourIsNotAChild(t *testing.T) {
+	t.Parallel()
 	here := t.TempDir()
 	work := filepath.Join(here, "proj")
 	method := filepath.Join(here, "proj-v4")

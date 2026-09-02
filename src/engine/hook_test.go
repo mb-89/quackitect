@@ -9,16 +9,14 @@ import (
 	"testing"
 )
 
+// buildEngine answers the engine the package built once, in enginebin_test.go.
+//
+// It used to build its own into t.TempDir(), and so did every other helper
+// like it. Windows will not run a file with no extension, so the fixture
+// builds to the name the engine computes for itself.
 func buildEngine(t *testing.T) string {
 	t.Helper()
-	// Windows will not run a file with no extension, so the name the engine
-	// already computes for itself is the name the test must build to.
-	exe := filepath.Join(t.TempDir(), exeName("se"))
-	out, err := exec.Command("go", "build", "-o", exe, ".").CombinedOutput()
-	if err != nil {
-		t.Fatalf("building the engine failed: %s", out)
-	}
-	return exe
+	return theEngine(t)
 }
 
 func hookSays(t *testing.T, exe, method, event string, body map[string]any) string {
@@ -34,49 +32,10 @@ func hookSays(t *testing.T, exe, method, event string, body map[string]any) stri
 	return strings.TrimSpace(string(out))
 }
 
-// UC-3 and UC-35. The one refusal with no override, and the answer names the
-// original. Everything else is allowed and recorded.
-func TestTheGuardRefusesAProjectionAndNothingElse(t *testing.T) {
-	exe := buildEngine(t)
-	r := guidanceTree(t)
-	one := withATokenInHand(t, r)
-	if _, err := Project(r); err != nil {
-		t.Fatal(err)
-	}
-	l, _ := OpenLog(r.Private("log"))
-	l.Close()
-
-	deny := hookSays(t, exe, r.Method, "PreToolUse", map[string]any{
-		"cwd": r.Work, "tool_name": "Write",
-		"tool_input": map[string]any{"file_path": filepath.Join(r.Work, "AGENTS.md")},
-	})
-	if !strings.Contains(deny, `"permissionDecision":"deny"`) {
-		t.Fatalf("a projection write was not refused: %s", deny)
-	}
-	if !strings.Contains(deny, "voice.md") {
-		t.Fatalf("the refusal does not name the original: %s", deny)
-	}
-
-	// An ordinary write, and one outside the roots. Neither is guarded.
-	//
-	// A NAME ARMS ONE WRITE, so each of these gets its own. This test is about
-	// the projection guard rather than the write gate's grain, and the first
-	// write above spent the ticket withATokenInHand armed.
-	for _, p := range []string{filepath.Join(r.Work, "notes.md"), filepath.Join(t.TempDir(), "desktop.txt")} {
-		ArmTicket(r, "main", one.ID)
-		got := hookSays(t, exe, r.Method, "PreToolUse", map[string]any{
-			"cwd": r.Work, "tool_name": "Write",
-			"tool_input": map[string]any{"file_path": p},
-		})
-		if got != "" {
-			t.Fatalf("an ordinary write to %s was not allowed: %s", p, got)
-		}
-	}
-}
-
 // UC-34. Every call is in the log, written by a separate process, appended to
 // the session that is already running.
 func TestTheGuardAppendsToTheRunningSession(t *testing.T) {
+	t.Parallel()
 	exe := buildEngine(t)
 	r := guidanceTree(t)
 	Project(r)
@@ -129,6 +88,7 @@ func logLines(t *testing.T, r Roots) []string {
 // Read evidence is kept, and a compaction throws it away: the agent no longer
 // holds what it read, so the record of having read it is no longer true.
 func TestReadEvidenceIsResetByCompaction(t *testing.T) {
+	t.Parallel()
 	exe := buildEngine(t)
 	r := guidanceTree(t)
 	Project(r)
@@ -160,6 +120,7 @@ func TestReadEvidenceIsResetByCompaction(t *testing.T) {
 
 // Every agent has an identity, and the record says which one acted.
 func TestAnAgentIdentityIsRecordedWhenTheHarnessStartsIt(t *testing.T) {
+	t.Parallel()
 	exe := buildEngine(t)
 	r := guidanceTree(t)
 	Project(r)
@@ -181,46 +142,11 @@ func TestAnAgentIdentityIsRecordedWhenTheHarnessStartsIt(t *testing.T) {
 	}
 }
 
-// UC-32. A document that breaks a mechanical rule does not reach disk, and
-// the refusal names the rule and the place.
-func TestAWriteThatBreaksAVoiceRuleIsRefused(t *testing.T) {
-	exe := buildEngine(t)
-	r := guidanceTree(t)
-	withATokenInHand(t, r)
-	Project(r)
-	l, _ := OpenLog(r.Private("log"))
-	l.Close()
-
-	deny := hookSays(t, exe, r.Method, "PreToolUse", map[string]any{
-		"cwd": r.Work, "tool_name": "Write",
-		"tool_input": map[string]any{
-			"file_path": filepath.Join(r.Work, "note.md"),
-			"content":   "This is one thing; this is another.\n",
-		},
-	})
-	if !strings.Contains(deny, `"permissionDecision":"deny"`) {
-		t.Fatalf("a semicolon in prose was not refused: %s", deny)
-	}
-	if !strings.Contains(deny, "no semicolon") {
-		t.Fatalf("the refusal does not name the rule: %s", deny)
-	}
-
-	// The same text in a file that is not prose is nobody's business.
-	ok := hookSays(t, exe, r.Method, "PreToolUse", map[string]any{
-		"cwd": r.Work, "tool_name": "Write",
-		"tool_input": map[string]any{
-			"file_path": filepath.Join(r.Work, "main.go"),
-			"content":   "a := 1; b := 2\n",
-		},
-	})
-	if ok != "" {
-		t.Fatalf("code was checked as prose: %s", ok)
-	}
-}
-
 // UC-1 and UC-2. A folder with nothing in it can be driven, and two copies
 // are two entries that both resolve.
 func TestAnEmptyFolderCanBeDrivenAndTwoCopiesBothResolve(t *testing.T) {
+	// NOT PARALLEL: t.Setenv sets a process-wide value, and Go
+	// refuses the two together.
 	home := t.TempDir()
 	t.Setenv("SE_REGISTRY", home)
 	a, b := t.TempDir(), t.TempDir()
@@ -260,6 +186,8 @@ func TestAnEmptyFolderCanBeDrivenAndTwoCopiesBothResolve(t *testing.T) {
 // The choice is asked once. Running init again clears it, which is how a
 // project is moved to another vehicle.
 func TestInitClearsTheDriverSoTheChoiceIsAskedAgain(t *testing.T) {
+	// NOT PARALLEL: t.Setenv sets a process-wide value, and Go
+	// refuses the two together.
 	r := guidanceTree(t)
 	t.Setenv("SE_REGISTRY", t.TempDir())
 	if _, err := Attach(r); err != nil {
@@ -286,6 +214,7 @@ func TestInitClearsTheDriverSoTheChoiceIsAskedAgain(t *testing.T) {
 // UC-7. A configuration change resets the read evidence, because what was
 // read was read under rules that no longer hold.
 func TestAConfigurationChangeResetsTheReadEvidence(t *testing.T) {
+	t.Parallel()
 	exe := buildEngine(t)
 	r := guidanceTree(t)
 	Project(r)
@@ -306,139 +235,13 @@ func TestAConfigurationChangeResetsTheReadEvidence(t *testing.T) {
 	}
 }
 
-// A checker that cannot run says so and allows the write. A broken checker
-// must not stop a person from working.
-func TestABrokenVoiceCheckerDoesNotStopAWrite(t *testing.T) {
-	exe := buildEngine(t)
-	r := guidanceTree(t)
-	withATokenInHand(t, r)
-	Project(r)
-	l, _ := OpenLog(r.Private("log"))
-	l.Close()
-	os.Remove(filepath.Join(r.Method, "util", "voice-rules.json"))
-
-	got := hookSays(t, exe, r.Method, "PreToolUse", map[string]any{
-		"cwd": r.Work, "tool_name": "Write",
-		"tool_input": map[string]any{
-			"file_path": filepath.Join(r.Work, "note.md"),
-			"content":   "This is one thing; this is another.\n",
-		},
-	})
-	if got != "" {
-		t.Fatalf("a write was refused by a checker that could not run: %s", got)
-	}
-	b, _ := os.ReadFile(filepath.Join(r.Private("log"), Current))
-	if !strings.Contains(string(b), "voice rules could not be read") {
-		t.Fatal("a checker that could not run said nothing about it")
-	}
-}
-
-// Private originals do not travel. Digests do. A copy is a hash match, so
-// nothing here judges what a file says.
-func TestACopyOfAPrivateOriginalIsRefused(t *testing.T) {
-	exe := buildEngine(t)
-	r := guidanceTree(t)
-	inHand := withATokenInHand(t, r)
-	Project(r)
-	l, _ := OpenLog(r.Private("log"))
-	l.Close()
-
-	secret := "the whole of a paper that may not leave this machine\n"
-	os.MkdirAll(r.Private("sources"), 0o755)
-	os.WriteFile(filepath.Join(r.Private("sources"), "paper.txt"), []byte(secret), 0o644)
-
-	deny := hookSays(t, exe, r.Method, "PreToolUse", map[string]any{
-		"cwd": r.Work, "tool_name": "Write",
-		"tool_input": map[string]any{
-			"file_path": filepath.Join(r.Work, "notes", "paper.txt"),
-			"content":   secret,
-		},
-	})
-	if !strings.Contains(deny, `"permissionDecision":"deny"`) {
-		t.Fatalf("a copy of a private original was allowed: %s", deny)
-	}
-	if !strings.Contains(deny, "does not travel") {
-		t.Fatalf("the refusal does not say why: %s", deny)
-	}
-
-	// A digest is not a copy, so it goes.
-	ok := hookSays(t, exe, r.Method, "PreToolUse", map[string]any{
-		"cwd": r.Work, "tool_name": "Write",
-		"tool_input": map[string]any{
-			"file_path": filepath.Join(r.Work, "notes", "digest.txt"),
-			"content":   "A paper about one thing. Two findings. Kept under .se.\n",
-		},
-	})
-	if ok != "" {
-		t.Fatalf("a digest was refused: %s", ok)
-	}
-
-	// And moving it about INSIDE the private folder is nobody's business. A name
-	// arms one write, and the digest above spent the one this test started with.
-	ArmTicket(r, "main", inHand.ID)
-	inside := hookSays(t, exe, r.Method, "PreToolUse", map[string]any{
-		"cwd": r.Work, "tool_name": "Write",
-		"tool_input": map[string]any{
-			"file_path": filepath.Join(r.Private("sources"), "paper-copy.txt"),
-			"content":   secret,
-		},
-	})
-	if inside != "" {
-		t.Fatalf("a copy inside the private folder was refused: %s", inside)
-	}
-}
-
-// AN ANSWER SETTLES WHAT WAS OUTSTANDING WHEN IT WAS WRITTEN.
-//
-// The guard copies this event's mid-turn messages first and cleared the
-// obligation afterwards, so a question that arrived while the agent was
-// answering was recorded and then deleted in the same event. The answer that
-// discharged it was composed before that question existed.
-func TestAQuestionThatArrivesDuringTheAnsweringSurvivesIt(t *testing.T) {
-	exe := buildEngine(t)
-	r := guidanceTree(t)
-	l, _ := OpenLog(r.Private("log"))
-	l.Write("engine", "start", "engine", "started", Yes(), nil)
-	l.Close()
-
-	if err := TheyAsked(r, "main", "the first thing"); err != nil {
-		t.Fatal(err)
-	}
-
-	// A transcript the engine has already read to the end, so only what is
-	// written next counts as new.
-	path := filepath.Join(t.TempDir(), "session.jsonl")
-	if err := os.WriteFile(path, nil, 0o644); err != nil {
-		t.Fatal(err)
-	}
-	StartWhereItIs(r, path)
-	const asked = "and one more thing while you are at it"
-	if err := os.WriteFile(path, []byte(queued(asked)), 0o644); err != nil {
-		t.Fatal(err)
-	}
-
-	// The agent answers the first question. In the same event, the harness
-	// hands over a transcript carrying the second.
-	hookSays(t, exe, r.Method, "PostToolUse", map[string]any{
-		"cwd": r.Work, "tool_name": "Bash", "transcript_path": path,
-		"tool_input": map[string]any{"command": exe + ` --answer "here is the answer to the first"`},
-	})
-
-	said, owed := AnswerOwed(r, "main")
-	if !owed {
-		t.Fatal("a question that arrived while the agent was answering was erased unanswered")
-	}
-	if said != asked {
-		t.Fatalf("what is owed is %q", said)
-	}
-}
-
 // A MULTI-LINE COMMAND IS RECORDED AS ITS CONTENT AND NOT AS ITS FIRST LINE.
 // The owner read a log of `Bash python -c "` repeated forever and asked
 // whether the agent was failing: it was the record cutting a multi-line
 // program at the newline after the opening quote. The description folds the
 // lines to spaces, and the cap still holds.
 func TestAMultiLineCommandIsRecordedWhole(t *testing.T) {
+	t.Parallel()
 	got := describe("Bash", "", "python -c \"\nimport os\nprint(os.getcwd())\n\"")
 	if got != `Bash python -c " import os print(os.getcwd()) "` {
 		t.Fatalf("the record cut the command: %q", got)

@@ -16,38 +16,44 @@
 // Nothing here reads the filesystem, spawns anything, or knows about vscode, so
 // the check can call it.
 
-export function mintArgs(text: string, kind: string): string[] | undefined {
+// THE PICKER CHOOSES A PROCESS, and nothing else.
+//
+// It used to choose a scope and whether the token was traced, joined into one
+// word with a middle dot and read apart here. Both of those are the process's
+// now: src/processes/<name>.process.yaml says whether its tokens are traced and
+// what the steps are, so the panel picks the file and the file answers the rest.
+export function mintArgs(text: string, process: string): string[] | undefined {
   const said = text.trim();
   if (!said) return undefined;
-  const [scope, traced] = readKind(kind);
-  // THE FORM IS BEFORE THE SLASH AND THE DETAIL IS AFTER IT. Four words name
+  // THE TITLE IS BEFORE THE SLASH AND THE DETAIL IS AFTER IT. Four words name
   // the work and the rest is everything the next hand needs.
   const cut = said.indexOf("/");
   const title = (cut < 0 ? said : said.slice(0, cut)).trim();
   const detail = cut < 0 ? "" : said.slice(cut + 1).trim();
-  const args = ["work", "--title", title, "--assignee", "human", "--by", "person",
-                "--scope", scope, "--traced=" + traced];
+  const args = ["work", "--title", title, "--by", "person",
+                "--process", process.trim() || "note"];
   if (detail) args.push("--detail", detail);
   return args;
-}
-
-// The picker carries one word for two decisions, so one place reads it apart.
-export function readKind(kind: string): [string, string] {
-  const [left, right] = kind.split("·");
-  const scope = left === "MS" ? "multi-step" : left === "T" ? "token" : "single-step";
-  return [scope, right === "E" ? "false" : "true"];
 }
 
 export function editCellArgs(id: string, col: string, text: string): string[] {
   return ["work", "--set", id, "--field", col, "--to", text, "--by", "person"];
 }
 
-// FILING PUTS A TOKEN IN A GROUPING. The column a person dropped it on says
-// which field is written, and the engine decides whether that is allowed.
+// FILING PUTS A TOKEN IN A GROUP THE PERSON MADE.
+//
+// TWO KINDS OF GROUP AND THIS IS THE SECOND. A query is a filter in the view
+// file and nothing drags a row into one. A bucket is a place, and the column
+// a person dropped the row on says which field is written. The engine decides
+// whether that is allowed, and it refuses a bucket from anybody but a person.
 export function fileArgs(id: string, sets: string, into: string): string[] {
-  return ["work", "--set", id, "--" + sets, into];
+  return ["work", "--set", id, "--field", sets, "--to", into, "--by", "person"];
 }
 
+// TICKED ROWS MAKE A GROUP. No name is sent: the engine knows which names are
+// taken and hands back a free one, which is why the group is made first and
+// named afterwards. A webview cannot raise a prompt, so a control that asked
+// for a name first did nothing at all when pressed.
 export function groupArgs(ids: string[]): string[] | undefined {
   if (ids.length === 0) return undefined;
   return ["work", "--file", ids.join(","), "--by", "person"];
@@ -181,4 +187,15 @@ export function startArgs(): string[] {
 // caller's, and the flags are this file's like every other call.
 export function setArgs(key: string, text: string, method: string): string[] {
   return ["--set", key + "=" + text, "--method", method];
+}
+
+// The language server, which the editor starts and then speaks to over stdio.
+//
+// THE WHOLE ARGUMENT LIST IS HERE, --stdio INCLUDED. The language client adds
+// that flag itself when it is told a transport, and the engine refuses a flag
+// it was not given, so the server exited before it read a byte and the editor
+// gave up after five tries. The transport is left off the client and the flag
+// is written here, so one place says what the server is run with.
+export function lspArgs(work: string): string[] {
+  return ["lsp", "--work", work, "--stdio"];
 }

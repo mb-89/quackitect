@@ -31,8 +31,10 @@ const root = process.argv[2] ?? ".";
 // NOT AN ARGUMENT BUILDER, and named here with its reason so a reader can tell
 // an exclusion from an oversight.
 const notABuilder = {
-  readKind: "reads a kind out of a string. It builds no argument list and is "
-    + "called inside engineargs.ts by the one that does",
+  lspArgs: "the language client owns this child, so it cannot go through a door "
+    + "of ours. Its ExecutableOptions carry cwd, env, detached and shell and no "
+    + "windowsHide, so the server frees its own console instead, in "
+    + "console_windows.go, and engine-args.mjs drives the handshake",
 };
 
 const doors = {

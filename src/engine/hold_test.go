@@ -9,6 +9,7 @@ import (
 // A PERSON PUT EVERYTHING DOWN, and nothing the agent asks for is allowed.
 // The button is the grant, so no claim is wanted for the stop that follows.
 func TestNothingIsAllowedWhileEverythingIsOnHold(t *testing.T) {
+	t.Parallel()
 	exe := buildEngine(t)
 	r := guidanceTree(t)
 	Project(r)
@@ -57,6 +58,7 @@ func TestNothingIsAllowedWhileEverythingIsOnHold(t *testing.T) {
 // It is a file, so it outlives the process that set it and every process that
 // reads it.
 func TestTheHoldSurvivesTheProcessThatSetIt(t *testing.T) {
+	t.Parallel()
 	r := guidanceTree(t)
 	if LoadHold(r).On {
 		t.Fatal("it started on")

@@ -19,6 +19,7 @@ func theRules(t *testing.T) VoiceRules {
 
 // UC-32. The mechanical rules, and only the mechanical rules.
 func TestTheVoiceCheckSeesWhatAProgramCanSee(t *testing.T) {
+	t.Parallel()
 	for _, c := range []struct {
 		text string
 		rule string
@@ -44,6 +45,7 @@ func TestTheVoiceCheckSeesWhatAProgramCanSee(t *testing.T) {
 
 // Code is not prose. A semicolon in a fenced block is a semicolon in code.
 func TestCodeIsNotProse(t *testing.T) {
+	t.Parallel()
 	text := "Prose here.\n\n```go\na := 1; b := 2\n```\n\nMore prose.\n"
 	if got := theRules(t).Check(text); len(got) != 0 {
 		t.Fatalf("code was checked as prose: %v", got)
@@ -52,6 +54,7 @@ func TestCodeIsNotProse(t *testing.T) {
 
 // A table cell is not a paragraph, and the design documents are full of them.
 func TestATableRowIsNotCheckedForLength(t *testing.T) {
+	t.Parallel()
 	row := "| a | " + longWords(40) + " |"
 	for _, f := range theRules(t).Check(row) {
 		if f.Rule == "25 words to a sentence" {
@@ -71,6 +74,7 @@ func longWords(n int) string {
 // THE RULES ARE DATA. A different file is a different checker, and no program
 // changes.
 func TestTheRulesCanBeSwapped(t *testing.T) {
+	t.Parallel()
 	root := t.TempDir()
 	os.MkdirAll(filepath.Join(root, "util"), 0o755)
 	os.WriteFile(filepath.Join(root, "util", "voice-rules.json"), []byte(`{
@@ -98,6 +102,7 @@ func TestTheRulesCanBeSwapped(t *testing.T) {
 
 // A rules file that will not load stops the check and never a write.
 func TestARulesFileThatWillNotLoadIsReported(t *testing.T) {
+	t.Parallel()
 	root := t.TempDir()
 	os.MkdirAll(filepath.Join(root, "util"), 0o755)
 	os.WriteFile(filepath.Join(root, "util", "voice-rules.json"),

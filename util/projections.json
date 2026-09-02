@@ -1,40 +1,22 @@
 {
   "projections": [
     {
-      "name": "agent protocol",
-      "target": "AGENTS.md",
-      "sources": [
-        "doc/guidance/voice.md",
-        "doc/guidance/behaviour.md",
-        "doc/guidance/work-token.md"
-      ],
-      "wrap": "markdown",
-      "section": "Actionables"
-    },
-    {
       "name": "copilot instructions",
       "target": ".github/copilot-instructions.md",
-      "sources": [
-        "doc/guidance/voice.md",
-        "doc/guidance/behaviour.md",
-        "doc/guidance/work-token.md"
-      ],
       "wrap": "markdown",
-      "section": "Actionables"
+      "section": "Actionables",
+      "sources_from": "doc/guidance"
     },
     {
       "name": "claude output style",
       "target": ".claude/output-styles/quackitect.md",
-      "sources": [
-        "doc/guidance/voice.md",
-        "doc/guidance/behaviour.md",
-        "doc/guidance/work-token.md"
-      ],
       "wrap": "frontmatter",
       "frontmatter": {
         "name": "quackitect"
       },
-      "section": "Actionables"
+      "section": "Actionables",
+      "sources_from": "doc/guidance",
+      "preamble": "util/cage/first-turn.md"
     },
     {
       "name": "claude cage",

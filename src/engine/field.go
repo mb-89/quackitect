@@ -15,12 +15,10 @@ import "fmt"
 // shows as a group beside open. A name nobody asked for is a grouping nobody
 // meant, and it spreads: two agents inventing two names for one idea is how a
 // list stops being readable.
-func WriteField(t *Token, field, to string) error {
-	return writeField(t, field, to, "person")
-}
-
-// WriteFieldBy is the same with the caller named, so the rules that depend on
-// who is asking can be applied.
+// The caller is named, so the rules that depend on who is asking can be
+// applied. There is no version that does not name one: a caller that would not
+// say who it was got "person" by default, and a default answer to who did this
+// is the answer nothing can check.
 func WriteFieldBy(t *Token, field, to, by string) error {
 	return writeField(t, field, to, by)
 }
@@ -34,35 +32,33 @@ func writeField(t *Token, field, to, by string) error {
 		t.Title = to
 	case "detail":
 		t.Detail = to
-	case "guidance":
-		t.Guidance = to
-	case "assignee":
-		if to == "" {
-			return fmt.Errorf("a token needs an assignee: every token is somebody's")
-		}
-		t.Assignee = to
-	case "bucket":
-		if by != "person" && to != "" {
-			return fmt.Errorf("a bucket is a name a person typed. " +
-				"What you can say is that it is backlogged, which is a status")
-		}
-		t.Bucket = to
+	case "proposed_action":
+		t.ProposedAction = to
+	case "ready_when":
+		t.ReadyWhen = to
 	case "reason":
 		t.Reason = to
-	case "scope":
-		s := Scope(to)
-		if !s.Known() {
-			return fmt.Errorf("a scope is %s, %s or %s", MultiStep, SingleStep, InToken)
+	case "needs_human":
+		t.NeedsHuman = to == "true"
+	case "bucket":
+		// ONLY A PERSON MAKES A GROUP. What an agent can say about where work
+		// sits is the state, which the process owns and the pull moves. A name
+		// nobody asked for is a grouping nobody meant, and it spreads: two
+		// agents inventing two names for one idea is how a list stops being
+		// readable.
+		if by != "person" {
+			return fmt.Errorf("a bucket is a person's own name for a group, and %s is not a person. "+
+				"Say what you mean about where the work stands, and the process moves it", by)
 		}
-		t.Scope = s
-	case "id", "seq", "type", "minted_by", "submitted_by":
+		t.Bucket = to
+	case "kind", "id", "guidance":
 		return fmt.Errorf("%s is the engine's, and it is not written by hand", field)
+	case "process":
+		return fmt.Errorf("a process is chosen at minting, and it decides the token's shape")
 	case "status", "holder":
 		return fmt.Errorf("%s is moved by a pull, not by a keystroke", field)
-	case "subs", "depends_on", "successors":
+	case "depends_on", "successors":
 		return fmt.Errorf("%s is a relation, and it is edited in the note", field)
-	case "traced":
-		return fmt.Errorf("traced is decided at minting, and it decides where the note lives")
 	default:
 		return fmt.Errorf("this program does not write %q", field)
 	}

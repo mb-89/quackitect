@@ -16,18 +16,22 @@ import (
 // minted has to reach the work. So the check has two homes and one
 // implementation.
 
-type Finding3 struct {
+// File and Line are what an editor needs to put the mark on the right row.
+// A finding about no place in particular leaves them empty.
+type Finding struct {
 	ID    string `json:"id"`
 	Title string `json:"title"`
 	Says  string `json:"says"`
+	File  string `json:"file,omitempty"`
+	Line  int    `json:"line,omitempty"`
 }
 
 // LintTokens names what breaks a rule. An empty answer is a clean ledger.
-func LintTokens(r Roots) []Finding3 {
-	var out []Finding3
+func LintTokens(r Roots) []Finding {
+	var out []Finding
 	for _, t := range Tokens(r) {
 		if err := checkTitle(t.Title); err != nil {
-			out = append(out, Finding3{ID: t.ID, Title: t.Title, Says: err.Error()})
+			out = append(out, Finding{ID: t.ID, Title: t.Title, Says: err.Error()})
 		}
 		for _, dir := range workDirs(r) {
 			b, err := os.ReadFile(filepath.Join(dir, t.ID+".md"))
@@ -35,7 +39,7 @@ func LintTokens(r Roots) []Finding3 {
 				continue
 			}
 			for _, line := range timesIn(string(b)) {
-				out = append(out, Finding3{ID: t.ID, Title: t.Title,
+				out = append(out, Finding{ID: t.ID, Title: t.Title,
 					Says: "a token carries no time, and this one carries " + line})
 			}
 		}
@@ -48,32 +52,32 @@ func LintTokens(r Roots) []Finding3 {
 // AN UNDECLARED NAME DRAWS ITSELF, so the mistake reaches a button as a bare
 // word rather than as a blank. That is visible, and this is how it is caught
 // before somebody sees it.
-func LintIcons(r Roots) []Finding3 {
+func LintIcons(r Roots) []Finding {
 	icons, err := Icons(r)
 	if err != nil {
-		return []Finding3{{ID: "icons", Says: err.Error()}}
+		return []Finding{{ID: "icons", Says: err.Error()}}
 	}
 	// A CHECK THAT CANNOT READ WHAT IT GUARDS SAYS SO. Returning nothing here
 	// made the lint answer clean precisely when the file was missing or broken,
 	// which is the moment it was most worth hearing from.
 	raw, err := os.ReadFile(filepath.Join(r.Method, "util", "parameters.json"))
 	if err != nil {
-		return []Finding3{{ID: "util/parameters.json", Title: "the declaration",
+		return []Finding{{ID: "util/parameters.json", Title: "the declaration",
 			Says: "cannot be read, so nothing about it was checked: " + err.Error()}}
 	}
 	var root Node
 	if err := json.Unmarshal(raw, &root); err != nil {
-		return []Finding3{{ID: "util/parameters.json", Title: "the declaration",
+		return []Finding{{ID: "util/parameters.json", Title: "the declaration",
 			Says: "cannot be read, so nothing about it was checked: " + err.Error()}}
 	}
-	var out []Finding3
+	var out []Finding
 	Walk(root, "", func(path string, n Node) {
 		for _, want := range append(valuesOf(n.Labels), n.Label) {
 			if want == "" || !plainName(want) {
 				continue
 			}
 			if _, ok := icons[want]; !ok {
-				out = append(out, Finding3{ID: path, Title: n.Name,
+				out = append(out, Finding{ID: path, Title: n.Name,
 					Says: "names the icon " + want + ", and util/icons.json has no such name"})
 			}
 		}
@@ -110,18 +114,17 @@ func plainName(s string) bool {
 // ONE NUMBER DECLARED TWICE HAS TO AGREE WITH ITSELF. The floor in Go and the
 // default in the declaration are one fact in two places, and nothing said so
 // while they happened to match.
-func LintLimits(r Roots) []Finding3 {
+func LintLimits(r Roots) []Finding {
 	root, err := LoadTree(r.Method)
 	if err != nil {
-		return []Finding3{{ID: "util/parameters.json", Title: "the declaration",
+		return []Finding{{ID: "util/parameters.json", Title: "the declaration",
 			Says: "cannot be read, so no limit was checked: " + err.Error()}}
 	}
-	var out []Finding3
+	var out []Finding
 	floor := TheFloor()
 	inGo := map[string]int{
 		"quackitect.limits.heartbeat_seconds":          floor.HeartbeatSeconds,
 		"quackitect.limits.ready_budget_ms":            floor.ReadyBudgetMs,
-		"quackitect.limits.unreviewed_before_blocked":  floor.UnreviewedBeforeBlocked,
 		"quackitect.limits.pulls_before_hold_is_stale": floor.PullsBeforeHoldIsStale,
 		"quackitect.limits.detail_bytes":               floor.DetailBytes,
 		"quackitect.limits.section_bytes":              floor.SectionBytes,
@@ -130,18 +133,18 @@ func LintLimits(r Roots) []Finding3 {
 		d, hasDefault := toNumber(n.Default)
 		if n.Narrow == "smaller" && hasDefault && n.Max != nil && *n.Max > d {
 			top := *n.Max
-			out = append(out, Finding3{ID: path, Title: n.Name, Says: fmt.Sprintf(
+			out = append(out, Finding{ID: path, Title: n.Name, Says: fmt.Sprintf(
 				"offers up to %v and may only be made smaller than %v, so the range above %v is one nobody can reach",
 				top, d, d)})
 		}
 		if want, ok := inGo[path]; ok && hasDefault && int(d) != want {
-			out = append(out, Finding3{ID: path, Title: n.Name, Says: fmt.Sprintf(
+			out = append(out, Finding{ID: path, Title: n.Name, Says: fmt.Sprintf(
 				"is %v in the declaration and %d in the engine, and one number cannot be two", d, want)})
 		}
 		delete(inGo, path)
 	})
 	for path := range inGo {
-		out = append(out, Finding3{ID: path, Title: path,
+		out = append(out, Finding{ID: path, Title: path,
 			Says: "is a number in the engine and nothing declares it"})
 	}
 	return out
@@ -166,6 +169,8 @@ func runLint(args []string) {
 	}
 	found := append(LintTokens(roots), LintIcons(roots)...)
 	found = append(found, LintLimits(roots)...)
+	found = append(found, LintGuidance(roots)...)
+	found = append(found, LintProcesses(roots)...)
 	answerJSON(map[string]any{"findings": found, "clean": len(found) == 0})
 	if len(found) > 0 {
 		os.Exit(1)

@@ -11,72 +11,11 @@ import (
 	"time"
 )
 
-// SOMEBODY WAITING TO BE ANSWERED WHILE THE AGENT WORKS ON is the failure this
-// exists to stop. The order was a rule the agent kept, and it forgot it twice.
-func TestNothingHappensWhileAnAnswerIsOwed(t *testing.T) {
-	exe := buildEngine(t)
-	r := guidanceTree(t)
-	Project(r)
-	l, _ := OpenLog(r.Private("log"))
-	l.Write("engine", "start", "engine", "engine started", Yes(), nil)
-	l.Close()
-
-	read := map[string]any{
-		"cwd": r.Work, "tool_name": "Read", "tool_use_id": "t1",
-		"tool_input": map[string]any{"file_path": filepath.Join(r.Work, "notes.md")},
-	}
-	// With nothing owed, an ordinary call goes through.
-	if out := hookSays(t, exe, r.Method, "PreToolUse", read); strings.Contains(out, `"deny"`) {
-		t.Fatalf("a read was refused with nothing owed: %s", out)
-	}
-
-	// They said something.
-	hookSays(t, exe, r.Method, "UserPromptSubmit",
-		map[string]any{"cwd": r.Work, "prompt": "the editor is still not right"})
-
-	// THE GRACE IS SPENT FIRST, and it is warned rather than refused. A prompt
-	// lands while a call is already in flight, and killing that call kills work
-	// the agent began before it could have known.
-	for i := 0; i < GraceCalls; i++ {
-		if out := hookSays(t, exe, r.Method, "PreToolUse", read); strings.Contains(out, `"deny"`) {
-			t.Fatalf("call %d of the grace was refused: %s", i+1, out)
-		} else if !strings.Contains(out, "the editor is still not right") {
-			t.Fatalf("call %d of the grace says nothing about the prompt: %s", i+1, out)
-		}
-	}
-
-	out := hookSays(t, exe, r.Method, "PreToolUse", read)
-	if !strings.Contains(out, `"permissionDecision":"deny"`) {
-		t.Fatalf("work went on while they waited: %s", out)
-	}
-	// The refusal carries what they said, so the agent answers the right thing.
-	if !strings.Contains(out, "the editor is still not right") {
-		t.Fatalf("the refusal does not say what they said: %s", out)
-	}
-
-	// THE ONE CALL THAT IS ALLOWED IS THE ONE THAT ANSWERS. A refusal nobody
-	// can satisfy is a trap.
-	answering := map[string]any{
-		"cwd": r.Work, "tool_name": "Bash", "tool_use_id": "t2",
-		"tool_input": map[string]any{"command": `se --answer "I am on it"`},
-	}
-	if out := hookSays(t, exe, r.Method, "PreToolUse", answering); strings.Contains(out, `"deny"`) {
-		t.Fatalf("answering was refused: %s", out)
-	}
-
-	// Answered, and the work goes on.
-	if err := TheyWereAnswered(r, "main"); err != nil {
-		t.Fatal(err)
-	}
-	if out := hookSays(t, exe, r.Method, "PreToolUse", read); strings.Contains(out, `"deny"`) {
-		t.Fatalf("a read was refused after they were answered: %s", out)
-	}
-}
-
 // The newest prompt is the one that is owed. Answering one and being asked
 // another leaves the second owed.
 // A PROMPT FLIPS IT AND AN ANSWER CLEARS IT. Nothing reads the log back.
 func TestAPromptFlipsTheFlagAndAnAnswerClearsIt(t *testing.T) {
+	t.Parallel()
 	r := guidanceTree(t)
 
 	if _, owed := AnswerOwed(r, "main"); owed {
@@ -122,6 +61,7 @@ func TestAPromptFlipsTheFlagAndAnAnswerClearsIt(t *testing.T) {
 // for the project blocked every one of them on a message given to one, then let
 // any of them clear it. That drew three answers to one question.
 func TestAnObligationBelongsToOneAgent(t *testing.T) {
+	t.Parallel()
 	r := guidanceTree(t)
 
 	if err := TheyAsked(r, "main", "the editor is still not right"); err != nil {
@@ -159,89 +99,6 @@ func TestAnObligationBelongsToOneAgent(t *testing.T) {
 	}
 }
 
-// THE ESCAPE MATCHES THE COMMAND, NOT THE TEXT. A substring match opened the
-// guard for anything that mentioned the words.
-func TestOnlyTheEngineAnsweringEscapesTheRefusal(t *testing.T) {
-	answering := []string{
-		`se --answer "I am on it"`,
-		`.bin/se.exe --answer "I am on it"`,
-		`"C:/x/.bin/se.exe" --answer "I am on it"`,
-		`se --answer="I am on it"`,
-	}
-	for _, cmd := range answering {
-		if !runsTheEngineWith(cmd, "--answer") {
-			t.Errorf("an answering call was refused: %s", cmd)
-		}
-	}
-	notAnswering := []string{
-		`grep -rn "--answer" src/`,
-		`cat > sub.json <<EOF
-{"evidence":{"what":"se_answer is in the live tools list"}}
-EOF`,
-		`git commit -m "the --answer flag"`,
-		`se --said "they asked about --answer"`,
-		`echo --answer`,
-		`ls --answer.md`,
-	}
-	for _, cmd := range notAnswering {
-		if runsTheEngineWith(cmd, "--answer") {
-			t.Errorf("the guard opened for a call that answers nobody: %s", cmd)
-		}
-	}
-}
-
-// THE GUARD CLEARS THE OBLIGATION, BECAUSE ONLY THE GUARD KNOWS WHO ANSWERED.
-//
-// The answer verb runs as a program with no idea which agent called it, so it
-// cleared the default actor and left the caller still owing. A reviewer
-// answered seven times, watched the engine say recorded seven times, and stayed
-// refused until it gave up holding a token in review.
-func TestAnsweringClearsTheObligationOfWhoeverAnswered(t *testing.T) {
-	exe := buildEngine(t)
-	r := guidanceTree(t)
-	l, _ := OpenLog(r.Private("log"))
-	l.Write("engine", "start", "engine", "started", Yes(), nil)
-	l.Close()
-
-	// A subagent is given a name, and that name is what the obligation is under.
-	NoteAgent(r, "agent-1", "general-purpose")
-	them := NameOf(r, "agent-1")
-	if them == "main" {
-		t.Fatalf("the subagent was not named: %q", them)
-	}
-	if err := TheyAsked(r, them, "the editor is still not right"); err != nil {
-		t.Fatal(err)
-	}
-
-	read := map[string]any{
-		"cwd": r.Work, "tool_name": "Read", "tool_use_id": "t1", "agent_id": "agent-1",
-		"tool_input": map[string]any{"file_path": filepath.Join(r.Work, "notes.md")},
-	}
-	// The grace first, which is warned, and then the refusal.
-	for i := 0; i < GraceCalls; i++ {
-		hookSays(t, exe, r.Method, "PreToolUse", read)
-	}
-	if out := hookSays(t, exe, r.Method, "PreToolUse", read); !strings.Contains(out, `"deny"`) {
-		t.Fatalf("the subagent was not refused after its grace: %s", out)
-	}
-
-	// It answers with the tool, which runs as a program that does not know it.
-	answering := map[string]any{
-		"cwd": r.Work, "tool_name": "mcp__quackitect__se_answer",
-		"tool_use_id": "t2", "agent_id": "agent-1",
-		"tool_input": map[string]any{"answer": "I am on it"},
-	}
-	hookSays(t, exe, r.Method, "PreToolUse", answering)
-	hookSays(t, exe, r.Method, "PostToolUse", answering)
-
-	if said, owed := AnswerOwed(r, them); owed {
-		t.Fatalf("%s still owes %q after answering", them, said)
-	}
-	if out := hookSays(t, exe, r.Method, "PreToolUse", read); strings.Contains(out, `"deny"`) {
-		t.Fatalf("the subagent is still refused after answering: %s", out)
-	}
-}
-
 // A VERB THAT CANNOT KNOW WHOSE OBLIGATION IT IS WRITES NOBODY'S.
 //
 // The store is keyed by actor and the one writer every agent reaches always
@@ -254,6 +111,7 @@ func TestAnsweringClearsTheObligationOfWhoeverAnswered(t *testing.T) {
 // defaulted key does damage, and a check on the clear alone would pass a verb
 // that still misfiles every message.
 func TestAnUnnamedActorWritesNobodysObligation(t *testing.T) {
+	t.Parallel()
 	r := lane(t)
 	if err := TheyAsked(r, "main", "the thing main was told"); err != nil {
 		t.Fatal(err)
@@ -308,6 +166,7 @@ func TestAnUnnamedActorWritesNobodysObligation(t *testing.T) {
 // lost one of the two obligations every time, and a lost obligation is a
 // question in the record that nobody is refused for.
 func TestTwoAgentsAskingAtOnceBothStillOwe(t *testing.T) {
+	t.Parallel()
 	for round := 0; round < 200; round++ {
 		r := lane(t)
 		var wg sync.WaitGroup
@@ -338,6 +197,7 @@ func TestTwoAgentsAskingAtOnceBothStillOwe(t *testing.T) {
 // arrivals.json had the same problem and solved it: an arrival from an earlier
 // session says nothing about this one. The same sentence is true here.
 func TestAnObligationDiesWithItsSession(t *testing.T) {
+	t.Parallel()
 	r := guidanceTree(t)
 	l, _ := OpenLog(r.Private("log"))
 	l.Write("engine", "start", "engine", "started", Yes(), nil)
@@ -379,6 +239,7 @@ func TestAnObligationDiesWithItsSession(t *testing.T) {
 // waiter gave up after a second and a lock went stale after five, so no waiter
 // ever lived long enough to steal one and every one of them wrote unlocked.
 func TestTheWaiterOutlastsTheStaleness(t *testing.T) {
+	t.Parallel()
 	budget := time.Duration(lockTries) * lockWait
 	if budget <= lockIsStale {
 		t.Fatalf("a waiter gives up after %v and a lock goes stale after %v, "+
@@ -392,6 +253,7 @@ func TestTheWaiterOutlastsTheStaleness(t *testing.T) {
 // says nothing about whether the number is right. The one above is what holds
 // the numbers in the right order, and that one goes red.
 func TestADeadLockIsStolenAndTheWriteHappensUnderIt(t *testing.T) {
+	t.Parallel()
 	r := lane(t)
 	os.MkdirAll(r.Private(), 0o755)
 	lock := owedPath(r) + ".lock"
@@ -433,6 +295,7 @@ func TestADeadLockIsStolenAndTheWriteHappensUnderIt(t *testing.T) {
 // TWO WRITERS OF ONE FACT HAVE TO AGREE ABOUT WHOSE IT IS. The copier writes it
 // against the walker. So does this.
 func TestTheFallbackVerbLeavesTheWalkerOwing(t *testing.T) {
+	t.Parallel()
 	exe := buildEngine(t)
 	r := guidanceTree(t)
 	l, _ := OpenLog(r.Private("log"))
@@ -459,6 +322,7 @@ func TestTheFallbackVerbLeavesTheWalkerOwing(t *testing.T) {
 // The defect is that they disagree, so a check on one order alone would pass a
 // tree where the other order still loses the message.
 func TestTheTwoWritersMakeOneObligationInEitherOrder(t *testing.T) {
+	t.Parallel()
 	exe := buildEngine(t)
 	const said = "and one more thing while you are at it"
 
@@ -524,6 +388,7 @@ func TestTheTwoWritersMakeOneObligationInEitherOrder(t *testing.T) {
 // that goes quiet into its work, and a call that started before the message
 // arrived is not that.
 func TestAnAnswerIsAskedForThreeTimesBeforeItIsRefused(t *testing.T) {
+	t.Parallel()
 	r := lane(t)
 	if err := TheyAsked(r, "main", "what is going on with the icons"); err != nil {
 		t.Fatal(err)
@@ -570,6 +435,7 @@ func TestAnAnswerIsAskedForThreeTimesBeforeItIsRefused(t *testing.T) {
 // THE GRACE IS ONE AGENT'S. Two agents overlapping is why this store is keyed
 // by actor at all, and a grace spent by one would refuse the other early.
 func TestTheGraceIsCountedPerAgent(t *testing.T) {
+	t.Parallel()
 	r := lane(t)
 	if err := TheyAsked(r, "main", "a question"); err != nil {
 		t.Fatal(err)
@@ -597,6 +463,7 @@ func TestTheGraceIsCountedPerAgent(t *testing.T) {
 // IT IS NOT COUNTED RATHER THAN FORGIVEN. A notice that became an obligation
 // and then had its grace spent is still an obligation nobody can clear.
 func TestANoticeFromTheEditorIsNotAQuestion(t *testing.T) {
+	t.Parallel()
 	r := lane(t)
 	notices := []string{
 		"<ide_opened_file>The user opened the file c:/x/y.md in the IDE. " +

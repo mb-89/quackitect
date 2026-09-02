@@ -346,7 +346,7 @@ function script(): string {
       const text = line.value.trim();
       if (!text) return;
       const pick = document.querySelector('.pick .picked');
-      send({ type: 'run', command: line.dataset.run, text, kind: pick ? pick.dataset.value : '' });
+      send({ type: 'run', command: line.dataset.run, text, process: pick ? pick.dataset.value : '' });
       line.value = '';
     };
   }

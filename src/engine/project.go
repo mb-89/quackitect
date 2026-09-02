@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -25,19 +26,63 @@ import (
 const generatedMark = "GENERATED. Edit the source named below, not this file."
 
 type Projection struct {
-	Name        string            `json:"name"`
-	Target      string            `json:"target"`  // under the work root
-	Sources     []string          `json:"sources"` // under the method root
-	Wrap        string            `json:"wrap"`    // markdown, frontmatter, or none
+	Name    string   `json:"name"`
+	Target  string   `json:"target"`  // under the work root
+	Sources []string `json:"sources"` // under the method root
+
+	// SourcesFrom names a folder instead of the files in it.
+	//
+	// A HAND-WRITTEN LIST GOES STALE. Parking two guidance files meant editing
+	// this list in three places, and a list nobody edits is a projection that
+	// assembles a file somebody moved. The folder answers instead.
+	//
+	// TOP LEVEL ONLY. Guidance in a subfolder is for one lane, and the
+	// standing layer is paid for by every agent on every turn. A parked file
+	// is skipped, which is what makes parking enough on its own.
+	SourcesFrom string            `json:"sources_from,omitempty"`
+	Wrap        string            `json:"wrap"` // markdown, frontmatter, or none
 	Frontmatter map[string]string `json:"frontmatter,omitempty"`
 
 	// The one chapter to take from each source, named by its heading. Empty
 	// means the whole file.
 	Section string `json:"section,omitempty"`
+
+	// PREAMBLE GOES IN FRONT OF THE RULES, WHOLE.
+	//
+	// It is one file, taken entire rather than by chapter, because it is not
+	// guidance: it says what the reader is looking at and what to do about
+	// having read it. Guidance is what a person maintains and this is what the
+	// projection needs said around it.
+	Preamble string `json:"preamble,omitempty"`
 }
 
 type projectionFile struct {
 	Projections []Projection `json:"projections"`
+}
+
+// sourcesOf answers the files a projection assembles, from the folder it named
+// or from the list it wrote.
+func sourcesOf(methodRoot string, p Projection) ([]string, error) {
+	if p.SourcesFrom == "" {
+		return p.Sources, nil
+	}
+	dir := filepath.Join(methodRoot, filepath.FromSlash(p.SourcesFrom))
+	entries, err := os.ReadDir(dir)
+	if err != nil {
+		return nil, fmt.Errorf("%s reads %s, which cannot be read: %w", p.Name, p.SourcesFrom, err)
+	}
+	var out []string
+	for _, e := range entries {
+		if e.IsDir() || !strings.HasSuffix(e.Name(), ".md") || Parked(e.Name()) {
+			continue
+		}
+		out = append(out, path.Join(p.SourcesFrom, e.Name()))
+	}
+	sort.Strings(out)
+	if len(out) == 0 {
+		return nil, fmt.Errorf("%s reads %s and found nothing to assemble", p.Name, p.SourcesFrom)
+	}
+	return out, nil
 }
 
 func LoadProjections(methodRoot string) ([]Projection, error) {
@@ -69,11 +114,22 @@ func Project(roots Roots) ([]string, error) {
 	}
 	var written []string
 	for _, p := range list {
-		body, err := assemble(roots.Method, p.Sources, p.Section, vars)
+		srcs, err := sourcesOf(roots.Method, p)
+		if err != nil {
+			return nil, err
+		}
+		body, err := assemble(roots.Method, srcs, p.Section, vars)
 		if err != nil {
 			return written, fmt.Errorf("%s: %w", p.Name, err)
 		}
-		out, err := wrap(p, body)
+		if p.Preamble != "" {
+			front, err := assemble(roots.Method, []string{p.Preamble}, "", vars)
+			if err != nil {
+				return written, fmt.Errorf("%s: %w", p.Name, err)
+			}
+			body = front + "\n" + body
+		}
+		out, err := wrap(p, srcs, body)
 		if err != nil {
 			return written, fmt.Errorf("%s: %w", p.Name, err)
 		}
@@ -151,7 +207,9 @@ func assemble(methodRoot string, sources []string, section string, vars map[stri
 			}
 			// The chapter is headed by the file it came from, so a reader of
 			// three chapters in a row can tell which file each one belongs to.
-			text = "# " + title(text) + "\n\n" + only
+			// The chapter sits under the name of the file it came from, so it
+			// is demoted to level two whatever level it was written at.
+			text = "# " + nameOf(name) + "\n\n" + shiftHeadings(only, 2)
 		}
 		if i > 0 {
 			b.WriteString("\n")
@@ -162,14 +220,48 @@ func assemble(methodRoot string, sources []string, section string, vars map[stri
 	return b.String(), nil
 }
 
-// title is the text of the first level-one heading, or the empty string.
-func title(text string) string {
-	for _, line := range strings.Split(text, "\n") {
-		if strings.HasPrefix(line, "# ") {
-			return strings.TrimSpace(line[2:])
+// shiftHeadings rewrites a chapter so its own heading sits at the level given
+// and everything under it keeps its distance.
+func shiftHeadings(text string, to int) string {
+	lines := strings.Split(text, "\n")
+	first := 0
+	for _, line := range lines {
+		if d := headingDepth(line); d > 0 {
+			first = d
+			break
 		}
 	}
-	return ""
+	if first == 0 || first == to {
+		return text
+	}
+	by := to - first
+	for i, line := range lines {
+		d := headingDepth(line)
+		if d == 0 {
+			continue
+		}
+		level := d + by
+		if level < 1 {
+			level = 1
+		}
+		lines[i] = strings.Repeat("#", level) + line[d:]
+	}
+	return strings.Join(lines, "\n")
+}
+
+// nameOf is a source's name, which is its file name.
+//
+// IT IS THE FILE RATHER THAN A HEADING INSIDE IT. This read the first level-one
+// heading, and a guidance file's chapters moved up to one hash, so every
+// projection was headed "Motivation" and the reader could no longer tell which
+// file a chapter came from.
+func nameOf(source string) string {
+	base := filepath.Base(filepath.FromSlash(source))
+	base = strings.ReplaceAll(strings.TrimSuffix(base, filepath.Ext(base)), "-", " ")
+	if base == "" {
+		return base
+	}
+	return strings.ToUpper(base[:1]) + base[1:]
 }
 
 func expand(s string, vars map[string]string) string {
@@ -181,8 +273,19 @@ func expand(s string, vars map[string]string) string {
 
 // Each format says it is generated in its own comment syntax. It is the first
 // line a person sees when they open the wrong file.
-func wrap(p Projection, body string) (string, error) {
-	mark := generatedMark + " Source: " + strings.Join(p.Sources, ", ")
+// wrap puts the generated mark in front of the body, in the comment syntax the
+// format has.
+//
+// IT IS HANDED THE SOURCES RATHER THAN READING THEM OFF THE PROJECTION. A
+// projection that names a folder carries no list, so the mark read "Edit the
+// source named below, not this file. Source:" and then named nothing, on the
+// two files every agent is handed. What sourcesOf resolved is what is said.
+func wrap(p Projection, sources []string, body string) (string, error) {
+	said := sources
+	if len(said) == 0 {
+		said = p.Sources
+	}
+	mark := generatedMark + " Source: " + strings.Join(said, ", ")
 	switch p.Wrap {
 	case "markdown", "":
 		return "<!-- " + mark + " -->\n\n" + body, nil

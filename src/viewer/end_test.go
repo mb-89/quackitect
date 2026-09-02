@@ -6,6 +6,7 @@ import "testing"
 // somewhere they did not ask to go, and they have to work out where they are
 // before they can do anything else.
 func TestPagingDownAtTheEndStaysThere(t *testing.T) {
+	t.Parallel()
 	m := newTestModel(60)
 	m = key(m, "home")
 	if m.selID != 1 {
@@ -29,6 +30,7 @@ func TestPagingDownAtTheEndStaysThere(t *testing.T) {
 // The same for a single step, and for what the window shows rather than only
 // what is selected.
 func TestSteppingDownAtTheEndStaysThere(t *testing.T) {
+	t.Parallel()
 	m := newTestModel(60)
 	m = key(m, "end")
 	top := m.top
@@ -47,6 +49,7 @@ func TestSteppingDownAtTheEndStaysThere(t *testing.T) {
 // past it. The filter is the last row a person walks onto, and walking into
 // it must not move the list.
 func TestWalkingOntoTheFilterDoesNotMoveTheList(t *testing.T) {
+	t.Parallel()
 	m := newTestModel(60)
 	m = key(m, "end")
 	top, sel := m.top, m.selID

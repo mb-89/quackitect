@@ -11,6 +11,7 @@ import "testing"
 // SysProcAttr written over the one Quietly made would take HideWindow and
 // CreationFlags off every child the engine starts.
 func TestTheWindowFlagsSurviveAQuotedScript(t *testing.T) {
+	t.Parallel()
 	r := lane(t)
 	cmd := evidenceCommand(r, `rg -q "a phrase with spaces" held.md`)
 	if cmd.SysProcAttr == nil {

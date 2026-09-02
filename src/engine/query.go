@@ -3,7 +3,6 @@ package main
 import (
 	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
 )
 
@@ -26,28 +25,24 @@ func rowOf(r Roots, t Token) Row {
 		rel = path
 	}
 	row := Row{
-		"id": vs(t.ID), "type": vs(TypeWork), "title": vs(t.Title),
+		// KIND IS A CONSTANT AND IT IS STILL A COLUMN. Every token this
+		// function sees is a work-token, because that is what picked the
+		// schema that read it. A view says so anyway, so the filter still
+		// reads as a question about the note rather than about this program.
+		"kind": vs("work-token"),
+		"id":   vs(t.ID), "title": vs(t.Title), "file": vs(rel),
 		"detail": vs(t.Detail), "guidance": vs(t.Guidance),
-		"status": vs(string(t.Status)), "assignee": vs(t.Assignee),
-		"scope": vs(string(t.Scope)), "traced": vb(t.Traced),
+		"status": vs(string(t.Status)), "process": vs(t.Process),
+		"bucket": vs(t.Bucket),
+		"holder": vs(t.Holder), "needs_human": vb(t.NeedsHuman),
+		"depends_on": vl(t.DependsOn), "ready_when": vs(t.ReadyWhen),
 		"disposition": vs(string(t.Disposition)), "reason": vs(t.Reason),
-		"holder": vs(t.Holder), "bucket": vs(t.Bucket), "parent": vs(t.Parent),
-		"subs": vl(t.Subs), "depends_on": vl(t.DependsOn),
 		"successors": vl(t.Successors),
-		"evidence":   vl(t.Evidence.Sections), "evidence_script": vs(t.Evidence.Script),
-		"rounds": vn(float64(t.Rounds)), "minted_by": vs(t.MintedBy),
-		"seq": vn(float64(t.Seq)),
-
-		"file.name":   vs(t.ID),
-		"file.path":   vs(filepath.ToSlash(rel)),
-		"file.folder": vs(filepath.ToSlash(filepath.Dir(rel))),
-		"file.ext":    vs("md"),
 	}
 	// WHAT A QUERY CAN ASK THAT THE TOKEN DOES NOT ANSWER ITSELF. Blocked is
 	// a walk over other tokens, so it cannot be a field and it can be a
 	// property. A view filters on it without knowing how it is worked out.
 	row["blocked"] = vs(Blocked(r, t))
-	row["rounds_text"] = vs(strconv.Itoa(t.Rounds))
 	return row
 }
 
@@ -128,7 +123,7 @@ func ViewPathToWrite(r Roots, name string) (string, bool) {
 	if err != nil {
 		return "", false
 	}
-	if err := os.WriteFile(to, b, 0o644); err != nil {
+	if err := writeAtomic(to, b, 0o644); err != nil {
 		return "", false
 	}
 	return to, true
@@ -188,7 +183,7 @@ func Views(r Roots) []string {
 			continue
 		}
 		for _, e := range entries {
-			if e.IsDir() || filepath.Ext(e.Name()) != ".base" {
+			if e.IsDir() || filepath.Ext(e.Name()) != ".base" || Parked(e.Name()) {
 				continue
 			}
 			name := e.Name()[:len(e.Name())-len(".base")]

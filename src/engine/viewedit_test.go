@@ -9,6 +9,7 @@ import (
 // A VIEW FILE IS THE OWNER'S. It carries comments explaining why a view is the
 // way it is, and a change must not take them with it.
 func TestWritingAViewKeepsWhatSomebodyWroteInIt(t *testing.T) {
+	t.Parallel()
 	p := writeBase(t, t.TempDir(), "w.base", `# WHY THIS VIEW EXISTS, in the owner's own words.
 properties:
   title:
@@ -58,6 +59,7 @@ views:
 
 // A width nobody set yet is added rather than refused.
 func TestAWidthIsAddedWhereThereWasNone(t *testing.T) {
+	t.Parallel()
 	p := writeBase(t, t.TempDir(), "w.base",
 		"views:\n  - name: left\n    order:\n      - title\n")
 	if err := SetWidth(p, "left", "title", 200); err != nil {
@@ -76,6 +78,7 @@ func TestAWidthIsAddedWhereThereWasNone(t *testing.T) {
 // A dragged heading writes the order, and the columns it names are the columns
 // that draw.
 func TestDraggingAHeadingWritesTheOrder(t *testing.T) {
+	t.Parallel()
 	p := writeBase(t, t.TempDir(), "o.base",
 		"views:\n  - name: left\n    order:\n      - title\n      - status\n")
 	if err := SetOrder(p, "left", []string{"status", "title"}); err != nil {
@@ -101,6 +104,7 @@ func TestDraggingAHeadingWritesTheOrder(t *testing.T) {
 // heading press would throw away an arrangement the person built, and the
 // heading is honest about naming the first level rather than the whole list.
 func TestClickingAHeadingWritesTheFirstSortLevel(t *testing.T) {
+	t.Parallel()
 	p := writeBase(t, t.TempDir(), "s.base",
 		"views:\n  - name: left\n    order:\n      - title\n    sort:\n      - property: seq\n        direction: ASC\n      - property: title\n        direction: DESC\n")
 	if err := SetSort(p, "left", "status", "DESC"); err != nil {
@@ -123,6 +127,7 @@ func TestClickingAHeadingWritesTheFirstSortLevel(t *testing.T) {
 
 // A view nobody declared is named rather than written to by accident.
 func TestWritingAViewThatIsNotThereRefuses(t *testing.T) {
+	t.Parallel()
 	p := writeBase(t, t.TempDir(), "n.base", "views:\n  - name: left\n    order:\n      - title\n")
 	if err := SetWidth(p, "middle", "title", 100); err == nil {
 		t.Fatal("a view that does not exist was written to")
@@ -134,6 +139,7 @@ func TestWritingAViewThatIsNotThereRefuses(t *testing.T) {
 // PINNING IS THE OWNER'S, AND IT IS A FILTER. A pin written as a value of
 // whatever the grouping is today would go wrong the moment the grouping moved.
 func TestAGroupIsPinnedAndUnpinned(t *testing.T) {
+	t.Parallel()
 	path := writeBase(t, t.TempDir(), "work.base", `# the owner's comment stays
 views:
   - type: table
@@ -213,6 +219,7 @@ views:
 // whole file, so a person who pinned one group and changed their mind lost the
 // pane.
 func TestUnpinningTheLastPinLeavesAReadableFile(t *testing.T) {
+	t.Parallel()
 	// A view that ships with pins, emptied one at a time.
 	path := writeBase(t, t.TempDir(), "w.base", `views:
   - type: table
@@ -300,6 +307,7 @@ func TestUnpinningTheLastPinLeavesAReadableFile(t *testing.T) {
 // So this is driven over the shipped shape, and it reads the file back through
 // the loader after every write.
 func TestAPinIsWrittenWhereTheReaderLooks(t *testing.T) {
+	t.Parallel()
 	shipped := func(t *testing.T) string {
 		return writeBase(t, t.TempDir(), "work.base", `
 groups:
@@ -369,6 +377,7 @@ views:
 // default rather than a rule, so a pane that keeps its own arrangement goes on
 // keeping it, and pinning there does not reach the other pane.
 func TestAViewWithItsOwnPinsKeepsThemToItself(t *testing.T) {
+	t.Parallel()
 	path := writeBase(t, t.TempDir(), "work.base", `
 groups:
   - name: yours
@@ -418,6 +427,7 @@ views:
 // the level list could not disagree about what is in force. That was right for
 // one level and wrong for many.
 func TestALevelIsAddedRewrittenAndDropped(t *testing.T) {
+	t.Parallel()
 	path := writeBase(t, t.TempDir(), "w.base", `
 views:
   - type: table
@@ -482,6 +492,7 @@ views:
 // dropped into a heading is filed under, and it is a fact about the property
 // rather than about the direction or the position.
 func TestAGroupingKeepsWhatADropWrote(t *testing.T) {
+	t.Parallel()
 	path := writeBase(t, t.TempDir(), "w.base", `
 views:
   - type: table
@@ -520,6 +531,7 @@ views:
 // THIS USES THE IN-PLACE BRANCH, which is where the defect is. A check that
 // appends never reaches it.
 func TestSetsDiesWithItsProperty(t *testing.T) {
+	t.Parallel()
 	write := func() string {
 		return writeBase(t, t.TempDir(), "w.base", `
 views:

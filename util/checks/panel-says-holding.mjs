@@ -29,7 +29,7 @@ const first = {
   hold: { on: false },
 };
 const second = {
-  actors: [{ actor: "judge", state: "reviewing", id: "wk-2222222222",
+  actors: [{ actor: "second", state: "stopped", id: "wk-2222222222",
              title: "the second thing", holding: "wk-2222222222 the second thing" }],
   hold: { on: true, by: "the person" },
 };
@@ -56,14 +56,14 @@ holds(one, "working", "first: the state it was handed");
 holds(one, "wk-1111111111", "first: the token it was handed");
 holds(one, "the first thing", "first: the title it was handed");
 
-holds(two, "judge", "second: the actor it was handed");
-holds(two, "reviewing", "second: the state it was handed");
+holds(two, "second", "second: the actor it was handed");
+holds(two, "stopped", "second: the state it was handed");
 holds(two, "wk-2222222222", "second: the token it was handed");
 
 // AND NEITHER CARRIES THE OTHER'S, which is what a page printing a state of its
 // own would fail: a fixed header carries the same words whatever it is given.
 holdsNot(one, "wk-2222222222", "first: nothing from the second answer");
-holdsNot(one, "reviewing", "first: not the other answer's state");
+holdsNot(one, "stopped", "first: not the other answer's state");
 holdsNot(two, "wk-1111111111", "second: nothing from the first answer");
 holdsNot(two, "walker", "second: not the other answer's actor");
 

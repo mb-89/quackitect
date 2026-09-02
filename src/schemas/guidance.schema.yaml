@@ -1,0 +1,61 @@
+# The frontmatter half is JSON Schema 2020-12, documented at
+# https://json-schema.org/draft/2020-12. It reads the yaml block at the top of
+# the note, which is data.
+# The body half is this project's own. The keywords are borrowed from Document Schema,
+# https://document-schema.org.
+# A value written [[like this]] is a link. The brackets are how it is shown and
+# the name inside is the value.
+
+kind: guidance
+
+frontmatter:
+  type: object
+  additionalProperties: false
+  required:
+    - kind
+    - scope
+  properties:
+    kind:
+      const: guidance
+      x-link: true
+      description: which schema reads this note, and what the editor picks by
+    scope:
+      type: array
+      description: who this file binds, one entry per audience
+    out_of_scope:
+      type: array
+      description: what this file does not bind, where a reader would assume it does
+    depends_on:
+      type: array
+      x-link: true
+      description: guidance this file rests on, so its rules are not repeated here
+
+body:
+  headingLevel: 1
+  order: strict
+  extraSections: false
+
+  sections:
+    - header: Motivation
+      required: true
+      tense: present
+      maxSentences: 10
+      maxWordsPerSentence: 25
+      description: why this file exists, and what goes wrong without it
+
+    - header: Actionables
+      required: true
+      list: true
+      ordered: true
+      detailMarker: "*"
+      tense: present
+      maxItems: 15
+      maxWordsPerItem: 25
+      description: one rule per item, active voice, present tense, an instruction rather than a prohibition
+
+    - header: Discussion
+      required: true
+      explains: Actionables
+      tense: past
+      maxWords: 1000
+      description: one chapter per starred rule, titled with that rule's number

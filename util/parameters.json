@@ -102,29 +102,11 @@
           "title": "Four words name the work. After the slash goes everything the next hand needs. Enter mints it."
         },
         {
-          "name": "kind",
+          "name": "process",
           "type": "pick",
           "span": 1,
-          "default": "SS·T",
-          "options": [
-            {
-              "value": "SS·T",
-              "says": "single step, traced"
-            },
-            {
-              "value": "SS·E",
-              "says": "single step, ephemeral"
-            },
-            {
-              "value": "MS·T",
-              "says": "multi step, traced"
-            },
-            {
-              "value": "MS·E",
-              "says": "multi step, ephemeral"
-            }
-          ],
-          "title": "What the token is. Closed it shows the short form, open it says what each one means. A sub-token is not here, because this row has no way to name its parent."
+          "optionsFrom": "processes.names",
+          "title": "Which process shapes the token. The choices are the files in src/processes, so the picker cannot offer one the engine would refuse. Closed it shows the name, open it says what the process is for."
         }
       ]
     },
@@ -155,36 +137,6 @@
           "help": "Milliseconds allowed from the press to a ready agent. Missing it turns the light red."
         },
         {
-          "name": "unreviewed_before_blocked",
-          "title": "unreviewed before blocked",
-          "type": "int",
-          "default": 3,
-          "min": 0,
-          "max": 3,
-          "narrow": "smaller",
-          "help": "How many tokens may wait for review with nothing in review before the pull refuses. Zero turns it off. It may be made smaller and never larger, so a person tightens the rule here and loosens it by changing the default."
-        },
-        {
-          "name": "criteria_ceiling",
-          "title": "criteria ceiling",
-          "type": "int",
-          "default": 8,
-          "min": 1,
-          "max": 8,
-          "narrow": "smaller",
-          "help": "How many criteria a draft may carry before the engine refuses it at submission. A draft bigger than this is too big to converge: its one finding is the size, and the remedy is a split. It may be made smaller and never larger."
-        },
-        {
-          "name": "rounds_per_rung",
-          "title": "rounds per rung",
-          "type": "int",
-          "default": 2,
-          "min": 1,
-          "max": 2,
-          "narrow": "smaller",
-          "help": "How many consecutive failing rounds on one half of a token climb one rung of the authority ladder. The second rung hands the reviewer full authority once for the whole token, and the same count again after it is spent reaches the person. It may be made smaller and never larger."
-        },
-        {
           "name": "detail_bytes",
           "title": "detail bytes",
           "type": "int",
@@ -212,7 +164,7 @@
           "min": 1,
           "max": 10,
           "narrow": "smaller",
-          "help": "How many pulls may pass without the holder of a token in review pulling before that hold stops counting as somebody reading. The queue itself is the clock, so a reviewer that has stopped goes stale after a few pulls by anybody else. It may be made smaller and never larger."
+          "help": "How many pulls may pass without the holder of a token pulling before that hold stops counting as somebody working. The queue itself is the clock, so a holder that has stopped goes stale after a few pulls by anybody else. It may be made smaller and never larger."
         }
       ]
     },

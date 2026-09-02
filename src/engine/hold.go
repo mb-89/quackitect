@@ -50,5 +50,5 @@ func SetHold(r Roots, on bool, by string) (Hold, error) {
 	if err != nil {
 		return h, err
 	}
-	return h, os.WriteFile(holdPath(r), append(b, '\n'), 0o644)
+	return h, writeAtomic(holdPath(r), append(b, '\n'), 0o644)
 }

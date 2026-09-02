@@ -73,6 +73,7 @@ func arrive(m model, recs ...Record) model {
 // UC-36. The list does not jump when entries arrive and the reader has
 // scrolled up. This is the v3 defect stated as a test.
 func TestArrivingLinesDoNotMoveAHeldSelection(t *testing.T) {
+	t.Parallel()
 	m := newTestModel(50)
 	m = key(m, "up")
 	m = key(m, "up")
@@ -92,6 +93,7 @@ func TestArrivingLinesDoNotMoveAHeldSelection(t *testing.T) {
 // UC-36. The detail pane is bound to a record. Later records are not that
 // record, so it must not redraw.
 func TestArrivingLinesDoNotRedrawTheDetailPane(t *testing.T) {
+	t.Parallel()
 	m := newTestModel(30)
 	m = key(m, "up")
 	m = key(m, "ctrl+d")
@@ -113,6 +115,7 @@ func TestArrivingLinesDoNotRedrawTheDetailPane(t *testing.T) {
 // Following is where the selection is, not a mode. Return to the newest line
 // and it resumes.
 func TestFollowingResumesAtTheNewestLine(t *testing.T) {
+	t.Parallel()
 	m := newTestModel(10)
 	m = key(m, "up")
 	if m.follow {
@@ -130,6 +133,7 @@ func TestFollowingResumesAtTheNewestLine(t *testing.T) {
 
 // UC-37. Typing filters with no key pressed first.
 func TestTypingFiltersImmediately(t *testing.T) {
+	t.Parallel()
 	m := newTestModel(20)
 	for _, r := range "message 7" {
 		m = key(m, string(r))
@@ -153,6 +157,7 @@ func TestTypingFiltersImmediately(t *testing.T) {
 }
 
 func TestFilterShapes(t *testing.T) {
+	t.Parallel()
 	recs := []Record{
 		rec(1, "agent", "call", "read the file"),
 		rec(2, "engine", "refusal", "write refused"),
@@ -197,6 +202,7 @@ func TestFilterShapes(t *testing.T) {
 
 // UC-37. A half-typed pattern is not an error, and it must never blank the view.
 func TestHalfTypedPatternKeepsTheLastGoodFilter(t *testing.T) {
+	t.Parallel()
 	m := newTestModel(20)
 	for _, r := range "message 1" {
 		m = key(m, string(r))
@@ -226,6 +232,7 @@ func TestHalfTypedPatternKeepsTheLastGoodFilter(t *testing.T) {
 }
 
 func TestEscapeClearsTheFilter(t *testing.T) {
+	t.Parallel()
 	m := newTestModel(20)
 	m = key(m, "z")
 	if len(m.view) != 0 {
@@ -240,6 +247,7 @@ func TestEscapeClearsTheFilter(t *testing.T) {
 // The irritating walk, in one test. Hold the selection, filter, read, and
 // clear. Clearing the filter alone left the reader held, watching nothing.
 func TestEscapeAlsoReturnsToFollowing(t *testing.T) {
+	t.Parallel()
 	m := newTestModel(20)
 	m = key(m, "up")
 	m = key(m, "up")
@@ -271,6 +279,7 @@ func TestEscapeAlsoReturnsToFollowing(t *testing.T) {
 // Escape on an empty log has nothing to select, and the next line to arrive
 // is still the newest one.
 func TestEscapeFollowsEvenWithNothingToSelect(t *testing.T) {
+	t.Parallel()
 	m := newTestModel(0)
 	m = key(m, "esc")
 	if !m.follow {
@@ -284,6 +293,7 @@ func TestEscapeFollowsEvenWithNothingToSelect(t *testing.T) {
 
 // A record the filter removed must not take the selection with it silently.
 func TestSelectionSurvivesAFilterThatKeepsIt(t *testing.T) {
+	t.Parallel()
 	m := newTestModel(20)
 	m = key(m, "up")
 	m = key(m, "up")
@@ -297,6 +307,7 @@ func TestSelectionSurvivesAFilterThatKeepsIt(t *testing.T) {
 }
 
 func TestUnparsedLineIsShownNotHidden(t *testing.T) {
+	t.Parallel()
 	r := ParseRecord("this is not json", 7)
 	if !r.Broken {
 		t.Fatal("should be marked broken")
@@ -310,6 +321,7 @@ func TestUnparsedLineIsShownNotHidden(t *testing.T) {
 }
 
 func TestRotationRestartsFromTheTop(t *testing.T) {
+	t.Parallel()
 	tl := &tailer{path: "/dev/null", offset: 500, lineNo: 10}
 	// A file that shrank was rotated. Reading from the old offset would return
 	// bytes that mean something else.
@@ -321,6 +333,7 @@ func TestRotationRestartsFromTheTop(t *testing.T) {
 // A session is written by more than one process, and each carries its own
 // counter. Two records with the same seq must not make the selection stick.
 func TestTheSelectionSurvivesRepeatedSequenceNumbers(t *testing.T) {
+	t.Parallel()
 	m := newModel("/dev/null")
 	m.w, m.h = 120, 20
 	// What a real session looks like: the engine writes seq 1, then each

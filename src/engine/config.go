@@ -72,6 +72,16 @@ type Node struct {
 	Step    *float64 `json:"step,omitempty"`
 	Options []Option `json:"options,omitempty"`
 
+	// OptionsFrom names where the choices come from, when they are not a list
+	// somebody typed. The schema's x-enum-from says the same thing about a
+	// field's values, and this is the panel's half of it.
+	//
+	// A LIST TYPED HERE GOES STALE. The mint picker offered four values naming
+	// a scope and whether the token was traced, and the process owns both of
+	// those now, so the panel offered four words the engine would refuse. A
+	// picker whose choices are files cannot be wrong about which files exist.
+	OptionsFrom string `json:"optionsFrom,omitempty"`
+
 	// How the panel draws it. The engine does not read these, and it must not
 	// drop them: --tree prints the tree AS DECLARED, and a field this program
 	// happens not to use is still part of what somebody wrote.
@@ -83,7 +93,6 @@ type Node struct {
 
 	// Drawn rather than held.
 	Label       string            `json:"label,omitempty"`
-	Title2      string            `json:"-"`
 	Command     string            `json:"command,omitempty"`
 	StopCommand string            `json:"stopCommand,omitempty"`
 	Labels      map[string]string `json:"labels,omitempty"`
@@ -115,7 +124,32 @@ func LoadTree(methodRoot string) (Node, error) {
 		return root, err
 	}
 	drawIcons(&root, icons)
+	fillOptions(&root, methodRoot)
 	return root, nil
+}
+
+// fillOptions answers every picker that names where its choices come from.
+// It is here because LoadTree is the one place a tree is read, which is where
+// the icons are resolved for the same reason.
+func fillOptions(n *Node, methodRoot string) {
+	if n.OptionsFrom == "processes.names" {
+		n.Options = nil
+		for _, name := range AvailableProcesses(methodRoot) {
+			says := name
+			if p, err := LoadProcess(methodRoot, name); err == nil && p.Description != "" {
+				says = p.Description
+			}
+			n.Options = append(n.Options, Option{Value: name, Says: says})
+		}
+		if n.Default == nil || n.Default == "" {
+			if len(n.Options) > 0 {
+				n.Default = n.Options[0].Value
+			}
+		}
+	}
+	for i := range n.Children {
+		fillOptions(&n.Children[i], methodRoot)
+	}
 }
 
 func drawIcons(n *Node, icons map[string]Icon) {
@@ -162,7 +196,7 @@ func LoadValues(roots Roots) (Values, error) {
 	if b, err := os.ReadFile(valuesPath(roots)); err == nil {
 		// A store that cannot be read is skipped, never fatal. One bad file
 		// must not stop the machine from working.
-		_ = json.Unmarshal(b, &stored)
+		_ = json.Unmarshal(b, &stored) // a file that will not read is no stored value, which is the default
 	}
 	Walk(root, "", func(path string, n Node) {
 		if !n.holdsValue() {
@@ -280,7 +314,7 @@ func SetValue(roots Roots, key string, want any) (any, error) {
 	}
 	stored := map[string]any{}
 	if b, err := os.ReadFile(valuesPath(roots)); err == nil {
-		_ = json.Unmarshal(b, &stored)
+		_ = json.Unmarshal(b, &stored) // a file that will not read is no stored value, which is the default
 	}
 	stored[key] = got
 	b, err := json.MarshalIndent(stored, "", "  ")
@@ -290,7 +324,7 @@ func SetValue(roots Roots, key string, want any) (any, error) {
 	if err := os.MkdirAll(filepath.Dir(valuesPath(roots)), 0o755); err != nil {
 		return got, err
 	}
-	return got, os.WriteFile(valuesPath(roots), append(b, '\n'), 0o644)
+	return got, writeAtomic(valuesPath(roots), append(b, '\n'), 0o644)
 }
 
 func toStrings(v any) []string {
@@ -347,22 +381,15 @@ type Config struct {
 	HeartbeatSeconds int
 	ReadyBudgetMs    int
 
-	// HOW MUCH UNREVIEWED WORK IS TOLERABLE before the pull refuses. Zero turns
-	// it off. It is a guess about a queue rather than a fact about the code, so
-	// it is a parameter a person moves.
-	UnreviewedBeforeBlocked int
-	PullsBeforeHoldIsStale  int
-
-	// HOW MANY CRITERIA A DRAFT MAY CARRY. A draft bigger than this is too big
-	// to converge: the record holds one that carried fourteen and ate ten
-	// rounds, because a token that big always has some criterion left for the
-	// next reviewer to reject. Too big is a property a gate can count.
-	CriteriaCeiling int
-
-	// HOW MANY CONSECUTIVE FAILING ROUNDS ON ONE HALF CLIMB ONE RUNG. It is a
-	// guess about how much patience a token deserves rather than a fact about
-	// the code, so it is a parameter a person moves. See TheRung.
-	RoundsPerRung int
+	// HOW MANY PULLS GO PAST BEFORE A HOLD IS WORTH LOOKING AT. It is a guess
+	// about how long somebody may be quiet rather than a fact about the code,
+	// so it is a parameter a person moves.
+	//
+	// THREE LIMITS WENT WITH THE REVIEW FLOW: how much unreviewed work the
+	// pull tolerated, how many criteria a draft could carry, and how many
+	// failing rounds climbed a rung. Nothing counts reviews, drafts or rounds
+	// now, so each was a number a person could set and nothing would read.
+	PullsBeforeHoldIsStale int
 
 	// How big a token's prose may be before the save refuses it. A token is a
 	// ticket a person reads cold, and the record once held tokens of 117 KB.
@@ -380,16 +407,14 @@ func TheFloor() Config {
 	// AnswerFirst is ON. Somebody waiting to be answered while the agent works
 	// on is the failure this exists to stop.
 	return Config{GuardProjections: true, StopNeedsClaim: true, AnswerFirst: true,
-		HeartbeatSeconds: 5, ReadyBudgetMs: 15000, UnreviewedBeforeBlocked: 3,
+		HeartbeatSeconds: 5, ReadyBudgetMs: 15000,
 		PullsBeforeHoldIsStale: 10,
-		CriteriaCeiling: 8,
 		// TWO, BECAUSE THE SECOND RUNG IS SHARED OVER BOTH HALVES. One failing
 		// round per rung would spend the token's whole ladder on a first bad
 		// draft, and the grant never comes back.
-		RoundsPerRung: 2,
-		DetailBytes:   1500,
-		SectionBytes:  1000,
-		From:          map[string]string{}}
+		DetailBytes:  1500,
+		SectionBytes: 1000,
+		From:         map[string]string{}}
 }
 
 func LoadConfig(roots Roots) Config {
@@ -416,17 +441,8 @@ func LoadConfig(roots Roots) Config {
 	}
 	// ZERO IS A VALUE HERE and not a missing one, because zero turns the
 	// refusal off and somebody has to be able to say that.
-	if n, ok := toNumber(v.Value["limits.unreviewed_before_blocked"]); ok && int(n) >= 0 {
-		c.UnreviewedBeforeBlocked = int(n)
-	}
 	if n, ok := toNumber(v.Value["limits.pulls_before_hold_is_stale"]); ok && int(n) > 0 {
 		c.PullsBeforeHoldIsStale = int(n)
-	}
-	if n, ok := toNumber(v.Value["limits.criteria_ceiling"]); ok && int(n) > 0 {
-		c.CriteriaCeiling = int(n)
-	}
-	if n, ok := toNumber(v.Value["limits.rounds_per_rung"]); ok && int(n) > 0 {
-		c.RoundsPerRung = int(n)
 	}
 	if n, ok := toNumber(v.Value["limits.detail_bytes"]); ok && int(n) > 0 {
 		c.DetailBytes = int(n)
@@ -480,12 +496,12 @@ func ArmEmergency(roots Roots, by, reason string, forMinutes int) (Emergency, er
 	if err := os.MkdirAll(filepath.Dir(emergencyPath(roots)), 0o755); err != nil {
 		return e, err
 	}
-	return e, os.WriteFile(emergencyPath(roots), append(b, '\n'), 0o644)
+	return e, writeAtomic(emergencyPath(roots), append(b, '\n'), 0o644)
 }
 
 func DisarmEmergency(roots Roots) error {
 	b, _ := json.MarshalIndent(Emergency{}, "", "  ")
-	return os.WriteFile(emergencyPath(roots), append(b, '\n'), 0o644)
+	return writeAtomic(emergencyPath(roots), append(b, '\n'), 0o644)
 }
 
 func (e Emergency) Describe() string {

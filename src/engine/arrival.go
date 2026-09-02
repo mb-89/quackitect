@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"os"
-	"path/filepath"
 	"strings"
 )
 
@@ -112,24 +111,6 @@ func StillPulling(r Roots, session, actor string, within int) bool {
 	return a.Pulls-at <= within
 }
 
-// HasPulled answers whether this actor has pulled at all in this session.
-//
-// It is the difference between a holder that has fallen behind and one the
-// engine has never seen, and those are two different sentences to write about a
-// hold. Calling the second one stopped sent a worker to spawn a reviewer whose
-// arrival then reclaimed what the first reviewer was reading.
-func HasPulled(r Roots, session, actor string) bool {
-	if !Named(session) || actor == "" {
-		return false
-	}
-	a := loadArrivals(r)
-	if a.Session != session {
-		return false
-	}
-	_, seen := a.At[actor]
-	return seen
-}
-
 // HowFarBehind answers how many pulls the queue has taken since this actor last
 // pulled, and whether the engine has ever seen it pull at all.
 //
@@ -170,133 +151,31 @@ func saveArrivals(r Roots, a arrivals) {
 	if err != nil {
 		return
 	}
-	_ = os.WriteFile(arrivalPath(r), append(b, '\n'), 0o644)
+	_ = writeAtomic(arrivalPath(r), append(b, '\n'), 0o644) // the guard answers whether or not it can record the arrival
 }
 
-// RECLAIM ON ARRIVAL, which is what replaces a clock.
+// Reclaim takes back what this actor was holding when it last stopped.
 //
-// A timeout guesses how long work takes and gets it wrong in both directions.
-// An arrival is a fact: an agent starting means the one before it is gone, so
-// what that one held is free.
-//
-// A WORKER RECLAIMS ITS OWN AND WHAT IT MINTED. The second half is the crew. A
-// walker that comes back spawns fresh scribes, so the sub-tokens it delegated
-// have to come back to it. Without that, a dead scribe strands its token and no
-// arrival ever frees it.
-//
-// A REVIEWER RECLAIMS EVERY REVIEW IN ITS SPHERE, whoever holds it, because a
-// sphere has one reviewer. That is also what evicts a second one: the newer
-// arrival takes the token, and the older reviewer is refused on its next call.
-//
-// AT THESE LEVELS THE SPHERE IS THE SESSION. When a level above supplies more
-// scopes, the same two sentences hold with a narrower filter and nothing else
-// changes.
-func Reclaim(r Roots, actor, role string) []string {
+// AN ARRIVAL MEANS WHOEVER HELD THIS NAME BEFORE IS GONE. What they held is
+// work nobody is doing, so the hold is cleared and the queue can hand it out
+// again. The token is not moved: where it stands is the process's business,
+// and only the hold was ever this function's.
+func Reclaim(r Roots, actor string) []string {
 	var back []string
 	for _, t := range Tokens(r) {
-		to, held := whereItGoesBack[t.Status]
-		if !held || heldBy[t.Status] != role {
+		if t.Holder != actor || t.Ended() {
 			continue
 		}
-		// A WORKER TAKES BACK ITS OWN. Work in hand belongs to whoever was
-		// asked for it.
-		if role == RoleWorker && t.Assignee != actor && t.MintedBy != actor {
+		t.Holder = ""
+		if err := SaveToken(r, t); err != nil {
 			continue
 		}
-		// AND A REVIEWER TAKES BACK ITS OWN, OR A DEAD HOLDER'S, AND NEVER A
-		// LIVE ONE'S.
-		//
-		// This said a reviewer takes back ANY, because a review belongs to
-		// whichever reviewer is here now. That was written when one reviewer ran
-		// at a time. With fifteen, every arriving reviewer took the token out of
-		// the hands of one that was mid-review: three reported it in one
-		// afternoon, one of them having reviewed four tokens fully and lost every
-		// one at the verdict. The work was done and thrown away.
-		//
-		// THE ENGINE ALREADY KNOWS THE DIFFERENCE. StillPulling is what the
-		// investigate answer is built on and what the reviewer refusal uses. This
-		// was the one place that did not ask.
-		if role == RoleReviewer && t.Holder != "" && t.Holder != actor {
-			// AND WITH NO SESSION IT LEAVES THE HOLD ALONE, which is the
-			// opposite default from the refusal that counts a queue. There,
-			// refusing on a fact the engine cannot check would block a queue
-			// for a reason nobody could act on. Here, TAKING on a fact it
-			// cannot check destroys somebody's work in progress. The cheap
-			// mistake goes the other way.
-			session := sessionOf(filepath.Join(r.Private("log"), Current))
-			if !Named(session) || StillPulling(r, session, t.Holder, LoadConfig(r).PullsBeforeHoldIsStale) {
-				continue
-			}
-		}
-		t.Status, t.Holder = to, ""
-		if SaveToken(r, t) == nil {
-			back = append(back, t.ID)
-		}
+		back = append(back, t.ID)
+		inSession(r, "work", actor, t.ID+" reclaimed: whoever held it is gone", Yes(),
+			map[string]any{"id": t.ID})
 	}
 	return back
 }
-
-// WHICH STATES A PULL HANDS OUT, AND WHICH ONE SOMEBODY IS ALREADY HOLDING.
-//
-// ONE ANSWER, BECAUSE IT WAS WRITTEN OUT THREE TIMES IN THREE SHAPES. pull.go
-// tested for spec_open or spec_in_work where it picks a draft, countQueue wrote
-// the whole set again for both roles, and a view file typed two of them into a
-// filter. Nothing said they were one set, so a twelfth state would have joined
-// some of them and not others.
-//
-// TWO HALVES, THE SAME FOUR VERBS. A worker is handed what is open and holds
-// what is in work. A reviewer is handed what is submitted and holds what is in
-// review.
-func HandedOut(role string) []Status {
-	if role == RoleReviewer {
-		return []Status{ImpSubmitted, SpecSubmitted}
-	}
-	return []Status{ImpOpen, SpecOpen}
-}
-
-// containsStatus answers whether a set holds a state.
-func containsStatus(all []Status, one Status) bool {
-	for _, s := range all {
-		if s == one {
-			return true
-		}
-	}
-	return false
-}
-
-// HeldBy answers the states this role is already working, which is the other
-// half of what an actor can be in on a queue.
-func HeldBy(role string) []Status {
-	var out []Status
-	for _, s := range States() {
-		if to, held := whereItGoesBack[s]; held && heldBy[s] == role {
-			_ = to
-			out = append(out, s)
-		}
-	}
-	return out
-}
-
-// THE FOUR STATES SOMEBODY HOLDS, AND WHERE EACH GOES BACK TO.
-//
-// TWO HALVES, THE SAME FOUR VERBS. This answered for one half, so a drafter or
-// a spec reviewer that died holding a token stranded it: nothing returned it
-// and se work --set refuses a status, so the note sat held by a name that was
-// gone. Measured on wk-2b78b911b1.
-var (
-	whereItGoesBack = map[Status]Status{
-		SpecInWork:   SpecOpen,
-		SpecInReview: SpecSubmitted,
-		ImpInWork:    ImpOpen,
-		ImpInReview:  ImpSubmitted,
-	}
-	heldBy = map[Status]string{
-		SpecInWork:   RoleWorker,
-		SpecInReview: RoleReviewer,
-		ImpInWork:    RoleWorker,
-		ImpInReview:  RoleReviewer,
-	}
-)
 
 func reclaimNotice(back []string) string {
 	if len(back) == 0 {

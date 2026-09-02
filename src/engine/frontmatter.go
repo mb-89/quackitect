@@ -17,9 +17,9 @@ import (
 // the block form. That is what this program writes, and a parser that silently
 // ignores what it cannot read returns a note that looks complete and is wrong.
 //
-// It is our own rather than a library because the engine carries no
-// dependencies: the installer builds it on the reader's machine, and a machine
-// that cannot reach the network still has to get an engine.
+// It is our own because it is small, not because a dependency is forbidden.
+// The bar is one-click installable, and the installer already fetches Go, Node
+// and ripgrep. This reads the handful of shapes a note's frontmatter holds.
 
 const noteFence = "---"
 
@@ -116,7 +116,7 @@ func WriteFront(f Front, order []string) string {
 			}
 			b.WriteString(k + ":\n")
 			for _, e := range val {
-				b.WriteString("  - " + quote(e) + "\n")
+				b.WriteString("  - " + quoteInList(e) + "\n")
 			}
 		case string:
 			if val == "" {
@@ -142,12 +142,39 @@ func WriteFront(f Front, order []string) string {
 	return b.String()
 }
 
+// A LINK IN A LIST KEEPS ITS QUOTES, and a link on its own does not.
+//
+// Both open with a bracket, which is where YAML starts a flow sequence, so
+// neither is strictly a string. The difference is what a reader can tell:
+// `kind: [[work-token]]` sits alone on its line and there is nothing else it
+// could be, while `- [[wk-abc]]` under depends_on is a list item that opens
+// another list, and a reader following the indentation has two readings.
+//
+// So the scalar is written the way Obsidian and a person write one, and the
+// list item is written the way YAML means one.
+func quoteInList(s string) string {
+	if isWikiLink(s) {
+		return strconv.Quote(s)
+	}
+	return quote(s)
+}
+
+func isWikiLink(s string) bool {
+	return strings.HasPrefix(s, "[[") && strings.HasSuffix(s, "]]") &&
+		!strings.ContainsAny(s, "\n\"'")
+}
+
 // A value is quoted when leaving it bare would change what it means. Quoting
 // everything would be safe and would make the file unpleasant to read, and a
 // person reading it is the reason the file is markdown.
 func quote(s string) string {
 	if s == "" {
 		return `""`
+	}
+	// A WIKI LINK ON ITS OWN IS WRITTEN BARE, the way Obsidian and a person
+	// write one. See quoteInList for why the same value inside a list is not.
+	if isWikiLink(s) {
+		return s
 	}
 	if strings.ContainsAny(s, ":#\n\"'") || strings.TrimSpace(s) != s ||
 		strings.HasPrefix(s, "-") || strings.HasPrefix(s, "[") || strings.HasPrefix(s, "{") ||

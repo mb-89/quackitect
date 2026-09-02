@@ -412,8 +412,8 @@ type Group struct {
 // that took the number here and went looking for the members itself would hold
 // two answers to one question, and they disagree the moment a filter moves.
 type Tally struct {
-	Name string    `json:"name"`
-	N    int       `json:"n"`
+	Name string `json:"name"`
+	N    int    `json:"n"`
 	// The whole this number is a part of, where the view declared one, so the
 	// bar reads 2/21 rather than a 2 with a missing half.
 	OutOf int       `json:"out_of,omitempty"`
@@ -456,7 +456,7 @@ func propertyInventory(rows []Row, order []string) []PropertyInfo {
 	sort.Strings(names)
 	var out []PropertyInfo
 	for _, n := range names {
-		out = append(out, PropertyInfo{Name: n, Type: or3(seen[n], "string"), On: contains(order, n)})
+		out = append(out, PropertyInfo{Name: n, Type: orElse(seen[n], "string"), On: contains(order, n)})
 	}
 	return out
 }
@@ -471,13 +471,6 @@ func kindName(k byte) string {
 		return "list"
 	}
 	return "string"
-}
-
-func or3(s, fallback string) string {
-	if s == "" {
-		return fallback
-	}
-	return s
 }
 
 type Table struct {

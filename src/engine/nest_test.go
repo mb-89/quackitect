@@ -12,6 +12,7 @@ import "testing"
 // another, and a parent is itself a row, so grouping by parent would draw the
 // parent twice.
 func TestAChildDrawsUnderItsParent(t *testing.T) {
+	t.Parallel()
 	p := writeBase(t, t.TempDir(), "w.base", `
 views:
   - type: table
@@ -71,6 +72,7 @@ views:
 // A filter or a page can leave the parent out, and a row that vanishes because
 // its parent did is a row nobody can find.
 func TestAChildWithNoParentHereDrawsOnItsOwn(t *testing.T) {
+	t.Parallel()
 	p := writeBase(t, t.TempDir(), "w.base", `
 views:
   - type: table
@@ -102,6 +104,7 @@ views:
 // A sub-token that also matches a pin would otherwise appear under the pin and
 // under its parent, and the page stops being a partition.
 func TestAChildIsDrawnOnceEvenUnderAPin(t *testing.T) {
+	t.Parallel()
 	p := writeBase(t, t.TempDir(), "w.base", `
 groups:
   - name: backlogged

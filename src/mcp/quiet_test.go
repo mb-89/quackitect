@@ -22,6 +22,7 @@ import (
 // anywhere but the door is refused too: an assignment after Quietly silently
 // clobbers both flags, which had already happened once in this tree.
 func TestEveryChildProcessIsStartedQuietly(t *testing.T) {
+	t.Parallel()
 	makes := regexp.MustCompile(`(exec\.Command(Context)?\(|&exec\.Cmd\{)`)
 	attrs := regexp.MustCompile(`\.SysProcAttr\s*=`)
 

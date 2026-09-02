@@ -61,7 +61,7 @@ type Collected struct {
 func WhoIsStillWorking(r Roots, mine string) []string {
 	var busy []string
 	for _, t := range Tokens(r) {
-		if t.Holder == "" || t.Holder == mine || t.Status.Ended() {
+		if t.Holder == "" || t.Holder == mine || t.Ended() {
 			continue
 		}
 		busy = append(busy, t.Holder+" holds "+t.ID+" ("+string(t.Status)+")")
@@ -189,7 +189,7 @@ func Retro(r Roots, actor string, transcripts map[string]string) (Collected, err
 func citedInOpenWork(r Roots) map[string]bool {
 	kept := map[string]bool{}
 	for _, t := range Tokens(r) {
-		if t.Status.Ended() {
+		if t.Ended() {
 			continue
 		}
 		for _, one := range everyWordOn(reflect.ValueOf(t)) {
@@ -211,8 +211,8 @@ func citedInOpenWork(r Roots) map[string]bool {
 // undo. The record grows a field every few days and the walk grew none.
 //
 // IT FOLLOWS WHAT THE NOTE WRITES: strings, structs, slices of structs and
-// maps of string, which is the same boundary wk-24be1c06ae draws over the
-// parser, so the two agree by construction rather than by anybody checking.
+// maps of string, which is the boundary the frontmatter reader draws, so the
+// two agree by construction rather than by anybody checking.
 func everyWordOn(v reflect.Value) []string {
 	var out []string
 	switch v.Kind() {

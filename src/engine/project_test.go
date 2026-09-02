@@ -55,6 +55,7 @@ func guidanceTree(t *testing.T) Roots {
 
 // UC-31. A changed original re-projects. Refreshing needs no installer.
 func TestAChangedOriginalIsProjectedAgain(t *testing.T) {
+	t.Parallel()
 	r := guidanceTree(t)
 	if _, err := Project(r); err != nil {
 		t.Fatal(err)
@@ -86,6 +87,7 @@ func TestAChangedOriginalIsProjectedAgain(t *testing.T) {
 // Every projection says it is one, in the first line, in the comment syntax
 // of its own format.
 func TestEveryProjectionSaysItIsGenerated(t *testing.T) {
+	t.Parallel()
 	r := guidanceTree(t)
 	if _, err := Project(r); err != nil {
 		t.Fatal(err)
@@ -108,6 +110,7 @@ func TestEveryProjectionSaysItIsGenerated(t *testing.T) {
 // The guard needs to recognise one. This is the one refusal with no override,
 // so it must not depend on how the path was spelled.
 func TestAProjectionIsRecognised(t *testing.T) {
+	t.Parallel()
 	r := guidanceTree(t)
 	Project(r)
 	yes, instead := IsProjection(r, filepath.Join(r.Work, "AGENTS.md"))
@@ -125,6 +128,7 @@ func TestAProjectionIsRecognised(t *testing.T) {
 // The digest is what tells a change from a rewrite. Same content, same
 // digest, whatever the modification time says.
 func TestTheDigestFollowsContentNotTime(t *testing.T) {
+	t.Parallel()
 	r := guidanceTree(t)
 	first, err := GuidanceDigest(r.Method)
 	if err != nil {
@@ -152,6 +156,7 @@ func TestTheDigestFollowsContentNotTime(t *testing.T) {
 // So the scope comes from the data. Every projection that lists the guidance
 // as a source has to carry what the guidance says.
 func TestEveryProjectionOfAGuidanceCarriesIt(t *testing.T) {
+	t.Parallel()
 	r := guidanceTree(t)
 	source := filepath.Join("doc", "guidance", "behaviour.md")
 
@@ -210,6 +215,7 @@ func projectionsFrom(t *testing.T, r Roots, source string) []string {
 // A projection that names a section carries that chapter from each source and
 // nothing else, and a source without the chapter is refused by name.
 func TestAProjectionWithASectionCarriesOnlyThatChapter(t *testing.T) {
+	t.Parallel()
 	r := guidanceTree(t)
 	guidance := filepath.Join(r.Method, "doc", "guidance")
 	os.WriteFile(filepath.Join(guidance, "voice.md"),

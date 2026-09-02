@@ -8,6 +8,7 @@ import { whyNothingHappened } from "./mintwhy";
 import { editorHtml, paneBody, Table, Pane } from "./editor";
 import { whichHarness, kickoffText, openAgent } from "./agent";
 import { nextEngineState, whyNot, HEARTBEAT_MS } from "./liveness";
+import { startLanguageServer, stopLanguageServer } from "./lsp";
 import {
   mintArgs, editCellArgs, fileArgs, groupArgs, renameGroupArgs, holdArgs,
   viewArgs, paneArgs, panesArgs, viewsArgs, pinArgs, unpinArgs, widthArgs,
@@ -32,6 +33,7 @@ export function activate(context: vscode.ExtensionContext) {
   projectOnStartup(context);
   watchParameters(context);
   void chooseEngine(context);
+  startNotesServer(context);
   context.subscriptions.push(
     vscode.window.registerWebviewViewProvider("quackitect.control", provider),
     vscode.commands.registerCommand("quackitect.startAgent", () => startAgent(context)),
@@ -48,7 +50,7 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand("quackitect.showLog", () => showLog(context)),
     vscode.commands.registerCommand("quackitect.showWork", () => toggleWork(context)),
     vscode.commands.registerCommand("quackitect.hold", () => toggleHold(context)),
-    vscode.commands.registerCommand("quackitect.mintWork", (arg?: { text: string; kind: string }) =>
+    vscode.commands.registerCommand("quackitect.mintWork", (arg?: { text: string; process: string }) =>
       mintWork(context, arg),
     ),
     vscode.commands.registerCommand("quackitect.welcome", () =>
@@ -120,6 +122,7 @@ function projectOnStartup(context: vscode.ExtensionContext) {
 export function deactivate() {
   for (const w of watchers) w.close();
   stopEngine();
+  void stopLanguageServer();
 }
 
 // The two roots. The method root is where this copy is installed. The work
@@ -176,6 +179,17 @@ function registeredRoot(): string | undefined {
 
 function workRoot(): string | undefined {
   return vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+}
+
+// The language server starts with the window rather than with a button,
+// because a mark on a note is wanted before anybody has pressed anything. It
+// is the only thing here that starts by itself, and it writes nothing.
+function startNotesServer(context: vscode.ExtensionContext) {
+  const work = workRoot();
+  if (!work) return;
+  const exe = binary(context, "se");
+  if (!fs.existsSync(exe)) return;
+  startLanguageServer(exe, work);
 }
 
 function binary(context: vscode.ExtensionContext, name: string): string {
@@ -896,7 +910,7 @@ class ControlPanel implements vscode.WebviewViewProvider {
       // A control that carries something runs its command with it. The panel
       // holds no value of its own, so what it carries is spent here.
       if (msg.type === "run") {
-        vscode.commands.executeCommand(msg.command, { text: msg.text, kind: msg.kind });
+        vscode.commands.executeCommand(msg.command, { text: msg.text, process: msg.process });
         return;
       }
       if (msg.type === "set") setValue(this.context, msg.key, msg.value);
@@ -920,7 +934,7 @@ class ControlPanel implements vscode.WebviewViewProvider {
 
 type PanelMessage =
   | { type: "command"; command: string }
-  | { type: "run"; command: string; text: string; kind: string }
+  | { type: "run"; command: string; text: string; process: string }
   | { type: "set"; key: string; value: unknown }
   | { type: "ready" };
 
@@ -954,6 +968,9 @@ function toggleWork(context: vscode.ExtensionContext) {
       return;
     }
     if (m.type === "open") void openNote(context, m.id);
+    if (m.type === "file") void fileWork(context, m.id, m.sets, m.into);
+    if (m.type === "group") void groupWork(context, m.ids);
+    if (m.type === "rename") void renameGroup(context, m.from, m.to);
     if (m.type === "edit") void editCell(context, m.id, m.col, m.text);
     if (m.type === "column") void showColumn(context, m.side, m.property, m.show);
     if (m.type === "columns") void setColumns(context, m.side, m.only);
@@ -961,11 +978,8 @@ function toggleWork(context: vscode.ExtensionContext) {
     if (m.type === "drop-level") void dropLevel(context, m.side, m.kind, m.at);
     if (m.type === "width") void setWidth(context, m.side, m.property, m.px);
     if (m.type === "filter") void setFilter(context, m.side, m.groups);
-    if (m.type === "file") void fileWork(context, m.id, m.sets, m.into);
     if (m.type === "pin") void writeView(context, m.side, pinArgs(m.name, m.matching));
     if (m.type === "unpin") void writeView(context, m.side, unpinArgs(m.name));
-    if (m.type === "group") void groupWork(context, m.ids);
-    if (m.type === "rename") void renameGroup(context, m.from, m.to);
   });
   void drawWork(context);
 
@@ -1124,9 +1138,6 @@ async function fileWork(context: vscode.ExtensionContext, id: string, sets: stri
 
 // TICKED ROWS MAKE A GROUP. A person pressed the button, so a person made it,
 // and the engine refuses a group from anybody else.
-//
-// NO NAME IS SENT. The engine knows which names are taken and hands back a free
-// one, which is why the group is made first and named afterwards.
 async function groupWork(context: vscode.ExtensionContext, ids: string[]) {
   if (ids.length === 0) return;
   const args = groupArgs(ids);
@@ -1140,9 +1151,9 @@ async function renameGroup(context: vscode.ExtensionContext, from: string, to: s
   void drawWork(context);
 }
 
-async function mintWork(context: vscode.ExtensionContext, arg?: { text: string; kind: string }) {
+async function mintWork(context: vscode.ExtensionContext, arg?: { text: string; process: string }) {
   // A person typed it in the panel, so a person minted it.
-  const args = mintArgs(arg?.text ?? "", arg?.kind ?? "");
+  const args = mintArgs(arg?.text ?? "", arg?.process ?? "");
   if (!args) {
     vscode.window.showErrorMessage(whyNothingHappened("nothing typed"));
     return;
@@ -1170,7 +1181,12 @@ function askEngine(context: vscode.ExtensionContext, args: string[]): Promise<an
     }
     const done = spawn(exe, [...args, "--work", work], { cwd: work });
     let out = "";
+    // STANDARD ERROR IS WHERE THE REASON IS. fail() writes there and exits, so
+    // reading only stdout threw the reason away and left the person with a
+    // message saying the answer was not JSON and nothing saying why.
+    let said = "";
     done.stdout?.on("data", (b: Buffer) => (out += b.toString()));
+    done.stderr?.on("data", (b: Buffer) => (said += b.toString()));
     done.on("error", (err: Error) => {
       vscode.window.showErrorMessage(whyNothingHappened("no start", String(err?.message ?? err)));
       resolve(undefined);
@@ -1182,7 +1198,7 @@ function askEngine(context: vscode.ExtensionContext, args: string[]): Promise<an
         // THE ONE THE OWNER HIT. The engine printed its usage because it was
         // sent a flag it has not got, and usage is not JSON, so this swallowed
         // it. It is also where an engine that did not read the call arrives.
-        vscode.window.showErrorMessage(whyNothingHappened("not json", out));
+        vscode.window.showErrorMessage(whyNothingHappened("not json", said.trim() || out));
         resolve(undefined);
       }
     });

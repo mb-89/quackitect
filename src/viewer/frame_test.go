@@ -29,6 +29,7 @@ func line(kind, msg string) string {
 // columns, the same order and the same status line, or there are two answers
 // to how the record looks.
 func TestFrameDrawsTheWindow(t *testing.T) {
+	t.Parallel()
 	path := writeLog(t, line("call", "the first"), line("refusal", "the second"))
 	out, err := Frame(path, 100, 12, "")
 	if err != nil {
@@ -44,6 +45,7 @@ func TestFrameDrawsTheWindow(t *testing.T) {
 // The filter is the same language the window takes, and it narrows the frame
 // the same way.
 func TestFrameTakesAFilter(t *testing.T) {
+	t.Parallel()
 	path := writeLog(t, line("call", "the first"), line("refusal", "the second"))
 	out, err := Frame(path, 100, 12, "kind:refusal")
 	if err != nil {
@@ -60,6 +62,7 @@ func TestFrameTakesAFilter(t *testing.T) {
 // A filter that will not compile is said, and nothing is drawn. A frame that
 // silently showed everything would be read as everything matching.
 func TestFrameSaysWhatIsWrongWithAFilter(t *testing.T) {
+	t.Parallel()
 	path := writeLog(t, line("call", "the first"))
 	if _, err := Frame(path, 100, 12, "kind:("); err == nil {
 		t.Fatal("a filter that cannot compile was accepted")
@@ -69,6 +72,7 @@ func TestFrameSaysWhatIsWrongWithAFilter(t *testing.T) {
 // A file that is not there yet is not an error. The window says so on a
 // screen, and the frame says so here.
 func TestFrameOnAFileThatIsNotThere(t *testing.T) {
+	t.Parallel()
 	out, err := Frame(filepath.Join(t.TempDir(), "nothing.jsonl"), 100, 12, "")
 	if err != nil {
 		t.Fatalf("a missing file was an error: %v", err)
@@ -81,6 +85,7 @@ func TestFrameOnAFileThatIsNotThere(t *testing.T) {
 // A screen is padded to its height. A pipe is not, and the padding would read
 // as the record having ended long before it did.
 func TestFrameDoesNotEndInBlankLines(t *testing.T) {
+	t.Parallel()
 	path := writeLog(t, line("call", "the only one"))
 	out, err := Frame(path, 100, 40, "")
 	if err != nil {
@@ -92,6 +97,7 @@ func TestFrameDoesNotEndInBlankLines(t *testing.T) {
 }
 
 func TestParseSize(t *testing.T) {
+	t.Parallel()
 	for _, c := range []struct {
 		in   string
 		w, h int

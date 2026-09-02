@@ -16,41 +16,106 @@ import (
 func laneTools() []map[string]any {
 	return []map[string]any{
 		{
+			"name": "se_apply",
+			"description": "CHANGE FILES. This is how you write, and it says which work the change is.\n\n" +
+				"The harness's Write and Edit are refused: they carry no way to name a " +
+				"token, so a change made with one is a change nothing can file.\n\n" +
+				"ONE MANIFEST, AS MANY FILES AS YOU LIKE. Every edit is checked before " +
+				"any is written, so one bad edit writes nothing and the tree is never " +
+				"half changed. Edits to one file compose in the order you wrote them.\n\n" +
+				"THREE OPS.\n" +
+				"- left off: replace old with new. old must be in the file exactly once, " +
+				"so take in enough of what is around it to be sure.\n" +
+				"- create: a file that is not there yet. It refuses if it is.\n" +
+				"- write: replace a whole file.\n\n" +
+				"NAMING A TOKEN YOU WERE NOT ON SWAPS THEM. The one you held goes back " +
+				"and this one comes into your hands, so changing what you work on is one " +
+				"word on the next write and never a call of its own.",
+			"inputSchema": map[string]any{
+				"type": "object",
+				"properties": map[string]any{
+					"on": map[string]any{"type": "string",
+						"description": "the token this change belongs to, by id"},
+					"edits": map[string]any{"type": "array",
+						"description": "the manifest, in order",
+						"items": map[string]any{"type": "object",
+							"properties": map[string]any{
+								"file": map[string]any{"type": "string",
+									"description": "the path, from the folder being worked on"},
+								"old": map[string]any{"type": "string",
+									"description": "the bytes to replace. It has to be there exactly once"},
+								"new": map[string]any{"type": "string",
+									"description": "what to put there, or the whole content for create and write"},
+								"op": map[string]any{"type": "string",
+									"description": "create, write, or left off for an exact replacement"},
+							},
+							"required": []string{"file"},
+						}},
+					"dry": map[string]any{"type": "boolean",
+						"description": "check every edit and write nothing"},
+					"undo": map[string]any{"type": "boolean",
+						"description": "instead of writing: put back what the last apply overwrote. " +
+							"It refuses if any of those files has changed since, so it never " +
+							"throws away work somebody did afterwards. Needs no on and no edits"},
+					"actor": map[string]any{"type": "string", "description": "who is writing. Default main"},
+				},
+			},
+		},
+		{
+			"name": "se_run",
+			"description": "RUN A SHELL COMMAND. This is how you build, test and search, and it " +
+				"says which work the command is.\n\n" +
+				"The harness's Bash is refused. The engine cannot read a command and know " +
+				"whether it writes -- a redirection, sed -i, mv, rm and a script you wrote " +
+				"all reach the filesystem -- so it does not ask. Every command names its " +
+				"work because it could write.\n\n" +
+				"The command runs in the folder being worked on. Output and errors come " +
+				"back as one stream with the exit code. A long output is cut at the FRONT " +
+				"and the cut is reported, because a failure says why on its last lines.\n\n" +
+				"NAMING A TOKEN YOU WERE NOT ON SWAPS THEM, the same as a write.",
+			"inputSchema": map[string]any{
+				"type": "object",
+				"properties": map[string]any{
+					"on": map[string]any{"type": "string",
+						"description": "the token this command belongs to, by id"},
+					"command": map[string]any{"type": "string",
+						"description": "the command, whole. Quotes, newlines and pipes are yours to use"},
+					"actor": map[string]any{"type": "string", "description": "who is running it. Default main"},
+				},
+				"required": []string{"on", "command"},
+			},
+		},
+		{
 			"name": "se_work",
 			"description": "MINT A WORK TOKEN. Every piece of work is one.\n\n" +
-				"\"Write a note on this\" means backlog: true.\n" +
-				"An instruction to act on now means backlog left off.\n\n" +
-				"form is one line. detail is the whole instruction, in the words it was asked in.\n" +
-				"You cannot close what you mint. A reviewer settles it.\n\n" +
+				"THE PROCESS SHAPES IT. Pass process: <name>, one of the files in " +
+				"src/processes. It says which sections the note carries, which states " +
+				"it can be in, and what each step asks before it is done. Left off, " +
+				"it is note.\n\n" +
+				"title is four words at most. detail is the whole instruction, in the " +
+				"words it was asked in. proposed_action is what you think should " +
+				"happen about it.\n\n" +
 				"AND IT IS WHERE YOU SAY WHICH TOKEN YOU ARE ON. Pass on: <id>. " +
-				"That token goes in work, whatever else you held goes back, and " +
+				"That token goes in your hands, whatever else you held goes back, and " +
 				"a write is refused until you have said it.",
 			"inputSchema": map[string]any{
 				"type": "object",
 				"properties": map[string]any{
-					"title":    map[string]any{"type": "string", "description": "what the work is, in four words at most"},
-					"assignee": map[string]any{"type": "string", "description": "whose it is"},
-					"detail":   map[string]any{"type": "string", "description": "the whole instruction"},
-					"guidance": map[string]any{"type": "string", "description": "the method, inline"},
-					"guidance_ref": map[string]any{"type": "string",
-						"description": "the method, by path"},
-					"evidence": map[string]any{"type": "array", "items": map[string]any{"type": "string"},
-						"description": "sections completion must fill. Each is checked before a reviewer sees it"},
-					"evidence_script": map[string]any{"type": "string",
-						"description": "a command that must exit zero"},
-					"parent": map[string]any{"type": "string",
-						"description": "the token this breaks down. Yours to close, if it is ephemeral"},
-					"backlog": map[string]any{"type": "boolean",
-						"description": "out of the queue, holding nobody. What a note is"},
-					"open": map[string]any{"type": "string",
-						"description": "instead of minting: move a backlogged token into the queue, by id"},
+					"title":   map[string]any{"type": "string", "description": "what the work is, in four words at most"},
+					"detail":  map[string]any{"type": "string", "description": "the whole instruction"},
+					"process": map[string]any{"type": "string", "description": "which process shapes it. Default note"},
+					"proposed_action": map[string]any{"type": "string",
+						"description": "what you think should happen about it"},
+					"depends_on": map[string]any{"type": "array", "items": map[string]any{"type": "string"},
+						"description": "ids that have to end before this can start"},
 					"on": map[string]any{"type": "string",
 						"description": "instead of minting: say which token you are working on, by id. " +
-							"It goes in work and whatever else you held goes back. A write is refused until you have said it"},
+							"It goes in your hands and whatever else you held goes back. " +
+							"A write is refused until you have said it"},
 					"actor": map[string]any{"type": "string",
 						"description": "who is minting. Default main"},
 				},
-				"required": []string{"title", "assignee"},
+				"required": []string{"title"},
 			},
 		},
 		{
@@ -72,17 +137,18 @@ func laneTools() []map[string]any {
 		{
 			"name": "se_pull",
 			"description": "THE PULL, your one verb for work. Pull, do what comes back, pull again.\n\n" +
-				"FOUR ANSWERS, and the pull field names which.\n" +
-				"- work: do the token. Findings from an earlier round have to be answered.\n" +
-				"- review: judge it against its own rules. Answer verdict accept, or reject with findings.\n" +
+				"THREE ANSWERS, and the pull field names which.\n" +
+				"- work: do the token. Walk the checklist for the step you are on.\n" +
 				"- refused: a check failed. Fix what the finding names and pull again with the same id.\n" +
 				"- wait: nothing for you. Say so and stop.\n\n" +
-				"SUBMITTING IS A PULL: id, evidence and disposition. You cannot close a token.",
+				"SUBMITTING IS A PULL: id and disposition. The checklist is on the note " +
+				"itself, so answer it there and the engine reads it. A step the token " +
+				"has not reached yet, ticked, is refused.",
 			"inputSchema": map[string]any{
 				"type": "object",
 				"properties": map[string]any{
 					"id": map[string]any{"type": "string",
-						"description": "the token you are submitting or judging. Leave it out to ask for work"},
+						"description": "the token you are submitting. Leave it out to ask for work"},
 					"evidence": map[string]any{"type": "object",
 						"additionalProperties": map[string]any{"type": "string"},
 						"description":          "one entry per section the token asked for. Empty is refused"},
@@ -91,40 +157,7 @@ func laneTools() []map[string]any {
 					"successors": map[string]any{"type": "array", "items": map[string]any{"type": "string"},
 						"description": "became only: the tokens this turned into. They must exist"},
 					"reason": map[string]any{"type": "string", "description": "dropped only: why the work stopped"},
-					"verdict": map[string]any{"type": "string",
-						"description": "reviewer only: accept or reject"},
-					"findings": map[string]any{"type": "array",
-						"description": "reviewer only, with reject: clause, wrong, satisfies",
-						"items": map[string]any{"type": "object", "properties": map[string]any{
-							"clause":    map[string]any{"type": "string"},
-							"wrong":     map[string]any{"type": "string"},
-							"satisfies": map[string]any{"type": "string"},
-						}}},
-					"lesson": map[string]any{"type": "object",
-						"description": "reviewer only, with reject: the class of mistake and what to do " +
-							"instead. A rejection with no lesson is refused",
-						"properties": map[string]any{
-							"class":    map[string]any{"type": "string"},
-							"avoid":    map[string]any{"type": "string"},
-							"prevents": map[string]any{"type": "string"},
-						}},
-					"learned": map[string]any{"type": "string",
-						"description": "reviewer only, with reject: the id of the token you minted for " +
-							"the lesson. A rejection naming none is refused"},
-					"rewatched": map[string]any{"type": "object",
-						"additionalProperties": map[string]any{"type": "string"},
-						"description": "reviewer only, with accept: what you watched go red, keyed by " +
-							"the criterion's own sentence"},
-					"criteria": map[string]any{"type": "array",
-						"description": "a draft's criteria: says, and runs where a command decides it",
-						"items": map[string]any{"type": "object", "properties": map[string]any{
-							"says":    map[string]any{"type": "string"},
-							"runs":    map[string]any{"type": "string"},
-							"without": map[string]any{"type": "string"},
-							"red":     map[string]any{"type": "string"},
-						}}},
-					"as":    map[string]any{"type": "string", "description": "worker, or reviewer. Default worker"},
-					"actor": map[string]any{"type": "string", "description": "who is pulling. Default main"},
+					"actor":  map[string]any{"type": "string", "description": "who is pulling. Default main"},
 				},
 			},
 		},
@@ -132,17 +165,10 @@ func laneTools() []map[string]any {
 }
 
 func mintWork(r roots, args map[string]any) string {
-	if id := str(args["open"]); id != "" {
-		return engineCall(r, []string{"work", "--open", id}, nil)
-	}
 	// NAMING A TOKEN IS WHAT OPENS IT, so it goes through the same verb the
 	// agent already has rather than becoming a second thing to remember.
 	if id := str(args["on"]); id != "" {
-		by := str(args["actor"])
-		if by == "" {
-			by = "main"
-		}
-		return engineCall(r, []string{"work", "--on", id, "--by", by}, nil)
+		return engineCall(r, []string{"work", "--on", id, "--by", orMain(str(args["actor"]))}, nil)
 	}
 	// The agent minting is the actor it pulls as, so the engine is told rather
 	// than left to guess.
@@ -150,31 +176,33 @@ func mintWork(r roots, args map[string]any) string {
 	if by == "" {
 		by = "main"
 	}
-	a := []string{"work", "--title", str(args["title"]), "--assignee", str(args["assignee"]), "--by", by}
-	if b, ok := args["backlog"].(bool); ok && b {
-		a = append(a, "--backlog")
-	}
+	// EVERY FLAG HERE IS ONE se work DEFINES.
+	//
+	// MEASURED, AND IT MEANT NOTHING COULD MINT THROUGH THIS DOOR. It sent
+	// --assignee, --backlog, --guidance, --guidance-ref, --evidence-script,
+	// --parent and --evidence, and the verb defines none of them, so the engine
+	// printed its usage and minted nothing on every call. The extension's
+	// builders are driven against the real binary by util/checks/engine-args.mjs
+	// and these were not, which is why it was quiet.
+	a := []string{"work", "--title", str(args["title"]), "--by", by}
 	// A fixed order, because a map's is not one and a command line a person
 	// reads in the log should look the same every time.
 	for _, pair := range [][2]string{
-		{"--detail", "detail"}, {"--guidance", "guidance"}, {"--guidance-ref", "guidance_ref"},
-		{"--evidence-script", "evidence_script"}, {"--parent", "parent"},
+		{"--detail", "detail"}, {"--process", "process"},
+		{"--proposed-action", "proposed_action"},
 	} {
 		if v := str(args[pair[1]]); v != "" {
 			a = append(a, pair[0], v)
 		}
 	}
-	if s := strList(args["evidence"]); len(s) > 0 {
-		a = append(a, "--evidence", strings.Join(s, ","))
+	if s := strList(args["depends_on"]); len(s) > 0 {
+		a = append(a, "--depends-on", strings.Join(s, ","))
 	}
 	return engineCall(r, a, nil)
 }
 
 func stopClaim(r roots, args map[string]any) string {
-	actor := str(args["actor"])
-	if actor == "" {
-		actor = "main"
-	}
+	actor := orMain(str(args["actor"]))
 	if str(args["because"]) == "" {
 		return engineCall(r, []string{"stop", "--list"}, nil)
 	}
@@ -183,20 +211,17 @@ func stopClaim(r roots, args map[string]any) string {
 }
 
 func pull(r roots, args map[string]any) string {
-	actor, role := str(args["actor"]), str(args["as"])
-	if actor == "" {
-		actor = "main"
-	}
-	// Everything but the two routing arguments is the payload, which the
-	// engine reads. The stub does not know what a payload means.
+	actor := orMain(str(args["actor"]))
+	// Everything but the routing argument is the payload, which the engine
+	// reads. The stub does not know what a payload means.
 	payload := map[string]any{}
-	// EVERY FIELD THE ENGINE'S PAYLOAD CARRIES. It was seven of them, and the
-	// three a rejection needs were among the missing: a reviewer coming through
-	// this door could only ever send accept, because the engine refuses a
-	// rejection with no lesson and no lesson token. One did, on a token it had
-	// not reviewed, and the token closed.
-	for _, k := range []string{"id", "evidence", "rewatched", "disposition", "successors",
-		"reason", "verdict", "findings", "lesson", "learned", "criteria"} {
+	// EVERY FIELD THE ENGINE'S PAYLOAD CARRIES, AND NO MORE.
+	//
+	// It forwarded eleven. Six of them — rewatched, verdict, findings, lesson,
+	// learned, criteria — are fields Payload no longer has, so json.Unmarshal
+	// dropped them without a word. A door that invites an agent to fill in
+	// something nothing reads is worse than one that does not offer it.
+	for _, k := range []string{"id", "evidence", "disposition", "successors", "reason"} {
 		if v, ok := args[k]; ok && v != nil {
 			payload[k] = v
 		}
@@ -205,11 +230,9 @@ func pull(r roots, args map[string]any) string {
 	if err != nil {
 		return "the payload will not encode: " + err.Error()
 	}
-	a := []string{"pull", "--actor", actor}
-	if role != "" {
-		a = append(a, "--as", role)
-	}
-	return engineCall(r, a, body)
+	// NO --as. se pull defines no such flag, so a call that named a role was
+	// refused by the engine before it read a byte of the payload.
+	return engineCall(r, []string{"pull", "--actor", actor}, body)
 }
 
 // engineCall runs a subcommand with an optional payload on standard input. A
@@ -227,6 +250,61 @@ func engineCall(r roots, args []string, stdin []byte) string {
 		return fmt.Sprintf("the engine could not be asked: %v", err)
 	}
 	return out
+}
+
+// applyEdits hands the manifest to the engine, whole, on standard input.
+//
+// THE MANIFEST IS NOT FLATTENED INTO FLAGS. It is a list of edits carrying
+// content with newlines and quotes in it, and a command line is the wrong shape
+// for that: it has a length limit, and every layer between here and the engine
+// would have to agree about quoting. The stub passes the bytes through.
+func applyEdits(r roots, args map[string]any) string {
+	if undo, is := args["undo"].(bool); is && undo {
+		return engineCall(r, []string{"apply", "--undo"}, nil)
+	}
+	on := str(args["on"])
+	if on == "" {
+		return `{"error":"say which token this change is, with on: <id>"}`
+	}
+	raw, ok := args["edits"].([]any)
+	if !ok || len(raw) == 0 {
+		return `{"error":"an apply with no edits: say what to change"}`
+	}
+	body, err := json.Marshal(raw)
+	if err != nil {
+		return "the manifest will not encode: " + err.Error()
+	}
+	a := []string{"apply", "--on", on, "--by", orMain(str(args["actor"]))}
+	if dry, is := args["dry"].(bool); is && dry {
+		a = append(a, "--dry")
+	}
+	return engineCall(r, a, body)
+}
+
+// runCommand hands the command to the engine on standard input, whole.
+//
+// NOT AS A FLAG. A command line holds quotes, newlines, dollar signs and pipes,
+// and passing it as an argument makes every layer between the agent and the
+// engine agree about quoting. They do not.
+func runCommand(r roots, args map[string]any) string {
+	on := str(args["on"])
+	if on == "" {
+		return `{"error":"say which token this command is, with on: <id>"}`
+	}
+	command := str(args["command"])
+	if strings.TrimSpace(command) == "" {
+		return `{"error":"say what to run"}`
+	}
+	return engineCall(r, []string{"run", "--on", on, "--by", orMain(str(args["actor"]))},
+		[]byte(command))
+}
+
+// orMain is who is acting, and it is main where nobody said.
+func orMain(actor string) string {
+	if actor == "" {
+		return "main"
+	}
+	return actor
 }
 
 func str(v any) string {

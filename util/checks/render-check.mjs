@@ -2,6 +2,7 @@
 // The page is pure: given a table it returns HTML, so it can be checked
 // without an editor. What it cannot check is how it looks.
 import { execFileSync } from "node:child_process";
+import { readdirSync } from "node:fs";
 import { writeFileSync, mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
@@ -71,9 +72,22 @@ const wantPanel = [
   // controls rather than columns asked for seven and the row wrapped.
   ["the work row adds no filler", (h) => !/<summary>work<\/summary>[\s\S]*?<span><\/span>/.test(h)],
   ["the picker", /class="pick"/],
-  ["the picker short when closed", /class="picked" data-value="SS·T">SS·T</],
-  ["the picker saying what it means", /single step, traced/],
-  ["no sub-token in the picker", (h) => !/data-value="T·/.test(h)],
+  // THE PICKER IS FILLED FROM THE PROCESS FILES, so this asks for the shape
+  // rather than for a word. It named SS·T, which was a scope and whether the
+  // token was traced joined with a middle dot, and the process owns both of
+  // those now. A check naming one process would go red the day somebody adds
+  // a second and renames the first.
+  ["the picker short when closed", /class="picked" data-value="[^"]+">[^<]+</],
+  ["the picker saying what it means", /<li data-value="[^"]+"><b>[^<]+<\/b><span>[^<]+<\/span><\/li>/],
+  // A CHOICE THE ENGINE WOULD REFUSE IS THE FAULT THIS GUARDS. Every value the
+  // picker offers is a process src/processes declares.
+  ["every choice is a process that exists", (h) => {
+    const offered = [...h.matchAll(/<li data-value="([^"]+)"/g)].map((m) => m[1]);
+    const declared = new Set(readdirSync(join(root, "src", "processes"))
+      .filter((f) => f.endsWith(".process.yaml") && !f.startsWith("_"))
+      .map((f) => f.slice(0, -".process.yaml".length)));
+    return offered.length > 0 && offered.every((o) => declared.has(o));
+  }],
 ];
 for (const [says, re] of wantPanel) {
   const ok = typeof re === "function" ? re(panel) : re.test(panel);
@@ -162,7 +176,7 @@ const want = [
   // What this page can decide is the mapping below, which holds for any
   // count.
   // And it pins by its name alone, because the file already holds its filter.
-  ["a declared group pins by its name", /class="pin" data-pin="backlogged" title=/],
+  ["a declared group pins by its name", /class="pin" data-pin="noted" title=/],
 
   // The table is three parts and they hide together for the raw query.
   ["the raw query hides the whole table", (h) => {

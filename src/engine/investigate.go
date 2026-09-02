@@ -58,13 +58,10 @@ func quietHold(r Roots, actor string) (Token, bool) {
 	return Token{}, false
 }
 
-func holdWorthWatching(t Token) bool {
-	switch t.Status {
-	case ImpInReview, SpecInReview, ImpInWork:
-		return true
-	}
-	return false
-}
+// A HOLD WORTH WATCHING IS A HOLD ON WORK THAT HAS NOT ENDED. It used to name
+// three states, which meant the watcher knew the engine's old vocabulary and
+// would have gone silent the first time a process invented its own word.
+func holdWorthWatching(t Token) bool { return !t.Ended() }
 
 // investigate is the answer. It says what is stuck, who left it, and what to do
 // about it, so the walker does not have to look any of that up.
@@ -84,23 +81,10 @@ func investigate(r Roots, t Token) Answer {
 			"until you rule on it, because a timeout guesses and a person looking "+
 			"does not.\n\n"+
 			"Find out whether %s is still working. If it is gone, pull again "+
-			"with se pull, and the engine takes it back to %s for you. If it "+
+			"with se pull, and the engine puts it back in the queue for you. If it "+
 			"is working, leave it where it is and come back to se pull. This "+
 			"notice stands until they move.",
-		t.ID, t.Title, t.Status, t.Holder, howFar, t.Holder, freeAgain(t))}
-}
-
-// freeAgain answers where a held token goes when nobody is behind the hold.
-//
-// ONE TABLE, IN arrival.go, BECAUSE THE RECLAIM IS WHAT ACTUALLY MOVES IT. This
-// was a second switch saying the same thing and it disagreed with the first:
-// it sent a spec in review back to spec_open, where the reclaim sends it to
-// spec_submitted, so the notice named a state the engine would not have used.
-func freeAgain(t Token) Status {
-	if to, held := whereItGoesBack[t.Status]; held {
-		return to
-	}
-	return ImpOpen
+		t.ID, t.Title, t.Status, t.Holder, howFar, t.Holder)}
 }
 
 // PULLING AGAIN IS THE WALKER'S ANSWER, AND THE NOTICE PROMISES IT WORKS.
@@ -126,7 +110,7 @@ func Looked(r Roots, actor, id string) {
 	seen := lookedAt(r)
 	seen[actor] = id
 	if b, err := json.MarshalIndent(seen, "", "  "); err == nil {
-		_ = os.WriteFile(lookedPath(r), b, 0o644)
+		_ = writeAtomic(lookedPath(r), b, 0o644) // a walker it cannot remember is sent to look again
 	}
 }
 
@@ -136,7 +120,7 @@ func lookedAt(r Roots) map[string]string {
 	if err != nil {
 		return out
 	}
-	_ = json.Unmarshal(b, &out)
+	_ = json.Unmarshal(b, &out) // a file that will not read is an empty answer
 	return out
 }
 
@@ -154,23 +138,25 @@ func TakeBackWhatWasLookedAt(r Roots, actor string) []string {
 	}
 	delete(seen, actor)
 	if b, err := json.MarshalIndent(seen, "", "  "); err == nil {
-		_ = os.WriteFile(lookedPath(r), b, 0o644)
+		_ = writeAtomic(lookedPath(r), b, 0o644) // a walker it cannot remember is sent to look again
 	}
 	t, err := LoadToken(r, id)
 	if err != nil {
 		return nil
 	}
-	to, holdable := whereItGoesBack[t.Status]
-	if !holdable || t.Holder == "" || t.Holder == actor {
+	if t.Ended() || t.Holder == "" || t.Holder == actor {
 		return nil
 	}
-	was2 := t.Holder
-	t.Status, t.Holder = to, ""
+	// ONLY THE HOLD IS RELEASED. Where the token stands is the process's
+	// business, and a walker taking a hold back is not a step of anybody's
+	// process.
+	heldBefore := t.Holder
+	t.Holder = ""
 	if err := SaveToken(r, t); err != nil {
 		return nil
 	}
-	inSession(r, "work", actor, t.ID+" taken back from "+was2+
+	inSession(r, "work", actor, t.ID+" taken back from "+heldBefore+
 		", who was looked at and is gone", Yes(),
-		map[string]any{"id": t.ID, "from": was2, "to": string(to)})
-	return []string{t.ID + " from " + was2}
+		map[string]any{"id": t.ID, "from": heldBefore})
+	return []string{t.ID + " from " + heldBefore}
 }

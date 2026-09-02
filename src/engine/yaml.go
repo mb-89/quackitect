@@ -18,9 +18,15 @@ import (
 // documents. A reader that ignores what it cannot understand returns a view
 // that looks complete and is wrong.
 //
-// It is ours rather than a library because the engine carries no dependencies:
-// the installer builds it on the reader's machine, and a machine that cannot
-// reach the network still has to get an engine.
+// IT IS OURS BECAUSE IT IS SMALL, NOT BECAUSE A DEPENDENCY IS FORBIDDEN. The
+// bar is one-click installable: anything the installer can fetch is allowed,
+// and src/viewer already carries twenty-two modules. This is two hundred
+// lines, it was quicker to write than to choose, and the narrow subset is a
+// feature here because it refuses rather than guesses.
+//
+// WHAT WOULD CHANGE THE ANSWER: a schema wanting multi-line descriptions, or
+// anything else in the parts of yaml this refuses. Then a library earns its
+// place and this goes.
 
 // A node is a string, a []any, or a map[string]any. Nothing else.
 func ParseYAML(text string) (any, error) {

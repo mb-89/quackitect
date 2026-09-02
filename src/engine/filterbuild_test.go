@@ -12,6 +12,7 @@ import (
 // person who added a second group saw their table empty on the next touch of
 // the popover, because the page handed the misread filter back to the engine.
 func TestAFilterReadsBackAsWhatWasBuilt(t *testing.T) {
+	t.Parallel()
 	for name, groups := range map[string][]FilterGroup{
 		"one condition": {
 			{Rows: []FilterRow{{Property: "status", Operator: "is", Value: "open"}}},
@@ -87,6 +88,7 @@ func sameGroups(a, b []FilterGroup) bool {
 // ONE UNREADABLE ROW MAKES THE WHOLE GROUP RAW. That is already the rule here.
 // What was missing is the reader saying it cannot read one.
 func TestAValueThatIsNotOneLiteralIsNotReadAsAComparison(t *testing.T) {
+	t.Parallel()
 	cannot := []string{
 		`status == "open" && assignee == "main"`,
 		`status == "open" || status == "in_work"`,

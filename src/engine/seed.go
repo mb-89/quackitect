@@ -53,8 +53,12 @@ func runmeName() string {
 // already has a README keeps the README it has.
 func Seed(roots Roots, kind Kind) ([]string, error) {
 	var made []string
-	id, err := CopyID(roots.Method)
-	if err != nil {
+	// THE COPY IS ASKED FOR ITS IDENTITY BEFORE ANYTHING IS WRITTEN, and the
+	// identity itself is not wanted here. A method root that cannot say which
+	// copy it is has nothing to seed from, so this is the check and not a
+	// value: it was read into id, thrown away nine lines later with `_ = id`,
+	// and the blank identifier hid that the value had no use.
+	if _, err := CopyID(roots.Method); err != nil {
 		return nil, err
 	}
 
@@ -65,7 +69,6 @@ func Seed(roots Roots, kind Kind) ([]string, error) {
 		r.CommandWindows = `.bin\se.exe`
 		r.InstallWindows = `util\setup\install.ps1`
 	}
-	_ = id
 	if err := writeNew(filepath.Join(roots.Work, ".se", "runme.json"), mustIndent(r), &made); err != nil {
 		return made, err
 	}
@@ -129,13 +132,6 @@ func exeName(n string) string {
 		return n + ".exe"
 	}
 	return n
-}
-
-func installName() string {
-	if runtime.GOOS == "windows" {
-		return "install.ps1"
-	}
-	return "install.sh"
 }
 
 func readmeFor(kind Kind, name string) string {

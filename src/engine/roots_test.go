@@ -21,6 +21,7 @@ func markProject(t *testing.T, dir string) {
 // agent had written at the root. The record split by directory and nobody was
 // told.
 func TestTheProjectRootIsFoundFromASubfolder(t *testing.T) {
+	t.Parallel()
 	root := t.TempDir()
 	deep := filepath.Join(root, "source", "mcp")
 	if err := os.MkdirAll(deep, 0o755); err != nil {
@@ -45,6 +46,7 @@ func TestTheProjectRootIsFoundFromASubfolder(t *testing.T) {
 // where somebody is standing is the only answer there is. The register lives
 // in a .se under the home directory, and that must not count as one.
 func TestAFolderWithNoMarkerIsItsOwnRoot(t *testing.T) {
+	t.Parallel()
 	root := t.TempDir()
 	deep := filepath.Join(root, "a", "b")
 	if err := os.MkdirAll(deep, 0o755); err != nil {
@@ -62,6 +64,7 @@ func TestAFolderWithNoMarkerIsItsOwnRoot(t *testing.T) {
 // The register lives in a .se under the home directory. It is not a project,
 // and a walk that took it for one would swallow every project beneath it.
 func TestTheHomeDirectoryIsNeverTheProject(t *testing.T) {
+	t.Parallel()
 	home, err := os.UserHomeDir()
 	if err != nil {
 		t.Skip("no home directory on this machine")
@@ -78,6 +81,7 @@ func TestTheHomeDirectoryIsNeverTheProject(t *testing.T) {
 // The nearest one wins. A project inside a project is driven by its own
 // marker, not by whatever is further up.
 func TestTheNearestMarkerWins(t *testing.T) {
+	t.Parallel()
 	outer := t.TempDir()
 	inner := filepath.Join(outer, "nested")
 	os.MkdirAll(inner, 0o755)

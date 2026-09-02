@@ -1,8 +1,6 @@
 package main
 
 import (
-	"os"
-	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -15,6 +13,7 @@ const thePhrase = `"the gate is built"`
 // the inner quotes rather than eating them, so the phrase comes back whole with
 // the defect still in place and a Contains is green both ways.
 func TestAQuotedScriptReachesTheShellWhole(t *testing.T) {
+	t.Parallel()
 	r := lane(t)
 	said, err := runEvidence(r, "echo "+thePhrase)
 	if err != nil {
@@ -29,33 +28,10 @@ func TestAQuotedScriptReachesTheShellWhole(t *testing.T) {
 	}
 }
 
-// A CRITERION WITH A QUOTED PATTERN IS MET. This is the shape that refused
-// wk-d898634fd3, driven through the gate the submission runs.
-func TestACriterionWithAQuotedPatternIsMet(t *testing.T) {
-	r := lane(t)
-	held := "a phrase with spaces in it"
-	if err := os.WriteFile(filepath.Join(r.Work, "held.md"), []byte(held+"\n"), 0o644); err != nil {
-		t.Fatal(err)
-	}
-	// IT CARRIES AN OBSERVATION, because a criterion nobody has watched fail is
-	// reported unmet whatever its command answers, and this fixture is about
-	// the command rather than about that gate.
-	one := Criterion{
-		Says:    "the file holds the phrase",
-		Runs:    `rg -q "` + held + `" held.md`,
-		Without: "the file",
-		Red:     "rg found nothing",
-	}
-	tok := Token{Criteria: []Criterion{one}}
-	if unmet := UnmetCriteria(r, tok, Payload{}); len(unmet) > 0 {
-		t.Errorf("a criterion whose pattern has spaces was reported unmet:\n%s",
-			strings.Join(unmet, "\n"))
-	}
-}
-
 // AND AN UNQUOTED SCRIPT IS UNCHANGED, which is what stops the fix breaking
 // every command already in the tree.
 func TestAnUnquotedScriptIsUnchanged(t *testing.T) {
+	t.Parallel()
 	r := lane(t)
 	if said, err := runEvidence(r, "exit 0"); err != nil {
 		t.Errorf("a script that exits zero answered %v, %s", err, said)

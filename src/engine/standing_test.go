@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"os"
 	"path/filepath"
 	"strings"
@@ -26,26 +25,28 @@ import (
 // rule without anybody remembering this test.
 func standingSources(t *testing.T, r Roots) []string {
 	t.Helper()
-	b, err := os.ReadFile(filepath.Join(r.Method, "util", "projections.json"))
+	// THE ENGINE'S OWN READER, NOT A SECOND COPY OF THE SHAPE. This declared
+	// its own struct with target and sources on it, so a projection that names
+	// a folder rather than a list did not parse into it and the check went
+	// quiet on the tree it was written to guard.
+	list, err := LoadProjections(r.Method)
 	if err != nil {
 		t.Fatalf("the projection map cannot be read, so this guards nothing: %v", err)
 	}
-	var m struct {
-		Projections []struct {
-			Target  string   `json:"target"`
-			Sources []string `json:"sources"`
-		} `json:"projections"`
-	}
-	if err := json.Unmarshal(b, &m); err != nil {
-		t.Fatal(err)
-	}
 	seen := map[string]bool{}
 	var out []string
-	for _, p := range m.Projections {
+	for _, p := range list {
 		if !strings.HasSuffix(p.Target, ".md") && !strings.HasSuffix(p.Target, "quackitect.md") {
 			continue
 		}
-		for _, s := range p.Sources {
+		// THE SAME ANSWER THE ENGINE USES. This read p.Sources, and a
+		// projection that names a folder instead of a list left it empty, so
+		// the check guarded nothing while looking like it passed.
+		srcs, err := sourcesOf(r.Method, p)
+		if err != nil {
+			t.Fatalf("%s: %v", p.Name, err)
+		}
+		for _, s := range srcs {
 			if strings.HasPrefix(s, "doc/guidance/") && !seen[s] {
 				seen[s], out = true, append(out, s)
 			}
@@ -59,6 +60,7 @@ func standingSources(t *testing.T, r Roots) []string {
 
 // A CASE STUDY IS NOT A RULE, so it is not paid for on every turn.
 func TestTheStandingLayerCarriesNoCaseStudies(t *testing.T) {
+	t.Parallel()
 	r := Roots{Method: filepath.Join("..", ".."), Work: filepath.Join("..", "..")}
 	for _, name := range standingSources(t, r) {
 		b, err := os.ReadFile(filepath.Join(r.Method, filepath.FromSlash(name)))

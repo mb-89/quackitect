@@ -35,6 +35,7 @@ views:
 
 // A GROUP COUNTS A NESTED CHILD.
 func TestAGroupCountsANestedChild(t *testing.T) {
+	t.Parallel()
 	b := aNestingBase(t)
 	rows := []Row{
 		row("id", "wk-parent", "assignee", "main", "status", "open", "title", "a parent"),
@@ -63,6 +64,7 @@ func TestAGroupCountsANestedChild(t *testing.T) {
 // the total, and a count that counts one twice sums over it, so the equality is
 // what makes the number on the rule true rather than decorative.
 func TestTheBucketsAddUpToTheTotal(t *testing.T) {
+	t.Parallel()
 	b := aNestingBase(t)
 	rows := []Row{
 		row("id", "wk-parent", "assignee", "main", "status", "open", "title", "a parent"),

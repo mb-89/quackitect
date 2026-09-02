@@ -11,7 +11,7 @@ import (
 //
 // THE EXCEPTION HAS NOW LEAKED THREE TIMES IN THE SAME PLACE. Round 1: any word
 // being the engine. Round 2: a redirection, which writes and runs nothing.
-// Round 3, found by rev-16 while reviewing wk-4e8eeb76aa: a command
+// Round 3, found in review: a command
 // substitution inside DOUBLE quotes, which the stripper removed and bash
 // expands. Round 4, found by rev-25: an apostrophe in ordinary English opening
 // a span for the scan that hunted substitutions.
@@ -32,6 +32,7 @@ import (
 // and a backtick pair are LITERAL inside single quotes and LIVE inside double
 // quotes, so the quoting decides.
 func TestTheEngineExceptionReadsEachQuotingTheWayBashDoes(t *testing.T) {
+	t.Parallel()
 	const lead = ".bin/se pull --actor x "
 	for _, one := range []struct {
 		what  string
@@ -89,6 +90,7 @@ func TestTheEngineExceptionReadsEachQuotingTheWayBashDoes(t *testing.T) {
 // table that varies one construct at a time, however complete it is over
 // constructs. The pairs are why rev-25 found the third leak still open.
 func TestBashDecidesWhichCommandsLeaveTheException(t *testing.T) {
+	t.Parallel()
 	if _, err := exec.LookPath("bash"); err != nil {
 		t.Fatal("bash is not on PATH, so this check cannot ask the shell and guards nothing")
 	}

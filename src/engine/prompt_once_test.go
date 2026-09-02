@@ -12,6 +12,7 @@ import (
 // and the agent calls the said verb, and the log carried six records for four
 // messages.
 func TestOnePromptOneRecord(t *testing.T) {
+	t.Parallel()
 	r := guidanceTree(t)
 	dir := r.Private("log")
 	l, _ := OpenLog(dir)
@@ -40,6 +41,7 @@ func TestOnePromptOneRecord(t *testing.T) {
 // with an answer between, is two things a person said and both belong in the
 // record.
 func TestTheSameWordsAfterAnAnswerAreANewMessage(t *testing.T) {
+	t.Parallel()
 	r := guidanceTree(t)
 	dir := r.Private("log")
 	l, _ := OpenLog(dir)
@@ -59,6 +61,7 @@ func TestTheSameWordsAfterAnAnswerAreANewMessage(t *testing.T) {
 // The verb refuses a repeat rather than asking the caller to check, so a rule
 // that says always record is safe.
 func TestTheSaidVerbRefusesARepeat(t *testing.T) {
+	t.Parallel()
 	exe := buildEngine(t)
 	r := guidanceTree(t)
 	l, _ := OpenLog(r.Private("log"))

@@ -1,8 +1,12 @@
 // THE BAR DRAWS THE BURN DOWN, driven rather than read.
 //
-// BD: four numbers separated by slashes, small, with the detail on hover and
+// BD: three numbers separated by slashes, small, with the detail on hover and
 // not on the bar. The page is rendered from an answer this check builds, and
 // then from a second one, so a bar that prints numbers of its own fails.
+//
+// THE FOURTH NUMBER WENT WITH THE REVIEW FLOW. It was the rate at which tokens
+// fail reviews, nothing writes a verdict any more, and a rate over no reviews
+// reads as nought percent, which is a claim that everything passes.
 //
 //   node util/checks/burndown.mjs <root>
 import { execFileSync } from "node:child_process";
@@ -45,17 +49,17 @@ try {
   no("the engine would not answer the builder's call: " + String(e).split("\n")[0]);
 }
 if (live) {
-  for (const field of ["minted", "done", "open", "rate", "says", "detail", "window"]) {
+  for (const field of ["minted", "done", "open", "says", "detail", "window"]) {
     if (live[field] === undefined) no(`the engine's answer carries no ${field}`);
   }
-  if (typeof live.says === "string" && live.says.startsWith("BD:")) ok("the engine says BD and four numbers");
-  else no(`the engine says ${JSON.stringify(live?.says)} rather than BD and four numbers`);
+  if (typeof live.says === "string" && live.says.startsWith("BD:")) ok("the engine says BD and three numbers");
+  else no(`the engine says ${JSON.stringify(live?.says)} rather than BD and three numbers`);
 }
 
 const anAnswer = (n) => ({
-  day: "2026-08-3" + n, minted: n, done: n + 1, open: n + 2, rate: n + 3,
+  day: "2026-08-3" + n, minted: n, done: n + 1, open: n + 2,
   window: "the window for " + n,
-  says: `BD: ${n}/${n + 1}/${n + 2}/${n + 3}%`,
+  says: `BD: ${n}/${n + 1}/${n + 2}`,
   detail: `the detail for ${n}`,
 });
 
@@ -71,9 +75,9 @@ ok("the bar draws it");
 
 // BD AND FOUR NUMBERS SEPARATED BY SLASHES.
 const text = bd.textContent.trim();
-if (!/^BD:\s*\d+\/\d+\/\d+\/\d+%$/.test(text)) {
-  no(`the bar reads ${JSON.stringify(text)} rather than BD and four numbers separated by slashes`);
-} else ok("BD, four numbers, slashes");
+if (!/^BD:\s*\d+\/\d+\/\d+$/.test(text)) {
+  no(`the bar reads ${JSON.stringify(text)} rather than BD and three numbers separated by slashes`);
+} else ok("BD, three numbers, slashes");
 
 // THE DETAIL IS ON HOVER AND NOT ON THE BAR.
 if (bd.getAttribute("title") !== "the detail for 1") {
@@ -88,7 +92,7 @@ const other = second.window.document.querySelector(".bd");
 if (!other || other.textContent.trim() === text) {
   no("the bar says the same over two different answers, so it is not drawing what it was handed");
 } else ok("two answers, two bars");
-if (other && other.textContent.trim() !== "BD: 5/6/7/8%") {
+if (other && other.textContent.trim() !== "BD: 5/6/7") {
   no(`the second bar reads ${JSON.stringify(other.textContent.trim())} rather than what it was handed`);
 } else ok("the second bar carries its own four numbers");
 

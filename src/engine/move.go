@@ -447,7 +447,7 @@ var skipDirs = map[string]bool{
 }
 
 func walkWork(root string, see func(abs, rel, name string)) {
-	_ = filepath.WalkDir(root, func(abs string, d os.DirEntry, err error) error {
+	_ = filepath.WalkDir(root, func(abs string, d os.DirEntry, err error) error { // a walk that cannot finish answers what it found
 		if err != nil {
 			return nil
 		}

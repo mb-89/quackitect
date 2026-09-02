@@ -1,82 +1,59 @@
-<!-- GENERATED. Edit the source named below, not this file. Source: doc/guidance/voice.md, doc/guidance/behaviour.md, doc/guidance/work-token.md -->
+<!-- GENERATED. Edit the source named below, not this file. Source: doc/guidance/driving-the-engine.md, doc/guidance/voice.md, doc/guidance/work-token.md -->
+
+# Driving the engine
+
+## Actionables
+
+1. Follow and trust the process. Take the step in hand rather than arguing with it. *
+2. Disagree and commit. If in doubt, mint a note about your concern and continue. *
+3. On errors, the engine provides remedies. Incorporate them in your way of working.
+4. Stop only with a reason named to the engine. On an interrupt, claim `asked`. *
+5. Do not kill yourself because you are afraid of dying. Test to find defects, not to feel covered. *
+6. Answer prompts before anything else with `se --answer "..."`. Copy the prompt verbatim. *
+7. Use the tool the engine gives you. *
+8. Change files with `se_apply`, naming the token on every write. *
+9. Run every shell command with `se_run`, naming the token. It could write. *
+10. A helper script goes in `.se/scratchpad/`. A standing check goes in `util/checks/`. *
 
 # Voice
 
 ## Actionables
 
-- Answer first. The conclusion is the first sentence.
-- Do it, then say what happened. Do not narrate what you are about to do.
-- Answer whole. Do not send a short message before a long piece of work.
-- One sentence, one idea. At most 25 words. A paragraph has at most 6 sentences.
-- Use the same word for the same thing every time.
-- Active voice. Name who acts.
-- Do not write words in capitals for emphasis.
-- Do not use "just" as a minimiser.
-- Know who reads the document before writing a line. Write what that reader
-  needs and nothing a different reader would need.
-- State a fact only if you own it. Otherwise name where it lives.
-- Name the door, not what is behind it: a document says a program exists and
-  answers `--help`, and nothing about its flags.
-- Say what is. Do not write what a document leaves out.
-- Derive a count and paste the command with its answer. Never retype one.
-- Mark an estimate as an estimate. Say "I do not know" when you do not know.
-- Do not say where you looked, how long it took, or how hard it was.
-
-# Behaviour
-
-## Actionables
-
-- Do what the token asks and nothing next to it. If the ask is ambiguous,
-  ask one question and wait.
-- Answer the person before anything else: `se --answer "<your answer>"`.
-- Basics first. Before a feature, write what it stands on into the token,
-  open each basic, and mint the missing one before the feature.
-- Read a file before you change it. Change one thing at a time. Leave every
-  other file as it was.
-- Stage the paths you edited, by name. Never stage everything.
-- Search the tree with the tool the engine's probe found. A recursive search
-  with the older tool is refused.
-- Stop only with a reason named to the engine. On an interrupt, claim
-  `asked`, say what you were doing, and stop.
-- Write the check before the work. Run it against the defect and watch it go
-  red. Then do the work and watch it go green.
-- A check that will not go red is the finding. Write it down and stop.
-- When a claim says every, count from the side that produces the set. Ask
-  the language for the members. If the count is larger than the work,
-  narrow the claim.
-- An observation names the test and what it said, never a line number.
-- Put both halves of a mechanism in the evidence. "Nothing yet, owed by X"
-  is an answer. Silence is not.
-- Fix the defect where it is, never in the caller that meets it.
-- A helper script goes in `.se/scratchpad/`. A standing check goes in
-  `util/checks/`.
-- Do not report work as done without the evidence that it is.
+1. One sentence, one idea. At most 25 words, preferably shorter. End lines on sentence ends. Avoid endlines within sentences.
+2. One paragraph, one idea. At most 6 sentences. One newline between paragraphs.
+3. Render enumerations and key:value pairs as lists, not as chained sentences.
+4. BLUF: bottom line upfront, progressive disclosure: details come later, at the discretion of the reader.
+5. Active voice. Name who acts. Present tense for everything except discussions. Past tense is allowed there.
+6. Stakeholder-specific communication: do not leak internals, write what is relevant to the audience. For details, see [[doc/guidance/stakeholders]].
+7. Use the same word for the same thing every time. For details, see [[doc/glossary]].
+8. In general, with few exceptions: say what is. Do not say what is not, the list is endless. *
+9. State a fact only if you own it. Otherwise name where it lives, via "For details, see [[link]]". *
+10. Mark an estimate as an estimate. Say "I do not know" when you do not know.
+11. Follow the technical English rules. For details, see [[doc/guidance/ASD-STE-100]].
+12. DRY: do not repeat yourself. SPOT: single point of truth for every datum.
+13. Private data: names, datetimes and unfiltered notes. They do not go into git.
+14. Do not put history in the current surface. It goes into git commit messages.
 
 # Work token
 
 ## Actionables
 
-- A token is the size of a ticket a good engineer writes by hand. Under 1,200
-  bytes as the aim, 2,500 as the limit, commands excepted.
-- `## detail` says what is asked or what is wrong, in 1 to 6 sentences. Keep
-  the owner's words where the owner decided. Name files, verbs and tests.
-- `## detail` carries no argument, no history, no measurement of the record,
-  and no account of who said what.
-- Related tokens are named in one line: `Related: wk-..., wk-...`.
-- `## done when` holds one criterion per line. Where a command can decide
-  it, the command is on the next line in backticks, and it passes on exit 0.
-- A criterion is one line. A command decides the sentence above it, and the
-  two are about one thing.
-- A criterion about a set walks the set and fails on the first miss. `rg -q`
-  over three files exits 0 when any one matches, so write the loop.
-- Ask whether a criterion is about the change or about the project, and
-  whether it is asserted once or forever. Pin a one-time assertion to what
-  existed when the work started.
-- A criterion is not a plan and not a restatement of the problem.
-- `## evidence: outcome` on an ended token says what was built, in 1 to 4
-  sentences naming files, tests and verbs.
-- No other heading. The engine rewrites the body from what it parsed, and
-  any other heading is lost on the next save.
-- A token's prose follows `voice.md`. No capitals for emphasis.
-- Before a feature token is worked, its detail names the basics it stands on
-  and where each one lives.
+### Writing one
+
+1. Write the problem in detail, and the answer in proposed action. *
+2. Reduce to the smallest case that still shows the problem. Cut what a reader does not need.
+3. Write acceptance criteria first. A criterion is decidable, and somebody answers it yes or no. *
+4. Where a command decides a criterion, write the command. Otherwise name who looks at what.
+5. A criterion is not a plan, and not the problem restated.
+6. Ask whether a criterion is about this change or about the project. Pin a one-time one. *
+7. One token, one piece of work. A done-when needing "and" is usually two tokens.
+8. Before a feature, name the basics it stands on. Mint the missing one first. *
+
+### Using one
+
+9. Do what the token asks and nothing next to it. If the ask is ambiguous, ask one question and wait.
+10. Write the check before the work. Watch it go red for the reason you expect.
+11. A check that will not go red is the finding. Write it down and stop.
+12. Put both halves of a mechanism in the evidence. "Nothing yet, owed by X" is an answer.
+13. Report work as done only with the evidence that it is.
+14. A checklist carries institutional knowledge. Answer each line rather than ticking it. *

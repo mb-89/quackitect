@@ -17,7 +17,8 @@ import (
 //
 // So the sentence here is the guidance's own, and this refuses when it is not.
 func TestTheToolSaysWhatTheGuidanceSays(t *testing.T) {
-	path := filepath.Join("..", "..", "doc", "guidance", "behaviour.md")
+	t.Parallel()
+	path := filepath.Join("..", "..", "doc", "guidance", "driving-the-engine.md")
 	b, err := os.ReadFile(path)
 	if err != nil {
 		t.Fatalf("%s cannot be read, so this guards nothing: %v", path, err)

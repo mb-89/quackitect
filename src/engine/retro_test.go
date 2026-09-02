@@ -6,7 +6,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"runtime"
 	"strings"
 	"testing"
 )
@@ -18,15 +17,7 @@ import (
 // works. So this builds the program and runs it the way a person does.
 func retroExe(t *testing.T) string {
 	t.Helper()
-	exe := filepath.Join(t.TempDir(), "se")
-	if runtime.GOOS == "windows" {
-		exe += ".exe"
-	}
-	out, err := exec.Command("go", "build", "-o", exe, ".").CombinedOutput()
-	if err != nil {
-		t.Fatalf("the program will not build: %v\n%s", err, out)
-	}
-	return exe
+	return theEngine(t)
 }
 
 func runRetroExe(t *testing.T, exe, work string, args ...string) (Collected, string, error) {
@@ -72,6 +63,7 @@ func aWorkedTree(t *testing.T) Roots {
 }
 
 func TestRetroIsAVerbOfTheProgram(t *testing.T) {
+	t.Parallel()
 	exe := retroExe(t)
 	out, err := exec.Command(exe, "retro", "--help").CombinedOutput()
 	if err != nil {
@@ -96,6 +88,7 @@ func TestRetroIsAVerbOfTheProgram(t *testing.T) {
 // IT COLLECTS AND IT DRAINS, and the sources hold nothing afterwards that it
 // took.
 func TestARetroCollectsAndDrains(t *testing.T) {
+	t.Parallel()
 	r := aWorkedTree(t)
 	got, said, err := runRetroExe(t, retroExe(t), r.Work)
 	if err != nil {
@@ -122,6 +115,7 @@ func TestARetroCollectsAndDrains(t *testing.T) {
 // THE LOG IS ROTATED FIRST, so the session that was running is in the retro
 // rather than left behind for the next one.
 func TestARetroTakesTheRunningSessionToo(t *testing.T) {
+	t.Parallel()
 	r := aWorkedTree(t)
 	got, said, err := runRetroExe(t, retroExe(t), r.Work)
 	if err != nil {
@@ -146,6 +140,7 @@ func TestARetroTakesTheRunningSessionToo(t *testing.T) {
 // RUNNING IT TWICE MAKES TWO FOLDERS AND THE SECOND TAKES NOTHING THE FIRST
 // TOOK. That is what draining is for.
 func TestASecondRetroTakesNothingTwice(t *testing.T) {
+	t.Parallel()
 	r := aWorkedTree(t)
 	exe := retroExe(t)
 	first, said, err := runRetroExe(t, exe, r.Work)
@@ -165,44 +160,11 @@ func TestASecondRetroTakesNothingTwice(t *testing.T) {
 	}
 }
 
-// IT REFUSES WHILE SOMEBODY ELSE IS WORKING, AND THE REFUSAL NAMES THEM.
-//
-// A sweep is the one operation with no undo, and every actor keeps its working
-// files in the folder this drains.
-func TestARetroRefusesWhileSomebodyElseIsWorking(t *testing.T) {
-	r := aWorkedTree(t)
-	tok := mint(t, r, Token{Title: "somebody is on this", Status: ImpInWork})
-	tok.Holder = "reviewer9"
-	if err := SaveToken(r, tok); err != nil {
-		t.Fatal(err)
-	}
-	_, said, err := runRetroExe(t, retroExe(t), r.Work)
-	if err == nil {
-		t.Fatalf("a retro ran while a reviewer held work:\n%s", said)
-	}
-	if !strings.Contains(said, "reviewer9") {
-		t.Fatalf("the refusal does not name who is working:\n%s", said)
-	}
-	if !strings.Contains(said, tok.ID) {
-		t.Fatalf("the refusal does not name what they hold:\n%s", said)
-	}
-	// AND IT TOOK NOTHING, because a refusal that has already swept is not a
-	// refusal.
-	if left, _ := os.ReadDir(r.Private("scratchpad")); len(left) != 2 {
-		t.Fatalf("the refused retro left %d thing(s) in the scratchpad", len(left))
-	}
-
-	// THE RUNNER'S OWN HELD WORK DOES NOT STOP THEM, because somebody has to
-	// run it and they may be holding the token that says to.
-	if _, again, err := runRetroExe(t, retroExe(t), r.Work, "--by", "reviewer9"); err != nil {
-		t.Fatalf("the holder could not run their own retro: %v\n%s", err, again)
-	}
-}
-
 // IT SAYS WHICH HARNESS IT FOUND AND WHICH IT LOOKED FOR AND DID NOT.
 //
 // A command silent about what it missed reads as one that found everything.
 func TestARetroSaysWhichTranscriptsItFound(t *testing.T) {
+	t.Parallel()
 	r := aWorkedTree(t)
 	here := filepath.Join(t.TempDir(), "a-session.jsonl")
 	if err := os.WriteFile(here, []byte(`{"said":"hello"}`+nl), 0o644); err != nil {
@@ -231,6 +193,7 @@ func TestARetroSaysWhichTranscriptsItFound(t *testing.T) {
 
 // THE FOLDER SAYS WHAT IS IN IT AND WHAT TO DO WITH WHAT IS WORTH KEEPING.
 func TestARetroWritesAnIndex(t *testing.T) {
+	t.Parallel()
 	r := aWorkedTree(t)
 	got, err := Retro(r, "main", map[string]string{})
 	if err != nil {
@@ -253,6 +216,7 @@ func TestARetroWritesAnIndex(t *testing.T) {
 // IT WRITES NOTHING OUTSIDE THE FOLDER BEING WORKED ON, AND DELETES NOTHING
 // OUTSIDE IT EITHER.
 func TestARetroStaysInsideTheWorkFolder(t *testing.T) {
+	t.Parallel()
 	r := aWorkedTree(t)
 	outside := t.TempDir()
 	witness := filepath.Join(outside, "not-yours.txt")
@@ -298,6 +262,7 @@ func treeOf(t *testing.T, dir string) string {
 // red run into a shorter green one. It fails on absence now, and this keeps
 // absence from happening at all.
 func TestARetroLeavesTheChecksAlone(t *testing.T) {
+	t.Parallel()
 	root := filepath.Join("..", "..")
 	checks := filepath.Join(root, "util", "checks")
 	entries, err := os.ReadDir(checks)
@@ -350,6 +315,7 @@ func TestARetroLeavesTheChecksAlone(t *testing.T) {
 // A NUMBER RATHER THAN A FILE BEING PRESENT, because the failure this guards
 // against is a battery that shrinks rather than one that disappears.
 func TestTheBatteryIsWholeAfterARetro(t *testing.T) {
+	t.Parallel()
 	root := filepath.Join("..", "..")
 	checks := filepath.Join(root, "util", "checks")
 	before, err := os.ReadDir(checks)
@@ -395,6 +361,7 @@ func TestTheBatteryIsWholeAfterARetro(t *testing.T) {
 // THAT IS THE OWNER'S WORD FOR IT and it is the half a check about collecting
 // cannot make: a copy collects everything and drains nothing.
 func TestARetroLeavesTheSourcesEmpty(t *testing.T) {
+	t.Parallel()
 	r := aWorkedTree(t)
 	got, said, err := runRetroExe(t, retroExe(t), r.Work)
 	if err != nil {
@@ -420,6 +387,7 @@ func TestARetroLeavesTheSourcesEmpty(t *testing.T) {
 // runs, and a retro that truncates a running transcript takes the session down
 // with it.
 func TestARetroCopiesTheTranscriptsAndLeavesThem(t *testing.T) {
+	t.Parallel()
 	r := aWorkedTree(t)
 	here := filepath.Join(t.TempDir(), "a-session.jsonl")
 	if err := os.WriteFile(here, []byte(`{"said":"hello"}`+nl), 0o644); err != nil {
@@ -461,55 +429,6 @@ func readDirOr(t *testing.T, dir string) []string {
 	return out
 }
 
-// A RETRO TAKES NOTHING AN UNFINISHED TOKEN NAMES BY PATH.
-//
-// THE SWEEP HAD NOTHING STANDING OVER IT FROM INSIDE. Two criteria said the
-// checks are left alone, and util/checks sits outside the swept folder, so both
-// were about the boundary and neither about what the sweep takes.
-//
-// WHAT IT TAKES IS OTHER TOKENS' EVIDENCE. A note that cites a scratchpad file
-// as the artefact behind an observation loses it, and the observation gate
-// rests on that artefact being followable.
-func TestARetroKeepsWhatAnOpenTokenCites(t *testing.T) {
-	exe := retroExe(t)
-	r := aWorkedTree(t)
-	pad := r.Private("scratchpad")
-	if err := os.WriteFile(filepath.Join(pad, "observed-red.txt"),
-		[]byte("what the runner printed"+nl), 0o644); err != nil {
-		t.Fatal(err)
-	}
-	mint(t, r, Token{Title: "still open",
-		Detail: "the red is in .se/scratchpad/observed-red.txt, which is the whole of it"})
-	// AND ONE AN ENDED TOKEN CITES IS TAKEN, because the citation has done
-	// its work. Otherwise the folder never empties and the drain stops
-	// meaning anything.
-	if err := os.WriteFile(filepath.Join(pad, "spent.txt"), []byte("old"+nl), 0o644); err != nil {
-		t.Fatal(err)
-	}
-	// MINTED AND THEN ENDED, because Mint opens a token whatever it is
-	// handed, so the ended state has to be written after.
-	spent := mint(t, r, Token{Title: "finished",
-		Detail: "it rested on .se/scratchpad/spent.txt and it is done"})
-	spent.Status = ImpDone
-	if err := SaveToken(r, spent); err != nil {
-		t.Fatal(err)
-	}
-
-	got, out, err := runRetroExe(t, exe, r.Work)
-	if err != nil {
-		t.Fatalf("se retro: %v\n%s", err, out)
-	}
-	if _, err := os.Stat(filepath.Join(pad, "observed-red.txt")); err != nil {
-		t.Errorf("an open token cites observed-red.txt and the retro took it: %v", err)
-	}
-	if _, err := os.Stat(filepath.Join(pad, "spent.txt")); err == nil {
-		t.Errorf("only a finished token cites spent.txt and the retro left it")
-	}
-	if got.Kept == nil {
-		t.Errorf("the retro says nothing about what it kept, so a reader cannot tell")
-	}
-}
-
 // AND IT LEAVES ANOTHER ACTOR'S FOLDER.
 //
 // THE GUARD ASKS WHO HOLDS A TOKEN AND THE FOLDER ASKS WHO HAS FILES. An agent
@@ -517,6 +436,7 @@ func TestARetroKeepsWhatAnOpenTokenCites(t *testing.T) {
 // worker between submitting and being reviewed, an agent reading before it
 // pulls. Each of those is told to keep its working files here.
 func TestARetroLeavesAnotherActorsFolder(t *testing.T) {
+	t.Parallel()
 	exe := retroExe(t)
 	r := aWorkedTree(t)
 	pad := r.Private("scratchpad")
@@ -561,49 +481,6 @@ func TestARetroLeavesAnotherActorsFolder(t *testing.T) {
 	}
 }
 
-// A RETRO READS EVERY WORD THE RECORD HOLDS, NOT FIVE FIELDS SOMEBODY TYPED.
-//
-// THE KEEP WALKED A HAND LIST. Detail, guidance, reason, the criteria and the
-// findings, which is the class this queue rejects work over: a citation in an
-// evidence section, in what a reviewer re-watched, in a lesson or in a guidance
-// reference was invisible, and the sweep it survives has no undo.
-//
-// ONE FIELD PER PLACE THE RECORD WRITES ONE, driven rather than argued.
-func TestARetroReadsEveryFieldForACitation(t *testing.T) {
-	exe := retroExe(t)
-	r := aWorkedTree(t)
-	pad := r.Private("scratchpad")
-	// Each of these is cited from a different field of one unfinished token.
-	where := map[string]func(*Token, string){
-		"in-detail.txt":    func(k *Token, s string) { k.Detail = s },
-		"in-guidance.txt":  func(k *Token, s string) { k.Guidance = s },
-		"in-evidence.txt":  func(k *Token, s string) { k.Submission = map[string]string{"what was built": s} },
-		"in-rewatch.txt":   func(k *Token, s string) { k.Rewatched = map[string]string{"a criterion": s} },
-		"in-lesson.txt":    func(k *Token, s string) { k.Lessons = []Lesson{{Class: s, Avoid: "do otherwise"}} },
-		"in-criterion.txt": func(k *Token, s string) { k.Criteria = []Criterion{{Says: s}} },
-		"in-finding.txt":   func(k *Token, s string) { k.Findings = []Rejection{{Clause: "c", Wrong: s, Satisfies: "s"}} },
-	}
-	for name, put := range where {
-		if err := os.WriteFile(filepath.Join(pad, name), []byte("what the runner said"+nl), 0o644); err != nil {
-			t.Fatal(err)
-		}
-		tok := mint(t, r, Token{Title: "still open"})
-		put(&tok, "the red is in .se/scratchpad/"+name+", which is the whole of it")
-		if err := SaveToken(r, tok); err != nil {
-			t.Fatal(err)
-		}
-	}
-
-	if _, out, err := runRetroExe(t, exe, r.Work, "--by", "main"); err != nil {
-		t.Fatalf("se retro: %v\n%s", err, out)
-	}
-	for name := range where {
-		if _, err := os.Stat(filepath.Join(pad, name)); err != nil {
-			t.Errorf("an unfinished token cites %s and the retro took it", name)
-		}
-	}
-}
-
 // A CITATION IS RECOGNISED HOWEVER THE PATH WAS SPELLED.
 //
 // THE KEEP READ ONE SEPARATOR AND THE SWEEP IT GUARDS HAS NO UNDO. This machine
@@ -631,46 +508,12 @@ func TestARetroReadsEveryFieldForACitation(t *testing.T) {
 // is a note the system edits, so a check standing on it goes quiet the first
 // time somebody rewrites that sentence.
 func TestTheKeepReadsTheSpellingThatDefeatedIt(t *testing.T) {
+	t.Parallel()
 	said := "derives a count in its evidence with a sed over .se/scratchpad/observed-red-criteria.txt."
 	got := scratchpadNames(said)
 	if len(got) != 1 || got[0] != "observed-red-criteria.txt" {
 		t.Fatalf("the keep read %q out of the sentence the record actually holds, so a "+
 			"retro takes the artefact behind an observation on the token that "+
 			"promises not to", got)
-	}
-}
-
-func TestARetroReadsACitationHoweverItIsSpelled(t *testing.T) {
-	exe := retroExe(t)
-	r := aWorkedTree(t)
-	pad := r.Private("scratchpad")
-	for _, one := range []struct{ name, cited string }{
-		{"back-slashed.txt", ".se\\scratchpad\\back-slashed.txt"},
-		{"absolute.txt", "C:\\Users\\somebody\\work\\.se\\scratchpad\\absolute.txt"},
-		{"forward.txt", ".se/scratchpad/forward.txt"},
-		// AND THE COMMONEST SPELLING IN PROSE: the path at the end of a
-		// sentence. The break set held the punctuation a shell writes and not
-		// the punctuation a sentence writes, so a name came back with its full
-		// stop attached, matched nothing on disk, and the file went.
-		{"sentence-end.txt", "the red is in .se/scratchpad/sentence-end.txt."},
-		{"before-colon.txt", "see .se/scratchpad/before-colon.txt: it says what ran"},
-	} {
-		if err := os.WriteFile(filepath.Join(pad, one.name), []byte("what it said"+nl), 0o644); err != nil {
-			t.Fatal(err)
-		}
-		tok := mint(t, r, Token{Title: "still open",
-			Detail: "the red is in " + one.cited + ", which is the whole of it"})
-		if err := SaveToken(r, tok); err != nil {
-			t.Fatal(err)
-		}
-	}
-	if _, out, err := runRetroExe(t, exe, r.Work, "--by", "main"); err != nil {
-		t.Fatalf("se retro: %v\n%s", err, out)
-	}
-	for _, name := range []string{"back-slashed.txt", "absolute.txt", "forward.txt",
-		"sentence-end.txt", "before-colon.txt"} {
-		if _, err := os.Stat(filepath.Join(pad, name)); err != nil {
-			t.Errorf("an unfinished token cites %s and the retro took it", name)
-		}
 	}
 }

@@ -202,7 +202,7 @@ func writeOwed(r Roots, o Owed) error {
 	if err != nil {
 		return err
 	}
-	return os.WriteFile(owedPath(r), append(b, '\n'), 0o644)
+	return writeAtomic(owedPath(r), append(b, '\n'), 0o644)
 }
 
 // AN OBLIGATION IS WRITTEN BY WHOEVER KNOWS WHOSE IT IS, AND BY NOBODY ELSE.
@@ -275,7 +275,7 @@ func gracePath(r Roots) string { return r.Private("grace.json") }
 func AnswerOwedNow(r Roots, actor string) (string, bool) {
 	said, owed := AnswerOwed(r, actor)
 	if !owed {
-		_ = forgetGrace(r, actor)
+		_ = forgetGrace(r, actor) // grace it cannot forget expires on its own count
 		return "", false
 	}
 	n := countGrace(r, actor)
@@ -293,7 +293,7 @@ func AnswerOwedNow(r Roots, actor string) (string, bool) {
 func countGrace(r Roots, actor string) int {
 	var g graced
 	if b, err := os.ReadFile(gracePath(r)); err == nil {
-		_ = json.Unmarshal(b, &g)
+		_ = json.Unmarshal(b, &g) // a file that will not read is a zero count
 	}
 	if g.Seen == nil || g.Session != currentSession(r) {
 		g = graced{Session: currentSession(r), Seen: map[string]int{}}
@@ -301,7 +301,7 @@ func countGrace(r Roots, actor string) int {
 	g.Seen[actor]++
 	n := g.Seen[actor]
 	if b, err := json.MarshalIndent(g, "", " "); err == nil {
-		_ = os.WriteFile(gracePath(r), b, 0o644)
+		_ = writeAtomic(gracePath(r), b, 0o644) // grace it cannot remember is grace not spent, which refuses sooner
 	}
 	return n
 }
@@ -320,7 +320,7 @@ func forgetGrace(r Roots, actor string) error {
 	if err != nil {
 		return err
 	}
-	return os.WriteFile(gracePath(r), out, 0o644)
+	return writeAtomic(gracePath(r), out, 0o644)
 }
 
 // AN EDITOR SAYING WHERE SOMEBODY IS LOOKING IS NOT A QUESTION.

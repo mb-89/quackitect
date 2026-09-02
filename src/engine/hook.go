@@ -104,7 +104,7 @@ func isAnswering(in hookIn) bool {
 		return true
 	}
 	var ti toolInput
-	_ = json.Unmarshal(in.ToolInput, &ti)
+	_ = json.Unmarshal(in.ToolInput, &ti) // a call whose input will not read names no file, and the caller checks that
 	return runsTheEngineWith(ti.Command, "--answer")
 }
 
@@ -368,7 +368,7 @@ func runHook(args []string) {
 	// THE GUARD CLEARS IT, BECAUSE ONLY THE GUARD KNOWS WHO ANSWERED. The
 	// answer verb runs as a program with no idea which agent called it.
 	if in.Event == "PostToolUse" && isAnswering(in) {
-		_ = TheyWereAnswered(roots, actor)
+		_ = TheyWereAnswered(roots, actor) // an answer it cannot clear is cleared on the next call
 	}
 	if in.Event == "PreToolUse" || in.Event == "PostToolUse" || in.Event == "Stop" {
 		CopyWhatWasHeard(roots, in.Transcript, log, actor)
@@ -418,7 +418,7 @@ func runHook(args []string) {
 		StartWhereItIs(roots, in.Transcript)
 		// A PROMPT GOING IN FLIPS THE FLAG, here for a prompt that starts a
 		// turn and in the said verb for one written into a running turn.
-		_ = TheyAsked(roots, actor, in.Prompt+in.UserPrompt)
+		_ = TheyAsked(roots, actor, in.Prompt+in.UserPrompt) // the guard answers whether or not it can note the question
 	case "SessionStart":
 		// A session that resumes after a compaction starts with nothing read.
 		if in.Source == "compact" || in.Source == "clear" {
@@ -478,7 +478,7 @@ func runHook(args []string) {
 // pathOf is the file a call is about, under whichever name the harness used.
 func pathOf(in hookIn) string {
 	var ti toolInput
-	_ = json.Unmarshal(in.ToolInput, &ti)
+	_ = json.Unmarshal(in.ToolInput, &ti) // a call whose input will not read names no file, and the caller checks that
 	if ti.FilePath != "" {
 		return ti.FilePath
 	}
@@ -509,7 +509,7 @@ func decidePreToolUse(roots Roots, cfg Config, emergency Emergency, log *Log, in
 	SpendClaim(roots, actor)
 
 	var ti toolInput
-	_ = json.Unmarshal(in.ToolInput, &ti)
+	_ = json.Unmarshal(in.ToolInput, &ti) // a call whose input will not read names no file, and the caller checks that
 	path := ti.FilePath
 	if path == "" {
 		path = ti.Path
@@ -577,6 +577,40 @@ func decidePreToolUse(roots Roots, cfg Config, emergency Emergency, log *Log, in
 			denyToolUse("This text breaks rules the voice check can see. Nothing is wrong with the file: " +
 				"fix these and write it again.\n" + strings.Join(lines, "\n"))
 			return
+		}
+	}
+
+	// A NOTE IS HELD TO ITS SCHEMA AT THE WRITE, NOT AFTERWARDS.
+	//
+	// The editor gets this from the language server as it types. An agent has
+	// no editor, so without this it writes, moves on, and finds out at the next
+	// lint, which is a round trip per mistake.
+	//
+	// EVERY DEPARTURE AT ONCE. ValidateNote answers all of them rather than the
+	// first, so one refusal carries the whole list and the agent fixes them
+	// together instead of one call at a time.
+	//
+	// A FILE THAT NAMES NO KIND IS NOT A NOTE and is left alone. So is one
+	// whose schema cannot be read: a checker that cannot run must not stop
+	// somebody working, the same as the voice rules above.
+	if writes[in.ToolName] && isProse(path) && ti.Content != "" {
+		if kind := kindOf(ti.Content); kind != "" {
+			if schema, err := LoadSchema(roots.Method, kind); err != nil {
+				record(log, "engine", "error", actor, "the schema could not be read", No(),
+					map[string]any{"reason": err.Error(), "kind": kind})
+			} else if found := ValidateNote(schema, ti.Content, roots.Method); len(found) > 0 {
+				lines := make([]string, 0, len(found))
+				for _, d := range found {
+					lines = append(lines, fmt.Sprintf("  line %d: %s", d.Line, d.Says))
+				}
+				record(log, "engine", "refusal", actor,
+					fmt.Sprintf("write refused: %d schema findings in %s", len(found), filepath.Base(path)), No(),
+					map[string]any{"rule": "schema", "path": path, "kind": kind, "findings": lines})
+				denyToolUse("This note does not match the schema its kind names. " +
+					"Every departure is below, so fix them together and write it again.\n" +
+					strings.Join(lines, "\n"))
+				return
+			}
 		}
 	}
 
@@ -651,7 +685,7 @@ func rememberCall(r Roots, id, said string) {
 		calls = map[string]string{id: said}
 	}
 	if b, err := json.Marshal(calls); err == nil {
-		_ = os.WriteFile(callPath(r), b, 0o644)
+		_ = writeAtomic(callPath(r), b, 0o644) // the guard answers whether or not it can count the call
 	}
 }
 
@@ -664,7 +698,7 @@ func takeCall(r Roots, id string) string {
 	if said != "" {
 		delete(calls, id)
 		if b, err := json.Marshal(calls); err == nil {
-			_ = os.WriteFile(callPath(r), b, 0o644)
+			_ = writeAtomic(callPath(r), b, 0o644) // the guard answers whether or not it can count the call
 		}
 	}
 	return said
@@ -699,7 +733,7 @@ func underPrivate(roots Roots, path string) bool {
 func copyOfAPrivateOriginal(roots Roots, content string) (string, bool) {
 	want := sha256.Sum256([]byte(content))
 	var found string
-	_ = filepath.Walk(roots.Private(), func(p string, info os.FileInfo, err error) error {
+	_ = filepath.Walk(roots.Private(), func(p string, info os.FileInfo, err error) error { // a walk that cannot finish answers what it found
 		if err != nil || info.IsDir() || found != "" {
 			return nil
 		}

@@ -18,6 +18,7 @@ import (
 // The rule is in doc/guidance/behaviour.md and in all three projections: a
 // check that finds nothing to check refuses.
 func TestALinterThatCannotReadTheDeclarationRefuses(t *testing.T) {
+	t.Parallel()
 	for _, how := range []struct {
 		name  string
 		write func(path string)
@@ -31,7 +32,7 @@ func TestALinterThatCannotReadTheDeclarationRefuses(t *testing.T) {
 			r := guidanceTree(t)
 			how.write(filepath.Join(r.Method, "util", "parameters.json"))
 
-			for what, found := range map[string][]Finding3{
+			for what, found := range map[string][]Finding{
 				"LintLimits": LintLimits(r),
 				"LintIcons":  LintIcons(r),
 			} {
@@ -49,8 +50,9 @@ func TestALinterThatCannotReadTheDeclarationRefuses(t *testing.T) {
 
 // And with a declaration it can read, it says nothing about reading it.
 func TestALinterThatCanReadSaysNothingAboutIt(t *testing.T) {
+	t.Parallel()
 	r := guidanceTree(t)
-	for what, found := range map[string][]Finding3{
+	for what, found := range map[string][]Finding{
 		"LintLimits": LintLimits(r),
 		"LintIcons":  LintIcons(r),
 	} {
@@ -75,6 +77,7 @@ func TestALinterThatCanReadSaysNothingAboutIt(t *testing.T) {
 // drawn around what was touched is the shape this project keeps finding, so
 // the list of verbs comes from the program rather than from this test.
 func TestAVerbRefusesAnArgumentItWillNotUse(t *testing.T) {
+	t.Parallel()
 	if len(Verbs()) == 0 {
 		t.Fatal("the program declares no verbs, so this guards nothing")
 	}
@@ -95,6 +98,7 @@ func TestAVerbRefusesAnArgumentItWillNotUse(t *testing.T) {
 // nothing parses its own flags beside it, so this refuses a second parse
 // anywhere but in the door itself.
 func TestNothingParsesItsOwnFlags(t *testing.T) {
+	t.Parallel()
 	here, err := os.ReadDir(".")
 	if err != nil {
 		t.Fatal(err)

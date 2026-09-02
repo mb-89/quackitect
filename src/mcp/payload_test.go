@@ -21,6 +21,7 @@ import (
 // of seven keys beside a struct that declares more. So the list is held against
 // the struct rather than read once and trusted.
 func TestThePullDoorCarriesEveryFieldThePayloadHas(t *testing.T) {
+	t.Parallel()
 	b, err := os.ReadFile(filepath.Join("..", "engine", "pull.go"))
 	if err != nil {
 		t.Fatalf("the engine's payload cannot be read, so this guards nothing: %v", err)

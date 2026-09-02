@@ -11,6 +11,7 @@ import (
 // build run by hand replaces one name and leaves the other where it was, and
 // then a person reads one build while the guards run another.
 func TestTwoNamesAreOneFileUntilSomebodyBuildsByHand(t *testing.T) {
+	t.Parallel()
 	bin := t.TempDir()
 	plain := filepath.Join(bin, "se")
 	suffixed := filepath.Join(bin, "se.exe")
@@ -60,6 +61,7 @@ func TestTwoNamesAreOneFileUntilSomebodyBuildsByHand(t *testing.T) {
 // A platform where the two names are the same string has nothing to come
 // apart, and this is how that reads.
 func TestOneNameIsNeverApartFromItself(t *testing.T) {
+	t.Parallel()
 	if _, _, split := apart("/x/.bin/se", "/x/.bin/se"); split {
 		t.Fatal("a name was found to differ from itself")
 	}

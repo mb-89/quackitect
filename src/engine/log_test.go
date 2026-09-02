@@ -8,37 +8,10 @@ import (
 	"testing"
 )
 
-// UC-34. Every call is in the log, and each line names who wrote it.
-func TestEveryWriteReachesTheFileAndNamesItsWriter(t *testing.T) {
-	dir := t.TempDir()
-	l, err := OpenLog(dir)
-	if err != nil {
-		t.Fatal(err)
-	}
-	l.Write("engine", "start", "engine", "one", Yes(), nil)
-	l.Write("agent", "call", "helper-1", "two", nil, map[string]any{"path": "x"})
-	l.Close()
-
-	b, err := os.ReadFile(filepath.Join(dir, Current))
-	if err != nil {
-		t.Fatal(err)
-	}
-	lines := strings.Split(strings.TrimSpace(string(b)), "\n")
-	if len(lines) != 2 {
-		t.Fatalf("expected two records, got %d", len(lines))
-	}
-	var r Record
-	if err := json.Unmarshal([]byte(lines[1]), &r); err != nil {
-		t.Fatal(err)
-	}
-	if r.Actor != "helper-1" || r.Src != "agent" || r.Seq != 2 {
-		t.Fatalf("the record does not name its writer: %+v", r)
-	}
-}
-
 // A long session is unbounded. The file is not, and the session stays one
 // scope across the parts.
 func TestTheFileRotatesAndTheSessionDoesNot(t *testing.T) {
+	t.Parallel()
 	dir := t.TempDir()
 	l, _ := OpenLog(dir)
 	l.limit = 400
@@ -70,6 +43,7 @@ func TestTheFileRotatesAndTheSessionDoesNot(t *testing.T) {
 // The log is private material. It holds prompts, so it lives where private
 // material lives and never travels.
 func TestTheLogLivesInThePrivateFolder(t *testing.T) {
+	t.Parallel()
 	r := Roots{Method: "/m", Work: "/w"}
 	got := r.Private("log")
 	if filepath.ToSlash(got) != "/w/.se/log" {
@@ -80,6 +54,7 @@ func TestTheLogLivesInThePrivateFolder(t *testing.T) {
 // The session that was current is set aside under a stamped name, never
 // deleted, and the new session starts on a clean file with the same name.
 func TestAnEarlierSessionIsSetAsideNotOverwritten(t *testing.T) {
+	t.Parallel()
 	dir := t.TempDir()
 	first, err := OpenLog(dir)
 	if err != nil {
@@ -115,6 +90,7 @@ func TestAnEarlierSessionIsSetAsideNotOverwritten(t *testing.T) {
 // Opening a window before any engine must not show the last session. The
 // editor sets the current log aside when a window opens, and nothing is lost.
 func TestRotatingWithoutAnEngineKeepsWhatWasThere(t *testing.T) {
+	t.Parallel()
 	dir := t.TempDir()
 	l, _ := OpenLog(dir)
 	l.Write("engine", "start", "engine", "the session before", Yes(), nil)

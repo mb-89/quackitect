@@ -19,156 +19,31 @@ import (
 // ledger makes that a lock. It is also what a person reads six months later,
 // and a person reads a file better than a line in a stream.
 
-// THE SIX STATES. A token is in exactly one of them.
+// A STATE IS A WORD THE PROCESS OWNS.
 //
-// BACKLOGGED IS NOT OPEN, and that is the whole point of it. A note somebody
-// asked for is work that exists, is visible, and is not being done. It never
-// reaches the queue and it never holds anybody from stopping. Draining the
-// backlog is a separate act, and it is somebody's decision rather than a
-// consequence of having written the note down.
+// The engine held eleven of them and named every one: backlogged, spec_open,
+// imp_in_review, and so on down. That was a second process, written in Go,
+// which every real process then had to be bent into. Now the states are in
+// src/processes/<name>.process.yaml, the engine reads them from there, and a
+// process with two states carries two.
 //
-// Submitted and in review are separate because a reviewer has to be able to
-// take one back. Without the split there is nothing to reclaim from a reviewer
-// that died holding it.
-type Status string
+// SO THE TYPE IS A STRING AND IT STAYS ONE. Nothing here decides which words
+// are legal, because the file the token names decides that, and validation
+// reads that file rather than a list beside it.
+type Status = string
 
-// TWO HALVES, ONE SHAPE. Each half runs open, in work, submitted, in review, so
-// somebody who has learned one half has learned the other and the engine
-// carries one set of rules rather than two.
-//
-// THERE IS NO SPEC DONE, because a spec that is agreed IS implementation open.
-//
-// ELEVEN STATES. The owner named ten and the eleventh is aborted, which is the
-// engine's: the owner named where work goes and this is where a dropped token
-// stops.
-const (
-	Backlogged Status = "backlogged" // minted, and not work anybody is asked to do yet
-
-	// A TOKEN CARRIES WHAT DONE MEANS BEFORE ANYBODY WORKS ON IT.
-	//
-	// The reviewer kept telling the worker it had not done the work, and that
-	// is a fault in the token rather than in the review. Nothing said what done
-	// meant, so nothing could be checked before the submission and the review
-	// became the first place anybody looked.
-	SpecOpen      Status = "spec_open"      // nobody has picked the drafting up
-	SpecInWork    Status = "spec_in_work"   // a drafter holds it
-	SpecSubmitted Status = "spec_submitted" // the draft is in, and it waits for a reviewer
-	SpecInReview  Status = "spec_in_review" // a reviewer holds the draft
-
-	ImpOpen      Status = "imp_open"      // the draft is agreed. Nobody has picked it up
-	ImpInWork    Status = "imp_in_work"   // an actor holds it
-	ImpSubmitted Status = "imp_submitted" // the evidence is in, and it waits for a reviewer
-	ImpInReview  Status = "imp_in_review" // a reviewer holds it
-	ImpDone      Status = "imp_done"      // finished, with a disposition saying how
-
-	// AN ABORT COMES OFF ANY STATE AND CARRIES WHY. It is where a dropped token
-	// stops, and dropped already refuses to be without a reason. Deferring is
-	// not an ending at all: a deferred token goes back to backlogged.
-	Aborted Status = "aborted"
-)
-
-// THE STATES, IN THE ORDER WORK PASSES THROUGH THEM. One list, so an abort
-// walks the engine's own rather than one written out beside it.
-func States() []Status {
-	return []Status{Backlogged,
-		SpecOpen, SpecInWork, SpecSubmitted, SpecInReview,
-		ImpOpen, ImpInWork, ImpSubmitted, ImpInReview, ImpDone, Aborted}
-}
-
-// Drafting answers whether a token is in the spec half of the machine, which is
-// where a draft is being written or read rather than work being done.
-//
-// ONE PLACE, BECAUSE THE HALVES WERE TESTED BY NAMING THEIR MEMBERS. A test for
-// spec_open or spec_in_work is a hand list of two over a half that has four.
-func (s Status) Drafting() bool {
-	return s == SpecOpen || s == SpecInWork || s == SpecSubmitted || s == SpecInReview
-}
-
-// Ended answers whether a token has stopped, either way.
-func (s Status) Ended() bool { return s == ImpDone || s == Aborted }
-
-// WHERE A DISPOSITION LANDS. A state and a disposition are two fields and they
-// stay two: the state says which half of the machine a token ended in, the
-// disposition says what became of it.
-//
-//	done      imp_done   stays as it is
-//	became    imp_done   stays, with its successors
-//	dropped   aborted    stays, and its reason is the abort's
-//
-// An abort is where a dropped token stops rather than a fourth exit, and
-// dropped already refuses to be without a reason.
-func EndsAt(d Disposition) Status {
-	if d == Dropped {
-		return Aborted
-	}
-	return ImpDone
-}
-
-// WHAT A NAME USED TO BE. Every token already on disk keeps what it says, and
-// this is what reads it. No note is rewritten by hand.
-//
-// spec_in_review keeps its name, so it is not here.
-var wasCalled = map[Status]Status{
-	"spec":       SpecOpen,
-	"open":       ImpOpen,
-	"in_work":    ImpInWork,
-	"submitted":  ImpSubmitted,
-	"in_review":  ImpInReview,
-	"closed":     ImpDone,
-	"spec_ready": SpecSubmitted,
-}
-
-// ReadStatus answers the state a note names, under whatever name it used.
-func ReadStatus(said string) Status {
-	s := Status(said)
-	if now, older := wasCalled[s]; older {
-		return now
-	}
-	return s
-}
-
-// THE SCOPE. The barrier a token sits behind, and the one thing Level 1 reads
-// from it is who may close.
-//
-// Multi-step and single-step behave identically here. That is the point rather
-// than a gap: if they behaved differently, Level 1 would know what a step is.
-// It carries the word and hands the meaning upward.
-type Scope string
-
-const (
-	MultiStep  Scope = "multi-step"  // a barrier supplied from above
-	SingleStep Scope = "single-step" // a barrier supplied from above
-	InToken    Scope = "token"       // inside another token: a step of somebody's own breakdown
-)
-
-// The word a drop uses to say "no bucket". A person can type it, and a group
-// with no name answers to it.
-const Cleared = ""
-
-// A status is the engine's word, so a group named after one is a derived group
-// and a drop into it clears the bucket rather than setting one.
-func (s Status) Known() bool {
-	for _, k := range States() {
-		if s == k {
-			return true
-		}
-	}
-	return false
-}
-
-func (s Scope) Known() bool {
-	return s == MultiStep || s == SingleStep || s == InToken
-}
+// WHERE A TOKEN ENDS IS THE DISPOSITION, NOT THE STATE. A token has ended when
+// it says what became of it, so the two questions have one answer and no
+// process has to declare a terminal state to be readable.
 
 // The three exits, and there is no fourth. A token that closes without saying
 // what became of it is how work disappears — v3 lost 25 that way.
 type Disposition string
 
 const (
-	NoDisposition Disposition = ""
-	Done          Disposition = "done"
-	Became        Disposition = "became"
-	Dropped       Disposition = "dropped"
+	Done    Disposition = "done"
+	Became  Disposition = "became"
+	Dropped Disposition = "dropped"
 )
 
 // A rejection is typed so the worker acts mechanically instead of
@@ -187,18 +62,6 @@ type Rejection struct {
 	Answer string `json:"answer,omitempty"`
 }
 
-// The evidence a token demands: a filled form, or a script that runs. Two
-// kinds, because completion is either judged or measured and nothing else.
-//
-// The Go name carries SpecOpen because read evidence already holds the plain word
-// in this package. In the token, in JSON, and in prose it is evidence.
-type EvidenceSpec struct {
-	Sections []string `json:"sections,omitempty"` // a form: every named section must be filled
-	Script   string   `json:"script,omitempty"`   // a command: its exit code decides
-}
-
-func (e EvidenceSpec) Empty() bool { return len(e.Sections) == 0 && e.Script == "" }
-
 // WHAT DONE MEANS, WRITTEN BEFORE THE WORK.
 //
 // One line saying what has to be true. Where that can be a command, it is one,
@@ -212,29 +75,26 @@ type Criterion struct {
 	Says string `json:"says"`           // what has to be true, in one line
 	Runs string `json:"runs,omitempty"` // the command that decides it, if one can
 
-	// WHAT WAS TAKEN AWAY TO MAKE IT FAIL, AND WHAT IT SAID WHEN IT DID.
-	//
-	// A criterion nobody has watched fail is a criterion nobody has tested. The
-	// observation is two fields rather than a paragraph near them, because the
-	// note is re-rendered from the parsed token on every save and prose written
-	// beside a criterion is dropped the next time anybody writes the note.
-	Without string `json:"without,omitempty"` // what was absent when it went red
-	Red     string `json:"red,omitempty"`     // what it said when it went red
-
-	Ran string `json:"ran,omitempty"` // what it answered when the worker ran it
-	Met bool   `json:"met,omitempty"` // whether it passed
-}
-
-// Watched answers whether somebody has seen this criterion fail.
-//
-// A CRITERION WITH NO COMMAND IS NOT WATCHED AND IS NOT ASKED TO BE. It is
-// answered by name in the evidence and a reviewer judges the answer.
-func (c Criterion) Watched() bool {
-	return c.Runs == "" || (trimmed(c.Without) != "" && trimmed(c.Red) != "")
 }
 
 type Token struct {
 	ID string `json:"id"`
+
+	// WHICH PROCESS SHAPES THIS TOKEN. It says which sections and fields
+	// apply, which states exist, and how the work moves. The engine owns none
+	// of that any more.
+	Process string `json:"process"`
+
+	// The guidance for filling this kind, written by the template so a reader
+	// is one click from the rules.
+	Guidance string `json:"guidance,omitempty"`
+
+	// WHEN IT NEEDS A PERSON, IT SAYS SO. There is no assignee: which agent
+	// does the work was never a thing anybody read.
+	NeedsHuman bool `json:"needs_human,omitempty"`
+
+	// What you think should happen about it, beside what is wrong.
+	ProposedAction string `json:"proposed_action,omitempty"`
 
 	// What work is to be done. There is no work without one.
 	Title string `json:"title"`
@@ -243,158 +103,72 @@ type Token struct {
 	// and this is everything the next hand needs that the line cannot carry.
 	Detail string `json:"detail,omitempty"`
 
-	// Method travels with the work: inline for small, by reference for shared.
-	Guidance    string `json:"guidance,omitempty"`
-	GuidanceRef string `json:"guidance_ref,omitempty"`
-
-	// What completion has to demonstrate. Asserting done is not evidence.
-	Evidence EvidenceSpec `json:"evidence"`
-
-	// WHAT DONE MEANS, AGREED BEFORE THE WORK. A token with none cannot leave
-	// spec, and a submission runs every criterion that is a command.
+	// WHAT DONE MEANS, AGREED BEFORE THE WORK. One line each, and each one a
+	// thing somebody can check.
+	//
+	// A CRITERION IS A SENTENCE AND NOT A COMMAND ANY MORE. It carried a shell
+	// line the engine ran, plus what was taken away to watch it fail and what
+	// it said when it did. The checklist on the process replaced all of that:
+	// what a step demands belongs to the step, so every token of a process
+	// answers the same questions rather than each one inventing its own.
 	Criteria []Criterion `json:"criteria,omitempty"`
-
-	// WHAT EACH ROUND TAUGHT. A finding says what is wrong with this token and
-	// a lesson says what class of mistake it is, so a reader finds both where
-	// the round happened.
-	Lessons []Lesson `json:"lessons,omitempty"`
-
-	Assignee string `json:"assignee"`
-	Scope    Scope  `json:"scope"`
-
-	// Decided at minting, by the minter. Ephemeral is scratch work that the
-	// record has no use for. It is not a way out of review: see SelfClosing.
-	Traced bool `json:"traced"`
-
-	// A GROUPING A PERSON MADE, and the only thing here they name themselves.
-	//
-	// EMPTY MEANS THE DERIVED GROUP. A token carrying a bucket groups under it,
-	// and one without groups under what the view falls back to. That fallback
-	// lives in the view, as if(bucket, bucket, ...), so the note stays honest:
-	// an absent bucket is absent rather than a copy that drifts.
-	//
-	// THE DERIVED GROUP IS THE ENGINE'S AND A BUCKET IS THE PERSON'S. A bucket
-	// is a name somebody typed, so it can be renamed and it can be emptied.
-	// Dropping work onto a derived group clears it, because saying where the
-	// work belongs is stronger than the grouping it was filed under.
-	Bucket string `json:"bucket,omitempty"`
-
-	Parent string   `json:"parent,omitempty"`
-	Subs   []string `json:"subs,omitempty"`
 
 	// Work that has to close before this can start. Containment is the parent
 	// holding its children. This is order between peers, which is a different
 	// relation and gets its own field.
 	DependsOn []string `json:"depends_on,omitempty"`
 
+	// The other blocker, and the one only a person can judge: a date, or a
+	// condition in whatever words fit. Triage passes over a token that is not
+	// ready, so deciding not to decide leaves no history on the token.
+	ReadyWhen string `json:"ready_when,omitempty"`
+
 	Status      Status      `json:"status"`
 	Disposition Disposition `json:"disposition,omitempty"`
 	Successors  []string    `json:"successors,omitempty"` // became names these, and they must exist
 	Reason      string      `json:"reason,omitempty"`     // dropped carries this
 
-	// WHERE THE ABORT CAME FROM. An abort comes off any state, so aborted on
-	// its own says a token stopped without saying what it stopped in the
-	// middle of. A draft nobody agreed and a build somebody half finished are
-	// different things to read six weeks later.
-	AbortedFrom Status `json:"aborted_from,omitempty"`
-
-	// WHO SENT IT, WRITTEN BY THE ENGINE AND TYPED BY NOBODY.
-	//
-	// Four eyes were asked of the assignee, which is a field any actor may
-	// rewrite: an actor drafted a token, reassigned it, and was then handed its
-	// own draft to agree. Afterwards the note read exactly like a legitimate
-	// review, so nothing showed it had happened.
-	//
-	// SO THE QUESTION IS ABOUT THE PAST RATHER THAN THE PRESENT. Who owns a
-	// token now is a decision somebody may change. Who sent this one for
-	// judgment is a thing that happened, and the bypass has nothing to rewrite.
-	SubmittedBy string `json:"submitted_by,omitempty"`
-
-	// WHAT THE LAST REVIEWER READ OF A DRAFT, as a fingerprint of the detail and
-	// the criteria. A redraft that comes back with both unchanged has answered
-	// nothing, whatever it says, and that is a thing a program can decide where
-	// whether it answers WELL is a judgment and stays the reviewer's.
-	SpecSeen string `json:"spec_seen,omitempty"`
-
 	Submission map[string]string `json:"submission,omitempty"`
 
-	// WHAT THE REVIEWER WATCHED, per criterion, after the work landed.
+	// THE PERSON'S OWN NAME FOR A GROUP, and it does not move the work.
 	//
-	// TWO OBSERVATIONS AND THEY ARE DIFFERENT. The worker's proves the check
-	// can fail. The reviewer's proves the check is still the one that guards
-	// the behaviour, which is the half the recorded red cannot answer for.
+	// A STATE IS THE ENGINE READING THE PROCESS AND A BUCKET IS SOMEBODY
+	// DECIDING. The view groups by this, so a person can sweep a handful of
+	// tokens into a heading of their own without any of them changing where
+	// they stand. A query in the view file is the other kind of group, and it
+	// is a filter rather than a place.
 	//
-	// THE GATE RESTS ON A STRING NOW. A criterion that passes is agreed on
-	// the strength of what it records, so somebody has to read those words
-	// against the tree, and nothing asked anybody to.
-	Rewatched map[string]string `json:"rewatched,omitempty"`
-
-	Findings []Rejection `json:"findings,omitempty"`
-	Rounds   int         `json:"rounds"`
-
-	// THE LADDER'S OWN COUNT, AND IT IS NOT Rounds.
-	//
-	// Rounds is cumulative, it is never reset, and everyFindingAnswered keys the
-	// findings a submission owes off it. The ladder counts CONSECUTIVE failures
-	// PER HALF and sets a half back to zero when that half is accepted. Those
-	// are two different values however alike they look, and two different values
-	// never share one field: reusing Rounds would have stopped that gate
-	// guarding the moment a half was accepted. Two ints is the price of keeping
-	// it. See TheRung.
-	SpecFails int `json:"spec_fails,omitempty"`
-	ImpFails  int `json:"imp_fails,omitempty"`
-
-	// WHETHER THE SECOND RUNG HAS BEEN TAKEN. It is spent once for the whole
-	// token: an accept sets a half's count back to zero, and it never gives the
-	// grant back.
-	RungTwoSpent bool `json:"rung_two_spent,omitempty"`
-
-	// WHO JUDGED IT LAST, so a token that comes back goes to the same hand.
-	//
-	// wk-24be1c06ae took 10 rejections and wk-1412093cd8 took 11, each with 8
-	// distinct reviewer identities named on its findings. Every new reviewer
-	// arrived with no memory of what earlier rounds settled and its own class to
-	// find, so rounds six and seven rejected the same criterion for overlapping
-	// reasons under different names. With unbounded standards and a new judge
-	// every round, convergence never has to happen.
-	//
-	// IT IS WRITTEN BY THE ENGINE WHEN A VERDICT LANDS, never typed, for the
-	// reason SubmittedBy is: a field an actor may write is a field an actor may
-	// use to be handed its own work.
-	ReviewedBy string `json:"reviewed_by,omitempty"`
-
-	// WHICH RUNG THE REVIEWER HOLDING THIS TOKEN NOW STANDS ON. It is written
-	// when a review is handed out and cleared when the verdict lands, so the
-	// powers a verdict may use are read from the token rather than recomputed
-	// from counters the grant has already reset.
-	Rung int `json:"rung,omitempty"`
+	// ONLY A PERSON WRITES ONE. See field.go: a name nobody asked for is a
+	// grouping nobody meant, and two agents inventing two names for one idea
+	// is how a list stops being readable.
+	Bucket string `json:"bucket,omitempty"`
 
 	// Who holds it now. A worker while it is in work, a reviewer while it is
 	// in review. It is what an arriving agent reclaims against.
 	Holder string `json:"holder,omitempty"`
 
-	// WHEN THINGS HAPPENED IS NOT ON THE TOKEN. A traced token travels, and a
-	// timestamp on it says when somebody was at their desk. The record holds
-	// every change, and the record never travels.
+	// WHAT THE READER DID NOT UNDERSTAND, KEPT SO THE WRITER CAN PUT IT BACK.
 	//
-	// WHAT ORDER THEY WERE MINTED IN IS NOT A TIME. The queue hands out the
-	// thing that waited longest, and a plain number answers that while saying
-	// nothing about when anybody was working.
-	Seq      int    `json:"seq"`
-	MintedBy string `json:"minted_by"`
+	// The file is rendered from this struct, so anything absent here is absent
+	// from the file after the next save. That is fine for a field nobody
+	// wrote. It is not fine for a section a person added on purpose.
+	//
+	// It is out of the JSON because it is about the file rather than about the
+	// work, and a caller handing the engine a token should not have to carry
+	// somebody else's prose to avoid deleting it.
+	Kept []KeptSection `json:"-"`
 }
 
-// WHO MAY CLOSE, AND IT IS NOT A FIELD.
-//
-// The creator closes its own breakdown, and nothing else. Both conditions are
-// set at minting and neither moves afterwards, so an agent cannot talk its way
-// past a reviewer by editing one.
-//
-// Minting an ephemeral step is not an escape from review. A token scope exists
-// only inside a parent the agent already holds, that parent is closed by a
-// reviewer, and it cannot close while a child is open. The barrier is the
-// parent, and the parent was never the agent's to settle.
-func (t Token) SelfClosing() bool { return t.Scope == InToken && !t.Traced }
+// Ended answers whether a token has stopped, either way. It reads the
+// disposition rather than the state, because the disposition is the engine's
+// field and the state is the process's.
+func (t Token) Ended() bool { return t.Disposition != "" }
+
+// KeptSection is one section of a note the reader has no field for.
+type KeptSection struct {
+	Head string
+	Text string
+}
 
 // THE TITLE IS FOUR WORDS AT MOST. It is what a person reads down a column,
 // and a column of sentences is a column nobody reads. Everything the four
@@ -435,76 +209,12 @@ func newID() string {
 
 func now() string { return time.Now().UTC().Format(time.RFC3339Nano) }
 
-// The next number in the ledger. Two mints at the same instant can read the
-// same one, and the cost of that is a tie in the queue's order rather than a
-// token that is lost.
-func nextSeq(r Roots) int {
-	high := 0
-	for _, t := range Tokens(r) {
-		if t.Seq > high {
-			high = t.Seq
-		}
-	}
-	return high + 1
-}
-
-// Mint writes a new token. The caller decides everything the token carries,
-// because the caller is the minter and the minter is who those decisions
-// belong to.
-func Mint(r Roots, t Token) (Token, error) {
-	if err := checkTitle(t.Title); err != nil {
-		return t, err
-	}
-	if t.Assignee == "" {
-		return t, fmt.Errorf("a token needs an assignee: every token is somebody's")
-	}
-	if t.Scope == "" {
-		t.Scope = SingleStep
-	}
-	if !t.Scope.Known() {
-		return t, fmt.Errorf("a scope is %s, %s or %s", MultiStep, SingleStep, InToken)
-	}
-	// A dependency that does not exist never closes, so the token it holds
-	// waits forever. Refusing here is cheaper than finding it in the queue.
-	for _, id := range t.DependsOn {
-		if _, err := LoadToken(r, id); err != nil {
-			return t, fmt.Errorf("it depends on %s, which does not exist", id)
-		}
-	}
-	t.ID = newID()
-	t.Seq = nextSeq(r)
-	// THE MINTER SAYS WHERE IT STARTS, and with nothing said it is open. Which
-	// tokens draft first is the verb's policy rather than this function's: see
-	// StartsAt, which se work calls.
-	if !t.Status.Known() || t.Status.Ended() {
-		t.Status = ImpOpen
-	}
-	// A sub-token is a token. The parent holds the list, because a parent
-	// cannot close while a child is open and that is the parent's rule.
-	if t.Parent != "" {
-		p, err := LoadToken(r, t.Parent)
-		if err != nil {
-			return t, fmt.Errorf("no such parent: %s", t.Parent)
-		}
-		if err := SaveToken(r, t); err != nil {
-			return t, err
-		}
-		p.Subs = append(p.Subs, t.ID)
-		return t, SaveToken(r, p)
-	}
-	return t, SaveToken(r, t)
-}
-
 // Blocked says what holds a token back, in words, or nothing.
 //
-// TWO RELATIONS, and they are not the same thing. A parent is held by its open
-// children, which is containment. A token is held by its open dependencies,
-// which is order between peers. One predicate reads both, because the queue
-// only ever asks the one question.
+// ONE RELATION NOW. Containment went with the parent field: a token is held by
+// what it says it depends on, and an order somebody decided is the only order
+// there is.
 func Blocked(r Roots, t Token) string {
-	if open := OpenSubs(r, t); len(open) > 0 {
-		return "its sub-tokens are open: " + strings.Join(open, ", ")
-	}
 	var waiting []string
 	for _, id := range t.DependsOn {
 		d, err := LoadToken(r, id)
@@ -512,7 +222,7 @@ func Blocked(r Roots, t Token) string {
 			waiting = append(waiting, id+" (which does not exist)")
 			continue
 		}
-		if !d.Status.Ended() {
+		if !d.Ended() {
 			waiting = append(waiting, id)
 		}
 	}
@@ -520,65 +230,6 @@ func Blocked(r Roots, t Token) string {
 		return "it waits on " + strings.Join(waiting, ", ")
 	}
 	return ""
-}
-
-// Activate moves a backlogged token into the queue. Draining the backlog is a
-// decision somebody makes, and it is not a consequence of having written the
-// note down.
-func Activate(r Roots, id string) (Token, error) {
-	t, err := LoadToken(r, id)
-	if err != nil {
-		return t, err
-	}
-	if t.Status != Backlogged {
-		return t, fmt.Errorf("%s is %s, and only a backlogged token is opened this way", id, t.Status)
-	}
-	t.Status = ImpOpen
-	return t, SaveToken(r, t)
-}
-
-// OpenSubs names the children still holding a parent open. A parent that
-// cannot close is not an error, it is the barrier doing its job.
-func OpenSubs(r Roots, t Token) []string {
-	var open []string
-	for _, id := range t.Subs {
-		s, err := LoadToken(r, id)
-		if err != nil || !s.Status.Ended() {
-			open = append(open, id)
-		}
-	}
-	return open
-}
-
-// PutFirst moves one token to the front of the queue.
-//
-// WHAT A PERSON OWNS IS THE ORDER. The queue hands out the oldest open token,
-// oldest means the lowest seq, and nothing could change that, so a person who
-// wanted a different thing done next had no way to say it. An agent holding
-// the wrong token could not put it down and a person could not pull another
-// forward.
-//
-// IT WRITES SEQ AND NOTHING ELSE. Which state a token is in stays with the
-// pull, which is why a status written by hand is refused.
-func PutFirst(r Roots, id string) (Token, error) {
-	t, err := LoadToken(r, id)
-	if err != nil {
-		return t, err
-	}
-	if t.Status.Ended() {
-		return t, fmt.Errorf("%s is closed, and the queue does not hand out closed work", id)
-	}
-	low := t.Seq
-	for _, o := range Tokens(r) {
-		if !o.Status.Ended() && o.Seq < low {
-			low = o.Seq
-		}
-	}
-	if low == t.Seq {
-		return t, nil // already first, and a write that changes nothing is noise
-	}
-	t.Seq = low - 1
-	return t, SaveToken(r, t)
 }
 
 func trimmed(s string) string {
@@ -589,4 +240,29 @@ func trimmed(s string) string {
 		s = s[:len(s)-1]
 	}
 	return s
+}
+
+// Mint writes a new token. The caller decides everything the token carries,
+// because the caller is the minter and the minter is who those decisions
+// belong to.
+//
+// WHAT IT REFUSES IS WHAT NOTHING DOWNSTREAM CAN RECOVER FROM: a title nobody
+// can read down a column, and a dependency that does not exist. A dependency
+// that does not exist never closes, so the token it holds waits forever, and
+// refusing here is cheaper than finding it in the queue.
+//
+// EVERYTHING ELSE IS THE SCHEMA'S. Which fields a process allows, which
+// sections it wants, and which states are legal are all in the files, and this
+// asking them again would be a second answer to a question already answered.
+func Mint(r Roots, t Token) (Token, error) {
+	if err := checkTitle(t.Title); err != nil {
+		return t, err
+	}
+	for _, id := range t.DependsOn {
+		if _, err := LoadToken(r, id); err != nil {
+			return t, fmt.Errorf("it depends on %s, which does not exist", id)
+		}
+	}
+	t.ID = newID()
+	return t, SaveToken(r, t)
 }

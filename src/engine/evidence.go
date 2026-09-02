@@ -74,7 +74,7 @@ func SaveEvidence(roots Roots, e Evidence) error {
 	if err := os.MkdirAll(filepath.Dir(evidencePath(roots)), 0o755); err != nil {
 		return err
 	}
-	return os.WriteFile(evidencePath(roots), append(b, '\n'), 0o644)
+	return writeAtomic(evidencePath(roots), append(b, '\n'), 0o644)
 }
 
 // NoteRead records that an actor read a file, with what the file said at the
@@ -85,7 +85,7 @@ func NoteRead(roots Roots, actor, path string) {
 	}
 	e := LoadEvidence(roots)
 	e.Reads[clean(path)] = Read{Actor: actor, Hash: hashFile(path), At: time.Now().UTC()}
-	_ = SaveEvidence(roots, e)
+	_ = SaveEvidence(roots, e) // a read it cannot record is a read it asks about again
 }
 
 // StaleReads names the files that were read and have changed since. What was
@@ -108,7 +108,7 @@ func ForgetReads(roots Roots, why string) int {
 	e := LoadEvidence(roots)
 	n := len(e.Reads)
 	e.Reads = map[string]Read{}
-	_ = SaveEvidence(roots, e)
+	_ = SaveEvidence(roots, e) // a read it cannot record is a read it asks about again
 	return n
 }
 
@@ -116,7 +116,7 @@ func ForgetReads(roots Roots, why string) int {
 func ForgetRead(roots Roots, path string) {
 	e := LoadEvidence(roots)
 	delete(e.Reads, clean(path))
-	_ = SaveEvidence(roots, e)
+	_ = SaveEvidence(roots, e) // a read it cannot record is a read it asks about again
 }
 
 // NoteAgent records an identity the harness started. Level 0 does not invent
@@ -130,7 +130,7 @@ func NoteAgent(roots Roots, id, kind string) {
 	e := LoadEvidence(roots)
 	if _, seen := e.Agents[id]; !seen {
 		e.Agents[id] = Agent{Kind: kind, First: time.Now().UTC(), Name: nextName(e, kind)}
-		_ = SaveEvidence(roots, e)
+		_ = SaveEvidence(roots, e) // a read it cannot record is a read it asks about again
 	}
 }
 

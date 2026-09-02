@@ -41,71 +41,100 @@ var WriteTools = map[string]bool{
 	"PowerShell":   true,
 }
 
+// THE TOOLS THAT CANNOT SAY WHICH WORK THEY ARE.
+//
+// The harness's Write and Edit carry a path and some content, and no field for
+// a token. So the engine could only ever ask for the name in a SEPARATE call
+// before the edit: se work --on armed one write and the write spent it. Naming
+// the work was a thing to remember, and a thing to remember is a thing to
+// forget.
+//
+// se apply takes the name ON the write, so the two cannot come apart. These are
+// refused whatever the agent holds, and the refusal says what to use instead.
+//
+// A SHELL IS HERE TOO, AND FOR THE HARDER REASON. The engine cannot read a
+// command and know whether it writes: sed -i, a redirection, mv, rm and a
+// script somebody wrote all reach the filesystem, and a list of safe programs
+// goes stale the day anybody runs a new one. So the question is not asked. A
+// shell command names its work because it COULD write, and se run takes that
+// name the same way se apply does.
+//
+// THE STANDING HAND WAS THE OTHER ANSWER AND IT LEAKED. Holding a token let
+// every shell call through for as long as it was held, so one name bought a
+// session of writes and nothing said which of them belonged to what.
+var NamesItsOwnToken = map[string]bool{
+	"Write": true, "Edit": true, "MultiEdit": true, "NotebookEdit": true,
+	"Bash": true, "PowerShell": true,
+}
+
+// theVerbFor says which of the engine's verbs does the job a refused tool was
+// reaching for, so a refusal ends with the call to make.
+func theVerbFor(tool string) string {
+	if tool == "Bash" || tool == "PowerShell" {
+		return "run"
+	}
+	return "apply"
+}
+
 // InWorkFor is every token that agent is holding. The invariant is that this is
 // never longer than one, and it answers a list rather than a token so a check
 // can see the invariant break rather than only its consequences.
 func InWorkFor(r Roots, actor string) []Token {
+	// NOBODY HOLDS NOTHING, AND NOBODY IS NOT AN ACTOR.
+	//
+	// MEASURED, AND IT OPENED THE WHOLE GATE. An unheld token carries an empty
+	// holder, so an actor with no name matched every one of them: this answered
+	// 192 tokens for "", the gate read that as a hand full of work, and every
+	// write by an unnamed caller went through. NO TOKEN, NO WRITING was off for
+	// anyone who did not say who they were.
+	if strings.TrimSpace(actor) == "" {
+		return nil
+	}
 	var held []Token
 	for _, t := range Tokens(r) {
 		if t.Holder != actor {
 			continue
 		}
-		// A REVIEWER HOLDS A TOKEN TOO, AND IT IS THE ONE IT IS JUDGING.
+		// HOLDING IT IS BEING ON IT. The gate asks the hold rather than the
+		// state, because the state is a word the process owns and the gate
+		// would otherwise have to know every process's vocabulary.
 		//
-		// MEASURED, BY THE REVIEWERS THIS BROKE. Two of them reported the same
-		// thing in one afternoon: the gate refuses all Bash unless a token is
-		// named, a reviewer has none to name, so neither could run go test, node
-		// or the battery. One wrote that every measurement it reported had been
-		// recomputed by hand and named the claims it could not confirm.
-		//
-		// That is the first thing doc/guidance/reviewing.md asks of a reviewer,
-		// which is to reproduce every measurement, refused by this gate. And the
-		// answer is not a list of safe commands, which goes stale the day
-		// somebody runs a new one: a reviewer holding a token IS working on one.
-		if t.Status == ImpInWork || t.Status == SpecInWork ||
-			t.Status == ImpInReview || t.Status == SpecInReview {
+		// MEASURED, BY WHAT THE OLD RULE BROKE. It named four states, so an
+		// actor holding a token in any other one was refused every command
+		// including ls, could not run the battery, and reported measurements it
+		// had recomputed by hand.
+		if !t.Ended() {
 			held = append(held, t)
 		}
 	}
 	return held
 }
 
-// WHERE A TOKEN PUT BACK GOES, and it is open rather than backlogged. Open is
-// where it came from. Backlogged means nobody is doing it, and somebody was.
-func putBack(s Status) Status {
-	if s == SpecInWork {
-		return SpecOpen
-	}
-	return ImpOpen
-}
-
-// WHICH IN-WORK STATE A TOKEN TAKES, decided by which half it is in. A draft
-// being written and an implementation being cut are both work, and they are not
-// the same state.
-func takesUp(s Status) Status {
-	if s.Drafting() {
-		return SpecInWork
-	}
-	return ImpInWork
-}
-
-// WorkOn names the token an agent is working on. It puts that token in work and
-// puts back everything else that agent was holding.
-func WorkOn(r Roots, id, actor string) (Token, error) {
+// TakeUp is a person or an agent saying which token it is on.
+//
+// IT IS NOT A CALL AN AGENT MAKES ANY MORE. se apply calls it with the name on
+// the write, so naming the work and doing the work are one act. The verb is
+// still here because a person picks a token up from the panel, and because a
+// write has to say what it did.
+//
+// WHATEVER ELSE THIS ACTOR HELD GOES BACK. One thing in hand at a time, so the
+// queue never shows an agent working on two, and so changing what you are
+// working on is one word rather than a put-down and a take-up.
+func TakeUp(r Roots, id, actor string) (Token, error) {
 	t, err := LoadToken(r, id)
 	if err != nil {
 		return t, err
 	}
-	// A TOKEN THAT HAS ENDED CANNOT BE NAMED. Writing under a closed token files
-	// the work where nobody will go looking for it.
-	if t.Status.Ended() {
+	// A TOKEN THAT HAS ENDED CANNOT BE NAMED. Writing under a closed token
+	// files the work where nobody will go looking for it.
+	if t.Ended() {
 		return t, fmt.Errorf("%s already ended as %s. Name a token that is open, or mint one",
-			t.ID, t.Status)
+			t.ID, t.Disposition)
 	}
-	// A TOKEN SOMEBODY ELSE IS HOLDING IS NOT TAKEN AWAY FROM THEM. The flip is
-	// per agent, and two agents on one token is the collision this record has
-	// already paid for once.
-	if (t.Status == ImpInWork || t.Status == SpecInWork) && t.Holder != "" && t.Holder != actor {
+	// A TOKEN SOMEBODY ELSE HOLDS IS NOT TAKEN AWAY FROM THEM. The swap is per
+	// agent, and two agents on one token is a collision this record has already
+	// paid for once.
+	if t.Holder != "" && t.Holder != actor {
 		return t, fmt.Errorf("%s is held by %s. One token has one holder", t.ID, t.Holder)
 	}
 	// THE PUTTING BACK COMES FIRST, and it skips the token being named, so an
@@ -115,26 +144,18 @@ func WorkOn(r Roots, id, actor string) (Token, error) {
 		if held.ID == t.ID {
 			continue
 		}
-		held.Status, held.Holder = putBack(held.Status), ""
+		held.Holder = ""
 		if err := SaveToken(r, held); err != nil {
 			return t, err
 		}
-		inSession(r, "work", actor, held.ID+" put back to "+string(held.Status)+
-			", because "+actor+" is on "+t.ID+" now", Yes(),
-			map[string]any{"id": held.ID, "for": t.ID})
+		inSession(r, "work", actor, held.ID+" put back, because "+actor+" is on "+t.ID+" now",
+			Yes(), map[string]any{"id": held.ID, "for": t.ID})
 	}
-	was := t.Status
-	t.Status, t.Holder = takesUp(t.Status), actor
-	if err := SaveToken(r, t); err != nil {
-		return t, err
+	if t.Holder == actor {
+		return t, nil
 	}
-	if was != t.Status {
-		inSession(r, "work", actor, t.ID+" taken up from "+string(was), Yes(),
-			map[string]any{"id": t.ID, "from": string(was)})
-	}
-	// AND NAMING IT ARMS ONE WRITE. See ticket.go.
-	ArmTicket(r, actor, t.ID)
-	return t, nil
+	t.Holder = actor
+	return t, SaveToken(r, t)
 }
 
 // THE SCRATCHPAD STAYS ALLOWED, BECAUSE THINKING IS NOT A CHANGE.
@@ -185,71 +206,70 @@ func WriteNeedsAToken(r Roots, actor, tool, path string) (string, bool) {
 	if insideTheScratchpad(r, path) {
 		return "", false
 	}
-	// EVERY NAME THIS PROCESS ANSWERS TO, because the harness calls it one thing
-	// and it pulls under another.
-	names := everyNameOf(r, actor)
-	// A REVIEWER'S HOLD WRITES WITHOUT A TICKET. The queue put that token in its
-	// hands, so it has already said which work this is.
-	for _, name := range names {
-		if holdsAReview(r, name) {
-			return "", false
-		}
+	// EVERY TOOL THAT CAN WRITE IS REFUSED, WHATEVER THE AGENT HOLDS.
+	//
+	// Holding a token is not saying which work THIS call is, and the difference
+	// is the whole rule: an agent that names a token once files everything
+	// after it under whatever it named first. The engine's own verbs take the
+	// name on the call, so the two cannot come apart.
+	if NamesItsOwnToken[tool] {
+		return theRefusal(r, actor, tool, path), true
 	}
-	if SpendsATicket[tool] {
-		// ONE NAME, ONE WRITE. The tool names the file it changes, and the
-		// ticket is the record of which work that file belongs to.
-		for _, name := range names {
-			if _, armed := SpendTicket(r, name); armed {
-				return "", false
-			}
-		}
-	} else {
-		// A SHELL NAMES NO FILE, so it keeps the standing hand it has today.
-		// Charging it a ticket would charge a name for every cat and rg.
-		for _, name := range names {
-			if len(InWorkFor(r, name)) > 0 {
-				return "", false
-			}
-		}
+	return "", false
+}
+
+// theRefusal sends the agent to the verb that can say what this call is.
+func theRefusal(r Roots, actor, tool, path string) string {
+	if theVerbFor(tool) == "run" {
+		return "THE ENGINE RUNS COMMANDS, BECAUSE A COMMAND SAYS WHICH WORK IT IS.\n\n" +
+			tool + " carries no way to name a token, so it is refused whatever you hold. " +
+			"The engine cannot read a command and know whether it writes: a redirection, " +
+			"sed -i, mv, rm and a script you wrote all reach the filesystem. So it does " +
+			"not ask, and every command names its work:\n\n" +
+			"  echo 'go test ./...' | se run --on <id> --by " + actor + "\n\n" +
+			"The command is read whole from standard input, quotes and all, and it runs " +
+			"in the folder being worked on. Output comes back with its exit code, and a " +
+			"long one is cut at the end rather than sent entire.\n\n" +
+			"Naming a token you were not on puts the old one back and takes the new one " +
+			"up, so changing what you work on is one word on the next command.\n\n" +
+			whatIsOpen(r, actor)
 	}
+	where := shortPath(r, path)
+	if strings.TrimSpace(where) == "" {
+		where = "the/file.go"
+	}
+	return "THE ENGINE WRITES FILES, BECAUSE A WRITE SAYS WHICH WORK IT IS.\n\n" +
+		tool + " carries no way to name a token, so it is refused whatever you hold. " +
+		"se apply takes the name on the write itself, so there is no call to make " +
+		"first and nothing to remember:\n\n" +
+		"  echo '[{\"file\":\"" + where + "\",\"old\":\"...\",\"new\":\"...\"}]' |\n" +
+		"    se apply --on <id> --by " + actor + "\n\n" +
+		"One manifest changes as many files as you like, and every edit is checked " +
+		"before any is written, so one bad edit writes nothing. op create makes a " +
+		"file that is not there, op write replaces one whole.\n\n" +
+		"Naming a token you were not on puts the old one back and takes the new one " +
+		"up, so changing what you work on is one word on the next write.\n\n" +
+		whatIsOpen(r, actor)
+}
+
+// whatIsOpen lists what this actor could pick up, so a refusal ends with
+// something to do rather than with a wall.
+func whatIsOpen(r Roots, actor string) string {
 	var open []string
 	for _, t := range Tokens(r) {
-		if t.Assignee != actor {
-			continue
-		}
-		if t.Status == ImpOpen || t.Status == SpecOpen {
+		if !t.Ended() && t.Holder == "" && Workable(r, t) {
 			open = append(open, "  "+t.ID+"  "+t.Title)
 		}
 	}
-	why := "NO TOKEN, NO WRITING. " + tool + " can write, and you have not said which " +
-		"work this belongs to.\n\nName it. Naming it is what opens it, so there is " +
-		"nothing else to do first:\n\n  se work --on <id> --by " + actor + "\n\n"
 	if len(open) == 0 {
-		return why + "Nothing is open for " + actor + ". Mint one with se work, which is " +
-			"the one thing you may do with no token in hand.", true
+		return "Nothing is open for " + actor + ". Mint one with se work, which is " +
+			"the one thing you may do with no token in hand."
 	}
-	return why + "Open for " + actor + ":\n\n" + strings.Join(open, "\n"), true
-}
-
-// WHO SENT A TOKEN FOR JUDGMENT, which is what four eyes is a question about.
-//
-// A REVIEWER MAY NOT JUDGE WHAT IT SUBMITTED, and that was asked of the
-// assignee, which is a field any actor may rewrite. One extra command made four
-// eyes into two: draft it, submit it, hand it to somebody else, then pull as a
-// reviewer and agree your own draft. The note afterwards reads exactly like a
-// legitimate review.
-//
-// SO IT ASKS ABOUT THE PAST. Who sent it is a thing that happened and the
-// engine writes it. Who owns it now is a decision somebody may change.
-//
-// AND A TOKEN SENT BEFORE THIS FIELD EXISTED FALLS BACK TO THE ASSIGNEE. That
-// is the guard that was there, so nothing already in flight loses the weaker
-// check while gaining the stronger one.
-func sentBy(t Token) string {
-	if t.SubmittedBy != "" {
-		return t.SubmittedBy
+	// A MENU LONGER THAN THE SCREEN IS NOT A MENU. The queue hands one out.
+	if len(open) > 10 {
+		open = append(open[:10], "  ... and "+itoa(len(open)-10)+" more. se pull hands you one.")
 	}
-	return t.Assignee
+	return "Open for " + actor + ":\n\n" + strings.Join(open, "\n")
 }
 
 // THE NAME THE HARNESS USES AND THE NAME THE AGENT PULLS WITH.
@@ -300,7 +320,7 @@ func NoteTheNameItPullsWith(r Roots, harness, command string) {
 	}
 	known[harness] = append(known[harness], named)
 	if b, err := json.MarshalIndent(known, "", "  "); err == nil {
-		_ = os.WriteFile(aliasPath(r), b, 0o644)
+		_ = writeAtomic(aliasPath(r), b, 0o644) // a name it cannot remember is looked up again next call
 	}
 }
 

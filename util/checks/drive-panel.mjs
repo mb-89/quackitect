@@ -149,7 +149,7 @@ const cases = {
     if (!run) { no("reaches: the line sent nothing, so nothing can reach the engine"); return; }
 
     const { mintArgs } = await load("engineargs");
-    const args = mintArgs(run.text, run.kind ?? "");
+    const args = mintArgs(run.text, run.process ?? "");
     if (!args) { no("reaches: the arguments builder answered nothing for what the line sent"); return; }
 
     // THE REAL BINARY, IN A TREE OF ITS OWN, so the record is not written to.

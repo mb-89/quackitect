@@ -40,6 +40,7 @@ func readBack(t *testing.T, root, rel string) string {
 // TWO FORMS OF REFERENCE. A path as written, and a wiki link with the
 // extension dropped. Prose takes both. Source takes the path form only.
 func TestAMoveFixesEveryReference(t *testing.T) {
+	t.Parallel()
 	r := guidanceTree(t)
 	put(t, r.Work, "doc/old.md", "the thing itself\n")
 	put(t, r.Work, "doc/reader.md", "see doc/old.md and also [[doc/old]] for more\n")
@@ -75,6 +76,7 @@ func TestAMoveFixesEveryReference(t *testing.T) {
 // WHAT IT COULD NOT REWRITE IS REPORTED. An empty rewritten list must never be
 // the only thing separating no references from references left dangling.
 func TestAMoveReportsWhatItCouldNotRewrite(t *testing.T) {
+	t.Parallel()
 	r := guidanceTree(t)
 	put(t, r.Work, "doc/old.md", "the thing\n")
 	put(t, r.Work, "notes.rst", "a format nobody listed points at doc/old.md here\n")
@@ -102,6 +104,7 @@ func TestAMoveReportsWhatItCouldNotRewrite(t *testing.T) {
 // A MOVE INTO A SUBDIRECTORY leaves the old path as a substring of every path
 // it just rewrote. Reporting those would make the report useless.
 func TestAMoveIntoASubdirectoryReportsNothing(t *testing.T) {
+	t.Parallel()
 	r := guidanceTree(t)
 	put(t, r.Work, "doc/old.md", "the thing\n")
 	put(t, r.Work, "doc/reader.md", "see doc/old.md\n")
@@ -126,6 +129,7 @@ func TestAMoveIntoASubdirectoryReportsNothing(t *testing.T) {
 // substring of doc/very-old.md, so the rewriter was never asked the question.
 // These names make it a substring, twice.
 func TestALongerNameIsADifferentFile(t *testing.T) {
+	t.Parallel()
 	r := guidanceTree(t)
 	put(t, r.Work, "old.md", "the one being moved\n")
 	put(t, r.Work, "very-old.md", "a different file\n")
@@ -172,6 +176,7 @@ func TestALongerNameIsADifferentFile(t *testing.T) {
 // spelling stats as the old file, and the verb refused one of the commonest
 // renames there is.
 func TestACaseCorrectionIsARename(t *testing.T) {
+	t.Parallel()
 	r := guidanceTree(t)
 	put(t, r.Work, "doc/Readme.md", "the file\n")
 	put(t, r.Work, "reader.md", "see doc/Readme.md\n")
@@ -190,6 +195,7 @@ func TestACaseCorrectionIsARename(t *testing.T) {
 
 // THREE REFUSALS, and each one says what would satisfy it.
 func TestAMoveRefusesWhatItMustNotDo(t *testing.T) {
+	t.Parallel()
 	r := guidanceTree(t)
 	put(t, r.Work, "doc/old.md", "the thing\n")
 	put(t, r.Work, "doc/taken.md", "somebody else\n")
@@ -219,6 +225,7 @@ func TestAMoveRefusesWhatItMustNotDo(t *testing.T) {
 // A DIRECTORY MOVES LIKE A FILE. It refused one, saying to move its files one
 // at a time, and a folder of a hundred files is not a hundred moves.
 func TestAFolderMovesAndItsReferencesFollow(t *testing.T) {
+	t.Parallel()
 	r := guidanceTree(t)
 	write := func(rel, text string) {
 		p := filepath.Join(r.Work, filepath.FromSlash(rel))
@@ -280,6 +287,7 @@ func TestAFolderMovesAndItsReferencesFollow(t *testing.T) {
 // report was asked with the same narrowed spelling, so it answered zero
 // unrewritten while it had left two.
 func TestANestedFolderIsRewrittenWhenNamedBare(t *testing.T) {
+	t.Parallel()
 	r := guidanceTree(t)
 	write := func(rel, text string) {
 		p := filepath.Join(r.Work, filepath.FromSlash(rel))
@@ -325,6 +333,7 @@ func TestANestedFolderIsRewrittenWhenNamedBare(t *testing.T) {
 // AND THE REPORT NAMES WHAT THE REWRITE COULD NOT REACH. A file the verb does
 // not read is not a file it may stay silent about.
 func TestTheReportNamesWhatWasNotRewritten(t *testing.T) {
+	t.Parallel()
 	r := guidanceTree(t)
 	write := func(rel, text string) {
 		p := filepath.Join(r.Work, filepath.FromSlash(rel))
@@ -360,6 +369,7 @@ func TestTheReportNamesWhatWasNotRewritten(t *testing.T) {
 // neither list of formats, so the one file in this tree whose whole job is
 // naming paths was the one file a rename could not repair.
 func TestAMoveRepairsAFileNamedRatherThanExtended(t *testing.T) {
+	t.Parallel()
 	dir := t.TempDir()
 	r := Roots{Method: dir, Work: dir}
 	os.MkdirAll(filepath.Join(dir, "source", "engine"), 0o755)
@@ -394,6 +404,7 @@ func TestAMoveRepairsAFileNamedRatherThanExtended(t *testing.T) {
 // <work>/source/engine is exactly the folder being renamed, written out in
 // full, and a test fixture naming one was left pointing at nothing.
 func TestAMoveRepairsAPathWrittenInFull(t *testing.T) {
+	t.Parallel()
 	dir := t.TempDir()
 	r := Roots{Method: dir, Work: dir}
 	os.MkdirAll(filepath.Join(dir, "source", "engine"), 0o755)
@@ -425,6 +436,7 @@ func TestAMoveRepairsAPathWrittenInFull(t *testing.T) {
 // anything. One mark can mean two things, and saying so on the line is how
 // they are told apart.
 func TestALineThatSaysItIsNotAPathIsLeftAlone(t *testing.T) {
+	t.Parallel()
 	dir := t.TempDir()
 	r := Roots{Method: dir, Work: dir}
 	os.MkdirAll(filepath.Join(dir, "source", "engine"), 0o755)
@@ -464,6 +476,7 @@ func TestALineThatSaysItIsNotAPathIsLeftAlone(t *testing.T) {
 // THE REWRITE ASKS MAY I CHANGE THIS. THE REPORT ASKS DOES THE CALLER STILL OWE
 // SOMETHING HERE. They are different questions.
 func TestATopLevelMoveReportsWhatItDeclinedToRewrite(t *testing.T) {
+	t.Parallel()
 	dir := t.TempDir()
 	r := Roots{Method: dir, Work: dir}
 	put(t, dir, "source/engine/main.go", "package main\n")
@@ -503,6 +516,7 @@ func TestATopLevelMoveReportsWhatItDeclinedToRewrite(t *testing.T) {
 // AND A NESTED FOLDER IS REWRITTEN RATHER THAN REPORTED, which is the other
 // side of the same branch. The check pins the difference between the two.
 func TestANestedMoveRewritesTheSameSegments(t *testing.T) {
+	t.Parallel()
 	dir := t.TempDir()
 	r := Roots{Method: dir, Work: dir}
 	put(t, dir, "source/engine/main.go", "package main\n")

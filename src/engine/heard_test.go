@@ -47,6 +47,7 @@ func promptsIn(t *testing.T, r Roots) []string {
 // THE ENGINE COPIES WHAT THE PERSON SAID. The harness fires no event for a
 // message written into a running turn, and it writes one to its own transcript.
 func TestTheEngineCopiesWhatWasSaidMidTurn(t *testing.T) {
+	t.Parallel()
 	r := guidanceTree(t)
 	l, _ := OpenLog(r.Private("log"))
 	l.Write("engine", "start", "engine", "started", Yes(), nil)
@@ -96,6 +97,7 @@ func TestTheEngineCopiesWhatWasSaidMidTurn(t *testing.T) {
 // ONLY WHAT A PERSON TYPED. A transcript carries the agent's own lines, tool
 // calls and queued work of other kinds, and none of those is somebody talking.
 func TestOnlyWhatAPersonTypedIsCopied(t *testing.T) {
+	t.Parallel()
 	r := guidanceTree(t)
 	l, _ := OpenLog(r.Private("log"))
 	l.Write("engine", "start", "engine", "started", Yes(), nil)
@@ -125,6 +127,7 @@ func TestOnlyWhatAPersonTypedIsCopied(t *testing.T) {
 // A TRANSCRIPT THAT WILL NOT READ IS NOT AN ERROR. A person is waiting on the
 // tool call the guard is deciding.
 func TestAMissingTranscriptCopiesNothingAndSaysNothing(t *testing.T) {
+	t.Parallel()
 	r := guidanceTree(t)
 	l, _ := OpenLog(r.Private("log"))
 	l.Write("engine", "start", "engine", "started", Yes(), nil)
@@ -142,6 +145,7 @@ func TestAMissingTranscriptCopiesNothingAndSaysNothing(t *testing.T) {
 // already in it was said before the engine could copy anything, and starting at
 // the beginning replayed a whole session.
 func TestATranscriptNeverReadStartsAtItsEnd(t *testing.T) {
+	t.Parallel()
 	r := guidanceTree(t)
 	l, _ := OpenLog(r.Private("log"))
 	l.Write("engine", "start", "engine", "started", Yes(), nil)
@@ -180,6 +184,7 @@ func TestATranscriptNeverReadStartsAtItsEnd(t *testing.T) {
 // A PROMPT THAT STARTS A TURN IS RECORDED BY THE HARNESS EVENT, so the
 // transcript pass must not record it a second time.
 func TestAPromptThatStartsATurnIsNotCopiedTwice(t *testing.T) {
+	t.Parallel()
 	r := guidanceTree(t)
 	l, _ := OpenLog(r.Private("log"))
 	l.Write("engine", "start", "engine", "started", Yes(), nil)
@@ -201,6 +206,7 @@ func TestAPromptThatStartsATurnIsNotCopiedTwice(t *testing.T) {
 // twice was put at both call sites and only one of them was checked, so the
 // engine's copier could stop asking and every check in the tree stayed green.
 func TestTheEngineDoesNotCopyWhatTheAgentAlreadyWrote(t *testing.T) {
+	t.Parallel()
 	r := guidanceTree(t)
 	l, _ := OpenLog(r.Private("log"))
 	l.Write("engine", "start", "engine", "started", Yes(), nil)
@@ -234,6 +240,7 @@ func TestTheEngineDoesNotCopyWhatTheAgentAlreadyWrote(t *testing.T) {
 // family as the double count it was written to fix, in the direction that
 // loses what somebody said.
 func TestTwoIdenticalMessagesAreTwoRecords(t *testing.T) {
+	t.Parallel()
 	r := guidanceTree(t)
 	l, _ := OpenLog(r.Private("log"))
 	l.Write("engine", "start", "engine", "started", Yes(), nil)
@@ -265,6 +272,7 @@ func TestTwoIdenticalMessagesAreTwoRecords(t *testing.T) {
 // unrefused. Three answers reached one question, twice in one afternoon, which
 // is the exact failure the store was keyed by actor to prevent.
 func TestAMidTurnMessageIsOwedByTheWalker(t *testing.T) {
+	t.Parallel()
 	r := guidanceTree(t)
 	l, _ := OpenLog(r.Private("log"))
 	l.Write("engine", "start", "engine", "started", Yes(), nil)

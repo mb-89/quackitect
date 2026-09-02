@@ -34,6 +34,7 @@ func theProbeFound(t *testing.T) Tool {
 // A RECURSIVE SEARCH OVER THE TREE IS REFUSED, and the refusal names what the
 // probe found rather than a name written into the engine.
 func TestARecursiveGrepIsRefused(t *testing.T) {
+	t.Parallel()
 	better := theProbeFound(t)
 	for _, command := range []string{
 		"grep -rn LoadConfig src",
@@ -60,6 +61,7 @@ func TestARecursiveGrepIsRefused(t *testing.T) {
 // is not that tool, and refusing the permitted case would send somebody looking
 // for a workaround rather than a better search.
 func TestAGrepOnOneFileIsLeftAlone(t *testing.T) {
+	t.Parallel()
 	better := theProbeFound(t)
 	for _, command := range []string{
 		"grep -n LoadConfig src/engine/config.go",
@@ -79,6 +81,7 @@ func TestAGrepOnOneFileIsLeftAlone(t *testing.T) {
 // or with its flags rearranged is judged the same way, and a sentence that
 // merely mentions one is not judged at all.
 func TestTheRefusalReadsTheCommand(t *testing.T) {
+	t.Parallel()
 	better := theProbeFound(t)
 	// BEHIND A PIPE IS STILL A PROGRAM BEING RUN.
 	if _, refused := ARecursiveSearch("cat list.txt | grep -rn thing src", better); !refused {
@@ -130,6 +133,7 @@ func TestTheRefusalReadsTheCommand(t *testing.T) {
 // THE TESTS ARE EXCLUDED, because a test of a refusal has to say what is being
 // refused. The engine itself carries no such name.
 func TestNothingNamesTheSearchingTool(t *testing.T) {
+	t.Parallel()
 	here, err := os.ReadDir(".")
 	if err != nil {
 		t.Fatal(err)
@@ -174,6 +178,7 @@ func TestNothingNamesTheSearchingTool(t *testing.T) {
 // THE SEARCH IS ASSEMBLED so this file does not carry the refused words, which
 // the guard would refuse on the way in.
 func TestAHereDocBodyIsNotCommands(t *testing.T) {
+	t.Parallel()
 	recursive := "g" + "rep -rn LoadConfig src"
 	allowed := []string{
 		"cat > x.sh <<'EOF'\n" + recursive + "\nEOF",

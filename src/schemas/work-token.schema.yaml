@@ -1,0 +1,120 @@
+# The catalogue of everything a work token may carry.
+#
+# Nothing here says a token carries all of it. A process in src/processes names
+# which sections and which fields apply, and everything it does not name is off.
+# So this file grows as kinds of work appear, and no token grows with it.
+#
+# NOTHING IS HERE FOR HAVING BEEN THERE BEFORE. The old token carried 28 fields.
+# Eleven served a reviewer who is gone, id repeated the file name, type repeated
+# kind, traced repeated the folder, assignee repeated holder, and seq recorded
+# when a token was typed and then let a queue read it as what to do next.
+# An order somebody decided is depends_on. What is left is what something reads.
+#
+# The frontmatter half is JSON Schema 2020-12, https://json-schema.org/draft/2020-12.
+# The body half is this project's own, https://document-schema.org.
+#
+# A keyword starting x- is ours and is not in either standard, the way
+# Kubernetes writes x-kubernetes-validations. Everything else is standard.
+#   x-link         the value is written [[in brackets]] and the editor walks it
+#   x-enum-from    the values come from somewhere else, named by a path
+#   x-max-words    how many words the value may hold
+#   x-whole-words  a word joined with _ / or \ to get under the count is refused
+
+kind: work-token
+
+# The guidance for filling one of these. The template writes it onto every
+# token, so a reader is one click from the rules.
+guidance: work-token
+
+frontmatter:
+  type: object
+  additionalProperties: false
+  required:
+    - kind
+    - process
+    - title
+    - status
+    - guidance
+  properties:
+    kind:
+      const: work-token
+      x-link: true
+      description: which schema reads this note
+
+    process:
+      x-link: true
+      x-enum-from: processes.names
+      description: which process shapes this token and says how it moves
+
+    guidance:
+      x-link: true
+      description: the rules for filling this token
+
+    title:
+      x-max-words: 4
+      x-whole-words: true
+      description: the name this token is known by, in references and in links
+
+    status:
+      x-enum-from: process.states
+      description: where the token stands. The process owns these values.
+
+    # WHO HAS IT, SO NOBODY ELSE TAKES IT. A name rather than a flag, because a
+    # hold nobody can attribute is a hold nobody can reclaim: the holders are
+    # held against the agents that are alive, and a dead one's work goes back.
+    bucket:
+      description: the person's own name for a group. It does not move the work
+
+    holder:
+      description: who is working on it now. Empty means nobody
+
+    # WHEN IT NEEDS A PERSON, IT SAYS SO. There is no assignee, because which
+    # agent does the work was never a thing anybody read. Whether a human is
+    # needed is, and it is the one thing that has to reach a screen.
+    needs_human:
+      description: true when this waits for a person rather than an agent
+
+    depends_on:
+      type: array
+      x-link: true
+      description: tokens that have to close before this can start
+
+    ready_when:
+      description: what has to be true before this is worth reading again
+
+    disposition:
+      x-enum-from: process.dispositions
+      description: how it ended. Only an ended token carries one.
+
+    reason:
+      description: why it was dropped
+
+    successors:
+      type: array
+      x-link: true
+      description: what it became. They have to exist.
+
+body:
+  headingLevel: 2
+  order: strict
+  extraSections: false
+
+  sections:
+    - header: detail
+      tense: present
+      maxWords: 250
+      description: what is asked, or what is wrong, and why it matters
+
+    - header: proposed action
+      tense: present
+      maxWords: 150
+      description: what you think should happen about it
+
+    - header: done when
+      list: true
+      description: one criterion per line, each one a thing somebody can check
+
+    # One per activity, named for it. The template writes the table and the
+    # process writes the rows.
+    - headerPrefix: "evidence: "
+      description: what was checked at each step, and what was seen

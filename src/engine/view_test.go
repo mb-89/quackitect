@@ -17,6 +17,7 @@ func row(pairs ...string) Row {
 
 // The expression language, at the width the views actually use.
 func TestWhatAFilterCanSay(t *testing.T) {
+	t.Parallel()
 	r := row("status", "open", "assignee", "main", "bucket", "", "title", "write the thing")
 	r["rounds"] = vn(2)
 	r["subs"] = vl([]string{"wk-1", "wk-2"})
@@ -74,6 +75,7 @@ func TestWhatAFilterCanSay(t *testing.T) {
 // a clause it cannot read answers with a table that looks complete and is
 // wrong, and nobody reading the table can tell.
 func TestAnUnknownConstructRefusesByName(t *testing.T) {
+	t.Parallel()
 	for _, c := range []struct{ src, says string }{
 		{`status.sortBackwards()`, "sortBackwards"},
 		{`nonsense(status)`, "nonsense"},
@@ -108,6 +110,7 @@ func writeBase(t *testing.T, dir, name, text string) string {
 // The format is the owner's and we render it, so the shapes the owner writes
 // have to read.
 func TestAViewFileReads(t *testing.T) {
+	t.Parallel()
 	p := writeBase(t, t.TempDir(), "x.base", `
 properties:
   title:
@@ -170,6 +173,7 @@ views:
 
 // A key nobody implemented refuses rather than being read past.
 func TestAViewFileRefusesWhatItCannotDraw(t *testing.T) {
+	t.Parallel()
 	dir := t.TempDir()
 	for _, c := range []struct{ text, says string }{
 		{"views:\n  - type: pivot\n    name: p\n", "table"},
@@ -192,6 +196,7 @@ func TestAViewFileRefusesWhatItCannotDraw(t *testing.T) {
 // PINNED GROUPS ARE A PARTITION. A row goes to the first one that matches and
 // is not repeated below, so the top is not a second copy of the same rows.
 func TestAQueryTakesNoRowOutOfTheGrouping(t *testing.T) {
+	t.Parallel()
 	p := writeBase(t, t.TempDir(), "z.base", `
 views:
   - name: left
@@ -256,6 +261,7 @@ views:
 // A collapsed group ships folded, and it is a declaration in the file rather
 // than a name in the renderer.
 func TestACollapsedGroupIsDeclaredInTheFile(t *testing.T) {
+	t.Parallel()
 	p := writeBase(t, t.TempDir(), "c.base", `
 views:
   - name: left
@@ -290,6 +296,7 @@ views:
 // It is reachable from a shipped control: the Sort popover's group-by level
 // writes se view --group <column>, and any column some rows lack makes it.
 func TestTheGroupWithNoNameCarriesAPinLikeEveryOther(t *testing.T) {
+	t.Parallel()
 	p := writeBase(t, t.TempDir(), "z.base", `
 views:
   - name: left
@@ -355,6 +362,7 @@ views:
 
 // EVERY GROUP MEANS EVERY GROUP, so the count is asserted rather than read.
 func TestEveryGroupOnThePageCarriesAPin(t *testing.T) {
+	t.Parallel()
 	p := writeBase(t, t.TempDir(), "z.base", `
 views:
   - name: left
@@ -391,6 +399,7 @@ views:
 // Pinning is the person saying they want to see it. One they did not pin is an
 // empty heading they did not ask for.
 func TestAPinnedFunctionalGroupIsDrawnEvenWithNoRows(t *testing.T) {
+	t.Parallel()
 	p := writeBase(t, t.TempDir(), "z.base", `
 views:
   - name: left
@@ -452,6 +461,7 @@ func names(gs []Group) []string {
 // asked for, so an empty heading is noise, and the declaration is what brings
 // it back the moment the filter returns a row.
 func TestAnUnpinnedFunctionalGroupHidesAtZeroAndComesBack(t *testing.T) {
+	t.Parallel()
 	p := writeBase(t, t.TempDir(), "z.base", `
 views:
   - name: left
@@ -504,6 +514,7 @@ views:
 // not. Pinning one writes its filter into the pin and declares nothing, so an
 // invented group goes on disappearing when it empties.
 func TestPinningAnInventedGroupDoesNotMakeItPermanent(t *testing.T) {
+	t.Parallel()
 	dir := t.TempDir()
 	p := writeBase(t, dir, "z.base", `
 views:
@@ -569,6 +580,7 @@ views:
 // row yours would have had. It then had none, and none is what hides it. Under
 // queries neither takes anything, and the pin decides only where a group draws.
 func TestAPinDecidesOrderAndNotMembership(t *testing.T) {
+	t.Parallel()
 	write := func(pins string) Base {
 		p := writeBase(t, t.TempDir(), "z.base", `
 views:
@@ -650,6 +662,7 @@ views:
 // other. Declaring them twice made that a copy, and the panes drew different
 // groups the first time somebody edited one.
 func TestAViewInheritsTheFilesGroups(t *testing.T) {
+	t.Parallel()
 	p := writeBase(t, t.TempDir(), "z.base", `
 groups:
   - name: yours
@@ -693,6 +706,7 @@ views:
 // own. Taking both together wiped a view's pins when it declared pins and no
 // groups, which is what an ad-hoc pin on a group the data made looks like.
 func TestAViewKeepsWhatItDeclaresForItself(t *testing.T) {
+	t.Parallel()
 	p := writeBase(t, t.TempDir(), "z.base", `
 groups:
   - name: yours
@@ -739,6 +753,7 @@ views:
 // The owner read three rows under here where the queue held nine, and saw no
 // group for the state at all. Under the partition there was no way to have both.
 func TestARowIsInEveryQueryThatMatchesIt(t *testing.T) {
+	t.Parallel()
 	p := writeBase(t, t.TempDir(), "z.base", `
 views:
   - name: left
@@ -813,6 +828,7 @@ func inABucketNamed(tab Table, name string) bool {
 // A BUCKET IS WHERE A PERSON PUT A ROW. A state is the engine's word for where
 // the row is, and there is already a query for each one.
 func TestAStateIsNotABucket(t *testing.T) {
+	t.Parallel()
 	p := writeBase(t, t.TempDir(), "z.base", `
 views:
   - name: left
@@ -858,6 +874,7 @@ views:
 // counting what was drawn answered 156 over a queue of about 60. The owner read
 // it off the page and said so.
 func TestTheTotalCountsTokensAndNotRowsDrawn(t *testing.T) {
+	t.Parallel()
 	p := writeBase(t, t.TempDir(), "z.base", `
 views:
   - name: left

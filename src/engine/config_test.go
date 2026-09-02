@@ -9,6 +9,7 @@ import (
 )
 
 func TestTheFloorCannotBeLowered(t *testing.T) {
+	t.Parallel()
 	r := guidanceTree(t)
 	os.MkdirAll(filepath.Join(r.Work, ".se"), 0o755)
 	// A project that tries to turn a guard off and to make a budget bigger.
@@ -30,6 +31,7 @@ func TestTheFloorCannotBeLowered(t *testing.T) {
 }
 
 func TestALaterLayerMayNarrow(t *testing.T) {
+	t.Parallel()
 	r := guidanceTree(t)
 	os.MkdirAll(filepath.Join(r.Work, ".se"), 0o755)
 	os.WriteFile(filepath.Join(r.Work, ".se", "parameters.json"),
@@ -46,6 +48,7 @@ func TestALaterLayerMayNarrow(t *testing.T) {
 }
 
 func TestAnUnreadableConfigIsSkipped(t *testing.T) {
+	t.Parallel()
 	r := guidanceTree(t)
 	os.MkdirAll(filepath.Join(r.Work, ".se"), 0o755)
 	os.WriteFile(filepath.Join(r.Work, ".se", "parameters.json"), []byte("{not json"), 0o644)
@@ -57,6 +60,7 @@ func TestAnUnreadableConfigIsSkipped(t *testing.T) {
 
 // Emergency mode ends on its own, so it cannot be left on and forgotten.
 func TestEmergencyModeExpires(t *testing.T) {
+	t.Parallel()
 	r := guidanceTree(t)
 	if _, err := ArmEmergency(r, "someone", "repairing the projector", 30); err != nil {
 		t.Fatal(err)
@@ -86,6 +90,7 @@ func TestEmergencyModeExpires(t *testing.T) {
 
 // The panel is a subtree of the same tree. A group marked shown is a section.
 func TestTheShownGroupsAreTheSections(t *testing.T) {
+	t.Parallel()
 	r := guidanceTree(t)
 	root, err := LoadTree(r.Method)
 	if err != nil {
@@ -104,6 +109,7 @@ func TestTheShownGroupsAreTheSections(t *testing.T) {
 
 // The engine validates, and it says why when it refuses.
 func TestSettingAValueIsValidatedByTheEngine(t *testing.T) {
+	t.Parallel()
 	r := guidanceTree(t)
 	if _, err := SetValue(r, "limits.heartbeat_seconds", 2); err != nil {
 		t.Fatalf("a narrowing change was refused: %v", err)

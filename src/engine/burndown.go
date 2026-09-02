@@ -21,10 +21,13 @@ import (
 // A number the editor derives is a number nothing checks.
 
 // TheWindowIsTheLog says what the reading covers, so a reader can tell a small
-// number from a short window. A retro truncates the log, and how long the run
-// is kept is decided on wk-88f4fcc517.
-const TheWindowIsTheLog = "the log under .se/log, which a retro truncates. " +
-	"How long the run is kept is decided on wk-88f4fcc517"
+// number from a short window.
+//
+// IT NAMES NO TOKEN. It read "how long the run is kept is decided on
+// wk-88f4fcc517", and that id is gone, so the sentence a person read on the
+// hover pointed at nothing. A note is where a decision is argued and a
+// constant is not the place to cite one.
+const TheWindowIsTheLog = "the log under .se/log, which a retro truncates"
 
 type Burndown struct {
 	Day    string `json:"day"`
@@ -32,13 +35,8 @@ type Burndown struct {
 	Done   int    `json:"done"`
 
 	// Open is absolute rather than per day: everything that has not ended,
-	// across both stores, taken now.
+	// taken now.
 	Open int `json:"open"`
-
-	// Rate is rejections that day over tokens that reached a review that day,
-	// as a percentage. It goes above a hundred when one token is rejected
-	// twice, which is the property the owner asked for by name.
-	Rate int `json:"rate"`
 
 	Window string `json:"window"`
 
@@ -48,52 +46,50 @@ type Burndown struct {
 	Detail string `json:"detail"`
 }
 
+// THREE NUMBERS NOW, AND THE FOURTH IS GONE WITH WHAT MEASURED IT.
+//
+// The owner asked for four, and the fourth was the rate at which tokens fail
+// reviews. The review flow is gone, so nothing writes a verdict and the number
+// had no source. A rate computed over zero reviews reads as nought percent,
+// which is a claim that everything passes, so it is absent rather than nought.
+//
+// WHAT WOULD BRING IT BACK: a process that declares a state work can come back
+// from. Then the rate is how often a token goes backwards, the process names
+// the state, and this counts the log lines that move into it.
+
 // TheDay is the UTC day a burn-down is asked for. Every line in the log carries
 // a Z stamp, so a person reading at half past midnight in central Europe is
 // shown the day that ended ninety minutes earlier. That is a decision.
 func TheDay(at time.Time) string { return at.UTC().Format("2006-01-02") }
 
-// TheBurndown answers the four numbers for one UTC day.
+// TheBurndown answers the numbers for one UTC day.
 func TheBurndown(r Roots, day string) Burndown {
 	b := Burndown{Day: day, Window: TheWindowIsTheLog}
-	rejected := 0
-	reviewed := map[string]bool{}
 	for _, e := range theLog(r) {
-		if theDayOf(e.T) != day {
+		if theDayOf(e.T) != day || e.Kind != "work" {
 			continue
 		}
 		switch {
-		case e.Kind == "work" && e.Data["assignee"] != nil && e.Data["status"] != nil:
+		case e.Data["minted"] != nil:
 			b.Minted++
-		case e.Kind == "work" && said(e.Data["to"]) == string(ImpDone):
+		case said(e.Data["disposition"]) != "":
 			b.Done++
-		case e.Kind == "review":
-			if id := said(e.Data["id"]); id != "" {
-				reviewed[id] = true
-			}
-			if v := said(e.Data["verdict"]); v == "rejected" || v == "spec rejected" {
-				rejected++
-			}
 		}
 	}
 	for _, t := range Tokens(r) {
-		if !t.Status.Ended() {
+		if !t.Ended() {
 			b.Open++
 		}
 	}
-	if len(reviewed) > 0 {
-		b.Rate = rejected * 100 / len(reviewed)
-	}
-	b.Says = fmt.Sprintf("BD: %d/%d/%d/%d%%", b.Minted, b.Done, b.Open, b.Rate)
-	b.Detail = fmt.Sprintf("on %s: %d minted, %d done. %d open or backlogged now. "+
-		"%d rejection(s) over %d token(s) that reached a review, %d%%. Over %s",
-		b.Day, b.Minted, b.Done, b.Open, rejected, len(reviewed), b.Rate, b.Window)
+	b.Says = fmt.Sprintf("BD: %d/%d/%d", b.Minted, b.Done, b.Open)
+	b.Detail = fmt.Sprintf("on %s: %d minted, %d ended. %d open now. Over %s",
+		b.Day, b.Minted, b.Done, b.Open, b.Window)
 	return b
 }
 
 // AN EVENT, AT THE WIDTH THIS READS. The log is written by several processes and
 // may be read twice, so duplicates are dropped on session, seq, src and time,
-// which is what util/checks/count-reviews.py drops them on.
+// which is what the review count in the scratchpad drops them on.
 type logged struct {
 	T       string         `json:"t"`
 	Seq     int            `json:"seq"`

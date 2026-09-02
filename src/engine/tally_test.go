@@ -11,8 +11,9 @@ import "testing"
 // number printed beside it and still look right.
 //
 // SO THE COUNT CARRIES ITS MEMBERS and the page draws what it was handed. This
-// is the ruling wk-1b7c1a2da1 made for the burndown, applied to the same bar.
+// is the ruling made for the burndown, applied to the same bar.
 func TestACountCarriesTheTokensBehindIt(t *testing.T) {
+	t.Parallel()
 	p := writeBase(t, t.TempDir(), "z.base", `
 views:
   - name: left
@@ -67,6 +68,7 @@ views:
 // still deciding the number, which draws a pill saying nought that opens onto
 // the whole queue.
 func TestACountThatMatchesNothingCarriesNothing(t *testing.T) {
+	t.Parallel()
 	p := writeBase(t, t.TempDir(), "z.base", `
 views:
   - name: left
@@ -99,6 +101,7 @@ views:
 // declares the whole with outOf, both halves are counted over the same rows,
 // and a count without an outOf stays a bare number.
 func TestACountSaysWhatItIsOutOf(t *testing.T) {
+	t.Parallel()
 	p := writeBase(t, t.TempDir(), "z.base", `
 views:
   - name: left

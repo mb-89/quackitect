@@ -8,6 +8,7 @@ import (
 // NOTHING IS CUT OFF is the whole point, so the test is that every word
 // survives and no line is wider than the pane.
 func TestNothingIsCutOff(t *testing.T) {
+	t.Parallel()
 	long := "the prompt that I see in the log needs to be exactly the prompt " +
 		"that I say, not something that you interpreted"
 	src := "kind     prompt\nactor    owner\n\n" + long + "\n\npath     " +
@@ -34,6 +35,7 @@ func TestNothingIsCutOff(t *testing.T) {
 // A CONTINUATION LINES UP UNDER THE VALUE, or a wrapped value reads as a new
 // field with no name.
 func TestAContinuationLinesUpUnderTheValue(t *testing.T) {
+	t.Parallel()
 	got := Wrap("msg      one two three four five six seven eight nine ten", 24)
 	lines := strings.Split(got, "\n")
 	if len(lines) < 2 {
@@ -50,6 +52,7 @@ func TestAContinuationLinesUpUnderTheValue(t *testing.T) {
 // A word wider than the pane is broken rather than left long, because one long
 // path would otherwise push the pane sideways.
 func TestOneLongWordIsBroken(t *testing.T) {
+	t.Parallel()
 	got := Wrap(strings.Repeat("a", 90), 30)
 	lines := strings.Split(got, "\n")
 	if len(lines) != 3 {
@@ -62,6 +65,7 @@ func TestOneLongWordIsBroken(t *testing.T) {
 
 // A line that already fits is left exactly as it was.
 func TestAShortLineIsUntouched(t *testing.T) {
+	t.Parallel()
 	src := "kind     prompt\nactor    owner"
 	if got := Wrap(src, 40); got != src {
 		t.Fatalf("it changed a line that fitted:\n%q\n%q", src, got)

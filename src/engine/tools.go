@@ -82,7 +82,7 @@ func ProbeTools(r Roots, session string) Probe {
 		wg.Add(1)
 		go func(c Candidate) {
 			defer wg.Done()
-			t, ok := ask1(c)
+			t, ok := askOne(c)
 			if !ok {
 				return
 			}
@@ -99,7 +99,7 @@ func ProbeTools(r Roots, session string) Probe {
 
 // A tool is present when it is on the path and it answers. Both have to hold:
 // a name that resolves and then refuses to run is not a tool anyone can use.
-func ask1(c Candidate) (Tool, bool) {
+func askOne(c Candidate) (Tool, bool) {
 	path, err := exec.LookPath(c.Name)
 	if err != nil {
 		return Tool{}, false
@@ -121,7 +121,7 @@ func writeProbe(r Roots, p Probe) {
 	if err != nil {
 		return
 	}
-	_ = os.WriteFile(probePath(r), append(b, '\n'), 0o644)
+	_ = writeAtomic(probePath(r), append(b, '\n'), 0o644) // a probe it cannot remember is run again
 }
 
 func LoadProbe(r Roots) (Probe, bool) {

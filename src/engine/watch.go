@@ -73,7 +73,7 @@ func SayRunning(r Roots, v Running) {
 	if err != nil {
 		return
 	}
-	_ = os.WriteFile(runningPath(r), append(b, '\n'), 0o644)
+	_ = writeAtomic(runningPath(r), append(b, '\n'), 0o644) // the next engine decides again whether one is running
 }
 
 // StopSaying is called when the engine leaves on purpose. A file left behind

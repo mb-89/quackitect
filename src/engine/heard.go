@@ -47,7 +47,7 @@ func saveHeard(r Roots, h heardAt) {
 		return
 	}
 	if b, err := json.Marshal(h); err == nil {
-		_ = os.WriteFile(heardPath(r), append(b, '\n'), 0o644)
+		_ = writeAtomic(heardPath(r), append(b, '\n'), 0o644) // the copy is retried from the transcript on the next call
 	}
 }
 
@@ -147,7 +147,13 @@ func CopyWhatWasHeard(r Roots, transcript string, log *Log, actor string) int {
 			have[said]--
 			continue
 		}
-		log.Write("user", "prompt", "owner", said, nil, map[string]any{"heard": "mid-turn"})
+		// THROUGH record(), BECAUSE THERE MAY BE NO LOG. The hook keeps nil
+		// when no session is running and says so: the guard still answers,
+		// because the answer is about a file and not about a session. This one
+		// call went straight to the log and took the tool call down with it,
+		// and it is reached PRECISELY when there is no log, because SaidCount
+		// reads the record and answers nought for everything without one.
+		record(log, "user", "prompt", "owner", said, nil, map[string]any{"heard": "mid-turn"})
 		// THE WALKER OWES THE ANSWER, NOT WHOEVER HAPPENED TO COPY IT.
 		//
 		// Several agents run here at once and any of their tool calls can be
@@ -158,7 +164,7 @@ func CopyWhatWasHeard(r Roots, transcript string, log *Log, actor string) int {
 		//
 		// The person is talking to the walker and the walker is the one that
 		// can act on what they said.
-		_ = TheyAsked(r, Walker, said)
+		_ = TheyAsked(r, Walker, said) // the guard answers whether or not it can note the question
 		copied++
 	}
 	// The offset is kept even when nothing was copied, so the next pass does

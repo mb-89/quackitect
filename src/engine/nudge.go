@@ -63,43 +63,8 @@ func Nudge(r Roots, actor, role string) string {
 	if !firstTimeAt(r, role, step) {
 		return ""
 	}
-	return fmt.Sprintf("%d %s and nothing in hand. How about spawning %s. "+
-		"Declining is a fine answer: sometimes work does not split.", waiting, what, whoToSpawn(role))
-}
-
-// countQueue answers how many are waiting on this actor's queue, whether the
-// actor already has one in hand, and what the queue is called.
-//
-// TWO QUEUES, ONE MECHANISM. Open work where the walker is, and work waiting
-// for a reviewer. Same steps, same rule, two counts.
-func countQueue(r Roots, actor, role string) (int, bool, string) {
-	waiting, busy := 0, false
-	for _, t := range Tokens(r) {
-		// WHICH STATES COUNT IS THE ENGINE'S ONE ANSWER. This wrote the
-		// whole set out again, for both roles, so a twelfth state would have
-		// joined the pull and not the count.
-		// THE COUNT ASKS THE SAME QUESTION THE PULL ASKS, and the pull stopped
-		// asking about the assignee. A count that filtered by name reported an
-		// empty worker queue while open work sat in it, which is the number the
-		// nudge is built on.
-		if containsStatus(HandedOut(role), t.Status) {
-			waiting++
-		}
-		if containsStatus(HeldBy(role), t.Status) && t.Holder == actor {
-			busy = true
-		}
-	}
-	if role == RoleReviewer {
-		return waiting, busy, "waiting for a reviewer"
-	}
-	return waiting, busy, "open where you are"
-}
-
-func whoToSpawn(role string) string {
-	if role == RoleReviewer {
-		return "another reviewer"
-	}
-	return "a subagent"
+	return fmt.Sprintf("%d %s and nothing in hand. How about spawning another agent. "+
+		"Declining is a fine answer: sometimes work does not split.", waiting, what)
 }
 
 // stepFor answers the highest step this count has reached, or zero.
@@ -141,7 +106,7 @@ func forgetAbove(r Roots, role string, waiting int) {
 func loadNudged(r Roots) nudged {
 	var g nudged
 	if b, err := os.ReadFile(nudgePath(r)); err == nil {
-		_ = json.Unmarshal(b, &g)
+		_ = json.Unmarshal(b, &g) // a file that will not read is a zero count
 	}
 	if g.At == nil || g.Session != currentSession(r) {
 		g = nudged{Session: currentSession(r), At: map[string]int{}}
@@ -151,6 +116,29 @@ func loadNudged(r Roots) nudged {
 
 func saveNudged(r Roots, g nudged) {
 	if b, err := json.MarshalIndent(g, "", " "); err == nil {
-		_ = os.WriteFile(nudgePath(r), b, 0o644)
+		_ = writeAtomic(nudgePath(r), b, 0o644) // a nudge it cannot remember is said again
 	}
+}
+
+// countQueue answers how much work is open and how much is in hand, so the
+// nudge can say the queue is long while nothing is being done.
+//
+// IT ASKS THE PROCESS WHAT IS OPEN. A token is open when some activity of its
+// process can run from where it stands, and in hand when somebody holds it.
+func countQueue(r Roots, actor, role string) (open int, busy bool, what string) {
+	for _, t := range Tokens(r) {
+		if t.Ended() {
+			continue
+		}
+		if t.Holder != "" {
+			if t.Holder == actor {
+				busy = true
+			}
+			continue
+		}
+		if Workable(r, t) {
+			open++
+		}
+	}
+	return open, busy, "open"
 }

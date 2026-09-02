@@ -9,6 +9,7 @@ import (
 // A CONTROL NAMES AN ICON AND THE TABLE DRAWS IT. Nothing else carries a
 // glyph, so the same mark is the same mark everywhere and one edit changes it.
 func TestAControlNamesAnIconAndTheTableDrawsIt(t *testing.T) {
+	t.Parallel()
 	r := guidanceTree(t)
 	os.WriteFile(filepath.Join(r.Method, "util", "parameters.json"), []byte(`{
 	  "name":"quackitect","type":"group","children":[
@@ -39,6 +40,7 @@ func TestAControlNamesAnIconAndTheTableDrawsIt(t *testing.T) {
 
 // The table is read, and its notes are not icons.
 func TestTheIconTableSkipsItsOwnNotes(t *testing.T) {
+	t.Parallel()
 	r := guidanceTree(t)
 	icons, err := Icons(r)
 	if err != nil {

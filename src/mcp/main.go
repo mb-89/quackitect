@@ -63,7 +63,7 @@ func main() {
 			continue
 		}
 		var id any
-		_ = json.Unmarshal(req.ID, &id)
+		_ = json.Unmarshal(req.ID, &id) // an id that will not read is a notification, which has none
 
 		switch req.Method {
 		case "initialize":
@@ -72,7 +72,7 @@ func main() {
 			var p struct {
 				ProtocolVersion string `json:"protocolVersion"`
 			}
-			_ = json.Unmarshal(req.Params, &p)
+			_ = json.Unmarshal(req.Params, &p) // params that will not read are no params
 			if p.ProtocolVersion == "" {
 				p.ProtocolVersion = "2025-06-18"
 			}
@@ -95,12 +95,12 @@ func main() {
 }
 
 func reply(out *json.Encoder, id any, result any) {
-	_ = out.Encode(response{JSONRPC: "2.0", ID: id, Result: result})
+	_ = out.Encode(response{JSONRPC: "2.0", ID: id, Result: result}) // the pipe is shut, so there is nobody left to tell
 }
 
 // A blank line between paragraphs, written once so every description reads the
 // same and none of them carries the escape.
-const nl2 = "\n\n"
+const blankLine = "\n\n"
 
 func tools() []map[string]any {
 	// The lane's tools are declared where they are handled, so a tool and its
@@ -114,9 +114,9 @@ func tools() []map[string]any {
 		{
 			"name": "se_answer",
 			"description": "ANSWER THE PERSON, IN THE RECORD. One prompt, one answer, where they are " +
-				"already looking." + nl2 +
+				"already looking." + blankLine +
 				"Use it for every prompt they give you. Say what you would have said to them, in " +
-				"full, and then carry on with the work you hold." + nl2 +
+				"full, and then carry on with the work you hold." + blankLine +
 				"YOU DO NOT HAVE TO STOP TO BE HEARD. Answer, then keep working.",
 			"inputSchema": map[string]any{
 				"type": "object",
@@ -134,18 +134,18 @@ func tools() []map[string]any {
 			// This said the opposite of the guidance it sits beside. Look in
 			// the log first is a condition over a private log that an agent has
 			// to evaluate before every recording and can forget, and the
-			// guidance says use it whenever you are unsure, because the verb
-			// refuses a repeat. An agent reads both.
+			// guidance removed it. An agent reads both.
 			//
-			// The sentence below is the guidance's own, and a check in this
-			// package holds the two together.
+			// The sentence in saidRule is the guidance's own, and a check in
+			// this package holds the two together. What is written here around
+			// it says what this layer knows and the guidance does not: which
+			// message the engine has already copied.
 			"description": "PUT WHAT THE PERSON SAID IN THE RECORD, WORD FOR WORD.\n\n" +
 				"THE ENGINE COPIES A MID-TURN MESSAGE ON YOUR NEXT TOOL CALL. This is the " +
-				"fallback, for a message it has not copied. " + saidRule + "\n\n" +
-				"THEIR SENTENCE, NOT A SUMMARY OF IT. Copy the message. Do not shorten it, tidy " +
-				"it, or join two.\n\n" +
-				"A NOTE IS SOMETHING ELSE. A note is a work token in the backlog, and se_work with " +
-				"backlog set is what mints one.",
+				"fallback, for a message it has not copied, and it refuses a repeat.\n\n" +
+				"THEIR SENTENCE, NOT A SUMMARY OF IT. " + saidRule + "\n\n" +
+				"A NOTE IS SOMETHING ELSE. A note is a work token, and se_work is what " +
+				"mints one.",
 			"inputSchema": map[string]any{
 				"type": "object",
 				"properties": map[string]any{
@@ -163,7 +163,7 @@ func call(roots roots, params json.RawMessage) map[string]any {
 		Name      string         `json:"name"`
 		Arguments map[string]any `json:"arguments"`
 	}
-	_ = json.Unmarshal(params, &p)
+	_ = json.Unmarshal(params, &p) // params that will not read are no params
 
 	switch p.Name {
 	case "se_status":
@@ -186,6 +186,10 @@ func call(roots roots, params json.RawMessage) map[string]any {
 			return text("It could not be recorded: " + err.Error())
 		}
 		return text("recorded")
+	case "se_apply":
+		return text(applyEdits(roots, p.Arguments))
+	case "se_run":
+		return text(runCommand(roots, p.Arguments))
 	case "se_work":
 		return text(mintWork(roots, p.Arguments))
 	case "se_pull":

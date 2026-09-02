@@ -10,6 +10,7 @@ import (
 // said the same mark is the same mark in the sidebar, the editor and the log
 // window, and the log window's marks were not in it.
 func TestTheMarksComeFromTheTable(t *testing.T) {
+	t.Parallel()
 	icons = nil
 	yes, no := true, false
 

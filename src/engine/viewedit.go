@@ -335,7 +335,7 @@ func patchView(path, view, key string, rewrite func(block []string, indent strin
 	if strings.HasSuffix(string(b), "\n") && !strings.HasSuffix(text, "\n") {
 		text += "\n"
 	}
-	return os.WriteFile(path, []byte(text), 0o644)
+	return writeAtomic(path, []byte(text), 0o644)
 }
 
 // A VIEW STARTS AT ITS LIST ITEM, not at the line that names it. The name may

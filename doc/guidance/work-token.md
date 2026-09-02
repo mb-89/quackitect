@@ -1,92 +1,81 @@
-# Work token
+---
+kind: [[guidance]]
+scope: ["every work token, whatever its process"]
+out_of_scope: []
+depends_on: ["[[voice]]"]
+---
 
-What a work token carries, and how one is written.
+# Motivation
 
-## Motivation
+A work token (wt) is the fundamental unit of work we work on.
+The work can be done in different ways, we call those processes.
+Processes sit under [[src/processes]], and every worktokens structure is informed by the process that is use for it.
+The token is the only information the reader has, so it needs to be understandable
 
-A token is the only way work is described, delegated, evidenced and closed.
-A person reads it cold, six months later, in under a minute. That is the
-size. A token that takes longer to read than the work took to do is the
-failure this file exists to stop.
+Rules about writing wts that are mechanical are under [[src/schemas/work-token.schema.yaml]].
+Rules about writing wts that are judgement are here.
 
-The engine owns the frontmatter and four headings. Everything else in the
-note is prose a person reads, and prose that explains why a sentence is true
-is not read by anybody.
+# Actionables
 
-## Actionables
+## Writing one
 
-- A token is the size of a ticket a good engineer writes by hand. Under 1,200
-  bytes as the aim, 2,500 as the limit, commands excepted.
-- `## detail` says what is asked or what is wrong, in 1 to 6 sentences. Keep
-  the owner's words where the owner decided. Name files, verbs and tests.
-- `## detail` carries no argument, no history, no measurement of the record,
-  and no account of who said what.
-- Related tokens are named in one line: `Related: wk-..., wk-...`.
-- `## done when` holds one criterion per line. Where a command can decide
-  it, the command is on the next line in backticks, and it passes on exit 0.
-- A criterion is one line. A command decides the sentence above it, and the
-  two are about one thing.
-- A criterion about a set walks the set and fails on the first miss. `rg -q`
-  over three files exits 0 when any one matches, so write the loop.
-- Ask whether a criterion is about the change or about the project, and
-  whether it is asserted once or forever. Pin a one-time assertion to what
-  existed when the work started.
-- A criterion is not a plan and not a restatement of the problem.
-- `## evidence: outcome` on an ended token says what was built, in 1 to 4
-  sentences naming files, tests and verbs.
-- No other heading. The engine rewrites the body from what it parsed, and
-  any other heading is lost on the next save.
-- A token's prose follows `voice.md`. No capitals for emphasis.
-- Before a feature token is worked, its detail names the basics it stands on
-  and where each one lives.
+1. Write the problem in detail, and the answer in proposed action. *
+2. Reduce to the smallest case that still shows the problem. Cut what a reader does not need.
+3. Write acceptance criteria first. A criterion is decidable, and somebody answers it yes or no. *
+4. Where a command decides a criterion, write the command. Otherwise name who looks at what.
+5. A criterion is not a plan, and not the problem restated.
+6. Ask whether a criterion is about this change or about the project. Pin a one-time one. *
+7. One token, one piece of work. A done-when needing "and" is usually two tokens.
+8. Before a feature, name the basics it stands on. Mint the missing one first. *
 
-## Discussion
+## Using one
 
-### What the engine reads
+9. Do what the token asks and nothing next to it. If the ask is ambiguous, ask one question and wait.
+10. Write the check before the work. Watch it go red for the reason you expect.
+11. A check that will not go red is the finding. Write it down and stop.
+12. Put both halves of a mechanism in the evidence. "Nothing yet, owed by X" is an answer.
+13. Report work as done only with the evidence that it is.
+14. A checklist carries institutional knowledge. Answer each line rather than ticking it. *
 
-`src/engine/store.go` reads the frontmatter and the headings `## detail`,
-`## guidance`, `## done when`, `## evidence: <name>`. It also reads
-`## finding`, `## lesson` and `## re-watched:`, which belong to the review
-system and are not written while reviewers are off. On save the body is
-rebuilt from those fields, so anything else in the note is dropped.
+# Discussion
 
-### The shape on the page
+## 1. The problem, not the answer
 
-The shape here is a stopgap. The owner's ruling in
-`doc/cross-cutting/cross-cutting-design.md`, section 4d, is that every note
-kind has a schema, the template is generated from the schema, every field
-carries the description the author sees, and enumerated fields are
-constrained. When that exists, this file's shape rules move into the schema
-and leave this file.
+The sections are separate so that a reader can disagree with the answer while
+still believing the problem.
+Keep the argument out of it: no history, no measurement of the record, and no account of who said what.
 
-### Why the size rule
+## 3. A criterion that cannot fail
 
-On 2026-09-02 the record held 335 tokens at 2.8 MB, an average of 8 KB and a
-largest of 117 KB. A rewrite to the shape above brought the record to about
-0.3 MB with no criterion or command lost. The bulk was argument written to
-satisfy reviewers, measurements of the record pasted into details, and the
-reviewers' findings and lessons appended round by round.
+A check built after the work, from the work, cannot go red.
+It asserts what the fix happens to produce.
+Shapes seen here: a check for a class name nothing writes, a rule enforced in
+one language and checked in another, a word list built from the cases already
+found, a scope drawn around what was touched rather than around the claim.
 
-### Drift between sentence and command
+Write the check first and watch it fail (for the expected reason, no randomly).
+A check that will not go red is the finding.
 
-Shapes found on real tokens: a command borrowed from a neighbouring token
-that still names the neighbour's deliverable. A literal nobody derived, so
-the search proves the string is present and nothing about whether it is
-true. A pattern that must find nothing once the work is done, so it has to
-find something before, or it is dead on the day it is written. A criterion
-that pins the token a pull answers with and never the token the pull
-rewrote, found at round 3 of wk-386169824b. A set covered by one member. A
-snapshot taken after the work started, so the token closes owing fewer than
-it did.
+## 6. About the change, or about the project
+Ask whether the sentence is asserted once or forever.
+A one-time assertion is pinned to what existed when the work started.
+A standing one is a rule the project keeps, and it belongs in a check rather
+than on a token that closes.
 
-### Prior art
+## 14. A checklist is not a formality
 
-Fit, Cunningham, about 2002: an example a program can run is worth more than
-a sentence only a person can read. FitNesse put the tables in a wiki the
-requirement's owner edits, which is why criteria live in the note. Adzic,
-Specification by Example, 2011: automate validation without changing the
-specification, which is why a criterion carries its command rather than
-being replaced by one. North, behaviour-driven development, about 2006: the
-diagnosis is taken and the given-when-then form is not, because a token is
-not a user story. Estimate, marked as one: agreeing the criteria before the
-work costs less than the rounds it saves. One data point exists.
+The lines come from the process, and the process carries what earlier work
+learned the hard way.
+A line ticked without being read is the institutional knowledge thrown away and
+the tick kept.
+
+Where a line asks for evidence, the sentence is the answer and the tick only
+counts it. Where it asks for none, the tick is honest, because there is no
+artifact and the only thing anybody can say is that they thought about it.
+
+## 8. Basics first
+
+The basics look self-evident, so nobody writes them down, and the gap is found
+after the feature. If basics arent built first, the feature based on them will not be solid.
+Before a feature token is worked, its detail names what it stands on, and each
+missing basic is minted first.

@@ -23,6 +23,7 @@ func probeTree(t *testing.T) Roots {
 // The engine asks the machine rather than assuming. A name that resolves and
 // answers is kept, and a name that does not is dropped without a word.
 func TestTheProbeKeepsOnlyWhatAnswers(t *testing.T) {
+	t.Parallel()
 	r := probeTree(t)
 	p := ProbeTools(r, "20260831-000000")
 	if len(p.Found) != 1 || p.Found[0].Name != "go" {
@@ -41,6 +42,7 @@ func TestTheProbeKeepsOnlyWhatAnswers(t *testing.T) {
 // boot, because not knowing what the machine has is worse than a slow start
 // and better than no engine.
 func TestAMissingCandidateListDoesNotStopTheProbe(t *testing.T) {
+	t.Parallel()
 	r := Roots{Method: t.TempDir(), Work: t.TempDir()}
 	if p := ProbeTools(r, "20260831-000000"); len(p.Found) != 0 {
 		t.Fatalf("it found %d tools with no list", len(p.Found))
@@ -50,6 +52,7 @@ func TestAMissingCandidateListDoesNotStopTheProbe(t *testing.T) {
 // An arrival happens once per actor per session, and it is what every
 // once-per-session fact keys off.
 func TestAnActorArrivesOnceAndThenDoesNot(t *testing.T) {
+	t.Parallel()
 	r := probeTree(t)
 	const session = "20260831-000000"
 	if !Arrived(r, session, "main") {
@@ -71,6 +74,7 @@ func TestAnActorArrivesOnceAndThenDoesNot(t *testing.T) {
 // A probe from an earlier session says what an earlier machine had. Somebody
 // may have installed something since, so it is ignored rather than trusted.
 func TestAProbeFromAnEarlierSessionIsIgnored(t *testing.T) {
+	t.Parallel()
 	r := probeTree(t)
 	ProbeTools(r, "20260831-000000")
 	if got := KnownTools(r, "20260831-111111"); got != nil {
@@ -81,6 +85,7 @@ func TestAProbeFromAnEarlierSessionIsIgnored(t *testing.T) {
 // The pull is where it reaches the agent, because the pull is the one call
 // every agent makes.
 func TestTheFirstPullCarriesTheToolsAndTheSecondDoesNot(t *testing.T) {
+	t.Parallel()
 	r := probeTree(t)
 	l, err := OpenLog(r.Private("log"))
 	if err != nil {

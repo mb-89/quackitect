@@ -150,22 +150,6 @@ func (r Record) Haystack() string {
 	return b.String()
 }
 
-// DetailValues is everything under details, names and values alike, as one
-// string. It is what details: searches.
-func (r Record) DetailValues() string {
-	if r.Data == nil {
-		return ""
-	}
-	var b strings.Builder
-	for _, k := range sortedKeys(r.Data) {
-		b.WriteString(k)
-		b.WriteByte(' ')
-		fmt.Fprint(&b, r.Data[k])
-		b.WriteByte(' ')
-	}
-	return b.String()
-}
-
 func sortedKeys(m map[string]any) []string {
 	out := make([]string, 0, len(m))
 	for k := range m {

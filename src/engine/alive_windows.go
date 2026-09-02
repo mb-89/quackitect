@@ -3,7 +3,6 @@
 package main
 
 import (
-	"os"
 	"syscall"
 )
 
@@ -22,6 +21,5 @@ func alive(pid int) bool {
 		return false
 	}
 	const stillRunning = 259
-	_ = os.Getpid()
 	return code == stillRunning
 }

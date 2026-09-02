@@ -19,7 +19,7 @@ import (
 // the answer is one row per actor and the panel draws the list. A panel drawing
 // one agent would have to choose, and choosing is a decision nothing here owns.
 
-// THE FOUR STATES, IN THE ORDER AN ACTOR IS ASKED ABOUT THEM.
+// THE THREE STATES, IN THE ORDER AN ACTOR IS ASKED ABOUT THEM.
 //
 // THEY DO NOT PARTITION, WHICH IS WHY THE ORDER IS PART OF THE ANSWER. An actor
 // can hold a token and have claimed a stop, and it can hold nothing and have
@@ -29,16 +29,19 @@ import (
 // STOPPED COMES FIRST BECAUSE IT IS THE ONE THE PERSON ACTS ON. An agent that
 // has claimed a stop while holding a token is stopped holding a token, and
 // drawing it as working would hide the thing they need to see.
+//
+// REVIEWING WENT WITH THE REVIEW FLOW. An actor holding a token is working on
+// it, and which activity of its process that is belongs to the process rather
+// than to this list.
 const (
-	Stopped   = "stopped"
-	Working   = "working"
-	Reviewing = "reviewing"
-	Waiting   = "waiting"
+	Stopped = "stopped"
+	Working = "working"
+	Waiting = "waiting"
 )
 
 // TheStates answers the order, so a check walks the engine's list rather than
 // one typed out beside it.
-func TheStates() []string { return []string{Stopped, Working, Reviewing, Waiting} }
+func TheStates() []string { return []string{Stopped, Working, Waiting} }
 
 // NothingInHand is what the answer says where an actor holds no token, because
 // an empty field says nothing and a reader cannot tell it from a field nobody
@@ -97,14 +100,13 @@ func doingOf(r Roots, all []Token, actor string) Doing {
 		if t.Holder != actor {
 			continue
 		}
-		switch t.Status {
-		case ImpInWork, SpecInWork:
-			d.True = append(d.True, Working)
-		case ImpInReview, SpecInReview:
-			d.True = append(d.True, Reviewing)
-		default:
+		// HOLDING IT IS WORKING ON IT. The engine knows the hold; which
+		// state of which process it sits in is the token's own word and is
+		// reported as it stands rather than sorted into a category here.
+		if t.Ended() {
 			continue
 		}
+		d.True = append(d.True, Working)
 		d.ID, d.Title = t.ID, t.Title
 		d.Holding = t.ID + " " + t.Title
 	}

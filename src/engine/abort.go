@@ -29,15 +29,15 @@ func Abort(r Roots, id, why, by string) (Token, error) {
 	}
 	// A TOKEN THAT HAS ALREADY ENDED IS NOT ENDED AGAIN. Doing it twice would
 	// write over what the first ending said, and the first one is the true one.
-	if t.Status.Ended() {
+	if t.Ended() {
 		return t, fmt.Errorf("%s already ended as %s, with disposition %q. "+
 			"An ending is not written over", t.ID, t.Status, t.Disposition)
 	}
-	// WHERE IT CAME FROM IS WRITTEN BEFORE IT IS OVERWRITTEN. Aborted on its
-	// own says a token stopped without saying what it stopped in the middle of.
+	// WHERE IT CAME FROM IS IN THE LOG, NOT ON THE TOKEN. The status it stood
+	// in is what the record holds, and a second copy on the note is history in
+	// the current surface.
 	from := t.Status
-	t.Status, t.Holder = Aborted, ""
-	t.AbortedFrom = from
+	t.Holder = ""
 	t.Disposition, t.Reason = Dropped, why
 	if err := SaveToken(r, t); err != nil {
 		return t, err

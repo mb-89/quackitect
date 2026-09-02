@@ -10,6 +10,7 @@ import (
 // said, and finding the beginning of it, has been given the one thing they were
 // checking with the end taken off.
 func TestAPromptIsRecordedWhole(t *testing.T) {
+	t.Parallel()
 	exe := buildEngine(t)
 	r := guidanceTree(t)
 	Project(r)

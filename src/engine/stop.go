@@ -116,7 +116,7 @@ func saveClaims(r Roots, c claims) error {
 	if err := os.MkdirAll(r.Private(), 0o755); err != nil {
 		return err
 	}
-	return os.WriteFile(claimPath(r), append(b, nl...), 0o644)
+	return writeAtomic(claimPath(r), append(b, nl...), 0o644)
 }
 
 func Sanctioned() []StopReason { return sanctioned }
@@ -166,7 +166,7 @@ func SpendClaim(r Roots, actor string) {
 	// ONE ACTOR'S CLAIM IS SPENT AND THE REST STAND. Removing the file spent
 	// everybody's, so one agent carrying on ended another's stop.
 	delete(all.Claims, actor)
-	_ = saveClaims(r, all)
+	_ = saveClaims(r, all) // a claim it cannot drop is dropped when the session rotates
 }
 
 func reasonIDs() string {

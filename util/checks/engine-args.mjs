@@ -51,7 +51,7 @@ if (!existsSync(exe)) {
 // One token to aim the token-shaped controls at, minted through the engine so
 // the id is a real one.
 const minted = JSON.parse(
-  execFileSync(exe, ["work", "--title", "a token to aim", "--assignee", "human",
+  execFileSync(exe, ["work", "--title", "a token to aim",
     "--by", "person", "--work", work], { encoding: "utf8" }),
 );
 const id = minted.id;
@@ -98,18 +98,18 @@ function ask(name, args) {
 
 const file = join(work, "util", "views", "work.base");
 
-ask("mint", A.mintArgs("test", "SS·T"));
-ask("mint with a detail", A.mintArgs("four words name work / and the rest is the detail", "MS·E"));
-ask("edit a cell", A.editCellArgs(id, "title", "a new title here"));
+ask("mint", A.mintArgs("test", "note"));
+ask("mint with a detail", A.mintArgs("four words name work / and the rest is the detail", "note"));
 ask("file into a group", A.fileArgs(id, "bucket", "later"));
 ask("make a group", A.groupArgs([id]));
 ask("rename a group", A.renameGroupArgs("later", "much later"));
+ask("edit a cell", A.editCellArgs(id, "title", "a new title here"));
 ask("hold on", A.holdArgs(false));
 ask("hold off", A.holdArgs(true));
 ask("the panes", A.panesArgs(file));
 ask("one pane", A.paneArgs(file, "left"));
 ask("the views", A.viewsArgs());
-ask("pin a declared group", A.viewArgs(file, "left", A.pinArgs("backlogged")));
+ask("pin a declared group", A.viewArgs(file, "left", A.pinArgs("noted")));
 ask("pin an invented group", A.viewArgs(file, "left", A.pinArgs("later", 'bucket == "later"')));
 ask("unpin", A.viewArgs(file, "left", A.unpinArgs("later")));
 ask("a column width", A.viewArgs(file, "left", A.widthArgs("title", 320)));
@@ -146,7 +146,7 @@ ask("dropping a level", A.viewArgs(file, "left", A.dropLevelArgs("sort", 1)));
 for (const [what, groups] of [
   ["two groups", [
     { rows: [{ property: "status", operator: "is", value: "open" }] },
-    { rows: [{ property: "assignee", operator: "is", value: "main" }] },
+    { rows: [{ property: "holder", operator: "is", value: "main" }] },
   ]],
   ["one group of two", [
     { rows: [
@@ -190,7 +190,7 @@ for (const [what, groups] of [
 // pass every assertion above.
 {
   const typed = "four words name work / and the rest is the detail, whole";
-  const args = A.mintArgs(typed, "SS·T");
+  const args = A.mintArgs(typed, "note");
   let made = {};
   try {
     made = JSON.parse(execFileSync(exe, [...args, "--work", work], { encoding: "utf8" }));
@@ -202,7 +202,7 @@ for (const [what, groups] of [
   say("everything after the slash is the detail",
     (made.detail ?? "") === "and the rest is the detail, whole",
     "the token carries " + JSON.stringify(made.detail ?? made.error));
-  const plain = A.mintArgs("no slash at all", "SS·T");
+  const plain = A.mintArgs("no slash at all", "note");
   let bare = {};
   try {
     bare = JSON.parse(execFileSync(exe, [...plain, "--work", work], { encoding: "utf8" }));
@@ -212,6 +212,26 @@ for (const [what, groups] of [
   say("a line with no slash is all title and no detail",
     bare.title === "no slash at all" && !bare.detail,
     JSON.stringify(bare));
+}
+
+// THE LANGUAGE SERVER ANSWERS THE FIRST THING AN EDITOR ASKS IT.
+//
+// The verb is reached with the extension's own builder, and the handshake is
+// the one an editor sends, so an unwired verb fails here rather than in a
+// window nobody is watching. Standard input closes after the message, which is
+// how the server is told the conversation is over.
+{
+  const body = JSON.stringify({ jsonrpc: "2.0", id: 1, method: "initialize", params: {} });
+  const hello = "Content-Length: " + Buffer.byteLength(body) + "\r\n\r\n" + body;
+  let said = "";
+  try {
+    said = execFileSync(exe, A.lspArgs(work), { input: hello, encoding: "utf8", timeout: 20000 });
+  } catch (e) {
+    said = String(e.stdout ?? e);
+  }
+  say("the language server answers initialize with what it can do",
+    said.includes("completionProvider") && said.includes("Content-Length"),
+    said.slice(0, 200));
 }
 
 // EVERY BUILDER IS DRIVEN, OR IS EXCLUDED BY NAME WITH A REASON.
@@ -225,7 +245,6 @@ for (const [what, groups] of [
 // AND AN EXCLUSION IS WRITTEN DOWN WITH ITS ANSWER, so a reader can tell one
 // from an oversight.
 const excluded = {
-  readKind: "not an argument builder: it reads a kind out of an answer",
 };
 const builders = Object.keys(A).filter((k) => typeof A[k] === "function");
 say("the extension exports its argument builders (" + builders.length + ")", builders.length > 5);

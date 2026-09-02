@@ -9,6 +9,7 @@ import (
 // A LINE WRITTEN NOW IS READ NOW. The window is watched while somebody works,
 // so a line that only arrives on a reload is a line that arrived too late.
 func TestALineAppendedIsReadWithoutReopening(t *testing.T) {
+	t.Parallel()
 	p := filepath.Join(t.TempDir(), "session.jsonl")
 	write := func(s string) {
 		f, err := os.OpenFile(p, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0o644)

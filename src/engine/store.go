@@ -5,7 +5,6 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
-	"strconv"
 	"strings"
 )
 
@@ -29,181 +28,145 @@ import (
 // `type: work`, so neither folder is claimed whole and a person may keep their
 // own notes beside them.
 
-const TypeWork = "work"
-
 // EphemeralDir is private and never travels. TracedDir is the record.
 func EphemeralDir(r Roots) string { return r.Private("work") }
 func TracedDir(r Roots) string    { return filepath.Join(r.Work, "doc", "work") }
 
 func workDirs(r Roots) []string { return []string{TracedDir(r), EphemeralDir(r)} }
 
+// dirFor asks the process where a token of this kind lives.
+//
+// THE FOLDER IS THE ANSWER, NOT A FIELD. A token in doc/work is traced and one
+// in .se/work is not, so writing it on the note as well was a second copy that
+// could disagree with where the file actually is. The process decides where a
+// new one goes, and the folder answers for one that exists.
 func dirFor(r Roots, t Token) string {
-	if t.Traced {
+	if p, err := LoadProcess(r.Method, t.Process); err == nil && p.Traced {
 		return TracedDir(r)
 	}
 	return EphemeralDir(r)
 }
 
-// The frontmatter's order on the page. Identity first, then where it stands,
-// then what it is attached to, then the times.
+// The frontmatter's order on the page: what it is, then where it stands, then
+// what holds it back, then how it ended.
 var frontOrder = []string{
-	"id", "seq", "type", "title", "status", "assignee", "scope", "traced",
-	"disposition", "reason", "aborted_from", "holder", "bucket",
-	"parent", "subs", "depends_on", "successors",
-	"evidence", "evidence_script", "rounds",
-	"spec_fails", "imp_fails", "rung_two_spent", "rung",
-	"minted_by", "submitted_by", "reviewed_by", "spec_seen",
+	"kind", "process", "guidance", "title", "status", "bucket",
+	"holder", "needs_human", "depends_on", "ready_when",
+	"disposition", "reason", "successors",
+}
+
+// A value the editor walks is written in brackets. The name inside is the
+// value, so nothing downstream has to know the difference.
+// asLinks is asLink over a list, and an empty entry is dropped rather than
+// written as an empty pair of brackets.
+func asLinks(all []string) []string {
+	var out []string
+	for _, v := range all {
+		if l := asLink(v); l != "" {
+			out = append(out, l)
+		}
+	}
+	return out
+}
+
+// unlinkAll reads a list of links back as the names inside them. A list
+// written before this program wrote links is read unchanged, because unlink
+// takes a bare name as it stands.
+func unlinkAll(all []string) []string {
+	var out []string
+	for _, v := range all {
+		if name := unlink(v); name != "" {
+			out = append(out, name)
+		}
+	}
+	return out
+}
+
+func asLink(v string) string {
+	if v == "" {
+		return ""
+	}
+	return "[[" + v + "]]"
 }
 
 func (t Token) front() Front {
 	f := Front{
-		"id": t.ID, "seq": strconv.Itoa(t.Seq), "type": TypeWork, "title": t.Title,
-		"status": string(t.Status), "assignee": t.Assignee, "scope": string(t.Scope),
-		"traced":      strconv.FormatBool(t.Traced),
-		"disposition": string(t.Disposition), "reason": t.Reason,
-		"aborted_from": string(t.AbortedFrom), "holder": t.Holder,
-		"bucket": t.Bucket,
-		"parent": t.Parent, "subs": t.Subs, "depends_on": t.DependsOn,
-		"successors": t.Successors,
-		"evidence":   t.Evidence.Sections, "evidence_script": t.Evidence.Script,
-		"minted_by": t.MintedBy, "submitted_by": t.SubmittedBy,
-		"reviewed_by": t.ReviewedBy,
-		"spec_seen": t.SpecSeen,
+		"kind":     asLink("work-token"),
+		"process":  asLink(t.Process),
+		"guidance": asLink(t.Guidance),
+		"title":    t.Title,
+		"status":   string(t.Status),
+		"bucket":   t.Bucket,
+		"holder":   t.Holder,
+		// A RELATION IS WRITTEN AS A LINK, because the schema says the editor
+		// walks it. It was written as a bare id, so the walk had nothing to
+		// follow and the x-link on those two fields was a claim about a
+		// behaviour that was not there.
+		"depends_on":  asLinks(t.DependsOn),
+		"ready_when":  t.ReadyWhen,
+		"disposition": string(t.Disposition),
+		"reason":      t.Reason,
+		"successors":  asLinks(t.Successors),
 	}
-	if t.Rounds > 0 {
-		f["rounds"] = strconv.Itoa(t.Rounds)
-	}
-	// THE LADDER'S COUNT IS ON THE NOTE ONLY WHILE IT SAYS SOMETHING. A zero on
-	// every note is a column of noise, and the reader that wants one reads a
-	// missing key as zero.
-	if t.SpecFails > 0 {
-		f["spec_fails"] = strconv.Itoa(t.SpecFails)
-	}
-	if t.ImpFails > 0 {
-		f["imp_fails"] = strconv.Itoa(t.ImpFails)
-	}
-	if t.RungTwoSpent {
-		f["rung_two_spent"] = "true"
-	}
-	if t.Rung > 0 {
-		f["rung"] = strconv.Itoa(t.Rung)
+	if t.NeedsHuman {
+		f["needs_human"] = "true"
 	}
 	return f
 }
 
+// THE ID IS THE FILE NAME AND IS NOT WRITTEN TWICE. It is set by the reader
+// from the path, so a token that is renamed is the token it is called.
 func tokenFromFront(f Front) Token {
 	return Token{
-		ID: fs(f, "id"), Seq: fi(f, "seq"), Title: fs(f, "title"),
-		SubmittedBy: fs(f, "submitted_by"), ReviewedBy: fs(f, "reviewed_by"),
-		SpecSeen: fs(f, "spec_seen"),
-		// EVERY TOKEN ALREADY ON DISK KEEPS WHAT IT SAYS. The states were
-		// renamed and no note was rewritten by hand, so this is what reads one
-		// under the name it used.
-		Status: ReadStatus(fs(f, "status")), Assignee: fs(f, "assignee"),
-		Scope: Scope(fs(f, "scope")), Traced: fb(f, "traced"),
-		Disposition: Disposition(fs(f, "disposition")), Reason: fs(f, "reason"),
-		AbortedFrom: ReadStatus(fs(f, "aborted_from")),
-		Holder:      fs(f, "holder"), Bucket: fs(f, "bucket"), Parent: fs(f, "parent"),
-		Subs: fl(f, "subs"), DependsOn: fl(f, "depends_on"),
-		Successors: fl(f, "successors"),
-		Evidence:   EvidenceSpec{Sections: fl(f, "evidence"), Script: fs(f, "evidence_script")},
-		Rounds:     fi(f, "rounds"), MintedBy: fs(f, "minted_by"),
-		SpecFails: fi(f, "spec_fails"), ImpFails: fi(f, "imp_fails"),
-		RungTwoSpent: fb(f, "rung_two_spent"), Rung: fi(f, "rung"),
+		Process:     unlink(fs(f, "process")),
+		Guidance:    unlink(fs(f, "guidance")),
+		Title:       fs(f, "title"),
+		Status:      Status(fs(f, "status")),
+		Bucket:      fs(f, "bucket"),
+		Holder:      fs(f, "holder"),
+		NeedsHuman:  fb(f, "needs_human"),
+		DependsOn:   unlinkAll(fl(f, "depends_on")),
+		ReadyWhen:   fs(f, "ready_when"),
+		Disposition: Disposition(fs(f, "disposition")),
+		Reason:      fs(f, "reason"),
+		Successors:  unlinkAll(fl(f, "successors")),
 	}
 }
 
 // THE BODY IS PROSE, AND THE ENGINE WRITES ALL OF IT.
 //
-// Four kinds of section, each under a heading this program owns. A person may
-// write anything else in the note and it is left alone, because nothing but
-// these headings is read back.
+// Each section sits under a heading this program owns. A section under any
+// other heading is kept whole and written back, because not understanding
+// something is not a reason to delete it.
 const (
-	headDetail    = "## detail"
-	headGuidance  = "## guidance"
-	headEvidence  = "## evidence: "
-	headRewatched = "## re-watched: "
-	headFinding   = "## finding "
-	headCriteria  = "## done when"
-
-	// WHAT A WATCHED CRITERION SAYS ON THE PAGE. One lead each, so a reader
-	// sees what was absent and what it said without opening anything else.
-	leadWithout = "**red without** "
-	leadRed     = "**red said** "
-	headLesson  = "## lesson "
-
-	// WHAT WOULD HAVE STOPPED THE MISTAKE BEING MADE. One lead of its own, so
-	// a reader sees the prevention beside the detection rather than inside it.
-	leadPrevents = "**before it:** "
+	headDetail   = "## detail"
+	headProposed = "## proposed action"
+	headEvidence = "## evidence: "
+	headCriteria = "## done when"
 )
 
 func (t Token) body() string {
 	var b strings.Builder
 	if t.Detail != "" {
-		b.WriteString(headDetail + "\n\n" + t.Detail + "\n\n")
+		b.WriteString(headDetail + nl + nl + t.Detail + nl + nl)
 	}
-	if t.Guidance != "" {
-		b.WriteString(headGuidance + "\n\n" + t.Guidance + "\n\n")
+	if t.ProposedAction != "" {
+		b.WriteString(headProposed + nl + nl + t.ProposedAction + nl + nl)
 	}
-	if t.GuidanceRef != "" {
-		b.WriteString(headGuidance + "\n\nSee " + t.GuidanceRef + "\n\n")
+	// WHAT DONE MEANS, in the note a person reads and edits.
+	if len(t.Criteria) > 0 {
+		b.WriteString(headCriteria + nl + nl)
+		for _, c := range t.Criteria {
+			b.WriteString("- " + c.Says + nl)
+		}
+		b.WriteString(nl)
 	}
 	for _, s := range sortedKeys(t.Submission) {
-		b.WriteString(headEvidence + s + "\n\n" + t.Submission[s] + "\n\n")
+		b.WriteString(headEvidence + s + nl + nl + t.Submission[s] + nl + nl)
 	}
-	// AND WHAT THE REVIEWER WATCHED, beside the evidence rather than in a
-	// session that ends. The gate takes the worker's recorded red on trust,
-	// so the second look is the only thing holding it and it has to be a
-	// record a later reader can follow.
-	for _, s := range sortedKeys(t.Rewatched) {
-		b.WriteString(headRewatched + s + nl + nl + t.Rewatched[s] + nl + nl)
-	}
-	// WHAT DONE MEANS, in the note a person reads and edits. A criterion with a
-	// command carries it, so a reader runs the same thing the engine runs.
-	if len(t.Criteria) > 0 {
-		b.WriteString(headCriteria + "\n\n")
-		for _, c := range t.Criteria {
-			b.WriteString("- " + c.Says + "\n")
-			if c.Runs != "" {
-				b.WriteString("  `" + c.Runs + "`\n")
-			}
-			// WHAT WAS TAKEN AWAY TO MAKE IT FAIL, AND WHAT IT SAID. It sits
-			// beside the command because that is what it is about, and it is a
-			// field rather than prose because prose here is lost on the next
-			// save.
-			if c.Without != "" {
-				b.WriteString("  " + leadWithout + c.Without + "\n")
-			}
-			if c.Red != "" {
-				b.WriteString("  " + leadRed + c.Red + "\n")
-			}
-		}
-		b.WriteString("\n")
-	}
-	for i, f := range t.Findings {
-		fmt.Fprintf(&b, "%s%d · round %d · %s · by %s\n\n", headFinding, i+1, f.Round, f.Clause, f.By)
-		b.WriteString("**wrong:** " + f.Wrong + "\n\n")
-		b.WriteString("**satisfies:** " + f.Satisfies + "\n\n")
-		if f.Answer != "" {
-			b.WriteString("**answered:** " + f.Answer + "\n\n")
-		}
-	}
-	// A LESSON SITS BESIDE THE ROUND THAT TAUGHT IT, so a reader finds what a
-	// round cost and what it was worth in the same place.
-	for i, l := range t.Lessons {
-		fmt.Fprintf(&b, "%s%d · round %d · by %s\n\n", headLesson, i+1, l.Round, l.By)
-		b.WriteString("**the class:** " + l.Class + "\n\n")
-		b.WriteString("**instead:** " + l.Avoid + "\n\n")
-		// AND WHAT WOULD HAVE STOPPED IT BEING MADE, which is the half a
-		// worker reads before starting rather than after being caught.
-		if l.Prevents != "" {
-			b.WriteString(leadPrevents + l.Prevents + nl + nl)
-		}
-		// THE TOKEN THE REVIEWER MINTED FOR IT, so a reader of this note can
-		// go to the work rather than to a sentence about it.
-		if l.Learned != "" {
-			b.WriteString("**minted as:** " + l.Learned + "\n\n")
-		}
+	// AND WHATEVER THIS PROGRAM DOES NOT UNDERSTAND, PUT BACK.
+	for _, k := range t.Kept {
+		b.WriteString(k.Head + nl + nl + k.Text + nl + nl)
 	}
 	return b.String()
 }
@@ -217,83 +180,19 @@ func sortedKeys(m map[string]string) []string {
 	return out
 }
 
-// readBody fills the prose fields back. Only the headings above are read, so
-// anything else in the note survives a rewrite untouched by being ignored.
-func readBody(t *Token, body string) {
-	for _, sec := range sections(body) {
-		head, text := sec[0], sec[1]
-		switch {
-		case head == headDetail:
-			t.Detail = text
-		case head == headGuidance:
-			if ref := strings.TrimPrefix(text, "See "); ref != text {
-				t.GuidanceRef = ref
-			} else {
-				t.Guidance = text
-			}
-		case strings.HasPrefix(head, headRewatched):
-			if t.Rewatched == nil {
-				t.Rewatched = map[string]string{}
-			}
-			t.Rewatched[strings.TrimPrefix(head, headRewatched)] = text
-		case strings.HasPrefix(head, headEvidence):
-			if t.Submission == nil {
-				t.Submission = map[string]string{}
-			}
-			t.Submission[strings.TrimPrefix(head, headEvidence)] = text
-		case head == headCriteria:
-			t.Criteria = readCriteria(text)
-		case strings.HasPrefix(head, headFinding):
-			t.Findings = append(t.Findings, readFinding(head, text))
-		case strings.HasPrefix(head, headLesson):
-			t.Lessons = append(t.Lessons, readLesson(head, text))
-		}
-	}
-}
-
 // One newline, named, because writing it inline is where these files keep
 // breaking.
 const nl = "\n"
 
-// A CRITERION IS A LIST ITEM, and the command under it is fenced in backticks
-// so a person can copy it out and run the same thing the engine runs.
+// A CRITERION IS A LIST ITEM. One line, and the line is the whole of it.
 func readCriteria(text string) []Criterion {
 	var out []Criterion
 	for _, line := range strings.Split(text, nl) {
-		l := strings.TrimSpace(line)
-		switch {
-		case strings.HasPrefix(l, "- "):
+		if l := strings.TrimSpace(line); strings.HasPrefix(l, "- ") {
 			out = append(out, Criterion{Says: strings.TrimSpace(l[2:])})
-		case strings.HasPrefix(l, "`") && strings.HasSuffix(l, "`") && len(out) > 0:
-			out[len(out)-1].Runs = strings.Trim(l, "`")
-		case strings.HasPrefix(l, leadWithout) && len(out) > 0:
-			out[len(out)-1].Without = strings.TrimPrefix(l, leadWithout)
-		case strings.HasPrefix(l, leadRed) && len(out) > 0:
-			out[len(out)-1].Red = strings.TrimPrefix(l, leadRed)
 		}
 	}
 	return out
-}
-
-func readLesson(head, text string) Lesson {
-	// The heading carries the round and the author, the way a finding's does.
-	l := Lesson{}
-	for _, p := range strings.Split(strings.TrimPrefix(head, headLesson), "·") {
-		p = strings.TrimSpace(p)
-		switch {
-		case strings.HasPrefix(p, "round "):
-			l.Round, _ = strconv.Atoi(strings.TrimPrefix(p, "round "))
-		case strings.HasPrefix(p, "by "):
-			l.By = strings.TrimPrefix(p, "by ")
-		}
-	}
-	said := underLeads(text, []string{"**the class:** ", "**instead:** ",
-		leadPrevents, "**minted as:** "})
-	l.Class = said["**the class:** "]
-	l.Avoid = said["**instead:** "]
-	l.Prevents = said[leadPrevents]
-	l.Learned = strings.TrimSpace(said["**minted as:** "])
-	return l
 }
 
 // sections cuts the body at every level-two heading. The heading is the whole
@@ -320,145 +219,26 @@ func sections(body string) [][2]string {
 	return out
 }
 
-func readFinding(head, text string) Rejection {
-	f := Rejection{}
-	// "## finding 2 · round 1 · voice · by rev"
-	parts := strings.Split(strings.TrimPrefix(head, headFinding), "·")
-	for i, p := range parts {
-		p = strings.TrimSpace(p)
-		switch {
-		case strings.HasPrefix(p, "round "):
-			f.Round, _ = strconv.Atoi(strings.TrimPrefix(p, "round "))
-		case strings.HasPrefix(p, "by "):
-			f.By = strings.TrimPrefix(p, "by ")
-		case i > 0:
-			f.Clause = p
-		}
-	}
-	said := underLeads(text, []string{"**wrong:** ", "**satisfies:** ", "**answered:** "})
-	f.Wrong, f.Satisfies = said["**wrong:** "], said["**satisfies:** "]
-	f.Answer = said["**answered:** "]
-	return f
-}
-
-// underLeads answers what each lead holds, to the next lead or to the end.
-//
-// A BLOCK IS A BLOCK AND NOT A LINE. This read line by line, so a value written
-// in two paragraphs came back as its first, which is the silent loss the whole
-// token is about: of fourteen findings in the record every paragraphed one was
-// cut, 85 characters of about 1900 in the worst case.
-//
-// THE WRITER ALREADY WRITES THEM WHOLE. Only the reader was wrong, so there is
-// no format to invent and nothing for a person to get wrong.
-func underLeads(text string, leads []string) map[string]string {
-	said := map[string]string{}
-	seen := map[string]bool{}
-	at, held := "", []string{}
-	keep := func() {
-		if at != "" {
-			said[at] = strings.TrimSpace(strings.Join(held, nl))
-		}
-	}
-	for _, line := range strings.Split(text, nl) {
-		trimmed := strings.TrimSpace(line)
-		opened := false
-		for _, lead := range leads {
-			// A LEAD OPENS ONCE, THE FIRST TIME IT IS SEEN. A block quoting
-			// one of these leads in a later paragraph is a block and not a
-			// second section, and reading it as a section is how a value that
-			// quotes the parser's own words comes back cut.
-			if seen[lead] || !strings.HasPrefix(trimmed, lead) {
-				continue
-			}
-			keep()
-			seen[lead] = true
-			at, held = lead, []string{strings.TrimPrefix(trimmed, lead)}
-			opened = true
-			break
-		}
-		if opened || at == "" {
-			continue
-		}
-		held = append(held, line)
-	}
-	keep()
-	return said
-}
-
-// SaveToken writes the whole note, and it writes it atomically.
-//
-// A reader sees the old file or the new one and never half of one. Two writers
-// are ordinary here: a command line and a lane are separate processes that talk
-// to no one, and only the rename decides which of them landed last.
-func SaveToken(r Roots, t Token) error {
-	// THE RECORD REFUSES TO HOLD WHAT IT CANNOT READ BACK. A criterion is one
-	// lead and one line, and the reader stops at the first newline, so a second
-	// line is lost on the save rather than on the write. Here is where the value
-	// stops being a value and becomes a line, and a refusal in a caller is a
-	// refusal the next caller does not have.
-	if err := linesThatFit(t); err != nil {
-		return err
-	}
-	if err := blocksHoldNoHeading(t); err != nil {
-		return err
-	}
-	if err := proseThatFits(LoadConfig(r), t); err != nil {
-		return err
-	}
-	// EVERY CHANGE OF STATE IS IN THE RECORD, and this is the one place that
-	// sees them all. The agent does not remember to write them and cannot
-	// forget to: whoever moves a token moves it through here.
-	//
-	// It is the record and not the token because a traced token travels, and a
-	// time on it says when somebody was at their desk.
-	was, existed := LoadToken(r, t.ID)
-	dir := dirFor(r, t)
-	if err := os.MkdirAll(dir, 0o755); err != nil {
-		return err
-	}
-	text := WriteFront(t.front(), frontOrder) + "\n" + t.body()
-	final := filepath.Join(dir, t.ID+".md")
-
-	tmp, err := os.CreateTemp(dir, t.ID+".*.tmp")
-	if err != nil {
-		return err
-	}
-	name := tmp.Name()
-	if _, err := tmp.WriteString(text); err != nil {
-		tmp.Close()
-		os.Remove(name)
-		return err
-	}
-	if err := tmp.Close(); err != nil {
-		os.Remove(name)
-		return err
-	}
-	if err := os.Rename(name, final); err != nil {
-		os.Remove(name)
-		return err
-	}
-	noteMove(r, t, was, existed == nil)
-	if existed == nil && was.Status != t.Status {
-		followChildren(r, t)
-	}
-	return nil
-}
-
 // WHAT MOVED, IN THE RECORD. The agent does not remember to write these and
 // cannot forget to: whoever moves a token moves it through SaveToken.
 func noteMove(r Roots, t, was Token, existed bool) {
 	switch {
+	// THE LINE SAYS WHAT HAPPENED, IT IS NOT INFERRED FROM WHAT IS IN IT.
+	//
+	// MEASURED. The burn-down counted a mint by looking for a line that had a
+	// status and no from, and an ending by looking for a disposition, and
+	// neither key was ever written. Both numbers read nought for every day
+	// there has ever been, and nothing said so, because nought is a number a
+	// burn-down is allowed to answer.
 	case !existed:
-		inSession(r, "work", t.MintedBy, t.ID+" minted "+string(t.Status)+": "+t.Title, Yes(),
-			map[string]any{"id": t.ID, "status": string(t.Status), "assignee": t.Assignee})
+		inSession(r, "work", orElse(t.Holder, "main"), t.ID+" minted "+t.Status+": "+t.Title, Yes(),
+			map[string]any{"id": t.ID, "minted": true, "status": t.Status, "process": t.Process})
 	case was.Status != t.Status:
-		who := t.Holder
-		if who == "" {
-			who = t.Assignee
-		}
+		who := orElse(t.Holder, was.Holder)
 		inSession(r, "work", who,
-			t.ID+" "+string(was.Status)+" to "+string(t.Status)+": "+t.Title, Yes(),
-			map[string]any{"id": t.ID, "from": string(was.Status), "to": string(t.Status)})
+			t.ID+" "+was.Status+" to "+t.Status+": "+t.Title, Yes(),
+			map[string]any{"id": t.ID, "from": was.Status, "to": t.Status,
+				"disposition": string(t.Disposition)})
 	}
 }
 
@@ -478,10 +258,15 @@ func readNote(path string) (Token, bool) {
 		fmt.Fprintf(os.Stderr, "engine: %s: %v\n", path, err)
 		return Token{}, false
 	}
-	if fs(f, "type") != TypeWork || fs(f, "id") == "" {
+	// A NOTE IS A TOKEN WHEN IT SAYS WHICH SCHEMA READS IT. type: work said the
+	// same thing twice, so it went with the rest of what nothing read.
+	if unlink(fs(f, "kind")) != "work-token" {
 		return Token{}, false
 	}
 	t := tokenFromFront(f)
+	// THE ID IS THE FILE NAME. It was written into the note as well, and two
+	// copies of one name is one that can be renamed and one that cannot.
+	t.ID = strings.TrimSuffix(filepath.Base(path), ".md")
 	readBody(&t, body)
 	// A NOTE IS EDITED BY HAND, so the rule is checked where the note is read
 	// and not only where it was minted. A title that broke it is said out loud
@@ -512,7 +297,7 @@ func Tokens(r Roots) []Token {
 			continue
 		}
 		for _, e := range entries {
-			if e.IsDir() || !strings.HasSuffix(e.Name(), ".md") {
+			if e.IsDir() || !strings.HasSuffix(e.Name(), ".md") || Parked(e.Name()) {
 				continue
 			}
 			if t, ok := readNote(filepath.Join(dir, e.Name())); ok {
@@ -523,186 +308,12 @@ func Tokens(r Roots) []Token {
 	// OLDEST FIRST, by the number it was minted with. A time would have said
 	// the same thing and also said when somebody was at their desk.
 	sort.Slice(out, func(i, j int) bool {
-		if out[i].Seq != out[j].Seq {
-			return out[i].Seq < out[j].Seq
-		}
+		// THE FILE NAME IS THE ORDER. A token carries no time and no sequence:
+		// when it was typed is an accident, and a queue that sorts on it reads
+		// an accident as a decision. An order somebody decided is depends_on.
 		return out[i].ID < out[j].ID
 	})
 	return out
-}
-
-// A PARENT FOLLOWS ITS CHILDREN INTO WORK, AND OUT OF IT AGAIN.
-//
-// A parent is in work while any child is in work, and it leaves in_work when
-// the last child does. That is how two tokens are in work at once without an
-// agent holding two: the agent holds the child, and the parent is in work
-// because the child is how the parent is being done.
-//
-// It also replaces a wrong reading. A parent looked blocked by its own
-// sub-token, which said the sub-token was in the way when it was the work.
-//
-// NOTHING PULLS A PARENT, so the rule can only live here. This is the one
-// place that sees a state change, and a parent is not a queue entry: the
-// holder stays empty, because nobody is holding it.
-func followChildren(r Roots, child Token) {
-	if child.Parent == "" {
-		return
-	}
-	p, err := LoadToken(r, child.Parent)
-	if err != nil {
-		return
-	}
-	// A parent already settled is left alone. Its children are history.
-	if p.Status.Ended() || p.Status == ImpSubmitted || p.Status == ImpInReview {
-		return
-	}
-	working := false
-	for _, id := range p.Subs {
-		if s, err := LoadToken(r, id); err == nil && s.Status == ImpInWork {
-			working = true
-			break
-		}
-	}
-	// LOWER ONLY WHAT THIS RULE RAISED, and the empty holder is the mark. A
-	// parent an agent pulled has a holder, and putting that one back to open
-	// left the record saying a token was open and held at once.
-	switch {
-	case working && p.Status == ImpOpen && p.Holder == "":
-		p.Status = ImpInWork
-	case !working && p.Status == ImpInWork && p.Holder == "":
-		p.Status = ImpOpen
-	default:
-		return
-	}
-	_ = SaveToken(r, p)
-}
-
-// linesThatFit refuses a criterion carrying a second line in a field the note
-// writes on one.
-//
-// WHY THIS IS A REFUSAL AND NOT A FOLD. A folded value invents a continuation
-// syntax. The note is a file a person opens and edits, and a syntax nobody
-// typed is a syntax somebody gets wrong. It would also need reading back, which
-// is a second place to be wrong about one thing.
-//
-// AND WITHOUT IT THE OBSERVATION GATE SWITCHES ITSELF OFF. A two-line command
-// reads back as no command, the criterion becomes prose, and prose is answered
-// by name in the evidence rather than by watching it fail. Writing a command on
-// two lines therefore turned the gate off, silently, at the moment of the save.
-// WHAT THE NOTE CANNOT HOLD, REFUSED WHERE THE VALUE BECOMES A LINE.
-//
-// A BLOCK READS TO THE NEXT LEAD OR THE NEXT HEADING, so a value carrying a
-// line that opens a section is cut on the save, by design and in silence. That
-// is the one outcome this refuses.
-//
-// REFUSED RATHER THAN ESCAPED. A person reads and edits these notes in an
-// editor, and a value written differently from how it was typed is one somebody
-// re-types wrongly. Accepting was never open: silence is what the refusal
-// exists to end. The cost is small and it is said here so nobody rediscovers
-// it: a reviewer quoting a section name indents that line or runs it into the
-// sentence.
-func blocksHoldNoHeading(t Token) error {
-	opens := func(where, value string) error {
-		for _, line := range strings.Split(value, nl) {
-			if !strings.HasPrefix(strings.TrimRight(line, "\r"), "## ") {
-				continue
-			}
-			return fmt.Errorf("%s carries a line that opens a section, %q, and a block "+
-				"reads to the next heading, so everything after it would be lost on this "+
-				"save. Indent that line, or run it into the sentence", where, firstLines(line, 1))
-		}
-		return nil
-	}
-	for _, one := range []struct{ where, value string }{
-		{"Token.Detail", t.Detail}, {"Token.Guidance", t.Guidance},
-		{"Token.GuidanceRef", t.GuidanceRef},
-	} {
-		if err := opens(one.where, one.value); err != nil {
-			return err
-		}
-	}
-	for i, f := range t.Findings {
-		for _, one := range []struct{ where, value string }{
-			{fmt.Sprintf("Rejection.Wrong on finding %d", i+1), f.Wrong},
-			{fmt.Sprintf("Rejection.Satisfies on finding %d", i+1), f.Satisfies},
-			// ANSWER IS A BLOCK AND THIS LIST WENT SHORT WITHOUT IT. The table in
-			// the shapes check calls it a block by design, and the refusal named
-			// two of the three, so a worker's answer carrying a section opener
-			// lost everything after it on the save and nothing said so.
-			{fmt.Sprintf("Rejection.Answer on finding %d", i+1), f.Answer},
-		} {
-			if err := opens(one.where, one.value); err != nil {
-				return err
-			}
-		}
-	}
-	for i, l := range t.Lessons {
-		for _, one := range []struct{ where, value string }{
-			{fmt.Sprintf("Lesson.Class on lesson %d", i+1), l.Class},
-			{fmt.Sprintf("Lesson.Avoid on lesson %d", i+1), l.Avoid},
-			{fmt.Sprintf("Lesson.Prevents on lesson %d", i+1), l.Prevents},
-			{fmt.Sprintf("Lesson.Learned on lesson %d", i+1), l.Learned},
-		} {
-			if err := opens(one.where, one.value); err != nil {
-				return err
-			}
-		}
-	}
-	// EVERY VALUE THE NOTE JOINS INTO A HEADING cannot hold the character it is
-	// joined on, the middle dot, or a newline. The set is the table's, not the
-	// one member a finding was found on.
-	for i, f := range t.Findings {
-		for _, one := range []struct{ where, value string }{
-			{fmt.Sprintf("Rejection.Clause on finding %d", i+1), f.Clause},
-			{fmt.Sprintf("Rejection.By on finding %d", i+1), f.By},
-		} {
-			if err := fitsAHeading(one.where, one.value); err != nil {
-				return err
-			}
-		}
-	}
-	for i, l := range t.Lessons {
-		if err := fitsAHeading(fmt.Sprintf("Lesson.By on lesson %d", i+1), l.By); err != nil {
-			return err
-		}
-	}
-	// A MAP THE NOTE WRITES AS A BODY SECTION: its value is a block, and its
-	// KEY is one line and not a heading. A newline in a key is cut and its
-	// tail moves into the value. The middle dot is safe there, because
-	// readBody strips the lead and takes the rest of the heading whole, so
-	// refusing it would refuse a character the record carries.
-	for _, one := range []struct {
-		where string
-		held  map[string]string
-	}{{"Token.Submission", t.Submission}, {"Token.Rewatched", t.Rewatched}} {
-		for key, value := range one.held {
-			if strings.ContainsAny(key, "\r\n") {
-				return fmt.Errorf("%s is filed under a key written on more than one line, "+
-					"%q. The reader takes the heading and stops, so the rest of the key "+
-					"moves into the value. Write the key on one line",
-					one.where, firstLines(key, 1))
-			}
-			if err := opens(one.where+", under "+firstLines(key, 1), value); err != nil {
-				return err
-			}
-		}
-	}
-	return nil
-}
-
-// fitsAHeading refuses a value the note joins into a heading line.
-func fitsAHeading(where, value string) error {
-	for _, bad := range []struct{ what, name string }{
-		{"·", "the heading separator"}, {"\n", "a newline"}, {"\r", "a newline"},
-	} {
-		if !strings.Contains(value, bad.what) {
-			continue
-		}
-		return fmt.Errorf("%s carries %s, and it is joined into a heading line with "+
-			"the round and the author on that character, so the reader would split it "+
-			"there. Write it without one", where, bad.name)
-	}
-	return nil
 }
 
 // A token is a ticket a person reads cold, and a ticket has a size. The
@@ -726,9 +337,6 @@ func linesThatFit(t Token) error {
 	for i, c := range t.Criteria {
 		for _, one := range []struct{ field, value string }{
 			{"says", c.Says},
-			{"runs", c.Runs},
-			{"red without", c.Without},
-			{"red said", c.Red},
 		} {
 			if !strings.ContainsAny(one.value, "\r\n") {
 				continue
@@ -740,4 +348,132 @@ func linesThatFit(t Token) error {
 		}
 	}
 	return nil
+}
+
+// blocksHoldNoHeading refuses a block that carries a line opening a section.
+//
+// THE RECORD REFUSES TO HOLD WHAT IT CANNOT READ BACK. A block reads to the
+// next heading, so a heading inside one ends it early and the rest is lost on
+// the save rather than on the write.
+func blocksHoldNoHeading(t Token) error {
+	opens := func(where, value string) error {
+		for _, line := range strings.Split(value, nl) {
+			if headingDepth(strings.TrimRight(line, "\r")) > 0 {
+				return fmt.Errorf("%s carries a line that opens a section, and a block "+
+					"reads to the next heading, so everything after it would be lost on this "+
+					"save: %q", where, strings.TrimSpace(line))
+			}
+		}
+		return nil
+	}
+	for _, one := range []struct{ where, value string }{
+		{"Token.Detail", t.Detail}, {"Token.ProposedAction", t.ProposedAction},
+	} {
+		if err := opens(one.where, one.value); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// readBody fills the prose fields back.
+//
+// A SECTION THIS READER DOES NOT KNOW IS KEPT, NOT DROPPED. The file is
+// rendered from this struct, so a heading nothing matched went nowhere and the
+// next save rebuilt the file without it. Not understanding a section is not a
+// reason to delete it.
+func readBody(t *Token, body string) {
+	for _, sec := range sections(body) {
+		head, text := sec[0], sec[1]
+		switch {
+		case head == headDetail:
+			t.Detail = text
+		case head == headProposed:
+			t.ProposedAction = text
+		case head == headCriteria:
+			t.Criteria = readCriteria(text)
+		case strings.HasPrefix(head, headEvidence):
+			if t.Submission == nil {
+				t.Submission = map[string]string{}
+			}
+			t.Submission[strings.TrimPrefix(head, headEvidence)] = text
+		default:
+			t.Kept = append(t.Kept, KeptSection{Head: head, Text: text})
+		}
+	}
+}
+
+func SaveToken(r Roots, t Token) error {
+	// THE RECORD REFUSES TO HOLD WHAT IT CANNOT READ BACK. A criterion is one
+	// lead and one line, and the reader stops at the first newline, so a second
+	// line is lost on the save rather than on the write. Here is where the value
+	// stops being a value and becomes a line, and a refusal in a caller is a
+	// refusal the next caller does not have.
+	if err := linesThatFit(t); err != nil {
+		return err
+	}
+	if err := blocksHoldNoHeading(t); err != nil {
+		return err
+	}
+	if err := proseThatFits(LoadConfig(r), t); err != nil {
+		return err
+	}
+	// EVERY CHANGE OF STATE IS IN THE RECORD, and this is the one place that
+	// sees them all. The agent does not remember to write them and cannot
+	// forget to: whoever moves a token moves it through here.
+	//
+	// It is the record and not the token because a traced token travels, and a
+	// time on it says when somebody was at their desk.
+	was, existed := LoadToken(r, t.ID)
+	// WHERE IT IS NOW, so a token whose process moved it leaves nothing behind.
+	//
+	// MEASURED. A save wrote into the folder the process names and left the old
+	// file where it was, so one token became two files with one id, and the
+	// editor drew the row twice. It cost nothing while every process agreed
+	// with the folder its tokens were already in, and it broke the day a note
+	// was converted in doc/work and saved into .se/work.
+	from := noteAt(r, t.ID)
+	dir := dirFor(r, t)
+	if err := os.MkdirAll(dir, 0o755); err != nil {
+		return err
+	}
+	text := WriteFront(t.front(), frontOrder) + "\n" + t.body()
+	final := filepath.Join(dir, t.ID+".md")
+
+	tmp, err := os.CreateTemp(dir, t.ID+".*.tmp")
+	if err != nil {
+		return err
+	}
+	name := tmp.Name()
+	if _, err := tmp.WriteString(text); err != nil {
+		tmp.Close()
+		os.Remove(name)
+		return err
+	}
+	if err := tmp.Close(); err != nil {
+		os.Remove(name)
+		return err
+	}
+	if err := os.Rename(name, final); err != nil {
+		os.Remove(name)
+		return err
+	}
+	if from != "" && from != final {
+		_ = os.Remove(from) // the note is written; a stale copy is reported by the duplicate check
+	}
+	noteMove(r, t, was, existed == nil)
+	return nil
+}
+
+// noteAt is the file a token is in now, or nothing when it is new. LoadToken
+// answers the token and this answers where it was found, because a move has to
+// know what it is moving from.
+func noteAt(r Roots, id string) string {
+	for _, dir := range workDirs(r) {
+		p := filepath.Join(dir, id+".md")
+		if _, err := os.Stat(p); err == nil {
+			return p
+		}
+	}
+	return ""
 }

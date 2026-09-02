@@ -180,10 +180,10 @@ if (level) {
 const group = wrap.querySelector('.bs-level[data-kind="group"] .bs-level-prop');
 say("the sort popover has a grouping to set", !!group);
 if (group) {
-  group.value = "assignee";
+  group.value = "bucket";
   change(group);
   const m = lastOf("level");
-  say("picking a grouping sends it", !!m && m.property === "assignee" && m.kind === "group",
+  say("picking a grouping sends it", !!m && m.property === "bucket" && m.kind === "group",
     "what it sent: " + JSON.stringify(m));
 }
 

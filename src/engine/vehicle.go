@@ -8,6 +8,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -356,7 +357,44 @@ func LinkBothNames(methodRoot string, names []string) ([]string, error) {
 		if _, err := os.Stat(suffixed); err != nil {
 			continue // that program is not built here, which is not a fault
 		}
-		_ = os.Remove(plain)
+		// ALREADY ONE FILE IS THE ORDINARY CASE, AND IT DOES NOTHING.
+		//
+		// Linking runs on every install and every build, and almost always the
+		// two names are already the one file. Unlinking and relinking them
+		// asks the filesystem to delete a running image, which Windows
+		// refuses through EVERY name the image holds, so the work below fails
+		// on exactly the tree it had nothing to do.
+		if fi, err := os.Stat(plain); err == nil {
+			if sfi, err := os.Stat(suffixed); err == nil && os.SameFile(fi, sfi) {
+				done = append(done, name)
+				continue
+			}
+		}
+		// A RUNNING PROGRAM CANNOT BE REMOVED ON WINDOWS, AND CAN BE RENAMED.
+		//
+		// After a build the two names are different files and the old one may
+		// be running. Removing it answers that it is in use, the link fails,
+		// and the copy underneath cannot open it either, so the tree keeps the
+		// previous build under its plain name. Moving it aside frees the name,
+		// and the processes holding it go on running from the moved file.
+		//
+		// THE ASIDE NAME IS SEARCHED because the last build's leavings may
+		// themselves be running. One fixed name silently failed the second
+		// time this ran with an engine up.
+		if err := os.Remove(plain); err != nil && !os.IsNotExist(err) {
+			for i := 0; i < 10; i++ {
+				aside := plain + "~"
+				if i > 0 {
+					aside += strconv.Itoa(i)
+				}
+				if err := os.Remove(aside); err != nil && !os.IsNotExist(err) {
+					continue // that one is running too
+				}
+				if os.Rename(plain, aside) == nil {
+					break
+				}
+			}
+		}
 		if err := os.Link(suffixed, plain); err != nil {
 			// A HARD LINK TO A FILE NEEDS NO PRIVILEGE, which is what makes it
 			// the right one. It wants one volume, and a failure is worth naming

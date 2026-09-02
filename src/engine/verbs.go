@@ -25,6 +25,8 @@ import (
 // first time somebody added a verb, and the check over it would then be a check
 // over the verbs somebody remembered.
 var run = map[string]func([]string){
+	"apply": runApply,
+	"run":   runRun,
 	"work":  runWork,
 	"pull":  runPull,
 	"stop":  runStop,
@@ -34,6 +36,7 @@ var run = map[string]func([]string){
 	"lint":  runLint,
 	"hold":  runHold,
 	"retro": runRetro,
+	"lsp":   runLSP,
 }
 
 // Verbs answers every verb this program has, in order.
@@ -75,7 +78,7 @@ func Stray(verb string, left []string) error {
 // parse is the one door a verb's flags come through. A verb that parses its own
 // is a verb that can drop what it was handed, which is the whole defect.
 func parse(fs *flag.FlagSet, verb string, args []string) {
-	_ = fs.Parse(args)
+	_ = fs.Parse(args) // the set is ExitOnError, so a bad flag has already left
 	if err := Stray(verb, fs.Args()); err != nil {
 		failUnread(err)
 	}
