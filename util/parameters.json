@@ -165,6 +165,46 @@
           "help": "How many tokens may wait for review with nothing in review before the pull refuses. Zero turns it off. It may be made smaller and never larger, so a person tightens the rule here and loosens it by changing the default."
         },
         {
+          "name": "criteria_ceiling",
+          "title": "criteria ceiling",
+          "type": "int",
+          "default": 8,
+          "min": 1,
+          "max": 8,
+          "narrow": "smaller",
+          "help": "How many criteria a draft may carry before the engine refuses it at submission. A draft bigger than this is too big to converge: its one finding is the size, and the remedy is a split. It may be made smaller and never larger."
+        },
+        {
+          "name": "rounds_per_rung",
+          "title": "rounds per rung",
+          "type": "int",
+          "default": 2,
+          "min": 1,
+          "max": 2,
+          "narrow": "smaller",
+          "help": "How many consecutive failing rounds on one half of a token climb one rung of the authority ladder. The second rung hands the reviewer full authority once for the whole token, and the same count again after it is spent reaches the person. It may be made smaller and never larger."
+        },
+        {
+          "name": "detail_bytes",
+          "title": "detail bytes",
+          "type": "int",
+          "default": 1500,
+          "min": 200,
+          "max": 1500,
+          "narrow": "smaller",
+          "help": "How many bytes a token's detail may hold before the save refuses it. A token is a ticket a person reads cold. It may be made smaller and never larger."
+        },
+        {
+          "name": "section_bytes",
+          "title": "section bytes",
+          "type": "int",
+          "default": 1000,
+          "min": 200,
+          "max": 1000,
+          "narrow": "smaller",
+          "help": "How many bytes one evidence section may hold before the save refuses it. Name what was built and what the check said. It may be made smaller and never larger."
+        },
+        {
           "name": "pulls_before_hold_is_stale",
           "title": "pulls before hold is stale",
           "type": "int",

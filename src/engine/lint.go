@@ -123,6 +123,8 @@ func LintLimits(r Roots) []Finding3 {
 		"quackitect.limits.ready_budget_ms":            floor.ReadyBudgetMs,
 		"quackitect.limits.unreviewed_before_blocked":  floor.UnreviewedBeforeBlocked,
 		"quackitect.limits.pulls_before_hold_is_stale": floor.PullsBeforeHoldIsStale,
+		"quackitect.limits.detail_bytes":               floor.DetailBytes,
+		"quackitect.limits.section_bytes":              floor.SectionBytes,
 	}
 	Walk(root, "", func(path string, n Node) {
 		d, hasDefault := toNumber(n.Default)

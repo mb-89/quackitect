@@ -191,22 +191,59 @@ func whatIsWrong(fs []Rejection) string {
 //
 // FOUR FIELDS, and they are the ones the note writes on one line. A block field
 // is a different shape and belongs to the token about the parser.
-func TestALineHoldsOneLine(t *testing.T) {
-	r := lane(t)
-	tried := 0
-	for _, one := range []struct {
+// THE ROWS THE TABLE NAMES, not the four this test happened to think of.
+//
+// theShapes has 38 rows and this typed its members, which is the shape the
+// token itself is about: a fifth field put on the one line by design row was
+// fed by nothing and no test went red. Its siblings over blocks and headings
+// already walk the table and fail by name on a row nothing feeds.
+func oneLineRows() []string {
+	var names []string
+	for _, name := range sorted(theShapes) {
+		if theShapes[name] == "one line by design" {
+			names = append(names, name)
+		}
+	}
+	return names
+}
+
+// THE FIELD NAME THE REFUSAL USES, per row. The table names a Go field and the
+// engine's message names the word a person types in the note, and they are two
+// spellings of one thing.
+func oneLineFields() map[string]struct {
+	field string
+	c     Criterion
+} {
+	return map[string]struct {
 		field string
 		c     Criterion
 	}{
-		{"says", Criterion{Says: "it works" + nl + "and also this", Runs: "exit 0",
+		"Criterion.Says": {"says", Criterion{Says: "it works" + nl + "and also this", Runs: "exit 0",
 			Without: "the fix", Red: "it said no"}},
-		{"runs", Criterion{Says: "it works", Runs: "cd src" + nl + "go test .",
+		"Criterion.Runs": {"runs", Criterion{Says: "it works", Runs: "cd src" + nl + "go test .",
 			Without: "the fix", Red: "it said no"}},
-		{"red without", Criterion{Says: "it works", Runs: "exit 0",
+		"Criterion.Without": {"red without", Criterion{Says: "it works", Runs: "exit 0",
 			Without: "the fix" + nl + "and the test", Red: "it said no"}},
-		{"red said", Criterion{Says: "it works", Runs: "exit 0",
+		"Criterion.Red": {"red said", Criterion{Says: "it works", Runs: "exit 0",
 			Without: "the fix", Red: "it said no" + nl + "twice"}},
-	} {
+	}
+}
+
+func TestALineHoldsOneLine(t *testing.T) {
+	r := lane(t)
+	tried := 0
+	how := oneLineFields()
+	rows := oneLineRows()
+	if len(rows) == 0 {
+		t.Fatal("the table names no one-line field, so this guards nothing")
+	}
+	for _, name := range rows {
+		one, ok := how[name]
+		if !ok {
+			t.Errorf("%s is a one-line field the table names and nothing here feeds it "+
+				"a second line, so the refusal is unchecked on it", name)
+			continue
+		}
 		tried++
 		tok := mint(t, r, Token{Title: "one to write"})
 		tok.Criteria = []Criterion{one.c}

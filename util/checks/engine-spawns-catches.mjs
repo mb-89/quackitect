@@ -47,15 +47,51 @@ say("the check passes on the tree as it stands", clean.code === 0,
   "it already fails without anything planted, so a red below would say nothing:\n"
   + clean.out.split("\n").filter((l) => l.includes("FAIL")).join("\n"));
 
-// A SPAWN THE PATTERN CANNOT READ. Its arguments are spread into the call
-// rather than written as an array, so the reader walks past it, and the flag
-// it carries reaches the engine unread.
 const p = join(work, "src", "extension", "extension.ts");
 const was = readFileSync(p, "utf8");
 const mark = "spawn(exe, [...startArgs()";
 say("the spawn this plants a shape at is where it was", was.includes(mark),
   "extension.ts no longer starts the engine at a spawn this can find, so this "
   + "check is driving nothing");
+
+// TWO PLANTS, AND EACH IS EVIDENCE ABOUT A DIFFERENT HALF.
+//
+// REPLACING A SPAWN DOES TWO THINGS AT ONCE. It hides a call from the reading
+// pattern AND it orphans the builder that call used to spread, so the red that
+// comes back is the module-side count firing and says nothing about spawns. The
+// check was written that way and was taken as evidence about the pattern.
+//
+// SO THE FIRST PLANT ADDS A CALL RATHER THAN REPLACING ONE. It orphans no
+// builder, spreads nothing and writes its flag as a literal, which is how the
+// defect actually arrives: nobody breaks a working call site, somebody writes a
+// new one. The red for it has to come from the spawn count and from nothing
+// else, so this asserts the line it comes back on.
+const added = 'spawnRaw(binary(context, "se"), ["--form", "x", "--work", work], { cwd: work });\n  '
+  + mark;
+writeFileSync(p, was.replace(mark, added), "utf8");
+
+const grown = run();
+say("the check names a spawn ADDED in a shape it cannot read", grown.code !== 0,
+  "a new call site was written with its flags as literals, spreading no builder, "
+  + "and the check answered clean. That is the defect this file exists for and it "
+  + "is how it arrives");
+say("and the red is about the spawn count rather than about a builder",
+  /every spawn in the tree was read/.test(grown.out),
+  "it went red for something else, so this plant is evidence about the module "
+  + "side and not about the pattern:\n"
+  + grown.out.split("\n").filter((l) => l.includes("FAIL")).join("\n"));
+say("and the spawns-read count is in the output",
+  /\d+ spawn\(s\) read/.test(grown.out),
+  "the count the pattern read is not printed, so the number this criterion names "
+  + "as one of the two is held against nothing a reader can see");
+
+writeFileSync(p, was, "utf8");
+say("and it passes again once the added call is taken out", run().code === 0,
+  "it stayed red with the tree back as it was, so the red above says nothing");
+
+// THE SECOND PLANT REPLACES A SPAWN, and it is kept because it exercises the
+// module side: the builder it used to spread is orphaned and the converse loop
+// is what has to notice.
 writeFileSync(p, was.replace(mark, 'spawn(...[exe, ["--form", "x"'), "utf8");
 
 const planted = run();

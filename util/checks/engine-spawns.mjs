@@ -18,8 +18,8 @@
 // check goes where the defect is, in the language the defect is written in.
 //
 //   node .se/scratchpad/engine-spawns.mjs <root>
-import { readdirSync, readFileSync } from "node:fs";
-import { join } from "node:path";
+import { readdirSync, readFileSync, statSync } from "node:fs";
+import { join, relative } from "node:path";
 
 const root = process.argv[2] ?? ".";
 
@@ -55,13 +55,89 @@ function say(what, ok, why) {
 // and this read eight: the ninth built its array one line above and wrote
 // --set at the call site. Putting --form there, which is the defect this whole
 // check exists for, answered 8 spawn(s) read, 0 failed.
-const spawnCall = /\bspawn(?:Raw)?\s*\(\s*([A-Za-z_$][\w$]*)\s*,\s*(\[[^\]]*\]|[A-Za-z_$][\w$]*)/g;
+// THE NAME IS ASKED OF THE IMPORT, NOT ASSUMED TO BE THE WORD SPAWN.
+//
+// Both counts used to require the letters spawn before the parenthesis, so they
+// shared one premise and a rename defeated both at once: this very file already
+// writes `import { spawn as spawnRaw }`, so `import { spawn as run }` and
+// `run(exe, ["--form", ...])` was in neither count, and the check answered N in
+// the source, N read, 0 failed with the flag at a call site.
+//
+// THE SET IS DECLARED IN ONE PLACE THE TREE CAN BE ASKED: what the file binds
+// from node:child_process. So the words searched for are those bindings, and a
+// binding that is not searched is a failure by name rather than a silence.
+const boundToChildProcess = (text) => {
+  const names = new Set();
+  for (const imp of text.matchAll(/import\s*\{([^}]*)\}\s*from\s*["']node:child_process["']/g)) {
+    for (const piece of imp[1].split(",")) {
+      const as = piece.trim().match(/^(\w+)(?:\s+as\s+(\w+))?$/);
+      if (as && /^(spawn|spawnSync|exec|execFile|execSync|execFileSync|fork)$/.test(as[1])) {
+        names.add(as[2] ?? as[1]);
+      }
+    }
+  }
+  // AND THE WRAPPER THAT FORWARDS TO ONE. This extension starts the engine
+  // through a local function of its own, so the binding alone reads nothing.
+  // The wrapper is found by asking which local function calls a bound name,
+  // which is one hop and derived, rather than by typing its name here.
+  // A FORWARDER IS A FUNCTION WHOSE FIRST ACT IS THE CALL. That is what a
+  // wrapper is, and matching anything looser pulls in every function that
+  // merely mentions the name: I tried it and the clean tree read twenty-two
+  // starts where it has nine.
+  for (const n of [...names]) {
+    const forwards = new RegExp(
+      "function\\s+([A-Za-z_$][\\w$]*)\\s*\\([^)]*\\)[^{]*\\{\\s*return\\s+" + n + "\\s*\\(", "g");
+    for (const fn of text.matchAll(forwards)) names.add(fn[1]);
+  }
+  return names;
+};
+
+const spawnCallFor = (names) => new RegExp(
+  "\\b(?:" + [...names].join("|") + ")\\s*\\(\\s*([A-Za-z_$][\\w$]*)\\s*,\\s*(\\[[^\\]]*\\]|[A-Za-z_$][\\w$]*)", "g");
+const anySpawnFor = (names) => new RegExp("\\b(?:" + [...names].join("|") + ")\\s*\\(", "g");
+
+// EVERY PLACE THE WORD APPEARS, WHICH IS NOT THE SAME SET AS THE ONE ABOVE.
+//
+// The reading pattern needs a bare identifier and then an array or a name. A
+// spawn written any other way is not matched, so it produces no entry, no
+// failure, and nothing notices: spawnRaw(binary(context, "se"), ["--form", ...])
+// was invisible to both halves of this file, and that is the defect the token
+// was minted for. So the count is held against something this check did not
+// produce.
+// EVERY .ts UNDER THE EXTENSION, INCLUDING ONE IN A FOLDER. Reading only the
+// top directory put a file in a subdirectory in neither count.
+function everyTs(dir) {
+  const out = [];
+  for (const entry of readdirSync(dir)) {
+    if (entry === "node_modules" || entry === "out") continue;
+    const full = join(dir, entry);
+    if (statSync(full).isDirectory()) out.push(...everyTs(full));
+    else if (entry.endsWith(".ts")) out.push(full);
+  }
+  return out;
+}
 
 const found = [];
-for (const name of readdirSync(here).filter((f) => f.endsWith(".ts"))) {
-  const text = readFileSync(join(here, name), "utf8");
+const sites = [];
+const searched = new Set();
+const bound = new Set();
+for (const full of everyTs(here)) {
+  const name = relative(here, full).split("\\").join("/");
+  const text = readFileSync(full, "utf8");
   const lines = text.split("\n");
-  for (const m of text.matchAll(spawnCall)) {
+  const names = boundToChildProcess(text);
+  for (const n of names) bound.add(n);
+  if (names.size === 0) continue;
+  for (const n of names) searched.add(n);
+  for (const m of text.matchAll(anySpawnFor(names))) {
+    const line = text.slice(0, m.index).split("\n").length;
+    if (/function spawn\b/.test(lines[line - 1])) continue;
+    if (/^spawnRaw\(exe, args/.test(text.slice(m.index, m.index + 20))) continue;
+    // KEYED BY WHERE IT IS IN THE FILE AND NOT BY ITS LINE, because two starts
+    // on one line collided and left the two counts disagreeing with nothing named.
+    sites.push(name + ":" + line + "@" + m.index);
+  }
+  for (const m of text.matchAll(spawnCallFor(names))) {
     const line = text.slice(0, m.index).split("\n").length;
     // The wrapper in extension.ts is the one spawn that forwards somebody
     // else's array, so it is the door rather than a call through it.
@@ -79,13 +155,41 @@ for (const name of readdirSync(here).filter((f) => f.endsWith(".ts"))) {
         ? assigned[assigned.length - 1][1]
         : "(named " + args + ", and nothing above it gives that name an array)";
     }
-    found.push({ where: name + ":" + line, args: args.replace(/\s+/g, " "),
+    found.push({ where: name + ":" + line + "@" + m.index, args: args.replace(/\s+/g, " "),
                  before: text.slice(0, m.index), whole: text });
   }
 }
 
 say("the extension starts the engine somewhere", found.length > 0,
   "no spawn was found at all, so this check has nothing to judge and is not doing its job");
+
+// AND EVERY NAME THE EXTENSION BINDS IS ONE OF THE WORDS THIS SEARCHED FOR.
+// A binding it does not search is a start it cannot see, and that is the premise
+// both counts used to share.
+say("every child_process binding is searched for (" + [...bound].sort().join(", ") + ")",
+  [...bound].every((n) => searched.has(n)),
+  [...bound].filter((n) => !searched.has(n)).join(", ")
+    + " is bound from node:child_process and this check never looks for it");
+say("the extension binds something to start with", bound.size > 0,
+  "nothing imports from node:child_process, so neither count has a word to look for");
+
+// AND EVERY ONE OF THEM WAS READ. A spawn the reading pattern could not match
+// is a spawn nothing is checking, and it is silent rather than red: no entry,
+// no failure, and the converse loop stays green because every builder is still
+// spread somewhere else.
+//
+// THE TWO COUNTS COME FROM DIFFERENT PLACES ON PURPOSE. One is what the reading
+// pattern matched. The other is every occurrence of the word, which this check
+// cannot get wrong by being too narrow.
+{
+  const read = new Set(found.map((one) => one.where));
+  const unread = sites.filter((where) => !read.has(where));
+  say("every spawn in the tree was read (" + sites.length + " in the source, "
+      + found.length + " read)", unread.length === 0,
+    unread.join(", ") + " is a spawn this check could not read, so nothing is "
+    + "checking its arguments. Write the call with a name as its first argument "
+    + "and an array or the name of one as its second");
+}
 
 // THE BUILDERS engineargs EXPORTS, read before the walk needs them.
 const argsSrc = readFileSync(join(here, "engineargs.ts"), "utf8");
@@ -207,13 +311,47 @@ function whatItResolvesTo(one, before, whole, depth) {
   if (depth > 5) return "this check will not follow " + one + " any further";
   const name = one.match(/^([A-Za-z_$][\w$]*)\s*(?:[.[][^\]]*\]?|\([^()]*\))?$/);
   if (!name) return "this check cannot read " + one;
-  const gives = new RegExp(
-    "\\b(?:const|let|var)\\s+" + name[1] + "\\s*(?::[^=]*)?=\\s*([^;\\n]+)", "g");
-  const all = [...(before || "").matchAll(gives)];
+  // THE WINDOW IS THE VALUE AND NOT THE LINE.
+  //
+  // This captured to the first newline, so an object or an array written over
+  // two lines was handed on as the single character it opened with. That one
+  // character holds no dash literal and starts with a bracket, so it was
+  // answered clean, and a flag two lines down reached the call site with
+  // nothing failing. The capture now ends where the value ends.
+  const opens = new RegExp(
+    "\\b(?:const|let|var)\\s+" + name[1] + "\\s*(?::[^=]*)?=\\s*", "g");
+  const all = [...(before || "").matchAll(opens)];
   if (!all.length) {
     return "nothing above the call gives " + name[1] + " a value this check can read";
   }
-  return whatThisIs(all[all.length - 1][1].trim(), before, whole, depth);
+  const at = all[all.length - 1];
+  const value = valueAt(before, at.index + at[0].length);
+  if (value === null) {
+    return name[1] + " is given a bracket this check cannot follow to its end";
+  }
+  return whatThisIs(value.trim(), before, whole, depth);
+}
+
+// valueAt reads one value out of the source, from where it begins.
+//
+// A BRACKET IS READ TO ITS MATCH AND ANYTHING ELSE TO THE END OF ITS LINE. A
+// bracket that never closes in what this can see is answered as unreadable
+// rather than classified, because the whole class of defect here is a value
+// judged on the part of it that happened to fit in the window.
+function valueAt(text, at) {
+  const rest = text.slice(at);
+  const open = rest[0];
+  if (open === "{" || open === "[") {
+    const shut = open === "{" ? "}" : "]";
+    let depth = 0;
+    for (let i = 0; i < rest.length; i++) {
+      if (rest[i] === open) depth++;
+      else if (rest[i] === shut && --depth === 0) return rest.slice(0, i + 1);
+    }
+    return null;
+  }
+  const end = rest.search(/[;\n]/);
+  return end < 0 ? rest : rest.slice(0, end);
 }
 
 // whatThisIs classifies what a name was given.

@@ -44,8 +44,13 @@ raising it must say why that time cannot be recovered.
 
 **Cases.** UC-0.
 
-**Surface.** Everything about setup lives in one folder. The root shows one entry for
-installation, never two scripts side by side.
+**Surface.** Everything about setup lives in one folder, and the root points at it.
+
+**The two RUNME scripts are the exception, and it is deliberate.** One script for both
+systems was tried and did not work: PowerShell runs on Windows and bash runs on Linux, and
+nothing runs on both without something else installed first. The done-when above says both
+platforms work, so two entry scripts is what that costs. An earlier version of this rule
+asked for one entry and is withdrawn.
 
 ---
 

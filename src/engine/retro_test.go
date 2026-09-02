@@ -541,6 +541,24 @@ func TestARetroLeavesAnotherActorsFolder(t *testing.T) {
 	if len(got.Kept) == 0 {
 		t.Errorf("the retro says nothing about the folder it left")
 	}
+
+	// AND THE INDEX SAYS IT, WHICH IS THE HALF THE STRUCT CANNOT PROVE.
+	//
+	// got.Kept is what the producer decided. index.md is what a person opens
+	// and reads, and it is the deliverable this token names. Three tests
+	// touched this keep and every one of them asked the struct, so the index
+	// never carried a word about anything left behind and nothing could fail
+	// for it.
+	index, err := os.ReadFile(filepath.Join(got.Folder, "index.md"))
+	if err != nil {
+		t.Fatalf("the retro wrote no index, so this guards nothing: %v", err)
+	}
+	for _, want := range []string{"reviewer9", "whoever owns it may be writing to it"} {
+		if !strings.Contains(string(index), want) {
+			t.Errorf("the index a person reads never says %q, so a retro that left a "+
+				"folder reads exactly like one that took it", want)
+		}
+	}
 }
 
 // A RETRO READS EVERY WORD THE RECORD HOLDS, NOT FIVE FIELDS SOMEBODY TYPED.
@@ -601,6 +619,27 @@ func TestARetroReadsEveryFieldForACitation(t *testing.T) {
 //
 // THE COST OF EVERY OTHER FINDING ON THIS TOKEN IS A ROUND. The cost of this
 // one is a file nobody can get back.
+// THE POSITIVE CONTROL, AND IT COMES BEFORE THE SWEEP RATHER THAN AFTER IT.
+//
+// A sweep that has never found anything has never been tested, which is the rule
+// in doc/guidance/behaviour.md. So this drives the keep's own rule over the one
+// citation the record already holds in the spelling that defeated it, taken out
+// of this token's own note rather than invented: observed-red-criteria.txt, at
+// the end of a sentence.
+//
+// IT IS A FIXTURE THIS TEST OWNS, not a read of the tree. The note it came from
+// is a note the system edits, so a check standing on it goes quiet the first
+// time somebody rewrites that sentence.
+func TestTheKeepReadsTheSpellingThatDefeatedIt(t *testing.T) {
+	said := "derives a count in its evidence with a sed over .se/scratchpad/observed-red-criteria.txt."
+	got := scratchpadNames(said)
+	if len(got) != 1 || got[0] != "observed-red-criteria.txt" {
+		t.Fatalf("the keep read %q out of the sentence the record actually holds, so a "+
+			"retro takes the artefact behind an observation on the token that "+
+			"promises not to", got)
+	}
+}
+
 func TestARetroReadsACitationHoweverItIsSpelled(t *testing.T) {
 	exe := retroExe(t)
 	r := aWorkedTree(t)
@@ -609,6 +648,12 @@ func TestARetroReadsACitationHoweverItIsSpelled(t *testing.T) {
 		{"back-slashed.txt", ".se\\scratchpad\\back-slashed.txt"},
 		{"absolute.txt", "C:\\Users\\somebody\\work\\.se\\scratchpad\\absolute.txt"},
 		{"forward.txt", ".se/scratchpad/forward.txt"},
+		// AND THE COMMONEST SPELLING IN PROSE: the path at the end of a
+		// sentence. The break set held the punctuation a shell writes and not
+		// the punctuation a sentence writes, so a name came back with its full
+		// stop attached, matched nothing on disk, and the file went.
+		{"sentence-end.txt", "the red is in .se/scratchpad/sentence-end.txt."},
+		{"before-colon.txt", "see .se/scratchpad/before-colon.txt: it says what ran"},
 	} {
 		if err := os.WriteFile(filepath.Join(pad, one.name), []byte("what it said"+nl), 0o644); err != nil {
 			t.Fatal(err)
@@ -622,7 +667,8 @@ func TestARetroReadsACitationHoweverItIsSpelled(t *testing.T) {
 	if _, out, err := runRetroExe(t, exe, r.Work, "--by", "main"); err != nil {
 		t.Fatalf("se retro: %v\n%s", err, out)
 	}
-	for _, name := range []string{"back-slashed.txt", "absolute.txt", "forward.txt"} {
+	for _, name := range []string{"back-slashed.txt", "absolute.txt", "forward.txt",
+		"sentence-end.txt", "before-colon.txt"} {
 		if _, err := os.Stat(filepath.Join(pad, name)); err != nil {
 			t.Errorf("an unfinished token cites %s and the retro took it", name)
 		}

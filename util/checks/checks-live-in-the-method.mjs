@@ -11,7 +11,7 @@
 // command exited zero over it.
 //
 //   node util/checks/checks-live-in-the-method.mjs <root>
-import { readFileSync, existsSync } from "node:fs";
+import { readFileSync, existsSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 
 const root = process.argv[2] ?? ".";
@@ -51,6 +51,27 @@ for (const c of listed) {
   say(c + " is in util/checks", existsSync(join(root, "util", "checks", c + ".mjs")),
     "the battery names it and util/checks does not hold it");
 }
+
+// AND THE LIST IS THE WHOLE FOLDER, ASKED FOR RATHER THAN DESCRIBED.
+//
+// The half above walks the battery's list and asks the folder about each name,
+// so it catches a check that was deleted and never catches one that was written
+// and never listed. A check nobody runs is a check that has quietly stopped
+// working, and nothing goes red at the moment it is added, which is the only
+// moment anybody would have acted on it.
+//
+// THE SET IS THE FOLDER, so the folder is what is walked. battery.sh is not a
+// check and names itself nowhere in its own list.
+const named = new Set(listed);
+const onDisk = readdirSync(join(root, "util", "checks"))
+  .filter((f) => f.endsWith(".mjs"))
+  .map((f) => f.slice(0, -".mjs".length));
+say("util/checks holds checks to run (" + onDisk.length + ")", onDisk.length > 0,
+  "the folder holds no .mjs at all, so this half has nothing to judge");
+const unlisted = onDisk.filter((c) => !named.has(c));
+say("the battery runs every check in util/checks", unlisted.length === 0,
+  unlisted.join(", ") + " sits in util/checks and the battery never names it, "
+  + "so it is a check nobody runs");
 
 console.log("\n" + listed.length + " check(s) named, " + new Set(paths).size
   + " path(s) built. " + bad + " failed.");

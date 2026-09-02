@@ -53,10 +53,19 @@ func aQuietHold(t *testing.T, status Status, holder string) quiet {
 }
 
 // pullPast asks for work enough times that the holder falls behind the queue.
+// pullPast pulls until the hold has gone stale, and STOPS AT THE ALARM.
+//
+// It used to pull a fixed number of times and answer whatever came last. That
+// was the same answer every time until pulling again became the walker's way of
+// saying the holder is gone: after the alarm, the next pull TAKES THE TOKEN BACK
+// and answers work, so this helper walked past the thing it exists to reach.
 func pullPast(r Roots, actor string) Answer {
 	var a Answer
 	for i := 0; i <= TheFloor().PullsBeforeHoldIsStale; i++ {
 		a = Pull(r, actor, RoleWorker, Payload{})
+		if a.Pull == AnswerInvestigate {
+			return a
+		}
 	}
 	return a
 }
@@ -256,7 +265,10 @@ func TestOneNumberDecidesAQuietHold(t *testing.T) {
 // answer how long a token has been held.
 func TestNoNoteCarriesATime(t *testing.T) {
 	q := aQuietHold(t, ImpInReview, "reviewer1")
-	pullPast(q.roots, "main")
+	// ONE INVESTIGATION, READ TWICE. The notice is kept from the pull that
+	// raised it, because pulling again is now the walker saying the holder is
+	// gone and the token comes back rather than the alarm sounding twice.
+	raised := pullPast(q.roots, "main")
 	read := 0
 	for _, dir := range []string{filepath.Join(q.roots.Work, "doc", "work"), q.roots.Private("work")} {
 		entries, err := os.ReadDir(dir)
@@ -284,7 +296,7 @@ func TestNoNoteCarriesATime(t *testing.T) {
 	// AND NEITHER DOES THE INVESTIGATION ITSELF. The notice is where a duration
 	// would be written if anybody wrote one, and this file is about notes, so
 	// nothing else looks at it.
-	a := pullPast(q.roots, "main")
+	a := raised
 	if a.Pull != AnswerInvestigate {
 		t.Fatalf("nothing was investigated, so the notice cannot be judged: %q", a.Pull)
 	}
@@ -473,5 +485,63 @@ func TestAnUnreadCallExitsWithItsOwnCode(t *testing.T) {
 				strings.Join(one.args, " "), code, one.why, one.want,
 				firstLines(strings.TrimSpace(string(out)), 2))
 		}
+	}
+}
+
+// PULLING AGAIN IS THE ANSWER, AND THE NOTICE SAYS SO.
+//
+// The investigate notice reads: if it is gone, pull again with se pull, and the
+// engine takes it back to imp_submitted for you. It did not. Reclaim runs only
+// on an ARRIVAL, and an agent that has already arrived this session never
+// arrives again, so the second pull answered the same notice as the first and
+// the token stayed held by a name that was gone.
+//
+// MEASURED. A reviewer died on an API error holding a token in review. The
+// engine sent the walker to look, the walker looked, knew it was gone, and
+// pulled again twenty-eight times. Nothing moved.
+//
+// A MESSAGE THAT NAMES A REMEDY IS A CLAIM ABOUT THAT REMEDY. This is that class
+// on the notice this token is about.
+func TestPullingAgainTakesBackWhatTheDeadHolderHeld(t *testing.T) {
+	r := lane(t)
+	one := mint(t, r, Token{Title: "the probe", Assignee: "probeA", Status: ImpOpen})
+	if _, done := settle(r, "probeA", RoleWorker, Payload{ID: one.ID, Disposition: "done"}); done {
+		t.Fatal("the submission was refused")
+	}
+	// A reviewer takes it and then stops existing.
+	if got := next(r, "rev-gone", RoleReviewer); got.Pull != AnswerReview {
+		t.Fatalf("the reviewer was handed nothing: %+v", got)
+	}
+
+	// THE FIRST ASK SENDS SOMEBODY TO LOOK AND MOVES NOTHING, which is right:
+	// a timeout guesses and a person looking does not. Whether the engine can
+	// TELL a hold is quiet needs a session and is asserted elsewhere; what this
+	// drives is what happens after somebody has looked.
+	Looked(r, "main", one.ID)
+	if got, err := LoadToken(r, one.ID); err != nil {
+		t.Fatal(err)
+	} else if got.Status != ImpInReview {
+		t.Fatalf("being sent to look moved it to %s, and it must move nothing", got.Status)
+	}
+
+	// AND THE SECOND ASK TAKES IT BACK, because pulling again is the walker
+	// saying the holder is gone.
+	back := TakeBackWhatWasLookedAt(r, "main")
+	if len(back) == 0 {
+		t.Fatal("pulling again after looking took nothing back, which is what the notice promises")
+	}
+	got, err := LoadToken(r, one.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got.Status != ImpSubmitted {
+		t.Errorf("it came back as %s and it was in review", got.Status)
+	}
+	if got.Holder != "" {
+		t.Errorf("it came back still held by %q", got.Holder)
+	}
+	// AND IT TAKES BACK NOTHING THE WALKER WAS NOT SENT TO LOOK AT.
+	if again := TakeBackWhatWasLookedAt(r, "main"); len(again) != 0 {
+		t.Errorf("it took back %v on a pull nobody was sent to look for", again)
 	}
 }

@@ -45,7 +45,8 @@ export type Group = {
   lines?: Line[];
   groups?: Group[];
 };
-export type Tally = { name: string; n: number };
+export type TallyOf = { id: string; title: string };
+export type Tally = { name: string; n: number; out_of?: number; of?: TallyOf[] };
 export type Table = {
   view: string;
   columns: string[];
@@ -84,7 +85,24 @@ export type LevelSaid = { property: string; direction: string; sets?: string };
 export type Pane = { side: string; table: Table };
 export type Body = { heads: string; pinned: string; scrolling: string; total: number; counts: Tally[] };
 
-export function editorHtml(panes: Pane[], views: string[], view: string): string {
+// THE BURN DOWN, AS THE ENGINE ANSWERED IT.
+//
+// The bar DRAWS this and forms none of it. Every number is computed by the
+// engine, so a bar that worked one out from the others would be a count living
+// only where it is displayed, which this record has already been bitten by.
+export interface Burndown {
+  day: string;
+  minted: number;
+  done: number;
+  open: number;
+  rate: number;
+  window: string;
+  says: string;
+  detail: string;
+}
+
+export function editorHtml(panes: Pane[], views: string[], view: string,
+                           burndown?: Burndown): string {
   // THE TABLE ARRIVES WITH THE DATA, and it is taken before a mark is drawn.
   // Every pane carries the same one, so the first that has it decides.
   for (const p of panes) {
@@ -106,6 +124,7 @@ export function editorHtml(panes: Pane[], views: string[], view: string): string
 </head>
 <body>
 <div class="bar">${tabs}
+  ${burnDown(burndown)}
   <button class="second" id="second" title="show a second column">${icon("split")}</button>
 </div>
 <div class="panes">
@@ -121,7 +140,7 @@ function paneHtml(p: Pane, hidden: boolean): string {
   const b = paneBody(p.table);
   const t = p.table;
   return `<div class="pane-wrap" data-side="${esc(p.side)}"${hidden ? " hidden" : ""}>
-  <div class="chrome">${toolbar(t)}${filterPop(t)}${sortPop(t)}${propsPop(t)}</div>
+  <div class="chrome">${toolbar(t)}${filterPop(t)}${sortPop(t)}${propsPop(t)}<span class="bs-tally-pops">${tallyPops(t)}</span></div>
   <div class="heads">${b.heads}</div>
   <div class="top">${b.pinned}</div>
   <div class="pane">${b.scrolling}</div>
@@ -154,10 +173,20 @@ function toolbar(t: Table): string {
     <button type="button" class="bs-tool bs-rename" hidden
       title="rename the group these rows are in">Rename</button>
     <input class="bs-rename-field" type="text" hidden placeholder="a name for it">
+    <span class="bs-tallies">${tallyPills(t)}</span>
     <span class="bs-gap"></span>
-    <button type="button" class="bs-tool" data-pop="filter" data-help="filter">${icon("filter")} Filter</button>
-    <button type="button" class="bs-tool" data-pop="sort" data-help="sort">${icon("sort")} Sort</button>
+    <input class="bs-sift" type="text" spellcheck="false"
+      placeholder="filter, the log's syntax"
+      title="narrows what the panes draw and writes nothing: word, name: value, and or not, ( ), val*, /pattern/">
+    <button type="button" class="bs-tool" data-pop="filter" data-help="filter"
+      title="filter">${icon("filter")}</button>
+    <button type="button" class="bs-tool" data-pop="sort" data-help="sort"
+      title="sort">${icon("sort")}</button>
     <button type="button" class="bs-tool" data-pop="props" data-help="properties">${icon("columns")} Properties</button>
+    <button type="button" class="bs-tool bs-expand-all"
+      title="open every group and every row">${icon("expandAll")}</button>
+    <button type="button" class="bs-tool bs-collapse-all"
+      title="shut every group and every row">${icon("collapseAll")}</button>
     <button type="button" class="bs-tool bs-code-toggle" title="show the query">${icon("query")}</button>
   </div>`;
 }
@@ -356,17 +385,38 @@ export function paneBody(t: Table): Body {
 //
 // AND no group IS A BUCKET, not a query that came up empty, which is the other
 // thing the rule says without a legend.
+//
+// THE RULE CARRIES THE NUMBER, because it is the only line on the page that can
+// say which half adds up. The owner read 370 tokens off a tree holding 187: the
+// headings above the rule and the headings below it are the same rows counted
+// twice, and nothing said so in a number. Measured on that tree: total 187, the
+// group counts summed to 376.
+//
+// THE BUCKETS BELOW ADD TO IT AND THE QUERIES ABOVE DO NOT. Every row is in
+// exactly one bucket and in as many queries as match it, so the half below the
+// rule is a partition and the half above is a set of questions.
+//
+// AND IT IS STILL NOT ON THE TOOLBAR. That ruling stands and it is the reason
+// this is here instead: a number on the bar is the same fact in a second place,
+// with nothing beside it saying what it counts.
 function withARuleBetweenTheKinds(groups: Group[], cols: string[], t: Table): string {
   const out: string[] = [];
   let ruled = false;
   for (const g of groups) {
     if (!ruled && !g.declared && out.length > 0) {
-      out.push(`<div class="kinds"></div>`);
+      out.push(theRule(t));
       ruled = true;
     }
     out.push(groupHtml(g, cols, t));
   }
   return out.join("");
+}
+
+// The rule, and what it says about the two halves it divides.
+function theRule(t: Table): string {
+  const n = t.total ?? 0;
+  return `<div class="kinds"><b>${n}</b> ${n === 1 ? "token" : "tokens"}` +
+    `<span class="kinds-why">the groups below hold each one once, the queries above ask about them again</span></div>`;
 }
 
 // THE LAST COLUMN TAKES WHATEVER IS LEFT, so the table always fills its pane.
@@ -482,8 +532,51 @@ function locked(col: string): string {
   return "";
 }
 
+// THE NUMBER IS A FRACTION WHERE THE VIEW SAID WHAT IT IS OUT OF: 2/21 in
+// work reads as a queue with a size, and a bare 2 reads as a mystery.
+function figure(c: Tally): string {
+  return c.out_of ? `${c.n}/${c.out_of}` : `${c.n}`;
+}
+
 export function tallyHtml(counts: Tally[]): string {
-  return counts.map((c) => `<span class="tally"><b>${c.n}</b>${esc(c.name)}</span>`).join("");
+  return counts.map((c) => `<span class="tally"><b>${figure(c)}</b>${esc(c.name)}</span>`).join("");
+}
+
+// A COUNT IS A PILL ON THE BAR, AND THE PILL OPENS ONTO WHAT IT COUNTED.
+//
+// THE NUMBER AND THE NAMES ARE ONE ANSWER. The engine counts and hands over the
+// tokens behind the number, so the list cannot disagree with the figure beside
+// it. A page that took the number here and went looking for the members itself
+// would hold two answers to one question.
+//
+// THE KEY IS THE POSITION AND NOT THE NAME, because a name is the view file's
+// to choose and a person may write one with a quote in it.
+const tallyKey = (i: number) => `tally${i}`;
+
+function tallyPills(t: Table): string {
+  return (t.counts ?? [])
+    .map((c, i) => `<button type="button" class="bs-tool bs-pill" data-pop="${tallyKey(i)}"
+      title="${esc(c.name)}"><b>${figure(c)}</b> ${esc(c.name)}</button>`)
+    .join("");
+}
+
+function tallyPops(t: Table): string {
+  return (t.counts ?? [])
+    .map((c, i) => {
+      // A COUNT OF NOUGHT STILL OPENS, and it says so. A pill that does nothing
+      // when pressed reads as a broken control rather than as an empty list.
+      const names = (c.of ?? [])
+        .map(
+          (o) => `<button type="button" class="bs-pill-open" data-id="${esc(o.id)}"
+        title="open this token">${esc(o.title)}</button>`,
+        )
+        .join("");
+      return `<div class="bs-pop" data-pop="${tallyKey(i)}" hidden>
+    <div class="bs-pop-title">${esc(c.name)}</div>
+    <div class="bs-pill-list">${names || `<div class="bs-pill-none">nothing</div>`}</div>
+  </div>`;
+    })
+    .join("");
 }
 
 function esc(s: string): string {
@@ -497,6 +590,11 @@ function css(): string {
          margin: 0; padding: 0; display: flex; flex-direction: column; height: 100vh; }
   .bar { display: flex; align-items: center; gap: 4px; padding: 4px 8px; flex: 0 0 auto;
          border-bottom: 1px solid var(--vscode-panel-border); }
+  /* THE BURN DOWN IS SMALL AND OUT OF THE WAY. It sits after the tabs and
+     pushes the split button to the far end, and the detail is on hover so it
+     does not fill up too much space. */
+  .bd { margin-left: auto; font-size: 0.85em; opacity: 0.75; white-space: nowrap;
+        cursor: default; }
   /* ONE LOOK FOR EVERY BUTTON. v3 drew its table's buttons differently from
      every other button in the product, and the reader had to learn two. */
   ${controlCss()}
@@ -512,9 +610,17 @@ function css(): string {
   /* THE COLUMN HEADER IS ABOVE EVERYTHING, so a pinned group has columns over
      it exactly like every other group. */
   .heads { flex: 0 0 auto; }
-  /* The pinned groups do not scroll. That is the whole of what pinning is. */
-  .top { flex: 0 0 auto; border-bottom: 1px solid var(--vscode-panel-border); }
-  .kinds { border-top: 1px solid var(--vscode-panel-border); margin: 6px 0; }
+  /* THE PINNED GROUPS STAY PUT, AND THE PANE UNDER THEM KEEPS A FLOOR. This
+     box never scrolled, which was the whole of what pinning was, until the
+     owner opened two pinned groups: an unbounded top box eats the scrolling
+     pane's height, and the groups under it cannot be scrolled to at all. So
+     the pinned box keeps at most half the pane and scrolls itself past that. */
+  .top { flex: 0 1 auto; max-height: 50%; overflow: auto;
+         border-bottom: 1px solid var(--vscode-panel-border); }
+  .kinds { border-top: 1px solid var(--vscode-panel-border); margin: 10px 0 6px;
+    padding-top: 4px; color: var(--vscode-descriptionForeground); font-size: 11px; }
+  .kinds b { color: var(--vscode-foreground); font-weight: 600; }
+  .kinds-why { margin-left: 8px; }
   .pane { flex: 1 1 auto; overflow: auto; }
   thead th { position: sticky; top: 0; z-index: 2; text-align: left; font-weight: 600;
              padding: 4px 8px; background: var(--vscode-editor-background);
@@ -539,6 +645,28 @@ function css(): string {
        display: flex; align-items: center; gap: 6px; cursor: pointer; }
   h2 .count { color: var(--vscode-descriptionForeground); font-weight: 400; }
   .group.shut .rows { display: none; }
+  /* A CHILD DRAWS UNDER ITS PARENT, AND THE STYLESHEET IS WHAT DRAWS IT.
+     The tree is one flat run of rows that know their depth, so both halves of
+     nesting are decisions this sheet has to carry out: the indent that says a
+     row is a child, and the fold that takes it away. Neither was here, so a
+     sub-token drew flush with its parent and the fold moved nothing. */
+  tr.folded-away { display: none; }
+  /* A ROW THE SIFT BOX PUT AWAY. THE GROUPS ALL STAY, HOWEVER EMPTY THEY
+     SIFT: the owner's ruling is that a filter narrows the elements and never
+     throws out the groups they sit in. */
+  tr.sifted-away { display: none; }
+  .bs-sift { flex: 0 1 220px; min-width: 90px; background: var(--vscode-input-background);
+    color: var(--vscode-input-foreground); border: 1px solid var(--vscode-input-border, transparent);
+    border-radius: 2px; padding: 2px 6px; font-family: inherit; font-size: inherit; }
+  .bs-sift.bad { border-color: var(--vscode-inputValidation-errorBorder, #f48771); }
+  /* The containers exist so new counts can land without rebuilding the bar,
+     and display: contents keeps the flex row exactly as it was. */
+  .bs-tallies, .bs-tally-pops { display: contents; }
+  /* A SPAN IS INLINE, so the width the row writes on it does nothing until the
+     span is told it may take one. This is the indent. */
+  .kid-pad { display: inline-block; }
+  .kid-fold { display: inline-block; width: 14px; cursor: pointer;
+              color: var(--vscode-descriptionForeground); }
   /* A PINNED GROUP LOOKS LIKE EVERY OTHER GROUP. What says it is pinned is the
      pin, which is lit rather than faint. */
   .pin { margin-left: 6px; opacity: 0; cursor: pointer; font-size: .9em; }
@@ -572,6 +700,15 @@ function css(): string {
      open. This says it once, for every popover. */
   .bs-pop[hidden] { display: none; }
   .bs-pop-tall { max-height: 60vh; display: flex; flex-direction: column; }
+  /* A PILL IS A COUNT YOU CAN OPEN. The number leads, because that is what the
+     eye is coming for, and the name follows it. */
+  .bs-pill b { font-variant-numeric: tabular-nums; margin-right: 4px; }
+  .bs-pill-list { display: flex; flex-direction: column; max-height: 40vh; overflow: auto; }
+  .bs-pill-open { text-align: left; background: none; border: 0; padding: 3px 4px;
+                  color: var(--vscode-foreground); cursor: pointer;
+                  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .bs-pill-open:hover { background: var(--vscode-list-hoverBackground); }
+  .bs-pill-none { padding: 3px 4px; color: var(--vscode-descriptionForeground); }
   .bs-pop-title { font-size: .85em; text-transform: uppercase; letter-spacing: .06em;
                   color: var(--vscode-descriptionForeground); margin: 4px 0; cursor: pointer; }
   .bs-level { display: flex; gap: 6px; align-items: center; margin-bottom: 4px; }
@@ -781,6 +918,15 @@ function script(): string {
         g.classList.toggle('shut');
         h.querySelector('.fold').textContent = g.classList.contains('shut') ? '\\u25B8' : '\\u25BE';
         remember();
+        // A FOLD REDRAWS THE PAGE. This handler used to change the class and
+        // stop, so the pager kept hiding rows by a window computed before the
+        // fold: a group opened with its rows beyond the old window drew an
+        // open arrow over nothing, and the bar under the table said a number
+        // from another world. AND A GROUP OPENED IS A GROUP SHOWN: the window
+        // jumps to its first row, because the person who pressed the heading
+        // wants to see it, not find it on page three.
+        drawFolds(where);
+        if (!g.classList.contains('shut')) showGroup(where, g);
       };
     }
     for (const p of where.querySelectorAll('.pin')) {
@@ -797,6 +943,41 @@ function script(): string {
         send({ type: 'open', id: door.closest('tr').dataset.id });
       };
     }
+    // A NAME IN A PILL'S LIST OPENS THAT TOKEN, through the same message a
+    // row's door sends, so there is one way to open a note and not two.
+    for (const name of where.querySelectorAll('.bs-pill-open')) {
+      name.onclick = (ev) => {
+        ev.stopPropagation();
+        send({ type: 'open', id: name.dataset.id });
+      };
+    }
+
+    // TWO BUTTONS FOLD EVERYTHING, AND ALL MEANS BOTH KINDS OF FOLD.
+    //
+    // A group folds by a class on its section and a row folds by its key in the
+    // set. Reaching only one of them would move half the table on a press, and
+    // a person cannot tell that from a table that was already half folded.
+    //
+    // IT ACTS ON THE PANE THE BUTTON SITS IN. The two panes are two instances
+    // of one editor and neither owns the other.
+    const foldEverything = (shut) => {
+      for (const g of where.querySelectorAll('.group[data-key]')) {
+        g.classList.toggle('shut', shut);
+        const f = g.querySelector('.fold');
+        if (f) f.textContent = shut ? '\\u25B8' : '\\u25BE';
+      }
+      for (const row of where.querySelectorAll('tr[data-kids]')) {
+        const key = rowKey(where, row);
+        if (shut) folded.add(key); else folded.delete(key);
+      }
+      remember();
+      drawFolds(where);
+    };
+    const shutAll = where.querySelector('.bs-collapse-all');
+    if (shutAll) shutAll.onclick = () => foldEverything(true);
+    const openAll = where.querySelector('.bs-expand-all');
+    if (openAll) openAll.onclick = () => foldEverything(false);
+
     // A PARENT FOLDS WHAT IS UNDER IT, and the press stops there rather than
     // ticking the parent on the way past.
     for (const fold of where.querySelectorAll('.kid-fold')) {
@@ -840,9 +1021,12 @@ function script(): string {
     if (m.heads) wrap.querySelector('.heads').innerHTML = m.heads;
     wrap.querySelector('.top').innerHTML = m.pinned;
     pane.innerHTML = m.scrolling;
+    if (m.counts) drawTallies(wrap, m.counts);
     restore(wrap);
     wire(wrap);
+    wireChrome(wrap);
     wireColumns(wrap);
+    applySift(wrap);
     showPage(wrap);
     pane.scrollTop = at;
   });
@@ -1157,6 +1341,202 @@ function script(): string {
   // Ported from basesclient.ts:479-520.
   const page = new Map();
 
+  // THE WINDOW MOVES TO A GROUP THE PERSON JUST OPENED, so pressing a
+  // heading never answers with an open arrow over an empty page.
+  function showGroup(wrap, g) {
+    const bar = wrap.querySelector('.bs-pager');
+    if (!bar) return;
+    const per = Math.max(0, Number(bar.querySelector('.bs-per').value) || 0);
+    if (per === 0) return;
+    const first = g.querySelector('tr[data-id]:not(.folded-away):not(.sifted-away)');
+    const i = candidates(wrap).indexOf(first);
+    if (i < 0) return;
+    page.set(wrap.dataset.side, Math.floor(i / per));
+    showPage(wrap);
+  }
+
+  // THE SIFT BOX. The owner asked for a small line edit in the heading line
+  // that filters the way the log does, so the syntax is the log's, ported
+  // from src/viewer/filter.go rather than invented here: bare words over the
+  // whole row, name: value for one drawn column, quotes for a phrase, and or
+  // not to combine, parentheses to group, val* as the wildcard and /pattern/
+  // as a regular expression, terms with nothing between them combined as and.
+  // IT NARROWS WHAT IS DRAWN AND WRITES NOTHING: the .base filter is the
+  // view's and this one is the reader's, gone when the editor closes.
+  const sift = new Map();
+
+  function lexSift(s) {
+    const out = [];
+    for (let i = 0; i < s.length; ) {
+      const c = s[i];
+      if (c === ' ' || c === '\t') { i++; continue; }
+      if (c === '(' || c === ')') { out.push({ kind: c }); i++; continue; }
+      if (c === ':') { out.push({ kind: 'colon' }); i++; continue; }
+      if (c === '"') {
+        const j = s.indexOf('"', i + 1);
+        if (j < 0) return { incomplete: true };
+        out.push({ kind: 'quoted', text: s.slice(i + 1, j) }); i = j + 1; continue;
+      }
+      if (c === '/') {
+        let j = i + 1;
+        while (j < s.length && s[j] !== '/') j += s.charCodeAt(j) === 92 ? 2 : 1;
+        if (j >= s.length) return { incomplete: true };
+        out.push({ kind: 'regex', text: s.slice(i + 1, j) }); i = j + 1; continue;
+      }
+      let j = i;
+      while (j < s.length && !' \t():"'.includes(s[j])) j++;
+      const w = s.slice(i, j);
+      const low = w.toLowerCase();
+      if (low === 'and' || low === 'or' || low === 'not') out.push({ kind: low });
+      else out.push({ kind: 'word', text: w });
+      i = j;
+    }
+    return { toks: out };
+  }
+
+  function clauseSift(field, tok) {
+    const BS = String.fromCharCode(92);
+    let test;
+    if (tok.kind === 'regex') {
+      const re = new RegExp(tok.text);
+      test = (v) => re.test(v);
+    } else if (tok.kind === 'word' && tok.text.includes('*')) {
+      const special = BS + '^.|?+()[]{}';
+      let pat = '';
+      for (const ch of tok.text) pat += ch === '*' ? '.*' : (special.includes(ch) ? BS + ch : ch);
+      const re = new RegExp(pat, 'i');
+      test = (v) => re.test(v);
+    } else {
+      const needle = tok.text.toLowerCase();
+      test = (v) => v.toLowerCase().includes(needle);
+    }
+    if (field === '') return (row) => test(row.dataset.id + ' ' + row.textContent);
+    const want = field.toLowerCase();
+    // A COLUMN NOBODY HAS HEARD OF MATCHES NOTHING, exactly like the log: a
+    // typo that matched everything would look like a working filter.
+    return (row) => {
+      for (const td of row.querySelectorAll('td[data-col]')) {
+        if (td.dataset.col.toLowerCase() === want) return test(td.textContent);
+      }
+      return false;
+    };
+  }
+
+  function parseSift(text) {
+    const lexed = lexSift(text);
+    if (lexed.incomplete) return { incomplete: true };
+    const t = lexed.toks;
+    if (t.length === 0) return { match: null };
+    let i = 0;
+    const peek = () => (i < t.length ? t[i].kind : '');
+    const starts = () => ['word', 'quoted', 'regex', '(', 'not'].includes(peek());
+    function atom() {
+      if (peek() === '(') {
+        i++;
+        const n = parseOr();
+        if (peek() !== ')') throw new Error('missing )');
+        i++;
+        return n;
+      }
+      if (peek() === 'not') { i++; const n = atom(); return (r) => !n(r); }
+      if (peek() === 'word' || peek() === 'quoted' || peek() === 'regex') {
+        const first = t[i++];
+        if (first.kind === 'word' && peek() === 'colon') {
+          i++;
+          const k = peek();
+          if (k !== 'word' && k !== 'quoted' && k !== 'regex') throw new Error('a value is missing');
+          return clauseSift(first.text, t[i++]);
+        }
+        if (first.kind === 'word' && first.text.length > 1 && first.text[0] === '-') {
+          const n = clauseSift('', { kind: 'word', text: first.text.slice(1) });
+          return (r) => !n(r);
+        }
+        return clauseSift('', first);
+      }
+      throw new Error('cannot read this');
+    }
+    function parseAnd() {
+      let l = atom();
+      for (;;) {
+        if (peek() === 'and') { i++; const r2 = atom(); const l2 = l; l = (r) => l2(r) && r2(r); continue; }
+        if (starts()) { const r2 = atom(); const l2 = l; l = (r) => l2(r) && r2(r); continue; }
+        return l;
+      }
+    }
+    function parseOr() {
+      let l = parseAnd();
+      while (peek() === 'or') { i++; const r2 = parseAnd(); const l2 = l; l = (r) => l2(r) || r2(r); }
+      return l;
+    }
+    const root = parseOr();
+    if (i !== t.length) throw new Error('cannot read the rest');
+    return { match: root };
+  }
+
+  // THE GROUPS ALL STAY, HOWEVER EMPTY THEY SIFT. Only rows are put away.
+  function applySift(wrap) {
+    const has = sift.get(wrap.dataset.side);
+    const match = has ? has.match : null;
+    for (const row of wrap.querySelectorAll('tr[data-id]')) {
+      row.classList.toggle('sifted-away', match !== null && !match(row));
+    }
+    showPage(wrap);
+  }
+
+  function wireSift(wrap) {
+    const box = wrap.querySelector('.bs-sift');
+    if (!box) return;
+    const side = wrap.dataset.side;
+    box.value = sift.get(side) ? sift.get(side).text : '';
+    box.oninput = () => {
+      const text = box.value;
+      if (text.trim() === '') {
+        sift.delete(side);
+        box.classList.remove('bad');
+        applySift(wrap);
+        return;
+      }
+      try {
+        const p = parseSift(text);
+        if (p.incomplete) return; // still typing a quote or a slash
+        box.classList.remove('bad');
+        sift.set(side, { text, match: p.match });
+        applySift(wrap);
+      } catch (e) {
+        // A FILTER THAT WILL NOT PARSE IS AN ERROR, NOT A FILTER THAT MATCHES
+        // NOTHING. The last one that worked keeps ruling and the box says so.
+        box.classList.add('bad');
+      }
+    };
+  }
+
+  // THE COUNTS ARE DRAWN AGAIN WHEN NEW DATA LANDS. The body handler used to
+  // replace the rows and leave the toolbar pills saying whatever they said
+  // when the page was built, so the owner watched IN WORK name two tokens
+  // that had both moved on. The engine sends the counts with every body and
+  // this draws exactly what it was handed.
+  function escS(v) {
+    return String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  function drawTallies(wrap, counts) {
+    const pills = wrap.querySelector('.bs-tallies');
+    const pops = wrap.querySelector('.bs-tally-pops');
+    if (!pills || !pops) return;
+    const fig = (c) => (c.out_of ? c.n + '/' + c.out_of : String(c.n));
+    pills.innerHTML = counts.map((c, i) =>
+      '<button type="button" class="bs-tool bs-pill" data-pop="tally' + i + '" title="' + escS(c.name) + '">' +
+      '<b>' + fig(c) + '</b> ' + escS(c.name) + '</button>').join('');
+    pops.innerHTML = counts.map((c, i) => {
+      const names = (c.of || []).map((o) =>
+        '<button type="button" class="bs-pill-open" data-id="' + escS(o.id) + '" title="open this token">' +
+        escS(o.title) + '</button>').join('');
+      return '<div class="bs-pop" data-pop="tally' + i + '" hidden>' +
+        '<div class="bs-pop-title">' + escS(c.name) + '</div>' +
+        '<div class="bs-pill-list">' + (names || '<div class="bs-pill-none">nothing</div>') + '</div></div>';
+    }).join('');
+  }
+
   function candidates(wrap) {
     // Every row a closed group is not swallowing and no folded parent has
     // taken away, in the order they are drawn.
@@ -1166,6 +1546,7 @@ function script(): string {
       if (g.closest('.group.shut') !== null) continue;
       for (const row of g.querySelectorAll('tr[data-id]')) {
         if (row.classList.contains('folded-away')) continue;
+        if (row.classList.contains('sifted-away')) continue;
         out.push(row);
       }
     }
@@ -1209,7 +1590,18 @@ function script(): string {
   }
 
   for (const wrap of document.querySelectorAll('.pane-wrap')) {
-    wire(wrap); wireChrome(wrap); wireFilter(wrap); wireColumns(wrap); wirePager(wrap);
+    wire(wrap); wireChrome(wrap); wireFilter(wrap); wireColumns(wrap); wirePager(wrap); wireSift(wrap);
   }
   `;
+}
+
+
+// BD: four numbers separated by slashes, small, with the detail on hover.
+//
+// EVERY VALUE IS PRINTED AS IT ARRIVED. Nothing here adds, subtracts, divides
+// or compares them: the engine computed all four and the window, and the bar
+// says what it was handed.
+function burnDown(b?: Burndown): string {
+  if (!b) return "";
+  return `<span class="bd" title="${esc(b.detail)}">${esc(b.says)}</span>`;
 }

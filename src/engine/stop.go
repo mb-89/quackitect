@@ -70,6 +70,55 @@ type StopClaim struct {
 
 func claimPath(r Roots) string { return r.Private("stop-claim.json") }
 
+// THE CLAIMS, ONE PER ACTOR, IN ONE FILE.
+//
+// It held ONE claim. ClaimStop wrote a whole object over whatever was there
+// without reading it first, and StandingClaim answered true only when the
+// stored actor was the one being asked about, so a second actor's stop erased
+// the first's in silence. Anything reading the record then said working over an
+// agent that had stopped, which is the failure the header exists to end.
+//
+// A CLAIM IS PER ACTOR THE WAY THE HOLD IS PER TREE, and each is written where
+// its subject is. The hold is one file because a person put everything down. A
+// claim is one agent's named reason, and there are as many of those as there
+// are agents.
+type claims struct {
+	Claims map[string]StopClaim `json:"claims"`
+}
+
+// loadClaims reads them, under either shape.
+//
+// A FILE WRITTEN BEFORE THIS EXISTED IS ONE CLAIM AT THE TOP LEVEL, and it is
+// read as that actor's, so a session already running when this lands keeps the
+// claim it made rather than losing it.
+func loadClaims(r Roots) claims {
+	c := claims{Claims: map[string]StopClaim{}}
+	b, err := os.ReadFile(claimPath(r))
+	if err != nil {
+		return c
+	}
+	if json.Unmarshal(b, &c) == nil && len(c.Claims) > 0 {
+		return c
+	}
+	c.Claims = map[string]StopClaim{}
+	var one StopClaim
+	if json.Unmarshal(b, &one) == nil && one.Actor != "" {
+		c.Claims[one.Actor] = one
+	}
+	return c
+}
+
+func saveClaims(r Roots, c claims) error {
+	b, err := json.MarshalIndent(c, "", "  ")
+	if err != nil {
+		return err
+	}
+	if err := os.MkdirAll(r.Private(), 0o755); err != nil {
+		return err
+	}
+	return os.WriteFile(claimPath(r), append(b, nl...), 0o644)
+}
+
 func Sanctioned() []StopReason { return sanctioned }
 
 func knownReason(id string) bool {
@@ -91,30 +140,18 @@ func ClaimStop(r Roots, actor, because, why string) error {
 	if strings.TrimSpace(why) == "" {
 		return fmt.Errorf("say why in one line. The reason on its own is a category, not a reason")
 	}
-	c := StopClaim{Session: currentSession(r), Actor: actor, Because: because, Why: why, At: now()}
-	b, err := json.MarshalIndent(c, "", "  ")
-	if err != nil {
-		return err
-	}
-	if err := os.MkdirAll(r.Private(), 0o755); err != nil {
-		return err
-	}
-	return os.WriteFile(claimPath(r), append(b, '\n'), 0o644)
+	all := loadClaims(r)
+	all.Claims[actor] = StopClaim{Session: currentSession(r), Actor: actor,
+		Because: because, Why: why, At: now()}
+	return saveClaims(r, all)
 }
 
 // StandingClaim reads an actor's claim, and leaves it standing. A claim from
 // another session is gone, because a session is where a decision was made.
 func StandingClaim(r Roots, actor string) (StopClaim, bool) {
-	var c StopClaim
-	b, err := os.ReadFile(claimPath(r))
-	if err != nil {
-		return c, false
-	}
-	if json.Unmarshal(b, &c) != nil {
-		return c, false
-	}
-	if c.Actor != actor || c.Session != currentSession(r) {
-		return c, false
+	c, has := loadClaims(r).Claims[actor]
+	if !has || c.Session != currentSession(r) {
+		return StopClaim{}, false
 	}
 	return c, true
 }
@@ -122,14 +159,14 @@ func StandingClaim(r Roots, actor string) (StopClaim, bool) {
 // SpendClaim is what the guard calls before every tool, and it is the only
 // thing that ends a claim. Working again is changing your mind.
 func SpendClaim(r Roots, actor string) {
-	var c StopClaim
-	b, err := os.ReadFile(claimPath(r))
-	if err != nil || json.Unmarshal(b, &c) != nil {
+	all := loadClaims(r)
+	if _, has := all.Claims[actor]; !has {
 		return
 	}
-	if c.Actor == actor {
-		os.Remove(claimPath(r))
-	}
+	// ONE ACTOR'S CLAIM IS SPENT AND THE REST STAND. Removing the file spent
+	// everybody's, so one agent carrying on ended another's stop.
+	delete(all.Claims, actor)
+	_ = saveClaims(r, all)
 }
 
 func reasonIDs() string {

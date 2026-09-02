@@ -276,6 +276,20 @@ func scratchpadNames(said string) []string {
 		if cut := strings.IndexByte(name, '/'); cut >= 0 {
 			name = name[:cut]
 		}
+		// A NAME IS WHAT IS LEFT WHEN THE SENTENCE'S PUNCTUATION COMES OFF.
+		//
+		// The break set above holds the punctuation a SHELL writes and not the
+		// punctuation a SENTENCE writes, so a citation in the commonest form
+		// English prose has, with the path ending the sentence, came back with
+		// its full stop attached, matched nothing on disk, and the drain took
+		// the file. Measured on this record: observed-red-criteria.txt, cited
+		// once, in that spelling, on the token that promises not to take it.
+		//
+		// TRIMMED AFTERWARDS RATHER THAN ADDED TO THE BREAK SET, because a
+		// character list is complete on the day it is written and this one was
+		// not. A file name carries a dot inside it and does not end in one, so
+		// what comes off is a trailing RUN of punctuation no name can end in.
+		name = strings.TrimRight(name, ".:!?}>")
 		if name != "" {
 			out = append(out, name)
 		}
@@ -329,6 +343,22 @@ func retroIndex(got Collected) string {
 		b.WriteString("\nLOOKED FOR AND NOT FOUND:\n")
 		for _, m := range got.Missing {
 			b.WriteString("- " + m + "\n")
+		}
+	}
+	// WHAT WAS LEFT BEHIND, AND WHY, IN THE THING A PERSON OPENS.
+	//
+	// The keep was built and the half that says what it kept was not, so the
+	// index carried three counts and the LOOKED FOR AND NOT FOUND block and
+	// no word about anything left in place. A retro that leaves a file and
+	// does not say so reads exactly like one that took it.
+	//
+	// IT IS THE HALF WITH NO OUTPUT, which is why it went missing: the keep
+	// can be shown by pointing at a file that is still there, and this one
+	// can only be shown by reading the page.
+	if len(got.Kept) > 0 {
+		b.WriteString("\nLEFT WHERE IT WAS, AND WHY:\n")
+		for _, k := range got.Kept {
+			b.WriteString("- " + k + "\n")
 		}
 	}
 	b.WriteString("\nA SCRIPT WORTH KEEPING IS MOVED INTO THE METHOD, into util/checks, " +

@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -30,6 +31,11 @@ type arrivals struct {
 	Session string         `json:"session"`
 	Pulls   int            `json:"pulls"`
 	At      map[string]int `json:"at"`
+
+	// THE ORDER THEY FIRST PULLED, which At cannot answer twice over: a map has
+	// no order, and the count it holds is the LAST pull rather than the first.
+	// It is written where the first pull is already known, which is here.
+	Order []string `json:"order,omitempty"`
 }
 
 func arrivalPath(r Roots) string { return r.Private("arrivals.json") }
@@ -56,6 +62,9 @@ func Arrived(r Roots, session, actor string) bool {
 	// somebody else is still pulling.
 	a.Pulls++
 	a.At[actor] = a.Pulls
+	if !seen {
+		a.Order = append(a.Order, actor)
+	}
 	saveArrivals(r, a)
 	return !seen
 }
@@ -189,11 +198,35 @@ func Reclaim(r Roots, actor, role string) []string {
 		if !held || heldBy[t.Status] != role {
 			continue
 		}
-		// A WORKER TAKES BACK ITS OWN AND A REVIEWER TAKES BACK ANY. Work in
-		// hand belongs to whoever was asked for it. A review belongs to
-		// whichever reviewer is here now.
+		// A WORKER TAKES BACK ITS OWN. Work in hand belongs to whoever was
+		// asked for it.
 		if role == RoleWorker && t.Assignee != actor && t.MintedBy != actor {
 			continue
+		}
+		// AND A REVIEWER TAKES BACK ITS OWN, OR A DEAD HOLDER'S, AND NEVER A
+		// LIVE ONE'S.
+		//
+		// This said a reviewer takes back ANY, because a review belongs to
+		// whichever reviewer is here now. That was written when one reviewer ran
+		// at a time. With fifteen, every arriving reviewer took the token out of
+		// the hands of one that was mid-review: three reported it in one
+		// afternoon, one of them having reviewed four tokens fully and lost every
+		// one at the verdict. The work was done and thrown away.
+		//
+		// THE ENGINE ALREADY KNOWS THE DIFFERENCE. StillPulling is what the
+		// investigate answer is built on and what the reviewer refusal uses. This
+		// was the one place that did not ask.
+		if role == RoleReviewer && t.Holder != "" && t.Holder != actor {
+			// AND WITH NO SESSION IT LEAVES THE HOLD ALONE, which is the
+			// opposite default from the refusal that counts a queue. There,
+			// refusing on a fact the engine cannot check would block a queue
+			// for a reason nobody could act on. Here, TAKING on a fact it
+			// cannot check destroys somebody's work in progress. The cheap
+			// mistake goes the other way.
+			session := sessionOf(filepath.Join(r.Private("log"), Current))
+			if !Named(session) || StillPulling(r, session, t.Holder, LoadConfig(r).PullsBeforeHoldIsStale) {
+				continue
+			}
 		}
 		t.Status, t.Holder = to, ""
 		if SaveToken(r, t) == nil {

@@ -46,7 +46,7 @@ func TestNoCagedFileNamesTheMachineItWasWrittenOn(t *testing.T) {
 	}
 
 	for _, p := range list {
-		body, err := assemble(root, p.Sources, vars)
+		body, err := assemble(root, p.Sources, p.Section, vars)
 		if err != nil {
 			t.Fatalf("%s: %v", p.Name, err)
 		}

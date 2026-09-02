@@ -30,6 +30,10 @@ type Projection struct {
 	Sources     []string          `json:"sources"` // under the method root
 	Wrap        string            `json:"wrap"`    // markdown, frontmatter, or none
 	Frontmatter map[string]string `json:"frontmatter,omitempty"`
+
+	// The one chapter to take from each source, named by its heading. Empty
+	// means the whole file.
+	Section string `json:"section,omitempty"`
 }
 
 type projectionFile struct {
@@ -65,7 +69,7 @@ func Project(roots Roots) ([]string, error) {
 	}
 	var written []string
 	for _, p := range list {
-		body, err := assemble(roots.Method, p.Sources, vars)
+		body, err := assemble(roots.Method, p.Sources, p.Section, vars)
 		if err != nil {
 			return written, fmt.Errorf("%s: %w", p.Name, err)
 		}
@@ -129,20 +133,43 @@ func within(work, path string) string {
 	return "./" + filepath.ToSlash(rel)
 }
 
-func assemble(methodRoot string, sources []string, vars map[string]string) (string, error) {
+// assemble joins the sources in order. With a section named, it takes only
+// that chapter from each source, and a source without it is an error rather
+// than a silent gap.
+func assemble(methodRoot string, sources []string, section string, vars map[string]string) (string, error) {
 	var b strings.Builder
 	for i, name := range sources {
 		raw, err := os.ReadFile(filepath.Join(methodRoot, filepath.FromSlash(name)))
 		if err != nil {
 			return "", fmt.Errorf("a source is missing: %w", err)
 		}
+		text := string(raw)
+		if section != "" {
+			only, found := chapter(text, section)
+			if !found {
+				return "", fmt.Errorf("%s has no chapter headed %q", name, section)
+			}
+			// The chapter is headed by the file it came from, so a reader of
+			// three chapters in a row can tell which file each one belongs to.
+			text = "# " + title(text) + "\n\n" + only
+		}
 		if i > 0 {
 			b.WriteString("\n")
 		}
-		b.WriteString(strings.TrimSpace(expand(string(raw), vars)))
+		b.WriteString(strings.TrimSpace(expand(text, vars)))
 		b.WriteString("\n")
 	}
 	return b.String(), nil
+}
+
+// title is the text of the first level-one heading, or the empty string.
+func title(text string) string {
+	for _, line := range strings.Split(text, "\n") {
+		if strings.HasPrefix(line, "# ") {
+			return strings.TrimSpace(line[2:])
+		}
+	}
+	return ""
 }
 
 func expand(s string, vars map[string]string) string {

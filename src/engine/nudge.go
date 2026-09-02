@@ -78,9 +78,10 @@ func countQueue(r Roots, actor, role string) (int, bool, string) {
 		// WHICH STATES COUNT IS THE ENGINE'S ONE ANSWER. This wrote the
 		// whole set out again, for both roles, so a twelfth state would have
 		// joined the pull and not the count.
-		if role != RoleReviewer && t.Assignee != actor {
-			continue
-		}
+		// THE COUNT ASKS THE SAME QUESTION THE PULL ASKS, and the pull stopped
+		// asking about the assignee. A count that filtered by name reported an
+		// empty worker queue while open work sat in it, which is the number the
+		// nudge is built on.
 		if containsStatus(HandedOut(role), t.Status) {
 			waiting++
 		}

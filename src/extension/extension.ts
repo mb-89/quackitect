@@ -3,15 +3,17 @@ import { spawn as spawnRaw, ChildProcess, SpawnOptions } from "node:child_proces
 import * as fs from "node:fs";
 import * as path from "node:path";
 import * as os from "node:os";
-import { panelHtml, everyGroup, Node } from "./panel";
+import { panelHtml, everyGroup, Node, Happening } from "./panel";
+import { whyNothingHappened } from "./mintwhy";
 import { editorHtml, paneBody, Table, Pane } from "./editor";
 import { whichHarness, kickoffText, openAgent } from "./agent";
 import { nextEngineState, whyNot, HEARTBEAT_MS } from "./liveness";
 import {
   mintArgs, editCellArgs, fileArgs, groupArgs, renameGroupArgs, holdArgs,
   viewArgs, paneArgs, panesArgs, viewsArgs, pinArgs, unpinArgs, widthArgs,
+  burndownArgs,
   orderArgs, levelArgs, dropLevelArgs, filterArgs,
-  rotateArgs, projectArgs, copiesArgs, attachArgs, configArgs, initArgs, startArgs,
+  rotateArgs, projectArgs, copiesArgs, attachArgs, configArgs, doingArgs, initArgs, startArgs,
   setArgs,
 } from "./engineargs";
 
@@ -373,7 +375,37 @@ function render(context: vscode.ExtensionContext) {
   if (!view) return;
   const groups = shownGroups(context);
   builtWith = groups.join(",");
-  view.webview.html = panelHtml(loadTree(context), groups, theIcons(context));
+  view.webview.html = panelHtml(loadTree(context), groups, theIcons(context), lastDoing);
+}
+
+// WHAT EACH ACTOR IS DOING, ASKED OF THE ENGINE AND NEVER DERIVED HERE.
+//
+// The person watching the panel could not tell working from stopped, or see
+// which token was in hand. Every fact in that answer is read off the record, so
+// the header says what is true rather than what somebody typed.
+//
+// Reading is quiet, the way the config read is: a window with no folder open is
+// not wrong, and saying so on every refresh would be noise.
+let lastDoing: Happening = { actors: [], hold: { on: false } };
+
+function readDoing(context: vscode.ExtensionContext): Promise<void> {
+  return new Promise((resolve) => {
+    const work = workRoot();
+    const exe = binary(context, "se");
+    if (!work || !fs.existsSync(exe)) return resolve();
+    const done = spawn(exe, [...doingArgs(), "--work", work], { cwd: work });
+    let out = "";
+    done.stdout?.on("data", (b: Buffer) => (out += b.toString()));
+    done.on("error", () => resolve());
+    done.on("exit", () => {
+      try {
+        lastDoing = JSON.parse(out) as Happening;
+      } catch {
+        /* nothing to show. The header keeps what it had. */
+      }
+      resolve();
+    });
+  });
 }
 
 // WHICH GROUPS ARE SHOWN, and the default is not written here.
@@ -454,6 +486,11 @@ function loadTree(context: vscode.ExtensionContext): Node {
 // The values in force come from the engine, because the engine is what
 // decides whether a stored value is allowed to replace a default.
 function postValues(context: vscode.ExtensionContext) {
+  // THE HEADER IS REFRESHED ON THE SAME BEAT AS THE VALUES, because what an
+  // actor is doing changes as often as anything else on this panel and a
+  // header that is right only when the panel is rebuilt is a header that lies
+  // most of the time.
+  void readDoing(context).then(() => render(context));
   void readValues(context).then(() => {
     // The panel is rebuilt when the groups it holds are not the groups it was
     // built with. One comparison, against what is on screen.
@@ -988,7 +1025,11 @@ async function drawWork(context: vscode.ExtensionContext, rebuild = false) {
   }
   if (rebuild || workBuilt !== workView) {
     const listed = await askEngine(context, viewsArgs());
-    workPanel.webview.html = editorHtml(panes, listed?.views ?? [], workView);
+    // THE ENGINE COMPUTES THE FOUR NUMBERS. The bar draws what it is handed and
+    // forms none of them, because a number that lives only where it is
+    // displayed is a number nothing checks.
+    const burndown = await askEngine(context, burndownArgs());
+    workPanel.webview.html = editorHtml(panes, listed?.views ?? [], workView, burndown);
     workBuilt = workView;
     return;
   }
@@ -998,9 +1039,11 @@ async function drawWork(context: vscode.ExtensionContext, rebuild = false) {
     // built and never again, so a first build that arrived before the engine
     // answered left them empty for the life of the window. That is why they
     // appeared only after a property was ticked: ticking rebuilds the page.
+    // THE COUNTS TRAVEL WITH THE BODY. They were computed and left behind,
+    // so the toolbar pills said whatever they said when the page was built.
     void workPanel.webview.postMessage({
       type: "body", side: p.side, heads: b.heads, pinned: b.pinned,
-      scrolling: b.scrolling, total: b.total,
+      scrolling: b.scrolling, total: b.total, counts: b.counts,
     });
   }
 }
@@ -1100,28 +1143,46 @@ async function renameGroup(context: vscode.ExtensionContext, from: string, to: s
 async function mintWork(context: vscode.ExtensionContext, arg?: { text: string; kind: string }) {
   // A person typed it in the panel, so a person minted it.
   const args = mintArgs(arg?.text ?? "", arg?.kind ?? "");
-  if (!args) return;
+  if (!args) {
+    vscode.window.showErrorMessage(whyNothingHappened("nothing typed"));
+    return;
+  }
   const out = await askEngine(context, args);
   if (out?.error) {
     vscode.window.showErrorMessage(out.error);
     return;
   }
+  if (out === undefined) return; // askEngine has already said which way it went
   void drawWork(context);
 }
 
+// NO SILENT RETURN. Every way out of here used to answer undefined and say
+// nothing, so a person watched their work vanish with no way to learn whether
+// the engine refused it or nothing was sent. Each one now names which, where
+// the person is already looking, which is vscode.window.showErrorMessage.
 function askEngine(context: vscode.ExtensionContext, args: string[]): Promise<any> {
   return new Promise((resolve) => {
     const work = workRoot();
     const exe = binary(context, "se");
-    if (!work || !fs.existsSync(exe)) return resolve(undefined);
+    if (!work || !fs.existsSync(exe)) {
+      vscode.window.showErrorMessage(whyNothingHappened("no engine"));
+      return resolve(undefined);
+    }
     const done = spawn(exe, [...args, "--work", work], { cwd: work });
     let out = "";
     done.stdout?.on("data", (b: Buffer) => (out += b.toString()));
-    done.on("error", () => resolve(undefined));
+    done.on("error", (err: Error) => {
+      vscode.window.showErrorMessage(whyNothingHappened("no start", String(err?.message ?? err)));
+      resolve(undefined);
+    });
     done.on("exit", () => {
       try {
         resolve(JSON.parse(out));
       } catch {
+        // THE ONE THE OWNER HIT. The engine printed its usage because it was
+        // sent a flag it has not got, and usage is not JSON, so this swallowed
+        // it. It is also where an engine that did not read the call arrives.
+        vscode.window.showErrorMessage(whyNothingHappened("not json", out));
         resolve(undefined);
       }
     });

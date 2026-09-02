@@ -21,7 +21,10 @@ func laneTools() []map[string]any {
 				"\"Write a note on this\" means backlog: true.\n" +
 				"An instruction to act on now means backlog left off.\n\n" +
 				"form is one line. detail is the whole instruction, in the words it was asked in.\n" +
-				"You cannot close what you mint. A reviewer settles it.",
+				"You cannot close what you mint. A reviewer settles it.\n\n" +
+				"AND IT IS WHERE YOU SAY WHICH TOKEN YOU ARE ON. Pass on: <id>. " +
+				"That token goes in work, whatever else you held goes back, and " +
+				"a write is refused until you have said it.",
 			"inputSchema": map[string]any{
 				"type": "object",
 				"properties": map[string]any{
@@ -41,6 +44,9 @@ func laneTools() []map[string]any {
 						"description": "out of the queue, holding nobody. What a note is"},
 					"open": map[string]any{"type": "string",
 						"description": "instead of minting: move a backlogged token into the queue, by id"},
+					"on": map[string]any{"type": "string",
+						"description": "instead of minting: say which token you are working on, by id. " +
+							"It goes in work and whatever else you held goes back. A write is refused until you have said it"},
 					"actor": map[string]any{"type": "string",
 						"description": "who is minting. Default main"},
 				},
@@ -94,6 +100,29 @@ func laneTools() []map[string]any {
 							"wrong":     map[string]any{"type": "string"},
 							"satisfies": map[string]any{"type": "string"},
 						}}},
+					"lesson": map[string]any{"type": "object",
+						"description": "reviewer only, with reject: the class of mistake and what to do " +
+							"instead. A rejection with no lesson is refused",
+						"properties": map[string]any{
+							"class":    map[string]any{"type": "string"},
+							"avoid":    map[string]any{"type": "string"},
+							"prevents": map[string]any{"type": "string"},
+						}},
+					"learned": map[string]any{"type": "string",
+						"description": "reviewer only, with reject: the id of the token you minted for " +
+							"the lesson. A rejection naming none is refused"},
+					"rewatched": map[string]any{"type": "object",
+						"additionalProperties": map[string]any{"type": "string"},
+						"description": "reviewer only, with accept: what you watched go red, keyed by " +
+							"the criterion's own sentence"},
+					"criteria": map[string]any{"type": "array",
+						"description": "a draft's criteria: says, and runs where a command decides it",
+						"items": map[string]any{"type": "object", "properties": map[string]any{
+							"says":    map[string]any{"type": "string"},
+							"runs":    map[string]any{"type": "string"},
+							"without": map[string]any{"type": "string"},
+							"red":     map[string]any{"type": "string"},
+						}}},
 					"as":    map[string]any{"type": "string", "description": "worker, or reviewer. Default worker"},
 					"actor": map[string]any{"type": "string", "description": "who is pulling. Default main"},
 				},
@@ -105,6 +134,15 @@ func laneTools() []map[string]any {
 func mintWork(r roots, args map[string]any) string {
 	if id := str(args["open"]); id != "" {
 		return engineCall(r, []string{"work", "--open", id}, nil)
+	}
+	// NAMING A TOKEN IS WHAT OPENS IT, so it goes through the same verb the
+	// agent already has rather than becoming a second thing to remember.
+	if id := str(args["on"]); id != "" {
+		by := str(args["actor"])
+		if by == "" {
+			by = "main"
+		}
+		return engineCall(r, []string{"work", "--on", id, "--by", by}, nil)
 	}
 	// The agent minting is the actor it pulls as, so the engine is told rather
 	// than left to guess.
@@ -152,7 +190,13 @@ func pull(r roots, args map[string]any) string {
 	// Everything but the two routing arguments is the payload, which the
 	// engine reads. The stub does not know what a payload means.
 	payload := map[string]any{}
-	for _, k := range []string{"id", "evidence", "disposition", "successors", "reason", "verdict", "findings"} {
+	// EVERY FIELD THE ENGINE'S PAYLOAD CARRIES. It was seven of them, and the
+	// three a rejection needs were among the missing: a reviewer coming through
+	// this door could only ever send accept, because the engine refuses a
+	// rejection with no lesson and no lesson token. One did, on a token it had
+	// not reviewed, and the token closed.
+	for _, k := range []string{"id", "evidence", "rewatched", "disposition", "successors",
+		"reason", "verdict", "findings", "lesson", "learned", "criteria"} {
 		if v, ok := args[k]; ok && v != nil {
 			payload[k] = v
 		}

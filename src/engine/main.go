@@ -64,6 +64,8 @@ func main() {
 	minutes := flag.Int("minutes", 30, "how long emergency mode lasts, at most 240")
 	settings := flag.Bool("config", false, "print every parameter, its value, and where the value came from")
 	tree := flag.Bool("tree", false, "print the parameter tree as declared")
+	doing := flag.Bool("doing", false, "print what each actor is doing, and the hold, as JSON")
+	burndown := flag.String("burndown", "", "print the burn down for one UTC day, or today with the word today")
 	set := flag.String("set", "", "change one parameter: name=value")
 	said := flag.String("said", "", "put what the person said in the record, word for word, and exit")
 	answer := flag.String("answer", "", "put your answer to them in the record, and exit")
@@ -198,6 +200,26 @@ func main() {
 			fail(err)
 		}
 		fmt.Println("recorded")
+		return
+	}
+
+	// THE BURN DOWN, for the work editor's bar. Four numbers a day, computed
+	// here, because a number the editor derives is a number nothing checks.
+	if *burndown != "" {
+		day := *burndown
+		if day == "today" {
+			day = TheDay(time.Now())
+		}
+		out, _ := json.MarshalIndent(TheBurndown(roots, day), "", "  ")
+		fmt.Println(string(out))
+		return
+	}
+
+	// WHAT EACH ACTOR IS DOING, for the panel header. It is read off the
+	// record, so the panel draws a fact rather than something an agent said.
+	if *doing {
+		out, _ := json.MarshalIndent(WhatIsHappening(roots), "", "  ")
+		fmt.Println(string(out))
 		return
 	}
 

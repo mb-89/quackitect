@@ -169,7 +169,7 @@ func TestRejectedWorkIsWorkInHandAgain(t *testing.T) {
 	Pull(r, "main", RoleWorker, Payload{})
 	Pull(r, "main", RoleWorker, Payload{ID: tok.ID, Disposition: string(Done)})
 	Pull(r, "rev", RoleReviewer, Payload{})
-	taught := Lesson{Class: "a check built from the fix", Avoid: "write the check first and watch it go red"}
+	taught := Lesson{Class: "a check built from the fix", Avoid: "write the check first and watch it go red", Prevents: "ask before writing the check whether it can fail"}
 	Pull(r, "rev", RoleReviewer, Payload{ID: tok.ID, Verdict: "reject",
 		Findings: []Rejection{{Clause: "voice", Wrong: "a semicolon", Satisfies: "two sentences"}},
 		Lesson:   taught, Learned: learnedFrom(t, r, taught)})

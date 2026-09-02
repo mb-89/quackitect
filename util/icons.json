@@ -50,6 +50,16 @@
     "at": "U+25B8",
     "for": "a group that is folded"
   },
+  "expandAll": {
+    "glyph": "⊞",
+    "at": "U+229E",
+    "for": "open every group and every row in the pane"
+  },
+  "collapseAll": {
+    "glyph": "⊟",
+    "at": "U+229F",
+    "for": "shut every group and every row in the pane"
+  },
   "filter": {
     "glyph": "▼",
     "at": "U+25BC",

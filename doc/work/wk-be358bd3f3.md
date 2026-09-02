@@ -1,24 +1,36 @@
 ---
 id: wk-be358bd3f3
-seq: "66"
+seq: 66
 type: work
 title: answer every finding
-status: backlogged
-assignee: main
+status: imp_done
+assignee: cowork
 scope: single-step
 traced: true
+disposition: done
+rounds: 2
+evidence:
+  - outcome
 minted_by: reviewer4
+submitted_by: cowork
 ---
 
 ## detail
 
-A round that answers the finding cheapest to fix and is silent about the rest. wk-61af3a054e came back with criterion 2 given its own test, which closes finding 1, and with finding 2 and finding 3 untouched: the detail is byte-identical and criteria 1 and 4 are byte-identical to the round before. Not declined with a reason, which would have been a legal answer. Simply absent. wk-bb34ab1208 did the same thing one round earlier, closing the pinned-rows finding and saying nothing about the class-name one.
+Answer every finding by name, one section each, closed with proof or not taken with why. The engine refuses a submission that leaves a standing finding unanswered, on both paths. Found on wk-61af3a054e and wk-bb34ab1208.
 
-WHY IT COSTS A ROUND: a submission that answers some findings reads exactly like one that answers all of them, because the evidence names what it did and nothing names what it did not. The gap is invisible until the reviewer re-runs its own reproduction.
+## done when
 
-WHAT TO DO: answer every finding by name, including the ones you are not fixing. One section per finding, headed with its number, and its body is either closed with what proves it or not taken with why and what owes it. Before submitting, list the last round's findings, tick each against a section, and re-run the reviewer's reproduction where it named one.
+- A redraft that changes nothing is refused, and one that changes something goes through.
+  `rg -q func.TestARedraftThatChangesNothingIsRefused src/engine && go test -C src/engine -count=1 -run TestARedraftThatChangesNothingIsRefused$ .`
+- A redraft answering none of three findings is refused naming them, and fully answered it reaches review with the answers on the note.
+  `rg -q func.TestAPartialRedraftIsRefusedByName src/engine && go test -C src/engine -count=1 -run TestAPartialRedraftIsRefusedByName$ .`
+- A finding is answered by its own number and by nothing else.
+  `rg -q func.TestAFindingIsAnsweredByItsOwnNumber src/engine && go test -C src/engine -count=1 -run TestAFindingIsAnsweredByItsOwnNumber$ .`
+- A section for the tenth does not answer the first.
+  `rg -q func.TestASectionForTheTenthDoesNotAnswerTheFirst src/engine && go test -C src/engine -count=1 -run TestASectionForTheTenthDoesNotAnswerTheFirst$ .`
+- Silence about a standing finding is refused by name on both paths, and truth stays the reviewer's.
 
-WHERE IT COULD LIVE RATHER THAN IN A HABIT: the engine already knows the findings on a token, so it could refuse a submission whose evidence names fewer sections than there are open findings. That is the shape of the fix worth considering, because a rule the agent keeps is a rule the agent can forget.
+## evidence: outcome
 
-Found on wk-61af3a054e and wk-bb34ab1208.
-
+everyFindingAnswered runs at pull.go:306 on the implementation path and at pull.go:387 in submitSpec. answers matches finding N with a digit boundary, and Rejection carries Answer at token.go:187. All four named tests pass.

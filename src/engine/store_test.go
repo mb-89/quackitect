@@ -274,3 +274,22 @@ func TestANumberIsWrittenAsANumber(t *testing.T) {
 		t.Error("a value starting with a dash is written bare")
 	}
 }
+
+// A token is a ticket a person reads cold. The record once held one of 117 KB,
+// and the save is where the size is refused, because every change of state
+// passes through it.
+func TestAnEssayOfADetailIsRefusedAtTheSave(t *testing.T) {
+	r := lane(t)
+	small := mint(t, r, Token{Title: "fits", Detail: "One line.", Assignee: "main", Scope: SingleStep, Traced: true})
+	small.Detail = strings.Repeat("An argument nobody asked for. ", 60)
+	err := SaveToken(r, small)
+	if err == nil || !strings.Contains(err.Error(), "the detail is") {
+		t.Fatalf("a detail of %d bytes was saved, and the limit is %d", len(small.Detail), TheFloor().DetailBytes)
+	}
+	small.Detail = "One line."
+	small.Submission = map[string]string{"outcome": strings.Repeat("A paragraph about the paragraph. ", 40)}
+	err = SaveToken(r, small)
+	if err == nil || !strings.Contains(err.Error(), `evidence "outcome" is`) {
+		t.Fatalf("an evidence section of %d bytes was saved", len(small.Submission["outcome"]))
+	}
+}

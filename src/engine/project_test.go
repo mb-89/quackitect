@@ -18,8 +18,8 @@ func guidanceTree(t *testing.T) Roots {
 	// test reads the mechanism rather than the product's wording.
 	os.WriteFile(filepath.Join(method, "doc", "guidance", "reviewing.md"),
 		[]byte("# Reviewing\n\nVerify, do not read.\n"), 0o644)
-	os.WriteFile(filepath.Join(method, "doc", "guidance", "specifying.md"),
-		[]byte("# Specifying\n\nA criterion that can be a command is one.\n"), 0o644)
+	os.WriteFile(filepath.Join(method, "doc", "guidance", "work-token.md"),
+		[]byte("# Work token\n\nA criterion that can be a command is one.\n"), 0o644)
 	// What is projected where is data. The test declares its own, so it tests
 	// the mechanism rather than the product's list.
 	os.MkdirAll(filepath.Join(method, "util"), 0o755)
@@ -205,4 +205,40 @@ func projectionsFrom(t *testing.T, r Roots, source string) []string {
 		}
 	}
 	return out
+}
+
+// A projection that names a section carries that chapter from each source and
+// nothing else, and a source without the chapter is refused by name.
+func TestAProjectionWithASectionCarriesOnlyThatChapter(t *testing.T) {
+	r := guidanceTree(t)
+	guidance := filepath.Join(r.Method, "doc", "guidance")
+	os.WriteFile(filepath.Join(guidance, "voice.md"),
+		[]byte("# Voice\n\n## Motivation\n\nWhy.\n\n## Actionables\n\n- Answer first.\n\n## Discussion\n\nAt length.\n"), 0o644)
+	os.WriteFile(filepath.Join(guidance, "behaviour.md"),
+		[]byte("# Behaviour\n\n## Motivation\n\nWhy.\n\n## Actionables\n\n- Do what was asked.\n\n## Discussion\n\nAt length.\n"), 0o644)
+	os.WriteFile(filepath.Join(r.Method, "util", "projections.json"), []byte(`{"projections":[
+	  {"name":"protocol","target":"AGENTS.md","sources":["doc/guidance/voice.md","doc/guidance/behaviour.md"],"wrap":"markdown","section":"Actionables"}
+	]}`), 0o644)
+	if _, err := Project(r); err != nil {
+		t.Fatal(err)
+	}
+	b, err := os.ReadFile(filepath.Join(r.Work, "AGENTS.md"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	got := string(b)
+	for _, want := range []string{"## Actionables\n\n- Answer first.\n", "## Actionables\n\n- Do what was asked.\n"} {
+		if !strings.Contains(got, want) {
+			t.Fatalf("the projection lacks %q:\n%s", want, got)
+		}
+	}
+	for _, stray := range []string{"Motivation", "Discussion", "Why.", "At length."} {
+		if strings.Contains(got, stray) {
+			t.Fatalf("the projection carries %q, which is outside the section:\n%s", stray, got)
+		}
+	}
+	os.WriteFile(filepath.Join(guidance, "behaviour.md"), []byte("# Behaviour\n\nNo chapters here.\n"), 0o644)
+	if _, err := Project(r); err == nil || !strings.Contains(err.Error(), "behaviour.md") {
+		t.Fatalf("a source without the section was not refused by name: %v", err)
+	}
 }

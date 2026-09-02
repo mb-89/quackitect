@@ -5,30 +5,36 @@
       "target": "AGENTS.md",
       "sources": [
         "doc/guidance/voice.md",
-        "doc/guidance/behaviour.md"
+        "doc/guidance/behaviour.md",
+        "doc/guidance/work-token.md"
       ],
-      "wrap": "markdown"
+      "wrap": "markdown",
+      "section": "Actionables"
     },
     {
       "name": "copilot instructions",
       "target": ".github/copilot-instructions.md",
       "sources": [
         "doc/guidance/voice.md",
-        "doc/guidance/behaviour.md"
+        "doc/guidance/behaviour.md",
+        "doc/guidance/work-token.md"
       ],
-      "wrap": "markdown"
+      "wrap": "markdown",
+      "section": "Actionables"
     },
     {
       "name": "claude output style",
       "target": ".claude/output-styles/quackitect.md",
       "sources": [
         "doc/guidance/voice.md",
-        "doc/guidance/behaviour.md"
+        "doc/guidance/behaviour.md",
+        "doc/guidance/work-token.md"
       ],
       "wrap": "frontmatter",
       "frontmatter": {
         "name": "quackitect"
-      }
+      },
+      "section": "Actionables"
     },
     {
       "name": "claude cage",

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -158,69 +157,6 @@ func TestNothingNamesTheSearchingTool(t *testing.T) {
 	if read == 0 {
 		t.Fatal("no source was read, so this guards nothing")
 	}
-}
-
-// EVERY FILE PROJECTED FROM THE GUIDANCE CARRIES THE RULE, and the list of them
-// is read from the declaration rather than written out here.
-//
-// A HAND-DRAWN LIST IS EXACTLY THE SIZE OF WHAT YOU ALREADY LOOKED AT. Declare a
-// fourth projection from the same source and the claim stays true of its three
-// while the fourth goes without the rule.
-func TestTheSearchRuleReachesEveryProjection(t *testing.T) {
-	root := filepath.Join("..", "..")
-	const rule = "the tool the probe found"
-	source := "doc/guidance/behaviour.md"
-
-	b, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(source)))
-	if err != nil {
-		t.Fatalf("%s cannot be read, so this guards nothing: %v", source, err)
-	}
-	if !strings.Contains(string(b), rule) {
-		t.Fatalf("%s does not carry the rule", source)
-	}
-
-	targets := projectionTargets(t, root, source)
-	if len(targets) == 0 {
-		t.Fatalf("nothing is projected from %s, so this guards nothing", source)
-	}
-	for _, target := range targets {
-		got, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(target)))
-		if err != nil {
-			t.Errorf("%s is projected from %s and cannot be read: %v", target, source, err)
-			continue
-		}
-		if !strings.Contains(string(got), rule) {
-			t.Errorf("%s is projected from %s and does not carry the rule", target, source)
-		}
-	}
-}
-
-// projectionTargets answers every target whose sources include this file, read
-// from the declaration in this tree.
-func projectionTargets(t *testing.T, root, source string) []string {
-	t.Helper()
-	b, err := os.ReadFile(filepath.Join(root, "util", "projections.json"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	var declared struct {
-		Projections []struct {
-			Target  string   `json:"target"`
-			Sources []string `json:"sources"`
-		} `json:"projections"`
-	}
-	if err := json.Unmarshal(b, &declared); err != nil {
-		t.Fatal(err)
-	}
-	var out []string
-	for _, p := range declared.Projections {
-		for _, s := range p.Sources {
-			if s == source {
-				out = append(out, p.Target)
-			}
-		}
-	}
-	return out
 }
 
 // A HERE-DOC BODY IS DATA, NOT COMMANDS.

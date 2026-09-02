@@ -60,13 +60,24 @@ func TestPullingAgainReturnsTheSameTokenUntilItIsSubmitted(t *testing.T) {
 	}
 }
 
-// Idleness is read from the tokens, and it is never read from anywhere else.
-func TestAnActorWithNoTokenIsToldToWait(t *testing.T) {
+// WAIT MEANS THERE IS NO OPEN WORK, AND IT USED TO MEAN NONE WITH YOUR NAME ON.
+//
+// THIS TEST ASSERTED THE OLD RULE AND THE OWNER REVERSED IT: every agent can
+// take every open token, and a token assigned to somebody else is now handed
+// out. So the fixture that used to prove wait is the fixture that now proves
+// work, and it moved to anyagent_test.go under that name.
+//
+// WHAT WAIT STILL MEANS, AND IT IS WHY THIS TEST STAYS. Idleness is read from
+// the tokens and never from anywhere else. A lane with nothing open answers
+// wait, whoever pulls.
+func TestAnActorIsToldToWaitWhenNothingIsOpen(t *testing.T) {
 	r := lane(t)
-	mint(t, r, Token{Assignee: "somebody else"})
+	mint(t, r, Token{Title: "somebody is holding it", Assignee: "somebody else",
+		Status: ImpInWork, Holder: "somebody else"})
 	a := Pull(r, "main", RoleWorker, Payload{})
 	if a.Pull != AnswerWait {
-		t.Fatalf("wanted wait, got %s", a.Pull)
+		t.Fatalf("nothing is open and the pull answered %s, so an agent is handed work "+
+			"that is in somebody else's hands", a.Pull)
 	}
 }
 
@@ -120,7 +131,7 @@ func TestARejectionComesBackWithItsFindingsOnTheToken(t *testing.T) {
 	Pull(r, "main", RoleWorker, Payload{ID: tok.ID, Disposition: string(Done)})
 	// A reviewer judges what was handed to it, so it pulls before it answers.
 	Pull(r, "rev", RoleReviewer, Payload{})
-	one := Lesson{Class: "a check built from the fix", Avoid: "write the check first and watch it go red"}
+	one := Lesson{Class: "a check built from the fix", Avoid: "write the check first and watch it go red", Prevents: "ask before writing the check whether it can fail"}
 	Pull(r, "rev", RoleReviewer, Payload{ID: tok.ID, Verdict: "reject",
 		Findings: []Rejection{{Clause: "voice", Wrong: "it uses a semicolon", Satisfies: "two sentences"}},
 		Lesson:   one, Learned: learnedFrom(t, r, one)})
@@ -138,9 +149,12 @@ func TestARejectionComesBackWithItsFindingsOnTheToken(t *testing.T) {
 
 	// A second rejection accumulates rather than replaces. A fresh reviewer
 	// reads the token's history and not a colleague's memory.
-	Pull(r, "main", RoleWorker, Payload{ID: tok.ID, Disposition: string(Done)})
+	// THE FINDING IS ANSWERED BEFORE THE WORK GOES BACK, because a submission
+	// silent about one is refused now.
+	Pull(r, "main", RoleWorker, Payload{ID: tok.ID, Disposition: string(Done),
+		Evidence: map[string]string{"finding 1": "closed: the check names it now"}})
 	Pull(r, "rev2", RoleReviewer, Payload{})
-	two := Lesson{Class: "a number that was not read from a run", Avoid: "state no number you have not just read"}
+	two := Lesson{Class: "a number that was not read from a run", Avoid: "state no number you have not just read", Prevents: "ask before writing the check whether it can fail"}
 	Pull(r, "rev2", RoleReviewer, Payload{ID: tok.ID, Verdict: "reject",
 		Findings: []Rejection{{Clause: "evidence", Wrong: "no measurement", Satisfies: "a number"}},
 		Lesson:   two, Learned: learnedFrom(t, r, two)})
@@ -379,7 +393,7 @@ func TestAVerdictLandsInTheRecordWithItsReasons(t *testing.T) {
 	Pull(r, "main", RoleWorker, Payload{})
 	Pull(r, "main", RoleWorker, Payload{ID: tok.ID, Disposition: "done"})
 	Pull(r, "reviewer", RoleReviewer, Payload{})
-	taught := Lesson{Class: "a check built from the fix", Avoid: "write the check first and watch it go red"}
+	taught := Lesson{Class: "a check built from the fix", Avoid: "write the check first and watch it go red", Prevents: "ask before writing the check whether it can fail"}
 	Pull(r, "reviewer", RoleReviewer, Payload{ID: tok.ID, Verdict: "reject",
 		Findings: []Rejection{{Clause: "the total", Wrong: "it is still on the bar",
 			Satisfies: "no count outside a group heading"}},
@@ -1048,5 +1062,32 @@ func TestOnlyTheHolderPutsItDown(t *testing.T) {
 		t.Fatalf("the refusal does not say it had ended: %v", err)
 	}
 
+}
 
+// The engine hands an agent the Actionables chapter and nothing else. A file
+// without that chapter is handed out whole, as before.
+func TestTheMethodIsTheActionablesChapterAlone(t *testing.T) {
+	r := lane(t)
+	dir := GuidanceDir(r.Method)
+	if err := os.MkdirAll(dir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	three := "# Reviewing\n\n## Motivation\n\nWhy this exists.\n\n" +
+		"## Actionables\n\n- Verify, do not read.\n- Run the criteria.\n\n" +
+		"## Discussion\n\n### A case\n\nOnce, on wk-1, something happened.\n"
+	if err := os.WriteFile(filepath.Join(dir, "reviewing.md"), []byte(three), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	got := ReviewMethod(r)
+	want := "## Actionables\n\n- Verify, do not read.\n- Run the criteria.\n"
+	if got != want {
+		t.Fatalf("the method is not the Actionables chapter alone:\n%q", got)
+	}
+	flat := "# Work token\n\nOne rule, no chapters.\n"
+	if err := os.WriteFile(filepath.Join(dir, "work-token.md"), []byte(flat), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if got := SpecMethod(r); got != flat {
+		t.Fatalf("a file with no Actionables chapter is not handed out whole:\n%q", got)
+	}
 }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/sha256"
 	"fmt"
 	"os"
 	"os/exec"
@@ -158,7 +159,20 @@ func answerFor(r Roots, actor, role string, p Payload) Answer {
 	// out. A walker given another token goes on working while the stuck one
 	// stays stuck, which is what happened.
 	if role == RoleWorker {
+		// PULLING AGAIN IS THE WALKER'S ANSWER. Being sent to look is the first
+		// ask; coming back is the walker saying the holder is gone, which is the
+		// one thing the engine cannot find out for itself. The notice promised
+		// this and did not do it: Reclaim runs on an arrival, and an agent that
+		// has already arrived never arrives again, so the second pull answered
+		// the same notice as the first and nothing moved.
+		if back := TakeBackWhatWasLookedAt(r, actor); len(back) > 0 {
+			a := next(r, actor, role)
+			a.Learned = learned
+			a.Notice += reclaimNotice(back)
+			return a
+		}
 		if t, quiet := quietHold(r, actor); quiet {
+			Looked(r, actor, t.ID)
 			a := investigate(r, t)
 			a.Learned = learned
 			return a
@@ -189,54 +203,71 @@ func reviewerMissing(r Roots, role string) (Answer, bool) {
 		return Answer{}, false
 	}
 	session := currentSession(r)
-	var waiting []string
+	// WHAT IS WAITING IS ASKED OF THE ENGINE RATHER THAN NAMED HERE: the
+	// states the reviewer queue hands out, plus the reads nobody is behind.
+	// A LIVE REVIEWER IS WORTH EXACTLY THE ONE TOKEN IT TOOK: taking one
+	// moves it out of the waiting count, and nothing here returns early on
+	// its account, because one live reader turning the wall off for good is
+	// how eleven submissions piled up behind a green light.
+	// THE READS NOBODY IS BEHIND GO FIRST IN THE LIST, because they carry the
+	// holder's name and the why, which is the actionable half, and the brief
+	// cut must never lose them.
+	dead, readers := deadReads(r, session, stale)
+	waiting := append([]string{}, dead...)
 	for _, t := range Tokens(r) {
-		switch t.Status {
-		case ImpInReview, SpecInReview:
-			// A HOLD IS NOT A READER. A token in review carries the name of
-			// whoever took it, and that name outlives the process behind it. A
-			// reviewer whose process died left a token held forever, and this
-			// read that hold as somebody reading, so one dead reviewer turned
-			// the refusal off for good.
-			//
-			// A HOLDER THAT IS STILL PULLING IS READING, and one that has
-			// fallen behind the queue is not. An arrival is recorded once and
-			// never unwritten, so it stayed true after the reviewer died. The
-			// count of pulls is refreshed by pulling, which is the only thing
-			// a live reviewer does that a dead one cannot.
-			//
-			// WITH NO NAMED SESSION THE HOLD IS TAKEN AT ITS WORD. Nothing
-			// arrives when no engine is running, so the engine cannot tell a
-			// live hold from a stale one, and refusing on a fact it cannot
-			// check would block a queue for a reason nobody could act on.
-			if !Named(session) || StillPulling(r, session, t.Holder, stale) {
-				return Answer{}, false
-			}
-			// NOBODY HOLDS A DRAFT ITS DRAFTER HAS SENT. It sits in review
-			// waiting for a reviewer to take it, so it is waiting work like
-			// any other and naming a holder would name an empty string.
-			if t.Holder == "" {
-				waiting = append(waiting, t.ID+" "+t.Title)
-				continue
-			}
-			why := ", who has not pulled since the engine started"
-			if HasPulled(r, session, t.Holder) {
-				why = ", who has stopped pulling"
-			}
-			waiting = append(waiting, t.ID+" "+t.Title+" (held by "+t.Holder+why+")")
-		case ImpSubmitted:
+		if containsStatus(HandedOut(RoleReviewer), t.Status) {
 			waiting = append(waiting, t.ID+" "+t.Title)
 		}
 	}
 	if len(waiting) <= limit {
 		return Answer{}, false
 	}
-	return Answer{Pull: AnswerWait, Notice: fmt.Sprintf(
-		"NO REVIEWER IS RUNNING AND %d PIECES OF WORK ARE WAITING FOR ONE. "+
-			"Nothing new is handed out until one is.\n\n%s\n\n"+
+	head := fmt.Sprintf("NO REVIEWER IS RUNNING AND %d PIECES OF WORK ARE WAITING FOR ONE. "+
+		"Nothing new is handed out until one is.", len(waiting))
+	if readers > 0 {
+		head = fmt.Sprintf("%d PIECES OF WORK ARE WAITING FOR REVIEW AND %d REVIEWERS ARE READING. "+
+			"A reviewer is worth the one token it took, the queue is still over the limit, "+
+			"and nothing new is handed out until it drains.", len(waiting), readers)
+	}
+	return Answer{Pull: AnswerWait, Notice: head + fmt.Sprintf(
+		"\n\n%s\n\n"+
 			"Spawn a reviewer. It pulls with --as reviewer, judges one token, "+
-			"answers, and pulls again. This clears the moment its first pull moves "+
-			"a token into review.", len(waiting), briefly(waiting))}, true
+			"answers, and pulls again. This clears the moment the waiting count "+
+			"drops to the limit.", briefly(waiting))}, true
+}
+
+// deadReads answers the reviews nobody is behind, and counts the live ones.
+// THE DEAD-HOLDER DETECTION IS ITS OWN THING WITH ITS OWN NAME, because it
+// answers a different question from the waiting count, and one function
+// answering both is how the wall got lost.
+func deadReads(r Roots, session string, stale int) (dead []string, readers int) {
+	for _, t := range Tokens(r) {
+		if t.Status != ImpInReview && t.Status != SpecInReview {
+			continue
+		}
+		// NOBODY HOLDS A DRAFT ITS DRAFTER HAS SENT. It sits in review
+		// waiting for a reviewer to take it, so it is waiting work like
+		// any other and naming a holder would name an empty string.
+		if t.Holder == "" {
+			dead = append(dead, t.ID+" "+t.Title)
+			continue
+		}
+		// A HOLDER THAT IS STILL PULLING IS READING, and one that has fallen
+		// behind the queue is not. WITH NO NAMED SESSION THE HOLD IS TAKEN AT
+		// ITS WORD: nothing arrives when no engine is running, so the engine
+		// cannot tell a live hold from a stale one, and refusing on a fact it
+		// cannot check would block a queue for a reason nobody could act on.
+		if !Named(session) || StillPulling(r, session, t.Holder, stale) {
+			readers++
+			continue
+		}
+		why := ", who has not pulled since the engine started"
+		if HasPulled(r, session, t.Holder) {
+			why = ", who has stopped pulling"
+		}
+		dead = append(dead, t.ID+" "+t.Title+" (held by "+t.Holder+why+")")
+	}
+	return dead, readers
 }
 
 // The session is named in the first record of the current log. A pull that
@@ -289,6 +320,9 @@ func submit(r Roots, actor string, t Token, p Payload) (Answer, bool) {
 	if f := checkDisposition(r, p); f != nil {
 		return refuse(&t, *f), true
 	}
+	if f := everyFindingAnswered(t, p); f != nil {
+		return refuse(&t, *f), true
+	}
 	if f := checkEvidence(r, t, p); f != nil {
 		return refuse(&t, *f), true
 	}
@@ -302,6 +336,9 @@ func submit(r Roots, actor string, t Token, p Payload) (Answer, bool) {
 			Satisfies: "every criterion met, or a reviewer agreeing a change to them"}), true
 	}
 
+	// WHO SENT IT, so four eyes ask about the past rather than about a field
+	// anybody may rewrite. See Token.SubmittedBy.
+	t.SubmittedBy = actor
 	t.Submission = p.Evidence
 	t.Disposition = Disposition(p.Disposition)
 	t.Successors = p.Successors
@@ -332,9 +369,51 @@ func submitSpec(r Roots, actor string, t Token, p Payload) (Answer, bool) {
 		return refuse(&t, Rejection{Clause: "assignee", Wrong: "this token is not yours",
 			Satisfies: "draft a token assigned to " + actor}), true
 	}
-	if err := DraftReady(t); err != nil {
+	if err := DraftReady(r, t); err != nil {
 		return refuse(&t, Rejection{Clause: "the spec", Wrong: err.Error(),
 			Satisfies: "a detail saying what the problem is, and criteria saying what done means"}), true
+	}
+	// A REDRAFT THAT CHANGES NOTHING HAS ANSWERED NOTHING.
+	//
+	// The finding-answered refusal stood in submit and not here, so a redraft
+	// that answered none of the round's findings reached a reviewer. The case
+	// this was founded on is a draft round, and so is the one measured on this
+	// queue: a token arrived at round 5 with round 4's findings standing byte
+	// for byte.
+	//
+	// A DRAFT CARRIES NO EVIDENCE MAP, so what it answers with is the note. The
+	// drafter writes into the detail or the criteria, which is where a draft's
+	// whole work is, and the engine asks whether either moved since the last
+	// reviewer read it. Whether the change ANSWERS the finding is a judgment and
+	// stays the reviewer's. Whether anything changed at all is not.
+	if t.SpecSeen != "" && t.SpecSeen == draftPrint(t) {
+		return refuse(&t, Rejection{Clause: "the spec",
+			Wrong: "the detail and every criterion come back unchanged since the last " +
+				"round, so nothing on this token answers the findings standing on it",
+			Satisfies: "a detail or a criterion that says what changed, or a note under the " +
+				"finding saying why it is not taken and what owes it"}), true
+	}
+
+	// AND EACH STANDING FINDING IS ANSWERED BY NAME. The fingerprint asks only
+	// whether anything moved, and one changed character bought a redraft that
+	// answered nothing else: the founding case gave one criterion its own test
+	// and left two findings standing, and it reached a reviewer. So the draft
+	// path asks the question the implementation path asks, a section per
+	// finding of the current round, and silence about one of three is refused
+	// naming it.
+	if f := everyFindingAnswered(t, p); f != nil {
+		return refuse(&t, *f), true
+	}
+	// THE ANSWERS LAND ON THE NOTE, the drafter's word beside the finding it
+	// answers, so a reviewer reads the finding and its answer in one place
+	// rather than hunting a payload that is gone by then.
+	for i := range t.Findings {
+		if t.Findings[i].Round != t.Rounds {
+			continue
+		}
+		if said := answerFound(p.Evidence, fmt.Sprintf("finding %d", i+1)); said != "" {
+			t.Findings[i].Answer = said
+		}
 	}
 	// WHERE IT BITES FIRST. A spec whose criteria already pass does not go to
 	// review. A criterion that passes before the work cannot report on the
@@ -345,9 +424,19 @@ func submitSpec(r Roots, actor string, t Token, p Payload) (Answer, bool) {
 				len(green), len(t.Criteria), strings.Join(green, "\n  ")),
 			Satisfies: "a command that is red today and goes green when the work lands"}), true
 	}
+	// AND A RED IS JUDGED FOR ITS CAUSE, at the same gate: a crash and a dead
+	// pattern assert nothing about the work, so they are refused before a
+	// reviewer spends anything on them.
+	if bad := RedForTheWrongReason(r, t); len(bad) > 0 {
+		return refuse(&t, Rejection{Clause: "the criteria",
+			Wrong: fmt.Sprintf("%d of the %d criteria are red for a reason that asserts nothing:\n\n  %s",
+				len(bad), len(t.Criteria), strings.Join(bad, "\n  ")),
+			Satisfies: "a command red by its own assertion: a failing test, or a clean not-found"}), true
+	}
 	// SUBMITTED IS WHERE A QUEUE IS COUNTED. A draft went from the drafter's
 	// hands straight into a reviewer's with no state in between, so nothing
 	// could say how much was waiting for a reviewer.
+	t.SubmittedBy = actor
 	t.Status, t.Holder = SpecSubmitted, ""
 	if err := SaveToken(r, t); err != nil {
 		return refuse(&t, Rejection{Clause: "the record", Wrong: err.Error(),
@@ -359,7 +448,8 @@ func submitSpec(r Roots, actor string, t Token, p Payload) (Answer, bool) {
 // judgeSpec applies a reviewer's verdict on a draft. Accepting it opens the
 // token, which is when the work starts.
 func judgeSpec(r Roots, actor string, t Token, p Payload) (Answer, bool) {
-	if t.Assignee == actor {
+	// IT ASKS WHO SENT IT AND NOT WHO OWNS IT, for the reason judge gives.
+	if sentBy(t) == actor {
 		return refuse(&t, Rejection{Clause: "the reviewer",
 			Wrong:     "you drafted this spec, so you cannot agree it",
 			Satisfies: "a draft from somebody else"}), true
@@ -369,8 +459,23 @@ func judgeSpec(r Roots, actor string, t Token, p Payload) (Answer, bool) {
 			Wrong:     "this spec is not with you",
 			Satisfies: "pull for a review, and judge what comes back"}), true
 	}
+	// THE THIRD RUNG IS THE PERSON, and no agent's verdict is taken past it.
+	if f := TheLadderRefusesAnAgent(t); f != nil {
+		return refuse(&t, *f), true
+	}
+	// AND THE SECOND RUNG REPAIRS THE DRAFT ITSELF rather than spending a round
+	// describing the repair. The criteria it sends land on the note as the
+	// verdict does, which is the verb behind the power the notice names.
+	TheReviewerRepairs(&t, p)
+	// WHO JUDGED IT, WRITTEN BY THE ENGINE. The queue hands a returning
+	// submission back to this hand, so a token converges against one standard
+	// rather than meeting a new one every round.
+	t.ReviewedBy = actor
 	switch p.Verdict {
 	case "accept":
+		t.SpecSeen = ""
+		theHalfPassed(&t, true)
+		t.Rung = 0
 		if f := somethingWasRewatched(t, p, "the draft"); f != nil {
 			return refuse(&t, *f), true
 		}
@@ -382,16 +487,53 @@ func judgeSpec(r Roots, actor string, t Token, p Payload) (Answer, bool) {
 		}
 		noteVerdict(r, actor, t, "spec agreed", nil)
 		return Answer{}, false
+	case "accept_with_findings":
+		// THE THIRD VERDICT, AND IT IS THE SECOND WIRE THE OLD SYSTEM HAD.
+		// The reviewer agrees the whole while a part is not okay: the work
+		// opens the way an accept opens it, and the findings land on the
+		// token carrying the current round, which is exactly the round the
+		// implementation submission's gate already owes. Point one okay,
+		// point two okay, point three not okay, overall accepted.
+		if len(p.Findings) == 0 {
+			return refuse(&t, Rejection{Clause: "the findings",
+				Wrong:     "accept_with_findings carries no findings, so it is an accept wearing a longer name",
+				Satisfies: "verdict: accept, or findings for the obligations this verdict attaches"}), true
+		}
+		t.SpecSeen = ""
+		theHalfPassed(&t, true)
+		t.Rung = 0
+		if f := somethingWasRewatched(t, p, "the draft"); f != nil {
+			return refuse(&t, *f), true
+		}
+		t.Rewatched = alsoWatched(t.Rewatched, p.Rewatched)
+		for _, f := range p.Findings {
+			f.Round, f.By = t.Rounds, actor
+			t.Findings = append(t.Findings, f)
+		}
+		t.Status, t.Holder = ImpOpen, ""
+		if err := SaveToken(r, t); err != nil {
+			return refuse(&t, Rejection{Clause: "the record", Wrong: err.Error(),
+				Satisfies: "a writable .se/work"}), true
+		}
+		noteVerdict(r, actor, t, "spec agreed with findings", p.Findings)
+		return Answer{}, false
 	case "reject":
 		if f := rejectionIsWhole(r, p); f != nil {
 			return refuse(&t, *f), true
 		}
 		t.Rounds++
+		theHalfFailed(&t, true)
+		t.Rung = 0
 		for _, f := range p.Findings {
 			f.Round, f.By = t.Rounds, actor
 			t.Findings = append(t.Findings, f)
 		}
 		t.Status, t.Holder = SpecOpen, ""
+		// WHAT THIS REVIEWER READ, so the next submission can be asked whether
+		// anything moved. It is a fingerprint and not a copy: the note is the
+		// record and a second copy of it inside the record is a second thing to
+		// keep in step.
+		t.SpecSeen = draftPrint(t)
 
 		if err := SaveToken(r, t); err != nil {
 			return refuse(&t, Rejection{Clause: "the record", Wrong: err.Error(),
@@ -465,7 +607,11 @@ func rejectionIsWhole(r Roots, p Payload) *Rejection {
 func judge(r Roots, actor string, t Token, p Payload) (Answer, bool) {
 	// A REVIEWER MAY NOT JUDGE WHAT IT SUBMITTED. Otherwise an agent reviews
 	// itself by pulling with the other role, and four eyes become two.
-	if t.Assignee == actor {
+	//
+	// IT ASKS WHO SENT IT AND NOT WHO OWNS IT. Assignee is a field any actor may
+	// rewrite, so this same check, asked of the assignee, was walked round by
+	// one extra command.
+	if sentBy(t) == actor {
 		return refuse(&t, Rejection{Clause: "the reviewer",
 			Wrong:     "you submitted this token, so you cannot judge it",
 			Satisfies: "a submission from somebody else"}), true
@@ -479,8 +625,39 @@ func judge(r Roots, actor string, t Token, p Payload) (Answer, bool) {
 			Wrong:     "a newer reviewer holds this sphere, and this token is theirs now",
 			Satisfies: "stop. One sphere has one reviewer"}), true
 	}
+	// THE THIRD RUNG IS THE PERSON, and no agent's verdict is taken past it.
+	if f := TheLadderRefusesAnAgent(t); f != nil {
+		return refuse(&t, *f), true
+	}
+	// AND THE SECOND RUNG REPAIRS THE CRITERIA ITSELF, which is the verb behind
+	// the power the rung-two notice names.
+	TheReviewerRepairs(&t, p)
+	t.ReviewedBy = actor
 	switch p.Verdict {
+	case VerdictSpecify:
+		// SEND BACK. The second rung's other verb: a review of an
+		// implementation that ends by deciding done was never said properly,
+		// so the token goes back to where done is decided rather than round
+		// again on a draft nobody can meet.
+		if t.Rung < RungTwo {
+			return refuse(&t, Rejection{Clause: "the ladder",
+				Wrong: "sending the work back to specification is the second rung's, and " +
+					"this review is at the first",
+				Satisfies: "verdict: accept, or verdict: reject with findings and a lesson"}), true
+		}
+		t.Rung = 0
+		theHalfFailed(&t, false)
+		t.Submission = nil
+		t.Status, t.Holder = SpecOpen, ""
+		if err := SaveToken(r, t); err != nil {
+			return refuse(&t, Rejection{Clause: "the record", Wrong: err.Error(),
+				Satisfies: "a writable .se/work"}), true
+		}
+		noteVerdict(r, actor, t, "sent back to specification", p.Findings)
+		return Answer{}, false
 	case "accept":
+		theHalfPassed(&t, false)
+		t.Rung = 0
 		if f := somethingWasRewatched(t, p, "this token"); f != nil {
 			return refuse(&t, *f), true
 		}
@@ -502,6 +679,8 @@ func judge(r Roots, actor string, t Token, p Payload) (Answer, bool) {
 			return refuse(&t, *f), true
 		}
 		t.Rounds++
+		theHalfFailed(&t, false)
+		t.Rung = 0
 		for _, f := range p.Findings {
 			f.Round, f.By = t.Rounds, actor
 			t.Findings = append(t.Findings, f)
@@ -519,6 +698,14 @@ func judge(r Roots, actor string, t Token, p Payload) (Answer, bool) {
 		}
 		noteVerdict(r, actor, t, "rejected", p.Findings)
 		return Answer{Learned: learned}, false
+	}
+	if p.Verdict == "accept_with_findings" {
+		return refuse(&t, Rejection{Clause: "the verdict",
+			Wrong: "accept_with_findings is refused on an implementation: the next gate " +
+				"after an implementation is the closer and the closer is not built, so " +
+				"there is nowhere for the obligation to be owed",
+			Satisfies: "verdict: accept, or verdict: reject with findings. The narrowing " +
+				"is a decision, recorded on wk-6428f18b01"}), true
 	}
 	return refuse(&t, Rejection{Clause: "the verdict", Wrong: "a verdict is accept or reject",
 		Satisfies: "verdict: accept, or verdict: reject with findings"}), true
@@ -572,20 +759,32 @@ func noteVerdict(r Roots, actor string, t Token, verdict string, found []Rejecti
 // A TOKEN WITH NONE OF THEM ASKS FOR NOTHING, and a refusal that fired on those
 // would be a gate with no way through.
 func somethingWasRewatched(t Token, p Payload, half string) *Rejection {
-	says := map[string]bool{}
-	owed := 0
+	// ONE SET, COUNTED ONCE, USED FOR BOTH SIDES.
+	//
+	// says was filled for EVERY criterion and owed was counted over a subset, so
+	// a refusal raised about the subset was paid off with a key from the
+	// superset. A token carrying one command criterion and one prose criterion
+	// was accepted by re-watching the prose one, which nothing can be run
+	// against, and the criterion the gate was asking about was read by nobody.
+	//
+	// SO asking IS THE SET, AND THE KEY IS HELD AGAINST IT. on is every criterion
+	// the token carries, which is what tells a key naming nothing from a key
+	// naming something outside the set: two different mistakes and two messages.
+	on := map[string]bool{}
+	asking := map[string]bool{}
 	for _, c := range t.Criteria {
-		says[trimmed(c.Says)] = true
+		on[trimmed(c.Says)] = true
 		if half == "the draft" {
 			if c.Runs != "" && c.Watched() {
-				owed++
+				asking[trimmed(c.Says)] = true
 			}
 			continue
 		}
 		if trimmed(c.Runs) != "" {
-			owed++
+			asking[trimmed(c.Says)] = true
 		}
 	}
+	owed := len(asking)
 	// THE KEY NAMES A CRITERION ON THE TOKEN. This once took the first
 	// non-blank value under any key at all, so one word under a key naming
 	// nothing satisfied it. The map is keyed by the criterion, so the key is
@@ -595,22 +794,44 @@ func somethingWasRewatched(t Token, p Payload, half string) *Rejection {
 		if trimmed(what) == "" {
 			continue
 		}
-		if !says[trimmed(key)] {
+		if !on[trimmed(key)] {
 			return &Rejection{Clause: "the criteria",
 				Wrong: fmt.Sprintf("what you re-watched is filed under %q, and this "+
 					"token carries no criterion of that name", firstLines(key, 1)),
 				Satisfies: "rewatched, keyed by the criterion's own sentence"}
 		}
-		said++
+		// WHETHER THE DEBT IS PAID IS ASKED OF THE MAP, NOT OF EACH KEY.
+		//
+		// This refused any key outside the set while a debt stood, so a verdict
+		// that PAID THE DEBT IN FULL and recorded one observation more was
+		// refused for the extra one. That punishes a reviewer for writing down
+		// more than it owed, and the record is worse for it.
+		//
+		// So a key inside the set PAYS, and a key outside it is kept and counted
+		// for nothing. A key naming no criterion at all is still refused above,
+		// per key, because that is a mistake whatever else the map carries.
+		if asking[trimmed(key)] {
+			said++
+		}
 	}
 	if owed == 0 || said > 0 {
 		return nil
 	}
+	// AND IT NAMES WHICH ONES, because a reviewer told a debt stands and not what
+	// would settle it has to go and work that out from the same list the engine
+	// just walked.
+	var names []string
+	for _, c := range t.Criteria {
+		if asking[trimmed(c.Says)] {
+			names = append(names, "  "+firstLines(c.Says, 1))
+		}
+	}
 	return &Rejection{Clause: "the criteria",
 		Wrong: fmt.Sprintf("%s carries %d criteria the gate takes on a recorded red and "+
 			"none was re-watched. The worker's red proves the check can fail. Yours "+
-			"proves it is still the check that guards the behaviour", half, owed),
-		Satisfies: "rewatched, keyed by the criterion, saying what you took away and what it said"}
+			"proves it is still the check that guards the behaviour. The gate is "+
+			"asking about:"+nl+nl+"%s", half, owed, strings.Join(names, nl)),
+		Satisfies: "rewatched, keyed by one of those criteria, saying what you took away and what it said"}
 }
 
 // alsoWatched adds what this reviewer watched to what an earlier one did.
@@ -677,6 +898,91 @@ func checkDisposition(r Roots, p Payload) *Rejection {
 		Satisfies: "done, became, or dropped"}
 }
 
+// EVERY FINDING IS ANSWERED BY NAME, INCLUDING THE ONES NOT BEING FIXED.
+//
+// A ROUND THAT ANSWERS THE CHEAPEST FINDING AND IS SILENT ABOUT THE REST reads
+// exactly like one that answered them all: the evidence names what it did and
+// nothing names what it did not. The gap is invisible until the reviewer
+// re-runs its own reproduction, and then it has cost a whole round.
+//
+// MEASURED ON TWO TOKENS. wk-61af3a054e came back closing one finding with the
+// detail byte-identical and two findings untouched. wk-bb34ab1208 did the same
+// one round earlier.
+//
+// NOT TAKING ONE IS AN ANSWER. Declined with a reason is what a reviewer can
+// read; silence is what it cannot. So this asks for a section per finding and
+// does not care which of the two it says.
+//
+// ONLY THE LAST ROUND'S, because a finding from an earlier round was answered
+// when it was raised, and asking again would make every round carry every round
+// before it. A FIRST SUBMISSION OWES NOTHING for the same reason rather than by
+// a special case: nothing has been raised, so there is no section to owe.
+func everyFindingAnswered(t Token, p Payload) *Rejection {
+	var owed []string
+	for i, f := range t.Findings {
+		if f.Round != t.Rounds {
+			continue
+		}
+		name := fmt.Sprintf("finding %d", i+1)
+		if answers(p.Evidence, name) {
+			continue
+		}
+		owed = append(owed, name+", "+firstLines(f.Clause, 1))
+	}
+	if len(owed) == 0 {
+		return nil
+	}
+	return &Rejection{Clause: "the evidence",
+		Wrong: fmt.Sprintf("this round says nothing about %s. A submission that answers "+
+			"some findings reads exactly like one that answers all of them, so the "+
+			"silence costs a round", strings.Join(owed, "; and nothing about ")),
+		Satisfies: "a section per finding, headed with its number, saying either what " +
+			"closed it or why it is not taken and what owes it"}
+}
+
+// answerFound hands back the section's text where answers would say yes, so
+// the drafter's words can be written where the finding stands.
+func answerFound(said map[string]string, name string) string {
+	for key, what := range said {
+		if trimmed(what) == "" {
+			continue
+		}
+		at := strings.Index(strings.ToLower(key), name)
+		if at < 0 {
+			continue
+		}
+		after := at + len(name)
+		if after < len(key) && key[after] >= '0' && key[after] <= '9' {
+			continue
+		}
+		return what
+	}
+	return ""
+}
+
+// answers whether the evidence carries a section for this finding.
+func answers(said map[string]string, name string) bool {
+	for key, what := range said {
+		if trimmed(what) == "" {
+			continue
+		}
+		// finding 1 IS NOT ANSWERED BY A SECTION HEADED finding 10. This matched
+		// by substring, so one section satisfied every finding whose number is a
+		// prefix of its own: ten findings and a section for the tenth left nine
+		// silences the gate read as answers.
+		at := strings.Index(strings.ToLower(key), name)
+		if at < 0 {
+			continue
+		}
+		after := at + len(name)
+		if after < len(key) && key[after] >= '0' && key[after] <= '9' {
+			continue
+		}
+		return true
+	}
+	return false
+}
+
 // Evidence is a form or a script. A form is filled section by section. A
 // script is run, and its exit code is the answer.
 func checkEvidence(r Roots, t Token, p Payload) *Rejection {
@@ -705,12 +1011,7 @@ func checkEvidence(r Roots, t Token, p Payload) *Rejection {
 // The script runs in the folder being worked on, through a shell, because a
 // token's evidence is written by a person as a command line.
 func runEvidence(r Roots, script string) (string, error) {
-	name, args := "sh", []string{"-c", script}
-	if runtime.GOOS == "windows" {
-		name, args = "cmd", []string{"/c", script}
-	}
-	cmd := Quietly(exec.Command(name, args...))
-	cmd.Dir = r.Work
+	cmd := evidenceCommand(r, script)
 	done := make(chan struct{})
 	var out []byte
 	var err error
@@ -724,6 +1025,18 @@ func runEvidence(r Roots, script string) (string, error) {
 		}
 		return string(out), fmt.Errorf("it did not finish in five minutes")
 	}
+}
+
+// evidenceCommand builds the command a criterion runs. It is its own function
+// so a check can ask what the runner made rather than only what it printed.
+func evidenceCommand(r Roots, script string) *exec.Cmd {
+	name, args := "sh", []string{"-c", script}
+	if runtime.GOOS == "windows" {
+		name, args = "cmd", []string{"/c", script}
+	}
+	cmd := TheScriptVerbatim(Quietly(exec.Command(name, args...)), script)
+	cmd.Dir = r.Work
+	return cmd
 }
 
 // briefly lists a few of something and says how many more there are. A notice
@@ -748,13 +1061,15 @@ func firstLines(s string, n int) string {
 	return strings.Join(lines, "\n")
 }
 
-// aheadOf answers the index of an open token of this actor's that a person put
-// ahead of seq, or -1. Only a person writes an order, so anything ahead of
-// what the agent holds is a person saying which one is next.
-func aheadOf(r Roots, all []Token, actor string, seq int) int {
+// aheadOf answers the index of an open token that a person put ahead of seq,
+// or -1. Only a person writes an order, so anything ahead of what the agent
+// holds is a person saying which one is next. It stopped asking the assignee
+// when the pick did: every agent takes every open token, so an order a person
+// wrote reaches whoever is holding something behind it.
+func aheadOf(r Roots, all []Token, seq int) int {
 	best := -1
 	for i := range all {
-		if all[i].Assignee != actor || all[i].Status != ImpOpen || all[i].Seq >= seq {
+		if all[i].Status != ImpOpen || all[i].Seq >= seq {
 			continue
 		}
 		if Blocked(r, all[i]) != "" {
@@ -765,6 +1080,42 @@ func aheadOf(r Roots, all []Token, actor string, seq int) int {
 		}
 	}
 	return best
+}
+
+// KeptForItsReviewer answers whether this submission is waiting for the hand
+// that judged it last, rather than for whoever pulls next.
+//
+// WHY A TOKEN REMEMBERS ITS JUDGE. wk-24be1c06ae took 10 rejections and
+// wk-1412093cd8 took 11, each with 8 distinct reviewer identities on its
+// findings. Every fresh reviewer arrived with no memory of what earlier rounds
+// settled and its own class to find, so rounds six and seven rejected the same
+// criterion for overlapping reasons under different names. With unbounded
+// standards and a new judge every round, convergence never has to happen.
+//
+// ABSENT IS StillPulling AND NOTHING ELSE. Arrived never goes false inside a
+// session, so reading absence off it would freeze every token whose reviewer
+// arrived, judged and stopped: measured on the live record, 17 of 26 arrived
+// identities were already gone. StillPulling asks how far the queue has moved
+// since that actor last pulled, so a reviewer that stops frees the token while
+// the worker it is holding up goes on asking.
+//
+// AND A REMEMBERED REVIEWER THE SESSION HAS NOT SEEN IS TRUSTED for exactly one
+// staleness window, which is what StillPulling already answers for a holder with
+// no entry, and the same trust the hold reclaim gives one. So the memory
+// survives an engine restart for one window and then lets go.
+//
+// FOUR EYES IS ASKED AFTER THIS AND WINS. A remembered reviewer that submitted
+// the token could never judge it, so keeping it for that one would keep it for
+// nobody, and the memory stands aside rather than stranding the work.
+func KeptForItsReviewer(r Roots, session string, t Token, actor string, stale int) bool {
+	who := t.ReviewedBy
+	if who == "" || who == actor {
+		return false
+	}
+	if sentBy(t) == who {
+		return false
+	}
+	return StillPulling(r, session, who, stale)
 }
 
 // next reads the queue the role names. An agent is idle when no token is
@@ -785,74 +1136,80 @@ func next(r Roots, actor, role string) Answer {
 		// in_review and that is a fact the engine can see.
 		for i := range all {
 			if all[i].Status == SpecInReview && all[i].Holder == actor {
-				return Answer{Pull: AnswerReview, Token: &all[i], Notice: heldNotice(),
+				return Answer{Pull: AnswerReview, Token: &all[i],
+					Notice:   heldNotice() + theRungSays(r, all[i]),
 					Guidance: ReviewMethod(r)}
 			}
 		}
 		for i := range all {
 			if all[i].Status == ImpInReview && all[i].Holder == actor {
-				return Answer{Pull: AnswerReview, Token: &all[i], Notice: heldNotice(),
+				return Answer{Pull: AnswerReview, Token: &all[i],
+					Notice:   heldNotice() + theRungSays(r, all[i]),
 					Guidance: ReviewMethod(r)}
 			}
 		}
-		// A DRAFT IS JUDGED BEFORE THE WORK STARTS, and it comes first: a spec
-		// waiting is somebody blocked from starting, and a submission waiting
-		// is work already done.
+		// FINISHED WORK IS COUNTED FIRST: a submission waiting is work already
+		// done but not yet counted, and a verdict is the only thing that can
+		// count it. A spec waiting is somebody blocked from starting, and it
+		// is judged next, so a lane with nothing finished still gets its
+		// draft judged rather than a wait.
+		// A RETURNING SUBMISSION GOES TO THE HAND THAT JUDGED IT, and a fresh
+		// one goes to whoever pulls. Read once for both scans, because the
+		// session and the window are the same question for each.
+		session, stale := currentSession(r), LoadConfig(r).PullsBeforeHoldIsStale
 		for i := range all {
-			if all[i].Status == SpecSubmitted && all[i].Holder == "" && all[i].Assignee != actor {
-				all[i].Status, all[i].Holder = SpecInReview, actor
-				if err := SaveToken(r, all[i]); err != nil {
-					return Answer{Pull: AnswerWait, Notice: "the record will not take a write: " + err.Error()}
+			if all[i].Status == ImpSubmitted && sentBy(all[i]) != actor {
+				if KeptForItsReviewer(r, session, all[i], actor, stale) {
+					continue
 				}
-				return Answer{Pull: AnswerReview, Token: &all[i], Notice: specNotice(),
-					Guidance: ReviewMethod(r)}
-			}
-		}
-		for i := range all {
-			if all[i].Status == ImpSubmitted && all[i].Assignee != actor {
 				all[i].Status, all[i].Holder = ImpInReview, actor
+				// THE RUNG IS TAKEN AS THE REVIEW IS HANDED OVER, because the
+				// grant is a thing the reviewer acts on and it has to be on the
+				// token before the verdict comes back.
+				TakeTheRung(&all[i], LoadConfig(r).RoundsPerRung)
 				if err := SaveToken(r, all[i]); err != nil {
 					return Answer{Pull: AnswerWait, Notice: "the record will not take a write: " + err.Error()}
 				}
-				return Answer{Pull: AnswerReview, Token: &all[i], Notice: reviewNotice(),
+				return Answer{Pull: AnswerReview, Token: &all[i],
+					Notice:   reviewNotice() + theRungSays(r, all[i]),
 					Guidance: ReviewMethod(r)}
 			}
 		}
-		return Answer{Pull: AnswerWait,
-			Notice: "Nothing is waiting for review. Say so and stop."}
-	}
-
-	// A DRAFT COMES BEFORE WORK. A token in spec is not work yet, and nothing
-	// else will draft it: whoever minted it has to say what done means before
-	// anybody can start. Leaving it out meant a spec was minted and then had to
-	// be remembered, which is the class of failure this whole queue replaces.
-	//
-	// THE METHOD FOR DRAFTING RIDES WITH IT, the way the method for reviewing
-	// rides with a review.
-	for i := range all {
-		if all[i].Assignee != actor || (all[i].Status != SpecOpen && all[i].Status != SpecInWork) {
-			continue
-		}
-		// HANDING IT OUT IS WHAT MAKES IT IN WORK. Before, a draft nobody had
-		// touched and one somebody was writing were the same state, so nothing
-		// could say how much drafting was in flight.
-		if all[i].Status == SpecOpen {
-			all[i].Status, all[i].Holder = SpecInWork, actor
-			if err := SaveToken(r, all[i]); err != nil {
-				return Answer{Pull: AnswerWait, Notice: "the record will not take a write: " + err.Error()}
+		for i := range all {
+			if all[i].Status == SpecSubmitted && all[i].Holder == "" && sentBy(all[i]) != actor {
+				if KeptForItsReviewer(r, session, all[i], actor, stale) {
+					continue
+				}
+				all[i].Status, all[i].Holder = SpecInReview, actor
+				TakeTheRung(&all[i], LoadConfig(r).RoundsPerRung)
+				if err := SaveToken(r, all[i]); err != nil {
+					return Answer{Pull: AnswerWait, Notice: "the record will not take a write: " + err.Error()}
+				}
+				return Answer{Pull: AnswerReview, Token: &all[i],
+					Notice:   specNotice() + theRungSays(r, all[i]),
+					Guidance: ReviewMethod(r)}
 			}
 		}
-		return Answer{Pull: AnswerWork, Token: &all[i], Findings: all[i].Findings,
-			Notice: draftNotice(all[i]), Guidance: SpecMethod(r)}
+		// A REVIEWER WITH NOTHING WAITING STAYS. This answer used to end with an
+		// order to stop, so the engine itself despawned every reviewer and the
+		// next submission found nobody. The queue feeds the one who stayed.
+		// wk-890febfb99.
+		return Answer{Pull: AnswerWait,
+			Notice: "Nothing is waiting for review right now. Stay. Pull again in a " +
+				"moment and judge what arrives: a reviewer that despawns here is why " +
+				"submissions sit unreviewed, and the queue feeds the one who stayed."}
 	}
 
-	// Work already picked up comes back first. An agent that pulled, was
-	// interrupted, and pulled again gets the same token, not a second one.
+	// WORK ALREADY PICKED UP COMES BACK FIRST, in either half. An agent that
+	// pulled, was interrupted, and pulled again gets the same token, not a
+	// second one.
 	//
 	// THE PERSON'S ORDER WINS. Unless something open now sits ahead of what
 	// the agent holds, which only happens because a person put it there. Then
 	// the held token goes back to the queue untouched and the person's choice
-	// is handed out.
+	// is handed out. A held draft is put down the same way an implementation
+	// is: written back as spec_open, the holder cleared, a put down line in
+	// the log.
 	//
 	// It is decided here because the pull is the only thing that moves a token
 	// between states, and a person saying which is next has to be able to
@@ -864,13 +1221,16 @@ func next(r Roots, actor, role string) Answer {
 		if all[i].Assignee != actor || all[i].Status != ImpInWork || all[i].Holder != actor {
 			continue
 		}
-		ahead := aheadOf(r, all, actor, all[i].Seq)
+		ahead := aheadOf(r, all, all[i].Seq)
 		if ahead < 0 {
 			return Answer{Pull: AnswerWork, Token: &all[i], Findings: all[i].Findings,
 				Notice: workNotice(all[i])}
 		}
 		put := all[i]
-		put.Status, put.Holder = ImpOpen, ""
+		// THE STATUS COMES FROM THE MAP PutDown USES. Each half goes back to
+		// its own open, and one map serving both places is what stops a second
+		// hardcoded constant drifting from the rule.
+		put.Status, put.Holder = whereItCameFrom[put.Status], ""
 		if err := SaveToken(r, put); err != nil {
 			return Answer{Pull: AnswerWait, Notice: "the record will not take a write: " + err.Error()}
 		}
@@ -878,25 +1238,112 @@ func next(r Roots, actor, role string) Answer {
 			map[string]any{"id": put.ID, "for": all[ahead].ID})
 		break
 	}
-	// THE OLDEST THAT IS NOT BLOCKED. A token waiting on something else is
-	// not work anybody can do, so it is not offered.
+	for i := range all {
+		if all[i].Assignee != actor || all[i].Status != SpecInWork || all[i].Holder != actor {
+			continue
+		}
+		ahead := aheadOf(r, all, all[i].Seq)
+		if ahead < 0 {
+			return Answer{Pull: AnswerWork, Token: &all[i], Findings: all[i].Findings,
+				Notice: draftNotice(all[i]), Guidance: SpecMethod(r)}
+		}
+		put := all[i]
+		put.Status, put.Holder = whereItCameFrom[put.Status], ""
+		if err := SaveToken(r, put); err != nil {
+			return Answer{Pull: AnswerWait, Notice: "the record will not take a write: " + err.Error()}
+		}
+		inSession(r, "work", actor, put.ID+" put down: "+all[ahead].ID+" was put ahead of it", Yes(),
+			map[string]any{"id": put.ID, "for": all[ahead].ID})
+		break
+	}
+	// AN OPEN IMPLEMENTATION COMES BEFORE A NEW DRAFT. An open implementation
+	// is work somebody already agreed to, and a spec is a promise of work, so
+	// agreed work does not queue behind new promises. THE OLDEST THAT IS NOT
+	// BLOCKED: a token waiting on something else is not work anybody can do,
+	// so it is not offered.
 	var held []string
 	for i := range all {
-		if all[i].Assignee != actor || all[i].Status != ImpOpen {
+		// EVERY AGENT TAKES EVERY OPEN TOKEN, AND THE ENGINE DECIDES WHICH.
+		//
+		// THE OWNER'S RULING: you can also touch those assigned to a coworker,
+		// it does not matter, every agent can take every open token. And: you
+		// just pull it and you get what the engine gives you, you do not decide
+		// this for yourself.
+		//
+		// THIS ASKED THE ASSIGNEE AND THAT MADE A HINT INTO A LOCK. Measured on
+		// four fresh agents: each pulled once and each was told no token is
+		// assigned to you, while the work view answered 26 rows under here. A
+		// queue that hands out nothing while it is full is a stall wearing the
+		// face of an empty queue, and it is what sent an agent to the backlog.
+		//
+		// ASSIGNMENT STAYS AND IT IS A HINT. It says who knows the area and it
+		// is what yours reads in the work view, which is the person's own list
+		// and is not touched by this.
+		if all[i].Status != ImpOpen {
 			continue
 		}
 		if why := Blocked(r, all[i]); why != "" {
 			held = append(held, all[i].ID+": "+why)
 			continue
 		}
-		all[i].Status, all[i].Holder = ImpInWork, actor
+		// THE HANDOUT TAKES THE ASSIGNEE WITH IT. A permission is a road, not a
+		// door: the submit, the reclaim and the arrival all ask the assignee,
+		// so a handout that leaves the old name standing is work that can be
+		// started and never finished. Writing the actor here is what carries
+		// one answer to every site that asks.
+		all[i].Status, all[i].Holder, all[i].Assignee = ImpInWork, actor, actor
 		if err := SaveToken(r, all[i]); err != nil {
 			return Answer{Pull: AnswerWait, Notice: "the record will not take a write: " + err.Error()}
 		}
 		return Answer{Pull: AnswerWork, Token: &all[i], Findings: all[i].Findings,
 			Notice: workNotice(all[i])}
 	}
+	// A DRAFT IS HANDED OUT WHEN NOTHING ELSE WAITS, and it still is: a token
+	// in spec is not work yet, and nothing else will draft it. Whoever minted
+	// it has to say what done means before anybody can start, so a lane with
+	// no implementation waiting gets its draft rather than a wait.
+	//
+	// THE METHOD FOR DRAFTING RIDES WITH IT, the way the method for reviewing
+	// rides with a review.
+	for i := range all {
+		if all[i].Status != SpecOpen && all[i].Status != SpecInWork {
+			continue
+		}
+		// AND A DRAFT SOMEBODY IS WRITING STAYS THEIRS. Open work goes to
+		// whoever pulls next, which is the ruling above. Work in a live
+		// agent's hands is a different question and its answer did not change:
+		// spec_in_work carries a holder, and only that holder is handed it
+		// back. Without this the widening would have taken drafts out from
+		// under the agents writing them.
+		if all[i].Status == SpecInWork && all[i].Holder != "" && all[i].Holder != actor {
+			continue
+		}
+		// HANDING IT OUT IS WHAT MAKES IT IN WORK. Before, a draft nobody had
+		// touched and one somebody was writing were the same state, so nothing
+		// could say how much drafting was in flight.
+		if all[i].Status == SpecOpen {
+			// THE HANDOUT TAKES THE ASSIGNEE WITH IT, for the same reason the
+			// implementation pick writes it: the submit and the reclaim ask
+			// the assignee, and the name has to be the hand that holds it.
+			all[i].Status, all[i].Holder, all[i].Assignee = SpecInWork, actor, actor
+			if err := SaveToken(r, all[i]); err != nil {
+				return Answer{Pull: AnswerWait, Notice: "the record will not take a write: " + err.Error()}
+			}
+		}
+		return Answer{Pull: AnswerWork, Token: &all[i], Findings: all[i].Findings,
+			Notice: draftNotice(all[i]), Guidance: SpecMethod(r)}
+	}
 	return Answer{Pull: AnswerWait, Notice: waitNotice(r, actor, held)}
+}
+
+// theRungSays is what the ladder adds to a review notice, or nothing at the
+// first rung, where a review works as it always has.
+func theRungSays(r Roots, t Token) string {
+	said := TheRungNotice(t, LoadConfig(r).RoundsPerRung)
+	if said == "" {
+		return ""
+	}
+	return nl + nl + said
 }
 
 // heldNotice goes to a reviewer that pulled while still holding one.
@@ -907,7 +1354,8 @@ func heldNotice() string {
 
 // specNotice goes to a reviewer judging a draft rather than finished work.
 func specNotice() string {
-	return "THIS IS A DRAFT, NOT FINISHED WORK. Judge whether the problem is stated " +
+	return theLeadingQuestion() +
+		"THIS IS A DRAFT, NOT FINISHED WORK. Judge whether the problem is stated " +
 		"and whether the criteria say what done means.\n\n" +
 		"A criterion that can be a command has to be one, because a command fails and " +
 		"a sentence does not. A criterion nobody could check is not a criterion.\n\n" +
@@ -915,11 +1363,21 @@ func specNotice() string {
 		"findings and a lesson."
 }
 
+// THE LEADING QUESTION DECIDES THE VERDICT, and it rides the notice because
+// the notice is what the reviewer acts on. The method file carries the full
+// form; these four sentences are the projection, and a projection reduces.
+func theLeadingQuestion() string {
+	return "Would the product be damaged if this were blessed as it stands? " +
+		"That question decides the verdict. No damage means no rejection. A nitpick " +
+		"is corrected by the reviewer itself rather than costing a round, and a " +
+		"number that moved is not damage unless the decision rests on it.\n\n"
+}
+
 func reviewNotice() string {
-	return "Judge this submission against the token's own rules and nothing else. " +
+	return theLeadingQuestion() +
 		"Answer with verdict: accept, or verdict: reject and findings, each naming " +
 		"the clause, what is wrong, and what would satisfy it. " +
-		"The guidance field carries the method: four rounds, and every measurement reproduced."
+		"The guidance field carries the method."
 }
 
 // ReviewMethod is the method a reviewer works to. It is read from the method
@@ -933,14 +1391,57 @@ func ReviewMethod(r Roots) string { return method(r, "reviewing.md") }
 // THE METHOD FOR DRAFTING RIDES WITH THE DRAFT, for the same reason the method
 // for reviewing rides with a review: an agent told to go and read the method
 // drafts from whatever it happens to think.
-func SpecMethod(r Roots) string { return method(r, "specifying.md") }
+func SpecMethod(r Roots) string { return method(r, "work-token.md") }
 
+// method hands out the Actionables chapter of a guidance file, and the whole
+// file when it has no such chapter. The agent opens the file when it wants the
+// reason, and the other chapters are never paid for on a pull.
 func method(r Roots, name string) string {
 	b, err := os.ReadFile(filepath.Join(GuidanceDir(r.Method), name))
 	if err != nil {
 		return "doc/guidance/" + name + " could not be read: " + err.Error()
 	}
+	if only, found := chapter(string(b), "Actionables"); found {
+		return only
+	}
 	return string(b)
+}
+
+// chapter cuts one chapter out of a markdown file: the line reading
+// "## heading" and everything up to the next line that starts with "## ". It
+// says whether the chapter was there at all.
+func chapter(text, heading string) (string, bool) {
+	lines := strings.Split(text, "\n")
+	for i, line := range lines {
+		if strings.TrimSpace(line) != "## "+heading {
+			continue
+		}
+		end := len(lines)
+		for j := i + 1; j < len(lines); j++ {
+			if strings.HasPrefix(lines[j], "## ") {
+				end = j
+				break
+			}
+		}
+		return strings.TrimRight(strings.Join(lines[i:end], "\n"), "\n") + "\n", true
+	}
+	return "", false
+}
+
+// draftPrint fingerprints the part of a draft a redraft is expected to move:
+// the problem as stated and every criterion. It is a hash rather than a copy,
+// because the note is the record and a second copy of it inside the record is a
+// second thing to keep in step.
+func draftPrint(t Token) string {
+	h := sha256.New()
+	h.Write([]byte(t.Detail))
+	for _, c := range t.Criteria {
+		for _, part := range []string{c.Says, c.Runs, c.Without, c.Red} {
+			h.Write([]byte{0})
+			h.Write([]byte(part))
+		}
+	}
+	return fmt.Sprintf("%x", h.Sum(nil))
 }
 
 // draftNotice goes to whoever has to say what done means before the work starts.
@@ -987,10 +1488,19 @@ func waitNotice(r Roots, actor string, held []string) string {
 		}
 	}
 	if waiting > 0 {
-		return fmt.Sprintf("No open tokens. %d of yours wait for review. "+
-			"Spawn a reviewer if you have not, then pull again in a minute to see whether it finished.", waiting)
+		// THE SPAWN ASK IS KEYED ON LIVENESS rather than said on every
+		// submission: a line under every answer reads as a broken record and
+		// stops being read. Live is the readers count of deadReads, the same
+		// function the wall reads. wk-890febfb99.
+		_, readers := deadReads(r, currentSession(r), LoadConfig(r).PullsBeforeHoldIsStale)
+		if readers > 0 {
+			return fmt.Sprintf("No open tokens. %d of yours wait for review and a "+
+				"reviewer is reading. Pull again in a minute to see whether it finished.", waiting)
+		}
+		return fmt.Sprintf("No open tokens. %d of yours wait for review and no "+
+			"reviewer is reading. Spawn one now, then pull again in a minute.", waiting)
 	}
-	return "No token is assigned to you. Tell the person plainly that there is no work, and stop."
+	return "Nothing is open. Tell the person plainly that there is no work, and stop."
 }
 
 // THE AUTHORITY, ON STOPPING.
@@ -1018,6 +1528,11 @@ func init() {
 func AskToStop(r Roots, actor string) Ruling {
 	var mine []string
 	for _, t := range Tokens(r) {
+		// THE ASSIGNEE IS STILL THE QUESTION HERE, and under the widened pick
+		// it stays a true one: the handout writes the assignee, so in-work
+		// answers the hand that holds it, and open answers the hint. Open work
+		// cannot hold every actor, because the engine does not know who is a
+		// reviewer, and a net over everybody catches the reviewers too.
 		if t.Assignee != actor {
 			continue
 		}

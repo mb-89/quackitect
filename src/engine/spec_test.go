@@ -32,7 +32,7 @@ func TestADraftIsAgreedBeforeTheWorkStarts(t *testing.T) {
 	if !strings.Contains(a.Notice, "DRAFT THIS BEFORE ANYBODY WORKS ON IT") {
 		t.Fatalf("the notice does not say to draft it: %q", a.Notice)
 	}
-	if !strings.Contains(a.Guidance, "Specifying") {
+	if !strings.Contains(a.Guidance, "Work token") {
 		t.Fatalf("the method for drafting did not ride with it: %q", firstLines(a.Guidance, 2))
 	}
 	// HANDING IT OUT IS WHAT MAKES IT IN WORK. A draft nobody had touched and
@@ -152,7 +152,7 @@ func TestARejectionWithoutALessonIsRefused(t *testing.T) {
 	// With one, it lands, and the lesson is on the token beside the finding.
 	whole := bare
 	whole.Lesson = Lesson{Class: "a check built from the fix",
-		Avoid: "write the check first and watch it go red"}
+		Avoid: "write the check first and watch it go red", Prevents: "ask before writing the check whether it can fail"}
 	whole.Learned = learnedFrom(t, r, whole.Lesson)
 	if a := Pull(r, "reviewer", RoleReviewer, whole); a.Pull == AnswerRefused {
 		t.Fatalf("a whole rejection was refused: %v", a.Findings)

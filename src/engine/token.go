@@ -180,6 +180,11 @@ type Rejection struct {
 	Clause    string `json:"clause"`    // what rule it fails
 	Wrong     string `json:"wrong"`     // what is wrong with it
 	Satisfies string `json:"satisfies"` // what would satisfy the clause
+
+	// THE DRAFTER'S ANSWER, written from the payload the way evidence is on
+	// the implementation path. Empty means the finding stands unanswered, and
+	// a redraft is refused while any standing finding's answer is empty.
+	Answer string `json:"answer,omitempty"`
 }
 
 // The evidence a token demands: a filled form, or a script that runs. Two
@@ -293,6 +298,24 @@ type Token struct {
 	// different things to read six weeks later.
 	AbortedFrom Status `json:"aborted_from,omitempty"`
 
+	// WHO SENT IT, WRITTEN BY THE ENGINE AND TYPED BY NOBODY.
+	//
+	// Four eyes were asked of the assignee, which is a field any actor may
+	// rewrite: an actor drafted a token, reassigned it, and was then handed its
+	// own draft to agree. Afterwards the note read exactly like a legitimate
+	// review, so nothing showed it had happened.
+	//
+	// SO THE QUESTION IS ABOUT THE PAST RATHER THAN THE PRESENT. Who owns a
+	// token now is a decision somebody may change. Who sent this one for
+	// judgment is a thing that happened, and the bypass has nothing to rewrite.
+	SubmittedBy string `json:"submitted_by,omitempty"`
+
+	// WHAT THE LAST REVIEWER READ OF A DRAFT, as a fingerprint of the detail and
+	// the criteria. A redraft that comes back with both unchanged has answered
+	// nothing, whatever it says, and that is a thing a program can decide where
+	// whether it answers WELL is a judgment and stays the reviewer's.
+	SpecSeen string `json:"spec_seen,omitempty"`
+
 	Submission map[string]string `json:"submission,omitempty"`
 
 	// WHAT THE REVIEWER WATCHED, per criterion, after the work landed.
@@ -308,6 +331,43 @@ type Token struct {
 
 	Findings []Rejection `json:"findings,omitempty"`
 	Rounds   int         `json:"rounds"`
+
+	// THE LADDER'S OWN COUNT, AND IT IS NOT Rounds.
+	//
+	// Rounds is cumulative, it is never reset, and everyFindingAnswered keys the
+	// findings a submission owes off it. The ladder counts CONSECUTIVE failures
+	// PER HALF and sets a half back to zero when that half is accepted. Those
+	// are two different values however alike they look, and two different values
+	// never share one field: reusing Rounds would have stopped that gate
+	// guarding the moment a half was accepted. Two ints is the price of keeping
+	// it. See TheRung.
+	SpecFails int `json:"spec_fails,omitempty"`
+	ImpFails  int `json:"imp_fails,omitempty"`
+
+	// WHETHER THE SECOND RUNG HAS BEEN TAKEN. It is spent once for the whole
+	// token: an accept sets a half's count back to zero, and it never gives the
+	// grant back.
+	RungTwoSpent bool `json:"rung_two_spent,omitempty"`
+
+	// WHO JUDGED IT LAST, so a token that comes back goes to the same hand.
+	//
+	// wk-24be1c06ae took 10 rejections and wk-1412093cd8 took 11, each with 8
+	// distinct reviewer identities named on its findings. Every new reviewer
+	// arrived with no memory of what earlier rounds settled and its own class to
+	// find, so rounds six and seven rejected the same criterion for overlapping
+	// reasons under different names. With unbounded standards and a new judge
+	// every round, convergence never has to happen.
+	//
+	// IT IS WRITTEN BY THE ENGINE WHEN A VERDICT LANDS, never typed, for the
+	// reason SubmittedBy is: a field an actor may write is a field an actor may
+	// use to be handed its own work.
+	ReviewedBy string `json:"reviewed_by,omitempty"`
+
+	// WHICH RUNG THE REVIEWER HOLDING THIS TOKEN NOW STANDS ON. It is written
+	// when a review is handed out and cleared when the verdict lands, so the
+	// powers a verdict may use are read from the token rather than recomputed
+	// from counters the grant has already reset.
+	Rung int `json:"rung,omitempty"`
 
 	// Who holds it now. A worker while it is in work, a reviewer while it is
 	// in review. It is what an arriving agent reclaims against.

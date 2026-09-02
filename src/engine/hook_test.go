@@ -39,6 +39,7 @@ func hookSays(t *testing.T, exe, method, event string, body map[string]any) stri
 func TestTheGuardRefusesAProjectionAndNothingElse(t *testing.T) {
 	exe := buildEngine(t)
 	r := guidanceTree(t)
+	one := withATokenInHand(t, r)
 	if _, err := Project(r); err != nil {
 		t.Fatal(err)
 	}
@@ -57,7 +58,12 @@ func TestTheGuardRefusesAProjectionAndNothingElse(t *testing.T) {
 	}
 
 	// An ordinary write, and one outside the roots. Neither is guarded.
+	//
+	// A NAME ARMS ONE WRITE, so each of these gets its own. This test is about
+	// the projection guard rather than the write gate's grain, and the first
+	// write above spent the ticket withATokenInHand armed.
 	for _, p := range []string{filepath.Join(r.Work, "notes.md"), filepath.Join(t.TempDir(), "desktop.txt")} {
+		ArmTicket(r, "main", one.ID)
 		got := hookSays(t, exe, r.Method, "PreToolUse", map[string]any{
 			"cwd": r.Work, "tool_name": "Write",
 			"tool_input": map[string]any{"file_path": p},
@@ -180,6 +186,7 @@ func TestAnAgentIdentityIsRecordedWhenTheHarnessStartsIt(t *testing.T) {
 func TestAWriteThatBreaksAVoiceRuleIsRefused(t *testing.T) {
 	exe := buildEngine(t)
 	r := guidanceTree(t)
+	withATokenInHand(t, r)
 	Project(r)
 	l, _ := OpenLog(r.Private("log"))
 	l.Close()
@@ -304,6 +311,7 @@ func TestAConfigurationChangeResetsTheReadEvidence(t *testing.T) {
 func TestABrokenVoiceCheckerDoesNotStopAWrite(t *testing.T) {
 	exe := buildEngine(t)
 	r := guidanceTree(t)
+	withATokenInHand(t, r)
 	Project(r)
 	l, _ := OpenLog(r.Private("log"))
 	l.Close()
@@ -330,6 +338,7 @@ func TestABrokenVoiceCheckerDoesNotStopAWrite(t *testing.T) {
 func TestACopyOfAPrivateOriginalIsRefused(t *testing.T) {
 	exe := buildEngine(t)
 	r := guidanceTree(t)
+	inHand := withATokenInHand(t, r)
 	Project(r)
 	l, _ := OpenLog(r.Private("log"))
 	l.Close()
@@ -364,7 +373,9 @@ func TestACopyOfAPrivateOriginalIsRefused(t *testing.T) {
 		t.Fatalf("a digest was refused: %s", ok)
 	}
 
-	// And moving it about INSIDE the private folder is nobody's business.
+	// And moving it about INSIDE the private folder is nobody's business. A name
+	// arms one write, and the digest above spent the one this test started with.
+	ArmTicket(r, "main", inHand.ID)
 	inside := hookSays(t, exe, r.Method, "PreToolUse", map[string]any{
 		"cwd": r.Work, "tool_name": "Write",
 		"tool_input": map[string]any{
@@ -419,5 +430,21 @@ func TestAQuestionThatArrivesDuringTheAnsweringSurvivesIt(t *testing.T) {
 	}
 	if said != asked {
 		t.Fatalf("what is owed is %q", said)
+	}
+}
+
+// A MULTI-LINE COMMAND IS RECORDED AS ITS CONTENT AND NOT AS ITS FIRST LINE.
+// The owner read a log of `Bash python -c "` repeated forever and asked
+// whether the agent was failing: it was the record cutting a multi-line
+// program at the newline after the opening quote. The description folds the
+// lines to spaces, and the cap still holds.
+func TestAMultiLineCommandIsRecordedWhole(t *testing.T) {
+	got := describe("Bash", "", "python -c \"\nimport os\nprint(os.getcwd())\n\"")
+	if got != `Bash python -c " import os print(os.getcwd()) "` {
+		t.Fatalf("the record cut the command: %q", got)
+	}
+	long := describe("Bash", "", strings.Repeat("x", 300))
+	if len(long) > len("Bash ")+200+len("…") || !strings.HasSuffix(long, "…") {
+		t.Fatalf("the cap does not hold: %d chars", len(long))
 	}
 }

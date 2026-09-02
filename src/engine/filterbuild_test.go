@@ -78,7 +78,7 @@ func sameGroups(a, b []FilterGroup) bool {
 // value was `open" && assignee == "main`. The page then redrew its builder from
 // that and one touch wrote the value back quoted and escaped:
 //
-//	- status == "open\" && assignee == \"main"
+//   - status == "open\" && assignee == \"main"
 //
 // and the pane answered zero rows. The builder no longer emits that shape, so
 // the way in is a person editing the file by hand, which is the population the

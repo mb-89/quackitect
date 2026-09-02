@@ -353,6 +353,23 @@ type Config struct {
 	UnreviewedBeforeBlocked int
 	PullsBeforeHoldIsStale  int
 
+	// HOW MANY CRITERIA A DRAFT MAY CARRY. A draft bigger than this is too big
+	// to converge: the record holds one that carried fourteen and ate ten
+	// rounds, because a token that big always has some criterion left for the
+	// next reviewer to reject. Too big is a property a gate can count.
+	CriteriaCeiling int
+
+	// HOW MANY CONSECUTIVE FAILING ROUNDS ON ONE HALF CLIMB ONE RUNG. It is a
+	// guess about how much patience a token deserves rather than a fact about
+	// the code, so it is a parameter a person moves. See TheRung.
+	RoundsPerRung int
+
+	// How big a token's prose may be before the save refuses it. A token is a
+	// ticket a person reads cold, and the record once held tokens of 117 KB.
+	// Both are bytes, and both are parameters a person moves.
+	DetailBytes  int
+	SectionBytes int
+
 	From map[string]string
 }
 
@@ -365,7 +382,14 @@ func TheFloor() Config {
 	return Config{GuardProjections: true, StopNeedsClaim: true, AnswerFirst: true,
 		HeartbeatSeconds: 5, ReadyBudgetMs: 15000, UnreviewedBeforeBlocked: 3,
 		PullsBeforeHoldIsStale: 10,
-		From:                   map[string]string{}}
+		CriteriaCeiling: 8,
+		// TWO, BECAUSE THE SECOND RUNG IS SHARED OVER BOTH HALVES. One failing
+		// round per rung would spend the token's whole ladder on a first bad
+		// draft, and the grant never comes back.
+		RoundsPerRung: 2,
+		DetailBytes:   1500,
+		SectionBytes:  1000,
+		From:          map[string]string{}}
 }
 
 func LoadConfig(roots Roots) Config {
@@ -397,6 +421,18 @@ func LoadConfig(roots Roots) Config {
 	}
 	if n, ok := toNumber(v.Value["limits.pulls_before_hold_is_stale"]); ok && int(n) > 0 {
 		c.PullsBeforeHoldIsStale = int(n)
+	}
+	if n, ok := toNumber(v.Value["limits.criteria_ceiling"]); ok && int(n) > 0 {
+		c.CriteriaCeiling = int(n)
+	}
+	if n, ok := toNumber(v.Value["limits.rounds_per_rung"]); ok && int(n) > 0 {
+		c.RoundsPerRung = int(n)
+	}
+	if n, ok := toNumber(v.Value["limits.detail_bytes"]); ok && int(n) > 0 {
+		c.DetailBytes = int(n)
+	}
+	if n, ok := toNumber(v.Value["limits.section_bytes"]); ok && int(n) > 0 {
+		c.SectionBytes = int(n)
 	}
 	return c
 }

@@ -27,7 +27,7 @@ func TestARejectionNamesTheLessonsToken(t *testing.T) {
 	Pull(r, "rev", RoleReviewer, Payload{})
 
 	const class = "a check built from the fix, which cannot go red"
-	lesson := Lesson{Class: class, Avoid: "write the check first and watch it go red"}
+	lesson := Lesson{Class: class, Avoid: "write the check first and watch it go red", Prevents: "ask before writing the check whether it can fail"}
 	findings := []Rejection{{Clause: "the check", Wrong: "it cannot fail",
 		Satisfies: "one that was watched failing"}}
 
@@ -119,7 +119,7 @@ func TestASpecRejectionNamesTheLessonsTokenToo(t *testing.T) {
 	Pull(r, "reviewer", RoleReviewer, Payload{})
 
 	const class = "a criterion whose command does not decide its sentence"
-	lesson := Lesson{Class: class, Avoid: "read the command and ask what file it names"}
+	lesson := Lesson{Class: class, Avoid: "read the command and ask what file it names", Prevents: "ask before writing the check whether it can fail"}
 	findings := []Rejection{{Clause: "the criteria", Wrong: "the command is borrowed",
 		Satisfies: "one that decides the sentence above it"}}
 

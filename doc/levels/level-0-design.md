@@ -362,9 +362,6 @@ was never the problem.
 | An invalid expression **says so, and keeps the last good filter** | **ACCEPTED** | The state stays honest and the reader keeps their place. | An error looks the same as a search with no hits. |
 | The details pane **shows the filter syntax** when the filter needs explaining | **ACCEPTED** | The explanation belongs where the user is already looking. The pane holds either a record or the help. | The syntax lives in documentation nobody opens while typing. |
 
-**OPEN.** The exact filter grammar. Negation, quoted phrases, and combining terms are not
-ruled. The three rules above are the floor.
-
 ### What the window shows, and how the log is kept
 
 | Entry | Ruling | Why | Breaks without it |
@@ -403,7 +400,7 @@ the agent must know for a task rides the task. What the agent must always be rid
 |---|---|---|---|
 | The **standing layer holds voice and general behaviour only** | **ACCEPTED** | These are the rules with no task to attach to. Everything with a task attaches to the task. | Either manner depends on what is being worked on, or the floor is copied into every guidance document. |
 | The standing layer is **small, and its size is budgeted** | **ACCEPTED** | It is paid on every turn. The standing prefix is a measured complaint about v3, and a rule with no owner grows. | The prefix tax returns, one reasonable addition at a time. |
-| **OPEN** — the number | **SPIKE** | The budget must be stated and measured. It is not invented here. | A budget nobody set is a budget nobody meets. |
+| **MEASURED, AND THE NUMBER IS THE OWNER'S** | **SPIKE**, wk-23801b6603 | EVERY FIGURE HERE HAS THE COMMAND THAT ANSWERS IT, because a number in a design document with nothing behind it outlives everybody who could have checked it. `uvx --from tiktoken python util/checks/count-standing.py .` answers **one turn carries 5,506 tokens** of standing layer, cl100k_base, which is not this host's own encoding and is the nearest reproducible one. The same command against a worktree at **c28e87d8** answers **5,502**. SO THE SPLIT HAS BOUGHT NOTHING YET, AND THE LAYER IS 4 TOKENS LARGER THAN BEFORE IT. The case studies leaving behaviour.md took text out, and rules added to behaviour.md since have put more back, and the two cannot be separated from here because nothing was committed between the split and this reading. What would separate them is a commit at the split, and there is not one. THE CEILING PUT TO THE OWNER: 6,000, and a rule added above it is paid for by one removed. WHAT STILL OWES A NUMBER is the other half, whether a rule in this layer changes behaviour at all, which is wk-69150c6d69 and is the half that should decide the ceiling. | A budget nobody set is a budget nobody meets. |
 | The standing layer is a **projection** of the guidance corpus | **ACCEPTED** | It is assembled from documents that are authored elsewhere. See Projection. | Two places state the voice rules, and they disagree within a month. |
 | **Delivery is not enforcement**, and this layer says which it is doing | **ACCEPTED** | Rules in a prompt change behaviour some of the time. Claiming more is the error that makes the gap invisible. | The rules are believed to be enforced, so nobody measures whether they hold. |
 | **Written artefacts are checked at the write path** | **ACCEPTED** | That is where interception exists. A refusal names the rule and the place. | Voice rules apply to conversation and not to the record, which is the part that lasts. |

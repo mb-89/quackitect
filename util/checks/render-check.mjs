@@ -4,11 +4,15 @@
 import { execFileSync } from "node:child_process";
 import { writeFileSync, mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 
-
-const root = process.argv[2];
-const work = process.argv[3];
+// THE ROOT IS RESOLVED HERE, so a criterion can name this check with a relative
+// path and mean this tree. It took whatever it was handed, so `node
+// util/checks/render-check.mjs .` built ".\src\extension\node_modules\..." and
+// died on the import, and the only way to run it was to pass an absolute path
+// twice. A check nobody can name from a criterion is a check no criterion has.
+const root = resolve(process.argv[2] ?? ".");
+const work = resolve(process.argv[3] ?? process.argv[2] ?? ".");
 const se = join(root, ".bin", process.env.SE_EXE || (process.platform === "win32" ? "se.exe" : "se"));
 
 const ask = (...args) => JSON.parse(execFileSync(se, [...args, "--work", work], { encoding: "utf8" }));
@@ -133,7 +137,11 @@ const want = [
     //
     // The set is right below. Counting it in a comment kept a second copy of
     // one fact, and the two disagreed in three rounds running.
-    const data = new Set(["name", "count", "bs-view-name", "bs-ticked", "bs-join", "door"]);
+    // bs-pill-open holds a token's TITLE, which is a person's words: the pill
+    // lists what a count counted, and a token called the bar burns down ends in
+    // a word the icon table also uses. It is data and not a mark.
+    const data = new Set(["name", "count", "bs-view-name", "bs-ticked", "bs-join", "door",
+                          "bs-pill-open"]);
     const slots = [...h.matchAll(/<(?:span|button)[^>]*class="([^"]*)"[^>]*>([^<]*)</g)];
     // EACH WORD, NOT THE WHOLE CONTENT. Four buttons draw a mark beside a
     // word, so their content is the two together and a whole-content lookup
@@ -240,6 +248,43 @@ const want = [
         && !after.includes('<span class="name">q/');
     });
   }],
+  // THE NUMBER OF TOKENS IS ON THE PAGE, ONCE, AND IT IS THE DISTINCT COUNT.
+  //
+  // THE OWNER READ 370 OFF A TREE HOLDING 187. Every row is drawn under every
+  // query that matches it and again under its bucket, so the headings add to
+  // roughly twice the tokens and there was nothing on the page saying which
+  // number was the tokens. Measured on this tree: total 187, and the group
+  // counts summed to 376.
+  //
+  // IT GOES ON THE RULE, because the rule is where the two halves meet and it
+  // is the one place that can say the buckets below add to this and the queries
+  // above do not. The toolbar is where it was ruled out, and that ruling stands:
+  // a bar number is the same fact in a second place.
+  //
+  // THE NUMBER IS ASKED OF THE TABLE, never typed. A check that types 187 stops
+  // being able to fail the moment a token is minted.
+  ["the rule carries the distinct number of rows", (h) => {
+    const wraps = h.split('<div class="pane-wrap"').slice(1);
+    if (wraps.length === 0 || panes.length === 0) return false;
+    return wraps.every((pane, i) => {
+      const total = panes[i]?.table?.total;
+      if (typeof total !== "number") return false;
+      const rule = pane.match(/<div class="kinds">([\s\S]*?)<\/div>/);
+      return !!rule && rule[1].includes(String(total));
+    });
+  }],
+  // AND THE BUCKETS BELOW IT ADD UP TO THAT NUMBER, which is what makes the
+  // sentence on the rule true rather than decorative. The queries above do not
+  // and are not asked to.
+  ["the buckets add up to the number on the rule", () => {
+    if (panes.length === 0) return false;
+    return panes.every((p) => {
+      const gs = p.table.groups || [];
+      const buckets = gs.filter((g) => !g.declared);
+      if (buckets.length === 0) return false;
+      return buckets.reduce((n, g) => n + (g.count || 0), 0) === p.table.total;
+    });
+  }],
   ["a query draws q slash and a bucket does not", (h) => {
     const flat = [];
     const walk = (gs) => (gs || []).forEach((g) => { flat.push(g); walk(g.groups); });
@@ -332,6 +377,66 @@ if (empties.groups) {
   const hp = heightOf(panel);
   say2("a control is the same height in both", !!he && he === hp,
     "editor " + he + ", panel " + hp);
+}
+
+// THE BAR SAYS IT WITH ICONS, AND AN ICON STILL HAS TO SAY WHAT IT IS.
+//
+// The owner named filter and sort as the two whose words are spare, so those
+// two are what is asserted here. Properties keeps its word on purpose: a third
+// button nobody asked about is a decision this check does not own.
+//
+// A BUTTON WITH NO WORDS AND NO TITLE IS A MYSTERY, which is why the second
+// half is here rather than left to be noticed. The title is what the pointer
+// shows and what a screen reader reads.
+{
+  const buttons = new Map();
+  for (const b of html.matchAll(/<button\b([^>]*)>([\s\S]*?)<\/button>/g)) {
+    const pop = /data-pop="([^"]+)"/.exec(b[1]);
+    if (pop) buttons.set(pop[1], { attrs: b[1], inner: b[2] });
+  }
+  say2("the bar draws its popover buttons (" + [...buttons.keys()].join(", ") + ")",
+    buttons.size > 0, "no button carrying data-pop was found, so this guards nothing");
+  for (const name of ["filter", "sort"]) {
+    const b = buttons.get(name);
+    if (!b) { say2(name + " is on the bar", false, "no button carries data-pop=\"" + name + "\""); continue; }
+    // WHAT COUNTS AS A WORD. The icon is one glyph and everything else in the
+    // button is text the owner asked to lose. Stripping tags first, so a mark
+    // wrapped in a span is not read as a word.
+    const words = b.inner.replace(/<[^>]*>/g, "").replace(/[^\p{L}\p{N}]/gu, "").trim();
+    say2(name + " carries its icon and no word", words === "",
+      "it still says " + JSON.stringify(words));
+    say2(name + " says what it is in its title", /\btitle="[^"]+"/.test(b.attrs),
+      "it has no title, so with the word gone nothing names it");
+  }
+}
+
+// THE RULE BETWEEN THE KINDS IS THE SAME RULE THAT DIVIDES THE PINNED FROM THE
+// REST, AND NOT A SECOND KIND OF LINE.
+//
+// The criterion says both halves and only the first had a check: that a rule is
+// drawn. Whether it is the SAME rule was asserted by nothing, so the two could
+// drift to different widths, styles or colours and the page would grow a second
+// kind of divider with every check green.
+//
+// THE TWO DECLARATIONS ARE COMPARED RATHER THAN EITHER BEING TYPED HERE. What a
+// border should look like is the stylesheet's decision and this check does not
+// own it. What it owns is that the two agree.
+{
+  const css = [...html.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g)].map((m) => m[1]).join("\n");
+  const border = (selector) => {
+    const rule = new RegExp("\\." + selector + "\\s*\\{([^}]*)\\}").exec(css);
+    if (!rule) return null;
+    const found = /border(?:-top|-bottom)?\s*:\s*([^;]+)/.exec(rule[1]);
+    return found ? found[1].trim() : null;
+  };
+  const top = border("top");
+  const kinds = border("kinds");
+  say2("the pinned groups are divided from the rest by a rule", !!top,
+    "no border was found on .top, so there is nothing to be the same as");
+  say2("and the kinds are divided by the same rule rather than a second kind of line",
+    !!top && top === kinds,
+    "the pinned divider is " + JSON.stringify(top) + " and the kinds divider is "
+      + JSON.stringify(kinds) + ", so the page draws two kinds of line");
 }
 
 // Every tag that opens is closed, which is the mistake a template makes.

@@ -21,8 +21,15 @@ func TestAReclaimReachesEveryHeldState(t *testing.T) {
 		{ImpInReview, ImpSubmitted, RoleReviewer},
 	} {
 		r := lane(t)
-		tok := mint(t, r, Token{Title: "held by somebody gone"})
-		tok.Status, tok.Holder = at.held, "gone"
+		tok := mint(t, r, Token{Title: "held and returned"})
+		// THE HOLDER IS THE ACTOR THAT ARRIVES, which is the case a reclaim is
+		// for: a process died and came back, and its own work is returned to it.
+		// It used to be somebody else, and a reviewer took back ANY token: with
+		// fifteen reviewers running that meant every arrival stole the token out
+		// of the hands of one mid-review, and three of them lost whole reviews to
+		// it in an afternoon. A reviewer now takes back its own and a dead
+		// holder's, and this drives the first of those two.
+		tok.Status, tok.Holder = at.held, "main"
 		if err := SaveToken(r, tok); err != nil {
 			t.Fatal(err)
 		}
@@ -85,5 +92,54 @@ func TestTheStatesAPullHandsOutAreOneAnswer(t *testing.T) {
 				t.Errorf("%s is both handed out and held for %s", one, role)
 			}
 		}
+	}
+}
+
+// AN ARRIVING REVIEWER DOES NOT TAKE THE TOKEN OUT OF A LIVE REVIEWER'S HANDS.
+//
+// Reclaim ran on every arrival and its comment said a reviewer takes back ANY,
+// because a review belongs to whichever reviewer is here now. That was written
+// when one reviewer ran at a time.
+//
+// MEASURED, BY THE REVIEWERS IT ROBBED. With fifteen running, three reported the
+// same thing in one afternoon: one reviewed four tokens fully and lost every one
+// mid-verdict, one had a rejection ready and was told a newer reviewer holds this
+// sphere, and one was cut off partway through and could not even send its verdict,
+// because losing the token closes the write gate and a verdict goes in on a pipe.
+// Every one of those reviews was work done and thrown away.
+//
+// THE ENGINE ALREADY KNOWS THE DIFFERENCE. StillPulling is what the investigate
+// answer is built on and what the reviewer refusal uses. Reclaim was the one
+// place that did not ask.
+func TestAnArrivingReviewerLeavesALiveReviewersToken(t *testing.T) {
+	r := lane(t)
+	one := mint(t, r, Token{Title: "the probe", Assignee: "probeA", Status: ImpOpen})
+	if _, done := settle(r, "probeA", RoleWorker, Payload{ID: one.ID, Disposition: "done"}); done {
+		t.Fatal("the submission was refused")
+	}
+	if got := next(r, "rev-live", RoleReviewer); got.Pull != AnswerReview {
+		t.Fatalf("the first reviewer was handed nothing: %+v", got)
+	}
+	// A SECOND REVIEWER ARRIVES while the first is still pulling.
+	Reclaim(r, "rev-new", RoleReviewer)
+
+	got, err := LoadToken(r, one.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got.Holder != "rev-live" || got.Status != ImpInReview {
+		t.Errorf("an arriving reviewer took a live reviewer's token: it is %s held by %q",
+			got.Status, got.Holder)
+	}
+
+	// AND A REVIEWER STILL TAKES BACK ITS OWN, which is what the reclaim is for:
+	// an agent whose process died and came back gets its own work returned.
+	if back := Reclaim(r, "rev-live", RoleReviewer); len(back) == 0 {
+		t.Error("a reviewer arriving again did not take back what it was holding")
+	}
+	if got, err := LoadToken(r, one.ID); err != nil {
+		t.Fatal(err)
+	} else if got.Status != ImpSubmitted || got.Holder != "" {
+		t.Errorf("its own token came back as %s held by %q", got.Status, got.Holder)
 	}
 }

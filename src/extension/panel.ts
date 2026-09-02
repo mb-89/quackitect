@@ -45,8 +45,28 @@ const COLUMNS = 5;
 // decision util/icons.json owns, and invisible twice over: not in the table, so
 // no check that read the table could see it, and written as a reference rather
 // than as the character.
+// WHAT EACH ACTOR IS DOING, AS THE ENGINE ANSWERED IT.
+//
+// The panel DRAWS this and derives none of it. Every field is read off the
+// record by the engine, so a header that worked out a state for itself would be
+// a second opinion about a fact that already has an owner.
+export interface Doing {
+  actor: string;
+  state: string;
+  why?: string;
+  id?: string;
+  title?: string;
+  holding: string;
+}
+
+export interface Happening {
+  actors: Doing[];
+  hold: { on: boolean; by?: string; says?: string };
+}
+
 export function panelHtml(root: Node, shown: string[],
-                          icons: Record<string, { glyph?: string }> = {}): string {
+                          icons: Record<string, { glyph?: string }> = {},
+                          doing: Happening = { actors: [], hold: { on: false } }): string {
   const groups = groupsNamed(root, "", shown);
   const gear = icons.gear?.glyph ?? "gear";
   return `<!DOCTYPE html>
@@ -59,6 +79,7 @@ export function panelHtml(root: Node, shown: string[],
 <body>
 <div class="head">
   <button class="gear" id="gear" title="choose which groups are shown">${esc(gear)}</button>
+  ${whoIsDoingWhat(doing)}
 </div>
 ${groups.map(([path, n]) => section(path, n)).join("\n")}
 <script>${script()}</script>
@@ -405,4 +426,27 @@ function script(): string {
     }
   });
   `;
+}
+
+// ONE ROW PER ACTOR, AND THE HOLD ONCE FOR THE TREE.
+//
+// The hold is one file covering everything, so a copy beside each row would say
+// four agents are held when one file is. It is drawn outside the rows for that
+// reason and for no other.
+//
+// NOTHING HERE DECIDES A STATE. The strip prints what it was handed, so a page
+// rendered from two different answers says two different things, which is what
+// the check holds it to.
+function whoIsDoingWhat(doing: Happening): string {
+  const rows = (doing.actors ?? []).map((d) =>
+    `<div class="doing ${esc(d.state)}" data-actor="${esc(d.actor)}">` +
+    `<span class="who">${esc(d.actor)}</span> ` +
+    `<span class="state">${esc(d.state)}</span> ` +
+    `<span class="holds">${esc(d.holding)}</span>` +
+    (d.why ? ` <span class="why">${esc(d.why)}</span>` : "") +
+    `</div>`).join("");
+  const held = doing.hold?.on
+    ? `<div class="onhold">everything is on hold${doing.hold.by ? ", by " + esc(doing.hold.by) : ""}</div>`
+    : "";
+  return `<div class="doings">${rows}${held}</div>`;
 }

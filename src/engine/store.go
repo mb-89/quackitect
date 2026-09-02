@@ -51,7 +51,8 @@ var frontOrder = []string{
 	"disposition", "reason", "aborted_from", "holder", "bucket",
 	"parent", "subs", "depends_on", "successors",
 	"evidence", "evidence_script", "rounds",
-	"minted_by",
+	"spec_fails", "imp_fails", "rung_two_spent", "rung",
+	"minted_by", "submitted_by", "reviewed_by", "spec_seen",
 }
 
 func (t Token) front() Front {
@@ -65,10 +66,27 @@ func (t Token) front() Front {
 		"parent": t.Parent, "subs": t.Subs, "depends_on": t.DependsOn,
 		"successors": t.Successors,
 		"evidence":   t.Evidence.Sections, "evidence_script": t.Evidence.Script,
-		"minted_by": t.MintedBy,
+		"minted_by": t.MintedBy, "submitted_by": t.SubmittedBy,
+		"reviewed_by": t.ReviewedBy,
+		"spec_seen": t.SpecSeen,
 	}
 	if t.Rounds > 0 {
 		f["rounds"] = strconv.Itoa(t.Rounds)
+	}
+	// THE LADDER'S COUNT IS ON THE NOTE ONLY WHILE IT SAYS SOMETHING. A zero on
+	// every note is a column of noise, and the reader that wants one reads a
+	// missing key as zero.
+	if t.SpecFails > 0 {
+		f["spec_fails"] = strconv.Itoa(t.SpecFails)
+	}
+	if t.ImpFails > 0 {
+		f["imp_fails"] = strconv.Itoa(t.ImpFails)
+	}
+	if t.RungTwoSpent {
+		f["rung_two_spent"] = "true"
+	}
+	if t.Rung > 0 {
+		f["rung"] = strconv.Itoa(t.Rung)
 	}
 	return f
 }
@@ -76,6 +94,8 @@ func (t Token) front() Front {
 func tokenFromFront(f Front) Token {
 	return Token{
 		ID: fs(f, "id"), Seq: fi(f, "seq"), Title: fs(f, "title"),
+		SubmittedBy: fs(f, "submitted_by"), ReviewedBy: fs(f, "reviewed_by"),
+		SpecSeen: fs(f, "spec_seen"),
 		// EVERY TOKEN ALREADY ON DISK KEEPS WHAT IT SAYS. The states were
 		// renamed and no note was rewritten by hand, so this is what reads one
 		// under the name it used.
@@ -88,6 +108,8 @@ func tokenFromFront(f Front) Token {
 		Successors: fl(f, "successors"),
 		Evidence:   EvidenceSpec{Sections: fl(f, "evidence"), Script: fs(f, "evidence_script")},
 		Rounds:     fi(f, "rounds"), MintedBy: fs(f, "minted_by"),
+		SpecFails: fi(f, "spec_fails"), ImpFails: fi(f, "imp_fails"),
+		RungTwoSpent: fb(f, "rung_two_spent"), Rung: fi(f, "rung"),
 	}
 }
 
@@ -109,6 +131,10 @@ const (
 	leadWithout = "**red without** "
 	leadRed     = "**red said** "
 	headLesson  = "## lesson "
+
+	// WHAT WOULD HAVE STOPPED THE MISTAKE BEING MADE. One lead of its own, so
+	// a reader sees the prevention beside the detection rather than inside it.
+	leadPrevents = "**before it:** "
 )
 
 func (t Token) body() string {
@@ -158,6 +184,9 @@ func (t Token) body() string {
 		fmt.Fprintf(&b, "%s%d · round %d · %s · by %s\n\n", headFinding, i+1, f.Round, f.Clause, f.By)
 		b.WriteString("**wrong:** " + f.Wrong + "\n\n")
 		b.WriteString("**satisfies:** " + f.Satisfies + "\n\n")
+		if f.Answer != "" {
+			b.WriteString("**answered:** " + f.Answer + "\n\n")
+		}
 	}
 	// A LESSON SITS BESIDE THE ROUND THAT TAUGHT IT, so a reader finds what a
 	// round cost and what it was worth in the same place.
@@ -165,6 +194,11 @@ func (t Token) body() string {
 		fmt.Fprintf(&b, "%s%d · round %d · by %s\n\n", headLesson, i+1, l.Round, l.By)
 		b.WriteString("**the class:** " + l.Class + "\n\n")
 		b.WriteString("**instead:** " + l.Avoid + "\n\n")
+		// AND WHAT WOULD HAVE STOPPED IT BEING MADE, which is the half a
+		// worker reads before starting rather than after being caught.
+		if l.Prevents != "" {
+			b.WriteString(leadPrevents + l.Prevents + nl + nl)
+		}
 		// THE TOKEN THE REVIEWER MINTED FOR IT, so a reader of this note can
 		// go to the work rather than to a sentence about it.
 		if l.Learned != "" {
@@ -253,17 +287,12 @@ func readLesson(head, text string) Lesson {
 			l.By = strings.TrimPrefix(p, "by ")
 		}
 	}
-	for _, part := range strings.Split(text, nl+nl) {
-		p := strings.TrimSpace(part)
-		switch {
-		case strings.HasPrefix(p, "**the class:** "):
-			l.Class = strings.TrimPrefix(p, "**the class:** ")
-		case strings.HasPrefix(p, "**instead:** "):
-			l.Avoid = strings.TrimPrefix(p, "**instead:** ")
-		case strings.HasPrefix(p, "**minted as:** "):
-			l.Learned = strings.TrimSpace(strings.TrimPrefix(p, "**minted as:** "))
-		}
-	}
+	said := underLeads(text, []string{"**the class:** ", "**instead:** ",
+		leadPrevents, "**minted as:** "})
+	l.Class = said["**the class:** "]
+	l.Avoid = said["**instead:** "]
+	l.Prevents = said[leadPrevents]
+	l.Learned = strings.TrimSpace(said["**minted as:** "])
 	return l
 }
 
@@ -306,16 +335,54 @@ func readFinding(head, text string) Rejection {
 			f.Clause = p
 		}
 	}
-	for _, line := range strings.Split(text, "\n") {
-		line = strings.TrimSpace(line)
-		switch {
-		case strings.HasPrefix(line, "**wrong:** "):
-			f.Wrong = strings.TrimPrefix(line, "**wrong:** ")
-		case strings.HasPrefix(line, "**satisfies:** "):
-			f.Satisfies = strings.TrimPrefix(line, "**satisfies:** ")
+	said := underLeads(text, []string{"**wrong:** ", "**satisfies:** ", "**answered:** "})
+	f.Wrong, f.Satisfies = said["**wrong:** "], said["**satisfies:** "]
+	f.Answer = said["**answered:** "]
+	return f
+}
+
+// underLeads answers what each lead holds, to the next lead or to the end.
+//
+// A BLOCK IS A BLOCK AND NOT A LINE. This read line by line, so a value written
+// in two paragraphs came back as its first, which is the silent loss the whole
+// token is about: of fourteen findings in the record every paragraphed one was
+// cut, 85 characters of about 1900 in the worst case.
+//
+// THE WRITER ALREADY WRITES THEM WHOLE. Only the reader was wrong, so there is
+// no format to invent and nothing for a person to get wrong.
+func underLeads(text string, leads []string) map[string]string {
+	said := map[string]string{}
+	seen := map[string]bool{}
+	at, held := "", []string{}
+	keep := func() {
+		if at != "" {
+			said[at] = strings.TrimSpace(strings.Join(held, nl))
 		}
 	}
-	return f
+	for _, line := range strings.Split(text, nl) {
+		trimmed := strings.TrimSpace(line)
+		opened := false
+		for _, lead := range leads {
+			// A LEAD OPENS ONCE, THE FIRST TIME IT IS SEEN. A block quoting
+			// one of these leads in a later paragraph is a block and not a
+			// second section, and reading it as a section is how a value that
+			// quotes the parser's own words comes back cut.
+			if seen[lead] || !strings.HasPrefix(trimmed, lead) {
+				continue
+			}
+			keep()
+			seen[lead] = true
+			at, held = lead, []string{strings.TrimPrefix(trimmed, lead)}
+			opened = true
+			break
+		}
+		if opened || at == "" {
+			continue
+		}
+		held = append(held, line)
+	}
+	keep()
+	return said
 }
 
 // SaveToken writes the whole note, and it writes it atomically.
@@ -330,6 +397,12 @@ func SaveToken(r Roots, t Token) error {
 	// stops being a value and becomes a line, and a refusal in a caller is a
 	// refusal the next caller does not have.
 	if err := linesThatFit(t); err != nil {
+		return err
+	}
+	if err := blocksHoldNoHeading(t); err != nil {
+		return err
+	}
+	if err := proseThatFits(LoadConfig(r), t); err != nil {
 		return err
 	}
 	// EVERY CHANGE OF STATE IS IN THE RECORD, and this is the one place that
@@ -516,6 +589,139 @@ func followChildren(r Roots, child Token) {
 // reads back as no command, the criterion becomes prose, and prose is answered
 // by name in the evidence rather than by watching it fail. Writing a command on
 // two lines therefore turned the gate off, silently, at the moment of the save.
+// WHAT THE NOTE CANNOT HOLD, REFUSED WHERE THE VALUE BECOMES A LINE.
+//
+// A BLOCK READS TO THE NEXT LEAD OR THE NEXT HEADING, so a value carrying a
+// line that opens a section is cut on the save, by design and in silence. That
+// is the one outcome this refuses.
+//
+// REFUSED RATHER THAN ESCAPED. A person reads and edits these notes in an
+// editor, and a value written differently from how it was typed is one somebody
+// re-types wrongly. Accepting was never open: silence is what the refusal
+// exists to end. The cost is small and it is said here so nobody rediscovers
+// it: a reviewer quoting a section name indents that line or runs it into the
+// sentence.
+func blocksHoldNoHeading(t Token) error {
+	opens := func(where, value string) error {
+		for _, line := range strings.Split(value, nl) {
+			if !strings.HasPrefix(strings.TrimRight(line, "\r"), "## ") {
+				continue
+			}
+			return fmt.Errorf("%s carries a line that opens a section, %q, and a block "+
+				"reads to the next heading, so everything after it would be lost on this "+
+				"save. Indent that line, or run it into the sentence", where, firstLines(line, 1))
+		}
+		return nil
+	}
+	for _, one := range []struct{ where, value string }{
+		{"Token.Detail", t.Detail}, {"Token.Guidance", t.Guidance},
+		{"Token.GuidanceRef", t.GuidanceRef},
+	} {
+		if err := opens(one.where, one.value); err != nil {
+			return err
+		}
+	}
+	for i, f := range t.Findings {
+		for _, one := range []struct{ where, value string }{
+			{fmt.Sprintf("Rejection.Wrong on finding %d", i+1), f.Wrong},
+			{fmt.Sprintf("Rejection.Satisfies on finding %d", i+1), f.Satisfies},
+			// ANSWER IS A BLOCK AND THIS LIST WENT SHORT WITHOUT IT. The table in
+			// the shapes check calls it a block by design, and the refusal named
+			// two of the three, so a worker's answer carrying a section opener
+			// lost everything after it on the save and nothing said so.
+			{fmt.Sprintf("Rejection.Answer on finding %d", i+1), f.Answer},
+		} {
+			if err := opens(one.where, one.value); err != nil {
+				return err
+			}
+		}
+	}
+	for i, l := range t.Lessons {
+		for _, one := range []struct{ where, value string }{
+			{fmt.Sprintf("Lesson.Class on lesson %d", i+1), l.Class},
+			{fmt.Sprintf("Lesson.Avoid on lesson %d", i+1), l.Avoid},
+			{fmt.Sprintf("Lesson.Prevents on lesson %d", i+1), l.Prevents},
+			{fmt.Sprintf("Lesson.Learned on lesson %d", i+1), l.Learned},
+		} {
+			if err := opens(one.where, one.value); err != nil {
+				return err
+			}
+		}
+	}
+	// EVERY VALUE THE NOTE JOINS INTO A HEADING cannot hold the character it is
+	// joined on, the middle dot, or a newline. The set is the table's, not the
+	// one member a finding was found on.
+	for i, f := range t.Findings {
+		for _, one := range []struct{ where, value string }{
+			{fmt.Sprintf("Rejection.Clause on finding %d", i+1), f.Clause},
+			{fmt.Sprintf("Rejection.By on finding %d", i+1), f.By},
+		} {
+			if err := fitsAHeading(one.where, one.value); err != nil {
+				return err
+			}
+		}
+	}
+	for i, l := range t.Lessons {
+		if err := fitsAHeading(fmt.Sprintf("Lesson.By on lesson %d", i+1), l.By); err != nil {
+			return err
+		}
+	}
+	// A MAP THE NOTE WRITES AS A BODY SECTION: its value is a block, and its
+	// KEY is one line and not a heading. A newline in a key is cut and its
+	// tail moves into the value. The middle dot is safe there, because
+	// readBody strips the lead and takes the rest of the heading whole, so
+	// refusing it would refuse a character the record carries.
+	for _, one := range []struct {
+		where string
+		held  map[string]string
+	}{{"Token.Submission", t.Submission}, {"Token.Rewatched", t.Rewatched}} {
+		for key, value := range one.held {
+			if strings.ContainsAny(key, "\r\n") {
+				return fmt.Errorf("%s is filed under a key written on more than one line, "+
+					"%q. The reader takes the heading and stops, so the rest of the key "+
+					"moves into the value. Write the key on one line",
+					one.where, firstLines(key, 1))
+			}
+			if err := opens(one.where+", under "+firstLines(key, 1), value); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+// fitsAHeading refuses a value the note joins into a heading line.
+func fitsAHeading(where, value string) error {
+	for _, bad := range []struct{ what, name string }{
+		{"·", "the heading separator"}, {"\n", "a newline"}, {"\r", "a newline"},
+	} {
+		if !strings.Contains(value, bad.what) {
+			continue
+		}
+		return fmt.Errorf("%s carries %s, and it is joined into a heading line with "+
+			"the round and the author on that character, so the reader would split it "+
+			"there. Write it without one", where, bad.name)
+	}
+	return nil
+}
+
+// A token is a ticket a person reads cold, and a ticket has a size. The
+// record once held a token of 117 KB, grown round by round, and nothing
+// refused it. The limits are parameters in util/parameters.json.
+func proseThatFits(c Config, t Token) error {
+	if n := len(t.Detail); n > c.DetailBytes {
+		return fmt.Errorf("the detail is %d bytes and the limit is %d. Say what is asked in a few "+
+			"sentences, and put the argument somewhere a reader opens on purpose", n, c.DetailBytes)
+	}
+	for _, name := range sortedKeys(t.Submission) {
+		if n := len(t.Submission[name]); n > c.SectionBytes {
+			return fmt.Errorf("evidence %q is %d bytes and the limit is %d. Name what was built "+
+				"and what the check said, and leave the rest in the log", name, n, c.SectionBytes)
+		}
+	}
+	return nil
+}
+
 func linesThatFit(t Token) error {
 	for i, c := range t.Criteria {
 		for _, one := range []struct{ field, value string }{

@@ -37,6 +37,38 @@ const { editorHtml } = await import(pathToFileURL(join(out, "editor.mjs")).href)
 
 const sides = ask("query", "--view", "work", "--panes").panes;
 const panes = sides.map((side) => ({ side, table: ask("query", "--view", "work", "--pane", side) }));
+// A PARENT IS PLANTED RATHER THAN HOPED FOR.
+//
+// The fold assertions read whatever the live queue happened to hold, so they
+// were driving 4 parents one hour and 0 the next: every sub-token closed and
+// the checks that press the folds had nothing to press. That is a check whose
+// red depends on data the system eats, on a check written to catch exactly that
+// class, and it went from proving something to proving nothing with no failure
+// in between.
+//
+// SO THE CASE IS WRITTEN RATHER THAN FOUND. One parent and one child, added to
+// the first group of the first pane, beside whatever the tree holds. It is
+// additive: every other assertion still reads the real page.
+{
+  const first = (panes[0].table.groups ?? []).find((g) => (g.lines ?? []).length > 0)
+    ?? (panes[0].table.pinned ?? []).find((g) => (g.lines ?? []).length > 0);
+  if (!first) {
+    console.error("no group on the page holds a row, so the fold cases cannot be planted");
+    process.exit(1);
+  }
+  const cells = (title) => {
+    const out = {};
+    for (const c of panes[0].table.columns) out[c] = { value: c === "title" ? title : "planted" };
+    return out;
+  };
+  first.lines.push({
+    id: "wk-planted-parent", cells: cells("a planted parent"), depth: 0,
+    under: [{ id: "wk-planted-child", cells: cells("a planted child"),
+              depth: 1, parent: "wk-planted-parent" }],
+  });
+  first.count = first.lines.length;
+}
+
 const html = editorHtml(panes, ask("query", "--list").views, "work");
 
 // The page talks to VS Code. Nothing here answers, and what it tried to say is
@@ -277,6 +309,108 @@ if (tick) {
     say("and unfolding puts the count back", counted() === said);
     // A press on the fold does not tick the row it sits on.
     say("folding does not tick the row", !parent.classList.contains("ticked"));
+  }
+}
+
+// A COUNT ON THE BAR OPENS ONTO THE TOKENS BEHIND IT.
+//
+// THE SET IS THE TABLE'S, NOT THIS FILE'S. How many counts there are and what
+// they are called is the view file's decision, so the assertion walks what the
+// engine answered. A list typed here would be complete on the day it is written
+// and would stop being the moment somebody declares a third count.
+{
+  const counts = panes[0].table.counts ?? [];
+  say("the engine answers counts for the bar (" + counts.map((c) => c.name).join(", ") + ")",
+    counts.length > 0,
+    "the view declares no count, so this guards nothing");
+  const pills = [...wrap.querySelectorAll(".bs-pill")];
+  say("the bar draws a pill for each count", pills.length === counts.length,
+    counts.length + " count(s) answered and " + pills.length + " pill(s) drawn");
+  for (const c of counts) {
+    const pill = pills.find((p) => p.textContent.includes(c.name));
+    if (!pill) { say("a pill for " + c.name, false, "no pill names it"); continue; }
+    say(c.name + " shows its number", pill.textContent.includes(String(c.n)),
+      "the count is " + c.n + " and the pill says " + JSON.stringify(pill.textContent));
+
+    const list = wrap.querySelector('.bs-pop[data-pop="' + pill.dataset.pop + '"]');
+    say(c.name + " has a list behind it", !!list);
+    if (!list) continue;
+    say(c.name + " starts closed", list.hidden);
+    press(pill);
+    say(c.name + " opens on a press", !list.hidden);
+    // THE MEMBERS ARE THE ENGINE'S ANSWER, drawn rather than found again.
+    const drawn = [...list.querySelectorAll("[data-id]")].map((b) => b.dataset.id);
+    const want = (c.of ?? []).map((o) => o.id);
+    say(c.name + " lists the tokens the engine named (" + want.length + ")",
+      drawn.length === want.length && want.every((id) => drawn.includes(id)),
+      "the engine named " + JSON.stringify(want) + " and the list holds " + JSON.stringify(drawn));
+    for (const o of c.of ?? []) {
+      const entry = list.querySelector('[data-id="' + o.id + '"]');
+      say(o.id + " is named by its title", !!entry && entry.textContent.includes(o.title),
+        "the title is " + JSON.stringify(o.title));
+    }
+    // AND PRESSING ONE OPENS IT, through the same message a row's door sends,
+    // so there is one way to open a note and not two.
+    const first = list.querySelector("[data-id]");
+    if (first) {
+      const before = sent.filter((m) => m.type === "open").length;
+      press(first);
+      const after = sent.filter((m) => m.type === "open");
+      say("pressing a name in " + c.name + " opens that token",
+        after.length === before + 1 && after[after.length - 1].id === first.dataset.id,
+        "what it sent: " + JSON.stringify(after[after.length - 1]));
+    }
+    press(pill);
+  }
+}
+
+// TWO BUTTONS FOLD EVERYTHING, AND ALL MEANS BOTH KINDS OF FOLD.
+//
+// A group folds by a class on its section and a row folds by a set the page
+// keeps. A button that reached only one of them would move half the table on a
+// press, which is worse than moving none, because the person cannot tell a
+// button that did half its job from a table that was already half folded.
+//
+// THE ASSERTION COUNTS FROM THE PAGE rather than from a number typed here. How
+// many groups and how many parents there are is the data's business.
+{
+  const shutAll = wrap.querySelector(".bs-collapse-all");
+  const openAll = wrap.querySelector(".bs-expand-all");
+  say("the bar carries collapse all and expand all", !!shutAll && !!openAll,
+    "collapse " + !!shutAll + ", expand " + !!openAll);
+  if (shutAll && openAll) {
+    const groups = () => [...wrap.querySelectorAll("section.group")];
+    const parents = () => [...wrap.querySelectorAll("tr[data-kids]")];
+    const kidsOf = (row) => {
+      const depth = Number(row.dataset.depth || 0);
+      const out = [];
+      for (let n = row.nextElementSibling; n; n = n.nextElementSibling) {
+        if (Number(n.dataset.depth || 0) <= depth) break;
+        out.push(n);
+      }
+      return out;
+    };
+    say("the pane has groups and parents to fold ("
+      + groups().length + " group(s), " + parents().length + " parent(s))",
+      groups().length > 0 && parents().length > 0,
+      "nothing on the page can fold, so this guards nothing");
+
+    press(shutAll);
+    say("collapse all shuts every group",
+      groups().every((g) => g.classList.contains("shut")),
+      groups().filter((g) => !g.classList.contains("shut")).length + " group(s) stayed open");
+    say("collapse all folds every parent",
+      parents().every((p) => kidsOf(p).every((k) => k.classList.contains("folded-away"))),
+      parents().filter((p) => !kidsOf(p).every((k) => k.classList.contains("folded-away")))
+        .length + " parent(s) kept their children on show");
+
+    press(openAll);
+    say("expand all opens every group",
+      groups().every((g) => !g.classList.contains("shut")),
+      groups().filter((g) => g.classList.contains("shut")).length + " group(s) stayed shut");
+    say("expand all unfolds every parent",
+      [...wrap.querySelectorAll("tr.folded-away")].length === 0,
+      [...wrap.querySelectorAll("tr.folded-away")].length + " row(s) stayed folded away");
   }
 }
 

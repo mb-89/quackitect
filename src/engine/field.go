@@ -55,7 +55,7 @@ func writeField(t *Token, field, to, by string) error {
 			return fmt.Errorf("a scope is %s, %s or %s", MultiStep, SingleStep, InToken)
 		}
 		t.Scope = s
-	case "id", "seq", "type", "minted_by":
+	case "id", "seq", "type", "minted_by", "submitted_by":
 		return fmt.Errorf("%s is the engine's, and it is not written by hand", field)
 	case "status", "holder":
 		return fmt.Errorf("%s is moved by a pull, not by a keystroke", field)

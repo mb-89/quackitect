@@ -12,22 +12,14 @@ parent: wk-66a28ca311
 successors:
   - wk-5bec911840
 minted_by: person
+evidence:
+  - outcome
 ---
 
 ## detail
 
-Sort and filter do nothing when a person uses them.
+Sort and filter do nothing when a person uses them: the popovers open and the controls inside have no effect, while Properties works. The select renders 29 options, so the defect is in the wiring or in what the message does when it arrives. Render the page, read what is drawn, and follow one control from the press to the file it writes. Start from the v3 bases client, where the controls worked.
 
-WHAT THE OWNER SEES: the popovers open and the controls inside them have no
-effect. Properties is the one that works.
+## evidence: outcome
 
-WHAT IS RULED OUT: the select is not empty. It renders 29 options, one per
-property, measured on the rendered page.
-
-SO THE DEFECT IS IN THE WIRING OR IN WHAT THE MESSAGE DOES WHEN IT ARRIVES.
-Render the page, read what is drawn, and follow one control from the press to
-the file it writes. Do not guess at it again.
-
-V3'S WORKED. bases had one client and the controls were part of it, so start
-there rather than from this one.
-
+The token became wk-5bec911840, which carries the sort and filter wiring under the editor port wk-66a28ca311.

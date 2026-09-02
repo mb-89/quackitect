@@ -1,6 +1,10 @@
 package main
 
-import "fmt"
+import (
+	"encoding/json"
+	"fmt"
+	"os"
+)
 
 // A HOLD NOBODY IS BEHIND SENDS SOMEBODY TO LOOK.
 //
@@ -97,4 +101,76 @@ func freeAgain(t Token) Status {
 		return to
 	}
 	return ImpOpen
+}
+
+// PULLING AGAIN IS THE WALKER'S ANSWER, AND THE NOTICE PROMISES IT WORKS.
+//
+// The notice says: if it is gone, pull again with se pull, and the engine takes
+// it back for you. It did not. Reclaim runs on an ARRIVAL, and an agent that has
+// already arrived this session never arrives again, so the second pull answered
+// the same notice as the first and the token stayed held by a name that was gone.
+//
+// MEASURED. A reviewer died on an API error holding a token in review. The
+// engine sent the walker to look, the walker looked, knew it was gone, and
+// pulled again twenty-eight times. Nothing moved.
+//
+// SO THE ENGINE REMEMBERS WHO IT SENT WHERE. Being sent to look is the first
+// ask. Pulling again after that is the walker saying the holder is gone, which
+// is the one thing the engine cannot find out for itself, and it is exactly what
+// the notice asks the walker to do.
+
+func lookedPath(r Roots) string { return r.Private("looked.json") }
+
+// Looked records that this actor was sent to look at this token.
+func Looked(r Roots, actor, id string) {
+	seen := lookedAt(r)
+	seen[actor] = id
+	if b, err := json.MarshalIndent(seen, "", "  "); err == nil {
+		_ = os.WriteFile(lookedPath(r), b, 0o644)
+	}
+}
+
+func lookedAt(r Roots) map[string]string {
+	out := map[string]string{}
+	b, err := os.ReadFile(lookedPath(r))
+	if err != nil {
+		return out
+	}
+	_ = json.Unmarshal(b, &out)
+	return out
+}
+
+// TakeBackWhatWasLookedAt returns what this actor was sent to look at, if the
+// holder is still not pulling. It answers the ids it moved.
+//
+// IT TAKES BACK ONE TOKEN AND ONLY THE ONE THE WALKER WAS SENT TO. A pull that
+// swept up every stale hold would be the timeout this whole answer exists to
+// refuse.
+func TakeBackWhatWasLookedAt(r Roots, actor string) []string {
+	seen := lookedAt(r)
+	id, was := seen[actor]
+	if !was || id == "" {
+		return nil
+	}
+	delete(seen, actor)
+	if b, err := json.MarshalIndent(seen, "", "  "); err == nil {
+		_ = os.WriteFile(lookedPath(r), b, 0o644)
+	}
+	t, err := LoadToken(r, id)
+	if err != nil {
+		return nil
+	}
+	to, holdable := whereItGoesBack[t.Status]
+	if !holdable || t.Holder == "" || t.Holder == actor {
+		return nil
+	}
+	was2 := t.Holder
+	t.Status, t.Holder = to, ""
+	if err := SaveToken(r, t); err != nil {
+		return nil
+	}
+	inSession(r, "work", actor, t.ID+" taken back from "+was2+
+		", who was looked at and is gone", Yes(),
+		map[string]any{"id": t.ID, "from": was2, "to": string(to)})
+	return []string{t.ID + " from " + was2}
 }

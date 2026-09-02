@@ -11,6 +11,21 @@ against this document.
 
 Same admission test throughout: **name, ruling, why, and what breaks without it.**
 
+## What each level is for
+
+One sentence each. The order of the sentences is the reason for the order of the levels.
+
+| Level | What it is for |
+|---|---|
+| 0 | Controlling how the agent behaves |
+| 1 | Teaching the agent how to do work at all |
+| 2 | Saying how a process runs |
+| 3 | Running our process |
+
+A concept belongs to the first level that can hold it. Reaching for one earlier means
+building the concepts it rests on in a level that was not meant to carry them, and the
+level stops being separable, which is the first acceptance test.
+
 **This document states intended behaviour, not solutions.** Where v3 is cited, it is cited
 as evidence. Evidence means a measured failure, or a confirmed fact about what exists. It
 is never cited as a mechanism to inherit. How any of this is built is decided when it is
@@ -93,8 +108,8 @@ shareable side, and one filtered door between them.
 |---|---|---|---|
 | `.se/` is the confidential side | **ACCEPTED** — exists | Machine-local, never committed. Anything that might be confidential goes here by default. | No place for anything that must not travel. |
 | The ledger is the shareable side | **ACCEPTED** | Committed, distributed, readable by anyone who has the repo. | The distinction that makes the filter meaningful. |
-| The crossing has **one door** | **ACCEPTED** — exists | Direct writes into the shared pool are refused. Everything goes through the mint. *"The mint is what checks that nothing private travels."* | A second write path makes every check advisory. |
-| **Mechanical checks refuse** at the door | **ACCEPTED** — exists | A statement is refused if it carries a token that looks like an identifier — one containing a separator, or a long opaque run. It is also refused for a six-word run copied from the source. *"An address, a path or a secret is one word, and one word is enough to leak."* *"The rewrite IS the privacy boundary."* | The only guarantee that does not depend on somebody's judgement. |
+| The crossing has **one door** | **ACCEPTED** — v3 built it, v4 has not | v3 refuses direct writes into the shared pool and sends everything through the mint. *"The mint is what checks that nothing private travels."* v4 holds one guard at the door, `copyOfAPrivateOriginal`, and no mint. | A second write path makes every check advisory. |
+| **Mechanical checks refuse** at the door | **ACCEPTED** — one of them is built | v4 refuses a write that carries a whole private original, matched by content hash. The identifier-shaped token and the six-word copied run are v3 rules and are **RULED, NEVER BUILT** here. Paraphrase is not the target: what must not cross is a date, a username, a personal name, or a passage nobody cleaned up. | The only guarantee that does not depend on somebody's judgement. |
 | **Judgement may add refusals, never override them** | **ACCEPTED** | An LLM or a person may refuse what the mechanical checks let through. Neither may approve what the checks refused. A model approving a leak is a leak. A model refusing a safe line costs a rewrite. Same narrowing-only shape as the config chain. | The privacy boundary becomes probabilistic in the one direction where being wrong is unrecoverable. |
 | Refs are **root-relative** | **ACCEPTED** — exists | An absolute path carries the account name of whoever ran it, and work items land in version control. | Machine and user identity leak into committed artefacts. |
 | Privacy **tiers** (no-remote / private / shareable) | **NOT NEEDED** | Superseded by the two-sides-and-a-door model above. In v3 they were prose only — no classification, no redaction pass, no scanning — so nothing is lost by dropping them. | A classification scheme to maintain, on top of a boundary that already decides the question. |
@@ -310,6 +325,18 @@ things this level is actually about.
 | The **entry point does not count** | **ACCEPTED** | The README and the RUNME are the front door, not a choice a person makes between things. The rule is about what has to be chosen between. | Either the front door is hidden to satisfy a count, or the count is abandoned. |
 | The limit is a **question, not a quota** | **ACCEPTED** | Hitting six is a sign that two of the six are the same thing. Renaming to dodge the count is the failure mode. | A folder called `misc`, and the rule is satisfied while the pile is intact. |
 
+**Where a name is not ours to choose.** `AGENTS.md` is generated output and sits un-dotted
+at the root, against the rule above. It stays there because the harnesses look for that
+name in that place, and a name every tool already agrees on is worth more than the count.
+This is the shape of a real exception: the rule is right, something outside decides the
+name, and the exception is written down rather than left to read as a broken rule.
+
+**The count, measured 2026-09-01.** The root shows five entries a person chooses between:
+`AGENTS.md`, `_to_delete`, `doc`, `src` and `util`. The README and the RUNME scripts are
+the front door and do not count. Dotted names do not count. `_to_delete` is a holding pen
+and leaves when it is emptied. **The rule holds at the root, which is where it matters
+most.** Below the root it is asked less with every level of depth.
+
 ---
 
 ## 4f. One design system
@@ -365,6 +392,7 @@ the buttons elsewhere. That is the failure this section exists to prevent.
 | Trace checking is done by the **engine and scripts**, not by judgement | **ACCEPTED** | Mechanical, repeatable, and cheap enough to run every time. | Coverage becomes an opinion. |
 | The **whole trace** is checked, always | **ACCEPTED** | Nothing is left open because it was made in another phase. | Omissions hide in the seams between phases, which is exactly where they collect. |
 | **Delta applies to content review only** | **ACCEPTED** | Content review over an ever-growing whole eventually means reading shallowly. Coverage runs over an index, not content, so it stays cheap while content review does not. | Either batch review stops scaling, or the check that finds omissions is scoped away. |
+| Mechanical trace coverage is **Level 3 work** | **ACCEPTED** | It needs a use case, a user story, and a graph joining both to the tests. Level 0 holds none of those concepts. Level 1 holds work tokens, which describe work rather than requirements. Until then the map is kept by hand, and it says where it stops. | Either the concepts are forced into a level that cannot carry them, or the debt is forgotten and the first real trace check is built with nothing telling it what it owes. |
 
 ## 8. Stale prose in v3 — a standing warning
 

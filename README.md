@@ -31,7 +31,7 @@ See `doc/cross-cutting/cross-cutting-design.md`.
 evidence, the record, ephemeral work, and `scratchpad/` for anything throwaway.
 
 `doc/coverage.md` maps every story and every case to the test that proves it.
-`doc/open.md` names what no test proves yet, and why.
+What is not done yet is work, so it is a token. Ask the engine.
 
 ## Which folder do I open
 

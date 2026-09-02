@@ -54,6 +54,10 @@ type Level struct {
 type Count struct {
 	Name   string
 	Filter *Expr
+	// WHAT THE COUNT IS OUT OF. The person reads a bare number as a fraction
+	// with a missing half: two in work, out of how much that could be? The
+	// second filter names the whole, and the bar draws n over it.
+	OutOf *Expr
 }
 
 type Sort struct {
@@ -227,7 +231,15 @@ func readView(m map[string]any) (View, error) {
 		if err != nil {
 			return v, fmt.Errorf("count %q: %w", ystr(c["name"]), err)
 		}
-		v.Counts = append(v.Counts, Count{Name: ystr(c["name"]), Filter: e})
+		count := Count{Name: ystr(c["name"]), Filter: e}
+		if of := ystr(c["outOf"]); of != "" {
+			whole, err := Parse(of)
+			if err != nil {
+				return v, fmt.Errorf("count %q outOf: %w", count.Name, err)
+			}
+			count.OutOf = whole
+		}
+		v.Counts = append(v.Counts, count)
 	}
 	for _, raw := range ylist(m["groups"]) {
 		p := ymap(raw)
@@ -394,10 +406,25 @@ type Group struct {
 	Groups []Group `json:"groups,omitempty"`
 }
 
-// A count, answered. Name and number, because that is all a bar has room for.
+// A count, answered. Name, number, and the tokens behind it.
+//
+// THE MEMBERS TRAVEL WITH THE NUMBER because the bar opens onto them. A page
+// that took the number here and went looking for the members itself would hold
+// two answers to one question, and they disagree the moment a filter moves.
 type Tally struct {
-	Name string `json:"name"`
-	N    int    `json:"n"`
+	Name string    `json:"name"`
+	N    int       `json:"n"`
+	// The whole this number is a part of, where the view declared one, so the
+	// bar reads 2/21 rather than a 2 with a missing half.
+	OutOf int       `json:"out_of,omitempty"`
+	Of    []TallyOf `json:"of,omitempty"`
+}
+
+// One token behind a count. Its id, so the page can open it, and its title,
+// so the page can name it without going back to the table.
+type TallyOf struct {
+	ID    string `json:"id"`
+	Title string `json:"title"`
 }
 
 // WHAT COLUMNS EXIST, AND WHAT TYPE EACH ONE IS.
@@ -519,18 +546,35 @@ func Render(b Base, v View, rows []Row) (Table, error) {
 	// Counted over what the view selects, and not over the ledger. A number
 	// that answers a different question from the table under it is worse than
 	// no number.
+	//
+	// AND IT CARRIES WHAT IT COUNTED. The bar opens onto the tokens behind a
+	// number, so the number and the list are one answer taken in one pass. Two
+	// passes, or a page finding the members for itself, is two answers to one
+	// question that disagree the moment a filter moves.
 	for _, c := range v.Counts {
-		n := 0
+		tally := Tally{Name: c.Name}
 		for _, r := range kept {
 			ok, err := truthy(c.Filter, r)
 			if err != nil {
 				return t, err
 			}
 			if ok {
-				n++
+				tally.N++
+				tally.Of = append(tally.Of, TallyOf{ID: r["id"].Text(), Title: r["title"].Text()})
+			}
+			// THE WHOLE IS COUNTED OVER THE SAME ROWS AS THE PART, so the two
+			// halves of the fraction cannot answer different questions.
+			if c.OutOf != nil {
+				whole, err := truthy(c.OutOf, r)
+				if err != nil {
+					return t, err
+				}
+				if whole {
+					tally.OutOf++
+				}
 			}
 		}
-		t.Counts = append(t.Counts, Tally{Name: c.Name, N: n})
+		t.Counts = append(t.Counts, tally)
 	}
 
 	// A GROUP TAKES ITS ROWS OUT OF WHAT IS LEFT, in order, so the page is a
@@ -720,12 +764,31 @@ func nest(t *Table) {
 	}
 	for i := range t.Pinned {
 		t.Pinned[i].Lines = keep(t.Pinned[i].Lines)
-		t.Pinned[i].Count = len(t.Pinned[i].Lines)
+		t.Pinned[i].Count = rowsDrawn(t.Pinned[i].Lines)
 	}
 	for i := range t.Groups {
 		t.Groups[i].Lines = keep(t.Groups[i].Lines)
-		t.Groups[i].Count = len(t.Groups[i].Lines)
+		t.Groups[i].Count = rowsDrawn(t.Groups[i].Lines)
 	}
+}
+
+// EVERY LINE IN THE SUBTREE, BECAUSE A NESTED CHILD IS A ROW A PERSON CAN SEE.
+//
+// This was len(Lines), taken after nesting had dropped every child whose parent
+// is on the same page, so the count answered the TOP LEVEL where Total answers
+// the TOKENS. The two agreed until somebody minted a sub-token of an open
+// parent, and then the sentence on the rule, that the buckets below add to this
+// number, stopped being true with nothing saying so.
+//
+// THE TOTAL IS THE ONE THAT WAS RIGHT. It is the number the page uses to say how
+// many tokens there are, and a number that hides work is worse than one that has
+// to walk a subtree.
+func rowsDrawn(ls []Line) int {
+	n := 0
+	for _, l := range ls {
+		n += 1 + rowsDrawn(l.Under)
+	}
+	return n
 }
 
 func pinnedByName(pins []Pin, name string) bool {

@@ -153,6 +153,18 @@ export function configArgs(method: string): string[] {
   return ["--config", "--method", method];
 }
 
+// THE BURN DOWN, for the work editor's bar. The day is the engine's own word
+// for today, so the caller does not compute one and get the timezone wrong.
+export function burndownArgs(day = "today"): string[] {
+  return ["--burndown", day];
+}
+
+// WHAT EACH ACTOR IS DOING, for the panel header. It is read off the record by
+// the engine, so the panel draws a fact rather than something an agent said.
+export function doingArgs(): string[] {
+  return ["--doing"];
+}
+
 // The kind of vehicle is the person's, chosen from a list the engine answered.
 export function initArgs(kind: string): string[] {
   return ["--init", kind];

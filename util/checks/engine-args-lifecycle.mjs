@@ -85,6 +85,11 @@ ask("project", A.projectArgs());
 ask("copies", A.copiesArgs(root));
 ask("attach", A.attachArgs(root));
 ask("config", A.configArgs(root));
+// WHAT EACH ACTOR IS DOING, which the panel header draws. It takes no argument
+// of its own, so the only thing to drive is that the engine reads the flag.
+ask("doing", A.doingArgs());
+// The burn down for the work editor bar. today is the engine's own word for it.
+ask("burndown", A.burndownArgs());
 // --init takes a kind the engine named, so the kind here is one of the engine's.
 ask("init", A.initArgs("vehicle"));
 // A cell a person edited, or a field the panel set. The token id is one the

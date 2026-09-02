@@ -56,6 +56,7 @@ func runWork(args []string) {
 	of := fs.String("of", "", "with duplicate: the token it says the same as")
 	abort := fs.String("abort", "", "instead of minting: end a token from wherever it stands, by id")
 	putDown := fs.String("put-down", "", "instead of minting: set a token you are holding back where it was, by id")
+	on := fs.String("on", "", "instead of minting: say which token you are working on, by id. It goes in work and whatever else you held goes back")
 	why := fs.String("why", "", "with abort: why it is ending. An abort with no reason is refused")
 	bucket := fs.String("bucket", "", "with set: file it under this grouping. Empty clears it")
 	file := fs.String("file", "", "instead of minting: file these ids in one bucket, comma separated")
@@ -76,6 +77,22 @@ func runWork(args []string) {
 	// not.
 	if *putDown != "" {
 		t, err := PutDown(roots, *putDown, or2(*by, "main"))
+		if err != nil {
+			answerJSON(map[string]any{"error": err.Error()})
+			os.Exit(1)
+		}
+		answerJSON(t)
+		return
+	}
+
+	// NAMING A TOKEN IS WHAT OPENS IT. The agent never opens one as a separate
+	// act: it says which token the writing belongs to, and that token goes in
+	// work while everything else that agent held goes back to open.
+	//
+	// SO THE PERSON SEES WHAT IS BEING DONE without the agent remembering to say
+	// so, and one agent holds one token.
+	if *on != "" {
+		t, err := WorkOn(roots, *on, or2(*by, "main"))
 		if err != nil {
 			answerJSON(map[string]any{"error": err.Error()})
 			os.Exit(1)

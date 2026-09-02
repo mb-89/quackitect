@@ -8,6 +8,12 @@
 # heading that comes and goes is a heading nobody can aim at. A group nobody
 # declared comes from the data, and one of those is gone the moment it empties.
 #
+# A DECLARED GROUP IS A QUERY AND NOT A PLACE. A row draws under every group
+# whose filter takes it, and under its bucket as well. So a state needs a group
+# NAMED FOR IT or the page never says which state the row is in: here says yes
+# to four states at once, and a token whose only group was here was one the
+# owner could not tell from three other kinds of work.
+#
 # A PIN IS AN ORDERING AND NOT AN EXISTENCE. It names a declared group and puts
 # it on top, so unpinning leaves the group where the grouping puts it.
 #
@@ -15,9 +21,11 @@
 # on declaring nothing about it. So unpinning takes the whole entry away, and a
 # bucket somebody invented goes back to disappearing when it empties.
 #
-# The declared groups take their rows first, in order, so the page is a
-# partition and no row appears twice. What is left is grouped by the bucket,
-# which is the only kind of group a person invents.
+# EVERY STATE A WORKER IS HANDED OR HOLDS HAS A GROUP OF ITS OWN, and
+# src/engine/workview_test.go is what holds that: it asks the engine for those
+# states, renders this file, and requires each one to draw under a group of its
+# own name. imp_open and imp_in_work were missing, so the owner read a token in
+# work as work in no state at all.
 #
 # HERE IS EVERYTHING AT THE CURRENT STATE, and there are no states above the
 # token yet, so here is everything that is open or in work. It carries in_work
@@ -57,8 +65,21 @@ groups:
   # anticipated shows up here rather than disappearing.
   - name: yours
     filter: assignee == "human" && status != "backlogged" && status != "spec_submitted" && status != "spec_in_review" && status != "imp_submitted" && status != "imp_in_review"
+  # HERE IS FOUR STATES AND IT USED TO BE TWO. The engine's states are two
+  # halves with the same four verbs, so somebody who has learned one half has
+  # learned the other, and this filter named the second half only. Fourteen
+  # drafts sat below the rule with nothing on the page saying they were work in
+  # flight. It was written when one agent drafted at a time and nothing noticed.
+  #
+  # THE FOUR ARE HandedOut(worker) AND HeldBy(worker), which is where
+  # src/engine/arrival.go declares which states a worker is handed and which it
+  # holds. A .base file cannot ask the engine for a set, so the names are typed
+  # here and src/engine/here_test.go is what holds them: it reads those two
+  # functions and requires this filter to answer yes to every state they name
+  # and no to every state somebody else holds. A twelfth state joining either
+  # one goes red there rather than going quiet here.
   - name: here
-    filter: status == "imp_open" || status == "imp_in_work"
+    filter: status == "imp_open" || status == "imp_in_work" || status == "spec_open" || status == "spec_in_work"
   - name: backlogged
     filter: status == "backlogged"
   - name: spec_open
@@ -69,6 +90,10 @@ groups:
     filter: status == "spec_submitted"
   - name: spec_in_review
     filter: status == "spec_in_review"
+  - name: imp_open
+    filter: status == "imp_open"
+  - name: imp_in_work
+    filter: status == "imp_in_work"
   - name: imp_submitted
     filter: status == "imp_submitted"
   - name: imp_in_review
@@ -80,15 +105,22 @@ pinned:
 views:
   - type: table
     name: left
+    counts:
+      - name: in work
+        filter: status == "imp_in_work" || status == "spec_in_work"
+        outOf: status == "imp_in_work" || status == "spec_in_work" || status == "imp_open" || status == "spec_open"
+      - name: in review
+        filter: status == "imp_in_review" || status == "spec_in_review"
+        outOf: status == "imp_in_review" || status == "spec_in_review" || status == "imp_submitted" || status == "spec_submitted"
     order:
       - title
       - status
       - assignee
-      - blocked
     columnSize:
       title: 300
       status: 110
       assignee: 71
+      blocked: 543
     groupBy:
       - property: bucket
         sets: bucket
@@ -100,6 +132,13 @@ views:
         direction: DESC
   - type: table
     name: right
+    counts:
+      - name: in work
+        filter: status == "imp_in_work" || status == "spec_in_work"
+        outOf: status == "imp_in_work" || status == "spec_in_work" || status == "imp_open" || status == "spec_open"
+      - name: in review
+        filter: status == "imp_in_review" || status == "spec_in_review"
+        outOf: status == "imp_in_review" || status == "spec_in_review" || status == "imp_submitted" || status == "spec_submitted"
     order:
       - title
       - status

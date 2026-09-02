@@ -6,7 +6,16 @@ proves it.** A case with no test is named as such, with the reason.
 | | |
 |---|---|
 | Date | 2026-08-30 |
+| Covers | Level 0, the first-build set |
 | Run | `RUNME --selftest`, and `go test ./...` in each source folder |
+
+**This map stops at Level 0.** Level 1 is built and it is tested, and its work is carried
+by the tokens under `doc/work/` rather than by a row here. Say so plainly, because a reader
+who finds a coverage map reads it as the whole picture.
+
+A map like this one is kept by hand. The mechanical version needs a use case, a user story,
+and a graph joining both to the tests, and those arrive at Level 3. See trace coverage in
+`cross-cutting/cross-cutting-design.md`.
 
 ## The stories
 

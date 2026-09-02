@@ -8,26 +8,11 @@ assignee: main
 scope: single-step
 traced: true
 disposition: dropped
-reason: THIS ABORT WAS WRONG, and it is left standing because an ending is not written over. It said the remedy landed because TestAFilterReadsBackAsWhatWasBuilt drives the round trip, and that test only ever feeds the reader what the writer produced, so it cannot fail for the defect this token was about. Two of the three remedies landed. The third, that reCompare refuses a value that is not a single literal, was never done, and a person editing a filter by hand still meets the corruption. It is carried by wk-5bec911840, which a reviewer sent back for exactly that. The lesson is wk-644aae4ac6.
+reason: "Dropped as landed, wrongly, since reCompare refusing a compound value was never done and is now carried by wk-5bec911840, lesson wk-644aae4ac6."
 aborted_from: backlogged
 minted_by: reviewer4
 ---
 
 ## detail
 
-A writer and a reader of one file that do not agree, with a safety net the writer's own output slips through. The filter builder compiles a person's groups into one string: rows inside a group joined with || inside parentheses, groups joined with && (filterbuild.go:96-115), and SetFilter writes the lot as one list item. FromExpression reads a list item back with reCompare (filterbuild.go:123), whose value group is anchored to the end of the string.
-
-TWO SHAPES THE BUILDER PRODUCES AND THE READER CANNOT READ, both reproduced end to end against a lab tree.
-
-Two groups. status == "open" && assignee == "main" is written correctly and the pane answers 12 rows. Read back, reCompare matches it as ONE comparison whose value is open" && assignee == "main. The page redraws its builder from that and one touch sends it back: the file becomes status == "open\" && assignee == \"main" and the pane answers 0 rows. Adding a second filter group empties the table on the next visit.
-
-One group, two rows. (status == "open" || status == "in_work") is written correctly and answers 13 rows. Read back it is raw, so the person's two rows become an uneditable block the builder will not draw.
-
-THE REMEDY IS PROVED for the first: written as two list items the same filter answers the same 12 rows and round-trips exactly, because the list is already ANDed. For the second the parentheses have to be understood or the or: map used, which the reader already handles.
-
-AND THE NET HAS TO CATCH THE REST: make reCompare refuse a value that is not a single literal, so a compound falls to Raw instead of being misread.
-
-THE CHECK, RED TODAY: compile every shape the builder can produce, write it, read it back, and require the same groups and rows.
-
-Found on wk-5bec911840.
-
+The filter builder writes a person's groups as one string in filterbuild.go:96-115. FromExpression reads a list item back with reCompare at filterbuild.go:123, whose value group is anchored to the end. Two groups joined with && are read back as one comparison and one touch corrupts the file to 0 rows. One group of two rows in parentheses reads back as raw and becomes an uneditable block. Write each ANDed group as its own list item, and read parentheses or use the or: map for a group with two rows. Make reCompare refuse a value that is not a single literal, so a compound falls to Raw. Check: compile every shape the builder can produce, write it, read it back, and require the same groups and rows. Related: wk-5bec911840.
