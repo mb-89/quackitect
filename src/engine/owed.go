@@ -6,7 +6,6 @@ import (
 	"os"
 	"regexp"
 	"strings"
-	"time"
 )
 
 // AN ANSWER THAT IS OWED, BY THE AGENT IT WAS SAID TO.
@@ -81,62 +80,12 @@ func TheyWereAnswered(r Roots, actor string) error {
 // memory, no parent, and not even a start time. Creating a file exclusively is
 // the one thing the filesystem promises only one of them can do.
 func changeOwed(r Roots, change func(Owed)) error {
-	unlock, err := lockOwed(r)
-	if err != nil {
-		return err
-	}
-	defer unlock()
-	o := loadOwed(r)
-	change(o)
-	return writeOwed(r, o)
+	return locked(owedPath(r), func() error {
+		o := loadOwed(r)
+		change(o)
+		return writeOwed(r, o)
+	})
 }
-
-// A LOCK NOBODY CAN RELEASE IS WORSE THAN A LOST WRITE. A process that dies
-// holding it would block every agent for good, so a lock that is older than
-// the time any of these writes can take is taken from whoever left it.
-func lockOwed(r Roots) (func(), error) {
-	path := owedPath(r) + ".lock"
-	if err := os.MkdirAll(r.Private(), 0o755); err != nil {
-		return nil, err
-	}
-	for tries := 0; ; tries++ {
-		f, err := os.OpenFile(path, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0o644)
-		if err == nil {
-			f.Close()
-			return func() { os.Remove(path) }, nil
-		}
-		if st, err := os.Stat(path); err == nil && time.Since(st.ModTime()) > lockIsStale {
-			os.Remove(path)
-			continue
-		}
-		if tries > lockTries {
-			// The write matters more than the lock. Going ahead can lose a
-			// write, and refusing loses one for certain.
-			return func() {}, nil
-		}
-		time.Sleep(lockWait)
-	}
-}
-
-// How long a lock is waited for, and when one is taken from whoever left it.
-// These are this file's to decide: the write they guard is a few hundred bytes
-// of JSON, so any holder that has not finished in a second has died.
-//
-// THE WAITER HAS TO OUTLAST THE STALENESS. It did not: a waiter gave up after
-// one second and a lock went stale after five, so no waiter ever lived long
-// enough to steal one. Every one of them went ahead without the lock instead,
-// which is the unsynchronised write the lock exists to stop, and it did that
-// for the whole five seconds after a process died holding it.
-//
-// SO STEALING IS WHAT RESOLVES A DEAD LOCK and going ahead is the last resort.
-// A second is long enough that a live holder is never robbed, and the budget
-// is three times that, so a waiter always sees the steal first.
-// TestTheWaiterOutlastsTheStaleness holds these three to that.
-const (
-	lockWait    = 2 * time.Millisecond
-	lockTries   = 1500
-	lockIsStale = 1 * time.Second
-)
 
 // AnswerOwed answers everything this agent was told and whether it still owes.
 // One answer settles the lot, because a person waiting on two questions is

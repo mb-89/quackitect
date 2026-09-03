@@ -32,6 +32,8 @@ would say so.
 8. Change files with `se_apply`, naming the token on every write. *
 9. Run every shell command with `se_run`, naming the token. It could write. *
 10. A helper script goes in `.se/scratchpad/`. A standing check goes in `util/checks/`. *
+11. Spend your thinking where a mistake is dear to undo. Where it is cheap, decide and move. *
+12. Compared two things thrice and still cannot pick? Either will do, or the answer is a third thing. *
 
 # Voice
 
@@ -39,7 +41,7 @@ would say so.
 
 1. One sentence, one idea. At most 25 words, preferably shorter. End lines on sentence ends. Avoid endlines within sentences.
 2. One paragraph, one idea. At most 6 sentences. One newline between paragraphs.
-3. Render enumerations and key:value pairs as lists, not as chained sentences.
+3. Three or more parallel things are a list, each with its status, in a chat answer as in a file. *
 4. BLUF: bottom line upfront, progressive disclosure: details come later, at the discretion of the reader.
 5. Active voice. Name who acts. Present tense for everything except discussions. Past tense is allowed there.
 6. Stakeholder-specific communication: do not leak internals, write what is relevant to the audience. For details, see [[doc/guidance/stakeholders]].
@@ -51,6 +53,7 @@ would say so.
 12. DRY: do not repeat yourself. SPOT: single point of truth for every datum.
 13. Private data: names, datetimes and unfiltered notes. They do not go into git.
 14. Do not put history in the current surface. It goes into git commit messages.
+15. A number about the tree is the command that answers it, never the answer. *
 
 # Work token
 
@@ -73,5 +76,5 @@ would say so.
 10. Write the check before the work. Watch it go red for the reason you expect.
 11. A check that will not go red is the finding. Write it down and stop.
 12. Put both halves of a mechanism in the evidence. "Nothing yet, owed by X" is an answer.
-13. Report work as done only with the evidence that it is.
+13. Report work as done only with the evidence that it is. The change itself is `git diff began..ended`, never a list of files. *
 14. A checklist carries institutional knowledge. Answer each line rather than ticking it. *

@@ -159,6 +159,12 @@ func (p *yparser) sequence(indent int) (any, error) {
 		}
 		p.at++
 		if item == "" {
+			// A BARE DASH ON THE LAST LINE OPENS A BLOCK THAT IS NOT THERE.
+			// Reading the next line's indent indexed past the end, and a
+			// file ending in "-" took the program down rather than answering.
+			if p.at >= len(p.lines) {
+				return nil, fmt.Errorf("line %d: this list item opens a block and the file ends", l.no)
+			}
 			v, err := p.block(p.lines[p.at].indent)
 			if err != nil {
 				return nil, err

@@ -25,6 +25,8 @@ For what the engine offers, run `se --help`.
 8. Change files with `se_apply`, naming the token on every write. *
 9. Run every shell command with `se_run`, naming the token. It could write. *
 10. A helper script goes in `.se/scratchpad/`. A standing check goes in `util/checks/`. *
+11. Spend your thinking where a mistake is dear to undo. Where it is cheap, decide and move. *
+12. Compared two things thrice and still cannot pick? Either will do, or the answer is a third thing. *
 
 # Discussion
 
@@ -86,8 +88,8 @@ refuses a repeat.
 ## 7. The tool it found, not the one you know
 
 The engine probes the machine and hands you what is there.
-Measured warm, three runs: `grep -rnI LoadConfig src` about 260 ms, `rg -n
-LoadConfig src` about 40 ms.
+Measured on this machine, `rg` answers a search several times faster than
+`grep -r`, and it is what the probe hands over when it is here.
 The `.rgignore` un-ignores `.se/`, so a search reaches the log and the
 scratchpad without a flag.
 
@@ -118,8 +120,32 @@ Every command names its work because it could write, the same way every edit
 does, and the record says which token each one ran under.
 
 Output and errors come back as one stream with the exit code.
-A long output is cut at the front, and the cut is reported, because a failure
-says why on its last lines.
+A long output is kept whole and answered a window at a time, so nothing is
+lost: the answer carries how long the whole thing is and the page to ask for
+the rest by.
+Ask from the end with a negative offset, which is usually where a failure says
+why.
+
+## 11. Weigh the cost of being wrong, not the cost of deciding
+
+Deleting one test file was escalated to the person. A system-wide install on
+their machine was decided in a single line, and so was a rule that deleted
+twenty-two test files, two of which were wanted.
+
+The deliberation went where the rules said to be careful and was skipped where
+nothing had said anything. So the question is not how big the change looks. It
+is what it costs to put back: a commit is cheap, a file the tree has never held
+is cheap, and anything that touches the machine, the record, or somebody else's
+work is not.
+
+## 12. Two comparisons is enough
+
+Laying out A against B and then taking neither happened a dozen times in one
+day. Where it went four rounds, the options were not far apart.
+
+If two answers have survived two honest comparisons, the difference is not what
+is blocking you. Pick one and say why, or stop comparing and ask what neither of
+them is.
 
 ## 10. Where a script lives
 

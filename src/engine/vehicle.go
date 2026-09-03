@@ -46,10 +46,7 @@ func CopyID(methodRoot string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
-		return "", err
-	}
-	return got.ID, os.WriteFile(path, append(b, '\n'), 0o644)
+	return got.ID, writeAtomic(path, append(b, '\n'), 0o644)
 }
 
 // A project says which copy drives it. The file is the marker that a folder
@@ -82,10 +79,7 @@ func Attach(roots Roots) (Driven, error) {
 	if err != nil {
 		return p, err
 	}
-	if err := os.MkdirAll(filepath.Dir(projectPath(roots)), 0o755); err != nil {
-		return p, err
-	}
-	return p, os.WriteFile(projectPath(roots), append(b, '\n'), 0o644)
+	return p, writeAtomic(projectPath(roots), append(b, '\n'), 0o644)
 }
 
 // Detach forgets which copy drives this folder, so the next start asks again.
@@ -267,11 +261,7 @@ func RegisterCopy(methodRoot, version string) (string, error) {
 			last = err
 			continue
 		}
-		if err := os.MkdirAll(dir, 0o755); err != nil {
-			last = err
-			continue
-		}
-		if err := os.WriteFile(path, append(b, '\n'), 0o644); err != nil {
+		if err := writeAtomic(path, append(b, '\n'), 0o644); err != nil {
 			last = err
 			continue
 		}

@@ -263,7 +263,10 @@ func (s *server) handle(m rpcMessage) bool {
 func (s *server) diagnose(uri string) {
 	text := s.docs[uri]
 	kind := kindOf(text)
-	if kind == "" {
+	// A PARKED NOTE IS LEFT ALONE, the way the lint and the projection leave
+	// it. Parking is how a file is taken out of the engine's way, and a red
+	// mark on a parked draft is the engine reading what it was told not to.
+	if kind == "" || parkedPath(uri) {
 		s.publish(uri, []diagnostic{})
 		return
 	}
@@ -389,12 +392,12 @@ func notesUnder(root string) ([]string, error) {
 			return nil
 		}
 		if info.IsDir() {
-			if skip[info.Name()] {
+			if skip[info.Name()] || Parked(info.Name()) {
 				return filepath.SkipDir
 			}
 			return nil
 		}
-		if !strings.HasSuffix(info.Name(), ".md") {
+		if !strings.HasSuffix(info.Name(), ".md") || Parked(info.Name()) {
 			return nil
 		}
 		b, err := os.ReadFile(path)
@@ -404,6 +407,17 @@ func notesUnder(root string) ([]string, error) {
 		return nil
 	})
 	return out, err
+}
+
+// parkedPath says whether any folder or the file itself on a path or uri is
+// parked, so a note under a parked folder is parked with it.
+func parkedPath(p string) bool {
+	for _, part := range strings.Split(strings.ReplaceAll(p, "\\", "/"), "/") {
+		if Parked(part) {
+			return true
+		}
+	}
+	return false
 }
 
 // pathToURI spells a path the way the editor spells it, so a note marked by

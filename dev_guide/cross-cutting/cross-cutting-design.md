@@ -331,11 +331,7 @@ name in that place, and a name every tool already agrees on is worth more than t
 This is the shape of a real exception: the rule is right, something outside decides the
 name, and the exception is written down rather than left to read as a broken rule.
 
-**The count, measured 2026-09-01.** The root shows five entries a person chooses between:
-`AGENTS.md`, `_to_delete`, `doc`, `src` and `util`. The README and the RUNME scripts are
-the front door and do not count. Dotted names do not count. `_to_delete` is a holding pen
-and leaves when it is emptied. **The rule holds at the root, which is where it matters
-most.** Below the root it is asked less with every level of depth.
+**The count is asked of the tree, not written here.** `ls` at the root answers it, and the rule is read against that answer. The README and the RUNME scripts are the front door and do not count. Dotted names do not count. A holding pen such as `_to_delete` leaves when it is emptied. The rule holds at the root, which is where it matters most. Below the root it is asked less with every level of depth.
 
 ---
 

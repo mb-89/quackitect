@@ -3,6 +3,82 @@ package main
 import (
 	"os"
 	"path/filepath"
+	"time"
+)
+
+// A READ, A CHANGE AND A WRITE ARE ONE OPERATION, OR THE CHANGE IS LOST.
+//
+// Every store under .se was read whole, changed in one place, and written
+// back whole. The guard is a fresh process on every tool call of every agent,
+// so the gap between the read and the write is not a rare event: two agents
+// overlapping lost one of the two changes every time. The owed store got a
+// lock for it, and the other stores kept the gap, so an arrival, a call, a
+// claim and a read could each vanish the same way.
+//
+// A LOCK FILE IS WHAT TWO PROCESSES CAN AGREE ON. They share nothing else: no
+// memory, no parent, and not even a start time. Creating a file exclusively is
+// the one thing the filesystem promises only one of them can do.
+//
+// locked runs change while holding the lock beside path. Whatever change
+// reads and writes under that path is then read and written by one process
+// at a time.
+func locked(path string, change func() error) error {
+	unlock, err := lockFile(path)
+	if err != nil {
+		return err
+	}
+	defer unlock()
+	return change()
+}
+
+// A LOCK NOBODY CAN RELEASE IS WORSE THAN A LOST WRITE. A process that dies
+// holding it would block every agent for good, so a lock that is older than
+// the time any of these writes can take is taken from whoever left it.
+func lockFile(path string) (func(), error) {
+	lock := path + ".lock"
+	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+		return nil, err
+	}
+	for tries := 0; ; tries++ {
+		f, err := os.OpenFile(lock, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0o644)
+		if err == nil {
+			f.Close()
+			return func() { os.Remove(lock) }, nil
+		}
+		if st, err := os.Stat(lock); err == nil && time.Since(st.ModTime()) > lockIsStale {
+			os.Remove(lock)
+			continue
+		}
+		if tries > lockTries {
+			// The write matters more than the lock. Going ahead can lose a
+			// write, and refusing loses one for certain.
+			return func() {}, nil
+		}
+		time.Sleep(lockWait)
+	}
+}
+
+// How long a lock is waited for, and when one is taken from whoever left it.
+// These are this file's to decide: the write they guard is a few hundred bytes
+// of JSON, so any holder that has not finished in a second has died.
+//
+// THE WAITER HAS TO OUTLAST THE STALENESS. It did not: a waiter gave up after
+// one second and a lock went stale after five, so no waiter ever lived long
+// enough to steal one. Every one of them went ahead without the lock instead,
+// which is the unsynchronised write the lock exists to stop, and it did that
+// for the whole five seconds after a process died holding it.
+//
+// SO STEALING IS WHAT RESOLVES A DEAD LOCK and going ahead is the last resort.
+// Ten seconds is long enough that a live holder is never robbed, even under
+// the battery's load with a scanner on every temporary file: a second was
+// not, and a holder robbed mid-write is two writers on one file, which lost
+// eleven counts in fifty. The budget is three times that, so a waiter always
+// sees the steal first. TestTheWaiterOutlastsTheStaleness holds these three
+// to that.
+const (
+	lockWait    = 2 * time.Millisecond
+	lockTries   = 15000
+	lockIsStale = 10 * time.Second
 )
 
 // EVERY WRITE IS ATOMIC, SO A CRASH LEAVES THE OLD FILE RATHER THAN HALF A NEW ONE.
@@ -52,9 +128,23 @@ func writeAtomic(path string, b []byte, mode os.FileMode) error {
 		os.Remove(name)
 		return err
 	}
-	if err := os.Rename(name, path); err != nil {
-		os.Remove(name)
-		return err
+	// THE RENAME IS TRIED AGAIN ON A REFUSAL. Windows refuses to replace a
+	// file that something has open, and a virus scanner or an indexer opens
+	// a freshly written file for a moment. Under the battery's load one
+	// write in fifty met that moment and answered access denied. A few short
+	// waits ride it out, and a refusal that outlasts them is answered.
+	for try := 0; try < renameTries; try++ {
+		if err = os.Rename(name, path); err == nil {
+			return nil
+		}
+		time.Sleep(renameWait)
 	}
-	return nil
+	os.Remove(name)
+	return err
 }
+
+// How often a refused rename is tried again, and how long between tries.
+const (
+	renameTries = 20
+	renameWait  = 10 * time.Millisecond
+)

@@ -83,13 +83,15 @@ func SelfTest(roots Roots, keep bool) int {
 
 	// 6. The copy projects into the project, and not into itself.
 	//
-	// A copy carries an AGENTS.md, because the tree it was made from is a
-	// project as well as the method. So the file being there proves nothing.
-	// What is asked here is where this run WROTE, and Project says that.
+	// WHAT IS ASKED IS WHERE THIS RUN WROTE, and Project says that. The step
+	// named one file by hand, AGENTS.md, and that file stopped being a
+	// projection: the map in util/projections.json decides what is one, so
+	// the step read a decision it did not own and went red on a working tree.
+	// Every path Project answers is checked instead, and the map is not named.
 	written, err := Project(driven)
-	_, inProject := os.Stat(filepath.Join(project, "AGENTS.md"))
-	say("the copy writes into the project", err == nil && len(written) > 0 && inProject == nil,
-		fmt.Sprintf("%d files", len(written)))
+	allInProject, says := everythingUnder(written, project)
+	say("the copy writes into the project", err == nil && len(written) > 0 && allInProject,
+		fmt.Sprintf("%d files, %s", len(written), says))
 	apart, says := nothingUnder(written, copyRoot)
 	say("the copy does not write into itself", apart, says)
 
@@ -105,7 +107,15 @@ func SelfTest(roots Roots, keep bool) int {
 		filepath.Join(".se", "log", Current))
 
 	// 8. The guard in the copy refuses a write to the project's projection.
-	yes, instead := IsProjection(driven, filepath.Join(project, "AGENTS.md"))
+	// The projection asked about is one this run wrote, so the step follows
+	// the map wherever it goes.
+	yes, instead := false, "nothing was projected, so there is nothing to guard"
+	if len(written) > 0 {
+		yes, instead = IsProjection(driven, written[0])
+		if yes {
+			instead = filepath.Base(written[0]) + " is written from " + instead
+		}
+	}
 	say("the guard knows the project's projections", yes, instead)
 
 	// 9. And the two trees stay apart: nothing was written back here.
@@ -191,6 +201,18 @@ func runRunme(dir string, args ...string) (string, error) {
 
 // nothingUnder answers whether a projection landed inside a tree it had no
 // business writing to, and names the first one that did.
+// everythingUnder answers whether every written path lies under root, and
+// names the first one that does not.
+func everythingUnder(written []string, root string) (bool, string) {
+	for _, w := range written {
+		rel, err := filepath.Rel(root, w)
+		if err != nil || rel == ".." || strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
+			return false, w + " is outside " + root
+		}
+	}
+	return true, "all under " + root
+}
+
 func nothingUnder(written []string, root string) (bool, string) {
 	for _, w := range written {
 		rel, err := filepath.Rel(root, w)

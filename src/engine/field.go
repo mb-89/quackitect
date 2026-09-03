@@ -51,13 +51,13 @@ func writeField(t *Token, field, to, by string) error {
 				"Say what you mean about where the work stands, and the process moves it", by)
 		}
 		t.Bucket = to
-	case "kind", "id", "guidance":
+	case "kind", "id", "guidance", "began", "ended":
 		return fmt.Errorf("%s is the engine's, and it is not written by hand", field)
 	case "process":
 		return fmt.Errorf("a process is chosen at minting, and it decides the token's shape")
 	case "status", "holder":
 		return fmt.Errorf("%s is moved by a pull, not by a keystroke", field)
-	case "depends_on", "successors":
+	case "depends_on", "successors", "parent":
 		return fmt.Errorf("%s is a relation, and it is edited in the note", field)
 	default:
 		return fmt.Errorf("this program does not write %q", field)

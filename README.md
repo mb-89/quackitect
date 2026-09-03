@@ -1,6 +1,8 @@
 # quackitect v4
 
-Level 0. Nothing above it exists yet.
+An engine that records and guards an agent's session, and the work tokens the
+agent pulls. Everything that was planned around it, and may or may not have
+happened, is in `dev_guide/`.
 
 ## Install
 
@@ -18,20 +20,20 @@ it takes.
 
 ## What is here
 
-See `doc/cross-cutting/cross-cutting-design.md`.
-
 | Entry | What it is for |
 |---|---|
-| `doc/` | The design, as it was collected, the guidance the agent is told, and the work. Start with `user-stories.md`. Not specification. |
-| `src/` | Everything that is written. `engine`, `viewer`, `extension`. |
-| `util/` | Everything that is run rather than shipped. `setup` and `cage`. |
+| `doc/` | The guidance the agent is told. Start with `guidance/voice.md`. |
+| `src/` | Everything that is written. `engine`, `viewer`, `extension`, `mcp`, and the schemas and processes the engine reads. |
+| `util/` | Everything that is run rather than shipped. `setup`, `cage` and `checks`. |
+| `dev_guide/` | Design notes, plans and drafts. Not the product, and not kept current. |
 | `.bin/` | Built programs. Rebuilt from source, and not in version control. |
 
 `.se/` holds private material, and it never travels. Dated reports, measured
-evidence, the record, ephemeral work, and `scratchpad/` for anything throwaway.
+evidence, the record, the index, ephemeral work, and `scratchpad/` for anything
+throwaway.
 
-`doc/coverage.md` maps every story and every case to the test that proves it.
-What is not done yet is work, so it is a token. Ask the engine.
+`sh util/checks/battery.sh` runs every check, and says whether the tree is
+sound. What is not done yet is work, so it is a token. Ask the engine.
 
 ## Which folder do I open
 

@@ -30,6 +30,7 @@ This is craft guidance, read when changing code, and it is not part of the stand
 12. Keep every change small enough to review whole, and leave the tree green at each commit, cleanup included.
 13. One name per thing, the glossary's, in code and prose. A numbered or suffixed name is a name not yet found.
 14. Do the cleanup the change reveals in the same change. Refactoring is not a separate token unless it is large. *
+15. A test's engine, tree or database is a fixture: made once, shared, torn down once. Building one per test measures the linker. *
 
 # Discussion
 
@@ -97,3 +98,17 @@ The Google guide's rule for deviations: a change may not worsen an existing prob
 Deferred cleanup is the debt TigerBeetle refuses: a problem solved in design costs one unit, in production exponentially more.
 A change that reveals a duplicate, a dead branch or a missing type fixes it there.
 A cleanup too large for the change becomes a token, minted before the change closes.
+
+## 15. Fixtures
+
+The engine suite once built the engine thirty-five times, and the battery
+once fifteen, and each build was the same bytes.
+A build is a fixture: made once in TestMain or in the battery's first step,
+named to everything after it, and taken away once at the end.
+The same holds for a tree, a running engine, a database: a test that needs
+one starts from a helper that makes it, and the helper is the one place the
+making is written.
+A check that starts its own copy of what a fixture already holds is a check
+measuring the cost of starting, not the thing it was written for.
+The battery reports how long each check took, so a fixture that stopped being
+shared shows as a lane that grew.

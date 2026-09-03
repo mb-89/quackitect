@@ -141,4 +141,44 @@ func TestNothingParsesItsOwnFlags(t *testing.T) {
 
 const theDoor = "verbs.go"
 
-var parses = regexp.MustCompile(`\.Parse\(`)
+// A FLAG SET'S PARSE, AND NOT EVERY PARSE. The pattern matched any .Parse(
+// and so refused time.Parse, which parses no flags and drops nothing. A flag
+// set in this package is the package's own, flag, or a verb's, fs, and the
+// test below holds every flag set to the door, so a set under another name
+// cannot slip past the narrower pattern.
+var parses = regexp.MustCompile(`\b(flag|fs)\.Parse\(`)
+
+var makesFlagSet = regexp.MustCompile(`flag\.NewFlagSet\(`)
+var throughTheDoor = regexp.MustCompile(`\bparse\(fs,`)
+
+// EVERY FLAG SET GOES THROUGH THE DOOR. A file that makes one and does not
+// hand it to parse has a way of dropping what it was handed, whatever it
+// called the set.
+func TestEveryFlagSetGoesThroughTheDoor(t *testing.T) {
+	t.Parallel()
+	here, err := os.ReadDir(".")
+	if err != nil {
+		t.Fatal(err)
+	}
+	read := 0
+	for _, f := range here {
+		name := f.Name()
+		if !strings.HasSuffix(name, ".go") || strings.HasSuffix(name, "_test.go") || name == theDoor {
+			continue
+		}
+		b, err := os.ReadFile(name)
+		if err != nil {
+			t.Fatalf("%s cannot be read, so this guards nothing: %v", name, err)
+		}
+		read++
+		made := len(makesFlagSet.FindAll(b, -1))
+		parsed := len(throughTheDoor.FindAll(b, -1))
+		if made != parsed {
+			t.Errorf("%s makes %d flag set(s) and hands %d to parse(fs, ...), so one is parsed elsewhere or not at all",
+				name, made, parsed)
+		}
+	}
+	if read == 0 {
+		t.Fatal("no source was read")
+	}
+}

@@ -1,0 +1,84 @@
+# A change too clear to specify: the ask is the design, and the token is
+# worked and closed by whoever took it. No reviewer, no design step, no
+# second actor. What holds it honest is the checklist: the change is small
+# enough to review whole, a check went red and then green, and the tree is
+# sound.
+#
+# The activities are SIPOC rows, so the drawing is derived rather than drawn.
+
+name: trivial
+description: a fix or a small addition that needs no specification, worked and closed by its taker
+
+# A trivial token is not traced. It is the smallest unit of doing, and what
+# it did is in the record and the commit, not in a token that travels.
+traced: false
+
+sections:
+  required:
+    - detail
+    - done when
+  optional:
+    - proposed action
+    - "evidence: "
+
+fields:
+  optional:
+    - bucket
+    - holder
+    - needs_human
+    - depends_on
+    - parent
+    - ready_when
+    - began
+    - ended
+    - disposition
+    - reason
+    - successors
+
+states:
+  - name: open
+    description: written, and waiting to be taken
+  - name: closed
+    description: closed, and the disposition says how
+
+activities:
+  - name: ask
+    supplier: anyone
+    input: something to change, clear enough that the ask is the design
+    does: write what is asked and what done means, one criterion per line
+    output: a token
+    customer: the queue
+    by: anyone
+    to: open
+    criteria:
+      - says: the ask is small enough to review whole, or it is split first
+      - says: every done-when line is decidable, and names the command where one decides it
+        evidence: required
+      - says: the basics it stands on exist, or are minted first
+
+  - name: do
+    supplier: the queue
+    input: an open token
+    does: write one test, watch it go red, make the change, watch it go green
+    output: the change, in the tree, and the evidence on the token
+    customer: whoever asked
+    by: the agent that took it
+    from: open
+    to: closed
+    criteria:
+      - says: the guidance this token names was read and applied
+      - says: one test was written first and seen red for the reason expected
+        evidence: required
+      - says: the same test was seen green after the change, and named
+        evidence: required
+      - says: the change is git diff began..ended, the two hashes the engine wrote on this token
+      - says: the cleanup the change revealed is in the change, or is a token of its own
+
+dispositions:
+  - name: done
+    description: the change is in the tree and the checks say so
+  - name: became
+    description: it turned out larger, and the successors carry it
+  - name: dropped
+    description: it is not wanted after all
+    reason: required

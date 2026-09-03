@@ -68,4 +68,8 @@ func TestEveryChildProcessIsStartedQuietly(t *testing.T) {
 
 // The door is where the attribute is written on purpose, and the one file that
 // may set it.
-func isTheDoor(name string) bool { return name == "quiet_windows.go" }
+//
+// BOTH PLATFORM FILES ARE THE DOOR. Each holds the one call that differs, and
+// a detached start on Unix is a session attribute the way a quiet start on
+// Windows is a creation flag.
+func isTheDoor(name string) bool { return strings.HasPrefix(name, "quiet_") }

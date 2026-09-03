@@ -29,6 +29,16 @@ var sharedEngine string
 
 // TestMain builds the engine once, runs the suite, and takes the build away.
 func TestMain(m *testing.M) {
+	// AN ENGINE ALREADY BUILT IS USED AS IT IS. The battery builds one from
+	// this same tree a moment before it runs the suite, and names it in
+	// SE_ENGINE, so the suite is spared the link of a second one. A run by
+	// hand, with nothing named, builds its own the way it always did.
+	if given := os.Getenv("SE_ENGINE"); given != "" {
+		if _, err := os.Stat(given); err == nil {
+			sharedEngine = given
+			os.Exit(m.Run())
+		}
+	}
 	dir, err := os.MkdirTemp("", "se-engine")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "the engine fixture has nowhere to build: %v\n", err)

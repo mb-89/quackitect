@@ -6,7 +6,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"time"
 )
 
 // The stub finds its engine the way anything else does: through the register.
@@ -28,10 +27,36 @@ func findRoots() roots {
 	if m == "" {
 		m = fromRegister()
 	}
+	// THE STUB LIVES BESIDE ITS ENGINE. It is built into .bin under the method
+	// root, so where this program is answers which engine it belongs to, and
+	// that answer holds when the register names nothing usable. The register
+	// held eighty entries left by a check, each a folder with no engine in it,
+	// and the first of them was taken as the engine for every call.
+	if m == "" {
+		if exe, err := os.Executable(); err == nil {
+			own := filepath.Dir(filepath.Dir(exe))
+			if hasEngine(own) {
+				m = own
+			}
+		}
+	}
 	m, _ = filepath.Abs(m)
 	return roots{method: m, work: w}
 }
 
+// hasEngine says whether a method root has a built engine to ask.
+func hasEngine(methodRoot string) bool {
+	exe := filepath.Join(methodRoot, ".bin", "se")
+	if isWindows() {
+		exe += ".exe"
+	}
+	_, err := os.Stat(exe)
+	return err == nil
+}
+
+// fromRegister answers the first entry with an engine in it. An entry that no
+// longer resolves, or resolves to a folder with nothing built, is skipped:
+// a folder that exists is not an engine that answers.
 func fromRegister() string {
 	dirs := splitList(os.Getenv("SE_REGISTRY"))
 	if len(dirs) == 0 {
@@ -49,10 +74,7 @@ func fromRegister() string {
 			continue
 		}
 		for _, e := range entries {
-			if e.MethodRoot == "" {
-				continue
-			}
-			if _, err := os.Stat(e.MethodRoot); err == nil {
+			if e.MethodRoot != "" && hasEngine(e.MethodRoot) {
 				return e.MethodRoot
 			}
 		}
@@ -82,13 +104,9 @@ func status(r roots) string {
 	}
 
 	// The rules in force are the engine's answer, not this program's opinion.
-	if out, err := ask(r, "--config"); err == nil {
-		b.WriteString("\n")
-		b.WriteString(strings.TrimSpace(out))
-		b.WriteString("\n")
-	} else {
-		b.WriteString("\nthe engine could not be asked: " + err.Error() + "\n")
-	}
+	b.WriteString("\n")
+	b.WriteString(strings.TrimSpace(engineCall(r, []string{"config"}, nil)))
+	b.WriteString("\n")
 	return b.String()
 }
 
@@ -102,39 +120,19 @@ func or(s, fallback string) string {
 // said puts what the person said in the record, word for word. The engine owns
 // the format, so the stub asks it rather than writing the record itself.
 func said(r roots, msg string) error {
-	_, err := ask(r, "--said", msg)
-	return err
+	return recorded(engineCall(r, []string{"said", "--text", msg}, nil))
 }
 
 // answered puts the agent's answer in the record beside the prompt it answers.
 func answered(r roots, msg string) error {
-	_, err := ask(r, "--answer", msg)
-	return err
+	return recorded(engineCall(r, []string{"answer", "--text", msg}, nil))
 }
 
-func ask(r roots, args ...string) (string, error) {
-	exe := filepath.Join(r.method, ".bin", "se")
-	if isWindows() {
-		exe += ".exe"
+// recorded reads the record verbs' one-word answer, and anything else as
+// the reason it was not recorded.
+func recorded(said string) error {
+	if strings.Contains(said, "recorded") {
+		return nil
 	}
-	if _, err := os.Stat(exe); err != nil {
-		return "", fmt.Errorf("no engine at %s", exe)
-	}
-	full := append([]string{"--work", r.work, "--method", r.method}, args...)
-	out, err := runWithTimeout(exe, full, 10*time.Second)
-	return out, err
-}
-
-// askWithInput is ask with a payload. The engine is found the same way. The
-// arguments are passed exactly as given, because a subcommand has to be the
-// first of them.
-func askWithInput(r roots, args []string, in []byte, d time.Duration) (string, error) {
-	exe := filepath.Join(r.method, ".bin", "se")
-	if isWindows() {
-		exe += ".exe"
-	}
-	if _, err := os.Stat(exe); err != nil {
-		return "", fmt.Errorf("no engine at %s", exe)
-	}
-	return runWithInput(exe, args, in, d)
+	return fmt.Errorf("%s", strings.TrimSpace(said))
 }

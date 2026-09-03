@@ -23,12 +23,25 @@ type Manifest struct {
 		ID, Name, Version string
 	} `json:"product"`
 	Profiles map[string][]string `json:"profiles"`
-	Tools    map[string]struct {
-		Probe, Winget, Apt, Why string
-	} `json:"tools"`
+	Tools    map[string]Tool     `json:"tools"`
+	// CC names the tool that is the C compiler. Every build runs with it, so
+	// the engine's SQLite is built by the compiler this program put here and
+	// not by whichever one the machine has on PATH.
+	CC     string `json:"cc"`
 	Builds []struct {
 		Name, Source, Why string
 	} `json:"builds"`
+}
+
+// A Tool comes one of two ways. A package manager installs it and PATH says
+// whether it is here, or it is an archive this program fetches and pins.
+type Tool struct {
+	Probe, Winget, Apt, Why string
+	Archive                 *Archive `json:"archive"`
+	// Only names the one platform a tool is for, as Go spells it, and the
+	// other platforms skip it. The zig archive for Linux is tar.xz, and the
+	// tar there needs xz beside it, which Windows never does.
+	Only string `json:"only"`
 }
 
 // usage is what --help prints. The bootstrap scripts hand every flag through
@@ -87,8 +100,15 @@ func main() {
 			fail(err)
 		}
 	}
+	env, err := cgoEnvironment(m)
+	if err != nil {
+		fail(err)
+	}
+	if firstCgoBuild() {
+		say("  build    the first cgo build compiles the C runtime and SQLite, about three minutes, once")
+	}
 	for _, b := range m.Builds {
-		if err := build(b.Name, filepath.Join(*root, b.Source)); err != nil {
+		if err := build(b.Name, filepath.Join(*root, b.Source), env); err != nil {
 			fail(err)
 		}
 	}
@@ -194,6 +214,12 @@ func ensureTool(m *Manifest, name string) error {
 	if !ok {
 		return fmt.Errorf("the manifest names a tool it does not describe: %s", name)
 	}
+	if t.Only != "" && t.Only != runtime.GOOS {
+		return nil // a tool for another platform is not missing here
+	}
+	if t.Archive != nil {
+		return ensureArchive(name, t)
+	}
 	if _, err := exec.LookPath(t.Probe); err == nil {
 		say("  %-8s already here", name)
 		return nil
@@ -240,9 +266,32 @@ func installTool(winget, apt string) error {
 	return fmt.Errorf("no package manager here")
 }
 
+// cgoEnvironment answers the environment the builds run under, and writes
+// it where the battery and the engine read it. The compiler is the pinned
+// archive, so its path is known without asking PATH.
+func cgoEnvironment(m *Manifest) ([]string, error) {
+	t, ok := m.Tools[m.CC]
+	if !ok || t.Archive == nil {
+		return nil, fmt.Errorf("the manifest names %q as the C compiler and pins no archive for it", m.CC)
+	}
+	env := CgoEnv(archiveExe(m.CC, t.Archive))
+	if *dry {
+		say("  cgo      %s would be written", CgoEnvPath())
+		return env, nil
+	}
+	if err := writeCgoEnv(CgoEnvPath(), env); err != nil {
+		return nil, fmt.Errorf("could not write %s: %w", CgoEnvPath(), err)
+	}
+	say("  cgo      %s", CgoEnvPath())
+	return env, nil
+}
+
 // The built programs go in .bin, which is machinery: rebuilt from source and
 // out of version control.
-func build(name, source string) error {
+//
+// THE ENVIRONMENT IS SET ON THE PROCESS, never on this program or the shell
+// that ran it. The person's own go builds keep whatever compiler they chose.
+func build(name, source string, env []string) error {
 	out := filepath.Join(*root, ".bin", name)
 	if runtime.GOOS == "windows" {
 		out += ".exe"
@@ -260,6 +309,7 @@ func build(name, source string) error {
 	stamp := time.Now().UTC().Format("01-02-1504")
 	cmd := Quietly(exec.Command("go", "build", "-ldflags", "-s -w -X main.Build="+stamp, "-o", out, "."))
 	cmd.Dir = source
+	cmd.Env = append(os.Environ(), env...)
 	cmd.Stdout, cmd.Stderr = os.Stdout, os.Stderr
 	if err := cmd.Run(); err != nil {
 		return fmt.Errorf("building %s failed: %w", name, err)

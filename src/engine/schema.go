@@ -744,40 +744,74 @@ func firstWords(s string, n int) string {
 	return strings.Join(f[:n], " ") + " ..."
 }
 
-// LintNotes reads every note in a folder against the schema its kind names.
+// LintNotes reads every note under a folder against the schema its kind names.
 // A note naming no kind is a finding, not a skip.
+//
+// IT GOES ALL THE WAY DOWN, and it did not.
+//
+// MEASURED. It read one level and skipped every directory, so doc/guidance was
+// checked and doc/guidance/software-development was not. Three lane files and a
+// fourth in engine_design_principles had never been read by anything: the
+// schema they name applied to them exactly as much as to any other file, and
+// nothing had ever asked. A check that reads the top of a tree reports on the
+// tree, which is how a folder becomes the place unchecked things go.
+//
+// os.DirEntry AND filepath.SkipDir RATHER THAN THE io/fs SPELLING, because this
+// package already has a function called fs: the one that reads a frontmatter
+// field. One name, one thing.
+//
+// A PARKED FOLDER IS SKIPPED WHOLE. Parking is how a file is taken out of the
+// engine's way, and a folder named with a leading underscore takes everything
+// under it out too, which is what makes parking a thing you can do to a lane.
 func LintNotes(r Roots, dir string) []Finding {
 	var out []Finding
-	entries, err := os.ReadDir(dir)
-	if err != nil {
-		return []Finding{{ID: dir, Says: "it cannot be read, so this guards nothing: " + err.Error()}}
-	}
-	for _, e := range entries {
-		if e.IsDir() || !strings.HasSuffix(e.Name(), ".md") || Parked(e.Name()) {
-			continue
+	err := filepath.WalkDir(dir, func(path string, e os.DirEntry, err error) error {
+		if err != nil {
+			return err
 		}
-		path := filepath.Join(dir, e.Name())
+		if e.IsDir() {
+			// The folder this walk started at is never parked by its own name.
+			if path != dir && Parked(e.Name()) {
+				return filepath.SkipDir
+			}
+			return nil
+		}
+		if !strings.HasSuffix(e.Name(), ".md") || Parked(e.Name()) {
+			return nil
+		}
+		// THE NAME SAYS WHERE IT IS. Two files called guidance.md, one at the
+		// top and one in a lane's folder, are two findings a reader has to be
+		// able to tell apart.
+		id := e.Name()
+		if rel, err := filepath.Rel(dir, path); err == nil {
+			id = filepath.ToSlash(rel)
+		}
 		b, err := os.ReadFile(path)
 		if err != nil {
-			out = append(out, Finding{ID: e.Name(), File: path, Says: "it cannot be read: " + err.Error()})
-			continue
+			out = append(out, Finding{ID: id, File: path, Says: "it cannot be read: " + err.Error()})
+			return nil
 		}
 		// kindOf is the one reader of a note's kind, so a linked value means
 		// the same thing to the lint as it does to the editor.
 		kind := kindOf(string(b))
 		if kind == "" {
-			out = append(out, Finding{ID: e.Name(), File: path, Line: 1,
+			out = append(out, Finding{ID: id, File: path, Line: 1,
 				Says: "it names no kind, so no schema can read it"})
-			continue
+			return nil
 		}
 		s, err := LoadSchema(r.Method, kind)
 		if err != nil {
-			out = append(out, Finding{ID: e.Name(), File: path, Line: 1, Says: err.Error()})
-			continue
+			out = append(out, Finding{ID: id, File: path, Line: 1, Says: err.Error()})
+			return nil
 		}
 		for _, d := range ValidateNote(s, string(b), r.Method) {
-			out = append(out, Finding{ID: e.Name(), Title: kind, File: path, Line: d.Line, Says: d.Says})
+			out = append(out, Finding{ID: id, Title: kind, File: path, Line: d.Line, Says: d.Says})
 		}
+		return nil
+	})
+	if err != nil {
+		return append(out, Finding{ID: dir,
+			Says: "it cannot be read, so this guards nothing: " + err.Error()})
 	}
 	return out
 }

@@ -186,6 +186,8 @@ func call(roots roots, params json.RawMessage) map[string]any {
 			return text("It could not be recorded: " + err.Error())
 		}
 		return text("recorded")
+	case "se_ask":
+		return text(askIndex(roots, p.Arguments))
 	case "se_apply":
 		return text(applyEdits(roots, p.Arguments))
 	case "se_run":

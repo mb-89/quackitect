@@ -140,10 +140,12 @@ func ClaimStop(r Roots, actor, because, why string) error {
 	if strings.TrimSpace(why) == "" {
 		return fmt.Errorf("say why in one line. The reason on its own is a category, not a reason")
 	}
-	all := loadClaims(r)
-	all.Claims[actor] = StopClaim{Session: currentSession(r), Actor: actor,
-		Because: because, Why: why, At: now()}
-	return saveClaims(r, all)
+	return locked(claimPath(r), func() error {
+		all := loadClaims(r)
+		all.Claims[actor] = StopClaim{Session: currentSession(r), Actor: actor,
+			Because: because, Why: why, At: now()}
+		return saveClaims(r, all)
+	})
 }
 
 // StandingClaim reads an actor's claim, and leaves it standing. A claim from
@@ -159,14 +161,16 @@ func StandingClaim(r Roots, actor string) (StopClaim, bool) {
 // SpendClaim is what the guard calls before every tool, and it is the only
 // thing that ends a claim. Working again is changing your mind.
 func SpendClaim(r Roots, actor string) {
-	all := loadClaims(r)
-	if _, has := all.Claims[actor]; !has {
-		return
-	}
-	// ONE ACTOR'S CLAIM IS SPENT AND THE REST STAND. Removing the file spent
-	// everybody's, so one agent carrying on ended another's stop.
-	delete(all.Claims, actor)
-	_ = saveClaims(r, all) // a claim it cannot drop is dropped when the session rotates
+	_ = locked(claimPath(r), func() error { // a claim it cannot drop is dropped when the session rotates
+		all := loadClaims(r)
+		if _, has := all.Claims[actor]; !has {
+			return nil
+		}
+		// ONE ACTOR'S CLAIM IS SPENT AND THE REST STAND. Removing the file
+		// spent everybody's, so one agent carrying on ended another's stop.
+		delete(all.Claims, actor)
+		return saveClaims(r, all)
+	})
 }
 
 func reasonIDs() string {

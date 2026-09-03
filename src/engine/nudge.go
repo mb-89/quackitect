@@ -81,24 +81,32 @@ func stepFor(n int) int {
 // firstTimeAt answers whether this queue has already been nudged at this step,
 // and remembers that it has.
 func firstTimeAt(r Roots, role string, step int) bool {
-	g := loadNudged(r)
-	if g.At[role] >= step {
-		return false
-	}
-	g.At[role] = step
-	saveNudged(r, g)
-	return true
+	first := false
+	_ = locked(nudgePath(r), func() error { // a nudge it cannot remember is said again
+		g := loadNudged(r)
+		if g.At[role] >= step {
+			return nil
+		}
+		g.At[role] = step
+		first = true
+		saveNudged(r, g)
+		return nil
+	})
+	return first
 }
 
 // forgetAbove drops a step the count has fallen below, so a queue that empties
 // and fills again is nudged again.
 func forgetAbove(r Roots, role string, waiting int) {
-	g := loadNudged(r)
-	if g.At[role] <= stepFor(waiting) {
-		return
-	}
-	g.At[role] = stepFor(waiting)
-	saveNudged(r, g)
+	_ = locked(nudgePath(r), func() error { // a nudge it cannot remember is said again
+		g := loadNudged(r)
+		if g.At[role] <= stepFor(waiting) {
+			return nil
+		}
+		g.At[role] = stepFor(waiting)
+		saveNudged(r, g)
+		return nil
+	})
 }
 
 // A SESSION OF ITS OWN, the way arrivals has one. What was nudged at in a run

@@ -155,6 +155,8 @@ func TakeUp(r Roots, id, actor string) (Token, error) {
 		return t, nil
 	}
 	t.Holder = actor
+	// TAKING UP OPENS A STRETCH, with the tree as it stands as its before.
+	t = openStretch(r, t)
 	return t, SaveToken(r, t)
 }
 
@@ -312,16 +314,20 @@ func NoteTheNameItPullsWith(r Roots, harness, command string) {
 	if !pulls || named == "" || named == harness {
 		return
 	}
-	known := TheNamesItPullsWith(r)
-	for _, was := range known[harness] {
-		if was == named {
-			return
+	_ = locked(aliasPath(r), func() error { // a name it cannot remember is looked up again next call
+		known := TheNamesItPullsWith(r)
+		for _, was := range known[harness] {
+			if was == named {
+				return nil
+			}
 		}
-	}
-	known[harness] = append(known[harness], named)
-	if b, err := json.MarshalIndent(known, "", "  "); err == nil {
-		_ = writeAtomic(aliasPath(r), b, 0o644) // a name it cannot remember is looked up again next call
-	}
+		known[harness] = append(known[harness], named)
+		b, err := json.MarshalIndent(known, "", "  ")
+		if err != nil {
+			return err
+		}
+		return writeAtomic(aliasPath(r), b, 0o644)
+	})
 }
 
 // TheNamesItPullsWith answers the map from a harness name to the names it has

@@ -48,24 +48,23 @@ groups:
   - name: yours
     filter: needs_human == "true"
 
-  # HERE IS WHAT SOMEBODY IS ON. A hold is what says work is being done, and it
-  # is the engine's own field, so this reads true under every process.
-  - name: here
-    filter: holder != ""
-
   # AND ONE GROUP PER STATE THE note PROCESS DECLARES, from
   # src/processes/note.process.yaml.
+  #
+  # THERE IS NO GROUP PER PROCESS. With one process and one open state, a query
+  # on the process and a query on the state answer the same set, and two
+  # headings over one set of rows is two things a reader has to tell apart for
+  # no reason. Add one when a second process makes the two answers differ.
+  #
+  # AND THERE IS NO here. It asked who holds a token, which was worth a heading
+  # while a hold was a standing thing an agent took up and kept. A hold lasts
+  # from one call to the next now, because se apply and se run name their token
+  # on the write, so the group was empty whenever nobody was mid-command.
   - name: noted
     filter: status == "noted"
 
-  # AND ONE PER PROCESS, so a person can see one process at a time without
-  # taking the grouping away from the buckets.
-  - name: note
-    filter: process == "note"
-
 pinned:
   - yours
-  - here
 
 views:
   - type: table

@@ -31,6 +31,12 @@ type Read struct {
 	Actor string    `json:"actor"`
 	Hash  string    `json:"hash"`
 	At    time.Time `json:"at"`
+	// Page is the range that was read, as offset:limit, so a second read of
+	// another range of the same file is not the same read.
+	Page string `json:"page,omitempty"`
+	// Bytes is the size of the file when it was read, which is what a helper's
+	// digest is measured against.
+	Bytes int64 `json:"bytes,omitempty"`
 }
 
 type Agent struct {
@@ -79,13 +85,43 @@ func SaveEvidence(roots Roots, e Evidence) error {
 
 // NoteRead records that an actor read a file, with what the file said at the
 // time. The hash is what makes a later change detectable.
-func NoteRead(roots Roots, actor, path string) {
+func NoteRead(roots Roots, actor, path string) { NoteReadPage(roots, actor, path, "") }
+
+// NoteReadPage is NoteRead with the range that was read.
+func NoteReadPage(roots Roots, actor, path, page string) {
 	if path == "" {
 		return
 	}
-	e := LoadEvidence(roots)
-	e.Reads[clean(path)] = Read{Actor: actor, Hash: hashFile(path), At: time.Now().UTC()}
-	_ = SaveEvidence(roots, e) // a read it cannot record is a read it asks about again
+	var size int64
+	if info, err := os.Stat(path); err == nil {
+		size = info.Size()
+	}
+	changeEvidence(roots, func(e *Evidence) {
+		e.Reads[clean(path)] = Read{Actor: actor, Hash: hashFile(path), At: time.Now().UTC(), Page: page, Bytes: size}
+	})
+}
+
+// BytesReadBy answers how much one actor has read this session, which is
+// the denominator of a helper's compression ratio.
+func BytesReadBy(roots Roots, actor string) int64 {
+	var n int64
+	for _, r := range LoadEvidence(roots).Reads {
+		if r.Actor == actor {
+			n += r.Bytes
+		}
+	}
+	return n
+}
+
+// changeEvidence reads, changes and writes the store as one operation. Two
+// guards recording two reads at once each wrote the whole store, and the
+// second write took the first read with it.
+func changeEvidence(roots Roots, change func(*Evidence)) {
+	_ = locked(evidencePath(roots), func() error { // a read it cannot record is a read it asks about again
+		e := LoadEvidence(roots)
+		change(&e)
+		return SaveEvidence(roots, e)
+	})
 }
 
 // StaleReads names the files that were read and have changed since. What was
@@ -105,18 +141,17 @@ func StaleReads(roots Roots) []string {
 // ForgetReads is what a compaction does. The agent no longer holds what it
 // read, so the record of having read it is no longer true.
 func ForgetReads(roots Roots, why string) int {
-	e := LoadEvidence(roots)
-	n := len(e.Reads)
-	e.Reads = map[string]Read{}
-	_ = SaveEvidence(roots, e) // a read it cannot record is a read it asks about again
+	var n int
+	changeEvidence(roots, func(e *Evidence) {
+		n = len(e.Reads)
+		e.Reads = map[string]Read{}
+	})
 	return n
 }
 
 // ForgetRead drops one file, which is what a change to that file means.
 func ForgetRead(roots Roots, path string) {
-	e := LoadEvidence(roots)
-	delete(e.Reads, clean(path))
-	_ = SaveEvidence(roots, e) // a read it cannot record is a read it asks about again
+	changeEvidence(roots, func(e *Evidence) { delete(e.Reads, clean(path)) })
 }
 
 // NoteAgent records an identity the harness started. Level 0 does not invent
@@ -127,11 +162,11 @@ func NoteAgent(roots Roots, id, kind string) {
 	if id == "" || id == "main" {
 		return
 	}
-	e := LoadEvidence(roots)
-	if _, seen := e.Agents[id]; !seen {
-		e.Agents[id] = Agent{Kind: kind, First: time.Now().UTC(), Name: nextName(e, kind)}
-		_ = SaveEvidence(roots, e) // a read it cannot record is a read it asks about again
-	}
+	changeEvidence(roots, func(e *Evidence) {
+		if _, seen := e.Agents[id]; !seen {
+			e.Agents[id] = Agent{Kind: kind, First: time.Now().UTC(), Name: nextName(*e, kind)}
+		}
+	})
 }
 
 // The next free name for this kind. Counting the ones already named means the

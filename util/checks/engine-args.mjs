@@ -21,6 +21,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, copyFileSync, existsSync, readFi
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
+import { liveEngine } from "./lib/engine.mjs";
 
 const root = process.argv[2] ?? ".";
 const here = join(root, "src", "extension");
@@ -47,6 +48,8 @@ if (!existsSync(exe)) {
   console.log("FAIL the engine is not built at " + exe);
   process.exit(1);
 }
+// The verbs run in the engine over the folder, so one lives here.
+liveEngine(root, work);
 
 // One token to aim the token-shaped controls at, minted through the engine so
 // the id is a real one.

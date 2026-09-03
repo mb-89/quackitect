@@ -150,31 +150,31 @@ func LintLimits(r Roots) []Finding {
 	return out
 }
 
-func runLint(args []string) {
-	fs := flag.NewFlagSet("lint", flag.ExitOnError)
-	fs.SetOutput(os.Stdout)
+func runLint(c *call) int {
+	fs := flag.NewFlagSet("lint", flag.ContinueOnError)
+	fs.SetOutput(c.out)
 	fs.Usage = func() {
-		fmt.Fprintln(os.Stdout, "se lint - read every work token and name what breaks a rule.")
-		fmt.Fprintln(os.Stdout, "")
-		fmt.Fprintln(os.Stdout, "  se lint          say what is wrong, and exit non-zero if anything is")
-		fmt.Fprintln(os.Stdout, "")
+		fmt.Fprintln(c.out, "se lint - read every work token and name what breaks a rule.")
+		fmt.Fprintln(c.out, "")
+		fmt.Fprintln(c.out, "  se lint          say what is wrong, and exit non-zero if anything is")
+		fmt.Fprintln(c.out, "")
 		fs.PrintDefaults()
 	}
-	work := fs.String("work", "", "the folder being worked on (default: this one)")
-	parse(fs, "lint", args)
-
-	roots, err := FindRoots(*work)
-	if err != nil {
-		fail(err)
+	fs.String("work", "", "the folder being worked on (default: this one)")
+	if code, stop := c.parse(fs, "lint"); stop {
+		return code
 	}
+
+	roots := c.roots
 	found := append(LintTokens(roots), LintIcons(roots)...)
 	found = append(found, LintLimits(roots)...)
 	found = append(found, LintGuidance(roots)...)
 	found = append(found, LintProcesses(roots)...)
-	answerJSON(map[string]any{"findings": found, "clean": len(found) == 0})
+	c.answerJSON(map[string]any{"findings": found, "clean": len(found) == 0})
 	if len(found) > 0 {
-		os.Exit(1)
+		return 1
 	}
+	return 0
 }
 
 // A TOKEN CARRIES NO TIME. It travels, and a time on it says when somebody was

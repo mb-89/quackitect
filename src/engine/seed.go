@@ -112,7 +112,7 @@ func writeNew(path, content string, made *[]string) error {
 	if strings.HasSuffix(path, ".sh") {
 		mode = 0o755
 	}
-	if err := os.WriteFile(path, []byte(content), mode); err != nil {
+	if err := writeAtomic(path, []byte(content), mode); err != nil {
 		return err
 	}
 	*made = append(*made, path)

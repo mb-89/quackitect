@@ -48,23 +48,27 @@ func Arrived(r Roots, session, actor string) bool {
 	if !Named(session) {
 		return false
 	}
-	a := loadArrivals(r)
-	if a.Session != session {
-		a = arrivals{Session: session}
-	}
-	if a.At == nil {
-		a.At = map[string]int{}
-	}
-	_, seen := a.At[actor]
-	// EVERY PULL MOVES THE COUNT, whoever made it. That is what makes the
-	// queue its own clock: a reviewer that has stopped falls behind because
-	// somebody else is still pulling.
-	a.Pulls++
-	a.At[actor] = a.Pulls
-	if !seen {
-		a.Order = append(a.Order, actor)
-	}
-	saveArrivals(r, a)
+	var seen bool
+	_ = locked(arrivalPath(r), func() error { // the guard answers whether or not it can record the arrival
+		a := loadArrivals(r)
+		if a.Session != session {
+			a = arrivals{Session: session}
+		}
+		if a.At == nil {
+			a.At = map[string]int{}
+		}
+		_, seen = a.At[actor]
+		// EVERY PULL MOVES THE COUNT, whoever made it. That is what makes the
+		// queue its own clock: a reviewer that has stopped falls behind because
+		// somebody else is still pulling.
+		a.Pulls++
+		a.At[actor] = a.Pulls
+		if !seen {
+			a.Order = append(a.Order, actor)
+		}
+		saveArrivals(r, a)
+		return nil
+	})
 	return !seen
 }
 

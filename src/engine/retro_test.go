@@ -20,9 +20,11 @@ func retroExe(t *testing.T) string {
 	return theEngine(t)
 }
 
-func runRetroExe(t *testing.T, exe, work string, args ...string) (Collected, string, error) {
+func runRetroExe(t *testing.T, exe string, r Roots, args ...string) (Collected, string, error) {
 	t.Helper()
-	out, err := exec.Command(exe, append([]string{"retro", "--work", work}, args...)...).CombinedOutput()
+	// The verb runs in the engine over the folder, so one lives here.
+	aLiveEngine(t, r)
+	out, err := exec.Command(exe, append([]string{"retro", "--work", r.Work}, args...)...).CombinedOutput()
 	var got Collected
 	json.Unmarshal(out, &got)
 	return got, string(out), err
@@ -90,7 +92,7 @@ func TestRetroIsAVerbOfTheProgram(t *testing.T) {
 func TestARetroCollectsAndDrains(t *testing.T) {
 	t.Parallel()
 	r := aWorkedTree(t)
-	got, said, err := runRetroExe(t, retroExe(t), r.Work)
+	got, said, err := runRetroExe(t, retroExe(t), r)
 	if err != nil {
 		t.Fatalf("se retro: %v\n%s", err, said)
 	}
@@ -117,7 +119,7 @@ func TestARetroCollectsAndDrains(t *testing.T) {
 func TestARetroTakesTheRunningSessionToo(t *testing.T) {
 	t.Parallel()
 	r := aWorkedTree(t)
-	got, said, err := runRetroExe(t, retroExe(t), r.Work)
+	got, said, err := runRetroExe(t, retroExe(t), r)
 	if err != nil {
 		t.Fatalf("se retro: %v\n%s", err, said)
 	}
@@ -143,11 +145,11 @@ func TestASecondRetroTakesNothingTwice(t *testing.T) {
 	t.Parallel()
 	r := aWorkedTree(t)
 	exe := retroExe(t)
-	first, said, err := runRetroExe(t, exe, r.Work)
+	first, said, err := runRetroExe(t, exe, r)
 	if err != nil {
 		t.Fatalf("se retro: %v\n%s", err, said)
 	}
-	second, said, err := runRetroExe(t, exe, r.Work)
+	second, said, err := runRetroExe(t, exe, r)
 	if err != nil {
 		t.Fatalf("the second se retro: %v\n%s", err, said)
 	}
@@ -363,7 +365,7 @@ func TestTheBatteryIsWholeAfterARetro(t *testing.T) {
 func TestARetroLeavesTheSourcesEmpty(t *testing.T) {
 	t.Parallel()
 	r := aWorkedTree(t)
-	got, said, err := runRetroExe(t, retroExe(t), r.Work)
+	got, said, err := runRetroExe(t, retroExe(t), r)
 	if err != nil {
 		t.Fatalf("se retro: %v: %s", err, said)
 	}
@@ -448,7 +450,7 @@ func TestARetroLeavesAnotherActorsFolder(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	got, out, err := runRetroExe(t, exe, r.Work, "--by", "main")
+	got, out, err := runRetroExe(t, exe, r, "--by", "main")
 	if err != nil {
 		t.Fatalf("se retro: %v\n%s", err, out)
 	}

@@ -76,6 +76,11 @@ type MoveResult struct {
 	Unrewrit  []Residual  `json:"unrewritten"`
 	UnrewritN int         `json:"unrewritten_total"`
 	Searched  int         `json:"files_searched"`
+
+	// A REWRITE THAT COULD NOT BE WRITTEN IS ANSWERED, NOT SWALLOWED. It was
+	// neither counted as rewritten nor as left, so a read-only file kept its
+	// old reference and the verb answered as though nothing were owed there.
+	Unwritten []Residual `json:"unwritten,omitempty"`
 }
 
 type refPair struct {
@@ -226,9 +231,11 @@ func MoveFile(r Roots, from, to string) (MoveResult, error) {
 		if len(use) > 0 {
 			after, n := applyPairs(text, use)
 			if n > 0 && after != text {
-				if os.WriteFile(abs, []byte(after), 0o644) == nil {
+				if err := writeAtomic(abs, []byte(after), 0o644); err == nil {
 					out.Rewritten = append(out.Rewritten, Rewritten{Path: rel, Count: n})
 					text = after
+				} else {
+					out.Unwritten = append(out.Unwritten, Residual{Path: rel, Text: err.Error()})
 				}
 			}
 		}

@@ -159,6 +159,7 @@ func Apply(r Roots, edits []Edit, dry bool) (Applied, error) {
 		if err := writeAtomic(path, content[path], 0o644); err != nil {
 			return out, fmt.Errorf("writing %s: %w", shortPath(r, path), err)
 		}
+		_ = IndexFile(r, path) // the file is the truth, and the watcher catches up on a row it could not write
 	}
 	return out.said(r), nil
 }

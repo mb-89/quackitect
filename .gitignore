@@ -14,3 +14,6 @@ util/setup/setup.exe
 src/extension/out/
 *.tgz
 *.tar.gz
+dev_guide/*
+# design notes and plans, owner-kept and not the product
+dev_guide/

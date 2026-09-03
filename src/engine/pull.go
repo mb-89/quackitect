@@ -69,7 +69,11 @@ type Answer struct {
 	// THE METHOD FOR THIS ANSWER, DELIVERED RATHER THAN REMEMBERED. A reviewer
 	// told to go and read the method reviews from whatever it happens to think.
 	// It rides on the answer for the same reason the tool list does.
-	Guidance string `json:"guidance,omitempty"`
+	// Guidance is the rules, sent the first time this actor is handed them.
+	// GuidanceAt is where they are, said every time, so an agent that has lost
+	// them knows what to open.
+	Guidance   string `json:"guidance,omitempty"`
+	GuidanceAt string `json:"guidance_at,omitempty"`
 
 	// THE TOKEN THE LESSON MINTED, so the reviewer can name it. A rejection
 	// that produces no id is one the engine did not accept, and the reviewer
@@ -210,6 +214,9 @@ func submit(r Roots, actor string, t Token, p Payload) (Answer, bool) {
 		}
 	}
 	t.Holder = ""
+	// CLOSING ENDS THE STRETCH, so the change is the diffs between began and
+	// ended, pair by pair.
+	t = closeStretch(r, t)
 	if err := SaveToken(r, t); err != nil {
 		return refuse(&t, Rejection{Clause: "the record", Wrong: err.Error(),
 			Satisfies: "a writable .se/work"}), true
@@ -399,6 +406,11 @@ func runEvidence(r Roots, script string) (string, error) {
 		if cmd.Process != nil {
 			_ = cmd.Process.Kill() // it has already finished, which is the only way this fails
 		}
+		// THE OUTPUT IS READ AFTER THE GOROUTINE HAS WRITTEN IT. Killing the
+		// process makes CombinedOutput return, and reading out before that
+		// return was a race the detector names: one goroutine writing the
+		// slice while this one reads it.
+		<-done
 		return string(out), fmt.Errorf("it did not finish in five minutes")
 	}
 }
@@ -451,13 +463,39 @@ func firstLines(s string, n int) string {
 // the backlog and deciding, so the activity says pulled: false and the queue
 // passes over it. Nothing else in the process decides queue order: that is the
 // engine's, and it is oldest-unblocked-first among what is workable.
+//
+// A SCOPE IS NOT A STEP. A held token whose sub-tokens are open is a scope the
+// agent stands in, and the step it can take is a sub-token. So a held scope is
+// passed over for a held token without open sub-tokens, and when everything
+// held is a scope, an unheld sub-token of one of them is handed out inside
+// it, with the scope staying held. A parent with open sub-tokens is blocked
+// for everybody, so the general queue hands sub-tokens out before their
+// parents without a rule of its own.
 func next(r Roots, actor string) Answer {
 	all := Tokens(r)
 
+	var scopes []Token
 	for i := range all {
-		if all[i].Holder == actor && !all[i].Ended() {
-			return Answer{Pull: AnswerWork, Token: &all[i],
-				Notice: workNotice(all[i]), Guidance: SpecMethod(r)}
+		if all[i].Holder != actor || all[i].Ended() {
+			continue
+		}
+		if len(OpenSubTokens(r, all[i].ID)) > 0 {
+			scopes = append(scopes, all[i])
+			continue
+		}
+		return handed(r, actor, all[i])
+	}
+
+	for _, scope := range scopes {
+		for i := range all {
+			t := all[i]
+			if t.Parent != scope.ID || t.Ended() || t.Holder != "" || !Workable(r, t) {
+				continue
+			}
+			if why := Blocked(r, t); why != "" {
+				continue
+			}
+			return take(r, actor, t)
 		}
 	}
 
@@ -476,18 +514,43 @@ func next(r Roots, actor string) Answer {
 		if why := Blocked(r, t); why != "" {
 			continue
 		}
-		t.Holder = actor
-		if err := SaveToken(r, t); err != nil {
-			return Answer{Pull: AnswerWait, Notice: "the record will not take a write: " + err.Error()}
-		}
-		all[i] = t
-		return Answer{Pull: AnswerWork, Token: &all[i],
-			Notice: workNotice(all[i]), Guidance: SpecMethod(r)}
+		return take(r, actor, t)
+	}
+	if len(scopes) > 0 {
+		return Answer{Pull: AnswerWait, Notice: scopeNotice(r, scopes)}
 	}
 	return Answer{Pull: AnswerWait, Notice: waitNotice(r, actor, held)}
 }
 
-func SpecMethod(r Roots) string { return method(r, "work-token.md") }
+// take puts a token in the actor's hands and answers it.
+func take(r Roots, actor string, t Token) Answer {
+	t.Holder = actor
+	// HANDING OUT OPENS A STRETCH, with the tree as it stands as its before.
+	t = openStretch(r, t)
+	if err := SaveToken(r, t); err != nil {
+		return Answer{Pull: AnswerWait, Notice: "the record will not take a write: " + err.Error()}
+	}
+	return handed(r, actor, t)
+}
+
+// handed answers a token the actor holds, with the guidance for it.
+func handed(r Roots, actor string, t Token) Answer {
+	text, says := TheGuidanceFor(r, actor, t.Guidance)
+	return Answer{Pull: AnswerWork, Token: &t,
+		Notice: workNotice(t), Guidance: text, GuidanceAt: says}
+}
+
+// scopeNotice says why nothing was handed out inside a scope the actor holds:
+// every open sub-token is in somebody else's hands, or is waiting on a person.
+func scopeNotice(r Roots, scopes []Token) string {
+	var lines []string
+	for _, s := range scopes {
+		lines = append(lines, fmt.Sprintf("%s holds open sub-token(s) you cannot take: %s",
+			s.ID, strings.Join(OpenSubTokens(r, s.ID), ", ")))
+	}
+	return "Nothing you can start inside what you hold. " + strings.Join(lines, "; ") +
+		". A scope cannot close while a sub-token is open. Say what it waits on, then stop."
+}
 
 // method hands out the Actionables chapter of a guidance file, and the whole
 // file when it has no such chapter. The agent opens the file when it wants the
@@ -626,6 +689,9 @@ func PutDown(r Roots, id, actor string) (Token, error) {
 	if t.Holder != actor {
 		return t, fmt.Errorf("%s is not held by %s", id, actor)
 	}
+	// A PUT-DOWN ENDS THE STRETCH, so what this holding did is a pair of its
+	// own, and what other hands do before the next take-up stays out of it.
+	t = closeStretch(r, t)
 	t.Holder = ""
 	if err := SaveToken(r, t); err != nil {
 		return t, err

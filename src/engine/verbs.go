@@ -1,8 +1,10 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
+	"io"
 	"sort"
 	"strings"
 )
@@ -24,19 +26,42 @@ import (
 // THE LIST IS THE DISPATCH. A second list written by hand would go stale the
 // first time somebody added a verb, and the check over it would then be a check
 // over the verbs somebody remembered.
-var run = map[string]func([]string){
-	"apply": runApply,
-	"run":   runRun,
-	"work":  runWork,
-	"pull":  runPull,
-	"stop":  runStop,
-	"query": runQuery,
-	"view":  runView,
-	"move":  runMove,
-	"lint":  runLint,
-	"hold":  runHold,
-	"retro": runRetro,
-	"lsp":   runLSP,
+//
+// A VERB IS A FUNCTION OVER A CALL, AND THE ENGINE THAT LIVES RUNS IT. The
+// call carries the roots, what came in, and where the answer goes, and the
+// verb answers an exit code. Nothing in a verb reaches the process it runs
+// in: no standard output, no exit. So the same function runs inside the
+// resident engine for the command line and the lane, which are clients of
+// it, and a verb is one thing under both doors.
+var run = map[string]verb{
+	"apply":  runApply,
+	"ask":    runAsk,
+	"run":    runRun,
+	"work":   runWork,
+	"pull":   runPull,
+	"stop":   runStop,
+	"query":  runQuery,
+	"view":   runView,
+	"move":   runMove,
+	"lint":   runLint,
+	"hold":   runHold,
+	"retro":  runRetro,
+	"said":   runSaid,
+	"answer": runAnswer,
+	"config": runConfig,
+}
+
+// verb is what a verb is: the call in, the exit code out.
+type verb func(c *call) int
+
+// call is one invocation of a verb: whose tree, what was said, where the
+// answer goes.
+type call struct {
+	roots Roots
+	args  []string
+	in    io.Reader
+	out   io.Writer
+	err   io.Writer
 }
 
 // Verbs answers every verb this program has, in order.
@@ -77,6 +102,35 @@ func Stray(verb string, left []string) error {
 
 // parse is the one door a verb's flags come through. A verb that parses its own
 // is a verb that can drop what it was handed, which is the whole defect.
+//
+// It answers whether the verb is done: a help asked for and printed, a flag
+// the verb does not have, or something left over that nothing would read.
+func (c *call) parse(fs *flag.FlagSet, verb string) (code int, stop bool) {
+	// THE SET DOES NOT EXIT, because the process it runs in is the engine.
+	fs.Init(fs.Name(), flag.ContinueOnError)
+	fs.SetOutput(c.out)
+	if err := fs.Parse(c.args); err != nil {
+		if errors.Is(err, flag.ErrHelp) {
+			return 0, true
+		}
+		return Unread, true // the set has printed the flag and the usage
+	}
+	if err := Stray(verb, fs.Args()); err != nil {
+		fmt.Fprintln(c.err, "engine:", err)
+		return Unread, true
+	}
+	return 0, false
+}
+
+// fail is how a verb says it could not do what it was asked.
+func (c *call) fail(err error) int {
+	fmt.Fprintln(c.err, "engine:", err)
+	return 1
+}
+
+// parse is the door for a verb that is its own process: the language
+// server, which the editor starts and speaks to for as long as the window
+// is open. A verb that runs inside the engine goes through the call's.
 func parse(fs *flag.FlagSet, verb string, args []string) {
 	_ = fs.Parse(args) // the set is ExitOnError, so a bad flag has already left
 	if err := Stray(verb, fs.Args()); err != nil {

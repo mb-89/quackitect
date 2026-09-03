@@ -412,11 +412,16 @@ function withARuleBetweenTheKinds(groups: Group[], cols: string[], t: Table): st
   return out.join("");
 }
 
-// The rule, and what it says about the two halves it divides.
+// The rule, and the count it carries.
+//
+// IT SAYS THE NUMBER AND STOPS. It carried a sentence explaining that the
+// groups below hold each token once while the queries above ask again. The
+// owner has now asked twice, in two sessions, for that sentence to go. A count
+// is a count, and a person reading a table does not need the table explained on
+// every render.
 function theRule(t: Table): string {
   const n = t.total ?? 0;
-  return `<div class="kinds"><b>${n}</b> ${n === 1 ? "token" : "tokens"}` +
-    `<span class="kinds-why">the groups below hold each one once, the queries above ask about them again</span></div>`;
+  return `<div class="kinds"><b>${n}</b> ${n === 1 ? "token" : "tokens"}</div>`;
 }
 
 // THE LAST COLUMN TAKES WHATEVER IS LEFT, so the table always fills its pane.

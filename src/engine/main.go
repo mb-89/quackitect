@@ -22,12 +22,17 @@ func main() {
 		runHook(os.Args[2:])
 		return
 	}
-	// Level 1's two verbs. They speak JSON on standard input and output, for
-	// the same reason the guard does: a program calls them, not a person.
+	// THE LANGUAGE SERVER IS A PROCESS THE EDITOR STARTS, and it speaks to the
+	// editor for as long as the window is open.
+	if len(os.Args) > 1 && os.Args[1] == "lsp" {
+		runLSP(os.Args[2:])
+		return
+	}
+	// EVERY OTHER VERB RUNS IN THE ENGINE THAT LIVES, and this process is
+	// its client: it sends the verb and prints what came back.
 	if len(os.Args) > 1 {
-		if verb, ok := run[os.Args[1]]; ok {
-			verb(os.Args[2:])
-			return
+		if _, ok := run[os.Args[1]]; ok {
+			os.Exit(callTheEngine(os.Args[1], os.Args[2:]))
 		}
 	}
 	flag.Usage = func() {
@@ -58,6 +63,7 @@ func main() {
 	where := flag.Bool("where", false, "print the log path and exit")
 	rotate := flag.Bool("rotate", false, "set the current log aside and exit, writing nothing")
 	link := flag.Bool("link", false, "give every built program both its names as one file, and exit")
+	stopFlag := flag.Bool("stop", false, "ask the engine running over this folder to stop, and exit")
 	project := flag.Bool("project", false, "write the projections from guidance and exit")
 	emergency := flag.String("emergency", "", "arm or disarm emergency mode: on, off, or status")
 	reason := flag.String("reason", "", "why emergency mode is being armed")
@@ -129,6 +135,17 @@ func main() {
 			fail(err)
 		}
 		answerJSON(map[string]any{"linked": done})
+		return
+	}
+
+	// ASK THE ENGINE OVER THIS FOLDER TO STOP. The battery does, before it
+	// wakes one on the build it just made, and a person does when a stale
+	// engine says it is older than the program on disk.
+	if *stopFlag {
+		if _, _, ok := askModel(roots, "stop", nil); !ok {
+			fail(fmt.Errorf("no engine is running over %s", roots.Work))
+		}
+		fmt.Println("stopping")
 		return
 	}
 
@@ -499,6 +516,25 @@ func main() {
 	if cfg.HeartbeatSeconds > 0 && *beat == 5*time.Second {
 		*beat = time.Duration(cfg.HeartbeatSeconds) * time.Second
 	}
+	// THE RESIDENT ENGINE KEEPS THE INDEX. It is the one process that lives
+	// as long as the session, so it is the one that can watch the tree.
+	stopIndexer, socket, askedToStop := StartIndexer(roots, log, *beat)
+	defer stopIndexer()
+	// THE GUARD'S DOOR. Every per-call event the cage names comes here over
+	// HTTP, and the port is the one the cage was projected with.
+	if ln, err := listenHooks(roots); err != nil {
+		log.Write("engine", "error", "engine",
+			"the guard's port is taken, so the cage's HTTP hooks reach nothing until this engine restarts", No(),
+			map[string]any{"url": hooksURL(roots), "reason": err.Error()})
+	} else {
+		go serveHooks(ln, roots, log)
+		defer ln.Close()
+		here.Hooks = hooksURL(roots)
+	}
+	// THE ADDRESSES ARE PUBLISHED WHERE A CLIENT ALREADY LOOKS, beside the
+	// pid and the beat, so finding the model is reading one file.
+	here.Socket = socket
+	SayRunning(roots, here)
 	ticker := time.NewTicker(*beat)
 	defer ticker.Stop()
 	started := time.Now()
@@ -554,6 +590,12 @@ func main() {
 			fmt.Println(string(beat))
 		case <-stop:
 			log.Write("engine", "stop", "engine", "engine stopped, asked to", Yes(),
+				map[string]any{"uptime_s": int(time.Since(started).Seconds())})
+			return
+		case <-askedToStop:
+			// A CLIENT ASKED IT TO STOP, over the socket. The battery does,
+			// before it wakes one on the build it just made.
+			log.Write("engine", "stop", "engine", "engine stopped, asked to over the socket", Yes(),
 				map[string]any{"uptime_s": int(time.Since(started).Seconds())})
 			return
 		}

@@ -1,10 +1,13 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"reflect"
+	"runtime"
 	"sort"
 	"strings"
 	"time"
@@ -44,9 +47,28 @@ type Collected struct {
 	Folder     string   `json:"folder"`
 	Logs       int      `json:"logs"`
 	Scripts    int      `json:"scripts"`
+	Outputs    int      `json:"outputs"`
+	Undos      int      `json:"undos"`
 	Transcript []string `json:"transcripts"`
 	Missing    []string `json:"looked_for_and_missing"`
 	Kept       []string `json:"kept_and_why"`
+
+	// WHAT THE ENGINE SENT, MEASURED. The retro is where the size of the thing
+	// this engine hands an agent stops being a feeling and becomes a number
+	// somebody can watch fall.
+	Sent Sizes `json:"sent"`
+}
+
+// Sizes is what one turn costs, in bytes, at the places an agent is handed
+// something. Each is measured now rather than remembered, so a number here is
+// about the tree as it stands.
+type Sizes struct {
+	Prompt   int `json:"standing_prompt"`
+	Tools    int `json:"tool_list,omitempty"`
+	Pull     int `json:"a_pull_answer"`
+	Refusal  int `json:"a_gate_refusal"`
+	OutKept  int `json:"output_kept_on_disk"`
+	PageSize int `json:"one_output_window"`
 }
 
 // AN ACTOR STILL HOLDING WORK STOPS A RETRO, AND THE REFUSAL NAMES THEM.
@@ -98,7 +120,7 @@ func Retro(r Roots, actor string, transcripts map[string]string) (Collected, err
 		folder = fmt.Sprintf("%s.%d", filepath.Join(RetroDir(r),
 			time.Now().UTC().Format("20060102-150405")), i)
 	}
-	for _, sub := range []string{"log", "scratchpad", "transcript"} {
+	for _, sub := range []string{"log", "scratchpad", "transcript", "out", "undo"} {
 		if err := os.MkdirAll(filepath.Join(folder, sub), 0o755); err != nil {
 			return got, err
 		}
@@ -156,6 +178,22 @@ func Retro(r Roots, actor string, transcripts map[string]string) (Collected, err
 	}
 	got.Scripts = n
 
+	// WHAT COMMANDS PRINTED, AND WHAT APPLIES OVERWROTE.
+	//
+	// Both grow one file per call and nothing drained them, so a folder nobody
+	// opens filled with the output of every command ever run. They move whole:
+	// a kept output is what an agent was reading and an undo journal is what a
+	// change would be put back from, and neither survives the session that made
+	// it useful.
+	if n, err := drain(outDir(r), filepath.Join(folder, "out"), everyFile); err == nil {
+		got.Outputs = n
+	}
+	if n, err := drain(undoDir(r), filepath.Join(folder, "undo"), everyFile); err == nil {
+		got.Undos = n
+	}
+
+	got.Sent = whatItSends(r)
+
 	// THE TRANSCRIPTS ARE COPIED, AND THE ONES THAT WERE NOT THERE ARE NAMED.
 	// A command silent about what it looked for and missed reads as a command
 	// that found everything.
@@ -173,11 +211,12 @@ func Retro(r Roots, actor string, transcripts map[string]string) (Collected, err
 		got.Transcript = append(got.Transcript, to)
 	}
 
-	if err := os.WriteFile(filepath.Join(folder, "index.md"), []byte(retroIndex(got)), 0o644); err != nil {
+	if err := writeAtomic(filepath.Join(folder, "index.md"), []byte(retroIndex(got)), 0o644); err != nil {
 		return got, err
 	}
 	inSession(r, "retro", actor, "a retro collected "+folder, Yes(),
-		map[string]any{"folder": folder, "logs": got.Logs, "scripts": got.Scripts})
+		map[string]any{"folder": folder, "logs": got.Logs, "scripts": got.Scripts,
+			"outputs": got.Outputs, "undos": got.Undos})
 	return got, nil
 }
 
@@ -339,6 +378,29 @@ func retroIndex(got Collected) string {
 	fmt.Fprintf(&b, "- log: %d file(s) the record wrote since the last retro\n", got.Logs)
 	fmt.Fprintf(&b, "- scratchpad: %d thing(s) an agent wrote while working\n", got.Scripts)
 	fmt.Fprintf(&b, "- transcript: %d harness transcript(s), copied\n", len(got.Transcript))
+	fmt.Fprintf(&b, "- out: %d kept command output(s)\n", got.Outputs)
+	fmt.Fprintf(&b, "- undo: %d journal(s) of what an apply overwrote\n", got.Undos)
+
+	// WHAT THE ENGINE SENDS, AS NUMBERS TO WATCH FALL.
+	//
+	// A NUMBER NOBODY WATCHES IS A NUMBER THAT GROWS. No single answer is ever
+	// obviously too big, which is how the whole of it gets too big with nothing
+	// anywhere saying so. These are what a turn pays, measured on this tree at
+	// the moment the retro ran.
+	b.WriteString("\nWHAT ONE TURN COSTS, IN BYTES:\n")
+	for _, row := range []struct {
+		n    int
+		says string
+	}{
+		{got.Sent.Tools, "the tool list, sent on every turn"},
+		{got.Sent.Prompt, "the standing layer, in the prompt on every turn"},
+		{got.Sent.Pull, "a pull answer, at its biggest token"},
+		{got.Sent.Refusal, "a gate refusal"},
+		{got.Sent.PageSize, "one window of a command's output"},
+		{got.Sent.OutKept, "command output kept on disk, before this retro"},
+	} {
+		fmt.Fprintf(&b, "- %6d  %s\n", row.n, row.says)
+	}
 	if len(got.Missing) > 0 {
 		b.WriteString("\nLOOKED FOR AND NOT FOUND:\n")
 		for _, m := range got.Missing {
@@ -419,4 +481,125 @@ func newestUnder(dir, suffix string) string {
 		return nil
 	})
 	return best
+}
+
+// everyFile takes everything in a folder, which is what draining one means.
+func everyFile(string) bool { return true }
+
+// whatItSends measures the places this engine hands an agent something.
+//
+// MEASURED NOW, NOT REMEMBERED. Each number is read off the tree as it stands,
+// so a retro says what a turn costs today rather than what somebody wrote down
+// when they last looked.
+//
+// A NUMBER NOBODY WATCHES IS A NUMBER THAT GROWS. v3's answers to an agent grew
+// until they were the problem, and nothing anywhere said so, because no single
+// answer was obviously too big. These are the four an agent pays on every turn
+// or close to it, so the retro is where the trend shows.
+func whatItSends(r Roots) Sizes {
+	out := Sizes{PageSize: ThePageSize}
+
+	// The standing layer, which every turn carries whether or not it is read.
+	for _, p := range mustProjections(r) {
+		if p.Section != "Actionables" {
+			continue
+		}
+		if b, err := os.ReadFile(filepath.Join(r.Work, filepath.FromSlash(p.Target))); err == nil {
+			if len(b) > out.Prompt {
+				out.Prompt = len(b)
+			}
+		}
+	}
+
+	// THE TOOL LIST, ASKED OF THE LANE ITSELF. It is the second biggest thing a
+	// turn carries and the engine does not own it, so it is measured by asking
+	// rather than guessed at. A lane that is not built leaves the number out
+	// rather than reporting nought, because nought reads as "it costs nothing".
+	out.Tools = theToolList(r)
+
+	// A pull answer, taken without moving anything: the biggest token there is,
+	// plus what a pull wraps around it.
+	var biggest Token
+	for _, t := range Tokens(r) {
+		if t.Ended() {
+			continue
+		}
+		if b, err := json.Marshal(t); err == nil && len(b) > len(asSent(biggest)) {
+			biggest = t
+		}
+	}
+	if biggest.ID != "" {
+		a := Answer{Pull: AnswerWork, Token: &biggest, Notice: workNotice(biggest),
+			GuidanceAt: "doc/guidance/work-token.md is in your prompt already"}
+		out.Pull = len(asSent(a))
+	}
+
+	// A gate refusal, which is the message an agent hits most often when it is
+	// getting something wrong.
+	out.Refusal = len(theRefusal(r, "main", "Write", "src/engine/x.go"))
+
+	// And what the kept output has grown to since the last retro.
+	if names, err := os.ReadDir(outDir(r)); err == nil {
+		for _, n := range names {
+			if info, err := n.Info(); err == nil {
+				out.OutKept += int(info.Size())
+			}
+		}
+	}
+	return out
+}
+
+// theToolList is how many bytes the lane sends an agent on every turn, or nought
+// where there is no lane built to ask.
+func theToolList(r Roots) int {
+	exe := filepath.Join(r.Method, ".bin", "se-mcp")
+	if runtime.GOOS == "windows" {
+		exe += ".exe"
+	}
+	if _, err := os.Stat(exe); err != nil {
+		return 0
+	}
+	cmd := Quietly(exec.Command(exe, "--work", r.Work))
+	cmd.Stdin = strings.NewReader(
+		`{"jsonrpc":"2.0","id":0,"method":"initialize","params":{}}` + nl +
+			`{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}` + nl)
+	said, err := cmd.Output()
+	if err != nil {
+		return 0
+	}
+	// THE ANSWER TO THE SECOND QUESTION, NOT THE FIRST. Initialize replies with
+	// a capabilities block that also holds the word tools, and it is 147 bytes,
+	// so matching the word alone measured the wrong line and said the tool list
+	// was small.
+	for _, line := range strings.Split(string(said), nl) {
+		var m struct {
+			ID     int `json:"id"`
+			Result struct {
+				Tools []json.RawMessage `json:"tools"`
+			} `json:"result"`
+		}
+		if json.Unmarshal([]byte(line), &m) == nil && m.ID == 1 && len(m.Result.Tools) > 0 {
+			return len(line)
+		}
+	}
+	return 0
+}
+
+// mustProjections answers what is projected, or nothing. A retro that cannot
+// read the declaration measures what it can rather than refusing to run.
+func mustProjections(r Roots) []Projection {
+	list, err := LoadProjections(r.Method)
+	if err != nil {
+		return nil
+	}
+	return list
+}
+
+// asSent is a value the size the agent would receive it, or nothing.
+func asSent(v any) []byte {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return nil
+	}
+	return b
 }

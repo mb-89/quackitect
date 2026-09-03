@@ -32,6 +32,12 @@ const A = await import(pathToFileURL(join(out, "engineargs.mjs")).href);
 
 const work = mkdtempSync(join(tmpdir(), "lifecycle-work-"));
 mkdirSync(join(work, "util", "views"), { recursive: true });
+// THE REGISTER IS REDIRECTED, so a check leaves nothing on the machine. The
+// init call below registers the folder it makes, and without this it did so
+// in the real register: eighty temporary folders were listed there, and the
+// tool lane took the first of them as its engine.
+const registry = mkdtempSync(join(tmpdir(), "lifecycle-registry-"));
+const env = { ...process.env, SE_REGISTRY: registry };
 const exe = join(root, ".bin", process.platform === "win32" ? "se.exe" : "se");
 if (!existsSync(exe)) {
   console.log("FAIL the engine is not built at " + exe);
@@ -56,7 +62,7 @@ function ask(name, args) {
   }
   let said = "";
   try {
-    said = execFileSync(exe, [...args, "--work", work], { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
+    said = execFileSync(exe, [...args, "--work", work], { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"], env });
   } catch (e) {
     said = String(e.stdout ?? "") + String(e.stderr ?? "");
   }

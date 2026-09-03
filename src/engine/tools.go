@@ -49,9 +49,12 @@ type Probe struct {
 func probePath(r Roots) string { return r.Private("tools.json") }
 
 // A probe that hangs holds up the boot, and a boot that is slow is one a
-// person stops using. Two seconds is more than any of these needs to print a
-// version, and they run at the same time.
-const probeWait = 2 * time.Second
+// person stops using. They run at the same time, so the boot pays for the
+// slowest one. Two seconds was more than any of them needs to print a
+// version on a quiet machine, and under the battery's load go version took
+// longer and the first pull carried no tools. Ten is the bound of a hang,
+// not the cost of a boot.
+const probeWait = 10 * time.Second
 
 func LoadCandidates(methodRoot string) ([]Candidate, error) {
 	b, err := os.ReadFile(filepath.Join(methodRoot, "util", "tools.json"))

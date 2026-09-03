@@ -34,7 +34,7 @@ Rules about writing wts that are judgement are here.
 10. Write the check before the work. Watch it go red for the reason you expect.
 11. A check that will not go red is the finding. Write it down and stop.
 12. Put both halves of a mechanism in the evidence. "Nothing yet, owed by X" is an answer.
-13. Report work as done only with the evidence that it is.
+13. Report work as done only with the evidence that it is. The change itself is `git diff began..ended`, never a list of files. *
 14. A checklist carries institutional knowledge. Answer each line rather than ticking it. *
 
 # Discussion
@@ -79,3 +79,14 @@ The basics look self-evident, so nobody writes them down, and the gap is found
 after the feature. If basics arent built first, the feature based on them will not be solid.
 Before a feature token is worked, its detail names what it stands on, and each
 missing basic is minted first.
+
+## 13. The change is two hashes
+
+The engine snapshots the tree when a token is taken up and when it closes,
+and writes the two hashes on the token as began and ended.
+The snapshots are commits under a ref no push carries, so the person's
+history holds only the commits they made.
+A list of files on a token is a list somebody typed, and it is wrong the day
+after; the diff between two hashes is right for as long as the repository is.
+A reviewer of a whole stage reads the same way: the tree at its start against
+the tree at its end.

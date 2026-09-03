@@ -118,10 +118,27 @@ type Token struct {
 	// relation and gets its own field.
 	DependsOn []string `json:"depends_on,omitempty"`
 
+	// THE TOKEN THIS IS A PART OF. A token with sub-tokens is a scope, and a
+	// scope cannot be left while anything in it is open: the parent is
+	// refused every ending until its sub-tokens have ended, and the queue
+	// hands the sub-tokens out first. The sub-token carries the link, so a
+	// parent holds no list that can go stale.
+	Parent string `json:"parent,omitempty"`
+
 	// The other blocker, and the one only a person can judge: a date, or a
 	// condition in whatever words fit. Triage passes over a token that is not
 	// ready, so deciding not to decide leaves no history on the token.
 	ReadyWhen string `json:"ready_when,omitempty"`
+
+	// THE CHANGE, AS PAIRS OF HASHES. Every time the work is taken up the
+	// tree is snapshotted into began, and every time it is put down or
+	// closed, into ended, so the two lists run in step and each pair is one
+	// stretch of holding. The change is the diffs of the pairs, and what
+	// other hands did between two stretches stays out of it. Each hash is a
+	// snapshot commit under refs/se/steps, and the engine writes them all:
+	// a hand cannot.
+	Began    []string `json:"began,omitempty"`
+	Finished []string `json:"ended,omitempty"`
 
 	Status      Status      `json:"status"`
 	Disposition Disposition `json:"disposition,omitempty"`
@@ -211,9 +228,10 @@ func now() string { return time.Now().UTC().Format(time.RFC3339Nano) }
 
 // Blocked says what holds a token back, in words, or nothing.
 //
-// ONE RELATION NOW. Containment went with the parent field: a token is held by
-// what it says it depends on, and an order somebody decided is the only order
-// there is.
+// TWO RELATIONS HOLD A TOKEN. What it depends on is order between peers, and
+// it waits until those have ended. What is part of it is containment, and it
+// cannot end while any of that is open. Both are read here, so the queue and
+// the submission ask one question and get one answer.
 func Blocked(r Roots, t Token) string {
 	var waiting []string
 	for _, id := range t.DependsOn {
@@ -226,10 +244,65 @@ func Blocked(r Roots, t Token) string {
 			waiting = append(waiting, id)
 		}
 	}
+	var says []string
 	if len(waiting) > 0 {
-		return "it waits on " + strings.Join(waiting, ", ")
+		says = append(says, "it waits on "+strings.Join(waiting, ", "))
 	}
-	return ""
+	if open := OpenSubTokens(r, t.ID); len(open) > 0 {
+		says = append(says, fmt.Sprintf("it holds %d open sub-token(s): %s",
+			len(open), strings.Join(open, ", ")))
+	}
+	return strings.Join(says, ", and ")
+}
+
+// OpenSubTokens names the tokens that are part of this one and have not
+// ended, oldest first. A sub-token whose own sub-tokens are open is open too,
+// so reading one level down reads the whole tree.
+func OpenSubTokens(r Roots, id string) []string {
+	if id == "" {
+		return nil
+	}
+	var open []string
+	for _, t := range Tokens(r) {
+		if t.Parent == id && !t.Ended() {
+			open = append(open, t.ID)
+		}
+	}
+	return open
+}
+
+// checkParent refuses a parent nothing can be part of: one that does not
+// exist, one that has already ended, or one that would make a loop.
+//
+// THE WALK UP IS BOUNDED. A loop written by hand into two notes would send
+// an unbounded walk round for ever, and a chain deeper than this is a
+// breakdown nobody is reading anyway.
+const parentDepth = 64
+
+func checkParent(r Roots, id, parent string) error {
+	if parent == "" {
+		return nil
+	}
+	if parent == id {
+		return fmt.Errorf("a token cannot be part of itself")
+	}
+	for at, depth := parent, 0; at != ""; depth++ {
+		p, err := LoadToken(r, at)
+		if err != nil {
+			return fmt.Errorf("it is part of %s, which does not exist", at)
+		}
+		if at == parent && p.Ended() {
+			return fmt.Errorf("it is part of %s, which already ended as %s", at, p.Disposition)
+		}
+		if p.Parent == id {
+			return fmt.Errorf("%s is part of %s, so %s cannot be part of it", at, id, id)
+		}
+		if depth >= parentDepth {
+			return fmt.Errorf("the chain of parents above %s is deeper than %d", parent, parentDepth)
+		}
+		at = p.Parent
+	}
+	return nil
 }
 
 func trimmed(s string) string {
@@ -264,5 +337,11 @@ func Mint(r Roots, t Token) (Token, error) {
 		}
 	}
 	t.ID = newID()
+	// A PART OF SOMETHING THAT HAS ENDED IS A PART OF NOTHING. The parent
+	// closed on the strength of having no open sub-tokens, and a sub-token
+	// minted under it afterwards would make that closing wrong in hindsight.
+	if err := checkParent(r, t.ID, t.Parent); err != nil {
+		return t, err
+	}
 	return t, SaveToken(r, t)
 }

@@ -18,6 +18,7 @@
 //
 //   node util/checks/mcp-tools.mjs <root>
 import { execFileSync } from "node:child_process";
+import { liveEngine } from "./lib/engine.mjs";
 import { mkdtempSync, mkdirSync, copyFileSync, writeFileSync, existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
@@ -34,6 +35,9 @@ const work = mkdtempSync(join(tmpdir(), "mcptools-work-"));
 mkdirSync(join(work, "util", "views"), { recursive: true });
 copyFileSync(join(root, "util", "views", "work.base"), join(work, "util", "views", "work.base"));
 writeFileSync(join(work, ".gitignore"), ".se/\n");
+
+// The verbs run in the engine over the folder, so one lives here.
+liveEngine(root, work);
 
 let bad = 0;
 const say = (what, ok, why) => {
@@ -52,7 +56,10 @@ function ask(calls) {
     jsonrpc: "2.0", id: i + 1, method: "tools/call",
     params: { name: c.tool, arguments: c.args },
   })));
-  const out = execFileSync(exe, ["--work", work],
+  // THE ENGINE UNDER CHECK IS NAMED, the way the cage names it. Left to the
+  // register, the lane answered for whichever copy was listed first, which
+  // was a temporary folder another check had left behind.
+  const out = execFileSync(exe, ["--work", work, "--method", root],
     { input: lines.join("\n") + "\n", encoding: "utf8" });
   const said = new Map();
   for (const line of out.split("\n")) {
@@ -103,9 +110,19 @@ const calls = [
     { file: "made-by-apply.md", op: "create", new: "# a file the lane wrote\n" },
   ] } },
   { tool: "se_run", args: { on: "", actor: "mcp", command: "echo ran through the lane" } },
+  // A LONG OUTPUT IS PAGED RATHER THAN CUT. The page name comes back in the
+  // answer and the next window is asked for by it, below.
+  { tool: "se_run", args: { on: "", actor: "mcp",
+    command: "seq 1 6000 | sed 's/$/ padded out to make the line longer/'" } },
   { tool: "se_apply", args: { on: "", actor: "mcp", dry: true, edits: [
     { file: "made-by-apply.md", old: "a file the lane wrote", new: "a file it changed" },
   ] } },
+  // THE INDEX ANSWERS A QUESTION. The mint above wrote a token and synced it
+  // into the index, so a count over the file table has a row to find, and
+  // the shape of the tables is the door's own documentation.
+  { tool: "se_ask", args: { sql: "SELECT count(*) AS n FROM file WHERE path LIKE '.se/work/%'" } },
+  { tool: "se_ask", args: { schema: true } },
+  { tool: "se_ask", args: { search: "whole instruction" } },
 ];
 // The apply cases need a real id, so the first mint runs on its own and its
 // answer fills them in.
@@ -170,6 +187,41 @@ say("se_run runs the command it was given", (ran?.output ?? "").includes("ran th
 say("and answers its exit code", ran?.exit === 0, "it says " + JSON.stringify(ran?.exit));
 say("and files it under the token it named", ran?.on === mintedFirst?.id,
   "it says " + JSON.stringify(ran?.on));
+
+// AND A LONG ONE PAGES, with nothing lost.
+const longAt = calls.map((c, i) => [c, i + 1]).filter(([c]) => c.tool === "se_run")[1]?.[1];
+let long = null;
+try { long = JSON.parse(answers.get(longAt) ?? ""); } catch { /* said above */ }
+say("se_run keeps a long output whole", (long?.bytes ?? 0) > (long?.output ?? "").length,
+  "bytes=" + long?.bytes + " window=" + (long?.output ?? "").length);
+say("and hands back a page to ask for the rest by", !!long?.page && long?.more === true,
+  "page=" + JSON.stringify(long?.page) + " more=" + JSON.stringify(long?.more));
+if (long?.page) {
+  const next = ask([{ tool: "se_run", args: { page: long.page, from: long.output.length } }]).get(1) ?? "";
+  let win = null;
+  try { win = JSON.parse(next); } catch { /* the case below says so */ }
+  say("and the next window carries on where the first stopped",
+    (win?.from ?? -1) === long.output.length && (win?.output ?? "").length > 0,
+    "from=" + win?.from + " window=" + (win?.output ?? "").length);
+  const tail = ask([{ tool: "se_run", args: { page: long.page, from: -200 } }]).get(1) ?? "";
+  let end = null;
+  try { end = JSON.parse(tail); } catch { /* said above */ }
+  say("and a negative from reads the end", end?.more === undefined || end?.more === false,
+    "more=" + JSON.stringify(end?.more));
+}
+
+// AND THE INDEX ANSWERS ROWS, WITH THE TOKEN THE MINT SYNCED INTO IT.
+const askAt = calls.findIndex((c) => c.tool === "se_ask") + 1;
+let asked = null;
+try { asked = JSON.parse(answers.get(askAt) ?? ""); } catch { /* said above */ }
+say("se_ask answers rows from the index", asked?.columns?.[0] === "n" && (asked?.rows?.[0]?.[0] ?? 0) >= 1,
+  JSON.stringify(asked)?.slice(0, 200));
+say("and the schema names the tables", /CREATE TABLE IF NOT EXISTS note/.test(answers.get(askAt + 1) ?? ""),
+  (answers.get(askAt + 1) ?? "").slice(0, 120));
+let found = null;
+try { found = JSON.parse(answers.get(askAt + 2) ?? ""); } catch { /* said above */ }
+say("and a search finds the words in a body", found?.rows?.some((r) => r[0] === mintedFirst?.id),
+  JSON.stringify(found)?.slice(0, 200));
 
 console.log(bad + " failed.");
 process.exit(bad === 0 ? 0 : 1);

@@ -67,6 +67,21 @@ const panes = sides.map((side) => ({ side, table: ask("query", "--view", "work",
               depth: 1, parent: "wk-planted-parent" }],
   });
   first.count = first.lines.length;
+
+  // AND A ROW IN A PINNED GROUP, FOR THE SAME REASON.
+  //
+  // MEASURED. The pinned groups are declared queries, so whether either holds a
+  // row is a fact about today's data. A retro put every token down and marked
+  // none for a person, both pinned groups emptied, and the check that asks for
+  // one row from each box went red over a page that was working.
+  const top = (panes[0].table.pinned ?? [])[0];
+  if (!top) {
+    console.error("the pane declares no pinned group, so the two-box case cannot be planted");
+    process.exit(1);
+  }
+  top.lines = [...(top.lines ?? []),
+    { id: "wk-planted-pinned", cells: cells("a planted pinned row"), depth: 0 }];
+  top.count = top.lines.length;
 }
 
 const html = editorHtml(panes, ask("query", "--list").views, "work");

@@ -20,7 +20,7 @@ For mechanical rules, see [[util/voice-rules.json]].
 
 1. One sentence, one idea. At most 25 words, preferably shorter. End lines on sentence ends. Avoid endlines within sentences.
 2. One paragraph, one idea. At most 6 sentences. One newline between paragraphs.
-3. Render enumerations and key:value pairs as lists, not as chained sentences.
+3. Three or more parallel things are a list, each with its status, in a chat answer as in a file. *
 4. BLUF: bottom line upfront, progressive disclosure: details come later, at the discretion of the reader.
 5. Active voice. Name who acts. Present tense for everything except discussions. Past tense is allowed there.
 6. Stakeholder-specific communication: do not leak internals, write what is relevant to the audience. For details, see [[doc/guidance/stakeholders]].
@@ -32,8 +32,19 @@ For mechanical rules, see [[util/voice-rules.json]].
 12. DRY: do not repeat yourself. SPOT: single point of truth for every datum.
 13. Private data: names, datetimes and unfiltered notes. They do not go into git.
 14. Do not put history in the current surface. It goes into git commit messages.
+15. A number about the tree is the command that answers it, never the answer. *
 
 # Discussion
+
+## 3. Lists
+
+A paragraph that names seven things to do and two to decide is two lists
+wearing prose.
+The reader has to count, and cannot tell at a glance which item has which
+status.
+So parallel items go one to a line, with what stands against each: done, owed,
+or needing a decision.
+This binds a chat answer as much as a note, because the reader is the same.
 
 ## 8. Absences
 
@@ -64,3 +75,13 @@ The brackets are how it is shown and walked, and the name inside is the value,
 so `kind: [[guidance]]` and `kind: guidance` are one thing.
 A link resolves as a path first and then as a note name, so both
 [[src/schemas/guidance.schema.yaml]] and [[voice]] reach what they name.
+
+## 15. Standing counts
+
+A count of files, tests, checks or tokens is true on the day it is written and
+wrong soon after, and nothing tells the reader which day that was.
+So the prose names the command: `ls`, `go test`, `se ask`, or the check that
+counts.
+The reader runs it and gets today's number.
+A measurement that argues a decision belongs in the commit or the retro, which
+are dated, and not on the surface.

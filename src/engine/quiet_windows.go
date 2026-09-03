@@ -23,6 +23,18 @@ func Quietly(cmd *exec.Cmd) *exec.Cmd {
 	return cmd
 }
 
+// A PROCESS THAT OUTLIVES THE ONE THAT STARTED IT. The engine is started by a
+// hook that has to return, so the engine is put in its own process group and
+// given no console, and the hook's end is not the engine's.
+func Detached(cmd *exec.Cmd) *exec.Cmd {
+	if cmd.SysProcAttr == nil {
+		Quietly(cmd)
+	}
+	// DETACHED_PROCESS and CREATE_NEW_PROCESS_GROUP, beside CREATE_NO_WINDOW.
+	cmd.SysProcAttr.CreationFlags |= 0x00000008 | 0x00000200
+	return cmd
+}
+
 // THE SCRIPT REACHES cmd VERBATIM, so the quotes an author typed are the quotes
 // the shell sees. Go rebuilds a command line from the argument list and escapes
 // the inner quotes, so rg was handed each word of a pattern as a separate path

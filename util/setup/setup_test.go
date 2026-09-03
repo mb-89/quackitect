@@ -4,10 +4,14 @@ import (
 	"bytes"
 	"encoding/json"
 	"flag"
+	"io"
 	"io/fs"
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"path/filepath"
 	"regexp"
+	"slices"
 	"strings"
 	"testing"
 )
@@ -227,5 +231,171 @@ func TestTheHelpNamesEveryFlag(t *testing.T) {
 	})
 	if seen == 0 {
 		t.Fatal("no flags were declared, so this test proves nothing")
+	}
+}
+
+// The manifest pins the C compiler by version and by hash, for every
+// platform the installer runs on. A pin with a hole is a download nobody
+// checked.
+func TestTheManifestPinsTheCompiler(t *testing.T) {
+	t.Parallel()
+	m, err := readManifest("manifest.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	cc, ok := m.Tools[m.CC]
+	if !ok || cc.Archive == nil {
+		t.Fatalf("cc %q is not an archive in the manifest", m.CC)
+	}
+	if cc.Archive.Version == "" {
+		t.Error("the compiler has no version")
+	}
+	for _, profile := range []string{"desktop", "headless"} {
+		if !slices.Contains(m.Profiles[profile], m.CC) {
+			t.Errorf("profile %s does not install %s", profile, m.CC)
+		}
+	}
+	hex64 := regexp.MustCompile(`^[0-9a-f]{64}$`)
+	for _, platform := range []string{"windows/amd64", "linux/amd64"} {
+		t.Run(platform, func(t *testing.T) {
+			t.Parallel()
+			a, ok := cc.Archive.Platforms[platform]
+			if !ok {
+				t.Fatalf("no archive for %s", platform)
+			}
+			if !strings.Contains(a.URL, cc.Archive.Version) {
+				t.Errorf("url %s does not carry the version %s", a.URL, cc.Archive.Version)
+			}
+			if !hex64.MatchString(a.SHA256) {
+				t.Errorf("sha256 %q is not 64 lower-case hex digits", a.SHA256)
+			}
+			if a.Size <= 0 {
+				t.Errorf("size %d is no size", a.Size)
+			}
+		})
+	}
+}
+
+func TestCheckSum(t *testing.T) {
+	t.Parallel()
+	const sum = "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
+	tests := []struct {
+		name, got, want string
+		refused         bool
+	}{
+		{name: "same", got: sum, want: sum},
+		{name: "publisher printed upper case", got: sum, want: strings.ToUpper(sum)},
+		{name: "one digit off", got: sum, want: sum[:63] + "e", refused: true},
+		{name: "nothing pinned", got: sum, want: "", refused: true},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			err := checkSum(tc.got, tc.want)
+			if (err != nil) != tc.refused {
+				t.Errorf("checkSum(%q, %q) = %v, refused %v", tc.got, tc.want, err, tc.refused)
+			}
+		})
+	}
+}
+
+// hashInto answers the sha256 of what passed through, on the known vector.
+func TestHashInto(t *testing.T) {
+	t.Parallel()
+	var out bytes.Buffer
+	got, n, err := hashInto(&out, strings.NewReader("abc"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if want := "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"; got != want {
+		t.Errorf("got %s, want %s", got, want)
+	}
+	if n != 3 || out.String() != "abc" {
+		t.Errorf("copied %d bytes %q, want 3 bytes abc", n, out.String())
+	}
+}
+
+// A download is kept only when it hashes to the pin and is no larger than
+// the pin says. Anything else is removed, so a second run starts clean.
+func TestADownloadIsKeptOnlyWhenItMatchesThePin(t *testing.T) {
+	t.Parallel()
+	body := "abc"
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/missing" {
+			http.NotFound(w, r)
+			return
+		}
+		io.WriteString(w, body)
+	}))
+	t.Cleanup(srv.Close)
+	const sum = "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
+	tests := []struct {
+		name string
+		art  Artifact
+		kept bool
+	}{
+		{name: "matches", art: Artifact{URL: srv.URL + "/a", SHA256: sum, Size: 3}, kept: true},
+		{name: "wrong hash", art: Artifact{URL: srv.URL + "/a", SHA256: strings.Repeat("0", 64), Size: 3}},
+		{name: "larger than pinned", art: Artifact{URL: srv.URL + "/a", SHA256: sum, Size: 2}},
+		{name: "not there", art: Artifact{URL: srv.URL + "/missing", SHA256: sum, Size: 3}},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			dest := filepath.Join(t.TempDir(), "a.download")
+			err := download(tc.art, dest)
+			if (err == nil) != tc.kept {
+				t.Errorf("download = %v, kept %v", err, tc.kept)
+			}
+			_, statErr := os.Stat(dest)
+			if (statErr == nil) != tc.kept {
+				t.Errorf("file present %v, want %v", statErr == nil, tc.kept)
+			}
+		})
+	}
+}
+
+// The env file is two KEY=value lines, the compiler first, so a shell reads
+// it line by line and go reads CC as a command line.
+func TestCgoEnv(t *testing.T) {
+	t.Parallel()
+	tests := []struct {
+		name, cc string
+		want     []string
+	}{
+		{name: "plain path", cc: `C:\tools\zig-0.16.0\zig.exe`,
+			want: []string{`CC=C:\tools\zig-0.16.0\zig.exe cc`, "CGO_ENABLED=1", "GOFLAGS=-tags=sqlite_fts5"}},
+		{name: "path with a space", cc: `/opt/my tools/zig`,
+			want: []string{`CC="/opt/my tools/zig" cc`, "CGO_ENABLED=1", "GOFLAGS=-tags=sqlite_fts5"}},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			if got := CgoEnv(tc.cc); !slices.Equal(got, tc.want) {
+				t.Errorf("got %q, want %q", got, tc.want)
+			}
+		})
+	}
+}
+
+func TestTheEnvFileHoldsTheLinesItWasGiven(t *testing.T) {
+	t.Parallel()
+	path := filepath.Join(t.TempDir(), "quackitect", "cgo.env")
+	env := CgoEnv("/x/zig")
+	for i := 0; i < 2; i++ { // a second write replaces, never appends
+		if err := writeCgoEnv(path, env); err != nil {
+			t.Fatal(err)
+		}
+	}
+	b, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got, want := string(b), "CC=/x/zig cc\nCGO_ENABLED=1\nGOFLAGS=-tags=sqlite_fts5\n"; got != want {
+		t.Errorf("got %q, want %q", got, want)
+	}
+	left, _ := filepath.Glob(filepath.Join(filepath.Dir(path), ".cgo.env-*"))
+	if len(left) != 0 {
+		t.Errorf("temporaries left behind: %v", left)
 	}
 }

@@ -11,6 +11,43 @@ import (
 type Roots struct {
 	Method string
 	Work   string
+
+	// THE TOKENS ARE READ ONCE PER PROCESS. Every verb is one process over
+	// one folder of files, and it asked for every token five times in one
+	// pull and once more for each token it looked at. That is the shape v3
+	// had, measured there at thousands of file reads per call. The snapshot
+	// is filled the first time anything asks and dropped by every write this
+	// process makes, so a verb reads the folder once and what it wrote is
+	// what it reads back.
+	//
+	// It is a pointer, so every copy of these roots shares one snapshot. A
+	// Roots built by hand carries none and reads the folder on every ask,
+	// which is what a test that edits files under the engine's feet wants.
+	// A process that lives longer than one verb holds none either, because a
+	// snapshot that outlives the folder it was read from is a second truth.
+	snap *snapshot
+}
+
+// snapshot is what one process has read of the token folders.
+type snapshot struct {
+	loaded bool
+	tokens []Token
+}
+
+// ReadOnce gives these roots a snapshot, so the token folders are read the
+// first time anything asks and not again until this process writes.
+func (r Roots) ReadOnce() Roots {
+	r.snap = &snapshot{}
+	return r
+}
+
+// forget drops the snapshot, which is what a write does. The next ask reads
+// the folder again, and reads what was written.
+func (r Roots) forget() {
+	if r.snap != nil {
+		r.snap.loaded = false
+		r.snap.tokens = nil
+	}
 }
 
 func FindRoots(workArg string) (Roots, error) {
@@ -30,7 +67,7 @@ func FindRoots(workArg string) (Roots, error) {
 	if err != nil {
 		return Roots{}, err
 	}
-	return Roots{Method: method, Work: projectRoot(work)}, nil
+	return Roots{Method: method, Work: projectRoot(work)}.ReadOnce(), nil
 }
 
 // THE PROJECT IS THE FOLDER, NOT THE DIRECTORY SOMEBODY IS STANDING IN.

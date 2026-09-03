@@ -2,7 +2,7 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -15,6 +15,26 @@ import (
 
 func laneTools() []map[string]any {
 	return []map[string]any{
+		{
+			"name": "se_ask",
+			"description": "ASK THE INDEX. SQL over the tree, read-only: file(path,size,hash), " +
+				"note(path,id,kind,front JSON,body), link(from_path,key,target,to_path,line), " +
+				"note_text(path,id,body) for MATCH. schema prints the tables.\n\n" +
+				"search finds words in note bodies. links answers what reaches a note " +
+				"and what it reaches. dangling lists links that reach nothing. Rows are " +
+				"cut at limit; page with LIMIT and OFFSET.",
+			"inputSchema": map[string]any{
+				"type": "object",
+				"properties": map[string]any{
+					"sql":      map[string]any{"type": "string", "description": "a SELECT over the index"},
+					"search":   map[string]any{"type": "string", "description": "words to find in note bodies"},
+					"links":    map[string]any{"type": "string", "description": "a note id or path"},
+					"dangling": map[string]any{"type": "boolean", "description": "every link that reaches nothing"},
+					"schema":   map[string]any{"type": "boolean", "description": "print the tables"},
+					"limit":    map[string]any{"type": "integer", "description": "rows to answer at most. Default 200"},
+				},
+			},
+		},
 		{
 			"name": "se_apply",
 			"description": "CHANGE FILES. This is how you write, and it says which work the change is.\n\n" +
@@ -70,8 +90,13 @@ func laneTools() []map[string]any {
 				"all reach the filesystem -- so it does not ask. Every command names its " +
 				"work because it could write.\n\n" +
 				"The command runs in the folder being worked on. Output and errors come " +
-				"back as one stream with the exit code. A long output is cut at the FRONT " +
-				"and the cut is reported, because a failure says why on its last lines.\n\n" +
+				"back as one stream with the exit code.\n\n" +
+				"A LONG OUTPUT IS KEPT WHOLE AND ANSWERED A WINDOW AT A TIME. Nothing is " +
+				"lost. The answer carries bytes, which is the whole length, and page, which " +
+				"is the name to ask for the rest by:\n\n" +
+				"  {\"page\": \"<name>\", \"from\": 40960}   the next window\n" +
+				"  {\"page\": \"<name>\", \"from\": -4000}   the last four thousand bytes\n\n" +
+				"Reading a page names no token, because looking is not writing.\n\n" +
 				"NAMING A TOKEN YOU WERE NOT ON SWAPS THEM, the same as a write.",
 			"inputSchema": map[string]any{
 				"type": "object",
@@ -80,9 +105,12 @@ func laneTools() []map[string]any {
 						"description": "the token this command belongs to, by id"},
 					"command": map[string]any{"type": "string",
 						"description": "the command, whole. Quotes, newlines and pipes are yours to use"},
+					"page": map[string]any{"type": "string",
+						"description": "instead of running: read a window of an output that was kept"},
+					"from": map[string]any{"type": "integer",
+						"description": "with page: where the window starts. Negative counts back from the end"},
 					"actor": map[string]any{"type": "string", "description": "who is running it. Default main"},
 				},
-				"required": []string{"on", "command"},
 			},
 		},
 		{
@@ -108,6 +136,9 @@ func laneTools() []map[string]any {
 						"description": "what you think should happen about it"},
 					"depends_on": map[string]any{"type": "array", "items": map[string]any{"type": "string"},
 						"description": "ids that have to end before this can start"},
+					"parent": map[string]any{"type": "string",
+						"description": "the id this is a part of. That token cannot close while this is open, " +
+							"and the queue hands this out first"},
 					"on": map[string]any{"type": "string",
 						"description": "instead of minting: say which token you are working on, by id. " +
 							"It goes in your hands and whatever else you held goes back. " +
@@ -189,7 +220,7 @@ func mintWork(r roots, args map[string]any) string {
 	// reads in the log should look the same every time.
 	for _, pair := range [][2]string{
 		{"--detail", "detail"}, {"--process", "process"},
-		{"--proposed-action", "proposed_action"},
+		{"--proposed-action", "proposed_action"}, {"--parent", "parent"},
 	} {
 		if v := str(args[pair[1]]); v != "" {
 			a = append(a, pair[0], v)
@@ -199,6 +230,39 @@ func mintWork(r roots, args map[string]any) string {
 		a = append(a, "--depends-on", strings.Join(s, ","))
 	}
 	return engineCall(r, a, nil)
+}
+
+// askIndex hands a question to se ask. One question per call, and the flag
+// order is the verb's own, so the command a person reads in the log is the
+// one they would type.
+func askIndex(r roots, args map[string]any) string {
+	// THE SCHEMA IS THE ENGINE'S TEXT, and needs no engine running.
+	if args["schema"] == true {
+		return engineCall(r, []string{"ask", "--schema"}, nil)
+	}
+	params := map[string]any{}
+	for _, k := range [...]string{"sql", "search", "links"} {
+		if v := str(args[k]); v != "" {
+			params[k] = v
+		}
+	}
+	if args["dangling"] == true {
+		params["dangling"] = true
+	}
+	if len(params) == 0 {
+		return "Say what to ask: sql, search, links, dangling or schema."
+	}
+	if n, ok := args["limit"].(float64); ok && n > 0 {
+		params["limit"] = int(n)
+	}
+	// THE QUESTION GOES TO THE ENGINE THAT LIVES, over its socket, and
+	// nothing is started for it.
+	raw, err := askModel(r, "ask", params)
+	if err != nil {
+		b, _ := json.Marshal(map[string]any{"error": err.Error()})
+		return string(b)
+	}
+	return string(raw)
 }
 
 func stopClaim(r roots, args map[string]any) string {
@@ -243,13 +307,24 @@ func pull(r roots, args map[string]any) string {
 // thing, so the wait is longer than a question deserves and shorter than a
 // hang.
 func engineCall(r roots, args []string, stdin []byte) string {
-	// The subcommand leads. The engine reads it before it parses a flag, the
-	// way it reads the guard's, so nothing may come in front of it.
-	out, err := askWithInput(r, append(args, "--work", r.work), stdin, 6*time.Minute)
-	if err != nil && strings.TrimSpace(out) == "" {
-		return fmt.Sprintf("the engine could not be asked: %v", err)
+	// THE VERB RUNS IN THE ENGINE THAT LIVES. The lane sends the verb, its
+	// flags and the payload over the socket, and prints what the engine
+	// wrote. Nothing is started for a call. With no engine over the folder
+	// the answer says so, and how to start one.
+	raw, err := askModelWithin(r, "verb", map[string]any{"verb": args[0], "args": args[1:], "stdin": string(stdin)}, 6*time.Minute)
+	if err != nil {
+		b, _ := json.Marshal(map[string]any{"error": err.Error()})
+		return string(b)
 	}
-	return out
+	var a struct {
+		Out  string `json:"out"`
+		Err  string `json:"err"`
+		Code int    `json:"code"`
+	}
+	if json.Unmarshal(raw, &a) != nil {
+		return string(raw)
+	}
+	return strings.TrimRight(a.Out+a.Err, "\n")
 }
 
 // applyEdits hands the manifest to the engine, whole, on standard input.
@@ -287,6 +362,14 @@ func applyEdits(r roots, args map[string]any) string {
 // and passing it as an argument makes every layer between the agent and the
 // engine agree about quoting. They do not.
 func runCommand(r roots, args map[string]any) string {
+	// READING A PAGE NAMES NO TOKEN, because looking is not writing.
+	if page := str(args["page"]); page != "" {
+		a := []string{"run", "--page", page}
+		if from, is := args["from"].(float64); is {
+			a = append(a, "--from", itoa(int(from)))
+		}
+		return engineCall(r, a, nil)
+	}
 	on := str(args["on"])
 	if on == "" {
 		return `{"error":"say which token this command is, with on: <id>"}`
@@ -298,6 +381,9 @@ func runCommand(r roots, args map[string]any) string {
 	return engineCall(r, []string{"run", "--on", on, "--by", orMain(str(args["actor"]))},
 		[]byte(command))
 }
+
+// itoa is a number as the flag takes it.
+func itoa(n int) string { return strconv.Itoa(n) }
 
 // orMain is who is acting, and it is main where nobody said.
 func orMain(actor string) string {

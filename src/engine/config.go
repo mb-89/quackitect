@@ -391,6 +391,18 @@ type Config struct {
 	// now, so each was a number a person could set and nothing would read.
 	PullsBeforeHoldIsStale int
 
+	// HOW MANY LINES A READ MAY TAKE AT ONCE. Context budgets differ per
+	// harness and model, so it is a parameter, and a read over it is
+	// corrected rather than refused: the correction is unambiguous.
+	ReadClampLines int
+
+	// A HELPER'S ANSWER IS A DIGEST OF WHAT IT READ. It may be at most this
+	// fraction of the bytes it read, or the floor when it read little, and
+	// a longer one is sent back to compress. Both are parameters because
+	// delegation jobs differ in kind, and a fixed pair is wrong for one.
+	HelperRatio      int
+	HelperFloorBytes int
+
 	// How big a token's prose may be before the save refuses it. A token is a
 	// ticket a person reads cold, and the record once held tokens of 117 KB.
 	// Both are bytes, and both are parameters a person moves.
@@ -409,6 +421,9 @@ func TheFloor() Config {
 	return Config{GuardProjections: true, StopNeedsClaim: true, AnswerFirst: true,
 		HeartbeatSeconds: 5, ReadyBudgetMs: 15000,
 		PullsBeforeHoldIsStale: 10,
+		ReadClampLines:         800,
+		HelperRatio:            10,
+		HelperFloorBytes:       6000,
 		// TWO, BECAUSE THE SECOND RUNG IS SHARED OVER BOTH HALVES. One failing
 		// round per rung would spend the token's whole ladder on a first bad
 		// draft, and the grant never comes back.
@@ -443,6 +458,17 @@ func LoadConfig(roots Roots) Config {
 	// refusal off and somebody has to be able to say that.
 	if n, ok := toNumber(v.Value["limits.pulls_before_hold_is_stale"]); ok && int(n) > 0 {
 		c.PullsBeforeHoldIsStale = int(n)
+	}
+	if n, ok := toNumber(v.Value["limits.read_clamp_lines"]); ok && int(n) > 0 && int(n) < c.ReadClampLines {
+		c.ReadClampLines = int(n)
+	}
+	// A HELPER MAY BE HELD TIGHTER, NEVER LOOSER: a larger ratio is a smaller
+	// digest, and a smaller floor is too.
+	if n, ok := toNumber(v.Value["limits.helper_ratio"]); ok && int(n) > c.HelperRatio {
+		c.HelperRatio = int(n)
+	}
+	if n, ok := toNumber(v.Value["limits.helper_floor_bytes"]); ok && int(n) > 0 && int(n) < c.HelperFloorBytes {
+		c.HelperFloorBytes = int(n)
 	}
 	if n, ok := toNumber(v.Value["limits.detail_bytes"]); ok && int(n) > 0 {
 		c.DetailBytes = int(n)

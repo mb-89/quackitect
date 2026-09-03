@@ -51,8 +51,8 @@ func dirFor(r Roots, t Token) string {
 // what holds it back, then how it ended.
 var frontOrder = []string{
 	"kind", "process", "guidance", "title", "status", "bucket",
-	"holder", "needs_human", "depends_on", "ready_when",
-	"disposition", "reason", "successors",
+	"holder", "needs_human", "depends_on", "parent", "ready_when",
+	"began", "ended", "disposition", "reason", "successors",
 }
 
 // A value the editor walks is written in brackets. The name inside is the
@@ -103,7 +103,10 @@ func (t Token) front() Front {
 		// follow and the x-link on those two fields was a claim about a
 		// behaviour that was not there.
 		"depends_on":  asLinks(t.DependsOn),
+		"parent":      asLink(t.Parent),
 		"ready_when":  t.ReadyWhen,
+		"began":       t.Began,
+		"ended":       t.Finished,
 		"disposition": string(t.Disposition),
 		"reason":      t.Reason,
 		"successors":  asLinks(t.Successors),
@@ -126,7 +129,10 @@ func tokenFromFront(f Front) Token {
 		Holder:      fs(f, "holder"),
 		NeedsHuman:  fb(f, "needs_human"),
 		DependsOn:   unlinkAll(fl(f, "depends_on")),
+		Parent:      unlink(fs(f, "parent")),
 		ReadyWhen:   fs(f, "ready_when"),
+		Began:       fl(f, "began"),
+		Finished:    fl(f, "ended"),
 		Disposition: Disposition(fs(f, "disposition")),
 		Reason:      fs(f, "reason"),
 		Successors:  unlinkAll(fl(f, "successors")),
@@ -279,6 +285,17 @@ func readNote(path string) (Token, bool) {
 }
 
 func LoadToken(r Roots, id string) (Token, error) {
+	// WHAT THE SNAPSHOT HOLDS IS WHAT IS ON DISK, so one token is read out of
+	// it rather than opened again. A process that has read the folder once
+	// does not open a file in it a second time.
+	if r.snap != nil && r.snap.loaded {
+		for _, t := range r.snap.tokens {
+			if t.ID == id {
+				return t, nil
+			}
+		}
+		return Token{}, fmt.Errorf("no such token: %s", id)
+	}
 	for _, dir := range workDirs(r) {
 		if t, ok := readNote(filepath.Join(dir, id+".md")); ok {
 			return t, nil
@@ -289,7 +306,22 @@ func LoadToken(r Roots, id string) (Token, error) {
 
 // Tokens reads both folders, oldest first. Order is by when a token was opened,
 // so a queue hands out the thing that has waited longest.
+//
+// IT READS THE FOLDERS ONCE PER PROCESS when the roots carry a snapshot, and
+// answers a copy of the list, so a caller that moves a token in its copy
+// moves nothing in anybody else's.
 func Tokens(r Roots) []Token {
+	if r.snap != nil {
+		if !r.snap.loaded {
+			r.snap.tokens = readTokens(r)
+			r.snap.loaded = true
+		}
+		return append([]Token(nil), r.snap.tokens...)
+	}
+	return readTokens(r)
+}
+
+func readTokens(r Roots) []Token {
 	var out []Token
 	for _, dir := range workDirs(r) {
 		entries, err := os.ReadDir(dir)
@@ -459,8 +491,14 @@ func SaveToken(r Roots, t Token) error {
 		return err
 	}
 	if from != "" && from != final {
-		_ = os.Remove(from) // the note is written; a stale copy is reported by the duplicate check
+		_ = os.Remove(from)    // the note is written; a stale copy is reported by the duplicate check
+		_ = IndexFile(r, from) // the file is the truth, and the watcher catches up on a row it could not drop
 	}
+	// WHAT THIS PROCESS WROTE IS WHAT IT READS BACK. The snapshot was read
+	// before the write, so it is dropped and the next ask reads the folder.
+	// And the index is told, so the write is not missing from it either.
+	r.forget()
+	_ = IndexFile(r, final) // the file is the truth, and the watcher catches up on a row it could not write
 	noteMove(r, t, was, existed == nil)
 	return nil
 }

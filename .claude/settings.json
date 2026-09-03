@@ -1,5 +1,5 @@
 {
-  "$comment": "GENERATED from util/cage/claude-settings.json. Edit the source, not this file.",
+  "$comment": "THE PER-CALL EVENTS GO TO THE ENGINE THAT LIVES, over HTTP, so no process is started per tool call. SessionStart stays a command, because it is what brings the engine up. The timeout is short: an engine that has not answered is one that is not there, and the call goes on.",
   "outputStyle": "quackitect",
   "hooks": {
     "PreToolUse": [
@@ -7,8 +7,9 @@
         "matcher": "",
         "hooks": [
           {
-            "type": "command",
-            "command": "./.bin/se hook --method ."
+            "type": "http",
+            "url": "http://127.0.0.1:39056/hook",
+            "timeout": 3
           }
         ]
       }
@@ -18,8 +19,9 @@
         "matcher": "",
         "hooks": [
           {
-            "type": "command",
-            "command": "./.bin/se hook --method ."
+            "type": "http",
+            "url": "http://127.0.0.1:39056/hook",
+            "timeout": 3
           }
         ]
       }
@@ -29,8 +31,9 @@
         "matcher": "",
         "hooks": [
           {
-            "type": "command",
-            "command": "./.bin/se hook --method ."
+            "type": "http",
+            "url": "http://127.0.0.1:39056/hook",
+            "timeout": 3
           }
         ]
       }
@@ -40,8 +43,13 @@
         "matcher": "",
         "hooks": [
           {
+            "type": "http",
+            "url": "http://127.0.0.1:39056/hook",
+            "timeout": 3
+          },
+          {
             "type": "command",
-            "command": "./.bin/se hook --method ."
+            "command": "./.bin/se hook --method . --wake"
           }
         ]
       }
@@ -66,8 +74,9 @@
         "matcher": "",
         "hooks": [
           {
-            "type": "command",
-            "command": "./.bin/se hook --method ."
+            "type": "http",
+            "url": "http://127.0.0.1:39056/hook",
+            "timeout": 3
           }
         ]
       }
@@ -77,8 +86,9 @@
         "matcher": "",
         "hooks": [
           {
-            "type": "command",
-            "command": "./.bin/se hook --method ."
+            "type": "http",
+            "url": "http://127.0.0.1:39056/hook",
+            "timeout": 3
           }
         ]
       }
@@ -88,8 +98,9 @@
         "matcher": "",
         "hooks": [
           {
-            "type": "command",
-            "command": "./.bin/se hook --method ."
+            "type": "http",
+            "url": "http://127.0.0.1:39056/hook",
+            "timeout": 3
           }
         ]
       }
@@ -99,8 +110,9 @@
         "matcher": "",
         "hooks": [
           {
-            "type": "command",
-            "command": "./.bin/se hook --method ."
+            "type": "http",
+            "url": "http://127.0.0.1:39056/hook",
+            "timeout": 3
           }
         ]
       }
@@ -110,8 +122,9 @@
         "matcher": "",
         "hooks": [
           {
-            "type": "command",
-            "command": "./.bin/se hook --method ."
+            "type": "http",
+            "url": "http://127.0.0.1:39056/hook",
+            "timeout": 3
           }
         ]
       }
@@ -121,8 +134,9 @@
         "matcher": "",
         "hooks": [
           {
-            "type": "command",
-            "command": "./.bin/se hook --method ."
+            "type": "http",
+            "url": "http://127.0.0.1:39056/hook",
+            "timeout": 3
           }
         ]
       }
@@ -132,8 +146,9 @@
         "matcher": "",
         "hooks": [
           {
-            "type": "command",
-            "command": "./.bin/se hook --method ."
+            "type": "http",
+            "url": "http://127.0.0.1:39056/hook",
+            "timeout": 3
           }
         ]
       }
@@ -143,8 +158,9 @@
         "matcher": "",
         "hooks": [
           {
-            "type": "command",
-            "command": "./.bin/se hook --method ."
+            "type": "http",
+            "url": "http://127.0.0.1:39056/hook",
+            "timeout": 3
           }
         ]
       }
@@ -154,8 +170,9 @@
         "matcher": "",
         "hooks": [
           {
-            "type": "command",
-            "command": "./.bin/se hook --method ."
+            "type": "http",
+            "url": "http://127.0.0.1:39056/hook",
+            "timeout": 3
           }
         ]
       }

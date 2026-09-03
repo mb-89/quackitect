@@ -83,6 +83,15 @@ func CopyWhatWasHeard(r Roots, transcript string, log *Log, actor string) int {
 	}
 	defer f.Close()
 
+	// ONE GUARD COPIES AT A TIME. Two events arriving together both read the
+	// same offset, both copied the same lines, and the person's sentence
+	// landed in the record twice with two obligations behind it.
+	unlock, err := lockFile(heardPath(r))
+	if err != nil {
+		return 0
+	}
+	defer unlock()
+
 	was := loadHeard(r)
 	// A TRANSCRIPT THIS ENGINE HAS NOT READ BEFORE STARTS AT ITS END.
 	//

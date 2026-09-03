@@ -36,6 +36,13 @@ type hookIn struct {
 	AgentType      string          `json:"agent_type"`
 	StopHookActive bool            `json:"stop_hook_active"`
 	Transcript     string          `json:"transcript_path"`
+	// ErrorType is what ended a turn on an API error: rate_limit,
+	// max_output_tokens and the rest. It comes with StopFailure only.
+	ErrorType string `json:"error_type"`
+	// LastAssistantMessage is what the agent, or a helper, said last. It
+	// comes with Stop and SubagentStop, and for a helper it is the answer
+	// handed back to whoever spawned it.
+	LastAssistantMessage string `json:"last_assistant_message"`
 }
 
 type toolInput struct {
@@ -43,10 +50,19 @@ type toolInput struct {
 	Path     string `json:"path"`
 	Command  string `json:"command"`
 	Content  string `json:"content"`
+	// NewString is what an Edit puts in, which is a write of that text.
+	NewString string `json:"new_string"`
+	// The range a read asked for. Offset is the first line and Limit how
+	// many, and both are zero when the read asked for the whole file.
+	Offset int `json:"offset"`
+	Limit  int `json:"limit"`
 }
 
+// THE TOOLS THAT WRITE A FILE THE HARNESS NAMES, declared once.
+var writesTools = map[string]bool{"Write": true, "Edit": true, "NotebookEdit": true, "MultiEdit": true}
+
 // Deny is the shape Claude Code reads for a tool decision.
-func denyToolUse(reason string) {
+func (g *guard) deny(reason string) {
 	out, _ := json.Marshal(map[string]any{
 		"hookSpecificOutput": map[string]any{
 			"hookEventName":            "PreToolUse",
@@ -54,7 +70,7 @@ func denyToolUse(reason string) {
 			"permissionDecisionReason": reason,
 		},
 	})
-	fmt.Println(string(out))
+	fmt.Fprintln(g.out, string(out))
 }
 
 // THE BACK CHANNEL. An authority above may exist, and this is where it speaks.
@@ -263,11 +279,13 @@ func isTheEngine(word string) bool {
 }
 
 // Block is the shape a Stop hook reads. The reason reaches the agent.
-func blockStop(reason string) {
+func (g *guard) blockStop(reason string) {
 	out, _ := json.Marshal(map[string]any{"decision": "block", "reason": reason})
-	fmt.Println(string(out))
+	fmt.Fprintln(g.out, string(out))
 }
 
+// runHook is the command form: the event on standard input, the decision on
+// standard output. The engine that lives serves the same function over HTTP.
 func runHook(args []string) {
 	raw, err := io.ReadAll(os.Stdin)
 	if err != nil {
@@ -277,12 +295,20 @@ func runHook(args []string) {
 		fmt.Fprintln(os.Stderr, "hook: cannot read the event:", err)
 		return
 	}
+	answerHook(raw, args, os.Stdout, nil)
+}
+
+// answerHook is the guard: one event in, one decision out. held is the
+// record when the engine that lives is answering, and nil when a process
+// per event is, which then opens the record for the length of the event.
+func answerHook(raw []byte, args []string, out io.Writer, held *Log) {
+	g := &guard{out: out}
 	var in hookIn
 	if err := json.Unmarshal(raw, &in); err != nil {
 		fmt.Fprintln(os.Stderr, "hook: the event is not readable JSON:", err)
 		return
 	}
-	method := ""
+	method, wake := "", false
 	for i := 0; i < len(args); i++ {
 		switch args[i] {
 		case "--method":
@@ -290,6 +316,8 @@ func runHook(args []string) {
 				method = args[i+1]
 				i++
 			}
+		case "--wake":
+			wake = true
 		default:
 			if in.Event == "" {
 				in.Event = args[i] // a harness that names the event on the line
@@ -316,13 +344,26 @@ func runHook(args []string) {
 		}
 	}
 
-	log, err := OpenExistingLog(roots.Private("log"))
-	if err != nil {
-		// No log means no engine. The guard still answers, because the answer
-		// is about a file and not about a session.
-		log = nil
-	} else {
-		defer log.Close()
+	// THE WAKE. A command hook that does one thing: an engine that is down is
+	// brought up. It runs at session start and once per prompt, so a crash
+	// costs at most the rest of one turn, and every per-call event goes to
+	// the engine over HTTP with no process at all.
+	if wake {
+		ensureEngine(roots)
+		return
+	}
+
+	log := held
+	if log == nil {
+		opened, err := OpenExistingLog(roots.Private("log"))
+		if err != nil {
+			// No log means no engine. The guard still answers, because the
+			// answer is about a file and not about a session.
+			log = nil
+		} else {
+			log = opened
+			defer opened.Close()
+		}
 	}
 
 	// A HASH IN THE ACTOR COLUMN TELLS A READER NOTHING. The harness names an
@@ -346,7 +387,7 @@ func runHook(args []string) {
 		case "PreToolUse":
 			record(log, "engine", "hold", actor, "refused: everything is on hold", No(),
 				map[string]any{"tool": in.ToolName})
-			denyToolUse(h.Says)
+			g.deny(h.Says)
 			return
 		case "Stop":
 			record(log, "agent", "stop", actor, "stopped: everything is on hold", Yes(), nil)
@@ -387,7 +428,7 @@ func runHook(args []string) {
 			if refuse {
 				record(log, "engine", "owed", actor, "refused: they are waiting for an answer", No(),
 					map[string]any{"tool": in.ToolName})
-				denyToolUse("THEY ARE WAITING FOR AN ANSWER, and nothing else happens until you " +
+				g.deny("THEY ARE WAITING FOR AN ANSWER, and nothing else happens until you " +
 					"give one.\n\nWhat they said:\n\n" + firstLines(said, 12) +
 					"\n\nAnswer them, in full, with se_answer. Then carry on with the work you hold. " +
 					"You do not have to stop the turn to be heard.")
@@ -395,16 +436,16 @@ func runHook(args []string) {
 			}
 			record(log, "engine", "owed", actor, "warned: they are waiting for an answer", Yes(),
 				map[string]any{"tool": in.ToolName})
-			warnTheAgent(firstLines(said, 12) +
+			g.warn(firstLines(said, 12) +
 				"\n\nAnswer them with se_answer. You do not have to stop the turn to be heard.")
 		}
 	}
 
 	switch in.Event {
 	case "PreToolUse":
-		decidePreToolUse(roots, cfg, emergency, log, in, actor)
+		decidePreToolUse(g, roots, cfg, emergency, log, in, actor)
 	case "Stop":
-		decideStop(roots, cfg, log, in, actor)
+		decideStop(g, roots, cfg, log, in, actor)
 	case "UserPromptSubmit":
 		// THE PROMPT IS WHAT THEY WROTE, WHOLE. firstLine took the first line
 		// and cut it at two hundred characters, so a person reading the log for
@@ -426,6 +467,15 @@ func runHook(args []string) {
 		}
 		record(log, "agent", "session", actor, "session started, "+in.Source, Yes(),
 			map[string]any{"source": in.Source, "session": in.SessionID})
+		// THE ENGINE IS UP BEFORE THE FIRST CALL, because every call from
+		// here on is answered by it.
+		ensureEngine(roots)
+	case "StopFailure":
+		// A TURN ENDED BY THE API, WITH THE KIND OF ENDING. Without the type
+		// every such ending read as unknown, and the one class the agent can
+		// fix itself, running out of output, looked like the ones it cannot.
+		record(log, "agent", "stop", actor, "turn ended by the API: "+orElse(in.ErrorType, "unknown"), No(),
+			map[string]any{"error_type": orElse(in.ErrorType, "unknown")})
 	case "SessionEnd":
 		record(log, "agent", "session", actor, "session ended", Yes(), nil)
 	case "SubagentStart":
@@ -433,8 +483,24 @@ func runHook(args []string) {
 		record(log, "agent", "helper", actor, "helper started: "+in.AgentType, Yes(),
 			map[string]any{"agent_type": in.AgentType})
 	case "SubagentStop":
-		// A helper stopping is not the walk stopping. It is recorded and
-		// never refused.
+		// A HELPER'S ANSWER IS A DIGEST, OR IT GOES BACK TO BE ONE. A helper
+		// that returns what it read moves the tokens into the parent's context
+		// with extra steps, and today that looks like a slow turn. The budget
+		// is a ratio of what it read, with a floor for a helper given a small
+		// job, and the refusal is bounded so the harness never overrides it
+		// silently.
+		if why, refuse := aHelperReturningTooMuch(roots, cfg, in); refuse {
+			if countRefusedStop(roots, "helper:"+in.AgentID) {
+				record(log, "agent", "helper", actor, "helper stopped, its answer over budget and the guard relenting", No(),
+					map[string]any{"relented": true})
+				break
+			}
+			record(log, "agent", "helper", actor, "helper stop refused: its answer is over budget", No(),
+				map[string]any{"returned": len(in.LastAssistantMessage), "read": BytesReadBy(roots, in.AgentID)})
+			g.blockStop(why)
+			break
+		}
+		forgetRefusedStops(roots, "helper:"+in.AgentID)
 		record(log, "agent", "helper", actor, "helper stopped", Yes(), nil)
 	case "PreCompact":
 		// What was read is no longer held, so it is no longer claimed as read.
@@ -448,6 +514,8 @@ func runHook(args []string) {
 		// A read is evidence. A write means what anyone read of that file is
 		// no longer what is there.
 		notePostTool(roots, in, actor)
+		// A call that came back ends any run of failures: the loop is over.
+		clearFailures(roots, actor)
 		// THE SOURCE IS WHOEVER ASKED. The engine answered, and what the line
 		// is about is the agent's call.
 		said := takeCall(roots, in.ToolUseID)
@@ -461,6 +529,9 @@ func runHook(args []string) {
 		ForgetReads(roots, "configuration changed")
 		record(log, "engine", "config", actor, "configuration changed, read evidence reset", Yes(), nil)
 	case "PostToolUseFailure":
+		// THE FAILURE IS COUNTED, so the same call failing the same way over
+		// and over is refused before the turn dies of it.
+		noteFailure(roots, actor, in)
 		// The same one line, and the ok column is what says it failed.
 		said := takeCall(roots, in.ToolUseID)
 		if said == "" {
@@ -492,13 +563,15 @@ func notePostTool(roots Roots, in hookIn, actor string) {
 	}
 	switch in.ToolName {
 	case "Read", "NotebookRead":
-		NoteRead(roots, actor, path)
+		var ti toolInput
+		_ = json.Unmarshal(in.ToolInput, &ti) // a range that will not read is the whole file
+		NoteReadPage(roots, actor, path, pageOf(ti))
 	case "Write", "Edit", "MultiEdit", "NotebookEdit":
 		ForgetRead(roots, path)
 	}
 }
 
-func decidePreToolUse(roots Roots, cfg Config, emergency Emergency, log *Log, in hookIn, actor string) {
+func decidePreToolUse(g *guard, roots Roots, cfg Config, emergency Emergency, log *Log, in hookIn, actor string) {
 	// ANYTHING YOU DO AFTER CLAIMING A STOP ERASES THE CLAIM. A claim says the
 	// next thing is stopping. An agent that claims and then carries on has
 	// changed its mind, whether or not it noticed.
@@ -515,6 +588,55 @@ func decidePreToolUse(roots Roots, cfg Config, emergency Emergency, log *Log, in
 		path = ti.Path
 	}
 
+	// THE SAME CALL FAILING THE SAME WAY AGAIN IS STOPPED HERE, before the
+	// tokens are spent on it once more.
+	if why, refuse := aRepeatedFailure(roots, actor, in); refuse {
+		record(log, "engine", "loop", actor, "refused: the same call failed again and again", No(),
+			map[string]any{"tool": in.ToolName})
+		g.deny(why)
+		return
+	}
+
+	// A READ IS DEDUPLICATED AND CLAMPED. The range the read will take is
+	// settled first, so the dedup asks about the read that will happen and
+	// not the one that was asked for.
+	if in.ToolName == "Read" && path != "" {
+		effective := ti
+		lines, clamp := aReadTooLarge(cfg, path, ti)
+		if clamp {
+			effective.Limit = cfg.ReadClampLines
+		}
+		if why, refuse := aReadAlreadyHeld(roots, actor, path, pageOf(effective)); refuse {
+			record(log, "engine", "dedup", actor, "refused: a read already held, unchanged", No(),
+				map[string]any{"path": path})
+			g.deny(why)
+			return
+		}
+		if clamp {
+			updated := map[string]any{"file_path": ti.FilePath, "limit": cfg.ReadClampLines}
+			if ti.Offset > 0 {
+				updated["offset"] = ti.Offset
+			}
+			record(log, "engine", "clamp", actor,
+				fmt.Sprintf("read corrected: %d lines asked for, %d handed over", lines, cfg.ReadClampLines), Yes(),
+				map[string]any{"path": path, "lines": lines, "limit": cfg.ReadClampLines})
+			g.correct(updated, fmt.Sprintf("%s has %d lines. This read is cut to %d; read on with offset.",
+				filepath.Base(path), lines, cfg.ReadClampLines))
+			return
+		}
+	}
+
+	// A WRITE AGAINST CONTENT THE WRITER HAS NOT SEEN IS REFUSED, and never
+	// corrected, because nobody knows what was meant against it.
+	if writesTools[in.ToolName] && path != "" {
+		if why, refuse := aStaleWrite(roots, path); refuse {
+			record(log, "engine", "stale", actor, "refused: the file changed since it was read", No(),
+				map[string]any{"path": path})
+			g.deny(why)
+			return
+		}
+	}
+
 	// SEARCH WITH THE TOOL THE PROBE FOUND. It is on this machine, the engine
 	// wrote it down at boot, and the agent went on typing the one its fingers
 	// knew. Every rule an agent is asked to remember is one it forgets, so this
@@ -524,13 +646,13 @@ func decidePreToolUse(roots Roots, cfg Config, emergency Emergency, log *Log, in
 			if why, refuse := ARecursiveSearch(ti.Command, better); refuse {
 				record(log, "engine", "search", actor, "refused: a recursive search over the tree", No(),
 					map[string]any{"tool": in.ToolName, "better": better.Name})
-				denyToolUse(why)
+				g.deny(why)
 				return
 			}
 		}
 	}
 
-	writes := map[string]bool{"Write": true, "Edit": true, "NotebookEdit": true, "MultiEdit": true}
+	writes := writesTools
 	if writes[in.ToolName] && path != "" && cfg.GuardProjections {
 		if yes, instead := IsProjection(roots, path); yes {
 			// Emergency mode widens the floor, because repair needs powers
@@ -548,7 +670,7 @@ func decidePreToolUse(roots Roots, cfg Config, emergency Emergency, log *Log, in
 				filepath.Base(path), instead)
 			record(log, "engine", "refusal", actor, "write refused: "+filepath.Base(path)+" is a projection", No(),
 				map[string]any{"rule": "projection-is-output", "path": path, "write_instead": instead})
-			denyToolUse(reason)
+			g.deny(reason)
 			return
 		}
 	}
@@ -574,7 +696,7 @@ func decidePreToolUse(roots Roots, cfg Config, emergency Emergency, log *Log, in
 			// This refuses a FORM, never a place. The same file, written
 			// properly, goes through. Say so, so the refusal is not read as
 			// a ban on the folder.
-			denyToolUse("This text breaks rules the voice check can see. Nothing is wrong with the file: " +
+			g.deny("This text breaks rules the voice check can see. Nothing is wrong with the file: " +
 				"fix these and write it again.\n" + strings.Join(lines, "\n"))
 			return
 		}
@@ -606,7 +728,7 @@ func decidePreToolUse(roots Roots, cfg Config, emergency Emergency, log *Log, in
 				record(log, "engine", "refusal", actor,
 					fmt.Sprintf("write refused: %d schema findings in %s", len(found), filepath.Base(path)), No(),
 					map[string]any{"rule": "schema", "path": path, "kind": kind, "findings": lines})
-				denyToolUse("This note does not match the schema its kind names. " +
+				g.deny("This note does not match the schema its kind names. " +
 					"Every departure is below, so fix them together and write it again.\n" +
 					strings.Join(lines, "\n"))
 				return
@@ -616,14 +738,26 @@ func decidePreToolUse(roots Roots, cfg Config, emergency Emergency, log *Log, in
 
 	// PRIVATE ORIGINALS DO NOT TRAVEL. Digests do. A copy is a hash match, so
 	// this is a comparison and never a judgement about content.
-	if writes[in.ToolName] && path != "" && ti.Content != "" {
-		if from, yes := copyOfAPrivateOriginal(roots, ti.Content); yes && !underPrivate(roots, path) {
+	written := orElse(ti.Content, ti.NewString)
+	if writes[in.ToolName] && path != "" && written != "" && !underPrivate(roots, path) {
+		if from, yes := copyOfAPrivateOriginal(roots, written); yes {
 			record(log, "engine", "refusal", actor,
 				"write refused: this is a copy of a private original", No(),
 				map[string]any{"rule": "private-originals-do-not-travel", "path": path, "copy_of": from})
-			denyToolUse(fmt.Sprintf(
+			g.deny(fmt.Sprintf(
 				"This is the content of %s, which is private and does not travel. "+
 					"Write a digest of it instead, or keep it under .se.", from))
+			return
+		}
+		// AND NEITHER DOES A PASSAGE OF ONE. A sentence may be quoted; a run
+		// of lines pasted whole is the original leaving in pieces.
+		if from, line, yes := copiedPassageOf(roots, written); yes {
+			record(log, "engine", "refusal", actor,
+				"write refused: a passage of a private original", No(),
+				map[string]any{"rule": "private-originals-do-not-travel", "path": path, "copy_of": from, "line": line})
+			g.deny(fmt.Sprintf(
+				"This carries a passage copied whole from %s, from line %d. A private note does not travel "+
+					"in pieces either: write it in your own words, or quote one sentence.", from, line))
 			return
 		}
 	}
@@ -634,10 +768,19 @@ func decidePreToolUse(roots Roots, cfg Config, emergency Emergency, log *Log, in
 	// token in work. So the queue on the person's screen is the truth about what
 	// is being done, rather than a thing the agent has to remember to update.
 	//
-	// THE ENGINE'S OWN CALLS GO THROUGH. Minting a token, naming one, answering
-	// the person: all of those are how an agent with nothing in hand gets a
-	// token, so gating them would be a gate nobody could ever pass. This is the
-	// named exception the token asks for rather than a hole.
+	// THERE IS NO EXCEPTION FOR THE ENGINE'S OWN COMMANDS ANY MORE.
+	//
+	// It was here because an agent with nothing in hand has to be able to get a
+	// token, and the only door was a shell. Now the door is the lane: se_work
+	// mints one and se_run runs anything, both of them tools the gate does not
+	// stand in front of. So the exception had no user left, and an open door
+	// with no user is the one that gets found.
+	//
+	// WHAT IT LET THROUGH. `se --version > src/engine/gate.go` was caught by the
+	// redirection check, and it took four goes to get that check right: an
+	// apostrophe in ordinary English opened a quoted span, and a substitution
+	// behind it went past. A parser that has been wrong four times about its own
+	// grammar is not the thing to leave holding a gate.
 	//
 	// IT IS ASKED LAST, AFTER THE GUARDS THAT READ THE WRITE ITSELF. A refusal
 	// naming the projection, the voice rule or the private original tells the
@@ -648,13 +791,11 @@ func decidePreToolUse(roots Roots, cfg Config, emergency Emergency, log *Log, in
 	// writes the link down here and the gate can ask about both.
 	NoteTheNameItPullsWith(roots, actor, ti.Command)
 
-	if !runsTheEngine(ti.Command) {
-		if why, refuse := WriteNeedsAToken(roots, actor, in.ToolName, pathOf(in)); refuse {
-			record(log, "engine", "gate", actor, "refused: no token in hand", No(),
-				map[string]any{"tool": in.ToolName})
-			denyToolUse(why)
-			return
-		}
+	if why, refuse := WriteNeedsAToken(roots, actor, in.ToolName, pathOf(in)); refuse {
+		record(log, "engine", "gate", actor, "refused: it cannot name its token", No(),
+			map[string]any{"tool": in.ToolName})
+		g.deny(why)
+		return
 	}
 
 	// ONE LINE PER CALL, and it is written when the call comes back.
@@ -677,30 +818,40 @@ func rememberCall(r Roots, id, said string) {
 	if id == "" || said == "" {
 		return
 	}
-	calls := loadCalls(r)
-	calls[id] = said
-	// A call that never came back would keep its line for ever. The newest few
-	// are what an answer can still be waiting for.
-	if len(calls) > 64 {
-		calls = map[string]string{id: said}
-	}
-	if b, err := json.Marshal(calls); err == nil {
-		_ = writeAtomic(callPath(r), b, 0o644) // the guard answers whether or not it can count the call
-	}
+	_ = locked(callPath(r), func() error { // the guard answers whether or not it can count the call
+		calls := loadCalls(r)
+		calls[id] = said
+		// A call that never came back would keep its line for ever. The newest
+		// few are what an answer can still be waiting for.
+		if len(calls) > 64 {
+			calls = map[string]string{id: said}
+		}
+		b, err := json.Marshal(calls)
+		if err != nil {
+			return err
+		}
+		return writeAtomic(callPath(r), b, 0o644)
+	})
 }
 
 func takeCall(r Roots, id string) string {
 	if id == "" {
 		return ""
 	}
-	calls := loadCalls(r)
-	said := calls[id]
-	if said != "" {
-		delete(calls, id)
-		if b, err := json.Marshal(calls); err == nil {
-			_ = writeAtomic(callPath(r), b, 0o644) // the guard answers whether or not it can count the call
+	var said string
+	_ = locked(callPath(r), func() error { // the guard answers whether or not it can count the call
+		calls := loadCalls(r)
+		said = calls[id]
+		if said == "" {
+			return nil
 		}
-	}
+		delete(calls, id)
+		b, err := json.Marshal(calls)
+		if err != nil {
+			return err
+		}
+		return writeAtomic(callPath(r), b, 0o644)
+	})
 	return said
 }
 
@@ -727,10 +878,45 @@ func underPrivate(roots Roots, path string) bool {
 	return !strings.HasPrefix(rel, "..")
 }
 
+// copiedPassageOf asks whether content carries a passage of a private file.
+// The model answers first, then the index file while it is fresh. With
+// neither there is no cheap way to know, and the write goes through: the
+// whole-file check above still holds, and the record shows which path
+// answered.
+func copiedPassageOf(roots Roots, content string) (string, int, bool) {
+	if from, line, found, answered := copiedPassageViaModel(roots, content); answered {
+		return fromPrivate(roots, from), line, found
+	}
+	if from, line, found, trusted := copiedPassageInIndex(roots, content); trusted {
+		return fromPrivate(roots, from), line, found
+	}
+	return "", 0, false
+}
+
+func fromPrivate(roots Roots, rel string) string {
+	if rel == "" {
+		return ""
+	}
+	return filepath.Join(roots.Work, filepath.FromSlash(rel))
+}
+
 // copyOfAPrivateOriginal compares the content being written against what is
 // in the private folder. A match is a copy, and a copy is a hash, so nothing
 // here reads or judges what the file says.
 func copyOfAPrivateOriginal(roots Roots, content string) (string, bool) {
+	// THE INDEX ANSWERS FIRST, AND THE WALK ANSWERS WHEN IT CANNOT. The walk
+	// grew with the work: measured at tens of milliseconds today and seconds
+	// at twenty thousand tokens, paid on every write. Against the index it is
+	// one lookup by size and hash. An index the daemon is not keeping fresh
+	// is not trusted, and then the walk is what it always was.
+	// THE MODEL FIRST, THE INDEX FILE SECOND, THE WALK LAST. Each answers
+	// only when it can, and the next one is what it always was.
+	if from, found, answered := privateCopyViaModel(roots, content); answered {
+		return from, found
+	}
+	if from, found, trusted := privateCopyInIndex(roots, content); trusted {
+		return from, found
+	}
 	want := sha256.Sum256([]byte(content))
 	var found string
 	_ = filepath.Walk(roots.Private(), func(p string, info os.FileInfo, err error) error { // a walk that cannot finish answers what it found
@@ -777,21 +963,33 @@ func isProse(path string) bool {
 // flag, so asking twice proves the harness retried and nothing about what the
 // agent decided. v3 measured that: block, pass, block, pass, and the tooth
 // never bit.
-func decideStop(roots Roots, cfg Config, log *Log, in hookIn, actor string) {
+func decideStop(g *guard, roots Roots, cfg Config, log *Log, in hookIn, actor string) {
 	if !cfg.StopNeedsClaim {
 		record(log, "agent", "stop", actor, "stopped", Yes(), nil)
 		return
 	}
 	if c, ok := StandingClaim(roots, actor); ok {
+		forgetRefusedStops(roots, actor)
 		record(log, "agent", "stop", actor, "stopped: "+c.Because+" — "+c.Why, Yes(),
 			map[string]any{"because": c.Because, "why": c.Why})
+		return
+	}
+	// A REFUSAL THAT KEEPS BEING REFUSED NOTICES, AND RELENTS. The harness
+	// overrides a hook that blocks too many times in a row, so past that the
+	// refusal would stop existing without a word. Granting it here, with the
+	// count in the record, keeps the failure visible instead.
+	if countRefusedStop(roots, actor) {
+		record(log, "agent", "stop", actor,
+			fmt.Sprintf("stop granted with no reason claimed: refused %d times in a row, so the guard relents",
+				stopRefusalsBeforeRelenting), No(),
+			map[string]any{"relented": true, "refusals": stopRefusalsBeforeRelenting})
 		return
 	}
 	// AN AUTHORITY MAY EXIST, AND THIS ASKS IT. It does not decide whether the
 	// stop is refused. It says what else the agent is holding, so the refusal
 	// names the work rather than only the rule.
 	record(log, "agent", "stop", actor, "stop refused, no reason claimed", No(), nil)
-	blockStop(TheList(askTheAuthority(roots, actor).Reason))
+	g.blockStop(TheList(askTheAuthority(roots, actor).Reason))
 }
 
 func describe(tool, path, command string) string {
@@ -844,12 +1042,12 @@ func record(log *Log, src, kind, actor, msg string, ok *bool, data map[string]an
 // call, which is the thing the grace exists to stop for the first few. Claude
 // Code reads additionalContext on a PreToolUse that allows, so the call goes
 // through and the agent is told anyway.
-func warnTheAgent(said string) {
+func (g *guard) warn(said string) {
 	out, _ := json.Marshal(map[string]any{
 		"hookSpecificOutput": map[string]any{
 			"hookEventName":     "PreToolUse",
 			"additionalContext": said,
 		},
 	})
-	fmt.Println(string(out))
+	fmt.Fprintln(g.out, string(out))
 }

@@ -172,6 +172,10 @@ func variables(roots Roots) (map[string]string, error) {
 		"mcp":    within(roots.Work, filepath.Join(bin, "se-mcp")),
 		"method": within(roots.Work, roots.Method),
 		"work":   within(roots.Work, roots.Work),
+		// THE GUARD'S DOOR, derived from the work root, so the cage can name it
+		// before an engine exists and every engine over this folder binds it.
+		"hooks":        hooksURL(roots),
+		"hook_timeout": fmt.Sprint(hookTimeoutSeconds),
 	}, nil
 }
 
@@ -315,10 +319,10 @@ func writeIfDifferent(path, content string) (bool, error) {
 	if old, err := os.ReadFile(path); err == nil && string(old) == content {
 		return false, nil
 	}
-	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
-		return false, err
-	}
-	return true, os.WriteFile(path, []byte(content), modeFor(path))
+	// A PROJECTION IS READ BY THE HARNESS WHILE IT IS WRITTEN. A truncating
+	// write leaves a half-written cage for the length of the write, and a
+	// harness that read it then ran with half its hooks.
+	return true, writeAtomic(path, []byte(content), modeFor(path))
 }
 
 // A SHELL SCRIPT IS RUN, so it is written with the bit that lets it run.
@@ -345,9 +349,20 @@ func IsProjection(roots Roots, path string) (bool, string) {
 	}
 	for _, p := range list {
 		dest := filepath.Join(roots.Work, filepath.FromSlash(p.Target))
-		if sameFile(abs, dest) {
+		if !sameFile(abs, dest) {
+			continue
+		}
+		// WHERE TO WRITE INSTEAD IS THE FOLDER WHEN THE MAP NAMES ONE. A
+		// projection assembled from a folder lists no source of its own, and
+		// reading the first of an empty list took the guard down on the one
+		// write it exists to refuse. The self-test found it.
+		if p.SourcesFrom != "" {
+			return true, filepath.Join(roots.Method, filepath.FromSlash(p.SourcesFrom))
+		}
+		if len(p.Sources) > 0 {
 			return true, filepath.Join(roots.Method, filepath.FromSlash(p.Sources[0]))
 		}
+		return true, "the map in util/projections.json, which names no source for it"
 	}
 	return false, ""
 }

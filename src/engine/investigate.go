@@ -107,11 +107,19 @@ func lookedPath(r Roots) string { return r.Private("looked.json") }
 
 // Looked records that this actor was sent to look at this token.
 func Looked(r Roots, actor, id string) {
-	seen := lookedAt(r)
-	seen[actor] = id
-	if b, err := json.MarshalIndent(seen, "", "  "); err == nil {
-		_ = writeAtomic(lookedPath(r), b, 0o644) // a walker it cannot remember is sent to look again
+	_ = locked(lookedPath(r), func() error { // a walker it cannot remember is sent to look again
+		seen := lookedAt(r)
+		seen[actor] = id
+		return saveLooked(r, seen)
+	})
+}
+
+func saveLooked(r Roots, seen map[string]string) error {
+	b, err := json.MarshalIndent(seen, "", "  ")
+	if err != nil {
+		return err
 	}
+	return writeAtomic(lookedPath(r), b, 0o644)
 }
 
 func lookedAt(r Roots) map[string]string {
@@ -131,14 +139,18 @@ func lookedAt(r Roots) map[string]string {
 // swept up every stale hold would be the timeout this whole answer exists to
 // refuse.
 func TakeBackWhatWasLookedAt(r Roots, actor string) []string {
-	seen := lookedAt(r)
-	id, was := seen[actor]
-	if !was || id == "" {
+	var id string
+	_ = locked(lookedPath(r), func() error { // a walker it cannot remember is sent to look again
+		seen := lookedAt(r)
+		id = seen[actor]
+		if id == "" {
+			return nil
+		}
+		delete(seen, actor)
+		return saveLooked(r, seen)
+	})
+	if id == "" {
 		return nil
-	}
-	delete(seen, actor)
-	if b, err := json.MarshalIndent(seen, "", "  "); err == nil {
-		_ = writeAtomic(lookedPath(r), b, 0o644) // a walker it cannot remember is sent to look again
 	}
 	t, err := LoadToken(r, id)
 	if err != nil {

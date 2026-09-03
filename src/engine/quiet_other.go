@@ -2,7 +2,17 @@
 
 package main
 
-import "os/exec"
+import (
+	"os/exec"
+	"syscall"
+)
+
+// A PROCESS THAT OUTLIVES THE ONE THAT STARTED IT. A new session, so the
+// hook's end, and the terminal's, is not the engine's.
+func Detached(cmd *exec.Cmd) *exec.Cmd {
+	cmd.SysProcAttr = &syscall.SysProcAttr{Setsid: true}
+	return cmd
+}
 
 // Nothing to hide. A process started here inherits the terminal it was started
 // from, and no window is made for it.

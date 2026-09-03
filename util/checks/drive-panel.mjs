@@ -22,6 +22,7 @@ import { mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve as resolvePath } from "node:path";
 import { pathToFileURL } from "node:url";
+import { liveEngine } from "./lib/engine.mjs";
 
 const asked = process.argv[2]?.startsWith("--") ? process.argv[2] : "";
 const root = resolvePath((asked ? process.argv[3] : process.argv[2]) ?? ".");
@@ -154,7 +155,11 @@ const cases = {
 
     // THE REAL BINARY, IN A TREE OF ITS OWN, so the record is not written to.
     const work = mkdtempSync(join(tmpdir(), "panel-work-"));
+    // The verb runs in the engine over the folder, so one lives here for
+    // the length of the call.
+    const stopEngine = liveEngine(root, work);
     const got = spawnSync(exe, [...args, "--work", work], { encoding: "utf8" });
+    stopEngine();
     // THE ENGINE SAYS WHETHER IT READ THE CALL. Unread is 2 in src/engine/verbs.go.
     if (got.status === 2) {
       no(`reaches: the engine did not read the call, exit 2: ${firstLine(got.stdout + got.stderr)}`);

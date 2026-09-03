@@ -7,71 +7,104 @@ import (
 	"testing"
 )
 
-// THE STANDING LAYER IS THE RULE. THE CASE IT CAME FROM IS SERVED.
+// GUIDANCE THE PROMPT ALREADY CARRIES IS NEVER SENT.
 //
-// Level 0 ruled that the standing layer is small and its size is budgeted. It
-// has been growing by accretion instead: every lesson that reached guidance
-// added a section and nothing took one out, so AGENTS.md is paid on every turn
-// by every agent whatever it is doing.
-//
-// WHAT SPLITS. A rule is standing, because an agent has to be holding it before
-// it acts. The MEASURED narrative under a rule is the evidence for it, and it is
-// read at two moments and no others: when somebody is judging work, and when
-// somebody is authoring a criterion. So it rides with the review and with the
-// draft, which is a door the engine already has.
-//
-// THE SOURCES ARE ASKED FOR, NOT LISTED. util/projections.json says which files
-// the standing layer is made of, so a third one added there is held to the same
-// rule without anybody remembering this test.
-func standingSources(t *testing.T, r Roots) []string {
-	t.Helper()
-	// THE ENGINE'S OWN READER, NOT A SECOND COPY OF THE SHAPE. This declared
-	// its own struct with target and sources on it, so a projection that names
-	// a folder rather than a list did not parse into it and the check went
-	// quiet on the tree it was written to guard.
-	list, err := LoadProjections(r.Method)
-	if err != nil {
-		t.Fatalf("the projection map cannot be read, so this guards nothing: %v", err)
+// MEASURED. Every pull carried the whole Actionables chapter of work-token.md,
+// 1,201 bytes, and all fourteen of its rules were already in the system prompt
+// the same agent was reading from. A quarter of the pull answer, on every pull,
+// saying what the agent was told before it started.
+func TestGuidanceInThePromptIsNotSentAgain(t *testing.T) {
+	t.Parallel()
+	r := aTreeWithGuidance(t)
+
+	text, says := TheGuidanceFor(r, "main", "standing")
+	if text != "" {
+		t.Errorf("it sent %d bytes of guidance the prompt already carries", len(text))
 	}
-	seen := map[string]bool{}
-	var out []string
-	for _, p := range list {
-		if !strings.HasSuffix(p.Target, ".md") && !strings.HasSuffix(p.Target, "quackitect.md") {
-			continue
-		}
-		// THE SAME ANSWER THE ENGINE USES. This read p.Sources, and a
-		// projection that names a folder instead of a list left it empty, so
-		// the check guarded nothing while looking like it passed.
-		srcs, err := sourcesOf(r.Method, p)
-		if err != nil {
-			t.Fatalf("%s: %v", p.Name, err)
-		}
-		for _, s := range srcs {
-			if strings.HasPrefix(s, "doc/guidance/") && !seen[s] {
-				seen[s], out = true, append(out, s)
-			}
-		}
+	if !strings.Contains(says, "doc/guidance/standing.md") {
+		t.Errorf("it does not say where the rules are: %q", says)
 	}
-	if len(out) == 0 {
-		t.Fatal("no guidance file is projected into the standing layer, so this guards nothing")
+	// AND IT SAYS SO EVERY TIME, because an agent that has lost them has to
+	// know what to open.
+	if _, again := TheGuidanceFor(r, "main", "standing"); again != says {
+		t.Error("the second pull says something different about the same file")
 	}
-	return out
 }
 
-// A CASE STUDY IS NOT A RULE, so it is not paid for on every turn.
-func TestTheStandingLayerCarriesNoCaseStudies(t *testing.T) {
+// GUIDANCE THE PROMPT DOES NOT CARRY IS SENT ONCE, AND NAMED AFTER THAT.
+func TestGuidanceOutsideThePromptIsSentOnce(t *testing.T) {
 	t.Parallel()
-	r := Roots{Method: filepath.Join("..", ".."), Work: filepath.Join("..", "..")}
-	for _, name := range standingSources(t, r) {
-		b, err := os.ReadFile(filepath.Join(r.Method, filepath.FromSlash(name)))
-		if err != nil {
-			t.Fatalf("%s cannot be read: %v", name, err)
-		}
-		for i, line := range strings.Split(string(b), "\n") {
-			if strings.HasPrefix(line, "MEASURED") {
-				t.Errorf("%s:%d is a case study in the standing layer, paid for on every "+
-					"turn by every agent: %s", name, i+1, firstLines(line, 1))
-			}
+	r := aTreeWithGuidance(t)
+
+	text, says := TheGuidanceFor(r, "main", "software-development/lane")
+	if !strings.Contains(text, "A rule only this lane has") {
+		t.Fatalf("the first pull did not send the rules: %q", text)
+	}
+	if !strings.Contains(says, "doc/guidance/software-development/lane.md") {
+		t.Errorf("it does not name the file: %q", says)
+	}
+
+	// The second time it is named and not sent.
+	again, saysAgain := TheGuidanceFor(r, "main", "software-development/lane")
+	if again != "" {
+		t.Errorf("it sent the same rules twice: %d bytes", len(again))
+	}
+	if !strings.Contains(saysAgain, "read this session") {
+		t.Errorf("it does not say why it was not sent: %q", saysAgain)
+	}
+
+	// ANOTHER ACTOR HAS NOT READ IT. They are separate contexts, and what one
+	// holds the other never saw.
+	other, _ := TheGuidanceFor(r, "reviewer-2", "software-development/lane")
+	if other == "" {
+		t.Error("a second actor was told it had already read what it never saw")
+	}
+
+	// AND A COMPACTION FORGETS IT, because a compacted agent no longer holds
+	// what it read.
+	ForgetReads(r, "compaction")
+	after, _ := TheGuidanceFor(r, "main", "software-development/lane")
+	if after == "" {
+		t.Error("after a compaction the rules were still withheld")
+	}
+}
+
+// aTreeWithGuidance is a method root with two guidance files: one the
+// projection puts in the prompt, and one it does not.
+func aTreeWithGuidance(t *testing.T) Roots {
+	t.Helper()
+	root := t.TempDir()
+	r := Roots{Method: root, Work: root}
+	dir := GuidanceDir(root)
+	if err := os.MkdirAll(dir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	write := func(name, body string) {
+		if err := os.WriteFile(filepath.Join(dir, name), []byte(body), 0o644); err != nil {
+			t.Fatal(err)
 		}
 	}
+	write("standing.md", "# Actionables\n\n1. A rule every agent is handed.\n")
+	write("lane.md", "# Actionables\n\n1. A rule only this lane has.\n")
+
+	// The projection carries the top-level folder, which is where standing.md
+	// is. lane.md sits in a subfolder, which the standing layer never reaches.
+	sub := filepath.Join(dir, "software-development")
+	if err := os.MkdirAll(sub, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Rename(filepath.Join(dir, "lane.md"), filepath.Join(sub, "lane.md")); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.MkdirAll(filepath.Join(root, "util"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	const projections = `{"projections":[
+	  {"name":"prompt","target":"prompt.md","wrap":"markdown",
+	   "section":"Actionables","sources_from":"doc/guidance"}]}`
+	if err := os.WriteFile(filepath.Join(root, "util", "projections.json"),
+		[]byte(projections), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	return r
 }

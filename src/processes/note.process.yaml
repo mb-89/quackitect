@@ -36,7 +36,10 @@ fields:
     - holder
     - needs_human
     - depends_on
+    - parent
     - ready_when
+    - began
+    - ended
     - disposition
     - reason
     - successors

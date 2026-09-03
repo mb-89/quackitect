@@ -79,8 +79,28 @@ frontmatter:
       x-link: true
       description: tokens that have to close before this can start
 
+    # A TOKEN WITH SUB-TOKENS IS A SCOPE. The sub-token names its parent, and
+    # the parent cannot close while any sub-token is open. Containment and
+    # order are two relations: depends_on is order between peers, and this is
+    # a piece of work inside a larger one.
+    parent:
+      x-link: true
+      description: the token this is a part of. It cannot close while this is open
+
     ready_when:
       description: what has to be true before this is worth reading again
+
+    # THE CHANGE, AS TWO HASHES. The engine snapshots the tree when the work
+    # is taken up and when it closes, and the diff between them is what
+    # changed. A list of files is not written anywhere: it goes stale the
+    # day after, and a hash pair does not.
+    began:
+      type: array
+      description: the tree each time the work was taken up, snapshots the engine wrote
+
+    ended:
+      type: array
+      description: the tree each time the work was put down or closed, snapshots the engine wrote
 
     disposition:
       x-enum-from: process.dispositions

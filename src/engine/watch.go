@@ -61,6 +61,11 @@ type Running struct {
 	Started string `json:"started"`
 	Beat    string `json:"beat"`
 	Build   string `json:"build"`
+	// Socket is where the model answers, and empty while it does not.
+	Socket string `json:"socket,omitempty"`
+	// Hooks is where the guard answers events over HTTP, and empty while
+	// the port could not be bound.
+	Hooks string `json:"hooks,omitempty"`
 }
 
 func runningPath(r Roots) string { return r.Private("engine.json") }
@@ -84,7 +89,18 @@ func StopSaying(r Roots) { _ = os.Remove(runningPath(r)) }
 // a process that is gone is not an engine, and saying so is the whole job.
 func LoadRunning(r Roots) (Running, bool) {
 	var v Running
-	b, err := os.ReadFile(runningPath(r))
+	// THE FILE IS REPLACED ON EVERY BEAT, and on Windows a reader can meet
+	// the instant between the old one going and the new one landing. A miss
+	// is read again before it is believed, because a guard that believed it
+	// went cold for one call in the middle of a session.
+	var b []byte
+	var err error
+	for try := 0; try < 20; try++ {
+		if b, err = os.ReadFile(runningPath(r)); err == nil {
+			break
+		}
+		time.Sleep(25 * time.Millisecond)
+	}
 	if err != nil || json.Unmarshal(b, &v) != nil {
 		return v, false
 	}

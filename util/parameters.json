@@ -157,6 +157,36 @@
           "help": "How many bytes one evidence section may hold before the save refuses it. Name what was built and what the check said. It may be made smaller and never larger."
         },
         {
+          "name": "read_clamp_lines",
+          "title": "read clamp",
+          "type": "int",
+          "default": 800,
+          "min": 50,
+          "max": 800,
+          "narrow": "smaller",
+          "help": "How many lines a read may take at once. A read of a longer file with no limit is corrected to this many, and the answer says how to read on. It may be made smaller and never larger."
+        },
+        {
+          "name": "helper_ratio",
+          "title": "helper ratio",
+          "type": "int",
+          "default": 10,
+          "min": 10,
+          "max": 100,
+          "narrow": "larger",
+          "help": "A helper's answer may be at most one part in this many of what it read. A larger number is a tighter digest, and only a larger one is taken."
+        },
+        {
+          "name": "helper_floor_bytes",
+          "title": "helper floor",
+          "type": "int",
+          "default": 6000,
+          "min": 500,
+          "max": 6000,
+          "narrow": "smaller",
+          "help": "Bytes a helper's answer may always run to, whatever it read, so a helper given a small job is not held to a ratio of nothing. It may be made smaller and never larger."
+        },
+        {
           "name": "pulls_before_hold_is_stale",
           "title": "pulls before hold is stale",
           "type": "int",

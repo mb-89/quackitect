@@ -35,8 +35,9 @@ func rowOf(r Roots, t Token) Row {
 		"status": vs(string(t.Status)), "process": vs(t.Process),
 		"bucket": vs(t.Bucket),
 		"holder": vs(t.Holder), "needs_human": vb(t.NeedsHuman),
-		"depends_on": vl(t.DependsOn), "ready_when": vs(t.ReadyWhen),
+		"depends_on": vl(t.DependsOn), "parent": vs(t.Parent), "ready_when": vs(t.ReadyWhen),
 		"disposition": vs(string(t.Disposition)), "reason": vs(t.Reason),
+		"began": vl(t.Began), "ended": vl(t.Finished),
 		"successors": vl(t.Successors),
 	}
 	// WHAT A QUERY CAN ASK THAT THE TOKEN DOES NOT ANSWER ITSELF. Blocked is
