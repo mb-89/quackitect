@@ -46,6 +46,18 @@ const hookTimeoutSeconds = 3
 // before any engine has started and every engine over this folder binds
 // the same one. The range sits above the well-known ports and below the
 // ephemeral ones on every platform this runs on.
+//
+// DERIVING IT WAS NEVER THE DEFECT. COMMITTING THE FILE IT LANDS IN WAS. This
+// number is right here and meaningless anywhere else, and it sat in the
+// settings file every clone carries: this box wrote 33987, a cloud clone bound
+// 30268, and whichever box committed last pushed its own. A value that must
+// tell two folders apart on one machine cannot also be the same on two
+// machines, because two clones of one commit are the same tree. So the cage is
+// two files, and only the door moves. See util/cage/claude-settings.json.
+//
+// v3 had no such number because every hook there was a command, computing the
+// door at runtime. The HTTP door is what removed a process per tool call, and
+// this is the price of it, paid in a file git does not carry.
 func hooksPort(r Roots) int {
 	h := fnv.New32a()
 	h.Write([]byte(theSameFolderEveryTime(r.Work)))

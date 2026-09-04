@@ -71,38 +71,45 @@ func TestTheCageSendsCallsToTheDoorAndWakesTheEngine(t *testing.T) {
 	r := guidanceTree(t)
 	// THE CAGE UNDER TEST IS THE PRODUCT'S, copied into the fixture's method,
 	// because what is checked is what the product projects.
-	cage, err := os.ReadFile(filepath.Join("..", "..", "util", "cage", "claude-settings.json"))
-	if err != nil {
-		t.Fatal(err)
-	}
+	//
+	// AND IT IS TWO FILES. The door is a port, and a port is this machine's, so
+	// it left the file every clone carries and went to one git does not. Claude
+	// Code combines list keys across settings files rather than picking one, so
+	// the two are one cage. What this holds is that the split fell where it was
+	// meant to: the door on one side, the wake on the other, and neither file
+	// carrying the other's half.
 	os.MkdirAll(filepath.Join(r.Method, "util", "cage"), 0o755)
-	os.WriteFile(filepath.Join(r.Method, "util", "cage", "claude-settings.json"), cage, 0o644)
+	for _, name := range []string{"claude-settings.json", "claude-settings-local.json"} {
+		cage, err := os.ReadFile(filepath.Join("..", "..", "util", "cage", name))
+		if err != nil {
+			t.Fatal(err)
+		}
+		os.WriteFile(filepath.Join(r.Method, "util", "cage", name), cage, 0o644)
+	}
 	os.WriteFile(filepath.Join(r.Method, "util", "projections.json"), []byte(`{"projections":[
-	  {"name":"claude cage","target":".claude/settings.json","sources":["util/cage/claude-settings.json"],"wrap":"none"}
+	  {"name":"claude cage","target":".claude/settings.json","sources":["util/cage/claude-settings.json"],"wrap":"none"},
+	  {"name":"claude door","target":".claude/settings.local.json","sources":["util/cage/claude-settings-local.json"],"wrap":"none","local":true}
 	]}`), 0o644)
 	if _, err := Project(r); err != nil {
 		t.Fatal(err)
 	}
-	b, err := os.ReadFile(filepath.Join(r.Work, ".claude", "settings.json"))
-	if err != nil {
-		t.Fatal(err)
+	travels := caged(t, filepath.Join(r.Work, ".claude", "settings.json"))
+	door := caged(t, filepath.Join(r.Work, ".claude", "settings.local.json"))
+
+	if !strings.Contains(door.text, hooksURL(r)) {
+		t.Fatalf("the door file does not name the door %s", hooksURL(r))
 	}
-	text := string(b)
-	if !strings.Contains(text, hooksURL(r)) {
-		t.Fatalf("the cage does not name the door %s", hooksURL(r))
+	// THE ONE THAT TRAVELS NAMES NO PORT AT ALL, which is the whole point of
+	// there being two.
+	if strings.Contains(travels.text, "127.0.0.1") {
+		t.Fatal("the file every clone carries names a port, so it is one box's")
 	}
-	if strings.Contains(text, "{{") {
-		t.Fatal("the cage carries an unfilled placeholder")
+	for _, one := range []cagedFile{travels, door} {
+		if strings.Contains(one.text, "{{") {
+			t.Fatalf("%s carries an unfilled placeholder", one.path)
+		}
 	}
-	var v struct {
-		Hooks map[string][]struct {
-			Hooks []map[string]any `json:"hooks"`
-		} `json:"hooks"`
-	}
-	if err := json.Unmarshal(b, &v); err != nil {
-		t.Fatal(err)
-	}
-	for event, entries := range v.Hooks {
+	for event, entries := range door.parsed {
 		for _, e := range entries {
 			for _, h := range e.Hooks {
 				if h["type"] == "http" {
@@ -114,7 +121,7 @@ func TestTheCageSendsCallsToTheDoorAndWakesTheEngine(t *testing.T) {
 		}
 	}
 	wakes := 0
-	for _, e := range v.Hooks["UserPromptSubmit"] {
+	for _, e := range travels.parsed["UserPromptSubmit"] {
 		for _, h := range e.Hooks {
 			if cmd, _ := h["command"].(string); strings.Contains(cmd, "--wake") {
 				wakes++
@@ -124,4 +131,32 @@ func TestTheCageSendsCallsToTheDoorAndWakesTheEngine(t *testing.T) {
 	if wakes != 1 {
 		t.Fatalf("the prompt event carries %d wake hooks, want one", wakes)
 	}
+}
+
+// cagedFile is one projected settings file, as text and as hooks.
+type cagedFile struct {
+	path   string
+	text   string
+	parsed map[string][]struct {
+		Hooks []map[string]any `json:"hooks"`
+	}
+}
+
+func caged(t *testing.T, path string) cagedFile {
+	t.Helper()
+	b, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	one := cagedFile{path: path, text: string(b)}
+	var v struct {
+		Hooks map[string][]struct {
+			Hooks []map[string]any `json:"hooks"`
+		} `json:"hooks"`
+	}
+	if err := json.Unmarshal(b, &v); err != nil {
+		t.Fatal(err)
+	}
+	one.parsed = v.Hooks
+	return one
 }

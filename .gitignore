@@ -19,3 +19,7 @@ src/extension/out/
 dev_guide/*
 # design notes and plans, owner-kept and not the product
 dev_guide/
+
+# the guard's HTTP door is this machine's own, and its port is derived from
+# this folder's path. See util/cage/claude-settings.json.
+.claude/settings.local.json

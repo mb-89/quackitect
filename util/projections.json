@@ -27,6 +27,15 @@
       "wrap": "none"
     },
     {
+      "name": "claude door",
+      "target": ".claude/settings.local.json",
+      "sources": [
+        "util/cage/claude-settings-local.json"
+      ],
+      "wrap": "none",
+      "local": true
+    },
+    {
       "name": "copilot cage",
       "target": ".copilot/mcp-config.json",
       "sources": [

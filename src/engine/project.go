@@ -43,6 +43,21 @@ type Projection struct {
 	Wrap        string            `json:"wrap"` // markdown, frontmatter, or none
 	Frontmatter map[string]string `json:"frontmatter,omitempty"`
 
+	// Local says this projection is this machine's own and is not in version
+	// control.
+	//
+	// A PROJECTION THAT TRAVELS MAY NOT NAME A MACHINE, and one that stays may.
+	// The guard's HTTP door is a port derived from this folder's path, so it is
+	// right here and wrong everywhere else, and it sat in the settings file
+	// every clone carries. Every box rewrote that file before it had done
+	// anything, and whichever box committed last pushed its own port to the
+	// branch. So the cage is two files: what travels, and the door.
+	//
+	// It is declared here rather than read off .gitignore, because the map is
+	// where a projection says what it is, and TestATravellingProjectionIsTheSame
+	// OnEveryMachine reads this field to know which ones it holds to that.
+	Local bool `json:"local,omitempty"`
+
 	// The one chapter to take from each source, named by its heading. Empty
 	// means the whole file.
 	Section string `json:"section,omitempty"`

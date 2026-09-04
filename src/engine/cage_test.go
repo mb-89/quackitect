@@ -160,3 +160,96 @@ func TestNoCagedFileNamesAProgramThatIsNotBuiltYet(t *testing.T) {
 
 // root2 is the self-hosting pair, which is the case a cage travels in.
 func root2(root string) Roots { return Roots{Method: root, Work: root} }
+
+// A PROJECTION THAT TRAVELS IS THE SAME FILE ON EVERY MACHINE.
+//
+// THE TWO CHECKS ABOVE ASK THE WRONG QUESTION, and this is the one they meant.
+// They ask whether a caged file spells out this machine's path. What matters is
+// whether the file would come out different somewhere else, and it did, for a
+// value that is not a path at all: the guard's HTTP door is a port hashed from
+// the work root, so the settings file every clone carries held one box's number.
+// This box wrote 33987 and a cloud clone bound 30268. Every machine rewrote that
+// file before it had done anything, and whichever one committed last pushed its
+// own port to the branch.
+//
+// SO THE CAGE IS TWO FILES NOW: what travels, and the door. A projection that is
+// this machine's own says so in the map, and only those may move.
+func TestATravellingProjectionIsTheSameOnEveryMachine(t *testing.T) {
+	t.Parallel()
+	root, err := filepath.Abs(filepath.Join("..", ".."))
+	if err != nil {
+		t.Fatal(err)
+	}
+	list, err := LoadProjections(root)
+	if err != nil || len(list) == 0 {
+		t.Skip("this test reads the product's own list, and it is not here")
+	}
+	// TWO MACHINES, WHICH IS TWO WORK ROOTS. Everything a projection may say
+	// about where it is comes through the variables, so varying the roots is
+	// varying the machine.
+	here, err := variables(Roots{Method: root, Work: root})
+	if err != nil {
+		t.Fatal(err)
+	}
+	elsewhere, err := variables(Roots{Method: "/srv/clone", Work: "/srv/clone"})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	moved := 0
+	for _, p := range list {
+		srcs, err := sourcesOf(root, p)
+		if err != nil {
+			t.Fatalf("%s: %v", p.Name, err)
+		}
+		a, err := assemble(root, srcs, p.Section, here)
+		if err != nil {
+			t.Fatalf("%s: %v", p.Name, err)
+		}
+		b, err := assemble(root, srcs, p.Section, elsewhere)
+		if err != nil {
+			t.Fatalf("%s: %v", p.Name, err)
+		}
+		if p.Local {
+			moved++
+			continue // the door is this machine's own, and it is meant to move
+		}
+		if a != b {
+			t.Errorf("%s (%s) comes out differently on another machine, so the "+
+				"committed copy is one box's and every other box rewrites it",
+				p.Name, p.Target)
+		}
+	}
+	// AND SOMETHING STILL MOVES, or this check passes on a cage that named no
+	// machine because it named nothing.
+	if moved == 0 {
+		t.Error("no projection is this machine's own, so nothing here proves the split holds")
+	}
+}
+
+// AND WHAT MOVES IS NOT IN VERSION CONTROL. Declaring a projection local and
+// committing it anyway is the same dirt under a new name.
+func TestALocalProjectionIsIgnoredByGit(t *testing.T) {
+	t.Parallel()
+	root, err := filepath.Abs(filepath.Join("..", ".."))
+	if err != nil {
+		t.Fatal(err)
+	}
+	list, err := LoadProjections(root)
+	if err != nil || len(list) == 0 {
+		t.Skip("this test reads the product's own list, and it is not here")
+	}
+	ignored, err := os.ReadFile(filepath.Join(root, ".gitignore"))
+	if err != nil {
+		t.Skip("no .gitignore here to read")
+	}
+	for _, p := range list {
+		if !p.Local {
+			continue
+		}
+		if !strings.Contains(string(ignored), p.Target) {
+			t.Errorf("%s writes %s, which is this machine's own and is not in .gitignore",
+				p.Name, p.Target)
+		}
+	}
+}

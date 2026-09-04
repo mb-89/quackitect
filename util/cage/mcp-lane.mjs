@@ -34,7 +34,8 @@
 //   node util/cage/mcp-lane.mjs --method . --work .
 import { existsSync, statSync } from "node:fs";
 import { spawn } from "node:child_process";
-import { dirname, join } from "node:path";
+import { delimiter, dirname, join } from "node:path";
+import { homedir } from "node:os";
 import { fileURLToPath } from "node:url";
 import { createInterface } from "node:readline";
 
@@ -201,17 +202,29 @@ function answerWhileItBuilds() {
   // engine first and the lane last, so waiting on the installer to reach the
   // lane means waiting out the whole cgo build with no tool listed at all. This
   // puts the tools in front of the agent while that runs.
-  let quick = true;
-  const built = spawn("go", ["build", "-o", ownExe, "."], {
-    cwd: join(root, "src", "mcp"),
-    stdio: ["ignore", 2, 2],
-  });
-  built.on("error", () => {
-    quick = false; // no go on PATH yet, and the installer is putting one there
-  });
-  built.on("exit", () => {
-    quick = false;
-  });
+  // AND IT IS TRIED AGAIN WHILE THE INSTALLER RUNS, because the first attempt
+  // fails on the box this is for. A cloud clone has no go until the installer
+  // puts one there, so a single attempt at the start is an attempt that always
+  // misses, and the tools then wait out the whole cgo build after all. The
+  // installer fetches go first, so the second or third attempt is the one that
+  // works, and it costs a spawn every few seconds while nothing else can act.
+  let quick = null;
+  const buildTheLane = () => {
+    if (quick !== null) {
+      return; // one at a time, and two would race for one output file
+    }
+    quick = spawn("go", ["build", "-o", ownExe, "."], {
+      cwd: join(root, "src", "mcp"),
+      stdio: ["ignore", 2, 2],
+    });
+    quick.on("error", () => {
+      quick = null; // no go on PATH yet, and the installer is putting one there
+    });
+    quick.on("exit", () => {
+      quick = null;
+    });
+  };
+  buildTheLane();
 
   // WAITING WATCHES THE FILE AND NOT THE PROCESS THAT WRITES IT. Either build
   // may be the one that gets there, and the installer goes on for a while after
@@ -240,11 +253,15 @@ function answerWhileItBuilds() {
     if (waited % 40 === 0) {
       say("still building, " + Math.round(waited * 0.4) + " seconds so far");
     }
+    // Every few seconds, until go is there and the lane is built.
+    if (installing && waited % 12 === 0) {
+      buildTheLane();
+    }
     // GIVING UP IS ABOUT A FILE THAT IS NOT THERE, and never about one that is
     // still being written. The installer exits a moment after the last byte of
     // the lane lands, and reading "not settled yet" as "never coming" threw the
     // built lane away on the tick after the build that made it.
-    if (!installing && !quick && !existsSync(ownExe) && !existsSync(laneExe)) {
+    if (!installing && quick === null && !existsSync(ownExe) && !existsSync(laneExe)) {
       clearInterval(watch);
       broken = "the build finished and left no tool lane at " + laneExe + ".";
       say(broken);

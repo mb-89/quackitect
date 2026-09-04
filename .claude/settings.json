@@ -1,55 +1,14 @@
 {
-  "$comment": "THE PER-CALL EVENTS GO TO THE ENGINE THAT LIVES, over HTTP, so no process is started per tool call. SessionStart stays a command, because it is what brings the engine up. The timeout is short: an engine that has not answered is one that is not there, and the call goes on. WHAT EACH EVENT FIRES WAS MEASURED OFF THE RECORD, and the table is on wk-218e541ec2. Every event below has arrived, under the command line and under the editor, apart from PreCompact. PreCompact stays because no session in the record has compacted, and the read set has to be dropped when one does. PostCompact was struck: it never arrived, and a SessionStart whose source is compact is the same moment.",
+  "$comment": "THE CAGE THAT TRAVELS. Everything here is the same on every machine, so this file is in version control and never moves once it is written. WHAT IS NOT HERE IS THE GUARD'S HTTP DOOR, and that is the whole reason there are two files. The door is a port, the port is per folder, and a per-machine number in a tracked file is dirt on every clone and a wrong number on all but one of them: this box committed 33987 and a cloud clone bound 30268, so the branch carried one box's port and every other box rewrote it before doing anything. The door lives in .claude/settings.local.json, which is not in version control. Claude Code merges list keys across settings files rather than picking one, so the two files are one cage, and it reloads hooks when a settings file changes, so a door written after the session began still arrives. SessionStart and the wake stay commands, because they are what brings the engine up, and neither needs a port to say so. WHAT EACH EVENT FIRES WAS MEASURED OFF THE RECORD, and the table is on wk-218e541ec2.",
   "outputStyle": "quackitect",
   "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "http",
-            "url": "http://127.0.0.1:33987/hook",
-            "timeout": 3
-          }
-        ]
-      }
-    ],
-    "PostToolUse": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "http",
-            "url": "http://127.0.0.1:33987/hook",
-            "timeout": 3
-          }
-        ]
-      }
-    ],
-    "PostToolUseFailure": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "http",
-            "url": "http://127.0.0.1:33987/hook",
-            "timeout": 3
-          }
-        ]
-      }
-    ],
     "UserPromptSubmit": [
       {
         "matcher": "",
         "hooks": [
           {
-            "type": "http",
-            "url": "http://127.0.0.1:33987/hook",
-            "timeout": 3
-          },
-          {
             "type": "command",
-            "command": "node {{hooklane}} hook --method . --wake"
+            "command": "node ./util/cage/hook-lane.mjs hook --method . --wake"
           }
         ]
       }
@@ -64,103 +23,7 @@
           },
           {
             "type": "command",
-            "command": "node {{hooklane}} hook --method ."
-          }
-        ]
-      }
-    ],
-    "SessionEnd": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "http",
-            "url": "http://127.0.0.1:33987/hook",
-            "timeout": 3
-          }
-        ]
-      }
-    ],
-    "SubagentStart": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "http",
-            "url": "http://127.0.0.1:33987/hook",
-            "timeout": 3
-          }
-        ]
-      }
-    ],
-    "SubagentStop": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "http",
-            "url": "http://127.0.0.1:33987/hook",
-            "timeout": 3
-          }
-        ]
-      }
-    ],
-    "Stop": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "http",
-            "url": "http://127.0.0.1:33987/hook",
-            "timeout": 3
-          }
-        ]
-      }
-    ],
-    "PreCompact": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "http",
-            "url": "http://127.0.0.1:33987/hook",
-            "timeout": 3
-          }
-        ]
-      }
-    ],
-    "Notification": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "http",
-            "url": "http://127.0.0.1:33987/hook",
-            "timeout": 3
-          }
-        ]
-      }
-    ],
-    "ConfigChange": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "http",
-            "url": "http://127.0.0.1:33987/hook",
-            "timeout": 3
-          }
-        ]
-      }
-    ],
-    "StopFailure": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "http",
-            "url": "http://127.0.0.1:33987/hook",
-            "timeout": 3
+            "command": "node ./util/cage/hook-lane.mjs hook --method ."
           }
         ]
       }
