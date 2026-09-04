@@ -281,8 +281,20 @@ func TestTheQueueIsStaffed(t *testing.T) {
 		answerHook(body, []string{"--method", r.Method}, &out, log)
 		return out.String()
 	}
-	if said := decide("WebSearch"); !strings.Contains(said, "spawn 2 subagents") {
+	// BASH, BECAUSE WHAT IS HELD IS THE WORK. A read is not held any more: the
+	// list of what was allowed refused Read, se_pull and se_stop, which left an
+	// agent no legal move at all. See heldDuringShortfall.
+	if said := decide("Bash"); !strings.Contains(said, "spawn 2 subagents") {
 		t.Fatalf("the main agent was not held for two workers: %s", said)
+	}
+	if said := decide("Read"); strings.Contains(said, "deny") {
+		t.Fatalf("a read was refused, so the agent cannot read the guard refusing it: %s", said)
+	}
+	if said := decide("mcp__quackitect__se_pull"); strings.Contains(said, "deny") {
+		t.Fatalf("the pull was refused, and a pull is what the refusal asks for: %s", said)
+	}
+	if said := decide("mcp__quackitect__se_stop"); strings.Contains(said, "deny") {
+		t.Fatalf("the stop was refused, so an agent that cannot work cannot stop either: %s", said)
 	}
 	if said := decide("Agent"); strings.Contains(said, "deny") {
 		t.Fatalf("the spawning tool was refused: %s", said)
@@ -307,11 +319,13 @@ func TestTheQueueIsStaffed(t *testing.T) {
 		t.Fatalf("after one helper pulled: %+v", s)
 	}
 	// ONE OF THE TWO IS HERE, so the main agent is still held for the other.
-	if said := decide("WebSearch"); !strings.Contains(said, "spawn 1 subagent") {
+	if said := decide("Bash"); !strings.Contains(said, "spawn 1 subagent") {
 		t.Fatalf("with one of two here, the main agent was not held for the second: %s", said)
 	}
 	tellHelper("a2", "worker-b")
-	if said := decide("WebSearch"); strings.Contains(said, "deny") {
+	// THE SHORTFALL IS WHAT LIFTS, and not every refusal. A bare Bash is still
+	// refused by the command gate, which is a different rule and stays.
+	if said := decide("Bash"); strings.Contains(said, "THE QUEUE WANTS MORE HANDS") {
 		t.Fatalf("with both workers here, the main agent is still held: %s", said)
 	}
 
@@ -330,7 +344,7 @@ func TestTheQueueIsStaffed(t *testing.T) {
 	if s.AwaitingVerdict != 1 || s.ReviewersWanted != 1 || s.ReviewersHere != 0 {
 		t.Fatalf("a verdict owed: %+v", s)
 	}
-	if said := decide("WebSearch"); !strings.Contains(said, "reviewing.md") {
+	if said := decide("Bash"); !strings.Contains(said, "reviewing.md") {
 		t.Fatalf("the main agent was not told to spawn a reviewer: %s", said)
 	}
 }

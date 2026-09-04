@@ -9,8 +9,8 @@ import (
 
 // THE WRITE DOOR CHECKS THE SCHEMA THE WAY THE MINT DOOR DOES.
 //
-// MEASURED. A detail grown to 2811 bytes through apply, against a cap of 1500,
-// was taken, and every engine call the holder made afterwards was refused:
+// MEASURED. A detail grown well past its bound through apply was taken, and
+// every engine call the holder made afterwards was refused:
 // putting a held token back validates it, and it would not load. The mint door
 // checked and the write door did not, so the way to leave a token nothing can
 // read was to use the door that writes files.
@@ -20,7 +20,7 @@ func TestAnApplyPastTheSchemasCapIsRefused(t *testing.T) {
 	tok := aMintedToken(t, r)
 	name := filepath.Join(".se", "work", tok.ID+".md")
 
-	long := strings.Repeat("argument ", 30) // 270 bytes, against a cap of 120
+	long := strings.Repeat("argument ", 30) // 30 words, against a bound of 20
 	_, err := Apply(r, []Edit{{File: name, Old: "short", New: long}}, false, tok.ID, "tester")
 	if err == nil {
 		t.Fatal("a write that leaves the token unloadable was taken")
@@ -58,7 +58,7 @@ func TestAnApplyThatShrinksAnOverLongSectionIsTaken(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	smaller := strings.Repeat("argument ", 20) // still over, and smaller
+	smaller := strings.Repeat("argument ", 25) // still over, and smaller
 	if _, err := Apply(r, []Edit{{File: name, Old: over, New: smaller}}, false, tok.ID, "tester"); err != nil {
 		t.Fatalf("an edit that brings an over-long section down was refused: %v", err)
 	}

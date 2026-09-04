@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
@@ -61,38 +60,6 @@ func aReadAlreadyHeld(r Roots, actor, path, page string) (string, bool) {
 	}
 	return fmt.Sprintf("You already hold %s, and it has not changed since you read it. "+
 		"Use what you have, or read a different range of it.", path), true
-}
-
-// A READ WITH NO LIMIT OVER A LONG FILE IS CORRECTED TO THE CLAMP.
-//
-// An oversize read either blows the context or comes back silently cut. The
-// correction is unambiguous, so it needs no decision from the agent: the
-// same read, with a limit, and the answer says how to read on. Correction
-// rather than refusal, because a refusal makes the agent guess the number.
-func aReadTooLarge(cfg Config, path string, ti toolInput) (int, bool) {
-	if path == "" || ti.Limit > 0 || cfg.ReadClampLines <= 0 {
-		return 0, false
-	}
-	info, err := os.Stat(path)
-	if err != nil || info.IsDir() || info.Size() > indexFileLimit {
-		return 0, false
-	}
-	b, err := os.ReadFile(path)
-	if err != nil {
-		return 0, false
-	}
-	lines := bytes.Count(b, []byte{'\n'})
-	if len(b) > 0 && b[len(b)-1] != '\n' {
-		lines++
-	}
-	from := ti.Offset
-	if from < 1 {
-		from = 1
-	}
-	if lines-from+1 <= cfg.ReadClampLines {
-		return 0, false
-	}
-	return lines, true
 }
 
 // correctToolUse answers the harness with the call rewritten. It is the

@@ -1,0 +1,357 @@
+package main
+
+import (
+	"bytes"
+	"crypto/sha256"
+	"encoding/hex"
+	"fmt"
+	"os"
+	"os/exec"
+	"path/filepath"
+	"strings"
+	"time"
+)
+
+// THE CLAIM. A block of work one agent has taken, and every other agent leaves
+// it alone until the claim lapses.
+//
+// A HOLD IS NOT A CLAIM. A hold says who is working a token right now, it is
+// this tree's own business, and holdstore.go keeps it under .se where a hold
+// can be dropped when the agent holding it is gone. A claim says which agent on
+// which box has taken a block of work, and that has to reach a box which is not
+// this one. So a claim travels in version control.
+//
+// IT LIVES ON THE TOKEN AND NEVER IN A LEDGER. Two claimants taking different
+// tokens touch different files, and git merges them without a word. Two
+// claimants taking the same token touch the same file, and git raises a
+// conflict. That conflict is the collision report, and git is the arbiter. One
+// ledger file would make every claim conflict with every other claim.
+//
+// A CLAIM THAT WAS NEVER PUT DOWN IS WHY THE HOLDER LEFT THE TOKEN. A name
+// written into a file that nothing reopens is a name that stays forever. So a
+// claim carries when it was made, the engine reads the limit, and a claim older
+// than the limit is no claim at all. Nothing has to come back to end it.
+
+// WHEN IT WAS CLAIMED, AND NEVER UNTIL WHEN.
+//
+// The token says the fact and the engine says what follows from it. Writing the
+// lapse would freeze the limit at the moment of the claim: moving
+// limits.claim_hours would then leave every standing claim on the old number,
+// and two tokens claimed a minute apart could disagree about how long a claim
+// lasts.
+//
+// A TOKEN CARRIES NO OTHER TIME. The record holds when things happened, and it
+// never travels. This one travels because the box that wrote it may be gone,
+// and its work has to come back to the pool without anybody deciding so.
+const ClaimStamp = time.RFC3339
+
+// BoxLength is how much of the hash names this installation.
+const BoxLength = 8
+
+// Box is what makes this installation's claims its own.
+//
+// A NAME AN AGENT TYPED IS NOT AN IDENTITY. Two boxes running one clone of one
+// repository both call their agent main. Both write main, both read main, and
+// each walks through the other's claims believing they are its own. From inside
+// either box the ledger looks right, so nothing would say so.
+//
+// So the box comes first and the engine works it out. THE AGENT NEVER SAYS
+// WHICH BOX IT IS ON, because an agent that could name a box could name another
+// one.
+//
+// THE BOX IS DERIVED AND NOT COPIED. It is a hash over this machine's own id
+// and the method root. The machine id is private and never travels, only the
+// hash does, and a hash does not run backwards. The method root is in the hash
+// because one machine runs two instances out of two folders, and those are two
+// boxes.
+func Box(r Roots) string {
+	h := sha256.New()
+	for _, path := range []string{"/etc/machine-id", "/var/lib/dbus/machine-id"} {
+		if b, err := os.ReadFile(path); err == nil {
+			h.Write(bytes.TrimSpace(b))
+			break
+		}
+	}
+	// A MACHINE WITH NO ID OF ITS OWN STILL NEEDS ONE. Windows has no
+	// machine-id file, and the copy identity is random, written once per
+	// installation, and answers there.
+	if id, err := CopyID(r.Method); err == nil {
+		h.Write([]byte(id))
+	}
+	h.Write([]byte(filepath.ToSlash(r.Method)))
+	return hex.EncodeToString(h.Sum(nil))[:BoxLength]
+}
+
+// Claimant is what goes on the token: this box, then the agent that asked. An
+// agent that names no actor is main, which is what every agent already pulls as.
+func Claimant(r Roots, actor string) string {
+	if actor = strings.TrimSpace(actor); actor == "" {
+		actor = "main"
+	}
+	return Box(r) + "/" + actor
+}
+
+// ClaimedNow says which claimant holds this token, and empty when nobody does.
+//
+// IT READS THE OTHER BOXES TOO. A claim made here is on the note; a claim made
+// elsewhere reached this box through git and sits in the sync's own store. Both
+// are claims, and the queue has to pass over either. See claimsync.go.
+func ClaimedNow(r Roots, t Token, now time.Time) string {
+	if by, at := standingClaim(r, t); by != "" && !lapsed(r, at, now) {
+		return by
+	}
+	return ""
+}
+
+// standingClaim answers the claim this box knows about, whichever side wrote
+// it. The later stamp wins, because a claim made after another is the one that
+// happened: a box that took a token this minute did so knowing what the note
+// said last hour.
+func standingClaim(r Roots, t Token) (by, at string) {
+	by, at = t.ClaimedBy, t.ClaimedAt
+	if far, ok := ClaimFromElsewhere(r, t.ID); ok && far.At > at {
+		by, at = far.By, far.At
+	}
+	return by, at
+}
+
+func lapsed(r Roots, at string, now time.Time) bool {
+	made, err := time.Parse(ClaimStamp, at)
+	if err != nil {
+		return true // a claim that cannot end is not a claim
+	}
+	return !now.Before(made.Add(time.Duration(LoadConfig(r).ClaimHours) * time.Hour))
+}
+
+// ClaimLapsed answers whether this claim has run out. A claim carrying no time,
+// or a time nothing can read, has lapsed.
+func ClaimLapsed(r Roots, t Token, now time.Time) bool {
+	by, at := standingClaim(r, t)
+	return by == "" || lapsed(r, at, now)
+}
+
+// DropClaim takes the claim off a token. It answers whether anything moved, so
+// a caller writes the note only when there is something to write.
+func DropClaim(t *Token) bool {
+	if t.ClaimedBy == "" && t.ClaimedAt == "" {
+		return false
+	}
+	t.ClaimedBy, t.ClaimedAt = "", ""
+	return true
+}
+
+// ClaimRefused says why one token could not be claimed. It has the shape of a
+// rejection for the same reason a rejection has it: the caller acts on it
+// mechanically rather than reading prose.
+type ClaimRefused struct {
+	ID        string `json:"id"`
+	Wrong     string `json:"wrong"`
+	Satisfies string `json:"satisfies"`
+}
+
+// ClaimResult is what a claim or a release came to.
+type ClaimResult struct {
+	Claimant  string         `json:"claimant"`
+	Taken     []string       `json:"taken,omitempty"`
+	Freed     []string       `json:"freed,omitempty"`
+	At        string         `json:"at,omitempty"`
+	Lapses    string         `json:"lapses,omitempty"`
+	Files     []string       `json:"-"`
+	Refused   []ClaimRefused `json:"refused,omitempty"`
+	Published *Published     `json:"published,omitempty"`
+	Notice    string         `json:"notice,omitempty"`
+}
+
+// WhyNotClaimable names what stops this claimant taking this token, or nothing.
+func WhyNotClaimable(r Roots, t Token, claimant string, now time.Time) *ClaimRefused {
+	if t.Ended() {
+		return &ClaimRefused{ID: t.ID, Wrong: "it has ended: " + string(t.Disposition),
+			Satisfies: "a token that is still open"}
+	}
+	if by := ClaimedNow(r, t, now); by != "" && by != claimant {
+		return &ClaimRefused{ID: t.ID, Wrong: "it is claimed by " + by,
+			Satisfies: "wait for that claim to lapse, or take a token nobody has claimed"}
+	}
+	return nil
+}
+
+// Claim takes the named tokens for a claimant. Every id is answered, in taken
+// or in refused, so a caller never has to work out which of its ids landed.
+func Claim(r Roots, claimant string, ids []string, now time.Time) (ClaimResult, error) {
+	res := ClaimResult{Claimant: claimant, At: now.UTC().Format(ClaimStamp)}
+	res.Lapses = now.Add(time.Duration(LoadConfig(r).ClaimHours) * time.Hour).UTC().Format(ClaimStamp)
+	if len(ids) == 0 {
+		return res, fmt.Errorf("a claim needs tokens: name them, or say how many to take")
+	}
+	for _, id := range ids {
+		t, err := LoadToken(r, id)
+		if err != nil {
+			res.Refused = append(res.Refused, ClaimRefused{ID: id, Wrong: err.Error(),
+				Satisfies: "an id the engine minted"})
+			continue
+		}
+		if bad := WhyNotClaimable(r, t, claimant, now); bad != nil {
+			res.Refused = append(res.Refused, *bad)
+			continue
+		}
+		t.ClaimedBy, t.ClaimedAt = claimant, res.At
+		if err := SaveToken(r, t); err != nil {
+			res.Refused = append(res.Refused, ClaimRefused{ID: id, Wrong: err.Error(),
+				Satisfies: "a writable work folder"})
+			continue
+		}
+		res.Taken = append(res.Taken, t.ID)
+		res.Files = append(res.Files, filepath.Join(dirFor(r, t), t.ID+".md"))
+	}
+	return res, nil
+}
+
+// Release gives tokens back. A claimant releases its own and nothing else:
+// taking somebody's claim away is a person's act, at the note, rather than a
+// verb an agent reaches for. Naming no id releases everything this claimant
+// holds.
+func Release(r Roots, claimant string, ids []string, now time.Time) (ClaimResult, error) {
+	res := ClaimResult{Claimant: claimant}
+	if len(ids) == 0 {
+		for _, t := range Tokens(r) {
+			if t.ClaimedBy == claimant {
+				ids = append(ids, t.ID)
+			}
+		}
+	}
+	for _, id := range ids {
+		t, err := LoadToken(r, id)
+		if err != nil {
+			res.Refused = append(res.Refused, ClaimRefused{ID: id, Wrong: err.Error(),
+				Satisfies: "an id the engine minted"})
+			continue
+		}
+		if t.ClaimedBy != claimant {
+			res.Refused = append(res.Refused, ClaimRefused{ID: id,
+				Wrong:     "it is not claimed by " + claimant,
+				Satisfies: "release what you took"})
+			continue
+		}
+		DropClaim(&t)
+		if err := SaveToken(r, t); err != nil {
+			res.Refused = append(res.Refused, ClaimRefused{ID: id, Wrong: err.Error(),
+				Satisfies: "a writable work folder"})
+			continue
+		}
+		res.Freed = append(res.Freed, t.ID)
+		res.Files = append(res.Files, filepath.Join(dirFor(r, t), t.ID+".md"))
+	}
+	return res, nil
+}
+
+// Claimed is one row of what --list answers.
+type Claimed struct {
+	ID       string `json:"id"`
+	Title    string `json:"title"`
+	Claimant string `json:"claimant"`
+	At       string `json:"at"`
+	Lapsed   bool   `json:"lapsed"`
+	Elsewhere bool  `json:"elsewhere,omitempty"` // it reached here through git
+}
+
+// Claims answers every claim this box knows about, its own and the ones that
+// came from elsewhere. A lapsed one is shown rather than hidden: it is still on
+// the note until the next hand takes the token, and a person reading the list
+// wants to see that.
+func Claims(r Roots, now time.Time) []Claimed {
+	var out []Claimed
+	for _, t := range Tokens(r) {
+		by, at := standingClaim(r, t)
+		if by == "" {
+			continue
+		}
+		out = append(out, Claimed{ID: t.ID, Title: t.Title, Claimant: by, At: at,
+			Lapsed: lapsed(r, at, now), Elsewhere: by != t.ClaimedBy})
+	}
+	return out
+}
+
+// PUBLISHING, WHICH IS WHAT MAKES A CLAIM REAL.
+//
+// A claim on this box is a claim nobody else can see. It reaches another box
+// through git and through nothing else, so every claim tries to publish and
+// none of them has to be asked to.
+//
+// ONLY THE NOTES THAT CHANGED ARE COMMITTED, BY PATH. A box has other work in
+// its tree, half done and not for anybody, and a commit that swept that up
+// would publish it. So `git add .` never runs here, and this is the whole of
+// what the owner meant by nothing else going onto git.
+//
+// A FAILURE IS A WARNING AND NEVER A STOP. A box with no remote, no network or
+// no permission still claims: the claim is written, the work is still that
+// agent's on this box, and what could not be said is said in the answer.
+//
+// A REJECTED PUSH IS ORDINARY. Another box claimed something else and pushed
+// first. The notes are separate files, so a rebase joins them without a
+// conflict, and the retry is what a second box racing you needs.
+type Published struct {
+	Committed bool   `json:"committed"`
+	Pushed    bool   `json:"pushed"`
+	Rebased   bool   `json:"rebased,omitempty"`
+	Says      string `json:"says"`
+}
+
+func Publish(r Roots, files []string, message string) Published {
+	var p Published
+	if len(files) == 0 {
+		p.Says = "nothing changed, so nothing was committed"
+		return p
+	}
+	if out, err := git(r, append([]string{"add", "--"}, files...)...); err != nil {
+		p.Says = "the claim stands here. git add did not run: " + out
+		return p
+	}
+	if _, err := git(r, "diff", "--cached", "--quiet", "--"); err == nil {
+		p.Says = "the notes already say this, so there was nothing to commit"
+		return p
+	}
+	if out, err := git(r, append([]string{"commit", "-m", message, "--only", "--"}, files...)...); err != nil {
+		p.Says = "the claim stands here. git commit did not run: " + out
+		return p
+	}
+	p.Committed = true
+
+	branch, err := git(r, "rev-parse", "--abbrev-ref", "HEAD")
+	if err != nil {
+		p.Says = "committed here. The branch could not be read, so nothing was pushed"
+		return p
+	}
+	branch = strings.TrimSpace(branch)
+	if _, err := git(r, "push", "origin", branch); err == nil {
+		p.Pushed = true
+		p.Says = "committed and pushed to " + branch + ". Other boxes see this claim now"
+		return p
+	}
+	if out, err := git(r, "pull", "--rebase", "origin", branch); err != nil {
+		p.Says = "committed here. The push was rejected and the rebase did not run: " + firstLines(out, 3)
+		return p
+	}
+	p.Rebased = true
+	if out, err := git(r, "push", "origin", branch); err != nil {
+		p.Says = "committed and rebased here. The push still did not run: " + firstLines(out, 3)
+		return p
+	}
+	p.Pushed = true
+	p.Says = "committed, rebased onto " + branch + " and pushed. Other boxes see this claim now"
+	return p
+}
+
+// The message says what a person reading the history needs: which claimant,
+// what it did, and to which tokens.
+func ClaimMessage(claimant, verb string, ids []string) string {
+	return fmt.Sprintf("%s %s %d token(s)\n\n  %s\n",
+		claimant, verb, len(ids), strings.Join(ids, "\n  "))
+}
+
+// Quietly, because a claim publishes on every call and a console window per git
+// call is what quiet_windows.go exists to stop.
+func git(r Roots, args ...string) (string, error) {
+	cmd := Quietly(exec.Command("git", append([]string{"-C", r.Work}, args...)...))
+	out, err := cmd.CombinedOutput()
+	return strings.TrimSpace(string(out)), err
+}

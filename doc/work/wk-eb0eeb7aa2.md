@@ -8,11 +8,11 @@ status: open
 
 ## detail
 
-The command guard walks a shell command twice with two ideas of quoting, and its rows were written by the hand that wrote the simulation. An apostrophe inside a double-quoted argument opens a span the second pass believes in and bash does not, so a substitution after it is exempt from the write gate. Bash has a backslash state and no row carries a backslash; three commands with escaped quotes drove past the exception. Consumes wk-d7f53103f0 and wk-df597db237.
+The command guard walks a shell command twice with two ideas of quoting, and its rows were written by the hand that wrote the simulation. An apostrophe inside a double-quoted argument opens a span the second pass believes in and bash does not. So a substitution after it is exempt from the write gate. Bash has a backslash state and no row carries a backslash. Three commands with escaped quotes drove past the exception. Consumes wk-d7f53103f0 and wk-df597db237.
 
 ## approach
 
-One walk of the command in a quoting state machine taken from bash's manual, with the states named as the manual names them, and both questions, separators and substitutions, read off that one walk. The test rows derive from the manual, one pair per state, and a generator drives the guard's alphabet through bash itself with a did-a-file-appear oracle, requiring the guard to refuse exactly what reached the filesystem and nothing else.
+One walk of the command in a quoting state machine taken from bash's manual, with the states named as the manual names them. Both questions, separators and substitutions, are read off that one walk. The test rows derive from the manual, one pair per state. A generator drives the guard's alphabet through bash itself with a did-a-file-appear oracle. The guard must refuse exactly what reached the filesystem and nothing else.
 
 ## done when
 

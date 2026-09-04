@@ -15,6 +15,7 @@ fields:
   optional:
     - bucket
     - holder
+    - author
     - needs_human
     - depends_on
     - parent
@@ -52,7 +53,7 @@ activities:
   - name: decide
     supplier: the backlog
     input: a note
-    does: "decide what to do with it. To say it is not ready, name why: depends_on for other tokens that have to close first, which the engine decides on its own, and ready_when for anything else in whatever words fit, a date or a condition only a person judges. Deciding not to decide ends nothing: you leave the activity, no transition happens, the note stays noted, and the call log holds that you looked."
+    does: "decide what to do with it. To say it is not ready, name why. depends_on is for other tokens that have to close first, and the engine decides it on its own. ready_when is anything else, in whatever words fit, a date or a condition only a person judges. Deciding not to decide ends nothing: you leave the activity, no transition happens, the note stays noted, and the call log holds that you looked."
     output: a disposition, and a work token when it becomes one
     customer: the backlog
     by: the owner or an assigned agent

@@ -104,7 +104,7 @@ body:
   headingLevel: 2
   sections:
     - header: detail
-      maxBytes: 120
+      maxWords: 20
     - header: done when
       list: true
 `

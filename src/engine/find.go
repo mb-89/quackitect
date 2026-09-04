@@ -149,7 +149,7 @@ func findDB(db *sql.DB, p FindParams) (Found, error) {
 
 	// A PATH ALONE LISTS FILES, which is what a glob over the tree is for.
 	if p.Words == "" && p.Regex == "" {
-		rows, err := db.Query("SELECT path FROM file WHERE path LIKE ? ORDER BY path", likePrefix(prefix))
+		rows, err := db.Query(`SELECT path FROM file WHERE path LIKE ? ESCAPE '\' ORDER BY path`, likePrefix(prefix))
 		if err != nil {
 			return out, err
 		}
@@ -178,10 +178,11 @@ func findDB(db *sql.DB, p FindParams) (Found, error) {
 		// THE FULL-TEXT INDEX ANSWERS TERMS, BEST FIRST. rank is FTS5's own
 		// relevance, and the path narrows it in SQL where the glob has a
 		// literal prefix, in Go for the rest.
-		rows, err = db.Query("SELECT path, n, text FROM line_text WHERE line_text MATCH ? AND path LIKE ? ORDER BY rank",
-			p.Words, likePrefix(prefix))
+		rows, err = db.Query("SELECT path, n, text FROM line_text WHERE line_text MATCH ? "+
+			`AND path LIKE ? ESCAPE '\' ORDER BY rank`, p.Words, likePrefix(prefix))
 	} else {
-		rows, err = db.Query("SELECT path, n, text FROM line_text WHERE path LIKE ? ORDER BY path, n", likePrefix(prefix))
+		rows, err = db.Query(`SELECT path, n, text FROM line_text WHERE path LIKE ? ESCAPE '\' `+
+			"ORDER BY path, n", likePrefix(prefix))
 	}
 	if err != nil {
 		return out, err
@@ -250,6 +251,12 @@ func literalPrefix(glob string) string {
 
 // likePrefix is a LIKE pattern for everything under a literal prefix, with
 // the characters LIKE would read as wildcards escaped.
+//
+// EVERY QUERY USING IT DECLARES ESCAPE '\'. SQLite has no default escape
+// character, so a backslash written here without one is matched as a backslash:
+// dev_guide/ became dev\_guide/% and matched nothing at all. Every path holding
+// an underscore answered zero hits, and an answer of zero reads exactly like an
+// empty folder. Three agents read one that way in a night and acted on it.
 func likePrefix(prefix string) string {
 	r := strings.NewReplacer("\\", "\\\\", "%", "\\%", "_", "\\_")
 	return r.Replace(prefix) + "%"

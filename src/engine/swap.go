@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -172,10 +173,10 @@ func putInPlace(r Roots, next string) error {
 		return nil // the program on disk is already the one to run
 	}
 	live := filepath.Join(r.Method, ".bin", exeName("se"))
-	aside := live + ".was"
 	if _, err := os.Stat(live); err == nil {
-		_ = os.Remove(aside) // the one a previous swap moved aside
-		if err := os.Rename(live, aside); err != nil {
+		// IT GOES WHERE EVERY REPLACED PROGRAM GOES, which is .bin/was and not
+		// beside the one that replaced it. See wasbin.go.
+		if _, err := PutAside(r.Method, live); err != nil {
 			return fmt.Errorf("the running engine could not be moved aside: %w", err)
 		}
 	}
@@ -271,11 +272,17 @@ type swapAnswer struct {
 // askForASwap asks the engine over this folder to replace itself, and answers
 // what it said.
 func askForASwap(r Roots, why string, built bool) (swapAnswer, error) {
-	raw, _, ok := askModelWithin(r, "swap", map[string]any{"why": why, "built": built},
+	raw, err := askModelForAnAnswer(r, "swap", map[string]any{"why": why, "built": built},
 		swapDrainBudget+swapVerifyBudget)
-	if !ok {
+	if errors.Is(err, ErrNoEngine) {
 		return swapAnswer{}, fmt.Errorf("no engine is running over %s, so there is nothing to swap. "+
 			"Build it the way the installer does: util/setup", r.Work)
+	}
+	if err != nil {
+		// THE ENGINE'S OWN WORDS. It said what was wrong with the program it
+		// was handed, and a caller told only that the swap failed would go
+		// looking for an engine that is answering perfectly well.
+		return swapAnswer{}, fmt.Errorf("the engine refused the swap: %w", err)
 	}
 	var a swapAnswer
 	if err := json.Unmarshal(raw, &a); err != nil {

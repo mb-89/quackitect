@@ -11,6 +11,7 @@ import { nextEngineState, whyNot, HEARTBEAT_MS } from "./liveness";
 import { startLanguageServer, stopLanguageServer } from "./lsp";
 import {
   mintArgs, editCellArgs, fileArgs, groupArgs, renameGroupArgs, holdArgs,
+  bindArgs, bindingArgs, askArgs, askedArgs,
   viewArgs, paneArgs, panesArgs, viewsArgs, pinArgs, unpinArgs, widthArgs,
   burndownArgs,
   orderArgs, levelArgs, dropLevelArgs, filterArgs,
@@ -30,6 +31,8 @@ export function activate(context: vscode.ExtensionContext) {
   rotateLogOnStartup(context);
   reattach(context);
   void showHold(context);
+  void showBinding(context);
+  void showAsked(context);
   projectOnStartup(context);
   watchParameters(context);
   void chooseEngine(context);
@@ -51,6 +54,9 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand("quackitect.showLog", () => showLog(context)),
     vscode.commands.registerCommand("quackitect.showWork", () => toggleWork(context)),
     vscode.commands.registerCommand("quackitect.hold", () => toggleHold(context)),
+    vscode.commands.registerCommand("quackitect.ask", () => toggleAsk(context)),
+    vscode.commands.registerCommand("quackitect.unbind", () => pressBinding(context)),
+    vscode.commands.registerCommand("quackitect.god", () => armGod(context)),
     vscode.commands.registerCommand("quackitect.mintWork", (arg?: { text: string; process: string }) =>
       mintWork(context, arg),
     ),
@@ -320,6 +326,8 @@ function sayEverything(context: vscode.ExtensionContext) {
     view?.webview.postMessage({ type: "state", id: "engine", state: engineState, detail });
   }
   void showHold(context);
+  void showBinding(context);
+  void showAsked(context);
 }
 
 function post() {
@@ -1374,4 +1382,102 @@ async function showHold(context: vscode.ExtensionContext) {
 
 function setHoldState(on: boolean) {
   view?.webview.postMessage({ type: "state", id: "hold", state: on ? "good" : "idle", detail: "" });
+}
+
+// THE PERSON ASKS WHAT IS HAPPENING. The engine owes them an update and refuses
+// every call until it lands, and the button untoggles itself when it does.
+async function toggleAsk(context: vscode.ExtensionContext) {
+  const now = await askEngine(context, askedArgs());
+  const owed = typeof now?.on === "string" && now.on !== "";
+  const out = await askEngine(context, askArgs(!owed));
+  if (out?.error) {
+    vscode.window.showErrorMessage(out.error);
+    return;
+  }
+  setAskedState(typeof out?.on === "string" && out.on !== "");
+}
+
+async function showAsked(context: vscode.ExtensionContext) {
+  const now = await askEngine(context, askedArgs(), { quiet: true });
+  setAskedState(typeof now?.on === "string" && now.on !== "");
+}
+
+function setAskedState(owed: boolean) {
+  view?.webview.postMessage({ type: "state", id: "ask", state: owed ? "good" : "idle", detail: "" });
+}
+
+// ONE PRESS MOVES BETWEEN BOUND AND UNBOUND, from either rung.
+//
+// v3'S ASYMMETRY, AND IT IS THE SAFETY. Climbing is deliberate and releasing is
+// easy, so a stray press always falls down and never up. A press while god mode
+// is armed puts the whole thing back, which is what the owner asked for.
+async function pressBinding(context: vscode.ExtensionContext) {
+  const now = await askEngine(context, bindingArgs());
+  const to = now?.at === "bound" || now?.at === undefined ? "unbound" : "bound";
+  const out = await askEngine(context, bindArgs(to));
+  if (out?.error) {
+    vscode.window.showErrorMessage(out.error);
+    return;
+  }
+  showTheBinding(out?.at ?? "bound");
+}
+
+// FIVE PRESSES INSIDE A SECOND. The panel counts them; this is what it asks
+// for, and it always climbs, never toggles.
+async function armGod(context: vscode.ExtensionContext) {
+  const out = await askEngine(context, bindArgs("god"));
+  if (out?.error) {
+    vscode.window.showErrorMessage(out.error);
+    return;
+  }
+  showTheBinding(out?.at ?? "god");
+  vscode.window.showWarningMessage(
+    "Engine controls are disabled. Nothing will refuse this agent and nothing will check it.",
+    "Put them back",
+  ).then((pressed) => {
+    if (pressed) void vscode.commands.executeCommand("quackitect.unbind");
+  });
+}
+
+async function showBinding(context: vscode.ExtensionContext) {
+  const now = await askEngine(context, bindingArgs(), { quiet: true });
+  showTheBinding(typeof now?.at === "string" ? now.at : "bound");
+}
+
+// THE BLOCK IN THE STATUS BAR, WHICH IS THE WHOLE MITIGATION.
+//
+// God mode has no timer on it, on the owner's ruling, so what stops it being
+// left on and forgotten is that it cannot be missed. VS Code has no banner an
+// extension may draw: `banner` appears nowhere in its API. A status bar item
+// with a warning background is what there is, and it is better than a banner in
+// the one way that matters here — it is on screen whether or not the panel is
+// open, and it cannot be dismissed.
+//
+// THE BLOCK IS ALSO THE OFF SWITCH, because the nearest control to a person who
+// has just noticed the thing is the thing they noticed.
+let bindingBar: vscode.StatusBarItem | undefined;
+
+function showTheBinding(at: string) {
+  view?.webview.postMessage({ type: "state", id: "unbind", state: at, detail: "" });
+  if (!bindingBar) {
+    // FAR LEFT, which is where the eye lands and where nothing else of ours is.
+    bindingBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, Number.MAX_SAFE_INTEGER);
+    bindingBar.command = "quackitect.unbind";
+  }
+  if (at === "god") {
+    bindingBar.text = "$(alert) engine controls disabled";
+    bindingBar.tooltip = "Every refusal this engine has is off. Click to put them back.";
+    bindingBar.backgroundColor = new vscode.ThemeColor("statusBarItem.errorBackground");
+    bindingBar.show();
+    return;
+  }
+  if (at === "unbound") {
+    bindingBar.text = "$(unlock) the queue is off";
+    bindingBar.tooltip = "No token is needed to write or to run, and nobody is made to spawn. " +
+      "Click to put the queue back.";
+    bindingBar.backgroundColor = new vscode.ThemeColor("statusBarItem.warningBackground");
+    bindingBar.show();
+    return;
+  }
+  bindingBar.hide();
 }

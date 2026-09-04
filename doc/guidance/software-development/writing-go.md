@@ -1,8 +1,15 @@
 ---
 kind: [[guidance]]
 scope: ["every agent or person writing or changing Go source"]
-out_of_scope: ["a beginner's introduction to Go", "the structure, which is [[shape-of-a-program]]", "the craft of a change, which is [[writing-software]]", "what a test depends on, which is [[testing]]"]
-depends_on: ["[[writing-software]]", "[[shape-of-a-program]]", "[[testing]]"]
+out_of_scope:
+  - "a beginner's introduction to Go"
+  - "the structure, which is [[shape-of-a-program]]"
+  - "the craft of a change, which is [[writing-software]]"
+  - "what a test depends on, which is [[testing]]"
+depends_on:
+  - "[[writing-software]]"
+  - "[[shape-of-a-program]]"
+  - "[[testing]]"
 ---
 
 # Motivation
@@ -11,6 +18,7 @@ The reader is an expert who writes Go well and gains nothing from being told wha
 Go is small, and it leaves the shape of a program to its author.
 The compiler accepts one package of a hundred files, a string where a type belongs, and an error assigned to the blank identifier.
 So the habits matter more than in a language that refuses them.
+
 This file says how each general rule lands in Go, and adds the rules Go alone needs.
 It follows the Google Go style guide and the Go team's code review comments, and names where it departs from them.
 The toolchain is Go 1.27, and a rule that leans on a recent release says which.
@@ -91,7 +99,12 @@ A `runtime.GOOS` branch in shared code is the same split made worse, because bot
 
 ## 14. Tests
 
-The Go team's guidance: no assertion library, a table with named fields, and `got` before `want`.
+The Go team's guidance:
+
+- no assertion library
+- a table with named fields
+- `got` before `want`
+
 Compare a structure with `cmp.Diff`, use `t.Error` to keep going and `t.Fatal` when the rest is meaningless.
 `t.Parallel()` lets the package run on every core, and a test that cannot take it says why beside the call it makes instead.
 `t.TempDir()` hands each test a tree that is its own, and `t.Context()` a context that ends with the test.

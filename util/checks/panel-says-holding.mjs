@@ -1,5 +1,10 @@
-// THE PANEL HEADER DRAWS THE STATE AND THE TOKEN IT WAS HANDED, AND DERIVES
-// NEITHER.
+// THE PANEL'S TABLE DRAWS THE ACTOR, THE STATE AND THE TOKEN IT WAS HANDED,
+// AND DERIVES NONE OF THEM.
+//
+// IT USED TO ASK THIS OF THE HEADER. The header drew a line per working actor
+// beside the gear, so every agent was on the panel twice and the strip's first
+// line ran into the view's own title. An actor is drawn in the table and
+// nowhere else now, so that is where this asks.
 //
 // A page that ignored its input and printed a state of its own would pass any
 // check that rendered it once and looked for words. So it is rendered from TWO
@@ -21,21 +26,34 @@ await build({
 });
 const { panelHtml } = await import("file://" + join(out, "panel.mjs"));
 
-const tree = { name: "quackitect", type: "group", children: [] };
+// THE TABLE AS THE PRODUCT DECLARES IT, so this drives the shape that ships.
+const tree = {
+  name: "quackitect", type: "group",
+  children: [{
+    name: "control", title: "agent and engine control", type: "group",
+    children: [{
+      name: "agents", type: "table", source: "present",
+      columns: [{ field: "actor", title: "agent" },
+                { field: "title", title: "working on", link: "id", empty: "holding" }],
+    }],
+  }],
+};
 
 const first = {
-  actors: [{ actor: "walker", state: "working", id: "wk-1111111111",
-             title: "the first thing", holding: "wk-1111111111 the first thing" }],
+  actors: [],
+  present: [{ actor: "walker", state: "working", id: "wk-1111111111",
+              title: "the first thing", holding: "wk-1111111111 the first thing" }],
   hold: { on: false },
 };
 const second = {
-  actors: [{ actor: "second", state: "stopped", id: "wk-2222222222",
-             title: "the second thing", holding: "wk-2222222222 the second thing" }],
+  actors: [],
+  present: [{ actor: "second", state: "stopped", id: "wk-2222222222",
+              title: "the second thing", holding: "wk-2222222222 the second thing" }],
   hold: { on: true, by: "the person" },
 };
 
-const one = panelHtml(tree, [], {}, first);
-const two = panelHtml(tree, [], {}, second);
+const one = panelHtml(tree, ["control"], {}, first);
+const two = panelHtml(tree, ["control"], {}, second);
 
 let failed = 0;
 const ok = (said) => console.log("ok    " + said);
@@ -71,6 +89,12 @@ holdsNot(two, "walker", "second: not the other answer's actor");
 // off in the first, so a page that draws it always fails here.
 holds(two, "on hold", "second: the hold is drawn");
 holdsNot(one, "on hold", "first: the hold is not drawn when it is off");
+
+// AND NO ACTOR IS DRAWN ANYWHERE BUT THE TABLE. The head carries the hold,
+// which is one fact about the whole panel, and it names nobody.
+const head = one.slice(one.indexOf('<div class="head">'), one.indexOf("</div>", one.indexOf('<div class="head">')));
+holdsNot(head, "walker", "the head names no actor");
+holdsNot(head, "wk-1111111111", "the head names no token");
 
 console.log(failed ? `\n${failed} failed.` : "\n0 failed.");
 process.exit(failed ? 1 : 0);

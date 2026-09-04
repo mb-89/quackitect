@@ -599,6 +599,11 @@ func firstLines(s string, n int) string {
 // parents without a rule of its own.
 func next(r Roots, actor, role string) Answer {
 	all := Tokens(r)
+	// WHO IS ASKING, AS THE OTHER BOXES SEE THEM. The agent says its actor and
+	// the engine says which box that actor is on, so nothing an agent types can
+	// reach another box's claims. See claim.go.
+	me := Claimant(r, actor)
+	now := time.Now().UTC()
 
 	var scopes []Token
 	for i := range all {
@@ -624,29 +629,51 @@ func next(r Roots, actor, role string) Answer {
 			if why := Blocked(r, t); why != "" {
 				continue
 			}
+			if why := WaitsForAPerson(t); why != "" {
+				continue
+			}
 			return take(r, actor, t)
 		}
 	}
 
 	var held []string
-	for i := range all {
-		t := all[i]
-		if t.Ended() || t.Holder != "" {
-			if t.Holder != "" {
-				held = append(held, t.ID)
+	for _, wantMine := range []bool{true, false} {
+		for i := range all {
+			t := all[i]
+			if t.Ended() || t.Holder != "" {
+				if t.Holder != "" {
+					held = append(held, t.ID)
+				}
+				continue
 			}
-			continue
+			if !WorkableBy(r, t, role) {
+				continue
+			}
+			if role == RoleReviewer && t.Author == actor {
+				continue // never the author
+			}
+			if why := Blocked(r, t); why != "" {
+				continue
+			}
+			// A PARKED TOKEN IS NOT HANDED OUT. It waits on a person, and an agent
+			// that takes one cannot put it down: the queue would answer it again.
+			if why := WaitsForAPerson(t); why != "" {
+				continue
+			}
+			// A CLAIM SOMEBODY ELSE HOLDS IS NOT WORK YOU CAN START. It reads as
+			// blocked because that is what it is: nothing you do releases it, and
+			// it releases itself when it lapses. See claim.go.
+			if by := ClaimedNow(r, t, now); by != "" && by != me {
+				continue
+			}
+			// WHAT YOU CLAIMED COMES BEFORE WHAT NOBODY HAS. A claim is an agent
+			// saying these are the ones I am working through, so handing it
+			// something else would make the claim mean nothing.
+			if wantMine != (ClaimedNow(r, t, now) == me) {
+				continue
+			}
+			return take(r, actor, t)
 		}
-		if !WorkableBy(r, t, role) {
-			continue
-		}
-		if role == RoleReviewer && t.Author == actor {
-			continue // never the author
-		}
-		if why := Blocked(r, t); why != "" {
-			continue
-		}
-		return take(r, actor, t)
 	}
 	if len(scopes) > 0 {
 		return Answer{Pull: AnswerWait, Notice: scopeNotice(r, scopes)}
@@ -799,7 +826,7 @@ func AskToStop(r Roots, actor string) Ruling {
 		if t.Ended() || t.Holder != actor {
 			continue
 		}
-		if Blocked(r, t) != "" {
+		if Blocked(r, t) != "" || WaitsForAPerson(t) != "" {
 			continue
 		}
 		mine = append(mine, t.ID+" "+t.Title)

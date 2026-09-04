@@ -537,7 +537,7 @@ func runChosen(r Roots, db *sql.DB, tests []aTest, picks []chosen) []ran {
 				x.Said = tailOf(said, 2000)
 			}
 			if err == nil && ok {
-				_ = writeRegions(db, t, regions) // a map it cannot write is written on the next run
+				_ = writeRegions(db, t, regions, took) // a map it cannot write is written on the next run
 			}
 			out = append(out, x)
 		case "check":

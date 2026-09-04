@@ -76,7 +76,7 @@ activities:
   - name: verdict
     supplier: the queue
     input: a done token, its diff, its criteria and its note
-    does: read every hunk, run every criterion, and say whether each part improves the product. How a reviewer works is [[reviewing]]. Your verdict blocks nothing: you give it once, the token closes on it, and every finding you have is a trivial token you mint naming this one.
+    does: read every hunk, run every criterion, and say whether each part improves the product. How a reviewer works is [[reviewing]]. Your verdict blocks nothing. You give it once and the token closes on it. Every finding you have is a trivial token you mint naming this one.
     output: a verdict, and a trivial token per finding
     customer: whoever asked
     by: a reviewer, never the author

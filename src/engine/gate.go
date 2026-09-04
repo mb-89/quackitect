@@ -243,11 +243,24 @@ func insideTheScratchpad(r Roots, path string) bool {
 // THE REFUSAL IS A MENU. A wall that says no and stops there sends the agent
 // looking for a way round, so this names what is open for that agent and the
 // call that takes one.
-func WriteNeedsAToken(r Roots, actor, tool, path string) (string, bool) {
+func WriteNeedsAToken(r Roots, actor, tool, path, command string) (string, bool) {
 	if !WriteTools[tool] {
 		return "", false
 	}
 	if insideTheScratchpad(r, path) {
+		return "", false
+	}
+	// A COMMAND THAT IS ONLY THE ENGINE ALREADY NAMES ITS WORK.
+	//
+	// runsTheEngine is the named exception this gate always meant to have, and
+	// it was written and wired to one caller. So `se pull` at a shell was
+	// refused, and a pull is how you get the id this refusal demands.
+	//
+	// IT ONLY BIT WITH NO MCP LANE. With the lane up, se_pull and se_stop are
+	// lane tools and never reach Bash. A cloud box clones, and whatever
+	// .mcp.json the clone carries is the lane for that whole session: get it
+	// wrong once and the agent has no first move at all. Measured there.
+	if runsTheEngine(command) {
 		return "", false
 	}
 	// EVERY TOOL THAT CAN WRITE IS REFUSED, WHATEVER THE AGENT HOLDS.

@@ -57,6 +57,13 @@ type Agent struct {
 	// says no end for anybody, and every row would stay here for ever. So
 	// what is present is what this run wrote, the same test the arrival
 	// record already applies to an actor that pulled.
+	//
+	// IT IS THE ENGINE'S PROCESS AND NOT THE LOG'S SESSION. Those were one
+	// thing until a swap made the successor continue the session, which is
+	// right for the record and wrong for this: an agent registered hours
+	// earlier stayed present for ever, and a fresh editor drew five workers
+	// that had not existed since the night before. An agent that is still
+	// here says so on its next call, which is at most one call away.
 	Run string `json:"run,omitempty"`
 
 	// WHEN IT WENT, and zero while it is here. The row is kept rather than
@@ -182,14 +189,14 @@ func NoteAgent(roots Roots, id, kind, session string) {
 		was, seen := e.Agents[id]
 		if !seen {
 			e.Agents[id] = Agent{Kind: kind, First: time.Now().UTC(),
-				Name: nextName(*e, kind), Session: session, Run: currentSession(roots)}
+				Name: nextName(*e, kind), Session: session, Run: TheRunNow(roots)}
 			return
 		}
 		// AN IDENTITY THAT ARRIVES AGAIN IS HERE AGAIN, and it keeps the name
 		// it was given. Renaming it would put two names on one agent in one
 		// record.
 		was.Gone = time.Time{}
-		was.Session, was.Run = session, currentSession(roots)
+		was.Session, was.Run = session, TheRunNow(roots)
 		e.Agents[id] = was
 	})
 }
@@ -210,7 +217,7 @@ func NoteSession(roots Roots, session string) {
 			was = Agent{First: time.Now().UTC()}
 		}
 		was.Kind, was.Name, was.Session, was.Gone = "session", "main", session, time.Time{}
-		was.Run = currentSession(roots)
+		was.Run = TheRunNow(roots)
 		e.Agents[session] = was
 	})
 }

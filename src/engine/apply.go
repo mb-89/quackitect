@@ -146,6 +146,17 @@ func Apply(r Roots, edits []Edit, dry bool, on, by string) (Applied, error) {
 		out.Edits[path]++
 	}
 
+	// AND THE VOICE RULES, WHICH THIS DOOR WENT ROUND.
+	//
+	// The check lives in the guard hook, which fires on the harness's write
+	// tools. Those are refused: the method sends every write through here. So
+	// the rules were enforced on the door nobody uses and not on the one
+	// everybody uses, and a sentence carrying a semicolon, a contraction and a
+	// Latin abbreviation went into a report through this door and was taken.
+	if err := proseThatReads(r, edits); err != nil {
+		return out, err
+	}
+
 	// THE SCHEMA IS CHECKED HERE TOO, and a dry run checks it with the rest.
 	for _, path := range out.Files {
 		id, isNote := tokenNoteAt(r, path)
@@ -229,11 +240,11 @@ func tokenNoteAt(r Roots, path string) (string, bool) {
 	return "", false
 }
 
-// tokensThatFit holds a write to the byte bounds the save holds a token to, so
+// tokensThatFit holds a write to the same bounds the save holds a token to, so
 // this door cannot leave behind a token the engine will not load.
 //
-// MEASURED. A detail was grown to 2811 bytes through here, against a cap of
-// 1500, and the write was taken. Every engine call the holder made afterwards
+// MEASURED. A detail was grown well past its bound through here, and the write
+// was taken. Every engine call the holder made afterwards
 // was refused naming that size, because switching tokens puts the held one
 // back and putting it back validates it. So the write door was the way to make
 // a token unreadable, and the mint door's check was the only one there was.
@@ -255,17 +266,17 @@ func tokensThatFit(r Roots, id string, was, now []byte) error {
 	if len(over) == 0 {
 		return nil
 	}
-	held := map[string]string{}
+	held := map[string]int{}
 	if before, err := noteToken(string(was), id); err == nil {
 		held = before.bounded()
 	}
 	for _, one := range over {
-		if len(one.Text) <= len(held[one.Says]) {
+		if one.Words <= held[one.Says] {
 			continue // it came down, or did not move, and refusing that is the trap
 		}
-		return fmt.Errorf("%s: %s would be %d bytes and the schema allows %d. Nothing was written. "+
+		return fmt.Errorf("%s: %s would run to %d words and the schema allows %d. Nothing was written. "+
 			"Shorten it in this edit: a write that pushes a section further past its bound is "+
-			"refused, and one that brings it down is not", id, one.Says, len(one.Text), one.Max)
+			"refused, and one that brings it down is not", id, one.Says, one.Words, one.Max)
 	}
 	return nil
 }
@@ -454,4 +465,44 @@ func Undo(r Roots, on, by string) ([]string, error) {
 		return done, fmt.Errorf("the files were put back and the journal entry was not removed: %w", err)
 	}
 	return done, nil
+}
+
+// proseThatReads holds a write to the mechanical voice rules, the way the guard
+// holds the harness's write tools to them.
+//
+// WHAT IS CHECKED IS WHAT WAS WRITTEN, not the file it lands in. A rule broken
+// in a paragraph nobody touched is not this write's to answer for, and the
+// guard reads the tool's own text for the same reason.
+//
+// ONLY THE MECHANICAL RULES. Pattern and vocabulary are reproducible, and a
+// refusal nobody can reproduce is an obstacle rather than a rule.
+//
+// A CHECKER THAT CANNOT RUN LETS THE WRITE THROUGH. It is a check on form, and
+// a broken one must not stop somebody working.
+func proseThatReads(r Roots, edits []Edit) error {
+	var written []string
+	for _, e := range edits {
+		if e.New != "" && isProse(e.File) {
+			written = append(written, e.New)
+		}
+	}
+	if len(written) == 0 {
+		return nil
+	}
+	rules, err := LoadVoiceRules(r.Method)
+	if err != nil {
+		return nil // said by the guard where it can be said; a write is not stopped for it
+	}
+	found := rules.Check(strings.Join(written, "\n"))
+	if len(found) == 0 {
+		return nil
+	}
+	lines := make([]string, 0, len(found))
+	for _, f := range found {
+		lines = append(lines, "  "+f.String())
+	}
+	// THIS REFUSES A FORM, NEVER A PLACE. The same text, written properly, goes
+	// through, and the refusal says so rather than reading as a ban on the file.
+	return fmt.Errorf("this text breaks rules the voice check can see, so nothing was written. "+
+		"Nothing is wrong with the file: fix these and write it again.\n%s", strings.Join(lines, "\n"))
 }

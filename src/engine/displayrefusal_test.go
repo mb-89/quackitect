@@ -33,6 +33,12 @@ import (
 var displayOnly = []string{"MessageDisplay"}
 
 // displayOnlyEventsIn answers which display-only events a cage subscribes to.
+//
+// IT ANSWERED NOTHING, WHATEVER IT WAS HANDED. The rule below and the check
+// that the check works were both written, and the reading between them was not,
+// so the shipped cage passed on a function that could only ever say yes. That
+// is the half-a-mechanism defect the work-token guidance names: ask which half
+// has no output, because that is the one that will be missing.
 func displayOnlyEventsIn(settings []byte) []string {
 	var cage struct {
 		Hooks map[string]json.RawMessage `json:"hooks"`
@@ -41,7 +47,11 @@ func displayOnlyEventsIn(settings []byte) []string {
 		return nil
 	}
 	var found []string
-	_ = cage
+	for _, name := range displayOnly {
+		if _, subscribed := cage.Hooks[name]; subscribed {
+			found = append(found, name)
+		}
+	}
 	return found
 }
 

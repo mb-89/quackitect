@@ -40,7 +40,7 @@ func TestTheMenuKnowsTheNameItPullsWith(t *testing.T) {
 	}
 	NoteTheNameItPullsWith(r, "general-purpose-28", ".bin/se pull --actor rev-6")
 
-	why, refused := WriteNeedsAToken(r, "general-purpose-28", "Edit", "doc/x.md")
+	why, refused := WriteNeedsAToken(r, "general-purpose-28", "Edit", "doc/x.md", "")
 	if !refused {
 		t.Fatal("an Edit was not refused")
 	}

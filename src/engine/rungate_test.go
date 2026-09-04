@@ -34,7 +34,7 @@ func TestEveryWritingToolIsRefusedAndNamesItsVerb(t *testing.T) {
 		{"PowerShell", "se run"},
 	} {
 		t.Run(c.tool, func(t *testing.T) {
-			why, refuse := WriteNeedsAToken(r, "main", c.tool, "src/x.go")
+			why, refuse := WriteNeedsAToken(r, "main", c.tool, "src/x.go", "")
 			if !refuse {
 				t.Fatalf("%s was allowed while holding a token", c.tool)
 			}
@@ -47,7 +47,7 @@ func TestEveryWritingToolIsRefusedAndNamesItsVerb(t *testing.T) {
 	// A TOOL THAT CANNOT WRITE IS NOT GATED. A guard that refuses a read is one
 	// somebody turns off.
 	for _, tool := range []string{"Read", "Grep", "Glob", "WebFetch"} {
-		if _, refuse := WriteNeedsAToken(r, "main", tool, "src/x.go"); refuse {
+		if _, refuse := WriteNeedsAToken(r, "main", tool, "src/x.go", ""); refuse {
 			t.Errorf("%s was refused, and it cannot write", tool)
 		}
 	}
@@ -60,10 +60,10 @@ func TestTheScratchpadIsStillOpenToAWrite(t *testing.T) {
 	root := t.TempDir()
 	r := Roots{Method: root, Work: root}
 	pad := r.Private("scratchpad") + "/thinking.md"
-	if _, refuse := WriteNeedsAToken(r, "main", "Write", pad); refuse {
+	if _, refuse := WriteNeedsAToken(r, "main", "Write", pad, ""); refuse {
 		t.Error("a write into the scratchpad was refused")
 	}
-	if _, refuse := WriteNeedsAToken(r, "main", "Bash", ""); !refuse {
+	if _, refuse := WriteNeedsAToken(r, "main", "Bash", "", ""); !refuse {
 		t.Error("a shell command was allowed because it names no file")
 	}
 }

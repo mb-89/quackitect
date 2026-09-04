@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"strings"
 )
 
 // THE CLAIM MEETS THE RECORD. The owner's words: the guard should be really
@@ -18,7 +17,7 @@ import (
 // record, and nothing when the claim stands.
 func BlockedIsFalse(r Roots, actor string) (string, bool) {
 	for _, t := range InWorkFor(r, actor) {
-		if t.NeedsHuman || strings.TrimSpace(t.ReadyWhen) != "" || Blocked(r, t) != "" {
+		if WaitsForAPerson(t) != "" || Blocked(r, t) != "" {
 			continue
 		}
 		if len(OpenSubTokens(r, t.ID)) > 0 {

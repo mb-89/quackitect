@@ -20,15 +20,42 @@ import (
 // evidence, and says nothing about whose hands it is in.
 func holdsPath(r Roots) string { return r.Private("holds.json") }
 
-// heldNow is every hold the engine is keeping, token to actor.
+// A SESSION OF ITS OWN, the way arrivals and the nudge have one.
+//
+// A HOLD BELONGS TO AN AGENT, AND THE AGENTS OF A SESSION THAT ENDED ARE GONE.
+// The store outlived them: a fresh editor showed worker-heron holding a token
+// from the night before, on a machine where nothing was running. That is the
+// same defect the holder came off the token for, moved into the store, and
+// moving it was supposed to end it rather than relocate it.
+//
+// So the store says which session it belongs to. A store from another one is
+// nobody holding anything, and the tokens are back in the queue with no walker
+// having to rule anybody dead.
+type theHolds struct {
+	Session string            `json:"session"`
+	Held    map[string]string `json:"held"`
+}
+
+// heldNow is every hold this session is keeping, token to actor.
 func heldNow(r Roots) map[string]string {
-	out := map[string]string{}
+	all := loadHolds(r)
+	return all.Held
+}
+
+func loadHolds(r Roots) theHolds {
+	out := theHolds{Session: currentSession(r), Held: map[string]string{}}
 	b, err := os.ReadFile(holdsPath(r))
 	if err != nil {
 		return out
 	}
-	_ = json.Unmarshal(b, &out) // a store that will not read is nobody holding anything
-	return out
+	var was theHolds
+	if json.Unmarshal(b, &was) != nil || was.Held == nil {
+		return out // a store that will not read is nobody holding anything
+	}
+	if was.Session != out.Session {
+		return out // it belongs to a session that has ended
+	}
+	return was
 }
 
 // HeldBy answers who holds this token. It is the one place that decides, so a
@@ -46,14 +73,14 @@ func recordHold(r Roots, id, actor string) error {
 		return nil
 	}
 	return locked(holdsPath(r), func() error {
-		all := heldNow(r)
-		if all[id] == actor {
+		all := loadHolds(r)
+		if all.Held[id] == actor {
 			return nil
 		}
 		if actor == "" {
-			delete(all, id)
+			delete(all.Held, id)
 		} else {
-			all[id] = actor
+			all.Held[id] = actor
 		}
 		b, err := json.MarshalIndent(all, "", "  ")
 		if err != nil {

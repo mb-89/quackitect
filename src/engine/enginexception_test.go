@@ -88,7 +88,7 @@ func TestTheWriteGateKeepsNoEngineException(t *testing.T) {
 		{"a bare substitution", `.bin/se pull --actor x $(touch M)`},
 		{"the engine and nothing else", `.bin/se pull --actor x`},
 	} {
-		why, refused := WriteNeedsAToken(r, "worker-x", "Bash", "")
+		why, refused := WriteNeedsAToken(r, "worker-x", "Bash", "", "")
 		if !refused {
 			t.Errorf("%s: a shell command was let past the write gate, so a write "+
 				"through it says which work it is nowhere: %s", one.what, one.command)

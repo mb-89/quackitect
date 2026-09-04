@@ -67,6 +67,25 @@ export function holdArgs(on: boolean): string[] {
   return ["hold", on ? "--off" : "--on", "--by", "person"];
 }
 
+// HOW MUCH OF THE ENGINE SPEAKS TO THE AGENT. One press moves between bound and
+// unbound; the five-press gesture asks for god. See src/engine/unbound.go.
+export function bindArgs(to: string): string[] {
+  return ["--bind", to];
+}
+
+export function bindingArgs(): string[] {
+  return ["--bind", "status"];
+}
+
+// THE PERSON ASKS WHAT IS HAPPENING, and nothing else runs until it is said.
+export function askArgs(on: boolean): string[] {
+  return ["--ask", on ? "on" : "off"];
+}
+
+export function askedArgs(): string[] {
+  return ["--ask", "status"];
+}
+
 export function viewArgs(file: string, side: string, rest: string[]): string[] {
   return ["view", "--file", file, "--pane", side, ...rest];
 }

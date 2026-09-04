@@ -122,7 +122,6 @@ body:
     - header: detail
       tense: present
       maxWords: 250
-      maxBytes: 1500
       description: what is asked, or what is wrong, and why it matters
 
     - header: proposed action
@@ -147,5 +146,5 @@ body:
     # One per activity, named for it. The template writes the table and the
     # process writes the rows.
     - headerPrefix: "evidence: "
-      maxBytes: 1000
+      maxWords: 200
       description: what was checked at each step, and what was seen

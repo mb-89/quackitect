@@ -46,6 +46,7 @@ var run = map[string]verb{
 	"state":  runState,
 	"view":   runView,
 	"move":   runMove,
+	"claim":  runClaim,
 	"lint":   runLint,
 	"hold":   runHold,
 	"retro":  runRetro,

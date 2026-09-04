@@ -29,7 +29,7 @@ func TestTheMenuSaysWhatIsAlreadyInYourHands(t *testing.T) {
 
 	// WITH A HAND: the refusal names the token that hand is on, and says so as
 	// a hand rather than as one more thing that could be picked up.
-	why, refused := WriteNeedsAToken(r, "worker-x", "Bash", "")
+	why, refused := WriteNeedsAToken(r, "worker-x", "Bash", "", "")
 	if !refused {
 		t.Fatal("a shell command was let past the write gate")
 	}
@@ -44,7 +44,7 @@ func TestTheMenuSaysWhatIsAlreadyInYourHands(t *testing.T) {
 
 	// WITH NO HAND: the same menu says nothing about hands. This is the half
 	// that keeps the first from being satisfied by printing the phrase always.
-	why, refused = WriteNeedsAToken(r, "worker-y", "Bash", "")
+	why, refused = WriteNeedsAToken(r, "worker-y", "Bash", "", "")
 	if !refused {
 		t.Fatal("a shell command from an actor holding nothing was let past the write gate")
 	}

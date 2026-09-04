@@ -115,28 +115,6 @@ func TestAReadAlreadyHeldUnchangedIsRefusedOnce(t *testing.T) {
 	}
 }
 
-func TestAReadOverTheClampIsCorrectedNotRefused(t *testing.T) {
-	t.Parallel()
-	exe, r := aGuardedTree(t)
-	file := filepath.Join(r.Work, "long.md")
-	os.WriteFile(file, []byte(strings.Repeat("a line\n", 1000)), 0o644)
-	read := map[string]any{"cwd": r.Work, "tool_name": "Read", "agent_id": "helper-1",
-		"tool_input": map[string]any{"file_path": file}}
-	d, out := decisionOf(t, hookSays(t, exe, r.Method, "PreToolUse", read))
-	if d != "allow" {
-		t.Fatalf("a read over the clamp was answered %q", d)
-	}
-	updated, _ := out["updatedInput"].(map[string]any)
-	if limit, _ := updated["limit"].(float64); int(limit) != TheFloor().ReadClampLines {
-		t.Fatalf("the corrected read carries limit %v, want the clamp", updated["limit"])
-	}
-	// A READ WITH ITS OWN LIMIT IS LEFT ALONE.
-	own := map[string]any{"cwd": r.Work, "tool_name": "Read", "agent_id": "helper-1",
-		"tool_input": map[string]any{"file_path": file, "offset": 900, "limit": 50}}
-	if said := hookSays(t, exe, r.Method, "PreToolUse", own); said != "" {
-		t.Fatalf("a read with a limit was answered %q", said)
-	}
-}
 
 func TestTheSameFailingCallIsRefusedAfterThreeFailures(t *testing.T) {
 	t.Parallel()

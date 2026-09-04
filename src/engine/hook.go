@@ -431,6 +431,23 @@ func answerHook(raw []byte, args []string, out io.Writer, held *Log) {
 		}
 	}
 
+	// A PERSON ASKED WHAT IS HAPPENING, and nothing else runs until they are
+	// told. The button raises the obligation and the answer discharges it, the
+	// same shape as the hold: no claim is wanted, because the press is the
+	// grant.
+	//
+	// IT SITS BESIDE THE HOLD AND ABOVE EVERYTHING ELSE, WHICH IS THE POINT.
+	// The binding below can turn every rule this engine has off, and it does
+	// not reach up here: what god mode removes is the ENGINE'S judgement, never
+	// the person's own controls. An override that could also silence the person
+	// holding it is not an override, it is a runaway.
+	if asked := LoadAsked(roots); asked.Owed() && in.Event == "PreToolUse" && !isAnswering(in) {
+		record(log, "engine", "asked", actor, "refused: the person asked what is happening", No(),
+			map[string]any{"tool": in.ToolName, "asked": asked.On})
+		g.deny(asked.Says)
+		return
+	}
+
 	// WHAT THE PERSON SAID MID-TURN, COPIED BY THE ENGINE.
 	//
 	// The harness fires no event for a message written into a running turn, and
@@ -639,10 +656,33 @@ func decidePreToolUse(g *guard, roots Roots, cfg Config, emergency Emergency, lo
 		path = ti.Path
 	}
 
+	// HOW MUCH OF THIS ENGINE IS SPEAKING. See unbound.go: a person takes the
+	// process off with one press and the whole of it off with five.
+	binding := LoadBinding(roots)
+
+	// GOD MODE. Every refusal below is off, because something in the engine is
+	// in the way and this is the state where it stops arguing.
+	//
+	// NOTHING IS SAID PER CALL. Turning each refusal into a warning was weighed
+	// and dropped: a log of everything the engine would have said is the engine
+	// in the way with extra steps. What says it is the orange block in the
+	// status bar, for as long as it is armed.
+	//
+	// THE PERSON'S OWN CONTROLS ARE ABOVE THIS, not below it. The hold and the
+	// ask are enforced before this function is reached, so an override cannot
+	// silence whoever is holding it.
+	if binding.At == God {
+		return
+	}
+
 	// THE QUEUE WANTS MORE HANDS, and the main agent is held until it has
 	// spawned them. Every other guard waits behind this one, because a tool
 	// call that is not a spawn is not what the queue is waiting for.
-	if why, refuse := AStaffShortfall(roots, cfg, actor, in.ToolName); refuse {
+	//
+	// UNBOUND TAKES THE QUEUE OFF. A person working on one specific thing is
+	// not short-handed, and being told to spawn five workers for a backlog they
+	// are deliberately ignoring is the engine arguing with them.
+	if why, refuse := AStaffShortfall(roots, cfg, actor, in.ToolName, ti.Command); refuse && !Unleashed(roots) {
 		record(log, "engine", "staffing", actor, "refused: the queue wants more hands than are here", No(),
 			map[string]any{"tool": in.ToolName})
 		g.deny(why)
@@ -658,31 +698,28 @@ func decidePreToolUse(g *guard, roots Roots, cfg Config, emergency Emergency, lo
 		return
 	}
 
-	// A READ IS DEDUPLICATED AND CLAMPED. The range the read will take is
-	// settled first, so the dedup asks about the read that will happen and
-	// not the one that was asked for.
+	// A READ ALREADY HELD IS NOT PAID FOR TWICE.
+	//
+	// THERE WAS A CLAMP HERE AND IT IS GONE. It cut a read with no limit to
+	// eight hundred lines and told the agent where to carry on, to stop an
+	// oversize read blowing the context or coming back silently cut.
+	//
+	// NEITHER OF THOSE WAS TRUE. Eight hundred lines in one call and four
+	// hundred in two put the same tokens in the same context, so it saved
+	// nothing and cost a second call. Nothing comes back silently cut.
+	//
+	// MEASURED BEFORE IT WENT: five clamps in every log this tree keeps. Two
+	// were the harness's own transcript files. Of the three that were source,
+	// one was a file of eight hundred and forty lines cut to eight hundred, so
+	// the agent made a second call for the last forty.
+	//
+	// The dedup below stays. It is a different question and it answers it: a
+	// second read of the same unchanged range puts the same tokens in twice.
 	if in.ToolName == "Read" && path != "" {
-		effective := ti
-		lines, clamp := aReadTooLarge(cfg, path, ti)
-		if clamp {
-			effective.Limit = cfg.ReadClampLines
-		}
-		if why, refuse := aReadAlreadyHeld(roots, actor, path, pageOf(effective)); refuse {
+		if why, refuse := aReadAlreadyHeld(roots, actor, path, pageOf(ti)); refuse {
 			record(log, "engine", "dedup", actor, "refused: a read already held, unchanged", No(),
 				map[string]any{"path": path})
 			g.deny(why)
-			return
-		}
-		if clamp {
-			updated := map[string]any{"file_path": ti.FilePath, "limit": cfg.ReadClampLines}
-			if ti.Offset > 0 {
-				updated["offset"] = ti.Offset
-			}
-			record(log, "engine", "clamp", actor,
-				fmt.Sprintf("read corrected: %d lines asked for, %d handed over", lines, cfg.ReadClampLines), Yes(),
-				map[string]any{"path": path, "lines": lines, "limit": cfg.ReadClampLines})
-			g.correct(updated, fmt.Sprintf("%s has %d lines. This read is cut to %d; read on with offset.",
-				filepath.Base(path), lines, cfg.ReadClampLines))
 			return
 		}
 	}
@@ -901,7 +938,13 @@ func decidePreToolUse(g *guard, roots Roots, cfg Config, emergency Emergency, lo
 		NoteTheNameItActsAs(roots, actor, ti.Actor)
 	}
 
-	if why, refuse := WriteNeedsAToken(roots, actor, in.ToolName, pathOf(in)); refuse {
+	// UNBOUND TAKES THE TOKEN OFF THE WRITE. Naming the work is what makes the
+	// queue on the person's screen true, and a person who has deliberately left
+	// the queue is not asking it to be. Everything that protects the tree ran
+	// above this line and still ran: the voice rules, the schema, the private
+	// originals, the stale write. This one is procedure, so this is the one the
+	// press removes.
+	if why, refuse := WriteNeedsAToken(roots, actor, in.ToolName, pathOf(in), ti.Command); refuse && binding.At == Bound {
 		record(log, "engine", "gate", actor, "refused: it cannot name its token", No(),
 			map[string]any{"tool": in.ToolName})
 		g.deny(why)

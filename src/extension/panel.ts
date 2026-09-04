@@ -26,6 +26,9 @@ export type Node = {
   step?: number;
   options?: Array<string | { value: string; says: string }>;
   placeholder?: string;
+  // WHAT THE NUMBER IS COUNTED IN, beside the box. "a claim lasts: 3" says
+  // nothing on its own, and the unit is the one word that makes it a fact.
+  unit?: string;
   span?: number;
   narrow?: string;
   shown?: boolean;
@@ -35,6 +38,15 @@ export type Node = {
   stopCommand?: string;
   labels?: Record<string, string>;
   titles?: Record<string, string>;
+  // A GESTURE IS A PRESS COUNT THAT MEANS SOMETHING ELSE.
+  //
+  // v3's ruling, and the reason this is not a second button: climbing goes one
+  // rung at a time, because handing over a whole ladder in one click is a move
+  // a person should have to mean. Releasing goes any distance at once, so a
+  // stray press always falls DOWN and never up, and that asymmetry is the
+  // safety rather than a confirmation dialog.
+  gesture?: number;
+  gestureCommand?: string;
   // A TABLE NAMES A LIST THE ENGINE ANSWERS AND THE COLUMNS TO DRAW OF IT.
   // The widget knows how to draw a list of rows; which list, and which of
   // each row's fields are worth a column, is the declaration's to say.
@@ -74,8 +86,9 @@ export interface Doing {
 export interface Happening {
   actors: Doing[];
   hold: { on: boolean; by?: string; says?: string };
-  // WHO IS HERE, which is not who has worked. The header draws actors,
-  // because that is what a person acts on; a table draws this.
+  // WHO IS HERE, AND WHAT EACH ONE HOLDS. The table draws this and it is the
+  // only place an actor is drawn. The header drew them too, so every agent
+  // appeared twice and the first one spilled into the view's title.
   present?: Doing[];
 }
 
@@ -203,10 +216,17 @@ function button(n: Node): string {
     // this only ever says what the person last pressed.
     const labels = n.labels ?? {};
     const titles = n.titles ?? {};
-    return `<button class="toggle" id="${esc(n.name)}"${wide} data-state="off"
-      data-command="${esc(n.command ?? "")}"
+    // THE RESTING POSITION IS THE FIRST ONE IT DECLARES. A toggle with two
+    // positions calls it off; the binding has three and calls it bound, and a
+    // widget that assumed off would draw a state that control does not have.
+    const rest = labels.off !== undefined ? "off" : Object.keys(labels)[0] ?? "off";
+    const ges = n.gesture && n.gestureCommand
+      ? ` data-gesture="${n.gesture}" data-gesture-command="${esc(n.gestureCommand)}"`
+      : "";
+    return `<button class="toggle" id="${esc(n.name)}"${wide} data-state="${esc(rest)}"
+      data-command="${esc(n.command ?? "")}"${ges}
       data-labels='${json(labels)}' data-titles='${json(titles)}'
-      title="${esc(titles.off ?? n.name)}">${esc(labels.off ?? n.name)}</button>`;
+      title="${esc(titles[rest] ?? n.name)}">${esc(labels[rest] ?? n.name)}</button>`;
   }
   if (n.type === "action") {
     return `<button data-command="${esc(n.command ?? "")}" title="${esc(n.title ?? n.label ?? n.name)}">${esc(
@@ -242,7 +262,11 @@ function field(k: string, n: Node): string {
       n.max !== undefined ? `max="${n.max}"` : "",
       `step="${n.step ?? (n.type === "int" ? 1 : "any")}"`,
     ].join(" ");
-    control = `<input type="number" ${bounds} ${common}>`;
+    // THE UNIT SITS BESIDE THE BOX AND NOT IN THE LABEL. A row reads
+    // "a claim lasts [3] hours", which is a sentence, and the label stays
+    // short enough for a narrow sidebar.
+    const unit = n.unit ? `<span class="unit">${esc(n.unit)}</span>` : "";
+    control = `<input type="number" ${bounds} ${common}>${unit}`;
   } else {
     control = `<input type="text" ${common}>`;
   }
@@ -323,9 +347,21 @@ function css(): string {
   details:not([open]) summary::before { transform: rotate(-90deg); }
   h3 { font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.06em;
        color: var(--vscode-descriptionForeground); margin: 0 0 6px 0; font-weight: 600; }
+  .control .unit { margin-left: 6px; opacity: 0.7; }
+  .control input[type="number"] { width: auto; max-width: 6em; }
   h3 + .grid { margin-bottom: 12px; }
   button { width: 100%; }
   button.status { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+  /* UNBOUND IS THE SAME MARK IN A DIFFERENT LIGHT, because it is the same act.
+     GOD MODE PULSES, and it is the one thing on this panel that moves: a state
+     with no timer on it has to be the thing a person cannot fail to notice. */
+  button.toggle[data-state="unbound"] { background: var(--vscode-inputValidation-warningBackground,
+    var(--vscode-editorWarning-foreground)); }
+  button.toggle[data-state="god"] { background: var(--vscode-statusBarItem-errorBackground,
+    var(--vscode-inputValidation-errorBackground));
+    color: var(--vscode-statusBarItem-errorForeground, var(--vscode-foreground));
+    animation: godpulse 1.1s ease-in-out infinite; }
+  @keyframes godpulse { 0%, 100% { opacity: 1 } 50% { opacity: 0.45 } }
   button.toggle[data-state="on"] { background: var(--vscode-inputValidation-warningBackground,
                                    var(--vscode-button-secondaryBackground));
                                    color: var(--vscode-foreground);
@@ -386,8 +422,31 @@ function script(): string {
     b.onclick = () => send({ type: 'command', command: b.dataset.command });
   }
 
+  // A TOGGLE PRESSES ONCE. A toggle that declares a gesture also counts.
+  //
+  // WITHIN ONE BURST ONLY THE FIRST PRESS ACTS. Presses two to four do nothing
+  // at all, so a person going for the gesture does not flip the control four
+  // times on the way, and the fifth sends the other command.
+  //
+  // AND THE BUTTON IS DEAD FOR A MOMENT AFTER IT ARMS, so the tail of a
+  // fumbled six-press burst cannot undo the thing that was just meant.
+  const BURST = 1000, DEADNESS = 600;
   for (const b of document.querySelectorAll('button.toggle')) {
-    b.onclick = () => send({ type: 'command', command: b.dataset.command });
+    const want = Number(b.dataset.gesture || '0');
+    let began = 0, presses = 0, deadUntil = 0;
+    b.onclick = () => {
+      const now = Date.now();
+      if (now < deadUntil) return;
+      if (want < 2) { send({ type: 'command', command: b.dataset.command }); return; }
+      if (now - began > BURST) { began = now; presses = 0; }
+      presses++;
+      if (presses === 1) { send({ type: 'command', command: b.dataset.command }); return; }
+      if (presses === want) {
+        send({ type: 'command', command: b.dataset.gestureCommand });
+        deadUntil = now + DEADNESS;
+        presses = 0;
+      }
+    };
   }
 
   for (const b of document.querySelectorAll('button.status')) {
@@ -463,12 +522,15 @@ function script(): string {
     if (m.type === 'state' && m.id) {
       const t = document.getElementById(m.id);
       if (t && t.classList.contains('toggle')) {
-        const on = m.state === 'good';
-        t.dataset.state = on ? 'on' : 'off';
         const labels = JSON.parse(t.dataset.labels || '{}');
         const titles = JSON.parse(t.dataset.titles || '{}');
-        t.textContent = labels[on ? 'on' : 'off'] || t.textContent;
-        t.title = titles[on ? 'on' : 'off'] || '';
+        // A CONTROL WITH MORE THAN TWO POSITIONS NAMES ITS OWN. on and off
+        // cannot say which of the two positions that are not bound this is.
+        const named = labels[m.state] !== undefined;
+        const key = named ? m.state : (m.state === 'good' ? 'on' : 'off');
+        t.dataset.state = key;
+        t.textContent = labels[key] || t.textContent;
+        t.title = titles[key] || '';
         return;
       }
     }
@@ -593,6 +655,16 @@ export function livePieces(root: Node, shown: string[], doing: Happening):
   return { head: doingRows(doing), tables };
 }
 
+// THE HEAD SAYS WHAT IS TRUE OF THE WHOLE SYSTEM, AND NAMES NO ACTOR.
+//
+// It drew a line per working actor beside the gear. The table below already
+// draws every actor and what it holds, so each one was on the panel twice, and
+// the strip's first line ran into the view's own title: a person opening the
+// editor read "worker-heron working wk-12c6e7ad1e Overnight report for o..."
+// where the name of the view belongs.
+//
+// A HOLD IS NOT AN ACTOR. Everything being on hold is one fact about the whole
+// panel, so it stays here, and it is the only thing that does.
 function whoIsDoingWhat(doing: Happening): string {
   return `<div class="doings" id="doings">${doingRows(doing)}</div>`;
 }
@@ -602,16 +674,8 @@ function whoIsDoingWhat(doing: Happening): string {
 // the hover: a reason an actor stopped is a paragraph, and it is the one thing
 // on this panel a person most wants to read in full.
 function doingRows(doing: Happening): string {
-  const rows = (doing.actors ?? []).map((d) =>
-    `<div class="doing ${esc(d.state)}" data-actor="${esc(d.actor)}"` +
-    ` title="${esc(d.why ? d.why : d.holding)}">` +
-    `<span class="who">${esc(d.actor)}</span> ` +
-    `<span class="state">${esc(d.state)}</span> ` +
-    `<span class="holds">${esc(d.holding)}</span>` +
-    (d.why ? ` <span class="why">${esc(d.why)}</span>` : "") +
-    `</div>`).join("");
   const held = doing.hold?.on
     ? `<div class="onhold">everything is on hold${doing.hold.by ? ", by " + esc(doing.hold.by) : ""}</div>`
     : "";
-  return `${rows}${held}`;
+  return held;
 }

@@ -71,6 +71,8 @@ func main() {
 	pingFlag := flag.Bool("ping", false, "print what the engine running over this folder says about itself, and exit")
 	project := flag.Bool("project", false, "write the projections from guidance and exit")
 	emergency := flag.String("emergency", "", "arm or disarm emergency mode: on, off, or status")
+	bind := flag.String("bind", "", "how much of the engine speaks to the agent: bound, unbound, god, or status")
+	ask := flag.String("ask", "", "ask the agent what is happening, and refuse it everything until it says: on, off, or status")
 	reason := flag.String("reason", "", "why emergency mode is being armed")
 	minutes := flag.Int("minutes", 30, "how long emergency mode lasts, at most 240")
 	settings := flag.Bool("config", false, "print every parameter, its value, and where the value came from")
@@ -146,6 +148,44 @@ func main() {
 			fail(fmt.Errorf("no engine is running over %s", roots.Work))
 		}
 		fmt.Println("stopping")
+		return
+	}
+
+	// HOW MUCH OF THIS ENGINE IS SPEAKING TO THE AGENT. The panel's button
+	// presses this, and a person at a prompt can press it too. See unbound.go.
+	if *bind != "" {
+		if *bind == "status" {
+			answerJSON(LoadBinding(roots))
+			return
+		}
+		to := TheBinding(*bind)
+		switch to {
+		case Bound, Unbound, God:
+		default:
+			fail(fmt.Errorf("--bind takes bound, unbound, god or status, and not %q", *bind))
+		}
+		was := LoadBinding(roots)
+		now, err := SetBinding(roots, to, "the owner")
+		if err != nil {
+			fail(err)
+		}
+		noteInLog(dir, "engine", "binding", "the engine is now "+string(now.At)+
+			", and was "+string(was.At), Yes(), map[string]any{"at": now.At, "was": was.At})
+		answerJSON(now)
+		return
+	}
+
+	// ASK THE AGENT WHAT IS HAPPENING. Every call is refused until it answers.
+	if *ask != "" {
+		if *ask == "status" {
+			answerJSON(LoadAsked(roots))
+			return
+		}
+		now, err := SetAsked(roots, *ask == "on", "the owner")
+		if err != nil {
+			fail(err)
+		}
+		answerJSON(now)
 		return
 	}
 
@@ -503,6 +543,21 @@ func main() {
 	// This start is the first moment anything can put it in the record.
 	RecordFinishedBattery(roots, log)
 
+	// AND WHAT A KILLED WRITE LEFT BEHIND. A swap ends the old engine while a
+	// heartbeat's write is in flight, so a temp file is orphaned under .se with
+	// nothing owning it.
+	if swept := SweepOrphanedWrites(roots, time.Minute); swept > 0 {
+		log.Write("engine", "start", "engine", "temporary files no write finished were swept", Yes(),
+			map[string]any{"swept": swept})
+	}
+
+	// AND THE PROGRAMS THIS TREE USED TO SHIP. One that will not delete is one
+	// a process is still running from, and it stays until that process ends.
+	if swept := SweepWhatWasReplaced(roots.Method); swept > 0 {
+		log.Write("engine", "start", "engine", "programs nothing is running any more were swept", Yes(),
+			map[string]any{"swept": swept, "from": WasDir(roots.Method)})
+	}
+
 	// TWO NAMES, ONE FILE. Installing links them, so the cage and RUNME call
 	// the same program. A build run by hand replaces one name and leaves the
 	// other pointing at what was there before, and then the guards run one
@@ -580,6 +635,17 @@ func main() {
 	// pid and the beat, so finding the model is reading one file.
 	here.Socket = socket
 	SayRunning(roots, here)
+	// AND THE OTHER BOXES' CLAIMS, ON A CLOCK OF THEIR OWN.
+	//
+	// A fetch is a second over the network and a pull may not wait on one, so
+	// the engine does the fetching and a pull reads what is already here. It is
+	// the ENGINE'S and not the indexer's: started from there it ran in every
+	// test tree that opens an index, spawning git processes under a parallel
+	// suite, and three index tests went red under the load while passing alone.
+	claimsDone := make(chan struct{})
+	defer close(claimsDone)
+	go WatchForClaims(roots, log, claimsDone)
+
 	ticker := time.NewTicker(*beat)
 	defer ticker.Stop()
 	started := time.Now()
@@ -665,6 +731,10 @@ func main() {
 			// this one has to have let go of all three before the other looks.
 			release()
 			StopSaying(roots)
+			// AND WHAT THIS ENGINE IS ABOUT TO ORPHAN. A heartbeat's write in
+			// flight when the process ends leaves a temp file nothing owns, and
+			// the engine handing over is the one party that knows it is ending.
+			SweepOrphanedWrites(roots, 0)
 			if err := handOver(roots, log.Session()); err != nil {
 				log.Write("engine", "error", "engine",
 					"the next engine is in place and did not start, so this tree has no engine", No(),

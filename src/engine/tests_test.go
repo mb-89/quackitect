@@ -28,6 +28,21 @@ const padTests = 20
 // cover build and a run per test, so a test takes it once.
 func aTreeWithTests(t *testing.T) (Roots, string) {
 	t.Helper()
+	// THE COMPILER IS FED, NOT RUN. What these tests are about is which tests
+	// the engine chooses from a delta, and the toolchain answers the same thing
+	// every time and takes ten seconds to say it. TestTheMapIsBuiltByTheRealGo
+	// drives the real one, once. See toolchainfed_test.go.
+	reaches := map[string][]string{
+		"TestA": {"lib.go:3.13,5.2 1 1"},
+		"TestB": {"lib.go:7.13,9.2 1 1"},
+	}
+	// THE PADDING REACHES B, the way the padding written below does, so the
+	// suite is as big here as it is there and the whole-battery rule sees the
+	// share it is about.
+	for i := 1; i <= padTests; i++ {
+		reaches[fmt.Sprintf("TestPad%d", i)] = []string{"lib.go:7.13,9.2 1 1"}
+	}
+	aFedToolchain(t, "example.com/lib", reaches)
 	dir := t.TempDir()
 	r := Roots{Method: dir, Work: dir}
 	lib := "package lib\n\n" +
@@ -174,9 +189,10 @@ func TestTheEngineSelectsByRegion(t *testing.T) {
 		t.Fatalf("one function changed and the whole battery was chosen: %s", got.WhyWhole)
 	}
 
-	// AND IT RUNS, GREEN, WITH ITS TIME.
+	// AND IT RUNS, GREEN. How long it took is a fact about the real toolchain,
+	// so TestTheMapIsBuiltByTheRealGo holds that and this holds the selection.
 	got, err = TestTheDelta(r, db, "", nil, true, "worker-one")
-	if err != nil || !got.OK || len(got.Ran) != 1 || !got.Ran[0].OK || got.Ran[0].Seconds <= 0 {
+	if err != nil || !got.OK || len(got.Ran) != 1 || !got.Ran[0].OK {
 		t.Fatalf("running the selection answered %+v %v", got, err)
 	}
 }

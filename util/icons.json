@@ -166,5 +166,15 @@
     "glyph": "·",
     "at": "U+00B7",
     "for": "nothing"
+  },
+  "unbound": {
+    "glyph": "❌🔗🤖",
+    "at": "U+274C U+1F517 U+1F916",
+    "for": "the binding. A burst and the robot it came off, so what is loose is on the button. An open padlock was tried and read as a shut one at this size: the two differ by a few pixels. The broken chain the owner drew is U+26D3 U+FE0F U+200D U+1F4A5, which is Emoji 15.1 and older than no Windows 10 font, so it falls apart into two glyphs there. This is the half of that picture which carries the meaning. One icon for both rungs: unbound and god differ by colour."
+  },
+  "asked": {
+    "glyph": "❓🤖",
+    "at": "U+2753 U+1F916",
+    "for": "a person asking the agent what is happening. It owes an answer until it gives one"
   }
 }

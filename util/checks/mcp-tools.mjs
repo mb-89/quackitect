@@ -132,6 +132,10 @@ const calls = [
   // THE ENGINE OWNS THE TESTS. A plan asks what would run and runs nothing,
   // and the answer is the engine's decision as a structure.
   { tool: "se_test", args: { on: "", plan: true } },
+  // A CLAIM IS WHAT KEEPS TWO BOXES OFF ONE PIECE OF WORK. whoami is the name
+  // this box writes, and list is what it knows about, and neither reaches git.
+  { tool: "se_claim", args: { whoami: true } },
+  { tool: "se_claim", args: { list: true } },
 ];
 // The apply cases need a real id, so the first mint runs on its own and its
 // answer fills them in.
@@ -231,6 +235,20 @@ let found = null;
 try { found = JSON.parse(answers.get(askAt + 2) ?? ""); } catch { /* said above */ }
 say("and a search finds the words in a body", found?.rows?.some((r) => r[0] === mintedFirst?.id),
   JSON.stringify(found)?.slice(0, 200));
+
+// AND se_claim SAYS WHO THIS BOX IS, WITHOUT BEING TOLD.
+//
+// An agent that could name a box could name another one, so the engine works it
+// out and nothing passes it in.
+const claimAt = calls.findIndex((c) => c.tool === "se_claim") + 1;
+{
+  const whoami = (() => { try { return JSON.parse(answers.get(claimAt) ?? ""); } catch { return null; } })();
+  const listed = (() => { try { return JSON.parse(answers.get(claimAt + 1) ?? ""); } catch { return null; } })();
+  say("se_claim says which box and agent this is", /^[0-9a-f]{8}\/.+/.test(whoami?.claimant ?? ""),
+    whoami?.claimant ?? answers.get(claimAt));
+  say("se_claim lists what is claimed", listed !== null && "claims" in listed,
+    answers.get(claimAt + 1));
+}
 
 // AND se_find ANSWERS PATH, LINE AND TEXT OFF THE INDEX.
 const findAt = calls.findIndex((c) => c.tool === "se_find") + 1;

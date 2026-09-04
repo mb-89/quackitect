@@ -108,6 +108,65 @@ const aTreeWithALine = {
 // ---- the cases ----
 
 const cases = {
+  // THE FIVE-PRESS GESTURE, PRESSED.
+  //
+  // It is the one control on this panel where a press does not mean what the
+  // press before it meant, so it is the one that has to be driven rather than
+  // read. v3's ruling is the shape: climbing is deliberate and releasing is
+  // easy, so a stray press always falls down and never up.
+  async "--gesture"() {
+    const tree = {
+      name: "quackitect", type: "group", children: [{
+        name: "control", type: "group", shown: true, children: [{
+          name: "unbind", type: "toggle", command: "quackitect.unbind",
+          gesture: 5, gestureCommand: "quackitect.god",
+          labels: { bound: "U", unbound: "U", god: "U" },
+          titles: { bound: "unbind", unbound: "unbound", god: "god" },
+        }],
+      }],
+    };
+    const { panelHtml } = await load("panel");
+    const dom = new JSDOM(panelHtml(tree, ["control"], {}), {
+      runScripts: "dangerously",
+      beforeParse(w) {
+        w.sent = [];
+        w.acquireVsCodeApi = () => ({ postMessage: (m) => w.sent.push(m), setState() {}, getState: () => undefined });
+      },
+    });
+    const w = dom.window;
+    const b = w.document.getElementById("unbind");
+    if (!b) { no("gesture: the panel drew no unbind button"); return; }
+    const sent = () => w.sent.filter((m) => m.type === "command").map((m) => m.command);
+
+    // THE RESTING POSITION IS THE FIRST ONE DECLARED, not "off". A toggle with
+    // three positions has no off, and falling back to one drew the node's own
+    // name as the button's text.
+    if (b.dataset.state !== "bound") no(`gesture: the button rests at ${b.dataset.state}, not bound`);
+    else ok("gesture: it rests at the first position it declares");
+    if (b.textContent.trim() !== "U") no(`gesture: the button reads ${JSON.stringify(b.textContent.trim())}`);
+    else ok("gesture: it draws the label it was given");
+
+    // ONE PRESS IS THE ORDINARY ONE.
+    b.click();
+    if (sent().join() !== "quackitect.unbind") no(`gesture: one press sent ${sent().join()}`);
+    else ok("gesture: one press asks for the ordinary command");
+
+    // AND FOUR MORE INSIDE THE BURST ARM THE OTHER ONE, sending nothing on the
+    // way: a person going for the gesture must not flip the control four times.
+    w.sent.length = 0;
+    for (let i = 0; i < 4; i++) b.click();
+    if (sent().join() !== "quackitect.god") no(`gesture: the burst sent ${JSON.stringify(sent())}`);
+    else ok("gesture: five presses arm the other command, and nothing between");
+
+    // AND THE BUTTON IS DEAD FOR A MOMENT AFTER IT ARMS, so the tail of a
+    // fumbled six-press burst cannot undo what was just meant.
+    w.sent.length = 0;
+    b.click();
+    b.click();
+    if (sent().length !== 0) no(`gesture: a press straight after arming sent ${JSON.stringify(sent())}`);
+    else ok("gesture: the button is dead for a moment after it arms");
+  },
+
   // EVERY PLACE ON THE MINT CHAIN THAT ANSWERS undefined SAYS SOMETHING FIRST,
   // AND THE SET IS ASKED FOR RATHER THAN LISTED.
   async "--says-why"() {

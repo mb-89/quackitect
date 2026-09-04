@@ -93,6 +93,20 @@ func runIdentity() string {
 
 func runningPath(r Roots) string { return r.Private("engine.json") }
 
+// TheRunNow is the engine process that is running over this tree, as an
+// identity that changes every time one starts.
+//
+// IT IS NOT THE LOG SESSION. A swap hands over to a successor that continues
+// the same session, so the session stopped saying which process wrote a thing
+// the day that landed. With no engine at all the session is the best answer
+// there is, which is what it was before.
+func TheRunNow(r Roots) string {
+	if v, up := LoadRunning(r); up && v.Run != "" {
+		return v.Run
+	}
+	return currentSession(r)
+}
+
 func SayRunning(r Roots, v Running) {
 	if err := os.MkdirAll(r.Private(), 0o755); err != nil {
 		return

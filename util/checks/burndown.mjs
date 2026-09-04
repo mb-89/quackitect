@@ -96,12 +96,20 @@ if (other && other.textContent.trim() !== "BD: 5/6/7") {
   no(`the second bar reads ${JSON.stringify(other.textContent.trim())} rather than what it was handed`);
 } else ok("the second bar carries its own four numbers");
 
-// AND NO BURN DOWN, NO BAR. A page built before the engine answered draws
+// AND NO BURN DOWN, NO NUMBERS. A page built before the engine answered says
 // nothing rather than four zeroes, which would read as a quiet day.
+//
+// THE BOX IS STILL THERE, AND EMPTY. This asked for no node at all, which is
+// what the page did until a number that arrived later had nowhere to land: the
+// counter then stayed missing for the life of the page. What must not be made
+// up is the numbers, and an empty box makes none.
 const none = new JSDOM(pageFor(undefined));
-if (none.window.document.querySelector(".bd")) {
-  no("a page built with no answer still draws a burn down, so the numbers are made here");
-} else ok("no answer, nothing drawn");
+const quiet = none.window.document.querySelector(".bd");
+if (!quiet) {
+  no("a page built with no answer draws no burn down at all, so a number arriving later has nowhere to land");
+} else if (quiet.textContent.trim() !== "" || quiet.getAttribute("title")) {
+  no(`a page built with no answer reads ${JSON.stringify(quiet.textContent.trim())}, so the numbers are made here`);
+} else ok("no answer, an empty box and no numbers");
 
 console.log(failed ? `\n${failed} failed.` : "\n0 failed.");
 process.exit(failed ? 1 : 0);

@@ -107,6 +107,24 @@ func WhatIsHappening(r Roots) Happening {
 		}
 		out.Actors = append(out.Actors, d)
 	}
+	// AN ACTOR AT WORK IS PRESENT, WHETHER OR NOT THE HARNESS SAID SO.
+	//
+	// The register knows who the harness announced; the hold knows who is
+	// working. They are usually the same, and where they are not it is the
+	// second that matters to a person. The panel draws the table and nothing
+	// else now, so an actor missing from it is an actor nobody can see.
+	for _, d := range out.Actors {
+		known := false
+		for _, p := range out.Present {
+			if p.Actor == d.Actor {
+				known = true
+				break
+			}
+		}
+		if !known {
+			out.Present = append(out.Present, d)
+		}
+	}
 	return out
 }
 
@@ -203,7 +221,7 @@ func trueOf(all []string, one string) bool {
 // here. A row left by a session that died without saying so is not drawn,
 // the same way an actor that pulled in an earlier session is not.
 func AgentsPresent(r Roots) []Doing {
-	session := currentSession(r)
+	session := TheRunNow(r)
 	if !Named(session) {
 		return []Doing{}
 	}

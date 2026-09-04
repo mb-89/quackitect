@@ -1,8 +1,13 @@
 ---
 kind: [[guidance]]
 scope: ["every agent or person designing or changing the structure of a program in this tree"]
-out_of_scope: ["a beginner's introduction to any of these patterns", "how a single change is made, which is [[writing-software]]", "language rules, which are [[writing-go]]"]
-depends_on: ["[[voice]]", "[[work-token]]"]
+out_of_scope:
+  - "a beginner's introduction to any of these patterns"
+  - "how a single change is made, which is [[writing-software]]"
+  - "language rules, which are [[writing-go]]"
+depends_on:
+  - "[[voice]]"
+  - "[[work-token]]"
 ---
 
 # Motivation
@@ -64,6 +69,7 @@ A count kept beside the list it counts is two truths, and the day they differ no
 The record is the input, and a count, a view, a burndown and a queue are functions over it.
 Re-deriving is cheap from memory and ruinous from disk inside a loop.
 So the shell reads once into a snapshot and the core derives from that.
+
 A cache is a derived value kept for speed.
 It is keyed by the hash of what it was computed from, validated against it, and deleted at will.
 It may be stale, and it is never read as the truth.
@@ -74,6 +80,7 @@ Thompson's principle from the ring-buffer work: contention is the cost, and a si
 A file written by two processes needs a lock, and a lock needs a timeout, and a timeout needs a stale check.
 A file with one owner needs an append.
 Where several processes must write, they append to their own file, and one reader merges.
+
 A hold on a shared thing is a lease: it expires, and the holder renews it while it works.
 A resident process that holds the model and takes every write is the single writer by construction.
 It stays a cache over the record, rebuilt from disk on start, and a client reads cold when it is absent.

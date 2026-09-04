@@ -15,6 +15,7 @@ fields:
   optional:
     - bucket
     - holder
+    - author
     - needs_human
     - depends_on
     - parent

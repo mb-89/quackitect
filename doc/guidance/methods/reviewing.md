@@ -1,8 +1,15 @@
 ---
 kind: [[guidance]]
 scope: ["whoever gives the verdict on a standard token"]
-out_of_scope: ["the change itself, which is [[writing-software]]", "the tests it runs, which is [[testing]]", "a review before the change lands, which nothing here does"]
-depends_on: ["[[voice]]", "[[behaviour]]", "[[work-token]]", "[[testing]]"]
+out_of_scope:
+  - "the change itself, which is [[writing-software]]"
+  - "the tests it runs, which is [[testing]]"
+  - "a review before the change lands, which nothing here does"
+depends_on:
+  - "[[voice]]"
+  - "[[behaviour]]"
+  - "[[work-token]]"
+  - "[[testing]]"
 ---
 
 # Motivation
@@ -11,6 +18,7 @@ A standard token lands its change and then gets one verdict, from a second agent
 The process is [[src/processes/standard.process.yaml]], and this file is how its verdict step is done.
 The bar is improvement: every part of a change earns its place by making the product better.
 A part that neither helps nor hurts is how a tree fills with code nobody needs.
+
 The verdict is one round.
 There is no second, because rounds were the cost of the last reviewers and never their output.
 The record held two hundred rounds over sixty-seven tokens, and one token at eleven.
@@ -43,31 +51,42 @@ A hunk that cannot say what it improves is a finding, and the finding says so in
 
 ## 2. The standard
 
-Google's reviewers approve a change once it improves the overall health of the system, even when it is not perfect, and over eighty percent of their changes need at most one iteration.
+Google's reviewers approve a change once it improves the overall health of the system, even when it is not perfect.
+Over eighty percent of their changes need at most one iteration.
 That is the standard here.
 A verdict that withholds a pass for what it would have done differently is a second author, not a reviewer.
 
 ## 3. Every hunk
 
 A reviewer that reads the note and skims the diff has reviewed the note.
-Every hunk is read, and a hunk skipped is named in the verdict, so a reader knows what was not looked at rather than assuming it was.
+Every hunk is read, and a hunk skipped is named in the verdict.
+So a reader knows what was not looked at rather than assuming it was.
 
 ## 4. Verify
 
 Every criterion names a command, and the reviewer runs it.
-Two recorded observations in one sitting did not survive being followed: one cited a line that never carried the assertion, and one a line another test guarded.
-The engine's test answer says what ran and whether it passed; the reviewer reads it and runs what the criteria name beyond it.
+Two recorded observations in one sitting did not survive being followed.
+One cited a line that never carried the assertion, and one a line another test guarded.
+The engine's test answer says what ran and whether it passed.
+The reviewer reads it and runs what the criteria name beyond it.
 
 ## 6. Two passes
 
 A reviewer built as one careful prompt raised two or three false findings in every eight.
 Built as two passes, everything first and a filter second, it raised almost none.
-So the candidate list is written in full and then cut: a finding survives only with a line it points at, the damage or the dead weight it names, and the check that would catch the class next time.
+So the candidate list is written in full and then cut.
+A finding survives only with all of these:
+
+- a line it points at
+- the damage or the dead weight it names
+- the check that would catch the class next time
+
 What does not survive is dropped, or fixed on the spot without a word, because a nitpick costs a reader more than it saves.
 
 ## 7. Five
 
-An agent pushed to find everything found a fifth more and its signal fell by more than half, and a review nobody trusts is a review nobody reads.
+An agent pushed to find everything found a fifth more, and its signal fell by more than half.
+A review nobody trusts is a review nobody reads.
 Five findings, worst first, is what a reader acts on.
 Everything past five is one line naming what else was seen, so nothing is hidden and nothing is padded.
 
@@ -79,7 +98,8 @@ The verdict is not scored by findings, and a clean pass of sound work is the rev
 ## 9. A finding is work
 
 A finding that stays on the verdict is read once and forgotten.
-Minted as a trivial token that names the standard token it came from, it is work in the queue, and the reviewer who holds the context is the cheapest hand to do it.
+Minted as a trivial token that names the standard token it came from, it is work in the queue.
+The reviewer who holds the context is the cheapest hand to do it.
 It is never a child of the standard token, because a child would hold the parent open, and nothing here blocks.
 
 ## 10. Numbers
@@ -96,9 +116,11 @@ A reviewer that disagrees now writes a note token, which the backlog decides, an
 
 There is no round two.
 The token closes on the verdict, the findings are in the queue, and the reviewer pulls the next standard token.
-When none is left the reviewer's work is done and it stops; the engine asks for another when the next standard token wants one.
+When none is left the reviewer's work is done and it stops.
+The engine asks for another when the next standard token wants one.
 
 ## 14. Never the author
 
 An evaluator recognises its own output and favours it, and the preference grows with the recognition.
-The engine writes down who did the work step and refuses that actor the verdict; a reviewer handed its own work by mistake declines it and says so.
+The engine writes down who did the work step and refuses that actor the verdict.
+A reviewer handed its own work by mistake declines it and says so.

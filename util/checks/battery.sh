@@ -68,6 +68,49 @@ why() {
   printf '%s' "$said"
 }
 
+# AS MANY LANES AT ONCE AS THIS MACHINE HAS CORES, AND NEVER MORE.
+#
+# Every check started at once, which was thirty-nine processes on eight cores,
+# and each go test is already parallel inside itself. Nothing was faster for it
+# and two things were worse. A go vet over the viewer takes half a second alone
+# and thirty-six seconds in the run, all of it waiting for a core. And a test
+# carrying a budget went red at sixteen seconds where it takes two, so the suite
+# was reporting on the scheduling rather than on the program.
+#
+# A POOL RATHER THAN A WARM-UP. Compiling everything first, in order, was tried
+# and made it slower: the warming joined the critical path and the lanes went on
+# competing afterwards. What is scarce is cores, and the answer to that is to
+# hand out no more work than there are cores.
+#
+# THE HEAVIEST ARE STARTED FIRST, because the run is as long as its longest lane
+# and a long one started last is time nobody gets back.
+# HEADROOM, BECAUSE THIS MACHINE IS NOT IDLE. The resident engine, the editor
+# and its language server are all running while the battery does, and claiming
+# every core means the lanes fight them as well as each other. One is left.
+cores=$(nproc 2>/dev/null || echo 4)
+[ "$cores" -gt 2 ] && cores=$((cores - 1))
+inflight=0
+
+# A SHELL THAT CANNOT WAIT FOR ONE LANE WAITS FOR ALL OF THEM. wait -n frees a
+# slot the moment any lane ends; dash has no such thing, and there it falls back
+# to draining the batch, which is slower and just as correct. It is asked once,
+# here, rather than guessed from the name of the shell.
+if (sleep 0 & wait -n) >/dev/null 2>&1; then waitsForOne=yes; else waitsForOne=no; fi
+
+# gate blocks until a slot is free. The exit status of whatever finished is not
+# read: the answer file carries the verdict.
+gate() {
+  inflight=$((inflight + 1))
+  [ "$inflight" -lt "$cores" ] && return 0
+  if [ "$waitsForOne" = yes ]; then
+    wait -n >/dev/null 2>&1
+    inflight=$((inflight - 1))
+  else
+    wait
+    inflight=0
+  fi
+}
+
 # start runs a check in the background, into its own answer file.
 start() {
   name=$1
@@ -90,6 +133,7 @@ start() {
       printf 'FAIL %3ss  %s\n' "$took" "$(why "$out")"
     fi
   ) >"$results/$(slug "$name")" 2>&1 &
+  gate
 }
 
 # report waits for every started check and prints them in the order started.
@@ -160,9 +204,15 @@ build() {
   # -gcflags=-e LIFTS THE ERROR CAP. The type checker stops after a batch by
   # default, so a sweep of undefined symbols came back one round at a time.
   go build -C src/engine -gcflags=-e -ldflags "-X main.Build=$stamp" -o ../../.bin/se.next.exe . || return 1
+  # A REPLACED PROGRAM GOES WHERE EVERY REPLACED PROGRAM GOES. .bin holds what
+  # this tree ships and .bin/was holds what it used to, and the engine sweeps
+  # that folder at every start: one that will not delete is one a process is
+  # still running from. It was left beside the shipped programs, so .bin grew a
+  # se~, a se~1 and a se.exe.was that nothing ever removed.
   if [ -f .bin/se.exe ]; then
-    rm -f .bin/se.exe.was
-    mv .bin/se.exe .bin/se.exe.was || return 1
+    mkdir -p .bin/was
+    rm -f .bin/was/se.exe
+    mv .bin/se.exe .bin/was/se.exe || return 1
   fi
   mv .bin/se.next.exe .bin/se.exe || return 1
   # The suffixed name is the build. The plain one is the same file.
@@ -253,6 +303,7 @@ gofmt_clean() {
 # sources it just compiled, so this is the one that cannot overlap.
 run "go build" build
 
+
 # THE ENGINE THAT LIVES RUNS THE VERBS, so the checks below need one over
 # this tree, and one on the build that was just made. An engine on an older
 # build would run the old verbs against the new tree and report on neither.
@@ -308,10 +359,19 @@ start "se selftest" .bin/se.exe --selftest
 # THE SUITE DRIVES THE ENGINE THIS BATTERY JUST BUILT, rather than linking a
 # second one of its own. The link of a cgo engine is the slow part of the
 # suite under load, and the code is the same code.
-# The halves are the tests whose names start with an A, which is most of
-# them, and the rest. Both run off the one binary the build linked.
-start "go test a" engine_tests '^TestA'
-start "go test rest" engine_tests '^Test[^A]'
+# ONE LANE, BECAUSE THE SUITE IS ALREADY PARALLEL INSIDE ITSELF.
+#
+# It was two shards, and that was right when each lane linked its own cgo
+# binary: the link was the slow part and two links beat one. The build makes the
+# binary once now, so what a shard buys is nothing and what it costs is real.
+#
+# MEASURED. The whole suite off the built binary, with the machine to itself,
+# takes about thirty seconds. Split five ways under this battery it took a
+# hundred and sixty seconds of lane time between them: every shard pays the
+# binary's start again, every shard competes with the other four, and every test
+# in it already runs in parallel with its siblings. Sharding a suite that is
+# parallel inside multiplies the fixed cost and buys back nothing.
+start "go test engine" engine_tests '.*'
 start "go test mcp" go test -C src/mcp -count=1 ./...
 start "go test viewer" go test -C src/viewer -count=1 ./...
 start "go test setup" go test -C util/setup -count=1 ./...
@@ -330,7 +390,7 @@ start "se lint" .bin/se.exe lint
 # holding five of the twelve and it answered all ok, exit 0, having said nothing
 # about the seven it did not run. Any sweep, or any accidental deletion, shrinks
 # the battery in silence while every submission goes on citing a green run.
-for c in render-check drive-editor drawn-classes-have-rules panel-draws-the-register engine-args engine-args-lifecycle engine-spawns liveness one-look panel-icons no-loose-glyphs no-loose-spawns no-lone-escape checks-live-in-the-method engine-spawns-catches panel-is-handed-the-state panel-says-holding drive-panel burndown burndown-derives-nothing tests-name-no-token mcp-tools scripts-are-lf build-reports-every-error binaries-live-in-bin private-files-have-writers projections-carry-chapters; do
+for c in render-check drive-editor drawn-classes-have-rules panel-draws-the-register engine-args engine-args-lifecycle engine-spawns liveness one-look panel-icons no-loose-glyphs no-loose-spawns no-lone-escape checks-live-in-the-method engine-spawns-catches panel-is-handed-the-state panel-says-holding drive-panel burndown burndown-derives-nothing tests-name-no-token tests-are-not-hotspots mcp-tools scripts-are-lf build-reports-every-error binaries-live-in-bin private-files-have-writers projections-carry-chapters; do
   if [ -f "util/checks/$c.mjs" ]; then
     start "$c" node "util/checks/$c.mjs" "$root"
   else

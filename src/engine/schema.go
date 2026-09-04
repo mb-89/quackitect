@@ -75,10 +75,7 @@ type SectionSpec struct {
 	MaxSentences        int
 	MaxWordsPerSentence int
 	MaxWords            int
-	// MaxBytes bounds the section at the save, where the engine writes prose
-	// no editor has checked. A token is a ticket a person reads cold.
-	MaxBytes    int
-	Description string
+	Description         string
 }
 
 // listValue reads a frontmatter value as a list, in either yaml spelling.
@@ -229,7 +226,6 @@ func LoadSchema(methodRoot, kind string) (Schema, error) {
 			MaxSentences:        schemaInt(m["maxSentences"]),
 			MaxWordsPerSentence: schemaInt(m["maxWordsPerSentence"]),
 			MaxWords:            schemaInt(m["maxWords"]),
-			MaxBytes:            schemaInt(m["maxBytes"]),
 			Description:         ystr(m["description"]),
 		})
 	}
@@ -405,6 +401,29 @@ func checkWords(p PropSpec, name, got string, line int) []Departure {
 	return out
 }
 
+// overWords answers a section's length when it runs past the bound the schema
+// puts on it, and the length is words.
+//
+// ONE SECTION, ONE BOUND, MEASURED IN ONE PLACE. The size was written twice:
+// maxWords for the editor and maxBytes for the save. Two numbers for one fact
+// drift, and these had, at six bytes to a word against the five this corpus
+// actually runs at. The two doors then disagreed about the same chapter, and a
+// writer was marked by one and refused by the other for the same prose.
+//
+// WORDS RATHER THAN BYTES, because a person writing a ticket counts words. A
+// byte count is the machine's unit, it says nothing a writer can act on, and
+// it moves when the text is not English.
+//
+// THE COMMENTS COME OUT FIRST. A comment is the template talking to the
+// writer, not prose the reader was handed, so it is not part of the size.
+func overWords(max int, text string) (int, bool) {
+	if max <= 0 {
+		return 0, false
+	}
+	n := len(strings.Fields(stripComments(text)))
+	return n, n > max
+}
+
 func checkBody(spec BodySpec, body string, bodyLine int) []Departure {
 	var out []Departure
 	found := chaptersOf(body, spec.HeadingLevel)
@@ -559,11 +578,9 @@ func checkSection(sec SectionSpec, c bodyChapter, bodyLine int) []Departure {
 	var out []Departure
 	head := bodyLine + c.Line
 	body := stripComments(c.Body)
-	if sec.MaxWords > 0 {
-		if n := len(strings.Fields(body)); n > sec.MaxWords {
-			out = append(out, Departure{Line: head,
-				Says: fmt.Sprintf("%s runs to %d words and the schema allows %d", sec.Header, n, sec.MaxWords)})
-		}
+	if n, over := overWords(sec.MaxWords, c.Body); over {
+		out = append(out, Departure{Line: head,
+			Says: fmt.Sprintf("%s runs to %d words and the schema allows %d", sec.Header, n, sec.MaxWords)})
 	}
 	if sec.MaxSentences > 0 {
 		if n := sentenceCount(body); n > sec.MaxSentences {

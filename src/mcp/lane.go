@@ -28,6 +28,23 @@ func laneTools() []map[string]any {
 			},
 		},
 		{
+			"name": "se_claim",
+			"description": "TAKE A BLOCK OF WORK so no other box starts it: next: <n>, or these: [ids]. " +
+				"It publishes to git by itself, and list says what is claimed.",
+			"inputSchema": map[string]any{
+				"type": "object",
+				"properties": map[string]any{
+					"actor":   map[string]any{"type": "string"},
+					"next":    map[string]any{"type": "integer", "description": "claim what the queue would hand you on this many pulls"},
+					"these":   map[string]any{"type": "array", "items": map[string]any{"type": "string"}},
+					"as":      map[string]any{"type": "string", "description": "with next: worker or reviewer"},
+					"release": map[string]any{"type": "boolean", "description": "give back what you hold"},
+					"list":    map[string]any{"type": "boolean"},
+					"whoami":  map[string]any{"type": "boolean"},
+				},
+			},
+		},
+		{
 			"name": "se_find",
 			"description": "SEARCH THE TREE THROUGH THE INDEX: words (FTS5), regex, or path " +
 				"(a glob; alone it lists files).",
@@ -419,4 +436,49 @@ func strList(v any) []string {
 		}
 	}
 	return out
+}
+
+// claimWork is se claim through the lane. Every flag here is one the verb
+// defines, which is what mcp-tools.mjs drives against the real engine.
+func claimWork(r roots, args map[string]any) string {
+	a := []string{"claim", "--actor", orMain(str(args["actor"]))}
+	if b, _ := args["whoami"].(bool); b {
+		return engineCall(r, append(a, "--whoami"), nil)
+	}
+	if b, _ := args["list"].(bool); b {
+		return engineCall(r, append(a, "--list"), nil)
+	}
+	var ids []string
+	if these, ok := args["these"].([]any); ok {
+		for _, v := range these {
+			if id := str(v); id != "" {
+				ids = append(ids, id)
+			}
+		}
+	}
+	if len(ids) > 0 {
+		a = append(a, "--these", strings.Join(ids, ","))
+	}
+	if b, _ := args["release"].(bool); b {
+		return engineCall(r, append(a, "--release"), nil)
+	}
+	if n, ok := args["next"].(float64); ok && n > 0 {
+		a = append(a, "--next", strconv.Itoa(int(n)))
+		if as := str(args["as"]); as != "" {
+			a = append(a, "--as", as)
+		}
+	}
+	if len(ids) == 0 && !hasNext(a) {
+		return "Say what to claim: these, or next."
+	}
+	return engineCall(r, a, nil)
+}
+
+func hasNext(a []string) bool {
+	for _, w := range a {
+		if w == "--next" {
+			return true
+		}
+	}
+	return false
 }

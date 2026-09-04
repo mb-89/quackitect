@@ -52,7 +52,7 @@ func dirFor(r Roots, t Token) string {
 // what holds it back, then how it ended.
 var frontOrder = []string{
 	"kind", "process", "guidance", "title", "status", "bucket",
-	"author", "needs_human", "depends_on", "parent", "ready_when",
+	"author", "claimed_by", "claimed_at", "needs_human", "depends_on", "parent", "ready_when",
 	"began", "ended", "disposition", "reason", "successors",
 }
 
@@ -128,6 +128,11 @@ func (t Token) front() Front {
 		// reopened. holdstore.go keeps it under .se, where a hold can be
 		// dropped when the agent holding it is gone.
 		"author": t.Author,
+		// THE CLAIM IS WRITTEN, WHERE THE HOLDER IS NOT. A hold is this tree's
+		// own and holdstore.go keeps it under .se. A claim is for the other
+		// boxes, so it goes in the note that travels.
+		"claimed_by": t.ClaimedBy,
+		"claimed_at": t.ClaimedAt,
 		// A RELATION IS WRITTEN AS A LINK, because the schema says the editor
 		// walks it. It was written as a bare id, so the walk had nothing to
 		// follow and the x-link on those two fields was a claim about a
@@ -161,6 +166,8 @@ func tokenFromFront(f Front) Token {
 		// reading it would put a dead hand back on live work. There is no
 		// field to read it into: the hold comes from holdstore.go.
 		Author:      fs(f, "author"),
+		ClaimedBy:   fs(f, "claimed_by"),
+		ClaimedAt:   fs(f, "claimed_at"),
 		NeedsHuman:  fb(f, "needs_human"),
 		DependsOn:   unlinkAll(fl(f, "depends_on")),
 		Parent:      unlink(fs(f, "parent")),
@@ -415,11 +422,11 @@ func readTokens(r Roots) []Token {
 func proseThatFits(s Schema, t Token) error {
 	for _, one := range overCaps(s, t) {
 		if one.Detail {
-			return fmt.Errorf("the detail is %d bytes and the schema allows %d. Say what is asked in a few "+
-				"sentences, and put the argument somewhere a reader opens on purpose", len(one.Text), one.Max)
+			return fmt.Errorf("the detail runs to %d words and the schema allows %d. Say what is asked in a few "+
+				"sentences, and put the argument somewhere a reader opens on purpose", one.Words, one.Max)
 		}
-		return fmt.Errorf("%s is %d bytes and the schema allows %d. Name what was built "+
-			"and what the check said, and leave the rest in the log", one.Says, len(one.Text), one.Max)
+		return fmt.Errorf("%s runs to %d words and the schema allows %d. Name what was built "+
+			"and what the check said, and leave the rest in the log", one.Says, one.Words, one.Max)
 	}
 	return nil
 }
@@ -429,57 +436,88 @@ type overLong struct {
 	// Says names the section the way a refusal names it, so the name a reader
 	// is given is the name the guard compared on.
 	Says   string
-	Text   string
+	Words  int
 	Max    int
 	Detail bool
 }
 
-// overCaps answers every bounded section that runs past its bound, the detail
-// first and the evidence in a settled order, so a refusal names the same one
-// every time it is asked.
+// overCaps answers every bounded section that runs past its bound, in the
+// order the schema declares them, so a refusal names the same one every time.
 //
 // IT IS SEPARATE FROM THE REFUSAL because two doors need the measurement and
 // only one of them wants the save's wording: the write door has to compare
 // what a section would become against what it already holds.
+//
+// IT WEIGHS WHAT THE EDITOR WEIGHS. The bound is the section's maxWords and
+// the count is overWords, which is what the lint and the language server run.
+// A chapter the editor marks is a chapter the save refuses, and there is no
+// third answer for the writer to discover at the door.
 func overCaps(s Schema, t Token) []overLong {
-	var detailMax, sectionMax int
-	for _, sec := range s.Body.Sections {
-		if sec.Header == "detail" {
-			detailMax = sec.MaxBytes
-		}
-		if sec.HeaderPrefix != "" && strings.HasPrefix(headEvidence, "## "+sec.HeaderPrefix) {
-			sectionMax = sec.MaxBytes
-		}
-	}
 	var out []overLong
-	if detailMax > 0 && len(t.Detail) > detailMax {
-		out = append(out, overLong{Says: sectionSaid(""), Text: t.Detail, Max: detailMax, Detail: true})
-	}
-	if sectionMax > 0 {
-		for _, name := range sortedKeys(t.Submission) {
-			if len(t.Submission[name]) > sectionMax {
-				out = append(out, overLong{Says: sectionSaid(name),
-					Text: t.Submission[name], Max: sectionMax})
+	for _, sec := range s.Body.Sections {
+		for _, one := range t.chaptersFor(sec) {
+			if n, over := overWords(sec.MaxWords, one.Body); over {
+				out = append(out, overLong{Says: sectionSaid(one.Header), Words: n,
+					Max: sec.MaxWords, Detail: one.Header == "detail"})
 			}
 		}
 	}
 	return out
 }
 
-// sectionSaid names one bounded section. An empty name is the detail.
-func sectionSaid(name string) string {
-	if name == "" {
+// chaptersFor answers what this token carries for one declared section, as the
+// same bodyChapter the note reader hands the lint. A section naming a prefix
+// matches as many chapters as the process has activities.
+func (t Token) chaptersFor(sec SectionSpec) []bodyChapter {
+	if sec.HeaderPrefix != "" {
+		var out []bodyChapter
+		for _, name := range sortedKeys(t.Submission) {
+			if strings.HasPrefix("evidence: "+name, sec.HeaderPrefix) {
+				out = append(out, bodyChapter{Header: "evidence: " + name, Body: t.Submission[name]})
+			}
+		}
+		return out
+	}
+	switch sec.Header {
+	case "detail":
+		return []bodyChapter{{Header: "detail", Body: t.Detail}}
+	case "proposed action":
+		return []bodyChapter{{Header: "proposed action", Body: t.ProposedAction}}
+	}
+	// Every other declared chapter is kept as it was written, so it is weighed
+	// as it was written.
+	for _, k := range t.Kept {
+		if strings.TrimPrefix(k.Head, "## ") == sec.Header {
+			return []bodyChapter{{Header: sec.Header, Body: k.Text}}
+		}
+	}
+	return nil
+}
+
+// sectionSaid names one bounded section the way a refusal names it.
+func sectionSaid(header string) string {
+	if header == "detail" {
 		return "the detail"
 	}
-	return fmt.Sprintf("evidence %q", name)
+	if name, is := strings.CutPrefix(header, "evidence: "); is {
+		return fmt.Sprintf("evidence %q", name)
+	}
+	return "the " + header
 }
 
 // bounded answers every bounded section of a token by the name a refusal gives
 // it, so what a section holds now can be weighed against what it would become.
-func (t Token) bounded() map[string]string {
-	out := map[string]string{sectionSaid(""): t.Detail}
+func (t Token) bounded() map[string]int {
+	out := map[string]int{
+		sectionSaid("detail"):          len(strings.Fields(stripComments(t.Detail))),
+		sectionSaid("proposed action"): len(strings.Fields(stripComments(t.ProposedAction))),
+	}
 	for name, text := range t.Submission {
-		out[sectionSaid(name)] = text
+		out[sectionSaid("evidence: "+name)] = len(strings.Fields(stripComments(text)))
+	}
+	for _, k := range t.Kept {
+		head := strings.TrimPrefix(k.Head, "## ")
+		out[sectionSaid(head)] = len(strings.Fields(stripComments(k.Text)))
 	}
 	return out
 }

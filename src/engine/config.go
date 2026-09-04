@@ -86,6 +86,12 @@ type Node struct {
 	// drop them: --tree prints the tree AS DECLARED, and a field this program
 	// happens not to use is still part of what somebody wrote.
 	Placeholder string `json:"placeholder,omitempty"`
+
+	// WHAT THE NUMBER IS COUNTED IN. The engine does not read it: the panel
+	// draws it beside the box. It is declared here because --tree prints the
+	// tree as declared, and a row that reads "a claim lasts: 3" is a fact with
+	// its unit missing.
+	Unit string `json:"unit,omitempty"`
 	Span        int    `json:"span,omitempty"`
 	Narrow      string `json:"narrow,omitempty"` // smaller, larger, on, off, or empty for free
 	Shown       bool   `json:"shown,omitempty"`
@@ -97,6 +103,16 @@ type Node struct {
 	StopCommand string            `json:"stopCommand,omitempty"`
 	Labels      map[string]string `json:"labels,omitempty"`
 	Titles      map[string]string `json:"titles,omitempty"`
+
+	// A PRESS COUNT THAT MEANS SOMETHING ELSE, and the command it means.
+	//
+	// The engine does not read these: the panel counts the presses. They are
+	// here because --tree prints the tree AS DECLARED, and a field this program
+	// happens not to use is still part of what somebody wrote. Left out, the
+	// engine answered a tree with the gesture silently missing from it, which
+	// is the same defect the comment above this block warns about.
+	Gesture        int    `json:"gesture,omitempty"`
+	GestureCommand string `json:"gestureCommand,omitempty"`
 }
 
 func (n Node) holdsValue() bool {
@@ -394,7 +410,14 @@ type Config struct {
 	// AND IT OWNS ITS OWN REPLACEMENT. A build aimed at .bin inside the tree
 	// is refused and pointed at the swap door, which builds the next engine and
 	// hands over without severing a call. Off, the build is run by hand.
-	BuildViaEngine   bool
+	BuildViaEngine bool
+
+	// HOW LONG A CLAIM STANDS before it lapses and the work is back in the
+	// pool. It is what frees work from a box that never came back.
+	ClaimHours int
+
+	// HOW OFTEN THE ENGINE LOOKS FOR OTHER BOXES' CLAIMS. Zero turns it off.
+	ClaimSyncSeconds int
 	HeartbeatSeconds int
 	ReadyBudgetMs    int
 
@@ -411,7 +434,6 @@ type Config struct {
 	// HOW MANY LINES A READ MAY TAKE AT ONCE. Context budgets differ per
 	// harness and model, so it is a parameter, and a read over it is
 	// corrected rather than refused: the correction is unambiguous.
-	ReadClampLines int
 
 	// A HELPER'S ANSWER IS A DIGEST OF WHAT IT READ. It may be at most this
 	// fraction of the bytes it read, or the floor when it read little, and
@@ -446,9 +468,10 @@ func TheFloor() Config {
 		SearchViaIndex:   true,
 		TestsViaEngine:   true,
 		BuildViaEngine:   true,
+		ClaimHours:       3,
+		ClaimSyncSeconds: 30,
 		HeartbeatSeconds: 5, ReadyBudgetMs: 15000,
 		PullsBeforeHoldIsStale: 10,
-		ReadClampLines:         800,
 		HelperRatio:            10,
 		HelperFloorBytes:       6000,
 		// FIVE, WHICH IS WHAT THE WORKER CEILING WAS. The busier of the two
@@ -484,6 +507,14 @@ func LoadConfig(roots Roots) Config {
 	if b, ok := toBool(v.Value["guards.build_via_engine"]); ok {
 		c.BuildViaEngine = b
 	}
+	// A CLAIM MAY BE HELD SHORTER, NEVER LONGER. Work a dead box holds for a
+	// day is work nobody can reach for a day.
+	if n, ok := toNumber(v.Value["limits.claim_hours"]); ok && int(n) > 0 && int(n) < c.ClaimHours {
+		c.ClaimHours = int(n)
+	}
+	if n, ok := toNumber(v.Value["limits.claim_sync_seconds"]); ok && int(n) >= 0 {
+		c.ClaimSyncSeconds = int(n)
+	}
 	if n, ok := toNumber(v.Value["limits.heartbeat_seconds"]); ok && int(n) > 0 {
 		c.HeartbeatSeconds = int(n)
 	}
@@ -497,9 +528,6 @@ func LoadConfig(roots Roots) Config {
 	}
 	if n, ok := toNumber(v.Value["limits.pulls_before_hold_is_stale"]); ok && int(n) > 0 {
 		c.PullsBeforeHoldIsStale = int(n)
-	}
-	if n, ok := toNumber(v.Value["limits.read_clamp_lines"]); ok && int(n) > 0 && int(n) < c.ReadClampLines {
-		c.ReadClampLines = int(n)
 	}
 	// A HELPER MAY BE HELD TIGHTER, NEVER LOOSER: a larger ratio is a smaller
 	// digest, and a smaller floor is too.

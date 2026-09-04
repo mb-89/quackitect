@@ -2,195 +2,170 @@
 kind: [[guidance]]
 scope: ["whoever runs a retro, once a cycle"]
 out_of_scope: ["a review of one token, which is that token's own process"]
-depends_on: ["[[voice]]", "[[driving-the-engine]]"]
+depends_on:
+  - "[[voice]]"
+  - "[[driving-the-engine]]"
+  - "[[refactoring]]"
 ---
 
 # Motivation
 
 The retro turns a period's record into changes to the machinery.
 Its outputs are changes to the guidance, the engine, the schemas and the tools.
-Its best output is a mechanization: a check, a refusal or a gate that removes a
-whole pattern of waste.
+Its best output is a mechanization: a check, a refusal or a gate that removes a whole pattern of waste.
 
 It is blameless.
-A bad output is evidence about what produced it, and what produced it is a rule,
-a schema, a refusal or a tool.
+A bad output is evidence about what produced it, and what produced it is a rule, a schema, a refusal or a tool.
 Repairing the artefact is not the finding.
 The finding is what would have stopped it being made.
 
-The retro is two halves: `se retro` collects and drains, and this file judges
-what it collected.
+The retro is two halves: `se retro` collects and drains, and this file judges what it collected.
 
 # Actionables
 
 1. Run it when nobody else holds work. The engine refuses otherwise, and that refusal has no override. *
-2. Run `se retro` first. It rotates the log, collects what it can into one folder, and drains what it took. *
+2. Run `se retro` first, then read the folder it made and nothing else. Hunting for an input is a defect in the verb. *
 3. Ask the person what came back from the field since the last retro. Then stop and wait. *
-4. Read that folder and nothing else. An input you had to go looking for is a defect in the collect verb. *
-5. Score the last retro's improvements against this period's numbers, which `se retro` hands you under `earlier`. Promote what worked, drop what did not, and record why. *
-6. Hunt waste in the log, which says what happened, and in the transcripts, which say why. Rank what repeats. *
-7. Put a reader on every slice of every transcript. A record too big to read is not a record you have read. *
-8. Count every shell command and say what each was standing in for. One is a tool you do not have. *
-9. Read what one turn costs from the index, and run `util/checks/benchmark.sh`. Name what grew since the last retro. *
-10. For each pattern name its mechanization: a check, a refusal, a gate, a prefill, then a clearer sentence. *
-11. Judge every script in the drained scratchpad. Promote it to `util/checks/`, or delete it, and repair what the move breaks. *
-12. Merge what repeats into one class, then mint one note per improvement and nothing larger. *
-13. Report themes with counts and never the list. Say what you could not do and why. *
-14. Measure the session itself: errors and thinking length by fifths. A retro that reads only the work misses the worker. *
-15. Distribute last, after the person has read the report. Their reading is what turns a theme into work. *
-16. Agree to a keep rule on the drain only with the command that counted it, keyed off a fact the engine writes. *
-17. Write the finished report to the path `se retro` answers under `report`. It is on this machine, out of git, and no drain reaches it, so the next retro is handed it with this period's counts.
+4. Score the last retro's improvements against this period's numbers, handed to you under `earlier`. Promote what worked, drop what did not. *
+5. Hunt waste in the log and the transcripts, a reader on every slice. Rank what repeats. *
+6. Count every shell command and say what each was standing in for. One is a tool you do not have. *
+7. Read what one turn costs, run `util/checks/benchmark.sh`, and rank the battery's lanes. Name what grew, then [[refactoring]]. *
+8. For each pattern name its mechanization: a check, a refusal, a gate, a prefill, then a clearer sentence. *
+9. Judge every script in the drained scratchpad. Promote it to `util/checks/`, or delete it, and repair what the move breaks. *
+10. Merge what repeats into one class, then mint one note per improvement and nothing larger. *
+11. Report themes with counts and never the list. Say what you could not do and why. *
+12. Measure the session itself: errors and thinking length by fifths. A retro that reads only the work misses the worker. *
+13. Distribute last, after the person has read the report. Their reading is what turns a theme into work. *
+14. Agree to a keep rule on the drain only with the command that counted it, keyed off a fact the engine writes. *
+15. Write the finished report to the path `se retro` answers under `report`. It is out of git, and no drain reaches it.
 
 # Discussion
 
 ## 1. A boundary is nothing else running
 
-A drain has no undo, and it takes folders every actor keeps working files in.
+A drain has no undo and it takes folders every actor keeps working files in.
 One run while somebody was mid-task deleted what they were reading.
-
 Refusing beats skipping: a skip list leaves the retro half done.
 
 ## 2. Everything in one folder, taken once
 
-`se retro` rotates the log first, so the running session is collected with the
-rest. The next one starts empty and nothing is counted twice.
+`se retro` rotates the log first, so the running session is collected with the rest.
+The next one starts empty and nothing is counted twice.
 
-Ownership decides drain against copy: what this machine owns moves, and the
-harness transcripts are copied. `util/checks/` is in version control and the
-verb never touches it.
+Ownership decides drain against copy: what this machine owns moves and the transcripts are copied.
+`util/checks/` is in version control and is never touched.
 
-One thing outlives the drain, because the next retro reads it: this period's
-report and its counts. They go to `.se/reports`, which no drain names and git
-does not see, and `se retro` hands the earlier ones back. The owner ruled that
-is as far as it goes for now: on the machine, and out of version control.
+An input you had to go and find is one the next retro will also have to find.
+That is a fault in the verb, and fixing it is worth more than the input.
+Reading around the folder hides the gap, and a hidden gap is never fixed.
 
 ## 3. The one thing the machine cannot collect
 
-The stop after asking the person is the retro's one sanctioned stop. v3 walked
-past it until the owner said so.
+The stop after asking the person is the retro's one sanctioned stop. v3 walked past it until the owner said so.
 
 Everything else in the folder is the machine talking about itself.
 
-## 4. A hunt is a defect in the verb
+## 4. An improvement nobody scored is a guess
 
-An input you had to go and find is one the next retro will also have to find.
-That is a fault in `se retro`, and fixing it is worth more than the input.
+A retro that only proposes never learns whether it was right.
+Last period's improvements are this period's evidence.
 
-Reading around the folder hides the gap, and a hidden gap is never fixed.
+Record why a dud was dropped.
+Without the reason it comes back, reading as a reasonable idea for the second time.
 
-## 5. An improvement nobody scored is a guess
+The measure of a guidance change is the failure rate on both sides of the commit that made it.
 
-A retro that only proposes never learns whether it was right. Last period's
-improvements are this period's evidence.
+## 5. Two records, and each says half
 
-Record why a dud was dropped. Without the reason it comes back, because it read
-as a reasonable idea the first time and still does.
+The log says what happened and the transcript says why, and where the log shows a retry the transcript names the misunderstanding.
 
-The measure of a guidance change is the failure rate on both sides of the
-commit that made it.
+One retro wrote its report off the counts, and counts are the shape of a day rather than its reasons.
+So slice the transcripts and give a reader each slice whole.
+The same failures then come back independently from different parts of the day, which no count can give.
 
-## 6. Two records, and each says half
+Ask for friction, not achievement.
+Rank by what repeats: one bad afternoon is an anecdote, and the same shape three times is a property of the machinery.
 
-The log says what happened and the transcript says why. Where the log shows a
-retry, the transcript names the misunderstanding, which is the thing to fix.
+## 6. Every shell command is a tool that is missing
 
-Rank by what repeats. One bad afternoon is an anecdote; the same shape three
-times is a property of the machinery.
+One session ran a thousand of them, and most found where a symbol appears, read a line range, or substituted a string.
 
-## 7. A record too big to read is not a record you have read
+That is not an agent misbehaving.
+It is what the engine does not offer, written out one command at a time.
 
-The first pass over this retro aggregated the log and wrote a report off the
-counts. Counts are the shape of a day, not its reasons, and the report read as
-though the transcripts had been walked.
+Group by the job, rank by count times how mechanical, and write the mechanical ones as verbs.
 
-So slice them and give a reader each slice whole. The same failures then come
-back independently from different parts of the day, which no count can give.
+## 7. A number nobody watches is a number that grows
 
-Ask for friction, not achievement, and say where the harness redacted the
-reasoning.
+The index says what one turn costs.
+No single number looks too big alone, which is how the whole gets too big with nothing saying so.
+A number that grew for a reason is fine, and one that grew because nobody looked is the finding.
 
-## 8. Every shell command is a tool that is missing
+Nothing in the battery waits on a clock, so timings are read here, against the last retro's.
+Reading them is the retro's.
+What to do about one is [[refactoring]], which says to measure where the cost is paid before changing anything.
 
-One session ran a thousand of them. Most found where a symbol appears, read a
-line range, or substituted a string, and nearly all opened by setting the path
-and changing directory.
+## 8. The order is by how little it asks of anybody
 
-That is not an agent misbehaving. It is what the engine does not offer, written
-out one command at a time.
+A check runs without being read.
+A refusal arrives when it is needed.
+A gate stops the thing happening.
+A prefill makes the right answer easy.
+A sentence is last: it works only on somebody who reads it and remembers it.
 
-Group by the job, rank by count times how mechanical, and write the mechanical
-ones as verbs.
+Prefer the earliest that would have removed the waste.
+A rule where a check would do is one somebody breaks.
 
-## 9. A number nobody watches is a number that grows
+## 9. A script written twice is a capability asking for a name
 
-The index says what one turn costs. No single number is ever obviously too big,
-which is how the whole of it gets too big with nothing saying so.
+A helper written and thrown away is fine.
+The same helper rewritten next session is the machinery naming what it lacks.
 
-A number that grew for a reason is fine. One that grew because nobody looked is
-the finding.
+Home it as a check, then a flag on a verb that exists, then a new verb.
+Say which and why.
+Nothing stays because it might be useful.
 
-Nothing in the battery waits on a clock, so timings are read here, against the
-last retro's.
+## 10. One class, one note, and the backlog is the place
 
-## 10. The order is by how little it asks of anybody
+A lesson minted per occurrence schedules the same fix ten times, each reading as a reasonable idea on its own.
+So the duplicates become one class with one home: a check, then a checklist line, then a sentence.
+What went stale is dropped with its reason.
 
-A check runs without being read. A refusal arrives when it is needed. A gate
-stops the thing happening. A prefill makes the right answer easy. A sentence is
-last: it works only on somebody who reads it and remembers it in the moment.
+An improvement written only into a report is one nobody scheduled.
+One note per class, small enough that a stranger could act on it, and triage decides.
 
-Prefer the earliest that would have removed the waste. A rule where a check
-would do is one somebody breaks.
+## 11. Themes with counts, not a list
 
-## 11. A script written twice is a capability asking for a name
+A report that lists everything is one nobody finishes.
+Three of one shape says what a list of forty does not.
 
-A helper written and thrown away is fine. The same helper rewritten next session
-is the machinery naming what it lacks.
+Say what you could not do.
+A retro silent about what it skipped reads like one that covered everything, and the next inherits the gap.
 
-Home it as a check, then a flag on a verb that exists, then a new verb. Say
-which and why. Nothing stays because it might be useful.
+## 12. The worker thins, and says it is only cutting scope
 
-## 12. One class, one note, and the backlog is the place
+Measured across one long session by fifths, the error rate tripled in the last fifth while the length of a thought halved from its peak.
 
-A lesson minted per occurrence schedules the same fix ten times, and each copy
-reads as a reasonable idea on its own. So the duplicates become one class with
-one home: a check, then a checklist line, then a sentence. What went stale is
-dropped with the reason, so it does not come back next period looking new.
+The agent noticed.
+Six times it worried about session length, and each time said it was cutting scope rather than rigour.
+It cut both and saw one.
 
-An improvement written only into a report is one nobody scheduled. One note per
-class, small enough that a stranger could act on it, and triage decides.
+## 13. Reading is what makes it work
 
-## 13. Themes with counts, not a list
+Routing before the person has read puts the machine's reading ahead of theirs.
+They hold the half the folder does not.
 
-A report that lists everything is one nobody finishes. Three of one shape says
-what a list of forty does not.
+So everything lands in the backlog, the report is discussed, and only then is anything routed.
+That order buys the only review the retro itself gets.
 
-Say what you could not do. A retro silent about what it skipped reads like one
-that covered everything, and the next inherits the gap.
+## 14. Count before agreeing
 
-## 14. The worker thins, and says it is only cutting scope
+A keep rule was once justified by how the tree is arranged, and nobody counted.
+So the rule runs over the real tree first:
 
-Measured across one long session by fifths, the error rate tripled in the last
-fifth while the length of a thought halved from its peak.
+- what it keeps
+- what it takes
+- what share of today's actors and tokens
 
-The agent noticed. Six times it worried about session length, and each time said
-it was cutting scope rather than rigour. It cut both and saw one.
-
-So measure the session, not only the tree.
-
-## 15. Reading is what makes it work
-
-Routing before the person has read puts the machine's reading of the period
-ahead of theirs. They hold the half the folder does not.
-
-So everything lands in the backlog, the report is discussed, and only then is
-anything routed. That order buys the only review the retro itself gets.
-
-## 16. Count before agreeing
-
-A keep rule was once justified by a sentence about how the tree is arranged,
-and nobody counted.
-So the rule runs over the real tree first: what it keeps, what it takes, and
-how much of today's actors and tokens it covers.
 A protection keys off a fact the engine writes, such as who holds a token.
-A convention drifts, and the sweep that trusted it takes what somebody still
-needed.
+A convention drifts, and the sweep that trusted it takes what somebody still needed.

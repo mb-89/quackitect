@@ -8,7 +8,7 @@ status: open
 
 ## detail
 
-The rule to stage by path exists and was broken three times in one session: a commit that staged everything took a refusal a background sweep had cut out, and the message named a different subject. The guard sees every tool call of the turn with its path or command, so it can know which paths this turn wrote. Consumes wk-b13ade88e2.
+The rule to stage by path exists and was broken three times in one session. A commit that staged everything took a refusal a background sweep had cut out, and the message named a different subject. The guard sees every tool call of the turn with its path or command, so it can know which paths this turn wrote. Consumes wk-b13ade88e2.
 
 ## approach
 

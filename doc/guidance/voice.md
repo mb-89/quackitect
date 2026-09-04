@@ -30,64 +30,62 @@ For mechanical rules, see [[util/voice-rules.json]].
 10. Follow the technical English rules. For details, see [[doc/guidance/ASD-STE-100]].
 11. DRY: do not repeat yourself. SPOT: single point of truth for every datum. A repetition in a spec, finding or answer is a defect. *
 12. Do not put history in the current surface. It goes into git commit messages.
-13. A number about the tree is the command that answers it, never the answer. *
+13. A number something else answers is never written down. The tree's count is the command that answers it. A list's count is the list. *
 
 # Discussion
 
 ## 3. Lists
 
-A paragraph that names seven things to do and two to decide is two lists
-wearing prose.
-The reader has to count, and cannot tell at a glance which item has which
-status.
-So parallel items go one to a line, with what stands against each: done, owed,
-or needing a decision.
+A paragraph that names seven things to do and two to decide is two lists wearing prose.
+The reader has to count, and cannot tell at a glance which item has which status.
+So parallel items go one to a line, with what stands against each: done, owed, or needing a decision.
 This binds a chat answer as much as a note, because the reader is the same.
 
 ## 8. Absences
 
-Strunk and White: make definite assertions, and use "not" for denial, never
-for evasion.
-A negative is worth writing only where the reader would otherwise act on the
-opposite.
+Strunk and White: make definite assertions, and use "not" for denial, never for evasion.
+A negative is worth writing only where the reader would otherwise act on the opposite.
 Those places are a refusal, a limit and a warning.
 
 ## 9. Authority, Links and provenance
 
-Hunt and Thomas: every piece of knowledge has one authoritative
-representation.
+Hunt and Thomas: every piece of knowledge has one authoritative representation.
 Larman: the class that holds the information states it.
-Page-Jones: values that must change together are bound to each other, and a
-document sits a long way from the code it repeats.
+Page-Jones: values that must change together are bound to each other, and a document sits a long way from the code it repeats.
 A test decides how many steps it runs.
 A folder decides what is in it.
 A document that repeats one of those makes a decision it does not own.
 
 A case earns its place by teaching the reader something.
 The token it happened on teaches nothing.
-It goes stale when that token is retired, and it is a second copy of a record
-that nothing keeps in step.
+It goes stale when that token is retired, and it is a second copy of a record that nothing keeps in step.
 
 A value in double brackets is a link.
-The brackets are how it is shown and walked, and the name inside is the value,
-so `kind: [[guidance]]` and `kind: guidance` are one thing.
-A link resolves as a path first and then as a note name, so both
-[[src/schemas/guidance.schema.yaml]] and [[voice]] reach what they name.
+The brackets are how it is shown and walked, and the name inside is the value, so `kind: [[guidance]]` and `kind: guidance` are one thing.
+A link resolves as a path first and then as a note name, so both [[src/schemas/guidance.schema.yaml]] and [[voice]] reach what they name.
 
 ## 11. Say it once
 
 No human writes walls of text, and a reader who meets the same sentence twice reads neither.
 So a thing is said once, where the reader needs it, and a second copy is a defect rather than emphasis.
-The copies drift. A measurement written twice on one note was corrected in the copy a finding quoted, and the two totals then disagreed and named different worst cases.
-A constant moved into config is the same: the prose that pins the number is a second copy, so the paragraph states the rule and the literal appears only in the config file.
-A detail carries a byte cap the schema enforces, so the judgement left here is what to cut, not how long to run.
+The copies drift.
+A measurement written twice on one note was corrected in the copy a finding quoted.
+The two totals then disagreed and named different worst cases.
+
+A constant moved into config is the same: the prose that pins the number is a second copy.
+So the paragraph states the rule, and the literal appears only in the config file.
+A detail carries a word bound the schema enforces, so the judgement left here is what to cut, not how long to run.
 Where a second mention is wanted, it names the first rather than restating it.
 
-## 13. Standing counts
+## 13. Counts
 
-A count of files, tests, checks or tokens is true on the day it is written and
-wrong soon after, and nothing tells the reader which day that was.
+A count of files, tests, checks or tokens is true on the day it is written and wrong soon after.
+Nothing tells the reader which day that was.
 So the prose names the command: `ls`, `go test`, or the check that counts.
 The reader runs it and gets today's number.
-A measurement that argues a decision belongs in the commit or the retro, which
-are dated, and not on the surface.
+A measurement that argues a decision belongs in the commit or the retro, which are dated, and not on the surface.
+
+A count of a list is the same fault, and it needs no time to go wrong.
+A sentence saying four regions above a list of six hands the reader two answers.
+The list is the one that cannot drift, because it is the items themselves.
+So the sentence introduces the list, and the list says how many.

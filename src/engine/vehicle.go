@@ -8,7 +8,6 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -368,22 +367,11 @@ func LinkBothNames(methodRoot string, names []string) ([]string, error) {
 		// previous build under its plain name. Moving it aside frees the name,
 		// and the processes holding it go on running from the moved file.
 		//
-		// THE ASIDE NAME IS SEARCHED because the last build's leavings may
-		// themselves be running. One fixed name silently failed the second
-		// time this ran with an engine up.
+		// IT GOES IN .bin/was, NOT BESIDE THE PROGRAMS IT IS NO LONGER ONE OF.
+		// See wasbin.go: .bin holds what this tree ships, .bin/was holds what
+		// it used to, and the engine sweeps that folder at every start.
 		if err := os.Remove(plain); err != nil && !os.IsNotExist(err) {
-			for i := 0; i < 10; i++ {
-				aside := plain + "~"
-				if i > 0 {
-					aside += strconv.Itoa(i)
-				}
-				if err := os.Remove(aside); err != nil && !os.IsNotExist(err) {
-					continue // that one is running too
-				}
-				if os.Rename(plain, aside) == nil {
-					break
-				}
-			}
+			_, _ = PutAside(methodRoot, plain) // a name it cannot free is one the link below reports
 		}
 		if err := os.Link(suffixed, plain); err != nil {
 			// A HARD LINK TO A FILE NEEDS NO PRIVILEGE, which is what makes it

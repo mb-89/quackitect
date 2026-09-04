@@ -178,6 +178,14 @@ type Token struct {
 	// the author its own verdict, because an evaluator favours what it made.
 	Author string `json:"author,omitempty"`
 
+	// WHICH AGENT ON WHICH BOX HAS TAKEN THIS, AND WHEN.
+	//
+	// Unlike the holder, these are written into the note, because a claim has to
+	// reach a box that is not this one and a hold never leaves this tree. See
+	// claim.go for why the token says when rather than until when.
+	ClaimedBy string `json:"claimed_by,omitempty"`
+	ClaimedAt string `json:"claimed_at,omitempty"`
+
 	// WHAT THE READER DID NOT UNDERSTAND, KEPT SO THE WRITER CAN PUT IT BACK.
 	//
 	// The file is rendered from this struct, so anything absent here is absent
@@ -393,4 +401,30 @@ func Mint(r Roots, t Token) (Token, error) {
 		return t, err
 	}
 	return t, SaveToken(r, t)
+}
+
+// WaitsForAPerson says why a token is not an agent's to be handed, or nothing.
+//
+// A ready_when is a condition only a person can judge, which is what the note
+// process has always said. Nothing on the hand-out path read it, so a pull
+// answered a parked note, the agent put it down, and the next pull answered the
+// same one: PutDown clears the holder and the queue has no memory. The agent
+// could not decline and the process forbids a fourth ending, so an agent that
+// obeyed was livelocked and one that wanted progress wrote a disposition it did
+// not believe, on exactly the tokens that most needed a person.
+//
+// IT IS NOT Blocked. Blocked gates the submission as well, and refusing to take
+// a submission on a parked token would stop the person who un-parks it from
+// closing it. This gates being handed work, and nothing else.
+//
+// WHOEVER PARKS ONE OWNS UN-PARKING IT. The queue stops offering it, so the
+// panel is where it is seen: stateofplay lists ready_when for that reason.
+func WaitsForAPerson(t Token) string {
+	if t.NeedsHuman {
+		return "it is marked as needing a person"
+	}
+	if w := strings.TrimSpace(t.ReadyWhen); w != "" {
+		return "it waits on a person: " + w
+	}
+	return ""
 }

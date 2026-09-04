@@ -32,6 +32,7 @@
 8. Search the tree through the index: `se_find` for words, a regex or a path glob, `se_ask` for SQL. *
 9. Test through the engine: `se_test` runs what your delta reaches. A test you name runs, a pattern narrows. *
 10. Break work into sub-tokens with `se_work`, naming the parent. Your own todo list is refused. *
+11. Replace the engine with `se --swap`. A build aimed at `.bin` is refused. *
 
 # Voice
 
@@ -49,7 +50,7 @@
 10. Follow the technical English rules. For details, see [[doc/guidance/ASD-STE-100]].
 11. DRY: do not repeat yourself. SPOT: single point of truth for every datum. A repetition in a spec, finding or answer is a defect. *
 12. Do not put history in the current surface. It goes into git commit messages.
-13. A number about the tree is the command that answers it, never the answer. *
+13. A number something else answers is never written down. The tree's count is the command that answers it. A list's count is the list. *
 
 # Work token
 
@@ -63,8 +64,8 @@
 4. Match on what the check holds at run time: a whole identifier written once into both halves, or a length as a number. *
 5. Number what the detail says the change does and put a criterion against each. Work that moves off takes its criteria with it. *
 6. A detail names the constraint, never the assignment. A criterion answering with a verb states the effect as field and value.
-7. Ask whether a criterion is about this change or about the project. Pin a one-time one; a standing one belongs in a check.
-8. One token, one piece of work; one command decides one sentence. A done-when needing "and" is usually two tokens.
+7. Ask whether a criterion is about this change or about the project. Pin a one-time one. A standing one belongs in a check.
+8. One token, one piece of work. One command decides one sentence. A done-when needing "and" is usually two tokens.
 9. Before a feature, name the basics it stands on. Mint the missing one first. *
 10. A clear small fix is a trivial token, minted at once. A note is for what needs a decision first.
 

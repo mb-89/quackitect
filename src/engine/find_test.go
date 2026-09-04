@@ -123,3 +123,52 @@ func TestAPathGlobReadsAsWritten(t *testing.T) {
 		t.Fatal("the literal prefix is not the part before the first wildcard")
 	}
 }
+
+// A PATH WITH AN UNDERSCORE IN IT IS FOUND.
+//
+// se_find answered zero hits for dev_guide while nineteen files sat there, in
+// the tree and in the index's own tables. The narrowing escapes the characters
+// LIKE reads as wildcards, and SQLite has no default escape character, so the
+// backslash was matched as a backslash and dev_guide/ became a prefix nothing
+// has. Every path holding an underscore or a percent answered the same zero.
+//
+// THE COST WAS NOT A MISSING HIT. The method sends every agent to the index
+// rather than the disk, so an answer of zero read as an empty folder. Three
+// agents read one that way in a night, and one dropped a token over it.
+func TestAPathWithAnUnderscoreIsFound(t *testing.T) {
+	r := aTreeToIndex(t)
+	for _, name := range []string{
+		"dev_guide/coverage.md",
+		"dev_guide/levels/level-0-design.md",
+		"plain/ordinary.md",
+	} {
+		p := filepath.Join(r.Work, filepath.FromSlash(name))
+		if err := writeAtomic(p, []byte("the word we are looking for is quackitect\n"), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	aFedDaemon(t, r, true)
+
+	for _, c := range []struct {
+		name string
+		find FindParams
+		want int
+	}{
+		{"a glob under a folder with an underscore", FindParams{Path: "dev_guide/**"}, 2},
+		{"the same folder, one level", FindParams{Path: "dev_guide/*"}, 1},
+		{"a folder with no underscore, which always worked", FindParams{Path: "plain/**"}, 1},
+		{"words narrowed to the underscored folder", FindParams{Words: "quackitect", Path: "dev_guide/**"}, 2},
+		{"a regex narrowed to it", FindParams{Regex: "quackitect", Path: "dev_guide/**"}, 2},
+	} {
+		t.Run(c.name, func(t *testing.T) {
+			got, err := Find(r, c.find)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if got.Count != c.want {
+				t.Fatalf("%+v answered %d, wanted %d. An answer of zero reads as an empty folder",
+					c.find, got.Count, c.want)
+			}
+		})
+	}
+}

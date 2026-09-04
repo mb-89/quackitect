@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"path/filepath"
 	"reflect"
 	"strings"
 	"testing"
@@ -151,5 +152,43 @@ func TestAStaleHolderInTheFileIsNotBelieved(t *testing.T) {
 	}
 	if held := InWorkFor(r, "worker-gone"); len(held) != 0 {
 		t.Fatalf("a name left in a file put work in worker-gone's hands: %v", held)
+	}
+}
+
+// A HOLD FROM A SESSION THAT HAS ENDED IS NOBODY HOLDING ANYTHING.
+//
+// A fresh editor drew worker-heron holding a token from the night before, on a
+// machine where nothing was running and no agent of that name existed. The
+// holder came off the token so a take-up that was never put down would stop
+// leaving a name in a file nothing reopens. Keeping it in a store that outlives
+// the session moved that defect rather than ending it.
+func TestAHoldFromAnEndedSessionIsNotBelieved(t *testing.T) {
+	r := aTreeToWriteIn(t)
+	if err := os.MkdirAll(r.Private(), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	// What the night before left behind, under its own session. The id is made
+	// up: a test naming a token in the record goes stale when that one retires.
+	was := []byte(`{"session":"20260903-193501","held":{"wk-fromlastnight":"worker-heron"}}`)
+	if err := writeAtomic(filepath.Join(r.Private(), "holds.json"), was, 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if by := HeldBy(r, "wk-fromlastnight"); by != "" {
+		t.Fatalf("a hold from an ended session reads as held by %q", by)
+	}
+
+	// AND A HOLD THIS SESSION TOOK IS KEPT, which is the half that has to work.
+	if err := recordHold(r, "wk-mine", "worker-one"); err != nil {
+		t.Fatal(err)
+	}
+	if by := HeldBy(r, "wk-mine"); by != "worker-one" {
+		t.Fatalf("a hold taken in this session reads as %q", by)
+	}
+	// AND PUTTING IT DOWN CLEARS IT, rather than leaving a name behind.
+	if err := recordHold(r, "wk-mine", ""); err != nil {
+		t.Fatal(err)
+	}
+	if by := HeldBy(r, "wk-mine"); by != "" {
+		t.Fatalf("a hold put down still reads as held by %q", by)
 	}
 }

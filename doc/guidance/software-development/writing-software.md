@@ -1,8 +1,16 @@
 ---
 kind: [[guidance]]
 scope: ["every agent or person making a change to source code in this tree, in any language"]
-out_of_scope: ["a beginner's introduction", "program structure, which is [[shape-of-a-program]]", "what to build, which the token says", "language rules, which are [[writing-go]]", "checks and tests, which are [[testing]]"]
-depends_on: ["[[voice]]", "[[work-token]]", "[[shape-of-a-program]]"]
+out_of_scope:
+  - "a beginner's introduction"
+  - "program structure, which is [[shape-of-a-program]]"
+  - "what to build, which the token says"
+  - "language rules, which are [[writing-go]]"
+  - "checks and tests, which are [[testing]]"
+depends_on:
+  - "[[voice]]"
+  - "[[work-token]]"
+  - "[[shape-of-a-program]]"
 ---
 
 # Motivation

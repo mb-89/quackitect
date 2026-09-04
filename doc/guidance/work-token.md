@@ -2,7 +2,9 @@
 kind: [[guidance]]
 scope: ["every work token, whatever its process"]
 out_of_scope: []
-depends_on: ["[[voice]]", "[[behaviour]]"]
+depends_on:
+  - "[[voice]]"
+  - "[[behaviour]]"
 ---
 
 # Motivation
@@ -26,8 +28,8 @@ How a test is built is [[testing]].
 4. Match on what the check holds at run time: a whole identifier written once into both halves, or a length as a number. *
 5. Number what the detail says the change does and put a criterion against each. Work that moves off takes its criteria with it. *
 6. A detail names the constraint, never the assignment. A criterion answering with a verb states the effect as field and value.
-7. Ask whether a criterion is about this change or about the project. Pin a one-time one; a standing one belongs in a check.
-8. One token, one piece of work; one command decides one sentence. A done-when needing "and" is usually two tokens.
+7. Ask whether a criterion is about this change or about the project. Pin a one-time one. A standing one belongs in a check.
+8. One token, one piece of work. One command decides one sentence. A done-when needing "and" is usually two tokens.
 9. Before a feature, name the basics it stands on. Mint the missing one first. *
 10. A clear small fix is a trivial token, minted at once. A note is for what needs a decision first.
 
@@ -46,15 +48,23 @@ How a test is built is [[testing]].
 The sections are separate so a reader can disagree with the answer while still believing the problem.
 Keep the argument out of it: no history, no measurement of the record, no account of who said what.
 Write the smallest case that still shows the problem.
+
 A detail once prescribed an assignment the tree's own check refused wherever it was written.
-A detail says what has to become true and names the constraint; where the write goes is the worker's decision.
+A detail says what has to become true and names the constraint.
+Where the write goes is the worker's decision.
 Before a detail names a file and a line, run the tree's checks against it on a copy.
 
 ## 2. A criterion that cannot fail
 
 A criterion written after the work asserts what the fix happens to produce.
-Shapes seen here: a class name nothing writes, a rule enforced in one language and checked in another, and a word list built from cases already found.
+Shapes seen here:
+
+- a class name nothing writes
+- a rule enforced in one language and checked in another
+- a word list built from cases already found
+
 So criteria are written first, each naming the input, the answer, and what has to survive.
+
 A directional verb is satisfied by the extreme: a filter dropping every row narrows perfectly.
 A criterion answering with a system verb states the effect as field and value, because a branch can perform it inline and stay green.
 A detail borrowing another component's syntax borrows its rulings on wrong input too.
@@ -78,7 +88,8 @@ Rendered text is no handle: a template or a renderer holds no text to match, so 
 ## 5. Every item the detail names
 
 A detail once enumerated a question, three rules and two old sentences while the criteria pinned only two.
-Number what the change does and put a criterion against each; on a rewrite, add a delete criterion for every sentence the detail calls the problem.
+Number what the change does and put a criterion against each.
+On a rewrite, add a delete criterion for every sentence the detail calls the problem.
 A scope decision once moved work away in prose while three criteria still asked for it.
 Move the criteria first, then write the sentence saying where they went.
 A spike closes on its own numbered questions, including those it declines, and a mechanism it turns up is its own token.
@@ -100,7 +111,8 @@ A check that arrives green has proved nothing about the defect.
 Watched going red for the reason expected, it proves the defect was there and the check can see it.
 One that cannot be made to go red is a finding about the criterion, and it goes on the token first.
 A blanket sentence claiming every check was watched failing cannot hold beside a regression criterion, which goes red by putting the defect in.
-So the red is recorded per criterion: each names the test its criterion runs, its message matches an assertion in the tree, and a split-out criterion earns a fresh red.
+So the red is recorded per criterion.
+Each names the test its criterion runs, its message matches an assertion in the tree, and a split-out criterion earns a fresh red.
 
 ## 13. Half a mechanism ships
 
@@ -108,7 +120,8 @@ A detail names two parts and says neither is enough alone.
 The producing half is built and evidenced, the checking half is not, and nothing looks wrong until it is.
 Ask which half has no output: that is the one that will be missing.
 A rule taught to one half of a mirrored pair is the same defect.
-So the halves are written down where the system declares them, the rule is driven through each, and a field the second half ignores is refused rather than accepted.
+So the halves are written down where the system declares them, and the rule is driven through each.
+A field the second half ignores is refused rather than accepted.
 
 ## 14. Evidence
 
@@ -116,7 +129,8 @@ An observation names the check and what it said, never a line number, because a 
 Work reported done without its evidence is a claim the record cannot check.
 A number carries the command that produced it, written beside it as it is taken.
 Both halves of a ratio come from the one instrument the code reads, and a half that cannot says so beside the number.
-A reading pins to a commit, never to the word today, and before submitting every command runs again with its fresh answer beside what was written.
+A reading pins to a commit, never to the word today.
+Before submitting, every command runs again with its fresh answer beside what was written.
 
 ## 15. A checklist is not a formality
 

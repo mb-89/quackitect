@@ -109,6 +109,19 @@ ask("rename a group", A.renameGroupArgs("later", "much later"));
 ask("edit a cell", A.editCellArgs(id, "title", "a new title here"));
 ask("hold on", A.holdArgs(false));
 ask("hold off", A.holdArgs(true));
+// THE BINDING AND THE ASK ARE THE PERSON'S TWO OTHER BUTTONS. They are driven
+// here for the same reason every other builder is: the panel calls them and
+// nothing else would notice a flag being renamed under them.
+//
+// THE ORDER MATTERS. This drives the real engine over a real tree, so god is
+// asked for before bound, and the tree is left bound.
+ask("what the binding is", A.bindingArgs());
+ask("unbind", A.bindArgs("unbound"));
+ask("god", A.bindArgs("god"));
+ask("bind again", A.bindArgs("bound"));
+ask("what is asked", A.askedArgs());
+ask("ask the agent", A.askArgs(true));
+ask("stop asking", A.askArgs(false));
 ask("the panes", A.panesArgs(file));
 ask("one pane", A.paneArgs(file, "left"));
 ask("the views", A.viewsArgs());

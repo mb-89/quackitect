@@ -67,7 +67,14 @@ CREATE TABLE IF NOT EXISTS test (
   line   INTEGER NOT NULL,
   hash   TEXT NOT NULL,
   reads  TEXT NOT NULL DEFAULT '',
-  mapped TEXT NOT NULL DEFAULT ''
+  mapped TEXT NOT NULL DEFAULT '',
+  -- HOW LONG IT TOOK, THE LAST TIME THE MAPPER RAN IT.
+  --
+  -- The mapper has always measured this and thrown it away. A suite gets slow
+  -- one test at a time and no single one is ever obviously the problem, so the
+  -- number nobody kept is the number nobody could rank by. Zero means it has
+  -- not been mapped yet.
+  seconds REAL NOT NULL DEFAULT 0
 );
 CREATE INDEX IF NOT EXISTS test_path ON test (path);
 CREATE TABLE IF NOT EXISTS test_region (
@@ -235,7 +242,7 @@ func regionsOf(db *sql.DB, id string) ([]region, error) {
 
 // writeRegions replaces a test's regions and marks the test mapped at the
 // hash its file has now.
-func writeRegions(db *sql.DB, t aTest, regions []region) error {
+func writeRegions(db *sql.DB, t aTest, regions []region, took time.Duration) error {
 	tx, err := db.Begin()
 	if err != nil {
 		return err
@@ -250,7 +257,8 @@ func writeRegions(db *sql.DB, t aTest, regions []region) error {
 			return err
 		}
 	}
-	if _, err := tx.Exec("UPDATE test SET mapped = ? WHERE id = ?", t.Hash, t.ID); err != nil {
+	if _, err := tx.Exec("UPDATE test SET mapped = ?, seconds = ? WHERE id = ?",
+		t.Hash, took.Seconds(), t.ID); err != nil {
 		return err
 	}
 	return tx.Commit()
@@ -347,15 +355,12 @@ func runOneGoTest(r Roots, bin string, t aTest) (ok bool, said string, took time
 	profile.Close()
 	defer os.Remove(profile.Name())
 	dir := filepath.Join(r.Work, filepath.FromSlash(filepath.Dir(t.Path)))
-	cmd := Quietly(exec.Command(bin, "-test.run", "^"+t.Name+"$", "-test.count", "1", "-test.coverprofile", profile.Name()))
-	cmd.Dir = dir
 	env := buildEnv()
 	if engine := filepath.Join(r.Method, ".bin", exeName("se")); fileExists(engine) {
 		env = append(env, "SE_ENGINE="+engine)
 	}
-	cmd.Env = env
 	start := time.Now()
-	out, runErr := cmd.CombinedOutput()
+	out, runErr := theToolchain.runOne(bin, dir, t.Name, profile.Name(), env)
 	took = time.Since(start)
 	said = string(out)
 	ok = runErr == nil
@@ -537,16 +542,52 @@ func mapMissing(r Roots, db *sql.DB, done <-chan struct{}) (mapped, failed int, 
 		if bin == "" {
 			continue
 		}
-		_, _, _, regions, err := runOneGoTest(r, bin, t)
+		_, _, took, regions, err := runOneGoTest(r, bin, t)
 		if err != nil {
 			failed++
 			continue
 		}
-		if err := writeRegions(db, t, regions); err != nil {
+		if err := writeRegions(db, t, regions, took); err != nil {
 			failed++
 			continue
 		}
 		mapped++
 	}
 	return mapped, failed, first
+}
+
+// THE GO TOOLCHAIN, AND THE SEAM A TEST FEEDS BY HAND.
+//
+// THE OWNER'S RULING: an expensive external interface is tested once and mocked
+// everywhere else. Building a cover binary and running a test under coverage is
+// the most expensive thing this program does, and the four slowest tests in the
+// suite were all driving it: forty-nine seconds between them, to check which
+// tests the engine SELECTS, which is a decision of ours and not the compiler's.
+//
+// So the toolchain is a variable, the way the filesystem watcher and git are.
+// ONE TEST DRIVES THE REAL COMPILER and holds this contract; the rest feed one
+// and decide what it answers.
+type toolchain struct {
+	buildCover func(dir, bin string) ([]byte, error)
+	runOne     func(bin, dir, test, profile string, env []string) ([]byte, error)
+}
+
+var theToolchain = realToolchain()
+
+func realToolchain() toolchain {
+	return toolchain{
+		buildCover: func(dir, bin string) ([]byte, error) {
+			cmd := Quietly(exec.Command(goTool(), "test", "-c", "-cover", "-o", bin, "."))
+			cmd.Dir = dir
+			cmd.Env = buildEnv()
+			return cmd.CombinedOutput()
+		},
+		runOne: func(bin, dir, test, profile string, env []string) ([]byte, error) {
+			cmd := Quietly(exec.Command(bin, "-test.run", "^"+test+"$",
+				"-test.count", "1", "-test.coverprofile", profile))
+			cmd.Dir = dir
+			cmd.Env = env
+			return cmd.CombinedOutput()
+		},
+	}
 }

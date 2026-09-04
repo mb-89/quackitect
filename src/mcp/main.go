@@ -181,6 +181,8 @@ func call(roots roots, params json.RawMessage) map[string]any {
 		return text("recorded")
 	case "se_test":
 		return text(testTheDelta(roots, p.Arguments))
+	case "se_claim":
+		return text(claimWork(roots, p.Arguments))
 	case "se_find":
 		return text(findInTree(roots, p.Arguments))
 	case "se_ask":

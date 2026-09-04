@@ -80,10 +80,48 @@
           }
         },
         {
+          "name": "ask",
+          "type": "toggle",
+          "command": "quackitect.ask",
+          "labels": {
+            "off": "asked",
+            "on": "asked"
+          },
+          "titles": {
+            "off": "ask / the agent says what it and every subagent is working on. Nothing else runs until it does",
+            "on": "asked / waiting for the agent to say what is happening. It untoggles when the answer lands"
+          }
+        },
+        {
+          "name": "gap-1",
+          "type": "gap"
+        },
+        {
+          "name": "gap-2",
+          "type": "gap"
+        },
+        {
+          "name": "unbind",
+          "type": "toggle",
+          "command": "quackitect.unbind",
+          "gesture": 5,
+          "gestureCommand": "quackitect.god",
+          "labels": {
+            "bound": "unbound",
+            "unbound": "unbound",
+            "god": "unbound"
+          },
+          "titles": {
+            "bound": "unbind / take the queue off: no token on a write, no token on a command, nobody made to spawn. Press five times for god mode",
+            "unbound": "unbound / the queue is off. Press to put it back",
+            "god": "GOD MODE / every refusal this engine has is off. Press to put it all back"
+          }
+        },
+        {
           "name": "agents",
           "type": "table",
           "source": "present",
-          "help": "every agent the engine has been told about, and what it holds",
+          "help": "Who is working, and on what.",
           "columns": [
             {
               "field": "actor",
@@ -140,7 +178,28 @@
           "default": 5,
           "min": 0,
           "max": 20,
-          "help": "How many agents of each role the engine wants while there is work for them, and never more than this. The main agent is held from everything but spawning and answering until they have pulled. Zero turns the holding off."
+          "help": "How many helpers may work at once. More finishes more at a time and costs more. Zero means the main agent works alone."
+        },
+        {
+          "name": "claim_hours",
+          "title": "a claim lasts",
+          "type": "int",
+          "default": 3,
+          "min": 1,
+          "max": 3,
+          "narrow": "smaller",
+          "unit": "h",
+          "help": "How long one machine keeps work reserved before another may take it. Short frees work quickly when a machine never comes back. Long stops two machines racing for it."
+        },
+        {
+          "name": "claim_sync_seconds",
+          "title": "look for claims every",
+          "type": "int",
+          "default": 30,
+          "min": 0,
+          "max": 600,
+          "unit": "s",
+          "help": "How often this machine looks for work another machine has reserved. Lower notices sooner. Zero stops looking, and then two machines can start the same thing."
         },
         {
           "name": "heartbeat_seconds",
@@ -150,7 +209,8 @@
           "min": 1,
           "max": 5,
           "narrow": "smaller",
-          "help": "Seconds between heartbeats. A smaller number is taken. A larger one is ignored."
+          "unit": "s",
+          "help": "How often the engine says it is alive. Lower spots a dead one sooner and writes more to the log."
         },
         {
           "name": "ready_budget_ms",
@@ -161,47 +221,41 @@
           "max": 15000,
           "step": 500,
           "narrow": "smaller",
-          "help": "Milliseconds allowed from the press to a ready agent. Missing it turns the light red."
-        },
-        {
-          "name": "read_clamp_lines",
-          "title": "read clamp",
-          "type": "int",
-          "default": 800,
-          "min": 50,
-          "max": 800,
-          "narrow": "smaller",
-          "help": "How many lines a read may take at once. A read of a longer file with no limit is corrected to this many, and the answer says how to read on. It may be made smaller and never larger."
+          "unit": "ms",
+          "help": "How long the agent has to start after you press. Raise it on a slow machine, where the light goes red for nothing."
         },
         {
           "name": "helper_ratio",
-          "title": "helper ratio",
+          "title": "helper hands back",
           "type": "int",
           "default": 10,
           "min": 10,
           "max": 100,
           "narrow": "larger",
-          "help": "A helper's answer may be at most one part in this many of what it read. A larger number is a tighter digest, and only a larger one is taken."
+          "unit": ":1",
+          "help": "How much a helper may hand back: one part in this many of what it read. A helper that returns what it read has saved you nothing. Higher asks for a shorter answer."
         },
         {
           "name": "helper_floor_bytes",
-          "title": "helper floor",
+          "title": "helper may always hand back",
           "type": "int",
           "default": 6000,
           "min": 500,
           "max": 6000,
           "narrow": "smaller",
-          "help": "Bytes a helper's answer may always run to, whatever it read, so a helper given a small job is not held to a ratio of nothing. It may be made smaller and never larger."
+          "unit": "B",
+          "help": "How much a helper may always hand back, however little it read. Without it, a helper given a small job has almost no room to answer at all."
         },
         {
           "name": "pulls_before_hold_is_stale",
-          "title": "pulls before hold is stale",
+          "title": "work goes stale after",
           "type": "int",
           "default": 10,
           "min": 1,
           "max": 10,
           "narrow": "smaller",
-          "help": "How many pulls may pass without the holder of a token pulling before that hold stops counting as somebody working. The queue itself is the clock, so a holder that has stopped goes stale after a few pulls by anybody else. It may be made smaller and never larger."
+          "unit": "turns",
+          "help": "How long work may sit with an agent that has gone quiet before somebody else may take it. It is counted in how often the others ask for work, not in minutes, so a busy team notices sooner. Too low and a slow worker is interrupted."
         }
       ]
     },
@@ -216,7 +270,7 @@
           "type": "bool",
           "default": true,
           "narrow": "on",
-          "help": "Refuse every call while the person is waiting to be answered. The engine reads its own log to know."
+          "help": "Stop the agent until it has answered you. Without this it works on through your question."
         },
         {
           "name": "guard_projections",
@@ -224,7 +278,7 @@
           "type": "bool",
           "default": true,
           "narrow": "on",
-          "help": "Refuse a write to a projection. It can be turned on and never off."
+          "help": "Stop the agent editing a file that is written from somewhere else. The edit would be thrown away the next time that file is written."
         },
         {
           "name": "stop_needs_claim",
@@ -232,21 +286,21 @@
           "type": "bool",
           "default": true,
           "narrow": "on",
-          "help": "Refuse every stop the agent has not claimed a sanctioned reason for. The engine names which reasons those are."
+          "help": "Make the agent say why it is stopping. Without this a turn ends with no reason in the record."
         },
         {
           "name": "search_via_index",
           "title": "search via index",
           "type": "bool",
           "default": true,
-          "help": "Refuse Grep, Glob, rg and grep aimed inside the tree, and point them at se find, which answers off the index. Off, the disk is searched as before."
+          "help": "Make the agent search through the engine rather than the disk. Every line of the tree is in there, and it answers faster."
         },
         {
           "name": "tests_via_engine",
           "title": "tests via engine",
           "type": "bool",
           "default": true,
-          "help": "Refuse go test, a check script or the battery run by hand inside the tree, and point them at se test, which runs what the delta reaches. Off, tests run by hand as before."
+          "help": "Make the agent test through the engine, which runs the tests its own change reaches. By hand it runs everything, or the wrong thing."
         },
         {
           "name": "build_via_engine",
@@ -254,7 +308,7 @@
           "type": "bool",
           "default": true,
           "narrow": "on",
-          "help": "Refuse a build aimed at .bin inside the tree and name the swap door. The engine builds the next one, checks it answers and hands over."
+          "help": "Make the agent ask the engine to rebuild itself. A build by hand leaves the program that is running and the one on disk as two different builds."
         }
       ]
     }
