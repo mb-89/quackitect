@@ -126,8 +126,16 @@ func main() {
 	if err := seedThroughEngine(*root); err != nil {
 		warn("could not seed this copy: %v", err)
 	}
+	// THE EXTENSION IS BUILT ON EVERY PROFILE, AND LINKED ONLY WHERE THERE IS
+	// AN EDITOR. The checks bundle it with the esbuild npm puts in
+	// src/extension/node_modules, so a headless box that skipped the build had
+	// four of them fail on a fresh clone before they read anything. See
+	// editor.go.
+	if err := buildExtension(*root); err != nil {
+		fail(err)
+	}
 	if *profile == "desktop" {
-		if err := installExtension(*root, m.Product.ID); err != nil {
+		if err := linkExtension(*root, m.Product.ID); err != nil {
 			fail(err)
 		}
 		if !*noOpen {

@@ -297,15 +297,36 @@ func firstWord(command string) string {
 	return out.String()
 }
 
+// theShellDoor is the same call at a shell, for a session whose tool lane never
+// came up.
+//
+// A REFUSAL NAMES A DOOR THAT IS THERE. With the lane up, se_answer and se_stop
+// never reach Bash and this line is one sentence nobody needs. With no lane it
+// is the difference between a session that can act and one that cannot: the
+// cloud box that met this had no se_answer, so the only call that satisfied the
+// refusal was the only call it could not make.
+func theShellDoor(verb string) string {
+	return "IF YOUR LANE HAS NO se_ TOOLS, this is the same call at a shell, and the " +
+		"guards let it through: ./RUNME.sh " + verb
+}
+
 // isTheEngine answers whether this word names the engine, wherever it was
 // started from and however it is quoted.
+//
+// RUNME IS THE ENGINE, because on a fresh clone it is the only engine there is.
+// .bin is not in version control, so a box that has just cloned this tree has no
+// se to name: RUNME.sh installs what is missing and hands every argument
+// through. This knew se and se.exe alone, so a cloud session with no tool lane
+// met the answer guard with ./RUNME.sh --answer and was refused, and the stop
+// guard with ./RUNME.sh stop and was refused. Each guard's only door was held
+// shut by the other, and the session had no legal move at all.
 func isTheEngine(word string) bool {
 	w := strings.Trim(word, `"'`)
 	w = strings.ReplaceAll(w, `\`, "/")
 	if i := strings.LastIndex(w, "/"); i >= 0 {
 		w = w[i+1:]
 	}
-	return w == "se" || w == "se.exe"
+	return w == "se" || w == "se.exe" || w == "RUNME.sh"
 }
 
 // Block is the shape a Stop hook reads. The reason reaches the agent.
@@ -481,10 +502,15 @@ func answerHook(raw []byte, args []string, out io.Writer, held *Log) {
 			if refuse {
 				record(log, "engine", "owed", actor, "refused: they are waiting for an answer", No(),
 					map[string]any{"tool": in.ToolName})
+				// A REFUSAL THAT NAMES ONLY A LANE TOOL IS A DOOR THAT MAY NOT BE
+				// THERE. A cloud box whose tool lane never came up read "answer with
+				// se_answer" and had no se_answer, so the one call that satisfies this
+				// refusal was the one call it could not make. Every refusal naming a
+				// lane tool names the shell that does the same job beside it.
 				g.deny("THEY ARE WAITING FOR AN ANSWER, and nothing else happens until you " +
 					"give one.\n\nWhat they said:\n\n" + firstLines(said, 12) +
 					"\n\nAnswer them, in full, with se_answer. Then carry on with the work you hold. " +
-					"You do not have to stop the turn to be heard.")
+					"You do not have to stop the turn to be heard.\n\n" + theShellDoor("--answer \"...\""))
 				return
 			}
 			record(log, "engine", "owed", actor, "warned: they are waiting for an answer", Yes(),

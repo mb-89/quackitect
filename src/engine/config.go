@@ -91,11 +91,11 @@ type Node struct {
 	// draws it beside the box. It is declared here because --tree prints the
 	// tree as declared, and a row that reads "a claim lasts: 3" is a fact with
 	// its unit missing.
-	Unit string `json:"unit,omitempty"`
-	Span        int    `json:"span,omitempty"`
-	Narrow      string `json:"narrow,omitempty"` // smaller, larger, on, off, or empty for free
-	Shown       bool   `json:"shown,omitempty"`
-	Children    []Node `json:"children,omitempty"`
+	Unit     string `json:"unit,omitempty"`
+	Span     int    `json:"span,omitempty"`
+	Narrow   string `json:"narrow,omitempty"` // smaller, larger, on, off, or empty for free
+	Shown    bool   `json:"shown,omitempty"`
+	Children []Node `json:"children,omitempty"`
 
 	// Drawn rather than held.
 	Label       string            `json:"label,omitempty"`

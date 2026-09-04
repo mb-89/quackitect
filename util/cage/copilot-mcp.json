@@ -3,8 +3,8 @@
   "mcpServers": {
     "quackitect": {
       "type": "local",
-      "command": "{{mcp}}",
-      "args": ["--method", "{{method}}", "--work", "{{work}}"],
+      "command": "node",
+      "args": ["{{mcplane}}", "--method", "{{method}}", "--work", "{{work}}"],
       "tools": ["*"]
     }
   }

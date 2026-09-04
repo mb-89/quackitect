@@ -140,7 +140,8 @@ func AStaffShortfall(r Roots, cfg Config, actor, tool, command string) (string, 
 			"actor reviewer-<a name>, role reviewer, and give one verdict per token until the queue answers wait.\n\n",
 			s.AwaitingVerdict, s.ReviewersHere, s.ReviewersWanted, moreReviewers)
 	}
-	b.WriteString("A spawned agent is here the moment it pulls. What was asked: " + tool + ".")
+	b.WriteString("A spawned agent is here the moment it pulls. What was asked: " + tool + ".\n\n")
+	b.WriteString(theShellDoor("pull --actor <a name> --role worker"))
 	return b.String(), true
 }
 

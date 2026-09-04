@@ -115,7 +115,6 @@ func TestAReadAlreadyHeldUnchangedIsRefusedOnce(t *testing.T) {
 	}
 }
 
-
 func TestTheSameFailingCallIsRefusedAfterThreeFailures(t *testing.T) {
 	t.Parallel()
 	exe, r := aGuardedTree(t)

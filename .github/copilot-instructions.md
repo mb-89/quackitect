@@ -67,7 +67,7 @@
 7. Ask whether a criterion is about this change or about the project. Pin a one-time one. A standing one belongs in a check.
 8. One token, one piece of work. One command decides one sentence. A done-when needing "and" is usually two tokens.
 9. Before a feature, name the basics it stands on. Mint the missing one first. *
-10. A clear small fix is a trivial token, minted at once. A note is for what needs a decision first. Everything but a note says tracked or local at the mint. A token that travels names no token that does not.
+10. A small fix is a trivial token. A note needs a decision first. Everything else is tracked or local, and tracked names no local. *
 
 ### Using one
 

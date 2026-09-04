@@ -24,6 +24,13 @@ type Log struct {
 	seq     int64
 	written int64
 	limit   int64
+
+	// continued says this engine took over a session another engine began,
+	// rather than starting one. A swap is one session with two processes in it,
+	// so the successor is not a new session and nothing about a start belongs
+	// to it. See unbound.go, where the binding is put back on a start and left
+	// alone on a handover.
+	continued bool
 }
 
 type Record struct {
@@ -57,6 +64,12 @@ func OpenLog(dir string) (*Log, error) {
 	// of retiring it. Retiring here split one stretch of work in half at a
 	// moment nobody chose, and a person watching the log saw it start over.
 	if s := os.Getenv(sessionVar); s != "" {
+		// THE BATON IS PUT DOWN ONCE IT IS TAKEN. It stayed in the successor's
+		// environment, so every process that engine started inherited it: a test
+		// run under a swapped engine opened a log that continued the engine's own
+		// session instead of its own, and the check that an earlier session is
+		// set aside rather than written over went red for no defect of its own.
+		os.Unsetenv(sessionVar)
 		return ContinueLog(dir, s)
 	}
 	if err := os.MkdirAll(dir, 0o755); err != nil {
@@ -78,9 +91,13 @@ func ContinueLog(dir, session string) (*Log, error) {
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return nil, err
 	}
-	l := &Log{dir: dir, limit: defaultLimit, session: session}
+	l := &Log{dir: dir, limit: defaultLimit, session: session, continued: true}
 	return l, l.open()
 }
+
+// Continued answers whether this engine took over a session rather than
+// beginning one.
+func (l *Log) Continued() bool { return l.continued }
 
 func (l *Log) retire() error { return RetireCurrent(l.dir) }
 

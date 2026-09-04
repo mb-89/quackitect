@@ -32,6 +32,15 @@ function say(what, ok, why) {
 // reader can tell an allowance from an oversight.
 const sidecar = /-(shm|wal)$/;
 
+// A WRITE IN FLIGHT IS NOT STATE. The engine builds every temporary under .se
+// with os.CreateTemp, which puts a number in the middle of the name, so no
+// source can name the file that appears: the source names the pattern. One is
+// there for as long as a snapshot, a claim or a test run takes, and the sweep
+// takes what a killed process left. So the suffix is the allowance, and a
+// temporary that outlives its writer is the sweep's business rather than this
+// check's.
+const inFlight = /\.tmp$/;
+
 // Where the code that writes the engine's state lives. Anything built or
 // fetched is skipped: it is not source, and a name found there proves nothing.
 const sourceDirs = ["src"];
@@ -81,7 +90,13 @@ try {
   process.exit(1);
 }
 
+let inFlightSeen = 0;
 for (const name of entries.sort()) {
+  if (inFlight.test(name)) {
+    inFlightSeen++;
+    say(name + " is a write in flight, and the sweep owns it", true);
+    continue;
+  }
   const looksFor = name.replace(sidecar, "");
   const owned = haystack.includes(looksFor);
   const aside = looksFor === name ? "" : ", written beside " + looksFor + " by SQLite";
@@ -91,5 +106,6 @@ for (const name of entries.sort()) {
     + "land the code that keeps it");
 }
 
-console.log("\n" + entries.length + " entr(y/ies) looked at. " + bad + " failed.");
+console.log("\n" + entries.length + " entr(y/ies) looked at, " + inFlightSeen
+  + " of them a write in flight. " + bad + " failed.");
 process.exit(bad ? 1 : 0);

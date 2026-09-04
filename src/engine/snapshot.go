@@ -44,7 +44,11 @@ func Snapshot(r Roots, label string) (string, error) {
 	}
 	// A TEMPORARY INDEX, so the person's staging is untouched, and one per
 	// snapshot, so two agents snapshotting at once do not share it.
-	index, err := os.CreateTemp(r.Private(), "snapshot.*.index")
+	//
+	// IT ENDS .tmp SO THE SWEEP KNOWS IT. The remove below is deferred, and a
+	// process killed before it runs leaves the file in .se for ever. A swap kills
+	// the engine on purpose, so that is the ordinary case. See atomic.go.
+	index, err := os.CreateTemp(r.Private(), "snapshot.*.index.tmp")
 	if err != nil {
 		return "", err
 	}

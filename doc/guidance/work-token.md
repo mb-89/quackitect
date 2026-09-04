@@ -31,7 +31,7 @@ How a test is built is [[testing]].
 7. Ask whether a criterion is about this change or about the project. Pin a one-time one. A standing one belongs in a check.
 8. One token, one piece of work. One command decides one sentence. A done-when needing "and" is usually two tokens.
 9. Before a feature, name the basics it stands on. Mint the missing one first. *
-10. A clear small fix is a trivial token, minted at once. A note is for what needs a decision first. Everything but a note says tracked or local at the mint. A token that travels names no token that does not.
+10. A small fix is a trivial token. A note needs a decision first. Everything else is tracked or local, and tracked names no local. *
 
 ## Using one
 
@@ -49,7 +49,6 @@ The sections are separate so a reader can disagree with the answer while still b
 Keep the argument out of it: no history, no measurement of the record, no account of who said what.
 Write the smallest case that still shows the problem.
 
-A detail once prescribed an assignment the tree's own check refused wherever it was written.
 A detail says what has to become true and names the constraint.
 Where the write goes is the worker's decision.
 Before a detail names a file and a line, run the tree's checks against it on a copy.
@@ -65,7 +64,6 @@ Shapes seen here:
 
 So criteria are written first, each naming the input, the answer, and what has to survive.
 
-A directional verb is satisfied by the extreme: a filter dropping every row narrows perfectly.
 A criterion answering with a system verb states the effect as field and value, because a branch can perform it inline and stay green.
 A detail borrowing another component's syntax borrows its rulings on wrong input too.
 Where the answer touches another token, name its status and holder.
@@ -74,20 +72,17 @@ Where the answer touches another token, name its status and holder.
 
 Two criteria once carried identical commands, so whatever made the first green made the second green.
 Pull the commands and their run patterns out of a draft and compare them for repeats.
-Another named a check no file declared, owned by a token that depended on this one.
 So every command runs from the root before submitting, exit zero or a stated reason, pointing at the instrument held until its owner replaces it.
 A draft obeys the class it commits, and names a walk the tree already has rather than retyping it.
 
 ## 4. What a check may match on
 
-A two-part guard once paired a search for a definition with a run of the test, naming different symbols.
-It failed shut: the worker wrote exactly the test the criterion named and the search found nothing.
+A two-part guard that pairs a search for a definition with a run of the test, naming different symbols, fails shut.
 So the identifier is written once into both halves, and the guard is run against the artefact on its own before submitting.
 Rendered text is no handle: a template or a renderer holds no text to match, so the durable handle is the producer's name.
 
 ## 5. Every item the detail names
 
-A detail once enumerated a question, three rules and two old sentences while the criteria pinned only two.
 Number what the change does and put a criterion against each.
 On a rewrite, add a delete criterion for every sentence the detail calls the problem.
 A scope decision once moved work away in prose while three criteria still asked for it.
@@ -101,19 +96,15 @@ Before a feature token is worked, its detail names what it stands on, and each m
 
 ## 10. Tracked is claimable
 
-A note is private and stays private, because nobody has decided what it is yet.
+A note is private, because nobody has decided what it is yet.
+Everything else is tracked or local, and the minter says which: there is no default.
+Tracked is doc/work, which git carries, so another box can claim it.
+Local is .se/work, which nothing else reaches.
+The question is who can pick it up, not how big it is.
 
-Everything else is born in one of two places, and the minter says which. Tracked is doc/work, which git carries, so another agent on another box can claim it. Local is .se/work, which nothing else reaches.
-
-So the question is not how big the work is. It is who can pick it up.
-
-Work you are going to do yourself next, tied to what is in your hands, stays local. Anything another hand could take is tracked.
-
-There is no default, on any process. Later this follows from whether the work sits in a tracked state machine. That does not exist yet, so a person or an agent decides it, every time.
-
-And the reference runs one way only. A tracked token names no local one, because the reader of a tracked token may not have the local one at all. A cloud box reads the tree out of git, where .se/work is not, so a local id there is not a private door. It is a broken link.
-
-A local token naming a tracked one is fine. Whoever reads the local one has the tracked one too.
+The reference runs one way.
+A cloud box reads the tree out of git, where .se/work is not, so a local id there is a broken link.
+A local token naming a tracked one is fine.
 
 ## 11. Next to the ask
 
@@ -126,7 +117,6 @@ A question costs a turn, and a guess at an ambiguous ask costs the work and the 
 A check that arrives green has proved nothing about the defect.
 Watched going red for the reason expected, it proves the defect was there and the check can see it.
 One that cannot be made to go red is a finding about the criterion, and it goes on the token first.
-A blanket sentence claiming every check was watched failing cannot hold beside a regression criterion, which goes red by putting the defect in.
 So the red is recorded per criterion.
 Each names the test its criterion runs, its message matches an assertion in the tree, and a split-out criterion earns a fresh red.
 

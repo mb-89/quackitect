@@ -409,7 +409,8 @@ func Publish(r Roots, files []string, message string) Published {
 		p.Says = "the claim stands here. There is nowhere to build the commit: " + err.Error()
 		return p
 	}
-	index, err := os.CreateTemp(r.Private(), "claim.*.index")
+	// IT ENDS .tmp SO THE SWEEP KNOWS IT, the way the snapshot's index does.
+	index, err := os.CreateTemp(r.Private(), "claim.*.index.tmp")
 	if err != nil {
 		p.Says = "the claim stands here. There is nowhere to build the commit: " + err.Error()
 		return p

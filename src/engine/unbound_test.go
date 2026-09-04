@@ -198,6 +198,73 @@ func TestOnePressReleasesFromEitherRung(t *testing.T) {
 	}
 }
 
+// A SESSION STARTS BOUND, WHATEVER THE LAST ONE ENDED ON.
+//
+// The rung was a file and nothing put it back, so an editor closed on an
+// unbound tree opened on an unbound tree, with nobody having asked for it in
+// that session. God is the sharp case: every refusal off, and armed again at the
+// next start with nothing said.
+func TestANewSessionIsBoundWhateverTheLastOneLeft(t *testing.T) {
+	t.Parallel()
+	for _, was := range []TheBinding{Unbound, God} {
+		r := aTreeToWriteIn(t)
+		if _, err := SetBinding(r, was, "the owner"); err != nil {
+			t.Fatal(err)
+		}
+		if at := LoadBinding(r).At; at != was {
+			t.Fatalf("this proves nothing: the tree would not go to %q", was)
+		}
+		got, put := PutTheBindingBack(r)
+		if !put || got != was {
+			t.Errorf("a start off %q answered (%q, %v), and it puts the rung back", was, got, put)
+		}
+		if at := LoadBinding(r).At; at != Bound {
+			t.Errorf("a session starting on a %q tree reads %q", was, at)
+		}
+		if Unleashed(r) || NoGuardsAtAll(r) {
+			t.Errorf("a session starting on a %q tree still reads as unleashed", was)
+		}
+	}
+}
+
+// AND A TREE ALREADY BOUND IS NOT WRITTEN, so a start says nothing about a rung
+// nobody moved.
+func TestAStartSaysNothingAboutATreeAlreadyBound(t *testing.T) {
+	t.Parallel()
+	r := aTreeToWriteIn(t)
+	if got, put := PutTheBindingBack(r); put || got != Bound {
+		t.Errorf("a bound tree answered (%q, %v), and there was nothing to put back", got, put)
+	}
+}
+
+// A HANDOVER IS NOT A START. A swap is one session with two processes in it, so
+// the log the successor opens says it is continuing and the rung is left alone.
+func TestAHandoverContinuesTheSessionRatherThanStartingOne(t *testing.T) {
+	dir := t.TempDir()
+	// THE BATON IS TAKEN OUT OF THE ENVIRONMENT FIRST. This suite runs under an
+	// engine that may itself have been handed a session, and the variable is
+	// process-wide, so a first log opened without clearing it reads as a
+	// successor's.
+	t.Setenv(sessionVar, "")
+	fresh, err := OpenLog(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer fresh.Close()
+	if fresh.Continued() {
+		t.Error("a log opened with no session to continue says it is continuing one")
+	}
+	t.Setenv(sessionVar, fresh.Session())
+	next, err := OpenLog(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer next.Close()
+	if !next.Continued() {
+		t.Error("a successor handed a session says it began one, so a swap would bind the person again")
+	}
+}
+
 // A BINDING NOTHING CAN READ IS BOUND, because the safe answer to not knowing
 // is every rule on.
 func TestAnUnreadableBindingIsBound(t *testing.T) {
@@ -216,4 +283,3 @@ func TestAnUnreadableBindingIsBound(t *testing.T) {
 		t.Fatalf("a rung this engine does not know answered %q", at)
 	}
 }
-

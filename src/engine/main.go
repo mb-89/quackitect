@@ -537,6 +537,17 @@ func main() {
 	}
 	log.Write("engine", "start", "engine", "engine started", Yes(), startRecord)
 
+	// AND THE BINDING GOES BACK TO BOUND, because a session starting is nobody
+	// having asked for the rules to be off. A handover is not a start, so the
+	// successor of a swap leaves the rung where the person put it. See unbound.go.
+	if !log.Continued() {
+		if was, put := PutTheBindingBack(roots); put {
+			log.Write("engine", "start", "engine",
+				"this tree was "+string(was)+" and a new session is bound", Yes(),
+				map[string]any{"was": string(was), "now": string(Bound)})
+		}
+	}
+
 	// A BATTERY THAT RAN OUTSIDE THE ENGINE IS REPORTED HERE. It is started
 	// detached, because it replaces the engine that started it, so the process
 	// that would have waited for its answer is gone by the time there is one.

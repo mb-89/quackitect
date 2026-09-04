@@ -48,8 +48,7 @@ A summary is your reading of what was said, and the record is for the saying.
 ## 3. A stop the engine knows about
 
 Which stops are sanctioned is the engine's, and it says so when it refuses one.
-A refused stop is not permission to carry on.
-It says the reason was missing, so name one or keep working.
+A refused stop is not permission to carry on: the reason was missing, so name one or keep working.
 
 `asked` is the reason for an interrupt, because an interrupt is the person arriving and the engine cannot see them arrive.
 
@@ -58,7 +57,7 @@ It says the reason was missing, so name one or keep working.
 The engine probes the machine and hands you what is there.
 A tool you reached for yourself is one the engine cannot account for.
 On a machine without it the work stops for a reason nobody wrote down.
-Inside the tree, the search tool is the index, which is rule 8.
+Inside the tree the search tool is the index, rule 8.
 Outside it, `rg` is what the probe hands over when it is here.
 
 ## 5. The write says which work it is
@@ -77,7 +76,6 @@ The engine cannot read a command and know whether it writes.
 `sed -i`, a redirection, `mv`, `rm` and a script you wrote all reach the filesystem.
 A list of safe programs goes stale the day anybody runs a new one.
 
-So the question is not asked.
 Every command names its work because it could write, the same way every edit does, and the record says which token each one ran under.
 
 Output and errors come back as one stream with the exit code.
@@ -109,7 +107,6 @@ Every test is mapped to the lines it exercises, by running it once under coverag
 Name a test and it runs whether or not your delta reaches it.
 Give a pattern and it narrows the engine's selection, never widens it.
 The whole battery runs when the engine's rules say so, and the answer says why.
-Nobody asks for it.
 `go test`, a check script or the battery run by hand inside the tree are refused and told this door.
 
 ## 10. The plan is in the record
@@ -118,13 +115,13 @@ The harness carries a todo list of its own, and a plan written there lives insid
 It goes when the agent goes, and the person reading the queue never sees what the work was broken into.
 A sub-token says the same thing where everybody reads it.
 The queue hands the parts out before their parent, and the parent cannot close while one is open.
-So the harness's todo tools are refused, and the refusal names the token in your hands to mint under.
+So the harness's todo tools are refused, and the refusal names the token to mint under.
 
 ## 11. One door to the next engine
 
-Windows locks a running program, so replacing the engine was a stop and a start, typed by hand thirty-four times in one day.
-The stop severed the calls in flight and the start began a new log session.
-So a run that asked for the whole battery killed the process it was running in.
+Windows locks a running program, so replacing the engine by hand is a stop and a start.
+The stop severs the calls in flight and the start begins a new log session.
+A run that asked for the whole battery then kills the process it runs in.
 
 `se --swap` is the engine doing it to itself.
 It builds the next one, checks that it answers, waits for the calls in flight, and hands over on the same session.

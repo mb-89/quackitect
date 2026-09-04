@@ -3,8 +3,8 @@
   "mcpServers": {
     "quackitect": {
       "type": "local",
-      "command": "./.bin/se-mcp",
-      "args": ["--method", ".", "--work", "."],
+      "command": "node",
+      "args": ["./util/cage/mcp-lane.mjs", "--method", ".", "--work", "."],
       "tools": ["*"]
     }
   }

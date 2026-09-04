@@ -90,3 +90,40 @@ func TestTheEngineExceptionIsAnchoredToTheProgram(t *testing.T) {
 		}
 	}
 }
+
+// RUNME IS THE ENGINE ON A BOX THAT HAS NOT BUILT ONE.
+//
+// A cloud session cloned this tree, had no .bin and no tool lane, and reached
+// for the one door a clone carries. The exception knew se and se.exe, so
+// ./RUNME.sh --answer was refused by the guard that demands an answer, and
+// ./RUNME.sh stop by the guard that demands a claim. Each guard's only door was
+// held shut by the other, and the session had no legal move at all.
+func TestRunmeIsTheEngineForAGuardsException(t *testing.T) {
+	t.Parallel()
+	for _, c := range []string{
+		`./RUNME.sh --answer "the whole answer"`,
+		"./RUNME.sh stop --because asked --why \"they said so\"",
+		"RUNME.sh pull --actor main",
+		`"C:\Users\x\RUNME.sh" --said "what they typed"`,
+	} {
+		if !runsTheEngine(c) {
+			t.Errorf("this is the engine through the door a clone carries, and it is outside the exception: %s", c)
+		}
+	}
+	// AND THE ANSWER GUARD READS IT AS AN ANSWER, which is the refusal that
+	// cannot otherwise be satisfied.
+	if !runsTheEngineWith(`./RUNME.sh --answer "a sentence"`, "--answer") {
+		t.Error("the guard that demands an answer refuses the command that gives one")
+	}
+	// THE ANCHORING STILL HOLDS. RUNME is the engine, and a second program after
+	// it is still a second program.
+	for _, c := range []string{
+		"echo RUNME.sh",
+		"./RUNME.sh pull --actor main && rm -rf src/engine",
+		"./RUNME.sh pull --help > notes.md",
+	} {
+		if runsTheEngine(c) {
+			t.Errorf("this does not run the engine alone and the gate was skipped for it: %s", c)
+		}
+	}
+}

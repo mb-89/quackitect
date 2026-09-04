@@ -204,6 +204,7 @@ func TheList(reason string) string {
 		"piece, or wanting to say what you did. An update is not a stop. Give it and carry on.\n")
 	b.WriteString("\nSTOPPING FOR ONE OF THOSE? SAY SO ON THE RECORD, then stop again:\n" +
 		"  se_stop {because: \"<which one>\", why: \"<one line>\"}\n" +
+		"  " + theShellDoor("stop --because <which one> --why \"<one line>\"") + "\n" +
 		"Saying it in chat is not enough. Nothing can read chat.\n" +
 		"The claim stands while you are stopped. Do anything and it is gone.")
 	return b.String()

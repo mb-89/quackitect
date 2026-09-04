@@ -163,23 +163,45 @@ const (
 // belong to a write happening right now, in another process over the same tree.
 // An engine handing over passes zero, because it knows it is the one ending and
 // the write it is about to orphan is its own.
+//
+// .se AND THE FOLDERS DIRECTLY UNDER IT. A test run's coverage profile is made
+// in .se/tests, so a sweep of the top level alone left every killed run's
+// profile there. It goes one level and no further: nothing writes a temporary
+// deeper than that, and a walk of the whole tree would reach the index.
 func SweepOrphanedWrites(r Roots, olderThan time.Duration) int {
-	entries, err := os.ReadDir(r.Private())
-	if err != nil {
-		return 0
-	}
 	swept := 0
-	for _, e := range entries {
-		if e.IsDir() || !strings.HasSuffix(e.Name(), ".tmp") {
+	for _, dir := range append([]string{r.Private()}, foldersUnder(r.Private())...) {
+		entries, err := os.ReadDir(dir)
+		if err != nil {
 			continue
 		}
-		info, err := e.Info()
-		if err != nil || time.Since(info.ModTime()) < olderThan {
-			continue
-		}
-		if os.Remove(filepath.Join(r.Private(), e.Name())) == nil {
-			swept++
+		for _, e := range entries {
+			if e.IsDir() || !strings.HasSuffix(e.Name(), ".tmp") {
+				continue
+			}
+			info, err := e.Info()
+			if err != nil || time.Since(info.ModTime()) < olderThan {
+				continue
+			}
+			if os.Remove(filepath.Join(dir, e.Name())) == nil {
+				swept++
+			}
 		}
 	}
 	return swept
+}
+
+// foldersUnder answers the folders directly inside one, and nothing deeper.
+func foldersUnder(dir string) []string {
+	entries, err := os.ReadDir(dir)
+	if err != nil {
+		return nil
+	}
+	var out []string
+	for _, e := range entries {
+		if e.IsDir() {
+			out = append(out, filepath.Join(dir, e.Name()))
+		}
+	}
+	return out
 }

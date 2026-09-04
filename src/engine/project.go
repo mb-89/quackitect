@@ -170,8 +170,13 @@ func variables(roots Roots) (map[string]string, error) {
 	return map[string]string{
 		"engine": within(roots.Work, filepath.Join(bin, "se")),
 		"mcp":    within(roots.Work, filepath.Join(bin, "se-mcp")),
-		"method": within(roots.Work, roots.Method),
-		"work":   within(roots.Work, roots.Work),
+		// THE TOOL LANE IS STARTED THROUGH A FILE GIT CARRIES, and never through
+		// .bin. The harness spawns the MCP server before any hook can install
+		// anything, so a fresh clone answered ENOENT and the session had no lane
+		// and no door. See util/cage/mcp-lane.mjs.
+		"mcplane": within(roots.Work, filepath.Join(roots.Method, "util", "cage", "mcp-lane.mjs")),
+		"method":  within(roots.Work, roots.Method),
+		"work":    within(roots.Work, roots.Work),
 		// THE GUARD'S DOOR, derived from the work root, so the cage can name it
 		// before an engine exists and every engine over this folder binds it.
 		"hooks":        hooksURL(roots),

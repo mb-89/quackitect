@@ -13,13 +13,24 @@ import (
 
 // The extension is linked, never copied. The build renders the tree, and this
 // points the editor at it, so a rebuild needs no second install.
+//
+// BUILDING IT AND LINKING IT ARE TWO THINGS, AND ONLY THE SECOND NEEDS AN
+// EDITOR. Both sat in one function that ran on the desktop profile alone, so a
+// headless box never ran npm install and src/extension/node_modules was never
+// made. Four checks bundle the extension's TypeScript with the esbuild in that
+// folder, and on a fresh Linux clone all four failed with ERR_MODULE_NOT_FOUND
+// before they read a line of the tree. The dependencies are the battery's, so
+// every profile installs them; the link into the editor's extensions folder
+// needs an editor, so it stays behind the desktop profile.
 
 func extensionsDir() string { return filepath.Join(homeDir(), ".vscode", "extensions") }
 
-func installExtension(root, id string) error {
+// buildExtension makes the extension's dependencies and renders it. Every
+// profile runs this, because the checks read what it makes.
+func buildExtension(root string) error {
 	src := filepath.Join(root, "src", "extension")
 	if *dry {
-		say("  editor   the extension would be built and linked from %s", src)
+		say("  build    the extension would be built in %s", src)
 		return nil
 	}
 	say("  build    the extension")
@@ -29,7 +40,16 @@ func installExtension(root, id string) error {
 	if err := runIn(src, "npm", "run", "build"); err != nil {
 		return fmt.Errorf("building the extension failed: %w", err)
 	}
+	return nil
+}
 
+// linkExtension points the editor at the folder buildExtension rendered.
+func linkExtension(root, id string) error {
+	src := filepath.Join(root, "src", "extension")
+	if *dry {
+		say("  editor   the extension would be linked from %s", src)
+		return nil
+	}
 	dest := filepath.Join(extensionsDir(), id+"."+id+"-0.1.0")
 	if err := os.MkdirAll(extensionsDir(), 0o755); err != nil {
 		return err

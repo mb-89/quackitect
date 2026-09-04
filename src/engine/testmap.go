@@ -348,7 +348,9 @@ func buildEnv() []string {
 // uses the one this engine is, and a per-test run costs the test and not a
 // link.
 func runOneGoTest(r Roots, bin string, t aTest) (ok bool, said string, took time.Duration, regions []region, err error) {
-	profile, err := os.CreateTemp(r.Private("tests"), "profile.*.out")
+	// IT ENDS .tmp SO THE SWEEP KNOWS IT. The remove below is deferred, and a
+	// run that is killed left a zero-byte profile in .se/tests for ever.
+	profile, err := os.CreateTemp(r.Private("tests"), "profile.*.out.tmp")
 	if err != nil {
 		return false, "", 0, nil, err
 	}

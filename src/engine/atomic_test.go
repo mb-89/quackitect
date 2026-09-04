@@ -3,8 +3,10 @@ package main
 import (
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"testing"
+	"time"
 )
 
 // A WRITE THAT FAILS LEAVES WHAT WAS THERE, RATHER THAN NOTHING.
@@ -74,6 +76,100 @@ func TestAWriteReplacesTheWholeFile(t *testing.T) {
 		if string(b) != want {
 			t.Errorf("it reads %q where %q was written", b, want)
 		}
+	}
+}
+
+// EVERY TEMPORARY THE ENGINE LEAVES UNDER .se IS SWEPT, AND ONE SUFFIX SAYS
+// WHICH ONES THEY ARE.
+//
+// The sweep took names ending .tmp, which is what writeAtomic makes. Snapshot
+// and Publish build a temporary git index with os.CreateTemp under
+// "snapshot.*.index" and "claim.*.index", and a process killed before its
+// deferred remove left one in .se for ever. A swap kills the engine on purpose,
+// so this is the ordinary case and not the rare one.
+//
+// THE PATTERNS ARE READ OUT OF THE SOURCE, not typed here. A third temporary
+// added under a fourth suffix is the same defect coming back, and a list in this
+// file would go on passing over it.
+func TestEveryTemporaryTheEngineMakesIsSwept(t *testing.T) {
+	t.Parallel()
+	dir := t.TempDir()
+	r := Roots{Method: dir, Work: dir}
+	if err := os.MkdirAll(r.Private(), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	// EVERY LITERAL PATTERN THIS PACKAGE HANDS os.CreateTemp. writeAtomic builds
+	// its own from the file it is replacing, so its suffix is written in beside
+	// them rather than read: the sweep has to take that one too.
+	patterns := map[string]string{"state.json.*.tmp": "atomic.go"}
+	here, err := os.ReadDir(".")
+	if err != nil {
+		t.Fatal(err)
+	}
+	literal := regexp.MustCompile(`os\.CreateTemp\([^,]+,\s*"([^"]+)"`)
+	for _, e := range here {
+		if e.IsDir() || !strings.HasSuffix(e.Name(), ".go") {
+			continue
+		}
+		b, err := os.ReadFile(e.Name())
+		if err != nil {
+			t.Fatal(err)
+		}
+		for _, m := range literal.FindAllStringSubmatch(string(b), -1) {
+			patterns[m[1]] = e.Name()
+		}
+	}
+	if len(patterns) < 3 {
+		t.Fatalf("%d temporary patterns were found, and this package writes at least three", len(patterns))
+	}
+	// EACH ONE IS PUT IN .se AND IN A FOLDER UNDER IT, because a coverage
+	// profile is made in .se/tests and a sweep of the top level alone missed it.
+	under := r.Private("tests")
+	if err := os.MkdirAll(under, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	for pattern, where := range patterns {
+		for _, at := range []string{r.Private(), under} {
+			f, err := os.CreateTemp(at, pattern)
+			if err != nil {
+				t.Fatal(err)
+			}
+			f.Close()
+			if SweepOrphanedWrites(r, 0) == 0 {
+				t.Errorf("%s makes %q in %s and the sweep left it behind, so a killed "+
+					"process leaves it there for ever", where, pattern, at)
+			}
+			left, err := os.ReadDir(at)
+			if err != nil {
+				t.Fatal(err)
+			}
+			for _, e := range left {
+				if e.IsDir() {
+					continue
+				}
+				t.Errorf("%s was left in %s after the sweep, from %q", e.Name(), at, pattern)
+				_ = os.Remove(filepath.Join(at, e.Name()))
+			}
+		}
+	}
+}
+
+// AND A TEMPORARY YOUNGER THAN THE AGE IT IS GIVEN IS LEFT ALONE, because it
+// may belong to a write happening now in another process over the same tree.
+func TestASweepLeavesAWriteThatMayStillBeGoing(t *testing.T) {
+	t.Parallel()
+	dir := t.TempDir()
+	r := Roots{Method: dir, Work: dir}
+	if err := os.MkdirAll(r.Private(), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	f, err := os.CreateTemp(r.Private(), "snapshot.*.index.tmp")
+	if err != nil {
+		t.Fatal(err)
+	}
+	f.Close()
+	if swept := SweepOrphanedWrites(r, time.Minute); swept != 0 {
+		t.Errorf("a temporary written a moment ago was swept, and %d went", swept)
 	}
 }
 
