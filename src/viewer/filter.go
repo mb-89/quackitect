@@ -372,10 +372,10 @@ stays on screen, and the line below the list says which of the two it is.
 
 KEYS
 
-  up down        move the selection, or scroll the pane that has focus
+  up down        move the selection, or scroll the details when shown
+  w s            move the selection while the details are shown
   page up down   move a screen at a time
   home end       first line, newest line
-  tab            move focus between the list and the details
   ctrl+d         open the details, and close them again
   esc            clear the filter
   ctrl+c         quit

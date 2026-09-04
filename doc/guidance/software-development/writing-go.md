@@ -1,8 +1,8 @@
 ---
 kind: [[guidance]]
 scope: ["every agent or person writing or changing Go source"]
-out_of_scope: ["a beginner's introduction to Go", "the structure, which is [[shape-of-a-program]]", "the craft of a change, which is [[writing-software]]"]
-depends_on: ["[[writing-software]]", "[[shape-of-a-program]]"]
+out_of_scope: ["a beginner's introduction to Go", "the structure, which is [[shape-of-a-program]]", "the craft of a change, which is [[writing-software]]", "what a test depends on, which is [[testing]]"]
+depends_on: ["[[writing-software]]", "[[shape-of-a-program]]", "[[testing]]"]
 ---
 
 # Motivation

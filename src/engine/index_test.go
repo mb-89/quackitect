@@ -7,6 +7,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/fsnotify/fsnotify"
 )
 
 // THE INDEX IS BUILT FROM THE TREE, AND THE TREE STAYS THE TRUTH.
@@ -262,22 +264,12 @@ func TestAnIndexFromAnotherTreeIsRebuilt(t *testing.T) {
 func TestTheWatcherKeepsTheIndexInStep(t *testing.T) {
 	t.Parallel()
 	r := aTreeToIndex(t)
-	if err := os.MkdirAll(r.Private("log"), 0o755); err != nil {
-		t.Fatal(err)
-	}
-	log, err := OpenLog(r.Private("log"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer log.Close()
-	stop, _, _ := StartIndexer(r, log, 50*time.Millisecond)
-	defer stop()
+	fed, _ := aFedDaemon(t, r, true)
 
 	// THE INDEX IS FRESH ONCE THE DAEMON HAS BUILT IT AND HEARD ITS COOKIE.
-	waitFor(t, func() bool {
-		_, _, trusted := privateCopyInIndex(r, "anything")
-		return trusted
-	}, "the index to be trusted")
+	if _, _, trusted := privateCopyInIndex(r, "anything"); !trusted {
+		t.Fatal("the index is not trusted after the first scan and a heard cookie")
+	}
 
 	// A FILE WRITTEN BY SOMEBODY ELSE, WITH NO SYNC CALL, ARRIVES BY EVENT.
 	three := filepath.Join(r.Work, ".se", "work", "wk-three.md")
@@ -285,19 +277,19 @@ func TestTheWatcherKeepsTheIndexInStep(t *testing.T) {
 	if err := os.WriteFile(three, []byte(text), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	waitFor(t, func() bool {
-		_, found, _ := privateCopyInIndex(r, text)
-		return found
-	}, "the hand-written note to be indexed")
+	fed.feed(three, fsnotify.Create)
+	if _, found, _ := privateCopyInIndex(r, text); !found {
+		t.Fatal("the hand-written note is not in the index after its event")
+	}
 
 	// AND A FILE THAT GOES, GOES.
 	if err := os.Remove(three); err != nil {
 		t.Fatal(err)
 	}
-	waitFor(t, func() bool {
-		_, found, _ := privateCopyInIndex(r, text)
-		return !found
-	}, "the removed note to be dropped")
+	fed.feed(three, fsnotify.Remove)
+	if _, found, _ := privateCopyInIndex(r, text); found {
+		t.Fatal("the removed note is still in the index after its event")
+	}
 }
 
 // markFresh says what the daemon says every tick, so a reader trusts the
@@ -310,18 +302,4 @@ func markFresh(t *testing.T, db *sql.DB) {
 	if err := setMeta(db, "beat", beatAt(time.Now())); err != nil {
 		t.Fatal(err)
 	}
-}
-
-// waitFor polls a condition with a bound, because the watcher delivers on
-// its own clock and a test that waits for ever is a test nobody runs.
-func waitFor(t *testing.T, ok func() bool, what string) {
-	t.Helper()
-	deadline := time.Now().Add(5 * time.Second)
-	for time.Now().Before(deadline) {
-		if ok() {
-			return
-		}
-		time.Sleep(20 * time.Millisecond)
-	}
-	t.Fatalf("waited five seconds for %s", what)
 }

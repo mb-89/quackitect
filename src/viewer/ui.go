@@ -11,13 +11,6 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-type focus int
-
-const (
-	focusList focus = iota
-	focusDetail
-)
-
 type model struct {
 	path string
 
@@ -28,7 +21,6 @@ type model struct {
 	onFilter bool  // the selection is on the filter line, which is a row like any other
 	top      int   // first visible row of the list
 	follow   bool  // true while the selection sits on the newest line
-	focus    focus
 	details  bool
 
 	helping   bool // the pane is showing the filter language rather than a record
@@ -221,8 +213,6 @@ func (m *model) toggleDetails() {
 	m.detail.Height = max(3, m.h-4)
 	if m.details {
 		m.loadDetail()
-	} else {
-		m.focus = focusList
 	}
 	m.clampTop()
 }
@@ -369,21 +359,17 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.toggleDetails()
 			return m, nil
 
-		case tea.KeyTab:
-			if m.details {
-				if m.focus == focusList {
-					m.focus = focusDetail
-				} else {
-					m.focus = focusList
-				}
-			}
-			return m, nil
 		case tea.KeyEsc:
 			m.clearAndFollow()
 			return m, nil
 		case tea.KeyUp, tea.KeyDown, tea.KeyPgUp, tea.KeyPgDown, tea.KeyHome, tea.KeyEnd,
 			tea.KeyCtrlP, tea.KeyCtrlN:
-			if m.focus == focusDetail {
+			// THE PANES SHARE THE KEYS RATHER THAN A FOCUS. Shown, the details
+			// take the arrows, w and s step the log lines, and the jump keys
+			// stay the log's, so End always reaches the newest line. Hidden,
+			// every key here is the log's. There is nothing to tab between.
+			if m.details && (msg.Type == tea.KeyUp || msg.Type == tea.KeyDown ||
+				msg.Type == tea.KeyCtrlP || msg.Type == tea.KeyCtrlN) {
 				var cmd tea.Cmd
 				m.detail, cmd = m.detail.Update(msg)
 				return m, cmd
@@ -408,10 +394,32 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		// The same keys, matched by name, for a terminal this build has not
 		// met. Nothing here is reached when the types above matched.
 		switch msg.String() {
+		case "w":
+			// The log's own key while the details hold the arrows. Hidden,
+			// it falls out of the switch and is filter input like any letter.
+			if m.details {
+				m.moveSel(-1)
+				return m, nil
+			}
+		case "s":
+			if m.details {
+				m.moveSel(1)
+				return m, nil
+			}
 		case "up", "ctrl+p":
+			if m.details {
+				var cmd tea.Cmd
+				m.detail, cmd = m.detail.Update(msg)
+				return m, cmd
+			}
 			m.moveSel(-1)
 			return m, nil
 		case "down", "ctrl+n":
+			if m.details {
+				var cmd tea.Cmd
+				m.detail, cmd = m.detail.Update(msg)
+				return m, cmd
+			}
 			m.moveSel(1)
 			return m, nil
 		case "pgup":
@@ -580,15 +588,11 @@ func (m model) renderStatus(w int) string {
 	if m.follow {
 		follow = "following"
 	}
-	focus := "list"
-	if m.focus == focusDetail {
-		focus = "details"
-	}
 	// A BUILD THAT WAS NEVER STAMPED SAYS NOTHING, so it is not shown. The
 	// word is what a variable holds when nobody set it, and putting it on the
 	// bar asks the reader to work that out.
-	s := fmt.Sprintf("%d of %d  ·  %s  ·  tab focus %s  ·  enter details  ·  esc clear and follow", // · is a separator, not an icon
-		shown, total, follow, focusStyle.Render(focus))
+	s := fmt.Sprintf("%d of %d  ·  %s  ·  enter details  ·  esc clear and follow", // · is a separator, not an icon
+		shown, total, follow)
 	if Build != "unstamped" {
 		s += "  ·  " + Build // · is a separator, not an icon
 	}

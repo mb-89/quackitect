@@ -141,10 +141,11 @@ func TestAReadOverTheClampIsCorrectedNotRefused(t *testing.T) {
 func TestTheSameFailingCallIsRefusedAfterThreeFailures(t *testing.T) {
 	t.Parallel()
 	exe, r := aGuardedTree(t)
-	// A tool the write gate does not stand in front of, so the only refusal
-	// in play is the loop breaker's.
-	call := map[string]any{"cwd": r.Work, "tool_name": "Grep", "agent_id": "helper-1", "tool_use_id": "t1",
-		"tool_input": map[string]any{"pattern": "nothing matches this"}}
+	// A tool no other guard stands in front of, so the only refusal in play
+	// is the loop breaker's. Grep was that tool until the index took over
+	// searching and the search guard stood in front of it.
+	call := map[string]any{"cwd": r.Work, "tool_name": "WebSearch", "agent_id": "helper-1", "tool_use_id": "t1",
+		"tool_input": map[string]any{"query": "nothing matches this"}}
 	for i := 0; i < failuresBeforeRefusal; i++ {
 		if d, _ := decisionOf(t, hookSays(t, exe, r.Method, "PreToolUse", call)); d == "deny" {
 			t.Fatalf("failure %d was refused before it happened", i+1)
@@ -156,8 +157,8 @@ func TestTheSameFailingCallIsRefusedAfterThreeFailures(t *testing.T) {
 		t.Fatalf("the fourth try was answered %q: %v", d, out)
 	}
 	// A DIFFERENT CALL IS NOT THE LOOP.
-	other := map[string]any{"cwd": r.Work, "tool_name": "Grep", "agent_id": "helper-1", "tool_use_id": "t2",
-		"tool_input": map[string]any{"pattern": "something else"}}
+	other := map[string]any{"cwd": r.Work, "tool_name": "WebSearch", "agent_id": "helper-1", "tool_use_id": "t2",
+		"tool_input": map[string]any{"query": "something else"}}
 	if d, _ := decisionOf(t, hookSays(t, exe, r.Method, "PreToolUse", other)); d == "deny" {
 		t.Fatal("a different call was refused as the loop")
 	}
@@ -172,6 +173,9 @@ func TestARefusedStopRelentsBeforeTheHarnessOverridesIt(t *testing.T) {
 	t.Parallel()
 	exe, r := aGuardedTree(t)
 	stop := map[string]any{"cwd": r.Work, "agent_id": "helper-1"}
+	// The first stop of the session is granted, so it is spent before the
+	// refusals under test are counted.
+	hookSays(t, exe, r.Method, "Stop", stop)
 	for i := 1; i < stopRefusalsBeforeRelenting; i++ {
 		d, _ := decisionOf(t, hookSays(t, exe, r.Method, "Stop", stop))
 		if d != "block" {
@@ -243,6 +247,80 @@ func TestAHelperReturningWhatItReadIsSentBackToDigest(t *testing.T) {
 	}
 	if said := stop(strings.Repeat("z", 10)); said != "" {
 		t.Fatalf("a short answer after the loop was refused: %s", said)
+	}
+}
+
+// AN EDIT IS A WRITE OF ITS NEW TEXT. The content guards read only the
+// content field, and an Edit arrives as old_string and new_string, so what an
+// edit wrote walked past every content rule.
+func TestAnEditsNewTextWalksTheContentRules(t *testing.T) {
+	t.Parallel()
+	exe, r := aGuardedTree(t)
+	edit := map[string]any{"cwd": r.Work, "tool_name": "Edit", "agent_id": "helper-1",
+		"tool_input": map[string]any{"file_path": filepath.Join(r.Work, "doc", "note.md"),
+			"old_string": "one thing", "new_string": "This is one thing; this is another.\n"}}
+	d, out := decisionOf(t, hookSays(t, exe, r.Method, "PreToolUse", edit))
+	why, _ := out["permissionDecisionReason"].(string)
+	if d != "deny" || !strings.Contains(why, "no semicolon") {
+		t.Fatalf("an edit putting in a semicolon was answered %q without naming the rule: %v", d, out)
+	}
+}
+
+// THE MAP AND THE PAYLOAD SHAPES MOVE TOGETHER. A tool declared as writing
+// whose payload yields no text is a tool whose writes skip every content
+// rule, which is how the Edit hole opened. This walks the declaration.
+func TestEveryWritingToolsPayloadYieldsItsText(t *testing.T) {
+	t.Parallel()
+	shapes := map[string]string{
+		"Write":        `{"file_path":"a.md","content":"the text"}`,
+		"Edit":         `{"file_path":"a.md","old_string":"x","new_string":"the text"}`,
+		"MultiEdit":    `{"file_path":"a.md","edits":[{"old_string":"x","new_string":"the"},{"old_string":"y","new_string":"text"}]}`,
+		"NotebookEdit": `{"notebook_path":"a.ipynb","new_source":"the text"}`,
+	}
+	for tool := range writesTools {
+		shape, ok := shapes[tool]
+		if !ok {
+			t.Errorf("%s writes and this table has no payload for it, so what it writes is invisible to the guards", tool)
+			continue
+		}
+		var ti toolInput
+		if err := json.Unmarshal([]byte(shape), &ti); err != nil {
+			t.Fatal(err)
+		}
+		if got := ti.writtenText(); !strings.Contains(got, "the") || !strings.Contains(got, "text") {
+			t.Errorf("%s's payload yields %q, so what it writes walks no content rule", tool, got)
+		}
+	}
+}
+
+// AND SO IS EVERY MEMBER OF A MULTI-EDIT, not only the first. A private
+// original leaving in the second member is the original leaving.
+func TestAPrivatePassageDoesNotTravelThroughAMultiEdit(t *testing.T) {
+	t.Parallel()
+	exe, r := aGuardedTree(t)
+	private := strings.Repeat("this is a line of private material that nobody has cleaned up yet\n", 5)
+	os.MkdirAll(r.Private("work"), 0o755)
+	os.WriteFile(r.Private("work", "wk-private.md"), []byte("---\nkind: [[work-token]]\ntitle: private\n---\n\n"+private), 0o644)
+	db, err := openIndex(r)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := Reindex(r, db); err != nil {
+		t.Fatal(err)
+	}
+	markFresh(t, db)
+	db.Close()
+
+	d, out := decisionOf(t, hookSays(t, exe, r.Method, "PreToolUse", map[string]any{"cwd": r.Work,
+		"tool_name": "MultiEdit", "agent_id": "helper-1",
+		"tool_input": map[string]any{"file_path": filepath.Join(r.Work, "doc", "note.md"),
+			"edits": []map[string]any{
+				{"old_string": "a", "new_string": "A heading nobody minds.\n"},
+				{"old_string": "b", "new_string": private},
+			}}}))
+	why, _ := out["permissionDecisionReason"].(string)
+	if d != "deny" || !strings.Contains(why, "wk-private.md") {
+		t.Fatalf("a pasted passage in a multi-edit was answered %q without naming the original: %v", d, out)
 	}
 }
 

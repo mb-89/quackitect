@@ -1,7 +1,7 @@
 ---
 kind: [[guidance]]
 scope: ["every agent or person making a change to source code in this tree, in any language"]
-out_of_scope: ["a beginner's introduction", "program structure, which is [[shape-of-a-program]]", "what to build, which the token says", "language rules, which are [[writing-go]]"]
+out_of_scope: ["a beginner's introduction", "program structure, which is [[shape-of-a-program]]", "what to build, which the token says", "language rules, which are [[writing-go]]", "checks and tests, which are [[testing]]"]
 depends_on: ["[[voice]]", "[[work-token]]", "[[shape-of-a-program]]"]
 ---
 
@@ -21,16 +21,13 @@ This is craft guidance, read when changing code, and it is not part of the stand
 3. Define the error out of existence first. Otherwise return it with what the caller lacks. Never mask one with a default. *
 4. A comment says the why, the invariant and the trap. The doc comment is the contract. The incident goes in the commit. *
 5. Least mechanism: the language, then the standard library, then what the tree imports, then a dependency, with the choice written where made. *
-6. Check at the surface the token names. A check of the code's own output proves the output, and an agent delivers what is checked. *
-7. For a pure function, state the property and generate the inputs. One property finds about fifty times the defects of one example. *
-8. Fix the defect where it is, and add the case the check missed before the fix, so the check goes red once.
-9. Delete dead code and the helper that outlived its test, in the same change that found them. *
-10. Write the interface first and put it in the token. An interface is a decision, an implementation is work.
-11. Cut a change as a vertical slice through every layer, so the integration risk is met first and once.
-12. Keep every change small enough to review whole, and leave the tree green at each commit, cleanup included.
-13. One name per thing, the glossary's, in code and prose. A numbered or suffixed name is a name not yet found.
-14. Do the cleanup the change reveals in the same change. Refactoring is not a separate token unless it is large. *
-15. A test's engine, tree or database is a fixture: made once, shared, torn down once. Building one per test measures the linker. *
+6. Fix the defect where it is, never in the caller that meets it. *
+7. Delete dead code and the helper that outlived its test, in the same change that found them. *
+8. Write the interface first and put it in the token. An interface is a decision, an implementation is work.
+9. Cut a change as a vertical slice through every layer, so the integration risk is met first and once.
+10. Keep every change small enough to review whole, and leave the tree green at each commit, cleanup included.
+11. One name per thing, the glossary's, in code and prose. A numbered or suffixed name is a name not yet found.
+12. Do the cleanup the change reveals in the same change. Refactoring is not a separate token unless it is large. *
 
 # Discussion
 
@@ -71,44 +68,22 @@ A hand-written reader of a format somebody else owns covers the cases seen so fa
 A dependency is a thing to vet and to carry, so the choice is a design decision and is written where it is made.
 Hickey's test applies to both sides: does this braid two things together that were separate.
 
-## 6. Building to the test
+## 6. Fix in the caller
 
-A 2026 study gave two agents a hidden test suite and watched them.
-With the tests visible the scores went to near perfect, and the feature the user would meet was left dead.
-An agent delivers what is checked, so the check reads the command a person would run or the file a person would open.
-Fowler calls these sensors, and a sensor on the wrong surface reads clean while the product is wrong.
+A consumer misreads a shape, and the producer is changed to stop emitting it.
+The symptom goes and the defect stays, reachable by every other producer, including a person with an editor.
+The fix goes where the misreading is, and the case that exposed it goes into the test first, so the test goes red once.
 
-## 7. Properties
-
-An empirical evaluation over forty projects: a property-based test finds about fifty times the mutants of a unit test.
-A property is the invariant the core promises: a round trip, an order preserved, a total that matches, an idempotent second call.
-The core is pure, so the inputs can be generated, and the shrinker hands back the smallest failing case.
-Examples still hold the known regressions, and the property holds the space between them.
-
-## 9. Dead code
+## 7. Dead code
 
 GitClear: refactoring fell from 21 percent of changed lines to under 4, and maintenance of old code fell 74 percent.
 Code with no caller is read by every reviewer and compiled by every build, and it guards nothing.
 A test helper with no test is the same, and it survives longer because nothing counts it.
 Version control remembers both, so deletion costs nothing and is done on sight.
 
-## 14. Cleanup in the change
+## 12. Cleanup in the change
 
 The Google guide's rule for deviations: a change may not worsen an existing problem, and the cleanup goes in the same change.
 Deferred cleanup is the debt TigerBeetle refuses: a problem solved in design costs one unit, in production exponentially more.
 A change that reveals a duplicate, a dead branch or a missing type fixes it there.
 A cleanup too large for the change becomes a token, minted before the change closes.
-
-## 15. Fixtures
-
-The engine suite once built the engine thirty-five times, and the battery
-once fifteen, and each build was the same bytes.
-A build is a fixture: made once in TestMain or in the battery's first step,
-named to everything after it, and taken away once at the end.
-The same holds for a tree, a running engine, a database: a test that needs
-one starts from a helper that makes it, and the helper is the one place the
-making is written.
-A check that starts its own copy of what a fixture already holds is a check
-measuring the cost of starting, not the thing it was written for.
-The battery reports how long each check took, so a fixture that stopped being
-shared shows as a lane that grew.

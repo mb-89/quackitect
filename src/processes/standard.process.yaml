@@ -1,0 +1,104 @@
+name: standard
+description: a change large enough to want an approach first and a second pair of eyes after, and small enough to review whole
+
+traced: true
+
+sections:
+  required:
+    - detail
+    - approach
+    - done when
+  optional:
+    - proposed action
+    - note
+    - "evidence: "
+
+fields:
+  optional:
+    - bucket
+    - holder
+    - author
+    - needs_human
+    - depends_on
+    - parent
+    - ready_when
+    - began
+    - ended
+    - disposition
+    - reason
+    - successors
+
+states:
+  - name: open
+    description: written with its approach, and waiting to be taken
+  - name: done
+    description: the change is in the tree and tested, and a verdict is owed
+  - name: closed
+    description: closed, and the disposition says how
+
+activities:
+  - name: ask
+    supplier: anyone
+    input: a change too large for trivial and small enough to review whole
+    does: write what is asked, the approach, and what done means, one criterion per line
+    output: a token
+    customer: the queue
+    by: anyone
+    to: open
+    criteria:
+      - says: the approach is on the token before any work, as an interface or a shape a reader can disagree with
+        evidence: required
+      - says: every done-when line is decidable, and names the command where one decides it
+        evidence: required
+      - says: the change is small enough to review whole, or it is split first
+      - says: the basics it stands on exist, or are minted first
+
+  - name: do
+    supplier: the queue
+    input: an open token
+    does: make the change with its tests, hand the engine the delta to test, and write the note
+    output: the change in the tree, the engine's test answer, and a note for a reader
+    customer: the reviewer
+    by: the agent that took it
+    role: worker
+    from: open
+    to: done
+    criteria:
+      - says: the guidance this token names was read and applied
+      - says: the change follows the approach on the token, or the token says why it departed
+        evidence: required
+      - says: se test --on this token answered ok, and what it ran is named
+        evidence: required
+      - says: the note says what changed and why, for a reader who was not here
+        evidence: required
+      - says: the cleanup the change revealed is in the change, or is a token of its own
+
+  - name: verdict
+    supplier: the queue
+    input: a done token, its diff, its criteria and its note
+    does: read every hunk, run every criterion, and say whether each part improves the product. How a reviewer works is [[reviewing]]. Your verdict blocks nothing: you give it once, the token closes on it, and every finding you have is a trivial token you mint naming this one.
+    output: a verdict, and a trivial token per finding
+    customer: whoever asked
+    by: a reviewer, never the author
+    role: reviewer
+    from: done
+    to: closed
+    criteria:
+      - says: "[[reviewing]] was read and applied"
+      - says: every hunk of git diff began..ended was read, and any not read is named
+        evidence: required
+      - says: every criterion's command was run again, and what it said is named
+        evidence: required
+      - says: every hunk improves the product, or a finding names the one that does not
+        evidence: required
+      - says: every finding is a trivial token naming this one, and their ids are here
+        evidence: required
+
+dispositions:
+  - name: done
+    description: the change is in the tree and the verdict is given
+  - name: became
+    description: it turned out larger, and the successors carry it
+  - name: dropped
+    description: it is not wanted after all
+    reason: required

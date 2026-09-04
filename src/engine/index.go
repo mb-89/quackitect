@@ -44,7 +44,7 @@ import (
 
 // indexSchema is the shape of the tables. A database carrying another number
 // is dropped and rebuilt, so a change here needs no migration.
-const indexSchema = 2
+const indexSchema = 4
 
 // indexFileLimit is the largest file that is hashed. A file above it is
 // recorded with no hash, so it matches nothing: a write that large is not
@@ -96,7 +96,13 @@ CREATE TABLE IF NOT EXISTS passage (
 CREATE INDEX IF NOT EXISTS passage_hash ON passage (hash);
 CREATE INDEX IF NOT EXISTS passage_path ON passage (path);
 CREATE VIRTUAL TABLE IF NOT EXISTS note_text USING fts5 (path UNINDEXED, id, body);
+CREATE VIRTUAL TABLE IF NOT EXISTS line_text USING fts5 (path UNINDEXED, n UNINDEXED, text);
 `
+
+// EVERY LINE OF EVERY TEXT FILE IS IN line_text, so a search over the tree is
+// a question to the index and never a walk over the disk. It is one table
+// and one copy: FTS5 keeps the text it indexes, answers MATCH over it, and
+// answers a plain SELECT off the same rows, which is what a regex scans.
 
 // A PASSAGE IS A RUN OF LINES COPIED WHOLE. The private folder holds notes
 // nobody cleaned up, and what must not cross into the shareable side is a
@@ -179,7 +185,7 @@ func indexDSN(p string, readOnly bool) string {
 }
 
 func ensureIndexShape(db *sql.DB, r Roots) error {
-	if _, err := db.Exec(indexTables); err != nil {
+	if _, err := db.Exec(indexTables + testTables); err != nil {
 		if strings.Contains(err.Error(), ftsMissing) {
 			return fmt.Errorf("this engine was built without the sqlite_fts5 tag, so the index cannot be made. " +
 				"Build with the environment in the installer's cgo.env, which sets GOFLAGS")
@@ -194,12 +200,12 @@ func ensureIndexShape(db *sql.DB, r Roots) error {
 	}
 	// A DATABASE FROM ANOTHER SHAPE OR ANOTHER TREE IS DROPPED, NOT MIGRATED.
 	// It is a cache, so the cost of being wrong is a rebuild and nothing else.
-	for _, t := range []string{"file", "note", "link", "note_text", "passage", "meta"} {
+	for _, t := range []string{"file", "note", "link", "note_text", "line_text", "passage", "test", "test_region", "meta"} {
 		if _, err := db.Exec("DROP TABLE IF EXISTS " + t); err != nil {
 			return err
 		}
 	}
-	if _, err := db.Exec(indexTables); err != nil {
+	if _, err := db.Exec(indexTables + testTables); err != nil {
 		return err
 	}
 	if err := setMeta(db, "schema", want); err != nil {
@@ -383,13 +389,21 @@ func indexOne(db *sql.DB, r Roots, abs, rel string, info os.FileInfo) error {
 		return err
 	}
 	for _, q := range []string{"DELETE FROM note WHERE path = ?", "DELETE FROM link WHERE from_path = ?",
-		"DELETE FROM note_text WHERE path = ?", "DELETE FROM passage WHERE path = ?"} {
+		"DELETE FROM note_text WHERE path = ?", "DELETE FROM line_text WHERE path = ?",
+		"DELETE FROM passage WHERE path = ?"} {
 		if _, err := tx.Exec(q, rel); err != nil {
 			return err
 		}
 	}
 	if strings.HasSuffix(rel, ".md") && text != nil {
 		if err := indexNote(tx, rel, string(text)); err != nil {
+			return err
+		}
+	}
+	// EVERY LINE OF A TEXT FILE, numbered from one, so a search answers the
+	// line a person opens the file at.
+	if text != nil && isText(text) {
+		if err := indexLines(tx, rel, string(text)); err != nil {
 			return err
 		}
 	}
@@ -423,10 +437,25 @@ func isText(b []byte) bool {
 	return true
 }
 
+// indexLines writes one row per line of a text file.
+func indexLines(tx *sql.Tx, rel, text string) error {
+	stmt, err := tx.Prepare("INSERT INTO line_text (path, n, text) VALUES (?, ?, ?)")
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+	for i, line := range strings.Split(strings.TrimSuffix(text, "\n"), "\n") {
+		if _, err := stmt.Exec(rel, i+1, strings.TrimSuffix(line, "\r")); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func dropOne(db *sql.DB, rel string) error {
 	for _, q := range []string{"DELETE FROM file WHERE path = ?", "DELETE FROM note WHERE path = ?",
 		"DELETE FROM link WHERE from_path = ?", "DELETE FROM note_text WHERE path = ?",
-		"DELETE FROM passage WHERE path = ?"} {
+		"DELETE FROM line_text WHERE path = ?", "DELETE FROM passage WHERE path = ?"} {
 		if _, err := db.Exec(q, rel); err != nil {
 			return err
 		}

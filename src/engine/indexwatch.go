@@ -5,6 +5,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/fsnotify/fsnotify"
@@ -26,6 +27,63 @@ import (
 // cookieBudget is how long the watcher has to report the cookie.
 const cookieBudget = 2 * time.Second
 
+// A WATCHER IS WHAT TELLS THE INDEXER A PATH CHANGED. The real one is
+// fsnotify, and it delivers on the operating system's clock. A test feeds
+// one by hand, so the test decides what arrives and in what order, and no
+// test waits on a clock for the tree to be noticed. The one timed thing,
+// hearing the cookie, is behind the same door: the real watcher waits for
+// it at every start and says whether it came, and a fed one says what the
+// test told it to.
+type watcher interface {
+	Events() <-chan fsnotify.Event
+	Errors() <-chan error
+	Watch(path string) error
+	// Hears says whether the watcher reports a file written at path. The
+	// real watcher writes it and waits; that wait is the daemon's own
+	// self-check at start, and the battery reads its result off the engine.
+	Hears(cookie string) bool
+	Close() error
+}
+
+// fsWatcher is the operating system's watcher.
+type fsWatcher struct{ w *fsnotify.Watcher }
+
+func openFSWatcher() (watcher, error) {
+	w, err := fsnotify.NewBufferedWatcher(4096)
+	if err != nil {
+		return nil, err
+	}
+	return fsWatcher{w}, nil
+}
+
+func (f fsWatcher) Events() <-chan fsnotify.Event { return f.w.Events }
+func (f fsWatcher) Errors() <-chan error          { return f.w.Errors }
+func (f fsWatcher) Close() error                  { return f.w.Close() }
+func (f fsWatcher) Watch(path string) error {
+	return f.w.AddWith(path, fsnotify.WithBufferSize(watchBuffer))
+}
+
+// Hears writes the cookie and waits for the watcher to report it. The
+// cookie is removed either way.
+func (f fsWatcher) Hears(cookie string) bool {
+	defer os.Remove(cookie)
+	if err := os.WriteFile(cookie, []byte(time.Now().String()), 0o644); err != nil {
+		return false
+	}
+	deadline := time.After(cookieBudget)
+	for {
+		select {
+		case ev := <-f.w.Events:
+			if filepath.Clean(ev.Name) == filepath.Clean(cookie) {
+				return true
+			}
+		case <-f.w.Errors:
+		case <-deadline:
+			return false
+		}
+	}
+}
+
 // watchBuffer is the size of the buffer the watcher reads events into. On
 // Windows a full buffer is an overflow and the answer is a full scan, so it
 // is set well above the default and an overflow stays rare.
@@ -40,12 +98,26 @@ const watchBuffer = 1 << 20
 // THE SOCKET IS OPEN BEFORE THE SCAN. A client that connects during the
 // first scan is answered from what is indexed so far, with the revision
 // saying so, rather than refused for the length of the scan.
-func StartIndexer(r Roots, log *Log, beat time.Duration) (stop func(), socket string, askedToStop <-chan struct{}) {
+func StartIndexer(r Roots, log *Log, beat time.Duration) (stop func(), socket string, asked Asks) {
+	return startIndexer(r, log, beat, openFSWatcher)
+}
+
+// Asks are what a client can set going over the socket that the engine's own
+// loop has to finish. Both are things the answer to one call cannot do for
+// itself: stopping ends the process that owes the answer, and swapping has to
+// wait for the calls in flight, of which this is one.
+type Asks struct {
+	Stop <-chan struct{}
+	Swap <-chan swapPlan
+}
+
+// startIndexer is StartIndexer with the watcher chosen by the caller.
+func startIndexer(r Roots, log *Log, beat time.Duration, open func() (watcher, error)) (stop func(), socket string, asked Asks) {
 	db, err := openIndex(r)
 	if err != nil {
 		log.Write("engine", "error", "engine", "the index could not be opened, so the engine reads the files", No(),
 			map[string]any{"reason": err.Error()})
-		return func() {}, "", nil
+		return func() {}, "", Asks{}
 	}
 	// THE MODEL ANSWERS ON A READ-ONLY CONNECTION, so a question that arrives
 	// on the socket cannot write, whatever it says.
@@ -54,10 +126,11 @@ func StartIndexer(r Roots, log *Log, beat time.Duration) (stop func(), socket st
 		db.Close()
 		log.Write("engine", "error", "engine", "the index could not be opened read-only", No(),
 			map[string]any{"reason": err.Error()})
-		return func() {}, "", nil
+		return func() {}, "", Asks{}
 	}
-	asked := make(chan struct{}, 1)
-	m := &model{db: ro, roots: r, askedToStop: asked}
+	toStop := make(chan struct{}, 1)
+	toSwap := make(chan swapPlan, 1)
+	m := &model{db: ro, roots: r, askedToStop: toStop, askedToSwap: toSwap}
 	ln, addr, err := listenModel(r)
 	if err != nil {
 		log.Write("engine", "error", "engine", "the model cannot listen, so every reader reads the index file", No(),
@@ -73,7 +146,7 @@ func StartIndexer(r Roots, log *Log, beat time.Duration) (stop func(), socket st
 		defer close(stopped)
 		defer db.Close()
 		defer ro.Close()
-		runIndexer(r, log, beat, done, db, m)
+		runIndexer(r, log, beat, done, db, m, open)
 	}()
 	return func() {
 		close(done)
@@ -82,11 +155,11 @@ func StartIndexer(r Roots, log *Log, beat time.Duration) (stop func(), socket st
 			_ = os.Remove(addr) // the socket file is the engine's, and it is gone with it
 		}
 		<-stopped
-	}, addr, asked
+	}, addr, Asks{Stop: toStop, Swap: toSwap}
 }
 
-func runIndexer(r Roots, log *Log, beat time.Duration, done <-chan struct{}, db *sql.DB, m *model) {
-	w, err := fsnotify.NewBufferedWatcher(4096)
+func runIndexer(r Roots, log *Log, beat time.Duration, done <-chan struct{}, db *sql.DB, m *model, open func() (watcher, error)) {
+	w, err := open()
 	if err != nil {
 		log.Write("engine", "error", "engine", "the tree cannot be watched, so the index is not kept", No(),
 			map[string]any{"reason": err.Error()})
@@ -106,9 +179,15 @@ func runIndexer(r Roots, log *Log, beat time.Duration, done <-chan struct{}, db 
 			map[string]any{"reason": err.Error()})
 		return
 	}
-	watching := hearsTheCookie(w, r)
+	watching := w.Hears(r.Private("index.cookie.tmp"))
 	_ = setMeta(db, "watching", yesNo(watching)) // the beat below says it again every tick
 	_ = setMeta(db, "beat", beatAt(time.Now()))
+	m.watching.Store(watching)
+	m.ready.Store(true)
+	// THE MAP FROM TESTS TO SOURCE IS FILLED IN THE BACKGROUND, one test at
+	// a time, and again whenever a run or a changed test file asks.
+	go mapTests(r, log, done, remap)
+	askToMap()
 	log.Write("engine", "index", "engine", "the index is built and the tree is watched", &watching,
 		map[string]any{"seen": got.Seen, "written": got.Written, "dropped": got.Dropped, "watching": watching})
 	if !watching {
@@ -126,14 +205,17 @@ func runIndexer(r Roots, log *Log, beat time.Duration, done <-chan struct{}, db 
 		case <-ticker.C:
 			_ = setMeta(db, "beat", beatAt(time.Now()))
 			_ = setMeta(db, "watching", yesNo(watching))
-		case ev, ok := <-w.Events:
+		case ev, ok := <-w.Events():
 			if !ok {
 				return
 			}
 			if onEvent(w, r, db, ev) {
 				m.moved()
+				if strings.HasSuffix(ev.Name, "_test.go") || strings.Contains(filepath.ToSlash(ev.Name), "/"+checksDir+"/") {
+					askToMap()
+				}
 			}
-		case err, ok := <-w.Errors:
+		case err, ok := <-w.Errors():
 			if !ok {
 				return
 			}
@@ -155,7 +237,7 @@ func runIndexer(r Roots, log *Log, beat time.Duration, done <-chan struct{}, db 
 // watchTree adds every folder the index covers. The watcher is not
 // recursive, so each folder is added, and a folder made later is added when
 // its creation arrives as an event.
-func watchTree(w *fsnotify.Watcher, r Roots) error {
+func watchTree(w watcher, r Roots) error {
 	return filepath.WalkDir(r.Work, func(abs string, d os.DirEntry, err error) error {
 		if err != nil || !d.IsDir() {
 			return nil
@@ -163,7 +245,7 @@ func watchTree(w *fsnotify.Watcher, r Roots) error {
 		if _, skip := indexRel(r, abs, true); skip {
 			return filepath.SkipDir
 		}
-		return w.AddWith(abs, fsnotify.WithBufferSize(watchBuffer))
+		return w.Watch(abs)
 	})
 }
 
@@ -171,12 +253,12 @@ func watchTree(w *fsnotify.Watcher, r Roots) error {
 // arrives as a remove and a create, and an editor's atomic save as a
 // rename, so what matters is the path and not the kind: the file is
 // re-read, or dropped when it is gone.
-func onEvent(w *fsnotify.Watcher, r Roots, db *sql.DB, ev fsnotify.Event) bool {
+func onEvent(w watcher, r Roots, db *sql.DB, ev fsnotify.Event) bool {
 	info, err := os.Stat(ev.Name)
 	if err == nil && info.IsDir() {
 		if ev.Has(fsnotify.Create) {
 			if _, skip := indexRel(r, ev.Name, true); !skip {
-				_ = w.AddWith(ev.Name, fsnotify.WithBufferSize(watchBuffer)) // a folder it cannot watch is caught by the next scan
+				_ = w.Watch(ev.Name) // a folder it cannot watch is caught by the next scan
 			}
 		}
 		return false
@@ -192,28 +274,6 @@ func onEvent(w *fsnotify.Watcher, r Roots, db *sql.DB, ev fsnotify.Event) bool {
 	_ = indexOne(db, r, ev.Name, rel, info) // a row it cannot write is written by the next scan
 	_ = resolveLinks(db)
 	return true
-}
-
-// hearsTheCookie writes a file under the private folder and waits for the
-// watcher to report it. The cookie is removed either way.
-func hearsTheCookie(w *fsnotify.Watcher, r Roots) bool {
-	cookie := r.Private("index.cookie.tmp")
-	defer os.Remove(cookie)
-	if err := os.WriteFile(cookie, []byte(time.Now().String()), 0o644); err != nil {
-		return false
-	}
-	deadline := time.After(cookieBudget)
-	for {
-		select {
-		case ev := <-w.Events:
-			if filepath.Clean(ev.Name) == filepath.Clean(cookie) {
-				return true
-			}
-		case <-w.Errors:
-		case <-deadline:
-			return false
-		}
-	}
 }
 
 func yesNo(b bool) string {

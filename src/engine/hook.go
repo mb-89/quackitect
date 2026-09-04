@@ -52,6 +52,15 @@ type toolInput struct {
 	Content  string `json:"content"`
 	// NewString is what an Edit puts in, which is a write of that text.
 	NewString string `json:"new_string"`
+	// Actor is the name a lane call acts as: se_pull, se_run and the rest
+	// carry it as a field where a shell command carries it as --actor.
+	Actor string `json:"actor"`
+	// NewSource is what a NotebookEdit puts in a cell, which is a write too.
+	NewSource string `json:"new_source"`
+	// Edits is a MultiEdit's manifest, and every member of it writes.
+	Edits []struct {
+		NewString string `json:"new_string"`
+	} `json:"edits"`
 	// The range a read asked for. Offset is the first line and Limit how
 	// many, and both are zero when the read asked for the whole file.
 	Offset int `json:"offset"`
@@ -60,6 +69,27 @@ type toolInput struct {
 
 // THE TOOLS THAT WRITE A FILE THE HARNESS NAMES, declared once.
 var writesTools = map[string]bool{"Write": true, "Edit": true, "NotebookEdit": true, "MultiEdit": true}
+
+// writtenText is everything a writing tool is about to put on disk, whichever
+// field its shape carries the text in, joined so a guard reads all of it.
+//
+// EVERY MEMBER, NOT THE FIRST. The content guards read only the content
+// field, so an Edit's new_string, a MultiEdit's members and a NotebookEdit's
+// new_source all walked past every content rule.
+func (ti toolInput) writtenText() string {
+	parts := make([]string, 0, 3+len(ti.Edits))
+	for _, s := range []string{ti.Content, ti.NewString, ti.NewSource} {
+		if s != "" {
+			parts = append(parts, s)
+		}
+	}
+	for _, e := range ti.Edits {
+		if e.NewString != "" {
+			parts = append(parts, e.NewString)
+		}
+	}
+	return strings.Join(parts, "\n")
+}
 
 // Deny is the shape Claude Code reads for a tool decision.
 func (g *guard) deny(reason string) {
@@ -329,7 +359,7 @@ func answerHook(raw []byte, args []string, out io.Writer, held *Log) {
 	if work == "" {
 		work, _ = os.Getwd()
 	}
-	roots, err := FindRoots(work)
+	roots, err := FindRoots(work, "")
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "hook:", err)
 		return
@@ -372,7 +402,13 @@ func answerHook(raw []byte, args []string, out io.Writer, held *Log) {
 	// The identity is still the harness's, and it is what everything is keyed
 	// by. The name is what the record shows.
 	if in.Event == "SubagentStart" {
-		NoteAgent(roots, in.AgentID, in.AgentType)
+		NoteAgent(roots, in.AgentID, in.AgentType, in.SessionID)
+	}
+	// WHOEVER IS CALLING IS HERE, whether or not this run saw them arrive.
+	// An end event is the one call that says the opposite, and it is
+	// handled below rather than registered here.
+	if in.Event != "SessionEnd" && in.Event != "SubagentStop" {
+		AgentSeen(roots, in.SessionID, in.AgentID, in.AgentType)
 	}
 	actor := NameOf(roots, in.AgentID)
 
@@ -445,8 +481,17 @@ func answerHook(raw []byte, args []string, out io.Writer, held *Log) {
 	case "PreToolUse":
 		decidePreToolUse(g, roots, cfg, emergency, log, in, actor)
 	case "Stop":
+		// THE TURN ENDED, and its foreground helpers with it.
+		if in.AgentID == "" {
+			HelpersGoneWith(roots, in.SessionID)
+		}
 		decideStop(g, roots, cfg, log, in, actor)
 	case "UserPromptSubmit":
+		// A NEW PROMPT IS A NEW TURN, and the last turn's helpers are gone
+		// with it, interrupted or finished. One still calling comes back.
+		if in.AgentID == "" {
+			HelpersGoneWith(roots, in.SessionID)
+		}
 		// THE PROMPT IS WHAT THEY WROTE, WHOLE. firstLine took the first line
 		// and cut it at two hundred characters, so a person reading the log for
 		// what they said found the beginning of it.
@@ -467,6 +512,10 @@ func answerHook(raw []byte, args []string, out io.Writer, held *Log) {
 		}
 		record(log, "agent", "session", actor, "session started, "+in.Source, Yes(),
 			map[string]any{"source": in.Source, "session": in.SessionID})
+		// THE SESSION IS AN AGENT AND IT HAS ARRIVED. What is present is
+		// answered off this register, so a panel says who is here rather
+		// than who has pulled.
+		NoteSession(roots, in.SessionID)
 		// THE ENGINE IS UP BEFORE THE FIRST CALL, because every call from
 		// here on is answered by it.
 		ensureEngine(roots)
@@ -478,6 +527,7 @@ func answerHook(raw []byte, args []string, out io.Writer, held *Log) {
 			map[string]any{"error_type": orElse(in.ErrorType, "unknown")})
 	case "SessionEnd":
 		record(log, "agent", "session", actor, "session ended", Yes(), nil)
+		AgentsGoneWith(roots, in.SessionID)
 	case "SubagentStart":
 		// Every agent has an identity, and the record says which one acted.
 		record(log, "agent", "helper", actor, "helper started: "+in.AgentType, Yes(),
@@ -501,6 +551,7 @@ func answerHook(raw []byte, args []string, out io.Writer, held *Log) {
 			break
 		}
 		forgetRefusedStops(roots, "helper:"+in.AgentID)
+		AgentGone(roots, in.AgentID)
 		record(log, "agent", "helper", actor, "helper stopped", Yes(), nil)
 	case "PreCompact":
 		// What was read is no longer held, so it is no longer claimed as read.
@@ -588,6 +639,16 @@ func decidePreToolUse(g *guard, roots Roots, cfg Config, emergency Emergency, lo
 		path = ti.Path
 	}
 
+	// THE QUEUE WANTS MORE HANDS, and the main agent is held until it has
+	// spawned them. Every other guard waits behind this one, because a tool
+	// call that is not a spawn is not what the queue is waiting for.
+	if why, refuse := AStaffShortfall(roots, cfg, actor, in.ToolName); refuse {
+		record(log, "engine", "staffing", actor, "refused: the queue wants more hands than are here", No(),
+			map[string]any{"tool": in.ToolName})
+		g.deny(why)
+		return
+	}
+
 	// THE SAME CALL FAILING THE SAME WAY AGAIN IS STOPPED HERE, before the
 	// tokens are spent on it once more.
 	if why, refuse := aRepeatedFailure(roots, actor, in); refuse {
@@ -637,6 +698,50 @@ func decidePreToolUse(g *guard, roots Roots, cfg Config, emergency Emergency, lo
 		}
 	}
 
+	// A SEARCH OVER THE TREE GOES THROUGH THE INDEX. Grep and Glob aimed
+	// inside the tree, and rg or grep run over it, are refused and told the
+	// door: se find answers off the index the engine keeps in step, path,
+	// line and text. Outside the tree the disk is the agent's own.
+	if cfg.SearchViaIndex {
+		if why, refuse := AToolSearchOverTheTree(in.ToolName, path, roots.Work); refuse {
+			record(log, "engine", "search", actor, "refused: a search over the tree, which the index answers", No(),
+				map[string]any{"tool": in.ToolName, "path": path})
+			g.deny(why)
+			return
+		}
+		if ti.Command != "" {
+			if why, refuse := ASearchOverTheTree(ti.Command, roots.Work); refuse {
+				record(log, "engine", "search", actor, "refused: a search over the tree, which the index answers", No(),
+					map[string]any{"tool": in.ToolName})
+				g.deny(why)
+				return
+			}
+		}
+	}
+
+	// THE ENGINE OWNS THE TESTS. A test run by hand inside the tree is
+	// refused and told to hand the engine its delta instead.
+	if cfg.TestsViaEngine && ti.Command != "" {
+		if why, refuse := ATestRunByHand(ti.Command, roots.Work); refuse {
+			record(log, "engine", "tests", actor, "refused: a test run by hand, which the engine decides", No(),
+				map[string]any{"tool": in.ToolName})
+			g.deny(why)
+			return
+		}
+	}
+
+	// AND IT OWNS ITS OWN REPLACEMENT. A build aimed at .bin under a live
+	// engine leaves the running program and the one on disk as two builds,
+	// and the swap door is what does it without severing anything.
+	if cfg.BuildViaEngine && ti.Command != "" {
+		if why, refuse := ABuildRunByHand(ti.Command, roots.Method); refuse {
+			record(log, "engine", "build", actor, "refused: a build aimed at .bin, which the engine does", No(),
+				map[string]any{"tool": in.ToolName})
+			g.deny(why)
+			return
+		}
+	}
+
 	// SEARCH WITH THE TOOL THE PROBE FOUND. It is on this machine, the engine
 	// wrote it down at boot, and the agent went on typing the one its fingers
 	// knew. Every rule an agent is asked to remember is one it forgets, so this
@@ -677,15 +782,18 @@ func decidePreToolUse(g *guard, roots Roots, cfg Config, emergency Emergency, lo
 
 	// Written text is checked against the mechanical form rules. Only those:
 	// pattern and vocabulary are reproducible, and a refusal nobody can
-	// reproduce is an obstacle rather than a rule.
-	if writes[in.ToolName] && isProse(path) && ti.Content != "" {
+	// reproduce is an obstacle rather than a rule. It is the joined text of
+	// whichever shape the tool carries, so an edit's new text walks the same
+	// rules a whole write does.
+	written := ti.writtenText()
+	if writes[in.ToolName] && isProse(path) && written != "" {
 		rules, err := LoadVoiceRules(roots.Method)
 		if err != nil {
 			// The checker cannot run. That is said, loudly, and the write is
 			// allowed: a broken checker must not stop a person from working.
 			record(log, "engine", "error", actor, "the voice rules could not be read", No(),
 				map[string]any{"reason": err.Error()})
-		} else if found := rules.Check(ti.Content); len(found) > 0 {
+		} else if found := rules.Check(written); len(found) > 0 {
 			lines := make([]string, 0, len(found))
 			for _, f := range found {
 				lines = append(lines, "  "+f.String())
@@ -715,12 +823,12 @@ func decidePreToolUse(g *guard, roots Roots, cfg Config, emergency Emergency, lo
 	// A FILE THAT NAMES NO KIND IS NOT A NOTE and is left alone. So is one
 	// whose schema cannot be read: a checker that cannot run must not stop
 	// somebody working, the same as the voice rules above.
-	if writes[in.ToolName] && isProse(path) && ti.Content != "" {
-		if kind := kindOf(ti.Content); kind != "" {
+	if writes[in.ToolName] && isProse(path) && written != "" {
+		if kind := kindOf(written); kind != "" {
 			if schema, err := LoadSchema(roots.Method, kind); err != nil {
 				record(log, "engine", "error", actor, "the schema could not be read", No(),
 					map[string]any{"reason": err.Error(), "kind": kind})
-			} else if found := ValidateNote(schema, ti.Content, roots.Method); len(found) > 0 {
+			} else if found := ValidateNote(schema, written, roots.Method); len(found) > 0 {
 				lines := make([]string, 0, len(found))
 				for _, d := range found {
 					lines = append(lines, fmt.Sprintf("  line %d: %s", d.Line, d.Says))
@@ -738,7 +846,6 @@ func decidePreToolUse(g *guard, roots Roots, cfg Config, emergency Emergency, lo
 
 	// PRIVATE ORIGINALS DO NOT TRAVEL. Digests do. A copy is a hash match, so
 	// this is a comparison and never a judgement about content.
-	written := orElse(ti.Content, ti.NewString)
 	if writes[in.ToolName] && path != "" && written != "" && !underPrivate(roots, path) {
 		if from, yes := copyOfAPrivateOriginal(roots, written); yes {
 			record(log, "engine", "refusal", actor,
@@ -790,9 +897,22 @@ func decidePreToolUse(g *guard, roots Roots, cfg Config, emergency Emergency, lo
 	// agent one thing and the command says what it pulls with, so the guard
 	// writes the link down here and the gate can ask about both.
 	NoteTheNameItPullsWith(roots, actor, ti.Command)
+	if ti.Actor != "" {
+		NoteTheNameItActsAs(roots, actor, ti.Actor)
+	}
 
 	if why, refuse := WriteNeedsAToken(roots, actor, in.ToolName, pathOf(in)); refuse {
 		record(log, "engine", "gate", actor, "refused: it cannot name its token", No(),
+			map[string]any{"tool": in.ToolName})
+		g.deny(why)
+		return
+	}
+
+	// A PLAN IS WORK, AND WORK IS A TOKEN. The harness's list is refused here
+	// rather than in the write gate above, because it writes nothing in the tree
+	// and the refusal has a different thing to say.
+	if why, refuse := TodoIsASubToken(roots, actor, in.ToolName); refuse {
+		record(log, "engine", "gate", actor, "refused: a todo is a sub-token", No(),
 			map[string]any{"tool": in.ToolName})
 		g.deny(why)
 		return
@@ -968,10 +1088,30 @@ func decideStop(g *guard, roots Roots, cfg Config, log *Log, in hookIn, actor st
 		record(log, "agent", "stop", actor, "stopped", Yes(), nil)
 		return
 	}
+	first := firstStopOfSession(roots, actor)
 	if c, ok := StandingClaim(roots, actor); ok {
+		// THE CLAIM IS JUDGED AGAIN AT THE STOP, because the queue moves
+		// between the claim and the stop it covers.
+		if c.Because == "blocked" {
+			if refusal, lied := BlockedIsFalse(roots, actor); lied {
+				record(log, "agent", "stop", actor, "stop refused: blocked is not true", No(),
+					map[string]any{"because": c.Because})
+				g.blockStop("You claimed blocked, and " + refusal)
+				return
+			}
+		}
 		forgetRefusedStops(roots, actor)
 		record(log, "agent", "stop", actor, "stopped: "+c.Because+" — "+c.Why, Yes(),
 			map[string]any{"because": c.Because, "why": c.Why})
+		return
+	}
+	// THE FIRST STOP OF THE SESSION IS GRANTED. The kickoff says be ready and
+	// wait, so the first stop is obedience, and a claim for obedience teaches
+	// nothing. One per actor per session, and the record says it was the first.
+	if first {
+		forgetRefusedStops(roots, actor)
+		record(log, "agent", "stop", actor, "stopped: the first stop of the session, granted", Yes(),
+			map[string]any{"first": true})
 		return
 	}
 	// A REFUSAL THAT KEEPS BEING REFUSED NOTICES, AND RELENTS. The harness

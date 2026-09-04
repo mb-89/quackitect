@@ -11,7 +11,9 @@ Guidance is what an agent holds before it acts.
 An agent handed essays writes essays.
 An agent handed rules writes to the rules.
 
-The schema in [[src/schemas/guidance.schema.yaml]] says what shape this is.
+The files at the top of [[doc/guidance]] are the standing layer, projected into every session.
+The folders under it hold craft and method, read when the work calls for it.
+The schema in [[src/schemas/guidance.schema.yaml]] says what shape a file is.
 The rules below say what goes in it.
 
 # Actionables

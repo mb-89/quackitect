@@ -16,14 +16,41 @@ field() { sed -n 's/.*"'"$1"'"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$2" 
 command_rel=$(field command "$spec")
 install_rel=$(field install "$spec")
 driver=$(field driver "$spec")
+sources_rel=$(field sources "$spec")
+
+# A FAILED BUILD REFUSES OUT LOUD. Falling back to the binary already in .bin
+# runs code the source no longer says, and it exits 0, so nobody finds out.
+build_it() {
+  if ! "$here/$install_rel"; then
+    echo "the build failed, so $cmd was not run ($1). Fix the build and run this again." >&2
+    exit 1
+  fi
+}
 
 if [ -n "$command_rel" ]; then
   cmd="$here/$command_rel"
   if [ ! -x "$cmd" ] && [ -n "$install_rel" ]; then
     echo "not built yet - installing"
-    "$here/$install_rel"
+    build_it "it was never built"
   fi
   [ -x "$cmd" ] || { echo "still no $cmd after installing" >&2; exit 1; }
+  # A BINARY OLDER THAN ITS SOURCE IS THE WRONG PROGRAM. It runs, and it
+  # answers for code that is no longer there. sources says where the source
+  # lives; the installer builds everything this tree builds, so one rebuild
+  # covers every binary in .bin and not only the one about to run.
+  if [ -n "$install_rel" ] && [ -n "$sources_rel" ]; then
+    newer=""
+    for s in $sources_rel; do
+      if [ -d "$here/$s" ]; then
+        newer=$(find "$here/$s" -type f -newer "$cmd" | head -1)
+      fi
+      if [ -n "$newer" ]; then break; fi
+    done
+    if [ -n "$newer" ]; then
+      echo "$command_rel is older than its source - rebuilding"
+      build_it "$newer is newer than it"
+    fi
+  fi
   exec "$cmd" "$@"
 fi
 
@@ -68,4 +95,8 @@ if [ ! -x "$engine" ]; then
   echo "the driver is not built yet - installing"
   "$root/util/setup/install.sh" --profile headless
 fi
-exec "$engine" --work "$here" "$@"
+# The work root rides out of band: an argument added here would sit where
+# the verb belongs, and the engine reads the verb as its first argument.
+SE_WORK="$here"
+export SE_WORK
+exec "$engine" "$@"

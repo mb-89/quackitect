@@ -139,6 +139,42 @@ func LoadProbe(r Roots) (Probe, bool) {
 	return p, true
 }
 
+// PathWithTools prepends the directory of every probed tool to PATH in the
+// given environment, so a command through the engine resolves what the probe
+// found without exporting anything by hand. The parent's entries stay, after
+// the probe's, so the copy the probe answered is the copy that runs.
+func PathWithTools(env []string, found []Tool) []string {
+	var dirs []string
+	seen := map[string]bool{}
+	for _, t := range found {
+		d := filepath.Dir(t.Path)
+		if d == "." || d == "" || seen[strings.ToLower(d)] {
+			continue
+		}
+		seen[strings.ToLower(d)] = true
+		dirs = append(dirs, d)
+	}
+	if len(dirs) == 0 {
+		return env
+	}
+	sep := string(os.PathListSeparator)
+	prefix := strings.Join(dirs, sep)
+	out := make([]string, 0, len(env)+1)
+	donePath := false
+	for _, e := range env {
+		if k, v, ok := strings.Cut(e, "="); ok && strings.EqualFold(k, "PATH") && !donePath {
+			out = append(out, k+"="+prefix+sep+v)
+			donePath = true
+			continue
+		}
+		out = append(out, e)
+	}
+	if !donePath {
+		out = append(out, "PATH="+prefix)
+	}
+	return out
+}
+
 // KnownTools is what this boot found. Who has already been told is not asked
 // here: an arrival is the one thing that decides it, and arrivals are recorded
 // in one place for every fact that keys off them.

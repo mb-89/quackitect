@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"sort"
+	"time"
 )
 
 // WHAT EACH ACTOR IS DOING, ANSWERED OFF THE RECORD.
@@ -68,6 +69,12 @@ type Doing struct {
 	// With an ordering the interesting failure is TWO rather than none, and a
 	// failure that names only the state it did not get cannot say which two.
 	True []string `json:"true,omitempty"`
+
+	// WHAT KIND OF AGENT IT IS, session or the type the harness spawned it
+	// as, and WHEN IT ARRIVED. Both are the register's, so they are empty on
+	// a row built for an actor that pulled without ever being registered.
+	Kind  string `json:"kind,omitempty"`
+	Since string `json:"since,omitempty"`
 }
 
 // Happening is the whole answer.
@@ -78,14 +85,27 @@ type Doing struct {
 type Happening struct {
 	Actors []Doing `json:"actors"`
 	Hold   Hold    `json:"hold"`
+
+	// WHO IS HERE, which is not who has worked. Actors is what a person can
+	// act on and it is drawn in the header; this is the register, and it
+	// holds an agent that has arrived and pulled nothing yet.
+	Present []Doing `json:"present"`
 }
 
-// WhatIsHappening answers one row per actor that has pulled in this session.
+// WhatIsHappening answers one row per actor that is working or stopped.
+//
+// A WAITING ACTOR WITH NOTHING IN HAND HAS NO ROW. Its row says only that it
+// once pulled, and the owner read four of those in the header as nonsense.
+// The header is for what a person can act on: a hold, a stop, a token in hand.
 func WhatIsHappening(r Roots) Happening {
-	out := Happening{Actors: []Doing{}, Hold: LoadHold(r)}
+	out := Happening{Actors: []Doing{}, Hold: LoadHold(r), Present: AgentsPresent(r)}
 	all := Tokens(r)
 	for _, actor := range ActorsThatPulled(r) {
-		out.Actors = append(out.Actors, doingOf(r, all, actor))
+		d := doingOf(r, all, actor)
+		if d.State == Waiting {
+			continue
+		}
+		out.Actors = append(out.Actors, d)
 	}
 	return out
 }
@@ -169,4 +189,68 @@ func trueOf(all []string, one string) bool {
 		}
 	}
 	return false
+}
+
+// AgentsPresent answers one row per agent that has arrived and not gone, in
+// the order they arrived.
+//
+// THE HARNESS SAYS WHO IS HERE AND THE ENGINE WRITES IT DOWN. SessionStart
+// and SubagentStart bring one in, SessionEnd and SubagentStop take one out,
+// and all four already reach this engine. Nothing is guessed from a process
+// list and nothing is declared by the agent itself.
+//
+// A REGISTER OUTLIVES THE RUN THAT FILLED IT, so only this run's agents are
+// here. A row left by a session that died without saying so is not drawn,
+// the same way an actor that pulled in an earlier session is not.
+func AgentsPresent(r Roots) []Doing {
+	session := currentSession(r)
+	if !Named(session) {
+		return []Doing{}
+	}
+	here := []Agent{}
+	for _, a := range LoadEvidence(r).Agents {
+		if a.Run == session && a.Gone.IsZero() {
+			here = append(here, a)
+		}
+	}
+	sort.Slice(here, func(i, j int) bool { return here[i].First.Before(here[j].First) })
+	all := Tokens(r)
+	aliases := TheNamesItPullsWith(r)
+	out := make([]Doing, 0, len(here))
+	for _, a := range here {
+		// THE NAME IT PULLS WITH IS THE NAME THAT HOLDS THE TOKEN. The
+		// register knows an agent by the harness's name, and the gate wrote
+		// down which name that one answers to when it pulled. The row is
+		// drawn under the pulling name, which is the header's name too, so
+		// the two agree.
+		names := append([]string{a.Name}, aliases[a.Name]...)
+		if id := harnessIDOf(r, a); id != "" {
+			names = append(names, aliases[id]...)
+		}
+		// THE LAST NAME IT PULLED WITH IS THE NAME THE RECORD USES, and the
+		// header draws that one, so the table does too. Its state and what
+		// it holds come from whichever of its names is not merely waiting.
+		d := doingOf(r, all, names[len(names)-1])
+		for _, n := range names {
+			if other := doingOf(r, all, n); other.State != Waiting {
+				other.Actor = names[len(names)-1]
+				d = other
+				break
+			}
+		}
+		d.Kind, d.Since = a.Kind, a.First.Format(time.RFC3339)
+		out = append(out, d)
+	}
+	return out
+}
+
+// harnessIDOf answers the identity the harness knows an agent by, which is
+// the key its aliases were written under.
+func harnessIDOf(r Roots, a Agent) string {
+	for id, known := range LoadEvidence(r).Agents {
+		if known.Name == a.Name && known.First.Equal(a.First) {
+			return id
+		}
+	}
+	return ""
 }

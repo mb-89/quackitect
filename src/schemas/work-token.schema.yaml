@@ -4,11 +4,8 @@
 # which sections and which fields apply, and everything it does not name is off.
 # So this file grows as kinds of work appear, and no token grows with it.
 #
-# NOTHING IS HERE FOR HAVING BEEN THERE BEFORE. The old token carried 28 fields.
-# Eleven served a reviewer who is gone, id repeated the file name, type repeated
-# kind, traced repeated the folder, assignee repeated holder, and seq recorded
-# when a token was typed and then let a queue read it as what to do next.
-# An order somebody decided is depends_on. What is left is what something reads.
+# A FIELD IS HERE BECAUSE SOMETHING READS IT, and one nothing reads comes out.
+# What that cost and what it settled is [[a-field-is-read-or-gone]].
 #
 # The frontmatter half is JSON Schema 2020-12, https://json-schema.org/draft/2020-12.
 # The body half is this project's own, https://document-schema.org.
@@ -59,14 +56,16 @@ frontmatter:
       x-enum-from: process.states
       description: where the token stands. The process owns these values.
 
-    # WHO HAS IT, SO NOBODY ELSE TAKES IT. A name rather than a flag, because a
-    # hold nobody can attribute is a hold nobody can reclaim: the holders are
-    # held against the agents that are alive, and a dead one's work goes back.
     bucket:
       description: the person's own name for a group. It does not move the work
 
-    holder:
-      description: who is working on it now. Empty means nobody
+    # THERE IS NO HOLDER HERE. Who has a token is the engine's, kept under .se
+    # by holdstore.go and dropped when the agent holding it is gone. It was a
+    # field on the token, so a take-up that was never put down left a name in a
+    # file nothing reopened, and the queue answered investigate on a hold whose
+    # owner had not existed for hours.
+    author:
+      description: who did the work step, so the verdict is never theirs
 
     # WHEN IT NEEDS A PERSON, IT SAYS SO. There is no assignee, because which
     # agent does the work was never a thing anybody read. Whether a human is
@@ -123,6 +122,7 @@ body:
     - header: detail
       tense: present
       maxWords: 250
+      maxBytes: 1500
       description: what is asked, or what is wrong, and why it matters
 
     - header: proposed action
@@ -130,11 +130,22 @@ body:
       maxWords: 150
       description: what you think should happen about it
 
+    - header: approach
+      tense: present
+      maxWords: 200
+      description: the interface or the shape the change will take, written before the work so a reader can disagree with it
+
     - header: done when
       list: true
       description: one criterion per line, each one a thing somebody can check
 
+    - header: note
+      tense: past
+      maxWords: 150
+      description: what changed and why, for a reader who was not here
+
     # One per activity, named for it. The template writes the table and the
     # process writes the rows.
     - headerPrefix: "evidence: "
+      maxBytes: 1000
       description: what was checked at each step, and what was seen

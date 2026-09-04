@@ -307,7 +307,9 @@ func build(name, source string, env []string) error {
 	// The build is stamped, so a window that has been open a while can say
 	// which code it is running.
 	stamp := time.Now().UTC().Format("01-02-1504")
-	cmd := Quietly(exec.Command("go", "build", "-ldflags", "-s -w -X main.Build="+stamp, "-o", out, "."))
+	// -gcflags=-e lifts the compiler's error cap, so a broken tree reports
+	// every error in one round rather than a batch per build.
+	cmd := Quietly(exec.Command("go", "build", "-gcflags=-e", "-ldflags", "-s -w -X main.Build="+stamp, "-o", out, "."))
 	cmd.Dir = source
 	cmd.Env = append(os.Environ(), env...)
 	cmd.Stdout, cmd.Stderr = os.Stdout, os.Stderr

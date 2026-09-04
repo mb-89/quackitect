@@ -378,6 +378,23 @@ type Config struct {
 	GuardProjections bool
 	StopNeedsClaim   bool
 	AnswerFirst      bool
+
+	// A SEARCH OVER THE TREE GOES THROUGH THE INDEX. Grep, Glob, rg and grep
+	// aimed inside the tree are refused and pointed at se find, which answers
+	// off the index the engine keeps in step. Outside the tree they are the
+	// agent's own. It is a parameter because a tree whose watcher is deaf
+	// has an index that is behind, and a person may want the disk back.
+	SearchViaIndex bool
+
+	// THE ENGINE OWNS THE TESTS. go test, a check script or the battery run
+	// by hand inside the tree is refused and pointed at se test, which runs
+	// what the delta reaches. Off, the tests are run by hand as before.
+	TestsViaEngine bool
+
+	// AND IT OWNS ITS OWN REPLACEMENT. A build aimed at .bin inside the tree
+	// is refused and pointed at the swap door, which builds the next engine and
+	// hands over without severing a call. Off, the build is run by hand.
+	BuildViaEngine   bool
 	HeartbeatSeconds int
 	ReadyBudgetMs    int
 
@@ -403,11 +420,18 @@ type Config struct {
 	HelperRatio      int
 	HelperFloorBytes int
 
-	// How big a token's prose may be before the save refuses it. A token is a
-	// ticket a person reads cold, and the record once held tokens of 117 KB.
-	// Both are bytes, and both are parameters a person moves.
-	DetailBytes  int
-	SectionBytes int
+	// HOW MANY HANDS THE QUEUE WANTS, AND IT IS ONE NUMBER FOR EVERY ROLE.
+	//
+	// THE OWNER'S RULING: one control, a maximum, and it goes for every role.
+	// The engine wants that many of each role as long as there is work for
+	// them, never more, and holds the main agent until they are here.
+	//
+	// IT WAS FOUR NUMBERS AND A RATIO. One worker per so many tokens, one
+	// reviewer per so many verdicts, each under its own ceiling, and a nudge
+	// and a wall speaking beside them about the same queue. Four dials that
+	// interact are four ways to be wrong about one question, and nobody could
+	// say what the machine would do without working it out.
+	ParallelAgents int
 
 	From map[string]string
 }
@@ -419,17 +443,18 @@ func TheFloor() Config {
 	// AnswerFirst is ON. Somebody waiting to be answered while the agent works
 	// on is the failure this exists to stop.
 	return Config{GuardProjections: true, StopNeedsClaim: true, AnswerFirst: true,
+		SearchViaIndex:   true,
+		TestsViaEngine:   true,
+		BuildViaEngine:   true,
 		HeartbeatSeconds: 5, ReadyBudgetMs: 15000,
 		PullsBeforeHoldIsStale: 10,
 		ReadClampLines:         800,
 		HelperRatio:            10,
 		HelperFloorBytes:       6000,
-		// TWO, BECAUSE THE SECOND RUNG IS SHARED OVER BOTH HALVES. One failing
-		// round per rung would spend the token's whole ladder on a first bad
-		// draft, and the grant never comes back.
-		DetailBytes:  1500,
-		SectionBytes: 1000,
-		From:         map[string]string{}}
+		// FIVE, WHICH IS WHAT THE WORKER CEILING WAS. The busier of the two
+		// roles kept its most, and the number now means the same thing for both.
+		ParallelAgents: 5,
+		From:           map[string]string{}}
 }
 
 func LoadConfig(roots Roots) Config {
@@ -448,6 +473,17 @@ func LoadConfig(roots Roots) Config {
 	if b, ok := toBool(v.Value["guards.answer_first"]); ok {
 		c.AnswerFirst = b || c.AnswerFirst
 	}
+	// THIS ONE CAN BE TURNED OFF, unlike the three above, because an index
+	// that is behind the tree is a reason to want the disk.
+	if b, ok := toBool(v.Value["guards.search_via_index"]); ok {
+		c.SearchViaIndex = b
+	}
+	if b, ok := toBool(v.Value["guards.tests_via_engine"]); ok {
+		c.TestsViaEngine = b
+	}
+	if b, ok := toBool(v.Value["guards.build_via_engine"]); ok {
+		c.BuildViaEngine = b
+	}
 	if n, ok := toNumber(v.Value["limits.heartbeat_seconds"]); ok && int(n) > 0 {
 		c.HeartbeatSeconds = int(n)
 	}
@@ -455,7 +491,10 @@ func LoadConfig(roots Roots) Config {
 		c.ReadyBudgetMs = int(n)
 	}
 	// ZERO IS A VALUE HERE and not a missing one, because zero turns the
-	// refusal off and somebody has to be able to say that.
+	// holding off and somebody has to be able to say that.
+	if n, ok := toNumber(v.Value["limits.parallel_agents"]); ok && int(n) >= 0 {
+		c.ParallelAgents = int(n)
+	}
 	if n, ok := toNumber(v.Value["limits.pulls_before_hold_is_stale"]); ok && int(n) > 0 {
 		c.PullsBeforeHoldIsStale = int(n)
 	}
@@ -469,12 +508,6 @@ func LoadConfig(roots Roots) Config {
 	}
 	if n, ok := toNumber(v.Value["limits.helper_floor_bytes"]); ok && int(n) > 0 && int(n) < c.HelperFloorBytes {
 		c.HelperFloorBytes = int(n)
-	}
-	if n, ok := toNumber(v.Value["limits.detail_bytes"]); ok && int(n) > 0 {
-		c.DetailBytes = int(n)
-	}
-	if n, ok := toNumber(v.Value["limits.section_bytes"]); ok && int(n) > 0 {
-		c.SectionBytes = int(n)
 	}
 	return c
 }

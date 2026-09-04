@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"os"
 	"os/exec"
@@ -79,11 +80,19 @@ func TestAVerbRunsInsideTheEngineAndTheClientPrintsIt(t *testing.T) {
 		t.Fatalf("the submission did not end the token: %+v", ended)
 	}
 
-	// HELP NEEDS NO ENGINE, and a bad flag is refused as one.
+	// HELP NEEDS NO ENGINE, AND IT IS NOT AN ANSWER. It goes where the
+	// reasons go, so a reader parsing the answer stream as JSON never meets
+	// a usage message where a token should be.
 	cold := Roots{Method: t.TempDir(), Work: t.TempDir()}
-	help, err := exec.Command(exe, "work", "--help", "--work", cold.Work).Output()
-	if err != nil || !strings.Contains(string(help), "se work -") {
-		t.Fatalf("help without an engine answered %v: %s", err, help)
+	asked := exec.Command(exe, "work", "--help", "--work", cold.Work)
+	var answer, reason bytes.Buffer
+	asked.Stdout, asked.Stderr = &answer, &reason
+	_ = asked.Run()
+	if !strings.Contains(reason.String(), "se work -") {
+		t.Fatalf("help without an engine answered %q on the reason stream", reason.String())
+	}
+	if answer.Len() != 0 {
+		t.Fatalf("help put %q on the answer stream", answer.String())
 	}
 
 	// AND WITH NO ENGINE THE VERB IS REFUSED, and the answer says how to start one.

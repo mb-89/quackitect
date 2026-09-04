@@ -75,7 +75,10 @@ type SectionSpec struct {
 	MaxSentences        int
 	MaxWordsPerSentence int
 	MaxWords            int
-	Description         string
+	// MaxBytes bounds the section at the save, where the engine writes prose
+	// no editor has checked. A token is a ticket a person reads cold.
+	MaxBytes    int
+	Description string
 }
 
 // listValue reads a frontmatter value as a list, in either yaml spelling.
@@ -226,6 +229,7 @@ func LoadSchema(methodRoot, kind string) (Schema, error) {
 			MaxSentences:        schemaInt(m["maxSentences"]),
 			MaxWordsPerSentence: schemaInt(m["maxWordsPerSentence"]),
 			MaxWords:            schemaInt(m["maxWords"]),
+			MaxBytes:            schemaInt(m["maxBytes"]),
 			Description:         ystr(m["description"]),
 		})
 	}
@@ -329,7 +333,11 @@ func frontLine(front, key string) int {
 func checkFront(spec FrontSpec, f Front, front string) []Departure {
 	var out []Departure
 	for _, key := range spec.Required {
-		if strings.TrimSpace(fs(f, key)) == "" {
+		// A REQUIRED FIELD MAY BE A LIST, and asking a list for its string
+		// answers nothing. Every rationale in this tree was reported as having
+		// no explains while carrying one, because explains is an array and this
+		// read it as text: a required array could not be satisfied at all.
+		if !given(f, key) {
 			out = append(out, Departure{Line: 1,
 				Says: fmt.Sprintf("the frontmatter has no %s", key)})
 		}
@@ -819,4 +827,18 @@ func LintNotes(r Roots, dir string) []Finding {
 // LintGuidance reads the guidance corpus against the schemas it names.
 func LintGuidance(r Roots) []Finding {
 	return LintNotes(r, GuidanceDir(r.Method))
+}
+
+// LintRationales reads the arguments against the schema they name.
+//
+// A COPY WITH NO RATIONALE FOLDER IS NOT A FINDING. A working copy may carry
+// no argument yet, and an empty shelf is not a fault. A folder that is there
+// and will not read still is, because that is the case where this would
+// otherwise answer clean about notes it never opened.
+func LintRationales(r Roots) []Finding {
+	dir := RationaleDir(r.Method)
+	if _, err := os.Stat(dir); os.IsNotExist(err) {
+		return nil
+	}
+	return LintNotes(r, dir)
 }

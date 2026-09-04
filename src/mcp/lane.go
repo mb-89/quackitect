@@ -10,185 +10,139 @@ import (
 // THE LANE, for Level 1. The stub decides nothing. It shapes the arguments,
 // hands them to the engine, and returns what the engine said.
 //
-// A DESCRIPTION IS IN THE PROMPT ON EVERY TURN, so it says what to do and
-// stops. Explaining why costs the same tokens forever and changes nothing.
+// A DESCRIPTION SAYS WHAT TO DO AND STOPS. Where a reader would ask why the
+// door is shaped this way, the answer is [[a-description-is-an-instruction]].
 
 func laneTools() []map[string]any {
 	return []map[string]any{
 		{
-			"name": "se_ask",
-			"description": "ASK THE INDEX. SQL over the tree, read-only: file(path,size,hash), " +
-				"note(path,id,kind,front JSON,body), link(from_path,key,target,to_path,line), " +
-				"note_text(path,id,body) for MATCH. schema prints the tables.\n\n" +
-				"search finds words in note bodies. links answers what reaches a note " +
-				"and what it reaches. dangling lists links that reach nothing. Rows are " +
-				"cut at limit; page with LIMIT and OFFSET.",
+			"name":        "se_test",
+			"description": "TEST WHAT YOU CHANGED, naming the token: on: <id>.",
 			"inputSchema": map[string]any{
 				"type": "object",
 				"properties": map[string]any{
-					"sql":      map[string]any{"type": "string", "description": "a SELECT over the index"},
-					"search":   map[string]any{"type": "string", "description": "words to find in note bodies"},
-					"links":    map[string]any{"type": "string", "description": "a note id or path"},
-					"dangling": map[string]any{"type": "boolean", "description": "every link that reaches nothing"},
-					"schema":   map[string]any{"type": "boolean", "description": "print the tables"},
-					"limit":    map[string]any{"type": "integer", "description": "rows to answer at most. Default 200"},
+					"on":      map[string]any{"type": "string"},
+					"propose": map[string]any{"type": "array", "items": map[string]any{"type": "string"}, "description": "tests by name, or patterns"},
+					"plan":    map[string]any{"type": "boolean", "description": "say what would run, run nothing"},
+				},
+			},
+		},
+		{
+			"name": "se_find",
+			"description": "SEARCH THE TREE THROUGH THE INDEX: words (FTS5), regex, or path " +
+				"(a glob; alone it lists files).",
+			"inputSchema": map[string]any{
+				"type": "object",
+				"properties": map[string]any{
+					"words": map[string]any{"type": "string"},
+					"regex": map[string]any{"type": "string"},
+					"path":  map[string]any{"type": "string"},
+					"limit": map[string]any{"type": "integer"},
+				},
+			},
+		},
+		{
+			"name":        "se_ask",
+			"description": "ASK THE INDEX: sql, read-only; schema prints the tables.",
+			"inputSchema": map[string]any{
+				"type": "object",
+				"properties": map[string]any{
+					"sql":      map[string]any{"type": "string"},
+					"search":   map[string]any{"type": "string"},
+					"links":    map[string]any{"type": "string"},
+					"dangling": map[string]any{"type": "boolean"},
+					"schema":   map[string]any{"type": "boolean"},
+					"limit":    map[string]any{"type": "integer"},
 				},
 			},
 		},
 		{
 			"name": "se_apply",
-			"description": "CHANGE FILES. This is how you write, and it says which work the change is.\n\n" +
-				"The harness's Write and Edit are refused: they carry no way to name a " +
-				"token, so a change made with one is a change nothing can file.\n\n" +
-				"ONE MANIFEST, AS MANY FILES AS YOU LIKE. Every edit is checked before " +
-				"any is written, so one bad edit writes nothing and the tree is never " +
-				"half changed. Edits to one file compose in the order you wrote them.\n\n" +
-				"THREE OPS.\n" +
-				"- left off: replace old with new. old must be in the file exactly once, " +
-				"so take in enough of what is around it to be sure.\n" +
-				"- create: a file that is not there yet. It refuses if it is.\n" +
-				"- write: replace a whole file.\n\n" +
-				"NAMING A TOKEN YOU WERE NOT ON SWAPS THEM. The one you held goes back " +
-				"and this one comes into your hands, so changing what you work on is one " +
-				"word on the next write and never a call of its own.",
+			"description": "CHANGE FILES, naming the token: on: <id>. op: left off (replace old, " +
+				"exactly once, with new), create, write. undo puts back what that token wrote, " +
+				"and never another agent's work.",
 			"inputSchema": map[string]any{
 				"type": "object",
 				"properties": map[string]any{
-					"on": map[string]any{"type": "string",
-						"description": "the token this change belongs to, by id"},
+					"on": map[string]any{"type": "string"},
 					"edits": map[string]any{"type": "array",
-						"description": "the manifest, in order",
 						"items": map[string]any{"type": "object",
 							"properties": map[string]any{
-								"file": map[string]any{"type": "string",
-									"description": "the path, from the folder being worked on"},
-								"old": map[string]any{"type": "string",
-									"description": "the bytes to replace. It has to be there exactly once"},
-								"new": map[string]any{"type": "string",
-									"description": "what to put there, or the whole content for create and write"},
-								"op": map[string]any{"type": "string",
-									"description": "create, write, or left off for an exact replacement"},
+								"file": map[string]any{"type": "string"},
+								"old":  map[string]any{"type": "string"},
+								"new":  map[string]any{"type": "string"},
+								"op":   map[string]any{"type": "string"},
 							},
 							"required": []string{"file"},
 						}},
-					"dry": map[string]any{"type": "boolean",
-						"description": "check every edit and write nothing"},
-					"undo": map[string]any{"type": "boolean",
-						"description": "instead of writing: put back what the last apply overwrote. " +
-							"It refuses if any of those files has changed since, so it never " +
-							"throws away work somebody did afterwards. Needs no on and no edits"},
-					"actor": map[string]any{"type": "string", "description": "who is writing. Default main"},
+					"dry":   map[string]any{"type": "boolean"},
+					"undo":  map[string]any{"type": "boolean"},
+					"actor": map[string]any{"type": "string"},
 				},
 			},
 		},
 		{
 			"name": "se_run",
-			"description": "RUN A SHELL COMMAND. This is how you build, test and search, and it " +
-				"says which work the command is.\n\n" +
-				"The harness's Bash is refused. The engine cannot read a command and know " +
-				"whether it writes -- a redirection, sed -i, mv, rm and a script you wrote " +
-				"all reach the filesystem -- so it does not ask. Every command names its " +
-				"work because it could write.\n\n" +
-				"The command runs in the folder being worked on. Output and errors come " +
-				"back as one stream with the exit code.\n\n" +
-				"A LONG OUTPUT IS KEPT WHOLE AND ANSWERED A WINDOW AT A TIME. Nothing is " +
-				"lost. The answer carries bytes, which is the whole length, and page, which " +
-				"is the name to ask for the rest by:\n\n" +
-				"  {\"page\": \"<name>\", \"from\": 40960}   the next window\n" +
-				"  {\"page\": \"<name>\", \"from\": -4000}   the last four thousand bytes\n\n" +
-				"Reading a page names no token, because looking is not writing.\n\n" +
-				"NAMING A TOKEN YOU WERE NOT ON SWAPS THEM, the same as a write.",
+			"description": "RUN A SHELL COMMAND in the work folder, naming the token: on: <id>. " +
+				"A long output pages with page and from.",
 			"inputSchema": map[string]any{
 				"type": "object",
 				"properties": map[string]any{
-					"on": map[string]any{"type": "string",
-						"description": "the token this command belongs to, by id"},
-					"command": map[string]any{"type": "string",
-						"description": "the command, whole. Quotes, newlines and pipes are yours to use"},
-					"page": map[string]any{"type": "string",
-						"description": "instead of running: read a window of an output that was kept"},
-					"from": map[string]any{"type": "integer",
-						"description": "with page: where the window starts. Negative counts back from the end"},
-					"actor": map[string]any{"type": "string", "description": "who is running it. Default main"},
+					"on":      map[string]any{"type": "string"},
+					"command": map[string]any{"type": "string"},
+					"page":    map[string]any{"type": "string"},
+					"from":    map[string]any{"type": "integer"},
+					"actor":   map[string]any{"type": "string"},
 				},
 			},
 		},
 		{
 			"name": "se_work",
-			"description": "MINT A WORK TOKEN. Every piece of work is one.\n\n" +
-				"THE PROCESS SHAPES IT. Pass process: <name>, one of the files in " +
-				"src/processes. It says which sections the note carries, which states " +
-				"it can be in, and what each step asks before it is done. Left off, " +
-				"it is note.\n\n" +
-				"title is four words at most. detail is the whole instruction, in the " +
-				"words it was asked in. proposed_action is what you think should " +
-				"happen about it.\n\n" +
-				"AND IT IS WHERE YOU SAY WHICH TOKEN YOU ARE ON. Pass on: <id>. " +
-				"That token goes in your hands, whatever else you held goes back, and " +
-				"a write is refused until you have said it.",
+			"description": "MINT A WORK TOKEN: title (four words at most), detail, done_when. " +
+				"Or on: <id> takes that token into your hands.",
 			"inputSchema": map[string]any{
 				"type": "object",
 				"properties": map[string]any{
-					"title":   map[string]any{"type": "string", "description": "what the work is, in four words at most"},
-					"detail":  map[string]any{"type": "string", "description": "the whole instruction"},
-					"process": map[string]any{"type": "string", "description": "which process shapes it. Default note"},
-					"proposed_action": map[string]any{"type": "string",
-						"description": "what you think should happen about it"},
-					"depends_on": map[string]any{"type": "array", "items": map[string]any{"type": "string"},
-						"description": "ids that have to end before this can start"},
-					"parent": map[string]any{"type": "string",
-						"description": "the id this is a part of. That token cannot close while this is open, " +
-							"and the queue hands this out first"},
-					"on": map[string]any{"type": "string",
-						"description": "instead of minting: say which token you are working on, by id. " +
-							"It goes in your hands and whatever else you held goes back. " +
-							"A write is refused until you have said it"},
-					"actor": map[string]any{"type": "string",
-						"description": "who is minting. Default main"},
+					"title":           map[string]any{"type": "string"},
+					"detail":          map[string]any{"type": "string"},
+					"process":         map[string]any{"type": "string"},
+					"proposed_action": map[string]any{"type": "string"},
+					"done_when":       map[string]any{"type": "array", "items": map[string]any{"type": "string"}},
+					"depends_on":      map[string]any{"type": "array", "items": map[string]any{"type": "string"}},
+					"parent":          map[string]any{"type": "string"},
+					"on":              map[string]any{"type": "string"},
+					"actor":           map[string]any{"type": "string"},
 				},
 				"required": []string{"title"},
 			},
 		},
 		{
 			"name": "se_stop",
-			"description": "NAME WHY YOU ARE STOPPING, when a stop was refused.\n\n" +
-				"The refusal carries the list. Say which entry applies and why.\n" +
-				"One claim releases one stop. Do anything else first and it is gone.\n" +
-				"No arguments reads the list.",
+			"description": "NAME WHY YOU ARE STOPPING, when a stop was refused. No arguments " +
+				"reads the list.",
 			"inputSchema": map[string]any{
 				"type": "object",
 				"properties": map[string]any{
-					"because": map[string]any{"type": "string",
-						"description": "the id of the sanctioned stop. Leave it out to read the list"},
-					"why":   map[string]any{"type": "string", "description": "why it applies, in one line"},
-					"actor": map[string]any{"type": "string", "description": "who is stopping. Default main"},
+					"because": map[string]any{"type": "string"},
+					"why":     map[string]any{"type": "string"},
+					"actor":   map[string]any{"type": "string"},
 				},
 			},
 		},
 		{
 			"name": "se_pull",
-			"description": "THE PULL, your one verb for work. Pull, do what comes back, pull again.\n\n" +
-				"THREE ANSWERS, and the pull field names which.\n" +
-				"- work: do the token. Walk the checklist for the step you are on.\n" +
-				"- refused: a check failed. Fix what the finding names and pull again with the same id.\n" +
-				"- wait: nothing for you. Say so and stop.\n\n" +
-				"SUBMITTING IS A PULL: id and disposition. The checklist is on the note " +
-				"itself, so answer it there and the engine reads it. A step the token " +
-				"has not reached yet, ticked, is refused.",
+			"description": "PULL FOR WORK; act on work, refused or wait. Submit with id and " +
+				"disposition, the checklist answered on the note.",
 			"inputSchema": map[string]any{
 				"type": "object",
 				"properties": map[string]any{
-					"id": map[string]any{"type": "string",
-						"description": "the token you are submitting. Leave it out to ask for work"},
-					"evidence": map[string]any{"type": "object",
-						"additionalProperties": map[string]any{"type": "string"},
-						"description":          "one entry per section the token asked for. Empty is refused"},
-					"disposition": map[string]any{"type": "string",
-						"description": "done, became, or dropped"},
-					"successors": map[string]any{"type": "array", "items": map[string]any{"type": "string"},
-						"description": "became only: the tokens this turned into. They must exist"},
-					"reason": map[string]any{"type": "string", "description": "dropped only: why the work stopped"},
-					"actor":  map[string]any{"type": "string", "description": "who is pulling. Default main"},
+					"id":          map[string]any{"type": "string"},
+					"evidence":    map[string]any{"type": "object", "additionalProperties": map[string]any{"type": "string"}},
+					"disposition": map[string]any{"type": "string"},
+					"successors":  map[string]any{"type": "array", "items": map[string]any{"type": "string"}},
+					"reason":      map[string]any{"type": "string"},
+					"actor":       map[string]any{"type": "string"},
+					"role":        map[string]any{"type": "string", "description": "worker, or reviewer for verdicts owed"},
 				},
 			},
 		},
@@ -229,12 +183,56 @@ func mintWork(r roots, args map[string]any) string {
 	if s := strList(args["depends_on"]); len(s) > 0 {
 		a = append(a, "--depends-on", strings.Join(s, ","))
 	}
+	for _, says := range strList(args["done_when"]) {
+		a = append(a, "--done-when", says)
+	}
 	return engineCall(r, a, nil)
 }
 
 // askIndex hands a question to se ask. One question per call, and the flag
 // order is the verb's own, so the command a person reads in the log is the
 // one they would type.
+// testTheDelta hands the engine a token's delta and a proposal, as the verb.
+func testTheDelta(r roots, args map[string]any) string {
+	argv := []string{"test"}
+	if on := str(args["on"]); on != "" {
+		argv = append(argv, "--on", on)
+	}
+	if list, ok := args["propose"].([]any); ok {
+		for _, p := range list {
+			if s := str(p); s != "" {
+				argv = append(argv, "--propose", s)
+			}
+		}
+	}
+	if args["plan"] == true {
+		argv = append(argv, "--plan")
+	}
+	return engineCall(r, argv, nil)
+}
+
+// findInTree puts one search to the engine that lives, over its socket.
+func findInTree(r roots, args map[string]any) string {
+	params := map[string]any{}
+	for _, k := range [...]string{"words", "regex", "path"} {
+		if v := str(args[k]); v != "" {
+			params[k] = v
+		}
+	}
+	if len(params) == 0 {
+		return "Say what to find: words, regex, or path."
+	}
+	if n, ok := args["limit"].(float64); ok && n > 0 {
+		params["limit"] = int(n)
+	}
+	raw, err := askModel(r, "find", params)
+	if err != nil {
+		b, _ := json.Marshal(map[string]any{"error": err.Error()})
+		return string(b)
+	}
+	return string(raw)
+}
+
 func askIndex(r roots, args map[string]any) string {
 	// THE SCHEMA IS THE ENGINE'S TEXT, and needs no engine running.
 	if args["schema"] == true {
@@ -296,7 +294,11 @@ func pull(r roots, args map[string]any) string {
 	}
 	// NO --as. se pull defines no such flag, so a call that named a role was
 	// refused by the engine before it read a byte of the payload.
-	return engineCall(r, []string{"pull", "--actor", actor}, body)
+	argv := []string{"pull", "--actor", actor}
+	if role := str(args["role"]); role != "" {
+		argv = append(argv, "--role", role)
+	}
+	return engineCall(r, argv, body)
 }
 
 // engineCall runs a subcommand with an optional payload on standard input. A
@@ -334,10 +336,20 @@ func engineCall(r roots, args []string, stdin []byte) string {
 // for that: it has a length limit, and every layer between here and the engine
 // would have to agree about quoting. The stub passes the bytes through.
 func applyEdits(r roots, args map[string]any) string {
-	if undo, is := args["undo"].(bool); is && undo {
-		return engineCall(r, []string{"apply", "--undo"}, nil)
-	}
 	on := str(args["on"])
+	// AN UNDO CARRIES ITS TOKEN LIKE ANY OTHER WRITE, and this dropped it.
+	//
+	// The stub took on: and actor: for an apply and threw both away for an undo,
+	// so the engine was asked to put back the newest apply on the tree by anybody.
+	// With several agents writing at once that is somebody else's change, and it
+	// was: an undo named on one token restored a file belonging to another actor's.
+	if undo, is := args["undo"].(bool); is && undo {
+		if on == "" {
+			return `{"error":"say which token to undo, with on: <id>. An undo puts back what that token wrote"}`
+		}
+		return engineCall(r, []string{"apply", "--undo", "--on", on,
+			"--by", orMain(str(args["actor"]))}, nil)
+	}
 	if on == "" {
 		return `{"error":"say which token this change is, with on: <id>"}`
 	}

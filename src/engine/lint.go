@@ -126,8 +126,6 @@ func LintLimits(r Roots) []Finding {
 		"quackitect.limits.heartbeat_seconds":          floor.HeartbeatSeconds,
 		"quackitect.limits.ready_budget_ms":            floor.ReadyBudgetMs,
 		"quackitect.limits.pulls_before_hold_is_stale": floor.PullsBeforeHoldIsStale,
-		"quackitect.limits.detail_bytes":               floor.DetailBytes,
-		"quackitect.limits.section_bytes":              floor.SectionBytes,
 	}
 	Walk(root, "", func(path string, n Node) {
 		d, hasDefault := toNumber(n.Default)
@@ -152,12 +150,12 @@ func LintLimits(r Roots) []Finding {
 
 func runLint(c *call) int {
 	fs := flag.NewFlagSet("lint", flag.ContinueOnError)
-	fs.SetOutput(c.out)
+	fs.SetOutput(c.err)
 	fs.Usage = func() {
-		fmt.Fprintln(c.out, "se lint - read every work token and name what breaks a rule.")
-		fmt.Fprintln(c.out, "")
-		fmt.Fprintln(c.out, "  se lint          say what is wrong, and exit non-zero if anything is")
-		fmt.Fprintln(c.out, "")
+		fmt.Fprintln(c.err, "se lint - read every work token and name what breaks a rule.")
+		fmt.Fprintln(c.err, "")
+		fmt.Fprintln(c.err, "  se lint          say what is wrong, and exit non-zero if anything is")
+		fmt.Fprintln(c.err, "")
 		fs.PrintDefaults()
 	}
 	fs.String("work", "", "the folder being worked on (default: this one)")
@@ -169,6 +167,7 @@ func runLint(c *call) int {
 	found := append(LintTokens(roots), LintIcons(roots)...)
 	found = append(found, LintLimits(roots)...)
 	found = append(found, LintGuidance(roots)...)
+	found = append(found, LintRationales(roots)...)
 	found = append(found, LintProcesses(roots)...)
 	c.answerJSON(map[string]any{"findings": found, "clean": len(found) == 0})
 	if len(found) > 0 {

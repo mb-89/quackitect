@@ -71,7 +71,14 @@ func Snapshot(r Roots, label string) (string, error) {
 		}
 		return strings.TrimSpace(string(out)), nil
 	}
-	if _, err := git("add", "-A", "--", "."); err != nil {
+	// A FILE GIT CANNOT READ DOES NOT COST THE SNAPSHOT. A shell on Windows
+	// that was told > nul leaves a file named nul, which is a device name
+	// and reads as nothing, and git add stopped on it: "unable to index
+	// file 'nul', fatal: adding files failed", and every take-up for an
+	// afternoon had no began. --ignore-errors adds the rest and goes on.
+	// safecrlf off keeps the line-ending warnings out of the record, which
+	// is where they were landing, twenty per snapshot.
+	if _, err := git("-c", "core.safecrlf=false", "add", "-A", "--ignore-errors", "--", "."); err != nil {
 		return "", err
 	}
 	tree, err := git("write-tree")

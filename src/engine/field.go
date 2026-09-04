@@ -55,8 +55,15 @@ func writeField(t *Token, field, to, by string) error {
 		return fmt.Errorf("%s is the engine's, and it is not written by hand", field)
 	case "process":
 		return fmt.Errorf("a process is chosen at minting, and it decides the token's shape")
-	case "status", "holder":
+	case "status":
 		return fmt.Errorf("%s is moved by a pull, not by a keystroke", field)
+	case "holder":
+		// NOT A FIELD ANY MORE, and the refusal says so rather than repeating
+		// the one above it. A caller reaching for this is working from a note
+		// written before the hold moved into the engine, and telling them it
+		// is moved by a pull would leave them looking for it on the page.
+		return fmt.Errorf("a holder is not on the token. The engine keeps who holds what, " +
+			"and se --doing answers it")
 	case "depends_on", "successors", "parent":
 		return fmt.Errorf("%s is a relation, and it is edited in the note", field)
 	default:

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -17,6 +18,12 @@ func TestAStopIsRefusedUntilAReasonIsClaimed(t *testing.T) {
 	Project(r)
 	l, _ := OpenLog(r.Private("log"))
 	l.Close()
+
+	// THE FIRST STOP OF THE SESSION IS GRANTED, so it is spent before the rule
+	// under test can be seen.
+	if out := hookSays(t, exe, r.Method, "Stop", map[string]any{"cwd": r.Work}); strings.Contains(out, `"decision":"block"`) {
+		t.Fatalf("the first stop of the session was refused: %s", out)
+	}
 
 	first := hookSays(t, exe, r.Method, "Stop", map[string]any{"cwd": r.Work})
 	if !strings.Contains(first, `"decision":"block"`) {
@@ -61,6 +68,96 @@ func TestAStopClaimNamesSomethingSanctioned(t *testing.T) {
 	}
 }
 
+// THE FIRST STOP OF A SESSION IS GRANTED, AND ONLY THE FIRST. A window that
+// has just started says it is ready and waits, because the person asked it
+// to. Refusing that stop made the agent claim a reason for doing what it was
+// told, twice, on every start.
+func TestTheFirstStopOfASessionIsGranted(t *testing.T) {
+	t.Parallel()
+	exe := buildEngine(t)
+	r := guidanceTree(t)
+	Project(r)
+	l, _ := OpenLog(r.Private("log"))
+	l.Close()
+
+	if out := hookSays(t, exe, r.Method, "Stop", map[string]any{"cwd": r.Work}); out != "" {
+		t.Fatalf("the first stop of the session was answered %q, want it granted in silence", out)
+	}
+	if out := hookSays(t, exe, r.Method, "Stop", map[string]any{"cwd": r.Work}); !strings.Contains(out, `"decision":"block"`) {
+		t.Fatalf("the second unclaimed stop passed: %s", out)
+	}
+}
+
+// A BLOCKED CLAIM MEETS THE QUEUE. Blocked means everything you hold waits on
+// somebody else, and the engine knows when that is false: the same code that
+// answers a pull knows what it would hand you. The refusal carries the offer.
+func TestABlockedClaimIsRefusedWhileTheQueueWouldHandWork(t *testing.T) {
+	t.Parallel()
+	exe := buildEngine(t)
+	r := guidanceTree(t)
+	Project(r)
+	l, _ := OpenLog(r.Private("log"))
+	l.Close()
+
+	// The first stop of the session is granted; spend the grace first.
+	hookSays(t, exe, r.Method, "Stop", map[string]any{"cwd": r.Work})
+
+	// The fixture declares its own process, so the queue has a rule to hand
+	// work out by.
+	procs := filepath.Join(r.Method, "src", "processes")
+	if err := os.MkdirAll(procs, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	proc := "name: task\ndescription: a fixture process\ntraced: false\nsections:\n  required:\n    - detail\nstates:\n  - name: open\n    description: waiting\n  - name: closed\n    description: finished\nactivities:\n  - name: mint\n    does: write it down\n    to: open\n  - name: do\n    does: do it\n    from: open\n    to: closed\ndispositions:\n  - name: done\n    description: it was done\n"
+	if err := os.WriteFile(filepath.Join(procs, "task.process.yaml"), []byte(proc), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	tok, err := Mint(r, Token{Title: "work that stands", Process: "task", Status: "open",
+		Detail: "minted by the test"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	// THE FIRST DOOR: the claim is refused as it is made, carrying the offer.
+	err = ClaimStop(r, "main", "blocked", "waiting on agents")
+	if err == nil {
+		t.Fatal("a false blocked claim was accepted")
+	}
+	if !strings.Contains(err.Error(), tok.ID) {
+		t.Fatalf("the claim refusal does not carry the offer %s: %v", tok.ID, err)
+	}
+
+	// THE SECOND DOOR: a claim that got in anyway is judged again at the stop.
+	if err := saveClaims(r, claims{Claims: map[string]StopClaim{"main": {
+		Session: currentSession(r), Actor: "main", Because: "blocked", Why: "stale", At: now()}}}); err != nil {
+		t.Fatal(err)
+	}
+	out := hookSays(t, exe, r.Method, "Stop", map[string]any{"cwd": r.Work})
+	if !strings.Contains(out, `"decision":"block"`) {
+		t.Fatalf("a blocked claim passed with work standing: %s", out)
+	}
+	if !strings.Contains(out, tok.ID) {
+		t.Fatalf("the refusal does not carry the offer %s: %s", tok.ID, out)
+	}
+}
+
+// AND WITH NOTHING TO HAND, BLOCKED IS TRUE AND THE STOP IS GRANTED.
+func TestABlockedClaimStandsWhenTheQueueIsEmpty(t *testing.T) {
+	t.Parallel()
+	exe := buildEngine(t)
+	r := guidanceTree(t)
+	Project(r)
+	l, _ := OpenLog(r.Private("log"))
+	l.Close()
+
+	hookSays(t, exe, r.Method, "Stop", map[string]any{"cwd": r.Work})
+	if err := ClaimStop(r, "main", "blocked", "the queue is dry"); err != nil {
+		t.Fatal(err)
+	}
+	if out := hookSays(t, exe, r.Method, "Stop", map[string]any{"cwd": r.Work}); out != "" {
+		t.Fatalf("a true blocked claim was refused: %s", out)
+	}
+}
+
 // ANYTHING THE AGENT DOES AFTER CLAIMING ERASES THE CLAIM. A claim says the
 // next thing is stopping. Carrying on is changing your mind.
 func TestAnyActionSpendsTheClaim(t *testing.T) {
@@ -70,6 +167,10 @@ func TestAnyActionSpendsTheClaim(t *testing.T) {
 	Project(r)
 	l, _ := OpenLog(r.Private("log"))
 	l.Close()
+
+	// The first stop of the session is granted, and the claim rule is what is
+	// under test, so that grace is spent first.
+	hookSays(t, exe, r.Method, "Stop", map[string]any{"cwd": r.Work})
 
 	if err := ClaimStop(r, "main", "broken", "the build will not run here"); err != nil {
 		t.Fatal(err)

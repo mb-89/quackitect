@@ -78,6 +78,24 @@
             "off": "hold / stop the agent. Nothing it asks for is allowed until this is pressed again",
             "on": "held / everything is on hold. Press to let it go on"
           }
+        },
+        {
+          "name": "agents",
+          "type": "table",
+          "source": "present",
+          "help": "every agent the engine has been told about, and what it holds",
+          "columns": [
+            {
+              "field": "actor",
+              "title": "agent"
+            },
+            {
+              "field": "title",
+              "title": "working on",
+              "link": "id",
+              "empty": "holding"
+            }
+          ]
         }
       ]
     },
@@ -116,6 +134,15 @@
       "type": "group",
       "children": [
         {
+          "name": "parallel_agents",
+          "title": "parallel agents",
+          "type": "int",
+          "default": 5,
+          "min": 0,
+          "max": 20,
+          "help": "How many agents of each role the engine wants while there is work for them, and never more than this. The main agent is held from everything but spawning and answering until they have pulled. Zero turns the holding off."
+        },
+        {
           "name": "heartbeat_seconds",
           "title": "heartbeat",
           "type": "int",
@@ -135,26 +162,6 @@
           "step": 500,
           "narrow": "smaller",
           "help": "Milliseconds allowed from the press to a ready agent. Missing it turns the light red."
-        },
-        {
-          "name": "detail_bytes",
-          "title": "detail bytes",
-          "type": "int",
-          "default": 1500,
-          "min": 200,
-          "max": 1500,
-          "narrow": "smaller",
-          "help": "How many bytes a token's detail may hold before the save refuses it. A token is a ticket a person reads cold. It may be made smaller and never larger."
-        },
-        {
-          "name": "section_bytes",
-          "title": "section bytes",
-          "type": "int",
-          "default": 1000,
-          "min": 200,
-          "max": 1000,
-          "narrow": "smaller",
-          "help": "How many bytes one evidence section may hold before the save refuses it. Name what was built and what the check said. It may be made smaller and never larger."
         },
         {
           "name": "read_clamp_lines",
@@ -226,6 +233,28 @@
           "default": true,
           "narrow": "on",
           "help": "Refuse every stop the agent has not claimed a sanctioned reason for. The engine names which reasons those are."
+        },
+        {
+          "name": "search_via_index",
+          "title": "search via index",
+          "type": "bool",
+          "default": true,
+          "help": "Refuse Grep, Glob, rg and grep aimed inside the tree, and point them at se find, which answers off the index. Off, the disk is searched as before."
+        },
+        {
+          "name": "tests_via_engine",
+          "title": "tests via engine",
+          "type": "bool",
+          "default": true,
+          "help": "Refuse go test, a check script or the battery run by hand inside the tree, and point them at se test, which runs what the delta reaches. Off, tests run by hand as before."
+        },
+        {
+          "name": "build_via_engine",
+          "title": "build via engine",
+          "type": "bool",
+          "default": true,
+          "narrow": "on",
+          "help": "Refuse a build aimed at .bin inside the tree and name the swap door. The engine builds the next one, checks it answers and hands over."
         }
       ]
     }

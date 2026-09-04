@@ -39,7 +39,13 @@ type Runme struct {
 	InstallWindows string `json:"install_windows,omitempty"`
 	CommandWindows string `json:"command_windows,omitempty"`
 	Driver         string `json:"driver,omitempty"` // or: the copy that drives this folder
-	Version        string `json:"version"`
+	// Sources names the folders the command is built from, separated by
+	// spaces, so RUNME can tell a binary that is older than its source from one
+	// that is current. A folder with a space in its name is not supported, and
+	// no folder that is built from has one. Left empty, RUNME builds only when
+	// the command is missing, which is what every project without a build does.
+	Sources string `json:"sources,omitempty"`
+	Version string `json:"version"`
 }
 
 func runmeName() string {
@@ -68,6 +74,9 @@ func Seed(roots Roots, kind Kind) ([]string, error) {
 		r.Install = "util/setup/install.sh"
 		r.CommandWindows = `.bin\se.exe`
 		r.InstallWindows = `util\setup\install.ps1`
+		// The three folders manifest.json builds from. Installing builds all of
+		// them, so a write to any one makes every binary in .bin stale together.
+		r.Sources = "src/engine src/viewer src/mcp"
 	}
 	if err := writeNew(filepath.Join(roots.Work, ".se", "runme.json"), mustIndent(r), &made); err != nil {
 		return made, err

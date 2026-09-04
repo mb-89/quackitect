@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"strings"
 )
 
 // se work: mint a token, or move one that exists.
@@ -15,14 +16,14 @@ import (
 // what does not fit.
 func runWork(c *call) int {
 	fs := flag.NewFlagSet("work", flag.ContinueOnError)
-	fs.SetOutput(c.out)
+	fs.SetOutput(c.err)
 	fs.Usage = func() {
-		fmt.Fprintln(c.out, "se work - mint a work token. Prints the token as JSON.")
-		fmt.Fprintln(c.out, "")
-		fmt.Fprintln(c.out, "  se work --title \"...\" --process note")
-		fmt.Fprintln(c.out, "  se work --template note   print what one starts from")
-		fmt.Fprintln(c.out, "  se work --stdin           read the whole token as JSON")
-		fmt.Fprintln(c.out, "")
+		fmt.Fprintln(c.err, "se work - mint a work token. Prints the token as JSON.")
+		fmt.Fprintln(c.err, "")
+		fmt.Fprintln(c.err, "  se work --title \"...\" --process note")
+		fmt.Fprintln(c.err, "  se work --template note   print what one starts from")
+		fmt.Fprintln(c.err, "  se work --stdin           read the whole token as JSON")
+		fmt.Fprintln(c.err, "")
 		fs.PrintDefaults()
 	}
 	fs.String("work", "", "the folder being worked on (default: this one)")
@@ -32,6 +33,8 @@ func runWork(c *call) int {
 	title := fs.String("title", "", "what the work is, in four words at most")
 	detail := fs.String("detail", "", "what is asked, or what is wrong")
 	action := fs.String("proposed-action", "", "what you think should happen about it")
+	var doneWhen manyFlag
+	fs.Var(&doneWhen, "done-when", "one done-when criterion. Repeat the flag for more")
 	dependsOn := fs.String("depends-on", "", "ids that must close first, comma separated")
 	parent := fs.String("parent", "", "the id this is a part of. That token cannot close while this is open")
 	by := fs.String("by", "", "who is minting it")
@@ -70,7 +73,7 @@ func runWork(c *call) int {
 		t, err := TakeUp(roots, *on, orElse(*by, "main"))
 		return c.answerOrFail(t, err)
 	case *abort != "":
-		t, err := Abort(roots, *abort, orElse(*by, "main"), *why)
+		t, err := Abort(roots, Aborting{ID: *abort, By: orElse(*by, "main"), Why: *why})
 		return c.answerOrFail(t, err)
 	// TWO KINDS OF GROUP, AND THIS VERB MAKES THE OTHER ONE. A query is a
 	// filter in the view file. A bucket is a name a person gave a handful of
@@ -114,6 +117,9 @@ func runWork(c *call) int {
 	} else {
 		t = Token{Title: *title, Detail: *detail, ProposedAction: *action,
 			Process: *process, DependsOn: splitComma(*dependsOn), Parent: *parent}
+		for _, says := range doneWhen {
+			t.Criteria = append(t.Criteria, Criterion{Says: says})
+		}
 	}
 	if t.Process == "" {
 		t.Process = orElse(*process, "note")
@@ -147,6 +153,16 @@ func runWork(c *call) int {
 	}
 	c.answerJSON(minted)
 	return 0
+}
+
+// A REPEATABLE FLAG, because a criterion is a sentence and sentences hold
+// commas.
+type manyFlag []string
+
+func (m *manyFlag) String() string { return strings.Join(*m, "; ") }
+func (m *manyFlag) Set(v string) error {
+	*m = append(*m, v)
+	return nil
 }
 
 func (c *call) answerOrFail(t Token, err error) int {

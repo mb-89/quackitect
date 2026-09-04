@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -42,6 +43,46 @@ import (
 // RetroDir is where a retro's folder goes, inside the folder being worked on.
 func RetroDir(r Roots) string { return r.Private("retro") }
 
+// WHAT THE NEXT RETRO READS LIVES WHERE NO DRAIN LOOKS.
+//
+// A retro's report and its period's counts are the two things a later retro
+// reads: one rule scores the last retro's improvements, another compares this
+// period's shape against earlier ones. The report was written into the folder
+// above, which is the folder a retro fills and empties, and the counts were
+// written down nowhere at all. Then the guidance sent the report to doc/retro,
+// which git sees and nothing carries off the machine anyway.
+//
+// THE OWNER'S RULING: it is too early for a proper retro system. The reports
+// stay on this machine and out of git, and the drain never touches them. So
+// they live here: under .se, which .gitignore covers, and in a folder no drain
+// in this file names.
+func ReportsDir(r Roots) string { return r.Private("reports") }
+
+// THE COUNTS AND THE REPORT SHARE THE RETRO'S STAMP, so the pair belonging to
+// one period is found by name rather than by a list somebody maintains.
+const countsSuffix = ".counts.json"
+
+// Counts is one period in numbers: what the retro took, and what a turn cost
+// while it was running. The engine writes it, because a number a person is
+// asked to copy down is a number that stops being written.
+type Counts struct {
+	Stamp   string `json:"stamp"`
+	Folder  string `json:"folder"`
+	Logs    int    `json:"logs"`
+	Scripts int    `json:"scripts"`
+	Outputs int    `json:"outputs"`
+	Undos   int    `json:"undos"`
+	Sent    Sizes  `json:"sent"`
+}
+
+// Period is what one retro left for the next: its counts, and the report
+// whoever ran it wrote, where they wrote one.
+type Period struct {
+	Stamp  string `json:"stamp"`
+	Counts Counts `json:"counts"`
+	Report string `json:"report,omitempty"`
+}
+
 // Collected says what a retro took and where it put it.
 type Collected struct {
 	Folder     string   `json:"folder"`
@@ -53,10 +94,54 @@ type Collected struct {
 	Missing    []string `json:"looked_for_and_missing"`
 	Kept       []string `json:"kept_and_why"`
 
+	// WHERE THIS PERIOD IS WRITTEN DOWN, AND WHAT EARLIER ONES LEFT. None of
+	// these is in the folder above, which is the folder the next retro empties.
+	// A place nobody is told about is a place nobody writes to, so the retro
+	// says where its report goes rather than leaving it to be remembered.
+	Counts  string   `json:"counts"`
+	Report  string   `json:"report"`
+	Earlier []Period `json:"earlier"`
+
 	// WHAT THE ENGINE SENT, MEASURED. The retro is where the size of the thing
 	// this engine hands an agent stops being a feeling and becomes a number
 	// somebody can watch fall.
 	Sent Sizes `json:"sent"`
+
+	// HOW THE AGENT WROTE WHILE THE PERIOD RAN, and the file it is written in.
+	// The rules refuse a write at the time; this is the same rules read back
+	// over a whole session, which is where a habit shows and a single refusal
+	// does not.
+	Voice string `json:"voice"`
+
+	// The one order over everything the folder holds. The log and the
+	// transcripts arrive on separate clocks, so this is where they are read as
+	// one run. Unplaced counts the entries whose file carried no stamp at all,
+	// because a reading that quietly leaves something out is worse than a
+	// reading that says how much it could not take.
+	Timeline         string `json:"timeline"`
+	TimelineUnplaced int    `json:"timeline_unplaced,omitempty"`
+}
+
+// VoiceTally is one rule the agent broke while the period ran: which rule, how
+// many times, and where to look.
+type VoiceTally struct {
+	Rule  string   `json:"rule"`
+	Count int      `json:"count"`
+	Where []string `json:"where"`
+}
+
+// VoiceReading is how the period read: what was looked at, what it broke, or
+// why it could not be looked at.
+//
+// UNAVAILABLE IS NOT NOUGHT. A rules file that will not load and a session with
+// nothing wrong in it are opposite answers, and reporting both as nought breaks
+// would let the checker rot unnoticed behind a clean-looking number.
+type VoiceReading struct {
+	RulesFrom   string       `json:"rules_from,omitempty"`
+	Messages    int          `json:"messages"`
+	Breaches    int          `json:"breaches"`
+	ByRule      []VoiceTally `json:"by_rule,omitempty"`
+	Unavailable string       `json:"unavailable,omitempty"`
 }
 
 // Sizes is what one turn costs, in bytes, at the places an agent is handed
@@ -92,9 +177,57 @@ func WhoIsStillWorking(r Roots, mine string) []string {
 	return busy
 }
 
+// A MANIFEST, NOT COUNTS. One JSONL line per thing: its name in the retro
+// folder, where it came from, and its fate. A count is derivable from it,
+// and a thing left behind or looked for and missed is on the same page as
+// the things taken, so a retro that leaves a file no longer reads exactly
+// like one that took it.
+type manifestLine struct {
+	Name   string `json:"name"`
+	Origin string `json:"origin"`
+	Fate   string `json:"fate"`
+	Why    string `json:"why,omitempty"`
+}
+
+// takenLines answers one manifest line per name moved into the retro folder.
+func takenLines(sub, origin string, names []string) []manifestLine {
+	var out []manifestLine
+	for _, name := range names {
+		out = append(out, manifestLine{Name: sub + "/" + name, Origin: origin, Fate: "taken"})
+	}
+	return out
+}
+
+// asLines is the manifest as it is written: one JSON object per line.
+func asLines(manifest []manifestLine) []byte {
+	var b strings.Builder
+	for _, l := range manifest {
+		if line, err := json.Marshal(l); err == nil {
+			b.Write(line)
+			b.WriteString("\n")
+		}
+	}
+	return []byte(b.String())
+}
+
+// A Transcript is one harness session's record: what the copy is called in the
+// retro folder, where it is now, and whose it is.
+//
+// WHOSE IT IS, OR WHY THAT CANNOT BE SAID. A session file is named by the
+// harness's own id and nothing on this machine maps that to an actor, so a
+// transcript is attributed where the engine actually knows and is called
+// unattributed where it does not. The alternative is a folder of files with
+// confident names nobody can check.
+type Transcript struct {
+	Name string `json:"name"`
+	Path string `json:"path"` // empty means it was looked for and not found
+	Who  string `json:"who"`
+}
+
 // Retro collects and drains, and answers what it took.
-func Retro(r Roots, actor string, transcripts map[string]string) (Collected, error) {
+func Retro(r Roots, actor string, transcripts []Transcript) (Collected, error) {
 	var got Collected
+	var manifest []manifestLine
 	if busy := WhoIsStillWorking(r, actor); len(busy) > 0 {
 		return got, fmt.Errorf("a retro is a cycle boundary and somebody is still working:\n  %s\n"+
 			"Wait for them, or take the work back, and run it again",
@@ -129,13 +262,15 @@ func Retro(r Roots, actor string, transcripts map[string]string) (Collected, err
 
 	// EVERY OLD LOG MOVES. The current one is not there to move, because it was
 	// only made again by whoever writes next.
-	n, err := drain(logs, filepath.Join(folder, "log"), func(name string) bool {
+	taken, err := drain(logs, filepath.Join(folder, "log"), func(name string) bool {
 		return strings.HasPrefix(name, "session-") && strings.HasSuffix(name, ".jsonl")
 	})
 	if err != nil {
 		return got, err
 	}
-	got.Logs = n
+	got.Logs = len(taken)
+	sessions := taken // read for voice below, before taken is used again
+	manifest = append(manifest, takenLines("log", ".se/log", taken)...)
 
 	// THE SCRATCHPAD MOVES EXCEPT FOR TWO THINGS, AND THE INDEX SAYS WHICH.
 	//
@@ -155,9 +290,11 @@ func Retro(r Roots, actor string, transcripts map[string]string) (Collected, err
 	// not a boundary.
 	cited := citedInOpenWork(r)
 	pad := r.Private("scratchpad")
-	n, err = drain(pad, filepath.Join(folder, "scratchpad"), func(name string) bool {
+	taken, err = drain(pad, filepath.Join(folder, "scratchpad"), func(name string) bool {
 		if cited[name] {
 			got.Kept = append(got.Kept, name+": an unfinished token names it by path")
+			manifest = append(manifest, manifestLine{Name: name, Origin: ".se/scratchpad",
+				Fate: "kept", Why: "an unfinished token names it by path"})
 			return false
 		}
 		// A FOLDER, AND WHOEVER OWNS IT MAY BE WRITING TO IT.
@@ -169,6 +306,8 @@ func Retro(r Roots, actor string, transcripts map[string]string) (Collected, err
 		// sentence is widened to match rather than the keep narrowed.
 		if isDir(filepath.Join(pad, name)) && name != actor {
 			got.Kept = append(got.Kept, name+": a folder, and whoever owns it may be writing to it")
+			manifest = append(manifest, manifestLine{Name: name, Origin: ".se/scratchpad",
+				Fate: "kept", Why: "a folder, and whoever owns it may be writing to it"})
 			return false
 		}
 		return true
@@ -176,7 +315,8 @@ func Retro(r Roots, actor string, transcripts map[string]string) (Collected, err
 	if err != nil {
 		return got, err
 	}
-	got.Scripts = n
+	got.Scripts = len(taken)
+	manifest = append(manifest, takenLines("scratchpad", ".se/scratchpad", taken)...)
 
 	// WHAT COMMANDS PRINTED, AND WHAT APPLIES OVERWROTE.
 	//
@@ -185,39 +325,197 @@ func Retro(r Roots, actor string, transcripts map[string]string) (Collected, err
 	// a kept output is what an agent was reading and an undo journal is what a
 	// change would be put back from, and neither survives the session that made
 	// it useful.
-	if n, err := drain(outDir(r), filepath.Join(folder, "out"), everyFile); err == nil {
-		got.Outputs = n
+	if taken, err := drain(outDir(r), filepath.Join(folder, "out"), everyFile); err == nil {
+		got.Outputs = len(taken)
+		manifest = append(manifest, takenLines("out", ".se/out", taken)...)
 	}
-	if n, err := drain(undoDir(r), filepath.Join(folder, "undo"), everyFile); err == nil {
-		got.Undos = n
+	if taken, err := drain(undoDir(r), filepath.Join(folder, "undo"), everyFile); err == nil {
+		got.Undos = len(taken)
+		manifest = append(manifest, takenLines("undo", ".se/undo", taken)...)
 	}
 
 	got.Sent = whatItSends(r)
 
+	// HOW THE AGENT WROTE, over the sessions this retro just took. The rules
+	// refuse a write at the time and see one file; this is the same rules over
+	// a whole period, which is where a habit shows.
+	got.Voice = filepath.Join(folder, "voice.json")
+	reading, err := json.MarshalIndent(theVoiceOf(r, filepath.Join(folder, "log"), sessions), "", "  ")
+	if err != nil {
+		return got, err
+	}
+	if err := writeAtomic(got.Voice, reading, 0o644); err != nil {
+		return got, err
+	}
+
 	// THE TRANSCRIPTS ARE COPIED, AND THE ONES THAT WERE NOT THERE ARE NAMED.
 	// A command silent about what it looked for and missed reads as a command
 	// that found everything.
-	for _, harness := range sortedKeys(transcripts) {
-		from := transcripts[harness]
-		if from == "" {
-			got.Missing = append(got.Missing, harness+": this machine says nothing about where it keeps one")
+	for _, t := range inNameOrder(transcripts) {
+		if t.Path == "" {
+			got.Missing = append(got.Missing, t.Name+": "+t.Who)
+			manifest = append(manifest, manifestLine{Name: t.Name, Origin: "transcript",
+				Fate: "looked for and missing", Why: t.Who})
 			continue
 		}
-		to := filepath.Join(folder, "transcript", harness+filepath.Ext(from))
-		if err := copyFile(from, to, 0o644); err != nil {
-			got.Missing = append(got.Missing, harness+": "+err.Error())
+		to := filepath.Join(folder, "transcript", t.Name+filepath.Ext(t.Path))
+		if err := copyFile(t.Path, to, 0o644); err != nil {
+			got.Missing = append(got.Missing, t.Name+": "+err.Error())
+			manifest = append(manifest, manifestLine{Name: t.Name, Origin: t.Path,
+				Fate: "looked for and missing", Why: err.Error()})
 			continue
 		}
 		got.Transcript = append(got.Transcript, to)
+		// WHOSE IT IS GOES ON THE LINE, so a reader of the folder can tell a
+		// transcript the engine could attribute from one it could not.
+		manifest = append(manifest, manifestLine{Name: "transcript/" + t.Name + filepath.Ext(t.Path),
+			Origin: t.Path, Fate: "taken", Why: t.Who})
 	}
 
-	if err := writeAtomic(filepath.Join(folder, "index.md"), []byte(retroIndex(got)), 0o644); err != nil {
+	// ONE ORDER OVER THE TWO CLOCKS, woven last, because it reads the log this
+	// retro drained and the transcripts it has just copied. It leaves both
+	// where they are: the sources are the evidence the weave can be checked
+	// against, and a reading that consumed them could not be.
+	got.Timeline, got.TimelineUnplaced = weaveTimeline(folder, transcripts)
+
+	if err := writeAtomic(filepath.Join(folder, "manifest.jsonl"), asLines(manifest), 0o644); err != nil {
 		return got, err
 	}
+
+	// WHAT EARLIER RETROS LEFT, READ BEFORE THIS ONE IS ADDED TO IT, so a retro
+	// is handed the reports and counts its own rules ask it to score rather than
+	// going to look for them. An input you had to hunt for is a defect in this
+	// verb, and these two were the ones being hunted.
+	stamp := filepath.Base(folder)
+	got.Earlier = earlierPeriods(r)
+	got.Counts = filepath.Join(ReportsDir(r), stamp+countsSuffix)
+	got.Report = filepath.Join(ReportsDir(r), stamp+".md")
+	counts, err := json.Marshal(Counts{Stamp: stamp, Folder: folder, Logs: got.Logs,
+		Scripts: got.Scripts, Outputs: got.Outputs, Undos: got.Undos, Sent: got.Sent})
+	if err != nil {
+		return got, err
+	}
+	if err := writeAtomic(got.Counts, counts, 0o644); err != nil {
+		return got, err
+	}
+
 	inSession(r, "retro", actor, "a retro collected "+folder, Yes(),
 		map[string]any{"folder": folder, "logs": got.Logs, "scripts": got.Scripts,
-			"outputs": got.Outputs, "undos": got.Undos})
+			"outputs": got.Outputs, "undos": got.Undos, "counts": got.Counts,
+			"earlier": len(got.Earlier)})
 	return got, nil
+}
+
+// theVoiceOf reads the sessions this retro took and answers how the agent wrote
+// while the period ran: which rule, how many, and where to look.
+//
+// ONLY THE AGENT'S WORDS. The record carries three writers and the rules are
+// only about one of them. The person writes their prompt however they like, and
+// the engine's own messages are nobody's prose to improve, so counting either
+// would put the number out of reach of the one who could act on it.
+//
+// IT NEVER FAILS THE RETRO. A retro is a cycle boundary, and a checker that
+// cannot run must not take one down. It says why it could not look, which is a
+// different answer from a clean session and is written as one.
+func theVoiceOf(r Roots, logDir string, sessions []string) VoiceReading {
+	var out VoiceReading
+	rules, err := LoadVoiceRules(r.Method)
+	if err != nil {
+		out.Unavailable = err.Error()
+		return out
+	}
+	out.RulesFrom = rules.Source
+	found := map[string][]string{}
+	for _, name := range sessions {
+		f, err := os.Open(filepath.Join(logDir, name))
+		if err != nil {
+			continue
+		}
+		scan := bufio.NewScanner(f)
+		// A RECORD IS ONE LINE AND A LINE CAN BE LONG. The scanner's own limit is
+		// 64k, and an answer carrying a whole reply passes that, so without this
+		// the long records would be dropped and the count would read low while
+		// looking like a measurement.
+		scan.Buffer(make([]byte, 0, 64<<10), 8<<20)
+		for n := 1; scan.Scan(); n++ {
+			var rec Record
+			if json.Unmarshal(scan.Bytes(), &rec) != nil || rec.Src != "agent" || rec.Msg == "" {
+				continue
+			}
+			out.Messages++
+			for _, b := range rules.Check(rec.Msg) {
+				out.Breaches++
+				found[b.Rule] = append(found[b.Rule],
+					fmt.Sprintf("log/%s record %d, %s: %s", name, n, b.Where, b.Says))
+			}
+		}
+		f.Close()
+	}
+	// BY RULE, IN A FIXED ORDER, so two retros over the same sessions read the
+	// same way and a difference between them is about the sessions.
+	var rulesBroken []string
+	for rule := range found {
+		rulesBroken = append(rulesBroken, rule)
+	}
+	sort.Strings(rulesBroken)
+	for _, rule := range rulesBroken {
+		where := found[rule]
+		// THE COUNT IS WHOLE AND THE PLACES ARE A SAMPLE. A rule broken two
+		// hundred times needs the number and somewhere to start, not two hundred
+		// lines nobody reads.
+		tally := VoiceTally{Rule: rule, Count: len(where), Where: where}
+		if len(where) > 10 {
+			tally.Where = where[:10]
+		}
+		out.ByRule = append(out.ByRule, tally)
+	}
+	return out
+}
+
+// earlierPeriods answers what earlier retros left in the reports folder, oldest
+// first, pairing a period's counts with its report by the stamp they share.
+//
+// A PERIOD WITH NO REPORT IS STILL A PERIOD. The counts are the engine's and
+// arrive whatever anybody writes afterwards, so a retro nobody wrote up still
+// carries numbers the next one can compare against, and the gap shows as a
+// period with no report rather than as nothing at all.
+func earlierPeriods(r Roots) []Period {
+	entries, err := os.ReadDir(ReportsDir(r))
+	if err != nil {
+		return nil
+	}
+	found := map[string]*Period{}
+	var stamps []string
+	at := func(stamp string) *Period {
+		p, seen := found[stamp]
+		if !seen {
+			p = &Period{Stamp: stamp, Counts: Counts{Stamp: stamp}}
+			found[stamp], stamps = p, append(stamps, stamp)
+		}
+		return p
+	}
+	for _, e := range entries {
+		if e.IsDir() {
+			continue
+		}
+		name := e.Name()
+		switch {
+		case strings.HasSuffix(name, countsSuffix):
+			p := at(strings.TrimSuffix(name, countsSuffix))
+			if b, err := os.ReadFile(filepath.Join(ReportsDir(r), name)); err == nil {
+				json.Unmarshal(b, &p.Counts)
+			}
+		case strings.HasSuffix(name, ".md"):
+			at(strings.TrimSuffix(name, ".md")).Report = filepath.Join(ReportsDir(r), name)
+		}
+	}
+	// THE STAMP SORTS BY TIME, being the time written the way it sorts.
+	sort.Strings(stamps)
+	var out []Period
+	for _, s := range stamps {
+		out = append(out, *found[s])
+	}
+	return out
 }
 
 // citedInOpenWork answers every scratchpad entry a token that has not ended
@@ -345,15 +643,17 @@ func isDir(path string) bool {
 // drain moves what matches into another folder and leaves the source empty of
 // it. Moving rather than copying is the whole point: the next retro starts
 // empty and nothing is counted twice.
-func drain(from, to string, wanted func(string) bool) (int, error) {
+// IT ANSWERS THE NAMES IT MOVED, because the manifest carries names and a
+// count cannot say which name came from where.
+func drain(from, to string, wanted func(string) bool) ([]string, error) {
 	entries, err := os.ReadDir(from)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return 0, nil
+			return nil, nil
 		}
-		return 0, err
+		return nil, err
 	}
-	moved := 0
+	var moved []string
 	for _, e := range entries {
 		if wanted != nil && !wanted(e.Name()) {
 			continue
@@ -361,76 +661,9 @@ func drain(from, to string, wanted func(string) bool) (int, error) {
 		if err := os.Rename(filepath.Join(from, e.Name()), filepath.Join(to, e.Name())); err != nil {
 			return moved, fmt.Errorf("%s will not move: %w", e.Name(), err)
 		}
-		moved++
+		moved = append(moved, e.Name())
 	}
 	return moved, nil
-}
-
-// THE FOLDER SAYS WHAT IS IN IT AND WHAT TO DO WITH IT.
-//
-// A folder of files is a folder somebody has to work out. The one thing a
-// reader needs telling is what v3's retro asked: which scripts here a tool
-// could own, and that keeping one means moving it into the method rather than
-// leaving it for the next retro to take again.
-func retroIndex(got Collected) string {
-	var b strings.Builder
-	b.WriteString("# A retro\n\nWhat this folder holds, and what to do with it.\n\n")
-	fmt.Fprintf(&b, "- log: %d file(s) the record wrote since the last retro\n", got.Logs)
-	fmt.Fprintf(&b, "- scratchpad: %d thing(s) an agent wrote while working\n", got.Scripts)
-	fmt.Fprintf(&b, "- transcript: %d harness transcript(s), copied\n", len(got.Transcript))
-	fmt.Fprintf(&b, "- out: %d kept command output(s)\n", got.Outputs)
-	fmt.Fprintf(&b, "- undo: %d journal(s) of what an apply overwrote\n", got.Undos)
-
-	// WHAT THE ENGINE SENDS, AS NUMBERS TO WATCH FALL.
-	//
-	// A NUMBER NOBODY WATCHES IS A NUMBER THAT GROWS. No single answer is ever
-	// obviously too big, which is how the whole of it gets too big with nothing
-	// anywhere saying so. These are what a turn pays, measured on this tree at
-	// the moment the retro ran.
-	b.WriteString("\nWHAT ONE TURN COSTS, IN BYTES:\n")
-	for _, row := range []struct {
-		n    int
-		says string
-	}{
-		{got.Sent.Tools, "the tool list, sent on every turn"},
-		{got.Sent.Prompt, "the standing layer, in the prompt on every turn"},
-		{got.Sent.Pull, "a pull answer, at its biggest token"},
-		{got.Sent.Refusal, "a gate refusal"},
-		{got.Sent.PageSize, "one window of a command's output"},
-		{got.Sent.OutKept, "command output kept on disk, before this retro"},
-	} {
-		fmt.Fprintf(&b, "- %6d  %s\n", row.n, row.says)
-	}
-	if len(got.Missing) > 0 {
-		b.WriteString("\nLOOKED FOR AND NOT FOUND:\n")
-		for _, m := range got.Missing {
-			b.WriteString("- " + m + "\n")
-		}
-	}
-	// WHAT WAS LEFT BEHIND, AND WHY, IN THE THING A PERSON OPENS.
-	//
-	// The keep was built and the half that says what it kept was not, so the
-	// index carried three counts and the LOOKED FOR AND NOT FOUND block and
-	// no word about anything left in place. A retro that leaves a file and
-	// does not say so reads exactly like one that took it.
-	//
-	// IT IS THE HALF WITH NO OUTPUT, which is why it went missing: the keep
-	// can be shown by pointing at a file that is still there, and this one
-	// can only be shown by reading the page.
-	if len(got.Kept) > 0 {
-		b.WriteString("\nLEFT WHERE IT WAS, AND WHY:\n")
-		for _, k := range got.Kept {
-			b.WriteString("- " + k + "\n")
-		}
-	}
-	b.WriteString("\nA SCRIPT WORTH KEEPING IS MOVED INTO THE METHOD, into util/checks, " +
-		"and not left here. This folder is read once. Anything left in it is read " +
-		"again by nobody, and a script that earns its place belongs where every " +
-		"submission runs it.\n")
-	b.WriteString("\nTHE STANDING CHECKS ARE NOT HERE AND WERE NEVER TAKEN. They live in " +
-		"util/checks, which is in version control, so a sweep of the scratchpad " +
-		"cannot reach them.\n")
-	return b.String()
 }
 
 // WHERE EACH HARNESS KEEPS ITS TRANSCRIPT, and it is a different answer per
@@ -445,20 +678,103 @@ func retroIndex(got Collected) string {
 // business rather than the engine's. What is here is the folder to look in, and
 // a retro that finds nothing says which folder it looked in rather than being
 // silent about a harness it missed.
-func Transcripts(r Roots) map[string]string {
-	out := map[string]string{"claude": "", "copilot": ""}
-	if h := loadHeard(r); h.Path != "" {
-		if _, err := os.Stat(h.Path); err == nil {
-			out["claude"] = h.Path
-		}
+func Transcripts(r Roots) []Transcript {
+	return append(claudeSessions(r), copilotChats()...)
+}
+
+// claudeSessions answers every session the harness kept for this project.
+//
+// THE FOLDER IS THE FACT, NOT THE ONE FILE. heard.json holds the single path
+// the guard was last handed, so asking it answered whichever agent happened to
+// make the most recent tool call, and a session runs ten agents with a
+// transcript each. MEASURED: three sessions in the folder, one collected, and
+// looked_for_and_missing was empty, so the retro folder read like a complete
+// record of the period while holding a third of it.
+//
+// The harness keeps every session for this project beside the one it named, so
+// the folder that path is in is what the engine knows, and the walk goes there.
+func claudeSessions(r Roots) []Transcript {
+	h := loadHeard(r)
+	if h.Path == "" {
+		return []Transcript{{Name: "claude",
+			Who: "this machine says nothing about where it keeps one"}}
 	}
-	if home, err := os.UserHomeDir(); err == nil {
-		// The newest chat session under the editor's storage, if there is one.
-		if p := newestUnder(filepath.Join(home, "AppData", "Roaming", "Code",
-			"User", "workspaceStorage"), ".json"); p != "" {
-			out["copilot"] = p
-		}
+	dir := filepath.Dir(h.Path)
+	entries, err := os.ReadDir(dir)
+	if err != nil {
+		return []Transcript{{Name: "claude", Who: "the folder the guard named, " + dir +
+			", will not read: " + err.Error()}}
 	}
+	heard := filepath.Base(h.Path)
+	var out []Transcript
+	for _, e := range entries {
+		if e.IsDir() || !strings.HasSuffix(e.Name(), ".jsonl") {
+			continue
+		}
+		// WHOSE IT IS, AND THE ENGINE ONLY EVER KNOWS ONE OF THEM. The file is
+		// named by the harness's session id and nothing on this machine maps
+		// that to an actor, so the rest are called unattributed rather than
+		// given a name a reader would trust.
+		who := "unattributed: named by its session, and nothing here says which agent wrote it"
+		if e.Name() == heard {
+			who = "the session the guard was last handed, from heard.json"
+		}
+		out = append(out, Transcript{
+			Name: "claude-" + strings.TrimSuffix(e.Name(), ".jsonl"),
+			Path: filepath.Join(dir, e.Name()),
+			Who:  who,
+		})
+	}
+	if len(out) == 0 {
+		return []Transcript{{Name: "claude", Who: "no session file under " + dir}}
+	}
+	return out
+}
+
+// copilotChats answers the chat files the editor kept beside the newest one.
+//
+// BEST EFFORT, AND IT SAYS SO. Which workspace folder belongs to this project is
+// the editor's business rather than the engine's, so the newest chat file is
+// taken as the way in and its folder is read whole. A retro that finds nothing
+// says which folder it looked in rather than being silent about a harness.
+func copilotChats() []Transcript {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return []Transcript{{Name: "copilot", Who: "this machine has no home folder to look under"}}
+	}
+	store := filepath.Join(home, "AppData", "Roaming", "Code", "User", "workspaceStorage")
+	newest := newestUnder(store, ".json")
+	if newest == "" {
+		return []Transcript{{Name: "copilot", Who: "nothing chat-shaped under " + store}}
+	}
+	dir := filepath.Dir(newest)
+	entries, err := os.ReadDir(dir)
+	if err != nil {
+		return []Transcript{{Name: "copilot", Path: newest,
+			Who: "unattributed: the editor names no agent in the file"}}
+	}
+	var out []Transcript
+	for _, e := range entries {
+		if e.IsDir() || !strings.HasSuffix(e.Name(), ".json") {
+			continue
+		}
+		out = append(out, Transcript{
+			Name: "copilot-" + strings.TrimSuffix(e.Name(), ".json"),
+			Path: filepath.Join(dir, e.Name()),
+			Who:  "unattributed: the editor names no agent in the file",
+		})
+	}
+	if len(out) == 0 {
+		return []Transcript{{Name: "copilot", Who: "nothing chat-shaped under " + dir}}
+	}
+	return out
+}
+
+// inNameOrder answers the transcripts sorted by name, so a retro folder and its
+// manifest read the same way twice.
+func inNameOrder(in []Transcript) []Transcript {
+	out := append([]Transcript(nil), in...)
+	sort.Slice(out, func(i, j int) bool { return out[i].Name < out[j].Name })
 	return out
 }
 

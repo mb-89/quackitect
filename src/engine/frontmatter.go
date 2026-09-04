@@ -99,10 +99,25 @@ func ParseFront(front string) (Front, error) {
 
 // WriteFront renders in a stable order, so a token that did not change reads
 // as a file that did not change, and a diff shows the field that moved.
-func WriteFront(f Front, order []string) string {
+// describe puts each field's description above it as a comment, so the
+// guidance sits where the field is on every note the engine writes.
+func WriteFront(f Front, order []string, describe map[string]string) string {
+	return writeFront(f, order, describe, false)
+}
+
+// writeFront is the one writer of frontmatter, for the saved token and the
+// template alike, so the two cannot drift. keepEmpty writes a field whose
+// value is blank, which is what a template is for: the blank is the field a
+// person fills, and a saved token leaves it out.
+func writeFront(f Front, order []string, describe map[string]string, keepEmpty bool) string {
 	var b strings.Builder
 	b.WriteString(noteFence + "\n")
 	seen := map[string]bool{}
+	comment := func(k string) {
+		if d := describe[k]; d != "" {
+			b.WriteString("# " + d + "\n")
+		}
+	}
 	write := func(k string) {
 		v, ok := f[k]
 		if !ok || seen[k] {
@@ -112,16 +127,26 @@ func WriteFront(f Front, order []string) string {
 		switch val := v.(type) {
 		case []string:
 			if len(val) == 0 {
+				if keepEmpty {
+					comment(k)
+					b.WriteString(k + ": []\n")
+				}
 				return
 			}
+			comment(k)
 			b.WriteString(k + ":\n")
 			for _, e := range val {
 				b.WriteString("  - " + quoteInList(e) + "\n")
 			}
 		case string:
 			if val == "" {
+				if keepEmpty {
+					comment(k)
+					b.WriteString(k + ": \n")
+				}
 				return
 			}
+			comment(k)
 			b.WriteString(k + ": " + quote(val) + "\n")
 		}
 	}
@@ -252,4 +277,23 @@ func fb(f Front, k string) bool { return fs(f, k) == "true" }
 func fi(f Front, k string) int {
 	n, _ := strconv.Atoi(fs(f, k))
 	return n
+}
+
+// given answers whether a field carries anything, whatever shape it is in.
+//
+// A REQUIRED FIELD MAY BE A LIST. Asking a list for its string answers nothing,
+// so a required array read as text was always missing and no rationale in this
+// tree could satisfy its own schema.
+func given(f Front, k string) bool {
+	switch v := f[k].(type) {
+	case string:
+		return strings.TrimSpace(v) != ""
+	case []string:
+		for _, s := range v {
+			if strings.TrimSpace(s) != "" {
+				return true
+			}
+		}
+	}
+	return false
 }

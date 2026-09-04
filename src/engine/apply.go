@@ -59,8 +59,12 @@ type Applied struct {
 
 // Apply runs a manifest against the work root. It answers what it wrote, or
 // says why it wrote nothing.
-func Apply(r Roots, edits []Edit, dry bool) (Applied, error) {
-	out := Applied{Edits: map[string]int{}, Dry: dry}
+//
+// IT IS TOLD WHOSE CHANGE THIS IS, because the journal it writes is the thing
+// an undo reads, and an undo that cannot tell one agent's apply from another's
+// takes the wrong one back.
+func Apply(r Roots, edits []Edit, dry bool, on, by string) (Applied, error) {
+	out := Applied{On: on, Edits: map[string]int{}, Dry: dry}
 	if len(edits) == 0 {
 		return out, fmt.Errorf("an apply with no edits: say what to change")
 	}
@@ -142,6 +146,17 @@ func Apply(r Roots, edits []Edit, dry bool) (Applied, error) {
 		out.Edits[path]++
 	}
 
+	// THE SCHEMA IS CHECKED HERE TOO, and a dry run checks it with the rest.
+	for _, path := range out.Files {
+		id, isNote := tokenNoteAt(r, path)
+		if !isNote {
+			continue
+		}
+		if err := tokensThatFit(r, id, before[path], content[path]); err != nil {
+			return out, err
+		}
+	}
+
 	if dry {
 		return out.said(r), nil
 	}
@@ -149,7 +164,7 @@ func Apply(r Roots, edits []Edit, dry bool) (Applied, error) {
 	// WHAT WAS THERE IS WRITTEN DOWN BEFORE ANYTHING IS OVERWRITTEN, and a
 	// journal that cannot be written refuses the apply. A bulk edit nobody can
 	// undo is the incident this exists to prevent.
-	undo, err := journalUndo(r, out.Files, before, born, content)
+	undo, err := journalUndo(r, on, by, out.Files, before, born, content)
 	if err != nil {
 		return out, fmt.Errorf("the undo journal would not write, so nothing was: %w", err)
 	}
@@ -198,6 +213,63 @@ func inTheTree(r Roots, name string) (string, error) {
 	return path, nil
 }
 
+// tokenNoteAt answers the id a file would be read under, when the file is a
+// note in one of the folders tokens live in. Everywhere else this door writes
+// what it is told to write.
+func tokenNoteAt(r Roots, path string) (string, bool) {
+	if !strings.HasSuffix(path, ".md") {
+		return "", false
+	}
+	dir := filepath.Clean(filepath.Dir(path))
+	for _, one := range workDirs(r) {
+		if dir == filepath.Clean(one) {
+			return strings.TrimSuffix(filepath.Base(path), ".md"), true
+		}
+	}
+	return "", false
+}
+
+// tokensThatFit holds a write to the byte bounds the save holds a token to, so
+// this door cannot leave behind a token the engine will not load.
+//
+// MEASURED. A detail was grown to 2811 bytes through here, against a cap of
+// 1500, and the write was taken. Every engine call the holder made afterwards
+// was refused naming that size, because switching tokens puts the held one
+// back and putting it back validates it. So the write door was the way to make
+// a token unreadable, and the mint door's check was the only one there was.
+//
+// THE REFUSAL NAMES THE TOKEN IT MEASURED. A size on its own reads as a
+// complaint about whatever the caller happened to name, and the caller has no
+// way to tell which file is the one over.
+//
+// AN EDIT THAT BRINGS AN OVER-LONG SECTION DOWN IS LET THROUGH. A guard that
+// weighs the result alone refuses the one edit that fixes the file, and the
+// holder is then locked out with nowhere to go. What is refused is a write
+// that pushes a section past its bound, or further past it.
+func tokensThatFit(r Roots, id string, was, now []byte) error {
+	t, err := noteToken(string(now), id)
+	if err != nil {
+		return nil // a note that is not a token is not this guard's business
+	}
+	over := overCaps(narrowedSchema(r, t), t)
+	if len(over) == 0 {
+		return nil
+	}
+	held := map[string]string{}
+	if before, err := noteToken(string(was), id); err == nil {
+		held = before.bounded()
+	}
+	for _, one := range over {
+		if len(one.Text) <= len(held[one.Says]) {
+			continue // it came down, or did not move, and refusing that is the trap
+		}
+		return fmt.Errorf("%s: %s would be %d bytes and the schema allows %d. Nothing was written. "+
+			"Shorten it in this edit: a write that pushes a section further past its bound is "+
+			"refused, and one that brings it down is not", id, one.Says, len(one.Text), one.Max)
+	}
+	return nil
+}
+
 // shortPath says where a file is from the work root, because an absolute path
 // in the record is a path on one machine written into a file that travels.
 func shortPath(r Roots, path string) string {
@@ -224,10 +296,29 @@ type wasFile struct {
 
 func undoDir(r Roots) string { return r.Private("undo") }
 
+// A JOURNAL ENTRY SAYS WHOSE APPLY IT WAS.
+//
+// It was a bare list of files, and the undo took the newest list in the folder
+// whoever had written it. One agent on a tree never notices. Ten agents on one
+// tree means the newest apply is somebody else's most of the time, and an undo
+// is what an agent reaches for the moment it has made a mistake, which is the
+// moment it is least likely to check who wrote last.
+//
+// MEASURED ONCE, ON THIS TREE: an undo named on one token restored a file that
+// belonged to another actor's token, and the newer content was gone for good,
+// both files being untracked. So an entry carries the token it was written
+// against, and an undo takes back only its own.
+type journal struct {
+	On    string    `json:"on"`
+	By    string    `json:"by"`
+	At    string    `json:"at"`
+	Files []wasFile `json:"files"`
+}
+
 // journalUndo writes what every file held before this apply, and answers where
 // it put it. A file this apply brings into being is recorded as absent, so
 // undoing removes it rather than writing an empty one.
-func journalUndo(r Roots, files []string, before map[string][]byte, born map[string]bool, after map[string][]byte) (string, error) {
+func journalUndo(r Roots, on, by string, files []string, before map[string][]byte, born map[string]bool, after map[string][]byte) (string, error) {
 	var was []wasFile
 	for _, path := range files {
 		e := wasFile{File: shortPath(r, path), Applied: hashOf(after[path])}
@@ -238,7 +329,7 @@ func journalUndo(r Roots, files []string, before map[string][]byte, born map[str
 		}
 		was = append(was, e)
 	}
-	b, err := json.MarshalIndent(was, "", "  ")
+	b, err := json.MarshalIndent(journal{On: on, By: by, At: now(), Files: was}, "", "  ")
 	if err != nil {
 		return "", err
 	}
@@ -249,6 +340,44 @@ func journalUndo(r Roots, files []string, before map[string][]byte, born map[str
 		return "", err
 	}
 	return filepath.ToSlash(filepath.Join(".se", "undo", name)), nil
+}
+
+// newestOn answers the newest journal entry written against the token named,
+// the file it is in, and whether there was one. An empty want takes the newest
+// entry whatever it says, which is what this did before it could tell.
+func newestOn(r Roots, names []string, want string) (string, journal, bool) {
+	for i := len(names) - 1; i >= 0; i-- {
+		path := filepath.Join(undoDir(r), names[i])
+		j, err := readJournal(path)
+		if err != nil {
+			continue // an entry nobody can read is not an entry anybody can undo
+		}
+		if want == "" || j.On == want {
+			return path, j, true
+		}
+	}
+	return "", journal{}, false
+}
+
+// readJournal reads one entry, in either shape.
+//
+// THE OLD SHAPE IS A BARE LIST and entries written before this are still in the
+// folder. One read answers both, and an old entry carries no token, so an undo
+// naming a token walks past it rather than taking a change nobody can attribute.
+func readJournal(path string) (journal, error) {
+	var j journal
+	b, err := os.ReadFile(path)
+	if err != nil {
+		return j, err
+	}
+	if err := json.Unmarshal(b, &j); err == nil && j.Files != nil {
+		return j, nil
+	}
+	var was []wasFile
+	if err := json.Unmarshal(b, &was); err != nil {
+		return j, fmt.Errorf("the undo journal is not readable: %w", err)
+	}
+	return journal{Files: was}, nil
 }
 
 func hashOf(b []byte) string {
@@ -262,7 +391,7 @@ func hashOf(b []byte) string {
 // the apply wrote before anything is restored, so an undo never throws away a
 // change somebody made afterwards. A tree half restored is worse than one not
 // restored at all: nobody can tell which half is which.
-func Undo(r Roots) ([]string, error) {
+func Undo(r Roots, on, by string) ([]string, error) {
 	entries, err := os.ReadDir(undoDir(r))
 	if err != nil || len(entries) == 0 {
 		return nil, fmt.Errorf("nothing to undo: no apply has been journalled")
@@ -277,16 +406,12 @@ func Undo(r Roots) ([]string, error) {
 		return nil, fmt.Errorf("nothing to undo: no apply has been journalled")
 	}
 	sort.Strings(names)
-	newest := filepath.Join(undoDir(r), names[len(names)-1])
-
-	b, err := os.ReadFile(newest)
-	if err != nil {
-		return nil, fmt.Errorf("the undo journal will not read: %w", err)
+	newest, j, found := newestOn(r, names, on)
+	if !found {
+		return nil, fmt.Errorf("nothing of %s to undo: an undo puts back what the token it names wrote, "+
+			"and nothing here was written against it", on)
 	}
-	var was []wasFile
-	if err := json.Unmarshal(b, &was); err != nil {
-		return nil, fmt.Errorf("the undo journal is not readable: %w", err)
-	}
+	was := j.Files
 
 	// THE DRIFT CHECK COMES FIRST, OVER EVERY FILE.
 	for _, e := range was {

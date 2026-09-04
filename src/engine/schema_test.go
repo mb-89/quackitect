@@ -325,6 +325,86 @@ func whatEachSaid(found []Finding) []string {
 	return out
 }
 
+// A VALUE OUTSIDE ITS PROCESS'S ENUM IS NAMED, WITH THE VALUES ALLOWED.
+//
+// The schema carries no values of its own here: x-enum-from sends the field
+// to the token's own process, Narrow resolves it, and checkFront refuses what
+// is outside. Fixtures drive that path, one field at a time.
+
+const theEnumSchema = `kind: note
+frontmatter:
+  type: object
+  additionalProperties: false
+  required:
+    - kind
+  properties:
+    kind:
+      const: note
+    process:
+      type: string
+    status:
+      x-enum-from: process.states
+    disposition:
+      x-enum-from: process.dispositions
+body:
+  headingLevel: 2
+  order: strict
+  extraSections: false
+  sections:
+    - header: One
+      required: true
+`
+
+const theTinyProcess = `name: tiny
+sections:
+  required:
+    - One
+fields:
+  required:
+    - kind
+    - process
+    - status
+  optional:
+    - disposition
+states:
+  - name: open
+  - name: closed
+activities:
+  - name: close
+    from: open
+    to: closed
+dispositions:
+  - name: done
+  - name: dropped
+`
+
+func TestAValueOutsideItsProcessEnumIsNamed(t *testing.T) {
+	t.Parallel()
+	root := aSchema(t, theEnumSchema)
+	dir := ProcessesDir(root)
+	if err := os.MkdirAll(dir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(dir, "tiny.process.yaml"), []byte(theTinyProcess), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	s := load(t, root)
+	note := func(status, disposition string) string {
+		return "---\nkind: note\nprocess: tiny\nstatus: " + status +
+			"\ndisposition: " + disposition + "\n---\n\n# A note\n\n## One\n\nShort.\n"
+	}
+	// The fixture pair holds together: values drawn from the process pass.
+	if got := ValidateNote(s, note("open", "done"), root); len(got) != 0 {
+		t.Fatalf("a note inside its process enums was refused: %v", got)
+	}
+	if got := ValidateNote(s, note("elsewhere", "done"), root); !saidIn(got, `status reads "elsewhere" and the values are open, closed`) {
+		t.Errorf("a status outside its process states was not named with the values: %v", got)
+	}
+	if got := ValidateNote(s, note("open", "vanished"), root); !saidIn(got, `disposition reads "vanished" and the values are done, dropped`) {
+		t.Errorf("a disposition outside its process dispositions was not named with the values: %v", got)
+	}
+}
+
 // THE SHIPPED SCHEMA LOADS, AND IT CONSTRAINS WHAT IT CLAIMS TO.
 //
 // This reads src/schemas because a schema that does not parse is a defect in

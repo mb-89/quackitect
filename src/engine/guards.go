@@ -194,13 +194,20 @@ func aRepeatedFailure(r Roots, actor string, in hookIn) (string, bool) {
 // unbounded refusal is not a stronger guard: it is a guard that stops
 // existing without saying so. This one counts, and before the harness would
 // override it, it grants the stop and says in the record that it did.
-const stopRefusalsBeforeRelenting = 6
+// THREE, BY THE OWNER'S WORD. An agent that was refused thrice with the
+// budget spelled out is not going to shrink on the fourth, and six rounds of
+// the same refusal taught nothing extra.
+const stopRefusalsBeforeRelenting = 3
 
 func stopsPath(r Roots) string { return r.Private("stops.json") }
 
 type refusedStops struct {
 	Session string         `json:"session"`
 	Count   map[string]int `json:"count"`
+
+	// Seen holds the actors whose first stop of this session has happened,
+	// granted or refused, so the grace below is one per actor per session.
+	Seen map[string]bool `json:"seen,omitempty"`
 }
 
 func loadStops(r Roots) refusedStops {
@@ -229,6 +236,33 @@ func countRefusedStop(r Roots, actor string) (relent bool) {
 		return writeAtomic(stopsPath(r), b, 0o644)
 	})
 	return relent
+}
+
+// THE FIRST STOP OF A SESSION IS GRANTED. The kickoff tells the agent to say
+// it is ready and wait, so its first stop is doing what the person asked, and
+// refusing it demanded a claim for obedience. The grace is one stop per actor
+// per session, and the session ends when the engine starts again.
+//
+// firstStopOfSession answers whether this is the actor's first stop since the
+// session began, and remembers the stop happened either way.
+func firstStopOfSession(r Roots, actor string) (first bool) {
+	_ = locked(stopsPath(r), func() error { // a first it cannot record is refused like any other, which is the safe side
+		s := loadStops(r)
+		if s.Seen[actor] {
+			return nil
+		}
+		first = true
+		if s.Seen == nil {
+			s.Seen = map[string]bool{}
+		}
+		s.Seen[actor] = true
+		b, err := json.MarshalIndent(s, "", "  ")
+		if err != nil {
+			return err
+		}
+		return writeAtomic(stopsPath(r), b, 0o644)
+	})
+	return first
 }
 
 // forgetRefusedStops is what a granted stop does: the run of refusals ended.

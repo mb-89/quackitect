@@ -5,6 +5,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -178,6 +180,38 @@ func mustJSON(s string) string {
 }
 
 // A request the server does not answer is still answered, or the editor waits.
+// THE SCRATCHPAD IS NOT NOTES. A fixture under .se/scratchpad written to look
+// broken must not reach the problems panel, and the tokens under .se/work
+// still must.
+func TestTheWorkspaceScanLeavesTheScratchpadAlone(t *testing.T) {
+	t.Parallel()
+	root := t.TempDir()
+	for dir, name := range map[string]string{
+		filepath.Join(root, ".se", "scratchpad"): "broken.md",
+		filepath.Join(root, ".se", "work"):       "wk-under-test.md",
+	} {
+		if err := os.MkdirAll(dir, 0o755); err != nil {
+			t.Fatal(err)
+		}
+		note := "---\nkind: [[work-token]]\ntitle: a note\n---\n\n## detail\n\nwords\n"
+		if err := os.WriteFile(filepath.Join(dir, name), []byte(note), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	notes, err := notesUnder(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, p := range notes {
+		if strings.Contains(filepath.ToSlash(p), ".se/scratchpad") {
+			t.Fatalf("the scan read the scratchpad: %s", p)
+		}
+	}
+	if len(notes) != 1 {
+		t.Fatalf("the scan answered %d note(s), want the one under .se/work: %v", len(notes), notes)
+	}
+}
+
 func TestAnUnknownRequestIsStillAnswered(t *testing.T) {
 	t.Parallel()
 	got := drive(t, aSchema(t, theTestSchema),

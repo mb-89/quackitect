@@ -59,6 +59,41 @@ async function thePanel(tree) {
   return dom;
 }
 
+// A tree holding the mint line and the live table under it, which is the shape
+// of the group titled agent and engine control: a line a person types in, and a
+// table drawn from what the engine answered.
+const aTreeWithALiveTable = {
+  name: "quackitect", type: "group", children: [
+    {
+      name: "work", type: "group", shown: true, children: [
+        { name: "mint", type: "text", command: "quackitect.mintWork", placeholder: "what the work is" },
+        {
+          name: "present", type: "table", source: "present",
+          columns: [
+            { field: "actor", title: "agent" },
+            { field: "title", title: "working on", link: "id" },
+          ],
+        },
+      ],
+    },
+  ],
+};
+
+// TWO ANSWERS, DIFFERING IN WHO HOLDS WHAT. The second is what the engine says
+// after a token has changed hands.
+const anActor = (actor, id, title) =>
+  ({ actor, state: "working", id, title, holding: id + " " + title });
+const before = {
+  actors: [anActor("main", "wk-1111111111", "the first thing")],
+  present: [anActor("main", "wk-1111111111", "the first thing")],
+  hold: { on: false },
+};
+const after = {
+  actors: [anActor("worker-ivo", "wk-2222222222", "the second thing")],
+  present: [anActor("worker-ivo", "wk-2222222222", "the second thing")],
+  hold: { on: false },
+};
+
 // A tree holding one text control, which is what the sidebar's mint line is.
 const aTreeWithALine = {
   name: "quackitect", type: "group", children: [
@@ -177,6 +212,64 @@ const cases = {
     if (minted.title !== "driven by the check") {
       no(`reaches: the token it minted is titled ${JSON.stringify(minted.title)}`);
     } else ok("reaches: the token carries what was typed");
+  },
+
+  // A TOKEN CHANGES HANDS AND THE PANEL FOLLOWS, WITHOUT BEING TORN DOWN.
+  //
+  // THE ONE THE OWNER MET. The strip and the table were drawn once, when the
+  // sidebar was built, and nothing ever drew them again. The only way to see a
+  // new value was to shut the sidebar and open it, because that tears the view
+  // down and building it reads once more. Their words were that everything in
+  // the UI always needs to be live.
+  //
+  // SO THIS DRIVES THE SEAM. The page is built from one answer, handed a second
+  // as the message the extension sends on its clock, and asked what it says now.
+  // Nothing here rebuilds the page: that is the whole of what is being decided.
+  async "--live"() {
+    const { panelHtml, livePieces } = await load("panel");
+    if (typeof livePieces !== "function") {
+      no("live: panel exports no livePieces, so there is no way to hand the page a fresh answer");
+      return;
+    }
+    const dom = new JSDOM(panelHtml(aTreeWithALiveTable, ["work"], {}, before), {
+      runScripts: "dangerously",
+      beforeParse(w) {
+        w.sent = [];
+        w.acquireVsCodeApi = () => ({ postMessage: (m) => w.sent.push(m), setState() {}, getState: () => undefined });
+      },
+    });
+    const doc = dom.window.document;
+    const says = () => doc.body.textContent;
+
+    if (says().includes("main")) ok("live: the page opens saying what the first answer said");
+    else { no("live: the page does not say the first answer at all, so nothing below decides anything"); return; }
+    if (says().includes("the first thing")) ok("live: and the table under it draws the first answer");
+    else { no("live: the table drew nothing from the first answer"); return; }
+
+    // A PERSON IS MID-SENTENCE IN THE LINE. What they typed has to survive, and
+    // it is the strongest thing this case decides: text that is still there is
+    // proof the page was not built again.
+    const line = doc.querySelector("input.line");
+    if (!line) { no("live: the page draws no line edit, so nothing can be typed into it"); return; }
+    line.value = "half a sentence";
+
+    const pieces = livePieces(aTreeWithALiveTable, ["work"], after);
+    dom.window.dispatchEvent(new dom.window.MessageEvent("message", {
+      data: { type: "doing", head: pieces.head, tables: pieces.tables },
+    }));
+
+    if (says().includes("worker-ivo")) ok("live: the strip says the new holder with no open and close");
+    else no("live: the strip still does not say worker-ivo, so a token changing hands does not reach it");
+    if (says().includes("the second thing")) ok("live: the table says the new token with no open and close");
+    else no("live: the table still does not say the new token");
+    if (!says().includes("main")) ok("live: and the holder that let go is gone from the page");
+    else no("live: the page still says main, so the new answer was added rather than drawn");
+    if (line.value === "half a sentence") {
+      ok("live: what a person was typing is untouched, so the page was not built again");
+    } else {
+      no("live: the line lost what was typed, so the page was replaced rather than filled: " +
+         "a person loses their words once a second");
+    }
   },
 
   // THE SLASH RULE, DRIVEN RATHER THAN READ.

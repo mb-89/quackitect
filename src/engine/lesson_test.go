@@ -31,7 +31,6 @@ func TestNoExportedFunctionHereIsUncalled(t *testing.T) {
 		"Retro":      "a verb of the program, reached through the dispatch table",
 		"Abort":      "a verb of the program, reached through the dispatch table",
 		"PutDown":    "a verb of the program, reached through the dispatch table",
-		"Nudge":      "called on every pull",
 		"Reclaim":    "called on every pull",
 		"KnownTools": "called on a first pull",
 		// HANDED TO A REGISTER RATHER THAN CALLED. The stop checks are a list

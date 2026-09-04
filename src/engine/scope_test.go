@@ -155,13 +155,13 @@ func TestAnAbortIsRefusedWhileASubTokenIsOpen(t *testing.T) {
 	parent := mintTask(t, r, "the whole", "")
 	child := mintTask(t, r, "a part", parent.ID)
 
-	if _, err := Abort(r, parent.ID, "person", "obsolete"); err == nil || !strings.Contains(err.Error(), child.ID) {
+	if _, err := Abort(r, Aborting{ID: parent.ID, By: "person", Why: "obsolete"}); err == nil || !strings.Contains(err.Error(), child.ID) {
 		t.Fatalf("the abort went through, or did not name the sub-token: %v", err)
 	}
-	if _, err := Abort(r, child.ID, "person", "obsolete"); err != nil {
+	if _, err := Abort(r, Aborting{ID: child.ID, By: "person", Why: "obsolete"}); err != nil {
 		t.Fatalf("the sub-token could not be aborted: %v", err)
 	}
-	if _, err := Abort(r, parent.ID, "person", "obsolete"); err != nil {
+	if _, err := Abort(r, Aborting{ID: parent.ID, By: "person", Why: "obsolete"}); err != nil {
 		t.Fatalf("the parent could not be aborted after its sub-token: %v", err)
 	}
 }
@@ -170,7 +170,7 @@ func TestAParentNothingCanBePartOfIsRefused(t *testing.T) {
 	t.Parallel()
 	r := aTreeWithOneStep(t)
 	ended := mintTask(t, r, "already over", "")
-	if _, err := Abort(r, ended.ID, "person", "obsolete"); err != nil {
+	if _, err := Abort(r, Aborting{ID: ended.ID, By: "person", Why: "obsolete"}); err != nil {
 		t.Fatal(err)
 	}
 	top := mintTask(t, r, "the top", "")

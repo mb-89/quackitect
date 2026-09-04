@@ -27,12 +27,10 @@ For mechanical rules, see [[util/voice-rules.json]].
 7. Use the same word for the same thing every time. For details, see [[doc/glossary]].
 8. In general, with few exceptions: say what is. Do not say what is not, the list is endless. *
 9. State a fact only if you own it. Otherwise name where it lives, via "For details, see [[link]]". *
-10. Mark an estimate as an estimate. Say "I do not know" when you do not know.
-11. Follow the technical English rules. For details, see [[doc/guidance/ASD-STE-100]].
-12. DRY: do not repeat yourself. SPOT: single point of truth for every datum.
-13. Private data: names, datetimes and unfiltered notes. They do not go into git.
-14. Do not put history in the current surface. It goes into git commit messages.
-15. A number about the tree is the command that answers it, never the answer. *
+10. Follow the technical English rules. For details, see [[doc/guidance/ASD-STE-100]].
+11. DRY: do not repeat yourself. SPOT: single point of truth for every datum. A repetition in a spec, finding or answer is a defect. *
+12. Do not put history in the current surface. It goes into git commit messages.
+13. A number about the tree is the command that answers it, never the answer. *
 
 # Discussion
 
@@ -76,12 +74,20 @@ so `kind: [[guidance]]` and `kind: guidance` are one thing.
 A link resolves as a path first and then as a note name, so both
 [[src/schemas/guidance.schema.yaml]] and [[voice]] reach what they name.
 
-## 15. Standing counts
+## 11. Say it once
+
+No human writes walls of text, and a reader who meets the same sentence twice reads neither.
+So a thing is said once, where the reader needs it, and a second copy is a defect rather than emphasis.
+The copies drift. A measurement written twice on one note was corrected in the copy a finding quoted, and the two totals then disagreed and named different worst cases.
+A constant moved into config is the same: the prose that pins the number is a second copy, so the paragraph states the rule and the literal appears only in the config file.
+A detail carries a byte cap the schema enforces, so the judgement left here is what to cut, not how long to run.
+Where a second mention is wanted, it names the first rather than restating it.
+
+## 13. Standing counts
 
 A count of files, tests, checks or tokens is true on the day it is written and
 wrong soon after, and nothing tells the reader which day that was.
-So the prose names the command: `ls`, `go test`, `se ask`, or the check that
-counts.
+So the prose names the command: `ls`, `go test`, or the check that counts.
 The reader runs it and gets today's number.
 A measurement that argues a decision belongs in the commit or the retro, which
 are dated, and not on the surface.

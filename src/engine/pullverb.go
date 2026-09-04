@@ -11,17 +11,18 @@ import (
 
 func runPull(c *call) int {
 	fs := flag.NewFlagSet("pull", flag.ContinueOnError)
-	fs.SetOutput(c.out)
+	fs.SetOutput(c.err)
 	fs.Usage = func() {
-		fmt.Fprintln(c.out, "se pull - ask the engine what to do. Prints the answer as JSON.")
-		fmt.Fprintln(c.out, "")
-		fmt.Fprintln(c.out, "  se pull --actor main               get work")
-		fmt.Fprintln(c.out, "  echo '{\"id\":\"wk-..\",...}' | se pull --actor main")
-		fmt.Fprintln(c.out, "")
+		fmt.Fprintln(c.err, "se pull - ask the engine what to do. Prints the answer as JSON.")
+		fmt.Fprintln(c.err, "")
+		fmt.Fprintln(c.err, "  se pull --actor main               get work")
+		fmt.Fprintln(c.err, "  echo '{\"id\":\"wk-..\",...}' | se pull --actor main")
+		fmt.Fprintln(c.err, "")
 		fs.PrintDefaults()
 	}
 	fs.String("work", "", "the folder being worked on (default: this one)")
 	actor := fs.String("actor", "main", "who is pulling")
+	role := fs.String("role", RoleWorker, "which queue answers: worker, or reviewer")
 	if code, stop := c.parse(fs, "pull"); stop {
 		return code
 	}
@@ -40,7 +41,7 @@ func runPull(c *call) int {
 		}
 	}
 
-	a := Pull(roots, *actor, RoleWorker, p)
+	a := Pull(roots, *actor, *role, p)
 	id := ""
 	if a.Token != nil {
 		id = a.Token.ID

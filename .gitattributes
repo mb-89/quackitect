@@ -1,0 +1,7 @@
+# THE SCRIPTS THE SYSTEM EXECUTES ARE LF, WHATEVER THE CHECKOUT.
+#
+# sh reads a CRLF script and hands the shell options with a \r stuck to them:
+# util/setup/install.sh died on Linux with "set: Illegal option -" because a
+# Windows checkout converted its line endings on the way out. eol=lf pins the
+# working tree copy too, so what runs is what git holds.
+*.sh text eol=lf

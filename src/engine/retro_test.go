@@ -172,7 +172,10 @@ func TestARetroSaysWhichTranscriptsItFound(t *testing.T) {
 	if err := os.WriteFile(here, []byte(`{"said":"hello"}`+nl), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	got, err := Retro(r, "main", map[string]string{"claude": here, "copilot": ""})
+	got, err := Retro(r, "main", []Transcript{
+		{Name: "claude", Path: here, Who: "the session the guard was last handed"},
+		{Name: "copilot", Who: "this machine says nothing about where it keeps one"},
+	})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -193,25 +196,64 @@ func TestARetroSaysWhichTranscriptsItFound(t *testing.T) {
 	}
 }
 
-// THE FOLDER SAYS WHAT IS IN IT AND WHAT TO DO WITH WHAT IS WORTH KEEPING.
-func TestARetroWritesAnIndex(t *testing.T) {
+// ONE MANIFEST SAYS WHAT EVERY THING BECAME: taken, kept and why, or looked
+// for and missing. The counts an index carried are derivable from it, and the
+// instruction that was in the index belongs to the retro method.
+func TestARetroWritesAManifest(t *testing.T) {
 	t.Parallel()
 	r := aWorkedTree(t)
-	got, err := Retro(r, "main", map[string]string{})
+	here := filepath.Join(t.TempDir(), "a-session.jsonl")
+	if err := os.WriteFile(here, []byte(`{"said":"hello"}`+nl), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	got, err := Retro(r, "main", []Transcript{
+		{Name: "claude", Path: here, Who: "the session the guard was last handed"},
+		{Name: "copilot", Who: "this machine says nothing about where it keeps one"},
+	})
 	if err != nil {
 		t.Fatal(err)
 	}
-	b, err := os.ReadFile(filepath.Join(got.Folder, "index.md"))
+	b, err := os.ReadFile(filepath.Join(got.Folder, "manifest.jsonl"))
 	if err != nil {
-		t.Fatal(err)
+		t.Fatalf("the retro wrote no manifest: %v", err)
 	}
-	// READ WITHOUT ITS CASE, because the index writes its leads in capitals and
-	// which words are shouted is the writer's rather than this check's.
-	said := strings.ToLower(string(b))
-	for _, want := range []string{"3 file(s)", "2 thing(s)", "moved into the method", "util/checks"} {
-		if !strings.Contains(said, want) {
-			t.Errorf("the index does not say %q:\n%s", want, said)
+	type line struct {
+		Name   string `json:"name"`
+		Origin string `json:"origin"`
+		Fate   string `json:"fate"`
+		Why    string `json:"why"`
+	}
+	var lines []line
+	for _, raw := range strings.Split(strings.TrimSpace(string(b)), "\n") {
+		var l line
+		if err := json.Unmarshal([]byte(raw), &l); err != nil {
+			t.Fatalf("a manifest line will not read: %v: %q", err, raw)
 		}
+		if l.Name == "" || l.Origin == "" || l.Fate == "" {
+			t.Fatalf("a line misses name, origin or fate: %q", raw)
+		}
+		lines = append(lines, l)
+	}
+	// THE COUNTS ARE DERIVABLE, which is what lets them go from the page.
+	logs, pad, missing := 0, 0, 0
+	for _, l := range lines {
+		if l.Origin == ".se/log" && l.Fate == "taken" {
+			logs++
+		}
+		if l.Origin == ".se/scratchpad" && l.Fate == "taken" {
+			pad++
+		}
+		if l.Name == "copilot" && l.Fate == "looked for and missing" {
+			missing++
+		}
+	}
+	if logs != 3 || pad != 2 || missing != 1 {
+		t.Fatalf("the manifest derives %d log(s), %d scratchpad thing(s) and %d missing, "+
+			"want 3, 2 and 1:\n%s", logs, pad, missing, b)
+	}
+	// THE INDEX IS REPLACED, NOT ACCOMPANIED.
+	if _, err := os.Stat(filepath.Join(got.Folder, "index.md")); err == nil {
+		t.Fatal("index.md is still written beside the manifest")
 	}
 }
 
@@ -226,7 +268,7 @@ func TestARetroStaysInsideTheWorkFolder(t *testing.T) {
 		t.Fatal(err)
 	}
 	before := treeOf(t, outside)
-	if _, err := Retro(r, "main", map[string]string{"claude": witness}); err != nil {
+	if _, err := Retro(r, "main", []Transcript{{Name: "claude", Path: witness}}); err != nil {
 		t.Fatal(err)
 	}
 	if after := treeOf(t, outside); after != before {
@@ -296,7 +338,7 @@ func TestARetroLeavesTheChecksAlone(t *testing.T) {
 	if err := os.WriteFile(kept, []byte("go test"+nl), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := Retro(lab, "main", map[string]string{}); err != nil {
+	if _, err := Retro(lab, "main", nil); err != nil {
 		t.Fatal(err)
 	}
 	b, err := os.ReadFile(kept)
@@ -344,7 +386,7 @@ func TestTheBatteryIsWholeAfterARetro(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(mine, "battery.sh"), b, 0o644); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := Retro(lab, "main", map[string]string{}); err != nil {
+	if _, err := Retro(lab, "main", nil); err != nil {
 		t.Fatal(err)
 	}
 	after, err := os.ReadFile(filepath.Join(mine, "battery.sh"))
@@ -395,7 +437,7 @@ func TestARetroCopiesTheTranscriptsAndLeavesThem(t *testing.T) {
 	if err := os.WriteFile(here, []byte(`{"said":"hello"}`+nl), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	got, err := Retro(r, "main", map[string]string{"claude": here})
+	got, err := Retro(r, "main", []Transcript{{Name: "claude", Path: here}})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -464,20 +506,18 @@ func TestARetroLeavesAnotherActorsFolder(t *testing.T) {
 		t.Errorf("the retro says nothing about the folder it left")
 	}
 
-	// AND THE INDEX SAYS IT, WHICH IS THE HALF THE STRUCT CANNOT PROVE.
+	// AND THE MANIFEST SAYS IT, WHICH IS THE HALF THE STRUCT CANNOT PROVE.
 	//
-	// got.Kept is what the producer decided. index.md is what a person opens
-	// and reads, and it is the deliverable this token names. Three tests
-	// touched this keep and every one of them asked the struct, so the index
-	// never carried a word about anything left behind and nothing could fail
-	// for it.
-	index, err := os.ReadFile(filepath.Join(got.Folder, "index.md"))
+	// got.Kept is what the producer decided. manifest.jsonl is what a person
+	// opens, and a retro that leaves a thing and does not say so reads exactly
+	// like one that took it.
+	manifest, err := os.ReadFile(filepath.Join(got.Folder, "manifest.jsonl"))
 	if err != nil {
-		t.Fatalf("the retro wrote no index, so this guards nothing: %v", err)
+		t.Fatalf("the retro wrote no manifest, so this guards nothing: %v", err)
 	}
-	for _, want := range []string{"reviewer9", "whoever owns it may be writing to it"} {
-		if !strings.Contains(string(index), want) {
-			t.Errorf("the index a person reads never says %q, so a retro that left a "+
+	for _, want := range []string{"reviewer9", "kept", "whoever owns it may be writing to it"} {
+		if !strings.Contains(string(manifest), want) {
+			t.Errorf("the manifest never says %q, so a retro that left a "+
 				"folder reads exactly like one that took it", want)
 		}
 	}

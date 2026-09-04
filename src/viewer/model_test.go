@@ -357,6 +357,63 @@ func TestTheSelectionSurvivesRepeatedSequenceNumbers(t *testing.T) {
 	}
 }
 
+// The two panes share the keys rather than a focus. Details hidden: up and
+// down move the log selection. Shown: up and down scroll the details while w
+// and s move the log lines, and there is no focus control to tab between.
+func TestTwoPanesOneScroll(t *testing.T) {
+	t.Parallel()
+	m := newTestModel(50)
+	sel := m.selID
+	m = key(m, "up")
+	if m.selID != sel-1 {
+		t.Fatalf("details hidden: up should move the selection, %d became %d", sel, m.selID)
+	}
+	m = key(m, "ctrl+d")
+	if !m.details {
+		t.Fatal("setup: ctrl+d should open the details")
+	}
+	sel = m.selID
+	m = key(m, "w")
+	if m.selID != sel-1 {
+		t.Fatalf("details shown: w should move the log up, %d became %d", sel, m.selID)
+	}
+	m = key(m, "s")
+	if m.selID != sel {
+		t.Fatalf("details shown: s should move the log down, want %d got %d", sel, m.selID)
+	}
+	if got := m.input.Value(); got != "" {
+		t.Fatalf("w and s with the details shown must not reach the filter, it holds %q", got)
+	}
+	m = key(m, "up")
+	if m.selID != sel {
+		t.Fatalf("details shown: up should scroll the details and leave the log, selection moved to %d", m.selID)
+	}
+	// THE JUMP KEYS STAY THE LOG'S. The owner opened the details and could not
+	// get the log back to its newest line.
+	m = key(m, "home")
+	if m.selIndex() != 0 {
+		t.Fatalf("details shown: Home should select the first log line, it sits at %d", m.selIndex())
+	}
+	m = key(m, "end")
+	if !m.follow {
+		t.Fatal("details shown: End should land the log on its newest line, and it did not")
+	}
+	sel = m.selID
+	m = key(m, "pgup")
+	if m.selID == sel {
+		t.Fatal("details shown: PgUp should move the log a screen, and the selection stood still")
+	}
+	if strings.Contains(m.View(), "tab focus") {
+		t.Fatal("the focus control is deleted, and the status line still names it")
+	}
+	// Hidden again, w is filter input like any other letter.
+	m = key(m, "ctrl+d")
+	m = key(m, "w")
+	if got := m.input.Value(); got != "w" {
+		t.Fatalf("details hidden: w should type into the filter, it holds %q", got)
+	}
+}
+
 func mustJSON(r Record) string {
 	b, err := json.Marshal(map[string]any{
 		"t": r.Time.Format(time.RFC3339Nano), "seq": r.Seq, "src": r.Src,

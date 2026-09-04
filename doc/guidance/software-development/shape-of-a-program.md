@@ -20,14 +20,14 @@ This is craft guidance, read when designing, and it is not part of the standing 
 2. Parse, do not validate. Input crosses the boundary once and becomes a typed value that cannot be wrong. Nothing past it re-checks. *
 3. Make illegal states unrepresentable. A state is one of a closed set, and a transition is a function from one state to the next. *
 4. Essential state is what was input. The rest is derived, cached by the hash of its inputs where it pays, never a second truth. *
-5. One writer per file. Every other process reads it, or asks the writer. A resident process holding the model can be that writer. *
+5. One writer per file. Every other process reads it, or asks the writer, and a hold on a shared thing is a lease. *
 6. Append-only record, derived views. The record is written once and read many times, and a view is rebuilt from it. *
 7. Crash-only. Nothing lives only in memory, and every write is atomic or idempotent, so a restart at any line is the recovery. *
 8. Deep modules. A small interface over a large implementation. Pull complexity down into the module, not up to every caller. *
 9. Dependencies point inward. The core imports nothing that touches the world, and reaches the world through a port it defines.
 10. Put a limit on everything: queue length, loop count, file size, retries, waits. An unbounded thing is a defect waiting for load. *
 11. Assert the invariant where it holds, in production code, and fail loudly. A test proves a case, an assertion proves a state.
-12. A lease, not a lock. A hold on a shared thing expires, and the holder renews it while it works.
+12. Many weak cores. Work spreads across them and never rests on one call being fast, because a loaded core throttles. *
 13. Batch at the boundary. The shell amortises disk and network, and the core sees one value at a time.
 14. One shape per concept: one error, one reply, one id. A second shape is a second parser somebody has to write.
 15. Command or query. A function changes the world or answers a question, and a function that does both hides the change. *
@@ -74,6 +74,7 @@ Thompson's principle from the ring-buffer work: contention is the cost, and a si
 A file written by two processes needs a lock, and a lock needs a timeout, and a timeout needs a stale check.
 A file with one owner needs an append.
 Where several processes must write, they append to their own file, and one reader merges.
+A hold on a shared thing is a lease: it expires, and the holder renews it while it works.
 A resident process that holds the model and takes every write is the single writer by construction.
 It stays a cache over the record, rebuilt from disk on start, and a client reads cold when it is absent.
 Every answer then carries a revision, and a write names the revision it was based on, so a stale write is refused.
@@ -105,6 +106,12 @@ TigerBeetle's rule: every loop, queue, buffer and retry has a bound written wher
 A limit is a design number, and a limit hit is a signal, so it is asserted and logged rather than grown.
 Unbounded means somebody sizes it later, under load, in production.
 The parameter tree is where the limits live, and a new one joins it with its floor.
+
+## 12. Many weak cores
+
+The reference machine is a 2025 corporate laptop: many cores that overheat and throttle, so no core stays fast under load.
+The battery learned this once, falling from 100 seconds serial to 37 parallel on that machine.
+So a design fans work out across processes, and a step that rests on one core being fast slows down under load.
 
 ## 15. Command or query
 

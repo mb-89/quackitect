@@ -112,6 +112,72 @@ say("and it passes again once the shape is put back", back.code === 0,
   "it stayed red after the copy was restored, so it fails on everything and "
   + "the red above says nothing");
 
+// THE THIRD PLANT USES A DECLARATION SHAPE THE READER DOES NOT KNOW. A
+// namespace import binds nothing boundToChildProcess can read, and the file
+// used to be skipped whole: no count, no failure, no output. A file a check
+// cannot understand is reported, never skipped.
+const nsFile = join(work, "src", "extension", "planted-ns.ts");
+writeFileSync(nsFile,
+  'import * as cp from "node:child_process";\n'
+  + 'export function plantedStart(exe: string, work: string) {\n'
+  + '  return cp.spawn(exe, ["--form", "x", "--work", work], { cwd: work });\n'
+  + '}\n', "utf8");
+
+const ns = run();
+say("the check fails on a namespace-import spawn it cannot read", ns.code !== 0,
+  "a file imports node:child_process as a namespace and calls cp.spawn with a "
+  + "literal flag list, and the check skipped it whole: no count, no failure, "
+  + "no output");
+say("and the red names the file that yielded no binding", /planted-ns\.ts/.test(ns.out),
+  "it went red without naming planted-ns.ts, so a reader is told there is a "
+  + "defect and not where:\n"
+  + ns.out.split("\n").filter((l) => l.includes("FAIL")).join("\n"));
+
+rmSync(nsFile, { force: true });
+say("and it passes again once the namespace file is removed", run().code === 0,
+  "it stayed red with the file gone, so the red above says nothing");
+
+// THE VALUE IS READ TO ITS END AND NOT TO ITS LINE. whatItResolvesTo once
+// captured an assignment with a one-line window, so an object written over
+// lines arrived at the classifier as its opening bracket and was answered
+// clean: a flag two lines below the const reached the call site with nothing
+// failing. Each case is driven twice, on one line and broken over lines the
+// way the tree writes it, and a value that reaches the edge of the window has
+// to come back as a refusal rather than as clean.
+const flat = 'const carriedA = { form: "--form" };\n  '
+  + 'spawnRaw(exe2, [...startArgs(), carriedA.form, "--work", work], { cwd: work });\n  ' + mark;
+writeFileSync(p, was.replace(mark, flat), "utf8");
+const one = run();
+say("a flag held in an object on one line is classified",
+  one.code !== 0 && /--form reaches the call site/.test(one.out),
+  "the object sits on one line, the flag is in it, and the check did not say "
+  + "--form reaches the call site:\n"
+  + one.out.split("\n").filter((l) => l.includes("FAIL")).join("\n"));
+writeFileSync(p, was, "utf8");
+
+const spread2 = 'const carriedB = {\n    form: "--form",\n  };\n  '
+  + 'spawnRaw(exe2, [...startArgs(), carriedB.form, "--work", work], { cwd: work });\n  ' + mark;
+writeFileSync(p, was.replace(mark, spread2), "utf8");
+const two = run();
+say("a flag held in an object two lines below is classified",
+  two.code !== 0 && /--form reaches the call site/.test(two.out),
+  "the object is broken over lines the way the tree writes it, and the reader "
+  + "handed the classifier a fragment, so the flag two lines below the const "
+  + "passed as clean");
+writeFileSync(p, was, "utf8");
+
+const edge = 'const edgeC = [{\n    form: '
+  + 'spawnRaw(exe2, [...startArgs(), edgeC, "--work", work], { cwd: work }),\n  }];\n  ' + mark;
+writeFileSync(p, was.replace(mark, edge), "utf8");
+const cut = run();
+say("a value at the edge of the window is refused as unreadable",
+  cut.code !== 0 && /bracket this check cannot follow to its end/.test(cut.out),
+  "the bracket closes below the call, so the window ends before the value "
+  + "does, and the check classified the fragment instead of refusing it");
+writeFileSync(p, was, "utf8");
+say("and it passes again once the values are put back", run().code === 0,
+  "it stayed red with the tree restored, so the reds above say nothing");
+
 rmSync(work, { recursive: true, force: true });
 console.log("\n" + (bad ? bad + " failed." : "0 failed."));
 process.exit(bad ? 1 : 0);

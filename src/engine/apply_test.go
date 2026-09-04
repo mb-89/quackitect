@@ -51,7 +51,7 @@ func TestOneBadEditWritesNothing(t *testing.T) {
 				[]byte("one and one"), 0o644); err != nil {
 				t.Fatal(err)
 			}
-			_, err := Apply(r, c.edits, false)
+			_, err := Apply(r, c.edits, false, "wk-test", "tester")
 			if err == nil {
 				t.Fatalf("%s was taken", c.name)
 			}
@@ -83,7 +83,7 @@ func TestEditsToOneFileCompose(t *testing.T) {
 	got, err := Apply(r, []Edit{
 		{File: "compose.txt", Old: "alpha", New: "gamma"},
 		{File: "compose.txt", Old: "gamma beta", New: "gamma delta"},
-	}, false)
+	}, false, "wk-test", "tester")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -105,7 +105,7 @@ func TestADryRunWritesNothing(t *testing.T) {
 	if err := os.WriteFile(path, []byte("before"), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	got, err := Apply(r, []Edit{{File: "dry.txt", Old: "before", New: "after"}}, true)
+	got, err := Apply(r, []Edit{{File: "dry.txt", Old: "before", New: "after"}}, true, "wk-test", "tester")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -132,7 +132,7 @@ func TestAnApplyKeepsWhatWasThere(t *testing.T) {
 	got, err := Apply(r, []Edit{
 		{File: "journal.txt", Old: "old", New: "new"},
 		{File: "born.txt", Op: "create", New: "brand new"},
-	}, false)
+	}, false, "wk-test", "tester")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -149,6 +149,13 @@ func TestAnApplyKeepsWhatWasThere(t *testing.T) {
 	if !strings.Contains(said, "did_not_exist") {
 		t.Errorf("the journal does not say born.txt was not there: %s", said)
 	}
+	// AND IT SAYS WHOSE APPLY IT WAS, which is what keeps an undo off another
+	// agent's work.
+	for _, want := range []string{"wk-test", "tester"} {
+		if !strings.Contains(said, want) {
+			t.Errorf("the journal does not say %q wrote it: %s", want, said)
+		}
+	}
 }
 
 // A PATH THAT LEAVES THE TREE IS REFUSED, whether it climbs out or is absolute.
@@ -161,7 +168,7 @@ func TestAPathOutsideTheTreeIsRefused(t *testing.T) {
 		filepath.Join("a", "..", "..", "round.txt"),
 		elsewhere,
 	} {
-		if _, err := Apply(r, []Edit{{File: name, Op: "create", New: "x"}}, false); err == nil {
+		if _, err := Apply(r, []Edit{{File: name, Op: "create", New: "x"}}, false, "wk-test", "tester"); err == nil {
 			t.Errorf("%s was taken", name)
 		}
 		if _, err := os.Stat(elsewhere); err == nil {
@@ -187,10 +194,10 @@ func TestAnUndoPutsBackWhatWasThere(t *testing.T) {
 	if _, err := Apply(r, []Edit{
 		{File: "kept.txt", Old: "original", New: "changed"},
 		{File: "born.txt", Op: "create", New: "new"},
-	}, false); err != nil {
+	}, false, "wk-test", "tester"); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := Undo(r); err != nil {
+	if _, err := Undo(r, "wk-test", "tester"); err != nil {
 		t.Fatal(err)
 	}
 	if b, _ := os.ReadFile(kept); string(b) != "the original" {
@@ -200,7 +207,7 @@ func TestAnUndoPutsBackWhatWasThere(t *testing.T) {
 		t.Error("a file the apply created survived the undo")
 	}
 	// AND THE ENTRY IS USED UP, so undoing twice does not undo something else.
-	if _, err := Undo(r); err == nil {
+	if _, err := Undo(r, "wk-test", "tester"); err == nil {
 		t.Error("the same entry was undone twice")
 	}
 }
@@ -222,14 +229,14 @@ func TestAnUndoRefusesWhenAFileHasDrifted(t *testing.T) {
 	if _, err := Apply(r, []Edit{
 		{File: "one.txt", Old: "before", New: "after"},
 		{File: "two.txt", Old: "before", New: "after"},
-	}, false); err != nil {
+	}, false, "wk-test", "tester"); err != nil {
 		t.Fatal(err)
 	}
 	// Somebody else works on one of them.
 	if err := os.WriteFile(one, []byte("somebody else's work"), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := Undo(r); err == nil {
+	if _, err := Undo(r, "wk-test", "tester"); err == nil {
 		t.Fatal("the undo ran over a file that had changed")
 	} else if !strings.Contains(err.Error(), "changed since the apply") {
 		t.Errorf("it was refused for something else: %v", err)

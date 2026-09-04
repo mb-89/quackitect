@@ -27,17 +27,19 @@ what it collected.
 2. Run `se retro` first. It rotates the log, collects what it can into one folder, and drains what it took. *
 3. Ask the person what came back from the field since the last retro. Then stop and wait. *
 4. Read that folder and nothing else. An input you had to go looking for is a defect in the collect verb. *
-5. Score the last retro's improvements against this period's numbers. Promote what worked, drop what did not, and record why. *
+5. Score the last retro's improvements against this period's numbers, which `se retro` hands you under `earlier`. Promote what worked, drop what did not, and record why. *
 6. Hunt waste in the log, which says what happened, and in the transcripts, which say why. Rank what repeats. *
 7. Put a reader on every slice of every transcript. A record too big to read is not a record you have read. *
 8. Count every shell command and say what each was standing in for. One is a tool you do not have. *
-9. Read what one turn costs from the index. Name what grew since the last retro and what made it grow. *
+9. Read what one turn costs from the index, and run `util/checks/benchmark.sh`. Name what grew since the last retro. *
 10. For each pattern name its mechanization: a check, a refusal, a gate, a prefill, then a clearer sentence. *
 11. Judge every script in the drained scratchpad. Promote it to `util/checks/`, or delete it, and repair what the move breaks. *
 12. Merge what repeats into one class, then mint one note per improvement and nothing larger. *
 13. Report themes with counts and never the list. Say what you could not do and why. *
 14. Measure the session itself: errors and thinking length by fifths. A retro that reads only the work misses the worker. *
 15. Distribute last, after the person has read the report. Their reading is what turns a theme into work. *
+16. Agree to a keep rule on the drain only with the command that counted it, keyed off a fact the engine writes. *
+17. Write the finished report to the path `se retro` answers under `report`. It is on this machine, out of git, and no drain reaches it, so the next retro is handed it with this period's counts.
 
 # Discussion
 
@@ -56,6 +58,11 @@ rest. The next one starts empty and nothing is counted twice.
 Ownership decides drain against copy: what this machine owns moves, and the
 harness transcripts are copied. `util/checks/` is in version control and the
 verb never touches it.
+
+One thing outlives the drain, because the next retro reads it: this period's
+report and its counts. They go to `.se/reports`, which no drain names and git
+does not see, and `se retro` hands the earlier ones back. The owner ruled that
+is as far as it goes for now: on the machine, and out of version control.
 
 ## 3. The one thing the machine cannot collect
 
@@ -122,6 +129,9 @@ which is how the whole of it gets too big with nothing saying so.
 A number that grew for a reason is fine. One that grew because nobody looked is
 the finding.
 
+Nothing in the battery waits on a clock, so timings are read here, against the
+last retro's.
+
 ## 10. The order is by how little it asks of anybody
 
 A check runs without being read. A refusal arrives when it is needed. A gate
@@ -151,8 +161,8 @@ class, small enough that a stranger could act on it, and triage decides.
 
 ## 13. Themes with counts, not a list
 
-A report that lists everything is one nobody finishes. The count is the
-argument: three of one shape says what a list of forty does not.
+A report that lists everything is one nobody finishes. Three of one shape says
+what a list of forty does not.
 
 Say what you could not do. A retro silent about what it skipped reads like one
 that covered everything, and the next inherits the gap.
@@ -165,8 +175,7 @@ fifth while the length of a thought halved from its peak.
 The agent noticed. Six times it worried about session length, and each time said
 it was cutting scope rather than rigour. It cut both and saw one.
 
-So measure the session, not only the tree, and build against a shape only once
-it repeats.
+So measure the session, not only the tree.
 
 ## 15. Reading is what makes it work
 
@@ -175,3 +184,13 @@ ahead of theirs. They hold the half the folder does not.
 
 So everything lands in the backlog, the report is discussed, and only then is
 anything routed. That order buys the only review the retro itself gets.
+
+## 16. Count before agreeing
+
+A keep rule was once justified by a sentence about how the tree is arranged,
+and nobody counted.
+So the rule runs over the real tree first: what it keeps, what it takes, and
+how much of today's actors and tokens it covers.
+A protection keys off a fact the engine writes, such as who holds a token.
+A convention drifts, and the sweep that trusted it takes what somebody still
+needed.

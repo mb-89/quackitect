@@ -1,7 +1,10 @@
 package main
 
 import (
+	"crypto/rand"
+	"encoding/hex"
 	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
 	"time"
@@ -39,6 +42,13 @@ func GuidanceDir(methodRoot string) string {
 	return filepath.Join(methodRoot, "doc", "guidance")
 }
 
+// RationaleDir is where the arguments live, one note per decision. Guidance
+// and a schema say what to do; a rationale says why it is that, and the thing
+// it explains names it by link. It is spelled here so nothing else spells it.
+func RationaleDir(methodRoot string) string {
+	return filepath.Join(methodRoot, "doc", "rationale")
+}
+
 func exists(p string) bool {
 	_, err := os.Stat(p)
 	return err == nil
@@ -66,6 +76,19 @@ type Running struct {
 	// Hooks is where the guard answers events over HTTP, and empty while
 	// the port could not be bound.
 	Hooks string `json:"hooks,omitempty"`
+	// Run is this engine run's own identity, minted at start. A PID number
+	// comes back around and this does not, so it is what tells the engine
+	// that wrote the record from a process that inherited its number.
+	Run string `json:"run,omitempty"`
+}
+
+// runIdentity mints the name of one engine run.
+func runIdentity() string {
+	b := make([]byte, 5)
+	if _, err := rand.Read(b); err != nil {
+		return fmt.Sprintf("%010x", time.Now().UnixNano())
+	}
+	return hex.EncodeToString(b)
 }
 
 func runningPath(r Roots) string { return r.Private("engine.json") }
@@ -88,6 +111,13 @@ func StopSaying(r Roots) { _ = os.Remove(runningPath(r)) }
 // LoadRunning answers what is running, and whether it still is. A file naming
 // a process that is gone is not an engine, and saying so is the whole job.
 func LoadRunning(r Roots) (Running, bool) {
+	v, why := loadRunning(r)
+	return v, why == ""
+}
+
+// loadRunning answers the record and why it is not an engine, empty when it
+// is. The reason names the field that failed, so a reader can say what it saw.
+func loadRunning(r Roots) (Running, string) {
 	var v Running
 	// THE FILE IS REPLACED ON EVERY BEAT, and on Windows a reader can meet
 	// the instant between the old one going and the new one landing. A miss
@@ -102,12 +132,41 @@ func LoadRunning(r Roots) (Running, bool) {
 		time.Sleep(25 * time.Millisecond)
 	}
 	if err != nil || json.Unmarshal(b, &v) != nil {
-		return v, false
+		return v, "record: no readable engine.json"
 	}
 	if v.PID <= 0 || !alive(v.PID) {
-		return v, false
+		return v, fmt.Sprintf("pid: %d is not a running process", v.PID)
 	}
-	return v, true
+	// A PID NUMBER COMES BACK AROUND, and any process holding it answers
+	// signal zero. The beat is the tell: an engine that stopped writing
+	// beats stopped, whatever now owns its number. A record carrying no time
+	// at all keeps its old meaning, which is what the fixtures write.
+	last, field := v.Beat, "beat"
+	if last == "" {
+		last, field = v.Started, "started"
+	}
+	if last != "" {
+		if at, err := time.Parse(time.RFC3339, last); err == nil {
+			beat := LoadConfig(r).HeartbeatSeconds
+			if beat <= 0 {
+				beat = 5
+			}
+			limit := 3 * time.Duration(beat) * time.Second
+			if age := time.Since(at); age > limit {
+				return v, fmt.Sprintf("%s: last written %s ago, over %s, so the engine stopped",
+					field, age.Round(time.Second), limit)
+			}
+		}
+	}
+	return v, ""
+}
+
+// SameRun answers whether the engine on disk is the run this identity names.
+// A reused PID answers alive; a run identity is never reused, so a mismatch
+// is refused.
+func SameRun(r Roots, run string) bool {
+	v, ok := LoadRunning(r)
+	return ok && run != "" && v.Run == run
 }
 
 // ONE ENGINE PER PROJECT, AND THE ENGINE IS WHAT SAYS SO.

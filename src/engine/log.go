@@ -47,7 +47,18 @@ const defaultLimit = 32 << 20
 // no stamp" is always the one happening now.
 const Current = "session.jsonl"
 
+// sessionVar names the session a starting engine is continuing rather than
+// beginning. Only a handover sets it: see swap.go.
+const sessionVar = "SE_SESSION"
+
 func OpenLog(dir string) (*Log, error) {
+	// A SWAP IS ONE SESSION WITH TWO PROCESSES IN IT. The engine that handed
+	// over named the session it was in, so the successor appends to it instead
+	// of retiring it. Retiring here split one stretch of work in half at a
+	// moment nobody chose, and a person watching the log saw it start over.
+	if s := os.Getenv(sessionVar); s != "" {
+		return ContinueLog(dir, s)
+	}
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return nil, err
 	}
@@ -58,6 +69,16 @@ func OpenLog(dir string) (*Log, error) {
 	if err := l.retire(); err != nil {
 		return nil, err
 	}
+	return l, l.open()
+}
+
+// ContinueLog opens the current log under a session that is already going.
+// Nothing is retired, because nothing has ended.
+func ContinueLog(dir, session string) (*Log, error) {
+	if err := os.MkdirAll(dir, 0o755); err != nil {
+		return nil, err
+	}
+	l := &Log{dir: dir, limit: defaultLimit, session: session}
 	return l, l.open()
 }
 

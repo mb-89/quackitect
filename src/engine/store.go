@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -51,7 +52,7 @@ func dirFor(r Roots, t Token) string {
 // what holds it back, then how it ended.
 var frontOrder = []string{
 	"kind", "process", "guidance", "title", "status", "bucket",
-	"holder", "needs_human", "depends_on", "parent", "ready_when",
+	"author", "needs_human", "depends_on", "parent", "ready_when",
 	"began", "ended", "disposition", "reason", "successors",
 }
 
@@ -89,15 +90,44 @@ func asLink(v string) string {
 	return "[[" + v + "]]"
 }
 
+// narrowedSchema answers the work-token schema cut to the token's process.
+// A schema that cannot be read answers the zero schema, which describes
+// nothing and bounds nothing, because a writer that cannot look things up
+// must still save.
+func narrowedSchema(r Roots, t Token) Schema {
+	s, err := LoadSchema(r.Method, "work-token")
+	if err != nil {
+		return Schema{}
+	}
+	if p, err := LoadProcess(r.Method, t.Process); err == nil {
+		s = p.Narrow(s)
+	}
+	return s
+}
+
+// describeFields answers each field's description, so a saved token carries
+// the same field guidance the template writes.
+func describeFields(s Schema) map[string]string {
+	out := map[string]string{}
+	for name, spec := range s.Frontmatter.Properties {
+		out[name] = spec.Description
+	}
+	return out
+}
+
 func (t Token) front() Front {
 	f := Front{
-		"kind":     asLink("work-token"),
+		"kind":     asLink(t.kind()),
 		"process":  asLink(t.Process),
 		"guidance": asLink(t.Guidance),
 		"title":    t.Title,
 		"status":   string(t.Status),
 		"bucket":   t.Bucket,
-		"holder":   t.Holder,
+		// THE HOLDER IS NOT WRITTEN. It is engine state, and it was kept here,
+		// so a take-up that was never put down left a name in a file nothing
+		// reopened. holdstore.go keeps it under .se, where a hold can be
+		// dropped when the agent holding it is gone.
+		"author": t.Author,
 		// A RELATION IS WRITTEN AS A LINK, because the schema says the editor
 		// walks it. It was written as a bare id, so the walk had nothing to
 		// follow and the x-link on those two fields was a claim about a
@@ -121,12 +151,16 @@ func (t Token) front() Front {
 // from the path, so a token that is renamed is the token it is called.
 func tokenFromFront(f Front) Token {
 	return Token{
-		Process:     unlink(fs(f, "process")),
-		Guidance:    unlink(fs(f, "guidance")),
-		Title:       fs(f, "title"),
-		Status:      Status(fs(f, "status")),
-		Bucket:      fs(f, "bucket"),
-		Holder:      fs(f, "holder"),
+		Process:  unlink(fs(f, "process")),
+		Guidance: unlink(fs(f, "guidance")),
+		Title:    fs(f, "title"),
+		Status:   Status(fs(f, "status")),
+		Bucket:   fs(f, "bucket"),
+		// A HOLDER IN THE FILE IS NOT READ. A note written before the hold
+		// moved into the engine carries one, naming an agent that is gone, and
+		// reading it would put a dead hand back on live work. There is no
+		// field to read it into: the hold comes from holdstore.go.
+		Author:      fs(f, "author"),
 		NeedsHuman:  fb(f, "needs_human"),
 		DependsOn:   unlinkAll(fl(f, "depends_on")),
 		Parent:      unlink(fs(f, "parent")),
@@ -248,32 +282,53 @@ func noteMove(r Roots, t, was Token, existed bool) {
 	}
 }
 
+// errNotAToken says a note is not a work token: it carries no frontmatter, or
+// its kind belongs to somebody else. That is not a fault and nothing says it
+// out loud, because both folders may hold notes beside the tokens.
+var errNotAToken = errors.New("it is not a work token")
+
+// noteToken reads a token out of a note's text. The id comes from the caller,
+// because the file name is the id and the text does not carry it.
+//
+// ONE READER FOR BOTH DOORS. readNote opens a file and this reads what was in
+// it, so a write checked before it lands is checked as the thing that will be
+// read back off disk afterwards, by the same code.
+func noteToken(text, id string) (Token, error) {
+	front, body := SplitNote(text)
+	if front == "" {
+		return Token{}, errNotAToken
+	}
+	f, err := ParseFront(front)
+	if err != nil {
+		return Token{}, err
+	}
+	// A NOTE IS A TOKEN WHEN IT SAYS WHICH SCHEMA READS IT. type: work said the
+	// same thing twice, so it went with the rest of what nothing read.
+	if unlink(fs(f, "kind")) != "work-token" {
+		return Token{}, errNotAToken
+	}
+	t := tokenFromFront(f)
+	// THE ID IS THE FILE NAME. It was written into the note as well, and two
+	// copies of one name is one that can be renamed and one that cannot.
+	t.ID = id
+	readBody(&t, body)
+	return t, nil
+}
+
 func readNote(path string) (Token, bool) {
 	b, err := os.ReadFile(path)
 	if err != nil {
 		return Token{}, false
 	}
-	front, body := SplitNote(string(b))
-	if front == "" {
-		return Token{}, false
-	}
-	f, err := ParseFront(front)
+	t, err := noteToken(string(b), strings.TrimSuffix(filepath.Base(path), ".md"))
 	if err != nil {
 		// A note that will not read is said out loud. Skipping it silently
 		// would drop work from the queue and nothing would say why.
-		fmt.Fprintf(os.Stderr, "engine: %s: %v\n", path, err)
+		if !errors.Is(err, errNotAToken) {
+			fmt.Fprintf(os.Stderr, "engine: %s: %v\n", path, err)
+		}
 		return Token{}, false
 	}
-	// A NOTE IS A TOKEN WHEN IT SAYS WHICH SCHEMA READS IT. type: work said the
-	// same thing twice, so it went with the rest of what nothing read.
-	if unlink(fs(f, "kind")) != "work-token" {
-		return Token{}, false
-	}
-	t := tokenFromFront(f)
-	// THE ID IS THE FILE NAME. It was written into the note as well, and two
-	// copies of one name is one that can be renamed and one that cannot.
-	t.ID = strings.TrimSuffix(filepath.Base(path), ".md")
-	readBody(&t, body)
 	// A NOTE IS EDITED BY HAND, so the rule is checked where the note is read
 	// and not only where it was minted. A title that broke it is said out loud
 	// and the token is still returned: refusing to read work is worse than
@@ -298,6 +353,7 @@ func LoadToken(r Roots, id string) (Token, error) {
 	}
 	for _, dir := range workDirs(r) {
 		if t, ok := readNote(filepath.Join(dir, id+".md")); ok {
+			t.Holder = HeldBy(r, t.ID)
 			return t, nil
 		}
 	}
@@ -323,6 +379,9 @@ func Tokens(r Roots) []Token {
 
 func readTokens(r Roots) []Token {
 	var out []Token
+	// THE HOLDS ARE READ ONCE, not per note, because they are one small file
+	// and the folder can be hundreds of them.
+	held := heldNow(r)
 	for _, dir := range workDirs(r) {
 		entries, err := os.ReadDir(dir)
 		if err != nil {
@@ -333,6 +392,7 @@ func readTokens(r Roots) []Token {
 				continue
 			}
 			if t, ok := readNote(filepath.Join(dir, e.Name())); ok {
+				t.Holder = held[t.ID]
 				out = append(out, t)
 			}
 		}
@@ -350,19 +410,78 @@ func readTokens(r Roots) []Token {
 
 // A token is a ticket a person reads cold, and a ticket has a size. The
 // record once held a token of 117 KB, grown round by round, and nothing
-// refused it. The limits are parameters in util/parameters.json.
-func proseThatFits(c Config, t Token) error {
-	if n := len(t.Detail); n > c.DetailBytes {
-		return fmt.Errorf("the detail is %d bytes and the limit is %d. Say what is asked in a few "+
-			"sentences, and put the argument somewhere a reader opens on purpose", n, c.DetailBytes)
-	}
-	for _, name := range sortedKeys(t.Submission) {
-		if n := len(t.Submission[name]); n > c.SectionBytes {
-			return fmt.Errorf("evidence %q is %d bytes and the limit is %d. Name what was built "+
-				"and what the check said, and leave the rest in the log", name, n, c.SectionBytes)
+// refused it. The bounds are the schema's, on the section they bound, so the
+// rule lives with the field it holds.
+func proseThatFits(s Schema, t Token) error {
+	for _, one := range overCaps(s, t) {
+		if one.Detail {
+			return fmt.Errorf("the detail is %d bytes and the schema allows %d. Say what is asked in a few "+
+				"sentences, and put the argument somewhere a reader opens on purpose", len(one.Text), one.Max)
 		}
+		return fmt.Errorf("%s is %d bytes and the schema allows %d. Name what was built "+
+			"and what the check said, and leave the rest in the log", one.Says, len(one.Text), one.Max)
 	}
 	return nil
+}
+
+// overLong is one bounded section of a token that runs past its bound.
+type overLong struct {
+	// Says names the section the way a refusal names it, so the name a reader
+	// is given is the name the guard compared on.
+	Says   string
+	Text   string
+	Max    int
+	Detail bool
+}
+
+// overCaps answers every bounded section that runs past its bound, the detail
+// first and the evidence in a settled order, so a refusal names the same one
+// every time it is asked.
+//
+// IT IS SEPARATE FROM THE REFUSAL because two doors need the measurement and
+// only one of them wants the save's wording: the write door has to compare
+// what a section would become against what it already holds.
+func overCaps(s Schema, t Token) []overLong {
+	var detailMax, sectionMax int
+	for _, sec := range s.Body.Sections {
+		if sec.Header == "detail" {
+			detailMax = sec.MaxBytes
+		}
+		if sec.HeaderPrefix != "" && strings.HasPrefix(headEvidence, "## "+sec.HeaderPrefix) {
+			sectionMax = sec.MaxBytes
+		}
+	}
+	var out []overLong
+	if detailMax > 0 && len(t.Detail) > detailMax {
+		out = append(out, overLong{Says: sectionSaid(""), Text: t.Detail, Max: detailMax, Detail: true})
+	}
+	if sectionMax > 0 {
+		for _, name := range sortedKeys(t.Submission) {
+			if len(t.Submission[name]) > sectionMax {
+				out = append(out, overLong{Says: sectionSaid(name),
+					Text: t.Submission[name], Max: sectionMax})
+			}
+		}
+	}
+	return out
+}
+
+// sectionSaid names one bounded section. An empty name is the detail.
+func sectionSaid(name string) string {
+	if name == "" {
+		return "the detail"
+	}
+	return fmt.Sprintf("evidence %q", name)
+}
+
+// bounded answers every bounded section of a token by the name a refusal gives
+// it, so what a section holds now can be weighed against what it would become.
+func (t Token) bounded() map[string]string {
+	out := map[string]string{sectionSaid(""): t.Detail}
+	for name, text := range t.Submission {
+		out[sectionSaid(name)] = text
+	}
+	return out
 }
 
 func linesThatFit(t Token) error {
@@ -447,7 +566,8 @@ func SaveToken(r Roots, t Token) error {
 	if err := blocksHoldNoHeading(t); err != nil {
 		return err
 	}
-	if err := proseThatFits(LoadConfig(r), t); err != nil {
+	schema := narrowedSchema(r, t)
+	if err := proseThatFits(schema, t); err != nil {
 		return err
 	}
 	// EVERY CHANGE OF STATE IS IN THE RECORD, and this is the one place that
@@ -469,7 +589,7 @@ func SaveToken(r Roots, t Token) error {
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return err
 	}
-	text := WriteFront(t.front(), frontOrder) + "\n" + t.body()
+	text := WriteFront(t.front(), frontOrder, describeFields(schema)) + "\n" + t.body()
 	final := filepath.Join(dir, t.ID+".md")
 
 	tmp, err := os.CreateTemp(dir, t.ID+".*.tmp")
@@ -493,6 +613,13 @@ func SaveToken(r Roots, t Token) error {
 	if from != "" && from != final {
 		_ = os.Remove(from)    // the note is written; a stale copy is reported by the duplicate check
 		_ = IndexFile(r, from) // the file is the truth, and the watcher catches up on a row it could not drop
+	}
+	// THE HOLD GOES WHERE THE ENGINE KEEPS IT, and not into the file that was
+	// just written. Whoever moves a hold moves it through here, so this is the
+	// one place that has to remember, and it is the same one place that used to
+	// put the name on the page.
+	if err := recordHold(r, t.ID, t.Holder); err != nil {
+		return err
 	}
 	// WHAT THIS PROCESS WROTE IS WHAT IT READS BACK. The snapshot was read
 	// before the write, so it is dropped and the next ask reads the folder.

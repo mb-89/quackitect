@@ -135,16 +135,18 @@ ${panes.map((p, i) => paneHtml(p, i > 0)).join(seam)}
 </html>`;
 }
 
-// A pane is the pinned groups that do not scroll, and the part that does.
+// A pane is one scrolling body: the pinned groups first, then the rest, with
+// the rule between them. One scrollbar for the whole thing is the owner's ask.
 function paneHtml(p: Pane, hidden: boolean): string {
   const b = paneBody(p.table);
   const t = p.table;
   return `<div class="pane-wrap" data-side="${esc(p.side)}"${hidden ? " hidden" : ""}>
   <div class="chrome">${toolbar(t)}${filterPop(t)}${sortPop(t)}${propsPop(t)}<span class="bs-tally-pops">${tallyPops(t)}</span></div>
   <div class="heads">${b.heads}</div>
-  <div class="top">${b.pinned}</div>
-  <div class="pane">${b.scrolling}</div>
-  ${pager()}
+  <div class="body">
+    <div class="top">${b.pinned}</div>
+    <div class="pane">${b.scrolling}</div>
+  </div>
   ${codePanel(t)}
 </div>`;
 }
@@ -322,29 +324,9 @@ function propsPop(t: Table): string {
   </div>`;
 }
 
-// THE PAGER: previous, where you are, next, and how big a page is.
-//
-// THE SIZE IS TYPED RATHER THAN PICKED. The right page for a table of 249 is
-// not on anybody's list of four.
-//
-// IT SHIPS HIDDEN AND THE PAGE DECIDES. Whether a pager is worth drawing
-// depends on how many rows a closed group is swallowing, and only the page
-// knows that. A pager over one page says nothing the count does not.
-//
-// EVERY ROW STAYS IN THE MARKUP. Paging hides, it never prunes. A page change
-// costs no fetch and the reader's place survives it.
-//
-// Ported from baseui.ts:466-474.
-function pager(): string {
-  return `<div class="bs-pager" hidden>
-    <button type="button" class="bs-prev" title="previous page">${icon("previous")}</button>
-    <span class="bs-where"></span>
-    <button type="button" class="bs-next" title="next page">${icon("next")}</button>
-    <input type="number" class="bs-per" min="0" step="1" value="50"
-      title="rows a page. Type any number, or 0 for all">
-    <span class="bs-per-label">a page</span>
-  </div>`;
-}
+// THERE IS NO PAGER. The owner asked for one scrollbar for the whole thing
+// with separators in between, so the pagination went out and the sift box is
+// what narrows the page.
 
 // THE QUERY, SHOWN. It replaces the table rather than sitting beside it,
 // because the two are the same thing rendered twice and nobody needs both at
@@ -594,12 +576,28 @@ function css(): string {
          color: var(--vscode-foreground); background: var(--vscode-editor-background);
          margin: 0; padding: 0; display: flex; flex-direction: column; height: 100vh; }
   .bar { display: flex; align-items: center; gap: 4px; padding: 4px 8px; flex: 0 0 auto;
+         min-width: 0; overflow: hidden;
          border-bottom: 1px solid var(--vscode-panel-border); }
   /* THE BURN DOWN IS SMALL AND OUT OF THE WAY. It sits after the tabs and
      pushes the split button to the far end, and the detail is on hover so it
-     does not fill up too much space. */
-  .bd { margin-left: auto; font-size: 0.85em; opacity: 0.75; white-space: nowrap;
+     does not fill up too much space.
+
+     AND IT IS NEVER THE THING THAT GIVES WAY.
+
+     THE ONE THE OWNER MET. This is one flex row of tabs, then the counter, then
+     the split button, and every item in it was free to shrink. Once there were
+     tabs enough the row ran past the right edge and the counter was cut
+     mid-number: it read BD: 98/182/5 and then stopped, with the third figure
+     unreadable. Half a number is worse than no number, because it looks like a
+     whole one.
+
+     So the counter and the button hold their size and the TABS give way. A tab
+     a little narrower can still be read; half a figure cannot. */
+  .bd { margin-left: auto; flex: 0 0 auto; font-size: 0.85em; opacity: 0.75; white-space: nowrap;
         cursor: default; }
+  .bar .second { flex: 0 0 auto; }
+  .bar .tab { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis;
+              white-space: nowrap; }
   /* ONE LOOK FOR EVERY BUTTON. v3 drew its table's buttons differently from
      every other button in the product, and the reader had to learn two. */
   ${controlCss()}
@@ -615,18 +613,16 @@ function css(): string {
   /* THE COLUMN HEADER IS ABOVE EVERYTHING, so a pinned group has columns over
      it exactly like every other group. */
   .heads { flex: 0 0 auto; }
-  /* THE PINNED GROUPS STAY PUT, AND THE PANE UNDER THEM KEEPS A FLOOR. This
-     box never scrolled, which was the whole of what pinning was, until the
-     owner opened two pinned groups: an unbounded top box eats the scrolling
-     pane's height, and the groups under it cannot be scrolled to at all. So
-     the pinned box keeps at most half the pane and scrolls itself past that. */
-  .top { flex: 0 1 auto; max-height: 50%; overflow: auto;
-         border-bottom: 1px solid var(--vscode-panel-border); }
+  /* ONE SCROLLBAR FOR THE WHOLE THING. The pinned box and the pane under it
+     each scrolled on their own, and the small upper scrollbar's size came from
+     nowhere the owner could see. So both boxes sit in one scrolling body, the
+     pinned box keeps its rule as the separator, and neither scrolls alone. */
+  .body { flex: 1 1 auto; overflow: auto; min-height: 0; }
+  .top { border-bottom: 1px solid var(--vscode-panel-border); }
   .kinds { border-top: 1px solid var(--vscode-panel-border); margin: 10px 0 6px;
     padding-top: 4px; color: var(--vscode-descriptionForeground); font-size: 11px; }
   .kinds b { color: var(--vscode-foreground); font-weight: 600; }
   .kinds-why { margin-left: 8px; }
-  .pane { flex: 1 1 auto; overflow: auto; }
   thead th { position: sticky; top: 0; z-index: 2; text-align: left; font-weight: 600;
              padding: 4px 8px; background: var(--vscode-editor-background);
              color: var(--vscode-descriptionForeground);
@@ -741,10 +737,6 @@ function css(): string {
   th { position: relative; }
   .th-grip { position: absolute; right: 0; top: 0; width: 6px; height: 100%;
              cursor: col-resize; }
-  .bs-pager { display: flex; align-items: center; gap: 6px; padding: 3px 8px; flex: 0 0 auto;
-              border-top: 1px solid var(--vscode-panel-border); }
-  .bs-where, .bs-per-label { color: var(--vscode-descriptionForeground); font-size: .9em; }
-  .bs-per { width: 60px; font: inherit; }
   .bs-pane-code { flex: 1 1 auto; overflow: auto; }
   .bs-code-head { padding: 4px 8px; border-bottom: 1px solid var(--vscode-panel-border); }
   .bs-code-text { margin: 0; padding: 8px; font-family: var(--vscode-editor-font-family);
@@ -752,6 +744,7 @@ function css(): string {
   /* THE TABLE IS THREE PARTS AND THEY HIDE TOGETHER. The header moved out of
      the scroller and this rule was not extended to it, so the raw query showed
      with a stranded header row over it. */
+  .pane-wrap.showing-code .body,
   .pane-wrap.showing-code .pane,
   .pane-wrap.showing-code .top,
   .pane-wrap.showing-code .heads { display: none; }
@@ -810,10 +803,6 @@ function script(): string {
       row.classList.remove('folded-away');
       if (shut) hideUnder = depth;
     }
-    // THE PAGER COUNTS WHAT IS THERE TO COUNT. A fold changes how many rows a
-    // page holds, so the page is drawn again rather than left saying a number
-    // that includes rows nobody can see.
-    showPage(where);
   }
 
   // TICKED ROWS MAKE A GROUP, and a group is a bucket: the person's own name
@@ -923,15 +912,7 @@ function script(): string {
         g.classList.toggle('shut');
         h.querySelector('.fold').textContent = g.classList.contains('shut') ? '\\u25B8' : '\\u25BE';
         remember();
-        // A FOLD REDRAWS THE PAGE. This handler used to change the class and
-        // stop, so the pager kept hiding rows by a window computed before the
-        // fold: a group opened with its rows beyond the old window drew an
-        // open arrow over nothing, and the bar under the table said a number
-        // from another world. AND A GROUP OPENED IS A GROUP SHOWN: the window
-        // jumps to its first row, because the person who pressed the heading
-        // wants to see it, not find it on page three.
         drawFolds(where);
-        if (!g.classList.contains('shut')) showGroup(where, g);
       };
     }
     for (const p of where.querySelectorAll('.pin')) {
@@ -1013,12 +994,22 @@ function script(): string {
   // NEW DATA LANDS INSIDE THE PAGE, one pane at a time.
   window.addEventListener('message', (ev) => {
     const m = ev.data;
+    // THE COUNTER FOLLOWS THE RECORD. It was drawn once, when the page was
+    // built, so it said whatever was true when the editor was opened and the
+    // only way to move it was to shut the editor and open it again.
+    if (m.type === 'burndown') {
+      const bd = document.querySelector('.bd');
+      if (bd) { bd.textContent = m.says; bd.title = m.detail; }
+      return;
+    }
     if (m.type !== 'body') return;
     const wrap = document.querySelector('.pane-wrap[data-side="' + m.side + '"]');
     if (!wrap) return;
     remember();
+    // THE READER'S PLACE IS THE BODY'S SCROLL, the one scrollbar the pane has.
+    const body = wrap.querySelector('.body');
+    const at = body.scrollTop;
     const pane = wrap.querySelector('.pane');
-    const at = pane.scrollTop;
     // THE HEADINGS GO WITH THE ROWS, and this line wrote the word undefined
     // over them for months: the extension never sent m.heads, so every data
     // change replaced the column names with that string. It sends them now,
@@ -1032,8 +1023,7 @@ function script(): string {
     wireChrome(wrap);
     wireColumns(wrap);
     applySift(wrap);
-    showPage(wrap);
-    pane.scrollTop = at;
+    body.scrollTop = at;
   });
 
   for (const tab of document.querySelectorAll('.tab')) {
@@ -1335,31 +1325,6 @@ function script(): string {
     for (const t of document.querySelectorAll('.bs-tool[data-pop]')) t.classList.remove('on');
   });
 
-  // THREE THINGS HIDE A ROW and they share one attribute: a closed group, a
-  // folded parent, and a page the row is not on. Two handlers writing the
-  // hidden flag would fight, and the loser would be whichever ran second. SO
-  // ALL THREE ARE COMPUTED IN ONE PASS.
-  //
-  // The fold was added as a class of its own rather than through here, and the
-  // pager then counted rows the fold had taken away.
-  //
-  // Ported from basesclient.ts:479-520.
-  const page = new Map();
-
-  // THE WINDOW MOVES TO A GROUP THE PERSON JUST OPENED, so pressing a
-  // heading never answers with an open arrow over an empty page.
-  function showGroup(wrap, g) {
-    const bar = wrap.querySelector('.bs-pager');
-    if (!bar) return;
-    const per = Math.max(0, Number(bar.querySelector('.bs-per').value) || 0);
-    if (per === 0) return;
-    const first = g.querySelector('tr[data-id]:not(.folded-away):not(.sifted-away)');
-    const i = candidates(wrap).indexOf(first);
-    if (i < 0) return;
-    page.set(wrap.dataset.side, Math.floor(i / per));
-    showPage(wrap);
-  }
-
   // THE SIFT BOX. The owner asked for a small line edit in the heading line
   // that filters the way the log does, so the syntax is the log's, ported
   // from src/viewer/filter.go rather than invented here: bare words over the
@@ -1485,7 +1450,6 @@ function script(): string {
     for (const row of wrap.querySelectorAll('tr[data-id]')) {
       row.classList.toggle('sifted-away', match !== null && !match(row));
     }
-    showPage(wrap);
   }
 
   function wireSift(wrap) {
@@ -1542,60 +1506,8 @@ function script(): string {
     }).join('');
   }
 
-  function candidates(wrap) {
-    // Every row a closed group is not swallowing and no folded parent has
-    // taken away, in the order they are drawn.
-    const out = [];
-    for (const g of wrap.querySelectorAll('.group')) {
-      if (g.classList.contains('shut')) continue;
-      if (g.closest('.group.shut') !== null) continue;
-      for (const row of g.querySelectorAll('tr[data-id]')) {
-        if (row.classList.contains('folded-away')) continue;
-        if (row.classList.contains('sifted-away')) continue;
-        out.push(row);
-      }
-    }
-    return out;
-  }
-
-  function showPage(wrap) {
-    const bar = wrap.querySelector('.bs-pager');
-    if (!bar) return;
-    const per = Math.max(0, Number(bar.querySelector('.bs-per').value) || 0);
-    const rows = candidates(wrap);
-    const at = page.get(wrap.dataset.side) || 0;
-    const from = per === 0 ? 0 : at * per;
-    const to = per === 0 ? rows.length : from + per;
-    rows.forEach((row, i) => { row.hidden = i < from || i >= to; });
-    // A PAGER OVER ONE PAGE SAYS NOTHING THE COUNT DOES NOT.
-    bar.hidden = per === 0 || rows.length <= per;
-    // A ROW IS DRAWN UNDER EVERY QUERY THAT MATCHES IT AND UNDER ITS BUCKET,
-    // so the number of rows on the page is not the number of tokens. Saying
-    // one and meaning the other read as 156 work tokens over a queue of 61.
-    const tokens = new Set([...rows].map((r) => r.dataset.id)).size;
-    bar.querySelector('.bs-where').textContent = rows.length === 0 ? ''
-      : (from + 1) + '-' + Math.min(to, rows.length) + ' of ' + rows.length
-        + ' rows, ' + tokens + (tokens === 1 ? ' token' : ' tokens');
-  }
-
-  function wirePager(wrap) {
-    const bar = wrap.querySelector('.bs-pager');
-    if (!bar) return;
-    const side = wrap.dataset.side;
-    bar.querySelector('.bs-prev').onclick = () => {
-      page.set(side, Math.max(0, (page.get(side) || 0) - 1));
-      showPage(wrap);
-    };
-    bar.querySelector('.bs-next').onclick = () => {
-      page.set(side, (page.get(side) || 0) + 1);
-      showPage(wrap);
-    };
-    bar.querySelector('.bs-per').onchange = () => { page.set(side, 0); showPage(wrap); };
-    showPage(wrap);
-  }
-
   for (const wrap of document.querySelectorAll('.pane-wrap')) {
-    wire(wrap); wireChrome(wrap); wireFilter(wrap); wireColumns(wrap); wirePager(wrap); wireSift(wrap);
+    wire(wrap); wireChrome(wrap); wireFilter(wrap); wireColumns(wrap); wireSift(wrap);
   }
   `;
 }
@@ -1606,7 +1518,10 @@ function script(): string {
 // EVERY VALUE IS PRINTED AS IT ARRIVED. Nothing here adds, subtracts, divides
 // or compares them: the engine computed all four and the window, and the bar
 // says what it was handed.
+// THE SPAN IS ALWAYS DRAWN, EVEN EMPTY. It returned nothing at all when the
+// engine had not answered yet, so there was no node for a later number to land
+// in, and the counter stayed missing for the life of the page. A box with
+// nothing in it takes no room and is the thing that lets the number arrive.
 function burnDown(b?: Burndown): string {
-  if (!b) return "";
-  return `<span class="bd" title="${esc(b.detail)}">${esc(b.says)}</span>`;
+  return `<span class="bd" title="${esc(b?.detail ?? "")}">${esc(b?.says ?? "")}</span>`;
 }

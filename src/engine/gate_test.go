@@ -1,6 +1,7 @@
 package main
 
 import (
+	"strings"
 	"testing"
 )
 
@@ -24,6 +25,36 @@ import (
 // AND NOTHING COULD SEE IT. Every case of the exception in this suite is a case
 // that must be ALLOWED, so a test suite full of them cannot notice the exception
 // being too wide. These are the negative side.
+// THE MENU KNOWS EVERY NAME THE CALLER ANSWERS TO. The gate looked up open
+// tokens over the raw harness name, and no token is held under one, so a
+// subagent was told nothing is open while its own token stood open. And the
+// suggested command printed the harness name in --by, so an agent obeying it
+// held the token under the wrong name.
+func TestTheMenuKnowsTheNameItPullsWith(t *testing.T) {
+	t.Parallel()
+	r := aTreeWithOneStep(t)
+	tok := mintTask(t, r, "held work", "")
+	tok.Holder = "rev-6"
+	if err := SaveToken(r, tok); err != nil {
+		t.Fatal(err)
+	}
+	NoteTheNameItPullsWith(r, "general-purpose-28", ".bin/se pull --actor rev-6")
+
+	why, refused := WriteNeedsAToken(r, "general-purpose-28", "Edit", "doc/x.md")
+	if !refused {
+		t.Fatal("an Edit was not refused")
+	}
+	if !strings.Contains(why, tok.ID) {
+		t.Fatalf("the refusal does not name the token the caller's own name holds: %s", why)
+	}
+	if !strings.Contains(why, "--by rev-6") {
+		t.Fatalf("the suggested command does not spell --by with the pulled-with name: %s", why)
+	}
+	if !strings.Contains(why, "general-purpose-28") || !strings.Contains(why, "rev-6") {
+		t.Fatalf("the refusal does not say which name is which: %s", why)
+	}
+}
+
 func TestTheEngineExceptionIsAnchoredToTheProgram(t *testing.T) {
 	t.Parallel()
 	allowed := []string{

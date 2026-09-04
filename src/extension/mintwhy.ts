@@ -22,10 +22,11 @@ export type Reason =
   | "nothing typed"
   | "no engine"
   | "no start"
+  | "not running"
   | "not json";
 
 // Reasons is the set, in the order the chain meets them.
-export const Reasons: Reason[] = ["nothing typed", "no engine", "no start", "not json"];
+export const Reasons: Reason[] = ["nothing typed", "no engine", "no start", "not running", "not json"];
 
 // whyNothingHappened answers what to show the person, naming which way it went.
 //
@@ -47,9 +48,15 @@ export function whyNothingHappened(why: Reason, said = ""): string {
         "Nothing was minted.";
     case "no start":
       return "The engine would not start, so nothing was minted." + tail;
+    case "not running":
+      // THE STARTUP TOAST THE OWNER HIT. A verb sent before the engine was up
+      // came back with an empty answer and "no engine is running" on the other
+      // stream, and the not-json case below read that as a parse failure.
+      return "No engine is running over this folder, so the call did not run. " +
+        "Press start and try again." + tail;
     case "not json":
       return "The engine answered something that is not JSON, so it did not read the call " +
-        "and nothing was minted." + tail;
+        "and nothing happened." + tail;
   }
 }
 

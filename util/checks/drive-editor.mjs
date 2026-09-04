@@ -303,17 +303,10 @@ if (tick) {
 
     const fold = parent.querySelector(".kid-fold");
     say("the parent carries a fold", !!fold);
-    // THE PAGER COUNTS WHAT IS THERE TO COUNT. A fold changes how many rows a
-    // page holds, and the fold was a third way to hide a row, added outside the
-    // one pass the other two share.
-    const where = wrap.querySelector(".bs-where");
-    const counted = () => (where ? where.textContent : "");
-    const said = counted();
-
+    // THERE IS NO PAGER TO COUNT. The owner threw the pagination out for one
+    // scrollbar, so a fold only adds and removes the folded-away class.
     const wasAway = [...wrap.querySelectorAll("tr.folded-away")].length;
     press(fold);
-    say("folding changes what the pager counts", counted() !== said,
-      "the pager said " + JSON.stringify(said) + " and still says " + JSON.stringify(counted()));
     const nowAway = [...wrap.querySelectorAll("tr.folded-away")].length;
     say("folding the parent takes its children away", nowAway > wasAway);
     say("and the parent itself stays", !parent.classList.contains("folded-away"));
@@ -321,7 +314,6 @@ if (tick) {
     press(fold);
     say("and unfolding brings them back",
       [...wrap.querySelectorAll("tr.folded-away")].length === wasAway);
-    say("and unfolding puts the count back", counted() === said);
     // A press on the fold does not tick the row it sits on.
     say("folding does not tick the row", !parent.classList.contains("ticked"));
   }
@@ -525,7 +517,7 @@ say("they name the columns the view declares",
 // THEY STAY PUT WHILE THE ROWS GO PAST. The headings sit in their own block
 // outside the scrolling area, so scrolling the rows cannot move them. A DOM
 // has no layout, so what is asserted is the structure that makes it true.
-const scroller = wrap.querySelector(".pane");
+const scroller = wrap.querySelector(".body");
 say("the headings are outside the scrolling area", !scroller.contains(heads()));
 say("the rows are inside it", scroller.querySelectorAll("tr[data-id]").length > 0);
 say("the heading block does not scroll on its own",
@@ -560,6 +552,42 @@ say("the second pane closes on the button again", right.hidden);
     "the seam is " + (wide ? wide[1] + "px" : "not sized at all"));
 }
 
+
+// THE COUNTER FOLLOWS THE RECORD, WITHOUT THE PAGE BEING BUILT AGAIN.
+//
+// THE ONE THE OWNER MET. The number was drawn once, when the page was built, and
+// it was asked for only inside the branch that replaces the page, so it said
+// whatever was true when the editor was opened. Shutting the editor and opening
+// it again was the only way to move it.
+//
+// THE SPAN IS THERE BEFORE ANY NUMBER IS. The page above is built with no burn
+// down at all, which is exactly the case that used to draw nothing and leave no
+// node for a later number to land in.
+{
+  const bd = doc.querySelector(".bd");
+  say("the counter has a place on the bar before any number arrives", !!bd,
+    "there is no .bd on the page, so a number sent later lands nowhere at all");
+  if (bd) {
+    say("and it is empty rather than saying something nobody sent", bd.textContent === "",
+      "it says " + JSON.stringify(bd.textContent));
+    window.dispatchEvent(new window.MessageEvent("message", {
+      data: { type: "burndown", says: "BD: 119/191/69", detail: "on 2026-09-03: 119 minted" },
+    }));
+    say("a fresh number reaches it with no open and close",
+      bd.textContent === "BD: 119/191/69", "it says " + JSON.stringify(bd.textContent));
+    say("and the whole of it is there, with no figure cut off",
+      /^BD: \d+\/\d+\/\d+$/.test(bd.textContent), "it says " + JSON.stringify(bd.textContent));
+    say("the hover carries the detail that came with it",
+      bd.title === "on 2026-09-03: 119 minted", "the hover says " + JSON.stringify(bd.title));
+    // AND IT IS NEVER WHAT GIVES WAY when the bar runs out of room. A DOM has no
+    // layout, so what is asserted is the rule that makes it true.
+    say("the counter cannot be squeezed off the right edge",
+      /\.bd \{[^}]*flex: 0 0 auto/.test(html),
+      "nothing stops the counter shrinking, so a long bar cuts it mid-number");
+    say("and the tabs are what give way instead",
+      /\.bar \.tab \{[^}]*min-width: 0/.test(html));
+  }
+}
 
 // NOTHING THREW. Asserted at the end so it covers every press above, rather
 // than each press having to remember to ask.
@@ -684,7 +712,7 @@ say("no handler threw", thrown.length === 0, thrown.join("\n      "));
     // inside an instance is caught rather than slipping past on its id.
     const shellOwns = [".tab", ".second", ".seam"];
     const instanceOwns = [".bs-bar", ".bs-make-bucket", ".bs-rename", ".bs-code-toggle",
-                          ".bs-pop", ".heads", ".top", ".pane", ".bs-pager", ".bs-pane-code"];
+                          ".bs-pop", ".heads", ".top", ".pane", ".body", ".bs-pane-code"];
     for (const sel of shellOwns) {
       const all = [...d.querySelectorAll(sel)];
       say("the shell owns " + sel + ", and it is drawn", all.length > 0,

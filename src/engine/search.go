@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -176,4 +178,138 @@ func hereDocEnd(after string) string {
 		return ""
 	}
 	return word
+}
+
+// A SEARCH OVER THE TREE GOES THROUGH THE INDEX, AND THE DISK IS FOR OUTSIDE.
+//
+// THE OWNER'S WORDS: everything that's inside the system should be routed
+// there. Obviously, if the agent wants to do something outside of our system,
+// you can still use the other tools.
+//
+// So the line is the tree. A search whose every path is inside it, or that
+// names no path and so searches where it stands, is refused and told the
+// door. One that names a path outside is left alone.
+
+// searchers are the programs this is about, by the name they are run as.
+func searcher(word string) bool {
+	name := word
+	if i := strings.LastIndexAny(name, "/"+string(os.PathSeparator)); i >= 0 {
+		name = name[i+1:]
+	}
+	name = strings.ToLower(strings.TrimSuffix(name, ".exe"))
+	switch name {
+	case "rg", "grep", "egrep", "fgrep", "findstr", "ag", "ack":
+		return true
+	}
+	return false
+}
+
+// ASearchOverTheTree answers whether this command searches inside the tree
+// at work with a program that reads the disk, and says where to search
+// instead.
+func ASearchOverTheTree(command, work string) (string, bool) {
+	parts := pipeline(command)
+	for i, part := range parts {
+		words := strings.Fields(part)
+		if len(words) == 0 || !searcher(words[0]) {
+			continue
+		}
+		paths := pathsAmong(words[1:])
+		// grep WITH NO PATH READS ITS INPUT, and behind a pipe that input is
+		// another program's output rather than the tree. rg with no path
+		// searches where it stands, which is the tree.
+		if len(paths) == 0 && i > 0 {
+			continue
+		}
+		if len(paths) == 0 && strings.HasPrefix(strings.ToLower(filepath.Base(words[0])), "grep") {
+			continue
+		}
+		if len(paths) > 0 && !anyInside(paths, work) {
+			continue
+		}
+		return theIndexDoor(strings.TrimSpace(part)), true
+	}
+	return "", false
+}
+
+// AToolSearchOverTheTree is the same question for the harness's own Grep
+// and Glob, which take a path and search where they stand without one.
+func AToolSearchOverTheTree(tool, path, work string) (string, bool) {
+	if tool != "Grep" && tool != "Glob" {
+		return "", false
+	}
+	if path != "" && !anyInside([]string{path}, work) {
+		return "", false
+	}
+	what := tool
+	if path != "" {
+		what += " over " + path
+	}
+	return theIndexDoor(what), true
+}
+
+// theIndexDoor is the refusal, and it says exactly what to run instead.
+func theIndexDoor(what string) string {
+	return "THE TREE IS INDEXED, AND A SEARCH OVER IT GOES THROUGH THE INDEX. " +
+		"Every line of every text file is in it, and the engine keeps it in step with the tree.\n\n" +
+		"Use se_find, or se find at a prompt:\n" +
+		"- words: terms in FTS5 syntax, best hit first. \"one phrase\", pre*, a AND b, a NOT b.\n" +
+		"- regex: a Go regular expression matched against every line.\n" +
+		"- path: a glob that narrows either, src/**/*.go, or on its own lists the files it names.\n" +
+		"Every hit is a path, a line number and the line. se_ask takes SQL over the same tables.\n\n" +
+		"What was asked: " + what + "\n\n" +
+		"IF YOUR LANE HAS NO se_find YET, it began before the tool did: run se find --words ... " +
+		"through se_run, which is the same door.\n\n" +
+		"OUTSIDE THIS TREE THE DISK IS YOURS: a search naming a path outside it is not refused."
+}
+
+// pathsAmong answers the words that name a path: everything that is not a
+// flag and not the pattern, which is the first bare word.
+func pathsAmong(args []string) []string {
+	var out []string
+	pattern := false
+	for i := 0; i < len(args); i++ {
+		a := args[i]
+		if a == "--" {
+			out = append(out, args[i+1:]...)
+			break
+		}
+		if strings.HasPrefix(a, "-") {
+			// A FLAG THAT TAKES A VALUE TAKES THE NEXT WORD, and the ones that
+			// matter here are the pattern and the type: -e p, -g glob, -t go.
+			if a == "-e" || a == "-g" || a == "-t" || a == "-T" || a == "--regexp" || a == "--glob" || a == "--type" {
+				i++
+				if a == "-e" || a == "--regexp" {
+					pattern = true
+				}
+			}
+			continue
+		}
+		if !pattern {
+			pattern = true
+			continue
+		}
+		out = append(out, a)
+	}
+	return out
+}
+
+// anyInside says whether any of these paths is inside the tree at work. A
+// relative path is inside unless it climbs out; an absolute one is inside
+// when it starts with the root.
+func anyInside(paths []string, work string) bool {
+	root := filepath.Clean(work)
+	for _, p := range paths {
+		p = strings.Trim(p, "'\"")
+		if !filepath.IsAbs(p) {
+			if strings.HasPrefix(filepath.ToSlash(filepath.Clean(p)), "../") {
+				continue
+			}
+			return true
+		}
+		if rel, err := filepath.Rel(root, filepath.Clean(p)); err == nil && !strings.HasPrefix(rel, "..") {
+			return true
+		}
+	}
+	return false
 }

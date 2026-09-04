@@ -24,6 +24,9 @@ func TestNothingIsAllowedWhileEverythingIsOnHold(t *testing.T) {
 	if out := hookSays(t, exe, r.Method, "PreToolUse", read); strings.Contains(out, `"deny"`) {
 		t.Fatalf("a read was refused with no hold: %s", out)
 	}
+	// The first stop of the session is granted, so it is spent before the
+	// rule under test can be seen.
+	hookSays(t, exe, r.Method, "Stop", map[string]any{"cwd": r.Work})
 	if out := hookSays(t, exe, r.Method, "Stop", map[string]any{"cwd": r.Work}); out == "" {
 		t.Fatal("an unclaimed stop passed with no hold")
 	}

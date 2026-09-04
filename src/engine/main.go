@@ -4,10 +4,12 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io"
 	"os"
 	"os/signal"
 	"path/filepath"
 	"strings"
+	"sync"
 	"syscall"
 	"time"
 )
@@ -64,6 +66,9 @@ func main() {
 	rotate := flag.Bool("rotate", false, "set the current log aside and exit, writing nothing")
 	link := flag.Bool("link", false, "give every built program both its names as one file, and exit")
 	stopFlag := flag.Bool("stop", false, "ask the engine running over this folder to stop, and exit")
+	swapFlag := flag.Bool("swap", false, "ask the engine running over this folder to build the next one and hand over to it")
+	built := flag.Bool("built", false, "with swap: hand over to the program already in .bin rather than building one")
+	pingFlag := flag.Bool("ping", false, "print what the engine running over this folder says about itself, and exit")
 	project := flag.Bool("project", false, "write the projections from guidance and exit")
 	emergency := flag.String("emergency", "", "arm or disarm emergency mode: on, off, or status")
 	reason := flag.String("reason", "", "why emergency mode is being armed")
@@ -104,14 +109,9 @@ func main() {
 		return
 	}
 
-	roots, err := FindRoots(*work)
-	if *method != "" {
-		abs, err := filepath.Abs(*method)
-		if err != nil {
-			fail(err)
-		}
-		roots.Method = abs
-	}
+	// THE ERROR IS READ BEFORE THE ROOTS ARE USED. It was checked after the
+	// method was written over, so a FindRoots that failed was worked from.
+	roots, err := FindRoots(*work, *method)
 	if err != nil {
 		fail(err)
 	}
@@ -138,14 +138,40 @@ func main() {
 		return
 	}
 
-	// ASK THE ENGINE OVER THIS FOLDER TO STOP. The battery does, before it
-	// wakes one on the build it just made, and a person does when a stale
-	// engine says it is older than the program on disk.
+	// ASK THE ENGINE OVER THIS FOLDER TO STOP. A person does, when they are
+	// done with the tree. Replacing it with a newer build is a swap and not a
+	// stop, because a stop severs whatever was in flight.
 	if *stopFlag {
 		if _, _, ok := askModel(roots, "stop", nil); !ok {
 			fail(fmt.Errorf("no engine is running over %s", roots.Work))
 		}
 		fmt.Println("stopping")
+		return
+	}
+
+	// ASK THE ENGINE TO REPLACE ITSELF. This is the one door to a new engine
+	// over a tree that has one running: the engine builds, checks the new
+	// program answers, waits for the calls in flight and hands over, keeping
+	// the log session. Building over .bin by hand is refused and told this.
+	if *swapFlag {
+		said, err := askForASwap(roots, "asked for on the command line", *built)
+		if err != nil {
+			fail(err)
+		}
+		answerJSON(said)
+		return
+	}
+
+	// ASK THE ENGINE HOW IT IS. The answer carries ready, once the first
+	// scan is done, and watching, the daemon's own self-check of the tree's
+	// watcher. The battery waits for the first at start and reads the
+	// second as a check, so nothing in it waits on the operating system.
+	if *pingFlag {
+		raw, _, ok := askModel(roots, "ping", nil)
+		if !ok {
+			fail(fmt.Errorf("no engine is running over %s", roots.Work))
+		}
+		fmt.Println(string(raw))
 		return
 	}
 
@@ -471,6 +497,12 @@ func main() {
 	}
 	log.Write("engine", "start", "engine", "engine started", Yes(), startRecord)
 
+	// A BATTERY THAT RAN OUTSIDE THE ENGINE IS REPORTED HERE. It is started
+	// detached, because it replaces the engine that started it, so the process
+	// that would have waited for its answer is gone by the time there is one.
+	// This start is the first moment anything can put it in the record.
+	RecordFinishedBattery(roots, log)
+
 	// TWO NAMES, ONE FILE. Installing links them, so the cage and RUNME call
 	// the same program. A build run by hand replaces one name and leaves the
 	// other pointing at what was there before, and then the guards run one
@@ -499,7 +531,7 @@ func main() {
 	// reloads has no parent any more, and without this it cannot tell a live
 	// engine from none.
 	here := Running{PID: os.Getpid(), Log: log.Path(), Session: log.Session(),
-		Started: time.Now().UTC().Format(time.RFC3339), Build: Build}
+		Started: time.Now().UTC().Format(time.RFC3339), Build: Build, Run: runIdentity()}
 	SayRunning(roots, here)
 	defer StopSaying(roots)
 
@@ -518,8 +550,21 @@ func main() {
 	}
 	// THE RESIDENT ENGINE KEEPS THE INDEX. It is the one process that lives
 	// as long as the session, so it is the one that can watch the tree.
-	stopIndexer, socket, askedToStop := StartIndexer(roots, log, *beat)
-	defer stopIndexer()
+	stopIndexer, socket, asked := StartIndexer(roots, log, *beat)
+	// LETTING GO HAPPENS ONCE, whether the engine is ending or handing over.
+	// A swap has to release the socket and the port before the successor
+	// looks at them, and the deferred call still runs on the way out.
+	var letGo sync.Once
+	hooks := (io.Closer)(nil)
+	release := func() {
+		letGo.Do(func() {
+			stopIndexer()
+			if hooks != nil {
+				hooks.Close()
+			}
+		})
+	}
+	defer release()
 	// THE GUARD'S DOOR. Every per-call event the cage names comes here over
 	// HTTP, and the port is the one the cage was projected with.
 	if ln, err := listenHooks(roots); err != nil {
@@ -528,7 +573,7 @@ func main() {
 			map[string]any{"url": hooksURL(roots), "reason": err.Error()})
 	} else {
 		go serveHooks(ln, roots, log)
-		defer ln.Close()
+		hooks = ln
 		here.Hooks = hooksURL(roots)
 	}
 	// THE ADDRESSES ARE PUBLISHED WHERE A CLIENT ALREADY LOOKS, beside the
@@ -592,11 +637,39 @@ func main() {
 			log.Write("engine", "stop", "engine", "engine stopped, asked to", Yes(),
 				map[string]any{"uptime_s": int(time.Since(started).Seconds())})
 			return
-		case <-askedToStop:
-			// A CLIENT ASKED IT TO STOP, over the socket. The battery does,
-			// before it wakes one on the build it just made.
+		case <-asked.Stop:
+			// A CLIENT ASKED IT TO STOP, over the socket. A person does, when
+			// they are done with the tree for the day.
 			log.Write("engine", "stop", "engine", "engine stopped, asked to over the socket", Yes(),
 				map[string]any{"uptime_s": int(time.Since(started).Seconds())})
+			return
+		case plan := <-asked.Swap:
+			// THE HANDOVER. The new program is already built and has answered
+			// for itself, so what is left is the part only this loop can do:
+			// let the calls in flight finish, put the new one in place, and
+			// start it on the session this one has been writing.
+			left := drainCalls(swapDrainBudget)
+			log.Write("engine", "swap", "engine", "engine swapped, and the successor continues this session", Yes(),
+				map[string]any{"from": Build, "to": plan.Build, "why": plan.Why,
+					"cut": left, "uptime_s": int(time.Since(started).Seconds())})
+			if err := putInPlace(roots, plan.Next); err != nil {
+				// A SWAP THAT CANNOT LAND LEAVES THE ENGINE RUNNING. Nothing
+				// has been replaced at this point, so carrying on is the whole
+				// of the recovery.
+				log.Write("engine", "error", "engine", "the swap did not land, so this engine carries on", No(),
+					map[string]any{"reason": err.Error(), "build": Build})
+				continue
+			}
+			// THE LISTENERS GO BEFORE THE SUCCESSOR STARTS. It binds the same
+			// socket and the same port, and refuses to be a second engine, so
+			// this one has to have let go of all three before the other looks.
+			release()
+			StopSaying(roots)
+			if err := handOver(roots, log.Session()); err != nil {
+				log.Write("engine", "error", "engine",
+					"the next engine is in place and did not start, so this tree has no engine", No(),
+					map[string]any{"reason": err.Error(), "fix": "start it: se --work " + roots.Work})
+			}
 			return
 		}
 	}

@@ -1,16 +1,6 @@
-# A change too clear to specify: the ask is the design, and the token is
-# worked and closed by whoever took it. No reviewer, no design step, no
-# second actor. What holds it honest is the checklist: the change is small
-# enough to review whole, a check went red and then green, and the tree is
-# sound.
-#
-# The activities are SIPOC rows, so the drawing is derived rather than drawn.
-
 name: trivial
 description: a fix or a small addition that needs no specification, worked and closed by its taker
 
-# A trivial token is not traced. It is the smallest unit of doing, and what
-# it did is in the record and the commit, not in a token that travels.
 traced: false
 
 sections:

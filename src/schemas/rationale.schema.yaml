@@ -1,0 +1,66 @@
+# The argument for a decision, kept where an argument belongs.
+#
+# Every other kind says what to do. This one says why it is that, what it gives
+# up, and what would make it wrong. The thing it explains names it by link, so
+# the instruction stays short and the argument is still one step away.
+#
+# The frontmatter half is JSON Schema 2020-12, https://json-schema.org/draft/2020-12.
+# The body half is this project's own, https://document-schema.org.
+
+kind: rationale
+
+frontmatter:
+  type: object
+  additionalProperties: false
+  required:
+    - kind
+    - title
+    - explains
+  properties:
+    kind:
+      const: rationale
+      x-link: true
+      description: which schema reads this note
+
+    title:
+      description: the name this rationale is known by, in references and in links
+
+    explains:
+      type: array
+      description: what carries the instruction this argues for, one path per entry
+
+    supersedes:
+      type: array
+      x-link: true
+      description: the rationale this replaces, where the decision was taken again
+
+body:
+  headingLevel: 2
+  order: strict
+  extraSections: false
+
+  sections:
+    - header: decided
+      required: true
+      tense: present
+      maxWords: 60
+      description: what was ruled, said so a reader can act on it
+
+    - header: why
+      required: true
+      tense: past
+      maxWords: 250
+      description: the argument, and what was measured
+
+    - header: costs
+      required: true
+      tense: present
+      maxWords: 120
+      description: what the decision gives up, and who pays it
+
+    - header: revisit when
+      required: true
+      list: true
+      maxItems: 5
+      maxWordsPerItem: 30
+      description: what would have to become true for it to be decided again

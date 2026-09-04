@@ -240,6 +240,36 @@ func AnswerOwedNow(r Roots, actor string) (string, bool) {
 // A SESSION OF ITS OWN, the way arrivals has one. A count that outlived the run
 // it was made in would refuse a fresh agent on a prompt from hours ago.
 func countGrace(r Roots, actor string) int {
+	n := 0
+	// grace it cannot count is grace not spent, which refuses sooner
+	_ = changeGrace(r, func(g *graced) {
+		g.Seen[actor]++
+		n = g.Seen[actor]
+	})
+	return n
+}
+
+func forgetGrace(r Roots, actor string) error {
+	return changeGrace(r, func(g *graced) { delete(g.Seen, actor) })
+}
+
+// THE READ AND THE WRITE ARE ONE OPERATION, the shape changeOwed has and for
+// the same reason: the guard is a fresh process on every tool call, so two
+// agents overlapping lost increments and were given more grace than the rule
+// allows.
+func changeGrace(r Roots, change func(*graced)) error {
+	return locked(gracePath(r), func() error {
+		g := loadGrace(r)
+		change(&g)
+		b, err := json.MarshalIndent(g, "", " ")
+		if err != nil {
+			return err
+		}
+		return writeAtomic(gracePath(r), b, 0o644)
+	})
+}
+
+func loadGrace(r Roots) graced {
 	var g graced
 	if b, err := os.ReadFile(gracePath(r)); err == nil {
 		_ = json.Unmarshal(b, &g) // a file that will not read is a zero count
@@ -247,29 +277,7 @@ func countGrace(r Roots, actor string) int {
 	if g.Seen == nil || g.Session != currentSession(r) {
 		g = graced{Session: currentSession(r), Seen: map[string]int{}}
 	}
-	g.Seen[actor]++
-	n := g.Seen[actor]
-	if b, err := json.MarshalIndent(g, "", " "); err == nil {
-		_ = writeAtomic(gracePath(r), b, 0o644) // grace it cannot remember is grace not spent, which refuses sooner
-	}
-	return n
-}
-
-func forgetGrace(r Roots, actor string) error {
-	var g graced
-	b, err := os.ReadFile(gracePath(r))
-	if err != nil {
-		return nil
-	}
-	if json.Unmarshal(b, &g) != nil || g.Seen == nil {
-		return nil
-	}
-	delete(g.Seen, actor)
-	out, err := json.MarshalIndent(g, "", " ")
-	if err != nil {
-		return err
-	}
-	return writeAtomic(gracePath(r), out, 0o644)
+	return g
 }
 
 // AN EDITOR SAYING WHERE SOMEBODY IS LOOKING IS NOT A QUESTION.

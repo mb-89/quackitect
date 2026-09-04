@@ -90,7 +90,7 @@ func TestTheGuardsStateIsWrittenAtomically(t *testing.T) {
 	// passes over what is missing is a list nobody notices has gone stale.
 	for _, name := range []string{
 		"arrival.go", "evidence.go", "gate.go", "heard.go", "hold.go",
-		"hook.go", "investigate.go", "nudge.go", "owed.go", "stop.go",
+		"hook.go", "investigate.go", "owed.go", "stop.go",
 		"tools.go", "watch.go",
 	} {
 		b, err := os.ReadFile(filepath.Join("..", "..", "src", "engine", name))

@@ -129,7 +129,19 @@ for (const full of everyTs(here)) {
   const lines = text.split("\n");
   const names = boundToChildProcess(text);
   for (const n of names) bound.add(n);
-  if (names.size === 0) continue;
+  // A FILE THE READER CANNOT UNDERSTAND IS REPORTED, NEVER SKIPPED. The set
+  // above is derived from one declaration shape, the braced import, and a file
+  // that uses another used to be skipped whole: a namespace import calling
+  // cp.spawn with a literal flag list produced no count, no failure and no
+  // output. Mentioning child_process and yielding no binding is that silence,
+  // and it is a failure by name.
+  if (names.size === 0) {
+    say(name + " yields no binding this check can search", !text.includes("child_process"),
+      "it mentions child_process and binds nothing boundToChildProcess can read, "
+      + "so every start in it is invisible to both counts. Import what it uses "
+      + "with a braced import from node:child_process");
+    continue;
+  }
   for (const n of names) searched.add(n);
   for (const m of text.matchAll(anySpawnFor(names))) {
     const line = text.slice(0, m.index).split("\n").length;

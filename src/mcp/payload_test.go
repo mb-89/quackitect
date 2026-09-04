@@ -64,7 +64,13 @@ func TestThePullDoorCarriesEveryFieldThePayloadHas(t *testing.T) {
 				"so nothing reaching the engine through here can ever set it", name)
 			continue
 		}
-		if !strings.Contains(declared, `"`+name+`": map[string]any{`) {
+		// GOFMT DECIDES THE SPACING, NOT THE AUTHOR, so the gap after the colon
+		// is no part of what is being asked. gofmt aligns a property block on
+		// its longest key, so every shorter key is padded and a single-space
+		// match can only ever find the longest one. Matching a literal here
+		// failed shut: the four short keys were declared and still reported
+		// missing, and no correct schema could have turned it green.
+		if !regexp.MustCompile(`"` + regexp.QuoteMeta(name) + `":\s*map\[string\]any\{`).MatchString(declared) {
 			t.Errorf("this door forwards %q and its schema never declares it, so no caller "+
 				"knows to send it", name)
 		}

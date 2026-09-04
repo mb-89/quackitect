@@ -39,7 +39,8 @@ const (
 // The roles a puller can hold. A role decides which queue answers, and nothing
 // else. Level 0 knows none of these words.
 const (
-	RoleWorker = "worker"
+	RoleWorker   = "worker"
+	RoleReviewer = "reviewer"
 )
 
 // Payload is what a pull carries back. Empty means give me work.
@@ -94,25 +95,24 @@ func Pull(r Roots, actor, role string, p Payload) Answer {
 	// before is gone, so what they held comes back before anything is handed
 	// out. Nothing else in the protocol reclaims, on purpose.
 	var reclaimed []string
-	first := Arrived(r, session, actor)
+	// THE ARRIVAL IS KEYED ON THE HARNESS SESSION, not the engine's: the
+	// engine outlives agents, so a harness restart is a new agent even when
+	// the run is the same one.
+	first := ArrivedAs(r, ArrivalSession(r), actor, role)
 	if first {
 		reclaimed = Reclaim(r, actor)
 	}
 
-	// THE QUEUE IS COUNTED BEFORE THE HAND-OUT, because a pull that gives this
-	// agent a token makes it busy by definition, and the owner's condition is
-	// three open with nothing in work. Counted afterwards the nudge could only
-	// ever land on a wait.
-	said := Nudge(r, actor, role)
-
+	// THE NUDGE IS GONE, AND THE STAFFING SAYS IT INSTEAD.
+	//
+	// It said the queue was long and nothing was in hand, and declining was a
+	// fine answer, so a backlog sat with one agent on it. The owner's ruling put
+	// one number in its place: the engine wants that many hands of each role
+	// while there is work for them, and holds the main agent until they pull.
+	// A suggestion and a refusal about the same queue are two machines, and the
+	// refusal is the one that works.
 	a := answerFor(r, actor, role, p)
 	a.Notice += reclaimNotice(reclaimed)
-	// A NUDGE RIDES ON THE ANSWER RATHER THAN BEING A THING TO GO AND LOOK FOR.
-	// It refuses nothing: it says the queue is long and nothing is in hand, and
-	// declining is a fine answer.
-	if said != "" {
-		a.Notice += nl + nl + said
-	}
 	if first {
 		if a.Tools = KnownTools(r, session); len(a.Tools) > 0 {
 			a.Notice += " This machine's tools ride in this answer, with what each one is for." +
@@ -143,8 +143,9 @@ func answerFor(r Roots, actor, role string, p Payload) Answer {
 		// this and did not do it: Reclaim runs on an arrival, and an agent that
 		// has already arrived never arrives again, so the second pull answered
 		// the same notice as the first and nothing moved.
-		if back := TakeBackWhatWasLookedAt(r, actor); len(back) > 0 {
-			a := next(r, actor)
+		back, refused := TakeBackWhatWasLookedAt(r, actor)
+		if len(back) > 0 {
+			a := next(r, actor, role)
 			a.Learned = learned
 			a.Notice += reclaimNotice(back)
 			return a
@@ -152,11 +153,14 @@ func answerFor(r Roots, actor, role string, p Payload) Answer {
 		if t, quiet := quietHold(r, actor); quiet {
 			Looked(r, actor, t.ID)
 			a := investigate(r, t)
+			// AND IF THE WALKER ALREADY ANSWERED, SAY WHY IT DID NOT LAND.
+			// The same notice arriving twice reads as the engine not listening.
+			a.Notice += refusedNotice(refused)
 			a.Learned = learned
 			return a
 		}
 	}
-	a := next(r, actor)
+	a := next(r, actor, role)
 	a.Learned = learned
 	return a
 }
@@ -200,18 +204,42 @@ func submit(r Roots, actor string, t Token, p Payload) (Answer, bool) {
 	if f := checkEvidence(r, t, p); f != nil {
 		return refuse(&t, *f), true
 	}
-	t.Submission = p.Evidence
-	t.Disposition = Disposition(p.Disposition)
-	t.Successors = p.Successors
-	t.Reason = p.Reason
+	// A SUBMISSION SAYS WHAT IT BRINGS. IT DOES NOT SAY WHAT THE NOTE NO LONGER
+	// HOLDS.
+	t.Submission = keepingWhatWasNotSent(t.Submission, p.Evidence)
 
-	// A WORKER CLOSES ITS OWN WORK. There is no second actor, so a submission
-	// that met every criterion and answered every checklist is the ending.
-	// What a reviewer used to hold is now held by the checks above.
+	// A WORKER CLOSES ITS OWN WORK, and a standard token's verdict is the one
+	// step a second actor takes. Whoever did the work step is written down as
+	// the author, and the author is refused the verdict.
+	ends := true
 	if proc, err := LoadProcess(r.Method, t.Process); err == nil {
 		if a, found := proc.ActivityFrom(t.Status); found {
+			if a.Role == RoleReviewer && t.Author != "" && t.Author == actor {
+				return refuse(&t, Rejection{Clause: "author", Wrong: "you did the work on this token, so the verdict is not yours",
+					Satisfies: "a verdict from another actor"}), true
+			}
+			if a.Role != RoleReviewer {
+				t.Author = actor
+			}
 			t.Status = a.To
+			ends = proc.Ends(a.To)
 		}
+	}
+	// THE DISPOSITION IS THE ENDING'S, AND ONLY THE ENDING'S.
+	//
+	// MEASURED. It was written on every submission, including the standard
+	// process's work step, which goes open to done and owes a verdict. Ended()
+	// is Disposition != "", so the token read as ended while its status still
+	// read done, and every check that asks Ended() shut it against the reviewer
+	// meant to rule on it: submit refused the verdict as "this token is already
+	// closed", and TakeUp refused se run and se apply naming it, so a reviewer
+	// could not even run a criterion's command against what it was reviewing.
+	// The verdict activity is declared from done to closed and nothing could
+	// reach it: every standard token that got to done stranded there.
+	if ends {
+		t.Disposition = Disposition(p.Disposition)
+		t.Successors = p.Successors
+		t.Reason = p.Reason
 	}
 	t.Holder = ""
 	// CLOSING ENDS THE STRETCH, so the change is the diffs between began and
@@ -238,6 +266,28 @@ func checkDisposition(r Roots, t Token, p Payload) *Rejection {
 	// dropped carries one, while note.process.yaml declared exactly the same
 	// three and marked one `reason: required` — two answers to one question,
 	// and the file's was the one nothing read.
+	// A STEP THAT DOES NOT END THE TOKEN NEEDS NO DISPOSITION. The standard
+	// process moves a token from open to done and only the verdict closes it,
+	// so the work step is submitted with nothing to say about the ending.
+	//
+	// AND ONE SENT THERE ANYWAY IS NOT AN ENDING EITHER. submit drops it, so a
+	// worker's habitual "done" on the work step cannot end a token the process
+	// still owes a verdict on. Dropping it in silence would swallow an ending
+	// somebody meant, so a submission carrying one is refused instead. Which
+	// dispositions carry an ending is the process's to say and not this file's,
+	// so this asks what the submission brings rather than what it is called: a
+	// reason, which the process marks required on the ones that need it, or the
+	// successors a became names. Ending a token early is se stop's, which moves
+	// the status to where the process stops instead of leaving it standing.
+	if a, found := proc.ActivityFrom(t.Status); found && !proc.Ends(a.To) {
+		if strings.TrimSpace(p.Reason) != "" || len(p.Successors) > 0 {
+			return &Rejection{Clause: "disposition",
+				Wrong: "this step leaves the token at " + a.To + ", which " + proc.Name +
+					" does not end, so it cannot carry an ending",
+				Satisfies: "submit this step with no disposition, and end the token early with se stop"}
+		}
+		return nil
+	}
 	var spec *DispositionSpec
 	for i, d := range proc.Dispositions {
 		if d.Name == said {
@@ -282,6 +332,32 @@ func quoted(s string) string {
 	return `"` + s + `"`
 }
 
+// keepingWhatWasNotSent lays a submission's evidence over the note's own, and
+// keeps every section the submission did not name.
+//
+// MEASURED on wk-00c162f56e. This was an assignment, so a submission carrying
+// no evidence carried nil, and SaveToken rebuilt the note from the struct with
+// all three of the author's tables gone while the frontmatter came out
+// current. checkEvidence had just read those tables off the note to let the
+// move through, so the engine deleted the only copy of the answers it had
+// itself accepted, and the reviewer who came next had nothing to rule on.
+//
+// A section the payload names wins, because that is the submission speaking. A
+// section it says nothing about is the author's, and silence is not deletion.
+func keepingWhatWasNotSent(had, sent map[string]string) map[string]string {
+	if len(sent) == 0 {
+		return had
+	}
+	out := make(map[string]string, len(had)+len(sent))
+	for name, text := range had {
+		out[name] = text
+	}
+	for name, text := range sent {
+		out[name] = text
+	}
+	return out
+}
+
 // checkEvidence refuses a move while the step's checklist is unanswered.
 //
 // THE PROCESS OWNS THE CHECKLIST AND THE TOKEN CARRIES THE ANSWERS. Every row
@@ -319,7 +395,7 @@ func checkEvidence(r Roots, t Token, p Payload) *Rejection {
 		// a tick on it is somebody saying work is done that has not started.
 		if i+1 > through {
 			for _, c := range a.Criteria {
-				if done, _ := evidenceFor(table, c.Says); done {
+				if _, done, _ := evidenceFor(table, c.Says); done {
 					return &Rejection{Clause: "the checklist", Wrong: fmt.Sprintf(
 						"step %d, %s, is ticked, and this token has only reached step %d, %s",
 						i+1, a.Name, through, doing.Name),
@@ -328,14 +404,59 @@ func checkEvidence(r Roots, t Token, p Payload) *Rejection {
 			}
 			continue
 		}
+		// A SECTION THAT IS GONE IS NOT A ROW SOMEBODY FORGOT TO TICK. The
+		// checklist is written onto the note at the mint, so an empty one here
+		// means the note has lost it, and every row read unticked. Told to tick
+		// a row, a worker goes looking for a row that is not there, and a
+		// reviewer is asked to tick the author's answers, which are not its to
+		// give. Saying what actually happened is what lets either of them act.
+		if strings.TrimSpace(table) == "" {
+			return &Rejection{Clause: "the checklist", Wrong: fmt.Sprintf(
+				"the note carries no %q section, so there is no checklist here to answer. "+
+					"It was written onto the note when the token was minted",
+				headEvidence+fmt.Sprintf("step %d. %s", i+1, a.Name)),
+				Satisfies: "that section back on the note with the answers it held. " +
+					"git log -p on the note is where the last copy of them is"}
+		}
 		for _, c := range a.Criteria {
-			done, said := evidenceFor(table, c.Says)
-			if !done {
-				return &Rejection{Clause: "the checklist",
-					Wrong:     fmt.Sprintf("step %d, %s: this is not ticked: %s", i+1, a.Name, c.Says),
-					Satisfies: "walk every line of the " + a.Name + " checklist and answer it"}
+			found, done, said := evidenceFor(table, c.Says)
+			// A CRITERION WITH NO ROW IS NOT AN UNTICKED ROW EITHER. The note
+			// freezes its wording at the mint and this loads the process fresh,
+			// so a criterion renamed since can never match any row, and no
+			// amount of ticking will move the token.
+			if !found {
+				return &Rejection{Clause: "the checklist", Wrong: fmt.Sprintf(
+					"step %d, %s: the checklist on this note has no row for this: %s",
+					i+1, a.Name, c.Says),
+					Satisfies: "that row on the note, worded the way the process words it now. " +
+						"The note was minted before the process said this, so the wording moved " +
+						"underneath it"}
 			}
-			if c.NeedsEvidence && strings.TrimSpace(said) == "" {
+			// A LINE HAS THREE STATES AND THE GATE HELD TWO: met, not met, and not
+			// looked at. It refused on the tick before it ever read the evidence
+			// cell, so a worker who answered a line honestly with why the criterion
+			// does not hold could not close at all, and the only way out was to tick
+			// a line they had just written was false. That is the outcome rule 15 of
+			// the work-token guidance exists to prevent: the knowledge thrown away
+			// and the tick kept.
+			//
+			// MEASURED on wk-437137c7a1. Two answered lines, refused one per pull,
+			// then ticked with the qualification left in the sentence and accepted.
+			// Only the boxes changed, so a reader of that token cannot tell a line
+			// that was met from a line the gate forced.
+			//
+			// So an UNANSWERED line is what is refused. A line with something in its
+			// evidence cell has been looked at, and whether it was met is the
+			// reviewer's to rule on rather than the gate's to extort a tick over.
+			answered := strings.TrimSpace(said) != ""
+			if !done && !answered {
+				return &Rejection{Clause: "the checklist",
+					Wrong: fmt.Sprintf("step %d, %s: this is not answered: %s", i+1, a.Name, c.Says),
+					Satisfies: "walk every line of the " + a.Name + " checklist and answer it. " +
+						"A line you judge unmet is answered by saying so in the evidence column, " +
+						"and the token closes carrying that answer"}
+			}
+			if done && c.NeedsEvidence && !answered {
 				return &Rejection{Clause: "the checklist",
 					Wrong: fmt.Sprintf("step %d, %s: this is ticked and says nothing: %s",
 						i+1, a.Name, c.Says),
@@ -370,9 +491,14 @@ func evidenceTable(t Token, step int, name string) string {
 
 func itoa(n int) string { return fmt.Sprintf("%d", n) }
 
-// evidenceFor reads one row of the checklist table: whether it is ticked, and
-// what the evidence column says.
-func evidenceFor(table, says string) (done bool, evidence string) {
+// evidenceFor reads one row of the checklist table: whether the row is there at
+// all, whether it is ticked, and what the evidence column says.
+//
+// WHETHER A ROW EXISTS IS A SEPARATE ANSWER FROM WHETHER IT IS TICKED. It said
+// false to both, so a row that was never on the note and a row somebody had not
+// got to yet were indistinguishable, and the refusal for the first sent people
+// to tick something that is not there.
+func evidenceFor(table, says string) (found, done bool, evidence string) {
 	for _, line := range strings.Split(table, nl) {
 		if !strings.Contains(line, says) {
 			continue
@@ -386,9 +512,9 @@ func evidenceFor(table, says string) (done bool, evidence string) {
 		if got == "—" || got == "-" {
 			got = ""
 		}
-		return tick == "[x]", got
+		return true, tick == "[x]", got
 	}
-	return false, ""
+	return false, false, ""
 }
 
 // The script runs in the folder being worked on, through a shell, because a
@@ -471,7 +597,7 @@ func firstLines(s string, n int) string {
 // it, with the scope staying held. A parent with open sub-tokens is blocked
 // for everybody, so the general queue hands sub-tokens out before their
 // parents without a rule of its own.
-func next(r Roots, actor string) Answer {
+func next(r Roots, actor, role string) Answer {
 	all := Tokens(r)
 
 	var scopes []Token
@@ -489,8 +615,11 @@ func next(r Roots, actor string) Answer {
 	for _, scope := range scopes {
 		for i := range all {
 			t := all[i]
-			if t.Parent != scope.ID || t.Ended() || t.Holder != "" || !Workable(r, t) {
+			if t.Parent != scope.ID || t.Ended() || t.Holder != "" || !WorkableBy(r, t, role) {
 				continue
+			}
+			if role == RoleReviewer && t.Author == actor {
+				continue // never the author
 			}
 			if why := Blocked(r, t); why != "" {
 				continue
@@ -508,8 +637,11 @@ func next(r Roots, actor string) Answer {
 			}
 			continue
 		}
-		if !Workable(r, t) {
+		if !WorkableBy(r, t, role) {
 			continue
+		}
+		if role == RoleReviewer && t.Author == actor {
+			continue // never the author
 		}
 		if why := Blocked(r, t); why != "" {
 			continue

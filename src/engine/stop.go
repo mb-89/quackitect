@@ -140,6 +140,13 @@ func ClaimStop(r Roots, actor, because, why string) error {
 	if strings.TrimSpace(why) == "" {
 		return fmt.Errorf("say why in one line. The reason on its own is a category, not a reason")
 	}
+	// A BLOCKED CLAIM MEETS THE RECORD AS IT IS MADE, so the refusal lands
+	// where the claim was typed rather than at the stop after it.
+	if because == "blocked" {
+		if refusal, lied := BlockedIsFalse(r, actor); lied {
+			return fmt.Errorf("blocked is not true: %s", refusal)
+		}
+	}
 	return locked(claimPath(r), func() error {
 		all := loadClaims(r)
 		all.Claims[actor] = StopClaim{Session: currentSession(r), Actor: actor,

@@ -18,7 +18,7 @@ import { controlCss } from "./controls";
 export type Node = {
   name: string;
   title?: string;
-  type: "group" | "bool" | "int" | "float" | "str" | "list" | "strlist" | "action" | "status" | "gap" | "text" | "pick" | "toggle";
+  type: "group" | "bool" | "int" | "float" | "str" | "list" | "strlist" | "action" | "status" | "gap" | "text" | "pick" | "toggle" | "table";
   help?: string;
   default?: unknown;
   min?: number;
@@ -35,6 +35,14 @@ export type Node = {
   stopCommand?: string;
   labels?: Record<string, string>;
   titles?: Record<string, string>;
+  // A TABLE NAMES A LIST THE ENGINE ANSWERS AND THE COLUMNS TO DRAW OF IT.
+  // The widget knows how to draw a list of rows; which list, and which of
+  // each row's fields are worth a column, is the declaration's to say.
+  source?: string;
+  // A column shows a field. With link it is a link that opens the token the
+  // row's link field names, and with empty it shows that field instead when
+  // its own is blank, so a row holding nothing still says so.
+  columns?: Array<{ field: string; title: string; link?: string; empty?: string }>;
 };
 
 const COLUMNS = 5;
@@ -57,11 +65,18 @@ export interface Doing {
   id?: string;
   title?: string;
   holding: string;
+  // WHAT KIND OF AGENT IT IS AND WHEN IT ARRIVED, from the register. A row
+  // built for an actor that pulled without being registered carries neither.
+  kind?: string;
+  since?: string;
 }
 
 export interface Happening {
   actors: Doing[];
   hold: { on: boolean; by?: string; says?: string };
+  // WHO IS HERE, which is not who has worked. The header draws actors,
+  // because that is what a person acts on; a table draws this.
+  present?: Doing[];
 }
 
 export function panelHtml(root: Node, shown: string[],
@@ -81,7 +96,7 @@ export function panelHtml(root: Node, shown: string[],
   <button class="gear" id="gear" title="choose which groups are shown">${esc(gear)}</button>
   ${whoIsDoingWhat(doing)}
 </div>
-${groups.map(([path, n]) => section(path, n)).join("\n")}
+${groups.map(([path, n]) => section(path, n, doing)).join("\n")}
 <script>${script()}</script>
 </body>
 </html>`;
@@ -108,7 +123,7 @@ export function everyGroup(n: Node, path = ""): Array<{ key: string; title: stri
   return out;
 }
 
-function section(path: string, g: Node): string {
+function section(path: string, g: Node, doing: Happening): string {
   const kids = g.children ?? [];
   // A row is drawn one control per column. text and pick join the row because
   // they act rather than hold a stored value: what they carry is spent on the
@@ -117,10 +132,13 @@ function section(path: string, g: Node): string {
     k.type === "action" || k.type === "status" || k.type === "gap" ||
     k.type === "text" || k.type === "pick" || k.type === "toggle";
   const drawn = kids.filter(inRow);
-  const held = kids.filter((k) => !inRow(k) && k.type !== "group" && k.type !== "strlist");
+  const held = kids.filter((k) => !inRow(k) && k.type !== "group" && k.type !== "strlist" && k.type !== "table");
   const rows: string[] = [];
   if (drawn.length) rows.push(buttonRow(drawn));
   for (const k of held) rows.push(field(key(path, k), k));
+  // A TABLE IS ITS OWN BLOCK AND TAKES THE WHOLE ROW. It holds no value, so
+  // it comes after the controls that do.
+  for (const k of kids.filter((k) => k.type === "table")) rows.push(liveTable(key(path, k), k, doing));
   return `<details open>
   <summary>${esc(g.title ?? g.name)}</summary>
   <div class="grid">
@@ -248,8 +266,32 @@ function css(): string {
   body { font-family: var(--vscode-font-family); font-size: var(--vscode-font-size);
          color: var(--vscode-foreground); background: transparent; padding: 8px 6px; margin: 0; }
   .grid { display: grid; grid-template-columns: repeat(${COLUMNS}, 1fr); gap: 6px; align-items: center; }
-  .head { display: flex; justify-content: flex-end; margin: -2px 0 4px 0; }
-  .gear { width: 22px; height: 22px; padding: 0; background: transparent; border: none;
+  /* NOTHING IN THIS PANEL MAY SPILL PAST ITS LEFT EDGE.
+
+     THE ONE THE OWNER MET. The head is a flex row justified to its END, and the
+     strip inside it was a plain block, so its width was its longest line, and a
+     row can carry the whole reason an agent gave, which is a paragraph. A flex
+     item wider than the row it is justified to the end of overflows past the
+     START, off the left of the panel, where nothing can scroll to it and no
+     scrollbar appears. The first agent's name lost its first glyph, and an m
+     with its opening stem cut off reads as an h: main rendered as hain.
+
+     NO WORD OF THE ANSWER GOES IN THIS COMMENT. A stylesheet is part of the
+     page, so a state named in here is a state on every page this file draws,
+     whatever the engine said, and panel-says-holding is right to call that a
+     page carrying something nobody handed it. It caught this comment.
+
+     min-width is the whole of the fix. A flex item will not shrink below its
+     own longest word without it, so until it is there no ellipsis rule can ever
+     come into play: the box never narrows, so the text never overflows the box,
+     so there is nothing for the ellipsis to do. The row is what overflows. */
+  .head { display: flex; justify-content: flex-end; align-items: flex-start; gap: 6px;
+          margin: -2px 0 4px 0; min-width: 0; }
+  .doings { flex: 0 1 auto; min-width: 0; overflow: hidden; }
+  /* The line is cut at its END, where a reader can tell it was cut, and the
+     whole of it is on the hover. */
+  .doing, .onhold { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .gear { flex: 0 0 auto; width: 22px; height: 22px; padding: 0; background: transparent; border: none;
           color: var(--vscode-descriptionForeground); font-size: 14px; line-height: 1; cursor: pointer; }
   .gear:hover { color: var(--vscode-foreground); background: transparent; }
   /* A SIDEBAR CONTROL FILLS ITS ROW. That is the sidebar's own shape and the
@@ -305,6 +347,23 @@ function css(): string {
   .row-label { grid-column: 1 / 2; color: var(--vscode-descriptionForeground); font-size: .9em;
                white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .control input[type=number], .control input[type=text], .control select { width: 100%; }
+  /* A TABLE TAKES THE WHOLE ROW, and a narrow sidebar is what it has to fit
+     in: the holding column is the long one and it is the one that ellipses. */
+  .table { grid-column: 1 / -1; overflow: hidden; }
+  .table table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+  .table th.actor, .table td.actor { width: 34%; }
+  .table th { text-align: left; font-weight: normal; padding: 2px 4px 2px 0;
+              color: var(--vscode-descriptionForeground); font-size: .9em;
+              border-bottom: 1px solid var(--vscode-panel-border); }
+  .table td { padding: 2px 4px 2px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .table td.holding { color: var(--vscode-descriptionForeground); }
+  /* NO COLOUR PER STATE. A rule naming one would put that word on every page
+     this file draws, and panel-says-holding holds the page to the answer it
+     was handed: a page carrying a state nobody gave it is the defect that
+     check exists to find. The word is the whole of what a state says here. */
+  .table .empty { padding: 4px 0; color: var(--vscode-descriptionForeground); }
+  .table a.open { color: var(--vscode-textLink-foreground, inherit); text-decoration: none; }
+  .table a.open:hover { text-decoration: underline; }
   `;
 }
 
@@ -338,8 +397,17 @@ function script(): string {
     };
   }
 
+  // A LINK IN A TABLE OPENS THE TOKEN IT NAMES, in the editor, the way the
+  // work editor does.
+  for (const a of document.querySelectorAll('a.open')) {
+    a.onclick = (ev) => { ev.preventDefault(); send({ type: 'open', id: a.dataset.id }); };
+  }
+
   // A line edit spends what it holds on the command it runs, and keeps
-  // nothing. Enter is what a person presses, so Enter is what acts.
+  // nothing ONCE THE COMMAND HAS IT. Enter is what a person presses, so
+  // Enter is what acts. The line is cleared when the extension says the
+  // work was taken, and not before: clearing on Enter lost what was typed
+  // every time the engine was not there to take it.
   for (const line of document.querySelectorAll('input.line')) {
     line.onkeydown = (ev) => {
       if (ev.key !== 'Enter') return;
@@ -347,7 +415,6 @@ function script(): string {
       if (!text) return;
       const pick = document.querySelector('.pick .picked');
       send({ type: 'run', command: line.dataset.run, text, process: pick ? pick.dataset.value : '' });
-      line.value = '';
     };
   }
 
@@ -387,6 +454,12 @@ function script(): string {
 
   window.addEventListener('message', (e) => {
     const m = e.data;
+    if (m.type === 'ready') { /* nothing: the extension drives this */ }
+    if (m.type === 'taken') {
+      for (const line of document.querySelectorAll('input.line')) {
+        if (line.dataset.run === m.command) line.value = '';
+      }
+    }
     if (m.type === 'state' && m.id) {
       const t = document.getElementById(m.id);
       if (t && t.classList.contains('toggle')) {
@@ -399,6 +472,26 @@ function script(): string {
         return;
       }
     }
+    // A FRESH ANSWER, DROPPED INTO THE PAGE THAT IS ALREADY HERE.
+    //
+    // Not a new page. Replacing the html every second would empty the line a
+    // person is typing in, shut the picker under their hand, and fold every
+    // section they opened, once a second, for ever. Only the parts that follow
+    // the engine are replaced, which is how the values already arrive.
+    if (m.type === 'doing') {
+      const strip = document.getElementById('doings');
+      if (strip) strip.innerHTML = m.head;
+      for (const name of Object.keys(m.tables || {})) {
+        const t = document.querySelector('[data-table="' + name + '"]');
+        if (t) t.innerHTML = m.tables[name];
+      }
+      // THE LINKS ARE WIRED AGAIN, because the rows that carried them are gone.
+      for (const a of document.querySelectorAll('a.open')) {
+        a.onclick = (ev) => { ev.preventDefault(); send({ type: 'open', id: a.dataset.id }); };
+      }
+      return;
+    }
+
     if (m.type === 'beat') {
       const led = document.querySelector('button.status .led');
       if (!led) return;
@@ -437,9 +530,81 @@ function script(): string {
 // NOTHING HERE DECIDES A STATE. The strip prints what it was handed, so a page
 // rendered from two different answers says two different things, which is what
 // the check holds it to.
+// A LIVE TABLE DRAWS A LIST THE ENGINE ANSWERED, AND DERIVES NOTHING.
+//
+// The panel is rebuilt on every beat with a fresh answer, so the table is
+// live without holding anything: what is on screen is what the engine last
+// said. A row is a Doing, the same shape the header draws, because who is
+// here and what each one is doing are one question asked of one answer.
+//
+// AN EMPTY LIST SAYS SO. A table drawn with no rows and no word looks like a
+// panel that failed to load, and the difference matters: nobody here is a
+// fact, and it is the usual one.
+function liveTable(id: string, n: Node, doing: Happening): string {
+  // THE WRAPPER CARRIES THE NAME SO A FRESH ANSWER CAN FIND IT. What the engine
+  // said changes every few seconds; the wrapper is part of the page's shape and
+  // only changes when the declaration does, so the rows are refilled inside it
+  // rather than the page being built again.
+  return `<div class="table" data-table="${esc(id)}">${tableBody(n, doing)}</div>`;
+}
+
+function tableBody(n: Node, doing: Happening): string {
+  const lists: Record<string, Doing[] | undefined> = { present: doing.present, actors: doing.actors };
+  const rows = lists[n.source ?? ""];
+  if (!rows) {
+    // A SOURCE NOTHING ANSWERS IS A FAULT IN THE DECLARATION, and it says so
+    // rather than drawing an empty table, which would read as nobody here.
+    return `<div class="empty">no list called ${esc(n.source ?? "")}</div>`;
+  }
+  const cols = n.columns ?? [];
+  const head = cols.map((c) => `<th class="${esc(c.field)}">${esc(c.title)}</th>`).join("");
+  const body = rows.map((r) => {
+    const cells = cols.map((c) => {
+      const row = r as unknown as Record<string, unknown>;
+      const text = (v: unknown) => (v === undefined || v === null ? "" : String(v));
+      let value = text(row[c.field]);
+      if (!value && c.empty) value = text(row[c.empty]);
+      const id = c.link ? text(row[c.link]) : "";
+      const shown = id && text(row[c.field])
+        ? `<a href="#" class="open" data-id="${esc(id)}" title="${esc(id)}">${esc(value)}</a>`
+        : esc(value);
+      return `<td class="${esc(c.field)}">${shown}</td>`;
+    }).join("");
+    return `<tr data-state="${esc(r.state ?? "")}" data-actor="${esc(r.actor ?? "")}">${cells}</tr>`;
+  }).join("");
+  const empty = rows.length ? "" : `<div class="empty">nobody is here</div>`;
+  return `<table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>${empty}`;
+}
+
+// WHAT CHANGES WITHOUT THE PAGE CHANGING.
+//
+// The strip and the live tables are the only parts of this panel that follow the
+// engine rather than the declaration, so they are the only parts that travel on
+// the beat. Everything else is the SHAPE of the page, and the shape changes only
+// when util/parameters.json does.
+export function livePieces(root: Node, shown: string[], doing: Happening):
+    { head: string; tables: Record<string, string> } {
+  const tables: Record<string, string> = {};
+  for (const [path, g] of groupsNamed(root, "", shown)) {
+    for (const k of (g.children ?? []).filter((c) => c.type === "table")) {
+      tables[key(path, k)] = tableBody(k, doing);
+    }
+  }
+  return { head: doingRows(doing), tables };
+}
+
 function whoIsDoingWhat(doing: Happening): string {
+  return `<div class="doings" id="doings">${doingRows(doing)}</div>`;
+}
+
+// THE ROWS ALONE, so a fresh answer can be dropped into the strip that is
+// already on screen. The line is cut at its end now, so the whole of it goes on
+// the hover: a reason an actor stopped is a paragraph, and it is the one thing
+// on this panel a person most wants to read in full.
+function doingRows(doing: Happening): string {
   const rows = (doing.actors ?? []).map((d) =>
-    `<div class="doing ${esc(d.state)}" data-actor="${esc(d.actor)}">` +
+    `<div class="doing ${esc(d.state)}" data-actor="${esc(d.actor)}"` +
+    ` title="${esc(d.why ? d.why : d.holding)}">` +
     `<span class="who">${esc(d.actor)}</span> ` +
     `<span class="state">${esc(d.state)}</span> ` +
     `<span class="holds">${esc(d.holding)}</span>` +
@@ -448,5 +613,5 @@ function whoIsDoingWhat(doing: Happening): string {
   const held = doing.hold?.on
     ? `<div class="onhold">everything is on hold${doing.hold.by ? ", by " + esc(doing.hold.by) : ""}</div>`
     : "";
-  return `<div class="doings">${rows}${held}</div>`;
+  return `${rows}${held}`;
 }

@@ -24,7 +24,10 @@ import (
 func TestEveryChildProcessIsStartedQuietly(t *testing.T) {
 	t.Parallel()
 	makes := regexp.MustCompile(`(exec\.Command(Context)?\(|&exec\.Cmd\{)`)
-	attrs := regexp.MustCompile(`\.SysProcAttr\s*=`)
+	// A FIELD WRITE IS A WRITE. cmd.SysProcAttr.HideWindow = false undoes the
+	// door as surely as replacing the whole struct, so the path may carry
+	// fields between the attribute and the equals sign.
+	attrs := regexp.MustCompile(`\.SysProcAttr(\.[A-Za-z]+)*\s*=`)
 
 	names, err := filepath.Glob("*.go")
 	if err != nil {

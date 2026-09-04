@@ -56,10 +56,15 @@ groups:
   # headings over one set of rows is two things a reader has to tell apart for
   # no reason. Add one when a second process makes the two answers differ.
   #
-  # AND THERE IS NO here. It asked who holds a token, which was worth a heading
-  # while a hold was a standing thing an agent took up and kept. A hold lasts
-  # from one call to the next now, because se apply and se run name their token
-  # on the write, so the group was empty whenever nobody was mid-command.
+  # IN WORK IS WHAT SOMEBODY HOLDS. A group called here asked the same question
+  # and was taken out while a hold lasted only from one call to the next; naming
+  # a token with on: makes a hold standing again, and the owner watched a held
+  # token draw under the data's own heading as though nothing was being done.
+  # The filter is keyed off holder, a fact the engine writes at take-up and
+  # put-down, not off a convention.
+  - name: in work
+    filter: holder != ""
+
   - name: noted
     filter: status == "noted"
 

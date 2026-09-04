@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 // Two roots, and neither is declared. The method root is where this program
@@ -50,14 +51,86 @@ func (r Roots) forget() {
 	}
 }
 
-func FindRoots(workArg string) (Roots, error) {
-	exe, err := os.Executable()
-	if err != nil {
-		return Roots{}, err
+// THE METHOD ROOT IS FOUND BY WHAT IT HOLDS, NOT GUESSED FROM WHERE THE
+// PROGRAM SITS.
+//
+// It was the folder two above the executable, which is true only when the
+// program was run out of <method>/.bin. Run from anywhere else it still named a
+// folder, with no less confidence, and every path derived from it was wrong: a
+// lint over that guess filed findings against files that had nothing to do with
+// anything.
+//
+// So the walk goes up looking for the marker the method root actually carries,
+// the processes the engine loads out of it, the same shape projectRoot uses for
+// the work root. It answers empty when there is none, because empty is a thing
+// the caller can report and stop on, and a guess is not.
+// IT STOPS AT THE SAME WALLS THE PROJECT WALK DOES. A stray copy of the method
+// under the per-user data folder made every program under the temporary folder
+// answer that folder as its method root, and a lint over that guess files
+// findings against files that have nothing to do with anything.
+func methodRootFrom(start string) string {
+	for dir := range walkUp(start) {
+		if st, err := os.Stat(filepath.Join(dir, "src", "processes")); err == nil && st.IsDir() {
+			return dir
+		}
 	}
-	// The built program sits in .bin under the method root.
-	method := filepath.Dir(filepath.Dir(exe))
+	return ""
+}
+
+// argValue reads a named flag out of a verb's own arguments, in the two-word
+// spelling and the joined one.
+//
+// EVERY VERB IS ITS OWN COMMAND LINE. The client sends the verb to the engine
+// over the folder, so it has to read the roots off those arguments before it
+// knows which engine to ask, and it cannot use the flag package to do it.
+func argValue(args []string, name string) string {
+	for i, a := range args {
+		if a == name && i+1 < len(args) {
+			return args[i+1]
+		}
+		if rest, ok := strings.CutPrefix(a, name+"="); ok {
+			return rest
+		}
+	}
+	return ""
+}
+
+// MethodFound says whether the method root was found at all. A caller that
+// needs the method reports this and stops, rather than working from a guess.
+func (r Roots) MethodFound() bool { return r.Method != "" }
+
+// TheMethodIsLost is what a caller says when there is no method root to work
+// from, written once so every door says the same thing.
+func TheMethodIsLost() string {
+	return "engine: no method root here. This program looked up from where it " +
+		"is for a folder carrying src/processes and found none, so every path " +
+		"under the method would be a guess. Name it: --method <folder>"
+}
+
+func FindRoots(workArg, methodArg string) (Roots, error) {
+	method := methodArg
+	if method != "" {
+		abs, err := filepath.Abs(method)
+		if err != nil {
+			return Roots{}, err
+		}
+		method = abs
+	} else {
+		exe, err := os.Executable()
+		if err != nil {
+			return Roots{}, err
+		}
+		method = methodRootFrom(filepath.Dir(exe))
+	}
+	var err error
 	work := workArg
+	// THE WORK ROOT MAY RIDE OUT OF BAND. RUNME wraps the command line and
+	// adds nothing to argv, because an argument slipped in front of the verb
+	// sits where dispatch reads os.Args[1]. So the script names the folder in
+	// SE_WORK, read only when --work is absent: a flag anybody types still wins.
+	if work == "" {
+		work = os.Getenv("SE_WORK")
+	}
 	if work == "" {
 		if work, err = os.Getwd(); err != nil {
 			return Roots{}, err
@@ -87,22 +160,50 @@ func FindRoots(workArg string) (Roots, error) {
 // the home directory resolve to the home directory, which is worse than the
 // defect this was written to fix.
 //
+// AND IT DOES NOT CLIMB OUT OF THE TEMPORARY FOLDER. A folder made under temp
+// belongs to whatever made it, and never to an ancestor outside it. A stray .se
+// in the per-user data folder, which is where the temporary folder lives on
+// Windows, made every temporary tree resolve to that folder: the selftest then
+// seeded its project into it, which put a second .se there, which is how it
+// kept happening. Two tests answered that folder instead of the tree they made.
+//
 // A tree with no marker is a folder being driven for the first time, and then
 // where somebody is standing is the only answer there is.
 func projectRoot(start string) string {
-	home, _ := os.UserHomeDir()
-	for dir := start; ; {
-		if home != "" && sameDir(dir, home) {
-			return start
-		}
+	for dir := range walkUp(start) {
 		if st, err := os.Stat(filepath.Join(dir, ".se")); err == nil && st.IsDir() {
 			return dir
 		}
-		up := filepath.Dir(dir)
-		if up == dir {
-			return start
+	}
+	return start
+}
+
+// walkUp yields each folder from start upwards, stopping before any folder no
+// project may be: the home directory and the temporary folder.
+func walkUp(start string) func(func(string) bool) {
+	return func(yield func(string) bool) {
+		var walls []string
+		if home, err := os.UserHomeDir(); err == nil && home != "" {
+			walls = append(walls, home)
 		}
-		dir = up
+		if tmp := os.TempDir(); tmp != "" {
+			walls = append(walls, tmp)
+		}
+		for dir := start; ; {
+			for _, wall := range walls {
+				if sameDir(dir, wall) {
+					return
+				}
+			}
+			if !yield(dir) {
+				return
+			}
+			up := filepath.Dir(dir)
+			if up == dir {
+				return
+			}
+			dir = up
+		}
 	}
 }
 

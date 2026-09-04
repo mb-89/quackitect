@@ -50,8 +50,18 @@ type model struct {
 	db    *sql.DB
 	roots Roots
 	rev   atomic.Int64
+	// ready is set once the first scan is done and the cookie was waited
+	// for, and watching says whether the cookie came. A ping answers both,
+	// so the battery reads the daemon's own self-check instead of waiting
+	// on the operating system for a second time.
+	ready    atomic.Bool
+	watching atomic.Bool
 	// askedToStop is told once when a client asks the engine to stop.
 	askedToStop chan<- struct{}
+	// askedToSwap carries a built and verified engine waiting to take over.
+	// The loop does the handover, because draining the calls in flight is
+	// something the answer to one of them cannot do for itself.
+	askedToSwap chan<- swapPlan
 }
 
 func (m *model) moved() { m.rev.Add(1) }
@@ -140,7 +150,8 @@ func answerModel(conn net.Conn, m *model) {
 func (m *model) answer(ask_ modelAsk) (any, error) {
 	switch ask_.Method {
 	case "ping":
-		return map[string]any{"build": Build, "pid": os.Getpid(), "load": theLoad.snapshot()}, nil
+		return map[string]any{"build": Build, "pid": os.Getpid(), "load": theLoad.snapshot(),
+			"ready": m.ready.Load(), "watching": m.watching.Load()}, nil
 	case "verb":
 		var ask verbAsk
 		if err := json.Unmarshal(ask_.Params, &ask); err != nil {
@@ -156,6 +167,29 @@ func (m *model) answer(ask_ modelAsk) (any, error) {
 		default: // already asked
 		}
 		return map[string]any{"stopping": true}, nil
+	case "swap":
+		// THE BUILD HAPPENS HERE, WHILE THE ENGINE STILL ANSWERS. It touches
+		// nothing that is running, so a tree whose source will not compile is
+		// told so and keeps the engine it has. Only once the new program has
+		// answered for itself is the handover set going, and that is the loop's
+		// to do: it has to drain the calls in flight, and this is one of them.
+		var p struct {
+			Why   string `json:"why"`
+			Built bool   `json:"built"`
+		}
+		_ = json.Unmarshal(ask_.Params, &p) // a swap nobody explained is still a swap
+		plan, err := planSwap(m.roots, p.Why, p.Built)
+		if err != nil {
+			return nil, err
+		}
+		select {
+		case m.askedToSwap <- plan:
+		default: // one is already going
+			return swapAnswer{Swapping: true, Build: plan.Build, From: Build,
+				Says: "a swap was already asked for, so this one is the same one"}, nil
+		}
+		return swapAnswer{Swapping: true, Build: plan.Build, From: Build,
+			Says: "the next engine is built and answers. The calls in flight finish, then it takes over"}, nil
 	case "copy":
 		var p struct {
 			Size int    `json:"size"`
@@ -193,6 +227,17 @@ func (m *model) answer(ask_ modelAsk) (any, error) {
 			return nil, err
 		}
 		got, err := askDB(m.db, query, p.Limit)
+		if err != nil {
+			return nil, err
+		}
+		got.Fresh = indexIsFresh(m.db)
+		return got, nil
+	case "find":
+		var p FindParams
+		if err := json.Unmarshal(ask_.Params, &p); err != nil {
+			return nil, err
+		}
+		got, err := findDB(m.db, p)
 		if err != nil {
 			return nil, err
 		}

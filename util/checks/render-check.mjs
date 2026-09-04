@@ -68,6 +68,22 @@ const wantPanel = [
   ["the line edit spanning three", /grid-column: span 3/],
 
   ["a caret on the picker", /pick .picked::after/],
+
+  // THE STRIP CANNOT SPILL PAST THE LEFT EDGE OF THE PANEL.
+  //
+  // THE ONE THE OWNER MET. The head is a flex row justified to its end, and the
+  // strip inside it is a plain block, so its width is its longest line: an actor
+  // that stopped carries the whole reason it stopped. A flex item wider than the
+  // row it is justified to the end of overflows past the START, off the left of
+  // the panel, where nothing can scroll to it. The first glyph of the first
+  // agent's name went outside the box, and an m with its opening stem cut off
+  // reads as an h: main rendered as hain.
+  //
+  // min-width is what lets a flex item shrink below its own longest word, and
+  // without it none of the ellipsis rules can ever come into play.
+  ["the doing strip can shrink rather than spill off the left", /\.doings \{[^}]*min-width: 0/],
+  ["and a long line ends in an ellipsis inside the panel",
+    /\.doing, \.onhold \{[^}]*text-overflow: ellipsis/],
   // One plus three plus one is five, so the row asks for no filler. Counting
   // controls rather than columns asked for seven and the row wrapped.
   ["the work row adds no filler", (h) => !/<summary>work<\/summary>[\s\S]*?<span><\/span>/.test(h)],
@@ -106,8 +122,15 @@ const want = [
   ["a condition row", /class="bs-row bs-cond"/],
   ["the templates it clones", /class="bs-cond-tpl"[\s\S]*class="bs-group-tpl"/],
   ["the join word on every row", /class="bs-join">or</],
-  ["the pager", /class="bs-pager" hidden/],
-  ["the page size typed", /class="bs-per" min="0"/],
+  // THE PAGINATION IS GONE. The owner asked for one scrollbar for the whole
+  // thing with separators in between, so a pager anywhere on the page is the
+  // defect this line exists to catch, and the sift box is what narrows.
+  ["no pagination anywhere on the page", (h) => !/bs-pager|bs-per|bs-prev|bs-next|bs-where/.test(h)],
+  // ONE SCROLLBAR FOR THE WHOLE PANE. The body scrolls and neither box inside
+  // it scrolls on its own, which is where the small upper scrollbar came from.
+  ["one box scrolls per pane", (h) =>
+    /\.body \{[^}]*overflow: auto/.test(h)
+      && !/\.top \{[^}]*overflow/.test(h) && !/\.pane \{[^}]*overflow/.test(h)],
   ["a grip to drag a column", /th-grip/],
   // A CHECK THAT NAMES A CLASS NOBODY WRITES CANNOT FAIL. This one said
   // `total` while the bar said `bs-count`, so it passed with the total on
@@ -188,6 +211,19 @@ const want = [
   ["the second ships hidden", /data-side="right" hidden/],
   ["a seam between them", /class="seam" hidden/],
   ["the second column button", /id="second"/],
+  // THE COUNTER IS NEVER CUT OFF AT THE RIGHT EDGE.
+  //
+  // THE ONE THE OWNER MET. The bar is one flex row of tabs, then the counter,
+  // then the split button. The counter is nowrap and every item was free to
+  // shrink, so once there were tabs enough the row ran past the right edge and
+  // the counter was cut mid-number: BD: 98/182/5 and then nothing, with the
+  // third figure unreadable.
+  //
+  // The counter and the button hold their size and the TABS give way, because a
+  // tab that is a little narrower can still be read and half a number cannot.
+  ["the counter never shrinks or is cut off", /\.bd \{[^}]*flex: 0 0 auto/],
+  ["the split button keeps its size too", /\.bar \.second \{[^}]*flex: 0 0 auto/],
+  ["and the tabs are what give way", /\.bar \.tab \{[^}]*min-width: 0/],
   ["an editable cell", /class="edits"[^>]*data-was=/],
   // THE TEXT IS THE DOOR, AND ONLY THE TEXT. A cell that was a door edge to
   // edge left no way to tick a row.
@@ -286,6 +322,15 @@ const want = [
       const rule = pane.match(/<div class="kinds">([\s\S]*?)<\/div>/);
       return !!rule && rule[1].includes(String(total));
     });
+  }],
+  // AND THE RULE SAYS THE NUMBER AND STOPS. It carried a sentence explaining
+  // that the buckets hold each token once while the queries ask again, on
+  // every render, and the owner asked twice in two sessions for it to go.
+  // A shape an agent keeps re-adding after a telling needs a check rather
+  // than another telling, and this is that check.
+  ["the rule carries the count only, no prose after it", (h) => {
+    const rules = [...h.matchAll(/<div class="kinds">([\s\S]*?)<\/div>/g)].map((m) => m[1]);
+    return rules.length > 0 && rules.every((r) => /^<b>\d+<\/b> tokens?$/.test(r.trim()));
   }],
   // AND THE BUCKETS BELOW IT ADD UP TO THAT NUMBER, which is what makes the
   // sentence on the rule true rather than decorative. The queries above do not

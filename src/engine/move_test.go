@@ -37,6 +37,51 @@ func readBack(t *testing.T, root, rel string) string {
 	return string(b)
 }
 
+// A REWRITE THAT CANNOT SAVE IS REPORTED, NOT SWALLOWED. The verb's header
+// promises that what it could not rewrite is reported, and a clean answer
+// over a half-repaired tree is the silence this pins.
+func TestAMoveReportsTheFileItCouldNotRewrite(t *testing.T) {
+	t.Parallel()
+	r := guidanceTree(t)
+	put(t, r.Work, "doc/old.md", "the thing itself\n")
+	stuck := put(t, r.Work, "notes/stuck.md", "see doc/old.md for more\n")
+	// Read-only file for the rename on Windows, read-only folder for the
+	// temp file on everything else. Either way the save fails.
+	if err := os.Chmod(stuck, 0o444); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Chmod(filepath.Dir(stuck), 0o555); err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		os.Chmod(filepath.Dir(stuck), 0o755)
+		os.Chmod(stuck, 0o644)
+	})
+
+	out, err := MoveFile(r, "doc/old.md", "doc/new.md")
+	if err != nil {
+		t.Fatal(err)
+	}
+	found := ""
+	for _, u := range out.Unwritten {
+		if u.Path == "notes/stuck.md" {
+			found = u.Text
+		}
+	}
+	if found == "" {
+		t.Fatalf("the file that could not be saved is not reported: %+v", out.Unwritten)
+	}
+	// And nothing claims it was rewritten: the old reference still stands.
+	if !strings.Contains(readBack(t, r.Work, "notes/stuck.md"), "doc/old.md") {
+		t.Fatal("the stuck file was rewritten after all, so the fixture proves nothing")
+	}
+	for _, w := range out.Rewritten {
+		if w.Path == "notes/stuck.md" {
+			t.Fatal("the stuck file is reported rewritten and was not")
+		}
+	}
+}
+
 // TWO FORMS OF REFERENCE. A path as written, and a wiki link with the
 // extension dropped. Prose takes both. Source takes the path form only.
 func TestAMoveFixesEveryReference(t *testing.T) {

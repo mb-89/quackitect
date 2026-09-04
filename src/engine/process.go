@@ -57,6 +57,10 @@ type Activity struct {
 	// false, and the queue passes over it.
 	Pulled   bool
 	Criteria []ActivityCriterion
+	// Role is which queue this step is handed out on: worker, unless the
+	// process says reviewer. A verdict is a reviewer's step, and the engine
+	// never hands it to the actor that did the work.
+	Role string
 }
 
 type DispositionSpec struct {
@@ -113,6 +117,7 @@ func LoadProcess(methodRoot, name string) (Process, error) {
 			To:       ystr(m["to"]),
 			Pulled:   ystr(m["pulled"]) != "false",
 			Criteria: criteriaOf(m["criteria"]),
+			Role:     orElse(ystr(m["role"]), RoleWorker),
 		})
 	}
 	for _, raw := range ylist(top["dispositions"]) {
@@ -341,6 +346,17 @@ func (p Process) StartsAt() string {
 	return ""
 }
 
+// EndsAt is the state a token of this process stops in: the first one no
+// step leaves. StartsAt answers the other end of the same table.
+func (p Process) EndsAt() string {
+	for _, s := range p.States {
+		if _, found := p.ActivityFrom(s.Name); !found {
+			return s.Name
+		}
+	}
+	return ""
+}
+
 // ActivityFrom is the step that leaves a state, which is the one a token
 // standing there has next. StartsAt answers the other end of the same table.
 func (p Process) ActivityFrom(state string) (Activity, bool) {
@@ -362,4 +378,36 @@ func (p Process) StepOf(name string) int {
 		}
 	}
 	return 0
+}
+
+// WorkableBy is Workable for one queue: the step the token stands at is
+// handed out on this role's queue.
+func WorkableBy(r Roots, t Token, role string) bool {
+	if !Workable(r, t) {
+		return false
+	}
+	return roleAt(r, t) == role
+}
+
+// roleAt answers which queue the token's next step is handed out on.
+func roleAt(r Roots, t Token) string {
+	p, err := LoadProcess(r.Method, t.Process)
+	if err != nil {
+		return RoleWorker
+	}
+	if a, found := p.ActivityFrom(string(t.Status)); found {
+		return orElse(a.Role, RoleWorker)
+	}
+	return RoleWorker
+}
+
+// Ends says whether a state is one the process never leaves: no activity
+// goes from it, so a step into it is the token's ending.
+func (p Process) Ends(state string) bool {
+	for _, a := range p.Activities {
+		if a.From == state {
+			return false
+		}
+	}
+	return true
 }

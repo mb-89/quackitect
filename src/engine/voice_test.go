@@ -100,6 +100,19 @@ func TestTheRulesCanBeSwapped(t *testing.T) {
 	}
 }
 
+// A CHECKER WITH NOTHING TO CHECK REFUSES TO RUN. A file that parses to an
+// empty rule list loaded without a word, so Check found nothing and every
+// write passed. The unreadable case is loud; the empty one was silent.
+func TestAZeroRuleFileRefusesToLoad(t *testing.T) {
+	t.Parallel()
+	root := t.TempDir()
+	os.MkdirAll(filepath.Join(root, "util"), 0o755)
+	os.WriteFile(filepath.Join(root, "util", "voice-rules.json"), []byte(`{"rules":[]}`), 0o644)
+	if _, err := LoadVoiceRules(root); err == nil {
+		t.Fatal("a file with zero rules loaded quietly, so every write would pass unchecked")
+	}
+}
+
 // A rules file that will not load stops the check and never a write.
 func TestARulesFileThatWillNotLoadIsReported(t *testing.T) {
 	t.Parallel()

@@ -15,41 +15,52 @@ import (
 // the new one up, which is what changing what you are working on means.
 func runApply(c *call) int {
 	fs := flag.NewFlagSet("apply", flag.ContinueOnError)
-	fs.SetOutput(c.out)
+	fs.SetOutput(c.err)
 	fs.Usage = func() {
-		fmt.Fprintln(c.out, "se apply - change files. Prints what it wrote as JSON.")
-		fmt.Fprintln(c.out, "")
-		fmt.Fprintln(c.out, `  echo '[{"file":"a.go","old":"x","new":"y"}]' | se apply --on wk-1234567890`)
-		fmt.Fprintln(c.out, "")
-		fmt.Fprintln(c.out, "  The manifest is a JSON array on standard input. Each entry is one edit:")
-		fmt.Fprintln(c.out, `    {"file":"...","old":"...","new":"..."}   replace, and old must be there once`)
-		fmt.Fprintln(c.out, `    {"file":"...","op":"create","new":"..."}  a file that is not there yet`)
-		fmt.Fprintln(c.out, `    {"file":"...","op":"write","new":"..."}   replace a whole file`)
-		fmt.Fprintln(c.out, "")
-		fmt.Fprintln(c.out, "  Every edit is checked before any is written. One bad edit writes nothing.")
-		fmt.Fprintln(c.out, "")
+		fmt.Fprintln(c.err, "se apply - change files. Prints what it wrote as JSON.")
+		fmt.Fprintln(c.err, "")
+		fmt.Fprintln(c.err, `  echo '[{"file":"a.go","old":"x","new":"y"}]' | se apply --on wk-1234567890`)
+		fmt.Fprintln(c.err, "")
+		fmt.Fprintln(c.err, "  The manifest is a JSON array on standard input. Each entry is one edit:")
+		fmt.Fprintln(c.err, `    {"file":"...","old":"...","new":"..."}   replace, and old must be there once`)
+		fmt.Fprintln(c.err, `    {"file":"...","op":"create","new":"..."}  a file that is not there yet`)
+		fmt.Fprintln(c.err, `    {"file":"...","op":"write","new":"..."}   replace a whole file`)
+		fmt.Fprintln(c.err, "")
+		fmt.Fprintln(c.err, "  Every edit is checked before any is written. One bad edit writes nothing.")
+		fmt.Fprintln(c.err, "")
 		fs.PrintDefaults()
 	}
 	fs.String("work", "", "the folder being worked on (default: this one)")
 	on := fs.String("on", "", "the token this change belongs to, by id")
 	by := fs.String("by", "", "who is writing")
 	dry := fs.Bool("dry", false, "check every edit and write nothing")
-	undo := fs.Bool("undo", false, "instead of writing: put back what the last apply overwrote")
+	undo := fs.Bool("undo", false, "instead of writing: put back what this token's last apply overwrote")
 	if code, stop := c.parse(fs, "apply"); stop {
 		return code
 	}
 
 	roots := c.roots
-	// PUTTING BACK WHAT THE LAST APPLY DID NAMES NO TOKEN. It is not a change
-	// to the work, it is taking one back, and it reads the journal for what to
-	// do rather than being told.
+	// PUTTING BACK NAMES ITS TOKEN TOO, and it used to name none.
+	//
+	// The reasoning was that an undo is not a change to the work but a taking
+	// back of one, so it could read the journal rather than be told. That holds
+	// with one agent on a tree. With several it means the newest apply in the
+	// folder is somebody else's most of the time, and this took one: an undo
+	// called on one token put back a file belonging to another actor's, and the
+	// newer content was gone. So the token is named here as it is on a write,
+	// and an undo reaches only what that token wrote.
 	if *undo {
-		done, err := Undo(roots)
-		if err != nil {
-			c.answerJSON(map[string]any{"error": err.Error()})
+		if *on == "" {
+			c.answerJSON(map[string]any{"error": "say which token to undo, with --on <id>. " +
+				"An undo puts back what that token wrote and never another's work"})
 			return 1
 		}
-		c.answerJSON(map[string]any{"undone": done})
+		done, err := Undo(roots, *on, orElse(*by, "main"))
+		if err != nil {
+			c.answerJSON(map[string]any{"error": err.Error(), "on": *on})
+			return 1
+		}
+		c.answerJSON(map[string]any{"undone": done, "on": *on})
 		return 0
 	}
 	if *on == "" {
@@ -76,7 +87,7 @@ func runApply(c *call) int {
 		return 1
 	}
 
-	got, err := Apply(roots, edits, *dry)
+	got, err := Apply(roots, edits, *dry, *on, orElse(*by, "main"))
 	if err != nil {
 		c.answerJSON(map[string]any{"error": err.Error(), "on": *on})
 		return 1

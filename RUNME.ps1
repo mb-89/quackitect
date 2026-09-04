@@ -47,13 +47,50 @@ function Resolve-Driver($id) {
   return $null
 }
 
+function Build-It($install, $cmd, $why) {
+  # A FAILED BUILD REFUSES OUT LOUD. Falling back to the binary already in
+  # .bin runs code the source no longer says, and it exits 0, so nobody finds
+  # out. Stopping here and naming the build is the whole point.
+  $global:LASTEXITCODE = 0
+  & (Join-Path $here $install)
+  if ($LASTEXITCODE -ne 0) {
+    Write-Error "the build failed, so $cmd was not run ($why). Fix the build and run this again."
+    exit 1
+  }
+}
+
+# Newest-Source answers the newest file written under any of the source
+# folders, or nothing when none of them is here.
+function Newest-Source($sources) {
+  $newest = $null
+  foreach ($s in ($sources -split " ")) {
+    $dir = Join-Path $here $s
+    if (-not (Test-Path $dir)) { continue }
+    $n = Get-ChildItem -LiteralPath $dir -Recurse -File |
+         Sort-Object LastWriteTimeUtc -Descending | Select-Object -First 1
+    if ($n -and (-not $newest -or $n.LastWriteTimeUtc -gt $newest.LastWriteTimeUtc)) { $newest = $n }
+  }
+  return $newest
+}
+
 if ($command) {
   $cmd = Join-Path $here $command
   if (-not (Test-Path $cmd) -and $install) {
     Write-Host "not built yet - installing" -ForegroundColor Cyan
-    & (Join-Path $here $install)
+    Build-It $install $cmd "it was never built"
   }
   if (-not (Test-Path $cmd)) { Write-Error "still no $cmd after installing"; exit 1 }
+  # A BINARY OLDER THAN ITS SOURCE IS THE WRONG PROGRAM. It runs, and it
+  # answers for code that is no longer there. sources says where the source
+  # lives; the installer builds everything this tree builds, so one rebuild
+  # covers every binary in .bin and not only the one about to run.
+  if ($install -and $r.sources) {
+    $newest = Newest-Source $r.sources
+    if ($newest -and $newest.LastWriteTimeUtc -gt (Get-Item -LiteralPath $cmd).LastWriteTimeUtc) {
+      Write-Host "$command is older than its source - rebuilding" -ForegroundColor Cyan
+      Build-It $install $cmd "$($newest.FullName) is newer than it"
+    }
+  }
   & $cmd @args
   exit $LASTEXITCODE
 }
@@ -78,5 +115,8 @@ if (-not (Test-Path $engine)) {
   Write-Host "the driver is not built yet - installing" -ForegroundColor Cyan
   & (Join-Path $root "util\setup\install.ps1") --no-open
 }
-& $engine --work $here @args
+# The work root rides out of band: an argument added here would sit where
+# the verb belongs, and the engine reads the verb as its first argument.
+$env:SE_WORK = $here
+& $engine @args
 exit $LASTEXITCODE

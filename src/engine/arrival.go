@@ -1,8 +1,10 @@
 package main
 
 import (
+	"bufio"
 	"encoding/json"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -35,9 +37,55 @@ type arrivals struct {
 	// no order, and the count it holds is the LAST pull rather than the first.
 	// It is written where the first pull is already known, which is here.
 	Order []string `json:"order,omitempty"`
+
+	// THE QUEUE EACH ACTOR PULLS ON, so the staffing can count workers and
+	// reviewers apart.
+	Roles map[string]string `json:"roles,omitempty"`
 }
 
 func arrivalPath(r Roots) string { return r.Private("arrivals.json") }
+
+// ArrivalSession answers the session arrivals are keyed by: the harness's.
+//
+// THE ENGINE OUTLIVES AGENTS. Keyed on the engine's own session, a harness
+// restart inside one engine run was not seen as an arrival and the reclaim
+// never fired, so what a dead predecessor held stayed held. Every session
+// record in the log carries the harness session id and where it came from,
+// and a compaction is the same agent continuing, so a start from one does
+// not move the key.
+//
+// A LOG WITH NO SUCH RECORD FALLS BACK TO THE ENGINE SESSION, which is the
+// boundary it had before: better one arrival per engine run than none at all.
+func ArrivalSession(r Roots) string {
+	f, err := os.Open(filepath.Join(r.Private("log"), Current))
+	if err != nil {
+		return currentSession(r)
+	}
+	defer f.Close()
+	key := ""
+	sc := bufio.NewScanner(f)
+	sc.Buffer(make([]byte, 0, 64*1024), 4<<20)
+	for sc.Scan() {
+		var rec struct {
+			Kind string `json:"kind"`
+			Data struct {
+				Session string `json:"session"`
+				Source  string `json:"source"`
+			} `json:"data"`
+		}
+		if json.Unmarshal(sc.Bytes(), &rec) != nil {
+			continue
+		}
+		if rec.Kind != "session" || rec.Data.Session == "" || rec.Data.Source == "compact" {
+			continue
+		}
+		key = rec.Data.Session
+	}
+	if key == "" {
+		return currentSession(r)
+	}
+	return key
+}
 
 // Arrived answers whether this is the actor's first pull of the session, and
 // records that it has now happened. It answers true once and false after.
@@ -45,6 +93,11 @@ func arrivalPath(r Roots) string { return r.Private("arrivals.json") }
 // A pull with no session is a pull with no engine running. It answers false,
 // because nothing probed the machine and nothing knows what to reclaim from.
 func Arrived(r Roots, session, actor string) bool {
+	return ArrivedAs(r, session, actor, RoleWorker)
+}
+
+// ArrivedAs is Arrived with the queue the actor pulled on.
+func ArrivedAs(r Roots, session, actor, role string) bool {
 	if !Named(session) {
 		return false
 	}
@@ -57,6 +110,10 @@ func Arrived(r Roots, session, actor string) bool {
 		if a.At == nil {
 			a.At = map[string]int{}
 		}
+		if a.Roles == nil {
+			a.Roles = map[string]string{}
+		}
+		a.Roles[actor] = orElse(role, RoleWorker)
 		_, seen = a.At[actor]
 		// EVERY PULL MOVES THE COUNT, whoever made it. That is what makes the
 		// queue its own clock: a reviewer that has stopped falls behind because
@@ -113,6 +170,24 @@ func StillPulling(r Roots, session, actor string, within int) bool {
 		return a.Pulls <= within
 	}
 	return a.Pulls-at <= within
+}
+
+// ActorsPresent answers how many actors have pulled in this session. It is the
+// RATE THE SESSION'S PULL COUNT RUNS AT: one actor's pull moves the count by
+// one, twelve actors' pulls move it by twelve in the same stretch of work.
+//
+// IT IS NEVER LESS THAN ONE. A count of nought would collapse anything measured
+// per actor to nothing, and a session nobody has pulled in has no holder to
+// judge anyway.
+func ActorsPresent(r Roots, session string) int {
+	if !Named(session) {
+		return 1
+	}
+	a := loadArrivals(r)
+	if a.Session != session || len(a.At) == 0 {
+		return 1
+	}
+	return len(a.At)
 }
 
 // HowFarBehind answers how many pulls the queue has taken since this actor last

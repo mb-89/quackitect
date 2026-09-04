@@ -17,18 +17,22 @@ import (
 // manual nobody opens. The writer replaces the comment with the answer.
 
 // Template answers the note a person starts from for one kind and process.
+// The frontmatter half goes through writeFront, the same writer the saved
+// token goes through, so the template and the mint cannot drift.
 func Template(s Schema, p Process) string {
 	narrowed := p.Narrow(s)
-	var b strings.Builder
-	b.WriteString(noteFence + "\n")
-	for _, name := range templateOrder(narrowed) {
-		spec := narrowed.Frontmatter.Properties[name]
-		if spec.Description != "" {
-			b.WriteString("# " + spec.Description + "\n")
+	f := Front{}
+	describe := map[string]string{}
+	for name, spec := range narrowed.Frontmatter.Properties {
+		describe[name] = spec.Description
+		if spec.Type == "array" {
+			f[name] = []string{}
+			continue
 		}
-		b.WriteString(name + ": " + templateValue(name, narrowed.Guidance, spec, p) + "\n")
+		f[name] = templateValue(name, narrowed.Guidance, spec, p)
 	}
-	b.WriteString(noteFence + "\n")
+	var b strings.Builder
+	b.WriteString(writeFront(f, templateOrder(narrowed), describe, true))
 
 	head := strings.Repeat("#", narrowed.Body.HeadingLevel) + " "
 	for _, sec := range narrowed.Body.Sections {
@@ -96,8 +100,6 @@ func templateValue(name, guidance string, spec PropSpec, p Process) string {
 	case spec.EnumFrom == "process.states" && len(p.States) > 0:
 		// A token starts in the state the first activity puts it in.
 		return p.States[0].Name
-	case spec.Type == "array":
-		return "[]"
 	}
 	return ""
 }

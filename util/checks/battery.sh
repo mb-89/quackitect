@@ -9,6 +9,13 @@
 #   sh util/checks/battery.sh
 #
 # It exits non-zero when anything did.
+#
+# NOTHING IN IT WAITS ON A CLOCK. A check answers whether the program
+# behaves, and a number that depends on the machine and its load is not an
+# answer to that: a test that waited for the operating system to notice a
+# file failed here once for no defect of the program's. Everything about
+# time is a benchmark, util/checks/benchmark.sh, run at the retro. The one
+# wait left is for the engine this battery starts to finish its start.
 cd "$(dirname "$0")/../.." || exit 1
 battery_began=$(date +%s)
 # The node checks take a root and join paths onto it, so they need the one
@@ -43,6 +50,24 @@ say() {
   printf '%-16s %s\n' "$1" "$2"
 }
 
+# why answers the lines of a failed check's output that name the failure.
+#
+# THE VERDICT WITHOUT THE CAUSE IS ANOTHER RUN, and this battery exists to end
+# the re-running. It printed the last three lines of whatever failed, and the
+# last three lines of a go test run are the word FAIL three times: the test
+# that broke and the message it broke with sit above them. Two failures planted
+# in the viewer and setup lanes came back as two lanes failing and nothing
+# about why, and the cause had to be fetched by running each lane again by
+# hand, one per run, which is the shape this file was rewritten to remove.
+# A check that fails says so in a line, so those lines are picked out wherever
+# they sit rather than hoped for at the end, and output that names none falls
+# back to a longer tail than the three it used to print.
+why() {
+  said=$(printf '%s' "$1" | grep -E -- '--- FAIL|[^[:space:]]\.(go|mjs|ts|sh|py):[0-9]+|^[[:space:]]*FAIL[[:space:]]|panic:|[Ee]rror:' | head -6)
+  [ -n "$said" ] || said=$(printf '%s' "$1" | tail -6)
+  printf '%s' "$said"
+}
+
 # start runs a check in the background, into its own answer file.
 start() {
   name=$1
@@ -54,14 +79,15 @@ start() {
     out=$("$@" 2>&1)
     code=$?
     took=$(( $(date +%s) - began ))
-    # The answer file holds the verdict on its first line and the tail this
-    # report prints underneath, so nothing has to be re-run to say what broke.
+    # The answer file holds the verdict on its first line and the lines that
+    # name the failure underneath, so nothing has to be re-run to say what
+    # broke.
     # EACH CHECK SAYS HOW LONG IT TOOK, so the battery's length is asked of
     # the report rather than guessed at, and the slow lane names itself.
     if [ $code -eq 0 ]; then
       printf 'ok   %3ss  %s\n' "$took" "$(printf '%s' "$out" | tail -1)"
     else
-      printf 'FAIL %3ss  %s\n' "$took" "$(printf '%s' "$out" | tail -3)"
+      printf 'FAIL %3ss  %s\n' "$took" "$(why "$out")"
     fi
   ) >"$results/$(slug "$name")" 2>&1 &
 }
@@ -102,7 +128,7 @@ run() {
     say "$name" "ok   $(printf '%3ss' "$took")  $(printf '%s' "$out" | tail -1)"
   else
     bad=$((bad + 1))
-    say "$name" "FAIL $(printf '%3ss' "$took")  $(printf '%s' "$out" | tail -3)"
+    say "$name" "FAIL $(printf '%3ss' "$took")  $(why "$out")"
   fi
 }
 
@@ -131,10 +157,12 @@ run() {
 # code read as current and ran the old verbs against the new tree.
 stamp="$(git rev-parse --short HEAD 2>/dev/null || echo nogit).$(date +%H%M%S)"
 build() {
-  go build -C src/engine -ldflags "-X main.Build=$stamp" -o ../../.bin/se.next.exe . || return 1
+  # -gcflags=-e LIFTS THE ERROR CAP. The type checker stops after a batch by
+  # default, so a sweep of undefined symbols came back one round at a time.
+  go build -C src/engine -gcflags=-e -ldflags "-X main.Build=$stamp" -o ../../.bin/se.next.exe . || return 1
   if [ -f .bin/se.exe ]; then
-    rm -f .bin/se.exe~
-    mv .bin/se.exe .bin/se.exe~ || return 1
+    rm -f .bin/se.exe.was
+    mv .bin/se.exe .bin/se.exe.was || return 1
   fi
   mv .bin/se.next.exe .bin/se.exe || return 1
   # The suffixed name is the build. The plain one is the same file.
@@ -148,11 +176,11 @@ build() {
   # stale binary reports on the tree as it was rather than as it is. It is the
   # door an agent uses, and it drifted from the engine for want of a build here
   # and a check after it.
-  go build -C src/mcp -o ../../.bin/se-mcp.exe . || return 1
+  go build -C src/mcp -gcflags=-e -o ../../.bin/se-mcp.exe . || return 1
   # AND THE ENGINE'S TEST BINARY, ONCE. Linking a cgo binary is the slow part
   # of the suite, so it is a fixture made here and run below in two halves
   # at once, each half over trees of its own.
-  go test -C src/engine -c -o ../../.bin/se.test.exe . || return 1
+  go test -C src/engine -gcflags=-e -c -o ../../.bin/se.test.exe . || return 1
 }
 
 # engine_tests runs one half of the engine suite off the test binary the
@@ -196,17 +224,25 @@ fi
 gofmt_clean() {
   # ONE PROCESS OVER THE TREE FIRST. A pass per file cost forty seconds
   # under the battery's load, for a question gofmt answers in one.
-  bad=""
+  #
+  # THE LIST IS NOT CALLED bad, BECAUSE THE BATTERY'S COUNTER IS. A shell
+  # function shares the script's variables, so while this held its findings in
+  # a name the counter already had, the only thing keeping the count safe was
+  # that gofmt runs through start, in a background subshell, where an
+  # assignment cannot reach the parent. Move this to the run lane, where the
+  # build and engine-up lanes already sit, and the battery's tally of failures
+  # is quietly set to the empty string on every run.
+  unformatted=""
   for f in $(gofmt -l "$@"); do
     # A file gofmt names may be one that only carries carriage returns, so
     # it is asked again with them taken off, and only that answer counts.
     if [ -n "$(tr -d '\r' <"$f" | gofmt -l)" ]; then
-      bad="$bad$f
+      unformatted="$unformatted$f
 "
     fi
   done
-  if [ -n "$bad" ]; then
-    printf '%s' "$bad"
+  if [ -n "$unformatted" ]; then
+    printf '%s' "$unformatted"
     echo "gofmt would change the files above"
     return 1
   fi
@@ -220,19 +256,48 @@ run "go build" build
 # THE ENGINE THAT LIVES RUNS THE VERBS, so the checks below need one over
 # this tree, and one on the build that was just made. An engine on an older
 # build would run the old verbs against the new tree and report on neither.
-# So a stale engine is asked to stop, and one is woken on the new build.
+#
+# A STALE ENGINE IS ASKED TO HAND OVER, NOT TO STOP. Stopping it is what made
+# this battery unrunnable from inside the engine: se test with a whole ruling
+# ran this script in the engine's own process, and this line then killed the
+# process hosting the run. The swap door builds the next engine, waits for the
+# calls in flight, and hands over keeping the log session, so a battery started
+# by an engine can replace that engine without severing itself.
 engine_up() {
   running=$(grep -o '"build": *"[^"]*"' .se/engine.json 2>/dev/null | sed 's/.*"\([^"]*\)"$/\1/')
   if [ -n "$running" ] && [ "$running" != "$stamp" ]; then
-    echo "an engine on $running is running and the build is $stamp, so it is asked to stop"
-    .bin/se.exe --stop --work . >/dev/null 2>&1 || true
+    echo "an engine on $running is running and the build is $stamp, so it is asked to hand over"
+    # --built, BECAUSE THE BUILD ABOVE IS THE NEW ENGINE. Asking the engine to
+    # build as well would put a second stamp on the same code and check nothing.
+    .bin/se.exe --swap --built --work . >/dev/null 2>&1 || true
+    # THE HANDOVER IS DONE WHEN AN ENGINE ANSWERS ON THE NEW BUILD. The
+    # successor writes engine.json for itself, so this waits for the build to
+    # change rather than for the file to go.
     i=0
-    while [ $i -lt 50 ] && [ -f .se/engine.json ]; do i=$((i + 1)); sleep 0.1; done
+    while [ $i -lt 300 ]; do
+      now=$(grep -o '"build": *"[^"]*"' .se/engine.json 2>/dev/null | sed 's/.*"\([^"]*\)"$/\1/')
+      [ -n "$now" ] && [ "$now" != "$running" ] && break
+      i=$((i + 1)); sleep 0.1
+    done
   fi
   printf '{"hook_event_name":"UserPromptSubmit","cwd":"%s"}' "$root" | .bin/se.exe hook --method . --wake
-  grep -q '"socket"' .se/engine.json 2>/dev/null && echo "an engine on $stamp answers"
+  grep -q '"socket"' .se/engine.json 2>/dev/null || return 1
+  # THE START IS THE ONE WAIT: the first scan and the watcher's self-check
+  # run once per start, and what they found is read below as a check.
+  i=0
+  until .bin/se.exe --ping --work . 2>/dev/null | grep -q '"ready":true'; do
+    i=$((i + 1)); [ $i -lt 300 ] || return 1; sleep 0.1
+  done
+  echo "an engine on $stamp answers, scanned and self-checked"
 }
 run "engine up" engine_up
+# THE WATCHER'S SELF-CHECK, READ OFF THE ENGINE. At every start the daemon
+# writes a cookie and waits to hear it from the tree's watcher; a tree whose
+# watcher is deaf leaves the index untrusted and every reader cold. The
+# battery reads what the daemon found rather than waiting on the operating
+# system a second time.
+engine_watches() { .bin/se.exe --ping --work . | grep -q '"watching":true'; }
+run "engine watches" engine_watches
 
 # THE STORY IS IN THE BATTERY. The self-test produces a copy, drives a project
 # with it and has the vehicle make a project of its own. It was run by hand
@@ -265,7 +330,7 @@ start "se lint" .bin/se.exe lint
 # holding five of the twelve and it answered all ok, exit 0, having said nothing
 # about the seven it did not run. Any sweep, or any accidental deletion, shrinks
 # the battery in silence while every submission goes on citing a green run.
-for c in render-check drive-editor drawn-classes-have-rules engine-args engine-args-lifecycle engine-spawns liveness one-look panel-icons no-loose-glyphs no-loose-spawns no-lone-escape checks-live-in-the-method engine-spawns-catches panel-is-handed-the-state panel-says-holding drive-panel burndown burndown-derives-nothing tests-name-no-token mcp-tools; do
+for c in render-check drive-editor drawn-classes-have-rules panel-draws-the-register engine-args engine-args-lifecycle engine-spawns liveness one-look panel-icons no-loose-glyphs no-loose-spawns no-lone-escape checks-live-in-the-method engine-spawns-catches panel-is-handed-the-state panel-says-holding drive-panel burndown burndown-derives-nothing tests-name-no-token mcp-tools scripts-are-lf build-reports-every-error binaries-live-in-bin private-files-have-writers projections-carry-chapters; do
   if [ -f "util/checks/$c.mjs" ]; then
     start "$c" node "util/checks/$c.mjs" "$root"
   else

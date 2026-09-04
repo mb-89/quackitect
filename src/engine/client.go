@@ -43,18 +43,17 @@ const verbBudget = TheRunCeiling + time.Minute
 
 // callTheEngine sends one verb and answers its exit code.
 func callTheEngine(verb string, args []string) int {
-	work := ""
-	for i, a := range args {
-		if a == "--work" && i+1 < len(args) {
-			work = args[i+1]
-		}
-		if rest, ok := strings.CutPrefix(a, "--work="); ok {
-			work = rest
-		}
-	}
-	roots, err := FindRoots(work)
+	// BOTH ROOTS COME OFF THE VERB'S OWN ARGUMENTS. Only the flag form carried
+	// --method, so every verb took the guess whatever the caller typed.
+	roots, err := FindRoots(argValue(args, "--work"), argValue(args, "--method"))
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "engine:", err)
+		return 1
+	}
+	// NO METHOD, NO WORK. A verb run from outside the method used to derive
+	// every path from a folder that was not one, and file findings from it.
+	if !roots.MethodFound() {
+		fmt.Fprintln(os.Stderr, TheMethodIsLost())
 		return 1
 	}
 	if wantsHelp(args) {

@@ -47,6 +47,22 @@ type Agent struct {
 	// nothing. It is the kind and a number, so two reviewers are two names and
 	// the reader can tell them apart.
 	Name string `json:"name,omitempty"`
+
+	// THE SESSION IT BELONGS TO, as the harness names it. Its end is what
+	// takes out the helpers whose own stop never arrived.
+	Session string `json:"session,omitempty"`
+
+	// AND THE ENGINE'S OWN RUN, WHICH IS A DIFFERENT QUESTION. A register
+	// outlives the run that filled it: a machine switched off mid-session
+	// says no end for anybody, and every row would stay here for ever. So
+	// what is present is what this run wrote, the same test the arrival
+	// record already applies to an actor that pulled.
+	Run string `json:"run,omitempty"`
+
+	// WHEN IT WENT, and zero while it is here. The row is kept rather than
+	// deleted, because the name is numbered from what has been named and a
+	// deleted reviewer-1 would make the next helper a second reviewer-1.
+	Gone time.Time `json:"gone,omitempty"`
 }
 
 func evidencePath(roots Roots) string { return roots.Private("evidence.json") }
@@ -158,13 +174,134 @@ func ForgetRead(roots Roots, path string) {
 // identities and cannot check one: the harness says who is calling, and the
 // agent does not write that field. What this layer guarantees is that every
 // call carries one and that the record says which.
-func NoteAgent(roots Roots, id, kind string) {
+func NoteAgent(roots Roots, id, kind, session string) {
 	if id == "" || id == "main" {
 		return
 	}
 	changeEvidence(roots, func(e *Evidence) {
-		if _, seen := e.Agents[id]; !seen {
-			e.Agents[id] = Agent{Kind: kind, First: time.Now().UTC(), Name: nextName(*e, kind)}
+		was, seen := e.Agents[id]
+		if !seen {
+			e.Agents[id] = Agent{Kind: kind, First: time.Now().UTC(),
+				Name: nextName(*e, kind), Session: session, Run: currentSession(roots)}
+			return
+		}
+		// AN IDENTITY THAT ARRIVES AGAIN IS HERE AGAIN, and it keeps the name
+		// it was given. Renaming it would put two names on one agent in one
+		// record.
+		was.Gone = time.Time{}
+		was.Session, was.Run = session, currentSession(roots)
+		e.Agents[id] = was
+	})
+}
+
+// NoteSession registers the session itself, which is an agent like any other:
+// it is the one the person is talking to.
+//
+// ITS NAME IS THE ONE THE RECORD ALREADY USES. Everything the main agent does
+// is filed under main, so a register calling it session-1 would put a second
+// name on it and nothing would join the two.
+func NoteSession(roots Roots, session string) {
+	if session == "" {
+		return
+	}
+	changeEvidence(roots, func(e *Evidence) {
+		was, seen := e.Agents[session]
+		if !seen {
+			was = Agent{First: time.Now().UTC()}
+		}
+		was.Kind, was.Name, was.Session, was.Gone = "session", "main", session, time.Time{}
+		was.Run = currentSession(roots)
+		e.Agents[session] = was
+	})
+}
+
+// AgentSeen registers whoever is calling, if this run has not seen them.
+//
+// THE OWNER'S WORDS: it says there's nobody there, but that's not true.
+// There's one agent running.
+//
+// A session outlives the engine. The battery restarts the engine on every
+// run and a person's session goes on across it, so a register filled at
+// SessionStart is empty after the first restart and stays empty until the
+// next session. Every call carries the session and the agent it comes from,
+// so presence is read off the calls: a caller this run has not registered
+// is registered now, under the name it already has. The start events still
+// register first, and the end events still take out.
+func AgentSeen(roots Roots, session, id, kind string) {
+	if session == "" {
+		return
+	}
+	run := currentSession(roots)
+	e := LoadEvidence(roots)
+	if s, seen := e.Agents[session]; !seen || s.Run != run || !s.Gone.IsZero() {
+		NoteSession(roots, session)
+	}
+	if id == "" || id == "main" {
+		return
+	}
+	if a, seen := e.Agents[id]; !seen || a.Run != run || !a.Gone.IsZero() {
+		NoteAgent(roots, id, kind, session)
+	}
+}
+
+// HelpersGoneWith writes down that every helper of this session has gone,
+// and leaves the session itself.
+//
+// THE HARNESS SAYS NOTHING WHEN A TURN IS INTERRUPTED, and the record shows
+// it has never said SubagentStop here either. What it does say is when the
+// session's turn ends and when its next prompt arrives, and a helper is a
+// thing of one turn: it is spawned in it and it is dead by the next prompt,
+// whether the turn ended or was cut. So the turn's end takes the helpers
+// out, and one that goes on calling, as a background helper may, is
+// registered again by its own call.
+func HelpersGoneWith(roots Roots, session string) {
+	if session == "" {
+		return
+	}
+	changeEvidence(roots, func(e *Evidence) {
+		now := time.Now().UTC()
+		for id, a := range e.Agents {
+			if a.Session == session && id != session && a.Kind != "session" && a.Gone.IsZero() {
+				a.Gone = now
+				e.Agents[id] = a
+			}
+		}
+	})
+}
+
+// AgentGone writes down that this identity has gone. A stop for an identity
+// nothing started is ignored rather than recorded, because a row invented on
+// the way out says an agent was here that never was.
+func AgentGone(roots Roots, id string) {
+	if id == "" {
+		return
+	}
+	changeEvidence(roots, func(e *Evidence) {
+		if a, seen := e.Agents[id]; seen && a.Gone.IsZero() {
+			a.Gone = time.Now().UTC()
+			e.Agents[id] = a
+		}
+	})
+}
+
+// AgentsGoneWith writes down that every agent of this session has gone, the
+// session's own row among them.
+//
+// A HELPER'S STOP CAN GO MISSING and the session's end cannot: the harness
+// says SubagentStop for a helper that finishes, and a helper killed with its
+// session says nothing at all. So the session ending is what closes the rest,
+// and without it the panel would hold a crowd that is gone.
+func AgentsGoneWith(roots Roots, session string) {
+	if session == "" {
+		return
+	}
+	changeEvidence(roots, func(e *Evidence) {
+		now := time.Now().UTC()
+		for id, a := range e.Agents {
+			if a.Session == session && a.Gone.IsZero() {
+				a.Gone = now
+				e.Agents[id] = a
+			}
 		}
 	})
 }

@@ -264,6 +264,16 @@ for (const name of builders) {
   say("engineargs." + name + " is driven against the engine", false,
     "it is exported, no runner calls it, and it is in no exclusion");
 }
+// AND THE REVERSE, because the census has two sides. A runner asking a builder
+// the module no longer exports is a call counted against nothing: the asked
+// set grows, every exported name is still covered, and the check stays green
+// while a runner drives a ghost.
+for (const name of asked) {
+  if (builders.includes(name)) continue;
+  say("the runners ask engineargs." + name + ", which the module exports", false,
+    "a runner calls it and src/extension/engineargs.ts does not export it, so "
+    + "the call is counted against nothing");
+}
 for (const name of Object.keys(excluded)) {
   say("the exclusion " + name + " is still a builder", builders.includes(name),
     "it is excluded by name and the module no longer exports it");

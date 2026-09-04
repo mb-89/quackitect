@@ -9,6 +9,8 @@ src/engine/engine
 src/engine/engine.exe
 src/viewer/viewer
 src/viewer/viewer.exe
+src/mcp/mcp
+src/mcp/mcp.exe
 util/setup/setup
 util/setup/setup.exe
 src/extension/out/

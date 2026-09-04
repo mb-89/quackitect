@@ -19,19 +19,27 @@ import (
 // DEFERRING IS NOT AN ENDING. A deferred token goes back to backlogged, where it
 // is visible and nobody is doing it, which is what backlogged already means.
 
-// Abort ends a token, from wherever it stands, with the reason it is ending.
-// THE ARGUMENTS ARE NAMED IN THE ORDER THE CALLER HAS THEM, and they were not.
+// Aborting names what an abort carries. THE ARGUMENTS ARE NAMED FIELDS, and
+// they were not.
 //
 // MEASURED. The signature read (id, why, by) and the one caller passed
 // (id, by, why), so an abort wrote the actor's name into the reason: a token
 // dropped with a paragraph explaining why recorded reason: person. Two strings
-// side by side, and nothing could tell them apart.
-func Abort(r Roots, id, by, why string) (Token, error) {
-	t, err := LoadToken(r, id)
+// side by side, and nothing could tell them apart. A field has a name, so the
+// mistake is unwritable.
+type Aborting struct {
+	ID  string // the token that is ending
+	By  string // who is ending it
+	Why string // the reason it is ending
+}
+
+// Abort ends a token, from wherever it stands, with the reason it is ending.
+func Abort(r Roots, a Aborting) (Token, error) {
+	t, err := LoadToken(r, a.ID)
 	if err != nil {
 		return t, err
 	}
-	if trimmed(why) == "" {
+	if trimmed(a.Why) == "" {
 		return t, fmt.Errorf(
 			"an abort with no reason is a token somebody re-mints six weeks later. " +
 				"Say why: obsolete, a duplicate of something, or whatever it is")
@@ -54,12 +62,20 @@ func Abort(r Roots, id, by, why string) (Token, error) {
 	// the current surface.
 	from := t.Status
 	t.Holder = ""
-	t.Disposition, t.Reason = Dropped, why
+	t.Disposition, t.Reason = Dropped, a.Why
+	// AN ENDING READS AS ONE. The abort wrote the disposition and left the
+	// status standing, so an aborted token showed as open in every list and
+	// query. It stops where the process stops.
+	if proc, err := LoadProcess(r.Method, t.Process); err == nil {
+		if end := proc.EndsAt(); end != "" {
+			t.Status = Status(end)
+		}
+	}
 	t = closeStretch(r, t) // what was done before the drop is still a change somebody may read
 	if err := SaveToken(r, t); err != nil {
 		return t, err
 	}
-	inSession(r, "work", by, t.ID+" aborted from "+string(from)+": "+why, Yes(),
-		map[string]any{"id": t.ID, "from": string(from), "reason": why})
+	inSession(r, "work", a.By, t.ID+" aborted from "+string(from)+": "+a.Why, Yes(),
+		map[string]any{"id": t.ID, "from": string(from), "reason": a.Why})
 	return t, nil
 }

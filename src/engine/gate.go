@@ -67,6 +67,48 @@ var NamesItsOwnToken = map[string]bool{
 	"Bash": true, "PowerShell": true,
 }
 
+// THE HARNESS'S OWN TODO LIST, DECLARED ONCE.
+//
+// BOTH HALVES ARE HERE. Reading the list is how an agent finds the list it is
+// about to write, so refusing only the write moves the plan out of the record
+// just as surely and leaves the agent a way round.
+var TodoTools = map[string]bool{"TodoWrite": true, "TodoRead": true}
+
+// TodoIsASubToken refuses the harness's todo list and sends the plan into the
+// record instead.
+//
+// A TODO IS A WORK TOKEN NOBODY ELSE CAN SEE. It lives inside this agent, it
+// goes when the agent goes, and the queue on the person's screen never learns
+// what the work was broken into. The engine already has the shape for it: a
+// token that is part of another, which the queue hands out before its parent
+// and which keeps that parent open until it closes. So the breakdown is kept by
+// the record rather than remembered by whoever wrote it.
+func TodoIsASubToken(r Roots, actor, tool string) (string, bool) {
+	if !TodoTools[tool] {
+		return "", false
+	}
+	by := theByName(r, actor)
+	head := "A TODO IS A SUB-TOKEN, BECAUSE THE PLAN BELONGS IN THE RECORD.\n\n" +
+		tool + " keeps a list inside this agent, so it goes when the agent goes and " +
+		"the person reading the queue never sees what the work was broken into. " +
+		"The engine already has the shape: a token that is part of another.\n\n"
+	// NOTHING IN HAND MEANS NO PARENT TO NAME, and an id that is not there is
+	// worse than no id at all, so that branch sends the agent for work first.
+	held := InWorkFor(r, actor)
+	if len(held) == 0 {
+		return head + "You are holding nothing, so there is no token to be part of. " +
+			"Take work up first:\n\n" +
+			"  se pull --by " + by + "\n\n" +
+			whichNameIsWhich(actor, by) + whatIsOpen(r, actor), true
+	}
+	return head + "Mint each step as a part of the token in your hands:\n\n" +
+		"  se work --title \"...\" --detail \"...\" --parent " + held[0].ID +
+		" --by " + by + "\n\n" +
+		"That token cannot close while its parts are open, and the queue hands the " +
+		"parts out before it, so the plan is kept rather than remembered.\n\n" +
+		whichNameIsWhich(actor, by), true
+}
+
 // theVerbFor says which of the engine's verbs does the job a refused tool was
 // reaching for, so a refusal ends with the call to make.
 func theVerbFor(tool string) string {
@@ -220,21 +262,43 @@ func WriteNeedsAToken(r Roots, actor, tool, path string) (string, bool) {
 	return "", false
 }
 
+// theByName is the name the caller pulls with, which is the name a token is
+// held and closed under. The harness name is only linked to it, so a
+// suggested command spelling the harness name in --by files the work under a
+// name nothing else uses.
+func theByName(r Roots, actor string) string {
+	names := TheNamesItPullsWith(r)[actor]
+	if len(names) == 0 {
+		return actor
+	}
+	return names[len(names)-1]
+}
+
+// whichNameIsWhich says so when the two differ, and is empty when they do not.
+func whichNameIsWhich(actor, by string) string {
+	if by == actor {
+		return ""
+	}
+	return "The harness calls you " + actor + " and you pull as " + by +
+		", so --by takes " + by + ".\n\n"
+}
+
 // theRefusal sends the agent to the verb that can say what this call is.
 func theRefusal(r Roots, actor, tool, path string) string {
+	by := theByName(r, actor)
 	if theVerbFor(tool) == "run" {
 		return "THE ENGINE RUNS COMMANDS, BECAUSE A COMMAND SAYS WHICH WORK IT IS.\n\n" +
 			tool + " carries no way to name a token, so it is refused whatever you hold. " +
 			"The engine cannot read a command and know whether it writes: a redirection, " +
 			"sed -i, mv, rm and a script you wrote all reach the filesystem. So it does " +
 			"not ask, and every command names its work:\n\n" +
-			"  echo 'go test ./...' | se run --on <id> --by " + actor + "\n\n" +
+			"  echo 'go test ./...' | se run --on <id> --by " + by + "\n\n" +
 			"The command is read whole from standard input, quotes and all, and it runs " +
 			"in the folder being worked on. Output comes back with its exit code, and a " +
 			"long one is cut at the end rather than sent entire.\n\n" +
 			"Naming a token you were not on puts the old one back and takes the new one " +
 			"up, so changing what you work on is one word on the next command.\n\n" +
-			whatIsOpen(r, actor)
+			whichNameIsWhich(actor, by) + whatIsOpen(r, actor)
 	}
 	where := shortPath(r, path)
 	if strings.TrimSpace(where) == "" {
@@ -245,25 +309,40 @@ func theRefusal(r Roots, actor, tool, path string) string {
 		"se apply takes the name on the write itself, so there is no call to make " +
 		"first and nothing to remember:\n\n" +
 		"  echo '[{\"file\":\"" + where + "\",\"old\":\"...\",\"new\":\"...\"}]' |\n" +
-		"    se apply --on <id> --by " + actor + "\n\n" +
+		"    se apply --on <id> --by " + by + "\n\n" +
 		"One manifest changes as many files as you like, and every edit is checked " +
 		"before any is written, so one bad edit writes nothing. op create makes a " +
 		"file that is not there, op write replaces one whole.\n\n" +
 		"Naming a token you were not on puts the old one back and takes the new one " +
 		"up, so changing what you work on is one word on the next write.\n\n" +
-		whatIsOpen(r, actor)
+		whichNameIsWhich(actor, by) + whatIsOpen(r, actor)
 }
 
 // whatIsOpen lists what this actor could pick up, so a refusal ends with
 // something to do rather than with a wall.
+//
+// IT ASKS OVER EVERY NAME THE CALLER ANSWERS TO. No token is held under a
+// harness name, so a menu built over the raw name told a subagent nothing was
+// open while the token it pulled stood open under its pulled-with name.
 func whatIsOpen(r Roots, actor string) string {
-	var open []string
+	mine := map[string]bool{}
+	for _, n := range everyNameOf(r, actor) {
+		mine[n] = true
+	}
+	var held, open []string
 	for _, t := range Tokens(r) {
-		if !t.Ended() && t.Holder == "" && Workable(r, t) {
+		if t.Ended() {
+			continue
+		}
+		if mine[t.Holder] {
+			held = append(held, "  "+t.ID+"  "+t.Title+"  (in your hands as "+t.Holder+")")
+			continue
+		}
+		if t.Holder == "" && Workable(r, t) {
 			open = append(open, "  "+t.ID+"  "+t.Title)
 		}
 	}
-	if len(open) == 0 {
+	if len(held) == 0 && len(open) == 0 {
 		return "Nothing is open for " + actor + ". Mint one with se work, which is " +
 			"the one thing you may do with no token in hand."
 	}
@@ -271,7 +350,7 @@ func whatIsOpen(r Roots, actor string) string {
 	if len(open) > 10 {
 		open = append(open[:10], "  ... and "+itoa(len(open)-10)+" more. se pull hands you one.")
 	}
-	return "Open for " + actor + ":\n\n" + strings.Join(open, "\n")
+	return "Open for " + actor + ":\n\n" + strings.Join(append(held, open...), "\n")
 }
 
 // THE NAME THE HARNESS USES AND THE NAME THE AGENT PULLS WITH.
@@ -311,7 +390,21 @@ func NoteTheNameItPullsWith(r Roots, harness, command string) {
 			named = strings.TrimPrefix(w, "--actor=")
 		}
 	}
-	if !pulls || named == "" || named == harness {
+	if !pulls {
+		return
+	}
+	NoteTheNameItActsAs(r, harness, named)
+}
+
+// NoteTheNameItActsAs records that this harness name answers to that one.
+//
+// THE LANE IS THE OTHER DOOR. se_pull, se_run and the rest carry the actor
+// as a field rather than in a command, so a worker that never typed a shell
+// pull was never linked: five workers held five tokens under names the
+// register had never heard, and the panel drew them waiting with nothing in
+// hand while the header showed each one working.
+func NoteTheNameItActsAs(r Roots, harness, named string) {
+	if harness == "" || named == "" || named == harness {
 		return
 	}
 	_ = locked(aliasPath(r), func() error { // a name it cannot remember is looked up again next call

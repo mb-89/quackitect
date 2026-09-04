@@ -82,7 +82,7 @@ func Run(r Roots, command string) (Ran, error) {
 	if command == "" {
 		return Ran{}, fmt.Errorf("say what to run")
 	}
-	out := Ran{Command: command, Shell: TheShell()}
+	out := Ran{Command: command, Shell: TheShell(r)}
 
 	cmd := shellCommand(r, command)
 	done := make(chan struct{})
@@ -174,27 +174,52 @@ func keepOutput(r Roots, said []byte) (string, error) {
 // CMD IS THE FALLBACK AND NOT THE DEFAULT, for a Windows without a sh on the
 // path. The installer fetches Git, which brings one.
 func shellCommand(r Roots, script string) *exec.Cmd {
-	name := TheShell()
-	args := []string{"-c", script}
-	if name == "cmd" {
-		args = []string{"/c", script}
+	// THE RESOLVED PATH RUNS, NOT THE BARE NAME. The shell Git brought is not
+	// on PATH, so naming it sh here would fail to start the very shell the
+	// lookup just found.
+	sh, _ := posixShell(r)
+	name, args := sh, []string{"-c", script}
+	if sh == "" {
+		name, args = "cmd", []string{"/c", script}
 	}
 	cmd := Quietly(exec.Command(name, args...))
-	if name == "cmd" {
+	if sh == "" {
 		cmd = TheScriptVerbatim(cmd, script)
 	}
 	cmd.Dir = r.Work
+	// EVERY PROBED TOOL RESOLVES, so a command carries no environment of its
+	// own. A stale probe only pins directories, and a directory that lost its
+	// tool falls through to the parent's PATH behind it.
+	if p, ok := LoadProbe(r); ok {
+		cmd.Env = PathWithTools(os.Environ(), p.Found)
+	}
 	return cmd
 }
 
 // TheShell says which shell a command will run in, so a caller can say so and a
 // check can assert it rather than guessing from the platform.
-func TheShell() string {
-	if runtime.GOOS != "windows" {
-		return "sh"
-	}
-	if _, err := exec.LookPath("sh"); err == nil {
+func TheShell(r Roots) string {
+	if sh, _ := posixShell(r); sh != "" {
 		return "sh"
 	}
 	return "cmd"
+}
+
+// posixShell answers the shell a command runs in, and the places it looked. An
+// empty name means this machine really has none.
+//
+// IT IS THE LOOKUP THE BATTERY ALREADY USES, rather than a second one beside
+// it. This asked exec.LookPath for sh and nothing else. Git for Windows puts
+// git.exe on PATH from its cmd folder and leaves sh.exe in the sibling bin
+// folder, which is not on PATH, so on a machine carrying two copies of sh the
+// answer was cmd. Every command written for sh, which is what the guidance and
+// every helper script assume, then ran in cmd: exit 0, no output worth reading,
+// and a line saying 'ls' is not recognized. Nothing said the shell had changed
+// under it. The battery had already learned to ask the probe where git is and
+// look beside it, so both ask the same question in the same place now.
+func posixShell(r Roots) (string, []string) {
+	if runtime.GOOS != "windows" {
+		return "sh", []string{"sh on PATH"}
+	}
+	return batteryShell(r)
 }

@@ -14,10 +14,10 @@ import (
 func runSaid(c *call) int {
 	fs := flag.NewFlagSet("said", flag.ContinueOnError)
 	fs.Usage = func() {
-		fmt.Fprintln(c.out, "se said - put what the person said in the record, word for word.")
-		fmt.Fprintln(c.out, "")
-		fmt.Fprintln(c.out, "  se said --text \"...\" --actor main")
-		fmt.Fprintln(c.out, "")
+		fmt.Fprintln(c.err, "se said - put what the person said in the record, word for word.")
+		fmt.Fprintln(c.err, "")
+		fmt.Fprintln(c.err, "  se said --text \"...\" --actor main")
+		fmt.Fprintln(c.err, "")
 		fs.PrintDefaults()
 	}
 	fs.String("work", "", "the folder being worked on (default: this one)")
@@ -47,10 +47,10 @@ func runSaid(c *call) int {
 func runAnswer(c *call) int {
 	fs := flag.NewFlagSet("answer", flag.ContinueOnError)
 	fs.Usage = func() {
-		fmt.Fprintln(c.out, "se answer - put your answer to them in the record.")
-		fmt.Fprintln(c.out, "")
-		fmt.Fprintln(c.out, "  se answer --text \"...\" --actor main")
-		fmt.Fprintln(c.out, "")
+		fmt.Fprintln(c.err, "se answer - put your answer to them in the record.")
+		fmt.Fprintln(c.err, "")
+		fmt.Fprintln(c.err, "  se answer --text \"...\" --actor main")
+		fmt.Fprintln(c.err, "")
 		fs.PrintDefaults()
 	}
 	fs.String("work", "", "the folder being worked on (default: this one)")
@@ -73,8 +73,8 @@ func runAnswer(c *call) int {
 func runConfig(c *call) int {
 	fs := flag.NewFlagSet("config", flag.ContinueOnError)
 	fs.Usage = func() {
-		fmt.Fprintln(c.out, "se config - print every parameter, its value, and where the value came from.")
-		fmt.Fprintln(c.out, "")
+		fmt.Fprintln(c.err, "se config - print every parameter, its value, and where the value came from.")
+		fmt.Fprintln(c.err, "")
 		fs.PrintDefaults()
 	}
 	fs.String("work", "", "the folder being worked on (default: this one)")

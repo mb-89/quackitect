@@ -123,6 +123,15 @@ const calls = [
   { tool: "se_ask", args: { sql: "SELECT count(*) AS n FROM file WHERE path LIKE '.se/work/%'" } },
   { tool: "se_ask", args: { schema: true } },
   { tool: "se_ask", args: { search: "whole instruction" } },
+  // A SEARCH GOES THROUGH THE INDEX. The file se_apply created above is a
+  // text file the engine indexed line by line, so words find its line, a
+  // regex finds the same line, and a glob lists the file.
+  { tool: "se_find", args: { words: "lane wrote" } },
+  { tool: "se_find", args: { regex: "^# a file the lane", path: "*.md" } },
+  { tool: "se_find", args: { path: "made-by-*.md" } },
+  // THE ENGINE OWNS THE TESTS. A plan asks what would run and runs nothing,
+  // and the answer is the engine's decision as a structure.
+  { tool: "se_test", args: { on: "", plan: true } },
 ];
 // The apply cases need a real id, so the first mint runs on its own and its
 // answer fills them in.
@@ -130,7 +139,7 @@ let mintedFirst = null;
 {
   try { mintedFirst = JSON.parse(ask([calls[0]]).get(1) ?? ""); } catch { /* the case below says so */ }
   for (const c of calls) {
-    if (c.tool === "se_apply" || c.tool === "se_run") c.args.on = mintedFirst?.id ?? "wk-0000000000";
+    if (c.tool === "se_apply" || c.tool === "se_run" || c.tool === "se_test") c.args.on = mintedFirst?.id ?? "wk-0000000000";
   }
 }
 const answers = ask(calls);
@@ -222,6 +231,23 @@ let found = null;
 try { found = JSON.parse(answers.get(askAt + 2) ?? ""); } catch { /* said above */ }
 say("and a search finds the words in a body", found?.rows?.some((r) => r[0] === mintedFirst?.id),
   JSON.stringify(found)?.slice(0, 200));
+
+// AND se_find ANSWERS PATH, LINE AND TEXT OFF THE INDEX.
+const findAt = calls.findIndex((c) => c.tool === "se_find") + 1;
+const parsed = (i) => { try { return JSON.parse(answers.get(i) ?? ""); } catch { return null; } };
+const byWords = parsed(findAt), byRegex = parsed(findAt + 1), byGlob = parsed(findAt + 2);
+say("se_find finds the line by its words", byWords?.hits?.some((h) => h.path === "made-by-apply.md" && h.line === 1),
+  JSON.stringify(byWords)?.slice(0, 200));
+say("se_find finds the line by a regex", byRegex?.hits?.some((h) => h.path === "made-by-apply.md" && h.line === 1),
+  JSON.stringify(byRegex)?.slice(0, 200));
+say("se_find lists the files a glob names", byGlob?.files?.includes("made-by-apply.md") && (byGlob?.hits?.length ?? 0) === 0,
+  JSON.stringify(byGlob)?.slice(0, 200));
+
+// AND se_test ANSWERS THE ENGINE'S DECISION.
+const testAt = calls.findIndex((c) => c.tool === "se_test") + 1;
+const planned = parsed(testAt);
+say("se_test plans off the token's delta", Array.isArray(planned?.chosen) && Array.isArray(planned?.delta) && planned?.since !== undefined,
+  JSON.stringify(planned)?.slice(0, 200));
 
 console.log(bad + " failed.");
 process.exit(bad === 0 ? 0 : 1);

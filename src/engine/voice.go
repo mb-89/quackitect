@@ -71,6 +71,13 @@ func LoadVoiceRules(methodRoot string) (VoiceRules, error) {
 		}
 		v.compiled = append(v.compiled, re)
 	}
+	// ZERO RULES IS A CHECKER THAT CHECKS NOTHING, and it passed every write
+	// without a word. The unreadable case is loud already, so the empty one
+	// refuses the same way rather than passing quietly.
+	if len(v.compiled) == 0 {
+		return v, fmt.Errorf("util/voice-rules.json names no rules, so the check would pass everything. " +
+			"Name at least one rule, or remove the file to turn the check off loudly")
+	}
 	if v.Limits.SentenceWords <= 0 {
 		v.Limits.SentenceWords = 25
 	}

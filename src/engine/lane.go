@@ -20,14 +20,14 @@ import (
 // runHold is the person putting everything down, and picking it up again.
 func runHold(c *call) int {
 	fs := flag.NewFlagSet("hold", flag.ContinueOnError)
-	fs.SetOutput(c.out)
+	fs.SetOutput(c.err)
 	fs.Usage = func() {
-		fmt.Fprintln(c.out, "se hold - stop the agent, or let it go on. Prints what it now is.")
-		fmt.Fprintln(c.out, "")
-		fmt.Fprintln(c.out, "  se hold            say whether it is on")
-		fmt.Fprintln(c.out, "  se hold --on")
-		fmt.Fprintln(c.out, "  se hold --off")
-		fmt.Fprintln(c.out, "")
+		fmt.Fprintln(c.err, "se hold - stop the agent, or let it go on. Prints what it now is.")
+		fmt.Fprintln(c.err, "")
+		fmt.Fprintln(c.err, "  se hold            say whether it is on")
+		fmt.Fprintln(c.err, "  se hold --on")
+		fmt.Fprintln(c.err, "  se hold --off")
+		fmt.Fprintln(c.err, "")
 		fs.PrintDefaults()
 	}
 	fs.String("work", "", "the folder being worked on (default: this one)")
@@ -61,15 +61,15 @@ func runHold(c *call) int {
 // picked a level, and where that is stored is one place's business.
 func runView(c *call) int {
 	fs := flag.NewFlagSet("view", flag.ContinueOnError)
-	fs.SetOutput(c.out)
+	fs.SetOutput(c.err)
 	fs.Usage = func() {
-		fmt.Fprintln(c.out, "se view - change how a view looks. Prints what it now is.")
-		fmt.Fprintln(c.out, "")
-		fmt.Fprintln(c.out, "  se view --file work --pane left --width title=420")
-		fmt.Fprintln(c.out, "  se view --file work --pane left --order title,status")
-		fmt.Fprintln(c.out, "  se view --file work --pane left --sort status --direction DESC")
-		fmt.Fprintln(c.out, "  se view --file work --pane left --pin open --matching 'status == \"open\"'")
-		fmt.Fprintln(c.out, "")
+		fmt.Fprintln(c.err, "se view - change how a view looks. Prints what it now is.")
+		fmt.Fprintln(c.err, "")
+		fmt.Fprintln(c.err, "  se view --file work --pane left --width title=420")
+		fmt.Fprintln(c.err, "  se view --file work --pane left --order title,status")
+		fmt.Fprintln(c.err, "  se view --file work --pane left --sort status --direction DESC")
+		fmt.Fprintln(c.err, "  se view --file work --pane left --pin open --matching 'status == \"open\"'")
+		fmt.Fprintln(c.err, "")
 		fs.PrintDefaults()
 	}
 	fs.String("work", "", "the folder being worked on (default: this one)")
@@ -182,13 +182,13 @@ func levelKey(said string) (string, bool) {
 // whatever asked: a webview, or a person at a terminal reading JSON.
 func runQuery(c *call) int {
 	fs := flag.NewFlagSet("query", flag.ContinueOnError)
-	fs.SetOutput(c.out)
+	fs.SetOutput(c.err)
 	fs.Usage = func() {
-		fmt.Fprintln(c.out, "se query - draw a view over the work. Prints the table as JSON.")
-		fmt.Fprintln(c.out, "")
-		fmt.Fprintln(c.out, "  se query --list          which views exist")
-		fmt.Fprintln(c.out, "  se query --view work     draw the first view in work.base")
-		fmt.Fprintln(c.out, "")
+		fmt.Fprintln(c.err, "se query - draw a view over the work. Prints the table as JSON.")
+		fmt.Fprintln(c.err, "")
+		fmt.Fprintln(c.err, "  se query --list          which views exist")
+		fmt.Fprintln(c.err, "  se query --view work     draw the first view in work.base")
+		fmt.Fprintln(c.err, "")
 		fs.PrintDefaults()
 	}
 	fs.String("work", "", "the folder being worked on (default: this one)")
@@ -280,13 +280,13 @@ func inSession(r Roots, kind, actor, msg string, ok *bool, data map[string]any) 
 // and quietly meaning nothing.
 func runStop(c *call) int {
 	fs := flag.NewFlagSet("stop", flag.ContinueOnError)
-	fs.SetOutput(c.out)
+	fs.SetOutput(c.err)
 	fs.Usage = func() {
-		fmt.Fprintln(c.out, "se stop - name why you are stopping. Prints the claim as JSON.")
-		fmt.Fprintln(c.out, "")
-		fmt.Fprintln(c.out, "  se stop --list                     what is sanctioned")
-		fmt.Fprintln(c.out, "  se stop --because broken --why \"...\"")
-		fmt.Fprintln(c.out, "")
+		fmt.Fprintln(c.err, "se stop - name why you are stopping. Prints the claim as JSON.")
+		fmt.Fprintln(c.err, "")
+		fmt.Fprintln(c.err, "  se stop --list                     what is sanctioned")
+		fmt.Fprintln(c.err, "  se stop --because broken --why \"...\"")
+		fmt.Fprintln(c.err, "")
 		fs.PrintDefaults()
 	}
 	fs.String("work", "", "the folder being worked on (default: this one)")
@@ -352,12 +352,12 @@ func orElse(s, fallback string) string {
 // rewrote and what it could not, because the second is work the caller owes.
 func runMove(c *call) int {
 	fs := flag.NewFlagSet("move", flag.ContinueOnError)
-	fs.SetOutput(c.out)
+	fs.SetOutput(c.err)
 	fs.Usage = func() {
-		fmt.Fprintln(c.out, "se move - move a file and fix every reference to it. Prints what changed.")
-		fmt.Fprintln(c.out, "")
-		fmt.Fprintln(c.out, "  se move --from doc/old.md --to doc/new.md")
-		fmt.Fprintln(c.out, "")
+		fmt.Fprintln(c.err, "se move - move a file and fix every reference to it. Prints what changed.")
+		fmt.Fprintln(c.err, "")
+		fmt.Fprintln(c.err, "  se move --from doc/old.md --to doc/new.md")
+		fmt.Fprintln(c.err, "")
 		fs.PrintDefaults()
 	}
 	fs.String("work", "", "the folder being worked on (default: this one)")
@@ -387,15 +387,15 @@ func runMove(c *call) int {
 // se retro - collect everything a retro needs into one folder, and drain it.
 func runRetro(c *call) int {
 	fs := flag.NewFlagSet("retro", flag.ContinueOnError)
-	fs.SetOutput(c.out)
+	fs.SetOutput(c.err)
 	fs.Usage = func() {
-		fmt.Fprintln(c.out, "se retro - collect the record and the scratchpad into one folder, and drain them.")
-		fmt.Fprintln(c.out, "")
-		fmt.Fprintln(c.out, "  se retro                 collect, and answer where it put them")
-		fmt.Fprintln(c.out, "")
-		fmt.Fprintln(c.out, "It rotates the log first, so the session that is running is in the retro.")
-		fmt.Fprintln(c.out, "It refuses while anybody else holds work, because a sweep has no undo.")
-		fmt.Fprintln(c.out, "")
+		fmt.Fprintln(c.err, "se retro - collect the record and the scratchpad into one folder, and drain them.")
+		fmt.Fprintln(c.err, "")
+		fmt.Fprintln(c.err, "  se retro                 collect, and answer where it put them")
+		fmt.Fprintln(c.err, "")
+		fmt.Fprintln(c.err, "It rotates the log first, so the session that is running is in the retro.")
+		fmt.Fprintln(c.err, "It refuses while anybody else holds work, because a sweep has no undo.")
+		fmt.Fprintln(c.err, "")
 		fs.PrintDefaults()
 	}
 	fs.String("work", "", "the folder being worked on (default: this one)")

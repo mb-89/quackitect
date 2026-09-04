@@ -89,7 +89,7 @@ func runLSP(args []string) {
 	fs.Bool("stdio", false, "speak over standard input and output")
 	parse(fs, "lsp", args)
 
-	roots, err := FindRoots(*work)
+	roots, err := FindRoots(*work, "")
 	if err != nil {
 		fail(err)
 	}
@@ -392,7 +392,7 @@ func notesUnder(root string) ([]string, error) {
 			return nil
 		}
 		if info.IsDir() {
-			if skip[info.Name()] || Parked(info.Name()) {
+			if skip[info.Name()] || Parked(info.Name()) || isScratchpad(root, path) {
 				return filepath.SkipDir
 			}
 			return nil
@@ -407,6 +407,17 @@ func notesUnder(root string) ([]string, error) {
 		return nil
 	})
 	return out, err
+}
+
+// THE SCRATCHPAD IS NOT NOTES. Helper scripts and fixtures live in
+// .se/scratchpad by rule, and a fixture written to look broken was counted in
+// the problems panel as a problem of the tree.
+func isScratchpad(root, path string) bool {
+	rel, err := filepath.Rel(root, path)
+	if err != nil {
+		return false
+	}
+	return filepath.ToSlash(rel) == ".se/scratchpad"
 }
 
 // parkedPath says whether any folder or the file itself on a path or uri is

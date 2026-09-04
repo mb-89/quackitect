@@ -113,11 +113,8 @@ func tools() []map[string]any {
 		},
 		{
 			"name": "se_answer",
-			"description": "ANSWER THE PERSON, IN THE RECORD. One prompt, one answer, where they are " +
-				"already looking." + blankLine +
-				"Use it for every prompt they give you. Say what you would have said to them, in " +
-				"full, and then carry on with the work you hold." + blankLine +
-				"YOU DO NOT HAVE TO STOP TO BE HEARD. Answer, then keep working.",
+			"description": "ANSWER THE PERSON, IN THE RECORD: the whole answer, for every " +
+				"prompt. Then keep working.",
 			"inputSchema": map[string]any{
 				"type": "object",
 				"properties": map[string]any{
@@ -140,12 +137,8 @@ func tools() []map[string]any {
 			// this package holds the two together. What is written here around
 			// it says what this layer knows and the guidance does not: which
 			// message the engine has already copied.
-			"description": "PUT WHAT THE PERSON SAID IN THE RECORD, WORD FOR WORD.\n\n" +
-				"THE ENGINE COPIES A MID-TURN MESSAGE ON YOUR NEXT TOOL CALL. This is the " +
-				"fallback, for a message it has not copied, and it refuses a repeat.\n\n" +
-				"THEIR SENTENCE, NOT A SUMMARY OF IT. " + saidRule + "\n\n" +
-				"A NOTE IS SOMETHING ELSE. A note is a work token, and se_work is what " +
-				"mints one.",
+			"description": "PUT WHAT THE PERSON SAID IN THE RECORD, WORD FOR WORD, when the " +
+				"engine has not already copied it. " + saidRule,
 			"inputSchema": map[string]any{
 				"type": "object",
 				"properties": map[string]any{
@@ -186,6 +179,10 @@ func call(roots roots, params json.RawMessage) map[string]any {
 			return text("It could not be recorded: " + err.Error())
 		}
 		return text("recorded")
+	case "se_test":
+		return text(testTheDelta(roots, p.Arguments))
+	case "se_find":
+		return text(findInTree(roots, p.Arguments))
 	case "se_ask":
 		return text(askIndex(roots, p.Arguments))
 	case "se_apply":

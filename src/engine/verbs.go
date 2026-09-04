@@ -36,11 +36,14 @@ import (
 var run = map[string]verb{
 	"apply":  runApply,
 	"ask":    runAsk,
+	"find":   runFind,
+	"test":   runTest,
 	"run":    runRun,
 	"work":   runWork,
 	"pull":   runPull,
 	"stop":   runStop,
 	"query":  runQuery,
+	"state":  runState,
 	"view":   runView,
 	"move":   runMove,
 	"lint":   runLint,
@@ -50,6 +53,18 @@ var run = map[string]verb{
 	"answer": runAnswer,
 	"config": runConfig,
 }
+
+// A VERB'S FLAG ERRORS AND USAGE GO TO err, NEVER TO out.
+//
+// THE OWNER'S WORDS: What's up with this error message?
+//
+// Every flag set sent its output to the answer stream. So one flag a verb has
+// not got put a usage message where the reader was parsing JSON, and the
+// panel could only say the answer was not JSON and nothing was minted: the
+// cause was in the answer it had thrown away. out carries the answer and
+// nothing else, err carries every reason, and a reader that finds an empty
+// answer knows to read the other stream.
+// TestAFlagAVerbHasNotGotLeavesTheAnswerStreamEmpty holds every verb to it.
 
 // verb is what a verb is: the call in, the exit code out.
 type verb func(c *call) int
@@ -108,7 +123,7 @@ func Stray(verb string, left []string) error {
 func (c *call) parse(fs *flag.FlagSet, verb string) (code int, stop bool) {
 	// THE SET DOES NOT EXIT, because the process it runs in is the engine.
 	fs.Init(fs.Name(), flag.ContinueOnError)
-	fs.SetOutput(c.out)
+	fs.SetOutput(c.err)
 	if err := fs.Parse(c.args); err != nil {
 		if errors.Is(err, flag.ErrHelp) {
 			return 0, true

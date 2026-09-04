@@ -3,7 +3,7 @@ import { spawn as spawnRaw, ChildProcess, SpawnOptions } from "node:child_proces
 import * as fs from "node:fs";
 import * as path from "node:path";
 import * as os from "node:os";
-import { panelHtml, everyGroup, Node, Happening } from "./panel";
+import { panelHtml, livePieces, everyGroup, Node, Happening } from "./panel";
 import { whyNothingHappened } from "./mintwhy";
 import { editorHtml, paneBody, Table, Pane } from "./editor";
 import { whichHarness, kickoffText, openAgent } from "./agent";
@@ -34,6 +34,7 @@ export function activate(context: vscode.ExtensionContext) {
   watchParameters(context);
   void chooseEngine(context);
   startNotesServer(context);
+  keepEverythingLive(context);
   context.subscriptions.push(
     vscode.window.registerWebviewViewProvider("quackitect.control", provider),
     vscode.commands.registerCommand("quackitect.startAgent", () => startAgent(context)),
@@ -121,6 +122,7 @@ function projectOnStartup(context: vscode.ExtensionContext) {
 
 export function deactivate() {
   for (const w of watchers) w.close();
+  stopKeepingLive();
   stopEngine();
   void stopLanguageServer();
 }
@@ -220,7 +222,8 @@ function readCopies(context: vscode.ExtensionContext): Promise<{ driver: string;
     let out = "";
     done.stdout?.on("data", (b: Buffer) => (out += b.toString()));
     done.on("error", () => resolve(empty));
-    done.on("exit", () => {
+    // close, not exit: on exit the pipe can still hold the answer.
+    done.on("close", () => {
       try {
         resolve(JSON.parse(out));
       } catch {
@@ -323,6 +326,73 @@ function post() {
   view?.webview.postMessage({ type: "state", id: "engine", state: engineState, detail });
 }
 
+// EVERYTHING IN THE UI IS LIVE. That is the owner's rule, and it is not a
+// feature: a panel that is right only sometimes is worse than one that is
+// plainly empty, because there is no way to tell the two apart by looking.
+//
+// THE ONE THEY MET. Every panel here read the engine once, when it was built,
+// and then held it. postValues is what reads again, and it runs when a parameter
+// file changes, when a control is used, and when a fresh view says ready. None
+// of those happen because a token changed hands. So a person had to shut the
+// sidebar and open it, or shut the work editor and open it, before a new value
+// appeared: tearing a view down and building it is what read once more.
+//
+// SO THERE IS A CLOCK, AND BOTH PANELS ARE ON IT. It is the arrangement the
+// light already uses, and for the same reason: read what is true and say it,
+// over and over, rather than waiting to be told by something that will not tell.
+const LIVE_MS = 1000;
+let liveTimer: NodeJS.Timeout | undefined;
+let refreshing = false;
+
+function keepEverythingLive(context: vscode.ExtensionContext) {
+  if (liveTimer) return;
+  liveTimer = setInterval(() => void refreshLive(context), LIVE_MS);
+}
+
+function stopKeepingLive() {
+  if (liveTimer) clearInterval(liveTimer);
+  liveTimer = undefined;
+}
+
+// A PANEL NOBODY CAN SEE IS NOT READ. The sidebar is collapsed most of the time
+// and the work editor is a tab behind other tabs, and every read here is a
+// process: reading for a panel that is not on screen spends that for nothing.
+// Each one is read again the moment it becomes visible, so nothing that comes
+// back is stale.
+//
+// AND ONE READ AT A TIME. A read slower than the tick would otherwise pile up
+// behind itself until there were more engines running than answers wanted.
+//
+// IT IS QUIET. Nobody pressed this, so a read that fails says nothing and the
+// panel keeps what it had: a toast once a second is not a message, it is noise
+// that hides the one message that mattered.
+async function refreshLive(context: vscode.ExtensionContext) {
+  if (refreshing) return;
+  refreshing = true;
+  try {
+    if (view?.visible) {
+      await readDoing(context);
+      postDoing(context);
+    }
+    if (workPanel?.visible) await drawWork(context, false, true);
+  } catch {
+    /* a read that failed changes nothing. The next tick asks again. */
+  } finally {
+    refreshing = false;
+  }
+}
+
+// THE LIVE PARTS ONLY, NEVER THE WHOLE PAGE. Replacing view.webview.html would
+// empty the line a person is typing in, shut the picker under their hand and
+// fold every section they opened, once a second, for ever. The strip and the
+// tables are dropped into the page that is already there, which is how the
+// values have always arrived.
+function postDoing(context: vscode.ExtensionContext) {
+  if (!view) return;
+  const pieces = livePieces(loadTree(context), shownGroups(context), lastDoing);
+  void view.webview.postMessage({ type: "doing", head: pieces.head, tables: pieces.tables });
+}
+
 // THE OTHER HALF OF THE PARAMETER TREE.
 //
 // Two files, and each has one job.
@@ -411,7 +481,8 @@ function readDoing(context: vscode.ExtensionContext): Promise<void> {
     let out = "";
     done.stdout?.on("data", (b: Buffer) => (out += b.toString()));
     done.on("error", () => resolve());
-    done.on("exit", () => {
+    // close, not exit: on exit the pipe can still hold the answer.
+    done.on("close", () => {
       try {
         lastDoing = JSON.parse(out) as Happening;
       } catch {
@@ -529,7 +600,8 @@ function readValues(context: vscode.ExtensionContext): Promise<void> {
     let out = "";
     done.stdout?.on("data", (b: Buffer) => (out += b.toString()));
     done.on("error", () => resolve());
-    done.on("exit", () => {
+    // close, not exit: on exit the pipe can still hold the answer.
+    done.on("close", () => {
       try {
         lastValues = JSON.parse(out).value ?? {};
       } catch {
@@ -735,7 +807,12 @@ function startEngine(context: vscode.ExtensionContext) {
   // the same.
   child.on("exit", (code) => {
     engine = undefined;
-    stopWatching();
+    // THE POLL KEEPS LOOKING. Stopping the watch here left the light red for
+    // ever: an engine restarted from a terminal put a fresh heartbeat on disk
+    // and nothing in this window read it again. Only the start watchdog dies
+    // with the child; the liveness timer is stopped by a deliberate stop alone.
+    if (watchdog) clearTimeout(watchdog);
+    watchdog = undefined;
     if (engineState === "good" && (code === 0 || code === null)) {
       setState("idle", "");
     } else if (code !== 0 && code !== null) {
@@ -914,6 +991,7 @@ class ControlPanel implements vscode.WebviewViewProvider {
         return;
       }
       if (msg.type === "set") setValue(this.context, msg.key, msg.value);
+      if (msg.type === "open") void openNote(this.context, msg.id);
       if (msg.type === "ready") {
         // The view can listen now. Anything sent before this is lost, which
         // is how a panel comes up empty.
@@ -928,6 +1006,11 @@ class ControlPanel implements vscode.WebviewViewProvider {
       }
     });
     webviewView.onDidDispose(() => (view = undefined));
+    // The same as the work editor: a sidebar that was collapsed is read again
+    // when it is opened, rather than showing what was true when it closed.
+    webviewView.onDidChangeVisibility(() => {
+      if (webviewView.visible) void refreshLive(this.context);
+    });
     postValues(this.context);
   }
 }
@@ -935,6 +1018,7 @@ class ControlPanel implements vscode.WebviewViewProvider {
 type PanelMessage =
   | { type: "command"; command: string }
   | { type: "run"; command: string; text: string; process: string }
+  | { type: "open"; id: string }
   | { type: "set"; key: string; value: unknown }
   | { type: "ready" };
 
@@ -983,6 +1067,13 @@ function toggleWork(context: vscode.ExtensionContext) {
   });
   void drawWork(context);
 
+  // AND IT IS READ AGAIN THE MOMENT IT IS LOOKED AT. The clock leaves a panel
+  // nobody can see alone, so a tab that comes back to the front would otherwise
+  // show what was true when it went behind.
+  workPanel.onDidChangeViewState(() => {
+    if (workPanel?.visible) void drawWork(context, false, true);
+  });
+
   // THE LEDGER IS FILES, SO THE EDITOR WATCHES FILES. No server and no port:
   // the engine writes notes and this notices, which is the arrangement the log
   // window already uses.
@@ -994,6 +1085,21 @@ function toggleWork(context: vscode.ExtensionContext) {
   watcher.onDidChange(again);
   watcher.onDidDelete(again);
   context.subscriptions.push(watcher);
+
+  // THE QUERY IS A FILE ON DISK AND A PERSON EDITS IT. The code toggle names
+  // the path (util/views/work.base), so saving that file redraws the panes,
+  // the way saving util/parameters.json rebuilds the panel. The page is
+  // rebuilt whole because the view file declares the page's shape.
+  try {
+    let due: NodeJS.Timeout | undefined;
+    const views = fs.watch(path.join(methodRoot(context), "util", "views"), () => {
+      clearTimeout(due);
+      due = setTimeout(() => { if (workPanel) void drawWork(context, true); }, 120);
+    });
+    workPanel.onDidDispose(() => views.close());
+  } catch {
+    /* no views folder to watch. The editor still draws what it read. */
+  }
 }
 
 type WorkMessage =
@@ -1022,13 +1128,16 @@ let workBuilt = "";
 // THE VIEW FILE DECLARES THE PANES, and there are as many as it declares up to
 // two. A file with one view draws one, and the second column button has nothing
 // to show.
-async function drawWork(context: vscode.ExtensionContext, rebuild = false) {
+async function drawWork(context: vscode.ExtensionContext, rebuild = false, quiet = false) {
   if (!workPanel) return;
-  const sides = await askEngine(context, panesArgs(workView));
+  // QUIET IS FOR THE DRAWS NOBODY PRESSED. The clock draws this every second, so
+  // a read that fails has to say nothing and leave the page as it was.
+  const asked = { quiet };
+  const sides = await askEngine(context, panesArgs(workView), asked);
   const names: string[] = sides?.panes ?? [];
   const panes: Pane[] = [];
   for (const side of names.slice(0, 2)) {
-    const table: Table = (await askEngine(context, paneArgs(workView, side))) ?? {
+    const table: Table = (await askEngine(context, paneArgs(workView, side), asked)) ?? {
       view: workView, columns: [], heads: {}, total: 0, error: "the engine could not be asked",
     };
     panes.push({ side, table });
@@ -1037,12 +1146,26 @@ async function drawWork(context: vscode.ExtensionContext, rebuild = false) {
     panes.push({ side: "left", table: { view: workView, columns: [], heads: {}, total: 0,
       error: sides?.error ?? "the engine could not be asked" } });
   }
+  // A BAD EDIT IS TOLD, AND THE VIEW IS KEPT. Once a page is drawn, replacing
+  // it with the error would take the table away exactly when a person is
+  // mid-edit on the file that declares it. The message says what is wrong and
+  // the last good page stands until a save parses.
+  const broken = panes.find((p) => p.table.error);
+  if (broken?.table.error && workBuilt) {
+    if (!quiet) vscode.window.showErrorMessage(broken.table.error);
+    return;
+  }
+  // THE ENGINE COMPUTES THE FOUR NUMBERS. The bar draws what it is handed and
+  // forms none of them, because a number that lives only where it is displayed
+  // is a number nothing checks.
+  //
+  // AND IT IS READ ON EVERY DRAW. It was asked for inside the branch below, the
+  // one that replaces the page, so on an ordinary draw the bar kept the number
+  // it was built with: the counter said whatever was true when the editor was
+  // opened, and shutting it and opening it again was the only way to move it.
+  const burndown = await askEngine(context, burndownArgs(), asked);
   if (rebuild || workBuilt !== workView) {
-    const listed = await askEngine(context, viewsArgs());
-    // THE ENGINE COMPUTES THE FOUR NUMBERS. The bar draws what it is handed and
-    // forms none of them, because a number that lives only where it is
-    // displayed is a number nothing checks.
-    const burndown = await askEngine(context, burndownArgs());
+    const listed = await askEngine(context, viewsArgs(), asked);
     workPanel.webview.html = editorHtml(panes, listed?.views ?? [], workView, burndown);
     workBuilt = workView;
     return;
@@ -1060,6 +1183,9 @@ async function drawWork(context: vscode.ExtensionContext, rebuild = false) {
       scrolling: b.scrolling, total: b.total, counts: b.counts,
     });
   }
+  void workPanel.webview.postMessage({
+    type: "burndown", says: burndown?.says ?? "", detail: burndown?.detail ?? "",
+  });
 }
 
 // THE VIEW FILE IS THE OWNER'S, AND THE ENGINE WRITES IT. Ticking a column and
@@ -1164,6 +1290,10 @@ async function mintWork(context: vscode.ExtensionContext, arg?: { text: string; 
     return;
   }
   if (out === undefined) return; // askEngine has already said which way it went
+  // THE ENGINE HAS IT, so the line may let go of it. Until here the text
+  // stays where the person typed it, because a mint that fails must not
+  // take the words with it.
+  view?.webview.postMessage({ type: "taken", command: "quackitect.mintWork" });
   void drawWork(context);
 }
 
@@ -1171,12 +1301,17 @@ async function mintWork(context: vscode.ExtensionContext, arg?: { text: string; 
 // nothing, so a person watched their work vanish with no way to learn whether
 // the engine refused it or nothing was sent. Each one now names which, where
 // the person is already looking, which is vscode.window.showErrorMessage.
-function askEngine(context: vscode.ExtensionContext, args: string[]): Promise<any> {
+// A BACKGROUND READ IS QUIET. showHold runs when the window opens, before any
+// engine is started, and the toast it raised was the first thing a person saw
+// on a clean start. quiet is for the calls nobody pressed: they resolve
+// undefined and the panel keeps what it had, the way readValues does.
+function askEngine(context: vscode.ExtensionContext, args: string[],
+                   opts: { quiet?: boolean } = {}): Promise<any> {
   return new Promise((resolve) => {
     const work = workRoot();
     const exe = binary(context, "se");
     if (!work || !fs.existsSync(exe)) {
-      vscode.window.showErrorMessage(whyNothingHappened("no engine"));
+      if (!opts.quiet) vscode.window.showErrorMessage(whyNothingHappened("no engine"));
       return resolve(undefined);
     }
     const done = spawn(exe, [...args, "--work", work], { cwd: work });
@@ -1191,14 +1326,21 @@ function askEngine(context: vscode.ExtensionContext, args: string[]): Promise<an
       vscode.window.showErrorMessage(whyNothingHappened("no start", String(err?.message ?? err)));
       resolve(undefined);
     });
-    done.on("exit", () => {
+    // CLOSE, NOT EXIT. On exit the pipes can still hold the answer, so a
+    // healthy call parsed an empty string and the owner read "not JSON" with
+    // nothing after it. close fires when the streams have ended.
+    done.on("close", () => {
       try {
         resolve(JSON.parse(out));
       } catch {
         // THE ONE THE OWNER HIT. The engine printed its usage because it was
         // sent a flag it has not got, and usage is not JSON, so this swallowed
         // it. It is also where an engine that did not read the call arrives.
-        vscode.window.showErrorMessage(whyNothingHappened("not json", said.trim() || out));
+        // A VERB WITH NO ENGINE BEHIND IT LANDS HERE TOO, with an empty answer
+        // and the reason on the other stream, so it is named as what it is.
+        const why = /no engine is running/.test(said) ? "not running" : "not json";
+        const what = "se " + args.join(" ") + " answered: " + (said.trim() || out.trim() || "nothing at all");
+        if (!opts.quiet) vscode.window.showErrorMessage(whyNothingHappened(why, what));
         resolve(undefined);
       }
     });
@@ -1224,8 +1366,9 @@ async function toggleHold(context: vscode.ExtensionContext) {
 }
 
 // The button says what is true, and it says it after a reload as well.
+// Reading is quiet: a window whose engine is not up yet is not wrong.
 async function showHold(context: vscode.ExtensionContext) {
-  const now = await askEngine(context, ["hold"]);
+  const now = await askEngine(context, ["hold"], { quiet: true });
   setHoldState(now?.on === true);
 }
 

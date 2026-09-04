@@ -77,8 +77,18 @@ type Criterion struct {
 
 }
 
+// TokenKind is the kind the mint writes when a caller names none. One name in
+// one place, so the mint and the writer cannot disagree about which schema has
+// to exist.
+const TokenKind = "work-token"
+
 type Token struct {
 	ID string `json:"id"`
+
+	// WHICH KIND OF NOTE THIS IS WRITTEN AS, and so which schema reads it back.
+	// Empty means the one kind the mint writes, which is TokenKind: a caller that
+	// says nothing is not made to name what there is only one of.
+	Kind string `json:"kind,omitempty"`
 
 	// WHICH PROCESS SHAPES THIS TOKEN. It says which sections and fields
 	// apply, which states exist, and how the work moves. The engine owns none
@@ -163,6 +173,10 @@ type Token struct {
 	// Who holds it now. A worker while it is in work, a reviewer while it is
 	// in review. It is what an arriving agent reclaims against.
 	Holder string `json:"holder,omitempty"`
+
+	// WHO DID THE WORK STEP. A verdict is never theirs: the engine refuses
+	// the author its own verdict, because an evaluator favours what it made.
+	Author string `json:"author,omitempty"`
 
 	// WHAT THE READER DID NOT UNDERSTAND, KEPT SO THE WRITER CAN PUT IT BACK.
 	//
@@ -327,9 +341,44 @@ func trimmed(s string) string {
 // EVERYTHING ELSE IS THE SCHEMA'S. Which fields a process allows, which
 // sections it wants, and which states are legal are all in the files, and this
 // asking them again would be a second answer to a question already answered.
+// kind answers which kind this note is written as, so the mint and the writer
+// read one answer rather than each carrying its own copy of the default.
+func (t Token) kind() string {
+	if t.Kind == "" {
+		return TokenKind
+	}
+	return t.Kind
+}
+
 func Mint(r Roots, t Token) (Token, error) {
 	if err := checkTitle(t.Title); err != nil {
 		return t, err
+	}
+	// EVERY KIND HAS A SCHEMA, AND A NOTE DECLARING ONE WITHOUT IT IS REFUSED HERE.
+	//
+	// Two kinds exist, work-token and guidance, and each has one, so this binds
+	// nothing today. That is why it is worth writing now: the third kind cannot
+	// arrive without a schema, and there is no third kind yet to argue with.
+	//
+	// IT ASKS ABOUT THE KIND THE CALLER DECLARED. A caller naming none is writing
+	// the one kind the mint knows, and a tree with no schemas at all is a fixture
+	// rather than a copy of the method: making the default prove itself here would
+	// refuse most of the suite's fixtures while saying nothing about kinds. The
+	// lint is the other door, and it asks this of every note on disk, whoever
+	// wrote it and whether or not it came through here.
+	if t.Kind != "" {
+		if _, err := LoadSchema(r.Method, t.Kind); err != nil {
+			return t, fmt.Errorf("the kind %q has no schema in src/schemas, so nothing could read "+
+				"back what this would write: %w", t.Kind, err)
+		}
+	}
+	// A REQUIRED DONE WHEN IS REQUIRED AT THE MINT. Without it the file lands
+	// and the schema refuses it where nobody is looking. Refusing the call says
+	// the same rule sooner, to a caller who can still act.
+	if p, err := LoadProcess(r.Method, t.Process); err == nil &&
+		holdsName(p.RequiredSection, "done when") && len(t.Criteria) == 0 {
+		return t, fmt.Errorf("the %s process requires done when: give at least one criterion, "+
+			"with --done-when or done_when", t.Process)
 	}
 	for _, id := range t.DependsOn {
 		if _, err := LoadToken(r, id); err != nil {
