@@ -4,13 +4,15 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+
+	"quackitect/engine/internal/voice"
 )
 
 // The rules the product ships. The tests read them the way the guard does, so
 // a change to the file changes what the tests measure.
-func theRules(t *testing.T) VoiceRules {
+func theRules(t *testing.T) voice.Rules {
 	t.Helper()
-	v, err := LoadVoiceRules("../..")
+	v, err := voice.Load("../..")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -34,11 +36,11 @@ func TestTheVoiceCheckSeesWhatAProgramCanSee(t *testing.T) {
 	} {
 		got := theRules(t).Check(c.text)
 		if len(got) == 0 {
-			t.Errorf("%q broke %s and nothing was found", short60(c.text), c.rule)
+			t.Errorf("%q broke %s and nothing was found", voice.Short60(c.text), c.rule)
 			continue
 		}
 		if got[0].Rule != c.rule {
-			t.Errorf("%q was reported as %q, wanted %q", short60(c.text), got[0].Rule, c.rule)
+			t.Errorf("%q was reported as %q, wanted %q", voice.Short60(c.text), got[0].Rule, c.rule)
 		}
 	}
 }
@@ -82,7 +84,7 @@ func TestTheRulesCanBeSwapped(t *testing.T) {
 	  "rules": [{"name":"no shouting","pattern":"!","says":"an exclamation mark"}]
 	}`), 0o644)
 
-	v, err := LoadVoiceRules(root)
+	v, err := voice.Load(root)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -108,7 +110,7 @@ func TestAZeroRuleFileRefusesToLoad(t *testing.T) {
 	root := t.TempDir()
 	os.MkdirAll(filepath.Join(root, "util"), 0o755)
 	os.WriteFile(filepath.Join(root, "util", "voice-rules.json"), []byte(`{"rules":[]}`), 0o644)
-	if _, err := LoadVoiceRules(root); err == nil {
+	if _, err := voice.Load(root); err == nil {
 		t.Fatal("a file with zero rules loaded quietly, so every write would pass unchecked")
 	}
 }
@@ -120,10 +122,10 @@ func TestARulesFileThatWillNotLoadIsReported(t *testing.T) {
 	os.MkdirAll(filepath.Join(root, "util"), 0o755)
 	os.WriteFile(filepath.Join(root, "util", "voice-rules.json"),
 		[]byte(`{"rules":[{"name":"bad","pattern":"([","says":"x"}]}`), 0o644)
-	if _, err := LoadVoiceRules(root); err == nil {
+	if _, err := voice.Load(root); err == nil {
 		t.Fatal("a pattern that will not compile should be reported")
 	}
-	if _, err := LoadVoiceRules(t.TempDir()); err == nil {
+	if _, err := voice.Load(t.TempDir()); err == nil {
 		t.Fatal("a missing rules file should be reported")
 	}
 }

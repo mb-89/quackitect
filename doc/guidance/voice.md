@@ -31,6 +31,7 @@ For mechanical rules, see [[util/voice-rules.json]].
 11. DRY: do not repeat yourself. SPOT: single point of truth for every datum. A repetition in a spec, finding or answer is a defect. *
 12. Do not put history in the current surface. It goes into git commit messages.
 13. A number something else answers is never written down. The tree's count is the command that answers it. A list's count is the list. *
+14. A compression against a cap lists what it cut in the evidence, each sentence surviving elsewhere or cut on purpose. *
 
 # Discussion
 
@@ -89,3 +90,12 @@ A count of a list is the same fault, and it needs no time to go wrong.
 A sentence saying four regions above a list of six hands the reader two answers.
 The list is the one that cannot drift, because it is the items themselves.
 So the sentence introduces the list, and the list says how many.
+
+## 14. Paying for a cap
+
+A file at its word cap grew new chapters, and the writer paid by compressing the ones already there.
+The note said every incident and every citation survived.
+Chapters had lost their closing practice sentence, one its clock and seed, one its reason, one its citation.
+Nothing listed any of them, so the losses surfaced one at a time over later tokens.
+A claim that nothing was lost cannot be read back, and a reader who trusts it stops looking.
+So the change lists the sentences it cut in the evidence, where `se find` decides each one: still elsewhere, or gone on purpose.

@@ -5,6 +5,8 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"quackitect/engine/internal/voice"
 )
 
 // THE WRITE DOOR IS HELD TO THE VOICE RULES, THE WAY THE HARNESS'S IS.
@@ -27,7 +29,7 @@ func TestAnApplyIsHeldToTheVoiceRules(t *testing.T) {
 	if err := writeAtomic(filepath.Join(r.Method, "util", "voice-rules.json"), raw, 0o644); err != nil {
 		t.Fatal(err)
 	}
-	rules, err := LoadVoiceRules(r.Method)
+	rules, err := voice.Load(r.Method)
 	if err != nil {
 		t.Fatalf("the voice rules will not read: %v", err)
 	}
@@ -60,7 +62,7 @@ func TestAnApplyIsHeldToTheVoiceRules(t *testing.T) {
 
 // aBreachTheRulesSee answers a line this tree's own rules object to, so the
 // test asks the rules rather than assuming which words they carry.
-func aBreachTheRulesSee(t *testing.T, rules VoiceRules) string {
+func aBreachTheRulesSee(t *testing.T, rules voice.Rules) string {
 	t.Helper()
 	for _, try := range []string{
 		"It doesn't matter; the engine e.g. reads it.\n",

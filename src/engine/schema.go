@@ -6,6 +6,8 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+
+	"quackitect/engine/internal/voice"
 )
 
 // Reads a note kind's shape from src/schemas and validates a note against it.
@@ -346,11 +348,11 @@ func checkFront(spec FrontSpec, f Front, front string) []Departure {
 		if p.Type == "array" {
 			if _, isList := listValue(raw); !isList {
 				out = append(out, Departure{Line: frontLine(front, name),
-					Says: fmt.Sprintf("%s is a list in the schema, and it is written %q", name, fs(f, name))})
+					Says: fmt.Sprintf("%s is a list in the schema, and it is written %q", name, frontStr(f, name))})
 			}
 			continue
 		}
-		got := unlink(fs(f, name))
+		got := unlink(frontStr(f, name))
 		if p.Const != "" && got != "" && got != p.Const {
 			out = append(out, Departure{Line: frontLine(front, name),
 				Says: fmt.Sprintf("%s reads %q and the schema allows only %q", name, got, p.Const)})
@@ -700,7 +702,7 @@ func sentencesOf(text string) []string {
 		if strings.HasPrefix(strings.TrimSpace(para), "#") {
 			continue
 		}
-		out = append(out, sentencesIn(strings.Join(strings.Fields(para), " "))...)
+		out = append(out, voice.SentencesIn(strings.Join(strings.Fields(para), " "))...)
 	}
 	return out
 }

@@ -1,8 +1,10 @@
 package main
 
 import (
+	"errors"
 	"os"
 	"path/filepath"
+	"quackitect/engine/internal/replaced"
 	"strings"
 	"testing"
 	"time"
@@ -120,6 +122,216 @@ func TestTheBuildDoorIsTheEngines(t *testing.T) {
 			}
 		})
 	}
+}
+
+// A SWAP BUILDS EVERY PROGRAM THE TREE SHIPS, AND HANDS OVER ONLY THE ENGINE.
+//
+// The swap built src/engine alone while the installer builds three, so .bin was
+// half new after one. Measured: .bin/se.exe was written at 13:16 and
+// .bin/se-mcp.exe at 10:45, with src/mcp changed between them. The standing
+// check for the lane drives the binary in .bin, so it ran green against code
+// that was not in the tree. And a swap makes .bin/se the newest thing under the
+// source folders, which is what RUNME compares against, so nothing rebuilt the
+// stale lane either.
+//
+// THE FILES ARE THE FIXTURE AND NOT THE COMPILER. What is decided here is which
+// programs a swap moves into place, and compiling three modules to ask that is
+// what testing rule 13 names. The real build is driven by the battery, which
+// swaps on every run.
+func TestASwapBuildsEveryProgramTheManifestNames(t *testing.T) {
+	t.Parallel()
+	method := t.TempDir()
+	r := Roots{Method: method, Work: method}
+	if err := os.MkdirAll(filepath.Join(method, "util", "setup"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(method, "util", "setup", "manifest.json"), []byte(`{
+	  "builds": [
+	    {"name": "se", "source": "src/engine"},
+	    {"name": "logview", "source": "src/viewer"},
+	    {"name": "se-mcp", "source": "src/mcp"}
+	  ]
+	}`), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	// EVERY BUILD THE INSTALLER MAKES, READ FROM THE FILE IT READS.
+	got := theBuilds(method)
+	if len(got) != 3 {
+		t.Fatalf("the manifest names three programs and the swap reads %d: %+v", len(got), got)
+	}
+	for i, want := range []manifestBuild{
+		{Name: "se", Source: "src/engine"},
+		{Name: "logview", Source: "src/viewer"},
+		{Name: "se-mcp", Source: "src/mcp"},
+	} {
+		if got[i] != want {
+			t.Fatalf("the swap reads %+v where the manifest says %+v", got[i], want)
+		}
+	}
+
+	// A TREE THAT CANNOT BE READ STILL SWAPS THE ENGINE.
+	if bare := theBuilds(t.TempDir()); len(bare) != 1 || bare[0].Source != engineSource {
+		t.Fatalf("a tree with no manifest answered %+v, so a person there cannot replace the engine", bare)
+	}
+
+	// WHAT A BUILD LEFT: a next binary for each, over a .bin holding the old
+	// engine and the older lane.
+	if err := os.MkdirAll(filepath.Join(method, ".bin"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	for _, name := range []string{"se", "se-mcp"} {
+		if err := os.WriteFile(filepath.Join(method, ".bin", exeName(name)), []byte("what was there"), 0o755); err != nil {
+			t.Fatal(err)
+		}
+	}
+	for _, name := range []string{"se", "logview", "se-mcp"} {
+		if err := os.WriteFile(nextBinary(method, name), []byte("built by the swap: "+name), 0o755); err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	if err := putInPlace(r, nextBinary(method, "se")); err != nil {
+		t.Fatal(err)
+	}
+
+	// EVERY ONE OF THEM IS IN PLACE, and the lane is not left behind.
+	for _, name := range []string{"se", "logview", "se-mcp"} {
+		said, err := os.ReadFile(filepath.Join(method, ".bin", exeName(name)))
+		if err != nil {
+			t.Fatalf("%s is not in .bin after a swap: %v", name, err)
+		}
+		if string(said) != "built by the swap: "+name {
+			t.Fatalf(".bin/%s says %q after a swap, so the swap left it as it was", name, said)
+		}
+		if _, err := os.Stat(nextBinary(method, name)); err == nil {
+			t.Fatalf("%s was left at its build name as well as in place", name)
+		}
+	}
+
+	// AND WHAT IT REPLACED WAS MOVED ASIDE RATHER THAN DELETED, once each.
+	aside, err := os.ReadDir(replaced.WasDir(method))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(aside) != 2 {
+		t.Fatalf("two programs were replaced and %d were put aside", len(aside))
+	}
+
+	// THE HANDOVER IS THE ENGINE'S ALONE. Three programs were put in place and
+	// one is started, because one of them is the engine.
+	if engineAt(r) != filepath.Join(method, ".bin", exeName("se")) {
+		t.Fatalf("the swap would hand over to %s", engineAt(r))
+	}
+	for _, name := range []string{"logview", "se-mcp"} {
+		if engineAt(r) == filepath.Join(method, ".bin", exeName(name)) {
+			t.Fatalf("the swap would hand over to %s, which is not the engine", name)
+		}
+	}
+}
+
+// A SWAP BUILDS THE LANE, AND HANDS OVER THE ENGINE ALONE.
+//
+// The swap built src/engine and nothing else, so .bin/se-mcp.exe stayed at
+// whatever build it was. Measured: .bin/se.exe written at 13:16 and
+// .bin/se-mcp.exe at 10:45, with src/mcp changed between them. The standing
+// check for the lane drives the binary in .bin, so it ran green against code
+// that was not in the tree. A swap also makes .bin/se the newest thing under
+// the source folders, which is what RUNME compares against, so nothing
+// rebuilt the stale lane either.
+//
+// THE COMPILER IS HANDED IN. What is decided here is which programs a swap
+// builds and where each one goes, and asking that of three compilers is what
+// testing rule 13 names. The battery swaps on every run, so the real one is
+// driven there.
+func TestASwapBuildsTheLaneAndHandsOverTheEngineAlone(t *testing.T) {
+	t.Parallel()
+	method := aTreeShippingThree(t)
+	r := Roots{Method: method, Work: method}
+
+	type asked struct{ name, source, next, stamp string }
+	var built []asked
+	recorder := func(_ Roots, one manifestBuild, next, stamp string) error {
+		built = append(built, asked{one.Name, one.Source, next, stamp})
+		return os.WriteFile(next, []byte("built: "+one.Name), 0o755)
+	}
+
+	engine, err := buildNext(r, "abc1234.101112", recorder)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// EVERY PROGRAM THE MANIFEST NAMES, each from its own folder to its own
+	// build name. The lane is the one this token is about.
+	want := []asked{
+		{"se", "src/engine", nextBinary(method, "se"), "abc1234.101112"},
+		{"logview", "src/viewer", nextBinary(method, "logview"), "abc1234.101112"},
+		{"se-mcp", "src/mcp", nextBinary(method, "se-mcp"), "abc1234.101112"},
+	}
+	if len(built) != len(want) {
+		t.Fatalf("the manifest names %d programs and the swap built %d: %+v", len(want), len(built), built)
+	}
+	for i := range want {
+		if built[i] != want[i] {
+			t.Fatalf("the swap built %+v where the manifest says %+v", built[i], want[i])
+		}
+	}
+
+	// AND THE HANDOVER IS THE ENGINE'S ALONE. Three were built and one is
+	// answered for, because one of them is the program the engine is.
+	if engine != nextBinary(method, "se") {
+		t.Fatalf("a swap would hand over to %s", engine)
+	}
+	for _, name := range []string{"logview", "se-mcp"} {
+		if engine == nextBinary(method, name) {
+			t.Fatalf("a swap would hand over to %s, which is not the engine", name)
+		}
+	}
+
+	// AND ONE THAT WILL NOT BUILD LEAVES NOTHING BEHIND. A set half built is
+	// the state reading the manifest exists to avoid, and the next swap starts
+	// from nothing rather than from half of this one.
+	broken := aTreeShippingThree(t)
+	b := Roots{Method: broken, Work: broken}
+	stops := func(_ Roots, one manifestBuild, next, _ string) error {
+		if one.Name == "logview" {
+			return errors.New("undefined: something")
+		}
+		return os.WriteFile(next, []byte("built: "+one.Name), 0o755)
+	}
+	if _, err := buildNext(b, "abc1234.101112", stops); err == nil {
+		t.Fatal("a program did not build and the swap carried on")
+	} else if !strings.Contains(err.Error(), "logview") {
+		t.Fatalf("the refusal does not name what would not build: %v", err)
+	}
+	for _, name := range []string{"se", "logview", "se-mcp"} {
+		if _, err := os.Stat(nextBinary(broken, name)); err == nil {
+			t.Fatalf("%s was left at its build name after a swap that did not happen", name)
+		}
+	}
+}
+
+// aTreeShippingThree is a method root with the manifest this tree ships and a
+// .bin to build into. Every test makes its own, because every one writes to it.
+func aTreeShippingThree(t *testing.T) string {
+	t.Helper()
+	method := t.TempDir()
+	if err := os.MkdirAll(filepath.Join(method, "util", "setup"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(method, "util", "setup", "manifest.json"), []byte(`{
+	  "builds": [
+	    {"name": "se", "source": "src/engine"},
+	    {"name": "logview", "source": "src/viewer"},
+	    {"name": "se-mcp", "source": "src/mcp"}
+	  ]
+	}`), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.MkdirAll(filepath.Join(method, ".bin"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	return method
 }
 
 // A SWAP THAT WOULD REPLACE AN ENGINE WITH ITSELF IS REFUSED.

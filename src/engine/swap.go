@@ -7,6 +7,8 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"quackitect/engine/internal/quiet"
+	"quackitect/engine/internal/replaced"
 	"strings"
 	"time"
 )
@@ -59,7 +61,7 @@ type swapPlan struct {
 // current and ran the old verbs against the new tree.
 func buildStamp(method string) string {
 	commit := "nogit"
-	out, err := Quietly(exec.Command("git", "-C", method, "rev-parse", "--short", "HEAD")).Output()
+	out, err := quiet.Quietly(exec.Command("git", "-C", method, "rev-parse", "--short", "HEAD")).Output()
 	if err == nil {
 		if s := strings.TrimSpace(string(out)); s != "" {
 			commit = s
@@ -68,31 +70,139 @@ func buildStamp(method string) string {
 	return commit + "." + time.Now().Format("150405")
 }
 
-// buildNext builds the engine to a name of its own and answers where it is.
+// engineSource is the folder the engine itself is built from. Every program
+// the manifest names is built by a swap, and this is the one it hands over to.
+const engineSource = "src/engine"
+
+// manifestBuild is one program this tree ships: its name in .bin and the folder
+// it comes from.
+type manifestBuild struct {
+	Name   string `json:"name"`
+	Source string `json:"source"`
+}
+
+// theBuilds answers every program the tree ships, read from the file the
+// installer builds from, so the install door and the swap door cannot disagree
+// about what .bin holds.
+//
+// MEASURED. The swap built src/engine alone while the installer built three, so
+// .bin was half new after one. .bin/se.exe was written at 13:16 and
+// .bin/se-mcp.exe at 10:45 with src/mcp changed between them, and the standing
+// check for the lane drove that older program and passed on code that was not
+// in the tree. A swap also makes .bin/se the newest thing under the source
+// folders, which is what RUNME compares against, so nothing rebuilt the stale
+// lane either.
+//
+// A TREE WITH NO MANIFEST STILL SWAPS. The engine is the one program a swap
+// must have, and a file that will not read is no reason to leave a person with
+// no way to replace it.
+func theBuilds(method string) []manifestBuild {
+	only := []manifestBuild{{Name: "se", Source: engineSource}}
+	b, err := os.ReadFile(filepath.Join(method, "util", "setup", "manifest.json"))
+	if err != nil {
+		return only
+	}
+	var read struct {
+		Builds []manifestBuild `json:"builds"`
+	}
+	if err := json.Unmarshal(b, &read); err != nil {
+		return only
+	}
+	var out []manifestBuild
+	for _, one := range read.Builds {
+		if one.Name != "" && one.Source != "" {
+			out = append(out, one)
+		}
+	}
+	if len(out) == 0 {
+		return only
+	}
+	return out
+}
+
+// nextName is where a program is built before it is put in place. It is never
+// the running name: building over a program that is running fails on Windows
+// and, where it does not, replaces a file other processes are still reading.
+func nextBinary(method, name string) string {
+	return filepath.Join(method, ".bin", exeName(name+".next"))
+}
+
+// theEngine is the program a swap hands over to. Every program the manifest
+// names is built and put in place, and this is the only one that is started,
+// because it is the only one the engine is.
+func engineAt(r Roots) string {
+	return filepath.Join(r.Method, ".bin", exeName("se"))
+}
+
+// buildNext builds every program the tree ships, each to a name of its own,
+// and answers where the next engine is.
+//
+// EVERY PROGRAM, BECAUSE .BIN IS ONE SET. Building the engine alone left the
+// lane and the log window at whatever build they were, and the standing check
+// for the lane then drove a binary that was not in the tree. The manifest is
+// the one list, so the install door and this one cannot disagree.
+//
+// AND ONE THAT WILL NOT BUILD STOPS THE WHOLE SWAP, because a set half
+// replaced is the defect this reads the manifest to end.
 //
 // IT IS NOT THE RUNNING NAME. Building over the program that is running fails
 // on Windows and, where it does not, replaces a binary other processes are
 // still reading. The move is a separate act, and it happens only after this
 // one has answered.
-func buildNext(r Roots, stamp string) (string, error) {
-	next := filepath.Join(r.Method, ".bin", exeName("se.next"))
-	_ = os.Remove(next) // whatever a failed swap left behind
+func buildNext(r Roots, stamp string, build buildOne) (string, error) {
+	engine := ""
+	for _, one := range theBuilds(r.Method) {
+		next := nextBinary(r.Method, one.Name)
+		_ = os.Remove(next) // whatever a failed swap left behind
+		if err := build(r, one, next, stamp); err != nil {
+			dropNexts(r)
+			return "", fmt.Errorf("%s did not build, so this engine stays: %w", one.Name, err)
+		}
+		if one.Source == engineSource {
+			engine = next
+		}
+	}
+	if engine == "" {
+		dropNexts(r)
+		return "", fmt.Errorf("nothing the manifest builds comes from %s, "+
+			"so there is no next engine to hand over to", engineSource)
+	}
+	return engine, nil
+}
+
+// buildOne builds one program the manifest names, to the path it is given.
+//
+// IT IS HANDED IN. What a swap decides is which programs it builds and where
+// each one goes, and asking that of three compilers is what testing rule 13
+// names. The battery swaps on every run, so the real one is driven there.
+type buildOne func(r Roots, one manifestBuild, next, stamp string) error
+
+// goBuild is the real one.
+func goBuild(r Roots, one manifestBuild, next, stamp string) error {
 	// -gcflags=-e LIFTS THE ERROR CAP, so a sweep of undefined symbols comes
 	// back in one round rather than a batch at a time.
-	cmd := Quietly(exec.Command("go", "build", "-C", filepath.Join(r.Method, "src", "engine"),
+	cmd := quiet.Quietly(exec.Command("go", "build", "-C", filepath.Join(r.Method, one.Source),
 		"-gcflags=-e", "-ldflags", "-X main.Build="+stamp, "-o", next, "."))
 	cmd.Dir = r.Method
 	cmd.Env = buildEnv()
 	if said, err := cmd.CombinedOutput(); err != nil {
-		return "", fmt.Errorf("the next engine did not build, so this one stays: %s", tailOf(string(said), 2000))
+		return errors.New(tailOf(string(said), 2000))
 	}
-	return next, nil
+	return nil
+}
+
+// dropNexts takes away what a swap built and will not install, so the next one
+// starts from nothing rather than from half a set.
+func dropNexts(r Roots) {
+	for _, one := range theBuilds(r.Method) {
+		_ = os.Remove(nextBinary(r.Method, one.Name))
+	}
 }
 
 // answersForItself runs a binary and answers which build it says it is. A
 // program that will not start, or will not say, is not one to hand a tree to.
 func answersForItself(exe string) (string, error) {
-	cmd := Quietly(exec.Command(exe, "--version"))
+	cmd := quiet.Quietly(exec.Command(exe, "--version"))
 	var said []byte
 	done := make(chan error, 1)
 	go func() {
@@ -125,7 +235,7 @@ func planSwap(r Roots, why string, built bool) (swapPlan, error) {
 	if built {
 		// THE PROGRAM ON DISK IS THE ONE TO RUN. The battery has already built
 		// it, and building it again would put a second stamp on the same code.
-		live := filepath.Join(r.Method, ".bin", exeName("se"))
+		live := engineAt(r)
 		stamp, err := answersForItself(live)
 		if err != nil {
 			return swapPlan{}, fmt.Errorf("the program in .bin is not one to hand over to: %w", err)
@@ -137,12 +247,12 @@ func planSwap(r Roots, why string, built bool) (swapPlan, error) {
 		return swapPlan{Build: stamp, Why: why}, nil
 	}
 	stamp := buildStamp(r.Method)
-	next, err := buildNext(r, stamp)
+	next, err := buildNext(r, stamp, goBuild)
 	if err != nil {
 		return swapPlan{}, err
 	}
 	if _, err := answersForItself(next); err != nil {
-		_ = os.Remove(next)
+		dropNexts(r)
 		return swapPlan{}, fmt.Errorf("the next engine built and %w, so this one stays", err)
 	}
 	return swapPlan{Next: next, Build: stamp, Why: why}, nil
@@ -161,8 +271,12 @@ func drainCalls(budget time.Duration) int64 {
 	return theLoad.verbsInFlight.Load()
 }
 
-// putInPlace moves the built engine over the running name and gives it both
-// its names again.
+// putInPlace moves every program the swap built over its running name and
+// gives each of them both its names again.
+//
+// THE ENGINE IS ONE OF THEM AND NOT ALL OF THEM. next says a swap is landing
+// rather than which file moves: the set comes from the manifest, the same list
+// the build read, so what lands is what was built.
 //
 // THE OLD ONE IS MOVED ASIDE RATHER THAN DELETED. Windows allows a running
 // program to be renamed and refuses to have it overwritten, so the processes
@@ -172,22 +286,30 @@ func putInPlace(r Roots, next string) error {
 	if next == "" {
 		return nil // the program on disk is already the one to run
 	}
-	live := filepath.Join(r.Method, ".bin", exeName("se"))
-	if _, err := os.Stat(live); err == nil {
-		// IT GOES WHERE EVERY REPLACED PROGRAM GOES, which is .bin/was and not
-		// beside the one that replaced it. See wasbin.go.
-		if _, err := PutAside(r.Method, live); err != nil {
-			return fmt.Errorf("the running engine could not be moved aside: %w", err)
+	var names []string
+	for _, one := range theBuilds(r.Method) {
+		names = append(names, one.Name)
+		built := nextBinary(r.Method, one.Name)
+		if _, err := os.Stat(built); err != nil {
+			continue // nothing was built under this name, so nothing moves
 		}
-	}
-	if err := os.Rename(next, live); err != nil {
-		return fmt.Errorf("the next engine could not be put in place: %w", err)
+		live := filepath.Join(r.Method, ".bin", exeName(one.Name))
+		if _, err := os.Stat(live); err == nil {
+			// IT GOES WHERE EVERY REPLACED PROGRAM GOES, which is .bin/was and
+			// not beside the one that replaced it. See internal/replaced.
+			if _, err := replaced.PutAside(r.Method, live); err != nil {
+				return fmt.Errorf("the running %s could not be moved aside: %w", one.Name, err)
+			}
+		}
+		if err := os.Rename(built, live); err != nil {
+			return fmt.Errorf("the next %s could not be put in place: %w", one.Name, err)
+		}
 	}
 	// TWO NAMES, ONE FILE. The cage names .bin/se with no extension because it
 	// travels, and on Windows the engine is se.exe. A build that replaces one
 	// and leaves the other pointing at what was there before is how every hook
 	// in the cage stops firing with nothing to say why.
-	if _, err := LinkBothNames(r.Method, []string{"se", "se-mcp", "logview"}); err != nil {
+	if _, err := LinkBothNames(r.Method, names); err != nil {
 		return fmt.Errorf("the engine could not be given both its names: %w", err)
 	}
 	return nil
@@ -196,13 +318,13 @@ func putInPlace(r Roots, next string) error {
 // handOver starts the successor over the same tree and tells it which log
 // session it is continuing.
 func handOver(r Roots, session string) error {
-	exe := filepath.Join(r.Method, ".bin", exeName("se"))
+	exe := engineAt(r)
 	out, err := os.OpenFile(r.Private("engine.out"), os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0o644)
 	if err != nil {
 		return err
 	}
 	defer out.Close()
-	cmd := Detached(Quietly(exec.Command(exe, "--work", r.Work, "--method", r.Method)))
+	cmd := quiet.Detached(quiet.Quietly(exec.Command(exe, "--work", r.Work, "--method", r.Method)))
 	// THE SESSION RIDES OUT OF BAND. A swap is one session with two processes
 	// in it, and retiring the log at the handover would split the record of one
 	// stretch of work in half at a moment nobody chose.

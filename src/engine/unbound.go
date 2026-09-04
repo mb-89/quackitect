@@ -40,11 +40,12 @@ const (
 	// nobody at it stays.
 	Bound TheBinding = "bound"
 
-	// Unbound is the PROCESS off and the SAFETY on. No token is needed to
-	// write or to run a command, the queue stops being told what to hand out,
-	// and nobody is made to spawn. The record, the voice rules, the schema's
-	// caps, the stale-write refusal, answering the person and claiming a stop
-	// all stand: those protect the tree and the person, not the procedure.
+	// Unbound is the QUEUE off and everything else on. The queue stops being
+	// told what to hand out and nobody is made to spawn, so the agent picks its
+	// own work. It still writes a token for that work, and every write and every
+	// run still names one: a record with holes in it is not a procedure anybody
+	// gets to drop. The voice rules, the schema's caps, the stale-write refusal,
+	// answering the person and claiming a stop all stand as well.
 	Unbound TheBinding = "unbound"
 
 	// God is every refusal off, including the ones that protect the tree. It
@@ -97,9 +98,10 @@ func SetBinding(r Roots, to TheBinding, by string) (Binding, error) {
 	b := Binding{At: to, By: by, Since: time.Now().UTC().Format(time.RFC3339)}
 	switch to {
 	case Unbound:
-		b.Says = "A person took the queue off you. You need no token to write or to run a " +
-			"command, nothing will ask you to spawn, and the queue will not choose your work. " +
-			"Do what they asked and nothing beside it. Everything that protects the tree still stands."
+		b.Says = "A person took the queue off you. Nothing will ask you to spawn and the queue " +
+			"will not choose your work, so work on what they asked for, including a token " +
+			"nobody handed you. Write that token, and name it on every write and every run, " +
+			"the way you would on any other. Do what they asked and nothing beside it."
 	case God:
 		b.Says = "A person turned the engine's refusals off, because something in the engine is " +
 			"in the way. Nothing will stop you and nothing will check you. Do only what they " +
@@ -199,7 +201,7 @@ func SetAsked(r Roots, on bool, by string) (AskedToSay, error) {
 		a.By = by
 		a.Says = "The person asked what is happening. Answer with se_answer, before anything " +
 			"else: what you are working on, and what every subagent you spawned is working on. " +
-			"One message, and then carry on."
+			"One message, and then carry on.\n\n" + theShellDoor("--answer \"...\"")
 	}
 	if err := os.MkdirAll(r.Private(), 0o755); err != nil {
 		return a, err

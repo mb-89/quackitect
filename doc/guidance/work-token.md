@@ -77,9 +77,10 @@ A draft obeys the class it commits, and names a walk the tree already has rather
 
 ## 4. What a check may match on
 
-A two-part guard that pairs a search for a definition with a run of the test, naming different symbols, fails shut.
-So the identifier is written once into both halves, and the guard is run against the artefact on its own before submitting.
-Rendered text is no handle: a template or a renderer holds no text to match, so the durable handle is the producer's name.
+A two-part guard pairing a search for a definition with a run of the test, naming different symbols, fails shut.
+So the identifier is written once into both halves, and the guard is run against the artefact before submitting.
+A boundary in what the check cannot hold falls to a prefix that never fails, so a length is a number.
+Rendered text is no handle: a template holds no text to match, so the durable handle is the producer's name.
 
 ## 5. Every item the detail names
 
@@ -92,7 +93,7 @@ A spike closes on its own numbered questions, including those it declines, and a
 ## 9. Basics first
 
 The basics look self-evident, so nobody writes them down, and the gap is found after the feature.
-Before a feature token is worked, its detail names what it stands on, and each missing basic is minted first.
+Before a feature is worked, its detail names what it stands on, and each missing basic is minted first.
 
 ## 10. Tracked is claimable
 
@@ -108,15 +109,15 @@ A local token naming a tracked one is fine.
 
 ## 11. Next to the ask
 
-The token is the only thing a reader has to judge a change by.
-A change beside it is a change nobody asked for and nobody can find afterwards.
+The token is the only thing a reader can judge a change by.
+A change beside it is one nobody asked for and nobody can find afterwards.
 A question costs a turn, and a guess at an ambiguous ask costs the work and the turn that undoes it.
 
 ## 12. Red first
 
 A check that arrives green has proved nothing about the defect.
 Watched going red for the reason expected, it proves the defect was there and the check can see it.
-One that cannot be made to go red is a finding about the criterion, and it goes on the token first.
+One that cannot be made red is a finding about the criterion, and it goes on the token first.
 So the red is recorded per criterion.
 Each names the test its criterion runs, its message matches an assertion in the tree, and a split-out criterion earns a fresh red.
 
@@ -140,7 +141,7 @@ Before submitting, every command runs again with its fresh answer beside what wa
 
 ## 15. A checklist is not a formality
 
-The lines come from the process, and the process carries what earlier work learned the hard way.
-A line ticked without being read is the institutional knowledge thrown away and the tick kept.
-Where a line asks for evidence, the sentence is the answer and the tick only counts it.
-Where it asks for none, the tick is honest, because there is no artifact to name.
+The lines come from the process, which carries what earlier work learned the hard way.
+A line ticked without being read throws that knowledge away and keeps the tick.
+Where a line asks for evidence, the sentence is the answer and the tick counts it.
+Where it asks none, the tick is honest, because there is no artifact to name.

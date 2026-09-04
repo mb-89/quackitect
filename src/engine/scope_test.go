@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 )
 
 // A TOKEN WITH SUB-TOKENS IS A SCOPE, AND A SCOPE IS NOT LEFT WHILE ANYTHING
@@ -29,7 +30,6 @@ func aTreeWithOneStep(t *testing.T) Roots {
 	}
 	const proc = `name: task
 description: one step the queue hands out
-traced: false
 sections:
   required:
     - detail
@@ -66,7 +66,15 @@ func mintTask(t *testing.T, r Roots, title, parent string) Token {
 	if err != nil {
 		t.Fatalf("minting %q: %v", title, err)
 	}
-	return tok
+	// A TRACKED TOKEN NEEDS A CLAIM FROM THIS BOX BEFORE IT CAN BE WORKED.
+	if _, err := Claim(r, Claimant(r, "main"), []string{tok.ID}, time.Now().UTC()); err != nil {
+		t.Fatalf("claiming %q: %v", title, err)
+	}
+	back, err := LoadToken(r, tok.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return back
 }
 
 func TestAParentCannotCloseWhileASubTokenIsOpen(t *testing.T) {

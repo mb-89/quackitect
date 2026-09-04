@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"path/filepath"
+	"reflect"
 	"regexp"
 	"strings"
 	"testing"
@@ -20,6 +21,11 @@ import (
 // A REVIEWER THAT CANNOT REJECT IS NOT A REVIEWER, and the hole was a hand list
 // of seven keys beside a struct that declares more. So the list is held against
 // the struct rather than read once and trusted.
+//
+// THE LIST IS NOW A STRUCT TOO. pullPayload is what travels and pullArgs is
+// what the door takes, and both are read here by reflection rather than by
+// pattern over the source: a name is a name whatever gofmt does to the spacing
+// around it, and what an agent may send is what schema.go reads off pullArgs.
 func TestThePullDoorCarriesEveryFieldThePayloadHas(t *testing.T) {
 	t.Parallel()
 	b, err := os.ReadFile(filepath.Join("..", "engine", "pull.go"))
@@ -40,23 +46,17 @@ func TestThePullDoorCarriesEveryFieldThePayloadHas(t *testing.T) {
 		t.Fatal("the Payload struct declares no json field, so this guards nothing")
 	}
 
-	// WHAT THIS DOOR FORWARDS, read out of the door rather than typed here again.
-	door, err := os.ReadFile("lane.go")
-	if err != nil {
-		t.Fatal(err)
-	}
-	forwards := regexp.MustCompile(`for _, k := range \[\]string\{([^}]*)\}`).FindStringSubmatch(string(door))
-	if forwards == nil {
-		t.Fatal("no list of forwarded keys was found in lane.go, so this guards nothing")
-	}
+	// WHAT THIS DOOR SENDS, AND WHAT IT INVITES, read off the two types the
+	// lane declares rather than typed here again.
 	sends := map[string]bool{}
-	for _, one := range strings.Split(forwards[1], ",") {
-		sends[strings.Trim(strings.TrimSpace(one), `"`)] = true
+	for _, name := range fieldNames(reflect.TypeOf(pullPayload{})) {
+		sends[name] = true
+	}
+	invites := map[string]bool{}
+	for _, name := range keys(schemaOf(pullArgs{})["properties"].(map[string]any)) {
+		invites[name] = true
 	}
 
-	// AND THE SCHEMA SAYS SO, because a key forwarded and not declared is a key
-	// no caller knows to send.
-	declared := string(door)
 	for _, tag := range tags {
 		name := tag[1]
 		if !sends[name] {
@@ -64,15 +64,25 @@ func TestThePullDoorCarriesEveryFieldThePayloadHas(t *testing.T) {
 				"so nothing reaching the engine through here can ever set it", name)
 			continue
 		}
-		// GOFMT DECIDES THE SPACING, NOT THE AUTHOR, so the gap after the colon
-		// is no part of what is being asked. gofmt aligns a property block on
-		// its longest key, so every shorter key is padded and a single-space
-		// match can only ever find the longest one. Matching a literal here
-		// failed shut: the four short keys were declared and still reported
-		// missing, and no correct schema could have turned it green.
-		if !regexp.MustCompile(`"` + regexp.QuoteMeta(name) + `":\s*map\[string\]any\{`).MatchString(declared) {
+		// AND THE SCHEMA SAYS SO, because a field forwarded and not advertised is
+		// one no caller knows to send.
+		if !invites[name] {
 			t.Errorf("this door forwards %q and its schema never declares it, so no caller "+
 				"knows to send it", name)
+		}
+	}
+
+	// AND NOTHING TRAVELS THAT THE ENGINE WOULD DROP. A field the payload has
+	// not got is one json.Unmarshal discards without a word, which is a door
+	// inviting an agent to fill in something nothing reads.
+	carries := map[string]bool{}
+	for _, tag := range tags {
+		carries[tag[1]] = true
+	}
+	for name := range sends {
+		if !carries[name] {
+			t.Errorf("this door sends %q and the engine's payload has no such field, so the "+
+				"engine drops it without a word", name)
 		}
 	}
 }

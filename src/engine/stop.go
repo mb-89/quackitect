@@ -167,6 +167,11 @@ func StandingClaim(r Roots, actor string) (StopClaim, bool) {
 
 // SpendClaim is what the guard calls before every tool, and it is the only
 // thing that ends a claim. Working again is changing your mind.
+// THE ARGUMENT'S COUNT IS NOT CLEARED HERE, and that is measured rather than
+// chosen. se_stop is itself a tool call, so this runs between the claim and the
+// Stop event it is for: clearing the count here reset it on every claim, the
+// count never reached three, and no stop could ever be granted. The session was
+// wedged, which is worse than the valve this rule replaced.
 func SpendClaim(r Roots, actor string) {
 	_ = locked(claimPath(r), func() error { // a claim it cannot drop is dropped when the session rotates
 		all := loadClaims(r)
@@ -196,16 +201,57 @@ func TheList(reason string) string {
 	if strings.TrimSpace(reason) != "" {
 		b.WriteString(reason + "\n\n")
 	}
+	// THE FIRST LINE IS THE CALL TO MAKE, because an agent that has not claimed
+	// reads this whole notice as an argument it is losing.
+	//
+	// THE OWNER'S WORDS: the important thing is you still have to claim. Ask is
+	// not granted if you didn't claim.
+	//
+	// AN AGENT ANSWERED THE PERSON AND THEN CLAIMED, then claimed and then
+	// answered. Either way the claim was not standing when the stop was judged,
+	// because an answer is a call and a call clears it. The notice came back, the
+	// agent read a cleared claim as a refused one, and the person watched eleven
+	// turns of it. So the order is said first, and said as two calls.
+	b.WriteString("NO CLAIM IS STANDING, SO THE STOP IS NOT GRANTED. Claim one:\n\n" +
+		"  se_stop {because: \"<which one>\", why: \"<one line>\"}\n\n" +
+		"THEN STOP, AND MAKE THAT CLAIM YOUR LAST CALL. A status, a search and an\n" +
+		"answer to the person are all calls, and every call after the claim clears it.\n\n")
 	b.WriteString("THESE STOPS ARE SANCTIONED AND NOTHING ELSE IS.\n")
 	for _, s := range sanctioned {
 		fmt.Fprintf(&b, "  %-9s %s\n", s.ID, s.Says)
 	}
 	b.WriteString("\nThese are not: being unsure, having a lot left, having just finished a " +
 		"piece, or wanting to say what you did. An update is not a stop. Give it and carry on.\n")
+	// THE QUESTIONS COME BEFORE THE LIST.
+	//
+	// THE OWNER'S WORDS: it needs to ask you, do you need anything actionable
+	// from the user? Are you sure that you cannot just continue?
+	//
+	// A LIST TEACHES THE WORDS. An agent served this eight times in one session
+	// read it, picked whichever of the five fitted, and stopped. The list says
+	// what a sanctioned stop is called; it never asked whether one is true here,
+	// so the answer was a lookup rather than a judgement.
+	b.WriteString("\nBEFORE YOU PICK ONE, ANSWER THESE TO YOURSELF.\n" +
+		"  Is there something you need that only they can give? Name it, or there is not.\n" +
+		"  Can you carry on with what is in your hands? If you can, carry on.\n" +
+		"  Is what you are about to claim true, or is it the nearest word that fits?\n")
+	// THE CLAIM IS CLEARED BY THE NEXT CALL, AND THAT HAS TO BE SAID PLAINLY.
+	//
+	// "Do anything and it is gone" was read as "do work and it is gone". An agent
+	// claimed broken, then asked the engine for its status, and the status cleared
+	// the claim. This notice came back unchanged, so the agent claimed again, and
+	// checked again, and went round forty times. Nothing in the notice said the
+	// claim had been cleared, or by what, so a repeat looked like a refusal.
+	//
+	// SO IT NAMES THE CALLS THAT CLEAR IT, and it says what a second refusal means.
+	// A reading that has cost a session is worth three lines to close.
 	b.WriteString("\nSTOPPING FOR ONE OF THOSE? SAY SO ON THE RECORD, then stop again:\n" +
 		"  se_stop {because: \"<which one>\", why: \"<one line>\"}\n" +
 		"  " + theShellDoor("stop --because <which one> --why \"<one line>\"") + "\n" +
 		"Saying it in chat is not enough. Nothing can read chat.\n" +
-		"The claim stands while you are stopped. Do anything and it is gone.")
+		"\nMAKE THE CLAIM YOUR LAST CALL. Every call after it clears the claim, and a\n" +
+		"status, a search or an answer to the person is a call.\n" +
+		"SO A SECOND REFUSAL MEANS THE CLAIM WAS CLEARED, never that it was refused.\n" +
+		"Claim again, and this time stop on it.")
 	return b.String()
 }

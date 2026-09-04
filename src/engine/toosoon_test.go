@@ -71,7 +71,6 @@ func aTreeWithThreeSteps(t *testing.T) Roots {
 	}
 	const proc = `name: three
 description: three steps, so there is a step after the one in hand
-traced: false
 sections:
   required:
     - detail

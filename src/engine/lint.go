@@ -42,6 +42,10 @@ func LintTokens(r Roots) []Finding {
 				out = append(out, Finding{ID: t.ID, Title: t.Title,
 					Says: "a token carries no time, and this one carries " + line})
 			}
+			for _, line := range holdersIn(string(b)) {
+				out = append(out, Finding{ID: t.ID, Title: t.Title,
+					Says: "a hold ends with the session, so the record goes stale: " + line})
+			}
 		}
 	}
 	return out
@@ -123,6 +127,10 @@ func LintLimits(r Roots) []Finding {
 	var out []Finding
 	floor := TheFloor()
 	inGo := map[string]int{
+		// THE NUMBER OF HANDS IS ONE DATUM IN TWO FILES. A box with no tree
+		// reads the floor and a box with one reads the declaration, so a change
+		// to either alone is two machines staffing the queue differently.
+		"quackitect.limits.parallel_agents":            floor.ParallelAgents,
 		"quackitect.limits.heartbeat_seconds":          floor.HeartbeatSeconds,
 		"quackitect.limits.ready_budget_ms":            floor.ReadyBudgetMs,
 		"quackitect.limits.pulls_before_hold_is_stale": floor.PullsBeforeHoldIsStale,
@@ -190,6 +198,29 @@ func timesIn(text string) []string {
 		for _, key := range []string{"opened:", "taken_at:", "sent_at:", "closed_at:", "**at:**", "at:"} {
 			if strings.HasPrefix(l, key) {
 				found = append(found, l)
+			}
+		}
+	}
+	return found
+}
+
+// A TOKEN CARRIES NO HOLDER EITHER, and this is the same rule reaching prose.
+// A hold ends with the session, so a note saying who holds something is wrong
+// from the next session on, and nobody rereads it. The engine holds the holds
+// and answers for them, so the note names the door rather than the answer.
+//
+// IT IS THE SPELLINGS RATHER THAN ONE OF THEM. Saying a token is unheld goes
+// stale exactly as fast as saying who has it, so both are here, and a line that
+// names an actor without claiming a hold is left alone.
+func holdersIn(text string) []string {
+	var found []string
+	for _, line := range strings.Split(text, "\n") {
+		l := strings.TrimSpace(line)
+		low := strings.ToLower(l)
+		for _, says := range []string{"held by", "is held", "the holder is", "unheld"} {
+			if strings.Contains(low, says) {
+				found = append(found, l)
+				break
 			}
 		}
 	}

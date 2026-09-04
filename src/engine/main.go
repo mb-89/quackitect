@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
+	"quackitect/engine/internal/replaced"
 	"strings"
 	"sync"
 	"syscall"
@@ -554,6 +555,16 @@ func main() {
 	// This start is the first moment anything can put it in the record.
 	RecordFinishedBattery(roots, log)
 
+	// AND WORK LEFT BEHIND BY A HAND THAT IS GONE. A token held by an agent this
+	// run no longer has is work the queue counts as in hand and gives to nobody,
+	// and the panel draws a row for the holder, so the dead look busy. See
+	// goneputsdown.go.
+	if back := SweepWorkHeldByTheGone(roots); len(back) > 0 {
+		log.Write("engine", "start", "engine",
+			"work held by agents that are gone went back to the queue", Yes(),
+			map[string]any{"put_down": back})
+	}
+
 	// AND WHAT A KILLED WRITE LEFT BEHIND. A swap ends the old engine while a
 	// heartbeat's write is in flight, so a temp file is orphaned under .se with
 	// nothing owning it.
@@ -564,9 +575,9 @@ func main() {
 
 	// AND THE PROGRAMS THIS TREE USED TO SHIP. One that will not delete is one
 	// a process is still running from, and it stays until that process ends.
-	if swept := SweepWhatWasReplaced(roots.Method); swept > 0 {
+	if swept := replaced.SweepWhatWasReplaced(roots.Method); swept > 0 {
 		log.Write("engine", "start", "engine", "programs nothing is running any more were swept", Yes(),
-			map[string]any{"swept": swept, "from": WasDir(roots.Method)})
+			map[string]any{"swept": swept, "from": replaced.WasDir(roots.Method)})
 	}
 
 	// TWO NAMES, ONE FILE. Installing links them, so the cage and RUNME call

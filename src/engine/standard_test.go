@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 )
 
 // THE STANDARD PROCESS: the change lands, a second agent gives one verdict,
@@ -43,7 +44,25 @@ func aTreeWithTheProcesses(t *testing.T) Roots {
 	return r
 }
 
+// mintStandard hands back a tracked token this box may work, claim and all.
+//
+// A TRACKED TOKEN NEEDS A CLAIM BEFORE IT IS WORKED, so a fixture that did not
+// take one handed every test a token the gate refuses. A test about claiming
+// wants mintUnclaimed, which is this without the claim.
 func mintStandard(t *testing.T, r Roots, title string) Token {
+	t.Helper()
+	tok := mintUnclaimed(t, r, title)
+	if _, err := Claim(r, Claimant(r, "main"), []string{tok.ID}, time.Now().UTC()); err != nil {
+		t.Fatalf("claiming the fixture token: %v", err)
+	}
+	back, err := LoadToken(r, tok.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return back
+}
+
+func mintUnclaimed(t *testing.T, r Roots, title string) Token {
 	t.Helper()
 	tok, err := Mint(r, Token{Tracked: tracked(), Process: "standard", Title: title, Status: "open",
 		Detail:   "a change that wants an approach first and a verdict after",
@@ -252,23 +271,23 @@ func TestTheQueueIsStaffed(t *testing.T) {
 	// loads its own config out of the tree, so it read the declared five while
 	// the story said two, and the last three assertions were about a number
 	// nobody had set. Storing it is how a person sets it, so both halves agree.
-	theParametersSay(t, r, "limits.parallel_agents", 2)
+	theParametersSay(t, r, "limits.parallel_agents", 3)
 	cfg := LoadConfig(r)
-	if cfg.ParallelAgents != 2 {
-		t.Fatalf("the tree says two parallel agents and the config reads %d", cfg.ParallelAgents)
+	if cfg.ParallelAgents != 3 {
+		t.Fatalf("the tree says three parallel agents and the config reads %d", cfg.ParallelAgents)
 	}
 
-	// FOUR OPEN TOKENS WANT TWO WORKERS, because there is work for both.
+	// FOUR OPEN TOKENS WANT THREE WORKERS, because there is work for all three.
 	for i := 0; i < 4; i++ {
 		mintStandard(t, r, "open work")
 	}
 	s := StaffingOf(r, cfg)
-	if s.OpenWork != 4 || s.WorkersWanted != 2 || s.WorkersHere != 0 {
+	if s.OpenWork != 4 || s.WorkersWanted != 3 || s.WorkersHere != 0 {
 		t.Fatalf("four open tokens: %+v", s)
 	}
-	// AND FIVE STILL WANT TWO, because the number is a maximum.
+	// AND FIVE STILL WANT THREE, because the number is a maximum.
 	mintStandard(t, r, "one more")
-	if s := StaffingOf(r, cfg); s.WorkersWanted != 2 {
+	if s := StaffingOf(r, cfg); s.WorkersWanted != 3 {
 		t.Fatalf("five open tokens want %d workers", s.WorkersWanted)
 	}
 
@@ -288,6 +307,12 @@ func TestTheQueueIsStaffed(t *testing.T) {
 	if said := decide("Bash"); !strings.Contains(said, "spawn 2 subagents") {
 		t.Fatalf("the main agent was not held for two workers: %s", said)
 	}
+	// AND ITS OWN CALL PUT IT IN THE REGISTER, WHERE IT COUNTS AS A WORKER.
+	// Three is the main agent and two spawned, so it is asked for two rather
+	// than three.
+	if s := StaffingOf(r, cfg); s.WorkersHere != 1 {
+		t.Fatalf("the main agent has called and the count says %d worker(s): %+v", s.WorkersHere, s)
+	}
 	if said := decide("Read"); strings.Contains(said, "deny") {
 		t.Fatalf("a read was refused, so the agent cannot read the guard refusing it: %s", said)
 	}
@@ -305,7 +330,7 @@ func TestTheQueueIsStaffed(t *testing.T) {
 	}
 
 	// A HELPER THAT PULLS IS A HAND, and the token it takes leaves the open
-	// count: four open want one worker, and one is here.
+	// count: four open want three workers, and two of the three are here.
 	tellHelper := func(id, actor string) {
 		t.Helper()
 		body, _ := json.Marshal(map[string]any{"hook_event_name": "PreToolUse", "cwd": r.Work, "session_id": "s-1",
@@ -316,14 +341,19 @@ func TestTheQueueIsStaffed(t *testing.T) {
 		Pull(r, actor, RoleWorker, Payload{})
 	}
 	tellHelper("a1", "worker-a")
-	if s := StaffingOf(r, cfg); s.OpenWork != 4 || s.WorkersHere != 1 || s.WorkersWanted != 2 {
+	if s := StaffingOf(r, cfg); s.OpenWork != 4 || s.WorkersHere != 2 || s.WorkersWanted != 3 {
 		t.Fatalf("after one helper pulled: %+v", s)
 	}
-	// ONE OF THE TWO IS HERE, so the main agent is still held for the other.
+	// TWO OF THE THREE ARE HERE, so the main agent is still held for the third.
 	if said := decide("Bash"); !strings.Contains(said, "spawn 1 subagent") {
 		t.Fatalf("with one of two here, the main agent was not held for the second: %s", said)
 	}
 	tellHelper("a2", "worker-b")
+	// THREE WORKERS IS THE MAIN AGENT AND TWO SPAWNED, so the shortfall lifts
+	// here rather than at a third spawn.
+	if s := StaffingOf(r, cfg); s.WorkersHere != 3 {
+		t.Fatalf("the main agent and two spawned workers counted %d: %+v", s.WorkersHere, s)
+	}
 	// THE SHORTFALL IS WHAT LIFTS, and not every refusal. A bare Bash is still
 	// refused by the command gate, which is a different rule and stays.
 	if said := decide("Bash"); strings.Contains(said, "THE QUEUE WANTS MORE HANDS") {

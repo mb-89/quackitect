@@ -1,5 +1,5 @@
 {
-  "$comment": "THE PER-CALL EVENTS GO TO THE ENGINE THAT LIVES, over HTTP, so no process is started per tool call. SessionStart stays a command, because it is what brings the engine up. The timeout is short: an engine that has not answered is one that is not there, and the call goes on.",
+  "$comment": "THE PER-CALL EVENTS GO TO THE ENGINE THAT LIVES, over HTTP, so no process is started per tool call. SessionStart stays a command, because it is what brings the engine up. The timeout is short: an engine that has not answered is one that is not there, and the call goes on. WHAT EACH EVENT FIRES WAS MEASURED OFF THE RECORD, and the table is on wk-218e541ec2. Every event below has arrived, under the command line and under the editor, apart from PreCompact. PreCompact stays because no session in the record has compacted, and the read set has to be dropped when one does. PostCompact was struck: it never arrived, and a SessionStart whose source is compact is the same moment.",
   "outputStyle": "quackitect",
   "hooks": {
     "PreToolUse": [
@@ -130,18 +130,6 @@
       }
     ],
     "Notification": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "http",
-            "url": "{{hooks}}",
-            "timeout": 3
-          }
-        ]
-      }
-    ],
-    "PostCompact": [
       {
         "matcher": "",
         "hooks": [

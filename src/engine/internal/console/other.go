@@ -1,6 +1,6 @@
 //go:build !windows
 
-package main
+package console
 
 // Only Windows hands a console to a process that did not ask for one.
-func hideOwnConsole() {}
+func Hide() {}

@@ -26,6 +26,7 @@ func runClaim(c *call) int {
 		fmt.Fprintln(c.err, "  se claim --list               what is claimed, and by whom")
 		fmt.Fprintln(c.err, "  se claim --next 3             what the queue would hand you on three pulls")
 		fmt.Fprintln(c.err, "  se claim --these wk-aa,wk-bb  take these")
+		fmt.Fprintln(c.err, "  se claim --these wk-aa --take  take it and start on it")
 		fmt.Fprintln(c.err, "  se claim --release            give back everything you hold")
 		fmt.Fprintln(c.err, "")
 		fmt.Fprintln(c.err, "The engine says which box you are on. You say which agent you are,")
@@ -43,6 +44,7 @@ func runClaim(c *call) int {
 	whoami := fs.Bool("whoami", false, "print this box's name for this agent and exit")
 	sync := fs.Bool("sync", false, "look for other boxes' claims now, rather than waiting for the engine's clock")
 	quiet := fs.Bool("no-publish", false, "write the claim here and leave git alone")
+	take := fs.Bool("take", false, "with these: take the one token up as well, so a refused agent needs one call and not two")
 	if code, stop := c.parse(fs, "claim"); stop {
 		return code
 	}
@@ -96,6 +98,17 @@ func runClaim(c *call) int {
 	if len(moved) > 0 {
 		inSession(r, "claim", *actor, me+" "+verb+" "+strings.Join(moved, ", "), Yes(),
 			map[string]any{"claimant": me, "ids": moved, "at": res.At})
+	}
+	// CLAIMING AND TAKING IN ONE CALL. An agent refused for want of a claim is
+	// told to claim, and it would then need a second call to do the work it was
+	// already on. One id, because taking up two tokens is not a thing: the
+	// holder is one at a time.
+	if *take && !*release && len(res.Taken) == 1 {
+		if _, err := TakeUp(r, res.Taken[0], *actor); err != nil {
+			res.Notice = "claimed, and the take-up was refused: " + err.Error()
+		} else {
+			res.Notice = res.Taken[0] + " is claimed and in your hands"
+		}
 	}
 	if !*quiet {
 		p := Publish(r, res.Files, ClaimMessage(me, verb, moved))

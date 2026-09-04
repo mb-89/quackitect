@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"quackitect/engine/internal/voice"
 )
 
 // UNBINDING TAKES THE PROCESS OFF AND LEAVES THE SAFETY ON.
@@ -36,10 +38,11 @@ func TestUnboundTakesTheQueueOffAndLeavesTheTreeGuarded(t *testing.T) {
 		t.Fatal("unbinding took every guard off, and it takes the process off")
 	}
 
-	// THE PROCESS IS OFF: the gate refuses a command naming no token while
-	// bound, and lets it by once the queue is off.
+	// THE QUEUE IS OFF AND THE TOKEN IS NOT. Unbound means this agent is out of
+	// the queue, and it still names its work on every write.
+	// TestEveryRungButGodNamesItsToken drives all three rungs against one write.
 	if _, refuse := WriteNeedsAToken(r, "main", "Write", "doc/x.md", ""); !refuse {
-		t.Fatal("this test proves nothing: the gate does not refuse a bound write")
+		t.Fatal("this test proves nothing: the gate does not refuse a write naming no token")
 	}
 	log, err := OpenLog(r.Private("log"))
 	if err != nil {
@@ -56,8 +59,8 @@ func TestUnboundTakesTheQueueOffAndLeavesTheTreeGuarded(t *testing.T) {
 		answerHook(body, []string{"--method", r.Method}, &out, log)
 		return out.String()
 	}
-	if said := write("The engine reads the tree.\n"); strings.Contains(said, "deny") {
-		t.Fatalf("an unbound write naming no token was refused: %s", said)
+	if said := write("The engine reads the tree.\n"); !strings.Contains(said, theWriteDoor) {
+		t.Fatalf("unbinding took the token off the write along with the queue: %s", said)
 	}
 
 	// AND THE TREE IS STILL GUARDED. The voice rules are the clearest of them,
@@ -71,7 +74,7 @@ func TestUnboundTakesTheQueueOffAndLeavesTheTreeGuarded(t *testing.T) {
 	if err := writeAtomic(filepath.Join(r.Method, "util", "voice-rules.json"), raw, 0o644); err != nil {
 		t.Fatal(err)
 	}
-	rules, err := LoadVoiceRules(r.Method)
+	rules, err := voice.Load(r.Method)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -88,8 +91,15 @@ func TestUnboundTakesTheQueueOffAndLeavesTheTreeGuarded(t *testing.T) {
 	if bad == "" {
 		t.Fatal("no sentence this test knows breaks a voice rule, so it cannot show the guard standing")
 	}
-	if said := write(bad); !strings.Contains(said, "deny") {
+	// IT IS THE VOICE GUARD THAT REFUSES IT, AND NOT THE TOKEN RULE ABOVE. Both
+	// refuse this call now, so a test reading only deny would pass on the wrong
+	// one and say nothing about the voice rules at all.
+	said := write(bad)
+	if !strings.Contains(said, "deny") {
 		t.Fatalf("unbinding took the voice check off with the queue: %s", said)
+	}
+	if strings.Contains(said, theWriteDoor) {
+		t.Fatalf("the token rule answered first, so this proves nothing about the voice check: %s", said)
 	}
 }
 

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"io/fs"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -29,15 +30,25 @@ func TestEveryChildProcessIsStartedQuietly(t *testing.T) {
 	// fields between the attribute and the equals sign.
 	attrs := regexp.MustCompile(`\.SysProcAttr(\.[A-Za-z]+)*\s*=`)
 
-	names, err := filepath.Glob("*.go")
+	// IT WALKS THE TREE, BECAUSE THE DOOR MOVED INTO A PACKAGE. A glob of this
+	// folder saw the top level and nothing under it, and the two files that
+	// write the attribute now live in internal/quiet. Every sibling package
+	// starts processes on the same terms, so all of them are read.
+	var names []string
+	err := filepath.WalkDir(".", func(at string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if !d.IsDir() && strings.HasSuffix(at, ".go") && !strings.HasSuffix(at, "_test.go") {
+			names = append(names, filepath.ToSlash(at))
+		}
+		return nil
+	})
 	if err != nil {
 		t.Fatal(err)
 	}
 	found := 0
 	for _, name := range names {
-		if strings.HasSuffix(name, "_test.go") {
-			continue
-		}
 		b, err := os.ReadFile(name)
 		if err != nil {
 			t.Fatal(err)
@@ -57,7 +68,7 @@ func TestEveryChildProcessIsStartedQuietly(t *testing.T) {
 				continue
 			}
 			found++
-			if !strings.HasSuffix(strings.TrimSpace(line[:at[0]]), "Quietly(") {
+			if !strings.HasSuffix(strings.TrimSpace(line[:at[0]]), "quiet.Quietly(") {
 				t.Errorf("%s:%d starts a child process outside Quietly:\n\t%s",
 					name, i+1, strings.TrimSpace(line))
 			}
@@ -74,5 +85,5 @@ func TestEveryChildProcessIsStartedQuietly(t *testing.T) {
 //
 // BOTH PLATFORM FILES ARE THE DOOR. Each holds the one call that differs, and
 // a detached start on Unix is a session attribute the way a quiet start on
-// Windows is a creation flag.
-func isTheDoor(name string) bool { return strings.HasPrefix(name, "quiet_") }
+// Windows is a creation flag. They are the whole of internal/quiet.
+func isTheDoor(name string) bool { return strings.HasPrefix(name, "internal/quiet/") }

@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"quackitect/engine/internal/quiet"
 	"regexp"
 	"sort"
 	"strconv"
@@ -403,7 +404,7 @@ func spanOf(ch change) string {
 // the index, every file whole.
 func deltaSince(r Roots, db *sql.DB, since string) ([]change, error) {
 	git := func(args ...string) (string, error) {
-		cmd := Quietly(exec.Command("git", args...))
+		cmd := quiet.Quietly(exec.Command("git", args...))
 		cmd.Dir = r.Work
 		out, err := cmd.Output()
 		if err != nil {
@@ -541,7 +542,7 @@ func runChosen(r Roots, db *sql.DB, tests []aTest, picks []chosen) []ran {
 			}
 			out = append(out, x)
 		case "check":
-			cmd := Quietly(exec.Command(nodeTool(), filepath.Join(r.Work, filepath.FromSlash(t.Path)), r.Method))
+			cmd := quiet.Quietly(exec.Command(nodeTool(), filepath.Join(r.Work, filepath.FromSlash(t.Path)), r.Method))
 			cmd.Dir = r.Work
 			start := time.Now()
 			said, err := cmd.CombinedOutput()
@@ -571,21 +572,72 @@ func runChosen(r Roots, db *sql.DB, tests []aTest, picks []chosen) []ran {
 // false of the machine, and a lookup that names where it looked is the
 // difference between a tool that is missing and a lookup that is not reaching.
 func batteryShell(r Roots) (string, []string) {
+	return theShellAmong(exec.LookPath, shellsBesideGit(r), func(p string) bool {
+		info, err := os.Stat(p)
+		return err == nil && !info.IsDir()
+	})
+}
+
+// theShellAmong is that answer with both lookups handed in, so a check can put
+// this machine's shells wherever it needs them and drive the walk over a box
+// this one is not.
+//
+// A WINDOWS LAUNCHER NAMED bash IS NOT A SHELL. It starts a WSL distribution
+// rather than running a command, and where none is installed it exits 1 before
+// the command runs and prints WSL_E_WSL_OPTIONAL_COMPONENT_REQUIRED in UTF-16,
+// which no caller here reads as a shell that is missing. LookPath answers it
+// ahead of the sh Git brought, because Git leaves that one off PATH, so the
+// walk below never ran and every command on such a machine died at the shell.
+func theShellAmong(look func(string) (string, error), beside []string, isFile func(string) bool) (string, []string) {
 	// THE NAMES ARE A LIST, so a machine with bash and no sh is not called
 	// shell-less, and so the one lookup is not spelled out twice in the tree.
 	looked := []string{"sh or bash on PATH"}
 	for _, name := range []string{"sh", "bash"} {
-		if sh, err := exec.LookPath(name); err == nil {
-			return sh, looked
+		sh, err := look(name)
+		if err != nil {
+			continue
 		}
+		if theWindowsLauncher(sh) {
+			// IT SAYS WHAT IT PASSED OVER. A lookup that skips a hit and
+			// then answers nothing is a lookup nobody can argue with.
+			looked = append(looked, sh+", passed over: the WSL launcher is not a shell")
+			continue
+		}
+		return sh, looked
 	}
-	for _, maybe := range shellsBesideGit(r) {
+	for _, maybe := range beside {
 		looked = append(looked, maybe)
-		if info, err := os.Stat(maybe); err == nil && !info.IsDir() {
+		if isFile(maybe) {
 			return maybe, looked
 		}
 	}
 	return "", looked
+}
+
+// theWindowsLauncher answers whether a path is a stub Windows ships under the
+// name of a shell, rather than a shell.
+//
+// TWO FOLDERS HOLD THEM, and the folder is what tells them apart, because no
+// POSIX shell is ever installed in either. system32 holds bash.exe, which
+// starts a WSL distribution. WindowsApps holds the app execution aliases,
+// which are zero-length reparse points that start a store app, and that is the
+// one LookPath answered on the machine this was found on. The first guess here
+// named system32 alone and the probe said WindowsApps, so both are named.
+//
+// IT READS THE PATH AND ASKS THIS MACHINE NOTHING, so the answer is the same on
+// a box that has no such folder and a check for it runs everywhere. Both
+// separators are read, because the path under test is a Windows one wherever
+// the check runs.
+func theWindowsLauncher(p string) bool {
+	parts := strings.Split(strings.ToLower(strings.ReplaceAll(p, `\`, "/")), "/")
+	if len(parts) < 2 {
+		return false
+	}
+	switch parts[len(parts)-2] {
+	case "system32", "sysnative", "windowsapps":
+		return true
+	}
+	return false
 }
 
 // shellsBesideGit answers where a Git install keeps its shell, worked out from
@@ -698,8 +750,7 @@ func ATestRunByHand(command, work string) (string, bool) {
 			"se_test, or se test at a prompt. propose a test by name and it runs; propose a pattern and it " +
 			"narrows. The whole battery runs when the engine's rules say so, and the answer says why.\n\n" +
 			"What was run: " + strings.TrimSpace(part) + "\n\n" +
-			"IF YOUR LANE HAS NO se_test YET, it began before the tool did: run se test --on <token> " +
-			"through se_run, which is the same door.\n\n" +
+			theShellDoor("test --on <token>") + "\n\n" +
 			"OUTSIDE THIS TREE the tests are yours to run.", true
 	}
 	return "", false

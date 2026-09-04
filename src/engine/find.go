@@ -86,7 +86,11 @@ func runFind(c *call) int {
 	// THE ARCHIVE IS NOT IN THE INDEX, because it is not in the tree. It is
 	// read where it lives, which is the tags, so closed work still answers.
 	if *archive {
-		got, err := FindArchived(c.roots, FindParams{Words: *words, Regex: *regex, Limit: *limit})
+		// THE PATH IS HANDED OVER RATHER THAN LEFT BEHIND. Built from three of
+		// the four fields, this dropped --path on the floor and the archive
+		// answered unnarrowed, which is the one answer a narrowed search must
+		// never give. FindArchived is the half that decides what it can read.
+		got, err := FindArchived(c.roots, FindParams{Words: *words, Regex: *regex, Path: *path, Limit: *limit})
 		if err != nil {
 			c.answerJSON(map[string]any{"error": err.Error()})
 			return 1

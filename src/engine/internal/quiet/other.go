@@ -1,6 +1,8 @@
 //go:build !windows
 
-package main
+// Package quiet starts a child process without a window and without inheriting
+// the parent's end.
+package quiet
 
 import (
 	"os/exec"

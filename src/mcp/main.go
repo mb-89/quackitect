@@ -98,107 +98,69 @@ func reply(out *json.Encoder, id any, result any) {
 	_ = out.Encode(response{JSONRPC: "2.0", ID: id, Result: result}) // the pipe is shut, so there is nobody left to tell
 }
 
-// A blank line between paragraphs, written once so every description reads the
-// same and none of them carries the escape.
-const blankLine = "\n\n"
-
+// tools is every tool this door offers.
+//
+// IT IS THE LANE AND NOTHING BESIDE IT. Three tools were appended here after
+// laneTools(), outside the table TestToolSchemasComeFromTheirStructs walks, so
+// the drift the guard exists to end stayed open for exactly the tools it could
+// not see: se_status still wrote its schema as a literal, and se_answer and
+// se_said advertised a struct with nothing holding it against the handler that
+// decodes the arguments. A tool declared anywhere but the table is a tool no
+// guard reads.
 func tools() []map[string]any {
-	// The lane's tools are declared where they are handled, so a tool and its
-	// description never drift apart.
-	return append(laneTools(), []map[string]any{
-		{
-			"name":        "se_status",
-			"description": "What the engine knows: the two roots, the log it is writing, and the rules in force.",
-			"inputSchema": map[string]any{"type": "object", "properties": map[string]any{}},
-		},
-		{
-			"name": "se_answer",
-			"description": "ANSWER THE PERSON, IN THE RECORD: the whole answer, for every " +
-				"prompt. Then keep working.",
-			"inputSchema": map[string]any{
-				"type": "object",
-				"properties": map[string]any{
-					"answer": map[string]any{"type": "string",
-						"description": "what you would have said to them. The whole answer, not a summary of it."},
-				},
-				"required": []string{"answer"},
-			},
-		},
-		{
-			"name": "se_said",
-			// ONE RULE, SAID ONCE, IN BOTH PLACES AN AGENT READS IT.
-			//
-			// This said the opposite of the guidance it sits beside. Look in
-			// the log first is a condition over a private log that an agent has
-			// to evaluate before every recording and can forget, and the
-			// guidance removed it. An agent reads both.
-			//
-			// The sentence in saidRule is the guidance's own, and a check in
-			// this package holds the two together. What is written here around
-			// it says what this layer knows and the guidance does not: which
-			// message the engine has already copied.
-			"description": "PUT WHAT THE PERSON SAID IN THE RECORD, WORD FOR WORD, when the " +
-				"engine has not already copied it. " + saidRule,
-			"inputSchema": map[string]any{
-				"type": "object",
-				"properties": map[string]any{
-					"said": map[string]any{"type": "string",
-						"description": "what they said, copied. Their words and nothing else."},
-				},
-				"required": []string{"said"},
-			},
-		},
-	}...)
+	return laneTools()
 }
 
 func call(roots roots, params json.RawMessage) map[string]any {
 	var p struct {
-		Name      string         `json:"name"`
-		Arguments map[string]any `json:"arguments"`
+		Name      string          `json:"name"`
+		Arguments json.RawMessage `json:"arguments"`
 	}
 	_ = json.Unmarshal(params, &p) // params that will not read are no params
 
 	switch p.Name {
 	case "se_status":
-		return text(status(roots))
+		return text(taking(roots, p.Arguments, showStatus))
 	case "se_answer":
-		msg, _ := p.Arguments["answer"].(string)
-		if msg == "" {
-			return text("Say what you would have said to them.")
-		}
-		if err := answered(roots, msg); err != nil {
-			return text("It could not be recorded: " + err.Error())
-		}
-		return text("recorded")
+		return text(taking(roots, p.Arguments, recordAnswer))
 	case "se_said":
-		msg, _ := p.Arguments["said"].(string)
-		if msg == "" {
-			return text("Say what they said.")
-		}
-		if err := said(roots, msg); err != nil {
-			return text("It could not be recorded: " + err.Error())
-		}
-		return text("recorded")
+		return text(taking(roots, p.Arguments, recordSaid))
 	case "se_test":
-		return text(testTheDelta(roots, p.Arguments))
+		return text(taking(roots, p.Arguments, testTheDelta))
 	case "se_claim":
-		return text(claimWork(roots, p.Arguments))
+		return text(taking(roots, p.Arguments, claimWork))
 	case "se_find":
-		return text(findInTree(roots, p.Arguments))
+		return text(taking(roots, p.Arguments, findInTree))
 	case "se_ask":
-		return text(askIndex(roots, p.Arguments))
+		return text(taking(roots, p.Arguments, askIndex))
 	case "se_apply":
-		return text(applyEdits(roots, p.Arguments))
+		return text(taking(roots, p.Arguments, applyEdits))
 	case "se_run":
-		return text(runCommand(roots, p.Arguments))
+		return text(taking(roots, p.Arguments, runCommand))
 	case "se_work":
-		return text(mintWork(roots, p.Arguments))
+		return text(taking(roots, p.Arguments, mintWork))
 	case "se_pull":
-		return text(pull(roots, p.Arguments))
+		return text(taking(roots, p.Arguments, pull))
 	case "se_stop":
-		return text(stopClaim(roots, p.Arguments))
+		return text(taking(roots, p.Arguments, stopClaim))
 	}
 	return text("No such tool: " + p.Name)
+}
+
+// taking decodes the arguments into the request the handler declares, and
+// hands them over.
+//
+// THE TYPE IS THE ONE THE DOOR ADVERTISED. schema.go reads the same struct for
+// the schema an agent is shown, so what the agent is invited to send is what
+// the handler reads, and neither list can move without the other.
+func taking[T any](r roots, raw json.RawMessage, f func(roots, T) string) string {
+	var a T
+	if len(raw) > 0 && string(raw) != "null" {
+		if err := json.Unmarshal(raw, &a); err != nil {
+			return fail("the arguments will not read: " + err.Error())
+		}
+	}
+	return f(r, a)
 }
 
 func text(s string) map[string]any {

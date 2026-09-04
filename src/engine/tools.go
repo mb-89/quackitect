@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"quackitect/engine/internal/quiet"
 	"sort"
 	"strings"
 	"sync"
@@ -109,7 +110,7 @@ func askOne(c Candidate) (Tool, bool) {
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), probeWait)
 	defer cancel()
-	out, err := Quietly(exec.CommandContext(ctx, path, c.Args...)).CombinedOutput()
+	out, err := quiet.Quietly(exec.CommandContext(ctx, path, c.Args...)).CombinedOutput()
 	if err != nil {
 		return Tool{}, false
 	}

@@ -23,7 +23,6 @@ func aTreeThatClosesAt(t *testing.T) Roots {
 	}
 	const proc = `name: task
 description: one step the queue hands out
-traced: false
 sections:
   required:
     - detail

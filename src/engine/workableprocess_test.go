@@ -21,7 +21,7 @@ func writeWorkableProcess(t *testing.T, root, name string) {
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		t.Fatal(err)
 	}
-	body := "name: " + name + "\ndescription: a process for the test\ntraced: false\n" +
+	body := "name: " + name + "\ndescription: a process for the test\n" +
 		"sections:\n  required:\n    - detail\n" +
 		"states:\n  - name: first\n    description: where it starts\n" +
 		"  - name: last\n    description: where it ends\n" +

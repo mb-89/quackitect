@@ -258,8 +258,7 @@ func theIndexDoor(what string) string {
 		"- path: a glob that narrows either, src/**/*.go, or on its own lists the files it names.\n" +
 		"Every hit is a path, a line number and the line. se_ask takes SQL over the same tables.\n\n" +
 		"What was asked: " + what + "\n\n" +
-		"IF YOUR LANE HAS NO se_find YET, it began before the tool did: run se find --words ... " +
-		"through se_run, which is the same door.\n\n" +
+		theShellDoor("find --words ...") + "\n\n" +
 		"OUTSIDE THIS TREE THE DISK IS YOURS: a search naming a path outside it is not refused."
 }
 

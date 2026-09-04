@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"quackitect/engine/internal/quiet"
 	"sort"
 	"strconv"
 	"strings"
@@ -91,7 +92,7 @@ func holdAge(r Roots, t Token, now time.Time) string {
 // gitShowsWhen answers when a snapshot commit was made. Reading history is
 // not writing it, so the screen stays a reader here too.
 func gitShowsWhen(r Roots, hash string) (time.Time, error) {
-	cmd := Quietly(exec.Command("git", "show", "-s", "--format=%ct", hash))
+	cmd := quiet.Quietly(exec.Command("git", "show", "-s", "--format=%ct", hash))
 	cmd.Dir = r.Work
 	out, err := cmd.Output()
 	if err != nil {

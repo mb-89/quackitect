@@ -1,4 +1,4 @@
-package main
+package voice
 
 import (
 	"encoding/json"
@@ -24,24 +24,24 @@ import (
 // This refuses a FORM and never a place. The same file, written properly,
 // goes through.
 
-// VoiceBreach is one place prose breaks one voice rule.
+// Breach is one place prose breaks one voice rule.
 //
 // IT IS NOT A Finding, WHICH IS WHAT THE LINTER REPORTS. Both were called
 // Finding, so one carried a 3 and the number was the only thing telling a
 // reader which was which. A breach is about a sentence; a finding is about a
 // note, and it carries the file and line an editor puts a mark on.
-type VoiceBreach struct {
+type Breach struct {
 	Rule  string
 	Where string
 	Says  string
 }
 
-func (f VoiceBreach) String() string { return fmt.Sprintf("%s (%s): %s", f.Rule, f.Where, f.Says) }
+func (f Breach) String() string { return fmt.Sprintf("%s (%s): %s", f.Rule, f.Where, f.Says) }
 
 // Rules are read from the method root. A file that cannot be read means the
 // check cannot run, which is said loudly and never refuses a write: a broken
 // checker must not stop a person from working.
-type VoiceRules struct {
+type Rules struct {
 	Source string `json:"source"`
 	Limits struct {
 		SentenceWords int `json:"sentence_words"`
@@ -55,8 +55,8 @@ type VoiceRules struct {
 	compiled []*regexp.Regexp
 }
 
-func LoadVoiceRules(methodRoot string) (VoiceRules, error) {
-	var v VoiceRules
+func Load(methodRoot string) (Rules, error) {
+	var v Rules
 	b, err := os.ReadFile(filepath.Join(methodRoot, "util", "voice-rules.json"))
 	if err != nil {
 		return v, err
@@ -88,8 +88,8 @@ var fence = regexp.MustCompile("^\\s*```")
 
 // CheckVoice returns what a program can see. It is deliberately short: every
 // rule here is one a person can predict before they write the line.
-func (v VoiceRules) Check(text string) []VoiceBreach {
-	var out []VoiceBreach
+func (v Rules) Check(text string) []Breach {
+	var out []Breach
 	inCode := false
 	for n, line := range strings.Split(text, "\n") {
 		if fence.MatchString(line) {
@@ -106,21 +106,21 @@ func (v VoiceRules) Check(text string) []VoiceBreach {
 				if m != "" && len(m) < 30 {
 					says = m + " — " + r.Says
 				}
-				out = append(out, VoiceBreach{r.Name, at, says})
+				out = append(out, Breach{r.Name, at, says})
 			}
 		}
-		for _, s := range sentencesIn(line) {
+		for _, s := range SentencesIn(line) {
 			if n := len(strings.Fields(stripMarkup(s))); n > v.Limits.SentenceWords {
-				out = append(out, VoiceBreach{
+				out = append(out, Breach{
 					fmt.Sprintf("%d words to a sentence", v.Limits.SentenceWords),
-					at, fmt.Sprintf("%d words: %s", n, short60(s))})
+					at, fmt.Sprintf("%d words: %s", n, Short60(s))})
 			}
 		}
 	}
 	return out
 }
 
-func sentencesIn(line string) []string {
+func SentencesIn(line string) []string {
 	line = strings.TrimSpace(line)
 	if line == "" || strings.HasPrefix(line, "|") {
 		return nil // a table cell is not a paragraph
@@ -147,7 +147,7 @@ func stripMarkup(s string) string {
 	return regexp.MustCompile(`\([^)]*\)`).ReplaceAllString(s, "x")
 }
 
-func short60(s string) string {
+func Short60(s string) string {
 	if len(s) > 60 {
 		return s[:60] + "…"
 	}

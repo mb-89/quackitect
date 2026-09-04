@@ -7,11 +7,14 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"quackitect/engine/internal/quiet"
 	"reflect"
 	"runtime"
 	"sort"
 	"strings"
 	"time"
+
+	"quackitect/engine/internal/voice"
 )
 
 // ONE COMMAND COLLECTS EVERYTHING A RETRO NEEDS AND DRAINS IT.
@@ -419,7 +422,7 @@ func Retro(r Roots, actor string, transcripts []Transcript) (Collected, error) {
 // different answer from a clean session and is written as one.
 func theVoiceOf(r Roots, logDir string, sessions []string) VoiceReading {
 	var out VoiceReading
-	rules, err := LoadVoiceRules(r.Method)
+	rules, err := voice.Load(r.Method)
 	if err != nil {
 		out.Unavailable = err.Error()
 		return out
@@ -875,7 +878,7 @@ func theToolList(r Roots) int {
 	if _, err := os.Stat(exe); err != nil {
 		return 0
 	}
-	cmd := Quietly(exec.Command(exe, "--work", r.Work))
+	cmd := quiet.Quietly(exec.Command(exe, "--work", r.Work))
 	cmd.Stdin = strings.NewReader(
 		`{"jsonrpc":"2.0","id":0,"method":"initialize","params":{}}` + nl +
 			`{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}` + nl)

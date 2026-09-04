@@ -17,23 +17,23 @@ import (
 //
 // TWO FOLDERS, AND WHICH ONE DEPENDS ON THE TOKEN.
 //
-//	.se/work/   ephemeral. Scratch work, an agent's own breakdown. Private
+//	.se/work/   local. Scratch work, an agent's own breakdown. Private
 //	            material, and it never travels with a copy.
-//	doc/work/   traced. The record of what was done. It travels, and it is in
-//	            version control, because that is the point of tracing it.
+//	doc/work/   tracked. The record of what was done. It travels, and it is in
+//	            version control, because that is the point of tracking it.
 //
-// The minter decides which, by deciding whether the token is traced, and
+// The minter decides which, by deciding whether the token is tracked, and
 // nothing moves afterwards.
 //
 // A FOLDER MAY HOLD OTHER NOTES. A note is a token when its frontmatter says
 // `type: work`, so neither folder is claimed whole and a person may keep their
 // own notes beside them.
 
-// EphemeralDir is private and never travels. TracedDir is the record.
-func EphemeralDir(r Roots) string { return r.Private("work") }
-func TracedDir(r Roots) string    { return filepath.Join(r.Work, "doc", "work") }
+// LocalDir is private and never travels. TrackedDir is the record.
+func LocalDir(r Roots) string   { return r.Private("work") }
+func TrackedDir(r Roots) string { return filepath.Join(r.Work, "doc", "work") }
 
-func workDirs(r Roots) []string { return []string{TracedDir(r), EphemeralDir(r)} }
+func workDirs(r Roots) []string { return []string{TrackedDir(r), LocalDir(r)} }
 
 // dirFor answers where a token's file belongs.
 //
@@ -55,9 +55,9 @@ func dirFor(r Roots, t Token) string {
 		return filepath.Dir(at)
 	}
 	if t.Tracked != nil && *t.Tracked {
-		return TracedDir(r)
+		return TrackedDir(r)
 	}
-	return EphemeralDir(r)
+	return LocalDir(r)
 }
 
 // The frontmatter's order on the page: what it is, then where it stands, then
@@ -168,27 +168,27 @@ func (t Token) front() Front {
 // from the path, so a token that is renamed is the token it is called.
 func tokenFromFront(f Front) Token {
 	return Token{
-		Process:  unlink(fs(f, "process")),
-		Guidance: unlink(fs(f, "guidance")),
-		Title:    fs(f, "title"),
-		Status:   Status(fs(f, "status")),
-		Bucket:   fs(f, "bucket"),
+		Process:  unlink(frontStr(f, "process")),
+		Guidance: unlink(frontStr(f, "guidance")),
+		Title:    frontStr(f, "title"),
+		Status:   Status(frontStr(f, "status")),
+		Bucket:   frontStr(f, "bucket"),
 		// A HOLDER IN THE FILE IS NOT READ. A note written before the hold
 		// moved into the engine carries one, naming an agent that is gone, and
 		// reading it would put a dead hand back on live work. There is no
 		// field to read it into: the hold comes from holdstore.go.
-		Author:      fs(f, "author"),
-		ClaimedBy:   fs(f, "claimed_by"),
-		ClaimedAt:   fs(f, "claimed_at"),
-		NeedsHuman:  fb(f, "needs_human"),
-		DependsOn:   unlinkAll(fl(f, "depends_on")),
-		Parent:      unlink(fs(f, "parent")),
-		ReadyWhen:   fs(f, "ready_when"),
-		Began:       fl(f, "began"),
-		Finished:    fl(f, "ended"),
-		Disposition: Disposition(fs(f, "disposition")),
-		Reason:      fs(f, "reason"),
-		Successors:  unlinkAll(fl(f, "successors")),
+		Author:      frontStr(f, "author"),
+		ClaimedBy:   frontStr(f, "claimed_by"),
+		ClaimedAt:   frontStr(f, "claimed_at"),
+		NeedsHuman:  frontBool(f, "needs_human"),
+		DependsOn:   unlinkAll(frontList(f, "depends_on")),
+		Parent:      unlink(frontStr(f, "parent")),
+		ReadyWhen:   frontStr(f, "ready_when"),
+		Began:       frontList(f, "began"),
+		Finished:    frontList(f, "ended"),
+		Disposition: Disposition(frontStr(f, "disposition")),
+		Reason:      frontStr(f, "reason"),
+		Successors:  unlinkAll(frontList(f, "successors")),
 	}
 }
 
@@ -323,7 +323,7 @@ func noteToken(text, id string) (Token, error) {
 	}
 	// A NOTE IS A TOKEN WHEN IT SAYS WHICH SCHEMA READS IT. type: work said the
 	// same thing twice, so it went with the rest of what nothing read.
-	if unlink(fs(f, "kind")) != "work-token" {
+	if unlink(frontStr(f, "kind")) != "work-token" {
 		return Token{}, errNotAToken
 	}
 	t := tokenFromFront(f)
@@ -610,7 +610,42 @@ func readBody(t *Token, body string) {
 	}
 }
 
+// settleEnding makes the status follow the disposition.
+//
+// THE DISPOSITION IS THE FIELD THAT SAYS A TOKEN HAS STOPPED. Ended reads it,
+// because the disposition is the engine's and the state is the process's. So a
+// token carrying one has ended whatever its status says.
+//
+// AND A STATUS LEFT BEHIND IS UNREACHABLE BY EVERY VERB. Three tokens read
+// noted while carrying dropped. A submission against one was refused as already
+// closed, and writeField refuses a status outright as the pull's to write, so
+// the field could not be repaired except by hand. The archive never took them
+// either, because it asks for a closing state and decide still leaves noted.
+//
+// IT ONLY MOVES A TOKEN ITS PROCESS CANNOT MOVE. A standard token at done owes
+// a verdict and has not ended, so nothing here touches it. One that has ended
+// somewhere a step still leaves is the disagreement, and it goes to the state
+// the process ends at.
+func settleEnding(r Roots, t Token) Token {
+	if !t.Ended() || ClosingState(r, t) {
+		return t
+	}
+	p, err := LoadProcess(r.Method, t.Process)
+	if err != nil {
+		return t // a process nobody can read says nothing about where it ends
+	}
+	if at := p.EndsAt(); at != "" {
+		t.Status = Status(at)
+	}
+	return t
+}
+
 func SaveToken(r Roots, t Token) error {
+	// THE TWO FIELDS AGREE BEFORE ANYTHING IS WRITTEN, so the file a person
+	// reads and the answer Ended gives are the same answer. This is the one
+	// place every write goes through, which is why the rule lives here rather
+	// than in each caller that ends a token.
+	t = settleEnding(r, t)
 	// THE RECORD REFUSES TO HOLD WHAT IT CANNOT READ BACK. A criterion is one
 	// lead and one line, and the reader stops at the first newline, so a second
 	// line is lost on the save rather than on the write. Here is where the value
@@ -630,7 +665,7 @@ func SaveToken(r Roots, t Token) error {
 	// sees them all. The agent does not remember to write them and cannot
 	// forget to: whoever moves a token moves it through here.
 	//
-	// It is the record and not the token because a traced token travels, and a
+	// It is the record and not the token because a tracked token travels, and a
 	// time on it says when somebody was at their desk.
 	was, existed := LoadToken(r, t.ID)
 	// WHERE IT IS NOW, so a token whose process moved it leaves nothing behind.
@@ -693,8 +728,16 @@ func SaveToken(r Roots, t Token) error {
 	// IT IS THE STATE AND NOT THE DISPOSITION. A standard token carries done
 	// while a reviewer still has a step to take on it, so archiving on the
 	// disposition alone would take it off the disk before its verdict.
+	//
+	// AND AN ARCHIVE IT CANNOT WRITE DOES NOT UNDO ANY OF THAT. Everything
+	// above has already happened, so a git failure here is a consequence left
+	// over and not a save that went wrong. See NotArchived.
 	if ended := t.Ended() && ClosingState(r, t); ended && (existed != nil || !(was.Ended() && ClosingState(r, was))) {
-		return Archive(r, t)
+		if err := Archive(r, t); err != nil {
+			inSession(r, "work", orElse(t.Holder, "engine"), t.ID+" closed, and not archived: "+err.Error(), No(),
+				map[string]any{"id": t.ID})
+			return NotArchived{ID: t.ID, Err: err}
+		}
 	}
 	return nil
 }

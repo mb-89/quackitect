@@ -8,6 +8,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"quackitect/engine/internal/console"
 	"strconv"
 	"strings"
 )
@@ -93,7 +94,7 @@ func runLSP(args []string) {
 	if err != nil {
 		fail(err)
 	}
-	hideOwnConsole()
+	console.Hide()
 	s := &server{roots: roots, docs: map[string]string{}, notes: map[string]string{}, out: os.Stdout}
 	// Standard error is the editor's output channel, so it is where a person
 	// looks when nothing appears.
@@ -470,7 +471,7 @@ func kindOf(text string) string {
 	if err != nil {
 		return ""
 	}
-	return unlink(fs(f, "kind"))
+	return unlink(frontStr(f, "kind"))
 }
 
 // AvailableKinds answers every kind this copy has a schema for.

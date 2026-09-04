@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"quackitect/engine/internal/alive"
 	"time"
 )
 
@@ -148,7 +149,7 @@ func loadRunning(r Roots) (Running, string) {
 	if err != nil || json.Unmarshal(b, &v) != nil {
 		return v, "record: no readable engine.json"
 	}
-	if v.PID <= 0 || !alive(v.PID) {
+	if v.PID <= 0 || !alive.Is(v.PID) {
 		return v, fmt.Sprintf("pid: %d is not a running process", v.PID)
 	}
 	// A PID NUMBER COMES BACK AROUND, and any process holding it answers

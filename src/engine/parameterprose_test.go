@@ -6,6 +6,8 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"quackitect/engine/internal/voice"
 )
 
 // WHAT A PARAMETER SAYS ABOUT ITSELF IS PROSE, AND IT IS HELD TO THE PROSE
@@ -26,7 +28,7 @@ import (
 func TestEveryParameterSaysItselfInProse(t *testing.T) {
 	t.Parallel()
 	root := filepath.Join("..", "..")
-	rules, err := LoadVoiceRules(root)
+	rules, err := voice.Load(root)
 	if err != nil {
 		t.Fatalf("the voice rules will not read: %v", err)
 	}

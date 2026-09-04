@@ -52,6 +52,63 @@ func TestOneNumberStaffsEveryRole(t *testing.T) {
 	}
 }
 
+// THE MAIN AGENT IS A HAND, AND IT IS A WORKER.
+//
+// THE OWNER'S RULING: the number is how many workers there are, counting the
+// main agent. At three that is the session and two spawned, and the guard used
+// to ask for three spawned beside it, which is four hands for a number saying
+// three.
+//
+// IT IS NEVER A REVIEWER, because a verdict is never the author's, so the same
+// number at three still wants three reviewer spawns.
+func TestTheMainAgentCountsAsAWorker(t *testing.T) {
+	t.Parallel()
+	r := aTreeWithTheProcesses(t)
+	// THE RUN IS NAMED BY THE FIRST LINE OF ITS LOG, and the register holds
+	// only this run's agents, so nobody is present until the log is opened.
+	log, err := OpenLog(r.Private("log"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer log.Close()
+	record(log, "engine", "start", "engine", "engine started", Yes(), nil)
+
+	cfg := TheFloor()
+	cfg.ParallelAgents = 3
+	for i := 0; i < 4; i++ {
+		mintStandard(t, r, "open work")
+	}
+
+	// NOBODY IS HERE UNTIL SOMEBODY ARRIVES.
+	if s := StaffingOf(r, cfg); s.WorkersHere != 0 {
+		t.Fatalf("an empty register counted %d worker(s): %+v", s.WorkersHere, s)
+	}
+
+	// AND THE SESSION IS ONE OF THEM. This is the red: skipping the session
+	// agent leaves this at nought while the person watches one agent work.
+	NoteSession(r, "s-1")
+	s := StaffingOf(r, cfg)
+	if s.WorkersHere != 1 {
+		t.Fatalf("the main agent is here and the count says %d worker(s): %+v", s.WorkersHere, s)
+	}
+	if s.ReviewersHere != 0 {
+		t.Fatalf("the main agent was counted as a reviewer: %+v", s)
+	}
+
+	// FIVE VERDICTS OWED STILL WANT THREE REVIEWERS, AND NONE IS HERE, because
+	// every reviewer is spawned.
+	for i := 0; i < 5; i++ {
+		tok := mintStandard(t, r, "waiting on a verdict")
+		tok.Status, tok.Author = "done", "worker-1"
+		if err := SaveToken(r, tok); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if s := StaffingOf(r, cfg); s.AwaitingVerdict != 5 || s.ReviewersWanted != 3 || s.ReviewersHere != 0 {
+		t.Fatalf("five verdicts owed with the main agent here: %+v", s)
+	}
+}
+
 // AND A VERDICT OWED WANTS A REVIEWER UNDER THE SAME NUMBER, because the ruling
 // is one control for every role and not one for workers with another beside it.
 func TestOneNumberStaffsTheReviewersToo(t *testing.T) {

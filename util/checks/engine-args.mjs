@@ -323,15 +323,21 @@ for (const stray of [["lint", "/nope/not-a-file.md"], ["--config", "/nope/not-a-
   say("se " + stray.join(" ") + " refuses a path it will not read", code !== 0,
     "it answered success and read nothing from what it was handed");
 }
+//
+// AND THE OTHER SIDE IS READ BY WHAT IT SAID, NOT BY ITS EXIT CODE. An exit
+// code is not the same question: se lint exits non-zero when it has findings,
+// which is the verb answering about the tree it read rather than refusing the
+// call. The tree it reads here is the method, so this line went red whenever
+// anything anywhere in the method tripped a lint rule -- a fact about the
+// tree, not about the argument list -- while se --config, which never has
+// findings, stayed green beside it and hid that the two were not asking the
+// same thing. So the call is judged by the same instrument every line above
+// uses, which looks for the engine's two refusal shapes and nothing else.
 for (const fine of [["lint"], ["--config"]]) {
-  let code = 0;
-  try {
-    execFileSync(exe, [...fine, "--work", work], { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
-  } catch (e) {
-    code = e.status ?? 1;
-  }
-  say("se " + fine.join(" ") + " still answers", code === 0,
-    "the refusal is refusing a call that has nothing left over");
+  const answer = wellFormed(fine);
+  say("se " + fine.join(" ") + " still answers", answer.ok,
+    "the refusal is refusing a call that has nothing left over, and it said\n      "
+    + answer.said);
 }
 
 console.log("\n" + bad + " failed.");

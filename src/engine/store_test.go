@@ -8,7 +8,7 @@ import (
 // read back as what they meant.
 func TestTheFrontmatterReadsWhatAPersonWrites(t *testing.T) {
 	t.Parallel()
-	front, body := SplitNote("---\nid: wk-1\ntitle: \"a title: with a colon\"\nsubs:\n  - wk-2\n  - wk-3\ntraced: true\n---\n\nthe body.\n")
+	front, body := SplitNote("---\nid: wk-1\ntitle: \"a title: with a colon\"\nsubs:\n  - wk-2\n  - wk-3\ntracked: true\n---\n\nthe body.\n")
 	if body != "the body.\n" {
 		t.Fatalf("the body came back as %q", body)
 	}
@@ -16,14 +16,14 @@ func TestTheFrontmatterReadsWhatAPersonWrites(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if fs(f, "title") != "a title: with a colon" {
-		t.Errorf("a quoted colon read as %q", fs(f, "title"))
+	if frontStr(f, "title") != "a title: with a colon" {
+		t.Errorf("a quoted colon read as %q", frontStr(f, "title"))
 	}
-	if got := fl(f, "subs"); len(got) != 2 || got[1] != "wk-3" {
+	if got := frontList(f, "subs"); len(got) != 2 || got[1] != "wk-3" {
 		t.Errorf("the list read as %v", got)
 	}
-	if !fb(f, "traced") {
-		t.Error("traced read as false")
+	if !frontBool(f, "tracked") {
+		t.Error("tracked read as false")
 	}
 }
 

@@ -17,7 +17,7 @@ import (
 func TestAClaimHoldsTheWorkAndThenLapses(t *testing.T) {
 	t.Parallel()
 	r := aTreeWithTheProcesses(t)
-	tok := mintStandard(t, r, "work to be claimed")
+	tok := mintUnclaimed(t, r, "work to be claimed")
 	me := Claimant(r, "worker-one")
 	now := time.Now().UTC()
 
@@ -61,8 +61,8 @@ func TestAClaimHoldsTheWorkAndThenLapses(t *testing.T) {
 func TestAReleaseTakesBackOnlyItsOwn(t *testing.T) {
 	t.Parallel()
 	r := aTreeWithTheProcesses(t)
-	mine := mintStandard(t, r, "mine")
-	theirs := mintStandard(t, r, "theirs")
+	mine := mintUnclaimed(t, r, "mine")
+	theirs := mintUnclaimed(t, r, "theirs")
 	me, them := Claimant(r, "worker-one"), Claimant(r, "worker-two")
 	now := time.Now().UTC()
 
@@ -127,7 +127,7 @@ func TestTwoTreesAreTwoClaimants(t *testing.T) {
 func TestAClaimFromAnotherBoxIsHonouredWithoutTheNetwork(t *testing.T) {
 	t.Parallel()
 	r := aTreeWithTheProcesses(t)
-	tok := mintStandard(t, r, "work another box took")
+	tok := mintUnclaimed(t, r, "work another box took")
 	them := "0badc0de/worker-far"
 	now := time.Now().UTC()
 

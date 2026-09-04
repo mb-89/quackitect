@@ -1,4 +1,4 @@
-package main
+package runme
 
 import "runtime"
 
@@ -11,14 +11,14 @@ import "runtime"
 // Two shapes. A vehicle names its own command and how to build it. A project
 // names the copy that drives it, and the register turns that into a place.
 
-func runmeScript() string {
+func Script() string {
 	if runtime.GOOS == "windows" {
-		return runmePowerShell
+		return powerShell
 	}
-	return runmeShell
+	return shell
 }
 
-const runmePowerShell = `# RUNME. The one command that always works.
+const powerShell = `# RUNME. The one command that always works.
 #
 # It installs what has to be installed, then hands every argument through to
 # the command line interface. What that interface is written in is not this
@@ -142,7 +142,7 @@ $env:SE_WORK = $here
 exit $LASTEXITCODE
 `
 
-const runmeShell = `#!/usr/bin/env sh
+const shell = `#!/usr/bin/env sh
 # RUNME. The one command that always works.
 #
 # It installs what has to be installed, then hands every argument through to

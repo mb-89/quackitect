@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"quackitect/engine/internal/quiet"
 	"strings"
 )
 
@@ -58,7 +59,7 @@ func Snapshot(r Roots, label string) (string, error) {
 	os.Remove(index.Name())
 	defer os.Remove(index.Name())
 	git := func(args ...string) (string, error) {
-		cmd := Quietly(exec.Command("git", args...))
+		cmd := quiet.Quietly(exec.Command("git", args...))
 		cmd.Dir = r.Work
 		cmd.Env = append(os.Environ(),
 			"GIT_INDEX_FILE="+index.Name(),

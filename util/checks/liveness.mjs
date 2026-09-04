@@ -79,5 +79,34 @@ say("the detail tells the two failures apart",
   "it said " + JSON.stringify([L.whyNot("bad", undefined), L.whyNot("bad", silent)]));
 say("and a light that is fine says nothing", L.whyNot("good", beating) === "");
 
+// WHO ENDS THE ENGINE, AND WHEN.
+//
+// deactivate called stopEngine with no argument, and without a context that
+// can only kill a child handle. A window that reattached holds none, and a
+// swap successor is a process no window ever held. So the editor closed and
+// the engine stayed, and nothing on the engine's own side ends it.
+//
+// THE RULE IS THE LAST WINDOW OUT, because two windows can be open on one
+// tree and the second one must not take the engine from the first.
+say("endsTheEngine is exported", typeof L.endsTheEngine === "function",
+  "it is " + typeof L.endsTheEngine + ", so nothing below drives it");
+if (typeof L.endsTheEngine === "function") {
+  // 7 is a window that crashed. Its file is still there and it answers nothing.
+  const answers = (pid) => pid !== 7;
+  say("the last window out ends the engine",
+    L.endsTheEngine([], answers) === true,
+    "then no window ever ends it, which is what the owner met");
+  say("a window with another one still open ends nothing",
+    L.endsTheEngine([{ pid: 2 }], answers) === false,
+    "it would take the engine from a window that is still watching it");
+  // A FILE IS NOT A WINDOW. One a crashed window left would mean nobody is
+  // ever the last one out, and the engine would outlive every editor for ever.
+  say("a window that does not answer is not a window",
+    L.endsTheEngine([{ pid: 7 }], answers) === true,
+    "a file left by a window that crashed would keep the engine alive");
+  say("and one that answers still counts among ones that do not",
+    L.endsTheEngine([{ pid: 7 }, { pid: 2 }], answers) === false);
+}
+
 console.log("\n" + bad + " failed.");
 process.exit(bad ? 1 : 0);

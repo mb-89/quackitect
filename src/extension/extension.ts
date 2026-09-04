@@ -7,8 +7,9 @@ import { panelHtml, livePieces, everyGroup, Node, Happening } from "./panel";
 import { whyNothingHappened } from "./mintwhy";
 import { editorHtml, paneBody, Table, Pane } from "./editor";
 import { whichHarness, kickoffText, openAgent } from "./agent";
-import { nextEngineState, whyNot, HEARTBEAT_MS } from "./liveness";
+import { nextEngineState, whyNot, HEARTBEAT_MS, endsTheEngine } from "./liveness";
 import { startLanguageServer, stopLanguageServer } from "./lsp";
+import { sayWindowIsHere, forgetWindow, windowsThere, windowAnswers, sweepWindowsGone } from "./windows";
 import {
   mintArgs, editCellArgs, fileArgs, groupArgs, renameGroupArgs, holdArgs,
   bindArgs, bindingArgs, askArgs, askedArgs,
@@ -26,7 +27,14 @@ let engine: ChildProcess | undefined;
 let engineLog: string | undefined;
 let view: vscode.WebviewView | undefined;
 
+// DEACTIVATE TAKES NO ARGUMENT, AND IT NEEDS THE CONTEXT. Everything that
+// finds the engine reads it, so the one call the editor makes on the way out
+// had neither the engine nor a way to look it up, and it stopped nothing.
+let host: vscode.ExtensionContext | undefined;
+
 export function activate(context: vscode.ExtensionContext) {
+  host = context;
+  sayThisWindowIsHere();
   const provider = new ControlPanel(context);
   rotateLogOnStartup(context);
   reattach(context);
@@ -126,11 +134,45 @@ function projectOnStartup(context: vscode.ExtensionContext) {
   });
 }
 
+// THE LAST WINDOW OUT ENDS THE ENGINE.
+//
+// This called stopEngine with no argument, and stopEngine without a context
+// can only kill a child handle. A window that reattached holds none, and a
+// swap successor is a process no window ever held, so both of the ways an
+// engine is normally met ended nothing at all.
+//
+// AND IT IS NOT ALWAYS THIS WINDOW'S TO END. Another window on the same tree
+// is watching the same engine, so the question is asked of the tree before
+// anything is killed. The rule is in liveness.ts, where a check drives it.
 export function deactivate() {
   for (const w of watchers) w.close();
   stopKeepingLive();
-  stopEngine();
+  forgetThisWindow();
+  if (endsTheEngine(otherWindows(), windowAnswers)) stopEngine(host);
   void stopLanguageServer();
+}
+
+// The three lines above that touch the tree, each one guarded by there being a
+// folder open at all. A window with no folder is on nobody's tree.
+function sayThisWindowIsHere() {
+  const work = workRoot();
+  if (!work) return;
+  // AND WHAT WINDOWS THAT CRASHED LEFT. One file nobody deleted would be a
+  // window for ever, and then no window is ever the last one out.
+  sweepWindowsGone(work, process.pid);
+  sayWindowIsHere(work, process.pid);
+}
+
+function forgetThisWindow() {
+  const work = workRoot();
+  if (!work) return;
+  forgetWindow(work, process.pid);
+}
+
+function otherWindows(): { pid: number }[] {
+  const work = workRoot();
+  if (!work) return [];
+  return windowsThere(work, process.pid);
 }
 
 // The two roots. The method root is where this copy is installed. The work
@@ -733,8 +775,12 @@ function asText(v: unknown): string {
 
 function startEngine(context: vscode.ExtensionContext) {
   if (engineState === "busy") return;
+  // THE ENGINE ON DISK, NOT THE HANDLE. A swap leaves the handle naming a
+  // process that has gone, so stopping by handle alone ends nothing and sets
+  // the light to idle while the successor runs. The context is what the
+  // engine's own file is read through, and this window has one.
   if (engine) {
-    stopEngine();
+    stopEngine(context);
   }
   if (!vscode.workspace.isTrusted) {
     vscode.window
@@ -910,17 +956,19 @@ function waitForState(want: EngineState, ms: number): Promise<boolean> {
 // is no child to kill, and the button would have done nothing at all.
 function stopEngine(context?: vscode.ExtensionContext) {
   stopWatching();
-  if (engine) {
-    engine.kill();
-  } else if (context) {
-    const running = whatIsRunning(context);
-    if (running) {
-      try {
-        process.kill(running.pid);
-      } catch {
-        // It went while we were looking at it, which is the outcome anyway.
-      }
+  // THE PID ON DISK IS THE ENGINE, AND THE HANDLE IS ONLY THIS WINDOW'S GUESS.
+  // A swap makes them disagree: the old process is gone and the successor is
+  // one no window ever held. Killing the handle first reached something that
+  // had already exited and left the engine running, so the file is read first.
+  const running = context ? whatIsRunning(context) : undefined;
+  if (running) {
+    try {
+      process.kill(running.pid);
+    } catch {
+      // It went while we were looking at it, which is the outcome anyway.
     }
+  } else if (engine) {
+    engine.kill();
   }
   engine = undefined;
   engineLog = undefined;
@@ -1473,8 +1521,8 @@ function showTheBinding(at: string) {
   }
   if (at === "unbound") {
     bindingBar.text = "$(unlock) the queue is off";
-    bindingBar.tooltip = "No token is needed to write or to run, and nobody is made to spawn. " +
-      "Click to put the queue back.";
+    bindingBar.tooltip = "The queue will not choose the work and nobody is made to spawn. " +
+      "Every write and every run still names a token. Click to put the queue back.";
     bindingBar.backgroundColor = new vscode.ThemeColor("statusBarItem.warningBackground");
     bindingBar.show();
     return;

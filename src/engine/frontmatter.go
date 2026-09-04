@@ -254,12 +254,12 @@ func unquote(s string) string {
 	return s
 }
 
-func fs(f Front, k string) string {
+func frontStr(f Front, k string) string {
 	s, _ := f[k].(string)
 	return s
 }
 
-func fl(f Front, k string) []string {
+func frontList(f Front, k string) []string {
 	switch v := f[k].(type) {
 	case []string:
 		return v
@@ -272,10 +272,10 @@ func fl(f Front, k string) []string {
 	return nil
 }
 
-func fb(f Front, k string) bool { return fs(f, k) == "true" }
+func frontBool(f Front, k string) bool { return frontStr(f, k) == "true" }
 
-func fi(f Front, k string) int {
-	n, _ := strconv.Atoi(fs(f, k))
+func frontInt(f Front, k string) int {
+	n, _ := strconv.Atoi(frontStr(f, k))
 	return n
 }
 

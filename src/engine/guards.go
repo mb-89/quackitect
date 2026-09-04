@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"quackitect/engine/internal/quiet"
 	"time"
 )
 
@@ -157,14 +158,31 @@ func aRepeatedFailure(r Roots, actor string, in hookIn) (string, bool) {
 }
 
 // THE STOP THAT RELENTS. The harness gives up on a hook that refuses a stop
-// too many times in a row and lets the agent stop anyway, silently. So an
-// unbounded refusal is not a stronger guard: it is a guard that stops
-// existing without saying so. This one counts, and before the harness would
-// override it, it grants the stop and says in the record that it did.
-// THREE, BY THE OWNER'S WORD. An agent that was refused thrice with the
-// budget spelled out is not going to shrink on the fourth, and six rounds of
-// the same refusal taught nothing extra.
-const stopRefusalsBeforeRelenting = 3
+// too many times in a row and lets the agent stop anyway, silently.
+//
+// THE COUNT NO LONGER GRANTS ANYTHING. It did, on the reasoning that relenting
+// before the harness overrode kept the failure visible. That is the valve v3
+// removed, and its comment says why: the harness sets its retry flag itself, so
+// releasing on it releases automatically and the log reads block, pass, block,
+// pass. From outside that is a hook that does not work.
+//
+// MEASURED HERE. The owner watched it go quiet mid-session: an agent that kept
+// stopping was let through for stopping often enough, with nobody deciding
+// anything. A guard that gives up on persistence is one an agent outlasts.
+//
+// SO THE RUN IS COUNTED AND THE COUNT IS ONLY EVER READ. A claim grants a stop.
+// If the harness overrides the hook after that, it is the harness overriding a
+// guard that held, which the record now shows as a run of refusals.
+
+// helperRefusalsBeforeRelenting is how often a HELPER's stop is refused before
+// the engine lets it go.
+//
+// A HELPER IS NOT THE MAIN AGENT, and this is the one place the reasoning above
+// does not hold. A helper has no person to answer to and no se_stop claim to
+// make on its own behalf: it is spawned for one job and its turn ends when the
+// harness says so. Refusing it for ever wedges a session nobody is watching.
+// The main agent has a claim available and is refused until it makes one.
+const helperRefusalsBeforeRelenting = 3
 
 func stopsPath(r Roots) string { return r.Private("stops.json") }
 
@@ -175,6 +193,36 @@ type refusedStops struct {
 	// Seen holds the actors whose first stop of this session has happened,
 	// granted or refused, so the grace below is one per actor per session.
 	Seen map[string]bool `json:"seen,omitempty"`
+
+	// Asked holds the word each actor's standing challenge was named with, so a
+	// claim can be checked against the challenge it is answering. See
+	// challenge.go.
+	Asked map[string]string `json:"asked,omitempty"`
+}
+
+// TheStandingChallenge answers the word this actor was last challenged with,
+// and ChallengeWith writes one down. An empty word means it has not been asked.
+func TheStandingChallenge(r Roots, actor string) string {
+	return loadStops(r).Asked[actor]
+}
+
+func ChallengeWith(r Roots, actor, word string) {
+	_ = locked(stopsPath(r), func() error {
+		s := loadStops(r)
+		if s.Asked == nil {
+			s.Asked = map[string]string{}
+		}
+		if word == "" {
+			delete(s.Asked, actor)
+		} else {
+			s.Asked[actor] = word
+		}
+		b, err := json.MarshalIndent(s, "", "  ")
+		if err != nil {
+			return err
+		}
+		return writeAtomic(stopsPath(r), b, 0o644)
+	})
 }
 
 func loadStops(r Roots) refusedStops {
@@ -186,23 +234,20 @@ func loadStops(r Roots) refusedStops {
 	return s
 }
 
-// countRefusedStop counts one more refused stop for this actor and answers
-// whether the guard relents this time. Relenting resets the count.
-func countRefusedStop(r Roots, actor string) (relent bool) {
+// countRefusedStop counts one more refused stop for this actor and answers how
+// many in a row that makes. It grants nothing.
+func countRefusedStop(r Roots, actor string) (times int) {
 	_ = locked(stopsPath(r), func() error { // a refusal it cannot count refuses once more, which is the safe side
 		s := loadStops(r)
 		s.Count[actor]++
-		if s.Count[actor] >= stopRefusalsBeforeRelenting {
-			relent = true
-			delete(s.Count, actor)
-		}
+		times = s.Count[actor]
 		b, err := json.MarshalIndent(s, "", "  ")
 		if err != nil {
 			return err
 		}
 		return writeAtomic(stopsPath(r), b, 0o644)
 	})
-	return relent
+	return times
 }
 
 // THE FIRST STOP OF A SESSION IS GRANTED. The kickoff tells the agent to say
@@ -290,7 +335,7 @@ func ensureEngine(r Roots) {
 		return
 	}
 	defer out.Close()
-	cmd := Detached(Quietly(exec.Command(exe, "--work", r.Work, "--method", r.Method)))
+	cmd := quiet.Detached(quiet.Quietly(exec.Command(exe, "--work", r.Work, "--method", r.Method)))
 	cmd.Stdout, cmd.Stderr = out, out
 	if err := cmd.Start(); err != nil {
 		fmt.Fprintln(os.Stderr, "quackitect: the engine could not be started:", err)

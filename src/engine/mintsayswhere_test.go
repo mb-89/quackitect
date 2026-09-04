@@ -29,11 +29,11 @@ func TestTheMintSaysWhereATokenIsBorn(t *testing.T) {
 		tracked *bool
 		want    string
 	}{
-		{"standard", "tracked", &yes, TracedDir(r)},
-		{"trivial", "tracked", &yes, TracedDir(r)},
-		{"standard", "local", &no, EphemeralDir(r)},
-		{"trivial", "local", &no, EphemeralDir(r)},
-		{"note", "nothing", nil, EphemeralDir(r)},
+		{"standard", "tracked", &yes, TrackedDir(r)},
+		{"trivial", "tracked", &yes, TrackedDir(r)},
+		{"standard", "local", &no, LocalDir(r)},
+		{"trivial", "local", &no, LocalDir(r)},
+		{"note", "nothing", nil, LocalDir(r)},
 	} {
 		tok, err := Mint(r, Token{Process: c.process, Title: "a token", Status: "first", Tracked: c.tracked})
 		if err != nil {
@@ -100,9 +100,9 @@ func TestAHandMovedTokenStaysMoved(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	from := filepath.Join(TracedDir(r), tok.ID+".md")
-	to := filepath.Join(EphemeralDir(r), tok.ID+".md")
-	if err := os.MkdirAll(EphemeralDir(r), 0o755); err != nil {
+	from := filepath.Join(TrackedDir(r), tok.ID+".md")
+	to := filepath.Join(LocalDir(r), tok.ID+".md")
+	if err := os.MkdirAll(LocalDir(r), 0o755); err != nil {
 		t.Fatal(err)
 	}
 	if err := os.Rename(from, to); err != nil {

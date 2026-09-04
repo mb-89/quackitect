@@ -6,6 +6,8 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"quackitect/engine/internal/quiet"
+	"quackitect/engine/internal/runme"
 	"runtime"
 	"strings"
 	"testing"
@@ -91,7 +93,7 @@ func aFakeVehicle(t *testing.T, version string) (dir, binary string) {
 		t.Fatal(err)
 	}
 	mk(".se/runme.json", string(b), 0o644)
-	mk(runmeName(), runmeScript(), 0o755)
+	mk(runmeName(), runme.Script(), 0o755)
 
 	// The source is deliberately older than anything the build will write, so
 	// the first run is the never-built case and not a staleness case.
@@ -114,9 +116,9 @@ func runTheRunme(t *testing.T, dir string, extraEnv ...string) (string, string, 
 	script := filepath.Join(dir, runmeName())
 	var cmd *exec.Cmd
 	if runtime.GOOS == "windows" {
-		cmd = Quietly(exec.Command("powershell", "-NoProfile", "-File", script))
+		cmd = quiet.Quietly(exec.Command("powershell", "-NoProfile", "-File", script))
 	} else {
-		cmd = Quietly(exec.Command("sh", script))
+		cmd = quiet.Quietly(exec.Command("sh", script))
 	}
 	cmd.Dir = dir
 	cmd.Env = append(os.Environ(), extraEnv...)

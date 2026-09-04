@@ -51,6 +51,7 @@
 11. DRY: do not repeat yourself. SPOT: single point of truth for every datum. A repetition in a spec, finding or answer is a defect. *
 12. Do not put history in the current surface. It goes into git commit messages.
 13. A number something else answers is never written down. The tree's count is the command that answers it. A list's count is the list. *
+14. A compression against a cap lists what it cut in the evidence, each sentence surviving elsewhere or cut on purpose. *
 
 # Work token
 

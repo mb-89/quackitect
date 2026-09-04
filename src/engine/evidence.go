@@ -207,19 +207,106 @@ func NoteAgent(roots Roots, id, kind, session string) {
 // ITS NAME IS THE ONE THE RECORD ALREADY USES. Everything the main agent does
 // is filed under main, so a register calling it session-1 would put a second
 // name on it and nothing would join the two.
+//
+// AND AN ACTOR IS A SESSION, NOT A WORD. main is a word, and two sessions over
+// one tree can both say it. TakeUp puts back everything else that actor holds,
+// so every time one of them named a token the other's token left its hands,
+// and the agent it left was refused its next write for holding nothing. So the
+// session that is here first keeps main, any other is named apart from it, and
+// the name a session is given is the name it keeps for as long as it is here.
 func NoteSession(roots Roots, session string) {
 	if session == "" {
 		return
 	}
+	run := TheRunNow(roots)
 	changeEvidence(roots, func(e *Evidence) {
 		was, seen := e.Agents[session]
 		if !seen {
 			was = Agent{First: time.Now().UTC()}
 		}
-		was.Kind, was.Name, was.Session, was.Gone = "session", "main", session, time.Time{}
-		was.Run = TheRunNow(roots)
+		// A SESSION KEEPS THE NAME IT WAS GIVEN. It is registered again on
+		// every call the engine has not seen it make, and a name worked out
+		// afresh each time would move under the tokens it already holds.
+		if was.Name == "" {
+			was.Name = aSessionName(*e, session, run)
+		}
+		was.Kind, was.Session, was.Gone = "session", session, time.Time{}
+		was.Run = run
 		e.Agents[session] = was
 	})
+}
+
+// aSessionName is main where nobody here is main, and main with the id's short
+// form after it where somebody is.
+//
+// THE FIRST SESSION KEEPS main, so one session over one tree reads exactly as
+// it did and every name already written down goes on meaning what it meant.
+//
+// A COLLISION FALLS BACK TO THE WHOLE ID rather than to a second main, because
+// two actors under one name is the defect this is about and a short form is
+// short enough to repeat.
+func aSessionName(e Evidence, session, run string) string {
+	taken := map[string]bool{}
+	for id, a := range e.Agents {
+		if id != session && a.Name != "" && a.Gone.IsZero() && a.Run == run {
+			taken[a.Name] = true
+		}
+	}
+	if !taken["main"] {
+		return "main"
+	}
+	if short := "main-" + theShortForm(session); !taken[short] {
+		return short
+	}
+	return "main-" + session
+}
+
+// theShortForm is enough of an identity to tell two of them apart and short
+// enough for a person to type. A letter or a digit is kept and everything else
+// is dropped, because the name is typed on a command line and read in a table.
+func theShortForm(id string) string {
+	kept := strings.Map(func(r rune) rune {
+		switch {
+		case r >= 'a' && r <= 'z', r >= '0' && r <= '9':
+			return r
+		case r >= 'A' && r <= 'Z':
+			return r + ('a' - 'A')
+		}
+		return -1
+	}, id)
+	if kept == "" {
+		return "session"
+	}
+	if len(kept) > 8 {
+		return kept[:8]
+	}
+	return kept
+}
+
+// TheSessionName is the name this session acts under, which is the name it was
+// given when it was registered. A session nothing registered is main, because
+// one session over one tree is what main has always meant.
+func TheSessionName(roots Roots, session string) string {
+	if session == "" {
+		return "main"
+	}
+	if a, ok := LoadEvidence(roots).Agents[session]; ok && a.Name != "" {
+		return a.Name
+	}
+	return "main"
+}
+
+// TheActorOf is the name the record uses for whoever is calling: the helper's
+// name where the harness named one, and the session's own where it did not.
+//
+// THE SESSION IS NOT ASKED FOR BY A HASH. Every other identity the harness
+// sends is an agent id, and the session sends none: it is the caller with no
+// agent, so the session id is the only thing that tells two of them apart.
+func TheActorOf(roots Roots, session, agent string) string {
+	if agent == "" || agent == "main" {
+		return TheSessionName(roots, session)
+	}
+	return NameOf(roots, agent)
 }
 
 // AgentSeen registers whoever is calling, if this run has not seen them.
@@ -254,8 +341,11 @@ func AgentSeen(roots Roots, session, id, kind string) {
 // HelpersGoneWith writes down that every helper of this session has gone,
 // and leaves the session itself.
 //
-// THE HARNESS SAYS NOTHING WHEN A TURN IS INTERRUPTED, and the record shows
-// it has never said SubagentStop here either. What it does say is when the
+// THE HARNESS SAYS NOTHING WHEN A TURN IS INTERRUPTED, and SubagentStop
+// reaches some helpers and not others: 36 of the 78 that had settled by
+// 2026-09-04, and none of the seven an interrupt killed at 08:16 that day.
+// So a helper closed only by its own stop is a helper the register keeps
+// after it is gone. What it does say is when the
 // session's turn ends and when its next prompt arrives, and a helper is a
 // thing of one turn: it is spawned in it and it is dead by the next prompt,
 // whether the turn ended or was cut. So the turn's end takes the helpers
@@ -264,6 +354,14 @@ func AgentSeen(roots Roots, session, id, kind string) {
 func HelpersGoneWith(roots Roots, session string) {
 	if session == "" {
 		return
+	}
+	// AND THE WORK GOES BACK WITH THEM. A sweep that marks a helper gone and
+	// leaves its token held is the same defect by a second door: a stop reaches
+	// some helpers and never others, so this is where most of them are collected.
+	for id, a := range LoadEvidence(roots).Agents {
+		if a.Session == session && id != session && a.Kind != "session" && a.Gone.IsZero() {
+			PutDownWhatTheyHeld(roots, id)
+		}
 	}
 	changeEvidence(roots, func(e *Evidence) {
 		now := time.Now().UTC()
@@ -283,6 +381,11 @@ func AgentGone(roots Roots, id string) {
 	if id == "" {
 		return
 	}
+	// WHAT IT HELD GOES BACK BEFORE IT DOES. A token held by an agent that no
+	// longer exists is work the queue counts as in hand and hands to nobody, and
+	// the panel draws a row for the holder, so the dead look busy. See
+	// goneputsdown.go.
+	PutDownWhatTheyHeld(roots, id)
 	changeEvidence(roots, func(e *Evidence) {
 		if a, seen := e.Agents[id]; seen && a.Gone.IsZero() {
 			a.Gone = time.Now().UTC()

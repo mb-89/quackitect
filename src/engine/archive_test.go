@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -157,6 +158,63 @@ func TestTheArchiveAnswersASearch(t *testing.T) {
 	}
 }
 
+// A NARROWED SEARCH NEVER ANSWERS UNNARROWED.
+//
+// The verb built its archive search from three of the four fields it was
+// handed and left the path on the floor, so se find --archive --path
+// anything-at-all answered exactly what the same search with no --path
+// answered. The flag was declared, documented as a glob over paths, and taken.
+//
+// THE DAMAGE IS THE READING, not the missing filter. A reader who asks for one
+// folder and is handed the whole archive believes the hits came from that
+// folder, which is worse than being told the flag does not apply.
+//
+// THIS DRIVES THE VERB. The defect was the verb dropping a field on its way to
+// the function, so a test of the function alone stays green while the verb
+// goes on dropping it.
+func TestTheArchiveWillNotTakeAPathItCannotRead(t *testing.T) {
+	t.Parallel()
+	r := aTreeWithHistory(t)
+	tok, err := Mint(r, Token{Process: "standard", Title: "a token to find",
+		Status: "first", Tracked: tracked(), Detail: "the word the search looks for is gooseberry"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	tok.Disposition = Done
+	tok.Status = "closed"
+	if err := SaveToken(r, tok); err != nil {
+		t.Fatal(err)
+	}
+
+	// THE SAME SEARCH TWICE, ONE OF THEM NARROWED TO NOTHING. The unnarrowed
+	// one says the archive really does hold the word, so the narrowed one
+	// answering it is the defect rather than an empty archive.
+	find := func(args ...string) (string, int) {
+		var out, errs bytes.Buffer
+		code := run["find"](&call{roots: r, args: args,
+			in: strings.NewReader(""), out: &out, err: &errs})
+		return out.String() + errs.String(), code
+	}
+	if said, code := find("--archive", "--regex", "gooseberry"); code != 0 ||
+		!strings.Contains(said, "gooseberry") {
+		t.Fatalf("the archive does not answer the word unnarrowed, so nothing below means anything: %d %s", code, said)
+	}
+
+	said, code := find("--archive", "--regex", "gooseberry", "--path", "nothing/at/all/*")
+	if code == 0 && strings.Contains(said, "gooseberry") {
+		t.Fatalf("a search narrowed to nothing answered the hit anyway, so --path was taken and dropped: %s", said)
+	}
+	if !strings.Contains(said, "--path") {
+		t.Errorf("the refusal does not name the flag it refuses: %s", said)
+	}
+
+	// AND THE FUNCTION REFUSES IT TOO, because the verb is not the only caller
+	// and a field the second half ignores is refused rather than accepted.
+	if _, err := FindArchived(r, FindParams{Regex: "gooseberry", Path: "nothing/at/all/*"}); err == nil {
+		t.Errorf("FindArchived took a path it cannot read")
+	}
+}
+
 // THE LIST IS A RENDERING AND NEVER A SOURCE.
 //
 // Level 2 ruled against an index kept in step with the thing it indexes,
@@ -219,7 +277,7 @@ func TestATreeWithNoHistoryKeepsItsTokens(t *testing.T) {
 	if err := SaveToken(r, tok); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := os.Stat(filepath.Join(TracedDir(r), tok.ID+".md")); err != nil {
+	if _, err := os.Stat(filepath.Join(TrackedDir(r), tok.ID+".md")); err != nil {
 		t.Fatalf("it was taken off a tree that has nowhere to keep it: %v", err)
 	}
 }

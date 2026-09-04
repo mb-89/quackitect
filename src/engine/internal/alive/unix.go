@@ -1,6 +1,6 @@
 //go:build !windows
 
-package main
+package alive
 
 import (
 	"os"
@@ -8,7 +8,7 @@ import (
 )
 
 // Signal zero asks whether a process is there without telling it anything.
-func alive(pid int) bool {
+func Is(pid int) bool {
 	p, err := os.FindProcess(pid)
 	if err != nil {
 		return false

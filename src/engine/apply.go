@@ -11,6 +11,8 @@ import (
 	"sort"
 	"strings"
 	"time"
+
+	"quackitect/engine/internal/voice"
 )
 
 // WRITING IS A VERB OF THE ENGINE, AND IT NAMES ITS TOKEN.
@@ -489,7 +491,7 @@ func proseThatReads(r Roots, edits []Edit) error {
 	if len(written) == 0 {
 		return nil
 	}
-	rules, err := LoadVoiceRules(r.Method)
+	rules, err := voice.Load(r.Method)
 	if err != nil {
 		return nil // said by the guard where it can be said; a write is not stopped for it
 	}

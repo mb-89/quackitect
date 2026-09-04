@@ -478,7 +478,7 @@ func indexNote(tx *sql.Tx, rel, text string) error {
 		return nil // a note that will not read is said out loud where it is read, and has no rows here
 	}
 	id := strings.TrimSuffix(path.Base(rel), ".md")
-	kind := unlink(fs(f, "kind"))
+	kind := unlink(frontStr(f, "kind"))
 	if _, err := tx.Exec("INSERT INTO note (path, id, kind, front, body) VALUES (?, ?, ?, ?, ?)",
 		rel, id, kind, frontJSON(f), body); err != nil {
 		return err

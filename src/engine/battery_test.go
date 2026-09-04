@@ -116,4 +116,43 @@ func TestTheBatterysVerdictIsItsLastLine(t *testing.T) {
 			t.Fatalf("batteryPassed(%q) = %v, wanted %v", c.said, got, c.pass)
 		}
 	}
+	// AND THE GREEN CASE IS THE SCRIPT'S OWN LINE, NOT ONE TYPED HERE.
+	for _, said := range theBatterysVerdicts(t) {
+		if !batteryPassed(said + "\n") {
+			t.Fatalf("util/checks/battery.sh prints %q with nothing failed, and batteryPassed calls it a failure, so every green battery reaches the record as not ok", said)
+		}
+	}
+}
+
+// theBatterysVerdicts answers every line util/checks/battery.sh can print as its
+// verdict, with nothing failed and the wall clock filled in.
+//
+// IT READS THE SCRIPT RATHER THAN A COPY OF IT. The table above was written from
+// the reader's side. batteryPassed wanted a last line starting "0 failed" and
+// the script printed "all ok" when nothing had failed, so RecordFinishedBattery
+// wrote every passing battery into the record as not ok while both sides stayed
+// green.
+//
+// AND IT IS THE SET RATHER THAN ONE MEMBER, because a second spelling of the
+// verdict is how the two came apart. It refuses when the script prints none.
+func theBatterysVerdicts(t *testing.T) []string {
+	t.Helper()
+	said, err := os.ReadFile(filepath.Join("..", "..", "util", "checks", "battery.sh"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var out []string
+	for _, line := range strings.Split(string(said), "\n") {
+		line = strings.TrimSpace(line)
+		if !strings.HasPrefix(line, `echo "`) || !strings.Contains(line, "wall clock") {
+			continue
+		}
+		verdict := strings.TrimSuffix(strings.TrimPrefix(line, `echo "`), `"`)
+		verdict = strings.ReplaceAll(verdict, "$bad", "0")
+		out = append(out, strings.ReplaceAll(verdict, "${took}", "3"))
+	}
+	if len(out) == 0 {
+		t.Fatal("util/checks/battery.sh prints no verdict naming its wall clock, so nothing holds the script and batteryPassed in step")
+	}
+	return out
 }

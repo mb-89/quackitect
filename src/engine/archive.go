@@ -2,11 +2,13 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"quackitect/engine/internal/quiet"
 	"regexp"
 	"sort"
 	"strings"
@@ -42,7 +44,7 @@ const archiveRefs = "refs/tags/archive/"
 // ArchiveList is the list a person opens. It travels, because a box that reads
 // the tree out of git should see what has been archived without asking git.
 func ArchiveList(r Roots) string {
-	return filepath.Join(TracedDir(r), "archive.jsonl")
+	return filepath.Join(TrackedDir(r), "archive.jsonl")
 }
 
 // Archived is one line of that list.
@@ -62,7 +64,7 @@ type Archived struct {
 // or anybody's staging. The author is the engine, so nothing depends on a name
 // being configured on the box.
 func gitHere(r Roots, args ...string) (string, error) {
-	cmd := Quietly(exec.Command("git", args...))
+	cmd := quiet.Quietly(exec.Command("git", args...))
 	cmd.Dir = r.Work
 	cmd.Env = append(os.Environ(),
 		"GIT_AUTHOR_NAME=quackitect", "GIT_AUTHOR_EMAIL=engine@quackitect",
@@ -87,7 +89,7 @@ func Archive(r Roots, t Token) error {
 	if at == "" {
 		return nil // nothing on disk to archive
 	}
-	if filepath.Dir(at) != TracedDir(r) {
+	if filepath.Dir(at) != TrackedDir(r) {
 		return nil // it stays, closed, until a retro has read it
 	}
 	if _, err := os.Stat(filepath.Join(r.Work, ".git")); err != nil {
@@ -102,6 +104,40 @@ func Archive(r Roots, t Token) error {
 		return err
 	}
 	return WriteArchiveList(r)
+}
+
+// NotArchived says a token closed and its archive could not be written.
+//
+// THE ARCHIVE IS A CONSEQUENCE OF THE CLOSE AND NOT A CONDITION OF IT. By the
+// time it runs the note is on the disk, closed, and the move is in the record.
+// Returning git's error as the save's said a close that had happened had not,
+// and the retry then made it permanent: the second save sees a token that has
+// already ended, takes the arm for a repair rather than for a close, and never
+// archives. The token was then closed, on the disk, and nothing would archive
+// it again except a sweep nobody knew to run.
+//
+// So the close stands and this says what is left over. It is the shape
+// snapshotFor already uses for a tree it cannot snapshot, and keepInGit for a
+// push it cannot make: said out loud, and the work goes on.
+type NotArchived struct {
+	ID  string
+	Err error
+}
+
+func (n NotArchived) Error() string {
+	return n.ID + " is closed, and its archive could not be written: " + n.Err.Error() +
+		". It is closed and still on the disk, and se archive --sweep puts it into git."
+}
+
+func (n NotArchived) Unwrap() error { return n.Err }
+
+// TheCloseStood answers whether an error off a save left the token closed.
+// Every door that ends a token asks this one question, so neither of them can
+// be taught the rule while the other goes on reporting a close that happened
+// as one that did not.
+func TheCloseStood(err error) bool {
+	var n NotArchived
+	return errors.As(err, &n)
 }
 
 // forget removes a token from the disk and tells the index it is gone.
@@ -157,7 +193,7 @@ func keepInGit(r Roots, at string, row Archived) error {
 
 // treeOfOne writes a tree holding one file, by handing mktree its line.
 func treeOfOne(r Roots, name, blob string) (string, error) {
-	cmd := Quietly(exec.Command("git", "mktree"))
+	cmd := quiet.Quietly(exec.Command("git", "mktree"))
 	cmd.Dir = r.Work
 	cmd.Stdin = strings.NewReader("100644 blob " + blob + "\t" + name + "\n")
 	out, err := cmd.Output()
@@ -323,7 +359,7 @@ func SweepClosed(r Roots) (kept, gone int, err error) {
 		if !t.Ended() {
 			continue
 		}
-		tracked := filepath.Dir(noteAt(r, t.ID)) == TracedDir(r)
+		tracked := filepath.Dir(noteAt(r, t.ID)) == TrackedDir(r)
 		if err := Archive(r, t); err != nil {
 			return kept, gone, fmt.Errorf("%s: %w", t.ID, err)
 		}
@@ -351,6 +387,22 @@ func FindArchived(r Roots, p FindParams) (Found, error) {
 	rows, err := TheArchive(r)
 	if err != nil {
 		return Found{}, err
+	}
+	// A GLOB OVER PATHS HAS NOTHING TO NARROW HERE, SO IT IS REFUSED.
+	//
+	// An archived token is a tag rather than a file, and a hit names the tag it
+	// came from. There is no path for a glob to read, and the flag was taken and
+	// ignored: a search asking for one folder answered the whole archive.
+	//
+	// THE DAMAGE IS THE READING RATHER THAN THE MISSING FILTER. A reader handed
+	// the whole archive after asking for one folder believes the hits came from
+	// that folder, which is worse than being told the flag does not apply. So it
+	// says so, and it says so here rather than in the verb, because a field the
+	// half that reads it ignores is refused for every caller and not just one.
+	if p.Path != "" {
+		return Found{}, fmt.Errorf("the archive reads no path, so --path %s has nothing to narrow: "+
+			"an archived token is a tag rather than a file. Search the archive without it, "+
+			"or search the tree, which does read paths", p.Path)
 	}
 	want := p.Regex
 	if want == "" {

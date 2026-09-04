@@ -87,6 +87,31 @@ holdsNot(one, "walker-4", "first: nothing from the second answer");
 holdsNot(two, "reviewer-1", "second: nothing from the first answer");
 holdsNot(two, "wk-1111111111", "second: not the first answer's token");
 
+// TWO SESSIONS ARE TWO ROWS, EACH UNDER ITS OWN NAME.
+//
+// An actor is a session and not a word. Two sessions over one tree were both
+// the actor main, so the register answered one name where two agents were
+// working and the table drew one of them. The name is the engine's to give;
+// what is held to here is that the table draws every row it is handed and
+// collapses none of them, which is the half a person looks at.
+const sessions = {
+  actors: [],
+  hold: { on: false },
+  present: [
+    { actor: "main", kind: "session", state: "working", id: "wk-3333333333",
+      title: "the first session's work", holding: "wk-3333333333 the first session's work" },
+    { actor: "main-ssecond3", kind: "session", state: "working", id: "wk-4444444444",
+      title: "the second session's work", holding: "wk-4444444444 the second session's work" },
+  ],
+};
+const two_sessions = panelHtml(tree, shown, {}, sessions);
+holds(two_sessions, 'data-actor="main"', "two sessions: the first keeps main");
+holds(two_sessions, 'data-actor="main-ssecond3"', "two sessions: the second is drawn under its own name");
+holds(two_sessions, "wk-3333333333", "two sessions: the token the first holds");
+holds(two_sessions, "wk-4444444444", "two sessions: the token the second holds");
+if ((two_sessions.match(/<tr /g) ?? []).length === 2) ok("two sessions: two rows, and neither collapsed into the other");
+else no("two sessions: the table drew " + (two_sessions.match(/<tr /g) ?? []).length + " rows for two sessions");
+
 // THE COLUMNS ARE THE DECLARED ONES, by their titles, in the declared order.
 const titles = (table.columns ?? []).map((c) => c.title);
 const at = titles.map((t) => one.indexOf(">" + t + "<"));

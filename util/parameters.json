@@ -168,10 +168,10 @@
           "name": "parallel_agents",
           "title": "parallel agents",
           "type": "int",
-          "default": 5,
+          "default": 3,
           "min": 0,
           "max": 20,
-          "help": "How many helpers may work at once. More finishes more at a time and costs more. Zero means the main agent works alone."
+          "help": "How many workers there are, counting the main agent, and how many reviewers beside them. At three the main agent spawns two workers and three reviewers. More finishes more at a time and costs more. Zero means the main agent works alone."
         },
         {
           "name": "claim_hours",

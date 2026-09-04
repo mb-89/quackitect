@@ -146,35 +146,41 @@ func TestTheSameFailingCallIsRefusedAfterThreeFailures(t *testing.T) {
 	}
 }
 
-func TestARefusedStopRelentsBeforeTheHarnessOverridesIt(t *testing.T) {
+// A STOP IS NEVER GRANTED FOR BEING ASKED OFTEN ENOUGH.
+//
+// THIS TEST ASSERTED THE OPPOSITE, and the behaviour it locked in is the one
+// the owner watched fail: the hook refused, the agent stopped again, and after
+// three rounds the engine let it through with nothing claimed. Persistence was
+// a way past the guard, so the guard was a delay rather than a rule.
+//
+// v3 REMOVED THE SAME VALVE and said why: the harness sets its retry flag
+// itself, so releasing on it releases automatically, and the log reads block,
+// pass, block, pass. From outside that is a hook that does not work.
+//
+// THE RUN IS STILL COUNTED, into the record, because how many times an agent
+// asked is worth seeing. It buys nothing.
+func TestAStopIsNeverGrantedForAskingOftenEnough(t *testing.T) {
 	t.Parallel()
 	exe, r := aGuardedTree(t)
-	stop := map[string]any{"cwd": r.Work, "agent_id": "helper-1"}
-	// The first stop of the session is granted, so it is spent before the
-	// refusals under test are counted.
+	stop := map[string]any{"cwd": r.Work, "agent_id": "main"}
+	// The first stop of the session is granted on its own rule, so it is spent
+	// before the refusals under test begin.
 	hookSays(t, exe, r.Method, "Stop", stop)
-	for i := 1; i < stopRefusalsBeforeRelenting; i++ {
+	for i := 1; i <= 6; i++ {
 		d, _ := decisionOf(t, hookSays(t, exe, r.Method, "Stop", stop))
 		if d != "block" {
-			t.Fatalf("stop %d was answered %q, want a refusal", i, d)
+			t.Fatalf("stop %d with nothing claimed was answered %q, and only a claim grants one", i, d)
 		}
 	}
-	// THE LAST ONE IS GRANTED, AND THE RECORD SAYS SO.
-	if said := hookSays(t, exe, r.Method, "Stop", stop); said != "" {
-		t.Fatalf("the relenting stop was answered %q", said)
-	}
-	var relented bool
+	// AND THE RECORD CARRIES THE RUN, so a person can see how hard it was pushed.
+	var counted bool
 	for _, line := range logLines(t, r) {
-		if strings.Contains(line, "relents") {
-			relented = true
+		if strings.Contains(line, "in_a_row") {
+			counted = true
 		}
 	}
-	if !relented {
-		t.Fatal("the record does not say the guard relented")
-	}
-	// AND THE COUNT STARTS OVER.
-	if d, _ := decisionOf(t, hookSays(t, exe, r.Method, "Stop", stop)); d != "block" {
-		t.Fatalf("the stop after relenting was answered %q, want a refusal", d)
+	if !counted {
+		t.Error("the record does not say how many refusals in a row there were")
 	}
 }
 
@@ -218,8 +224,10 @@ func TestAHelperReturningWhatItReadIsSentBackToDigest(t *testing.T) {
 	if d != "block" {
 		t.Fatalf("an answer over budget was answered %q: %v", d, out)
 	}
-	// Bounded: the refusal relents rather than being overridden in silence.
-	for i := 0; i < stopRefusalsBeforeRelenting; i++ {
+	// Bounded: a HELPER's refusal relents rather than being overridden in
+	// silence. A helper has no person to answer to and no claim to make, which is
+	// the one place the never-relent rule above does not hold.
+	for i := 0; i < helperRefusalsBeforeRelenting; i++ {
 		stop(over)
 	}
 	if said := stop(strings.Repeat("z", 10)); said != "" {

@@ -72,6 +72,7 @@ Google's engineering book sizes a test by what it may touch, not by what it cove
 A small test runs in one thread with no disk, no network and no sleep.
 A medium test runs on one machine.
 The size says what can make it slow or flaky.
+The suite is mostly small, because that is what runs on every save.
 
 ## 6. Properties
 
@@ -123,12 +124,11 @@ So a binary or a parsed corpus is shared, and anything a test changes is fresh, 
 
 ## 13. The machine is not a fixture, and the contract is one test
 
-A probe test named `go` as certainly present, because it was running under it.
+A probe test named `go` as certainly present, because it ran under it.
 A test waiting for the operating system to notice a file failed under load, so the daemon takes its events from the test.
-Its tools, clock and randomness are fixtures.
+Its tools, clock and random source are fixtures the test hands in, so a failing case is replayed by its seed.
 
 A fake with nothing behind it drifts, so one test drives the real tool.
-The four slowest tests here compiled a module to decide which tests the engine picks.
 
 ## 14. Parallel, isolated, and never flaky
 
@@ -142,6 +142,5 @@ Google quarantines a flaky test the day it flakes, then fixes or deletes it.
 A benchmark asks whether this is faster than that, here, today.
 So both sides run on one machine in one sitting, enough times for the noise to show.
 `benchstat` reports only a difference that clears it.
-Six measurements once measured something else.
 A hook timed at fifty-eight milliseconds had failed on its first line, and vet piped to head printed clean while reporting errors.
 So a measurement reports only when its command produced output and the caller read the exit code itself, never one inherited through a pipe.

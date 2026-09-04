@@ -91,9 +91,7 @@ func TestTheEngineExceptionReadsEachQuotingTheWayBashDoes(t *testing.T) {
 // constructs. The pairs are why rev-25 found the third leak still open.
 func TestBashDecidesWhichCommandsLeaveTheException(t *testing.T) {
 	t.Parallel()
-	if _, err := exec.LookPath("bash"); err != nil {
-		t.Fatal("bash is not on PATH, so this check cannot ask the shell and guards nothing")
-	}
+	shell := theShellThisMachineHas(t)
 	const lead = ".bin/se work --detail "
 	for _, one := range []struct{ what, arg string }{
 		{"a bare substitution", "$(touch M)"},
@@ -121,7 +119,7 @@ func TestBashDecidesWhichCommandsLeaveTheException(t *testing.T) {
 		{"a bare redirection", "> M"},
 	} {
 		dir := t.TempDir()
-		twin := exec.Command("bash", "-c", ": "+one.arg)
+		twin := exec.Command(shell, "-c", ": "+one.arg)
 		twin.Dir = dir
 		if out, err := twin.CombinedOutput(); err != nil {
 			t.Fatalf("bash refused the twin for %s: %v: %s", one.what, err, out)
@@ -138,4 +136,37 @@ func TestBashDecidesWhichCommandsLeaveTheException(t *testing.T) {
 				lead+one.arg)
 		}
 	}
+}
+
+// theShellThisMachineHas is the shell the engine itself would run a command in,
+// and it is the oracle above rather than the bare name bash.
+//
+// A NAME THAT RESOLVES IS NOT A SHELL THAT RUNS. Windows ships bash.exe in the
+// system folder whether or not WSL is installed, and LookPath answers it ahead
+// of the sh Git left off PATH. Handed a script it exits 1 saying the Windows
+// Subsystem for Linux is required, so the table above was judged against a
+// launcher rather than against a shell. That is red on the box it was written
+// on, and quietly worse on a box that does have WSL, where the oracle would be
+// a different shell answering about a different filesystem.
+//
+// SO IT ASKS THE LOOKUP THE ENGINE ASKS. posixShell passes the launcher over and
+// finds the shell beside git, which is the shell se_run hands a command to, so
+// the guard is held against the thing it guards.
+//
+// AND A MACHINE WITH NO SHELL SKIPS, saying where it looked. A fatal there reads
+// as this check being broken, when what is true is that this box cannot run it.
+func theShellThisMachineHas(t *testing.T) string {
+	t.Helper()
+	root := t.TempDir()
+	r := Roots{Method: root, Work: root}
+	// THE PROBE IS HOW THE LOOKUP FINDS GIT, and a machine without git leaves it
+	// empty rather than writing a path nothing is at.
+	if git, err := exec.LookPath("git"); err == nil {
+		writeProbe(r, Probe{Session: "s", Found: []Tool{{Name: "git", Path: git}}})
+	}
+	sh, looked := posixShell(r)
+	if sh == "" {
+		t.Skipf("no POSIX shell on this machine, so this check cannot ask one. Looked in: %v", looked)
+	}
+	return sh
 }

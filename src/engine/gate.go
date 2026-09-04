@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 )
 
 // NO TOKEN, NO WRITING.
@@ -179,6 +180,11 @@ func TakeUp(r Roots, id, actor string) (Token, error) {
 	if t.Holder != "" && t.Holder != actor {
 		return t, fmt.Errorf("%s is held by %s. One token has one holder", t.ID, t.Holder)
 	}
+	// A TOKEN THAT TRAVELS IS CLAIMED BEFORE IT IS WORKED, because another box
+	// can read it out of git and take the same one.
+	if why := NoClaimHere(r, t, time.Now().UTC()); why != "" {
+		return t, fmt.Errorf("%s", why)
+	}
 	// THE PUTTING BACK COMES FIRST, and it skips the token being named, so an
 	// agent naming what it already holds does not put it back a moment before
 	// taking it up again.
@@ -270,9 +276,43 @@ func WriteNeedsAToken(r Roots, actor, tool, path, command string) (string, bool)
 	// after it under whatever it named first. The engine's own verbs take the
 	// name on the call, so the two cannot come apart.
 	if NamesItsOwnToken[tool] {
-		return theRefusal(r, actor, tool, path), true
+		return whatDisqualified(command) + theRefusal(r, actor, tool, path), true
 	}
 	return "", false
+}
+
+// whatDisqualified says why a command that is the engine did not get the
+// engine's exception, and is empty for one that never had a claim on it.
+//
+// THE REFUSAL ANSWERED THE WRONG QUESTION. `./RUNME.sh pull --help | head -40`
+// came back talking about naming a token, so a cloud agent read it as the engine
+// itself being refused and spent several calls on that reading. The engine was
+// not refused. The pipe was, because a pipe can write.
+//
+// IT READS THE SAME WALK runsTheEngine READS. theQuotings answers both readings
+// of the command once, so what disqualified it is read off the same string the
+// gate decided on rather than off a second parse that could disagree.
+func whatDisqualified(command string) string {
+	if !isTheEngine(firstWord(command)) {
+		return ""
+	}
+	separators, substitutions := theQuotings(command)
+	says := ""
+	switch {
+	case strings.ContainsAny(separators, "|"):
+		says = "a pipe"
+	case strings.ContainsAny(separators, "<>"):
+		says = "a redirection"
+	case strings.ContainsAny(separators, ";&\n"):
+		says = "a second command"
+	case strings.Contains(substitutions, "$(") || strings.Contains(substitutions, "`"):
+		says = "a substitution"
+	default:
+		return "" // it is inside the exception, and nothing was refused for it
+	}
+	return "THE ENGINE IS NOT WHAT WAS REFUSED. This command runs the engine, and " +
+		says + " took it out of the exception, because " + says + " can write and the " +
+		"engine cannot tell what it writes. The engine on its own goes through.\n\n"
 }
 
 // theByName is the name the caller pulls with, which is the name a token is
@@ -452,4 +492,92 @@ func TheNamesItPullsWith(r Roots) map[string][]string {
 // everyNameOf answers the caller and every name it has pulled with.
 func everyNameOf(r Roots, actor string) []string {
 	return append([]string{actor}, TheNamesItPullsWith(r)[actor]...)
+}
+
+// A NAME ANOTHER SESSION HOLDS IS NOT THIS ONE'S TO ACT UNDER.
+//
+// AN ACTOR IS A SESSION, NOT A WORD. Two sessions ran over one tree and both
+// said main. TakeUp puts back everything else that actor holds, so every time
+// one of them named a token the other's token left its hands, and the agent it
+// left was refused every write for holding nothing.
+//
+// THE REGISTER ALREADY KNOWS THE SESSIONS. It keys each one by the id the
+// harness sends and gives each one a name of its own, so the question here is
+// only whether the name on this call belongs to a session that is not this
+// one. Nothing in the call itself says which session sent it, and the guard
+// sees the session on every event, which is why the guard is where this is
+// asked and TakeUp is not.
+//
+// IT ASKS ABOUT SESSIONS AND NOT ABOUT HELPERS. A helper's name is its own, no
+// session answers to it, and two helpers of two sessions are already two names.
+//
+// AND A LIVE SESSION IS ONE OF THIS RUN, which is what live means everywhere
+// else in the register: aSessionName one file over decides the same names and
+// asks Run and Gone together. Gone is written on SessionEnd and on nothing
+// else, so a session killed without one keeps Kind session, its name and a zero
+// Gone for ever. The refusal is the whole product of this guard, and a stale
+// record under the same name made it name a session that is not here. The
+// refusal itself is never lost: dropping the run can only match more records
+// than the live holder, never fewer.
+//
+// THE PICK IS THE LOWEST ID RATHER THAN THE FIRST KEY. A map hands its keys
+// back in nobody's order, so two live sessions under one name would have made
+// this message change between two calls that asked the same thing.
+func ANameAnotherSessionHolds(r Roots, session, named string) (string, bool) {
+	if session == "" || named == "" {
+		return "", false
+	}
+	mine := TheSessionName(r, session)
+	if named == mine {
+		return "", false
+	}
+	run := TheRunNow(r)
+	theirs := ""
+	for id, a := range LoadEvidence(r).Agents {
+		if a.Kind != "session" || id == session || a.Name != named {
+			continue
+		}
+		if !a.Gone.IsZero() || a.Run != run {
+			continue
+		}
+		if theirs == "" || id < theirs {
+			theirs = id
+		}
+	}
+	if theirs == "" {
+		return "", false
+	}
+	return "THAT NAME IS ANOTHER SESSION'S, AND AN ACTOR IS A SESSION.\n\n" +
+		named + " is the session " + theirs + ", which is working over this same " +
+		"folder. Naming a token as " + named + " puts back everything " + named +
+		" holds, so that session's work would leave its hands and it would be " +
+		"refused its next write for holding nothing.\n\n" +
+		"You are " + mine + ". Pull under that name:\n\n" +
+		"  se pull --actor " + mine + "\n\n" +
+		"and send actor: " + mine + " on every call that names a token.", true
+}
+
+// theNameACommandActsUnder is the actor a shell command names, under whichever
+// flag the verb spells it: --actor for a pull and --by for a write.
+//
+// THE SHELL IS THE OTHER DOOR. A rule taught to the lane and not to the shell
+// is half a mechanism, and both doors are open at once in this tree.
+func theNameACommandActsUnder(command string) string {
+	if !runsTheEngine(command) {
+		return ""
+	}
+	separators, _ := theQuotings(command)
+	words := strings.Fields(separators)
+	named := ""
+	for i, w := range words {
+		for _, flag := range []string{"--actor", "--by"} {
+			if w == flag && i+1 < len(words) {
+				named = words[i+1]
+			}
+			if strings.HasPrefix(w, flag+"=") {
+				named = strings.TrimPrefix(w, flag+"=")
+			}
+		}
+	}
+	return named
 }

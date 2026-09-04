@@ -108,7 +108,7 @@ func TestABlockedClaimIsRefusedWhileTheQueueWouldHandWork(t *testing.T) {
 	if err := os.MkdirAll(procs, 0o755); err != nil {
 		t.Fatal(err)
 	}
-	proc := "name: task\ndescription: a fixture process\ntraced: false\nsections:\n  required:\n    - detail\nstates:\n  - name: open\n    description: waiting\n  - name: closed\n    description: finished\nactivities:\n  - name: mint\n    does: write it down\n    to: open\n  - name: do\n    does: do it\n    from: open\n    to: closed\ndispositions:\n  - name: done\n    description: it was done\n"
+	proc := "name: task\ndescription: a fixture process\nsections:\n  required:\n    - detail\nstates:\n  - name: open\n    description: waiting\n  - name: closed\n    description: finished\nactivities:\n  - name: mint\n    does: write it down\n    to: open\n  - name: do\n    does: do it\n    from: open\n    to: closed\ndispositions:\n  - name: done\n    description: it was done\n"
 	if err := os.WriteFile(filepath.Join(procs, "task.process.yaml"), []byte(proc), 0o644); err != nil {
 		t.Fatal(err)
 	}
@@ -153,8 +153,10 @@ func TestABlockedClaimStandsWhenTheQueueIsEmpty(t *testing.T) {
 	if err := ClaimStop(r, "main", "blocked", "the queue is dry"); err != nil {
 		t.Fatal(err)
 	}
+	// NOTHING IS HELD AND NOTHING IS OFFERED, so the engine has nothing to argue
+	// with and the claim that names the reason is the stop. See challenge.go.
 	if out := hookSays(t, exe, r.Method, "Stop", map[string]any{"cwd": r.Work}); out != "" {
-		t.Fatalf("a true blocked claim was refused: %s", out)
+		t.Fatalf("a true blocked claim with a dry queue was refused: %s", out)
 	}
 }
 
@@ -183,12 +185,12 @@ func TestAnyActionSpendsTheClaim(t *testing.T) {
 		t.Fatal("the claim survived an action")
 	}
 
-	// Claimed and used straight away, it is honoured.
+	// Claimed again, and with nothing in hand it is honoured at once.
 	if err := ClaimStop(r, "main", "broken", "the build will not run here"); err != nil {
 		t.Fatal(err)
 	}
 	if out := hookSays(t, exe, r.Method, "Stop", map[string]any{"cwd": r.Work}); out != "" {
-		t.Fatalf("a claimed stop was refused: %s", out)
+		t.Fatalf("a claim with nothing in hand was refused: %s", out)
 	}
 
 	// AND IT STANDS WHILE THE AGENT IS STOPPED. A harness sends turns nobody

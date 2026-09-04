@@ -91,6 +91,38 @@ func TestTheEngineExceptionIsAnchoredToTheProgram(t *testing.T) {
 	}
 }
 
+// A REFUSAL SAYS WHAT DISQUALIFIED THE COMMAND, WHERE IT WAS NEARLY ALLOWED.
+//
+// A command that is the engine and something else is refused for the something
+// else. The refusal talked about naming a token, so a cloud agent read it as the
+// engine itself being refused and spent several calls on that reading.
+func TestARefusalSaysWhatTookTheCommandOutOfTheException(t *testing.T) {
+	t.Parallel()
+	for _, c := range []struct{ command, says string }{
+		{"./RUNME.sh pull --help | head -40", "a pipe"},
+		{".bin/se lint > findings.json", "a redirection"},
+		{"se query --list; touch notes.md", "a second command"},
+		{"se work --title x && rm -rf src", "a second command"},
+		{`se work --detail "$(cat notes.md)"`, "a substitution"},
+	} {
+		got := whatDisqualified(c.command)
+		if !strings.Contains(got, c.says) {
+			t.Errorf("%q was disqualified by %s and the refusal says %q", c.command, c.says, got)
+		}
+	}
+	// A COMMAND THAT IS NOT THE ENGINE AT ALL GETS NO SUCH LINE. It did not
+	// nearly qualify, so telling it what disqualified it would be noise.
+	for _, c := range []string{"rm -rf src", "python -c print(1) | tee out"} {
+		if got := whatDisqualified(c); got != "" {
+			t.Errorf("%q does not run the engine and was told %q", c, got)
+		}
+	}
+	// NOR DOES ONE THAT QUALIFIES.
+	if got := whatDisqualified(`se --answer "a sentence; with punctuation"`); got != "" {
+		t.Errorf("a command inside the exception was told %q", got)
+	}
+}
+
 // RUNME IS THE ENGINE ON A BOX THAT HAS NOT BUILT ONE.
 //
 // A cloud session cloned this tree, had no .bin and no tool lane, and reached

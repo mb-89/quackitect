@@ -118,12 +118,12 @@ func SyncClaims(r Roots) TheFarClaims {
 		if err != nil {
 			continue // a note this build cannot read is not a claim it can honour
 		}
-		by := fs(f, "claimed_by")
+		by := frontStr(f, "claimed_by")
 		if by == "" {
 			continue
 		}
 		id := strings.TrimSuffix(path[strings.LastIndex(path, "/")+1:], ".md")
-		found[id] = FarClaim{By: by, At: fs(f, "claimed_at")}
+		found[id] = FarClaim{By: by, At: frontStr(f, "claimed_at")}
 	}
 	out.Claims, out.Ref, out.Says = found, head, ""
 	saveFarClaims(r, out)

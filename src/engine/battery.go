@@ -5,6 +5,8 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"quackitect/engine/internal/alive"
+	"quackitect/engine/internal/quiet"
 	"strings"
 	"time"
 )
@@ -68,7 +70,7 @@ func startBattery(r Roots, actor, token string) ran {
 		return ran{ID: "battery", Kind: "battery", Said: "the battery's output file could not be made: " + err.Error()}
 	}
 	defer out.Close()
-	cmd := Detached(Quietly(exec.Command(sh, filepath.Join(r.Method, "util", "checks", "battery.sh"))))
+	cmd := quiet.Detached(quiet.Quietly(exec.Command(sh, filepath.Join(r.Method, "util", "checks", "battery.sh"))))
 	cmd.Dir = r.Method
 	cmd.Env = buildEnv()
 	cmd.Stdout, cmd.Stderr = out, out
@@ -101,7 +103,7 @@ func batteryGoing(r Roots) (aBatteryRunning, bool) {
 
 // stillRunning answers whether that process is still there. A pid nothing
 // answers for is a run that has ended, one way or another.
-func stillRunning(pid int) bool { return pid > 0 && alive(pid) }
+func stillRunning(pid int) bool { return pid > 0 && alive.Is(pid) }
 
 // RecordFinishedBattery puts the outcome of a battery that ran outside the
 // engine into the record, and clears the marker. It is called at every start,

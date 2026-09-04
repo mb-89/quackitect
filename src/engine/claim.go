@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"quackitect/engine/internal/quiet"
 	"strings"
 	"sync"
 	"time"
@@ -203,6 +204,43 @@ type ClaimResult struct {
 	Notice    string         `json:"notice,omitempty"`
 }
 
+// ClaimedHere says whether a claim belongs to this box, whichever agent on it
+// wrote the claim.
+//
+// WHAT A CLAIM KEEPS OUT IS ANOTHER MACHINE. Two agents here already have the
+// holder between them, so reading a claim as one agent's would hide work from
+// the box that took it.
+func ClaimedHere(r Roots, by string) bool {
+	return by != "" && strings.HasPrefix(by, Box(r)+"/")
+}
+
+// NoClaimHere names why this box may not work this token, or nothing.
+//
+// CLAIMING WAS OPT-IN AND WORK WAS NOT. A box took a tracked token, worked it
+// and closed it, with nothing in git saying so. Another box reading the tree
+// saw an open token and took the same one.
+//
+// A LOCAL TOKEN IS EXEMPT. .se/work is not in git, so nothing else can see it
+// or take it. A claim there would cost a call and buy nothing.
+//
+// THE CLAIM IS THE BOX'S AND NOT THE AGENT'S. What it keeps out is another
+// machine. Two agents here already have the holder between them.
+func NoClaimHere(r Roots, t Token, now time.Time) string {
+	if filepath.Dir(noteAt(r, t.ID)) != TrackedDir(r) {
+		return ""
+	}
+	by := ClaimedNow(r, t, now)
+	if by == "" {
+		return t.ID + " travels, and this box holds no claim on it. " +
+			"Claim it and take it in one call: se claim --these " + t.ID + " --take"
+	}
+	if !ClaimedHere(r, by) {
+		return t.ID + " is claimed by " + by + ", which is another box. " +
+			"Take work nobody has claimed, or wait for that claim to lapse"
+	}
+	return ""
+}
+
 // WhyNotClaimable names what stops this claimant taking this token, or nothing.
 func WhyNotClaimable(r Roots, t Token, claimant string, now time.Time) *ClaimRefused {
 	if t.Ended() {
@@ -377,7 +415,7 @@ func realGit(r Roots, index string, args ...string) (string, error) {
 	// local and answers in milliseconds.
 	ctx, done := context.WithTimeout(context.Background(), gitBudget(args))
 	defer done()
-	cmd := Quietly(exec.CommandContext(ctx, "git", args...))
+	cmd := quiet.Quietly(exec.CommandContext(ctx, "git", args...))
 	cmd.Dir = r.Work
 	cmd.Env = append(os.Environ(),
 		"GIT_INDEX_FILE="+index,

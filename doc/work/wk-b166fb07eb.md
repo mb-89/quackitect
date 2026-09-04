@@ -18,7 +18,7 @@ began:
 
 ## detail
 
-src/engine carries 6,871 comment lines and 1,394 of them are written in capitals for emphasis, counted with rg on 2026-09-02. Rewrite them in the register of doc/guidance/voice.md, file by file, keeping what the comment says and dropping the argument. Add a check to util/checks that counts capitals-for-emphasis lines in Go comments and fails above zero. Watch it go red on the tree before the rewrite.
+src/engine carries 6,871 comment lines and 1,394 of them are written in capitals for emphasis, counted with rg in September 2026. Rewrite them in the register of doc/guidance/voice.md, file by file, keeping what the comment says and dropping the argument. Add a check to util/checks that counts capitals-for-emphasis lines in Go comments and fails above zero. Watch it go red on the tree before the rewrite.
 
 ## done when
 

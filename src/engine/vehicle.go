@@ -8,6 +8,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"quackitect/engine/internal/replaced"
 	"strings"
 	"time"
 )
@@ -371,7 +372,7 @@ func LinkBothNames(methodRoot string, names []string) ([]string, error) {
 		// See wasbin.go: .bin holds what this tree ships, .bin/was holds what
 		// it used to, and the engine sweeps that folder at every start.
 		if err := os.Remove(plain); err != nil && !os.IsNotExist(err) {
-			_, _ = PutAside(methodRoot, plain) // a name it cannot free is one the link below reports
+			_, _ = replaced.PutAside(methodRoot, plain) // a name it cannot free is one the link below reports
 		}
 		if err := os.Link(suffixed, plain); err != nil {
 			// A HARD LINK TO A FILE NEEDS NO PRIVILEGE, which is what makes it

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"quackitect/engine/internal/runme"
 	"runtime"
 	"strings"
 )
@@ -84,7 +85,7 @@ func Seed(roots Roots, kind Kind) ([]string, error) {
 	// THE SCRIPT FOR THIS HOST, and only this one. A project that moves gets
 	// the other one the next time init is run there, and keeps both. That is
 	// why init is worth pressing on a folder that is already a project.
-	if err := writeNew(filepath.Join(roots.Work, runmeName()), runmeScript(), &made); err != nil {
+	if err := writeNew(filepath.Join(roots.Work, runmeName()), runme.Script(), &made); err != nil {
 		return made, err
 	}
 	if err := writeNew(filepath.Join(roots.Work, "README.md"),

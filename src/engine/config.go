@@ -77,7 +77,7 @@ type Node struct {
 	// field's values, and this is the panel's half of it.
 	//
 	// A LIST TYPED HERE GOES STALE. The mint picker offered four values naming
-	// a scope and whether the token was traced, and the process owns both of
+	// a scope and whether the token was tracked, and the process owns both of
 	// those now, so the panel offered four words the engine would refuse. A
 	// picker whose choices are files cannot be wrong about which files exist.
 	OptionsFrom string `json:"optionsFrom,omitempty"`
@@ -474,9 +474,11 @@ func TheFloor() Config {
 		PullsBeforeHoldIsStale: 10,
 		HelperRatio:            10,
 		HelperFloorBytes:       6000,
-		// FIVE, WHICH IS WHAT THE WORKER CEILING WAS. The busier of the two
-		// roles kept its most, and the number now means the same thing for both.
-		ParallelAgents: 5,
+		// THREE, COUNTING THE MAIN AGENT. The number is how many workers there
+		// are rather than how many are spawned beside the one already working,
+		// so three is the session and two spawned. Reviewers are all spawned,
+		// because the main agent is a worker and never a reviewer.
+		ParallelAgents: 3,
 		From:           map[string]string{}}
 }
 

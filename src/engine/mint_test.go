@@ -126,7 +126,6 @@ func aTreeRequiringDoneWhen(t *testing.T) Roots {
 	}
 	const proc = `name: small
 description: a small change with criteria up front
-traced: false
 sections:
   required:
     - detail

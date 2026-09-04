@@ -12,6 +12,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"quackitect/engine/internal/quiet"
 	"sort"
 	"strconv"
 	"strings"
@@ -298,7 +299,7 @@ func coverBinary(r Roots, db *sql.DB, dir string) (string, error) {
 	if err := os.MkdirAll(filepath.Dir(bin), 0o755); err != nil {
 		return "", err
 	}
-	cmd := Quietly(exec.Command(goTool(), "test", "-c", "-cover", "-o", bin, "."))
+	cmd := quiet.Quietly(exec.Command(goTool(), "test", "-c", "-cover", "-o", bin, "."))
 	cmd.Dir = abs
 	cmd.Env = buildEnv()
 	if out, err := cmd.CombinedOutput(); err != nil {
@@ -579,13 +580,13 @@ var theToolchain = realToolchain()
 func realToolchain() toolchain {
 	return toolchain{
 		buildCover: func(dir, bin string) ([]byte, error) {
-			cmd := Quietly(exec.Command(goTool(), "test", "-c", "-cover", "-o", bin, "."))
+			cmd := quiet.Quietly(exec.Command(goTool(), "test", "-c", "-cover", "-o", bin, "."))
 			cmd.Dir = dir
 			cmd.Env = buildEnv()
 			return cmd.CombinedOutput()
 		},
 		runOne: func(bin, dir, test, profile string, env []string) ([]byte, error) {
-			cmd := Quietly(exec.Command(bin, "-test.run", "^"+test+"$",
+			cmd := quiet.Quietly(exec.Command(bin, "-test.run", "^"+test+"$",
 				"-test.count", "1", "-test.coverprofile", profile))
 			cmd.Dir = dir
 			cmd.Env = env

@@ -37,7 +37,6 @@ func aTreeWithAChecklist(t *testing.T, root, secondSays string) Roots {
 	}
 	proc := `name: task
 description: two steps, each with something to tick
-traced: false
 sections:
   required:
     - detail

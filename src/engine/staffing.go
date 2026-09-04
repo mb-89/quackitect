@@ -55,11 +55,55 @@ func StaffingOf(r Roots, cfg Config) Staffing {
 		}
 	}
 	roles := loadArrivals(r).Roles
-	for _, a := range AgentsPresent(r) {
+	present := AgentsPresent(r)
+	for _, a := range present {
+		// THE MAIN AGENT IS ONE OF THE HANDS. The owner's ruling: the number is
+		// how many workers there are, counting it. At three that is the session
+		// and two spawned. It was skipped here as the one being asked to spawn
+		// rather than a hand, so a number that said three bought four, and with
+		// two spawned workers and the main agent working the guard still
+		// refused every call and asked for a third spawn.
+		//
+		// IT IS A WORKER AND NEVER A REVIEWER, because a verdict is never the
+		// author's and the main agent is the one that works. So three means
+		// three reviewer spawns and only two worker spawns.
 		if a.Kind == "session" {
-			continue // the main agent is the one being asked to spawn, not a hand
+			s.WorkersHere++
+			continue
 		}
 		switch roles[a.Actor] {
+		case RoleWorker:
+			s.WorkersHere++
+		case RoleReviewer:
+			s.ReviewersHere++
+		}
+	}
+	// AN AGENT THAT PULLED IS HERE, WHETHER OR NOT THE REGISTER HEARD OF IT.
+	//
+	// The register is filled by SessionStart and SubagentStart. On a harness
+	// where SubagentStart does not arrive, a spawned agent is never registered
+	// and this counted none of them, however many pulled. The guard holds the
+	// main agent's work until the hands are here and names spawning as the
+	// remedy, so a number that spawning cannot move is a session with no way
+	// out: four workers were spawned, all four pulled, and it went on saying
+	// two workers are here.
+	//
+	// THE ARRIVAL RECORD IS THE OTHER WITNESS, and WhatIsHappening already
+	// merges it with the register. This is the count reading the same tree the
+	// same way. A record from an earlier run answers nothing, so an actor that
+	// pulled then is not a hand now.
+	for _, actor := range ActorsThatPulled(r) {
+		registered := false
+		for _, p := range present {
+			if p.answersTo(actor) {
+				registered = true
+				break
+			}
+		}
+		if registered {
+			continue
+		}
+		switch roles[actor] {
 		case RoleWorker:
 			s.WorkersHere++
 		case RoleReviewer:

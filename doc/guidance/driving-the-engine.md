@@ -47,10 +47,17 @@ A summary is your reading of what was said, and the record is for the saying.
 
 ## 3. A stop the engine knows about
 
-Which stops are sanctioned is the engine's, and it says so when it refuses one.
-A refused stop is not permission to carry on: the reason was missing, so name one or keep working.
+Stopping is two calls in this order: claim, then stop.
+No stop is granted without a claim standing, and `asked` is no exception.
+Every call after the claim clears it, and a status, a search and an answer are all calls.
+Answer them first, then claim, then stop.
+A second refusal says the claim was cleared, never that it was refused.
 
-`asked` is the reason for an interrupt, because an interrupt is the person arriving and the engine cannot see them arrive.
+Which stops are sanctioned is the engine's, and a refusal is not permission to carry on.
+`asked` is granted on the claim that names it, whatever is in your hands, because their word is not yours to weigh.
+
+`asked` is also the reason for an interrupt, on which the harness fires no hook event.
+So an interrupt nobody names is a turn the record cannot tell from one that never ended.
 
 ## 4. The tool it found, not the one you know
 
@@ -74,13 +81,9 @@ Naming a token you were not on puts the old one back and takes the new one up.
 
 The engine cannot read a command and know whether it writes.
 `sed -i`, a redirection, `mv`, `rm` and a script you wrote all reach the filesystem.
-A list of safe programs goes stale the day anybody runs a new one.
-
-Every command names its work because it could write, the same way every edit does, and the record says which token each one ran under.
 
 Output and errors come back as one stream with the exit code.
 A long output is kept whole and answered a window at a time, so nothing is lost.
-The answer carries how long the whole thing is and the page to ask for the rest by.
 Ask from the end with a negative offset, which is usually where a failure says why.
 
 ## 7. Where a script lives
@@ -92,12 +95,11 @@ So a worktree gets it and a retro cannot drain it.
 
 Every line of every text file in the tree is in the index.
 The engine keeps it in step with the tree as files change.
-So a search over the tree is a question, not a walk.
 `se_find` answers a path, a line number and the line.
 It answers the best hit first for words, every hit for a regex, and the files a glob names when given a path alone.
 `se_ask` takes SQL over the same tables, so a question no search can put is still a question.
 The harness's Grep and Glob and a shell's `rg` or `grep` aimed inside the tree are refused and told this door.
-It is the recursive form that is refused, `rg` over a folder or `grep -r`, and a `grep` on one named file is left alone.
+The recursive form is refused, and a `grep` on one named file is left alone.
 Aimed outside the tree, they are yours.
 
 ## 9. The engine owns the tests

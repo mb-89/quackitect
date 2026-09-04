@@ -8,6 +8,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"quackitect/engine/internal/voice"
 )
 
 // The guard. The harness runs this program for every event it has, hands it
@@ -431,7 +433,11 @@ func answerHook(raw []byte, args []string, out io.Writer, held *Log) {
 	if in.Event != "SessionEnd" && in.Event != "SubagentStop" {
 		AgentSeen(roots, in.SessionID, in.AgentID, in.AgentType)
 	}
-	actor := NameOf(roots, in.AgentID)
+	// WHOEVER IS CALLING, UNDER THE NAME THE RECORD USES FOR IT. A helper is
+	// known by the agent id the harness sends; a session sends none, so it is
+	// known by its session id, and two sessions over one tree are two names
+	// rather than one word both of them say.
+	actor := TheActorOf(roots, in.SessionID, in.AgentID)
 
 	cfg := LoadConfig(roots)
 	emergency := LoadEmergency(roots)
@@ -583,7 +589,7 @@ func answerHook(raw []byte, args []string, out io.Writer, held *Log) {
 		// job, and the refusal is bounded so the harness never overrides it
 		// silently.
 		if why, refuse := aHelperReturningTooMuch(roots, cfg, in); refuse {
-			if countRefusedStop(roots, "helper:"+in.AgentID) {
+			if countRefusedStop(roots, "helper:"+in.AgentID) >= helperRefusalsBeforeRelenting {
 				record(log, "agent", "helper", actor, "helper stopped, its answer over budget and the guard relenting", No(),
 					map[string]any{"relented": true})
 				break
@@ -593,7 +599,30 @@ func answerHook(raw []byte, args []string, out io.Writer, held *Log) {
 			g.blockStop(why)
 			break
 		}
+		// A HELPER DOES NOT WALK AWAY FROM WORK IN HAND.
+		//
+		// It leaves a token nobody decided anything about: not submitted, not put
+		// down, not carried. The queue then counts that work as in hand and hands
+		// it to nobody, and the panel draws a row for a holder that no longer
+		// exists. Nine tokens sat that way. So it is asked to finish or to put the
+		// work down on purpose, and the release below is the fallback for the one
+		// that dies anyway. See goneputsdown.go.
+		if why, refuse := AHelperStopHoldingWork(roots, in.AgentID); refuse {
+			if AHelperStopStillRefused(roots, in.AgentID) {
+				record(log, "agent", "helper", actor, "helper stop refused: it is holding open work", No(),
+					map[string]any{"held": len(TheyHold(roots, in.AgentID))})
+				g.blockStop(why)
+				break
+			}
+			record(log, "agent", "helper", actor, "helper stopped holding work, and the guard relented", No(),
+				map[string]any{"relented": true, "held": len(TheyHold(roots, in.AgentID))})
+		}
 		forgetRefusedStops(roots, "helper:"+in.AgentID)
+		forgetRefusedStops(roots, "holding:"+in.AgentID)
+		if back := PutDownWhatTheyHeld(roots, in.AgentID); len(back) > 0 {
+			record(log, "agent", "helper", actor, "work a helper left behind went back to the queue", Yes(),
+				map[string]any{"put_down": back})
+		}
 		AgentGone(roots, in.AgentID)
 		record(log, "agent", "helper", actor, "helper stopped", Yes(), nil)
 	case "PreCompact":
@@ -665,6 +694,29 @@ func notePostTool(roots Roots, in hookIn, actor string) {
 	}
 }
 
+// isTheStopVerb says whether this call is the agent claiming a stop, at the
+// lane or at the shell door.
+//
+// IT IS THE ONE CALL THAT IS NOT CARRYING ON. Every other call puts the
+// argument back to its start, and counting this one as work reset it between
+// every claim and its own Stop event, so the count never reached three at all.
+func isTheStopVerb(in hookIn) bool {
+	if strings.HasSuffix(in.ToolName, "se_stop") {
+		return true
+	}
+	var ti toolInput
+	if json.Unmarshal(in.ToolInput, &ti) != nil {
+		return false
+	}
+	words := strings.Fields(ti.Command)
+	for i, w := range words {
+		if isTheEngine(filepath.Base(w)) && i+1 < len(words) && words[i+1] == "stop" {
+			return true
+		}
+	}
+	return false
+}
+
 func decidePreToolUse(g *guard, roots Roots, cfg Config, emergency Emergency, log *Log, in hookIn, actor string) {
 	// ANYTHING YOU DO AFTER CLAIMING A STOP ERASES THE CLAIM. A claim says the
 	// next thing is stopping. An agent that claims and then carries on has
@@ -674,6 +726,14 @@ func decidePreToolUse(g *guard, roots Roots, cfg Config, emergency Emergency, lo
 	// claim itself is made by a tool call, and this fires before that call
 	// runs, so a claim never spends itself.
 	SpendClaim(roots, actor)
+
+	// AND IT PUTS THE ARGUMENT BACK TO ITS START. Three claims earn a stop over
+	// open work, and going back to work between two of them is changing your
+	// mind, so the run has to be unbroken. Claiming again is the argument itself
+	// and never breaks it.
+	if !isTheStopVerb(in) {
+		forgetRefusedStops(roots, "claimed:"+actor)
+	}
 
 	var ti toolInput
 	_ = json.Unmarshal(in.ToolInput, &ti) // a call whose input will not read names no file, and the caller checks that
@@ -701,6 +761,27 @@ func decidePreToolUse(g *guard, roots Roots, cfg Config, emergency Emergency, lo
 		return
 	}
 
+	// AN ACTOR IS A SESSION, AND A NAME ANOTHER SESSION HOLDS IS NOT THIS
+	// ONE'S TO ACT UNDER.
+	//
+	// IT IS ASKED BEFORE EVERY GUARD BELOW. Each of those reasons about the
+	// actor, so a call acting under somebody else's name makes every one of
+	// them reason about the wrong agent, and the write it lets through empties
+	// that agent's hands.
+	//
+	// BOTH DOORS, because the lane carries the name as a field and the shell
+	// carries it in a flag, and a rule taught to one of them is half a rule.
+	named := ti.Actor
+	if named == "" {
+		named = theNameACommandActsUnder(ti.Command)
+	}
+	if why, refuse := ANameAnotherSessionHolds(roots, in.SessionID, named); refuse {
+		record(log, "engine", "gate", actor, "refused: that name is another session's", No(),
+			map[string]any{"tool": in.ToolName, "named": named})
+		g.deny(why)
+		return
+	}
+
 	// THE QUEUE WANTS MORE HANDS, and the main agent is held until it has
 	// spawned them. Every other guard waits behind this one, because a tool
 	// call that is not a spawn is not what the queue is waiting for.
@@ -722,6 +803,27 @@ func decidePreToolUse(g *guard, roots Roots, cfg Config, emergency Emergency, lo
 			map[string]any{"tool": in.ToolName})
 		g.deny(why)
 		return
+	}
+
+	// A DELETE IS THE ONE CHANGE THE TREE DOES NOT CARRY BACK, so it is
+	// answered before the guards about how to search and where to test. Those
+	// send an agent to a better door; this one stops a file going away.
+	//
+	// THE LOOP IS ASKED FIRST. A loop names no files, so the read question has
+	// nothing to work on, and the refusal that fits is the one about the shape.
+	if ti.Command != "" {
+		if why, refuse := ALoopThatRemoves(ti.Command); refuse {
+			record(log, "engine", "removal", actor, "refused: a loop that deletes", No(),
+				map[string]any{"tool": in.ToolName})
+			g.deny(why)
+			return
+		}
+		if why, refuse := ARemovalWithoutARead(roots, actor, ti.Command, roots.Work); refuse {
+			record(log, "engine", "removal", actor, "refused: a removal of a file nobody read", No(),
+				map[string]any{"tool": in.ToolName})
+			g.deny(why)
+			return
+		}
 	}
 
 	// A READ ALREADY HELD IS NOT PAID FOR TWICE.
@@ -850,7 +952,7 @@ func decidePreToolUse(g *guard, roots Roots, cfg Config, emergency Emergency, lo
 	// rules a whole write does.
 	written := ti.writtenText()
 	if writes[in.ToolName] && isProse(path) && written != "" {
-		rules, err := LoadVoiceRules(roots.Method)
+		rules, err := voice.Load(roots.Method)
 		if err != nil {
 			// The checker cannot run. That is said, loudly, and the write is
 			// allowed: a broken checker must not stop a person from working.
@@ -930,6 +1032,25 @@ func decidePreToolUse(g *guard, roots Roots, cfg Config, emergency Emergency, lo
 					"in pieces either: write it in your own words, or quote one sentence.", from, line))
 			return
 		}
+		// AND NEITHER DOES IDENTITY MATERIAL. A datetime pins a person to a desk
+		// on a day, and a username names them outright. Rule 13 said so and had no
+		// mechanism, so the rule was enforced against nobody.
+		//
+		// IT READS PROSE AND NOT MACHINE FIELDS. A claim is compared against a
+		// clock, so began, ended and claimed_at keep their stamps.
+		if isProse(path) {
+			if rule, matched, yes := identityMaterial(written, TheUsername()); yes {
+				record(log, "engine", "refusal", actor,
+					"write refused: identity material does not travel", No(),
+					map[string]any{"rule": "identity-does-not-travel", "path": path, "matched": rule})
+				g.deny(fmt.Sprintf(
+					"This carries %s, %q, and identity material does not travel. "+
+						"Where a time is needed, write a month and a year. "+
+						"A machine field keeps its stamp, and .se keeps what does not travel.",
+					rule, matched))
+				return
+			}
+		}
 	}
 
 	// NO TOKEN, NO WRITING.
@@ -964,13 +1085,20 @@ func decidePreToolUse(g *guard, roots Roots, cfg Config, emergency Emergency, lo
 		NoteTheNameItActsAs(roots, actor, ti.Actor)
 	}
 
-	// UNBOUND TAKES THE TOKEN OFF THE WRITE. Naming the work is what makes the
-	// queue on the person's screen true, and a person who has deliberately left
-	// the queue is not asking it to be. Everything that protects the tree ran
-	// above this line and still ran: the voice rules, the schema, the private
-	// originals, the stale write. This one is procedure, so this is the one the
-	// press removes.
-	if why, refuse := WriteNeedsAToken(roots, actor, in.ToolName, pathOf(in), ti.Command); refuse && binding.At == Bound {
+	// UNBOUND IS THE QUEUE OFF, AND IT IS NOT THE TOKEN OFF.
+	//
+	// It used to be both. Unbound means one thing: this agent is not part of the
+	// queue. It picks what it works on, including a token nobody handed it, and
+	// it still names one on every write and every run.
+	//
+	// WHAT BOTH COST. A session ran with the queue off and left every token at
+	// noted with an empty submission. A reader could not tell the queue being off
+	// from the process being followed badly, because both look the same on the
+	// work surface.
+	//
+	// GOD IS THE ONE RUNG THAT DROPS IT, along with every other refusal, because
+	// god is for a broken engine.
+	if why, refuse := WriteNeedsAToken(roots, actor, in.ToolName, pathOf(in), ti.Command); refuse && binding.At != God {
 		record(log, "engine", "gate", actor, "refused: it cannot name its token", No(),
 			map[string]any{"tool": in.ToolName})
 		g.deny(why)
@@ -1169,9 +1297,47 @@ func decideStop(g *guard, roots Roots, cfg Config, log *Log, in hookIn, actor st
 				return
 			}
 		}
+		// THE ARGUMENT NEEDS SOMETHING TO ARGUE WITH, and that is work still in
+		// the agent's hands. A good reason with nothing blocking is granted on the
+		// claim that names it, which is the whole of the rule for an agent with
+		// empty hands.
+		//
+		// ARGUING WITH EVERY CLAIM was the mistake. It made the count the rule and
+		// the state of the tree irrelevant, so an agent holding nothing was refused
+		// twice with nothing to say back to it. Persistence is the price of leaving
+		// work behind, not the price of stopping.
+		//
+		// THE PERSON'S WORD IS NOT ARGUED WITH. asked is granted on the claim
+		// that names it, whatever is in the agent's hands.
+		//
+		// THE OWNER'S WORDS: if the user tells you that you stop, I don't give a
+		// shit about your sub tokens. You stop.
+		//
+		// The list already said their word is the reason and you need no other,
+		// and this code did not honour it. An agent told to stop claimed asked,
+		// the engine asked whether asked was the nearest of five words, and the
+		// person watched it take another turn to say yes. The argument exists to
+		// test the agent's own judgement. It has no business testing theirs.
+		if held := TheyHold(roots, actor); len(held) > 0 && c.Because != "asked" {
+			// THE ENGINE PUSHES BACK TWICE AND GRANTS THE THIRD. What earns a stop
+			// over open work is a reason given and held to. See challenge.go.
+			if sofar := countRefusedStop(roots, "claimed:"+actor); sofar < claimsBeforeAStopIsGranted {
+				record(log, "agent", "stop", actor, "stop refused: the claim is argued with", No(),
+					map[string]any{"because": c.Because, "why": c.Why, "claim": sofar})
+				g.blockStop(TheChallenge(c, sofar, held))
+				return
+			}
+		}
+		// THE COUNT IS CLEARED ON THE GRANT, because the argument is over. It is
+		// cleared again the moment the agent goes back to work, in decidePreToolUse,
+		// which is where the run of claims is kept unbroken.
+		forgetRefusedStops(roots, "claimed:"+actor)
+		// THE WORD STANDS AS LONG AS THE CLAIM DOES. A harness sends turns nobody
+		// asked for and every one ends in a stop, so an agent that has stopped and
+		// done nothing since meets this again and is let through on the same claim.
 		forgetRefusedStops(roots, actor)
 		record(log, "agent", "stop", actor, "stopped: "+c.Because+" — "+c.Why, Yes(),
-			map[string]any{"because": c.Because, "why": c.Why})
+			map[string]any{"because": c.Because, "why": c.Why, "claims": claimsBeforeAStopIsGranted})
 		return
 	}
 	// THE FIRST STOP OF THE SESSION IS GRANTED. The kickoff says be ready and
@@ -1183,21 +1349,25 @@ func decideStop(g *guard, roots Roots, cfg Config, log *Log, in hookIn, actor st
 			map[string]any{"first": true})
 		return
 	}
-	// A REFUSAL THAT KEEPS BEING REFUSED NOTICES, AND RELENTS. The harness
-	// overrides a hook that blocks too many times in a row, so past that the
-	// refusal would stop existing without a word. Granting it here, with the
-	// count in the record, keeps the failure visible instead.
-	if countRefusedStop(roots, actor) {
-		record(log, "agent", "stop", actor,
-			fmt.Sprintf("stop granted with no reason claimed: refused %d times in a row, so the guard relents",
-				stopRefusalsBeforeRelenting), No(),
-			map[string]any{"relented": true, "refusals": stopRefusalsBeforeRelenting})
-		return
-	}
+	// A RUN OF REFUSALS IS COUNTED AND NEVER CASHED IN.
+	//
+	// IT USED TO GRANT THE STOP once the run passed a number, on the reasoning
+	// that the harness overrides a hook that blocks too often, so relenting kept
+	// the failure visible. That is the valve v3 took out, and this file's own
+	// header already says why: a claim is what grants a stop, and not a retry.
+	//
+	// WHAT IT COST HERE. The owner watched the hook go quiet mid-session. An
+	// agent that kept stopping was released for stopping often enough, and the
+	// log read refused, refused, granted, with nobody having decided anything.
+	// A guard that gives up on persistence is a guard an agent learns to outlast.
+	//
+	// THE COUNT STAYS, because the run is worth seeing. Only the granting goes.
+	times := countRefusedStop(roots, actor)
 	// AN AUTHORITY MAY EXIST, AND THIS ASKS IT. It does not decide whether the
 	// stop is refused. It says what else the agent is holding, so the refusal
 	// names the work rather than only the rule.
-	record(log, "agent", "stop", actor, "stop refused, no reason claimed", No(), nil)
+	record(log, "agent", "stop", actor, "stop refused, no reason claimed", No(),
+		map[string]any{"in_a_row": times})
 	g.blockStop(TheList(askTheAuthority(roots, actor).Reason))
 }
 

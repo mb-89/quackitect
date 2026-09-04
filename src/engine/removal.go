@@ -1,0 +1,228 @@
+package main
+
+import (
+	"os"
+	"path/filepath"
+	"strings"
+)
+
+// A DELETE IS THE ONE CHANGE THE TREE DOES NOT CARRY BACK.
+//
+// WHAT HAPPENED. One command was a sixty-iteration loop: run go vet, take the
+// filename out of the first error, delete that file, go round again. It ate
+// live code four times. Every other guard here is about a change somebody can
+// read afterwards. A deleted file leaves nothing to read.
+//
+// THE TWO HALVES ARE DIFFERENT QUESTIONS. A removal that names its files can
+// be judged file by file, and the question is whether anybody looked. A loop
+// names no files at all: the ones it deletes come out of its own output, a
+// round at a time, so there is nothing in the command to judge. So the first
+// is answered from the read set and the second is refused outright.
+//
+// THE READ SET IS ALREADY THERE. The engine notes every read to answer the
+// stale-write and the dedup guards, so this costs no new bookkeeping: it asks
+// a question the evidence already holds the answer to.
+//
+// OUTSIDE THE TREE THE DISK IS THE AGENT'S OWN, the line the search guard
+// draws. Nothing out there is reviewed and nothing out there ships, so a
+// removal there is not this rule's business. The scratchpad is inside the
+// tree and out of this rule for the reason it is out of the gate: thinking is
+// not a change, and an agent that cannot delete its own scrap paper is being
+// argued with.
+
+// remover says whether this word runs a program that deletes files, by the
+// name it is run as. The name is taken off the path and the suffix the way
+// searcher does it, so ./bin/rm and RM.EXE are the same program.
+func remover(word string) bool {
+	name := strings.Trim(word, "'\"")
+	if i := strings.LastIndexAny(name, "/"+string(os.PathSeparator)); i >= 0 {
+		name = name[i+1:]
+	}
+	name = strings.ToLower(strings.TrimSuffix(name, ".exe"))
+	switch name {
+	case "rm", "rmdir", "unlink", "shred", "del", "erase", "rd", "remove-item":
+		return true
+	}
+	return false
+}
+
+// loopWord says whether this word opens a loop. A part's first word is what
+// is asked, because these are shell keywords and a keyword is where a
+// command starts.
+func loopWord(word string) bool {
+	switch strings.ToLower(strings.Trim(word, "'\"")) {
+	case "for", "while", "until", "foreach", "foreach-object", "%":
+		return true
+	}
+	return false
+}
+
+// runner says whether this word leaves the program still to come, so the walk
+// goes past it. It is how xargs rm, sudo rm and git rm are found without
+// reading every word on the line as a program.
+//
+// git IS HERE FOR ITS SUBCOMMAND, not because it runs another program. The
+// word after it decides what it is, and git rm deletes a file exactly the way
+// the others do. git status and git commit walk to a word that is no remover
+// and stop, which is the same answer they would get anywhere else.
+func runner(word string) bool {
+	switch strings.ToLower(strings.Trim(word, "'\"")) {
+	case "sudo", "xargs", "env", "time", "nohup", "command", "exec", "do", "then", "else", "git":
+		return true
+	}
+	return false
+}
+
+// removerAt answers where in these words a remover is RUN, or -1.
+//
+// IT IS A POSITION AND NOT A WORD ANYWHERE ON THE LINE.
+//
+// MEASURED, ON THIS GUARD'S OWN FIRST USE. It read every word, so the first
+// command that carried the word rm inside an argument was refused over the
+// word after it: minting a token whose detail said "rm would have been
+// refused" was answered with "this command deletes would". Prose goes through
+// this door constantly, in a --detail, a commit message, an echo.
+//
+// SO A PROGRAM IS WHERE A COMMAND STARTS, which is what the search guard
+// already assumes when it reads words[0]. The walk goes past only the words
+// that run another program, so xargs rm and do rm $f are still found and a
+// sentence containing rm is not a deletion.
+func removerAt(words []string) int {
+	for i, w := range words {
+		if remover(w) {
+			return i
+		}
+		if !runner(w) {
+			return -1
+		}
+	}
+	return -1
+}
+
+// filesAmong answers the words a removal names as files: everything that is
+// not a flag and not a redirection.
+//
+// EVERY BARE WORD IS A PATH HERE, unlike a search, where the first one is the
+// pattern. rm takes no pattern.
+func filesAmong(args []string) []string {
+	var out []string
+	for i := 0; i < len(args); i++ {
+		a := strings.Trim(args[i], "'\"")
+		if a == "" {
+			continue
+		}
+		if a == "--" {
+			for _, rest := range args[i+1:] {
+				if rest = strings.Trim(rest, "'\""); rest != "" {
+					out = append(out, rest)
+				}
+			}
+			break
+		}
+		if strings.HasPrefix(a, "-") {
+			continue
+		}
+		// A REDIRECTION IS NOT A FILE THIS COMMAND DELETES. It is where the
+		// output goes, and refusing over it would name a file nothing was
+		// about to lose.
+		if strings.ContainsAny(a, "<>") {
+			continue
+		}
+		out = append(out, a)
+	}
+	return out
+}
+
+// underWork answers this path as the engine keys a read by it. A relative
+// path is relative to the tree being worked on, never to wherever the engine
+// happens to stand.
+func underWork(work, p string) string {
+	if filepath.IsAbs(p) {
+		return filepath.Clean(p)
+	}
+	return filepath.Clean(filepath.Join(work, p))
+}
+
+// ARemovalWithoutARead answers whether this command deletes something inside
+// the tree that this actor has not read, and names the file it is about.
+func ARemovalWithoutARead(r Roots, actor, command, work string) (string, bool) {
+	reads := LoadEvidence(r).Reads
+	read := func(p string) bool {
+		// THE KEY IS WHATEVER THE HARNESS GAVE, so both spellings are asked:
+		// the path resolved against the tree, and the path as it stands.
+		for _, key := range []string{underWork(work, p), clean(p)} {
+			if rec, ok := reads[key]; ok && rec.Actor == actor {
+				return true
+			}
+		}
+		return false
+	}
+	for _, part := range pipeline(command) {
+		words := strings.Fields(part)
+		at := removerAt(words)
+		if at < 0 {
+			continue
+		}
+		for _, p := range filesAmong(words[at+1:]) {
+			if !anyInside([]string{p}, work) {
+				continue
+			}
+			if insideTheScratchpad(r, underWork(work, p)) {
+				continue
+			}
+			if read(p) {
+				continue
+			}
+			return aRemovalNeedsARead(p), true
+		}
+	}
+	return "", false
+}
+
+// ALoopThatRemoves answers whether this command runs a remover inside a loop,
+// which is refused whatever it names.
+func ALoopThatRemoves(command string) (string, bool) {
+	loop, deletes := false, ""
+	for _, part := range pipeline(command) {
+		words := strings.Fields(part)
+		if len(words) == 0 {
+			continue
+		}
+		if loopWord(words[0]) {
+			loop = true
+		}
+		if deletes == "" {
+			if at := removerAt(words); at >= 0 {
+				deletes = strings.Trim(words[at], "'\"")
+			}
+		}
+	}
+	if loop && deletes != "" {
+		return aLoopThatDeletes(deletes), true
+	}
+	return "", false
+}
+
+// aRemovalNeedsARead is the refusal, and it names the file it is about.
+func aRemovalNeedsARead(path string) string {
+	return "NOTHING IS DELETED THAT NOBODY LOOKED AT.\n\n" +
+		"This command deletes " + path + ", which is inside the tree and which nothing " +
+		"has read this turn. What is in it is unknown, and a delete is the one change " +
+		"the tree does not carry back.\n\n" +
+		"Read it, and delete it if it should go. If it should go unread, say so to the " +
+		"person rather than around them.\n\n" +
+		"OUTSIDE THIS TREE THE DISK IS YOURS: a removal naming a path outside it is not " +
+		"refused, and neither is one under .se/scratchpad."
+}
+
+// aLoopThatDeletes is the refusal for the shape, and it says what to do
+// instead rather than only what is wrong.
+func aLoopThatDeletes(word string) string {
+	return "A LOOP THAT DELETES IS REFUSED.\n\n" +
+		"This command runs " + word + " inside a loop, so the files it deletes are the ones " +
+		"its own output names, a round at a time. None of them is in the command, so " +
+		"nothing here and nobody reading it can say what it will take.\n\n" +
+		"MEASURED: a loop of this shape ran go vet sixty times, took the filename out of " +
+		"the first error and deleted it, and ate live code four times.\n\n" +
+		"List what you mean first and read it, then delete those files by name."
+}

@@ -75,6 +75,30 @@ type Doing struct {
 	// a row built for an actor that pulled without ever being registered.
 	Kind  string `json:"kind,omitempty"`
 	Since string `json:"since,omitempty"`
+
+	// EVERY NAME THIS ROW ANSWERS TO, which is the harness's name and each
+	// name that agent has pulled with. One process has two names as a matter
+	// of course, and a reader that knows only the drawn one reads it as two.
+	Names []string `json:"names,omitempty"`
+}
+
+// answersTo says whether this row is already that actor, under any of the names
+// its agent has pulled with.
+//
+// THE DRAWN NAME IS ONE OF SEVERAL. The session is announced as main and pulls
+// as orchestrator-mb, and the row is drawn under the second while the token is
+// held under the first. Asking about the drawn name alone answered no, and the
+// panel grew a second row for a process that was already in it.
+func (d Doing) answersTo(actor string) bool {
+	if d.Actor == actor {
+		return true
+	}
+	for _, n := range d.Names {
+		if n == actor {
+			return true
+		}
+	}
+	return false
 }
 
 // Happening is the whole answer.
@@ -116,7 +140,7 @@ func WhatIsHappening(r Roots) Happening {
 	for _, d := range out.Actors {
 		known := false
 		for _, p := range out.Present {
-			if p.Actor == d.Actor {
+			if p.answersTo(d.Actor) {
 				known = true
 				break
 			}
@@ -257,6 +281,7 @@ func AgentsPresent(r Roots) []Doing {
 			}
 		}
 		d.Kind, d.Since = a.Kind, a.First.Format(time.RFC3339)
+		d.Names = names
 		out = append(out, d)
 	}
 	return out

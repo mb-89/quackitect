@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"quackitect/engine/internal/quiet"
 	"runtime"
 	"strings"
 	"time"
@@ -182,9 +183,9 @@ func shellCommand(r Roots, script string) *exec.Cmd {
 	if sh == "" {
 		name, args = "cmd", []string{"/c", script}
 	}
-	cmd := Quietly(exec.Command(name, args...))
+	cmd := quiet.Quietly(exec.Command(name, args...))
 	if sh == "" {
-		cmd = TheScriptVerbatim(cmd, script)
+		cmd = quiet.TheScriptVerbatim(cmd, script)
 	}
 	cmd.Dir = r.Work
 	// EVERY PROBED TOOL RESOLVES, so a command carries no environment of its

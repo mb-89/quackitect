@@ -57,6 +57,27 @@ export function nextEngineState(
   return "good";
 }
 
+// WHO ENDS THE ENGINE, AND WHEN.
+//
+// deactivate called stopEngine with no argument, so a window that had only
+// reattached held no child handle and killed nothing. Nothing on the engine's
+// own side ends it either, so it outlived the editor.
+//
+// AND THE ANSWER IS NOT ALWAYS TO KILL. Two windows can be open on one tree.
+// The second one reattaches, and ending the engine when it closes would take
+// it away from the first, which is still watching. So the rule is the last
+// window out, and this is where that rule is written down.
+//
+// IT IS HANDED THE PROBE RATHER THAN CALLING ONE, for the same reason
+// nextEngineState is handed now rather than reading the clock. A function that
+// reaches for the world is not a thing a check can drive, and this is.
+export function endsTheEngine(
+  others: { pid: number }[],
+  answers: (pid: number) => boolean,
+): boolean {
+  return !others.some((w) => answers(w.pid));
+}
+
 // whyNot answers the detail beside a state, in the words a person reads.
 export function whyNot(state: EngineState, running: Running | undefined): string {
   if (state !== "bad") return "";

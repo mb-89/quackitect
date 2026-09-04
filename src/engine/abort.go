@@ -72,7 +72,9 @@ func Abort(r Roots, a Aborting) (Token, error) {
 		}
 	}
 	t = closeStretch(r, t) // what was done before the drop is still a change somebody may read
-	if err := SaveToken(r, t); err != nil {
+	// AN ARCHIVE THE SAVE COULD NOT WRITE IS NOT A STOP THAT DID NOT HAPPEN.
+	// The record carries what was left over, and the token is closed.
+	if err := SaveToken(r, t); err != nil && !TheCloseStood(err) {
 		return t, err
 	}
 	inSession(r, "work", a.By, t.ID+" aborted from "+string(from)+": "+a.Why, Yes(),

@@ -7,6 +7,7 @@ import (
 	"io"
 	"net"
 	"net/http"
+	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -47,8 +48,37 @@ const hookTimeoutSeconds = 3
 // ephemeral ones on every platform this runs on.
 func hooksPort(r Roots) int {
 	h := fnv.New32a()
-	h.Write([]byte(r.Work))
+	h.Write([]byte(theSameFolderEveryTime(r.Work)))
 	return 20000 + int(h.Sum32()%20000)
+}
+
+// theSameFolderEveryTime answers one spelling for one folder.
+//
+// THE HASH IS OF A PATH, AND A PATH IS NOT ONE STRING. A session was handed
+// this tree as c: and then as C:, which Windows means the same folder by. The
+// two spellings hashed to two ports, the engine restarted onto the second, and
+// the settings file was rewritten. The harness had read that file once, so it
+// went on posting to the first. Every guard rides on that door, so all of them
+// were absent for an hour and nothing said so.
+//
+// IT IS LEXICAL AND ASKS THIS MACHINE NOTHING. filepath answers differently on
+// each platform, and the cage names this port on every platform this runs on.
+// A canonical form that reads the disk would also fail before the folder is
+// made, which is exactly when the cage needs the number.
+//
+// CASE IS FOLDED ONLY FOR A WINDOWS PATH, which a colon in the second place
+// tells. A POSIX path is left alone, because two folders there really can
+// differ by case alone.
+func theSameFolderEveryTime(path string) string {
+	path = strings.ReplaceAll(path, `\`, "/")
+	for strings.Contains(path, "//") {
+		path = strings.ReplaceAll(path, "//", "/")
+	}
+	path = strings.TrimRight(path, "/")
+	if len(path) >= 2 && path[1] == ':' {
+		path = strings.ToLower(path)
+	}
+	return path
 }
 
 // hooksURL is where the engine over this folder answers hook events.

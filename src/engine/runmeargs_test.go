@@ -6,6 +6,8 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"quackitect/engine/internal/quiet"
+	"quackitect/engine/internal/runme"
 	"runtime"
 	"strings"
 	"testing"
@@ -46,7 +48,6 @@ func TestAVerbThroughRunmeReachesDispatchOnAProject(t *testing.T) {
 	}
 	const proc = `name: task
 description: one step the queue hands out
-traced: false
 sections:
   required:
     - detail
@@ -84,7 +85,7 @@ dispositions:
 	if err := writeAtomic(filepath.Join(project, ".se", "runme.json"), spec, 0o644); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(filepath.Join(project, runmeName()), []byte(runmeScript()), 0o755); err != nil {
+	if err := os.WriteFile(filepath.Join(project, runmeName()), []byte(runme.Script()), 0o755); err != nil {
 		t.Fatal(err)
 	}
 
@@ -98,9 +99,9 @@ dispositions:
 		"--tracked", "false", "--detail", "argv untouched"}
 	var cmd *exec.Cmd
 	if runtime.GOOS == "windows" {
-		cmd = Quietly(exec.Command("powershell", append([]string{"-NoProfile", "-File", script}, verb...)...))
+		cmd = quiet.Quietly(exec.Command("powershell", append([]string{"-NoProfile", "-File", script}, verb...)...))
 	} else {
-		cmd = Quietly(exec.Command("sh", append([]string{script}, verb...)...))
+		cmd = quiet.Quietly(exec.Command("sh", append([]string{script}, verb...)...))
 	}
 	cmd.Dir = elsewhere
 	env := make([]string, 0, len(os.Environ())+1)

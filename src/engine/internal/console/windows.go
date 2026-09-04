@@ -1,6 +1,6 @@
 //go:build windows
 
-package main
+package console
 
 import (
 	"os"
@@ -17,7 +17,7 @@ import (
 // ONLY WHEN STANDARD INPUT IS A PIPE. An editor speaks over pipes, and a person
 // at a terminal does not. Freeing the console while the terminal is standard
 // input takes the handles away and the conversation stops.
-func hideOwnConsole() {
+func Hide() {
 	info, err := os.Stdin.Stat()
 	if err != nil || info.Mode()&os.ModeCharDevice != 0 {
 		return

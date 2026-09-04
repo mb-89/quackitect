@@ -7,6 +7,8 @@ import (
 	"sort"
 	"strings"
 	"time"
+
+	"quackitect/engine/internal/voice"
 )
 
 // One order over the retro folder, woven from the sources it already holds.
@@ -207,7 +209,7 @@ func logEntries(path, name string) []timed {
 			what = strings.TrimSpace(rec.Kind + " " + rec.Msg)
 		}
 		out = append(out, timed{at: at, has: has, entry: TimelineEntry{
-			Source: "log", Who: rec.Actor, What: short60(what), From: name}})
+			Source: "log", Who: rec.Actor, What: voice.Short60(what), From: name}})
 	}
 	return out
 }

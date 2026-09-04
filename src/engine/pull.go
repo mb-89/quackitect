@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"quackitect/engine/internal/quiet"
 	"runtime"
 	"strings"
 	"time"
@@ -24,7 +25,7 @@ import (
 //
 // THE AGENT CANNOT CLOSE ITS OWN WORK. It submits, the engine checks what a
 // program can check, and a reviewer settles it. The one exception is a token in
-// its own scope that is ephemeral, which is an agent's breakdown of work it
+// its own scope that is local, which is an agent's breakdown of work it
 // already holds — four eyes belong at the boundary of delegated work.
 
 // The answers. The pull field names which one came back, so an agent branches
@@ -125,14 +126,27 @@ func Pull(r Roots, actor, role string, p Payload) Answer {
 func answerFor(r Roots, actor, role string, p Payload) Answer {
 	// THE TOKEN A REJECTION MINTED RIDES ON WHATEVER IS ANSWERED NEXT, so the
 	// reviewer is handed its id without having to ask for it.
-	learned := ""
+	//
+	// AND SO DOES WHAT THE SUBMISSION LEFT OVER. A close whose archive could
+	// not be written is still a close, and the notice is the whole of how the
+	// agent hears about it, so it is carried onto whatever comes back rather
+	// than dropped with the settled payload.
+	learned, over := "", ""
 	if p.ID != "" {
 		a, done := settle(r, actor, p)
 		if done {
 			return a
 		}
-		learned = a.Learned
+		learned, over = a.Learned, a.Notice
 	}
+	a := whatComesNext(r, actor, role)
+	a.Learned = learned
+	a.Notice += over
+	return a
+}
+
+// whatComesNext is the queue's answer to an actor with nothing in hand.
+func whatComesNext(r Roots, actor, role string) Answer {
 	// A HOLD NOBODY IS BEHIND SENDS SOMEBODY TO LOOK, before new work is handed
 	// out. A walker given another token goes on working while the stuck one
 	// stays stuck, which is what happened.
@@ -146,7 +160,6 @@ func answerFor(r Roots, actor, role string, p Payload) Answer {
 		back, refused := TakeBackWhatWasLookedAt(r, actor)
 		if len(back) > 0 {
 			a := next(r, actor, role)
-			a.Learned = learned
 			a.Notice += reclaimNotice(back)
 			return a
 		}
@@ -156,13 +169,10 @@ func answerFor(r Roots, actor, role string, p Payload) Answer {
 			// AND IF THE WALKER ALREADY ANSWERED, SAY WHY IT DID NOT LAND.
 			// The same notice arriving twice reads as the engine not listening.
 			a.Notice += refusedNotice(refused)
-			a.Learned = learned
 			return a
 		}
 	}
-	a := next(r, actor, role)
-	a.Learned = learned
-	return a
+	return next(r, actor, role)
 }
 
 func currentSession(r Roots) string {
@@ -246,8 +256,14 @@ func submit(r Roots, actor string, t Token, p Payload) (Answer, bool) {
 	// ended, pair by pair.
 	t = closeStretch(r, t)
 	if err := SaveToken(r, t); err != nil {
-		return refuse(&t, Rejection{Clause: "the record", Wrong: err.Error(),
-			Satisfies: "a writable .se/work"}), true
+		if !TheCloseStood(err) {
+			return refuse(&t, Rejection{Clause: "the record", Wrong: err.Error(),
+				Satisfies: "a writable .se/work"}), true
+		}
+		// THE CLOSE STOOD, AND THE ANSWER SAYS WHAT IS LEFT OVER. Refusing here
+		// told the worker its submission had failed, under a clause naming a
+		// folder that was written and not the archive that was not.
+		return Answer{Notice: "\n\n" + err.Error()}, false
 	}
 	return Answer{}, false
 }
@@ -548,7 +564,7 @@ func evidenceCommand(r Roots, script string) *exec.Cmd {
 	if runtime.GOOS == "windows" {
 		name, args = "cmd", []string{"/c", script}
 	}
-	cmd := TheScriptVerbatim(Quietly(exec.Command(name, args...)), script)
+	cmd := quiet.TheScriptVerbatim(quiet.Quietly(exec.Command(name, args...)), script)
 	cmd.Dir = r.Work
 	return cmd
 }
@@ -599,11 +615,20 @@ func firstLines(s string, n int) string {
 // parents without a rule of its own.
 func next(r Roots, actor, role string) Answer {
 	all := Tokens(r)
-	// WHO IS ASKING, AS THE OTHER BOXES SEE THEM. The agent says its actor and
-	// the engine says which box that actor is on, so nothing an agent types can
-	// reach another box's claims. See claim.go.
+	// WHO IS ASKING, AND ON WHICH BOX. Two questions and two answers. Whether
+	// this box may touch the token at all is the box's, and ClaimedHere answers
+	// it. Who is handed it first is the agent's, because a claim is an agent
+	// saying these are the ones it is working through. See claim.go.
 	me := Claimant(r, actor)
 	now := time.Now().UTC()
+
+	// WHAT THE RECORD WOULD NOT WRITE. Handing a token out saves it, and a
+	// token the save refuses cannot be handed to anybody. That refusal used to
+	// be the pull's whole answer, so one chapter past its bound answered wait
+	// to every puller and everything behind it in the queue went unseen.
+	// The queue passes over it and says so at the end, the way it passes over
+	// a token waiting on a person.
+	var unwritable []string
 
 	var scopes []Token
 	for i := range all {
@@ -632,7 +657,11 @@ func next(r Roots, actor, role string) Answer {
 			if why := WaitsForAPerson(t); why != "" {
 				continue
 			}
-			return take(r, actor, t)
+			a, ok := take(r, actor, t)
+			if ok {
+				return a
+			}
+			unwritable = append(unwritable, a.Notice)
 		}
 	}
 
@@ -663,7 +692,7 @@ func next(r Roots, actor, role string) Answer {
 			// A CLAIM SOMEBODY ELSE HOLDS IS NOT WORK YOU CAN START. It reads as
 			// blocked because that is what it is: nothing you do releases it, and
 			// it releases itself when it lapses. See claim.go.
-			if by := ClaimedNow(r, t, now); by != "" && by != me {
+			if by := ClaimedNow(r, t, now); by != "" && !ClaimedHere(r, by) {
 				continue
 			}
 			// WHAT YOU CLAIMED COMES BEFORE WHAT NOBODY HAS. A claim is an agent
@@ -672,24 +701,50 @@ func next(r Roots, actor, role string) Answer {
 			if wantMine != (ClaimedNow(r, t, now) == me) {
 				continue
 			}
-			return take(r, actor, t)
+			a, ok := take(r, actor, t)
+			if ok {
+				return a
+			}
+			unwritable = append(unwritable, a.Notice)
 		}
 	}
 	if len(scopes) > 0 {
-		return Answer{Pull: AnswerWait, Notice: scopeNotice(r, scopes)}
+		return Answer{Pull: AnswerWait, Notice: scopeNotice(r, scopes) + unwritableNotice(unwritable)}
 	}
-	return Answer{Pull: AnswerWait, Notice: waitNotice(r, actor, held)}
+	return Answer{Pull: AnswerWait, Notice: waitNotice(r, actor, held) + unwritableNotice(unwritable)}
 }
 
-// take puts a token in the actor's hands and answers it.
-func take(r Roots, actor string, t Token) Answer {
+// unwritableNotice names every token the queue passed over because the record
+// would not write it, so the chapter that has to be shortened can be found.
+// A pull that hands work out says nothing about them: the notice belongs to
+// the answer that has nothing better to say.
+func unwritableNotice(said []string) string {
+	if len(said) == 0 {
+		return ""
+	}
+	return fmt.Sprintf("\n\nPassed over, because the record will not write them:\n  %s\n\n"+
+		"Shorten what each refusal names. Until then nobody can be handed these.",
+		strings.Join(said, "\n  "))
+}
+
+// take puts a token in the actor's hands and answers it. It answers false when
+// the record will not write the token, and the notice then says which token and
+// why, for the queue to carry to whoever gets the wait.
+//
+// THE REFUSAL IS THE WRITE'S, NOT THE QUEUE'S. The save holds a token to the
+// bounds the schema puts on its chapters, and that stands: a record that took
+// whatever was handed to it would hold tickets nobody reads. What does not
+// stand is one such token answering for every other: it is skipped, and the
+// caps stay where they are.
+func take(r Roots, actor string, t Token) (Answer, bool) {
 	t.Holder = actor
 	// HANDING OUT OPENS A STRETCH, with the tree as it stands as its before.
 	t = openStretch(r, t)
 	if err := SaveToken(r, t); err != nil {
-		return Answer{Pull: AnswerWait, Notice: "the record will not take a write: " + err.Error()}
+		return Answer{Pull: AnswerWait,
+			Notice: t.ID + ": the record will not take a write: " + err.Error()}, false
 	}
-	return handed(r, actor, t)
+	return handed(r, actor, t), true
 }
 
 // handed answers a token the actor holds, with the guidance for it.

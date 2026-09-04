@@ -331,6 +331,103 @@ const cases = {
     }
   },
 
+  // THE PERSON'S ASK GOES BACK UP WHEN THE ANSWER LANDS.
+  //
+  // The button is a request rather than a state. It went down when it was
+  // pressed and nothing put it back up, so the panel said an update was being
+  // asked for long after it was given, and the only way back was another press.
+  //
+  // THE RECORD DECIDES IT, NOT THE PRESS. The pressing half is left as it was:
+  // the page sends the command and changes nothing on its own. What is driven
+  // here is the release, through the real binary and the real page.
+  async "--ask"() {
+    const tree = {
+      name: "quackitect", type: "group", children: [{
+        name: "control", type: "group", shown: true, children: [{
+          name: "ask", type: "toggle", command: "quackitect.ask",
+          labels: { off: "asked", on: "asked" },
+          titles: { off: "ask", on: "asked" },
+        }],
+      }],
+    };
+    const { panelHtml } = await load("panel");
+    const dom = new JSDOM(panelHtml(tree, ["control"], {}), {
+      runScripts: "dangerously",
+      beforeParse(w) {
+        w.sent = [];
+        w.acquireVsCodeApi = () => ({ postMessage: (m) => w.sent.push(m), setState() {}, getState: () => undefined });
+      },
+    });
+    const w = dom.window;
+    const b = w.document.getElementById("ask");
+    if (!b) { no("ask: the panel drew no ask button"); return; }
+    if (b.dataset.state !== "off") { no(`ask: the button opens at ${b.dataset.state} rather than up`); return; }
+    ok("ask: the button opens up");
+
+    b.click();
+    const pressed = w.sent.filter((m) => m.type === "command").map((m) => m.command);
+    if (pressed.join() !== "quackitect.ask") { no(`ask: pressing it sent ${JSON.stringify(pressed)}`); return; }
+    ok("ask: pressing it asks the extension, and draws nothing itself");
+
+    // THE RULE COMES FROM THE EXTENSION. A copy of it here would decide what
+    // this check believes rather than what the panel does.
+    const { askArgs, askedArgs, askIsOwed } = await load("engineargs");
+    if (typeof askIsOwed !== "function") {
+      no("ask: the extension exports no askIsOwed, so the check would read the record by a rule of its own");
+      return;
+    }
+
+    // THE RECORD, WRITTEN BY THE REAL BINARY IN A TREE OF ITS OWN.
+    const work = mkdtempSync(join(tmpdir(), "panel-ask-"));
+    const stopEngine = liveEngine(root, work);
+    const said = (args) => {
+      try { return execFileSync(exe, [...args, "--work", work], { encoding: "utf8" }); }
+      catch (e) { return String(e.stdout ?? "") + String(e.stderr ?? ""); }
+    };
+    const owed = () => {
+      try { return askIsOwed(JSON.parse(said(askedArgs()))); } catch { return undefined; }
+    };
+    const tell = (isOwed) => w.dispatchEvent(new w.MessageEvent("message", {
+      data: { type: "state", id: "ask", state: isOwed ? "good" : "idle", detail: "" },
+    }));
+    try {
+      said(askArgs(true));
+      if (owed() !== true) {
+        no("ask: the engine does not say an update is owed after the press, so nothing below decides anything");
+        return;
+      }
+      ok("ask: the record says an update is owed");
+      tell(true);
+      if (b.dataset.state !== "on") no(`ask: with an update owed the button reads ${b.dataset.state}`);
+      else ok("ask: with an update owed the button is down");
+
+      // AND THE ANSWER LANDS, through the verb an agent answers with.
+      said(["answer", "--text", "this is what everybody is working on", "--actor", "main"]);
+      if (owed() !== false) {
+        no("ask: an answer is in the record and the engine still says an update is owed, so the button can never come up");
+        return;
+      }
+      ok("ask: the answer discharges what the press raised");
+      tell(false);
+      if (b.dataset.state !== "off") no(`ask: with the answer in the record the button reads ${b.dataset.state}`);
+      else ok("ask: with the answer in the record the button is up again");
+    } finally {
+      stopEngine();
+    }
+
+    // AND THE WINDOW READS IT AGAIN WHEN THE RECORD CHANGES. The page follows
+    // the message and the message follows the file, so the watching half is
+    // named here rather than left for a person to remember.
+    const source = readFileSync(join(here, "extension.ts"), "utf8");
+    if (!/asked\.json/.test(source)) {
+      no("ask: nothing in extension.ts watches the ask record, so no message is ever sent");
+    } else if (!/showAsked/.test(source)) {
+      no("ask: extension.ts never reads the ask again, so the watch tells the panel nothing");
+    } else {
+      ok("ask: the window watches the ask record and reads it again");
+    }
+  },
+
   // THE SLASH RULE, DRIVEN RATHER THAN READ.
   async "--slash"() {
     const { mintArgs } = await load("engineargs");

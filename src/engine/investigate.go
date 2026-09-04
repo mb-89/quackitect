@@ -54,6 +54,10 @@ const AnswerInvestigate = "investigate"
 func staleWindow(r Roots, session string) (window, per, actors int) {
 	per = LoadConfig(r).PullsBeforeHoldIsStale
 	actors = ActorsPresent(r, session)
+	// AND THE MULTIPLICATION IS DONE HERE, which the first version described and
+	// did not do. It worked the actors out and then handed the per-actor number
+	// straight back as the window, so the holder was measured against the
+	// fleet's rate again and every long token looked stale in a busy room.
 	return per * actors, per, actors
 }
 

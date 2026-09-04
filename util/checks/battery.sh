@@ -390,7 +390,7 @@ start "se lint" .bin/se.exe lint
 # holding five of the twelve and it answered all ok, exit 0, having said nothing
 # about the seven it did not run. Any sweep, or any accidental deletion, shrinks
 # the battery in silence while every submission goes on citing a green run.
-for c in render-check drive-editor drawn-classes-have-rules panel-draws-the-register engine-args engine-args-lifecycle engine-spawns liveness one-look panel-icons no-loose-glyphs no-loose-spawns no-lone-escape checks-live-in-the-method engine-spawns-catches panel-is-handed-the-state panel-says-holding drive-panel burndown burndown-derives-nothing tests-name-no-token tests-are-not-hotspots mcp-tools scripts-are-lf build-reports-every-error binaries-live-in-bin private-files-have-writers no-private-links projections-carry-chapters; do
+for c in render-check drive-editor drawn-classes-have-rules panel-draws-the-register engine-args engine-args-lifecycle engine-spawns liveness one-look panel-icons no-loose-glyphs no-loose-spawns no-lone-escape checks-live-in-the-method engine-spawns-catches panel-is-handed-the-state panel-says-holding drive-panel burndown burndown-derives-nothing tests-name-no-token tests-are-not-hotspots mcp-tools scripts-are-lf build-reports-every-error binaries-live-in-bin private-files-have-writers no-private-links refusals-name-a-door engine-stops-by-pid windows-say-they-are-here projections-carry-chapters; do
   if [ -f "util/checks/$c.mjs" ]; then
     start "$c" node "util/checks/$c.mjs" "$root"
   else
@@ -402,9 +402,9 @@ done
 report
 
 took=$(( $(date +%s) - battery_began ))
-if [ "$bad" -eq 0 ]; then
-  echo "all ok, ${took}s wall clock"
-else
-  echo "$bad failed, ${took}s wall clock"
-fi
+# ONE VERDICT LINE, WHATEVER THE OUTCOME. The green branch printed "all ok" and
+# batteryPassed reads the last line for a count, so every passing battery went
+# into the record as not ok and nothing on either side went red. Two spellings
+# of one verdict is what came apart, so there is one, and the count is in it.
+echo "$bad failed, ${took}s wall clock"
 exit $bad
