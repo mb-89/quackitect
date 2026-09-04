@@ -95,6 +95,18 @@ type Token struct {
 	// of that any more.
 	Process string `json:"process"`
 
+	// WHERE THIS TOKEN IS BORN, AND ONLY THAT.
+	//
+	// True puts it in doc/work, which git carries, so another agent on another
+	// box can claim it. False keeps it in .se/work, which nothing else reaches.
+	// Unset is a question the mint refuses to answer for you, except on a note,
+	// which is private by what it is.
+	//
+	// IT IS READ AT THE MINT AND NOWHERE ELSE, and it is never written to the
+	// file. The folder is the answer, and a field beside the folder is a second
+	// answer that can disagree with it.
+	Tracked *bool `json:"tracked,omitempty"`
+
 	// The guidance for filling this kind, written by the template so a reader
 	// is one click from the rules.
 	Guidance string `json:"guidance,omitempty"`
@@ -218,6 +230,11 @@ type KeptSection struct {
 // makes one word of four and reads worse than the sentence it was hiding.
 const TitleWords = 4
 
+// PrivateProcess is the one process whose tokens never travel. A note is what
+// nobody has decided yet, so it is private by what it is, and its minter is
+// not asked where it goes.
+const PrivateProcess = "note"
+
 func checkTitle(title string) error {
 	title = strings.TrimSpace(title)
 	if title == "" {
@@ -232,6 +249,31 @@ func checkTitle(title string) error {
 		if strings.ContainsAny(w, "_/\\") && len(w) > 12 {
 			return fmt.Errorf("%q joins words to get under the limit. Put them in the detail instead", w)
 		}
+	}
+	return nil
+}
+
+// checkTracked refuses a mint that has not said where the token is born.
+//
+// THERE IS NO DEFAULT, AND THAT IS THE POINT. A standard token is not tracked
+// by rule any more than a trivial one is. Later that follows from whether the
+// work sits in a tracked state machine. That does not exist, so the minter
+// answers it, agent or person, and it is a judgement call every time.
+//
+// A NOTE IS NOT ASKED. It is what nobody has decided yet, so it is private by
+// what it is, and a minter saying otherwise is refused rather than obeyed.
+func checkTracked(t Token) error {
+	if t.Process == PrivateProcess {
+		if t.Tracked != nil {
+			return fmt.Errorf("a %s is private and stays in .se/work, so it takes no tracked: leave it unsaid",
+				PrivateProcess)
+		}
+		return nil
+	}
+	if t.Tracked == nil {
+		return fmt.Errorf("say where this %s token is born. tracked true puts it in doc/work, "+
+			"which git carries, so another agent on another box can claim it. tracked false keeps "+
+			"it in .se/work, for small work you do yourself next", t.Process)
 	}
 	return nil
 }
@@ -360,6 +402,9 @@ func (t Token) kind() string {
 
 func Mint(r Roots, t Token) (Token, error) {
 	if err := checkTitle(t.Title); err != nil {
+		return t, err
+	}
+	if err := checkTracked(t); err != nil {
 		return t, err
 	}
 	// EVERY KIND HAS A SCHEMA, AND A NOTE DECLARING ONE WITHOUT IT IS REFUSED HERE.

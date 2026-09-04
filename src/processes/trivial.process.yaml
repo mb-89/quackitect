@@ -1,8 +1,6 @@
 name: trivial
 description: a fix or a small addition that needs no specification, worked and closed by its taker
 
-traced: false
-
 sections:
   required:
     - detail

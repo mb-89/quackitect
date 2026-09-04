@@ -51,7 +51,7 @@ func TestAVerbRunsInsideTheEngineAndTheClientPrintsIt(t *testing.T) {
 	aLiveEngine(t, r)
 
 	out, err := exec.Command(exe, "work", "--title", "minted by a client", "--process", "task",
-		"--detail", "through the socket", "--work", r.Work).Output()
+		"--tracked", "true", "--detail", "through the socket", "--work", r.Work).Output()
 	if err != nil {
 		t.Fatalf("the client failed: %v\n%s", err, out)
 	}

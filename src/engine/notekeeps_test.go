@@ -30,6 +30,7 @@ import (
 func aTreeWithAChecklist(t *testing.T, root, secondSays string) Roots {
 	t.Helper()
 	r := Roots{Method: root, Work: root}
+	withHistory(t, root)
 	dir := ProcessesDir(root)
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		t.Fatal(err)
@@ -83,7 +84,7 @@ const (
 
 func mintWithChecklist(t *testing.T, r Roots, sub map[string]string) Token {
 	t.Helper()
-	tok, err := Mint(r, Token{Process: "task", Title: "a token that answers",
+	tok, err := Mint(r, Token{Tracked: tracked(), Process: "task", Title: "a token that answers",
 		Status: "open", Detail: "minted by the test", Submission: sub})
 	if err != nil {
 		t.Fatal(err)
@@ -91,13 +92,22 @@ func mintWithChecklist(t *testing.T, r Roots, sub map[string]string) Token {
 	return tok
 }
 
+// noteText answers what the note holds, wherever it is.
+//
+// A token that closes comes off the disk, so a test reading one after it
+// closed reads the archive. That is the same door a person gets.
 func noteText(t *testing.T, r Roots, id string) string {
 	t.Helper()
-	b, err := os.ReadFile(filepath.Join(EphemeralDir(r), id+".md"))
-	if err != nil {
-		t.Fatal(err)
+	for _, dir := range workDirs(r) {
+		if b, err := os.ReadFile(filepath.Join(dir, id+".md")); err == nil {
+			return string(b)
+		}
 	}
-	return string(b)
+	said, err := ReadArchived(r, id)
+	if err != nil {
+		t.Fatalf("%s is on neither disk nor in the archive: %v", id, err)
+	}
+	return said
 }
 
 // A SUBMISSION SAYS WHAT IT BRINGS. IT DOES NOT SAY WHAT THE NOTE NO LONGER

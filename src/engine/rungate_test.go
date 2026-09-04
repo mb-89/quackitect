@@ -15,8 +15,8 @@ func TestEveryWritingToolIsRefusedAndNamesItsVerb(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
 	r := Roots{Method: root, Work: root}
-	writeProcess(t, root, "gated", false)
-	tok, err := Mint(r, Token{Process: "gated", Title: "a token in hand", Status: "first"})
+	writeProcess(t, root, "gated")
+	tok, err := Mint(r, Token{Tracked: local(), Process: "gated", Title: "a token in hand", Status: "first"})
 	if err != nil {
 		t.Fatal(err)
 	}

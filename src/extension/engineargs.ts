@@ -16,13 +16,13 @@
 // Nothing here reads the filesystem, spawns anything, or knows about vscode, so
 // the check can call it.
 
-// THE PICKER CHOOSES A PROCESS, and nothing else.
+// THE PANEL MINTS A NOTE, and nothing else.
 //
-// It used to choose a scope and whether the token was traced, joined into one
-// word with a middle dot and read apart here. Both of those are the process's
-// now: src/processes/<name>.process.yaml says whether its tokens are traced and
-// what the steps are, so the panel picks the file and the file answers the rest.
-export function mintArgs(text: string, process: string): string[] | undefined {
+// A note is what a person writes down before anything is decided, which is what
+// the box is for. Every other process is minted by an agent, which has to say
+// whether the token is tracked. A note takes no such answer, so the box asks
+// one question and the engine answers the rest.
+export function mintArgs(text: string): string[] | undefined {
   const said = text.trim();
   if (!said) return undefined;
   // THE TITLE IS BEFORE THE SLASH AND THE DETAIL IS AFTER IT. Four words name
@@ -31,7 +31,7 @@ export function mintArgs(text: string, process: string): string[] | undefined {
   const title = (cut < 0 ? said : said.slice(0, cut)).trim();
   const detail = cut < 0 ? "" : said.slice(cut + 1).trim();
   const args = ["work", "--title", title, "--by", "person",
-                "--process", process.trim() || "note"];
+                "--process", "note"];
   if (detail) args.push("--detail", detail);
   return args;
 }

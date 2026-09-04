@@ -57,7 +57,7 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand("quackitect.ask", () => toggleAsk(context)),
     vscode.commands.registerCommand("quackitect.unbind", () => pressBinding(context)),
     vscode.commands.registerCommand("quackitect.god", () => armGod(context)),
-    vscode.commands.registerCommand("quackitect.mintWork", (arg?: { text: string; process: string }) =>
+    vscode.commands.registerCommand("quackitect.mintWork", (arg?: { text: string }) =>
       mintWork(context, arg),
     ),
     vscode.commands.registerCommand("quackitect.welcome", () =>
@@ -391,7 +391,7 @@ async function refreshLive(context: vscode.ExtensionContext) {
 }
 
 // THE LIVE PARTS ONLY, NEVER THE WHOLE PAGE. Replacing view.webview.html would
-// empty the line a person is typing in, shut the picker under their hand and
+// empty the line a person is typing in and
 // fold every section they opened, once a second, for ever. The strip and the
 // tables are dropped into the page that is already there, which is how the
 // values have always arrived.
@@ -995,7 +995,7 @@ class ControlPanel implements vscode.WebviewViewProvider {
       // A control that carries something runs its command with it. The panel
       // holds no value of its own, so what it carries is spent here.
       if (msg.type === "run") {
-        vscode.commands.executeCommand(msg.command, { text: msg.text, process: msg.process });
+        vscode.commands.executeCommand(msg.command, { text: msg.text });
         return;
       }
       if (msg.type === "set") setValue(this.context, msg.key, msg.value);
@@ -1025,7 +1025,7 @@ class ControlPanel implements vscode.WebviewViewProvider {
 
 type PanelMessage =
   | { type: "command"; command: string }
-  | { type: "run"; command: string; text: string; process: string }
+  | { type: "run"; command: string; text: string }
   | { type: "open"; id: string }
   | { type: "set"; key: string; value: unknown }
   | { type: "ready" };
@@ -1285,9 +1285,9 @@ async function renameGroup(context: vscode.ExtensionContext, from: string, to: s
   void drawWork(context);
 }
 
-async function mintWork(context: vscode.ExtensionContext, arg?: { text: string; process: string }) {
+async function mintWork(context: vscode.ExtensionContext, arg?: { text: string }) {
   // A person typed it in the panel, so a person minted it.
-  const args = mintArgs(arg?.text ?? "", arg?.process ?? "");
+  const args = mintArgs(arg?.text ?? "");
   if (!args) {
     vscode.window.showErrorMessage(whyNothingHappened("nothing typed"));
     return;

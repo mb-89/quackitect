@@ -65,9 +65,7 @@ const wantPanel = [
   ["the hold is not a field", (h) => !/data-key="control.hold"/.test(h)],
   ["the toggle button", /data-command="quackitect.showWork"/],
   ["the line edit", /class="line"[\s\S]*?data-run="quackitect.mintWork"/],
-  ["the line edit spanning three", /grid-column: span 3/],
-
-  ["a caret on the picker", /pick .picked::after/],
+  ["the line edit spanning four", /grid-column: span 4/],
 
   // THE STRIP CANNOT SPILL PAST THE LEFT EDGE OF THE PANEL.
   //
@@ -84,26 +82,14 @@ const wantPanel = [
   ["the doing strip can shrink rather than spill off the left", /\.doings \{[^}]*min-width: 0/],
   ["and a long line ends in an ellipsis inside the panel",
     /\.doing, \.onhold \{[^}]*text-overflow: ellipsis/],
-  // One plus three plus one is five, so the row asks for no filler. Counting
-  // controls rather than columns asked for seven and the row wrapped.
+  // One plus four is five, so the row asks for no filler. Counting controls
+  // rather than columns asked for seven and the row wrapped.
   ["the work row adds no filler", (h) => !/<summary>work<\/summary>[\s\S]*?<span><\/span>/.test(h)],
-  ["the picker", /class="pick"/],
-  // THE PICKER IS FILLED FROM THE PROCESS FILES, so this asks for the shape
-  // rather than for a word. It named SS·T, which was a scope and whether the
-  // token was traced joined with a middle dot, and the process owns both of
-  // those now. A check naming one process would go red the day somebody adds
-  // a second and renames the first.
-  ["the picker short when closed", /class="picked" data-value="[^"]+">[^<]+</],
-  ["the picker saying what it means", /<li data-value="[^"]+"><b>[^<]+<\/b><span>[^<]+<\/span><\/li>/],
-  // A CHOICE THE ENGINE WOULD REFUSE IS THE FAULT THIS GUARDS. Every value the
-  // picker offers is a process src/processes declares.
-  ["every choice is a process that exists", (h) => {
-    const offered = [...h.matchAll(/<li data-value="([^"]+)"/g)].map((m) => m[1]);
-    const declared = new Set(readdirSync(join(root, "src", "processes"))
-      .filter((f) => f.endsWith(".process.yaml") && !f.startsWith("_"))
-      .map((f) => f.slice(0, -".process.yaml".length)));
-    return offered.length > 0 && offered.every((o) => declared.has(o));
-  }],
+  // THE BOX WRITES A NOTE AND NOTHING ELSE, so there is no process to pick.
+  // Every other kind of token says at the mint whether it is tracked, and that
+  // is a second question this box does not ask.
+  ["nothing is picked", (h) => !/class="pick"/.test(h)],
+  ["and the box says it writes a note", /placeholder="title \/ the note body"/],
 ];
 for (const [says, re] of wantPanel) {
   const ok = typeof re === "function" ? re(panel) : re.test(panel);

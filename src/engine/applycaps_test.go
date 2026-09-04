@@ -69,7 +69,7 @@ func TestAnApplyThatShrinksAnOverLongSectionIsTaken(t *testing.T) {
 
 func aMintedToken(t *testing.T, r Roots) Token {
 	t.Helper()
-	tok, err := Mint(r, Token{Process: "small", Title: "a small change", Detail: "short",
+	tok, err := Mint(r, Token{Tracked: local(), Process: "small", Title: "a small change", Detail: "short",
 		Status: "open", Criteria: []Criterion{{Says: "go test ./... is green"}}})
 	if err != nil {
 		t.Fatal(err)

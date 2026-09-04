@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"strconv"
 	"strings"
 )
 
@@ -31,6 +32,8 @@ func runWork(c *call) int {
 	process := fs.String("process", "", "which process shapes this token (default: note)")
 	stdin := fs.Bool("stdin", false, "read the token as JSON on standard input")
 	title := fs.String("title", "", "what the work is, in four words at most")
+	tracked := fs.String("tracked", "", "true: born in doc/work, where another box can claim it. "+
+		"false: born in .se/work, for what you do yourself next. A note takes neither")
 	detail := fs.String("detail", "", "what is asked, or what is wrong")
 	action := fs.String("proposed-action", "", "what you think should happen about it")
 	var doneWhen manyFlag
@@ -117,6 +120,17 @@ func runWork(c *call) int {
 	} else {
 		t = Token{Title: *title, Detail: *detail, ProposedAction: *action,
 			Process: *process, DependsOn: splitComma(*dependsOn), Parent: *parent}
+		// UNSAID IS A THIRD ANSWER, so the flag is a string. A bool flag has
+		// two values and the mint has to tell them from the question nobody
+		// answered.
+		if *tracked != "" {
+			said, err := strconv.ParseBool(*tracked)
+			if err != nil {
+				c.answerJSON(map[string]any{"error": "tracked takes true or false, and this is " + *tracked})
+				return 1
+			}
+			t.Tracked = &said
+		}
 		for _, says := range doneWhen {
 			t.Criteria = append(t.Criteria, Criterion{Says: says})
 		}

@@ -99,6 +99,7 @@ So a search over the tree is a question, not a walk.
 It answers the best hit first for words, every hit for a regex, and the files a glob names when given a path alone.
 `se_ask` takes SQL over the same tables, so a question no search can put is still a question.
 The harness's Grep and Glob and a shell's `rg` or `grep` aimed inside the tree are refused and told this door.
+It is the recursive form that is refused, `rg` over a folder or `grep -r`, and a `grep` on one named file is left alone.
 Aimed outside the tree, they are yours.
 
 ## 9. The engine owns the tests

@@ -1,8 +1,6 @@
 name: note
 description: an observation written down, and later decided
 
-traced: false
-
 sections:
   required:
     - detail

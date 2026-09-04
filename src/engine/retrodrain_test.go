@@ -18,7 +18,7 @@ func TestARetroDrainsTheKeptOutputAndTheUndoJournal(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
 	r := Roots{Method: root, Work: root}
-	writeProcess(t, root, "drained", false)
+	writeProcess(t, root, "drained")
 
 	// Something in each folder, written the way the engine writes it.
 	for _, f := range []struct{ dir, name string }{

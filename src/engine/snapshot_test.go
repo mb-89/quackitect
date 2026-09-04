@@ -52,8 +52,11 @@ func TestAChangeIsBracketedByTwoSnapshotsOutsideTheHistory(t *testing.T) {
 	before, after := ended.Began[0], ended.Finished[0]
 
 	// THE CHANGE IS THE DIFF BETWEEN THE TWO, and it is exactly what was done.
-	changed := git("diff", "--name-only", before, after)
-	if changed != "a.md\nb.md" {
+	//
+	// A tracked token is a file in the tree, so its own note is in its own
+	// diff. That is the token being written rather than work being done, and
+	// it is left out here.
+	if changed := workOnly(git("diff", "--name-only", before, after)); changed != "a.md\nb.md" {
 		t.Fatalf("the diff between the snapshots names %q", changed)
 	}
 	// THE PERSON'S HISTORY IS UNTOUCHED: same head, one commit, nothing staged
@@ -96,16 +99,36 @@ func TestAChangeIsBracketedByTwoSnapshotsOutsideTheHistory(t *testing.T) {
 		t.Fatalf("two stretches wrote %d began and %d ended", len(stretched.Began), len(stretched.Finished))
 	}
 	for i := range stretched.Began {
-		if changed := git("diff", "--name-only", stretched.Began[i], stretched.Finished[i]); changed != "mine.md" {
+		if changed := workOnly(git("diff", "--name-only", stretched.Began[i], stretched.Finished[i])); changed != "mine.md" {
 			t.Fatalf("stretch %d names %q, and another hand's file is in it", i+1, changed)
 		}
 	}
+}
+
+// workOnly drops the token's own note from a diff.
+//
+// A tracked token is a file in the tree, so its note is in the diff of the
+// stretch it brackets. That is the token being written rather than work being
+// done, and a test about the change wants the change.
+func workOnly(changed string) string {
+	var out []string
+	for _, name := range strings.Split(changed, "\n") {
+		if name != "" && !strings.HasPrefix(name, "doc/work/") {
+			out = append(out, name)
+		}
+	}
+	return strings.Join(out, "\n")
 }
 
 // A FOLDER WITH NO HISTORY HAS NO SNAPSHOT, and the work goes on.
 func TestNoRepositoryMeansNoSnapshotAndNoRefusal(t *testing.T) {
 	t.Parallel()
 	r := aTreeWithOneStep(t)
+	// THE FIXTURE CARRIES A REPOSITORY AND THIS TEST IS ABOUT HAVING NONE, so
+	// the history is taken away again rather than a second fixture written.
+	if err := os.RemoveAll(filepath.Join(r.Work, ".git")); err != nil {
+		t.Fatal(err)
+	}
 	tok := mintTask(t, r, "a change", "")
 	taken, err := TakeUp(r, tok.ID, "agent")
 	if err != nil || len(taken.Began) != 0 {

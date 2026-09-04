@@ -23,7 +23,7 @@ func TestALookDoesNotStealFromAHolderStillPulling(t *testing.T) {
 	defer log.Close()
 	log.Write("engine", "start", "engine", "for the session name", Yes(), nil)
 
-	tok, err := Mint(r, Token{Process: "queued", Title: "work in review", Status: "first"})
+	tok, err := Mint(r, Token{Tracked: local(), Process: "queued", Title: "work in review", Status: "first"})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -56,7 +56,7 @@ func TestALookDoesNotStealFromANewerHolder(t *testing.T) {
 	defer log.Close()
 	log.Write("engine", "start", "engine", "for the session name", Yes(), nil)
 
-	tok, err := Mint(r, Token{Process: "queued", Title: "work that moved on", Status: "first"})
+	tok, err := Mint(r, Token{Tracked: local(), Process: "queued", Title: "work that moved on", Status: "first"})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -109,7 +109,7 @@ func aHeldTokenInASession(t *testing.T, holder string) (Roots, Token) {
 	}
 	t.Cleanup(func() { log.Close() })
 	log.Write("engine", "start", "engine", "for the session name", Yes(), nil)
-	tok, err := Mint(r, Token{Process: "queued", Title: "a long token", Status: "first"})
+	tok, err := Mint(r, Token{Tracked: local(), Process: "queued", Title: "a long token", Status: "first"})
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -15,11 +15,11 @@ func TestAnActorWithNoNameHoldsNothing(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
 	r := Roots{Method: root, Work: root}
-	writeProcess(t, root, "gated", false)
+	writeProcess(t, root, "gated")
 
 	// Three tokens nobody holds, which is the shape of a backlog.
 	for _, title := range []string{"the first note", "the second note", "the third one"} {
-		if _, err := Mint(r, Token{Process: "gated", Title: title, Status: "first"}); err != nil {
+		if _, err := Mint(r, Token{Tracked: local(), Process: "gated", Title: title, Status: "first"}); err != nil {
 			t.Fatal(err)
 		}
 	}

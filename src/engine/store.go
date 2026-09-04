@@ -35,14 +35,26 @@ func TracedDir(r Roots) string    { return filepath.Join(r.Work, "doc", "work") 
 
 func workDirs(r Roots) []string { return []string{TracedDir(r), EphemeralDir(r)} }
 
-// dirFor asks the process where a token of this kind lives.
+// dirFor answers where a token's file belongs.
 //
-// THE FOLDER IS THE ANSWER, NOT A FIELD. A token in doc/work is traced and one
-// in .se/work is not, so writing it on the note as well was a second copy that
-// could disagree with where the file actually is. The process decides where a
-// new one goes, and the folder answers for one that exists.
+// THE FOLDER IS THE ANSWER, AND NOTHING ELSE IS. A token in doc/work travels
+// and one in .se/work does not, so a field saying the same thing is a second
+// answer that can disagree with the first. There is no such field, on the note
+// or on the process.
+//
+// A token that has a file is in the folder that answers for it. So a token
+// moved by hand stays moved, which is what a move means.
+//
+// MEASURED. The process carried the answer and dirFor read it on every save.
+// A token dragged into the other store was dragged back by the next save, and
+// moving a hundred of them needed the process edited as well.
+//
+// A token with no file is new, and the mint said where it is born.
 func dirFor(r Roots, t Token) string {
-	if p, err := LoadProcess(r.Method, t.Process); err == nil && p.Traced {
+	if at := noteAt(r, t.ID); at != "" {
+		return filepath.Dir(at)
+	}
+	if t.Tracked != nil && *t.Tracked {
 		return TracedDir(r)
 	}
 	return EphemeralDir(r)
@@ -364,6 +376,12 @@ func LoadToken(r Roots, id string) (Token, error) {
 			return t, nil
 		}
 	}
+	// THE ARCHIVE IS A FOLDER THE READER CANNOT SEE. A token that closed came
+	// off the disk, and every caller that names an id by hand would otherwise
+	// be told it never existed. So the last place looked is history.
+	if t, ok := readArchivedNote(r, id); ok {
+		return t, nil
+	}
 	return Token{}, fmt.Errorf("no such token: %s", id)
 }
 
@@ -665,6 +683,19 @@ func SaveToken(r Roots, t Token) error {
 	r.forget()
 	_ = IndexFile(r, final) // the file is the truth, and the watcher catches up on a row it could not write
 	noteMove(r, t, was, existed == nil)
+	// THE CLOSE IS THE MOMENT, AND THIS IS THE ONE PLACE THAT SEES IT. A token
+	// that has just ended goes to the archive if it travels and is deleted if
+	// it does not, so no agent has to call anything and no door can forget.
+	//
+	// It asks whether this save is the one that ended it. A save of a token
+	// that was already ended is a repair, and a repair does not archive twice.
+	//
+	// IT IS THE STATE AND NOT THE DISPOSITION. A standard token carries done
+	// while a reviewer still has a step to take on it, so archiving on the
+	// disposition alone would take it off the disk before its verdict.
+	if ended := t.Ended() && ClosingState(r, t); ended && (existed != nil || !(was.Ended() && ClosingState(r, was))) {
+		return Archive(r, t)
+	}
 	return nil
 }
 

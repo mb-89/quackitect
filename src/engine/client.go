@@ -56,6 +56,14 @@ func callTheEngine(verb string, args []string) int {
 		fmt.Fprintln(os.Stderr, TheMethodIsLost())
 		return 1
 	}
+	// THE CALLER HEARS WHERE ITS WORK WENT. A folder named inside a project
+	// answers the project, and a mint aimed at a scratch folder that lands in
+	// the real backlog is quiet damage while nothing says this.
+	if asked, got, moved := WorkMoved(argValue(args, "--work")); moved {
+		fmt.Fprintf(os.Stderr, "engine: %s is inside %s, so that is the folder being worked on. "+
+			"Every path is under it, and anything minted lands there. Name a folder "+
+			"outside a project to work on its own\n", asked, got)
+	}
 	if wantsHelp(args) {
 		return run[verb](&call{roots: roots, args: args, in: os.Stdin, out: os.Stdout, err: os.Stderr})
 	}

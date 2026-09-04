@@ -67,6 +67,7 @@ func runFind(c *call) int {
 		fmt.Fprintln(c.err, "  se find --regex \"func \\(c \\*call\\)\"       a Go regular expression over every line")
 		fmt.Fprintln(c.err, "  se find --regex \"TODO\" --path \"src/**/*.go\"   narrowed to a file glob")
 		fmt.Fprintln(c.err, "  se find --path \"util/checks/*.mjs\"       the files a glob names, and nothing else")
+		fmt.Fprintln(c.err, "  se find --archive --regex \"gooseberry\"  the same, over what has been archived")
 		fmt.Fprintln(c.err, "")
 		fmt.Fprintln(c.err, "  Every hit is a path, a line number and the line. fresh says whether")
 		fmt.Fprintln(c.err, "  the engine is watching the tree; when it is not, hits may be behind the files.")
@@ -78,8 +79,20 @@ func runFind(c *call) int {
 	regex := fs.String("regex", "", "a regular expression, Go syntax, matched against each line")
 	path := fs.String("path", "", "a glob over paths: * within a folder, ** across folders")
 	limit := fs.Int("limit", findLimit, "how many hits to answer at most")
+	archive := fs.Bool("archive", false, "search what has been archived rather than the tree")
 	if code, stop := c.parse(fs, "find"); stop {
 		return code
+	}
+	// THE ARCHIVE IS NOT IN THE INDEX, because it is not in the tree. It is
+	// read where it lives, which is the tags, so closed work still answers.
+	if *archive {
+		got, err := FindArchived(c.roots, FindParams{Words: *words, Regex: *regex, Limit: *limit})
+		if err != nil {
+			c.answerJSON(map[string]any{"error": err.Error()})
+			return 1
+		}
+		c.answerJSON(got)
+		return 0
 	}
 	got, err := Find(c.roots, FindParams{Words: *words, Regex: *regex, Path: *path, Limit: *limit})
 	if err != nil {

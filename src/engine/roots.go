@@ -178,6 +178,31 @@ func projectRoot(start string) string {
 	return start
 }
 
+// WorkMoved says whether a named work folder resolved to a different one.
+//
+// THE WALK IS RIGHT AND THE SILENCE IS THE DEFECT. projectRoot goes up to the
+// nearest folder carrying .se, which is what lets a verb run from a
+// subdirectory. So --work naming a folder inside a project answers the
+// project.
+//
+// MEASURED. A mint aimed at a scratch folder under the tree landed in the real
+// backlog, under a real id, and nothing said so. The only sign was that it was
+// not where it had been asked for.
+//
+// So the answer is not to stop walking. It is to say the walk happened, to
+// whoever named a folder and got another.
+func WorkMoved(workArg string) (asked, got string, moved bool) {
+	if workArg == "" {
+		return "", "", false // nobody named one, so nothing was moved from
+	}
+	abs, err := filepath.Abs(workArg)
+	if err != nil {
+		return workArg, workArg, false
+	}
+	root := projectRoot(abs)
+	return abs, root, root != abs
+}
+
 // walkUp yields each folder from start upwards, stopping before any folder no
 // project may be: the home directory and the temporary folder.
 func walkUp(start string) func(func(string) bool) {

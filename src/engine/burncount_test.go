@@ -20,7 +20,7 @@ func TestTheBurndownCountsWhatHappened(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
 	r := Roots{Method: root, Work: root}
-	writeProcess(t, root, "counted", false)
+	writeProcess(t, root, "counted")
 	// A SESSION IS WHAT THE RECORD BELONGS TO. Every move writes into the log
 	// that is open, so a tree with no session records nothing, which is why
 	// this opens one rather than expecting the writes to land in the air.
@@ -29,11 +29,11 @@ func TestTheBurndownCountsWhatHappened(t *testing.T) {
 	today := TheDay(time.Now())
 	before := TheBurndown(r, today)
 
-	one, err := Mint(r, Token{Process: "counted", Title: "a token to count", Status: "first"})
+	one, err := Mint(r, Token{Tracked: local(), Process: "counted", Title: "a token to count", Status: "first"})
 	if err != nil {
 		t.Fatal(err)
 	}
-	if _, err := Mint(r, Token{Process: "counted", Title: "a second to count", Status: "first"}); err != nil {
+	if _, err := Mint(r, Token{Tracked: local(), Process: "counted", Title: "a second to count", Status: "first"}); err != nil {
 		t.Fatal(err)
 	}
 	afterMint := TheBurndown(r, today)
@@ -70,9 +70,9 @@ func TestABurndownForAQuietDayIsNought(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
 	r := Roots{Method: root, Work: root}
-	writeProcess(t, root, "counted", false)
+	writeProcess(t, root, "counted")
 	openSession(t, r)
-	if _, err := Mint(r, Token{Process: "counted", Title: "minted today", Status: "first"}); err != nil {
+	if _, err := Mint(r, Token{Tracked: local(), Process: "counted", Title: "minted today", Status: "first"}); err != nil {
 		t.Fatal(err)
 	}
 	// A day the log cannot hold anything for.

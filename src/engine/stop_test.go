@@ -112,7 +112,7 @@ func TestABlockedClaimIsRefusedWhileTheQueueWouldHandWork(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(procs, "task.process.yaml"), []byte(proc), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	tok, err := Mint(r, Token{Title: "work that stands", Process: "task", Status: "open",
+	tok, err := Mint(r, Token{Tracked: local(), Title: "work that stands", Process: "task", Status: "open",
 		Detail: "minted by the test"})
 	if err != nil {
 		t.Fatal(err)

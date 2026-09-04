@@ -1,8 +1,6 @@
 name: standard
 description: a change large enough to want an approach first and a second pair of eyes after, and small enough to review whole
 
-traced: true
-
 sections:
   required:
     - detail

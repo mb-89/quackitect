@@ -115,14 +115,18 @@ func laneTools() []map[string]any {
 		},
 		{
 			"name": "se_work",
-			"description": "MINT A WORK TOKEN: title (four words at most), detail, done_when. " +
-				"Or on: <id> takes that token into your hands.",
+			"description": "MINT A WORK TOKEN: title (four words at most), detail, done_when, " +
+				"and tracked, which says where it is born. tracked true puts it in doc/work, " +
+				"which git carries, so another agent on another box can claim it. tracked false " +
+				"keeps it in .se/work, for small work you do yourself next. A note takes neither " +
+				"and is always private. Or on: <id> takes that token into your hands.",
 			"inputSchema": map[string]any{
 				"type": "object",
 				"properties": map[string]any{
 					"title":           map[string]any{"type": "string"},
 					"detail":          map[string]any{"type": "string"},
 					"process":         map[string]any{"type": "string"},
+					"tracked":         map[string]any{"type": "boolean"},
 					"proposed_action": map[string]any{"type": "string"},
 					"done_when":       map[string]any{"type": "array", "items": map[string]any{"type": "string"}},
 					"depends_on":      map[string]any{"type": "array", "items": map[string]any{"type": "string"}},
@@ -195,6 +199,16 @@ func mintWork(r roots, args map[string]any) string {
 	} {
 		if v := str(args[pair[1]]); v != "" {
 			a = append(a, pair[0], v)
+		}
+	}
+	// TRACKED HAS THREE ANSWERS AND str KNOWS TWO. A false and a question
+	// nobody answered both read as empty, so it is taken off the map by type
+	// rather than through the pair list above.
+	if said, ok := args["tracked"].(bool); ok {
+		if said {
+			a = append(a, "--tracked", "true")
+		} else {
+			a = append(a, "--tracked", "false")
 		}
 	}
 	if s := strList(args["depends_on"]); len(s) > 0 {

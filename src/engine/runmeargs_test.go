@@ -94,7 +94,8 @@ dispositions:
 
 	// A verb through RUNME, from outside the project, argv as typed.
 	script := filepath.Join(project, runmeName())
-	verb := []string{"work", "--title", "minted through RUNME", "--process", "task", "--detail", "argv untouched"}
+	verb := []string{"work", "--title", "minted through RUNME", "--process", "task",
+		"--tracked", "false", "--detail", "argv untouched"}
 	var cmd *exec.Cmd
 	if runtime.GOOS == "windows" {
 		cmd = Quietly(exec.Command("powershell", append([]string{"-NoProfile", "-File", script}, verb...)...))

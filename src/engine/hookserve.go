@@ -138,8 +138,17 @@ const (
 )
 
 // noteHook records one answered hook against the bounds.
+//
+// THE HEADLINE SAYS WHICH BOUND TRIPPED. A deep queue or a long wait is other
+// work piling up behind the guard, which is what the word bottleneck means. A
+// long answer with nobody queued is one slow hook and nothing more.
+//
+// MEASURED. The line said bottleneck on all three, and the owner read "the
+// guard is the bottleneck: 1 queued, waited 0 ms" and asked how that was one.
+// The numbers beside the headline already said it was not.
 func (l *engineLoad) noteHook(log *Log, queued int, waited, took time.Duration) {
-	if queued < hookQueueBound && waited < hookWaitBound && took < hookTookBound {
+	behind := queued >= hookQueueBound || waited >= hookWaitBound
+	if !behind && took < hookTookBound {
 		return
 	}
 	now := time.Now().UnixNano()
@@ -147,11 +156,15 @@ func (l *engineLoad) noteHook(log *Log, queued int, waited, took time.Duration) 
 	if now-last < int64(loadSayEvery) || !l.lastSaid.CompareAndSwap(last, now) {
 		return
 	}
+	says := "the guard was slow on one hook"
+	if behind {
+		says = "the guard is the bottleneck"
+	}
 	log.Write("engine", "load", "engine",
-		fmt.Sprintf("the guard is the bottleneck: %d queued, waited %d ms, answered in %d ms",
-			queued, waited.Milliseconds(), took.Milliseconds()), No(),
+		fmt.Sprintf("%s: %d queued, waited %d ms, answered in %d ms",
+			says, queued, waited.Milliseconds(), took.Milliseconds()), No(),
 		map[string]any{"queued": queued, "waited_ms": waited.Milliseconds(), "took_ms": took.Milliseconds(),
-			"verbs_in_flight": l.verbsInFlight.Load()})
+			"behind": behind, "verbs_in_flight": l.verbsInFlight.Load()})
 }
 
 // snapshot answers the counters, for a ping.

@@ -18,7 +18,7 @@ func TestTheStateOfPlayReadsOneScreen(t *testing.T) {
 	l, _ := OpenLog(r.Private("log"))
 	l.Close()
 
-	held, err := Mint(r, Token{Title: "held work", Process: "trivial", Status: "open", Holder: "worker-x"})
+	held, err := Mint(r, Token{Tracked: local(), Title: "held work", Process: "trivial", Status: "open", Holder: "worker-x"})
 	if err != nil {
 		t.Fatal(err)
 	}

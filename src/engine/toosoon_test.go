@@ -22,7 +22,7 @@ func TestAStepTickedTooEarlyIsRefused(t *testing.T) {
 	r := aTreeWithThreeSteps(t)
 
 	tok := Token{
-		Process: "three", Title: "a token to walk", Status: "first",
+		Process: "three", Tracked: local(), Title: "a token to walk", Status: "first",
 		Detail: "walked by the test", Submission: map[string]string{},
 	}
 	p, err := LoadProcess(r.Method, "three")

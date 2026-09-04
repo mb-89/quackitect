@@ -31,7 +31,7 @@ How a test is built is [[testing]].
 7. Ask whether a criterion is about this change or about the project. Pin a one-time one. A standing one belongs in a check.
 8. One token, one piece of work. One command decides one sentence. A done-when needing "and" is usually two tokens.
 9. Before a feature, name the basics it stands on. Mint the missing one first. *
-10. A clear small fix is a trivial token, minted at once. A note is for what needs a decision first.
+10. A clear small fix is a trivial token, minted at once. A note is for what needs a decision first. Everything but a note says tracked or local at the mint. A token that travels names no token that does not.
 
 ## Using one
 
@@ -98,6 +98,22 @@ A spike closes on its own numbered questions, including those it declines, and a
 
 The basics look self-evident, so nobody writes them down, and the gap is found after the feature.
 Before a feature token is worked, its detail names what it stands on, and each missing basic is minted first.
+
+## 10. Tracked is claimable
+
+A note is private and stays private, because nobody has decided what it is yet.
+
+Everything else is born in one of two places, and the minter says which. Tracked is doc/work, which git carries, so another agent on another box can claim it. Local is .se/work, which nothing else reaches.
+
+So the question is not how big the work is. It is who can pick it up.
+
+Work you are going to do yourself next, tied to what is in your hands, stays local. Anything another hand could take is tracked.
+
+There is no default, on any process. Later this follows from whether the work sits in a tracked state machine. That does not exist yet, so a person or an agent decides it, every time.
+
+And the reference runs one way only. A tracked token names no local one, because the reader of a tracked token may not have the local one at all. A cloud box reads the tree out of git, where .se/work is not, so a local id there is not a private door. It is a broken link.
+
+A local token naming a tracked one is fine. Whoever reads the local one has the tracked one too.
 
 ## 11. Next to the ask
 

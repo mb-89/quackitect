@@ -14,7 +14,6 @@ import (
 type Process struct {
 	Name        string
 	Description string
-	Traced      bool
 	// Which of the catalogue's sections and fields this process switches on.
 	RequiredSection []string
 	OptionalSection []string
@@ -89,7 +88,6 @@ func LoadProcess(methodRoot, name string) (Process, error) {
 	p := Process{
 		Name:            ystr(top["name"]),
 		Description:     ystr(top["description"]),
-		Traced:          ystr(top["traced"]) == "true",
 		RequiredSection: ystrs(ymap(top["sections"])["required"]),
 		OptionalSection: ystrs(ymap(top["sections"])["optional"]),
 		OptionalField:   ystrs(ymap(top["fields"])["optional"]),

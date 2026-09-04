@@ -13,11 +13,11 @@ import (
 func TestAMintRequiringDoneWhenRefusesWithoutIt(t *testing.T) {
 	t.Parallel()
 	r := aTreeRequiringDoneWhen(t)
-	_, err := Mint(r, Token{Process: "small", Title: "a small change", Detail: "change it"})
+	_, err := Mint(r, Token{Tracked: local(), Process: "small", Title: "a small change", Detail: "change it"})
 	if err == nil || !strings.Contains(err.Error(), "done when") {
 		t.Fatalf("a mint without done when was answered %v, want a refusal naming done when", err)
 	}
-	tok, err := Mint(r, Token{Process: "small", Title: "a small change", Detail: "change it",
+	tok, err := Mint(r, Token{Tracked: local(), Process: "small", Title: "a small change", Detail: "change it",
 		Criteria: []Criterion{{Says: "go test ./... is green"}}})
 	if err != nil {
 		t.Fatal(err)
@@ -39,7 +39,7 @@ func TestAMintRequiringDoneWhenRefusesWithoutIt(t *testing.T) {
 func TestAMintedTokenCarriesEachFieldsComment(t *testing.T) {
 	t.Parallel()
 	r := aTreeDescribingFields(t)
-	tok, err := Mint(r, Token{Process: "small", Title: "a small change", Detail: "change it",
+	tok, err := Mint(r, Token{Tracked: local(), Process: "small", Title: "a small change", Detail: "change it",
 		Status: "open", Criteria: []Criterion{{Says: "go test ./... is green"}}})
 	if err != nil {
 		t.Fatal(err)
@@ -66,7 +66,7 @@ func TestAnOversizeDetailIsRefusedOffTheSchema(t *testing.T) {
 	t.Parallel()
 	r := aTreeDescribingFields(t)
 	long := strings.Repeat("argument ", 30)
-	_, err := Mint(r, Token{Process: "small", Title: "a small change", Detail: long,
+	_, err := Mint(r, Token{Tracked: local(), Process: "small", Title: "a small change", Detail: long,
 		Status: "open", Criteria: []Criterion{{Says: "go test ./... is green"}}})
 	if err == nil || !strings.Contains(err.Error(), "the schema allows") {
 		t.Fatalf("an oversize detail was answered %v, want a refusal naming the schema's bound", err)

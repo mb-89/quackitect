@@ -16,6 +16,7 @@ func aTreeThatClosesAt(t *testing.T) Roots {
 	t.Helper()
 	root := t.TempDir()
 	r := Roots{Method: root, Work: root}
+	withHistory(t, root)
 	dir := ProcessesDir(root)
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		t.Fatal(err)
@@ -55,7 +56,7 @@ dispositions:
 func TestAnAbortedTokenReadsClosed(t *testing.T) {
 	t.Parallel()
 	r := aTreeThatClosesAt(t)
-	tok, err := Mint(r, Token{Process: "task", Title: "soon aborted", Status: "open",
+	tok, err := Mint(r, Token{Tracked: tracked(), Process: "task", Title: "soon aborted", Status: "open",
 		Detail: "minted by the test"})
 	if err != nil {
 		t.Fatal(err)
@@ -81,7 +82,7 @@ func TestAnAbortedTokenReadsClosed(t *testing.T) {
 func TestAnAbortKeepsItsReason(t *testing.T) {
 	t.Parallel()
 	r := aTreeThatClosesAt(t)
-	tok, err := Mint(r, Token{Process: "task", Title: "soon aborted", Status: "open",
+	tok, err := Mint(r, Token{Tracked: tracked(), Process: "task", Title: "soon aborted", Status: "open",
 		Detail: "minted by the test"})
 	if err != nil {
 		t.Fatal(err)

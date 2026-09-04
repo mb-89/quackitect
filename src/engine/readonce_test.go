@@ -2,7 +2,7 @@ package main
 
 import (
 	"os"
-	"path/filepath"
+
 	"testing"
 )
 
@@ -24,7 +24,7 @@ func TestTheTokenFoldersAreReadOncePerProcess(t *testing.T) {
 
 	// THE FILE GOES AND THE ANSWER STAYS, which is what proves the folder was
 	// not read again. A Roots built without a snapshot sees the change.
-	if err := os.Remove(filepath.Join(EphemeralDir(r), one.ID+".md")); err != nil {
+	if err := os.Remove(noteAt(Roots{Method: r.Method, Work: r.Work}, one.ID)); err != nil {
 		t.Fatal(err)
 	}
 	if got := len(Tokens(r)); got != 2 {

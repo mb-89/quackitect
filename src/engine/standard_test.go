@@ -19,6 +19,7 @@ func aTreeWithTheProcesses(t *testing.T) Roots {
 	t.Helper()
 	root := t.TempDir()
 	r := Roots{Method: root, Work: root}
+	withHistory(t, root)
 	for _, dir := range []string{"processes", "schemas"} {
 		from := filepath.Join("..", "..", "src", dir)
 		to := filepath.Join(root, "src", dir)
@@ -44,7 +45,7 @@ func aTreeWithTheProcesses(t *testing.T) Roots {
 
 func mintStandard(t *testing.T, r Roots, title string) Token {
 	t.Helper()
-	tok, err := Mint(r, Token{Process: "standard", Title: title, Status: "open",
+	tok, err := Mint(r, Token{Tracked: tracked(), Process: "standard", Title: title, Status: "open",
 		Detail:   "a change that wants an approach first and a verdict after",
 		Criteria: []Criterion{{Says: "the check is green: go test -run TestX"}},
 		Kept:     []KeptSection{{Head: "approach", Text: "One function, one test, nothing else moves."}}})

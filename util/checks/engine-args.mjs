@@ -101,8 +101,8 @@ function ask(name, args) {
 
 const file = join(work, "util", "views", "work.base");
 
-ask("mint", A.mintArgs("test", "note"));
-ask("mint with a detail", A.mintArgs("four words name work / and the rest is the detail", "note"));
+ask("mint", A.mintArgs("test"));
+ask("mint with a detail", A.mintArgs("four words name work / and the rest is the detail"));
 ask("file into a group", A.fileArgs(id, "bucket", "later"));
 ask("make a group", A.groupArgs([id]));
 ask("rename a group", A.renameGroupArgs("later", "much later"));
@@ -206,7 +206,7 @@ for (const [what, groups] of [
 // pass every assertion above.
 {
   const typed = "four words name work / and the rest is the detail, whole";
-  const args = A.mintArgs(typed, "note");
+  const args = A.mintArgs(typed);
   let made = {};
   try {
     made = JSON.parse(execFileSync(exe, [...args, "--work", work], { encoding: "utf8" }));
@@ -218,7 +218,7 @@ for (const [what, groups] of [
   say("everything after the slash is the detail",
     (made.detail ?? "") === "and the rest is the detail, whole",
     "the token carries " + JSON.stringify(made.detail ?? made.error));
-  const plain = A.mintArgs("no slash at all", "note");
+  const plain = A.mintArgs("no slash at all");
   let bare = {};
   try {
     bare = JSON.parse(execFileSync(exe, [...plain, "--work", work], { encoding: "utf8" }));

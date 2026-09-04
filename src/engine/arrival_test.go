@@ -26,7 +26,7 @@ func TestASecondHarnessSessionReclaims(t *testing.T) {
 	log.Write("agent", "session", "main", "session started, startup", Yes(),
 		map[string]any{"source": "startup", "session": "harness-a"})
 
-	tok, err := Mint(r, Token{Process: "queued", Title: "work in hand", Status: "first"})
+	tok, err := Mint(r, Token{Tracked: local(), Process: "queued", Title: "work in hand", Status: "first"})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -61,7 +61,7 @@ func TestACompactionReclaimsNothing(t *testing.T) {
 	log.Write("agent", "session", "main", "session started, startup", Yes(),
 		map[string]any{"source": "startup", "session": "harness-a"})
 
-	tok, err := Mint(r, Token{Process: "queued", Title: "work in hand", Status: "first"})
+	tok, err := Mint(r, Token{Tracked: local(), Process: "queued", Title: "work in hand", Status: "first"})
 	if err != nil {
 		t.Fatal(err)
 	}

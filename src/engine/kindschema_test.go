@@ -28,7 +28,7 @@ func TestAKindNeedsASchema(t *testing.T) {
 	// THE MINT. A token declaring a kind nothing can read is refused before it is
 	// written, because a file that lands is a file somebody has to find again.
 	t.Run("the mint refuses a kind with no schema", func(t *testing.T) {
-		_, err := Mint(r, Token{Kind: "invented", Process: "trivial", Title: "a kind nobody declared",
+		_, err := Mint(r, Token{Tracked: local(), Kind: "invented", Process: "trivial", Title: "a kind nobody declared",
 			Criteria: []Criterion{{Says: "it is refused"}}})
 		if err == nil {
 			t.Fatal("the mint wrote a note whose kind has no schema, so nothing can read it back")
@@ -41,7 +41,7 @@ func TestAKindNeedsASchema(t *testing.T) {
 	// AND IT LETS THE KINDS THAT EXIST THROUGH. A guard that refuses everything
 	// is not a guard, and this is the half that would go quiet first.
 	t.Run("the mint takes a kind that has one", func(t *testing.T) {
-		if _, err := Mint(r, Token{Kind: "work-token", Process: "trivial", Title: "a declared kind",
+		if _, err := Mint(r, Token{Tracked: local(), Kind: "work-token", Process: "trivial", Title: "a declared kind",
 			Criteria: []Criterion{{Says: "it is written"}}}); err != nil {
 			t.Fatalf("the mint refused work-token, which has a schema: %v", err)
 		}

@@ -51,7 +51,7 @@ func heldTokenRoots(t *testing.T) Roots {
 	t.Helper()
 	root := t.TempDir()
 	r := Roots{Method: root, Work: root}
-	writeProcess(t, root, "queued", false)
+	writeProcess(t, root, "queued")
 	log, err := OpenLog(r.Private("log"))
 	if err != nil {
 		t.Fatal(err)
@@ -65,7 +65,7 @@ func heldTokenRoots(t *testing.T) Roots {
 func TestTakeUpAndPutDownWriteNoHolderIntoTheFile(t *testing.T) {
 	t.Parallel()
 	r := heldTokenRoots(t)
-	tok, err := Mint(r, Token{Process: "queued", Title: "work to be held", Status: "first"})
+	tok, err := Mint(r, Token{Tracked: local(), Process: "queued", Title: "work to be held", Status: "first"})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -100,7 +100,7 @@ func TestTakeUpAndPutDownWriteNoHolderIntoTheFile(t *testing.T) {
 func TestTheEngineStillKnowsWhoHoldsWhat(t *testing.T) {
 	t.Parallel()
 	r := heldTokenRoots(t)
-	tok, err := Mint(r, Token{Process: "queued", Title: "work to be held", Status: "first"})
+	tok, err := Mint(r, Token{Tracked: local(), Process: "queued", Title: "work to be held", Status: "first"})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -130,7 +130,7 @@ func TestTheEngineStillKnowsWhoHoldsWhat(t *testing.T) {
 func TestAStaleHolderInTheFileIsNotBelieved(t *testing.T) {
 	t.Parallel()
 	r := heldTokenRoots(t)
-	tok, err := Mint(r, Token{Process: "queued", Title: "work from before", Status: "first"})
+	tok, err := Mint(r, Token{Tracked: local(), Process: "queued", Title: "work from before", Status: "first"})
 	if err != nil {
 		t.Fatal(err)
 	}

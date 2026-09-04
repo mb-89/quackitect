@@ -18,7 +18,7 @@ import { controlCss } from "./controls";
 export type Node = {
   name: string;
   title?: string;
-  type: "group" | "bool" | "int" | "float" | "str" | "list" | "strlist" | "action" | "status" | "gap" | "text" | "pick" | "toggle" | "table";
+  type: "group" | "bool" | "int" | "float" | "str" | "list" | "strlist" | "action" | "status" | "gap" | "text" | "toggle" | "table";
   help?: string;
   default?: unknown;
   min?: number;
@@ -138,12 +138,12 @@ export function everyGroup(n: Node, path = ""): Array<{ key: string; title: stri
 
 function section(path: string, g: Node, doing: Happening): string {
   const kids = g.children ?? [];
-  // A row is drawn one control per column. text and pick join the row because
-  // they act rather than hold a stored value: what they carry is spent on the
-  // command they run, and nothing here keeps it afterwards.
+  // A row is drawn one control per column. text joins the row because it acts
+  // rather than holds a stored value: what it carries is spent on the command
+  // it runs, and nothing here keeps it afterwards.
   const inRow = (k: Node) =>
     k.type === "action" || k.type === "status" || k.type === "gap" ||
-    k.type === "text" || k.type === "pick" || k.type === "toggle";
+    k.type === "text" || k.type === "toggle";
   const drawn = kids.filter(inRow);
   const held = kids.filter((k) => !inRow(k) && k.type !== "group" && k.type !== "strlist" && k.type !== "table");
   const rows: string[] = [];
@@ -195,20 +195,6 @@ function button(n: Node): string {
     // to the command and is not stored: nothing here holds a draft.
     return `<input class="line" type="text"${wide} data-run="${esc(n.command ?? "")}"
       placeholder="${esc(n.placeholder ?? "")}" title="${esc(n.title ?? n.name)}">`;
-  }
-  if (n.type === "pick") {
-    // CLOSED IT IS SHORT, OPEN IT SAYS WHAT IT MEANS. A select shows one text
-    // in both places, and one column is not wide enough for the long one.
-    const opts = (n.options ?? []).map((o) => {
-      const v = typeof o === "string" ? o : o.value;
-      const says = typeof o === "string" ? o : o.says;
-      return `<li data-value="${esc(v)}"><b>${esc(v)}</b><span>${esc(says)}</span></li>`;
-    });
-    const first = n.default !== undefined ? String(n.default) : "";
-    return `<div class="pick"${wide} data-name="${esc(n.name)}" title="${esc(n.title ?? n.name)}">
-      <button class="picked" data-value="${esc(first)}">${esc(first)}</button>
-      <ul class="options" hidden>${opts.join("")}</ul>
-    </div>`;
   }
   if (n.type === "toggle") {
     // A TOGGLE IS DOWN OR IT IS UP. There is nothing to report about it, so
@@ -322,22 +308,13 @@ function css(): string {
      editor's toolbar controls hug their labels, so the width is here rather
      than in the shared block. Everything else about them is shared. */
   input.line { width: 100%; }
-  .pick { position: relative; }
   /* A CARET, so it reads as a thing that opens. Without one it is a button
      that says something odd. */
-  .pick .picked { width: 100%; height: var(--control-h); padding: 0 6px;
                   display: flex; align-items: center; justify-content: space-between; gap: 4px; }
-  .pick .picked::after { content: "\\25BE"; font-size: .9em; opacity: .8; }
-  .pick.open .picked::after { content: "\\25B4"; }
-  .pick .options { position: absolute; right: 0; top: calc(var(--control-h) + 2px); z-index: 20; margin: 0; padding: 4px 0;
                    list-style: none; min-width: 190px; border-radius: 2px;
                    background: var(--vscode-dropdown-background, var(--vscode-editor-background));
                    border: 1px solid var(--vscode-dropdown-border, var(--vscode-focusBorder));
                    box-shadow: 0 2px 8px rgba(0,0,0,.35); }
-  .pick .options li { display: flex; gap: 8px; align-items: baseline; padding: 3px 10px; cursor: pointer; }
-  .pick .options li:hover { background: var(--vscode-list-hoverBackground); }
-  .pick .options b { font-weight: 600; min-width: 36px; }
-  .pick .options span { color: var(--vscode-descriptionForeground); white-space: nowrap; }
   details { margin-bottom: 10px; }
   summary { font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.06em;
             color: var(--vscode-descriptionForeground); font-weight: 600; cursor: pointer;
@@ -472,35 +449,9 @@ function script(): string {
       if (ev.key !== 'Enter') return;
       const text = line.value.trim();
       if (!text) return;
-      const pick = document.querySelector('.pick .picked');
-      send({ type: 'run', command: line.dataset.run, text, process: pick ? pick.dataset.value : '' });
+      send({ type: 'run', command: line.dataset.run, text });
     };
   }
-
-  // CLOSED IT IS SHORT, OPEN IT SAYS WHAT IT MEANS.
-  for (const pick of document.querySelectorAll('.pick')) {
-    const button = pick.querySelector('.picked');
-    const list = pick.querySelector('.options');
-    button.onclick = (ev) => {
-      ev.stopPropagation();
-      list.hidden = !list.hidden;
-      pick.classList.toggle('open', !list.hidden);
-    };
-    for (const item of list.querySelectorAll('li')) {
-      item.onclick = () => {
-        button.dataset.value = item.dataset.value;
-        button.textContent = item.dataset.value;
-        list.hidden = true;
-        pick.classList.remove('open');
-      };
-    }
-  }
-  document.addEventListener('click', () => {
-    for (const p of document.querySelectorAll('.pick')) {
-      p.querySelector('.options').hidden = true;
-      p.classList.remove('open');
-    }
-  });
 
   for (const c of document.querySelectorAll('[data-key]')) {
     c.onchange = () => {
@@ -537,7 +488,7 @@ function script(): string {
     // A FRESH ANSWER, DROPPED INTO THE PAGE THAT IS ALREADY HERE.
     //
     // Not a new page. Replacing the html every second would empty the line a
-    // person is typing in, shut the picker under their hand, and fold every
+    // person is typing in and fold every
     // section they opened, once a second, for ever. Only the parts that follow
     // the engine are replaced, which is how the values already arrive.
     if (m.type === 'doing') {

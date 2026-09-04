@@ -22,6 +22,7 @@ func aTreeWithOneStep(t *testing.T) Roots {
 	t.Helper()
 	root := t.TempDir()
 	r := Roots{Method: root, Work: root}
+	withHistory(t, root)
 	dir := ProcessesDir(root)
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		t.Fatal(err)
@@ -60,7 +61,7 @@ dispositions:
 
 func mintTask(t *testing.T, r Roots, title, parent string) Token {
 	t.Helper()
-	tok, err := Mint(r, Token{Process: "task", Title: title, Status: "open",
+	tok, err := Mint(r, Token{Tracked: tracked(), Process: "task", Title: title, Status: "open",
 		Detail: "minted by the test", Parent: parent})
 	if err != nil {
 		t.Fatalf("minting %q: %v", title, err)
@@ -187,7 +188,7 @@ func TestAParentNothingCanBePartOfIsRefused(t *testing.T) {
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
 			t.Parallel()
-			_, err := Mint(r, Token{Process: "task", Title: "a part", Status: "open", Parent: c.parent})
+			_, err := Mint(r, Token{Tracked: tracked(), Process: "task", Title: "a part", Status: "open", Parent: c.parent})
 			if err == nil || !strings.Contains(err.Error(), c.wants) {
 				t.Fatalf("got %v, want a refusal saying %q", err, c.wants)
 			}
