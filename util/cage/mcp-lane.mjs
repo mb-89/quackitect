@@ -10,7 +10,21 @@
 // run the installer. So the one file that decides whether an agent has a lane
 // pointed at something a clone does not carry.
 //
-// SO IT NAMES THIS, WHICH GIT CARRIES. It builds what is missing and hands over.
+// SO IT NAMES THIS, WHICH GIT CARRIES.
+//
+// AND THE BUILD GOES BEHIND THE ANSWER, NEVER IN FRONT OF IT. Naming this file
+// was half the repair, and the half that was missing cost a whole session. This
+// script ran the installer synchronously before it handed over, and a harness
+// gives an MCP server thirty seconds to answer initialize. A cold clone spent
+// those thirty seconds compiling, the harness killed the spawn, and the session
+// this file exists to repair had no lane again. Moving .mcp.json off .bin never
+// touched the ordering, and the ordering was the bug.
+//
+// So this speaks the protocol itself while the build runs. initialize is
+// answered here, at once, out of a file git carries. Everything after it is
+// held until the lane is up and then handed over in the order it arrived. No
+// timeout can decide whether a session has a door, because the door answers
+// before there is anything behind it.
 //
 // WHY node AND NOT sh. This has to start on a Linux container and on a Windows
 // desktop from one committed line. A shell script needs sh on PATH, and Git for
@@ -18,40 +32,261 @@
 // because Claude Code runs on it.
 //
 //   node util/cage/mcp-lane.mjs --method . --work .
-import { existsSync } from "node:fs";
-import { spawn, spawnSync } from "node:child_process";
+import { existsSync, statSync } from "node:fs";
+import { spawn } from "node:child_process";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { createInterface } from "node:readline";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
+const windows = process.platform === "win32";
 
 // BOTH NAMES ARE THE SAME FILE once the installer has linked them, and before
 // it has, only the platform's own name is there.
-const exe = join(root, ".bin", process.platform === "win32" ? "se-mcp.exe" : "se-mcp");
+const suffix = windows ? ".exe" : "";
+const laneExe = join(root, ".bin", "se-mcp" + suffix);
+const engineExe = join(root, ".bin", "se" + suffix);
+
+// THE LANE THIS SCRIPT BUILDS FOR ITSELF HAS ITS OWN NAME, so it never writes
+// the file the installer is writing. Two builds racing for one path leave a
+// half-written program, and on Windows the running one holds the name and the
+// installer's build fails against it.
+const ownExe = join(root, ".bin", "se-mcp.lane" + suffix);
 
 // STANDARD OUTPUT IS THE PROTOCOL. Everything this script says goes to standard
 // error, or the harness reads it as a message from the server.
 const say = (line) => process.stderr.write("quackitect: " + line + "\n");
+process.stdout.on("error", () => {}); // a shut pipe has nobody left to tell
 
-if (!existsSync(exe)) {
-  say("nothing is built here yet, so the tool lane is being built. This takes a few minutes once.");
-  // THE INSTALLER IS THE BUILD. Asking go build directly here would be a second
-  // place that knows how this tree compiles, and it would miss the C compiler
-  // the installer pins for the engine's SQLite.
-  spawnSync("sh", [join(root, "util", "setup", "install.sh"), "--profile", "headless"],
-    { stdio: ["ignore", 2, 2] });
+if (existsSync(laneExe) && existsSync(engineExe)) {
+  handOver(laneExe);
+} else {
+  answerWhileItBuilds();
 }
 
-if (!existsSync(exe)) {
-  say("se-mcp could not be built, so this session has no tool lane. Run util/setup/install.sh and start again.");
-  process.exit(1);
+// handOver is the whole program on a tree that is built: stdio is inherited, so
+// the lane speaks to the harness directly and nothing here sits between them.
+function handOver(exe) {
+  const lane = spawn(exe, process.argv.slice(2), { stdio: "inherit" });
+  lane.on("error", (err) => {
+    say("the tool lane would not start: " + err.message);
+    process.exit(1);
+  });
+  lane.on("exit", (code, signal) => process.exit(signal ? 1 : code ?? 0));
 }
 
-// stdio is inherited, so the server speaks to the harness directly and nothing
-// here sits between them.
-const lane = spawn(exe, process.argv.slice(2), { stdio: "inherit" });
-lane.on("error", (err) => {
-  say("the tool lane would not start: " + err.message);
-  process.exit(1);
-});
-lane.on("exit", (code, signal) => process.exit(signal ? 1 : code ?? 0));
+// answerWhileItBuilds is the cold clone: a door that answers now, and a lane
+// that arrives behind it.
+function answerWhileItBuilds() {
+  say("nothing is built here yet. The door answers now and the build runs behind it.");
+
+  const held = []; // client messages waiting for a lane, in the order they came
+  let lane = null; // the built lane, once it is up
+  let open = false; // true once the held messages are through and lines go straight on
+  let broken = ""; // why the lane will never come up, once that is known
+  let clientInit = null; // what the harness asked for, to ask the lane the same
+  let engineHere = false;
+  const ourID = "quackitect-lane-initialize";
+
+  const send = (msg) => process.stdout.write(JSON.stringify(msg) + "\n");
+  const answer = (id, result) => send({ jsonrpc: "2.0", id, result });
+  const told = (s) => ({ content: [{ type: "text", text: s }] });
+  const read = (line) => {
+    try {
+      return JSON.parse(line);
+    } catch {
+      return null; // a line that is not a message is not ours to complain about
+    }
+  };
+
+  // A REFUSAL IS AN ANSWER AND A HANG IS NOT. Once the build has failed there is
+  // nothing left to wait for, so every held call is told so, and told where the
+  // door still is.
+  const refuse = (msg) => {
+    if (msg === null || msg.id === undefined) return;
+    const text =
+      "THIS SESSION HAS NO TOOL LANE. " + broken +
+      "\n\nThe engine is still a door. At a shell, ./RUNME.sh <verb> is the same " +
+      "call and the guards let it through. To build by hand, run " +
+      "util/setup/install.sh and start a new session.";
+    if (msg.method === "tools/call") answer(msg.id, told(text));
+    else send({ jsonrpc: "2.0", id: msg.id, error: { code: -32603, message: text } });
+  };
+
+  const stillBuilding =
+    "THE ENGINE IS STILL BEING BUILT, so this call was not made and nothing was " +
+    "done. The tool lane is up and the engine it asks is not there yet: the first " +
+    "build compiles SQLite, which takes a few minutes, once. Ask again in a minute.";
+
+  createInterface({ input: process.stdin })
+    .on("line", (line) => {
+      if (open) {
+        // A CALL NEEDS THE ENGINE AND A LIST NEEDS ONLY THE LANE. The lane comes
+        // up first, so tools/list is answered while the engine is still
+        // building, and a call made in that window is told to wait rather than
+        // handed to a program that would answer about a missing file.
+        if (!engineHere) {
+          engineHere = existsSync(engineExe);
+          if (!engineHere) {
+            const msg = read(line);
+            if (msg !== null && msg.method === "tools/call" && msg.id !== undefined) {
+              answer(msg.id, told(stillBuilding));
+              return;
+            }
+          }
+        }
+        lane.stdin.write(line + "\n");
+        return;
+      }
+      const raw = line.trim();
+      if (raw === "") return;
+      const msg = read(raw);
+      if (msg === null) return;
+
+      // INITIALIZE IS ANSWERED FROM HERE, AT ONCE. This is the handshake the
+      // thirty seconds are for, and answering it is what buys the build its
+      // time.
+      if (msg.method === "initialize" && msg.id !== undefined) {
+        clientInit = msg.params ?? {};
+        answer(msg.id, {
+          // The client's version is echoed back, which is what the lane itself
+          // does. Choosing one here is how a stub stops working when a harness
+          // moves on.
+          protocolVersion: clientInit.protocolVersion || "2025-06-18",
+          // THE LIST CHANGES, because a moment ago there was no lane to ask.
+          capabilities: { tools: { listChanged: true } },
+          serverInfo: { name: "quackitect", version: "0.1.0" },
+        });
+        return;
+      }
+      // A PING IS A QUESTION ABOUT THIS PROCESS and not about the lane, so it is
+      // answered here whatever the build is doing.
+      if (msg.method === "ping" && msg.id !== undefined) {
+        answer(msg.id, {});
+        return;
+      }
+      if (broken !== "") {
+        refuse(msg);
+        return;
+      }
+      held.push(raw);
+      if (msg.id !== undefined) say("holding " + msg.method + " until the lane is up");
+    })
+    .on("close", () => {
+      if (lane === null) process.exit(0);
+      lane.stdin.end();
+    });
+
+  // THE INSTALLER IS THE BUILD. Asking go build directly for the engine would be
+  // a second place that knows how this tree compiles, and it would miss the C
+  // compiler the installer pins for the engine's SQLite.
+  let installing = true;
+  const install = windows
+    ? spawn("powershell", ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File",
+      join(root, "util", "setup", "install.ps1"), "--profile", "headless"],
+      { stdio: ["ignore", 2, 2] })
+    : spawn("sh", [join(root, "util", "setup", "install.sh"), "--profile", "headless"],
+      { stdio: ["ignore", 2, 2] });
+  install.on("error", (err) => {
+    installing = false;
+    say("the installer would not start: " + err.message);
+  });
+  install.on("exit", () => {
+    installing = false;
+  });
+
+  // THE LANE IS THE ONE PROGRAM THIS CAN BUILD ON ITS OWN. src/mcp is the
+  // standard library and nothing besides, so it needs no C compiler and no
+  // pinned environment, and it compiles in seconds. The installer builds the
+  // engine first and the lane last, so waiting on the installer to reach the
+  // lane means waiting out the whole cgo build with no tool listed at all. This
+  // puts the tools in front of the agent while that runs.
+  let quick = true;
+  const built = spawn("go", ["build", "-o", ownExe, "."], {
+    cwd: join(root, "src", "mcp"),
+    stdio: ["ignore", 2, 2],
+  });
+  built.on("error", () => {
+    quick = false; // no go on PATH yet, and the installer is putting one there
+  });
+  built.on("exit", () => {
+    quick = false;
+  });
+
+  // WAITING WATCHES THE FILE AND NOT THE PROCESS THAT WRITES IT. Either build
+  // may be the one that gets there, and the installer goes on for a while after
+  // the lane it built is usable.
+  const sizes = new Map();
+  const ready = (path) => {
+    let size;
+    try {
+      size = statSync(path).size;
+    } catch {
+      sizes.delete(path);
+      return false;
+    }
+    const before = sizes.get(path);
+    sizes.set(path, size);
+    // A PROGRAM IS READY WHEN IT HAS STOPPED GROWING. A build in progress is a
+    // file that exists, and starting it half written is a lane that dies.
+    return size > 0 && before === size;
+  };
+
+  let waited = 0;
+  const watch = setInterval(() => {
+    waited += 1;
+    if (ready(ownExe)) return start(ownExe);
+    if (ready(laneExe)) return start(laneExe);
+    if (waited % 40 === 0) {
+      say("still building, " + Math.round(waited * 0.4) + " seconds so far");
+    }
+    // GIVING UP IS ABOUT A FILE THAT IS NOT THERE, and never about one that is
+    // still being written. The installer exits a moment after the last byte of
+    // the lane lands, and reading "not settled yet" as "never coming" threw the
+    // built lane away on the tick after the build that made it.
+    if (!installing && !quick && !existsSync(ownExe) && !existsSync(laneExe)) {
+      clearInterval(watch);
+      broken = "the build finished and left no tool lane at " + laneExe + ".";
+      say(broken);
+      for (const raw of held.splice(0)) refuse(read(raw));
+    }
+  }, 400);
+
+  // start hands the held messages to the lane and then gets out of the way.
+  function start(exe) {
+    clearInterval(watch);
+    lane = spawn(exe, process.argv.slice(2), { stdio: ["pipe", "pipe", "inherit"] });
+    lane.on("error", (err) => {
+      lane = null;
+      broken = "the tool lane would not start: " + err.message;
+      say(broken);
+      for (const raw of held.splice(0)) refuse(read(raw));
+    });
+    lane.on("exit", (code, signal) => process.exit(signal ? 1 : code ?? 0));
+
+    // THE LANE GETS ITS OWN HANDSHAKE, out of what the harness asked for. The
+    // lane holds no state today and would not miss one, and a door that works
+    // only because the program behind it forgot to ask is a door that breaks on
+    // the day it remembers.
+    let handshake = true;
+    createInterface({ input: lane.stdout }).on("line", (line) => {
+      if (handshake) {
+        const msg = read(line);
+        if (msg !== null && msg.id === ourID) {
+          handshake = false;
+          lane.stdin.write(JSON.stringify({ jsonrpc: "2.0", method: "notifications/initialized" }) + "\n");
+          for (const raw of held.splice(0)) lane.stdin.write(raw + "\n");
+          open = true;
+          say("the tool lane is up.");
+          // The list was answered by nothing a moment ago, so say that it moved.
+          send({ jsonrpc: "2.0", method: "notifications/tools/list_changed" });
+          return;
+        }
+      }
+      process.stdout.write(line + "\n");
+    });
+    lane.stdin.write(JSON.stringify({
+      jsonrpc: "2.0", id: ourID, method: "initialize", params: clientInit ?? {},
+    }) + "\n");
+  }
+}

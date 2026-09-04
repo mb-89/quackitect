@@ -310,9 +310,20 @@ func whatDisqualified(command string) string {
 	default:
 		return "" // it is inside the exception, and nothing was refused for it
 	}
-	return "THE ENGINE IS NOT WHAT WAS REFUSED. This command runs the engine, and " +
+	out := "THE ENGINE IS NOT WHAT WAS REFUSED. This command runs the engine, and " +
 		says + " took it out of the exception, because " + says + " can write and the " +
 		"engine cannot tell what it writes. The engine on its own goes through.\n\n"
+	// THE TWO VERBS THAT USED TO NEED A PIPE SAY SO HERE. run and apply read
+	// their payload from standard input, so the only form of them a session
+	// knew was the one form the guard refuses, and a lane failure cost that
+	// session every write rather than some convenience. Each has a flag now.
+	if says == "a pipe" {
+		out += "run and apply take their payload without a pipe, and name the same " +
+			"token either way:\n\n" +
+			"  se run --on <id> --command 'go test ./...'\n" +
+			`  se apply --on <id> --edits '[{"file":"a.go","old":"x","new":"y"}]'` + "\n\n"
+	}
+	return out
 }
 
 // theByName is the name the caller pulls with, which is the name a token is
@@ -351,6 +362,7 @@ func theRefusal(r Roots, actor, tool, path string) string {
 			"long one is cut at the end rather than sent entire.\n\n" +
 			"Naming a token you were not on puts the old one back and takes the new one " +
 			"up, so changing what you work on is one word on the next command.\n\n" +
+			theShellDoor("run --on <id> --by "+by+" --command 'go test ./...'") + "\n\n" +
 			whichNameIsWhich(actor, by) + whatIsOpen(r, actor)
 	}
 	where := shortPath(r, path)
@@ -368,6 +380,8 @@ func theRefusal(r Roots, actor, tool, path string) string {
 		"file that is not there, op write replaces one whole.\n\n" +
 		"Naming a token you were not on puts the old one back and takes the new one " +
 		"up, so changing what you work on is one word on the next write.\n\n" +
+		theShellDoor("apply --on <id> --by "+by+` --edits '[{"file":"`+where+
+			`","old":"...","new":"..."}]'`) + "\n\n" +
 		whichNameIsWhich(actor, by) + whatIsOpen(r, actor)
 }
 

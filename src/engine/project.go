@@ -175,8 +175,12 @@ func variables(roots Roots) (map[string]string, error) {
 		// anything, so a fresh clone answered ENOENT and the session had no lane
 		// and no door. See util/cage/mcp-lane.mjs.
 		"mcplane": within(roots.Work, filepath.Join(roots.Method, "util", "cage", "mcp-lane.mjs")),
-		"method":  within(roots.Work, roots.Method),
-		"work":    within(roots.Work, roots.Work),
+		// THE COMMAND HOOKS GO THE SAME WAY AND FOR THE SAME REASON. The cage
+		// named .bin/se for the wake and for the start, and a clone carries no
+		// .bin, so both were a path to nothing on the one box that needed them.
+		"hooklane": within(roots.Work, filepath.Join(roots.Method, "util", "cage", "hook-lane.mjs")),
+		"method":   within(roots.Work, roots.Method),
+		"work":     within(roots.Work, roots.Work),
 		// THE GUARD'S DOOR, derived from the work root, so the cage can name it
 		// before an engine exists and every engine over this folder binds it.
 		"hooks":        hooksURL(roots),

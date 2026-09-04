@@ -307,6 +307,12 @@ func firstWord(command string) string {
 // is the difference between a session that can act and one that cannot: the
 // cloud box that met this had no se_answer, so the only call that satisfied the
 // refusal was the only call it could not make.
+//
+// EVERY CALL NAMED HERE HAS TO FIT THROUGH THE Bash GUARD, which refuses a pipe
+// and a redirection. This line was written for find, pull and stop, which take
+// flags, and it was absent from run and apply, which read standard input. So a
+// lane-less session could read the tree and search it, and could not test it,
+// change it or commit it. run takes --command now, and apply takes --edits.
 func theShellDoor(verb string) string {
 	return "IF YOUR LANE HAS NO se_ TOOLS, this is the same call at a shell, and the " +
 		"guards let it through: ./RUNME.sh " + verb

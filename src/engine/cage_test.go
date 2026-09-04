@@ -108,3 +108,55 @@ func namesTheMachine(text, root string) string {
 	}
 	return ""
 }
+
+// AND NO CAGED FILE NAMES A PROGRAM THAT IS NOT BUILT YET.
+//
+// A cage travels, so a clone is caged before anything in it has been compiled.
+// .bin is out of version control, so a cage naming a path under it names a file
+// that is not there on the one box that has just arrived. It cost two sessions.
+// The first was .mcp.json naming .bin/se-mcp: the harness spawned it, answered
+// ENOENT, and the session had no se_ tool at all. The second was the settings
+// file naming .bin/se for the hook at SessionStart and for the wake on every
+// prompt, which no hook can repair, because the harness spawns the tool lane
+// before any hook runs.
+//
+// EVERY ONE OF THEM GOES THROUGH A FILE GIT CARRIES, under util/cage, which
+// builds what is missing and hands over.
+//
+// IT IS ABOUT THE CONFIGS AND NOT ABOUT THE SCRIPTS. A JSON config cannot look
+// before it leaps: whatever it names, the harness starts, and if it is not there
+// the answer is ENOENT. A script can ask, and the wake does, which is why it
+// names .bin/se three times and is right to.
+func TestNoCagedFileNamesAProgramThatIsNotBuiltYet(t *testing.T) {
+	t.Parallel()
+	root, err := filepath.Abs(filepath.Join("..", ".."))
+	if err != nil {
+		t.Fatal(err)
+	}
+	list, err := LoadProjections(root)
+	if err != nil || len(list) == 0 {
+		t.Skip("this test reads the product's own list, and it is not here")
+	}
+	vars, err := variables(root2(root))
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, p := range list {
+		if !strings.HasSuffix(p.Target, ".json") {
+			continue
+		}
+		body, err := assemble(root, p.Sources, p.Section, vars)
+		if err != nil {
+			t.Fatalf("%s: %v", p.Name, err)
+		}
+		for i, line := range strings.Split(body, "\n") {
+			if strings.Contains(line, ".bin/") || strings.Contains(line, `.bin\`) {
+				t.Errorf("%s (%s) line %d names a program a clone does not carry: %s",
+					p.Name, p.Target, i+1, strings.TrimSpace(line))
+			}
+		}
+	}
+}
+
+// root2 is the self-hosting pair, which is the case a cage travels in.
+func root2(root string) Roots { return Roots{Method: root, Work: root} }

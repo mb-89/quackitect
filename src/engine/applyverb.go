@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"os"
 )
 
 // se apply - change files, naming the token the change belongs to.
@@ -13,6 +14,14 @@ import (
 // is, every time, so there is no separate call to make and nothing to forget.
 // Naming a different token from the one in hand puts the old one back and takes
 // the new one up, which is what changing what you are working on means.
+//
+// AND --edits IS THE SAME MANIFEST WITH NO PIPE IN IT. A session whose tool lane
+// never came up reaches this verb at a shell, where the Bash guard refuses a
+// pipe and the Write tool is refused for naming no token. Both doors were shut
+// on the same session at once, so it could read the tree and could not change
+// one byte of it. --manifest reads a file, which helps a manifest too long for a
+// command line, and --edits carries it inline, which is the form that works when
+// there is no way to put the file there in the first place.
 func runApply(c *call) int {
 	fs := flag.NewFlagSet("apply", flag.ContinueOnError)
 	fs.SetOutput(c.err)
@@ -20,6 +29,8 @@ func runApply(c *call) int {
 		fmt.Fprintln(c.err, "se apply - change files. Prints what it wrote as JSON.")
 		fmt.Fprintln(c.err, "")
 		fmt.Fprintln(c.err, `  echo '[{"file":"a.go","old":"x","new":"y"}]' | se apply --on wk-1234567890`)
+		fmt.Fprintln(c.err, `  se apply --on wk-1234567890 --edits '[{"file":"a.go","old":"x","new":"y"}]'`)
+		fmt.Fprintln(c.err, "  se apply --on wk-1234567890 --manifest edits.json")
 		fmt.Fprintln(c.err, "")
 		fmt.Fprintln(c.err, "  The manifest is a JSON array on standard input. Each entry is one edit:")
 		fmt.Fprintln(c.err, `    {"file":"...","old":"...","new":"..."}   replace, and old must be there once`)
@@ -28,11 +39,16 @@ func runApply(c *call) int {
 		fmt.Fprintln(c.err, "")
 		fmt.Fprintln(c.err, "  Every edit is checked before any is written. One bad edit writes nothing.")
 		fmt.Fprintln(c.err, "")
+		fmt.Fprintln(c.err, "  --edits and --manifest are the same call with no pipe in it, for a")
+		fmt.Fprintln(c.err, "  session whose tool lane never came up and whose Bash guard refuses one.")
+		fmt.Fprintln(c.err, "")
 		fs.PrintDefaults()
 	}
 	fs.String("work", "", "the folder being worked on (default: this one)")
 	on := fs.String("on", "", "the token this change belongs to, by id")
 	by := fs.String("by", "", "who is writing")
+	edits := fs.String("edits", "", "the manifest itself, when there is no pipe to send it down")
+	manifest := fs.String("manifest", "", "a file holding the manifest, instead of standard input")
 	dry := fs.Bool("dry", false, "check every edit and write nothing")
 	undo := fs.Bool("undo", false, "instead of writing: put back what this token's last apply overwrote")
 	if code, stop := c.parse(fs, "apply"); stop {
@@ -76,18 +92,21 @@ func runApply(c *call) int {
 		return 1
 	}
 
-	b, err := io.ReadAll(c.in)
+	// ONE MANIFEST, FROM WHICHEVER DOOR NAMED ONE. Naming two is a caller who
+	// believes two different things about what is being written, and writing one
+	// of them silently is how the other is lost.
+	b, err := theManifest(c, *edits, *manifest)
 	if err != nil {
-		c.answerJSON(map[string]any{"error": "the manifest will not read: " + err.Error()})
+		c.answerJSON(map[string]any{"error": err.Error()})
 		return 1
 	}
-	var edits []Edit
-	if err := json.Unmarshal(b, &edits); err != nil {
+	var list []Edit
+	if err := json.Unmarshal(b, &list); err != nil {
 		c.answerJSON(map[string]any{"error": "the manifest is not a JSON array of edits: " + err.Error()})
 		return 1
 	}
 
-	got, err := Apply(roots, edits, *dry, *on, orElse(*by, "main"))
+	got, err := Apply(roots, list, *dry, *on, orElse(*by, "main"))
 	if err != nil {
 		c.answerJSON(map[string]any{"error": err.Error(), "on": *on})
 		return 1
@@ -101,4 +120,31 @@ func runApply(c *call) int {
 	}
 	c.answerJSON(got)
 	return 0
+}
+
+// theManifest answers the edits, from whichever of the three doors named them.
+//
+// STANDARD INPUT IS READ LAST AND ONLY WHEN NOTHING ELSE SAID ANYTHING. At a
+// shell with no pipe in front of it, standard input is the terminal, and reading
+// it there is a call that never returns.
+func theManifest(c *call, edits, manifest string) ([]byte, error) {
+	if edits != "" && manifest != "" {
+		return nil, fmt.Errorf("--edits and --manifest are two manifests, so name one. " +
+			"--edits carries the JSON itself and --manifest names a file holding it")
+	}
+	if edits != "" {
+		return []byte(edits), nil
+	}
+	if manifest != "" {
+		b, err := os.ReadFile(manifest)
+		if err != nil {
+			return nil, fmt.Errorf("the manifest will not read: %w", err)
+		}
+		return b, nil
+	}
+	b, err := io.ReadAll(c.in)
+	if err != nil {
+		return nil, fmt.Errorf("the manifest will not read: %w", err)
+	}
+	return b, nil
 }
