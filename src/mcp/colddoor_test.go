@@ -4,9 +4,10 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
-	"reflect"
 	"sort"
 	"testing"
+
+	"github.com/google/go-cmp/cmp"
 )
 
 // THE COLD DOOR IS THE LANE, TOOL FOR TOOL.
@@ -41,7 +42,7 @@ func TestTheColdDoorIsTheLane(t *testing.T) {
 				".bin/se-mcp --tools > util/cage/tools.json", name)
 			continue
 		}
-		if reflect.DeepEqual(got, want) {
+		if cmp.Diff(want, got) == "" {
 			continue
 		}
 		t.Errorf("the cold door and the lane differ on %s: %s. Rewrite it: "+
@@ -65,7 +66,7 @@ func TestTheColdDoorIsTheLane(t *testing.T) {
 		lane := asJSON(t, tools())
 		stale := asJSON(t, tools())
 		dropField(t, stale, "se_work", "needs_human")
-		if reflect.DeepEqual(byName(lane)["se_work"], byName(stale)["se_work"]) {
+		if cmp.Diff(byName(lane)["se_work"], byName(stale)["se_work"]) == "" {
 			t.Fatal("a schema with a field taken out of it reads the same as one with it, " +
 				"so this test cannot catch the drift it exists for")
 		}

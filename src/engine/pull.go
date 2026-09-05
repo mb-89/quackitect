@@ -34,6 +34,7 @@ import (
 const (
 	AnswerWork    = "work"    // here is a token: do it
 	AnswerRefused = "refused" // the submission failed a check a program could make
+	AnswerSettled = "settled" // the submission was taken and no work was handed on
 	AnswerWait    = "wait"    // nothing to do, and the notice says why
 	// The fifth. A hold nobody is behind is worth more than the next token.
 )
@@ -55,6 +56,14 @@ type Payload struct {
 	Disposition string   `json:"disposition,omitempty"`
 	Successors  []string `json:"successors,omitempty"`
 	Reason      string   `json:"reason,omitempty"`
+
+	// settleOnly says this submission wants no token back, which is a person at
+	// a shell rather than an agent in a lane.
+	//
+	// IT IS UNEXPORTED BECAUSE IT IS NOT THE PAYLOAD'S TO SAY. Which door an ask
+	// came through is the engine's own reading, and a field the JSON could set
+	// would let a lane opt out of being handed work.
+	settleOnly bool
 }
 
 type Answer struct {
@@ -139,6 +148,19 @@ func answerFor(r Roots, actor, role string, p Payload) Answer {
 			return a
 		}
 		learned, over = a.Learned, a.Notice
+		// A SUBMISSION AT A SHELL IS ONE THING ASKED FOR, AND ONE THING ANSWERED,
+		// AND THE QUEUE IS NOT READ AT ALL.
+		//
+		// It used to be read and the token it handed out put back a moment later.
+		// Handing out opens a stretch and a put-down closes one, so every shell
+		// submission wrote a began and an ended onto whatever token the queue
+		// would have handed on, with two snapshot commits behind them. That
+		// token's record then said it had been in a hand it was never in.
+		if p.settleOnly {
+			return Answer{Pull: AnswerSettled, Notice: p.ID + " is settled. The next token goes to a " +
+				"lane, because an agent that submits is asking for more. Ask for work again when " +
+				"you want it."}
+		}
 	}
 	// A HOLD ON YOUR OWN VERDICT IS NOT WORK IN HAND. The submission put the
 	// token down, and naming it again through se run or se apply took it back
