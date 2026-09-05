@@ -1,9 +1,6 @@
 package main
 
 import (
-	"encoding/json"
-	"os"
-	"path/filepath"
 	"testing"
 )
 
@@ -25,26 +22,11 @@ func TestTheLaneOffersTheTakeTheRefusalNames(t *testing.T) {
 		t.Error("se_claim does not offer take, and the refusal an agent reads names it")
 	}
 
-	path := filepath.Join("..", "..", "util", "cage", "tools.json")
-	b, err := os.ReadFile(path)
-	if err != nil {
-		t.Fatalf("%s cannot be read, so this guards nothing: %v", path, err)
-	}
-	var snapshot struct {
-		Tools []map[string]any `json:"tools"`
-	}
-	if err := json.Unmarshal(b, &snapshot); err != nil {
-		t.Fatalf("%s will not read, so this guards nothing: %v", path, err)
-	}
-	var cold map[string]any
-	for _, tool := range snapshot.Tools {
-		if tool["name"] == "se_claim" {
-			cold, _ = tool["inputSchema"].(map[string]any)
-		}
-	}
-	if cold == nil {
+	claim, offered := byName(coldDoor(t))["se_claim"]
+	if !offered {
 		t.Fatal("the cold door offers no se_claim at all")
 	}
+	cold, _ := claim["inputSchema"].(map[string]any)
 	if !offersTake(t, cold) {
 		t.Error("the cold door does not offer take. Rewrite it: " +
 			".bin/se-mcp --tools > util/cage/tools.json")

@@ -1,9 +1,6 @@
 package main
 
 import (
-	"encoding/json"
-	"os"
-	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -30,18 +27,7 @@ func TestSeStatusSaysItAnswersTheStateOfPlay(t *testing.T) {
 		}
 	}
 
-	path := filepath.Join("..", "..", "util", "cage", "tools.json")
-	b, err := os.ReadFile(path)
-	if err != nil {
-		t.Fatalf("%s cannot be read, so this guards nothing: %v", path, err)
-	}
-	var snapshot struct {
-		Tools []map[string]any `json:"tools"`
-	}
-	if err := json.Unmarshal(b, &snapshot); err != nil {
-		t.Fatalf("%s will not read, so this guards nothing: %v", path, err)
-	}
-	if cold := describes(t, snapshot.Tools, "se_status"); cold != says {
+	if cold := describes(t, coldDoor(t), "se_status"); cold != says {
 		t.Errorf("the cold door says something else. Rewrite it: "+
 			".bin/se-mcp --tools > util/cage/tools.json\n  lane: %q\n  cold: %q", says, cold)
 	}
