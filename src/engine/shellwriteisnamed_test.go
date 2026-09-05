@@ -35,7 +35,7 @@ func TestAShellWriteIsNamedRatherThanDropped(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	got, err := TestTheDelta(r, db, on, nil, false, "worker-"+on)
+	got, err := TestTheDelta(t.Context(), r, db, on, nil, false, "worker-"+on)
 	if err != nil {
 		t.Fatal(err)
 	}

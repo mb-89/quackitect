@@ -24,6 +24,11 @@ import (
 // LEVEL 0 DECIDES ALMOST NOTHING. It records everything, and it enforces the
 // short list that files and identities state fully. Everything about the work
 // is asked of an authority, and with no authority present the answer is yes.
+//
+// Why an event is taken only where this layer owns the decision is
+// [[a-hook-is-taken-only-when-level-0-owns-the-decision]]. What a write is
+// held to, and why place is never the reason, is
+// [[the-guard-scrutinises-rather-than-forbids]].
 
 type hookIn struct {
 	SessionID      string          `json:"session_id"`
@@ -458,6 +463,7 @@ func answerHook(ctx context.Context, raw []byte, args []string, out io.Writer, h
 	//
 	// The identity is still the harness's, and it is what everything is keyed
 	// by. The name is what the record shows.
+	// Why every call carries one is [[every-call-carries-an-identity]].
 	if in.Event == "SubagentStart" {
 		NoteAgent(roots, in.AgentID, in.AgentType, in.SessionID)
 	}
@@ -593,8 +599,11 @@ func answerHook(ctx context.Context, raw []byte, args []string, out io.Writer, h
 		if in.Source == "compact" || in.Source == "clear" {
 			ForgetReads(roots, in.Source)
 		}
+		// THE SURFACE IS WRITTEN WHERE THE SESSION BEGINS, because this process
+		// is the one the harness spawned for this event, and its environment is
+		// the only place that says what drove it.
 		record(log, "agent", "session", actor, "session started, "+in.Source, Yes(),
-			map[string]any{"source": in.Source, "session": in.SessionID})
+			map[string]any{"source": in.Source, "session": in.SessionID, "surface": TheSurface()})
 		// THE SESSION IS AN AGENT AND IT HAS ARRIVED. What is present is
 		// answered off this register, so a panel says who is here rather
 		// than who has pulled.

@@ -157,8 +157,7 @@ func TestBashDecidesWhichCommandsLeaveTheException(t *testing.T) {
 // as this check being broken, when what is true is that this box cannot run it.
 func theShellThisMachineHas(t *testing.T) string {
 	t.Helper()
-	root := t.TempDir()
-	r := Roots{Method: root, Work: root}
+	r := aTree(t).Roots
 	// THE PROBE IS HOW THE LOOKUP FINDS GIT, and a machine without git leaves it
 	// empty rather than writing a path nothing is at.
 	if git, err := exec.LookPath("git"); err == nil {

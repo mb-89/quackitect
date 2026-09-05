@@ -135,34 +135,3 @@ func TestARetroTidiesOnStart(t *testing.T) {
 		}
 	}
 }
-
-// aTidyTree is a tree with one thing for each part to find: a token that has
-// closed and never been archived, and a claim that has lapsed.
-func aTidyTree(t *testing.T) Roots {
-	t.Helper()
-	r := aTreeWithHistory(t)
-
-	closed, err := Mint(r, Token{Process: "trivial", Title: "already closed",
-		Status: "first", Tracked: local()})
-	if err != nil {
-		t.Fatal(err)
-	}
-	closed.Disposition = Done
-	closed.Status = "closed"
-	if err := SaveToken(r, closed); err != nil {
-		t.Fatal(err)
-	}
-
-	stale, err := Mint(r, Token{Process: "trivial", Title: "held too long",
-		Status: "first", Tracked: local()})
-	if err != nil {
-		t.Fatal(err)
-	}
-	long := time.Duration(LoadConfig(r).ClaimHours+1) * time.Hour
-	stale.ClaimedBy = "aaaaaaaa/worker-gone"
-	stale.ClaimedAt = time.Now().UTC().Add(-long).Format(ClaimStamp)
-	if err := SaveToken(r, stale); err != nil {
-		t.Fatal(err)
-	}
-	return r
-}

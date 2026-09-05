@@ -32,7 +32,7 @@ func TestASnapshotThisBoxNeverHadStillTests(t *testing.T) {
 		on := aTokenTaking(t, r, elsewhere)
 		wrote(t, r, on, "one.md", "# one\n")
 
-		got, err := TestTheDelta(r, db, on, nil, true, "worker-one")
+		got, err := TestTheDelta(t.Context(), r, db, on, nil, true, "worker-one")
 		if err != nil {
 			t.Fatalf("se test answered an error rather than a plan: %v", err)
 		}
@@ -59,7 +59,7 @@ func TestASnapshotThisBoxNeverHadStillTests(t *testing.T) {
 		}
 		wrote(t, r, on, "two.md", "# two\n")
 
-		got, err := TestTheDelta(r, db, on, nil, true, "worker-two")
+		got, err := TestTheDelta(t.Context(), r, db, on, nil, true, "worker-two")
 		if err != nil {
 			t.Fatalf("se test answered an error rather than a plan: %v", err)
 		}

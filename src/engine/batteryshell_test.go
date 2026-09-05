@@ -21,8 +21,8 @@ import (
 // keeps its shell beside its git, so the shell is derived from that rather than
 // hoped for on PATH, the way every other tool a command needs is resolved.
 func TestTheBatteryFindsTheShellGitBrought(t *testing.T) {
-	root := t.TempDir()
-	r := Roots{Method: root, Work: root}
+	r := aTree(t).Roots
+	root := r.Work
 
 	// A Git install the shape the installer leaves: git in cmd, the shell in bin.
 	git := filepath.Join(root, "Git", "cmd", "git.exe")
@@ -59,8 +59,8 @@ func TestTheBatteryRunsOnTheShellGitBrought(t *testing.T) {
 	if err != nil {
 		t.Skip("no git on this machine, and this is about the shell git brings")
 	}
-	root := t.TempDir()
-	r := Roots{Method: root, Work: root}
+	r := aTree(t).Roots
+	root := r.Work
 	writeProbe(r, Probe{Session: "s", Found: []Tool{{Name: "git", Path: git}}})
 	if err := writeAtomic(filepath.Join(root, "util", "checks", "battery.sh"),
 		[]byte("echo the battery ran\n"), 0o755); err != nil {
@@ -72,7 +72,7 @@ func TestTheBatteryRunsOnTheShellGitBrought(t *testing.T) {
 
 	// THE RUN IS STARTED AND NOT AWAITED, so what is watched here is the run
 	// itself reaching the file the engine pointed at. See battery.go.
-	got := startBattery(r, "worker-one", "")
+	got := startBattery(t.Context(), r, "worker-one", "")
 	if !got.OK {
 		t.Fatalf("the battery did not start: said=%q", got.Said)
 	}
@@ -96,8 +96,7 @@ func TestTheBatteryRunsOnTheShellGitBrought(t *testing.T) {
 // that names the places it tried is the difference between a tool that is not
 // installed and a lookup that is not reaching the one that is.
 func TestTheBatterySaysWhereItLookedForTheShell(t *testing.T) {
-	root := t.TempDir()
-	r := Roots{Method: root, Work: root}
+	r := aTree(t).Roots
 	t.Setenv("PATH", "")
 
 	got, looked := batteryShell(r)
@@ -109,7 +108,7 @@ func TestTheBatterySaysWhereItLookedForTheShell(t *testing.T) {
 	}
 
 	// AND THE ANSWER A PERSON READS CARRIES THEM, not only the refusal.
-	said := startBattery(r, "worker-one", "").Said
+	said := startBattery(t.Context(), r, "worker-one", "").Said
 	for _, want := range []string{"no sh on this machine", looked[0]} {
 		if !strings.Contains(said, want) {
 			t.Errorf("the battery's answer does not carry %q:\n%s", want, said)
