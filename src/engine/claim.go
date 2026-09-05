@@ -550,9 +550,17 @@ func Publish(ctx context.Context, r Roots, files []string, message string) Publi
 		p.Says = "published here, on " + claimsRef + ". The push did not run: " + err.Error()
 		return p
 	}
+	// AND WHAT THIS BOX WROTE COMES ACROSS THE MOVE. The write after it carries
+	// the parent's claims forward, and the parent is about to be the remote's
+	// head, which holds none of this box's. On a box whose push is refused
+	// every time that dropped every claim but the last: thirty were live here
+	// and the ref carried one. So the claims the local ref holds are named as
+	// files of this call, and the write puts them back.
+	if mine, err := readClaimsIn(ctx, r, claimsRef); err == nil {
+		files = withTheClaimsOnlyHereHolds(r, mine, files)
+	}
 	// THE REMOTE'S HEAD BECOMES THE PARENT, and the claim is written again on
-	// top of it. Moving the local ref loses nothing: what it held is these same
-	// files, and writeTheClaims adds them again over the head that won the race.
+	// top of it.
 	if head, err := gitIn(ctx, r, index.Name(), "rev-parse", "--verify", "--quiet", remoteClaimsRef); err == nil && head != "" {
 		if _, err := gitIn(ctx, r, index.Name(), "update-ref", claimsRef, head); err != nil {
 			p.Says = "published here. The other box's claims could not be taken up: " + err.Error()
@@ -586,6 +594,39 @@ const claimsFile = "claims"
 // written over what the ref holds. A claim the engine already ignores, because
 // lapsed says so, is dropped on the way. A token in files that is claimed sets
 // its line, and one that is not, released or gone, loses it.
+// withTheClaimsOnlyHereHolds names the note of every claim the local ref holds
+// that this call has not named already, so a write over another parent carries
+// them rather than dropping them.
+//
+// THE NOTE IS THE CLAIM'S OWN RECORD, and nextClaimsFile reads the token behind
+// each file it is handed, so naming the note is enough: a claim that has since
+// lapsed or been given back is left out there rather than renewed here.
+func withTheClaimsOnlyHereHolds(r Roots, mine map[string]FarClaim, files []string) []string {
+	have := map[string]bool{}
+	for _, f := range files {
+		have[strings.TrimSuffix(filepath.Base(f), ".md")] = true
+	}
+	ids := make([]string, 0, len(mine))
+	for id := range mine {
+		if !have[id] {
+			ids = append(ids, id)
+		}
+	}
+	sort.Strings(ids)
+	for _, id := range ids {
+		at := noteAt(r, id)
+		if at == "" {
+			continue // a note that has left the disk is a claim nothing here can speak for
+		}
+		rel, err := filepath.Rel(r.Work, at)
+		if err != nil {
+			continue
+		}
+		files = append(files, filepath.ToSlash(rel))
+	}
+	return files
+}
+
 func nextClaimsFile(r Roots, have map[string]FarClaim, files []string, now time.Time) string {
 	live := map[string]FarClaim{}
 	for id, c := range have {
@@ -624,6 +665,13 @@ func nextClaimsFile(r Roots, have map[string]FarClaim, files []string, now time.
 // is read through readClaimsIn, which reads the old shape too, so a ref written
 // the old way is folded into the file by this write.
 func writeTheClaims(ctx context.Context, r Roots, index string, files []string, message string) (string, error) {
+	// THE FOLDER IT WRITES INTO IS ITS OWN TO MAKE. Publish makes it before
+	// calling this, and a caller that does not was refused with "no such file
+	// or directory" for the temporary file below: a committed test read as red
+	// for the fixture rather than for the program.
+	if err := os.MkdirAll(r.Private(), 0o755); err != nil {
+		return "", err
+	}
 	_ = os.Remove(index) // a fresh index per attempt, so a failed one leaves nothing behind
 	parent, _ := gitIn(ctx, r, index, "rev-parse", "--verify", "--quiet", claimsRef)
 	have := map[string]FarClaim{}
