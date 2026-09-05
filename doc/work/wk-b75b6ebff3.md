@@ -8,7 +8,9 @@ guidance: [[work-token]]
 # the name this token is known by, in references and in links
 title: notes become tracked tokens
 # where the token stands. The process owns these values.
-status: open
+status: done
+# who did the work step, so the verdict is never theirs
+author: fable-cloud
 claimed_by: aeaf7bd9/fable-cloud
 claimed_at: "2026-09-05T13:07:50Z"
 # true when this goes out before everything else workable
@@ -17,9 +19,11 @@ urgent: true
 began:
   - 3b1c1f1f1723f560e6839659e877976250178461
   - 2346e38d83314e5910c653118fd44bdf7754e3b4
+  - 5d6126d5616611e15e0529bcd8e00888ef3fb5f2
 # the tree each time the work was put down or closed, snapshots the engine wrote
 ended:
   - ff2d2e17a6e4b38784a687790b4a5c6d61cdf9ce
+  - f0403692b72c6e2726fba462f981c419297c816a
 ---
 
 ## detail
@@ -45,18 +49,6 @@ On a cloud box, hold the agent at twenty notes the way the staffing guard holds 
 - a desk with twenty notes refuses nothing, proved by the same test with the variable unset
 - a note that became a tracked token no longer counts, so clearing them lets the agent through
 - a Go test in src/engine drives all four
-
-## approach
-
-One guard beside the staffing one, in the hook, before the work goes through.
-
-It asks three things. Whether this box is a cloud box, which host.go already answers off util/cage/hosts.json and the environment. How many notes are open, which is a walk over the tokens whose process is note. And whether the call is work, which is the list the staffing guard already keeps.
-
-At twenty it refuses, and the refusal is the handing over: every open note by id and title, and what to do with each one. Make it a tracked token, drop it, or make a tracked token marked needs_human where the answer is not yours.
-
-A note that became a token has ended, so it stops counting and the agent works again. Nothing converts a note by itself, because which of the three answers a note deserves is a reading only an agent can do.
-
-The unbound switch turns it off, the way it turns the staffing guard off.
 
 ## evidence: step 1. ask
 
@@ -87,9 +79,21 @@ The unbound switch turns it off, the way it turns the staffing guard off.
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | [[reviewing]] was read and applied | — |  |
-| [ ] | every hunk of git diff began..ended was read, and any not read is named |  |  |
-| [ ] | every criterion's command was run again, and what it said is named |  |  |
-| [ ] | every hunk improves the product, or a finding names the one that does not |  |  |
-| [ ] | every finding is a trivial token naming this one, and their ids are here |  |  |
+| [x] | [[reviewing]] was read and applied | Read whole. Candidates written in full, then cut to five. | |
+| [x] | every hunk of git diff began..ended was read, and any not read is named | All read, from 43bb60dc and 129d26f4: notesgohome.go, its test, hook.go 808, cloud-runner.md, this file. None skipped. Its wk-754581f5e8 paths go to wk-b344fb4fb4. | |
+| [x] | every criterion's command was run again, and what it said is named | go test -run TestACloudBoxTurnsItsNotesIn and TestADeskKeepsItsNotes: PASS both, ok quackitect/engine 5.306s, deciding all five. .bin/se work --close: flag not defined. | |
+| [x] | every hunk improves the product, or a finding names the one that does not | Pass. Guard, ceiling and tests earn their place. notesgohome.go 47 lacks staffing.go 216's escape, wk-130f64f596. Line 63 names absent flags, wk-213e782f8b. Line 65 needs_human is unreachable, wk-3f9f936ce7. Also wk-954d674f30, wk-b344fb4fb4. | |
+| [x] | every finding is a trivial token naming this one, and their ids are here | wk-130f64f596, wk-213e782f8b, wk-3f9f936ce7, wk-b344fb4fb4, wk-954d674f30, tracked trivial naming this one. | |
+
+## approach
+
+One guard beside the staffing one, in the hook, before the work goes through.
+
+It asks three things. Whether this box is a cloud box, which host.go already answers off util/cage/hosts.json and the environment. How many notes are open, which is a walk over the tokens whose process is note. And whether the call is work, which is the list the staffing guard already keeps.
+
+At twenty it refuses, and the refusal is the handing over: every open note by id and title, and what to do with each one. Make it a tracked token, drop it, or make a tracked token marked needs_human where the answer is not yours.
+
+A note that became a token has ended, so it stops counting and the agent works again. Nothing converts a note by itself, because which of the three answers a note deserves is a reading only an agent can do.
+
+The unbound switch turns it off, the way it turns the staffing guard off.
 
