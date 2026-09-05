@@ -44,9 +44,9 @@ Ask BytesReadBy for the same name notePostTool records under. TheActorOf is alre
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [x] | the ask is small enough to review whole, or it is split first | one reading swapped in the budget, one summing helper beside it, one test. | `git diff -- src/engine/guards.go` |
-| [x] | every done-when line is decidable, and names the command where one decides it | the first two are rows in the new test, the third is the package. Both were run. | `go test -run TestAHelperBudgetCountsWhatItReadUnderEveryName` |
-| [x] | the basics it stands on exist, or are minted first | everyNameOf, TheActorOf and BytesReadBy all existed. Nothing was minted. | src/engine/gate.go |
+| [x] | the ask is small enough to review whole, or it is split first | Two files carry code. guards.go gains one summing helper and swaps one reading. hook.go swaps the same reading in the refusal record. | `git diff origin/v4 -- src/engine/guards.go src/engine/hook.go` |
+| [x] | every done-when line is decidable, and names the command where one decides it | The first two lines are the two rows of the new test. The third is the package, run on both sides of the change. | `go test . -run TestAHelperBudgetCountsWhatItReadUnderEveryName` and `go test . -count=1` |
+| [x] | the basics it stands on exist, or are minted first | everyNameOf, TheActorOf and BytesReadBy are all in origin/v4 already. Nothing was minted. | `git show origin/v4:src/engine/gate.go` |
 
 ## evidence: step 2. do
 
@@ -54,9 +54,9 @@ Ask BytesReadBy for the same name notePostTool records under. TheActorOf is alre
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [x] | the guidance this token names was read and applied | read. Red first, then green. | doc/guidance/work-token.md |
-| [x] | one test was written first and seen red for the reason expected | on a clean copy of origin/v4 a digest of 12000 bytes was blocked. The helper had read 239995, where a tenth is 23999. | `go test -run TestAHelperBudgetCountsWhatItReadUnderEveryName` |
-| [x] | the same test was seen green after the change, and named | green, with TestAHelperReturningWhatItReadIsSentBackToDigest and the relent test beside it. Eight failures are left, a subset of the nine before. | same |
-| [x] | the change is git diff began..ended, the two hashes the engine wrote on this token | the budget reads bytesReadByAnyNameOf, which sums over every name, and the refusal record says the same number. | `git diff --stat` |
-| [x] | the cleanup the change revealed is in the change, or is a token of its own | none. The record and the guard say one number now. | the commit |
+| [x] | the guidance this token names was read and applied | Read whole. Rule 12 drove red first. Rule 11 drove the backslash scan back. | doc/guidance/work-token.md |
+| [x] | one test was written first and seen red for the reason expected | At origin/v4 with only the test added it failed. A digest of 12000 bytes was blocked, from a helper that read 239995. A tenth is 23999. | `go test . -run TestAHelperBudgetCountsWhatItReadUnderEveryName` |
+| [x] | the same test was seen green after the change, and named | That test answered ok true. The package answers seven failures, the same seven origin/v4 answers. | `go test . -count=1` |
+| [x] | the change is git diff began..ended, the two hashes the engine wrote on this token | bytesReadByAnyNameOf sums BytesReadBy over every name filing the helper. | `git diff origin/v4 -- src/engine` |
+| [x] | the cleanup the change revealed is in the change, or is a token of its own | 487d110a also dropped theQuotings' escaped flag. TestAnEscapedQuoteDoesNotEndTheSpan failed there. 87819dcb restores it. | `git diff origin/v4 -- src/engine/hook.go` |
 

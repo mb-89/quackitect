@@ -736,14 +736,11 @@ func next(r Roots, actor, role string) Answer {
 		}
 	}
 
-	var held []string
+	held := theirOwnHeld(all, actor)
 	for _, wantMine := range []bool{true, false} {
 		for i := range all {
 			t := all[i]
 			if t.Ended() || t.Holder != "" {
-				if t.Holder != "" {
-					held = append(held, t.ID)
-				}
 				continue
 			}
 			if !WorkableBy(r, t, role) {
@@ -909,6 +906,32 @@ func headingDepth(line string) int {
 		return 0
 	}
 	return n
+}
+
+// theirOwnHeld answers the open tokens this actor holds, for the notice that
+// calls them theirs.
+//
+// IT IS BUILT ONCE, AND IT IS THE ACTOR'S OWN.
+//
+// MEASURED, PULLING AS reviewer-poplar ON 2026-09-05. The notice read "12
+// piece(s) are yours and every one is blocked", listed six ids, then listed the
+// same six again. There were six, and not one of them was the puller's.
+//
+// The list was gathered inside the pass that runs once for what this actor
+// claimed and once for what nobody has, and what it appended did not depend on
+// which pass it was in, so every held token landed twice. And it took a token
+// whenever anybody held it, while the notice calls the list yours.
+//
+// A TOKEN THAT HAS ENDED IS NOBODY'S WORK. One that closed still carrying a
+// holder was named as a piece somebody still had to answer for.
+func theirOwnHeld(all []Token, actor string) []string {
+	var held []string
+	for i := range all {
+		if all[i].Holder == actor && !all[i].Ended() {
+			held = append(held, all[i].ID)
+		}
+	}
+	return held
 }
 
 // WHY THERE IS NOTHING TO DO, and it is never only "nothing".
