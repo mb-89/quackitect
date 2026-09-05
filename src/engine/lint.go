@@ -301,8 +301,9 @@ func claimsAHold(low, says string, at int) bool {
 			return namesSomebody(word(1))
 		}
 		// A TOKEN SAID TO BE HELD CLAIMS A HOLD WITHOUT NAMING ANYBODY, and it
-		// goes stale exactly as fast. That is the rule's other half.
-		return true
+		// goes stale exactly as fast. That is the rule's other half, and it is
+		// about THIS TOKEN, said outright.
+		return theTokenIsTheSubject(low[:at])
 	}
 
 	// THE WHO COMES NEXT, and a word naming no one particular is the rule being
@@ -312,16 +313,55 @@ func claimsAHold(low, says string, at int) bool {
 	return namesSomebody(word(0))
 }
 
+// theTokenIsTheSubject answers whether what stands before "is held" is this
+// token, claimed outright.
+//
+// THE OTHER HALF OF THE RULE READ EVERY SENTENCE CARRYING THE WORDS. A note is
+// where an engineer writes about the engine, and "the class is held rather than
+// the instance", "a cloud box is held until its notes are in git" and "name the
+// test as where it is held" were each reported as a stale claim on the token
+// they happen to sit on. The lint stood at five findings with no hold among
+// them, which is the state the first narrowing was written to end.
+//
+// SO THE SUBJECT HAS TO BE THE TOKEN. Saying a token is held goes stale with
+// the session; a class, a box or a ruling being held is prose about the engine
+// and it stays true.
+//
+// AND THE CLAIM IS MADE OUTRIGHT. "where it is held" names the place a thing
+// lives rather than saying anything is held now, so a relative word in front of
+// the subject takes the sentence back out of the rule.
+func theTokenIsTheSubject(before string) bool {
+	words := strings.Fields(before)
+	if len(words) == 0 {
+		return false // nothing said what is held, so nothing claimed a hold
+	}
+	switch strings.Trim(words[len(words)-1], ".,:;\"'`(") {
+	case "it", "this", "that", "token":
+	default:
+		return false
+	}
+	if len(words) < 2 {
+		return true
+	}
+	switch strings.Trim(words[len(words)-2], ".,:;\"'`(") {
+	case "where", "when", "why", "how", "whether", "which", "what":
+		return false
+	}
+	return true
+}
+
 // namesSomebody says whether this word stands for a person rather than for
 // anybody at all.
 func namesSomebody(w string) bool {
 	if w == "" {
 		return false // the line stops before it says who, so it names nobody
 	}
+	// "other" AND "others" NAME NOBODY, the way "agents" and "actors" do. A
+	// test holding tokens held by other actors is describing its fixture.
 	switch w {
 	case "a", "an", "the", "that", "this", "any", "some", "no", "another",
 		"agents", "agent", "actors", "actor", "somebody", "anybody", "nobody",
-		"whoever", "them", "it", "one":
+		"other", "others", "whoever", "them", "it", "one":
 		return false
 	}
 	return true

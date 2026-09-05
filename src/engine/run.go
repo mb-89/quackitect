@@ -6,7 +6,6 @@ import (
 	"os/exec"
 	"path/filepath"
 	"quackitect/engine/internal/quiet"
-	"runtime"
 	"strings"
 	"time"
 )
@@ -218,9 +217,15 @@ func TheShell(r Roots) string {
 // and a line saying 'ls' is not recognized. Nothing said the shell had changed
 // under it. The battery had already learned to ask the probe where git is and
 // look beside it, so both ask the same question in the same place now.
+//
+// AND THE SAME QUESTION ON EVERY PLATFORM, not only on Windows. A shortcut here
+// answered the bare name "sh" on any POSIX box without looking, which broke the
+// promise on either side of it. shellCommand says THE RESOLVED PATH RUNS, NOT
+// THE BARE NAME, and was handed a bare name; this doc says an empty name means
+// the machine really has none, and it could never answer empty because it never
+// asked. batteryShell already runs anywhere — exec.LookPath and os.Stat, no
+// build tag, and shellsBesideGit names sh beside sh.exe — so the platform test
+// bought nothing and cost exactly the drift the paragraph above is about.
 func posixShell(r Roots) (string, []string) {
-	if runtime.GOOS != "windows" {
-		return "sh", []string{"sh on PATH"}
-	}
 	return batteryShell(r)
 }
