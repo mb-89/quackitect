@@ -33,6 +33,8 @@ The step 1, step 2 and step 3 evidence checklists were lost from doc/work/wk-526
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
+| [ ] | what is gained by doing it, and not only what it does |  |  |
+| [ ] | what breaks if it is never done, and not only that it stays undone |  |  |
 | [x] | the ask is small enough to review whole, or it is split first | Two files, three criteria, all decided by reading. | 2 files |
 | [x] | every done-when line is decidable, and names the command where one decides it | All three name a command and all three were run: git show plus diff, se_find, .bin/se.exe lint. | 3 run |
 | [x] | the basics it stands on exist, or are minted first | Both ended commits 3dcc0969 and adb8b845 exist and git show reads each file out of them. | git show ok |

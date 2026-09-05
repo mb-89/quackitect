@@ -57,6 +57,8 @@ Also note the running engine is a stale build, so none of this takes effect unti
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
+| [ ] | what is gained by doing it, and not only what it does |  |  |
+| [ ] | what breaks if it is never done, and not only that it stays undone |  |  |
 | [x] | the ask is small enough to review whole, or it is split first | — | one lookup and its two call sites |
 | [x] | every done-when line is decidable, and names the command where one decides it | four by se_test and se_find | the fifth is the dependency and it is still open |
 | [x] | the basics it stands on exist, or are minted first | — | batteryShell and the tool probe were already there |
