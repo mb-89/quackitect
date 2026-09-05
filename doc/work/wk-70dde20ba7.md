@@ -9,8 +9,6 @@ guidance: [[work-token]]
 title: "delta is the token's"
 # where the token stands. The process owns these values.
 status: open
-claimed_by: 547b9365/worker-ash
-claimed_at: "2026-09-05T15:53:41Z"
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - 5b93841727d1773def309a5500a270fc1ddad3c9
@@ -22,6 +20,7 @@ ended:
   - 044ab9e809e7a1129acd76ba4fc2187543a44aed
   - df7de813f9536c8ca98f89fab284d4e08db27c17
   - 61381684afdea32b8edea7b2f1195d4b4e90515f
+  - 2bf82a22d4fb1345d7b96e567fe2ce093a8a8a7c
 ---
 
 ## detail
