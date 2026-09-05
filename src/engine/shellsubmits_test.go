@@ -72,6 +72,49 @@ func TestALaneSubmissionIsStillHandedTheNextToken(t *testing.T) {
 	}
 }
 
+// AND IT LEAVES NO STRETCH BEHIND ON THE TOKEN IT NEVER TOOK UP.
+//
+// The shell answer was built by taking the next token up and putting it back a
+// moment later. Handing out opens a stretch and a put-down closes one, so every
+// shell submission wrote a began and an ended onto whatever token the queue
+// would have handed on, and two snapshot commits behind them. That token's
+// record then said it had been in a hand it was never in, and a reviewer
+// running git diff began..ended over its last pair read an empty stretch.
+func TestAShellSubmissionOpensNoStretchOnTheNextToken(t *testing.T) {
+	r := aTreeWithTheProcesses(t)
+	const actor = "worker-shell"
+	mine := mintNote(t, r, "work in this hand")
+	next := mintStandard(t, r, "work nobody asked for")
+	ticked(t, r, mine.ID)
+	if _, err := TakeUp(r, mine.ID, actor); err != nil {
+		t.Fatal(err)
+	}
+	was, err := LoadToken(r, next.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(was.Began) != 0 || len(was.Finished) != 0 {
+		t.Fatalf("this proves nothing: %s carries a stretch before the submission, began %v ended %v",
+			next.ID, was.Began, was.Finished)
+	}
+
+	// THE ASK NAMES NO DOOR, so it is read as a shell.
+	aPullAnswer(t, r, verbAsk{
+		Verb:  "pull",
+		Args:  []string{"--actor", actor},
+		Stdin: `{"id":"` + mine.ID + `","disposition":"done"}`,
+	})
+
+	back, err := LoadToken(r, next.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(back.Began) != len(was.Began) || len(back.Finished) != len(was.Finished) {
+		t.Errorf("a shell submission that never named %s wrote a stretch onto it: began %v, ended %v",
+			next.ID, back.Began, back.Finished)
+	}
+}
+
 // AND A PULL CARRYING NO PAYLOAD IS WORK AT EITHER DOOR.
 func TestAPullWithNoPayloadIsWorkAtEitherDoor(t *testing.T) {
 	for _, door := range []string{"", DoorLane} {
