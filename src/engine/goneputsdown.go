@@ -118,3 +118,15 @@ func AHelperStopHoldingWork(r Roots, id string) (string, bool) {
 func AHelperStopStillRefused(r Roots, id string) bool {
 	return countRefusedStop(r, "holding:"+id) < helperRefusalsBeforeRelenting
 }
+
+// AHelperAnswerStillRefused is the same question about the budget door: it
+// counts this refusal and answers whether that guard refuses again.
+//
+// TWO DOORS, ONE SHAPE. The budget's condition was written inline at its call
+// site while this one was a function, so one rule was read two ways and only
+// half of it could be asked from anywhere else. The inline copy also spelled
+// the comparison the other way round, which is how a reader checking them
+// against each other has to hold both in mind to see they agree.
+func AHelperAnswerStillRefused(r Roots, id string) bool {
+	return countRefusedStop(r, "helper:"+id) < helperRefusalsBeforeRelenting
+}

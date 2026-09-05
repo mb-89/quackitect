@@ -598,15 +598,20 @@ func answerHook(ctx context.Context, raw []byte, args []string, out io.Writer, h
 		// job, and the refusal is bounded so the harness never overrides it
 		// silently.
 		if why, refuse := aHelperReturningTooMuch(roots, cfg, in); refuse {
-			if countRefusedStop(roots, "helper:"+in.AgentID) >= helperRefusalsBeforeRelenting {
-				record(log, "agent", "helper", actor, "helper stopped, its answer over budget and the guard relenting", No(),
-					map[string]any{"relented": true})
+			if AHelperAnswerStillRefused(roots, in.AgentID) {
+				record(log, "agent", "helper", actor, "helper stop refused: its answer is over budget", No(),
+					map[string]any{"returned": len(in.LastAssistantMessage), "read": BytesReadBy(roots, in.AgentID)})
+				g.blockStop(why)
 				break
 			}
-			record(log, "agent", "helper", actor, "helper stop refused: its answer is over budget", No(),
-				map[string]any{"returned": len(in.LastAssistantMessage), "read": BytesReadBy(roots, in.AgentID)})
-			g.blockStop(why)
-			break
+			// RELENTING LETS THE HELPER GO, AND LETTING GO IS EVERYTHING BELOW.
+			// This broke out of the case instead, so the holding-work door, the
+			// forgetting of the counts, the release of what it held and AgentGone
+			// were all skipped. A helper over budget and holding an open token
+			// walked off with the token, and the row sat in the panel until the
+			// sweep at the next engine start.
+			record(log, "agent", "helper", actor, "helper stopped, its answer over budget and the guard relenting", No(),
+				map[string]any{"relented": true})
 		}
 		// A HELPER DOES NOT WALK AWAY FROM WORK IN HAND.
 		//
