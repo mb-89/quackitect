@@ -32,10 +32,23 @@ type fedToolchain struct {
 	runs    int
 }
 
+// ONE TEST FEEDS THE TOOLCHAIN AT A TIME, because theToolchain is one variable
+// for the whole package and every test that feeds it runs in parallel. A second
+// feed installed mid-test takes the seam away from the first: the mapper then
+// reads a profile written from another test's reaches, and answers no regions
+// at all. TestWhenTheWholeBatteryRuns failed that way in four runs of eight,
+// saying a selection of everything did not call for the whole battery, with
+// lib.go uncovered and nothing chosen.
+//
+// So a feeding test holds this until it ends, and the tests that feed run one
+// after another while the rest of the suite runs alongside them.
+var feeding sync.Mutex
+
 // aFedToolchain feeds the engine a toolchain that compiles nothing. reaches
 // maps a test name to the profile lines it should answer with.
 func aFedToolchain(t *testing.T, module string, reaches map[string][]string) *fedToolchain {
 	t.Helper()
+	feeding.Lock()
 	fed := &fedToolchain{reaches: reaches}
 	was := theToolchain
 	theToolchain = toolchain{
@@ -74,7 +87,10 @@ func aFedToolchain(t *testing.T, module string, reaches map[string][]string) *fe
 			return []byte("ok"), nil
 		},
 	}
-	t.Cleanup(func() { theToolchain = was })
+	t.Cleanup(func() {
+		theToolchain = was
+		feeding.Unlock()
+	})
 	return fed
 }
 
