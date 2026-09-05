@@ -76,6 +76,8 @@ activities:
         evidence: required
       - says: the cleanup the change revealed is in the change, or is a token of its own
 
+  # Who closes a token, and why the reviewer is the default, is
+  # [[every-token-names-its-closer]].
   - name: verdict
     supplier: the queue
     input: a done token, its diff, its criteria and its note

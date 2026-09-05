@@ -28,6 +28,8 @@ import (
 // program can check, and a reviewer settles it. The one exception is a token in
 // its own scope that is local, which is an agent's breakdown of work it
 // already holds — four eyes belong at the boundary of delegated work.
+// Who closes what, and why the reviewer is the default, is
+// [[every-token-names-its-closer]].
 
 // The answers. The pull field names which one came back, so an agent branches
 // on one field and never has to infer.
@@ -711,6 +713,7 @@ func firstLines(s string, n int) string {
 // it, with the scope staying held. A parent with open sub-tokens is blocked
 // for everybody, so the general queue hands sub-tokens out before their
 // parents without a rule of its own.
+// Why a scope cannot be left is [[a-scope-cannot-be-left-while-its-tokens-are-open]].
 func next(r Roots, actor, role string) Answer {
 	all := urgentFirst(Tokens(r))
 	// WHO IS ASKING, AND ON WHICH BOX. Two questions and two answers. Whether
