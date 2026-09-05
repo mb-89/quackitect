@@ -89,6 +89,23 @@ func structSchema(t reflect.Type) map[string]any {
 	return out
 }
 
+func theFieldsItTakes(v any) string {
+	t := reflect.TypeOf(v)
+	for t != nil && t.Kind() == reflect.Pointer {
+		t = t.Elem()
+	}
+	if t == nil || t.Kind() != reflect.Struct {
+		return ""
+	}
+	var names []string
+	for i := 0; i < t.NumField(); i++ {
+		if name, ok := jsonName(t.Field(i)); ok {
+			names = append(names, name)
+		}
+	}
+	return strings.Join(names, ", ")
+}
+
 // jsonName is the name a field goes by on the wire, and whether it goes at all.
 func jsonName(f reflect.StructField) (string, bool) {
 	if f.PkgPath != "" {
