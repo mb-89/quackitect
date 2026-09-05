@@ -84,11 +84,11 @@ Narrow the delta to the files this token wrote, and leave the whole diff where t
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | [[reviewing]] was read and applied | — |  |
-| [ ] | every hunk of git diff began..ended was read, and any not read is named |  |  |
-| [ ] | every criterion's command was run again, and what it said is named |  |  |
-| [ ] | every hunk improves the product, or a finding names the one that does not |  |  |
-| [ ] | every finding is a trivial token naming this one, and their ids are here |  |  |
+| [x] | [[reviewing]] was read and applied | Read this session, and the candidates were cut to two. | reviewer-nancarrow |
+| [x] | every hunk of git diff began..ended was read, and any not read is named | Commit 31189489: tests.go in TestTheDelta and in choose, tokenwrote.go, deltaisthetokens_test.go, this file. None skipped. | reviewer-nancarrow |
+| [x] | every criterion's command was run again, and what it said is named | The tree will not build, so all four ran on a clean copy of HEAD. TestTheDeltaIsWhatThisTokenWrote PASS, driving every line, four neighbours PASS. | reviewer-nancarrow |
+| [x] | every hunk improves the product, or a finding names the one that does not | Both hunks earn their place. Two findings name where the code falls short of tokenwrote.go's own sentence. | reviewer-nancarrow |
+| [x] | every finding is a trivial token naming this one | wk-2ab8c4708a shell writes leave delta, wk-a8a9ceb587 private writes prove nothing. | reviewer-nancarrow |
 
 ## approach
 
