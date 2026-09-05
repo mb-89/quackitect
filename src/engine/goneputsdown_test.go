@@ -80,6 +80,49 @@ func TestATurnsEndPutsItsHelpersWorkDown(t *testing.T) {
 	}
 }
 
+// AND THE SESSION'S END TAKES THE WORK WITH THE HELPERS TOO.
+//
+// THE THIRD DOOR. AgentGone and HelpersGoneWith both put the work back before
+// they mark an identity gone. AgentsGoneWith, which SessionEnd calls, marked
+// every agent of the session gone and touched no token. A helper still alive
+// when its session ends, with no turn end before it, kept its token: the queue
+// counted that work as in hand and handed it to nobody until the next engine
+// start swept it.
+//
+// AND THE SESSION'S OWN HOLD STAYS. It is meant to survive a restart, so the
+// put-down is for the helpers of the session alone.
+func TestASessionsEndPutsItsHelpersWorkDown(t *testing.T) {
+	r := aTreeWithTheProcesses(t)
+	log, err := OpenLog(r.Private("log"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer log.Close()
+	record(log, "engine", "start", "engine", "engine started", Yes(), nil)
+
+	helpers := mintStandard(t, r, "held at session end")
+	aGhost(t, r, "general-purpose-4", "worker-ended", helpers.ID)
+
+	// THE SESSION HOLDS ONE OF ITS OWN, under the name it pulls with.
+	sessions := mintStandard(t, r, "the session's work")
+	NoteSession(r, "s-1")
+	NoteTheNameItPullsWith(r, "s-1", ".bin/se pull --actor main")
+	if _, err := TakeUp(r, sessions.ID, "main"); err != nil {
+		t.Fatal(err)
+	}
+
+	AgentsGoneWith(r, "s-1")
+
+	if back, _ := LoadToken(r, helpers.ID); back.Holder != "" {
+		t.Errorf("the session ended and %s is still held by %q, so the work is parked "+
+			"behind a helper that does not exist", helpers.ID, back.Holder)
+	}
+	if back, _ := LoadToken(r, sessions.ID); back.Holder != "main" {
+		t.Errorf("the session's own work reads as held by %q, and it is meant to "+
+			"survive its session ending", back.Holder)
+	}
+}
+
 // AND ITS STOP IS REFUSED WHILE IT STILL HOLDS ONE, so a helper finishes or
 // puts the work down deliberately rather than the engine tidying up after it.
 func TestAHelperCannotStopHoldingOpenWork(t *testing.T) {

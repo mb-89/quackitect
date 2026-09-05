@@ -9,6 +9,11 @@ guidance: [[work-token]]
 title: session end keeps holds
 # where the token stands. The process owns these values.
 status: open
+claimed_by: aeaf7bd9/worker-webern-two
+claimed_at: "2026-09-05T21:27:32Z"
+# the tree each time the work was taken up, snapshots the engine wrote
+began:
+  - 675b321d9aad544773438a39baeebadb1e4783ef
 ---
 
 ## detail
@@ -35,11 +40,11 @@ In AgentsGoneWith, before the register is changed, call PutDownWhatTheyHeld for 
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | what is gained by doing it, and not only what it does |  |  |
-| [ ] | what breaks if it is never done, and not only that it stays undone |  |  |
-| [ ] | the ask is small enough to review whole, or it is split first | — |  |
-| [ ] | every done-when line is decidable, and names the command where one decides it |  |  |
-| [ ] | the basics it stands on exist, or are minted first | — |  |
+| [x] | what is gained by doing it, and not only what it does | A helper's token comes back when its session ends, rather than waiting for the next engine start to sweep it. | the detail |
+| [x] | what breaks if it is never done, and not only that it stays undone | Work sits behind a helper that no longer exists, the queue counts it as in hand, and hands it to nobody. | the detail |
+| [x] | the ask is small enough to review whole, or it is split first | Three lines in one function, and one test beside two like it. | git diff HEAD --stat |
+| [x] | every done-when line is decidable, and names the command where one decides it | All three lines are Go tests in goneputsdown_test.go. | go test -run TestASessionsEndPutsItsHelpersWorkDown |
+| [x] | the basics it stands on exist, or are minted first | PutDownWhatTheyHeld and the filter both stand in HelpersGoneWith, so nothing was minted. | src/engine/evidence.go |
 
 ## evidence: step 2. do
 
@@ -47,9 +52,9 @@ In AgentsGoneWith, before the register is changed, call PutDownWhatTheyHeld for 
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the guidance this token names was read and applied | — |  |
-| [ ] | one test was written first and seen red for the reason expected |  |  |
-| [ ] | the same test was seen green after the change, and named |  |  |
-| [ ] | the change is git diff began..ended, the two hashes the engine wrote on this token | — |  |
-| [ ] | the cleanup the change revealed is in the change, or is a token of its own | — |  |
+| [x] | the guidance this token names was read and applied | Read whole. Rule 12 drove red first. Rule 13 drove both halves, the helper and the session's own hold. | doc/guidance/work-token.md |
+| [x] | one test was written first and seen red for the reason expected | TestASessionsEndPutsItsHelpersWorkDown failed saying the session ended and the token is still held by worker-ended. | /tmp/enggone |
+| [x] | the same test was seen green after the change, and named | It passes, with TestAnAgentThatGoesPutsDownItsWork and TestATurnsEndPutsItsHelpersWorkDown, in 6.1s. | /tmp/enggone |
+| [x] | the change is git diff began..ended, the two hashes the engine wrote on this token | Two files. AgentsGoneWith puts the helpers' work down first, and the test is new. | git diff HEAD |
+| [x] | the cleanup the change revealed is in the change, or is a token of its own | The filter naming a helper of a session is written twice now, here and in HelpersGoneWith. A third door would want it named once. | src/engine/evidence.go |
 

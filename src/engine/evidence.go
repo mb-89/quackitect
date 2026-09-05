@@ -401,9 +401,24 @@ func AgentGone(roots Roots, id string) {
 // says SubagentStop for a helper that finishes, and a helper killed with its
 // session says nothing at all. So the session ending is what closes the rest,
 // and without it the panel would hold a crowd that is gone.
+//
+// AND THE WORK GOES BACK WITH THEM, which is the third door. AgentGone and
+// HelpersGoneWith both put a token down before marking an identity gone, and
+// this one did not. A helper still alive when its session ended, with no turn
+// end before it, kept its token: the queue counted that work as in hand and
+// handed it to nobody until the next engine start swept it.
+//
+// THE SESSION'S OWN HOLD IS LEFT ALONE. It is meant to survive a restart, so
+// the put-down takes the helpers of the session and not the session, which is
+// the filter HelpersGoneWith already draws.
 func AgentsGoneWith(roots Roots, session string) {
 	if session == "" {
 		return
+	}
+	for id, a := range LoadEvidence(roots).Agents {
+		if a.Session == session && id != session && a.Kind != "session" && a.Gone.IsZero() {
+			PutDownWhatTheyHeld(roots, id)
+		}
 	}
 	changeEvidence(roots, func(e *Evidence) {
 		now := time.Now().UTC()
