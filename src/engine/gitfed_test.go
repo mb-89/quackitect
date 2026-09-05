@@ -151,7 +151,7 @@ func TestALostRaceReadsTheOtherBoxRatherThanRebasing(t *testing.T) {
 	if got.Pushed {
 		t.Fatal("a push that was refused twice reported as pushed")
 	}
-	if !fed.asked("fetch", claimsRef) {
+	if !fed.asked("fetch", claimsBranch) {
 		t.Error("the loser did not read what the winner wrote")
 	}
 	if fed.asked("rebase") || fed.asked("pull") {
