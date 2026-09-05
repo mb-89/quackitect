@@ -8,7 +8,9 @@ guidance: [[work-token]]
 # the name this token is known by, in references and in links
 title: stops hand work back
 # where the token stands. The process owns these values.
-status: open
+status: done
+# who did the work step, so the verdict is never theirs
+author: worker-varese
 claimed_by: aeaf7bd9/worker-varese
 claimed_at: "2026-09-05T14:28:55Z"
 # the tree each time the work was taken up, snapshots the engine wrote
@@ -16,10 +18,12 @@ began:
   - 8a4035249805dd9d745118bd13c10b3724210f32
   - f68049b3a3f5d35efd361f2a94b2f47480058ee3
   - 05adfb8a10366d136a5f5c1967b76bc2c7fc2c06
+  - d747900068bc35ec164d43a7c4378ca386cfdd11
 # the tree each time the work was put down or closed, snapshots the engine wrote
 ended:
   - 99d4735e87855e2241e047399d3e06dbc3a4a287
   - 2063fbaba324f1bdcd6f0fd3b66a5b58c3af13bd
+  - 304712686d8a533427ae91b066f2a6d51ef026ff
 ---
 
 ## detail
@@ -77,11 +81,11 @@ Refuse a SubagentStop while that agent holds an open token, have AgentGone put d
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | [[reviewing]] was read and applied | — |  |
-| [ ] | every hunk of git diff began..ended was read, and any not read is named |  |  |
-| [ ] | every criterion's command was run again, and what it said is named |  |  |
-| [ ] | every hunk improves the product, or a finding names the one that does not |  |  |
-| [ ] | every finding is a trivial token naming this one, and their ids are here |  |  |
+| [x] | [[reviewing]] was read and applied | Read this session, and one finding was kept of four candidates. | reviewer-nancarrow |
+| [x] | every hunk of git diff began..ended was read, and any not read is named | Only the last began and ended are objects here, and that stretch is other hands' work, so the change was read whole in the tree: goneputsdown.go, its test, helperstoprelents_test.go, the SubagentStop case in hook.go, guards.go. None skipped. | reviewer-nancarrow |
+| [x] | every criterion's command was run again, and what it said is named | Lines 1 to 4 on a clean copy of HEAD: TestAHelperCannotStopHoldingOpenWork, TestAHelperStopRelentsAfterEnoughRefusals, TestAnAgentThatGoesPutsDownItsWork, TestATurnsEndPutsItsHelpersWorkDown, all PASS. Line 5 by se -doing: ten rows hold work, each registered. | reviewer-nancarrow |
+| [x] | every hunk improves the product, or a finding names the one that does not | Both doors and the sweep earn their place. One finding names where the release is unreachable. | reviewer-nancarrow |
+| [x] | every finding is a trivial token naming this one, and their ids are here | wk-669bbef4c3, over-budget relent keeps work. | reviewer-nancarrow |
 
 ## approach
 
