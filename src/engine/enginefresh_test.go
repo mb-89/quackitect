@@ -96,7 +96,7 @@ func TestTheAnswerNamesTheEngineItDrove(t *testing.T) {
 	aFileBuiltAt(t, hook, then)
 	aFileBuiltAt(t, resident, then.Add(time.Minute))
 	db := openTheIndex(t, r)
-	got, err := TestTheDelta(r, db, "", []string{"TestA"}, true, "worker-one")
+	got, err := TestTheDelta(t.Context(), r, db, "", []string{"TestA"}, true, "worker-one")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -108,7 +108,7 @@ func TestTheAnswerNamesTheEngineItDrove(t *testing.T) {
 	if err := os.Chtimes(hook, now, now); err != nil {
 		t.Fatal(err)
 	}
-	got, err = TestTheDelta(r, db, "", []string{"TestA"}, true, "worker-one")
+	got, err = TestTheDelta(t.Context(), r, db, "", []string{"TestA"}, true, "worker-one")
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -2,6 +2,7 @@
 kind: [[rationale]]
 title: a field is read or gone
 explains:
+  - src/engine/store.go
   - src/schemas/work-token.schema.yaml
 ---
 

@@ -23,53 +23,6 @@ import (
 // criterion the process renamed after the mint reads the same way, when in
 // both cases there is no row on the note to tick at all.
 
-// aTreeWithAChecklist writes a two-step process whose steps carry criteria, so
-// a submission is about the checklist and not only about the disposition. The
-// second step's wording is a parameter, because a criterion renamed after a
-// token was minted is one of the things under test.
-func aTreeWithAChecklist(t *testing.T, root, secondSays string) Roots {
-	t.Helper()
-	r := Roots{Method: root, Work: root}
-	withHistory(t, root)
-	dir := ProcessesDir(root)
-	if err := os.MkdirAll(dir, 0o755); err != nil {
-		t.Fatal(err)
-	}
-	proc := `name: task
-description: two steps, each with something to tick
-sections:
-  required:
-    - detail
-states:
-  - name: open
-    description: waiting
-  - name: closed
-    description: finished
-activities:
-  - name: ask
-    does: say what is asked
-    to: open
-    criteria:
-      - says: the ask is small enough to review whole
-  - name: do
-    does: do it
-    from: open
-    to: closed
-    criteria:
-      - says: ` + secondSays + `
-dispositions:
-  - name: done
-    description: it was done
-  - name: dropped
-    description: it was not
-    reason: required
-`
-	if err := os.WriteFile(filepath.Join(dir, "task.process.yaml"), []byte(proc), 0o644); err != nil {
-		t.Fatal(err)
-	}
-	return r
-}
-
 // The author's own answers, written the way a person writes them into the note.
 const (
 	askTable = "| done | criterion | evidence | receipt |\n" +
@@ -114,7 +67,7 @@ func noteText(t *testing.T, r Roots, id string) string {
 // author has to come out the other side byte for byte.
 func TestASubmissionKeepsEvidenceItDidNotSend(t *testing.T) {
 	t.Parallel()
-	r := aTreeWithAChecklist(t, t.TempDir(), doSays)
+	r := aTreeWithAChecklist(t, doSays)
 	tok := mintWithChecklist(t, r, map[string]string{
 		"step 1. ask": askTable, "step 2. do": doTable})
 
@@ -139,7 +92,7 @@ func TestASubmissionKeepsEvidenceItDidNotSend(t *testing.T) {
 // somebody else's answers at all.
 func TestAMissingEvidenceSectionIsNamed(t *testing.T) {
 	t.Parallel()
-	r := aTreeWithAChecklist(t, t.TempDir(), doSays)
+	r := aTreeWithAChecklist(t, doSays)
 	tok := mintWithChecklist(t, r, nil)
 
 	got := Pull(r, "worker-a", RoleWorker, Payload{ID: tok.ID, Disposition: "done"})
@@ -160,14 +113,13 @@ func TestAMissingEvidenceSectionIsNamed(t *testing.T) {
 // as an unticked row, which is a lie: there is nothing on the note to tick.
 func TestACriterionRenamedSinceMintIsNamed(t *testing.T) {
 	t.Parallel()
-	root := t.TempDir()
-	r := aTreeWithAChecklist(t, root, doSays)
+	r := aTreeWithAChecklist(t, doSays)
 	tok := mintWithChecklist(t, r, map[string]string{
 		"step 1. ask": askTable, "step 2. do": doTable})
 
 	// The process is edited after the token was minted. That is the whole trap.
 	const renamed = "one test was written first, seen red, and seen green after"
-	aTreeWithAChecklist(t, root, renamed)
+	aChecklistOver(t, r, renamed)
 
 	got := Pull(r, "worker-a", RoleWorker, Payload{ID: tok.ID, Disposition: "done"})
 	if got.Pull != AnswerRefused {

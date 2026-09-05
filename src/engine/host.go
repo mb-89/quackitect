@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"quackitect/engine/internal/quiet"
+	"strings"
 )
 
 // WHERE THIS BOX IS, READ OFF ONE TABLE.
@@ -62,6 +63,32 @@ func TheHost(method string) Host {
 		named += c.Env
 	}
 	return Host{Because: "none of " + named + " is set", Says: "a box with a person beside it"}
+}
+
+// TheSurface answers what drove this session: a terminal, an editor, a
+// browser, a box with nobody beside it.
+//
+// IT IS READ OFF THE EVENT'S OWN ENVIRONMENT, because the harness spawns the
+// hook for the event it is announcing, so what that process was handed is what
+// started the session. The other answer was the harness's own transcript files
+// under the user's home folder, matched back to each line by timestamp, which
+// a cloud box does not have and nothing in the tree keeps.
+//
+// IT IS NOT IN THE HOST TABLE. That table is read by the cage and by the
+// engine both, and a key only one of them honours is half a mechanism. This is
+// written by the record and read by nobody else, so it is here.
+//
+// SE_SURFACE IS THE ANSWER BY HAND, the way SE_CLOUD is in the table, for a
+// harness that names its surface with a variable this does not know.
+func TheSurface() string {
+	for _, env := range []string{"SE_SURFACE", "CLAUDE_CODE_ENTRYPOINT"} {
+		if said := strings.TrimSpace(os.Getenv(env)); said != "" {
+			return said
+		}
+	}
+	// A BOX NOTHING SAID ABOUT SAYS SO. An empty field reads as a line
+	// written before the record carried one, and those are two answers.
+	return "unknown"
 }
 
 // Diagnose writes a diagnosis of this box and prints it, and answers the exit
