@@ -157,7 +157,7 @@ func theNotesDoor(t *testing.T, r Roots, tool string, argv []string) Token {
 	if why, refuse := TooManyNotes(r, "main", "Bash", shell); refuse {
 		t.Fatalf("the same call at a shell is refused: %s\n%s", shell, why)
 	}
-	a := runVerbInside(t.Context(), r, verbAsk{Verb: argv[0], Args: argv[1:]})
+	a := runVerbInside(r, verbAsk{Verb: argv[0], Args: argv[1:]})
 	if a.Code != 0 {
 		t.Fatalf("%s did not land: %s%s", shell, a.Out, a.Err)
 	}
