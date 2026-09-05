@@ -639,14 +639,15 @@ func runChosen(r Roots, db *sql.DB, tests []aTest, picks []chosen) ([]ran, strin
 			if !seen {
 				b, err := coverBinary(r, db, dir)
 				if err != nil {
-					out = append(out, ran{ID: t.ID, Kind: t.Kind, OK: false, Said: err.Error()})
+					// A PACKAGE THAT WILL NOT COMPILE IS NO RED. See nored.go.
+					out = append(out, aBuildFailure(r, t.ID, dir, err.Error()))
 					bins[dir] = ""
 					continue
 				}
 				bin, bins[dir] = b, b
 			}
 			if bin == "" {
-				out = append(out, ran{ID: t.ID, Kind: t.Kind, OK: false, Said: "the cover binary for " + dir + " will not build"})
+				out = append(out, aBuildFailure(r, t.ID, dir, ""))
 				continue
 			}
 			if !engineKnown {
