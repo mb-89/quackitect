@@ -49,8 +49,6 @@ In AgentsGoneWith, before the register is changed, call PutDownWhatTheyHeld for 
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | what is gained by doing it, and not only what it does |  |  |
-| [ ] | what breaks if it is never done, and not only that it stays undone |  |  |
 | [x] | the ask is small enough to review whole, or it is split first | One function, one guard clause, one test. 52 lines over two files. Nothing to split. | git diff began..tree |
 | [x] | every done-when line is decidable, and names the command where one decides it | se test --on wk-98c9dcc9df decides all three. Lines 1 and 2 are the two arms of the new test, and line 3 names its two. The red run line 1 asks for is in step 2. | se test --on wk-98c9dcc9df |
 | [x] | the basics it stands on exist, or are minted first | Nothing missing. PutDownWhatTheyHeld, LoadEvidence and the fixtures all existed. Only the test is new. | goneputsdown.go:25 |
