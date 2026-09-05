@@ -1,31 +1,8 @@
 package main
 
 import (
-	"encoding/json"
-	"os"
-	"path/filepath"
 	"testing"
 )
-
-// The candidates are data, so the fixture declares its own. One that is
-// certainly here, the engine this suite built and holds as a fixture, named
-// by its path so nothing on the machine's PATH decides the answer, and one
-// that is certainly not.
-//
-// IT WAS go, BY NAME. Under the battery's load go version took longer than
-// the probe's bound and the test read a machine's busy afternoon as a defect.
-// A fixture answers the same on every machine and under any load.
-func probeTree(t *testing.T) Roots {
-	t.Helper()
-	r := Roots{Method: t.TempDir(), Work: t.TempDir()}
-	os.MkdirAll(filepath.Join(r.Method, "util"), 0o755)
-	engine, _ := json.Marshal(theEngine(t))
-	os.WriteFile(filepath.Join(r.Method, "util", "tools.json"), []byte(`{"tools":[
-	  {"name":`+string(engine)+`,"args":["--version"],"for":"the engine itself"},
-	  {"name":"nothing-is-called-this","args":["--version"],"for":"nothing"}
-	]}`), 0o644)
-	return r
-}
 
 // The engine asks the machine rather than assuming. A name that resolves and
 // answers is kept, and a name that does not is dropped without a word.
@@ -50,7 +27,7 @@ func TestTheProbeKeepsOnlyWhatAnswers(t *testing.T) {
 // and better than no engine.
 func TestAMissingCandidateListDoesNotStopTheProbe(t *testing.T) {
 	t.Parallel()
-	r := Roots{Method: t.TempDir(), Work: t.TempDir()}
+	r := aTree(t).apart().Roots
 	if p := ProbeTools(t.Context(), r, "20260831-000000"); len(p.Found) != 0 {
 		t.Fatalf("it found %d tools with no list", len(p.Found))
 	}
