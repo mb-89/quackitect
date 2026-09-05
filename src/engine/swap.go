@@ -330,7 +330,13 @@ func handOver(r Roots, session string) error {
 	// stretch of work in half at a moment nobody chose.
 	cmd.Env = append(os.Environ(), sessionVar+"="+session)
 	cmd.Stdout, cmd.Stderr = out, out
+	// THE TREE IS LET GO OF FIRST, on purpose. A starting engine takes the
+	// tree before anything else, and this one still holds it, so a successor
+	// started while it is held would say already up and leave. A start that
+	// fails takes the tree back, because then this engine goes on being it.
+	LetGoOfTheTree()
 	if err := cmd.Start(); err != nil {
+		_, _ = HoldTheTree(r)
 		return err
 	}
 	return cmd.Process.Release() // it is its own process now

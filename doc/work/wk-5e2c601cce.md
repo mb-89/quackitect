@@ -9,6 +9,15 @@ guidance: [[work-token]]
 title: two engines one tree
 # where the token stands. The process owns these values.
 status: open
+claimed_by: aeaf7bd9/fable-cloud
+claimed_at: "2026-09-05T11:51:55Z"
+# the tree each time the work was taken up, snapshots the engine wrote
+began:
+  - 4e5a2e490ca74ea234fe18a972af0d28f7efe28a
+  - 20dc2a7678886f0db07abe81b716a0654b2ab777
+# the tree each time the work was put down or closed, snapshots the engine wrote
+ended:
+  - b5eb55b53e0ad3456f04590189a9d1d6e1af8f8f
 ---
 
 ## detail

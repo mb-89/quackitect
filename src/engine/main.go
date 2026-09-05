@@ -514,6 +514,22 @@ func main() {
 		return
 	}
 
+	// AND THE TREE IS TAKEN BEFORE ANYTHING ELSE IS. engine.json is written
+	// late, after the log, the projections and the tool probe, so two starts a
+	// second apart both passed the line above and both ran. The lock is the
+	// kernel's and lives as long as this process does. See onetree.go.
+	if held, err := HoldTheTree(roots); err != nil {
+		fail(err)
+	} else if !held {
+		line, _ := json.Marshal(map[string]any{
+			"ready": false, "already_up": true,
+			"method_root": roots.Method, "work_root": roots.Work,
+			"says": "an engine is already up over this tree, so this one leaves it alone",
+		})
+		fmt.Println(string(line))
+		return
+	}
+	defer LetGoOfTheTree()
 	log, err := OpenLog(dir)
 	if err != nil {
 		fail(err)
