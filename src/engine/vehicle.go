@@ -372,8 +372,8 @@ func LinkBothNames(methodRoot string, names []string) ([]string, error) {
 		// and the processes holding it go on running from the moved file.
 		//
 		// IT GOES IN .bin/was, NOT BESIDE THE PROGRAMS IT IS NO LONGER ONE OF.
-		// See wasbin.go: .bin holds what this tree ships, .bin/was holds what
-		// it used to, and the engine sweeps that folder at every start.
+		// See internal/replaced: .bin holds what this tree ships, .bin/was holds
+		// what it used to, and the engine sweeps that folder at every start.
 		if err := os.Remove(plain); err != nil && !os.IsNotExist(err) {
 			_, _ = replaced.PutAside(methodRoot, plain) // a name it cannot free is one the link below reports
 		}
