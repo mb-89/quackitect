@@ -9,6 +9,11 @@ guidance: [[work-token]]
 title: helper budget misses reads
 # where the token stands. The process owns these values.
 status: open
+claimed_by: aeaf7bd9/worker-sibelius
+claimed_at: "2026-09-05T17:20:59Z"
+# the tree each time the work was taken up, snapshots the engine wrote
+began:
+  - 96a4dc5991137a671cd99ad5124c12ed976f2587
 ---
 
 ## detail
@@ -39,9 +44,9 @@ Ask BytesReadBy for the same name notePostTool records under. TheActorOf is alre
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the ask is small enough to review whole, or it is split first | — |  |
-| [ ] | every done-when line is decidable, and names the command where one decides it |  |  |
-| [ ] | the basics it stands on exist, or are minted first | — |  |
+| [x] | the ask is small enough to review whole, or it is split first | one reading swapped in the budget, one summing helper beside it, one test. | `git diff -- src/engine/guards.go` |
+| [x] | every done-when line is decidable, and names the command where one decides it | the first two are rows in the new test, the third is the package. Both were run. | `go test -run TestAHelperBudgetCountsWhatItReadUnderEveryName` |
+| [x] | the basics it stands on exist, or are minted first | everyNameOf, TheActorOf and BytesReadBy all existed. Nothing was minted. | src/engine/gate.go |
 
 ## evidence: step 2. do
 
@@ -49,9 +54,9 @@ Ask BytesReadBy for the same name notePostTool records under. TheActorOf is alre
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the guidance this token names was read and applied | — |  |
-| [ ] | one test was written first and seen red for the reason expected |  |  |
-| [ ] | the same test was seen green after the change, and named |  |  |
-| [ ] | the change is git diff began..ended, the two hashes the engine wrote on this token | — |  |
-| [ ] | the cleanup the change revealed is in the change, or is a token of its own | — |  |
+| [x] | the guidance this token names was read and applied | read. Red first, then green. | doc/guidance/work-token.md |
+| [x] | one test was written first and seen red for the reason expected | on a clean copy of origin/v4 a digest of 12000 bytes was blocked. The helper had read 239995, where a tenth is 23999. | `go test -run TestAHelperBudgetCountsWhatItReadUnderEveryName` |
+| [x] | the same test was seen green after the change, and named | green, with TestAHelperReturningWhatItReadIsSentBackToDigest and the relent test beside it. Eight failures are left, a subset of the nine before. | same |
+| [x] | the change is git diff began..ended, the two hashes the engine wrote on this token | the budget reads bytesReadByAnyNameOf, which sums over every name, and the refusal record says the same number. | `git diff --stat` |
+| [x] | the cleanup the change revealed is in the change, or is a token of its own | none. The record and the guard say one number now. | the commit |
 

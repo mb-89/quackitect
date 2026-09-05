@@ -273,12 +273,44 @@ func forgetRefusedStops(r Roots, actor string) {
 // floor so a helper given a small job is not held to a ratio of nothing. A
 // helper that read nothing and reasoned gets the floor, which is the design's
 // absolute floor for that case.
+// bytesReadByAnyNameOf sums what one helper read under every name the record
+// files it by.
+//
+// THE TWO HALVES KEYED ON DIFFERENT NAMES. notePostTool files a read under
+// TheActorOf, which answers the register's name for a helper, and a helper that
+// has pulled answers to the name it pulled with as well. The budget asked under
+// the harness id, got nothing back, and fell to the floor. So the ratio never
+// bit on a helper the queue had handed work to, which is every helper that
+// reads anything worth a budget.
+//
+// IT SUMS RATHER THAN PICKING ONE, because a read made before the first pull is
+// filed under the name in force then, and choosing one name would drop it.
+func bytesReadByAnyNameOf(r Roots, agent string) int64 {
+	if agent == "" {
+		return 0
+	}
+	names := everyNameOf(r, agent)
+	if named := TheActorOf(r, "", agent); named != "" {
+		names = append(names, everyNameOf(r, named)...)
+	}
+	var n int64
+	seen := map[string]bool{}
+	for _, name := range names {
+		if name == "" || seen[name] {
+			continue
+		}
+		seen[name] = true
+		n += BytesReadBy(r, name)
+	}
+	return n
+}
+
 func aHelperReturningTooMuch(r Roots, cfg Config, in hookIn) (string, bool) {
 	if in.AgentID == "" || cfg.HelperRatio <= 0 {
 		return "", false
 	}
 	returned := int64(len(in.LastAssistantMessage))
-	read := BytesReadBy(r, in.AgentID)
+	read := bytesReadByAnyNameOf(r, in.AgentID)
 	allowed := max(int64(cfg.HelperFloorBytes), read/int64(cfg.HelperRatio))
 	if returned <= allowed {
 		return "", false
