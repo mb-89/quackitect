@@ -18,6 +18,9 @@ import (
 // Each one is stated fully by files, identities and this layer's own state,
 // so none needs a word from the levels above. Each names the failure it
 // prevents, which is the admission test: a guard that cannot is not here.
+//
+// What a write is held to, and the one place forbidden, is
+// [[the-guard-scrutinises-rather-than-forbids]].
 
 // A WRITE TO A FILE THAT CHANGED SINCE IT WAS READ IS REFUSED, NEVER FIXED.
 //

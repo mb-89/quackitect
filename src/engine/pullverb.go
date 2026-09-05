@@ -75,10 +75,32 @@ func runPull(c *call) int {
 		}
 	}
 
+	// A SUBMISSION AT A SHELL IS ONE THING ASKED FOR, AND ONE THING ANSWERED.
+	// Pull hands the next token on and takes it up as it does, which is right
+	// for the lane, because an agent that submits is asking for more. A person
+	// at a prompt asked for one thing, and the token they were handed stood in
+	// their name until somebody put it down by hand.
+	//
+	// THE DOOR IS READ BEFORE THE QUEUE IS, not after. This was a put-back of a
+	// token already taken up, and taking up and putting down are what write a
+	// stretch onto a token, so the shell's answer left a began and an ended on
+	// work nobody had touched. Deciding first means no stretch is opened.
+	p.settleOnly = p.ID != "" && c.door != DoorLane
 	a := Pull(roots, *actor, *role, p)
 	id := ""
 	if a.Token != nil {
 		id = a.Token.ID
+	}
+	// A CLAIM OTHER BOXES CANNOT SEE IS HALF A CLAIM. The queue writes it on the
+	// token as it hands the work over, and this is where it reaches the branch,
+	// on the call's own context. It runs only where this call wrote the claim,
+	// so a pull that hands back something already claimed pushes nothing.
+	if a.claimed && a.Token != nil {
+		put := Publish(c.ctx, roots, []string{noteAt(roots, a.Token.ID)},
+			ClaimMessage(a.Token.ClaimedBy, "claimed", []string{a.Token.ID}))
+		if !put.Pushed {
+			a.Notice += "\n\n" + a.Token.ID + " is claimed here, and " + put.Says
+		}
 	}
 	ok := Yes()
 	if a.Pull == AnswerRefused {

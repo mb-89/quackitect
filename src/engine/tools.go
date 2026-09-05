@@ -107,6 +107,8 @@ func ProbeTools(ctx context.Context, r Roots, session string) Probe {
 
 // A tool is present when it is on the path and it answers. Both have to hold:
 // a name that resolves and then refuses to run is not a tool anyone can use.
+// The program is named and its arguments listed, never a line for a shell:
+// [[a-program-is-named-never-a-command-line]].
 func askOne(ctx context.Context, c Candidate) (Tool, bool) {
 	path, err := exec.LookPath(c.Name)
 	if err != nil {

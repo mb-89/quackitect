@@ -17,6 +17,13 @@ Two answers to one question is the fault. A field and a location can disagree, a
 
 A move by hand then stays moved, which is what a move means.
 
+The save had the same fault the other way round.
+It wrote into the folder the process named and left the old file where it was, so one token became two files with one id.
+The editor drew the row twice.
+It cost nothing while every process agreed with the folder its tokens were already in.
+It broke the day a note was converted in doc/work and saved into .se/work.
+So the save removes the file it moved from, and a token has one file.
+
 ## costs
 
 Nothing records why a token was moved. A file dragged by accident is a decision the engine honours in silence, and git history is the only trace. A tool wanting to know where a token will be born, before it exists, has to ask the mint.

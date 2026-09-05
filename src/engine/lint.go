@@ -172,9 +172,10 @@ func runLint(c *call) int {
 	fs := flag.NewFlagSet("lint", flag.ContinueOnError)
 	fs.SetOutput(c.err)
 	fs.Usage = func() {
-		fmt.Fprintln(c.err, "se lint - read every work token and name what breaks a rule.")
+		fmt.Fprintln(c.err, "se lint - read the tree and name what breaks a rule: tokens, guidance and Go.")
 		fmt.Fprintln(c.err, "")
 		fmt.Fprintln(c.err, "  se lint          say what is wrong, and exit non-zero if anything is")
+		fmt.Fprintln(c.err, "  se format        run this first: a formatter settles what a lint reports")
 		fmt.Fprintln(c.err, "")
 		fs.PrintDefaults()
 	}
@@ -189,7 +190,12 @@ func runLint(c *call) int {
 	found = append(found, LintGuidance(roots)...)
 	found = append(found, LintRationales(roots)...)
 	found = append(found, LintProcesses(roots)...)
-	c.answerJSON(map[string]any{"findings": found, "clean": len(found) == 0})
+	// THE GO IS PART OF THE TREE THIS READS. It was checked by four programs
+	// the guidance named and the agent was told to remember, so it was read
+	// when the battery ran and at no other time.
+	inGo, refused := LintGo(c.ctx, roots)
+	found = append(found, inGo...)
+	c.answerJSON(map[string]any{"findings": found, "clean": len(found) == 0, "refused": refused})
 	if len(found) > 0 {
 		return 1
 	}
