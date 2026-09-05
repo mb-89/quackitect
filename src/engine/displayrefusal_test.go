@@ -10,18 +10,26 @@ import (
 // CAN THE DISPLAY BE REFUSED. It cannot, and this is the ruling written as a
 // check so that it cannot quietly stop being true.
 //
-// The level-0 design carried it as an open spike: the event that fires while
-// assistant text is displayed exists, and whether a refusal there is honoured
-// was undocumented, so the design either over-promised a live guard or gave up
-// one it had.
+// The level-0 design carried it as an open spike: whether a refusal from the
+// event that fires while assistant text is displayed is honoured was
+// undocumented, so the design either over-promised a live guard or gave up one
+// it had.
 //
-// THE ANSWER IS THAT NO REFUSAL IS EXPRESSIBLE THERE. MessageDisplay is the one
-// event that fires while assistant text reaches the person, and the harness
-// documents it as display-only: it carries no blocking decision at all, so the
-// question of whether a refusal is honoured does not arise. The events that can
-// refuse fire before the words exist, which is PreToolUse and UserPromptSubmit,
-// or after they are already on the screen, which is Stop and SubagentStop. A
-// block on Stop makes the agent write more and retracts nothing.
+// THE ANSWER IS THAT NO REFUSAL IS EXPRESSIBLE THERE. The harness fires only the
+// events it names in one list inside its own bundle. No event in that list
+// arrives while the words reach the person. So there is nothing to fire, nothing
+// to refuse from, and the words arrive whatever a hook would have said. The
+// events that can refuse fire before the words exist, which is PreToolUse and
+// UserPromptSubmit, or after they are already on the screen, which is Stop and
+// SubagentStop. A block on Stop makes the agent write more and retracts nothing.
+//
+// MEASURED ON claude-code 2.1.42, the harness this tree runs under. Its list is
+// PreToolUse, PostToolUse, PostToolUseFailure, Notification, UserPromptSubmit,
+// SessionStart, SessionEnd, Stop, SubagentStart, SubagentStop, PreCompact,
+// PermissionRequest, Setup, TeammateIdle and TaskCompleted. Read it again by
+// searching the installed cli.js of @anthropic-ai/claude-code for the array
+// whose first name is PreToolUse. MessageDisplay is in no array there and
+// nowhere in that file, so this rule watches for an event 2.1.42 never sends.
 //
 // SO THE CAGE MUST NOT SUBSCRIBE TO ONE. An event in the cage reads as a guard,
 // and a guard that cannot refuse is the over-promise the spike was about. This
@@ -29,7 +37,8 @@ import (
 
 // displayOnly names the events that fire while assistant text reaches the
 // person and carry no blocking decision. Subscribing to one buys nothing a
-// refusal can act on.
+// refusal can act on. The name below is the one to watch for, and the harness
+// measured above sends nothing by it.
 var displayOnly = []string{"MessageDisplay"}
 
 // displayOnlyEventsIn answers which display-only events a cage subscribes to.
