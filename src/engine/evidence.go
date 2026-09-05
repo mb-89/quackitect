@@ -405,6 +405,20 @@ func AgentsGoneWith(roots Roots, session string) {
 	if session == "" {
 		return
 	}
+	// AND THE HELPERS' WORK GOES BACK WITH THEM, by the third door. A helper
+	// still alive when its session ends, with no turn end before it, kept what
+	// it held: the queue counted that work as in hand and handed it to nobody
+	// until the next engine start swept it. The other two doors that mark an
+	// agent gone put down what it held first, and this one was left out.
+	//
+	// THE SESSION'S OWN HOLD IS LEFT ALONE. It holds its work across a restart
+	// on purpose, so the put-down is for the helpers of the session only, which
+	// is the filter HelpersGoneWith uses.
+	for id, a := range LoadEvidence(roots).Agents {
+		if a.Session == session && id != session && a.Kind != "session" && a.Gone.IsZero() {
+			PutDownWhatTheyHeld(roots, id)
+		}
+	}
 	changeEvidence(roots, func(e *Evidence) {
 		now := time.Now().UTC()
 		for id, a := range e.Agents {
