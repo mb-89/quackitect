@@ -8,16 +8,20 @@ guidance: [[work-token]]
 # the name this token is known by, in references and in links
 title: tests build their engine
 # where the token stands. The process owns these values.
-status: open
+status: done
+# who did the work step, so the verdict is never theirs
+author: worker-sibelius
 claimed_by: aeaf7bd9/worker-sibelius
 claimed_at: "2026-09-05T15:47:44Z"
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - d5e1c2b28e8a0778110e6f1f7b4372887c4596cd
   - fc1dcc58bde4c49a2d927c01137522c3931927c3
+  - 2261f45372fdedaf2ab84c3d752d30b61ce33dc4
 # the tree each time the work was put down or closed, snapshots the engine wrote
 ended:
   - db3347465840fcbe11619631058230c246878779
+  - ad9b42bad5a993db4290cddb1b59357548ef8975
 ---
 
 ## detail
@@ -70,11 +74,11 @@ Build the suite engine from the tree when the tree is newer than SE_ENGINE, and 
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | [[reviewing]] was read and applied | — |  |
-| [ ] | every hunk of git diff began..ended was read, and any not read is named |  |  |
-| [ ] | every criterion's command was run again, and what it said is named |  |  |
-| [ ] | every hunk improves the product, or a finding names the one that does not |  |  |
-| [ ] | every finding is a trivial token naming this one, and their ids are here |  |  |
+| [x] | [[reviewing]] was read and applied | read, and the candidates cut to two | this table |
+| [x] | every hunk of git diff began..ended was read, and any not read is named | the span carries only the ended marker, 72594c7a the note alone. The code was read instead: enginefresh.go and enginebin_test.go whole | wk-a70741151a |
+| [x] | every criterion's command was run again, and what it said is named | 1 and 2 engineToRun, ok. 3 the answer said .bin/se, built 2m3s ago. 4 the fresh binary and hook.go is newer. all four ok true | se test |
+| [x] | every hunk improves the product, or a finding names the one that does not | the resident serves while newer, the tree wins otherwise, the answer says which. One defect: newestSource counts files the toolchain ignores | wk-0a4ee0c1fa |
+| [x] | every finding is a trivial token naming this one, and their ids are here | wk-0a4ee0c1fa, wk-a70741151a, worst first. Also seen: residentStale repeats suiteEngine's opening | se work |
 
 ## approach
 
