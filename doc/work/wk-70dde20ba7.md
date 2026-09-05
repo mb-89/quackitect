@@ -57,10 +57,10 @@ Narrow the delta to the files this token wrote, and leave the whole diff where t
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the approach is on the token before any work, as an interface or a shape a reader can disagree with |  |  |
-| [ ] | every done-when line is decidable, and names the command where one decides it |  |  |
-| [ ] | the change is small enough to review whole, or it is split first | — |  |
-| [ ] | the basics it stands on exist, or are minted first | — |  |
+| [x] | the approach is on the token before any work, as an interface or a shape a reader can disagree with | Two approach sections, written by earlier hands before any code, naming the shape: one function for the paths this token wrote, the narrowing between deltaSince and choose, the whole diff where the record proves none. | |
+| [x] | every done-when line is decidable, and names the command where one decides it | All four by se_test --propose TestTheDeltaIsWhatThisTokenWrote, which drives one tree holding three files under one token, another hand's util/checks/scripts-are-lf.mjs, and a token with no apply on record. | |
+| [x] | the change is small enough to review whole, or it is split first | Seventeen added lines in tests.go, one new file of ninety-one, and the test. | |
+| [x] | the basics it stands on exist, or are minted first | Both stand: the undo journal already carries the token in On and the paths in Files, and readJournal already reads both of its shapes. Nothing was minted. | |
 
 ## evidence: step 2. do
 
