@@ -7,8 +7,13 @@ process: [[trivial]]
 guidance: [[work-token]]
 # the name this token is known by, in references and in links
 title: fed git honours context
+# the work this one stands on, and cannot be taken up before
+depends_on:
+  - "[[wk-697f9876cf]]"
 # where the token stands. The process owns these values.
 status: open
+claimed_by: aeaf7bd9/worker-nancarrow
+claimed_at: "2026-09-05T14:21:16Z"
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - 143237f6d3ebddf4497298c098cfb5c00d4160b4
@@ -23,6 +28,8 @@ gitRuns is the seam every claim test feeds, and the fake behind it now takes the
 So nothing asserts that a cancelled context reaches git through Publish, writeTheClaims, SyncClaims or WatchForClaims. The one cancel test the token added, TestACancelledContextEndsAGitCall, calls realGit directly and goes nowhere near those five. A later caller that reaches gitIn with a context it made itself, or with a context it never threads, passes every claim test in the tree.
 
 Have fedGit.run answer ctx.Err() when the context is already done, and add one test that cancels and sees SyncClaims (or Publish) come back with the cancellation instead of a fetch.
+
+WHAT THIS STANDS ON IS NOT IN THE TREE. wk-697f9876cf was to put the context there. It was put down open, and its work is not in the tree. The fake and the sync both take no context here, and gitRuns is realGit. So neither the guard nor a test of it compiles. This one waits on that one.
 
 ## done when
 
