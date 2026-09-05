@@ -28,12 +28,15 @@ import (
 // program can check, and a reviewer settles it. The one exception is a token in
 // its own scope that is local, which is an agent's breakdown of work it
 // already holds — four eyes belong at the boundary of delegated work.
+// Who closes what, and why the reviewer is the default, is
+// [[every-token-names-its-closer]].
 
 // The answers. The pull field names which one came back, so an agent branches
 // on one field and never has to infer.
 const (
 	AnswerWork    = "work"    // here is a token: do it
 	AnswerRefused = "refused" // the submission failed a check a program could make
+	AnswerSettled = "settled" // the submission was taken and no work was handed on
 	AnswerWait    = "wait"    // nothing to do, and the notice says why
 	// The fifth. A hold nobody is behind is worth more than the next token.
 )
@@ -55,6 +58,14 @@ type Payload struct {
 	Disposition string   `json:"disposition,omitempty"`
 	Successors  []string `json:"successors,omitempty"`
 	Reason      string   `json:"reason,omitempty"`
+
+	// settleOnly says this submission wants no token back, which is a person at
+	// a shell rather than an agent in a lane.
+	//
+	// IT IS UNEXPORTED BECAUSE IT IS NOT THE PAYLOAD'S TO SAY. Which door an ask
+	// came through is the engine's own reading, and a field the JSON could set
+	// would let a lane opt out of being handed work.
+	settleOnly bool
 }
 
 type Answer struct {
@@ -82,6 +93,16 @@ type Answer struct {
 	// that produces no id is one the engine did not accept, and the reviewer
 	// is not asked to remember to mint anything.
 	Learned string `json:"learned,omitempty"`
+
+	// claimed says the queue wrote the claim on the token it is handing over,
+	// so the verb that answered can put it on the claims branch.
+	//
+	// IT IS UNEXPORTED BECAUSE IT IS NOT THE AGENT'S TO READ, the way the
+	// payload's settleOnly is not the caller's to set. The claim is on the token
+	// in the answer, and this says only whether this call is the one that wrote
+	// it, which is the difference between publishing once and publishing on
+	// every pull for ever.
+	claimed bool
 }
 
 // Pull is the whole protocol. One function, because the order of its parts is
@@ -139,6 +160,19 @@ func answerFor(r Roots, actor, role string, p Payload) Answer {
 			return a
 		}
 		learned, over = a.Learned, a.Notice
+		// A SUBMISSION AT A SHELL IS ONE THING ASKED FOR, AND ONE THING ANSWERED,
+		// AND THE QUEUE IS NOT READ AT ALL.
+		//
+		// It used to be read and the token it handed out put back a moment later.
+		// Handing out opens a stretch and a put-down closes one, so every shell
+		// submission wrote a began and an ended onto whatever token the queue
+		// would have handed on, with two snapshot commits behind them. That
+		// token's record then said it had been in a hand it was never in.
+		if p.settleOnly {
+			return Answer{Pull: AnswerSettled, Notice: p.ID + " is settled. The next token goes to a " +
+				"lane, because an agent that submits is asking for more. Ask for work again when " +
+				"you want it."}
+		}
 	}
 	// A HOLD ON YOUR OWN VERDICT IS NOT WORK IN HAND. The submission put the
 	// token down, and naming it again through se run or se apply took it back
@@ -368,6 +402,18 @@ func checkDisposition(r Roots, t Token, p Payload) *Rejection {
 		}
 		return nil
 	}
+	return theEnding(r, proc, said, p.Reason, p.Successors)
+}
+
+// theEnding says whether an ending a caller names is one this token can carry.
+//
+// EVERY DOOR THAT ENDS A TOKEN ASKS THIS ONE. The submission asks it and so
+// does the abort, which is the door that ends a token from wherever it stands.
+// The abort wrote dropped whatever had happened, so a token that turned out
+// larger and was split could only be recorded as one nobody wanted, and a
+// second copy of these rules beside it would be a second answer to the same
+// question.
+func theEnding(r Roots, proc Process, said, reason string, successors []string) *Rejection {
 	var spec *DispositionSpec
 	for i, d := range proc.Dispositions {
 		if d.Name == said {
@@ -380,7 +426,7 @@ func checkDisposition(r Roots, t Token, p Payload) *Rejection {
 			Wrong:     "a token cannot close without one, and " + proc.Name + " does not end " + quoted(said),
 			Satisfies: "one of: " + strings.Join(proc.DispositionNames(), ", ")}
 	}
-	if spec.NeedsReason && strings.TrimSpace(p.Reason) == "" {
+	if spec.NeedsReason && strings.TrimSpace(reason) == "" {
 		return &Rejection{Clause: "disposition", Wrong: said + " carries no reason",
 			Satisfies: "why the work stopped"}
 	}
@@ -388,11 +434,11 @@ func checkDisposition(r Roots, t Token, p Payload) *Rejection {
 	// does not exist is not a thing a process can declare: it is a claim about
 	// the record, and the record is what this reads.
 	if Disposition(said) == Became {
-		if len(p.Successors) == 0 {
+		if len(successors) == 0 {
 			return &Rejection{Clause: "disposition", Wrong: "became names no successor",
 				Satisfies: "the ids of the tokens this became"}
 		}
-		for _, id := range p.Successors {
+		for _, id := range successors {
 			if _, err := LoadToken(r, id); err != nil {
 				return &Rejection{Clause: "disposition", Wrong: "no such successor: " + id,
 					Satisfies: "successors that exist"}
@@ -677,6 +723,7 @@ func firstLines(s string, n int) string {
 // it, with the scope staying held. A parent with open sub-tokens is blocked
 // for everybody, so the general queue hands sub-tokens out before their
 // parents without a rule of its own.
+// Why a scope cannot be left is [[a-scope-cannot-be-left-while-its-tokens-are-open]].
 func next(r Roots, actor, role string) Answer {
 	all := urgentFirst(Tokens(r))
 	// WHO IS ASKING, AND ON WHICH BOX. Two questions and two answers. Whether
@@ -839,13 +886,32 @@ func unwritableNotice(said []string) string {
 // caps stay where they are.
 func take(r Roots, actor string, t Token) (Answer, bool) {
 	t.Holder = actor
+	// THE QUEUE CLAIMS WHAT IT HANDS OVER.
+	//
+	// A tracked token is not worked without a claim, and the queue handed one
+	// out carrying none, so the agent's first run or apply on it was refused for
+	// want of a claim on the work it had been handed a moment before. It
+	// happened to two tokens in one session. Claiming it here is one more field
+	// on the save the handout already makes.
+	//
+	// A LOCAL TOKEN TAKES NONE, and one another box has claimed is not taken
+	// from it. Both are the gate's own rules, asked here rather than repeated:
+	// NoClaimHere says this box may not work it, and ClaimedNow says whether
+	// anybody has it.
+	claimed := false
+	if now := time.Now().UTC(); NoClaimHere(r, t, now) != "" && ClaimedNow(r, t, now) == "" {
+		t.ClaimedBy, t.ClaimedAt = Claimant(r, actor), now.Format(ClaimStamp)
+		claimed = true
+	}
 	// HANDING OUT OPENS A STRETCH, with the tree as it stands as its before.
 	t = openStretch(r, t)
 	if err := SaveToken(r, t); err != nil {
 		return Answer{Pull: AnswerWait,
 			Notice: t.ID + ": the record will not take a write: " + err.Error()}, false
 	}
-	return handed(r, actor, t), true
+	a := handed(r, actor, t)
+	a.claimed = claimed
+	return a, true
 }
 
 // handed answers a token the actor holds, with the guidance for it.

@@ -487,6 +487,8 @@ func realGit(ctx context.Context, r Roots, index string, args ...string) (string
 	// A NETWORK CALL GETS A CEILING, so a fetch to a host that never answers
 	// cannot leave the engine's claim loop waiting for ever. Everything else is
 	// local and answers in milliseconds.
+	// The program is named with its arguments, never a line for a shell:
+	// [[a-program-is-named-never-a-command-line]].
 	ctx, done := context.WithTimeout(ctx, gitBudget(args))
 	defer done()
 	cmd := quiet.Quietly(exec.CommandContext(ctx, "git", args...))

@@ -13,6 +13,7 @@ import (
 // about, the engine takes that token up, and a read goes through untouched.
 // Why a write names its work, and why a read is free, is
 // [[a-write-names-its-token]].
+// What no gate may close, look and shout, is [[the-floor-is-look-and-shout]].
 
 // WriteTools are the harness tools that can write, named once. Anything that
 // runs a command is one of them, whatever that command was going to do.

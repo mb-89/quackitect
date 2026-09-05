@@ -1,8 +1,6 @@
 package main
 
 import (
-	"os"
-	"path/filepath"
 	"strings"
 	"testing"
 	"time"
@@ -15,49 +13,6 @@ import (
 // queue hands the sub-tokens out first, and an abort is an ending like any
 // other. Without the barrier a parent closed on top of open work, and the
 // open work was found later by accident.
-
-// aTreeWithOneStep writes a process the queue hands out: one step from open
-// to done, with nothing to tick, so a submission is about the scope and not
-// about the checklist.
-func aTreeWithOneStep(t *testing.T) Roots {
-	t.Helper()
-	root := t.TempDir()
-	r := Roots{Method: root, Work: root}
-	withHistory(t, root)
-	dir := ProcessesDir(root)
-	if err := os.MkdirAll(dir, 0o755); err != nil {
-		t.Fatal(err)
-	}
-	const proc = `name: task
-description: one step the queue hands out
-sections:
-  required:
-    - detail
-states:
-  - name: open
-    description: waiting
-  - name: done
-    description: finished
-activities:
-  - name: mint
-    does: write it down
-    to: open
-  - name: do
-    does: do it
-    from: open
-    to: done
-dispositions:
-  - name: done
-    description: it was done
-  - name: dropped
-    description: it was not
-    reason: required
-`
-	if err := os.WriteFile(filepath.Join(dir, "task.process.yaml"), []byte(proc), 0o644); err != nil {
-		t.Fatal(err)
-	}
-	return r
-}
 
 func mintTask(t *testing.T, r Roots, title, parent string) Token {
 	t.Helper()

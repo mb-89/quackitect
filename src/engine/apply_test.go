@@ -177,12 +177,6 @@ func TestAPathOutsideTheTreeIsRefused(t *testing.T) {
 	}
 }
 
-func aTreeToWriteIn(t *testing.T) Roots {
-	t.Helper()
-	root := t.TempDir()
-	return Roots{Method: root, Work: root}
-}
-
 // AN UNDO PUTS BACK WHAT THE LAST APPLY OVERWROTE, and removes what it created.
 func TestAnUndoPutsBackWhatWasThere(t *testing.T) {
 	t.Parallel()

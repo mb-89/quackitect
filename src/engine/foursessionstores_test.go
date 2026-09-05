@@ -8,7 +8,7 @@ import (
 
 // THE FOUR SESSION-SCOPED STORES READ THE SESSION THE WAY THE CONTROLS DO.
 //
-// The rung, the hold and the ask learned it in wk-38c4d9e04c: a log that names
+// The rung, the hold and the ask learned it before these four: a log that names
 // no session decides nothing, so the stored value stands. These four write the
 // session on themselves and read it back with a bare comparison, so a rotation
 // -- the full log set aside and a fresh current opened, empty until the next

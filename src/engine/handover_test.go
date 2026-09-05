@@ -22,8 +22,7 @@ import (
 // refused and started a process anyway.
 func TestAnEndingEngineStartsNoSuccessor(t *testing.T) {
 	t.Parallel()
-	dir := t.TempDir()
-	r := Roots{Method: dir, Work: dir}
+	r := aTree(t).Roots
 	if err := os.MkdirAll(filepath.Dir(r.Private("engine.out")), 0o755); err != nil {
 		t.Fatal(err)
 	}
