@@ -9,8 +9,9 @@ guidance: [[work-token]]
 title: verdict leaves status done
 # where the token stands. The process owns these values.
 status: open
-claimed_by: 547b9365/reviewer-rowan
-claimed_at: "2026-09-05T18:37:04Z"
+# the tree each time the work was taken up, snapshots the engine wrote
+began:
+  - 75e56084321d35b4582d0d349e619411e6ca0703
 ---
 
 ## detail
