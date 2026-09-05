@@ -51,6 +51,12 @@ import (
 // the list the first time the list is written.
 const archiveRefs = "refs/tags/archive/"
 
+// keptRefs is where the close anchors the object it wrote, one ref per object.
+// It is written here, read by nothing, and pushed by nothing: it exists so that
+// a garbage collection on this box spares an archived note the branch never
+// carried. See keepInGit.
+const keptRefs = "refs/se/archive/"
+
 // ArchiveList is the archive: one line per closed token, naming the git object
 // that holds it.
 //
@@ -73,11 +79,12 @@ type Archived struct {
 	// OnBranch is the note as the branch last committed it, and it is the copy
 	// that travels.
 	//
-	// A BLOB WRITTEN AT THE CLOSE HANGS OFF NOTHING. git hash-object -w puts the
-	// object in the store and no tree or ref reaches it, so a clone is never sent
-	// it and a gc is free to sweep it. What the branch committed is in every
-	// clone of the branch: the same note without the lines the close wrote, and
-	// this row carries what those said.
+	// A BLOB WRITTEN AT THE CLOSE GOES NOWHERE. git hash-object -w puts the
+	// object in the store and no tree reaches it, so a clone is never sent it.
+	// The close anchors it under keptRefs so a gc on this box spares it, and that
+	// ref is never pushed either. What the branch committed is in every clone of
+	// the branch: the same note without the lines the close wrote, and this row
+	// carries what those said.
 	OnBranch string `json:"on_branch,omitempty"`
 	// Tag is what an older archive wrote, and nothing writes one now. It stays on
 	// the rows that already carry one so they go on reading.
@@ -193,19 +200,42 @@ func forget(r Roots, at string) error {
 
 // keepInGit writes the note into git as a blob and answers its name.
 //
-// IT WRITES NO REF AND PUSHES NOTHING. A ref has to be pushed to leave the box,
-// and the archive namespace is refused there, so anything hanging off one is an
-// archive a single machine holds. The row names this blob, and the row is a
-// line in a file the branch carries.
+// IT PUSHES NOTHING, AND THE REF IT WRITES IS NOT HOW THE ARCHIVE TRAVELS. A
+// ref has to be pushed to leave the box, and the archive namespace is refused
+// there, so an archive hanging off one is an archive a single machine holds.
+// The row names this blob, and the row is a line in a file the branch carries.
 //
 // WHAT IT WRITES REACHES NO FURTHER THAN THIS BOX, and that is why the row
-// names onBranch beside it: an object nothing points at is not sent to a clone.
+// names onBranch beside it: an object no clone was sent is no use to a clone.
 // This one is exact, and it is the better answer wherever it is there.
 //
 // IT NEVER TOUCHES THE BRANCH EITHER. A commit on the working branch would put
 // the engine in the person's history, and a stage would move what they staged.
 func keepInGit(r Roots, at string) (string, error) {
-	return gitHere(r, "hash-object", "-w", "--", at)
+	blob, err := gitHere(r, "hash-object", "-w", "--", at)
+	if err != nil {
+		return "", err
+	}
+	// AND SOMETHING POINTS AT IT, or a gc takes it. hash-object puts the object
+	// in the store and leaves it reachable from nothing, so git gc --prune=now,
+	// git prune and git repack -ad are all free to sweep it. Where the branch
+	// committed the note as well the row names that copy too and the loss is
+	// invisible. Where it did not, this object is the only copy there is, and
+	// the close has already taken the file off the disk.
+	//
+	// A REF IS THE ONLY THING THAT MAKES AN OBJECT REACHABLE, and this is not
+	// the tag that came out. That one was the archive's way of travelling and it
+	// had to be pushed, which is where the proxy refused it. This is an anchor on
+	// the box that wrote the object, in the namespace this program already keeps
+	// its own state in beside refs/se/steps, and nothing pushes it. What travels
+	// is still the row's on_branch.
+	//
+	// IT IS NAMED BY THE OBJECT, so a close that runs twice writes one ref and
+	// two notes with the same bytes share it.
+	if _, err := gitHere(r, "update-ref", keptRefs+blob, blob); err != nil {
+		return "", err
+	}
+	return blob, nil
 }
 
 // onBranch answers the blob the branch's own history holds for a path, and
