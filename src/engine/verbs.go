@@ -86,6 +86,9 @@ type call struct {
 	// refused is set by a verb that answers a refusal as a result with exit 0,
 	// the way pull does, so the count of wrong results still sees it.
 	refused bool
+	// door is the client this call came through, empty for a shell. A verb
+	// reads it the way it reads a flag.
+	door string
 }
 
 // Verbs answers every verb this program has, in order.

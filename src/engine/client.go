@@ -29,7 +29,14 @@ type verbAsk struct {
 	Verb  string   `json:"verb"`
 	Args  []string `json:"args"`
 	Stdin string   `json:"stdin,omitempty"`
+	// Door is which client sent this. The lane names itself and nothing else
+	// does, because a field added to a message has to mean the old thing where
+	// it is absent, and every client older than this one is a shell.
+	Door string `json:"door,omitempty"`
 }
+
+// DoorLane is what the tool lane writes on an ask of its own.
+const DoorLane = "lane"
 
 // verbAnswer is what comes back: both streams and the code.
 type verbAnswer struct {
@@ -149,7 +156,8 @@ func runVerbInside(ctx context.Context, r Roots, ask verbAsk) verbAnswer {
 		return verbAnswer{Err: "engine: no such verb: " + ask.Verb + "\n", Code: Unread}
 	}
 	var out, errs strings.Builder
-	c := &call{ctx: ctx, roots: r.ReadOnce(), args: ask.Args, in: strings.NewReader(ask.Stdin), out: &out, err: &errs}
+	c := &call{ctx: ctx, roots: r.ReadOnce(), args: ask.Args, in: strings.NewReader(ask.Stdin),
+		out: &out, err: &errs, door: ask.Door}
 	code := v(c)
 	// EVERY RESULT IS COUNTED HERE, because every lane result passes here on
 	// its way back. Wrong is a code that is not zero, or a refusal the verb

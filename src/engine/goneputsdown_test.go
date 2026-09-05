@@ -80,6 +80,44 @@ func TestATurnsEndPutsItsHelpersWorkDown(t *testing.T) {
 	}
 }
 
+// AND A SESSION'S END TAKES THE WORK WITH THE HELPERS THAT OUTLIVE THEIR TURN.
+//
+// THE THIRD DOOR. AgentsGoneWith marks every agent of a session gone and used
+// to touch no token, so a helper still alive when its session ends, with no
+// turn end before it, kept what it held: the queue counted that work as in
+// hand and handed it to nobody until the next engine start swept it.
+func TestASessionsEndPutsItsHelpersWorkDown(t *testing.T) {
+	r := aTreeWithTheProcesses(t)
+	log, err := OpenLog(r.Private("log"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer log.Close()
+	record(log, "engine", "start", "engine", "engine started", Yes(), nil)
+
+	helpers := mintStandard(t, r, "held at session end")
+	aGhost(t, r, "general-purpose-4", "worker-outlived", helpers.ID)
+
+	// AND THE SESSION'S OWN HOLD IS LEFT ALONE, because it holds its work
+	// across a restart on purpose.
+	its := mintStandard(t, r, "the session's own work")
+	NoteSession(r, "s-1")
+	if _, err := TakeUp(r, its.ID, TheSessionName(r, "s-1")); err != nil {
+		t.Fatal(err)
+	}
+
+	AgentsGoneWith(r, "s-1")
+
+	if back, _ := LoadToken(r, helpers.ID); back.Holder != "" {
+		t.Errorf("the session ended and %s is still held by %q, so the work is "+
+			"parked behind a helper that does not exist", helpers.ID, back.Holder)
+	}
+	if back, _ := LoadToken(r, its.ID); back.Holder == "" {
+		t.Errorf("the session's own hold on %s was put down, and it is meant to "+
+			"survive the session ending", its.ID)
+	}
+}
+
 // AND ITS STOP IS REFUSED WHILE IT STILL HOLDS ONE, so a helper finishes or
 // puts the work down deliberately rather than the engine tidying up after it.
 func TestAHelperCannotStopHoldingOpenWork(t *testing.T) {

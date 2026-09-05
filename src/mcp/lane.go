@@ -444,6 +444,9 @@ type verbCall struct {
 	Verb  string   `json:"verb"`
 	Args  []string `json:"args"`
 	Stdin string   `json:"stdin"`
+	// Door names this client, so the engine can answer a lane and a shell
+	// differently where the two want different answers.
+	Door string `json:"door"`
 }
 
 // engineCall runs a subcommand with an optional payload on standard input. A
@@ -459,7 +462,7 @@ func engineCall(r roots, args []string, stdin []byte) string {
 	// wrote. Nothing is started for a call. With no engine over the folder
 	// the answer says so, and how to start one.
 	raw, err := askModelWithin(r, "verb",
-		verbCall{Verb: args[0], Args: args[1:], Stdin: string(stdin)}, 6*time.Minute)
+		verbCall{Verb: args[0], Args: args[1:], Stdin: string(stdin), Door: "lane"}, 6*time.Minute)
 	if err != nil {
 		return fail(err.Error())
 	}
