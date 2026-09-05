@@ -115,6 +115,7 @@
 {"id":"wk-894fb72f52","title":"panel classes have rules","process":"trivial","disposition":"done","blob":"03da13d9d90e49dd63e94e11e48bb25b26c12f71","on_branch":"fb099a5a6f37a2070f560d39e1930693efc1ef36"}
 {"id":"wk-89847112fe","title":"delta misses bad object","process":"trivial","disposition":"done","blob":"00df3171eb8fcef007c1f937cc2a0c72d9112161","on_branch":"9d4773da419e65fcf7df1ccc3084ce15a784299d"}
 {"id":"wk-899d2dbc6c","title":"record names the harness","process":"trivial","disposition":"done","blob":"728ad43dc0fdaeb3bca67db3b84b56dc993a7448","on_branch":"0c1fe41cc3176b284d3d94e6423cc943e17cd4ef"}
+{"id":"wk-89847112fe","title":"delta misses bad object","process":"trivial","disposition":"done","blob":"00df3171eb8fcef007c1f937cc2a0c72d9112161","on_branch":"9d4773da419e65fcf7df1ccc3084ce15a784299d"}
 {"id":"wk-89c10296e6","title":"the engine holds holders","process":"trivial","disposition":"done","blob":"a9cfcca3ddf380e312cae14243f536ae272a0466","on_branch":"7666344ea3c150aad44af432ff498b6d0a5e25d2"}
 {"id":"wk-8ab502ee9d","title":"unmeasured is drawn silent","process":"trivial","disposition":"became","blob":"050a4cf11f4161cf7adfd3ca751d6ae5c8582a01","on_branch":"a7b4577452172b46de591dccf6dd711c9c84cfa2"}
 {"id":"wk-8c76f768c1","title":"separator inside quotes","process":"trivial","disposition":"done","blob":"1fa5ad4ffa113a4b4d105ad2ea26d54d0f3364d0","on_branch":"f7962d762d910bcf81369cf8232dcd94b17cb7fc"}
