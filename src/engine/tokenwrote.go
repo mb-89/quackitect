@@ -28,6 +28,12 @@ import (
 // folder, so a token with nothing on record keeps the whole diff and the answer
 // says why. Narrowing on an empty record would answer a green run over a change
 // nothing looked at, which is worse than a battery nobody needed.
+//
+// THE SAME HOLDS ONE APPLY LATER. A token with one apply on record proves that
+// one, and a shell write beside it is still in no journal. The narrowing keeps
+// it out of the delta, so the answer names every file it left out. An agent
+// reading a green run sees what no test was chosen for, whether the write was
+// its own shell command or another hand's.
 
 // WhatThisTokenWrote answers the paths the record says this token wrote, and
 // whether it proved any.
@@ -79,6 +85,25 @@ func onlyWhatItWrote(delta []change, wrote map[string]bool) []change {
 		if wrote[ch.Path] {
 			out = append(out, ch)
 		}
+	}
+	return out
+}
+
+// leftOut names the files the narrowing kept out, once each, in the order the
+// delta had them.
+//
+// A SHELL WRITE AND ANOTHER HAND'S WRITE READ THE SAME to the record, which is
+// why this names both rather than guessing between them. What the reader needs
+// is the list of changes in the tree that this answer chose no test for.
+func leftOut(delta []change, wrote map[string]bool) []string {
+	var out []string
+	seen := map[string]bool{}
+	for _, ch := range delta {
+		if wrote[ch.Path] || seen[ch.Path] {
+			continue
+		}
+		seen[ch.Path] = true
+		out = append(out, ch.Path)
 	}
 	return out
 }

@@ -72,6 +72,7 @@ type Tested struct {
 	Proposed   []string `json:"proposed,omitempty"`
 	Unreached  []string `json:"unreached,omitempty"`  // proposed patterns the delta does not reach
 	Uncovered  []string `json:"uncovered,omitempty"`  // changed files no test reaches
+	LeftOut    []string `json:"left_out,omitempty"`   // changed files the record does not put on this token, so the delta is without them
 	Undeclared []string `json:"undeclared,omitempty"` // checks that declare nothing, so run only whole
 	Ran        []ran    `json:"ran"`
 	Engine     string   `json:"engine,omitempty"` // the engine subprocess tests drove, and how old it is
@@ -176,7 +177,7 @@ func TestTheDelta(r Roots, db *sql.DB, on string, proposed []string, run bool, a
 	// sentence about somebody else's change. See tokenwrote.go.
 	if on != "" {
 		if wrote, proven := WhatThisTokenWrote(r, on); proven {
-			out.Delta = onlyWhatItWrote(delta, wrote)
+			out.Delta, out.LeftOut = onlyWhatItWrote(delta, wrote), leftOut(delta, wrote)
 		} else {
 			out.Whole, out.WhyWhole = true, nothingOnRecord(on)
 		}
