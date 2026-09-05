@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 )
 
@@ -29,6 +30,13 @@ type Finding struct {
 // LintTokens names what breaks a rule. An empty answer is a clean ledger.
 func LintTokens(r Roots) []Finding {
 	var out []Finding
+	known, err := theIDsThatOpen(r)
+	if err != nil {
+		// A CHECK THAT CANNOT READ WHAT IT GUARDS SAYS SO, rather than
+		// answering clean at the moment the archive is the thing that is broken.
+		out = append(out, Finding{ID: "doc/work/archive.jsonl", Title: "the archive",
+			Says: "cannot be read, so no id written into a note was checked: " + err.Error()})
+	}
 	for _, t := range Tokens(r) {
 		if err := checkTitle(t.Title); err != nil {
 			out = append(out, Finding{ID: t.ID, Title: t.Title, Says: err.Error()})
@@ -45,6 +53,10 @@ func LintTokens(r Roots) []Finding {
 			for _, line := range holdersIn(string(b)) {
 				out = append(out, Finding{ID: t.ID, Title: t.Title,
 					Says: "a hold ends with the session, so the record goes stale: " + line})
+			}
+			for _, id := range idsNamingNothing(string(b), t.ID, known) {
+				out = append(out, Finding{ID: t.ID, Title: t.Title,
+					Says: "names " + id + ", and no token and no archive row answers to it"})
 			}
 		}
 	}
@@ -182,6 +194,57 @@ func runLint(c *call) int {
 		return 1
 	}
 	return 0
+}
+
+// namesAToken is how a work token id is written wherever one is written.
+var namesAToken = regexp.MustCompile(`wk-[0-9a-f]{10}`)
+
+// theIDsThatOpen answers every id this tree can still be asked about: a token
+// on the disk, or a row in the archive. An error means the archive could not be
+// read, and the answer is nil rather than partial, so nothing is judged against
+// half a ledger.
+func theIDsThatOpen(r Roots) (map[string]bool, error) {
+	rows, err := TheArchive(r)
+	if err != nil {
+		return nil, err
+	}
+	known := map[string]bool{}
+	for _, t := range Tokens(r) {
+		known[t.ID] = true
+	}
+	for _, row := range rows {
+		known[row.ID] = true
+	}
+	return known, nil
+}
+
+// AN ID WRITTEN INTO A NOTE REACHES SOMETHING, OR IT IS A FINDING.
+//
+// A closed token's evidence said one token each had been minted for three
+// files. Two landed and archived. The third was reported missing, and nothing
+// in the tree could tell the reader whether that sentence was true. The lint
+// read the tokens that exist and never asked whether an id inside one opens.
+//
+// A CLOSED TOKEN COUNTS, because that is how finished work is traced. A nil
+// known is the archive saying it could not be read, and nothing is reported
+// against it.
+//
+// IT SKIPS THE NOTE'S OWN ID, which a note names about itself rather than as a
+// reference, and it says each missing id once however often it is written.
+func idsNamingNothing(text, self string, known map[string]bool) []string {
+	if known == nil {
+		return nil
+	}
+	var found []string
+	seen := map[string]bool{}
+	for _, id := range namesAToken.FindAllString(text, -1) {
+		if id == self || known[id] || seen[id] {
+			continue
+		}
+		seen[id] = true
+		found = append(found, id)
+	}
+	return found
 }
 
 // A TOKEN CARRIES NO TIME. It travels, and a time on it says when somebody was
