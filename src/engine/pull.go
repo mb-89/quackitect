@@ -28,6 +28,8 @@ import (
 // program can check, and a reviewer settles it. The one exception is a token in
 // its own scope that is local, which is an agent's breakdown of work it
 // already holds — four eyes belong at the boundary of delegated work.
+// Who closes what, and why the reviewer is the default, is
+// [[every-token-names-its-closer]].
 
 // The answers. The pull field names which one came back, so an agent branches
 // on one field and never has to infer.
@@ -91,6 +93,16 @@ type Answer struct {
 	// that produces no id is one the engine did not accept, and the reviewer
 	// is not asked to remember to mint anything.
 	Learned string `json:"learned,omitempty"`
+
+	// claimed says the queue wrote the claim on the token it is handing over,
+	// so the verb that answered can put it on the claims branch.
+	//
+	// IT IS UNEXPORTED BECAUSE IT IS NOT THE AGENT'S TO READ, the way the
+	// payload's settleOnly is not the caller's to set. The claim is on the token
+	// in the answer, and this says only whether this call is the one that wrote
+	// it, which is the difference between publishing once and publishing on
+	// every pull for ever.
+	claimed bool
 }
 
 // Pull is the whole protocol. One function, because the order of its parts is
@@ -279,12 +291,20 @@ func submit(r Roots, actor string, t Token, p Payload) (Answer, bool) {
 	if f := checkDisposition(r, t, p); f != nil {
 		return refuse(&t, *f), true
 	}
+	// A SUBMISSION SAYS WHAT IT BRINGS. IT DOES NOT SAY WHAT THE NOTE NO LONGER
+	// HOLDS.
+	//
+	// AND THE GATE READS WHAT IT BRINGS. This merge sat after checkEvidence,
+	// which reads the tables on the token, so a first submission whose answers
+	// were in the payload alone was refused naming a blank line, and the
+	// refusal returned before the merge, dropping the answers it carried. The
+	// only way in was to write the note first, and the evidence argument on
+	// the door was decoration. A refusal saves nothing, so a merge that is
+	// then refused leaves the note as it was.
+	t.Submission = keepingWhatWasNotSent(t.Submission, p.Evidence)
 	if f := checkEvidence(r, t, p); f != nil {
 		return refuse(&t, *f), true
 	}
-	// A SUBMISSION SAYS WHAT IT BRINGS. IT DOES NOT SAY WHAT THE NOTE NO LONGER
-	// HOLDS.
-	t.Submission = keepingWhatWasNotSent(t.Submission, p.Evidence)
 
 	// A WORKER CLOSES ITS OWN WORK, and a standard token's verdict is the one
 	// step a second actor takes. Whoever did the work step is written down as
@@ -711,8 +731,20 @@ func firstLines(s string, n int) string {
 // it, with the scope staying held. A parent with open sub-tokens is blocked
 // for everybody, so the general queue hands sub-tokens out before their
 // parents without a rule of its own.
+// Why a scope cannot be left is [[a-scope-cannot-be-left-while-its-tokens-are-open]].
+//
+// WHAT THE FETCHED BRANCH HAS ARCHIVED IS NOT WORK, whatever this tree's copy
+// of the note says. It comes out of the list before any walk, and the answer
+// names it. See pullbehind.go.
 func next(r Roots, actor, role string) Answer {
-	all := urgentFirst(Tokens(r))
+	all, behind, branch := offTheFetchedBranch(r, actor, urgentFirst(Tokens(r)))
+	a := nextAmong(r, actor, role, all)
+	a.Notice += behindNotice(branch, behind)
+	return a
+}
+
+// nextAmong is next over the tokens the fetched branch has not already closed.
+func nextAmong(r Roots, actor, role string, all []Token) Answer {
 	// WHO IS ASKING, AND ON WHICH BOX. Two questions and two answers. Whether
 	// this box may touch the token at all is the box's, and ClaimedHere answers
 	// it. Who is handed it first is the agent's, because a claim is an agent
@@ -873,20 +905,44 @@ func unwritableNotice(said []string) string {
 // caps stay where they are.
 func take(r Roots, actor string, t Token) (Answer, bool) {
 	t.Holder = actor
+	// THE QUEUE CLAIMS WHAT IT HANDS OVER.
+	//
+	// A tracked token is not worked without a claim, and the queue handed one
+	// out carrying none, so the agent's first run or apply on it was refused for
+	// want of a claim on the work it had been handed a moment before. It
+	// happened to two tokens in one session. Claiming it here is one more field
+	// on the save the handout already makes.
+	//
+	// A LOCAL TOKEN TAKES NONE, and one another box has claimed is not taken
+	// from it. Both are the gate's own rules, asked here rather than repeated:
+	// NoClaimHere says this box may not work it, and ClaimedNow says whether
+	// anybody has it.
+	claimed := false
+	if now := time.Now().UTC(); NoClaimHere(r, t, now) != "" && ClaimedNow(r, t, now) == "" {
+		t.ClaimedBy, t.ClaimedAt = Claimant(r, actor), now.Format(ClaimStamp)
+		claimed = true
+	}
 	// HANDING OUT OPENS A STRETCH, with the tree as it stands as its before.
 	t = openStretch(r, t)
 	if err := SaveToken(r, t); err != nil {
 		return Answer{Pull: AnswerWait,
 			Notice: t.ID + ": the record will not take a write: " + err.Error()}, false
 	}
-	return handed(r, actor, t), true
+	a := handed(r, actor, t)
+	a.claimed = claimed
+	return a, true
 }
 
 // handed answers a token the actor holds, with the guidance for it.
+//
+// AND WITH WHAT THIS BOX CANNOT SHOW IT. A travelled token names snapshots
+// taken somewhere else, and the reviewer's own step asks for every hunk of
+// git diff began..ended. That diff answers bad object here and says nothing
+// about why, so the hand-over says it instead. See travelNotice.
 func handed(r Roots, actor string, t Token) Answer {
 	text, says := TheGuidanceFor(r, actor, t.Guidance)
 	return Answer{Pull: AnswerWork, Token: &t,
-		Notice: workNotice(t), Guidance: text, GuidanceAt: says}
+		Notice: workNotice(t) + travelNotice(r, t), Guidance: text, GuidanceAt: says}
 }
 
 // scopeNotice says why nothing was handed out inside a scope the actor holds:

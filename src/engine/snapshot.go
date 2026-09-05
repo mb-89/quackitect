@@ -104,6 +104,50 @@ func Snapshot(r Roots, label string) (string, error) {
 	return hash, nil
 }
 
+// snapshotsNotHere answers the token's snapshots this box does not hold, began
+// and ended together, in the order the token names them.
+func snapshotsNotHere(r Roots, t Token) []string {
+	var gone []string
+	for _, hash := range append(append([]string{}, t.Began...), t.Finished...) {
+		if hash != "" && !anObjectHere(r, hash) {
+			gone = appendOnce(gone, hash)
+		}
+	}
+	return gone
+}
+
+// travelNotice says which of a token's snapshots this box does not hold.
+//
+// THE HASHES TRAVEL AND THE OBJECTS DO NOT. A tracked token carries began and
+// ended in its own text, which git moves with the branch. The snapshots they
+// name are commits under refs/se/steps, and no push carries that ref. So the
+// box that reviews the work is handed a pair of hashes it has never seen.
+//
+// MEASURED, ON wk-1c9dc4ef28. Its third began was 05adfb8a, taken on another
+// box, and git diff answered "fatal: bad object 05adfb8a" here with no remedy.
+// The test door reads theSnapshotToDiff and falls back. A reviewer runs git diff
+// began..ended by hand, off the checklist, and meets the bare git error.
+//
+// SO THE HAND-OVER SAYS IT, ONCE, WHERE THE AGENT IS ALREADY READING. It names
+// the hashes that are not here, why they are not, and what can be read instead.
+// A worker hears the same sentence, because it hits the same wall for the same
+// reason.
+func travelNotice(r Roots, t Token) string {
+	gone := snapshotsNotHere(r, t)
+	if len(gone) == 0 {
+		return "" // every snapshot it names is here, and a notice every time is one nobody reads
+	}
+	said := " Snapshots this token names are no object here: " + strings.Join(gone, ", ") +
+		". They were taken on another box, and refs/se/steps travels with no push, so" +
+		" git diff began..ended answers bad object."
+	if here := theSnapshotToDiff(r, t.Began); here != "HEAD" {
+		return said + " The newest one this box holds is " + here +
+			", so read the change against that and say so where you cite it."
+	}
+	return said + " This box holds none of them, so read the change against HEAD" +
+		" and say so where you cite it."
+}
+
 // EVERY PROCESS SNAPSHOTS INHERENTLY, and none says so. A token taken up or
 // handed out opens a stretch with a snapshot into began; a token put down,
 // closed or dropped ends the stretch with one into ended. The lists run in

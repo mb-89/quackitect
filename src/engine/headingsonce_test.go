@@ -11,7 +11,7 @@ import (
 //
 // The body is read into its sections by heading. The schema keeps the last
 // chapter under a name, so a second chapter under the same heading buries the
-// first and no departure says so. MEASURED on wk-963dbf6898: two approach
+// first and no departure says so. MEASURED on a closed token: two approach
 // sections in different words, one carrying a sentence the other did not, and
 // a reader could not say which the change was written against.
 

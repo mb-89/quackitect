@@ -181,6 +181,7 @@ func ForgetRead(roots Roots, path string) {
 // identities and cannot check one: the harness says who is calling, and the
 // agent does not write that field. What this layer guarantees is that every
 // call carries one and that the record says which.
+// Why is [[every-call-carries-an-identity]].
 func NoteAgent(roots Roots, id, kind, session string) {
 	if id == "" || id == "main" {
 		return

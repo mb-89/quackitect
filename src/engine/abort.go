@@ -65,6 +65,7 @@ func Abort(r Roots, a Aborting) (Token, error) {
 	// A SCOPE IS NOT LEFT WHILE ANYTHING IN IT IS OPEN, and an abort is a way
 	// of leaving. The sub-tokens end first, each with its own reason, or they
 	// are moved out from under this one.
+	// Why is [[a-scope-cannot-be-left-while-its-tokens-are-open]].
 	if open := OpenSubTokens(r, t.ID); len(open) > 0 {
 		return t, fmt.Errorf("%s holds %d open sub-token(s): %s. A scope cannot close while "+
 			"a sub-token is open, so end those first", t.ID, len(open), strings.Join(open, ", "))

@@ -395,11 +395,13 @@ views:
 	}
 }
 
-// A PINNED FUNCTIONAL GROUP IS DRAWN WITH NOTHING IN IT, and an unpinned one
-// hides at zero and comes back when its filter returns a row.
+// A PINNED FUNCTIONAL GROUP IS DRAWN WITH NOTHING IN IT, and so is an unpinned
+// one, because both were declared.
 //
-// Pinning is the person saying they want to see it. One they did not pin is an
-// empty heading they did not ask for.
+// This read the other way, that pinning was the person asking to see it and an
+// unpinned empty heading was noise. The .base file rules the opposite in its
+// opening lines, and the file is where the decision is written down. See
+// TestADeclaredGroupIsDrawnWithNothingInIt.
 func TestAPinnedFunctionalGroupIsDrawnEvenWithNoRows(t *testing.T) {
 	t.Parallel()
 	p := writeBase(t, t.TempDir(), "z.base", `
@@ -459,10 +461,10 @@ func names(gs []Group) []string {
 	return out
 }
 
-// AN UNPINNED FUNCTIONAL GROUP HIDES AT ZERO AND COMES BACK. It has not been
-// asked for, so an empty heading is noise, and the declaration is what brings
-// it back the moment the filter returns a row.
-func TestAnUnpinnedFunctionalGroupHidesAtZeroAndComesBack(t *testing.T) {
+// AN UNPINNED FUNCTIONAL GROUP STANDS AT ZERO, and holds its row when the
+// filter returns one. The declaration is what keeps it there, and a pin only
+// moves it to the top of the drawing.
+func TestAnUnpinnedFunctionalGroupStandsAtZero(t *testing.T) {
 	t.Parallel()
 	p := writeBase(t, t.TempDir(), "z.base", `
 views:
@@ -491,21 +493,21 @@ views:
 		return names(tab.Pinned), names(tab.Groups)
 	}
 
-	// Nothing at all. The pinned one is there, the unpinned one is not.
+	// Nothing at all. Both declared groups are drawn, one pinned, one not.
 	pinned, groups := draw()
 	if len(pinned) != 1 || pinned[0] != "yours" {
 		t.Fatalf("the pinned groups are %v", pinned)
 	}
-	if len(groups) != 0 {
-		t.Fatalf("an unpinned functional group drew at zero: %v", groups)
+	if !slices.Contains(groups, "mine") {
+		t.Fatalf("an unpinned declared group went at zero: %v", groups)
 	}
 
-	// One row for it, and it is back. THE GROUPING DRAWS THAT ROW AS WELL,
-	// because a query takes nothing away, so this asks whether mine is among
-	// the groups rather than whether it is the only one.
+	// One row for it, and it holds the row. THE GROUPING DRAWS THAT ROW AS
+	// WELL, because a query takes nothing away, so this asks whether mine is
+	// among the groups rather than whether it is the only one.
 	pinned, groups = draw(row("id", "1", "assignee", "main", "title", "a"))
 	if !slices.Contains(groups, "mine") {
-		t.Fatalf("it did not come back: %v", groups)
+		t.Fatalf("it did not hold the row: %v", groups)
 	}
 	if len(pinned) != 1 || pinned[0] != "yours" {
 		t.Fatalf("the pinned groups are %v", pinned)

@@ -647,9 +647,11 @@ func Render(b Base, v View, rows []expr.Row) (Table, error) {
 			pinned[p.Name] = g
 			continue
 		}
-		if len(mine) == 0 {
-			continue
-		}
+		// A DECLARED GROUP IS DRAWN WITH NOTHING IN IT, which the .base file
+		// rules in its opening lines. Only the pinned ones survived at zero, so
+		// a heading vanished the moment its last row left, which is when a
+		// person most wants somewhere to drop onto. What a declaration names
+		// goes on existing whether or not a row is in that state today.
 		declared = append(declared, g)
 	}
 

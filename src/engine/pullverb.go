@@ -91,6 +91,17 @@ func runPull(c *call) int {
 	if a.Token != nil {
 		id = a.Token.ID
 	}
+	// A CLAIM OTHER BOXES CANNOT SEE IS HALF A CLAIM. The queue writes it on the
+	// token as it hands the work over, and this is where it reaches the branch,
+	// on the call's own context. It runs only where this call wrote the claim,
+	// so a pull that hands back something already claimed pushes nothing.
+	if a.claimed && a.Token != nil {
+		put := Publish(c.ctx, roots, []string{noteAt(roots, a.Token.ID)},
+			ClaimMessage(a.Token.ClaimedBy, "claimed", []string{a.Token.ID}))
+		if !put.Pushed {
+			a.Notice += "\n\n" + a.Token.ID + " is claimed here, and " + put.Says
+		}
+	}
 	ok := Yes()
 	if a.Pull == AnswerRefused {
 		ok = No()
