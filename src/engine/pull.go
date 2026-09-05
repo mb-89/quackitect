@@ -685,6 +685,26 @@ func next(r Roots, actor, role string) Answer {
 			scopes = append(scopes, all[i])
 			continue
 		}
+		// AND THE SAME GATE AS EVERYTHING ELSE. This path answered handed on the
+		// strength of the hold alone, so it never asked whether the token was an
+		// agent's to be given. A token carrying needs_human was released and the
+		// claim handed it straight back inside a minute, because the claim asks
+		// the queue and the queue read it as work already in hand.
+		//
+		// IT IS SET BACK RATHER THAN PASSED OVER. A token waiting on a person and
+		// sitting in a hand is stuck where nobody looks: the queue will not offer
+		// it and the holder cannot close it.
+		//
+		// BLOCKED IS NOT ASKED HERE, and that is deliberate. A parent with open
+		// sub-tokens is blocked for everybody, which is how the branch above
+		// recognises a scope, so asking it here would set every scope back.
+		if why := WaitsForAPerson(all[i]); why != "" {
+			// THE HOLD COMES OFF AND THE TOKEN STAYS OPEN, so a person can
+			// still close it. This branch says nothing to the agent, because
+			// this copy of the queue has nowhere yet to say it.
+			_, _ = PutDown(r, all[i].ID, actor)
+			continue
+		}
 		return handed(r, actor, all[i])
 	}
 
