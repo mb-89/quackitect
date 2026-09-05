@@ -49,10 +49,11 @@ func TestATokensProseNamesNoHolder(t *testing.T) {
 		// AND FOUR MORE THAT STOOD AGAINST THE TREE AFTER THE FIRST NARROWING,
 		// which is five findings and no hold among them. Each is a sentence
 		// about something that is not a token, or about where a thing lives.
-		"a class held rather than an instance": "the shell door is covered by three commands, so the class is held rather than the instance",
-		"a fixture in somebody's test":         "a test with two tokens held by other actors and one held by the caller",
-		"a policy, quoted from a commit title": "a cloud box is held until its notes are in git",
-		"where a ruling lives, not who has it": "name displayrefusal_test.go as where it is held, so the two cannot drift",
+		"a class held rather than an instance":        "the shell door is covered by three commands, so the class is held rather than the instance",
+		"a fixture in somebody's test":                "a test with two tokens held by other actors and one held by the caller",
+		"a policy, quoted from a commit title":        "a cloud box is held until its notes are in git",
+		"where a ruling lives, not who has it":        "name displayrefusal_test.go as where it is held, so the two cannot drift",
+		"two halves of a rule, and no hold in either": "So the ordering half is held and this half is held by nothing.",
 	}
 	cleanIDs := map[string]string{}
 	for what, detail := range clean {
