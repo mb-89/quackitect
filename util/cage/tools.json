@@ -293,7 +293,7 @@
       "name": "se_pull"
     },
     {
-      "description": "What the engine knows: the two roots, the log it is writing, and the rules in force.",
+      "description": "What the engine knows: the two roots, the log it is writing, and the rules in force. It also answers the state of play: what is open, what is held, and what this session returned with how much of it was wrong.",
       "inputSchema": {
         "properties": {},
         "type": "object"

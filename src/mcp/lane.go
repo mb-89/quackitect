@@ -93,8 +93,15 @@ var theLane = []laneTool{
 		takes: pullArgs{},
 	},
 	{
-		name:  "se_status",
-		says:  "What the engine knows: the two roots, the log it is writing, and the rules in force.",
+		name: "se_status",
+		// A DESCRIPTION NAMING THREE THINGS IS READ FOR THOSE THREE. This tool
+		// grew the state of play, which carries what the engine returned this
+		// session and how much of it was wrong, and went on saying it answered
+		// the roots, the log and the rules. So the numbers arrived and nobody
+		// came for them.
+		says: "What the engine knows: the two roots, the log it is writing, and " +
+			"the rules in force. It also answers the state of play: what is open, " +
+			"what is held, and what this session returned with how much of it was wrong.",
 		takes: statusArgs{},
 	},
 	{
