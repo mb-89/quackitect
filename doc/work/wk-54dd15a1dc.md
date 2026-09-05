@@ -9,6 +9,11 @@ guidance: [[work-token]]
 title: archive list keeps tags
 # where the token stands. The process owns these values.
 status: open
+claimed_by: aeaf7bd9/worker-part
+claimed_at: "2026-09-05T15:53:24Z"
+# the tree each time the work was taken up, snapshots the engine wrote
+began:
+  - 24f3926f46c64ff7b85ce89141f918a13dd9526c
 ---
 
 ## detail
@@ -34,9 +39,9 @@ git rev-parse refs/tags/archive/wk-0086ed9e9b:wk-0086ed9e9b.md answers 024ca2283
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the ask is small enough to review whole, or it is split first | — |  |
-| [ ] | every done-when line is decidable, and names the command where one decides it |  |  |
-| [ ] | the basics it stands on exist, or are minted first | — |  |
+| [x] | the ask is small enough to review whole, or it is split first | A sweep, the list it wrote, and one check. What the fold does not buy is [[wk-0a418a53ac]]. | one check, one list |
+| [x] | every done-when line is decidable, and names the command where one decides it | Both are, and both were run. The first is read off the list with jq. The second is the check itself, run over a copy of the branch and over this tree. | `jq -s '[.[]\|select((.blob//"")=="" and (.on_branch//"")=="")]\|length'`, and `node util/checks/archive-rows-name-an-object.mjs .` |
+| [x] | the basics it stands on exist, or are minted first | The fold was already in writeArchiveRows and this box holds the tags it needs, 77 of them. Nothing had to be minted to run it. | `se archive --sweep` |
 
 ## evidence: step 2. do
 
@@ -44,9 +49,9 @@ git rev-parse refs/tags/archive/wk-0086ed9e9b:wk-0086ed9e9b.md answers 024ca2283
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the guidance this token names was read and applied | — |  |
-| [ ] | one test was written first and seen red for the reason expected |  |  |
-| [ ] | the same test was seen green after the change, and named |  |  |
-| [ ] | the change is git diff began..ended, the two hashes the engine wrote on this token | — |  |
-| [ ] | the cleanup the change revealed is in the change, or is a token of its own | — |  |
+| [x] | the guidance this token names was read and applied | Rule 2, a criterion that cannot fail. This one can, and still passes over rows a clone cannot read. | work-token |
+| [x] | one test was written first and seen red for the reason expected | archive-rows-name-an-object, over a copy of the branch head before the sweep: `66 row(s) read. 66 failed`, each naming only its tag. | exit 1 |
+| [x] | the same test was seen green after the change, and named | The same check over the swept list: `78 row(s) read. 0 failed`. checks-live-in-the-method passes, which says the battery names it. | exit 0 |
+| [x] | the change is git diff began..ended, the two hashes the engine wrote on this token | The swept list, the check, its name in the battery. | `git diff --stat` |
+| [x] | the cleanup the change revealed is in the change, or is a token of its own | Its own, [[wk-0a418a53ac]]: a --no-tags clone cannot read the folded blobs, eight of eight tried. | `git cat-file -e` |
 
