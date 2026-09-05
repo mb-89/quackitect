@@ -427,7 +427,19 @@ start "se lint" .bin/se.exe lint
 # holding five of the twelve and it answered all ok, exit 0, having said nothing
 # about the seven it did not run. Any sweep, or any accidental deletion, shrinks
 # the battery in silence while every submission goes on citing a green run.
-for c in render-check drive-editor drawn-classes-have-rules panel-draws-the-register adapter-decides-no-column engine-args engine-args-lifecycle engine-spawns liveness one-look panel-icons no-loose-glyphs no-loose-spawns no-lone-escape checks-live-in-the-method engine-spawns-catches panel-is-handed-the-state panel-says-holding drive-panel burndown burndown-derives-nothing tests-name-no-token tests-are-not-hotspots mcp-tools lane-answers-cold the-cards-reach-their-box the-travelling-cage-cannot-block scripts-are-lf build-reports-every-error binaries-live-in-bin private-files-have-writers no-private-links refusals-name-a-door a-refusal-names-a-legal-move engine-stops-by-pid windows-say-they-are-here projections-carry-chapters archive-rows-name-an-object notes-say-each-heading-once; do
+#
+# THE BRANCH HEAD LEADS THE LIST, BECAUSE EVERY OTHER LANE JUDGES THIS DISK.
+# go vet and go test compile the folder this runs in, where a file written and
+# not yet committed is present, so a change half committed reads green here and
+# breaks the branch for everyone who clones it. It happened twice in one day on
+# v4, at 559fc4a6 and d84810eb, and neither could be seen from the working tree
+# that made it. the-branch-head-builds reads the head into a folder of its own
+# and builds there, so what is judged is what git carries. It was in this list
+# at e3576f0f and went out of it at c193ad19, which is how it came back.
+#
+# It is first because it is a lane of its own length, and the run is as long as
+# its longest lane.
+for c in the-branch-head-builds render-check drive-editor drawn-classes-have-rules panel-draws-the-register adapter-decides-no-column engine-args engine-args-lifecycle engine-spawns liveness one-look panel-icons no-loose-glyphs no-loose-spawns no-lone-escape checks-live-in-the-method engine-spawns-catches panel-is-handed-the-state panel-says-holding drive-panel burndown burndown-derives-nothing tests-name-no-token tests-are-not-hotspots mcp-tools lane-answers-cold the-cards-reach-their-box the-travelling-cage-cannot-block scripts-are-lf build-reports-every-error binaries-live-in-bin private-files-have-writers no-private-links refusals-name-a-door a-refusal-names-a-legal-move engine-stops-by-pid windows-say-they-are-here projections-carry-chapters archive-rows-name-an-object notes-say-each-heading-once deleted-notes-have-a-row; do
   if [ -f "util/checks/$c.mjs" ]; then
     start "$c" node "util/checks/$c.mjs" "$root"
   else
