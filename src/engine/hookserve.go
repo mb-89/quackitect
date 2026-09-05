@@ -78,16 +78,28 @@ func hooksPort(r Roots) int {
 // A canonical form that reads the disk would also fail before the folder is
 // made, which is exactly when the cage needs the number.
 //
-// CASE IS FOLDED ONLY FOR A WINDOWS PATH, which a colon in the second place
-// tells. A POSIX path is left alone, because two folders there really can
-// differ by case alone.
+// THE WINDOWS SPELLINGS ARE FOLDED ONLY FOR A WINDOWS PATH, which a colon in
+// the second place tells. A POSIX path is left alone, because two folders there
+// really can differ by case alone, AND BY A BACKSLASH: it is an ordinary
+// character in a POSIX name, so /home/u/a\b and /home/u/a/b are two folders and
+// the fold made them one. Two real trees then answer one door, the second engine
+// cannot bind it, and every guard over that tree is absent with nothing saying
+// so, which is the class this function exists to shut.
+//
+// ONE TEST DECIDES BOTH FOLDS, so a path that is Windows for the case is Windows
+// for the separator too, and neither can be taught a rule the other has not.
+// Roots.Work comes through filepath.Abs, whose Clean already folds the
+// separators of the platform it runs on, so the fold buys nothing on POSIX.
 func theSameFolderEveryTime(path string) string {
-	path = strings.ReplaceAll(path, `\`, "/")
+	windows := len(path) >= 2 && path[1] == ':'
+	if windows {
+		path = strings.ReplaceAll(path, `\`, "/")
+	}
 	for strings.Contains(path, "//") {
 		path = strings.ReplaceAll(path, "//", "/")
 	}
 	path = strings.TrimRight(path, "/")
-	if len(path) >= 2 && path[1] == ':' {
+	if windows {
 		path = strings.ToLower(path)
 	}
 	return path

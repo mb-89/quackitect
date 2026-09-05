@@ -9,6 +9,11 @@ guidance: [[work-token]]
 title: backslash merges two folders
 # where the token stands. The process owns these values.
 status: open
+claimed_by: aeaf7bd9/worker-nono
+claimed_at: "2026-09-05T14:22:33Z"
+# the tree each time the work was taken up, snapshots the engine wrote
+began:
+  - 81be7157600206fd3f5ed0085d45fb4ee657c587
 ---
 
 ## detail
@@ -34,9 +39,9 @@ Gate the backslash fold the way the case fold is gated. Fold backslashes only wh
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the ask is small enough to review whole, or it is split first | — |  |
-| [ ] | every done-when line is decidable, and names the command where one decides it |  |  |
-| [ ] | the basics it stands on exist, or are minted first | — |  |
+| [x] | the ask is small enough to review whole, or it is split first | One gate in one function, and the row in the table that decides it. | |
+| [x] | every done-when line is decidable, and names the command where one decides it | Both by TestOneFolderAnswersOneDoor. The new row asserts that /home/u/a\b and /home/u/a/b answer two ports. The four rows above assert the Windows spellings still answer one. | |
+| [x] | the basics it stands on exist, or are minted first | Both stand: the case fold already reads the colon test, and hooksPort already hashes what this function answers. Nothing was minted. | |
 
 ## evidence: step 2. do
 
@@ -44,8 +49,9 @@ Gate the backslash fold the way the case fold is gated. Fold backslashes only wh
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the guidance this token names was read and applied | — |  |
-| [ ] | one test was written first and seen red for the reason expected |  |  |
-| [ ] | the same test was seen green after the change, and named |  |  |
-| [ ] | the change is git diff began..ended, the two hashes the engine wrote on this token | — |  |
-| [ ] | the cleanup the change revealed is in the change, or is a token of its own | — |  |
+| [x] | the guidance this token names was read and applied | Rule 12, red first. Rule 11: this gate, and nothing beside it. | |
+| [x] | one test was written first and seen red for the reason expected | Red on HEAD before the gate: the two POSIX spellings both answered port 31716, so two folders had one door. | |
+| [x] | the same test was seen green after the change, and named | TestOneFolderAnswersOneDoor, with TestAStartLeavesTheSettingsAsTheyWere and TestTheCageSendsCallsToTheDoorAndWakesTheEngine. The shared tree will not compile while other hands are mid-change, so the three ran in a worktree off HEAD carrying this token's files. | |
+| [x] | the change is git diff began..ended, the two hashes the engine wrote on this token | began 81be7157600206fd3f5ed0085d45fb4ee657c587, ended on submission. | |
+| [x] | the cleanup the change revealed is in the change, or is a token of its own | Nothing left over. Worth saying: this token was archived done at 10:35 today with the gate not in the tree, so that close outlived the change it stood for. | |
+
