@@ -122,8 +122,19 @@ func listenModel(r Roots) (net.Listener, string, error) {
 	return ln, p, nil
 }
 
-// serveModel answers questions until the listener closes.
-func serveModel(ln net.Listener, m *model) {
+// serveModel answers questions until its context ends or the listener closes.
+//
+// THE CONTEXT IS THE FIRST PARAMETER, so a reader of this function learns what
+// stops it here rather than by finding the caller. It was stopped from
+// startIndexer, which closed the listener for it, and the signature said
+// nothing about that.
+//
+// A CANCEL CLOSES THE THING THE LOOP WAITS ON. Accept blocks until a client
+// arrives, so a cancel that only set a flag would be felt on the next
+// connection and not before, which on a quiet socket is never.
+func serveModel(ctx context.Context, ln net.Listener, m *model) {
+	stop := context.AfterFunc(ctx, func() { _ = ln.Close() })
+	defer stop()
 	for {
 		conn, err := ln.Accept()
 		if err != nil {

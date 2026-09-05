@@ -20,7 +20,7 @@ func TestACancelledContextEndsASync(t *testing.T) {
 	t.Parallel()
 	r := Roots{Method: t.TempDir(), Work: t.TempDir()}
 	fed := aFedGit(t)
-	ctx, cancel := context.WithCancel(context.Background())
+	ctx, cancel := context.WithCancel(t.Context())
 	cancel()
 
 	got := SyncClaims(ctx, r)
@@ -39,7 +39,7 @@ func TestALiveContextStillReachesGit(t *testing.T) {
 	r := Roots{Method: t.TempDir(), Work: t.TempDir()}
 	fed := aFedGit(t)
 	fed.says["rev-parse"] = ""
-	SyncClaims(context.Background(), r)
+	SyncClaims(t.Context(), r)
 	if len(fed.ran) == 0 {
 		t.Error("a live context reached no git call at all, so this proves nothing")
 	}

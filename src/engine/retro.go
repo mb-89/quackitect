@@ -235,7 +235,7 @@ type Transcript struct {
 }
 
 // Retro collects and drains, and answers what it took.
-func Retro(r Roots, actor string, transcripts []Transcript) (Collected, error) {
+func Retro(ctx context.Context, r Roots, actor string, transcripts []Transcript) (Collected, error) {
 	var got Collected
 	var manifest []manifestLine
 	if busy := WhoIsStillWorking(r, actor); len(busy) > 0 {
@@ -248,7 +248,7 @@ func Retro(r Roots, actor string, transcripts []Transcript) (Collected, error) {
 	// soft, so the worst it can do is say what this box could not put right.
 	// A retro is where the tidying belongs because it is the cycle boundary,
 	// and one verb called from here beats a list somebody has to remember.
-	got.Tidy = Tidy(context.Background(), r)
+	got.Tidy = Tidy(ctx, r)
 
 	// THE LOG IS ROTATED FIRST, so the session that is running becomes an old
 	// file and this retro sees it rather than the next one.
