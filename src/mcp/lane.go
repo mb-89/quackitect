@@ -305,6 +305,17 @@ func mintWork(r roots, a workArgs) string {
 	if a.On != "" {
 		return engineCall(r, []string{"work", "--on", a.On, "--by", orMain(a.Actor)}, nil)
 	}
+	return engineCall(r, workArgv(a), nil)
+}
+
+// workArgv is the verb call se_work makes.
+//
+// IT IS ITS OWN FUNCTION SO A TEST CAN READ THE CALL, the shape claimArgv has
+// and for the same reason. A door that offers a field while the call behind it
+// drops it is the half with no output of its own, and needs_human is the field
+// where that costs a person: the refusal over a box full of notes singles it
+// out as the answer for a note nobody here can decide.
+func workArgv(a workArgs) []string {
 	// EVERY FLAG HERE IS ONE se work DEFINES.
 	//
 	// MEASURED, AND IT MEANT NOTHING COULD MINT THROUGH THIS DOOR. It sent
@@ -345,7 +356,7 @@ func mintWork(r roots, a workArgs) string {
 	for _, says := range saidOnly(a.DoneWhen) {
 		argv = append(argv, "--done-when", says)
 	}
-	return engineCall(r, argv, nil)
+	return argv
 }
 
 // testTheDelta hands the engine a token's delta and a proposal, as the verb.
