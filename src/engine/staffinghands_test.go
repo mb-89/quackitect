@@ -16,6 +16,7 @@ import (
 // it is gone, which is what happens to one that is killed.
 func TestAHandThatWentHomeIsNotAHand(t *testing.T) {
 	r := aTreeWithTheProcesses(t)
+	noEngineHere(t, r)
 	log, err := OpenLog(r.Private("log"))
 	if err != nil {
 		t.Fatal(err)

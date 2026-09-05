@@ -20,6 +20,7 @@ import (
 func TestTheCageHasNoStateWithNoLegalMove(t *testing.T) {
 	t.Parallel()
 	r := aTreeWithTheProcesses(t)
+	noEngineHere(t, r)
 	theParametersSay(t, r, "limits.parallel_agents", 2)
 	cfg := LoadConfig(r)
 	for i := 0; i < 3; i++ {

@@ -240,6 +240,7 @@ func TestAnEndingIsRefusedOnAStepThatDoesNotEnd(t *testing.T) {
 func TestTheQueueIsStaffed(t *testing.T) {
 	t.Parallel()
 	r := aTreeWithTheProcesses(t)
+	noEngineHere(t, r)
 	log, err := OpenLog(r.Private("log"))
 	if err != nil {
 		t.Fatal(err)
