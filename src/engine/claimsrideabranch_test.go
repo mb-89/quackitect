@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 )
 
 // A REAL GIT AND A REAL REMOTE, because what is under test is which ref name a
@@ -57,8 +58,13 @@ func aClaimNote(t *testing.T, r Roots, id, by string) string {
 	if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
 		t.Fatal(err)
 	}
+	// THE STAMP IS LIVE, because a claim older than limits.claim_hours is one
+	// the engine drops on the next write. A fixture stamped at a fixed hour
+	// was a live claim for three hours of the day it was written and a lapsed
+	// one for the other twenty-one, so a test asking what the ref carries read
+	// the clock rather than the code.
 	body := "---\nkind: [[work-token]]\ntitle: " + id + "\nstatus: open\nclaimed_by: " + by +
-		"\nclaimed_at: \"2026-09-05T00:00:00Z\"\n---\n\n## detail\n\na claim.\n"
+		"\nclaimed_at: \"" + time.Now().UTC().Format(ClaimStamp) + "\"\n---\n\n## detail\n\na claim.\n"
 	if err := os.WriteFile(at, []byte(body), 0o644); err != nil {
 		t.Fatal(err)
 	}
