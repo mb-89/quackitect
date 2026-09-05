@@ -161,9 +161,7 @@ func TestTheDelta(r Roots, db *sql.DB, on string, proposed []string, run bool, a
 		if err != nil {
 			return out, err
 		}
-		if n := len(t.Began); n > 0 {
-			since = t.Began[n-1]
-		}
+		since = theSnapshotToDiff(r, t.Began)
 	}
 	out.Since = since
 	delta, err := deltaSince(r, db, since)
@@ -486,6 +484,33 @@ func spanOf(ch change) string {
 // A repository with no commit yet has every file untracked, which the
 // second list answers; a folder that is not a repository at all is read off
 // the index, every file whole.
+// theSnapshotToDiff answers the newest take-up this clone can diff against.
+//
+// A began hash is a commit under refs/se/steps, and no push carries those, so
+// a token taken up on one box and worked on another names a snapshot this
+// clone never had. The newest one it does hold is read instead, and HEAD is
+// the floor. What it answers is what Tested.Since carries, because a reader
+// who is not told which snapshot was used cannot tell a narrow delta from a
+// stale one.
+func theSnapshotToDiff(r Roots, began []string) string {
+	for i := len(began) - 1; i >= 0; i-- {
+		if anObjectHere(r, began[i]) {
+			return began[i]
+		}
+	}
+	return "HEAD"
+}
+
+// anObjectHere says whether this clone holds that commit.
+func anObjectHere(r Roots, hash string) bool {
+	if hash == "" {
+		return false
+	}
+	cmd := quiet.Quietly(exec.Command("git", "cat-file", "-e", hash+"^{commit}"))
+	cmd.Dir = r.Work
+	return cmd.Run() == nil
+}
+
 func deltaSince(r Roots, db *sql.DB, since string) ([]change, error) {
 	git := func(args ...string) (string, error) {
 		cmd := quiet.Quietly(exec.Command("git", args...))
@@ -507,8 +532,13 @@ func deltaSince(r Roots, db *sql.DB, since string) ([]change, error) {
 	diff, err := git("diff", "-U0", "--no-color", "--no-ext-diff", since, "--", ".")
 	if err != nil {
 		said := err.Error()
+		// A HASH THIS CLONE NEVER HAD IS THE SAME ANSWER IN A FIFTH WORDING. A
+		// began snapshot lives under refs/se/steps, which no push carries, so a
+		// token taken up on one box and worked on another names a commit that
+		// git here calls a bad object.
 		if strings.Contains(said, "Could not access") || strings.Contains(said, "bad revision") ||
-			strings.Contains(said, "unknown revision") || strings.Contains(said, "ambiguous argument") {
+			strings.Contains(said, "unknown revision") || strings.Contains(said, "ambiguous argument") ||
+			strings.Contains(said, "bad object") {
 			diff = "" // no history to diff against, and the untracked list below is the tree
 		} else {
 			return nil, err
