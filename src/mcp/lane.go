@@ -142,6 +142,7 @@ func laneTools() []map[string]any {
 // testArgs is what se_test takes.
 type testArgs struct {
 	On      string   `json:"on"`
+	Actor   string   `json:"actor"`
 	Propose []string `json:"propose" says:"tests by name, or patterns"`
 	Plan    bool     `json:"plan" says:"say what would run, run nothing"`
 }
@@ -156,6 +157,10 @@ type claimArgs struct {
 	Release bool     `json:"release" says:"give back what you hold"`
 	List    bool     `json:"list"`
 	Whoami  bool     `json:"whoami"`
+	Sync    bool     `json:"sync" says:"look for other boxes' claims now, rather than waiting for the engine's clock"`
+	// NoPublish writes the claim here and leaves git alone, which is what an
+	// offline box wants and what a test that must not push needs.
+	NoPublish bool `json:"no_publish" says:"write the claim here and leave git alone"`
 }
 
 // findArgs is what se_find takes, and it is the question the engine is asked,
@@ -165,6 +170,10 @@ type findArgs struct {
 	Regex string `json:"regex,omitempty"`
 	Path  string `json:"path,omitempty"`
 	Limit int    `json:"limit,omitempty"`
+	// Archive searches what has been archived rather than the tree. The
+	// archive is not in the index, so this goes to the verb rather than to
+	// the running model's index.
+	Archive bool `json:"archive,omitempty" says:"search what has been archived rather than the tree"`
 }
 
 // askArgs is what se_ask takes.
@@ -255,6 +264,7 @@ type stopArgs struct {
 	Because string `json:"because"`
 	Why     string `json:"why"`
 	Actor   string `json:"actor"`
+	List    bool   `json:"list" says:"print what is sanctioned, and claim nothing"`
 }
 
 // pullArgs is what se_pull takes: the payload the engine reads, and the two
@@ -368,6 +378,9 @@ func testTheDelta(r roots, a testArgs) string {
 	for _, p := range saidOnly(a.Propose) {
 		argv = append(argv, "--propose", p)
 	}
+	if a.Actor != "" {
+		argv = append(argv, "--by", a.Actor)
+	}
 	if a.Plan {
 		argv = append(argv, "--plan")
 	}
@@ -381,6 +394,24 @@ func findInTree(r roots, a findArgs) string {
 	}
 	if a.Limit < 0 {
 		a.Limit = 0
+	}
+	// THE ARCHIVE IS NOT IN THE INDEX, so that search is the verb's and not the
+	// model's. The flags are the verb's own, which mcp-tools.mjs drives.
+	if a.Archive {
+		argv := []string{"find", "--archive"}
+		if a.Words != "" {
+			argv = append(argv, "--words", a.Words)
+		}
+		if a.Regex != "" {
+			argv = append(argv, "--regex", a.Regex)
+		}
+		if a.Path != "" {
+			argv = append(argv, "--path", a.Path)
+		}
+		if a.Limit > 0 {
+			argv = append(argv, "--limit", strconv.Itoa(a.Limit))
+		}
+		return engineCall(r, argv, nil)
 	}
 	raw, err := askModel(r, "find", a)
 	if err != nil {
@@ -414,7 +445,7 @@ func askIndex(r roots, a askArgs) string {
 }
 
 func stopClaim(r roots, a stopArgs) string {
-	if a.Because == "" {
+	if a.List || a.Because == "" {
 		return engineCall(r, []string{"stop", "--list"}, nil)
 	}
 	return engineCall(r, []string{"stop", "--actor", orMain(a.Actor),
@@ -444,6 +475,9 @@ type verbCall struct {
 	Verb  string   `json:"verb"`
 	Args  []string `json:"args"`
 	Stdin string   `json:"stdin"`
+	// Door names this client, so the engine can answer a lane and a shell
+	// differently where the two want different answers.
+	Door string `json:"door"`
 }
 
 // engineCall runs a subcommand with an optional payload on standard input. A
@@ -459,7 +493,7 @@ func engineCall(r roots, args []string, stdin []byte) string {
 	// wrote. Nothing is started for a call. With no engine over the folder
 	// the answer says so, and how to start one.
 	raw, err := askModelWithin(r, "verb",
-		verbCall{Verb: args[0], Args: args[1:], Stdin: string(stdin)}, 6*time.Minute)
+		verbCall{Verb: args[0], Args: args[1:], Stdin: string(stdin), Door: "lane"}, 6*time.Minute)
 	if err != nil {
 		return fail(err.Error())
 	}
@@ -554,6 +588,12 @@ func claimWork(r roots, a claimArgs) string {
 // lane that cannot spell that sends the reader to a door it does not have.
 func claimArgv(a claimArgs) (argv []string, refusal string) {
 	argv = []string{"claim", "--actor", orMain(a.Actor)}
+	if a.Sync {
+		argv = append(argv, "--sync")
+	}
+	if a.NoPublish {
+		argv = append(argv, "--no-publish")
+	}
 	if a.Whoami {
 		return append(argv, "--whoami"), ""
 	}

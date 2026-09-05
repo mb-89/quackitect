@@ -84,7 +84,7 @@ func TestALongTestAnswersWhereItLands(t *testing.T) {
 	was := theTestBudget
 	theTestBudget = 20 * time.Millisecond
 	t.Cleanup(func() { theTestBudget = was })
-	got, err := TestTheDelta(r, db, "", []string{"TestA"}, true, "worker-one")
+	got, err := TestTheDelta(t.Context(), r, db, "", []string{"TestA"}, true, "worker-one")
 	if err != nil {
 		t.Fatal(err)
 	}

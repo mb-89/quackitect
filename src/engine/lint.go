@@ -421,10 +421,17 @@ func namesSomebody(w string) bool {
 	}
 	// "other" AND "others" NAME NOBODY, the way "agents" and "actors" do. A
 	// test holding tokens held by other actors is describing its fixture.
+	//
+	// AND "nothing" IS THE ABSENCE OF A HOLDER RATHER THAN ONE. A note wrote
+	// "the ordering half is held and this half is held by nothing", which says
+	// of a rule that nobody has half of it. It is the same sentence as "held by
+	// nobody" and "held by no one", both of which this already reads as prose,
+	// and the third spelling was the one missing. Nothing about it goes stale
+	// when the session ends, because it never named a session's holder.
 	switch w {
 	case "a", "an", "the", "that", "this", "any", "some", "no", "another",
 		"agents", "agent", "actors", "actor", "somebody", "anybody", "nobody",
-		"other", "others", "whoever", "them", "it", "one":
+		"nothing", "other", "others", "whoever", "them", "it", "one":
 		return false
 	}
 	return true

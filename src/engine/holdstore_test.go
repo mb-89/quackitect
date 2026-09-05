@@ -4,9 +4,10 @@ import (
 	"os"
 	"path/filepath"
 	"quackitect/engine/internal/frontmatter"
-	"reflect"
 	"strings"
 	"testing"
+
+	"github.com/google/go-cmp/cmp"
 )
 
 // THE HOLD IS ENGINE STATE, NOT TOKEN CONTENT.
@@ -63,8 +64,8 @@ func TestTakeUpAndPutDownWriteNoHolderIntoTheFile(t *testing.T) {
 	if v, ok := upFront["holder"]; ok {
 		t.Fatalf("take-up wrote holder %v into the token file; the hold is the engine's", v)
 	}
-	if !reflect.DeepEqual(exceptTheStretch(upFront), exceptTheStretch(wasFront)) || upBody != wasBody {
-		t.Fatalf("take-up changed the file beyond began and ended:\n%v\nwas\n%v", upFront, wasFront)
+	if d := cmp.Diff(exceptTheStretch(wasFront), exceptTheStretch(upFront)) + cmp.Diff(wasBody, upBody); d != "" {
+		t.Fatalf("take-up changed the file beyond began and ended (-was +now):\n%s", d)
 	}
 
 	if _, err := PutDown(r, tok.ID, "worker-1"); err != nil {
@@ -74,8 +75,8 @@ func TestTakeUpAndPutDownWriteNoHolderIntoTheFile(t *testing.T) {
 	if v, ok := downFront["holder"]; ok {
 		t.Fatalf("put-down wrote holder %v into the token file", v)
 	}
-	if !reflect.DeepEqual(exceptTheStretch(downFront), exceptTheStretch(wasFront)) || downBody != wasBody {
-		t.Fatalf("put-down changed the file beyond began and ended:\n%v\nwas\n%v", downFront, wasFront)
+	if d := cmp.Diff(exceptTheStretch(wasFront), exceptTheStretch(downFront)) + cmp.Diff(wasBody, downBody); d != "" {
+		t.Fatalf("put-down changed the file beyond began and ended (-was +now):\n%s", d)
 	}
 }
 

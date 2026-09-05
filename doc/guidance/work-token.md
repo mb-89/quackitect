@@ -22,9 +22,9 @@ How a test is built is [[testing]].
 
 ## Writing one
 
-1. Write the problem in detail and the answer in proposed action, reduced to the smallest case that still shows it. *
+1. Write the problem in detail and the answer in proposed action, reduced to the smallest case that still shows it. The detail answers what is gained by doing it, and what breaks if it is never done. *
 2. Write acceptance criteria first. A criterion is decidable, names the input, the answer and what survives, and is not a plan. *
-3. Where a command decides a criterion, write the command and run it from the root before submitting. Otherwise name who looks at what. *
+3. Where a command decides a criterion, write the command and run it from the root before submitting. Otherwise name who looks at what. A criterion naming a go test names it through se test and reads unreached, because go test -run over a missing name answers ok. *
 4. Match on what the check holds at run time: a whole identifier written once into both halves, or a length as a number. *
 5. Number what the detail says the change does and put a criterion against each. Work that moves off takes its criteria with it. *
 6. A detail names the constraint, never the assignment. A criterion answering with a verb states the effect as field and value.
@@ -36,7 +36,7 @@ How a test is built is [[testing]].
 ## Using one
 
 11. Do what the token asks and nothing next to it. If the ask is ambiguous, ask one question and wait. *
-12. Write each criterion's check before the work and watch that one go red. A check that will not go red is the finding. *
+12. Write each criterion's check first and watch it redden on an assertion, never on a build failure. One that cannot redden is the finding. *
 13. Put both halves of a mechanism in the evidence. Where the system mirrors halves, table them and drive the rule through each. *
 14. Report work as done only with the evidence that it is. An observation names the check and what it said. *
 15. A checklist carries institutional knowledge. Answer each line rather than ticking it. *
@@ -52,6 +52,11 @@ Write the smallest case that still shows the problem.
 A detail says what has to become true and names the constraint.
 Where the write goes is the worker's decision.
 Before a detail names a file and a line, run the tree's checks against it on a copy.
+
+A tracked token spends real work, so the ask answers why the work is worth it.
+What is gained by doing it, and what breaks if it is never done.
+Both fail the same way, by restating the ask, so each carries evidence beside it.
+The note process has asked this from the beginning, and the tracked ask asks it now.
 
 ## 2. A criterion that cannot fail
 
@@ -74,6 +79,25 @@ Two criteria once carried identical commands, so whatever made the first green m
 Pull the commands and their run patterns out of a draft and compare them for repeats.
 So every command runs from the root before submitting, exit zero or a stated reason, pointing at the instrument held until its owner replaces it.
 A draft obeys the class it commits, and names a walk the tree already has rather than retyping it.
+
+### Naming a go test
+
+go test -run over a pattern answers ok and exits zero when the pattern matches nothing.
+Measured: on a tree carrying neither test, `go test -C src/engine -run 'ACancelledContextEndsAGitCall|ACancelledContextEndsTheProbe' ./...` answered `ok quackitect/engine 3.551s [no tests to run]`, exit 0.
+So a done-when line written that way is green on a tree where the thing it decides does not exist.
+Rename either test, or delete it, and the criterion goes on answering ok for ever.
+
+The engine's own answer is what tells the difference.
+se test names every proposal it could not reach under unreached, and ok stays true when it does.
+So the criterion reads unreached rather than ok alone, and it is written as a command that fails:
+
+```
+./RUNME.sh test --on <id> --propose TestTheThingItDecides | jq -e '.ok and ((.unreached // []) | length == 0)'
+```
+
+That exits 0 when the named test is in the tree and green, and 1 when nothing carries the name.
+Run it both ways before submitting: once as written, and once with a letter added to the name.
+The second run is the one that proves the criterion can go red.
 
 ## 4. What a check may match on
 
@@ -120,6 +144,13 @@ Watched going red for the reason expected, it proves the defect was there and th
 One that cannot be made red is a finding about the criterion, and it goes on the token first.
 So the red is recorded per criterion.
 Each names the test its criterion runs, its message matches an assertion in the tree, and a split-out criterion earns a fresh red.
+
+A build failure is not that red.
+The package is Go's compilation unit, and many hands share this tree.
+An identifier a half-finished change has not defined yet fails every test file beside it.
+So a failing check lands with the identifiers it names, as stubs, and the package still builds while the assertion fails.
+The engine holds the same line.
+A package that will not compile answers as a build, and it names the hand whose file the error names.
 
 ## 13. Half a mechanism ships
 

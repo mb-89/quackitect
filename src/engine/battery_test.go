@@ -22,7 +22,7 @@ import (
 func TestTheBatteryRunsOutsideTheEngine(t *testing.T) {
 	r := aTreeWithABattery(t)
 
-	got := startBattery(r, "worker-one", "wk-1")
+	got := startBattery(t.Context(), r, "worker-one", "wk-1")
 	if !got.OK {
 		t.Fatalf("the battery did not start: %s", got.Said)
 	}

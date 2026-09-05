@@ -86,6 +86,9 @@ type call struct {
 	// refused is set by a verb that answers a refusal as a result with exit 0,
 	// the way pull does, so the count of wrong results still sees it.
 	refused bool
+	// door is the client this call came through, empty for a shell. A verb
+	// reads it the way it reads a flag.
+	door string
 }
 
 // Verbs answers every verb this program has, in order.
@@ -173,4 +176,125 @@ func parseFlags() {
 	if err := Stray("", flag.Args()); err != nil {
 		failUnread(err)
 	}
+}
+
+// EVERY CALL A CALLER MAKES, BESIDE THE DISPATCH THAT ANSWERS IT.
+//
+// The dispatch above says which verbs there are and each verb's flag set says
+// which flags it takes, and neither is readable from outside this process. So
+// every caller retypes both, and the only thing joining the two programs is an
+// array of strings that neither one checks. A control in the panel sent
+// `se work --form "test"`: the engine has no --form, it printed its usage, and
+// the person who typed a token watched it vanish.
+//
+// SO THE ENGINE ANSWERS THE CALLS ITSELF, at se query --calls, and the catalog
+// sits beside the dispatch it describes. A second file would be the copy this
+// exists to remove.
+//
+// THE LANGUAGE IS SUBSTITUTION AND NOTHING ELSE, so no caller needs an
+// interpreter:
+//
+//   {name}  a hole anywhere in an argument, which the caller fills
+//   when    a segment kept where the parameter it names is not empty
+//
+// A flag that varies with a boolean is two entries, hold.on beside hold.off,
+// because a hole never spans a flag name. An entry carries the whole call, so
+// what a caller composes into a view call is an entry with that call around it.
+//
+// TestEveryCallInTheCatalogIsOneTheVerbTakes hands each of these to the flag
+// set of the verb it names, so a flag that is renamed here or there is red in
+// the engine's own suite rather than in somebody's hands.
+
+// aCall is one call: the arguments, and the segments kept only where the
+// parameter they name has a value.
+type aCall struct {
+	Argv []string    `json:"argv"`
+	When []whenGiven `json:"when,omitempty"`
+}
+
+// whenGiven is a segment of a call and the parameter that decides it.
+type whenGiven struct {
+	Given string   `json:"given"`
+	Argv  []string `json:"argv"`
+}
+
+// catalog is what se query --calls answers.
+type catalog struct {
+	Always []string         `json:"always"`
+	Calls  map[string]aCall `json:"calls"`
+}
+
+// everyCallCarries is what a caller appends to every call it makes. The folder
+// being worked on is the caller's and nothing in a call names it.
+var everyCallCarries = []string{"--work", "{work}"}
+
+// theCalls is the catalog itself, one entry per call.
+var theCalls = map[string]aCall{
+	// THE CALL THAT FETCHES THE CATALOG IS IN THE CATALOG, so a caller holds one
+	// call of its own and the engine hands back the rest.
+	"calls": {Argv: []string{"query", "--calls"}},
+
+	// THE WORK ITSELF.
+	"mint": {
+		Argv: []string{"work", "--title", "{title}", "--by", "person", "--process", "note"},
+		When: []whenGiven{{Given: "detail", Argv: []string{"--detail", "{detail}"}}},
+	},
+	"editCell":    {Argv: []string{"work", "--set", "{id}", "--field", "{field}", "--to", "{text}", "--by", "person"}},
+	"file":        {Argv: []string{"work", "--set", "{id}", "--field", "{field}", "--to", "{into}", "--by", "person"}},
+	"group":       {Argv: []string{"work", "--file", "{ids}", "--by", "person"}},
+	"renameGroup": {Argv: []string{"work", "--rename", "{from}", "--to", "{to}", "--by", "person"}},
+
+	// THE HOLD, WHICH IS ONE PRESS AND TWO CALLS.
+	"hold.on":  {Argv: []string{"hold", "--on", "--by", "person"}},
+	"hold.off": {Argv: []string{"hold", "--off", "--by", "person"}},
+
+	// HOW MUCH OF THE ENGINE SPEAKS TO THE AGENT, AND WHAT IT IS ASKED.
+	"bind":    {Argv: []string{"--bind", "{to}"}},
+	"binding": {Argv: []string{"--bind", "status"}},
+	"ask.on":  {Argv: []string{"--ask", "on"}},
+	"ask.off": {Argv: []string{"--ask", "off"}},
+	"asked":   {Argv: []string{"--ask", "status"}},
+
+	// READING A VIEW.
+	"pane":  {Argv: []string{"query", "--view", "{file}", "--pane", "{pane}"}},
+	"panes": {Argv: []string{"query", "--view", "{file}", "--panes"}},
+	"views": {Argv: []string{"query", "--list"}},
+
+	// WRITING ONE. Each of these is the whole call: the caller sends one entry
+	// rather than a view call with a fragment inside it.
+	"pin": {
+		Argv: []string{"view", "--file", "{file}", "--pane", "{pane}", "--pin", "{name}"},
+		When: []whenGiven{{Given: "matching", Argv: []string{"--matching", "{matching}"}}},
+	},
+	"unpin":       {Argv: []string{"view", "--file", "{file}", "--pane", "{pane}", "--unpin", "{name}"}},
+	"width":       {Argv: []string{"view", "--file", "{file}", "--pane", "{pane}", "--width", "{property}={px}"}},
+	"order":       {Argv: []string{"view", "--file", "{file}", "--pane", "{pane}", "--order", "{columns}"}},
+	"level.sort":  {Argv: []string{"view", "--file", "{file}", "--pane", "{pane}", "--sort", "{property}", "--direction", "{direction}", "--at", "{at}"}},
+	"level.group": {Argv: []string{"view", "--file", "{file}", "--pane", "{pane}", "--group", "{property}", "--direction", "{direction}", "--at", "{at}"}},
+	"dropLevel":   {Argv: []string{"view", "--file", "{file}", "--pane", "{pane}", "--drop", "{kind}", "--at", "{at}"}},
+	"filter":      {Argv: []string{"view", "--file", "{file}", "--pane", "{pane}", "--filter", "{groups}"}},
+
+	// STARTING THE ENGINE AND EVERY OTHER WAY A CALLER DRIVES IT.
+	"start":    {Argv: []string{}},
+	"rotate":   {Argv: []string{"--rotate"}},
+	"project":  {Argv: []string{"--project"}},
+	"copies":   {Argv: []string{"--copies", "--method", "{method}"}},
+	"attach":   {Argv: []string{"--attach", "--method", "{method}"}},
+	"config":   {Argv: []string{"--config", "--method", "{method}"}},
+	"set":      {Argv: []string{"--set", "{key}={value}", "--method", "{method}"}},
+	"burndown": {Argv: []string{"--burndown", "{day}"}},
+	"doing":    {Argv: []string{"--doing"}},
+	"init":     {Argv: []string{"--init", "{kind}"}},
+
+	// THE LANGUAGE SERVER, which the editor starts and then speaks to over
+	// stdio. The transport is here because the engine refuses a flag it was not
+	// given, and a client that adds one of its own is a server that exits
+	// before it reads a byte.
+	"lsp": {Argv: []string{"lsp", "--stdio"}},
+}
+
+// TheCatalog answers the calls a caller makes, with what every one of them
+// carries.
+func TheCatalog() catalog {
+	return catalog{Always: everyCallCarries, Calls: theCalls}
 }

@@ -9,8 +9,8 @@ guidance: [[work-token]]
 title: Held skips the gate
 # where the token stands. The process owns these values.
 status: open
-claimed_by: 547b9365/worker-relay-trial
-claimed_at: "2026-09-05T16:30:56Z"
+claimed_by: aeaf7bd9/main
+claimed_at: "2026-09-05T19:48:06Z"
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - 2ffcf9d79f74a1840f9e0ef52bd5607bd2b06fcc
@@ -45,9 +45,11 @@ A token waiting on a person should not sit in an agent's hand, so it is set back
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the ask is small enough to review whole, or it is split first | — |  |
-| [ ] | every done-when line is decidable, and names the command where one decides it |  |  |
-| [ ] | the basics it stands on exist, or are minted first | — |  |
+| [x] | what is gained by doing it, and not only what it does | An agent stops being handed work it may not do, and hears where the rest went. | 1 door |
+| [x] | what breaks if it is never done, and not only that it stays undone | A token nobody may work sits in a hand until the claim lapses, and the queue offers it to nobody else. | 3 hours |
+| [x] | the ask is small enough to review whole, or it is split first | One branch of one loop, one helper, one notice. | 3 hunks |
+| [x] | every done-when line is decidable, and names the command where one decides it | Four name one test. The fifth names the battery, which no agent may run by hand. | 5 of 5 |
+| [x] | the basics it stands on exist, or are minted first | Blocked, WaitsForAPerson and PutDown were all in the tree. | 3 of 3 |
 
 ## evidence: step 2. do
 
@@ -55,9 +57,9 @@ A token waiting on a person should not sit in an agent's hand, so it is set back
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the guidance this token names was read and applied | — |  |
-| [ ] | one test was written first and seen red for the reason expected |  |  |
-| [ ] | the same test was seen green after the change, and named |  |  |
-| [ ] | the change is git diff began..ended, the two hashes the engine wrote on this token | — |  |
-| [ ] | the cleanup the change revealed is in the change, or is a token of its own | — |  |
+| [x] | the guidance this token names was read and applied | The rule written five times is asked from one place now, so a path cannot ask half of it. | work-token.md |
+| [x] | one test was written first and seen red for the reason expected | TestAHeldTokenStillKnocksBeforeItIsHandedBack went red on the blocked case. The needs_human case already passed, so one door was missing rather than two. | 1 of 3 red |
+| [x] | the same test was seen green after the change, and named | All three pass. Every Pull, Wait, Queue, Hand and Parked test passes with it, and go vet is clean. | 0 failures |
+| [x] | the change is git diff began..ended, the two hashes the engine wrote on this token | Three hunks in pull.go and one new test file. | 2 files |
+| [x] | the cleanup the change revealed is in the change, or is a token of its own | In the change. The set-back holder is cleared in the queue's copy, so the notice stops calling it yours. | 1 line |
 

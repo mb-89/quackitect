@@ -56,9 +56,24 @@ func arrivalPath(r Roots) string { return r.Private("arrivals.json") }
 // A LOG WITH NO SUCH RECORD FALLS BACK TO THE ENGINE SESSION, which is the
 // boundary it had before: better one arrival per engine run than none at all.
 func ArrivalSession(r Roots) string {
+	if key := TheHarnessSession(r); key != "" {
+		return key
+	}
+	return currentSession(r)
+}
+
+// TheHarnessSession answers the harness session the log names, or nothing where
+// it names none.
+//
+// IT IS ArrivalSession WITHOUT THE FALLBACK, and the difference is the whole
+// point. A caller that wants a session whatever happens takes the fallback. A
+// caller deciding whether a person has left needs to tell "a different session"
+// from "the log cannot say", because an engine start retires the log and the
+// fallback then answers a fresh engine run, which reads as a person leaving.
+func TheHarnessSession(r Roots) string {
 	f, err := os.Open(filepath.Join(r.Private("log"), Current))
 	if err != nil {
-		return currentSession(r)
+		return ""
 	}
 	defer f.Close()
 	key := ""
@@ -79,9 +94,6 @@ func ArrivalSession(r Roots) string {
 			continue
 		}
 		key = rec.Data.Session
-	}
-	if key == "" {
-		return currentSession(r)
 	}
 	return key
 }

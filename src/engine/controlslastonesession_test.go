@@ -21,26 +21,40 @@ import (
 // function answers the question for all of them.
 
 // theSessionNowIs ends whatever session this tree was in and puts it in the one
-// named, the way closing the editor and opening it again does. The session name
-// lives in the first record of the current log, which is where currentSession
-// reads it, so writing that file is what starting a session looks like from
-// here.
+// named, the way closing the editor and opening it again does.
+//
+// IT WRITES BOTH RECORDS, because a person arriving is both. The engine start
+// names the run, which is where currentSession reads it. The session record is
+// what the harness writes on SessionStart, and it names the person's session,
+// which is where TheHarnessSession reads it. Writing only the first is an
+// ENGINE RESTART with the same person still sitting there, and that is a
+// different event: see godmodestands_test.go, which drives it.
 func theSessionNowIs(t *testing.T, r Roots, name string) {
 	t.Helper()
 	dir := r.Private("log")
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		t.Fatal(err)
 	}
-	b, err := json.Marshal(Record{Session: name, Src: "engine", Kind: "start",
+	start, err := json.Marshal(Record{Session: name, Src: "engine", Kind: "start",
 		Actor: "engine", Msg: "engine started"})
 	if err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(filepath.Join(dir, Current), append(b, '\n'), 0o644); err != nil {
+	arrived, err := json.Marshal(Record{Session: name, Src: "agent", Kind: "session",
+		Actor: "main", Msg: "session started, startup",
+		Data: map[string]any{"source": "startup", "session": name}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	both := append(append(start, '\n'), append(arrived, '\n')...)
+	if err := os.WriteFile(filepath.Join(dir, Current), both, 0o644); err != nil {
 		t.Fatal(err)
 	}
 	if got := currentSession(r); got != name {
-		t.Fatalf("the tree reads its session as %q and the test put it in %q", got, name)
+		t.Fatalf("the tree reads its run as %q and the test put it in %q", got, name)
+	}
+	if got := TheHarnessSession(r); got != name {
+		t.Fatalf("the tree reads the person's session as %q and the test put it in %q", got, name)
 	}
 }
 

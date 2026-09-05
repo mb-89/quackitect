@@ -34,6 +34,7 @@ import (
 const (
 	AnswerWork    = "work"    // here is a token: do it
 	AnswerRefused = "refused" // the submission failed a check a program could make
+	AnswerSettled = "settled" // the submission was taken and no work was handed on
 	AnswerWait    = "wait"    // nothing to do, and the notice says why
 	// The fifth. A hold nobody is behind is worth more than the next token.
 )
@@ -55,6 +56,14 @@ type Payload struct {
 	Disposition string   `json:"disposition,omitempty"`
 	Successors  []string `json:"successors,omitempty"`
 	Reason      string   `json:"reason,omitempty"`
+
+	// settleOnly says this submission wants no token back, which is a person at
+	// a shell rather than an agent in a lane.
+	//
+	// IT IS UNEXPORTED BECAUSE IT IS NOT THE PAYLOAD'S TO SAY. Which door an ask
+	// came through is the engine's own reading, and a field the JSON could set
+	// would let a lane opt out of being handed work.
+	settleOnly bool
 }
 
 type Answer struct {
@@ -139,6 +148,19 @@ func answerFor(r Roots, actor, role string, p Payload) Answer {
 			return a
 		}
 		learned, over = a.Learned, a.Notice
+		// A SUBMISSION AT A SHELL IS ONE THING ASKED FOR, AND ONE THING ANSWERED,
+		// AND THE QUEUE IS NOT READ AT ALL.
+		//
+		// It used to be read and the token it handed out put back a moment later.
+		// Handing out opens a stretch and a put-down closes one, so every shell
+		// submission wrote a began and an ended onto whatever token the queue
+		// would have handed on, with two snapshot commits behind them. That
+		// token's record then said it had been in a hand it was never in.
+		if p.settleOnly {
+			return Answer{Pull: AnswerSettled, Notice: p.ID + " is settled. The next token goes to a " +
+				"lane, because an agent that submits is asking for more. Ask for work again when " +
+				"you want it."}
+		}
 	}
 	// A HOLD ON YOUR OWN VERDICT IS NOT WORK IN HAND. The submission put the
 	// token down, and naming it again through se run or se apply took it back
@@ -695,6 +717,7 @@ func next(r Roots, actor, role string) Answer {
 	var unwritable []string
 
 	var scopes []Token
+	var setBack []string
 	for i := range all {
 		if all[i].Holder != actor || all[i].Ended() {
 			continue
@@ -703,11 +726,21 @@ func next(r Roots, actor, role string) Answer {
 			scopes = append(scopes, all[i])
 			continue
 		}
-		if why := WaitsForAPerson(all[i]); why != "" {
-			// THE HOLD COMES OFF AND THE TOKEN STAYS OPEN, so a person can
-			// still close it. This branch says nothing to the agent, because
-			// this copy of the queue has nowhere yet to say it.
+		// WHAT IS ALREADY IN A HAND IS STILL ASKED WHETHER IT MAY GO BACK.
+		//
+		// MEASURED. A token carrying needs_human was released, and the next
+		// pull handed it straight back within the minute. This walk asked one
+		// door and not the other, while every other path in this function asks
+		// both, and staffing and the stop judge ask them too.
+		//
+		// THE HOLD COMES OFF AND THE TOKEN STAYS OPEN, so a person can still
+		// close it and the queue can offer it once it is free. The holder is
+		// cleared in this copy as well, so everything read from it below agrees
+		// with the disk rather than calling a token yours after it left.
+		if why := whyNotNow(r, all[i]); why != "" {
 			_, _ = PutDown(r, all[i].ID, actor)
+			setBack = append(setBack, all[i].ID+": "+why)
+			all[i].Holder = ""
 			continue
 		}
 		return handed(r, actor, all[i])
@@ -777,9 +810,11 @@ func next(r Roots, actor, role string) Answer {
 		}
 	}
 	if len(scopes) > 0 {
-		return Answer{Pull: AnswerWait, Notice: scopeNotice(r, scopes) + unwritableNotice(unwritable)}
+		return Answer{Pull: AnswerWait,
+			Notice: scopeNotice(r, scopes) + setBackNotice(setBack) + unwritableNotice(unwritable)}
 	}
-	return Answer{Pull: AnswerWait, Notice: waitNotice(r, actor, held) + unwritableNotice(unwritable)}
+	return Answer{Pull: AnswerWait,
+		Notice: waitNotice(r, actor, held) + setBackNotice(setBack) + unwritableNotice(unwritable)}
 }
 
 // urgentFirst puts what a person marked urgent at the head of the list, and
@@ -906,6 +941,29 @@ func headingDepth(line string) int {
 		return 0
 	}
 	return n
+}
+
+// whyNotNow answers why a token cannot be worked now, or nothing.
+//
+// IT IS THE TWO DOORS IN ONE PLACE. Both were written out at every path that
+// hands work out, five times over, and the copy that mattered most is the one
+// that forgot half of them.
+func whyNotNow(r Roots, t Token) string {
+	if why := Blocked(r, t); why != "" {
+		return why
+	}
+	return WaitsForAPerson(t)
+}
+
+// setBackNotice says what the queue took out of this actor's hands, and why.
+// Work that leaves a hand without a word leaves the agent wondering where it
+// went, and looking for it is how a session is spent.
+func setBackNotice(setBack []string) string {
+	if len(setBack) == 0 {
+		return ""
+	}
+	return "\n\nSet back out of your hands, each waiting on something:\n  " +
+		strings.Join(setBack, "\n  ")
 }
 
 // theirOwnHeld answers the open tokens this actor holds, for the notice that

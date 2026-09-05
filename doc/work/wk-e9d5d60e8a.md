@@ -39,6 +39,8 @@ Move it onto a fixture beside the ones already there. Build a pane whose one gro
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
+| [ ] | what is gained by doing it, and not only what it does |  |  |
+| [ ] | what breaks if it is never done, and not only that it stays undone |  |  |
 | [x] | the ask is small enough to review whole, or it is split first | one assertion moved from the live page onto a fixture | — |
 | [x] | every done-when line is decidable, and names the command where one decides it | the render-check line in a battery run answers ok or FAIL | — |
 | [x] | the basics it stands on exist, or are minted first | the fixture block and editorHtml are already in the file | — |

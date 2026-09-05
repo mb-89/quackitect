@@ -46,6 +46,8 @@ Urgent stays as it is, because a person still needs a way to say what comes firs
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
+| [ ] | what is gained by doing it, and not only what it does |  |  |
+| [ ] | what breaks if it is never done, and not only that it stays undone |  |  |
 | [x] | the approach is on the token before any work, as an interface or a shape a reader can disagree with | the approach names the sort key, where it sits against urgent and the date, and what it reads to decide | the approach section |
 | [x] | every done-when line is decidable, and names the command where one decides it | every line by a pull over a tree built for it, and line 3 by a test | the done when section |
 | [x] | the change is small enough to review whole, or it is split first | — |  |
