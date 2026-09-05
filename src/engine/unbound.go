@@ -48,7 +48,31 @@ import (
 // A FILE WITH NO SESSION IS ANOTHER SESSION'S, which is the shape all three of
 // these files had before, so the first read after the change drops what each was
 // holding. That is the right answer for every control it could be holding.
-func ofThisSession(r Roots, session string) bool { return session == currentSession(r) }
+// A CONTROL THAT CANNOT BE PLACED KEEPS WHAT A PERSON SET. The session name
+// lives in the first record of the current log, and a rotation opens a fresh
+// one that holds nothing until the next record lands. Through that window the
+// log names no session, and comparing against the placeholder made every stored
+// control another session's: the rung fell back to bound, the hold to off and
+// the ask to nothing owed, with nobody having said so. The hold is the one that
+// matters, because a guard is a fresh process per event, so a guard firing there
+// read the hold as off and let through calls nobody had lifted it on.
+//
+// So a session that cannot be read decides nothing, and the control stands. Named
+// says which answers are a session at all.
+//
+// A FILE WITH NO SESSION ON IT IS STILL ANOTHER SESSION'S, whichever way the log
+// reads. That is the shape all three of these files had before the session was
+// written on them, and the first read after that change has to drop what each was
+// holding.
+func ofThisSession(r Roots, session string) bool {
+	if session == "" {
+		return false
+	}
+	if now := currentSession(r); Named(now) {
+		return session == now
+	}
+	return true
+}
 
 // TheBinding is how much of the engine is speaking to the agent.
 type TheBinding string

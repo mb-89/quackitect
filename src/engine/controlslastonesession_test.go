@@ -136,6 +136,67 @@ func TestOneFunctionAnswersWhetherAControlIsThisSessions(t *testing.T) {
 	}
 }
 
+// A ROTATION DOES NOT LIFT A CONTROL. The log is set aside when it fills and a
+// fresh current is opened, empty until the next record lands. The session name
+// lives in the first record, so in that window there is no name to read: every
+// stored control was read as another session's and the rung fell back to bound,
+// the hold to off, the ask to nothing owed.
+//
+// THE DIRECTION THAT MATTERS IS THE HOLD. A hold is a person stopping the
+// engine, and a guard is a fresh process per event, so a guard firing in that
+// window read the hold as off and let through calls nobody had lifted it on.
+func TestARotationDoesNotLiftAControl(t *testing.T) {
+	t.Parallel()
+	r := aTreeToWriteIn(t)
+	theSessionNowIs(t, r, "20260905-100000")
+	if _, err := SetBinding(r, God, "the owner"); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := SetHold(r, true, "the owner"); err != nil {
+		t.Fatal(err)
+	}
+	theRotationWindow(t, r)
+
+	if !LoadHold(r).On {
+		t.Error("a hold a person put on reads as off while the log names no session, " +
+			"so a guard firing there lets through what nobody lifted it on")
+	}
+	if at := LoadBinding(r).At; at != God {
+		t.Errorf("the rung reads %q while the log names no session, and the owner set god", at)
+	}
+}
+
+// AND A SESSION THAT CANNOT BE READ DECIDES NOTHING. The log answers a
+// placeholder where it names nobody, which is a string like any other: it was
+// compared against every stored control and matched none of them.
+func TestASessionThatCannotBeReadDecidesNothing(t *testing.T) {
+	t.Parallel()
+	r := aTreeToWriteIn(t)
+	theSessionNowIs(t, r, "20260905-100000")
+	theRotationWindow(t, r)
+
+	// The premise: through this window the log names no session.
+	if now := currentSession(r); Named(now) {
+		t.Fatalf("the log names the session %q, so this test is not in the window it means to be", now)
+	}
+	if !ofThisSession(r, "20260904-090000") {
+		t.Error("a stored control is read as another session's against a session that cannot be read")
+	}
+	// AND A FILE WITH NO SESSION ON IT IS STILL ANOTHER SESSION'S.
+	if ofThisSession(r, "") {
+		t.Error("a control with no session on it is read as this session's")
+	}
+}
+
+// theRotationWindow leaves the tree where a rotation leaves it: the full file
+// set aside and a fresh current opened, holding nothing until the next record.
+func theRotationWindow(t *testing.T, r Roots) {
+	t.Helper()
+	if err := os.WriteFile(filepath.Join(r.Private("log"), Current), nil, 0o644); err != nil {
+		t.Fatal(err)
+	}
+}
+
 // AND A CONTROL A SWAP CARRIES OVER IS KEPT. A handover is one session with two
 // processes in it, so the successor reads the same session name and a person who
 // unbound two minutes ago is not bound again under them.

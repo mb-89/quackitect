@@ -216,6 +216,10 @@ func OpenExistingLog(dir string) (*Log, error) {
 
 // The session name is in the first record of the file. Reading one line is
 // cheaper than any other way of knowing it.
+//
+// A FILE THAT NAMES NO SESSION ANSWERS THE PLACEHOLDER, which every writer has
+// something to put in a record. It is not a session: Named in arrival.go says
+// which answers are, and ofThisSession in unbound.go is where that matters.
 func sessionOf(path string) string {
 	f, err := os.Open(path)
 	if err != nil {
