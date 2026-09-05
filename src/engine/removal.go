@@ -230,7 +230,13 @@ func ARemovalWithoutARead(r Roots, actor, command, work string) (string, bool) {
 
 // ALoopThatRemoves answers whether this command runs a remover inside a loop,
 // which is refused whatever it names.
-func ALoopThatRemoves(command string) (string, bool) {
+//
+// OUTSIDE THE TREE THE DISK IS THE AGENT'S OWN, the same line ARemovalWithoutARead
+// draws through anyInside. A remover whose files are all outside the work tree is
+// not this rule's business, so it does not arm the loop. A remover naming no files
+// at all still does, because that is the shape this rule was written for: the files
+// come out of the loop's own output, a round at a time.
+func ALoopThatRemoves(command, work string) (string, bool) {
 	loop, deletes := false, ""
 	for _, part := range pipeline(command) {
 		words := strings.Fields(part)
@@ -242,7 +248,10 @@ func ALoopThatRemoves(command string) (string, bool) {
 		}
 		if deletes == "" {
 			if at := removerAt(words); at >= 0 {
-				deletes = strings.Trim(words[at], "'\"")
+				files := filesAmong(words[at+1:])
+				if len(files) == 0 || anyInside(files, work) {
+					deletes = strings.Trim(words[at], "'\"")
+				}
 			}
 		}
 	}

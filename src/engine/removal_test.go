@@ -168,6 +168,10 @@ func TestALoopThatDeletesIsRefused(t *testing.T) {
 		t.Fatal(err)
 	}
 	readIt(seen)
+	// A FOLDER OF THIS BOX'S OWN, outside the tree being worked on. A second
+	// temp folder is outside r.Work wherever the suite runs, which a literal
+	// path under /tmp is not.
+	outside := filepath.Join(t.TempDir(), "wt-berg2")
 
 	cases := []struct {
 		name    string
@@ -191,6 +195,15 @@ func TestALoopThatDeletesIsRefused(t *testing.T) {
 		// A REMOVAL THAT IS NOT IN A LOOP is the other test's question, and
 		// this file was read, so nothing here refuses it.
 		{"a removal of a file read this turn", "rm " + seen, false},
+		// A REMOVAL OUTSIDE THE TREE IS NOT THIS RULE'S BUSINESS, and a loop
+		// beside it does not make it one. This is the command that was refused:
+		// a worktree under the system temp folder, cleaned up before a loop that
+		// deletes nothing.
+		{"a loop beside a removal outside the tree",
+			"rm -rf " + outside + "; git worktree prune; for f in doc/work/a.md doc/work/b.md; do git cat-file -e FETCH_HEAD:$f; done", false},
+		// AND A LOOP WHOSE REMOVAL NAMES NOTHING STAYS REFUSED, because the
+		// files it takes are the ones its own output names.
+		{"a loop whose removal names no file", "for f in src/*.go; do echo $f | xargs rm; done", true},
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {

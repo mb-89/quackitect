@@ -862,7 +862,7 @@ func decidePreToolUse(g *guard, roots Roots, cfg Config, emergency Emergency, lo
 	// THE LOOP IS ASKED FIRST. A loop names no files, so the read question has
 	// nothing to work on, and the refusal that fits is the one about the shape.
 	if ti.Command != "" {
-		if why, refuse := ALoopThatRemoves(ti.Command); refuse {
+		if why, refuse := ALoopThatRemoves(ti.Command, roots.Work); refuse {
 			record(log, "engine", "removal", actor, "refused: a loop that deletes", No(),
 				map[string]any{"tool": in.ToolName})
 			g.deny(why)
