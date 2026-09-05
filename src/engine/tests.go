@@ -634,7 +634,7 @@ func runChosen(r Roots, db *sql.DB, tests []aTest, picks []chosen) ([]ran, strin
 	}
 	var out []ran
 	bins := map[string]string{}
-	engine, engineSaid, engineKnown := "", "", false
+	engine, engineSaid, engineStale, engineKnown := "", "", "", false
 	for _, p := range picks {
 		t := byID[p.ID]
 		switch t.Kind {
@@ -678,6 +678,7 @@ func runChosen(r Roots, db *sql.DB, tests []aTest, picks []chosen) ([]ran, strin
 			// it for a check that raises an engine of its own.
 			if !engineKnown {
 				engine, engineSaid = suiteEngine(r)
+				engineStale = residentStale(r)
 				engineKnown = true
 			}
 			cmd := quiet.Quietly(exec.Command(nodeTool(), filepath.Join(r.Work, filepath.FromSlash(t.Path)), r.Method))
@@ -688,7 +689,7 @@ func runChosen(r Roots, db *sql.DB, tests []aTest, picks []chosen) ([]ran, strin
 			start := time.Now()
 			said, err := cmd.CombinedOutput()
 			x := ran{ID: t.ID, Kind: t.Kind, OK: err == nil, Seconds: time.Since(start).Seconds(),
-				Engine: checkEngineNote(r, engineSaid)}
+				Engine: checkEngineNote(engineSaid, engineStale)}
 			if err != nil {
 				x.Said = tailOf(string(said), 2000)
 			}
@@ -837,14 +838,28 @@ func shellsBesideGit(r Roots) []string {
 // A reader following it either swapped to the same old binary, or was refused
 // for handing over to the build already running, and either way was told the
 // cure had been applied. A plain swap builds from the tree first.
-func checkEngineNote(r Roots, handed string) string {
-	note := "handed " + handed
-	if why := residentStale(r); why != "" {
-		note += ". The engine over this tree is older than its source: " + why +
-			". A check that asks it reads the old build, so a failure here may be its age and not the change's. " +
-			"Swap first: " + TheBuildDoor
+//
+// THE AGE IS DECIDED ONCE A SUITE AND SAID ONCE. The reason is handed in rather
+// than read here. Read here, it walked src/engine once per check, and it took a
+// reading of the clock of its own: the sentence gave .bin/se two ages, stamped
+// seconds apart, and a reader could not tell which one was the binary's. A
+// function with no roots cannot do either again.
+func checkEngineNote(handed, stale string) string {
+	if strings.TrimSpace(handed) == "" {
+		handed = "no engine: this tree carries none to hand"
 	}
-	return note
+	note := "handed " + handed
+	if stale == "" {
+		return note
+	}
+	// THE REASON IS SAID ONCE, WHEREVER IT IS SAID. suiteEngine's own sentence
+	// carries it where it passed the resident over, and the advice below is what
+	// this clause is for.
+	if !strings.Contains(note, stale) {
+		note += ". The engine over this tree is older than its source: " + stale
+	}
+	return note + ". A check that asks it reads the old build, so a failure here may be " +
+		"its age and not the change's. Swap first: " + TheBuildDoor
 }
 
 func nodeTool() string {
