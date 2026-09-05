@@ -155,8 +155,20 @@ func TestTheArchiveAnswersASearch(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(rows) != 1 || got.Hits[0].Path != rows[0].Where() {
-		t.Errorf("the hit names %q rather than the object it came from", got.Hits[0].Path)
+	if len(rows) != 1 {
+		t.Fatalf("the archive holds %d rows and one token was closed", len(rows))
+	}
+	// THE PREDICTION ASKS THE READER, and it used to state the precedence over
+	// again. A row may name a blob, a copy on the branch and a tag, and which one
+	// answers is what readArchived worked out by trying them. A second statement
+	// of that order can disagree with it, and then the test passes on a
+	// prediction that is wrong.
+	_, at, err := readArchived(r, rows[0])
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got.Hits[0].Path != at {
+		t.Errorf("the hit names %q and the object that answered is %q", got.Hits[0].Path, at)
 	}
 	if !strings.Contains(got.Hits[0].Text, "gooseberry") {
 		t.Errorf("the hit carries %q", got.Hits[0].Text)

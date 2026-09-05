@@ -22,6 +22,13 @@ import (
 // THE CHECK IS OVER THE PACKAGE AND NOT OVER THAT NAME. An exported function in
 // this package that nothing calls and no test drives is either dead or a claim,
 // and both want saying out loud.
+//
+// A METHOD IS ONE OF THEM. It was left out on the reasoning that a method is
+// reached through its type, and Archived.Where was the counter-example: it
+// stated the precedence among an archive row's three objects, readArchived
+// stated the same order again, and nothing but a test ever read the method. Two
+// statements of one rule, one of them unread, and they can be made to disagree.
+// A method carries a claim exactly as a function does.
 func TestNoExportedFunctionHereIsUncalled(t *testing.T) {
 	t.Parallel()
 	root := filepath.Join("..", "..")
@@ -43,6 +50,12 @@ func TestNoExportedFunctionHereIsUncalled(t *testing.T) {
 		// here so a reader can tell it from an oversight, which is the
 		// answer the method allows and the one silence does not.
 		"OperatorsFor": "the filter builder's per-type offer, owed a caller by the v3 editor port",
+		// CALLED THROUGH AN INTERFACE BY SOMEBODY ELSE'S CODE. The name never
+		// appears at a call site here, and it never will, because the caller is
+		// the standard library reaching the type through an interface.
+		"MarshalJSON":   "encoding/json calls it through an interface, never by name",
+		"UnmarshalJSON": "encoding/json calls it through an interface, never by name",
+		"Unwrap":        "errors.Is and errors.As call it through an interface, never by name",
 	}
 	declared := exportedFuncs(t, filepath.Join(root, "src", "engine"))
 	if len(declared) < 10 {
@@ -69,9 +82,10 @@ func TestNoExportedFunctionHereIsUncalled(t *testing.T) {
 	}
 }
 
-// exportedFuncs answers every exported plain function this package declares,
-// keyed by name, with the file it is in. Methods are left out: a method is
-// reached through its type and a search for its name says little.
+// exportedFuncs answers every exported function and method this package
+// declares, keyed by name, with the file it is in. A method is keyed by its own
+// name without its receiver, because that is what a caller writes after the dot
+// and so what a search for a caller has to look for.
 func exportedFuncs(t *testing.T, dir string) map[string]string {
 	t.Helper()
 	out := map[string]string{}
@@ -88,14 +102,17 @@ func exportedFuncs(t *testing.T, dir string) map[string]string {
 		if err != nil {
 			t.Fatal(err)
 		}
-		for _, m := range plainFunc.FindAllStringSubmatch(string(b), -1) {
+		for _, m := range exportedHere.FindAllStringSubmatch(string(b), -1) {
 			out[m[1]] = p
 		}
 	}
 	return out
 }
 
-var plainFunc = regexp.MustCompile(`(?m)^func ([A-Z]\w*)\(`)
+// exportedHere matches an exported declaration at the start of a line, function
+// or method. The receiver is passed over so the name it answers is the one a
+// call site writes.
+var exportedHere = regexp.MustCompile(`(?m)^func (?:\([^)]*\) )?([A-Z]\w*)\(`)
 
 // calledSomewhere answers whether anything but the declaration names it.
 func calledSomewhere(t *testing.T, root, name, declaredIn string) bool {
@@ -110,7 +127,13 @@ func calledSomewhere(t *testing.T, root, name, declaredIn string) bool {
 			return nil
 		}
 		for _, line := range strings.Split(string(b), nl) {
-			if strings.HasPrefix(line, "func "+name+"(") || strings.HasPrefix(line, "//") {
+			// THE DECLARATION IS NOT A CALL, and a method's declaration carries
+			// its receiver between func and the name, so a prefix match on the
+			// name alone read every method as calling itself.
+			if m := exportedHere.FindStringSubmatch(line); m != nil && m[1] == name {
+				continue
+			}
+			if strings.HasPrefix(line, "//") {
 				continue
 			}
 			if strings.Contains(line, name+"(") {

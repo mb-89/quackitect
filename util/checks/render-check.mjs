@@ -432,6 +432,43 @@ if (empties.groups) {
   if (!held) bad++;
   console.log((held ? "ok  " : "FAIL") + "  editor: an editable cell where the answer locks nothing");
 }
+// A LOCKED CELL SAYS WHY TO A PERSON, NOT TO A CALLER.
+//
+// refusedByHand ends in a default written for whoever calls WriteFieldBy, and
+// three columns a person can put in a view fell through to it, so hovering a
+// locked cell read: this program does not write "subs". The line above asking
+// that a locked cell says why was loosened in the same commit, from naming a
+// sentence to accepting any non-empty title, so nothing was left asking what
+// the words said.
+//
+// THE LIVE VIEW DRAWS NONE OF THOSE COLUMNS, so the question is put to the
+// engine over a view of this check's own. The reasons are the engine's and the
+// page is the real one, so a column a person adds to their view tomorrow is
+// answered the same way.
+{
+  const asked = ["seq", "type", "subs"];
+  const base = join(out, "locked.base");
+  writeFileSync(base,
+    "properties:\n  title:\n    opensNote: true\n"
+    + "filters:\n  and:\n    - kind == \"work-token\"\n"
+    + "views:\n  - type: table\n    name: left\n    order:\n      - title\n"
+    + asked.map((c) => "      - " + c + "\n").join(""));
+  const table = ask("query", "--view", base, "--pane", "left");
+  const locked = table.locked ?? {};
+  say2("the engine locks the columns this asks about (" + asked.join(", ") + ")",
+    asked.every((c) => (locked[c] ?? "") !== ""),
+    "it locks " + JSON.stringify(locked) + ", so this has no locked cell to read");
+  const drawn = editorHtml([{ side: "left", table }], views, "work");
+  const reasons = [...drawn.matchAll(/class="locked"[^>]*title="([^"]*)"/g)].map((m) => m[1]);
+  const forACaller = reasons.find((t) => /does not write/.test(t));
+  say2("a locked cell says why to a person (" + reasons.length + " locked)",
+    reasons.length > 0 && forACaller === undefined,
+    reasons.length === 0
+      ? "the page drew no locked cell, so this would pass by having nothing to read"
+      : "one of them reads " + JSON.stringify(forACaller)
+        + ", which is the sentence written for whoever calls WriteFieldBy");
+}
+
 // ONE STYLESHEET FOR A CONTROL, AND THIS IS THE ONLY CHECK THAT CAN SEE IT.
 //
 // The sidebar and the editor each carried their own rules for a button, a text

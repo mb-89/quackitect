@@ -406,20 +406,9 @@ func checkWords(p PropSpec, name, got string, line int) []Departure {
 }
 
 // overWords answers a section's length when it runs past the bound the schema
-// puts on it, and the length is words.
-//
-// ONE SECTION, ONE BOUND, MEASURED IN ONE PLACE. The size was written twice:
-// maxWords for the editor and maxBytes for the save. Two numbers for one fact
-// drift, and these had, at six bytes to a word against the five this corpus
-// actually runs at. The two doors then disagreed about the same chapter, and a
-// writer was marked by one and refused by the other for the same prose.
-//
-// WORDS RATHER THAN BYTES, because a person writing a ticket counts words. A
-// byte count is the machine's unit, it says nothing a writer can act on, and
-// it moves when the text is not English.
-//
-// THE COMMENTS COME OUT FIRST. A comment is the template talking to the
-// writer, not prose the reader was handed, so it is not part of the size.
+// puts on it. The length is words, with the template's own comments dropped
+// first, and one bound is written once. What that settled, and why the unit is
+// words, is [[a-section-is-measured-in-words]].
 func overWords(max int, text string) (int, bool) {
 	if max <= 0 {
 		return 0, false
@@ -773,25 +762,11 @@ func firstWords(s string, n int) string {
 	return strings.Join(f[:n], " ") + " ..."
 }
 
-// LintNotes reads every note under a folder against the schema its kind names.
-// A note naming no kind is a finding, not a skip.
-//
-// IT GOES ALL THE WAY DOWN, and it did not.
-//
-// MEASURED. It read one level and skipped every directory, so doc/guidance was
-// checked and doc/guidance/software-development was not. Three lane files and a
-// fourth in engine_design_principles had never been read by anything: the
-// schema they name applied to them exactly as much as to any other file, and
-// nothing had ever asked. A check that reads the top of a tree reports on the
-// tree, which is how a folder becomes the place unchecked things go.
-//
-// os.DirEntry AND filepath.SkipDir RATHER THAN THE io/fs SPELLING, because this
-// package already has a function called fs: the one that reads a frontmatter
-// field. One name, one thing.
-//
-// A PARKED FOLDER IS SKIPPED WHOLE. Parking is how a file is taken out of the
-// engine's way, and a folder named with a leading underscore takes everything
-// under it out too, which is what makes parking a thing you can do to a lane.
+// LintNotes reads every note under a folder against the schema its kind names,
+// walking all the way down. A note naming no kind is a finding rather than a
+// skip, and a folder parked with a leading underscore drops out with everything
+// beneath it. What the walk cost and what it caught is
+// [[a-lint-reads-the-whole-tree]].
 func LintNotes(r Roots, dir string) []Finding {
 	var out []Finding
 	err := filepath.WalkDir(dir, func(path string, e os.DirEntry, err error) error {
@@ -850,12 +825,10 @@ func LintGuidance(r Roots) []Finding {
 	return LintNotes(r, GuidanceDir(r.Method))
 }
 
-// LintRationales reads the arguments against the schema they name.
-//
-// A COPY WITH NO RATIONALE FOLDER IS NOT A FINDING. A working copy may carry
-// no argument yet, and an empty shelf is not a fault. A folder that is there
-// and will not read still is, because that is the case where this would
-// otherwise answer clean about notes it never opened.
+// LintRationales reads the arguments against the schema they name. Where the
+// folder is absent there is nothing to read and nothing to report, and where it
+// is present and unreadable there is. Both halves are
+// [[a-lint-reads-the-whole-tree]].
 func LintRationales(r Roots) []Finding {
 	dir := RationaleDir(r.Method)
 	if _, err := os.Stat(dir); os.IsNotExist(err) {

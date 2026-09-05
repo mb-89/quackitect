@@ -91,16 +91,6 @@ type Archived struct {
 	Tag string `json:"tag,omitempty"`
 }
 
-// Where names the git object a reader opens first to see the token.
-func (a Archived) Where() string {
-	for _, at := range []string{a.Blob, a.OnBranch, a.Tag} {
-		if at != "" {
-			return at
-		}
-	}
-	return ""
-}
-
 // gitHere runs git over the work tree without touching the branch, the index
 // or anybody's staging. The author is the engine, so nothing depends on a name
 // being configured on the box.

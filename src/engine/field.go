@@ -61,7 +61,12 @@ func refusedByHand(field, by string) string {
 				"Say what you mean about where the work stands, and the process moves it", by)
 		}
 		return ""
-	case "kind", "id", "guidance", "began", "ended":
+	// seq AND type ARE HERE FOR THE PERSON, NOT FOR THE CALLER. They fell
+	// through to the default below, so a person hovering a locked cell read the
+	// sentence written for whoever calls WriteFieldBy: this program does not
+	// write "seq". The editor's own list, deleted when this ruling moved here,
+	// said the engine decides these, which is what the line below says.
+	case "kind", "id", "guidance", "began", "ended", "seq", "type":
 		return field + " is the engine's, and it is not written by hand"
 	case "process":
 		return "a process is chosen at minting, and it decides the token's shape"
@@ -74,7 +79,9 @@ func refusedByHand(field, by string) string {
 		// is moved by a pull would leave them looking for it on the page.
 		return "a holder is not on the token. The engine keeps who holds what, " +
 			"and se --doing answers it"
-	case "depends_on", "successors", "parent":
+	// subs IS ONE OF THESE. It is the list of sub-tokens, which is the same
+	// kind of thing as depends_on and parent and is edited where they are.
+	case "depends_on", "successors", "parent", "subs":
 		return field + " is a relation, and it is edited in the note"
 	}
 	return fmt.Sprintf("this program does not write %q", field)

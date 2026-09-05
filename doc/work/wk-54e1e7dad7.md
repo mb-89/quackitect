@@ -9,8 +9,8 @@ guidance: [[work-token]]
 title: done keeps worker claim
 # where the token stands. The process owns these values.
 status: open
-claimed_by: aeaf7bd9/reviewer-lutoslawski
-claimed_at: "2026-09-05T16:11:16Z"
+claimed_by: aeaf7bd9/main
+claimed_at: "2026-09-05T16:53:13Z"
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - d4e3ae5ae6eeb653fd3d0d7525c2c9c0c43741c5
@@ -42,9 +42,9 @@ A submission that moves a token out of the step its claimant works releases that
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the ask is small enough to review whole, or it is split first | — |  |
-| [ ] | every done-when line is decidable, and names the command where one decides it |  |  |
-| [ ] | the basics it stands on exist, or are minted first | — |  |
+| [x] | the ask is small enough to review whole, or it is split first | One call added to the submission, beside the line that already released the hold. | 1 line |
+| [x] | every done-when line is decidable, and names the command where one decides it | All three name one Go test, which was written and seen red on both assertions. | 3 of 3 |
+| [x] | the basics it stands on exist, or are minted first | DropClaim already existed, and a close already used it. This calls the same one. | DropClaim |
 
 ## evidence: step 2. do
 
@@ -52,9 +52,9 @@ A submission that moves a token out of the step its claimant works releases that
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the guidance this token names was read and applied | — |  |
-| [ ] | one test was written first and seen red for the reason expected |  |  |
-| [ ] | the same test was seen green after the change, and named |  |  |
-| [ ] | the change is git diff began..ended, the two hashes the engine wrote on this token | — |  |
-| [ ] | the cleanup the change revealed is in the change, or is a token of its own | — |  |
+| [x] | the guidance this token names was read and applied | The check was written first and both assertions watched red, which is rule 12. | work-token.md |
+| [x] | one test was written first and seen red for the reason expected | TestASubmittedTokenIsNotStillClaimed failed on both lines. It read still claimed by worker-1, and the reviewer was refused naming worker-1. | 2 red |
+| [x] | the same test was seen green after the change, and named | It passes. se test over the delta ran what the change reaches, 0 failed. | 0 failed |
+| [x] | the change is git diff began..ended, the two hashes the engine wrote on this token | One call in pull.go, one new test, two tests corrected. | 4 files |
+| [x] | the cleanup the change revealed is in the change, or is a token of its own | Two tests were passing on the defect. A reviewer could name a done token only by riding the worker's stale claim. Both now claim first, as any actor must. | 2 corrected |
 
