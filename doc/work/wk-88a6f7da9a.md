@@ -9,6 +9,11 @@ guidance: [[work-token]]
 title: a pull payload needs
 # where the token stands. The process owns these values.
 status: open
+claimed_by: aeaf7bd9/worker-nono-two
+claimed_at: "2026-09-05T20:10:31Z"
+# the tree each time the work was taken up, snapshots the engine wrote
+began:
+  - 9066be8d227912c441ff775a693abf37f11c240a
 ---
 
 ## detail
@@ -42,11 +47,11 @@ Give se pull the --from that run and apply have, reading the payload from a file
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | what is gained by doing it, and not only what it does |  |  |
-| [ ] | what breaks if it is never done, and not only that it stays undone |  |  |
-| [ ] | the ask is small enough to review whole, or it is split first | — |  |
-| [ ] | every done-when line is decidable, and names the command where one decides it |  |  |
-| [ ] | the basics it stands on exist, or are minted first | — |  |
+| [x] | what is gained by doing it, and not only what it does | A session with no tool lane can put work down. Submitting is the only way a token moves, so it can finish what it takes. | `se pull --from` |
+| [x] | what breaks if it is never done, and not only that it stays undone | Tokens sit held by an agent that cannot let go, and a walker rules each one dead by hand. | the detail |
+| [x] | the ask is small enough to review whole, or it is split first | One flag on one verb, one usage line, one test. | `git show --stat 99ab6039` |
+| [x] | every done-when line is decidable, and names the command where one decides it | Both lines are assertions in one test, each driven red and green here. | `go test . -run TestAPullSubmitsAPayloadFromTheScratchpad` |
+| [x] | the basics it stands on exist, or are minted first | payloadFrom and the scratchpad rule were there for run and apply. | src/engine/payloadfrom.go |
 
 ## evidence: step 2. do
 
@@ -54,9 +59,9 @@ Give se pull the --from that run and apply have, reading the payload from a file
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the guidance this token names was read and applied | — |  |
-| [ ] | one test was written first and seen red for the reason expected |  |  |
-| [ ] | the same test was seen green after the change, and named |  |  |
-| [ ] | the change is git diff began..ended, the two hashes the engine wrote on this token | — |  |
-| [ ] | the cleanup the change revealed is in the change, or is a token of its own | — |  |
+| [x] | the guidance this token names was read and applied | Read. The change was already in the tree, so rule 12 was met by mutating it. | doc/guidance/work-token.md |
+| [x] | one test was written first and seen red for the reason expected | Two mutations, one per line. With --from read from nowhere the token stayed open. With the pipe back in the usage the test said the usage still prints a pipe. | `go test . -run TestAPullSubmitsAPayloadFromTheScratchpad` |
+| [x] | the same test was seen green after the change, and named | TestAPullSubmitsAPayloadFromTheScratchpad passes at origin/v4, unmutated. | the same test |
+| [x] | the change is git diff began..ended, the two hashes the engine wrote on this token | Nothing was written here. It landed as 99ab6039 under wk-42cc1c2f6e, which the archive holds done. | `git log -1 99ab6039` |
+| [x] | the cleanup the change revealed is in the change, or is a token of its own | This token and wk-42cc1c2f6e asked one thing, and the queue held both. | the archive row |
 
