@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"quackitect/engine/internal/yaml"
 	"regexp"
+	"slices"
 	"strconv"
 	"strings"
 )
@@ -260,7 +261,7 @@ func OperatorsFor(kind, keep string) []Operator {
 	var out []Operator
 	held := false
 	for _, o := range Operators {
-		if len(o.Types) == 0 || (kind != "" && contains(o.Types, kind)) {
+		if len(o.Types) == 0 || (kind != "" && slices.Contains(o.Types, kind)) {
 			out = append(out, o)
 			held = held || o.ID == keep
 		}

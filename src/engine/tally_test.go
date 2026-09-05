@@ -1,6 +1,9 @@
 package main
 
-import "testing"
+import (
+	"quackitect/engine/internal/expr"
+	"testing"
+)
 
 // A COUNT SAYS WHICH TOKENS IT COUNTED, AND NOT ONLY HOW MANY.
 //
@@ -27,7 +30,7 @@ views:
 	if err != nil {
 		t.Fatal(err)
 	}
-	rows := []Row{
+	rows := []expr.Row{
 		row("id", "wk-1", "status", "imp_in_work", "title", "the first"),
 		row("id", "wk-2", "status", "imp_open", "title", "the second"),
 		row("id", "wk-3", "status", "spec_in_work", "title", "the third"),
@@ -82,7 +85,7 @@ views:
 	if err != nil {
 		t.Fatal(err)
 	}
-	tab, err := Render(b, b.Views[0], []Row{
+	tab, err := Render(b, b.Views[0], []expr.Row{
 		row("id", "wk-1", "status", "imp_open", "title", "the first"),
 	})
 	if err != nil {
@@ -118,7 +121,7 @@ views:
 	if err != nil {
 		t.Fatal(err)
 	}
-	rows := []Row{
+	rows := []expr.Row{
 		row("id", "wk-1", "status", "imp_in_work", "title", "the first"),
 		row("id", "wk-2", "status", "imp_open", "title", "the second"),
 		row("id", "wk-3", "status", "imp_open", "title", "the third"),

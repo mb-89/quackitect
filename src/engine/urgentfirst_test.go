@@ -1,6 +1,7 @@
 package main
 
 import (
+	"quackitect/engine/internal/expr"
 	"testing"
 )
 
@@ -98,7 +99,7 @@ func TestAnUrgentTokenGoesOutFirst(t *testing.T) {
 			t.Errorf("the flag did not survive the note: %+v", back)
 		}
 		// AND THE ROW CARRIES IT, so the editor draws it and a view filters on it.
-		var row Row
+		var row expr.Row
 		for _, one := range TokenRows(r) {
 			if one["id"].S == back.ID {
 				row = one

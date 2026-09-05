@@ -1,6 +1,9 @@
 package main
 
-import "testing"
+import (
+	"quackitect/engine/internal/expr"
+	"testing"
+)
 
 // A CHILD DRAWS UNDER ITS PARENT.
 //
@@ -24,7 +27,7 @@ views:
 	if err != nil {
 		t.Fatal(err)
 	}
-	tab, err := Render(b, b.Views[0], []Row{
+	tab, err := Render(b, b.Views[0], []expr.Row{
 		row("id", "wk-parent", "title", "the whole thing"),
 		row("id", "wk-one", "title", "the first half", "parent", "wk-parent"),
 		row("id", "wk-two", "title", "the second half", "parent", "wk-parent"),
@@ -81,7 +84,7 @@ views:
       - title
 `)
 	b, _ := LoadBase(p)
-	tab, err := Render(b, b.Views[0], []Row{
+	tab, err := Render(b, b.Views[0], []expr.Row{
 		row("id", "wk-one", "title", "the first half", "parent", "wk-elsewhere"),
 	})
 	if err != nil {
@@ -122,7 +125,7 @@ views:
 	if err != nil {
 		t.Fatal(err)
 	}
-	tab, err := Render(b, b.Views[0], []Row{
+	tab, err := Render(b, b.Views[0], []expr.Row{
 		row("id", "wk-parent", "title", "the whole thing", "status", "open"),
 		row("id", "wk-one", "title", "the first half", "parent", "wk-parent", "status", "backlogged"),
 	})

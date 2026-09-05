@@ -1,12 +1,4 @@
-package main
-
-import (
-	"fmt"
-	"strconv"
-	"strings"
-)
-
-// THE EXPRESSION LANGUAGE A FILTER IS WRITTEN IN.
+// Package expr is the expression language a filter is written in.
 //
 // Filters and group levels share one syntax and one evaluator, which is what
 // Obsidian's format does and what lets a group level be computed rather than
@@ -19,6 +11,13 @@ import (
 //
 // Implemented: property lookup, string and number literals, true and false,
 // == != > < >= <=, && || !, parentheses, if(), and the method calls below.
+package expr
+
+import (
+	"fmt"
+	"strconv"
+	"strings"
+)
 
 type Value struct {
 	S    string
@@ -28,14 +27,14 @@ type Value struct {
 	Kind byte // s, n, b, l, x for absent
 }
 
-func vs(s string) Value  { return Value{S: s, Kind: 's'} }
-func vn(n float64) Value { return Value{N: n, Kind: 'n'} }
-func vb(b bool) Value    { return Value{B: b, Kind: 'b'} }
-func vl(l []string) Value {
+func Str(s string) Value  { return Value{S: s, Kind: 's'} }
+func Num(n float64) Value { return Value{N: n, Kind: 'n'} }
+func Bool(b bool) Value   { return Value{B: b, Kind: 'b'} }
+func List(l []string) Value {
 	return Value{L: l, Kind: 'l'}
 }
 
-var absent = Value{Kind: 'x'}
+var Absent = Value{Kind: 'x'}
 
 // Truth, as the language sees it. An absent property is false, an empty string
 // is false, and zero is false. That is what makes a bare property name a legal
@@ -162,6 +161,11 @@ type Expr struct {
 	args  []*Expr
 	strct string // the method's receiver name, for a call
 }
+
+// Op builds a node from an operator and its arguments. A caller that has
+// parsed several expressions joins them here rather than writing the tree's
+// own fields, which stay this package's business.
+func Op(op string, args ...*Expr) *Expr { return &Expr{op: op, args: args} }
 
 func Parse(src string) (*Expr, error) {
 	ts, err := lex(src)
@@ -324,43 +328,43 @@ func (e *Expr) Eval(row Row) (Value, error) {
 	if e.op == "" {
 		switch e.kind {
 		case 's':
-			return vs(e.text), nil
+			return Str(e.text), nil
 		case '#':
 			n, err := strconv.ParseFloat(e.text, 64)
 			if err != nil {
-				return absent, fmt.Errorf("%q is not a number", e.text)
+				return Absent, fmt.Errorf("%q is not a number", e.text)
 			}
-			return vn(n), nil
+			return Num(n), nil
 		case 'n':
 			switch e.text {
 			case "true":
-				return vb(true), nil
+				return Bool(true), nil
 			case "false":
-				return vb(false), nil
+				return Bool(false), nil
 			}
 			if v, ok := row[e.text]; ok {
 				return v, nil
 			}
-			return absent, nil
+			return Absent, nil
 		}
 	}
 	switch e.op {
 	case "!":
 		v, err := e.args[0].Eval(row)
-		return vb(!v.Truthy()), err
+		return Bool(!v.Truthy()), err
 	case "&&", "||":
 		l, err := e.args[0].Eval(row)
 		if err != nil {
-			return absent, err
+			return Absent, err
 		}
 		if e.op == "&&" && !l.Truthy() {
-			return vb(false), nil
+			return Bool(false), nil
 		}
 		if e.op == "||" && l.Truthy() {
-			return vb(true), nil
+			return Bool(true), nil
 		}
 		r, err := e.args[1].Eval(row)
-		return vb(r.Truthy()), err
+		return Bool(r.Truthy()), err
 	case "==", "!=", "<", ">", "<=", ">=":
 		return e.compare(row)
 	case "call":
@@ -368,56 +372,56 @@ func (e *Expr) Eval(row Row) (Value, error) {
 	case "method":
 		return e.method(row)
 	}
-	return absent, fmt.Errorf("this program does not know the operator %q", e.op)
+	return Absent, fmt.Errorf("this program does not know the operator %q", e.op)
 }
 
 func (e *Expr) compare(row Row) (Value, error) {
 	l, err := e.args[0].Eval(row)
 	if err != nil {
-		return absent, err
+		return Absent, err
 	}
 	r, err := e.args[1].Eval(row)
 	if err != nil {
-		return absent, err
+		return Absent, err
 	}
 	if e.op == "==" || e.op == "!=" {
 		same := l.Text() == r.Text()
-		return vb(same == (e.op == "==")), nil
+		return Bool(same == (e.op == "==")), nil
 	}
 	// Ordering is on numbers when both are numbers, and on text otherwise, so
 	// dates in the format this program writes order correctly as text.
 	if l.Kind == 'n' && r.Kind == 'n' {
 		switch e.op {
 		case "<":
-			return vb(l.N < r.N), nil
+			return Bool(l.N < r.N), nil
 		case ">":
-			return vb(l.N > r.N), nil
+			return Bool(l.N > r.N), nil
 		case "<=":
-			return vb(l.N <= r.N), nil
+			return Bool(l.N <= r.N), nil
 		}
-		return vb(l.N >= r.N), nil
+		return Bool(l.N >= r.N), nil
 	}
 	a, b := l.Text(), r.Text()
 	switch e.op {
 	case "<":
-		return vb(a < b), nil
+		return Bool(a < b), nil
 	case ">":
-		return vb(a > b), nil
+		return Bool(a > b), nil
 	case "<=":
-		return vb(a <= b), nil
+		return Bool(a <= b), nil
 	}
-	return vb(a >= b), nil
+	return Bool(a >= b), nil
 }
 
 func (e *Expr) call(row Row) (Value, error) {
 	switch e.text {
 	case "if":
 		if len(e.args) < 2 {
-			return absent, fmt.Errorf("if takes a condition and a result")
+			return Absent, fmt.Errorf("if takes a condition and a result")
 		}
 		c, err := e.args[0].Eval(row)
 		if err != nil {
-			return absent, err
+			return Absent, err
 		}
 		if c.Truthy() {
 			return e.args[1].Eval(row)
@@ -425,58 +429,58 @@ func (e *Expr) call(row Row) (Value, error) {
 		if len(e.args) > 2 {
 			return e.args[2].Eval(row)
 		}
-		return absent, nil
+		return Absent, nil
 	case "list":
 		var out []string
 		for _, a := range e.args {
 			v, err := a.Eval(row)
 			if err != nil {
-				return absent, err
+				return Absent, err
 			}
 			out = append(out, v.Text())
 		}
-		return vl(out), nil
+		return List(out), nil
 	}
-	return absent, fmt.Errorf("this program does not know the function %q", e.text)
+	return Absent, fmt.Errorf("this program does not know the function %q", e.text)
 }
 
 func (e *Expr) method(row Row) (Value, error) {
 	self, err := e.args[0].Eval(row)
 	if err != nil {
-		return absent, err
+		return Absent, err
 	}
 	var args []Value
 	for _, a := range e.args[1:] {
 		v, err := a.Eval(row)
 		if err != nil {
-			return absent, err
+			return Absent, err
 		}
 		args = append(args, v)
 	}
 	switch e.text {
 	case "isEmpty":
-		return vb(!self.Truthy()), nil
+		return Bool(!self.Truthy()), nil
 	case "toString":
-		return vs(self.Text()), nil
+		return Str(self.Text()), nil
 	case "lower":
-		return vs(strings.ToLower(self.Text())), nil
+		return Str(strings.ToLower(self.Text())), nil
 	case "contains":
 		if len(args) != 1 {
-			return absent, fmt.Errorf("contains takes one value")
+			return Absent, fmt.Errorf("contains takes one value")
 		}
 		if self.Kind == 'l' {
-			return vb(contains(self.L, args[0].Text())), nil
+			return Bool(contains(self.L, args[0].Text())), nil
 		}
-		return vb(strings.Contains(self.Text(), args[0].Text())), nil
+		return Bool(strings.Contains(self.Text(), args[0].Text())), nil
 	case "startsWith":
-		return vb(len(args) == 1 && strings.HasPrefix(self.Text(), args[0].Text())), nil
+		return Bool(len(args) == 1 && strings.HasPrefix(self.Text(), args[0].Text())), nil
 	case "endsWith":
-		return vb(len(args) == 1 && strings.HasSuffix(self.Text(), args[0].Text())), nil
+		return Bool(len(args) == 1 && strings.HasSuffix(self.Text(), args[0].Text())), nil
 	case "length":
 		if self.Kind == 'l' {
-			return vn(float64(len(self.L))), nil
+			return Num(float64(len(self.L))), nil
 		}
-		return vn(float64(len(self.Text()))), nil
+		return Num(float64(len(self.Text()))), nil
 	}
-	return absent, fmt.Errorf("this program does not know the method %q", e.text)
+	return Absent, fmt.Errorf("this program does not know the method %q", e.text)
 }

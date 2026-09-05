@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"path/filepath"
+	"quackitect/engine/internal/expr"
 	"strings"
 )
 
@@ -17,40 +18,40 @@ import (
 // and ext mean something now, and a query written against Obsidian's format
 // expects them.
 
-func rowOf(r Roots, t Token) Row {
+func rowOf(r Roots, t Token) expr.Row {
 	dir := dirFor(r, t)
 	path := filepath.Join(dir, t.ID+".md")
 	rel, err := filepath.Rel(r.Work, path)
 	if err != nil {
 		rel = path
 	}
-	row := Row{
+	row := expr.Row{
 		// KIND IS A CONSTANT AND IT IS STILL A COLUMN. Every token this
 		// function sees is a work-token, because that is what picked the
 		// schema that read it. A view says so anyway, so the filter still
 		// reads as a question about the note rather than about this program.
-		"kind": vs("work-token"),
-		"id":   vs(t.ID), "title": vs(t.Title), "file": vs(rel),
-		"detail": vs(t.Detail), "guidance": vs(t.Guidance),
-		"status": vs(string(t.Status)), "process": vs(t.Process),
-		"bucket": vs(t.Bucket),
-		"holder": vs(t.Holder), "needs_human": vb(t.NeedsHuman), "urgent": vb(t.Urgent),
-		"depends_on": vl(t.DependsOn), "parent": vs(t.Parent), "ready_when": vs(t.ReadyWhen),
-		"disposition": vs(string(t.Disposition)), "reason": vs(t.Reason),
-		"began": vl(t.Began), "ended": vl(t.Finished),
-		"successors": vl(t.Successors),
+		"kind": expr.Str("work-token"),
+		"id":   expr.Str(t.ID), "title": expr.Str(t.Title), "file": expr.Str(rel),
+		"detail": expr.Str(t.Detail), "guidance": expr.Str(t.Guidance),
+		"status": expr.Str(string(t.Status)), "process": expr.Str(t.Process),
+		"bucket": expr.Str(t.Bucket),
+		"holder": expr.Str(t.Holder), "needs_human": expr.Bool(t.NeedsHuman), "urgent": expr.Bool(t.Urgent),
+		"depends_on": expr.List(t.DependsOn), "parent": expr.Str(t.Parent), "ready_when": expr.Str(t.ReadyWhen),
+		"disposition": expr.Str(string(t.Disposition)), "reason": expr.Str(t.Reason),
+		"began": expr.List(t.Began), "ended": expr.List(t.Finished),
+		"successors": expr.List(t.Successors),
 	}
 	// WHAT A QUERY CAN ASK THAT THE TOKEN DOES NOT ANSWER ITSELF. Blocked is
 	// a walk over other tokens, so it cannot be a field and it can be a
 	// property. A view filters on it without knowing how it is worked out.
-	row["blocked"] = vs(Blocked(r, t))
+	row["blocked"] = expr.Str(Blocked(r, t))
 	return row
 }
 
 // TokenRows is every token, as rows. The order is the ledger's, and sorting is
 // the view's business.
-func TokenRows(r Roots) []Row {
-	var out []Row
+func TokenRows(r Roots) []expr.Row {
+	var out []expr.Row
 	for _, t := range Tokens(r) {
 		out = append(out, rowOf(r, t))
 	}
