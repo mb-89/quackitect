@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"path/filepath"
+	"quackitect/engine/internal/version"
 	"testing"
 	"time"
 
@@ -47,7 +48,7 @@ func BenchmarkPingOverTheSocket(b *testing.B) {
 		b.Fatal("the model did not listen")
 	}
 	defer stop()
-	SayRunning(r, Running{PID: os.Getpid(), Socket: socket, Build: Build})
+	SayRunning(r, Running{PID: os.Getpid(), Socket: socket, Build: version.Build})
 	defer StopSaying(r)
 	b.ResetTimer()
 	for b.Loop() {

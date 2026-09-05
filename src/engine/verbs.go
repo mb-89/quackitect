@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"flag"
 	"fmt"
@@ -72,13 +73,18 @@ var run = map[string]verb{
 type verb func(c *call) int
 
 // call is one invocation of a verb: whose tree, what was said, where the
-// answer goes.
+// answer goes, and the context it runs under, which is the engine's for a
+// verb run inside and main's for one run at a prompt.
 type call struct {
+	ctx   context.Context
 	roots Roots
 	args  []string
 	in    io.Reader
 	out   io.Writer
 	err   io.Writer
+	// refused is set by a verb that answers a refusal as a result with exit 0,
+	// the way pull does, so the count of wrong results still sees it.
+	refused bool
 }
 
 // Verbs answers every verb this program has, in order.

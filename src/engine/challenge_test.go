@@ -41,7 +41,7 @@ func TestAClaimIsArguedWithAndTheThirdIsGranted(t *testing.T) {
 		body, _ := json.Marshal(map[string]any{"hook_event_name": "Stop", "cwd": r.Work,
 			"session_id": "s-1", "stop_hook_active": true})
 		var out bytes.Buffer
-		answerHook(body, []string{"--method", r.Method}, &out, log)
+		answerHook(t.Context(), body, []string{"--method", r.Method}, &out, log)
 		return out.String()
 	}
 	claim := func() {
@@ -98,7 +98,7 @@ func TestAClaimWithEmptyHandsIsGrantedAtOnce(t *testing.T) {
 		body, _ := json.Marshal(map[string]any{"hook_event_name": "Stop", "cwd": r.Work,
 			"session_id": "s-1", "stop_hook_active": true})
 		var out bytes.Buffer
-		answerHook(body, []string{"--method", r.Method}, &out, log)
+		answerHook(t.Context(), body, []string{"--method", r.Method}, &out, log)
 		return out.String()
 	}
 	stop() // the first of the session, granted on its own rule
@@ -140,7 +140,7 @@ func TestCarryingOnStartsTheArgumentAgain(t *testing.T) {
 		}
 		raw, _ := json.Marshal(body)
 		var out bytes.Buffer
-		answerHook(raw, []string{"--method", r.Method}, &out, log)
+		answerHook(t.Context(), raw, []string{"--method", r.Method}, &out, log)
 		return out.String()
 	}
 	tell("Stop", nil) // the first of the session
@@ -210,7 +210,7 @@ func TestThePersonsWordIsNotArguedWith(t *testing.T) {
 		body, _ := json.Marshal(map[string]any{"hook_event_name": "Stop", "cwd": r.Work,
 			"session_id": "s-1", "stop_hook_active": true})
 		var out bytes.Buffer
-		answerHook(body, []string{"--method", r.Method}, &out, log)
+		answerHook(t.Context(), body, []string{"--method", r.Method}, &out, log)
 		return out.String()
 	}
 	stop() // the first of the session, granted on its own rule

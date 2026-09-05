@@ -138,6 +138,6 @@ func aLocalToken(t *testing.T, r Roots, title string) Token {
 func theVerbSaid(t *testing.T, r Roots, name, in string, args ...string) string {
 	t.Helper()
 	var out, errs bytes.Buffer
-	run[name](&call{roots: r, args: args, in: strings.NewReader(in), out: &out, err: &errs})
+	run[name](&call{ctx: t.Context(), roots: r, args: args, in: strings.NewReader(in), out: &out, err: &errs})
 	return out.String() + errs.String()
 }

@@ -97,11 +97,24 @@ func TooManyNotes(r Roots, actor, tool, command string) (string, bool) {
 	fmt.Fprintf(&b, "THIS BOX IS CARRYING %d NOTES, AND NOTHING PUSHES THEM. "+
 		"It is %s, by %s, so what is not in git dies with the container.\n\n",
 		len(notes), host.Says, host.Because)
-	b.WriteString("TURN EACH ONE IN, and the work goes through again. There are three answers:\n" +
-		"- it is useless, so drop it: se work --close <id> --as dropped --why \"...\"\n" +
-		"- it is work, so mint a tracked token from it and close the note as became\n" +
-		"- you cannot decide it, so mint a tracked token carrying your best attempt " +
-		"and set needs_human on it, which puts it where a person looks\n\n")
+	// EACH ANSWER NAMES THE COMMAND THAT PERFORMS IT, AND EACH SITS ON ITS OWN
+	// LINE. This guard is a handing-over: it holds the work and says how to get
+	// out. Its one copyable line named se work --close and --as, and neither flag
+	// is declared, so the agent held here spent a turn on a parse error and then
+	// had to read work.go for the real command. A line with prose after the
+	// command is the same defect in waiting, because what a reader copies is the
+	// line. See refusalflagsexist_test.go, which parses each of these.
+	b.WriteString("TURN EACH ONE IN, and the work goes through again. There are three answers.\n\n" +
+		"IT IS USELESS, so drop it:\n" +
+		"    se work --abort <id> --why \"...\"\n\n" +
+		"IT IS WORK, so mint a tracked token from it:\n" +
+		"    se work --title \"...\" --process trivial --tracked true --detail \"...\" --done-when \"...\"\n" +
+		"Say --process standard where the work wants an approach first. Then close this note as " +
+		"became, naming the minted id in successors. A disposition is moved by a pull, not by " +
+		"this verb.\n\n" +
+		"YOU CANNOT DECIDE IT, so mint it the same way with your best attempt, and put it where " +
+		"a person looks:\n" +
+		"    se work --set <minted> --field needs_human --to true\n\n")
 	b.WriteString("THE NOTES, AS THEY STAND:\n")
 	for _, one := range notes {
 		fmt.Fprintf(&b, "  %s  %s\n", one.ID, one.Title)

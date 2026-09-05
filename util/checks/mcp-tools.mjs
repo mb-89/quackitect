@@ -19,7 +19,7 @@
 //   node util/checks/mcp-tools.mjs <root>
 import { execFileSync } from "node:child_process";
 import { liveEngine } from "./lib/engine.mjs";
-import { mkdtempSync, mkdirSync, copyFileSync, writeFileSync, existsSync, readFileSync } from "node:fs";
+import { mkdtempSync, mkdirSync, copyFileSync, writeFileSync, existsSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 
@@ -49,8 +49,9 @@ const say = (what, ok, why) => {
 // than the request. Either one reaching an agent means the door is broken.
 const malformed = [/flag provided but not defined/, /^se \w+ - /m, /reads nothing but its flags/];
 
-// ask speaks one batch of JSON-RPC and answers what each call said.
-function ask(calls) {
+// ask speaks one batch of JSON-RPC and answers what each call said. The lane
+// is pointed at the check's work folder unless a case names another.
+function ask(calls, over = work) {
   const lines = [JSON.stringify({ jsonrpc: "2.0", id: 0, method: "initialize", params: {} })];
   calls.forEach((c, i) => lines.push(JSON.stringify({
     jsonrpc: "2.0", id: i + 1, method: "tools/call",
@@ -59,7 +60,7 @@ function ask(calls) {
   // THE ENGINE UNDER CHECK IS NAMED, the way the cage names it. Left to the
   // register, the lane answered for whichever copy was listed first, which
   // was a temporary folder another check had left behind.
-  const out = execFileSync(exe, ["--work", work, "--method", root],
+  const out = execFileSync(exe, ["--work", over, "--method", root],
     { input: lines.join("\n") + "\n", encoding: "utf8" });
   const said = new Map();
   for (const line of out.split("\n")) {
@@ -296,6 +297,48 @@ const testAt = calls.findIndex((c) => c.tool === "se_test") + 1;
 const planned = parsed(testAt);
 say("se_test plans off the token's delta", Array.isArray(planned?.chosen) && Array.isArray(planned?.delta) && planned?.since !== undefined,
   JSON.stringify(planned)?.slice(0, 200));
+
+// THE LANE'S SOCKET PATH MIRRORS THE ENGINE'S, AND THIS HOLDS THE MIRROR.
+//
+// theEngineSocket in src/mcp/model.go is a copy of socketPath in
+// src/engine/socket.go: .se/engine.sock under the work folder while that path
+// is under the limit, and quackitect-<six bytes of sha256>.sock under the
+// temporary folder past it. The lane dials it whenever the record names no
+// socket. Nothing else holds the two together: the engine's tests drive one and
+// the lane's the other, so a change to the limit, the hash width or the name on
+// either side leaves the lane dialling a path nothing listens on, and the
+// answer is "start it again" about an engine that is up.
+//
+// So a real engine is asked through the lane with no record to read, over a
+// folder on each side of the limit. THE RECORD IS MADE UNREADABLE AND STAYS SO:
+// a folder where the file was. The beat rewrites the record every few seconds
+// through an atomic rename, and a rename cannot land on a folder, so the lane
+// reads no record for the whole call rather than for the instant between two
+// beats, and this cannot pass on a beat that got there first.
+{
+  const limit = 100; // socketPathLimit in src/engine/socket.go, and the literal in theEngineSocket
+  const deep = join(mkdtempSync(join(tmpdir(), "mcptools-long-")), "a".repeat(96));
+  mkdirSync(join(deep, ".se"), { recursive: true });
+  writeFileSync(join(deep, ".gitignore"), ".se/\n");
+  liveEngine(root, deep);
+  for (const [side, folder, under] of [["short", work, true], ["long", deep, false]]) {
+    const own = join(folder, ".se", "engine.sock");
+    say("the " + side + " work folder is on its side of the socket path limit (" + own.length + " bytes)",
+      (own.length < limit) === under, own);
+    const record = join(folder, ".se", "engine.json");
+    // A beat can land between the remove and the mkdir, so the two go round
+    // until the folder is there.
+    for (;;) {
+      rmSync(record, { force: true });
+      try { mkdirSync(record); break; } catch { /* a beat got there first */ }
+    }
+    let whoami = null;
+    try { whoami = JSON.parse(ask([{ tool: "se_claim", args: { whoami: true } }], folder).get(1) ?? ""); } catch { /* said below */ }
+    say("a record naming no socket still reaches the engine over the " + side + " work folder",
+      /^[0-9a-f]{8}\//.test(whoami?.claimant ?? ""), JSON.stringify(whoami)?.slice(0, 300));
+    rmSync(record, { recursive: true, force: true });
+  }
+}
 
 console.log(bad + " failed.");
 process.exit(bad === 0 ? 0 : 1);

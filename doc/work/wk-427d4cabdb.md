@@ -9,9 +9,19 @@ guidance: [[work-token]]
 title: fed git honours context
 # where the token stands. The process owns these values.
 status: open
+claimed_by: aeaf7bd9/fable-cloud
+claimed_at: "2026-09-05T14:00:03Z"
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - 143237f6d3ebddf4497298c098cfb5c00d4160b4
+  - 2ca297a84afd7db7d10d7449f8c57e088c2598d2
+  - 9b4612de4a85783f5cd29f056abccb70760d309b
+  - c13a8ac3f3f534477d1cbfce8a259e0691691b40
+# the tree each time the work was put down or closed, snapshots the engine wrote
+ended:
+  - 896ee55232dbfb12e22bdcb86824b456dcded07c
+  - 3b94a9d1d26fdae7191752136162c288d170554b
+  - 20f4f54de7bffbcf483773ffcc19b0d15966bc6d
 ---
 
 ## detail

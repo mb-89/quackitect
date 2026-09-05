@@ -32,7 +32,7 @@ func TestAFlagAVerbHasNotGotLeavesTheAnswerStreamEmpty(t *testing.T) {
 			t.Parallel()
 			r := guidanceTree(t)
 			var out, errs bytes.Buffer
-			code := run[name](&call{roots: r, args: []string{"--a-flag-nothing-has", "x"},
+			code := run[name](&call{ctx: t.Context(), roots: r, args: []string{"--a-flag-nothing-has", "x"},
 				in: strings.NewReader(""), out: &out, err: &errs})
 
 			if out.Len() != 0 {

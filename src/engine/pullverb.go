@@ -49,6 +49,7 @@ func runPull(c *call) int {
 	ok := Yes()
 	if a.Pull == AnswerRefused {
 		ok = No()
+		c.refused = true // the answer is a result with exit 0, and it is still a refusal
 	}
 	inSession(roots, "pull", *actor, "pull answered "+a.Pull, ok,
 		map[string]any{"id": id})

@@ -298,7 +298,7 @@ func TestTheQueueIsStaffed(t *testing.T) {
 		body, _ := json.Marshal(map[string]any{"hook_event_name": "PreToolUse", "cwd": r.Work, "session_id": "s-1",
 			"tool_name": tool, "tool_input": map[string]any{"query": "x"}})
 		var out bytes.Buffer
-		answerHook(body, []string{"--method", r.Method}, &out, log)
+		answerHook(t.Context(), body, []string{"--method", r.Method}, &out, log)
 		return out.String()
 	}
 	// BASH, BECAUSE WHAT IS HELD IS THE WORK. A read is not held any more: the
@@ -337,7 +337,7 @@ func TestTheQueueIsStaffed(t *testing.T) {
 			"agent_id": id, "agent_type": "general-purpose", "tool_name": "mcp__quackitect__se_pull",
 			"tool_input": map[string]any{"actor": actor, "role": "worker"}})
 		var out bytes.Buffer
-		answerHook(body, []string{"--method", r.Method}, &out, log)
+		answerHook(t.Context(), body, []string{"--method", r.Method}, &out, log)
 		Pull(r, actor, RoleWorker, Payload{})
 	}
 	tellHelper("a1", "worker-a")

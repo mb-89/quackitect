@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"path/filepath"
+	"quackitect/engine/internal/frontmatter"
 	"reflect"
 	"strings"
 	"testing"
@@ -18,14 +19,14 @@ import (
 // noteParts answers a token file's frontmatter and its body as they are on
 // disk. The file is read rather than the token, because what is written on the
 // page is the thing under discussion.
-func noteParts(t *testing.T, r Roots, id string) (Front, string) {
+func noteParts(t *testing.T, r Roots, id string) (frontmatter.Front, string) {
 	t.Helper()
 	b, err := os.ReadFile(noteAt(r, id))
 	if err != nil {
 		t.Fatal(err)
 	}
-	front, body := SplitNote(string(b))
-	f, err := ParseFront(front)
+	front, body := frontmatter.Split(string(b))
+	f, err := frontmatter.Parse(front)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -34,8 +35,8 @@ func noteParts(t *testing.T, r Roots, id string) (Front, string) {
 
 // exceptTheStretch drops the two fields a take-up and a put-down are expected
 // to move: began and ended are the snapshots the engine writes at each end.
-func exceptTheStretch(f Front) Front {
-	out := Front{}
+func exceptTheStretch(f frontmatter.Front) frontmatter.Front {
+	out := frontmatter.Front{}
 	for k, v := range f {
 		if k == "began" || k == "ended" {
 			continue

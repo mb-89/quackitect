@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"quackitect/engine/internal/frontmatter"
 	"sort"
 	"strings"
 )
@@ -127,8 +128,8 @@ func describeFields(s Schema) map[string]string {
 	return out
 }
 
-func (t Token) front() Front {
-	f := Front{
+func (t Token) front() frontmatter.Front {
+	f := frontmatter.Front{
 		"kind":     asLink(t.kind()),
 		"process":  asLink(t.Process),
 		"guidance": asLink(t.Guidance),
@@ -171,30 +172,30 @@ func (t Token) front() Front {
 
 // THE ID IS THE FILE NAME AND IS NOT WRITTEN TWICE. It is set by the reader
 // from the path, so a token that is renamed is the token it is called.
-func tokenFromFront(f Front) Token {
+func tokenFromFront(f frontmatter.Front) Token {
 	return Token{
-		Process:  unlink(frontStr(f, "process")),
-		Guidance: unlink(frontStr(f, "guidance")),
-		Title:    frontStr(f, "title"),
-		Status:   Status(frontStr(f, "status")),
-		Bucket:   frontStr(f, "bucket"),
+		Process:  unlink(frontmatter.Str(f, "process")),
+		Guidance: unlink(frontmatter.Str(f, "guidance")),
+		Title:    frontmatter.Str(f, "title"),
+		Status:   Status(frontmatter.Str(f, "status")),
+		Bucket:   frontmatter.Str(f, "bucket"),
 		// A HOLDER IN THE FILE IS NOT READ. A note written before the hold
 		// moved into the engine carries one, naming an agent that is gone, and
 		// reading it would put a dead hand back on live work. There is no
 		// field to read it into: the hold comes from holdstore.go.
-		Author:      frontStr(f, "author"),
-		ClaimedBy:   frontStr(f, "claimed_by"),
-		ClaimedAt:   frontStr(f, "claimed_at"),
-		Urgent:      frontBool(f, "urgent"),
-		NeedsHuman:  frontBool(f, "needs_human"),
-		DependsOn:   unlinkAll(frontList(f, "depends_on")),
-		Parent:      unlink(frontStr(f, "parent")),
-		ReadyWhen:   frontStr(f, "ready_when"),
-		Began:       frontList(f, "began"),
-		Finished:    frontList(f, "ended"),
-		Disposition: Disposition(frontStr(f, "disposition")),
-		Reason:      frontStr(f, "reason"),
-		Successors:  unlinkAll(frontList(f, "successors")),
+		Author:      frontmatter.Str(f, "author"),
+		ClaimedBy:   frontmatter.Str(f, "claimed_by"),
+		ClaimedAt:   frontmatter.Str(f, "claimed_at"),
+		NeedsHuman:  frontmatter.Bool(f, "needs_human"),
+		Urgent:      frontmatter.Bool(f, "urgent"),
+		DependsOn:   unlinkAll(frontmatter.List(f, "depends_on")),
+		Parent:      unlink(frontmatter.Str(f, "parent")),
+		ReadyWhen:   frontmatter.Str(f, "ready_when"),
+		Began:       frontmatter.List(f, "began"),
+		Finished:    frontmatter.List(f, "ended"),
+		Disposition: Disposition(frontmatter.Str(f, "disposition")),
+		Reason:      frontmatter.Str(f, "reason"),
+		Successors:  unlinkAll(frontmatter.List(f, "successors")),
 	}
 }
 
@@ -319,17 +320,17 @@ var errNotAToken = errors.New("it is not a work token")
 // it, so a write checked before it lands is checked as the thing that will be
 // read back off disk afterwards, by the same code.
 func noteToken(text, id string) (Token, error) {
-	front, body := SplitNote(text)
+	front, body := frontmatter.Split(text)
 	if front == "" {
 		return Token{}, errNotAToken
 	}
-	f, err := ParseFront(front)
+	f, err := frontmatter.Parse(front)
 	if err != nil {
 		return Token{}, err
 	}
 	// A NOTE IS A TOKEN WHEN IT SAYS WHICH SCHEMA READS IT. type: work said the
 	// same thing twice, so it went with the rest of what nothing read.
-	if unlink(frontStr(f, "kind")) != "work-token" {
+	if unlink(frontmatter.Str(f, "kind")) != "work-token" {
 		return Token{}, errNotAToken
 	}
 	t := tokenFromFront(f)
@@ -686,7 +687,7 @@ func SaveToken(r Roots, t Token) error {
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return err
 	}
-	text := WriteFront(t.front(), frontOrder, describeFields(schema)) + "\n" + t.body()
+	text := frontmatter.Write(t.front(), frontOrder, describeFields(schema)) + "\n" + t.body()
 	final := filepath.Join(dir, t.ID+".md")
 
 	tmp, err := os.CreateTemp(dir, t.ID+".*.tmp")
@@ -731,14 +732,16 @@ func SaveToken(r Roots, t Token) error {
 	// It asks whether this save is the one that ended it. A save of a token
 	// that was already ended is a repair, and a repair does not archive twice.
 	//
-	// IT IS THE STATE AND NOT THE DISPOSITION. A standard token carries done
-	// while a reviewer still has a step to take on it, so archiving on the
-	// disposition alone would take it off the disk before its verdict.
+	// IT IS THE STATE AS WELL AS THE DISPOSITION. A token that has ended where
+	// its process still declares a step is one a hand edit or an older engine
+	// left, and archiving on the disposition alone would take it off the disk
+	// while its process can still move it. Archivable is the rule, and the
+	// sweep asks the same one.
 	//
 	// AND AN ARCHIVE IT CANNOT WRITE DOES NOT UNDO ANY OF THAT. Everything
 	// above has already happened, so a git failure here is a consequence left
 	// over and not a save that went wrong. See NotArchived.
-	if ended := t.Ended() && ClosingState(r, t); ended && (existed != nil || !(was.Ended() && ClosingState(r, was))) {
+	if ended := Archivable(r, t); ended && (existed != nil || !Archivable(r, was)) {
 		if err := Archive(r, t); err != nil {
 			inSession(r, "work", orElse(t.Holder, "engine"), t.ID+" closed, and not archived: "+err.Error(), No(),
 				map[string]any{"id": t.ID})

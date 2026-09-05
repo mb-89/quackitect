@@ -59,6 +59,14 @@ func TestOneFolderAnswersOneDoor(t *testing.T) {
 	if hooksPort(Roots{Work: `C:\Users\mb\one`}) == hooksPort(Roots{Work: `C:\Users\mb\two`}) {
 		t.Error("two folders answer one door, so the port says nothing about which tree it is")
 	}
+
+	// ON POSIX A BACKSLASH IS A CHARACTER IN A NAME, not a separator, so
+	// /home/u/a\b and /home/u/a/b are two folders. Folding the backslash there
+	// would hand two trees one door: the second engine cannot bind it, runs
+	// with none, and every guard over that tree is absent with nothing saying so.
+	if hooksPort(Roots{Work: `/home/u/a\b`}) == hooksPort(Roots{Work: `/home/u/a/b`}) {
+		t.Error("two POSIX folders differing by a backslash against a slash answer one door")
+	}
 }
 
 // A START WRITES NOTHING NEW INTO THE SETTINGS FILE.

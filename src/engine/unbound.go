@@ -155,33 +155,6 @@ func (b Binding) Describe() string {
 	return ""
 }
 
-// PutTheBindingBack puts the tree back to bound at the start of a session, and
-// answers the rung it was on when it did.
-//
-// UNBINDING IS FOR ONE PIECE OF WORK, AND A SESSION IS NOT ONE. A person takes
-// the rules off in front of the panel, for the thing in their hands. The file
-// held that decision for ever: an editor closed on an unbound tree opened on an
-// unbound tree the next day, with nobody having asked for it in that session.
-// God is the sharp case, because every refusal is off and it comes back armed.
-//
-// THE FILE STAYS. The guard is a fresh process per event and holds nothing
-// between them, so the rung has to be on disk. What changes is that a start
-// writes bound into it rather than reading what the last session left.
-//
-// A HANDOVER IS NOT A START. A swap is one session with two processes in it, so
-// the successor leaves the rung alone: a battery that swaps the engine under a
-// person who unbound two minutes ago must not bind them again.
-func PutTheBindingBack(r Roots) (TheBinding, bool) {
-	was := LoadBinding(r).At
-	if was == Bound {
-		return was, false
-	}
-	if _, err := SetBinding(r, Bound, "the engine, at the start of a session"); err != nil {
-		return was, false
-	}
-	return was, true
-}
-
 // TheRungBelow is what one press takes it to from here, so the button does not
 // have to know the ladder. Pressing it while unbound puts it back rather than
 // climbing: climbing is the five-press gesture and nothing else.

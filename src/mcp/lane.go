@@ -225,6 +225,7 @@ type workArgs struct {
 	DoneWhen       []string `json:"done_when"`
 	DependsOn      []string `json:"depends_on"`
 	Parent         string   `json:"parent"`
+	NeedsHuman     bool     `json:"needs_human" says:"true when the answer is not yours: your best attempt, and a person reads it first"`
 	On             string   `json:"on"`
 	Actor          string   `json:"actor"`
 }
@@ -329,6 +330,13 @@ func mintWork(r roots, a workArgs) string {
 	// and a question nobody answered stays unanswered rather than reading false.
 	if a.Tracked != nil {
 		argv = append(argv, "--tracked", strconv.FormatBool(*a.Tracked))
+	}
+	// THE FLAG A HELD AGENT IS TOLD TO SET. The refusal over a box full of notes
+	// names needs_human as the answer for a note nobody here can decide, and
+	// this door carried no way to say it, so the one answer it singled out was
+	// the one an agent under it could not give.
+	if a.NeedsHuman {
+		argv = append(argv, "--needs-human")
 	}
 	if said := saidOnly(a.DependsOn); len(said) > 0 {
 		argv = append(argv, "--depends-on", strings.Join(said, ","))

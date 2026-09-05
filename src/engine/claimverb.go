@@ -59,7 +59,7 @@ func runClaim(c *call) int {
 		return 0
 	}
 	if *sync {
-		c.answerJSON(SyncClaims(r))
+		c.answerJSON(SyncClaims(c.ctx, r))
 		return 0
 	}
 	if *list {
@@ -111,7 +111,7 @@ func runClaim(c *call) int {
 		}
 	}
 	if !*quiet {
-		p := Publish(r, res.Files, ClaimMessage(me, verb, moved))
+		p := Publish(c.ctx, r, res.Files, ClaimMessage(me, verb, moved))
 		res.Published = &p
 	}
 	c.answerJSON(res)

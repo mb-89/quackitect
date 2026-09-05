@@ -50,6 +50,11 @@ func aFedToolchain(t *testing.T, module string, reaches map[string][]string) *fe
 			}
 			return nil, nil
 		},
+		buildEngine: func(dir, bin string) ([]byte, error) {
+			// THE ENGINE HAS TO BE THERE TOO, because the next run reads its
+			// age. Nothing runs it: the test it is handed to is fed as well.
+			return nil, os.WriteFile(bin, []byte("an engine nothing runs"), 0o755)
+		},
 		runOne: func(bin, dir, test, profile string, env []string) ([]byte, error) {
 			fed.Lock()
 			fed.runs++

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"strings"
 	"sync"
@@ -44,7 +45,15 @@ func aFedGit(t *testing.T) *fedGit {
 	return fed
 }
 
-func (f *fedGit) run(r Roots, index string, args ...string) (string, error) {
+func (f *fedGit) run(ctx context.Context, r Roots, index string, args ...string) (string, error) {
+	// THE FAKE ANSWERS THE CONTEXT THE WAY THE REAL GIT DOES. exec refuses to
+	// start a process for a context that is already done, so a fake that ran
+	// anyway let a caller thread no context at all and still pass every claim
+	// test that comes through this seam. The call is refused before it is
+	// recorded, because a call the real git never started never happened.
+	if err := ctx.Err(); err != nil {
+		return "", err
+	}
 	f.Lock()
 	defer f.Unlock()
 	line := strings.Join(args, " ")
@@ -111,7 +120,7 @@ func TestAClaimTouchesNoBranchAndNoWorkingTree(t *testing.T) {
 	fed.says["write-tree"] = "aaaa"
 	fed.says["commit-tree"] = "bbbb"
 
-	got := Publish(r, []string{"doc/work/wk-1.md"}, "a claim")
+	got := Publish(t.Context(), r, []string{"doc/work/wk-1.md"}, "a claim")
 	if !got.Committed || !got.Pushed {
 		t.Fatalf("the claim did not publish: %+v", got)
 	}
@@ -129,13 +138,14 @@ func TestAClaimTouchesNoBranchAndNoWorkingTree(t *testing.T) {
 			t.Errorf("a claim ran %q, which reaches the branch or the working tree", forbidden)
 		}
 	}
-	// AND ONLY THE NOTES IT WAS GIVEN WERE ADDED. A sweep would publish
-	// whatever else the tree is holding.
-	if fed.carried("-A") || fed.carried(".") {
-		t.Error("the claim swept the tree into the commit")
+	// AND NO NOTE WAS ADDED. The ref carries one file of claim lines, written
+	// as a blob into a fresh index, so nothing from the tree is staged and a
+	// sweep has nothing to sweep.
+	if fed.carried("-A") || fed.carried(".") || fed.asked("add", "doc/work") {
+		t.Error("the claim staged the tree's notes into the commit")
 	}
-	if !fed.asked("add", "doc/work/wk-1.md") {
-		t.Error("the claim did not add the note it was given")
+	if !fed.asked("update-index", "--cacheinfo", claimsFile) {
+		t.Error("the claim did not write the one claims file into the index")
 	}
 }
 
@@ -147,7 +157,7 @@ func TestALostRaceReadsTheOtherBoxRatherThanRebasing(t *testing.T) {
 	fed.says["commit-tree"] = "bbbb"
 	fed.fails["push"] = "rejected: the ref moved"
 
-	got := Publish(r, []string{"doc/work/wk-1.md"}, "a claim")
+	got := Publish(t.Context(), r, []string{"doc/work/wk-1.md"}, "a claim")
 	if got.Pushed {
 		t.Fatal("a push that was refused twice reported as pushed")
 	}
@@ -169,7 +179,7 @@ func TestTheSyncFetchesOnlyTheClaimsRef(t *testing.T) {
 	fed.says["show"] = "---\nkind: [[work-token]]\nclaimed_by: 0badc0de/worker-far\n" +
 		"claimed_at: 2026-09-04T06:00:00Z\n---\n\n## detail\n\nsomething\n"
 
-	got := SyncClaims(r)
+	got := SyncClaims(t.Context(), r)
 	if got.Says != "" {
 		t.Fatalf("the sync did not read the ref: %s", got.Says)
 	}
@@ -252,7 +262,7 @@ func TestPublishReachesItsSecondPushWhenThisBoxIsAhead(t *testing.T) {
 	// both are the same call and the count below is what tells them apart.
 	pushes := 0
 	was := gitRuns
-	gitRuns = func(r Roots, index string, args ...string) (string, error) {
+	gitRuns = func(ctx context.Context, r Roots, index string, args ...string) (string, error) {
 		if args[0] == "push" {
 			pushes++
 			if pushes == 1 {
@@ -260,11 +270,11 @@ func TestPublishReachesItsSecondPushWhenThisBoxIsAhead(t *testing.T) {
 			}
 			return "", nil
 		}
-		return fed.run(r, index, args...)
+		return fed.run(ctx, r, index, args...)
 	}
 	t.Cleanup(func() { gitRuns = was })
 
-	got := Publish(r, []string{"doc/work/wk-1.md"}, "a claim")
+	got := Publish(t.Context(), r, []string{"doc/work/wk-1.md"}, "a claim")
 	if !fed.asked("fetch", "+"+claimsRef+":"+remoteClaimsRef) {
 		t.Error("the loser fetched over its own ref, which git refuses while this box is ahead")
 	}
@@ -301,7 +311,7 @@ func TestSyncClaimsReadsFarClaimsWhenThisBoxIsAhead(t *testing.T) {
 	fed.says["show"] = "---\nkind: [[work-token]]\nclaimed_by: 0badc0de/worker-far\n" +
 		"claimed_at: 2026-09-04T06:00:00Z\n---\n\n## detail\n\nsomething\n"
 
-	got := SyncClaims(r)
+	got := SyncClaims(t.Context(), r)
 	if got.Says != "" {
 		t.Fatalf("a box with a claim of its own read nothing: %s", got.Says)
 	}
@@ -320,7 +330,7 @@ func TestARefusedFetchCarriesGitsReason(t *testing.T) {
 	fed := aFedGit(t)
 	fed.fails["fetch"] = "git fetch: ! [rejected] " + claimsRef + " (non-fast-forward)"
 
-	got := SyncClaims(r)
+	got := SyncClaims(t.Context(), r)
 	if !strings.Contains(got.Says, "non-fast-forward") {
 		t.Errorf("the refusal does not carry git's reason: %q", got.Says)
 	}

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
@@ -288,7 +289,15 @@ func aHelperReturningTooMuch(r Roots, cfg Config, in hookIn) (string, bool) {
 // ensureEngine brings the engine over these roots up when none is running,
 // and waits for it to say so. It is what the wake hook and session start do,
 // and what makes a crashed engine cost at most the rest of one turn.
-func ensureEngine(r Roots) {
+//
+// THE CONTEXT GOVERNS THE START AND THE WAIT, AND NEVER THE CHILD. The engine
+// is meant to outlive the hook that started it, so it is not run under the
+// context, which would kill it when the hook returned. A caller already ended
+// starts nothing, and a caller that ends while waiting stops waiting.
+func ensureEngine(ctx context.Context, r Roots) {
+	if ctx.Err() != nil {
+		return
+	}
 	if _, up := LoadRunning(r); up {
 		return
 	}
@@ -320,7 +329,11 @@ func ensureEngine(r Roots) {
 		if v, up := LoadRunning(r); up && v.Socket != "" {
 			return
 		}
-		time.Sleep(50 * time.Millisecond)
+		select {
+		case <-ctx.Done():
+			return // the caller is gone, and the engine goes on coming up without it
+		case <-time.After(50 * time.Millisecond):
+		}
 	}
 	fmt.Fprintln(os.Stderr, "quackitect: the engine was started and has not reported ready")
 }

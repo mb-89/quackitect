@@ -22,6 +22,12 @@ import (
 // one byte of it. --manifest reads a file, which helps a manifest too long for a
 // command line, and --edits carries it inline, which is the form that works when
 // there is no way to put the file there in the first place.
+//
+// AND --from READS IT OUT OF THE SCRATCHPAD, the one folder that session can put
+// a file in: the harness's Write is let through under .se/scratchpad with
+// nothing in hand, so a manifest goes there whole, quotes and all, and is
+// named here. See payloadFrom. --manifest stays for a person at a terminal,
+// whose file may sit anywhere.
 func runApply(c *call) int {
 	fs := flag.NewFlagSet("apply", flag.ContinueOnError)
 	fs.SetOutput(c.err)
@@ -31,6 +37,7 @@ func runApply(c *call) int {
 		fmt.Fprintln(c.err, `  echo '[{"file":"a.go","old":"x","new":"y"}]' | se apply --on wk-1234567890`)
 		fmt.Fprintln(c.err, `  se apply --on wk-1234567890 --edits '[{"file":"a.go","old":"x","new":"y"}]'`)
 		fmt.Fprintln(c.err, "  se apply --on wk-1234567890 --manifest edits.json")
+		fmt.Fprintln(c.err, "  se apply --on wk-1234567890 --from .se/scratchpad/manifest.json")
 		fmt.Fprintln(c.err, "")
 		fmt.Fprintln(c.err, "  The manifest is a JSON array on standard input. Each entry is one edit:")
 		fmt.Fprintln(c.err, `    {"file":"...","old":"...","new":"..."}   replace, and old must be there once`)
@@ -41,6 +48,8 @@ func runApply(c *call) int {
 		fmt.Fprintln(c.err, "")
 		fmt.Fprintln(c.err, "  --edits and --manifest are the same call with no pipe in it, for a")
 		fmt.Fprintln(c.err, "  session whose tool lane never came up and whose Bash guard refuses one.")
+		fmt.Fprintln(c.err, "  --from reads the manifest whole from a file under .se/scratchpad, which")
+		fmt.Fprintln(c.err, "  is the one folder that session may write into with nothing in hand.")
 		fmt.Fprintln(c.err, "")
 		fs.PrintDefaults()
 	}
@@ -49,6 +58,7 @@ func runApply(c *call) int {
 	by := fs.String("by", "", "who is writing")
 	edits := fs.String("edits", "", "the manifest itself, when there is no pipe to send it down")
 	manifest := fs.String("manifest", "", "a file holding the manifest, instead of standard input")
+	from := fs.String("from", "", "a file under .se/scratchpad holding the manifest, read whole")
 	dry := fs.Bool("dry", false, "check every edit and write nothing")
 	undo := fs.Bool("undo", false, "instead of writing: put back what this token's last apply overwrote")
 	if code, stop := c.parse(fs, "apply"); stop {
@@ -95,7 +105,7 @@ func runApply(c *call) int {
 	// ONE MANIFEST, FROM WHICHEVER DOOR NAMED ONE. Naming two is a caller who
 	// believes two different things about what is being written, and writing one
 	// of them silently is how the other is lost.
-	b, err := theManifest(c, *edits, *manifest)
+	b, err := theManifest(c, *edits, *manifest, *from)
 	if err != nil {
 		c.answerJSON(map[string]any{"error": err.Error()})
 		return 1
@@ -122,18 +132,30 @@ func runApply(c *call) int {
 	return 0
 }
 
-// theManifest answers the edits, from whichever of the three doors named them.
+// theManifest answers the edits, from whichever of the four doors named them.
 //
 // STANDARD INPUT IS READ LAST AND ONLY WHEN NOTHING ELSE SAID ANYTHING. At a
 // shell with no pipe in front of it, standard input is the terminal, and reading
 // it there is a call that never returns.
-func theManifest(c *call, edits, manifest string) ([]byte, error) {
-	if edits != "" && manifest != "" {
-		return nil, fmt.Errorf("--edits and --manifest are two manifests, so name one. " +
-			"--edits carries the JSON itself and --manifest names a file holding it")
+func theManifest(c *call, edits, manifest, from string) ([]byte, error) {
+	var named []string
+	for _, door := range []struct{ flag, value string }{
+		{"--edits", edits}, {"--manifest", manifest}, {"--from", from},
+	} {
+		if door.value != "" {
+			named = append(named, door.flag)
+		}
+	}
+	if len(named) > 1 {
+		return nil, fmt.Errorf("%s are two manifests, so name one. "+
+			"--edits carries the JSON itself, --manifest names a file holding it, and "+
+			"--from names one under .se/scratchpad", joinAnd(named))
 	}
 	if edits != "" {
 		return []byte(edits), nil
+	}
+	if from != "" {
+		return payloadFrom(c.roots, from)
 	}
 	if manifest != "" {
 		b, err := os.ReadFile(manifest)

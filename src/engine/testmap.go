@@ -346,9 +346,10 @@ func buildEnv() []string {
 // whether it passed, what it said, and the regions it executed.
 //
 // THE ENGINE FIXTURE IS NAMED, so a suite whose TestMain builds an engine
-// uses the one this engine is, and a per-test run costs the test and not a
-// link.
-func runOneGoTest(r Roots, bin string, t aTest) (ok bool, said string, took time.Duration, regions []region, err error) {
+// uses the one it is handed, and a per-test run costs the test and not a
+// link. Which one that is, suiteEngine decides: the resident engine while it
+// is newer than the tree, and one built from the tree otherwise.
+func runOneGoTest(r Roots, bin, engine string, t aTest) (ok bool, said string, took time.Duration, regions []region, err error) {
 	// IT ENDS .tmp SO THE SWEEP KNOWS IT. The remove below is deferred, and a
 	// run that is killed left a zero-byte profile in .se/tests for ever.
 	profile, err := os.CreateTemp(r.Private("tests"), "profile.*.out.tmp")
@@ -359,7 +360,7 @@ func runOneGoTest(r Roots, bin string, t aTest) (ok bool, said string, took time
 	defer os.Remove(profile.Name())
 	dir := filepath.Join(r.Work, filepath.FromSlash(filepath.Dir(t.Path)))
 	env := buildEnv()
-	if engine := filepath.Join(r.Method, ".bin", exeName("se")); fileExists(engine) {
+	if engine != "" {
 		env = append(env, "SE_ENGINE="+engine)
 	}
 	start := time.Now()
@@ -517,6 +518,7 @@ func mapMissing(r Roots, db *sql.DB, done <-chan struct{}) (mapped, failed int, 
 		return 0, 0, err
 	}
 	bins := map[string]string{}
+	engine, engineKnown := "", false
 	var first error
 	for _, t := range tests {
 		if done != nil {
@@ -545,7 +547,11 @@ func mapMissing(r Roots, db *sql.DB, done <-chan struct{}) (mapped, failed int, 
 		if bin == "" {
 			continue
 		}
-		_, _, took, regions, err := runOneGoTest(r, bin, t)
+		if !engineKnown {
+			engine, _ = suiteEngine(r)
+			engineKnown = true
+		}
+		_, _, took, regions, err := runOneGoTest(r, bin, engine, t)
 		if err != nil {
 			failed++
 			continue
@@ -571,8 +577,9 @@ func mapMissing(r Roots, db *sql.DB, done <-chan struct{}) (mapped, failed int, 
 // ONE TEST DRIVES THE REAL COMPILER and holds this contract; the rest feed one
 // and decide what it answers.
 type toolchain struct {
-	buildCover func(dir, bin string) ([]byte, error)
-	runOne     func(bin, dir, test, profile string, env []string) ([]byte, error)
+	buildCover  func(dir, bin string) ([]byte, error)
+	buildEngine func(dir, bin string) ([]byte, error) // the engine a subprocess test drives, from the tree
+	runOne      func(bin, dir, test, profile string, env []string) ([]byte, error)
 }
 
 var theToolchain = realToolchain()
@@ -581,6 +588,12 @@ func realToolchain() toolchain {
 	return toolchain{
 		buildCover: func(dir, bin string) ([]byte, error) {
 			cmd := quiet.Quietly(exec.Command(goTool(), "test", "-c", "-cover", "-o", bin, "."))
+			cmd.Dir = dir
+			cmd.Env = buildEnv()
+			return cmd.CombinedOutput()
+		},
+		buildEngine: func(dir, bin string) ([]byte, error) {
+			cmd := quiet.Quietly(exec.Command(goTool(), "build", "-o", bin, "."))
 			cmd.Dir = dir
 			cmd.Env = buildEnv()
 			return cmd.CombinedOutput()

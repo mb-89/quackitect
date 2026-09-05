@@ -68,6 +68,8 @@ func runFind(c *call) int {
 		fmt.Fprintln(c.err, "  se find --regex \"TODO\" --path \"src/**/*.go\"   narrowed to a file glob")
 		fmt.Fprintln(c.err, "  se find --path \"util/checks/*.mjs\"       the files a glob names, and nothing else")
 		fmt.Fprintln(c.err, "  se find --archive --regex \"gooseberry\"  the same, over what has been archived")
+		fmt.Fprintln(c.err, "  se find --archive --words \"a AND b\"      the same FTS5 words over the archive. --path has")
+		fmt.Fprintln(c.err, "                                            nothing to narrow there and is refused")
 		fmt.Fprintln(c.err, "")
 		fmt.Fprintln(c.err, "  Every hit is a path, a line number and the line. fresh says whether")
 		fmt.Fprintln(c.err, "  the engine is watching the tree; when it is not, hits may be behind the files.")

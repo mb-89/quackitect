@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"context"
 	"crypto/sha256"
 	"database/sql"
 	"encoding/hex"
@@ -11,6 +12,7 @@ import (
 	"net"
 	"os"
 	"path/filepath"
+	"quackitect/engine/internal/version"
 	"sync/atomic"
 	"time"
 )
@@ -57,7 +59,10 @@ var slowMethods = map[string]time.Duration{
 type model struct {
 	db    *sql.DB
 	roots Roots
-	rev   atomic.Int64
+	// ctx is the engine's own, and a verb run inside takes it, so a git call
+	// a verb makes ends when the engine does.
+	ctx context.Context
+	rev atomic.Int64
 	// ready is set once the first scan is done and the cookie was waited
 	// for, and watching says whether the cookie came. A ping answers both,
 	// so the battery reads the daemon's own self-check instead of waiting
@@ -177,7 +182,7 @@ func answerModel(conn net.Conn, m *model) {
 func (m *model) answer(ask_ modelAsk) (any, error) {
 	switch ask_.Method {
 	case "ping":
-		return map[string]any{"build": Build, "pid": os.Getpid(), "load": theLoad.snapshot(),
+		return map[string]any{"build": version.Build, "pid": os.Getpid(), "load": theLoad.snapshot(),
 			"ready": m.ready.Load(), "watching": m.watching.Load()}, nil
 	case "verb":
 		var ask verbAsk
@@ -187,7 +192,7 @@ func (m *model) answer(ask_ modelAsk) (any, error) {
 		theLoad.verbsInFlight.Add(1)
 		defer theLoad.verbsInFlight.Add(-1)
 		defer theLoad.verbsAnswered.Add(1)
-		return runVerbInside(m.roots, ask), nil
+		return runVerbInside(m.ctx, m.roots, ask), nil
 	case "stop":
 		select {
 		case m.askedToStop <- struct{}{}:
@@ -210,10 +215,10 @@ func (m *model) answer(ask_ modelAsk) (any, error) {
 			return nil, err
 		}
 		if !m.pendingSwap.CompareAndSwap(nil, &plan) {
-			return swapAnswer{Swapping: true, Build: plan.Build, From: Build,
+			return swapAnswer{Swapping: true, Build: plan.Build, From: version.Build,
 				Says: "a swap was already asked for, so this one is the same one"}, nil
 		}
-		return swapAnswer{Swapping: true, Build: plan.Build, From: Build,
+		return swapAnswer{Swapping: true, Build: plan.Build, From: version.Build,
 			Says: "the next engine is built and answers. The calls in flight finish, then it takes over"}, nil
 	case "copy":
 		var p struct {
@@ -279,13 +284,27 @@ func askModel(r Roots, method string, params any) (json.RawMessage, int64, bool)
 	return askModelWithin(r, method, params, modelAnswerBudget)
 }
 
+// theSocketOf answers where the engine is dialled: the socket the record
+// names, and the engine's own path when it names none.
+//
+// THE SOCKET IS THE TRUTH, NOT THE RECORD. A second engine that could not
+// bind wrote the record with no socket in it and beat beside the first, so
+// every other read saw no socket while the first engine answered on its path
+// the whole time. Nine calls in twenty were told to start an engine. The path
+// is decided by socketPath from the roots alone, so a record naming none, or
+// no record at all, still leaves the one place to try. What is dialled
+// either answers or refuses, and only a refusal is no engine.
+func theSocketOf(r Roots, running Running) string {
+	if running.Socket != "" {
+		return running.Socket
+	}
+	return socketPath(r)
+}
+
 // askModelWithin is askModel with the caller's own patience for the answer.
 func askModelWithin(r Roots, method string, params any, within time.Duration) (json.RawMessage, int64, bool) {
-	running, ok := LoadRunning(r)
-	if !ok || running.Socket == "" {
-		return nil, 0, false
-	}
-	conn, err := net.DialTimeout("unix", running.Socket, modelDialBudget)
+	running, _ := LoadRunning(r) // a record that is not an engine still leaves the socket to try
+	conn, err := net.DialTimeout("unix", theSocketOf(r, running), modelDialBudget)
 	if err != nil {
 		return nil, 0, false
 	}
@@ -357,11 +376,8 @@ var ErrNoEngine = errors.New("no engine is running")
 // the program it was handed, and the battery went on for thirty seconds waiting
 // for a handover that had already been refused.
 func askModelForAnAnswer(r Roots, method string, params any, within time.Duration) (json.RawMessage, error) {
-	running, ok := LoadRunning(r)
-	if !ok || running.Socket == "" {
-		return nil, ErrNoEngine
-	}
-	conn, err := net.DialTimeout("unix", running.Socket, modelDialBudget)
+	running, _ := LoadRunning(r) // a record that is not an engine still leaves the socket to try
+	conn, err := net.DialTimeout("unix", theSocketOf(r, running), modelDialBudget)
 	if err != nil {
 		return nil, fmt.Errorf("%w: %v", ErrNoEngine, err)
 	}

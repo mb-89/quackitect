@@ -32,7 +32,7 @@ func probeTree(t *testing.T) Roots {
 func TestTheProbeKeepsOnlyWhatAnswers(t *testing.T) {
 	t.Parallel()
 	r := probeTree(t)
-	p := ProbeTools(r, "20260831-000000")
+	p := ProbeTools(t.Context(), r, "20260831-000000")
 	if len(p.Found) != 1 || p.Found[0].Name != theEngine(t) {
 		t.Fatalf("the probe found %+v", p.Found)
 	}
@@ -51,7 +51,7 @@ func TestTheProbeKeepsOnlyWhatAnswers(t *testing.T) {
 func TestAMissingCandidateListDoesNotStopTheProbe(t *testing.T) {
 	t.Parallel()
 	r := Roots{Method: t.TempDir(), Work: t.TempDir()}
-	if p := ProbeTools(r, "20260831-000000"); len(p.Found) != 0 {
+	if p := ProbeTools(t.Context(), r, "20260831-000000"); len(p.Found) != 0 {
 		t.Fatalf("it found %d tools with no list", len(p.Found))
 	}
 }
@@ -83,7 +83,7 @@ func TestAnActorArrivesOnceAndThenDoesNot(t *testing.T) {
 func TestAProbeFromAnEarlierSessionIsIgnored(t *testing.T) {
 	t.Parallel()
 	r := probeTree(t)
-	ProbeTools(r, "20260831-000000")
+	ProbeTools(t.Context(), r, "20260831-000000")
 	if got := KnownTools(r, "20260831-111111"); got != nil {
 		t.Fatalf("a stale probe was handed over: %+v", got)
 	}
@@ -99,7 +99,7 @@ func TestTheFirstPullCarriesTheToolsAndTheSecondDoesNot(t *testing.T) {
 		t.Fatal(err)
 	}
 	l.Write("engine", "start", "engine", "for the session name", Yes(), nil)
-	ProbeTools(r, l.Session())
+	ProbeTools(t.Context(), r, l.Session())
 	l.Close()
 
 	first := Pull(r, "main", RoleWorker, Payload{})

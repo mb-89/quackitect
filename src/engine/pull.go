@@ -140,10 +140,55 @@ func answerFor(r Roots, actor, role string, p Payload) Answer {
 		}
 		learned, over = a.Learned, a.Notice
 	}
+	// A HOLD ON YOUR OWN VERDICT IS NOT WORK IN HAND. The submission put the
+	// token down, and naming it again through se run or se apply took it back
+	// up, so the queue handed the author its own done token with the verdict's
+	// checklist. It comes off here, before the queue reads what is held, and a
+	// reviewer pull by the author is refused the way its submission is.
+	down, refused := ownVerdictOffTheHand(r, actor, role)
+	if refused != nil {
+		return *refused
+	}
 	a := whatComesNext(r, actor, role)
 	a.Learned = learned
-	a.Notice += over
+	a.Notice += over + down
 	return a
+}
+
+// ownVerdictOffTheHand puts down every token this actor holds whose next step
+// is a verdict on its own work. It answers what it said about that, and the
+// refusal when the pull was for a verdict, since the verdict is never the
+// author's.
+func ownVerdictOffTheHand(r Roots, actor, role string) (string, *Answer) {
+	var down []string
+	var own *Token
+	for _, t := range Tokens(r) {
+		if t.Holder != actor || t.Ended() || t.Author != actor || roleAt(r, t) != RoleReviewer {
+			continue
+		}
+		t.Holder = ""
+		if err := SaveToken(r, t); err != nil {
+			continue
+		}
+		inSession(r, "work", actor, t.ID+" put back: its next step is a verdict, and the verdict is never the author's",
+			Yes(), map[string]any{"id": t.ID})
+		down = append(down, t.ID)
+		if own == nil {
+			first := t
+			own = &first
+		}
+	}
+	if len(down) == 0 {
+		return "", nil
+	}
+	if role == RoleReviewer {
+		a := refuse(own, Rejection{Clause: "author",
+			Wrong:     "you did the work on " + own.ID + ", so the verdict is not yours. It is put back for a reviewer",
+			Satisfies: "a verdict from another actor. Pull with role worker for work of your own"})
+		return "", &a
+	}
+	return " Put back, because its next step is a verdict and the verdict is never the author's: " +
+		strings.Join(down, ", ") + ".", nil
 }
 
 // whatComesNext is the queue's answer to an actor with nothing in hand.
