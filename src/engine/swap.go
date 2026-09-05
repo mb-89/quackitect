@@ -405,6 +405,63 @@ type swapAnswer struct {
 	Build    string `json:"build,omitempty"`
 	From     string `json:"from,omitempty"`
 	Says     string `json:"says,omitempty"`
+	// Waited is how long the caller watched for the successor to take over.
+	// The engine answers before the handover, so this is the field that says
+	// somebody looked afterwards, and for how long.
+	Waited string `json:"waited,omitempty"`
+}
+
+// swapLandsBudget is how long the caller watches for the successor to take
+// over. The engine answers before it drains, so the whole of the drain and a
+// verify can pass before the new build writes engine.json.
+const swapLandsBudget = swapDrainBudget + swapVerifyBudget
+
+// swapLandsTick is how often the caller looks while it waits.
+const swapLandsTick = 500 * time.Millisecond
+
+// afterTheAnswer is what the caller is told, once somebody has looked.
+//
+// THE ENGINE'S ANSWER IS A PROMISE AND NOT A REPORT. It answers as soon as the
+// next program is built and has answered for itself, and the handover is the
+// loop's to do afterwards. So swapping true meant the swap had been arranged,
+// never that it happened.
+//
+// MEASURED, TWICE IN ONE DAY. The door answered swapping true and named the
+// build. Three quarters of a minute later engine.json still named the old one
+// and the old code went on answering. Nothing said so, and an agent that had
+// just fixed a guard read a success while the old guard went on refusing it.
+//
+// SO THE CALLER WATCHES FOR THE BUILD IT WAS PROMISED, and says how long it
+// watched either way. A swap that was never arranged names no build, and there
+// is nothing to watch for.
+func afterTheAnswer(r Roots, a swapAnswer, within, tick time.Duration) swapAnswer {
+	if !a.Swapping || a.Build == "" {
+		return a
+	}
+	started := time.Now()
+	for {
+		v, up := LoadRunning(r)
+		if up && v.Build == a.Build {
+			a.Waited = time.Since(started).Round(time.Millisecond).String()
+			return a
+		}
+		if waited := time.Since(started); waited >= within {
+			// THE BUILD THAT IS STILL THERE IS HALF THE ANSWER. Naming only
+			// the one that did not arrive leaves the reader unable to say
+			// whether anything moved at all.
+			standing := v.Build
+			if !up || standing == "" {
+				standing = "nothing"
+			}
+			a.Swapping = false
+			a.Waited = waited.Round(time.Millisecond).String()
+			a.Says = "the engine said it was handing over to " + a.Build + " and did not. " +
+				"After " + a.Waited + " engine.json still names " + standing + ", so the old code " +
+				"is still answering. Stop the engine and start it again: se --stop, then se --work " + r.Work
+			return a
+		}
+		time.Sleep(tick)
+	}
 }
 
 // askForASwap asks the engine over this folder to replace itself, and answers
@@ -426,5 +483,7 @@ func askForASwap(r Roots, why string, built bool) (swapAnswer, error) {
 	if err := json.Unmarshal(raw, &a); err != nil {
 		return swapAnswer{}, err
 	}
-	return a, nil
+	// AND THEN SOMEBODY LOOKS. What came back is what the engine arranged, and
+	// the caller is the party that can see whether it happened.
+	return afterTheAnswer(r, a, swapLandsBudget, swapLandsTick), nil
 }

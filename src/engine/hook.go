@@ -625,7 +625,7 @@ func answerHook(ctx context.Context, raw []byte, args []string, out io.Writer, h
 		if why, refuse := aHelperReturningTooMuch(roots, cfg, in); refuse {
 			if AHelperAnswerStillRefused(roots, in.AgentID) {
 				record(log, "agent", "helper", actor, "helper stop refused: its answer is over budget", No(),
-					map[string]any{"returned": len(in.LastAssistantMessage), "read": BytesReadBy(roots, in.AgentID)})
+					map[string]any{"returned": len(in.LastAssistantMessage), "read": bytesReadByAnyNameOf(roots, in.AgentID)})
 				g.blockStop(why)
 				break
 			}

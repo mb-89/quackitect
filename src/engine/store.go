@@ -12,23 +12,15 @@ import (
 
 // WHERE TOKENS LIVE, AND WHAT THEY ARE.
 //
-// A TOKEN IS A MARKDOWN NOTE. Its frontmatter is what the engine reads and
-// what a query filters on. Its body is prose, which is what makes it a thing a
-// person reads six months later rather than a record only a program can open.
+// A token is a markdown note. Two folders hold them, and the minter picks one:
 //
-// TWO FOLDERS, AND WHICH ONE DEPENDS ON THE TOKEN.
+//	.se/work/   local. Private material, and it never travels with a copy.
+//	doc/work/   tracked. The record of what was done, in version control.
 //
-//	.se/work/   local. Scratch work, an agent's own breakdown. Private
-//	            material, and it never travels with a copy.
-//	doc/work/   tracked. The record of what was done. It travels, and it is in
-//	            version control, because that is the point of tracking it.
+// A note is a token when its frontmatter says `type: work`, so a folder may
+// hold other notes beside them.
 //
-// The minter decides which, by deciding whether the token is tracked, and
-// nothing moves afterwards.
-//
-// A FOLDER MAY HOLD OTHER NOTES. A note is a token when its frontmatter says
-// `type: work`, so neither folder is claimed whole and a person may keep their
-// own notes beside them.
+// Why it is this shape: [[tokens-are-notes-in-two-folders]].
 
 // LocalDir is private and never travels. TrackedDir is the record.
 func LocalDir(r Roots) string   { return r.Private("work") }
@@ -38,19 +30,11 @@ func workDirs(r Roots) []string { return []string{TrackedDir(r), LocalDir(r)} }
 
 // dirFor answers where a token's file belongs.
 //
-// THE FOLDER IS THE ANSWER, AND NOTHING ELSE IS. A token in doc/work travels
-// and one in .se/work does not, so a field saying the same thing is a second
-// answer that can disagree with the first. There is no such field, on the note
-// or on the process.
+// THE FOLDER IS THE ANSWER, AND NOTHING ELSE IS. A token that has a file is in
+// the folder holding it, so one moved by hand stays moved. A token with no file
+// is new, and the mint said where it is born.
 //
-// A token that has a file is in the folder that answers for it. So a token
-// moved by hand stays moved, which is what a move means.
-//
-// MEASURED. The process carried the answer and dirFor read it on every save.
-// A token dragged into the other store was dragged back by the next save, and
-// moving a hundred of them needed the process edited as well.
-//
-// A token with no file is new, and the mint said where it is born.
+// Why it is this shape: [[the-folder-answers-where-a-token-lives]].
 func dirFor(r Roots, t Token) string {
 	if at := noteAt(r, t.ID); at != "" {
 		return filepath.Dir(at)
@@ -469,14 +453,10 @@ type overLong struct {
 // overCaps answers every bounded section that runs past its bound, in the
 // order the schema declares them, so a refusal names the same one every time.
 //
-// IT IS SEPARATE FROM THE REFUSAL because two doors need the measurement and
-// only one of them wants the save's wording: the write door has to compare
-// what a section would become against what it already holds.
+// IT MEASURES AND DOES NOT REFUSE, so both doors that want the count can use
+// it. It weighs what the editor weighs: maxWords, counted by overWords.
 //
-// IT WEIGHS WHAT THE EDITOR WEIGHS. The bound is the section's maxWords and
-// the count is overWords, which is what the lint and the language server run.
-// A chapter the editor marks is a chapter the save refuses, and there is no
-// third answer for the writer to discover at the door.
+// Why it is this shape: [[measuring-is-separate-from-refusing]].
 func overCaps(s Schema, t Token) []overLong {
 	var out []overLong
 	for _, sec := range s.Body.Sections {
@@ -619,20 +599,11 @@ func readBody(t *Token, body string) {
 
 // settleEnding makes the status follow the disposition.
 //
-// THE DISPOSITION IS THE FIELD THAT SAYS A TOKEN HAS STOPPED. Ended reads it,
-// because the disposition is the engine's and the state is the process's. So a
-// token carrying one has ended whatever its status says.
+// THE DISPOSITION IS THE FIELD THAT SAYS A TOKEN HAS STOPPED, and Ended reads
+// it. This moves only a token its process cannot: one that has ended somewhere
+// a step still leaves goes to the state the process ends at.
 //
-// AND A STATUS LEFT BEHIND IS UNREACHABLE BY EVERY VERB. Three tokens read
-// noted while carrying dropped. A submission against one was refused as already
-// closed, and writeField refuses a status outright as the pull's to write, so
-// the field could not be repaired except by hand. The archive never took them
-// either, because it asks for a closing state and decide still leaves noted.
-//
-// IT ONLY MOVES A TOKEN ITS PROCESS CANNOT MOVE. A standard token at done owes
-// a verdict and has not ended, so nothing here touches it. One that has ended
-// somewhere a step still leaves is the disagreement, and it goes to the state
-// the process ends at.
+// Why it is this shape: [[the-disposition-says-it-stopped]].
 func settleEnding(r Roots, t Token) Token {
 	if !t.Ended() || ClosingState(r, t) {
 		return t
