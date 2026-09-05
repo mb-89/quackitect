@@ -1,6 +1,9 @@
 package main
 
-import "testing"
+import (
+	"testing"
+	"time"
+)
 
 // A WORKER PULL NEVER HANDS THE AUTHOR ITS OWN DONE TOKEN.
 //
@@ -34,6 +37,13 @@ func TestAWorkerPullDoesNotHandTheAuthorItsOwnDoneToken(t *testing.T) {
 	noDoneTokenOfItsOwn("straight after the submission")
 
 	// AND AFTER NAMING IT AGAIN, the way se run --on does, which takes it up.
+	//
+	// IT CLAIMS AGAIN FIRST, because its own submission handed the claim back
+	// with the hold. Naming it without one used to work on the claim it had
+	// already finished with.
+	if _, err := Claim(r, Claimant(r, "worker-1"), []string{tok.ID}, time.Now().UTC()); err != nil {
+		t.Fatalf("the author claiming its own done token again: %v", err)
+	}
 	if _, err := TakeUp(r, tok.ID, "worker-1"); err != nil {
 		t.Fatalf("naming the done token again: %v", err)
 	}
