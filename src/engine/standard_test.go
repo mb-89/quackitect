@@ -102,7 +102,12 @@ func ticked(t *testing.T, r Roots, id string) Token {
 		}
 		rows := "| done | criterion | evidence | receipt |\n|---|---|---|---|\n"
 		for _, c := range step.Criteria {
-			rows += "| [x] | " + c.Says + " | seen: " + c.Says + " |  |\n"
+			// THE EVIDENCE IS A WORD, NOT THE CRITERION AGAIN. A section is
+			// measured in words, and repeating each criterion doubled the
+			// table: a process that gained a criterion pushed every fixture
+			// past the cap, and five tests failed about a limit none of them
+			// is about. The gate reads whether the cell says anything.
+			rows += "| [x] | " + c.Says + " | seen |  |\n"
 		}
 		tok.Submission["step "+itoa(i+1)+". "+step.Name] = rows
 	}

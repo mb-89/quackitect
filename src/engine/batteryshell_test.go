@@ -72,7 +72,7 @@ func TestTheBatteryRunsOnTheShellGitBrought(t *testing.T) {
 
 	// THE RUN IS STARTED AND NOT AWAITED, so what is watched here is the run
 	// itself reaching the file the engine pointed at. See battery.go.
-	got := startBattery(r, "worker-one", "")
+	got := startBattery(t.Context(), r, "worker-one", "")
 	if !got.OK {
 		t.Fatalf("the battery did not start: said=%q", got.Said)
 	}
@@ -109,7 +109,7 @@ func TestTheBatterySaysWhereItLookedForTheShell(t *testing.T) {
 	}
 
 	// AND THE ANSWER A PERSON READS CARRIES THEM, not only the refusal.
-	said := startBattery(r, "worker-one", "").Said
+	said := startBattery(t.Context(), r, "worker-one", "").Said
 	for _, want := range []string{"no sh on this machine", looked[0]} {
 		if !strings.Contains(said, want) {
 			t.Errorf("the battery's answer does not carry %q:\n%s", want, said)
