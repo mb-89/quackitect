@@ -15,7 +15,7 @@ import (
 // starting engine uses, because a caller reads one shape.
 func TestAskingForAnEngineWhileOneRunsAttachesToIt(t *testing.T) {
 	t.Parallel()
-	r := Roots{Method: t.TempDir(), Work: t.TempDir()}
+	r := aTree(t).apart().Roots
 
 	if _, yes := AlreadyHere(r); yes {
 		t.Fatal("it attached to an engine that is not there")
@@ -54,7 +54,7 @@ func TestAskingForAnEngineWhileOneRunsAttachesToIt(t *testing.T) {
 // that stopped writing beats stopped.
 func TestAStaleBeatReadsDead(t *testing.T) {
 	t.Parallel()
-	r := Roots{Method: t.TempDir(), Work: t.TempDir()}
+	r := aTree(t).apart().Roots
 	hourOld := time.Now().UTC().Add(-time.Hour).Format(time.RFC3339)
 	SayRunning(r, Running{PID: os.Getpid(), Beat: hourOld})
 	if _, up := LoadRunning(r); up {
@@ -75,7 +75,7 @@ func TestAStaleBeatReadsDead(t *testing.T) {
 // squatter from the engine it knew.
 func TestARunIdentityTellsEnginesApart(t *testing.T) {
 	t.Parallel()
-	r := Roots{Method: t.TempDir(), Work: t.TempDir()}
+	r := aTree(t).apart().Roots
 	SayRunning(r, Running{PID: os.Getpid(), Run: "run-abc",
 		Beat: time.Now().UTC().Format(time.RFC3339)})
 	if !SameRun(r, "run-abc") {

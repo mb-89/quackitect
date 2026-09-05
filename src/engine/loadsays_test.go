@@ -41,8 +41,7 @@ func loadLinesIn(t *testing.T, r Roots) []string {
 // headline said so while the headline said otherwise.
 func TestTheLoadLineSaysWhichBoundTripped(t *testing.T) {
 	t.Parallel()
-	root := t.TempDir()
-	r := Roots{Method: root, Work: root}
+	r := aTree(t).Roots
 	log, err := OpenLog(r.Private("log"))
 	if err != nil {
 		t.Fatal(err)

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	"encoding/json"
 	"errors"
 	"os"
@@ -17,27 +16,6 @@ import (
 // With six agents on one box the lane answered "answers no questions yet.
 // Start it again" between two calls that both answered, and a se_test that
 // outran the lane's sixty seconds read as a dead engine with its result lost.
-
-// aModelServed serves a model over an indexed tree on its socket, and answers
-// the roots and the socket's address.
-func aModelServed(t *testing.T) (Roots, string) {
-	t.Helper()
-	r := aTreeToIndex(t)
-	openTheIndex(t, r)
-	ro, err := sql.Open("sqlite3", indexDSN(indexPath(r), true))
-	if err != nil {
-		t.Fatal(err)
-	}
-	t.Cleanup(func() { ro.Close() })
-	m := &model{ctx: t.Context(), db: ro, roots: r, askedToStop: make(chan struct{}, 1), askedToSwap: make(chan swapPlan, 1)}
-	ln, addr, err := listenModel(r)
-	if err != nil {
-		t.Fatal(err)
-	}
-	t.Cleanup(func() { ln.Close() })
-	go serveModel(t.Context(), ln, m)
-	return r, addr
-}
 
 func TestConcurrentCallsAreAllAnswered(t *testing.T) {
 	r, addr := aModelServed(t)

@@ -4,9 +4,7 @@ import (
 	"bytes"
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -22,69 +20,6 @@ import (
 // each reaching B, so the suite is big enough for the share rule to mean
 // anything and a change to A still reaches exactly one test.
 const padTests = 20
-
-// aTreeWithTests is a git repository holding a Go module with lib.go and
-// lib_test.go, committed, indexed, and with every test mapped. It costs a
-// cover build and a run per test, so a test takes it once.
-func aTreeWithTests(t *testing.T) (Roots, string) {
-	t.Helper()
-	// THE COMPILER IS FED, NOT RUN. What these tests are about is which tests
-	// the engine chooses from a delta, and the toolchain answers the same thing
-	// every time and takes ten seconds to say it. TestTheMapIsBuiltByTheRealGo
-	// drives the real one, once. See toolchainfed_test.go.
-	reaches := map[string][]string{
-		"TestA": {"lib.go:3.13,5.2 1 1"},
-		"TestB": {"lib.go:7.13,9.2 1 1"},
-	}
-	// THE PADDING REACHES B, the way the padding written below does, so the
-	// suite is as big here as it is there and the whole-battery rule sees the
-	// share it is about.
-	for i := 1; i <= padTests; i++ {
-		reaches[fmt.Sprintf("TestPad%d", i)] = []string{"lib.go:7.13,9.2 1 1"}
-	}
-	aFedToolchain(t, "example.com/lib", reaches)
-	dir := t.TempDir()
-	r := Roots{Method: dir, Work: dir}
-	lib := "package lib\n\n" +
-		"func A() int {\n\treturn 1\n}\n\n" +
-		"func B() int {\n\treturn 2\n}\n"
-	test := "package lib\n\nimport \"testing\"\n\n" +
-		"func TestA(t *testing.T) {\n\tif A() != 1 {\n\t\tt.Fatal(\"A\")\n\t}\n}\n\n" +
-		"func TestB(t *testing.T) {\n\tif B() != 2 {\n\t\tt.Fatal(\"B\")\n\t}\n}\n"
-	for i := 1; i <= padTests; i++ {
-		test += fmt.Sprintf("\nfunc TestPad%d(t *testing.T) {\n\tif B() != 2 {\n\t\tt.Fatal(\"B\")\n\t}\n}\n", i)
-	}
-	for name, text := range map[string]string{"go.mod": "module example.com/lib\n\ngo 1.27\n", "lib.go": lib, "lib_test.go": test} {
-		if err := os.WriteFile(filepath.Join(dir, name), []byte(text), 0o644); err != nil {
-			t.Fatal(err)
-		}
-	}
-	git := func(args ...string) {
-		t.Helper()
-		cmd := exec.Command("git", args...)
-		cmd.Dir = dir
-		cmd.Env = append(os.Environ(), "GIT_AUTHOR_NAME=t", "GIT_AUTHOR_EMAIL=t@t", "GIT_COMMITTER_NAME=t", "GIT_COMMITTER_EMAIL=t@t")
-		if out, err := cmd.CombinedOutput(); err != nil {
-			t.Fatalf("git %v: %v\n%s", args, err, out)
-		}
-	}
-	git("init", "-q")
-	git("add", "-A")
-	git("commit", "-q", "-m", "the tree as it was")
-	db, err := openIndex(r)
-	if err != nil {
-		t.Fatal(err)
-	}
-	t.Cleanup(func() { db.Close() })
-	if _, err := Reindex(r, db); err != nil {
-		t.Fatal(err)
-	}
-	mapped, failed, err := mapMissing(r, db, nil)
-	if err != nil || failed != 0 || mapped != 2+padTests {
-		t.Fatalf("mapping the tests: mapped %d, failed %d, %v", mapped, failed, err)
-	}
-	return r, dir
-}
 
 func changeA(t *testing.T, dir string) {
 	t.Helper()

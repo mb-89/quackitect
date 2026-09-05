@@ -46,22 +46,6 @@ func exceptTheStretch(f frontmatter.Front) frontmatter.Front {
 	return out
 }
 
-// heldTokenRoots is the setup the hold tests share: a tree, a workable process
-// and an open log, so the session has a name to write arrivals against.
-func heldTokenRoots(t *testing.T) Roots {
-	t.Helper()
-	root := t.TempDir()
-	r := Roots{Method: root, Work: root}
-	writeProcess(t, root, "queued")
-	log, err := OpenLog(r.Private("log"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	t.Cleanup(func() { log.Close() })
-	log.Write("engine", "start", "engine", "for the session name", Yes(), nil)
-	return r
-}
-
 // A TAKE-UP AND A PUT-DOWN LEAVE THE FILE ALONE, apart from the stretch.
 func TestTakeUpAndPutDownWriteNoHolderIntoTheFile(t *testing.T) {
 	t.Parallel()

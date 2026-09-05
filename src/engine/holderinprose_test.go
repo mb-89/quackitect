@@ -16,8 +16,8 @@ import (
 // it. This is that rule reaching prose, which is where it was got round.
 func TestATokensProseNamesNoHolder(t *testing.T) {
 	t.Parallel()
-	root := t.TempDir()
-	r := Roots{Method: root, Work: root}
+	r := aTree(t).Roots
+	root := r.Work
 	writeProcess(t, root, "gated")
 
 	// EVERY SPELLING A NOTE REACHES FOR, counted from the side that writes them.
