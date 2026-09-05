@@ -9,6 +9,11 @@ guidance: [[work-token]]
 title: git carries every check
 # where the token stands. The process owns these values.
 status: open
+claimed_by: aeaf7bd9/worker-dutilleux
+claimed_at: "2026-09-05T16:06:14Z"
+# the tree each time the work was taken up, snapshots the engine wrote
+began:
+  - 98241a0f1b9e369b2576ce7181e9efb1935330fb
 ---
 
 ## detail
@@ -38,9 +43,9 @@ THE WRINKLE THE TAKER MEETS. The battery runs over a clean archive with no .git,
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the ask is small enough to review whole, or it is split first | — |  |
-| [ ] | every done-when line is decidable, and names the command where one decides it |  |  |
-| [ ] | the basics it stands on exist, or are minted first | — |  |
+| [x] | the ask is small enough to review whole, or it is split first | one half added to one check, about thirty lines, and nothing else changed | read whole |
+| [x] | every done-when line is decidable, and names the command where one decides it | all three name a root to run the check over: a clone carrying a listed check git does not hold, an archive with no repository, and a clean checkout | node the check, once per root |
+| [x] | the basics it stands on exist, or are minted first | battery.sh names its checks in the one for-loop this file already reads, and git ls-files answers what git carries. Both were already here | git ls-files over util/checks answers 46 |
 
 ## evidence: step 2. do
 
@@ -48,9 +53,9 @@ THE WRINKLE THE TAKER MEETS. The battery runs over a clean archive with no .git,
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the guidance this token names was read and applied | — |  |
-| [ ] | one test was written first and seen red for the reason expected |  |  |
-| [ ] | the same test was seen green after the change, and named |  |  |
-| [ ] | the change is git diff began..ended, the two hashes the engine wrote on this token | — |  |
-| [ ] | the cleanup the change revealed is in the change, or is a token of its own | — |  |
+| [x] | the guidance this token names was read and applied | work-token, in the prompt | — |
+| [x] | one test was written first and seen red for the reason expected | a clone with planted-and-uncommitted listed in battery.sh and left out of git: FAIL, it is in util/checks on this box and in no commit. Older halves green | exit 1 |
+| [x] | the same test was seen green after the change, and named | checks-live-in-the-method. Over a clean checkout of HEAD plus this change, 0 failed. Over an archive with no repository, and one unpacked inside another checkout, the skip line | exit 0, three roots |
+| [x] | the change is git diff began..ended, the two hashes the engine wrote on this token | checks-live-in-the-method.mjs gains the git half and two imports | git diff |
+| [x] | the cleanup the change revealed is in the change, or is a token of its own | the shared tree is red on another hand's untracked the-branch-head-builds.mjs, which the older half names. Theirs to land | left alone |
 

@@ -11,8 +11,9 @@
 // command exited zero over it.
 //
 //   node util/checks/checks-live-in-the-method.mjs <root>
-import { readFileSync, existsSync, readdirSync } from "node:fs";
-import { join } from "node:path";
+import { spawnSync } from "node:child_process";
+import { readFileSync, existsSync, readdirSync, realpathSync } from "node:fs";
+import { join, resolve } from "node:path";
 
 const root = process.argv[2] ?? ".";
 
@@ -50,6 +51,49 @@ for (const one of new Set(paths)) {
 for (const c of listed) {
   say(c + " is in util/checks", existsSync(join(root, "util", "checks", c + ".mjs")),
     "the battery names it and util/checks does not hold it");
+}
+
+// AND GIT CARRIES EVERY ONE OF THEM.
+//
+// existsSync answers yes on the box that wrote the file. A check written into
+// the list and never committed is therefore green on that box and missing on
+// every other one, where the battery prints two failures off the one gap: the
+// loop's own "it is not there, so it did not run" and this file's "<name> is in
+// util/checks". That is what happened at dd2fed69, which listed
+// a-refusal-names-a-legal-move while the file stayed out of git, and it stopped
+// only because another token's commit swept the file in. The tree is green by
+// accident until something asks git.
+//
+// WHERE THERE IS NO REPOSITORY THIS ASKS NOTHING. The battery also runs over a
+// clean archive of a commit, which holds no .git, and git can answer nothing
+// there. A check that failed for want of a repository would go red on every
+// archive run and say nothing about any check.
+//
+// AND THE FOLDER HAS TO BE THE REPOSITORY'S OWN ROOT. An archive unpacked
+// inside some other checkout is still inside a work tree, and asking that
+// checkout about util/checks answers nothing, which would read as every check
+// being uncommitted. So the toplevel git names is compared with the root.
+const git = (...args) => spawnSync("git", ["-C", root, ...args], { encoding: "utf8" });
+const sameFolder = (a, b) => {
+  const one = (p) => { try { return realpathSync(resolve(p)); } catch { return resolve(p); } };
+  const [x, y] = [one(a), one(b)];
+  return process.platform === "win32" ? x.toLowerCase() === y.toLowerCase() : x === y;
+};
+const top = (git("rev-parse", "--show-toplevel").stdout ?? "").trim();
+if (top === "" || !sameFolder(top, root)) {
+  console.log("  ok   git carries every check: there is no repository over " + root
+    + " to ask, so this says nothing rather than failing an archive run");
+} else {
+  const tracked = new Set(
+    (git("ls-files", "--", "util/checks").stdout ?? "").split("\n").map((s) => s.trim()).filter(Boolean),
+  );
+  say("git holds checks under util/checks (" + tracked.size + ")", tracked.size > 0,
+    "git names no file under util/checks, so this half would call every listed "
+    + "check uncommitted and is judging the question rather than the tree");
+  const loose = listed.filter((c) => !tracked.has("util/checks/" + c + ".mjs"));
+  say("git carries every check the battery lists", loose.length === 0,
+    loose.join(", ") + " is in util/checks on this box and in no commit, so it "
+    + "reads green here and red on every other box");
 }
 
 // AND THE LIST IS THE WHOLE FOLDER, ASKED FOR RATHER THAN DESCRIBED.
