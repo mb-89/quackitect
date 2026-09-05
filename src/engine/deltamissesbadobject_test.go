@@ -19,8 +19,9 @@ const nowhereHash = "c2682c671c7ab75306367de55d36104c0ec51b96"
 // read four other wordings of the same thing and not that one. So se test on
 // such a token answered an error and ran nothing.
 //
-// MEASURED on wk-40abb881a7 on a cloud box, while every other tracked token
-// tested.
+// MEASURED on a cloud box: one tracked token, taken up on a desk, answered an
+// error, while every other tracked token tested. The id is left out because a
+// test naming one in the record depends on the record.
 func TestADeltaAgainstAHashThisBoxDoesNotHold(t *testing.T) {
 	t.Parallel()
 	r, _ := aTreeWithTests(t)

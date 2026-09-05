@@ -11,7 +11,7 @@ import (
 // se pull hands the next token on after a submission, which is right for the
 // lane: an agent that submits is an agent asking for more. It is wrong for a
 // person at a prompt, who asked for one thing. Measured: a submission typed at
-// the shell closed a note and the answer carried wk-6542703f66, a parked note,
+// the shell closed a note and the answer carried another one, a parked note,
 // which then stood held until a put-down by hand gave it back.
 //
 // The engine could not tell the two doors apart, so the ask carries the door
