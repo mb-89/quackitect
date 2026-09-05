@@ -15,6 +15,7 @@ package expr
 
 import (
 	"fmt"
+	"slices"
 	"strconv"
 	"strings"
 )
@@ -199,7 +200,7 @@ func (p *eparser) binary(level int) (*Expr, error) {
 	if err != nil {
 		return nil, err
 	}
-	for p.at < len(p.ts) && p.ts[p.at].kind == 'o' && contains(levels[level], p.ts[p.at].text) {
+	for p.at < len(p.ts) && p.ts[p.at].kind == 'o' && slices.Contains(levels[level], p.ts[p.at].text) {
 		op := p.ts[p.at].text
 		p.at++
 		right, err := p.binary(level + 1)
@@ -309,15 +310,6 @@ func (p *eparser) primary() (*Expr, error) {
 		return &Expr{text: t.text, kind: 'n'}, nil
 	}
 	return nil, fmt.Errorf("%q: %q is not the start of a value", p.src, t.text)
-}
-
-func contains(list []string, s string) bool {
-	for _, e := range list {
-		if e == s {
-			return true
-		}
-	}
-	return false
 }
 
 // ---------------------------------------------------------------------------
@@ -469,7 +461,7 @@ func (e *Expr) method(row Row) (Value, error) {
 			return Absent, fmt.Errorf("contains takes one value")
 		}
 		if self.Kind == 'l' {
-			return Bool(contains(self.L, args[0].Text())), nil
+			return Bool(slices.Contains(self.L, args[0].Text())), nil
 		}
 		return Bool(strings.Contains(self.Text(), args[0].Text())), nil
 	case "startsWith":
