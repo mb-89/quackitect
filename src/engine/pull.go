@@ -390,6 +390,18 @@ func checkDisposition(r Roots, t Token, p Payload) *Rejection {
 		}
 		return nil
 	}
+	return theEnding(r, proc, said, p.Reason, p.Successors)
+}
+
+// theEnding says whether an ending a caller names is one this token can carry.
+//
+// EVERY DOOR THAT ENDS A TOKEN ASKS THIS ONE. The submission asks it and so
+// does the abort, which is the door that ends a token from wherever it stands.
+// The abort wrote dropped whatever had happened, so a token that turned out
+// larger and was split could only be recorded as one nobody wanted, and a
+// second copy of these rules beside it would be a second answer to the same
+// question.
+func theEnding(r Roots, proc Process, said, reason string, successors []string) *Rejection {
 	var spec *DispositionSpec
 	for i, d := range proc.Dispositions {
 		if d.Name == said {
@@ -402,7 +414,7 @@ func checkDisposition(r Roots, t Token, p Payload) *Rejection {
 			Wrong:     "a token cannot close without one, and " + proc.Name + " does not end " + quoted(said),
 			Satisfies: "one of: " + strings.Join(proc.DispositionNames(), ", ")}
 	}
-	if spec.NeedsReason && strings.TrimSpace(p.Reason) == "" {
+	if spec.NeedsReason && strings.TrimSpace(reason) == "" {
 		return &Rejection{Clause: "disposition", Wrong: said + " carries no reason",
 			Satisfies: "why the work stopped"}
 	}
@@ -410,11 +422,11 @@ func checkDisposition(r Roots, t Token, p Payload) *Rejection {
 	// does not exist is not a thing a process can declare: it is a claim about
 	// the record, and the record is what this reads.
 	if Disposition(said) == Became {
-		if len(p.Successors) == 0 {
+		if len(successors) == 0 {
 			return &Rejection{Clause: "disposition", Wrong: "became names no successor",
 				Satisfies: "the ids of the tokens this became"}
 		}
-		for _, id := range p.Successors {
+		for _, id := range successors {
 			if _, err := LoadToken(r, id); err != nil {
 				return &Rejection{Clause: "disposition", Wrong: "no such successor: " + id,
 					Satisfies: "successors that exist"}
