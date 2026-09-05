@@ -340,10 +340,13 @@ func LinkBothNames(methodRoot string, names []string) ([]string, error) {
 	var done []string
 	for _, name := range names {
 		bin := filepath.Join(methodRoot, ".bin")
-		plain, suffixed := filepath.Join(bin, name), filepath.Join(bin, exeName(name))
-		if plain == suffixed {
-			continue
-		}
+		// THE SUFFIXED NAME IS .exe ON EVERY PLATFORM, because the battery builds
+		// .bin/se.exe everywhere and the cage names ./.bin/se everywhere. This
+		// asked exeName, which adds .exe on Windows alone, so on Linux the two
+		// names were one string and nothing was linked: an installed tree kept
+		// .bin/se on the build the installer made, and a fresh worktree had no
+		// .bin/se at all, so its battery answered "no engine at .bin/se".
+		plain, suffixed := filepath.Join(bin, name), filepath.Join(bin, name+".exe")
 		if _, err := os.Stat(suffixed); err != nil {
 			continue // that program is not built here, which is not a fault
 		}

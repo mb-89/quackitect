@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"quackitect/engine/internal/alive"
 	"quackitect/engine/internal/quiet"
+	"quackitect/engine/internal/version"
 	"strings"
 	"time"
 )
@@ -78,11 +79,17 @@ func startBattery(r Roots, actor, token string) ran {
 		return ran{ID: "battery", Kind: "battery", Said: "the battery would not start: " + err.Error()}
 	}
 	going := aBatteryRunning{Started: time.Now().UTC().Format(time.RFC3339), Out: outPath,
-		PID: cmd.Process.Pid, Build: Build, Actor: actor, Token: token}
+		PID: cmd.Process.Pid, Build: version.Build, Actor: actor, Token: token}
 	if b, err := json.MarshalIndent(going, "", "  "); err == nil {
 		_ = writeAtomic(batteryMarker(r), b, 0o644) // a marker it cannot write is a run the next engine does not report
 	}
-	_ = cmd.Process.Release() // it is its own process now, and it outlives this one
+	// THE ENGINE WAITS ON WHAT IT STARTED, so the shell is reaped when it
+	// ends. Released and never waited on, it stayed a zombie for as long as
+	// this engine lived, the marker named it, and every later se_test that
+	// owed a battery answered still going and ran nothing. The wait is on a
+	// goroutine because the answer here does not wait: the run may replace
+	// this engine, and then the next one reaps and reports it.
+	go func() { _ = cmd.Wait() }()
 	return ran{ID: "battery", Kind: "battery", OK: true,
 		Said: "the battery is running outside this engine, because it replaces it. " +
 			"Its answer lands in " + outPath + ", and the next engine puts the outcome in the record."}
