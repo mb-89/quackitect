@@ -9,11 +9,12 @@ guidance: [[work-token]]
 title: one answer per rung
 # where the token stands. The process owns these values.
 status: open
-# the token this is a part of. It cannot close while this is open
-parent: [[wk-7783c03017]]
+claimed_by: aeaf7bd9/worker-elgar
+claimed_at: "2026-09-05T13:39:24Z"
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - 67764d508a08094269f60e9a44fb5f4e6c3387c7
+  - f48690d65556055c351c96ad58df66fc08fd3214
 # the tree each time the work was put down or closed, snapshots the engine wrote
 ended:
   - 33a27f3a8f3b00fe75226d1097733a68bf28e663
