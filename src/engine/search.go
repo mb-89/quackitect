@@ -117,16 +117,55 @@ func readsATree(args []string) bool {
 // semicolon, a newline, and the carriage return that comes with one here.
 var separators = []string{"\r\n", "\n", "\r", "&&", "||", "|", ";", "&"}
 
+// A SEPARATOR INSIDE QUOTES IS PART OF ONE PROGRAM'S ARGUMENT. The split ran
+// before anything read quotes, so a pipe or a semicolon inside a quoted pattern
+// cut the command in two and each half was judged as its own program. The half
+// before the cut kept the searcher and lost the path, and a searcher with no
+// path reads the tree, so a search whose every path was outside it was refused
+// by the message promising it would not be. This is the scan shellWords already
+// walks, applied one level up. See wk-7bab432426, which taught the words.
 func pipeline(command string) []string {
-	parts := []string{withoutHereDocs(command)}
-	for _, sep := range separators {
-		var next []string
-		for _, p := range parts {
-			next = append(next, strings.Split(p, sep)...)
+	text := withoutHereDocs(command)
+	var parts []string
+	var part strings.Builder
+	quote := byte(0)
+	for i := 0; i < len(text); i++ {
+		c := text[i]
+		if quote == 0 {
+			if n := separatorAt(text[i:]); n > 0 {
+				parts = append(parts, part.String())
+				part.Reset()
+				i += n - 1
+				continue
+			}
 		}
-		parts = next
+		switch {
+		case quote != 0 && c == quote:
+			quote = 0
+		case quote == 0 && (c == '\'' || c == '"'):
+			quote = c
+		case quote != '\'' && c == '\\' && i+1 < len(text):
+			// A BACKSLASH HANDS THE NEXT CHARACTER THROUGH AS TEXT, so an
+			// escaped separator cuts nothing and an escaped quote opens
+			// nothing. Inside single quotes it is an ordinary character.
+			part.WriteByte(c)
+			i++
+			c = text[i]
+		}
+		part.WriteByte(c)
 	}
-	return parts
+	return append(parts, part.String())
+}
+
+// separatorAt answers the length of the separator this text begins with, or
+// nought. The list is longest first, so && is never read as two ands.
+func separatorAt(text string) int {
+	for _, sep := range separators {
+		if strings.HasPrefix(text, sep) {
+			return len(sep)
+		}
+	}
+	return 0
 }
 
 // withoutHereDocs answers the command with every here-doc body taken out.
