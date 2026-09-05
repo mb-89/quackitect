@@ -34,9 +34,9 @@ In decideStop read held := TheyHold(roots, actor) before the count, and run coun
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the ask is small enough to review whole, or it is split first | — |  |
-| [ ] | every done-when line is decidable, and names the command where one decides it |  |  |
-| [ ] | the basics it stands on exist, or are minted first | — |  |
+| [x] | the ask is small enough to review whole, or it is split first | One branch in decideStop, at hook.go 1371. Nothing was written here. |  |
+| [x] | every done-when line is decidable, and names the command where one decides it | Three lines. Line two asks that asked is argued with, which the owner later reversed, and askedisgranted_test.go pins the reversal. |  |
+| [x] | the basics it stands on exist, or are minted first | TheyHold, countRefusedStop and TheChallenge all exist, and none of them changed. |  |
 
 ## evidence: step 2. do
 
@@ -44,9 +44,8 @@ In decideStop read held := TheyHold(roots, actor) before the count, and run coun
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the guidance this token names was read and applied | — |  |
-| [ ] | one test was written first and seen red for the reason expected |  |  |
-| [ ] | the same test was seen green after the change, and named |  |  |
-| [ ] | the change is git diff began..ended, the two hashes the engine wrote on this token | — |  |
-| [ ] | the cleanup the change revealed is in the change, or is a token of its own | — |  |
-
+| [x] | the guidance this token names was read and applied | Read. The change was already on origin, so this hand decided it rather than wrote it. |  |
+| [x] | one test was written first and seen red for the reason expected | Watched red with the holdings guard taken off in a worktree of origin. A second check was written and dropped: challenge_test.go carries it already. |  |
+| [x] | the same test was seen green after the change, and named | TestAClaimWithEmptyHandsIsGrantedAtOnce and TestAskedIsGrantedOnTheFirstClaim both pass on origin at 7395c3b1. |  |
+| [x] | the change is git diff began..ended, the two hashes the engine wrote on this token | began is ce8ee7f6 and is no object here. The change is the guard in hook.go and the check in challenge_test.go. |  |
+| [x] | the cleanup the change revealed is in the change, or is a token of its own | wk-5311365b82. Line three has one failure, TestPublishKeepsEarlierClaimsWhenThePushKeepsFailing, which is not this token. |  |
