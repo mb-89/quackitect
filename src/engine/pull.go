@@ -291,12 +291,20 @@ func submit(r Roots, actor string, t Token, p Payload) (Answer, bool) {
 	if f := checkDisposition(r, t, p); f != nil {
 		return refuse(&t, *f), true
 	}
+	// A SUBMISSION SAYS WHAT IT BRINGS. IT DOES NOT SAY WHAT THE NOTE NO LONGER
+	// HOLDS.
+	//
+	// AND THE GATE READS WHAT IT BRINGS. This merge sat after checkEvidence,
+	// which reads the tables on the token, so a first submission whose answers
+	// were in the payload alone was refused naming a blank line, and the
+	// refusal returned before the merge, dropping the answers it carried. The
+	// only way in was to write the note first, and the evidence argument on
+	// the door was decoration. A refusal saves nothing, so a merge that is
+	// then refused leaves the note as it was.
+	t.Submission = keepingWhatWasNotSent(t.Submission, p.Evidence)
 	if f := checkEvidence(r, t, p); f != nil {
 		return refuse(&t, *f), true
 	}
-	// A SUBMISSION SAYS WHAT IT BRINGS. IT DOES NOT SAY WHAT THE NOTE NO LONGER
-	// HOLDS.
-	t.Submission = keepingWhatWasNotSent(t.Submission, p.Evidence)
 
 	// A WORKER CLOSES ITS OWN WORK, and a standard token's verdict is the one
 	// step a second actor takes. Whoever did the work step is written down as
