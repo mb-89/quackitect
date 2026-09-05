@@ -9,6 +9,11 @@ guidance: [[work-token]]
 title: shell test assumes windows
 # where the token stands. The process owns these values.
 status: open
+claimed_by: 547b9365/worker-hawthorn
+claimed_at: "2026-09-05T16:05:25Z"
+# the tree each time the work was taken up, snapshots the engine wrote
+began:
+  - 5d6022ffe2e5340c260067658c9670c37394babc
 ---
 
 ## detail

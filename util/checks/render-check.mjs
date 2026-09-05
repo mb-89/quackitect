@@ -184,8 +184,9 @@ const want = [
   // red depends on the data it reads goes quiet as the data changes.
   // What this page can decide is the mapping below, which holds for any
   // count.
-  // And it pins by its name alone, because the file already holds its filter.
-  ["a declared group pins by its name", /class="pin" data-pin="noted" title=/],
+  // THAT IT PINS BY ITS NAME ALONE IS ASKED OF A FIXTURE, further down, for the
+  // same reason: an unpinned declared group is drawn only while it holds a row,
+  // so naming one here asks the data and not the renderer.
 
   // The table is three parts and they hide together for the raw query.
   ["the raw query hides the whole table", (h) => {
@@ -390,6 +391,32 @@ if (empties.groups) {
     if (!held) bad++;
     console.log((held ? "ok  " : "FAIL") + "  editor: " + says);
   }
+}
+// A DECLARED GROUP PINS BY ITS NAME ALONE, and a fixture is what can ask it.
+//
+// THE FILE ALREADY HOLDS THE FILTER, so the pin is a name and carries none.
+// That is the mapping, and it holds whatever is in the tree today.
+//
+// IT WAS HELD AGAINST THE LIVE PAGE as data-pin="noted", which stood only while
+// some open token carried that status. An unpinned declared group draws only
+// when it has rows, so the day the last noted token closed the check went red
+// with nothing wrong and no way to make it green but mint a token. That is the
+// hazard named above this check's neighbour, met from the other side: a check
+// whose colour depends on the data it reads goes quiet as the data changes, and
+// this one went loud.
+//
+// AND IT ASKS FOR THE ABSENCE TOO. A declared pin that also carried a filter
+// would match the old pattern and be wrong, because unpinning it would then
+// take the group away rather than move it.
+if (empties.groups) {
+  const declared = JSON.parse(JSON.stringify(empties));
+  declared.pinned = [];
+  declared.groups = [{ name: "noted", declared: true, depth: 0, count: 1, lines: [] }];
+  const page = editorHtml([{ side: "left", table: declared }], views, "work");
+  const ok = /class="pin" data-pin="noted" title=/.test(page) &&
+    !/data-pin="noted"[^>]*data-matching=/.test(page);
+  if (!ok) bad++;
+  console.log((ok ? "ok  " : "FAIL") + "  editor: a declared group pins by its name");
 }
 // AN EDITABLE CELL IS DRAWN WHERE THE ANSWER LOCKS NOTHING. The live work view
 // orders title, status, process and holder, and the engine locks the three
