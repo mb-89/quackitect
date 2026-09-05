@@ -30,7 +30,8 @@ func TestAHandThatWentHomeIsNotAHand(t *testing.T) {
 	}
 	NoteSession(r, "s-1")
 
-	// THREE HELPERS ARRIVE AND PULL, so the queue has the hands it wants.
+	// TWO HELPERS ARRIVE AND PULL, so with the session the queue has the three
+	// hands it wants.
 	for _, one := range []struct{ id, actor string }{
 		{"general-purpose-1", "worker-one"},
 		{"general-purpose-2", "worker-two"},
