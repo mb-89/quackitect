@@ -34,9 +34,9 @@ Either the resolver on a POSIX box prefers the shell beside git when PATH has no
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the ask is small enough to review whole, or it is split first | — |  |
-| [ ] | every done-when line is decidable, and names the command where one decides it |  |  |
-| [ ] | the basics it stands on exist, or are minted first | — |  |
+| [x] | the ask is small enough to review whole, or it is split first | one function, and the assertion in one test | — |
+| [x] | every done-when line is decidable, and names the command where one decides it | se test names the four tests and answers ok or not | — |
+| [x] | the basics it stands on exist, or are minted first | batteryShell, theShellAmong and shellsBesideGit were already in the tree | — |
 
 ## evidence: step 2. do
 
@@ -44,9 +44,9 @@ Either the resolver on a POSIX box prefers the shell beside git when PATH has no
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the guidance this token names was read and applied | — |  |
-| [ ] | one test was written first and seen red for the reason expected |  |  |
-| [ ] | the same test was seen green after the change, and named |  |  |
-| [ ] | the change is git diff began..ended, the two hashes the engine wrote on this token | — |  |
-| [ ] | the cleanup the change revealed is in the change, or is a token of its own | — |  |
+| [x] | the guidance this token names was read and applied | doc/guidance/work-token.md, in the prompt | — |
+| [x] | one test was written first and seen red for the reason expected | three stood red in .se/tests/battery-20260905-160529.out, the first saying it resolved "sh" where Git's shell is sh.exe | — |
+| [x] | the same test was seen green after the change, and named | se test over the four in src/engine answered ok, and go test engine is ok in battery-20260905-164315.out | — |
+| [x] | the change is git diff began..ended, the two hashes the engine wrote on this token | pushed as 85c88434 on origin/v4 | — |
+| [x] | the cleanup the change revealed is in the change, or is a token of its own | the runtime import run.go no longer needs went with it | — |
 
