@@ -9,6 +9,18 @@ guidance: [[work-token]]
 title: asked criterion contradicts ruling
 # where the token stands. The process owns these values.
 status: open
+claimed_by: aeaf7bd9/worker-berio-three
+claimed_at: "2026-09-05T21:11:44Z"
+# true when this waits for a person rather than an agent
+needs_human: true
+# the tree each time the work was taken up, snapshots the engine wrote
+began:
+  - 6ddd8aba4fd075e70ae7444eaa43c898440245da
+  - 212474764f575390299e7de6bf6e913b1c02697d
+# the tree each time the work was put down or closed, snapshots the engine wrote
+ended:
+  - 4f772760478d0f4023e09605242b7863697abd8b
+  - f555f62e45de4ea49f6b3e8fdde4d6c3e8199e3d
 ---
 
 ## detail
