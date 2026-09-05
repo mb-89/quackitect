@@ -10,22 +10,6 @@ import (
 
 // THE MECHANICAL GUARDS, DRIVEN THROUGH THE HOOK THE WAY THE HARNESS DRIVES IT.
 
-// aGuardedTree is a method tree with a session open, so the guard has a
-// record to write and a session to key its state by.
-func aGuardedTree(t *testing.T) (string, Roots) {
-	t.Helper()
-	exe := buildEngine(t)
-	r := guidanceTree(t)
-	Project(r)
-	l, err := OpenLog(r.Private("log"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	l.Write("engine", "start", "engine", "engine started", Yes(), nil)
-	l.Close()
-	return exe, r
-}
-
 func decisionOf(t *testing.T, said string) (decision string, out map[string]any) {
 	t.Helper()
 	if said == "" {

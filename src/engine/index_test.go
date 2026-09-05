@@ -18,29 +18,6 @@ import (
 // rows and nothing else. An index the daemon is not keeping fresh is not
 // trusted, so the guard reads the files the way it did before.
 
-// aTreeToIndex writes two private notes and one public note that links to
-// them, and answers the roots with the index built.
-func aTreeToIndex(t *testing.T) Roots {
-	t.Helper()
-	r := Roots{Method: t.TempDir(), Work: t.TempDir()}
-	write := func(rel, text string) {
-		p := filepath.Join(r.Work, filepath.FromSlash(rel))
-		if err := os.MkdirAll(filepath.Dir(p), 0o755); err != nil {
-			t.Fatal(err)
-		}
-		if err := os.WriteFile(p, []byte(text), 0o644); err != nil {
-			t.Fatal(err)
-		}
-	}
-	write(".se/work/wk-one.md", "---\nkind: [[work-token]]\ntitle: the first\ndepends_on: [\"[[wk-two]]\"]\n---\n\n## detail\n\nIt names [[wk-two]] and [[nowhere]].\n")
-	write(".se/work/wk-two.md", "---\nkind: [[work-token]]\ntitle: the second\n---\n\n## detail\n\nA heredoc ate a file.\n")
-	write("doc/plain.md", "no frontmatter here, so prose and nothing else\n")
-	// The kind every note names resolves to the schema file by its stem.
-	write("src/schemas/work-token.schema.yaml", "kind: work-token\n")
-	write(".se/log/session.jsonl", "{}\n")
-	return r
-}
-
 func TestTheIndexAnswersACopyOfAPrivateFile(t *testing.T) {
 	t.Parallel()
 	r := aTreeToIndex(t)

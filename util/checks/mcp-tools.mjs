@@ -144,10 +144,21 @@ const calls = [
   // THE ENGINE OWNS THE TESTS. A plan asks what would run and runs nothing,
   // and the answer is the engine's decision as a structure.
   { tool: "se_test", args: { on: "", plan: true } },
+  // AND WHO IS TESTING, which every other tool says with actor.
+  { tool: "se_test", args: { on: "", plan: true, actor: "mcp" } },
   // A CLAIM IS WHAT KEEPS TWO BOXES OFF ONE PIECE OF WORK. whoami is the name
   // this box writes, and list is what it knows about, and neither reaches git.
   { tool: "se_claim", args: { whoami: true } },
   { tool: "se_claim", args: { list: true } },
+  // THE TWO FLAGS ABOUT GIT. sync looks now, and a folder with no remote says
+  // so rather than hanging. no_publish writes the claim here and leaves git
+  // alone, which is what this folder needs.
+  { tool: "se_claim", args: { list: true, sync: true } },
+  { tool: "se_claim", args: { these: ["wk-0000000000"], no_publish: true, take: true, actor: "mcp" } },
+  // THE ARCHIVE IS SEARCHED WHERE IT LIVES, and an empty one answers no hits.
+  { tool: "se_find", args: { archive: true, words: "lane" } },
+  // AND WHAT IS SANCTIONED, ASKED FOR BY NAME.
+  { tool: "se_stop", args: { list: true } },
   // THE ENGINE IS ALREADY UP HERE, so this is the idempotent answer: it starts
   // nothing and says one is already running. The cold case, where it builds one,
   // is util/checks/lane-answers-cold.mjs, which is the only check with a tree

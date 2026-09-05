@@ -566,6 +566,25 @@ func blocksHoldNoHeading(t Token) error {
 	return nil
 }
 
+// headingsSaidOnce refuses a note that opens the same section twice.
+//
+// THE RECORD REFUSES TO HOLD WHAT IT CANNOT READ BACK. The body is read into
+// its sections by heading, and a reader keeps the last chapter under a name,
+// so a second chapter under the same heading buries the first. MEASURED on
+// wk-963dbf6898: two approach sections in different words, and a reader could
+// not say which one the change was written against.
+func headingsSaidOnce(t Token) error {
+	seen := map[string]bool{}
+	for _, c := range chaptersOf(t.body(), 2) {
+		if seen[c.Header] {
+			return fmt.Errorf("the note opens a %q section twice, and a reader cannot tell "+
+				"which one the work was written against. Fold the two into one", c.Header)
+		}
+		seen[c.Header] = true
+	}
+	return nil
+}
+
 // readBody fills the prose fields back.
 //
 // A SECTION THIS READER DOES NOT KNOW IS KEPT, NOT DROPPED. The file is
@@ -629,6 +648,9 @@ func SaveToken(r Roots, t Token) error {
 		return err
 	}
 	if err := blocksHoldNoHeading(t); err != nil {
+		return err
+	}
+	if err := headingsSaidOnce(t); err != nil {
 		return err
 	}
 	schema := narrowedSchema(r, t)

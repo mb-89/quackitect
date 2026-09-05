@@ -1,8 +1,6 @@
 package main
 
 import (
-	"os"
-	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -67,44 +65,4 @@ func TestGuidanceOutsideThePromptIsSentOnce(t *testing.T) {
 	if after == "" {
 		t.Error("after a compaction the rules were still withheld")
 	}
-}
-
-// aTreeWithGuidance is a method root with two guidance files: one the
-// projection puts in the prompt, and one it does not.
-func aTreeWithGuidance(t *testing.T) Roots {
-	t.Helper()
-	root := t.TempDir()
-	r := Roots{Method: root, Work: root}
-	dir := GuidanceDir(root)
-	if err := os.MkdirAll(dir, 0o755); err != nil {
-		t.Fatal(err)
-	}
-	write := func(name, body string) {
-		if err := os.WriteFile(filepath.Join(dir, name), []byte(body), 0o644); err != nil {
-			t.Fatal(err)
-		}
-	}
-	write("standing.md", "# Actionables\n\n1. A rule every agent is handed.\n")
-	write("lane.md", "# Actionables\n\n1. A rule only this lane has.\n")
-
-	// The projection carries the top-level folder, which is where standing.md
-	// is. lane.md sits in a subfolder, which the standing layer never reaches.
-	sub := filepath.Join(dir, "software-development")
-	if err := os.MkdirAll(sub, 0o755); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.Rename(filepath.Join(dir, "lane.md"), filepath.Join(sub, "lane.md")); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.MkdirAll(filepath.Join(root, "util"), 0o755); err != nil {
-		t.Fatal(err)
-	}
-	const projections = `{"projections":[
-	  {"name":"prompt","target":"prompt.md","wrap":"markdown",
-	   "section":"Actionables","sources_from":"doc/guidance"}]}`
-	if err := os.WriteFile(filepath.Join(root, "util", "projections.json"),
-		[]byte(projections), 0o644); err != nil {
-		t.Fatal(err)
-	}
-	return r
 }
