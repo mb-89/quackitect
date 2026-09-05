@@ -140,8 +140,8 @@ func TestTheBuildDoorIsTheEngines(t *testing.T) {
 // swaps on every run.
 func TestASwapBuildsEveryProgramTheManifestNames(t *testing.T) {
 	t.Parallel()
-	method := t.TempDir()
-	r := Roots{Method: method, Work: method}
+	r := aTree(t).Roots
+	method := r.Work
 	if err := os.MkdirAll(filepath.Join(method, "util", "setup"), 0o755); err != nil {
 		t.Fatal(err)
 	}
@@ -340,8 +340,8 @@ func aTreeShippingThree(t *testing.T) string {
 // built. Where nothing was built, the program on disk is the running build, and
 // handing over to it would rotate the process for no reason at all.
 func TestASwapToTheSameBuildIsRefused(t *testing.T) {
-	method := t.TempDir()
-	r := Roots{Method: method, Work: method}
+	r := aTree(t).Roots
+	method := r.Work
 	if err := os.MkdirAll(filepath.Join(method, ".bin"), 0o755); err != nil {
 		t.Fatal(err)
 	}

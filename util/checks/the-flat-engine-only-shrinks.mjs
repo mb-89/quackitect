@@ -28,7 +28,13 @@ import { join } from "node:path";
 const root = process.argv[2] ?? ".";
 
 // WHAT THE FLAT PACKAGE HELD WHEN THIS WAS WRITTEN, and the most it may hold.
-const most = { files: 89, lines: 29203 };
+//
+// IT WENT UP ONCE ON PURPOSE, and this is where that is said. The catalog of
+// calls sits beside the dispatch it describes, in verbs.go, because a second
+// file would be the copy it exists to remove. Everything else since is the
+// engine growing, which is what the numbers are here to make somebody answer
+// for.
+const most = { files: 89, lines: 29378 };
 
 let bad = 0;
 function say(what, ok, why) {

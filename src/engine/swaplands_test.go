@@ -21,8 +21,7 @@ import (
 // says how long it looked for.
 func TestASwapThatNeverLandsSaysSo(t *testing.T) {
 	t.Parallel()
-	dir := t.TempDir()
-	r := Roots{Method: dir, Work: dir}
+	r := aTree(t).Roots
 
 	now := func() string { return time.Now().UTC().Format(time.RFC3339) }
 	told := swapAnswer{Swapping: true, Build: "new-build", From: "old-build",

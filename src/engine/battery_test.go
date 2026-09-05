@@ -67,25 +67,6 @@ func TestTheBatteryRunsOutsideTheEngine(t *testing.T) {
 	}
 }
 
-// A battery that answers the way the real one does: a verdict on its last line.
-func aTreeWithABattery(t *testing.T) Roots {
-	t.Helper()
-	root := t.TempDir()
-	r := Roots{Method: root, Work: root}
-	checks := filepath.Join(root, "util", "checks")
-	if err := os.MkdirAll(checks, 0o755); err != nil {
-		t.Fatal(err)
-	}
-	script := "#!/bin/sh\necho 'go build         ok    1s'\necho '0 failed, 1s wall clock'\n"
-	if err := os.WriteFile(filepath.Join(checks, "battery.sh"), []byte(script), 0o755); err != nil {
-		t.Fatal(err)
-	}
-	if sh, _ := batteryShell(r); sh == "" {
-		t.Skip("no shell on this machine, so the battery cannot be started here")
-	}
-	return r
-}
-
 // waitForTheBattery waits for the started run to finish. It is the one wait in
 // this file, and it is on a process this test started rather than on a clock.
 func waitForTheBattery(t *testing.T, going aBatteryRunning) {

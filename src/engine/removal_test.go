@@ -1,8 +1,6 @@
 package main
 
 import (
-	"bytes"
-	"encoding/json"
 	"os"
 	"path/filepath"
 	"strings"
@@ -19,40 +17,6 @@ const (
 	saidUnread = "NOTHING IS DELETED THAT NOBODY LOOKED AT"
 	saidLoop   = "A LOOP THAT DELETES IS REFUSED"
 )
-
-// removalTree answers a tree and the two doors this guard is asked through:
-// one that registers a read the way the harness does, and one that puts a
-// shell command to the engine before it runs.
-//
-// BOTH HALVES GO THROUGH answerHook. The read is registered by the same
-// PostToolUse the harness fires rather than by calling NoteReadPage here, so
-// the test cannot pass on evidence the running engine would never have.
-func removalTree(t *testing.T) (Roots, func(command string) string, func(path string)) {
-	t.Helper()
-	r := guidanceTree(t)
-	log, err := OpenLog(r.Private("log"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	t.Cleanup(func() { log.Close() })
-
-	say := func(event, tool string, input map[string]any) string {
-		t.Helper()
-		body, _ := json.Marshal(map[string]any{"hook_event_name": event, "cwd": r.Work,
-			"tool_name": tool, "tool_input": input, "agent_id": "helper-1"})
-		var out bytes.Buffer
-		answerHook(t.Context(), body, []string{"--method", r.Method}, &out, log)
-		return out.String()
-	}
-	run := func(command string) string {
-		return say("PreToolUse", "Bash", map[string]any{"command": command})
-	}
-	readIt := func(path string) {
-		t.Helper()
-		say("PostToolUse", "Read", map[string]any{"file_path": path})
-	}
-	return r, run, readIt
-}
 
 // A REMOVAL OF A FILE THE TURN HAS NOT READ IS REFUSED, AND IT NAMES THE FILE.
 //
