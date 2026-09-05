@@ -9,15 +9,19 @@ guidance: [[work-token]]
 title: "delta is the token's"
 # where the token stands. The process owns these values.
 status: open
-claimed_by: aeaf7bd9/fable-cloud
-claimed_at: "2026-09-05T12:46:47Z"
+claimed_by: aeaf7bd9/worker-nono
+claimed_at: "2026-09-05T13:53:47Z"
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - 5b93841727d1773def309a5500a270fc1ddad3c9
   - c151dd4489d7eb8800cb5d4e8c20994389164234
+  - 903cef1adc8a5c9bf4012a18adda1745b9a7b524
+  - f9bdf9cb007a4fd044b7a0f8750fc47c502bb915
 # the tree each time the work was put down or closed, snapshots the engine wrote
 ended:
   - 044ab9e809e7a1129acd76ba4fc2187543a44aed
+  - 31be71428c615578d4ae8842519777eb2e86eed4
+  - 1e26948feed06d08c396685a20d695e6dbf722d9
 ---
 
 ## detail
@@ -47,18 +51,6 @@ Narrow the delta to the files this token wrote, and leave the whole diff where t
 - a token with no apply on record answers the whole diff, and why_whole names the empty record
 - a Go test in src/engine drives the three cases over one tree holding two tokens' writes
 
-## approach
-
-The engine already records what a token wrote. Every apply journals an entry under the private undo folder carrying the token it was made on and the files it touched.
-
-So the delta is read as it is today, against the snapshot, and then narrowed to the paths that record names for this token.
-
-Where the record names nothing for the token, the whole diff stands and the answer says why. A write the engine cannot prove is a write it will not silently drop.
-
-One function answers both halves: the paths this token wrote, and whether the record held any. Nothing else in the lane changes, so the choosing and the running read the same delta they always did.
-
-The cost, stated: a write made by a shell command rather than an apply is in no journal, so it leaves the delta. Naming a test outright still runs it.
-
 ## evidence: step 1. ask
 
 <!-- write what is asked, the approach, and what done means, one criterion per line -->
@@ -76,11 +68,11 @@ The cost, stated: a write made by a shell command rather than an apply is in no 
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the guidance this token names was read and applied | — |  |
-| [ ] | the change follows the approach on the token, or the token says why it departed |  |  |
-| [ ] | se test --on this token answered ok, and what it ran is named |  |  |
-| [ ] | the note says what changed and why, for a reader who was not here |  |  |
-| [ ] | the cleanup the change revealed is in the change, or is a token of its own | — |  |
+| [x] | the guidance this token names was read and applied | Rule 12, red first: red on all four assertions before the change. | |
+| [x] | the change follows the approach on the token, or the token says why it departed | As written: deltaSince untouched, the narrowing between it and choose, one function for both halves, the whole diff on an empty record. Departure: choose now keeps the first ruling rather than the last. | |
+| [x] | se test --on this token answered ok, and what it ran is named | TestTheDeltaIsWhatThisTokenWrote, TestTheEngineSelectsByRegion, TestANamedProposalOutrunsTheWholeBattery, TestTheProposalNarrows, TestWhenTheWholeBatteryRuns: all ok. Battery 20260905-140259 fails four, none from this change. | |
+| [x] | the note says what changed and why, for a reader who was not here | One function reads .se/undo for this token's writes, and the delta is narrowed to them. | |
+| [x] | the cleanup the change revealed is in the change, or is a token of its own | In the change. Left alone: two approach sections from two hands. | |
 
 ## evidence: step 3. verdict
 
@@ -93,6 +85,18 @@ The cost, stated: a write made by a shell command rather than an apply is in no 
 | [ ] | every criterion's command was run again, and what it said is named |  |  |
 | [ ] | every hunk improves the product, or a finding names the one that does not |  |  |
 | [ ] | every finding is a trivial token naming this one, and their ids are here |  |  |
+
+## approach
+
+The engine already records what a token wrote. Every apply journals an entry under the private undo folder carrying the token it was made on and the files it touched.
+
+So the delta is read as it is today, against the snapshot, and then narrowed to the paths that record names for this token.
+
+Where the record names nothing for the token, the whole diff stands and the answer says why. A write the engine cannot prove is a write it will not silently drop.
+
+One function answers both halves: the paths this token wrote, and whether the record held any. Nothing else in the lane changes, so the choosing and the running read the same delta they always did.
+
+The cost, stated: a write made by a shell command rather than an apply is in no journal, so it leaves the delta. Naming a test outright still runs it.
 
 ## approach
 

@@ -157,6 +157,17 @@ func TestTheDelta(r Roots, db *sql.DB, on string, proposed []string, run bool, a
 		return out, err
 	}
 	out.Delta = delta
+	// AND THE DELTA IS THIS TOKEN'S OWN WRITES, where the record can say which
+	// they are. On a tree several hands share, the diff against the snapshot is
+	// everybody's uncommitted work, and a whole ruling read off that is a
+	// sentence about somebody else's change. See tokenwrote.go.
+	if on != "" {
+		if wrote, proven := WhatThisTokenWrote(r, on); proven {
+			out.Delta = onlyWhatItWrote(delta, wrote)
+		} else {
+			out.Whole, out.WhyWhole = true, nothingOnRecord(on)
+		}
+	}
 	tests, err := discoverTests(r, db)
 	if err != nil {
 		return out, err
@@ -202,6 +213,12 @@ func choose(db *sql.DB, tests []aTest, out *Tested) error {
 	// THE WHOLE BATTERY, BY THE ENGINE'S RULES.
 	for _, ch := range out.Delta {
 		for _, g := range wholeTriggers {
+			// THE FIRST REASON STANDS. A ruling made before the triggers were read,
+			// because the record cannot say what this token wrote, is the answer to
+			// a different question and is not overwritten by a path.
+			if out.Whole {
+				continue
+			}
 			if re, _ := globRegexp(g); re != nil && re.MatchString(ch.Path) {
 				out.Whole, out.WhyWhole = true, ch.Path+" changed, and it is "+g
 			}
