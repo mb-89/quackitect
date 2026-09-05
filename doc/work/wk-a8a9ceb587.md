@@ -9,6 +9,11 @@ guidance: [[work-token]]
 title: private writes prove nothing
 # where the token stands. The process owns these values.
 status: open
+claimed_by: aeaf7bd9/worker-sibelius
+claimed_at: "2026-09-05T15:54:23Z"
+# the tree each time the work was taken up, snapshots the engine wrote
+began:
+  - 268a3202e6617346038dda09e20be9fe77a62f57
 ---
 
 ## detail
@@ -34,9 +39,9 @@ tokenwrote.go names this outcome as the thing it refuses: "Narrowing on an empty
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the ask is small enough to review whole, or it is split first | — |  |
-| [ ] | every done-when line is decidable, and names the command where one decides it |  |  |
-| [ ] | the basics it stands on exist, or are minted first | — |  |
+| [x] | the ask is small enough to review whole, or it is split first | one loop body inside WhatThisTokenWrote, and one test file beside it. | `git diff -- src/engine/tokenwrote.go` |
+| [x] | every done-when line is decidable, and names the command where one decides it | both are rows in TestAPrivateApplyProvesNothing, decided by the command below. | `go test ./src/engine -run TestAPrivateApply` |
+| [x] | the basics it stands on exist, or are minted first | isPrivateMaterial existed, and deltaSince already read it. Nothing was minted. | src/engine/index.go |
 
 ## evidence: step 2. do
 
@@ -44,9 +49,9 @@ tokenwrote.go names this outcome as the thing it refuses: "Narrowing on an empty
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the guidance this token names was read and applied | — |  |
-| [ ] | one test was written first and seen red for the reason expected |  |  |
-| [ ] | the same test was seen green after the change, and named |  |  |
-| [ ] | the change is git diff began..ended, the two hashes the engine wrote on this token | — |  |
-| [ ] | the cleanup the change revealed is in the change, or is a token of its own | — |  |
+| [x] | the guidance this token names was read and applied | read. Red first, then green. | doc/guidance/work-token.md |
+| [x] | one test was written first and seen red for the reason expected | TestAPrivateApplyProvesNothing failed saying the token answered an empty delta with whole false. On a clean copy at 5a83c225, because another hand's retro.go stops the build here. | `go test ./src/engine -run TestAPrivateApply` |
+| [x] | the same test was seen green after the change, and named | green, with TestAPrivateApplyDoesNotSpoilAShareableOne, TestTheDeltaIsWhatThisTokenWrote and TestAShellWriteIsNamedRatherThanDropped beside it. The package's eleven failures are the ones it had before. | same |
+| [x] | the change is git diff began..ended, the two hashes the engine wrote on this token | tokenwrote.go skips a private path, privatewrites_test.go drives both rows. | `git diff --stat began..ended` |
+| [x] | the cleanup the change revealed is in the change, or is a token of its own | none. The second test is the guard, and it reddens if the skip takes a shareable path too. | — |
 

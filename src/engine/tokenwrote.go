@@ -41,6 +41,17 @@ import (
 // ONE FUNCTION ANSWERS BOTH HALVES, because a caller that asked them apart
 // would narrow a delta to nothing on a record that says nothing, and read the
 // silence as a change that touched no file.
+//
+// AND A PATH NO DELTA CARRIES IS NOT A WRITE THIS CAN PROVE. deltaSince drops
+// private material, so a journalled write under .se proved a write the
+// narrowing then had nothing to keep: an empty delta with whole false, and the
+// suite ran nothing over a tree that had changed and called it ok. That is the
+// outcome the empty-record door below exists to refuse, open on the other side.
+//
+// IT IS THE ORDINARY CASE, NOT A CORNER. The engine tells an agent with nothing
+// in hand to put its command file and its manifest under .se/scratchpad and
+// apply them there, so a token whose applies are all private is what the
+// refusal itself asks for.
 func WhatThisTokenWrote(r Roots, on string) (map[string]bool, bool) {
 	wrote := map[string]bool{}
 	if on == "" {
@@ -65,9 +76,13 @@ func WhatThisTokenWrote(r Roots, on string) (map[string]bool, bool) {
 			continue
 		}
 		for _, f := range j.Files {
-			if f.File != "" {
-				wrote[filepath.ToSlash(f.File)] = true
+			// THE SAME READING deltaSince USES, so the two cannot come apart
+			// again: what proves a write is exactly what a delta can carry.
+			path := filepath.ToSlash(f.File)
+			if path == "" || isPrivateMaterial(path) {
+				continue
 			}
+			wrote[path] = true
 		}
 	}
 	return wrote, len(wrote) > 0
