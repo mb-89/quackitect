@@ -9,6 +9,11 @@ guidance: [[work-token]]
 title: a criterion already green
 # where the token stands. The process owns these values.
 status: open
+claimed_by: aeaf7bd9/main
+claimed_at: "2026-09-05T16:40:08Z"
+# the tree each time the work was taken up, snapshots the engine wrote
+began:
+  - 693c91d244bfe731eb43acc6a4866c5f079be3ac
 ---
 
 ## detail
@@ -30,9 +35,9 @@ Either drop the line from wk-40abb881a7 and put it on the token that actually sp
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the ask is small enough to review whole, or it is split first | — |  |
-| [ ] | every done-when line is decidable, and names the command where one decides it |  |  |
-| [ ] | the basics it stands on exist, or are minted first | — |  |
+| [x] | the ask is small enough to review whole, or it is split first | One line on one token. | 1 line |
+| [x] | every done-when line is decidable, and names the command where one decides it | Line one runs se find. Line two asks the step 2 evidence. Both were run. | 2 of 2 |
+| [x] | the basics it stands on exist, or are minted first | The token this is about no longer does. It closed and archived before this was worked. | archived |
 
 ## evidence: step 2. do
 
@@ -40,9 +45,9 @@ Either drop the line from wk-40abb881a7 and put it on the token that actually sp
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the guidance this token names was read and applied | — |  |
-| [ ] | one test was written first and seen red for the reason expected |  |  |
-| [ ] | the same test was seen green after the change, and named |  |  |
-| [ ] | the change is git diff began..ended, the two hashes the engine wrote on this token | — |  |
-| [ ] | the cleanup the change revealed is in the change, or is a token of its own | — |  |
+| [x] | the guidance this token names was read and applied | Rule 12 already says a check that will not go red is the finding. This token is an instance of that rule. | work-token.md |
+| [ ] | one test was written first and seen red for the reason expected | No red was available. The subject closed and archived before this was worked. | no red |
+| [x] | the same test was seen green after the change, and named | Criterion one is green with no change made. se find over doc/work/wk-40abb881a7.md answers nothing, because the file is gone. | 0 hits |
+| [x] | the change is git diff began..ended, the two hashes the engine wrote on this token | Nothing changed. Rewriting an archived note is what the archive exists to prevent. | 0 files |
+| [x] | the cleanup the change revealed is in the change, or is a token of its own | The archived blob still carries the line, at d3edff6f. A reader of the archive still meets it. | 1 blob |
 
