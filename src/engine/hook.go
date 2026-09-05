@@ -889,6 +889,14 @@ func decidePreToolUse(g *guard, roots Roots, cfg Config, emergency Emergency, lo
 			g.deny(why)
 			return
 		}
+		// A COMMIT CARRIES ONLY THE PATHS IT NAMES, because the index is every
+		// agent's at once. See commitpaths.go.
+		if why, refuse := ACommitCarriesStrangers(ti.Command); refuse {
+			record(log, "engine", "commit", actor, "refused: a commit of the index rather than of named paths", No(),
+				map[string]any{"tool": in.ToolName})
+			g.deny(why)
+			return
+		}
 	}
 
 	// A READ ALREADY HELD IS NOT PAID FOR TWICE.
