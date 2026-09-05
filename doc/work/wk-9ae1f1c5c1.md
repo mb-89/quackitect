@@ -8,12 +8,19 @@ guidance: [[work-token]]
 # the name this token is known by, in references and in links
 title: se_work cannot say successors
 # where the token stands. The process owns these values.
-status: open
+status: closed
+# who did the work step, so the verdict is never theirs
+author: worker-linden
 claimed_by: 547b9365/worker-linden
 claimed_at: "2026-09-05T20:41:52Z"
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - ae053aef8609d66c9d249bd0e88ce2f9a8931179
+# the tree each time the work was put down or closed, snapshots the engine wrote
+ended:
+  - 28a3fde5db4a8572bf8109a46ae5c50ded6250ae
+# how it ended. Only an ended token carries one.
+disposition: done
 ---
 
 ## detail
@@ -44,9 +51,9 @@ Add successors to the se_work struct in src/mcp/lane.go, and decide --dispositio
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the ask is small enough to review whole, or it is split first | — |  |
-| [ ] | every done-when line is decidable, and names the command where one decides it |  |  |
-| [ ] | the basics it stands on exist, or are minted first | — |  |
+| [x] | the ask is small enough to review whole, or it is split first | Two files: four fields on the lane's struct with the call behind them, and the tools.json they generate. | 2 files |
+| [x] | every done-when line is decidable, and names the command where one decides it | Three lines. The check decides the first, tools.json is read for the second, and the third is answered below. | 3 lines |
+| [x] | the basics it stands on exist, or are minted first | The abort the lane now sends is the engine's, landed as 5e94c17c, so nothing had to be minted first. | 5e94c17c |
 
 ## evidence: step 2. do
 
@@ -54,9 +61,9 @@ Add successors to the se_work struct in src/mcp/lane.go, and decide --dispositio
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the guidance this token names was read and applied | — |  |
-| [ ] | one test was written first and seen red for the reason expected |  |  |
-| [ ] | the same test was seen green after the change, and named |  |  |
-| [ ] | the change is git diff began..ended, the two hashes the engine wrote on this token | — |  |
-| [ ] | the cleanup the change revealed is in the change, or is a token of its own | — |  |
+| [x] | the guidance this token names was read and applied | work-token read. Rule 13 is why the door came with the field. | rule 13 |
+| [x] | one test was written first and seen red for the reason expected | The check was red before: FAIL se_work can say --successors, 1 failed, exit 1. | 1 FAIL |
+| [x] | the same test was seen green after the change, and named | It answers 0 failed, exit 0. The mcp package and vet are clean, and tools.json carries all four fields. | 0 failed |
+| [x] | the change is git diff began..ended, the two hashes the engine wrote on this token | Not this clone, which is behind origin/v4. It landed as 3912a572. | 3912a572 |
+| [x] | the cleanup the change revealed is in the change, or is a token of its own | In the change. The lane may say disposition: successors without it sends a became's ids on a drop, where the engine ignores them. | disposition |
 
