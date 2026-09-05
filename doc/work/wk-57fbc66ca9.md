@@ -10,10 +10,14 @@ title: parked files await halves
 # where the token stands. The process owns these values.
 status: open
 claimed_by: aeaf7bd9/worker-ligeti-three
-claimed_at: "2026-09-05T16:41:40Z"
+claimed_at: "2026-09-05T17:02:29Z"
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - 2769f471e9849d378081f2dbca0a13360498f528
+  - 50862125d6a00c105667d75fece565e1b5ba0cdd
+# the tree each time the work was put down or closed, snapshots the engine wrote
+ended:
+  - c5b4fe149be2a722f31e28877686b4fbe3b9cf8f
 ---
 
 ## detail
@@ -33,6 +37,16 @@ wk-918812a5e6 parked them to unblock every worker, and parking is a stopgap. Eac
 - no file under src/engine begins with an underscore, decided by: ls src/engine finds none
 - the package still builds with none of them parked, decided by: go vet -C src/engine ./... exits 0
 
+## evidence: step 1. ask
+
+<!-- write what is asked and what done means, one criterion per line -->
+
+| done | criterion | evidence | receipt |
+|---|---|---|---|
+| [ ] | the ask is small enough to review whole, or it is split first | — |  |
+| [ ] | every done-when line is decidable, and names the command where one decides it |  |  |
+| [ ] | the basics it stands on exist, or are minted first | — |  |
+
 ## evidence: step 2, where this stands
 
 The eleven parked files were compared with their live twins. Every one has a live twin, and all eleven twins are tracked in git.
@@ -46,16 +60,6 @@ So the halves these files waited for are in the tree. Each parked copy carries n
 Measured at HEAD 089d1f6b on a copy of src/engine under /tmp, compared by diff. Unparking each one over its twin there left go vet -C src/engine ./... at exit 0.
 
 The delete did not land. An rm or an mv naming a path inside the tree is refused by this box's permission layer, not by the engine. ls src/engine still counts eleven. The token is put down open with this reading on it.
-
-## evidence: step 1. ask
-
-<!-- write what is asked and what done means, one criterion per line -->
-
-| done | criterion | evidence | receipt |
-|---|---|---|---|
-| [ ] | the ask is small enough to review whole, or it is split first | — |  |
-| [ ] | every done-when line is decidable, and names the command where one decides it |  |  |
-| [ ] | the basics it stands on exist, or are minted first | — |  |
 
 ## evidence: step 2. do
 
