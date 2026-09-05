@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"encoding/json"
 	"flag"
 	"os"
@@ -172,8 +173,19 @@ func call(roots roots, params json.RawMessage) map[string]any {
 func taking[T any](r roots, raw json.RawMessage, f func(roots, T) string) string {
 	var a T
 	if len(raw) > 0 && string(raw) != "null" {
-		if err := json.Unmarshal(raw, &a); err != nil {
-			return fail("the arguments will not read: " + err.Error())
+		// A FIELD THIS TOOL DOES NOT TAKE IS REFUSED, NOT DISCARDED.
+		// json.Unmarshal drops one without a word, so a call naming the actor
+		// as by decoded to nothing, the actor fell back to main, and the write
+		// was filed under a name the caller never chose. The caller found out
+		// from a later refusal about a holder, two calls away from the cause.
+		//
+		// THE REFUSAL NAMES THE FIELDS THIS TOOL TAKES, off the same struct the
+		// advertised schema is read off, so the correction is one word.
+		d := json.NewDecoder(bytes.NewReader(raw))
+		d.DisallowUnknownFields()
+		if err := d.Decode(&a); err != nil {
+			return fail("the arguments will not read: " + err.Error() +
+				". This tool takes: " + theFieldsItTakes(a))
 		}
 	}
 	return f(r, a)
