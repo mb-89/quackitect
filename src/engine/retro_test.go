@@ -30,40 +30,6 @@ func runRetroExe(t *testing.T, exe string, r Roots, args ...string) (Collected, 
 	return got, string(out), err
 }
 
-// A tree with a log, a scratchpad and one token, the way a session leaves one.
-func aWorkedTree(t *testing.T) Roots {
-	t.Helper()
-	r := lane(t)
-	logs := r.Private("log")
-	if err := os.MkdirAll(logs, 0o755); err != nil {
-		t.Fatal(err)
-	}
-	for _, name := range []string{"session-20260101-000000.jsonl", "session-20260102-000000.jsonl"} {
-		if err := os.WriteFile(filepath.Join(logs, name), []byte("{}"+nl), 0o644); err != nil {
-			t.Fatal(err)
-		}
-	}
-	// The one that is running, which the retro rotates before it drains.
-	running := `{"running":true}` + nl
-	if err := os.WriteFile(filepath.Join(logs, Current), []byte(running), 0o644); err != nil {
-		t.Fatal(err)
-	}
-	// THE FOLDER BELONGS TO THE ACTOR THAT RUNS THE RETRO, so these fixtures
-	// are about a folder moving whole. Another actor's folder is left where
-	// it is now, and the test that decides that makes its own.
-	pad := r.Private("scratchpad")
-	if err := os.MkdirAll(filepath.Join(pad, "main"), 0o755); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(filepath.Join(pad, "one-off.py"), []byte("print(1)"+nl), 0o644); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(filepath.Join(pad, "main", "probe.sh"), []byte("echo"+nl), 0o644); err != nil {
-		t.Fatal(err)
-	}
-	return r
-}
-
 func TestRetroIsAVerbOfTheProgram(t *testing.T) {
 	t.Parallel()
 	exe := retroExe(t)

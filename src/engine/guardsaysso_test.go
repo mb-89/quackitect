@@ -19,7 +19,7 @@ import (
 // is, rather than leaving an agent to infer it from silence.
 func TestTheEngineSaysWhetherTheGuardIsLive(t *testing.T) {
 	t.Parallel()
-	r := Roots{Method: t.TempDir(), Work: t.TempDir()}
+	r := aTree(t).apart().Roots
 
 	// THE DOOR IS FREE, so the guard is live and the line says so.
 	ln, live, up := holdTheDoor(r)

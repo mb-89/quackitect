@@ -30,7 +30,7 @@ func TestABuildFailureIsNoRedAndNamesTheHand(t *testing.T) {
 	// test this one proposes is compiled with.
 	wrote(t, r, theirs, "half.go", "package lib\n\nfunc C() int {\n\treturn halfWritten()\n}\n")
 
-	got, err := TestTheDelta(r, db, mine, []string{"TestA"}, true, "worker-mine")
+	got, err := TestTheDelta(t.Context(), r, db, mine, []string{"TestA"}, true, "worker-mine")
 	if err != nil {
 		t.Fatal(err)
 	}

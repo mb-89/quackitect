@@ -80,7 +80,7 @@ func TestTheDeltaIsWhatThisTokenWrote(t *testing.T) {
 	// THE OTHER HAND WRITES A WHOLE TRIGGER, in the same tree, at the same time.
 	wrote(t, r, theirs, "util/checks/scripts-are-lf.mjs", "// another hand\n")
 
-	got, err := TestTheDelta(r, db, mine, nil, false, "worker-mine")
+	got, err := TestTheDelta(t.Context(), r, db, mine, nil, false, "worker-mine")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -99,7 +99,7 @@ func TestTheDeltaIsWhatThisTokenWrote(t *testing.T) {
 
 	// AND A TOKEN WITH NOTHING ON RECORD KEEPS THE WHOLE DIFF, AND SAYS SO.
 	empty := aTokenTaking(t, r, head)
-	blank, err := TestTheDelta(r, db, empty, nil, false, "worker-empty")
+	blank, err := TestTheDelta(t.Context(), r, db, empty, nil, false, "worker-empty")
 	if err != nil {
 		t.Fatal(err)
 	}
