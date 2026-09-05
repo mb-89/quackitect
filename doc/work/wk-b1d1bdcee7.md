@@ -6,31 +6,32 @@ process: [[trivial]]
 # the rules for filling this token
 guidance: [[work-token]]
 # the name this token is known by, in references and in links
-title: rows for eighteen ids
+title: seven rows reach nothing
 # where the token stands. The process owns these values.
 status: open
-# the tree each time the work was taken up, snapshots the engine wrote
-began:
-  - c9cf53273a39197cb2ff35b03e1bfb11398ae9e6
 ---
 
 ## detail
 
-Eighteen ids named by live notes reach no token and no archive row, and each has a note the branch still reaches. They want a row in doc/work/archive.jsonl carrying id, title, process, an empty disposition and on_branch.
+A FINDING WHILE WORKING wk-7873576bbb.
 
-The eighteen, measured at head ae4a7cc7: wk-191014c633, wk-212909368a, wk-218e541ec2, wk-2ef79848eb, wk-526ac833fb, wk-788cca53e9, wk-7a9da9eec2, wk-87de90d82b, wk-887e9a126a, wk-a4c80456c2, wk-aae03d4767, wk-b13ade88e2, wk-b42c0e9a53, wk-b42f08ff8d, wk-c93aac62be, wk-d7f53103f0, wk-df597db237, wk-e5010af20f.
+util/checks/archive-rows-travel exits 1 on seven rows whose objects no clone of the branch reaches. The eighteen rows wk-7873576bbb added all pass, so these seven are the only thing left holding that check red.
 
-The object for each is the newest blob of doc/work/ID.md that git rev-list --objects HEAD reaches. Every one of these eighteen has such a blob, so a row naming it passes util/checks/archive-rows-travel, which resolves against HEAD.
+Six name a tag and a blob: wk-3bad905ec0, wk-5002ef7c5f, wk-59f957dc38, wk-781c94fff2, wk-97e8bd9f38 and wk-f7153c420e. This box holds all 77 archive tags, so the note content for each is here. The branch never committed those notes, so there is no on_branch to fold in and se archive --sweep has nothing to write.
 
-None of the eighteen closed. Four read status open, four done, eight backlogged and two spec_open, so the row's disposition is empty and says so.
+The seventh, wk-2493bf564a, names a blob and no tag. Its close wrote the blob with git hash-object, and no tree reaches it.
 
-Split out of wk-7d2d36115f, where the write was refused: this box's sandbox denies any write to doc/work/archive.jsonl, whatever its size.
+So each note lives on whatever box holds the object, and a clone of the branch reads nothing back.
+
+## proposed action
+
+Write each of the seven notes out from the object the row names, commit them under doc/work, then delete them and commit again. The blob stays reachable from HEAD after the first commit, even with no file left. Put that blob on its row as on_branch.
 
 ## done when
 
-- se lint answers no finding naming any of the eighteen ids
-- node util/checks/archive-rows-travel.mjs . exits 0, and so does node util/checks/archive-rows-name-an-object.mjs .
-- each new row's on_branch is a blob git cat-file -p reads back as that token's note
+- node util/checks/archive-rows-travel.mjs . exits 0, with every row reading ok
+- each of the seven rows carries an on_branch that git rev-list --objects HEAD reaches
+- no note file is left in doc/work for any of the seven, decided by git status answering clean there
 
 ## evidence: step 1. ask
 
