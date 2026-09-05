@@ -9,6 +9,11 @@ guidance: [[work-token]]
 title: declared group vanishes empty
 # where the token stands. The process owns these values.
 status: open
+claimed_by: aeaf7bd9/worker-nono-two
+claimed_at: "2026-09-05T20:44:12Z"
+# the tree each time the work was taken up, snapshots the engine wrote
+began:
+  - 6fa55218fa90154309cb38bf6a6e71ffd44131c0
 ---
 
 ## detail
@@ -41,11 +46,11 @@ If the owner would rather an empty group were hidden, then the ruling at the top
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | what is gained by doing it, and not only what it does |  |  |
-| [ ] | what breaks if it is never done, and not only that it stays undone |  |  |
-| [ ] | the ask is small enough to review whole, or it is split first | — |  |
-| [ ] | every done-when line is decidable, and names the command where one decides it |  |  |
-| [ ] | the basics it stands on exist, or are minted first | — |  |
+| [x] | what is gained by doing it, and not only what it does | A person keeps the heading they drop work onto at the moment it empties, which is when they want it most. | the base's opening lines |
+| [x] | what breaks if it is never done, and not only that it stays undone | The file and the program go on disagreeing in writing, and a check naming a group swings with the data. | util/views/work.base |
+| [x] | the ask is small enough to review whole, or it is split first | One branch in Render, one test, and one older test the base overrules. | `git show --stat` |
+| [x] | every done-when line is decidable, and names the command where one decides it | Line one is the new test. Line two is render-check. Line three is the answer read back. | `RUNME.sh test --propose render-check` |
+| [x] | the basics it stands on exist, or are minted first | Render, the declared loop and the ruling were there. Nothing was minted. | src/engine/view.go |
 
 ## evidence: step 2. do
 
@@ -53,9 +58,9 @@ If the owner would rather an empty group were hidden, then the ruling at the top
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the guidance this token names was read and applied | — |  |
-| [ ] | one test was written first and seen red for the reason expected |  |  |
-| [ ] | the same test was seen green after the change, and named |  |  |
-| [ ] | the change is git diff began..ended, the two hashes the engine wrote on this token | — |  |
-| [ ] | the cleanup the change revealed is in the change, or is a token of its own | — |  |
+| [x] | the guidance this token names was read and applied | Read. Rule 12 drove the red, rule 13 the two halves: what a declaration keeps and what the data made. | doc/guidance/work-token.md |
+| [x] | one test was written first and seen red for the reason expected | At origin/v4 with only the test added it failed, saying a declared group with nothing matching is missing. | `go test . -run TestADeclaredGroupIsDrawnWithNothingInIt` |
+| [x] | the same test was seen green after the change, and named | It passes, with every other Group test. render-check answered ok. Seven package failures either way. | `RUNME.sh test --propose` |
+| [x] | the change is git diff began..ended, the two hashes the engine wrote on this token | The zero-count skip is gone. Over the live rows it answers urgent and noted at zero. | a Render over TokenRows |
+| [x] | the cleanup the change revealed is in the change, or is a token of its own | An older test ruled the opposite. It reads the base's ruling now. | view_test.go |
 
