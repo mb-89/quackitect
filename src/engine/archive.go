@@ -377,7 +377,7 @@ func keepInList(r Roots, add Archived) error {
 }
 
 // WriteArchiveList writes the list out as it stands, folding in the tags an
-// older archive left. A sweep with nothing to sweep calls this, which is how
+// older archive left. A sweep calls this where the list is there, which is how
 // the fold happens on a tree nobody is closing anything on.
 func WriteArchiveList(r Roots) error {
 	return keepInList(r, Archived{})
@@ -611,9 +611,25 @@ func SweepClosed(r Roots) (kept, gone int, err error) {
 			gone++
 		}
 	}
-	// THE LIST IS LEFT RIGHT WHETHER OR NOT ANYTHING MOVED. A sweep with
-	// nothing to sweep is how the tags an older archive left are folded in, and
-	// how a list somebody deleted a line from is written whole again.
+	// THE FOLD HAPPENS ON A LIST THAT IS THERE, AND NOTHING IS PUT BACK.
+	//
+	// The list is the record rather than a rendering of the tags: a row naming a
+	// blob is in no tag, and no box can write that row again. This ended by
+	// writing the list whatever it had found, and said that was how a list
+	// somebody lost came back. Over a tree whose list has gone it writes one
+	// holding what the tags carry and nothing else, so the rows naming a blob go
+	// for good at the moment a person sweeps to get them back. What git holds of
+	// the file is the way back, and it is only there while nothing has been
+	// written over it.
+	//
+	// A LIST THAT IS THERE LOSES NOTHING BY BEING WRITTEN WHOLE, and that write
+	// is where the tags an older archive left are folded in.
+	if _, err := os.Stat(ArchiveList(r)); err != nil {
+		if os.IsNotExist(err) {
+			return kept, gone, nil
+		}
+		return kept, gone, err
+	}
 	return kept, gone, WriteArchiveList(r)
 }
 
