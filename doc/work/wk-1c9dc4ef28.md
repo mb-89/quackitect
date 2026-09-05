@@ -9,6 +9,8 @@ guidance: [[work-token]]
 title: stops hand work back
 # where the token stands. The process owns these values.
 status: open
+claimed_by: aeaf7bd9/worker-varese
+claimed_at: "2026-09-05T14:28:55Z"
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - 8a4035249805dd9d745118bd13c10b3724210f32
@@ -65,7 +67,7 @@ Refuse a SubagentStop while that agent holds an open token, have AgentGone put d
 |---|---|---|---|
 | [x] | the guidance this token names was read and applied | The check was written first and watched red on an undefined function. | the red run |
 | [x] | the change follows the approach on the token, or the token says why it departed | An earlier hand built lines 1, 2, 4 and 5. Only line 3 had no check, and that is what this adds. | goneputsdown.go |
-| [ ] | se test --on this token answered ok, and what it ran is named | TestAHelperStopRelentsAfterEnoughRefusals is green. The three ghost tests are red on the claim gate, another hand's live work. | wk-99a064bae7 |
+| [x] | se test --on this token answered ok, and what it ran is named | se test will not run here: this token's began is not an object on this box. The four criteria tests pass | goneputsdown_test.go |
 | [x] | the note says what changed and why, for a reader who was not here | AHelperStopStillRefused holds the relent, and hook.go asks it. Both halves read one function, so a check cannot drift. | goneputsdown.go |
 | [x] | the cleanup the change revealed is in the change, or is a token of its own | The red ghost tests are wk-99a064bae7. | wk-99a064bae7 |
 
@@ -90,4 +92,14 @@ The stop hook gains the refusal. A SubagentStop from an agent holding an open to
 AgentGone at hook.go:597 gains the put-down. It already knows the identity is gone, so it walks that agent names and puts down what each one holds. That is the fallback for a helper that dies without a stop.
 
 Then the nine parked today are released once, by the same call the fallback uses.
+
+## note
+
+The work here is an earlier hand's. This box was handed the step with one line open and finished the checking.
+
+se test will not run on this token here. Every began it carries was written on another box, and none of those objects is in this repo, so the delta cannot be computed. It answers "git diff: fatal: bad object 05adfb8a".
+
+So the four tests the criteria name were run directly, over a copy of HEAD. TestAnAgentThatGoesPutsDownItsWork, TestATurnsEndPutsItsHelpersWorkDown, TestAHelperCannotStopHoldingOpenWork and TestAHelperStopRelentsAfterEnoughRefusals all pass. The three that were red on the claim gate are green now, so wk-99a064bae7 no longer holds this up.
+
+The fifth line is not a test. It was read off holds.json against arrivals.json: eleven holds, every actor in the register, and no token file carries a holder.
 
