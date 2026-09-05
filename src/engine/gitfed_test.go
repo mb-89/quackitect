@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"strings"
 	"sync"
@@ -45,15 +44,7 @@ func aFedGit(t *testing.T) *fedGit {
 	return fed
 }
 
-func (f *fedGit) run(ctx context.Context, r Roots, index string, args ...string) (string, error) {
-	// THE FAKE ANSWERS THE CONTEXT THE WAY THE REAL GIT DOES. exec refuses to
-	// start a process for a context that is already done, so a fake that ran
-	// anyway let a caller thread no context at all and still pass every claim
-	// test that comes through this seam. The call is refused before it is
-	// recorded, because a call the real git never started never happened.
-	if err := ctx.Err(); err != nil {
-		return "", err
-	}
+func (f *fedGit) run(r Roots, index string, args ...string) (string, error) {
 	f.Lock()
 	defer f.Unlock()
 	line := strings.Join(args, " ")
@@ -120,7 +111,7 @@ func TestAClaimTouchesNoBranchAndNoWorkingTree(t *testing.T) {
 	fed.says["write-tree"] = "aaaa"
 	fed.says["commit-tree"] = "bbbb"
 
-	got := Publish(t.Context(), r, []string{"doc/work/wk-1.md"}, "a claim")
+	got := Publish(r, []string{"doc/work/wk-1.md"}, "a claim")
 	if !got.Committed || !got.Pushed {
 		t.Fatalf("the claim did not publish: %+v", got)
 	}
@@ -129,8 +120,8 @@ func TestAClaimTouchesNoBranchAndNoWorkingTree(t *testing.T) {
 	if !fed.asked("update-ref", claimsRef) {
 		t.Error("the claim was not written to the claims ref")
 	}
-	if !fed.asked("push", "origin", claimsRef+":"+claimsRef) {
-		t.Error("the push did not carry the claims ref alone")
+	if !fed.asked("push", "origin", claimsRef+":"+claimsBranch) {
+		t.Error("the push did not carry the claims ref alone, onto the branch a remote takes")
 	}
 	// AND NOTHING THAT REACHES THE WORKING TREE OR THE BRANCH.
 	for _, forbidden := range []string{"commit -m", "checkout", "merge", "reset", "rebase", "pull", "stash"} {
@@ -138,14 +129,13 @@ func TestAClaimTouchesNoBranchAndNoWorkingTree(t *testing.T) {
 			t.Errorf("a claim ran %q, which reaches the branch or the working tree", forbidden)
 		}
 	}
-	// AND NO NOTE WAS ADDED. The ref carries one file of claim lines, written
-	// as a blob into a fresh index, so nothing from the tree is staged and a
-	// sweep has nothing to sweep.
-	if fed.carried("-A") || fed.carried(".") || fed.asked("add", "doc/work") {
-		t.Error("the claim staged the tree's notes into the commit")
+	// AND ONLY THE NOTES IT WAS GIVEN WERE ADDED. A sweep would publish
+	// whatever else the tree is holding.
+	if fed.carried("-A") || fed.carried(".") {
+		t.Error("the claim swept the tree into the commit")
 	}
-	if !fed.asked("update-index", "--cacheinfo", claimsFile) {
-		t.Error("the claim did not write the one claims file into the index")
+	if !fed.asked("add", "doc/work/wk-1.md") {
+		t.Error("the claim did not add the note it was given")
 	}
 }
 
@@ -157,7 +147,7 @@ func TestALostRaceReadsTheOtherBoxRatherThanRebasing(t *testing.T) {
 	fed.says["commit-tree"] = "bbbb"
 	fed.fails["push"] = "rejected: the ref moved"
 
-	got := Publish(t.Context(), r, []string{"doc/work/wk-1.md"}, "a claim")
+	got := Publish(r, []string{"doc/work/wk-1.md"}, "a claim")
 	if got.Pushed {
 		t.Fatal("a push that was refused twice reported as pushed")
 	}
@@ -179,7 +169,7 @@ func TestTheSyncFetchesOnlyTheClaimsRef(t *testing.T) {
 	fed.says["show"] = "---\nkind: [[work-token]]\nclaimed_by: 0badc0de/worker-far\n" +
 		"claimed_at: 2026-09-04T06:00:00Z\n---\n\n## detail\n\nsomething\n"
 
-	got := SyncClaims(t.Context(), r)
+	got := SyncClaims(r)
 	if got.Says != "" {
 		t.Fatalf("the sync did not read the ref: %s", got.Says)
 	}
@@ -189,13 +179,18 @@ func TestTheSyncFetchesOnlyTheClaimsRef(t *testing.T) {
 	// THE REMOTE'S CLAIMS LAND ON A REF OF THEIR OWN, never over this box's. A
 	// fetch into the local ref is a fast-forward, and a box holding an unpushed
 	// claim is ahead of the remote, so git refuses it. See remoteClaimsRef.
-	if !fed.asked("fetch", "+"+claimsRef+":"+remoteClaimsRef) {
-		t.Error("the sync did not ask for the claims ref by name, into a ref of the remote's own")
+	if !fed.asked("fetch", "+"+claimsBranch+":"+remoteClaimsRef) {
+		t.Error("the sync did not ask for the claims branch by name, into a ref of the remote's own")
 	}
-	// A FETCH OF THE BRANCH WOULD BRING EVERY COMMIT ON IT DOWN.
+	// A FETCH OF THE WORKING BRANCH WOULD BRING EVERY COMMIT ON IT DOWN. Two ref
+	// names may be asked for and no others: the claims branch, and the old ref
+	// behind it that a remote from before this change still carries.
 	for _, line := range fed.ran {
-		if strings.HasPrefix(line, "fetch") && !strings.Contains(line, claimsRef) {
-			t.Errorf("the sync fetched something that is not the claims ref: %q", line)
+		if !strings.HasPrefix(line, "fetch") {
+			continue
+		}
+		if !strings.Contains(line, claimsBranch) && !strings.Contains(line, claimsRef) {
+			t.Errorf("the sync fetched something that is not a claims ref: %q", line)
 		}
 	}
 	for _, forbidden := range []string{"merge", "checkout", "reset", "pull", "rebase"} {
@@ -262,7 +257,7 @@ func TestPublishReachesItsSecondPushWhenThisBoxIsAhead(t *testing.T) {
 	// both are the same call and the count below is what tells them apart.
 	pushes := 0
 	was := gitRuns
-	gitRuns = func(ctx context.Context, r Roots, index string, args ...string) (string, error) {
+	gitRuns = func(r Roots, index string, args ...string) (string, error) {
 		if args[0] == "push" {
 			pushes++
 			if pushes == 1 {
@@ -270,12 +265,12 @@ func TestPublishReachesItsSecondPushWhenThisBoxIsAhead(t *testing.T) {
 			}
 			return "", nil
 		}
-		return fed.run(ctx, r, index, args...)
+		return fed.run(r, index, args...)
 	}
 	t.Cleanup(func() { gitRuns = was })
 
-	got := Publish(t.Context(), r, []string{"doc/work/wk-1.md"}, "a claim")
-	if !fed.asked("fetch", "+"+claimsRef+":"+remoteClaimsRef) {
+	got := Publish(r, []string{"doc/work/wk-1.md"}, "a claim")
+	if !fed.asked("fetch", "+"+claimsBranch+":"+remoteClaimsRef) {
 		t.Error("the loser fetched over its own ref, which git refuses while this box is ahead")
 	}
 	if fed.asked("fetch", "--quiet") {
@@ -304,19 +299,22 @@ func TestSyncClaimsReadsFarClaimsWhenThisBoxIsAhead(t *testing.T) {
 	// THE LOCAL REF IS AHEAD, so a fetch into it would be refused. Only a fetch
 	// into the remote's own ref answers here, and the head below is read off
 	// that ref rather than off this box's.
-	fed.fails["fetch "+claimsRef+":"+claimsRef] = "git fetch: ! [rejected] " +
-		claimsRef + " -> " + claimsRef + " (non-fast-forward)"
 	fed.says["rev-parse --verify --quiet "+remoteClaimsRef] = "cafe1234"
 	fed.says["ls-tree"] = "doc/work/wk-far.md"
 	fed.says["show"] = "---\nkind: [[work-token]]\nclaimed_by: 0badc0de/worker-far\n" +
 		"claimed_at: 2026-09-04T06:00:00Z\n---\n\n## detail\n\nsomething\n"
 
-	got := SyncClaims(t.Context(), r)
+	got := SyncClaims(r)
 	if got.Says != "" {
 		t.Fatalf("a box with a claim of its own read nothing: %s", got.Says)
 	}
 	if len(got.Claims) != 1 || got.Claims["wk-far"].By != "0badc0de/worker-far" {
 		t.Fatalf("the sync read %+v", got.Claims)
+	}
+	// AND NO FETCH WRITES OVER THE LOCAL REF, which is the update git refuses
+	// while this box holds a claim the remote lacks.
+	if fed.asked("fetch", claimsRef+":"+claimsRef) {
+		t.Error("a fetch still writes over the local ref, so a box that is ahead reads nobody")
 	}
 }
 
@@ -330,7 +328,7 @@ func TestARefusedFetchCarriesGitsReason(t *testing.T) {
 	fed := aFedGit(t)
 	fed.fails["fetch"] = "git fetch: ! [rejected] " + claimsRef + " (non-fast-forward)"
 
-	got := SyncClaims(t.Context(), r)
+	got := SyncClaims(r)
 	if !strings.Contains(got.Says, "non-fast-forward") {
 		t.Errorf("the refusal does not carry git's reason: %q", got.Says)
 	}

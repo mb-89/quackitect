@@ -1,10 +1,10 @@
 package main
 
 import (
-	"context"
 	"encoding/json"
 	"os"
 	"quackitect/engine/internal/frontmatter"
+	"quackitect/engine/internal/logbook"
 	"strings"
 	"time"
 )
@@ -76,18 +76,18 @@ func loadFarClaims(r Roots) TheFarClaims {
 //
 // IT IS NEVER FATAL. A box with no remote, no network or no permission goes on
 // working with the claims it has, and the answer says why it saw nothing new.
-func SyncClaims(ctx context.Context, r Roots) TheFarClaims {
+func SyncClaims(r Roots) TheFarClaims {
 	out := loadFarClaims(r)
 	out.Looked = time.Now().UTC().Format(ClaimStamp)
 	// ONLY THE CLAIMS REF IS FETCHED, so nothing else can arrive. A fetch of the
 	// branch would bring every commit on it into .git, and a later mistake could
 	// put those on the disc. This asks for one ref and gets one ref.
-	if _, err := gitIn(ctx, r, "", theRemoteClaims()...); err != nil {
+	if err := fetchTheRemoteClaims(r, ""); err != nil {
 		out.Says = "no claims reached this box, so these are the ones from before: " + err.Error()
 		saveFarClaims(r, out)
 		return out
 	}
-	head, err := gitIn(ctx, r, "", "rev-parse", "--verify", "--quiet", remoteClaimsRef)
+	head, err := gitIn(r, "", "rev-parse", "--verify", "--quiet", remoteClaimsRef)
 	if err != nil || head == "" {
 		out.Says = "no box has published a claim yet"
 		saveFarClaims(r, out)
@@ -98,50 +98,25 @@ func SyncClaims(ctx context.Context, r Roots) TheFarClaims {
 		saveFarClaims(r, out)
 		return out
 	}
-	found, err := readClaimsIn(ctx, r, head)
+	// THE REF'S TREE IS CLAIM NOTES AND NOTHING ELSE, because that is all
+	// writeTheClaims ever puts in it. So a listing of it is a listing of claims.
+	listed, err := gitIn(r, "", "ls-tree", "-r", "--name-only", head)
 	if err != nil {
-		out.Says = "the claims could not be read: " + err.Error()
+		out.Says = "the claims could not be listed: " + err.Error()
 		saveFarClaims(r, out)
 		return out
 	}
-	out.Claims, out.Ref, out.Says = found, head, ""
-	saveFarClaims(r, out)
-	return out
-}
-
-// readClaimsIn answers the claims a commit on the ref holds.
-//
-// THE REF CARRIES ONE FILE, one line per live claim, and this reads it with one
-// git show. It carried the whole note of every token ever claimed, and this
-// listed the tree and showed each note to parse two frontmatter fields, which
-// at tens of thousands of tokens is tens of thousands of entries on every read.
-//
-// A COMMIT WITH NO SUCH FILE IS THE OLD SHAPE, and it is read the old way,
-// once: the tree is listed and each note parsed for claimed_by and claimed_at.
-// The next write folds what was read into the file, so a box holding claims
-// written the old way is migrated by its own first claim, and nobody types
-// anything.
-func readClaimsIn(ctx context.Context, r Roots, head string) (map[string]FarClaim, error) {
-	if text, err := gitIn(ctx, r, "", "show", head+":"+claimsFile); err == nil {
-		if found, ok := parseClaimLines(text); ok {
-			return found, nil
-		}
-	}
 	found := map[string]FarClaim{}
-	listed, err := gitIn(ctx, r, "", "ls-tree", "-r", "--name-only", head)
-	if err != nil {
-		return found, err
-	}
 	for _, path := range strings.Fields(listed) {
 		if !strings.HasSuffix(path, ".md") {
 			continue
 		}
-		text, err := gitIn(ctx, r, "", "show", head+":"+path)
+		text, err := gitIn(r, "", "show", head+":"+path)
 		if err != nil {
 			continue // a file the ref does not carry any more
 		}
-		front, _ := frontmatter.Split(text)
-		f, err := frontmatter.Parse(front)
+		front, _ := frontmatter.SplitNote(text)
+		f, err := frontmatter.ParseFront(front)
 		if err != nil {
 			continue // a note this build cannot read is not a claim it can honour
 		}
@@ -152,26 +127,9 @@ func readClaimsIn(ctx context.Context, r Roots, head string) (map[string]FarClai
 		id := strings.TrimSuffix(path[strings.LastIndex(path, "/")+1:], ".md")
 		found[id] = FarClaim{By: by, At: frontmatter.Str(f, "claimed_at")}
 	}
-	return found, nil
-}
-
-// parseClaimLines reads the claims file: one claim per line, the id, the
-// claimant and the stamp. A line of any other shape means the text is not the
-// file, and the caller reads the old shape instead.
-func parseClaimLines(text string) (map[string]FarClaim, bool) {
-	out := map[string]FarClaim{}
-	for _, line := range strings.Split(text, "\n") {
-		line = strings.TrimSpace(line)
-		if line == "" {
-			continue
-		}
-		f := strings.Fields(line)
-		if len(f) != 3 {
-			return nil, false
-		}
-		out[f[0]] = FarClaim{By: f[1], At: f[2]}
-	}
-	return out, true
+	out.Claims, out.Ref, out.Says = found, head, ""
+	saveFarClaims(r, out)
+	return out
 }
 
 func saveFarClaims(r Roots, all TheFarClaims) {
@@ -182,9 +140,8 @@ func saveFarClaims(r Roots, all TheFarClaims) {
 
 // WatchForClaims keeps the store in step on the engine's own clock, until the
 // engine stops. It is the resident engine's job because it is the one process
-// that lives long enough to have a clock. The context is the engine's, and
-// its end is the watch's end, fetch in flight included.
-func WatchForClaims(ctx context.Context, r Roots, log *Log) {
+// that lives long enough to have a clock.
+func WatchForClaims(r Roots, log *logbook.Log, done <-chan struct{}) {
 	every := LoadConfig(r).ClaimSyncSeconds
 	if every <= 0 {
 		return // turned off
@@ -195,14 +152,14 @@ func WatchForClaims(ctx context.Context, r Roots, log *Log) {
 	for {
 		// THE FIRST LOOK IS AT ONCE, so an engine that has just started knows
 		// what the other boxes took while it was down.
-		got := SyncClaims(ctx, r)
+		got := SyncClaims(r)
 		if got.Ref != "" && got.Ref != was {
 			was = got.Ref
-			log.Write("engine", "claim", "engine", "the claims other boxes published were read", Yes(),
+			log.Write("engine", "claim", "engine", "the claims other boxes published were read", logbook.Yes(),
 				map[string]any{"claims": len(got.Claims), "ref": got.Ref})
 		}
 		select {
-		case <-ctx.Done():
+		case <-done:
 			return
 		case <-tick.C:
 		}

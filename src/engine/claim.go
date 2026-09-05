@@ -10,7 +10,6 @@ import (
 	"os/exec"
 	"path/filepath"
 	"quackitect/engine/internal/quiet"
-	"sort"
 	"strings"
 	"sync"
 	"time"
@@ -393,11 +392,58 @@ const claimsRef = "refs/se/claims"
 // Measured on a cloud box: wk-c698d46866.
 const remoteClaimsRef = "refs/se/remote-claims"
 
-// theRemoteClaims is the fetch both readers make. It is one line so the two
+// claimsBranch is where claims live on the remote, and it is a branch because
+// the sandbox allows nothing else.
+//
+// THE BRANCH IS FORCED, NOT CHOSEN. Measured on a cloud box in September 2026:
+// a push to refs/se/*, refs/tags/* or refs/notes/* answers HTTP 403 from the
+// session's git proxy, and a push to refs/heads/* is accepted. So a box in the
+// sandbox could not publish a claim at all. Its claim stood on its own disc and
+// reached nobody, while the queue on every other box went on offering the token,
+// which is the one thing claims exist to prevent. Two boxes took the same token.
+//
+// THE OWNER RULED THE BRANCH KNOWING THE COST. A branch is listed, offered in a
+// pull request, checked out by accident and merged by a tidy-up. Against that:
+// the engine must publish a claim with nothing else present, no agent, no lane
+// and no workflow, and this is the only design that holds. The branch is swept
+// from time to time on purpose, and a claim lapses in three hours, so a stale
+// one ages out rather than needing a delete a cloud box cannot make. Measured
+// and decided on wk-4759d90994, from doc/spec/claims-relay-trial.md.
+//
+// ONLY THE FAR SIDE MOVED. Locally a claim is still refs/se/claims, off every
+// branch listing, and the remote's copy still lands on refs/se/remote-claims.
+const claimsBranch = "refs/heads/se/claims"
+
+// theRemoteClaims is the fetch both readers make. It is one place so the two
 // cannot drift into fetching different things, which is how one of them ended
 // up overwriting the ref the other depended on.
-func theRemoteClaims() []string {
-	return []string{"fetch", "origin", "+" + claimsRef + ":" + remoteClaimsRef}
+//
+// IT IS A LIST BECAUSE A REMOTE MAY STILL BE ON THE OLD REF. Every box that ran
+// before the branch published onto refs/se/claims, and a reader that asked only
+// for the branch would call those tokens nobody's and hand out work that is
+// held. So the branch is asked for first and the old ref is the fallback. The
+// old ref is read and never written, so once the branch exists it is never
+// reached again.
+func theRemoteClaims() [][]string {
+	return [][]string{
+		{"fetch", "origin", "+" + claimsBranch + ":" + remoteClaimsRef},
+		{"fetch", "origin", "+" + claimsRef + ":" + remoteClaimsRef},
+	}
+}
+
+// fetchTheRemoteClaims asks for them in order and stops at the first that
+// answers. Where none does it answers the last reason, so what git said reaches
+// the agent rather than an empty string.
+func fetchTheRemoteClaims(r Roots, index string) error {
+	var last error
+	for _, args := range theRemoteClaims() {
+		_, err := gitIn(r, index, args...)
+		if err == nil {
+			return nil
+		}
+		last = err
+	}
+	return last
 }
 
 // Published says what reached the other boxes.
@@ -430,18 +476,15 @@ func gitBudget(args []string) time.Duration {
 
 // gitIn runs git over this tree with an index of its own, so nothing it does
 // can reach the person's staging or their working tree.
-//
-// THE CONTEXT IS THE CALLER'S, so a caller that ends early ends the git call
-// with it, and a test hands t.Context. The budget is a ceiling on top.
-func gitIn(ctx context.Context, r Roots, index string, args ...string) (string, error) {
-	return gitRuns(ctx, r, index, args...)
+func gitIn(r Roots, index string, args ...string) (string, error) {
+	return gitRuns(r, index, args...)
 }
 
-func realGit(ctx context.Context, r Roots, index string, args ...string) (string, error) {
+func realGit(r Roots, index string, args ...string) (string, error) {
 	// A NETWORK CALL GETS A CEILING, so a fetch to a host that never answers
 	// cannot leave the engine's claim loop waiting for ever. Everything else is
 	// local and answers in milliseconds.
-	ctx, done := context.WithTimeout(ctx, gitBudget(args))
+	ctx, done := context.WithTimeout(context.Background(), gitBudget(args))
 	defer done()
 	cmd := quiet.Quietly(exec.CommandContext(ctx, "git", args...))
 	cmd.Dir = r.Work
@@ -465,7 +508,7 @@ func realGit(ctx context.Context, r Roots, index string, args ...string) (string
 }
 
 // Publish writes the claim notes into refs/se/claims and pushes that ref.
-func Publish(ctx context.Context, r Roots, files []string, message string) Published {
+func Publish(r Roots, files []string, message string) Published {
 	var p Published
 	if len(files) == 0 {
 		p.Says = "nothing changed, so nothing was published"
@@ -487,125 +530,67 @@ func Publish(ctx context.Context, r Roots, files []string, message string) Publi
 	os.Remove(index.Name())
 	defer os.Remove(index.Name())
 
-	if _, err := writeTheClaims(ctx, r, index.Name(), files, message); err != nil {
+	if _, err := writeTheClaims(r, index.Name(), files, message); err != nil {
 		p.Says = "the claim stands here. It could not be committed: " + err.Error()
 		return p
 	}
 	p.Committed = true
-	if _, err := gitIn(ctx, r, index.Name(), "push", "origin", claimsRef+":"+claimsRef); err == nil {
+	if _, err := gitIn(r, index.Name(), "push", "origin", claimsRef+":"+claimsBranch); err == nil {
 		p.Pushed = true
-		p.Says = "published on " + claimsRef + ". Other boxes see this claim now"
+		p.Says = "published on " + claimsBranch + ". Other boxes see this claim now"
 		return p
 	}
 	// ANOTHER BOX WROTE THE REF FIRST. Read what it wrote and write again on
 	// top of it. Nothing is rebased, because nothing is on a branch: this is
 	// two writes to one ref and the second one reads the first.
-	if _, err := gitIn(ctx, r, index.Name(), theRemoteClaims()...); err != nil {
+	if err := fetchTheRemoteClaims(r, index.Name()); err != nil {
 		p.Says = "published here, on " + claimsRef + ". The push did not run: " + err.Error()
 		return p
 	}
 	// THE REMOTE'S HEAD BECOMES THE PARENT, and the claim is written again on
 	// top of it. Moving the local ref loses nothing: what it held is these same
 	// files, and writeTheClaims adds them again over the head that won the race.
-	if head, err := gitIn(ctx, r, index.Name(), "rev-parse", "--verify", "--quiet", remoteClaimsRef); err == nil && head != "" {
-		if _, err := gitIn(ctx, r, index.Name(), "update-ref", claimsRef, head); err != nil {
+	if head, err := gitIn(r, index.Name(), "rev-parse", "--verify", "--quiet", remoteClaimsRef); err == nil && head != "" {
+		if _, err := gitIn(r, index.Name(), "update-ref", claimsRef, head); err != nil {
 			p.Says = "published here. The other box's claims could not be taken up: " + err.Error()
 			return p
 		}
 	}
 	p.Rebased = true
-	if _, err := writeTheClaims(ctx, r, index.Name(), files, message); err != nil {
+	if _, err := writeTheClaims(r, index.Name(), files, message); err != nil {
 		p.Says = "published here. Another box's claims were read and this one could not be written again: " + err.Error()
 		return p
 	}
-	if _, err := gitIn(ctx, r, index.Name(), "push", "origin", claimsRef+":"+claimsRef); err != nil {
+	if _, err := gitIn(r, index.Name(), "push", "origin", claimsRef+":"+claimsBranch); err != nil {
 		p.Says = "published here, on " + claimsRef + ". The push still did not run: " + err.Error()
 		return p
 	}
 	p.Pushed = true
-	p.Says = "published on " + claimsRef + ", after reading another box's claims. Other boxes see this claim now"
+	p.Says = "published on " + claimsBranch + ", after reading another box's claims. Other boxes see this claim now"
 	return p
 }
 
-// claimsFile is the one file the claims ref carries: one line per live claim,
-// the token id, the claimant and the stamp, sorted by id.
+// writeTheClaims builds the next claims commit: whatever the ref already holds,
+// with these notes written over it.
 //
-// THE REF HOLDS WHAT IS LIVE, NOT WHAT HAS EVER HAPPENED. It carried the whole
-// note of every token ever claimed, read only for two frontmatter fields, and
-// nothing ever left it. What happened is the record's job, and the record is
-// not this ref.
-const claimsFile = "claims"
-
-// nextClaimsFile is the text of the claims file after this box's tokens are
-// written over what the ref holds. A claim the engine already ignores, because
-// lapsed says so, is dropped on the way. A token in files that is claimed sets
-// its line, and one that is not, released or gone, loses it.
-func nextClaimsFile(r Roots, have map[string]FarClaim, files []string, now time.Time) string {
-	live := map[string]FarClaim{}
-	for id, c := range have {
-		if c.By != "" && !lapsed(r, c.At, now) {
-			live[id] = c
-		}
-	}
-	for _, f := range files {
-		id := strings.TrimSuffix(filepath.Base(f), ".md")
-		t, err := LoadToken(r, id)
-		if err != nil || t.ClaimedBy == "" {
-			delete(live, id)
-			continue
-		}
-		live[id] = FarClaim{By: t.ClaimedBy, At: t.ClaimedAt}
-	}
-	ids := make([]string, 0, len(live))
-	for id := range live {
-		ids = append(ids, id)
-	}
-	sort.Strings(ids)
-	var b strings.Builder
-	for _, id := range ids {
-		fmt.Fprintf(&b, "%s %s %s\n", id, live[id].By, live[id].At)
-	}
-	return b.String()
-}
-
-// writeTheClaims builds the next claims commit: the one claims file, holding
-// what the ref already had that is still live, with this box's claims written
-// over it.
-//
-// THE TREE HOLDS THE ONE FILE AND NOTHING ELSE. The file goes to git as a blob
-// and into a fresh index by its hash, so nothing is staged from the working
-// tree and no note rides along however the tree stands. What the parent held
-// is read through readClaimsIn, which reads the old shape too, so a ref written
-// the old way is folded into the file by this write.
-func writeTheClaims(ctx context.Context, r Roots, index string, files []string, message string) (string, error) {
+// THE TREE HOLDS CLAIM NOTES AND NOTHING ELSE. It is read from the ref rather
+// than from HEAD, so a source file can never ride along however the working
+// tree stands.
+func writeTheClaims(r Roots, index string, files []string, message string) (string, error) {
 	_ = os.Remove(index) // a fresh index per attempt, so a failed one leaves nothing behind
-	parent, _ := gitIn(ctx, r, index, "rev-parse", "--verify", "--quiet", claimsRef)
-	have := map[string]FarClaim{}
+	parent, _ := gitIn(r, index, "rev-parse", "--verify", "--quiet", claimsRef)
 	if parent != "" {
-		have, _ = readClaimsIn(ctx, r, parent) // a parent that will not read holds nothing this write can carry
+		if _, err := gitIn(r, index, "read-tree", parent); err != nil {
+			return "", err
+		}
 	}
-	text := nextClaimsFile(r, have, files, time.Now().UTC())
-	tmp, err := os.CreateTemp(r.Private(), "claims.*.tmp")
-	if err != nil {
+	// ONLY THE NOTES THIS CLAIM TOUCHED, BY PATH. A sweep would publish
+	// whatever else the tree is holding, and this ref is claims or nothing.
+	args := append([]string{"-c", "core.safecrlf=false", "add", "--"}, files...)
+	if _, err := gitIn(r, index, args...); err != nil {
 		return "", err
 	}
-	name := tmp.Name()
-	defer os.Remove(name)
-	if _, err := tmp.WriteString(text); err != nil {
-		tmp.Close()
-		return "", err
-	}
-	if err := tmp.Close(); err != nil {
-		return "", err
-	}
-	blob, err := gitIn(ctx, r, index, "hash-object", "-w", "--", name)
-	if err != nil {
-		return "", err
-	}
-	if _, err := gitIn(ctx, r, index, "update-index", "--add", "--cacheinfo", "100644,"+blob+","+claimsFile); err != nil {
-		return "", err
-	}
-	tree, err := gitIn(ctx, r, index, "write-tree")
+	tree, err := gitIn(r, index, "write-tree")
 	if err != nil {
 		return "", err
 	}
@@ -613,11 +598,11 @@ func writeTheClaims(ctx context.Context, r Roots, index string, files []string, 
 	if parent != "" {
 		made = append(made, "-p", parent)
 	}
-	hash, err := gitIn(ctx, r, index, made...)
+	hash, err := gitIn(r, index, made...)
 	if err != nil {
 		return "", err
 	}
-	if _, err := gitIn(ctx, r, index, "update-ref", claimsRef, hash); err != nil {
+	if _, err := gitIn(r, index, "update-ref", claimsRef, hash); err != nil {
 		return "", err
 	}
 	return hash, nil
