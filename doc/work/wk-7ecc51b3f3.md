@@ -9,8 +9,9 @@ guidance: [[work-token]]
 title: four tests pass eight
 # where the token stands. The process owns these values.
 status: open
-claimed_by: 547b9365/worker-hawthorn
-claimed_at: "2026-09-05T16:43:33Z"
+# the tree each time the work was taken up, snapshots the engine wrote
+began:
+  - a9fd0bfc8389eb0b6c1196a85999c706eba3768c
 ---
 
 ## detail
@@ -21,8 +22,11 @@ se ask over the test table answers TestANameAnotherSessionHoldsIsRefused in src/
 
 Three of the four sit just over the line, and the check went from ok in .se/tests/battery-20260905-154136.out to FAIL in battery-20260905-160529.out with no change to any of them. The timings are the mapper's, taken on a box carrying twenty agents, so what crossed the line was the load and not the suite.
 
-Two things are wanted and only one is this token. The four are slow because they drive a real tool where testing rule 13 says one test does and the rest are fed. Raising the number would be turning a check off.</detail>
-<parameter name="proposed_action">Feed three of the four so the mapper times them under eight seconds, leaving the one that drives the real tool. Say on this token which one stays real and why.
+Two things are wanted and only one is this token. The four are slow because they drive a real tool where testing rule 13 says one test does and the rest are fed. Raising the number would be turning a check off.
+
+## proposed action
+
+Feed three of the four so the mapper times them under eight seconds. Leave the one that drives the real tool, and say on this token which one stays real and why.
 
 ## done when
 
