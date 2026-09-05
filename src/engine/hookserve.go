@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"hash/fnv"
 	"io"
@@ -78,30 +79,20 @@ func hooksPort(r Roots) int {
 // A canonical form that reads the disk would also fail before the folder is
 // made, which is exactly when the cage needs the number.
 //
-// THE WINDOWS SPELLINGS ARE FOLDED ONLY FOR A WINDOWS PATH, which a colon in
+// CASE AND THE BACKSLASH ARE FOLDED ONLY FOR A WINDOWS PATH, which a colon in
 // the second place tells. A POSIX path is left alone, because two folders there
-// really can differ by case alone, AND BY A BACKSLASH: it is an ordinary
-// character in a POSIX name, so /home/u/a\b and /home/u/a/b are two folders and
-// the fold made them one. Two real trees then answer one door, the second engine
-// cannot bind it, and every guard over that tree is absent with nothing saying
-// so, which is the class this function exists to shut.
-//
-// ONE TEST DECIDES BOTH FOLDS, so a path that is Windows for the case is Windows
-// for the separator too, and neither can be taught a rule the other has not.
-// Roots.Work comes through filepath.Abs, whose Clean already folds the
-// separators of the platform it runs on, so the fold buys nothing on POSIX.
+// really can differ by case alone, and a backslash there is a character in a
+// name rather than a separator: /home/u/a\b and /home/u/a/b are two trees, and
+// folding them to one string would hand them one door.
 func theSameFolderEveryTime(path string) string {
-	windows := len(path) >= 2 && path[1] == ':'
-	if windows {
+	if len(path) >= 2 && path[1] == ':' {
 		path = strings.ReplaceAll(path, `\`, "/")
+		path = strings.ToLower(path)
 	}
 	for strings.Contains(path, "//") {
 		path = strings.ReplaceAll(path, "//", "/")
 	}
 	path = strings.TrimRight(path, "/")
-	if windows {
-		path = strings.ToLower(path)
-	}
 	return path
 }
 
@@ -123,7 +114,7 @@ func listenHooks(r Roots) (net.Listener, error) {
 // folder with a lock beside each, and the record is one file, so events are
 // serialised here rather than raced. A decision takes milliseconds, and the
 // harness sends few at once.
-func serveHooks(ln net.Listener, r Roots, log *Log) {
+func serveHooks(ctx context.Context, ln net.Listener, r Roots, log *Log) {
 	var one sync.Mutex
 	srv := &http.Server{
 		ReadHeaderTimeout: 2 * time.Second,
@@ -147,7 +138,7 @@ func serveHooks(ln net.Listener, r Roots, log *Log) {
 			theLoad.hooksWaiting.Add(-1)
 			waited := time.Since(arrived)
 			began := time.Now()
-			answerHook(raw, []string{"--method", r.Method}, &out, log)
+			answerHook(ctx, raw, []string{"--method", r.Method}, &out, log)
 			took := time.Since(began)
 			one.Unlock()
 			theLoad.hooksAnswered.Add(1)
