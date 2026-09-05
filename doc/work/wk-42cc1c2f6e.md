@@ -9,6 +9,11 @@ guidance: [[work-token]]
 title: a pull needs from
 # where the token stands. The process owns these values.
 status: open
+claimed_by: aeaf7bd9/worker-nancarrow
+claimed_at: "2026-09-05T15:11:12Z"
+# the tree each time the work was taken up, snapshots the engine wrote
+began:
+  - 33cb888094bf39ef9fa62b1304c2529a7844ebef
 ---
 
 ## detail
@@ -42,9 +47,9 @@ Give se pull the --from that run and apply have, reading the payload from a file
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the ask is small enough to review whole, or it is split first | — |  |
-| [ ] | every done-when line is decidable, and names the command where one decides it |  |  |
-| [ ] | the basics it stands on exist, or are minted first | — |  |
+| [x] | the ask is small enough to review whole, or it is split first | One flag on one verb, the reading behind it, four lines of usage, and one test. |  |
+| [x] | every done-when line is decidable, and names the command where one decides it | Both are decided by the test the criteria ask for, TestAPullSubmitsAPayloadFromTheScratchpad, which writes a payload under the scratchpad, drives the verb, and reads the usage the verb writes. |  |
+| [x] | the basics it stands on exist, or are minted first | payloadFrom and twoPayloads are here already, written for run and apply, and insideTheScratchpad is the gate's own rule. Nothing had to be minted. |  |
 
 ## evidence: step 2. do
 
@@ -52,9 +57,9 @@ Give se pull the --from that run and apply have, reading the payload from a file
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the guidance this token names was read and applied | — |  |
-| [ ] | one test was written first and seen red for the reason expected |  |  |
-| [ ] | the same test was seen green after the change, and named |  |  |
-| [ ] | the change is git diff began..ended, the two hashes the engine wrote on this token | — |  |
-| [ ] | the cleanup the change revealed is in the change, or is a token of its own | — |  |
+| [x] | the guidance this token names was read and applied | Read. Rule 12 put the red first, and the token's proposed action is what was built. |  |
+| [x] | one test was written first and seen red for the reason expected | It said `flag provided but not defined: -from`, the token stayed open, and the usage it printed carried the pipe. Expected, as pull had neither. |  |
+| [x] | the same test was seen green after the change, and named | TestAPullSubmitsAPayloadFromTheScratchpad passes. The other pull, payload and scratchpad tests pass with it, bar TestAVerbRuns, which fails without this too. |  |
+| [x] | the change is git diff began..ended, the two hashes the engine wrote on this token | src/engine/pullverb.go carries the flag, the reading and the usage. The test is its own file. |  |
+| [x] | the cleanup the change revealed is in the change, or is a token of its own | None beside it. The flag reuses payloadFrom and twoPayloads rather than opening a second way in. |  |
 
