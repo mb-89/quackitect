@@ -103,4 +103,10 @@ func TestACheckOverAStaleEngineSaysSo(t *testing.T) {
 			t.Fatalf("the run does not say the engine over the tree is stale, %q is missing: %q", want, runs[0].Engine)
 		}
 	}
+	// AND THE SWAP IT NAMES BUILDS. --built hands over to the program already
+	// in .bin, which is the stale one this note has just diagnosed, so a reader
+	// who follows it is left where they started and told the cure was applied.
+	if strings.Contains(runs[0].Engine, "--built") {
+		t.Errorf("the advice carries --built, which hands over to the stale build it warns about: %q", runs[0].Engine)
+	}
 }
