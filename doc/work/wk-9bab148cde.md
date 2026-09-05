@@ -9,8 +9,9 @@ guidance: [[work-token]]
 title: engine collisions still unanswered
 # where the token stands. The process owns these values.
 status: open
-claimed_by: 547b9365/reviewer-quince
-claimed_at: "2026-09-05T15:47:10Z"
+# the tree each time the work was taken up, snapshots the engine wrote
+began:
+  - d8d4b0495a4403083540f631411209ff752f80d5
 ---
 
 ## detail
@@ -23,8 +24,11 @@ That line cannot go red. Go already refuses two definitions of one name in one p
 
 So the token closed green on a line that guards nothing. The eleven groups did move, and twelve packages under src/engine/internal hold 16 files and 2058 lines, but the flat package is 85 non-test files and 27508 lines against the 80 and 23193 the detail measured.
 
-Wanted is a line that can fail: the flat package's size, written down where the next split has a baseline to beat.</detail>
-<parameter name="proposed_action">Add a check under util/checks that counts the non-test .go files and lines directly in src/engine, excluding internal, and fails when either rises above the number recorded when the check is written. Then a token meaning to shrink the namespace has a line that can go red, and one that grows it says so out loud.
+Wanted is a line that can fail: the flat package's size, written down where the next split has a baseline to beat.
+
+## proposed action
+
+Add a check under util/checks that counts the non-test .go files and lines directly in src/engine, excluding internal, and fails when either rises above the number recorded when the check is written. Then a token meaning to shrink the namespace has a line that can go red, and one that grows it says so out loud.
 
 ## done when
 
