@@ -699,12 +699,9 @@ func main() {
 	// the ENGINE'S and not the indexer's: started from there it ran in every
 	// test tree that opens an index, spawning git processes under a parallel
 	// suite, and three index tests went red under the load while passing alone.
-	// THE WATCHER STOPS WITH THE CONTEXT, AND IT TAKES A CHANNEL. Nothing in
-	// the claim layer reads a context, so the end of this one is turned into
-	// the channel that layer does read, and the engine still owns the goroutine.
-	claimsDone := make(chan struct{})
-	context.AfterFunc(ctx, func() { close(claimsDone) })
-	go WatchForClaims(roots, log, claimsDone)
+	// THE WATCHER STOPS WITH THE CONTEXT. The claim layer reads one, so it is
+	// handed this one directly and the engine still owns the goroutine.
+	go WatchForClaims(ctx, roots, log)
 
 	ticker := time.NewTicker(*beat)
 	defer ticker.Stop()
