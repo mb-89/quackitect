@@ -22,7 +22,7 @@ How a test is built is [[testing]].
 
 ## Writing one
 
-1. Write the problem in detail and the answer in proposed action, reduced to the smallest case that still shows it. *
+1. Write the problem in detail and the answer in proposed action, reduced to the smallest case that still shows it. The detail answers what is gained by doing it, and what breaks if it is never done. *
 2. Write acceptance criteria first. A criterion is decidable, names the input, the answer and what survives, and is not a plan. *
 3. Where a command decides a criterion, write the command and run it from the root before submitting. Otherwise name who looks at what. *
 4. Match on what the check holds at run time: a whole identifier written once into both halves, or a length as a number. *
@@ -52,6 +52,11 @@ Write the smallest case that still shows the problem.
 A detail says what has to become true and names the constraint.
 Where the write goes is the worker's decision.
 Before a detail names a file and a line, run the tree's checks against it on a copy.
+
+A tracked token spends real work, so the ask answers why the work is worth it.
+What is gained by doing it, and what breaks if it is never done.
+Both fail the same way, by restating the ask, so each carries evidence beside it.
+The note process has asked this from the beginning, and the tracked ask asks it now.
 
 ## 2. A criterion that cannot fail
 
