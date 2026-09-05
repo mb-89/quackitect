@@ -8,7 +8,9 @@ guidance: [[work-token]]
 # the name this token is known by, in references and in links
 title: urgent goes out first
 # where the token stands. The process owns these values.
-status: open
+status: done
+# who did the work step, so the verdict is never theirs
+author: fable-cloud
 claimed_by: aeaf7bd9/fable-cloud
 claimed_at: "2026-09-05T12:12:31Z"
 # the tree each time the work was taken up, snapshots the engine wrote
@@ -18,12 +20,14 @@ began:
   - 202c7082db6f46699dcb71c7718c080fc927a1c4
   - 12d4dcd46b1d785bf3d75e16b6794e5538007ab2
   - 321a41837e6a305fccad7694b2a5f07f3a56e9d0
+  - d826cf71d19f0c51cc6df835c31611ea0d398f34
 # the tree each time the work was put down or closed, snapshots the engine wrote
 ended:
   - be0dfc361b27b21d47a66b05cf096692e01e539d
   - a4ea79825ea0d7a91f38b7255023369c12279d7b
   - 63f2954858bf8d593da5c449797a7ff3f4b1b5d7
   - d2cb27afcfcd9f871a2bf06666713d91920f78f4
+  - 80a61101660825b40adfd9e0088f577623ae3639
 ---
 
 ## detail
@@ -60,10 +64,10 @@ Add an urgent flag to the token, set from the work editor the way a bucket is se
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the approach is on the token before any work, as an interface or a shape a reader can disagree with |  |  |
-| [ ] | every done-when line is decidable, and names the command where one decides it |  |  |
-| [ ] | the change is small enough to review whole, or it is split first | — |  |
-| [ ] | the basics it stands on exist, or are minted first | — |  |
+| [x] | the approach is on the token before any work, as an interface or a shape a reader can disagree with | the approach names the field, who writes it, the one sort in next, and that parked wins |  |
+| [x] | every done-when line is decidable, and names the command where one decides it | four are decided by go test -run TestAnUrgentTokenGoesOutFirst, the fifth by the driven editor check |  |
+| [x] | the change is small enough to review whole, or it is split first | 14 files and 346 lines, of which the test file is 146 |  |
+| [x] | the basics it stands on exist, or are minted first | the field door, the queue and the generic editor were all here, so nothing was missing |  |
 
 ## evidence: step 2. do
 
@@ -71,11 +75,11 @@ Add an urgent flag to the token, set from the work editor the way a bucket is se
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the guidance this token names was read and applied | — |  |
-| [ ] | the change follows the approach on the token, or the token says why it departed |  |  |
-| [ ] | se test --on this token answered ok, and what it ran is named |  |  |
-| [ ] | the note says what changed and why, for a reader who was not here |  |  |
-| [ ] | the cleanup the change revealed is in the change, or is a token of its own | — |  |
+| [x] | the guidance this token names was read and applied | the test was written first and watched red on a missing field |  |
+| [x] | the change follows the approach on the token, or the token says why it departed | a flag, a person's ruling, one stable sort at the top of next, and parked still out of the queue |  |
+| [x] | se test --on this token answered ok, and what it ran is named | TestAnUrgentTokenGoesOutFirst ok in 0.47s, and the driven editor check green over a tree with a current engine |  |
+| [x] | the note says what changed and why, for a reader who was not here | the note section carries the three halves and says nothing clears the flag |  |
+| [x] | the cleanup the change revealed is in the change, or is a token of its own | a driven check reading whatever engine is running is wk-711bbd91ec |  |
 
 ## evidence: step 3. verdict
 
