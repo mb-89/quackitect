@@ -9,6 +9,8 @@ guidance: [[work-token]]
 title: engine collisions still unanswered
 # where the token stands. The process owns these values.
 status: open
+claimed_by: 547b9365/worker-linden
+claimed_at: "2026-09-05T19:48:22Z"
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - d8d4b0495a4403083540f631411209ff752f80d5
