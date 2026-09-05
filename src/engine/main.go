@@ -699,6 +699,8 @@ func main() {
 	// the ENGINE'S and not the indexer's: started from there it ran in every
 	// test tree that opens an index, spawning git processes under a parallel
 	// suite, and three index tests went red under the load while passing alone.
+	// THE WATCHER STOPS WITH THE CONTEXT. The claim layer reads one, so it is
+	// handed this one directly and the engine still owns the goroutine.
 	go WatchForClaims(ctx, roots, log)
 
 	ticker := time.NewTicker(*beat)

@@ -47,25 +47,12 @@ Sessions before you read the standing rules, held no `se_apply` and no `se_run`,
 Nothing had refused them.
 Use Write, Edit and Bash until an engine answers, then use the lane.
 
-### 10. A note dies here, and a token does not
+### 4. A lane that is late is not a lane that is gone
 
-A note is private by what it is: nobody has decided about it yet, so it lives under `.se`, which nothing pushes.
-On a desk that is right, because the disk outlives the session.
-Here the container is reclaimed and every note in it goes with it.
-So the engine counts them, and at twenty it holds your work until they are turned in.
-Each note has three answers.
-Drop it where it is useless.
-Mint a tracked token from it where it is work.
-Where the answer is not yours, mint one carrying your best attempt and set `needs_human` on it.
-A note that became a token or was dropped stops counting, and the work goes through again.
-
-### 9. The chat is where they read you
-
-The rules say to answer the person with `se_answer`, and a cloud session did exactly that.
-Every answer went into the record, and the person read none of them.
-On a cloud box the record is not shown to them, and the chat is.
-The owner said so in September 2026: answer me in the chat, or I do not see it.
-So the answer goes to the chat first, whole, and `se_answer` carries the copy the record needs.
+The tool lane answers its handshake and its tool list at once, from a snapshot.
+The engine behind it is built while you work, and the first build compiles SQLite.
+So a call can answer `THE ENGINE IS STILL BEING BUILT`, which is the door working.
+`.se/lane.out` says how far that build has got.
 
 ### 5. Measure, then explain
 
@@ -76,13 +63,6 @@ The source you read may not be the program that ran, and on a cold clone it usua
 `./RUNME.sh --diagnose` asks this box instead: the commit, the built programs against their source, the engine, the lane's log and the network.
 On a tree with nothing built, `node util/cage/diagnose.mjs` is the same call.
 Where your reading and the diagnosis disagree, the diagnosis stands and you say both.
-
-### 4. A lane that is late is not a lane that is gone
-
-The tool lane answers its handshake and its tool list at once, from a snapshot.
-The engine behind it is built while you work, and the first build compiles SQLite.
-So a call can answer `THE ENGINE IS STILL BEING BUILT`, which is the door working.
-`.se/lane.out` says how far that build has got.
 
 ### 7. The doors that need no lane
 
@@ -96,3 +76,23 @@ These are the same calls a lane makes, and they work with nothing built:
 
 A pipe takes a command out of the gate's exception, so a piped engine call is refused.
 Each verb has a flag that carries what a pipe used to.
+
+### 9. The chat is where they read you
+
+The rules say to answer the person with `se_answer`, and a cloud session did exactly that.
+Every answer went into the record, and the person read none of them.
+On a cloud box the record is not shown to them, and the chat is.
+The owner said so in September 2026: answer me in the chat, or I do not see it.
+So the answer goes to the chat first, whole, and `se_answer` carries the copy the record needs.
+
+### 10. A note dies here, and a token does not
+
+A note is private by what it is: nobody has decided about it yet, so it lives under `.se`, which nothing pushes.
+On a desk that is right, because the disk outlives the session.
+Here the container is reclaimed and every note in it goes with it.
+So the engine counts them, and at twenty it holds your work until they are turned in.
+Each note has three answers.
+Drop it where it is useless.
+Mint a tracked token from it where it is work.
+Where the answer is not yours, mint one carrying your best attempt and set `needs_human` on it.
+A note that became a token or was dropped stops counting, and the work goes through again.

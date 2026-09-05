@@ -258,6 +258,37 @@ func onBranch(r Roots, at string) string {
 	return blob
 }
 
+// onBranchEver answers the note as the branch last committed it, for a note the
+// branch no longer carries, and nothing where it never carried one.
+//
+// onBranch above asks HEAD, which is the answer while the note is still on the
+// disk. By the time a row is folded the close has removed the file and the
+// branch has been told, so HEAD holds no such path and the copy that travels is
+// in the commit that carried it last. Every clone of the branch has that commit,
+// so the blob in it is in every clone.
+//
+// A NOTE THE BRANCH NEVER CARRIED HAS NO SUCH COPY, and this answers nothing for
+// it rather than an object no clone was sent.
+func onBranchEver(r Roots, id string) string {
+	rel := "doc/work/" + id + ".md"
+	if blob, err := gitHere(r, "rev-parse", "HEAD:"+rel); err == nil {
+		return blob
+	}
+	// FULL HISTORY, because the simplified walk drops the commit that carried a
+	// file through a merge, and the archive is written on a branch that takes
+	// other boxes' work in by merge.
+	said, err := gitHere(r, "rev-list", "--full-history", "HEAD", "--", rel)
+	if err != nil {
+		return ""
+	}
+	for _, commit := range strings.Fields(said) {
+		if blob, err := gitHere(r, "rev-parse", "--verify", "-q", commit+":"+rel); err == nil && blob != "" {
+			return blob
+		}
+	}
+	return ""
+}
+
 // archiveListRows reads the list, which is the archive.
 //
 // A LINE IT CANNOT READ IS A REFUSAL AND NEVER A SKIP. The list is the record
@@ -375,6 +406,14 @@ func writeArchiveRows(r Roots, rows []Archived) error {
 			if blob, err := gitHere(r, "rev-parse", rows[i].Tag+":"+rows[i].ID+".md"); err == nil {
 				rows[i].Blob = blob
 			}
+		}
+		// AND IT IS GIVEN THE COPY THAT TRAVELS, which naming an object is not.
+		// The blob a close wrote is reachable from nothing and a tag has to be
+		// pushed, so a clone made with --no-tags reads neither. What every clone
+		// has is what the branch committed, and a row closed before this looked
+		// for it carries none.
+		if rows[i].OnBranch == "" {
+			rows[i].OnBranch = onBranchEver(r, rows[i].ID)
 		}
 		line, err := json.Marshal(rows[i])
 		if err != nil {

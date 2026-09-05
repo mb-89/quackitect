@@ -40,6 +40,19 @@ func TestNamingACheckIsNotRunningIt(t *testing.T) {
 		{"go test, which is the same door", "go test ./...", true},
 		{"a check in somebody else's tree",
 			"node " + filepath.Join(elsewhere, "util", "checks", "liveness.mjs"), false},
+
+		// AND A PROGRAM THAT RUNS NO FILE IS NOT RUNNING A CHECK.
+		//
+		// MEASURED. A commit of a change to a check was refused as a test run
+		// by hand, so the one change nobody can land is a change to the checks.
+		// The scan read every word of the line, and a path is an argument to
+		// most of the commands that carry one.
+		{"committing a change to a check",
+			`git commit -m "the battery gains a lane" -- util/checks/battery.sh`, false},
+		{"staging a check", "git add util/checks/battery.sh", false},
+		{"reading a check", "cat util/checks/battery.sh", false},
+		{"copying a check out of the tree", "cp util/checks/battery.sh /tmp/x.sh", false},
+		{"a diff naming a check", "git diff HEAD -- util/checks/battery.sh", false},
 	} {
 		t.Run(c.name, func(t *testing.T) {
 			why, refused := ATestRunByHand(c.command, method)

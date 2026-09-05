@@ -239,6 +239,39 @@ engine_tests() {
   cd src/engine && SE_ENGINE="$root/.bin/se.exe" ../../.bin/se.test.exe -test.run "$1"
 }
 
+# THE RACE DETECTOR, ONCE, OVER THE ENGINE'S OWN SUITE.
+#
+# WHY IT IS HERE. The engine answers several agents at once, and the token that
+# exists because concurrent calls were dropped changed exactly that code. Until
+# now nothing in this tree passed -race, so the one class of defect that work
+# was about had no instrument at all.
+#
+# IT JUDGES RACES AND NOT FAILURES. The suite's own verdict is the lane above.
+# This lane answers one question, and a test red for its own reasons would hide
+# every race report behind it.
+#
+# MEASURED ON THIS BOX: the race binary links in 11s and the whole suite runs
+# under it in 81s, against about 30s uninstrumented. The lane end to end took
+# 157s with eight agents on the machine, so it is the longest one here and it
+# sets the battery's wall clock. That is the price of the only instrument for
+# this class. It builds inside this lane rather than in the serial build, so
+# both costs overlap the other lanes.
+#
+# WHAT WOULD CHANGE THE ANSWER: a battery somebody stops running because it is
+# slow. Then this narrows to the tests that start goroutines rather than the
+# whole suite, and the comment above says which.
+engine_race() {
+  go test -C src/engine -gcflags=-e -race -c -o ../../.bin/se.race.test.exe . || return 1
+  out=$(cd src/engine && SE_ENGINE="$root/.bin/se.exe" ../../.bin/se.race.test.exe -test.run '.*' 2>&1)
+  races=$(printf '%s' "$out" | grep -c 'WARNING: DATA RACE')
+  if [ "$races" -gt 0 ]; then
+    printf '%s' "$out" | awk '/WARNING: DATA RACE/{on=1} on' | head -40
+    echo "the race detector reported $races race(s) in the engine"
+    return 1
+  fi
+  echo "the race detector reported none over the engine's suite"
+}
+
 # THE C COMPILER THE INSTALLER PUT HERE, FOR EVERY GO COMMAND BELOW. The
 # engine's SQLite is C, and the installer writes the compiler it pinned into
 # cgo.env under the per-user data folder. A battery that built with whatever
@@ -371,6 +404,10 @@ start "se selftest" .bin/se.exe --selftest
 # binary's start again, every shard competes with the other four, and every test
 # in it already runs in parallel with its siblings. Sharding a suite that is
 # parallel inside multiplies the fixed cost and buys back nothing.
+# THE HEAVIEST LANE IS STARTED FIRST, and with a race binary to link this is
+# now it. The run is as long as its longest lane, so one started late is time
+# nobody gets back.
+start "race detector" engine_race
 start "go test engine" engine_tests '.*'
 start "go test mcp" go test -C src/mcp -count=1 ./...
 start "go test viewer" go test -C src/viewer -count=1 ./...

@@ -8,12 +8,18 @@ guidance: [[work-token]]
 # the name this token is known by, in references and in links
 title: no lane no move
 # where the token stands. The process owns these values.
-status: open
+status: done
+# who did the work step, so the verdict is never theirs
+author: worker-sibelius
 claimed_by: aeaf7bd9/worker-sibelius
 claimed_at: "2026-09-05T15:39:47Z"
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - cbc515229ba65fd638bf34e77d1fa84d404b49a8
+  - 3b3a1f142093a1d1d831a6a3f9c940cae63a1cf2
+# the tree each time the work was put down or closed, snapshots the engine wrote
+ended:
+  - 4cfbbc2e7f92917c109b31df7b0823f765031a76
 ---
 
 ## detail
@@ -63,9 +69,9 @@ A refusal names a command the gate admits, and the gate is the judge of that rat
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | [[reviewing]] was read and applied | — |  |
-| [ ] | every hunk of git diff began..ended was read, and any not read is named |  |  |
-| [ ] | every criterion's command was run again, and what it said is named |  |  |
-| [ ] | every hunk improves the product, or a finding names the one that does not |  |  |
-| [ ] | every finding is a trivial token naming this one, and their ids are here |  |  |
+| [x] | [[reviewing]] was read and applied | Applied. Not the author. | [[reviewing]] |
+| [x] | every hunk of git diff began..ended was read, and any not read is named | Both ranges carry other tokens' work. The change is fc27d9b1: theRefusal, --from on both verbs, legalmove_test.go and the new check, all read whole. | git show fc27d9b1 |
+| [x] | every criterion's command was run again, and what it said is named | All seven ran. run --from exits 0, apply --dry --from ok, a path out of the scratchpad refused, both checks exit 0, the piped line put back reddens the judgement naming it. Battery 7 failures, none this token's. | /tmp/bat.log |
+| [x] | every hunk improves the product, or a finding names the one that does not | PASS. The check is in battery.sh, carried by git, and drives the gate itself. | a-refusal-names-a-legal-move |
+| [x] | every finding is a trivial token naming this one, and their ids are here | None. Also seen: --from is a path and, with --page, an offset. | — |
 
