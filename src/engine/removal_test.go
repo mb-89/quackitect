@@ -168,16 +168,15 @@ func TestALoopThatDeletesIsRefused(t *testing.T) {
 		// AND A LOOP WHOSE REMOVAL NAMES NOTHING STAYS REFUSED, because the
 		// files it takes are the ones its own output names.
 		{"a loop whose removal names no file", "for f in src/*.go; do echo $f | xargs rm; done", true},
-		// A REMOVAL BESIDE A LOOP IS NOT A REMOVAL IN ONE, wherever the file
-		// sits. The case above puts the file outside the tree, so it is let
-		// through by the rule about what this guard is the business of, and a
-		// removal inside the tree next to a loop was refused with nothing to
-		// do about it: the remedy offered is naming the files, which these
-		// already do. The loop's body is what the rule is about.
-		{"a named removal after a loop",
+		// A REMOVAL AFTER THE LOOP IS NOT IN IT. This rule is about the files a
+		// loop names a round at a time, and a command written after done names
+		// its own. Refusing it said something untrue about the command it
+		// stopped, and offered a remedy that command had already followed.
+		{"a loop followed by a named removal",
 			"for f in src/*.go; do echo $f; done; rm " + seen, false},
+		// AND ONE WRITTEN BEFORE THE LOOP IS NOT IN IT EITHER.
 		{"a named removal before a loop",
-			"rm " + seen + " && for f in src/*.go; do echo $f; done", false},
+			"rm " + seen + "; for f in src/*.go; do echo $f; done", false},
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {

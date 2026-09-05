@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"os"
 	"os/exec"
@@ -49,7 +50,18 @@ type aBatteryRunning struct {
 
 // startBattery starts the whole battery detached and answers where its output
 // will be. It waits for nothing.
-func startBattery(r Roots, actor, token string) ran {
+//
+// THE CONTEXT SAYS WHETHER TO START ONE AT ALL, and it does not follow the
+// battery. The battery builds the engine and puts a new one over this tree, so
+// a context that killed the child would undo the reason it is detached. What
+// the context ends is the deciding: a call already over starts nothing and says
+// so, rather than putting a battery over the tree on nobody's behalf and
+// leaving a marker the next engine reports as somebody's run.
+func startBattery(ctx context.Context, r Roots, actor, token string) ran {
+	if err := ctx.Err(); err != nil {
+		return ran{ID: "battery", Kind: "battery",
+			Said: "the call that would have started the battery is over, so none was started: " + err.Error()}
+	}
 	sh, looked := batteryShell(r)
 	if sh == "" {
 		return ran{ID: "battery", Kind: "battery", Said: "no sh on this machine, so the battery cannot run. Looked at: " +

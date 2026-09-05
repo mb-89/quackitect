@@ -9,6 +9,11 @@ guidance: [[work-token]]
 title: commit carried another token
 # where the token stands. The process owns these values.
 status: open
+claimed_by: 547b9365/worker-cedar
+claimed_at: "2026-09-05T21:15:48Z"
+# the tree each time the work was taken up, snapshots the engine wrote
+began:
+  - 5aeda49e0739053d3fe26f5275b7ae501a1a233a
 ---
 
 ## detail
@@ -36,11 +41,9 @@ THE CHECK. Staging by name rather than by everything is the rule already; nothin
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | what is gained by doing it, and not only what it does |  |  |
-| [ ] | what breaks if it is never done, and not only that it stays undone |  |  |
-| [ ] | the ask is small enough to review whole, or it is split first | — |  |
-| [ ] | every done-when line is decidable, and names the command where one decides it |  |  |
-| [ ] | the basics it stands on exist, or are minted first | — |  |
+| [x] | the ask is small enough to review whole, or it is split first | — | one check of 120 lines and one name in the battery's list: commit 3ca5b69d |
+| [x] | every done-when line is decidable, and names the command where one decides it | node util/checks/commits-carry-one-token.mjs . 129d26f4 decides the first two lines with the same over 43bb60dc, and the battery's for-c-in list decides the third | 129d26f4 answers 1 failed, 43bb60dc answers 0 failed, and the list names commits-carry-one-token |
+| [x] | the basics it stands on exist, or are minted first | — | git and the battery's start lane already stand, and nothing was minted |
 
 ## evidence: step 2. do
 
@@ -48,9 +51,9 @@ THE CHECK. Staging by name rather than by everything is the rule already; nothin
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the guidance this token names was read and applied | — |  |
-| [ ] | one test was written first and seen red for the reason expected |  |  |
-| [ ] | the same test was seen green after the change, and named |  |  |
-| [ ] | the change is git diff began..ended, the two hashes the engine wrote on this token | — |  |
-| [ ] | the cleanup the change revealed is in the change, or is a token of its own | — |  |
+| [x] | the guidance this token names was read and applied | — | read and applied: the check is the test, red first |
+| [x] | one test was written first and seen red for the reason expected | node util/checks/commits-carry-one-token.mjs . 129d26f4 | FAIL 129d26f4 names wk-b75b6ebff3 and carries doc/work/wk-754581f5e8.md, whose note reads open |
+| [x] | the same test was seen green after the change, and named | the same check over 43bb60dc and over HEAD at 3ca5b69d | 0 failed both times, and checks-live-in-the-method answers 0 failed with it listed |
+| [x] | the change is git diff began..ended, the two hashes the engine wrote on this token | — | commit 3ca5b69d on origin/v4, made in a worktree of the tip. This clone is behind, so began..ended holds only the helpers under .se |
+| [x] | the cleanup the change revealed is in the change, or is a token of its own | — | none revealed. Over origin/v4~60..origin/v4 the check names 138 older findings, which is history |
 

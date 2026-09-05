@@ -26,6 +26,8 @@ import (
 // process that reads it. The guard is a fresh process per event and holds
 // nothing between them.
 //
+// The floor under every binding, look and shout, is [[the-floor-is-look-and-shout]].
+//
 // IT DOES NOT EXPIRE. Emergency mode in this tree ends on a clock, at thirty
 // minutes, because nothing said it was on. This says it: an orange block in the
 // status bar for as long as it is armed, which the editor draws whether or not

@@ -157,6 +157,7 @@ type Token struct {
 	// refused every ending until its sub-tokens have ended, and the queue
 	// hands the sub-tokens out first. The sub-token carries the link, so a
 	// parent holds no list that can go stale.
+	// Why a scope is a barrier is [[a-scope-cannot-be-left-while-its-tokens-are-open]].
 	Parent string `json:"parent,omitempty"`
 
 	// The other blocker, and the one only a person can judge: a date, or a

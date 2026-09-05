@@ -1,5 +1,5 @@
 {
-  "$comment": "ONE TREE. Everything that changes how the system runs is declared here. A group marked shown becomes a section in the sidebar. Types are pyqtgraph's and JSON Schema's: group, bool, int, float, str, list, action, status.",
+  "$comment": "ONE TREE. Everything that changes how the system runs is declared here. A group marked shown becomes a section in the sidebar. Types are pyqtgraph's and JSON Schema's: group, bool, int, float, str, list, action, status. Why one tree is [[one-tree-holds-every-parameter]].",
   "name": "quackitect",
   "type": "group",
   "children": [
