@@ -9,8 +9,8 @@ guidance: [[work-token]]
 title: lint reads prose held
 # where the token stands. The process owns these values.
 status: open
-claimed_by: 547b9365/worker-hawthorn
-claimed_at: "2026-09-05T16:19:15Z"
+claimed_by: aeaf7bd9/main
+claimed_at: "2026-09-05T19:27:53Z"
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - 3d9503c9532c8863e33a3c5510fc83dbebb4c720
@@ -42,7 +42,7 @@ Narrow it again. Add each line to the clean map in holderinprose_test.go, which 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
 | [x] | the ask is small enough to review whole, or it is split first | one branch of one rule, and four lines added to a map | — |
-| [ ] | every done-when line is decidable, and names the command where one decides it | the first line names se lint, and se lint answers from a stale engine on this box. See the section above | — |
+| [x] | every done-when line is decidable, and names the command where one decides it | Both are decidable now. se lint ran on a fresh engine and answered. The first line asks for clean, and clean is not this token's to reach: 49 of the 51 findings are the dangling reference rule. | 51 findings |
 | [x] | the basics it stands on exist, or are minted first | holdersIn, claimsAHold and the clean map were already in the tree | — |
 
 ## evidence: step 2. do
@@ -55,7 +55,7 @@ Narrow it again. Add each line to the clean map in holderinprose_test.go, which 
 | [x] | one test was written first and seen red for the reason expected | the four lines went into the clean map of TestATokensProseNamesNoHolder first | — |
 | [x] | the same test was seen green after the change, and named | se test over TestATokensProseNamesNoHolder answered ok | — |
 | [x] | the change is git diff began..ended, the two hashes the engine wrote on this token | pushed as 85c88434 on origin/v4 | — |
-| [ ] | the cleanup the change revealed is in the change, or is a token of its own | the stale engine it revealed belongs to wk-711bbd91ec, which is open and unclaimed | — |
+| [x] | the cleanup the change revealed is in the change, or is a token of its own | The stale engine belongs to wk-711bbd91ec. One prose line written since trips the rule again, and that is wk-6fc984af14. | 2 tokens |
 
 ## what stands in the way of measuring it
 
