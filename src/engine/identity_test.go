@@ -45,6 +45,24 @@ func TestIdentityMaterialIsRefused(t *testing.T) {
 			refused: true, rule: "a datetime",
 		},
 		{
+			what:    "a lower-case month beside a day, carrying a year",
+			writes:  "Counted on 2 september 2026 by hand.",
+			refused: true, rule: "a datetime",
+		},
+		{
+			what:    "a lower-case month beside an ordinal day",
+			writes:  "Counted on 2nd september by hand.",
+			refused: true, rule: "a datetime",
+		},
+		{
+			what:   "a month name that is an ordinary word, read as one",
+			writes: "The queue held 12 may be more than the box can run.",
+		},
+		{
+			what:   "another month name read as a verb",
+			writes: "It found 3 march past the gate and counted none.",
+		},
+		{
 			what:   "a month and a year, which is the ruling's own answer",
 			writes: "The rewrite landed in September 2026 and holds.",
 		},

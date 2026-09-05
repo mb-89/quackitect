@@ -31,14 +31,42 @@ var (
 	aClock = regexp.MustCompile(`\b([01]?\d|2[0-3]):[0-5]\d:[0-5]\d\b`)
 
 	// A DAY BESIDE A MONTH NAME, in either order, is the same day in words.
-	aWrittenDay = regexp.MustCompile(`(?i)\b(\d{1,2}(st|nd|rd|th)?\s+(` + theMonths + `)|(` +
-		theMonths + `)\s+\d{1,2}(st|nd|rd|th)?\b(?:\s*,?\s*\d{4})?)`)
+	//
+	// SEVERAL MONTH NAMES ARE ORDINARY ENGLISH WORDS. A day-first branch that
+	// ended at the month refused "The queue held 12 may be more than the box can
+	// run." on "12 may", and "It found 3 march past the gate" on "3 march", then
+	// advised writing a month and a year to a sentence that carried no date at
+	// all. A guard that refuses ordinary prose is one somebody turns off.
+	//
+	// SO THE DAY-FIRST BRANCH HOLDS OUT FOR A SHAPE A DATE HAS AND A SENTENCE
+	// DOES NOT: an ordinal on the day, a year beside it, or the month's own
+	// capital, which is a boundary a verb cannot be read across, because English
+	// does not capitalise one in the middle of a sentence.
+	//
+	// THE MONTH-FIRST BRANCH NEEDS NONE OF THAT, and keeps its optional year: no
+	// English sentence puts a bare number after one of these words.
+	aWrittenDay = regexp.MustCompile(`\b(?:` +
+		`\d{1,2}(?:st|nd|rd|th)\s+(?i:` + theMonths + `)\b|` +
+		`\d{1,2}\s+(?i:` + theMonths + `)\b\s*,?\s*\d{4}\b|` +
+		`\d{1,2}\s+(?:` + asADateWritesThem(theMonths) + `)\b|` +
+		`(?i:` + theMonths + `)\s+\d{1,2}(?:st|nd|rd|th)?\b(?:\s*,?\s*\d{4})?` +
+		`)`)
 
 	// A YAML KEY LINE IS A MACHINE FIELD, and a machine field keeps its stamp.
 	aKeyLine = regexp.MustCompile(`^\s*[a-z][a-z0-9_]*:\s`)
 )
 
 const theMonths = `january|february|march|april|may|june|july|august|september|october|november|december`
+
+// asADateWritesThem answers the same alternation with every name's first letter
+// raised, so the one list stays the one list and the two forms cannot drift.
+func asADateWritesThem(months string) string {
+	names := strings.Split(months, "|")
+	for i, one := range names {
+		names[i] = strings.ToUpper(one[:1]) + one[1:]
+	}
+	return strings.Join(names, "|")
+}
 
 // identityMaterial answers the first rule a piece of prose breaks, the text it
 // matched, and whether it broke one at all.
