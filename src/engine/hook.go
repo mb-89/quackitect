@@ -868,6 +868,12 @@ func decidePreToolUse(g *guard, roots Roots, cfg Config, emergency Emergency, lo
 			g.deny(why)
 			return
 		}
+		if why, refuse := AGitCleanIsARemoval(roots, actor, ti.Command, roots.Work); refuse {
+			record(log, "engine", "removal", actor, "refused: a git clean", No(),
+				map[string]any{"tool": in.ToolName})
+			g.deny(why)
+			return
+		}
 		if why, refuse := ARemovalWithoutARead(roots, actor, ti.Command, roots.Work); refuse {
 			record(log, "engine", "removal", actor, "refused: a removal of a file nobody read", No(),
 				map[string]any{"tool": in.ToolName})

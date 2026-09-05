@@ -19,6 +19,13 @@ import (
 // round at a time, so there is nothing in the command to judge. So the first
 // is answered from the read set and the second is refused outright.
 //
+// AND git clean IS BOTH OF THEM. It is not run as a program the remover list
+// holds, so both halves walked past it, and it took a 13MB binary out of the
+// source folder minutes after this file was written. With a pathspec it names
+// its files and the read set answers it. With none it takes every untracked
+// file under the tree, and -d takes whole folders, which is the loop's
+// question wearing another word.
+//
 // THE READ SET IS ALREADY THERE. The engine notes every read to answer the
 // stale-write and the dedup guards, so this costs no new bookkeeping: it asks
 // a question the evidence already holds the answer to.
@@ -192,11 +199,11 @@ func underWork(work, p string) string {
 	return filepath.Clean(filepath.Join(work, p))
 }
 
-// ARemovalWithoutARead answers whether this command deletes something inside
-// the tree that this actor has not read, and names the file it is about.
-func ARemovalWithoutARead(r Roots, actor, command, work string) (string, bool) {
+// readBy answers a question about this actor's read set: has it read this path
+// this turn. Both halves of the rule ask it, so it is made once here.
+func readBy(r Roots, actor, work string) func(string) bool {
 	reads := LoadEvidence(r).Reads
-	read := func(p string) bool {
+	return func(p string) bool {
 		// THE KEY IS WHATEVER THE HARNESS GAVE, so both spellings are asked:
 		// the path resolved against the tree, and the path as it stands.
 		for _, key := range []string{underWork(work, p), clean(p)} {
@@ -206,6 +213,12 @@ func ARemovalWithoutARead(r Roots, actor, command, work string) (string, bool) {
 		}
 		return false
 	}
+}
+
+// ARemovalWithoutARead answers whether this command deletes something inside
+// the tree that this actor has not read, and names the file it is about.
+func ARemovalWithoutARead(r Roots, actor, command, work string) (string, bool) {
+	read := readBy(r, actor, work)
 	for _, part := range pipeline(command) {
 		words := strings.Fields(part)
 		at := removerAt(words)
@@ -259,6 +272,135 @@ func ALoopThatRemoves(command, work string) (string, bool) {
 		return aLoopThatDeletes(deletes), true
 	}
 	return "", false
+}
+
+// gitCleanAt answers where in these words git clean is RUN, or -1. It walks
+// the way removerAt walks, past the words that run another program and past a
+// runner's flags, and asks whether the word after git is clean.
+//
+// git clean IS NOT IN THE REMOVER LIST, because that list is programs, and the
+// word that deletes here is a subcommand. git status walks to a word that is
+// no clean and stops, which is the answer it would get anywhere else.
+func gitCleanAt(words []string) int {
+	past := ""     // the runner most recently walked past
+	value := false // the next word is the value of the flag before it
+	for i, w := range words {
+		if value {
+			value = false
+			continue
+		}
+		bare := strings.ToLower(strings.Trim(w, "'\""))
+		if past == "git" && bare == "clean" {
+			return i
+		}
+		if runner(w) {
+			past = bare
+			continue
+		}
+		if past != "" && strings.HasPrefix(w, "-") {
+			value = takesAValue(past, w)
+			continue
+		}
+		return -1
+	}
+	return -1
+}
+
+// cleanPathspec answers the paths a git clean names, which is filesAmong once
+// the exclude has been taken out.
+//
+// AN EXCLUDE IS NOT A PATHSPEC. -e names what the clean will not take, so
+// reading its pattern as a path answers the question backwards: git clean -f
+// -e keep.go names no pathspec and takes everything else, and counting keep.go
+// as one would send it to the read rule and let it through.
+func cleanPathspec(args []string) []string {
+	var kept []string
+	for i := 0; i < len(args); i++ {
+		switch strings.Trim(args[i], "'\"") {
+		case "-e", "--exclude":
+			i++ // the pattern is the flag's value
+			continue
+		case "--":
+			kept = append(kept, args[i:]...)
+			return filesAmong(kept)
+		}
+		kept = append(kept, args[i])
+	}
+	return filesAmong(kept)
+}
+
+// cleansFolders says whether this clean was given -d, which takes whole
+// untracked folders. The letter rides in a cluster as often as alone, -fdx, so
+// the cluster is read letter by letter. A long flag is never it: git clean
+// spells this one -d and nothing else.
+func cleansFolders(args []string) bool {
+	for _, a := range args {
+		a = strings.Trim(a, "'\"")
+		if a == "--" {
+			return false
+		}
+		if !strings.HasPrefix(a, "-") || strings.HasPrefix(a, "--") {
+			continue
+		}
+		if strings.ContainsRune(a[1:], 'd') {
+			return true
+		}
+	}
+	return false
+}
+
+// AGitCleanIsARemoval answers whether this command's git clean is refused, and
+// says which of the two questions it failed.
+//
+// IT IS THE LARGER DELETION, NOT THE SMALLER ONE. git clean -fdx with no
+// pathspec removes every untracked and ignored file under the tree, and none of
+// them is in the command. That is the loop's question. A clean naming a
+// pathspec can be judged path by path, which is the read set's question, so
+// both halves are asked here in that order.
+func AGitCleanIsARemoval(r Roots, actor, command, work string) (string, bool) {
+	read := readBy(r, actor, work)
+	for _, part := range pipeline(command) {
+		words := strings.Fields(part)
+		at := gitCleanAt(words)
+		if at < 0 {
+			continue
+		}
+		args := words[at+1:]
+		paths := cleanPathspec(args)
+		if len(paths) == 0 {
+			return aCleanTakesWhatIsNotThere("names no pathspec, so it takes every " +
+				"untracked file under the tree"), true
+		}
+		if cleansFolders(args) {
+			return aCleanTakesWhatIsNotThere("was given -d, so it takes whole " +
+				"untracked folders, and what is inside them is named nowhere"), true
+		}
+		for _, p := range paths {
+			if !anyInside([]string{p}, work) {
+				continue
+			}
+			if insideTheScratchpad(r, underWork(work, p)) {
+				continue
+			}
+			if read(p) {
+				continue
+			}
+			return aRemovalNeedsARead(p), true
+		}
+	}
+	return "", false
+}
+
+// aCleanTakesWhatIsNotThere is the refusal for a clean whose files are not in
+// the command, and it says which of the two shapes it is.
+func aCleanTakesWhatIsNotThere(why string) string {
+	return "A CLEAN IS REFUSED WHERE WHAT IT TAKES IS NOT IN THE COMMAND.\n\n" +
+		"git clean deletes files, and this one " + why + ". Nothing here and nobody " +
+		"reading it can say what it will take.\n\n" +
+		"MEASURED: git clean -fx took a 13MB binary out of the source folder with nothing " +
+		"said, through the one door the removal guard did not watch. rm of that same file " +
+		"was refused, correctly, because nothing had read it.\n\n" +
+		"List the files you mean and read them, then delete those by name."
 }
 
 // aRemovalNeedsARead is the refusal, and it names the file it is about.
