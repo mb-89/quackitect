@@ -9,8 +9,11 @@ guidance: [[work-token]]
 title: Many agents one box
 # where the token stands. The process owns these values.
 status: open
-claimed_by: 547b9365/worker-relay-trial
-claimed_at: "2026-09-05T15:41:21Z"
+# true when this waits for a person rather than an agent
+needs_human: true
+# the tree each time the work was taken up, snapshots the engine wrote
+began:
+  - ada49a6390cc27edf296a371f3cee61341360c98
 ---
 
 ## detail
@@ -25,9 +28,11 @@ Everything else on the box is one copy shared by everyone, and each of those was
 
 The analysis is in doc/spec/one-box-many-agents.md rather than here, because it needs the instances and their cost, and a token detail is capped. This token carries the decision.
 
-The short of it: the tree is the scarce resource, not the claim. Scale by adding boxes, or give each agent its own working tree over one repository. Claims already coordinate across trees, which is what wk-4759d90994 made work today.</detail>
-<proposed_action>Read doc/spec/one-box-many-agents.md and pick. It proposes one fix that removes most of the conflicts, a worktree per agent, and a smaller fix for each conflict on its own where that is too much. The choice is the owner's, so needs_human is set.</proposed_action>
-</invoke>
+The short of it: the tree is the scarce resource, not the claim. Scale by adding boxes, or give each agent its own working tree over one repository. Claims already coordinate across trees, which is what wk-4759d90994 made work today.
+
+## proposed action
+
+Read doc/spec/one-box-many-agents.md and pick. It proposes one fix that removes most of the conflicts, a working tree per agent. It also proposes a smaller fix for each conflict on its own, where that is too much. The choice is the owner's, so needs_human is set.
 
 ## done when
 
