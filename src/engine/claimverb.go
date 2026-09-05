@@ -103,11 +103,27 @@ func runClaim(c *call) int {
 	// told to claim, and it would then need a second call to do the work it was
 	// already on. One id, because taking up two tokens is not a thing: the
 	// holder is one at a time.
-	if *take && !*release && len(res.Taken) == 1 {
-		if _, err := TakeUp(r, res.Taken[0], *actor); err != nil {
-			res.Notice = "claimed, and the take-up was refused: " + err.Error()
-		} else {
-			res.Notice = res.Taken[0] + " is claimed and in your hands"
+	//
+	// A REFUSED TAKE-UP IS NOT A CALL THAT WORKED. The reason went into the notice
+	// and this answered zero anyway, so an agent reading the code was told the
+	// work was in its hands, and its next write was refused for holding no token.
+	//
+	// AND TWO IDS WITH TAKE SAYS SO. The block was skipped, and skipped in
+	// silence: the flag was accepted and ignored. The claim itself landed, so the
+	// code stays zero and the notice carries what the flag did not do.
+	tookRefused := false
+	if *take && !*release {
+		switch {
+		case len(res.Taken) == 1:
+			if _, err := TakeUp(r, res.Taken[0], *actor); err != nil {
+				res.Notice = "claimed, and the take-up was refused: " + err.Error()
+				tookRefused = true
+			} else {
+				res.Notice = res.Taken[0] + " is claimed and in your hands"
+			}
+		default:
+			res.Notice = fmt.Sprintf("take was not applied: this call claimed %d tokens and a "+
+				"take-up is one at a time. Name one id with take", len(res.Taken))
 		}
 	}
 	if !*quiet {
@@ -115,6 +131,9 @@ func runClaim(c *call) int {
 		res.Published = &p
 	}
 	c.answerJSON(res)
+	if tookRefused {
+		return 1
+	}
 	return 0
 }
 
