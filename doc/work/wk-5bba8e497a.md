@@ -88,15 +88,9 @@ ONE QUESTION, ASKED WHERE THE QUEUE CHOOSES. WaitsForAPerson(t) answers a senten
 
 THE FIELD IS THE WHOLE STATE. Nothing is written when a token is parked. Clearing ready_when puts it in the queue again on the next pull, so the put-down needs no change of its own.
 
-AND WHOEVER PARKS ONE HAS TO FIND IT AGAIN. Both the state of play and se query name every token carrying the field, with its condition. A token nothing shows is one nobody un-parks.
+THE CONDITION SITS BESIDE THE Blocked CHECK, in the unheld loop of next(). A non-empty ready_when leaves the queue nothing to hand out. depends_on is the kind an engine judges, and ready_when is the other kind by definition.
+
+AND WHOEVER PARKS ONE HAS TO FIND IT AGAIN. Both the state of play and se query name every token carrying the field, with its condition. Un-parking is the parker's own, and wk-cfe766ba1c is the standing pass that asks.
 
 needs_human rides the same question. A token marked as needing a person waits on the same thing, and two questions meaning one thing drift apart.
-
-## approach
-
-One condition beside the Blocked check in the unheld loop of next(), at src/engine/pull.go:613. A non-empty ready_when takes the token out of what the queue may hand out.
-
-A condition an engine can check is depends_on, and the engine decides that one on its own. ready_when is the other kind by definition, so the queue has nothing to judge and passes over it.
-
-Parked work then has one surface, which is the state of play, and it already lists the field. Whoever parks a token owns un-parking it, and wk-cfe766ba1c is the standing pass that asks.
 
