@@ -210,7 +210,7 @@ func searcher(word string) bool {
 func ASearchOverTheTree(command, work string) (string, bool) {
 	parts := pipeline(command)
 	for i, part := range parts {
-		words := strings.Fields(part)
+		words := shellWords(part)
 		if len(words) == 0 || !searcher(words[0]) {
 			continue
 		}
@@ -260,6 +260,51 @@ func theIndexDoor(what string) string {
 		"What was asked: " + what + "\n\n" +
 		theShellDoor("find --words ...") + "\n\n" +
 		"OUTSIDE THIS TREE THE DISK IS YOURS: a search naming a path outside it is not refused."
+}
+
+// shellWords splits one program's words the way the shell that runs it would,
+// so a quoted pattern stays one word.
+//
+// SPLITTING ON SPACES TURNS A PATTERN INTO PATHS. This is the redirection
+// defect again by another road. rg -n "agent proxy" /root/.ccr/README.md handed
+// the guard proxy" as a bare word, a bare word that is not a flag is a path, a
+// relative path is inside the tree, and the search was refused by the message
+// whose last line promises a path outside is not. So the words the guard weighs
+// are the words the shell would run. See wk-7bab432426.
+//
+// A BACKSLASH ESCAPES INSIDE DOUBLE QUOTES AND OUTSIDE THEM, AND NOWHERE INSIDE
+// SINGLE ONES, which is the one place here the two quotes differ.
+func shellWords(part string) []string {
+	var out []string
+	var word strings.Builder
+	open := false // a word has begun, and the empty string is a word
+	quote := byte(0)
+	for i := 0; i < len(part); i++ {
+		c := part[i]
+		switch {
+		case quote != 0 && c == quote:
+			quote = 0
+		case quote == 0 && (c == '\'' || c == '"'):
+			quote, open = c, true
+		case quote != '\'' && c == '\\' && i+1 < len(part):
+			i++
+			word.WriteByte(part[i])
+			open = true
+		case quote == 0 && (c == ' ' || c == '\t'):
+			if open {
+				out = append(out, word.String())
+				word.Reset()
+				open = false
+			}
+		default:
+			word.WriteByte(c)
+			open = true
+		}
+	}
+	if open {
+		out = append(out, word.String())
+	}
+	return out
 }
 
 // pathsAmong answers the words that name a path: everything that is not a

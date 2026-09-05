@@ -47,6 +47,13 @@ func TestASearchOverTheTreeGoesThroughTheIndex(t *testing.T) {
 		{"rg with no path", "Bash", map[string]any{"command": "rg LoadConfig"}, true},
 		{"rg over a folder here", "Bash", map[string]any{"command": "rg -n LoadConfig src/engine"}, true},
 		{"rg over a folder elsewhere", "Bash", map[string]any{"command": "rg -n LoadConfig " + elsewhere}, false},
+		// A QUOTED PATTERN IS ONE WORD, AND THE WORDS INSIDE IT NAME NOTHING ON
+		// THE DISK. Split on spaces, the pattern's second word reads as a
+		// relative path, which is inside the tree, so a search whose only real
+		// path is outside was refused by a message promising it would not be.
+		{"a quoted pattern and a path elsewhere", "Bash", map[string]any{"command": `rg -n "agent proxy" ` + elsewhere}, false},
+		{"a single-quoted pattern and a path under /root", "Bash", map[string]any{"command": `rg -n 'agent proxy' /root/.ccr/README.md`}, false},
+		{"a quoted pattern and a folder here", "Bash", map[string]any{"command": `rg -n "agent proxy" src/engine`}, true},
 		{"grep -r here", "Bash", map[string]any{"command": "grep -rn LoadConfig src"}, true},
 		{"grep behind a pipe reads its input", "Bash", map[string]any{"command": "go test ./... 2>&1 | grep FAIL"}, false},
 		{"grep with no path reads its input", "Bash", map[string]any{"command": "grep FAIL"}, false},
