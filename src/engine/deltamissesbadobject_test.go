@@ -45,7 +45,7 @@ func TestTheSinceFallsBackToASnapshotThisBoxHolds(t *testing.T) {
 	// THE SECOND TAKE-UP WAS ON ANOTHER BOX, so its snapshot is nowhere here.
 	aTokenBegunAtThese(t, r, "wk-far", []string{here, nowhereHash})
 
-	got, err := TestTheDelta(r, db, "wk-far", nil, false, "worker-far")
+	got, err := TestTheDelta(t.Context(), r, db, "wk-far", nil, false, "worker-far")
 	if err != nil {
 		t.Fatalf("a token taken up on another box answered an error: %v", err)
 	}
@@ -72,7 +72,7 @@ func TestTheSinceFallsBackToHeadWithNoTakeUp(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	got, err := TestTheDelta(r, db, "wk-none", nil, false, "worker-none")
+	got, err := TestTheDelta(t.Context(), r, db, "wk-none", nil, false, "worker-none")
 	if err != nil {
 		t.Fatalf("a token with no take-up answered an error: %v", err)
 	}

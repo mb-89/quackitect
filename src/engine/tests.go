@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"encoding/json"
 	"flag"
@@ -134,7 +135,7 @@ func runTest(c *call) int {
 		return 1
 	}
 	defer db.Close()
-	got, err := TestTheDelta(c.roots, db, *on, proposed, !*plan, *by)
+	got, err := TestTheDelta(c.ctx, c.roots, db, *on, proposed, !*plan, *by)
 	if err != nil {
 		c.answerJSON(map[string]any{"error": err.Error()})
 		return 1
@@ -153,7 +154,7 @@ func (s *stringList) Set(v string) error { *s = append(*s, v); return nil }
 
 // TestTheDelta decides what the delta calls for and, unless told only to
 // plan, runs it.
-func TestTheDelta(r Roots, db *sql.DB, on string, proposed []string, run bool, actor string) (Tested, error) {
+func TestTheDelta(ctx context.Context, r Roots, db *sql.DB, on string, proposed []string, run bool, actor string) (Tested, error) {
 	out := Tested{Chosen: []chosen{}, Ran: []ran{}, Proposed: proposed}
 	since := "HEAD"
 	if on != "" {
@@ -196,7 +197,7 @@ func TestTheDelta(r Roots, db *sql.DB, on string, proposed []string, run bool, a
 		// THE BATTERY IS STARTED, NOT AWAITED. It builds the engine and puts a
 		// new one over this tree, so waiting for it here is waiting inside the
 		// process it replaces. See battery.go.
-		out.Ran = append(out.Ran, startBattery(r, actor, on))
+		out.Ran = append(out.Ran, startBattery(ctx, r, actor, on))
 	} else if err := runOrLand(r, tests, &out, start); err != nil {
 		return out, err
 	}
