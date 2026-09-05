@@ -49,7 +49,7 @@ func TestTheRetroWeavesOneTimeline(t *testing.T) {
 	t.Parallel()
 	r, transcript, original := aTreeToWeave(t)
 
-	got, err := Retro(r, "main", []Transcript{{Name: "claude", Path: transcript, Who: "main"}})
+	got, err := Retro(t.Context(), r, "main", []Transcript{{Name: "claude", Path: transcript, Who: "main"}})
 	if err != nil {
 		t.Fatalf("the retro did not collect: %v", err)
 	}

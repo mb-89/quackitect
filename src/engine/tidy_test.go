@@ -122,7 +122,7 @@ func TestTheTidyVerbAnswersItsParts(t *testing.T) {
 func TestARetroTidiesOnStart(t *testing.T) {
 	r := aTidyTree(t)
 
-	got, err := Retro(r, "main", nil)
+	got, err := Retro(t.Context(), r, "main", nil)
 	if err != nil {
 		t.Fatalf("the retro would not run: %v", err)
 	}

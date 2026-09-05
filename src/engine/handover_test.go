@@ -27,7 +27,7 @@ func TestAnEndingEngineStartsNoSuccessor(t *testing.T) {
 	if err := os.MkdirAll(filepath.Dir(r.Private("engine.out")), 0o755); err != nil {
 		t.Fatal(err)
 	}
-	ctx, cancel := context.WithCancel(context.Background())
+	ctx, cancel := context.WithCancel(t.Context())
 	cancel()
 
 	err := handOver(ctx, r, "20260101-000000")

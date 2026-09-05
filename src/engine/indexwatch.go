@@ -146,7 +146,7 @@ func startIndexer(ctx context.Context, r Roots, log *Log, beat time.Duration, op
 			map[string]any{"reason": err.Error()})
 		addr = ""
 	} else {
-		go serveModel(ln, m)
+		go serveModel(ctx, ln, m)
 	}
 
 	done := make(chan struct{})

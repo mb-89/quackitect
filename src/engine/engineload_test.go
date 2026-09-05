@@ -35,7 +35,7 @@ func aModelServed(t *testing.T) (Roots, string) {
 		t.Fatal(err)
 	}
 	t.Cleanup(func() { ln.Close() })
-	go serveModel(ln, m)
+	go serveModel(t.Context(), ln, m)
 	return r, addr
 }
 

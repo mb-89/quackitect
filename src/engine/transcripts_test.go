@@ -63,7 +63,7 @@ func TestARetroCollectsEveryTranscriptInTheFolder(t *testing.T) {
 	}
 
 	// AND THE COLLECT TAKES ALL THREE, with the manifest saying whose each is.
-	got, err := Retro(r, "main", found)
+	got, err := Retro(t.Context(), r, "main", found)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -405,7 +405,7 @@ func runRetro(c *call) int {
 	}
 
 	roots := c.roots
-	got, err := Retro(roots, *by, Transcripts(roots))
+	got, err := Retro(c.ctx, roots, *by, Transcripts(roots))
 	if err != nil {
 		c.answerJSON(map[string]any{"error": err.Error()})
 		return 1

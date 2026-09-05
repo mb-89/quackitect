@@ -31,7 +31,7 @@ func TestARetroDrainsTheKeptOutputAndTheUndoJournal(t *testing.T) {
 		}
 	}
 
-	got, err := Retro(r, "main", nil)
+	got, err := Retro(t.Context(), r, "main", nil)
 	if err != nil {
 		t.Fatalf("the retro would not run: %v", err)
 	}
@@ -89,7 +89,7 @@ func TestARetroKeepsWhatTheNextOneReads(t *testing.T) {
 	t.Parallel()
 	r := aWorkedTree(t)
 
-	first, err := Retro(r, "main", nil)
+	first, err := Retro(t.Context(), r, "main", nil)
 	if err != nil {
 		t.Fatalf("the first retro would not run: %v", err)
 	}
@@ -143,7 +143,7 @@ func TestARetroKeepsWhatTheNextOneReads(t *testing.T) {
 		}
 	}
 
-	second, err := Retro(r, "main", nil)
+	second, err := Retro(t.Context(), r, "main", nil)
 	if err != nil {
 		t.Fatalf("the second retro would not run: %v", err)
 	}

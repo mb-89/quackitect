@@ -81,7 +81,7 @@ func TestTheRetroCountsTheVoiceBreaksTheAgentWrote(t *testing.T) {
 	t.Parallel()
 	r := aSessionWithVoiceBreaks(t)
 
-	got, err := Retro(r, "main", nil)
+	got, err := Retro(t.Context(), r, "main", nil)
 	if err != nil {
 		t.Fatalf("the retro did not run: %v", err)
 	}
@@ -143,7 +143,7 @@ func TestAMissingRulesFileDoesNotStopTheRetro(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	got, err := Retro(r, "main", nil)
+	got, err := Retro(t.Context(), r, "main", nil)
 	if err != nil {
 		t.Fatalf("a missing rules file took the retro down: %v", err)
 	}
