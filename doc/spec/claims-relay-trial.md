@@ -153,6 +153,15 @@ real `ci` workflow on that credential answers `Workflow does not have
 
 **The relay runs on the GitHub MCP server's credential, not on `curl`.**
 
+**And the claim is published by the engine, which holds the other one.** `Publish`
+in `src/engine/claim.go` shells out to git from inside the engine process. That
+process has no MCP client, so the dispatch it could make is the `curl` row above.
+Re-measured at commit a9aced23 of v4, from a command the engine itself ran: the
+same dispatch answers `403`, `Resource not accessible by integration`, with
+`Server: github.com` and `X-Accepted-Github-Permissions: actions=write`. So the
+credential that may dispatch belongs to an agent's tool, and the process that
+publishes cannot reach it. What that costs the relay is below.
+
 ### Probe two: a workflow pushes the ref
 
 Run 33971164027 pushed `refs/se/probe-33971164027` and deleted it again:
