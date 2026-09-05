@@ -58,9 +58,12 @@ func runTidy(c *call) int {
 }
 
 // Tidy runs every part and never answers an error.
-func Tidy(ctx context.Context, r Roots) []TidyPart {
+// THE CONTEXT IS TAKEN AND NOT YET READ. The claim layer's git call does not
+// take one on this branch, so the caller's context stops here rather than
+// reaching the process. wk-697f9876cf is the threading that will carry it on.
+func Tidy(_ context.Context, r Roots) []TidyPart {
 	return tidyWith(r, time.Now().UTC(), func(args ...string) (string, error) {
-		return gitIn(ctx, r, "", args...)
+		return gitIn(r, "", args...)
 	})
 }
 
