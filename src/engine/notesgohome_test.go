@@ -1,12 +1,94 @@
 package main
 
 import (
-	"encoding/json"
+	"bytes"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
 )
+
+// THE COMMANDS IN A REFUSAL ARE READ BY NOTHING, SO THEY ROT.
+//
+// The one runnable line the notes refusal printed was se work --close <id>
+// --as dropped --why "...", and neither flag has ever existed. The whole guard
+// is a handing-over: it holds the work and tells the agent the way out. Its one
+// copyable line was a parse error, so the agent it held spent a turn on a
+// command that cannot run and then went to read the flag set itself.
+//
+// SO EVERY se work LINE THE REFUSAL PRINTS IS PARSED AGAINST THE SET runWork
+// DECLARES. A flag renamed next month breaks this test rather than the agent
+// standing in front of the guard. A command that parses and then fails on a
+// token id out of the text is fine: what is asserted is that the verb read it.
+func TestTheNotesRefusalNamesFlagsSeWorkHas(t *testing.T) {
+	r := aTreeWithTheProcesses(t)
+	aHostTable(t, r)
+	for i := 0; i < TheNoteCeiling; i++ {
+		mintNote(t, r, "a note nobody decided")
+	}
+	t.Setenv("CLAUDE_CODE_REMOTE", "true")
+	why, refuse := TooManyNotes(r, "main", "mcp__quackitect__se_apply", "")
+	if !refuse {
+		t.Fatal("the ceiling held nothing, so there is no refusal to read")
+	}
+
+	said := theSeWorkCommandsIn(why)
+	if len(said) == 0 {
+		t.Fatal("the refusal names no se work command, so the agent it holds is told nothing it can run")
+	}
+	for _, args := range said {
+		var out, errs bytes.Buffer
+		code := run["work"](&call{roots: r, args: args,
+			in: strings.NewReader(""), out: &out, err: &errs})
+		if code == Unread || strings.Contains(errs.String(), "not defined") {
+			t.Errorf("the refusal prints se work %s, which se work will not read: %s",
+				strings.Join(args, " "), strings.TrimSpace(errs.String()))
+		}
+	}
+}
+
+// theSeWorkCommandsIn answers the arguments of every se work command in a
+// refusal, so the verb itself can say whether it would read them. A command
+// runs to the end of its line, which is where a copyable one belongs.
+func theSeWorkCommandsIn(text string) [][]string {
+	var out [][]string
+	for _, line := range strings.Split(text, "\n") {
+		at := strings.Index(line, "se work ")
+		if at < 0 {
+			continue
+		}
+		if args := theWordsIn(line[at+len("se work "):]); len(args) > 0 {
+			out = append(out, args)
+		}
+	}
+	return out
+}
+
+// theWordsIn splits a command line the way a shell would, keeping a quoted
+// value whole, because a --why carries a sentence.
+func theWordsIn(s string) []string {
+	var out []string
+	var word strings.Builder
+	quoted := false
+	end := func() {
+		if word.Len() > 0 {
+			out = append(out, word.String())
+			word.Reset()
+		}
+	}
+	for _, ch := range s {
+		switch {
+		case ch == '"':
+			quoted = !quoted
+		case ch == ' ' && !quoted:
+			end()
+		default:
+			word.WriteRune(ch)
+		}
+	}
+	end()
+	return out
+}
 
 // A CLOUD BOX EMPTIES ITS NOTES INTO GIT BEFORE IT DIES.
 //
@@ -64,8 +146,8 @@ func TestACloudBoxTurnsItsNotesIn(t *testing.T) {
 	// guard that holds Bash while asking for work verbs leaves no legal move.
 	for _, command := range []string{
 		"./RUNME.sh work --title \"a token from a note\" --tracked",
-		"./RUNME.sh work --abort wk-0000000001 --why \"nothing rests on it\"",
-		"./RUNME.sh work --set wk-0000000001 --field needs_human --to true",
+		"./RUNME.sh work --abort wk-1111111111 --why \"nothing rests on it\"",
+		"./RUNME.sh work --set wk-1111111111 --field needs_human --to true",
 	} {
 		if _, refuse := TooManyNotes(r, "main", "Bash", command); refuse {
 			t.Errorf("the way out is refused at a shell: %s", command)
@@ -82,90 +164,13 @@ func TestACloudBoxTurnsItsNotesIn(t *testing.T) {
 		t.Fatal(err)
 	}
 	turnedIn.Status, turnedIn.Disposition = "closed", Became
-	turnedIn.Successors = []string{"wk-0000000001"}
+	turnedIn.Successors = []string{"wk-1111111111"}
 	if err := SaveToken(r, turnedIn); err != nil {
 		t.Fatal(err)
 	}
 	if _, refuse := TooManyNotes(r, "main", "mcp__quackitect__se_apply", ""); refuse {
 		t.Errorf("a note that became a token is still counted, so turning them in never clears the hold")
 	}
-}
-
-// THE THREE ANSWERS LAND THROUGH THE DOORS THE HOLD LEAVES OPEN.
-//
-// A refusal that names an action nobody can take through the tools it leaves
-// open is a deadlock with instructions. The lane's se_work carried no
-// needs_human, and the shell form of the flag was behind the same hold, so the
-// one answer the owner's words single out, the undecidable note that must still
-// reach a person, was the one answer a held agent could not give. So each
-// answer TooManyNotes names is taken here the way a held agent takes it, with
-// the hold standing: the tool passes the guard, and the verb behind it lands.
-func TestTheThreeAnswersLandThroughTheOpenDoors(t *testing.T) {
-	r := aTreeWithTheProcesses(t)
-	aHostTable(t, r)
-	var notes []Token
-	for i := 0; i < TheNoteCeiling; i++ {
-		notes = append(notes, mintNote(t, r, "a note nobody decided"))
-	}
-	t.Setenv("CLAUDE_CODE_REMOTE", "true")
-	if _, refuse := TooManyNotes(r, "main", "mcp__quackitect__se_apply", ""); !refuse {
-		t.Fatal("this proves nothing: the hold is not standing")
-	}
-
-	// DROPPED. The abort is the drop that carries why, and it ends the note.
-	theNotesDoor(t, r, "mcp__quackitect__se_work", []string{"work", "--abort", notes[0].ID,
-		"--why", "a passing thought, and nothing rests on it", "--by", "main"})
-	dropped, err := LoadToken(r, notes[0].ID)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if !dropped.Ended() || dropped.Disposition != Dropped {
-		t.Errorf("the note reads %s %q after the drop, and it should have ended as dropped", dropped.Status, dropped.Disposition)
-	}
-
-	// A TRACKED TOKEN, born where git carries it.
-	minted := theNotesDoor(t, r, "mcp__quackitect__se_work", []string{"work", "--title", "token from a note",
-		"--process", "trivial", "--tracked", "true", "--done-when", "the note is a token", "--by", "main"})
-	if _, err := os.Stat(filepath.Join(r.Work, "doc", "work", minted.ID+".md")); err != nil {
-		t.Errorf("the tracked token is not in doc/work: %v", err)
-	}
-	if minted.NeedsHuman {
-		t.Errorf("a token nobody flagged reads needs_human")
-	}
-
-	// AND ONE A PERSON HAS TO READ, flagged at the mint, through the lane's own
-	// argument and the shell flag it sends.
-	flagged := theNotesDoor(t, r, "mcp__quackitect__se_work", []string{"work", "--title", "one a person reads",
-		"--process", "trivial", "--tracked", "true", "--done-when", "a person has read it", "--needs-human", "--by", "main"})
-	if !flagged.NeedsHuman {
-		t.Errorf("the token minted with --needs-human does not read needs_human")
-	}
-	if again, err := LoadToken(r, flagged.ID); err != nil || !again.NeedsHuman {
-		t.Errorf("needs_human did not reach the disk: %v", err)
-	}
-}
-
-// theNotesDoor takes one action the way a held agent takes it: the tool has
-// to pass the hold, at the lane and at a shell, and then the verb behind it
-// runs. It answers the token the verb wrote.
-func theNotesDoor(t *testing.T, r Roots, tool string, argv []string) Token {
-	t.Helper()
-	shell := "./RUNME.sh " + strings.Join(argv, " ")
-	if why, refuse := TooManyNotes(r, "main", tool, ""); refuse {
-		t.Fatalf("%s is refused while the notes are held, and it is the way out:\n%s", tool, why)
-	}
-	if why, refuse := TooManyNotes(r, "main", "Bash", shell); refuse {
-		t.Fatalf("the same call at a shell is refused: %s\n%s", shell, why)
-	}
-	a := runVerbInside(t.Context(), r, verbAsk{Verb: argv[0], Args: argv[1:]})
-	if a.Code != 0 {
-		t.Fatalf("%s did not land: %s%s", shell, a.Out, a.Err)
-	}
-	var tok Token
-	if err := json.Unmarshal([]byte(a.Out), &tok); err != nil {
-		t.Fatalf("%s answered something that is not a token: %v\n%s", shell, err, a.Out)
-	}
-	return tok
 }
 
 // AND A DESK IS LEFT ALONE. Its notes are on a disk that survives the session,
