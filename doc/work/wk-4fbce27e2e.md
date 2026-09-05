@@ -44,6 +44,7 @@ Narrow it again. Add each line to the clean map in holderinprose_test.go, which 
 | [x] | the ask is small enough to review whole, or it is split first | one branch of one rule, and four lines added to a map | — |
 | [x] | every done-when line is decidable, and names the command where one decides it | Both are decidable now. se lint ran on a fresh engine and answered. The first line asks for clean, and clean is not this token's to reach: 49 of the 51 findings are the dangling reference rule. | 51 findings |
 | [x] | the basics it stands on exist, or are minted first | holdersIn, claimsAHold and the clean map were already in the tree | — |
+| [x] | what is gained by doing it, and not only what it does | A lint answering mostly noise is one a reader learns to run past, and that costs the findings that are real. All four lines it named are gone. | 4 of 4 |
 
 ## evidence: step 2. do
 
