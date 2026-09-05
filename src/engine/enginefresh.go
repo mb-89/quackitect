@@ -54,6 +54,15 @@ func newestSource(dirs []string) (path string, at time.Time) {
 			if err != nil || d.IsDir() || !strings.HasSuffix(p, ".go") || strings.HasSuffix(p, "_test.go") {
 				return nil
 			}
+			// WHAT THE TOOLCHAIN PASSES OVER IS NOT SOURCE HERE EITHER. go build
+			// ignores a file whose base name begins with an underscore or a dot,
+			// so a build over one of those compiles nothing new and the engine it
+			// makes is the same program. Counting one is a stale reading that no
+			// build can clear: a parked file left beside its own source made the
+			// suite build a fresh engine for code nothing compiles.
+			if base := filepath.Base(p); strings.HasPrefix(base, "_") || strings.HasPrefix(base, ".") {
+				return nil
+			}
 			if info, err := d.Info(); err == nil && info.ModTime().After(at) {
 				path, at = p, info.ModTime()
 			}

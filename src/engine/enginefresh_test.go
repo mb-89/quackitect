@@ -55,6 +55,12 @@ func TestAnEngineNewerThanTheTreeIsRunAsItIs(t *testing.T) {
 	// A TEST FILE IS NOT SOURCE: the engine has none in it, so a newer one
 	// is no reason to build.
 	aFileBuiltAt(t, filepath.Join(src, "hook_test.go"), then.Add(2*time.Minute))
+	// AND NEITHER IS A FILE THE TOOLCHAIN PASSES OVER. A base name beginning
+	// with an underscore or a dot is not source to go build, so a build over
+	// one of those compiles nothing new and the fresh engine is the same
+	// program. A parked file left beside its own source is exactly this case.
+	aFileBuiltAt(t, filepath.Join(src, "_parked.go"), then.Add(2*time.Minute))
+	aFileBuiltAt(t, filepath.Join(src, ".hidden.go"), then.Add(2*time.Minute))
 	c := engineToRun(engine, []string{src}, then.Add(3*time.Minute))
 	if c.Build {
 		t.Fatalf("an engine newer than every source was built again, because of %q", c.Newer)

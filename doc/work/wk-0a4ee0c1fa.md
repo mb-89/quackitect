@@ -36,9 +36,9 @@ Give newestSource the toolchain's own rule: skip a base name beginning with _ or
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the ask is small enough to review whole, or it is split first | — |  |
-| [ ] | every done-when line is decidable, and names the command where one decides it |  |  |
-| [ ] | the basics it stands on exist, or are minted first | — |  |
+| [x] | the ask is small enough to review whole, or it is split first | One skip in newestSource and two lines in the case beside it. |  |
+| [x] | every done-when line is decidable, and names the command where one decides it | All three are decided by the two tests the token names, run through se test on this token. |  |
+| [x] | the basics it stands on exist, or are minted first | engineToRun, newestSource and aFileBuiltAt are all here, and the case for a test file is the one this sits beside. |  |
 
 ## evidence: step 2. do
 
@@ -46,9 +46,9 @@ Give newestSource the toolchain's own rule: skip a base name beginning with _ or
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the guidance this token names was read and applied | — |  |
-| [ ] | one test was written first and seen red for the reason expected |  |  |
-| [ ] | the same test was seen green after the change, and named |  |  |
-| [ ] | the change is git diff began..ended, the two hashes the engine wrote on this token | — |  |
-| [ ] | the cleanup the change revealed is in the change, or is a token of its own | — |  |
+| [x] | the guidance this token names was read and applied | Read. Rule 12 put the red first, and the token's proposed action is what was built. |  |
+| [x] | one test was written first and seen red for the reason expected | TestAnEngineNewerThanTheTreeIsRunAsItIs said `an engine newer than every source was built again, because of ".../src/.hidden.go"`. Expected, as newestSource counted a file the toolchain passes over. |  |
+| [x] | the same test was seen green after the change, and named | It passes, and TestATreeNewerThanTheEngineIsBuilt with it. se test on this token answers ok true, having run both. |  |
+| [x] | the change is git diff began..ended, the two hashes the engine wrote on this token | src/engine/enginefresh.go, one skip in newestSource, and two lines in src/engine/enginefresh_test.go. |  |
+| [x] | the cleanup the change revealed is in the change, or is a token of its own | Token wk-57fbc66ca9 already names the parked files this was found through, and one of them is the underscore file the detail measures. |  |
 
