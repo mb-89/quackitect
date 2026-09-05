@@ -4,9 +4,10 @@ import (
 	"os"
 	"path/filepath"
 	"quackitect/engine/internal/frontmatter"
-	"reflect"
 	"strings"
 	"testing"
+
+	"github.com/google/go-cmp/cmp"
 )
 
 // THE HOLD IS ENGINE STATE, NOT TOKEN CONTENT.
@@ -46,22 +47,6 @@ func exceptTheStretch(f frontmatter.Front) frontmatter.Front {
 	return out
 }
 
-// heldTokenRoots is the setup the hold tests share: a tree, a workable process
-// and an open log, so the session has a name to write arrivals against.
-func heldTokenRoots(t *testing.T) Roots {
-	t.Helper()
-	root := t.TempDir()
-	r := Roots{Method: root, Work: root}
-	writeProcess(t, root, "queued")
-	log, err := OpenLog(r.Private("log"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	t.Cleanup(func() { log.Close() })
-	log.Write("engine", "start", "engine", "for the session name", Yes(), nil)
-	return r
-}
-
 // A TAKE-UP AND A PUT-DOWN LEAVE THE FILE ALONE, apart from the stretch.
 func TestTakeUpAndPutDownWriteNoHolderIntoTheFile(t *testing.T) {
 	t.Parallel()
@@ -79,8 +64,11 @@ func TestTakeUpAndPutDownWriteNoHolderIntoTheFile(t *testing.T) {
 	if v, ok := upFront["holder"]; ok {
 		t.Fatalf("take-up wrote holder %v into the token file; the hold is the engine's", v)
 	}
-	if !reflect.DeepEqual(exceptTheStretch(upFront), exceptTheStretch(wasFront)) || upBody != wasBody {
-		t.Fatalf("take-up changed the file beyond began and ended:\n%v\nwas\n%v", upFront, wasFront)
+	if d := cmp.Diff(exceptTheStretch(wasFront), exceptTheStretch(upFront)); d != "" {
+		t.Fatalf("take-up changed the front matter beyond began and ended (-was +now):\n%s", d)
+	}
+	if upBody != wasBody {
+		t.Fatalf("take-up changed the body:\n%s\nwas\n%s", upBody, wasBody)
 	}
 
 	if _, err := PutDown(r, tok.ID, "worker-1"); err != nil {
@@ -90,8 +78,11 @@ func TestTakeUpAndPutDownWriteNoHolderIntoTheFile(t *testing.T) {
 	if v, ok := downFront["holder"]; ok {
 		t.Fatalf("put-down wrote holder %v into the token file", v)
 	}
-	if !reflect.DeepEqual(exceptTheStretch(downFront), exceptTheStretch(wasFront)) || downBody != wasBody {
-		t.Fatalf("put-down changed the file beyond began and ended:\n%v\nwas\n%v", downFront, wasFront)
+	if d := cmp.Diff(exceptTheStretch(wasFront), exceptTheStretch(downFront)); d != "" {
+		t.Fatalf("put-down changed the front matter beyond began and ended (-was +now):\n%s", d)
+	}
+	if downBody != wasBody {
+		t.Fatalf("put-down changed the body:\n%s\nwas\n%s", downBody, wasBody)
 	}
 }
 
