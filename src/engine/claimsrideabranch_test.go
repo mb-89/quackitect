@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -75,8 +76,8 @@ func TestClaimsRideABranch(t *testing.T) {
 	fed.says["write-tree"] = "aaaa"
 	fed.says["commit-tree"] = "bbbb"
 
-	Publish(r, []string{"doc/work/wk-1.md"}, "a claim")
-	SyncClaims(r)
+	Publish(context.Background(), r, []string{"doc/work/wk-1.md"}, "a claim")
+	SyncClaims(context.Background(), r)
 
 	if !fed.asked("push", "origin", claimsRef+":"+claimsBranch) {
 		t.Error("the push does not name the branch on the remote side, so a box in the sandbox still publishes nothing")
@@ -100,7 +101,7 @@ func TestClaimReachesTheBareBranch(t *testing.T) {
 	bare := aBareOrigin(t, r)
 	note := aClaimNote(t, r, "wk-branch", "box-one/worker")
 
-	got := Publish(r, []string{note}, "a claim")
+	got := Publish(context.Background(), r, []string{note}, "a claim")
 	if !got.Pushed {
 		t.Fatalf("the claim did not reach the remote: %s", got.Says)
 	}
@@ -123,7 +124,7 @@ func TestOldClaimsRefIsStillRead(t *testing.T) {
 	// A REMOTE FROM BEFORE THE BRANCH: its claims sit on refs/se/claims and it
 	// carries no branch of them at all.
 	index := filepath.Join(t.TempDir(), "claim.index")
-	if _, err := writeTheClaims(r, index, []string{note}, "an older box's claim"); err != nil {
+	if _, err := writeTheClaims(context.Background(), r, index, []string{note}, "an older box's claim"); err != nil {
 		t.Fatal(err)
 	}
 	mustGit(t, r.Work, "push", bare, claimsRef+":"+claimsRef)
@@ -133,7 +134,7 @@ func TestOldClaimsRefIsStillRead(t *testing.T) {
 	// THE ONLY COPY IS THE REMOTE'S NOW, so what is read had to be fetched.
 	mustGit(t, r.Work, "update-ref", "-d", claimsRef)
 
-	got := SyncClaims(r)
+	got := SyncClaims(context.Background(), r)
 	if _, ok := got.Claims["wk-old"]; !ok {
 		t.Errorf("a claim on the old ref was not read, so every claim published before the branch is lost: %q %+v", got.Says, got.Claims)
 	}
