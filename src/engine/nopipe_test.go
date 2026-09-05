@@ -101,7 +101,9 @@ func TestEveryDoorARefusalNamesGetsPastTheGuard(t *testing.T) {
 // replace and not a redirection. The guard reads an angle bracket either way, so
 // the check is about the shape of the call and not about the stationery.
 func asAnAgentWouldType(line string) string {
-	return placeholder.ReplaceAllString(line, "wk-1234567890")
+	// AN INVENTED ID IS ONE CHARACTER REPEATED, which is how
+	// tests-name-no-token tells a fixture from a token in the record.
+	return placeholder.ReplaceAllString(line, "wk-1111111111")
 }
 
 var placeholder = regexp.MustCompile(`<[^>]*>`)

@@ -296,6 +296,10 @@ func main() {
 		if err := TheyWereAnsweredIfNamed(roots, *actor); err != nil {
 			fail(err)
 		}
+		// AND THE PERSON'S OWN PRESS, WHICH NAMES NO AGENT. See ThePersonWasAnswered.
+		if err := ThePersonWasAnswered(roots); err != nil {
+			fail(err)
+		}
 		fmt.Println("recorded")
 		return
 	}

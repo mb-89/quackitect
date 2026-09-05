@@ -86,6 +86,17 @@ export function askedArgs(): string[] {
   return ["--ask", "status"];
 }
 
+// WHETHER AN UPDATE IS STILL OWED, read off what askedArgs answered.
+//
+// THE RULE LIVES HERE BECAUSE THE PANEL AND THE CHECK BOTH NEED IT. The button
+// is down while the person is owed an update, and a check that decided that by
+// a rule of its own would agree with the panel only by luck. The engine writes
+// the press as a record with the time on it and clears the file when the answer
+// lands, so the question is whether anything is there.
+export function askIsOwed(asked: { on?: string } | null | undefined): boolean {
+  return typeof asked?.on === "string" && asked.on !== "";
+}
+
 export function viewArgs(file: string, side: string, rest: string[]): string[] {
   return ["view", "--file", file, "--pane", side, ...rest];
 }

@@ -261,6 +261,10 @@ for (const [what, groups] of [
 // AND AN EXCLUSION IS WRITTEN DOWN WITH ITS ANSWER, so a reader can tell one
 // from an oversight.
 const excluded = {
+  askIsOwed: "not an argument builder. It reads what askedArgs answered and says "
+    + "whether an update is still owed, so there is no engine call to drive: "
+    + "drive-panel.mjs drives it, against a record the real binary wrote, and the "
+    + "panel reads the same function so the two cannot disagree about the button",
 };
 const builders = Object.keys(A).filter((k) => typeof A[k] === "function");
 say("the extension exports its argument builders (" + builders.length + ")", builders.length > 5);

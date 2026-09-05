@@ -31,6 +31,10 @@ const root = process.argv[2] ?? ".";
 // NOT AN ARGUMENT BUILDER, and named here with its reason so a reader can tell
 // an exclusion from an oversight.
 const notABuilder = {
+  askIsOwed: "not an argument builder. It reads what askedArgs answered and says "
+    + "whether an update is still owed, so it reaches no engine and no spawn "
+    + "spreads it. drive-panel.mjs drives it against a record the real binary "
+    + "wrote",
   lspArgs: "the language client owns this child, so it cannot go through a door "
     + "of ours. Its ExecutableOptions carry cwd, env, detached and shell and no "
     + "windowsHide, so the server frees its own console instead, in "

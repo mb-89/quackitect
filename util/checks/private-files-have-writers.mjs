@@ -41,6 +41,13 @@ const sidecar = /-(shm|wal)$/;
 // check's.
 const inFlight = /\.tmp$/;
 
+// A DOCUMENT IS NOT STATE. The README says .se holds dated reports and measured
+// evidence, and a person writes those. This check hunts the file no source
+// mentions, which is a leftover of code that went, and a report is never that:
+// no source writes one and none should. Markdown at the top of .se is the
+// document, and the engine's own state is JSON and the index beside it.
+const aDocument = /\.md$/;
+
 // Where the code that writes the engine's state lives. Anything built or
 // fetched is skipped: it is not source, and a name found there proves nothing.
 const sourceDirs = ["src"];
@@ -95,6 +102,10 @@ for (const name of entries.sort()) {
   if (inFlight.test(name)) {
     inFlightSeen++;
     say(name + " is a write in flight, and the sweep owns it", true);
+    continue;
+  }
+  if (aDocument.test(name)) {
+    say(name + " is a document a person wrote, and no source writes one", true);
     continue;
   }
   const looksFor = name.replace(sidecar, "");

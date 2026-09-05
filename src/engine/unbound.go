@@ -216,6 +216,27 @@ func SetAsked(r Roots, on bool, by string) (AskedToSay, error) {
 // Owed answers whether an update is still owed.
 func (a AskedToSay) Owed() bool { return a.On != "" }
 
+// ThePersonWasAnswered discharges the press, because the answer it asked for is
+// now in the record.
+//
+// NOTHING DISCHARGED IT, AND THE PRESS REFUSES EVERY TOOL CALL. decidePreToolUse
+// denies each one while this stands, letting only the answer through, and the
+// answer cleared the other obligation and left this one. So a person who pressed
+// the button got one answer and an agent refused for the rest of the session,
+// however many times it answered, until they pressed again. The panel's button
+// could never come up either, which is how it was found.
+//
+// IT IS NOT KEYED BY AGENT, and the obligation a prompt raises is. Two agents
+// owe two answers to a question each was asked. This is one button a person
+// pressed once, so the first answer settles it.
+func ThePersonWasAnswered(r Roots) error {
+	if !LoadAsked(r).Owed() {
+		return nil
+	}
+	_, err := SetAsked(r, false, "")
+	return err
+}
+
 func (a AskedToSay) String() string {
 	if !a.Owed() {
 		return ""

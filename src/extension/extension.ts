@@ -12,7 +12,7 @@ import { startLanguageServer, stopLanguageServer } from "./lsp";
 import { sayWindowIsHere, forgetWindow, windowsThere, windowAnswers, sweepWindowsGone } from "./windows";
 import {
   mintArgs, editCellArgs, fileArgs, groupArgs, renameGroupArgs, holdArgs,
-  bindArgs, bindingArgs, askArgs, askedArgs,
+  bindArgs, bindingArgs, askArgs, askedArgs, askIsOwed,
   viewArgs, paneArgs, panesArgs, viewsArgs, pinArgs, unpinArgs, widthArgs,
   burndownArgs,
   orderArgs, levelArgs, dropLevelArgs, filterArgs,
@@ -41,6 +41,7 @@ export function activate(context: vscode.ExtensionContext) {
   void showHold(context);
   void showBinding(context);
   void showAsked(context);
+  watchTheAsk(context);
   projectOnStartup(context);
   watchParameters(context);
   void chooseEngine(context);
@@ -1436,18 +1437,41 @@ function setHoldState(on: boolean) {
 // every call until it lands, and the button untoggles itself when it does.
 async function toggleAsk(context: vscode.ExtensionContext) {
   const now = await askEngine(context, askedArgs());
-  const owed = typeof now?.on === "string" && now.on !== "";
-  const out = await askEngine(context, askArgs(!owed));
+  const out = await askEngine(context, askArgs(!askIsOwed(now)));
   if (out?.error) {
     vscode.window.showErrorMessage(out.error);
     return;
   }
-  setAskedState(typeof out?.on === "string" && out.on !== "");
+  setAskedState(askIsOwed(out));
 }
 
 async function showAsked(context: vscode.ExtensionContext) {
   const now = await askEngine(context, askedArgs(), { quiet: true });
-  setAskedState(typeof now?.on === "string" && now.on !== "");
+  setAskedState(askIsOwed(now));
+}
+
+// AND THE BUTTON FOLLOWS THE RECORD, NOT ONLY THE PRESS.
+//
+// The agent's answer discharges what the press raised, and it happens in the
+// engine, where this window is not looking. So a person pressed the button,
+// was answered, and watched it stay down until they pressed it again. The
+// record is a file, so the window watches the file, which is the arrangement
+// the work panel and the log window already use.
+function watchTheAsk(context: vscode.ExtensionContext) {
+  const work = workRoot();
+  if (!work) {
+    return; // no folder yet. chooseEngine calls showAsked once there is one.
+  }
+  try {
+    const asked = fs.watch(path.join(work, ".se"), (_event, name) => {
+      if (name === null || path.basename(String(name)) === "asked.json") {
+        void showAsked(context);
+      }
+    });
+    context.subscriptions.push({ dispose: () => asked.close() });
+  } catch {
+    /* no .se folder yet. The press and the redraw still set the button. */
+  }
 }
 
 function setAskedState(owed: boolean) {

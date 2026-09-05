@@ -66,6 +66,10 @@ func runAnswer(c *call) int {
 	if err := TheyWereAnsweredIfNamed(c.roots, *actor); err != nil {
 		return c.fail(err)
 	}
+	// AND THE PERSON'S OWN PRESS, WHICH NAMES NO AGENT. See ThePersonWasAnswered.
+	if err := ThePersonWasAnswered(c.roots); err != nil {
+		return c.fail(err)
+	}
 	fmt.Fprintln(c.out, "recorded")
 	return 0
 }

@@ -25,37 +25,62 @@ set -eu
 here=${CLAUDE_PROJECT_DIR:-$PWD}
 cd "$here"
 
-# THE ONE PLACE THIS BELONGS. SessionStart fires on every host, and where the
-# box is comes off one table, util/cage/hosts.json, through the one door that
-# reads it. A desk returns here.
-node util/cage/host.mjs --cloud || exit 0
-
 say() { echo "quackitect: $*"; }
 
-# THE COMMIT, SAID OUT LOUD, AGAINST ORIGIN. The cloud clones the tip of the
-# branch as it stood when the session was made, and a person who pushed a
-# minute later has no way to tell. So the box asks origin and says both.
+# THE ONE PLACE THIS BELONGS. SessionStart fires on every host, and where the
+# box is comes off one table, util/cage/hosts.json, through the one door that
+# reads it.
+#
+# EVERY SESSION IS TOLD WHICH KIND IT IS, and a desk is told here and returns.
+# The two kinds are handed different cards, so a session that does not know
+# which it is can read the wrong one and follow it. A desk that is told it is a
+# desk cannot mistake util/cage/cloud-runner.md for something addressed to it.
+if ! node util/cage/host.mjs --cloud; then
+  say "this is $(node util/cage/host.mjs --say). The extension starts the engine here, and util/cage/cloud-runner.md is a card for a cloud box and is not addressed to you."
+  exit 0
+fi
+
+# THE COMMIT, SAID OUT LOUD, AGAINST WHAT THIS CLONE CAME FROM.
+#
+# The cloud clones the tip as it stood when the session was made, and a person
+# who pushed a minute later has a box that is behind and says it is current.
+#
+# WHICH BRANCH TO ASK ABOUT IS NOT THIS ONE'S NAME. A cloud session works on a
+# branch of its own, so origin holds nothing under that name, and asking for it
+# answered "unknown" on every cloud box however current the tree was. What the
+# clone was made from is the upstream, and origin's own default is the fallback
+# for a branch that has none.
 branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo HEAD)
 head=$(git rev-parse --short HEAD 2>/dev/null || echo unknown)
 say "this is $(node util/cage/host.mjs --say), on commit $head of $branch"
-if [ "$branch" != HEAD ] && git fetch -q origin "$branch" 2>/dev/null; then
-  remote=$(git rev-parse --short "origin/$branch")
-  if [ "$remote" = "$head" ]; then
-    say "origin/$branch is $remote too: this clone is current"
-  elif git merge-base --is-ancestor HEAD "origin/$branch" 2>/dev/null && [ -z "$(git status --porcelain)" ]; then
-    # BEHIND, AND CLEAN, SO IT MOVES. A clone behind origin is a box working
-    # on a tree the person has already left, and every finding it makes is
-    # about the past.
-    if git merge -q --ff-only "origin/$branch" 2>/dev/null; then
-      say "origin/$branch was $remote and this clone was behind: fast-forwarded from $head. Programs built from the old tree are older than their source now, and the next ./RUNME.sh call rebuilds them."
-    else
-      say "origin/$branch is $remote and this clone is on $head, and the fast-forward failed, so nothing was moved. Say so in your first message."
-    fi
-  else
-    say "origin/$branch is $remote and this clone is on $head: they differ and it is not a fast-forward, so nothing was moved. Say so in your first message."
-  fi
+
+upstream=$(git rev-parse --abbrev-ref --symbolic-full-name '@{upstream}' 2>/dev/null || true)
+[ -n "$upstream" ] || upstream=$(git symbolic-ref -q --short refs/remotes/origin/HEAD 2>/dev/null || true)
+[ -n "$upstream" ] || { git show-ref -q --verify "refs/remotes/origin/$branch" && upstream="origin/$branch"; }
+
+if [ -z "$upstream" ]; then
+  say "nothing on origin is tracked by $branch, so whether this clone is current cannot be decided here. Say so in your first message."
+elif ! git fetch -q "${upstream%%/*}" "${upstream#*/}" 2>/dev/null; then
+  say "$upstream could not be fetched, so whether this clone is current is unknown. Say so in your first message."
 else
-  say "origin could not be asked about $branch, so whether this clone is current is unknown. Say so in your first message."
+  remote=$(git rev-parse --short FETCH_HEAD)
+  if [ "$remote" = "$head" ]; then
+    say "$upstream is $remote too: this clone is current"
+  elif ! git merge-base --is-ancestor HEAD FETCH_HEAD 2>/dev/null; then
+    say "$upstream is $remote and this clone is on $head, which is not behind it, so nothing was moved. Say both commits in your first message."
+  elif [ -n "$(git status --porcelain)" ]; then
+    # BEHIND, AND CARRYING WORK. Moving the tree under an agent that has
+    # written to it is how a session loses what it did, so this says it and
+    # stops. The agent decides what to do with its own changes.
+    say "$upstream is $remote and this clone is on $head, so it is behind. It was NOT moved, because this tree has uncommitted changes. Say so in your first message."
+  elif git merge -q --ff-only FETCH_HEAD 2>/dev/null; then
+    # THE PULL COMES BEFORE THE ENGINE, and this is the whole reason the wake
+    # does it. Below this line the engine is started and the guards come to
+    # life, so a tree that moves has already moved by then.
+    say "$upstream was $remote and this clone was behind: fast-forwarded from $head to $(git rev-parse --short HEAD). Anything built before now is older than its source, and the next ./RUNME.sh call rebuilds it."
+  else
+    say "$upstream is $remote and this clone is on $head, and the fast-forward failed, so nothing was moved. Say so in your first message."
+  fi
 fi
 
 # THE CARD FOR A BOX NOBODY SITS BESIDE.

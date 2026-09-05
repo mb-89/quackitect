@@ -102,3 +102,30 @@ func TestAStopClaimPassesEveryGuard(t *testing.T) {
 	}
 	_ = strings.TrimSpace
 }
+
+// AN ANSWER DISCHARGES THE PERSON'S PRESS.
+//
+// The press refuses every tool call and lets an answer through, and nothing
+// cleared it. So the agent answered, was refused again, and its only legal move
+// was an answer it had already given. A person had to press the button a second
+// time to release a session that had done exactly what was asked of it.
+//
+// THE PANEL FOUND IT FROM THE OTHER SIDE. Its button is down while an update is
+// owed, and drive-panel drove the press, the answer, and the button coming back
+// up. It never came up.
+func TestAnAnswerDischargesThePress(t *testing.T) {
+	t.Parallel()
+	r := aTreeWithTheProcesses(t)
+	if _, err := SetAsked(r, true, "the owner"); err != nil {
+		t.Fatal(err)
+	}
+	if !LoadAsked(r).Owed() {
+		t.Fatal("the press raised nothing, so there is nothing here to discharge")
+	}
+	theVerbSaid(t, r, "answer", "", "--text", "what everybody is working on", "--actor", "main")
+	if LoadAsked(r).Owed() {
+		t.Error("the answer is in the record and the press still stands, so every " +
+			"tool call goes on being refused and the only move left is an answer that " +
+			"changes nothing")
+	}
+}
