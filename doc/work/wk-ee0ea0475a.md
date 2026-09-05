@@ -11,8 +11,8 @@ title: expressions leave main
 status: done
 # who did the work step, so the verdict is never theirs
 author: worker-messiaen
-claimed_by: aeaf7bd9/worker-messiaen
-claimed_at: "2026-09-05T16:07:06Z"
+claimed_by: aeaf7bd9/reviewer-takemitsu
+claimed_at: "2026-09-05T16:21:41Z"
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - 3f2d1505dbc6b809fd657c5612cc398982621efd
@@ -69,11 +69,11 @@ The change landed as 69dc3aed, under wk-40abb881a7, whose call graph named the s
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | [[reviewing]] was read and applied | — |  |
-| [ ] | every hunk of git diff began..ended was read, and any not read is named |  |  |
-| [ ] | every criterion's command was run again, and what it said is named |  |  |
-| [ ] | every hunk improves the product, or a finding names the one that does not |  |  |
-| [ ] | every finding is a trivial token naming this one, and their ids are here |  |  |
+| [x] | [[reviewing]] was read and applied | Applied. Not the author. | [[reviewing]] |
+| [x] | every hunk of git diff began..ended was read, and any not read is named | The range holds only this token's note, and 69dc3aed is an ancestor of ended, as the note says. Every hunk of it read: the rename, filterbuild.go, query.go, view.go and five test files, all mechanical. | git show -M 69dc3aed |
+| [x] | every criterion's command was run again, and what it said is named | One: internal/expr is there and expr.go is gone. Two: build and vet exit 0. Three: the door answered ok but ran nothing, so both named tests were run directly and pass. | go test -run TestAViewFileReads |
+| [x] | every hunk improves the product, or a finding names the one that does not | PASS. Parse, Row, Value, token and contains left package main. | internal/expr/expr.go |
+| [x] | every finding is a trivial token naming this one, and their ids are here | None. Also seen: expr keeps a hand-rolled contains. | — |
 
 ## note
 
