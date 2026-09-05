@@ -15,35 +15,6 @@ import (
 // copied into a tree of their own, so a change to the file is a change to
 // what these hold.
 
-// aTreeWithTheProcesses is a tree carrying the shipped processes and schemas.
-func aTreeWithTheProcesses(t *testing.T) Roots {
-	t.Helper()
-	root := t.TempDir()
-	r := Roots{Method: root, Work: root}
-	withHistory(t, root)
-	for _, dir := range []string{"processes", "schemas"} {
-		from := filepath.Join("..", "..", "src", dir)
-		to := filepath.Join(root, "src", dir)
-		if err := os.MkdirAll(to, 0o755); err != nil {
-			t.Fatal(err)
-		}
-		entries, err := os.ReadDir(from)
-		if err != nil {
-			t.Fatal(err)
-		}
-		for _, e := range entries {
-			b, err := os.ReadFile(filepath.Join(from, e.Name()))
-			if err != nil {
-				t.Fatal(err)
-			}
-			if err := os.WriteFile(filepath.Join(to, e.Name()), b, 0o644); err != nil {
-				t.Fatal(err)
-			}
-		}
-	}
-	return r
-}
-
 // mintStandard hands back a tracked token this box may work, claim and all.
 //
 // A TRACKED TOKEN NEEDS A CLAIM BEFORE IT IS WORKED, so a fixture that did not
@@ -102,7 +73,12 @@ func ticked(t *testing.T, r Roots, id string) Token {
 		}
 		rows := "| done | criterion | evidence | receipt |\n|---|---|---|---|\n"
 		for _, c := range step.Criteria {
-			rows += "| [x] | " + c.Says + " | seen: " + c.Says + " |  |\n"
+			// THE EVIDENCE IS A WORD, NOT THE CRITERION AGAIN. A section is
+			// measured in words, and repeating each criterion doubled the
+			// table: a process that gained a criterion pushed every fixture
+			// past the cap, and five tests failed about a limit none of them
+			// is about. The gate reads whether the cell says anything.
+			rows += "| [x] | " + c.Says + " | seen |  |\n"
 		}
 		tok.Submission["step "+itoa(i+1)+". "+step.Name] = rows
 	}
@@ -264,6 +240,7 @@ func TestAnEndingIsRefusedOnAStepThatDoesNotEnd(t *testing.T) {
 func TestTheQueueIsStaffed(t *testing.T) {
 	t.Parallel()
 	r := aTreeWithTheProcesses(t)
+	noEngineHere(t, r)
 	log, err := OpenLog(r.Private("log"))
 	if err != nil {
 		t.Fatal(err)
