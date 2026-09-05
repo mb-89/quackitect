@@ -20,8 +20,8 @@ import (
 //
 // ONE LOOKUP, USED BY BOTH, so the two cannot drift apart again.
 func TestTheShellIsFoundBesideGitWhenPathHasNone(t *testing.T) {
-	root := t.TempDir()
-	r := Roots{Method: root, Work: root}
+	r := aTree(t).Roots
+	root := r.Work
 
 	// A Git install the shape the installer leaves: git in cmd, the shell in bin.
 	git := filepath.Join(root, "Git", "cmd", "git.exe")
@@ -50,8 +50,7 @@ func TestTheShellFallsBackToCmdWhenThereIsNone(t *testing.T) {
 	if runtime.GOOS != "windows" {
 		t.Skip("this is about the Windows fallback")
 	}
-	root := t.TempDir()
-	r := Roots{Method: root, Work: root}
+	r := aTree(t).Roots
 	t.Setenv("PATH", "")
 	if got := TheShell(r); got != "cmd" {
 		t.Fatalf("with no shell on the machine it answered %q", got)
@@ -68,8 +67,7 @@ func TestARunUsesTheShellGitBrought(t *testing.T) {
 	if err != nil {
 		t.Skip("no git on this machine, and this is about the shell git brings")
 	}
-	root := t.TempDir()
-	r := Roots{Method: root, Work: root}
+	r := aTree(t).Roots
 	writeProbe(r, Probe{Session: "s", Found: []Tool{{Name: "git", Path: git}}})
 	t.Setenv("PATH", "")
 

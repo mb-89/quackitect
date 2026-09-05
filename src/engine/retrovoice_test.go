@@ -24,59 +24,6 @@ import (
 // number beyond the reach of the one who could act on it, so this test writes
 // breaks into all three and expects two of them ignored.
 
-// aSessionWithVoiceBreaks lays down one retired session whose records break
-// known rules a known number of times.
-func aSessionWithVoiceBreaks(t *testing.T) Roots {
-	t.Helper()
-	r := lane(t)
-
-	// THE RULES ARE DATA, and the fixture declares its own, so this test is
-	// about the counting and not about the list the product happens to ship.
-	if err := os.MkdirAll(filepath.Join(r.Method, "util"), 0o755); err != nil {
-		t.Fatal(err)
-	}
-	const rules = `{
-  "source": "the fixture's own",
-  "limits": {"sentence_words": 25},
-  "rules": [
-    {"name": "no semicolon", "pattern": ";", "says": "a semicolon joins two sentences that should be two"},
-    {"name": "no contraction", "pattern": "(?i)\\b\\w+n't\\b", "says": "write both words"}
-  ]
-}`
-	if err := os.WriteFile(filepath.Join(r.Method, "util", "voice-rules.json"), []byte(rules), 0o644); err != nil {
-		t.Fatal(err)
-	}
-
-	logs := r.Private("log")
-	if err := os.MkdirAll(logs, 0o755); err != nil {
-		t.Fatal(err)
-	}
-	records := []Record{
-		// The agent, breaking one rule each, and once breaking none.
-		{Seq: 1, Src: "agent", Kind: "answer", Actor: "main", Msg: "I looked; it was there."},
-		{Seq: 2, Src: "agent", Kind: "answer", Actor: "main", Msg: "It doesn't build yet."},
-		{Seq: 3, Src: "agent", Kind: "answer", Actor: "main", Msg: "Nothing is wrong with this line."},
-		// The person, breaking both. Their words are not the agent's to fix.
-		{Seq: 4, Src: "user", Kind: "prompt", Actor: "main", Msg: "why doesn't it work; tell me"},
-		// The engine, breaking one. Not prose anybody is asked to improve.
-		{Seq: 5, Src: "engine", Kind: "refusal", Actor: "main", Msg: "write refused; voice"},
-	}
-	var b strings.Builder
-	for _, rec := range records {
-		line, err := json.Marshal(rec)
-		if err != nil {
-			t.Fatal(err)
-		}
-		b.Write(line)
-		b.WriteString(nl)
-	}
-	if err := os.WriteFile(filepath.Join(logs, "session-20260101-000000.jsonl"),
-		[]byte(b.String()), 0o644); err != nil {
-		t.Fatal(err)
-	}
-	return r
-}
-
 func TestTheRetroCountsTheVoiceBreaksTheAgentWrote(t *testing.T) {
 	t.Parallel()
 	r := aSessionWithVoiceBreaks(t)

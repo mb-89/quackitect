@@ -1,8 +1,6 @@
 package main
 
 import (
-	"os"
-	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -62,31 +60,6 @@ func TestAParkedFolderIsSkippedWhole(t *testing.T) {
 			t.Errorf("a parked file was read: %s", f.ID)
 		}
 	}
-}
-
-// aTreeOfGuidance writes notes at three depths, one parked file and one parked
-// folder. Every note names no kind, so each one this walk reaches is a finding
-// and the test can ask which were reached.
-func aTreeOfGuidance(t *testing.T) Roots {
-	t.Helper()
-	root := t.TempDir()
-	dir := GuidanceDir(root)
-	for _, name := range []string{
-		"top.md",
-		"_alone.md",
-		filepath.Join("lane", "deep.md"),
-		filepath.Join("lane", "deeper", "deepest.md"),
-		filepath.Join("_parked", "hidden.md"),
-	} {
-		path := filepath.Join(dir, name)
-		if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
-			t.Fatal(err)
-		}
-		if err := os.WriteFile(path, []byte("# A note naming no kind\n"), 0o644); err != nil {
-			t.Fatal(err)
-		}
-	}
-	return Roots{Method: root, Work: root}
 }
 
 func keysOf(m map[string]bool) []string {

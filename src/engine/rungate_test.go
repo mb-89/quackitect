@@ -13,8 +13,8 @@ import (
 // saying which of them belonged to what.
 func TestEveryWritingToolIsRefusedAndNamesItsVerb(t *testing.T) {
 	t.Parallel()
-	root := t.TempDir()
-	r := Roots{Method: root, Work: root}
+	r := aTree(t).Roots
+	root := r.Work
 	writeProcess(t, root, "gated")
 	tok, err := Mint(r, Token{Tracked: local(), Process: "gated", Title: "a token in hand", Status: "first"})
 	if err != nil {
@@ -57,8 +57,7 @@ func TestEveryWritingToolIsRefusedAndNamesItsVerb(t *testing.T) {
 // names no file, so it is gated wherever it would have run.
 func TestTheScratchpadIsStillOpenToAWrite(t *testing.T) {
 	t.Parallel()
-	root := t.TempDir()
-	r := Roots{Method: root, Work: root}
+	r := aTree(t).Roots
 	pad := r.Private("scratchpad") + "/thinking.md"
 	if _, refuse := WriteNeedsAToken(r, "main", "Write", pad, ""); refuse {
 		t.Error("a write into the scratchpad was refused")

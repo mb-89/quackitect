@@ -10,11 +10,16 @@
 // A token this names has to be openable from the tree the comment ships in:
 // a note under doc/work or .se/work, or a row in the archive.
 //
+// A PATH IS A CITATION TOO. The comment names files as well as tokens, and a
+// path into the method that no clone carries is the same shut door as a lost
+// id. Only the method's own folders are resolved: what the engine writes under
+// .claude is absent until it has run, and that is not this check's business.
+//
 // It reads the folders rather than the index, so it answers on a fresh clone
 // where no index has been built yet.
 //
 //   node util/checks/the-cage-cites-what-is-here.mjs <root>
-import { readdirSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
 const root = process.argv[2] ?? ".";
@@ -68,6 +73,9 @@ const cages = [
 ];
 
 const names = /wk-[0-9a-f]{10}/g;
+// A path into the method, which is util, doc and src. It ends in an
+// extension, so a folder named in passing is not read as a file.
+const files = /\b(?:util|doc|src)(?:\/[A-Za-z0-9._-]+)+\.[a-z]+\b/g;
 
 let looked = 0;
 for (const path of cages) {
@@ -86,6 +94,14 @@ for (const path of cages) {
     + (lost.length === 1 ? "is" : "are") + " in no note under doc/work or "
     + ".se/work and in no archive row. A reader of this comment cannot open "
     + "it. Name a source the tree carries, or say in words what the source held");
+
+  const named = new Set();
+  for (const m of text.matchAll(files)) named.add(m[0]);
+  const gone = [...named].filter((f) => !existsSync(join(root, f))).sort();
+  say(path + " names only files this tree carries", gone.length === 0,
+    path + " names " + gone.join(", ") + ", which this tree does not carry. A "
+    + "reader of this comment cannot open " + (gone.length === 1 ? "it" : "them")
+    + ". Name a file the tree has, or say in words what it held");
 }
 
 say("the cage files were found (" + looked + ")", looked > 0,

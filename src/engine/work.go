@@ -45,6 +45,8 @@ func runWork(c *call) int {
 	on := fs.String("on", "", "instead of minting: say which token you are working on, by id")
 	abort := fs.String("abort", "", "instead of minting: end a token from wherever it stands, by id")
 	why := fs.String("why", "", "with abort: why it is ending. An abort with no reason is refused")
+	as := fs.String("disposition", "", "with abort: how it ends, one the process declares (default: dropped)")
+	successors := fs.String("successors", "", "with abort and became: the ids it became, comma separated")
 	putDown := fs.String("put-down", "", "instead of minting: set a token you are holding back, by id")
 	set := fs.String("set", "", "instead of minting: change one thing about a token, by id")
 	field := fs.String("field", "", "with set: which field to write")
@@ -77,7 +79,8 @@ func runWork(c *call) int {
 		t, err := TakeUp(roots, *on, orElse(*by, "main"))
 		return c.answerOrFail(t, err)
 	case *abort != "":
-		t, err := Abort(roots, Aborting{ID: *abort, By: orElse(*by, "main"), Why: *why})
+		t, err := Abort(roots, Aborting{ID: *abort, By: orElse(*by, "main"), Why: *why,
+			As: Disposition(*as), Successors: splitComma(*successors)})
 		return c.answerOrFail(t, err)
 	// TWO KINDS OF GROUP, AND THIS VERB MAKES THE OTHER ONE. A query is a
 	// filter in the view file. A bucket is a name a person gave a handful of
