@@ -300,9 +300,21 @@ func shortPath(r Roots, path string) string {
 // old bytes over it would throw that away silently. So the undo compares what
 // is there now against what this apply wrote, refuses the whole entry if any
 // file has moved, and restores nothing.
+//
+// AND THE TEXT IT WROTE, NOT ONLY THE HASH OF IT. The hash is what the drift
+// check reads, and nobody can read a file back out of one. The private folder
+// is not in git, so a file the engine overwrote was gone for good unless some
+// later apply happened to journal that text as its own before. Two tokens were
+// lost that way, one entry holding a blank template and one holding a state an
+// apply short of what the token said.
+//
+// SO THE ENTRY IS THE WHOLE OF BOTH SIDES, and the state between two applies is
+// rebuilt from the older entry alone. It costs the size of the file again,
+// which is what a journal of an edit is for.
 type wasFile struct {
 	File    string `json:"file"`
 	Was     string `json:"was,omitempty"`
+	Made    string `json:"made,omitempty"`
 	Applied string `json:"applied"`
 	Blank   bool   `json:"did_not_exist,omitempty"`
 }
@@ -334,7 +346,7 @@ type journal struct {
 func journalUndo(r Roots, on, by string, files []string, before map[string][]byte, born map[string]bool, after map[string][]byte) (string, error) {
 	var was []wasFile
 	for _, path := range files {
-		e := wasFile{File: shortPath(r, path), Applied: hashOf(after[path])}
+		e := wasFile{File: shortPath(r, path), Made: string(after[path]), Applied: hashOf(after[path])}
 		if born[path] {
 			e.Blank = true
 		} else {
