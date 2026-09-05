@@ -724,8 +724,19 @@ func firstLines(s string, n int) string {
 // for everybody, so the general queue hands sub-tokens out before their
 // parents without a rule of its own.
 // Why a scope cannot be left is [[a-scope-cannot-be-left-while-its-tokens-are-open]].
+//
+// WHAT THE FETCHED BRANCH HAS ARCHIVED IS NOT WORK, whatever this tree's copy
+// of the note says. It comes out of the list before any walk, and the answer
+// names it. See pullbehind.go.
 func next(r Roots, actor, role string) Answer {
-	all := urgentFirst(Tokens(r))
+	all, behind, branch := offTheFetchedBranch(r, actor, urgentFirst(Tokens(r)))
+	a := nextAmong(r, actor, role, all)
+	a.Notice += behindNotice(branch, behind)
+	return a
+}
+
+// nextAmong is next over the tokens the fetched branch has not already closed.
+func nextAmong(r Roots, actor, role string, all []Token) Answer {
 	// WHO IS ASKING, AND ON WHICH BOX. Two questions and two answers. Whether
 	// this box may touch the token at all is the box's, and ClaimedHere answers
 	// it. Who is handed it first is the agent's, because a claim is an agent
