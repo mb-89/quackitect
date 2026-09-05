@@ -108,7 +108,7 @@ func TestTheMapIsBuiltByTheRealGo(t *testing.T) {
 	}
 
 	// A TEST THE DELTA REACHES RUNS, AND THE ENGINE SAYS HOW LONG IT TOOK.
-	got, err := TestTheDelta(r, db, "", []string{"TestA"}, true, "worker-one")
+	got, err := TestTheDelta(t.Context(), r, db, "", []string{"TestA"}, true, "worker-one")
 	if err != nil {
 		t.Fatal(err)
 	}
