@@ -34,6 +34,7 @@ import (
 const (
 	AnswerWork    = "work"    // here is a token: do it
 	AnswerRefused = "refused" // the submission failed a check a program could make
+	AnswerSettled = "settled" // the submission was taken and no work was handed on
 	AnswerWait    = "wait"    // nothing to do, and the notice says why
 	// The fifth. A hold nobody is behind is worth more than the next token.
 )
