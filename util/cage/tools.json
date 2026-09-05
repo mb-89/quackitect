@@ -209,9 +209,13 @@
       "name": "se_run"
     },
     {
-      "description": "MINT A WORK TOKEN: title (four words at most), detail, done_when, and tracked, which says where it is born. tracked true puts it in doc/work, which git carries, so another agent on another box can claim it. tracked false keeps it in .se/work, for small work you do yourself next. A note takes neither and is always private. Or on: \u003cid\u003e takes that token into your hands.",
+      "description": "MINT A WORK TOKEN: title (four words at most), detail, done_when, and tracked, which says where it is born. tracked true puts it in doc/work, which git carries, so another agent on another box can claim it. tracked false keeps it in .se/work, for small work you do yourself next. A note takes neither and is always private. Or on: \u003cid\u003e takes that token into your hands. Or abort: \u003cid\u003e with why ends it where it stands, and disposition became names in successors what it became.",
       "inputSchema": {
         "properties": {
+          "abort": {
+            "description": "instead of minting: end this token, by id, with why",
+            "type": "string"
+          },
           "actor": {
             "type": "string"
           },
@@ -222,6 +226,10 @@
             "type": "array"
           },
           "detail": {
+            "type": "string"
+          },
+          "disposition": {
+            "description": "with abort: how it ends, one the process declares (default: dropped)",
             "type": "string"
           },
           "done_when": {
@@ -246,11 +254,22 @@
           "proposed_action": {
             "type": "string"
           },
+          "successors": {
+            "description": "with abort and became: the ids it became",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
           "title": {
             "type": "string"
           },
           "tracked": {
             "type": "boolean"
+          },
+          "why": {
+            "description": "with abort: why it is ending. An abort with no reason is refused",
+            "type": "string"
           }
         },
         "required": [

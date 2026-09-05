@@ -130,3 +130,4 @@
 {"id":"wk-f7153c420e","title":"cloud card answers here","process":"trivial","disposition":"done","blob":"089b42fd933ebc84bf99210820253b36fe690468","tag":"refs/tags/archive/wk-f7153c420e"}
 {"id":"wk-f71a2d7e89","title":"verify jory answered-line tests","process":"trivial","disposition":"done","blob":"253ef7b3004678999ff3f98a886d1c4add53b850","on_branch":"15a40246e4accb50b55b23e4d09687b6fb65f9ca"}
 {"id":"wk-fc6b6c5aa7","title":"restart silences every guard","process":"standard","disposition":"done","blob":"bd0690b9edf02fd5eda1d51ae33b11d79175afcf","on_branch":"1613224944abb698d38468b2f36670f3e5bc4e26","tag":"refs/tags/archive/wk-fc6b6c5aa7"}
+{"id":"wk-899d2dbc6c","title":"record names the harness","process":"trivial","disposition":"done","blob":"728ad43dc0fdaeb3bca67db3b84b56dc993a7448","on_branch":"0c1fe41cc3176b284d3d94e6423cc943e17cd4ef"}
