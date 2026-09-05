@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"os"
 	"quackitect/engine/internal/frontmatter"
-	"quackitect/engine/internal/logbook"
 	"strings"
 	"time"
 )
@@ -115,8 +114,8 @@ func SyncClaims(r Roots) TheFarClaims {
 		if err != nil {
 			continue // a file the ref does not carry any more
 		}
-		front, _ := frontmatter.SplitNote(text)
-		f, err := frontmatter.ParseFront(front)
+		front, _ := frontmatter.Split(text)
+		f, err := frontmatter.Parse(front)
 		if err != nil {
 			continue // a note this build cannot read is not a claim it can honour
 		}
@@ -141,7 +140,7 @@ func saveFarClaims(r Roots, all TheFarClaims) {
 // WatchForClaims keeps the store in step on the engine's own clock, until the
 // engine stops. It is the resident engine's job because it is the one process
 // that lives long enough to have a clock.
-func WatchForClaims(r Roots, log *logbook.Log, done <-chan struct{}) {
+func WatchForClaims(r Roots, log *Log, done <-chan struct{}) {
 	every := LoadConfig(r).ClaimSyncSeconds
 	if every <= 0 {
 		return // turned off
@@ -155,7 +154,7 @@ func WatchForClaims(r Roots, log *logbook.Log, done <-chan struct{}) {
 		got := SyncClaims(r)
 		if got.Ref != "" && got.Ref != was {
 			was = got.Ref
-			log.Write("engine", "claim", "engine", "the claims other boxes published were read", logbook.Yes(),
+			log.Write("engine", "claim", "engine", "the claims other boxes published were read", Yes(),
 				map[string]any{"claims": len(got.Claims), "ref": got.Ref})
 		}
 		select {
