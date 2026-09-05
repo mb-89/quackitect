@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"os"
 	"path/filepath"
 	"strings"
@@ -88,6 +89,83 @@ func TestACloudBoxTurnsItsNotesIn(t *testing.T) {
 	if _, refuse := TooManyNotes(r, "main", "mcp__quackitect__se_apply", ""); refuse {
 		t.Errorf("a note that became a token is still counted, so turning them in never clears the hold")
 	}
+}
+
+// THE THREE ANSWERS LAND THROUGH THE DOORS THE HOLD LEAVES OPEN.
+//
+// A refusal that names an action nobody can take through the tools it leaves
+// open is a deadlock with instructions. The lane's se_work carried no
+// needs_human, and the shell form of the flag was behind the same hold, so the
+// one answer the owner's words single out, the undecidable note that must still
+// reach a person, was the one answer a held agent could not give. So each
+// answer TooManyNotes names is taken here the way a held agent takes it, with
+// the hold standing: the tool passes the guard, and the verb behind it lands.
+func TestTheThreeAnswersLandThroughTheOpenDoors(t *testing.T) {
+	r := aTreeWithTheProcesses(t)
+	aHostTable(t, r)
+	var notes []Token
+	for i := 0; i < TheNoteCeiling; i++ {
+		notes = append(notes, mintNote(t, r, "a note nobody decided"))
+	}
+	t.Setenv("CLAUDE_CODE_REMOTE", "true")
+	if _, refuse := TooManyNotes(r, "main", "mcp__quackitect__se_apply", ""); !refuse {
+		t.Fatal("this proves nothing: the hold is not standing")
+	}
+
+	// DROPPED. The abort is the drop that carries why, and it ends the note.
+	theNotesDoor(t, r, "mcp__quackitect__se_work", []string{"work", "--abort", notes[0].ID,
+		"--why", "a passing thought, and nothing rests on it", "--by", "main"})
+	dropped, err := LoadToken(r, notes[0].ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !dropped.Ended() || dropped.Disposition != Dropped {
+		t.Errorf("the note reads %s %q after the drop, and it should have ended as dropped", dropped.Status, dropped.Disposition)
+	}
+
+	// A TRACKED TOKEN, born where git carries it.
+	minted := theNotesDoor(t, r, "mcp__quackitect__se_work", []string{"work", "--title", "token from a note",
+		"--process", "trivial", "--tracked", "true", "--done-when", "the note is a token", "--by", "main"})
+	if _, err := os.Stat(filepath.Join(r.Work, "doc", "work", minted.ID+".md")); err != nil {
+		t.Errorf("the tracked token is not in doc/work: %v", err)
+	}
+	if minted.NeedsHuman {
+		t.Errorf("a token nobody flagged reads needs_human")
+	}
+
+	// AND ONE A PERSON HAS TO READ, flagged at the mint, through the lane's own
+	// argument and the shell flag it sends.
+	flagged := theNotesDoor(t, r, "mcp__quackitect__se_work", []string{"work", "--title", "one a person reads",
+		"--process", "trivial", "--tracked", "true", "--done-when", "a person has read it", "--needs-human", "--by", "main"})
+	if !flagged.NeedsHuman {
+		t.Errorf("the token minted with --needs-human does not read needs_human")
+	}
+	if again, err := LoadToken(r, flagged.ID); err != nil || !again.NeedsHuman {
+		t.Errorf("needs_human did not reach the disk: %v", err)
+	}
+}
+
+// theNotesDoor takes one action the way a held agent takes it: the tool has
+// to pass the hold, at the lane and at a shell, and then the verb behind it
+// runs. It answers the token the verb wrote.
+func theNotesDoor(t *testing.T, r Roots, tool string, argv []string) Token {
+	t.Helper()
+	shell := "./RUNME.sh " + strings.Join(argv, " ")
+	if why, refuse := TooManyNotes(r, "main", tool, ""); refuse {
+		t.Fatalf("%s is refused while the notes are held, and it is the way out:\n%s", tool, why)
+	}
+	if why, refuse := TooManyNotes(r, "main", "Bash", shell); refuse {
+		t.Fatalf("the same call at a shell is refused: %s\n%s", shell, why)
+	}
+	a := runVerbInside(t.Context(), r, verbAsk{Verb: argv[0], Args: argv[1:]})
+	if a.Code != 0 {
+		t.Fatalf("%s did not land: %s%s", shell, a.Out, a.Err)
+	}
+	var tok Token
+	if err := json.Unmarshal([]byte(a.Out), &tok); err != nil {
+		t.Fatalf("%s answered something that is not a token: %v\n%s", shell, err, a.Out)
+	}
+	return tok
 }
 
 // AND A DESK IS LEFT ALONE. Its notes are on a disk that survives the session,
