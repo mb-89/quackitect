@@ -56,7 +56,14 @@ func StaffingOf(r Roots, cfg Config) Staffing {
 	}
 	roles := loadArrivals(r).Roles
 	present := AgentsPresent(r)
+	left := namesThatLeft(r)
 	for _, a := range present {
+		// AN AGENT THAT HAS CLAIMED A STOP IS NOT A HAND. It is here in the
+		// register until the harness says otherwise, and it is doing nothing.
+		// Counting it is how a queue of a hundred looked fully staffed.
+		if a.State == Stopped {
+			continue
+		}
 		// THE MAIN AGENT IS ONE OF THE HANDS. The owner's ruling: the number is
 		// how many workers there are, counting it. At three that is the session
 		// and two spawned. It was skipped here as the one being asked to spawn
@@ -103,6 +110,23 @@ func StaffingOf(r Roots, cfg Config) Staffing {
 		if registered {
 			continue
 		}
+		// AND A HAND THAT HAS GONE HOME IS NOT ONE EITHER.
+		//
+		// This list is every actor that has pulled in the session, and nothing
+		// took one out of it again. Thirteen actors had pulled on this tree
+		// and three were here, so the count answered eight workers, wanted
+		// three, and the guard never fired while one session worked a hundred
+		// open tokens.
+		//
+		// TWO WAYS TO LEAVE, AND BOTH ARE READ. A stop claim is the sanctioned
+		// one, which the stop hook makes every agent give. The register's gone
+		// is the other, written when the harness says a subagent has ended.
+		if left[actor] {
+			continue
+		}
+		if _, stopped := StandingClaim(r, actor); stopped {
+			continue
+		}
 		switch roles[actor] {
 		case RoleWorker:
 			s.WorkersHere++
@@ -113,6 +137,34 @@ func StaffingOf(r Roots, cfg Config) Staffing {
 	s.WorkersWanted = wanted(s.OpenWork, cfg.ParallelAgents)
 	s.ReviewersWanted = wanted(s.AwaitingVerdict, cfg.ParallelAgents)
 	return s
+}
+
+// namesThatLeft is every name an agent of this run has gone under: the one the
+// register knows it by, and each name it pulled with.
+//
+// A ROW FROM ANOTHER RUN SAYS NOTHING. The register outlives the run that
+// filled it, and an agent of an earlier run is neither here nor a hand that
+// left this queue short.
+func namesThatLeft(r Roots) map[string]bool {
+	out := map[string]bool{}
+	run := TheRunNow(r)
+	if !Named(run) {
+		return out
+	}
+	aliases := TheNamesItPullsWith(r)
+	for id, a := range LoadEvidence(r).Agents {
+		if a.Run != run || a.Gone.IsZero() {
+			continue
+		}
+		out[a.Name] = true
+		for _, n := range aliases[a.Name] {
+			out[n] = true
+		}
+		for _, n := range aliases[id] {
+			out[n] = true
+		}
+	}
+	return out
 }
 
 // wanted is how many hands there is work for, and never more than the number.
