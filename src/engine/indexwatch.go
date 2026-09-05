@@ -167,13 +167,11 @@ func startIndexer(ctx context.Context, r Roots, log *Log, beat time.Duration, op
 			}
 		})
 	}
-	go func() {
-		select {
-		case <-ctx.Done():
-			shutdown()
-		case <-stopped:
-		}
-	}()
+	// The context runs the shutdown whenever it ends, and it does so even
+	// after the loop has returned of its own accord, which it does on every
+	// degraded run above. A goroutine that watched the loop as well would
+	// have left with it, and the socket would then outlive its owner.
+	context.AfterFunc(ctx, shutdown)
 	return func() {
 		shutdown()
 		<-stopped
