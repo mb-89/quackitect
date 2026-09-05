@@ -40,7 +40,7 @@ const (
 
 func TestAnUntickedLineThatIsAnsweredCloses(t *testing.T) {
 	t.Parallel()
-	r := aTreeWithAChecklist(t, t.TempDir(), doSays)
+	r := aTreeWithAChecklist(t, doSays)
 	tok := mintWithChecklist(t, r, map[string]string{
 		"step 1. ask": askTable, "step 2. do": unmetButAnswered})
 
@@ -57,7 +57,7 @@ func TestAnUntickedLineThatIsAnsweredCloses(t *testing.T) {
 
 func TestAnUnansweredLineIsRefusedAndSaysSo(t *testing.T) {
 	t.Parallel()
-	r := aTreeWithAChecklist(t, t.TempDir(), doSays)
+	r := aTreeWithAChecklist(t, doSays)
 	tok := mintWithChecklist(t, r, map[string]string{
 		"step 1. ask": askTable, "step 2. do": notLookedAt})
 

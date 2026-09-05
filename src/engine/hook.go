@@ -593,8 +593,11 @@ func answerHook(ctx context.Context, raw []byte, args []string, out io.Writer, h
 		if in.Source == "compact" || in.Source == "clear" {
 			ForgetReads(roots, in.Source)
 		}
+		// THE SURFACE IS WRITTEN WHERE THE SESSION BEGINS, because this process
+		// is the one the harness spawned for this event, and its environment is
+		// the only place that says what drove it.
 		record(log, "agent", "session", actor, "session started, "+in.Source, Yes(),
-			map[string]any{"source": in.Source, "session": in.SessionID})
+			map[string]any{"source": in.Source, "session": in.SessionID, "surface": TheSurface()})
 		// THE SESSION IS AN AGENT AND IT HAS ARRIVED. What is present is
 		// answered off this register, so a panel says who is here rather
 		// than who has pulled.
