@@ -298,6 +298,24 @@ func submit(r Roots, actor string, t Token, p Payload) (Answer, bool) {
 		t.Reason = p.Reason
 	}
 	t.Holder = ""
+	// AND THE CLAIM GOES BACK WITH THE HOLD.
+	//
+	// A SUBMISSION HANDS THE TOKEN ON, SO IT HANDS THE CLAIM BACK. The next step
+	// is worked by somebody else, and on the standard process it must be: the
+	// author is refused its own verdict a few lines above. The hold was released
+	// here and the claim was not, so a token at done stayed claimed by the actor
+	// who had finished with it, for the whole three hours a claim stands.
+	//
+	// MEASURED on 2026-09-05, working the verdict queue. Four tokens stood at
+	// done and every one was refused to the reviewer, each naming its own
+	// worker. Three were claimed on this box, so it is not the cloud push. The
+	// queue read empty while it was full, and two reviewers spent a session
+	// polling it.
+	//
+	// IT IS THE NOTE'S CLAIM THAT IS DROPPED, not a release published to git.
+	// The next actor's claim publishes in the ordinary way, and a submission
+	// that had to reach the network to finish would fail where the network does.
+	DropClaim(&t)
 	// CLOSING ENDS THE STRETCH, so the change is the diffs between began and
 	// ended, pair by pair.
 	t = closeStretch(r, t)
@@ -683,26 +701,6 @@ func next(r Roots, actor, role string) Answer {
 		}
 		if len(OpenSubTokens(r, all[i].ID)) > 0 {
 			scopes = append(scopes, all[i])
-			continue
-		}
-		// AND THE SAME GATE AS EVERYTHING ELSE. This path answered handed on the
-		// strength of the hold alone, so it never asked whether the token was an
-		// agent's to be given. A token carrying needs_human was released and the
-		// claim handed it straight back inside a minute, because the claim asks
-		// the queue and the queue read it as work already in hand.
-		//
-		// IT IS SET BACK RATHER THAN PASSED OVER. A token waiting on a person and
-		// sitting in a hand is stuck where nobody looks: the queue will not offer
-		// it and the holder cannot close it.
-		//
-		// BLOCKED IS NOT ASKED HERE, and that is deliberate. A parent with open
-		// sub-tokens is blocked for everybody, which is how the branch above
-		// recognises a scope, so asking it here would set every scope back.
-		if why := WaitsForAPerson(all[i]); why != "" {
-			// THE HOLD COMES OFF AND THE TOKEN STAYS OPEN, so a person can
-			// still close it. This branch says nothing to the agent, because
-			// this copy of the queue has nowhere yet to say it.
-			_, _ = PutDown(r, all[i].ID, actor)
 			continue
 		}
 		return handed(r, actor, all[i])
