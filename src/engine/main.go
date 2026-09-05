@@ -136,7 +136,7 @@ func main() {
 	// ONE FILE UNDER BOTH NAMES, ASKED FOR BY THE BUILD. Installing does this
 	// too, and a build by hand is the thing that took it away.
 	if *link {
-		done, err := LinkBothNames(roots.Method, []string{"se", "se-mcp", "logview"})
+		done, err := LinkEveryProgram(roots.Method)
 		if err != nil {
 			fail(err)
 		}
@@ -621,7 +621,7 @@ func main() {
 	//
 	// It cannot be fixed from here, because the fix is to install. Saying so
 	// in the record is what turns a silent difference into a visible one.
-	for _, name := range []string{"se", "se-mcp"} {
+	for _, name := range theProgramNames(roots.Method) {
 		if a, b, split := twoNames(roots.Method, name); split {
 			log.Write("engine", "error", "engine",
 				name+" is two different files, so the cage and RUNME run different builds", No(),

@@ -9,6 +9,8 @@ guidance: [[work-token]]
 title: comments in plain register
 # where the token stands. The process owns these values.
 status: open
+# what has to be true before this is worth reading again
+ready_when: "the owner says the capitals headline goes. The tree must be quiet enough that 122 files can be rewritten without colliding with work in flight. Split first: this is not one trivial token."
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - 5a75bcf1b115e6114d3335cdce79ab8788e72f7e
@@ -17,10 +19,6 @@ began:
 ## detail
 
 src/engine carries 6,871 comment lines and 1,394 of them are written in capitals for emphasis, counted with rg in September 2026. Rewrite them in the register of doc/guidance/voice.md, file by file, keeping what the comment says and dropping the argument. Add a check to util/checks that counts capitals-for-emphasis lines in Go comments and fails above zero. Watch it go red on the tree before the rewrite.
-
-## proposed action
-
-THE OWNER HAS RULED: the capitals headline goes. Rewrite the comments in the register of doc/guidance/voice.md, keeping what each says and dropping the argument, and add a check that counts capitals-for-emphasis lines in Go comments and fails above zero. Watch it red first. Split the rewrite so no single change collides with more than one lane in flight.
 
 ## done when
 

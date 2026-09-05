@@ -29,14 +29,14 @@ func TestACloudBoxTurnsItsNotesIn(t *testing.T) {
 
 	// NINETEEN NOTES ON A CLOUD BOX REFUSE NOTHING.
 	t.Setenv("CLAUDE_CODE_REMOTE", "true")
-	if why, refuse := TooManyNotes(r, "main", "mcp__quackitect__se_apply"); refuse {
+	if why, refuse := TooManyNotes(r, "main", "mcp__quackitect__se_apply", ""); refuse {
 		t.Fatalf("%d notes were refused, and the ceiling is %d:\n%s", len(notes), TheNoteCeiling, why)
 	}
 
 	// THE TWENTIETH HOLDS THE WORK, AND THE REFUSAL HANDS THE NOTES OVER.
 	last := mintNote(t, r, "the note filling it")
 	notes = append(notes, last)
-	why, refuse := TooManyNotes(r, "main", "mcp__quackitect__se_apply")
+	why, refuse := TooManyNotes(r, "main", "mcp__quackitect__se_apply", "")
 	if !refuse {
 		t.Fatalf("%d notes on a cloud box were not refused", len(notes))
 	}
@@ -54,8 +54,25 @@ func TestACloudBoxTurnsItsNotesIn(t *testing.T) {
 
 	// AND A CALL THAT IS NOT WORK GOES THROUGH, so the agent can mint the
 	// tokens the refusal asks for.
-	if _, refuse := TooManyNotes(r, "main", "mcp__quackitect__se_work"); refuse {
+	if _, refuse := TooManyNotes(r, "main", "mcp__quackitect__se_work", ""); refuse {
 		t.Errorf("the minting that answers this refusal is itself refused")
+	}
+
+	// AND SO DOES THE SAME CALL AT A SHELL. A cloud box is where a lane may be
+	// absent, and every refusal here tells such an agent to use the shell. A
+	// guard that holds Bash while asking for work verbs leaves no legal move.
+	for _, command := range []string{
+		"./RUNME.sh work --title \"a token from a note\" --tracked",
+		"./RUNME.sh work --abort wk-0000000001 --why \"nothing rests on it\"",
+		"./RUNME.sh work --set wk-0000000001 --field needs_human --to true",
+	} {
+		if _, refuse := TooManyNotes(r, "main", "Bash", command); refuse {
+			t.Errorf("the way out is refused at a shell: %s", command)
+		}
+	}
+	// THE WORK ITSELF IS STILL HELD, whichever door it comes through.
+	if _, refuse := TooManyNotes(r, "main", "Bash", "./RUNME.sh apply --on wk-x --by main --edits '[]'"); !refuse {
+		t.Errorf("an apply at a shell walked round the hold")
 	}
 
 	// A NOTE THAT BECAME A TOKEN NO LONGER COUNTS.
@@ -68,7 +85,7 @@ func TestACloudBoxTurnsItsNotesIn(t *testing.T) {
 	if err := SaveToken(r, turnedIn); err != nil {
 		t.Fatal(err)
 	}
-	if _, refuse := TooManyNotes(r, "main", "mcp__quackitect__se_apply"); refuse {
+	if _, refuse := TooManyNotes(r, "main", "mcp__quackitect__se_apply", ""); refuse {
 		t.Errorf("a note that became a token is still counted, so turning them in never clears the hold")
 	}
 }
@@ -85,7 +102,7 @@ func TestADeskKeepsItsNotes(t *testing.T) {
 	for _, v := range []string{"CLAUDE_CODE_REMOTE", "GITHUB_ACTIONS", "SE_CLOUD"} {
 		t.Setenv(v, "")
 	}
-	if why, refuse := TooManyNotes(r, "main", "mcp__quackitect__se_apply"); refuse {
+	if why, refuse := TooManyNotes(r, "main", "mcp__quackitect__se_apply", ""); refuse {
 		t.Fatalf("a desk was held over its own notes:\n%s", why)
 	}
 }

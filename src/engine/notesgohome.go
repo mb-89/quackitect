@@ -72,8 +72,17 @@ func NotesGoWithTheBox(r Roots) (string, bool) {
 // TooManyNotes answers why this call is held until the notes are tokens, and
 // whether it is. It holds the work and lets everything else through, the way
 // the staffing guard does, because minting the tokens is the way out.
-func TooManyNotes(r Roots, actor, tool string) (string, bool) {
+func TooManyNotes(r Roots, actor, tool, command string) (string, bool) {
 	if actor != "main" || !heldDuringShortfall[tool] {
+		return "", false
+	}
+	// A SHELL COMMAND THAT IS ONLY THE ENGINE IS NOT WORK, and here that matters
+	// more than anywhere. This guard fires on a cloud box, which is exactly where
+	// a lane can be missing, and every refusal this engine writes tells such an
+	// agent to make the same call at a shell. Holding Bash while demanding work
+	// verbs would leave no legal move at all, which is the deadlock the staffing
+	// guard records as having happened once already.
+	if runsTheEngine(command) && !engineWork(command) {
 		return "", false
 	}
 	host := TheHost(r.Method)

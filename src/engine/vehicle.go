@@ -395,3 +395,27 @@ func LinkBothNames(methodRoot string, names []string) ([]string, error) {
 	}
 	return done, nil
 }
+
+// theProgramNames answers every program this tree ships, by name, for the
+// doors that want the names and not where each is built from. theBuilds is the
+// one list, read from util/setup/manifest.json, and the swap door reads the
+// same call.
+//
+// MEASURED on startup. It named se, se-mcp and logview in a literal of its
+// own, which was a second copy of the manifest in code. Nothing was wrong
+// while the two agreed, and nothing held them together. A program added to the
+// manifest is built by the installer and put in place by a swap, and was then
+// left with only its suffixed name by the engine that starts.
+func theProgramNames(methodRoot string) []string {
+	var names []string
+	for _, one := range theBuilds(methodRoot) {
+		names = append(names, one.Name)
+	}
+	return names
+}
+
+// LinkEveryProgram is the link step: every program this tree ships is given its
+// plain name and its suffixed one as the same file.
+func LinkEveryProgram(methodRoot string) ([]string, error) {
+	return LinkBothNames(methodRoot, theProgramNames(methodRoot))
+}
