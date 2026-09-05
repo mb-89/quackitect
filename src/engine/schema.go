@@ -333,10 +333,9 @@ func frontLine(front, key string) int {
 func checkFront(spec FrontSpec, f frontmatter.Front, front string) []Departure {
 	var out []Departure
 	for _, key := range spec.Required {
-		// A REQUIRED FIELD MAY BE A LIST, and asking a list for its string
-		// answers nothing. Every rationale in this tree was reported as having
-		// no explains while carrying one, because explains is an array and this
-		// read it as text: a required array could not be satisfied at all.
+		// A required field is asked for by presence, never by its string, so
+		// a required list is satisfied by the list it carries. Why is
+		// [[a-required-field-is-checked-by-presence]].
 		if !frontmatter.Given(f, key) {
 			out = append(out, Departure{Line: 1,
 				Says: fmt.Sprintf("the frontmatter has no %s", key)})
@@ -424,11 +423,9 @@ func checkBody(spec BodySpec, body string, bodyLine int) []Departure {
 	at := map[string]bodyChapter{}
 	var order []string
 	for _, c := range found {
-		// A HEADING OPENED TWICE IS A DEPARTURE, NOT A REPLACEMENT. The map
-		// kept the last chapter under the name and the first was buried with
-		// nothing saying so. MEASURED on wk-963dbf6898, two approach sections
-		// in different words, and no reader could say which one the change
-		// was written against.
+		// A heading opened twice is a departure, reported at the second, and
+		// the second is left out of what the rest of this check reads. Why it
+		// is not a replacement is [[a-chapter-opened-twice-is-a-departure]].
 		if _, again := at[c.Header]; again {
 			out = append(out, Departure{Line: bodyLine + c.Line,
 				Says: fmt.Sprintf("it opens the %s chapter twice, and a reader cannot tell which one the work was written against", c.Header)})
@@ -440,10 +437,9 @@ func checkBody(spec BodySpec, body string, bodyLine int) []Departure {
 
 	var wanted []string
 	for _, sec := range spec.Sections {
-		// A SECTION MAY NAME A PREFIX RATHER THAN A HEADING. "evidence: write"
-		// and "evidence: decide" are one section of the schema and as many
-		// chapters as the process has activities, so the schema names the part
-		// that does not vary.
+		// A section naming a prefix matches every chapter whose heading starts
+		// with it, and each one is held to that section's bounds. Why the
+		// schema names a prefix is [[a-section-may-name-a-prefix]].
 		if sec.HeaderPrefix != "" {
 			for _, c := range found {
 				if strings.HasPrefix(c.Header, sec.HeaderPrefix) {
@@ -526,9 +522,8 @@ func checkExplains(spec BodySpec, at map[string]bodyChapter, bodyLine int) []Dep
 					Says: fmt.Sprintf("%q explains rule %d, and that rule carries no %q",
 						sub.Header, n, listSpec.DetailMarker)})
 			}
-			// ONE RULE, ONE CHAPTER. Two chapters numbered the same both found
-			// their star and both passed, so a rule could be argued twice and
-			// a reader had no way to know which chapter was the one.
+			// One rule, one chapter: a second chapter carrying a number already
+			// taken is a departure. See [[a-chapter-opened-twice-is-a-departure]].
 			if got[n] {
 				out = append(out, Departure{Line: line,
 					Says: fmt.Sprintf("%q explains rule %d, and another chapter already does",
@@ -793,9 +788,8 @@ func LintNotes(r Roots, dir string) []Finding {
 		if !strings.HasSuffix(e.Name(), ".md") || Parked(e.Name()) {
 			return nil
 		}
-		// THE NAME SAYS WHERE IT IS. Two files called guidance.md, one at the
-		// top and one in a lane's folder, are two findings a reader has to be
-		// able to tell apart.
+		// The finding is named by the file's path from the folder walked, so
+		// two files with one name stay apart. See [[a-finding-is-named-by-its-path]].
 		id := e.Name()
 		if rel, err := filepath.Rel(dir, path); err == nil {
 			id = filepath.ToSlash(rel)
