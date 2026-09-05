@@ -20,8 +20,15 @@
 // lane says the same thing under its own name. The record verbs' actor, because
 // the lane speaks as itself and the engine names it. A flag whose own help opens
 // "instead of minting", because that is a door of its own the lane never
-// claimed, and its companions, whose help opens "with <that door>:". A gap in
-// any of those is a token rather than a red battery.
+// claimed, and its companions, whose help opens "with <that door>:". state's
+// --json, because a lane call is answered with the structure whatever it says.
+// A gap in any of those is a token rather than a red battery.
+//
+// AND IT HOLDS BOTH WAYS NOW. A verb found its tool by name alone, so a tool
+// named unlike its verb fell out of the check in silence: se_status wraps state,
+// and state's flags were held to nothing at all. So the tools that wrap a verb
+// under another name are named here, and every advertised tool has to name a
+// verb, with the one that runs none named too.
 //
 //   node util/checks/lane-carries-every-flag.mjs <root>
 import { existsSync, readdirSync, readFileSync } from "node:fs";
@@ -49,6 +56,17 @@ const renamed = {
 // THE LANE SPEAKS AS ITSELF on the record verbs, so actor is the engine's to
 // fill in and not a field a caller sends.
 const speaksAsItself = new Set(["se_said", "se_answer"]);
+// THE TOOLS THAT WRAP A VERB UNDER ANOTHER NAME. Everything else finds its verb
+// by name, and a tool missing from here whose name matches no verb is a FAIL
+// rather than a silence.
+const wraps = { se_status: "state" };
+// THE ONE TOOL THAT RUNS NO VERB. se_start brings the engine up, which is the
+// thing a caller cannot ask a running engine to do for itself.
+const runsNoVerb = new Set(["se_start"]);
+// WHAT THE LANE ANSWERS WHATEVER THE CALLER SAYS. state's --json chooses the
+// structure over the screen, and the lane is always answered the structure, so
+// there is no field for a caller to send.
+const alwaysAnswered = { se_status: new Set(["json"]) };
 
 const listPath = join(root, "util", "cage", "tools.json");
 if (!existsSync(listPath)) {
@@ -101,14 +119,19 @@ function ownDoors(flags) {
 }
 
 let asked = 0;
+const toolOf = new Map(Object.entries(wraps).map(([tool, verb]) => [verb, tool]));
 for (const [verb, flags] of flagsOf) {
-  const tool = "se_" + verb;
+  const tool = toolOf.get(verb) ?? "se_" + verb;
   if (!tools.has(tool)) continue; // a verb the lane does not wrap is not its business
   const fields = tools.get(tool);
   const own = ownDoors(flags);
   for (const { flag } of flags) {
     if (shells.has(flag) || own.has(flag)) continue;
     if (speaksAsItself.has(tool) && (flag === "actor" || flag === "by")) continue;
+    if ((alwaysAnswered[tool] ?? new Set()).has(flag)) {
+      say(tool + " is answered the structure, so " + verb + " --" + flag + " is not its to send", true, "");
+      continue;
+    }
     const field = ((renamed[tool] ?? {})[flag] ?? renamed["*"][flag] ?? flag).replace(/-/g, "_");
     asked++;
     say(tool + " can say --" + flag, fields.has(field),
@@ -120,6 +143,21 @@ for (const [verb, flags] of flagsOf) {
 }
 say("flags were held to their tools (" + asked + ")", asked > 0,
   "no verb the lane wraps declares a flag, so this check decided nothing");
+
+// AND EVERY TOOL NAMES A VERB. This is the same drift from the other side: a
+// tool the map does not name and whose name matches no verb was held to nothing,
+// and said so to nobody.
+for (const tool of tools.keys()) {
+  if (runsNoVerb.has(tool)) {
+    say(tool + " runs no engine verb, and that is what it is for", true, "");
+    continue;
+  }
+  const verb = wraps[tool] ?? tool.replace(/^se_/, "");
+  say(tool + " names the " + verb + " verb", flagsOf.has(verb),
+    tool + " names no verb the engine declares, so nothing holds its fields to any " +
+    "flags and the gap is silent. Name the verb it wraps in wraps, or say in " +
+    "runsNoVerb why it runs none");
+}
 
 console.log("\n" + bad + " failed.");
 process.exit(bad ? 1 : 0);

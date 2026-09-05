@@ -825,6 +825,13 @@ func shellsBesideGit(r Roots) []string {
 // handed, because the client reaches the engine that is up and nothing else
 // can answer over that folder. So the age is said rather than hidden, and a
 // failure reads as the engine's age first and the change's second.
+//
+// THE SWAP IT NAMES HAS TO BUILD. It named se --swap --built, and --built is
+// the one flag that cannot cure what the sentence has just diagnosed: it hands
+// over to the program already in .bin, which is the build being called stale.
+// A reader following it either swapped to the same old binary, or was refused
+// for handing over to the build already running, and either way was told the
+// cure had been applied. A plain swap builds from the tree first.
 func checkEngineNote(r Roots, handed string) string {
 	note := "handed " + handed
 	if why := residentStale(r); why != "" {

@@ -77,7 +77,9 @@ var theLane = []laneTool{
 			"and tracked, which says where it is born. tracked true puts it in doc/work, " +
 			"which git carries, so another agent on another box can claim it. tracked false " +
 			"keeps it in .se/work, for small work you do yourself next. A note takes neither " +
-			"and is always private. Or on: <id> takes that token into your hands.",
+			"and is always private. Or on: <id> takes that token into your hands. Or " +
+			"abort: <id> with why ends it where it stands, and disposition became names " +
+			"in successors what it became.",
 		takes: workArgs{},
 	},
 	{
@@ -238,6 +240,15 @@ type workArgs struct {
 	NeedsHuman     bool     `json:"needs_human" says:"true when the answer is not yours: your best attempt, and a person reads it first"`
 	On             string   `json:"on"`
 	Actor          string   `json:"actor"`
+
+	// ENDING A TOKEN FROM WHEREVER IT STANDS, which is a door of its own and
+	// was the shell's alone. The engine grew an abort that can end a token as
+	// became, and the lane could not say what a became names, so an agent here
+	// could only record a split as work nobody wanted.
+	Abort       string   `json:"abort" says:"instead of minting: end this token, by id, with why"`
+	Why         string   `json:"why" says:"with abort: why it is ending. An abort with no reason is refused"`
+	Disposition string   `json:"disposition" says:"with abort: how it ends, one the process declares (default: dropped)"`
+	Successors  []string `json:"successors" says:"with abort and became: the ids it became"`
 }
 
 // statusArgs is what se_status takes, which is nothing.
@@ -315,7 +326,30 @@ func mintWork(r roots, a workArgs) string {
 	if a.On != "" {
 		return engineCall(r, []string{"work", "--on", a.On, "--by", orMain(a.Actor)}, nil)
 	}
+	// AND ENDING ONE GOES THROUGH IT TOO, for the same reason.
+	if a.Abort != "" {
+		return engineCall(r, abortArgv(a), nil)
+	}
 	return engineCall(r, workArgv(a), nil)
+}
+
+// abortArgv is the verb call se_work makes to end a token.
+//
+// IT IS ITS OWN FUNCTION SO A TEST CAN READ THE CALL, the way workArgv is. A
+// door that offers a field the call behind it drops is the half with no output,
+// and successors is the field where that costs the record: an abort that
+// silently dropped them would write became with nothing to follow.
+func abortArgv(a workArgs) []string {
+	argv := []string{"work", "--abort", a.Abort, "--by", orMain(a.Actor)}
+	for _, pair := range [][2]string{{"--why", a.Why}, {"--disposition", a.Disposition}} {
+		if pair[1] != "" {
+			argv = append(argv, pair[0], pair[1])
+		}
+	}
+	if said := saidOnly(a.Successors); len(said) > 0 {
+		argv = append(argv, "--successors", strings.Join(said, ","))
+	}
+	return argv
 }
 
 // workArgv is the verb call se_work makes.

@@ -6,25 +6,19 @@ process: [[trivial]]
 # the rules for filling this token
 guidance: [[work-token]]
 # the name this token is known by, in references and in links
-title: record names the harness
+title: shared tree reads stale
 # where the token stands. The process owns these values.
 status: open
-# the tree each time the work was taken up, snapshots the engine wrote
-began:
-  - b5cf5b3f8dd0ab588f7b59c31142ec89564e45fd
 ---
 
 ## detail
 
-No record line says which harness posted the event. The hook spike on wk-218e541ec2 had to attribute every line by matching its timestamp against the entrypoint field in the harness's own transcript files under the user's home folder, which a cloud box does not have and which nothing in the tree keeps. So the one question the record cannot answer about itself is which surface a session was driven from.
-
-## proposed action
-
-Write the surface on the session line at SessionStart, read from whatever the event carries, so the record answers it without a second source.
+The working tree several agents share falls behind the branch and nothing brings it forward, so every agent reads stale source and some of them redo work that is already landed. Measured here at 20:40. The tree stood 134 commits behind origin/v4 with two of its own unpushed. Each agent commits from the shared tree and pushes through a detached worktree, so pushes land while the shared checkout never advances. THE COST, MEASURED. I took wk-89847112fe, read tests.go in the shared tree, found no fallback for a snapshot this box never had, wrote theSnapshotHere with its test, and only found on the push that another agent had landed theSnapshotToDiff, the same function, earlier. One token's work duplicated because the tree I read was behind. A fast-forward is refused: untracked files collide, one of them carrying a live claim written minutes before, and the tree diverges as soon as another agent commits. So bringing it forward needs a door that keeps live claims and in-flight files, not a merge somebody runs by hand.
 
 ## done when
 
-- a session line in .se/log carries the surface it was started from, and se find over that log names it
+- an agent reading the shared tree can tell it is behind: a pull answers how far behind origin the working tree stands
+- the number is measured rather than assumed, decided by a test over that answer with a tree set two commits behind
 
 ## evidence: step 1. ask
 
