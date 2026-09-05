@@ -9,6 +9,8 @@ guidance: [[work-token]]
 title: four tests pass eight
 # where the token stands. The process owns these values.
 status: open
+claimed_by: 547b9365/worker-fir
+claimed_at: "2026-09-05T17:06:34Z"
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - a9fd0bfc8389eb0b6c1196a85999c706eba3768c
