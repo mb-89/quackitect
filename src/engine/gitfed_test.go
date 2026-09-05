@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"os"
 	"strings"
 	"sync"
 	"testing"
@@ -336,5 +337,120 @@ func TestARefusedFetchCarriesGitsReason(t *testing.T) {
 	got := SyncClaims(t.Context(), r)
 	if !strings.Contains(got.Says, "non-fast-forward") {
 		t.Errorf("the refusal does not carry git's reason: %q", got.Says)
+	}
+}
+
+// A REF THIS BOX WROTE AND COULD NOT PUSH STILL HOLDS WHAT IT WROTE.
+//
+// Publish moves refs/se/claims to the remote's head when the push loses, and
+// writes this call's claim again on top. What the local ref held that the
+// remote does not is then gone: writeTheClaims carries forward the parent's
+// claims, and the new parent is the remote's. On a box whose push is refused
+// every time, that is every claim but the last.
+//
+// THE DAMAGE LANDS WHEN THE PUSH WORKS AGAIN. The other boxes are handed one
+// claim where thirty are live, and take work this box is already on.
+//
+// A REF OF ITS OWN, FED BY HAND. The fake here is a ref and the blobs behind
+// it, so what the second publish writes can be read back the way git would
+// read it, rather than guessed from the calls.
+type fedRef struct {
+	t       *testing.T
+	commits map[string]string // commit -> the claims file it carries
+	staged  string            // the text staged for the next tree
+	refs    map[string]string
+	made    int
+	last    string // the claims file most recently written
+}
+
+func (f *fedRef) run(_ context.Context, r Roots, index string, args ...string) (string, error) {
+	switch args[0] {
+	case "hash-object":
+		b, err := os.ReadFile(args[len(args)-1])
+		if err != nil {
+			return "", err
+		}
+		f.made++
+		blob := fmt.Sprintf("blob%d", f.made)
+		f.commits[blob] = string(b)
+		f.last = string(b)
+		return blob, nil
+	case "update-index":
+		last := args[len(args)-1] // 100644,<blob>,<path>
+		parts := strings.Split(last, ",")
+		if len(parts) == 3 {
+			f.staged = f.commits[parts[1]]
+		}
+		return "", nil
+	case "write-tree":
+		f.made++
+		tree := fmt.Sprintf("tree%d", f.made)
+		f.commits[tree] = f.staged
+		return tree, nil
+	case "commit-tree":
+		f.made++
+		commit := fmt.Sprintf("commit%d", f.made)
+		f.commits[commit] = f.commits[args[1]]
+		return commit, nil
+	case "update-ref":
+		f.refs[args[1]] = args[2]
+		return "", nil
+	case "rev-parse":
+		return f.refs[args[len(args)-1]], nil
+	case "show":
+		at := args[1]
+		if i := strings.Index(at, ":"); i >= 0 {
+			at = at[:i]
+		}
+		// A REF NAMES A COMMIT, the way it does at a real prompt, so a reader
+		// asking for refs/se/claims gets what the ref points at.
+		if commit, ok := f.refs[at]; ok {
+			at = commit
+		}
+		text, ok := f.commits[at]
+		if !ok {
+			return "", fmt.Errorf("git show: %s is not here", args[1])
+		}
+		return text, nil
+	case "push":
+		return "", fmt.Errorf("git push: rejected: this box may not write that ref")
+	case "fetch":
+		return "", nil
+	}
+	return "", nil
+}
+
+func TestAPushThatNeverLandsKeepsEveryClaimThisBoxWrote(t *testing.T) {
+	r := aTreeWithTheProcesses(t)
+	// THE REMOTE HAS CLAIMS OF ITS OWN AND NONE OF THIS BOX'S, which is what
+	// makes the move to its head a loss rather than a no-op.
+	fed := &fedRef{t: t, commits: map[string]string{"cafe1234": ""},
+		refs: map[string]string{remoteClaimsRef: "cafe1234"}}
+	was := gitRuns
+	gitRuns = fed.run
+	t.Cleanup(func() { gitRuns = was })
+
+	first := mintUnclaimed(t, r, "the first claim")
+	second := mintUnclaimed(t, r, "the second claim")
+	now := time.Now().UTC()
+	for _, id := range []string{first.ID, second.ID} {
+		if _, err := Claim(r, Claimant(r, "worker-one"), []string{id}, now); err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	if got := Publish(t.Context(), r, []string{"doc/work/" + first.ID + ".md"}, "the first"); got.Pushed {
+		t.Fatal("the push was meant to be refused, and this test is about what happens then")
+	}
+	if !strings.Contains(fed.last, first.ID) {
+		t.Fatalf("the first claim never reached the ref: %q", fed.last)
+	}
+	Publish(t.Context(), r, []string{"doc/work/" + second.ID + ".md"}, "the second")
+
+	for _, id := range []string{first.ID, second.ID} {
+		if !strings.Contains(fed.last, id) {
+			t.Errorf("the ref no longer holds %s, so a box whose push is refused publishes one claim "+
+				"where two are live:\n%s", id, fed.last)
+		}
 	}
 }
