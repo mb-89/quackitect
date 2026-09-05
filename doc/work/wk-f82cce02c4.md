@@ -9,6 +9,10 @@ guidance: [[work-token]]
 title: four notes claim deletion
 # where the token stands. The process owns these values.
 status: open
+claimed_by: aeaf7bd9/main
+claimed_at: "2026-09-05T20:12:54Z"
+# what has to be true before this is worth reading again
+ready_when: on a desk, where dev_guide is on disk. It is gitignored and in no commit, so no cloud clone can reach it
 ---
 
 ## detail
