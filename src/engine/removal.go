@@ -231,32 +231,47 @@ func ARemovalWithoutARead(r Roots, actor, command, work string) (string, bool) {
 // ALoopThatRemoves answers whether this command runs a remover inside a loop,
 // which is refused whatever it names.
 //
+// INSIDE THE LOOP IS THE WHOLE OF IT. The rule armed on a loop anywhere and
+// a removal anywhere, so a loop followed by a named removal was refused with
+// a notice saying the removal was in the loop, which it was not, and offering
+// a remedy that command had already followed. The body is what is walked now:
+// from the do or brace that opens it to the done or brace that closes it.
+//
 // OUTSIDE THE TREE THE DISK IS THE AGENT'S OWN, the same line ARemovalWithoutARead
 // draws through anyInside. A remover whose files are all outside the work tree is
 // not this rule's business, so it does not arm the loop. A remover naming no files
 // at all still does, because that is the shape this rule was written for: the files
 // come out of the loop's own output, a round at a time.
 func ALoopThatRemoves(command, work string) (string, bool) {
-	loop, deletes := false, ""
+	sawLoop, depth := false, 0
 	for _, part := range pipeline(command) {
 		words := strings.Fields(part)
 		if len(words) == 0 {
 			continue
 		}
 		if loopWord(words[0]) {
-			loop = true
+			sawLoop = true
 		}
-		if deletes == "" {
-			if at := removerAt(words); at >= 0 {
-				files := filesAmong(words[at+1:])
-				if len(files) == 0 || anyInside(files, work) {
-					deletes = strings.Trim(words[at], "'\"")
-				}
+		switch strings.ToLower(strings.Trim(words[0], "'\"")) {
+		case "done", "}":
+			if depth > 0 {
+				depth--
+			}
+			continue
+		case "do", "{":
+			if sawLoop {
+				depth++
 			}
 		}
-	}
-	if loop && deletes != "" {
-		return aLoopThatDeletes(deletes), true
+		if depth == 0 {
+			continue
+		}
+		if at := removerAt(words); at >= 0 {
+			files := filesAmong(words[at+1:])
+			if len(files) == 0 || anyInside(files, work) {
+				return aLoopThatDeletes(strings.Trim(words[at], "'\"")), true
+			}
+		}
 	}
 	return "", false
 }
