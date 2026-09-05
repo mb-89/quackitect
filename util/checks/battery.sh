@@ -203,7 +203,7 @@ stamp="$(git rev-parse --short HEAD 2>/dev/null || echo nogit).$(date +%H%M%S)"
 build() {
   # -gcflags=-e LIFTS THE ERROR CAP. The type checker stops after a batch by
   # default, so a sweep of undefined symbols came back one round at a time.
-  go build -C src/engine -gcflags=-e -ldflags "-X main.Build=$stamp" -o ../../.bin/se.next.exe . || return 1
+  go build -C src/engine -gcflags=-e -ldflags "-X quackitect/engine/internal/version.Build=$stamp" -o ../../.bin/se.next.exe . || return 1
   # A REPLACED PROGRAM GOES WHERE EVERY REPLACED PROGRAM GOES. .bin holds what
   # this tree ships and .bin/was holds what it used to, and the engine sweeps
   # that folder at every start: one that will not delete is one a process is
@@ -390,7 +390,7 @@ start "se lint" .bin/se.exe lint
 # holding five of the twelve and it answered all ok, exit 0, having said nothing
 # about the seven it did not run. Any sweep, or any accidental deletion, shrinks
 # the battery in silence while every submission goes on citing a green run.
-for c in render-check drive-editor drawn-classes-have-rules panel-draws-the-register engine-args engine-args-lifecycle engine-spawns liveness one-look panel-icons no-loose-glyphs no-loose-spawns no-lone-escape checks-live-in-the-method engine-spawns-catches panel-is-handed-the-state panel-says-holding drive-panel burndown burndown-derives-nothing tests-name-no-token tests-are-not-hotspots mcp-tools lane-answers-cold the-cards-reach-their-box the-travelling-cage-cannot-block scripts-are-lf build-reports-every-error binaries-live-in-bin private-files-have-writers no-private-links refusals-name-a-door engine-stops-by-pid windows-say-they-are-here projections-carry-chapters; do
+for c in render-check drive-editor drawn-classes-have-rules panel-draws-the-register adapter-decides-no-column engine-args engine-args-lifecycle engine-spawns liveness one-look panel-icons no-loose-glyphs no-loose-spawns no-lone-escape checks-live-in-the-method engine-spawns-catches panel-is-handed-the-state panel-says-holding drive-panel burndown burndown-derives-nothing tests-name-no-token tests-are-not-hotspots mcp-tools lane-answers-cold the-cards-reach-their-box the-travelling-cage-cannot-block scripts-are-lf build-reports-every-error binaries-live-in-bin private-files-have-writers no-private-links refusals-name-a-door a-refusal-names-a-legal-move engine-stops-by-pid windows-say-they-are-here projections-carry-chapters; do
   if [ -f "util/checks/$c.mjs" ]; then
     start "$c" node "util/checks/$c.mjs" "$root"
   else

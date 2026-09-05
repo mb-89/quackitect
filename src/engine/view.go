@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"quackitect/engine/internal/yaml"
 	"sort"
 	"strconv"
 	"strings"
@@ -120,11 +121,11 @@ func LoadBase(path string) (Base, error) {
 	if err != nil {
 		return b, err
 	}
-	tree, err := ParseYAML(string(text))
+	tree, err := yaml.Parse(string(text))
 	if err != nil {
 		return b, fmt.Errorf("%s: %w", filepath.Base(path), err)
 	}
-	top := ymap(tree)
+	top := yaml.Map(tree)
 	for key := range top {
 		switch key {
 		case "properties", "views", "filters", "groups", "pinned":
@@ -134,12 +135,12 @@ func LoadBase(path string) (Base, error) {
 				filepath.Base(path), key)
 		}
 	}
-	for name, cfg := range ymap(top["properties"]) {
-		m := ymap(cfg)
-		if d := ystr(m["displayName"]); d != "" {
+	for name, cfg := range yaml.Map(top["properties"]) {
+		m := yaml.Map(cfg)
+		if d := yaml.Str(m["displayName"]); d != "" {
 			b.Display[name] = d
 		}
-		b.Opens[name] = ystr(m["opensNote"]) == "true"
+		b.Opens[name] = yaml.Str(m["opensNote"]) == "true"
 	}
 	if b.Filter, err = filterOf(top["filters"]); err != nil {
 		return b, fmt.Errorf("%s: %w", filepath.Base(path), err)
@@ -157,8 +158,8 @@ func LoadBase(path string) (Base, error) {
 		"groups": top["groups"], "pinned": top["pinned"]}); err != nil {
 		return b, fmt.Errorf("%s: %w", filepath.Base(path), err)
 	}
-	for _, raw := range ylist(top["views"]) {
-		m := ymap(raw)
+	for _, raw := range yaml.List(top["views"]) {
+		m := yaml.Map(raw)
 		// A VIEW INHERITS EACH LIST ON ITS OWN. Taking both together wiped a
 		// view's own pins when it declared pins and no groups, which is what an
 		// ad-hoc pin on a group the data made looks like.
@@ -187,20 +188,20 @@ func LoadBase(path string) (Base, error) {
 var InheritedKeys = []string{"groups", "pinned"}
 
 func readView(m map[string]any) (View, error) {
-	v := View{Name: ystr(m["name"]), Type: ystr(m["type"]), Widths: map[string]int{}}
+	v := View{Name: yaml.Str(m["name"]), Type: yaml.Str(m["type"]), Widths: map[string]int{}}
 	if v.Type == "" {
 		v.Type = "table"
 	}
 	if v.Type != "table" {
 		return v, fmt.Errorf("view %q is a %s. This program draws a table", v.Name, v.Type)
 	}
-	v.Order = ystrs(m["order"])
-	v.Collapsed = ystrs(m["collapsed"])
-	if s := ystr(m["limit"]); s != "" {
+	v.Order = yaml.Strs(m["order"])
+	v.Collapsed = yaml.Strs(m["collapsed"])
+	if s := yaml.Str(m["limit"]); s != "" {
 		v.Limit, _ = strconv.Atoi(s)
 	}
-	for name, w := range ymap(m["columnSize"]) {
-		n, _ := strconv.Atoi(ystr(w))
+	for name, w := range yaml.Map(m["columnSize"]) {
+		n, _ := strconv.Atoi(yaml.Str(w))
 		v.Widths[name] = n
 	}
 	var err error
@@ -210,29 +211,29 @@ func readView(m map[string]any) (View, error) {
 	}
 	// groupBy takes a list, and each level subdivides the one above it. A
 	// single object parses too, because that is what Obsidian writes.
-	for _, raw := range ylist(m["groupBy"]) {
-		g := ymap(raw)
-		text := ystr(g["property"])
+	for _, raw := range yaml.List(m["groupBy"]) {
+		g := yaml.Map(raw)
+		text := yaml.Str(g["property"])
 		e, err := Parse(text)
 		if err != nil {
 			return v, fmt.Errorf("groupBy: %w", err)
 		}
-		v.Group = append(v.Group, Level{By: e, Text: text, Sets: ystr(g["sets"]),
-			Descending: strings.EqualFold(ystr(g["direction"]), "DESC")})
+		v.Group = append(v.Group, Level{By: e, Text: text, Sets: yaml.Str(g["sets"]),
+			Descending: strings.EqualFold(yaml.Str(g["direction"]), "DESC")})
 	}
-	for _, raw := range ylist(m["sort"]) {
-		s := ymap(raw)
-		v.Sort = append(v.Sort, Sort{Property: ystr(s["property"]),
-			Descending: strings.EqualFold(ystr(s["direction"]), "DESC")})
+	for _, raw := range yaml.List(m["sort"]) {
+		s := yaml.Map(raw)
+		v.Sort = append(v.Sort, Sort{Property: yaml.Str(s["property"]),
+			Descending: strings.EqualFold(yaml.Str(s["direction"]), "DESC")})
 	}
-	for _, raw := range ylist(m["counts"]) {
-		c := ymap(raw)
-		e, err := Parse(ystr(c["filter"]))
+	for _, raw := range yaml.List(m["counts"]) {
+		c := yaml.Map(raw)
+		e, err := Parse(yaml.Str(c["filter"]))
 		if err != nil {
-			return v, fmt.Errorf("count %q: %w", ystr(c["name"]), err)
+			return v, fmt.Errorf("count %q: %w", yaml.Str(c["name"]), err)
 		}
-		count := Count{Name: ystr(c["name"]), Filter: e}
-		if of := ystr(c["outOf"]); of != "" {
+		count := Count{Name: yaml.Str(c["name"]), Filter: e}
+		if of := yaml.Str(c["outOf"]); of != "" {
 			whole, err := Parse(of)
 			if err != nil {
 				return v, fmt.Errorf("count %q outOf: %w", count.Name, err)
@@ -241,16 +242,16 @@ func readView(m map[string]any) (View, error) {
 		}
 		v.Counts = append(v.Counts, count)
 	}
-	for _, raw := range ylist(m["groups"]) {
-		p := ymap(raw)
-		e, err := Parse(ystr(p["filter"]))
+	for _, raw := range yaml.List(m["groups"]) {
+		p := yaml.Map(raw)
+		e, err := Parse(yaml.Str(p["filter"]))
 		if err != nil {
-			return v, fmt.Errorf("group %q: %w", ystr(p["name"]), err)
+			return v, fmt.Errorf("group %q: %w", yaml.Str(p["name"]), err)
 		}
-		v.Groups = append(v.Groups, Pin{Name: ystr(p["name"]), Filter: e})
+		v.Groups = append(v.Groups, Pin{Name: yaml.Str(p["name"]), Filter: e})
 	}
-	for _, raw := range ylist(m["pinned"]) {
-		if name := ystr(raw); name != "" {
+	for _, raw := range yaml.List(m["pinned"]) {
+		if name := yaml.Str(raw); name != "" {
 			// A NAME PINS A DECLARED GROUP. Naming one that is not declared
 			// would pin something with no filter, which draws nothing forever.
 			found := false
@@ -263,12 +264,12 @@ func readView(m map[string]any) (View, error) {
 			v.Pinned = append(v.Pinned, Pin{Name: name})
 			continue
 		}
-		p := ymap(raw)
-		e, err := Parse(ystr(p["filter"]))
+		p := yaml.Map(raw)
+		e, err := Parse(yaml.Str(p["filter"]))
 		if err != nil {
-			return v, fmt.Errorf("pinned %q: %w", ystr(p["name"]), err)
+			return v, fmt.Errorf("pinned %q: %w", yaml.Str(p["name"]), err)
 		}
-		v.Pinned = append(v.Pinned, Pin{Name: ystr(p["name"]), Filter: e})
+		v.Pinned = append(v.Pinned, Pin{Name: yaml.Str(p["name"]), Filter: e})
 	}
 	for key := range m {
 		switch key {
@@ -301,11 +302,11 @@ func filterOf(raw any) (*Expr, error) {
 			var err error
 			switch key {
 			case "and":
-				e, err = joined("&&", ylist(v))
+				e, err = joined("&&", yaml.List(v))
 			case "or":
-				e, err = joined("||", ylist(v))
+				e, err = joined("||", yaml.List(v))
 			case "not":
-				inner, ierr := joined("&&", ylist(v))
+				inner, ierr := joined("&&", yaml.List(v))
 				e, err = &Expr{op: "!", args: []*Expr{inner}}, ierr
 			default:
 				return nil, fmt.Errorf("a filter group is and, or, or not. It is not %q", key)
@@ -479,10 +480,15 @@ type Table struct {
 	Heads   map[string]string `json:"heads"`
 	Widths  map[string]int    `json:"widths,omitempty"`
 	Opens   map[string]bool   `json:"opens,omitempty"`
-	Pinned  []Group           `json:"pinned,omitempty"`
-	Groups  []Group           `json:"groups"`
-	Counts  []Tally           `json:"counts,omitempty"`
-	Total   int               `json:"total"`
+	// A CELL THE ENGINE WILL NOT LET A PERSON TYPE OVER SAYS SO, AND WHY. The
+	// mirror of opens: opens says a cell is a door, locked says a cell is not an
+	// edit. The editor kept a list of its own that copied these refusals, so a
+	// property renamed here left it offering an edit the engine refused.
+	Locked map[string]string `json:"locked,omitempty"`
+	Pinned []Group           `json:"pinned,omitempty"`
+	Groups []Group           `json:"groups"`
+	Counts []Tally           `json:"counts,omitempty"`
+	Total  int               `json:"total"`
 
 	// WHAT THE TOOLBAR OPERATES ON. The properties a column list ticks, the
 	// levels a sort list shows, and the file itself, because the query is the
@@ -682,6 +688,16 @@ func Render(b Base, v View, rows []Row) (Table, error) {
 		t.Sorted = append(t.Sorted, LevelSaid{Property: sr.Property, Direction: dirOf(sr.Descending)})
 	}
 	t.Props = propertyInventory(kept, t.Columns)
+	// THE RULING ON AN EDIT IS MADE ONCE, in refusedByHand, and the answer
+	// carries it per column. A person is who types in the editor.
+	for _, c := range t.Columns {
+		if why := refusedByHand(c, "person"); why != "" {
+			if t.Locked == nil {
+				t.Locked = map[string]string{}
+			}
+			t.Locked[c] = why
+		}
+	}
 	t.Filters = FilterGroups(v.RawFilter)
 	t.Operators = Operators
 

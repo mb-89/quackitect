@@ -125,7 +125,8 @@
           "columns": [
             {
               "field": "actor",
-              "title": "agent"
+              "title": "agent",
+              "width": "34%"
             },
             {
               "field": "title",

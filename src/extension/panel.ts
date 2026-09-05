@@ -54,7 +54,10 @@ export type Node = {
   // A column shows a field. With link it is a link that opens the token the
   // row's link field names, and with empty it shows that field instead when
   // its own is blank, so a row holding nothing still says so.
-  columns?: Array<{ field: string; title: string; link?: string; empty?: string }>;
+  // With width it is as wide as the declaration says, in the units it says,
+  // and the last column takes what is left. A width is the declaration's to
+  // decide, the way the columns are, so none is written into this file.
+  columns?: Array<{ field: string; title: string; link?: string; empty?: string; width?: string }>;
 };
 
 const COLUMNS = 5;
@@ -361,10 +364,11 @@ function css(): string {
                white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .control input[type=number], .control input[type=text], .control select { width: 100%; }
   /* A TABLE TAKES THE WHOLE ROW, and a narrow sidebar is what it has to fit
-     in: the holding column is the long one and it is the one that ellipses. */
+     in: the holding column is the long one and it is the one that ellipses.
+     A column's width is on the cell, from the declaration, and no rule here
+     names a column. */
   .table { grid-column: 1 / -1; overflow: hidden; }
   .table table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-  .table th.actor, .table td.actor { width: 34%; }
   .table th { text-align: left; font-weight: normal; padding: 2px 4px 2px 0;
               color: var(--vscode-descriptionForeground); font-size: .9em;
               border-bottom: 1px solid var(--vscode-panel-border); }
@@ -570,7 +574,8 @@ function tableBody(n: Node, doing: Happening): string {
     return `<div class="empty">no list called ${esc(n.source ?? "")}</div>`;
   }
   const cols = n.columns ?? [];
-  const head = cols.map((c) => `<th class="${esc(c.field)}">${esc(c.title)}</th>`).join("");
+  const wide = (c: { width?: string }) => (c.width ? ` style="width:${esc(c.width)}"` : "");
+  const head = cols.map((c) => `<th class="${esc(c.field)}"${wide(c)}>${esc(c.title)}</th>`).join("");
   const body = rows.map((r) => {
     const cells = cols.map((c) => {
       const row = r as unknown as Record<string, unknown>;
@@ -581,7 +586,7 @@ function tableBody(n: Node, doing: Happening): string {
       const shown = id && text(row[c.field])
         ? `<a href="#" class="open" data-id="${esc(id)}" title="${esc(id)}">${esc(value)}</a>`
         : esc(value);
-      return `<td class="${esc(c.field)}">${shown}</td>`;
+      return `<td class="${esc(c.field)}"${wide(c)}>${shown}</td>`;
     }).join("");
     return `<tr data-state="${esc(r.state ?? "")}" data-actor="${esc(r.actor ?? "")}">${cells}</tr>`;
   }).join("");

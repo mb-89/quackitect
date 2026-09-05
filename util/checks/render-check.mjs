@@ -210,7 +210,6 @@ const want = [
   ["the counter never shrinks or is cut off", /\.bd \{[^}]*flex: 0 0 auto/],
   ["the split button keeps its size too", /\.bar \.second \{[^}]*flex: 0 0 auto/],
   ["and the tabs are what give way", /\.bar \.tab \{[^}]*min-width: 0/],
-  ["an editable cell", /class="edits"[^>]*data-was=/],
   // THE TEXT IS THE DOOR, AND ONLY THE TEXT. A cell that was a door edge to
   // edge left no way to tick a row.
   // The indent and the fold sit between the cell and the words, so the pattern
@@ -225,7 +224,9 @@ const want = [
   ["a button to group them", /class="bs-tool bs-make-bucket" hidden/],
   ["a button to rename it", /class="bs-tool bs-rename" hidden/],
   ["a field to type the name in", /class="bs-rename-field" type="text" hidden/],
-  ["a locked cell says why", /class="locked"[^>]*title="a pull moves this/],
+  // THE WORDS ARE THE ENGINE'S, off the pane answer, so the check asks for a
+  // reason and not for a sentence this file would have to keep in step.
+  ["a locked cell says why", /class="locked"[^>]*title="[^"]+"/],
   // THE RULE, NOT A COLUMN NAME. This named assignee, so it went red the day
   // the owner ticked a fourth property and assignee stopped being last. What
   // it means is that whichever column is last carries no width, so the table
@@ -389,6 +390,20 @@ if (empties.groups) {
     if (!held) bad++;
     console.log((held ? "ok  " : "FAIL") + "  editor: " + says);
   }
+}
+// AN EDITABLE CELL IS DRAWN WHERE THE ANSWER LOCKS NOTHING. The live work view
+// orders title, status, process and holder, and the engine locks the three
+// that are not the door, so the live page carries no editable cell and a check
+// reading it went quiet the day the ruling moved into the engine. The fixture
+// is the live pane with its locks taken off, so the question is put to the
+// renderer and not to the data.
+if (empties.groups) {
+  const unlocked = JSON.parse(JSON.stringify(empties));
+  delete unlocked.locked;
+  const page = editorHtml([{ side: "left", table: unlocked }], views, "work");
+  const held = /class="edits"[^>]*data-was=/.test(page);
+  if (!held) bad++;
+  console.log((held ? "ok  " : "FAIL") + "  editor: an editable cell where the answer locks nothing");
 }
 // ONE STYLESHEET FOR A CONTROL, AND THIS IS THE ONLY CHECK THAT CAN SEE IT.
 //

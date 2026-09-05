@@ -53,6 +53,9 @@ export type Table = {
   heads: Record<string, string>;
   widths?: Record<string, number>;
   opens?: Record<string, boolean>;
+  // A cell the engine will not let a person type over, and why. The mirror
+  // of opens, and read the same way: this file decides no column of its own.
+  locked?: Record<string, string>;
   icons?: Record<string, { glyph: string }>;
   pinned?: Group[];
   groups?: Group[];
@@ -486,7 +489,7 @@ function rowHtml(l: Line, cols: string[], t: Table): string {
         return `<td class="opens" data-col="${esc(c)}"${width}>${lead}<span class="door" ` +
           `title="open the note">${esc(v)}</span></td>`;
       }
-      const why = locked(c);
+      const why = t.locked?.[c] ?? "";
       if (why) {
         return `<td class="locked" data-col="${esc(c)}"${width} title="${esc(why)}">${esc(v)}</td>`;
       }
@@ -497,26 +500,6 @@ function rowHtml(l: Line, cols: string[], t: Table): string {
     (kids ? ` data-kids="${kids}"` : "") +
     (depth ? ` data-under="${esc(l.parent ?? "")}"` : "") +
     `>${cells}</tr>`;
-}
-
-// What the engine decides and a person may not type over. Editing one of these
-// would put the note and the engine's reading of it out of step.
-function locked(col: string): string {
-  if (col.startsWith("file.")) return "renaming is a move, not an edit";
-  switch (col) {
-    case "id":
-    case "seq":
-    case "type":
-      return "the engine decides this";
-    case "status":
-    case "holder":
-      return "a pull moves this, not a keystroke";
-    case "subs":
-    case "depends_on":
-    case "successors":
-      return "a list is edited in the note";
-  }
-  return "";
 }
 
 // THE NUMBER IS A FRACTION WHERE THE VIEW SAID WHAT IT IS OUT OF: 2/21 in
