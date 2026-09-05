@@ -827,6 +827,23 @@ func askToMap() {
 	}
 }
 
+// interprets says whether this program runs a file it is handed, so a check
+// among its arguments is a check about to run.
+func interprets(name string) bool {
+	switch name {
+	case "node", "npx", "deno", "bun", "sh", "bash", "zsh", "dash", "ksh",
+		"python", "python3", "py", "powershell", "pwsh":
+		return true
+	}
+	return false
+}
+
+// namesAFile says whether this word is a path under the checks folder, which
+// is a check being run as the program.
+func namesAFile(word string) bool {
+	return strings.Contains(filepath.ToSlash(strings.Trim(word, "'\"")), checksDir+"/")
+}
+
 // ATestRunByHand answers whether this command runs the tests itself, inside
 // the tree, and says where to run them instead.
 func ATestRunByHand(command, work string) (string, bool) {
@@ -864,14 +881,31 @@ func ATestRunByHand(command, work string) (string, bool) {
 			// test run, twice, and a session with no tool lane had no other
 			// way to mint. runsTheEngine anchors the write gate on the same
 			// first word.
-		default:
-			for _, w := range words {
+		case namesAFile(words[0]):
+			// THE CHECK RUN AS THE PROGRAM, which is how a shell script is run.
+			runs = true
+			where = strings.Trim(words[0], "'\"")
+		case interprets(head):
+			// AN INTERPRETER RUNS WHAT IT IS HANDED, so a check among its
+			// arguments is a check about to run.
+			for _, w := range words[1:] {
 				w = strings.Trim(w, "'\"")
 				if strings.Contains(filepath.ToSlash(w), checksDir+"/") {
 					runs = true
 					where = w
 				}
 			}
+			// AND EVERY OTHER PROGRAM RUNS NOTHING, whatever it is handed.
+			//
+			// MEASURED. This arm read every word of the line, so a path was a test
+			// run wherever it appeared. git commit of a change to a check was
+			// refused, and so were git add, git diff, cat and cp. The one change
+			// nobody could land was a change to the checks, which is how the
+			// battery went a day without the lane this token adds.
+			//
+			// A PROGRAM IS WHERE A COMMAND STARTS, the same rule the search guard
+			// and the removal guard already keep. What decides is the first word,
+			// not a path somewhere after it.
 		}
 		if !runs || !anyInside([]string{where}, work) {
 			continue
