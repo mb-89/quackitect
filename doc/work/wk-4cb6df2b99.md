@@ -11,6 +11,8 @@ title: no lane no move
 status: done
 # who did the work step, so the verdict is never theirs
 author: worker-ash
+claimed_by: 547b9365/reviewer-quince
+claimed_at: "2026-09-05T15:54:46Z"
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - 97cac68841e678e6a0166277a3f36196ab2de400
