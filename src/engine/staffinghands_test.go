@@ -70,4 +70,23 @@ func TestAHandThatWentHomeIsNotAHand(t *testing.T) {
 	if !strings.Contains(why, "spawn 2 subagents") {
 		t.Errorf("the refusal does not ask for the two that left:\n%s", why)
 	}
+
+	// AND A THIRD HELPER THE REGISTER NEVER HEARD OF.
+	//
+	// The register is filled by SessionStart and SubagentStart. On a harness
+	// where SubagentStart never arrives, a spawned helper is only ever a name
+	// that pulled, so this is the ordinary shape of a helper rather than a
+	// corner. It cannot leave by the register's gone list either, because it
+	// was never in the register, so the stop claim is its only sanctioned end.
+	// That made the line that drops it the one line nothing here reached.
+	ArrivedAs(r, currentSession(r), "worker-three", RoleWorker)
+	if s := StaffingOf(r, cfg); s.WorkersHere != 2 {
+		t.Fatalf("a helper that pulled without being registered is not counted as a hand: %+v", s)
+	}
+	if err := ClaimStop(r, "worker-three", "asked", "the brief was one token, and it is submitted"); err != nil {
+		t.Fatal(err)
+	}
+	if s := StaffingOf(r, cfg); s.WorkersHere != 1 {
+		t.Errorf("an unregistered helper that claimed a stop is still counted: %+v", s)
+	}
 }
