@@ -1,0 +1,23 @@
+{
+  "$comment": "WHERE THIS BOX IS, READ OFF ITS ENVIRONMENT. A cloud box has no person beside it, clones the tree cold, and cannot be told anything by hand, so the cage behaves differently there: it says which commit it is on, builds what a clone does not carry, and tells the agent how to get a diagnosis out. Every harness names its cloud with its own variable, so this is the one table of them, and one door reads it: util/cage/host.mjs for the cage and src/engine/host.go for the engine, both off this file. A harness not in the table is told about by hand with SE_CLOUD.",
+  "clouds": [
+    {
+      "harness": "claude",
+      "env": "CLAUDE_CODE_REMOTE",
+      "is": "true",
+      "says": "Claude Code on the web"
+    },
+    {
+      "harness": "copilot",
+      "env": "GITHUB_ACTIONS",
+      "is": "true",
+      "says": "GitHub Actions, where the Copilot coding agent runs"
+    },
+    {
+      "harness": "any",
+      "env": "SE_CLOUD",
+      "is": "1",
+      "says": "set by hand, for a box the table does not know"
+    }
+  ]
+}

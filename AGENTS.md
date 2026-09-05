@@ -18,3 +18,9 @@ nothing about how the engine behaves.
   whether the tree is sound.
 - `go build -C src/engine -o ../../.bin/se.exe .` rebuilds the engine.
 - `se --project` rewrites the projections after a guidance edit.
+- `.bin/se-mcp --tools > util/cage/tools.json` rewrites the tool list the cold
+  door answers from, after a change to `src/mcp/lane.go`. `mcp-tools` says
+  when it is stale.
+- `./RUNME.sh --diagnose` writes a diagnosis of this box under
+  `.se/scratchpad` and prints it. On a tree with nothing built,
+  `node util/cage/diagnose.mjs` is the same call.

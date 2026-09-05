@@ -30,8 +30,15 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 const engine = join(root, ".bin", process.platform === "win32" ? "se.exe" : "se");
 
 if (!existsSync(engine)) {
-  process.stderr.write("quackitect: nothing is built here yet, so this event went " +
-    "unrecorded and the call goes on. The tool lane is building the engine.\n");
+  // THE AGENT IS TOLD, ON ITS OWN SCREEN. This said so on standard error,
+  // which the harness keeps in a log no agent reads, so a session with no
+  // engine worked a whole turn believing it was guarded. The harness adds a
+  // SessionStart or UserPromptSubmit hook's standard output to the agent's
+  // context, and those are the two events the cage sends here.
+  process.stdout.write("quackitect: NO ENGINE IS BUILT HERE, so this turn is neither guarded nor " +
+    "recorded. On a cold clone the tool lane is building it: wait a minute, then call se_status. " +
+    "If it stays down, get a diagnosis out: node util/cage/diagnose.mjs writes " +
+    ".se/scratchpad/diagnosis-<stamp>.md, and it goes in your answer whole.\n");
   process.exit(0);
 }
 

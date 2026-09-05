@@ -32,7 +32,7 @@
 // because Claude Code runs on it.
 //
 //   node util/cage/mcp-lane.mjs --method . --work .
-import { existsSync, statSync } from "node:fs";
+import { existsSync, mkdirSync, openSync, readFileSync, statSync, writeSync } from "node:fs";
 import { spawn } from "node:child_process";
 import { delimiter, dirname, join } from "node:path";
 import { homedir } from "node:os";
@@ -54,9 +54,38 @@ const engineExe = join(root, ".bin", "se" + suffix);
 // installer's build fails against it.
 const ownExe = join(root, ".bin", "se-mcp.lane" + suffix);
 
+// THE STUB KEEPS A LOG THE AGENT CAN READ. Everything it says goes to standard
+// error, which the harness keeps in a log of its own that no agent on a cloud
+// box can open: a session lost its lane and could say nothing about how,
+// because every word about it had gone there. So it goes under .se as well,
+// with the installer's and the build's output behind it, and
+// util/cage/diagnose.mjs reads it back. The last line is where the stub got to.
+const laneLog = join(root, ".se", "lane.out");
+let log = 2;
+try {
+  mkdirSync(join(root, ".se"), { recursive: true });
+  log = openSync(laneLog, "a");
+} catch {
+  // a tree that cannot take a log still gets a lane
+}
+
+// THE LIST THE COLD DOOR ANSWERS FROM. The lane's tools are static, so the
+// snapshot .bin/se-mcp --tools writes is answered at once, before there is a
+// lane to ask, and util/checks/mcp-tools.mjs holds it against the lane.
+const toolsSnapshot = join(root, "util", "cage", "tools.json");
+
 // STANDARD OUTPUT IS THE PROTOCOL. Everything this script says goes to standard
 // error, or the harness reads it as a message from the server.
-const say = (line) => process.stderr.write("quackitect: " + line + "\n");
+const say = (line) => {
+  process.stderr.write("quackitect: " + line + "\n");
+  if (log !== 2) {
+    try {
+      writeSync(log, new Date().toISOString() + " " + line + "\n");
+    } catch {
+      // the log is a convenience, and the lane is not
+    }
+  }
+};
 process.stdout.on("error", () => {}); // a shut pipe has nobody left to tell
 
 if (existsSync(laneExe) && existsSync(engineExe)) {
@@ -68,6 +97,7 @@ if (existsSync(laneExe) && existsSync(engineExe)) {
 // handOver is the whole program on a tree that is built: stdio is inherited, so
 // the lane speaks to the harness directly and nothing here sits between them.
 function handOver(exe) {
+  say("built already, handing over to " + exe);
   const lane = spawn(exe, process.argv.slice(2), { stdio: "inherit" });
   lane.on("error", (err) => {
     say("the tool lane would not start: " + err.message);
@@ -109,15 +139,17 @@ function answerWhileItBuilds() {
       "THIS SESSION HAS NO TOOL LANE. " + broken +
       "\n\nThe engine is still a door. At a shell, ./RUNME.sh <verb> is the same " +
       "call and the guards let it through. To build by hand, run " +
-      "util/setup/install.sh and start a new session.";
+      "util/setup/install.sh and start a new session. To see why this one has no " +
+      "lane, node util/cage/diagnose.mjs writes a diagnosis under .se/scratchpad, " +
+      "and it goes in your answer whole.";
     if (msg.method === "tools/call") answer(msg.id, told(text));
     else send({ jsonrpc: "2.0", id: msg.id, error: { code: -32603, message: text } });
   };
 
   const stillBuilding =
     "THE ENGINE IS STILL BEING BUILT, so this call was not made and nothing was " +
-    "done. The tool lane is up and the engine it asks is not there yet: the first " +
-    "build compiles SQLite, which takes a few minutes, once. Ask again in a minute.";
+    "done. The first build compiles SQLite, which takes a few minutes, once. Ask " +
+    "again in a minute. .se/lane.out says how far the build has got.";
 
   createInterface({ input: process.stdin })
     .on("line", (line) => {
@@ -166,12 +198,35 @@ function answerWhileItBuilds() {
         answer(msg.id, {});
         return;
       }
+      // A NOTIFICATION TAKES NO ANSWER, and the lane gets a handshake of its
+      // own below, so nothing the client notifies is worth holding.
+      if (msg.id === undefined) return;
+      // THE LIST IS ANSWERED COLD, off the snapshot. The harness asks for it
+      // right behind the handshake, and a list held for a build is a session
+      // that begins with no tool listed, which is the session this file
+      // exists to end.
+      if (msg.method === "tools/list") {
+        try {
+          answer(msg.id, { tools: JSON.parse(readFileSync(toolsSnapshot, "utf8")).tools });
+          return;
+        } catch {
+          // no snapshot here, so the lane answers it when it is up
+        }
+      }
       if (broken !== "") {
         refuse(msg);
         return;
       }
+      // A CALL BEFORE THE LANE IS UP IS ANSWERED, NOT HELD. A call held for a
+      // build is a tool that hangs for minutes, and an agent reads a hang as a
+      // tool that is broken. The answer says what is happening and where to
+      // look.
+      if (msg.method === "tools/call") {
+        answer(msg.id, told(stillBuilding + " " + Math.round(waited * 0.4) + " seconds so far."));
+        return;
+      }
       held.push(raw);
-      if (msg.id !== undefined) say("holding " + msg.method + " until the lane is up");
+      say("holding " + msg.method + " until the lane is up");
     })
     .on("close", () => {
       if (lane === null) process.exit(0);
@@ -185,9 +240,9 @@ function answerWhileItBuilds() {
   const install = windows
     ? spawn("powershell", ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File",
       join(root, "util", "setup", "install.ps1"), "--profile", "headless"],
-      { stdio: ["ignore", 2, 2] })
+      { stdio: ["ignore", log, log] })
     : spawn("sh", [join(root, "util", "setup", "install.sh"), "--profile", "headless"],
-      { stdio: ["ignore", 2, 2] });
+      { stdio: ["ignore", log, log] });
   install.on("error", (err) => {
     installing = false;
     say("the installer would not start: " + err.message);
@@ -215,7 +270,7 @@ function answerWhileItBuilds() {
     }
     quick = spawn("go", ["build", "-o", ownExe, "."], {
       cwd: join(root, "src", "mcp"),
-      stdio: ["ignore", 2, 2],
+      stdio: ["ignore", log, log],
     });
     quick.on("error", () => {
       quick = null; // no go on PATH yet, and the installer is putting one there

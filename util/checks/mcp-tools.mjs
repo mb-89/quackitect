@@ -19,7 +19,7 @@
 //   node util/checks/mcp-tools.mjs <root>
 import { execFileSync } from "node:child_process";
 import { liveEngine } from "./lib/engine.mjs";
-import { mkdtempSync, mkdirSync, copyFileSync, writeFileSync, existsSync } from "node:fs";
+import { mkdtempSync, mkdirSync, copyFileSync, writeFileSync, existsSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 
@@ -74,7 +74,7 @@ function ask(calls) {
 
 // THE TOOLS THE LANE DECLARES, read off the lane rather than typed here, so a
 // tool added without a case is a failure rather than a gap.
-const declared = (() => {
+const declaredTools = (() => {
   const out = execFileSync(exe, ["--work", work], {
     input: JSON.stringify({ jsonrpc: "2.0", id: 0, method: "initialize", params: {} }) + "\n" +
       JSON.stringify({ jsonrpc: "2.0", id: 1, method: "tools/list", params: {} }) + "\n",
@@ -84,12 +84,23 @@ const declared = (() => {
     if (!line.trim()) continue;
     let m;
     try { m = JSON.parse(line); } catch { continue; }
-    if (m.id === 1) return (m.result?.tools ?? []).map((t) => t.name);
+    if (m.id === 1) return m.result?.tools ?? [];
   }
   return [];
 })();
+const declared = declaredTools.map((t) => t.name);
 say("the lane declares its tools", declared.length > 0,
   "tools/list answered nothing, so this check guards nothing");
+
+// AND THE SNAPSHOT THE COLD DOOR ANSWERS FROM IS THIS LIST. util/cage/mcp-lane.mjs
+// answers tools/list off util/cage/tools.json before the lane is built, so a
+// lane whose tools moved without the file is a cold session shown the old door.
+{
+  let snapshot = null;
+  try { snapshot = JSON.parse(readFileSync(join(root, "util", "cage", "tools.json"), "utf8")).tools; } catch { /* said below */ }
+  say("util/cage/tools.json is the lane's own list", JSON.stringify(snapshot) === JSON.stringify(declaredTools),
+    "it differs from what tools/list answers. Rewrite it: .bin/se-mcp --tools > util/cage/tools.json");
+}
 
 // EVERY CALL A REAL AGENT MAKES. Each one is the shape the tool's own schema
 // describes, so a schema that has drifted from the engine fails here.

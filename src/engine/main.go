@@ -99,6 +99,8 @@ func main() {
 	initAs := flag.String("init", "", "make this folder a project or a vehicle")
 	register := flag.Bool("register", false, "put this copy in the register and print its identity")
 	copies := flag.Bool("copies", false, "list the copies on this machine, and which drives this folder")
+	hostFlag := flag.Bool("host", false, "say where this box is, cloud or desk, and which variable said so")
+	diagnose := flag.Bool("diagnose", false, "write a diagnosis of this box under .se/scratchpad, and print it")
 	parseFlags()
 	if *help || *helpShort {
 		flag.CommandLine.SetOutput(os.Stdout)
@@ -214,6 +216,17 @@ func main() {
 		}
 		fmt.Println(string(raw))
 		return
+	}
+
+	// WHERE THIS BOX IS, off util/cage/hosts.json. See host.go.
+	if *hostFlag {
+		answerJSON(TheHost(roots.Method))
+		return
+	}
+
+	// A DIAGNOSIS OF THIS BOX, MEASURED. See host.go.
+	if *diagnose {
+		os.Exit(Diagnose(roots))
 	}
 
 	if *rotate {

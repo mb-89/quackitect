@@ -1,14 +1,20 @@
 #!/usr/bin/env sh
-# THE WAKE. A box with no button starts its own engine.
+# THE WAKE. A box with no button starts its own engine, and says where it is.
 #
 # On a desktop the person presses start, and the extension builds what is
 # missing, starts the engine, opens the log window and hands the agent its
 # first instruction. A cloud session has no extension and no button, and the
 # agent is already running by the time anything here can act.
 #
-# So this does the one part of that walk which nothing else can do: the
-# engine. Without it the guard appends to a log that is not there, and the
-# session leaves no record.
+# So this does what nothing else on a cloud box can do. It says which commit
+# the box is on, against origin, because a session was told it was current and
+# was not, and nothing on the box could show either side. It hands the agent
+# the card for a box nobody sits beside. And it starts the engine, without
+# which the guard appends to a log that is not there.
+#
+# WHAT IT PRINTS, THE AGENT READS. The harness adds a SessionStart hook's
+# standard output to the agent's context, so every line here is a line the
+# agent begins its first turn holding.
 #
 # IT NEVER STARTS THE AGENT, and it never speaks to one. Idle is still where
 # a desktop session rests, because on a desktop this returns before it has
@@ -16,12 +22,44 @@
 
 set -eu
 
-# THE ONE PLACE THIS BELONGS. SessionStart fires on every host, so the guard
-# is the first line and not an afterthought.
-[ "${CLAUDE_CODE_REMOTE:-}" = "true" ] || exit 0
-
 here=${CLAUDE_PROJECT_DIR:-$PWD}
 cd "$here"
+
+# THE ONE PLACE THIS BELONGS. SessionStart fires on every host, and where the
+# box is comes off one table, util/cage/hosts.json, through the one door that
+# reads it. A desk returns here.
+node util/cage/host.mjs --cloud || exit 0
+
+say() { echo "quackitect: $*"; }
+
+# THE COMMIT, SAID OUT LOUD, AGAINST ORIGIN. The cloud clones the tip of the
+# branch as it stood when the session was made, and a person who pushed a
+# minute later has no way to tell. So the box asks origin and says both.
+branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo HEAD)
+head=$(git rev-parse --short HEAD 2>/dev/null || echo unknown)
+say "this is $(node util/cage/host.mjs --say), on commit $head of $branch"
+if [ "$branch" != HEAD ] && git fetch -q origin "$branch" 2>/dev/null; then
+  remote=$(git rev-parse --short "origin/$branch")
+  if [ "$remote" = "$head" ]; then
+    say "origin/$branch is $remote too: this clone is current"
+  elif git merge-base --is-ancestor HEAD "origin/$branch" 2>/dev/null && [ -z "$(git status --porcelain)" ]; then
+    # BEHIND, AND CLEAN, SO IT MOVES. A clone behind origin is a box working
+    # on a tree the person has already left, and every finding it makes is
+    # about the past.
+    if git merge -q --ff-only "origin/$branch" 2>/dev/null; then
+      say "origin/$branch was $remote and this clone was behind: fast-forwarded from $head. Programs built from the old tree are older than their source now, and the next ./RUNME.sh call rebuilds them."
+    else
+      say "origin/$branch is $remote and this clone is on $head, and the fast-forward failed, so nothing was moved. Say so in your first message."
+    fi
+  else
+    say "origin/$branch is $remote and this clone is on $head: they differ and it is not a fast-forward, so nothing was moved. Say so in your first message."
+  fi
+else
+  say "origin could not be asked about $branch, so whether this clone is current is unknown. Say so in your first message."
+fi
+
+# THE CARD FOR A BOX NOBODY SITS BESIDE.
+cat util/cage/cloud-runner.md
 
 # A FRESH CLONE CARRIES NO BUILT PROGRAMS, AND THE TOOL LANE IS ALREADY
 # BUILDING THEM. This ran the installer itself, and the harness starts the tool
@@ -34,7 +72,7 @@ cd "$here"
 # engine, and says so. The wake on the next prompt starts it the moment it is
 # there, and the guard answers permitted while it is not.
 if [ ! -x "$here/.bin/se" ]; then
-  echo "quackitect: nothing is built here yet. The tool lane is building it." >&2
+  say "nothing is built here yet. The tool lane is building it, and .se/lane.out says how far it got."
   i=0
   while [ $i -lt 100 ]; do
     [ -x "$here/.bin/se" ] && break
@@ -42,7 +80,7 @@ if [ ! -x "$here/.bin/se" ]; then
     sleep 0.2
   done
 fi
-[ -x "$here/.bin/se" ] || { echo "quackitect: no engine yet, so this session starts with no record" >&2; exit 0; }
+[ -x "$here/.bin/se" ] || { say "no engine yet, so this session starts with no record and nothing guarding it"; exit 0; }
 
 # Detached, because the hook has to return and the engine has to stay. The
 # engine refuses to be a second one, so this is safe on every session.
@@ -58,4 +96,4 @@ while [ $i -lt 50 ]; do
   i=$((i + 1))
   sleep 0.2
 done
-echo "quackitect: the engine did not report ready" >&2
+say "the engine did not report ready"
