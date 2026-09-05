@@ -2,7 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"encoding/json"
 	"flag"
 	"fmt"
 	"os"
@@ -56,10 +55,6 @@ type ran struct {
 	OK      bool    `json:"ok"`
 	Seconds float64 `json:"seconds"`
 	Said    string  `json:"said,omitempty"` // the tail of what a failing test printed
-	// Engine is, for a check, the engine it was handed and whether the one
-	// over the tree is older than its source, so a stale engine reads as a
-	// stale engine and never as a defect in the change.
-	Engine string `json:"engine,omitempty"`
 }
 
 // Tested is the whole answer.
@@ -72,11 +67,8 @@ type Tested struct {
 	Proposed   []string `json:"proposed,omitempty"`
 	Unreached  []string `json:"unreached,omitempty"`  // proposed patterns the delta does not reach
 	Uncovered  []string `json:"uncovered,omitempty"`  // changed files no test reaches
-	LeftOut    []string `json:"left_out,omitempty"`   // changed files the record does not put on this token, so the delta is without them
 	Undeclared []string `json:"undeclared,omitempty"` // checks that declare nothing, so run only whole
 	Ran        []ran    `json:"ran"`
-	Engine     string   `json:"engine,omitempty"` // the engine subprocess tests drove, and how old it is
-	Lands      string   `json:"lands,omitempty"`  // where a run still going writes its answer when it ends
 	OK         bool     `json:"ok"`
 	Seconds    float64  `json:"seconds"`
 }
@@ -95,12 +87,6 @@ const (
 	wholeAbove   = 0.4
 	wholeAtLeast = 20
 )
-
-// theTestBudget is how long the test verb waits for its run before it answers
-// where the result will land. The harness cuts a tool call at sixty seconds,
-// and a run cut there read as a dead engine with its answer lost. A variable,
-// so a test can make the wait short.
-var theTestBudget = 45 * time.Second
 
 func runTest(c *call) int {
 	fs := flag.NewFlagSet("test", flag.ContinueOnError)
@@ -171,17 +157,6 @@ func TestTheDelta(r Roots, db *sql.DB, on string, proposed []string, run bool, a
 		return out, err
 	}
 	out.Delta = delta
-	// AND THE DELTA IS THIS TOKEN'S OWN WRITES, where the record can say which
-	// they are. On a tree several hands share, the diff against the snapshot is
-	// everybody's uncommitted work, and a whole ruling read off that is a
-	// sentence about somebody else's change. See tokenwrote.go.
-	if on != "" {
-		if wrote, proven := WhatThisTokenWrote(r, on); proven {
-			out.Delta, out.LeftOut = onlyWhatItWrote(delta, wrote), leftOut(delta, wrote)
-		} else {
-			out.Whole, out.WhyWhole = true, nothingOnRecord(on)
-		}
-	}
 	tests, err := discoverTests(r, db)
 	if err != nil {
 		return out, err
@@ -199,69 +174,16 @@ func TestTheDelta(r Roots, db *sql.DB, on string, proposed []string, run bool, a
 		// new one over this tree, so waiting for it here is waiting inside the
 		// process it replaces. See battery.go.
 		out.Ran = append(out.Ran, startBattery(r, actor, on))
-	} else if err := runOrLand(r, tests, &out, start); err != nil {
-		return out, err
+	} else {
+		out.Ran = runChosen(r, db, tests, out.Chosen)
 	}
 	out.Seconds = time.Since(start).Seconds()
-	out.OK = okOf(out.Ran)
+	out.OK = true
+	for _, x := range out.Ran {
+		out.OK = out.OK && x.OK
+	}
 	askToMap()
 	return out, nil
-}
-
-// okOf is whether every run went well.
-func okOf(runs []ran) bool {
-	for _, x := range runs {
-		if !x.OK {
-			return false
-		}
-	}
-	return true
-}
-
-// runOrLand runs the chosen tests and waits theTestBudget for them. A run
-// still going then is answered as a landing: where its answer is written
-// when it ends, and a ran entry saying so, the way the battery answers.
-//
-// THE RUN KEEPS AN INDEX HANDLE OF ITS OWN. The caller's closes with the
-// call, and a run that outlives the call would write its map into a closed
-// database.
-func runOrLand(r Roots, tests []aTest, out *Tested, start time.Time) error {
-	bg, err := openIndex(r)
-	if err != nil {
-		return err
-	}
-	done := make(chan struct{})
-	var runs []ran
-	var engine string
-	go func() {
-		defer close(done)
-		runs, engine = runChosen(r, bg, tests, out.Chosen)
-	}()
-	select {
-	case <-done:
-		bg.Close()
-		out.Ran, out.Engine = runs, engine
-		return nil
-	case <-time.After(theTestBudget):
-	}
-	lands := filepath.Join(r.Private("tests"), "test-"+time.Now().UTC().Format("20060102-150405.000")+".json")
-	out.Lands = lands
-	out.Ran = append(out.Ran, ran{ID: "the run", Kind: "landing", OK: true,
-		Said: fmt.Sprintf("still running after %s, which is as long as the lane waits. Its answer lands in %s", theTestBudget, lands)})
-	// WHAT LANDS IS THE ANSWER THIS CALL WOULD HAVE GIVEN, whole, taken as it
-	// stands before the caller moves on with its own copy.
-	final := *out
-	go func() {
-		<-done
-		bg.Close()
-		final.Ran, final.Engine, final.Lands = runs, engine, ""
-		final.Seconds = time.Since(start).Seconds()
-		final.OK = okOf(final.Ran)
-		if b, err := json.MarshalIndent(final, "", "  "); err == nil {
-			_ = writeAtomic(lands, b, 0o644) // an answer it cannot write is a run the caller reads as still going
-		}
-	}()
-	return nil
 }
 
 // choose fills Chosen, Whole and the rest of the answer from the delta, the
@@ -280,12 +202,6 @@ func choose(db *sql.DB, tests []aTest, out *Tested) error {
 	// THE WHOLE BATTERY, BY THE ENGINE'S RULES.
 	for _, ch := range out.Delta {
 		for _, g := range wholeTriggers {
-			// THE FIRST REASON STANDS. A ruling made before the triggers were read,
-			// because the record cannot say what this token wrote, is the answer to
-			// a different question and is not overwritten by a path.
-			if out.Whole {
-				continue
-			}
 			if re, _ := globRegexp(g); re != nil && re.MatchString(ch.Path) {
 				out.Whole, out.WhyWhole = true, ch.Path+" changed, and it is "+g
 			}
@@ -589,16 +505,14 @@ func everyFileWhole(db *sql.DB) ([]change, error) {
 
 // runChosen runs the chosen tests: a Go test off its package's cover
 // binary, which refreshes its map as a side effect, and a check as the
-// process it is. It answers what ran, and which engine the Go tests were
-// handed, in a sentence with its age, so a stale one reads as stale.
-func runChosen(r Roots, db *sql.DB, tests []aTest, picks []chosen) ([]ran, string) {
+// process it is.
+func runChosen(r Roots, db *sql.DB, tests []aTest, picks []chosen) []ran {
 	byID := map[string]aTest{}
 	for _, t := range tests {
 		byID[t.ID] = t
 	}
 	var out []ran
 	bins := map[string]string{}
-	engine, engineSaid, engineKnown := "", "", false
 	for _, p := range picks {
 		t := byID[p.ID]
 		switch t.Kind {
@@ -618,11 +532,7 @@ func runChosen(r Roots, db *sql.DB, tests []aTest, picks []chosen) ([]ran, strin
 				out = append(out, ran{ID: t.ID, Kind: t.Kind, OK: false, Said: "the cover binary for " + dir + " will not build"})
 				continue
 			}
-			if !engineKnown {
-				engine, engineSaid = suiteEngine(r)
-				engineKnown = true
-			}
-			ok, said, took, regions, err := runOneGoTest(r, bin, engine, t)
+			ok, said, took, regions, err := runOneGoTest(r, bin, t)
 			x := ran{ID: t.ID, Kind: t.Kind, OK: ok, Seconds: took.Seconds()}
 			if !ok {
 				x.Said = tailOf(said, 2000)
@@ -632,33 +542,18 @@ func runChosen(r Roots, db *sql.DB, tests []aTest, picks []chosen) ([]ran, strin
 			}
 			out = append(out, x)
 		case "check":
-			// A CHECK IS HANDED THE ENGINE THE GO LANE WOULD RUN. A check asks for
-			// its data through .bin/se, and that reaches whatever engine is up, so
-			// a check read the engine that was started and not the source it was
-			// built from: a field added to the engine went red as locked because
-			// the running engine was four minutes older than the tree. The same
-			// choice the Go tests get rides in SE_ENGINE, and lib/engine.mjs starts
-			// it for a check that raises an engine of its own.
-			if !engineKnown {
-				engine, engineSaid = suiteEngine(r)
-				engineKnown = true
-			}
 			cmd := quiet.Quietly(exec.Command(nodeTool(), filepath.Join(r.Work, filepath.FromSlash(t.Path)), r.Method))
 			cmd.Dir = r.Work
-			if engine != "" {
-				cmd.Env = append(os.Environ(), "SE_ENGINE="+engine)
-			}
 			start := time.Now()
 			said, err := cmd.CombinedOutput()
-			x := ran{ID: t.ID, Kind: t.Kind, OK: err == nil, Seconds: time.Since(start).Seconds(),
-				Engine: checkEngineNote(r, engineSaid)}
+			x := ran{ID: t.ID, Kind: t.Kind, OK: err == nil, Seconds: time.Since(start).Seconds()}
 			if err != nil {
 				x.Said = tailOf(string(said), 2000)
 			}
 			out = append(out, x)
 		}
 	}
-	return out, engineSaid
+	return out
 }
 
 // WHERE THE BATTERY'S SHELL IS, AND EVERY PLACE THAT WAS LOOKED FOR IT.
@@ -785,24 +680,6 @@ func shellsBesideGit(r Roots) []string {
 	return out
 }
 
-// checkEngineNote is what a check's run says about its engine: the one it was
-// handed, and, when the engine over the tree is older than its source, that a
-// check asking the tree read the old build.
-//
-// A CHECK OVER THE TREE ITSELF ASKS THE RESIDENT ENGINE, whatever it was
-// handed, because the client reaches the engine that is up and nothing else
-// can answer over that folder. So the age is said rather than hidden, and a
-// failure reads as the engine's age first and the change's second.
-func checkEngineNote(r Roots, handed string) string {
-	note := "handed " + handed
-	if why := residentStale(r); why != "" {
-		note += ". The engine over this tree is older than its source: " + why +
-			". A check that asks it reads the old build, so a failure here may be its age and not the change's. " +
-			"Swap first: se --swap --built"
-	}
-	return note
-}
-
 func nodeTool() string {
 	if p, err := exec.LookPath("node"); err == nil {
 		return p
@@ -825,23 +702,6 @@ func askToMap() {
 	case remap <- struct{}{}:
 	default:
 	}
-}
-
-// interprets says whether this program runs a file it is handed, so a check
-// among its arguments is a check about to run.
-func interprets(name string) bool {
-	switch name {
-	case "node", "npx", "deno", "bun", "sh", "bash", "zsh", "dash", "ksh",
-		"python", "python3", "py", "powershell", "pwsh":
-		return true
-	}
-	return false
-}
-
-// namesAFile says whether this word is a path under the checks folder, which
-// is a check being run as the program.
-func namesAFile(word string) bool {
-	return strings.Contains(filepath.ToSlash(strings.Trim(word, "'\"")), checksDir+"/")
 }
 
 // ATestRunByHand answers whether this command runs the tests itself, inside
@@ -873,39 +733,14 @@ func ATestRunByHand(command, work string) (string, bool) {
 		case strings.HasSuffix(head, ".test"):
 			runs = true
 			where = words[0]
-		case isTheEngine(firstWord(part)):
-			// THE ENGINE RUNS NO TEST BY HAND. A check named in its arguments
-			// is prose: a mint whose done-when says which check decides it,
-			// which is the spelling the work-token guidance asks for. This
-			// fell through to the scan below and the mint was refused as a
-			// test run, twice, and a session with no tool lane had no other
-			// way to mint. runsTheEngine anchors the write gate on the same
-			// first word.
-		case namesAFile(words[0]):
-			// THE CHECK RUN AS THE PROGRAM, which is how a shell script is run.
-			runs = true
-			where = strings.Trim(words[0], "'\"")
-		case interprets(head):
-			// AN INTERPRETER RUNS WHAT IT IS HANDED, so a check among its
-			// arguments is a check about to run.
-			for _, w := range words[1:] {
+		default:
+			for _, w := range words {
 				w = strings.Trim(w, "'\"")
 				if strings.Contains(filepath.ToSlash(w), checksDir+"/") {
 					runs = true
 					where = w
 				}
 			}
-			// AND EVERY OTHER PROGRAM RUNS NOTHING, whatever it is handed.
-			//
-			// MEASURED. This arm read every word of the line, so a path was a test
-			// run wherever it appeared. git commit of a change to a check was
-			// refused, and so were git add, git diff, cat and cp. The one change
-			// nobody could land was a change to the checks, which is how the
-			// battery went a day without the lane this token adds.
-			//
-			// A PROGRAM IS WHERE A COMMAND STARTS, the same rule the search guard
-			// and the removal guard already keep. What decides is the first word,
-			// not a path somewhere after it.
 		}
 		if !runs || !anyInside([]string{where}, work) {
 			continue
