@@ -206,6 +206,13 @@ func TestTheWorkStepDoesNotEndTheToken(t *testing.T) {
 
 	// AND IT IS OPEN TO ITS REVIEWER: nameable, which is what se run and se
 	// apply ask for, and rulable, which is the step the process says is left.
+	//
+	// THE REVIEWER CLAIMS IT FIRST, the way any actor takes a travelling token.
+	// It used to be nameable without one, by riding the worker's claim, which
+	// still stood because a submission released the hold and not the claim.
+	if _, err := Claim(r, Claimant(r, "reviewer-1"), []string{tok.ID}, time.Now().UTC()); err != nil {
+		t.Fatalf("the reviewer claiming the token it is reviewing: %v", err)
+	}
 	if _, err := TakeUp(r, tok.ID, "reviewer-1"); err != nil {
 		t.Fatalf("a reviewer could not name the token it is reviewing: %v", err)
 	}
