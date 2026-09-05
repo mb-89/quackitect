@@ -58,10 +58,17 @@ const uncommented = (s) => s.replace(/\/\*[\s\S]*?\*\//g, "")
   // halves of the extension carry a type, and one of them is called file,
   // which is also a property. The discriminator names a message and not a
   // column, so it is taken out before the names are looked for.
-  .replace(/\btype\s*(?:===?|:)\s*"[^"]*"/g, "");
+  //
+  // AND IN WHICHEVER QUOTE IT WAS WRITTEN. This source uses all three, so a
+  // rule that reads one of them guards a third of the file.
+  .replace(/\btype\s*(?:===?|:)\s*(['"`])[^'"`]*\1/g, "");
 for (const file of ["editor.ts", "extension.ts"]) {
   const code = uncommented(readFileSync(join(here, file), "utf8"));
-  const named = props.filter((p) => new RegExp('"' + literal(p) + '[."]').test(code));
+  // EVERY QUOTE THIS SOURCE USES, and it uses all three. The pattern read a
+  // double-quoted string alone, so 'status' and `status` walked past a check
+  // whose first line says no property name is written here. src/extension
+  // carries hundreds of single quotes, so that was most of the file.
+  const named = props.filter((p) => new RegExp("['\"`]" + literal(p) + "[.'\"`]").test(code));
   if (named.length === 0) ok(file + " writes no token property name");
   else no(file + " writes a token property name the engine owns: " + named.join(", "));
 }
