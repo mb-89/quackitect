@@ -9,6 +9,8 @@ guidance: [[work-token]]
 title: lint reads prose held
 # where the token stands. The process owns these values.
 status: open
+claimed_by: 547b9365/worker-fir
+claimed_at: "2026-09-05T16:50:58Z"
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - 3d9503c9532c8863e33a3c5510fc83dbebb4c720
