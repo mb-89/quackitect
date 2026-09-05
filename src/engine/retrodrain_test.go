@@ -16,8 +16,8 @@ import (
 // filled with the output of every command ever run.
 func TestARetroDrainsTheKeptOutputAndTheUndoJournal(t *testing.T) {
 	t.Parallel()
-	root := t.TempDir()
-	r := Roots{Method: root, Work: root}
+	r := aTree(t).Roots
+	root := r.Work
 	writeProcess(t, root, "drained")
 
 	// Something in each folder, written the way the engine writes it.

@@ -14,8 +14,8 @@ import (
 // a held token from rev-14, which was alive and mid-review.
 func TestALookDoesNotStealFromAHolderStillCalling(t *testing.T) {
 	t.Parallel()
-	root := t.TempDir()
-	r := Roots{Method: root, Work: root}
+	r := aTree(t).Roots
+	root := r.Work
 	writeWorkableProcess(t, root, "queued")
 	log, err := OpenLog(r.Private("log"))
 	if err != nil {
@@ -48,8 +48,8 @@ func TestALookDoesNotStealFromAHolderStillCalling(t *testing.T) {
 // changed hands in the meantime is somebody else's work now.
 func TestALookDoesNotStealFromANewerHolder(t *testing.T) {
 	t.Parallel()
-	root := t.TempDir()
-	r := Roots{Method: root, Work: root}
+	r := aTree(t).Roots
+	root := r.Work
 	writeWorkableProcess(t, root, "queued")
 	log, err := OpenLog(r.Private("log"))
 	if err != nil {
@@ -96,31 +96,6 @@ func TestTheInvestigateNoticeSeparatesLeaveFromTake(t *testing.T) {
 	if !strings.Contains(notice, "se work --on") {
 		t.Fatalf("the leave gesture is missing, or is the same as the take one: %q", notice)
 	}
-}
-
-// aHeldTokenInASession is one token in one pair of hands, inside a real session,
-// because whether a holder has gone is answered from the record that session
-// writes. It was the session's pull count, and a worker on one long token pulls
-// once: the count read a busy room as a stopped holder.
-func aHeldTokenInASession(t *testing.T, holder string) (Roots, Token) {
-	t.Helper()
-	root := t.TempDir()
-	r := Roots{Method: root, Work: root}
-	writeWorkableProcess(t, root, "queued")
-	log, err := OpenLog(r.Private("log"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	t.Cleanup(func() { log.Close() })
-	log.Write("engine", "start", "engine", "for the session name", Yes(), nil)
-	tok, err := Mint(r, Token{Tracked: local(), Process: "queued", Title: "a long token", Status: "first"})
-	if err != nil {
-		t.Fatal(err)
-	}
-	if _, err := TakeUp(r, tok.ID, holder); err != nil {
-		t.Fatal(err)
-	}
-	return r, tok
 }
 
 // theOthersPull moves the session's pull count by everybody except the holder,

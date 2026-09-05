@@ -22,6 +22,8 @@ import (
 // The engine projects. Nobody copies by hand. A changed source projects again
 // on its own, and a projection is output: editing it is editing something
 // that will be written over.
+//
+// Why is [[one-source-projected-everywhere]].
 
 const generatedMark = "GENERATED. Edit the source named below, not this file."
 

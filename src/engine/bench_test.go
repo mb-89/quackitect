@@ -86,21 +86,3 @@ func BenchmarkWatcherDelivery(b *testing.B) {
 		}
 	}
 }
-
-// aTreeToIndexB is aTreeToIndex for a benchmark.
-func aTreeToIndexB(b *testing.B) Roots {
-	b.Helper()
-	root := b.TempDir()
-	r := Roots{Method: root, Work: root}
-	work := filepath.Join(root, ".se", "work")
-	if err := os.MkdirAll(work, 0o755); err != nil {
-		b.Fatal(err)
-	}
-	for _, name := range []string{"wk-one", "wk-two", "wk-three"} {
-		text := "---\nkind: [[work-token]]\ntitle: " + name + "\n---\n\n## detail\n\nA note the benchmark wrote, long enough to be a passage of its own.\n"
-		if err := os.WriteFile(filepath.Join(work, name+".md"), []byte(text), 0o644); err != nil {
-			b.Fatal(err)
-		}
-	}
-	return r
-}

@@ -39,7 +39,7 @@ func TestAPrivateApplyProvesNothing(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	got, err := TestTheDelta(r, db, on, nil, false, "worker-"+on)
+	got, err := TestTheDelta(t.Context(), r, db, on, nil, false, "worker-"+on)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -84,7 +84,7 @@ func TestAPrivateApplyDoesNotSpoilAShareableOne(t *testing.T) {
 	wrote(t, r, on, ".se/scratchpad/cmd.sh", "ls\n")
 	wrote(t, r, on, "one.md", "# one\n")
 
-	got, err := TestTheDelta(r, db, on, nil, false, "worker-"+on)
+	got, err := TestTheDelta(t.Context(), r, db, on, nil, false, "worker-"+on)
 	if err != nil {
 		t.Fatal(err)
 	}

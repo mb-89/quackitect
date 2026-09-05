@@ -21,7 +21,7 @@ func TestACancelledContextEndsTheWaitForAnEngine(t *testing.T) {
 	if runtime.GOOS == "windows" {
 		t.Skip("the stand-in engine is a shell script, and Windows runs se.exe")
 	}
-	r := Roots{Method: t.TempDir(), Work: t.TempDir()}
+	r := aTree(t).apart().Roots
 	// AN ENGINE THAT STARTS AND NEVER REPORTS, so the wait is the whole
 	// budget unless something ends it. It sleeps briefly and leaves.
 	bin := filepath.Join(r.Method, ".bin")
