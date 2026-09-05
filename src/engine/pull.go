@@ -849,10 +849,15 @@ func take(r Roots, actor string, t Token) (Answer, bool) {
 }
 
 // handed answers a token the actor holds, with the guidance for it.
+//
+// AND WITH WHAT THIS BOX CANNOT SHOW IT. A travelled token names snapshots
+// taken somewhere else, and the reviewer's own step asks for every hunk of
+// git diff began..ended. That diff answers bad object here and says nothing
+// about why, so the hand-over says it instead. See travelNotice.
 func handed(r Roots, actor string, t Token) Answer {
 	text, says := TheGuidanceFor(r, actor, t.Guidance)
 	return Answer{Pull: AnswerWork, Token: &t,
-		Notice: workNotice(t), Guidance: text, GuidanceAt: says}
+		Notice: workNotice(t) + travelNotice(r, t), Guidance: text, GuidanceAt: says}
 }
 
 // scopeNotice says why nothing was handed out inside a scope the actor holds:
