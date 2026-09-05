@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"encoding/json"
 	"flag"
@@ -134,7 +135,7 @@ func runTest(c *call) int {
 		return 1
 	}
 	defer db.Close()
-	got, err := TestTheDelta(c.roots, db, *on, proposed, !*plan, *by)
+	got, err := TestTheDelta(c.ctx, c.roots, db, *on, proposed, !*plan, *by)
 	if err != nil {
 		c.answerJSON(map[string]any{"error": err.Error()})
 		return 1
@@ -153,7 +154,7 @@ func (s *stringList) Set(v string) error { *s = append(*s, v); return nil }
 
 // TestTheDelta decides what the delta calls for and, unless told only to
 // plan, runs it.
-func TestTheDelta(r Roots, db *sql.DB, on string, proposed []string, run bool, actor string) (Tested, error) {
+func TestTheDelta(ctx context.Context, r Roots, db *sql.DB, on string, proposed []string, run bool, actor string) (Tested, error) {
 	out := Tested{Chosen: []chosen{}, Ran: []ran{}, Proposed: proposed}
 	since := "HEAD"
 	if on != "" {
@@ -161,9 +162,7 @@ func TestTheDelta(r Roots, db *sql.DB, on string, proposed []string, run bool, a
 		if err != nil {
 			return out, err
 		}
-		if n := len(t.Began); n > 0 {
-			since = t.Began[n-1]
-		}
+		since = theSnapshotToDiff(r, t.Began)
 	}
 	out.Since = since
 	delta, err := deltaSince(r, db, since)
@@ -198,7 +197,7 @@ func TestTheDelta(r Roots, db *sql.DB, on string, proposed []string, run bool, a
 		// THE BATTERY IS STARTED, NOT AWAITED. It builds the engine and puts a
 		// new one over this tree, so waiting for it here is waiting inside the
 		// process it replaces. See battery.go.
-		out.Ran = append(out.Ran, startBattery(r, actor, on))
+		out.Ran = append(out.Ran, startBattery(ctx, r, actor, on))
 	} else if err := runOrLand(r, tests, &out, start); err != nil {
 		return out, err
 	}
@@ -486,6 +485,33 @@ func spanOf(ch change) string {
 // A repository with no commit yet has every file untracked, which the
 // second list answers; a folder that is not a repository at all is read off
 // the index, every file whole.
+// theSnapshotToDiff answers the newest take-up this clone can diff against.
+//
+// A began hash is a commit under refs/se/steps, and no push carries those, so
+// a token taken up on one box and worked on another names a snapshot this
+// clone never had. The newest one it does hold is read instead, and HEAD is
+// the floor. What it answers is what Tested.Since carries, because a reader
+// who is not told which snapshot was used cannot tell a narrow delta from a
+// stale one.
+func theSnapshotToDiff(r Roots, began []string) string {
+	for i := len(began) - 1; i >= 0; i-- {
+		if anObjectHere(r, began[i]) {
+			return began[i]
+		}
+	}
+	return "HEAD"
+}
+
+// anObjectHere says whether this clone holds that commit.
+func anObjectHere(r Roots, hash string) bool {
+	if hash == "" {
+		return false
+	}
+	cmd := quiet.Quietly(exec.Command("git", "cat-file", "-e", hash+"^{commit}"))
+	cmd.Dir = r.Work
+	return cmd.Run() == nil
+}
+
 func deltaSince(r Roots, db *sql.DB, since string) ([]change, error) {
 	git := func(args ...string) (string, error) {
 		cmd := quiet.Quietly(exec.Command("git", args...))
@@ -507,8 +533,13 @@ func deltaSince(r Roots, db *sql.DB, since string) ([]change, error) {
 	diff, err := git("diff", "-U0", "--no-color", "--no-ext-diff", since, "--", ".")
 	if err != nil {
 		said := err.Error()
+		// A HASH THIS CLONE NEVER HAD IS THE SAME ANSWER IN A FIFTH WORDING. A
+		// began snapshot lives under refs/se/steps, which no push carries, so a
+		// token taken up on one box and worked on another names a commit that
+		// git here calls a bad object.
 		if strings.Contains(said, "Could not access") || strings.Contains(said, "bad revision") ||
-			strings.Contains(said, "unknown revision") || strings.Contains(said, "ambiguous argument") {
+			strings.Contains(said, "unknown revision") || strings.Contains(said, "ambiguous argument") ||
+			strings.Contains(said, "bad object") {
 			diff = "" // no history to diff against, and the untracked list below is the tree
 		} else {
 			return nil, err
@@ -608,14 +639,15 @@ func runChosen(r Roots, db *sql.DB, tests []aTest, picks []chosen) ([]ran, strin
 			if !seen {
 				b, err := coverBinary(r, db, dir)
 				if err != nil {
-					out = append(out, ran{ID: t.ID, Kind: t.Kind, OK: false, Said: err.Error()})
+					// A PACKAGE THAT WILL NOT COMPILE IS NO RED. See nored.go.
+					out = append(out, aBuildFailure(r, t.ID, dir, err.Error()))
 					bins[dir] = ""
 					continue
 				}
 				bin, bins[dir] = b, b
 			}
 			if bin == "" {
-				out = append(out, ran{ID: t.ID, Kind: t.Kind, OK: false, Said: "the cover binary for " + dir + " will not build"})
+				out = append(out, aBuildFailure(r, t.ID, dir, ""))
 				continue
 			}
 			if !engineKnown {
@@ -798,7 +830,7 @@ func checkEngineNote(r Roots, handed string) string {
 	if why := residentStale(r); why != "" {
 		note += ". The engine over this tree is older than its source: " + why +
 			". A check that asks it reads the old build, so a failure here may be its age and not the change's. " +
-			"Swap first: se --swap --built"
+			"Swap first: " + TheBuildDoor
 	}
 	return note
 }

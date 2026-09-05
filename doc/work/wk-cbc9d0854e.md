@@ -39,6 +39,8 @@ Then write the two sections. Each one says the thing that went wrong, the way th
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
+| [ ] | what is gained by doing it, and not only what it does |  |  |
+| [ ] | what breaks if it is never done, and not only that it stays undone |  |  |
 | [ ] | the ask is small enough to review whole, or it is split first | — |  |
 | [ ] | every done-when line is decidable, and names the command where one decides it |  |  |
 | [ ] | the basics it stands on exist, or are minted first | — |  |

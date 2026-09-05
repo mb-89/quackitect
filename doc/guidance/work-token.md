@@ -36,7 +36,7 @@ How a test is built is [[testing]].
 ## Using one
 
 11. Do what the token asks and nothing next to it. If the ask is ambiguous, ask one question and wait. *
-12. Write each criterion's check before the work and watch that one go red. A check that will not go red is the finding. *
+12. Write each criterion's check first and watch it redden on an assertion, never on a build failure. One that cannot redden is the finding. *
 13. Put both halves of a mechanism in the evidence. Where the system mirrors halves, table them and drive the rule through each. *
 14. Report work as done only with the evidence that it is. An observation names the check and what it said. *
 15. A checklist carries institutional knowledge. Answer each line rather than ticking it. *
@@ -125,6 +125,13 @@ Watched going red for the reason expected, it proves the defect was there and th
 One that cannot be made red is a finding about the criterion, and it goes on the token first.
 So the red is recorded per criterion.
 Each names the test its criterion runs, its message matches an assertion in the tree, and a split-out criterion earns a fresh red.
+
+A build failure is not that red.
+The package is Go's compilation unit, and many hands share this tree.
+An identifier a half-finished change has not defined yet fails every test file beside it.
+So a failing check lands with the identifiers it names, as stubs, and the package still builds while the assertion fails.
+The engine holds the same line.
+A package that will not compile answers as a build, and it names the hand whose file the error names.
 
 ## 13. Half a mechanism ships
 

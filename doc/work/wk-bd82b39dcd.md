@@ -35,6 +35,8 @@ The guard says what it wants and lets the call through. It refuses nothing the m
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
+| [ ] | what is gained by doing it, and not only what it does |  |  |
+| [ ] | what breaks if it is never done, and not only that it stays undone |  |  |
 | [ ] | the approach is on the token before any work, as an interface or a shape a reader can disagree with |  |  |
 | [ ] | every done-when line is decidable, and names the command where one decides it |  |  |
 | [ ] | the change is small enough to review whole, or it is split first | — |  |

@@ -34,6 +34,8 @@ Fix: count over the same rows the panel draws, and let staffing ask a row's Name
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
+| [ ] | what is gained by doing it, and not only what it does |  |  |
+| [ ] | what breaks if it is never done, and not only that it stays undone |  |  |
 | [ ] | the ask is small enough to review whole, or it is split first | — |  |
 | [ ] | every done-when line is decidable, and names the command where one decides it |  |  |
 | [ ] | the basics it stands on exist, or are minted first | — |  |
