@@ -41,7 +41,7 @@ func TestAStaleBatteryMarkerDoesNotStopTheNextBattery(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	got := startBattery(r, "worker-one", "wk-1")
+	got := startBattery(t.Context(), r, "worker-one", "wk-1")
 	if strings.Contains(got.Said, "still going") {
 		t.Fatalf("a zombie held the battery: %s", got.Said)
 	}

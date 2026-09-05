@@ -131,6 +131,40 @@ body:
       maxWords: 250
       description: what is asked, or what is wrong, and why it matters
 
+    # THE FUNNEL SECTIONS. An idea is held before anybody commits to it, so it
+    # carries what a work token never has to: why it would be worth doing, what
+    # it costs to skip, and how much we would be willing to spend. Only the
+    # funnel process names these, so no other token grows by a word.
+    - header: what we gain
+      tense: present
+      maxWords: 200
+      description: what the system gains by doing it, written so a reader can disagree
+
+    - header: what breaks without it
+      tense: present
+      maxWords: 150
+      description: what stays broken or unbuilt if this is never done
+
+    - header: appetite
+      tense: present
+      maxWords: 100
+      description: how much we would be willing to spend, which bounds the solution rather than predicting it
+
+    - header: not this
+      tense: present
+      maxWords: 100
+      description: what is left out on purpose, so the idea does not grow while it waits
+
+    - header: what we do not know
+      tense: present
+      maxWords: 250
+      description: the open questions and the places a reader could sink, so the idea can be taken up cold
+
+    - header: prior art
+      tense: present
+      maxWords: 250
+      description: what was read and where the thinking came from, with links a later reader can follow
+
     - header: proposed action
       tense: present
       maxWords: 150
