@@ -87,11 +87,11 @@ Add an urgent flag to the token, set from the work editor the way a bucket is se
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | [[reviewing]] was read and applied | — |  |
-| [ ] | every hunk of git diff began..ended was read, and any not read is named |  |  |
-| [ ] | every criterion's command was run again, and what it said is named |  |  |
-| [ ] | every hunk improves the product, or a finding names the one that does not |  |  |
-| [ ] | every finding is a trivial token naming this one, and their ids are here |  |  |
+| [x] | [[reviewing]] was read and applied | read first: one round, improvement over perfection, findings minted |  |
+| [x] | every hunk of git diff began..ended was read, and any not read is named | all 14 files of 6cbecc0a read whole, none skipped. The rest of that span is other tokens |  |
+| [x] | every criterion's command was run again, and what it said is named | set --by person wrote the flag and se find read it back, --by an agent was refused. TestAnUrgentTokenGoesOutFirst ok 0.45s. drive-editor ok 2.60s |  |
+| [x] | every hunk improves the product, or a finding names the one that does not | yes, but for two work.base hunks answering no criterion: wk-ef7d0af942 |  |
+| [x] | every finding is a trivial token naming this one, and their ids are here | wk-ef7d0af942. Also seen: a put-down never clears the flag, which the token settled |  |
 
 ## note
 
