@@ -275,11 +275,7 @@ func noteMove(r Roots, t, was Token, existed bool) {
 	switch {
 	// THE LINE SAYS WHAT HAPPENED, IT IS NOT INFERRED FROM WHAT IS IN IT.
 	//
-	// MEASURED. The burn-down counted a mint by looking for a line that had a
-	// status and no from, and an ending by looking for a disposition, and
-	// neither key was ever written. Both numbers read nought for every day
-	// there has ever been, and nothing said so, because nought is a number a
-	// burn-down is allowed to answer.
+	// Why it is this shape: [[the-line-says-what-happened]].
 	case !existed:
 		inSession(r, "work", orElse(t.Holder, "main"), t.ID+" minted "+t.Status+": "+t.Title, Yes(),
 			map[string]any{"id": t.ID, "minted": true, "status": t.Status, "process": t.Process})
