@@ -53,5 +53,5 @@ The step 1, step 2 and step 3 evidence checklists were lost from doc/work/wk-526
 
 Nothing was lost from either file, so there is nothing to restore. Both carry all three step tables and their criterion sections. Against the ended commits both working files are LARGER, 12945 vs 7855 and 13549 vs 8029 bytes. Diffed by git show, step 1 and step 2 are byte-identical. The only differences are the close itself and step 3, which is ANSWERED here where the commit holds five blank rows. So criterion 1, byte-identical to the ended commit, cannot be met without DELETING the step 3 verdict. Criterion 2 is met. Criterion 3 is met: .bin/se.exe lint exits 0 with 33 finding lines, all against doc/guidance/methods/retro.md and none against either file. Caution: git diff against those commits calls both files deleted, which is a false signal, because both are untracked in git. Compare with git show.
 
-Submitted dropped and refused: blocked on wk-7887984486, open and held by worker-tarn.
+Submitted dropped and refused: blocked on wk-7887984486, which was open and in another actor's hands.
 

@@ -268,24 +268,60 @@ func claimsAHold(low, says string, at int) bool {
 			strings.HasSuffix(low[:at], "are ") || strings.HasSuffix(low[:at], "were ") ||
 			strings.HasPrefix(strings.TrimSpace(rest), "token")
 	}
-	// "the holder is" ALREADY NAMES THE HOLDER, so whatever follows is the who,
-	// and "the holder is the reviewer who asked" is a claim like any other. Only
-	// the two phrases where a generic word can stand in for a person are
-	// narrowed below.
+	next := strings.Fields(rest)
+	word := func(i int) string {
+		if i >= len(next) {
+			return ""
+		}
+		return strings.Trim(next[i], ".,:;\"'`)")
+	}
+
+	// "the holder is" ALREADY NAMES THE HOLDER, so whatever follows is the who.
+	// A word that is a state rather than a person is the engine being described:
+	// "the holder is engine state", "the holder is alive", "the holder is not
+	// called stale". None of those goes stale when a session ends.
 	if says == "the holder is" {
+		switch word(0) {
+		case "not", "neither", "never", "still", "alive", "gone", "engine", "":
+			return false
+		}
 		return true
 	}
-	// THE WHO COMES NEXT, and a word that names no one particular is the rule
-	// being described rather than this token being claimed. "held by that agent"
-	// and "held by agents that are gone" are sentences about how the engine
-	// behaves, and they were the bulk of what this rule reported.
-	next := strings.Fields(rest)
-	if len(next) == 0 {
+
+	// "is held TO" IS A STANDARD, NOT A HOLD. An agent is held to the voice
+	// rules, and nobody is holding it. The two senses are one word apart.
+	if says == "is held" {
+		switch word(0) {
+		case "to":
+			return false
+		case "by":
+			// "is held by X" IS THE SAME SENTENCE AS "held by X", and both
+			// spellings match here, so the who is read past the by rather than
+			// judged as if it were the who.
+			return namesSomebody(word(1))
+		}
+		// A TOKEN SAID TO BE HELD CLAIMS A HOLD WITHOUT NAMING ANYBODY, and it
+		// goes stale exactly as fast. That is the rule's other half.
+		return true
+	}
+
+	// THE WHO COMES NEXT, and a word naming no one particular is the rule being
+	// described rather than this token being claimed. "held by that agent" and
+	// "held by agents that are gone" are sentences about how the engine behaves,
+	// and they were the bulk of what this rule reported.
+	return namesSomebody(word(0))
+}
+
+// namesSomebody says whether this word stands for a person rather than for
+// anybody at all.
+func namesSomebody(w string) bool {
+	if w == "" {
 		return false // the line stops before it says who, so it names nobody
 	}
-	switch strings.Trim(next[0], ".,:;\"'`)") {
-	case "a", "an", "that", "this", "any", "some", "no", "another",
-		"agents", "agent", "somebody", "anybody", "nobody", "whoever", "them", "it":
+	switch w {
+	case "a", "an", "the", "that", "this", "any", "some", "no", "another",
+		"agents", "agent", "actors", "actor", "somebody", "anybody", "nobody",
+		"whoever", "them", "it", "one":
 		return false
 	}
 	return true

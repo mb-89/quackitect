@@ -15,6 +15,14 @@ import (
 //
 // NAMING A REASON WAS STOPPING. The claim was read and the stop granted in the
 // same breath, so the reason cost nothing and any of the five words did.
+//
+// THE REASON HERE IS NOT asked, AND THAT IS THE POINT OF THE CHOICE. The
+// person's word is granted on the claim that names it, whatever is in the
+// agent's hands, so an argument test claiming asked argues with nothing and
+// asserts that it did. These three did, and went on passing until the carve-out
+// landed and then failed together for a rule they were never about.
+// TestThePersonsWordIsNotArguedWith holds that rule, so it is tested where it
+// lives rather than by accident here.
 func TestAClaimIsArguedWithAndTheThirdIsGranted(t *testing.T) {
 	r := aTreeWithTheProcesses(t)
 	log, err := OpenLog(r.Private("log"))
@@ -38,7 +46,7 @@ func TestAClaimIsArguedWithAndTheThirdIsGranted(t *testing.T) {
 	}
 	claim := func() {
 		t.Helper()
-		if err := ClaimStop(r, "main", "asked", "they told me to stop"); err != nil {
+		if err := ClaimStop(r, "main", "broken", "the toolchain will not build and no remedy gets past it"); err != nil {
 			t.Fatal(err)
 		}
 	}
@@ -97,7 +105,7 @@ func TestAClaimWithEmptyHandsIsGrantedAtOnce(t *testing.T) {
 
 	// NOTHING IS MINTED, so nothing is held and the engine has no answer to give
 	// back. One claim is the whole of it.
-	if err := ClaimStop(r, "main", "asked", "they told me to stop"); err != nil {
+	if err := ClaimStop(r, "main", "broken", "the toolchain will not build and no remedy gets past it"); err != nil {
 		t.Fatal(err)
 	}
 	if said := stop(); strings.Contains(said, "block") {
@@ -138,7 +146,7 @@ func TestCarryingOnStartsTheArgumentAgain(t *testing.T) {
 	tell("Stop", nil) // the first of the session
 
 	for i := 0; i < claimsBeforeAStopIsGranted-1; i++ {
-		if err := ClaimStop(r, "main", "asked", "they told me to stop"); err != nil {
+		if err := ClaimStop(r, "main", "broken", "the toolchain will not build and no remedy gets past it"); err != nil {
 			t.Fatal(err)
 		}
 		tell("Stop", nil)
@@ -148,7 +156,7 @@ func TestCarryingOnStartsTheArgumentAgain(t *testing.T) {
 		"tool_input": map[string]any{"file_path": "notes.md"}})
 
 	// THE NEXT CLAIM IS CLAIM ONE, so it is argued with rather than granted.
-	if err := ClaimStop(r, "main", "asked", "they told me to stop"); err != nil {
+	if err := ClaimStop(r, "main", "broken", "the toolchain will not build and no remedy gets past it"); err != nil {
 		t.Fatal(err)
 	}
 	if said := tell("Stop", nil); !strings.Contains(said, "block") {
@@ -164,5 +172,53 @@ func TestTheRefusalAsksBeforeItLists(t *testing.T) {
 		if !strings.Contains(said, asks) {
 			t.Errorf("the refusal does not ask about %q: %s", asks, said)
 		}
+	}
+}
+
+// THE PERSON'S WORD IS NOT ARGUED WITH.
+//
+// THE OWNER'S WORDS: if the user tells you that you stop, I don't give a shit
+// about your sub tokens. You stop.
+//
+// Every other reason is the agent's own judgement, and the engine tests that by
+// pushing back twice. asked is not the agent's judgement, so pushing back tests
+// the person, which the engine has no business doing. An agent told to stop
+// claimed asked, the engine asked whether asked was the nearest of five words,
+// and the person watched it take another turn to say yes.
+//
+// IT IS HELD HERE BECAUSE NOTHING HELD IT. The rule was written into the stop
+// decision and the tests around it went on claiming asked while asserting an
+// argument, so the carve-out and its own coverage were the same three tests
+// pulling opposite ways.
+func TestThePersonsWordIsNotArguedWith(t *testing.T) {
+	r := aTreeWithTheProcesses(t)
+	log, err := OpenLog(r.Private("log"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer log.Close()
+	record(log, "engine", "start", "engine", "engine started", Yes(), nil)
+
+	// WORK IS IN HAND, which is the only thing the engine ever argues with. Any
+	// other reason would be pushed back on twice here.
+	tok := mintStandard(t, r, "work being interrupted")
+	if _, err := TakeUp(r, tok.ID, "main"); err != nil {
+		t.Fatal(err)
+	}
+	stop := func() string {
+		t.Helper()
+		body, _ := json.Marshal(map[string]any{"hook_event_name": "Stop", "cwd": r.Work,
+			"session_id": "s-1", "stop_hook_active": true})
+		var out bytes.Buffer
+		answerHook(body, []string{"--method", r.Method}, &out, log)
+		return out.String()
+	}
+	stop() // the first of the session, granted on its own rule
+
+	if err := ClaimStop(r, "main", "asked", "they told me to stop"); err != nil {
+		t.Fatal(err)
+	}
+	if said := stop(); strings.Contains(said, "block") {
+		t.Fatalf("the person's word was argued with over open work: %s", said)
 	}
 }
