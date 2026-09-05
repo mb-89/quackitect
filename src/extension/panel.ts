@@ -365,8 +365,8 @@ function css(): string {
   .control input[type=number], .control input[type=text], .control select { width: 100%; }
   /* A TABLE TAKES THE WHOLE ROW, and a narrow sidebar is what it has to fit
      in: the holding column is the long one and it is the one that ellipses.
-     A column's width is on the cell, from the declaration, and no rule here
-     names a column. */
+     A column that declares a width carries it inline and wins over the sheet.
+     What the two declared columns get when it does not is named below. */
   .table { grid-column: 1 / -1; overflow: hidden; }
   .table table { width: 100%; border-collapse: collapse; table-layout: fixed; }
   .table th { text-align: left; font-weight: normal; padding: 2px 4px 2px 0;
@@ -374,6 +374,14 @@ function css(): string {
               border-bottom: 1px solid var(--vscode-panel-border); }
   .table td { padding: 2px 4px 2px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .table td.holding { color: var(--vscode-descriptionForeground); }
+  /* THE COLUMNS, NAMED. A cell's class is its column's field name, so these two
+     are the agent and what it is working on. The layout is fixed, so with a
+     width on neither the sidebar split the row evenly and the long column
+     ellipsed a title away while the short one sat half empty. The agent column
+     is as wide as a worker name needs and no wider, and the rest is the
+     title's, which is the column the comment above says should ellipse. */
+  .table th.actor, .table td.actor { width: 8.5em; }
+  .table th.title, .table td.title { width: auto; }
   /* NO COLOUR PER STATE. A rule naming one would put that word on every page
      this file draws, and panel-says-holding holds the page to the answer it
      was handed: a page carrying a state nobody gave it is the defect that
