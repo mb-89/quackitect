@@ -1,0 +1,92 @@
+name: funnel
+description: an idea worth keeping, held before anybody commits to it
+
+# THE FUNNEL IS WHERE AN IDEA WAITS, AND WAITING IS NOT A BACKLOG. A backlog is
+# work somebody is owed. A funnel item is an option: it may be drawn, and until
+# it is, nobody owes anybody anything. So no step here is pulled, and every one
+# of them is the owner's. The engine hands a funnel item to nobody.
+#
+# AND IT TRAVELS, unlike a note. A note is private because nobody has decided
+# what it is. An idea has been decided: it is worth keeping. An idea only one
+# box can read is a drawer, so a funnel item is born tracked.
+#
+# READY_WHEN IS REQUIRED, AND THAT IS THE WHOLE DEFENCE. Every store of ideas
+# turns into a graveyard, and the name on the store never saves it. What saves
+# it is that each item says what would make it worth reading again. A token
+# carries no time, so this is a condition and never a date.
+
+sections:
+  required:
+    - detail
+    - what we gain
+    - what breaks without it
+    - appetite
+  optional:
+    - not this
+    - what we do not know
+    - prior art
+
+fields:
+  required:
+    - needs_human
+    - ready_when
+  optional:
+    - bucket
+    - author
+    - depends_on
+    - parent
+    - disposition
+    - reason
+    - successors
+
+states:
+  - name: funnel
+    description: held, and waiting for the day it is worth reading again
+  - name: closed
+    description: drawn or dropped, and the disposition says which
+
+activities:
+  - name: write
+    supplier: anyone
+    input: an idea nobody is ready to commit to
+    does: write it so a stranger can take it up cold, and say what it would gain and what it costs to skip
+    output: a funnel item
+    customer: the funnel
+    by: anyone
+    to: funnel
+    pulled: false
+    criteria:
+      - says: the guidance this token names was read and applied
+      - says: what the system gains is written so a reader can disagree with it
+        evidence: required
+      - says: what breaks if it is never done, and not a restatement of the idea
+        evidence: required
+      - says: the appetite says what we would spend, and not what it would cost
+      - says: ready_when names the condition that makes this worth reading again
+      - says: it is born tracked, because an idea one box alone can read is a drawer
+      - says: a stranger could take it up without asking you anything
+
+  - name: draw
+    supplier: the funnel
+    input: a funnel item whose ready_when holds
+    does: "decide whether it becomes work. Drawing it mints the tokens and names them as successors. Leaving it costs nothing, and the item stays where it was."
+    output: a disposition, and the work it became
+    customer: the queue
+    by: the owner
+    from: funnel
+    to: closed
+    pulled: false
+    criteria:
+      - says: the item was read whole, and its ready_when was judged
+      - says: the disposition says what happened
+        evidence: required
+      - says: a became names its successors, and every one of them exists
+      - says: a dropped says why, in a sentence about this idea
+      - says: not yet is a new ready_when, and never a disposition
+
+dispositions:
+  - name: became
+    description: it is work now, and the successors name it
+  - name: dropped
+    description: it is not something we will ever do, or it stopped being true
+    reason: required
