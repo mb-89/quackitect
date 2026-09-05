@@ -8,7 +8,9 @@ guidance: [[work-token]]
 # the name this token is known by, in references and in links
 title: "delta is the token's"
 # where the token stands. The process owns these values.
-status: open
+status: done
+# who did the work step, so the verdict is never theirs
+author: worker-nono
 claimed_by: aeaf7bd9/worker-nono
 claimed_at: "2026-09-05T13:53:47Z"
 # the tree each time the work was taken up, snapshots the engine wrote
@@ -17,11 +19,13 @@ began:
   - c151dd4489d7eb8800cb5d4e8c20994389164234
   - 903cef1adc8a5c9bf4012a18adda1745b9a7b524
   - f9bdf9cb007a4fd044b7a0f8750fc47c502bb915
+  - 30ca447cbae9d61bd3f39bb2bf5c6f27d810748f
 # the tree each time the work was put down or closed, snapshots the engine wrote
 ended:
   - 044ab9e809e7a1129acd76ba4fc2187543a44aed
   - 31be71428c615578d4ae8842519777eb2e86eed4
   - 1e26948feed06d08c396685a20d695e6dbf722d9
+  - 2681370a2feb46c6c9492c84edc0a8f847a698c9
 ---
 
 ## detail
