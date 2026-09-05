@@ -36,3 +36,39 @@ func TestARefusedColumnIsLockedOnTheAnswer(t *testing.T) {
 		t.Fatalf("the write refuses with %v and the answer says %q", err, got.Locked["status"])
 	}
 }
+
+// AND THE REASON IS WRITTEN FOR THE PERSON HOVERING THE CELL.
+//
+// refusedByHand ends in a default addressed to whoever calls WriteFieldBy:
+// this program does not write "subs". Three columns a person can put in a view
+// fell through to it, so the tooltip on a locked cell was the compiler's
+// sentence. The editor's own list, deleted when this ruling moved into the
+// engine, said the engine decides this for seq and type, and a list is edited
+// in the note for subs.
+//
+// blocked still falls through, and should: it is a column nothing knows, and
+// the default is the true answer for one of those. What is asked here is that
+// a field the engine does know is answered in words.
+func TestALockedColumnSaysWhyToAPerson(t *testing.T) {
+	t.Parallel()
+	for _, field := range []string{"seq", "type", "subs"} {
+		why := refusedByHand(field, "person")
+		if why == "" {
+			t.Fatalf("%s is not locked, so the page offers an edit the engine refuses", field)
+		}
+		if strings.Contains(why, "this program does not write") {
+			t.Fatalf("%s falls through to the default, and a person hovering it reads %q", field, why)
+		}
+	}
+	// AND EACH SAYS THE THING THAT IS TRUE OF IT, rather than all three sharing
+	// one sentence that fits none of them.
+	for field, want := range map[string]string{
+		"seq":  "the engine's",
+		"type": "the engine's",
+		"subs": "edited in the note",
+	} {
+		if why := refusedByHand(field, "person"); !strings.Contains(why, want) {
+			t.Fatalf("%s is locked with %q, which does not say %q", field, why, want)
+		}
+	}
+}
