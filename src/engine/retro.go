@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"context"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -123,6 +124,12 @@ type Collected struct {
 	// reading that says how much it could not take.
 	Timeline         string `json:"timeline"`
 	TimelineUnplaced int    `json:"timeline_unplaced,omitempty"`
+
+	// WHAT THE TIDY PUT RIGHT ON THE WAY IN, part by part. A retro is the cycle
+	// boundary, so it is where a tree that has drifted is put back. Each part
+	// says what it did and what this box could not do, which is how a desk
+	// learns the work a cloud box had to leave.
+	Tidy []TidyPart `json:"tidy"`
 }
 
 // VoiceTally is one rule the agent broke while the period ran: which rule, how
@@ -236,6 +243,12 @@ func Retro(r Roots, actor string, transcripts []Transcript) (Collected, error) {
 			"Wait for them, or take the work back, and run it again",
 			strings.Join(busy, "\n  "))
 	}
+
+	// THE TIDY RUNS FIRST, AND NEVER STOPS THE RETRO. Every part of it fails
+	// soft, so the worst it can do is say what this box could not put right.
+	// A retro is where the tidying belongs because it is the cycle boundary,
+	// and one verb called from here beats a list somebody has to remember.
+	got.Tidy = Tidy(context.Background(), r)
 
 	// THE LOG IS ROTATED FIRST, so the session that is running becomes an old
 	// file and this retro sees it rather than the next one.

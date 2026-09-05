@@ -51,6 +51,7 @@ var run = map[string]verb{
 	"lint":    runLint,
 	"hold":    runHold,
 	"retro":   runRetro,
+	"tidy":    runTidy,
 	"said":    runSaid,
 	"answer":  runAnswer,
 	"config":  runConfig,

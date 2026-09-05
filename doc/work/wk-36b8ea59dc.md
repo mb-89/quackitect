@@ -73,11 +73,21 @@ runRetro calls it and carries the parts.
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the guidance this token names was read and applied | — |  |
-| [ ] | the change follows the approach on the token, or the token says why it departed |  |  |
-| [ ] | se test --on this token answered ok, and what it ran is named |  |  |
-| [ ] | the note says what changed and why, for a reader who was not here |  |  |
-| [ ] | the cleanup the change revealed is in the change, or is a token of its own | — |  |
+| [x] | the guidance this token names was read and applied | Each check was written first and watched red. The second-run one stayed red on a real defect and found it. | work-token.md |
+| [x] | the change follows the approach on the token, or the token says why it departed | It departs on one part. refs counts and deletes nothing, because a sweep would take a closed token's steps. | 1 departure |
+| [x] | se test --on this token answered ok, and what it ran is named | ok. Four tidy tests and three retro ones. go vet and gofmt clean. | 7 ran, ok |
+| [x] | the note says what changed and why, for a reader who was not here | The note is below. | note written |
+| [x] | the cleanup the change revealed is in the change, or is a token of its own | wk-e9df6b4eaa carries began and ended onto the archived row, which makes the refs sweep decidable. | wk-e9df6b4eaa |
+
+## note
+
+se tidy is one verb with three parts, in src/engine/tidy.go. Each answers a name, a count, whether this box could do it, and why it did no more. No part answers an error or sets an exit code, so one that cannot run leaves the rest running. runRetro calls it on the way in.
+
+archive is SweepClosed, the right job behind the wrong door. It counts rows the archive gained, not tokens SweepClosed walked. A closed local token stays on the disk until a retro reads it, so SweepClosed reports it swept every run.
+
+claims drops a lapsed claim from the frontmatter. Readers only asked lapsed again, so a stale holder sat in every list.
+
+refs counts and deletes nothing, departing from the approach. Only began or ended names a snapshot ref, and an archived row carries neither. A sweep would take what a reviewer reads. wk-e9df6b4eaa makes it decidable.
 
 ## evidence: step 3. verdict
 
