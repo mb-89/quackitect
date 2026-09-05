@@ -77,10 +77,10 @@ A token carrying a non-empty ready_when is not handed out by the queue.
 | done | criterion | evidence | receipt |
 |---|---|---|---|
 | [x] | [[reviewing]] was read and applied | Read whole and applied. | [[reviewing]] |
-| [x] | every hunk of git diff began..ended was read, and any not read is named | Only doc/work/wk-5bba8e497a.md moved, in 502e425a and d8345e95. Both read. Four commits in the range are other tokens, not read: 1b9e95b3, 468a2c45, 09546eee, 54dacf1d. | git show |
-| [x] | every criterion's command was run again, and what it said is named | go test answered ok. The door answered ok true on TestAParkedTokenLeavesTheQueueAndIsNamed. The regex found it at parkednamed_test.go:17. Source agrees at pull.go:728 and pull.go:760. | go test -run TestAParkedTokenLeavesTheQueueAndIsNamed |
-| [x] | every hunk improves the product, or a finding names the one that does not | Pass. One hunk does not. The added approach contradicts the older one below it. | line 85 |
-| [x] | every finding is a trivial token naming this one, and their ids are here | One finding, wk-72360d4c5f. Nothing else seen. | wk-72360d4c5f |
+| [x] | every hunk of git diff began..ended was read, and any not read is named | This clone holds 3 of 7 snapshots, so began..ended does not resolve. The real span be26f4b1..cbe199d3 holds 6. I read 502e425a and d8345e95. Unread, other tokens: 1b9e95b3, 468a2c45, 09546eee, 54dacf1d. | git log be26f4b1..cbe199d3 |
+| [x] | every criterion's command was run again, and what it said is named | I ran the test. It answered ok, 2.851s. se find found it at parkednamed_test.go:17. WaitsForAPerson is asked at pull.go:706, 728, 757. | go test -run TestAParkedTokenLeavesTheQueueAndIsNamed |
+| [x] | every hunk improves the product, or a finding names the one that does not | Pass. The note is the whole delta. One hunk fails. 502e425a added a second approach citing pull.go:613, where no check sits. | doc/work/wk-5bba8e497a.md |
+| [x] | every finding is a trivial token naming this one, and their ids are here | One finding, wk-72360d4c5f, minted already and naming this token. Nothing else seen. | wk-72360d4c5f |
 
 ## approach
 
@@ -88,15 +88,9 @@ ONE QUESTION, ASKED WHERE THE QUEUE CHOOSES. WaitsForAPerson(t) answers a senten
 
 THE FIELD IS THE WHOLE STATE. Nothing is written when a token is parked. Clearing ready_when puts it in the queue again on the next pull, so the put-down needs no change of its own.
 
-AND WHOEVER PARKS ONE HAS TO FIND IT AGAIN. Both the state of play and se query name every token carrying the field, with its condition. A token nothing shows is one nobody un-parks.
+THE CONDITION SITS BESIDE THE Blocked CHECK, in the unheld loop of next(). A non-empty ready_when leaves the queue nothing to hand out. depends_on is the kind an engine judges, and ready_when is the other kind by definition.
+
+AND WHOEVER PARKS ONE HAS TO FIND IT AGAIN. Both the state of play and se query name every token carrying the field, with its condition. Un-parking is the parker's own, and wk-cfe766ba1c is the standing pass that asks.
 
 needs_human rides the same question. A token marked as needing a person waits on the same thing, and two questions meaning one thing drift apart.
-
-## approach
-
-One condition beside the Blocked check in the unheld loop of next(), at src/engine/pull.go:613. A non-empty ready_when takes the token out of what the queue may hand out.
-
-A condition an engine can check is depends_on, and the engine decides that one on its own. ready_when is the other kind by definition, so the queue has nothing to judge and passes over it.
-
-Parked work then has one surface, which is the state of play, and it already lists the field. Whoever parks a token owns un-parking it, and wk-cfe766ba1c is the standing pass that asks.
 
