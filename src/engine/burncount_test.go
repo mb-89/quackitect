@@ -18,8 +18,8 @@ import (
 // only reading of nought is that the count is broken.
 func TestTheBurndownCountsWhatHappened(t *testing.T) {
 	t.Parallel()
-	root := t.TempDir()
-	r := Roots{Method: root, Work: root}
+	r := aTree(t).Roots
+	root := r.Work
 	writeProcess(t, root, "counted")
 	// A SESSION IS WHAT THE RECORD BELONGS TO. Every move writes into the log
 	// that is open, so a tree with no session records nothing, which is why
@@ -68,8 +68,8 @@ func TestTheBurndownCountsWhatHappened(t *testing.T) {
 // A day nothing happened on answers nought, and that is not the same fault.
 func TestABurndownForAQuietDayIsNought(t *testing.T) {
 	t.Parallel()
-	root := t.TempDir()
-	r := Roots{Method: root, Work: root}
+	r := aTree(t).Roots
+	root := r.Work
 	writeProcess(t, root, "counted")
 	openSession(t, r)
 	if _, err := Mint(r, Token{Tracked: local(), Process: "counted", Title: "minted today", Status: "first"}); err != nil {
@@ -90,8 +90,7 @@ func TestABurndownForAQuietDayIsNought(t *testing.T) {
 // a short window rather than guessed at.
 func TestABurndownSaysWhatItCovers(t *testing.T) {
 	t.Parallel()
-	root := t.TempDir()
-	r := Roots{Method: root, Work: root}
+	r := aTree(t).Roots
 	b := TheBurndown(r, TheDay(time.Now()))
 	if b.Window == "" {
 		t.Error("the burn-down says nothing about what it covers")

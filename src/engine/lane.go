@@ -188,6 +188,7 @@ func runQuery(c *call) int {
 		fmt.Fprintln(c.err, "")
 		fmt.Fprintln(c.err, "  se query --list          which views exist")
 		fmt.Fprintln(c.err, "  se query --view work     draw the first view in work.base")
+		fmt.Fprintln(c.err, "  se query --calls         every call a caller makes, as JSON")
 		fmt.Fprintln(c.err, "")
 		fs.PrintDefaults()
 	}
@@ -196,8 +197,25 @@ func runQuery(c *call) int {
 	which := fs.String("pane", "", "which view inside the file (default: the first)")
 	list := fs.Bool("list", false, "print the views that exist and exit")
 	panes := fs.Bool("panes", false, "print the views this file declares, in order, and exit")
+	calls := fs.Bool("calls", false, "print every call a caller makes, as JSON, and exit")
 	if code, stop := c.parse(fs, "query"); stop {
 		return code
+	}
+
+	// THE CALLS COME BEFORE ANY VIEW IS RESOLVED, because the catalog is about
+	// this program rather than about the tree, and a caller asking what to send
+	// has nothing to send yet.
+	//
+	// IT IS ONE LINE, where every other answer here is indented. A caller reads
+	// it whole either way, and a person greps the call that fetched it out of
+	// what came back, which indented JSON puts on four lines.
+	if *calls {
+		b, err := json.Marshal(TheCatalog())
+		if err != nil {
+			return c.fail(err)
+		}
+		fmt.Fprintln(c.out, string(b))
+		return 0
 	}
 
 	roots := c.roots

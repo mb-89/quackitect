@@ -103,7 +103,7 @@ func TestAVerbRunsInsideTheEngineAndTheClientPrintsIt(t *testing.T) {
 	// HELP NEEDS NO ENGINE, AND IT IS NOT AN ANSWER. It goes where the
 	// reasons go, so a reader parsing the answer stream as JSON never meets
 	// a usage message where a token should be.
-	cold := Roots{Method: t.TempDir(), Work: t.TempDir()}
+	cold := aTree(t).apart().Roots
 	asked := exec.Command(exe, "work", "--help", "--work", cold.Work)
 	var answer, reason bytes.Buffer
 	asked.Stdout, asked.Stderr = &answer, &reason
@@ -132,7 +132,7 @@ func TestAVerbRunsInsideTheEngineAndTheClientPrintsIt(t *testing.T) {
 func TestAClientFailureNamesTheReasonStream(t *testing.T) {
 	t.Parallel()
 	exe := theEngine(t)
-	cold := Roots{Method: t.TempDir(), Work: t.TempDir()}
+	cold := aTree(t).apart().Roots
 	verb := []string{"work", "--title", "nobody home", "--work", cold.Work}
 
 	// WHAT THE CLIENT WROTE THERE, read off the stream itself, so the check

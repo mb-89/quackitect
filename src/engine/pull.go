@@ -34,6 +34,7 @@ import (
 const (
 	AnswerWork    = "work"    // here is a token: do it
 	AnswerRefused = "refused" // the submission failed a check a program could make
+	AnswerSettled = "settled" // the submission was taken and no work was handed on
 	AnswerWait    = "wait"    // nothing to do, and the notice says why
 	// The fifth. A hold nobody is behind is worth more than the next token.
 )
@@ -55,6 +56,14 @@ type Payload struct {
 	Disposition string   `json:"disposition,omitempty"`
 	Successors  []string `json:"successors,omitempty"`
 	Reason      string   `json:"reason,omitempty"`
+
+	// settleOnly says this submission wants no token back, which is a person at
+	// a shell rather than an agent in a lane.
+	//
+	// IT IS UNEXPORTED BECAUSE IT IS NOT THE PAYLOAD'S TO SAY. Which door an ask
+	// came through is the engine's own reading, and a field the JSON could set
+	// would let a lane opt out of being handed work.
+	settleOnly bool
 }
 
 type Answer struct {
@@ -139,6 +148,19 @@ func answerFor(r Roots, actor, role string, p Payload) Answer {
 			return a
 		}
 		learned, over = a.Learned, a.Notice
+		// A SUBMISSION AT A SHELL IS ONE THING ASKED FOR, AND ONE THING ANSWERED,
+		// AND THE QUEUE IS NOT READ AT ALL.
+		//
+		// It used to be read and the token it handed out put back a moment later.
+		// Handing out opens a stretch and a put-down closes one, so every shell
+		// submission wrote a began and an ended onto whatever token the queue
+		// would have handed on, with two snapshot commits behind them. That
+		// token's record then said it had been in a hand it was never in.
+		if p.settleOnly {
+			return Answer{Pull: AnswerSettled, Notice: p.ID + " is settled. The next token goes to a " +
+				"lane, because an agent that submits is asking for more. Ask for work again when " +
+				"you want it."}
+		}
 	}
 	// A HOLD ON YOUR OWN VERDICT IS NOT WORK IN HAND. The submission put the
 	// token down, and naming it again through se run or se apply took it back
@@ -368,6 +390,18 @@ func checkDisposition(r Roots, t Token, p Payload) *Rejection {
 		}
 		return nil
 	}
+	return theEnding(r, proc, said, p.Reason, p.Successors)
+}
+
+// theEnding says whether an ending a caller names is one this token can carry.
+//
+// EVERY DOOR THAT ENDS A TOKEN ASKS THIS ONE. The submission asks it and so
+// does the abort, which is the door that ends a token from wherever it stands.
+// The abort wrote dropped whatever had happened, so a token that turned out
+// larger and was split could only be recorded as one nobody wanted, and a
+// second copy of these rules beside it would be a second answer to the same
+// question.
+func theEnding(r Roots, proc Process, said, reason string, successors []string) *Rejection {
 	var spec *DispositionSpec
 	for i, d := range proc.Dispositions {
 		if d.Name == said {
@@ -380,7 +414,7 @@ func checkDisposition(r Roots, t Token, p Payload) *Rejection {
 			Wrong:     "a token cannot close without one, and " + proc.Name + " does not end " + quoted(said),
 			Satisfies: "one of: " + strings.Join(proc.DispositionNames(), ", ")}
 	}
-	if spec.NeedsReason && strings.TrimSpace(p.Reason) == "" {
+	if spec.NeedsReason && strings.TrimSpace(reason) == "" {
 		return &Rejection{Clause: "disposition", Wrong: said + " carries no reason",
 			Satisfies: "why the work stopped"}
 	}
@@ -388,11 +422,11 @@ func checkDisposition(r Roots, t Token, p Payload) *Rejection {
 	// does not exist is not a thing a process can declare: it is a claim about
 	// the record, and the record is what this reads.
 	if Disposition(said) == Became {
-		if len(p.Successors) == 0 {
+		if len(successors) == 0 {
 			return &Rejection{Clause: "disposition", Wrong: "became names no successor",
 				Satisfies: "the ids of the tokens this became"}
 		}
-		for _, id := range p.Successors {
+		for _, id := range successors {
 			if _, err := LoadToken(r, id); err != nil {
 				return &Rejection{Clause: "disposition", Wrong: "no such successor: " + id,
 					Satisfies: "successors that exist"}

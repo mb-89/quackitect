@@ -18,6 +18,9 @@
       "description": "TEST WHAT YOU CHANGED, naming the token: on: \u003cid\u003e.",
       "inputSchema": {
         "properties": {
+          "actor": {
+            "type": "string"
+          },
           "on": {
             "type": "string"
           },
@@ -55,8 +58,16 @@
             "description": "claim what the queue would hand you on this many pulls",
             "type": "integer"
           },
+          "no_publish": {
+            "description": "write the claim here and leave git alone",
+            "type": "boolean"
+          },
           "release": {
             "description": "give back what you hold",
+            "type": "boolean"
+          },
+          "sync": {
+            "description": "look for other boxes' claims now, rather than waiting for the engine's clock",
             "type": "boolean"
           },
           "take": {
@@ -81,6 +92,10 @@
       "description": "SEARCH THE TREE THROUGH THE INDEX: words (FTS5), regex, or path (a glob; alone it lists files).",
       "inputSchema": {
         "properties": {
+          "archive": {
+            "description": "search what has been archived rather than the tree",
+            "type": "boolean"
+          },
           "limit": {
             "type": "integer"
           },
@@ -254,6 +269,10 @@
           },
           "because": {
             "type": "string"
+          },
+          "list": {
+            "description": "print what is sanctioned, and claim nothing",
+            "type": "boolean"
           },
           "why": {
             "type": "string"
