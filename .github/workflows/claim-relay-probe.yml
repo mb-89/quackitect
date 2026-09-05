@@ -27,6 +27,8 @@ jobs:
       - name: push a throwaway ref under refs/se/
         run: |
           set -x
+          git config user.name quackitect-probe
+          git config user.email noreply@github.com
           S="${{ inputs.stamp || github.run_id }}"
           R="refs/se/probe-$S"
           echo "PROBE_REF $R"
