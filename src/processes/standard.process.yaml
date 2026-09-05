@@ -16,6 +16,7 @@ fields:
     - bucket
     - holder
     - author
+    - urgent
     - needs_human
     - depends_on
     - parent

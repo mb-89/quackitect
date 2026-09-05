@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"quackitect/engine/internal/quiet"
 	"runtime"
+	"sort"
 	"strings"
 	"time"
 )
@@ -614,7 +615,7 @@ func firstLines(s string, n int) string {
 // for everybody, so the general queue hands sub-tokens out before their
 // parents without a rule of its own.
 func next(r Roots, actor, role string) Answer {
-	all := Tokens(r)
+	all := urgentFirst(Tokens(r))
 	// WHO IS ASKING, AND ON WHICH BOX. Two questions and two answers. Whether
 	// this box may touch the token at all is the box's, and ClaimedHere answers
 	// it. Who is handed it first is the agent's, because a claim is an agent
@@ -712,6 +713,26 @@ func next(r Roots, actor, role string) Answer {
 		return Answer{Pull: AnswerWait, Notice: scopeNotice(r, scopes) + unwritableNotice(unwritable)}
 	}
 	return Answer{Pull: AnswerWait, Notice: waitNotice(r, actor, held) + unwritableNotice(unwritable)}
+}
+
+// urgentFirst puts what a person marked urgent at the head of the list, and
+// leaves everything else in the order it came in.
+//
+// ONE SORT SERVES EVERY PASS. The queue walks this list four times over: what
+// is held, what is inside a held scope, what this box claimed, and what nobody
+// has. A rule written into each of those walks is the same rule written four
+// times, and the fourth copy is the one somebody forgets.
+//
+// IT IS STABLE, so among the urgent and among the rest the order is still
+// oldest first. Urgent is a flag rather than a rank: it says before the others,
+// and it says nothing about which of two urgent tokens comes first.
+//
+// IT DOES NOT REACH PAST THE OTHER RULES. A parked token, a blocked one and a
+// claim another box holds are each passed over further down, whatever this
+// says: the flag moves a token up the queue and takes nothing out of its way.
+func urgentFirst(all []Token) []Token {
+	sort.SliceStable(all, func(i, j int) bool { return all[i].Urgent && !all[j].Urgent })
+	return all
 }
 
 // unwritableNotice names every token the queue passed over because the record

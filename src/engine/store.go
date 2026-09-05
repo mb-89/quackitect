@@ -64,7 +64,7 @@ func dirFor(r Roots, t Token) string {
 // what holds it back, then how it ended.
 var frontOrder = []string{
 	"kind", "process", "guidance", "title", "status", "bucket",
-	"author", "claimed_by", "claimed_at", "needs_human", "depends_on", "parent", "ready_when",
+	"author", "claimed_by", "claimed_at", "urgent", "needs_human", "depends_on", "parent", "ready_when",
 	"began", "ended", "disposition", "reason", "successors",
 }
 
@@ -161,6 +161,11 @@ func (t Token) front() Front {
 	if t.NeedsHuman {
 		f["needs_human"] = "true"
 	}
+	// A FLAG THAT IS OFF IS NOT WRITTEN, the way needs_human is not. False on
+	// every note is a line the reader learns to skip.
+	if t.Urgent {
+		f["urgent"] = "true"
+	}
 	return f
 }
 
@@ -180,6 +185,7 @@ func tokenFromFront(f Front) Token {
 		Author:      frontStr(f, "author"),
 		ClaimedBy:   frontStr(f, "claimed_by"),
 		ClaimedAt:   frontStr(f, "claimed_at"),
+		Urgent:      frontBool(f, "urgent"),
 		NeedsHuman:  frontBool(f, "needs_human"),
 		DependsOn:   unlinkAll(frontList(f, "depends_on")),
 		Parent:      unlink(frontStr(f, "parent")),

@@ -40,6 +40,16 @@ func refusedByHand(field, by string) string {
 	switch field {
 	case "title", "detail", "proposed_action", "ready_when", "reason", "needs_human":
 		return ""
+	case "urgent":
+		// ONLY A PERSON SAYS WHAT COMES FIRST. The queue hands an urgent token
+		// out before everything else, so an agent that could set it would put
+		// its own work at the front of every other agent's queue. What an agent
+		// can say about what it found is a token, and a person reads it.
+		if by != "person" {
+			return fmt.Sprintf("urgent is a person saying what comes first, and %s is not a person. "+
+				"Say what is wrong in a token, and a person decides where it goes", by)
+		}
+		return ""
 	case "bucket":
 		// ONLY A PERSON MAKES A GROUP. What an agent can say about where work
 		// sits is the state, which the process owns and the pull moves. A name
@@ -90,6 +100,8 @@ func writeField(t *Token, field, to, by string) error {
 		t.Reason = to
 	case "needs_human":
 		t.NeedsHuman = to == "true"
+	case "urgent":
+		t.Urgent = to == "true"
 	case "bucket":
 		t.Bucket = to
 	}

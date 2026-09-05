@@ -73,6 +73,13 @@ frontmatter:
     needs_human:
       description: true when this waits for a person rather than an agent
 
+    # WHAT COMES FIRST, SAID BY THE PERSON WATCHING THE QUEUE. The pull hands
+    # an urgent token out before anything else workable, and nothing clears it:
+    # a put-down leaves it set, and a person takes it off. It is a flag rather
+    # than a rank, so nobody keeps a set of numbers apart.
+    urgent:
+      description: true when this goes out before everything else workable
+
     depends_on:
       type: array
       x-link: true

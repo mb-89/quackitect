@@ -48,6 +48,18 @@ groups:
   - name: yours
     filter: needs_human == "true"
 
+  # URGENT IS WHAT THE PERSON PUT AT THE FRONT. The queue hands these out
+  # before anything else workable, so this group is what the next agent to pull
+  # will be handed, and it is where the flag is taken off again.
+  - name: urgent
+    filter: urgent == "true"
+
+  # PARKED IS WHAT WAITS BEHIND A CONDITION ONLY A PERSON JUDGES. The queue
+  # hands out nothing carrying a ready_when, so whoever parked a token owns
+  # un-parking it, and this is where they find it, with the condition beside.
+  - name: parked
+    filter: ready_when != ""
+
   # AND ONE GROUP PER STATE THE note PROCESS DECLARES, from
   # src/processes/note.process.yaml.
   #
@@ -83,15 +95,19 @@ views:
         outOf: disposition == ""
     order:
       - title
+      - urgent
       - status
       - process
       - holder
+      - ready_when
     columnSize:
       title: 300
+      urgent: 70
       status: 110
       process: 90
       bucket: 90
       holder: 71
+      ready_when: 220
       blocked: 543
     # THE GROUPING IS BY BUCKET, and a drop writes one. The queries above are
     # the other kind of group and they need no level: a declared group is a

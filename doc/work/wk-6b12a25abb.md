@@ -9,12 +9,21 @@ guidance: [[work-token]]
 title: urgent goes out first
 # where the token stands. The process owns these values.
 status: open
+claimed_by: aeaf7bd9/fable-cloud
+claimed_at: "2026-09-05T12:12:31Z"
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - 5ae39024b7d0f32ed9e89ff6504eda505e8b7a00
+  - c627f405617c2ddad5dca2a73461ba3571c9ded8
+  - 202c7082db6f46699dcb71c7718c080fc927a1c4
+  - 12d4dcd46b1d785bf3d75e16b6794e5538007ab2
+  - 321a41837e6a305fccad7694b2a5f07f3a56e9d0
 # the tree each time the work was put down or closed, snapshots the engine wrote
 ended:
   - be0dfc361b27b21d47a66b05cf096692e01e539d
+  - a4ea79825ea0d7a91f38b7255023369c12279d7b
+  - 63f2954858bf8d593da5c449797a7ff3f4b1b5d7
+  - d2cb27afcfcd9f871a2bf06666713d91920f78f4
 ---
 
 ## detail
@@ -79,6 +88,18 @@ Add an urgent flag to the token, set from the work editor the way a bucket is se
 | [ ] | every criterion's command was run again, and what it said is named |  |  |
 | [ ] | every hunk improves the product, or a finding names the one that does not |  |  |
 | [ ] | every finding is a trivial token naming this one, and their ids are here |  |  |
+
+## note
+
+Urgent is a flag a person writes, and the queue reads it before the order it already had.
+
+The engine half is five small pieces. The token carries the field, the note writes it only when it is on, the reader reads it back, field.go refuses it to an agent, and the row carries it so a view can filter.
+
+The queue half is one function. next sorts what it walks with urgentFirst, which lifts the urgent ones and leaves the rest oldest first. It sits at the top, so all four passes read one rule.
+
+The editor half is the view file. The work view names an urgent column and an urgent group, and the editor draws every column the engine does not lock. The control is the cell.
+
+Nothing clears the flag. A put-down leaves it set.
 
 ## approach
 
