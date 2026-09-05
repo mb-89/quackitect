@@ -168,6 +168,11 @@ func TestAHoldFromAnEndedSessionIsNotBelieved(t *testing.T) {
 	if err := os.MkdirAll(r.Private(), 0o755); err != nil {
 		t.Fatal(err)
 	}
+	// AND A SESSION HAS TO BE READABLE FOR ANOTHER ONE TO HAVE ENDED. The store
+	// now decides through ofThisSession, so a log naming nobody decides nothing
+	// and what was written stands. This test is about a session that ended, so
+	// the tree is put in a later one and the window is its own test.
+	theSessionNowIs(t, r, "20260905-100000")
 	// What the night before left behind, under its own session. The id is made
 	// up: a test naming a token in the record goes stale when that one retires.
 	was := []byte(`{"session":"20260903-193501","held":{"wk-fromlastnight":"worker-heron"}}`)

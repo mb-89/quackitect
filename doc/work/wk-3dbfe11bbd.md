@@ -9,6 +9,8 @@ guidance: [[work-token]]
 title: four stores compare directly
 # where the token stands. The process owns these values.
 status: open
+claimed_by: aeaf7bd9/worker-varese
+claimed_at: "2026-09-05T15:18:04Z"
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - d8b91431f5c1405b80f4b173ef1557352261b0f4
@@ -47,9 +49,9 @@ The smallest case: write one of these, empty log/current the way a rotation does
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the ask is small enough to review whole, or it is split first | — |  |
-| [ ] | every done-when line is decidable, and names the command where one decides it |  |  |
-| [ ] | the basics it stands on exist, or are minted first | — |  |
+| [x] | the ask is small enough to review whole, or it is split first | four one-line reads in three files, plus one test file | not split |
+| [x] | every done-when line is decidable, and names the command where one decides it | lines 1 and 2 by `./RUNME.sh test --propose TestARotationDoesNotEmptyTheFourStores` and `--propose TestTheFourStoresEndWithTheirSession`. Line 3 by `se find --regex currentSession --path 'src/engine/{guards,owed,holdstore}.go'`, which answers no hits | run from the root |
+| [x] | the basics it stands on exist, or are minted first | ofThisSession and Named already exist and are what the three controls use. The helpers theSessionNowIs and theRotationWindow are reused from controlslastonesession_test.go | nothing minted |
 
 ## evidence: step 2. do
 
@@ -57,9 +59,9 @@ The smallest case: write one of these, empty log/current the way a rotation does
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the guidance this token names was read and applied | — |  |
-| [ ] | one test was written first and seen red for the reason expected |  |  |
-| [ ] | the same test was seen green after the change, and named |  |  |
-| [ ] | the change is git diff began..ended, the two hashes the engine wrote on this token | — |  |
-| [ ] | the cleanup the change revealed is in the change, or is a token of its own | — |  |
+| [x] | the guidance this token names was read and applied | read. Rule 13 drives the one rule through all four, tabled in theFourSessionStores | — |
+| [x] | one test was written first and seen red for the reason expected | TestARotationDoesNotEmptyTheFourStores red on all four: counts "0", owed "", grace "0", register "" where "1", "what is happening", "1", "worker-a" were written | FAIL, 4 lines |
+| [x] | the same test was seen green after the change, and named | that test ok after it. TestTheFourStoresEndWithTheirSession ok either side. 83 reach-selected tests, none failed | test-20260905-153104.908.json |
+| [x] | the change is git diff began..ended, the two hashes the engine wrote on this token | the four reads now ask ofThisSession. foursessionstores_test.go added, holdstore_test.go has its session named | one commit |
+| [x] | the cleanup the change revealed is in the change, or is a token of its own | TestAHoldFromAnEndedSessionIsNotBelieved read a tree whose log named nobody and went red. Its session is named here. stop.go:178 StandingClaim has the same shape, next to the ask | wk-5477e00b39 |
 

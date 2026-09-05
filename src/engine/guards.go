@@ -199,7 +199,10 @@ type refusedStops struct {
 func loadStops(r Roots) refusedStops {
 	var s refusedStops
 	b, err := os.ReadFile(stopsPath(r))
-	if err != nil || json.Unmarshal(b, &s) != nil || s.Session != currentSession(r) || s.Count == nil {
+	// A SESSION THAT CANNOT BE READ DECIDES NOTHING, which ofThisSession is
+	// where that is said: a rotation opens a fresh log that names nobody, and a
+	// bare comparison against the placeholder emptied the counts in that window.
+	if err != nil || json.Unmarshal(b, &s) != nil || !ofThisSession(r, s.Session) || s.Count == nil {
 		return refusedStops{Session: currentSession(r), Count: map[string]int{}}
 	}
 	return s
