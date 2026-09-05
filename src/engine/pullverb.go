@@ -75,18 +75,18 @@ func runPull(c *call) int {
 		}
 	}
 
-	a := Pull(roots, *actor, *role, p)
 	// A SUBMISSION AT A SHELL IS ONE THING ASKED FOR, AND ONE THING ANSWERED.
 	// Pull hands the next token on and takes it up as it does, which is right
 	// for the lane, because an agent that submits is asking for more. A person
 	// at a prompt asked for one thing, and the token they were handed stood in
 	// their name until somebody put it down by hand.
-	if p.ID != "" && c.door != DoorLane && a.Token != nil && a.Token.ID != p.ID {
-		_, _ = PutDown(roots, a.Token.ID, *actor)
-		a = Answer{Pull: AnswerSettled, Notice: p.ID + " is settled. The next token goes to a " +
-			"lane, because an agent that submits is asking for more. Ask for work again when " +
-			"you want it."}
-	}
+	//
+	// THE DOOR IS READ BEFORE THE QUEUE IS, not after. This was a put-back of a
+	// token already taken up, and taking up and putting down are what write a
+	// stretch onto a token, so the shell's answer left a began and an ended on
+	// work nobody had touched. Deciding first means no stretch is opened.
+	p.settleOnly = p.ID != "" && c.door != DoorLane
+	a := Pull(roots, *actor, *role, p)
 	id := ""
 	if a.Token != nil {
 		id = a.Token.ID
