@@ -3,8 +3,8 @@
 The owner's question, and the owner's first answer: a hook that refuses a push
 while the battery is red. The decision is on [[wk-814acc87a2]].
 
-The first answer is right about the goal and wrong about the mechanism, for
-three reasons measured on a cloud box in September 2026.
+The goal is right. Two of the three objections this session first raised are
+real, and the third was wrong and is struck below.
 
 ## Why absolute red is the wrong test
 
@@ -12,8 +12,8 @@ three reasons measured on a cloud box in September 2026.
 
 A claim is the first of them. A box that cannot publish a claim is invisible to
 every other box, and two boxes take the same token, which is the one thing
-claims exist to prevent. That failure is not hypothetical: it is what
-[[wk-4759d90994]] was written for, and it happened.
+claims exist to prevent. That is not hypothetical: it is what [[wk-4759d90994]]
+was written for, and it happened.
 
 Work tokens and notes are the second. They carry records rather than code. A
 cloud box is reclaimed when the session ends, so a record that is not pushed
@@ -27,9 +27,9 @@ into lost work and a duplicated token.
 
 The battery on this box was red all afternoon, between three and six failures
 at a time, and not one of them belonged to the agent that happened to be
-pushing. Two were fixtures shaped for another operating system. One was a
-check named in the battery that had never existed. One was another hand's file
-left unformatted.
+pushing. Two were fixtures shaped for another operating system. One was a check
+named in the battery that had never existed. One was another hand's file left
+unformatted.
 
 A gate on absolute red would have stopped every agent on the box from pushing
 anything all day, including the four fixes that made the battery greener. The
@@ -38,29 +38,48 @@ agent punished is never the one who broke it.
 This is not a property of a bad day. It is what a shared tree does: the battery
 reads the whole tree, and the whole tree is everybody's.
 
-### Three. The battery takes two minutes
+### Struck: the argument from time
 
-Running it on the push path taxes every push for a build the pusher usually did
-not break. A rule people work around stops being read, and the way round this
-one is a flag.
+This session first wrote that two minutes on every push is a tax nobody pays,
+and that a rule people work around stops being read.
+
+THE OWNER STRUCK IT AND WAS RIGHT. That is convenience bought with correctness.
+In a team with people, pushing something broken to main gets you put on a spike.
+Commits stay quick. A push can cost two minutes.
+
+It is recorded struck rather than deleted, because the reasoning that produced
+it will come back otherwise.
 
 ## What to gate on instead
 
-### A new failure against a recorded baseline
+### A new failure against a baseline, judged by the test verb
 
-The question a gate should ask is not "is the battery green" but "did this
-change make it worse". That question has a right answer on a shared tree and
-the other does not.
+The question a gate should ask is not whether the battery is green. It is
+whether this change made it worse. That question has a right answer on a shared
+tree and the other does not.
 
 The tree already works this way by hand. Half the tokens here carry a criterion
-reading "the battery reports no new failure against the run before the change",
-and this session answered it four times by comparing two recorded runs. The
-gate would do what the agents already do.
+reading that the battery reports no new failure against the run before the
+change.
 
-It also fails safe in the direction that matters. A change that adds a failure
-is refused and the refusal names the failure. A change landing into a tree that
-is already red goes through, and the standing failures stay somebody's problem
-rather than everybody's wall.
+THE PUSH DOES NOT READ A RECORDED RUN, AND IT DOES NOT START A BATTERY. It
+calls the test verb, and the verb decides what needs running. That is the
+owner's design and it is better than the one this session proposed.
+
+The verb already knows how. It takes a delta and answers which tests reach it.
+It already decides when the whole battery is owed, and it already says why. So
+nothing substantial changed and the last run still stands means it says so and
+the push goes. A delta reaching code the last run did not cover means it runs
+what is needed and the push waits. A run that comes back worse than the
+baseline means the push is refused, and the refusal names the failure.
+
+This is the same rule the owner gave for the claim gate: one door answers the
+question and everybody asks that door. A push that reads a recorded file is a
+second place that learns the rules. A push that calls the test verb is not.
+
+It also disposes of staleness without anybody defining it. The verb already
+knows whether a recorded run covers this delta, so there is no separate
+question about when a run is too old.
 
 ### Exempt by path, not by flag
 
@@ -77,21 +96,33 @@ being pushed:
 
 Anything carrying `src/**` or `util/checks/**` is code and is gated.
 
-### Read the last run, do not start one
+## What this would have caught, measured
 
-The gate reads the newest recorded battery run rather than running the battery.
-That keeps the push path fast, and it is honest about what it knows: a run that
-is stale says so, and a stale run is a weaker claim than a fresh one rather
-than a reason to block.
+This is not a hypothetical gate. It would have stopped a real landing on this
+branch, this session, made by this agent.
+
+df31079a was pushed with plumbing from a tree that predated another hand's
+work. The tree it produced did not compile, and src/engine stayed broken for
+every agent on every box until a reviewer found it and it was repaired under
+[[wk-8d10ed2a9e]].
+
+A push that called the test verb would have refused it outright, because the
+pushed tree does not build. A push that read the last recorded battery run
+would have let it through, because that run was made against the agent's own
+tree rather than the one being pushed. The owner's design catches it and the
+one this session proposed does not.
 
 ## What is still open, for the owner
 
 - **What else must go through.** The table above is what this session can name.
   There will be more.
-- **What a stale baseline means.** If the newest run predates the change, does
-  the gate refuse, warn, or pass? This session would pass and say so, on the
-  grounds that a gate which blocks on missing information gets disabled.
 - **Whether the gate is advisory first.** A gate that refuses on the day it
   lands, in a tree with standing failures, teaches everyone to route around it.
 - **Where it lives.** A git hook is per box and easily absent, and the engine
-  already holds every other guard. The engine is the more likely home.
+  already holds every other guard, so the engine is the more likely home. A
+  check on the server is a good second net: it cannot see the tree the agent is
+  holding, it answers after the fact, and it ties the method to one host.
+- **What the verb judges against.** The gate needs a baseline before it can call
+  a failure new. Whether that is the last run on this box, the last run on the
+  branch, or something recorded per commit is a question the verb does not
+  answer yet.

@@ -45,12 +45,41 @@ agents and are half written.
 
 **What it cost.** Every push made that day was built with plumbing rather than
 a commit: read the remote's tree into a private index, hash the changed files,
-write a tree, commit-tree on origin's head, push. That works, and it is not
-something an agent should have to invent.
+write a tree, commit-tree on origin's head, push. That is not something an
+agent should have to invent, and it is also not safe.
 
-**And it has bitten for real.** A whole-tree commit deleted `version.go` and
-`yaml.go` and `origin/v4` stopped compiling until a later commit put them back.
-That is [[wk-ad32a95f60]], and the token that duplicates it is [[wk-07df68aa8e]].
+**And it has bitten for real, twice, in opposite directions.** A whole-tree
+commit deleted `version.go` and `yaml.go` and `origin/v4` stopped compiling
+until a later commit put them back. That is [[wk-ad32a95f60]], and the token
+that duplicates it is [[wk-07df68aa8e]].
+
+### Two and a half. The plumbing has the same fault, and it is quieter
+
+The workaround for the shared index is to read the remote's tree and write your
+own blobs into it. That reverts, silently, anything another hand landed in the
+files you write, because your blob is whole and it is old.
+
+This session did exactly that and did not notice. Two pushes carried a
+`claim.go` and a `claimsync.go` from a tree that predated another hand's work,
+so they reverted a context-threading refactor and deleted four functions a test
+file on the branch still called. `src/engine` stopped compiling for every agent
+on every box, and it stayed broken until a reviewer found it. The repair is
+[[wk-8d10ed2a9e]].
+
+It is worse than the commit case in one way. A whole-tree commit sweeps up
+files you can see in `git status`. The plumbing writes only the paths you name,
+which reads as careful, and the damage is inside those paths where nothing
+shows it.
+
+**And the damage recruits.** Two other agents then wrote code against the
+reverted signatures, one leaving a comment saying the claim layer reads no
+context. Undoing the revert meant undoing their adaptations too. A bad landing
+on a shared branch does not stay one commit wide.
+
+So neither path is safe: the commit sweeps up other people's files, and the
+plumbing overwrites other people's work inside the files it touches. Both are
+the shared tree. A push that names its base and refuses when a file moved under
+it is the smallest guard, and a working tree per agent removes the need.
 
 ### Three. The built engine goes backwards
 
