@@ -59,6 +59,10 @@
             "description": "give back what you hold",
             "type": "boolean"
           },
+          "take": {
+            "description": "with these, and one id: take that token up as well, so a refused agent needs one call and not two",
+            "type": "boolean"
+          },
           "these": {
             "items": {
               "type": "string"

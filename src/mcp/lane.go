@@ -152,6 +152,7 @@ type claimArgs struct {
 	Next    int      `json:"next" says:"claim what the queue would hand you on this many pulls"`
 	These   []string `json:"these"`
 	As      string   `json:"as" says:"with next: worker or reviewer"`
+	Take    bool     `json:"take" says:"with these, and one id: take that token up as well, so a refused agent needs one call and not two"`
 	Release bool     `json:"release" says:"give back what you hold"`
 	List    bool     `json:"list"`
 	Whoami  bool     `json:"whoami"`
@@ -526,19 +527,34 @@ func runCommand(r roots, a runArgs) string {
 // claimWork is se claim through the lane. Every flag here is one the verb
 // defines, which is what mcp-tools.mjs drives against the real engine.
 func claimWork(r roots, a claimArgs) string {
-	argv := []string{"claim", "--actor", orMain(a.Actor)}
+	argv, refusal := claimArgv(a)
+	if refusal != "" {
+		return refusal
+	}
+	return engineCall(r, argv, nil)
+}
+
+// claimArgv is the verb call se_claim makes, or the sentence that refuses it
+// before the engine is asked.
+//
+// IT IS ITS OWN FUNCTION SO A TEST CAN READ THE CALL. The flags here are the
+// verb's, and the one an agent is sent to by a refusal is take: the engine
+// refuses an unclaimed tracked token with "se claim --these <id> --take", and a
+// lane that cannot spell that sends the reader to a door it does not have.
+func claimArgv(a claimArgs) (argv []string, refusal string) {
+	argv = []string{"claim", "--actor", orMain(a.Actor)}
 	if a.Whoami {
-		return engineCall(r, append(argv, "--whoami"), nil)
+		return append(argv, "--whoami"), ""
 	}
 	if a.List {
-		return engineCall(r, append(argv, "--list"), nil)
+		return append(argv, "--list"), ""
 	}
 	ids := saidOnly(a.These)
 	if len(ids) > 0 {
 		argv = append(argv, "--these", strings.Join(ids, ","))
 	}
 	if a.Release {
-		return engineCall(r, append(argv, "--release"), nil)
+		return append(argv, "--release"), ""
 	}
 	if a.Next > 0 {
 		argv = append(argv, "--next", strconv.Itoa(a.Next))
@@ -547,9 +563,15 @@ func claimWork(r roots, a claimArgs) string {
 		}
 	}
 	if len(ids) == 0 && a.Next <= 0 {
-		return "Say what to claim: these, or next."
+		return nil, "Say what to claim: these, or next."
 	}
-	return engineCall(r, argv, nil)
+	// TAKE RIDES WITH THESE. The verb takes one token up at a time and says so
+	// itself when more are named, so the flag is passed on rather than judged
+	// here, and one place decides what take means.
+	if a.Take && len(ids) > 0 {
+		argv = append(argv, "--take")
+	}
+	return argv, ""
 }
 
 // showStatus is se_status through the lane. It takes no arguments and says so
