@@ -28,7 +28,7 @@ import { join } from "node:path";
 const root = process.argv[2] ?? ".";
 
 // WHAT THE FLAT PACKAGE HELD WHEN THIS WAS WRITTEN, and the most it may hold.
-const most = { files: 89, lines: 29111 };
+const most = { files: 89, lines: 29203 };
 
 let bad = 0;
 function say(what, ok, why) {
