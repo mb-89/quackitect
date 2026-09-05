@@ -36,7 +36,10 @@ function say(what, ok, why) {
 }
 
 // THE SHELL'S OWN. Each says where the shell stands, not what the verb does.
-const shells = new Set(["work", "method", "stdin", "from", "template", "help", "h"]);
+const shells = new Set(["work", "method", "stdin", "from", "template", "help", "h",
+  // A FILE HOLDING THE PAYLOAD is a door for a caller with no pipe. The lane
+  // sends the payload itself, on the call.
+  "manifest"]);
 // THE RENAMES. The lane says the same thing under its own name.
 const renamed = {
   "*": { by: "actor" },
