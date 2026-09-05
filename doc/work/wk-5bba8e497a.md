@@ -70,11 +70,11 @@ needs_human rides the same question. A token marked as needing a person waits on
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the guidance this token names was read and applied | — |  |
-| [ ] | the change follows the approach on the token, or the token says why it departed |  |  |
-| [ ] | se test --on this token answered ok, and what it ran is named |  |  |
-| [ ] | the note says what changed and why, for a reader who was not here |  |  |
-| [ ] | the cleanup the change revealed is in the change, or is a token of its own | — |  |
+| [x] | the guidance this token names was read and applied | Read. The change stood in the tree already, so this step wrote the approach and ran the commands again. | — |
+| [x] | the change follows the approach on the token, or the token says why it departed | It does. WaitsForAPerson is asked on the hand-out path for either role, and both readers name a parked token. | src/engine/pull.go |
+| [x] | se test --on this token answered ok, and what it ran is named | It answered ok true, having run src/engine/TestAParkedTokenLeavesTheQueueAndIsNamed. | se test --on wk-5bba8e497a |
+| [x] | the note says what changed and why, for a reader who was not here | The detail says why. The approach says what: one question, the field as the whole state, and two readers. | the approach section |
+| [x] | the cleanup the change revealed is in the change, or is a token of its own | None beside it. needs_human was already answered by the same question. | — |
 
 ## evidence: step 3. verdict
 
