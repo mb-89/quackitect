@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"os"
 	"path/filepath"
+	"strconv"
+	"strings"
 	"testing"
 )
 
@@ -117,5 +119,19 @@ func TestAStartLeavesTheSettingsAsTheyWere(t *testing.T) {
 	}
 	if !bytes.Equal(before, after) {
 		t.Error("a second start changed the settings file, so the harness that read the first one is now wrong")
+	}
+
+	// AND THE DOOR IS NOT IN IT AT ALL.
+	//
+	// Two starts in one process over one Roots project the same bytes whatever
+	// the cage names, because every variable is a function of the roots. So the
+	// comparison above holds while the door sits in the travelling file, which
+	// is the defect this test was written against. The value itself is what has
+	// to be absent, and it is a port and the address it is on.
+	door := strconv.Itoa(hooksPort(r))
+	for _, gone := range []string{"127.0.0.1", door} {
+		if strings.Contains(string(before), gone) {
+			t.Errorf("the settings file that travels carries this box's door, %q:\n%s", gone, before)
+		}
 	}
 }
