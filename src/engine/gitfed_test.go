@@ -176,8 +176,11 @@ func TestTheSyncFetchesOnlyTheClaimsRef(t *testing.T) {
 	if len(got.Claims) != 1 || got.Claims["wk-far"].By != "0badc0de/worker-far" {
 		t.Fatalf("the sync read %+v", got.Claims)
 	}
-	if !fed.asked("fetch", claimsRef+":"+claimsRef) {
-		t.Error("the sync did not ask for the claims ref by name")
+	// THE REMOTE'S CLAIMS LAND ON A REF OF THEIR OWN, never over this box's. A
+	// fetch into the local ref is a fast-forward, and a box holding an unpushed
+	// claim is ahead of the remote, so git refuses it. See remoteClaimsRef.
+	if !fed.asked("fetch", "+"+claimsRef+":"+remoteClaimsRef) {
+		t.Error("the sync did not ask for the claims ref by name, into a ref of the remote's own")
 	}
 	// A FETCH OF THE BRANCH WOULD BRING EVERY COMMIT ON IT DOWN.
 	for _, line := range fed.ran {
@@ -224,5 +227,101 @@ func TestAClaimIsReadTheSameInAnyTimeZoneAndOnAWrongClock(t *testing.T) {
 	}
 	if !lapsed(r, far.Format(ClaimStamp), now.Add(time.Duration(hours+1)*time.Hour)) {
 		t.Error("a claim from a fast clock outlived the limit as this box counts it")
+	}
+}
+
+// A BOX THAT IS AHEAD OF THE REMOTE STILL PUBLISHES.
+//
+// Both readers fetched origin's claims straight over refs/se/claims. That is a
+// fast-forward, and a box holding a claim it has not pushed is ahead, so git
+// refuses it. Measured on a cloud box: the local ref held one commit the remote
+// lacked, the fetch exited non-zero, and the push's own recovery never ran. A
+// box that lost one race never published again.
+//
+// AND THE REFUSAL SAID NOTHING. The fetch carried --quiet, so git's reason was
+// suppressed and the engine answered "The push did not run: " with an empty
+// string after the colon, on every claim.
+func TestPublishReachesItsSecondPushWhenThisBoxIsAhead(t *testing.T) {
+	r := aTreeWithTheProcesses(t)
+	fed := aFedGit(t)
+	fed.says["write-tree"] = "aaaa"
+	fed.says["commit-tree"] = "bbbb"
+	fed.says["rev-parse --verify --quiet "+remoteClaimsRef] = "cafe1234"
+	// THE FIRST PUSH LOSES THE RACE AND THE SECOND WINS, which is the whole
+	// path this test exists for. The fed answers a push by the ref it names, so
+	// both are the same call and the count below is what tells them apart.
+	pushes := 0
+	was := gitRuns
+	gitRuns = func(r Roots, index string, args ...string) (string, error) {
+		if args[0] == "push" {
+			pushes++
+			if pushes == 1 {
+				return "", fmt.Errorf("git push: rejected: the ref moved")
+			}
+			return "", nil
+		}
+		return fed.run(r, index, args...)
+	}
+	t.Cleanup(func() { gitRuns = was })
+
+	got := Publish(r, []string{"doc/work/wk-1.md"}, "a claim")
+	if !fed.asked("fetch", "+"+claimsRef+":"+remoteClaimsRef) {
+		t.Error("the loser fetched over its own ref, which git refuses while this box is ahead")
+	}
+	if fed.asked("fetch", "--quiet") {
+		t.Error("the fetch is quiet, so a refusal reaches the agent with nothing after the colon")
+	}
+	if !got.Rebased {
+		t.Errorf("the other box's claims were never taken up: %s", got.Says)
+	}
+	if !got.Pushed {
+		t.Errorf("the second push never ran, so a box that lost one race never publishes again: %s", got.Says)
+	}
+	if pushes != 2 {
+		t.Errorf("the push ran %d time(s), and losing a race then winning is two", pushes)
+	}
+}
+
+// AND IT STILL READS THE OTHER BOXES.
+//
+// SyncClaims stopped the moment this box had one claim of its own, for the same
+// fetch and with the same empty reason: "no claims reached this box, so these
+// are the ones from before: ". A box that has claimed anything then never sees
+// anybody else's claim, which is the one thing the ref is for.
+func TestSyncClaimsReadsFarClaimsWhenThisBoxIsAhead(t *testing.T) {
+	r := aTreeWithTheProcesses(t)
+	fed := aFedGit(t)
+	// THE LOCAL REF IS AHEAD, so a fetch into it would be refused. Only a fetch
+	// into the remote's own ref answers here, and the head below is read off
+	// that ref rather than off this box's.
+	fed.fails["fetch "+claimsRef+":"+claimsRef] = "git fetch: ! [rejected] " +
+		claimsRef + " -> " + claimsRef + " (non-fast-forward)"
+	fed.says["rev-parse --verify --quiet "+remoteClaimsRef] = "cafe1234"
+	fed.says["ls-tree"] = "doc/work/wk-far.md"
+	fed.says["show"] = "---\nkind: [[work-token]]\nclaimed_by: 0badc0de/worker-far\n" +
+		"claimed_at: 2026-09-04T06:00:00Z\n---\n\n## detail\n\nsomething\n"
+
+	got := SyncClaims(r)
+	if got.Says != "" {
+		t.Fatalf("a box with a claim of its own read nothing: %s", got.Says)
+	}
+	if len(got.Claims) != 1 || got.Claims["wk-far"].By != "0badc0de/worker-far" {
+		t.Fatalf("the sync read %+v", got.Claims)
+	}
+}
+
+// AND A FETCH GIT DOES REFUSE SAYS WHY.
+//
+// The reason is git's own and it reaches the agent, because the fetch no longer
+// carries --quiet. An answer that ends at the colon tells nobody anything, and
+// that is what every claim on that box got.
+func TestARefusedFetchCarriesGitsReason(t *testing.T) {
+	r := aTreeWithTheProcesses(t)
+	fed := aFedGit(t)
+	fed.fails["fetch"] = "git fetch: ! [rejected] " + claimsRef + " (non-fast-forward)"
+
+	got := SyncClaims(r)
+	if !strings.Contains(got.Says, "non-fast-forward") {
+		t.Errorf("the refusal does not carry git's reason: %q", got.Says)
 	}
 }

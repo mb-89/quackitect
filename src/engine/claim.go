@@ -375,6 +375,30 @@ func Claims(r Roots, now time.Time) []Claimed {
 // rather than by reading a message and hoping.
 const claimsRef = "refs/se/claims"
 
+// remoteClaimsRef is where the remote's claims land, and it is a ref of its own.
+//
+// A FETCH INTO THE LOCAL REF IS A FAST-FORWARD, AND THIS BOX IS AHEAD. Both
+// readers fetched origin's claims straight over refs/se/claims, which git
+// refuses the moment this box holds a claim it has not pushed, which is the
+// state of every box that has just claimed anything. So the push's own recovery
+// never ran, and a box that lost one race never published again; and the sync
+// stopped reading other boxes the moment this one had a claim of its own, and
+// said so with an empty reason, because --quiet had eaten git's.
+//
+// SO THE REMOTE GETS ITS OWN REF AND THE LOCAL ONE IS NEVER OVERWRITTEN BY A
+// FETCH. It is forced, because this ref is a copy of the remote's and holds
+// nothing of ours to lose. Where the two have to be joined, the claim is
+// written again on top of the remote's head, which is what the ref is for.
+// Measured on a cloud box: wk-c698d46866.
+const remoteClaimsRef = "refs/se/remote-claims"
+
+// theRemoteClaims is the fetch both readers make. It is one line so the two
+// cannot drift into fetching different things, which is how one of them ended
+// up overwriting the ref the other depended on.
+func theRemoteClaims() []string {
+	return []string{"fetch", "origin", "+" + claimsRef + ":" + remoteClaimsRef}
+}
+
 // Published says what reached the other boxes.
 type Published struct {
 	Committed bool   `json:"committed"`
@@ -472,10 +496,18 @@ func Publish(r Roots, files []string, message string) Published {
 	// ANOTHER BOX WROTE THE REF FIRST. Read what it wrote and write again on
 	// top of it. Nothing is rebased, because nothing is on a branch: this is
 	// two writes to one ref and the second one reads the first.
-	if _, err := gitIn(r, index.Name(), "fetch", "--quiet", "origin",
-		claimsRef+":"+claimsRef); err != nil {
+	if _, err := gitIn(r, index.Name(), theRemoteClaims()...); err != nil {
 		p.Says = "published here, on " + claimsRef + ". The push did not run: " + err.Error()
 		return p
+	}
+	// THE REMOTE'S HEAD BECOMES THE PARENT, and the claim is written again on
+	// top of it. Moving the local ref loses nothing: what it held is these same
+	// files, and writeTheClaims adds them again over the head that won the race.
+	if head, err := gitIn(r, index.Name(), "rev-parse", "--verify", "--quiet", remoteClaimsRef); err == nil && head != "" {
+		if _, err := gitIn(r, index.Name(), "update-ref", claimsRef, head); err != nil {
+			p.Says = "published here. The other box's claims could not be taken up: " + err.Error()
+			return p
+		}
 	}
 	p.Rebased = true
 	if _, err := writeTheClaims(r, index.Name(), files, message); err != nil {

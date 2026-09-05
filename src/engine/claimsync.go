@@ -80,12 +80,12 @@ func SyncClaims(r Roots) TheFarClaims {
 	// ONLY THE CLAIMS REF IS FETCHED, so nothing else can arrive. A fetch of the
 	// branch would bring every commit on it into .git, and a later mistake could
 	// put those on the disc. This asks for one ref and gets one ref.
-	if _, err := gitIn(r, "", "fetch", "--quiet", "origin", claimsRef+":"+claimsRef); err != nil {
+	if _, err := gitIn(r, "", theRemoteClaims()...); err != nil {
 		out.Says = "no claims reached this box, so these are the ones from before: " + err.Error()
 		saveFarClaims(r, out)
 		return out
 	}
-	head, err := gitIn(r, "", "rev-parse", "--verify", "--quiet", claimsRef)
+	head, err := gitIn(r, "", "rev-parse", "--verify", "--quiet", remoteClaimsRef)
 	if err != nil || head == "" {
 		out.Says = "no box has published a claim yet"
 		saveFarClaims(r, out)
