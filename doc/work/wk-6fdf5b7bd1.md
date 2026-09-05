@@ -20,6 +20,7 @@ began:
 # the tree each time the work was put down or closed, snapshots the engine wrote
 ended:
   - d3f17ce4e5991732c569358f5b816a3d61428053
+  - 6e7abc893e6c834a955499b6cb2b530aacf75032
 ---
 
 ## detail

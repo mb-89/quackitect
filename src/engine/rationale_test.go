@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"path/filepath"
+	"quackitect/engine/internal/frontmatter"
 	"strings"
 	"testing"
 )
@@ -58,7 +59,7 @@ func TestARationaleIsNamedNotRepeated(t *testing.T) {
 				}
 			}
 
-			f, err := ParseFront(front)
+			f, err := frontmatter.Parse(front)
 			if err != nil {
 				t.Fatalf("the frontmatter does not parse: %v", err)
 			}

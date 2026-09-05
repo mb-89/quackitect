@@ -10,6 +10,7 @@ import (
 	"os/signal"
 	"path/filepath"
 	"quackitect/engine/internal/replaced"
+	"quackitect/engine/internal/version"
 	"strings"
 	"sync"
 	"syscall"
@@ -20,10 +21,16 @@ import (
 // exists yet, so there is no authority to ask and every permission question
 // answers permitted.
 func main() {
+	// THE ENGINE'S CONTEXT ENDS WITH THE ENGINE, and everything long-lived
+	// takes it, so letting go once lets go of all of it. This is the one place
+	// a context begins, which is why it is the one place context.Background is,
+	// and it is made first so the client, the probe and the loop all take it.
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 	// The guard runs as its own process, started by the harness. It reads one
 	// event and answers, so it is handled before any flag is parsed.
 	if len(os.Args) > 1 && os.Args[1] == "hook" {
-		runHook(os.Args[2:])
+		runHook(ctx, os.Args[2:])
 		return
 	}
 	// THE LANGUAGE SERVER IS A PROCESS THE EDITOR STARTS, and it speaks to the
@@ -36,7 +43,7 @@ func main() {
 	// its client: it sends the verb and prints what came back.
 	if len(os.Args) > 1 {
 		if _, ok := run[os.Args[1]]; ok {
-			os.Exit(callTheEngine(os.Args[1], os.Args[2:]))
+			os.Exit(callTheEngine(ctx, os.Args[1], os.Args[2:]))
 		}
 	}
 	flag.Usage = func() {
@@ -91,7 +98,7 @@ func main() {
 	// every other agent's answer discharged that one's obligation, and every
 	// other agent's message landed on it.
 	actor := flag.String("actor", "", "with said or answer: who is speaking")
-	version := flag.Bool("version", false, "print which build this is and exit")
+	showVersion := flag.Bool("version", false, "print which build this is and exit")
 	selftest := flag.Bool("selftest", false, "produce a copy, drive a project with it, and check what came out")
 	keep := flag.Bool("keep", false, "with selftest: leave the temporary trees behind")
 	produce := flag.String("produce", "", "make a copy of the method in this folder")
@@ -109,9 +116,9 @@ func main() {
 		return
 	}
 
-	if *version {
+	if *showVersion {
 		// Every project answers this, whatever it is written in.
-		fmt.Printf("quackitect engine %s\n", Build)
+		fmt.Printf("quackitect engine %s\n", version.Build)
 		return
 	}
 
@@ -514,7 +521,6 @@ func main() {
 		fmt.Println(line)
 		return
 	}
-
 	// AND THE TREE IS TAKEN BEFORE ANYTHING ELSE IS. engine.json is written
 	// late, after the log, the projections and the tool probe, so two starts a
 	// second apart both passed the line above and both ran. The lock is the
@@ -531,6 +537,7 @@ func main() {
 		return
 	}
 	defer LetGoOfTheTree()
+
 	log, err := OpenLog(dir)
 	if err != nil {
 		fail(err)
@@ -557,7 +564,7 @@ func main() {
 	// What the machine has, asked once per boot. It goes in a file the pull
 	// reads, and not in the record: a person watching the log did not ask what
 	// this machine has, and a line they did not ask for is a line in the way.
-	ProbeTools(roots, log.Session())
+	ProbeTools(ctx, roots, log.Session())
 
 	startRecord := map[string]any{
 		"method_root": roots.Method,
@@ -567,21 +574,10 @@ func main() {
 	}
 	// A build that was never stamped says nothing, so it is left out rather
 	// than written as the word a variable holds when nobody set it.
-	if Build != "unstamped" {
-		startRecord["build"] = Build
+	if version.Build != "unstamped" {
+		startRecord["build"] = version.Build
 	}
 	log.Write("engine", "start", "engine", "engine started", Yes(), startRecord)
-
-	// AND THE BINDING GOES BACK TO BOUND, because a session starting is nobody
-	// having asked for the rules to be off. A handover is not a start, so the
-	// successor of a swap leaves the rung where the person put it. See unbound.go.
-	if !log.Continued() {
-		if was, put := PutTheBindingBack(roots); put {
-			log.Write("engine", "start", "engine",
-				"this tree was "+string(was)+" and a new session is bound", Yes(),
-				map[string]any{"was": string(was), "now": string(Bound)})
-		}
-	}
 
 	// A BATTERY THAT RAN OUTSIDE THE ENGINE IS REPORTED HERE. It is started
 	// detached, because it replaces the engine that started it, so the process
@@ -642,7 +638,7 @@ func main() {
 	// reloads has no parent any more, and without this it cannot tell a live
 	// engine from none.
 	here := Running{PID: os.Getpid(), Log: log.Path(), Session: log.Session(),
-		Started: time.Now().UTC().Format(time.RFC3339), Build: Build, Run: runIdentity()}
+		Started: time.Now().UTC().Format(time.RFC3339), Build: version.Build, Run: runIdentity()}
 	SayRunning(roots, here)
 	defer StopSaying(roots)
 
@@ -660,12 +656,8 @@ func main() {
 		*beat = time.Duration(cfg.HeartbeatSeconds) * time.Second
 	}
 	// THE RESIDENT ENGINE KEEPS THE INDEX. It is the one process that lives
-	// as long as the session, so it is the one that can watch the tree.
-	// THE ENGINE'S CONTEXT ENDS WITH THE ENGINE, and everything long-lived
-	// takes it, so letting go once lets go of all of it. This is the one place
-	// a context begins, which is why it is the one place context.Background is.
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	// as long as the session, so it is the one that can watch the tree, and
+	// it takes the context main made at the top.
 	stopIndexer, socket, asked := StartIndexer(ctx, roots, log, *beat)
 	// LETTING GO HAPPENS ONCE, whether the engine is ending or handing over.
 	// A swap has to release the socket and the port before the successor
@@ -689,7 +681,7 @@ func main() {
 	// refused, and one of those ran for a whole day. See guardsaysso.go.
 	ln, saying, live := holdTheDoor(roots)
 	if live {
-		go serveHooks(ln, roots, log)
+		go serveHooks(ctx, ln, roots, log)
 		hooks = ln
 		here.Hooks = hooksURL(roots)
 	}
@@ -707,9 +699,7 @@ func main() {
 	// the ENGINE'S and not the indexer's: started from there it ran in every
 	// test tree that opens an index, spawning git processes under a parallel
 	// suite, and three index tests went red under the load while passing alone.
-	claimsDone := make(chan struct{})
-	defer close(claimsDone)
-	go WatchForClaims(roots, log, claimsDone)
+	go WatchForClaims(ctx, roots, log)
 
 	ticker := time.NewTicker(*beat)
 	defer ticker.Stop()
@@ -758,7 +748,7 @@ func main() {
 				saidStale = true
 				log.Write("engine", "error", "engine",
 					"this engine is older than the program on disk, so it writes what its own build knew", No(),
-					map[string]any{"build": Build, "fix": "stop it and start it again"})
+					map[string]any{"build": version.Build, "fix": "stop it and start it again"})
 			}
 			beat, _ := json.Marshal(map[string]any{
 				"beat": beats, "uptime_s": int(time.Since(started).Seconds()),
@@ -781,14 +771,14 @@ func main() {
 			// start it on the session this one has been writing.
 			left := drainCalls(swapDrainBudget)
 			log.Write("engine", "swap", "engine", "engine swapped, and the successor continues this session", Yes(),
-				map[string]any{"from": Build, "to": plan.Build, "why": plan.Why,
+				map[string]any{"from": version.Build, "to": plan.Build, "why": plan.Why,
 					"cut": left, "uptime_s": int(time.Since(started).Seconds())})
 			if err := putInPlace(roots, plan.Next); err != nil {
 				// A SWAP THAT CANNOT LAND LEAVES THE ENGINE RUNNING. Nothing
 				// has been replaced at this point, so carrying on is the whole
 				// of the recovery.
 				log.Write("engine", "error", "engine", "the swap did not land, so this engine carries on", No(),
-					map[string]any{"reason": err.Error(), "build": Build})
+					map[string]any{"reason": err.Error(), "build": version.Build})
 				continue
 			}
 			// THE LISTENERS GO BEFORE THE SUCCESSOR STARTS. It binds the same
@@ -800,7 +790,7 @@ func main() {
 			// flight when the process ends leaves a temp file nothing owns, and
 			// the engine handing over is the one party that knows it is ending.
 			SweepOrphanedWrites(roots, 0)
-			if err := handOver(roots, log.Session()); err != nil {
+			if err := handOver(ctx, roots, log.Session()); err != nil {
 				log.Write("engine", "error", "engine",
 					"the next engine is in place and did not start, so this tree has no engine", No(),
 					map[string]any{"reason": err.Error(), "fix": "start it: se --work " + roots.Work})

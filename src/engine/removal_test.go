@@ -41,7 +41,7 @@ func removalTree(t *testing.T) (Roots, func(command string) string, func(path st
 		body, _ := json.Marshal(map[string]any{"hook_event_name": event, "cwd": r.Work,
 			"tool_name": tool, "tool_input": input, "agent_id": "helper-1"})
 		var out bytes.Buffer
-		answerHook(body, []string{"--method", r.Method}, &out, log)
+		answerHook(t.Context(), body, []string{"--method", r.Method}, &out, log)
 		return out.String()
 	}
 	run := func(command string) string {
@@ -121,15 +121,32 @@ func TestARemovalNeedsARead(t *testing.T) {
 	// AND THE PROGRAM IS STILL FOUND WHERE SOMETHING ELSE RUNS IT, which is
 	// the half the fix above must not have cost. git rm is here because the
 	// approach on the token names it, and it deletes the file the same way.
-	for _, command := range []string{"sudo rm " + unseen, "xargs rm " + unseen, "git rm " + unseen} {
-		if said := run(command); !strings.Contains(said, saidUnread) {
+	//
+	// AND A FLAG BETWEEN THE RUNNER AND THE PROGRAM DOES NOT TURN THE GUARD OFF.
+	// The walk stopped at the first word that was neither, and every flag is
+	// such a word, so xargs -n1 rm ran where xargs rm was refused. A flag
+	// whose value is the next word, sudo -u me or git -C dir, is stepped over
+	// with its value. A shell's -c carries a command, and the program in it is
+	// read the way any program is.
+	for _, command := range []string{
+		"sudo rm " + unseen, "xargs rm " + unseen, "git rm " + unseen,
+		"xargs -n1 rm " + unseen, "xargs -I{} rm " + unseen, "xargs -I {} rm " + unseen,
+		"sudo -u someone rm " + unseen, "git -C " + r.Work + " rm " + unseen,
+		`sh -c "rm ` + unseen + `"`, "bash -c 'rm -f " + unseen + "'",
+	} {
+		said := run(command)
+		if !strings.Contains(said, saidUnread) {
 			t.Fatalf("a removal run through another program was allowed: %s\n%s", command, said)
+		}
+		if !strings.Contains(said, "unseen.go") {
+			t.Fatalf("the refusal does not name the file it is about: %s\n%s", command, said)
 		}
 	}
 
 	// AND git IS NOT A REMOVER ON ITS OWN. The word after it decides, so the
 	// rest of git goes through untouched.
-	for _, command := range []string{"git status", "git add " + unseen, "git log --oneline"} {
+	for _, command := range []string{"git status", "git add " + unseen, "git log --oneline",
+		"git -C " + r.Work + " status", "xargs -n1 echo " + unseen, `sh -c "echo rm is a word here"`} {
 		if said := run(command); strings.Contains(said, saidUnread) {
 			t.Fatalf("a git subcommand that deletes nothing was refused: %s\n%s", command, said)
 		}

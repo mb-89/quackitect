@@ -43,7 +43,7 @@ func TestEveryRungButGodNamesItsToken(t *testing.T) {
 		body, _ := json.Marshal(map[string]any{"hook_event_name": "PreToolUse", "cwd": r.Work,
 			"session_id": "s-1", "tool_name": tool, "tool_input": input})
 		var out bytes.Buffer
-		answerHook(body, []string{"--method", r.Method}, &out, log)
+		answerHook(t.Context(), body, []string{"--method", r.Method}, &out, log)
 		return out.String()
 	}
 

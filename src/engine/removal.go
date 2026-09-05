@@ -65,10 +65,39 @@ func loopWord(word string) bool {
 // word after it decides what it is, and git rm deletes a file exactly the way
 // the others do. git status and git commit walk to a word that is no remover
 // and stop, which is the same answer they would get anywhere else.
+//
+// A SHELL IS HERE FOR ITS -c. sh -c "rm f" runs rm as surely as xargs does,
+// and the program inside the quoted command is a word on this line once the
+// quotes come off, so the same walk reads it.
 func runner(word string) bool {
 	switch strings.ToLower(strings.Trim(word, "'\"")) {
-	case "sudo", "xargs", "env", "time", "nohup", "command", "exec", "do", "then", "else", "git":
+	case "sudo", "xargs", "env", "time", "nohup", "command", "exec", "do", "then", "else", "git",
+		"sh", "bash", "zsh", "dash", "ksh", "powershell", "pwsh":
 		return true
+	}
+	return false
+}
+
+// valueFlags names, per runner, the flags whose value is the next word, so the
+// walk steps over the value rather than reading it as the program. A flag
+// with its value attached, -n1 or -I{} or --chdir=x, is one word and needs no
+// entry. A shell's -c is not here: its value is the command, which is what
+// the walk is looking for.
+var valueFlags = map[string][]string{
+	"sudo":  {"-u", "-g", "-C", "-D", "-h", "-p", "-r", "-t", "-T", "-U", "-R"},
+	"git":   {"-C", "-c", "--git-dir", "--work-tree", "--namespace"},
+	"xargs": {"-I", "-L", "-n", "-P", "-s", "-E", "-d", "-a", "--replace", "--max-lines", "--max-args", "--max-procs", "--max-chars", "--eof", "--delimiter", "--arg-file"},
+	"env":   {"-u", "-C", "-S", "--unset", "--chdir", "--split-string"},
+	"time":  {"-f", "-o", "--format", "--output"},
+}
+
+// takesAValue says whether this flag, on this runner, has its value in the
+// next word.
+func takesAValue(runner, flag string) bool {
+	for _, f := range valueFlags[runner] {
+		if f == flag {
+			return true
+		}
 	}
 	return false
 }
@@ -87,14 +116,34 @@ func runner(word string) bool {
 // already assumes when it reads words[0]. The walk goes past only the words
 // that run another program, so xargs rm and do rm $f are still found and a
 // sentence containing rm is not a deletion.
+//
+// AND A RUNNER'S FLAGS ARE WALKED PAST TOO. The walk stopped at the first
+// word that was neither a runner nor a remover, and every flag is such a
+// word, so xargs -n1 rm ran where xargs rm was refused: the guard's own named
+// door was one flag from open. A flag after a runner is stepped over, and a
+// flag whose value is the next word takes its value with it. A flag before
+// any runner still stops the walk, because nothing has said a program is
+// coming.
 func removerAt(words []string) int {
+	past := ""     // the runner most recently walked past
+	value := false // the next word is the value of the flag before it
 	for i, w := range words {
+		if value {
+			value = false
+			continue
+		}
 		if remover(w) {
 			return i
 		}
-		if !runner(w) {
-			return -1
+		if runner(w) {
+			past = strings.ToLower(strings.Trim(w, "'\""))
+			continue
 		}
+		if past != "" && strings.HasPrefix(w, "-") {
+			value = takesAValue(past, w)
+			continue
+		}
+		return -1
 	}
 	return -1
 }

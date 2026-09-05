@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"crypto/sha256"
 	"encoding/json"
 	"fmt"
@@ -345,7 +346,7 @@ func (g *guard) blockStop(reason string) {
 
 // runHook is the command form: the event on standard input, the decision on
 // standard output. The engine that lives serves the same function over HTTP.
-func runHook(args []string) {
+func runHook(ctx context.Context, args []string) {
 	raw, err := io.ReadAll(os.Stdin)
 	if err != nil {
 		// A guard that cannot read its input must not pass silently. It says
@@ -354,13 +355,15 @@ func runHook(args []string) {
 		fmt.Fprintln(os.Stderr, "hook: cannot read the event:", err)
 		return
 	}
-	answerHook(raw, args, os.Stdout, nil)
+	answerHook(ctx, raw, args, os.Stdout, nil)
 }
 
 // answerHook is the guard: one event in, one decision out. held is the
 // record when the engine that lives is answering, and nil when a process
 // per event is, which then opens the record for the length of the event.
-func answerHook(raw []byte, args []string, out io.Writer, held *Log) {
+// The context is the caller's, and the one spawn here, ensureEngine, waits
+// on it and no longer than it.
+func answerHook(ctx context.Context, raw []byte, args []string, out io.Writer, held *Log) {
 	g := &guard{out: out}
 	var in hookIn
 	if err := json.Unmarshal(raw, &in); err != nil {
@@ -408,7 +411,7 @@ func answerHook(raw []byte, args []string, out io.Writer, held *Log) {
 	// costs at most the rest of one turn, and every per-call event goes to
 	// the engine over HTTP with no process at all.
 	if wake {
-		ensureEngine(roots)
+		ensureEngine(ctx, roots)
 		return
 	}
 
@@ -573,7 +576,7 @@ func answerHook(raw []byte, args []string, out io.Writer, held *Log) {
 		NoteSession(roots, in.SessionID)
 		// THE ENGINE IS UP BEFORE THE FIRST CALL, because every call from
 		// here on is answered by it.
-		ensureEngine(roots)
+		ensureEngine(ctx, roots)
 	case "StopFailure":
 		// A TURN ENDED BY THE API, WITH THE KIND OF ENDING. Without the type
 		// every such ending read as unknown, and the one class the agent can

@@ -356,10 +356,12 @@ func theRefusal(r Roots, actor, tool, path string) string {
 			"The engine cannot read a command and know whether it writes: a redirection, " +
 			"sed -i, mv, rm and a script you wrote all reach the filesystem. So it does " +
 			"not ask, and every command names its work:\n\n" +
-			"  echo 'go test ./...' | se run --on <id> --by " + by + "\n\n" +
-			"The command is read whole from standard input, quotes and all, and it runs " +
-			"in the folder being worked on. Output comes back with its exit code, and a " +
-			"long one is cut at the end rather than sent entire.\n\n" +
+			"  se run --on <id> --by " + by + " --from .se/scratchpad/cmd.txt\n\n" +
+			"The command is read whole from that file, quotes and all, and it runs in " +
+			"the folder being worked on. The scratchpad is the one folder a write with " +
+			"nothing in hand may reach, so put the command there first, or carry a short " +
+			"one inline with --command. Output comes back with its exit code, and a long " +
+			"one is cut at the end rather than sent entire.\n\n" +
 			"Naming a token you were not on puts the old one back and takes the new one " +
 			"up, so changing what you work on is one word on the next command.\n\n" +
 			theShellDoor("run --on <id> --by "+by+" --command 'go test ./...'") + "\n\n" +
@@ -373,8 +375,11 @@ func theRefusal(r Roots, actor, tool, path string) string {
 		tool + " carries no way to name a token, so it is refused whatever you hold. " +
 		"se apply takes the name on the write itself, so there is no call to make " +
 		"first and nothing to remember:\n\n" +
-		"  echo '[{\"file\":\"" + where + "\",\"old\":\"...\",\"new\":\"...\"}]' |\n" +
-		"    se apply --on <id> --by " + by + "\n\n" +
+		"  se apply --on <id> --by " + by + " --from .se/scratchpad/manifest.json\n\n" +
+		"The manifest is read whole from that file: a JSON array with one entry per " +
+		"edit, {\"file\":\"" + where + "\",\"old\":\"...\",\"new\":\"...\"}. The scratchpad " +
+		"is the one folder a write with nothing in hand may reach, so put it there " +
+		"first, or carry a short one inline with --edits. " +
 		"One manifest changes as many files as you like, and every edit is checked " +
 		"before any is written, so one bad edit writes nothing. op create makes a " +
 		"file that is not there, op write replaces one whole.\n\n" +

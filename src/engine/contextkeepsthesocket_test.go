@@ -17,8 +17,8 @@ import (
 // the first scan fails, the tree cannot be watched, and the watcher's channels
 // close. On those runs the loop is over while the process lives on, and the
 // listener and the socket file are still the engine's to take away. So the
-// shutdown the context runs has to outlive the loop, and a caller holding the
-// context alone is enough to close the socket.
+// shutdown the context runs has to outlive the loop, and a caller that holds
+// the context alone is enough to close the socket.
 func TestTheContextClosesTheSocketAfterTheLoopEnds(t *testing.T) {
 	t.Parallel()
 	r := aTreeToIndex(t)
@@ -33,7 +33,7 @@ func TestTheContextClosesTheSocketAfterTheLoopEnds(t *testing.T) {
 
 	ctx, cancel := context.WithCancel(t.Context())
 	noWatcher := func() (watcher, error) { return nil, errors.New("this mount has no watcher") }
-	stop, socket, _ := startIndexer(ctx, r, log, time.Hour, noWatcher)
+	stop, socket, _, _ := startIndexer(ctx, r, log, time.Hour, noWatcher)
 	if socket == "" {
 		t.Fatal("the model did not listen")
 	}
@@ -42,7 +42,7 @@ func TestTheContextClosesTheSocketAfterTheLoopEnds(t *testing.T) {
 	// The loop ends before the context does, and the record is where it says
 	// so. What follows is the degraded run the file's own comment covers, the
 	// engine going on without an index.
-	waitUntil(t, "the loop to say it cannot watch the tree", func() bool {
+	waitUntil(t, "the loop says it cannot watch the tree", func() bool {
 		for _, line := range logLines(t, r) {
 			if strings.Contains(line, "the tree cannot be watched") {
 				return true
@@ -72,8 +72,8 @@ func TestTheContextClosesTheSocketAfterTheLoopEnds(t *testing.T) {
 
 // waitUntil gives the engine's own goroutines a bounded time to reach what the
 // test waits on, and fails naming what did not happen. The wait is bounded
-// because what it waits on is another goroutine's to do, and nothing in the
-// test hands it its turn.
+// because the thing waited on is another goroutine's, and nothing in the test
+// hands it its turn.
 func waitUntil(t *testing.T, what string, reached func() bool) {
 	t.Helper()
 	deadline := time.Now().Add(5 * time.Second)

@@ -6,6 +6,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"testing"
+	"time"
 )
 
 // ONE BUILD FOR THE WHOLE PACKAGE, BECAUSE THIRTY-FIVE OF THEM IS THE SUITE.
@@ -29,15 +30,18 @@ var sharedEngine string
 
 // TestMain builds the engine once, runs the suite, and takes the build away.
 func TestMain(m *testing.M) {
-	// AN ENGINE ALREADY BUILT IS USED AS IT IS. The battery builds one from
-	// this same tree a moment before it runs the suite, and names it in
-	// SE_ENGINE, so the suite is spared the link of a second one. A run by
-	// hand, with nothing named, builds its own the way it always did.
-	if given := os.Getenv("SE_ENGINE"); given != "" {
-		if _, err := os.Stat(given); err == nil {
-			sharedEngine = given
-			os.Exit(m.Run())
-		}
+	// AN ENGINE ALREADY BUILT IS USED AS IT IS, WHILE IT IS NEWER THAN THE
+	// TREE. se test names one in SE_ENGINE, so the suite is spared the link
+	// of a second one. One older than a source here was built before that
+	// source changed, and a test driving it would read the tree as it was:
+	// so the tree wins and a fresh one is built. See enginefresh.go. The
+	// suite says which one it drives either way, so a failing test's output
+	// names the binary and its age, and a stale run reads as stale.
+	choice := engineToRun(os.Getenv("SE_ENGINE"), []string{"."}, time.Now())
+	if !choice.Build {
+		sharedEngine = choice.Path
+		fmt.Fprintf(os.Stderr, "the suite drives %s, built %s ago\n", choice.Path, choice.Age)
+		os.Exit(m.Run())
 	}
 	dir, err := os.MkdirTemp("", "se-engine")
 	if err != nil {
@@ -53,6 +57,7 @@ func TestMain(m *testing.M) {
 		os.RemoveAll(dir)
 		os.Exit(1)
 	}
+	fmt.Fprintf(os.Stderr, "the suite drives %s, built now from the tree: %s\n", sharedEngine, choice.whyBuilt())
 	code := m.Run()
 	os.RemoveAll(dir)
 	os.Exit(code)

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -42,7 +43,7 @@ type verbAnswer struct {
 const verbBudget = TheRunCeiling + time.Minute
 
 // callTheEngine sends one verb and answers its exit code.
-func callTheEngine(verb string, args []string) int {
+func callTheEngine(ctx context.Context, verb string, args []string) int {
 	// BOTH ROOTS COME OFF THE VERB'S OWN ARGUMENTS. Only the flag form carried
 	// --method, so every verb took the guess whatever the caller typed.
 	roots, err := FindRoots(argValue(args, "--work"), argValue(args, "--method"))
@@ -65,7 +66,7 @@ func callTheEngine(verb string, args []string) int {
 			"outside a project to work on its own\n", asked, got)
 	}
 	if wantsHelp(args) {
-		return run[verb](&call{roots: roots, args: args, in: os.Stdin, out: os.Stdout, err: os.Stderr})
+		return run[verb](&call{ctx: ctx, roots: roots, args: args, in: os.Stdin, out: os.Stdout, err: os.Stderr})
 	}
 	raw, _, ok := askModelWithin(roots, "verb", verbAsk{Verb: verb, Args: args, Stdin: stdinFor(verb, args)}, verbBudget)
 	if !ok {
@@ -142,14 +143,18 @@ func wantsHelp(args []string) bool {
 // A SNAPSHOT PER VERB. The roots carry one, filled the first time the verb
 // asks and dropped by its writes, and it is this verb's alone: a snapshot
 // that outlived the verb would be a second truth in a process that lives.
-func runVerbInside(r Roots, ask verbAsk) verbAnswer {
+func runVerbInside(ctx context.Context, r Roots, ask verbAsk) verbAnswer {
 	v, ok := run[ask.Verb]
 	if !ok {
 		return verbAnswer{Err: "engine: no such verb: " + ask.Verb + "\n", Code: Unread}
 	}
 	var out, errs strings.Builder
-	c := &call{roots: r.ReadOnce(), args: ask.Args, in: strings.NewReader(ask.Stdin), out: &out, err: &errs}
+	c := &call{ctx: ctx, roots: r.ReadOnce(), args: ask.Args, in: strings.NewReader(ask.Stdin), out: &out, err: &errs}
 	code := v(c)
+	// EVERY RESULT IS COUNTED HERE, because every lane result passes here on
+	// its way back. Wrong is a code that is not zero, or a refusal the verb
+	// answered with exit 0 and marked. See results.go.
+	CountResult(r, code != 0 || c.refused)
 	return verbAnswer{Out: out.String(), Err: errs.String(), Code: code}
 }
 

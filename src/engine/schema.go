@@ -7,7 +7,9 @@ import (
 	"strconv"
 	"strings"
 
+	"quackitect/engine/internal/frontmatter"
 	"quackitect/engine/internal/voice"
+	"quackitect/engine/internal/yaml"
 )
 
 // Reads a note kind's shape from src/schemas and validates a note against it.
@@ -103,7 +105,7 @@ func listValue(v any) ([]string, bool) {
 		var out []string
 		for _, part := range splitOutsideQuotes(inner) {
 			if part = strings.TrimSpace(part); part != "" {
-				out = append(out, unquote(part))
+				out = append(out, frontmatter.Unquote(part))
 			}
 		}
 		return out, true
@@ -177,58 +179,58 @@ func LoadSchema(methodRoot, kind string) (Schema, error) {
 	if err != nil {
 		return Schema{}, fmt.Errorf("no schema for kind %q: %w", kind, err)
 	}
-	tree, err := ParseYAML(string(b))
+	tree, err := yaml.Parse(string(b))
 	if err != nil {
 		return Schema{}, fmt.Errorf("%s does not parse: %w", path, err)
 	}
-	top := ymap(tree)
-	s := Schema{Kind: ystr(top["kind"]), Guidance: ystr(top["guidance"])}
+	top := yaml.Map(tree)
+	s := Schema{Kind: yaml.Str(top["kind"]), Guidance: yaml.Str(top["guidance"])}
 	if s.Kind != kind {
 		return Schema{}, fmt.Errorf("%s declares kind %q and is named for %q", path, s.Kind, kind)
 	}
 
-	front := ymap(top["frontmatter"])
-	s.Frontmatter.AdditionalProperties = ystr(front["additionalProperties"]) == "true"
-	s.Frontmatter.Required = ystrs(front["required"])
+	front := yaml.Map(top["frontmatter"])
+	s.Frontmatter.AdditionalProperties = yaml.Str(front["additionalProperties"]) == "true"
+	s.Frontmatter.Required = yaml.Strs(front["required"])
 	s.Frontmatter.Properties = map[string]PropSpec{}
-	for name, raw := range ymap(front["properties"]) {
-		p := ymap(raw)
+	for name, raw := range yaml.Map(front["properties"]) {
+		p := yaml.Map(raw)
 		s.Frontmatter.Properties[name] = PropSpec{
-			Const:       ystr(p["const"]),
-			Type:        ystr(p["type"]),
-			Link:        ystr(p["x-link"]) == "true",
-			Enum:        ystrs(p["enum"]),
-			EnumFrom:    ystr(p["x-enum-from"]),
+			Const:       yaml.Str(p["const"]),
+			Type:        yaml.Str(p["type"]),
+			Link:        yaml.Str(p["x-link"]) == "true",
+			Enum:        yaml.Strs(p["enum"]),
+			EnumFrom:    yaml.Str(p["x-enum-from"]),
 			MaxWords:    schemaInt(p["x-max-words"]),
-			WholeWords:  ystr(p["x-whole-words"]) == "true",
-			Description: ystr(p["description"]),
+			WholeWords:  yaml.Str(p["x-whole-words"]) == "true",
+			Description: yaml.Str(p["description"]),
 		}
 	}
 
-	body := ymap(top["body"])
+	body := yaml.Map(top["body"])
 	s.Body.HeadingLevel = schemaInt(body["headingLevel"])
 	if s.Body.HeadingLevel == 0 {
 		s.Body.HeadingLevel = 1
 	}
-	s.Body.StrictOrder = ystr(body["order"]) == "strict"
-	s.Body.ExtraSections = ystr(body["extraSections"]) == "true"
-	for _, raw := range ylist(body["sections"]) {
-		m := ymap(raw)
+	s.Body.StrictOrder = yaml.Str(body["order"]) == "strict"
+	s.Body.ExtraSections = yaml.Str(body["extraSections"]) == "true"
+	for _, raw := range yaml.List(body["sections"]) {
+		m := yaml.Map(raw)
 		s.Body.Sections = append(s.Body.Sections, SectionSpec{
-			Header:              ystr(m["header"]),
-			HeaderPrefix:        ystr(m["headerPrefix"]),
-			Required:            ystr(m["required"]) == "true",
-			List:                ystr(m["list"]) == "true",
-			Ordered:             ystr(m["ordered"]) == "true",
-			DetailMarker:        ystr(m["detailMarker"]),
-			Explains:            ystr(m["explains"]),
-			Tense:               ystr(m["tense"]),
+			Header:              yaml.Str(m["header"]),
+			HeaderPrefix:        yaml.Str(m["headerPrefix"]),
+			Required:            yaml.Str(m["required"]) == "true",
+			List:                yaml.Str(m["list"]) == "true",
+			Ordered:             yaml.Str(m["ordered"]) == "true",
+			DetailMarker:        yaml.Str(m["detailMarker"]),
+			Explains:            yaml.Str(m["explains"]),
+			Tense:               yaml.Str(m["tense"]),
 			MaxItems:            schemaInt(m["maxItems"]),
 			MaxWordsPerItem:     schemaInt(m["maxWordsPerItem"]),
 			MaxSentences:        schemaInt(m["maxSentences"]),
 			MaxWordsPerSentence: schemaInt(m["maxWordsPerSentence"]),
 			MaxWords:            schemaInt(m["maxWords"]),
-			Description:         ystr(m["description"]),
+			Description:         yaml.Str(m["description"]),
 		})
 	}
 	if len(s.Body.Sections) == 0 {
@@ -239,22 +241,22 @@ func LoadSchema(methodRoot, kind string) (Schema, error) {
 
 // Every scalar arrives as a string, so a number is read where it is used.
 func schemaInt(v any) int {
-	n, err := strconv.Atoi(strings.TrimSpace(ystr(v)))
+	n, err := strconv.Atoi(strings.TrimSpace(yaml.Str(v)))
 	if err != nil {
 		return 0
 	}
 	return n
 }
 
-// splitNoteLines is SplitNote with the body's first line number, which an
+// splitNoteLines is frontmatter.Split with the body's first line number, which an
 // editor needs to put a mark on the right row.
 func splitNoteLines(text string) (front, body string, bodyLine int) {
 	lines := strings.Split(strings.ReplaceAll(text, "\r\n", "\n"), "\n")
-	if len(lines) == 0 || lines[0] != noteFence {
+	if len(lines) == 0 || lines[0] != frontmatter.Fence {
 		return "", text, 1
 	}
 	for i := 1; i < len(lines); i++ {
-		if lines[i] != noteFence {
+		if lines[i] != frontmatter.Fence {
 			continue
 		}
 		j := i + 1
@@ -295,7 +297,7 @@ func ValidateNote(s Schema, text, methodRoot string) []Departure {
 		out = append(out, Departure{Line: 1,
 			Says: "it has no frontmatter, so nothing says which schema reads it"})
 	} else {
-		f, err := ParseFront(front)
+		f, err := frontmatter.Parse(front)
 		if err != nil {
 			out = append(out, Departure{Line: 1, Says: "the frontmatter does not parse: " + err.Error()})
 		} else {
@@ -311,7 +313,7 @@ func ValidateNote(s Schema, text, methodRoot string) []Departure {
 func frontValue(front, key string) string {
 	for _, line := range strings.Split(front, "\n") {
 		if rest, found := strings.CutPrefix(strings.TrimSpace(line), key+":"); found {
-			return unquote(strings.TrimSpace(rest))
+			return frontmatter.Unquote(strings.TrimSpace(rest))
 		}
 	}
 	return ""
@@ -328,14 +330,14 @@ func frontLine(front, key string) int {
 	return 1
 }
 
-func checkFront(spec FrontSpec, f Front, front string) []Departure {
+func checkFront(spec FrontSpec, f frontmatter.Front, front string) []Departure {
 	var out []Departure
 	for _, key := range spec.Required {
 		// A REQUIRED FIELD MAY BE A LIST, and asking a list for its string
 		// answers nothing. Every rationale in this tree was reported as having
 		// no explains while carrying one, because explains is an array and this
 		// read it as text: a required array could not be satisfied at all.
-		if !given(f, key) {
+		if !frontmatter.Given(f, key) {
 			out = append(out, Departure{Line: 1,
 				Says: fmt.Sprintf("the frontmatter has no %s", key)})
 		}
@@ -348,11 +350,11 @@ func checkFront(spec FrontSpec, f Front, front string) []Departure {
 		if p.Type == "array" {
 			if _, isList := listValue(raw); !isList {
 				out = append(out, Departure{Line: frontLine(front, name),
-					Says: fmt.Sprintf("%s is a list in the schema, and it is written %q", name, frontStr(f, name))})
+					Says: fmt.Sprintf("%s is a list in the schema, and it is written %q", name, frontmatter.Str(f, name))})
 			}
 			continue
 		}
-		got := unlink(frontStr(f, name))
+		got := unlink(frontmatter.Str(f, name))
 		if p.Const != "" && got != "" && got != p.Const {
 			out = append(out, Departure{Line: frontLine(front, name),
 				Says: fmt.Sprintf("%s reads %q and the schema allows only %q", name, got, p.Const)})

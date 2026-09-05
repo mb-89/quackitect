@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"quackitect/engine/internal/yaml"
 	"strings"
 )
 
@@ -80,50 +81,50 @@ func LoadProcess(methodRoot, name string) (Process, error) {
 	if err != nil {
 		return Process{}, fmt.Errorf("no process named %q: %w", name, err)
 	}
-	tree, err := ParseYAML(string(b))
+	tree, err := yaml.Parse(string(b))
 	if err != nil {
 		return Process{}, fmt.Errorf("%s does not parse: %w", path, err)
 	}
-	top := ymap(tree)
+	top := yaml.Map(tree)
 	p := Process{
-		Name:            ystr(top["name"]),
-		Description:     ystr(top["description"]),
-		RequiredSection: ystrs(ymap(top["sections"])["required"]),
-		OptionalSection: ystrs(ymap(top["sections"])["optional"]),
-		OptionalField:   ystrs(ymap(top["fields"])["optional"]),
-		RequiredField:   ystrs(ymap(top["fields"])["required"]),
+		Name:            yaml.Str(top["name"]),
+		Description:     yaml.Str(top["description"]),
+		RequiredSection: yaml.Strs(yaml.Map(top["sections"])["required"]),
+		OptionalSection: yaml.Strs(yaml.Map(top["sections"])["optional"]),
+		OptionalField:   yaml.Strs(yaml.Map(top["fields"])["optional"]),
+		RequiredField:   yaml.Strs(yaml.Map(top["fields"])["required"]),
 	}
 	if p.Name != name {
 		return Process{}, fmt.Errorf("%s declares name %q and is named for %q", path, p.Name, name)
 	}
-	for _, raw := range ylist(top["states"]) {
-		m := ymap(raw)
+	for _, raw := range yaml.List(top["states"]) {
+		m := yaml.Map(raw)
 		p.States = append(p.States, ProcessState{
-			Name: ystr(m["name"]), Description: ystr(m["description"])})
+			Name: yaml.Str(m["name"]), Description: yaml.Str(m["description"])})
 	}
-	for _, raw := range ylist(top["activities"]) {
-		m := ymap(raw)
+	for _, raw := range yaml.List(top["activities"]) {
+		m := yaml.Map(raw)
 		p.Activities = append(p.Activities, Activity{
-			Name:     ystr(m["name"]),
-			Supplier: ystr(m["supplier"]),
-			Input:    ystr(m["input"]),
-			Does:     ystr(m["does"]),
-			Output:   ystr(m["output"]),
-			Customer: ystr(m["customer"]),
-			By:       ystr(m["by"]),
-			From:     ystr(m["from"]),
-			To:       ystr(m["to"]),
-			Pulled:   ystr(m["pulled"]) != "false",
+			Name:     yaml.Str(m["name"]),
+			Supplier: yaml.Str(m["supplier"]),
+			Input:    yaml.Str(m["input"]),
+			Does:     yaml.Str(m["does"]),
+			Output:   yaml.Str(m["output"]),
+			Customer: yaml.Str(m["customer"]),
+			By:       yaml.Str(m["by"]),
+			From:     yaml.Str(m["from"]),
+			To:       yaml.Str(m["to"]),
+			Pulled:   yaml.Str(m["pulled"]) != "false",
 			Criteria: criteriaOf(m["criteria"]),
-			Role:     orElse(ystr(m["role"]), RoleWorker),
+			Role:     orElse(yaml.Str(m["role"]), RoleWorker),
 		})
 	}
-	for _, raw := range ylist(top["dispositions"]) {
-		m := ymap(raw)
+	for _, raw := range yaml.List(top["dispositions"]) {
+		m := yaml.Map(raw)
 		p.Dispositions = append(p.Dispositions, DispositionSpec{
-			Name:        ystr(m["name"]),
-			Description: ystr(m["description"]),
-			NeedsReason: ystr(m["reason"]) == "required",
+			Name:        yaml.Str(m["name"]),
+			Description: yaml.Str(m["description"]),
+			NeedsReason: yaml.Str(m["reason"]) == "required",
 		})
 	}
 	if err := p.check(path); err != nil {
@@ -161,11 +162,11 @@ func (p Process) check(path string) error {
 // criteriaOf reads an activity's criteria, in the order they were written.
 func criteriaOf(v any) []ActivityCriterion {
 	var out []ActivityCriterion
-	for _, raw := range ylist(v) {
-		m := ymap(raw)
+	for _, raw := range yaml.List(v) {
+		m := yaml.Map(raw)
 		out = append(out, ActivityCriterion{
-			Says:          ystr(m["says"]),
-			NeedsEvidence: ystr(m["evidence"]) == "required",
+			Says:          yaml.Str(m["says"]),
+			NeedsEvidence: yaml.Str(m["evidence"]) == "required",
 		})
 	}
 	return out

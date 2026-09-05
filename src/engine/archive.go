@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
 	"errors"
 	"flag"
@@ -264,22 +265,78 @@ func WriteArchiveList(r Roots) error {
 }
 
 // ClosingState says whether a token stands where its process can move it no
-// further.
+// further. It is Process.Ends asked of the token's own process, and not a
+// second loop that could answer differently.
 //
 // A token that has ended still has a step to take where its process declares
-// one from where it stands. The standard process is the case: a done token is
-// waiting for a verdict, and taking it off the disk would strand the reviewer.
+// one from where it stands. The pull never writes that shape, because it sets
+// a disposition only on a step into an ending state, but a hand edit or an
+// older engine did, and taking such a token off the disk strands it.
 func ClosingState(r Roots, t Token) bool {
 	p, err := LoadProcess(r.Method, t.Process)
 	if err != nil {
 		return true // a process nobody can read says nothing about what is left
 	}
-	for _, a := range p.Activities {
-		if a.From != "" && a.From == string(t.Status) {
-			return false
+	return p.Ends(string(t.Status))
+}
+
+// Archivable is the one rule for whether a token may come off the disk: it has
+// ended, and it stands where its process can move it no further. The save and
+// the sweep both ask it, so the two doors cannot disagree about a token.
+func Archivable(r Roots, t Token) bool {
+	return t.Ended() && ClosingState(r, t)
+}
+
+// findArchivedWords answers FTS5 words over the archive the way findDB answers
+// them over the tree: the archived lines are read into an index of their own,
+// held in memory for the length of the call, and findDB runs the same MATCH
+// over it. The archive is not in the tree's index, because it is not in the
+// tree, and a second matcher beside findDB is how the two doors drifted apart.
+func findArchivedWords(r Roots, rows []Archived, p FindParams) (Found, error) {
+	db, err := sql.Open("sqlite3", ":memory:")
+	if err != nil {
+		return Found{}, err
+	}
+	defer db.Close()
+	// ONE CONNECTION, because every connection to :memory: is a database of
+	// its own, and a second one would answer over an empty table.
+	db.SetMaxOpenConns(1)
+	if _, err := db.Exec(`CREATE VIRTUAL TABLE line_text USING fts5 (path UNINDEXED, n UNINDEXED, text)`); err != nil {
+		return Found{}, err
+	}
+	tx, err := db.Begin()
+	if err != nil {
+		return Found{}, err
+	}
+	put, err := tx.Prepare(`INSERT INTO line_text (path, n, text) VALUES (?, ?, ?)`)
+	if err != nil {
+		_ = tx.Rollback()
+		return Found{}, err
+	}
+	for _, row := range rows {
+		said, err := ReadArchived(r, row.ID)
+		if err != nil {
+			continue // a tag whose blob has gone proves nothing about the rest
+		}
+		for n, line := range strings.Split(said, "\n") {
+			// THE PATH IS THE TAG, so a reader can open what answered.
+			if _, err := put.Exec(row.Tag, n+1, strings.TrimRight(line, "\r")); err != nil {
+				put.Close()
+				_ = tx.Rollback()
+				return Found{}, err
+			}
 		}
 	}
-	return true
+	put.Close()
+	if err := tx.Commit(); err != nil {
+		return Found{}, err
+	}
+	got, err := findDB(db, FindParams{Words: p.Words, Limit: p.Limit})
+	if err != nil {
+		return Found{}, err
+	}
+	got.Fresh = true // the archive is read off its tags, and no watcher can be behind them
+	return got, nil
 }
 
 // readArchivedNote answers a token out of history, so a reader naming a closed
@@ -356,7 +413,7 @@ func runArchive(c *call) int {
 // deleted, so a person reads what happened rather than trusting it.
 func SweepClosed(r Roots) (kept, gone int, err error) {
 	for _, t := range Tokens(r) {
-		if !t.Ended() {
+		if !Archivable(r, t) {
 			continue
 		}
 		tracked := filepath.Dir(noteAt(r, t.ID)) == TrackedDir(r)
@@ -404,14 +461,20 @@ func FindArchived(r Roots, p FindParams) (Found, error) {
 			"an archived token is a tag rather than a file. Search the archive without it, "+
 			"or search the tree, which does read paths", p.Path)
 	}
-	want := p.Regex
-	if want == "" {
-		want = regexp.QuoteMeta(p.Words)
-	}
-	if want == "" {
+	if p.Words == "" && p.Regex == "" {
 		return Found{}, fmt.Errorf("say what to look for: --words or --regex")
 	}
-	re, err := regexp.Compile(want)
+	// WORDS MEAN OVER THE ARCHIVE WHAT THEY MEAN OVER THE TREE. This quoted
+	// the words into a regular expression and matched them as one literal
+	// string, so se find --words 'undo AND pops' answered two hits and the
+	// same words over the archive answered none: no archived line carries
+	// the characters "undo AND pops". A searcher reads zero over closed work
+	// as work that never was. So the words go to FTS5 here too, through the
+	// one function the tree door uses.
+	if p.Words != "" {
+		return findArchivedWords(r, rows, p)
+	}
+	re, err := regexp.Compile(p.Regex)
 	if err != nil {
 		return Found{}, fmt.Errorf("that regular expression will not read: %w", err)
 	}

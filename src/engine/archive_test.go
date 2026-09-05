@@ -191,7 +191,7 @@ func TestTheArchiveWillNotTakeAPathItCannotRead(t *testing.T) {
 	// answering it is the defect rather than an empty archive.
 	find := func(args ...string) (string, int) {
 		var out, errs bytes.Buffer
-		code := run["find"](&call{roots: r, args: args,
+		code := run["find"](&call{ctx: t.Context(), roots: r, args: args,
 			in: strings.NewReader(""), out: &out, err: &errs})
 		return out.String() + errs.String(), code
 	}

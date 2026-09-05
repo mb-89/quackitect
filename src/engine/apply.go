@@ -481,12 +481,27 @@ func Undo(r Roots, on, by string) ([]string, error) {
 //
 // A CHECKER THAT CANNOT RUN LETS THE WRITE THROUGH. It is a check on form, and
 // a broken one must not stop somebody working.
+//
+// AND IDENTITY MATERIAL IS ASKED HERE TOO. The guard hook asks identityMaterial
+// of the harness's write tools, and this door is the mirror of that one: it is
+// the door agents are told to use, and the only one open while the hook is
+// down. So a datetime went through here into a tracked file with no refusal,
+// while the same sentence through Write was refused. A write under .se is left
+// alone, the way the guard leaves it: that is where what does not travel lives.
 func proseThatReads(r Roots, edits []Edit) error {
 	var written []string
 	for _, e := range edits {
-		if e.New != "" && isProse(e.File) {
-			written = append(written, e.New)
+		if e.New == "" || !isProse(e.File) {
+			continue
 		}
+		if path, err := inTheTree(r, e.File); err == nil && !underPrivate(r, path) {
+			if rule, matched, yes := identityMaterial(e.New, TheUsername()); yes {
+				return fmt.Errorf("this text carries %s, %q, and identity material does not travel, so nothing was written. "+
+					"Where a time is needed, write a month and a year. "+
+					"A machine field keeps its stamp, and .se keeps what does not travel.", rule, matched)
+			}
+		}
+		written = append(written, e.New)
 	}
 	if len(written) == 0 {
 		return nil

@@ -35,7 +35,7 @@ func TestTheRegisterFollowsAgentsInAndOut(t *testing.T) {
 		}
 		body, _ := json.Marshal(in)
 		var out bytes.Buffer
-		answerHook(body, []string{"--method", r.Method}, &out, log)
+		answerHook(t.Context(), body, []string{"--method", r.Method}, &out, log)
 	}
 	here := func() []Doing { return AgentsPresent(r) }
 	named := func(want ...string) {
@@ -109,7 +109,7 @@ func TestAnAgentSeenAfterARestartIsHereAgain(t *testing.T) {
 		}
 		body, _ := json.Marshal(in)
 		var out bytes.Buffer
-		answerHook(body, []string{"--method", r.Method}, &out, log)
+		answerHook(t.Context(), body, []string{"--method", r.Method}, &out, log)
 	}
 	tell("SessionStart", map[string]any{"source": "startup"})
 	tell("SubagentStart", map[string]any{"agent_id": "1f4c", "agent_type": "reviewer"})

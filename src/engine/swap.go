@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -9,6 +10,7 @@ import (
 	"path/filepath"
 	"quackitect/engine/internal/quiet"
 	"quackitect/engine/internal/replaced"
+	"quackitect/engine/internal/version"
 	"strings"
 	"time"
 )
@@ -182,7 +184,7 @@ func goBuild(r Roots, one manifestBuild, next, stamp string) error {
 	// -gcflags=-e LIFTS THE ERROR CAP, so a sweep of undefined symbols comes
 	// back in one round rather than a batch at a time.
 	cmd := quiet.Quietly(exec.Command("go", "build", "-C", filepath.Join(r.Method, one.Source),
-		"-gcflags=-e", "-ldflags", "-X main.Build="+stamp, "-o", next, "."))
+		"-gcflags=-e", "-ldflags", "-X quackitect/engine/internal/version.Build="+stamp, "-o", next, "."))
 	cmd.Dir = r.Method
 	cmd.Env = buildEnv()
 	if said, err := cmd.CombinedOutput(); err != nil {
@@ -240,9 +242,9 @@ func planSwap(r Roots, why string, built bool) (swapPlan, error) {
 		if err != nil {
 			return swapPlan{}, fmt.Errorf("the program in .bin is not one to hand over to: %w", err)
 		}
-		if stamp == Build {
+		if stamp == version.Build {
 			return swapPlan{}, fmt.Errorf("the program on disk is this same build, %s, "+
-				"so there is nothing to hand over to", Build)
+				"so there is nothing to hand over to", version.Build)
 		}
 		return swapPlan{Build: stamp, Why: why}, nil
 	}
@@ -317,7 +319,15 @@ func putInPlace(r Roots, next string) error {
 
 // handOver starts the successor over the same tree and tells it which log
 // session it is continuing.
-func handOver(r Roots, session string) error {
+//
+// THE CONTEXT GOVERNS THE START AND NEVER THE CHILD. The successor is meant
+// to outlive this engine, so it is not run under the context, which would
+// kill it when this engine let go. An engine already ending starts no
+// successor, and that is the whole of what the context decides here.
+func handOver(ctx context.Context, r Roots, session string) error {
+	if err := ctx.Err(); err != nil {
+		return fmt.Errorf("this engine is ending, so it starts no successor: %w", err)
+	}
 	exe := engineAt(r)
 	out, err := os.OpenFile(r.Private("engine.out"), os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0o644)
 	if err != nil {

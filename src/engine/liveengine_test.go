@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"quackitect/engine/internal/version"
 	"strings"
 	"testing"
 	"time"
@@ -34,7 +35,7 @@ func aLiveEngine(t *testing.T, r Roots) {
 	if socket == "" {
 		t.Fatal("the engine did not listen")
 	}
-	SayRunning(r, Running{PID: os.Getpid(), Socket: socket, Build: Build,
+	SayRunning(r, Running{PID: os.Getpid(), Socket: socket, Build: version.Build,
 		Started: time.Now().UTC().Format(time.RFC3339)})
 	t.Cleanup(func() {
 		stop()

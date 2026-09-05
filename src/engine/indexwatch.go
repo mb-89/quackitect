@@ -101,11 +101,13 @@ const watchBuffer = 1 << 20
 // first scan is answered from what is indexed so far, with the revision
 // saying so, rather than refused for the length of the scan.
 //
-// THE CONTEXT IS THE OWNER. Its end is the shutdown, once, and stop is how a
-// caller waits for that shutdown to finish. A test hands t.Context and what it
-// started ends with it, handles and socket included, before its cleanup runs.
+// THE CONTEXT IS THE OWNER. Its end begins the shutdown, once, and stop is
+// how a caller waits for that shutdown to finish. A test that hands t.Context
+// and never calls stop gets the shutdown begun at its end, and a test that
+// wants it finished calls stop.
 func StartIndexer(ctx context.Context, r Roots, log *Log, beat time.Duration) (stop func(), socket string, asked Asks) {
-	return startIndexer(ctx, r, log, beat, openFSWatcher)
+	stop, socket, asked, _ = startIndexer(ctx, r, log, beat, openFSWatcher)
+	return stop, socket, asked
 }
 
 // Asks are what a client can set going over the socket that the engine's own
@@ -117,13 +119,14 @@ type Asks struct {
 	Swap <-chan swapPlan
 }
 
-// startIndexer is StartIndexer with the watcher chosen by the caller.
-func startIndexer(ctx context.Context, r Roots, log *Log, beat time.Duration, open func() (watcher, error)) (stop func(), socket string, asked Asks) {
+// startIndexer is StartIndexer with the watcher chosen by the caller. It also
+// answers the index handles the shutdown closes, so a test can ask them.
+func startIndexer(ctx context.Context, r Roots, log *Log, beat time.Duration, open func() (watcher, error)) (stop func(), socket string, asked Asks, handles []*sql.DB) {
 	db, err := openIndex(r)
 	if err != nil {
 		log.Write("engine", "error", "engine", "the index could not be opened, so the engine reads the files", No(),
 			map[string]any{"reason": err.Error()})
-		return func() {}, "", Asks{}
+		return func() {}, "", Asks{}, nil
 	}
 	// THE MODEL ANSWERS ON A READ-ONLY CONNECTION, so a question that arrives
 	// on the socket cannot write, whatever it says.
@@ -132,11 +135,11 @@ func startIndexer(ctx context.Context, r Roots, log *Log, beat time.Duration, op
 		db.Close()
 		log.Write("engine", "error", "engine", "the index could not be opened read-only", No(),
 			map[string]any{"reason": err.Error()})
-		return func() {}, "", Asks{}
+		return func() {}, "", Asks{}, nil
 	}
 	toStop := make(chan struct{}, 1)
 	toSwap := make(chan swapPlan, 1)
-	m := &model{db: ro, roots: r, askedToStop: toStop, askedToSwap: toSwap}
+	m := &model{ctx: ctx, db: ro, roots: r, askedToStop: toStop, askedToSwap: toSwap}
 	ln, addr, err := listenModel(r)
 	if err != nil {
 		log.Write("engine", "error", "engine", "the model cannot listen, so every reader reads the index file", No(),
@@ -175,7 +178,7 @@ func startIndexer(ctx context.Context, r Roots, log *Log, beat time.Duration, op
 	return func() {
 		shutdown()
 		<-stopped
-	}, addr, Asks{Stop: toStop, Swap: toSwap}
+	}, addr, Asks{Stop: toStop, Swap: toSwap}, []*sql.DB{db, ro}
 }
 
 func runIndexer(r Roots, log *Log, beat time.Duration, done <-chan struct{}, db *sql.DB, m *model, open func() (watcher, error)) {

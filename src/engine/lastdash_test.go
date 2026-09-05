@@ -1,6 +1,7 @@
 package main
 
 import (
+	"quackitect/engine/internal/yaml"
 	"strings"
 	"testing"
 )
@@ -20,7 +21,7 @@ func TestABareDashOnTheLastLineIsRefused(t *testing.T) {
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
 			t.Parallel()
-			_, err := ParseYAML(c.text)
+			_, err := yaml.Parse(c.text)
 			if err == nil || !strings.Contains(err.Error(), "the file ends") {
 				t.Fatalf("got %v, want a refusal naming the end of the file", err)
 			}

@@ -70,7 +70,7 @@ func TestAClaimCanTakeTheTokenUp(t *testing.T) {
 	tok := mintUnclaimed(t, r, "claimed and taken once")
 
 	var out, errs bytes.Buffer
-	code := run["claim"](&call{roots: r,
+	code := run["claim"](&call{ctx: t.Context(), roots: r,
 		args: []string{"--these", tok.ID, "--actor", "worker-one", "--take", "--no-publish"},
 		in:   strings.NewReader(""), out: &out, err: &errs})
 	said := out.String() + errs.String()

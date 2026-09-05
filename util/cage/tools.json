@@ -211,6 +211,10 @@
             },
             "type": "array"
           },
+          "needs_human": {
+            "description": "true when the answer is not yours: your best attempt, and a person reads it first",
+            "type": "boolean"
+          },
           "on": {
             "type": "string"
           },

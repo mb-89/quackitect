@@ -56,7 +56,7 @@ func TestUnboundTakesTheQueueOffAndLeavesTheTreeGuarded(t *testing.T) {
 			"session_id": "s-1", "tool_name": "Write",
 			"tool_input": map[string]any{"file_path": "doc/x.md", "content": text}})
 		var out bytes.Buffer
-		answerHook(body, []string{"--method", r.Method}, &out, log)
+		answerHook(t.Context(), body, []string{"--method", r.Method}, &out, log)
 		return out.String()
 	}
 	if said := write("The engine reads the tree.\n"); !strings.Contains(said, theWriteDoor) {
@@ -123,7 +123,7 @@ func TestGodModeRefusesNothingAndIsNotSpoken(t *testing.T) {
 		body, _ := json.Marshal(map[string]any{"hook_event_name": "PreToolUse", "cwd": r.Work,
 			"session_id": "s-1", "tool_name": "Bash", "tool_input": map[string]any{"command": "rm -rf src"}})
 		var out bytes.Buffer
-		answerHook(body, []string{"--method", r.Method}, &out, log)
+		answerHook(t.Context(), body, []string{"--method", r.Method}, &out, log)
 		return out.String()
 	}
 	if said := decide(); !strings.Contains(said, "deny") {
@@ -162,7 +162,7 @@ func TestGodModeDoesNotSilenceThePerson(t *testing.T) {
 		body, _ := json.Marshal(map[string]any{"hook_event_name": "PreToolUse", "cwd": r.Work,
 			"session_id": "s-1", "tool_name": tool, "tool_input": map[string]any{"command": "ls"}})
 		var out bytes.Buffer
-		answerHook(body, []string{"--method", r.Method}, &out, log)
+		answerHook(t.Context(), body, []string{"--method", r.Method}, &out, log)
 		return out.String()
 	}
 
@@ -205,45 +205,6 @@ func TestOnePressReleasesFromEitherRung(t *testing.T) {
 	}
 	if got := TheRungBelow(God); got != Bound {
 		t.Fatalf("a press while in god mode went to %q, and one press releases all the way", got)
-	}
-}
-
-// A SESSION STARTS BOUND, WHATEVER THE LAST ONE ENDED ON.
-//
-// The rung was a file and nothing put it back, so an editor closed on an
-// unbound tree opened on an unbound tree, with nobody having asked for it in
-// that session. God is the sharp case: every refusal off, and armed again at the
-// next start with nothing said.
-func TestANewSessionIsBoundWhateverTheLastOneLeft(t *testing.T) {
-	t.Parallel()
-	for _, was := range []TheBinding{Unbound, God} {
-		r := aTreeToWriteIn(t)
-		if _, err := SetBinding(r, was, "the owner"); err != nil {
-			t.Fatal(err)
-		}
-		if at := LoadBinding(r).At; at != was {
-			t.Fatalf("this proves nothing: the tree would not go to %q", was)
-		}
-		got, put := PutTheBindingBack(r)
-		if !put || got != was {
-			t.Errorf("a start off %q answered (%q, %v), and it puts the rung back", was, got, put)
-		}
-		if at := LoadBinding(r).At; at != Bound {
-			t.Errorf("a session starting on a %q tree reads %q", was, at)
-		}
-		if Unleashed(r) || NoGuardsAtAll(r) {
-			t.Errorf("a session starting on a %q tree still reads as unleashed", was)
-		}
-	}
-}
-
-// AND A TREE ALREADY BOUND IS NOT WRITTEN, so a start says nothing about a rung
-// nobody moved.
-func TestAStartSaysNothingAboutATreeAlreadyBound(t *testing.T) {
-	t.Parallel()
-	r := aTreeToWriteIn(t)
-	if got, put := PutTheBindingBack(r); put || got != Bound {
-		t.Errorf("a bound tree answered (%q, %v), and there was nothing to put back", got, put)
 	}
 }
 

@@ -74,7 +74,11 @@ func LoadCandidates(methodRoot string) ([]Candidate, error) {
 // ProbeTools runs every candidate and writes what answered. It never fails a
 // boot: a candidate that is missing is the ordinary case, and a rules file
 // that will not read leaves the list empty rather than stopping the engine.
-func ProbeTools(r Roots, session string) Probe {
+//
+// THE CONTEXT IS THE CALLER'S. Each candidate runs under it, bounded by
+// probeWait, so a caller that ends early ends every probe with it and a test
+// hands t.Context.
+func ProbeTools(ctx context.Context, r Roots, session string) Probe {
 	p := Probe{Session: session, At: now()}
 	cands, err := LoadCandidates(r.Method)
 	if err != nil {
@@ -86,7 +90,7 @@ func ProbeTools(r Roots, session string) Probe {
 		wg.Add(1)
 		go func(c Candidate) {
 			defer wg.Done()
-			t, ok := askOne(c)
+			t, ok := askOne(ctx, c)
 			if !ok {
 				return
 			}
@@ -103,12 +107,12 @@ func ProbeTools(r Roots, session string) Probe {
 
 // A tool is present when it is on the path and it answers. Both have to hold:
 // a name that resolves and then refuses to run is not a tool anyone can use.
-func askOne(c Candidate) (Tool, bool) {
+func askOne(ctx context.Context, c Candidate) (Tool, bool) {
 	path, err := exec.LookPath(c.Name)
 	if err != nil {
 		return Tool{}, false
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), probeWait)
+	ctx, cancel := context.WithTimeout(ctx, probeWait)
 	defer cancel()
 	out, err := quiet.Quietly(exec.CommandContext(ctx, path, c.Args...)).CombinedOutput()
 	if err != nil {

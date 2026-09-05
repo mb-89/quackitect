@@ -171,7 +171,7 @@ func TestASyncWithNoRemoteIsNotFatal(t *testing.T) {
 	if err := os.MkdirAll(r.Private(), 0o755); err != nil {
 		t.Fatal(err)
 	}
-	got := SyncClaims(r)
+	got := SyncClaims(t.Context(), r)
 	if got.Says == "" {
 		t.Fatal("a sync that found nothing said nothing about why")
 	}

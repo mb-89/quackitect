@@ -21,7 +21,7 @@ func arrive(t *testing.T, r Roots, log *Log, session string) {
 	body, _ := json.Marshal(map[string]any{"hook_event_name": "SessionStart",
 		"cwd": r.Work, "session_id": session, "source": "startup"})
 	var out bytes.Buffer
-	answerHook(body, []string{"--method", r.Method}, &out, log)
+	answerHook(t.Context(), body, []string{"--method", r.Method}, &out, log)
 }
 
 // TWO SESSIONS OVER ONE TREE ARE TWO ACTORS, and neither puts back the other's
@@ -103,7 +103,7 @@ func TestANameAnotherSessionHoldsIsRefused(t *testing.T) {
 		body, _ := json.Marshal(map[string]any{"hook_event_name": "PreToolUse",
 			"cwd": r.Work, "session_id": session, "tool_name": tool, "tool_input": in})
 		var out bytes.Buffer
-		answerHook(body, []string{"--method", r.Method}, &out, log)
+		answerHook(t.Context(), body, []string{"--method", r.Method}, &out, log)
 		return out.String()
 	}
 	arrive(t, r, log, "s-first")
