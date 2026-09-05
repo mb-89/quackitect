@@ -18,6 +18,7 @@ Nothing you write survives except what you push.
 6. Put a diagnosis in your answer whole, as it was written. *
 7. Never pipe into the engine. The flags `--command` and `--edits` carry the payload. *
 8. Push what you want kept. A finding that stays on this box dies with it. *
+9. Answer the person in the chat. `se_answer` is the record's copy, and they do not read the record. *
 
 ## Discussion
 
@@ -44,6 +45,14 @@ The hooks that can refuse a call are written by the engine when it starts, so a 
 Sessions before you read the standing rules, held no `se_apply` and no `se_run`, and concluded they could do nothing.
 Nothing had refused them.
 Use Write, Edit and Bash until an engine answers, then use the lane.
+
+### 9. The chat is where they read you
+
+The rules say to answer the person with `se_answer`, and a cloud session did exactly that.
+Every answer went into the record, and the person read none of them.
+On a cloud box the record is not shown to them, and the chat is.
+The owner said so in September 2026: answer me in the chat, or I do not see it.
+So the answer goes to the chat first, whole, and `se_answer` carries the copy the record needs.
 
 ### 5. Measure, then explain
 
