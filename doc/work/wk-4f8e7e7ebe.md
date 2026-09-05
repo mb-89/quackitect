@@ -11,10 +11,13 @@ title: tests build their engine
 status: done
 # who did the work step, so the verdict is never theirs
 author: worker-birch
+claimed_by: 547b9365/reviewer-quince
+claimed_at: "2026-09-05T15:55:45Z"
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - d5e1c2b28e8a0778110e6f1f7b4372887c4596cd
   - e529ad30457cef1729d1f4fe9e3ed04718a6e0dc
+  - 98cd4e804683d7b95c5c54aed96dd135af1bb7f3
 # the tree each time the work was put down or closed, snapshots the engine wrote
 ended:
   - db3347465840fcbe11619631058230c246878779
