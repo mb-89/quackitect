@@ -14,8 +14,8 @@ import (
 // were only a missing rg.
 func TestShellCommandPutsEveryProbedToolOnPath(t *testing.T) {
 	t.Parallel()
-	root := t.TempDir()
-	r := Roots{Method: root, Work: root}
+	r := aTree(t).Roots
+	root := r.Work
 	// TWO TOOLS IN TWO PLACES. One proves a directory reaches the child and
 	// says nothing about the second, and every tool is what the ask is.
 	one := filepath.Join(root, "somewhere", "bin")

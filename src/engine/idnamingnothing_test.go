@@ -22,8 +22,8 @@ import (
 // count as reaching something: a token on disk, and a row in the archive.
 func TestATokenIdNamingNothingIsAFinding(t *testing.T) {
 	t.Parallel()
-	root := t.TempDir()
-	r := Roots{Method: root, Work: root}
+	r := aTree(t).Roots
+	root := r.Work
 	writeProcess(t, root, "gated")
 
 	// A CLOSED TOKEN IS OFF THE DISK AND IN THE LIST, so the archive is the

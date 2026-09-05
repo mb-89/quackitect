@@ -5,8 +5,8 @@ import "testing"
 // THE STOP CLAIM IS THE FIFTH SESSION-SCOPED STORE, AND IT READS THE SESSION
 // THE WAY THE OTHER FOUR DO.
 //
-// The rung, the hold and the ask learned the rule in wk-38c4d9e04c, and the
-// four stores in wk-3dbfe11bbd: a log that names no session decides nothing, so
+// The rung, the hold and the ask learned the rule first, and the four stores
+// after them: a log that names no session decides nothing, so
 // what was stored stands. The stop-claim register compared its stored session
 // against currentSession itself, so through a rotation -- the full log set aside
 // and a fresh current opened, empty until the next record lands -- a claim made

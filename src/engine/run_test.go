@@ -2,7 +2,6 @@ package main
 
 import (
 	"os"
-	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -132,14 +131,4 @@ func TestAPageNameCannotLeaveTheFolder(t *testing.T) {
 			t.Errorf("%q was read", name)
 		}
 	}
-}
-
-func aTreeToRunIn(t *testing.T) Roots {
-	t.Helper()
-	root := t.TempDir()
-	// The command runs in the work root, so it must be a real folder.
-	if err := os.MkdirAll(filepath.Join(root, ".se"), 0o755); err != nil {
-		t.Fatal(err)
-	}
-	return Roots{Method: root, Work: root}
 }

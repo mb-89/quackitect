@@ -119,6 +119,14 @@ func runRun(c *call) int {
 		said = string(b)
 	}
 
+	// A COMMIT NAMES ITS PATHS AT THIS DOOR TOO. The hook reads a Bash call,
+	// and this verb is the same shell with a token on it, so the index of the
+	// moment is refused here the same way. See commitpaths.go.
+	if why, refuse := ACommitCarriesStrangers(said); refuse {
+		c.answerJSON(map[string]any{"error": why, "on": *on})
+		return 1
+	}
+
 	// NAMING IT IS TAKING IT UP, the same as on a write. Whatever this actor
 	// held goes back, so changing what you work on is one word on the next
 	// command.

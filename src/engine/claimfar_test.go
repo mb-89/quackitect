@@ -94,12 +94,16 @@ func TestAClaimIsWrittenOnTheFarCommit(t *testing.T) {
 	}
 }
 
-// A FETCH THAT FAILS SAYS WHY.
+// A FETCH TO A REMOTE THAT IS NOT THERE SAYS WHY.
+//
+// The seam-driven twin of this lives in claimrereadlands_test.go under the
+// plain name. This one uses a real git and a path nobody made, so it proves
+// the same sentence over words git itself wrote.
 //
 // The recovery's fetch carried --quiet, so git's reason was suppressed and the
 // answer read "The push did not run: " with nothing after the colon, on every
 // claim a box made while it could not reach the remote.
-func TestAFetchThatFailsLeavesItsReason(t *testing.T) {
+func TestAFetchToARemoteThatIsNotThereLeavesItsReason(t *testing.T) {
 	t.Parallel()
 	nowhere := filepath.Join(t.TempDir(), "no-such-remote.git")
 	r := aBoxHolding(t, nowhere, "wk-3333333333", "box-three/worker-alone")

@@ -31,6 +31,18 @@ type Aborting struct {
 	ID  string // the token that is ending
 	By  string // who is ending it
 	Why string // the reason it is ending
+
+	// HOW IT ENDS, WHICH WAS dropped AND NOTHING ELSE. A token that turned out
+	// larger and was split into others is what became describes, and the only
+	// door that ends a token from wherever it stands could not write it, so a
+	// split went into the record as work nobody wanted. Empty is dropped, which
+	// is what every abort written before this meant.
+	As Disposition
+
+	// WHAT IT BECAME, which became names and no other ending has. They have to
+	// exist, because a successor nobody can open is the vanishing the three
+	// dispositions are there to prevent.
+	Successors []string
 }
 
 // Abort ends a token, from wherever it stands, with the reason it is ending.
@@ -53,6 +65,7 @@ func Abort(r Roots, a Aborting) (Token, error) {
 	// A SCOPE IS NOT LEFT WHILE ANYTHING IN IT IS OPEN, and an abort is a way
 	// of leaving. The sub-tokens end first, each with its own reason, or they
 	// are moved out from under this one.
+	// Why is [[a-scope-cannot-be-left-while-its-tokens-are-open]].
 	if open := OpenSubTokens(r, t.ID); len(open) > 0 {
 		return t, fmt.Errorf("%s holds %d open sub-token(s): %s. A scope cannot close while "+
 			"a sub-token is open, so end those first", t.ID, len(open), strings.Join(open, ", "))
@@ -60,16 +73,30 @@ func Abort(r Roots, a Aborting) (Token, error) {
 	// WHERE IT CAME FROM IS IN THE LOG, NOT ON THE TOKEN. The status it stood
 	// in is what the record holds, and a second copy on the note is history in
 	// the current surface.
+	as := a.As
+	if as == "" {
+		as = Dropped
+	}
+	// THE ENDING IS THE ONE RULE, ASKED WHEREVER A TOKEN ENDS. Which endings
+	// exist is the process's, which of them need a reason is the process's, and
+	// that a became names successors the record holds is the engine's. A door
+	// that decided any of it for itself would be a second answer.
+	proc, err := LoadProcess(r.Method, t.Process)
+	if err != nil {
+		return t, err
+	}
+	if bad := theEnding(r, proc, string(as), a.Why, a.Successors); bad != nil {
+		return t, fmt.Errorf("%s: %s. Give it %s", bad.Clause, bad.Wrong, bad.Satisfies)
+	}
 	from := t.Status
 	t.Holder = ""
-	t.Disposition, t.Reason = Dropped, a.Why
+	t.Disposition, t.Reason = as, a.Why
+	t.Successors = a.Successors
 	// AN ENDING READS AS ONE. The abort wrote the disposition and left the
 	// status standing, so an aborted token showed as open in every list and
 	// query. It stops where the process stops.
-	if proc, err := LoadProcess(r.Method, t.Process); err == nil {
-		if end := proc.EndsAt(); end != "" {
-			t.Status = Status(end)
-		}
+	if end := proc.EndsAt(); end != "" {
+		t.Status = Status(end)
 	}
 	t = closeStretch(r, t) // what was done before the drop is still a change somebody may read
 	// AN ARCHIVE THE SAVE COULD NOT WRITE IS NOT A STOP THAT DID NOT HAPPEN.
@@ -77,7 +104,8 @@ func Abort(r Roots, a Aborting) (Token, error) {
 	if err := SaveToken(r, t); err != nil && !TheCloseStood(err) {
 		return t, err
 	}
-	inSession(r, "work", a.By, t.ID+" aborted from "+string(from)+": "+a.Why, Yes(),
-		map[string]any{"id": t.ID, "from": string(from), "reason": a.Why})
+	inSession(r, "work", a.By, t.ID+" aborted from "+string(from)+" as "+string(as)+": "+a.Why, Yes(),
+		map[string]any{"id": t.ID, "from": string(from), "disposition": string(as),
+			"successors": a.Successors, "reason": a.Why})
 	return t, nil
 }

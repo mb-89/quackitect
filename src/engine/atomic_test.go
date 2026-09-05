@@ -93,8 +93,7 @@ func TestAWriteReplacesTheWholeFile(t *testing.T) {
 // file would go on passing over it.
 func TestEveryTemporaryTheEngineMakesIsSwept(t *testing.T) {
 	t.Parallel()
-	dir := t.TempDir()
-	r := Roots{Method: dir, Work: dir}
+	r := aTree(t).Roots
 	if err := os.MkdirAll(r.Private(), 0o755); err != nil {
 		t.Fatal(err)
 	}
@@ -158,8 +157,7 @@ func TestEveryTemporaryTheEngineMakesIsSwept(t *testing.T) {
 // may belong to a write happening now in another process over the same tree.
 func TestASweepLeavesAWriteThatMayStillBeGoing(t *testing.T) {
 	t.Parallel()
-	dir := t.TempDir()
-	r := Roots{Method: dir, Work: dir}
+	r := aTree(t).Roots
 	if err := os.MkdirAll(r.Private(), 0o755); err != nil {
 		t.Fatal(err)
 	}

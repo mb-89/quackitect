@@ -35,6 +35,8 @@ type Manifest struct {
 
 // A Tool comes one of two ways. A package manager installs it and PATH says
 // whether it is here, or it is an archive this program fetches and pins.
+// This program may use the network, and nothing at runtime may:
+// [[the-installer-needs-the-network-and-nothing-else-does]].
 type Tool struct {
 	Probe, Winget, Apt, Why string
 	Archive                 *Archive `json:"archive"`

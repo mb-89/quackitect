@@ -13,8 +13,8 @@ import (
 // harness session id, and that is the boundary an agent's life actually has.
 func TestASecondHarnessSessionReclaims(t *testing.T) {
 	t.Parallel()
-	root := t.TempDir()
-	r := Roots{Method: root, Work: root}
+	r := aTree(t).Roots
+	root := r.Work
 	writeWorkableProcess(t, root, "queued")
 	log, err := OpenLog(r.Private("log"))
 	if err != nil {
@@ -49,8 +49,8 @@ func TestASecondHarnessSessionReclaims(t *testing.T) {
 // reclaims nothing: the holder is mid-work, not dead.
 func TestACompactionReclaimsNothing(t *testing.T) {
 	t.Parallel()
-	root := t.TempDir()
-	r := Roots{Method: root, Work: root}
+	r := aTree(t).Roots
+	root := r.Work
 	writeWorkableProcess(t, root, "queued")
 	log, err := OpenLog(r.Private("log"))
 	if err != nil {

@@ -8,51 +8,6 @@ import (
 	"testing"
 )
 
-func guidanceTree(t *testing.T) Roots {
-	t.Helper()
-	method, work := t.TempDir(), t.TempDir()
-	os.MkdirAll(filepath.Join(method, "doc", "guidance"), 0o755)
-	os.WriteFile(filepath.Join(method, "doc", "guidance", "voice.md"), []byte("# Voice\n\nAnswer first.\n"), 0o644)
-	os.WriteFile(filepath.Join(method, "doc", "guidance", "behaviour.md"), []byte("# Behaviour\n\nDo what was asked.\n"), 0o644)
-	// The methods that ride on an answer. The fixture declares its own, so a
-	// test reads the mechanism rather than the product's wording.
-	os.WriteFile(filepath.Join(method, "doc", "guidance", "reviewing.md"),
-		[]byte("# Reviewing\n\nVerify, do not read.\n"), 0o644)
-	os.WriteFile(filepath.Join(method, "doc", "guidance", "work-token.md"),
-		[]byte("# Work token\n\nA criterion that can be a command is one.\n"), 0o644)
-	// What is projected where is data. The test declares its own, so it tests
-	// the mechanism rather than the product's list.
-	os.MkdirAll(filepath.Join(method, "util"), 0o755)
-	os.WriteFile(filepath.Join(method, "util", "projections.json"), []byte(`{"projections":[
-	  {"name":"protocol","target":"AGENTS.md","sources":["doc/guidance/voice.md","doc/guidance/behaviour.md"],"wrap":"markdown"},
-	  {"name":"copilot","target":".github/copilot-instructions.md","sources":["doc/guidance/voice.md","doc/guidance/behaviour.md"],"wrap":"markdown"},
-	  {"name":"style","target":".claude/output-styles/quackitect.md","sources":["doc/guidance/voice.md","doc/guidance/behaviour.md"],"wrap":"frontmatter","frontmatter":{"name":"quackitect"}}
-	]}`), 0o644)
-	// The icon table. The fixture declares its own for the same reason it
-	// declares its own tree: the mechanism is the thing under test.
-	os.WriteFile(filepath.Join(method, "util", "icons.json"), []byte(`{
-	  "$comment": "the fixture's own",
-	  "power": {"glyph": "⏻", "at": "U+23FB"},
-	  "hand": {"glyph": "✋", "at": "U+270B"}
-	}`), 0o644)
-	// One tree. The fixture declares its own, so the tests exercise the
-	// mechanism rather than the product's list.
-	os.WriteFile(filepath.Join(method, "util", "parameters.json"), []byte(`{
-	  "name":"quackitect","type":"group","children":[
-	    {"name":"limits","type":"group","shown":true,"children":[
-	      {"name":"heartbeat_seconds","type":"int","default":5,"min":1,"max":60,"narrow":"smaller"},
-	      {"name":"ready_budget_ms","type":"int","default":15000,"min":1000,"max":15000,"narrow":"smaller"}]},
-	    {"name":"guards","type":"group","shown":true,"children":[
-	      {"name":"guard_projections","type":"bool","default":true,"narrow":"on"},
-	      {"name":"stop_needs_claim","type":"bool","default":true,"narrow":"on"}]}]}`), 0o644)
-	// The rules the guard checks against are data, so the fixture carries a
-	// copy of the ones the product ships.
-	if b, err := os.ReadFile(filepath.Join("..", "..", "util", "voice-rules.json")); err == nil {
-		os.WriteFile(filepath.Join(method, "util", "voice-rules.json"), b, 0o644)
-	}
-	return Roots{Method: method, Work: work}
-}
-
 // UC-31. A changed original re-projects. Refreshing needs no installer.
 func TestAChangedOriginalIsProjectedAgain(t *testing.T) {
 	t.Parallel()
