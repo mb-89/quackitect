@@ -13,8 +13,8 @@ import (
 // NO TOKEN, NO WRITING was off for anyone who did not say who they were.
 func TestAnActorWithNoNameHoldsNothing(t *testing.T) {
 	t.Parallel()
-	root := t.TempDir()
-	r := Roots{Method: root, Work: root}
+	r := aTree(t).Roots
+	root := r.Work
 	writeProcess(t, root, "gated")
 
 	// Three tokens nobody holds, which is the shape of a backlog.

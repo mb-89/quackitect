@@ -418,8 +418,8 @@ func TestTheReportNamesWhatWasNotRewritten(t *testing.T) {
 // naming paths was the one file a rename could not repair.
 func TestAMoveRepairsAFileNamedRatherThanExtended(t *testing.T) {
 	t.Parallel()
-	dir := t.TempDir()
-	r := Roots{Method: dir, Work: dir}
+	r := aTree(t).Roots
+	dir := r.Work
 	os.MkdirAll(filepath.Join(dir, "source", "engine"), 0o755)
 	os.WriteFile(filepath.Join(dir, "source", "engine", "main.go"), []byte("package main\n"), 0o644)
 	const ignore = "src/engine/engine.exe\nsource/extension/out/\n*.tgz\n"
@@ -453,8 +453,8 @@ func TestAMoveRepairsAFileNamedRatherThanExtended(t *testing.T) {
 // full, and a test fixture naming one was left pointing at nothing.
 func TestAMoveRepairsAPathWrittenInFull(t *testing.T) {
 	t.Parallel()
-	dir := t.TempDir()
-	r := Roots{Method: dir, Work: dir}
+	r := aTree(t).Roots
+	dir := r.Work
 	os.MkdirAll(filepath.Join(dir, "source", "engine"), 0o755)
 	os.WriteFile(filepath.Join(dir, "source", "engine", "main.go"), []byte("package main\n"), 0o644)
 
@@ -485,8 +485,8 @@ func TestAMoveRepairsAPathWrittenInFull(t *testing.T) {
 // they are told apart.
 func TestALineThatSaysItIsNotAPathIsLeftAlone(t *testing.T) {
 	t.Parallel()
-	dir := t.TempDir()
-	r := Roots{Method: dir, Work: dir}
+	r := aTree(t).Roots
+	dir := r.Work
 	os.MkdirAll(filepath.Join(dir, "source", "engine"), 0o755)
 	os.WriteFile(filepath.Join(dir, "source", "engine", "main.go"), []byte("package main\n"), 0o644)
 
@@ -525,8 +525,8 @@ func TestALineThatSaysItIsNotAPathIsLeftAlone(t *testing.T) {
 // SOMETHING HERE. They are different questions.
 func TestATopLevelMoveReportsWhatItDeclinedToRewrite(t *testing.T) {
 	t.Parallel()
-	dir := t.TempDir()
-	r := Roots{Method: dir, Work: dir}
+	r := aTree(t).Roots
+	dir := r.Work
 	put(t, dir, "source/engine/main.go", "package main\n")
 	put(t, dir, "run.sh", "go build -C source/engine\n")
 	put(t, dir, "check.mjs", `const here = join(root, "source", "engine");`+"\n")
@@ -565,8 +565,8 @@ func TestATopLevelMoveReportsWhatItDeclinedToRewrite(t *testing.T) {
 // side of the same branch. The check pins the difference between the two.
 func TestANestedMoveRewritesTheSameSegments(t *testing.T) {
 	t.Parallel()
-	dir := t.TempDir()
-	r := Roots{Method: dir, Work: dir}
+	r := aTree(t).Roots
+	dir := r.Work
 	put(t, dir, "source/engine/main.go", "package main\n")
 	put(t, dir, "check.mjs", `const here = join(root, "source/engine");`+"\n")
 	put(t, dir, "check.py", `here = join(root, "source/engine")`+"\n")

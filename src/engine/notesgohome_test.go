@@ -64,8 +64,8 @@ func TestACloudBoxTurnsItsNotesIn(t *testing.T) {
 	// guard that holds Bash while asking for work verbs leaves no legal move.
 	for _, command := range []string{
 		"./RUNME.sh work --title \"a token from a note\" --tracked",
-		"./RUNME.sh work --abort wk-0000000001 --why \"nothing rests on it\"",
-		"./RUNME.sh work --set wk-0000000001 --field needs_human --to true",
+		"./RUNME.sh work --abort wk-1111111111 --why \"nothing rests on it\"",
+		"./RUNME.sh work --set wk-1111111111 --field needs_human --to true",
 	} {
 		if _, refuse := TooManyNotes(r, "main", "Bash", command); refuse {
 			t.Errorf("the way out is refused at a shell: %s", command)
@@ -82,7 +82,7 @@ func TestACloudBoxTurnsItsNotesIn(t *testing.T) {
 		t.Fatal(err)
 	}
 	turnedIn.Status, turnedIn.Disposition = "closed", Became
-	turnedIn.Successors = []string{"wk-0000000001"}
+	turnedIn.Successors = []string{"wk-1111111111"}
 	if err := SaveToken(r, turnedIn); err != nil {
 		t.Fatal(err)
 	}

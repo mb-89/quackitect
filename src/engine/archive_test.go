@@ -29,18 +29,6 @@ func withHistory(t *testing.T, root string) {
 	}
 }
 
-// aTreeWithHistory is a work tree git will write into.
-func aTreeWithHistory(t *testing.T) Roots {
-	t.Helper()
-	root := t.TempDir()
-	r := Roots{Method: root, Work: root}
-	for _, name := range []string{"note", "standard", "trivial"} {
-		writeProcess(t, root, name)
-	}
-	withHistory(t, root)
-	return r
-}
-
 // A CLOSED TOKEN COMES OFF THE DISK, AND THE FOLDER SAYS WHERE IT GOES.
 //
 // A token is the work rather than the record of it. Kept after it closes it is
@@ -284,8 +272,8 @@ func TestTheArchiveListIsWrittenTheSameTwice(t *testing.T) {
 // a tracked token there would lose it with nowhere to read it back from.
 func TestATreeWithNoHistoryKeepsItsTokens(t *testing.T) {
 	t.Parallel()
-	root := t.TempDir()
-	r := Roots{Method: root, Work: root}
+	r := aTree(t).Roots
+	root := r.Work
 	writeProcess(t, root, "standard")
 	tok, err := Mint(r, Token{Process: "standard", Title: "nowhere to keep it",
 		Status: "first", Tracked: tracked()})

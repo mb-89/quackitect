@@ -78,14 +78,10 @@ func TestACheckOverAStaleEngineSaysSo(t *testing.T) {
 			t.Fatalf("the run does not say the engine over the tree is stale, %q is missing: %q", want, runs[0].Engine)
 		}
 	}
-	// AND THE SWAP IT NAMES HAS TO BUILD. --built hands over to the program
-	// in .bin already, which is the very build this note has just called stale,
-	// so a reader who follows it either swaps to the same stale binary or is
-	// refused for handing over to the build already running. Containing
-	// "se --swap" is satisfied by "se --swap --built", so the flag is what this
-	// asks about.
+	// AND THE SWAP IT NAMES BUILDS. --built hands over to the program already
+	// in .bin, which is the stale one this note has just diagnosed, so a reader
+	// who follows it is left where they started and told the cure was applied.
 	if strings.Contains(runs[0].Engine, "--built") {
-		t.Fatalf("the advice for a stale engine names --built, which hands over to that same stale build: %q",
-			runs[0].Engine)
+		t.Errorf("the advice carries --built, which hands over to the stale build it warns about: %q", runs[0].Engine)
 	}
 }
