@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -43,7 +42,7 @@ type verbAnswer struct {
 const verbBudget = TheRunCeiling + time.Minute
 
 // callTheEngine sends one verb and answers its exit code.
-func callTheEngine(ctx context.Context, verb string, args []string) int {
+func callTheEngine(verb string, args []string) int {
 	// BOTH ROOTS COME OFF THE VERB'S OWN ARGUMENTS. Only the flag form carried
 	// --method, so every verb took the guess whatever the caller typed.
 	roots, err := FindRoots(argValue(args, "--work"), argValue(args, "--method"))
@@ -51,12 +50,14 @@ func callTheEngine(ctx context.Context, verb string, args []string) int {
 		fmt.Fprintln(os.Stderr, "engine:", err)
 		return 1
 	}
-	// NO METHOD, NO WORK. A verb run from outside the method used to derive
-	// every path from a folder that was not one, and file findings from it.
-	if !roots.MethodFound() {
-		fmt.Fprintln(os.Stderr, TheMethodIsLost())
-		return 1
-	}
+	// THE METHOD IS NOT ASKED FOR HERE, BECAUSE THIS PROGRAM DOES NOT USE IT.
+	// A verb runs inside the engine over the work folder, which has roots of its
+	// own, and the socket is found under the work root. Refusing in front of the
+	// socket for want of a method meant an engine installed anywhere but a
+	// method's own .bin could relay nothing, however plainly the folder it was
+	// handed carried one, and whatever the engine over that folder was doing.
+	// Where there is no engine either, the refusal below says both things.
+
 	// THE CALLER HEARS WHERE ITS WORK WENT. A folder named inside a project
 	// answers the project, and a mint aimed at a scratch folder that lands in
 	// the real backlog is quiet damage while nothing says this.
@@ -66,12 +67,18 @@ func callTheEngine(ctx context.Context, verb string, args []string) int {
 			"outside a project to work on its own\n", asked, got)
 	}
 	if wantsHelp(args) {
-		return run[verb](&call{ctx: ctx, roots: roots, args: args, in: os.Stdin, out: os.Stdout, err: os.Stderr})
+		return run[verb](&call{roots: roots, args: args, in: os.Stdin, out: os.Stdout, err: os.Stderr})
 	}
 	raw, _, ok := askModelWithin(roots, "verb", verbAsk{Verb: verb, Args: args, Stdin: stdinFor(verb, args)}, verbBudget)
 	if !ok {
 		fmt.Fprintf(os.Stderr, "engine: no engine is running over %s, so there is nothing to run %s. "+
 			"Start it: se --work %s\n", roots.Work, verb, roots.Work)
+		// AND THE START WILL WANT A METHOD NAMED, where this folder carries none.
+		// The door comes first, because it is the one a person walks through, and
+		// this is what they meet on the other side of it.
+		if !roots.MethodFound() {
+			fmt.Fprintln(os.Stderr, TheMethodIsLost())
+		}
 		return 1
 	}
 	var a verbAnswer
@@ -143,18 +150,14 @@ func wantsHelp(args []string) bool {
 // A SNAPSHOT PER VERB. The roots carry one, filled the first time the verb
 // asks and dropped by its writes, and it is this verb's alone: a snapshot
 // that outlived the verb would be a second truth in a process that lives.
-func runVerbInside(ctx context.Context, r Roots, ask verbAsk) verbAnswer {
+func runVerbInside(r Roots, ask verbAsk) verbAnswer {
 	v, ok := run[ask.Verb]
 	if !ok {
 		return verbAnswer{Err: "engine: no such verb: " + ask.Verb + "\n", Code: Unread}
 	}
 	var out, errs strings.Builder
-	c := &call{ctx: ctx, roots: r.ReadOnce(), args: ask.Args, in: strings.NewReader(ask.Stdin), out: &out, err: &errs}
+	c := &call{roots: r.ReadOnce(), args: ask.Args, in: strings.NewReader(ask.Stdin), out: &out, err: &errs}
 	code := v(c)
-	// EVERY RESULT IS COUNTED HERE, because every lane result passes here on
-	// its way back. Wrong is a code that is not zero, or a refusal the verb
-	// answered with exit 0 and marked. See results.go.
-	CountResult(r, code != 0 || c.refused)
 	return verbAnswer{Out: out.String(), Err: errs.String(), Code: code}
 }
 

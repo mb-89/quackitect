@@ -40,9 +40,9 @@ The smallest case: build the engine into a folder outside the tree and run that 
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the ask is small enough to review whole, or it is split first | — |  |
-| [ ] | every done-when line is decidable, and names the command where one decides it |  |  |
-| [ ] | the basics it stands on exist, or are minted first | — |  |
+| [x] | the ask is small enough to review whole, or it is split first | Two blocks: the method lookup falls back to the folder the caller named, and the client stops asking for a method it does not use. | |
+| [x] | every done-when line is decidable, and names the command where one decides it | Both by the command the token names, run twice: once with SE_ENGINE naming an engine built under the OS temp root, once with it naming one built in a tree's own .bin. | |
+| [x] | the basics it stands on exist, or are minted first | Both stand: methodRootFrom already walks up for the marker, and the socket the client dials is found under the work root, so the relay never wanted a method. Nothing was minted. | |
 
 ## evidence: step 2. do
 
@@ -50,9 +50,9 @@ The smallest case: build the engine into a folder outside the tree and run that 
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the guidance this token names was read and applied | — |  |
-| [ ] | one test was written first and seen red for the reason expected |  |  |
-| [ ] | the same test was seen green after the change, and named |  |  |
-| [ ] | the change is git diff began..ended, the two hashes the engine wrote on this token | — |  |
-| [ ] | the cleanup the change revealed is in the change, or is a token of its own | — |  |
+| [x] | the guidance this token names was read and applied | Rule 12, red first, watched with the engine outside the tree, which is the case the token names. | |
+| [x] | one test was written first and seen red for the reason expected | Red with the engine built under the OS temp root. The client said the same by hand: no method root here, run from a folder carrying none. | |
+| [x] | the same test was seen green after the change, and named | TestAVerbRunsInsideTheEngineAndTheClientPrintsIt, ok with the engine outside the tree and ok again with one in a tree's own .bin. | |
+| [x] | the change is git diff began..ended, the two hashes the engine wrote on this token | began 6e9ba294bcf5834639d4663f6a83e6b45687d922, ended on submission. | |
+| [x] | the cleanup the change revealed is in the change, or is a token of its own | In the change: the refusal was moved rather than deleted, to where it is still true, beside the no-engine door. Nothing it says was lost and nothing went dead. | |
 
