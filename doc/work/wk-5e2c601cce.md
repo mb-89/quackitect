@@ -11,10 +11,13 @@ title: two engines one tree
 status: done
 # who did the work step, so the verdict is never theirs
 author: worker-birch
+claimed_by: 547b9365/reviewer-quince
+claimed_at: "2026-09-05T16:02:42Z"
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - 4e5a2e490ca74ea234fe18a972af0d28f7efe28a
   - 20dc2a7678886f0db07abe81b716a0654b2ab777
+  - eb49a6f212307bfaa0dfb0e89ea81448e46b3833
 # the tree each time the work was put down or closed, snapshots the engine wrote
 ended:
   - b5eb55b53e0ad3456f04590189a9d1d6e1af8f8f
