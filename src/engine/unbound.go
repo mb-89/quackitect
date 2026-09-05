@@ -114,6 +114,34 @@ type Binding struct {
 
 func bindingPath(r Roots) string { return r.Private("binding.json") }
 
+// THE RUNG IS THE ONE CONTROL ONLY A CLICK MAY END.
+//
+// MEASURED. A tree was put in god mode from the button and read as bound a
+// moment later with nothing clicked. The rung is stamped with a session and the
+// read drops a stamp that does not match, and the session it was stamped with
+// was the ENGINE RUN. An engine start retires the log and opens a fresh one
+// under a new run, so every restart, rebuild and crash read as a person leaving
+// and put the guards back on somebody who had taken them off.
+//
+// THE PERSON'S SESSION IS THE HARNESS'S. The engine is restarted for its own
+// reasons and the person is still sitting there, so the rung asks the harness
+// which session it is in.
+//
+// AND WHERE THE LOG CANNOT SAY, THE RUNG STANDS. A retired log names no harness
+// session until the harness writes one, and answering the engine run through
+// that window is the defect itself. The hold and the ask keep the engine run,
+// because neither has this ruling on it: what ends the rung is a click, and
+// nothing else may.
+func ofThisPersonsSession(r Roots, session string) bool {
+	if session == "" {
+		return false
+	}
+	if now := TheHarnessSession(r); Named(now) {
+		return session == now
+	}
+	return true
+}
+
 // LoadBinding answers where this tree stands. Anything unreadable is bound,
 // because the safe answer to not knowing is every rule on.
 func LoadBinding(r Roots) Binding {
@@ -122,8 +150,8 @@ func LoadBinding(r Roots) Binding {
 	if err != nil || json.Unmarshal(raw, &b) != nil {
 		return Binding{At: Bound}
 	}
-	if !ofThisSession(r, b.Session) {
-		return Binding{At: Bound} // it belongs to a session that has ended
+	if !ofThisPersonsSession(r, b.Session) {
+		return Binding{At: Bound} // the person who set it has left
 	}
 	switch b.At {
 	case Unbound, God:
@@ -143,8 +171,12 @@ func NoGuardsAtAll(r Roots) bool { return LoadBinding(r).At == God }
 
 // SetBinding moves the tree to a rung and answers where it now is.
 func SetBinding(r Roots, to TheBinding, by string) (Binding, error) {
+	// THE STAMP IS THE PERSON'S SESSION, which is what the read compares
+	// against. ArrivalSession is that with a fallback for a log that names no
+	// harness session, so a rung set before the harness has spoken is still
+	// stamped with something the read can hold.
 	b := Binding{At: to, By: by, Since: time.Now().UTC().Format(time.RFC3339),
-		Session: currentSession(r)}
+		Session: ArrivalSession(r)}
 	switch to {
 	case Unbound:
 		b.Says = "A person took the queue off you. Nothing will ask you to spawn and the queue " +
@@ -156,7 +188,10 @@ func SetBinding(r Roots, to TheBinding, by string) (Binding, error) {
 			"in the way. Nothing will stop you and nothing will check you. Do only what they " +
 			"asked, say what you did, and tell them when they can put it back."
 	default:
-		b.At, b.By, b.Says = Bound, "", ""
+		// THE NAME STAYS ON THE WAY DOWN. Blanking it left a rung that had been
+		// put back with nobody's name on it, so a drop could not be attributed
+		// and only guessed at, which is the state this was measured in.
+		b.At, b.Says = Bound, ""
 	}
 	if err := os.MkdirAll(r.Private(), 0o755); err != nil {
 		return b, err
