@@ -8,18 +8,22 @@ guidance: [[work-token]]
 # the name this token is known by, in references and in links
 title: ready_when leaves the queue
 # where the token stands. The process owns these values.
-status: open
-claimed_by: aeaf7bd9/worker-nancarrow
-claimed_at: "2026-09-05T16:50:36Z"
+status: done
+# who did the work step, so the verdict is never theirs
+author: worker-nancarrow
+claimed_by: aeaf7bd9/reviewer-nancarrow-two
+claimed_at: "2026-09-05T18:29:48Z"
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - 14ef55309aea9cde047526236c0f92535201dfc3
   - 95c482c1e199d45d88b8618a7852fad9f8bcde9c
   - be26f4b14a60472b5070bcfb93f772d9d2459af0
+  - f64ea0634aeff3e2554d2884cfcb8a13466d1c51
 # the tree each time the work was put down or closed, snapshots the engine wrote
 ended:
   - a2cadce1ed457d9618b7150b0e42b80a3d89efb0
   - 731fa879c7bc6aa38b304ad38bd80047c7c61cb7
+  - cbe199d3a7a5fd5f2b3220533700ab7c8f80eeb2
 ---
 
 ## detail
@@ -42,16 +46,6 @@ A token carrying a non-empty ready_when is not handed out by the queue.
 - clearing that field puts the token back in the queue. Decided by the same test, which clears it and pulls again
 - the state of play and se query name every parked token, with its condition. Decided by the same test, which reads both
 - the three cases above are one Go test. Decided by: se find --regex 'func TestAParkedTokenLeavesTheQueueAndIsNamed'
-
-## approach
-
-ONE QUESTION, ASKED WHERE THE QUEUE CHOOSES. WaitsForAPerson(t) answers a sentence and not a yes, so whatever refuses can say what is waited on. The hand-out path asks it of every token it might hand out, for either role, and passes over the ones that answer.
-
-THE FIELD IS THE WHOLE STATE. Nothing is written when a token is parked. Clearing ready_when puts it in the queue again on the next pull, so the put-down needs no change of its own.
-
-AND WHOEVER PARKS ONE HAS TO FIND IT AGAIN. Both the state of play and se query name every token carrying the field, with its condition. A token nothing shows is one nobody un-parks.
-
-needs_human rides the same question. A token marked as needing a person waits on the same thing, and two questions meaning one thing drift apart.
 
 ## evidence: step 1. ask
 
@@ -82,11 +76,21 @@ needs_human rides the same question. A token marked as needing a person waits on
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | [[reviewing]] was read and applied | — |  |
-| [ ] | every hunk of git diff began..ended was read, and any not read is named |  |  |
-| [ ] | every criterion's command was run again, and what it said is named |  |  |
-| [ ] | every hunk improves the product, or a finding names the one that does not |  |  |
-| [ ] | every finding is a trivial token naming this one, and their ids are here |  |  |
+| [x] | [[reviewing]] was read and applied | Read whole and applied. | [[reviewing]] |
+| [x] | every hunk of git diff began..ended was read, and any not read is named | Only doc/work/wk-5bba8e497a.md moved, in 502e425a and d8345e95. Both read. Four commits in the range are other tokens, not read: 1b9e95b3, 468a2c45, 09546eee, 54dacf1d. | git show |
+| [x] | every criterion's command was run again, and what it said is named | go test answered ok. The door answered ok true on TestAParkedTokenLeavesTheQueueAndIsNamed. The regex found it at parkednamed_test.go:17. Source agrees at pull.go:728 and pull.go:760. | go test -run TestAParkedTokenLeavesTheQueueAndIsNamed |
+| [x] | every hunk improves the product, or a finding names the one that does not | Pass. One hunk does not. The added approach contradicts the older one below it. | line 85 |
+| [x] | every finding is a trivial token naming this one, and their ids are here | One finding, wk-72360d4c5f. Nothing else seen. | wk-72360d4c5f |
+
+## approach
+
+ONE QUESTION, ASKED WHERE THE QUEUE CHOOSES. WaitsForAPerson(t) answers a sentence and not a yes, so whatever refuses can say what is waited on. The hand-out path asks it of every token it might hand out, for either role, and passes over the ones that answer.
+
+THE FIELD IS THE WHOLE STATE. Nothing is written when a token is parked. Clearing ready_when puts it in the queue again on the next pull, so the put-down needs no change of its own.
+
+AND WHOEVER PARKS ONE HAS TO FIND IT AGAIN. Both the state of play and se query name every token carrying the field, with its condition. A token nothing shows is one nobody un-parks.
+
+needs_human rides the same question. A token marked as needing a person waits on the same thing, and two questions meaning one thing drift apart.
 
 ## approach
 
