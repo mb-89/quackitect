@@ -11,6 +11,8 @@ title: notes become tracked tokens
 status: done
 # who did the work step, so the verdict is never theirs
 author: fable-cloud
+claimed_by: 547b9365/reviewer-rowan
+claimed_at: "2026-09-05T18:33:35Z"
 # true when this goes out before everything else workable
 urgent: true
 # the tree each time the work was taken up, snapshots the engine wrote
