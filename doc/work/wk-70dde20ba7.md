@@ -9,9 +9,12 @@ guidance: [[work-token]]
 title: "delta is the token's"
 # where the token stands. The process owns these values.
 status: open
+claimed_by: aeaf7bd9/fable-cloud
+claimed_at: "2026-09-05T12:46:47Z"
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - 5b93841727d1773def309a5500a270fc1ddad3c9
+  - c151dd4489d7eb8800cb5d4e8c20994389164234
 # the tree each time the work was put down or closed, snapshots the engine wrote
 ended:
   - 044ab9e809e7a1129acd76ba4fc2187543a44aed
@@ -43,6 +46,18 @@ Narrow the delta to the files this token wrote, and leave the whole diff where t
 - with another hand editing util/checks/scripts-are-lf.mjs, the answer for a token that never wrote it is whole false
 - a token with no apply on record answers the whole diff, and why_whole names the empty record
 - a Go test in src/engine drives the three cases over one tree holding two tokens' writes
+
+## approach
+
+The engine already records what a token wrote. Every apply journals an entry under the private undo folder carrying the token it was made on and the files it touched.
+
+So the delta is read as it is today, against the snapshot, and then narrowed to the paths that record names for this token.
+
+Where the record names nothing for the token, the whole diff stands and the answer says why. A write the engine cannot prove is a write it will not silently drop.
+
+One function answers both halves: the paths this token wrote, and whether the record held any. Nothing else in the lane changes, so the choosing and the running read the same delta they always did.
+
+The cost, stated: a write made by a shell command rather than an apply is in no journal, so it leaves the delta. Naming a test outright still runs it.
 
 ## evidence: step 1. ask
 
