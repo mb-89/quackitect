@@ -9,6 +9,11 @@ guidance: [[work-token]]
 title: short username guards nothing
 # where the token stands. The process owns these values.
 status: open
+claimed_by: aeaf7bd9/worker-sibelius
+claimed_at: "2026-09-05T15:32:41Z"
+# the tree each time the work was taken up, snapshots the engine wrote
+began:
+  - f1345e587b3a69299eda703313a2907b93f25596
 ---
 
 ## detail
@@ -37,9 +42,9 @@ Give a short name a handle that ordinary prose does not carry: match it where a 
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the ask is small enough to review whole, or it is split first | — |  |
-| [ ] | every done-when line is decidable, and names the command where one decides it |  |  |
-| [ ] | the basics it stands on exist, or are minted first | — |  |
+| [x] | the ask is small enough to review whole, or it is split first | one branch inside identityMaterial and one table beside it. Nothing else in the guard moves. | `git diff -- src/engine/identity.go` |
+| [x] | every done-when line is decidable, and names the command where one decides it | the first two are rows in the new table, decided by the command below. The third asks the whole package, and no token can answer that while the branch tip will not build. | `go test ./src/engine -run TestAShortUsernameIsCaughtInAPath` |
+| [x] | the basics it stands on exist, or are minted first | identityMaterial and the table that drives it both existed. Nothing was minted. | src/engine/identity_test.go |
 
 ## evidence: step 2. do
 
@@ -47,9 +52,9 @@ Give a short name a handle that ordinary prose does not carry: match it where a 
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the guidance this token names was read and applied | — |  |
-| [ ] | one test was written first and seen red for the reason expected |  |  |
-| [ ] | the same test was seen green after the change, and named |  |  |
-| [ ] | the change is git diff began..ended, the two hashes the engine wrote on this token | — |  |
-| [ ] | the cleanup the change revealed is in the change, or is a token of its own | — |  |
+| [x] | the guidance this token names was read and applied | read. Red first, then green. | doc/guidance/work-token.md |
+| [x] | one test was written first and seen red for the reason expected | TestAShortUsernameIsCaughtInAPath, on a clean copy at 5a83c225 where identity.go matches the tip. The three path rows read not refused, and the two that must be taken were green already. | `go test ./src/engine -run TestAShortUsernameIsCaughtInAPath` |
+| [x] | the same test was seen green after the change, and named | green, with the other identity tables and both door tests beside it. gofmt and vet clean. | same |
+| [x] | the change is git diff began..ended, the two hashes the engine wrote on this token | identity.go grows the short-name branch, identity_test.go the table that drives it. | `git diff --stat began..ended` |
+| [x] | the cleanup the change revealed is in the change, or is a token of its own | none. The row the floor was for is asserted again beside the path rows, so both halves are read together. | — |
 
