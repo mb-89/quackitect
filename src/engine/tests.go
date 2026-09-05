@@ -828,7 +828,7 @@ func checkEngineNote(r Roots, handed string) string {
 	if why := residentStale(r); why != "" {
 		note += ". The engine over this tree is older than its source: " + why +
 			". A check that asks it reads the old build, so a failure here may be its age and not the change's. " +
-			"Swap first: se --swap --built"
+			"Swap first: " + TheBuildDoor
 	}
 	return note
 }
