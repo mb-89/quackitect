@@ -424,6 +424,16 @@ func checkBody(spec BodySpec, body string, bodyLine int) []Departure {
 	at := map[string]bodyChapter{}
 	var order []string
 	for _, c := range found {
+		// A HEADING OPENED TWICE IS A DEPARTURE, NOT A REPLACEMENT. The map
+		// kept the last chapter under the name and the first was buried with
+		// nothing saying so. MEASURED on wk-963dbf6898, two approach sections
+		// in different words, and no reader could say which one the change
+		// was written against.
+		if _, again := at[c.Header]; again {
+			out = append(out, Departure{Line: bodyLine + c.Line,
+				Says: fmt.Sprintf("it opens the %s chapter twice, and a reader cannot tell which one the work was written against", c.Header)})
+			continue
+		}
 		at[c.Header] = c
 		order = append(order, c.Header)
 	}
