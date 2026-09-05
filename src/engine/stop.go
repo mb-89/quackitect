@@ -147,6 +147,13 @@ func ClaimStop(r Roots, actor, because, why string) error {
 			return fmt.Errorf("blocked is not true: %s", refusal)
 		}
 	}
+	// AND A CLOUD BOX TURNS ITS NOTES IN BEFORE IT GOES QUIET. A note is
+	// private, nothing pushes it, and this container is reclaimed when the
+	// session ends. The refusal lands where the claim was typed, the way the
+	// blocked one does. Unbound turns it off.
+	if why, refuse := NotesGoWithTheBox(r); refuse && !Unleashed(r) {
+		return fmt.Errorf("%s", why)
+	}
 	return locked(claimPath(r), func() error {
 		all := loadClaims(r)
 		all.Claims[actor] = StopClaim{Session: currentSession(r), Actor: actor,

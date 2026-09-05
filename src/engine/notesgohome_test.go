@@ -90,6 +90,54 @@ func TestADeskKeepsItsNotes(t *testing.T) {
 	}
 }
 
+// AND THE LAST THING A CLOUD BOX DOES IS TURN IN WHAT IS LEFT.
+//
+// THE OWNER'S WORDS: when you have nothing else to do, claim all the notes that
+// are still there and work them in, then you can stop. A stop is the box saying
+// it has nothing else to do, so it is where the last note is caught.
+func TestACloudBoxTurnsThemInBeforeItStops(t *testing.T) {
+	r := aTreeWithTheProcesses(t)
+	aHostTable(t, r)
+	note := mintNote(t, r, "the last note here")
+	t.Setenv("CLAUDE_CODE_REMOTE", "true")
+
+	err := ClaimStop(r, "main", "asked", "the person said to stop")
+	if err == nil {
+		t.Fatal("a cloud box stopped with a note in hand, and the note dies with it")
+	}
+	if !strings.Contains(err.Error(), note.ID) || !strings.Contains(err.Error(), note.Title) {
+		t.Errorf("the refusal does not name the note that is about to be lost: %v", err)
+	}
+
+	// TURNED IN, AND THE STOP IS GRANTED.
+	turnedIn, err := LoadToken(r, note.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	turnedIn.Status, turnedIn.Disposition = "closed", Dropped
+	turnedIn.Reason = "it was a passing thought and nothing rests on it"
+	if err := SaveToken(r, turnedIn); err != nil {
+		t.Fatal(err)
+	}
+	if err := ClaimStop(r, "main", "asked", "the person said to stop"); err != nil {
+		t.Fatalf("the notes are in and the stop was still refused: %v", err)
+	}
+}
+
+// AND A DESK STOPS WHENEVER IT LIKES. Its notes are on a disk that outlives the
+// session, so holding a person at their own notes is the engine arguing.
+func TestADeskStopsWithNotesInHand(t *testing.T) {
+	r := aTreeWithTheProcesses(t)
+	aHostTable(t, r)
+	mintNote(t, r, "a desk note")
+	for _, v := range []string{"CLAUDE_CODE_REMOTE", "GITHUB_ACTIONS", "SE_CLOUD"} {
+		t.Setenv(v, "")
+	}
+	if err := ClaimStop(r, "main", "asked", "the person said to stop"); err != nil {
+		t.Fatalf("a desk was held at its own notes: %v", err)
+	}
+}
+
 // aHostTable puts the shipped table of cloud variables in the tree, so the
 // test reads the same file the product does.
 func aHostTable(t *testing.T, r Roots) {

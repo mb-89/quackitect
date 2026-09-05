@@ -40,6 +40,35 @@ func NotesInHand(r Roots) []Token {
 	return out
 }
 
+// NotesGoWithTheBox answers why a stop is refused while a note is still open,
+// and whether it is. A cloud box only.
+//
+// THE OWNER'S WORDS: when you have nothing else to do, claim all the notes that
+// are still there and work them in. Then you can stop.
+//
+// A STOP IS THE BOX SAYING IT HAS NOTHING ELSE TO DO, which is exactly the
+// moment every note left is about to go down with the container. The ceiling
+// above catches a session that is still working; this catches the end of one.
+func NotesGoWithTheBox(r Roots) (string, bool) {
+	if !TheHost(r.Method).Cloud {
+		return "", false
+	}
+	notes := NotesInHand(r)
+	if len(notes) == 0 {
+		return "", false
+	}
+	var b strings.Builder
+	fmt.Fprintf(&b, "%d NOTE(S) ARE STILL OPEN, AND THEY DIE WITH THIS BOX. "+
+		"Turn them in, and then stop.\n\n", len(notes))
+	for _, one := range notes {
+		fmt.Fprintf(&b, "  %s  %s\n", one.ID, one.Title)
+	}
+	b.WriteString("\nEach one is a tracked token, or it is dropped. Where the answer is not " +
+		"yours, mint the token with your best attempt and set needs_human on it, " +
+		"which puts it where a person looks.\n")
+	return b.String(), true
+}
+
 // TooManyNotes answers why this call is held until the notes are tokens, and
 // whether it is. It holds the work and lets everything else through, the way
 // the staffing guard does, because minting the tokens is the way out.
