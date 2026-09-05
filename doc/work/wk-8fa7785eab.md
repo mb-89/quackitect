@@ -9,6 +9,8 @@ guidance: [[work-token]]
 title: argue only when blocking
 # where the token stands. The process owns these values.
 status: open
+claimed_by: aeaf7bd9/worker-berio-three
+claimed_at: "2026-09-05T21:03:02Z"
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - ce8ee7f6c9e54efa531683e051d78c819abc1ed7
@@ -34,11 +36,11 @@ In decideStop read held := TheyHold(roots, actor) before the count, and run coun
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | what is gained by doing it, and not only what it does |  |  |
-| [ ] | what breaks if it is never done, and not only that it stays undone |  |  |
-| [ ] | the ask is small enough to review whole, or it is split first | — |  |
-| [ ] | every done-when line is decidable, and names the command where one decides it |  |  |
-| [ ] | the basics it stands on exist, or are minted first | — |  |
+| [x] | what is gained by doing it, and not only what it does | An agent holding nothing stops on the claim that names its reason, instead of arguing twice. | decideStop |
+| [x] | what breaks if it is never done, and not only that it stays undone | The hands condition could be deleted and every suite would stay green. | hook.go |
+| [x] | the ask is small enough to review whole, or it is split first | One test file. The engine already reads the hands, since 91c3b1f9. | git show --stat |
+| [x] | every done-when line is decidable, and names the command where one decides it | go test -run TestEmptyHandsAreNotArguedWith, and the Claim, Stop and Challenge selection. | go test |
+| [x] | the basics it stands on exist, or are minted first | TheyHold, decideStop, ClaimStop and forgetRefusedStops are all here. | hook.go |
 
 ## evidence: step 2. do
 
@@ -46,9 +48,9 @@ In decideStop read held := TheyHold(roots, actor) before the count, and run coun
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the guidance this token names was read and applied | — |  |
-| [ ] | one test was written first and seen red for the reason expected |  |  |
-| [ ] | the same test was seen green after the change, and named |  |  |
-| [ ] | the change is git diff began..ended, the two hashes the engine wrote on this token | — |  |
-| [ ] | the cleanup the change revealed is in the change, or is a token of its own | — |  |
+| [x] | the guidance this token names was read and applied | Read whole. Rule 12 drove the red, rule 13 named the untested half. | work-token.md |
+| [x] | one test was written first and seen red for the reason expected | With the hands condition out of decideStop, broken, decision and plan were each argued with by an actor holding nothing. | /tmp/stopredgreen.log |
+| [x] | the same test was seen green after the change, and named | TestEmptyHandsAreNotArguedWith passed with the condition back. TestPublishKeepsEarlierClaims fails on the bare base too. | /tmp/stop-base.log |
+| [x] | the change is git diff began..ended, the two hashes the engine wrote on this token | began ce8ee7f6 is no object here. One new test file, and no engine line. | git show --stat |
+| [x] | the cleanup the change revealed is in the change, or is a token of its own | wk-7c60f9f2ac. Criterion two wants asked argued with, and a ruling grants it at once. | wk-7c60f9f2ac |
 
