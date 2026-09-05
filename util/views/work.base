@@ -99,6 +99,11 @@ views:
       - status
       - process
       - holder
+      # THE CLAIM IS WHICH BOX HAS TAKEN THE TOKEN, and it is the only thing
+      # standing between two boxes and the same work. Until it was a column a
+      # person could see it by running se claim --list at a prompt and nowhere
+      # else. The holder beside it is which agent is on it here.
+      - claimed_by
       - ready_when
     columnSize:
       title: 300
@@ -107,6 +112,7 @@ views:
       process: 90
       bucket: 90
       holder: 71
+      claimed_by: 150
       ready_when: 220
       blocked: 543
     # THE GROUPING IS BY BUCKET, and a drop writes one. The queries above are
