@@ -93,6 +93,16 @@ type Answer struct {
 	// that produces no id is one the engine did not accept, and the reviewer
 	// is not asked to remember to mint anything.
 	Learned string `json:"learned,omitempty"`
+
+	// claimed says the queue wrote the claim on the token it is handing over,
+	// so the verb that answered can put it on the claims branch.
+	//
+	// IT IS UNEXPORTED BECAUSE IT IS NOT THE AGENT'S TO READ, the way the
+	// payload's settleOnly is not the caller's to set. The claim is on the token
+	// in the answer, and this says only whether this call is the one that wrote
+	// it, which is the difference between publishing once and publishing on
+	// every pull for ever.
+	claimed bool
 }
 
 // Pull is the whole protocol. One function, because the order of its parts is
@@ -876,13 +886,32 @@ func unwritableNotice(said []string) string {
 // caps stay where they are.
 func take(r Roots, actor string, t Token) (Answer, bool) {
 	t.Holder = actor
+	// THE QUEUE CLAIMS WHAT IT HANDS OVER.
+	//
+	// A tracked token is not worked without a claim, and the queue handed one
+	// out carrying none, so the agent's first run or apply on it was refused for
+	// want of a claim on the work it had been handed a moment before. It
+	// happened to two tokens in one session. Claiming it here is one more field
+	// on the save the handout already makes.
+	//
+	// A LOCAL TOKEN TAKES NONE, and one another box has claimed is not taken
+	// from it. Both are the gate's own rules, asked here rather than repeated:
+	// NoClaimHere says this box may not work it, and ClaimedNow says whether
+	// anybody has it.
+	claimed := false
+	if now := time.Now().UTC(); NoClaimHere(r, t, now) != "" && ClaimedNow(r, t, now) == "" {
+		t.ClaimedBy, t.ClaimedAt = Claimant(r, actor), now.Format(ClaimStamp)
+		claimed = true
+	}
 	// HANDING OUT OPENS A STRETCH, with the tree as it stands as its before.
 	t = openStretch(r, t)
 	if err := SaveToken(r, t); err != nil {
 		return Answer{Pull: AnswerWait,
 			Notice: t.ID + ": the record will not take a write: " + err.Error()}, false
 	}
-	return handed(r, actor, t), true
+	a := handed(r, actor, t)
+	a.claimed = claimed
+	return a, true
 }
 
 // handed answers a token the actor holds, with the guidance for it.
