@@ -161,9 +161,7 @@ func TestTheDelta(r Roots, db *sql.DB, on string, proposed []string, run bool, a
 		if err != nil {
 			return out, err
 		}
-		if n := len(t.Began); n > 0 {
-			since = t.Began[n-1]
-		}
+		since = theSnapshotHere(r, t.Began)
 	}
 	out.Since = since
 	delta, err := deltaSince(r, db, since)
@@ -478,6 +476,40 @@ func spanOf(ch change) string {
 	return strconv.Itoa(ch.Start) + "-" + strconv.Itoa(ch.Finish)
 }
 
+// theSnapshotHere answers the newest snapshot this box actually holds, or HEAD.
+//
+// A SNAPSHOT DOES NOT TRAVEL. A take-up writes a commit under refs/se/steps,
+// and no push carries that ref. So a token taken up on one box and worked on
+// another names a hash the second box never had.
+//
+// MEASURED. git diff on a full hash it does not hold answers "fatal: bad
+// object", which the reader below did not recognise, so se test answered that
+// error and ran nothing. Every travelled token on one box answered it while
+// every token minted there tested: the test door was shut for exactly the work
+// that came from somewhere else.
+//
+// THE NEWEST ONE HERE IS A TRUER QUESTION THAN HEAD, and HEAD is better than an
+// error. A token taken up on two boxes carries both hashes, and the one this
+// box wrote is a delta somebody can read.
+func theSnapshotHere(r Roots, began []string) string {
+	for i := len(began) - 1; i >= 0; i-- {
+		if anObjectHere(r, began[i]) {
+			return began[i]
+		}
+	}
+	return "HEAD"
+}
+
+// anObjectHere answers whether this clone holds the commit named.
+func anObjectHere(r Roots, hash string) bool {
+	if hash == "" {
+		return false
+	}
+	cmd := quiet.Quietly(exec.Command("git", "cat-file", "-e", hash+"^{commit}"))
+	cmd.Dir = r.Work
+	return cmd.Run() == nil
+}
+
 // deltaSince reads which lines of which files differ from the snapshot:
 // the hunks of a diff against it, and every untracked file whole. The
 // private folder is left out, because nothing tests the record.
@@ -507,8 +539,12 @@ func deltaSince(r Roots, db *sql.DB, since string) ([]change, error) {
 	diff, err := git("diff", "-U0", "--no-color", "--no-ext-diff", since, "--", ".")
 	if err != nil {
 		said := err.Error()
+		// AND "bad object", WHICH IS WHAT A SNAPSHOT FROM ANOTHER BOX ANSWERS.
+		// theSnapshotHere keeps one off this call, and a caller that names a hash
+		// itself still reaches here, so the word belongs in the list.
 		if strings.Contains(said, "Could not access") || strings.Contains(said, "bad revision") ||
-			strings.Contains(said, "unknown revision") || strings.Contains(said, "ambiguous argument") {
+			strings.Contains(said, "unknown revision") || strings.Contains(said, "ambiguous argument") ||
+			strings.Contains(said, "bad object") {
 			diff = "" // no history to diff against, and the untracked list below is the tree
 		} else {
 			return nil, err
