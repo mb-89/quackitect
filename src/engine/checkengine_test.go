@@ -17,31 +17,6 @@ import (
 // engine was four minutes older than the tree. The Go lane already answers
 // this, building se.fresh and naming it. The check lane now does the same.
 
-// aTreeWithAnEchoingCheck is a method root with engine source in it and one
-// check that writes the engine it was handed where the test can read it.
-func aTreeWithAnEchoingCheck(t *testing.T) (Roots, string) {
-	t.Helper()
-	root := t.TempDir()
-	r := Roots{Method: root, Work: root}
-	for _, dir := range []string{filepath.Join("src", "engine"), filepath.Join("util", "checks"), ".se"} {
-		if err := os.MkdirAll(filepath.Join(root, dir), 0o755); err != nil {
-			t.Fatal(err)
-		}
-	}
-	if err := os.WriteFile(filepath.Join(root, "src", "engine", "a.go"), []byte("package main\n"), 0o644); err != nil {
-		t.Fatal(err)
-	}
-	seen := filepath.Join(root, ".se", "engine-seen.txt")
-	// The runner hands a check its method root as the one argument, so the
-	// script writes beside it.
-	script := "import { writeFileSync } from \"node:fs\";\nimport { join } from \"node:path\";\n" +
-		"writeFileSync(join(process.argv[2], \".se\", \"engine-seen.txt\"), process.env.SE_ENGINE ?? \"\");\n"
-	if err := os.WriteFile(filepath.Join(root, "util", "checks", "echo-engine.mjs"), []byte(script), 0o644); err != nil {
-		t.Fatal(err)
-	}
-	return r, seen
-}
-
 func echoingCheck() ([]aTest, []chosen) {
 	tests := []aTest{{ID: "util/checks/echo-engine", Name: "echo-engine", Kind: "check", Path: "util/checks/echo-engine.mjs"}}
 	return tests, []chosen{{ID: tests[0].ID, Kind: "check", Why: "named outright"}}
@@ -102,5 +77,11 @@ func TestACheckOverAStaleEngineSaysSo(t *testing.T) {
 		if !strings.Contains(runs[0].Engine, want) {
 			t.Fatalf("the run does not say the engine over the tree is stale, %q is missing: %q", want, runs[0].Engine)
 		}
+	}
+	// AND THE SWAP IT NAMES BUILDS. --built hands over to the program already
+	// in .bin, which is the stale one this note has just diagnosed, so a reader
+	// who follows it is left where they started and told the cure was applied.
+	if strings.Contains(runs[0].Engine, "--built") {
+		t.Errorf("the advice carries --built, which hands over to the stale build it warns about: %q", runs[0].Engine)
 	}
 }
