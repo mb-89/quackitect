@@ -249,18 +249,43 @@ func runsTheEngine(command string) bool {
 func theQuotings(command string) (separators, substitutions string) {
 	var sep, sub strings.Builder
 	quote := rune(0)
+	escaped := false
 	for _, r := range command {
+		// A BACKSLASH HANDS THE CHARACTER AFTER IT THROUGH AS TEXT, and both
+		// scans read a space in its place. A space starts no substitution and
+		// separates no command, which is what the escaped character now is.
+		if escaped {
+			escaped = false
+			sep.WriteRune(' ')
+			sub.WriteRune(' ')
+			continue
+		}
 		switch {
 		case quote == '\'':
+			// A BACKSLASH IS AN ORDINARY CHARACTER IN SINGLE QUOTES, so this
+			// branch never escapes and the span ends on the next quote.
 			if r == '\'' {
 				quote = 0
 			}
 		case quote == '"':
+			// MEASURED. Every double quote ended the span, so an escaped one
+			// closed it here while bash keeps it open. se apply carrying a
+			// JSON payload was then refused for a redirection, for a second
+			// command and for a newline, none of which it held.
+			if r == '\\' {
+				escaped = true
+				sub.WriteRune(' ')
+				continue
+			}
 			if r == '"' {
 				quote = 0
 				continue
 			}
 			sub.WriteRune(r)
+		case r == '\\':
+			escaped = true
+			sep.WriteRune(' ')
+			sub.WriteRune(' ')
 		case r == '\'' || r == '"':
 			quote = r
 			sep.WriteRune(' ')
