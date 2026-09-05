@@ -17,31 +17,6 @@ import (
 // engine was four minutes older than the tree. The Go lane already answers
 // this, building se.fresh and naming it. The check lane now does the same.
 
-// aTreeWithAnEchoingCheck is a method root with engine source in it and one
-// check that writes the engine it was handed where the test can read it.
-func aTreeWithAnEchoingCheck(t *testing.T) (Roots, string) {
-	t.Helper()
-	root := t.TempDir()
-	r := Roots{Method: root, Work: root}
-	for _, dir := range []string{filepath.Join("src", "engine"), filepath.Join("util", "checks"), ".se"} {
-		if err := os.MkdirAll(filepath.Join(root, dir), 0o755); err != nil {
-			t.Fatal(err)
-		}
-	}
-	if err := os.WriteFile(filepath.Join(root, "src", "engine", "a.go"), []byte("package main\n"), 0o644); err != nil {
-		t.Fatal(err)
-	}
-	seen := filepath.Join(root, ".se", "engine-seen.txt")
-	// The runner hands a check its method root as the one argument, so the
-	// script writes beside it.
-	script := "import { writeFileSync } from \"node:fs\";\nimport { join } from \"node:path\";\n" +
-		"writeFileSync(join(process.argv[2], \".se\", \"engine-seen.txt\"), process.env.SE_ENGINE ?? \"\");\n"
-	if err := os.WriteFile(filepath.Join(root, "util", "checks", "echo-engine.mjs"), []byte(script), 0o644); err != nil {
-		t.Fatal(err)
-	}
-	return r, seen
-}
-
 func echoingCheck() ([]aTest, []chosen) {
 	tests := []aTest{{ID: "util/checks/echo-engine", Name: "echo-engine", Kind: "check", Path: "util/checks/echo-engine.mjs"}}
 	return tests, []chosen{{ID: tests[0].ID, Kind: "check", Why: "named outright"}}
@@ -102,5 +77,15 @@ func TestACheckOverAStaleEngineSaysSo(t *testing.T) {
 		if !strings.Contains(runs[0].Engine, want) {
 			t.Fatalf("the run does not say the engine over the tree is stale, %q is missing: %q", want, runs[0].Engine)
 		}
+	}
+	// AND THE SWAP IT NAMES HAS TO BUILD. --built hands over to the program
+	// in .bin already, which is the very build this note has just called stale,
+	// so a reader who follows it either swaps to the same stale binary or is
+	// refused for handing over to the build already running. Containing
+	// "se --swap" is satisfied by "se --swap --built", so the flag is what this
+	// asks about.
+	if strings.Contains(runs[0].Engine, "--built") {
+		t.Fatalf("the advice for a stale engine names --built, which hands over to that same stale build: %q",
+			runs[0].Engine)
 	}
 }
