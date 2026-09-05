@@ -165,6 +165,13 @@ func ClaimStop(r Roots, actor, because, why string) error {
 // StandingClaim reads an actor's claim, and leaves it standing. A claim from
 // another session is gone, because a session is where a decision was made.
 //
+// THROUGH ofThisSession, SO A ROTATION DOES NOT SPEND THE CLAIM. A rotation
+// sets the full log aside and opens a fresh current that holds nothing until
+// the next record lands, and the session name lives in the first record. A bare
+// comparison against currentSession read the placeholder through that window,
+// matched no stored claim, and refused an agent its stop a moment after it had
+// claimed one. A session that cannot be read decides nothing.
+//
 // IT LOOKS UNDER EVERY NAME THE ACTOR ACTS AS. The lane stores a claim under
 // the name the agent pulls with, and the stop hook asks under the name the
 // harness gives it. An agent that pulled as fable-cloud and was main to the
@@ -175,7 +182,7 @@ func StandingClaim(r Roots, actor string) (StopClaim, bool) {
 	all := loadClaims(r)
 	for _, n := range everyNameOf(r, actor) {
 		c, has := all.Claims[n]
-		if has && c.Session == currentSession(r) {
+		if has && ofThisSession(r, c.Session) {
 			return c, true
 		}
 	}
