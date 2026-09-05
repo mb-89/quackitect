@@ -197,6 +197,23 @@ try { pulled = JSON.parse(answers.get(3) ?? ""); } catch { /* said above */ }
 say("se_pull hands work back", pulled?.pull === "work",
   "it answered " + JSON.stringify(pulled?.pull));
 
+// AND se_status CARRIES THE STATE OF PLAY, which is the count of what the
+// engine returned this session and how much of it was wrong.
+//
+// status() in src/mcp/roots.go appends the trimmed output of se state, so a
+// reader gets the two numbers without knowing a second command. Nothing held
+// it there. The se_status case is driven above and read only for the malformed
+// shapes every call is read for, so those four lines could go and the whole
+// battery would stay green with the criterion they were written for silently
+// false again.
+//
+// THE CASE IS FOUND BY WHAT IT IS, not by a number counted off the list.
+const statusAt = calls.findIndex((c) => c.tool === "se_status") + 1;
+const stateOfPlay = answers.get(statusAt) ?? "";
+say("se_status carries the state of play", /results \d+, \d+ wrong/.test(stateOfPlay),
+  "the answer holds no results line, so the count reaches no agent through the lane:\n      " +
+    stateOfPlay.split("\n").slice(-4).join("\n      "));
+
 // AND THE WRITE LANDED, UNDER THE TOKEN IT NAMED.
 // THE CASE IS FOUND BY WHAT IT IS, not by a number counted off the list. A
 // case added above it would have moved the answer and this would have read
