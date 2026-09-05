@@ -158,9 +158,6 @@ func TestNoCagedFileNamesAProgramThatIsNotBuiltYet(t *testing.T) {
 	}
 }
 
-// root2 is the self-hosting pair, which is the case a cage travels in.
-func root2(root string) Roots { return Roots{Method: root, Work: root} }
-
 // A PROJECTION THAT TRAVELS IS THE SAME FILE ON EVERY MACHINE.
 //
 // THE TWO CHECKS ABOVE ASK THE WRONG QUESTION, and this is the one they meant.

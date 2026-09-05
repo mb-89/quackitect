@@ -18,7 +18,7 @@ import (
 // every claim test already feeds, so one rule there covers all of them.
 func TestACancelledContextEndsASync(t *testing.T) {
 	t.Parallel()
-	r := Roots{Method: t.TempDir(), Work: t.TempDir()}
+	r := aTree(t).apart().Roots
 	fed := aFedGit(t)
 	ctx, cancel := context.WithCancel(t.Context())
 	cancel()
@@ -36,7 +36,7 @@ func TestACancelledContextEndsASync(t *testing.T) {
 // only what is cancelled.
 func TestALiveContextStillReachesGit(t *testing.T) {
 	t.Parallel()
-	r := Roots{Method: t.TempDir(), Work: t.TempDir()}
+	r := aTree(t).apart().Roots
 	fed := aFedGit(t)
 	fed.says["rev-parse"] = ""
 	SyncClaims(t.Context(), r)

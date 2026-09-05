@@ -17,6 +17,8 @@ import (
 // to, and which way it may be narrowed. The panel is a subtree of the same
 // tree, chosen by a flag on a group.
 //
+// Why is [[one-tree-holds-every-parameter]].
+//
 // The word "setting" is not used. A value is a PARAMETER. A parameter that
 // appears in the panel is SHOWN. v3 kept interface state in a file called
 // settings, and the name hid which of two things was meant.

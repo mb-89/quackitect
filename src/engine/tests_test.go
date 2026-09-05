@@ -4,9 +4,7 @@ import (
 	"bytes"
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -22,69 +20,6 @@ import (
 // each reaching B, so the suite is big enough for the share rule to mean
 // anything and a change to A still reaches exactly one test.
 const padTests = 20
-
-// aTreeWithTests is a git repository holding a Go module with lib.go and
-// lib_test.go, committed, indexed, and with every test mapped. It costs a
-// cover build and a run per test, so a test takes it once.
-func aTreeWithTests(t *testing.T) (Roots, string) {
-	t.Helper()
-	// THE COMPILER IS FED, NOT RUN. What these tests are about is which tests
-	// the engine chooses from a delta, and the toolchain answers the same thing
-	// every time and takes ten seconds to say it. TestTheMapIsBuiltByTheRealGo
-	// drives the real one, once. See toolchainfed_test.go.
-	reaches := map[string][]string{
-		"TestA": {"lib.go:3.13,5.2 1 1"},
-		"TestB": {"lib.go:7.13,9.2 1 1"},
-	}
-	// THE PADDING REACHES B, the way the padding written below does, so the
-	// suite is as big here as it is there and the whole-battery rule sees the
-	// share it is about.
-	for i := 1; i <= padTests; i++ {
-		reaches[fmt.Sprintf("TestPad%d", i)] = []string{"lib.go:7.13,9.2 1 1"}
-	}
-	aFedToolchain(t, "example.com/lib", reaches)
-	dir := t.TempDir()
-	r := Roots{Method: dir, Work: dir}
-	lib := "package lib\n\n" +
-		"func A() int {\n\treturn 1\n}\n\n" +
-		"func B() int {\n\treturn 2\n}\n"
-	test := "package lib\n\nimport \"testing\"\n\n" +
-		"func TestA(t *testing.T) {\n\tif A() != 1 {\n\t\tt.Fatal(\"A\")\n\t}\n}\n\n" +
-		"func TestB(t *testing.T) {\n\tif B() != 2 {\n\t\tt.Fatal(\"B\")\n\t}\n}\n"
-	for i := 1; i <= padTests; i++ {
-		test += fmt.Sprintf("\nfunc TestPad%d(t *testing.T) {\n\tif B() != 2 {\n\t\tt.Fatal(\"B\")\n\t}\n}\n", i)
-	}
-	for name, text := range map[string]string{"go.mod": "module example.com/lib\n\ngo 1.27\n", "lib.go": lib, "lib_test.go": test} {
-		if err := os.WriteFile(filepath.Join(dir, name), []byte(text), 0o644); err != nil {
-			t.Fatal(err)
-		}
-	}
-	git := func(args ...string) {
-		t.Helper()
-		cmd := exec.Command("git", args...)
-		cmd.Dir = dir
-		cmd.Env = append(os.Environ(), "GIT_AUTHOR_NAME=t", "GIT_AUTHOR_EMAIL=t@t", "GIT_COMMITTER_NAME=t", "GIT_COMMITTER_EMAIL=t@t")
-		if out, err := cmd.CombinedOutput(); err != nil {
-			t.Fatalf("git %v: %v\n%s", args, err, out)
-		}
-	}
-	git("init", "-q")
-	git("add", "-A")
-	git("commit", "-q", "-m", "the tree as it was")
-	db, err := openIndex(r)
-	if err != nil {
-		t.Fatal(err)
-	}
-	t.Cleanup(func() { db.Close() })
-	if _, err := Reindex(r, db); err != nil {
-		t.Fatal(err)
-	}
-	mapped, failed, err := mapMissing(r, db, nil)
-	if err != nil || failed != 0 || mapped != 2+padTests {
-		t.Fatalf("mapping the tests: mapped %d, failed %d, %v", mapped, failed, err)
-	}
-	return r, dir
-}
 
 func changeA(t *testing.T, dir string) {
 	t.Helper()
@@ -123,7 +58,7 @@ func TestANamedProposalOutrunsTheWholeBattery(t *testing.T) {
 	}
 
 	// Unproposed, the whole battery is the ruling.
-	got, err := TestTheDelta(r, db, "", nil, false, "worker-one")
+	got, err := TestTheDelta(t.Context(), r, db, "", nil, false, "worker-one")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -132,7 +67,7 @@ func TestANamedProposalOutrunsTheWholeBattery(t *testing.T) {
 	}
 
 	// Named, the name runs and the ruling is owed rather than executed.
-	got, err = TestTheDelta(r, db, "", []string{"TestA"}, false, "worker-one")
+	got, err = TestTheDelta(t.Context(), r, db, "", []string{"TestA"}, false, "worker-one")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -147,7 +82,7 @@ func TestANamedProposalOutrunsTheWholeBattery(t *testing.T) {
 	}
 
 	// A proposal reaching nothing leaves the engine's selection standing.
-	got, err = TestTheDelta(r, db, "", []string{"TestNothingHere"}, false, "worker-one")
+	got, err = TestTheDelta(t.Context(), r, db, "", []string{"TestNothingHere"}, false, "worker-one")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -168,14 +103,14 @@ func TestTheEngineSelectsByRegion(t *testing.T) {
 	}
 
 	// NOTHING CHANGED, NOTHING RUNS.
-	got, err := TestTheDelta(r, db, "", nil, false, "worker-one")
+	got, err := TestTheDelta(t.Context(), r, db, "", nil, false, "worker-one")
 	if err != nil || len(got.Chosen) != 0 || got.Whole {
 		t.Fatalf("an empty delta chose %+v", got)
 	}
 
 	// A CHANGES, AND ONLY THE TEST THAT REACHES A IS CHOSEN, for that reason.
 	changeA(t, dir)
-	got, err = TestTheDelta(r, db, "", nil, false, "worker-one")
+	got, err = TestTheDelta(t.Context(), r, db, "", nil, false, "worker-one")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -191,7 +126,7 @@ func TestTheEngineSelectsByRegion(t *testing.T) {
 
 	// AND IT RUNS, GREEN. How long it took is a fact about the real toolchain,
 	// so TestTheMapIsBuiltByTheRealGo holds that and this holds the selection.
-	got, err = TestTheDelta(r, db, "", nil, true, "worker-one")
+	got, err = TestTheDelta(t.Context(), r, db, "", nil, true, "worker-one")
 	if err != nil || !got.OK || len(got.Ran) != 1 || !got.Ran[0].OK {
 		t.Fatalf("running the selection answered %+v %v", got, err)
 	}
@@ -211,7 +146,7 @@ func TestTheProposalNarrows(t *testing.T) {
 	}
 
 	// A TEST NAMED OUTRIGHT RUNS, whether or not the delta reaches it.
-	got, err := TestTheDelta(r, db, "", []string{"TestB"}, false, "worker-one")
+	got, err := TestTheDelta(t.Context(), r, db, "", []string{"TestB"}, false, "worker-one")
 	if err != nil || strings.Join(ids(got), ",") != "TestB" {
 		t.Fatalf("naming TestB chose %v %v", ids(got), err)
 	}
@@ -220,17 +155,17 @@ func TestTheProposalNarrows(t *testing.T) {
 	}
 
 	// A PATTERN NARROWS THE ENGINE'S SELECTION, and never widens it.
-	got, _ = TestTheDelta(r, db, "", []string{"TestA*"}, false, "worker-one")
+	got, _ = TestTheDelta(t.Context(), r, db, "", []string{"TestA*"}, false, "worker-one")
 	if strings.Join(ids(got), ",") != "TestA" {
 		t.Fatalf("the pattern TestA* chose %v", ids(got))
 	}
-	got, _ = TestTheDelta(r, db, "", []string{"TestB*"}, false, "worker-one")
+	got, _ = TestTheDelta(t.Context(), r, db, "", []string{"TestB*"}, false, "worker-one")
 	if strings.Join(ids(got), ",") != "TestA" || len(got.Unreached) != 1 {
 		t.Fatalf("a pattern the delta does not reach chose %v and left %v unreached", ids(got), got.Unreached)
 	}
 
 	// A NAME NOTHING HAS IS SAID, AND THE SELECTION STANDS.
-	got, _ = TestTheDelta(r, db, "", []string{"TestNothing"}, false, "worker-one")
+	got, _ = TestTheDelta(t.Context(), r, db, "", []string{"TestNothing"}, false, "worker-one")
 	if strings.Join(ids(got), ",") != "TestA" || len(got.Unreached) != 1 || got.Unreached[0] != "TestNothing" {
 		t.Fatalf("a proposal nothing matches chose %v and left %v unreached", ids(got), got.Unreached)
 	}
@@ -248,7 +183,7 @@ func TestWhenTheWholeBatteryRuns(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(dir, "util", "checks", "one.mjs"), []byte("// reads: lib.go\nprocess.exit(0)\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	got, err := TestTheDelta(r, db, "", nil, false, "worker-one")
+	got, err := TestTheDelta(t.Context(), r, db, "", nil, false, "worker-one")
 	if err != nil || !got.Whole || !strings.Contains(got.WhyWhole, "util/checks/") {
 		t.Fatalf("a new check did not call for the whole battery: %+v %v", got, err)
 	}
@@ -262,7 +197,7 @@ func TestWhenTheWholeBatteryRuns(t *testing.T) {
 		t.Fatal(err)
 	}
 	changeA(t, dir)
-	got, _ = TestTheDelta(r, db, "", nil, false, "worker-one")
+	got, _ = TestTheDelta(t.Context(), r, db, "", nil, false, "worker-one")
 	if !got.Whole || !strings.Contains(got.WhyWhole, "no map yet") {
 		t.Fatalf("an unmapped package did not call for the whole battery: %+v", got)
 	}
@@ -277,7 +212,7 @@ func TestWhenTheWholeBatteryRuns(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(dir, "lib.go"), []byte(both), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	got, _ = TestTheDelta(r, db, "", nil, false, "worker-one")
+	got, _ = TestTheDelta(t.Context(), r, db, "", nil, false, "worker-one")
 	if !got.Whole || !strings.Contains(got.WhyWhole, "cheaper") {
 		t.Fatalf("a selection of everything did not call for the whole battery: %+v", got)
 	}
@@ -288,7 +223,7 @@ func TestWhenTheWholeBatteryRuns(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(dir, "lib.go"), []byte(strings.Replace(string(b), "return 1", "return 1 + 0", 1)), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	got, _ = TestTheDelta(r, db, "", []string{"battery"}, false, "worker-one")
+	got, _ = TestTheDelta(t.Context(), r, db, "", []string{"battery"}, false, "worker-one")
 	if got.Whole || len(got.Unreached) != 1 {
 		t.Fatalf("a proposal named the battery and got %+v", got)
 	}

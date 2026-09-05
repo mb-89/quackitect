@@ -1,0 +1,40 @@
+---
+kind: [[work-token]]
+process: [[trivial]]
+guidance: [[work-token]]
+title: scratch trivial probe
+status: closed
+disposition: dropped
+reason: a probe minted to see the file shape, done probing
+---
+
+## detail
+
+A probe to see the file a trivial mint writes.
+
+## done when
+
+- the file shape was seen, and the probe is aborted
+
+## evidence: step 1. ask
+
+<!-- write what is asked and what done means, one criterion per line -->
+
+| done | criterion | evidence | receipt |
+|---|---|---|---|
+| [ ] | the ask is small enough to review whole, or it is split first | — |  |
+| [ ] | every done-when line is decidable, and names the command where one decides it |  |  |
+| [ ] | the basics it stands on exist, or are minted first | — |  |
+
+## evidence: step 2. do
+
+<!-- write one test, watch it go red, make the change, watch it go green -->
+
+| done | criterion | evidence | receipt |
+|---|---|---|---|
+| [ ] | the guidance this token names was read and applied | — |  |
+| [ ] | one test was written first and seen red for the reason expected |  |  |
+| [ ] | the same test was seen green after the change, and named |  |  |
+| [ ] | the change is git diff began..ended, the two hashes the engine wrote on this token | — |  |
+| [ ] | the cleanup the change revealed is in the change, or is a token of its own | — |  |
+

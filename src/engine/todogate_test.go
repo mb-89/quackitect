@@ -14,8 +14,8 @@ import (
 // is open, so the breakdown is enforced rather than remembered.
 func TestATodoIsASubToken(t *testing.T) {
 	t.Parallel()
-	root := t.TempDir()
-	r := Roots{Method: root, Work: root}
+	r := aTree(t).Roots
+	root := r.Work
 	writeProcess(t, root, "gated")
 	tok, err := Mint(r, Token{Tracked: local(), Process: "gated", Title: "the token in hand", Status: "first"})
 	if err != nil {
@@ -58,8 +58,7 @@ func TestATodoIsASubToken(t *testing.T) {
 // a token rather than offering a --parent with nothing after it.
 func TestATodoWithNothingInHandSaysHowToGetOne(t *testing.T) {
 	t.Parallel()
-	root := t.TempDir()
-	r := Roots{Method: root, Work: root}
+	r := aTree(t).Roots
 	why, refuse := TodoIsASubToken(r, "nobody", "TodoWrite")
 	if !refuse {
 		t.Fatal("TodoWrite was allowed to an actor holding nothing")
