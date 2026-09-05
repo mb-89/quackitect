@@ -198,19 +198,3 @@ the trial did not touch.
 The probe workflow was landed on `v4` in 45caaa06 and removed again. A session
 building the relay recovers it with
 `git show 45caaa06:.github/workflows/claim-relay-probe.yml`.
-
-### What probe one costs the relay, and the way round it
-
-The dispatch runs on the GitHub MCP server's credential, and the engine cannot
-reach that credential. The engine is a process on the box, and it holds the
-proxy's credential alone, which probe one measured as lacking `actions: write`.
-So an engine that publishes a claim by dispatching has to ask the agent to make
-the call, and a claim then depends on the agent's lane being up.
-
-The box can push `refs/heads/*`. So the trigger does not have to be a dispatch.
-The engine pushes a request branch, and a `push`-triggered workflow reads it,
-builds the claim on the remote's head and pushes `refs/se/claims`. That needs no
-`actions: write` and no lane, and probe three measured it at 11 seconds against
-the dispatch's 30.
-
-Both halves are measured here. Which one the relay takes is for wk-4759d90994.

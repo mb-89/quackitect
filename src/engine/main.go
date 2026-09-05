@@ -683,15 +683,19 @@ func main() {
 	defer release()
 	// THE GUARD'S DOOR. Every per-call event the cage names comes here over
 	// HTTP, and the port is the one the cage was projected with.
-	if ln, err := listenHooks(roots); err != nil {
-		log.Write("engine", "error", "engine",
-			"the guard's port is taken, so the cage's HTTP hooks reach nothing until this engine restarts", No(),
-			map[string]any{"url": hooksURL(roots), "reason": err.Error()})
-	} else {
+	//
+	// AND THE START SAYS WHICH IT IS, in one line, on the record and on the way
+	// out. A session with no guard on it looks exactly like a session nothing
+	// refused, and one of those ran for a whole day. See guardsaysso.go.
+	ln, saying, live := holdTheDoor(roots)
+	if live {
 		go serveHooks(ln, roots, log)
 		hooks = ln
 		here.Hooks = hooksURL(roots)
 	}
+	SayTheDoor(log, live, saying)
+	guarded, _ := json.Marshal(map[string]any{"guarded": live, "hooks": hooksURL(roots), "says": saying})
+	fmt.Println(string(guarded))
 	// THE ADDRESSES ARE PUBLISHED WHERE A CLIENT ALREADY LOOKS, beside the
 	// pid and the beat, so finding the model is reading one file.
 	here.Socket = socket
