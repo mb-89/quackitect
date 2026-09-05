@@ -548,9 +548,11 @@ func Publish(r Roots, files []string, message string) Published {
 		return p
 	}
 	// THE REMOTE'S HEAD BECOMES THE PARENT, and the claim is written again on
-	// top of it. Moving the local ref loses nothing: what it held is these same
-	// files, and writeTheClaims adds them again over the head that won the race.
+	// top of it. What the local ref held that the remote lacks comes across the
+	// move, because writeTheClaims adds only the paths it is handed and the ref
+	// is about to stop being where the rest lived.
 	if head, err := gitIn(r, index.Name(), "rev-parse", "--verify", "--quiet", remoteClaimsRef); err == nil && head != "" {
+		files = withTheNotesOnlyHereHolds(r, index.Name(), head, files)
 		if _, err := gitIn(r, index.Name(), "update-ref", claimsRef, head); err != nil {
 			p.Says = "published here. The other box's claims could not be taken up: " + err.Error()
 			return p
@@ -568,6 +570,43 @@ func Publish(r Roots, files []string, message string) Published {
 	p.Pushed = true
 	p.Says = "published on " + claimsBranch + ", after reading another box's claims. Other boxes see this claim now"
 	return p
+}
+
+// withTheNotesOnlyHereHolds adds the claim notes the local ref carries and the
+// remote's head does not, so the move onto that head keeps them.
+//
+// A CLAIM THIS BOX HAS NOT PUSHED LIVES ON THE LOCAL REF AND NOWHERE ELSE. The
+// recovery moves that ref to the remote's head, and writeTheClaims adds back
+// only the paths this call was handed, so an earlier claim was dropped from the
+// ref and never published. A box that claimed A, then B, then C published C
+// alone, and held A and B where nobody could see them, which is the one thing
+// claims exist to prevent. It was not a rare state: a box whose push is refused
+// for a reason that is not a race takes this path on every claim after the
+// first. Measured on a cloud box whose proxy answered HTTP 403 on every push.
+//
+// A PATH THE WORKING TREE NO LONGER HAS IS LEFT OUT, because git add would fail
+// on it and take the whole claim down with it. A note that has been archived
+// away is already off the ref by somebody's decision.
+func withTheNotesOnlyHereHolds(r Roots, index, head string, files []string) []string {
+	listed, err := gitIn(r, index, "diff", "--name-only", head, claimsRef)
+	if err != nil || listed == "" {
+		return files
+	}
+	have := map[string]bool{}
+	for _, f := range files {
+		have[f] = true
+	}
+	for _, path := range strings.Fields(listed) {
+		if have[path] {
+			continue
+		}
+		if _, err := os.Stat(filepath.Join(r.Work, filepath.FromSlash(path))); err != nil {
+			continue
+		}
+		files = append(files, path)
+		have[path] = true
+	}
+	return files
 }
 
 // writeTheClaims builds the next claims commit: whatever the ref already holds,
