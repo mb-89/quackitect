@@ -273,6 +273,18 @@ func pathsAmong(args []string) []string {
 			out = append(out, args[i+1:]...)
 			break
 		}
+		// A REDIRECTION IS NOT A PATH TO SEARCH. It names a file the shell writes
+		// or reads, and the program never sees it. Reading one as a path was the
+		// whole of a live defect: 2>/dev/null is relative, a relative path counts
+		// as inside the tree, so one word of plumbing turned a search of /root
+		// into a search of the tree. The refusal then promised, in its own last
+		// line, that it would not have refused. See wk-7bab432426.
+		if aRedirection(a) {
+			if theArrowStandsAlone(a) {
+				i++ // its target is the next word, and that is not a path either
+			}
+			continue
+		}
 		if strings.HasPrefix(a, "-") {
 			// A FLAG THAT TAKES A VALUE TAKES THE NEXT WORD, and the ones that
 			// matter here are the pattern and the type: -e p, -g glob, -t go.
@@ -291,6 +303,24 @@ func pathsAmong(args []string) []string {
 		out = append(out, a)
 	}
 	return out
+}
+
+// aRedirection says whether this word is the shell redirecting, rather than a
+// path handed to the program. A file descriptor may lead it and an ampersand
+// may join it: 2>, &>, >>, < are all the shell's.
+//
+// A FILENAME MAY BEGIN WITH A DIGIT, so the digits come off only where an arrow
+// follows them. 2026-report.txt keeps its name and stays a path.
+func aRedirection(word string) bool {
+	w := strings.TrimLeft(word, "0123456789&")
+	return strings.HasPrefix(w, ">") || strings.HasPrefix(w, "<")
+}
+
+// theArrowStandsAlone answers whether a redirection names its file as the next
+// word, as in `2> out.txt`, rather than joined to it as in `2>out.txt`.
+func theArrowStandsAlone(word string) bool {
+	w := strings.TrimLeft(word, "0123456789&")
+	return strings.Trim(w, "><") == ""
 }
 
 // anyInside says whether any of these paths is inside the tree at work. A
