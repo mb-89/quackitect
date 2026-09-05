@@ -99,7 +99,9 @@ func TestTheInvestigateNoticeSeparatesLeaveFromTake(t *testing.T) {
 }
 
 // aHeldTokenInASession is one token in one pair of hands, inside a real session,
-// because staleness is answered from the session's own pull count.
+// because whether a holder has gone is answered from the record that session
+// writes. It was the session's pull count, and a worker on one long token pulls
+// once: the count read a busy room as a stopped holder.
 func aHeldTokenInASession(t *testing.T, holder string) (Roots, Token) {
 	t.Helper()
 	root := t.TempDir()
