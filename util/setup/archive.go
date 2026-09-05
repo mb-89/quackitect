@@ -188,10 +188,52 @@ func CgoEnv(cc string) []string {
 	if strings.ContainsAny(cc, " \t") {
 		cc = `"` + cc + `"`
 	}
+	// zig IS A TOOLBOX AND ITS C COMPILER IS A SUBCOMMAND, so the pinned
+	// compiler is two words. A compiler that is already a compiler is one, and
+	// CgoEnvWith is what that goes through.
+	return CgoEnvWith(cc + " cc")
+}
+
+// CgoEnvWith is the same answer for a compiler that is a whole command already.
+//
+// THE MACHINE'S OWN COMPILER IS THE FALLBACK, and it takes no subcommand. A
+// cloud box reaches package registries and GitHub and not much else, so the
+// pinned archive cannot always be fetched there, and a box that ships cc can
+// still build. See aWorkingCompiler.
+func CgoEnvWith(compiler string) []string {
 	// THE FULL-TEXT MODULE IS A BUILD TAG. The SQLite driver compiles FTS5
 	// in only when asked, so the tag rides in the same file as the compiler
 	// and every build that has the one has the other.
-	return []string{"CC=" + cc + " cc", "CGO_ENABLED=1", "GOFLAGS=-tags=sqlite_fts5"}
+	return []string{"CC=" + compiler, "CGO_ENABLED=1", "GOFLAGS=-tags=sqlite_fts5"}
+}
+
+// aWorkingCompiler answers a C compiler on this machine that can actually
+// compile, or an empty string.
+//
+// IT COMPILES SOMETHING RATHER THAN ASKING FOR A VERSION. A name on PATH is not
+// a compiler that works: a wrapper with no backend answers --version and fails
+// on the first translation unit, and the failure then arrives in the middle of
+// building SQLite where nobody reads it as a missing compiler.
+func aWorkingCompiler() string {
+	dir, err := os.MkdirTemp("", "cc-probe-")
+	if err != nil {
+		return ""
+	}
+	defer os.RemoveAll(dir)
+	src := filepath.Join(dir, "probe.c")
+	if err := os.WriteFile(src, []byte("int probe(void) { return 0; }\n"), 0o644); err != nil {
+		return ""
+	}
+	for _, name := range []string{"cc", "gcc", "clang"} {
+		if _, err := exec.LookPath(name); err != nil {
+			continue
+		}
+		out := filepath.Join(dir, name+".o")
+		if err := Quietly(exec.Command(name, "-c", src, "-o", out)).Run(); err == nil {
+			return name
+		}
+	}
+	return ""
 }
 
 // CgoEnvPath is where the env file lives. Another program reads it rather

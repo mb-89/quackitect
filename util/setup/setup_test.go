@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"regexp"
 	"slices"
@@ -397,5 +398,48 @@ func TestTheEnvFileHoldsTheLinesItWasGiven(t *testing.T) {
 	left, _ := filepath.Glob(filepath.Join(filepath.Dir(path), ".cgo.env-*"))
 	if len(left) != 0 {
 		t.Errorf("temporaries left behind: %v", left)
+	}
+}
+
+// THE MACHINE'S OWN COMPILER IS A WHOLE COMMAND, AND THE PINNED ONE IS NOT.
+//
+// zig is a toolbox whose C compiler is a subcommand, so the pinned answer is
+// two words. A cc that is already a cc takes no subcommand, and writing one
+// there gives every cgo build a compiler it cannot run. The two shapes are one
+// line apart and the failure lands in the middle of building SQLite, so they
+// are held apart here.
+func TestTheFallbackCompilerTakesNoSubcommand(t *testing.T) {
+	t.Parallel()
+	pinned := CgoEnv("/tools/zig/zig")
+	if pinned[0] != "CC=/tools/zig/zig cc" {
+		t.Errorf("the pinned compiler lost its subcommand: %q", pinned[0])
+	}
+	own := CgoEnvWith("cc")
+	if own[0] != "CC=cc" {
+		t.Errorf("the machine's own compiler was given a subcommand it has not got: %q", own[0])
+	}
+	// BOTH CARRY THE REST, because the tag and cgo being on are what make the
+	// engine's index build at all, and a fallback that dropped them would build
+	// a program that cannot open its own database.
+	for _, env := range [][]string{pinned, own} {
+		if len(env) != 3 || env[1] != "CGO_ENABLED=1" || env[2] != "GOFLAGS=-tags=sqlite_fts5" {
+			t.Errorf("the environment is missing what every build here needs: %q", env)
+		}
+	}
+}
+
+// AND THE PROBE ANSWERS A COMPILER THAT COMPILES, OR NOTHING.
+//
+// A name on PATH is not a compiler that works. This machine may have one or
+// not, and both are correct answers, so what is held here is that an answer is
+// usable: an empty string, or a name that compiled a C file a moment ago.
+func TestAWorkingCompilerAnswersOneThatCompiles(t *testing.T) {
+	t.Parallel()
+	cc := aWorkingCompiler()
+	if cc == "" {
+		t.Skip("this machine has no C compiler of its own, which is a fine answer")
+	}
+	if _, err := exec.LookPath(cc); err != nil {
+		t.Fatalf("it answered %q, which is not on PATH: %v", cc, err)
 	}
 }

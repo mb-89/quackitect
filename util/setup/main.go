@@ -95,12 +95,33 @@ func main() {
 	say("quackitect %s - installing, profile %s", m.Product.Version, *profile)
 	say("  method root %s", *root)
 
+	// THE PINNED COMPILER IS PREFERRED AND NOT REQUIRED.
+	//
+	// A cloud box reaches package registries and GitHub, and the manifest pins
+	// its C compiler to an archive on a host that is on neither list. So the
+	// fetch fails there, the whole install stops, and the engine that needs
+	// cgo for SQLite is never built: the one box that cannot be fixed by hand
+	// is the one this refuses to build on. Every other tool stays fatal.
+	fallbackCC := ""
 	for _, name := range want {
-		if err := ensureTool(m, name); err != nil {
+		err := ensureTool(m, name)
+		if err == nil {
+			continue
+		}
+		if name != m.CC {
 			fail(err)
 		}
+		cc := aWorkingCompiler()
+		if cc == "" {
+			fail(fmt.Errorf("%w\n\nand this machine has no C compiler of its own to fall back on. "+
+				"The engine needs one for SQLite. Install one (apt install build-essential), "+
+				"or allow the host the manifest pins", err))
+		}
+		warn("could not fetch %s: %v", name, err)
+		say("  cc       falling back to %s, which is on this machine and compiles", cc)
+		fallbackCC = cc
 	}
-	env, err := cgoEnvironment(m)
+	env, err := cgoEnvironment(m, fallbackCC)
 	if err != nil {
 		fail(err)
 	}
@@ -277,12 +298,17 @@ func installTool(winget, apt string) error {
 // cgoEnvironment answers the environment the builds run under, and writes
 // it where the battery and the engine read it. The compiler is the pinned
 // archive, so its path is known without asking PATH.
-func cgoEnvironment(m *Manifest) ([]string, error) {
-	t, ok := m.Tools[m.CC]
-	if !ok || t.Archive == nil {
-		return nil, fmt.Errorf("the manifest names %q as the C compiler and pins no archive for it", m.CC)
+func cgoEnvironment(m *Manifest, fallbackCC string) ([]string, error) {
+	var env []string
+	if fallbackCC != "" {
+		env = CgoEnvWith(fallbackCC)
+	} else {
+		t, ok := m.Tools[m.CC]
+		if !ok || t.Archive == nil {
+			return nil, fmt.Errorf("the manifest names %q as the C compiler and pins no archive for it", m.CC)
+		}
+		env = CgoEnv(archiveExe(m.CC, t.Archive))
 	}
-	env := CgoEnv(archiveExe(m.CC, t.Archive))
 	if *dry {
 		say("  cgo      %s would be written", CgoEnvPath())
 		return env, nil

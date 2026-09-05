@@ -238,8 +238,20 @@ try {
 }
 
 head("Network");
-for (const url of ["https://proxy.golang.org/", "https://go.dev/dl/", "https://github.com/", "https://registry.npmjs.org/"]) {
+// THE HOSTS A BUILD HERE ACTUALLY REACHES FOR, and ziglang.org is the one that
+// decides whether a cloud box can build at all. A cloud environment allows
+// package registries and GitHub by default, and the manifest pins its C
+// compiler to an archive on neither list. The installer falls back to this
+// machine's own cc when the fetch fails, so this row says which of the two
+// happened rather than leaving a build to explain itself.
+for (const url of ["https://proxy.golang.org/", "https://go.dev/dl/", "https://ziglang.org/",
+  "https://github.com/", "https://registry.npmjs.org/"]) {
   out("- " + url + ": " + await reached(url));
+}
+{
+  const probe = ran("cc", ["--version"]);
+  out("- this machine's own cc: " + (probe.ok ? first(probe.text)
+    : "not usable (" + first(probe.text) + "), so a blocked ziglang.org means no engine"));
 }
 
 head("What this says");
