@@ -14,19 +14,6 @@ import (
 // The engine sees every result on its way back through runVerbInside, so it
 // counts there, and the count is its own.
 
-// countingTree is a tree with a session to count in.
-func countingTree(t *testing.T) Roots {
-	t.Helper()
-	r := guidanceTree(t)
-	l, err := OpenLog(r.Private("log"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	l.Write("engine", "start", "engine", "for the session name", Yes(), nil)
-	t.Cleanup(func() { l.Close() })
-	return r
-}
-
 func TestTheEngineCountsTheResultsItReturns(t *testing.T) {
 	t.Parallel()
 	r := countingTree(t)

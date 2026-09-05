@@ -21,8 +21,7 @@ import (
 // down the branch that writes.
 func TestTheGuardCopiesWhatWasHeardWithNoSessionRunning(t *testing.T) {
 	t.Parallel()
-	root := t.TempDir()
-	r := Roots{Method: root, Work: root}
+	r := aTree(t).Roots
 
 	// A transcript holding one thing a person said mid-turn.
 	transcript := filepath.Join(t.TempDir(), "transcript.jsonl")
