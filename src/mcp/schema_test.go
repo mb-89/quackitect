@@ -29,6 +29,7 @@ func TestToolSchemasComeFromTheirStructs(t *testing.T) {
 	// so its parameter type is the one the compiler gave it and not a name
 	// typed again here.
 	handlers := map[string]any{
+		"se_start":  startTheEngine,
 		"se_test":   testTheDelta,
 		"se_claim":  claimWork,
 		"se_find":   findInTree,

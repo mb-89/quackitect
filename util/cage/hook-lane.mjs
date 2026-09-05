@@ -29,16 +29,29 @@ import { fileURLToPath } from "node:url";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 const engine = join(root, ".bin", process.platform === "win32" ? "se.exe" : "se");
 
+// NOTHING HERE BLOCKS UNLESS AN ENGINE IS LIVE.
+//
+// A hook that refuses is a hook that has read a rule, and the rules live in the
+// engine. With no engine there is no rule to have read, so a refusal from here
+// would be this script's own opinion, and a session on a cold clone met exactly
+// that: every door shut and nothing able to say why.
+//
+// SO THE ONLY EXIT CODE THIS SCRIPT PRODUCES ON ITS OWN IS ZERO, which the
+// harness reads as "carry on". The engine is what may refuse, and only once it
+// is here to be asked. util/checks/the-travelling-cage-cannot-block.mjs holds
+// the other half: the events that can refuse are not in the cage git carries,
+// so they cannot reach a box before an engine has written them.
 if (!existsSync(engine)) {
   // THE AGENT IS TOLD, ON ITS OWN SCREEN. This said so on standard error,
   // which the harness keeps in a log no agent reads, so a session with no
   // engine worked a whole turn believing it was guarded. The harness adds a
   // SessionStart or UserPromptSubmit hook's standard output to the agent's
   // context, and those are the two events the cage sends here.
-  process.stdout.write("quackitect: NO ENGINE IS BUILT HERE, so this turn is neither guarded nor " +
-    "recorded. On a cold clone the tool lane is building it: wait a minute, then call se_status. " +
-    "If it stays down, get a diagnosis out: node util/cage/diagnose.mjs writes " +
-    ".se/scratchpad/diagnosis-<stamp>.md, and it goes in your answer whole.\n");
+  process.stdout.write("quackitect: NO ENGINE IS BUILT HERE, so nothing is guarding or recording " +
+    "this turn, and nothing is refusing you either. The harness's own tools are how you work " +
+    "until an engine answers. To get one: call se_start, which builds it if this tree carries " +
+    "none. If it will not come up, node util/cage/diagnose.mjs writes " +
+    ".se/scratchpad/diagnosis-<stamp>.md, and that goes in your answer whole.\n");
   process.exit(0);
 }
 

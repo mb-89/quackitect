@@ -222,6 +222,23 @@ function answerWhileItBuilds() {
       // tool that is broken. The answer says what is happening and where to
       // look.
       if (msg.method === "tools/call") {
+        // se_start IS THE ONE TOOL THAT MEANS SOMETHING HERE. It is what an
+        // agent calls when nothing works, and answering it with "still
+        // building" would be this door refusing the question it exists to
+        // answer. The build it would start is already running, so this says
+        // so, in the shape se_start answers in.
+        const name = msg.params?.name ?? "";
+        if (name === "se_start") {
+          answer(msg.id, told(JSON.stringify({
+            running: false, building: true,
+            says: "The engine is being built here and is not up yet. This tree carried nothing " +
+              "built, so the build started with this lane, " + Math.round(waited * 0.4) +
+              " seconds ago. It compiles SQLite and takes a few minutes, once. Ask again in a " +
+              "minute. .se/lane.out says how far it has got. Nothing is guarding this session " +
+              "meanwhile, so the harness's own tools are how you work until it answers.",
+          }, null, 2)));
+          return;
+        }
         answer(msg.id, told(stillBuilding + " " + Math.round(waited * 0.4) + " seconds so far."));
         return;
       }

@@ -147,6 +147,14 @@ const calls = [
   // this box writes, and list is what it knows about, and neither reaches git.
   { tool: "se_claim", args: { whoami: true } },
   { tool: "se_claim", args: { list: true } },
+  // THE ENGINE IS ALREADY UP HERE, so this is the idempotent answer: it starts
+  // nothing and says one is already running. The cold case, where it builds one,
+  // is util/checks/lane-answers-cold.mjs, which is the only check with a tree
+  // that carries no .bin.
+  // IT GOES LAST BECAUSE THE CASES ABOVE ARE READ BY POSITION. The mint has to
+  // be the first call, and three answers are found by a number counted off this
+  // list, so an insertion anywhere above moves somebody else's answer.
+  { tool: "se_start", args: {} },
 ];
 // The apply cases need a real id, so the first mint runs on its own and its
 // answer fills them in.
@@ -259,6 +267,17 @@ const claimAt = calls.findIndex((c) => c.tool === "se_claim") + 1;
     whoami?.claimant ?? answers.get(claimAt));
   say("se_claim lists what is claimed", listed !== null && "claims" in listed,
     answers.get(claimAt + 1));
+}
+
+// AND se_start SAYS AN ENGINE IS ALREADY UP, rather than starting a second one.
+{
+  const at = calls.findIndex((c) => c.tool === "se_start") + 1;
+  let said = null;
+  try { said = JSON.parse(answers.get(at) ?? ""); } catch { /* the case below says so */ }
+  say("se_start says the engine is already running", said?.running === true,
+    (answers.get(at) ?? "").slice(0, 200));
+  say("and it started nothing, because one was up", said?.started === false,
+    "it says started=" + JSON.stringify(said?.started));
 }
 
 // AND se_find ANSWERS PATH, LINE AND TEXT OFF THE INDEX.

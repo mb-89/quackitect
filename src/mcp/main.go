@@ -133,6 +133,8 @@ func call(roots roots, params json.RawMessage) map[string]any {
 	_ = json.Unmarshal(params, &p) // params that will not read are no params
 
 	switch p.Name {
+	case "se_start":
+		return text(taking(roots, p.Arguments, startTheEngine))
 	case "se_status":
 		return text(taking(roots, p.Arguments, showStatus))
 	case "se_answer":

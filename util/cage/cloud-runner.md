@@ -11,12 +11,13 @@ Nothing you write survives except what you push.
 ## Actionables
 
 1. Say the commit above in your first message, and whether it matches origin. *
-2. Say whether you hold the `se_` tools, by name, or say you hold none. *
-3. Measure this box before you explain it. `./RUNME.sh --diagnose` writes the measurement. *
-4. Hold no lane? Wait a minute, call `se_status` again, and only then diagnose. *
-5. Put a diagnosis in your answer whole, as it was written. *
-6. Never pipe into the engine. The flags `--command` and `--edits` carry the payload. *
-7. Push what you want kept. A finding that stays on this box dies with it. *
+2. Call `se_start` first. It builds the engine if this tree carries none, and starts it. *
+3. Nothing refuses you until an engine is up, so work with the harness's own tools until then. *
+4. Say whether you hold the `se_` tools, by name, or say you hold none. *
+5. Measure this box before you explain it. `./RUNME.sh --diagnose` writes the measurement. *
+6. Put a diagnosis in your answer whole, as it was written. *
+7. Never pipe into the engine. The flags `--command` and `--edits` carry the payload. *
+8. Push what you want kept. A finding that stays on this box dies with it. *
 
 ## Discussion
 
@@ -28,7 +29,23 @@ A person who pushed a minute later has a box that is behind and says it is curre
 Two sessions were asked whether they were up to date, said yes, and were wrong.
 So the box says the commit and the person checks it, rather than the agent judging.
 
-### 3. Measure, then explain
+### 2. Start the engine, then follow the rest
+
+This tree was cloned with nothing built, so there is no engine here until you start one.
+`se_start` builds it and starts it, and it is safe to call twice.
+The first build compiles SQLite and takes a few minutes, once.
+It answers at once and says which it did, rather than waiting.
+`.se/lane.out` says how far the build has got.
+
+### 3. Nothing is refusing you
+
+Every guard this project has lives in the engine, and the engine is not here yet.
+The hooks that can refuse a call are written by the engine when it starts, so a box with no engine carries none of them.
+Sessions before you read the standing rules, held no `se_apply` and no `se_run`, and concluded they could do nothing.
+Nothing had refused them.
+Use Write, Edit and Bash until an engine answers, then use the lane.
+
+### 5. Measure, then explain
 
 A session read the tool lane's source and explained a failure with the code of an older build.
 The fix that report asked for was already in the tree it was running.
@@ -45,7 +62,7 @@ The engine behind it is built while you work, and the first build compiles SQLit
 So a call can answer `THE ENGINE IS STILL BEING BUILT`, which is the door working.
 `.se/lane.out` says how far that build has got.
 
-### 6. The doors that need no lane
+### 7. The doors that need no lane
 
 The write gate refuses the harness's own Write, Edit and Bash, and lets the engine through.
 These are the same calls a lane makes, and they work with nothing built:

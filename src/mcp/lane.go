@@ -30,6 +30,13 @@ type laneTool struct {
 // TestToolSchemasComeFromTheirStructs holds the two together.
 var theLane = []laneTool{
 	{
+		name: "se_start",
+		says: "START THE ENGINE, and build it first if this tree carries none. " +
+			"Every other tool here asks the engine, so this is the one to call when " +
+			"they answer that it is not running. Calling it twice starts nothing twice.",
+		takes: startArgs{},
+	},
+	{
 		name:  "se_test",
 		says:  "TEST WHAT YOU CHANGED, naming the token: on: <id>.",
 		takes: testArgs{},

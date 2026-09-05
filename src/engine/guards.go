@@ -193,36 +193,6 @@ type refusedStops struct {
 	// Seen holds the actors whose first stop of this session has happened,
 	// granted or refused, so the grace below is one per actor per session.
 	Seen map[string]bool `json:"seen,omitempty"`
-
-	// Asked holds the word each actor's standing challenge was named with, so a
-	// claim can be checked against the challenge it is answering. See
-	// challenge.go.
-	Asked map[string]string `json:"asked,omitempty"`
-}
-
-// TheStandingChallenge answers the word this actor was last challenged with,
-// and ChallengeWith writes one down. An empty word means it has not been asked.
-func TheStandingChallenge(r Roots, actor string) string {
-	return loadStops(r).Asked[actor]
-}
-
-func ChallengeWith(r Roots, actor, word string) {
-	_ = locked(stopsPath(r), func() error {
-		s := loadStops(r)
-		if s.Asked == nil {
-			s.Asked = map[string]string{}
-		}
-		if word == "" {
-			delete(s.Asked, actor)
-		} else {
-			s.Asked[actor] = word
-		}
-		b, err := json.MarshalIndent(s, "", "  ")
-		if err != nil {
-			return err
-		}
-		return writeAtomic(stopsPath(r), b, 0o644)
-	})
 }
 
 func loadStops(r Roots) refusedStops {

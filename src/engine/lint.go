@@ -212,17 +212,85 @@ func timesIn(text string) []string {
 // IT IS THE SPELLINGS RATHER THAN ONE OF THEM. Saying a token is unheld goes
 // stale exactly as fast as saying who has it, so both are here, and a line that
 // names an actor without claiming a hold is left alone.
+// AND A LINE THAT DESCRIBES HOLDING IS NOT A LINE THAT CLAIMS A HOLD.
+//
+// This matched four spellings anywhere in a line, and a token's detail is where
+// an engineer writes about the engine. So "AgentGone leaves no open token held
+// by that agent", "the unheld loop in next()" and every sentence naming the
+// behaviour under repair were reported as stale holder claims. Seven findings
+// stood against the tree, none of them a hold, and a lint answering mostly
+// noise is one a reader learns to run past.
+//
+// WHAT A CLAIM LOOKS LIKE. It names WHO, and the who is an actor: a name like
+// worker-one or reviewer-nyx, or a plain nobody-in-particular the engine writes.
+// A generic word after the phrase is prose about the rule rather than a claim
+// about this token, and a code identifier is not English at all.
 func holdersIn(text string) []string {
 	var found []string
 	for _, line := range strings.Split(text, "\n") {
 		l := strings.TrimSpace(line)
 		low := strings.ToLower(l)
 		for _, says := range []string{"held by", "is held", "the holder is", "unheld"} {
-			if strings.Contains(low, says) {
-				found = append(found, l)
-				break
+			at := strings.Index(low, says)
+			if at < 0 {
+				continue
 			}
+			if !claimsAHold(low, says, at) {
+				continue
+			}
+			found = append(found, l)
+			break
 		}
 	}
 	return found
+}
+
+// claimsAHold answers whether this occurrence names somebody rather than
+// describing the rule.
+func claimsAHold(low, says string, at int) bool {
+	// "unheld" IS A WORD IN AN IDENTIFIER MORE OFTEN THAN A CLAIM. A hold is
+	// claimed by naming a holder, and saying a token is unheld names nobody, so
+	// it only counts as English: a letter or an underscore against it makes it
+	// part of something else, like the unheld loop in next().
+	rest := low[at+len(says):]
+	if says == "unheld" {
+		before := byte(' ')
+		if at > 0 {
+			before = low[at-1]
+		}
+		if isWordByte(before) || (len(rest) > 0 && isWordByte(rest[0])) {
+			return false // part of a longer word, so not this word at all
+		}
+		// IT IS A CLAIM ONLY WHEN SOMETHING IS SAID TO BE UNHELD. As an
+		// adjective it names code, and the unheld loop in next() is the line
+		// that made this rule worth narrowing.
+		return strings.HasSuffix(low[:at], "is ") || strings.HasSuffix(low[:at], "was ") ||
+			strings.HasSuffix(low[:at], "are ") || strings.HasSuffix(low[:at], "were ") ||
+			strings.HasPrefix(strings.TrimSpace(rest), "token")
+	}
+	// "the holder is" ALREADY NAMES THE HOLDER, so whatever follows is the who,
+	// and "the holder is the reviewer who asked" is a claim like any other. Only
+	// the two phrases where a generic word can stand in for a person are
+	// narrowed below.
+	if says == "the holder is" {
+		return true
+	}
+	// THE WHO COMES NEXT, and a word that names no one particular is the rule
+	// being described rather than this token being claimed. "held by that agent"
+	// and "held by agents that are gone" are sentences about how the engine
+	// behaves, and they were the bulk of what this rule reported.
+	next := strings.Fields(rest)
+	if len(next) == 0 {
+		return false // the line stops before it says who, so it names nobody
+	}
+	switch strings.Trim(next[0], ".,:;\"'`)") {
+	case "a", "an", "that", "this", "any", "some", "no", "another",
+		"agents", "agent", "somebody", "anybody", "nobody", "whoever", "them", "it":
+		return false
+	}
+	return true
+}
+
+func isWordByte(b byte) bool {
+	return b == '_' || (b >= 'a' && b <= 'z') || (b >= 'A' && b <= 'Z') || (b >= '0' && b <= '9')
 }

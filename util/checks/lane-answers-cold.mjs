@@ -105,6 +105,21 @@ try {
     JSON.stringify(call).slice(0, 200));
   say("and the answer says the engine is being built", /BUILT/.test(textOf(call)), textOf(call).slice(0, 160));
 
+  // AND se_start IS ANSWERED HERE, because it is the tool an agent reaches for
+  // when nothing works, and answering it "still building" would be this door
+  // refusing the one question it exists to answer.
+  const start = await ask(5, "tools/call", { name: "se_start", arguments: {} });
+  let startSaid = null;
+  try {
+    startSaid = JSON.parse(textOf(start));
+  } catch { /* the case below says so */ }
+  say("se_start is answered cold, in its own shape",
+    startSaid !== null && startSaid.running === false, textOf(start).slice(0, 200));
+  say("and it says a build is under way rather than refusing", startSaid?.building === true,
+    "it says building=" + JSON.stringify(startSaid?.building));
+  say("and it says the session is not being guarded meanwhile",
+    /guarding/.test(startSaid?.says ?? ""), (startSaid?.says ?? "").slice(0, 160));
+
   await until(() => said.some((l) => /left no tool lane|would not start/.test(l)),
     "the stub's own word that the build left no lane");
   const after = await ask(4, "tools/call", { name: "se_status", arguments: {} });
