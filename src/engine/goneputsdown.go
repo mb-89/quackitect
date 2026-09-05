@@ -50,28 +50,30 @@ func TheyHold(r Roots, id string) []Token {
 	return out
 }
 
-// SweepWorkHeldByTheGone puts back every open token held by an agent this run
-// no longer has, and answers what it released.
+// SweepWorkHeldByTheGone puts back every open token whose holder has gone, and
+// answers what it released.
 //
 // A START IS WHERE A GHOST IS CAUGHT. The two doors above shut the future: a
 // helper is refused its stop while it holds work, and one that dies anyway is
 // released as it goes. Neither reaches what is already parked, and twelve
 // tokens were, held by hands that ended before either door existed.
 //
-// IT ASKS WHO IS HERE, not who ever was. AgentsPresent answers this run's
-// register, so a holder that is not in it is a holder that cannot come back.
-// The main agent is never swept: it holds its work across a restart on purpose.
+// IT ASKS THE RECORD, NOT THE REGISTER. It used to sweep every holder this run's
+// register did not name, and a register is emptied by a restart while the agents
+// go on working: worker-dvorak was writing to its token when this sweep put it
+// back under it, and a released hold is one another worker can take mid-change.
+// So gone is the same question here as it is at the pull notice, asked through
+// the one function that answers it: HasGone in gone.go.
+//
+// THE MAIN AGENT IS NEVER SWEPT. It holds its work across a restart on purpose,
+// and that is a decision rather than a silence.
 func SweepWorkHeldByTheGone(r Roots) []string {
-	here := map[string]bool{"main": true, "": true}
-	for _, d := range AgentsPresent(r) {
-		here[d.Actor] = true
-		for _, n := range everyNameOf(r, d.Actor) {
-			here[n] = true
-		}
-	}
 	var back []string
 	for _, t := range Tokens(r) {
-		if t.Holder == "" || t.Ended() || here[t.Holder] {
+		if t.Holder == "" || t.Holder == "main" || t.Ended() {
+			continue
+		}
+		if _, gone := HasGone(r, t.Holder); !gone {
 			continue
 		}
 		if _, err := PutDown(r, t.ID, t.Holder); err == nil {

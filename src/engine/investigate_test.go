@@ -4,14 +4,15 @@ import (
 	"fmt"
 	"strings"
 	"testing"
+	"time"
 )
 
-// A LOOK DOES NOT STEAL FROM A HOLDER WHO IS STILL PULLING.
+// A LOOK DOES NOT STEAL FROM A HOLDER WHO IS STILL CALLING.
 //
 // TakeBackWhatWasLookedAt moved the hold unconditionally, though its comment
-// said only if the holder is still not pulling. Seen twice on 2026-09-01:
-// work-a took a held token from rev-14, which was alive and mid-review.
-func TestALookDoesNotStealFromAHolderStillPulling(t *testing.T) {
+// said only if the holder is still there. Seen twice on 2026-09-01: work-a took
+// a held token from rev-14, which was alive and mid-review.
+func TestALookDoesNotStealFromAHolderStillCalling(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
 	r := Roots{Method: root, Work: root}
@@ -30,12 +31,13 @@ func TestALookDoesNotStealFromAHolderStillPulling(t *testing.T) {
 	if _, err := TakeUp(r, tok.ID, "rev"); err != nil {
 		t.Fatal(err)
 	}
-	// rev pulls, so the arrival record says it is alive.
-	Arrived(r, ArrivalSession(r), "rev")
+	// rev called a moment ago, in a record that has been running for twenty
+	// minutes, so it is alive.
+	theRecordSays(t, r, wasHeard{"engine", 20 * time.Minute}, wasHeard{"rev", 0})
 
 	Looked(r, "main", tok.ID)
 	if back, _ := TakeBackWhatWasLookedAt(r, "main"); len(back) != 0 {
-		t.Fatalf("a look stole %v from a holder who is still pulling", back)
+		t.Fatalf("a look stole %v from a holder who is still calling", back)
 	}
 	if got, _ := LoadToken(r, tok.ID); got.Holder != "rev" {
 		t.Fatalf("the hold moved: holder %q, want rev", got.Holder)
@@ -130,64 +132,20 @@ func theOthersPull(r Roots, others, each int) {
 	}
 }
 
-// A BUSY ROOM IS NOT A STOPPED HOLDER.
-//
-// limits.pulls_before_hold_is_stale is ten and the queue counted ten pulls by
-// ANYBODY, so the window's rate was the fleet size. With twelve actors ten pulls
-// go past in under a minute, and every holder deep in a twenty-minute token had
-// stopped pulling by the engine's measure. The queue then answered investigate
-// instead of handing out work, so one alarm stopped every worker.
-func TestABusyFleetDoesNotMakeAHolderStale(t *testing.T) {
+// THE ANSWER NAMES THE SILENCE IT MEASURED AND THE ONE IT ALLOWS, so the walker
+// it woke can see why it was woken without going to look it up.
+func TestTheInvestigateNoticeNamesTheSilenceAndItsWindow(t *testing.T) {
 	t.Parallel()
 	r, tok := aHeldTokenInASession(t, "holder")
-	// The holder pulled once, then went to work on a token that takes a while.
-	Arrived(r, ArrivalSession(r), "holder")
-	// Eleven others pull five times each: fifty-five pulls, well past ten, and
-	// well short of ten turns each across the twelve actors present.
-	theOthersPull(r, 11, 5)
-
-	if got, ok := quietHold(r, "walker"); ok {
-		t.Fatalf("a holder five turns into its own token was called stale: %s", got.ID)
-	}
-	if got, _ := LoadToken(r, tok.ID); got.Holder != "holder" {
-		t.Fatalf("the hold moved: holder %q, want holder", got.Holder)
-	}
-}
-
-// AND THE ALARM IS NOT MERELY SWITCHED OFF. A holder that has really gone falls
-// behind anyway, because the room goes on pulling and it does not.
-func TestAHolderThatStoppedIsStillStale(t *testing.T) {
-	t.Parallel()
-	r, tok := aHeldTokenInASession(t, "holder")
-	Arrived(r, ArrivalSession(r), "holder")
-	// The same twelve actors, and now the others have each had twelve turns
-	// while the holder had none.
-	theOthersPull(r, 11, 12)
-
-	got, ok := quietHold(r, "walker")
-	if !ok {
-		t.Fatal("a holder that stopped pulling for twelve rounds was not called stale")
-	}
-	if got.ID != tok.ID {
-		t.Fatalf("the wrong hold was named: %s, want %s", got.ID, tok.ID)
-	}
-}
-
-// THE ANSWER NAMES THE NUMBER IT USED AND WHAT IT WAS NORMALISED BY, so the
-// walker it woke can see why it was woken without going to look it up.
-func TestTheInvestigateNoticeNamesTheWindowAndItsRate(t *testing.T) {
-	t.Parallel()
-	r, tok := aHeldTokenInASession(t, "holder")
-	theOthersPull(r, 11, 12)
+	theRecordSays(t, r, wasHeard{"engine", time.Hour}, wasHeard{"holder", 30 * time.Minute})
 	held, _ := LoadToken(r, tok.ID)
 	notice := investigate(r, held).Notice
 
-	window, per, actors := staleWindow(r, ArrivalSession(r))
-	for _, want := range []string{
-		fmt.Sprintf("%d", window),
-		fmt.Sprintf("%d per actor", per),
-		fmt.Sprintf("%d actors present", actors),
-	} {
+	silent, gone := HasGone(r, "holder")
+	if !gone {
+		t.Fatal("the holder in this fixture is not gone, so the notice is about nothing")
+	}
+	for _, want := range []string{briefSilence(silent), briefSilence(SilenceBeforeGone(r))} {
 		if !strings.Contains(notice, want) {
 			t.Fatalf("the notice does not say %q: %q", want, notice)
 		}

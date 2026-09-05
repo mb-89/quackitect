@@ -802,6 +802,17 @@ func decidePreToolUse(g *guard, roots Roots, cfg Config, emergency Emergency, lo
 		return
 	}
 
+	// A CLOUD BOX'S NOTES GO INTO GIT BEFORE THEY GO DOWN WITH IT. Nothing
+	// pushes a note, and a cloud box is reclaimed when the session ends, so at
+	// the ceiling the work is held until each note is a tracked token or gone.
+	// Unbound turns it off, the way it turns the staffing guard off.
+	if why, refuse := TooManyNotes(roots, actor, in.ToolName); refuse && !Unleashed(roots) {
+		record(log, "engine", "notes", actor, "refused: the notes on this box are not in git", No(),
+			map[string]any{"tool": in.ToolName, "notes": len(NotesInHand(roots))})
+		g.deny(why)
+		return
+	}
+
 	// THE SAME CALL FAILING THE SAME WAY AGAIN IS STOPPED HERE, before the
 	// tokens are spent on it once more.
 	if why, refuse := aRepeatedFailure(roots, actor, in); refuse {

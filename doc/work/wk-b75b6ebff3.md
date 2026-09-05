@@ -46,16 +46,28 @@ On a cloud box, hold the agent at twenty notes the way the staffing guard holds 
 - a note that became a tracked token no longer counts, so clearing them lets the agent through
 - a Go test in src/engine drives all four
 
+## approach
+
+One guard beside the staffing one, in the hook, before the work goes through.
+
+It asks three things. Whether this box is a cloud box, which host.go already answers off util/cage/hosts.json and the environment. How many notes are open, which is a walk over the tokens whose process is note. And whether the call is work, which is the list the staffing guard already keeps.
+
+At twenty it refuses, and the refusal is the handing over: every open note by id and title, and what to do with each one. Make it a tracked token, drop it, or make a tracked token marked needs_human where the answer is not yours.
+
+A note that became a token has ended, so it stops counting and the agent works again. Nothing converts a note by itself, because which of the three answers a note deserves is a reading only an agent can do.
+
+The unbound switch turns it off, the way it turns the staffing guard off.
+
 ## evidence: step 1. ask
 
 <!-- write what is asked, the approach, and what done means, one criterion per line -->
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the approach is on the token before any work, as an interface or a shape a reader can disagree with |  |  |
-| [ ] | every done-when line is decidable, and names the command where one decides it |  |  |
-| [ ] | the change is small enough to review whole, or it is split first | — |  |
-| [ ] | the basics it stands on exist, or are minted first | — |  |
+| [x] | the approach is on the token before any work, as an interface or a shape a reader can disagree with | the approach names the three questions the guard asks and what it refuses to do by itself |  |
+| [x] | every done-when line is decidable, and names the command where one decides it | all five are decided by go test -run 'TestACloudBoxTurnsItsNotesIn|TestADeskKeepsItsNotes' |  |
+| [x] | the change is small enough to review whole, or it is split first | one new file of 74 lines, one guard wired into the hook, and a card entry |  |
+| [x] | the basics it stands on exist, or are minted first | host.go answers the box, the note process exists, and the staffing guard is the shape this follows |  |
 
 ## evidence: step 2. do
 
@@ -63,11 +75,11 @@ On a cloud box, hold the agent at twenty notes the way the staffing guard holds 
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the guidance this token names was read and applied | — |  |
-| [ ] | the change follows the approach on the token, or the token says why it departed |  |  |
-| [ ] | se test --on this token answered ok, and what it ran is named |  |  |
-| [ ] | the note says what changed and why, for a reader who was not here |  |  |
-| [ ] | the cleanup the change revealed is in the change, or is a token of its own | — |  |
+| [x] | the guidance this token names was read and applied | the test was written first and watched red on an undefined guard |  |
+| [x] | the change follows the approach on the token, or the token says why it departed | one guard, three questions, no conversion by the engine, and unbound turns it off |  |
+| [x] | se test --on this token answered ok, and what it ran is named | ok on TestACloudBoxTurnsItsNotesIn and TestADeskKeepsItsNotes |  |
+| [x] | the note says what changed and why, for a reader who was not here | the approach and the card entry both say it, and the commit message carries the change |  |
+| [x] | the cleanup the change revealed is in the change, or is a token of its own | the card entry is in the change, because a rule the agent is not told about is a wall |  |
 
 ## evidence: step 3. verdict
 

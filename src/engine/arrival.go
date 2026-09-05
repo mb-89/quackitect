@@ -25,9 +25,8 @@ import (
 // WHAT IS KEPT. The session, a count of the pulls it has seen, and the count
 // each actor was at when it last pulled.
 //
-// THE COUNT IS WHAT DECAYS. An actor that is in the record has arrived, and
-// that never changes. Whether it is still there is a different question, and it
-// is answered by how far the queue has moved since it last pulled.
+// AN ACTOR THAT IS IN THE RECORD HAS ARRIVED, and that never changes. Whether it
+// is still there is a different question, and this file no longer answers it.
 type arrivals struct {
 	Session string         `json:"session"`
 	Pulls   int            `json:"pulls"`
@@ -134,81 +133,12 @@ func ArrivedAs(r Roots, session, actor, role string) bool {
 // session, so neither can tell one run from another.
 func Named(session string) bool { return session != "" && session != "current" }
 
-// StillPulling answers whether this actor has pulled within the last `within`
-// pulls of the session, without recording an arrival.
-//
-// A HOLD IS NOT A READER. A token in review carries the name of whoever took
-// it, and that name outlives the process behind it: a reviewer whose process
-// died left a token held forever, and the queue read that hold as somebody
-// reading.
-//
-// AN ARRIVAL IS NOT A READER EITHER, which is what the first fix got wrong. An
-// arrival is written once and never unwritten, so it stays true for the rest of
-// the session after the process behind it is gone. That is the same shape as
-// the status it replaced, one scope smaller.
-//
-// SO WHAT IS CONSULTED IS REFRESHED BY THE ACTOR STILL BEING THERE. The pull
-// count moves for every pull by anybody, and an actor's entry only moves when
-// that actor pulls. A reviewer that stops falls behind while the worker it is
-// holding up goes on asking, and the refusal comes back on with nobody having
-// to know the time.
-func StillPulling(r Roots, session, actor string, within int) bool {
-	if !Named(session) || actor == "" || within <= 0 {
-		return false
-	}
-	a := loadArrivals(r)
-	if a.Session != session {
-		return false
-	}
-	at, seen := a.At[actor]
-	if !seen {
-		// A HOLDER THAT HAS NOT PULLED YET IN THIS SESSION HAS NOT STOPPED.
-		// Arrivals reset at every restart and a hold lives on the token, so
-		// every hold carried across a restart is a holder with no entry. The
-		// count is taken from the session's own pulls instead: the hold is
-		// trusted until the queue has moved further than the staleness allows.
-		return a.Pulls <= within
-	}
-	return a.Pulls-at <= within
-}
-
-// ActorsPresent answers how many actors have pulled in this session. It is the
-// RATE THE SESSION'S PULL COUNT RUNS AT: one actor's pull moves the count by
-// one, twelve actors' pulls move it by twelve in the same stretch of work.
-//
-// IT IS NEVER LESS THAN ONE. A count of nought would collapse anything measured
-// per actor to nothing, and a session nobody has pulled in has no holder to
-// judge anyway.
-func ActorsPresent(r Roots, session string) int {
-	if !Named(session) {
-		return 1
-	}
-	a := loadArrivals(r)
-	if a.Session != session || len(a.At) == 0 {
-		return 1
-	}
-	return len(a.At)
-}
-
-// HowFarBehind answers how many pulls the queue has taken since this actor last
-// pulled, and whether the engine has ever seen it pull at all.
-//
-// THE ENGINE HAS THE NUMBER, so it says it. An alarm that says a holder is
-// behind and never how far leaves the person it woke to go and find out.
-func HowFarBehind(r Roots, session, actor string) (int, bool) {
-	if !Named(session) || actor == "" {
-		return 0, false
-	}
-	a := loadArrivals(r)
-	if a.Session != session {
-		return 0, false
-	}
-	at, seen := a.At[actor]
-	if !seen {
-		return a.Pulls, false
-	}
-	return a.Pulls - at, true
-}
+// WHETHER A HOLDER IS STILL THERE IS NOT ASKED HERE ANY MORE. It was, and it was
+// answered by how far the queue had moved since that actor last pulled, which is
+// a proxy for a worker that stops BETWEEN tokens: one working inside a single
+// long token pulls once and then says nothing to the queue for as long as the
+// work takes. Gone is now the time since the holder's last call of any kind,
+// which the record already carries. See HasGone in gone.go.
 
 func loadArrivals(r Roots) arrivals {
 	var a arrivals

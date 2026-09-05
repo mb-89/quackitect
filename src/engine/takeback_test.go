@@ -3,6 +3,7 @@ package main
 import (
 	"strings"
 	"testing"
+	"time"
 )
 
 // A REFUSED TAKE-BACK KEEPS THE LOOK AND SAYS WHICH GUARD REFUSED.
@@ -82,12 +83,13 @@ func TestARefusedTakeBackKeepsTheLookAndNamesTheGuard(t *testing.T) {
 			},
 		},
 		{
-			name: "the holder is pulling again",
-			says: "is pulling again",
+			name: "the holder is calling again",
+			says: "is still calling",
 			setUp: func(t *testing.T) (Roots, string) {
 				r, tok := aHeldTokenInASession(t, "holder")
 				Looked(r, "walker", tok.ID)
-				Arrived(r, ArrivalSession(r), "holder")
+				theRecordSays(t, r,
+					wasHeard{"engine", 20 * time.Minute}, wasHeard{"holder", 0})
 				return r, tok.ID
 			},
 		},
@@ -118,9 +120,9 @@ func TestATakenBackHoldSpendsTheLookOnce(t *testing.T) {
 	t.Parallel()
 	r, tok := aHeldTokenInASession(t, "holder")
 	Looked(r, "walker", tok.ID)
-	// The holder never pulls again while the room goes on pulling, which is the
-	// only thing that makes a hold quiet.
-	theOthersPull(r, 11, 12)
+	// Nothing has been heard from the holder for half an hour, which is the only
+	// thing that makes a hold quiet.
+	theRecordSays(t, r, wasHeard{"engine", time.Hour}, wasHeard{"holder", 30 * time.Minute})
 
 	back, refused := TakeBackWhatWasLookedAt(r, "walker")
 

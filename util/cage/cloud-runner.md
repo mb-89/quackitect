@@ -19,6 +19,7 @@ Nothing you write survives except what you push.
 7. Never pipe into the engine. The flags `--command` and `--edits` carry the payload. *
 8. Push what you want kept. A finding that stays on this box dies with it. *
 9. Answer the person in the chat. `se_answer` is the record's copy, and they do not read the record. *
+10. Turn your notes into tracked tokens. A note is private, and private does not leave this box. *
 
 ## Discussion
 
@@ -45,6 +46,18 @@ The hooks that can refuse a call are written by the engine when it starts, so a 
 Sessions before you read the standing rules, held no `se_apply` and no `se_run`, and concluded they could do nothing.
 Nothing had refused them.
 Use Write, Edit and Bash until an engine answers, then use the lane.
+
+### 10. A note dies here, and a token does not
+
+A note is private by what it is: nobody has decided about it yet, so it lives under `.se`, which nothing pushes.
+On a desk that is right, because the disk outlives the session.
+Here the container is reclaimed and every note in it goes with it.
+So the engine counts them, and at twenty it holds your work until they are turned in.
+Each note has three answers.
+Drop it where it is useless.
+Mint a tracked token from it where it is work.
+Where the answer is not yours, mint one carrying your best attempt and set `needs_human` on it.
+A note that became a token or was dropped stops counting, and the work goes through again.
 
 ### 9. The chat is where they read you
 
