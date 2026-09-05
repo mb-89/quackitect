@@ -9,6 +9,11 @@ guidance: [[work-token]]
 title: unmeasured is drawn silent
 # where the token stands. The process owns these values.
 status: open
+claimed_by: aeaf7bd9/worker-dutilleux
+claimed_at: "2026-09-05T15:54:43Z"
+# the tree each time the work was taken up, snapshots the engine wrote
+began:
+  - a7641c405a498335fa88c2ef33380181b7901976
 ---
 
 ## detail
@@ -27,9 +32,9 @@ Found reviewing wk-218e541ec2. The table's legend says a dash is silent, and the
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the ask is small enough to review whole, or it is split first | — |  |
-| [ ] | every done-when line is decidable, and names the command where one decides it |  |  |
-| [ ] | the basics it stands on exist, or are minted first | — |  |
+| [x] | the ask is small enough to review whole, or it is split first | three corrections to one table. It is not too large, it is stalled: the table is not in the tree | read whole |
+| [x] | every done-when line is decidable, and names the command where one decides it | the third names a find over util/cage and is decidable. The first two name the note's table, which is not here, so neither can be decided | se find --words 218e541ec2 |
+| [x] | the basics it stands on exist, or are minted first | they do not. wk-218e541ec2 is in no note under doc/work or .se/work, no row of archive.jsonl, no commit on any branch and no archive tag. Minted as wk-5e31bc7615 | four counts, all zero |
 
 ## evidence: step 2. do
 
@@ -37,9 +42,9 @@ Found reviewing wk-218e541ec2. The table's legend says a dash is silent, and the
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the guidance this token names was read and applied | — |  |
-| [ ] | one test was written first and seen red for the reason expected |  |  |
-| [ ] | the same test was seen green after the change, and named |  |  |
-| [ ] | the change is git diff began..ended, the two hashes the engine wrote on this token | — |  |
-| [ ] | the cleanup the change revealed is in the change, or is a token of its own | — |  |
+| [x] | the guidance this token names was read and applied | work-token, in the prompt | — |
+| [x] | one test was written first and seen red for the reason expected | none was written. What it would read is a table that is in no file here, so it would assert against nothing and pass or fail by accident | nothing to drive |
+| [x] | the same test was seen green after the change, and named | no change was made to the tree, so nothing went green. The battery was left as it stood | — |
+| [x] | the change is git diff began..ended, the two hashes the engine wrote on this token | empty apart from this note and the successor. Inventing the three marks would put numbers in the table that nobody measured | git status |
+| [x] | the cleanup the change revealed is in the change, or is a token of its own | wk-5e31bc7615 carries the whole ask, and adds the cage comment citing an id that resolves to nothing | — |
 
