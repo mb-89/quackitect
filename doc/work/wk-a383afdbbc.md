@@ -34,9 +34,9 @@ Decide where the rise is answered. Either the check reads the number off the com
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the ask is small enough to review whole, or it is split first | — |  |
-| [ ] | every done-when line is decidable, and names the command where one decides it |  |  |
-| [ ] | the basics it stands on exist, or are minted first | — |  |
+| [x] | the ask is small enough to review whole, or it is split first | one check rewritten, the floor read off HEAD rather than a number in the file | 330d4ee5 |
+| [x] | every done-when line is decidable, and names the command where one decides it | the battery line for the check, and a node run over a worktree with one file added | 330d4ee5 |
+| [x] | the basics it stands on exist, or are minted first | git ls-tree and cat-file --batch answer what HEAD holds, and the check is in the battery list | b83389ce |
 
 ## evidence: step 2. do
 
@@ -44,9 +44,8 @@ Decide where the rise is answered. Either the check reads the number off the com
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the guidance this token names was read and applied | — |  |
-| [ ] | one test was written first and seen red for the reason expected |  |  |
-| [ ] | the same test was seen green after the change, and named |  |  |
-| [ ] | the change is git diff began..ended, the two hashes the engine wrote on this token | — |  |
-| [ ] | the cleanup the change revealed is in the change, or is a token of its own | — |  |
-
+| [x] | the guidance this token names was read and applied | read, and each row below names its check and what it said | 330d4ee5 |
+| [x] | one test was written first and seen red for the reason expected | the check as it stood over a worktree of b83389ce: 2 failed, 90 files and 29772 lines against 89 and 29378 | b83389ce |
+| [x] | the same test was seen green after the change, and named | battery.sh over the worktree names the-flat-engine-only-shrinks ok, and one file added to src/engine answers 2 failed naming it | 330d4ee5 |
+| [x] | the change is git diff began..ended, the two hashes the engine wrote on this token | began is adf5b933 here, and the change is 330d4ee5 on b83389ce, one file | 330d4ee5 |
+| [x] | the cleanup the change revealed is in the change, or is a token of its own | the number left with the floor, and the last commit on the package is named in its place | 330d4ee5 |
