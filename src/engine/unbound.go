@@ -32,6 +32,24 @@ import (
 // the panel is open, and pressing that block puts it back. The owner weighed a
 // timer against a thing you cannot miss and took the second.
 
+// A CONTROL LASTS THE SESSION IT WAS SET IN, AND ONE FUNCTION SAYS SO.
+//
+// The rung, the hold and the ask are all a person leaning on the engine for the
+// thing in their hands. None of them is a parameter, so none of them should
+// outlive the session that set it. Each is a file, because the guard is a fresh
+// process per event and holds nothing between them, so the file has to say which
+// session it belongs to and the read has to check.
+//
+// The store the hold register already uses is the shape: holds.json, grace.json,
+// stops.json and owed.json each carry a session, and a store from a session that
+// has ended is read as absent. A control left behind is not migrated and not
+// warned about. It belongs to a session that has ended.
+//
+// A FILE WITH NO SESSION IS ANOTHER SESSION'S, which is the shape all three of
+// these files had before, so the first read after the change drops what each was
+// holding. That is the right answer for every control it could be holding.
+func ofThisSession(r Roots, session string) bool { return session == currentSession(r) }
+
 // TheBinding is how much of the engine is speaking to the agent.
 type TheBinding string
 
@@ -59,12 +77,15 @@ const (
 	God TheBinding = "god"
 )
 
-// Binding is the state on disk, and who took it there.
+// Binding is the state on disk, who took it there, and the session they took it
+// there in. Session is what stops a rung outliving the person who set it: see
+// ofThisSession above.
 type Binding struct {
-	At    TheBinding `json:"at"`
-	By    string     `json:"by,omitempty"`
-	Since string     `json:"since,omitempty"`
-	Says  string     `json:"says,omitempty"`
+	At      TheBinding `json:"at"`
+	By      string     `json:"by,omitempty"`
+	Since   string     `json:"since,omitempty"`
+	Says    string     `json:"says,omitempty"`
+	Session string     `json:"session"`
 }
 
 func bindingPath(r Roots) string { return r.Private("binding.json") }
@@ -76,6 +97,9 @@ func LoadBinding(r Roots) Binding {
 	raw, err := os.ReadFile(bindingPath(r))
 	if err != nil || json.Unmarshal(raw, &b) != nil {
 		return Binding{At: Bound}
+	}
+	if !ofThisSession(r, b.Session) {
+		return Binding{At: Bound} // it belongs to a session that has ended
 	}
 	switch b.At {
 	case Unbound, God:
@@ -95,7 +119,8 @@ func NoGuardsAtAll(r Roots) bool { return LoadBinding(r).At == God }
 
 // SetBinding moves the tree to a rung and answers where it now is.
 func SetBinding(r Roots, to TheBinding, by string) (Binding, error) {
-	b := Binding{At: to, By: by, Since: time.Now().UTC().Format(time.RFC3339)}
+	b := Binding{At: to, By: by, Since: time.Now().UTC().Format(time.RFC3339),
+		Session: currentSession(r)}
 	switch to {
 	case Unbound:
 		b.Says = "A person took the queue off you. Nothing will ask you to spawn and the queue " +
@@ -176,10 +201,16 @@ func TheRungBelow(at TheBinding) TheBinding {
 // same obligation, raised by a button instead of by a sentence, so an owner who
 // wants to know what is happening does not have to type a question and wait for
 // the reading to notice it.
+//
+// AND IT LASTS THE SESSION IT WAS PRESSED IN. A press is a person waiting for an
+// answer, and the person waiting at six o'clock is not waiting the next morning.
+// The file said when and by whom and nothing about which session, so the first
+// thing a fresh agent was told was to answer a question nobody was still asking.
 type AskedToSay struct {
-	On   string `json:"on,omitempty"` // when it was pressed
-	By   string `json:"by,omitempty"`
-	Says string `json:"says,omitempty"`
+	On      string `json:"on,omitempty"` // when it was pressed
+	By      string `json:"by,omitempty"`
+	Says    string `json:"says,omitempty"`
+	Session string `json:"session"`
 }
 
 func askedPath(r Roots) string { return r.Private("asked.json") }
@@ -190,12 +221,15 @@ func LoadAsked(r Roots) AskedToSay {
 	if err != nil || json.Unmarshal(raw, &a) != nil {
 		return AskedToSay{}
 	}
+	if !ofThisSession(r, a.Session) {
+		return AskedToSay{} // it belongs to a session that has ended, and nothing is owed
+	}
 	return a
 }
 
 // SetAsked raises the obligation, or discharges it.
 func SetAsked(r Roots, on bool, by string) (AskedToSay, error) {
-	var a AskedToSay
+	a := AskedToSay{Session: currentSession(r)}
 	if on {
 		a.On = time.Now().UTC().Format(time.RFC3339)
 		a.By = by
