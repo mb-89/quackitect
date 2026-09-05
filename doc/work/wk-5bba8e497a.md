@@ -11,11 +11,14 @@ title: ready_when leaves the queue
 status: done
 # who did the work step, so the verdict is never theirs
 author: worker-ash
+claimed_by: 547b9365/reviewer-quince
+claimed_at: "2026-09-05T16:00:55Z"
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - 14ef55309aea9cde047526236c0f92535201dfc3
   - 95c482c1e199d45d88b8618a7852fad9f8bcde9c
   - 183aff1793d77de8fd0cde8f400e818523a14ee3
+  - f6a11533439b04c671a16de16e92fed0c8f277c6
 # the tree each time the work was put down or closed, snapshots the engine wrote
 ended:
   - a2cadce1ed457d9618b7150b0e42b80a3d89efb0
