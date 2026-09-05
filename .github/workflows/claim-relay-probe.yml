@@ -1,0 +1,46 @@
+name: claim relay probe
+
+# A trial, not a relay. It asks one question: can a workflow push a ref under
+# refs/se/, which this box cannot. It pushes one throwaway ref, holds it long
+# enough for the box to see it, and deletes it again, because no cloud box can
+# delete a ref of any kind. Delete this file once the trial has reported.
+# For details, see [[doc/spec/claims-relay-trial]].
+
+on:
+  workflow_dispatch:
+    inputs:
+      stamp:
+        required: true
+        type: string
+  push:
+    branches: [v4]
+    paths: ['.github/workflows/claim-relay-probe.yml']
+
+permissions:
+  contents: write
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: push a throwaway ref under refs/se/
+        run: |
+          set -x
+          S="${{ inputs.stamp || github.run_id }}"
+          R="refs/se/probe-$S"
+          echo "PROBE_REF $R"
+          C=$(git commit-tree $(git hash-object -t tree /dev/null) -m probe)
+          git push origin "$C:$R"
+          echo "PROBE_PUSH_OK $(date -u +%s)"
+          git ls-remote origin "$R"
+      - name: hold it, so the box can see it, then delete it
+        run: |
+          set -x
+          S="${{ inputs.stamp || github.run_id }}"
+          R="refs/se/probe-$S"
+          sleep 45
+          git push origin --delete "$R"
+          echo "PROBE_DELETE_OK $(date -u +%s)"
+          git ls-remote origin "$R"
+          echo "PROBE_GONE"
