@@ -443,19 +443,43 @@ func findArchivedWords(r Roots, rows []Archived, p FindParams) (Found, error) {
 
 // readArchivedNote answers a token out of history, so a reader naming a closed
 // id is answered rather than told it never existed.
+//
+// THE COPY THAT TRAVELS IS ONE CLOSE SHORT, AND THE ROW SAYS WHAT IT MISSES.
+// The close writes the disposition and the closing state into the frontmatter
+// and only then archives the note, so the blob the branch already carried is
+// the note as it stood open. A reader on a box with the branch and not the
+// loose blob was handed a token whose Ended() said the closed work was not
+// closed. The row carries the disposition, and the process says which state a
+// close ends at, so both are put back over what the older bytes said.
 func readArchivedNote(r Roots, id string) (Token, bool) {
 	if _, err := os.Stat(filepath.Join(r.Work, ".git")); err != nil {
 		return Token{}, false
 	}
-	said, err := ReadArchived(r, id)
-	if err != nil || said == "" {
-		return Token{}, false
-	}
-	t, err := noteToken(said, id)
+	rows, err := TheArchive(r)
 	if err != nil {
 		return Token{}, false
 	}
-	return t, true
+	for _, row := range rows {
+		if row.ID != id {
+			continue
+		}
+		said, at, err := readArchived(r, row)
+		if err != nil || said == "" {
+			return Token{}, false
+		}
+		t, err := noteToken(said, id)
+		if err != nil {
+			return Token{}, false
+		}
+		if at != row.Blob {
+			t.Disposition = Disposition(row.Disposition)
+			if p, err := LoadProcess(r.Method, t.Process); err == nil {
+				t.Status = Status(p.EndsAt())
+			}
+		}
+		return t, true
+	}
+	return Token{}, false
 }
 
 // runArchive sweeps what is already closed, and lists what the archive holds.

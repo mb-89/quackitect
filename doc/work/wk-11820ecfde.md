@@ -9,9 +9,14 @@ guidance: [[work-token]]
 title: archived note reads open
 # where the token stands. The process owns these values.
 status: open
+claimed_by: aeaf7bd9/worker-nancarrow
+claimed_at: "2026-09-05T15:29:51Z"
 # tokens that have to close before this can start
 depends_on:
   - "[[wk-808abd40a4]]"
+# the tree each time the work was taken up, snapshots the engine wrote
+began:
+  - 1b74ee0f6c2563f88a852e9311a9c7c6aa735127
 ---
 
 ## detail
@@ -41,9 +46,9 @@ Have readArchivedNote overlay what the row says over what the note text says: th
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the ask is small enough to review whole, or it is split first | — |  |
-| [ ] | every done-when line is decidable, and names the command where one decides it |  |  |
-| [ ] | the basics it stands on exist, or are minted first | — |  |
+| [x] | the ask is small enough to review whole, or it is split first | One reader, readArchivedNote, corrected from the row it already had to load, and one test. |  |
+| [x] | every done-when line is decidable, and names the command where one decides it | The first names its test, TestAnArchivedNoteReadsClosedOnTheBranchAlone, which reads back through a clone holding the branch and no tags. The second is read off the change, which touches no stored field. |  |
+| [x] | the basics it stands on exist, or are minted first | TheArchive, readArchived and Process.EndsAt are all here, and the row already carries the disposition. Nothing had to be minted. |  |
 
 ## evidence: step 2. do
 
@@ -51,9 +56,9 @@ Have readArchivedNote overlay what the row says over what the note text says: th
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the guidance this token names was read and applied | — |  |
-| [ ] | one test was written first and seen red for the reason expected |  |  |
-| [ ] | the same test was seen green after the change, and named |  |  |
-| [ ] | the change is git diff began..ended, the two hashes the engine wrote on this token | — |  |
-| [ ] | the cleanup the change revealed is in the change, or is a token of its own | — |  |
+| [x] | the guidance this token names was read and applied | Read. Rule 12 put the red first, and the proposed action is what was built. |  |
+| [x] | one test was written first and seen red for the reason expected | On a copy of the tree with the reader as it stood, the test said `a closed token reads as not ended, with disposition "" and status "open"`. Expected, as the branch holds the note the close later rewrote. |  |
+| [x] | the same test was seen green after the change, and named | It passes, and every other Archive test passes beside it on the same copy. |  |
+| [x] | the change is git diff began..ended, the two hashes the engine wrote on this token | src/engine/archive.go, readArchivedNote alone, and the new test file. |  |
+| [x] | the cleanup the change revealed is in the change, or is a token of its own | Token wk-0f91286ac1 already names it. claimsync.go imports internal/logbook, which nothing in the tree carries. |  |
 
