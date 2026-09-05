@@ -42,7 +42,7 @@ func BenchmarkPingOverTheSocket(b *testing.B) {
 		b.Fatal(err)
 	}
 	defer log.Close()
-	stop, socket, _ := StartIndexer(r, log, time.Hour)
+	stop, socket, _ := StartIndexer(b.Context(), r, log, time.Hour)
 	if socket == "" {
 		b.Fatal("the model did not listen")
 	}

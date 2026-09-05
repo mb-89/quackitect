@@ -30,7 +30,7 @@ func aLiveEngine(t *testing.T, r Roots) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	stop, socket, _ := StartIndexer(r, log, 50*time.Millisecond)
+	stop, socket, _ := StartIndexer(t.Context(), r, log, 50*time.Millisecond)
 	if socket == "" {
 		t.Fatal("the engine did not listen")
 	}

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -660,7 +661,12 @@ func main() {
 	}
 	// THE RESIDENT ENGINE KEEPS THE INDEX. It is the one process that lives
 	// as long as the session, so it is the one that can watch the tree.
-	stopIndexer, socket, asked := StartIndexer(roots, log, *beat)
+	// THE ENGINE'S CONTEXT ENDS WITH THE ENGINE, and everything long-lived
+	// takes it, so letting go once lets go of all of it. This is the one place
+	// a context begins, which is why it is the one place context.Background is.
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	stopIndexer, socket, asked := StartIndexer(ctx, roots, log, *beat)
 	// LETTING GO HAPPENS ONCE, whether the engine is ending or handing over.
 	// A swap has to release the socket and the port before the successor
 	// looks at them, and the deferred call still runs on the way out.

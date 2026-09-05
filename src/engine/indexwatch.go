@@ -1,11 +1,13 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/fsnotify/fsnotify"
@@ -98,8 +100,12 @@ const watchBuffer = 1 << 20
 // THE SOCKET IS OPEN BEFORE THE SCAN. A client that connects during the
 // first scan is answered from what is indexed so far, with the revision
 // saying so, rather than refused for the length of the scan.
-func StartIndexer(r Roots, log *Log, beat time.Duration) (stop func(), socket string, asked Asks) {
-	return startIndexer(r, log, beat, openFSWatcher)
+//
+// THE CONTEXT IS THE OWNER. Its end is the shutdown, once, and stop is how a
+// caller waits for that shutdown to finish. A test hands t.Context and what it
+// started ends with it, handles and socket included, before its cleanup runs.
+func StartIndexer(ctx context.Context, r Roots, log *Log, beat time.Duration) (stop func(), socket string, asked Asks) {
+	return startIndexer(ctx, r, log, beat, openFSWatcher)
 }
 
 // Asks are what a client can set going over the socket that the engine's own
@@ -112,7 +118,7 @@ type Asks struct {
 }
 
 // startIndexer is StartIndexer with the watcher chosen by the caller.
-func startIndexer(r Roots, log *Log, beat time.Duration, open func() (watcher, error)) (stop func(), socket string, asked Asks) {
+func startIndexer(ctx context.Context, r Roots, log *Log, beat time.Duration, open func() (watcher, error)) (stop func(), socket string, asked Asks) {
 	db, err := openIndex(r)
 	if err != nil {
 		log.Write("engine", "error", "engine", "the index could not be opened, so the engine reads the files", No(),
@@ -148,12 +154,28 @@ func startIndexer(r Roots, log *Log, beat time.Duration, open func() (watcher, e
 		defer ro.Close()
 		runIndexer(r, log, beat, done, db, m, open)
 	}()
-	return func() {
-		close(done)
-		if ln != nil {
-			ln.Close()
-			_ = os.Remove(addr) // the socket file is the engine's, and it is gone with it
+	// ONE SHUTDOWN, FROM WHICHEVER COMES FIRST: the context ending or the
+	// caller's stop. Closing the listener ends serveModel, so the socket
+	// server has the same owner as the loop.
+	var once sync.Once
+	shutdown := func() {
+		once.Do(func() {
+			close(done)
+			if ln != nil {
+				ln.Close()
+				_ = os.Remove(addr) // the socket file is the engine's, and it is gone with it
+			}
+		})
+	}
+	go func() {
+		select {
+		case <-ctx.Done():
+			shutdown()
+		case <-stopped:
 		}
+	}()
+	return func() {
+		shutdown()
 		<-stopped
 	}, addr, Asks{Stop: toStop, Swap: toSwap}
 }

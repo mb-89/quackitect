@@ -61,7 +61,7 @@ func aFedDaemon(t *testing.T, r Roots, hears bool) (*fedWatcher, func()) {
 		t.Fatal(err)
 	}
 	fed := feedWatcher(r, hears)
-	stop, socket, _ := startIndexer(r, log, time.Hour, fed.open)
+	stop, socket, _ := startIndexer(t.Context(), r, log, time.Hour, fed.open)
 	if socket == "" {
 		t.Fatal("the model did not listen")
 	}
