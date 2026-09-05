@@ -593,6 +593,40 @@ func lane(t *testing.T) Roots {
 	return aTree(t).apart().Roots
 }
 
+// ---- from pullbehindthebranch_test.go ----
+
+// aCloneBehindTheClose hands back a clone whose working tree still carries a
+// token the branch it tracks has archived, with that close already fetched.
+func aCloneBehindTheClose(t *testing.T) (Roots, Token) {
+	t.Helper()
+	r := aTreeWithTheProcesses(t)
+	tok := mintUnclaimed(t, r, "behind the branch")
+	// THE TREE IS ON THE BRANCH BEFORE THE CLONE IS TAKEN, processes and all,
+	// so the clone is a box that could work the token.
+	gitAt(t, r.Work, "add", "--", "doc", "src")
+	gitAt(t, r.Work, "commit", "--quiet", "-m", "the token")
+	clone := filepath.Join(t.TempDir(), "clone")
+	gitAt(t, r.Work, "clone", "--quiet", "--no-tags", "file://"+filepath.ToSlash(r.Work), clone)
+
+	// THE BRANCH CLOSES IT AND COMMITS THE CLOSE, while the clone stands still.
+	tok.Disposition = Done
+	tok.Status = "closed"
+	if err := SaveToken(r, tok); err != nil {
+		t.Fatalf("closing %s: %v", tok.ID, err)
+	}
+	gitAt(t, r.Work, "add", "--all", "--", "doc/work")
+	gitAt(t, r.Work, "commit", "--quiet", "-m", "the close")
+
+	// THE CLONE FETCHES, WHICH IS WHAT EVERY BOX DOES BEFORE IT WORKS, and its
+	// working tree stays where it was: the note is still open on its disk.
+	gitAt(t, clone, "fetch", "--quiet", "origin")
+	behind := Roots{Method: clone, Work: clone}
+	if at := noteAt(behind, tok.ID); at == "" {
+		t.Fatalf("the clone does not carry %s, so it is not behind the branch", tok.ID)
+	}
+	return behind, tok
+}
+
 // ---- from removal_test.go ----
 
 // removalTree answers a tree and the two doors this guard is asked through:
