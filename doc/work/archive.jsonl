@@ -158,6 +158,7 @@
 {"id":"wk-b42f08ff8d","title":"references carry rights","process":"","disposition":"","on_branch":"90bfa3672232729a52d4f8e8885337e9999106d6"}
 {"id":"wk-b75b6ebff3","title":"notes become tracked tokens","process":"standard","disposition":"done","blob":"7a13301f52722ea638c44c3764985ce0525c9068","on_branch":"e9b95bdc75c9ee693b9193d948622122a0b0b832","tag":"refs/tags/archive/wk-b75b6ebff3"}
 {"id":"wk-c1d58b91d6","title":"stop claim knows names","process":"standard","disposition":"done","blob":"e82971bcf3a9ac8c50004bd3e778c5689ba6f898","on_branch":"4eed914d50eb7d9c8fa1dbf58bd03a632e7e42e8","tag":"refs/tags/archive/wk-c1d58b91d6"}
+{"id":"wk-c2f9d39ea7","title":"long token traps hold","process":"trivial","disposition":"done","blob":"e12105605dc1824a6c57a67a5e10173192d5498c"}
 {"id":"wk-c698d46866","title":"claims fetch forces nothing","process":"standard","disposition":"done","blob":"a0e73d8a43bf2f6fe23ec48bdc00e12580e2da30","on_branch":"8db4d8ff036044160f68598103bce495c50b9b28","tag":"refs/tags/archive/wk-c698d46866"}
 {"id":"wk-c77fbdcaf3","title":"lock reason speaks code","process":"trivial","disposition":"done","blob":"a1a573a4b00b4bd63b8fc469b47fab2ae88f553e","on_branch":"7ea577f9e7c573ca45f9b4b95c70d722f26cab36"}
 {"id":"wk-c93aac62be","title":"criteria lessons into guidance","process":"standard","disposition":"","on_branch":"80292538bc5aa4851ae748badcee11dc8a11c1b2"}
