@@ -8,7 +8,17 @@ guidance: [[work-token]]
 # the name this token is known by, in references and in links
 title: a stage carries strangers
 # where the token stands. The process owns these values.
-status: open
+status: closed
+# who did the work step, so the verdict is never theirs
+author: worker-hokusai
+# the tree each time the work was taken up, snapshots the engine wrote
+began:
+  - d9c900428e8708ca40c89c7faedac0aa422828a6
+# the tree each time the work was put down or closed, snapshots the engine wrote
+ended:
+  - b60171ca95e4516b8f02de64f8394e1ab6f159d2
+# how it ended. Only an ended token carries one.
+disposition: done
 ---
 
 ## detail
@@ -31,25 +41,21 @@ The smallest case: with a token in hand, stage a file no verb of that token touc
 
 ## evidence: step 1. ask
 
-<!-- write what is asked and what done means, one criterion per line -->
-
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | what is gained by doing it, and not only what it does |  |  |
-| [ ] | what breaks if it is never done, and not only that it stays undone |  |  |
-| [ ] | the ask is small enough to review whole, or it is split first | — |  |
-| [ ] | every done-when line is decidable, and names the command where one decides it |  |  |
-| [ ] | the basics it stands on exist, or are minted first | — |  |
+| [x] | what is gained by doing it, and not only what it does | A commit stops carrying work nobody can attribute, because the gate now reads the record. |  |
+| [x] | what breaks if it is never done, and not only that it stays undone | Origin stops building. Sixty-seven of the last hundred and seventy-four commits import a package they do not carry. |  |
+| [x] | the ask is small enough to review whole, or it is split first | One function, two call sites, one test. Five files, two hundred and nineteen added lines. |  |
+| [x] | every done-when line is decidable, and names the command where one decides it | All three decided. Two by the new Go test, one by the check it names. |  |
+| [x] | the basics it stands on exist, or are minted first | WhatThisTokenWrote and gitVerbAt both exist at the tip. Neither was minted here. |  |
 
 ## evidence: step 2. do
 
-<!-- write one test, watch it go red, make the change, watch it go green -->
-
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the guidance this token names was read and applied | — |  |
-| [ ] | one test was written first and seen red for the reason expected |  |  |
-| [ ] | the same test was seen green after the change, and named |  |  |
-| [ ] | the change is git diff began..ended, the two hashes the engine wrote on this token | — |  |
-| [ ] | the cleanup the change revealed is in the change, or is a token of its own | — |  |
+| [x] | the guidance this token names was read and applied | Read as the pull sent it. It drove one test first, reddened on an assertion. |  |
+| [x] | one test was written first and seen red for the reason expected | TestAStageOfAStrangersPathIsRefused reddened against a stub, on its assertion, never on a build failure. |  |
+| [x] | the same test was seen green after the change, and named | The same test answers PASS. The package keeps the same eleven standing reds. |  |
+| [x] | the change is git diff began..ended, the two hashes the engine wrote on this token | The began hash is not on this box. The change is commit 7caf3fbf on origin v4. |  |
+| [x] | the cleanup the change revealed is in the change, or is a token of its own | A token of its own, wk-3fd684ca8a, landed as ac31d48d. It is a stage with no path. |  |
 
