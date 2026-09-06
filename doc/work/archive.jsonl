@@ -334,3 +334,5 @@
 {"id":"wk-c6e5db7c51","title":"lint reads work tokens","process":"trivial","disposition":"done","blob":"32a427277a772817e48b1e561b2a3159d933c594","on_branch":"13fadff07d092ab91c375a01e64d13a6fd996a98"}
 {"id":"wk-64e8f37aa4","title":"parallel tests swap seams","process":"trivial","disposition":"done","blob":"745aba9d6b279db6a6d7dd134d6a7d668c65c57b"}
 {"id":"wk-b65222b6f1","title":"claim a block","process":"standard","disposition":"done","blob":"96dbecd70a8cfd9974b83b962b1811190bbf5b40","on_branch":"965929a6a206362accac4c8b8841fb4442041aa2"}
+{"id":"wk-4140e954b7","title":"engine tests fail building","process":"trivial","disposition":"done","blob":"5913e8a95544bdced47aa35eb36e2b0315ccc71c"}
+{"id":"wk-c5b92df740","title":"session log leaves main","process":"standard","disposition":"done","blob":"1d2ad117a2bd4bcbde2d2f528e5266d8e4c142fb","on_branch":"71278ac49e25d75b51564694ebb862fdec75eabc"}
