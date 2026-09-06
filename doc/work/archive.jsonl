@@ -63,6 +63,7 @@
 {"id":"wk-2f6d34e845","title":"guidance draws search line","process":"trivial","disposition":"done","blob":"2ce5941e75df8925ffc86008d4dbe7a8a43ec38b","on_branch":"2ce5941e75df8925ffc86008d4dbe7a8a43ec38b","tag":"refs/tags/archive/wk-2f6d34e845"}
 {"id":"wk-2f780ad15b","title":"retro reports survive drains","process":"trivial","disposition":"done","blob":"28eb9539a3c9608dca11eb1bbc20fa57872769a1","on_branch":"28eb9539a3c9608dca11eb1bbc20fa57872769a1","tag":"refs/tags/archive/wk-2f780ad15b"}
 {"id":"wk-30821724fc","title":"spawns take a context","process":"standard","disposition":"done","blob":"4f2045f02b76e20abba11ad89c73c2587beedcfe","on_branch":"9bdc965a278e2ad4be23f49c5076e08f8931ac21","tag":"refs/tags/archive/wk-30821724fc"}
+{"id":"wk-324c0385df","title":"split halves want approaches","process":"trivial","disposition":"done","blob":"d895c5304b4ac72fb52aff666d652305a4c70644"}
 {"id":"wk-32c0df8d1c","title":"unbound still names tokens","process":"standard","disposition":"done","blob":"03bb780380df478b85ab205a265955c3f50d173a","on_branch":"03bb780380df478b85ab205a265955c3f50d173a","tag":"refs/tags/archive/wk-32c0df8d1c"}
 {"id":"wk-32d21588e6","title":"move fixture reads uid","process":"trivial","disposition":"done","blob":"1c4d4367a80b81f9ee89ffab63e7d49459bf70d0","on_branch":"81d9d41cad07217290397d59b1e8b01da4c6c04a"}
 {"id":"wk-33cc497670","title":"two tests one name","process":"trivial","disposition":"done","blob":"2cfa6b00d7c4bc680e95c2d0f3347ad6d31f9ac6","on_branch":"2cfa6b00d7c4bc680e95c2d0f3347ad6d31f9ac6"}
