@@ -44,3 +44,5 @@
 {"id":"wk-f921c702c9","title":"claim publish stages ignored","process":"trivial","disposition":"done","blob":"cc1c0237b17189e44fac099923f9deaeffe8311e","on_branch":"3259afe784a481a402d6648d81f5e17c6a1223ef"}
 {"id":"wk-fa2dd32c33","title":"Close eats the archive","process":"standard","disposition":"done","blob":"89e0448388db0dbbb5a0dd174b03c664692fffa5","on_branch":"dbb17e1980e3f625c1eebe30cf36937ce3a42770"}
 {"id":"wk-ff08c56e56","title":"Release frees no hold","process":"trivial","disposition":"done","blob":"acde15ad24d2d27a8b3e51ca1ca70d69088eb099","on_branch":"df6b1d24f8e93e84a27bad1e9d7299f3a122a1ac"}
+{"id":"wk-2d08f5df5d","title":"standing red blocks submissions","process":"trivial","disposition":"done","blob":"b7c8f85380a82bbdc34b46d7c5a3af50400b958f"}
+{"id":"wk-70384c47cd","title":"archived without evidence","process":"trivial","disposition":"done","blob":"d09773bb5a476e84cbb3beb8e47040482590808e"}
