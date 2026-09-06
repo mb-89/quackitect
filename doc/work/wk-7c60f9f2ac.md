@@ -67,6 +67,6 @@ WHAT PINS THE RULING NOW. TestAskedIsGrantedOnTheFirstClaim went when four stop 
 | [x] | the guidance this token names was read and applied | work-token, read. The record answered the ambiguity rather than a guess. |  |
 | [ ] | one test was written first and seen red for the reason expected | Not met, and it cannot be. No code changed: the contradiction dissolved when the argument was removed. |  |
 | [x] | the same test was seen green after the change, and named | TestAValidClaimStopsAtOnce, which drives asked among all four sanctioned reasons. |  |
-| [ ] | the change is git diff began..ended, the two hashes the engine wrote on this token | — |  |
-| [ ] | the cleanup the change revealed is in the change, or is a token of its own | — |  |
+| [x] | the change is git diff began..ended, the two hashes the engine wrote on this token | This note and nothing else. The answer was a reading, not a change. |  |
+| [x] | the cleanup the change revealed is in the change, or is a token of its own | Nothing to clean. The token this one named had already gone, and the test that pinned the ruling was already replaced. |  |
 
