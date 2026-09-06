@@ -1,8 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -42,6 +44,13 @@ const theRedBattery = "go build         ok     7s  \n" +
 	"se lint          FAIL   0s  a token names an id nothing answers to\n" +
 	"    and a second line of the same finding\n" +
 	"1 failed, 12s wall clock\n"
+
+// aBatteryLine is one answer printed the way battery.sh prints it. say() pads
+// the name into a column sixteen wide, so a shorter name is followed by a run
+// of spaces and a longer one by the single separator and nothing else.
+func aBatteryLine(name, answer string) string {
+	return fmt.Sprintf("%-16s %s\n", name, answer)
+}
 
 // aTokenDeciding is an ordinary token whose done-when line names one check.
 func aTokenDeciding(t *testing.T, r Roots, id, check string) {
@@ -125,4 +134,45 @@ func TestBlockingWorkGoesFirst(t *testing.T) {
 				whatWasHanded(got), older.ID)
 		}
 	})
+
+	// AND A CHECK WHOSE NAME FILLS THE COLUMN IS STILL SEEN.
+	//
+	// The name is padded into a column sixteen wide, so a longer one is followed
+	// by the separator alone. Every check written as a file is longer than that,
+	// the-branch-head-builds among them, which is the one this token was minted
+	// for. A pattern wanting two spaces read none of them.
+	t.Run("a check whose name fills the column is still seen", func(t *testing.T) {
+		r := aTreeWithTheProcesses(t)
+		older, newer := twoOrdinaryTokens(t, r)
+		const long = "the-branch-head-builds"
+		aTokenDeciding(t, r, newer.ID, long)
+		aBatterySaying(t, r, aBatteryLine("go build", "ok     7s  ")+
+			aBatteryLine(long, "FAIL   4s  the head does not build"))
+		if red := TheRedChecks(r); len(red) != 1 || red[0] != long {
+			t.Fatalf("the red checks read as %v, and %s is the one that failed", red, long)
+		}
+		got := Pull(r, "worker-1", RoleWorker, Payload{})
+		if whatWasHanded(got) != newer.ID {
+			t.Fatalf("the queue handed %s, wanted %s, which names the red %s, before the older %s",
+				whatWasHanded(got), newer.ID, long, older.ID)
+		}
+	})
+}
+
+// AND THE COLUMN THE FIXTURE PADS TO IS THE ONE BATTERY.SH PADS TO.
+//
+// The cases above write their own battery output. A fixture is only worth the
+// format it copies, so the width is read back out of the printer rather than
+// trusted, and a battery that starts printing another shape reddens here.
+func TestTheFixtureIsPaddedTheWayTheBatteryPrints(t *testing.T) {
+	t.Parallel()
+	at := filepath.Join("..", "..", "util", "checks", "battery.sh")
+	said, err := os.ReadFile(at)
+	if err != nil {
+		t.Fatalf("%s cannot be read, so this guards nothing: %v", at, err)
+	}
+	if !strings.Contains(string(said), `printf '%-16s %s\n'`) {
+		t.Fatalf("%s no longer pads a check's name into a column sixteen wide, so "+
+			"aBatteryLine writes a shape no run of the battery leaves behind", at)
+	}
 }

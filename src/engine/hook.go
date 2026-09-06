@@ -927,6 +927,18 @@ func decidePreToolUse(g *guard, roots Roots, cfg Config, emergency Emergency, lo
 			g.deny(why)
 			return
 		}
+		// AND A STAGE CARRIES ONLY WHAT THIS TOKEN WROTE, judged against the
+		// token in this agent's hands. An agent holding nothing is refused the
+		// whole call a few lines further down, so there is nothing to judge.
+		// See stagestrangers.go.
+		for _, held := range InWorkFor(roots, actor) {
+			if why, refuse := AStageCarriesStrangers(roots, held.ID, ti.Command); refuse {
+				record(log, "engine", "commit", actor, "refused: a stage of a path this token never wrote", sessionlog.No(),
+					map[string]any{"tool": in.ToolName})
+				g.deny(why)
+				return
+			}
+		}
 	}
 
 	// A READ ALREADY HELD IS NOT PAID FOR TWICE.

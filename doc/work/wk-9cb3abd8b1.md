@@ -19,6 +19,14 @@ The staffing guard refuses every call while fewer hands are here than the queue 
 
 Narrow the staffing refusal to the two verbs that take new work, se_pull and se_claim. Every other call goes through while hands are short. The pressure to spawn stays on the act of taking work.
 
+## approach
+
+The refusal moves from every call to the two verbs that take new work.
+
+AStaffShortfall answers on se_pull and se_claim, and answers nothing on anything else. The wording it returns does not change, so a spawned agent reads the remedy it reads today.
+
+A session short of hands can then read, run, test, apply and diagnose. What it cannot do is take more work, which is where the pressure to spawn belongs.
+
 ## done when
 
 - A session short of hands is refused se_pull and is refused se_claim, and the refusal names spawning as the remedy as it does today.

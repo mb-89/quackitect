@@ -9,8 +9,10 @@ guidance: [[work-token]]
 title: Cloud boxes publish nothing
 # where the token stands. The process owns these values.
 status: open
+# true when this waits for a person rather than an agent
+needs_human: true
 claimed_by: f5927132/main
-claimed_at: "2026-09-06T10:29:31Z"
+claimed_at: "2026-09-06T10:43:35Z"
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - b5ff43e70a6427056eca2680caed0a9d76412bb1
@@ -66,4 +68,16 @@ Move the claim relay onto refs/heads/se-queue, the one namespace a cloud box can
 | [ ] | every criterion's command was run again, and what it said is named |  |  |
 | [ ] | every hunk improves the product, or a finding names the one that does not |  |  |
 | [ ] | every finding is a trivial token naming this one, and their ids are here |  |  |
+
+## approach
+
+The owner's design, 2026-09-06. Nothing is cut until they give the go.
+
+The split is by path rather than by branch. doc/work goes straight to trunk, always. src goes on a worker's own branch and lands after review. Two things at two speeds, and no second branch is built.
+
+The claim relay keeps its mechanism and changes its target. A commit is built with a bare index, as claim.go does now, and pushed to trunk instead of refs/se/claims. The working tree is never touched.
+
+refs/heads is the one namespace a cloud box can write. That was measured rather than assumed, so trunk is not a preference here.
+
+One thing must move with it. doc/work/archive.jsonl is one file every close appends to, and every close now pushes at once. One file per archived token removes that conflict by construction.
 

@@ -184,6 +184,19 @@ func answerFor(r Roots, actor, role string, p Payload) Answer {
 	if refused != nil {
 		return *refused
 	}
+	// UNBOUND TAKES THE QUEUE OFF, AND THE HAND-OUT IS THE QUEUE.
+	//
+	// A submission still settles above this. Closing work is the record rather
+	// than the queue, and unbound leaves the record standing.
+	//
+	// MEASURED, ON 2026-09-06. An unbound session closed one token and was
+	// handed another, which the stop judge then held it over.
+	if Unleashed(r) {
+		a := Answer{Pull: AnswerWait, Notice: theQueueIsOff}
+		a.Learned = learned
+		a.Notice += over + down
+		return a
+	}
 	a := whatComesNext(r, actor, role)
 	a.Learned = learned
 	a.Notice += over + down
@@ -256,6 +269,21 @@ func theNotesLeft(r Roots, actor string) Answer {
 
 // whatComesNext is the queue's answer to an actor with nothing in hand.
 func whatComesNext(r Roots, actor, role string) Answer {
+	// AN UNBOUND TREE HANDS OUT NOTHING, WHICH IS WHAT THE BUTTON SAYS IT DOES.
+	//
+	// Nothing in the pull path read the rung, so unbound turned off one thing:
+	// the staffing shortfall, so nobody was told to spawn. A person took the
+	// queue off to work on one thing and the next pull handed their agent
+	// something else. Naming a token still takes it up, which is how an unbound
+	// agent gets work.
+	//
+	// GOD IS NOT THIS. Every refusal is off there, and a queue that refused
+	// would be a new one. See unbound.go.
+	if LoadBinding(r).At == Unbound {
+		return Answer{Pull: AnswerWait, Notice: "The tree is unbound, so the queue hands out nothing. " +
+			"Take up the token you mean by naming it, with se work --on <id>. " +
+			"Put the tree back with se --bind bound and the queue answers again."}
+	}
 	// FINISHING UP DRAINS THE NOTES AND HANDS OUT NOTHING ELSE.
 	if LoadHold(r).Finishing() {
 		return theNotesLeft(r, actor)
@@ -1167,9 +1195,22 @@ func workNotice(t Token) string {
 		"Walk the checklist for this step and answer every line, then submit."
 }
 
+// theQueueIsOff is what an unbound pull answers. A person took the queue off
+// this tree, so the agent picks its own work and names it.
+const theQueueIsOff = "This tree is unbound, so the queue hands out nothing. " +
+	"Work what the person asked for. Take a token by naming it: se claim --these <id>."
+
 // AskToStop refuses once when the actor holds work it could still do, and
 // names it, so a stop is a decision rather than a drift.
+//
+// UNBOUND TAKES THE QUEUE OFF, AND THIS IS THE QUEUE ARGUING.
+//
+// The queue did not choose this work and will not choose the next. So it has
+// no standing to hold a session over what that session is holding.
 func AskToStop(r Roots, actor string) Ruling {
+	if Unleashed(r) {
+		return Ruling{}
+	}
 	var mine []string
 	for _, t := range Tokens(r) {
 		if t.Ended() || t.Holder != actor {

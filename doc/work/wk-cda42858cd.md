@@ -6,25 +6,23 @@ process: [[trivial]]
 # the rules for filling this token
 guidance: [[work-token]]
 # the name this token is known by, in references and in links
-title: branch head misses fixtures
+title: Two guards one rule
 # where the token stands. The process owns these values.
 status: open
 ---
 
 ## detail
 
-A clone of the branch cannot build the engine's tests. Committed test files call aTreeWithTheProcesses and aTreeWithAnEchoingCheck, and at the head nothing defines either: both live in src/engine/fixture_test.go, which is on this box and in no commit.
+pull.go asks Unleashed twice for one rule. Line 194, in answerFor, came from wk-8797959d3c. Line 272, in whatComesNext, came from wk-b750954b82. Two boxes fixed the same defect at the same hour and both cuts merged cleanly. Nothing is broken and every unbound test is green. But one rule with two writers is the fault this project keeps finding, and the next hand reading either site will not know the other is there.
 
-Measured at head ae4a7cc7 in a detached worktree, with nothing overlaid: go test -run TestARationaleIsNamedNotRepeated answers "undefined: aTreeWithTheProcesses" from archivedreadsclosed_test.go, askedisgranted_test.go, authornotreviewer_test.go and challenge_test.go, and "undefined: aTreeWithAnEchoingCheck" from checkengine_test.go.
+## proposed action
 
-The move of the fixtures into one file landed as a commit that deleted the old definitions and an untracked file that holds the new ones. util/checks/the-branch-head-builds is the check that answers this question, and it is failing for every box that has only the branch.
-
-Found while working wk-913908cbd1, which had to overlay this tree's uncommitted work to run a test at all.
+Keep the cut that sits closest to the queue and drop the other. Leave one comment naming what unbound turns off, so a reader finds the whole rule at one site.
 
 ## done when
 
-- a detached worktree of the branch head builds the engine's tests, decided by: git worktree add --detach /tmp/head HEAD and go test -count=1 -run TestNothingAtAll ./src/engine
-- node util/checks/the-branch-head-builds.mjs . exits 0
+- src/engine/pull.go asks Unleashed at one site for the hand-out, decided by: se find with regex Unleashed over path src/engine/pull.go returns two hits, the hand-out and AskToStop.
+- TestAnUnboundPullIsHandedNothing and TestUnboundTakesTheQueueOffEveryPathThatIsTheQueue both pass, decided by: se test naming both.
 
 ## evidence: step 1. ask
 

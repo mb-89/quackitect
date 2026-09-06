@@ -46,6 +46,11 @@ func TestEveryCommandARefusalOffersIsAdmitted(t *testing.T) {
 	} else {
 		refusals["a helper stopping with work in hand"] = why
 	}
+	// A STAGE OF A STRANGER'S PATH IS A REFUSAL WITH A MENU TOO, and its menu
+	// stands beside a list of paths and a shell door, so this proves the reader
+	// picks the engine's line out of the three. See stagestrangers.go.
+	refusals["a stage of a stranger's path"] = aStageOfAStrangersPath("wk-1111111111",
+		[]string{"src/engine/lint.go"}, []string{"src/engine/gate.go"})
 	refusals["the stop challenge"] = TheChallenge(StopClaim{Because: "blocked", Why: "it waits"}, 1,
 		[]Token{{ID: "wk-1111111111", Title: "held"}})
 
