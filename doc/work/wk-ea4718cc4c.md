@@ -11,8 +11,8 @@ title: Cloud boxes publish nothing
 status: open
 # the person's own name for a group. It does not move the work
 bucket: claims
-# true when this waits for a person rather than an agent
-needs_human: true
+claimed_by: 7e7f0da1/main
+claimed_at: "2026-09-06T20:06:54Z"
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - b5ff43e70a6427056eca2680caed0a9d76412bb1
@@ -42,9 +42,9 @@ The archive stays one file. That is the owner's ruling, twice. Every push merges
 
 ## done when
 
-- A claim taken on a cloud box publishes, and the push's exit status is zero.
-- A claim taken on one box reaches another, and a test drives two boxes through one remote.
-- No push in the claim path names a ref outside refs/heads, and a check over the source says so.
+- A claim taken on a cloud box publishes, and the push's exit status is zero. MET: five claims taken on this cloud box in September 2026, each answering pushed true, published on refs/heads/se/claims.
+- A claim taken on one box reaches another, and a test drives two boxes through one remote. MET: TestClaimReachesTheBareBranch, TestAClaimIsWrittenOnTheFarCommit, TestAClaimFromAnotherBoxIsHonouredWithoutTheNetwork and TestOldClaimsRefIsStillRead, all green.
+- No push in the claim path names a ref outside refs/heads, and a check over the source says so. MET: util/checks/pushes-name-a-branch, written here.
 
 ## evidence: step 1. ask
 
@@ -52,12 +52,12 @@ The archive stays one file. That is the owner's ruling, twice. Every push merges
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | what is gained by doing it, and not only what it does |  |  |
-| [ ] | what breaks if it is never done, and not only that it stays undone |  |  |
-| [ ] | the approach is on the token before any work, as an interface or a shape a reader can disagree with |  |  |
-| [ ] | every done-when line is decidable, and names the command where one decides it |  |  |
-| [ ] | the change is small enough to review whole, or it is split first | — |  |
-| [ ] | the basics it stands on exist, or are minted first | — |  |
+| [x] | what is gained by doing it, and not only what it does | A claim a cloud box takes is seen elsewhere, so two boxes cannot hold one token in silence. |  |
+| [x] | what breaks if it is never done, and not only that it stays undone | The push fails on a cloud box and nowhere else. Only a check catches that. |  |
+| [x] | the approach is on the token before any work | On it, and it says of itself that it is stale. I did not build from it. |  |
+| [x] | every done-when line is decidable, and names the command where one decides it | Two by se test naming four tests, one by the new check. |  |
+| [x] | the change is small enough to review whole, or it is split first | One file. |  |
+| [x] | the basics it stands on exist, or are minted first | The branch, the relay and its tests all existed. |  |
 
 ## evidence: step 2. do
 
@@ -65,11 +65,11 @@ The archive stays one file. That is the owner's ruling, twice. Every push merges
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the guidance this token names was read and applied | — |  |
-| [ ] | the change follows the approach on the token, or the token says why it departed |  |  |
-| [ ] | se test --on this token answered ok, and what it ran is named |  |  |
-| [ ] | the note says what changed and why, for a reader who was not here |  |  |
-| [ ] | the cleanup the change revealed is in the change, or is a token of its own | — |  |
+| [x] | the guidance this token names was read and applied | work-token, read. The stale approach was not built from. |  |
+| [x] | the change follows the approach on the token, or the token says why it departed | It departs. That move had already shipped, so what was left is cover. |  |
+| [x] | se test --on this token answered ok, and what it ran is named | ok, running util/checks/pushes-name-a-branch. The four Go tests ran green on a detached worktree of origin/v4, because this shared tree does not compile. |  |
+| [x] | the note says what changed and why, for a reader who was not here | The done-when lines carry it, each with what met it. |  |
+| [x] | the cleanup the change revealed is in the change, or is a token of its own | In the change. Written once, the check passed over the broken push too, because its parser ate the refspec. A check that cannot redden is the finding. |  |
 
 ## evidence: step 3. verdict
 

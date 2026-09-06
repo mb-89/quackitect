@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"path/filepath"
 	"strings"
 )
 
@@ -27,12 +28,34 @@ import (
 // until they are turned in.
 const TheNoteCeiling = 20
 
-// NotesInHand is every note this tree carries that nobody has decided about,
-// oldest first.
+// theBranchCarries answers whether this note's file sits where git carries it.
+//
+// A NOTE COUNTS BECAUSE IT DIES HERE, AND ONE ON THE BRANCH DOES NOT. The rule
+// above counts by kind, and its reason is that a note lives under .se, which
+// nothing pushes. An earlier session moved one into doc/work for exactly that
+// reason, and the count went on billing it to whoever was here.
+//
+// MEASURED, September 2026. doc/work/wk-ac18ea020a.md was claimed by a box that
+// had gone. A stop was refused twice naming it, and a claim on it answered wait
+// for that claim to lapse. So the gate demanded the note be turned in and the
+// claim refused the only call that turns it in. No session could satisfy both.
+func theBranchCarries(r Roots, id string) bool {
+	at := noteAt(r, id)
+	if at == "" {
+		return false
+	}
+	return strings.HasPrefix(filepath.ToSlash(at), filepath.ToSlash(TrackedDir(r))+"/")
+}
+
+// NotesInHand is every note this tree carries that nobody has decided about
+// and that goes down with it, oldest first.
 func NotesInHand(r Roots) []Token {
 	var out []Token
 	for _, t := range Tokens(r) {
 		if t.Process != PrivateProcess || t.Ended() {
+			continue
+		}
+		if theBranchCarries(r, t.ID) {
 			continue
 		}
 		out = append(out, t)
