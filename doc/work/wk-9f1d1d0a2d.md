@@ -11,17 +11,19 @@ title: engine answers its calls
 status: done
 # who did the work step, so the verdict is never theirs
 author: worker-linden
-claimed_by: 547b9365/worker-linden
-claimed_at: "2026-09-05T20:00:34Z"
+claimed_by: ae61c33c/reviewer-cedar
+claimed_at: "2026-09-06T08:41:18Z"
 # the token this is a part of. It cannot close while this is open
 parent: [[wk-3b2bb11243]]
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - 3caf4baa01d13479a3f95ce4dc7059b308f9dc28
   - 137a7833de6567374ffaaa3bb57aee76fa3c98c0
+  - 76d5bb03ea97e3bc2b4ca3ed92d4b521c472379e
 # the tree each time the work was put down or closed, snapshots the engine wrote
 ended:
   - 9e53f4bbd2efae9ea9f5656c7be375d34281bc1e
+  - a33402397a5663a91cbef35b1d96e788fca9e5b6
 ---
 
 ## detail
@@ -91,11 +93,11 @@ The catalog names the call that fetches it, so a caller holds one list and the e
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | [[reviewing]] was read and applied | — |  |
-| [ ] | every hunk of git diff began..ended was read, and any not read is named |  |  |
-| [ ] | every criterion's command was run again, and what it said is named |  |  |
-| [ ] | every hunk improves the product, or a finding names the one that does not |  |  |
-| [ ] | every finding is a trivial token naming this one, and their ids are here |  |  |
+| [x] | [[reviewing]] was read and applied | Read whole. Candidates written first, then cut. | reviewing |
+| [x] | every hunk of git diff began..ended was read, and any not read is named | Three hashes: could not get object info. Read at HEAD, 13e2594f, four files, every hunk, none skipped. | 13e2594f |
+| [x] | every criterion's command was run again, and what it said is named | One, two and four green. Three reproduces: flag provided but not defined: -form. Five refused the shell, so engine-args and lane-carries-every-flag ran green. | 5 of 5 |
+| [x] | every hunk improves the product, or a finding names the one that does not | All 32 builders agree with their entries, --process note included. | 32 builders |
+| [x] | every finding is a trivial token naming this one, and their ids are here | wk-cd08a23a48: neither test compares argv, only names. | wk-cd08a23a48 |
 
 ## approach
 

@@ -113,6 +113,18 @@ mkdirSync(join(work, ".se"), { recursive: true });
 const hook = (body) => execFileSync(se, ["hook", "--method", root, "--work", work],
   { input: JSON.stringify(body), encoding: "utf8" });
 
+// AND WHAT THIS STARTS, THIS STOPS. A hook over a folder with no engine starts
+// one, and it outlives the run. Five were left behind before this line existed,
+// each holding the shared index, and every test run on the box answered
+// "database is locked" for a quarter of an hour.
+process.on("exit", () => {
+  try {
+    execFileSync(se, ["--work", work, "--stop"], { encoding: "utf8", timeout: 10000 });
+  } catch {
+    // A folder that never had one is nothing to stop, and this is the last word.
+  }
+});
+
 // THE VALUE IS READ OFF THE STORE THE ENGINE WROTE, because asking it takes a
 // running engine over this folder and the guard needs none.
 const stored = key.replace(tree.name + ".", "");
