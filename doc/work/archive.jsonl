@@ -372,3 +372,5 @@
 {"id":"wk-b5c68d2bbf","title":"desk token never pushed","process":"trivial","disposition":"done","blob":"2be221c7ccb32e2a7cb82d9bf82f6412fd9da5dd","on_branch":"2bfffc752ace0573aea4e7af4a43478b6daf7446"}
 {"id":"wk-ba5b3feb23","title":"branch head misses fixtures","process":"trivial","disposition":"done","blob":"afe14c8e2bc09375a491385a58b8d73021365478","on_branch":"6a2818f9e848ca02c6ebf765c3329c811859e373"}
 {"id":"wk-b750954b82","title":"unbound queue hands work","process":"trivial","disposition":"done","blob":"e8cc48e5c68801cb982e002a41aac1d871b1eb22","on_branch":"6c263df1b6ade915515c4de6bbf675763e86a3d2"}
+{"id":"wk-fc22efd280","title":"rank misses long checks","process":"trivial","disposition":"done","blob":"3b7ae29ce1035b70a40529e4071451f6577ba890"}
+{"id":"wk-2bdf00344e","title":"every retro test fails","process":"trivial","disposition":"done","blob":"5bf250bd367a349638f32a748dbc4911afcb0c6e"}
