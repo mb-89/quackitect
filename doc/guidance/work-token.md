@@ -50,7 +50,6 @@ Keep the argument out of it: no history, no measurement of the record, no accoun
 
 A detail says what has to become true and names the constraint.
 Where the write goes is the worker's decision.
-Before a detail names a file and a line, run the tree's checks against it on a copy.
 
 A tracked token spends real work, so the ask says what is gained and what breaks if nobody does it.
 Both fail the same way, by restating the ask, so each carries evidence beside it.
@@ -73,7 +72,21 @@ Where the answer touches another token, name its status and holder.
 Two criteria once carried identical commands, so whatever made the first green made the second green.
 Pull the commands and their run patterns out of a draft and compare them for repeats.
 So every command runs from the root before submitting, exit zero or a stated reason, pointing at the instrument held until its owner replaces it.
-A draft obeys the class it commits, and names a walk the tree already has rather than retyping it.
+
+### Naming a go test
+
+go test -run over a pattern answers ok and exits zero when the pattern matches nothing.
+Measured: on a tree carrying neither test, `go test -C src/engine -run 'ACancelledContextEndsAGitCall|ACancelledContextEndsTheProbe' ./...` answered `ok quackitect/engine 3.551s [no tests to run]`, exit 0.
+So a criterion written that way stays green after either test is renamed or deleted.
+
+se test names every proposal it could not reach under unreached, and ok stays true when it does.
+So the criterion reads unreached rather than ok alone:
+
+```
+./RUNME.sh test --on <id> --propose TestTheThingItDecides | jq -e '.ok and ((.unreached // []) | length == 0)'
+```
+
+Run it as written, then with a letter added to the name, and the second run is its red.
 
 ### Naming a go test
 
@@ -97,7 +110,6 @@ The second run is the one that proves the criterion can go red.
 ## 4. What a check may match on
 
 A two-part guard pairing a search for a definition with a run of the test, naming different symbols, fails shut.
-So the guard is run against the artefact before submitting.
 A boundary in what the check cannot hold falls to a prefix that never fails, so a length is a number.
 Rendered text is no handle: a template holds no text to match, so the durable handle is the producer's name.
 
@@ -120,7 +132,6 @@ Tracked is doc/work, which git carries, so another box can claim it.
 Local is .se/work, which nothing else reaches.
 The question is who can pick it up, not how big it is.
 
-The reference runs one way.
 A cloud box reads the tree out of git, where .se/work is not, so a local id there is a broken link.
 A local token naming a tracked one is fine.
 
@@ -135,10 +146,9 @@ A question costs a turn, and a guess at an ambiguous ask costs the work and the 
 A check that arrives green has proved nothing about the defect.
 Watched going red for the reason expected, it proves the defect was there and the check can see it.
 One that cannot be made red is a finding about the criterion, and it goes on the token first.
-So each criterion's red names the test it runs, its message matches an assertion in the tree, and a split-out criterion earns a fresh red.
+A split-out criterion earns a red of its own.
 
 A build failure is not that red.
-The package is Go's compilation unit and many hands share this tree, so one half-finished change reddens every test file at once.
 So a failing check lands with the identifiers it names, as stubs.
 Why the engine answers such a package as a build, and names the hand that wrote it, is [[workers-share-one-tree]].
 
@@ -147,7 +157,6 @@ Why the engine answers such a package as a build, and names the hand that wrote 
 A detail names two parts and says neither is enough alone.
 The producing half is built and evidenced, the checking half is not, and nothing looks wrong until it is.
 Ask which half has no output: that is the one that will be missing.
-A rule taught to one half of a mirrored pair is the same defect.
 A field the second half ignores is refused rather than accepted.
 
 ## 14. Evidence
@@ -156,7 +165,6 @@ An observation names the check and what it said, never a line number, because a 
 A number carries the command that produced it, written beside it as it is taken.
 Both halves of a ratio come from the one instrument the code reads, and a half that cannot says so beside the number.
 A reading pins to a commit, never to the word today.
-Before submitting, every command runs again with its fresh answer beside what was written.
 
 ## 15. A checklist is not a formality
 
