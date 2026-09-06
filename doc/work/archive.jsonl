@@ -324,3 +324,5 @@
 {"id":"wk-e318448216","title":"schema denies the claim","process":"trivial","disposition":"done","blob":"97f8a765146bda6641974619e5e134b2f27c423d"}
 {"id":"wk-d7629cc9af","title":"head tests half landed","process":"trivial","disposition":"done","blob":"5d5f5c29d3bbdbce79f72e81834e50700d5805e7","on_branch":"b4b625f37ff5a90d70caa5176775bf513b43d638"}
 {"id":"wk-00e4785e51","title":"three git tests flake","process":"trivial","disposition":"done","blob":"09efd227d78370340ef3524a4650a65fffd82eac"}
+{"id":"wk-2e9721e324","title":"lint reads formatting too","process":"trivial","disposition":"done","blob":"8ea399cde01721428a8bc33aa9f8454794af20d3"}
+{"id":"wk-c6e5db7c51","title":"lint reads work tokens","process":"trivial","disposition":"done","blob":"32a427277a772817e48b1e561b2a3159d933c594","on_branch":"13fadff07d092ab91c375a01e64d13a6fd996a98"}
