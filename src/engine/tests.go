@@ -629,6 +629,11 @@ func runChosen(r Roots, db *sql.DB, tests []aTest, picks []chosen) ([]ran, strin
 	}
 	var out []ran
 	bins := map[string]string{}
+	// WHAT THE BUILD SAID, KEPT BESIDE THE BINARY IT COULD NOT MAKE. The build
+	// runs once a folder, and the second test chosen there was answered from an
+	// empty binary and nothing else. So it named no file and no hand, and which
+	// answer carried the break depended on which test came first.
+	broke := map[string]string{}
 	engine, engineSaid, engineStale, engineKnown := "", "", "", false
 	for _, p := range picks {
 		t := byID[p.ID]
@@ -640,14 +645,15 @@ func runChosen(r Roots, db *sql.DB, tests []aTest, picks []chosen) ([]ran, strin
 				b, err := coverBinary(r, db, dir)
 				if err != nil {
 					// A PACKAGE THAT WILL NOT COMPILE IS NO RED. See nored.go.
-					out = append(out, aBuildFailure(r, t.ID, dir, err.Error()))
+					broke[dir] = err.Error()
+					out = append(out, aBuildFailure(r, t.ID, dir, broke[dir]))
 					bins[dir] = ""
 					continue
 				}
 				bin, bins[dir] = b, b
 			}
 			if bin == "" {
-				out = append(out, aBuildFailure(r, t.ID, dir, ""))
+				out = append(out, aBuildFailure(r, t.ID, dir, broke[dir]))
 				continue
 			}
 			if !engineKnown {
