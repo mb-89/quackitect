@@ -1,3 +1,4 @@
-{"id":"wk-08194db257","title":"Approach written for others","process":"trivial","disposition":"done","tag":"refs/tags/archive/wk-08194db257"}
-{"id":"wk-819e42bec6","title":"Say why refs failed","process":"trivial","disposition":"done","tag":"refs/tags/archive/wk-819e42bec6"}
-{"id":"wk-8797959d3c","title":"Unbound stops at staffing","process":"standard","disposition":"done","tag":"refs/tags/archive/wk-8797959d3c"}
+{"id":"wk-08194db257","title":"Approach written for others","process":"trivial","disposition":"done","blob":"0076aadc7374f33444ee52c7ece952d9672e9286","on_branch":"76e066437a89be16b3a6d2afee3a2c148f8abf4c","tag":"refs/tags/archive/wk-08194db257"}
+{"id":"wk-1da1791ba0","title":"guidance runs past bounds","process":"trivial","disposition":"done","blob":"39642620fe940f603823921f194b137101c9a1eb","on_branch":"d97f20ae072245d3fb1bf2ffd430a17d8a4605dd"}
+{"id":"wk-819e42bec6","title":"Say why refs failed","process":"trivial","disposition":"done","blob":"5fa155bdf767d3b7c46e52eb8684b2fb71d2322f","on_branch":"949e9bdbbf1286578a05f08d93be09daae2a4d28","tag":"refs/tags/archive/wk-819e42bec6"}
+{"id":"wk-8797959d3c","title":"Unbound stops at staffing","process":"standard","disposition":"done","blob":"bb2d133815b635775aa88af0ff8bdb1c4cabe1b1","on_branch":"d38a937058457a29f271d44c6c5134545891d5c8","tag":"refs/tags/archive/wk-8797959d3c"}
