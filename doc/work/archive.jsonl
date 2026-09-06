@@ -164,6 +164,7 @@
 {"id":"wk-a463727d87","title":"undo forgets after text","process":"trivial","disposition":"done","blob":"d4ca77ecadbd232e53a53c4351d3ba28fb76df39","on_branch":"47421858c46d3b2686ac25c24a16dd1c6ae7f30f"}
 {"id":"wk-a46c014566","title":"Trial claims relay","process":"standard","disposition":"done","blob":"2e37fbb1946e7c747acad2595c00cd7745ced815","on_branch":"d1b27b3e05a8ec054cb86da680e71dc71e467018"}
 {"id":"wk-a4c80456c2","title":"a machine proves sound","process":"","disposition":"","on_branch":"b4db8068a390195c68e02c13c53642b06eec8c37"}
+{"id":"wk-a82935e32b","title":"activity counts as working","process":"trivial","disposition":"dropped","blob":"522ad1e873f24692ecdd5b653f78f538e7b8d5c9","on_branch":"95bf73c111427c525a450be8da73b330c2b9a107"}
 {"id":"wk-a8a9ceb587","title":"private writes prove nothing","process":"trivial","disposition":"done","blob":"1333593143064fad4bed5970dba6ea9df6c737cb","on_branch":"d00fda331a807dc660b9d5716bb825ba06362bba"}
 {"id":"wk-aae03d4767","title":"the bar filters rows","process":"","disposition":"","on_branch":"6f811c940dacb3b4e61f05f8f4cd30e74855ae6f"}
 {"id":"wk-ac18ea020a","title":"verdict for wk-fc6b6c5aa7","process":"note","disposition":"dropped","blob":"f8ad478df11ea8d985826a01be0cb3af54d98702","on_branch":"f694302353888200f2589d4ddd413f6e55cc1c4d","tag":"refs/tags/archive/wk-ac18ea020a"}
