@@ -307,6 +307,7 @@
 {"id":"wk-ac0442ba84","title":"onetree test reads log","process":"trivial","disposition":"done","blob":"d2fbe52d0eb2629da8b1f50de98e4f14b79900b9","on_branch":"238fd0e4212f170e55a7f2a3398cd5cb4c1ecb89"}
 {"id":"wk-ac18ea020a","title":"verdict for wk-fc6b6c5aa7","process":"note","disposition":"dropped","blob":"f8ad478df11ea8d985826a01be0cb3af54d98702","on_branch":"f694302353888200f2589d4ddd413f6e55cc1c4d","tag":"refs/tags/archive/wk-ac18ea020a"}
 {"id":"wk-ae1d1b746e","title":"two panes one scroll","process":"trivial","disposition":"done","blob":"536c372295aea99c72535d1a6431343c7ed9466c","on_branch":"536c372295aea99c72535d1a6431343c7ed9466c","tag":"refs/tags/archive/wk-ae1d1b746e"}
+{"id":"wk-ae2ac9d15f","title":"a stage carries strangers","process":"trivial","disposition":"done","blob":"354686bee8fa8c374806d5c55de1d07faa688466","on_branch":"dc0ab1ebfc27cf11727b83ba0247274f42da85cc"}
 {"id":"wk-b008bfaa16","title":"hook server ignores context","process":"trivial","disposition":"done","blob":"e4dd126098d0ab6070f9a0267aff7ed215e214e1","on_branch":"2b73916c6adfbcff9ff53382e4ce21c69211f33c"}
 {"id":"wk-b13ade88e2","title":"a commit stages itself","process":"","disposition":"","on_branch":"d0077cbe6c521a460740b9f105f6f13f5aaeb8d0"}
 {"id":"wk-b1d1bdcee7","title":"seven rows reach nothing","process":"trivial","disposition":"done","blob":"1218dbcdb509695b9c2655a7dc93ad0adfcad24f","on_branch":"1456dc14f92ed98195ae1ea38c3ae918fa17618a"}
