@@ -6,38 +6,38 @@ process: [[trivial]]
 # the rules for filling this token
 guidance: [[work-token]]
 # the name this token is known by, in references and in links
-title: the clone never moves
+title: uncovered cannot see shell
 # where the token stands. The process owns these values.
 status: open
 # the person's own name for a group. It does not move the work
 bucket: claims
+claimed_by: 7e7f0da1/worker-sorrel
+claimed_at: "2026-09-06T20:57:54Z"
+# the tree each time the work was taken up, snapshots the engine wrote
+began:
+  - 25a07a89a40f0bd6dd2d44e76d8874d776e3013e
 ---
 
 ## detail
 
-util/git/land.sh pushes into a worktree of the branch tip and never moves this clone. So the working tree always reads dirty, whatever has been pushed, and the clone's HEAD stays where the box woke.
+se test answers uncovered for every changed file no test reaches. The reach it consults is test_region, and test_region is filled from Go coverage profiles, which describe Go statements only. So a shell script can never appear there, and every change to one is reported uncovered whatever tests drive it.
 
-WHAT THAT COST TODAY, three times over.
+MEASURED: se test --on wk-fcdadf13cb, over a change to util/git/land.sh carried by three Go tests that run that script end to end against a real bare origin, answered ok true and uncovered ["util/git/land.sh"].
 
-One, the stop hook's git check said there are uncommitted changes on every single stop of a long session. It is structurally always red on a box that lands through the push door, so it teaches an agent to wave it through. On the last stop it was right, and one file a reviewer had written was genuinely unpushed.
-
-Two, every count taken against HEAD is wrong. This box reported closing thirty-nine tokens when it had closed twenty-three, because HEAD was sixteen commits behind the tip the session started from.
-
-Three, the queue's pass-over notice blames a lag that is partly this. See wk-c5bc8a31b0.
-
-MEASURED, September 2026: origin/v4 at cc7d66b, this clone still at 95b9423, with nothing of value unpushed.
+An uncovered line that is structurally true of a whole language teaches the reader to skip the field, which is the same wearing-out that made the stop hook's git line worthless.
 
 ## proposed action
 
-After a push lands, land.sh brings the clone up to what it pushed, so the tree matches the branch. A fast-forward where the working tree is otherwise clean of it, and a plain fetch where it is not.
+Keep a file out of uncovered when its language has no coverage profile. Where it stays, say why in words that do not read as a missing test.
 
-Then git status means something again, HEAD is the right baseline for a count, and a dirty tree is news.
+## approach
+
+The decision is at src/engine/tests.go:379, where a delta entry no test_region row reaches is appended to Uncovered. Read what languages fill test_region, and gate that append on the changed file being one a profile can describe.
 
 ## done when
 
-- after a successful land, git rev-parse HEAD equals the commit land.sh reported pushing
-- a land whose paths were the only changes leaves git status clean
-- a land leaves any file it was not given exactly as it found it, and a test drives that
+- a change to a shell script that a go test drives is not reported uncovered, decided by: se test over a delta holding only util/git/land.sh answering an empty uncovered
+- a change to a go file that no test reaches is still reported uncovered, decided by a test that drives both halves
 
 ## evidence: step 1. ask
 

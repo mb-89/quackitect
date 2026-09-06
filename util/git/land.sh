@@ -19,6 +19,35 @@ cd "$(git rev-parse --show-toplevel)" || exit 1
 P=""
 [ -f .se/scratchpad/proxy.sh ] && P=$(sh .se/scratchpad/proxy.sh)
 [ -n "$P" ] && export HTTPS_PROXY="$P" https_proxy="$P"
+# THE CLONE FOLLOWS WHAT IT PUSHED. Left where the box woke, its HEAD is the
+# wrong baseline for every count taken against it, and git status reads dirty
+# whatever has landed, so the stop hook's uncommitted-changes line is red on
+# every stop and an agent learns to wave it through.
+#
+# The paths just landed are staged first. They already hold the pushed content,
+# and git refuses to fast-forward over a file it sees as dirty, so without this
+# the fast-forward is refused by the very change that was landed. Nothing else
+# is staged, and a refused fast-forward puts them back where they were: a file
+# this land was not given is left exactly as it was found, dirty or not.
+catchup() {
+  new="$1"; shift
+  for p in "$@"; do
+    if [ -f "$p" ]; then
+      git add -- "$p"
+    else
+      git rm --quiet --cached --ignore-unmatch -- "$p" >/dev/null 2>&1
+    fi
+  done
+  if git merge --ff-only "$new" >/dev/null 2>&1; then
+    echo "CLONE AT $(git rev-parse --short HEAD)"
+    return 0
+  fi
+  for p in "$@"; do
+    git restore --staged -- "$p" >/dev/null 2>&1
+  done
+  echo "CLONE LEFT AT $(git rev-parse --short HEAD), holding changes this fast-forward would overwrite"
+}
+
 wt=/tmp/land-$$
 for i in 1 2 3 4 5; do
   git fetch origin v4 >/dev/null 2>&1 || { sleep 5; continue; }
@@ -38,9 +67,11 @@ for i in 1 2 3 4 5; do
   fi
   git -C "$wt" commit -q -m "$msg" || { echo "COMMIT REFUSED"; exit 2; }
   if git -C "$wt" push origin HEAD:v4 >/dev/null 2>&1; then
+    landed=$(git -C "$wt" rev-parse HEAD)
     echo PUSHED
     git -C "$wt" log --oneline -1
     rm -rf "$wt"; git worktree prune
+    catchup "$landed" "$@"
     exit 0
   fi
   sleep 3
