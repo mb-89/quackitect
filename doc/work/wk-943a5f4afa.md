@@ -8,12 +8,17 @@ guidance: [[work-token]]
 # the name this token is known by, in references and in links
 title: event guard reads two
 # where the token stands. The process owns these values.
-status: open
-claimed_by: aeaf7bd9/worker-borromini
-claimed_at: "2026-09-06T09:24:25Z"
+status: closed
+# who did the work step, so the verdict is never theirs
+author: worker-borromini
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - 406e85261765f111d879a1f124ab3bc2d6eb4a7d
+# the tree each time the work was put down or closed, snapshots the engine wrote
+ended:
+  - 2bd98333b146c0b69fac144a7e38f2b41214fe7a
+# how it ended. Only an ended token carries one.
+disposition: done
 ---
 
 ## detail
