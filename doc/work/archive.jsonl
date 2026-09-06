@@ -306,3 +306,12 @@
 {"id":"wk-faeaddd8a7","title":"a stale engine rebuilds","process":"trivial","disposition":"done","blob":"dc5581243fa95485e2d09c2c0414982341c5a52c","on_branch":"dc5581243fa95485e2d09c2c0414982341c5a52c","tag":"refs/tags/archive/wk-faeaddd8a7"}
 {"id":"wk-fc6b6c5aa7","title":"restart silences every guard","process":"standard","disposition":"done","blob":"bd0690b9edf02fd5eda1d51ae33b11d79175afcf","on_branch":"1613224944abb698d38468b2f36670f3e5bc4e26","tag":"refs/tags/archive/wk-fc6b6c5aa7"}
 {"id":"wk-ff6f0d8b1e","title":"mint takes done when","process":"trivial","disposition":"done","blob":"71719ca63c72ecb61e30e873c615cf234451c471","on_branch":"71719ca63c72ecb61e30e873c615cf234451c471","tag":"refs/tags/archive/wk-ff6f0d8b1e"}
+{"id":"wk-07c2d80710","title":"engine git finds proxy","process":"trivial","disposition":"done","blob":"4a431ffa869ee98ad7796761a95c713e828ca8ba"}
+{"id":"wk-19c445440b","title":"restart strands the proxy","process":"trivial","disposition":"done","blob":"8d7f7037d95a3c375224456de8cfc5dba682268b"}
+{"id":"wk-2b8f45c1e7","title":"the ask answers why","process":"standard","disposition":"done","blob":"a4700842156e97cc3fb43e9ee09142e337e393e0","on_branch":"17de341088712da3ca3eb192ee774a7cef85cf71"}
+{"id":"wk-5295173471","title":"god mode drops itself","process":"standard","disposition":"done","blob":"76be9bebd9f0a535980dbb91726cabf30290bc38","on_branch":"8812ea5d75ace1e9fd00ef7e4ad7cf2ff59e4db1"}
+{"id":"wk-6a0b7f2d38","title":"one filter reader","process":"standard","disposition":"became","blob":"379f36e9cd588900c6621b933a4777ef8e27054a","on_branch":"f1892c90ea2ef56808f8008435e5c77ea2e481ec"}
+{"id":"wk-7a498f6a2b","title":"over-bound note strands","process":"trivial","disposition":"done","blob":"e08daa6bc9ac45c784e491cfcb98f5fa49c1cddb","on_branch":"2cd9d419b8c5508caf30a7c7660726dff3277c83"}
+{"id":"wk-7c41d9e206","title":"red first blocks everyone","process":"standard","disposition":"done","blob":"82ceca021e06bda0ace4fd6eb3e998a4641fcda4","on_branch":"dbb6f79626f167209688fec043a66a647f8924f9"}
+{"id":"wk-8c3c71d77d","title":"snapshots do not travel","process":"standard","disposition":"done","blob":"1725ada59ecde6265a60d23c47e31e9196d3893e","on_branch":"0daf092004daab199bbb62e8ea24e2888595bde8"}
+{"id":"wk-8ec7483730","title":"one lint one format","process":"standard","disposition":"done","blob":"7b16085e94b55e88bba9094a876df934abcd11ac","on_branch":"2b7f56add6c7b0250cbcf8a2d249177748301aef"}
