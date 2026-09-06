@@ -1413,8 +1413,8 @@ func decideStop(g *guard, roots Roots, cfg Config, log *sessionlog.Log, in hookI
 	// rather than the engine's, and they are enforced above that other check for
 	// exactly that reason. The stop hook is the engine's own rule, so it goes.
 	//
-	// UNBOUND IS UNTOUCHED. It keeps the claim and the argument, and only the
-	// queue stops being a reason to refuse a stop.
+	// UNBOUND IS UNTOUCHED. It keeps the claim, and only the queue stops being a
+	// reason to refuse a stop.
 	if NoGuardsAtAll(roots) {
 		record(log, "agent", "stop", actor, "stopped: god is on, and the engine argues with nobody",
 			sessionlog.Yes(), map[string]any{"at": string(God)})

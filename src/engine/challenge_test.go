@@ -62,50 +62,11 @@ func TestTheRefusalAsksBeforeItLists(t *testing.T) {
 	}
 }
 
-// THE PERSON'S WORD IS NOT ARGUED WITH.
+// THE PERSON'S WORD IS HELD WHERE EVERY REASON IS.
 //
 // THE OWNER'S WORDS: if the user tells you that you stop, I don't give a shit
 // about your sub tokens. You stop.
 //
-// Every other reason is the agent's own judgement, and the engine tests that by
-// pushing back twice. asked is not the agent's judgement, so pushing back tests
-// the person, which the engine has no business doing. An agent told to stop
-// claimed asked, the engine asked whether asked was the nearest of five words,
-// and the person watched it take another turn to say yes.
-//
-// IT IS HELD HERE BECAUSE NOTHING HELD IT. The rule was written into the stop
-// decision and the tests around it went on claiming asked while asserting an
-// argument, so the carve-out and its own coverage were the same three tests
-// pulling opposite ways.
-func TestThePersonsWordIsNotArguedWith(t *testing.T) {
-	r := aTreeWithTheProcesses(t)
-	log, err := sessionlog.Open(r.Private("log"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer log.Close()
-	record(log, "engine", "start", "engine", "engine started", sessionlog.Yes(), nil)
-
-	// WORK IS IN HAND, which is the only thing the engine ever argues with. Any
-	// other reason would be pushed back on twice here.
-	tok := mintStandard(t, r, "work being interrupted")
-	if _, err := TakeUp(r, tok.ID, "main"); err != nil {
-		t.Fatal(err)
-	}
-	stop := func() string {
-		t.Helper()
-		body, _ := json.Marshal(map[string]any{"hook_event_name": "Stop", "cwd": r.Work,
-			"session_id": "s-1", "stop_hook_active": true})
-		var out bytes.Buffer
-		answerHook(t.Context(), body, []string{"--method", r.Method}, &out, log)
-		return out.String()
-	}
-	stop() // the first of the session, granted on its own rule
-
-	if err := ClaimStop(r, "main", "asked", "they told me to stop"); err != nil {
-		t.Fatal(err)
-	}
-	if said := stop(); strings.Contains(said, "block") {
-		t.Fatalf("the person's word was argued with over open work: %s", said)
-	}
-}
+// asked once had a test of its own, because the engine argued with every other
+// reason and asked was the carve-out. There is nothing left to carve out of:
+// TestAValidClaimStopsAtOnce drives every one of the five with a token held.

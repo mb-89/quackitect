@@ -80,7 +80,6 @@ func TestAClaimGrantsOneStopAndThePullSpendsIt(t *testing.T) {
 
 	// A CLAIM GRANTS THE STOP. The token above was minted and never taken up, so
 	// nothing is in this agent's hands and the engine has nothing to argue with.
-	// See challenge.go.
 	if err := ClaimStop(r, "main", "asked", "they told me to"); err != nil {
 		t.Fatal(err)
 	}
