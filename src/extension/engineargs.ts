@@ -63,8 +63,11 @@ export function renameGroupArgs(from: string, to: string): string[] {
   return ["work", "--rename", from, "--to", to, "--by", "person"];
 }
 
-export function holdArgs(on: boolean): string[] {
-  return ["hold", on ? "--off" : "--on", "--by", "person"];
+// THE HOLD IS A WORD WITH THREE VALUES. One press finishes up, five presses
+// hold everything, and a press from either goes back to off. See
+// src/engine/hold.go.
+export function holdArgs(to: string): string[] {
+  return ["hold", "--state", to, "--by", "person"];
 }
 
 // HOW MUCH OF THE ENGINE SPEAKS TO THE AGENT. One press moves between bound and

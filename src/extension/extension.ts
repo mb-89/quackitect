@@ -63,6 +63,7 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand("quackitect.showLog", () => showLog(context)),
     vscode.commands.registerCommand("quackitect.showWork", () => toggleWork(context)),
     vscode.commands.registerCommand("quackitect.hold", () => toggleHold(context)),
+    vscode.commands.registerCommand("quackitect.held", () => holdEverything(context)),
     vscode.commands.registerCommand("quackitect.ask", () => toggleAsk(context)),
     vscode.commands.registerCommand("quackitect.ideation", () => toggleIdeation()),
     vscode.commands.registerCommand("quackitect.unbind", () => pressBinding(context)),
@@ -1409,25 +1410,50 @@ function askEngine(context: vscode.ExtensionContext, args: string[],
 //
 // The engine keeps it in a file, so it survives this window and reaches the
 // guard, which is a fresh process per event and holds nothing between them.
+// ONE PRESS FINISHES UP, and a press from anywhere else goes back to off.
+//
+// v3's asymmetry, the same one the binding uses: going further is deliberate
+// and coming back is easy, so a stray press always falls and never climbs.
+// Stopping everything is the five-press gesture below.
 async function toggleHold(context: vscode.ExtensionContext) {
   const now = await askEngine(context, ["hold"]);
-  const out = await askEngine(context, holdArgs(!!now?.on));
+  const to = now?.state === "off" || now?.state === undefined ? "finishing" : "off";
+  const out = await askEngine(context, holdArgs(to));
   if (out?.error) {
     vscode.window.showErrorMessage(out.error);
     return;
   }
-  setHoldState(out?.on === true);
-  vscode.window.showInformationMessage(
-    out?.on ? "Everything is on hold. The agent is refused until you press it again."
-            : "The hold is lifted.",
-  );
+  showTheHold(out?.state ?? "off");
+  vscode.window.showInformationMessage(sayTheHold(out?.state ?? "off"));
+}
+
+// FIVE PRESSES INSIDE A SECOND STOP EVERYTHING. The panel counts them, and
+// this always climbs rather than toggling.
+async function holdEverything(context: vscode.ExtensionContext) {
+  const out = await askEngine(context, holdArgs("held"));
+  if (out?.error) {
+    vscode.window.showErrorMessage(out.error);
+    return;
+  }
+  showTheHold(out?.state ?? "held");
+  vscode.window.showInformationMessage(sayTheHold(out?.state ?? "held"));
+}
+
+function sayTheHold(at: string): string {
+  if (at === "held") {
+    return "Everything is on hold. The agent is refused until you press it again.";
+  }
+  if (at === "finishing") {
+    return "Finishing up. No new work goes out. The agent works the notes it holds, then stops.";
+  }
+  return "The hold is lifted.";
 }
 
 // The button says what is true, and it says it after a reload as well.
 // Reading is quiet: a window whose engine is not up yet is not wrong.
 async function showHold(context: vscode.ExtensionContext) {
   const now = await askEngine(context, ["hold"], { quiet: true });
-  setHoldState(now?.on === true);
+  showTheHold(typeof now?.state === "string" ? now.state : "off");
 }
 
 // THE SURFACE EXISTS BEFORE THE BEHAVIOUR. Ideation is where an agent will put
@@ -1446,8 +1472,10 @@ function toggleIdeation() {
   });
 }
 
-function setHoldState(on: boolean) {
-  view?.webview.postMessage({ type: "state", id: "hold", state: on ? "good" : "idle", detail: "" });
+// THE WORD THE ENGINE ANSWERS IS THE WORD THE PANEL DRAWS, so the label and
+// the title are looked up under it and the two cannot disagree.
+function showTheHold(at: string) {
+  view?.webview.postMessage({ type: "state", id: "hold", state: at, detail: "" });
 }
 
 // THE PERSON ASKS WHAT IS HAPPENING. The engine owes them an update and refuses

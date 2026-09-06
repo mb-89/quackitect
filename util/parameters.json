@@ -70,13 +70,17 @@
           "name": "hold",
           "type": "toggle",
           "command": "quackitect.hold",
+          "gesture": 5,
+          "gestureCommand": "quackitect.held",
           "labels": {
             "off": "hand",
-            "on": "hand"
+            "finishing": "hand",
+            "held": "hand"
           },
           "titles": {
-            "off": "hold / stop the agent. Nothing it asks for is allowed until this is pressed again",
-            "on": "held / everything is on hold. Press to let it go on"
+            "off": "finish up / no new work goes out and none is taken up, while the agent finishes what it holds and works its notes. Press five times to stop everything",
+            "finishing": "finishing up / the agent takes nothing new and works the notes it holds, then stops. Press to let it go on",
+            "held": "held / everything is on hold. Press to let it go on"
           }
         },
         {

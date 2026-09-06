@@ -107,8 +107,9 @@ ask("file into a group", A.fileArgs(id, "bucket", "later"));
 ask("make a group", A.groupArgs([id]));
 ask("rename a group", A.renameGroupArgs("later", "much later"));
 ask("edit a cell", A.editCellArgs(id, "title", "a new title here"));
-ask("hold on", A.holdArgs(false));
-ask("hold off", A.holdArgs(true));
+ask("hold held", A.holdArgs("held"));
+ask("hold finishing", A.holdArgs("finishing"));
+ask("hold off", A.holdArgs("off"));
 // THE BINDING AND THE ASK ARE THE PERSON'S TWO OTHER BUTTONS. They are driven
 // here for the same reason every other builder is: the panel calls them and
 // nothing else would notice a flag being renamed under them.

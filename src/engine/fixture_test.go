@@ -206,6 +206,21 @@ func aTreeWithHistory(t *testing.T) Roots {
 	return r
 }
 
+// ---- from boxbranch_test.go ----
+
+// aTreeOnTrunk is a work tree with one commit on a branch called trunk, which
+// is where a box stands before it takes a branch of its own.
+func aTreeOnTrunk(t *testing.T) Roots {
+	t.Helper()
+	f := aTree(t)
+	withHistory(t, f.Work)
+	f.write("README.md", "a tree to branch off\n")
+	gitAt(t, f.Work, "add", "--", "README.md")
+	gitAt(t, f.Work, "commit", "--quiet", "-m", "the trunk as it stands")
+	gitAt(t, f.Work, "branch", "-M", "trunk")
+	return f.Roots
+}
+
 // ---- from battery_test.go ----
 
 // A battery that answers the way the real one does: a verdict on its last line.
