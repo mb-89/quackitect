@@ -352,6 +352,19 @@ func submit(r Roots, actor string, t Token, p Payload) (Answer, bool) {
 	if f := checkDisposition(r, t, p); f != nil {
 		return refuse(&t, *f), true
 	}
+	// AND WHAT THE ENGINE RAN, WHICH IS NOT WHAT THE CHECKLIST SAYS IT RAN.
+	//
+	// The row saying the tests passed is written by the agent, and checkEvidence
+	// asks only that it is ticked or carries a sentence. So done meant an agent
+	// said so. This asks the engine.
+	//
+	// IT ASKS BEFORE THE CHECKLIST, because a run that went red is a bigger
+	// thing to hear than a row nobody answered, and fixing the rows first would
+	// be work done in the wrong order.
+	if why := TestsRefuseTheClose(r, t); why != "" {
+		return refuse(&t, Rejection{Clause: "the tests", Wrong: why,
+			Satisfies: "a run over this token's delta that passed: se test --on " + t.ID}), true
+	}
 	// A SUBMISSION SAYS WHAT IT BRINGS. IT DOES NOT SAY WHAT THE NOTE NO LONGER
 	// HOLDS.
 	//

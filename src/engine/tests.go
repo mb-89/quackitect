@@ -145,6 +145,12 @@ func runTest(c *call) int {
 	}
 	defer db.Close()
 	got, err := TestTheDelta(c.ctx, c.roots, db, *on, proposed, !*plan, *by)
+	if !*plan && err == nil {
+		// THE RUN IS WRITTEN DOWN AGAINST THE TOKEN, so the submission that ends
+		// the work can ask what ran rather than read what the agent typed. A plan
+		// is not a run and records nothing.
+		RecordTheRun(c.roots, *on, got)
+	}
 	if err != nil {
 		c.answerJSON(map[string]any{"error": err.Error()})
 		return 1
