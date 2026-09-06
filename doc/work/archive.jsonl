@@ -14,6 +14,7 @@
 {"id":"wk-34d11d2caf","title":"Held skips the gate","process":"trivial","disposition":"done","blob":"438dfe8e3967a555661ce33ddebeac495e0747a1","on_branch":"767f7b69d8e555c9252bdb5ea594ff7f927190cd"}
 {"id":"wk-35abaa7cf6","title":"findings carry no bucket","process":"trivial","disposition":"done","blob":"e47e6aa77cd89f796857c8e4226ba7650bcb57e1"}
 {"id":"wk-362a803017","title":"Unleashed catches God too","process":"trivial","disposition":"done","blob":"cc464d9924ccf56dd5428b5e432298a31edf227b","on_branch":"02a723768c3993dd87e06605f436e36ad6ea9d8e"}
+{"id":"wk-3ba7e2cd14","title":"landing a check refused","process":"trivial","disposition":"done","blob":"bf28b21afe44166e1fa38dc08c7691b26587c8bf"}
 {"id":"wk-46bbf21644","title":"spawned work never pushed","process":"trivial","disposition":"done","blob":"18c1cd9ee6279d158908537f346c29dad6aff1d9"}
 {"id":"wk-4a202976eb","title":"bugs stay in bucket","process":"trivial","disposition":"done","blob":"7472a55154c90389f945d926df7561b716bf9a1a"}
 {"id":"wk-4ae19a7f0d","title":"same session gives verdict","process":"trivial","disposition":"done","blob":"c3dc8711f725c028fb1edb29e51eb158822ced23","on_branch":"25d909d4a7ea3829da2e963dbab545bbd2e1e7b1"}

@@ -1421,14 +1421,12 @@ func workNotice(t Token) string {
 // AskToStop refuses once when the actor holds work it could still do, and
 // names it, so a stop is a decision rather than a drift.
 //
-// UNBOUND TAKES THE QUEUE OFF, AND THIS IS THE QUEUE ARGUING.
-//
-// The queue did not choose this work and will not choose the next. So it has
-// no standing to hold a session over what that session is holding.
+// IT DOES NOT READ THE BINDING. It used to return at once on Unleashed, which
+// is Unbound or God. decideStop returns at the god rung and again at the
+// unbound rung, both above the checks this one is registered with, so the
+// branch could not be reached from anywhere. Two places deciding one rule is
+// what the rung was added to end. See decideStop in hook.go.
 func AskToStop(r Roots, actor string) Ruling {
-	if Unleashed(r) {
-		return Ruling{}
-	}
 	var mine []string
 	for _, t := range Tokens(r) {
 		if t.Ended() || t.Holder != actor {

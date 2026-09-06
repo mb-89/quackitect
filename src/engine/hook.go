@@ -1424,8 +1424,8 @@ func decideStop(g *guard, roots Roots, cfg Config, log *sessionlog.Log, in hookI
 	// Bound, the queue chose this work and will choose the next, so putting it
 	// down is a decision the queue is owed a reason for. Unbound, the queue chose
 	// nothing and hands out nothing, so it has no standing to ask a person's agent
-	// why it is stopping. That is the same reasoning AskToStop was written on and
-	// never wired to.
+	// why it is stopping. AskToStop was written on the same reasoning, and it
+	// no longer carries it: the rung is here and it is read before the checks.
 	//
 	// THIS IS NOT GOD. God skips the whole hook above. Here the record still says
 	// the agent stopped, because an unbound stop is ordinary rather than an

@@ -11,6 +11,11 @@ title: unbound rung strands AskToStop
 status: open
 # the person's own name for a group. It does not move the work
 bucket: claims
+claimed_by: 7e7f0da1/main
+claimed_at: "2026-09-06T19:21:15Z"
+# the tree each time the work was taken up, snapshots the engine wrote
+began:
+  - da1f1167db2484b1f18a40b1e0050518fc9b64d6
 ---
 
 ## detail
@@ -22,7 +27,6 @@ TWO THINGS ABOUT AskToStop ARE NOW WRONG, both left by the unbound rung the same
 DEAD WEIGHT. src/engine/pull.go's AskToStop opens with a carve-out: if Unleashed(r) it refuses nothing. Unleashed is Unbound or God. AskToStop's only caller is askTheAuthority, whose only caller is src/engine/hook.go at the tail of decideStop, and decideStop now returns at the god rung and again at the unbound rung, both above it. So the carve-out cannot be reached. src/engine/unboundqueue_test.go calls AskToStop directly and asserts it, so a test covers a branch no path takes and could never redden on the engine's behaviour.
 
 A COMMENT THAT MISREADS ITS OWN MECHANISM. The unbound rung's header says the reasoning is "the same reasoning AskToStop was written on and never wired to". AskToStop is wired: pull.go's init registers it with RegisterStopCheck, and askTheAuthority runs it. src/engine/lesson_test.go already records it as registered in init and never called by name. A reader is told a live check is dead, and the next hand either deletes it or wires it twice.
-
 
 ## proposed action
 
@@ -54,9 +58,9 @@ Do not simply reword the comment and keep the branch: two places implementing on
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the guidance this token names was read and applied | — |  |
-| [ ] | one test was written first and seen red for the reason expected |  |  |
-| [ ] | the same test was seen green after the change, and named |  |  |
-| [ ] | the change is git diff began..ended, the two hashes the engine wrote on this token | — |  |
-| [ ] | the cleanup the change revealed is in the change, or is a token of its own | — |  |
+| [x] | the guidance this token names was read and applied | work-token, read. The branch and the sentence, and nothing next to them. |  |
+| [x] | one test was written first and seen red for the reason expected | Not a new test. The existing one asserted the deleted branch, and it moved to decideStop, where the rung is read. |  |
+| [x] | the same test was seen green after the change, and named | se test on this token: five green, including TestUnboundTakesTheQueueOffEveryPathThatIsTheQueue, TestAValidClaimStopsAtOnce and TestGodSilencesTheStopHook. |  |
+| [x] | the change is git diff began..ended, the two hashes the engine wrote on this token | pull.go, hook.go and unboundqueue_test.go. se find for "never wired" over src answers nothing. |  |
+| [x] | the cleanup the change revealed is in the change, or is a token of its own | A token of its own. AskToStop may now be unreachable on every path: decideStop grants a standing claim above it and refuses an unclaimed stop above it. |  |
 

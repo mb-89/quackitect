@@ -1,6 +1,34 @@
 package main
 
-import "testing"
+import (
+	"bytes"
+	"quackitect/engine/internal/sessionlog"
+	"strings"
+	"testing"
+)
+
+// theStopJudgeRefuses drives the stop hook with nothing claimed and answers
+// whether it blocked.
+//
+// THE SESSION'S FIRST STOP IS GRANTED WHATEVER IT SAYS, so one is spent here
+// before the one that is judged.
+func theStopJudgeRefuses(t *testing.T, r Roots, actor string) bool {
+	t.Helper()
+	log, err := sessionlog.Open(r.Private("log"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer log.Close()
+	record(log, "engine", "start", "engine", "engine started", sessionlog.Yes(), nil)
+	blocked := false
+	for range 2 {
+		var said bytes.Buffer
+		g := &guard{out: &said}
+		decideStop(g, r, LoadConfig(r), log, hookIn{SessionID: "s-1"}, actor)
+		blocked = strings.Contains(said.String(), `"decision":"block"`)
+	}
+	return blocked
+}
 
 // UNBOUND TAKES THE QUEUE OFF, AND THE QUEUE IS MORE THAN THE STAFFING GUARD.
 //
@@ -45,10 +73,11 @@ func TestUnboundTakesTheQueueOffEveryPathThatIsTheQueue(t *testing.T) {
 				t.Fatalf("this half proves nothing: nothing was handed to hold: %s", a.Notice)
 			}
 			unbindIf(t, r2, c.unbind)
-			ruling := AskToStop(r2, "worker-1")
-			if refused := ruling.Reason != ""; refused != c.refuses {
-				t.Errorf("the stop judge refused %v and %s wants %v: %s",
-					refused, c.name, c.refuses, ruling.Reason)
+			// IT IS decideStop THAT IS DRIVEN, not AskToStop. The unbound rung
+			// lives in decideStop and AskToStop no longer reads the binding, so
+			// calling the check directly would test a rule that is not there.
+			if refused := theStopJudgeRefuses(t, r2, "worker-1"); refused != c.refuses {
+				t.Errorf("the stop judge refused %v and %s wants %v", refused, c.name, c.refuses)
 			}
 		})
 	}
