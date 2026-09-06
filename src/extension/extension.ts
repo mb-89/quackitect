@@ -12,7 +12,7 @@ import { startLanguageServer, stopLanguageServer } from "./lsp";
 import { sayWindowIsHere, forgetWindow, windowsThere, windowAnswers, sweepWindowsGone } from "./windows";
 import {
   mintArgs, editCellArgs, fileArgs, groupArgs, renameGroupArgs, holdArgs,
-  bindArgs, bindingArgs, askArgs, askedArgs, askIsOwed,
+  bindArgs, bindingArgs, askArgs, askedArgs, askIsOwed, ideationArgs, ideatingArgs, isIdeating,
   viewArgs, paneArgs, panesArgs, viewsArgs, pinArgs, unpinArgs, widthArgs,
   burndownArgs,
   orderArgs, levelArgs, dropLevelArgs, filterArgs,
@@ -65,7 +65,7 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand("quackitect.hold", () => toggleHold(context)),
     vscode.commands.registerCommand("quackitect.held", () => holdEverything(context)),
     vscode.commands.registerCommand("quackitect.ask", () => toggleAsk(context)),
-    vscode.commands.registerCommand("quackitect.ideation", () => toggleIdeation()),
+    vscode.commands.registerCommand("quackitect.ideation", () => toggleIdeation(context)),
     vscode.commands.registerCommand("quackitect.unbind", () => pressBinding(context)),
     vscode.commands.registerCommand("quackitect.god", () => armGod(context)),
     vscode.commands.registerCommand("quackitect.mintWork", (arg?: { text: string }) =>
@@ -1458,17 +1458,23 @@ async function showHold(context: vscode.ExtensionContext) {
 
 // THE SURFACE EXISTS BEFORE THE BEHAVIOUR. Ideation is where an agent will put
 // its own ideas in, rather than only working the tokens it is handed. What that
-// comes to mean is not designed, so this toggles a value nothing reads and the
+// comes to mean is not designed, so this moves a flag nothing reads yet and the
 // behaviour arrives later without a panel change.
 //
-// IT REACHES NO ENGINE. The state is this window's, so turning it on changes
-// nothing about how the machine runs, which is what the token asks for.
-let ideationOn = false;
+// THE FLAG IS THE ENGINE'S, AND THIS IS ONE ADAPTER ONTO IT. It was a variable
+// in this window, so a reload lost it and a box with no window could not reach
+// it at all. A chat message presses the same door through KEYWORD:IDEATION,
+// and two adapters onto one flag cannot disagree the way two flags would.
+async function toggleIdeation(context: vscode.ExtensionContext) {
+  const now = await askEngine(context, ideatingArgs(), { quiet: true });
+  await askEngine(context, ideationArgs(!isIdeating(now)), { quiet: true });
+  await showIdeation(context);
+}
 
-function toggleIdeation() {
-  ideationOn = !ideationOn;
+async function showIdeation(context: vscode.ExtensionContext) {
+  const now = await askEngine(context, ideatingArgs(), { quiet: true });
   view?.webview.postMessage({
-    type: "state", id: "ideation", state: ideationOn ? "good" : "idle", detail: "",
+    type: "state", id: "ideation", state: isIdeating(now) ? "on" : "off", detail: "",
   });
 }
 

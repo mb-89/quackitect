@@ -69,6 +69,7 @@
         {
           "name": "hold",
           "type": "toggle",
+          "console": true,
           "command": "quackitect.hold",
           "gesture": 5,
           "gestureCommand": "quackitect.held",
@@ -86,6 +87,7 @@
         {
           "name": "ask",
           "type": "toggle",
+          "console": true,
           "command": "quackitect.ask",
           "labels": {
             "off": "asked",
@@ -99,6 +101,7 @@
         {
           "name": "ideation",
           "type": "toggle",
+          "console": true,
           "command": "quackitect.ideation",
           "labels": {
             "off": "ideation",
@@ -116,6 +119,7 @@
         {
           "name": "unbind",
           "type": "toggle",
+          "console": true,
           "command": "quackitect.unbind",
           "gesture": 5,
           "gestureCommand": "quackitect.god",
@@ -180,6 +184,7 @@
       "children": [
         {
           "name": "parallel_agents",
+          "console": true,
           "title": "parallel agents",
           "type": "int",
           "default": 3,
@@ -189,6 +194,7 @@
         },
         {
           "name": "claim_hours",
+          "console": true,
           "title": "a claim lasts",
           "type": "int",
           "default": 3,
@@ -200,6 +206,7 @@
         },
         {
           "name": "claim_sync_seconds",
+          "console": true,
           "title": "look for claims every",
           "type": "int",
           "default": 30,
@@ -210,6 +217,7 @@
         },
         {
           "name": "heartbeat_seconds",
+          "console": true,
           "title": "heartbeat",
           "type": "int",
           "default": 5,
@@ -221,6 +229,7 @@
         },
         {
           "name": "ready_budget_ms",
+          "console": true,
           "title": "ready in",
           "type": "int",
           "default": 15000,
@@ -233,6 +242,7 @@
         },
         {
           "name": "helper_ratio",
+          "console": true,
           "title": "helper hands back",
           "type": "int",
           "default": 10,
@@ -244,6 +254,7 @@
         },
         {
           "name": "helper_floor_bytes",
+          "console": true,
           "title": "helper may always hand back",
           "type": "int",
           "default": 6000,
@@ -255,6 +266,7 @@
         },
         {
           "name": "pulls_before_hold_is_stale",
+          "console": true,
           "title": "work goes stale after",
           "type": "int",
           "default": 10,

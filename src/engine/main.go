@@ -84,6 +84,7 @@ func main() {
 	emergency := flag.String("emergency", "", "arm or disarm emergency mode: on, off, or status")
 	bind := flag.String("bind", "", "how much of the engine speaks to the agent: bound, unbound, god, or status")
 	ask := flag.String("ask", "", "ask the agent what is happening, and refuse it everything until it says: on, off, or status")
+	ideation := flag.String("ideation", "", "let the agent put its own ideas in: on, off, or status")
 	reason := flag.String("reason", "", "why emergency mode is being armed")
 	minutes := flag.Int("minutes", 30, "how long emergency mode lasts, at most 240")
 	settings := flag.Bool("config", false, "print every parameter, its value, and where the value came from")
@@ -195,6 +196,21 @@ func main() {
 			return
 		}
 		now, err := SetAsked(roots, *ask == "on", "the owner")
+		if err != nil {
+			fail(err)
+		}
+		answerJSON(now)
+		return
+	}
+
+	// LET THE AGENT PUT ITS OWN IDEAS IN. This is the one door, and the button
+	// and the keyword are two adapters onto it. Nothing reads the flag yet.
+	if *ideation != "" {
+		if *ideation == "status" {
+			answerJSON(LoadIdeation(roots))
+			return
+		}
+		now, err := SetIdeation(roots, *ideation == "on", "the owner")
 		if err != nil {
 			fail(err)
 		}

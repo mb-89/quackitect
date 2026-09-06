@@ -123,6 +123,9 @@ ask("bind again", A.bindArgs("bound"));
 ask("what is asked", A.askedArgs());
 ask("ask the agent", A.askArgs(true));
 ask("stop asking", A.askArgs(false));
+ask("whether ideation is on", A.ideatingArgs());
+ask("let the agent ideate", A.ideationArgs(true));
+ask("stop ideating", A.ideationArgs(false));
 ask("the panes", A.panesArgs(file));
 ask("one pane", A.paneArgs(file, "left"));
 ask("the views", A.viewsArgs());
@@ -266,6 +269,10 @@ const excluded = {
     + "whether an update is still owed, so there is no engine call to drive: "
     + "drive-panel.mjs drives it, against a record the real binary wrote, and the "
     + "panel reads the same function so the two cannot disagree about the button",
+  isIdeating: "not an argument builder. It reads what ideatingArgs answered the "
+    + "way askIsOwed reads the ask, so there is no engine call to drive. The "
+    + "engine writes both in the same shape, and the button and KEYWORD:IDEATION "
+    + "press one flag through one door",
 };
 const builders = Object.keys(A).filter((k) => typeof A[k] === "function");
 say("the extension exports its argument builders (" + builders.length + ")", builders.length > 5);

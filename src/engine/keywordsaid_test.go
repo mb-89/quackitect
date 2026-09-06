@@ -56,7 +56,7 @@ func TestAMessageThatIsOnlyTheKeywordMovesTheControl(t *testing.T) {
 	if valueOf(t, r, "guards.search_via_index") != true {
 		t.Fatal("the guard did not start on, so nothing this test sees is about the keyword")
 	}
-	heardHere(t, r, l, "  search via index  ")
+	heardHere(t, r, l, "  KEYWORD:SEARCH_VIA_INDEX=OFF  ")
 	if got := valueOf(t, r, "guards.search_via_index"); got != false {
 		t.Fatalf("the keyword moved nothing: the guard reads %v", got)
 	}
@@ -70,7 +70,7 @@ func TestTheKeywordInsideASentenceMovesNothing(t *testing.T) {
 	l, _ := sessionlog.Open(r.Private("log"))
 	defer l.Close()
 
-	heardHere(t, r, l, "please turn search via index off for me")
+	heardHere(t, r, l, "please send KEYWORD:SEARCH_VIA_INDEX=OFF for me")
 	if got := valueOf(t, r, "guards.search_via_index"); got != true {
 		t.Fatalf("a mention inside a sentence was taken as a keyword: the guard reads %v", got)
 	}
@@ -83,7 +83,7 @@ func TestAnUnflaggedControlHasNoKeyword(t *testing.T) {
 	l, _ := sessionlog.Open(r.Private("log"))
 	defer l.Close()
 
-	heardHere(t, r, l, "stop needs claim")
+	heardHere(t, r, l, "KEYWORD:STOP_NEEDS_CLAIM=OFF")
 	if got := valueOf(t, r, "guards.stop_needs_claim"); got != true {
 		t.Fatalf("a control nobody declared reachable was reached: it reads %v", got)
 	}
@@ -95,7 +95,7 @@ func TestTheChangeNamesTheKeywordAndWhatItMoved(t *testing.T) {
 	t.Parallel()
 	r := aConsoleTree(t)
 	l, _ := sessionlog.Open(r.Private("log"))
-	heardHere(t, r, l, "search via index")
+	heardHere(t, r, l, "KEYWORD:SEARCH_VIA_INDEX=OFF")
 	l.Close()
 
 	b, err := os.ReadFile(filepath.Join(r.Private("log"), sessionlog.Current))
@@ -115,7 +115,7 @@ func TestTheChangeNamesTheKeywordAndWhatItMoved(t *testing.T) {
 	if found == nil {
 		t.Fatal("the record says nothing about a keyword that moved a control")
 	}
-	if found["keyword"] != "search via index" {
+	if found["keyword"] != "SEARCH_VIA_INDEX" {
 		t.Fatalf("the record does not name the keyword: %v", found)
 	}
 	if found["parameter"] != "guards.search_via_index" {
@@ -135,7 +135,7 @@ func TestAKeywordAnAgentWritesMovesNothing(t *testing.T) {
 	defer l.Close()
 
 	var out, errs strings.Builder
-	c := &call{roots: r, args: []string{"--text", "search via index"}, out: &out, err: &errs}
+	c := &call{roots: r, args: []string{"--text", "KEYWORD:SEARCH_VIA_INDEX=OFF"}, out: &out, err: &errs}
 	if code := runSaid(c); code != 0 {
 		t.Fatalf("the said verb failed: %d %s", code, errs.String())
 	}

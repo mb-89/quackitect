@@ -89,6 +89,17 @@ export function askedArgs(): string[] {
   return ["--ask", "status"];
 }
 
+// THE AGENT MAY PUT ITS OWN IDEAS IN. Nothing reads the flag yet, and it is the
+// engine's rather than this window's so a chat can reach it and a reload cannot
+// lose it. See src/engine/ideation.go.
+export function ideationArgs(on: boolean): string[] {
+  return ["--ideation", on ? "on" : "off"];
+}
+
+export function ideatingArgs(): string[] {
+  return ["--ideation", "status"];
+}
+
 // WHETHER AN UPDATE IS STILL OWED, read off what askedArgs answered.
 //
 // THE RULE LIVES HERE BECAUSE THE PANEL AND THE CHECK BOTH NEED IT. The button
@@ -98,6 +109,12 @@ export function askedArgs(): string[] {
 // lands, so the question is whether anything is there.
 export function askIsOwed(asked: { on?: string } | null | undefined): boolean {
   return typeof asked?.on === "string" && asked.on !== "";
+}
+
+// AND WHETHER IDEATION IS ON, read the same way off what ideatingArgs answered.
+// The engine writes the same shape for both, so the rule is the same rule.
+export function isIdeating(now: { on?: string } | null | undefined): boolean {
+  return typeof now?.on === "string" && now.on !== "";
 }
 
 export function viewArgs(file: string, side: string, rest: string[]): string[] {

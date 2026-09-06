@@ -29,10 +29,10 @@ export type Node = {
   // WHAT THE NUMBER IS COUNTED IN, beside the box. "a claim lasts: 3" says
   // nothing on its own, and the unit is the one word that makes it a fact.
   unit?: string;
-  // THE WORD THAT REACHES THIS CONTROL FROM A CHAT, filled by the engine and
-  // declared nowhere. The tooltip draws it verbatim, so what a person reads is
+  // THE MESSAGES THAT REACH THIS CONTROL FROM A CHAT, filled by the engine and
+  // declared nowhere. The tooltip draws them verbatim, so what a person reads is
   // the exact string the matcher takes.
-  keyword?: string;
+  keywords?: string[];
   span?: number;
   narrow?: string;
   shown?: boolean;
@@ -208,7 +208,7 @@ function button(n: Node): string {
     // there is no light: a light says a thing is happening on its own, and
     // this only ever says what the person last pressed.
     const labels = n.labels ?? {};
-    const titles = n.titles ?? {};
+    const titles = tipsFor(n);
     // THE RESTING POSITION IS THE FIRST ONE IT DECLARES. A toggle with two
     // positions calls it off; the binding has three and calls it bound, and a
     // widget that assumed off would draw a state that control does not have.
@@ -222,12 +222,13 @@ function button(n: Node): string {
       title="${esc(titles[rest] ?? n.name)}">${esc(labels[rest] ?? n.name)}</button>`;
   }
   if (n.type === "action") {
-    return `<button data-command="${esc(n.command ?? "")}" title="${esc(n.title ?? n.label ?? n.name)}">${esc(
+    const says = withKeywords(n.title ?? n.label ?? n.name, n);
+    return `<button data-command="${esc(n.command ?? "")}" title="${esc(says)}">${esc(
       n.label ?? n.name,
     )}</button>`;
   }
   const labels = n.labels ?? {};
-  const titles = n.titles ?? {};
+  const titles = tipsFor(n);
   return `<button class="status" id="${esc(n.name)}" data-state="idle"
     data-command="${esc(n.command ?? "")}" data-stop="${esc(n.stopCommand ?? "")}"
     data-labels='${json(labels)}' data-titles='${json(titles)}'
@@ -237,14 +238,32 @@ function button(n: Node): string {
 }
 
 // A CONTROL A CHAT CAN REACH SAYS SO IN ITS TOOLTIP. The cloud has no panel,
-// so this line is the only place a person learns the word. It is copied from
-// the engine rather than composed, so it cannot drift from what works.
-function tipFor(n: Node): string {
-  const help = n.help ?? n.title ?? n.name;
-  if (!n.keyword) {
-    return help;
+// so these lines are the only place a person learns what to type. They are
+// copied from the engine rather than composed, so they cannot drift from what
+// works.
+//
+// EVERY STATE DRAWS THEM, AND NOT ONLY THE RESTING ONE. The webview swaps the
+// title as a toggle moves, so lines put on the resting state alone vanish the
+// moment somebody presses it, which is exactly when a person is looking.
+function withKeywords(says: string, n: Node): string {
+  if (!n.keywords?.length) {
+    return says;
   }
-  return help + "\n\nReach it from a chat by writing " + n.keyword + " on its own.";
+  return says + "\n\nFrom a chat, send one of these on its own:\n" + n.keywords.join("\n")
+    + (n.keywords.some((l) => l.includes("<")) ? "\n\nWhat is in angle brackets is yours to fill in." : "");
+}
+
+function tipFor(n: Node): string {
+  return withKeywords(n.help ?? n.title ?? n.name, n);
+}
+
+// tipsFor is the same for a control whose tooltip changes with its state.
+function tipsFor(n: Node): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const [state, says] of Object.entries(n.titles ?? {})) {
+    out[state] = withKeywords(says, n);
+  }
+  return out;
 }
 
 function field(k: string, n: Node): string {
