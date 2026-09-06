@@ -9,8 +9,6 @@ guidance: [[work-token]]
 title: Cloud boxes publish nothing
 # where the token stands. The process owns these values.
 status: open
-claimed_by: f5927132/main
-claimed_at: "2026-09-06T10:43:35Z"
 # true when this waits for a person rather than an agent
 needs_human: true
 # the tree each time the work was taken up, snapshots the engine wrote
