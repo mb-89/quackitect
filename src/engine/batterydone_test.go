@@ -54,7 +54,7 @@ func TestABatteryAnswersOnDoneAndNotOnStart(t *testing.T) {
 		t.Parallel()
 		r := aTreeWithTheProcesses(t)
 		aBatteryMarkerFor(t, r, 0, "a check ran\n0 failed in 91s\n")
-		got := startBattery(t.Context(), r, "main", "wk-857e0a4f99")
+		got := startBattery(t.Context(), r, "main", "wk-1111111111")
 		if !got.OK {
 			t.Errorf("a battery that finished with none failed did not answer ok: %s", got.Said)
 		}
@@ -68,7 +68,7 @@ func TestABatteryAnswersOnDoneAndNotOnStart(t *testing.T) {
 		t.Parallel()
 		r := aTreeWithTheProcesses(t)
 		aBatteryMarkerFor(t, r, 0, "a check ran\n3 failed in 91s\n")
-		got := startBattery(t.Context(), r, "main", "wk-857e0a4f99")
+		got := startBattery(t.Context(), r, "main", "wk-1111111111")
 		if got.OK {
 			t.Errorf("a battery that finished with 3 failed answered ok: %s", got.Said)
 		}
@@ -83,7 +83,7 @@ func TestABatteryAnswersOnDoneAndNotOnStart(t *testing.T) {
 		t.Parallel()
 		r := aTreeWithTheProcesses(t)
 		aBatteryMarkerFor(t, r, os.Getpid(), "a check ran\n")
-		got := startBattery(t.Context(), r, "main", "wk-857e0a4f99")
+		got := startBattery(t.Context(), r, "main", "wk-1111111111")
 		if got.OK {
 			t.Errorf("a battery still going answered ok: %s", got.Said)
 		}
@@ -102,7 +102,7 @@ func TestAWholeBatteryRunIsNotOkUntilItHasFinished(t *testing.T) {
 	r := aTreeWithTheProcesses(t)
 	aBatteryMarkerFor(t, r, os.Getpid(), "a check ran\n")
 
-	got := startBattery(t.Context(), r, "main", "wk-857e0a4f99")
+	got := startBattery(t.Context(), r, "main", "wk-1111111111")
 	if okOf([]ran{got}) {
 		t.Errorf("a run carrying a battery that has not finished answers ok: %s", got.Said)
 	}

@@ -14,7 +14,7 @@ import "testing"
 //
 // THE FIX IS A DELETION. whatComesNext already asks LoadBinding for Unbound
 // alone, so the guard in answerFor was a second writer of one rule as well as
-// a wrong one. See wk-cda42858cd.
+// a wrong one.
 func TestGodIsHandedWorkAndUnboundIsNot(t *testing.T) {
 	t.Parallel()
 
