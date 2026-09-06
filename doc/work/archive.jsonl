@@ -63,6 +63,7 @@
 {"id":"wk-b6de79f667","title":"tests name a token","process":"trivial","disposition":"done","blob":"acbc344a05acfd0459d63ecd29982dfd2e1467c0","on_branch":"8a8a4fd1c45bb07d9a113da755b0c7bff21ec672"}
 {"id":"wk-bdce520f18","title":"criterion outlived its rung","process":"trivial","disposition":"done","blob":"402ba9d07131c44105005b7c93c5adcc205a5a82","on_branch":"ae7af38eb724b837bd27027f90ec4340beb3ded0"}
 {"id":"wk-bdf3aaf583","title":"bad claims file empties","process":"trivial","disposition":"done","blob":"b71c4abe35d10b42535b5b1102e4a7b2e355ce36","on_branch":"aa0a5c9bb65c31e543f4fc127d46a9db3cd7b74f"}
+{"id":"wk-bf125db7b8","title":"isTheStopVerb has no caller","process":"trivial","disposition":"done","blob":"b9f91b14c7fbbdf852f5276dbd33bfac14f0cc66"}
 {"id":"wk-c456e72a75","title":"tests name minted ids","process":"trivial","disposition":"done","blob":"67a7f9d166a718606f99a4dd38ac0b13d2b6fccb","on_branch":"bc38dbed4bfd9258df54a07d9235cc57a620ae4f"}
 {"id":"wk-c5bbfb9512","title":"unbound rung strands AskToStop","process":"trivial","disposition":"done","blob":"a90cdfedcadaf22e49007847c7be032c26cd97d0","on_branch":"a534317591a0f9338ed764ada030a1d4ab5fcf4f"}
 {"id":"wk-c5bc8a31b0","title":"clone lags archived tokens","process":"trivial","disposition":"done","blob":"b09d08d7fc745d7d49ccdd3fd32b95c6663ceca7","on_branch":"f7b21310612e4d8c5dfb3bef42a5cf1634fcbaa2"}

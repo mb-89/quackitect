@@ -786,29 +786,6 @@ func notePostTool(roots Roots, in hookIn, actor string) {
 	}
 }
 
-// isTheStopVerb says whether this call is the agent claiming a stop, at the
-// lane or at the shell door.
-//
-// IT IS THE ONE CALL THAT IS NOT CARRYING ON. Every other call puts the
-// argument back to its start, and counting this one as work reset it between
-// every claim and its own Stop event, so the count never reached three at all.
-func isTheStopVerb(in hookIn) bool {
-	if strings.HasSuffix(in.ToolName, "se_stop") {
-		return true
-	}
-	var ti toolInput
-	if json.Unmarshal(in.ToolInput, &ti) != nil {
-		return false
-	}
-	words := strings.Fields(ti.Command)
-	for i, w := range words {
-		if isTheEngine(filepath.Base(w)) && i+1 < len(words) && words[i+1] == "stop" {
-			return true
-		}
-	}
-	return false
-}
-
 func decidePreToolUse(g *guard, roots Roots, cfg Config, emergency Emergency, log *sessionlog.Log, in hookIn, actor string) {
 	// ANYTHING YOU DO AFTER CLAIMING A STOP ERASES THE CLAIM. A claim says the
 	// next thing is stopping. An agent that claims and then carries on has
