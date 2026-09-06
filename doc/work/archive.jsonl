@@ -65,6 +65,7 @@
 {"id":"wk-2f6d34e845","title":"guidance draws search line","process":"trivial","disposition":"done","blob":"2ce5941e75df8925ffc86008d4dbe7a8a43ec38b","on_branch":"2ce5941e75df8925ffc86008d4dbe7a8a43ec38b","tag":"refs/tags/archive/wk-2f6d34e845"}
 {"id":"wk-2f780ad15b","title":"retro reports survive drains","process":"trivial","disposition":"done","blob":"28eb9539a3c9608dca11eb1bbc20fa57872769a1","on_branch":"28eb9539a3c9608dca11eb1bbc20fa57872769a1","tag":"refs/tags/archive/wk-2f780ad15b"}
 {"id":"wk-30821724fc","title":"spawns take a context","process":"standard","disposition":"done","blob":"4f2045f02b76e20abba11ad89c73c2587beedcfe","on_branch":"9bdc965a278e2ad4be23f49c5076e08f8931ac21","tag":"refs/tags/archive/wk-30821724fc"}
+{"id":"wk-324c0385df","title":"split halves want approaches","process":"trivial","disposition":"done","blob":"d895c5304b4ac72fb52aff666d652305a4c70644"}
 {"id":"wk-32c0df8d1c","title":"unbound still names tokens","process":"standard","disposition":"done","blob":"03bb780380df478b85ab205a265955c3f50d173a","on_branch":"03bb780380df478b85ab205a265955c3f50d173a","tag":"refs/tags/archive/wk-32c0df8d1c"}
 {"id":"wk-32d21588e6","title":"move fixture reads uid","process":"trivial","disposition":"done","blob":"1c4d4367a80b81f9ee89ffab63e7d49459bf70d0","on_branch":"81d9d41cad07217290397d59b1e8b01da4c6c04a"}
 {"id":"wk-33cc497670","title":"two tests one name","process":"trivial","disposition":"done","blob":"2cfa6b00d7c4bc680e95c2d0f3347ad6d31f9ac6","on_branch":"2cfa6b00d7c4bc680e95c2d0f3347ad6d31f9ac6"}
@@ -212,6 +213,7 @@
 {"id":"wk-8e717ef911","title":"stale note names --built","process":"trivial","disposition":"done","blob":"a3966c0a91f7ffde330ffa2ec52daeade98275c0","on_branch":"44f84159e51021849045a1076dfc0e77597a48c1"}
 {"id":"wk-8e9a4d03ac","title":"declared group vanishes empty","process":"trivial","disposition":"done","blob":"8b60a9bbd151397a1bfdd3de918df2c1e0452cc8","on_branch":"34ec1fa1934108c3f708d843a75b2b320680ee6c"}
 {"id":"wk-8fa7785eab","title":"argue only when blocking","process":"trivial","disposition":"done","blob":"160c4f1bb9be900653ad044102e6a911763db0bb","on_branch":"2ebc142c96d1499a2ac515011755806ba458da67"}
+{"id":"wk-8fb334b116","title":"lint doubles the battery","process":"trivial","disposition":"done","blob":"b0b80b7fd9f20c66357605233355d258d503498f"}
 {"id":"wk-8fb9a97399","title":"no public link private","process":"trivial","disposition":"done","blob":"fba4b3346605e7766080e3670eb151056ddf469b","on_branch":"fba4b3346605e7766080e3670eb151056ddf469b","tag":"refs/tags/archive/wk-8fb9a97399"}
 {"id":"wk-90145376d4","title":"green battery reads failed","process":"trivial","disposition":"done","blob":"f167b146362596954fa2d3a11db186183c9f0556","on_branch":"db37076db34099681f9ab3a296beb6abd77eb8a9"}
 {"id":"wk-905ae846cc","title":"go-cmp is a dependency","process":"trivial","disposition":"done","blob":"681631be2a61ca07b667a4bbf086c6e5b4025b1b","on_branch":"0708c99cd8a890ef89c9f674b9867dcde8a04a39"}
@@ -273,6 +275,7 @@
 {"id":"wk-b8bc5ab8d9","title":"enum refusal has test","process":"trivial","disposition":"done","blob":"db3940abda3ab6ce200000ddf7106e260054931f","on_branch":"db3940abda3ab6ce200000ddf7106e260054931f","tag":"refs/tags/archive/wk-b8bc5ab8d9"}
 {"id":"wk-bc8367eb5c","title":"size limits from schema","process":"trivial","disposition":"done","blob":"10c74479623e5f8ae382fa64eb2a56861c51788c","on_branch":"10c74479623e5f8ae382fa64eb2a56861c51788c","tag":"refs/tags/archive/wk-bc8367eb5c"}
 {"id":"wk-bd6c665ee8","title":"one agent two rows","process":"standard","disposition":"done","blob":"9bb98047cd3a41c58c34e481bd29001712fd9008","on_branch":"9bb98047cd3a41c58c34e481bd29001712fd9008","tag":"refs/tags/archive/wk-bd6c665ee8"}
+{"id":"wk-c057a08fa6","title":"stop criterion names test","process":"trivial","disposition":"done","blob":"3a9cafdd2181e99bcb44c74f499b92c3372780c5","on_branch":"f094f2e79a4ddf7017fa9f7eb0c5e00d6393e202"}
 {"id":"wk-c0b948b717","title":"menu knows one name","process":"trivial","disposition":"done","blob":"5a517f795e58d22af54e8ed75bf78fed1edec232","on_branch":"5a517f795e58d22af54e8ed75bf78fed1edec232","tag":"refs/tags/archive/wk-c0b948b717"}
 {"id":"wk-c1d58b91d6","title":"stop claim knows names","process":"standard","disposition":"done","blob":"e82971bcf3a9ac8c50004bd3e778c5689ba6f898","on_branch":"4eed914d50eb7d9c8fa1dbf58bd03a632e7e42e8","tag":"refs/tags/archive/wk-c1d58b91d6"}
 {"id":"wk-c2f9d39ea7","title":"long token traps hold","process":"trivial","disposition":"done","blob":"e12105605dc1824a6c57a67a5e10173192d5498c","on_branch":"e12105605dc1824a6c57a67a5e10173192d5498c"}
@@ -310,3 +313,23 @@
 {"id":"wk-faeaddd8a7","title":"a stale engine rebuilds","process":"trivial","disposition":"done","blob":"dc5581243fa95485e2d09c2c0414982341c5a52c","on_branch":"dc5581243fa95485e2d09c2c0414982341c5a52c","tag":"refs/tags/archive/wk-faeaddd8a7"}
 {"id":"wk-fc6b6c5aa7","title":"restart silences every guard","process":"standard","disposition":"done","blob":"bd0690b9edf02fd5eda1d51ae33b11d79175afcf","on_branch":"1613224944abb698d38468b2f36670f3e5bc4e26","tag":"refs/tags/archive/wk-fc6b6c5aa7"}
 {"id":"wk-ff6f0d8b1e","title":"mint takes done when","process":"trivial","disposition":"done","blob":"71719ca63c72ecb61e30e873c615cf234451c471","on_branch":"71719ca63c72ecb61e30e873c615cf234451c471","tag":"refs/tags/archive/wk-ff6f0d8b1e"}
+{"id":"wk-07c2d80710","title":"engine git finds proxy","process":"trivial","disposition":"done","blob":"4a431ffa869ee98ad7796761a95c713e828ca8ba"}
+{"id":"wk-19c445440b","title":"restart strands the proxy","process":"trivial","disposition":"done","blob":"8d7f7037d95a3c375224456de8cfc5dba682268b"}
+{"id":"wk-2b8f45c1e7","title":"the ask answers why","process":"standard","disposition":"done","blob":"a4700842156e97cc3fb43e9ee09142e337e393e0","on_branch":"17de341088712da3ca3eb192ee774a7cef85cf71"}
+{"id":"wk-5295173471","title":"god mode drops itself","process":"standard","disposition":"done","blob":"76be9bebd9f0a535980dbb91726cabf30290bc38","on_branch":"8812ea5d75ace1e9fd00ef7e4ad7cf2ff59e4db1"}
+{"id":"wk-6a0b7f2d38","title":"one filter reader","process":"standard","disposition":"became","blob":"379f36e9cd588900c6621b933a4777ef8e27054a","on_branch":"f1892c90ea2ef56808f8008435e5c77ea2e481ec"}
+{"id":"wk-7a498f6a2b","title":"over-bound note strands","process":"trivial","disposition":"done","blob":"e08daa6bc9ac45c784e491cfcb98f5fa49c1cddb","on_branch":"2cd9d419b8c5508caf30a7c7660726dff3277c83"}
+{"id":"wk-7c41d9e206","title":"red first blocks everyone","process":"standard","disposition":"done","blob":"82ceca021e06bda0ace4fd6eb3e998a4641fcda4","on_branch":"dbb6f79626f167209688fec043a66a647f8924f9"}
+{"id":"wk-8c3c71d77d","title":"snapshots do not travel","process":"standard","disposition":"done","blob":"1725ada59ecde6265a60d23c47e31e9196d3893e","on_branch":"0daf092004daab199bbb62e8ea24e2888595bde8"}
+{"id":"wk-8ec7483730","title":"one lint one format","process":"standard","disposition":"done","blob":"7b16085e94b55e88bba9094a876df934abcd11ac","on_branch":"2b7f56add6c7b0250cbcf8a2d249177748301aef"}
+{"id":"wk-4e91c7b3f8","title":"one fixture builder","process":"standard","disposition":"done","blob":"c406ec875989060a61111cad21b9ad70fcf1c053","on_branch":"a5d4f5aa5904dc921eba6d3d4788fbe2950938b6"}
+{"id":"wk-cc90a50641","title":"guidance reword reds test","process":"trivial","disposition":"done","blob":"0d9f21fbbef09cee3af368e34958bdd8e680b403"}
+{"id":"wk-36b8ea59dc","title":"the sweep fails soft","process":"standard","disposition":"done","blob":"997e3d52950d435f4cc05457ba73c0cd72592216","on_branch":"21a6e65c3c4624e0c1455be52cc6eecf09b2e6de"}
+{"id":"wk-b64dd5360a","title":"dead yaml version twins","process":"trivial","disposition":"done","blob":"0c8d80d8261e9a3ee0e02838f97a2729d4c9f4c6","on_branch":"42f523510e57d0b0eff022f2b2d37fe7173d9414"}
+{"id":"wk-e318448216","title":"schema denies the claim","process":"trivial","disposition":"done","blob":"97f8a765146bda6641974619e5e134b2f27c423d"}
+{"id":"wk-d7629cc9af","title":"head tests half landed","process":"trivial","disposition":"done","blob":"5d5f5c29d3bbdbce79f72e81834e50700d5805e7","on_branch":"b4b625f37ff5a90d70caa5176775bf513b43d638"}
+{"id":"wk-00e4785e51","title":"three git tests flake","process":"trivial","disposition":"done","blob":"09efd227d78370340ef3524a4650a65fffd82eac"}
+{"id":"wk-2e9721e324","title":"lint reads formatting too","process":"trivial","disposition":"done","blob":"8ea399cde01721428a8bc33aa9f8454794af20d3"}
+{"id":"wk-c6e5db7c51","title":"lint reads work tokens","process":"trivial","disposition":"done","blob":"32a427277a772817e48b1e561b2a3159d933c594","on_branch":"13fadff07d092ab91c375a01e64d13a6fd996a98"}
+{"id":"wk-64e8f37aa4","title":"parallel tests swap seams","process":"trivial","disposition":"done","blob":"745aba9d6b279db6a6d7dd134d6a7d668c65c57b"}
+{"id":"wk-b65222b6f1","title":"claim a block","process":"standard","disposition":"done","blob":"96dbecd70a8cfd9974b83b962b1811190bbf5b40","on_branch":"965929a6a206362accac4c8b8841fb4442041aa2"}

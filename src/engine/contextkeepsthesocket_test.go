@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net"
 	"os"
+	"quackitect/engine/internal/sessionlog"
 	"strings"
 	"testing"
 	"time"
@@ -25,7 +26,7 @@ func TestTheContextClosesTheSocketAfterTheLoopEnds(t *testing.T) {
 	if err := os.MkdirAll(r.Private("log"), 0o755); err != nil {
 		t.Fatal(err)
 	}
-	log, err := OpenLog(r.Private("log"))
+	log, err := sessionlog.Open(r.Private("log"))
 	if err != nil {
 		t.Fatal(err)
 	}

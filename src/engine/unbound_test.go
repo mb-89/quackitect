@@ -8,6 +8,7 @@ import (
 	"strings"
 	"testing"
 
+	"quackitect/engine/internal/sessionlog"
 	"quackitect/engine/internal/voice"
 )
 
@@ -44,12 +45,12 @@ func TestUnboundTakesTheQueueOffAndLeavesTheTreeGuarded(t *testing.T) {
 	if _, refuse := WriteNeedsAToken(r, "main", "Write", "doc/x.md", ""); !refuse {
 		t.Fatal("this test proves nothing: the gate does not refuse a write naming no token")
 	}
-	log, err := OpenLog(r.Private("log"))
+	log, err := sessionlog.Open(r.Private("log"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer log.Close()
-	record(log, "engine", "start", "engine", "engine started", Yes(), nil)
+	record(log, "engine", "start", "engine", "engine started", sessionlog.Yes(), nil)
 	write := func(text string) string {
 		t.Helper()
 		body, _ := json.Marshal(map[string]any{"hook_event_name": "PreToolUse", "cwd": r.Work,
@@ -106,12 +107,12 @@ func TestUnboundTakesTheQueueOffAndLeavesTheTreeGuarded(t *testing.T) {
 // GOD MODE TAKES EVERY REFUSAL OFF, AND SAYS NOTHING PER CALL.
 func TestGodModeRefusesNothingAndIsNotSpoken(t *testing.T) {
 	r := aTreeWithTheProcesses(t)
-	log, err := OpenLog(r.Private("log"))
+	log, err := sessionlog.Open(r.Private("log"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer log.Close()
-	record(log, "engine", "start", "engine", "engine started", Yes(), nil)
+	record(log, "engine", "start", "engine", "engine started", sessionlog.Yes(), nil)
 
 	// A CALL THE ENGINE WOULD REFUSE while bound: a shell command naming no
 	// token, by the main agent, with work waiting.
@@ -148,12 +149,12 @@ func TestGodModeRefusesNothingAndIsNotSpoken(t *testing.T) {
 // binding is read at all, and god mode does not reach them.
 func TestGodModeDoesNotSilenceThePerson(t *testing.T) {
 	r := aTreeWithTheProcesses(t)
-	log, err := OpenLog(r.Private("log"))
+	log, err := sessionlog.Open(r.Private("log"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer log.Close()
-	record(log, "engine", "start", "engine", "engine started", Yes(), nil)
+	record(log, "engine", "start", "engine", "engine started", sessionlog.Yes(), nil)
 	if _, err := SetBinding(r, God, "the owner"); err != nil {
 		t.Fatal(err)
 	}
@@ -216,8 +217,8 @@ func TestAHandoverContinuesTheSessionRatherThanStartingOne(t *testing.T) {
 	// engine that may itself have been handed a session, and the variable is
 	// process-wide, so a first log opened without clearing it reads as a
 	// successor's.
-	t.Setenv(sessionVar, "")
-	fresh, err := OpenLog(dir)
+	t.Setenv(sessionlog.SessionVar, "")
+	fresh, err := sessionlog.Open(dir)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -225,8 +226,8 @@ func TestAHandoverContinuesTheSessionRatherThanStartingOne(t *testing.T) {
 	if fresh.Continued() {
 		t.Error("a log opened with no session to continue says it is continuing one")
 	}
-	t.Setenv(sessionVar, fresh.Session())
-	next, err := OpenLog(dir)
+	t.Setenv(sessionlog.SessionVar, fresh.Session())
+	next, err := sessionlog.Open(dir)
 	if err != nil {
 		t.Fatal(err)
 	}

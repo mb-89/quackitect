@@ -1,4 +1,4 @@
-package main
+package sessionlog
 
 import (
 	"encoding/json"
@@ -8,9 +8,6 @@ import (
 	"sync"
 	"time"
 )
-
-// SessionLog is the file the record is being written to.
-func SessionLog(r Roots) string { return filepath.Join(r.Private("log"), Current) }
 
 // The engine writes the record. Nothing else does. A viewer reads the file,
 // and the file is the whole interface between them.
@@ -57,23 +54,23 @@ const defaultLimit = 32 << 20
 // no stamp" is always the one happening now.
 const Current = "session.jsonl"
 
-// sessionVar names the session a starting engine is continuing rather than
+// SessionVar names the session a starting engine is continuing rather than
 // beginning. Only a handover sets it: see swap.go.
-const sessionVar = "SE_SESSION"
+const SessionVar = "SE_SESSION"
 
-func OpenLog(dir string) (*Log, error) {
+func Open(dir string) (*Log, error) {
 	// A SWAP IS ONE SESSION WITH TWO PROCESSES IN IT. The engine that handed
 	// over named the session it was in, so the successor appends to it instead
 	// of retiring it. Retiring here split one stretch of work in half at a
 	// moment nobody chose, and a person watching the log saw it start over.
-	if s := os.Getenv(sessionVar); s != "" {
+	if s := os.Getenv(SessionVar); s != "" {
 		// THE BATON IS PUT DOWN ONCE IT IS TAKEN. It stayed in the successor's
 		// environment, so every process that engine started inherited it: a test
 		// run under a swapped engine opened a log that continued the engine's own
 		// session instead of its own, and the check that an earlier session is
 		// set aside rather than written over went red for no defect of its own.
-		os.Unsetenv(sessionVar)
-		return ContinueLog(dir, s)
+		os.Unsetenv(SessionVar)
+		return Continue(dir, s)
 	}
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return nil, err
@@ -88,9 +85,9 @@ func OpenLog(dir string) (*Log, error) {
 	return l, l.open()
 }
 
-// ContinueLog opens the current log under a session that is already going.
+// Continue opens the current log under a session that is already going.
 // Nothing is retired, because nothing has ended.
-func ContinueLog(dir, session string) (*Log, error) {
+func Continue(dir, session string) (*Log, error) {
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return nil, err
 	}
@@ -194,13 +191,13 @@ func No() *bool  { b := false; return &b }
 
 func (l *Log) Session() string { return l.session }
 
-// OpenExistingLog appends to the session that is already running. A guard is
+// OpenExisting appends to the session that is already running. A guard is
 // a separate process, started by the harness for one event, and it must add to
 // the record rather than start a new one.
 //
 // It is an error when there is no current file: no engine is running, and the
 // guard still has to answer.
-func OpenExistingLog(dir string) (*Log, error) {
+func OpenExisting(dir string) (*Log, error) {
 	cur := filepath.Join(dir, Current)
 	st, err := os.Stat(cur)
 	if err != nil {
@@ -214,7 +211,7 @@ func OpenExistingLog(dir string) (*Log, error) {
 	// shared counter. Each writer carries its own, and the record is read in
 	// file order, which is the order things happened.
 	return &Log{f: f, dir: dir, path: cur, limit: defaultLimit, written: st.Size(),
-		session: sessionOf(cur)}, nil
+		session: SessionOf(cur)}, nil
 }
 
 // The session name is in the first record of the file. Reading one line is
@@ -223,7 +220,7 @@ func OpenExistingLog(dir string) (*Log, error) {
 // A FILE THAT NAMES NO SESSION ANSWERS THE PLACEHOLDER, which every writer has
 // something to put in a record. It is not a session: Named in arrival.go says
 // which answers are, and ofThisSession in unbound.go is where that matters.
-func sessionOf(path string) string {
+func SessionOf(path string) string {
 	f, err := os.Open(path)
 	if err != nil {
 		return "current"

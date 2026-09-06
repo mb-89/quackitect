@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"quackitect/engine/internal/sessionlog"
 	"testing"
 )
 
@@ -17,7 +18,7 @@ import (
 func TestTheRegisterFollowsAgentsInAndOut(t *testing.T) {
 	t.Parallel()
 	r := guidanceTree(t)
-	log, err := OpenLog(r.Private("log"))
+	log, err := sessionlog.Open(r.Private("log"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -96,7 +97,7 @@ func TestTheRegisterFollowsAgentsInAndOut(t *testing.T) {
 func TestAnAgentSeenAfterARestartIsHereAgain(t *testing.T) {
 	t.Parallel()
 	r := guidanceTree(t)
-	log, err := OpenLog(r.Private("log"))
+	log, err := sessionlog.Open(r.Private("log"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -171,7 +172,7 @@ func TestAnAgentSeenAfterARestartIsHereAgain(t *testing.T) {
 func TestTheRegisterHoldsThisSessionOnly(t *testing.T) {
 	t.Parallel()
 	r := guidanceTree(t)
-	log, err := OpenLog(r.Private("log"))
+	log, err := sessionlog.Open(r.Private("log"))
 	if err != nil {
 		t.Fatal(err)
 	}

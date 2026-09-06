@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"quackitect/engine/internal/sessionlog"
 	"strings"
 	"time"
 )
@@ -96,7 +97,7 @@ func runClaim(c *call) int {
 		moved = res.Freed
 	}
 	if len(moved) > 0 {
-		inSession(r, "claim", *actor, me+" "+verb+" "+strings.Join(moved, ", "), Yes(),
+		inSession(r, "claim", *actor, me+" "+verb+" "+strings.Join(moved, ", "), sessionlog.Yes(),
 			map[string]any{"claimant": me, "ids": moved, "at": res.At})
 	}
 	// CLAIMING AND TAKING IN ONE CALL. An agent refused for want of a claim is

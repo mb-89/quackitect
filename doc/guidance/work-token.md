@@ -51,8 +51,8 @@ Keep the argument out of it: no history, no measurement of the record, no accoun
 A detail says what has to become true and names the constraint.
 Where the write goes is the worker's decision.
 
-A tracked token spends real work, so the ask says what is gained and what breaks if nobody does it.
-Both fail the same way, by restating the ask, so each carries evidence beside it.
+A tracked token spends real work, so the ask answers what is gained by doing it, and what breaks if it is never done.
+Both fail by restating the ask, so each carries evidence.
 
 ## 2. A criterion that cannot fail
 

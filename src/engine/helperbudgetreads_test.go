@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"path/filepath"
+	"quackitect/engine/internal/sessionlog"
 	"strings"
 	"testing"
 )
@@ -26,11 +27,11 @@ func TestAHelperBudgetCountsWhatItReadUnderEveryName(t *testing.T) {
 	exe := buildEngine(t)
 	r := aTreeWithTheProcesses(t)
 	Project(r)
-	l, err := OpenLog(r.Private("log"))
+	l, err := sessionlog.Open(r.Private("log"))
 	if err != nil {
 		t.Fatal(err)
 	}
-	l.Write("engine", "start", "engine", "engine started", Yes(), nil)
+	l.Write("engine", "start", "engine", "engine started", sessionlog.Yes(), nil)
 	l.Close()
 
 	cfg := TheFloor()

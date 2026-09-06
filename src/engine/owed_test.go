@@ -4,6 +4,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"quackitect/engine/internal/sessionlog"
 	"strconv"
 	"strings"
 	"sync"
@@ -199,8 +200,8 @@ func TestTwoAgentsAskingAtOnceBothStillOwe(t *testing.T) {
 func TestAnObligationDiesWithItsSession(t *testing.T) {
 	t.Parallel()
 	r := guidanceTree(t)
-	l, _ := OpenLog(r.Private("log"))
-	l.Write("engine", "start", "engine", "started", Yes(), nil)
+	l, _ := sessionlog.Open(r.Private("log"))
+	l.Write("engine", "start", "engine", "started", sessionlog.Yes(), nil)
 	l.Close()
 
 	if err := TheyAsked(r, "main", "the thing said in this session"); err != nil {
@@ -211,12 +212,11 @@ func TestAnObligationDiesWithItsSession(t *testing.T) {
 	}
 
 	// The engine restarts. Everything before this belongs to another run.
-	os.Remove(filepath.Join(r.Private("log"), Current))
-	l2, _ := OpenLog(r.Private("log"))
+	os.Remove(filepath.Join(r.Private("log"), sessionlog.Current))
 	// A session is stamped to the second, and a test runs faster than that, so
 	// the second run is named rather than waiting for the clock.
-	l2.session = l2.session + "-after-the-restart"
-	l2.Write("engine", "start", "engine", "started again", Yes(), nil)
+	l2, _ := sessionlog.Continue(r.Private("log"), "after-the-restart")
+	l2.Write("engine", "start", "engine", "started again", sessionlog.Yes(), nil)
 	l2.Close()
 
 	if said, owed := AnswerOwed(r, "main"); owed {
@@ -298,8 +298,8 @@ func TestTheFallbackVerbLeavesTheWalkerOwing(t *testing.T) {
 	t.Parallel()
 	exe := buildEngine(t)
 	r := guidanceTree(t)
-	l, _ := OpenLog(r.Private("log"))
-	l.Write("engine", "start", "engine", "started", Yes(), nil)
+	l, _ := sessionlog.Open(r.Private("log"))
+	l.Write("engine", "start", "engine", "started", sessionlog.Yes(), nil)
 	l.Close()
 
 	const said = "the reviewer backlog is too big"
@@ -326,28 +326,28 @@ func TestTheTwoWritersMakeOneObligationInEitherOrder(t *testing.T) {
 	exe := buildEngine(t)
 	const said = "and one more thing while you are at it"
 
-	fallbackFirst := func(t *testing.T, r Roots, l *Log, path string) {
+	fallbackFirst := func(t *testing.T, r Roots, l *sessionlog.Log, path string) {
 		out, err := exec.Command(exe, "--work", r.Work, "--method", r.Method, "--said", said).CombinedOutput()
 		if err != nil {
 			t.Fatalf("the verb failed: %v\n%s", err, out)
 		}
 		CopyWhatWasHeard(r, path, l, "reviewer3")
 	}
-	copierFirst := func(t *testing.T, r Roots, l *Log, path string) {
+	copierFirst := func(t *testing.T, r Roots, l *sessionlog.Log, path string) {
 		CopyWhatWasHeard(r, path, l, "reviewer3")
 		out, err := exec.Command(exe, "--work", r.Work, "--method", r.Method, "--said", said).CombinedOutput()
 		if err != nil {
 			t.Fatalf("the verb failed: %v\n%s", err, out)
 		}
 	}
-	for name, order := range map[string]func(*testing.T, Roots, *Log, string){
+	for name, order := range map[string]func(*testing.T, Roots, *sessionlog.Log, string){
 		"the fallback first": fallbackFirst,
 		"the copier first":   copierFirst,
 	} {
 		t.Run(name, func(t *testing.T) {
 			r := guidanceTree(t)
-			l, _ := OpenLog(r.Private("log"))
-			l.Write("engine", "start", "engine", "started", Yes(), nil)
+			l, _ := sessionlog.Open(r.Private("log"))
+			l.Write("engine", "start", "engine", "started", sessionlog.Yes(), nil)
 
 			path := filepath.Join(t.TempDir(), "session.jsonl")
 			os.WriteFile(path, nil, 0o644)

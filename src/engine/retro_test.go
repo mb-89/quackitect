@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"quackitect/engine/internal/sessionlog"
 	"strings"
 	"testing"
 )
@@ -100,7 +101,7 @@ func TestARetroTakesTheRunningSessionToo(t *testing.T) {
 	if !found {
 		t.Fatal("the session that was running was left behind")
 	}
-	if _, err := os.Stat(filepath.Join(r.Private("log"), Current)); err == nil {
+	if _, err := os.Stat(filepath.Join(r.Private("log"), sessionlog.Current)); err == nil {
 		t.Fatal("the running log is still where it was")
 	}
 }

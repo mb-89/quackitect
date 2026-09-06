@@ -6,25 +6,23 @@ process: [[trivial]]
 # the rules for filling this token
 guidance: [[work-token]]
 # the name this token is known by, in references and in links
-title: stop criterion names test
+title: driving discussion is full
 # where the token stands. The process owns these values.
 status: open
 ---
 
 ## detail
 
-A FINDING WHILE REVIEWING wk-c1d58b91d6.
-
-The third criterion on wk-c1d58b91d6 says a claim under a name no alias links is found under that name alone, decided by go test -C src/engine -run 'TestStopClaim|TestAClaim' ./... answering ok. No test in src/engine is named TestStopClaim, and the eight named TestAClaim are work-claim tests in claim_test.go, claimgate_test.go, challenge_test.go, gitfed_test.go and relentneedsaclaim_test.go, none of which touches a stop claim. se test --on wk-c1d58b91d6 with those two patterns proposed answered unreached for both. The case itself is asserted, but as the tail of TestAStopClaimIsFoundUnderTheHarnessName in src/engine/stopclaimnames_test.go, where StandingClaim(r, "worker-bach") must answer nothing. So the criterion's command runs eight unrelated tests and says ok, and a reader believes the no-alias case is guarded by the command named for it.
+doc/guidance/driving-the-engine.md carries a Discussion chapter of 997 words, and src/schemas/guidance.schema.yaml allows a thousand. The schema also asks one Discussion chapter per starred Actionable. So the file can take a new rule and cannot take the reason for it. wk-b65222b6f1 met that wall and landed rules twelve and thirteen unstarred, which leaves the argument for claiming a block in a commit message where no agent reads it. Measured with python over the file, splitting on the Discussion heading and counting whitespace fields, which is what overWords in src/engine/schema.go counts.
 
 ## proposed action
 
-Move the worker-bach assertion out of TestAStopClaimIsFoundUnderTheHarnessName into a test of its own in src/engine/stopclaimnames_test.go whose name the criterion's pattern reaches, such as TestAClaimUnderAnUnlinkedNameIsFoundUnderThatNameAlone, so go test -run 'TestStopClaim|TestAClaim' decides what the criterion says it decides.
+Either compress the ten existing chapters to buy room for new ones, or decide that this file's Discussion is full and the argument for a new rule goes to doc/rationale, named from the rule. The second is cheaper and matches how workers-share-one-tree is already named from work-token.md rather than repeated in it.
 
 ## done when
 
-- go test -C src/engine -run 'TestAClaimUnderAnUnlinkedName' ./... answers ok and names one test that ran, and it fails when StandingClaim is made to answer every claim regardless of name
-- TestAStopClaimIsFoundUnderTheHarnessName still answers ok
+- driving-the-engine.md Discussion sits under the cap with room for one more chapter, or a rationale note carries the argument for rule twelve, decided by: .bin/se.exe lint answering no guidance finding
+- the reason an agent bound to the queue claims a block is readable from the guidance, by a link or a chapter, decided by reading doc/guidance/driving-the-engine.md
 
 ## evidence: step 1. ask
 

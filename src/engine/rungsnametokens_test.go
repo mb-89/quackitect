@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"quackitect/engine/internal/sessionlog"
 	"strings"
 	"testing"
 )
@@ -31,12 +32,12 @@ const (
 func TestEveryRungButGodNamesItsToken(t *testing.T) {
 	t.Parallel()
 	r := aTreeWithTheProcesses(t)
-	log, err := OpenLog(r.Private("log"))
+	log, err := sessionlog.Open(r.Private("log"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer log.Close()
-	record(log, "engine", "start", "engine", "engine started", Yes(), nil)
+	record(log, "engine", "start", "engine", "engine started", sessionlog.Yes(), nil)
 
 	say := func(tool string, input map[string]any) string {
 		t.Helper()

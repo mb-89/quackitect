@@ -1,6 +1,9 @@
 package main
 
-import "testing"
+import (
+	"quackitect/engine/internal/sessionlog"
+	"testing"
+)
 
 // AN AGENT THAT PULLED IS A HAND, WHETHER OR NOT THE REGISTER HEARD OF IT.
 //
@@ -77,16 +80,16 @@ func TestAPulledAgentIsAHand(t *testing.T) {
 			r := aTreeWithTheProcesses(t)
 			// THE RUN IS NAMED BY THE FIRST LINE OF ITS LOG, and the
 			// register holds only this run's agents.
-			log, err := OpenLog(r.Private("log"))
+			log, err := sessionlog.Open(r.Private("log"))
 			if err != nil {
 				t.Fatal(err)
 			}
 			defer log.Close()
-			record(log, "engine", "start", "engine", "engine started", Yes(), nil)
+			record(log, "engine", "start", "engine", "engine started", sessionlog.Yes(), nil)
 			// WHAT SessionStart WRITES, hook.go's session case. The id on
 			// it is the harness's, and it is not the engine run.
 			if c.startup != "" {
-				record(log, "agent", "session", "main", "session started, startup", Yes(),
+				record(log, "agent", "session", "main", "session started, startup", sessionlog.Yes(),
 					map[string]any{"source": "startup", "session": c.startup})
 			}
 

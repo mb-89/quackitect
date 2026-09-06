@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"quackitect/engine/internal/sessionlog"
 	"testing"
 	"time"
 )
@@ -42,16 +43,16 @@ func theRecordSays(t *testing.T, r Roots, said ...wasHeard) {
 	session, now := currentSession(r), time.Now().UTC()
 	var lines []byte
 	for _, s := range said {
-		b, err := json.Marshal(Record{
+		b, err := json.Marshal(sessionlog.Record{
 			T: now.Add(-s.ago).Format(time.RFC3339Nano), Session: session,
-			Src: "agent", Kind: "call", Actor: s.actor, Msg: "se apply", OK: Yes(),
+			Src: "agent", Kind: "call", Actor: s.actor, Msg: "se apply", OK: sessionlog.Yes(),
 		})
 		if err != nil {
 			t.Fatal(err)
 		}
 		lines = append(lines, append(b, '\n')...)
 	}
-	if err := os.WriteFile(filepath.Join(r.Private("log"), Current), lines, 0o644); err != nil {
+	if err := os.WriteFile(filepath.Join(r.Private("log"), sessionlog.Current), lines, 0o644); err != nil {
 		t.Fatal(err)
 	}
 }

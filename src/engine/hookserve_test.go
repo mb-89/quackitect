@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"quackitect/engine/internal/sessionlog"
 	"strings"
 	"testing"
 )
@@ -18,7 +19,7 @@ func TestTheGuardAnswersTheSameOverHTTP(t *testing.T) {
 	t.Parallel()
 	r := guidanceTree(t)
 	Project(r)
-	log, err := OpenLog(r.Private("log"))
+	log, err := sessionlog.Open(r.Private("log"))
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"quackitect/engine/internal/sessionlog"
 	"strings"
 	"testing"
 	"time"
@@ -17,12 +18,12 @@ func TestALookDoesNotStealFromAHolderStillCalling(t *testing.T) {
 	r := aTree(t).Roots
 	root := r.Work
 	writeWorkableProcess(t, root, "queued")
-	log, err := OpenLog(r.Private("log"))
+	log, err := sessionlog.Open(r.Private("log"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer log.Close()
-	log.Write("engine", "start", "engine", "for the session name", Yes(), nil)
+	log.Write("engine", "start", "engine", "for the session name", sessionlog.Yes(), nil)
 
 	tok, err := Mint(r, Token{Tracked: local(), Process: "queued", Title: "work in review", Status: "first"})
 	if err != nil {
@@ -51,12 +52,12 @@ func TestALookDoesNotStealFromANewerHolder(t *testing.T) {
 	r := aTree(t).Roots
 	root := r.Work
 	writeWorkableProcess(t, root, "queued")
-	log, err := OpenLog(r.Private("log"))
+	log, err := sessionlog.Open(r.Private("log"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer log.Close()
-	log.Write("engine", "start", "engine", "for the session name", Yes(), nil)
+	log.Write("engine", "start", "engine", "for the session name", sessionlog.Yes(), nil)
 
 	tok, err := Mint(r, Token{Tracked: local(), Process: "queued", Title: "work that moved on", Status: "first"})
 	if err != nil {

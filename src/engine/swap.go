@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"quackitect/engine/internal/quiet"
 	"quackitect/engine/internal/replaced"
+	"quackitect/engine/internal/sessionlog"
 	"quackitect/engine/internal/version"
 	"strings"
 	"time"
@@ -338,7 +339,7 @@ func handOver(ctx context.Context, r Roots, session string) error {
 	// THE SESSION RIDES OUT OF BAND. A swap is one session with two processes
 	// in it, and retiring the log at the handover would split the record of one
 	// stretch of work in half at a moment nobody chose.
-	cmd.Env = append(os.Environ(), sessionVar+"="+session)
+	cmd.Env = append(os.Environ(), sessionlog.SessionVar+"="+session)
 	cmd.Stdout, cmd.Stderr = out, out
 	// THE TREE IS LET GO OF FIRST, on purpose. A starting engine takes the
 	// tree before anything else, and this one still holds it, so a successor

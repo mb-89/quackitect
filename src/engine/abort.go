@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"quackitect/engine/internal/sessionlog"
 	"strings"
 )
 
@@ -104,7 +105,7 @@ func Abort(r Roots, a Aborting) (Token, error) {
 	if err := SaveToken(r, t); err != nil && !TheCloseStood(err) {
 		return t, err
 	}
-	inSession(r, "work", a.By, t.ID+" aborted from "+string(from)+" as "+string(as)+": "+a.Why, Yes(),
+	inSession(r, "work", a.By, t.ID+" aborted from "+string(from)+" as "+string(as)+": "+a.Why, sessionlog.Yes(),
 		map[string]any{"id": t.ID, "from": string(from), "disposition": string(as),
 			"successors": a.Successors, "reason": a.Why})
 	return t, nil

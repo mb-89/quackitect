@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"quackitect/engine/internal/sessionlog"
 	"strings"
 	"testing"
 )
@@ -233,7 +234,7 @@ func TestWhenTheWholeBatteryRuns(t *testing.T) {
 func TestTheTestsAreTheEngines(t *testing.T) {
 	t.Parallel()
 	r := guidanceTree(t)
-	log, err := OpenLog(r.Private("log"))
+	log, err := sessionlog.Open(r.Private("log"))
 	if err != nil {
 		t.Fatal(err)
 	}

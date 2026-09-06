@@ -9,6 +9,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"quackitect/engine/internal/quiet"
+	"quackitect/engine/internal/sessionlog"
 	"reflect"
 	"runtime"
 	"sort"
@@ -253,7 +254,7 @@ func Retro(ctx context.Context, r Roots, actor string, transcripts []Transcript)
 	// THE LOG IS ROTATED FIRST, so the session that is running becomes an old
 	// file and this retro sees it rather than the next one.
 	logs := r.Private("log")
-	if err := RetireCurrent(logs); err != nil {
+	if err := sessionlog.RetireCurrent(logs); err != nil {
 		return got, fmt.Errorf("the running log will not set aside: %w", err)
 	}
 
@@ -415,7 +416,7 @@ func Retro(ctx context.Context, r Roots, actor string, transcripts []Transcript)
 		return got, err
 	}
 
-	inSession(r, "retro", actor, "a retro collected "+folder, Yes(),
+	inSession(r, "retro", actor, "a retro collected "+folder, sessionlog.Yes(),
 		map[string]any{"folder": folder, "logs": got.Logs, "scripts": got.Scripts,
 			"outputs": got.Outputs, "undos": got.Undos, "counts": got.Counts,
 			"earlier": len(got.Earlier)})
@@ -454,7 +455,7 @@ func theVoiceOf(r Roots, logDir string, sessions []string) VoiceReading {
 		// looking like a measurement.
 		scan.Buffer(make([]byte, 0, 64<<10), 8<<20)
 		for n := 1; scan.Scan(); n++ {
-			var rec Record
+			var rec sessionlog.Record
 			if json.Unmarshal(scan.Bytes(), &rec) != nil || rec.Src != "agent" || rec.Msg == "" {
 				continue
 			}

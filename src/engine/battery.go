@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"quackitect/engine/internal/alive"
 	"quackitect/engine/internal/quiet"
+	"quackitect/engine/internal/sessionlog"
 	"quackitect/engine/internal/version"
 	"strings"
 	"time"
@@ -128,7 +129,7 @@ func stillRunning(pid int) bool { return pid > 0 && alive.Is(pid) }
 // engine into the record, and clears the marker. It is called at every start,
 // because the run it reports on is usually the one that replaced the engine
 // that started it.
-func RecordFinishedBattery(r Roots, log *Log) {
+func RecordFinishedBattery(r Roots, log *sessionlog.Log) {
 	was, ok := batteryGoing(r)
 	if !ok {
 		return
@@ -138,7 +139,7 @@ func RecordFinishedBattery(r Roots, log *Log) {
 	}
 	said, err := os.ReadFile(was.Out)
 	if err != nil {
-		log.Write("engine", "test", "engine", "a battery ran and its output cannot be read", No(),
+		log.Write("engine", "test", "engine", "a battery ran and its output cannot be read", sessionlog.No(),
 			map[string]any{"out": was.Out, "reason": err.Error()})
 		_ = os.Remove(batteryMarker(r))
 		return

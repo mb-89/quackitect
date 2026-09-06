@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"quackitect/engine/internal/sessionlog"
 	"strings"
 	"testing"
 	"time"
@@ -241,14 +242,14 @@ func TestTheQueueIsStaffed(t *testing.T) {
 	t.Parallel()
 	r := aTreeWithTheProcesses(t)
 	noEngineHere(t, r)
-	log, err := OpenLog(r.Private("log"))
+	log, err := sessionlog.Open(r.Private("log"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer log.Close()
 	// THE RUN IS NAMED BY THE FIRST LINE OF ITS LOG, which the engine writes
 	// at start. A mint writing first would name it current, which is no name.
-	record(log, "engine", "start", "engine", "engine started", Yes(), nil)
+	record(log, "engine", "start", "engine", "engine started", sessionlog.Yes(), nil)
 	// THE NUMBER IS THIS TEST'S, AND THE TREE SAYS IT.
 	//
 	// It was set on a Config value the assertions below never reach: the hook

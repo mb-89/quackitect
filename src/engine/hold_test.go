@@ -2,6 +2,7 @@ package main
 
 import (
 	"path/filepath"
+	"quackitect/engine/internal/sessionlog"
 	"strings"
 	"testing"
 )
@@ -13,7 +14,7 @@ func TestNothingIsAllowedWhileEverythingIsOnHold(t *testing.T) {
 	exe := buildEngine(t)
 	r := guidanceTree(t)
 	Project(r)
-	l, _ := OpenLog(r.Private("log"))
+	l, _ := sessionlog.Open(r.Private("log"))
 	l.Close()
 
 	read := map[string]any{

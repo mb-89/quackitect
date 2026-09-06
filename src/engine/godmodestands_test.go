@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"quackitect/engine/internal/sessionlog"
 	"testing"
 )
 
@@ -31,12 +32,12 @@ func theEngineRestarted(t *testing.T, r Roots, run string) {
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		t.Fatal(err)
 	}
-	b, err := json.Marshal(Record{Session: run, Src: "engine", Kind: "start",
+	b, err := json.Marshal(sessionlog.Record{Session: run, Src: "engine", Kind: "start",
 		Actor: "engine", Msg: "engine started"})
 	if err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(filepath.Join(dir, Current), append(b, '\n'), 0o644); err != nil {
+	if err := os.WriteFile(filepath.Join(dir, sessionlog.Current), append(b, '\n'), 0o644); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -46,12 +47,12 @@ func theEngineRestarted(t *testing.T, r Roots, run string) {
 // ended.
 func appending(t *testing.T, r Roots, kind, msg string) {
 	t.Helper()
-	log, err := ContinueLog(r.Private("log"), currentSession(r))
+	log, err := sessionlog.Continue(r.Private("log"), currentSession(r))
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer log.Close()
-	record(log, "engine", kind, "engine", msg, Yes(), nil)
+	record(log, "engine", kind, "engine", msg, sessionlog.Yes(), nil)
 }
 
 func TestOnlyAClickPutsTheRungBack(t *testing.T) {

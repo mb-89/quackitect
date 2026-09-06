@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"quackitect/engine/internal/sessionlog"
 	"strings"
 	"testing"
 )
@@ -23,12 +24,12 @@ import (
 // retry. The code below that comment relented on a count anyway.
 func TestAStopWithNoClaimIsRefusedHoweverOftenItIsAsked(t *testing.T) {
 	r := aTreeWithTheProcesses(t)
-	log, err := OpenLog(r.Private("log"))
+	log, err := sessionlog.Open(r.Private("log"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer log.Close()
-	record(log, "engine", "start", "engine", "engine started", Yes(), nil)
+	record(log, "engine", "start", "engine", "engine started", sessionlog.Yes(), nil)
 
 	tok := mintStandard(t, r, "work left standing")
 	if _, err := TakeUp(r, tok.ID, "main"); err != nil {
@@ -59,12 +60,12 @@ func TestAStopWithNoClaimIsRefusedHoweverOftenItIsAsked(t *testing.T) {
 // AND A CLAIM GRANTS ONE STOP, WHICH THE NEXT PULL SPENDS.
 func TestAClaimGrantsOneStopAndThePullSpendsIt(t *testing.T) {
 	r := aTreeWithTheProcesses(t)
-	log, err := OpenLog(r.Private("log"))
+	log, err := sessionlog.Open(r.Private("log"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer log.Close()
-	record(log, "engine", "start", "engine", "engine started", Yes(), nil)
+	record(log, "engine", "start", "engine", "engine started", sessionlog.Yes(), nil)
 
 	mintStandard(t, r, "work to return to")
 	stop := func() string {

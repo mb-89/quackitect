@@ -297,41 +297,6 @@ else
   exit 1
 fi
 
-# gofmt_clean fails when gofmt would change anything, and says what.
-#
-# THE LINE ENDING IS NOT A FORMATTING FINDING. This checkout converts line
-# endings on the way out, so a file can carry a carriage return that the
-# index does not, and gofmt reports every such file as one it would change.
-# Each file is read with the carriage returns taken off, so what is judged is
-# what git holds and what the formatter cares about.
-gofmt_clean() {
-  # ONE PROCESS OVER THE TREE FIRST. A pass per file cost forty seconds
-  # under the battery's load, for a question gofmt answers in one.
-  #
-  # THE LIST IS NOT CALLED bad, BECAUSE THE BATTERY'S COUNTER IS. A shell
-  # function shares the script's variables, so while this held its findings in
-  # a name the counter already had, the only thing keeping the count safe was
-  # that gofmt runs through start, in a background subshell, where an
-  # assignment cannot reach the parent. Move this to the run lane, where the
-  # build and engine-up lanes already sit, and the battery's tally of failures
-  # is quietly set to the empty string on every run.
-  unformatted=""
-  for f in $(gofmt -l "$@"); do
-    # A file gofmt names may be one that only carries carriage returns, so
-    # it is asked again with them taken off, and only that answer counts.
-    if [ -n "$(tr -d '\r' <"$f" | gofmt -l)" ]; then
-      unformatted="$unformatted$f
-"
-    fi
-  done
-  if [ -n "$unformatted" ]; then
-    printf '%s' "$unformatted"
-    echo "gofmt would change the files above"
-    return 1
-  fi
-  echo "gofmt has nothing to change"
-}
-
 # THE BUILD GOES FIRST AND ALONE. Every check after it reads .bin/se.exe or the
 # sources it just compiled, so this is the one that cannot overlap.
 run "go build" build
@@ -412,14 +377,24 @@ start "go test engine" engine_tests '.*'
 start "go test mcp" go test -C src/mcp -count=1 ./...
 start "go test viewer" go test -C src/viewer -count=1 ./...
 start "go test setup" go test -C util/setup -count=1 ./...
-# THE TOOLS THE GO GUIDANCE NAMES, RUN HERE RATHER THAN REMEMBERED. gofmt
-# prints the files it would change and exits zero either way, so the check is
-# that it printed nothing.
-start "gofmt" gofmt_clean src/engine src/mcp src/viewer util/setup util/checks/trycmd
-start "go vet" go vet -C src/engine ./...
-start "go vet mcp" go vet -C src/mcp ./...
-start "go vet viewer" go vet -C src/viewer ./...
-start "go vet setup" go vet -C util/setup ./...
+# THE TOOLS THE GO GUIDANCE NAMES, RUN HERE RATHER THAN REMEMBERED.
+#
+# go vet IS NOT RUN HERE, BECAUSE se lint RUNS IT.
+#
+# The Go tools went behind the verb and these lines stayed where they were, so
+# go vet ran over four modules and then se lint ran it over every module
+# carrying a go.mod, with golangci-lint reading them again and govet among its
+# own default rules. Nothing was learned on the second pass, and the battery is
+# a wall agents wait behind.
+#
+# AND gofmt IS NOT RUN HERE EITHER, ONCE se lint LEARNED TO READ IT. It stayed
+# behind when the vet lines went, and the reason was measured: se lint ran go
+# vet and golangci-lint and neither formats, golangci-lint enabling errcheck,
+# govet, ineffassign, staticcheck and unused by default with no formatter among
+# them. So gofmt was the only formatting guard and this was the only place it
+# ran. se lint now reads the shape of every folder carrying a go.mod, which is
+# the same five this line passed by name, so the guard is behind the verb and
+# this line would be the second pass.
 start "se lint" .bin/se.exe lint
 # A CHECK THAT IS NOT THERE IS A FAILURE, NOT A SKIP.
 #
@@ -439,7 +414,7 @@ start "se lint" .bin/se.exe lint
 #
 # It is first because it is a lane of its own length, and the run is as long as
 # its longest lane.
-for c in the-branch-head-builds no-flat-twins render-check drive-editor drawn-classes-have-rules panel-draws-the-register adapter-decides-no-column engine-args engine-args-lifecycle engine-spawns liveness one-look panel-icons no-loose-glyphs no-loose-spawns no-lone-escape checks-live-in-the-method engine-spawns-catches panel-is-handed-the-state panel-says-holding drive-panel burndown burndown-derives-nothing tests-name-no-token tests-are-not-hotspots mcp-tools lane-answers-cold the-cards-reach-their-box the-travelling-cage-cannot-block scripts-are-lf build-reports-every-error binaries-live-in-bin private-files-have-writers no-private-links refusals-name-a-door a-refusal-names-a-legal-move engine-stops-by-pid windows-say-they-are-here projections-carry-chapters archive-rows-name-an-object notes-say-each-heading-once deleted-notes-have-a-row the-flat-engine-only-shrinks archive-rows-travel the-cage-cites-what-is-here lane-carries-every-flag commits-carry-one-token; do
+for c in the-branch-head-builds render-check drive-editor drawn-classes-have-rules panel-draws-the-register adapter-decides-no-column engine-args engine-args-lifecycle engine-spawns liveness one-look panel-icons no-loose-glyphs no-loose-spawns no-lone-escape checks-live-in-the-method engine-spawns-catches panel-is-handed-the-state panel-says-holding drive-panel burndown burndown-derives-nothing tests-name-no-token tests-are-not-hotspots mcp-tools lane-answers-cold the-cards-reach-their-box the-travelling-cage-cannot-block scripts-are-lf build-reports-every-error binaries-live-in-bin private-files-have-writers no-private-links refusals-name-a-door a-refusal-names-a-legal-move engine-stops-by-pid windows-say-they-are-here projections-carry-chapters archive-rows-name-an-object notes-say-each-heading-once deleted-notes-have-a-row open-tokens-carry-their-sections no-parallel-seam-swap; do
   if [ -f "util/checks/$c.mjs" ]; then
     start "$c" node "util/checks/$c.mjs" "$root"
   else

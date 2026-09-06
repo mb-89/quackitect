@@ -13,6 +13,8 @@ fields:
   optional:
     - bucket
     - holder
+    - claimed_by
+    - claimed_at
     - author
     - urgent
     - needs_human

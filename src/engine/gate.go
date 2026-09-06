@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"quackitect/engine/internal/sessionlog"
 	"strings"
 	"time"
 )
@@ -148,7 +149,7 @@ func TakeUp(r Roots, id, actor string) (Token, error) {
 			return t, err
 		}
 		inSession(r, "work", actor, held.ID+" put back, because "+actor+" is on "+t.ID+" now",
-			Yes(), map[string]any{"id": held.ID, "for": t.ID})
+			sessionlog.Yes(), map[string]any{"id": held.ID, "for": t.ID})
 	}
 	if t.Holder == actor {
 		return t, nil

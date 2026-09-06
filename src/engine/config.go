@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"quackitect/engine/internal/keyword"
+	"quackitect/engine/internal/sessionlog"
 )
 
 // ONE TREE.
@@ -620,7 +621,7 @@ func (e Emergency) Describe() string {
 // KeywordSaid moves the control a person named, and answers the word it
 // matched. Its callers are the two routes the harness feeds, so an agent
 // cannot forge one. A move the floor refuses is recorded with its reason.
-func KeywordSaid(r Roots, log *Log, actor, said string) string {
+func KeywordSaid(r Roots, log *sessionlog.Log, actor, said string) string {
 	root, err := LoadTree(r.Method)
 	if err != nil {
 		return ""
@@ -644,10 +645,10 @@ func KeywordSaid(r Roots, log *Log, actor, said string) string {
 	data := map[string]any{"keyword": k.Word, "parameter": k.Key, "value": got}
 	if err != nil {
 		data["refused"] = err.Error()
-		record(log, "engine", "keyword", actor, err.Error(), No(), data)
+		record(log, "engine", "keyword", actor, err.Error(), sessionlog.No(), data)
 		return k.Word
 	}
 	now, _ := toBool(got)
-	record(log, "engine", "keyword", actor, k.Word+" is now "+keyword.OnOrOff(now), Yes(), data)
+	record(log, "engine", "keyword", actor, k.Word+" is now "+keyword.OnOrOff(now), sessionlog.Yes(), data)
 	return k.Word
 }

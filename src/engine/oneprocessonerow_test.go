@@ -1,6 +1,7 @@
 package main
 
 import (
+	"quackitect/engine/internal/sessionlog"
 	"strings"
 	"testing"
 )
@@ -16,12 +17,12 @@ import (
 // many, and the owner asked why the panel and the number disagree.
 func TestOneProcessDrawsOneRow(t *testing.T) {
 	r := aTreeWithTheProcesses(t)
-	log, err := OpenLog(r.Private("log"))
+	log, err := sessionlog.Open(r.Private("log"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer log.Close()
-	record(log, "engine", "start", "engine", "engine started", Yes(), nil)
+	record(log, "engine", "start", "engine", "engine started", sessionlog.Yes(), nil)
 
 	session := currentSession(r)
 	NoteSession(r, session)

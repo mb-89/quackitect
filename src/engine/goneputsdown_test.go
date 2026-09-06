@@ -1,6 +1,7 @@
 package main
 
 import (
+	"quackitect/engine/internal/sessionlog"
 	"strings"
 	"testing"
 )
@@ -31,12 +32,12 @@ func aGhost(t *testing.T, r Roots, id, actor, token string) string {
 // the identity went and touched no token.
 func TestAnAgentThatGoesPutsDownItsWork(t *testing.T) {
 	r := aTreeWithTheProcesses(t)
-	log, err := OpenLog(r.Private("log"))
+	log, err := sessionlog.Open(r.Private("log"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer log.Close()
-	record(log, "engine", "start", "engine", "engine started", Yes(), nil)
+	record(log, "engine", "start", "engine", "engine started", sessionlog.Yes(), nil)
 
 	tok := mintStandard(t, r, "held when it dies")
 	id := aGhost(t, r, "general-purpose-1", "worker-ghost", tok.ID)
@@ -63,12 +64,12 @@ func TestAnAgentThatGoesPutsDownItsWork(t *testing.T) {
 // second door.
 func TestATurnsEndPutsItsHelpersWorkDown(t *testing.T) {
 	r := aTreeWithTheProcesses(t)
-	log, err := OpenLog(r.Private("log"))
+	log, err := sessionlog.Open(r.Private("log"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer log.Close()
-	record(log, "engine", "start", "engine", "engine started", Yes(), nil)
+	record(log, "engine", "start", "engine", "engine started", sessionlog.Yes(), nil)
 
 	tok := mintStandard(t, r, "held at turn end")
 	aGhost(t, r, "general-purpose-2", "worker-swept", tok.ID)
@@ -88,12 +89,12 @@ func TestATurnsEndPutsItsHelpersWorkDown(t *testing.T) {
 // hand and handed it to nobody until the next engine start swept it.
 func TestASessionsEndPutsItsHelpersWorkDown(t *testing.T) {
 	r := aTreeWithTheProcesses(t)
-	log, err := OpenLog(r.Private("log"))
+	log, err := sessionlog.Open(r.Private("log"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer log.Close()
-	record(log, "engine", "start", "engine", "engine started", Yes(), nil)
+	record(log, "engine", "start", "engine", "engine started", sessionlog.Yes(), nil)
 
 	helpers := mintStandard(t, r, "held at session end")
 	aGhost(t, r, "general-purpose-4", "worker-outlived", helpers.ID)
@@ -122,12 +123,12 @@ func TestASessionsEndPutsItsHelpersWorkDown(t *testing.T) {
 // puts the work down deliberately rather than the engine tidying up after it.
 func TestAHelperCannotStopHoldingOpenWork(t *testing.T) {
 	r := aTreeWithTheProcesses(t)
-	log, err := OpenLog(r.Private("log"))
+	log, err := sessionlog.Open(r.Private("log"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer log.Close()
-	record(log, "engine", "start", "engine", "engine started", Yes(), nil)
+	record(log, "engine", "start", "engine", "engine started", sessionlog.Yes(), nil)
 
 	tok := mintStandard(t, r, "work walked away from")
 	id := aGhost(t, r, "general-purpose-3", "worker-walker", tok.ID)

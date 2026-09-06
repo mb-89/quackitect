@@ -1,6 +1,9 @@
 package main
 
-import "testing"
+import (
+	"quackitect/engine/internal/sessionlog"
+	"testing"
+)
 
 // ONE NUMBER STAFFS EVERY ROLE, AND IT IS A MAXIMUM RATHER THAN A RATIO.
 //
@@ -66,12 +69,12 @@ func TestTheMainAgentCountsAsAWorker(t *testing.T) {
 	r := aTreeWithTheProcesses(t)
 	// THE RUN IS NAMED BY THE FIRST LINE OF ITS LOG, and the register holds
 	// only this run's agents, so nobody is present until the log is opened.
-	log, err := OpenLog(r.Private("log"))
+	log, err := sessionlog.Open(r.Private("log"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer log.Close()
-	record(log, "engine", "start", "engine", "engine started", Yes(), nil)
+	record(log, "engine", "start", "engine", "engine started", sessionlog.Yes(), nil)
 
 	cfg := TheFloor()
 	cfg.ParallelAgents = 3

@@ -15,7 +15,7 @@
 9. Do not kill yourself because you are afraid of dying. Build against a failure seen, not one feared. *
 10. Mark an estimate as an estimate. Say "I do not know" when you do not know.
 11. Read a file before you change it. Change one thing at a time, and leave every other file as it was.
-12. Stage the paths you edited, by name. Never stage everything. *
+12. Stage the paths you edited, by name. Never stage everything, and never merge in the shared tree: push through the cherry-pick door. *
 13. Private data: names, datetimes and unfiltered notes. They do not go into git.
 
 # Driving the engine
@@ -33,6 +33,8 @@
 9. Test through the engine: `se_test` runs what your delta reaches. A test you name runs, a pattern narrows. *
 10. Break work into sub-tokens with `se_work`, naming the parent. Your own todo list is refused. *
 11. Replace the engine with `se --swap`. A build aimed at `.bin` is refused. *
+12. Bound to the queue, claim a block with `se claim --next <n>` or `--these`, sized to what you finish before the claim lapses.
+13. Inside a box, take up what it holds rather than claiming again: a claim is between boxes, a hold within one.
 
 # Voice
 

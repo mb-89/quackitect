@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"quackitect/engine/internal/sessionlog"
 	"strings"
 	"testing"
 	"time"
@@ -16,7 +17,7 @@ import (
 // refused every write for holding nothing.
 
 // arrive tells the guard a session started, the way the harness does.
-func arrive(t *testing.T, r Roots, log *Log, session string) {
+func arrive(t *testing.T, r Roots, log *sessionlog.Log, session string) {
 	t.Helper()
 	body, _ := json.Marshal(map[string]any{"hook_event_name": "SessionStart",
 		"cwd": r.Work, "session_id": session, "source": "startup"})
@@ -29,12 +30,12 @@ func arrive(t *testing.T, r Roots, log *Log, session string) {
 // are told apart by something two sessions cannot both say.
 func TestTwoSessionsAreTwoActors(t *testing.T) {
 	r := aTreeWithTheProcesses(t)
-	log, err := OpenLog(r.Private("log"))
+	log, err := sessionlog.Open(r.Private("log"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer log.Close()
-	record(log, "engine", "start", "engine", "engine started", Yes(), nil)
+	record(log, "engine", "start", "engine", "engine started", sessionlog.Yes(), nil)
 
 	arrive(t, r, log, "s-first")
 	arrive(t, r, log, "s-second-3f2a9c1b")
@@ -91,12 +92,12 @@ func TestTwoSessionsAreTwoActors(t *testing.T) {
 // session on every event, so the guard is what answers.
 func TestANameAnotherSessionHoldsIsRefused(t *testing.T) {
 	r := aTreeWithTheProcesses(t)
-	log, err := OpenLog(r.Private("log"))
+	log, err := sessionlog.Open(r.Private("log"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer log.Close()
-	record(log, "engine", "start", "engine", "engine started", Yes(), nil)
+	record(log, "engine", "start", "engine", "engine started", sessionlog.Yes(), nil)
 
 	call := func(session, tool string, in map[string]any) string {
 		t.Helper()

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"quackitect/engine/internal/sessionlog"
 )
 
 // A HOLD NOBODY IS BEHIND SENDS SOMEBODY TO LOOK.
@@ -230,7 +231,7 @@ func TakeBackWhatWasLookedAt(r Roots, actor string) ([]string, string) {
 		return saveLooked(r, seen)
 	})
 	inSession(r, "work", actor, t.ID+" taken back from "+heldBefore+
-		", who was looked at and is gone", Yes(),
+		", who was looked at and is gone", sessionlog.Yes(),
 		map[string]any{"id": t.ID, "from": heldBefore})
 	return []string{t.ID + " from " + heldBefore}, ""
 }

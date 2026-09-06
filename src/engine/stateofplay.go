@@ -8,6 +8,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"quackitect/engine/internal/quiet"
+	"quackitect/engine/internal/sessionlog"
 	"sort"
 	"strconv"
 	"strings"
@@ -117,7 +118,7 @@ func gitShowsWhen(r Roots, hash string) (time.Time, error) {
 // the window. The record is the source, so nothing here derives a move from
 // what a token happens to look like now.
 func movedWithin(r Roots, now time.Time, window time.Duration) (minted, closed int) {
-	b, err := os.ReadFile(filepath.Join(r.Private("log"), Current))
+	b, err := os.ReadFile(filepath.Join(r.Private("log"), sessionlog.Current))
 	if err != nil {
 		return 0, 0
 	}

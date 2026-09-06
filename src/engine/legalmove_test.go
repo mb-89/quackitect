@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"path/filepath"
+	"quackitect/engine/internal/sessionlog"
 	"strings"
 	"testing"
 )
@@ -17,12 +18,12 @@ import (
 // in the shape it prints, and the gate is the judge of it rather than a reader.
 func TestEveryCommandARefusalOffersIsAdmitted(t *testing.T) {
 	r := aTreeWithTheProcesses(t)
-	log, err := OpenLog(r.Private("log"))
+	log, err := sessionlog.Open(r.Private("log"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer log.Close()
-	record(log, "engine", "start", "engine", "engine started", Yes(), nil)
+	record(log, "engine", "start", "engine", "engine started", sessionlog.Yes(), nil)
 
 	refusals := map[string]string{}
 	for _, tool := range []string{"Bash", "PowerShell", "Write", "Edit", "NotebookEdit"} {

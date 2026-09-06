@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"path/filepath"
+	"quackitect/engine/internal/sessionlog"
 	"strings"
 	"testing"
 )
@@ -21,12 +22,12 @@ import (
 // said about identity, and the .se row asserts the write went through whole.
 func TestTheIdentityDoorDecidesWrites(t *testing.T) {
 	r := aTreeWithTheProcesses(t)
-	log, err := OpenLog(r.Private("log"))
+	log, err := sessionlog.Open(r.Private("log"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer log.Close()
-	record(log, "engine", "start", "engine", "engine started", Yes(), nil)
+	record(log, "engine", "start", "engine", "engine started", sessionlog.Yes(), nil)
 
 	const dated = "Measured on 2026-09-04, and six failed.\n"
 	for _, one := range []struct {
@@ -78,7 +79,7 @@ func TestTheIdentityDoorDecidesWrites(t *testing.T) {
 
 // aWriteAtTheDoor drives one harness Write through the PreToolUse decision and
 // answers what the guard wrote, which is nothing when the call is allowed.
-func aWriteAtTheDoor(t *testing.T, r Roots, log *Log, path, content string) string {
+func aWriteAtTheDoor(t *testing.T, r Roots, log *sessionlog.Log, path, content string) string {
 	t.Helper()
 	input, err := json.Marshal(map[string]string{"file_path": path, "content": content})
 	if err != nil {

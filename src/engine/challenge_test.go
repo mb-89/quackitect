@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"quackitect/engine/internal/sessionlog"
 	"strings"
 	"testing"
 )
@@ -25,12 +26,12 @@ import (
 // lives rather than by accident here.
 func TestAClaimIsArguedWithAndTheThirdIsGranted(t *testing.T) {
 	r := aTreeWithTheProcesses(t)
-	log, err := OpenLog(r.Private("log"))
+	log, err := sessionlog.Open(r.Private("log"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer log.Close()
-	record(log, "engine", "start", "engine", "engine started", Yes(), nil)
+	record(log, "engine", "start", "engine", "engine started", sessionlog.Yes(), nil)
 
 	tok := mintStandard(t, r, "work still standing")
 	if _, err := TakeUp(r, tok.ID, "main"); err != nil {
@@ -86,12 +87,12 @@ func TestAClaimIsArguedWithAndTheThirdIsGranted(t *testing.T) {
 // of stopping.
 func TestAClaimWithEmptyHandsIsGrantedAtOnce(t *testing.T) {
 	r := aTreeWithTheProcesses(t)
-	log, err := OpenLog(r.Private("log"))
+	log, err := sessionlog.Open(r.Private("log"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer log.Close()
-	record(log, "engine", "start", "engine", "engine started", Yes(), nil)
+	record(log, "engine", "start", "engine", "engine started", sessionlog.Yes(), nil)
 
 	stop := func() string {
 		t.Helper()
@@ -117,12 +118,12 @@ func TestAClaimWithEmptyHandsIsGrantedAtOnce(t *testing.T) {
 // changing your mind, so the next stop is claim one again.
 func TestCarryingOnStartsTheArgumentAgain(t *testing.T) {
 	r := aTreeWithTheProcesses(t)
-	log, err := OpenLog(r.Private("log"))
+	log, err := sessionlog.Open(r.Private("log"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer log.Close()
-	record(log, "engine", "start", "engine", "engine started", Yes(), nil)
+	record(log, "engine", "start", "engine", "engine started", sessionlog.Yes(), nil)
 
 	// THE ARGUMENT ONLY HAPPENS OVER WORK IN HAND, so the token is taken up. With
 	// empty hands the first claim would be granted and there would be no count to
@@ -192,12 +193,12 @@ func TestTheRefusalAsksBeforeItLists(t *testing.T) {
 // pulling opposite ways.
 func TestThePersonsWordIsNotArguedWith(t *testing.T) {
 	r := aTreeWithTheProcesses(t)
-	log, err := OpenLog(r.Private("log"))
+	log, err := sessionlog.Open(r.Private("log"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer log.Close()
-	record(log, "engine", "start", "engine", "engine started", Yes(), nil)
+	record(log, "engine", "start", "engine", "engine started", sessionlog.Yes(), nil)
 
 	// WORK IS IN HAND, which is the only thing the engine ever argues with. Any
 	// other reason would be pushed back on twice here.

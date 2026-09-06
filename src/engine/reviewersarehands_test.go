@@ -1,6 +1,9 @@
 package main
 
-import "testing"
+import (
+	"quackitect/engine/internal/sessionlog"
+	"testing"
+)
 
 // A REVIEWER IS A HAND, AND THE COUNT OF THEM HAD NO TEST.
 //
@@ -19,12 +22,12 @@ import "testing"
 // reviewer is only ever a name that pulled.
 func TestAReviewerIsAHandWhetherOrNotItIsRegistered(t *testing.T) {
 	r := aTreeWithTheProcesses(t)
-	log, err := OpenLog(r.Private("log"))
+	log, err := sessionlog.Open(r.Private("log"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer log.Close()
-	record(log, "engine", "start", "engine", "engine started", Yes(), nil)
+	record(log, "engine", "start", "engine", "engine started", sessionlog.Yes(), nil)
 
 	cfg := TheFloor()
 	cfg.ParallelAgents = 3

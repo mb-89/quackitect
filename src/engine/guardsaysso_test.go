@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"quackitect/engine/internal/sessionlog"
 	"strings"
 	"testing"
 )
@@ -51,7 +52,7 @@ func TestTheEngineSaysWhetherTheGuardIsLive(t *testing.T) {
 
 	// AND THE RECORD CARRIES THE SAME ANSWER, so a reader who was not watching
 	// the start can tell afterwards.
-	log, err := OpenLog(r.Private("log"))
+	log, err := sessionlog.Open(r.Private("log"))
 	if err != nil {
 		t.Fatal(err)
 	}

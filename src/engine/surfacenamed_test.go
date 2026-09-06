@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"os"
+	"quackitect/engine/internal/sessionlog"
 	"strings"
 	"testing"
 )
@@ -50,7 +51,7 @@ func theSurfaceOnTheSessionLine(t *testing.T, path string) (string, bool) {
 
 func TestASessionLineNamesTheSurface(t *testing.T) {
 	r := aTreeWithTheProcesses(t)
-	log, err := OpenLog(r.Private("log"))
+	log, err := sessionlog.Open(r.Private("log"))
 	if err != nil {
 		t.Fatal(err)
 	}

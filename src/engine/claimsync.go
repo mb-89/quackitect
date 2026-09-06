@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"os"
 	"quackitect/engine/internal/frontmatter"
+	"quackitect/engine/internal/sessionlog"
 	"strings"
 	"time"
 )
@@ -184,7 +185,7 @@ func saveFarClaims(r Roots, all TheFarClaims) {
 // engine stops. It is the resident engine's job because it is the one process
 // that lives long enough to have a clock. The context is the engine's, and
 // its end is the watch's end, fetch in flight included.
-func WatchForClaims(ctx context.Context, r Roots, log *Log) {
+func WatchForClaims(ctx context.Context, r Roots, log *sessionlog.Log) {
 	every := LoadConfig(r).ClaimSyncSeconds
 	if every <= 0 {
 		return // turned off
@@ -198,7 +199,7 @@ func WatchForClaims(ctx context.Context, r Roots, log *Log) {
 		got := SyncClaims(ctx, r)
 		if got.Ref != "" && got.Ref != was {
 			was = got.Ref
-			log.Write("engine", "claim", "engine", "the claims other boxes published were read", Yes(),
+			log.Write("engine", "claim", "engine", "the claims other boxes published were read", sessionlog.Yes(),
 				map[string]any{"claims": len(got.Claims), "ref": got.Ref})
 		}
 		select {

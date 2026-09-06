@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"path/filepath"
+	"quackitect/engine/internal/sessionlog"
 	"strings"
 )
 
@@ -261,3 +262,6 @@ func sameDir(a, b string) bool {
 func (r Roots) Private(parts ...string) string {
 	return filepath.Join(append([]string{r.Work, ".se"}, parts...)...)
 }
+
+// SessionLog is the file the record is being written to.
+func SessionLog(r Roots) string { return filepath.Join(r.Private("log"), sessionlog.Current) }

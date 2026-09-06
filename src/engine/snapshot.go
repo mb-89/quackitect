@@ -6,6 +6,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"quackitect/engine/internal/quiet"
+	"quackitect/engine/internal/sessionlog"
 	"strings"
 )
 
@@ -187,7 +188,7 @@ func appendHash(list []string, hash string) []string {
 func snapshotFor(r Roots, t Token, when string) string {
 	hash, err := Snapshot(r, t.ID+" "+when)
 	if err != nil {
-		inSession(r, "work", orElse(t.Holder, "engine"), t.ID+": no snapshot "+when+": "+err.Error(), No(),
+		inSession(r, "work", orElse(t.Holder, "engine"), t.ID+": no snapshot "+when+": "+err.Error(), sessionlog.No(),
 			map[string]any{"id": t.ID, "when": when})
 		return ""
 	}

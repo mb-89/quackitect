@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"path/filepath"
+	"quackitect/engine/internal/sessionlog"
 	"quackitect/engine/internal/version"
 	"testing"
 	"time"
@@ -38,7 +39,7 @@ func BenchmarkReindex(b *testing.B) {
 // client verb pays before its own work.
 func BenchmarkPingOverTheSocket(b *testing.B) {
 	r := aTreeToIndexB(b)
-	log, err := OpenLog(filepath.Join(b.TempDir(), "log"))
+	log, err := sessionlog.Open(filepath.Join(b.TempDir(), "log"))
 	if err != nil {
 		b.Fatal(err)
 	}

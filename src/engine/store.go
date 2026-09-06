@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"quackitect/engine/internal/frontmatter"
+	"quackitect/engine/internal/sessionlog"
 	"sort"
 	"strings"
 )
@@ -272,12 +273,12 @@ func noteMove(r Roots, t, was Token, existed bool) {
 	//
 	// Why it is this shape: [[the-line-says-what-happened]].
 	case !existed:
-		inSession(r, "work", orElse(t.Holder, "main"), t.ID+" minted "+t.Status+": "+t.Title, Yes(),
+		inSession(r, "work", orElse(t.Holder, "main"), t.ID+" minted "+t.Status+": "+t.Title, sessionlog.Yes(),
 			map[string]any{"id": t.ID, "minted": true, "status": t.Status, "process": t.Process})
 	case was.Status != t.Status:
 		who := orElse(t.Holder, was.Holder)
 		inSession(r, "work", who,
-			t.ID+" "+was.Status+" to "+t.Status+": "+t.Title, Yes(),
+			t.ID+" "+was.Status+" to "+t.Status+": "+t.Title, sessionlog.Yes(),
 			map[string]any{"id": t.ID, "from": was.Status, "to": t.Status,
 				"disposition": string(t.Disposition)})
 	}
@@ -689,7 +690,7 @@ func SaveToken(r Roots, t Token) error {
 	// NotArchived. Why is [[the-close-archives-the-token]].
 	if ended := Archivable(r, t); ended && (existed != nil || !Archivable(r, was)) {
 		if err := Archive(r, t); err != nil {
-			inSession(r, "work", orElse(t.Holder, "engine"), t.ID+" closed, and not archived: "+err.Error(), No(),
+			inSession(r, "work", orElse(t.Holder, "engine"), t.ID+" closed, and not archived: "+err.Error(), sessionlog.No(),
 				map[string]any{"id": t.ID})
 			return NotArchived{ID: t.ID, Err: err}
 		}

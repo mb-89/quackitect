@@ -1,4 +1,4 @@
-package main
+package sessionlog
 
 import (
 	"encoding/json"
@@ -13,7 +13,7 @@ import (
 func TestTheFileRotatesAndTheSessionDoesNot(t *testing.T) {
 	t.Parallel()
 	dir := t.TempDir()
-	l, _ := OpenLog(dir)
+	l, _ := Open(dir)
 	l.limit = 400
 	for i := 0; i < 40; i++ {
 		l.Write("engine", "note", "engine", strings.Repeat("x", 40), nil, nil)
@@ -40,30 +40,19 @@ func TestTheFileRotatesAndTheSessionDoesNot(t *testing.T) {
 	}
 }
 
-// The log is private material. It holds prompts, so it lives where private
-// material lives and never travels.
-func TestTheLogLivesInThePrivateFolder(t *testing.T) {
-	t.Parallel()
-	r := Roots{Method: "/m", Work: "/w"}
-	got := r.Private("log")
-	if filepath.ToSlash(got) != "/w/.se/log" {
-		t.Fatalf("the log should be private, got %s", got)
-	}
-}
-
 // The session that was current is set aside under a stamped name, never
 // deleted, and the new session starts on a clean file with the same name.
 func TestAnEarlierSessionIsSetAsideNotOverwritten(t *testing.T) {
 	t.Parallel()
 	dir := t.TempDir()
-	first, err := OpenLog(dir)
+	first, err := Open(dir)
 	if err != nil {
 		t.Fatal(err)
 	}
 	first.Write("engine", "start", "engine", "the first session", Yes(), nil)
 	first.Close()
 
-	second, err := OpenLog(dir)
+	second, err := Open(dir)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -92,7 +81,7 @@ func TestAnEarlierSessionIsSetAsideNotOverwritten(t *testing.T) {
 func TestRotatingWithoutAnEngineKeepsWhatWasThere(t *testing.T) {
 	t.Parallel()
 	dir := t.TempDir()
-	l, _ := OpenLog(dir)
+	l, _ := Open(dir)
 	l.Write("engine", "start", "engine", "the session before", Yes(), nil)
 	l.Close()
 

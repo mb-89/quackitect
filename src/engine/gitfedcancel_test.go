@@ -17,7 +17,9 @@ import (
 // SO THE FAKE ANSWERS THE CONTEXT, the way the real one does. It is the seam
 // every claim test already feeds, so one rule there covers all of them.
 func TestACancelledContextEndsASync(t *testing.T) {
-	t.Parallel()
+	// NOT PARALLEL: aFedGit swaps gitRuns, which the whole package shares. A
+	// parallel test holding that seam takes the real git away from the three
+	// tests that drive one, and all three fail as a group.
 	r := aTree(t).apart().Roots
 	fed := aFedGit(t)
 	ctx, cancel := context.WithCancel(t.Context())
@@ -35,7 +37,8 @@ func TestACancelledContextEndsASync(t *testing.T) {
 // AND THE SAME SEAM STILL ANSWERS A LIVE CONTEXT, so the rule above refuses
 // only what is cancelled.
 func TestALiveContextStillReachesGit(t *testing.T) {
-	t.Parallel()
+	// NOT PARALLEL: this holds the same seam, and the reason is on the test
+	// above.
 	r := aTree(t).apart().Roots
 	fed := aFedGit(t)
 	fed.says["rev-parse"] = ""

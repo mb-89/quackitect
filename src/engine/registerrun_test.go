@@ -1,6 +1,7 @@
 package main
 
 import (
+	"quackitect/engine/internal/sessionlog"
 	"testing"
 	"time"
 )
@@ -16,12 +17,12 @@ func TestAnAgentFromAnEarlierRunIsNotPresent(t *testing.T) {
 	r := aTreeToWriteIn(t)
 	// A SESSION WITH A NAME, which is what the engine writes at its start and
 	// what the register is read against when no engine is running.
-	log, err := OpenLog(r.Private("log"))
+	log, err := sessionlog.Open(r.Private("log"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer log.Close()
-	record(log, "engine", "start", "engine", "engine started", Yes(), nil)
+	record(log, "engine", "start", "engine", "engine started", sessionlog.Yes(), nil)
 	now := time.Now().UTC()
 
 	// The register as an earlier engine left it, under that engine's run.
