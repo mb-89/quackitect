@@ -83,6 +83,28 @@ func SweepWorkHeldByTheGone(r Roots) []string {
 	return back
 }
 
+// sweepEveryBeats is how many of the engine's own beats pass between sweeps.
+//
+// EVERY SWEEP READS EVERY TOKEN, and the pulse is seconds while the silence
+// window is minutes. Sweeping on every beat asks a hundred times over a
+// question whose answer cannot have moved, and the tree is read each time.
+// Twelve beats is a minute at the default pulse.
+const sweepEveryBeats = 12
+
+// SweepOnTheBeat sweeps when this beat is one of the sweeping ones, and answers
+// what went back.
+//
+// A START WAS THE ONLY PLACE A GHOST WAS CAUGHT, and an engine that stays up all
+// day never reaches one. So a hold behind a hand that ended sat until somebody
+// pulled and was sent to look, and every ended agent cost the next one a pull.
+// Measured: nine agents ended over one session and each produced a look.
+func SweepOnTheBeat(r Roots, beats int) []string {
+	if beats <= 0 || beats%sweepEveryBeats != 0 {
+		return nil
+	}
+	return SweepWorkHeldByTheGone(r)
+}
+
 // AHelperStopHoldingWork answers why a helper's stop is refused while it holds
 // open work, and whether it is.
 //
