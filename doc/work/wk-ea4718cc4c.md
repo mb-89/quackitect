@@ -9,8 +9,10 @@ guidance: [[work-token]]
 title: Cloud boxes publish nothing
 # where the token stands. The process owns these values.
 status: open
+# true when this waits for a person rather than an agent
+needs_human: true
 claimed_by: f5927132/main
-claimed_at: "2026-09-06T10:29:31Z"
+claimed_at: "2026-09-06T10:43:35Z"
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - b5ff43e70a6427056eca2680caed0a9d76412bb1
@@ -23,14 +25,6 @@ A cloud box writes refs/heads and no other ref namespace. Measured 2026-09-06, o
 ## proposed action
 
 Move the claim relay onto refs/heads/se-queue, the one namespace a cloud box can write. The mechanism is unchanged: a commit built with a bare index, pushed, the working tree never touched. Only the ref name moves.
-
-## approach
-
-The claim relay keeps its mechanism and changes its ref.
-
-A commit is built with a bare index and pushed, exactly as claim.go does now. The working tree is never touched and a conflict on disk stays impossible. Only refs/se/claims becomes a branch under refs/heads.
-
-refs/heads is the one namespace a cloud box can write. That was measured rather than assumed, and it is what makes the relay work at all here.
 
 ## done when
 
@@ -74,4 +68,18 @@ refs/heads is the one namespace a cloud box can write. That was measured rather 
 | [ ] | every criterion's command was run again, and what it said is named |  |  |
 | [ ] | every hunk improves the product, or a finding names the one that does not |  |  |
 | [ ] | every finding is a trivial token naming this one, and their ids are here |  |  |
+
+## approach
+
+The owner has decisions open here, so nothing is cut until they land.
+
+What the branch carries: state only, not whole notes. That is the owner's ruling on 2026-09-06. A row is id, status, holder, claimed_by and claimed_at. The notes stay in doc/work on the code branch, where a person reads them in an editor.
+
+What that costs: a token minted elsewhere is a row here before its note is. It cannot be handed out until the code merge brings the note. The two defects that hurt are both state, so both are still fixed.
+
+The claim relay keeps its mechanism and changes its ref.
+
+A commit is built with a bare index and pushed, exactly as claim.go does now. The working tree is never touched and a conflict on disk stays impossible. Only refs/se/claims becomes a branch under refs/heads.
+
+refs/heads is the one namespace a cloud box can write. That was measured rather than assumed, and it is what makes the relay work at all here.
 
