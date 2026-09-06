@@ -89,7 +89,7 @@ func RecordTheRun(r Roots, id string, out Tested) {
 // stops is the case that actually happens: a run went red or had not finished,
 // and the row saying it passed was written anyway.
 //
-// wk-5c682f1a25 carries making an absent record a refusal, once every process
+// wk-be226f6ab8 carries making an absent record a refusal, once every process
 // has run once under this.
 func TestsRefuseTheClose(r Roots, t Token) string {
 	got, ok := LastRunOn(r, t.ID)
