@@ -213,8 +213,8 @@ func NoteAgent(roots Roots, id, kind, session string) {
 // one tree can both say it. TakeUp puts back everything else that actor holds,
 // so every time one of them named a token the other's token left its hands,
 // and the agent it left was refused its next write for holding nothing. So the
-// session that is here first keeps main, any other is named apart from it, and
-// the name a session is given is the name it keeps for as long as it is here.
+// session here first keeps main, and any other is named apart from it. A name
+// moves only toward main, so one named apart takes main back when it is free.
 func NoteSession(roots Roots, session string) {
 	if session == "" {
 		return
@@ -225,11 +225,11 @@ func NoteSession(roots Roots, session string) {
 		if !seen {
 			was = Agent{First: time.Now().UTC()}
 		}
-		// A SESSION KEEPS THE NAME IT WAS GIVEN. It is registered again on
-		// every call the engine has not seen it make, and a name worked out
-		// afresh each time would move under the tokens it already holds.
-		if was.Name == "" {
-			was.Name = aSessionName(*e, session, run)
+		if name := aSessionName(*e, session, run); was.Name == "" {
+			was.Name = name
+		} else if name == "main" && was.Name != name {
+			NoteTheNameItActsAs(roots, name, was.Name) // its tokens still find it
+			was.Name = name
 		}
 		was.Kind, was.Session, was.Gone = "session", session, time.Time{}
 		was.Run = run
@@ -328,7 +328,7 @@ func AgentSeen(roots Roots, session, id, kind string) {
 	}
 	run := currentSession(roots)
 	e := LoadEvidence(roots)
-	if s, seen := e.Agents[session]; !seen || s.Run != run || !s.Gone.IsZero() {
+	if s, seen := e.Agents[session]; !seen || s.Run != run || !s.Gone.IsZero() || s.Name != "main" {
 		NoteSession(roots, session)
 	}
 	if id == "" || id == "main" {
