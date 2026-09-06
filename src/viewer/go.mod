@@ -3,6 +3,8 @@ module quackitect/viewer
 go 1.27
 
 require (
+	quackitect/filter v0.0.0
+
 	github.com/charmbracelet/bubbles v1.0.0
 	github.com/charmbracelet/bubbletea v1.3.10
 	github.com/charmbracelet/lipgloss v1.1.0
@@ -33,3 +35,6 @@ require (
 	golang.org/x/sys v0.38.0 // indirect
 	golang.org/x/text v0.3.8 // indirect
 )
+
+// THE READER IS IN THIS TREE, so it is required by path rather than fetched.
+replace quackitect/filter => ../filter
