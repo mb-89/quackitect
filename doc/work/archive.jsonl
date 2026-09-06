@@ -326,3 +326,5 @@
 {"id":"wk-00e4785e51","title":"three git tests flake","process":"trivial","disposition":"done","blob":"09efd227d78370340ef3524a4650a65fffd82eac"}
 {"id":"wk-2e9721e324","title":"lint reads formatting too","process":"trivial","disposition":"done","blob":"8ea399cde01721428a8bc33aa9f8454794af20d3"}
 {"id":"wk-c6e5db7c51","title":"lint reads work tokens","process":"trivial","disposition":"done","blob":"32a427277a772817e48b1e561b2a3159d933c594","on_branch":"13fadff07d092ab91c375a01e64d13a6fd996a98"}
+{"id":"wk-64e8f37aa4","title":"parallel tests swap seams","process":"trivial","disposition":"done","blob":"745aba9d6b279db6a6d7dd134d6a7d668c65c57b"}
+{"id":"wk-b65222b6f1","title":"claim a block","process":"standard","disposition":"done","blob":"96dbecd70a8cfd9974b83b962b1811190bbf5b40","on_branch":"965929a6a206362accac4c8b8841fb4442041aa2"}
