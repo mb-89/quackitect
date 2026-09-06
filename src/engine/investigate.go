@@ -208,17 +208,20 @@ func TakeBackWhatWasLookedAt(r Roots, actor string) ([]string, string) {
 	// business, and a walker taking a hold back is not a step of anybody's
 	// process.
 	heldBefore := t.Holder
-	// AND THE HOLD IS WRITTEN WHERE THE ENGINE KEEPS IT, not through the save.
-	// The note never carried the holder, so releasing a hold changes no prose at
-	// all. Going through the save meant a section already past its bound refused
-	// the release: the token could not be claimed, put down, or handed back, the
-	// ruling on its quiet holder had nowhere to land, and the notice repeated
-	// word for word. The cap still stands and the save still holds it, which is
-	// TestAnOversizedChapterDoesNotStopTheQueue asks for. See wk-7a498f6a2b.
+	// AND NOT THROUGH THE TOKEN. SaveToken weighs every bounded section before
+	// it writes, and a release writes no prose at all. wk-963dbf6898 carried an
+	// ask of 249 words and a do of 219, against a cap of 200, so every release
+	// of it was refused and the walker was told only that it would not save.
+	// Four pulls in a row answered that same notice, and a look must be ruled
+	// on before work is handed out, so the queue gave out nothing else.
+	//
+	// The hold is the engine's own store, keyed by token, so it is put down
+	// there and the file is left exactly as its holder wrote it.
+	// See wk-c2f9d39ea7.
 	if err := recordHold(r, t.ID, ""); err != nil {
-		return nil, t.ID + " would not give up its hold, so the hold still stands"
+		return nil, t.ID + " would not let go of its hold: " + err.Error()
 	}
-	r.forget()
+	t.Holder = ""
 	// AND THE LOOK IS SPENT HERE, on the one path that moved something, so a
 	// second pull does not release a token somebody has since picked up.
 	_ = locked(lookedPath(r), func() error {
