@@ -1102,7 +1102,23 @@ func whyNotNow(r Roots, t Token) string {
 	if why := Blocked(r, t); why != "" {
 		return why
 	}
-	return WaitsForAPerson(t)
+	if why := WaitsForAPerson(t); why != "" {
+		return why
+	}
+	// AND A CLAIM ANOTHER BOX HOLDS, WHICH THIS ASKED AND THE OTHERS DID NOT.
+	//
+	// WouldHandOut asks it of every token it offers. This walk did not, so a
+	// token this box held was handed back after another box's claim arrived.
+	// The gate then refused the first write, naming that box. Two doors, one
+	// token, two answers.
+	//
+	// ONLY A CLAIM HELD ELSEWHERE IS ASKED. NoClaimHere also answers where
+	// nobody has claimed at all, and asking that here would set back every
+	// unclaimed tracked token this box legitimately holds.
+	if by := ClaimedNow(r, t, time.Now().UTC()); by != "" && !ClaimedHere(r, by) {
+		return t.ID + " is claimed by " + by + ", which is another box"
+	}
+	return ""
 }
 
 // setBackNotice says what the queue took out of this actor's hands, and why.

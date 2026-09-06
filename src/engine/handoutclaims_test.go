@@ -66,6 +66,53 @@ func TestTheHandOutWritesTheClaimItSaysItWrites(t *testing.T) {
 	}
 }
 
+// A CLAIM THAT ARRIVES WHILE THIS BOX HOLDS THE TOKEN IS STILL ANOTHER BOX'S.
+//
+// The walk over what an actor already holds asks Blocked and WaitsForAPerson
+// and nothing else. Every other path in the queue asks the claim as well.
+//
+// So a token this box held, over which another box's live claim then arrived,
+// was handed straight back. The gate refused it on the first write, naming the
+// other box. That is the queue and the gate disagreeing, which is the thing
+// the claim exists to prevent.
+func TestAHeldTokenUnderAnotherBoxsClaimGoesBack(t *testing.T) {
+	t.Parallel()
+	r := aTreeWithTheProcesses(t)
+
+	tok := mintStandard(t, r, "work taken up here")
+	first := Pull(r, "worker-here", RoleWorker, Payload{})
+	if first.Pull != AnswerWork || first.Token == nil || first.Token.ID != tok.ID {
+		t.Fatalf("this test proves nothing: nothing was handed to hold: %s", first.Notice)
+	}
+
+	// ANOTHER BOX'S CLAIM ARRIVES, AND IT IS LIVE.
+	held, err := LoadToken(r, tok.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	held.ClaimedBy = "another-box/worker-one"
+	held.ClaimedAt = time.Now().UTC().Format(ClaimStamp)
+	if err := SaveToken(r, held); err != nil {
+		t.Fatal(err)
+	}
+
+	got := Pull(r, "worker-here", RoleWorker, Payload{})
+	if got.Pull == AnswerWork && got.Token != nil && got.Token.ID == tok.ID {
+		t.Errorf("the queue handed %s back while another box's claim stands on it", tok.ID)
+	}
+	if by := HeldBy(r, tok.ID); by != "" {
+		t.Errorf("it was left in %s's hand, and a token another box claims sits in nobody's", by)
+	}
+	// AND THE GATE AGREES, which is the whole point: one answer, not two.
+	back, err := LoadToken(r, tok.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if why := NoClaimHere(r, back, time.Now().UTC()); why == "" {
+		t.Error("the gate would let this box write a token another box claims")
+	}
+}
+
 // AND A CLAIM THAT HAS NOT LAPSED IS STILL ANOTHER BOX'S, so the fix above does
 // not become a way to take work off somebody.
 func TestAStandingClaimIsNotTakenByTheQueue(t *testing.T) {
