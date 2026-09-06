@@ -2,6 +2,7 @@ package main
 
 import (
 	"strings"
+	"time"
 
 	"quackitect/filter"
 )
@@ -85,19 +86,39 @@ func (a aTokenRow) Field(name string) (string, bool) {
 // TheQueueTakes answers whether the filter in force lets this token out.
 func TheQueueTakes(f filter.Filter, t Token) bool { return f.Match(aTokenRow{t}) }
 
-// QueueDepth counts what the queue would hand out under the filter in force.
-// It is what the panel draws beside the box, so a person filing into a bucket
-// can watch it empty.
-func QueueDepth(r Roots) int {
-	f := theQueueFilter(r)
-	n := 0
-	for _, t := range Tokens(r) {
-		if t.Ended() || t.Process == PrivateProcess {
-			continue
-		}
-		if TheQueueTakes(f, t) {
-			n++
+// TheQueueWouldHandOut counts what the queue would hand out under the filter in
+// force, per role. IT IS THE ONE ANSWER TO HOW MANY ARE OPEN.
+//
+// THE OWNER'S RULING, September 2026: there is one answer to how many tokens
+// are open, and it is the one the filter gives.
+//
+// THERE WERE THREE. next() narrowed through theQueueOffers and then walked.
+// StaffingOf walked Tokens(r) raw, so it never saw the filter at all. And this
+// counted by a rule of its own, Ended and PrivateProcess, which was neither of
+// the other two. MEASURED that month: a filtered queue of twenty-two tokens was
+// announced to an agent as a hundred and forty-three open and workable.
+//
+// SO THE WALK LIVES HERE AND THE OTHERS READ IT. The narrowing is the pull's
+// own, theQueueOffers, and the question per token is the pull's own,
+// WouldHandOut. The empty actor holds nothing, so the narrowing filters and
+// keeps nothing back.
+func TheQueueWouldHandOut(r Roots) (work, verdicts int) {
+	archived := ArchivedOnTheBranch(r)
+	now := time.Now().UTC()
+	for _, t := range theQueueOffers(r, "", Tokens(r)) {
+		switch {
+		case WouldHandOut(r, t, "", RoleWorker, archived, now):
+			work++
+		case WouldHandOut(r, t, "", RoleReviewer, archived, now):
+			verdicts++
 		}
 	}
-	return n
+	return work, verdicts
+}
+
+// QueueDepth is the worker half of that count. It is what the panel draws
+// beside the box, so a person filing into a bucket can watch it empty.
+func QueueDepth(r Roots) int {
+	work, _ := TheQueueWouldHandOut(r)
+	return work
 }

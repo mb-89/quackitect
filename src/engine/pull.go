@@ -326,10 +326,37 @@ func whatComesNext(r Roots, actor, role string) Answer {
 	//
 	// THIS USED TO RIDE ON FINISHING ALONE, so an agent that ran out was told to
 	// wait while its own notes sat unworked.
-	if a := next(r, actor, role); a.Token != nil || a.Pull != AnswerWait {
+	a := next(r, actor, role)
+	if a.Token != nil || a.Pull != AnswerWait {
 		return a
 	}
-	return theNotesLeft(r, actor)
+	// AND WHAT THE QUEUE PASSED OVER IS STILL SAID.
+	//
+	// A wait carries the reason it waited: the sub-token another hand holds,
+	// the token the fetched branch archived, the chapter the record will not
+	// write. The drain answered with its own notice and threw that one away, so
+	// a blocked queue and an empty one said the same sentence. The sentence was
+	// the empty one, which is the false half: the queue knew exactly what it had
+	// passed over and why, and said nothing is left.
+	//
+	// SO THE REASON GOES IN FRONT OF THE DRAIN'S OWN WORDS. Both are true at
+	// once. There is nothing the queue may hand you, and here is what it held
+	// back.
+	left := theNotesLeft(r, actor)
+	left.Notice = joinNotices(a.Notice, left.Notice)
+	return left
+}
+
+// joinNotices puts one notice after another, with a blank line between them,
+// and answers the other where either is empty.
+func joinNotices(first, second string) string {
+	switch {
+	case strings.TrimSpace(first) == "":
+		return second
+	case strings.TrimSpace(second) == "":
+		return first
+	}
+	return strings.TrimRight(first, "\n") + "\n\n" + second
 }
 
 func currentSession(r Roots) string {
@@ -859,6 +886,12 @@ func next(r Roots, actor, role string) Answer {
 // narrows the queue while an agent is mid-token would otherwise strand it: the
 // token would leave the queue and the agent would be handed something else
 // while still holding the first.
+//
+// AND NOBODY IS AN ACTOR. An unheld token carries an empty holder, so an empty
+// actor matched every one of them and the filter kept nothing back. next()
+// always names a puller, so the hole never showed there. The count asks the
+// same question on nobody's behalf, and it read a narrowed queue as the whole
+// tree until this line named the case.
 func theQueueOffers(r Roots, actor string, all []Token) []Token {
 	f := theQueueFilter(r)
 	if f.Empty() {
@@ -866,7 +899,7 @@ func theQueueOffers(r Roots, actor string, all []Token) []Token {
 	}
 	out := make([]Token, 0, len(all))
 	for _, t := range all {
-		if t.Holder == actor || TheQueueTakes(f, t) {
+		if (actor != "" && t.Holder == actor) || TheQueueTakes(f, t) {
 			out = append(out, t)
 		}
 	}
@@ -942,6 +975,21 @@ func nextAmong(r Roots, actor, role string, all []Token) Answer {
 			// the staffing count asks it. A parked token, a claim another box
 			// holds, and a note the record refuses are all its business.
 			if !WouldHandOut(r, t, actor, role, nil, now) {
+				// AND THE ONE A PERSON HAS TO FIX BY HAND IS STILL NAMED.
+				//
+				// The notice used to be filled by a take that failed, further
+				// down. WouldHandOut took that case over so the count and the
+				// pull would agree, and the token stopped reaching the take at
+				// all. So the wait went quiet about a chapter too long for the
+				// record, which is the one passing-over nobody can clear
+				// without being told which note it is.
+				// ONCE, THOUGH. This walk runs twice, over what this box claimed
+				// and then over what nobody has, and the question above is asked
+				// before either pass narrows. So the naming rides on the second
+				// pass alone, or every such token is named twice.
+				if why := TheRecordRefuses(r, t); why != nil && !wantMine {
+					unwritable = append(unwritable, t.ID+": "+why.Error())
+				}
 				continue
 			}
 			// WHAT YOU CLAIMED COMES BEFORE WHAT NOBODY HAS. A claim is an agent

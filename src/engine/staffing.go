@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"strings"
-	"time"
 )
 
 // THE QUEUE SAYS HOW MANY HANDS IT WANTS, AND THE ENGINE HOLDS THE MAIN AGENT
@@ -50,16 +49,13 @@ func StaffingOf(r Roots, cfg Config) Staffing {
 	// pass over. The guard then held the main agent until hands arrived for
 	// work no hand could be given, and each one spawned was told wait and
 	// left. WouldHandOut is the pull's own question, asked here.
-	archived := ArchivedOnTheBranch(r)
-	now := time.Now().UTC()
-	for _, t := range Tokens(r) {
-		switch {
-		case WouldHandOut(r, t, "", RoleWorker, archived, now):
-			s.OpenWork++
-		case WouldHandOut(r, t, "", RoleReviewer, archived, now):
-			s.AwaitingVerdict++
-		}
-	}
+	//
+	// AND WHAT A PERSON NARROWED THE QUEUE TO IS PART OF THAT QUESTION. The
+	// filter is applied by next() a layer above WouldHandOut, so asking
+	// WouldHandOut alone missed it: a queue narrowed to twenty-two was counted
+	// as a hundred and forty-three, and the guard sized its demand off that.
+	// TheQueueWouldHandOut is the whole question, narrowing included.
+	s.OpenWork, s.AwaitingVerdict = TheQueueWouldHandOut(r)
 	roles := loadArrivals(r).Roles
 	present := AgentsPresent(r)
 	left := namesThatLeft(r)
