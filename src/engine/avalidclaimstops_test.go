@@ -1,7 +1,9 @@
 package main
 
 import (
+	"bytes"
 	"quackitect/engine/internal/sessionlog"
+	"strings"
 	"testing"
 )
 
@@ -18,6 +20,10 @@ import (
 // WHAT THE ARGUMENT PROTECTED IS NOT LOST. A stop still needs a claim, the
 // claim still names one of five sanctioned reasons, and a false blocked is
 // still refused where it is typed.
+//
+// asked ONCE HAD A TEST OF ITS OWN, because the engine pushed back on every
+// other reason and asked was the carve-out. There is nothing left to carve out
+// of, so the loop below drives all four and that test is gone.
 func TestAValidClaimStopsAtOnce(t *testing.T) {
 	r := aTreeWithTheProcesses(t)
 	log, err := sessionlog.Open(r.Private("log"))
@@ -56,4 +62,17 @@ func TestAValidClaimStopsAtOnce(t *testing.T) {
 	if aStopWithNoClaim(t, r, log, actor) {
 		t.Error("a stop went through with no claim standing")
 	}
+}
+
+// aStopIsGranted drives one claim through the stop decision and answers whether
+// the engine let it go.
+func aStopIsGranted(t *testing.T, r Roots, log *sessionlog.Log, actor, because string) bool {
+	t.Helper()
+	if err := ClaimStop(r, actor, because, "the person said so"); err != nil {
+		t.Fatal(err)
+	}
+	var said bytes.Buffer
+	g := &guard{out: &said}
+	decideStop(g, r, LoadConfig(r), log, hookIn{SessionID: "s-1"}, actor)
+	return !strings.Contains(said.String(), `"decision":"block"`)
 }
