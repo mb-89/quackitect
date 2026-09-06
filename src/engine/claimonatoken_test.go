@@ -19,7 +19,6 @@ import (
 // A CLAIM IS NOT A HOLD. A hold belongs to an agent and lives under .se, which
 // is why the schema keeps no holder. A claim belongs to a box and travels on
 // the branch, which is the whole reason it is written on the token.
-// See wk-e318448216.
 func TestAClaimOnATokenIsNotAFinding(t *testing.T) {
 	t.Parallel()
 	method, err := filepath.Abs(filepath.Join("..", ".."))
@@ -45,7 +44,7 @@ A token a box has claimed, which is what every taken token looks like.
 
 - it reads clean against its own schema
 `
-	at := filepath.Join(dir, "wk-0000000001.md")
+	at := filepath.Join(dir, "wk-1111111111.md")
 	if err := os.WriteFile(at, []byte(note), 0o644); err != nil {
 		t.Fatal(err)
 	}
@@ -60,7 +59,7 @@ A token a box has claimed, which is what every taken token looks like.
 // A declared property is what a token author writes. It reaches completion and
 // the field descriptions, as though somebody were meant to fill it in. Nobody
 // fills a claim in, so the schema declares neither name and the engine exempts
-// both in one place. See wk-4e643716ec.
+// both in one place.
 func TestAClaimIsExemptRatherThanDeclared(t *testing.T) {
 	t.Parallel()
 	b, err := os.ReadFile(filepath.Join("..", "schemas", "work-token.schema.yaml"))
@@ -88,7 +87,7 @@ func TestAClaimIsExemptRatherThanDeclared(t *testing.T) {
 
 // AND A FIELD NOTHING DECLARES AND NOTHING EXEMPTS IS STILL REFUSED.
 //
-// The exemption is two names, not a hole. See wk-4e643716ec.
+// The exemption is two names, not a hole.
 func TestAnInventedFieldIsStillRefused(t *testing.T) {
 	t.Parallel()
 	method, err := filepath.Abs(filepath.Join("..", ".."))
@@ -113,7 +112,7 @@ A token carrying a field no schema declares and nothing exempts.
 
 - its own schema refuses the field
 `
-	at := filepath.Join(dir, "wk-0000000002.md")
+	at := filepath.Join(dir, "wk-2222222222.md")
 	if err := os.WriteFile(at, []byte(note), 0o644); err != nil {
 		t.Fatal(err)
 	}

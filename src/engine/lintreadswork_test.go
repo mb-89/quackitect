@@ -17,8 +17,8 @@ import (
 //
 // MEASURED before wiring it in, because this puts every token in the tree to a
 // schema at once. LintNotes over doc/work answered 283 findings. 208 of those
-// were two fields the engine itself writes, which wk-e318448216 declared, and
-// what is left is 75. See wk-c6e5db7c51.
+// were two fields the engine itself writes, which an earlier token declared,
+// and what is left is 75.
 func TestTheLintReadsAWorkTokenAgainstItsSchema(t *testing.T) {
 	t.Parallel()
 	method, err := filepath.Abs(filepath.Join("..", ".."))
@@ -36,7 +36,7 @@ func TestTheLintReadsAWorkTokenAgainstItsSchema(t *testing.T) {
 			t.Fatal(err)
 		}
 	}
-	write("wk-0000000001", `---
+	write("wk-1111111111", `---
 kind: [[work-token]]
 process: [[trivial]]
 guidance: [[work-token]]
@@ -52,7 +52,7 @@ A token whose chapters are the ones its schema declares.
 
 - it reads clean
 `)
-	write("wk-0000000002", `---
+	write("wk-2222222222", `---
 kind: [[work-token]]
 process: [[trivial]]
 guidance: [[work-token]]
@@ -74,9 +74,9 @@ A token carrying a field its schema refuses.
 	var about1, about2 int
 	for _, f := range found {
 		switch {
-		case strings.Contains(f.ID, "wk-0000000001"):
+		case strings.Contains(f.ID, "wk-1111111111"):
 			about1++
-		case strings.Contains(f.ID, "wk-0000000002"):
+		case strings.Contains(f.ID, "wk-2222222222"):
 			about2++
 		}
 	}

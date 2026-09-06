@@ -14,8 +14,8 @@ import "testing"
 // bare and relative, so anyInside answered true, and the path under /tmp beside
 // it never decided anything.
 //
-// This is the shape wk-7bab432426 and wk-8c76f768c1 fixed twice already: a
-// guard ruling on words it has not finished reading. See wk-9875cf128f.
+// This is the shape two earlier fixes closed already: a guard ruling on words
+// it has not finished reading.
 func TestAFlagsValueIsNotAPath(t *testing.T) {
 	t.Parallel()
 	work := "/home/user/quackitect"

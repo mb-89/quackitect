@@ -15,7 +15,7 @@ import (
 // MEASURED. Four claims in a row answered: the push did not run, git fetch,
 // unable to access, failed to connect to 127.0.0.1 port 33243. Nothing was
 // wrong with the claim or the remote. The same call with the variable set to
-// 37347 answered the branch head. See wk-07c2d80710.
+// 37347 answered the branch head.
 func TestTheEngineFindsTheProxyThatMoved(t *testing.T) {
 	const live = "http://127.0.0.1:37347"
 	const dead = "http://127.0.0.1:33243"

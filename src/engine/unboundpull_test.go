@@ -17,7 +17,7 @@ import (
 // which is how an unbound agent gets work.
 //
 // GOD IS NOT ASKED HERE. Every refusal is off there, so a queue that refused
-// would be a new one. See unbound.go, and wk-b750954b82.
+// would be a new one. See unbound.go.
 func TestAnUnboundPullIsHandedNothing(t *testing.T) {
 	r := aTreeWithTheProcesses(t)
 	tok := mintStandard(t, r, "work nobody asked for")

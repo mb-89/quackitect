@@ -15,14 +15,13 @@ import (
 // runs past its cap therefore refused its own release, and the walker was told
 // only that it would not save.
 //
-// MEASURED. wk-963dbf6898 carried an ask of 249 words and a do of 219, against
+// MEASURED. A token carried an ask of 249 words and a do of 219, against
 // a cap of 200. Its holder had been silent over nine hours. Four pulls in a row
 // answered the same notice, and the queue handed out nothing else while it
 // stood, because a look must be ruled on before work is given.
 //
 // A RELEASE WRITES NO PROSE. The hold is the engine's own store, keyed by
 // token, so it is put down there and the token file is not rewritten at all.
-// See wk-c2f9d39ea7.
 func TestAHoldIsReleasedEvenWhenTheProseIsTooLong(t *testing.T) {
 	r, tok := aHeldTokenInASession(t, "holder")
 	aCappedSchema(t, r)

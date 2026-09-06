@@ -16,4 +16,5 @@
 {"id":"wk-8ec7483730","title":"one lint one format","process":"standard","disposition":"done","blob":"454e89973c1b31ba82ccbc0d1b02d8b8468bd64e","on_branch":"8829c6b5b2435d7aaf3280188750d7d4f8902048"}
 {"id":"wk-a0fac12719","title":"two guidance rules overrun","process":"trivial","disposition":"done","blob":"e16360942321fde578ec8dc734502a2ab0ae45b1","on_branch":"8cec2ed88aea6318c08c75bf044e9aa005d91941"}
 {"id":"wk-a8b817198a","title":"test names real token","process":"trivial","disposition":"done","blob":"c7ef2a090fe1872fa7e800ec94cf70215c90feae","on_branch":"d322543e1f8255bdeb4099a78729282c53bc5a9b"}
+{"id":"wk-c456e72a75","title":"tests name minted ids","process":"trivial","disposition":"done","blob":"67a7f9d166a718606f99a4dd38ac0b13d2b6fccb","on_branch":"bc38dbed4bfd9258df54a07d9235cc57a620ae4f"}
 {"id":"wk-fa2dd32c33","title":"Close eats the archive","process":"standard","disposition":"done","blob":"89e0448388db0dbbb5a0dd174b03c664692fffa5","on_branch":"dbb17e1980e3f625c1eebe30cf36937ce3a42770"}

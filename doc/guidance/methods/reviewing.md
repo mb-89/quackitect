@@ -63,7 +63,7 @@ Every hunk is read, and a hunk skipped is named in the verdict.
 So a reader knows what was not looked at rather than assuming it was.
 
 A span can be empty while the change is real.
-Measured in September 2026 on wk-4f8e7e7ebe, whose last span carried only the ended marker.
+Measured in September 2026 on a token whose last span carried only the ended marker.
 Its four criteria were all about src/engine/enginefresh.go, and a hundred and twenty-five lines had entered the tree on a take-up snapshot.
 A reviewer who took that span at its word would have found nothing, because the span held nothing.
 So the worker names the commit that carries the change, and the reviewer reads that instead.
