@@ -1,4 +1,14 @@
-<!-- GENERATED. Edit the source named below, not this file. Source: doc/guidance/behaviour.md, doc/guidance/driving-the-engine.md, doc/guidance/voice.md, doc/guidance/work-token.md -->
+<!-- GENERATED. Edit the source named below, not this file. Source: doc/guidance/backlog.md, doc/guidance/behaviour.md, doc/guidance/driving-the-engine.md, doc/guidance/voice.md, doc/guidance/work-token.md -->
+
+# Backlog
+
+## Actionables
+
+1. One token, one piece of work. One command decides one sentence. A done-when needing "and" is usually two tokens. *
+2. Number what the detail says the change does and put a criterion against each. Work that moves off takes its criteria with it. *
+3. Before a feature, name the basics it stands on. Mint the missing one first. *
+4. A small fix is a trivial token. A note needs a decision first. Everything else is tracked or local, and tracked names no local. *
+5. A bug found while working a bucket is filed into that bucket, and worked at once where it is trivial. *
 
 # Behaviour
 
@@ -67,18 +77,13 @@
 2. Write acceptance criteria first. A criterion is decidable, names the input, the answer and what survives, and is not a plan. *
 3. Where a command decides a criterion, write the command and run it from the root before submitting. Otherwise name who looks at what. *
 4. Match on what the check holds at run time: a whole identifier written once into both halves, or a length as a number. *
-5. Number what the detail says the change does and put a criterion against each. Work that moves off takes its criteria with it. *
-6. A detail names the constraint, never the assignment. A criterion answering with a verb states the effect as field and value.
-7. Ask whether a criterion is about this change or about the project. Pin a one-time one. A standing one belongs in a check.
-8. One token, one piece of work. One command decides one sentence. A done-when needing "and" is usually two tokens.
-9. Before a feature, name the basics it stands on. Mint the missing one first. *
-10. A small fix is a trivial token. A note needs a decision first. Everything else is tracked or local, and tracked names no local. *
+5. A detail names the constraint, never the assignment. A criterion answering with a verb states the effect as field and value.
+6. Ask whether a criterion is about this change or about the project. Pin a one-time one. A standing one belongs in a check.
 
 ### Using one
 
-11. Do what the token asks and nothing next to it. If the ask is ambiguous, ask one question and wait. *
-12. Write each criterion's check first and watch it redden on an assertion, never on a build failure. One that cannot redden is the finding. *
-13. Put both halves of a mechanism in the evidence. Where the system mirrors halves, table them and drive the rule through each. *
-14. Report work as done only with the evidence that it is. An observation names the check and what it said. *
-15. A checklist carries institutional knowledge. Answer each line rather than ticking it. *
-16. A bug found while working a bucket is filed into that bucket, and worked at once where it is trivial. *
+7. Do what the token asks and nothing next to it. If the ask is ambiguous, ask one question and wait. *
+8. Write each criterion's check first and watch it redden on an assertion, never on a build failure. One that cannot redden is the finding. *
+9. Put both halves of a mechanism in the evidence. Where the system mirrors halves, table them and drive the rule through each. *
+10. Report work as done only with the evidence that it is. An observation names the check and what it said. *
+11. A checklist carries institutional knowledge. Answer each line rather than ticking it. *

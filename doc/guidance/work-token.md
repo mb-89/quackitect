@@ -1,7 +1,7 @@
 ---
 kind: [[guidance]]
 scope: ["every work token, whatever its process"]
-out_of_scope: []
+out_of_scope: ["how a body of tokens is cut, filed and ordered"]
 depends_on:
   - "[[voice]]"
   - "[[behaviour]]"
@@ -15,6 +15,8 @@ The token is the only information the reader has, so it needs to be understandab
 The engine snapshots the tree at every take-up and put-down, and writes the hashes on the token as began and ended.
 So the change is on the token before anybody writes about it, and a remark on it is welcome where a file list is not.
 
+This file is one token on its own, and how a body of them is cut, filed and ordered is [[backlog]].
+
 Rules about writing wts that are mechanical are under [[src/schemas/work-token.schema.yaml]], and rules that are judgement are here.
 How a test is built is [[testing]].
 
@@ -26,21 +28,16 @@ How a test is built is [[testing]].
 2. Write acceptance criteria first. A criterion is decidable, names the input, the answer and what survives, and is not a plan. *
 3. Where a command decides a criterion, write the command and run it from the root before submitting. Otherwise name who looks at what. *
 4. Match on what the check holds at run time: a whole identifier written once into both halves, or a length as a number. *
-5. Number what the detail says the change does and put a criterion against each. Work that moves off takes its criteria with it. *
-6. A detail names the constraint, never the assignment. A criterion answering with a verb states the effect as field and value.
-7. Ask whether a criterion is about this change or about the project. Pin a one-time one. A standing one belongs in a check.
-8. One token, one piece of work. One command decides one sentence. A done-when needing "and" is usually two tokens.
-9. Before a feature, name the basics it stands on. Mint the missing one first. *
-10. A small fix is a trivial token. A note needs a decision first. Everything else is tracked or local, and tracked names no local. *
+5. A detail names the constraint, never the assignment. A criterion answering with a verb states the effect as field and value.
+6. Ask whether a criterion is about this change or about the project. Pin a one-time one. A standing one belongs in a check.
 
 ## Using one
 
-11. Do what the token asks and nothing next to it. If the ask is ambiguous, ask one question and wait. *
-12. Write each criterion's check first and watch it redden on an assertion, never on a build failure. One that cannot redden is the finding. *
-13. Put both halves of a mechanism in the evidence. Where the system mirrors halves, table them and drive the rule through each. *
-14. Report work as done only with the evidence that it is. An observation names the check and what it said. *
-15. A checklist carries institutional knowledge. Answer each line rather than ticking it. *
-16. A bug found while working a bucket is filed into that bucket, and worked at once where it is trivial. *
+7. Do what the token asks and nothing next to it. If the ask is ambiguous, ask one question and wait. *
+8. Write each criterion's check first and watch it redden on an assertion, never on a build failure. One that cannot redden is the finding. *
+9. Put both halves of a mechanism in the evidence. Where the system mirrors halves, table them and drive the rule through each. *
+10. Report work as done only with the evidence that it is. An observation names the check and what it said. *
+11. A checklist carries institutional knowledge. Answer each line rather than ticking it. *
 
 # Discussion
 
@@ -95,35 +92,13 @@ A two-part guard pairing a search for a definition with a run of the test, namin
 A boundary in what the check cannot hold falls to a prefix that never fails, so a length is a number.
 Rendered text is no handle: a template holds no text to match, so the durable handle is the producer's name.
 
-## 5. Every item the detail names
-
-On a rewrite, add a delete criterion for every sentence the detail calls the problem.
-A scope decision once moved work away in prose while three criteria still asked for it.
-Move the criteria first, then write the sentence saying where they went.
-A spike closes on its own numbered questions, including those it declines, and a mechanism it turns up is its own token.
-
-## 9. Basics first
-
-The basics look self-evident, so nobody writes them down, and the gap is found after the feature.
-
-## 10. Tracked is claimable
-
-A note is private, because nobody has decided what it is yet.
-The minter says which, and there is no default.
-Tracked is doc/work, which git carries, so another box can claim it.
-Local is .se/work, which nothing else reaches.
-The question is who can pick it up, not how big it is.
-
-A cloud box reads the tree out of git, where .se/work is not, so a local id there is a broken link.
-A local token naming a tracked one is fine.
-
-## 11. Next to the ask
+## 7. Next to the ask
 
 The token is the only thing a reader can judge a change by.
 A change beside it is one nobody asked for and nobody can find afterwards.
 A question costs a turn, and a guess at an ambiguous ask costs the work and the turn that undoes it.
 
-## 12. Red first
+## 8. Red first
 
 A check that arrives green has proved nothing about the defect.
 Watched going red for the reason expected, it proves the defect was there and the check can see it.
@@ -134,37 +109,23 @@ A build failure is not that red.
 So a failing check lands with the identifiers it names, as stubs.
 Why the engine answers such a package as a build, and names the hand that wrote it, is [[workers-share-one-tree]].
 
-## 13. Half a mechanism ships
+## 9. Half a mechanism ships
 
 A detail names two parts and says neither is enough alone.
 The producing half is built and evidenced, the checking half is not, and nothing looks wrong until it is.
 Ask which half has no output: that is the one that will be missing.
 A field the second half ignores is refused rather than accepted.
 
-## 14. Evidence
+## 10. Evidence
 
 An observation names the check and what it said, never a line number, because a line moves and a check can be run again.
 A number carries the command that produced it, written beside it as it is taken.
 Both halves of a ratio come from the one instrument the code reads, and a half that cannot says so beside the number.
 A reading pins to a commit, never to the word today.
 
-## 15. A checklist is not a formality
+## 11. A checklist is not a formality
 
 The lines come from the process, which carries what earlier work learned the hard way.
 A line ticked without being read throws that knowledge away and keeps the tick.
 Where a line asks for evidence, the sentence is the answer and the tick counts it.
 Where it asks none, the tick is honest, because there is no artifact to name.
-
-## 16. A bug found in the bucket
-
-The finder already holds what the fix needs: the file, the reading, and why it matters.
-Filed somewhere tidier, the next hand pays for that reading again.
-The bucket a person is draining also loses work that belongs to it.
-A token minted with no bucket is invisible to a narrowed queue, so the finder cannot be handed it back.
-
-THE OWNER'S RULING: put it in the bucket you are working, pull it at once, and fix it first.
-That is preferred over leaving it for a hand that has to rediscover it.
-
-The bound is triviality.
-A fix you can make right away is yours to make.
-A big one is filed with everything you learned, and left.
