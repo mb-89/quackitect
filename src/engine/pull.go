@@ -753,7 +753,7 @@ func firstLines(s string, n int) string {
 // of the note says. It comes out of the list before any walk, and the answer
 // names it. See pullbehind.go.
 func next(r Roots, actor, role string) Answer {
-	all, behind, branch := offTheFetchedBranch(r, actor, urgentFirst(Tokens(r)))
+	all, behind, branch := offTheFetchedBranch(r, actor, urgentFirst(blockingFirst(r, Tokens(r))))
 	a := nextAmong(r, actor, role, all)
 	a.Notice += behindNotice(branch, behind)
 	return a
