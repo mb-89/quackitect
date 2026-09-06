@@ -11,6 +11,11 @@ title: four tests, one rule
 status: open
 # the person's own name for a group. It does not move the work
 bucket: claims
+claimed_by: 7e7f0da1/worker-fen
+claimed_at: "2026-09-06T18:17:34Z"
+# the tree each time the work was taken up, snapshots the engine wrote
+began:
+  - fa8525c4893b01131d4df4ce38f75f0fc91c28f0
 ---
 
 ## detail
@@ -48,11 +53,11 @@ Keep TestAValidClaimStopsAtOnce for the rule over open work and TestEmptyHandsAr
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | what is gained by doing it, and not only what it does |  |  |
-| [ ] | what breaks if it is never done, and not only that it stays undone |  |  |
-| [ ] | the ask is small enough to review whole, or it is split first | — |  |
-| [ ] | every done-when line is decidable, and names the command where one decides it |  |  |
-| [ ] | the basics it stands on exist, or are minted first | — |  |
+| [x] | what is gained by doing it, and not only what it does | Two tests hold the stop rule, and a reader of the suite learns the rule the engine has. |  |
+| [x] | what breaks if it is never done, and not only that it stays undone | Comments teach the deleted argument as current, and a test file stays named for a source file that went. |  |
+| [x] | the ask is small enough to review whole, or it is split first | One test deleted, two moved, one file gone. |  |
+| [x] | every done-when line is decidable, and names the command where one decides it | Two by se find over src, two by se test. | se find --path 'src/engine/challenge*' |
+| [x] | the basics it stands on exist, or are minted first | Both surviving tests were already in the tree. |  |
 
 ## evidence: step 2. do
 
@@ -60,9 +65,8 @@ Keep TestAValidClaimStopsAtOnce for the rule over open work and TestEmptyHandsAr
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the guidance this token names was read and applied | — |  |
-| [ ] | one test was written first and seen red for the reason expected |  |  |
-| [ ] | the same test was seen green after the change, and named |  |  |
-| [ ] | the change is git diff began..ended, the two hashes the engine wrote on this token | — |  |
-| [ ] | the cleanup the change revealed is in the change, or is a token of its own | — |  |
-
+| [x] | the guidance this token names was read and applied | work-token, read. |  |
+| [ ] | one test was written first and seen red for the reason expected | Not met. The change deletes and moves tests, so the guard is that the survivors still pass. |  |
+| [x] | the same test was seen green after the change, and named | All six green: TestAValidClaimStopsAtOnce, TestAClaimWithEmptyHandsIsGrantedAtOnce, TestTheRefusalAsksBeforeItLists, TestTheRefusalSaysTheClaimWasCleared, TestGodSilencesTheStopHook, TestAStopWithNoClaimIsRefusedHoweverOftenItIsAsked. se test on this token answers ok, having built the package. |  |
+| [x] | the change is git diff began..ended, the two hashes the engine wrote on this token | Landed 7224354. |  |
+| [x] | the cleanup the change revealed is in the change, or is a token of its own | In the change. askedisgranted_test.go held the deleted test's name, so its helper moved beside its one caller and both refusal tests went to therefusal_test.go. |  |
