@@ -56,9 +56,13 @@ No stop is granted without a claim standing, and `asked` is no exception.
 Every call after the claim clears it, and a status, a search and an answer are all calls.
 Answer them first, then claim, then stop.
 
+## 4. A standing claim is granted
+
 A claim that is standing is granted, whatever is still open.
 So a second refusal has one cause: a call cleared the claim between the claim and the stop.
 Claim again, and make it your last call.
+
+## 5. Their word is the reason
 
 Which stops are sanctioned is the engine's, and a refusal is not permission to carry on.
 `asked` is granted on the claim that names it, whatever is in your hands, because their word is not yours to weigh.
@@ -66,15 +70,15 @@ Which stops are sanctioned is the engine's, and a refusal is not permission to c
 `asked` is also the reason for an interrupt, on which the harness fires no hook event.
 So an interrupt nobody names is a turn the record cannot tell from one that never ended.
 
-## 4. The tool it found, not the one you know
+## 6. The tool it found, not the one you know
 
 The engine probes the machine and hands you what is there.
 A tool you reached for yourself is one the engine cannot account for.
 On a machine without it the work stops for a reason nobody wrote down.
-Inside the tree the search tool is the index, rule 8.
+Inside the tree the search tool is the index, rule 10.
 Outside it, `rg` is what the probe hands over when it is here.
 
-## 5. The write says which work it is
+## 7. The write says which work it is
 
 `se_apply` takes the token id on the write itself, so naming the work and doing the work are one act.
 The harness's Write and Edit are refused, because they carry no field for a token.
@@ -84,7 +88,7 @@ One manifest changes as many files as you like.
 Every edit is checked before any is written, so one bad edit writes nothing and the tree is never half changed.
 Naming a token you were not on puts the old one back and takes the new one up.
 
-## 6. A command could write, so it names its work
+## 8. A command could write, so it names its work
 
 The engine cannot read a command and know whether it writes.
 `sed -i`, a redirection, `mv`, `rm` and a script you wrote all reach the filesystem.
@@ -93,12 +97,12 @@ Output and errors come back as one stream with the exit code.
 A long output is kept whole and answered a window at a time, so nothing is lost.
 Ask from the end with a negative offset, which is usually where a failure says why.
 
-## 7. Where a script lives
+## 9. Where a script lives
 
 A script that earns its place moves from the scratchpad to `util/checks/`, which is in version control.
 So a worktree gets it and a retro cannot drain it.
 
-## 8. The index is the search
+## 10. The index is the search
 
 Every line of every text file in the tree is in the index.
 The engine keeps it in step with the tree as files change.
@@ -109,7 +113,7 @@ The harness's Grep and Glob and a shell's `rg` or `grep` aimed inside the tree a
 The recursive form is refused, and a `grep` on one named file is left alone.
 Aimed outside the tree, they are yours.
 
-## 9. The engine owns the tests
+## 11. The engine owns the tests
 
 Every test is mapped to the lines it exercises, by running it once under coverage, and the map lives in the index.
 `se_test` reads your delta, the tree against the snapshot taken when you took the token up, and runs the tests whose lines you changed.
@@ -118,7 +122,7 @@ Give a pattern and it narrows the engine's selection, never widens it.
 The whole battery runs when the engine's rules say so, and the answer says why.
 `go test`, a check script or the battery run by hand inside the tree are refused and told this door.
 
-## 10. The plan is in the record
+## 12. The plan is in the record
 
 The harness carries a todo list of its own, and a plan written there lives inside one agent.
 It goes when the agent goes, and the person reading the queue never sees what the work was broken into.
@@ -126,14 +130,11 @@ A sub-token says the same thing where everybody reads it.
 The queue hands the parts out before their parent, and the parent cannot close while one is open.
 So the harness's todo tools are refused, and the refusal names the token to mint under.
 
-## 11. One door to the next engine
+## 13. One door to the next engine
 
 Windows locks a running program, so replacing the engine by hand is a stop and a start.
-The stop severs the calls in flight and the start begins a new log session.
-A run that asked for the whole battery then kills the process it runs in.
+That severs the calls in flight and begins a new log session.
 
 `se --swap` is the engine doing it to itself.
 It builds the next one, checks that it answers, waits for the calls in flight, and hands over on the same session.
 A build aimed at `.bin` is refused, because the running program and the one on disk being two builds is a thing nothing says out loud.
-
-The whole battery is started and not awaited, because it replaces the engine hosting it, and `se_test` says where its answer lands.
