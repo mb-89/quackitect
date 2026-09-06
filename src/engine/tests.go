@@ -684,9 +684,14 @@ func runChosen(r Roots, db *sql.DB, tests []aTest, picks []chosen) ([]ran, strin
 			}
 			cmd := quiet.Quietly(exec.Command(nodeTool(), filepath.Join(r.Work, filepath.FromSlash(t.Path)), r.Method))
 			cmd.Dir = r.Work
-			if engine != "" {
-				cmd.Env = append(os.Environ(), "SE_ENGINE="+engine)
-			}
+			// THE VARIABLE IS SET WHETHER OR NOT ONE WAS NAMED. Set only where
+			// one was, a tree with no engine to hand left the environment alone,
+			// and the child inherited the parent's whole one, SE_ENGINE included.
+			// So a check drove whatever binary an outer run or a person's shell
+			// had left there, while its run said nothing was handed. Cleared, it
+			// drives .bin/se, which is what engine.mjs promises a check with
+			// nothing handed.
+			cmd.Env = append(os.Environ(), "SE_ENGINE="+engine)
 			start := time.Now()
 			said, err := cmd.CombinedOutput()
 			x := ran{ID: t.ID, Kind: t.Kind, OK: err == nil, Seconds: time.Since(start).Seconds(),
