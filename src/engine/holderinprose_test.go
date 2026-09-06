@@ -16,9 +16,15 @@ import (
 // it. This is that rule reaching prose, which is where it was got round.
 func TestATokensProseNamesNoHolder(t *testing.T) {
 	t.Parallel()
-	r := aTree(t).Roots
+	f := aTree(t)
+	r := f.Roots
 	root := r.Work
 	writeProcess(t, root, "gated")
+	// THE CHECKS THIS TREE CARRIES ARE NAMES, NOT PEOPLE. The fixture declares
+	// its own, the way it declares its own process, so the test reads the
+	// mechanism rather than the product's list of checks.
+	f.writeMethod("util/checks/render-check.mjs", "// a check the fixture carries\n")
+	f.writeMethod("util/checks/drive-editor.mjs", "// a check the fixture carries\n")
 
 	// EVERY SPELLING A NOTE REACHES FOR, counted from the side that writes them.
 	for _, said := range []string{
@@ -54,6 +60,16 @@ func TestATokensProseNamesNoHolder(t *testing.T) {
 		"a policy, quoted from a commit title":        "a cloud box is held until its notes are in git",
 		"where a ruling lives, not who has it":        "name displayrefusal_test.go as where it is held, so the two cannot drift",
 		"two halves of a rule, and no hold in either": "So the ordering half is held and this half is held by nothing.",
+
+		// AND FOUR THAT STOOD AFTER THE SECOND NARROWING, on notes written
+		// since. Each is the line as its note carries it, whole, because what
+		// makes it prose is the sentence around the words: a paraphrase of the
+		// first of these passed while the note itself still drew a finding.
+		"a check pinning a rule, not a person":      "Cause found and removed. .bar is one flex row of tabs, then .bd, then the split button, and every item could shrink. The engine's says is BD: minted/done/open, today BD: 119/191/69, and the owner read BD: 98/182/5 cut mid-number. .bd and .bar .second now take flex: 0 0 auto and .bar .tab takes min-width: 0, so the tabs give way and the number never does. Also burnDown now always draws the span, even empty, so a number arriving later has a node to land in. Held by render-check and drive-editor. NOT MET AS OBSERVATION: same limit as 4, the rule is asserted, the window is not measured.",
+		"the holder named as the engine, not a who": "This is not a new rule. The schema already says the holder is the engine and not a field on the token, and work-token rule 14 already says an observation names the check rather than a thing that moves. Prose is the same defect through a back door.",
+		"what the holder is doing, not who it is":   "TestARefusedTakeBackKeepsTheLookAndNamesTheGuard drives all six refusing paths as subtests. The first three: the token will not load, it has already ended, nobody is holding it. The last three: the walker holds it itself, it changed hands since the look, and the holder is pulling again. Each asserts the look is still recorded afterwards. Against the stub it failed on every one with the look now reads empty. After the change it is ok in 0.57s.",
+		"any token, not this one":                   "A token is held under the name its holder pulls with, never under the harness name. gate.go:334 says so, and the holds file on this box files one under a worker name while the actors file maps main to it. So the one holder the sweep means to protect is the one holder it never recognises.",
+		"where the holder ends up, not who it is":   "se_apply does not enforce the schema's size caps, and every other door does. So a write through apply can leave a token the engine will not load, and the holder is then locked out of the engine entirely.",
 	}
 	cleanIDs := map[string]string{}
 	for what, detail := range clean {

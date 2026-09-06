@@ -82,6 +82,7 @@ func whatTheLintReads() string {
 // LintTokens names what breaks a rule. An empty answer is a clean ledger.
 func LintTokens(r Roots) []Finding {
 	var out []Finding
+	checks := checkNames(r)
 	known, err := theIDsThatOpen(r)
 	if err != nil {
 		// A CHECK THAT CANNOT READ WHAT IT GUARDS SAYS SO, rather than
@@ -102,7 +103,7 @@ func LintTokens(r Roots) []Finding {
 				out = append(out, Finding{ID: t.ID, Title: t.Title,
 					Says: "a token carries no time, and this one carries " + line})
 			}
-			for _, line := range holdersIn(string(b)) {
+			for _, line := range holdersIn(string(b), checks) {
 				out = append(out, Finding{ID: t.ID, Title: t.Title,
 					Says: "a hold ends with the session, so the record goes stale: " + line})
 			}
@@ -352,7 +353,29 @@ func timesIn(text string) []string {
 // worker-one or reviewer-nyx, or a plain nobody-in-particular the engine writes.
 // A generic word after the phrase is prose about the rule rather than a claim
 // about this token, and a code identifier is not English at all.
-func holdersIn(text string) []string {
+// checkNames answers the checks this tree carries, by name and without the
+// extension. A NAME THE TREE CARRIES AS A CHECK IS NOT A PERSON: a note saying
+// a rule is held by render-check says what pins it, and a check does not change
+// hands when the session rolls. Reading the folder rather than a list means a
+// check born tomorrow is answered the same way.
+func checkNames(r Roots) map[string]bool {
+	out := map[string]bool{}
+	entries, err := os.ReadDir(filepath.Join(r.Method, filepath.FromSlash(checksDir)))
+	if err != nil {
+		return out // no checks here, so no name is one
+	}
+	for _, e := range entries {
+		if e.IsDir() {
+			continue
+		}
+		if name := strings.TrimSuffix(e.Name(), filepath.Ext(e.Name())); name != "" {
+			out[name] = true
+		}
+	}
+	return out
+}
+
+func holdersIn(text string, checks map[string]bool) []string {
 	var found []string
 	for _, line := range strings.Split(text, "\n") {
 		l := strings.TrimSpace(line)
@@ -362,7 +385,7 @@ func holdersIn(text string) []string {
 			if at < 0 {
 				continue
 			}
-			if !claimsAHold(low, says, at) {
+			if !claimsAHold(low, says, at, checks) {
 				continue
 			}
 			found = append(found, l)
@@ -374,7 +397,7 @@ func holdersIn(text string) []string {
 
 // claimsAHold answers whether this occurrence names somebody rather than
 // describing the rule.
-func claimsAHold(low, says string, at int) bool {
+func claimsAHold(low, says string, at int, checks map[string]bool) bool {
 	// "unheld" IS A WORD IN AN IDENTIFIER MORE OFTEN THAN A CLAIM. A hold is
 	// claimed by naming a holder, and saying a token is unheld names nobody, so
 	// it only counts as English: a letter or an underscore against it makes it
@@ -408,8 +431,21 @@ func claimsAHold(low, says string, at int) bool {
 	// "the holder is engine state", "the holder is alive", "the holder is not
 	// called stale". None of those goes stale when a session ends.
 	if says == "the holder is" {
-		switch word(0) {
-		case "not", "neither", "never", "still", "alive", "gone", "engine", "":
+		who := word(0)
+		// AN ARTICLE IS NOT THE WHO. "the holder is the engine and not a field
+		// on the token" names a thing one word further on, and the words below
+		// decide that word instead.
+		if who == "the" || who == "a" || who == "an" {
+			who = word(1)
+		}
+		// WHAT THE HOLDER IS DOING IS NOT WHO IT IS. "the holder is pulling
+		// again" says what the engine found, not whose hands the token is in,
+		// and nothing about it goes stale when the session ends.
+		if strings.HasSuffix(who, "ing") {
+			return false
+		}
+		switch who {
+		case "not", "neither", "never", "still", "alive", "gone", "engine", "then", "":
 			return false
 		}
 		return true
@@ -425,7 +461,7 @@ func claimsAHold(low, says string, at int) bool {
 			// "is held by X" IS THE SAME SENTENCE AS "held by X", and both
 			// spellings match here, so the who is read past the by rather than
 			// judged as if it were the who.
-			return namesSomebody(word(1))
+			return namesSomebody(word(1), checks)
 		}
 		// A TOKEN SAID TO BE HELD CLAIMS A HOLD WITHOUT NAMING ANYBODY, and it
 		// goes stale exactly as fast. That is the rule's other half, and it is
@@ -437,7 +473,7 @@ func claimsAHold(low, says string, at int) bool {
 	// described rather than this token being claimed. "held by that agent" and
 	// "held by agents that are gone" are sentences about how the engine behaves,
 	// and they were the bulk of what this rule reported.
-	return namesSomebody(word(0))
+	return namesSomebody(word(0), checks)
 }
 
 // theTokenIsTheSubject answers whether what stands before "is held" is this
@@ -473,15 +509,26 @@ func theTokenIsTheSubject(before string) bool {
 	switch strings.Trim(words[len(words)-2], ".,:;\"'`(") {
 	case "where", "when", "why", "how", "whether", "which", "what":
 		return false
+	// AN INDEFINITE SUBJECT IS ANY TOKEN, NOT THIS ONE. "A token is held under
+	// the name its holder pulls with" says how the engine files a hold, and it
+	// is as true tomorrow as today. "The token is held" and "this token is
+	// held" are the claims that go stale, and they keep their finding.
+	case "a", "an", "any", "every", "another":
+		return false
 	}
 	return true
 }
 
 // namesSomebody says whether this word stands for a person rather than for
 // anybody at all.
-func namesSomebody(w string) bool {
+func namesSomebody(w string, checks map[string]bool) bool {
 	if w == "" {
 		return false // the line stops before it says who, so it names nobody
+	}
+	// A CHECK IS NOT A PERSON. "Held by render-check and drive-editor" names
+	// what pins a rule, and the tree says which names those are.
+	if checks[w] {
+		return false
 	}
 	// "other" AND "others" NAME NOBODY, the way "agents" and "actors" do. A
 	// test holding tokens held by other actors is describing its fixture.
