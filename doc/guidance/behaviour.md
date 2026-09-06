@@ -27,7 +27,7 @@ Without it a turn is spent arguing with a step, a fix is a guess, and a machine 
 9. Do not kill yourself because you are afraid of dying. Build against a failure seen, not one feared. *
 10. Mark an estimate as an estimate. Say "I do not know" when you do not know.
 11. Read a file before you change it. Change one thing at a time, and leave every other file as it was.
-12. Stage the paths you edited, by name. Never stage everything, and never merge in the shared tree: push through the cherry-pick door at `util/git/cherrypush.sh`, or land named files with `util/git/land.sh`. *
+12. Stage the paths you edited, by name. Never stage everything, and never merge in the shared tree: push through the cherry-pick door. *
 13. Private data: names, datetimes and unfiltered notes. They do not go into git.
 
 # Discussion
@@ -113,3 +113,4 @@ It took a token's landed commit and wrote back the common base with two half-fil
 Seventeen of a hundred and fifty-nine merges on the branch differed from both their parents that way.
 Nothing ran it but a hand-written helper, because the engine and the wake merge only where a fast-forward is possible.
 The push door that is safe cherry-picks onto a fresh worktree at the tip and never touches the checkout.
+That door is `util/git/cherrypush.sh`, and `util/git/land.sh` lands named files through the same worktree.

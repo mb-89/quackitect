@@ -28,7 +28,7 @@ A finding is work, minted as a trivial token, and the reviewer may take it and f
 
 1. Ask one question of every hunk: does this improve the product? A hunk that does not is a finding. *
 2. Pass when the change holds its criteria and leaves the tree better. Not when it is perfect. *
-3. Read every hunk of `git diff began..ended`. Name any you did not read. A span with no code in it is not a change with none: the token names the commit that carries it, so read that. *
+3. Read every hunk of `git diff began..ended`. Name any you did not read. An empty span is not a change with none. *
 4. Verify, do not read: run each criterion's command yourself. A description of the work is not the work. *
 5. Find the clause of the token no hunk answers. That is where the work drifted.
 6. Write every candidate finding first. Keep only those naming a line, the damage or dead weight, and the check that catches the class. *
