@@ -9,6 +9,8 @@ guidance: [[work-token]]
 title: criterion outlived its rung
 # where the token stands. The process owns these values.
 status: open
+# the person's own name for a group. It does not move the work
+bucket: claims
 claimed_by: 7e7f0da1/reviewer-wren
 claimed_at: "2026-09-06T16:31:53Z"
 # the tree each time the work was taken up, snapshots the engine wrote
