@@ -74,8 +74,8 @@ func TestATokensProseNamesNoHolder(t *testing.T) {
 		// AND TWO THAT STOOD AFTER THE THIRD NARROWING, both of them the word
 		// unheld used of tokens in general rather than of one. A plural, and a
 		// singular under each, name no token and no session, so neither goes
-		// stale when the session rolls. They are the lines of wk-24cdeae29b,
-		// whole, because what makes a line prose is the sentence around it.
+		// stale when the session rolls. One is a title and one a done-when line,
+		// quoted whole, because what makes a line prose is the sentence around it.
 		"a plural, and it reaches a title": "title: unheld tokens want approaches",
 		"one of many, named under each":    "Read each unheld token the check names, and write an approach onto it",
 	}
@@ -113,12 +113,11 @@ func TestATokensProseNamesNoHolder(t *testing.T) {
 // prose is the sentence around it. So the rule is decided a second time over
 // the work root the product carries, with nothing rewritten.
 //
-// The two lines were written onto wk-24cdeae29b, which is archived now, and
-// they are quoted since. Either way no hold finding may name them, and none
-// may name that token.
+// The two lines are a token's title and one of its done-when lines. Wherever
+// in the work root they stand, and on whichever token, no hold finding may
+// quote them.
 func TestTheWorkRootReadsNoHoldInGenericProse(t *testing.T) {
 	t.Parallel()
-	const came = "wk-24cdeae29b"
 	generic := []string{
 		"unheld tokens want approaches",
 		"Read each unheld token the check names, and write an approach onto it",
@@ -132,10 +131,6 @@ func TestTheWorkRootReadsNoHoldInGenericProse(t *testing.T) {
 	}
 	for _, f := range all {
 		if !strings.Contains(f.Says, "a hold ends with the session") {
-			continue
-		}
-		if f.ID == came {
-			t.Errorf("%s is read as claiming a hold: %s", came, f.Says)
 			continue
 		}
 		for _, line := range generic {
