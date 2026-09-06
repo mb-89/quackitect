@@ -64,11 +64,8 @@ func TestTakeUpAndPutDownWriteNoHolderIntoTheFile(t *testing.T) {
 	if v, ok := upFront["holder"]; ok {
 		t.Fatalf("take-up wrote holder %v into the token file; the hold is the engine's", v)
 	}
-	if d := cmp.Diff(exceptTheStretch(wasFront), exceptTheStretch(upFront)); d != "" {
-		t.Fatalf("take-up changed the front matter beyond began and ended (-was +now):\n%s", d)
-	}
-	if upBody != wasBody {
-		t.Fatalf("take-up changed the body:\n%s\nwas\n%s", upBody, wasBody)
+	if d := cmp.Diff(exceptTheStretch(wasFront), exceptTheStretch(upFront)) + cmp.Diff(wasBody, upBody); d != "" {
+		t.Fatalf("take-up changed the file beyond began and ended (-was +now):\n%s", d)
 	}
 
 	if _, err := PutDown(r, tok.ID, "worker-1"); err != nil {
@@ -78,11 +75,8 @@ func TestTakeUpAndPutDownWriteNoHolderIntoTheFile(t *testing.T) {
 	if v, ok := downFront["holder"]; ok {
 		t.Fatalf("put-down wrote holder %v into the token file", v)
 	}
-	if d := cmp.Diff(exceptTheStretch(wasFront), exceptTheStretch(downFront)); d != "" {
-		t.Fatalf("put-down changed the front matter beyond began and ended (-was +now):\n%s", d)
-	}
-	if downBody != wasBody {
-		t.Fatalf("put-down changed the body:\n%s\nwas\n%s", downBody, wasBody)
+	if d := cmp.Diff(exceptTheStretch(wasFront), exceptTheStretch(downFront)) + cmp.Diff(wasBody, downBody); d != "" {
+		t.Fatalf("put-down changed the file beyond began and ended (-was +now):\n%s", d)
 	}
 }
 

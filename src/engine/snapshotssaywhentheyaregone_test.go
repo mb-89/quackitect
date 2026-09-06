@@ -12,7 +12,7 @@ import (
 // they name stay behind. So the second box is handed a pair of hashes it has
 // never seen.
 //
-// THE TEST DOOR ALREADY FALLS BACK. theSnapshotHere answers the newest began
+// THE TEST DOOR ALREADY FALLS BACK. theSnapshotToDiff answers the newest began
 // this box holds, or HEAD, and Since names it. The reviewer has no such door:
 // the checklist asks for every hunk of git diff began..ended, and that answers
 // "fatal: bad object" with nothing said about why or what to do instead.

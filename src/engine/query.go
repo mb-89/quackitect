@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"quackitect/engine/internal/expr"
 	"strings"
+	"time"
 )
 
 // TOKENS AS ROWS, WHICH IS THE ONLY PLACE THAT BINDS THE TWO.
@@ -45,6 +46,15 @@ func rowOf(r Roots, t Token) expr.Row {
 	// a walk over other tokens, so it cannot be a field and it can be a
 	// property. A view filters on it without knowing how it is worked out.
 	row["blocked"] = expr.Str(Blocked(r, t))
+	// THE CLAIM IS THE SAME KIND OF ANSWER, and it is the one thing standing
+	// between two boxes and the same token. A person could see it by running
+	// se claim --list at a prompt and nowhere else.
+	//
+	// IT IS THE STANDING CLAIM AND NOT THE FIELD. A claim made here is on the
+	// note and one made elsewhere reached this box through git, so reading the
+	// field alone would draw another box's token as free. A claim that has
+	// lapsed is not one either, and ClaimedNow answers all three.
+	row["claimed_by"] = expr.Str(ClaimedNow(r, t, time.Now().UTC()))
 	return row
 }
 

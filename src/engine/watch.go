@@ -94,6 +94,22 @@ func runIdentity() string {
 
 func runningPath(r Roots) string { return r.Private("engine.json") }
 
+// noRecord is what a reader is told when there is no engine.json it can read,
+// said once so the two ways of not reading one answer alike.
+const noRecord = "record: no readable engine.json"
+
+// recordTries is how often a read that met a write is tried again, and
+// betweenRecordTries how long it waits. A rename window costs milliseconds and
+// this rides out a long one.
+const (
+	recordTries        = 20
+	betweenRecordTries = 25 * time.Millisecond
+)
+
+// readsRecord is how the record is read, named so a test can take the file
+// away between tries.
+var readsRecord = os.ReadFile
+
 // TheRunNow is the engine process that is running over this tree, as an
 // identity that changes every time one starts.
 //
@@ -134,20 +150,29 @@ func LoadRunning(r Roots) (Running, bool) {
 // is. The reason names the field that failed, so a reader can say what it saw.
 func loadRunning(r Roots) (Running, string) {
 	var v Running
+	// A RECORD THAT WAS NEVER WRITTEN IS ANSWERED AT ONCE. writeAtomic renames
+	// a temp over the target and never removes it first, so a beat cannot leave
+	// the path empty. An empty path is a tree with no engine, and the wait below
+	// was one nothing was ever going to end: NoteSession took 507ms, NoteAgent
+	// 507ms, and StaffingOf 1.017s, which asks twice. Every cold client paid it,
+	// a hook over a tree with no engine included.
+	if _, err := os.Stat(runningPath(r)); os.IsNotExist(err) {
+		return v, noRecord
+	}
 	// THE FILE IS REPLACED ON EVERY BEAT, and on Windows a reader can meet
 	// the instant between the old one going and the new one landing. A miss
 	// is read again before it is believed, because a guard that believed it
 	// went cold for one call in the middle of a session.
 	var b []byte
 	var err error
-	for try := 0; try < 20; try++ {
-		if b, err = os.ReadFile(runningPath(r)); err == nil {
+	for try := 0; try < recordTries; try++ {
+		if b, err = readsRecord(runningPath(r)); err == nil {
 			break
 		}
-		time.Sleep(25 * time.Millisecond)
+		time.Sleep(betweenRecordTries)
 	}
 	if err != nil || json.Unmarshal(b, &v) != nil {
-		return v, "record: no readable engine.json"
+		return v, noRecord
 	}
 	if v.PID <= 0 || !alive.Is(v.PID) {
 		return v, fmt.Sprintf("pid: %d is not a running process", v.PID)

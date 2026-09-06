@@ -230,7 +230,12 @@ func hereDocEnd(after string) string {
 // door. One that names a path outside is left alone.
 
 // searchers are the programs this is about, by the name they are run as.
-func searcher(word string) bool {
+func searcher(word string) bool { return searcherName(word) != "" }
+
+// searcherName answers which searcher this word runs, by the name it is known
+// by, or nothing. It is the one place a program word is normalised, so the
+// flag list and the question of whether to look are asked about one name.
+func searcherName(word string) string {
 	name := word
 	if i := strings.LastIndexAny(name, "/"+string(os.PathSeparator)); i >= 0 {
 		name = name[i+1:]
@@ -238,9 +243,9 @@ func searcher(word string) bool {
 	name = strings.ToLower(strings.TrimSuffix(name, ".exe"))
 	switch name {
 	case "rg", "grep", "egrep", "fgrep", "findstr", "ag", "ack":
-		return true
+		return name
 	}
-	return false
+	return ""
 }
 
 // ASearchOverTheTree answers whether this command searches inside the tree
@@ -253,7 +258,7 @@ func ASearchOverTheTree(command, work string) (string, bool) {
 		if len(words) == 0 || !searcher(words[0]) {
 			continue
 		}
-		paths := pathsAmong(words[1:])
+		paths := pathsAmong(searcherName(words[0]), words[1:])
 		// grep WITH NO PATH READS ITS INPUT, and behind a pipe that input is
 		// another program's output rather than the tree. rg with no path
 		// searches where it stands, which is the tree.
@@ -348,7 +353,7 @@ func shellWords(part string) []string {
 
 // pathsAmong answers the words that name a path: everything that is not a
 // flag and not the pattern, which is the first bare word.
-func pathsAmong(args []string) []string {
+func pathsAmong(runner string, args []string) []string {
 	var out []string
 	pattern := false
 	for i := 0; i < len(args); i++ {
@@ -370,9 +375,13 @@ func pathsAmong(args []string) []string {
 			continue
 		}
 		if strings.HasPrefix(a, "-") {
-			// A FLAG THAT TAKES A VALUE TAKES THE NEXT WORD, and the ones that
-			// matter here are the pattern and the type: -e p, -g glob, -t go.
-			if a == "-e" || a == "-g" || a == "-t" || a == "-T" || a == "--regexp" || a == "--glob" || a == "--type" {
+			// A FLAG THAT TAKES A VALUE TAKES THE NEXT WORD, and that word is
+			// not a path. Six flags were named here and every other value was
+			// left on the list, where a bare word is read as a path and a
+			// relative path counts as inside the tree. rg -A 12 over a file
+			// under /tmp was refused by the message whose last line promises
+			// that a search outside is not: the 12 decided it. See wk-9875cf128f.
+			if takesAValue(runner, a) {
 				i++
 				if a == "-e" || a == "--regexp" {
 					pattern = true

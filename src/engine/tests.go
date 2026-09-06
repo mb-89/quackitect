@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"encoding/json"
 	"flag"
@@ -134,7 +135,7 @@ func runTest(c *call) int {
 		return 1
 	}
 	defer db.Close()
-	got, err := TestTheDelta(c.roots, db, *on, proposed, !*plan, *by)
+	got, err := TestTheDelta(c.ctx, c.roots, db, *on, proposed, !*plan, *by)
 	if err != nil {
 		c.answerJSON(map[string]any{"error": err.Error()})
 		return 1
@@ -153,7 +154,7 @@ func (s *stringList) Set(v string) error { *s = append(*s, v); return nil }
 
 // TestTheDelta decides what the delta calls for and, unless told only to
 // plan, runs it.
-func TestTheDelta(r Roots, db *sql.DB, on string, proposed []string, run bool, actor string) (Tested, error) {
+func TestTheDelta(ctx context.Context, r Roots, db *sql.DB, on string, proposed []string, run bool, actor string) (Tested, error) {
 	out := Tested{Chosen: []chosen{}, Ran: []ran{}, Proposed: proposed}
 	since := "HEAD"
 	if on != "" {
@@ -161,7 +162,7 @@ func TestTheDelta(r Roots, db *sql.DB, on string, proposed []string, run bool, a
 		if err != nil {
 			return out, err
 		}
-		since = theSnapshotHere(r, t.Began)
+		since = theSnapshotToDiff(r, t.Began)
 	}
 	out.Since = since
 	delta, err := deltaSince(r, db, since)
@@ -196,7 +197,7 @@ func TestTheDelta(r Roots, db *sql.DB, on string, proposed []string, run bool, a
 		// THE BATTERY IS STARTED, NOT AWAITED. It builds the engine and puts a
 		// new one over this tree, so waiting for it here is waiting inside the
 		// process it replaces. See battery.go.
-		out.Ran = append(out.Ran, startBattery(r, actor, on))
+		out.Ran = append(out.Ran, startBattery(ctx, r, actor, on))
 	} else if err := runOrLand(r, tests, &out, start); err != nil {
 		return out, err
 	}
@@ -476,22 +477,23 @@ func spanOf(ch change) string {
 	return strconv.Itoa(ch.Start) + "-" + strconv.Itoa(ch.Finish)
 }
 
-// theSnapshotHere answers the newest snapshot this box actually holds, or HEAD.
+// deltaSince reads which lines of which files differ from the snapshot:
+// the hunks of a diff against it, and every untracked file whole. The
+// private folder is left out, because nothing tests the record.
 //
-// A SNAPSHOT DOES NOT TRAVEL. A take-up writes a commit under refs/se/steps,
-// and no push carries that ref. So a token taken up on one box and worked on
-// another names a hash the second box never had.
+// A TREE WITHOUT HISTORY HAS NO DIFF, AND IT STILL HAS A DELTA: everything.
+// A repository with no commit yet has every file untracked, which the
+// second list answers; a folder that is not a repository at all is read off
+// the index, every file whole.
+// theSnapshotToDiff answers the newest take-up this clone can diff against.
 //
-// MEASURED. git diff on a full hash it does not hold answers "fatal: bad
-// object", which the reader below did not recognise, so se test answered that
-// error and ran nothing. Every travelled token on one box answered it while
-// every token minted there tested: the test door was shut for exactly the work
-// that came from somewhere else.
-//
-// THE NEWEST ONE HERE IS A TRUER QUESTION THAN HEAD, and HEAD is better than an
-// error. A token taken up on two boxes carries both hashes, and the one this
-// box wrote is a delta somebody can read.
-func theSnapshotHere(r Roots, began []string) string {
+// A began hash is a commit under refs/se/steps, and no push carries those, so
+// a token taken up on one box and worked on another names a snapshot this
+// clone never had. The newest one it does hold is read instead, and HEAD is
+// the floor. What it answers is what Tested.Since carries, because a reader
+// who is not told which snapshot was used cannot tell a narrow delta from a
+// stale one.
+func theSnapshotToDiff(r Roots, began []string) string {
 	for i := len(began) - 1; i >= 0; i-- {
 		if anObjectHere(r, began[i]) {
 			return began[i]
@@ -500,7 +502,7 @@ func theSnapshotHere(r Roots, began []string) string {
 	return "HEAD"
 }
 
-// anObjectHere answers whether this clone holds the commit named.
+// anObjectHere says whether this clone holds that commit.
 func anObjectHere(r Roots, hash string) bool {
 	if hash == "" {
 		return false
@@ -510,14 +512,6 @@ func anObjectHere(r Roots, hash string) bool {
 	return cmd.Run() == nil
 }
 
-// deltaSince reads which lines of which files differ from the snapshot:
-// the hunks of a diff against it, and every untracked file whole. The
-// private folder is left out, because nothing tests the record.
-//
-// A TREE WITHOUT HISTORY HAS NO DIFF, AND IT STILL HAS A DELTA: everything.
-// A repository with no commit yet has every file untracked, which the
-// second list answers; a folder that is not a repository at all is read off
-// the index, every file whole.
 func deltaSince(r Roots, db *sql.DB, since string) ([]change, error) {
 	git := func(args ...string) (string, error) {
 		cmd := quiet.Quietly(exec.Command("git", args...))
@@ -539,9 +533,10 @@ func deltaSince(r Roots, db *sql.DB, since string) ([]change, error) {
 	diff, err := git("diff", "-U0", "--no-color", "--no-ext-diff", since, "--", ".")
 	if err != nil {
 		said := err.Error()
-		// AND "bad object", WHICH IS WHAT A SNAPSHOT FROM ANOTHER BOX ANSWERS.
-		// theSnapshotHere keeps one off this call, and a caller that names a hash
-		// itself still reaches here, so the word belongs in the list.
+		// A HASH THIS CLONE NEVER HAD IS THE SAME ANSWER IN A FIFTH WORDING. A
+		// began snapshot lives under refs/se/steps, which no push carries, so a
+		// token taken up on one box and worked on another names a commit that
+		// git here calls a bad object.
 		if strings.Contains(said, "Could not access") || strings.Contains(said, "bad revision") ||
 			strings.Contains(said, "unknown revision") || strings.Contains(said, "ambiguous argument") ||
 			strings.Contains(said, "bad object") {

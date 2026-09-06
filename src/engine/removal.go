@@ -90,12 +90,43 @@ func runner(word string) bool {
 // with its value attached, -n1 or -I{} or --chdir=x, is one word and needs no
 // entry. A shell's -c is not here: its value is the command, which is what
 // the walk is looking for.
+// searcherFlags are the flags a searcher takes a value for. THE VALUE IS NOT A
+// PATH, and reading one as a path is how rg -A 12 over a file under /tmp was
+// refused as a search of this tree: the 12 was bare and relative, so it counted
+// as inside. See wk-9875cf128f.
+//
+// OVER-EATING IS THE DANGER. A flag listed here that takes no value would
+// swallow the path beside it and let a search of the tree through, so each of
+// these really does take one. rg and grep are handed the same list, because a
+// flag only one of them has is a flag the other is never given.
+var searcherFlags = []string{
+	// what to look for, and where
+	"-e", "--regexp", "-f", "--file", "-g", "--glob", "--iglob",
+	"-t", "--type", "-T", "--type-not", "--type-add", "--type-clear",
+	"--include", "--exclude", "--exclude-dir", "--exclude-from", "--ignore-file",
+	// how much to show
+	"-A", "--after-context", "-B", "--before-context", "-C", "--context",
+	"-m", "--max-count", "-M", "--max-columns", "--max-depth", "--max-filesize",
+	"--context-separator", "--group-separator",
+	"--field-context-separator", "--field-match-separator", "--path-separator",
+	// how to run and how to print
+	"-j", "--threads", "--num-threads", "-r", "--replace", "-E", "--encoding",
+	"--pre", "--pre-glob", "--sort", "--sortr", "--engine", "--binary-files",
+	"--color", "--colour", "--colors", "--label",
+	"-d", "--directories", "-D", "--devices",
+	"--dfa-size-limit", "--regex-size-limit",
+}
+
 var valueFlags = map[string][]string{
 	"sudo":  {"-u", "-g", "-C", "-D", "-h", "-p", "-r", "-t", "-T", "-U", "-R"},
 	"git":   {"-C", "-c", "--git-dir", "--work-tree", "--namespace"},
 	"xargs": {"-I", "-L", "-n", "-P", "-s", "-E", "-d", "-a", "--replace", "--max-lines", "--max-args", "--max-procs", "--max-chars", "--eof", "--delimiter", "--arg-file"},
 	"env":   {"-u", "-C", "-S", "--unset", "--chdir", "--split-string"},
 	"time":  {"-f", "-o", "--format", "--output"},
+
+	"rg": searcherFlags, "grep": searcherFlags, "egrep": searcherFlags,
+	"fgrep": searcherFlags, "findstr": searcherFlags,
+	"ag": searcherFlags, "ack": searcherFlags,
 }
 
 // takesAValue says whether this flag, on this runner, has its value in the
@@ -244,85 +275,47 @@ func ARemovalWithoutARead(r Roots, actor, command, work string) (string, bool) {
 // ALoopThatRemoves answers whether this command runs a remover inside a loop,
 // which is refused whatever it names.
 //
+// INSIDE THE LOOP IS THE WHOLE OF IT. The rule armed on a loop anywhere and
+// a removal anywhere, so a loop followed by a named removal was refused with
+// a notice saying the removal was in the loop, which it was not, and offering
+// a remedy that command had already followed. The body is what is walked now:
+// from the do or brace that opens it to the done or brace that closes it.
+//
 // OUTSIDE THE TREE THE DISK IS THE AGENT'S OWN, the same line ARemovalWithoutARead
 // draws through anyInside. A remover whose files are all outside the work tree is
 // not this rule's business, so it does not arm the loop. A remover naming no files
 // at all still does, because that is the shape this rule was written for: the files
 // come out of the loop's own output, a round at a time.
-//
-// INSIDE THE BODY, AND NOWHERE ELSE. It asked whether the command held a loop
-// and whether it held a removal, never whether one was in the other. pipeline
-// splits on the separators, so a loop in one part and a named removal in
-// another were read as a loop that deletes.
-//
-// MEASURED: rm -f zzprobe_test.go && for T in ...; do go test ...; done was
-// refused, and the refusal said the command runs rm inside a loop, which it
-// does not. The remedy it offers is to list the files and delete them by name,
-// which that command already did, so there was no door out of it.
-//
-// SO THE BODY IS TRACKED. A loop word opens one, do or a brace after it starts
-// the body, and done or a brace closes it. Only the words between them are
-// asked whether they remove.
 func ALoopThatRemoves(command, work string) (string, bool) {
-	opened, depth := 0, 0
+	sawLoop, depth := false, 0
 	for _, part := range pipeline(command) {
 		words := strings.Fields(part)
 		if len(words) == 0 {
 			continue
 		}
 		if loopWord(words[0]) {
-			opened++
+			sawLoop = true
 		}
-		// WHERE THE BODY THIS PART SITS IN BEGINS, or -1 for no body. A part
-		// reached while already inside one is body from its first word.
-		start := -1
-		if depth > 0 {
-			start = 0
-		}
-		for i, w := range words {
-			switch strings.ToLower(strings.Trim(w, "'\"")) {
-			case "do", "{":
-				// A BODY MARKER WITH NO LOOP OPEN IS NOT ONE. A brace is a
-				// group, an argument to awk, or half a glob far more often
-				// than it is a loop.
-				if opened > 0 {
-					opened--
-					if depth == 0 {
-						start = i + 1
-					}
-					depth++
-				}
-			case "done", "}":
-				if depth > 0 {
-					depth--
-					if depth == 0 && start >= 0 {
-						if name, ok := removesInside(words[start:i], work); ok {
-							return aLoopThatDeletes(name), true
-						}
-						start = -1
-					}
-				}
+		switch strings.ToLower(strings.Trim(words[0], "'\"")) {
+		case "done", "}":
+			if depth > 0 {
+				depth--
+			}
+			continue
+		case "do", "{":
+			if sawLoop {
+				depth++
 			}
 		}
-		if depth > 0 && start >= 0 {
-			if name, ok := removesInside(words[start:], work); ok {
-				return aLoopThatDeletes(name), true
+		if depth == 0 {
+			continue
+		}
+		if at := removerAt(words); at >= 0 {
+			files := filesAmong(words[at+1:])
+			if len(files) == 0 || anyInside(files, work) {
+				return aLoopThatDeletes(strings.Trim(words[at], "'\"")), true
 			}
 		}
-	}
-	return "", false
-}
-
-// removesInside answers the remover these words run, when what it deletes is
-// this rule's business: a file inside the tree, or no file named at all.
-func removesInside(words []string, work string) (string, bool) {
-	at := removerAt(words)
-	if at < 0 {
-		return "", false
-	}
-	files := filesAmong(words[at+1:])
-	if len(files) == 0 || anyInside(files, work) {
-		return strings.Trim(words[at], "'\""), true
 	}
 	return "", false
 }
