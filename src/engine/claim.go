@@ -502,6 +502,10 @@ func realGit(ctx context.Context, r Roots, index string, args ...string) (string
 		// A FETCH THAT ASKS FOR A PASSWORD WAITS FOR EVER, and this runs with
 		// nobody at a terminal. It fails instead, and the answer says so.
 		"GIT_TERMINAL_PROMPT=0")
+	// AND THE PROXY IS THE ONE THIS BOX IS RUNNING. This is the engine's one
+	// git call that leaves the box, and HTTPS_PROXY names the port the old
+	// container used after a restart. See proxy.go.
+	cmd.Env = append(cmd.Env, TheProxyEnv()...)
 	out, err := cmd.Output()
 	if err != nil {
 		if ee, ok := err.(*exec.ExitError); ok {
