@@ -209,6 +209,16 @@
           "help": "How many workers there are, counting the main agent, and how many reviewers beside them. At three the main agent spawns two workers and three reviewers. More finishes more at a time and costs more. Zero means the main agent works alone."
         },
         {
+          "name": "reds_before_a_change_is_needed",
+          "console": true,
+          "title": "reds a run may leave",
+          "type": "int",
+          "default": 2,
+          "min": 0,
+          "max": 20,
+          "help": "How many failures a test run may leave before the next run has to answer them. Under this many, one edit is the right size for the page. The next run is refused where fewer places moved than there were failures. Zero turns the rule off."
+        },
+        {
           "name": "claim_hours",
           "console": true,
           "title": "a claim lasts",

@@ -514,6 +514,11 @@ type Config struct {
 	// say what the machine would do without working it out.
 	ParallelAgents int
 
+	// HOW MANY REDS A RUN MAY LEAVE before the next one has to answer them.
+	// Under this many, one edit is the right size for the page. Zero turns the
+	// rule off, because a person may want the suite as a scratchpad.
+	RedsBeforeAChangeIsNeeded int
+
 	From map[string]string
 }
 
@@ -538,7 +543,10 @@ func TheFloor() Config {
 		// so three is the session and two spawned. Reviewers are all spawned,
 		// because the main agent is a worker and never a reviewer.
 		ParallelAgents: 3,
-		From:           map[string]string{}}
+		// TWO, because one red is answered by one edit and that is the
+		// commonest turn there is.
+		RedsBeforeAChangeIsNeeded: 2,
+		From:                      map[string]string{}}
 }
 
 func LoadConfig(roots Roots) Config {
@@ -589,6 +597,10 @@ func LoadConfig(roots Roots) Config {
 	}
 	if n, ok := toNumber(v.Value["limits.pulls_before_hold_is_stale"]); ok && int(n) > 0 {
 		c.PullsBeforeHoldIsStale = int(n)
+	}
+	// ZERO IS A VALUE HERE TOO, and it turns the rule off.
+	if n, ok := toNumber(v.Value["limits.reds_before_a_change_is_needed"]); ok && int(n) >= 0 {
+		c.RedsBeforeAChangeIsNeeded = int(n)
 	}
 	// A HELPER MAY BE HELD TIGHTER, NEVER LOOSER: a larger ratio is a smaller
 	// digest, and a smaller floor is too.

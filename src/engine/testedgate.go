@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"regexp"
 	"strings"
@@ -28,6 +29,14 @@ type TheLastRun struct {
 	Pending bool   `json:"pending,omitempty"` // a battery that had not finished when this was written
 	At      string `json:"at"`
 	Said    string `json:"said,omitempty"` // the first failing test, so a refusal can name it
+	// Reds is how many of that run's failures were this token's to answer. A
+	// package that did not compile counts one, whatever it listed, because the
+	// compiler stopped at the first wall and every test behind it is unrun.
+	Reds int `json:"reds,omitempty"`
+	// Delta is the delta as it stood at that run, so the next one can say how
+	// many places moved since. The engine keeps no snapshot per run, and this
+	// is the shape it already had.
+	Delta []change `json:"delta,omitempty"`
 }
 
 // theLastRuns is the whole store, by token id.
@@ -86,7 +95,8 @@ func RecordTheRun(r Roots, id string, out Tested) {
 	// says nothing about whose failure it was.
 	ok := out.OK || (!mine && len(out.Ran) > 0)
 	all.Runs[id] = TheLastRun{OK: ok, Pending: pending,
-		At: time.Now().UTC().Format(time.RFC3339), Said: said}
+		At: time.Now().UTC().Format(time.RFC3339), Said: said,
+		Reds: theRedsToAnswer(out), Delta: out.Delta}
 	if b, err := json.MarshalIndent(all, "", "  "); err == nil {
 		_ = writeAtomic(lastRunsPath(r), b, 0o644) // a run it cannot write is a run nothing gates on
 	}
@@ -126,6 +136,86 @@ func thisTokensFailure(x ran, delta []change) bool {
 			if p == d.Path || strings.HasSuffix(d.Path, "/"+p) || strings.HasSuffix(p, "/"+d.Path) {
 				return true
 			}
+		}
+	}
+	return false
+}
+
+// theRedsToAnswer counts what this run left for the agent to answer.
+//
+// A BUILD FAILURE COUNTS ONE, whatever it listed. The compiler stops at the
+// first wall, so every test behind it is unrun and the page is one error rather
+// than a page. Answering it with one edit is the right size.
+func theRedsToAnswer(out Tested) int {
+	build, reds := false, 0
+	for _, x := range out.Ran {
+		if x.OK || x.Pending || !thisTokensFailure(x, out.Delta) {
+			continue
+		}
+		if x.Kind == "build" {
+			build = true
+			continue
+		}
+		reds++
+	}
+	if build && reds == 0 {
+		return 1
+	}
+	return reds
+}
+
+// ARunThatAnswersTooLittle answers why this run is refused, and nothing where
+// it goes through.
+//
+// A PAGE OF REDS ANSWERED BY ONE EDIT IS A GUESS WITH A TEST RUN ATTACHED.
+//
+// THE OWNER'S WORDS, September 2026: we need the engine to reject tests if the
+// number of changes is not as big as the number of errors.
+//
+// MEASURED that month. A run came back with six reds. The agent read one,
+// changed one thing, and ran the whole set again. Two of four runs in that
+// sequence taught it nothing, and each rebuilds the engine.
+//
+// IT IS NOT A BOUND ON EFFORT. It is a bound on running the suite as a way of
+// thinking. A change touching as many places as there were reds goes through,
+// whatever it did in them.
+//
+// A FIRST RUN IS NEVER REFUSED, because nothing was left unanswered, and
+// neither is a run after a single red, because one edit is its right size.
+func ARunThatAnswersTooLittle(r Roots, id string, now []change) string {
+	if id == "" {
+		return ""
+	}
+	least := LoadConfig(r).RedsBeforeAChangeIsNeeded
+	if least <= 0 {
+		return "" // the person turned the rule off
+	}
+	was, ok := LastRunOn(r, id)
+	if !ok || was.Reds < least {
+		return ""
+	}
+	moved := 0
+	for _, c := range now {
+		if !amongTheChanges(was.Delta, c) {
+			moved++
+		}
+	}
+	if moved >= was.Reds {
+		return ""
+	}
+	return fmt.Sprintf("THE LAST RUN LEFT %d RED AND THE TREE HAS MOVED IN %d PLACE(S) SINCE.\n\n"+
+		"A page of failures answered by one edit is a guess with a test run attached, and the "+
+		"run costs a rebuild. Read the whole page first: every one of the %d says what it wanted "+
+		"and what it got.\n\n"+
+		"Fix what you can see, all of it, then ask again. A change touching as many places as "+
+		"there were reds goes through, whatever it did in them.", was.Reds, moved, was.Reds)
+}
+
+// amongTheChanges answers whether this place was already in that delta.
+func amongTheChanges(was []change, c change) bool {
+	for _, x := range was {
+		if x.Path == c.Path && x.Start == c.Start && x.Finish == c.Finish && x.Whole == c.Whole {
+			return true
 		}
 	}
 	return false

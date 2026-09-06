@@ -196,6 +196,13 @@ func TestTheDelta(ctx context.Context, r Roots, db *sql.DB, on string, proposed 
 			out.Whole, out.WhyWhole = true, nothingOnRecord(on)
 		}
 	}
+	// A PAGE OF REDS ANSWERED BY ONE EDIT IS REFUSED. See testedgate.go. A plan
+	// runs nothing, so it costs nothing and is never refused.
+	if run {
+		if why := ARunThatAnswersTooLittle(r, on, out.Delta); why != "" {
+			return out, fmt.Errorf("%s", why)
+		}
+	}
 	tests, err := discoverTests(r, db)
 	if err != nil {
 		return out, err
