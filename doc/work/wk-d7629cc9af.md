@@ -8,7 +8,17 @@ guidance: [[work-token]]
 # the name this token is known by, in references and in links
 title: head tests half landed
 # where the token stands. The process owns these values.
-status: open
+status: closed
+# who did the work step, so the verdict is never theirs
+author: worker-piranesi
+# the tree each time the work was taken up, snapshots the engine wrote
+began:
+  - 1ae31b4a7f7a66d349a57b96b283512747109fe1
+# the tree each time the work was put down or closed, snapshots the engine wrote
+ended:
+  - 70ab59ad75a93cb4ea62513c50302b88ef4b8fa1
+# how it ended. Only an ended token carries one.
+disposition: done
 ---
 
 ## detail
@@ -34,11 +44,11 @@ Either the layer those tests read lands, or the two files come off the branch un
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | what is gained by doing it, and not only what it does |  |  |
-| [ ] | what breaks if it is never done, and not only that it stays undone |  |  |
-| [ ] | the ask is small enough to review whole, or it is split first | — |  |
-| [ ] | every done-when line is decidable, and names the command where one decides it |  |  |
-| [ ] | the basics it stands on exist, or are minted first | — |  |
+| [x] | what is gained by doing it, and not only what it does | A reviewer testing the way the method says gets a running suite rather than a build failure. | criterion one |
+| [x] | what breaks if it is never done, and not only that it stays undone | Every engine test stays dark on a clean checkout, so nothing red can be told from nothing run. | the detail |
+| [x] | the ask is small enough to review whole, or it is split first | — | two files |
+| [x] | every done-when line is decidable, and names the command where one decides it | Both name a command over a clean copy of a commit. Both were run at the tip and at the commit before the repair. | piranesi-head-red.sh |
+| [x] | the basics it stands on exist, or are minted first | — | claim.go |
 
 ## evidence: step 2. do
 
@@ -46,9 +56,9 @@ Either the layer those tests read lands, or the two files come off the branch un
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the guidance this token names was read and applied | — |  |
-| [ ] | one test was written first and seen red for the reason expected |  |  |
-| [ ] | the same test was seen green after the change, and named |  |  |
-| [ ] | the change is git diff began..ended, the two hashes the engine wrote on this token | — |  |
-| [ ] | the cleanup the change revealed is in the change, or is a token of its own | — |  |
+| [x] | the guidance this token names was read and applied | — | work-token |
+| [x] | one test was written first and seen red for the reason expected | Over a clean copy of 65c3cfcb both commands exit one, naming realGit in cancelends_test.go and Publish in claimsfile_test.go. | pir-before |
+| [x] | the same test was seen green after the change, and named | Over a clean copy of 32f4c872 vet exits zero, and the named test answers ok for the engine package. | pir-now |
+| [x] | the change is git diff began..ended, the two hashes the engine wrote on this token | This token wrote nothing. The repair landed in e36ad513, which restored the context threading a push had reverted. | e36ad513 |
+| [x] | the cleanup the change revealed is in the change, or is a token of its own | — | wk-4bede61b24 |
 
