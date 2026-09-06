@@ -8,12 +8,18 @@ guidance: [[work-token]]
 # the name this token is known by, in references and in links
 title: a merge reverts commits
 # where the token stands. The process owns these values.
-status: open
-claimed_by: aeaf7bd9/worker-berlioz
-claimed_at: "2026-09-06T07:43:12Z"
+status: done
+# who did the work step, so the verdict is never theirs
+author: worker-piranesi
+claimed_by: aeaf7bd9/worker-piranesi
+claimed_at: "2026-09-06T09:06:50Z"
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - 0d2bde185ef33f7c864e93a356198ec2cb519f9a
+  - cb52a1ad51c2f5f6673af3458c36ef9afbdf560d
+# the tree each time the work was put down or closed, snapshots the engine wrote
+ended:
+  - 3179ea14c8233a659b34585fc12861b1ac1e0012
 ---
 
 ## detail
@@ -63,11 +69,11 @@ Stop agents merging in the shared tree at all. Pushing already has a door that i
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the guidance this token names was read and applied | — |  |
-| [ ] | the change follows the approach on the token, or the token says why it departed |  |  |
-| [ ] | se test --on this token answered ok, and what it ran is named |  |  |
-| [ ] | the note says what changed and why, for a reader who was not here |  |  |
-| [ ] | the cleanup the change revealed is in the change, or is a token of its own | — |  |
+| [x] | the guidance this token names was read and applied | — | work-token |
+| [x] | the change follows the approach on the token, or the token says why it departed | Rule 12 now bans the merge and names the door, and the two helpers refuse. Nothing else was touched. | behaviour.md |
+| [x] | se test --on this token answered ok, and what it ran is named | It ran three checks over the tokens. Two answered ok, and the third asked this token for an approach section, which it now carries. | se test |
+| [x] | the note says what changed and why, for a reader who was not here | The note carries the rule, the two helpers and the walk. | the note |
+| [x] | the cleanup the change revealed is in the change, or is a token of its own | — | wk-2a591a892a |
 
 ## evidence: step 3. verdict
 
@@ -80,4 +86,12 @@ Stop agents merging in the shared tree at all. Pushing already has a door that i
 | [ ] | every criterion's command was run again, and what it said is named |  |  |
 | [ ] | every hunk improves the product, or a finding names the one that does not |  |  |
 | [ ] | every finding is a trivial token naming this one, and their ids are here |  |  |
+
+## approach
+
+Merging leaves the shared working tree. Rule 12 of behaviour.md carries the ban beside the staging rule it already holds, and names the door that is safe. That door cherry-picks or copies onto a fresh worktree at the branch tip, and it never touches this checkout. The helpers in the scratchpad that merged stop doing it and say where to go instead.
+
+## note
+
+Rule 12 of behaviour.md carried the staging half of this and now carries the merge half, naming the cherry-pick door. Its chapter gained the incident, the count and the reason the engine is not the one merging. The two scratchpad helpers that merged over the shared checkout now refuse and name the doors that are safe. The branch was walked again from the tip. One hundred and fifty-nine merges, seventeen with a file matching neither parent, and they are the seventeen the detail names. A narrower walk, which also asks that only one side moved the file, answered one. The seventeen and the files each one touches are wk-2a591a892a.
 
