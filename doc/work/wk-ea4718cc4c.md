@@ -8,14 +8,18 @@ guidance: [[work-token]]
 # the name this token is known by, in references and in links
 title: Cloud boxes publish nothing
 # where the token stands. The process owns these values.
-status: open
+status: done
 # the person's own name for a group. It does not move the work
 bucket: claims
-claimed_by: 7e7f0da1/main
-claimed_at: "2026-09-06T20:06:54Z"
+# who did the work step, so the verdict is never theirs
+author: main
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - b5ff43e70a6427056eca2680caed0a9d76412bb1
+  - bbcf8a916ab28abf8e1bc4ea5fac125523f5c939
+# the tree each time the work was put down or closed, snapshots the engine wrote
+ended:
+  - 77be75a746e797723bc36c4aea77ed191ccac68d
 ---
 
 ## detail

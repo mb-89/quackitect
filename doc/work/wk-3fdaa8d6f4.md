@@ -9,11 +9,12 @@ guidance: [[work-token]]
 title: blocked offers parked work
 # where the token stands. The process owns these values.
 status: open
-claimed_by: 7e7f0da1/worker-gale
-claimed_at: "2026-09-06T18:36:02Z"
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - 621531d106f180de0e21deb1abc746b15d7e1a67
+# the tree each time the work was put down or closed, snapshots the engine wrote
+ended:
+  - 7cb5876c6f354bc49c6aca72eb6e639a377b5d1e
 ---
 
 ## detail
