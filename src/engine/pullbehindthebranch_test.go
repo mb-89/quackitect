@@ -40,6 +40,30 @@ func TestAPullDoesNotHandOutWhatTheBranchArchived(t *testing.T) {
 	}
 }
 
+// AND A NOTE ON THE BOX DOES NOT SILENCE THE PASS-OVER.
+//
+// A queue with nothing tracked left drains the notes, and the drain answered
+// with its own notice and threw the queue's away. So the one case where the
+// pass-over is the whole answer was the one case that lost it: drain the queue,
+// or narrow it to a bucket that is done, and the agent is handed a note and
+// never learns the clone is behind.
+func TestTheNotesDrainKeepsThePassOver(t *testing.T) {
+	t.Parallel()
+	behind, tok := aCloneBehindTheClose(t)
+	note := mintNote(t, behind, "a note here")
+
+	got := Pull(behind, "worker-1", RoleWorker, Payload{})
+	if got.Token == nil || got.Token.ID != note.ID {
+		t.Fatalf("the drain did not hand out the note: %+v %s", got.Token, got.Notice)
+	}
+	if !strings.Contains(got.Notice, tok.ID) {
+		t.Errorf("handing out the note lost the pass-over naming %s: %s", tok.ID, got.Notice)
+	}
+	if !strings.Contains(got.Notice, "archived") {
+		t.Errorf("the answer no longer says the branch archived it: %s", got.Notice)
+	}
+}
+
 // THE PASS-OVER NAMES THE TOKEN AND THE BRANCH, so an agent that sees a shorter
 // queue is told why and what to bring into step, rather than left to guess.
 func TestAPassOverNamesTheBranchThatArchivedIt(t *testing.T) {
