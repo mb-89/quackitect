@@ -24,7 +24,7 @@ How a test is built is [[testing]].
 
 1. Write the problem in detail and the answer in proposed action, reduced to the smallest case that still shows it. *
 2. Write acceptance criteria first. A criterion is decidable, names the input, the answer and what survives, and is not a plan. *
-3. Where a command decides a criterion, write the command and run it from the root before submitting. Otherwise name who looks at what. *
+3. Where a command decides a criterion, write the command and run it from the root before submitting. Otherwise name who looks at what. A criterion naming a go test names it through se test and reads unreached, because go test -run over a missing name answers ok. *
 4. Match on what the check holds at run time: a whole identifier written once into both halves, or a length as a number. *
 5. Number what the detail says the change does and put a criterion against each. Work that moves off takes its criteria with it. *
 6. A detail names the constraint, never the assignment. A criterion answering with a verb states the effect as field and value.
@@ -74,6 +74,25 @@ Two criteria once carried identical commands, so whatever made the first green m
 Pull the commands and their run patterns out of a draft and compare them for repeats.
 So every command runs from the root before submitting, exit zero or a stated reason, pointing at the instrument held until its owner replaces it.
 A draft obeys the class it commits, and names a walk the tree already has rather than retyping it.
+
+### Naming a go test
+
+go test -run over a pattern answers ok and exits zero when the pattern matches nothing.
+Measured: on a tree carrying neither test, `go test -C src/engine -run 'ACancelledContextEndsAGitCall|ACancelledContextEndsTheProbe' ./...` answered `ok quackitect/engine 3.551s [no tests to run]`, exit 0.
+So a done-when line written that way is green on a tree where the thing it decides does not exist.
+Rename either test, or delete it, and the criterion goes on answering ok for ever.
+
+The engine's own answer is what tells the difference.
+se test names every proposal it could not reach under unreached, and ok stays true when it does.
+So the criterion reads unreached rather than ok alone, and it is written as a command that fails:
+
+```
+./RUNME.sh test --on <id> --propose TestTheThingItDecides | jq -e '.ok and ((.unreached // []) | length == 0)'
+```
+
+That exits 0 when the named test is in the tree and green, and 1 when nothing carries the name.
+Run it both ways before submitting: once as written, and once with a letter added to the name.
+The second run is the one that proves the criterion can go red.
 
 ## 4. What a check may match on
 

@@ -17,8 +17,8 @@ import (
 // private by what it is and the minter is not asked.
 func TestTheMintSaysWhereATokenIsBorn(t *testing.T) {
 	t.Parallel()
-	root := t.TempDir()
-	r := Roots{Method: root, Work: root}
+	r := aTree(t).Roots
+	root := r.Work
 	for _, name := range []string{"note", "standard", "trivial"} {
 		writeProcess(t, root, name)
 	}
@@ -53,8 +53,8 @@ func TestTheMintSaysWhereATokenIsBorn(t *testing.T) {
 // still act on it.
 func TestAMintThatDoesNotSayWhereIsRefused(t *testing.T) {
 	t.Parallel()
-	root := t.TempDir()
-	r := Roots{Method: root, Work: root}
+	r := aTree(t).Roots
+	root := r.Work
 	for _, name := range []string{"note", "standard", "trivial"} {
 		writeProcess(t, root, name)
 	}
@@ -92,8 +92,8 @@ func TestAMintThatDoesNotSayWhereIsRefused(t *testing.T) {
 // straight back, which made a move by hand undo itself.
 func TestAHandMovedTokenStaysMoved(t *testing.T) {
 	t.Parallel()
-	root := t.TempDir()
-	r := Roots{Method: root, Work: root}
+	r := aTree(t).Roots
+	root := r.Work
 	writeProcess(t, root, "standard")
 	yes := true
 	tok, err := Mint(r, Token{Process: "standard", Title: "a token that moves", Status: "first", Tracked: &yes})

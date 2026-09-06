@@ -1,4 +1,5 @@
 {
+  "$comment": "WHAT IS PROJECTED WHERE. Each entry is one projection the engine writes, and adding one is an entry here. Why is [[one-source-projected-everywhere]].",
   "projections": [
     {
       "name": "copilot instructions",

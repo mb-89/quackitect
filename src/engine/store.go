@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-// WHERE TOKENS LIVE, AND WHAT THEY ARE.
+// Where tokens live, and what they are.
 //
 // A token is a markdown note. Two folders hold them, and the minter picks one:
 //
@@ -30,7 +30,7 @@ func workDirs(r Roots) []string { return []string{TrackedDir(r), LocalDir(r)} }
 
 // dirFor answers where a token's file belongs.
 //
-// THE FOLDER IS THE ANSWER, AND NOTHING ELSE IS. A token that has a file is in
+// The folder is the answer, and nothing else is. A token that has a file is in
 // the folder holding it, so one moved by hand stays moved. A token with no file
 // is new, and the mint said where it is born.
 //
@@ -120,20 +120,15 @@ func (t Token) front() frontmatter.Front {
 		"title":    t.Title,
 		"status":   string(t.Status),
 		"bucket":   t.Bucket,
-		// THE HOLDER IS NOT WRITTEN. It is engine state, and it was kept here,
-		// so a take-up that was never put down left a name in a file nothing
-		// reopened. holdstore.go keeps it under .se, where a hold can be
-		// dropped when the agent holding it is gone.
+		// The holder is not written: holdstore.go keeps it under .se. Why is
+		// [[the-hold-is-engine-state]].
 		"author": t.Author,
-		// THE CLAIM IS WRITTEN, WHERE THE HOLDER IS NOT. A hold is this tree's
-		// own and holdstore.go keeps it under .se. A claim is for the other
-		// boxes, so it goes in the note that travels.
+		// The claim is written, where the holder is not, because it is for
+		// the other boxes. See [[the-hold-is-engine-state]].
 		"claimed_by": t.ClaimedBy,
 		"claimed_at": t.ClaimedAt,
-		// A RELATION IS WRITTEN AS A LINK, because the schema says the editor
-		// walks it. It was written as a bare id, so the walk had nothing to
-		// follow and the x-link on those two fields was a claim about a
-		// behaviour that was not there.
+		// A relation is written as a link, so the editor can walk it. Why is
+		// [[a-note-is-written-for-its-readers]].
 		"depends_on":  asLinks(t.DependsOn),
 		"parent":      asLink(t.Parent),
 		"ready_when":  t.ReadyWhen,
@@ -146,16 +141,17 @@ func (t Token) front() frontmatter.Front {
 	if t.NeedsHuman {
 		f["needs_human"] = "true"
 	}
-	// A FLAG THAT IS OFF IS NOT WRITTEN, the way needs_human is not. False on
-	// every note is a line the reader learns to skip.
+	// A flag that is off is not written, the way needs_human is not. See
+	// [[a-note-is-written-for-its-readers]].
 	if t.Urgent {
 		f["urgent"] = "true"
 	}
 	return f
 }
 
-// THE ID IS THE FILE NAME AND IS NOT WRITTEN TWICE. It is set by the reader
-// from the path, so a token that is renamed is the token it is called.
+// The id is the file name and is not written twice: the reader sets it from
+// the path, so a renamed token is the token it is called. See
+// [[a-field-is-read-or-gone]].
 func tokenFromFront(f frontmatter.Front) Token {
 	return Token{
 		Process:  unlink(frontmatter.Str(f, "process")),
@@ -163,10 +159,8 @@ func tokenFromFront(f frontmatter.Front) Token {
 		Title:    frontmatter.Str(f, "title"),
 		Status:   Status(frontmatter.Str(f, "status")),
 		Bucket:   frontmatter.Str(f, "bucket"),
-		// A HOLDER IN THE FILE IS NOT READ. A note written before the hold
-		// moved into the engine carries one, naming an agent that is gone, and
-		// reading it would put a dead hand back on live work. There is no
-		// field to read it into: the hold comes from holdstore.go.
+		// A holder in the file is not read, and there is no field to read it
+		// into: the hold comes from holdstore.go. See [[the-hold-is-engine-state]].
 		Author:      frontmatter.Str(f, "author"),
 		ClaimedBy:   frontmatter.Str(f, "claimed_by"),
 		ClaimedAt:   frontmatter.Str(f, "claimed_at"),
@@ -183,11 +177,9 @@ func tokenFromFront(f frontmatter.Front) Token {
 	}
 }
 
-// THE BODY IS PROSE, AND THE ENGINE WRITES ALL OF IT.
-//
-// Each section sits under a heading this program owns. A section under any
-// other heading is kept whole and written back, because not understanding
-// something is not a reason to delete it.
+// The body is prose, and the engine writes all of it. Each section sits under
+// a heading this program owns, and a section under any other heading is kept
+// whole and written back. Why is [[a-section-nobody-understands-is-kept]].
 const (
 	headDetail   = "## detail"
 	headProposed = "## proposed action"
@@ -203,7 +195,7 @@ func (t Token) body() string {
 	if t.ProposedAction != "" {
 		b.WriteString(headProposed + nl + nl + t.ProposedAction + nl + nl)
 	}
-	// WHAT DONE MEANS, in the note a person reads and edits.
+	// What done means, in the note a person reads and edits.
 	if len(t.Criteria) > 0 {
 		b.WriteString(headCriteria + nl + nl)
 		for _, c := range t.Criteria {
@@ -214,7 +206,8 @@ func (t Token) body() string {
 	for _, s := range sortedKeys(t.Submission) {
 		b.WriteString(headEvidence + s + nl + nl + t.Submission[s] + nl + nl)
 	}
-	// AND WHATEVER THIS PROGRAM DOES NOT UNDERSTAND, PUT BACK.
+	// And whatever this program does not understand is put back, in
+	// [[a-section-nobody-understands-is-kept]].
 	for _, k := range t.Kept {
 		b.WriteString(k.Head + nl + nl + k.Text + nl + nl)
 	}
@@ -234,7 +227,9 @@ func sortedKeys(m map[string]string) []string {
 // breaking.
 const nl = "\n"
 
-// A CRITERION IS A LIST ITEM. One line, and the line is the whole of it.
+// A criterion is a list item: one line, and the line is the whole of it.
+// The save refuses a second line, see
+// [[the-record-refuses-what-it-cannot-read-back]].
 func readCriteria(text string) []Criterion {
 	var out []Criterion
 	for _, line := range strings.Split(text, nl) {
@@ -269,11 +264,11 @@ func sections(body string) [][2]string {
 	return out
 }
 
-// WHAT MOVED, IN THE RECORD. The agent does not remember to write these and
-// cannot forget to: whoever moves a token moves it through SaveToken.
+// noteMove writes what moved into the record. Whoever moves a token moves it
+// through SaveToken, so no caller writes these. See [[the-save-is-the-one-door]].
 func noteMove(r Roots, t, was Token, existed bool) {
 	switch {
-	// THE LINE SAYS WHAT HAPPENED, IT IS NOT INFERRED FROM WHAT IS IN IT.
+	// The line says what happened, and it is not inferred from what is in it.
 	//
 	// Why it is this shape: [[the-line-says-what-happened]].
 	case !existed:
@@ -296,9 +291,9 @@ var errNotAToken = errors.New("it is not a work token")
 // noteToken reads a token out of a note's text. The id comes from the caller,
 // because the file name is the id and the text does not carry it.
 //
-// ONE READER FOR BOTH DOORS. readNote opens a file and this reads what was in
-// it, so a write checked before it lands is checked as the thing that will be
-// read back off disk afterwards, by the same code.
+// One reader for both doors: readNote opens a file and this reads what was in
+// it, and the save checks a write through it too. See
+// [[the-record-refuses-what-it-cannot-read-back]].
 func noteToken(text, id string) (Token, error) {
 	front, body := frontmatter.Split(text)
 	if front == "" {
@@ -308,14 +303,14 @@ func noteToken(text, id string) (Token, error) {
 	if err != nil {
 		return Token{}, err
 	}
-	// A NOTE IS A TOKEN WHEN IT SAYS WHICH SCHEMA READS IT. type: work said the
-	// same thing twice, so it went with the rest of what nothing read.
+	// A note is a token when its kind says the work-token schema reads it.
+	// Why type: work went is [[a-field-is-read-or-gone]].
 	if unlink(frontmatter.Str(f, "kind")) != "work-token" {
 		return Token{}, errNotAToken
 	}
 	t := tokenFromFront(f)
-	// THE ID IS THE FILE NAME. It was written into the note as well, and two
-	// copies of one name is one that can be renamed and one that cannot.
+	// The id is the file name, and the caller passes it in. See
+	// [[a-field-is-read-or-gone]].
 	t.ID = id
 	readBody(&t, body)
 	return t, nil
@@ -335,10 +330,9 @@ func readNote(path string) (Token, bool) {
 		}
 		return Token{}, false
 	}
-	// A NOTE IS EDITED BY HAND, so the rule is checked where the note is read
-	// and not only where it was minted. A title that broke it is said out loud
-	// and the token is still returned: refusing to read work is worse than
-	// reading work with a bad title.
+	// A note is edited by hand, so the title rule is checked here as well as
+	// at the mint. A break is said out loud and the token is still returned.
+	// Why the read side never refuses is [[the-record-refuses-what-it-cannot-read-back]].
 	if err := checkTitle(t.Title); err != nil {
 		fmt.Fprintf(os.Stderr, "engine: %s: %v\n", path, err)
 	}
@@ -346,9 +340,8 @@ func readNote(path string) (Token, bool) {
 }
 
 func LoadToken(r Roots, id string) (Token, error) {
-	// WHAT THE SNAPSHOT HOLDS IS WHAT IS ON DISK, so one token is read out of
-	// it rather than opened again. A process that has read the folder once
-	// does not open a file in it a second time.
+	// One token is read out of the snapshot rather than opened again. See
+	// [[the-folders-are-read-once-per-process]].
 	if r.snap != nil && r.snap.loaded {
 		for _, t := range r.snap.tokens {
 			if t.ID == id {
@@ -363,9 +356,8 @@ func LoadToken(r Roots, id string) (Token, error) {
 			return t, nil
 		}
 	}
-	// THE ARCHIVE IS A FOLDER THE READER CANNOT SEE. A token that closed came
-	// off the disk, and every caller that names an id by hand would otherwise
-	// be told it never existed. So the last place looked is history.
+	// The last place looked is the archive, in history. Why a closed token
+	// is off the disk is [[the-close-archives-the-token]].
 	if t, ok := readArchivedNote(r, id); ok {
 		return t, nil
 	}
@@ -375,9 +367,8 @@ func LoadToken(r Roots, id string) (Token, error) {
 // Tokens reads both folders, oldest first. Order is by when a token was opened,
 // so a queue hands out the thing that has waited longest.
 //
-// IT READS THE FOLDERS ONCE PER PROCESS when the roots carry a snapshot, and
-// answers a copy of the list, so a caller that moves a token in its copy
-// moves nothing in anybody else's.
+// It reads the folders once per process when the roots carry a snapshot, and
+// answers a copy of the list. Why is [[the-folders-are-read-once-per-process]].
 func Tokens(r Roots) []Token {
 	if r.snap != nil {
 		if !r.snap.loaded {
@@ -391,8 +382,8 @@ func Tokens(r Roots) []Token {
 
 func readTokens(r Roots) []Token {
 	var out []Token
-	// THE HOLDS ARE READ ONCE, not per note, because they are one small file
-	// and the folder can be hundreds of them.
+	// The holds are read once, not per note. See
+	// [[the-folders-are-read-once-per-process]].
 	held := heldNow(r)
 	for _, dir := range workDirs(r) {
 		entries, err := os.ReadDir(dir)
@@ -409,12 +400,10 @@ func readTokens(r Roots) []Token {
 			}
 		}
 	}
-	// OLDEST FIRST, by the number it was minted with. A time would have said
-	// the same thing and also said when somebody was at their desk.
+	// Oldest first, by the number it was minted with, which is the file name.
+	// An order somebody decided is depends_on. Why a token carries no time is
+	// [[the-token-carries-no-time]].
 	sort.Slice(out, func(i, j int) bool {
-		// THE FILE NAME IS THE ORDER. A token carries no time and no sequence:
-		// when it was typed is an accident, and a queue that sorts on it reads
-		// an accident as a decision. An order somebody decided is depends_on.
 		return out[i].ID < out[j].ID
 	})
 	return out
@@ -449,7 +438,7 @@ type overLong struct {
 // overCaps answers every bounded section that runs past its bound, in the
 // order the schema declares them, so a refusal names the same one every time.
 //
-// IT MEASURES AND DOES NOT REFUSE, so both doors that want the count can use
+// It measures and does not refuse, so both doors that want the count can use
 // it. It weighs what the editor weighs: maxWords, counted by overWords.
 //
 // Why it is this shape: [[measuring-is-separate-from-refusing]].
@@ -542,9 +531,8 @@ func linesThatFit(t Token) error {
 
 // blocksHoldNoHeading refuses a block that carries a line opening a section.
 //
-// THE RECORD REFUSES TO HOLD WHAT IT CANNOT READ BACK. A block reads to the
-// next heading, so a heading inside one ends it early and the rest is lost on
-// the save rather than on the write.
+// A block reads to the next heading, so a heading inside one would lose the
+// rest on the save. See [[the-record-refuses-what-it-cannot-read-back]].
 func blocksHoldNoHeading(t Token) error {
 	opens := func(where, value string) error {
 		for _, line := range strings.Split(value, nl) {
@@ -566,12 +554,27 @@ func blocksHoldNoHeading(t Token) error {
 	return nil
 }
 
+// headingsSaidOnce refuses a note that opens the same section twice.
+//
+// A second chapter under one heading would bury the first on the save. See
+// [[the-record-refuses-what-it-cannot-read-back]], and the lint's half of the
+// rule in [[a-chapter-opened-twice-is-a-departure]].
+func headingsSaidOnce(t Token) error {
+	seen := map[string]bool{}
+	for _, c := range chaptersOf(t.body(), 2) {
+		if seen[c.Header] {
+			return fmt.Errorf("the note opens a %q section twice, and a reader cannot tell "+
+				"which one the work was written against. Fold the two into one", c.Header)
+		}
+		seen[c.Header] = true
+	}
+	return nil
+}
+
 // readBody fills the prose fields back.
 //
-// A SECTION THIS READER DOES NOT KNOW IS KEPT, NOT DROPPED. The file is
-// rendered from this struct, so a heading nothing matched went nowhere and the
-// next save rebuilt the file without it. Not understanding a section is not a
-// reason to delete it.
+// A section this reader does not know is kept, not dropped. Why is
+// [[a-section-nobody-understands-is-kept]].
 func readBody(t *Token, body string) {
 	for _, sec := range sections(body) {
 		head, text := sec[0], sec[1]
@@ -595,7 +598,7 @@ func readBody(t *Token, body string) {
 
 // settleEnding makes the status follow the disposition.
 //
-// THE DISPOSITION IS THE FIELD THAT SAYS A TOKEN HAS STOPPED, and Ended reads
+// The disposition is the field that says a token has stopped, and Ended reads
 // it. This moves only a token its process cannot: one that has ended somewhere
 // a step still leaves goes to the state the process ends at.
 //
@@ -615,40 +618,31 @@ func settleEnding(r Roots, t Token) Token {
 }
 
 func SaveToken(r Roots, t Token) error {
-	// THE TWO FIELDS AGREE BEFORE ANYTHING IS WRITTEN, so the file a person
-	// reads and the answer Ended gives are the same answer. This is the one
-	// place every write goes through, which is why the rule lives here rather
-	// than in each caller that ends a token.
+	// The two fields agree before anything is written, here, because every
+	// write goes through here. See [[the-disposition-says-it-stopped]] and
+	// [[the-save-is-the-one-door]].
 	t = settleEnding(r, t)
-	// THE RECORD REFUSES TO HOLD WHAT IT CANNOT READ BACK. A criterion is one
-	// lead and one line, and the reader stops at the first newline, so a second
-	// line is lost on the save rather than on the write. Here is where the value
-	// stops being a value and becomes a line, and a refusal in a caller is a
-	// refusal the next caller does not have.
+	// The record refuses what it cannot read back, and here is where a value
+	// becomes a line. See [[the-record-refuses-what-it-cannot-read-back]].
 	if err := linesThatFit(t); err != nil {
 		return err
 	}
 	if err := blocksHoldNoHeading(t); err != nil {
 		return err
 	}
+	if err := headingsSaidOnce(t); err != nil {
+		return err
+	}
 	schema := narrowedSchema(r, t)
 	if err := proseThatFits(schema, t); err != nil {
 		return err
 	}
-	// EVERY CHANGE OF STATE IS IN THE RECORD, and this is the one place that
-	// sees them all. The agent does not remember to write them and cannot
-	// forget to: whoever moves a token moves it through here.
-	//
-	// It is the record and not the token because a tracked token travels, and a
-	// time on it says when somebody was at their desk.
+	// The token as it was, so the record line can say which move this is.
+	// See [[the-save-is-the-one-door]], and [[the-token-carries-no-time]] for
+	// why the time goes in the record and not on the note.
 	was, existed := LoadToken(r, t.ID)
-	// WHERE IT IS NOW, so a token whose process moved it leaves nothing behind.
-	//
-	// MEASURED. A save wrote into the folder the process names and left the old
-	// file where it was, so one token became two files with one id, and the
-	// editor drew the row twice. It cost nothing while every process agreed
-	// with the folder its tokens were already in, and it broke the day a note
-	// was converted in doc/work and saved into .se/work.
+	// Where it is now, so a token that moves folders leaves nothing behind.
+	// See [[the-folder-answers-where-a-token-lives]].
 	from := noteAt(r, t.ID)
 	dir := dirFor(r, t)
 	if err := os.MkdirAll(dir, 0o755); err != nil {
@@ -679,35 +673,20 @@ func SaveToken(r Roots, t Token) error {
 		_ = os.Remove(from)    // the note is written; a stale copy is reported by the duplicate check
 		_ = IndexFile(r, from) // the file is the truth, and the watcher catches up on a row it could not drop
 	}
-	// THE HOLD GOES WHERE THE ENGINE KEEPS IT, and not into the file that was
-	// just written. Whoever moves a hold moves it through here, so this is the
-	// one place that has to remember, and it is the same one place that used to
-	// put the name on the page.
+	// The hold goes where the engine keeps it, and not into the file that was
+	// just written. See [[the-hold-is-engine-state]].
 	if err := recordHold(r, t.ID, t.Holder); err != nil {
 		return err
 	}
-	// WHAT THIS PROCESS WROTE IS WHAT IT READS BACK. The snapshot was read
-	// before the write, so it is dropped and the next ask reads the folder.
-	// And the index is told, so the write is not missing from it either.
+	// The snapshot was read before the write, so it is dropped, and the index
+	// is told. See [[the-folders-are-read-once-per-process]].
 	r.forget()
 	_ = IndexFile(r, final) // the file is the truth, and the watcher catches up on a row it could not write
 	noteMove(r, t, was, existed == nil)
-	// THE CLOSE IS THE MOMENT, AND THIS IS THE ONE PLACE THAT SEES IT. A token
-	// that has just ended goes to the archive if it travels and is deleted if
-	// it does not, so no agent has to call anything and no door can forget.
-	//
-	// It asks whether this save is the one that ended it. A save of a token
-	// that was already ended is a repair, and a repair does not archive twice.
-	//
-	// IT IS THE STATE AS WELL AS THE DISPOSITION. A token that has ended where
-	// its process still declares a step is one a hand edit or an older engine
-	// left, and archiving on the disposition alone would take it off the disk
-	// while its process can still move it. Archivable is the rule, and the
-	// sweep asks the same one.
-	//
-	// AND AN ARCHIVE IT CANNOT WRITE DOES NOT UNDO ANY OF THAT. Everything
-	// above has already happened, so a git failure here is a consequence left
-	// over and not a save that went wrong. See NotArchived.
+	// The save that ends a token archives it, and only that save: a repair of
+	// an ended token does not archive twice. Archivable asks the state as well
+	// as the disposition, and an archive that fails undoes nothing above, see
+	// NotArchived. Why is [[the-close-archives-the-token]].
 	if ended := Archivable(r, t); ended && (existed != nil || !Archivable(r, was)) {
 		if err := Archive(r, t); err != nil {
 			inSession(r, "work", orElse(t.Holder, "engine"), t.ID+" closed, and not archived: "+err.Error(), No(),

@@ -181,6 +181,7 @@ func ForgetRead(roots Roots, path string) {
 // identities and cannot check one: the harness says who is calling, and the
 // agent does not write that field. What this layer guarantees is that every
 // call carries one and that the record says which.
+// Why is [[every-call-carries-an-identity]].
 func NoteAgent(roots Roots, id, kind, session string) {
 	if id == "" || id == "main" {
 		return
@@ -401,20 +402,19 @@ func AgentGone(roots Roots, id string) {
 // says SubagentStop for a helper that finishes, and a helper killed with its
 // session says nothing at all. So the session ending is what closes the rest,
 // and without it the panel would hold a crowd that is gone.
-//
-// AND THE WORK GOES BACK WITH THEM, which is the third door. AgentGone and
-// HelpersGoneWith both put a token down before marking an identity gone, and
-// this one did not. A helper still alive when its session ended, with no turn
-// end before it, kept its token: the queue counted that work as in hand and
-// handed it to nobody until the next engine start swept it.
-//
-// THE SESSION'S OWN HOLD IS LEFT ALONE. It is meant to survive a restart, so
-// the put-down takes the helpers of the session and not the session, which is
-// the filter HelpersGoneWith already draws.
 func AgentsGoneWith(roots Roots, session string) {
 	if session == "" {
 		return
 	}
+	// AND THE HELPERS' WORK GOES BACK WITH THEM, by the third door. A helper
+	// still alive when its session ends, with no turn end before it, kept what
+	// it held: the queue counted that work as in hand and handed it to nobody
+	// until the next engine start swept it. The other two doors that mark an
+	// agent gone put down what it held first, and this one was left out.
+	//
+	// THE SESSION'S OWN HOLD IS LEFT ALONE. It holds its work across a restart
+	// on purpose, so the put-down is for the helpers of the session only, which
+	// is the filter HelpersGoneWith uses.
 	for id, a := range LoadEvidence(roots).Agents {
 		if a.Session == session && id != session && a.Kind != "session" && a.Gone.IsZero() {
 			PutDownWhatTheyHeld(roots, id)

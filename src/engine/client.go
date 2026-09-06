@@ -22,6 +22,12 @@ import (
 // HELP NEEDS NO ENGINE. A verb asked for its usage is answered here, off the
 // same function, because a person reading the flags has not started
 // anything yet and should not have to.
+//
+// NOR DOES THE CATALOG. se query --calls is about this program rather than
+// about the tree, and it lists start, so a caller that has to start an
+// engine before it can ask what to send holds start on its own, which is
+// the list the catalog exists to end. It is answered here the way help is,
+// and before any root is looked up: a fresh folder has no method root.
 
 // verbAsk is what the client sends: the verb, its flags, and what was on
 // standard input, which a verb such as run or pull reads whole.
@@ -29,7 +35,14 @@ type verbAsk struct {
 	Verb  string   `json:"verb"`
 	Args  []string `json:"args"`
 	Stdin string   `json:"stdin,omitempty"`
+	// Door is which client sent this. The lane names itself and nothing else
+	// does, because a field added to a message has to mean the old thing where
+	// it is absent, and every client older than this one is a shell.
+	Door string `json:"door,omitempty"`
 }
+
+// DoorLane is what the tool lane writes on an ask of its own.
+const DoorLane = "lane"
 
 // verbAnswer is what comes back: both streams and the code.
 type verbAnswer struct {
@@ -44,6 +57,11 @@ const verbBudget = TheRunCeiling + time.Minute
 
 // callTheEngine sends one verb and answers its exit code.
 func callTheEngine(ctx context.Context, verb string, args []string) int {
+	// THE CATALOG IS ABOUT THE PROGRAM, so no root is looked up for it. The
+	// verb reads nothing but its flags before it answers the catalog.
+	if wantsCalls(verb, args) {
+		return run[verb](&call{ctx: ctx, args: args, in: os.Stdin, out: os.Stdout, err: os.Stderr})
+	}
 	// BOTH ROOTS COME OFF THE VERB'S OWN ARGUMENTS. Only the flag form carried
 	// --method, so every verb took the guess whatever the caller typed.
 	roots, err := FindRoots(argValue(args, "--work"), argValue(args, "--method"))
@@ -137,6 +155,20 @@ func wantsHelp(args []string) bool {
 	return false
 }
 
+// wantsCalls answers whether this is the query for the catalog, which is
+// about the program and is answered here the way help is.
+func wantsCalls(verb string, args []string) bool {
+	if verb != "query" {
+		return false
+	}
+	for _, a := range args {
+		if a == "--calls" || a == "-calls" {
+			return true
+		}
+	}
+	return false
+}
+
 // runVerbInside runs one verb inside the engine that lives, over a fresh
 // snapshot of the roots, and answers what it wrote.
 //
@@ -149,7 +181,8 @@ func runVerbInside(ctx context.Context, r Roots, ask verbAsk) verbAnswer {
 		return verbAnswer{Err: "engine: no such verb: " + ask.Verb + "\n", Code: Unread}
 	}
 	var out, errs strings.Builder
-	c := &call{ctx: ctx, roots: r.ReadOnce(), args: ask.Args, in: strings.NewReader(ask.Stdin), out: &out, err: &errs}
+	c := &call{ctx: ctx, roots: r.ReadOnce(), args: ask.Args, in: strings.NewReader(ask.Stdin),
+		out: &out, err: &errs, door: ask.Door}
 	code := v(c)
 	// EVERY RESULT IS COUNTED HERE, because every lane result passes here on
 	// its way back. Wrong is a code that is not zero, or a refusal the verb
