@@ -8,16 +8,20 @@ guidance: [[work-token]]
 # the name this token is known by, in references and in links
 title: filter gets its module
 # where the token stands. The process owns these values.
-status: open
+status: done
+# who did the work step, so the verdict is never theirs
+author: worker-chagall
 claimed_by: aeaf7bd9/worker-chagall
-claimed_at: "2026-09-06T08:41:00Z"
+claimed_at: "2026-09-06T08:52:37Z"
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - 93f48eaf73b40a41203539bbb77b862b802e7745
   - 39271a89fa48f78c057ba8cf40076d85e465e7e6
+  - d01adec2e9b4e8f9b474cf566aa9ac6903a6831e
 # the tree each time the work was put down or closed, snapshots the engine wrote
 ended:
   - 4931cede7114810cfff9539d08b8bba03388f3c8
+  - eb35760d57275f71a638619ad3f86b34b99097ad
 ---
 
 ## detail
