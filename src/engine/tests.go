@@ -59,6 +59,11 @@ type ran struct {
 	ID      string  `json:"id"`
 	Kind    string  `json:"kind"`
 	OK      bool    `json:"ok"`
+	// Pending is a run that has neither passed nor failed because it has not
+	// finished. A battery replaces the engine that started it, so it cannot be
+	// awaited, and calling a run that has not happened a pass is the defect
+	// this exists to end. Pending is never ok, and it is not a failure either.
+	Pending bool    `json:"pending,omitempty"`
 	Seconds float64 `json:"seconds"`
 	Said    string  `json:"said,omitempty"` // the tail of what a failing test printed
 	// Engine is, for a check, the engine it was handed and whether the one

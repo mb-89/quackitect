@@ -73,9 +73,27 @@ func startBattery(ctx context.Context, r Roots, actor, token string) ran {
 	}
 	// A RUN ALREADY GOING IS NOT STARTED TWICE. Two batteries over one tree
 	// build the same binary over each other and neither answer means anything.
-	if was, ok := batteryGoing(r); ok && stillRunning(was.PID) {
-		return ran{ID: "battery", Kind: "battery", OK: true,
-			Said: "a battery started at " + was.Started + " is still going. Its answer lands in " + was.Out}
+	// A RUN THAT HAS ENDED IS READ, AND ITS OWN VERDICT IS THE ANSWER.
+	//
+	// This answered ok the moment a battery started, so a whole se test read as
+	// green before a single check had run. The battery cannot be awaited, but a
+	// battery that has already finished can be read, and usually has by the
+	// time anybody asks again.
+	//
+	// WHERE THE ENGINE RESTARTED IN BETWEEN, RecordFinishedBattery has taken
+	// the marker and put the outcome in the log. Then there is nothing here to
+	// read and a new run starts, which is the old behaviour and is honest.
+	if was, ok := batteryGoing(r); ok {
+		if stillRunning(was.PID) {
+			return ran{ID: "battery", Kind: "battery", Pending: true,
+				Said: "a battery started at " + was.Started + " is still going, so this is neither " +
+					"a pass nor a failure. Its answer lands in " + was.Out}
+		}
+		if said, err := os.ReadFile(was.Out); err == nil {
+			passed := batteryPassed(string(said))
+			return ran{ID: "battery", Kind: "battery", OK: passed,
+				Said: "the battery started at " + was.Started + " has finished: " + lastLine(string(said))}
+		}
 	}
 	stamp := time.Now().UTC().Format("20060102-150405")
 	outPath := filepath.Join(batteryDir(r), "battery-"+stamp+".out")
@@ -103,9 +121,12 @@ func startBattery(ctx context.Context, r Roots, actor, token string) ran {
 	// goroutine because the answer here does not wait: the run may replace
 	// this engine, and then the next one reaps and reports it.
 	go func() { _ = cmd.Wait() }()
-	return ran{ID: "battery", Kind: "battery", OK: true,
+	// STARTING IS NOT PASSING. The run has not happened yet, so this is pending
+	// rather than ok, and a caller gating on ok gates on the outcome.
+	return ran{ID: "battery", Kind: "battery", Pending: true,
 		Said: "the battery is running outside this engine, because it replaces it. " +
-			"Its answer lands in " + outPath + ", and the next engine puts the outcome in the record."}
+			"This is neither a pass nor a failure. Its answer lands in " + outPath + ", " +
+			"and asking again once it has finished reads the outcome."}
 }
 
 // batteryGoing answers the run the marker names, if there is one.
