@@ -184,19 +184,12 @@ func answerFor(r Roots, actor, role string, p Payload) Answer {
 	if refused != nil {
 		return *refused
 	}
-	// UNBOUND TAKES THE QUEUE OFF, AND THE HAND-OUT IS THE QUEUE.
-	//
-	// A submission still settles above this. Closing work is the record rather
-	// than the queue, and unbound leaves the record standing.
-	//
-	// MEASURED, ON 2026-09-06. An unbound session closed one token and was
-	// handed another, which the stop judge then held it over.
-	if Unleashed(r) {
-		a := Answer{Pull: AnswerWait, Notice: theQueueIsOff}
-		a.Learned = learned
-		a.Notice += over + down
-		return a
-	}
+	// THE RUNG IS ASKED IN whatComesNext, AND ONCE. A guard here asked
+	// Unleashed, which is Unbound OR God, so a God tree was handed nothing and
+	// told it was unbound. God is every refusal off, and a queue that refuses
+	// there is a new refusal in the one state that exists for working without
+	// the engine in the way. See wk-362a803017, and wk-cda42858cd for the
+	// second writer this deletion also takes out.
 	a := whatComesNext(r, actor, role)
 	a.Learned = learned
 	a.Notice += over + down
@@ -1223,11 +1216,6 @@ func workNotice(t Token) string {
 	return "This is yours now. Do what the detail asks and nothing next to it. " +
 		"Walk the checklist for this step and answer every line, then submit."
 }
-
-// theQueueIsOff is what an unbound pull answers. A person took the queue off
-// this tree, so the agent picks its own work and names it.
-const theQueueIsOff = "This tree is unbound, so the queue hands out nothing. " +
-	"Work what the person asked for. Take a token by naming it: se claim --these <id>."
 
 // AskToStop refuses once when the actor holds work it could still do, and
 // names it, so a stop is a decision rather than a drift.
