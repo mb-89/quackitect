@@ -11,12 +11,14 @@ title: asked criterion contradicts ruling
 status: open
 # the person's own name for a group. It does not move the work
 bucket: claims
+claimed_by: 7e7f0da1/main
+claimed_at: "2026-09-06T20:02:30Z"
 # true when this waits for a person rather than an agent
-needs_human: true
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - 6ddd8aba4fd075e70ae7444eaa43c898440245da
   - 212474764f575390299e7de6bf6e913b1c02697d
+  - 70a8849d3c3978053a95f5491094232270dddcc2
 # the tree each time the work was put down or closed, snapshots the engine wrote
 ended:
   - 4f772760478d0f4023e09605242b7863697abd8b
@@ -29,12 +31,20 @@ wk-8fa7785eab carries this criterion: a standing claim of asked, made by an acto
 
 ## proposed action
 
-Ask the owner. If the ruling stands, reword the criterion on wk-8fa7785eab to name a reason the engine argues with, and leave the code alone.
+THE ANSWER CAME WITHOUT THE OWNER, AND IT LEAVES NOTHING TO REWORD.
+
+The ruling stands. It is rule 5 of the standing layer an agent is handed: asked outranks every other reason when their word is what stopped you.
+
+NO REASON IS LEFT TO REWORD THE CRITERION TO. The argument went altogether under wk-dffbf05720. A standing claim is granted at once, whatever is in hand.
+
+AND THE CRITERION IS GONE WITH ITS TOKEN. wk-8fa7785eab is on no disk here, in no archive row, and named by nothing but this note.
+
+WHAT PINS THE RULING NOW. TestAskedIsGrantedOnTheFirstClaim went when four stop tests were folded to two. TestAValidClaimStopsAtOnce replaced it and is wider.
 
 ## done when
 
-- a person says whether asked is argued with over open work, and the answer is written here
-- the criterion or the code agrees with the other, and TestAskedIsGrantedOnTheFirstClaim says which
+- a person says whether asked is argued with over open work, and the answer is written here. ANSWERED: it is not, and nothing else is either
+- the criterion or the code agrees with the other, and a test says which. TestAValidClaimStopsAtOnce says it, having replaced the test this line named
 
 ## evidence: step 1. ask
 
@@ -42,11 +52,11 @@ Ask the owner. If the ruling stands, reword the criterion on wk-8fa7785eab to na
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | what is gained by doing it, and not only what it does |  |  |
-| [ ] | what breaks if it is never done, and not only that it stays undone |  |  |
-| [ ] | the ask is small enough to review whole, or it is split first | — |  |
-| [ ] | every done-when line is decidable, and names the command where one decides it |  |  |
-| [ ] | the basics it stands on exist, or are minted first | — |  |
+| [x] | what is gained by doing it, and not only what it does | A contradiction between a ruling and a criterion is closed, and the record says which won. |  |
+| [x] | what breaks if it is never done, and not only that it stays undone | A token sits on a person's desk for a decision that decided itself, and every reader re-reasons it. |  |
+| [x] | the ask is small enough to review whole, or it is split first | One question, answered in prose. |  |
+| [x] | every done-when line is decidable, and names the command where one decides it | By se find over doc/work for wk-8fa7785eab, which answers nothing, and by se test on TestAValidClaimStopsAtOnce. |  |
+| [x] | the basics it stands on exist, or are minted first | The ruling and its test both exist. The criterion does not, and that is the answer. |  |
 
 ## evidence: step 2. do
 
@@ -54,9 +64,9 @@ Ask the owner. If the ruling stands, reword the criterion on wk-8fa7785eab to na
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the guidance this token names was read and applied | — |  |
-| [ ] | one test was written first and seen red for the reason expected |  |  |
-| [ ] | the same test was seen green after the change, and named |  |  |
+| [x] | the guidance this token names was read and applied | work-token, read. The record answered the ambiguity rather than a guess. |  |
+| [ ] | one test was written first and seen red for the reason expected | Not met, and it cannot be. No code changed: the contradiction dissolved when the argument was removed. |  |
+| [x] | the same test was seen green after the change, and named | TestAValidClaimStopsAtOnce, which drives asked among all four sanctioned reasons. |  |
 | [ ] | the change is git diff began..ended, the two hashes the engine wrote on this token | — |  |
 | [ ] | the cleanup the change revealed is in the change, or is a token of its own | — |  |
 
