@@ -575,7 +575,18 @@ function liveTable(id: string, n: Node, doing: Happening): string {
 
 function tableBody(n: Node, doing: Happening): string {
   const lists: Record<string, Doing[] | undefined> = { present: doing.present, actors: doing.actors };
-  const rows = lists[n.source ?? ""];
+  const all = lists[n.source ?? ""];
+  // AN EMPTY HAND DRAWS NO ROW. A row saying only that somebody once pulled is
+  // a row a person cannot act on, and the header is for what they can act on.
+  //
+  // A STOPPED AGENT KEEPS ITS ROW, whether or not it holds anything, because a
+  // stop is the thing a person most needs to see and hiding it would be the
+  // opposite of the rule.
+  //
+  // IT IS DROPPED HERE AND NOT IN THE LIST. The staffing count reads the length
+  // of that list, so an agent taken out of it is one the guard cannot count,
+  // and a worker that has spawned and not pulled yet would go missing.
+  const rows = all?.filter((r) => r.id || r.state !== "waiting");
   if (!rows) {
     // A SOURCE NOTHING ANSWERS IS A FAULT IN THE DECLARATION, and it says so
     // rather than drawing an empty table, which would read as nobody here.

@@ -1,5 +1,15 @@
 // THE TABLE DRAWS THE REGISTER IT WAS HANDED, AND DERIVES NOTHING.
 //
+// EXCEPT AN EMPTY HAND, WHICH DRAWS NO ROW. The owner's rule: an agent with
+// nothing in hand can despawn, and one holding something is shown with what it
+// holds. A row that says only that somebody once pulled is a row a person
+// cannot act on, and four of them read as nonsense.
+//
+// THE DROP IS HERE AND NOT IN THE REGISTER. The staffing count reads the
+// length of that list, so an agent taken out of it is an agent the guard
+// cannot count, and a worker that has spawned and not pulled yet would go
+// missing. It is hidden from the drawing, and the count still sees it.
+//
 // The panel is where a person looks to see who is here. A table that made up
 // its own rows, or kept the last ones, would look right in a screenshot and
 // lie every other minute. So it is rendered from TWO different answers and
@@ -77,8 +87,8 @@ const two = panelHtml(tree, shown, {}, second);
 holds(one, "reviewer-1", "first: the helper it was handed");
 holds(one, "wk-1111111111", "first: the token that helper holds");
 holds(one, 'class="open" data-id="wk-1111111111"', "first: the title is a link that opens the token");
-holds(one, "main", "first: the session it was handed");
-holds(one, "nothing in hand", "first: an agent holding nothing is still a row");
+holdsNot(one, "nothing in hand", "first: an agent holding nothing draws no row");
+holdsNot(one, 'data-actor="main"', "first: the empty-handed session is not drawn");
 holds(two, "walker-4", "second: the agent it was handed");
 holds(two, "wk-2222222222", "second: the token it was handed");
 
@@ -124,6 +134,18 @@ else no("the columns are drawn out of the declared order");
 // panel that failed to load, and nobody here is a fact rather than a fault.
 const none = panelHtml(tree, shown, {}, { actors: [], hold: { on: false }, present: [] });
 holds(none, "nobody is here", "an empty register says nobody is here");
+
+// AND SO DOES A REGISTER OF EMPTY HANDS. Every row is dropped, so the table
+// has none, and a table with no rows and no word reads as a panel that failed.
+const idle = panelHtml(tree, shown, {}, {
+  actors: [], hold: { on: false },
+  present: [
+    { actor: "worker-1", kind: "worker", state: "waiting", holding: "nothing in hand" },
+    { actor: "worker-2", kind: "worker", state: "waiting", holding: "nothing in hand" },
+  ],
+});
+holds(idle, "nobody is here", "a register of empty hands says nobody is here");
+holdsNot(idle, "worker-1", "a register of empty hands draws no row");
 
 // AND A SOURCE NOTHING ANSWERS IS A FAULT IN THE DECLARATION, said out loud
 // rather than drawn as an empty table.
