@@ -71,15 +71,13 @@ Move the claim relay onto refs/heads/se-queue, the one namespace a cloud box can
 
 ## approach
 
-The owner has decisions open here, so nothing is cut until they land.
+The owner's design, 2026-09-06. Nothing is cut until they give the go.
 
-What the branch carries: state only, not whole notes. That is the owner's ruling on 2026-09-06. A row is id, status, holder, claimed_by and claimed_at. The notes stay in doc/work on the code branch, where a person reads them in an editor.
+The split is by path rather than by branch. doc/work goes straight to trunk, always. src goes on a worker's own branch and lands after review. Two things at two speeds, and no second branch is built.
 
-What that costs: a token minted elsewhere is a row here before its note is. It cannot be handed out until the code merge brings the note. The two defects that hurt are both state, so both are still fixed.
+The claim relay keeps its mechanism and changes its target. A commit is built with a bare index, as claim.go does now, and pushed to trunk instead of refs/se/claims. The working tree is never touched.
 
-The claim relay keeps its mechanism and changes its ref.
+refs/heads is the one namespace a cloud box can write. That was measured rather than assumed, so trunk is not a preference here.
 
-A commit is built with a bare index and pushed, exactly as claim.go does now. The working tree is never touched and a conflict on disk stays impossible. Only refs/se/claims becomes a branch under refs/heads.
-
-refs/heads is the one namespace a cloud box can write. That was measured rather than assumed, and it is what makes the relay work at all here.
+One thing must move with it. doc/work/archive.jsonl is one file every close appends to, and every close now pushes at once. One file per archived token removes that conflict by construction.
 
