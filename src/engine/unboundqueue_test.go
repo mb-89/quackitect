@@ -7,12 +7,12 @@ import (
 	"testing"
 )
 
-// theStopJudgeRefuses drives the stop hook with nothing claimed and answers
-// whether it blocked.
+// theStopJudgeSays drives the stop hook with nothing claimed and answers what
+// it wrote.
 //
 // THE SESSION'S FIRST STOP IS GRANTED WHATEVER IT SAYS, so one is spent here
 // before the one that is judged.
-func theStopJudgeRefuses(t *testing.T, r Roots, actor string) bool {
+func theStopJudgeSays(t *testing.T, r Roots, actor string) string {
 	t.Helper()
 	log, err := sessionlog.Open(r.Private("log"))
 	if err != nil {
@@ -20,14 +20,19 @@ func theStopJudgeRefuses(t *testing.T, r Roots, actor string) bool {
 	}
 	defer log.Close()
 	record(log, "engine", "start", "engine", "engine started", sessionlog.Yes(), nil)
-	blocked := false
+	said := bytes.Buffer{}
 	for range 2 {
-		var said bytes.Buffer
+		said.Reset()
 		g := &guard{out: &said}
 		decideStop(g, r, LoadConfig(r), log, hookIn{SessionID: "s-1"}, actor)
-		blocked = strings.Contains(said.String(), `"decision":"block"`)
 	}
-	return blocked
+	return said.String()
+}
+
+// theStopJudgeRefuses answers whether that stop was blocked.
+func theStopJudgeRefuses(t *testing.T, r Roots, actor string) bool {
+	t.Helper()
+	return strings.Contains(theStopJudgeSays(t, r, actor), `"decision":"block"`)
 }
 
 // UNBOUND TAKES THE QUEUE OFF, AND THE QUEUE IS MORE THAN THE STAFFING GUARD.
