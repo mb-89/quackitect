@@ -87,3 +87,4 @@
 9. Put both halves of a mechanism in the evidence. Where the system mirrors halves, table them and drive the rule through each. *
 10. Report work as done only with the evidence that it is. An observation names the check and what it said. *
 11. A checklist carries institutional knowledge. Answer each line rather than ticking it. *
+12. An archived token whose evidence is empty is unfinished. Take it out of the archive and finish it. *
