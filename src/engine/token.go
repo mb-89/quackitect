@@ -212,6 +212,12 @@ type Token struct {
 	// the author its own verdict, because an evaluator favours what it made.
 	Author string `json:"author,omitempty"`
 
+	// AND IN WHICH LANE IT WAS DONE: the box, then the session on it, written
+	// the way a claim is. A session that spawns a reviewer of its own answers
+	// to a second name, and a name is not what tells two evaluators apart, so
+	// the verdict is refused to the whole lane. See laneverdict.go.
+	WorkedIn string `json:"worked_in,omitempty"`
+
 	// WHICH AGENT ON WHICH BOX HAS TAKEN THIS, AND WHEN.
 	//
 	// Unlike the holder, these are written into the note, because a claim has to

@@ -387,9 +387,12 @@ func checkFront(spec FrontSpec, f frontmatter.Front, front string) []Departure {
 // Nobody fills these in.
 // So they are exempt here, beside the check that would otherwise refuse them.
 // See wk-4e643716ec.
+// The lane the work step was done in is the same kind of bookkeeping: the
+// engine writes it when a work step is submitted, and nobody fills it in.
 var theEnginesOwnFields = map[string]bool{
 	"claimed_by": true,
 	"claimed_at": true,
+	"worked_in":  true,
 }
 
 // checkWords holds a scalar field to its word count.

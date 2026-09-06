@@ -196,6 +196,90 @@ func answerFor(r Roots, actor, role string, p Payload) Answer {
 	return a
 }
 
+// THE LANE: THE BOX, AND THE SESSION ON IT.
+//
+// A verdict is never the author's, and the engine wrote the author's name down
+// and compared the name. A session that spawns a reviewer of its own answers
+// to a second name, so one session worked a token and the same session was
+// handed the verdict on it. An evaluator recognises its own output and favours
+// it, which is what reviewing rule 14 exists to stop.
+//
+// IT IS THE SESSION AND NOT THE BOX. Two sessions over one clone are two
+// evaluators: the standard process is driven that way in this package, and the
+// staffing spawns a reviewer beside the agent that works, so a guard on the box
+// alone would refuse every verdict one machine can give. The box is written
+// beside the session, because a session id from another machine is another
+// machine's.
+//
+// A LANE NOBODY CAN NAME IS NOT COMPARED. A tree nothing has started names no
+// session, and refusing on two empty strings would refuse every verdict there
+// is.
+
+// TheLaneHere is the box and the harness session pulling on it, and nothing
+// where the log names no session.
+func TheLaneHere(r Roots) string {
+	session := TheHarnessSession(r)
+	if !Named(session) {
+		return ""
+	}
+	return Box(r) + "/" + session
+}
+
+// TheLaneWorkedIt says whether the lane asking did the work step, whatever
+// name it is asking under.
+func TheLaneWorkedIt(r Roots, t Token) bool {
+	return t.WorkedIn != "" && t.WorkedIn == TheLaneHere(r)
+}
+
+// laneInWords is which box and which session worked a token, for a refusal
+// that has to name them. A lane is written box first, the way a claim is.
+func (t Token) laneInWords() string {
+	box, session, _ := strings.Cut(t.WorkedIn, "/")
+	return "box " + box + ", session " + session
+}
+
+// theVerdictIsNotYours answers why this actor may not rule on this token, or
+// nothing. The author's own name is asked first and the lane it worked in
+// after, because the lane is what a second name in one session does not change.
+func theVerdictIsNotYours(r Roots, t Token, actor string) *Rejection {
+	if t.Author != "" && t.Author == actor {
+		return &Rejection{Clause: "author",
+			Wrong:     "you did the work on " + t.ID + ", so the verdict is not yours",
+			Satisfies: "a verdict from another actor. Pull with role worker for work of your own"}
+	}
+	if TheLaneWorkedIt(r, t) {
+		return &Rejection{Clause: "author",
+			Wrong: "the work step on " + t.ID + " was done in this lane, " + t.laneInWords() +
+				", so the verdict is not yours whatever name you pull under",
+			Satisfies: "a verdict from another session, on this box or another. " +
+				"Pull with role worker for work of your own"}
+	}
+	return nil
+}
+
+// otherLaneNotice names what the queue passed over because this lane worked
+// it, so a reviewer told there is nothing knows there is something and whose
+// it is. A pull that hands work out says nothing about them: the notice
+// belongs to the answer that has nothing better to say.
+func otherLaneNotice(r Roots, role string, all []Token) string {
+	if role != RoleReviewer {
+		return ""
+	}
+	var said []string
+	for _, t := range all {
+		if t.Ended() || t.Holder != "" || !WorkableBy(r, t, RoleReviewer) || !TheLaneWorkedIt(r, t) {
+			continue
+		}
+		said = append(said, t.ID+", worked in "+t.laneInWords())
+	}
+	if len(said) == 0 {
+		return ""
+	}
+	return "\n\nPassed over, because this lane worked them and a verdict is never the worker's own:\n  " +
+		strings.Join(said, "\n  ") +
+		"\n\nThese go to another session, on this box or another. Say so, and wait."
+}
+
 // ownVerdictOffTheHand puts down every token this actor holds whose next step
 // is a verdict on its own work. It answers what it said about that, and the
 // refusal when the pull was for a verdict, since the verdict is never the
@@ -203,8 +287,16 @@ func answerFor(r Roots, actor, role string, p Payload) Answer {
 func ownVerdictOffTheHand(r Roots, actor, role string) (string, *Answer) {
 	var down []string
 	var own *Token
+	var saying *Rejection
 	for _, t := range Tokens(r) {
-		if t.Holder != actor || t.Ended() || t.Author != actor || roleAt(r, t) != RoleReviewer {
+		if t.Holder != actor || t.Ended() || roleAt(r, t) != RoleReviewer {
+			continue
+		}
+		// THE NAME FIRST, AND THE LANE AFTER. A session that spawns a reviewer
+		// of its own holds its own work under a second name, and the name is
+		// all this compared. See laneverdict.go.
+		why := theVerdictIsNotYours(r, t, actor)
+		if why == nil {
 			continue
 		}
 		t.Holder = ""
@@ -216,16 +308,16 @@ func ownVerdictOffTheHand(r Roots, actor, role string) (string, *Answer) {
 		down = append(down, t.ID)
 		if own == nil {
 			first := t
-			own = &first
+			own, saying = &first, why
 		}
 	}
 	if len(down) == 0 {
 		return "", nil
 	}
 	if role == RoleReviewer {
-		a := refuse(own, Rejection{Clause: "author",
-			Wrong:     "you did the work on " + own.ID + ", so the verdict is not yours. It is put back for a reviewer",
-			Satisfies: "a verdict from another actor. Pull with role worker for work of your own"})
+		a := refuse(own, Rejection{Clause: saying.Clause,
+			Wrong:     saying.Wrong + ". It is put back for whoever the verdict is",
+			Satisfies: saying.Satisfies})
 		return "", &a
 	}
 	return " Put back, because its next step is a verdict and the verdict is never the author's: " +
@@ -429,12 +521,17 @@ func submit(r Roots, actor string, t Token, p Payload) (Answer, bool) {
 	ends := true
 	if proc, err := LoadProcess(r.Method, t.Process); err == nil {
 		if a, found := proc.ActivityFrom(t.Status); found {
-			if a.Role == RoleReviewer && t.Author != "" && t.Author == actor {
-				return refuse(&t, Rejection{Clause: "author", Wrong: "you did the work on this token, so the verdict is not yours",
-					Satisfies: "a verdict from another actor"}), true
+			if a.Role == RoleReviewer {
+				if why := theVerdictIsNotYours(r, t, actor); why != nil {
+					return refuse(&t, *why), true
+				}
 			}
 			if a.Role != RoleReviewer {
 				t.Author = actor
+				// AND WHICH LANE DID IT, beside which name did it. Two names in
+				// one session are one evaluator, and a name is not what tells
+				// two evaluators apart. See laneverdict.go.
+				t.WorkedIn = TheLaneHere(r)
 			}
 			t.Status = a.To
 			ends = proc.Ends(a.To)
@@ -1010,7 +1107,8 @@ func nextAmong(r Roots, actor, role string, all []Token) Answer {
 			Notice: scopeNotice(r, scopes) + setBackNotice(setBack) + unwritableNotice(unwritable)}
 	}
 	return Answer{Pull: AnswerWait,
-		Notice: waitNotice(r, actor, held) + setBackNotice(setBack) + unwritableNotice(unwritable)}
+		Notice: waitNotice(r, actor, held) + setBackNotice(setBack) + unwritableNotice(unwritable) +
+			otherLaneNotice(r, role, all)}
 }
 
 // urgentFirst puts what a person marked urgent at the head of the list, and
@@ -1066,6 +1164,13 @@ func WouldHandOut(r Roots, t Token, actor, role string, archived map[string]bool
 	}
 	// NEVER THE AUTHOR. A verdict on your own work is not a verdict.
 	if role == RoleReviewer && t.Author == actor {
+		return false
+	}
+	// NOR THE LANE THAT WORKED IT, whatever name it asks under. A reviewer
+	// this session spawns is this session, so the staffing count asks the
+	// same question with no actor at all and gets the same answer: there is
+	// nothing here to spawn a reviewer of this lane for.
+	if role == RoleReviewer && TheLaneWorkedIt(r, t) {
 		return false
 	}
 	if Blocked(r, t) != "" || WaitsForAPerson(t) != "" {
