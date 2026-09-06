@@ -59,6 +59,11 @@ type ran struct {
 	ID      string  `json:"id"`
 	Kind    string  `json:"kind"`
 	OK      bool    `json:"ok"`
+	// Pending is a run that has neither passed nor failed because it has not
+	// finished. A battery replaces the engine that started it, so it cannot be
+	// awaited, and calling a run that has not happened a pass is the defect
+	// this exists to end. Pending is never ok, and it is not a failure either.
+	Pending bool    `json:"pending,omitempty"`
 	Seconds float64 `json:"seconds"`
 	Said    string  `json:"said,omitempty"` // the tail of what a failing test printed
 	// Engine is, for a check, the engine it was handed and whether the one
@@ -140,6 +145,12 @@ func runTest(c *call) int {
 	}
 	defer db.Close()
 	got, err := TestTheDelta(c.ctx, c.roots, db, *on, proposed, !*plan, *by)
+	if !*plan && err == nil {
+		// THE RUN IS WRITTEN DOWN AGAINST THE TOKEN, so the submission that ends
+		// the work can ask what ran rather than read what the agent typed. A plan
+		// is not a run and records nothing.
+		RecordTheRun(c.roots, *on, got)
+	}
 	if err != nil {
 		c.answerJSON(map[string]any{"error": err.Error()})
 		return 1

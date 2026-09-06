@@ -184,19 +184,12 @@ func answerFor(r Roots, actor, role string, p Payload) Answer {
 	if refused != nil {
 		return *refused
 	}
-	// UNBOUND TAKES THE QUEUE OFF, AND THE HAND-OUT IS THE QUEUE.
-	//
-	// A submission still settles above this. Closing work is the record rather
-	// than the queue, and unbound leaves the record standing.
-	//
-	// MEASURED, ON 2026-09-06. An unbound session closed one token and was
-	// handed another, which the stop judge then held it over.
-	if Unleashed(r) {
-		a := Answer{Pull: AnswerWait, Notice: theQueueIsOff}
-		a.Learned = learned
-		a.Notice += over + down
-		return a
-	}
+	// THE RUNG IS ASKED IN whatComesNext, AND ONCE. A guard here asked
+	// Unleashed, which is Unbound OR God, so a God tree was handed nothing and
+	// told it was unbound. God is every refusal off, and a queue that refuses
+	// there is a new refusal in the one state that exists for working without
+	// the engine in the way. See wk-362a803017, and wk-cda42858cd for the
+	// second writer this deletion also takes out.
 	a := whatComesNext(r, actor, role)
 	a.Learned = learned
 	a.Notice += over + down
@@ -351,6 +344,19 @@ func submit(r Roots, actor string, t Token, p Payload) (Answer, bool) {
 	}
 	if f := checkDisposition(r, t, p); f != nil {
 		return refuse(&t, *f), true
+	}
+	// AND WHAT THE ENGINE RAN, WHICH IS NOT WHAT THE CHECKLIST SAYS IT RAN.
+	//
+	// The row saying the tests passed is written by the agent, and checkEvidence
+	// asks only that it is ticked or carries a sentence. So done meant an agent
+	// said so. This asks the engine.
+	//
+	// IT ASKS BEFORE THE CHECKLIST, because a run that went red is a bigger
+	// thing to hear than a row nobody answered, and fixing the rows first would
+	// be work done in the wrong order.
+	if why := TestsRefuseTheClose(r, t); why != "" {
+		return refuse(&t, Rejection{Clause: "the tests", Wrong: why,
+			Satisfies: "a run over this token's delta that passed: se test --on " + t.ID}), true
 	}
 	// A SUBMISSION SAYS WHAT IT BRINGS. IT DOES NOT SAY WHAT THE NOTE NO LONGER
 	// HOLDS.
@@ -1102,7 +1108,23 @@ func whyNotNow(r Roots, t Token) string {
 	if why := Blocked(r, t); why != "" {
 		return why
 	}
-	return WaitsForAPerson(t)
+	if why := WaitsForAPerson(t); why != "" {
+		return why
+	}
+	// AND A CLAIM ANOTHER BOX HOLDS, WHICH THIS ASKED AND THE OTHERS DID NOT.
+	//
+	// WouldHandOut asks it of every token it offers. This walk did not, so a
+	// token this box held was handed back after another box's claim arrived.
+	// The gate then refused the first write, naming that box. Two doors, one
+	// token, two answers.
+	//
+	// ONLY A CLAIM HELD ELSEWHERE IS ASKED. NoClaimHere also answers where
+	// nobody has claimed at all, and asking that here would set back every
+	// unclaimed tracked token this box legitimately holds.
+	if by := ClaimedNow(r, t, time.Now().UTC()); by != "" && !ClaimedHere(r, by) {
+		return t.ID + " is claimed by " + by + ", which is another box"
+	}
+	return ""
 }
 
 // setBackNotice says what the queue took out of this actor's hands, and why.
@@ -1194,11 +1216,6 @@ func workNotice(t Token) string {
 	return "This is yours now. Do what the detail asks and nothing next to it. " +
 		"Walk the checklist for this step and answer every line, then submit."
 }
-
-// theQueueIsOff is what an unbound pull answers. A person took the queue off
-// this tree, so the agent picks its own work and names it.
-const theQueueIsOff = "This tree is unbound, so the queue hands out nothing. " +
-	"Work what the person asked for. Take a token by naming it: se claim --these <id>."
 
 // AskToStop refuses once when the actor holds work it could still do, and
 // names it, so a stop is a decision rather than a drift.

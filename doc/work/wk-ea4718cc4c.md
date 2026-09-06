@@ -9,8 +9,6 @@ guidance: [[work-token]]
 title: Cloud boxes publish nothing
 # where the token stands. The process owns these values.
 status: open
-claimed_by: f5927132/main
-claimed_at: "2026-09-06T10:43:35Z"
 # true when this waits for a person rather than an agent
 needs_human: true
 # the tree each time the work was taken up, snapshots the engine wrote
@@ -70,6 +68,8 @@ Move the claim relay onto refs/heads/se-queue, the one namespace a cloud box can
 | [ ] | every finding is a trivial token naming this one, and their ids are here |  |  |
 
 ## approach
+
+Written by main on 2026-09-06, while working wk-8797959d3c, which does not name this token. It is also STALE: the red team found claim.go already publishes on refs/heads/se/claims, so the move this describes has shipped. Do not build from it.
 
 The owner's design, 2026-09-06. Nothing is cut until they give the go.
 

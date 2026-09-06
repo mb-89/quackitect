@@ -6,34 +6,29 @@ process: [[standard]]
 # the rules for filling this token
 guidance: [[work-token]]
 # the name this token is known by, in references and in links
-title: Staffing guard refuses everything
+title: An absent run passes
 # where the token stands. The process owns these values.
 status: open
+claimed_by: f5927132/main
+claimed_at: "2026-09-06T11:48:27Z"
+# the tree each time the work was taken up, snapshots the engine wrote
+began:
+  - a46d151d592b29e8a069edfb3cd32aac9f8e7da6
 ---
 
 ## detail
 
-The staffing guard refuses every call while fewer hands are here than the queue wants, including se_run and Bash. Unbound already has the shape wanted: the queue off and every other rule on. Measured on 2026-09-06: a cloud session asked to diagnose a push failure was refused Bash, then refused se_run, on a box whose work could not have been published. wanted() caps at parallel_agents, so a queue of 49 open tokens deadlocks a session identically to one of 96: the staleness is not the cause.
+TestsRefuseTheClose lets a token through where the engine has no run recorded for it. That was deliberate on wk-5c682f1a25: every token open on 2026-09-06 predates the store, so refusing an absent record would have refused the whole queue at once, with six agents mid-flight. It leaves a hole. An agent that never runs se test at all is not refused, so the gate catches a red run and not a run that never happened.
 
 ## proposed action
 
-Narrow the staffing refusal to the two verbs that take new work, se_pull and se_claim. Every other call goes through while hands are short. The pressure to spawn stays on the act of taking work.
-
-## approach
-
-Written by main on 2026-09-06, while working wk-8797959d3c, which does not name this token. The hand that pulls this one is free to disagree with all of it.
-
-The refusal moves from every call to the two verbs that take new work.
-
-AStaffShortfall answers on se_pull and se_claim, and answers nothing on anything else. The wording it returns does not change, so a spawned agent reads the remedy it reads today.
-
-A session short of hands can then read, run, test, apply and diagnose. What it cannot do is take more work, which is where the pressure to spawn belongs.
+Once every open token has been through a run under the store, an absent record becomes a refusal. A close then means the engine saw the tests pass, rather than the engine not having seen them fail.
 
 ## done when
 
-- A session short of hands is refused se_pull and is refused se_claim, and the refusal names spawning as the remedy as it does today.
-- The same session, short of the same hands, is allowed se_run, se_apply, se_test, se_find and se_ask, and a test drives each of those five through the guard and sees it pass.
-- A session short of hands that calls se_pull sees the same wording it sees today, so the remedy a spawned agent is given does not change.
+- A submission on a token the engine has no run for is refused, and a test drives it and reads the refusal.
+- The refusal names se test on that token as the way through, and the same test reads it.
+- A token whose process runs no tests at all still closes, and a test drives one and reads the close.
 
 ## evidence: step 1. ask
 
@@ -41,6 +36,8 @@ A session short of hands can then read, run, test, apply and diagnose. What it c
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
+| [ ] | what is gained by doing it, and not only what it does |  |  |
+| [ ] | what breaks if it is never done, and not only that it stays undone |  |  |
 | [ ] | the approach is on the token before any work, as an interface or a shape a reader can disagree with |  |  |
 | [ ] | every done-when line is decidable, and names the command where one decides it |  |  |
 | [ ] | the change is small enough to review whole, or it is split first | — |  |

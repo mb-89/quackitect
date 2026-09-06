@@ -289,10 +289,48 @@ func archiveListRows(r Roots) ([]Archived, error) {
 	said, err := os.ReadFile(path)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return nil, nil
+			return archiveListOnBranch(r)
 		}
 		return nil, err
 	}
+	return archiveRowsIn(path, said)
+}
+
+// archiveListOnBranch answers the list the branch carries, for a tree whose
+// working copy of it has gone.
+//
+// A LIST THAT IS ABSENT IS NOT AN EMPTY ARCHIVE.
+//
+// MEASURED, ON A CLOUD BOX, 2026-09-06. The working copy was not there, this
+// read answered nothing, and the close then wrote a list holding only the tags
+// this box had made itself. 377 rows became one.
+//
+// The tags are why it is that bad rather than merely wrong. A push to refs/tags
+// answers 403 on these boxes and nothing fetches them back, so the tags here
+// are this box's own and no others. See
+// [[a-cloud-box-writes-refs-heads-and-nothing-else]].
+//
+// THE LIST TRAVELS, SO THE BRANCH STILL HAS IT. That copy is read before the
+// archive is called empty. A tree that never had one reads nothing and is empty
+// for real, so a first close still records what it closed.
+func archiveListOnBranch(r Roots) ([]Archived, error) {
+	rel, err := filepath.Rel(r.Work, ArchiveList(r))
+	if err != nil {
+		return nil, nil
+	}
+	at := "HEAD:" + filepath.ToSlash(rel)
+	said, err := gitHere(r, "show", at)
+	if err != nil || strings.TrimSpace(said) == "" {
+		return nil, nil // no history, or a branch that has never carried one
+	}
+	// A COPY THAT WILL NOT READ IS A REFUSAL RATHER THAN AN EMPTY ARCHIVE,
+	// because answering empty here is the whole defect this function exists for.
+	return archiveRowsIn(at, []byte(said))
+}
+
+// archiveRowsIn reads the rows out of one copy of the list, naming where the
+// copy came from so a refusal says which one would not read.
+func archiveRowsIn(from string, said []byte) ([]Archived, error) {
 	var out []Archived
 	for n, line := range strings.Split(string(said), "\n") {
 		line = strings.TrimSpace(line)
@@ -301,7 +339,7 @@ func archiveListRows(r Roots) ([]Archived, error) {
 		}
 		var row Archived
 		if err := json.Unmarshal([]byte(line), &row); err != nil || row.ID == "" {
-			return nil, fmt.Errorf("%s:%d does not read as an archived token: %s", path, n+1, line)
+			return nil, fmt.Errorf("%s:%d does not read as an archived token: %s", from, n+1, line)
 		}
 		out = append(out, row)
 	}
