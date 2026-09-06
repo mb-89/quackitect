@@ -29,6 +29,18 @@ Whichever is chosen, the declaration, the Go floor and the lint move together, b
 
 My best attempt: offer the silence window and drop the dead knob, so the panel keeps a control over staleness and it is the one the engine reads. Marked needs_human, because what the panel offers is the owner's to say.
 
+## approach
+
+The check comes first, because it is the same under either answer the owner gives.
+
+It walks every parameter declared in util/parameters.json to a reader in the engine's source. A declared parameter nothing reads is the failure, and limits.pulls_before_hold_is_stale is its first red. That check outlives this token and holds the class.
+
+The change itself is one datum in three places, so the three move in one commit: the declaration in util/parameters.json, the floor in config.go, and the rule in lint.go.
+
+Under the owner's answer the datum is either removed or renamed to the silence window the engine actually reads. That window is heartbeat_seconds times heartbeatsBeforeGone in gone.go, so the second answer is a declaration of a number the source already has.
+
+The token stays needs_human until the owner has said which, and it carries their words rather than a summary of them.
+
 ## done when
 
 - the panel offers no setting that nothing reads, proved by a check that walks every declared parameter to a reader

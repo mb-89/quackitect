@@ -29,6 +29,18 @@ The call sits at src/engine/tests.go:148-153 and RecordTheRun at src/engine/test
 
 Find why se test writes no store in a real tree, fix it, and drive the seam with a test that runs the test verb and reads LastRunOn back.
 
+## approach
+
+The first thing to test is not in either place the detail names, and it costs one command.
+
+Every tool call is answered by the engine that lives, in its own process, and runVerbInside runs the verb there. A rebuilt .bin/se does not replace a running resident. So a binary carrying testedgate.go's strings, and an engine answering without them, are one box at one moment.
+
+Ask the running engine for its build rather than the file on disk. wk-084e23e08b puts the age of the answering engine onto the answer itself, which is the reading this wants.
+
+If that is it, the fix is a restart, and the defect is the silence rather than the store.
+
+If it is not, the seam test decides between the two places the detail names. It drives the test verb over a fixture tree and reads LastRunOn back. It has to drive the verb rather than call RecordTheRun, because testedgate_test.go already calls it in process and passes.
+
 ## done when
 
 - se test --on an id over a real tree leaves a record for that id. Decided by: se test --on this id --propose TestTheTestVerbWritesTheRunItRan, a test that runs the verb over a fixture tree and reads LastRunOn back

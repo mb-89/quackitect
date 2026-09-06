@@ -23,6 +23,18 @@ The guard's aim is right: 97 open tokens want more hands than one. Its door is w
 
 The guard says what it wants and lets the call through. It refuses nothing the main agent does on a token it holds, and it asks for hands as additional context on the answer, once per shortfall rather than on every call. A restart reads the register of agents that are still alive rather than starting the count at zero. A test drives a held token's se_apply through the guard with zero helpers registered and asserts the write lands and the answer carries the ask.
 
+## approach
+
+The guard stops being a gate and becomes a sentence on the answer.
+
+In staffing.go the shortfall is computed as it is today. What changes is what it returns. No call is refused for it, and the shortfall rides back as context on the answer, beside the notice a pull already carries.
+
+Once per shortfall, not once per call. The engine holds a mark of the shortfall it last asked about, and asks again only when the number moves. So five calls under one shortfall carry one ask, which is what the second criterion counts.
+
+A restart reads the register of agents still alive rather than starting the count at zero. That is what turned two spawned reviewers, still working, into a shortfall.
+
+The red is a held token's se_apply with no helpers registered. It is refused today. After the change the write lands and the answer carries the ask.
+
 ## done when
 
 - a call on a token the main agent holds is not refused for want of helpers, decided by: go test -C src/engine -run 'StaffingAsksAndLetsThrough' ./... answers ok

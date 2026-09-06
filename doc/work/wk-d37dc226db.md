@@ -41,6 +41,18 @@ One message shape reaches every control the engine can move, and the engine make
 5. One door per control. The button and the keyword are two adapters onto it.
 6. Every control draws its lines in its tooltip, copied from the engine.
 
+## approach
+
+One door per control, and the six rules in the proposed action are that door's contract.
+
+The control registry is derived from the node tree rather than declared. Each entry carries its name in capitals, its kind, and the move the engine makes. A rung stores a value. A gesture runs its command, and its name is the command's last segment.
+
+The button and the keyword are two adapters onto that registry, so a control added anywhere is reachable both ways and neither can drift.
+
+The tooltip is drawn from the same registry, which is why tipFor moves out of the field branch. Every button branch draws its lines in every state it has.
+
+God mode is asymmetric on purpose. A word may fall off that rung and never stand on it, because the stray press falling down is the safety. OFF lands bound and ON is refused.
+
 ## done when
 
 - every reachable control carries its KEYWORD lines, derived rather than declared, decided by: se --tree, and the check refuses a line written into util/parameters.json

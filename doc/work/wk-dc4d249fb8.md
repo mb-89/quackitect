@@ -19,6 +19,18 @@ A fresh clone gets no tool lane for the whole session, and every agent on that b
 
 Take the build off the protocol path. Two parts. ONE: the stub answers the harness at once. It stops using stdio inherit, reads standard input itself, answers initialize and ping from a static reply, and forwards everything else to the child once the child is up, buffering what arrives meanwhile. TWO: a cold start comes up in seconds rather than minutes. src/mcp is eleven files of pure Go with no cgo, and the lane needs the engine at tool-call time rather than at start. So with nothing built the stub runs go run ./src/mcp rather than the whole installer, and .bin/se stays SessionStart's job as it already is.
 
+## approach
+
+Read wk-286ed8482b first. It retires the lane once level 0 registers the tools, and this fixes the cold start of the door that token deletes. Where the retirement is near, the honest answer may be to close this rather than build it.
+
+If it is built, the shape is the one the proposed action names, as an interface.
+
+The stub owns standard input. It answers initialize and tools/list itself, from laneTools rather than from a second list, so the cold answer and the warm answer cannot drift. Everything else is queued until the child is up, then forwarded in order.
+
+The cold path runs go run ./src/mcp, which is eleven files of pure Go. The installer leaves the protocol path entirely, and .bin/se stays SessionStart's job.
+
+The red is a tree with .bin renamed away. A standing check drives that case, so a box with .bin built cannot hide it.
+
 ## done when
 
 - from a tree with .bin renamed away, node util/cage/mcp-lane.mjs --method . --work . answers a JSON-RPC initialize within 10 seconds

@@ -36,6 +36,18 @@ The package is the compilation unit, and every other hand builds against it. A h
 
 Split this token into batches of files at step 1. Then convert each _test.go file under src/engine to a table under t.Run, building and testing the package after each file.
 
+## approach
+
+The batching rule is written before any file moves, so a reader can disagree with the batches rather than with two hundred conversions.
+
+A batch is one subject and ten files at most. Each is a trivial sub-token of this one, naming its files outright. The list comes from the same find the criteria name, so the batches partition it and a reader can check that they do.
+
+Inside a file the shape is one table under one t.Run. The setup each old function copied becomes a row's fields. The assertion stays where it is, and a row is named for its case rather than numbered.
+
+A file is converted, built and tested before the next one starts. That is the invariant, because a half landed rewrite here stops every other hand, which is wk-1bb23ea110.
+
+It waits on the three smaller packages, so the shape arrives settled and this one copies it.
+
 ## done when
 
 - no _test.go file under src/engine lacks t.Run. Decided by `find src/engine -name '*_test.go' -exec grep -L 't\.Run(' {} + | wc -l`, which answers 206 at HEAD and must answer 0

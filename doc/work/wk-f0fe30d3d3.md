@@ -26,6 +26,16 @@ Two of the four were closed by hand afterwards. The other two remain as evidence
 
 Make the verdict step write status closed with its disposition. Add a check that no token carrying verdict evidence is left at done.
 
+## approach
+
+The transition belongs to the activity, not to the hand that writes the text. The verdict activity says it goes to closed, and the code applies the do step's transition instead. So the fix is at the seam that reads the activity and writes the state.
+
+One test drives it. A token at done takes a verdict submission, and the assertion is status closed with the disposition the submission carried. It is red before the change, saying done where closed is wanted.
+
+The check is the other half, because the four tokens measured here are already wrong on disk. It names a token whose step 3 evidence is filled while its status reads done. It is red on the two that were not closed by hand.
+
+Those two are then closed properly rather than edited, so the check goes green through the door it guards.
+
 ## done when
 
 - a submitted verdict leaves the token at closed, decided by a Go test in src/engine
