@@ -9,10 +9,10 @@ guidance: [[work-token]]
 title: Cloud boxes publish nothing
 # where the token stands. The process owns these values.
 status: open
-# true when this waits for a person rather than an agent
-needs_human: true
 claimed_by: f5927132/main
 claimed_at: "2026-09-06T10:43:35Z"
+# true when this waits for a person rather than an agent
+needs_human: true
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - b5ff43e70a6427056eca2680caed0a9d76412bb1
@@ -79,5 +79,5 @@ The claim relay keeps its mechanism and changes its target. A commit is built wi
 
 refs/heads is the one namespace a cloud box can write. That was measured rather than assumed, so trunk is not a preference here.
 
-One thing must move with it. doc/work/archive.jsonl is one file every close appends to, and every close now pushes at once. One file per archived token removes that conflict by construction.
+The archive stays one file. That is the owner's ruling, twice. Every push merges anyway, so an archive conflict is part of a merge already happening. A union merge driver on doc/work/archive.jsonl resolves it without a person, because both sides' lines belong.
 
