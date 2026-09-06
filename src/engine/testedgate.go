@@ -3,6 +3,8 @@ package main
 import (
 	"encoding/json"
 	"os"
+	"regexp"
+	"strings"
 	"time"
 )
 
@@ -64,20 +66,69 @@ func RecordTheRun(r Roots, id string, out Tested) {
 		return
 	}
 	all := loadLastRuns(r)
-	said, pending := "", false
+	said, pending, mine := "", false, false
 	for _, x := range out.Ran {
 		if x.Pending {
 			pending = true
+			continue
 		}
-		if !x.OK && !x.Pending && said == "" {
+		if x.OK || !thisTokensFailure(x, out.Delta) {
+			continue
+		}
+		mine = true
+		if said == "" {
 			said = x.ID
 		}
 	}
-	all.Runs[id] = TheLastRun{OK: out.OK, Pending: pending,
+	// A RUN IS THIS TOKEN'S PASS WHERE NOTHING THAT FAILED WAS ITS DOING.
+	//
+	// A run that named nothing keeps whatever it answered, because an empty list
+	// says nothing about whose failure it was.
+	ok := out.OK || (!mine && len(out.Ran) > 0)
+	all.Runs[id] = TheLastRun{OK: ok, Pending: pending,
 		At: time.Now().UTC().Format(time.RFC3339), Said: said}
 	if b, err := json.MarshalIndent(all, "", "  "); err == nil {
 		_ = writeAtomic(lastRunsPath(r), b, 0o644) // a run it cannot write is a run nothing gates on
 	}
+}
+
+// aPathItPrinted finds the files a check named in what it printed. A path here
+// is a word carrying a dot with something after it, which is how every check in
+// util/checks names a file.
+var aPathItPrinted = regexp.MustCompile(`[A-Za-z0-9_./-]+\.[A-Za-z0-9]+`)
+
+// thisTokensFailure answers whether a failing run is this token's to answer.
+//
+// A CHECK READS WHAT IT DECLARES, AND SOME OF THEM READ A WHOLE FOLDER. So one
+// hand's defective note is chosen by every token whose delta touches that
+// folder, and every one of those runs answers not ok. MEASURED: twelve older
+// tokens with no approach section refused three submissions that touched none
+// of them.
+//
+// SO A CHECK NAMING ONLY FILES OUTSIDE THE DELTA IS THE PROJECT'S RED. It is
+// still run, still printed and still red. It stops standing in the way of a
+// token that did not cause it.
+//
+// A GO TEST IS NEVER EXCUSED, because its output names no changed path in the
+// ordinary case, and excusing it would wave through the reds this gate exists
+// for. Neither is a build, nor a check that names no file at all: where nothing
+// says whose red it is, the safe reading is that it is this one's.
+func thisTokensFailure(x ran, delta []change) bool {
+	if x.Kind != "check" {
+		return true
+	}
+	named := aPathItPrinted.FindAllString(x.Said, -1)
+	if len(named) == 0 {
+		return true
+	}
+	for _, p := range named {
+		for _, d := range delta {
+			if p == d.Path || strings.HasSuffix(d.Path, "/"+p) || strings.HasSuffix(p, "/"+d.Path) {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 // TestsRefuseTheClose answers why the tests will not let this token move on,
