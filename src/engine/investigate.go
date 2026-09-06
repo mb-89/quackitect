@@ -208,10 +208,17 @@ func TakeBackWhatWasLookedAt(r Roots, actor string) ([]string, string) {
 	// business, and a walker taking a hold back is not a step of anybody's
 	// process.
 	heldBefore := t.Holder
-	t.Holder = ""
-	if err := SaveToken(r, t); err != nil {
-		return nil, t.ID + " would not save, so the hold still stands"
+	// AND THE HOLD IS WRITTEN WHERE THE ENGINE KEEPS IT, not through the save.
+	// The note never carried the holder, so releasing a hold changes no prose at
+	// all. Going through the save meant a section already past its bound refused
+	// the release: the token could not be claimed, put down, or handed back, the
+	// ruling on its quiet holder had nowhere to land, and the notice repeated
+	// word for word. The cap still stands and the save still holds it, which is
+	// TestAnOversizedChapterDoesNotStopTheQueue asks for. See wk-7a498f6a2b.
+	if err := recordHold(r, t.ID, ""); err != nil {
+		return nil, t.ID + " would not give up its hold, so the hold still stands"
 	}
+	r.forget()
 	// AND THE LOOK IS SPENT HERE, on the one path that moved something, so a
 	// second pull does not release a token somebody has since picked up.
 	_ = locked(lookedPath(r), func() error {
