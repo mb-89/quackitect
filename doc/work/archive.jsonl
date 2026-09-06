@@ -73,6 +73,7 @@
 {"id":"wk-d303f5e1ec","title":"the claims change uncommitted","process":"trivial","disposition":"done","blob":"7d5b5bd57b81e7e5fdb7b0a466528e2909c7c64e","on_branch":"3894b5e85963908acf930e34722a9d44d6f3f376"}
 {"id":"wk-d489a63ae0","title":"mint opens without approach","process":"trivial","disposition":"done","blob":"3c9db5c48b4b00d9bf8bad5b89ef4a942a10fdaa","on_branch":"213a88266028a31489444dacfc7be0a17bb89724"}
 {"id":"wk-d5fa370ae8","title":"four tests, one rule","process":"trivial","disposition":"done","blob":"d37184c635b7929faaab4913747f35b5ffba9509","on_branch":"47be1bafc87d5297fe0f2d2ff0751e0dd2c90031"}
+{"id":"wk-d9db4e65d8","title":"uncovered cannot see shell","process":"trivial","disposition":"done","blob":"136ee2144f092d3214003736cb2cda54738139d7"}
 {"id":"wk-db6bdc8872","title":"filter gets its module","process":"standard","disposition":"done","blob":"fb0fd96448712ce54664c29757e3306f293be3ee","on_branch":"4f7983b2dff3496a5c81558029a0b3e4a6c154f4"}
 {"id":"wk-dffbf05720","title":"relenting needs a claim","process":"standard","disposition":"done","blob":"3478519f38961b0fdb7c4c5a13081e5977bf5ca1","on_branch":"3d4584314eae5e2eedd364295f94681e0d533298"}
 {"id":"wk-e99d60617c","title":"cloud answers reach chat","process":"trivial","disposition":"done","blob":"e28c4d124c2a724be5d130540b52bdf5dabf518a","on_branch":"6568d02617c7d60f2c6757273cfff40abf27a700"}

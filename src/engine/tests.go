@@ -376,7 +376,7 @@ func choose(db *sql.DB, tests []aTest, out *Tested) error {
 			}
 		}
 		rows.Close()
-		if !reached && !isTestFile(ch.Path) && !reachedByACheck(tests, ch.Path) {
+		if !reached && !isTestFile(ch.Path) && !reachedByACheck(tests, ch.Path) && aProfileCouldReach(ch.Path) {
 			out.Uncovered = appendOnce(out.Uncovered, ch.Path)
 		}
 	}
@@ -488,6 +488,26 @@ func hasGoTests(tests []aTest, dir string) bool {
 
 func isTestFile(p string) bool {
 	return strings.HasSuffix(p, "_test.go") || strings.HasPrefix(p, checksDir+"/")
+}
+
+// aProfileCouldReach says whether a coverage profile could ever name this
+// file, which is the question uncovered is really asking.
+//
+// UNCOVERED IS A SENTENCE ABOUT A MISSING TEST, and it is only that where a
+// test could have been mapped to the file. Every row in test_region comes from
+// a Go cover profile, written by mapMissing for tests of kind go, and such a
+// profile describes Go statements and nothing else. So a shell script is
+// uncovered whatever drives it, and a line that is structurally true of a whole
+// language teaches the reader to skip the field.
+//
+// MEASURED, September 2026: a change to util/git/land.sh carried by three Go
+// tests that run that script end to end against a real bare origin was answered
+// ok true, uncovered ["util/git/land.sh"].
+//
+// A test naming a file in another language is not lost with this: it is chosen
+// because its own file changed, or by a check that declares it reads the file.
+func aProfileCouldReach(p string) bool {
+	return strings.HasSuffix(p, ".go")
 }
 
 func reachedByACheck(tests []aTest, p string) bool {
