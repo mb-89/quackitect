@@ -50,6 +50,10 @@ type chosen struct {
 	Why  string `json:"why"`
 }
 
+// whyNamed is the one reason that asks the map nothing: a person or an agent
+// named this test, so the selection was already made.
+const whyNamed = "named outright"
+
 // A ran test and how it went.
 type ran struct {
 	ID      string  `json:"id"`
@@ -376,7 +380,7 @@ func choose(db *sql.DB, tests []aTest, out *Tested) error {
 				hit := false
 				for id, t := range byID {
 					if t.Name == p || id == p {
-						narrowed[id] = "named outright"
+						narrowed[id] = whyNamed
 						hit = true
 					}
 				}
@@ -623,6 +627,16 @@ func everyFileWhole(db *sql.DB) ([]change, error) {
 // process it is. It answers what ran, and which engine the Go tests were
 // handed, in a sentence with its age, so a stale one reads as stale.
 func runChosen(r Roots, db *sql.DB, tests []aTest, picks []chosen) ([]ran, string) {
+	// DOES THIS RUN ASK THE MAP ANYTHING? The owner's rule: build it when the
+	// answer depends on it. Every pick named outright was selected by whoever
+	// asked, so nothing here consults the map and nothing writes one.
+	wantMap := false
+	for _, p := range picks {
+		if p.Why != whyNamed {
+			wantMap = true
+			break
+		}
+	}
 	byID := map[string]aTest{}
 	for _, t := range tests {
 		byID[t.ID] = t
@@ -660,12 +674,12 @@ func runChosen(r Roots, db *sql.DB, tests []aTest, picks []chosen) ([]ran, strin
 				engine, engineSaid = suiteEngine(r)
 				engineKnown = true
 			}
-			ok, said, took, regions, err := runOneGoTest(r, bin, engine, t)
+			ok, said, took, regions, err := runOneGoTest(r, bin, engine, t, wantMap)
 			x := ran{ID: t.ID, Kind: t.Kind, OK: ok, Seconds: took.Seconds()}
 			if !ok {
 				x.Said = tailOf(said, 2000)
 			}
-			if err == nil && ok {
+			if wantMap && err == nil && ok {
 				_ = writeRegions(db, t, regions, took) // a map it cannot write is written on the next run
 			}
 			out = append(out, x)
