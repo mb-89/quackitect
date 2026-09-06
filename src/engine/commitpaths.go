@@ -1,6 +1,10 @@
 package main
 
-import "strings"
+import (
+	"os"
+	"path/filepath"
+	"strings"
+)
 
 // A COMMIT CARRIES ONLY THE PATHS IT NAMES.
 //
@@ -119,7 +123,7 @@ func stagesEverything(args []string) bool {
 // index of the moment rather than paths it names, and says what to run
 // instead. It is asked at both doors a shell command comes through: the
 // harness's Bash and the run verb.
-func ACommitCarriesStrangers(command string) (string, bool) {
+func ACommitCarriesStrangers(r Roots, command string) (string, bool) {
 	for _, part := range pipeline(command) {
 		words := shellWords(part)
 		if at := gitVerbAt(words, "commit"); at >= 0 {
@@ -127,7 +131,7 @@ func ACommitCarriesStrangers(command string) (string, bool) {
 			switch {
 			case index:
 				return aCommitTakesTheIndex("asks for the index with -a, -i, --all or --include"), true
-			case len(paths) == 0:
+			case len(paths) == 0 && !aMergeIsInProgress(r):
 				return aCommitTakesTheIndex("names no path"), true
 			}
 		}
@@ -136,6 +140,33 @@ func ACommitCarriesStrangers(command string) (string, bool) {
 		}
 	}
 	return "", false
+}
+
+// aMergeIsInProgress answers whether this tree is midway through a merge.
+//
+// A MERGE IS THE ONE COMMIT THAT CANNOT NAME A PATH. The merge commit is the
+// index, deliberately, and git offers no pathspec for one. Naming paths there
+// makes an ordinary commit instead, leaves the branch diverged, and makes the
+// next push worse rather than better.
+//
+// MEASURED: a merge of origin/v4 conflicted, the conflict was resolved and
+// staged, and the conclusion was refused. The way through, git merge
+// --continue, is not read as a commit by this guard, and nothing said so.
+//
+// THE INDEX FLAGS STAY REFUSED. A merge commits what it was handed, and -a
+// adds every tracked change on the box to it, which is the danger this guard
+// exists for.
+func aMergeIsInProgress(r Roots) bool {
+	dir := filepath.Join(r.Work, ".git")
+	// A WORKTREE'S .git IS A FILE NAMING THE REAL ONE, so it is read rather
+	// than taken for an absent repository.
+	if b, err := os.ReadFile(dir); err == nil {
+		if said := strings.TrimSpace(strings.TrimPrefix(strings.TrimSpace(string(b)), "gitdir:")); said != "" {
+			dir = said
+		}
+	}
+	_, err := os.Stat(filepath.Join(dir, "MERGE_HEAD"))
+	return err == nil
 }
 
 // aCommitTakesTheIndex is the refusal, and it says which shape it was.
@@ -147,7 +178,10 @@ func aCommitTakesTheIndex(why string) string {
 		"MEASURED: f0c20fa3 carried another agent's two deletions and left origin not building, and " +
 		"its message named neither.\n\n" +
 		"Name the paths: git commit --only -m \"...\" <paths>. With paths, git commits those and leaves " +
-		"the rest of the index where it was."
+		"the rest of the index where it was.\n\n" +
+		"CONCLUDING A MERGE IS THE ONE EXCEPTION, and no merge is in progress here. A merge commit is " +
+		"the index on purpose and git takes no paths on one, so it is finished with " +
+		"GIT_EDITOR=true git merge --continue, which this guard lets through while MERGE_HEAD stands."
 }
 
 // aStageOfEverything is the refusal for a stage that names no path.
