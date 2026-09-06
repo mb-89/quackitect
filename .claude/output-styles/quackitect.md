@@ -64,7 +64,7 @@ would say so.
 9. Do not kill yourself because you are afraid of dying. Build against a failure seen, not one feared. *
 10. Mark an estimate as an estimate. Say "I do not know" when you do not know.
 11. Read a file before you change it. Change one thing at a time, and leave every other file as it was.
-12. Stage the paths you edited, by name. Never stage everything. *
+12. Stage the paths you edited, by name. Never stage everything, and never merge in the shared tree: push through the cherry-pick door. *
 13. Private data: names, datetimes and unfiltered notes. They do not go into git.
 
 # Driving the engine
