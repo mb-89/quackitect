@@ -256,6 +256,21 @@ func theNotesLeft(r Roots, actor string) Answer {
 
 // whatComesNext is the queue's answer to an actor with nothing in hand.
 func whatComesNext(r Roots, actor, role string) Answer {
+	// AN UNBOUND TREE HANDS OUT NOTHING, WHICH IS WHAT THE BUTTON SAYS IT DOES.
+	//
+	// Nothing in the pull path read the rung, so unbound turned off one thing:
+	// the staffing shortfall, so nobody was told to spawn. A person took the
+	// queue off to work on one thing and the next pull handed their agent
+	// something else. Naming a token still takes it up, which is how an unbound
+	// agent gets work.
+	//
+	// GOD IS NOT THIS. Every refusal is off there, and a queue that refused
+	// would be a new one. See unbound.go.
+	if LoadBinding(r).At == Unbound {
+		return Answer{Pull: AnswerWait, Notice: "The tree is unbound, so the queue hands out nothing. " +
+			"Take up the token you mean by naming it, with se work --on <id>. " +
+			"Put the tree back with se --bind bound and the queue answers again."}
+	}
 	// FINISHING UP DRAINS THE NOTES AND HANDS OUT NOTHING ELSE.
 	if LoadHold(r).Finishing() {
 		return theNotesLeft(r, actor)
