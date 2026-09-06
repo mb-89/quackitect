@@ -138,6 +138,7 @@
 {"id":"wk-5e2c601cce","title":"two engines one tree","process":"standard","disposition":"done","blob":"6618e544ce1136e9a7fb0013ccb2ca0d8031d39d","on_branch":"5545c86514817c8dced93942b551f26b4d5f4a25","tag":"refs/tags/archive/wk-5e2c601cce"}
 {"id":"wk-5e31bc7615","title":"the events table travels","process":"trivial","disposition":"done","blob":"fd84f5fc2bc0d2ff6908a94322e5e08b84b989c8","on_branch":"9e8a7ef1ac5b684a2990688ac7ae412a1e36d728"}
 {"id":"wk-5e710c3675","title":"a flag hides removers","process":"trivial","disposition":"done","blob":"7df1d8c1fce4e4536decd94a06c96b98f53c8ce2","on_branch":"46b72736ca6c505fdb0cf321d81b7263872378b8"}
+{"id":"wk-5f8dda7870","title":"branch tip fails building","process":"trivial","disposition":"done","blob":"b54999f50a539e21c1eca44fa8124cfaa151d741","on_branch":"b54999f50a539e21c1eca44fa8124cfaa151d741"}
 {"id":"wk-613964c9d7","title":"a person edits queries","process":"trivial","disposition":"done","blob":"b0928457887afa8c58c92b19d0811047eb33838f","on_branch":"b0928457887afa8c58c92b19d0811047eb33838f","tag":"refs/tags/archive/wk-613964c9d7"}
 {"id":"wk-61a08182b8","title":"the panel mints notes","process":"trivial","disposition":"done","blob":"93cb1b1e2ddd28e304d8b9d5045e8b84cb492a5a","on_branch":"93cb1b1e2ddd28e304d8b9d5045e8b84cb492a5a","tag":"refs/tags/archive/wk-61a08182b8"}
 {"id":"wk-63da32e640","title":"gate token went missing","process":"trivial","disposition":"done","blob":"131de742d2df31b9cb0d71ff0c6503ad1874a9df","on_branch":"67c305488b35df773103e384c46888e06c8516ef"}
