@@ -3,6 +3,8 @@ package main
 import (
 	"strings"
 	"testing"
+
+	"quackitect/engine/internal/sessionlog"
 )
 
 // A SESSION REGISTERED UNDER ONE NAME AND PULLING UNDER ANOTHER DRAWS ONE ROW.
@@ -15,12 +17,12 @@ import (
 // person read two agents where one process is, and the count read two hands.
 func TestASessionTakesMainBackAndDrawsOneRow(t *testing.T) {
 	r := aTreeWithTheProcesses(t)
-	log, err := OpenLog(r.Private("log"))
+	log, err := sessionlog.Open(r.Private("log"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer log.Close()
-	record(log, "engine", "start", "engine", "engine started", Yes(), nil)
+	record(log, "engine", "start", "engine", "engine started", sessionlog.Yes(), nil)
 
 	session := currentSession(r)
 	// ANOTHER SESSION IS HERE FIRST AND TAKES main, so this one is named apart.
