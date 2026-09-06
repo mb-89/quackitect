@@ -11,6 +11,7 @@
 {"id":"wk-2ae17ac8ec","title":"AskToStop reaches nothing","process":"trivial","disposition":"done","blob":"22a1ae1a0d328c5e057846b6a1e5a1d6cfe93fc9","on_branch":"ee02940ddd45a79188f399f001629a28d30e3061"}
 {"id":"wk-2b8f45c1e7","title":"the ask answers why","process":"standard","disposition":"done","blob":"ef15fd69f4c5b9422adbf890aaa9a7594f7d3906","on_branch":"c8aaa5135b99674bb09b4b52aac9018fbb26de54"}
 {"id":"wk-2d08f5df5d","title":"standing red blocks submissions","process":"trivial","disposition":"done","blob":"b7c8f85380a82bbdc34b46d7c5a3af50400b958f","on_branch":"ed6a51abc6cb8a132288a541eb755e1203aed5ec"}
+{"id":"wk-3280feecca","title":"claim scopes to agent","process":"trivial","disposition":"done","blob":"df258428698eb0517d6eed3d5326a638d8607417","on_branch":"1fa55f28502dd64c0e6ad8643331f547ce5d67ed"}
 {"id":"wk-32d21588e6","title":"move fixture reads uid","process":"trivial","disposition":"done","blob":"433c26da5d923889bec17aed137f10933c95d6a7","on_branch":"81d9d41cad07217290397d59b1e8b01da4c6c04a"}
 {"id":"wk-34d11d2caf","title":"Held skips the gate","process":"trivial","disposition":"done","blob":"438dfe8e3967a555661ce33ddebeac495e0747a1","on_branch":"767f7b69d8e555c9252bdb5ea594ff7f927190cd"}
 {"id":"wk-35abaa7cf6","title":"findings carry no bucket","process":"trivial","disposition":"done","blob":"e47e6aa77cd89f796857c8e4226ba7650bcb57e1","on_branch":"f75ce305bc2f7e5bdb89e1be84e42504ab7735df"}
