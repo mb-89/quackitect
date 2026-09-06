@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"strings"
 	"time"
 
@@ -114,6 +115,54 @@ func TheQueueWouldHandOut(r Roots) (work, verdicts int) {
 		}
 	}
 	return work, verdicts
+}
+
+// TheDepthAfter says what the queue holds after a keyword moved a control. It
+// answers for the keyword that narrows the queue and for no other.
+//
+// A PERSON ON A CLOUD BOX PRESSES NOTHING AND SEES NOTHING. The panel draws a
+// depth beside the filter box, and there is no panel here. So the number
+// arrives as words, at the moment the keyword lands.
+//
+// AND THE AGENT IS ASKED TO RELAY IT, because the record is not where they
+// read. MEASURED: the owner set a filter, nothing said so, and they had to ask
+// how many were in the bucket.
+//
+// AN EXPRESSION THAT WILL NOT READ SAYS SO RATHER THAN COUNTING. It filters
+// nothing, so the unfiltered depth would tell a person their bucket is far
+// larger than they filed.
+func TheDepthAfter(r Roots, word string) string {
+	if word != "QUEUE_FILTER" {
+		return ""
+	}
+	v, err := LoadValues(r)
+	if err != nil {
+		return ""
+	}
+	said, _ := v.Value["work.queue_filter"].(string)
+	work, _ := TheQueueWouldHandOut(r)
+	counted := fmt.Sprintf("%d tokens", work)
+	if work == 1 {
+		counted = "1 token"
+	}
+	switch {
+	case strings.TrimSpace(said) == "":
+		return fmt.Sprintf("The queue filter is cleared, so the whole queue is back: %s. "+
+			"Say that number to them in the chat.", counted)
+	case readsAsAFilter(said):
+		return fmt.Sprintf("The queue is narrowed to %q, and %s match. "+
+			"Say that number to them in the chat.", said, counted)
+	}
+	return fmt.Sprintf("%q will not read as a filter, so the queue is narrowed by nothing. "+
+		"Say so in the chat, and say what they wrote.", said)
+}
+
+// readsAsAFilter answers whether an expression reads. It is the one thing the
+// filter's own reader will not say, because a broken expression is turned into
+// one that matches everything before any caller sees it.
+func readsAsAFilter(said string) bool {
+	_, err := filter.ParseFilter(said)
+	return err == nil
 }
 
 // QueueDepth is the worker half of that count. It is what the panel draws

@@ -622,7 +622,17 @@ func answerHook(ctx context.Context, raw []byte, args []string, out io.Writer, h
 		// turn and in the said verb for one written into a running turn.
 		_ = TheyAsked(roots, actor, in.Prompt+in.UserPrompt) // the guard answers whether or not it can note the question
 		// A PERSON WITH NO PANEL REACHES A CONTROL BY WRITING ITS KEYWORD.
-		KeywordSaid(roots, log, actor, in.Prompt+in.UserPrompt)
+		//
+		// AND THE ONE THAT NARROWS THE QUEUE SAYS HOW DEEP IT IS LEFT. A person
+		// who filed into a bucket wants to know the bucket is what an agent will
+		// now be handed, and how much of it there is. A desk reads that off the
+		// panel. This hook's own words reach the turn, which is the surface a
+		// cloud box has instead.
+		if word := KeywordSaid(roots, log, actor, in.Prompt+in.UserPrompt); word != "" {
+			if said := TheDepthAfter(roots, word); said != "" {
+				fmt.Fprintln(g.out, "quackitect: "+said)
+			}
+		}
 	case EventSessionStart:
 		// A session that resumes after a compaction starts with nothing read.
 		if in.Source == "compact" || in.Source == "clear" {
