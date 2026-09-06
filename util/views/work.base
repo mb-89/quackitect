@@ -95,16 +95,12 @@ views:
         outOf: disposition == ""
     order:
       - title
-      - urgent
       - status
       - process
       - holder
-      # THE CLAIM IS WHICH BOX HAS TAKEN THE TOKEN, and it is the only thing
-      # standing between two boxes and the same work. Until it was a column a
-      # person could see it by running se claim --list at a prompt and nowhere
-      # else. The holder beside it is which agent is on it here.
       - claimed_by
       - ready_when
+      - urgent
     columnSize:
       title: 300
       urgent: 70

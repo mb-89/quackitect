@@ -10,7 +10,7 @@ title: roots cannot be named
 # where the token stands. The process owns these values.
 status: open
 # what has to be true before this can be taken again
-ready_when: src/engine builds its tests again. writeWorkableProcess is defined in workableprocess_test.go, and the build no longer names it. The two errors the build answers are both in snapshotnevertravelled_test.go, which calls TestTheDelta with a context this clone's tests.go does not take. That context landed on the branch tip, and this clone has not caught up. A clone at the tip builds its tests, so the owed red on rootsmethod_test.go can be watched there.
+ready_when: ""
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - 468000144b7f531c56500a524ee2d7938849e5e4
@@ -34,7 +34,7 @@ roots.go gains methodRootFrom, walking up for a folder carrying src/processes an
 
 go build -C src/engine ./... answered BUILD_EXIT=0. go vet reports one error, arrival_test.go, an untracked file from another lane calling a helper nothing defines, so every other call site compiles.
 
-Owed: rootsmethod_test.go is written and never watched, because the test binary will not build.
+Owed: rootsmethod_test.go is written and never watched. The wall is down now. workableprocess_test.go defines writeWorkableProcess and arrival_test.go is tracked, so the red can be watched.
 
 ## evidence: step 1. ask
 

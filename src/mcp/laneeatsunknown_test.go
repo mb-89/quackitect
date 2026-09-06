@@ -26,31 +26,46 @@ func TestAFieldTheToolDoesNotTakeIsRefused(t *testing.T) {
 		On    string `json:"on"`
 		Actor string `json:"actor"`
 	}
-	ran := ""
-	handler := func(_ roots, a takes) string {
-		ran = "the handler ran as " + a.Actor
-		return ran
-	}
-	got := taking(roots{}, json.RawMessage(`{"on":"wk-1","by":"worker-relay-trial"}`), handler)
-	if ran != "" {
-		t.Errorf("a request naming a field this tool does not take reached the handler: %s", ran)
-	}
-	// THE REFUSAL NAMES BOTH: what was sent, and what the tool takes instead.
-	for _, want := range []string{"by", "actor", "on"} {
-		if !strings.Contains(got, want) {
-			t.Errorf("the refusal does not name %q, so the caller cannot tell what to send: %s", want, got)
-		}
-	}
-	// AND A REQUEST NAMING ONLY WHAT THE TOOL TAKES STILL RUNS.
-	ran = ""
-	taking(roots{}, json.RawMessage(`{"on":"wk-1","actor":"worker-relay-trial"}`), handler)
-	if ran != "the handler ran as worker-relay-trial" {
-		t.Errorf("a request naming only what the tool takes did not run: %q", ran)
-	}
-	// AND SO DOES ONE WITH NO ARGUMENTS AT ALL, which is how se_stop reads its list.
-	ran = ""
-	taking(roots{}, nil, handler)
-	if ran != "the handler ran as " {
-		t.Errorf("a request with no arguments did not run: %q", ran)
+	for _, c := range []struct {
+		name  string
+		sent  json.RawMessage
+		ran   string
+		names []string
+	}{
+		// THE REFUSAL NAMES BOTH: what was sent, and what the tool takes instead.
+		{
+			"a field this tool does not take",
+			json.RawMessage(`{"on":"wk-1","by":"worker-relay-trial"}`),
+			"",
+			[]string{"by", "actor", "on"},
+		},
+
+		// AND A REQUEST NAMING ONLY WHAT THE TOOL TAKES STILL RUNS.
+		{
+			"only what this tool takes",
+			json.RawMessage(`{"on":"wk-1","actor":"worker-relay-trial"}`),
+			"the handler ran as worker-relay-trial",
+			nil,
+		},
+
+		// AND SO DOES ONE WITH NO ARGUMENTS AT ALL, which is how se_stop reads its list.
+		{"no arguments at all", nil, "the handler ran as ", nil},
+	} {
+		t.Run(c.name, func(t *testing.T) {
+			ran := ""
+			handler := func(_ roots, a takes) string {
+				ran = "the handler ran as " + a.Actor
+				return ran
+			}
+			got := taking(roots{}, c.sent, handler)
+			if ran != c.ran {
+				t.Errorf("the handler ran %q where this case asks for %q", ran, c.ran)
+			}
+			for _, want := range c.names {
+				if !strings.Contains(got, want) {
+					t.Errorf("the refusal does not name %q, so the caller cannot tell what to send: %s", want, got)
+				}
+			}
+		})
 	}
 }

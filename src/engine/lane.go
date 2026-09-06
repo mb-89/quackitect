@@ -25,22 +25,26 @@ func runHold(c *call) int {
 	fs.Usage = func() {
 		fmt.Fprintln(c.err, "se hold - stop the agent, or let it go on. Prints what it now is.")
 		fmt.Fprintln(c.err, "")
-		fmt.Fprintln(c.err, "  se hold            say whether it is on")
-		fmt.Fprintln(c.err, "  se hold --on")
-		fmt.Fprintln(c.err, "  se hold --off")
+		fmt.Fprintln(c.err, "  se hold                    say which of the three it is")
+		fmt.Fprintln(c.err, "  se hold --state finishing  no new work goes out, and what is held is finished")
+		fmt.Fprintln(c.err, "  se hold --state held       nothing the agent asks for is allowed")
+		fmt.Fprintln(c.err, "  se hold --state off")
 		fmt.Fprintln(c.err, "")
 		fs.PrintDefaults()
 	}
 	fs.String("work", "", "the folder being worked on (default: this one)")
 	on := fs.Bool("on", false, "put everything on hold")
 	off := fs.Bool("off", false, "let it go on")
+	// THE WORD IS WHAT THE PANEL SENDS, and the two booleans stay for a caller
+	// written before the word: on is held and off is off.
+	state := fs.String("state", "", "off, finishing or held")
 	by := fs.String("by", "person", "who did it")
 	if code, stop := c.parse(fs, "hold"); stop {
 		return code
 	}
 
 	roots := c.roots
-	if !*on && !*off {
+	if !*on && !*off && *state == "" {
 		c.answerJSON(LoadHold(roots))
 		return 0
 	}
@@ -48,16 +52,21 @@ func runHold(c *call) int {
 	if *on {
 		want = HoldHeld
 	}
+	if *state != "" {
+		want = *state
+	}
 	h, err := SetHold(roots, want, *by)
 	if err != nil {
 		c.answerJSON(map[string]any{"error": err.Error()})
 		return 1
 	}
-	what := "everything is on hold"
-	if !h.On {
-		what = "the hold is lifted"
-	}
-	inSession(roots, "hold", *by, what, sessionlog.Yes(), map[string]any{"on": h.On})
+	what := map[string]string{
+		HoldHeld:      "everything is on hold",
+		HoldFinishing: "the work is finishing up",
+		HoldOff:       "the hold is lifted",
+	}[h.State]
+	inSession(roots, "hold", *by, what, sessionlog.Yes(),
+		map[string]any{"on": h.On, "state": h.State})
 	c.answerJSON(h)
 	return 0
 }

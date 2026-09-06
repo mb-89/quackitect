@@ -56,33 +56,36 @@ func TestThePullDoorCarriesEveryFieldThePayloadHas(t *testing.T) {
 	for _, name := range keys(schemaOf(pullArgs{})["properties"].(map[string]any)) {
 		invites[name] = true
 	}
+	carried := map[string]bool{}
+	for _, tag := range tags {
+		carried[tag[1]] = true
+	}
 
 	for _, tag := range tags {
 		name := tag[1]
-		if !sends[name] {
-			t.Errorf("the engine's payload carries %q and this door does not forward it, "+
-				"so nothing reaching the engine through here can ever set it", name)
-			continue
-		}
-		// AND THE SCHEMA SAYS SO, because a field forwarded and not advertised is
-		// one no caller knows to send.
-		if !invites[name] {
-			t.Errorf("this door forwards %q and its schema never declares it, so no caller "+
-				"knows to send it", name)
-		}
+		t.Run("the engine's payload carries "+name, func(t *testing.T) {
+			if !sends[name] {
+				t.Fatalf("the engine's payload carries %q and this door does not forward it, "+
+					"so nothing reaching the engine through here can ever set it", name)
+			}
+			// AND THE SCHEMA SAYS SO, because a field forwarded and not advertised is
+			// one no caller knows to send.
+			if !invites[name] {
+				t.Errorf("this door forwards %q and its schema never declares it, so no caller "+
+					"knows to send it", name)
+			}
+		})
 	}
 
 	// AND NOTHING TRAVELS THAT THE ENGINE WOULD DROP. A field the payload has
 	// not got is one json.Unmarshal discards without a word, which is a door
 	// inviting an agent to fill in something nothing reads.
-	carries := map[string]bool{}
-	for _, tag := range tags {
-		carries[tag[1]] = true
-	}
 	for name := range sends {
-		if !carries[name] {
-			t.Errorf("this door sends %q and the engine's payload has no such field, so the "+
-				"engine drops it without a word", name)
-		}
+		t.Run("this door sends "+name, func(t *testing.T) {
+			if !carried[name] {
+				t.Errorf("this door sends %q and the engine's payload has no such field, so the "+
+					"engine drops it without a word", name)
+			}
+		})
 	}
 }

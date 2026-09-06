@@ -19,18 +19,23 @@ import (
 func TestSeStatusSaysItAnswersTheStateOfPlay(t *testing.T) {
 	t.Parallel()
 	says := describes(t, tools(), "se_status")
+
 	// The state of play, and the two halves of the count it carries: what came
 	// back this session, and how much of it was wrong.
 	for _, want := range []string{"state of play", "returned", "wrong"} {
-		if !strings.Contains(says, want) {
-			t.Errorf("se_status does not say %q, so nobody comes here for it: %q", want, says)
-		}
+		t.Run("se_status says "+want, func(t *testing.T) {
+			if !strings.Contains(says, want) {
+				t.Errorf("se_status does not say %q, so nobody comes here for it: %q", want, says)
+			}
+		})
 	}
 
-	if cold := describes(t, coldDoor(t), "se_status"); cold != says {
-		t.Errorf("the cold door says something else. Rewrite it: "+
-			".bin/se-mcp --tools > util/cage/tools.json\n  lane: %q\n  cold: %q", says, cold)
-	}
+	t.Run("the cold door says the same", func(t *testing.T) {
+		if cold := describes(t, coldDoor(t), "se_status"); cold != says {
+			t.Errorf("the cold door says something else. Rewrite it: "+
+				".bin/se-mcp --tools > util/cage/tools.json\n  lane: %q\n  cold: %q", says, cold)
+		}
+	})
 }
 
 // describes answers what one tool in a list says of itself, and refuses when

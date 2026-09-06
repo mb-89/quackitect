@@ -126,6 +126,15 @@ func TakeUp(r Roots, id, actor string) (Token, error) {
 		return t, fmt.Errorf("%s already ended as %s. Name a token that is open, or mint one",
 			t.ID, t.Disposition)
 	}
+	// FINISHING UP TAKES NOTHING NEW UP, AND HELD TAKES NOTHING UP AT ALL.
+	//
+	// What is already in this hand stays reachable while finishing, because
+	// finishing means finishing what is in hand. Held is everything down, so it
+	// refuses the token in hand too.
+	if h := LoadHold(r); h.Held() || (h.Finishing() && t.Holder != actor) {
+		return t, fmt.Errorf("%s is not taken up, because a person put the work on %s. "+
+			"Finish what you already hold and put it down", t.ID, h.State)
+	}
 	// A TOKEN SOMEBODY ELSE HOLDS IS NOT TAKEN AWAY FROM THEM. The swap is per
 	// agent, and two agents on one token is a collision this record has already
 	// paid for once.

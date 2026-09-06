@@ -42,24 +42,33 @@ func anEngineListening(t *testing.T, r roots) {
 }
 
 func TestARecordNamingNoSocketStillReachesTheEngine(t *testing.T) {
-	r := roots{method: t.TempDir(), work: t.TempDir()}
-	anEngineListening(t, r)
-	record := filepath.Join(r.work, ".se", "engine.json")
-	if err := os.WriteFile(record, []byte("{\"pid\": 1}\n"), 0o644); err != nil {
-		t.Fatal(err)
-	}
-	if _, err := askModel(r, "ping", nil); err != nil {
-		t.Fatalf("a record naming no socket was answered %q, and an engine was listening on its own path", err)
-	}
-	// AND NO RECORD AT ALL, which is what a second engine leaves when it goes.
-	if err := os.Remove(record); err != nil {
-		t.Fatal(err)
-	}
-	if _, err := askModel(r, "ping", nil); err != nil {
-		t.Fatalf("with no record the call was answered %q, and an engine was listening on its own path", err)
+	for _, c := range []struct {
+		name   string
+		record bool
+	}{
+		{"a record naming no socket", true},
+
+		// AND NO RECORD AT ALL, which is what a second engine leaves when it goes.
+		{"no record at all", false},
+	} {
+		t.Run(c.name, func(t *testing.T) {
+			r := roots{method: t.TempDir(), work: t.TempDir()}
+			anEngineListening(t, r)
+			if c.record {
+				record := filepath.Join(r.work, ".se", "engine.json")
+				if err := os.WriteFile(record, []byte("{\"pid\": 1}\n"), 0o644); err != nil {
+					t.Fatal(err)
+				}
+			}
+			if _, err := askModel(r, "ping", nil); err != nil {
+				t.Fatalf("the call was answered %q, and an engine was listening on its own path", err)
+			}
+		})
 	}
 }
 
+// ONE CASE, SO ONE FUNCTION. Nothing is listening and no record names a
+// socket, and there is no second reading to sit beside it.
 func TestNothingListeningIsNoEngine(t *testing.T) {
 	r := roots{method: t.TempDir(), work: t.TempDir()}
 	_, err := askModel(r, "ping", nil)
