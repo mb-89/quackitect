@@ -125,7 +125,7 @@ func snapshotsNotHere(r Roots, t Token) []string {
 //
 // MEASURED, ON wk-1c9dc4ef28. Its third began was 05adfb8a, taken on another
 // box, and git diff answered "fatal: bad object 05adfb8a" here with no remedy.
-// The test door reads theSnapshotHere and falls back. A reviewer runs git diff
+// The test door reads theSnapshotToDiff and falls back. A reviewer runs git diff
 // began..ended by hand, off the checklist, and meets the bare git error.
 //
 // SO THE HAND-OVER SAYS IT, ONCE, WHERE THE AGENT IS ALREADY READING. It names
@@ -140,7 +140,7 @@ func travelNotice(r Roots, t Token) string {
 	said := " Snapshots this token names are no object here: " + strings.Join(gone, ", ") +
 		". They were taken on another box, and refs/se/steps travels with no push, so" +
 		" git diff began..ended answers bad object."
-	if here := theSnapshotHere(r, t.Began); here != "HEAD" {
+	if here := theSnapshotToDiff(r, t.Began); here != "HEAD" {
 		return said + " The newest one this box holds is " + here +
 			", so read the change against that and say so where you cite it."
 	}
