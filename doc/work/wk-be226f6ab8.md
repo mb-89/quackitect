@@ -1,0 +1,69 @@
+---
+# which schema reads this note
+kind: [[work-token]]
+# which process shapes this token and says how it moves
+process: [[standard]]
+# the rules for filling this token
+guidance: [[work-token]]
+# the name this token is known by, in references and in links
+title: An absent run passes
+# where the token stands. The process owns these values.
+status: open
+claimed_by: f5927132/main
+claimed_at: "2026-09-06T11:48:27Z"
+# the tree each time the work was taken up, snapshots the engine wrote
+began:
+  - a46d151d592b29e8a069edfb3cd32aac9f8e7da6
+---
+
+## detail
+
+TestsRefuseTheClose lets a token through where the engine has no run recorded for it. That was deliberate on wk-5c682f1a25: every token open on 2026-09-06 predates the store, so refusing an absent record would have refused the whole queue at once, with six agents mid-flight. It leaves a hole. An agent that never runs se test at all is not refused, so the gate catches a red run and not a run that never happened.
+
+## proposed action
+
+Once every open token has been through a run under the store, an absent record becomes a refusal. A close then means the engine saw the tests pass, rather than the engine not having seen them fail.
+
+## done when
+
+- A submission on a token the engine has no run for is refused, and a test drives it and reads the refusal.
+- The refusal names se test on that token as the way through, and the same test reads it.
+- A token whose process runs no tests at all still closes, and a test drives one and reads the close.
+
+## evidence: step 1. ask
+
+<!-- write what is asked, the approach, and what done means, one criterion per line -->
+
+| done | criterion | evidence | receipt |
+|---|---|---|---|
+| [ ] | what is gained by doing it, and not only what it does |  |  |
+| [ ] | what breaks if it is never done, and not only that it stays undone |  |  |
+| [ ] | the approach is on the token before any work, as an interface or a shape a reader can disagree with |  |  |
+| [ ] | every done-when line is decidable, and names the command where one decides it |  |  |
+| [ ] | the change is small enough to review whole, or it is split first | — |  |
+| [ ] | the basics it stands on exist, or are minted first | — |  |
+
+## evidence: step 2. do
+
+<!-- make the change with its tests, hand the engine the delta to test, and write the note -->
+
+| done | criterion | evidence | receipt |
+|---|---|---|---|
+| [ ] | the guidance this token names was read and applied | — |  |
+| [ ] | the change follows the approach on the token, or the token says why it departed |  |  |
+| [ ] | se test --on this token answered ok, and what it ran is named |  |  |
+| [ ] | the note says what changed and why, for a reader who was not here |  |  |
+| [ ] | the cleanup the change revealed is in the change, or is a token of its own | — |  |
+
+## evidence: step 3. verdict
+
+<!-- read every hunk, run every criterion, and say whether each part improves the product. How a reviewer works is [[reviewing]]. Your verdict blocks nothing. You give it once and the token closes on it. Every finding you have is a trivial token you mint naming this one. -->
+
+| done | criterion | evidence | receipt |
+|---|---|---|---|
+| [ ] | [[reviewing]] was read and applied | — |  |
+| [ ] | every hunk of git diff began..ended was read, and any not read is named |  |  |
+| [ ] | every criterion's command was run again, and what it said is named |  |  |
+| [ ] | every hunk improves the product, or a finding names the one that does not |  |  |
+| [ ] | every finding is a trivial token naming this one, and their ids are here |  |  |
+
