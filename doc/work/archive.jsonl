@@ -347,3 +347,4 @@
 {"id":"wk-7a4406186a","title":"six checks nobody runs","process":"trivial","disposition":"done","blob":"97de37f120a8cabea9b3e8686b9df4caa41aa4f8"}
 {"id":"wk-106911cbea","title":"glyph check misses filter","process":"trivial","disposition":"done","blob":"16732e18f1b681ec265e5174f8235fcbca822010"}
 {"id":"wk-910b6e4000","title":"second build answer unattributed","process":"trivial","disposition":"done","blob":"d44fb6162a1b27f7dc97316d7a76a5b660295c4b"}
+{"id":"wk-4e643716ec","title":"engine fields not declared","process":"trivial","disposition":"done","blob":"7010d3d4267e525fd51814c7742edd4eb84693d9"}
