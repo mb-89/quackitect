@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -9,6 +10,7 @@ import (
 	"quackitect/engine/internal/sessionlog"
 	"strconv"
 	"strings"
+	"time"
 )
 
 // THE TWO SUBCOMMANDS LEVEL 1 ADDS. Both read JSON on standard input and
@@ -355,7 +357,27 @@ func (c *call) answerJSON(v any) {
 		fmt.Fprintln(c.err, err)
 		return
 	}
-	fmt.Fprintln(c.out, string(b))
+	fmt.Fprintln(c.out, string(withStale(b, staleSays(c.roots, whatRuns, builtAt, time.Now()))))
+}
+
+// withStale puts the sentence on an answer, as its first member.
+//
+// EVERY VERB'S ANSWER COMES THROUGH HERE, through both doors: the lane sends
+// a verb to the engine that lives, and runVerbInside builds the call whose
+// buffer this fills. So the one place that writes an answer is the one place
+// that can date it.
+//
+// AN ANSWER THAT IS NOT AN OBJECT IS LEFT ALONE, because there is nowhere in
+// it to put a member, and a sentence bolted beside it would not parse.
+func withStale(b []byte, says string) []byte {
+	if says == "" || !bytes.HasPrefix(b, []byte("{\n")) {
+		return b
+	}
+	line, err := json.Marshal(says)
+	if err != nil {
+		return b
+	}
+	return append([]byte("{\n  \"stale\": "+string(line)+","), b[1:]...)
 }
 
 func splitComma(s string) []string {

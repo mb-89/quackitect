@@ -98,6 +98,49 @@ func residentStale(r Roots) string {
 	return c.whyBuilt()
 }
 
+// WHAT ANSWERS A CALL SAYS HOW OLD IT IS, WHERE THE SOURCE HAS MOVED ON.
+//
+// residentStale above reads .bin/se, and that is the wrong subject for an
+// answer. Every tool call is run by the engine that lives, in its own process,
+// so a rebuild of .bin/se leaves the old code answering while the file on disk
+// reads new. The reading is taken once, at start, before a rebuild can
+// overwrite the file it is taken from.
+
+// whatRuns and builtAt are the program answering and when it was built.
+var whatRuns, builtAt = thisBuild()
+
+func thisBuild() (string, time.Time) {
+	exe, err := os.Executable()
+	if err != nil {
+		return "", time.Time{}
+	}
+	info, err := os.Stat(exe)
+	if err != nil {
+		return exe, time.Time{}
+	}
+	return exe, info.ModTime()
+}
+
+// staleSays is the sentence an answer carries when the program that wrote it
+// was built before the source it is built from, and nothing when it was not.
+// It names the newer file, the program and the age, which is what a reader
+// needs to know what to rebuild.
+func staleSays(r Roots, exe string, built, now time.Time) string {
+	if exe == "" || built.IsZero() {
+		return ""
+	}
+	src := filepath.Join(r.Method, "src", "engine")
+	if !fileExists(src) {
+		return ""
+	}
+	newest, at := newestSource([]string{src})
+	if newest == "" || !at.After(built) {
+		return ""
+	}
+	c := engineChoice{Path: exe, Age: now.Sub(built).Round(time.Second), Newer: newest}
+	return c.whyBuilt()
+}
+
 // suiteEngine answers the engine se test hands a subprocess test in
 // SE_ENGINE, and the sentence the answer carries about it. The resident
 // engine in .bin serves while it is newer than every source under
