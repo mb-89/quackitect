@@ -29,6 +29,10 @@ export type Node = {
   // WHAT THE NUMBER IS COUNTED IN, beside the box. "a claim lasts: 3" says
   // nothing on its own, and the unit is the one word that makes it a fact.
   unit?: string;
+  // THE WORD THAT REACHES THIS CONTROL FROM A CHAT, filled by the engine and
+  // declared nowhere. The tooltip draws it verbatim, so what a person reads is
+  // the exact string the matcher takes.
+  keyword?: string;
   span?: number;
   narrow?: string;
   shown?: boolean;
@@ -232,9 +236,20 @@ function button(n: Node): string {
   </button>`;
 }
 
+// A CONTROL A CHAT CAN REACH SAYS SO IN ITS TOOLTIP. The cloud has no panel,
+// so this line is the only place a person learns the word. It is copied from
+// the engine rather than composed, so it cannot drift from what works.
+function tipFor(n: Node): string {
+  const help = n.help ?? n.title ?? n.name;
+  if (!n.keyword) {
+    return help;
+  }
+  return help + "\n\nReach it from a chat by writing " + n.keyword + " on its own.";
+}
+
 function field(k: string, n: Node): string {
   const span = COLUMNS - 1;
-  const help = n.help ?? n.title ?? n.name;
+  const help = tipFor(n);
   const common = `data-key="${esc(k)}" data-type="${n.type}" title="${esc(help)}"`;
   let control: string;
   if (n.type === "bool") {

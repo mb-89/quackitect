@@ -124,6 +124,8 @@ type Node struct {
 	// that reaches this node, and it is the node's own name. Some controls
 	// make no sense away from a desk, and those carry no flag.
 	Console bool `json:"console,omitempty"`
+	// Keyword is that word, filled here so the panel draws what the matcher takes.
+	Keyword string `json:"keyword,omitempty"`
 }
 
 func (n Node) holdsValue() bool {
@@ -159,6 +161,10 @@ func LoadTree(methodRoot string) (Node, error) {
 // It is here because LoadTree is the one place a tree is read, which is where
 // the icons are resolved for the same reason.
 func fillOptions(n *Node, methodRoot string) {
+	// AND THE WORD A CONSOLE REACHES IT BY, derived so nobody keeps a copy.
+	if n.Console && n.Type == "bool" {
+		n.Keyword = keyword.For(n.Name)
+	}
 	if n.OptionsFrom == "processes.names" {
 		n.Options = nil
 		for _, name := range AvailableProcesses(methodRoot) {
@@ -611,27 +617,21 @@ func (e Emergency) Describe() string {
 	return fmt.Sprintf("emergency mode, armed by %s, until %s", e.By, e.Until.Format(time.RFC3339))
 }
 
-// Reachable is every control a console can reach, in tree order. Why only a
-// bool, and why the word is the name, is [[keyword]].
-func Reachable(methodRoot string) []keyword.Of {
-	root, err := LoadTree(methodRoot)
-	if err != nil {
-		return nil
-	}
-	var out []keyword.Of
-	Walk(root, "", func(path string, n Node) {
-		if n.Console && n.Type == "bool" {
-			out = append(out, keyword.Of{Word: keyword.For(n.Name), Key: strings.TrimPrefix(path, root.Name+"."), Says: n.Help})
-		}
-	})
-	return out
-}
-
 // KeywordSaid moves the control a person named, and answers the word it
 // matched. Its callers are the two routes the harness feeds, so an agent
 // cannot forge one. A move the floor refuses is recorded with its reason.
 func KeywordSaid(r Roots, log *Log, actor, said string) string {
-	k, ok := keyword.Match(said, Reachable(r.Method))
+	root, err := LoadTree(r.Method)
+	if err != nil {
+		return ""
+	}
+	var have []keyword.Of
+	Walk(root, "", func(path string, n Node) {
+		if n.Keyword != "" {
+			have = append(have, keyword.Of{Word: n.Keyword, Key: strings.TrimPrefix(path, root.Name+"."), Says: n.Help})
+		}
+	})
+	k, ok := keyword.Match(said, have)
 	if !ok {
 		return ""
 	}
