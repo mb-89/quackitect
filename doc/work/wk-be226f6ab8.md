@@ -9,6 +9,8 @@ guidance: [[work-token]]
 title: An absent run passes
 # where the token stands. The process owns these values.
 status: open
+# what has to be true before this can start, which a person judges
+ready_when: every open token has been through one run under the store
 claimed_by: f5927132/main
 claimed_at: "2026-09-06T11:48:27Z"
 # the tree each time the work was taken up, snapshots the engine wrote
