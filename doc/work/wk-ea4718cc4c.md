@@ -24,6 +24,14 @@ A cloud box writes refs/heads and no other ref namespace. Measured 2026-09-06, o
 
 Move the claim relay onto refs/heads/se-queue, the one namespace a cloud box can write. The mechanism is unchanged: a commit built with a bare index, pushed, the working tree never touched. Only the ref name moves.
 
+## approach
+
+The claim relay keeps its mechanism and changes its ref.
+
+A commit is built with a bare index and pushed, exactly as claim.go does now. The working tree is never touched and a conflict on disk stays impossible. Only refs/se/claims becomes a branch under refs/heads.
+
+refs/heads is the one namespace a cloud box can write. That was measured rather than assumed, and it is what makes the relay work at all here.
+
 ## done when
 
 - A claim taken on a cloud box publishes, and the push's exit status is zero.
