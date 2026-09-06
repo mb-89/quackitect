@@ -27,6 +27,58 @@ type Finding struct {
 	Line  int    `json:"line,omitempty"`
 }
 
+// LintWork reads every work token against the schema its kind names.
+//
+// THE ONE CORPUS THE SCHEMA LINT NEVER SAW. Guidance and rationales went
+// through LintNotes from the start. The token lint read a title and looked for
+// times, so a token whose chapters broke its schema was clean to se lint and
+// red only in the editor.
+//
+// A FOLDER THAT IS NOT THERE IS NOT A FINDING. A tree with no private work
+// folder has nothing to read there, which is every clone that never made one.
+func LintWork(r Roots) []Finding {
+	var out []Finding
+	for _, dir := range workDirs(r) {
+		if _, err := os.Stat(dir); os.IsNotExist(err) {
+			continue
+		}
+		out = append(out, LintNotes(r, dir)...)
+	}
+	return out
+}
+
+// aLint is one corpus se lint reads, and the name a reader is given for it.
+type aLint struct {
+	Name string
+	Read func(Roots) []Finding
+}
+
+// theLints are the corpora the verb reads, named once.
+var theLints = []aLint{
+	{"tokens", LintTokens},
+	{"work tokens against their schema", LintWork},
+	{"icons", LintIcons},
+	{"limits", LintLimits},
+	{"guidance", LintGuidance},
+	{"rationales", LintRationales},
+	{"processes", LintProcesses},
+}
+
+// whatTheLintReads is the list, as the help line says it.
+//
+// THE HELP AND THE VERB WERE TWO LISTS AND THEY DRIFTED. The line said tokens,
+// guidance and Go while the verb also read icons, limits, rationales and
+// processes, and read no work token against its schema at all. One list is one
+// answer. Go is named after it, because it is the one lint that takes a
+// context and answers what it could not run.
+func whatTheLintReads() string {
+	names := make([]string, 0, len(theLints))
+	for _, one := range theLints {
+		names = append(names, one.Name)
+	}
+	return strings.Join(names, ", ") + " and Go"
+}
+
 // LintTokens names what breaks a rule. An empty answer is a clean ledger.
 func LintTokens(r Roots) []Finding {
 	var out []Finding
@@ -172,7 +224,7 @@ func runLint(c *call) int {
 	fs := flag.NewFlagSet("lint", flag.ContinueOnError)
 	fs.SetOutput(c.err)
 	fs.Usage = func() {
-		fmt.Fprintln(c.err, "se lint - read the tree and name what breaks a rule: tokens, guidance and Go.")
+		fmt.Fprintln(c.err, "se lint - read the tree and name what breaks a rule: "+whatTheLintReads()+".")
 		fmt.Fprintln(c.err, "")
 		fmt.Fprintln(c.err, "  se lint          say what is wrong, and exit non-zero if anything is")
 		fmt.Fprintln(c.err, "  se format        run this first: a formatter settles what a lint reports")
@@ -185,11 +237,10 @@ func runLint(c *call) int {
 	}
 
 	roots := c.roots
-	found := append(LintTokens(roots), LintIcons(roots)...)
-	found = append(found, LintLimits(roots)...)
-	found = append(found, LintGuidance(roots)...)
-	found = append(found, LintRationales(roots)...)
-	found = append(found, LintProcesses(roots)...)
+	var found []Finding
+	for _, one := range theLints {
+		found = append(found, one.Read(roots)...)
+	}
 	// THE GO IS PART OF THE TREE THIS READS. It was checked by four programs
 	// the guidance named and the agent was told to remember, so it was read
 	// when the battery ran and at no other time.
