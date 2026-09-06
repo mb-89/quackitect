@@ -72,7 +72,7 @@ func aReadAlreadyHeld(r Roots, actor, path, page string) (string, bool) {
 func (g *guard) correct(updated map[string]any, reason string) {
 	out, _ := json.Marshal(map[string]any{
 		"hookSpecificOutput": map[string]any{
-			"hookEventName":            "PreToolUse",
+			"hookEventName":            string(EventPreToolUse),
 			"permissionDecision":       "allow",
 			"permissionDecisionReason": reason,
 			"updatedInput":             updated,

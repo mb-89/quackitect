@@ -31,10 +31,36 @@ import (
 // held to, and why place is never the reason, is
 // [[the-guard-scrutinises-rather-than-forbids]].
 
+// THE HARNESS NAMES ITS EVENT, AND THE SET OF NAMES IS CLOSED. Every event
+// this engine handles is a constant of one type, so a case or a comparison
+// naming one is a name the compiler resolves rather than a string nobody
+// checks. A typo in a bare literal was silent: the case never fired, and the
+// event fell through to the default.
+//
+// The decode is the one edge where an unchecked string arrives, and an event
+// this engine does not handle is what the default case is for.
+type HookEvent string
+
+const (
+	EventPreToolUse         HookEvent = "PreToolUse"
+	EventPostToolUse        HookEvent = "PostToolUse"
+	EventPostToolUseFailure HookEvent = "PostToolUseFailure"
+	EventStop               HookEvent = "Stop"
+	EventStopFailure        HookEvent = "StopFailure"
+	EventUserPromptSubmit   HookEvent = "UserPromptSubmit"
+	EventSessionStart       HookEvent = "SessionStart"
+	EventSessionEnd         HookEvent = "SessionEnd"
+	EventSubagentStart      HookEvent = "SubagentStart"
+	EventSubagentStop       HookEvent = "SubagentStop"
+	EventPreCompact         HookEvent = "PreCompact"
+	EventConfigChange       HookEvent = "ConfigChange"
+	EventNotification       HookEvent = "Notification"
+)
+
 type hookIn struct {
 	SessionID      string          `json:"session_id"`
 	Cwd            string          `json:"cwd"`
-	Event          string          `json:"hook_event_name"`
+	Event          HookEvent       `json:"hook_event_name"`
 	ToolName       string          `json:"tool_name"`
 	ToolInput      json.RawMessage `json:"tool_input"`
 	ToolUseID      string          `json:"tool_use_id"`
@@ -104,7 +130,7 @@ func (ti toolInput) writtenText() string {
 func (g *guard) deny(reason string) {
 	out, _ := json.Marshal(map[string]any{
 		"hookSpecificOutput": map[string]any{
-			"hookEventName":            "PreToolUse",
+			"hookEventName":            string(EventPreToolUse),
 			"permissionDecision":       "deny",
 			"permissionDecisionReason": reason,
 		},
@@ -413,7 +439,7 @@ func answerHook(ctx context.Context, raw []byte, args []string, out io.Writer, h
 			wake = true
 		default:
 			if in.Event == "" {
-				in.Event = args[i] // a harness that names the event on the line
+				in.Event = HookEvent(args[i]) // a harness that names the event on the line
 			}
 		}
 	}
@@ -465,13 +491,13 @@ func answerHook(ctx context.Context, raw []byte, args []string, out io.Writer, h
 	// The identity is still the harness's, and it is what everything is keyed
 	// by. The name is what the record shows.
 	// Why every call carries one is [[every-call-carries-an-identity]].
-	if in.Event == "SubagentStart" {
+	if in.Event == EventSubagentStart {
 		NoteAgent(roots, in.AgentID, in.AgentType, in.SessionID)
 	}
 	// WHOEVER IS CALLING IS HERE, whether or not this run saw them arrive.
 	// An end event is the one call that says the opposite, and it is
 	// handled below rather than registered here.
-	if in.Event != "SessionEnd" && in.Event != "SubagentStop" {
+	if in.Event != EventSessionEnd && in.Event != EventSubagentStop {
 		AgentSeen(roots, in.SessionID, in.AgentID, in.AgentType)
 	}
 	// WHOEVER IS CALLING, UNDER THE NAME THE RECORD USES FOR IT. A helper is
@@ -488,12 +514,12 @@ func answerHook(ctx context.Context, raw []byte, args []string, out io.Writer, h
 	// wanted: the button is the grant.
 	if h := LoadHold(roots); h.On {
 		switch in.Event {
-		case "PreToolUse":
+		case EventPreToolUse:
 			record(log, "engine", "hold", actor, "refused: everything is on hold", sessionlog.No(),
 				map[string]any{"tool": in.ToolName})
 			g.deny(h.Says)
 			return
-		case "Stop":
+		case EventStop:
 			record(log, "agent", "stop", actor, "stopped: everything is on hold", sessionlog.Yes(), nil)
 			return
 		}
@@ -509,7 +535,7 @@ func answerHook(ctx context.Context, raw []byte, args []string, out io.Writer, h
 	// not reach up here: what god mode removes is the ENGINE'S judgement, never
 	// the person's own controls. An override that could also silence the person
 	// holding it is not an override, it is a runaway.
-	if asked := LoadAsked(roots); asked.Owed() && in.Event == "PreToolUse" && !isAnswering(in) {
+	if asked := LoadAsked(roots); asked.Owed() && in.Event == EventPreToolUse && !isAnswering(in) {
 		record(log, "engine", "asked", actor, "refused: the person asked what is happening", sessionlog.No(),
 			map[string]any{"tool": in.ToolName, "asked": asked.On})
 		g.deny(asked.Says)
@@ -529,10 +555,10 @@ func answerHook(ctx context.Context, raw []byte, args []string, out io.Writer, h
 	//
 	// THE GUARD CLEARS IT, BECAUSE ONLY THE GUARD KNOWS WHO ANSWERED. The
 	// answer verb runs as a program with no idea which agent called it.
-	if in.Event == "PostToolUse" && isAnswering(in) {
+	if in.Event == EventPostToolUse && isAnswering(in) {
 		_ = TheyWereAnswered(roots, actor) // an answer it cannot clear is cleared on the next call
 	}
-	if in.Event == "PreToolUse" || in.Event == "PostToolUse" || in.Event == "Stop" {
+	if in.Event == EventPreToolUse || in.Event == EventPostToolUse || in.Event == EventStop {
 		CopyWhatWasHeard(roots, in.Transcript, log, actor)
 	}
 
@@ -544,7 +570,7 @@ func answerHook(ctx context.Context, raw []byte, args []string, out io.Writer, h
 	// a tool call is on its way, so refusing that call kills work the agent
 	// began before it could have known. The first few calls are warned and the
 	// rest are refused, and the warning says how many are left.
-	if in.Event == "PreToolUse" && cfg.AnswerFirst && !isAnswering(in) {
+	if in.Event == EventPreToolUse && cfg.AnswerFirst && !isAnswering(in) {
 		if said, refuse := AnswerOwedNow(roots, actor); said != "" {
 			if refuse {
 				record(log, "engine", "owed", actor, "refused: they are waiting for an answer", sessionlog.No(),
@@ -568,15 +594,15 @@ func answerHook(ctx context.Context, raw []byte, args []string, out io.Writer, h
 	}
 
 	switch in.Event {
-	case "PreToolUse":
+	case EventPreToolUse:
 		decidePreToolUse(g, roots, cfg, emergency, log, in, actor)
-	case "Stop":
+	case EventStop:
 		// THE TURN ENDED, and its foreground helpers with it.
 		if in.AgentID == "" {
 			HelpersGoneWith(roots, in.SessionID)
 		}
 		decideStop(g, roots, cfg, log, in, actor)
-	case "UserPromptSubmit":
+	case EventUserPromptSubmit:
 		// A NEW PROMPT IS A NEW TURN, and the last turn's helpers are gone
 		// with it, interrupted or finished. One still calling comes back.
 		if in.AgentID == "" {
@@ -597,7 +623,7 @@ func answerHook(ctx context.Context, raw []byte, args []string, out io.Writer, h
 		_ = TheyAsked(roots, actor, in.Prompt+in.UserPrompt) // the guard answers whether or not it can note the question
 		// A PERSON WITH NO PANEL REACHES A CONTROL BY WRITING ITS KEYWORD.
 		KeywordSaid(roots, log, actor, in.Prompt+in.UserPrompt)
-	case "SessionStart":
+	case EventSessionStart:
 		// A session that resumes after a compaction starts with nothing read.
 		if in.Source == "compact" || in.Source == "clear" {
 			ForgetReads(roots, in.Source)
@@ -614,20 +640,20 @@ func answerHook(ctx context.Context, raw []byte, args []string, out io.Writer, h
 		// THE ENGINE IS UP BEFORE THE FIRST CALL, because every call from
 		// here on is answered by it.
 		ensureEngine(ctx, roots)
-	case "StopFailure":
+	case EventStopFailure:
 		// A TURN ENDED BY THE API, WITH THE KIND OF ENDING. Without the type
 		// every such ending read as unknown, and the one class the agent can
 		// fix itself, running out of output, looked like the ones it cannot.
 		record(log, "agent", "stop", actor, "turn ended by the API: "+orElse(in.ErrorType, "unknown"), sessionlog.No(),
 			map[string]any{"error_type": orElse(in.ErrorType, "unknown")})
-	case "SessionEnd":
+	case EventSessionEnd:
 		record(log, "agent", "session", actor, "session ended", sessionlog.Yes(), nil)
 		AgentsGoneWith(roots, in.SessionID)
-	case "SubagentStart":
+	case EventSubagentStart:
 		// Every agent has an identity, and the record says which one acted.
 		record(log, "agent", "helper", actor, "helper started: "+in.AgentType, sessionlog.Yes(),
 			map[string]any{"agent_type": in.AgentType})
-	case "SubagentStop":
+	case EventSubagentStop:
 		// A HELPER'S ANSWER IS A DIGEST, OR IT GOES BACK TO BE ONE. A helper
 		// that returns what it read moves the tokens into the parent's context
 		// with extra steps, and today that looks like a slow turn. The budget
@@ -676,12 +702,12 @@ func answerHook(ctx context.Context, raw []byte, args []string, out io.Writer, h
 		}
 		AgentGone(roots, in.AgentID)
 		record(log, "agent", "helper", actor, "helper stopped", sessionlog.Yes(), nil)
-	case "PreCompact":
+	case EventPreCompact:
 		// What was read is no longer held, so it is no longer claimed as read.
 		n := ForgetReads(roots, "compaction")
 		record(log, "engine", "compact", actor, "context compacted, read evidence reset", sessionlog.Yes(),
 			map[string]any{"forgotten": n})
-	case "PostToolUse":
+	case EventPostToolUse:
 		// The obligation was already cleared above, before this event's new
 		// messages were copied.
 		//
@@ -698,11 +724,11 @@ func answerHook(ctx context.Context, raw []byte, args []string, out io.Writer, h
 		}
 		record(log, "agent", "call", actor, said, sessionlog.Yes(),
 			map[string]any{"tool": in.ToolName, "path": pathOf(in)})
-	case "ConfigChange":
+	case EventConfigChange:
 		// The files that changed were read under rules that no longer hold.
 		ForgetReads(roots, "configuration changed")
 		record(log, "engine", "config", actor, "configuration changed, read evidence reset", sessionlog.Yes(), nil)
-	case "PostToolUseFailure":
+	case EventPostToolUseFailure:
 		// THE FAILURE IS COUNTED, so the same call failing the same way over
 		// and over is refused before the turn dies of it.
 		noteFailure(roots, actor, in)
@@ -713,10 +739,11 @@ func answerHook(ctx context.Context, raw []byte, args []string, out io.Writer, h
 		}
 		record(log, "agent", "call", actor, said, sessionlog.No(),
 			map[string]any{"tool": in.ToolName})
-	case "Notification":
+	case EventNotification:
 		record(log, "engine", "note", actor, firstLine(string(raw)), nil, nil)
 	default:
-		record(log, "engine", "hook", actor, in.Event, nil, map[string]any{"event": in.Event})
+		record(log, "engine", "hook", actor, string(in.Event), nil,
+			map[string]any{"event": string(in.Event)})
 	}
 }
 
@@ -1500,7 +1527,7 @@ func record(log *sessionlog.Log, src, kind, actor, msg string, ok *bool, data ma
 func (g *guard) warn(said string) {
 	out, _ := json.Marshal(map[string]any{
 		"hookSpecificOutput": map[string]any{
-			"hookEventName":     "PreToolUse",
+			"hookEventName":     string(EventPreToolUse),
 			"additionalContext": said,
 		},
 	})
