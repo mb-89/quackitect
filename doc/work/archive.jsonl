@@ -364,3 +364,4 @@
 {"id":"wk-a933164f2c","title":"one parallel control","process":"trivial","disposition":"done","blob":"f944c415a707e8bbefb68de77f9721d50d8a53db","on_branch":"24c097576fedf20d37a30428c5f50eaa9a251f8b"}
 {"id":"wk-baefed4190","title":"checks lost fresh engine","process":"trivial","disposition":"dropped","blob":"ce046ddc36fcc5b7495342efb3e9876fa12a1421"}
 {"id":"wk-ca1842e1f0","title":"staffing test picks default","process":"trivial","disposition":"done","blob":"a3453d2eaac1608dce4a4e8f4c4d00277ba4b980"}
+{"id":"wk-b008bfaa16","title":"hook server ignores context","process":"trivial","disposition":"done","blob":"e4dd126098d0ab6070f9a0267aff7ed215e214e1","on_branch":"2b73916c6adfbcff9ff53382e4ce21c69211f33c"}
