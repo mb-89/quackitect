@@ -31,7 +31,7 @@ func TestNothingIsAllowedWhileEverythingIsOnHold(t *testing.T) {
 		t.Fatal("an unclaimed stop passed with no hold")
 	}
 
-	if _, err := SetHold(r, true, "person"); err != nil {
+	if _, err := SetHold(r, HoldHeld, "person"); err != nil {
 		t.Fatal(err)
 	}
 
@@ -50,7 +50,7 @@ func TestNothingIsAllowedWhileEverythingIsOnHold(t *testing.T) {
 	}
 
 	// Lifted, and work goes on.
-	if _, err := SetHold(r, false, "person"); err != nil {
+	if _, err := SetHold(r, HoldOff, "person"); err != nil {
 		t.Fatal(err)
 	}
 	if out := hookSays(t, exe, r.Method, "PreToolUse", read); strings.Contains(out, `"deny"`) {
@@ -66,7 +66,7 @@ func TestTheHoldSurvivesTheProcessThatSetIt(t *testing.T) {
 	if LoadHold(r).On {
 		t.Fatal("it started on")
 	}
-	h, err := SetHold(r, true, "person")
+	h, err := SetHold(r, HoldHeld, "person")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -76,7 +76,7 @@ func TestTheHoldSurvivesTheProcessThatSetIt(t *testing.T) {
 	if again := LoadHold(r); !again.On || again.Says != h.Says {
 		t.Fatalf("read back as %+v", again)
 	}
-	SetHold(r, false, "person")
+	SetHold(r, HoldOff, "person")
 	if LoadHold(r).On {
 		t.Fatal("it stayed on after being lifted")
 	}

@@ -43,7 +43,11 @@ func runHold(c *call) int {
 		c.answerJSON(LoadHold(roots))
 		return 0
 	}
-	h, err := SetHold(roots, *on, *by)
+	want := HoldOff
+	if *on {
+		want = HoldHeld
+	}
+	h, err := SetHold(roots, want, *by)
 	if err != nil {
 		c.answerJSON(map[string]any{"error": err.Error()})
 		return 1

@@ -74,7 +74,7 @@ func TestAControlDoesNotOutliveTheSessionThatSetIt(t *testing.T) {
 		{"the rung", func(r Roots) error { _, err := SetBinding(r, God, "the owner"); return err },
 			func(r Roots) bool { return LoadBinding(r).At != Bound },
 			"god came back armed with nobody having said so"},
-		{"the hold", func(r Roots) error { _, err := SetHold(r, true, "the owner"); return err },
+		{"the hold", func(r Roots) error { _, err := SetHold(r, HoldHeld, "the owner"); return err },
 			func(r Roots) bool { return LoadHold(r).On },
 			"a hold put on yesterday is still on"},
 		{"the ask", func(r Roots) error { _, err := SetAsked(r, true, "the owner"); return err },
@@ -109,7 +109,7 @@ func TestTheNextSessionReadsTheRestingValue(t *testing.T) {
 	if _, err := SetBinding(r, God, "the owner"); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := SetHold(r, true, "the owner"); err != nil {
+	if _, err := SetHold(r, HoldHeld, "the owner"); err != nil {
 		t.Fatal(err)
 	}
 	if _, err := SetAsked(r, true, "the owner"); err != nil {
@@ -166,7 +166,7 @@ func TestARotationDoesNotLiftAControl(t *testing.T) {
 	if _, err := SetBinding(r, God, "the owner"); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := SetHold(r, true, "the owner"); err != nil {
+	if _, err := SetHold(r, HoldHeld, "the owner"); err != nil {
 		t.Fatal(err)
 	}
 	theRotationWindow(t, r)

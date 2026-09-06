@@ -167,13 +167,13 @@ func TestGodModeDoesNotSilenceThePerson(t *testing.T) {
 	}
 
 	// THE HOLD STILL STOPS IT.
-	if _, err := SetHold(r, true, "the owner"); err != nil {
+	if _, err := SetHold(r, HoldHeld, "the owner"); err != nil {
 		t.Fatal(err)
 	}
 	if said := decide("Bash"); !strings.Contains(said, "deny") {
 		t.Fatalf("the hold did not stop an agent in god mode: %s", said)
 	}
-	if _, err := SetHold(r, false, "the owner"); err != nil {
+	if _, err := SetHold(r, HoldOff, "the owner"); err != nil {
 		t.Fatal(err)
 	}
 
