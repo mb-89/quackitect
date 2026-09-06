@@ -363,3 +363,4 @@
 {"id":"wk-aa039204a4","title":"staffing test overrides nothing","process":"trivial","disposition":"done","blob":"d69897d3ea47a2c5d27c27a0ac3146ea141aa5bf","on_branch":"d89dff7bcaf4ef3e2b33191a0011ba44dc89a6c9"}
 {"id":"wk-a933164f2c","title":"one parallel control","process":"trivial","disposition":"done","blob":"f944c415a707e8bbefb68de77f9721d50d8a53db","on_branch":"24c097576fedf20d37a30428c5f50eaa9a251f8b"}
 {"id":"wk-baefed4190","title":"checks lost fresh engine","process":"trivial","disposition":"dropped","blob":"ce046ddc36fcc5b7495342efb3e9876fa12a1421"}
+{"id":"wk-ca1842e1f0","title":"staffing test picks default","process":"trivial","disposition":"done","blob":"a3453d2eaac1608dce4a4e8f4c4d00277ba4b980"}
