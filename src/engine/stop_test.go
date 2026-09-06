@@ -36,10 +36,11 @@ func TestAStopIsRefusedUntilAReasonIsClaimed(t *testing.T) {
 		}
 	}
 
-	// A RETRY IS NOT A CLAIM. The harness sets that flag by itself, so asking
-	// twice proves the harness retried and nothing about what was decided.
-	again := hookSays(t, exe, r.Method, "Stop",
-		map[string]any{"cwd": r.Work, "stop_hook_active": true})
+	// A RETRY IS NOT A CLAIM. A harness retries a blocked stop by itself, so
+	// asking twice proves the harness retried and nothing about what was decided.
+	// The engine reads no flag saying a stop is a retry, so a second ask arrives
+	// as the first one did.
+	again := hookSays(t, exe, r.Method, "Stop", map[string]any{"cwd": r.Work})
 	if !strings.Contains(again, `"decision":"block"`) {
 		t.Fatalf("a bare retry granted the stop: %s", again)
 	}

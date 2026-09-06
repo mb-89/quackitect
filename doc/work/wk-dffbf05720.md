@@ -85,7 +85,7 @@ TestAClaimGrantsOneStopAndThePullSpendsIt, ok true. Its first half is this crite
 | done | criterion | evidence | receipt |
 |---|---|---|---|
 | [x] | the guidance this token names was read and applied | work-token, read. Each line is answered rather than ticked. |  |
-| [x] | the change follows the approach on the token, or the token says why it departed | It follows it. The granting is gone from hook.go, the count stays, and se find answers no hits for stopRefusalsBeforeRelenting. |  |
+| [x] | the change follows the approach on the token, or the token says why it departed | It departed: the flag half was dropped, because a harness sets stop_hook_active on its own retries, so a claim alone is stricter. |  |
 | [x] | se test --on this token answered ok, and what it ran is named | ok true, over TestAStopWithNoClaimIsRefusedHoweverOftenItIsAsked, TestAClaimGrantsOneStopAndThePullSpendsIt, TestAStopIsNeverGrantedForAskingOftenEnough and TestAHelperStopRelentsAfterEnoughRefusals. |  |
 | [x] | the note says what changed and why, for a reader who was not here | The detail and hook.go carry it: what the valve was, what it cost, and that v3 removed it before. |  |
 | [ ] | the cleanup the change revealed is in the change, or is a token of its own | Reported rather than ticked. The change was made on another box and this clone holds neither snapshot, so git diff began..ended answers bad object. I verified the outcome without reading the hunks. |  |

@@ -58,19 +58,18 @@ const (
 )
 
 type hookIn struct {
-	SessionID      string          `json:"session_id"`
-	Cwd            string          `json:"cwd"`
-	Event          HookEvent       `json:"hook_event_name"`
-	ToolName       string          `json:"tool_name"`
-	ToolInput      json.RawMessage `json:"tool_input"`
-	ToolUseID      string          `json:"tool_use_id"`
-	Prompt         string          `json:"prompt"`
-	UserPrompt     string          `json:"user_prompt"`
-	Source         string          `json:"source"`
-	AgentID        string          `json:"agent_id"`
-	AgentType      string          `json:"agent_type"`
-	StopHookActive bool            `json:"stop_hook_active"`
-	Transcript     string          `json:"transcript_path"`
+	SessionID  string          `json:"session_id"`
+	Cwd        string          `json:"cwd"`
+	Event      HookEvent       `json:"hook_event_name"`
+	ToolName   string          `json:"tool_name"`
+	ToolInput  json.RawMessage `json:"tool_input"`
+	ToolUseID  string          `json:"tool_use_id"`
+	Prompt     string          `json:"prompt"`
+	UserPrompt string          `json:"user_prompt"`
+	Source     string          `json:"source"`
+	AgentID    string          `json:"agent_id"`
+	AgentType  string          `json:"agent_type"`
+	Transcript string          `json:"transcript_path"`
 	// ErrorType is what ended a turn on an API error: rate_limit,
 	// max_output_tokens and the rest. It comes with StopFailure only.
 	ErrorType string `json:"error_type"`

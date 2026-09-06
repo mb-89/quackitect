@@ -36,22 +36,24 @@ func TestAStopWithNoClaimIsRefusedHoweverOftenItIsAsked(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	stop := func(active bool) string {
+	stop := func() string {
 		t.Helper()
 		body, _ := json.Marshal(map[string]any{"hook_event_name": "Stop", "cwd": r.Work,
-			"session_id": "s-1", "stop_hook_active": active})
+			"session_id": "s-1"})
 		var out bytes.Buffer
 		answerHook(t.Context(), body, []string{"--method", r.Method}, &out, log)
 		return out.String()
 	}
 
 	// THE FIRST STOP OF THE SESSION IS GRANTED, and that is its own rule.
-	stop(false)
+	stop()
 
-	// EVERY ONE AFTER IT IS REFUSED, however often it is asked. The harness's own
-	// retry flag is set on the later ones, because that is what a harness does.
+	// EVERY ONE AFTER IT IS REFUSED, however often it is asked. Nothing in the
+	// payload says which of these is a retry, because the engine reads no such
+	// flag: the harness sets one for its own reasons, and the field it would
+	// arrive in is gone.
 	for i := 0; i < 6; i++ {
-		if said := stop(i > 0); !strings.Contains(said, "block") {
+		if said := stop(); !strings.Contains(said, "block") {
 			t.Fatalf("stop %d with nothing claimed was granted: %s", i+2, said)
 		}
 	}
@@ -71,7 +73,7 @@ func TestAClaimGrantsOneStopAndThePullSpendsIt(t *testing.T) {
 	stop := func() string {
 		t.Helper()
 		body, _ := json.Marshal(map[string]any{"hook_event_name": "Stop", "cwd": r.Work,
-			"session_id": "s-1", "stop_hook_active": true})
+			"session_id": "s-1"})
 		var out bytes.Buffer
 		answerHook(t.Context(), body, []string{"--method", r.Method}, &out, log)
 		return out.String()
