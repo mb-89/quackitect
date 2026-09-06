@@ -4,6 +4,7 @@ import (
 	"go/ast"
 	"go/parser"
 	"go/token"
+	"os"
 	"sort"
 	"strconv"
 	"strings"
@@ -32,10 +33,6 @@ func TestHookEventsAreOneType(t *testing.T) {
 	hook, err := parser.ParseFile(fset, "hook.go", nil, 0)
 	if err != nil {
 		t.Fatalf("parsing hook.go: %v", err)
-	}
-	guards, err := parser.ParseFile(fset, "guards.go", nil, 0)
-	if err != nil {
-		t.Fatalf("parsing guards.go: %v", err)
 	}
 
 	named := theEventFieldType(hook)
@@ -75,18 +72,24 @@ func TestHookEventsAreOneType(t *testing.T) {
 		}
 	}
 
-	// AND NO LITERAL IN EITHER FILE SAYS AN EVENT NAME AGAIN.
+	// AND NO LITERAL IN THE PACKAGE SAYS AN EVENT NAME AGAIN.
+	//
+	// EVERY FILE OF IT, rather than a list of two written out here. The
+	// property is about src/engine, and two names held it over two files: a
+	// bare event name added anywhere else in the package is the exact thing
+	// this guard is for, and it went unseen.
 	known := map[string]bool{}
 	for _, value := range events {
 		known[value] = true
 	}
-	for _, file := range []struct {
-		name string
-		said *ast.File
-	}{{"hook.go", hook}, {"guards.go", guards}} {
-		for _, said := range stringsOutsideConstants(file.said) {
+	for _, name := range packageFilesHere(t) {
+		file, err := parser.ParseFile(fset, name, nil, 0)
+		if err != nil {
+			t.Fatalf("parsing %s: %v", name, err)
+		}
+		for _, said := range stringsOutsideConstants(file) {
 			if known[said] {
-				bare = append(bare, file.name+": "+strconv.Quote(said))
+				bare = append(bare, name+": "+strconv.Quote(said))
 			}
 		}
 	}
@@ -96,6 +99,29 @@ func TestHookEventsAreOneType(t *testing.T) {
 		t.Fatalf("%d event names are bare strings rather than constants of %s: %s",
 			len(bare), named, strings.Join(bare, ", "))
 	}
+}
+
+// packageFilesHere answers the package's own source files, and refuses to
+// report on too few, because a walk that finds nothing passes the guard above
+// for free.
+func packageFilesHere(t *testing.T) []string {
+	t.Helper()
+	entries, err := os.ReadDir(".")
+	if err != nil {
+		t.Fatal(err)
+	}
+	var names []string
+	for _, e := range entries {
+		name := e.Name()
+		if e.IsDir() || !strings.HasSuffix(name, ".go") || strings.HasSuffix(name, "_test.go") {
+			continue
+		}
+		names = append(names, name)
+	}
+	if len(names) < 50 {
+		t.Fatalf("the walk found %d source files, so it is not reading the package", len(names))
+	}
+	return names
 }
 
 // theEventFieldType answers the type hookIn.Event is declared with, and the
