@@ -21,6 +21,8 @@ Narrow the staffing refusal to the two verbs that take new work, se_pull and se_
 
 ## approach
 
+Written by main on 2026-09-06, while working wk-8797959d3c, which does not name this token. The hand that pulls this one is free to disagree with all of it.
+
 The refusal moves from every call to the two verbs that take new work.
 
 AStaffShortfall answers on se_pull and se_claim, and answers nothing on anything else. The wording it returns does not change, so a spawned agent reads the remedy it reads today.

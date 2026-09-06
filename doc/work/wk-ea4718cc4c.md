@@ -69,6 +69,8 @@ Move the claim relay onto refs/heads/se-queue, the one namespace a cloud box can
 
 ## approach
 
+Written by main on 2026-09-06, while working wk-8797959d3c, which does not name this token. It is also STALE: the red team found claim.go already publishes on refs/heads/se/claims, so the move this describes has shipped. Do not build from it.
+
 The owner's design, 2026-09-06. Nothing is cut until they give the go.
 
 The split is by path rather than by branch. doc/work goes straight to trunk, always. src goes on a worker's own branch and lands after review. Two things at two speeds, and no second branch is built.
