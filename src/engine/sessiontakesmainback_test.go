@@ -4,8 +4,6 @@ import (
 	"quackitect/engine/internal/sessionlog"
 	"strings"
 	"testing"
-
-	"quackitect/engine/internal/sessionlog"
 )
 
 // A SESSION REGISTERED UNDER ONE NAME AND PULLING UNDER ANOTHER DRAWS ONE ROW.
