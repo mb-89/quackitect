@@ -367,13 +367,29 @@ func checkFront(spec FrontSpec, f frontmatter.Front, front string) []Departure {
 	}
 	if !spec.AdditionalProperties {
 		for name := range f {
-			if _, declared := spec.Properties[name]; !declared {
+			if _, declared := spec.Properties[name]; !declared && !theEnginesOwnFields[name] {
 				out = append(out, Departure{Line: frontLine(front, name),
 					Says: fmt.Sprintf("the frontmatter carries %s, which the schema does not declare", name)})
 			}
 		}
 	}
 	return out
+}
+
+// theEnginesOwnFields are written by the engine and never by an author.
+//
+// A claim is bookkeeping. The engine writes it when an agent takes a token up.
+// It removes it when the token goes back.
+//
+// Declaring the pair as schema properties works, and says the wrong thing.
+// A declared property is what an author writes.
+// It reaches completion and the field descriptions.
+// Nobody fills these in.
+// So they are exempt here, beside the check that would otherwise refuse them.
+// See wk-4e643716ec.
+var theEnginesOwnFields = map[string]bool{
+	"claimed_by": true,
+	"claimed_at": true,
 }
 
 // checkWords holds a scalar field to its word count.
