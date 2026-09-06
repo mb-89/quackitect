@@ -210,6 +210,7 @@
 {"id":"wk-8e717ef911","title":"stale note names --built","process":"trivial","disposition":"done","blob":"a3966c0a91f7ffde330ffa2ec52daeade98275c0","on_branch":"44f84159e51021849045a1076dfc0e77597a48c1"}
 {"id":"wk-8e9a4d03ac","title":"declared group vanishes empty","process":"trivial","disposition":"done","blob":"8b60a9bbd151397a1bfdd3de918df2c1e0452cc8","on_branch":"34ec1fa1934108c3f708d843a75b2b320680ee6c"}
 {"id":"wk-8fa7785eab","title":"argue only when blocking","process":"trivial","disposition":"done","blob":"160c4f1bb9be900653ad044102e6a911763db0bb","on_branch":"2ebc142c96d1499a2ac515011755806ba458da67"}
+{"id":"wk-8fb334b116","title":"lint doubles the battery","process":"trivial","disposition":"done","blob":"b0b80b7fd9f20c66357605233355d258d503498f"}
 {"id":"wk-8fb9a97399","title":"no public link private","process":"trivial","disposition":"done","blob":"fba4b3346605e7766080e3670eb151056ddf469b","on_branch":"fba4b3346605e7766080e3670eb151056ddf469b","tag":"refs/tags/archive/wk-8fb9a97399"}
 {"id":"wk-90145376d4","title":"green battery reads failed","process":"trivial","disposition":"done","blob":"f167b146362596954fa2d3a11db186183c9f0556","on_branch":"db37076db34099681f9ab3a296beb6abd77eb8a9"}
 {"id":"wk-905ae846cc","title":"go-cmp is a dependency","process":"trivial","disposition":"done","blob":"681631be2a61ca07b667a4bbf086c6e5b4025b1b","on_branch":"0708c99cd8a890ef89c9f674b9867dcde8a04a39"}
