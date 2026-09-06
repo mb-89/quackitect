@@ -136,5 +136,34 @@ say("a card in util/cage numbers its discussion (" + numbered + ")", numbered > 
   "no card carries two numbered sections, so the half above passed by having "
   + "nothing to ask rather than by the cards being in order");
 
+// AND EVERY ACTIONABLE IT LISTS HAS A SECTION DISCUSSING IT.
+//
+// A session is told to follow the numbered lines. Where one has no section, it
+// gets the line and none of the case a person built out of the sessions that
+// went wrong, and it is the line it will shave first.
+//
+// THE HALF ABOVE CANNOT SEE THIS. wk-954d674f30 asked only that the discussion
+// ascend, so a number listed and never discussed was nobody's to catch, and two
+// of cloud-runner.md's ten sat that way.
+//
+// THE LIST IS READ FROM THE ACTIONABLES HEADING ONLY, because a numbered line
+// anywhere else in a card is prose rather than a point to discuss.
+for (const file of cards) {
+  const text = read(join("util", "cage", file));
+  const block = /^##\s+Actionables\s*$([\s\S]*?)(?=^##\s|\Z)/m.exec(text);
+  const discussed = new Set([...text.matchAll(/^###\s+(\d+)\./gm)].map((m) => Number(m[1])));
+  if (block === null || discussed.size === 0) {
+    continue;
+  }
+  const listed = [...new Set([...block[1].matchAll(/^(\d+)\.\s+\S/gm)].map((m) => Number(m[1])))];
+  const quiet = listed.filter((n) => !discussed.has(n));
+  say("util/cage/" + file + " discusses every actionable it lists (" + listed.length + ")",
+    listed.length > 0 && quiet.length === 0,
+    listed.length === 0
+      ? "its Actionables heading lists no numbered line, so this counted nothing"
+      : "these are listed and nothing discusses them: " + quiet.join(", ")
+        + ", so a session follows a line with none of the case behind it");
+}
+
 console.log("\n" + bad + " failed.");
 process.exit(bad ? 1 : 0);

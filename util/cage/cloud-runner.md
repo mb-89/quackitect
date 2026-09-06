@@ -17,7 +17,7 @@ Nothing you write survives except what you push.
 5. Measure this box before you explain it. `./RUNME.sh --diagnose` writes the measurement. *
 6. Put a diagnosis in your answer whole, as it was written. *
 7. Never pipe into the engine. The flags `--command` and `--edits` carry the payload. *
-8. Push what you want kept. A finding that stays on this box dies with it. *
+8. Commit and push each time you finish a thing. Unpushed work dies with this box. *
 9. Answer the person in the chat. `se_answer` is the record's copy, and they do not read the record. *
 10. Turn your notes into tracked tokens. A note is private, and private does not leave this box. *
 
@@ -64,6 +64,15 @@ The source you read may not be the program that ran, and on a cold clone it usua
 On a tree with nothing built, `node util/cage/diagnose.mjs` is the same call.
 Where your reading and the diagnosis disagree, the diagnosis stands and you say both.
 
+### 6. A diagnosis is quoted, not summarised
+
+The measurement is long and the temptation is to say what it means instead.
+Two sessions did that, and both times the line that mattered was the one they cut.
+One reported that the lane was down and left out the build clock the diagnosis printed, which said the lane was younger than the source.
+The reader chased a dead lane for an attempt, and the fault was an old build.
+A summary keeps what the writer already understood, which is the half nobody needed.
+So the diagnosis goes in whole, as it was written, and your reading goes beside it.
+
 ### 7. The doors that need no lane
 
 The write gate refuses the harness's own Write, Edit and Bash, and lets the engine through.
@@ -76,6 +85,20 @@ These are the same calls a lane makes, and they work with nothing built:
 
 A pipe takes a command out of the gate's exception, so a piped engine call is refused.
 Each verb has a flag that carries what a pipe used to.
+
+### 8. Nothing here survives you
+
+This container is reclaimed when the session ends, and what is not pushed goes with it.
+That is not a warning about the end of the session. It is a warning about every minute of it.
+A session that works for two hours and pushes at the end loses two hours to one crash, one timeout, or one reclaim.
+MEASURED: six archived notes name an object no clone can read, because each was closed on a box that never pushed the tag.
+The work was done, the record says so, and the note is gone.
+So the unit is the finished thing, not the session: a token closed, a check written, a finding minted, a section like this one.
+
+Commit it, push it, then take up the next thing.
+A push costs seconds and it is the only thing that makes work real.
+Name the paths you edited, because the index is shared and a bare commit carries whatever another hand staged.
+Where the push is refused because the branch moved, merge and push again rather than leaving it.
 
 ### 9. The chat is where they read you
 
