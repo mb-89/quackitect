@@ -3,8 +3,10 @@ package main
 import (
 	"fmt"
 	"strings"
+	"sync"
 	"time"
 
+	"quackitect/engine/internal/sessionlog"
 	"quackitect/filter"
 )
 
@@ -30,6 +32,14 @@ import (
 // see. So a broken filter is the same as no filter, and the box beside it is
 // where a person sees what they typed.
 //
+// AND IT SAYS SO, BECAUSE ON A CLOUD BOX THERE IS NO BOX. That is the machine
+// this feature exists for: nobody is typing and nobody sees what was typed. A
+// person who gets a word wrong hands the whole backlog to a box they meant to
+// hand one bucket, and the two readings are identical from outside, because
+// work comes out either way. So the expression that would not read goes into
+// the record. It is reported and not enforced: refusing it would be the
+// starvation this rule was written to avoid.
+//
 // AN EXPRESSION THAT PARSES AND MATCHES NOTHING HANDS OUT NOTHING. That is the
 // point: the bucket is done, and what comes next is the agent's own notes.
 
@@ -38,18 +48,47 @@ import (
 func theQueueFilter(r Roots) filter.Filter {
 	v, err := LoadValues(r)
 	if err != nil {
+		sayTheFilterIsLost(r, "the parameters will not read, so the queue filter is unknown "+
+			"and the queue is narrowed by nothing", map[string]any{"reason": err.Error()})
 		return filter.Filter{}
 	}
 	said, _ := v.Value["work.queue_filter"].(string)
 	if strings.TrimSpace(said) == "" {
+		theFilterReads(r)
 		return filter.Filter{}
 	}
 	f, err := filter.ParseFilter(said)
 	if err != nil {
+		sayTheFilterIsLost(r, "the queue filter will not read, so the queue is narrowed by "+
+			"nothing: "+said, map[string]any{"filter": said, "reason": err.Error()})
 		return filter.Filter{}
 	}
+	theFilterReads(r)
 	return f
 }
+
+// theFilterAlreadySaid remembers, per work root, the last thing said about a
+// filter that would not read.
+//
+// ONCE PER EXPRESSION, BECAUSE THIS IS READ ON EVERY PULL. Every count and
+// every panel refresh reads it too, so a line per read would bury the one line
+// it is written for under thousands of copies of itself. What changes is the
+// expression, so that is what is remembered, and a person who mistypes a second
+// filter hears about the second one.
+//
+// AND A FILTER THAT READS FORGETS IT, so the same mistake made again after it
+// was fixed is said again rather than swallowed as already known.
+var theFilterAlreadySaid sync.Map
+
+func sayTheFilterIsLost(r Roots, said string, data map[string]any) {
+	if was, seen := theFilterAlreadySaid.Load(r.Work); seen && was == said {
+		return
+	}
+	theFilterAlreadySaid.Store(r.Work, said)
+	inSession(r, "filter", "engine", said, sessionlog.No(), data)
+}
+
+func theFilterReads(r Roots) { theFilterAlreadySaid.Delete(r.Work) }
 
 // aTokenRow is a token read the way the filter reads a row. The names are the
 // ones a person sees on the work surface, so what filters the editor filters
