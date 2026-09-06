@@ -322,3 +322,4 @@
 {"id":"wk-36b8ea59dc","title":"the sweep fails soft","process":"standard","disposition":"done","blob":"997e3d52950d435f4cc05457ba73c0cd72592216","on_branch":"21a6e65c3c4624e0c1455be52cc6eecf09b2e6de"}
 {"id":"wk-b64dd5360a","title":"dead yaml version twins","process":"trivial","disposition":"done","blob":"0c8d80d8261e9a3ee0e02838f97a2729d4c9f4c6","on_branch":"42f523510e57d0b0eff022f2b2d37fe7173d9414"}
 {"id":"wk-e318448216","title":"schema denies the claim","process":"trivial","disposition":"done","blob":"97f8a765146bda6641974619e5e134b2f27c423d"}
+{"id":"wk-d7629cc9af","title":"head tests half landed","process":"trivial","disposition":"done","blob":"5d5f5c29d3bbdbce79f72e81834e50700d5805e7","on_branch":"b4b625f37ff5a90d70caa5176775bf513b43d638"}
