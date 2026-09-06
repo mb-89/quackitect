@@ -40,7 +40,7 @@ Stop agents merging in the shared tree at all. Pushing already has a door that i
 
 ## done when
 
-- the guidance an agent reads before pushing names the cherry-pick door and forbids a merge in the shared tree, decided by reading that guidance
+- rule 12 of doc/guidance/behaviour.md, commit by name, also forbids a merge in the shared tree and names the cherry-pick door, decided by reading it. Mind its word bound, which the owner was trimming under wk-54936ec0f0
 - no helper in the scratchpad runs git merge over the shared tree, decided by a search for that command there
 - the branch is walked for other commits whose content matches neither parent, and what is found is named here
 
