@@ -71,6 +71,43 @@ async function reached(url) {
   }
 }
 
+// theProxy answers the agent proxy this box runs, and whether HTTPS_PROXY names
+// it.
+//
+// A RESTART MOVES THE PORT AND LEAVES THE VARIABLE BEHIND. Outbound HTTPS on a
+// cloud box goes through an agent proxy on a local port, and a resumed session
+// carries the port the old container used. Every git call then answers Failed
+// to connect, and the engine reports that as its own trouble on every claim.
+// Measured here: the variable said 33243 and nothing answered, while
+// /root/.ccr/README.md named 37347, which answered at once. See wk-19c445440b.
+//
+// THE STATUS ENDPOINT IS WHAT DECIDES ONE. A port that accepts a connection is
+// not the proxy, and the README names ports in prose that may be stale too.
+async function theProxy() {
+  const answers = async (url) => {
+    if (!url) return false;
+    try {
+      const res = await fetch(url.replace(/\/$/, "") + "/__agentproxy/status",
+        { signal: AbortSignal.timeout(3000) });
+      return res.ok;
+    } catch {
+      return false;
+    }
+  };
+  const named = process.env.HTTPS_PROXY ?? process.env.https_proxy ?? "";
+  if (await answers(named)) return { named, live: named };
+  let readme = "";
+  try {
+    readme = readFileSync("/root/.ccr/README.md", "utf8");
+  } catch {
+    return { named, live: "" }; // no agent proxy is documented on this box
+  }
+  for (const m of readme.matchAll(/http:\/\/127\.0\.0\.1:\d+/g)) {
+    if (await answers(m[0])) return { named, live: m[0] };
+  }
+  return { named, live: "" };
+}
+
 const stamp = new Date().toISOString();
 out("# Diagnosis of this box");
 out();
@@ -248,6 +285,16 @@ for (const url of ["https://proxy.golang.org/", "https://go.dev/dl/", "https://z
   "https://github.com/", "https://registry.npmjs.org/"]) {
   out("- " + url + ": " + await reached(url));
 }
+// THE PROXY IS SAID ONLY WHEN IT IS WRONG. A box whose HTTPS_PROXY answers has
+// nothing to report, and a row saying so on every run is noise in a diagnosis
+// read when something is already broken.
+const proxy = await theProxy();
+const proxyWrong = proxy.live !== "" && proxy.live !== proxy.named;
+if (proxyWrong) {
+  out("- HTTPS_PROXY names " + (proxy.named || "nothing") + ", and no agent proxy answers there");
+  out("- the agent proxy is at " + proxy.live + ", so every call through the variable fails to connect");
+}
+
 {
   const probe = ran("cc", ["--version"]);
   out("- this machine's own cc: " + (probe.ok ? first(probe.text)
@@ -262,6 +309,9 @@ out("- built programs: " + (!built ? "none, so nothing here has been built"
 out("- engine: " + (engineUp ? "running and answering" : "not answering"));
 out("- lane log: " + (existsSync(join(work, ".se", "lane.out")) ? "above, and its last line is where the stub got to" : "none"));
 if (mcpText.includes("{{")) out("- DEFECT: .mcp.json carries a placeholder, and no lane can start from it");
+if (proxyWrong) {
+  out("- DEFECT: HTTPS_PROXY names a port nothing listens on, so no push or fetch leaves this box");
+}
 
 const text = lines.join("\n") + "\n";
 const dir = join(work, ".se", "scratchpad");

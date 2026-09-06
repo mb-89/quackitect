@@ -116,6 +116,7 @@
 {"id":"wk-525461ec19","title":"empty hands draw nothing","process":"trivial","disposition":"done","blob":"40d3ce53ede898b2599bdec2df17550d1e343e79","on_branch":"5c5a8853416ae72ebfe0c516df5788e8c3b0965a"}
 {"id":"wk-526ac833fb","title":"test lessons into testing","process":"standard","disposition":"","on_branch":"3a5fe758cf98b34b57257d62da621e64203455f8"}
 {"id":"wk-5477e00b39","title":"stop claim compares directly","process":"trivial","disposition":"done","blob":"2460eb2b3b4629fac7194785909fc90d3206510b","on_branch":"fedc7cf9ca7c235aa22fa3d3fee6ce8292e0d062"}
+{"id":"wk-54936ec0f0","title":"guidance over bounds again","process":"trivial","disposition":"done","blob":"4ba3cb0031dec489444cd88e11bf70b98d5e1d90","on_branch":"8fa8a57fd8ce606a58d2f70b489e8d8ad9d15e47"}
 {"id":"wk-54dd15a1dc","title":"archive list keeps tags","process":"trivial","disposition":"done","blob":"de38b5be7ff82c9a34707cfd198ece6fbf6eaff1","on_branch":"63c4cf9911e77a653bec83d1d4ed263aebacb2d4"}
 {"id":"wk-54e1e7dad7","title":"done keeps worker claim","process":"trivial","disposition":"done","blob":"18033e5c9f398d3cf425804db2e2d298f45a572e","on_branch":"ac98a223192b792ae834fe71033617c02416499c"}
 {"id":"wk-5605920ea3","title":"commit will not compile","process":"trivial","disposition":"became","blob":"3496d2992c84364ab306769a909eeb635ae14514","on_branch":"9651b16a91e1b302246622bf54a5de1a26d64ff5"}
@@ -200,7 +201,6 @@
 {"id":"wk-88f5e77313","title":"gate argues in place","process":"trivial","disposition":"done","blob":"bfc9b4a6ac820edfd80d05a184dfdca58fd91397","on_branch":"0de8f86d5eb910ba09a1f1844160968241c4de86"}
 {"id":"wk-894fb72f52","title":"panel classes have rules","process":"trivial","disposition":"done","blob":"03da13d9d90e49dd63e94e11e48bb25b26c12f71","on_branch":"fb099a5a6f37a2070f560d39e1930693efc1ef36"}
 {"id":"wk-89847112fe","title":"delta misses bad object","process":"trivial","disposition":"done","blob":"00df3171eb8fcef007c1f937cc2a0c72d9112161","on_branch":"9d4773da419e65fcf7df1ccc3084ce15a784299d"}
-{"id":"wk-89847112fe","title":"delta misses bad object","process":"trivial","disposition":"done","blob":"00df3171eb8fcef007c1f937cc2a0c72d9112161","on_branch":"9d4773da419e65fcf7df1ccc3084ce15a784299d"}
 {"id":"wk-899d2dbc6c","title":"record names the harness","process":"trivial","disposition":"done","blob":"728ad43dc0fdaeb3bca67db3b84b56dc993a7448","on_branch":"0c1fe41cc3176b284d3d94e6423cc943e17cd4ef"}
 {"id":"wk-89c10296e6","title":"the engine holds holders","process":"trivial","disposition":"done","blob":"a9cfcca3ddf380e312cae14243f536ae272a0466","on_branch":"7666344ea3c150aad44af432ff498b6d0a5e25d2"}
 {"id":"wk-8ab502ee9d","title":"unmeasured is drawn silent","process":"trivial","disposition":"became","blob":"050a4cf11f4161cf7adfd3ca751d6ae5c8582a01","on_branch":"a7b4577452172b46de591dccf6dd711c9c84cfa2"}
@@ -216,11 +216,9 @@
 {"id":"wk-918812a5e6","title":"orphan test breaks build","process":"trivial","disposition":"done","blob":"e3d1c8517aaa5fdbb287d70f5a2f9ff19ede5b00","on_branch":"36bfd79ba5947a3833df98b61d2661b1e5744ebf","tag":"refs/tags/archive/wk-918812a5e6"}
 {"id":"wk-92e9b13a45","title":"the harness has tools","process":"trivial","disposition":"done","blob":"8fb7ed313c4555bc0603b18286536cef28f15cbe","on_branch":"8fb7ed313c4555bc0603b18286536cef28f15cbe","tag":"refs/tags/archive/wk-92e9b13a45"}
 {"id":"wk-935453023f","title":"loop refusal overreaches","process":"trivial","disposition":"done","blob":"84af95749be366df147de93f441fb7118162634f","on_branch":"84af95749be366df147de93f441fb7118162634f","tag":"refs/tags/archive/wk-935453023f"}
-{"id":"wk-935453023f","title":"loop refusal overreaches","process":"trivial","disposition":"done","blob":"c8b24d02004ef87d6ce8fef2061639edb820e52d","on_branch":"5db961624ee84a2df1e14b634a406aadc99b7088"}
 {"id":"wk-954d674f30","title":"cloud card section misordered","process":"trivial","disposition":"done","blob":"cf653f09cda0c967401ef41a0e3ea3c28f47ed6f","on_branch":"15afb4e0fb72152ee51e5114077136196bb97782"}
 {"id":"wk-9753f669de","title":"engine note repeats itself","process":"trivial","disposition":"done","blob":"601aa8ddfa3a2a00f344e57225450c53e5d5015f","on_branch":"a8d8760c098206989c1d02a66657019b244bf85b"}
 {"id":"wk-977319bccb","title":"table names no method","process":"trivial","disposition":"dropped","blob":"b29e3941d3290d97fde366c2b2781cf5ae22c570","on_branch":"b29e3941d3290d97fde366c2b2781cf5ae22c570"}
-{"id":"wk-977319bccb","title":"table names no method","process":"trivial","disposition":"dropped","blob":"b29e3941d3290d97fde366c2b2781cf5ae22c570","on_branch":"b927a6b5905628ba8bff20935420efb25aa931a9"}
 {"id":"wk-979c779751","title":"session says guard live","process":"trivial","disposition":"dropped","blob":"c36b41e76ce3a786cf1b7c521f8567608bc5fa7c","on_branch":"c36b41e76ce3a786cf1b7c521f8567608bc5fa7c","tag":"refs/tags/archive/wk-979c779751"}
 {"id":"wk-97a144fdc6","title":"staffing counts ghosts","process":"standard","disposition":"done","blob":"28c1fdb2932632a34a52ff812fa5d1ecdc9f9a66","on_branch":"36aac42a409b53a5e9c1f5c00037b50054bc1c9e","tag":"refs/tags/archive/wk-97a144fdc6"}
 {"id":"wk-97b792ee13","title":"note says approach twice","process":"trivial","disposition":"done","blob":"48e3e8178f9071b166c240c828e305c35740372d","on_branch":"48e3e8178f9071b166c240c828e305c35740372d","tag":"refs/tags/archive/wk-97b792ee13"}
@@ -228,10 +226,8 @@
 {"id":"wk-97ec0d1542","title":"relay needs the engine","process":"trivial","disposition":"done","blob":"fcc55ba88d27229737ff1618ac866c75466aaef1","on_branch":"c5b093083b0ff664f8a8ef0f96e86984ff48d905"}
 {"id":"wk-97f1251d43","title":"proposed action optional","process":"trivial","disposition":"done","blob":"1ddb166c6ab6fc8d69b4c92c6e1bfc6c3b02020d","on_branch":"1ddb166c6ab6fc8d69b4c92c6e1bfc6c3b02020d","tag":"refs/tags/archive/wk-97f1251d43"}
 {"id":"wk-98739fa19c","title":"publish keeps earlier claims","process":"trivial","disposition":"done","blob":"ccbfc96557fba805922d84578d5aa1f5699d16f9","on_branch":"d356140f08baa4f46d9e33ed1f4fce6e880e0378"}
-{"id":"wk-98739fa19c","title":"publish keeps earlier claims","process":"trivial","disposition":"done","blob":"ccbfc96557fba805922d84578d5aa1f5699d16f9","on_branch":"d356140f08baa4f46d9e33ed1f4fce6e880e0378"}
 {"id":"wk-9875cf128f","title":"context count reads path","process":"trivial","disposition":"done","blob":"794c00e9a7e513bb7ee10a02f6bcd57d3b3d9c4d","on_branch":"cd6234b31a2614084c34f87c6a45baeb3a000b9a"}
 {"id":"wk-98c9dcc9df","title":"session end keeps holds","process":"trivial","disposition":"done","blob":"b316e684fe4e73dca482bb80b29111c4d86a2754","on_branch":"d7829d391b395be571b5593688599a96c061ce03"}
-{"id":"wk-98c9dcc9df","title":"session end keeps holds","process":"trivial","disposition":"done","blob":"94893151c41ae660cb4aed3911fde0b124128181","on_branch":"94893151c41ae660cb4aed3911fde0b124128181","tag":"refs/tags/archive/wk-98c9dcc9df"}
 {"id":"wk-98df32b772","title":"cold read waits","process":"trivial","disposition":"done","blob":"99bf207787565457f81d97eacc6c5deafbe255ca","on_branch":"14c6ca2d61e485912a8ed08f3310f21cba9bf5f1"}
 {"id":"wk-990c0214b6","title":"abort loses its reason","process":"trivial","disposition":"done","blob":"f47bf34bb4b480c2352e48779e2c18001ce06f94","on_branch":"f47bf34bb4b480c2352e48779e2c18001ce06f94","tag":"refs/tags/archive/wk-990c0214b6"}
 {"id":"wk-9935549f19","title":"Apply skips schema caps","process":"trivial","disposition":"done","blob":"b6292bbfceb936854ce5c3748feccb4269849159","on_branch":"b6292bbfceb936854ce5c3748feccb4269849159","tag":"refs/tags/archive/wk-9935549f19"}
@@ -253,6 +249,7 @@
 {"id":"wk-a4c80456c2","title":"a machine proves sound","process":"","disposition":"","on_branch":"b4db8068a390195c68e02c13c53642b06eec8c37"}
 {"id":"wk-a5fd348bde","title":"grace is unlocked","process":"trivial","disposition":"done","blob":"a323bfc09876e728e9c250c5e70153a744b128d7","on_branch":"a323bfc09876e728e9c250c5e70153a744b128d7","tag":"refs/tags/archive/wk-a5fd348bde"}
 {"id":"wk-a6394cf05e","title":"ideation mode placeholder","process":"trivial","disposition":"done","blob":"7afcd82408576adfdf1b1d7166d69106f12c23f4","on_branch":"e45e3fc516f584dc554b4da7133f38c892ec09fa"}
+{"id":"wk-a82935e32b","title":"activity counts as working","process":"trivial","disposition":"dropped","blob":"522ad1e873f24692ecdd5b653f78f538e7b8d5c9","on_branch":"95bf73c111427c525a450be8da73b330c2b9a107"}
 {"id":"wk-a8a9ceb587","title":"private writes prove nothing","process":"trivial","disposition":"done","blob":"1333593143064fad4bed5970dba6ea9df6c737cb","on_branch":"d00fda331a807dc660b9d5716bb825ba06362bba"}
 {"id":"wk-aa0e2ea529","title":"restore wiped evidence tables","process":"trivial","disposition":"dropped","blob":"4ce104e45f086d1546a1dd01b3c7dad8835504f3","on_branch":"4ce104e45f086d1546a1dd01b3c7dad8835504f3","tag":"refs/tags/archive/wk-aa0e2ea529"}
 {"id":"wk-aae03d4767","title":"the bar filters rows","process":"","disposition":"","on_branch":"6f811c940dacb3b4e61f05f8f4cd30e74855ae6f"}
@@ -274,7 +271,6 @@
 {"id":"wk-bd6c665ee8","title":"one agent two rows","process":"standard","disposition":"done","blob":"9bb98047cd3a41c58c34e481bd29001712fd9008","on_branch":"9bb98047cd3a41c58c34e481bd29001712fd9008","tag":"refs/tags/archive/wk-bd6c665ee8"}
 {"id":"wk-c0b948b717","title":"menu knows one name","process":"trivial","disposition":"done","blob":"5a517f795e58d22af54e8ed75bf78fed1edec232","on_branch":"5a517f795e58d22af54e8ed75bf78fed1edec232","tag":"refs/tags/archive/wk-c0b948b717"}
 {"id":"wk-c1d58b91d6","title":"stop claim knows names","process":"standard","disposition":"done","blob":"e82971bcf3a9ac8c50004bd3e778c5689ba6f898","on_branch":"4eed914d50eb7d9c8fa1dbf58bd03a632e7e42e8","tag":"refs/tags/archive/wk-c1d58b91d6"}
-{"id":"wk-c2f9d39ea7","title":"long token traps hold","process":"trivial","disposition":"done","blob":"e12105605dc1824a6c57a67a5e10173192d5498c","on_branch":"e12105605dc1824a6c57a67a5e10173192d5498c"}
 {"id":"wk-c2f9d39ea7","title":"long token traps hold","process":"trivial","disposition":"done","blob":"e12105605dc1824a6c57a67a5e10173192d5498c","on_branch":"e12105605dc1824a6c57a67a5e10173192d5498c"}
 {"id":"wk-c698d46866","title":"claims fetch forces nothing","process":"standard","disposition":"done","blob":"a0e73d8a43bf2f6fe23ec48bdc00e12580e2da30","on_branch":"8db4d8ff036044160f68598103bce495c50b9b28","tag":"refs/tags/archive/wk-c698d46866"}
 {"id":"wk-c77fbdcaf3","title":"lock reason speaks code","process":"trivial","disposition":"done","blob":"a1a573a4b00b4bd63b8fc469b47fab2ae88f553e","on_branch":"7ea577f9e7c573ca45f9b4b95c70d722f26cab36"}
