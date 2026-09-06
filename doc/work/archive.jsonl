@@ -53,6 +53,7 @@
 {"id":"wk-2493bf564a","title":"battery selection flake","process":"trivial","disposition":"done","blob":"efcbc572b02228e9a852a552ea3a7ff555b70600","on_branch":"efcbc572b02228e9a852a552ea3a7ff555b70600"}
 {"id":"wk-2507074715","title":"nothing runs race detector","process":"trivial","disposition":"done","blob":"43db2c14ed28d61cbfe686385411123eef543520","on_branch":"209b7a7d21c936ea76420465bfc6eb301aa41ec0"}
 {"id":"wk-258d63d350","title":"check reads untracked leftovers","process":"trivial","disposition":"done","blob":"11d322c69d08cb8400edfd1acb02c0341ba619f9","on_branch":"84ff54a640d0c284b7a8d47b44a4e4e94408eabd"}
+{"id":"wk-259aa1500b","title":"guard misses inline roots","process":"trivial","disposition":"became","blob":"b91fc2680bf3408fa8fdf97f2fc5fd5b0d240f38","on_branch":"b91fc2680bf3408fa8fdf97f2fc5fd5b0d240f38"}
 {"id":"wk-2755b2a235","title":"the light goes red","process":"trivial","disposition":"done","blob":"582a737cc3eaad1d30493cb5ccfd0db167ed8f58","on_branch":"582a737cc3eaad1d30493cb5ccfd0db167ed8f58","tag":"refs/tags/archive/wk-2755b2a235"}
 {"id":"wk-295e2ac556","title":"failed archive fails close","process":"trivial","disposition":"done","blob":"e6bf784af5081999e0af07bb4204075bb1505d21","on_branch":"e6bf784af5081999e0af07bb4204075bb1505d21","tag":"refs/tags/archive/wk-295e2ac556"}
 {"id":"wk-2ab8c4708a","title":"shell writes leave delta","process":"trivial","disposition":"done","blob":"a1f952e89f65b669188c1a888bd756d3a2575839","on_branch":"d41acbdcb6839a3d67dc190b08d06cf3c60aab2e","tag":"refs/tags/archive/wk-2ab8c4708a"}
