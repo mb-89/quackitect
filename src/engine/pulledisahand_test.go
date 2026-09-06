@@ -111,7 +111,7 @@ func TestAPulledAgentIsAHand(t *testing.T) {
 			}
 			// AND THE GUARD READS THE SAME NUMBER. Its ask is satisfiable
 			// only where as many hands as the limit allows lift it.
-			why, refused := AStaffShortfall(r, cfg, "main", "mcp__quackitect__se_pull", "")
+			why, refused := AStaffShortfall(r, cfg, "main", "mcp__quackitect__se_pull", "", "", "")
 			if refused != c.refused {
 				t.Fatalf("%s: the guard refused=%v with %d of %d hand(s) here: %s",
 					c.says, refused, s.WorkersHere, s.WorkersWanted, why)

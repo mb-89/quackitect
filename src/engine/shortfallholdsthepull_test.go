@@ -25,13 +25,13 @@ func TestAShortfallHoldsThePullAndNothingElse(t *testing.T) {
 	for i := 0; i < 4; i++ {
 		mintStandard(t, r, "queue work")
 	}
-	if _, refuse := AStaffShortfall(r, cfg, "main", "mcp__quackitect__se_pull", ""); !refuse {
+	if _, refuse := AStaffShortfall(r, cfg, "main", "mcp__quackitect__se_pull", "", "", ""); !refuse {
 		t.Fatal("no shortfall is standing, so nothing here is about the guard")
 	}
 
 	// THE PULL IS HELD. It is the one thing that takes from the queue.
 	for _, tool := range []string{"mcp__quackitect__se_pull", "se_pull"} {
-		if why, refuse := AStaffShortfall(r, cfg, "main", tool, ""); !refuse {
+		if why, refuse := AStaffShortfall(r, cfg, "main", tool, "", "", ""); !refuse {
 			t.Errorf("%s went through, so the main agent can take queue work with hands missing", tool)
 		} else if why == "" {
 			t.Errorf("%s was refused with nothing said", tool)
@@ -45,7 +45,7 @@ func TestAShortfallHoldsThePullAndNothingElse(t *testing.T) {
 		"mcp__quackitect__se_apply", "mcp__quackitect__se_run", "mcp__quackitect__se_test",
 		"se_apply", "se_run", "se_test",
 	} {
-		if _, refuse := AStaffShortfall(r, cfg, "main", tool, ""); refuse {
+		if _, refuse := AStaffShortfall(r, cfg, "main", tool, "", "", ""); refuse {
 			t.Errorf("%s was held, so a person cannot talk to a bound agent without it spawning first", tool)
 		}
 	}
@@ -61,7 +61,7 @@ func TestOnlyAShellPullIsHeld(t *testing.T) {
 		mintStandard(t, r, "queue work")
 	}
 
-	if _, refuse := AStaffShortfall(r, cfg, "main", "Bash", "./RUNME.sh pull --actor a --role worker"); !refuse {
+	if _, refuse := AStaffShortfall(r, cfg, "main", "Bash", "./RUNME.sh pull --actor a --role worker", "", ""); !refuse {
 		t.Error("a shell pull went through, so the shell is a way round the guard")
 	}
 	for _, command := range []string{
@@ -71,7 +71,7 @@ func TestOnlyAShellPullIsHeld(t *testing.T) {
 		"./RUNME.sh stop --because asked --why \"they said so\"",
 		"./RUNME.sh apply --on wk-1 --file x",
 	} {
-		if _, refuse := AStaffShortfall(r, cfg, "main", "Bash", command); refuse {
+		if _, refuse := AStaffShortfall(r, cfg, "main", "Bash", command, "", ""); refuse {
 			t.Errorf("a shell call was held: %s", command)
 		}
 	}
@@ -85,7 +85,7 @@ func TestOnlyTheMainAgentIsAskedForHands(t *testing.T) {
 	for i := 0; i < 4; i++ {
 		mintStandard(t, r, "queue work")
 	}
-	if _, refuse := AStaffShortfall(r, cfg, "worker-ada", "mcp__quackitect__se_pull", ""); refuse {
+	if _, refuse := AStaffShortfall(r, cfg, "worker-ada", "mcp__quackitect__se_pull", "", "", ""); refuse {
 		t.Error("a spawned hand was refused its pull, which is the escape the refusal names")
 	}
 }

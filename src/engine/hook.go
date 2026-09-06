@@ -89,6 +89,11 @@ type toolInput struct {
 	// Actor is the name a lane call acts as: se_pull, se_run and the rest
 	// carry it as a field where a shell command carries it as --actor.
 	Actor string `json:"actor"`
+	// ID and Disposition are what a submit carries. se_pull naming a token and
+	// how it ended is handing work in rather than asking for more, and the
+	// staffing guard reads both to tell the two apart.
+	ID          string `json:"id"`
+	Disposition string `json:"disposition"`
 	// NewSource is what a NotebookEdit puts in a cell, which is a write too.
 	NewSource string `json:"new_source"`
 	// Edits is a MultiEdit's manifest, and every member of it writes.
@@ -868,7 +873,7 @@ func decidePreToolUse(g *guard, roots Roots, cfg Config, emergency Emergency, lo
 	// UNBOUND TAKES THE QUEUE OFF. A person working on one specific thing is
 	// not short-handed, and being told to spawn five workers for a backlog they
 	// are deliberately ignoring is the engine arguing with them.
-	if why, refuse := AStaffShortfall(roots, cfg, actor, in.ToolName, ti.Command); refuse && !Unleashed(roots) {
+	if why, refuse := AStaffShortfall(roots, cfg, actor, in.ToolName, ti.Command, ti.ID, ti.Disposition); refuse && !Unleashed(roots) {
 		record(log, "engine", "staffing", actor, "refused: the queue wants more hands than are here", sessionlog.No(),
 			map[string]any{"tool": in.ToolName})
 		g.deny(why)

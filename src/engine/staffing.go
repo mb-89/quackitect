@@ -224,8 +224,24 @@ var heldDuringShortfall = map[string]bool{
 
 // AStaffShortfall answers whether this call by the main agent is refused
 // until the hands the queue wants have pulled, and says how to spawn them.
-func AStaffShortfall(r Roots, cfg Config, actor, tool, command string) (string, bool) {
+func AStaffShortfall(r Roots, cfg Config, actor, tool, command, id, disposition string) (string, bool) {
 	if actor != "main" || !heldDuringShortfall[tool] {
+		return "", false
+	}
+	// HANDING WORK IN IS NOT ASKING FOR MORE. A submit is an se_pull call, and
+	// the guard read only the tool name, so it refused both. An agent that had
+	// finished its work could not record it.
+	//
+	// MEASURED, September 2026. A token was finished, green and written up, and
+	// its submit answered THE QUEUE WANTS MORE HANDS with 144 tokens open and
+	// one worker here. On a cloud box that is worse than a delay: the agent is
+	// told to spawn two hands so that it may file work it has already done, and
+	// a box that cannot spawn loses the work when it is reclaimed.
+	//
+	// A SUBMIT NAMES A TOKEN AND HOW IT ENDED. Half of one is not a submit:
+	// letting a bare id or a bare disposition through would be a way round the
+	// guard rather than a narrowing of it.
+	if id != "" && disposition != "" {
 		return "", false
 	}
 	// A SHELL CALL IS HELD ONLY WHEN IT IS THE PULL ITSELF. On a box with no
@@ -233,6 +249,12 @@ func AStaffShortfall(r Roots, cfg Config, actor, tool, command string) (string, 
 	// guard has any business stopping. Every other Bash call goes through,
 	// including the spawn and the stop the refusal below tells the agent to make.
 	if tool == "Bash" && !(runsTheEngine(command) && aPull(command)) {
+		return "", false
+	}
+	// AND THE SHELL DOOR READS THE SAME RULE, because a box with no lane files
+	// its work there and holding that one would move the deadlock rather than
+	// end it.
+	if tool == "Bash" && aSubmitAtTheShell(command) {
 		return "", false
 	}
 	// A PERSON WHO PUT THE WORK DOWN IS NOT ASKED FOR MORE HANDS.
@@ -280,6 +302,31 @@ func engineWork(command string) bool {
 		}
 	}
 	return false
+}
+
+// aSubmitAtTheShell answers whether a shell pull hands work in rather than
+// asking for more.
+//
+// THE REAL DOOR IS --from. A submission is one JSON object, and a box with no
+// lane hands it over in a file: se pull --actor main --from .se/scratchpad/x.json.
+// Every submit this engine's own sessions make goes that way.
+//
+// THE FLAG PAIR IS READ TOO, because the lane's fields are id and disposition
+// and a shell caller may spell them out rather than write a file.
+func aSubmitAtTheShell(command string) bool {
+	separators, _ := theQuotings(command)
+	names, ended := false, false
+	for _, w := range strings.Fields(separators) {
+		switch {
+		case w == "--from" || strings.HasPrefix(w, "--from="):
+			return true
+		case w == "--id" || w == "--on" || strings.HasPrefix(w, "--id=") || strings.HasPrefix(w, "--on="):
+			names = true
+		case w == "--disposition" || strings.HasPrefix(w, "--disposition="):
+			ended = true
+		}
+	}
+	return names && ended
 }
 
 // aPull answers whether an engine command is the pull. That is the one verb a

@@ -45,7 +45,7 @@ func TestAHandThatWentHomeIsNotAHand(t *testing.T) {
 	if s := StaffingOf(r, cfg); s.WorkersHere != 3 {
 		t.Fatalf("the session and two helpers are %d hands: %+v", s.WorkersHere, s)
 	}
-	if why, refuse := AStaffShortfall(r, cfg, "main", "mcp__quackitect__se_apply", ""); refuse {
+	if why, refuse := AStaffShortfall(r, cfg, "main", "mcp__quackitect__se_apply", "", "", ""); refuse {
 		t.Fatalf("the hands are here and the guard still refuses: %s", why)
 	}
 
@@ -65,7 +65,7 @@ func TestAHandThatWentHomeIsNotAHand(t *testing.T) {
 	}
 
 	// SO THE GUARD ASKS FOR THEM AGAIN, and says how many.
-	why, refuse := AStaffShortfall(r, cfg, "main", "mcp__quackitect__se_pull", "")
+	why, refuse := AStaffShortfall(r, cfg, "main", "mcp__quackitect__se_pull", "", "", "")
 	if !refuse {
 		t.Fatalf("six tokens are open with one hand here, and nothing was refused: %+v", s)
 	}

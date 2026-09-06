@@ -119,7 +119,11 @@ func TestTheStaffingDemandIsQuietWhileFinishing(t *testing.T) {
 	cfg := LoadConfig(r)
 
 	// WITH NO HOLD IT ASKS FOR HANDS, so the quiet below is about the hold.
-	if _, held := AStaffShortfall(r, cfg, "main", "mcp__quackitect__se_run", "go test"); !held {
+	//
+	// THE TOOL IS THE PULL, which is the one heldDuringShortfall names. It was
+	// se_run here, from before that list was narrowed, so the guard answered
+	// not-held whatever the hold said and this line could not redden.
+	if _, held := AStaffShortfall(r, cfg, "main", "mcp__quackitect__se_pull", "", "", ""); !held {
 		t.Fatal("this proves nothing: the guard asks for no hands with a full queue and none here")
 	}
 
@@ -127,7 +131,7 @@ func TestTheStaffingDemandIsQuietWhileFinishing(t *testing.T) {
 		if _, err := SetHold(r, state, "the owner"); err != nil {
 			t.Fatal(err)
 		}
-		if said, held := AStaffShortfall(r, cfg, "main", "mcp__quackitect__se_run", "go test"); held {
+		if said, held := AStaffShortfall(r, cfg, "main", "mcp__quackitect__se_pull", "", "", ""); held {
 			t.Errorf("the guard asks for hands while %s: %s", state, said)
 		}
 	}
