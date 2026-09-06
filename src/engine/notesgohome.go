@@ -77,6 +77,23 @@ func NotesGoWithTheBox(r Roots) (string, bool) {
 		return "", false
 	}
 	notes := NotesInHand(r)
+	// A NOTE NOBODY HOLDS IS OUT OF REACH WHILE A PERSON IS FINISHING UP, so
+	// asking for it is asking for what the engine forbids. The pull hands out
+	// nothing at all then, notes included, and a take-up of a token this actor
+	// does not already hold is refused at the gate. Between the two, a cloud box
+	// could neither drain nor stop, and the stop stayed refused for ever.
+	//
+	// ONE SOMEBODY HOLDS IS STILL ASKED FOR, because that hand can work it and
+	// close it, which is what finishing tells it to do. The gate is narrowed to
+	// what is reachable rather than taken off.
+	//
+	// THE DRAIN RIDES ON AN EMPTY QUEUE, not on finishing, so the notes still
+	// have their moment: a box that runs out of work is handed them one by one.
+	// The staffing demand goes quiet under finishing for this same reason, that
+	// a demand nothing can satisfy is a session with no legal move.
+	if LoadHold(r).Finishing() {
+		notes = theNotesAHandCanStillClose(notes)
+	}
 	if len(notes) == 0 {
 		return "", false
 	}
@@ -90,6 +107,19 @@ func NotesGoWithTheBox(r Roots) (string, bool) {
 		"yours, mint the token with your best attempt and set needs_human on it, " +
 		"which puts it where a person looks.\n")
 	return b.String(), true
+}
+
+// theNotesAHandCanStillClose keeps the notes somebody here is holding. Those
+// are the ones a stop can honestly be refused for, because their holder can
+// still submit them.
+func theNotesAHandCanStillClose(notes []Token) []Token {
+	var out []Token
+	for _, one := range notes {
+		if one.Holder != "" {
+			out = append(out, one)
+		}
+	}
+	return out
 }
 
 // TooManyNotes answers why this call is held until the notes are tokens, and
