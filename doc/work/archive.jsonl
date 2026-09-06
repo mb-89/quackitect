@@ -367,3 +367,4 @@
 {"id":"wk-b008bfaa16","title":"hook server ignores context","process":"trivial","disposition":"done","blob":"e4dd126098d0ab6070f9a0267aff7ed215e214e1","on_branch":"2b73916c6adfbcff9ff53382e4ce21c69211f33c"}
 {"id":"wk-9d3e05a4bc","title":"blocking work goes first","process":"standard","disposition":"done","blob":"9cfae71e3558ea86d277944887aa3db98f809bb2","on_branch":"28df33393f451a12d4199a41b4112eb4dec0bcda"}
 {"id":"wk-abed8c4980","title":"restore wiped evidence kest","process":"trivial","disposition":"dropped","blob":"5bc00407a3a230d983b2793048dc2b6a5819725f","on_branch":"51e13efe3357979c6f23a0a091c3490ab175749b"}
+{"id":"wk-e8d13100cc","title":"gone hands loop pulls","process":"trivial","disposition":"done","blob":"2b66d3badb7505238d88dcb8324d90f32b1377ab"}
