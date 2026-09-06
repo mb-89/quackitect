@@ -72,6 +72,22 @@ func runAnswer(c *call) int {
 	if err := ThePersonWasAnswered(c.roots); err != nil {
 		return c.fail(err)
 	}
+	// AND ON A CLOUD BOX THE RECORD IS NOT WHERE THEY READ IT.
+	//
+	// THE OWNER'S RULING: answer me in the chat, or I do not see it. A desk has
+	// a person beside it and a panel that draws the record, so "recorded" is the
+	// whole story there. Nobody sits beside a cloud box, and the chat is the only
+	// surface it has. So the same word is true and misleading at once, and this
+	// says the half it left out.
+	//
+	// THE CARD ALREADY SAYS IT. A card is read once, at session start, and this
+	// is needed at the moment the verb is used. Where the box is comes off the
+	// one host table, so nothing here keeps a second list of variables.
+	if TheHost(c.roots.Method).Cloud {
+		fmt.Fprintln(c.out, "recorded. Nobody reads the record on a cloud box, "+
+			"so say this answer in the chat as well, whole.")
+		return 0
+	}
 	fmt.Fprintln(c.out, "recorded")
 	return 0
 }
