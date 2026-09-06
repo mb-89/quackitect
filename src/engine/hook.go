@@ -1412,9 +1412,6 @@ func decideStop(g *guard, roots Roots, cfg Config, log *sessionlog.Log, in hookI
 	// THE PERSON'S OWN CONTROLS ARE NOT THIS. The hold and the ask are theirs
 	// rather than the engine's, and they are enforced above that other check for
 	// exactly that reason. The stop hook is the engine's own rule, so it goes.
-	//
-	// UNBOUND IS UNTOUCHED. It keeps the claim, and only the queue stops being a
-	// reason to refuse a stop.
 	if NoGuardsAtAll(roots) {
 		record(log, "agent", "stop", actor, "stopped: god is on, and the engine argues with nobody",
 			sessionlog.Yes(), map[string]any{"at": string(God)})
@@ -1455,18 +1452,11 @@ func decideStop(g *guard, roots Roots, cfg Config, log *sessionlog.Log, in hookI
 				return
 			}
 		}
-		// THE ARGUMENT NEEDS SOMETHING TO ARGUE WITH, and that is work still in
-		// the agent's hands. A good reason with nothing blocking is granted on the
-		// claim that names it, which is the whole of the rule for an agent with
-		// empty hands.
+		// A CLAIM THAT NAMES A SANCTIONED REASON IS THE STOP. Nothing weighs it
+		// against what is in the agent's hands, and nothing asks twice.
 		//
-		// ARGUING WITH EVERY CLAIM was the mistake. It made the count the rule and
-		// the state of the tree irrelevant, so an agent holding nothing was refused
-		// twice with nothing to say back to it. Persistence is the price of leaving
-		// work behind, not the price of stopping.
-		//
-		// THE PERSON'S WORD IS NOT ARGUED WITH. asked is granted on the claim
-		// that names it, whatever is in the agent's hands.
+		// THE PERSON'S WORD LEAST OF ALL. asked is granted on the claim that names
+		// it, whatever is in the agent's hands.
 		//
 		// THE OWNER'S WORDS: if the user tells you that you stop, I don't give a
 		// shit about your sub tokens. You stop.

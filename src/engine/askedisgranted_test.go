@@ -18,9 +18,10 @@ import (
 // clears the claim, so the count went back to one and the argument never ended.
 // The person watched eleven turns of it.
 //
-// THE ARGUMENT TESTS THE AGENT'S JUDGEMENT, NOT THEIRS. blocked, broken,
+// THE ARGUMENT TESTED THE AGENT'S JUDGEMENT, NOT THEIRS. blocked, broken,
 // decision and plan are the agent's own reading of the tree, and holding work
-// is something to push back with. asked is a fact about what the person said.
+// was something to push back with. asked is a fact about what the person said,
+// which is why it was carved out before the argument went altogether.
 func TestAskedIsGrantedOnTheFirstClaim(t *testing.T) {
 	r := aTreeWithTheProcesses(t)
 	log, err := sessionlog.Open(r.Private("log"))
