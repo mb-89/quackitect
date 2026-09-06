@@ -70,6 +70,14 @@ func TestATokensProseNamesNoHolder(t *testing.T) {
 		"what the holder is doing, not who it is":   "TestARefusedTakeBackKeepsTheLookAndNamesTheGuard drives all six refusing paths as subtests. The first three: the token will not load, it has already ended, nobody is holding it. The last three: the walker holds it itself, it changed hands since the look, and the holder is pulling again. Each asserts the look is still recorded afterwards. Against the stub it failed on every one with the look now reads empty. After the change it is ok in 0.57s.",
 		"any token, not this one":                   "A token is held under the name its holder pulls with, never under the harness name. gate.go:334 says so, and the holds file on this box files one under a worker name while the actors file maps main to it. So the one holder the sweep means to protect is the one holder it never recognises.",
 		"where the holder ends up, not who it is":   "se_apply does not enforce the schema's size caps, and every other door does. So a write through apply can leave a token the engine will not load, and the holder is then locked out of the engine entirely.",
+
+		// AND TWO THAT STOOD AFTER THE THIRD NARROWING, both of them the word
+		// unheld used of tokens in general rather than of one. A plural, and a
+		// singular under each, name no token and no session, so neither goes
+		// stale when the session rolls. They are the lines of wk-24cdeae29b,
+		// whole, because what makes a line prose is the sentence around it.
+		"a plural, and it reaches a title": "title: unheld tokens want approaches",
+		"one of many, named under each":    "Read each unheld token the check names, and write an approach onto it",
 	}
 	cleanIDs := map[string]string{}
 	for what, detail := range clean {
@@ -94,6 +102,47 @@ func TestATokensProseNamesNoHolder(t *testing.T) {
 		}
 		if !strings.Contains(says, "a hold ends with the session, so the record goes stale") {
 			t.Errorf("the finding does not say why a holder cannot be written down: %s", says)
+		}
+	}
+}
+
+// THE WORK ROOT ANSWERS TOO, AND NOT ONLY A TABLE OF PARAPHRASES.
+//
+// A paraphrase is not the note. One of the lines above passed as a paraphrase
+// while the note it came from still drew a finding, because what makes a line
+// prose is the sentence around it. So the rule is decided a second time over
+// the work root the product carries, with nothing rewritten.
+//
+// The two lines were written onto wk-24cdeae29b, which is archived now, and
+// they are quoted since. Either way no hold finding may name them, and none
+// may name that token.
+func TestTheWorkRootReadsNoHoldInGenericProse(t *testing.T) {
+	t.Parallel()
+	const came = "wk-24cdeae29b"
+	generic := []string{
+		"unheld tokens want approaches",
+		"Read each unheld token the check names, and write an approach onto it",
+	}
+	all := LintTokens(Roots{Method: "../..", Work: "../.."})
+	// A LINT THAT READ NOTHING ANSWERS CLEAN, and this would pass on it. The
+	// work root carries hundreds of tokens, so an empty answer is the reader
+	// broken rather than the tree clean.
+	if len(all) == 0 {
+		t.Fatal("the lint read the work root and found nothing at all, so this decides nothing")
+	}
+	for _, f := range all {
+		if !strings.Contains(f.Says, "a hold ends with the session") {
+			continue
+		}
+		if f.ID == came {
+			t.Errorf("%s is read as claiming a hold: %s", came, f.Says)
+			continue
+		}
+		for _, line := range generic {
+			if strings.Contains(f.Says, line) {
+				t.Errorf("%s: a sentence about tokens in general is read as a claim on one: %s",
+					f.ID, f.Says)
+			}
 		}
 	}
 }

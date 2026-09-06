@@ -403,6 +403,13 @@ func claimsAHold(low, says string, at int, checks map[string]bool) bool {
 	// it only counts as English: a letter or an underscore against it makes it
 	// part of something else, like the unheld loop in next().
 	rest := low[at+len(says):]
+	next := strings.Fields(rest)
+	word := func(i int) string {
+		if i >= len(next) {
+			return ""
+		}
+		return strings.Trim(next[i], ".,:;\"'`)")
+	}
 	if says == "unheld" {
 		before := byte(' ')
 		if at > 0 {
@@ -411,19 +418,22 @@ func claimsAHold(low, says string, at int, checks map[string]bool) bool {
 		if isWordByte(before) || (len(rest) > 0 && isWordByte(rest[0])) {
 			return false // part of a longer word, so not this word at all
 		}
+		// A GENERIC SUBJECT IS TOKENS AT LARGE RATHER THAN THIS ONE. "read
+		// each unheld token the check names" says what the work is, and it
+		// names no token and no session, so nothing in it goes stale.
+		if unheldNamesTokensAtLarge(low[:at]) {
+			return false
+		}
 		// IT IS A CLAIM ONLY WHEN SOMETHING IS SAID TO BE UNHELD. As an
 		// adjective it names code, and the unheld loop in next() is the line
 		// that made this rule worth narrowing.
 		return strings.HasSuffix(low[:at], "is ") || strings.HasSuffix(low[:at], "was ") ||
 			strings.HasSuffix(low[:at], "are ") || strings.HasSuffix(low[:at], "were ") ||
-			strings.HasPrefix(strings.TrimSpace(rest), "token")
-	}
-	next := strings.Fields(rest)
-	word := func(i int) string {
-		if i >= len(next) {
-			return ""
-		}
-		return strings.Trim(next[i], ".,:;\"'`)")
+			// AND THE NOUN IT SITS ON HAS TO BE ONE TOKEN. This half was
+			// written for "the unheld token is yours to take", and it read a
+			// plural the same way, so "unheld tokens want approaches" — a
+			// title, which is a token's name — was reported as a claim.
+			word(0) == "token"
 	}
 
 	// "the holder is" ALREADY NAMES THE HOLDER, so whatever follows is the who.
@@ -474,6 +484,41 @@ func claimsAHold(low, says string, at int, checks map[string]bool) bool {
 	// "held by agents that are gone" are sentences about how the engine behaves,
 	// and they were the bulk of what this rule reported.
 	return namesSomebody(word(0), checks)
+}
+
+// unheldNamesTokensAtLarge answers whether what stands before "unheld" is
+// tokens in general rather than the token the note sits on.
+//
+// THIS IS THE THIRD SHAPE THE RULE READ AS A CLAIM, and it is the same defect
+// the other two were: a sentence about the rule read as a claim about the token
+// it happens to sit on. "Read each unheld token the check names" and "every
+// token is unheld" name no token and no session, so neither goes stale when the
+// session rolls, and the note says exactly what it means.
+//
+// THE DETERMINER IS WHAT DECIDES IT, and it does not always stand next to the
+// word. "every token is unheld" says what "every unheld token" says with the
+// noun and its verb in between, so both are read past to reach it.
+func unheldNamesTokensAtLarge(before string) bool {
+	words := strings.Fields(before)
+	trim := func(w string) string { return strings.Trim(w, ".,:;\"'`(") }
+	for len(words) > 0 {
+		switch trim(words[len(words)-1]) {
+		case "is", "was", "are", "were", "token", "tokens":
+			words = words[:len(words)-1]
+			continue
+		}
+		break
+	}
+	if len(words) == 0 {
+		return false
+	}
+	// "the token is unheld" IS STILL THE CLAIM THAT GOES STALE, so a definite
+	// subject is left where it was and only these four take a line back out.
+	switch trim(words[len(words)-1]) {
+	case "each", "every", "any", "no":
+		return true
+	}
+	return false
 }
 
 // theTokenIsTheSubject answers whether what stands before "is held" is this
