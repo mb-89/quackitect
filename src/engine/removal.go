@@ -232,6 +232,11 @@ func underWork(work, p string) string {
 
 // readBy answers a question about this actor's read set: has it read this path
 // this turn. Both halves of the rule ask it, so it is made once here.
+//
+// THE READ SET HAS TWO WRITERS. The harness notes a Read call, and the engine
+// notes a file a command printed through se_run. A box whose harness Bash is
+// gated has only the second, and for a while this guard could not see it. See
+// enginereads.go.
 func readBy(r Roots, actor, work string) func(string) bool {
 	reads := LoadEvidence(r).Reads
 	return func(p string) bool {

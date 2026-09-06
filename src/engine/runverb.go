@@ -154,6 +154,15 @@ func runRun(c *call) int {
 		return 1
 	}
 	got.On = *on
+	// A FILE THIS COMMAND PRINTED IS A FILE THIS ACTOR LOOKED AT. The delete
+	// guard read the harness's evidence alone, so a cat through this door left
+	// no trace and the next rm was refused. See enginereads.go.
+	//
+	// IT IS NOTED AFTER THE RUN AND ONLY ON A CLEAN EXIT. A cat that could not
+	// open the file printed nothing, and nobody looked at anything.
+	if got.Exit == 0 {
+		AReadThroughTheEngine(roots, orElse(*by, "main"), said, roots.Work)
+	}
 	inSession(roots, "call", orElse(*by, "main"), *on+" ran "+firstLine(got.Command), sessionlog.Yes(),
 		map[string]any{"id": *on, "exit": got.Exit})
 	c.answerJSON(got)
