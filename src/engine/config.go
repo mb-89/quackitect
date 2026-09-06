@@ -8,6 +8,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"quackitect/engine/internal/keyword"
 )
 
 // ONE TREE.
@@ -115,6 +117,13 @@ type Node struct {
 	// is the same defect the comment above this block warns about.
 	Gesture        int    `json:"gesture,omitempty"`
 	GestureCommand string `json:"gestureCommand,omitempty"`
+
+	// REACHABLE FROM A CONSOLE, where there is no panel to press.
+	//
+	// The flag is the only thing anybody writes: the engine owns the word
+	// that reaches this node, and it is the node's own name. Some controls
+	// make no sense away from a desk, and those carry no flag.
+	Console bool `json:"console,omitempty"`
 }
 
 func (n Node) holdsValue() bool {
@@ -600,4 +609,45 @@ func (e Emergency) Describe() string {
 		return ""
 	}
 	return fmt.Sprintf("emergency mode, armed by %s, until %s", e.By, e.Until.Format(time.RFC3339))
+}
+
+// Reachable is every control a console can reach, in tree order. Why only a
+// bool, and why the word is the name, is [[keyword]].
+func Reachable(methodRoot string) []keyword.Of {
+	root, err := LoadTree(methodRoot)
+	if err != nil {
+		return nil
+	}
+	var out []keyword.Of
+	Walk(root, "", func(path string, n Node) {
+		if n.Console && n.Type == "bool" {
+			out = append(out, keyword.Of{Word: keyword.For(n.Name), Key: strings.TrimPrefix(path, root.Name+"."), Says: n.Help})
+		}
+	})
+	return out
+}
+
+// KeywordSaid moves the control a person named, and answers the word it
+// matched. Its callers are the two routes the harness feeds, so an agent
+// cannot forge one. A move the floor refuses is recorded with its reason.
+func KeywordSaid(r Roots, log *Log, actor, said string) string {
+	k, ok := keyword.Match(said, Reachable(r.Method))
+	if !ok {
+		return ""
+	}
+	v, err := LoadValues(r)
+	if err != nil {
+		return ""
+	}
+	was, _ := toBool(v.Value[k.Key])
+	got, err := SetValue(r, k.Key, !was)
+	data := map[string]any{"keyword": k.Word, "parameter": k.Key, "value": got}
+	if err != nil {
+		data["refused"] = err.Error()
+		record(log, "engine", "keyword", actor, err.Error(), No(), data)
+		return k.Word
+	}
+	now, _ := toBool(got)
+	record(log, "engine", "keyword", actor, k.Word+" is now "+keyword.OnOrOff(now), Yes(), data)
+	return k.Word
 }

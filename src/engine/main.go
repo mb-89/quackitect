@@ -10,6 +10,7 @@ import (
 	"os/signal"
 	"path/filepath"
 	"quackitect/engine/internal/replaced"
+	saidbefore "quackitect/engine/internal/said"
 	"quackitect/engine/internal/version"
 	"strings"
 	"sync"
@@ -276,7 +277,7 @@ func main() {
 		// ONE PROMPT, ONE RECORD. The engine copies the same messages off the
 		// transcript, so this refuses a repeat rather than asking the caller to
 		// check. Then always record is a rule with no condition on it.
-		if AlreadySaid(roots, *said) {
+		if saidbefore.Already(SessionLog(roots), *said) {
 			fmt.Println("already recorded")
 			return
 		}

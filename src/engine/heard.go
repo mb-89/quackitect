@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"os"
 	"strings"
+
+	saidbefore "quackitect/engine/internal/said"
 )
 
 // THE ENGINE COPIES WHAT THE PERSON SAID, RATHER THAN ASKING THE AGENT TO.
@@ -150,7 +152,7 @@ func CopyWhatWasHeard(r Roots, transcript string, log *Log, actor string) int {
 		// these words than the record does, and a person who said the same
 		// thing twice said it twice.
 		if _, asked := have[said]; !asked {
-			have[said] = SaidCount(r, said)
+			have[said] = saidbefore.Count(SessionLog(r), said)
 		}
 		if have[said] > 0 {
 			have[said]--
@@ -174,6 +176,10 @@ func CopyWhatWasHeard(r Roots, transcript string, log *Log, actor string) int {
 		// The person is talking to the walker and the walker is the one that
 		// can act on what they said.
 		_ = TheyAsked(r, Walker, said) // the guard answers whether or not it can note the question
+		// A PERSON WITH NO PANEL REACHES A CONTROL BY WRITING ITS KEYWORD.
+		// It sits here rather than in the agent, so the text comes from the
+		// harness and an agent cannot forge one.
+		KeywordSaid(r, log, Walker, said)
 		copied++
 	}
 	// The offset is kept even when nothing was copied, so the next pass does

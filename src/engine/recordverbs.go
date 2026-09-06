@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+
+	saidbefore "quackitect/engine/internal/said"
 )
 
 // THE RECORD VERBS. What the person said, what was answered, and what the
@@ -32,7 +34,7 @@ func runSaid(c *call) int {
 	// ONE PROMPT, ONE RECORD. The engine copies the same messages off the
 	// transcript, so this refuses a repeat rather than asking the caller to
 	// check.
-	if AlreadySaid(c.roots, *text) {
+	if saidbefore.Already(SessionLog(c.roots), *text) {
 		fmt.Fprintln(c.out, "already recorded")
 		return 0
 	}

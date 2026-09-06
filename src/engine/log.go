@@ -9,6 +9,9 @@ import (
 	"time"
 )
 
+// SessionLog is the file the record is being written to.
+func SessionLog(r Roots) string { return filepath.Join(r.Private("log"), Current) }
+
 // The engine writes the record. Nothing else does. A viewer reads the file,
 // and the file is the whole interface between them.
 //

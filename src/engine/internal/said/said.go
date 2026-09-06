@@ -1,13 +1,5 @@
-package main
-
-import (
-	"bufio"
-	"encoding/json"
-	"os"
-	"path/filepath"
-	"strings"
-)
-
+// Package said answers what a person has already said, out of the record.
+//
 // ONE PROMPT, ONE RECORD, WHOEVER WRITES IT.
 //
 // Two things copy what a person said: the engine, reading the transcript on
@@ -23,9 +15,19 @@ import (
 // A REPEAT IS THE SAME WORDS SINCE THE LAST ANSWER. The same sentence said
 // twice, with an answer between, is two things a person said and both belong in
 // the record.
-func AlreadySaid(r Roots, said string) bool { return SaidCount(r, said) > 0 }
+package said
 
-// SaidCount answers how many records since the last answer carry these words.
+import (
+	"bufio"
+	"encoding/json"
+	"os"
+	"strings"
+)
+
+// Already answers whether these words are in the record since the last answer.
+func Already(logFile, said string) bool { return Count(logFile, said) > 0 }
+
+// Count answers how many records since the last answer carry these words.
 //
 // A COUNT AND NOT A PRESENCE. Reconciling by presence swallowed a message the
 // person really sent: two identical messages with no answer between them, which
@@ -33,8 +35,8 @@ func AlreadySaid(r Roots, said string) bool { return SaidCount(r, said) > 0 }
 // the words when the source holds more of them than the record does, so two
 // messages make two records and a message the agent already wrote is still not
 // written twice.
-func SaidCount(r Roots, said string) int {
-	f, err := os.Open(filepath.Join(r.Private("log"), Current))
+func Count(logFile, said string) int {
+	f, err := os.Open(logFile)
 	if err != nil {
 		return 0
 	}

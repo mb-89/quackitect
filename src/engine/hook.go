@@ -594,6 +594,8 @@ func answerHook(ctx context.Context, raw []byte, args []string, out io.Writer, h
 		// A PROMPT GOING IN FLIPS THE FLAG, here for a prompt that starts a
 		// turn and in the said verb for one written into a running turn.
 		_ = TheyAsked(roots, actor, in.Prompt+in.UserPrompt) // the guard answers whether or not it can note the question
+		// A PERSON WITH NO PANEL REACHES A CONTROL BY WRITING ITS KEYWORD.
+		KeywordSaid(roots, log, actor, in.Prompt+in.UserPrompt)
 	case "SessionStart":
 		// A session that resumes after a compaction starts with nothing read.
 		if in.Source == "compact" || in.Source == "clear" {
