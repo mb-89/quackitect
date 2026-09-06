@@ -261,6 +261,15 @@ func TestTheQueueIsStaffed(t *testing.T) {
 	if cfg.ParallelAgents != 3 {
 		t.Fatalf("the tree says three parallel agents and the config reads %d", cfg.ParallelAgents)
 	}
+	// AND IT IS THE TREE'S NUMBER RATHER THAN THE METHOD'S OWN.
+	//
+	// Three is also what the method declares, so every count below reads the
+	// same whether the store worked or not. Taking the store out left the whole
+	// test green, which is the defect this test was fixed for reading as sound.
+	// Where the value came from is the one answer the default cannot fake.
+	if from := cfg.From["limits.parallel_agents"]; from != "the project" {
+		t.Fatalf("the number came from %q and not from the tree this test wrote", from)
+	}
 
 	// FOUR OPEN TOKENS WANT THREE WORKERS, because there is work for all three.
 	for i := 0; i < 4; i++ {

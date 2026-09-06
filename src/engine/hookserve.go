@@ -109,13 +109,23 @@ func listenHooks(r Roots) (net.Listener, error) {
 	return net.Listen("tcp", fmt.Sprintf("127.0.0.1:%d", hooksPort(r)))
 }
 
-// serveHooks answers events until the listener closes.
+// serveHooks answers events until its context is cancelled.
 //
 // ONE EVENT AT A TIME. The guard keeps its state in files under the private
 // folder with a lock beside each, and the record is one file, so events are
 // serialised here rather than raced. A decision takes milliseconds, and the
 // harness sends few at once.
 func serveHooks(ctx context.Context, ln net.Listener, r Roots, log *sessionlog.Log) {
+	// THE CONTEXT IS WHAT STOPS IT, and the signature said so while nothing
+	// acted on it. The listener was closed from main instead, so a caller that
+	// ended the context alone left this server accepting. serveModel had the
+	// same confusion removed, and these are the same three lines.
+	//
+	// SERVE IS WHAT THE LOOP WAITS ON, so a cancel that only set a flag would
+	// be felt when the next event arrived and not before. Closing the listener
+	// is what a cancel has to do to be felt at all.
+	stop := context.AfterFunc(ctx, func() { _ = ln.Close() })
+	defer stop()
 	var one sync.Mutex
 	srv := &http.Server{
 		ReadHeaderTimeout: 2 * time.Second,
@@ -153,7 +163,7 @@ func serveHooks(ctx context.Context, ln net.Listener, r Roots, log *sessionlog.L
 			_, _ = w.Write(out.Bytes()) // a client that went away gets nothing, and the record has the decision
 		}),
 	}
-	_ = srv.Serve(ln) // ends when the listener closes, which is the daemon stopping
+	_ = srv.Serve(ln) // ends when the listener closes, which the cancel above does
 }
 
 // THE LOAD, COUNTED WHERE IT QUEUES.
