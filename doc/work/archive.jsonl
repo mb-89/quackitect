@@ -135,10 +135,15 @@
 {"id":"wk-918812a5e6","title":"orphan test breaks build","process":"trivial","disposition":"done","blob":"e3d1c8517aaa5fdbb287d70f5a2f9ff19ede5b00","on_branch":"36bfd79ba5947a3833df98b61d2661b1e5744ebf","tag":"refs/tags/archive/wk-918812a5e6"}
 {"id":"wk-935453023f","title":"loop refusal overreaches","process":"trivial","disposition":"done","blob":"c8b24d02004ef87d6ce8fef2061639edb820e52d","on_branch":"5db961624ee84a2df1e14b634a406aadc99b7088"}
 {"id":"wk-954d674f30","title":"cloud card section misordered","process":"trivial","disposition":"done","blob":"cf653f09cda0c967401ef41a0e3ea3c28f47ed6f","on_branch":"15afb4e0fb72152ee51e5114077136196bb97782"}
+{"id":"wk-9753f669de","title":"engine note repeats itself","process":"trivial","disposition":"done","blob":"601aa8ddfa3a2a00f344e57225450c53e5d5015f","on_branch":"a8d8760c098206989c1d02a66657019b244bf85b"}
 {"id":"wk-977319bccb","title":"table names no method","process":"trivial","disposition":"dropped","blob":"b29e3941d3290d97fde366c2b2781cf5ae22c570","on_branch":"b927a6b5905628ba8bff20935420efb25aa931a9"}
 {"id":"wk-97a144fdc6","title":"staffing counts ghosts","process":"standard","disposition":"done","blob":"28c1fdb2932632a34a52ff812fa5d1ecdc9f9a66","on_branch":"36aac42a409b53a5e9c1f5c00037b50054bc1c9e","tag":"refs/tags/archive/wk-97a144fdc6"}
 {"id":"wk-97e8bd9f38","title":"hook path takes context","process":"trivial","disposition":"done","blob":"8df9de74aa5f6869399f14a721d718ce0bd423e4","tag":"refs/tags/archive/wk-97e8bd9f38"}
 {"id":"wk-97ec0d1542","title":"relay needs the engine","process":"trivial","disposition":"done","blob":"fcc55ba88d27229737ff1618ac866c75466aaef1","on_branch":"c5b093083b0ff664f8a8ef0f96e86984ff48d905"}
+{"id":"wk-98739fa19c","title":"publish keeps earlier claims","process":"trivial","disposition":"done","blob":"ccbfc96557fba805922d84578d5aa1f5699d16f9","on_branch":"d356140f08baa4f46d9e33ed1f4fce6e880e0378"}
+{"id":"wk-98c9dcc9df","title":"session end keeps holds","process":"trivial","disposition":"done","blob":"b316e684fe4e73dca482bb80b29111c4d86a2754","on_branch":"d7829d391b395be571b5593688599a96c061ce03"}
+{"id":"wk-98df32b772","title":"cold read waits","process":"trivial","disposition":"done","blob":"99bf207787565457f81d97eacc6c5deafbe255ca","on_branch":"14c6ca2d61e485912a8ed08f3310f21cba9bf5f1"}
+{"id":"wk-99a064bae7","title":"claim gate reddens ghosts","process":"trivial","disposition":"done","blob":"554bc80449d1bb6221a8b5658efb5321c2faa6df","on_branch":"5e44d7ed60059b4d023a0e098bb02735bf68d0e8"}
 {"id":"wk-9cf8a57b51","title":"unregistered stop untested","process":"trivial","disposition":"done","blob":"d21ceb238c62bb4cb087d508b32687b1e873753b","on_branch":"803c14240d6953c8e39536181737d9325d1e40e3"}
 {"id":"wk-a463727d87","title":"undo forgets after text","process":"trivial","disposition":"done","blob":"d4ca77ecadbd232e53a53c4351d3ba28fb76df39","on_branch":"47421858c46d3b2686ac25c24a16dd1c6ae7f30f"}
 {"id":"wk-a46c014566","title":"Trial claims relay","process":"standard","disposition":"done","blob":"2e37fbb1946e7c747acad2595c00cd7745ced815","on_branch":"d1b27b3e05a8ec054cb86da680e71dc71e467018"}
