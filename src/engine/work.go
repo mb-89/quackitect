@@ -36,6 +36,8 @@ func runWork(c *call) int {
 		"false: born in .se/work, for what you do yourself next. A note takes neither")
 	detail := fs.String("detail", "", "what is asked, or what is wrong")
 	action := fs.String("proposed-action", "", "what you think should happen about it")
+	approach := fs.String("approach", "", "the shape the work will take, written before the work: "+
+		"an interface, or a shape a reader can disagree with")
 	var doneWhen manyFlag
 	fs.Var(&doneWhen, "done-when", "one done-when criterion. Repeat the flag for more")
 	dependsOn := fs.String("depends-on", "", "ids that must close first, comma separated")
@@ -122,7 +124,7 @@ func runWork(c *call) int {
 			return 1
 		}
 	} else {
-		t = Token{Title: *title, Detail: *detail, ProposedAction: *action,
+		t = Token{Title: *title, Detail: *detail, ProposedAction: *action, Approach: *approach,
 			Process: *process, DependsOn: splitComma(*dependsOn), Parent: *parent, NeedsHuman: *needsHuman}
 		// UNSAID IS A THIRD ANSWER, so the flag is a string. A bool flag has
 		// two values and the mint has to tell them from the question nobody

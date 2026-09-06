@@ -235,6 +235,7 @@ type workArgs struct {
 	Process        string   `json:"process"`
 	Tracked        *bool    `json:"tracked"`
 	ProposedAction string   `json:"proposed_action"`
+	Approach       string   `json:"approach" says:"the shape the work will take, written before the work. A process that requires one refuses a mint without it"`
 	DoneWhen       []string `json:"done_when"`
 	DependsOn      []string `json:"depends_on"`
 	Parent         string   `json:"parent"`
@@ -399,7 +400,8 @@ func workArgv(a workArgs) []string {
 	// look the same every time.
 	for _, pair := range [][2]string{
 		{"--detail", a.Detail}, {"--process", a.Process},
-		{"--proposed-action", a.ProposedAction}, {"--parent", a.Parent},
+		{"--proposed-action", a.ProposedAction}, {"--approach", a.Approach},
+		{"--parent", a.Parent},
 	} {
 		if pair[1] != "" {
 			argv = append(argv, pair[0], pair[1])

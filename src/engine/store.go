@@ -184,6 +184,7 @@ func tokenFromFront(f frontmatter.Front) Token {
 const (
 	headDetail   = "## detail"
 	headProposed = "## proposed action"
+	headApproach = "## approach"
 	headEvidence = "## evidence: "
 	headCriteria = "## done when"
 )
@@ -195,6 +196,12 @@ func (t Token) body() string {
 	}
 	if t.ProposedAction != "" {
 		b.WriteString(headProposed + nl + nl + t.ProposedAction + nl + nl)
+	}
+	// THE SHAPE COMES BEFORE WHAT DONE MEANS, which is the order the schema
+	// declares and the order a reader wants: what is asked, what is proposed,
+	// the shape it will take, then how it is decided.
+	if t.Approach != "" {
+		b.WriteString(headApproach + nl + nl + t.Approach + nl + nl)
 	}
 	// What done means, in the note a person reads and edits.
 	if len(t.Criteria) > 0 {
@@ -474,6 +481,8 @@ func (t Token) chaptersFor(sec SectionSpec) []bodyChapter {
 		return []bodyChapter{{Header: "detail", Body: t.Detail}}
 	case "proposed action":
 		return []bodyChapter{{Header: "proposed action", Body: t.ProposedAction}}
+	case "approach":
+		return []bodyChapter{{Header: "approach", Body: t.approach()}}
 	}
 	// Every other declared chapter is kept as it was written, so it is weighed
 	// as it was written.
@@ -483,6 +492,26 @@ func (t Token) chaptersFor(sec SectionSpec) []bodyChapter {
 		}
 	}
 	return nil
+}
+
+// approach answers the shape the work will take, whoever wrote it in.
+//
+// TWO DOORS WROTE IT AND ONE NAME READS IT. A caller building a token in
+// memory sets the field. A caller that read the chapter off a file before this
+// field existed, or built one by hand, carries it among the kept sections, and
+// the fixtures in this suite do. A gate reading only the field would refuse a
+// token that carries an approach, and a bound measured off only the field
+// would weigh an empty string while the words sat in a kept chapter.
+func (t Token) approach() string {
+	if strings.TrimSpace(t.Approach) != "" {
+		return t.Approach
+	}
+	for _, k := range t.Kept {
+		if strings.TrimPrefix(k.Head, "## ") == "approach" {
+			return k.Text
+		}
+	}
+	return ""
 }
 
 // sectionSaid names one bounded section the way a refusal names it.
@@ -502,6 +531,7 @@ func (t Token) bounded() map[string]int {
 	out := map[string]int{
 		sectionSaid("detail"):          len(strings.Fields(stripComments(t.Detail))),
 		sectionSaid("proposed action"): len(strings.Fields(stripComments(t.ProposedAction))),
+		sectionSaid("approach"):        len(strings.Fields(stripComments(t.approach()))),
 	}
 	for name, text := range t.Submission {
 		out[sectionSaid("evidence: "+name)] = len(strings.Fields(stripComments(text)))
@@ -547,6 +577,7 @@ func blocksHoldNoHeading(t Token) error {
 	}
 	for _, one := range []struct{ where, value string }{
 		{"Token.Detail", t.Detail}, {"Token.ProposedAction", t.ProposedAction},
+		{"Token.Approach", t.Approach},
 	} {
 		if err := opens(one.where, one.value); err != nil {
 			return err
@@ -584,6 +615,8 @@ func readBody(t *Token, body string) {
 			t.Detail = text
 		case head == headProposed:
 			t.ProposedAction = text
+		case head == headApproach:
+			t.Approach = text
 		case head == headCriteria:
 			t.Criteria = readCriteria(text)
 		case strings.HasPrefix(head, headEvidence):

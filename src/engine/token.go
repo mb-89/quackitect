@@ -130,6 +130,15 @@ type Token struct {
 	// What you think should happen about it, beside what is wrong.
 	ProposedAction string `json:"proposed_action,omitempty"`
 
+	// THE SHAPE THE WORK WILL TAKE, WRITTEN BEFORE THE WORK. An interface, or
+	// a shape a reader can disagree with while disagreeing is still cheap.
+	//
+	// A PROCESS THAT REQUIRES IT REQUIRES IT AT THE MINT, the way a required
+	// done when is. Without a field to carry one there was no way to hand an
+	// approach in, so every standard token was born without the section its
+	// own process declares and its open state promises.
+	Approach string `json:"approach,omitempty"`
+
 	// What work is to be done. There is no work without one.
 	Title string `json:"title"`
 
@@ -445,6 +454,14 @@ func Mint(r Roots, t Token) (Token, error) {
 		holdsName(p.RequiredSection, "done when") && len(t.Criteria) == 0 {
 		return t, fmt.Errorf("the %s process requires done when: give at least one criterion, "+
 			"with --done-when or done_when", t.Process)
+	}
+	// AND SO IS A REQUIRED APPROACH. The process that asks for one says its
+	// open state is written with it, so a token minted without one is open and
+	// already failing the check that reads the declaration.
+	if p, err := LoadProcess(r.Method, t.Process); err == nil &&
+		holdsName(p.RequiredSection, "approach") && strings.TrimSpace(t.approach()) == "" {
+		return t, fmt.Errorf("the %s process requires an approach: say the shape the work will take, "+
+			"with --approach or approach", t.Process)
 	}
 	for _, id := range t.DependsOn {
 		if _, err := LoadToken(r, id); err != nil {

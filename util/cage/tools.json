@@ -209,7 +209,7 @@
       "name": "se_run"
     },
     {
-      "description": "MINT A WORK TOKEN: title (four words at most), detail, done_when, and tracked, which says where it is born. tracked true puts it in doc/work, which git carries, so another agent on another box can claim it. tracked false keeps it in .se/work, for small work you do yourself next. A note takes neither and is always private. Or on: \u003cid\u003e takes that token into your hands. Or abort: \u003cid\u003e with why ends it where it stands, and disposition became names in successors what it became.",
+      "description": "MINT A WORK TOKEN: title (four words at most), detail, done_when, and tracked, which says where it is born. tracked true puts it in doc/work, which git carries, so another agent on another box can claim it. tracked false keeps it in .se/work, for small work you do yourself next. A note takes neither and is always private. Or on: \u003cid\u003e takes that token into your hands, and put_down: \u003cid\u003e sets it back without closing it. Or abort: \u003cid\u003e with why ends it where it stands, and disposition became names in successors what it became.",
       "inputSchema": {
         "properties": {
           "abort": {
@@ -217,6 +217,10 @@
             "type": "string"
           },
           "actor": {
+            "type": "string"
+          },
+          "approach": {
+            "description": "the shape the work will take, written before the work. A process that requires one refuses a mint without it",
             "type": "string"
           },
           "depends_on": {
@@ -252,6 +256,10 @@
             "type": "string"
           },
           "proposed_action": {
+            "type": "string"
+          },
+          "put_down": {
+            "description": "instead of minting: set a token you hold back, by id, without closing it",
             "type": "string"
           },
           "successors": {
