@@ -90,12 +90,43 @@ func runner(word string) bool {
 // with its value attached, -n1 or -I{} or --chdir=x, is one word and needs no
 // entry. A shell's -c is not here: its value is the command, which is what
 // the walk is looking for.
+// searcherFlags are the flags a searcher takes a value for. THE VALUE IS NOT A
+// PATH, and reading one as a path is how rg -A 12 over a file under /tmp was
+// refused as a search of this tree: the 12 was bare and relative, so it counted
+// as inside. See wk-9875cf128f.
+//
+// OVER-EATING IS THE DANGER. A flag listed here that takes no value would
+// swallow the path beside it and let a search of the tree through, so each of
+// these really does take one. rg and grep are handed the same list, because a
+// flag only one of them has is a flag the other is never given.
+var searcherFlags = []string{
+	// what to look for, and where
+	"-e", "--regexp", "-f", "--file", "-g", "--glob", "--iglob",
+	"-t", "--type", "-T", "--type-not", "--type-add", "--type-clear",
+	"--include", "--exclude", "--exclude-dir", "--exclude-from", "--ignore-file",
+	// how much to show
+	"-A", "--after-context", "-B", "--before-context", "-C", "--context",
+	"-m", "--max-count", "-M", "--max-columns", "--max-depth", "--max-filesize",
+	"--context-separator", "--group-separator",
+	"--field-context-separator", "--field-match-separator", "--path-separator",
+	// how to run and how to print
+	"-j", "--threads", "--num-threads", "-r", "--replace", "-E", "--encoding",
+	"--pre", "--pre-glob", "--sort", "--sortr", "--engine", "--binary-files",
+	"--color", "--colour", "--colors", "--label",
+	"-d", "--directories", "-D", "--devices",
+	"--dfa-size-limit", "--regex-size-limit",
+}
+
 var valueFlags = map[string][]string{
 	"sudo":  {"-u", "-g", "-C", "-D", "-h", "-p", "-r", "-t", "-T", "-U", "-R"},
 	"git":   {"-C", "-c", "--git-dir", "--work-tree", "--namespace"},
 	"xargs": {"-I", "-L", "-n", "-P", "-s", "-E", "-d", "-a", "--replace", "--max-lines", "--max-args", "--max-procs", "--max-chars", "--eof", "--delimiter", "--arg-file"},
 	"env":   {"-u", "-C", "-S", "--unset", "--chdir", "--split-string"},
 	"time":  {"-f", "-o", "--format", "--output"},
+
+	"rg": searcherFlags, "grep": searcherFlags, "egrep": searcherFlags,
+	"fgrep": searcherFlags, "findstr": searcherFlags,
+	"ag": searcherFlags, "ack": searcherFlags,
 }
 
 // takesAValue says whether this flag, on this runner, has its value in the
