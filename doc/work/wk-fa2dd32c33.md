@@ -8,12 +8,17 @@ guidance: [[work-token]]
 # the name this token is known by, in references and in links
 title: Close eats the archive
 # where the token stands. The process owns these values.
-status: open
+status: done
+# who did the work step, so the verdict is never theirs
+author: main
 claimed_by: f5927132/main
 claimed_at: "2026-09-06T11:06:33Z"
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - b5e5666279a3625fce91fe8593a4964390fd9439
+# the tree each time the work was put down or closed, snapshots the engine wrote
+ended:
+  - 99b7df491823fa3b864ed16e90fc2e70dd2834b2
 ---
 
 ## detail
@@ -36,12 +41,12 @@ Give the close the guard the sweep already has. A list that is absent is not an 
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | what is gained by doing it, and not only what it does |  |  |
-| [ ] | what breaks if it is never done, and not only that it stays undone |  |  |
-| [ ] | the approach is on the token before any work, as an interface or a shape a reader can disagree with |  |  |
-| [ ] | every done-when line is decidable, and names the command where one decides it |  |  |
-| [ ] | the change is small enough to review whole, or it is split first | — |  |
-| [ ] | the basics it stands on exist, or are minted first | — |  |
+| [x] | what is gained by doing it, and not only what it does | The archive survives a close on a box whose copy of the list is gone. |  |
+| [x] | what breaks if it is never done, and not only that it stays undone | A close writes one row over hundreds, and those rows' notes are already off the disk. |  |
+| [x] | the approach is on the token before any work, as an interface or a shape a reader can disagree with | It names the guard and where it reads the branch's copy. |  |
+| [x] | every done-when line is decidable, and names the command where one decides it | All three by se test naming the two tests in archiveeaten_test.go. |  |
+| [x] | the change is small enough to review whole, or it is split first | One function split in three, one file. |  |
+| [x] | the basics it stands on exist, or are minted first | gitHere and ArchiveList are in archive.go. |  |
 
 ## evidence: step 2. do
 
@@ -49,11 +54,11 @@ Give the close the guard the sweep already has. A list that is absent is not an 
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the guidance this token names was read and applied | — |  |
-| [ ] | the change follows the approach on the token, or the token says why it departed |  |  |
-| [ ] | se test --on this token answered ok, and what it ran is named |  |  |
-| [ ] | the note says what changed and why, for a reader who was not here |  |  |
-| [ ] | the cleanup the change revealed is in the change, or is a token of its own | — |  |
+| [x] | the guidance this token names was read and applied | work-token. Rule 6 put the reproduction first and rule 12 the red. |  |
+| [x] | the change follows the approach on the token, or the token says why it departed | Yes. archiveListRows reads the branch's copy before it answers empty. |  |
+| [x] | se test --on this token answered ok, and what it ran is named | TestACloseDoesNotWriteAnArchiveItDidNotRead, red at one row over three, then green. Two other archive tests green. |  |
+| [x] | the note says what changed and why, for a reader who was not here | The commit message carries it. |  |
+| [x] | the cleanup the change revealed is in the change, or is a token of its own | wk-17f90ad848 names the same shape at keepInGit, where a cloud box's close loses the note. |  |
 
 ## evidence: step 3. verdict
 
@@ -66,4 +71,12 @@ Give the close the guard the sweep already has. A list that is absent is not an 
 | [ ] | every criterion's command was run again, and what it said is named |  |  |
 | [ ] | every hunk improves the product, or a finding names the one that does not |  |  |
 | [ ] | every finding is a trivial token naming this one, and their ids are here |  |  |
+
+## approach
+
+The list travels, so the branch carries it even where the working copy has gone. archiveListRows reads that copy before answering empty.
+
+A tree that never had a list reads nothing there and is empty for real, so a first close still records what it closed.
+
+A copy that will not read is a refusal rather than an empty archive. Answering empty is the whole defect this guards.
 
