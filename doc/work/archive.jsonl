@@ -357,3 +357,5 @@
 {"id":"wk-a70741151a","title":"criteria name untouched files","process":"trivial","disposition":"done","blob":"43b004ef9c0c2b0b3cc22cc25b805606729f6db6","on_branch":"c1a8e84080de0dc0ae2bd3a3112f382087cedc81"}
 {"id":"wk-2cd910750d","title":"token stalls before verdict","process":"trivial","disposition":"done","blob":"b5d09ac10887f2175523c1c16dba4c5d0ad243f5","on_branch":"d46f2ab855437f8d2546216c5b1279c8834340f0"}
 {"id":"wk-96f4fe18f8","title":"guard refuses the door","process":"trivial","disposition":"done","blob":"f4072fb05dd5d2251a29c1cd254fb711f53686b4"}
+{"id":"wk-9f1d1d0a2d","title":"engine answers its calls","process":"standard","disposition":"done","blob":"5e534c8f333df14c91bc3ea820c32f3c9e58e987","on_branch":"0e127f4ff19dab4b86f9243f541c53ebbaa21211"}
+{"id":"wk-ac0442ba84","title":"onetree test reads log","process":"trivial","disposition":"done","blob":"d2fbe52d0eb2629da8b1f50de98e4f14b79900b9","on_branch":"238fd0e4212f170e55a7f2a3398cd5cb4c1ecb89"}
