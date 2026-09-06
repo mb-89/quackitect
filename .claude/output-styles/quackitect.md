@@ -130,3 +130,4 @@ would say so.
 13. Put both halves of a mechanism in the evidence. Where the system mirrors halves, table them and drive the rule through each. *
 14. Report work as done only with the evidence that it is. An observation names the check and what it said. *
 15. A checklist carries institutional knowledge. Answer each line rather than ticking it. *
+16. A bug found while working a bucket is filed into that bucket, and worked at once where it is trivial. *

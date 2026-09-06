@@ -40,6 +40,7 @@ How a test is built is [[testing]].
 13. Put both halves of a mechanism in the evidence. Where the system mirrors halves, table them and drive the rule through each. *
 14. Report work as done only with the evidence that it is. An observation names the check and what it said. *
 15. A checklist carries institutional knowledge. Answer each line rather than ticking it. *
+16. A bug found while working a bucket is filed into that bucket, and worked at once where it is trivial. *
 
 # Discussion
 
@@ -153,3 +154,17 @@ The lines come from the process, which carries what earlier work learned the har
 A line ticked without being read throws that knowledge away and keeps the tick.
 Where a line asks for evidence, the sentence is the answer and the tick counts it.
 Where it asks none, the tick is honest, because there is no artifact to name.
+
+## 16. A bug found in the bucket
+
+The finder already holds what the fix needs: the file, the reading, and why it matters.
+Filed somewhere tidier, the next hand pays for that reading again.
+The bucket a person is draining also loses work that belongs to it.
+A token minted with no bucket is invisible to a narrowed queue, so the finder cannot be handed it back.
+
+THE OWNER'S RULING: put it in the bucket you are working, pull it at once, and fix it first.
+That is preferred over leaving it for a hand that has to rediscover it.
+
+The bound is triviality.
+A fix you can make right away is yours to make.
+A big one is filed with everything you learned, and left.
