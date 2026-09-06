@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"path/filepath"
 	"quackitect/engine/internal/sessionlog"
 	"strings"
 	"sync"
@@ -173,6 +174,25 @@ func theNoteStandsOnTheBranch(r Roots, commit string, behind []string) map[strin
 	return same
 }
 
+// whereTheNoteIs answers the file a passed-over token was read from, written as
+// a reader would type it, and whether that file is this box's own.
+//
+// A REMEDY NAMES A FILE AND NOT A FOLDER. The stale copy is under doc/work on
+// one box and under .se/work on another, and only the first is a lag a fetch
+// closes. Where the token has no file at all, doc/work is the folder it would
+// have been in, and naming it is the closest true thing to say.
+func whereTheNoteIs(r Roots, id string) (shown string, private bool) {
+	at := noteAt(r, id)
+	if at == "" {
+		return "doc/work/" + id + ".md", false
+	}
+	shown = filepath.ToSlash(at)
+	if rel, err := filepath.Rel(r.Work, at); err == nil && !strings.HasPrefix(rel, "..") {
+		shown = filepath.ToSlash(rel)
+	}
+	return shown, strings.HasPrefix(filepath.ToSlash(at), filepath.ToSlash(LocalDir(r))+"/")
+}
+
 // behindNotice names what the queue passed over because the fetched branch has
 // archived it. It rides on every answer, work or wait, because the queue is
 // shorter either way.
@@ -180,19 +200,33 @@ func theNoteStandsOnTheBranch(r Roots, commit string, behind []string) map[strin
 // IT ONLY BLAMES A LAG IT CANNOT RULE OUT. Where the note here is the branch's
 // own note, there is no lag to close, and the answer says the branch disagrees
 // with itself instead of asking for a fetch that changes nothing.
+//
+// AND A PRIVATE COPY IS ITS OWN CASE, WITH ITS OWN REMEDY. .se/work is this
+// box's own and git carries it nowhere, so no fetch, no merge and no reset
+// moves what is stale there. Sending that reader to doc/work sends them to a
+// folder with nothing in it.
+//
+// MEASURED, September 2026. Three ids were named on every pull of a session
+// under the fetch remedy, and doc/work held none of the three. All three sat
+// under .se/work, and deleting them drained the queue at once.
 func behindNotice(r Roots, branch string, behind []string) string {
 	if len(behind) == 0 {
 		return ""
 	}
 	commit, _ := fetchedBranch(r)
 	same := theNoteStandsOnTheBranch(r, commit, behind)
-	var lagging, disagreeing []string
+	var lagging, disagreeing, ours []string
 	for _, id := range behind {
-		if same[id] {
-			disagreeing = append(disagreeing, id)
-			continue
+		at, private := whereTheNoteIs(r, id)
+		line := id + "  " + at
+		switch {
+		case private:
+			ours = append(ours, line)
+		case same[id]:
+			disagreeing = append(disagreeing, line)
+		default:
+			lagging = append(lagging, line)
 		}
-		lagging = append(lagging, id)
 	}
 	said := ""
 	if len(lagging) > 0 {
@@ -206,6 +240,12 @@ func behindNotice(r Roots, branch string, behind []string) string {
 			"holds it. So the record disagrees with itself and a fetch changes nothing. "+
 			"A person says which half is the truth: the row, or the note.",
 			strings.Join(disagreeing, "\n  "), branch)
+	}
+	if len(ours) > 0 {
+		said += fmt.Sprintf("\n\nPassed over, because %s has archived them, and the copy here is this box's own:\n  %s\n\n"+
+			"They are not open work. .se/work is private and git carries it nowhere, so nothing "+
+			"the branch does reaches them. Delete the file named beside each id, and pull again.",
+			branch, strings.Join(ours, "\n  "))
 	}
 	return said
 }

@@ -44,6 +44,7 @@
 {"id":"wk-7f9e51936d","title":"landed tests name ids","process":"trivial","disposition":"done","blob":"dcab0eed63d9edf811468c5d8c291a2726463cac","on_branch":"027d48fc864e0c7c8526950193f31aabf026dc5d"}
 {"id":"wk-819e42bec6","title":"Say why refs failed","process":"trivial","disposition":"done","blob":"5fa155bdf767d3b7c46e52eb8684b2fb71d2322f","on_branch":"949e9bdbbf1286578a05f08d93be09daae2a4d28","tag":"refs/tags/archive/wk-819e42bec6"}
 {"id":"wk-8346a2e873","title":"decideStop explains an argument","process":"trivial","disposition":"done","blob":"a2a75a2f372e4b5047ccd8e7d64d64d38b1daefd","on_branch":"f55ae397be06010d875cb8dfaf5a643cca5cbed8"}
+{"id":"wk-8419e2b852","title":"remedy names doc/work","process":"trivial","disposition":"done","blob":"614e83f2611670085c6550ca9f297a0a7a2bcad7"}
 {"id":"wk-857e0a4f99","title":"Battery answers on start","process":"standard","disposition":"done","blob":"d59cfb3e55c7c24dac178cfce887664f9d847180","on_branch":"d68536e1f5440d4960a8309f9d2ed34ee7eebbe7"}
 {"id":"wk-85d5b0ec27","title":"god silences the stop","process":"standard","disposition":"done","blob":"3f0bbe581d125d09f8760f8aa0fc4710a5ad8833","on_branch":"7dc026307c3a7447af1b3c7b53f7114770b23ff2"}
 {"id":"wk-8797959d3c","title":"Unbound stops at staffing","process":"standard","disposition":"done","blob":"bb2d133815b635775aa88af0ff8bdb1c4cabe1b1","on_branch":"d38a937058457a29f271d44c6c5134545891d5c8","tag":"refs/tags/archive/wk-8797959d3c"}
