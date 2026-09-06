@@ -57,31 +57,40 @@ func TestATakeUpWhileHeldIsRefused(t *testing.T) {
 	}
 }
 
-// A PULL WHILE FINISHING HANDS OUT THIS ACTOR'S OWN NOTES, AND NOTHING ELSE.
+// A PULL WHILE FINISHING HANDS OUT NOTHING AT ALL, NOT EVEN THIS ACTOR'S NOTE.
 //
-// The owner's rule, September 2026: an agent told to finish up works every note
-// it holds, then stops. A note is private and lives outside git, so one left on
-// a cloud box dies with it. The queue hands a note out at no other time, which
-// is why the drain rides on finishing rather than on an ordering.
-func TestAPullWhileFinishingHandsOutANoteAndNoTrackedToken(t *testing.T) {
+// IT USED TO DRAIN THE NOTES, on the owner's rule that an agent told to finish
+// up works every note it holds and then stops. That was replaced: finishing now
+// means finish the token in your hand and stop, so picking anything up is the
+// opposite of what was pressed. See the rung in Pull, which says so and cites
+// them. This test asserted the drain and went red when the drain went.
+//
+// WHAT THAT LEAVES OPEN IS NOT THIS TEST'S. NotesGoWithTheBox still refuses a
+// stop until every note is turned in, and the pull will hand none of them over,
+// so a finishing agent can neither drain nor stop. wk-c821052892 carries it.
+func TestAPullWhileFinishingHandsOutNothing(t *testing.T) {
 	t.Parallel()
 	r := aTreeWithTheProcesses(t)
 	const actor = "worker-draining"
 	mine := mintNote(t, r, "a note here")
-	tracked := mintStandard(t, r, "work the queue has")
+	mintStandard(t, r, "work the queue has")
+
+	// THE NOTE IS IN THIS ACTOR'S OWN HANDS, so what is proved below is the rule
+	// and not a note the queue would have skipped anyway.
+	ticked(t, r, mine.ID)
+	if _, err := TakeUp(r, mine.ID, actor); err != nil {
+		t.Fatal(err)
+	}
 
 	if _, err := SetHold(r, HoldFinishing, "the owner"); err != nil {
 		t.Fatal(err)
 	}
 	said := Pull(r, actor, RoleWorker, Payload{})
-	if said.Token == nil {
-		t.Fatalf("finishing handed out nothing, with a note to work: %s", said.Notice)
+	if said.Token != nil {
+		t.Fatalf("finishing handed out %s, and it hands out nothing", said.Token.ID)
 	}
-	if said.Token.ID == tracked.ID {
-		t.Fatalf("finishing handed out a tracked token: %s", said.Token.ID)
-	}
-	if said.Token.ID != mine.ID {
-		t.Fatalf("finishing handed out %s, and the note is %s", said.Token.ID, mine.ID)
+	if !strings.Contains(said.Notice, "notes included") {
+		t.Errorf("the notice does not say notes are held back too: %s", said.Notice)
 	}
 }
 
