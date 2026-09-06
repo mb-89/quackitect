@@ -64,6 +64,20 @@ frontmatter:
     # field on the token, so a take-up that was never put down left a name in a
     # file nothing reopened, and the queue answered investigate on a hold whose
     # owner had not existed for hours.
+
+    # A CLAIM IS NOT A HOLD, so these two are fields and the holder is not. A
+    # hold belongs to an agent and dies with its session. A claim belongs to a
+    # box, and it travels on the branch, which is the whole reason se claim
+    # writes it here rather than under .se. THE ENGINE WROTE BOTH AND THE SCHEMA REFUSED THEM. additionalProperties is
+    # false, so every claimed token carried two lines nothing declared, 208 of
+    # the 283 findings a schema lint over doc/work answers, over 104 tokens, and
+    # not one of them written by a token's author. See wk-e318448216.
+    claimed_by:
+      description: the box and agent holding this claim, written by se claim
+
+    claimed_at:
+      description: when that claim was written, so a stale one can lapse
+
     author:
       description: who did the work step, so the verdict is never theirs
 
