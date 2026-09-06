@@ -32,6 +32,7 @@ const icons = JSON.parse(readFileSync(join(root, "util/icons.json"), "utf8"));
 const DRAWS = [
   ["src/extension", ["editor.ts", "panel.ts"]],
   ["src/viewer", null], // every .go file, because any of them may print
+  ["src/filter", null], // the log syntax reader, which moved out of the viewer
 ];
 
 // AN ASCII GLYPH IS NOT SEARCHED FOR. The table names # and {} as column-type
