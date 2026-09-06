@@ -9,6 +9,11 @@ guidance: [[work-token]]
 title: checks lost fresh engine
 # where the token stands. The process owns these values.
 status: open
+claimed_by: aeaf7bd9/reviewer-kandinsky
+claimed_at: "2026-09-06T09:52:29Z"
+# the tree each time the work was taken up, snapshots the engine wrote
+began:
+  - cd41ecabdbcbf8258c85bfb54e47d16d87cdbc1d
 ---
 
 ## detail
@@ -21,13 +26,13 @@ That token asked for one line in src/engine/tests.go, and got it: the check's ch
 
 where origin/v4 and the local HEAD read `process.env.SE_ENGINE || join(root, ".bin", "se")`, with a paragraph above saying why. Both the preference and the paragraph are gone.
 
-That undoes wk-711bbd91ec whole. SE_ENGINE was the only way the freshly built engine reached a check that raises one of its own, and three do: engine-args.mjs, mcp-tools.mjs and drive-panel.mjs all call liveEngine. They now spawn .bin/se, the resident build, which is the failure wk-711bbd91ec was minted for. Worse, se test still builds se.fresh and still names it in the run's engine field, so the answer says the check drove the fresh engine while it drove the stale one.
+That undoes wk-711bbd91ec whole. SE_ENGINE was the only way the fresh engine reached a check that raises one of its own, and three do: engine-args.mjs, mcp-tools.mjs and drive-panel.mjs all call liveEngine. They now spawn .bin/se, the resident build, which is the failure wk-711bbd91ec was minted for. Worse, se test still names se.fresh in the run's engine field, so the answer says the check drove the fresh engine while it drove the stale one.
 
-The change is incoherent with itself too: the comment tests.go now carries ends "which is what lib/engine.mjs promises", and the promise it cites is the paragraph the same change deleted.
+The comment tests.go now carries ends "which is what lib/engine.mjs promises", and the promise it cites is the paragraph the same change deleted.
 
-Restore the two lines in engine.mjs. The tests.go half stands: clearing SE_ENGINE is what makes that fallback correct rather than a hole.
+The removal is uncommitted in the shared clone, and is not on origin/v4. A worker starting from the tip finds the two lines already there. That is the ask: the preference stays, and a test pins it, so the next hand on wk-a18983bcc5 cannot delete it again.
 
-src/engine does not build its tests in this clone, so the Go half must be watched on a worktree at the branch tip.
+src/engine does not build its tests in this clone, so the Go half must be watched on a worktree at the tip.
 
 ## done when
 
