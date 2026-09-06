@@ -30,10 +30,21 @@ func TestTheCageHasNoStateWithNoLegalMove(t *testing.T) {
 		t.Fatal("this tree wants no hands, so there is no shortfall to be caught in")
 	}
 
-	// WHAT ALWAYS PASSES: spawning, looking, pulling, stopping, speaking.
+	// WHAT ALWAYS PASSES: spawning, looking, writing, running, testing,
+	// stopping, speaking. Everything but the pull.
+	//
+	// IT WAS A LIST OF WHAT IS ALLOWED, AND IT DEADLOCKED. Anything nobody
+	// thought to name was refused, and an agent could neither work, nor look,
+	// nor pull, nor stop. So the deny side is named instead, and it is one
+	// verb: see heldDuringShortfall in staffing.go.
+	//
+	// THE OWNER'S WORDS, quoted there: even if you are bound, I do not want the
+	// agent to have to spawn subagents just because I want to talk to him.
 	for _, tool := range []string{
 		"Task", "Agent", "Read", "Grep", "WebSearch",
-		"mcp__quackitect__se_pull", "mcp__quackitect__se_stop",
+		"Write", "Edit", "mcp__quackitect__se_apply",
+		"mcp__quackitect__se_run", "mcp__quackitect__se_test",
+		"mcp__quackitect__se_stop",
 		"mcp__quackitect__se_answer", "mcp__quackitect__se_said", "mcp__quackitect__se_status",
 	} {
 		if why, refused := AStaffShortfall(r, cfg, "main", tool, ""); refused {
@@ -41,18 +52,17 @@ func TestTheCageHasNoStateWithNoLegalMove(t *testing.T) {
 		}
 	}
 
-	// WHAT IS HELD: the work itself, which is what spawning is for.
-	for _, tool := range []string{"Bash", "Write", "Edit", "mcp__quackitect__se_apply",
-		"mcp__quackitect__se_run", "mcp__quackitect__se_test"} {
+	// WHAT IS HELD: the main agent asking the queue for more work, which is
+	// what spawning is instead of.
+	for _, tool := range []string{"mcp__quackitect__se_pull", "se_pull"} {
 		if _, refused := AStaffShortfall(r, cfg, "main", tool, ""); !refused {
-			t.Errorf("%s went through during a shortfall, so the main agent does the work itself", tool)
+			t.Errorf("%s went through during a shortfall, so the main agent takes the work itself", tool)
 		}
 	}
 
-	// AND WITH NO LANE, THE SHELL IS THE LANE. A pull and a stop typed at a
-	// shell are the same two calls, and both gates have to let them by.
-	for _, command := range []string{"./.bin/se pull --actor worker-one --role worker",
-		".bin/se.exe stop --because asked", "se --answer \"on my way\""} {
+	// AND WITH NO LANE, THE SHELL IS THE LANE. A stop and an answer typed at a
+	// shell are the same calls, and both gates have to let them by.
+	for _, command := range []string{".bin/se.exe stop --because asked", "se --answer \"on my way\""} {
 		if why, refused := AStaffShortfall(r, cfg, "main", "Bash", command); refused {
 			t.Errorf("the shortfall refused %q, which is the move it is asking for: %s", command, why)
 		}
@@ -61,11 +71,23 @@ func TestTheCageHasNoStateWithNoLegalMove(t *testing.T) {
 		}
 	}
 
-	// THE ENGINE'S OWN WORK VERBS STAY HELD, so a shortfall is not walked round
-	// by typing at a shell what the lane would have refused.
-	for _, command := range []string{"./.bin/se run --on wk-1 --by main", "se apply --on wk-1"} {
+	// A SHELL PULL IS HELD, INCLUDING ONE NAMING ANOTHER HAND, and that last
+	// case is a hole rather than a rule. On a box with no lane the main agent
+	// types the spawned worker's pull, and the guard reads the caller and holds
+	// it. wk-725b3914e7 carries the fix, and this line goes back to the
+	// going-through case when it lands.
+	for _, command := range []string{"./.bin/se pull --role worker",
+		"./.bin/se pull --actor worker-one --role worker"} {
 		if _, refused := AStaffShortfall(r, cfg, "main", "Bash", command); !refused {
 			t.Errorf("%q went through a shortfall, so the shell is a way round the guard", command)
+		}
+	}
+
+	// AND THE ENGINE'S WORK VERBS AT A SHELL GO THROUGH, the way the lane's do.
+	// The shortfall is about the queue and not about writing.
+	for _, command := range []string{"./.bin/se run --on wk-1 --by main", "se apply --on wk-1"} {
+		if why, refused := AStaffShortfall(r, cfg, "main", "Bash", command); refused {
+			t.Errorf("the shortfall refused %q, which is not the queue: %s", command, why)
 		}
 	}
 

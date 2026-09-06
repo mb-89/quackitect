@@ -65,7 +65,7 @@ func TestAHandThatWentHomeIsNotAHand(t *testing.T) {
 	}
 
 	// SO THE GUARD ASKS FOR THEM AGAIN, and says how many.
-	why, refuse := AStaffShortfall(r, cfg, "main", "mcp__quackitect__se_apply", "")
+	why, refuse := AStaffShortfall(r, cfg, "main", "mcp__quackitect__se_pull", "")
 	if !refuse {
 		t.Fatalf("six tokens are open with one hand here, and nothing was refused: %+v", s)
 	}

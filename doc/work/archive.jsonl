@@ -59,6 +59,7 @@
 {"id":"wk-bdf3aaf583","title":"bad claims file empties","process":"trivial","disposition":"done","blob":"b71c4abe35d10b42535b5b1102e4a7b2e355ce36","on_branch":"aa0a5c9bb65c31e543f4fc127d46a9db3cd7b74f"}
 {"id":"wk-c456e72a75","title":"tests name minted ids","process":"trivial","disposition":"done","blob":"67a7f9d166a718606f99a4dd38ac0b13d2b6fccb","on_branch":"bc38dbed4bfd9258df54a07d9235cc57a620ae4f"}
 {"id":"wk-c5bbfb9512","title":"unbound rung strands AskToStop","process":"trivial","disposition":"done","blob":"a90cdfedcadaf22e49007847c7be032c26cd97d0"}
+{"id":"wk-c5bc8a31b0","title":"clone lags archived tokens","process":"trivial","disposition":"done","blob":"b09d08d7fc745d7d49ccdd3fd32b95c6663ceca7"}
 {"id":"wk-d303f5e1ec","title":"the claims change uncommitted","process":"trivial","disposition":"done","blob":"7d5b5bd57b81e7e5fdb7b0a466528e2909c7c64e","on_branch":"3894b5e85963908acf930e34722a9d44d6f3f376"}
 {"id":"wk-d489a63ae0","title":"mint opens without approach","process":"trivial","disposition":"done","blob":"3c9db5c48b4b00d9bf8bad5b89ef4a942a10fdaa","on_branch":"213a88266028a31489444dacfc7be0a17bb89724"}
 {"id":"wk-d5fa370ae8","title":"four tests, one rule","process":"trivial","disposition":"done","blob":"d37184c635b7929faaab4913747f35b5ffba9509"}
